@@ -71,7 +71,7 @@ global:
   running_on_vm: {{ running_on_vm }}
   initial_admin_user_login: "{{ user_login | default('') }}"
 {% if user_password is defined %}
-  initial_admin_user_password: "{{ user_password }}"
+  initial_admin_user_password: "{{ user_password | safe }}"
   account_service_mode: "setup"
 {% elif user_password is not defined %}
   initial_admin_user_password: ""
