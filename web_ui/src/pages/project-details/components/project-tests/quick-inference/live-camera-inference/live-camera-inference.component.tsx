@@ -124,9 +124,10 @@ const LiveCameraInferenceLayout = ({ shouldShowExplanation, labels }: LiveCamera
             <Grid
                 areas={['toolbar toolbar', 'camera sidebar', 'button sidebar']}
                 columns={['1fr', 'max-content']}
-                rows={['max-content', minmax('size-3400', '1fr'), 'size-1000']}
+                rows={['max-content', minmax('size-2400', '1fr'), 'size-1000']}
                 height={'100%'}
                 width={'100%'}
+                UNSAFE_className={styles.layout}
             >
                 <View gridArea={'toolbar'} UNSAFE_className={clsx({ [styles.disabled]: !isInferencedImageVisible })}>
                     <SecondaryToolbar

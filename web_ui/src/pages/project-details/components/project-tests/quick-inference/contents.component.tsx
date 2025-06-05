@@ -60,9 +60,6 @@ export const Contents = () => {
                     acceptedFormats={acceptedFormats}
                     UNSAFE_className={classes.inferenceMediaDrop}
                     multiple={isMultipleUpload}
-                    onCameraSelected={() =>
-                        navigate(`${paths.project.dataset.camera(datasetIdentifier)}?isLivePrediction=true`)
-                    }
                     dropBoxHeader={<MediaDropBoxHeader formats={acceptedFormats} isMultipleUpload={isMultipleUpload} />}
                     disableUploadButton={!hasActiveModels}
                 >
