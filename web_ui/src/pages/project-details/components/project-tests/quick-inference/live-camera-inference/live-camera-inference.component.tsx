@@ -82,10 +82,6 @@ const LiveCameraInferenceLayout = ({ shouldShowExplanation, labels }: LiveCamera
     const { image, onResetImage } = useQuickInference();
     const isInferencedImageVisible = image !== undefined;
 
-    const handleTakeNext = () => {
-        onResetImage();
-    };
-
     const handleTakePhoto = async () => {
         const screenshotUrl = webcamRef.current?.getScreenshot();
 
@@ -141,7 +137,7 @@ const LiveCameraInferenceLayout = ({ shouldShowExplanation, labels }: LiveCamera
                 <View gridArea={'button'}>
                     <Flex height={'100%'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
                         {isInferencedImageVisible ? (
-                            <Button variant='primary' onPress={handleTakeNext}>
+                            <Button variant='primary' onPress={onResetImage}>
                                 Take next
                             </Button>
                         ) : (
