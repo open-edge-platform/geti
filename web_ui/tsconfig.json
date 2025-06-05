@@ -5,8 +5,5 @@
     "tests",
     "rsbuild.config.ts",
     "dev-proxy.ts"
-  ],
-  "exclude": [
-    "./src/opencv-types/**"
   ]
 }

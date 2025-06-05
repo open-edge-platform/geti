@@ -43,7 +43,6 @@ export default [
             '**/node_modules',
             '**/*.tsx.snap',
             'src/assets\\(!/icons/**/index.ts)',
-            'src/opencv-types',
             'src/__mocks__',
             '**/dex_templates',
             '**/oauth2_proxy_templates',
@@ -192,7 +191,7 @@ export default [
             'import/no-unresolved': [
                 2,
                 {
-                    ignore: ['opencv-types', 'OpenCVTypes', '^@.*', 'csstype', 'opencv'],
+                    ignore: ['^@.*', 'csstype', 'opencv'],
                 },
             ],
 

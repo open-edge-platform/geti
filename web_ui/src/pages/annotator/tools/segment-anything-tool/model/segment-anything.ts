@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import type OpenCVTypes from 'OpenCVTypes';
+import * as OpenCVTypes from '@geti/smart-tools/opencv-types';
 
 import { AlgorithmType } from '../../../../../hooks/use-load-ai-webworker/algorithm.interface';
 import { OpenCVPreprocessorConfig } from './pre-processing';

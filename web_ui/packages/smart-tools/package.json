@@ -10,7 +10,7 @@
   },
   "exports": {
     ".": "./index.ts",
-    "./types": "./opencv-types/index.d.ts"
+    "./opencv-types": "./opencv-types/index.d.ts"
   },
   "scripts": {
     "type-check": "tsc --noEmit -p tsconfig.json",
