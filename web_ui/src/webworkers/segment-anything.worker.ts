@@ -3,6 +3,7 @@
 
 //  Dependencies get bundled into the worker
 
+import { OpenCVLoader } from '@geti/smart-tools';
 import { expose } from 'comlink';
 import type OpenCVTypes from 'OpenCVTypes';
 
@@ -11,7 +12,6 @@ import { SegmentAnythingModel } from '../pages/annotator/tools/segment-anything-
 import { SegmentAnythingPrompt } from '../pages/annotator/tools/segment-anything-tool/model/segment-anything-decoder';
 import { EncodingOutput } from '../pages/annotator/tools/segment-anything-tool/model/segment-anything-encoder';
 import { SegmentAnythingResult } from '../pages/annotator/tools/segment-anything-tool/model/segment-anything-result';
-import cv from './opencv-loader';
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -25,7 +25,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return cv(self).then((cvInstance: OpenCVTypes.cv) => {
+        return OpenCVLoader(self).then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;
