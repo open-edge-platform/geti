@@ -1,4 +1,4 @@
-{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
+{{- if .Values.global.install_telemetry_stack }}
 ---
 apiVersion: v1
 kind: Service

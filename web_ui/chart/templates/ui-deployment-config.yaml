@@ -14,7 +14,12 @@ data:
         },
         "docsUrl": "https://docs.geti.intel.com/",
         "dataPlaneUrl": null,
-        "controlPlaneUrl": null
+        "controlPlaneUrl": null,
+        {{- if .Values.global.install_telemetry_stack }}
+        "telemetryStack": "true"
+        {{- else }}
+        "telemetryStack": "false"
+        {{- end }}
     }
   admin-deployment: |
     {

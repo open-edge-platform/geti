@@ -47,7 +47,7 @@ spec:
           {{- toYaml .Values.securityContext | nindent 12 }}
           env:
             - name: GOMAXPROCS
-              value: "{{ .Values.resources.requests.cpu }}"
+              value: "1"
             - name: GOMEMLIMIT
               value: "{{ .Values.global.mem_limit }}"
             - name: WORKDIR
@@ -87,7 +87,7 @@ spec:
                 secretKeyRef:
                   name: "{{ .Release.Namespace}}-seaweed-fs"
                   key: "inference_gateway_s3_presigned_url_secret_key"
-            {{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
+            {{- if .Values.global.install_telemetry_stack }}
             - name: ENABLE_TRACING
               value: "true"
             - name: ENABLE_METRICS
@@ -125,7 +125,7 @@ spec:
             - configMapRef:
                 name: {{ .Release.Namespace }}-s3-bucket-names
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+            {{ toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - mountPath: {{ .Values.mountPath }}
               name: data-storage

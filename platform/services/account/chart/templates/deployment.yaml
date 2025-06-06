@@ -45,11 +45,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           resources:
-            {{- if (eq .Values.global.installation_profile "lite") }}
-              {{ toYaml .Values.liteResources | nindent 12 }}
-            {{- else }}
-              {{ toYaml .Values.standardResources | nindent 12 }}
-            {{- end }}
+            {{ toYaml .Values.resources | nindent 12 }}
           livenessProbe:
             tcpSocket:
               port: {{ .Values.service.ports.http }}
@@ -214,7 +210,7 @@ spec:
                   key: "accountservice_presigned_url_secret_key"
             {{- end }}
             # OTEL variables
-            {{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
+            {{- if .Values.global.install_telemetry_stack }}
             - name: ENABLE_TRACING
               value: "false"
             - name: ENABLE_METRICS

@@ -14,7 +14,6 @@ class TestProductInfoRESTEndpoint:
         mock_smtp_host = "10.10.10.10"
         mock_intel_email = "test@intel.com"
         endpoint = "/api/v1/product_info"
-        mock_installation_profile = "standard"
 
         # Act
         with (
@@ -24,7 +23,6 @@ class TestProductInfoRESTEndpoint:
                     "PLATFORM_VERSION": mock_platform_version,
                     "BUILD_VERSION": mock_build_version,
                     "INTEL_EMAIL": mock_intel_email,
-                    "INSTALLATION_PROFILE": mock_installation_profile,
                 },
             ),
             patch(
@@ -57,7 +55,6 @@ class TestProductInfoRESTEndpoint:
             "grafana_enabled": False,
             "environment": "on-prem",
             "gpu-provider": "intel",
-            "installation-profile": mock_installation_profile,
         }
 
         # Act
@@ -68,7 +65,6 @@ class TestProductInfoRESTEndpoint:
                     "PLATFORM_VERSION": mock_platform_version,
                     "BUILD_VERSION": mock_build_version,
                     "INTEL_EMAIL": mock_intel_email,
-                    "INSTALLATION_PROFILE": mock_installation_profile,
                 },
             ),
             patch(
@@ -101,7 +97,6 @@ class TestProductInfoRESTEndpoint:
             "grafana_enabled": True,
             "environment": "saas",
             "gpu-provider": "none",
-            "installation-profile": mock_installation_profile,
         }
 
     def test_sc_product_info_endpoint_project_file_not_found(self, fxt_resource_rest):
@@ -110,7 +105,6 @@ class TestProductInfoRESTEndpoint:
         mock_build_version = "1.2.3-unittest"
         mock_intel_email = "test@intel.com"
         endpoint = "/api/v1/product_info"
-        mock_installation_profile = "standard"
 
         # Act
         # Test that when the smtp_host file is not found, no exception is raised
@@ -121,7 +115,6 @@ class TestProductInfoRESTEndpoint:
                     "PLATFORM_VERSION": mock_platform_version,
                     "BUILD_VERSION": mock_build_version,
                     "INTEL_EMAIL": mock_intel_email,
-                    "INSTALLATION_PROFILE": mock_installation_profile,
                 },
             ),
             patch(
@@ -154,5 +147,4 @@ class TestProductInfoRESTEndpoint:
             "grafana_enabled": True,
             "environment": "on-prem",
             "gpu-provider": "nvidia",
-            "installation-profile": mock_installation_profile,
         }

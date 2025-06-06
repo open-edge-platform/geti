@@ -18,8 +18,8 @@ ingress:
 
 resources:
   requests:
-    cpu: 500m
-    memory: 800Mi
+    cpu: 200m
+    memory: 400Mi
   limits:
     memory: 800Mi
 

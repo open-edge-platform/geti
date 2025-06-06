@@ -24,8 +24,8 @@ ingress:
 
 resources:
   requests:
-    cpu: '1'
-    memory: 1Gi
+    cpu: 300m
+    memory: 500Mi
   limits:
     memory: 1Gi # if you change this value, remember to update 'global.mem_limit' too
 

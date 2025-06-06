@@ -18,14 +18,7 @@ initResources:
   limits:
     memory: 100Mi
 
-standardResources:
-  requests:
-    cpu: 100m
-    memory: 400Mi
-  limits:
-    memory: 512Mi
-
-liteResources:
+resources:
   requests:
     cpu: 100m
     memory: 120Mi
