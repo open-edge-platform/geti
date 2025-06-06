@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, LoadingIndicator, Text } from '@geti/ui';
+import { Flex, Loading, Text } from '@geti/ui';
 
 import {
     ProjectImportBase,
@@ -38,7 +38,7 @@ export const ProjectImportStatus = ({ importItem }: ProjectImportStatusProps) =>
                 }
             />
             <Flex gap={'size-100'} alignItems='center' UNSAFE_className={classes.importContent}>
-                <LoadingIndicator size={'S'} marginEnd={'size-200'} />
+                <Loading mode='inline' size={'S'} marginEnd={'size-200'} />
                 <Flex gap='size-400' flex={1}>
                     <Text>Uploading...</Text>
                     <Flex flex={1} justifyContent={'end'} gap='size-250'>

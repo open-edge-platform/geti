@@ -4,7 +4,7 @@
 import { useState } from 'react';
 
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
-import { Flex } from '@geti/ui';
+import { Flex, Loading } from '@geti/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 
 import { PredictionMode } from '../../../../../../core/annotations/services/prediction-service.interface';
@@ -36,7 +36,6 @@ import { useLoadImageQuery } from '../../../../../annotator/providers/selected-m
 import { usePredictionsQuery } from '../../../../../annotator/providers/selected-media-item-provider/use-predictions-query.hook';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
 import { DetailsPreviewHeader } from '../../../common/details-preview-header/details-preview-header.component';
-import { LoadingOverlay } from '../../../project-media/loading-overlay.component';
 import { AnnotatorProviders } from '../../../project-test/test-details-preview/annotator-providers.component';
 import { TrainingDatasetVideoPlayer } from './training-dataset-video-player.component';
 
@@ -154,7 +153,7 @@ export const TrainingDatasetDetailsPreview = ({
                             disableActionModes={!isActive && !isVisualPrompt}
                         />
                         <Flex direction='column' height='100%' position='relative' minHeight={0}>
-                            <LoadingOverlay visible={isLoading && isPredictionsEnabled} />
+                            {isLoading && isPredictionsEnabled && <Loading mode='overlay' />}
 
                             <PreviewCanvasContent
                                 annotations={annotations}

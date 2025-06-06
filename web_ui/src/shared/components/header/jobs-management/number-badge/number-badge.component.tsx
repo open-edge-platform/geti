@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { LoadingIndicator, Text, useNumberFormatter, View, type StyleProps, type ViewProps } from '@geti/ui';
+import { Loading, Text, useNumberFormatter, View, type StyleProps, type ViewProps } from '@geti/ui';
 
 import classes from './number-badge.module.scss';
 
@@ -47,7 +47,7 @@ export const NumberBadge = ({
     const formatter = useNumberFormatter({ notation: 'compact' });
 
     if (isPending || jobsNumber === null) {
-        return <LoadingIndicator size={'S'} />;
+        return <Loading mode='inline' size={'S'} />;
     }
 
     return (

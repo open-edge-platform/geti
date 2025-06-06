@@ -9,7 +9,7 @@ import {
     Divider,
     Flex,
     Heading,
-    LoadingIndicator,
+    Loading,
     Tooltip,
     TooltipTrigger,
     View,
@@ -52,7 +52,7 @@ const ActiveLearningConfigurationDialog = ({ selectedTask }: { selectedTask: Tas
                 {isLoadingData ? (
                     <View height='size-1600'>
                         <Flex height='100%' alignItems='center' justifyContent={'center'}>
-                            <LoadingIndicator />
+                            <Loading mode='inline' />
                         </Flex>
                     </View>
                 ) : (

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, LoadingIndicator, Switch, Text, Tooltip, TooltipTrigger, useMediaQuery, View } from '@geti/ui';
+import { Divider, Flex, Loading, Switch, Text, Tooltip, TooltipTrigger, useMediaQuery, View } from '@geti/ui';
 import { RightClick } from '@geti/ui/icons';
 import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
@@ -50,7 +50,7 @@ export const SecondaryToolbar = () => {
                     </>
                 )}
 
-                <LoadingIndicator size={'S'} />
+                <Loading mode='inline' size={'S'} />
                 <Text>{isLoading ? 'Loading image model' : 'Extracting image features'}</Text>
             </Flex>
         );

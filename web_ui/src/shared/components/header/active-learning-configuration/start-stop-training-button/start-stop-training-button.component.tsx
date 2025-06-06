@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { Button, LoadingIndicator } from '@geti/ui';
+import { Button, Loading } from '@geti/ui';
 import { head } from 'lodash-es';
 
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
@@ -56,7 +56,7 @@ export const ToggleTrainingButton = ({
                     isDisabled={trainModel.isPending || isAutotraining}
                     id={`start-training-${idMatchingFormat(task.title)}`}
                 >
-                    {trainModel.isPending && <LoadingIndicator size={'S'} marginX={'size-100'} />}
+                    {trainModel.isPending && <Loading mode='inline' size={'S'} marginX={'size-100'} />}
                     Start training now
                 </Button>
             )}
@@ -68,7 +68,7 @@ export const ToggleTrainingButton = ({
                     onPress={() => setIsCancelDialogOpen(true)}
                     id={`stop-training-${idMatchingFormat(task.title)}`}
                 >
-                    {useCancelJob.isPending && <LoadingIndicator size={'S'} marginX={'size-100'} />}
+                    {useCancelJob.isPending && <Loading mode='inline' size={'S'} marginX={'size-100'} />}
                     Stop training
                 </Button>
             )}

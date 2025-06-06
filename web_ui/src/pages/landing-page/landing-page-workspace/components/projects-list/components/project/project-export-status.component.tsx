@@ -5,7 +5,7 @@ import { Dispatch, FC, SetStateAction, useEffect } from 'react';
 
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { WorkspaceIdentifier } from '@geti/core/src/workspaces/services/workspaces.interface';
-import { Button, ButtonGroup, Flex, LoadingIndicator, Text, View } from '@geti/ui';
+import { Button, ButtonGroup, Flex, Loading, Text, View } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ExportStatusStateDTO } from '../../../../../../../core/configurable-parameters/dtos/configurable-parameters.interface';
@@ -152,7 +152,7 @@ export const ProjectExportStatus: FC<ProjectExportStatusProps> = ({
                             <JobProgress idPrefix={`${projectId}-export-project-progress`} step={jobActiveStep} />
                         ) : (
                             <Flex alignItems={'center'} gap={'size-100'}>
-                                <LoadingIndicator size={'S'} />
+                                <Loading mode='inline' size={'S'} />
                                 <Text width={'size-3000'}>Exporting project</Text>
                             </Flex>
                         )}

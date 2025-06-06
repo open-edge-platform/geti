@@ -3,7 +3,7 @@
 
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
-import { ActionButton, Flex, LoadingIndicator, TextField, TextFieldRef } from '@geti/ui';
+import { ActionButton, Flex, Loading, TextField, TextFieldRef } from '@geti/ui';
 import { Edit } from '@geti/ui/icons';
 
 import { useProjectActions } from '../../../../../core/projects/hooks/use-project-actions.hook';
@@ -125,7 +125,7 @@ export const ProjectNameDomain = ({
                                 aria-label={'Edit project name field'}
                             />
                             {editProjectMutation.isPending ? (
-                                <LoadingIndicator marginStart={'size-75'} size={'S'} />
+                                <Loading mode='inline' marginStart={'size-75'} size={'S'} />
                             ) : (
                                 <></>
                             )}

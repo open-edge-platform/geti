@@ -1,32 +1,122 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { View } from '@adobe/react-spectrum';
+import { DimensionValue, Flex, ProgressCircle, View } from '@adobe/react-spectrum';
 import { SpectrumProgressCircleProps } from '@react-types/progress';
+import { BoxAlignmentStyleProps, StyleProps } from '@react-types/shared';
+import { Responsive } from '@react-types/shared/src/style';
 
-import { LoadingIndicator } from './loading-indicator.component';
+/**
+ * Props for the Loading component.
+ *
+ * Extends Adobe Spectrum's ProgressCircle props along with styling and alignment props
+ * to provide a flexible loading indicator suitable for various use cases.
+ */
+interface LoadingProps extends SpectrumProgressCircleProps, StyleProps, BoxAlignmentStyleProps {
+    /**
+     * The display mode for the loading component.
+     * - 'inline': Renders as an inline element without overlay positioning
+     * - 'fullscreen': Renders as a full-screen overlay with default background
+     * - 'overlay': Renders as a positioned overlay with modal background
+     * @default 'fullscreen'
+     */
+    mode?: 'inline' | 'fullscreen' | 'overlay';
 
-import classes from './loading.module.scss';
+    /**
+     * Height of the spinner container (not the overlay itself).
+     * @default '100%'
+     */
+    height?: Responsive<DimensionValue>;
 
-interface LoadingProps extends Partial<SpectrumProgressCircleProps> {
-    overlay?: boolean;
+    /**
+     * Height of the overlay container when in fullscreen or overlay mode.
+     * @default '100%'
+     */
+    overlayHeight?: Responsive<DimensionValue>;
+
     id?: string;
+    backgroundColor?: string;
+    className?: string;
+    paddingTop?: Responsive<DimensionValue>;
 }
 
-export const Loading = ({ overlay = false, id, ...rest }: LoadingProps): JSX.Element => {
+/**
+ * A flexible loading component that can display a progress circle in different modes.
+ *
+ * This component consolidates various loading patterns used throughout the application:
+ * - Inline loading indicators
+ * - Full-screen loading overlays
+ * - Modal-style loading overlays
+ *
+ * The component automatically handles positioning, background colors, and accessibility
+ * attributes based on the selected mode.
+ *
+ * @example
+ * ```tsx
+ * // Simple inline loading spinner
+ * <Loading mode="inline" size="M" />
+ *
+ * // Full-screen overlay with custom background
+ * <Loading mode="overlay" backgroundColor="rgba(0,0,0,0.5)" />
+ *
+ * // Conditional loading overlay
+ * {isLoading && <Loading mode="overlay" />}
+ * ```
+ *
+ * @param props - The component props
+ * @returns A loading component with progress circle
+ */
+export const Loading = ({
+    mode = 'fullscreen',
+    size = 'L',
+    height = '100%',
+    overlayHeight = '100%',
+    id,
+    backgroundColor,
+    className,
+    alignItems = 'center',
+    justifyContent = 'center',
+    paddingTop,
+    marginTop,
+    left = 0,
+    right = 0,
+    top = 0,
+    bottom = 0,
+    ...rest
+}: LoadingProps): JSX.Element => {
+    const spinner = (
+        <Flex alignItems={alignItems} justifyContent={justifyContent} height={height}>
+            <ProgressCircle aria-label={'Loading...'} isIndeterminate size={size} {...rest} />
+        </Flex>
+    );
+
+    if (mode === 'inline') {
+        return spinner;
+    }
+
     return (
         <View
-            height={'100%'}
+            height={overlayHeight}
             position={'absolute'}
-            left={0}
-            top={0}
-            right={0}
-            bottom={0}
+            left={left}
+            right={right}
+            top={top}
+            bottom={bottom}
+            zIndex={mode === 'overlay' ? 20 : undefined}
+            paddingTop={paddingTop}
+            marginTop={marginTop}
             id={id}
             data-testid={id}
-            UNSAFE_className={overlay ? classes.loadingBackground : ''}
+            UNSAFE_style={{
+                cursor: 'default',
+                // Use modal overlay background for overlay mode, or custom/default background for fullscreen
+                backgroundColor:
+                    backgroundColor ||
+                    (mode === 'overlay' ? 'var(--spectrum-alias-background-color-modal-overlay)' : 'gray-50'),
+            }}
+            UNSAFE_className={className}
         >
-            <LoadingIndicator {...rest} />
+            {spinner}
         </View>
     );
 };

@@ -3,7 +3,7 @@
 
 import { FC, PropsWithChildren, useRef } from 'react';
 
-import { ActionButton, Divider, Flex, LoadingIndicator, Text, View } from '@geti/ui';
+import { ActionButton, Divider, Flex, Loading, Text, View } from '@geti/ui';
 import { Alert, InfoOutline } from '@geti/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { useParams } from 'react-router-dom';
@@ -51,7 +51,7 @@ interface DatasetImportPanelProps {
 
 const StatusIcon = ({ datasetImportItem }: { datasetImportItem: DatasetImportItem }): JSX.Element => {
     if (isUploadingStatus(datasetImportItem)) {
-        return <LoadingIndicator size={'S'} />;
+        return <Loading mode='inline' size={'S'} />;
     }
 
     if (isErrorStatus(datasetImportItem)) {

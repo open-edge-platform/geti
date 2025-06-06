@@ -3,7 +3,7 @@
 
 import { useRef, useState } from 'react';
 
-import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Heading, LoadingIndicator, View } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Heading, Loading, View } from '@geti/ui';
 
 import { LabeledVideoRange } from '../../../../core/annotations/labeled-video-range.interface';
 import { MEDIA_TYPE } from '../../../../core/media/base-media.interface';
@@ -124,7 +124,7 @@ export const VideoPlayerDialog = ({
 
             {rangesQuery.isFetching ? (
                 <Content UNSAFE_style={{ overflowY: 'visible' }} height='size-4600'>
-                    <LoadingIndicator />
+                    <Loading mode='inline' />
                 </Content>
             ) : (
                 <Content UNSAFE_style={{ overflowY: 'visible' }}>
@@ -162,7 +162,7 @@ export const VideoPlayerDialog = ({
                     Cancel
                 </Button>
                 <Button variant='accent' onPress={handleSaveSelection} isDisabled={!undoRedoState.canUndo}>
-                    {rangesMutation.isPending ? <LoadingIndicator size='S' marginEnd='size-100' /> : <></>}
+                    {rangesMutation.isPending ? <Loading mode='inline' size='S' marginEnd='size-100' /> : <></>}
                     Save ranges
                 </Button>
             </ButtonGroup>

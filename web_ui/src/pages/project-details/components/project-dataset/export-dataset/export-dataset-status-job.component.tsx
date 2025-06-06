@@ -3,7 +3,7 @@
 
 import { FC, ReactNode, useState } from 'react';
 
-import { Divider, Flex, Heading, LoadingIndicator, Text, View } from '@geti/ui';
+import { Divider, Flex, Heading, Loading, Text, View } from '@geti/ui';
 
 import { getJobActiveStep } from '../../../../../core/jobs/utils';
 import { DatasetIdentifier, ExportDatasetLSData, ExportFormats } from '../../../../../core/projects/dataset.interface';
@@ -95,7 +95,7 @@ export const ExportDatasetStatusJob = ({
             >
                 <View padding={'size-200'}>
                     <Flex alignItems={'center'} gap={'size-200'}>
-                        <LoadingIndicator size={'S'} />
+                        <Loading mode='inline' size={'S'} />
                         <Text>Dataset - Processing data, please wait...</Text>
                     </Flex>
                 </View>
