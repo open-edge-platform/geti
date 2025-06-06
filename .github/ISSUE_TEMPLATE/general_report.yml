@@ -1,5 +1,5 @@
 name: 📝 General Issue
-description: Report a bug, request a feature, or suggest an enhancement
+description: Report a bug, request documentation updates, or ask a general question
 title: "[<type>] <short description>"
 labels: []
 assignees: []
@@ -12,9 +12,7 @@ body:
       description: What type of issue is this?
       options:
         - Bug 🐞
-        - Feature Request ✨
         - Documentation 📚
-        - Other❓
     validations:
       required: true
 
