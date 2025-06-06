@@ -24,12 +24,13 @@ import {
     RevisitLabel,
 } from '../../labels/label.interface';
 import {
-    filterOutEmptyLabel,
+    filterOutEmptyAndBackgroundLabel,
     getBehaviourFromDTO,
     getFlattenedItems,
     getFlattenedLabels,
     GROUP_SEPARATOR,
     isAnomalous,
+    isBackgroundLabel,
     isEmptyLabel,
 } from '../../labels/utils';
 import { DOMAIN } from '../core.interface';
@@ -68,7 +69,7 @@ import {
 import { getTaskTypeFromDomain, isKeypointTask } from '../utils';
 
 const getRevisitLabel = (label: RevisitLabelDTO, domain: DOMAIN): RevisitLabel => {
-    const { name, color, group, parent_id, hotkey, revisit_affected_annotations, id, is_empty } = label;
+    const { name, color, group, parent_id, hotkey, revisit_affected_annotations, id, is_empty, is_background } = label;
     const behaviour = getBehaviourFromDTO(label, domain);
 
     return {
@@ -81,6 +82,7 @@ const getRevisitLabel = (label: RevisitLabelDTO, domain: DOMAIN): RevisitLabel =
         behaviour,
         revisitAffectedAnnotations: revisit_affected_annotations,
         isEmpty: is_empty,
+        isBackground: is_background ?? false,
     };
 };
 
@@ -90,7 +92,7 @@ const getRevisitLabel = (label: RevisitLabelDTO, domain: DOMAIN): RevisitLabel =
 // Keeping in mind that model-labels don't have any functionality but render the tree-view,
 // this helper is a straightforward solution.
 export const getRawNewLabel = (label: LabelDTO): Label => {
-    const { id, name, color, group, parent_id, is_empty } = label;
+    const { id, name, color, group, parent_id, is_empty, is_background } = label;
 
     return {
         id,
@@ -101,11 +103,12 @@ export const getRawNewLabel = (label: LabelDTO): Label => {
         behaviour: is_empty ? LABEL_BEHAVIOUR.EXCLUSIVE : LABEL_BEHAVIOUR.LOCAL,
         parentLabelId: parent_id || null,
         isEmpty: is_empty,
+        isBackground: is_background ?? false,
     };
 };
 
 const getDeletedLabel = (label: DeletedLabelDTO, domain: DOMAIN): DeletedLabel => {
-    const { name, color, group, parent_id, hotkey, is_deleted, id, is_empty } = label;
+    const { name, color, group, parent_id, hotkey, is_deleted, id, is_empty, is_background } = label;
     const behaviour = getBehaviourFromDTO(label, domain);
 
     return {
@@ -118,11 +121,12 @@ const getDeletedLabel = (label: DeletedLabelDTO, domain: DOMAIN): DeletedLabel =
         behaviour,
         isDeleted: is_deleted,
         isEmpty: is_empty,
+        isBackground: is_background ?? false,
     };
 };
 
 const getLabel = (label: LabelDTO, domain: DOMAIN): Label => {
-    const { id, name, color, group, parent_id, hotkey, is_empty } = label;
+    const { id, name, color, group, parent_id, hotkey, is_empty, is_background } = label;
     const behaviour = getBehaviourFromDTO(label, domain);
 
     return {
@@ -134,6 +138,7 @@ const getLabel = (label: LabelDTO, domain: DOMAIN): Label => {
         hotkey,
         behaviour,
         isEmpty: is_empty,
+        isBackground: is_background ?? false,
     };
 };
 
@@ -235,21 +240,39 @@ const getCommonTaskStructure = (task: TaskDTO, domain: DOMAIN) => {
 
         return getLabel(label, domain);
     });
-    const emptyLabel = labels.find(isEmptyLabel);
 
     // NOTE: creation of tree transform Label to LabelTreeViewLabel, we have to translate to Label again
     const labelsSortedByStructure: LabelTreeLabelProps[] = getFlattenedLabels(
-        fetchLabelsTree(filterOutEmptyLabel(labels))
+        fetchLabelsTree(filterOutEmptyAndBackgroundLabel(labels))
     );
 
     const commonStructure = {
         id: task.id,
         title: task.title,
         domain,
-        labels: emptyLabel === undefined ? labelsSortedByStructure : [...labelsSortedByStructure, emptyLabel],
+        labels: [...labelsSortedByStructure, ...getEmptyAndBackgroundLabels(labels)],
     };
 
     return commonStructure;
+};
+
+const getEmptyAndBackgroundLabels = (labels: Label[]) => {
+    const emptyLabel = labels.find(isEmptyLabel);
+    const backgroundLabel = labels.find(isBackgroundLabel);
+
+    if (emptyLabel && backgroundLabel) {
+        return [emptyLabel, backgroundLabel];
+    }
+
+    if (backgroundLabel) {
+        return [backgroundLabel];
+    }
+
+    if (emptyLabel) {
+        return [emptyLabel];
+    }
+
+    return [];
 };
 
 const isKeypointType = (otherTask: TaskDTO | KeypointTaskDTO): otherTask is KeypointTaskDTO => {
@@ -320,7 +343,7 @@ export const getProjectEntity = (serverProject: ProjectDTO, router = API_URLS): 
 };
 
 const getLabelDTO = (label: EditedLabel): EditedLabelDTO => {
-    const { name, color, group, parentLabelId, hotkey, isEmpty } = label;
+    const { name, color, group, parentLabelId, hotkey, isEmpty, isBackground } = label;
 
     const common = {
         name,
@@ -329,6 +352,7 @@ const getLabelDTO = (label: EditedLabel): EditedLabelDTO => {
         hotkey,
         parent_id: parentLabelId,
         is_empty: isEmpty,
+        is_background: isBackground,
         is_anomalous: isAnomalous(label),
     };
 

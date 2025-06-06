@@ -7,10 +7,11 @@ interface LabelCommon {
     group: string;
     hotkey?: string;
     is_empty: boolean;
+    is_background: boolean;
     parent_id: string | null;
 }
 
-export type LabelCreation = Omit<LabelCommon, 'is_empty'>;
+export type LabelCreation = Omit<LabelCommon, 'is_empty' | 'is_background'>;
 
 export interface LabelDTO extends LabelCommon {
     id: string;

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { negate } from 'lodash-es';
+import { negate, overSome } from 'lodash-es';
 
 import { idMatchingFormat } from '../../test-utils/id-utils';
 import { AnnotationLabel } from '../annotations/annotation.interface';
@@ -61,9 +61,31 @@ export const isAnomalous = <T extends { behaviour: LABEL_BEHAVIOUR }>(label: T):
     return Boolean(label.behaviour & LABEL_BEHAVIOUR.ANOMALOUS);
 };
 
-export const isEmptyLabel = <T extends { isEmpty: boolean }>(label: T): boolean => label.isEmpty;
+export const isBackgroundBehavior = <T extends { behaviour: LABEL_BEHAVIOUR }>(label: T): boolean => {
+    return Boolean(label.behaviour & LABEL_BEHAVIOUR.BACKGROUND);
+};
 
-export const filterOutEmptyLabel = (labels: readonly Label[]): readonly Label[] => labels.filter(negate(isEmptyLabel));
+interface EmptyOrBackground {
+    isEmpty: boolean;
+    isBackground: boolean;
+    behaviour: LABEL_BEHAVIOUR;
+}
+
+export const isEmptyLabel = <T extends EmptyOrBackground>(label: T): boolean => label.isEmpty;
+export const isNonEmptyLabel = negate(isEmptyLabel);
+
+export const isBackgroundLabel = <T extends EmptyOrBackground>(label: T): boolean => {
+    return isBackgroundBehavior(label) && label.isBackground;
+};
+
+export const isNonBackgroundLabel = negate(isBackgroundLabel);
+
+export const isEmptyOrBackgroundLabel = overSome([isEmptyLabel, isBackgroundLabel]);
+
+export const filterOutEmptyLabel = (labels: readonly Label[]): readonly Label[] => labels.filter(isNonEmptyLabel);
+
+export const filterOutEmptyAndBackgroundLabel = (labels: readonly Label[]): readonly Label[] =>
+    labels.filter((label) => isNonEmptyLabel(label) && isNonBackgroundLabel(label));
 
 // Predictions come from a model but are not yet accepted (userId).
 export const isPrediction = (label?: AnnotationLabel) =>
@@ -100,6 +122,10 @@ export const getBehaviourFromDTO = (
         return LABEL_BEHAVIOUR.GLOBAL;
     }
 
+    if (label.is_background) {
+        return LABEL_BEHAVIOUR.BACKGROUND;
+    }
+
     return LABEL_BEHAVIOUR.LOCAL;
 };
 
@@ -131,11 +157,12 @@ export const getNewLabelPayload = (label: LabelTreeLabelProps, revisit: boolean)
         parentLabelId,
         behaviour,
         isEmpty: false,
+        isBackground: false,
     };
 };
 
 export const getDeletedLabelPayload = (label: LabelTreeLabelProps): DeletedLabel => {
-    const { name, color, hotkey, group, behaviour, parentLabelId, id, isEmpty } = label;
+    const { name, color, hotkey, group, behaviour, parentLabelId, id, isEmpty, isBackground } = label;
 
     return {
         id,
@@ -147,11 +174,12 @@ export const getDeletedLabelPayload = (label: LabelTreeLabelProps): DeletedLabel
         behaviour,
         isDeleted: true,
         isEmpty,
+        isBackground,
     };
 };
 
 export const getLabelPayload = (label: LabelTreeLabelProps): Label => {
-    const { id, name, color, hotkey, group, parentLabelId, behaviour, isEmpty } = label;
+    const { id, name, color, hotkey, group, parentLabelId, behaviour, isEmpty, isBackground } = label;
 
     return {
         id,
@@ -162,6 +190,7 @@ export const getLabelPayload = (label: LabelTreeLabelProps): Label => {
         parentLabelId,
         behaviour,
         isEmpty,
+        isBackground,
     };
 };
 
