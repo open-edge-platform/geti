@@ -8,9 +8,7 @@ type TaskLabelsCreationTreeProps = Omit<EditableTreeViewProps, 'type' | 'isInEdi
 
 export const TaskLabelsCreationTree = ({
     labelsTree,
-    deleteItem,
-    addChild,
-    save,
+    actions,
     domains,
     isHierarchicalMode,
     projectLabels,
@@ -22,12 +20,10 @@ export const TaskLabelsCreationTree = ({
             projectLabels={projectLabels}
             type={Readonly.NO}
             isHierarchicalMode={isHierarchicalMode}
-            addChild={addChild}
-            deleteItem={deleteItem}
+            actions={actions}
             domains={domains}
             isInEditMode={true}
             options={{ newTree: true }}
-            save={save}
             setValidationError={setValidationError}
         />
     );

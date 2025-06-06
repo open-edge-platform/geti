@@ -9,7 +9,14 @@ import { providersRender as render } from '../../../test-utils/required-provider
 import { FlatTreeView } from './flat-tree-view.component';
 
 describe('FlatTreeView', () => {
-    it('Check if new labels are shown on the top - reversed order', async () => {
+    const actions = {
+        save: jest.fn(),
+        addChild: jest.fn(),
+        deleteItem: jest.fn(),
+        reorder: jest.fn(),
+    };
+
+    it('Check if new labels are shown on the top', async () => {
         const labels = [
             getMockedTreeLabel({ name: 'Label 1' }),
             getMockedTreeLabel({ name: 'Label 2' }),
@@ -19,9 +26,7 @@ describe('FlatTreeView', () => {
         render(
             <FlatTreeView
                 labels={labels}
-                save={jest.fn()}
-                addChild={jest.fn()}
-                deleteItem={jest.fn()}
+                actions={actions}
                 isEditable={false}
                 domains={[DOMAIN.CLASSIFICATION]}
                 projectLabels={labels}
@@ -32,8 +37,8 @@ describe('FlatTreeView', () => {
 
         const treeItems = screen.getAllByRole('listitem');
 
-        expect(treeItems[0]).toHaveTextContent('Label 3');
+        expect(treeItems[0]).toHaveTextContent('Label 1');
         expect(treeItems[1]).toHaveTextContent('Label 2');
-        expect(treeItems[2]).toHaveTextContent('Label 1');
+        expect(treeItems[2]).toHaveTextContent('Label 3');
     });
 });

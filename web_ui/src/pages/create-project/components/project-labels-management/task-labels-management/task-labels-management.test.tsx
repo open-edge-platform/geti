@@ -271,8 +271,8 @@ describe('Task label management', () => {
             rerender(<Labels />);
             addLabel('test 2');
 
-            expect(allLabels[0].name).toBe(labelName);
-            expect(allLabels[1].name).toBe('test 2');
+            expect(allLabels[0].name).toBe('test 2');
+            expect(allLabels[1].name).toBe(labelName);
             expect((allLabels[0] as LabelTreeLabelProps).group).toBe(
                 `${DOMAIN.DETECTION} labels${GROUP_SEPARATOR}${allLabels[0].name}`
             );

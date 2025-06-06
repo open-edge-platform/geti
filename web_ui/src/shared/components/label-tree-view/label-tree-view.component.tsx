@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { isEmpty, noop } from 'lodash-es';
+import { isEmpty } from 'lodash-es';
 
 import {
     CommonTreeViewProps,
@@ -18,16 +18,7 @@ import { FlatTreeView } from './flat-tree-view.component';
 import { HierarchicalTreeView } from './hierarchical-tree-view.component';
 
 export const LabelTreeView = (props: LabelsTreeViewProps): JSX.Element => {
-    const {
-        type,
-        labelsTree,
-        save = noop,
-        addChild = noop,
-        deleteItem = noop,
-        domains = [],
-        projectLabels = labelsTree,
-        options,
-    } = props;
+    const { type, labelsTree, actions, domains = [], projectLabels = labelsTree, options } = props;
     const isEditable = type === Readonly.NO ? props.isInEditMode : false;
     const setLabelsValidationError = type === Readonly.NO ? props.setValidationError : false;
     const [treeItemsValidationErrors, setTreeItemsValidationErrors] = useState<Record<string, Record<string, string>>>(
@@ -70,22 +61,19 @@ export const LabelTreeView = (props: LabelsTreeViewProps): JSX.Element => {
             });
     };
 
-    const saveHandler = (editedLabel?: LabelTreeItem, oldId?: string) => {
-        save(editedLabel, oldId);
-    };
-
     const deleteItemHandler = (deletedItem: LabelTreeItem) => {
         // Clear validation errors from deleted item
         setLabelValidationError(deletedItem.id, {});
-        deleteItem(deletedItem);
+        actions.deleteItem(deletedItem);
     };
 
     const parameters: CommonTreeViewProps = {
-        labels: labelsTree,
+        treeItems: labelsTree,
         isEditable,
-        save: saveHandler,
-        deleteItem: deleteItemHandler,
-        addChild,
+        actions: {
+            ...actions,
+            deleteItem: deleteItemHandler,
+        },
         projectLabels,
         domains,
         treeValidationErrors: treeItemsValidationErrors,
