@@ -2091,7 +2091,7 @@ wheels = [
 [[package]]
 name = "otx"
 version = "2.5.0.dev0"
-source = { git = "https://github.com/open-edge-platform/training_extensions.git?rev=feature-v3#be964f5e06d7498913589318c957a7910b128cfb" }
+source = { git = "https://github.com/open-edge-platform/training_extensions.git?branch=feature-v3#be964f5e06d7498913589318c957a7910b128cfb" }
 dependencies = [
     { name = "anomalib", extra = ["core"] },
     { name = "datumaro" },
@@ -2158,7 +2158,7 @@ requires-dist = [
     { name = "minio", specifier = "~=7.1.0" },
     { name = "mlflow", specifier = "==2.19.0" },
     { name = "numpy", specifier = "==1.26.4" },
-    { name = "otx", extras = ["base"], git = "https://github.com/open-edge-platform/training_extensions.git?rev=feature-v3" },
+    { name = "otx", extras = ["base"], git = "https://github.com/open-edge-platform/training_extensions.git?branch=feature-v3" },
     { name = "requests", specifier = "==2.32.3" },
     { name = "torchmetrics", specifier = "<1.7.0" },
     { name = "tqdm", specifier = "==4.67.1" },

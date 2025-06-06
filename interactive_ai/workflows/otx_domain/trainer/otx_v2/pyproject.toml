@@ -10,7 +10,7 @@ dependencies = [
     "numpy==1.26.4",
     "requests==2.32.3",
     "tqdm==4.67.1",
-    "otx[base] @ git+https://github.com/open-edge-platform/training_extensions.git@feature-v3",
+    "otx[base]",
     "geti-kafka-tools",
     "geti-telemetry-tools[telemetry,kafka]",
     "torchmetrics<1.7.0",
@@ -19,6 +19,7 @@ dependencies = [
 [tool.uv.sources]
 geti-kafka-tools = { path = "../../../../../libs/kafka_tools" }
 geti-telemetry-tools = { path = "../../../../../libs/telemetry_tools" }
+otx = { git = "https://github.com/open-edge-platform/training_extensions.git", branch = "feature-v3" }
 
 [dependency-groups]
 dev = [
