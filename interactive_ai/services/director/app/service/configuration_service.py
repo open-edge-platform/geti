@@ -14,7 +14,7 @@ from storage.repos.partial_training_configuration_repo import PartialTrainingCon
 
 from geti_fastapi_tools.exceptions import ModelNotFoundException
 from geti_types import ID, ModelStorageIdentifier, ProjectIdentifier
-from iai_core.entities.model import Model, NullModel
+from iai_core.entities.model import NullModel
 from iai_core.entities.model_storage import ModelStorage
 from iai_core.repos import ModelRepo, ModelStorageRepo
 
@@ -117,8 +117,6 @@ class ConfigurationService:
         """
         task_model_storages = ModelStorageRepo(project_identifier).get_by_task_node_id(task_id)
 
-        model: Model | None = None
-        found_model_storage: ModelStorage | None = None
         for model_storage in task_model_storages:
             model_storage_identifier = ModelStorageIdentifier(
                 workspace_id=project_identifier.workspace_id,
@@ -127,8 +125,5 @@ class ConfigurationService:
             )
             model = ModelRepo(model_storage_identifier).get_by_id(model_id)
             if not isinstance(model, NullModel):
-                found_model_storage = model_storage
-                break
-        if model is None or found_model_storage is None:
-            raise ModelNotFoundException(model_id)
-        return model.configuration.display_only_configuration, found_model_storage
+                return model.configuration.display_only_configuration, model_storage
+        raise ModelNotFoundException(model_id)
