@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { ActionButton, Button, Flex, Grid, Loading, minmax, Tooltip, TooltipTrigger, View } from '@geti/ui';
-import { ChevronDoubleLeft, ChevronDoubleRight } from '@geti/ui/icons';
+import { Button, Flex, Grid, Loading, minmax, View } from '@geti/ui';
 import { clsx } from 'clsx';
 import { v4 as uuid } from 'uuid';
 

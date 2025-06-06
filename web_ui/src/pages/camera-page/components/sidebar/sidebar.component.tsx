@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { ActionButton, Flex, Tooltip, TooltipTrigger } from '@geti/ui';
-import { ChevronDoubleLeft, ChevronDoubleRight } from '@geti/ui/icons';
+import { Flex } from '@geti/ui';
 
 import { Label } from '../../../../core/labels/label.interface';
 import { useCameraParams } from '../../hooks/camera-params.hook';
@@ -13,8 +12,6 @@ import { getSortingHandler, SortingOptions } from '../../util';
 import { CloseSidebar } from './close-sidebar.component';
 import { OpenSidebar } from './open-sidebar.component';
 import { ToggleSidebarButton } from './toggle-sidebar-button.component';
-
-import classes from './sidebar.module.scss';
 
 interface SidebarProps {
     labels: Label[];
