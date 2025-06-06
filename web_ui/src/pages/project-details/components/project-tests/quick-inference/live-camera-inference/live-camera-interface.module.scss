@@ -1,0 +1,14 @@
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    user-select: none;
+}
+
+.layout {
+    overflow-x: auto;
+}
+
+.cameraPreview {
+    width: 100%;
+    height: 100%;
+}

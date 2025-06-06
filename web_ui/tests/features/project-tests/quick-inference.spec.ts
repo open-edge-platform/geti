@@ -87,7 +87,7 @@ test.describe('Explanation', () => {
             page.getByRole('button', { name: `${explanationLabel.name} show explanations dropdown` })
         ).toBeVisible();
 
-        const explanationImage = page.getByTestId('explanation-image');
+        const explanationImage = quickInferencePage.getExplanationImage();
         await expect(explanationImage).toBeVisible();
     });
 
@@ -116,6 +116,36 @@ test.describe('Explanation', () => {
 
         await expect(dropdown).toBeDisabled();
         await expect(page.getByRole('button', { name: /opacity slider button/i })).toBeDisabled();
+    });
+
+    test('Inference using camera', async ({ page, registerApiResponse, quickInferencePage }) => {
+        registerApiResponse('GetImagePrediction', async (_, res, ctx) => {
+            return res(ctx.status(200), ctx.json({ ...predictionAnnotationsResponse, maps: [explanation] }));
+        });
+        registerApiResponse('GetSingleExplanation', async (_, res, ctx) => {
+            return res(
+                ctx.status(200),
+                ctx.json({
+                    maps: [{ data: explanation.binary, label_id: explanation.label_id, id: explanation.id }],
+                })
+            );
+        });
+
+        await quickInferencePage.useCameraInference();
+        await quickInferencePage.takePhoto();
+
+        await quickInferencePage.toggleExplanation();
+        await expect(
+            page.getByRole('button', { name: `${explanationLabel.name} show explanations dropdown` })
+        ).toBeVisible();
+
+        await expect(quickInferencePage.getExplanationImage()).toBeVisible();
+
+        await quickInferencePage.takeNext();
+        await quickInferencePage.takePhoto();
+
+        await quickInferencePage.toggleExplanation();
+        await expect(quickInferencePage.getExplanationImage()).toBeVisible();
     });
 });
 

@@ -1,7 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { dimensionValue } from '@geti/ui';
 import Webcam from 'react-webcam';
 import { v4 as uuid } from 'uuid';
 
@@ -32,12 +31,7 @@ export const CapturePhotoButton = ({ webcamRef, selectedLabels }: CapturePhotoBu
 
     return (
         <CaptureButtonAnimation
-            height={'size-900'}
             videoTag={webcamRef.current?.video}
-            UNSAFE_style={{
-                borderRadius: '50%',
-                borderWidth: dimensionValue('size-50'),
-            }}
             onPress={isLivePrediction ? saveLivePredictionItem : saveItems}
         >
             {isLivePrediction ? '' : savedFilesQuery.data?.length || 0}

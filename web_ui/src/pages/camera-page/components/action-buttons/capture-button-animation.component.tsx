@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { Button, type ButtonProps } from '@geti/ui';
+import { Button, dimensionValue, type ButtonProps } from '@geti/ui';
 import { isNil, throttle } from 'lodash-es';
 
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
@@ -101,6 +101,11 @@ export const CaptureButtonAnimation = ({
             isDisabled={isNil(videoTag)}
             onPressStart={handleOnPressStart}
             onPressEnd={handleOnPressEnd}
+            UNSAFE_style={{
+                borderRadius: '50%',
+                borderWidth: dimensionValue('size-50'),
+            }}
+            height={'size-900'}
         >
             {buttonProps.children}
         </Button>

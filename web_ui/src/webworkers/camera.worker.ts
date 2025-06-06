@@ -3,43 +3,17 @@
 
 //  Dependencies get bundled into the worker
 
-import axios from 'axios';
 import { expose } from 'comlink';
 import localforage from 'localforage';
 
 import { validateMediaSize } from '../pages/camera-page/media-validation-utils';
 import { GETI_CAMERA_INDEXEDDB_INSTANCE_NAME, Screenshot } from '../pages/camera-support/camera.interface';
+import { fetchMediaAndConvertToFile, getBlobFromDataUrl } from './utils';
 
 declare const self: DedicatedWorkerGlobalScope;
 
 const terminate = (): void => {
     self.close();
-};
-
-const getBlobFromDataUrl = async (dataUrl: string): Promise<Blob> => {
-    const response = await axios.get(dataUrl, {
-        responseType: 'blob',
-    });
-
-    return response.data;
-};
-
-/*
-    1) Gets the blob from the source data url
-    2) Converts the .webp blob to .jpeg blob if necessary
-    3) Creates and returns a new file based on the blob
-*/
-const fetchMediaAndConvertToFile = async (id: string, dataUrl: string) => {
-    const blob = await getBlobFromDataUrl(dataUrl);
-
-    if (blob === undefined) {
-        return;
-    }
-
-    const fileType = blob.type.split('/').pop();
-    const fileName = `${id}.${fileType}`;
-
-    return new File([blob], fileName, { type: blob.type });
 };
 
 class Camera {

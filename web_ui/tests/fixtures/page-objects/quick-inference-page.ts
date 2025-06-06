@@ -10,11 +10,7 @@ export class QuickInferencePage {
         const [fileChooser] = await Promise.all([
             // It is important to call waitForEvent before click to set up waiting.
             this.page.waitForEvent('filechooser'),
-            this.page
-                .getByRole('button', { name: /upload/i })
-                .nth(0)
-                .click(),
-            this.page.getByTestId('menu-wrapper').getByLabel('File').click(),
+            this.page.getByRole('button', { name: /upload file/i }).click(),
         ]);
 
         await fileChooser.setFiles([file]);
@@ -34,5 +30,21 @@ export class QuickInferencePage {
 
     async toggleExplanation() {
         await this.page.getByRole('switch').click();
+    }
+
+    async takePhoto() {
+        await this.page.getByRole('button', { name: 'photo capture' }).click();
+    }
+
+    async takeNext() {
+        await this.page.getByRole('button', { name: 'Take next shot' }).click();
+    }
+
+    getExplanationImage() {
+        return this.page.getByTestId('explanation-image');
+    }
+
+    async useCameraInference() {
+        await this.page.getByRole('button', { name: /use camera/i }).click();
     }
 }

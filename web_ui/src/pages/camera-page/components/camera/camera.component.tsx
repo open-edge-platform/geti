@@ -2,7 +2,6 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { Flex, Text, View } from '@geti/ui';
-import Webcam from 'react-webcam';
 
 import { Label } from '../../../../core/labels/label.interface';
 import { formatToHourMinSec } from '../../../../shared/time-utils';
@@ -12,6 +11,7 @@ import { useVideoRecording } from '../../providers/video-recording-provider.comp
 import { CaptureModeButton } from '../action-buttons/capture-mode-button.component';
 import { CapturePhotoButton } from '../action-buttons/capture-photo-button.component';
 import { CaptureVideoButton } from '../action-buttons/capture-video-button.component';
+import { CameraView } from './camera-view.component';
 
 import classes from '../camera-page.module.scss';
 
@@ -26,25 +26,14 @@ const VideoTiming = () => {
 
 export const Camera = ({ selectedLabels }: CameraFactoryProps): JSX.Element => {
     const { isLivePrediction, isPhotoCaptureMode } = useCameraParams();
-    const { webcamRef, selectedDeviceId, loadDeviceCapabilities, isMirrored } = useDeviceSettings();
+    const { webcamRef } = useDeviceSettings();
 
     const CaptureButton = isPhotoCaptureMode ? CapturePhotoButton : CaptureVideoButton;
 
     return (
         <>
             {!isPhotoCaptureMode && <VideoTiming />}
-            <Webcam
-                mirrored={isMirrored}
-                ref={webcamRef}
-                aria-label='video camera'
-                className={classes.webCam}
-                onLoadStart={() => {
-                    if (webcamRef.current?.stream) {
-                        loadDeviceCapabilities(webcamRef.current?.stream);
-                    }
-                }}
-                videoConstraints={{ deviceId: { exact: selectedDeviceId } }}
-            />
+            <CameraView className={classes.webCam} />
             <Flex width={'100%'} marginTop={'size-250'} direction={'row'}>
                 <Flex width={'20%'} alignSelf={'center'}>
                     {!isLivePrediction && <CaptureModeButton />}

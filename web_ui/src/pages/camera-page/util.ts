@@ -17,6 +17,9 @@ export const TOO_LOW_FREE_STORAGE_MESSAGE = `Your storage is running low: less t
 export const hasPermissionsDenied = (permissions: UserCameraPermission) =>
     [UserCameraPermission.ERRORED, UserCameraPermission.DENIED].includes(permissions);
 
+export const isPermissionPending = (permissions: UserCameraPermission) =>
+    permissions.includes(UserCameraPermission.PENDING);
+
 export const isClassificationOrAnomaly = ({ domain }: Task) =>
     isClassificationDomain(domain) || isAnomalyDomain(domain);
 

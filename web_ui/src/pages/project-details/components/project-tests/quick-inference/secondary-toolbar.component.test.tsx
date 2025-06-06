@@ -105,6 +105,7 @@ const setQuickInference = (options: Partial<QuickInferenceContextProps>) => {
         explanationOpacity: 1,
         setExplanationOpacity: jest.fn(),
         dismissWarningCard: jest.fn(),
+        onResetImage: jest.fn(),
         ...options,
     });
 };
