@@ -61,6 +61,30 @@ class RandomHorizontalFlip(BaseModel):
     )
 
 
+class RandomVerticalFlip(BaseModel):
+    enable: bool = Field(
+        default=False,
+        title="Enable random vertical flip",
+        description="Whether to apply random flip images vertically along the horizontal axis (swap top and bottom)",
+    )
+
+
+class RandomIOUCrop(BaseModel):
+    enable: bool = Field(
+        default=False,
+        title="Enable random IoU crop",
+        description="Whether to apply random cropping based on IoU criteria",
+    )
+
+
+class ColorJitter(BaseModel):
+    enable: bool = Field(
+        default=False,
+        title="Enable color jitter",
+        description="Whether to apply random color jitter to the image",
+    )
+
+
 class GaussianBlur(BaseModel):
     enable: bool = Field(
         default=False,
@@ -101,6 +125,21 @@ class AugmentationParameters(BaseModel):
         default=None,
         title="Random horizontal flip",
         description="Randomly flip images horizontally along the vertical axis (swap left and right)",
+    )
+    random_vertical_flip: RandomVerticalFlip | None = Field(
+        default=None,
+        title="Random vertical flip",
+        description="Randomly flip images vertically along the horizontal axis (swap top and bottom)",
+    )
+    random_iou_crop: RandomIOUCrop | None = Field(
+        default=None,
+        title="Random IoU crop",
+        description="Randomly crop images based on Intersection over Union (IoU) criteria",
+    )
+    color_jitter: ColorJitter | None = Field(
+        default=None,
+        title="Color jitter",
+        description="Settings for random color jitter (brightness, contrast, saturation, hue)",
     )
     gaussian_blur: GaussianBlur | None = Field(
         default=None, title="Gaussian blur", description="Settings for Gaussian blur augmentation"

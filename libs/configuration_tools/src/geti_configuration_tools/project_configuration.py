@@ -73,6 +73,8 @@ class ProjectConfiguration(BaseModel, PersistentEntity):
         # then initialize PersistentEntity with id and ephemeral parameters
         PersistentEntity.__init__(self, id_=project_id, ephemeral=ephemeral)
 
+        self._task_idx_mapping = {task_config.task_id: i for i, task_config in enumerate(self.task_configs)}
+
     @property
     def project_id(self) -> ID:
         """Returns the project ID of this configuration."""
@@ -81,6 +83,26 @@ class ProjectConfiguration(BaseModel, PersistentEntity):
     task_configs: list[TaskConfig] = Field(
         title="Task configurations", description="List of configurations for all tasks in this project"
     )
+
+    def get_task_config(self, task_id: str) -> TaskConfig:
+        """
+        Retrieves the configuration for a specific task by its ID.
+
+        :param task_id: The ID of the task to retrieve the configuration for.
+        :return: The TaskConfig for the specified task, or None if not found.
+        """
+        if task_id not in self._task_idx_mapping:
+            raise ValueError(f"Task configuration with ID {task_id} not found.")
+
+        idx = self._task_idx_mapping[task_id]
+        return self.task_configs[idx]
+
+    def update_task_config(self, task_config: TaskConfig) -> None:
+        if task_config.task_id not in self._task_idx_mapping:
+            raise ValueError(f"Task configuration with ID {task_config.task_id} not found.")
+
+        idx = self._task_idx_mapping[task_config.task_id]
+        self.task_configs[idx] = task_config
 
     def __eq__(self, other: object) -> bool:
         """
