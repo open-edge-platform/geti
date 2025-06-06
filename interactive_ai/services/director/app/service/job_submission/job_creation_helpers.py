@@ -10,9 +10,10 @@ from dataclasses import dataclass
 from enum import Enum, auto
 
 from geti_configuration_tools.training_configuration import TrainingConfiguration
+from geti_feature_tools.feature_flags import FeatureFlagProvider
 
 from communication.exceptions import JobCreationFailedException
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from features.feature_flag import FeatureFlag
 
 from geti_types import ID, ProjectIdentifier
 from iai_core.entities.dataset_storage import DatasetStorage

@@ -14,7 +14,7 @@ from communication.exceptions import (
     ObsoleteTrainingAlgorithmException,
 )
 from entities import TrainingConfig
-from features.feature_flag_provider import FeatureFlag
+from features.feature_flag import FeatureFlag
 from service.job_submission import ModelTrainingJobSubmitter
 from service.project_service import ProjectService
 

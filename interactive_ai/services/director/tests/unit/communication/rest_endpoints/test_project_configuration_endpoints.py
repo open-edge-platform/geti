@@ -9,7 +9,7 @@ from geti_configuration_tools.project_configuration import PartialProjectConfigu
 from testfixtures import compare
 
 from communication.controllers.project_configuration_controller import ProjectConfigurationRESTController
-from features.feature_flag_provider import FeatureFlag
+from features.feature_flag import FeatureFlag
 
 from geti_types import ID, ProjectIdentifier
 

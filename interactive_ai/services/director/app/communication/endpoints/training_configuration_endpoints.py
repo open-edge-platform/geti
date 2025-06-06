@@ -7,10 +7,11 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
+from geti_feature_tools.feature_flags import FeatureFlagProvider
 
 from communication.controllers.training_configuration_controller import TrainingConfigurationRESTController
 from communication.views.training_configuration_rest_views import TrainingConfigurationRESTViews
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from features.feature_flag import FeatureFlag
 
 from geti_fastapi_tools.dependencies import get_project_identifier, get_request_json, setup_session_fastapi
 from geti_fastapi_tools.exceptions import GetiBaseException

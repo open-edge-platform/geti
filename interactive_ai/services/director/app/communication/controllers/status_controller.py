@@ -6,10 +6,12 @@
 import logging
 from typing import Any
 
+from geti_feature_tools.feature_flags import FeatureFlagProvider
+
 from communication.jobs_client import JobsClient
 from communication.views.status_rest_views import StatusRestViews
 from coordination.dataset_manager.missing_annotations_helper import MissingAnnotationsHelper
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from features.feature_flag import FeatureFlag
 from service.project_service import ProjectService
 
 from geti_types import ID, DatasetStorageIdentifier

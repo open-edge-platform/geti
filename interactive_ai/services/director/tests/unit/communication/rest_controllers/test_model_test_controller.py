@@ -15,7 +15,7 @@ from communication.exceptions import (
 from communication.views.job_rest_views import JobRestViews
 from communication.views.model_test_result_rest_views import ModelTestResultRestViews
 from communication.views.prediction_rest_views import PredictionRESTViews
-from features.feature_flag_provider import FeatureFlag
+from features.feature_flag import FeatureFlag
 from service.job_submission import ModelTestingJobSubmitter
 from service.label_schema_service import LabelSchemaService
 

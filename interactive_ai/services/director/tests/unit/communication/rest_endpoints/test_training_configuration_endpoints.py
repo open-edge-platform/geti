@@ -9,7 +9,7 @@ from geti_configuration_tools.training_configuration import PartialTrainingConfi
 from testfixtures import compare
 
 from communication.controllers.training_configuration_controller import TrainingConfigurationRESTController
-from features.feature_flag_provider import FeatureFlag
+from features.feature_flag import FeatureFlag
 
 from geti_types import ID, ProjectIdentifier
 

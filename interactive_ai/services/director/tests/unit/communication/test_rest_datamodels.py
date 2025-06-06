@@ -8,7 +8,7 @@ from testfixtures import compare
 from communication.views.job_rest_views import JobRestViews
 from communication.views.model_test_result_rest_views import ModelTestResultRestViews
 from communication.views.performance_rest_views import PerformanceRESTViews
-from features.feature_flag_provider import FeatureFlag
+from features.feature_flag import FeatureFlag
 
 from geti_types import ID
 from iai_core.entities.dataset_storage import NullDatasetStorage

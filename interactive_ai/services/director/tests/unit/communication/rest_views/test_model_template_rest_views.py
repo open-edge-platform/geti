@@ -5,7 +5,7 @@
 from testfixtures import compare
 
 from communication.views.model_template_rest_views import ModelTemplateRESTViews
-from features.feature_flag_provider import FeatureFlag
+from features.feature_flag import FeatureFlag
 
 
 class TestSCModelTemplateRESTViews:
