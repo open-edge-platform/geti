@@ -437,7 +437,7 @@ wheels = [
 [[package]]
 name = "geti-k8s-tools"
 version = "1.0.1"
-source = { editable = "../../../libs/k8s_tools" }
+source = { editable = "libs/k8s_tools" }
 dependencies = [
     { name = "kubernetes-asyncio" },
 ]
@@ -541,7 +541,7 @@ requires-dist = [
     { name = "click", specifier = "==8.1.7" },
     { name = "click-spinner", specifier = "==0.1.10" },
     { name = "cryptography", specifier = "==43.0.1" },
-    { name = "geti-k8s-tools", editable = "../../../libs/k8s_tools" },
+    { name = "geti-k8s-tools", editable = "libs/k8s_tools" },
     { name = "gputil", specifier = "==1.4.0" },
     { name = "ifaddr", specifier = "==0.2.0" },
     { name = "jinja2", specifier = "==3.1.4" },
