@@ -43,7 +43,10 @@ class PathValidatorsTexts:
         "Provided path {path} does not point to an existing folder. It must be an absolute path (e.g. {folder})."
     )
     path_not_folder = "Provided path {path} does not point to a folder."
-    path_already_exists = "Cannot create {path}. Please delete the folder or use '--data-folder' parameter and point to existing directory."
+    path_already_exists = (
+        "Cannot create {path}. Please delete the folder or use '--data-folder'"
+        " parameter and point to existing directory."
+    )
     path_not_empty = "Provided folder {path} is not empty."
     invalid_permissions = "Provided folder {path} has too open permissions {permissions}. Recommended are 750."
     path_permission_error = "Provided path {path} has wrong access permission. Please check your permissions."
