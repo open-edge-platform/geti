@@ -13,7 +13,6 @@ from bson import ObjectId
 
 from iai_core.entities.graph import MultiDiGraph
 from iai_core.entities.label import Label
-from iai_core.entities.scored_label import ScoredLabel
 from iai_core.utils.uid_generator import generate_uid
 
 from geti_types import ID, PersistentEntity
@@ -73,14 +72,9 @@ class LabelGroup:
     ):
         self.id_ = ID(ObjectId()) if id is None else id
 
-        self.labels = sorted(labels, key=natural_sort_label_id)
+        self.labels = list(labels)
         self.name = name
         self.group_type = group_type
-
-    @property
-    def minimum_label_id(self) -> ID:
-        """Returns the minimum (oldest) label ID, which is the first label in self.labels since this list is sorted."""
-        return self.labels[0].id_
 
     def remove_label(self, label: Label) -> None:
         """Remove label from label group if it exists in the group.
@@ -119,8 +113,6 @@ class LabelTree(MultiDiGraph):
     def __init__(self) -> None:
         super().__init__()
 
-        self.__topological_order_cache: list[Label] | None = None
-
     def add_edge(self, node1: Label, node2: Label, edge_value: Any = None) -> None:
         """Add edge between two nodes in the tree.
 
@@ -129,49 +121,23 @@ class LabelTree(MultiDiGraph):
         :param edge_value: The value of the new edge. Defaults to None.
         """
         super().add_edge(node1, node2, edge_value)
-        self.clear_topological_cache()
 
     def add_node(self, node: Label) -> None:
         """Add node to the tree."""
         super().add_node(node)
-        self.clear_topological_cache()
 
     def add_edges(self, edges: Any) -> None:
         """Add edges between Labels."""
         self._graph.add_edges_from(edges)
-        self.clear_topological_cache()
 
     def remove_node(self, node: Label) -> None:
         """Remove node from the tree."""
         super().remove_node(node)
-        self.clear_topological_cache()
 
     @property
     def num_labels(self) -> int:
         """Return the number of labels in the tree."""
         return self.num_nodes()
-
-    def clear_topological_cache(self) -> None:
-        """Clear the internal cache of the list of labels sorted in topological order.
-
-        This function should be called if the topology of the graph has changed to
-            prevent the cache from being stale.
-        Note that it is automatically called when modifying the topology through the
-            methods provided by this class.
-        """
-        self.__topological_order_cache = None
-
-    def get_labels_in_topological_order(self) -> list[Label]:
-        """Return a list of the labels in this graph sorted in topological order.
-
-        To avoid performance issues, the output of this function is cached.
-        """
-        if self.__topological_order_cache is None:
-            # TODO: It seems that we are storing the edges the wrong way around.
-            #       To work around this issue, we have to reverse the sorted list.
-            self.__topological_order_cache = list(reversed(list(self.topological_sort())))
-
-        return self.__topological_order_cache
 
     @property
     def type(self) -> str:
@@ -181,7 +147,6 @@ class LabelTree(MultiDiGraph):
     def add_child(self, parent: Label, child: Label) -> None:
         """Add a `child` Label to `parent`."""
         self.add_edge(child, parent)
-        self.clear_topological_cache()
 
     def get_parent(self, label: Label) -> Label | None:
         """Returns the parent of `label`"""
@@ -322,12 +287,12 @@ class LabelSchema(PersistentEntity):
         :param include_empty: flag determining whether to include empty labels
         :return: list of labels in the label schema
         """
-        labels = []
-        for group in self._groups:
-            for label in group.labels:
-                if (include_empty or not label.is_empty) and label.id_ not in self.deleted_label_ids:
-                    labels.append(label)
-        return sorted(labels, key=lambda x: x.id_)
+        return [
+            label
+            for group in self._groups
+            for label in group.labels
+            if (include_empty or not label.is_empty) and label.id_ not in self.deleted_label_ids
+        ]
 
     def get_label_map(self) -> dict[ID, Label]:
         """
@@ -345,7 +310,7 @@ class LabelSchema(PersistentEntity):
 
         :return: tuple of empty labels in the label schema
         """
-        return tuple(sorted([label for label in self.get_labels(include_empty=True) if label.is_empty]))
+        return tuple(label for label in self.get_labels(include_empty=True) if label.is_empty)
 
     def get_label_ids(self, include_empty: bool) -> list[ID]:
         """
@@ -364,9 +329,7 @@ class LabelSchema(PersistentEntity):
 
         :return: list of labels in the label schema
         """
-        labels = [label for group in self._groups for label in group.labels]
-
-        return sorted(labels, key=lambda x: x.id_)
+        return [label for group in self._groups for label in group.labels]
 
     def get_groups(self, include_empty: bool = False) -> list[LabelGroup]:
         """
@@ -676,7 +639,7 @@ class LabelSchemaView(LabelSchema):
         label_groups = []
 
         for parent_group in parent_schema.get_groups(include_empty=True):
-            group_labels = list(set(parent_group.labels).intersection(set_of_labels))
+            group_labels = [label for label in parent_group.labels if label in set_of_labels]
             if len(group_labels) > 0:
                 label_groups.append(
                     LabelGroup(
@@ -744,25 +707,3 @@ class LabelSchemaView(LabelSchema):
             and self.label_tree == other.label_tree
             and self.get_groups(include_empty=True) == other.get_groups(include_empty=True)
         )
-
-
-def natural_sort_label_id(target: ID | Label | ScoredLabel) -> list[int | str]:
-    """Generates a natural sort key for a Label object based on its ID.
-
-    Example:
-    origin_sorted_labels = sorted(labels, key=lambda x: x.id_)
-    natural_sorted_labels = sorted(labels, key=lambda x: x.natural_sort_label_id)
-
-    print(origin_sorted_labels) # Output: [Label(0), Label(1), Label(10), ... Label(2)]
-    print(natural_sorted_labels) # Output: [Label(0), Label(1), Label(2), ... Label(10)]
-
-    :param target (Union[ID, Label]): The ID or Label or ScoredLabel object to be sorted.
-    :returns: List[Union[int, str]]: A list of integers representing the numeric substrings in the ID
-    in the order they appear.
-    """
-
-    if isinstance(target, Label | ScoredLabel):
-        target = target.id_
-    if isinstance(target, str) and target.isdecimal():
-        return ["", int(target)]  # "" is added for the case where id of some lables is None
-    return [target]
