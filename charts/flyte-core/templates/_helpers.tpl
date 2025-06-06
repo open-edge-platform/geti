@@ -183,29 +183,29 @@ securityContext:
   allowPrivilegeEscalation: false
   runAsNonRoot: true
   runAsUser: 10001
-capabilities:
-  drop:
-    - ALL
-readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
 env:
 - name: POSTGRES_HOST
-  value: "{{ .Release.Namespace }}-postgresql.{{ .Release.Namespace }}"
+  value: "impt-postgresql.{{ .Values.main_namespace }}"
 - name: POSTGRES_PORT
   value: "5432"
 - name: FLYTE_POSTGRES_USER
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Namespace }}-postgresql
+      name: impt-postgresql
       key: flyte-postgresql-username
 - name: FLYTE_POSTGRES_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Namespace }}-postgresql
+      name: impt-postgresql
       key: flyte-postgresql-password
 - name: FLYTE_POSTGRES_DB
   valueFrom:
     configMapKeyRef:
-      name: {{ .Release.Namespace }}-postgresql
+      name: impt-postgresql
       key: flyte-postgresql-db
 command: [ "/bin/sh", "-ecu" ]
 args:

@@ -1,0 +1,5 @@
+name: modelmesh-serving-addon
+apiVersion: v2
+description: Helm chart for ovms runtime
+version: 0.0.1
+appVersion: v0.0.1

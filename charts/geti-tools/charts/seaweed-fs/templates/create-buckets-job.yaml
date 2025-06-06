@@ -6,8 +6,6 @@ metadata:
   namespace: "{{ .Release.Namespace }}"
   annotations:
     "helm.sh/hook": "post-install,post-upgrade"
-    "helm.sh/hook-weight": "2"
-    "helm.sh/hook-delete-policy": "hook-succeeded"
 spec:
   backoffLimit: {{ .Values.jobs.backoffLimit }}
   template:

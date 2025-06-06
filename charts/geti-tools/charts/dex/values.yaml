@@ -17,7 +17,7 @@ image:
 nameOverride: ""
 
 # -- Provide a name to substitute for the full names of resources.
-fullnameOverride: ""
+fullnameOverride: "impt-dex"
 
 https:
   # -- Enable the HTTPS endpoint.

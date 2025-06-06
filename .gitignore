@@ -10,3 +10,6 @@ __pycache__/
 build/
 common_libs/
 reports/
+*.tgz
+Chart.lock
+*.tar.gz

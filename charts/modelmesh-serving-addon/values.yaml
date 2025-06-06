@@ -1,0 +1,49 @@
+global:
+  enable_local_image_pull_secret: false
+
+modelserver:
+  image:
+    registry: docker.io
+    repository: openvino
+    name: model_server:2025.1
+
+ovmsMemBufferBytes: 134217728
+ovmsRuntimeResources:
+  requests:
+    cpu: 1
+    memory: 8Gi
+  limits:
+    memory: 8Gi
+
+modelRegistration:
+  namespace: impt
+  serviceAccount: impt-modelregistration
+
+ovmsRuntimeNodeSelector:
+
+ovmsRuntimeTolerations:
+
+ovmsLivenessProbe:
+  exec:
+    command:
+      - curl
+      - --fail
+      - --silent
+      - --show-error
+      - --max-time
+      - "9"
+      - http://localhost:8888/v2/health/live
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+  privileged: false
+  runAsGroup: 10001
+  runAsNonRoot: true
+  runAsUser: 10001

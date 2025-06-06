@@ -8,6 +8,7 @@ data:
   serverAddress: "{{ .Values.global.serverAddress }}"
   registry_address: "{{ .Values.global.registry_address }}"
   tag: "{{ .Chart.AppVersion }}"
+  installation_profile: "{{ .Values.global.installation_profile }}"
   mlflow_sidecar_image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/mlflow-geti-store:{{ .Values.global.tag | default .Chart.AppVersion }}"
   {{- if contains "intel" .Values.accelerator.name }}
   otx2_image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/otx2-intel:{{ .Values.global.tag | default .Chart.AppVersion }}"
