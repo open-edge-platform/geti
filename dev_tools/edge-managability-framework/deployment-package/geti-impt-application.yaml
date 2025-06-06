@@ -1,0 +1,66 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-impt
+version: 2.9.0
+description: Main module of Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: impt
+chartVersion: 2.9.0
+
+profiles:
+  - name: cpu
+    description: CPU only
+    valuesFileName: geti-impt-cpu-values.yaml
+  - name: nvidia-gpu
+    description: Nvidia GPU - see docs for driver installation
+    valuesFileName: geti-impt-nvidia-values.yaml
+  - name: intel-i915-gpu
+    description: Intel® i915 GPU (Max) - see docs for driver installation
+    valuesFileName: geti-impt-intel-i915-values.yaml
+  - name: intel-xe-gpu
+    description: Intel® Xe GPU (Arc and Battleimage) - see docs for driver installation
+    valuesFileName: geti-impt-intel-xe-values.yaml
+
+ignoredResources:
+  - name: servingruntime.serving.kserve.io
+    kind: ValidatingWebhookConfiguration
+  - name: impt-versions
+    kind: ConfigMap
+  - name: impt-s3-bucket-names
+    kind: ConfigMap
+  - name: flyte-pod-webhook
+    namespace: flyte
+    kind: Secret
+  - name: impt-postgresql
+    namespace: impt
+    kind: Secret
+  - name: impt-postgresql
+    namespace: flyte
+    kind: Secret
+  - name: model-serving-etcd
+    namespace: impt
+    kind: Secret
+  - name: datacatalog
+    namespace: flyte
+    kind: Deployment
+  - name: flyteadmin
+    namespace: flyte
+    kind: Deployment
+  - name: flytescheduler
+    namespace: flyte
+    kind: Deployment
+  - name: init-job-datacatalog
+    namespace: flyte
+    kind: Job
+  - name: init-job-flyteadmin
+    namespace: flyte
+    kind: Job
+  - name: init-job-flytescheduler
+    namespace: flyte
+    kind: Job
