@@ -1,16 +1,17 @@
 .toggleButton {
-    border-radius: 0;
-}
+    &:not(:last-child):not(:first-child) {
+        border-radius: 0;
+        border-right-color: transparent !important;
+        border-left-color: transparent !important;
+    }
 
-.firstButton {
-    border-right-color: transparent !important;
-}
+    &:first-child {
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 0;
+    }
 
-.middleButton {
-    border-right-color: transparent !important;
-    border-left-color: transparent !important;
-}
-
-.lastButton {
-    border-left-color: transparent !important;
+    &:last-child {
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+    }
 }

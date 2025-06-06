@@ -155,15 +155,11 @@ const LiveCameraInferenceContent = () => {
     const shouldShowExplanation = useIsExplanationEnabled(imageWasUploaded);
     const { userPermissions } = useDeviceSettings();
 
-    const permissionPending = isPermissionPending(userPermissions);
-
-    if (permissionPending) {
+    if (isPermissionPending(userPermissions)) {
         return <Loading aria-label='permissions pending' />;
     }
 
-    const permissionDenied = hasPermissionsDenied(userPermissions);
-
-    if (permissionDenied) {
+    if (hasPermissionsDenied(userPermissions)) {
         return <PermissionError />;
     }
 
