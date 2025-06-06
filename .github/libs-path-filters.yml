@@ -35,6 +35,7 @@ libs/types:
 libs/configuration_tools:
   - libs/types/**
   - libs/Makefile**
+  - libs/configuration_tools/**
   - .github/libs-path-filters.yml
 
 # # libraries for interactive_ai
@@ -51,6 +52,7 @@ interactive_ai/libs/iai_core_py:
   - libs/Makefile**
   - .github/libs-path-filters.yml
 interactive_ai/supported_models/:
+  - interactive_ai/supported_models/**
   - interactive_ai/libs/supported_algorithm/**
   - libs/Makefile**
   - .github/libs-path-filters.yml

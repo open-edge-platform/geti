@@ -1,6 +1,6 @@
 ---
-name: dataset-ie
-version: '{{VERSION}}'
+name: ${COMPONENT_NAME}
+version: ${TAG}
 apiVersion: v2
 description: dataset import and export
-appVersion: '{{VERSION}}'
+appVersion: ${TAG}

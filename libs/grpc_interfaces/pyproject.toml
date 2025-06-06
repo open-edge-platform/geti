@@ -11,7 +11,7 @@ license = { text = "Copyright (c) Intel - All Rights Reserved. Unauthorized copy
 requires-python = ">=3.10, <3.11"
 
 dependencies = [
-    "grpcio~=1.62"
+    "grpcio==1.62.*"
 ]
 
 [project.optional-dependencies]

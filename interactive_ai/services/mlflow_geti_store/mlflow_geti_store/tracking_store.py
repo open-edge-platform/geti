@@ -52,7 +52,7 @@ class GetiTrackingStore(AbstractStore):
 
     def search_experiments(
         self,
-        view_type: ViewType = ViewType.ACTIVE_ONLY,
+        view_type: ViewType = ViewType.ACTIVE_ONLY,  # type: ignore
         max_results: int = SEARCH_MAX_RESULTS_THRESHOLD,
         filter_string: str | None = None,
         order_by: list[str] | None = None,
@@ -207,7 +207,7 @@ class GetiTrackingStore(AbstractStore):
         raise MlflowException("Logging inputs is not allowed")
 
     def _search_datasets(self, experiment_ids: list[str]) -> list[_DatasetSummary]:
-        runs, _ = self._search_runs(experiment_ids=experiment_ids, filter_string="", run_view_type=ViewType.ALL)
+        runs, _ = self._search_runs(experiment_ids=experiment_ids, filter_string="", run_view_type=ViewType.ALL)  # type: ignore
 
         summaries = []
         for run in runs:

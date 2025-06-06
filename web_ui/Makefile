@@ -3,6 +3,7 @@
 
 include ../Makefile.shared
 
+COMPONENT_NAME := web
 # build contexts for web-ui image
 DOCKER_BUILD_CONTEXT := --build-context docs_context=../docs \
 						--build-context api_context=../interactive_ai/services/api

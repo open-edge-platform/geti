@@ -1,6 +1,6 @@
 ---
-name: observability
-version: '{{VERSION}}'
+name: ${COMPONENT_NAME}
+version: ${TAG}
 description: observability chart
 apiVersion: v2
-appVersion: '{{VERSION}}'
+appVersion: ${TAG}

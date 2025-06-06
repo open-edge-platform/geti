@@ -17,7 +17,7 @@ hyperparameters:
     max_epochs: 101
     learning_rate: 0.05
     early_stopping:
-      enable: true
+      enable: false
       patience: 5
   evaluation:
     metric: null

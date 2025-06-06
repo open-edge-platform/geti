@@ -1,6 +1,6 @@
 ---
 apiVersion: v2
-name: platform-cleaner
+name: ${COMPONENT_NAME}
 description: A Helm chart for automated platform cleanup cron job
-version: '{{VERSION}}'
-appVersion: '{{VERSION}}'
+version: ${TAG}
+appVersion: ${TAG}
