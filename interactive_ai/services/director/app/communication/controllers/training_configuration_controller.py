@@ -46,8 +46,22 @@ class TrainingConfigurationRESTController:
             raise TaskNodeNotFoundException(task_node_id=task_id)
 
         if model_id is not None:
-            # TODO ITEP-68215: if model_id is provided, load configuration from the model entity
-            pass
+            model_hyperparams_dict, model_storage = ConfigurationService.get_configuration_from_model(
+                project_identifier=project_identifier,
+                task_id=task_id,
+                model_id=model_id,
+            )
+            if model_hyperparams_dict is None:
+                # TODO ITEP-32067: add backward compatibility to display the old models configurable parameters
+                return {}
+            model_config = PartialTrainingConfiguration.model_validate(
+                {
+                    "task_id": task_id,
+                    "model_manifest_id": model_storage.model_template.model_template_id,
+                    "hyperparameters": model_hyperparams_dict,
+                }
+            )
+            return TrainingConfigurationRESTViews.training_configuration_to_rest(training_configuration=model_config)
 
         if model_manifest_id is None:
             training_configuration_repo = PartialTrainingConfigurationRepo(project_identifier)

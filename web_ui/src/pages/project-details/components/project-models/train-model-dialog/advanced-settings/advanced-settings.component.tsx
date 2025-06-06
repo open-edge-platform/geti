@@ -77,13 +77,7 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
         },
         {
             name: 'Data management',
-            children: (
-                <DataManagement
-                    configParameters={configParameters}
-                    isReshufflingSubsetsEnabled={isReshufflingSubsetsEnabled}
-                    onReshufflingSubsetsEnabledChange={onReshufflingSubsetsEnabledChange}
-                />
-            ),
+            children: <DataManagement configParameters={configParameters} />,
         },
         {
             name: 'Training',
@@ -92,6 +86,8 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
                     trainFromScratch={trainFromScratch}
                     onTrainFromScratchChange={onTrainFromScratchChange}
                     configParameters={configParameters}
+                    isReshufflingSubsetsEnabled={isReshufflingSubsetsEnabled}
+                    onReshufflingSubsetsEnabledChange={onReshufflingSubsetsEnabledChange}
                 />
             ),
         },

@@ -104,6 +104,14 @@ export const useTrainModelState = () => {
         setSelectedModelTemplateId(getActiveModelTemplateId(models, algorithms, newTask.id));
     };
 
+    const handleTrainFromScratchChange = (newTrainFromScratch: boolean): void => {
+        setTrainFromScratch(newTrainFromScratch);
+
+        if (newTrainFromScratch === false) {
+            setIsReshufflingSubsetsEnabled(false);
+        }
+    };
+
     return {
         isBasicMode,
         openAdvancedSettingsMode,
@@ -120,6 +128,6 @@ export const useTrainModelState = () => {
         changeReshufflingSubsetsEnabled: setIsReshufflingSubsetsEnabled,
         configParameters,
         trainFromScratch,
-        changeTrainFromScratch: setTrainFromScratch,
+        changeTrainFromScratch: handleTrainFromScratchChange,
     } as const;
 };
