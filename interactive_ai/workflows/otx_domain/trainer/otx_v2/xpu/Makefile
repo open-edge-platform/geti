@@ -11,7 +11,7 @@ build-image: install_common_libs
 	@docker build \
 		${DOCKER_EXTRA_ARGS} \
 		${DOCKER_BUILD_CONTEXT} \
-		-t ${IMAGES_REGISTRY}/${COMPONENT_NAME}:test \
+		-t ${IMAGES_REGISTRY}/${COMPONENT_NAME}:${TAG} \
 		--label "org.opencontainers.image.description=XPU trainer for Geti" \
 		-f ./Dockerfile ..
 
