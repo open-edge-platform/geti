@@ -29,7 +29,6 @@ export class OpenCVPreprocessor {
     config: OpenCVPreprocessorConfig;
 
     constructor(
-        // @ts-expect-error Ignore cannot use namespace as type
         private cv: cv,
         config: OpenCVPreprocessorConfig
     ) {
