@@ -12,6 +12,7 @@ import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { getSortingHandler, SortingOptions } from '../../util';
 import { CloseSidebar } from './close-sidebar.component';
 import { OpenSidebar } from './open-sidebar.component';
+import { ToggleSidebarButton } from './toggle-sidebar-button.component';
 
 import classes from './sidebar.module.scss';
 
@@ -40,18 +41,7 @@ export const Sidebar = ({ labels }: SidebarProps): JSX.Element => {
 
             {!isOpen && <CloseSidebar screenshots={screenshots} isLivePrediction={isLivePrediction} />}
 
-            <TooltipTrigger placement={'bottom'}>
-                <ActionButton
-                    isQuiet
-                    onPress={() => setIsOpen((prev) => !prev)}
-                    aria-label={'toggle sidebar'}
-                    UNSAFE_className={classes.toggleSidebarButton}
-                    id='annotations-pane-sidebar-toggle-button'
-                >
-                    {isOpen ? <ChevronDoubleRight size='XS' /> : <ChevronDoubleLeft size='XS' />}
-                </ActionButton>
-                <Tooltip>{isOpen ? 'Collapse sidebar' : 'Open sidebar'}</Tooltip>
-            </TooltipTrigger>
+            <ToggleSidebarButton onIsOpenChange={() => setIsOpen((prev) => !prev)} isOpen={isOpen} />
         </Flex>
     );
 };

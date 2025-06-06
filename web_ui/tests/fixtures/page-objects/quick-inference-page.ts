@@ -37,7 +37,7 @@ export class QuickInferencePage {
     }
 
     async takeNext() {
-        await this.page.getByRole('button', { name: 'Take next' }).click();
+        await this.page.getByRole('button', { name: 'Take next shot' }).click();
     }
 
     getExplanationImage() {

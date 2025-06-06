@@ -15,6 +15,7 @@ import { CaptureButtonAnimation } from '../../../../../camera-page/components/ac
 import { CameraView } from '../../../../../camera-page/components/camera/camera-view.component';
 import { PermissionError } from '../../../../../camera-page/components/camera/permissions-error.component';
 import { DeviceSettings } from '../../../../../camera-page/components/sidebar/device-settings.component';
+import { ToggleSidebarButton } from '../../../../../camera-page/components/sidebar/toggle-sidebar-button.component';
 import {
     DeviceSettingsProvider,
     useDeviceSettings,
@@ -48,17 +49,11 @@ const Sidebar = ({ isInferencedImageVisible }: { isInferencedImageVisible: boole
             >
                 <DeviceSettings />
             </View>
-            <TooltipTrigger placement={'bottom'}>
-                <ActionButton
-                    isQuiet
-                    onPress={() => setIsOpen((prev) => !prev)}
-                    aria-label={'Toggle camera settings'}
-                    flex={isOpen ? undefined : 1}
-                >
-                    {isOpen ? <ChevronDoubleRight size='XS' /> : <ChevronDoubleLeft size='XS' />}
-                </ActionButton>
-                <Tooltip>{isOpen ? 'Collapse camera settings' : 'Open camera settings'}</Tooltip>
-            </TooltipTrigger>
+            <ToggleSidebarButton
+                isOpen={isOpen}
+                onIsOpenChange={() => setIsOpen((prev) => !prev)}
+                flex={isOpen ? undefined : 1}
+            />
         </Flex>
     );
 };
@@ -113,6 +108,7 @@ const LiveCameraInferenceLayout = ({ shouldShowExplanation, labels }: LiveCamera
                 areas={['toolbar toolbar', 'camera sidebar', 'button sidebar']}
                 columns={['1fr', 'max-content']}
                 rows={['max-content', minmax('size-2400', '1fr'), 'size-1000']}
+                gap={'size-100'}
                 height={'100%'}
                 width={'100%'}
                 UNSAFE_className={styles.layout}
@@ -126,11 +122,11 @@ const LiveCameraInferenceLayout = ({ shouldShowExplanation, labels }: LiveCamera
                 </View>
                 <View gridArea={'camera'}>
                     <Flex height={'100%'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
-                        <View isHidden={!isInferencedImageVisible}>
+                        <View isHidden={!isInferencedImageVisible} height={'100%'}>
                             <InferencedImage />
                         </View>
-                        <View isHidden={isInferencedImageVisible}>
-                            <CameraView />
+                        <View isHidden={isInferencedImageVisible} height={'100%'}>
+                            <CameraView className={styles.cameraPreview} />
                         </View>
                     </Flex>
                 </View>
@@ -138,7 +134,7 @@ const LiveCameraInferenceLayout = ({ shouldShowExplanation, labels }: LiveCamera
                     <Flex height={'100%'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
                         {isInferencedImageVisible ? (
                             <Button variant='primary' onPress={onResetImage}>
-                                Take next
+                                Take next shot
                             </Button>
                         ) : (
                             <CaptureButtonAnimation videoTag={webcamRef.current?.video} onPress={handleTakePhoto} />
