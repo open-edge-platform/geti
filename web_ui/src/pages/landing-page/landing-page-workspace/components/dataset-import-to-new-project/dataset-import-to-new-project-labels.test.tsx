@@ -74,6 +74,7 @@ describe('DatasetImportToNewProjectLabels', () => {
 
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={mockUploadEmptyItem}
                 patchDatasetImport={mockPatchUpload}
             />
@@ -85,6 +86,7 @@ describe('DatasetImportToNewProjectLabels', () => {
     it('should correctly display the dataset with a "flat" labels structure', () => {
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={{ ...mockDatasetImportItem, labelsToSelect: MOCKED_LABELS_FLAT }}
                 patchDatasetImport={mockPatchUpload}
             />
@@ -96,9 +98,22 @@ describe('DatasetImportToNewProjectLabels', () => {
         expect(screen.queryAllByTestId(/expand-collapse-button/)).toHaveLength(0);
     });
 
+    it('should not display checkboxes when hasCheckbox is set to false', () => {
+        render(
+            <DatasetImportToNewProjectLabels
+                hasCheckbox={false}
+                datasetImportItem={{ ...mockDatasetImportItem, labelsToSelect: MOCKED_LABELS_FLAT }}
+                patchDatasetImport={mockPatchUpload}
+            />
+        );
+
+        expect(screen.queryByRole('checkbox', { name: 'select-all-labels' })).not.toBeInTheDocument();
+    });
+
     it('should correctly display the dataset with a "hierarchical" labels structure', () => {
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={{ ...mockDatasetImportItem, labelsToSelect: MOCKED_LABELS_HIERARCHY }}
                 patchDatasetImport={mockPatchUpload}
             />
@@ -120,6 +135,7 @@ describe('DatasetImportToNewProjectLabels', () => {
     it('should correctly display the dataset with a "hierarchical" labels structure which is collapsed by default', () => {
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={{ ...mockDatasetImportItem, labelsToSelect: MOCKED_LABELS_HIERARCHY }}
                 patchDatasetImport={mockPatchUpload}
                 labelsInitiallyCollapsed={true}
@@ -142,6 +158,7 @@ describe('DatasetImportToNewProjectLabels', () => {
     it('should correctly behave on toggle expand/collapse button', async () => {
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={{ ...mockDatasetImportItem, labelsToSelect: MOCKED_LABELS_HIERARCHY }}
                 patchDatasetImport={mockPatchUpload}
                 labelsInitiallyCollapsed={true}
@@ -180,6 +197,7 @@ describe('DatasetImportToNewProjectLabels', () => {
     it('should properly behave on change label color button click', async () => {
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={{
                     ...mockDatasetImportItem,
                     labelsToSelect: MOCKED_LABELS_FLAT,
@@ -217,6 +235,7 @@ describe('DatasetImportToNewProjectLabels', () => {
     it('should properly behave on "select all" user action', async () => {
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={{ ...mockDatasetImportItem, labelsToSelect: MOCKED_LABELS_HIERARCHY }}
                 patchDatasetImport={mockPatchUpload}
             />
@@ -229,6 +248,7 @@ describe('DatasetImportToNewProjectLabels', () => {
     it('should not add duplicate labels on toggling selection checkbox', async () => {
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={{ ...mockDatasetImportItem, labelsToSelect: MOCKED_LABELS_FLAT }}
                 patchDatasetImport={mockPatchUpload}
             />
@@ -244,6 +264,7 @@ describe('DatasetImportToNewProjectLabels', () => {
     it('should select all children labels on root level parent label select', async () => {
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={{ ...mockDatasetImportItem, labelsToSelect: MOCKED_LABELS_DEEP_HIERARCHY }}
                 patchDatasetImport={mockPatchUpload}
             />
@@ -259,6 +280,7 @@ describe('DatasetImportToNewProjectLabels', () => {
     it('should select only the level children and parent labels on level parent label select', async () => {
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={{ ...mockDatasetImportItem, labelsToSelect: MOCKED_LABELS_DEEP_HIERARCHY }}
                 patchDatasetImport={mockPatchUpload}
             />
@@ -282,6 +304,7 @@ describe('DatasetImportToNewProjectLabels', () => {
     it('should unselect only self label after it was selected by parent', async () => {
         render(
             <DatasetImportToNewProjectLabels
+                hasCheckbox={true}
                 datasetImportItem={{ ...mockDatasetImportItem, labelsToSelect: MOCKED_LABELS_DEEP_HIERARCHY }}
                 patchDatasetImport={mockPatchUpload}
             />

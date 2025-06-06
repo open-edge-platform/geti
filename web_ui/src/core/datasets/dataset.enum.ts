@@ -59,6 +59,7 @@ export enum DATASET_IMPORT_TASK_TYPE {
     CLASSIFICATION_HIERARCHICAL = 'classification_hierarchical',
     DETECTION_CLASSIFICATION = 'detection_classification',
     DETECTION_SEGMENTATION = 'detection_segmentation',
+    KEYPOINT_DETECTION = 'keypoint_detection',
 }
 
 export enum DATASET_IMPORT_DOMAIN {
@@ -74,4 +75,5 @@ export enum DATASET_IMPORT_DOMAIN {
     CLASSIFICATION_HIERARCHICAL = 'Classification hierarchical',
     DETECTION_CLASSIFICATION = 'Detection > Classification',
     DETECTION_SEGMENTATION = 'Detection > Segmentation',
+    KEYPOINT_DETECTION = 'Keypoint detection',
 }

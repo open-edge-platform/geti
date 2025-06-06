@@ -4,6 +4,7 @@
 import { type ButtonProps } from '@geti/ui';
 
 import { WorkspaceIdentifier } from '../../../packages/core/src/workspaces/services/workspaces.interface';
+import { KeypointStructureDTO } from '../projects/dtos/task.interface';
 import {
     DATASET_IMPORT_DIALOG_BUTTONS,
     DATASET_IMPORT_TASK_TYPE,
@@ -79,6 +80,7 @@ export interface DatasetImportTask {
     title: string;
     taskType: DATASET_IMPORT_TASK_TYPE;
     labels: DatasetImportLabel[];
+    keypointStructure?: KeypointStructureDTO;
 }
 
 export interface DatasetImportConnection {

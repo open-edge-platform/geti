@@ -4,13 +4,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { capitalize } from 'lodash-es';
 
-import {
-    DATASET_IMPORT_STATUSES,
-    DATASET_IMPORT_TASK_TYPE,
-    DATASET_IMPORT_TO_NEW_PROJECT_STEP,
-} from '../../../../../core/datasets/dataset.enum';
-import { DatasetImportToNewProjectItem } from '../../../../../core/datasets/dataset.interface';
+import { DATASET_IMPORT_TASK_TYPE } from '../../../../../core/datasets/dataset.enum';
 import { ProjectProps } from '../../../../../core/projects/project.interface';
+import { getMockedUploadItem } from '../../../../../test-utils/mocked-items-factory/mocked-dataset-import';
 import { getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';
 import { DatasetImportToNewProjectDomain } from './dataset-import-to-new-project-domain.component';
 
@@ -24,75 +20,6 @@ const mockProjects: ProjectProps[] = [
         name: 'Test project 2',
     }),
 ];
-
-const getMockedUploadItem = (item: Partial<DatasetImportToNewProjectItem> = {}): DatasetImportToNewProjectItem => ({
-    id: 'fileTestId',
-    name: 'fileTestName',
-    taskType: DATASET_IMPORT_TASK_TYPE.DETECTION_CLASSIFICATION,
-    supportedProjectTypes: [
-        {
-            projectType: DATASET_IMPORT_TASK_TYPE.DETECTION_CLASSIFICATION,
-            pipeline: {
-                connections: [
-                    {
-                        from: 'Dataset',
-                        to: 'Detection',
-                    },
-                    {
-                        from: 'Detection',
-                        to: 'Crop',
-                    },
-                    {
-                        from: 'Crop',
-                        to: 'Classification',
-                    },
-                ],
-                tasks: [
-                    {
-                        title: 'Dataset',
-                        taskType: DATASET_IMPORT_TASK_TYPE.DATASET,
-                        labels: [],
-                    },
-                    {
-                        title: 'Detection',
-                        taskType: DATASET_IMPORT_TASK_TYPE.DETECTION,
-                        labels: [],
-                    },
-                    {
-                        title: 'Crop',
-                        taskType: DATASET_IMPORT_TASK_TYPE.CROP,
-                        labels: [],
-                    },
-                    {
-                        title: 'Classification',
-                        taskType: DATASET_IMPORT_TASK_TYPE.CLASSIFICATION,
-                        labels: [],
-                    },
-                ],
-            },
-        },
-    ],
-    size: '',
-    labels: [],
-    progress: 0,
-    warnings: [],
-    uploadId: null,
-    projectName: '',
-    startFromBytes: 0,
-    startAt: Date.now(),
-    timeRemaining: null,
-    bytesRemaining: null,
-    firstChainTaskType: null,
-    firstChainLabels: [],
-    labelsToSelect: [],
-    labelColorMap: {},
-    completedSteps: [],
-    preparingJobId: null,
-    status: DATASET_IMPORT_STATUSES.UPLOADING,
-    activeStep: DATASET_IMPORT_TO_NEW_PROJECT_STEP.DATASET,
-    openedSteps: [DATASET_IMPORT_TO_NEW_PROJECT_STEP.DATASET],
-    ...item,
-});
 
 describe('DatasetImportToNewProjectDomain', () => {
     const mockPatchUpload = jest.fn();

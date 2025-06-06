@@ -6,7 +6,11 @@ import duration from 'dayjs/plugin/duration.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
 import { isEmpty } from 'lodash-es';
 
-import { DATASET_IMPORT_STATUSES, DATASET_IMPORT_TO_NEW_PROJECT_STEP } from '../../core/datasets/dataset.enum';
+import {
+    DATASET_IMPORT_STATUSES,
+    DATASET_IMPORT_TASK_TYPE,
+    DATASET_IMPORT_TO_NEW_PROJECT_STEP,
+} from '../../core/datasets/dataset.enum';
 import {
     DatasetImportSupportedProjectType,
     DatasetImportToNewProjectItem,
@@ -79,3 +83,11 @@ export const getTimeRemaining = (timeStarted: number, bytesUploaded: number, byt
 
 export const getBytesRemaining = (bytesRemaining: number): string =>
     bytesRemaining ? `${getFileSize(bytesRemaining)} left` : '';
+
+export const hasKeypointStructure = (supportedProjectTypes: DatasetImportSupportedProjectType[]) => {
+    return supportedProjectTypes.some(
+        ({ projectType, pipeline }) =>
+            projectType === DATASET_IMPORT_TASK_TYPE.KEYPOINT_DETECTION &&
+            pipeline.tasks.some((task) => !isEmpty(task.keypointStructure))
+    );
+};
