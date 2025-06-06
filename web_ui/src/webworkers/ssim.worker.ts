@@ -4,8 +4,8 @@
 // Dependencies get bundled into the worker
 
 import { OpenCVLoader } from '@geti/smart-tools';
-import * as OpenCVTypes from '@geti/smart-tools/opencv-types';
 import { expose } from 'comlink';
+import type OpenCVTypes from 'OpenCVTypes';
 
 import { RegionOfInterest } from '../core/annotations/annotation.interface';
 import { Rect } from '../core/annotations/shapes.interface';

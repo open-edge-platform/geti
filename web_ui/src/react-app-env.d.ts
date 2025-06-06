@@ -36,6 +36,14 @@ declare interface WindowEventHandlersEventMap {
     beforeinstallprompt: BeforeInstallPromptEvent;
 }
 
+declare module 'OpenCVTypes' {
+    import * as types from 'opencv-types';
+
+    export * from 'opencv-types';
+    export type cv = types;
+}
+
+declare const cv: Promise<OpenCVTypes.cv>;
 declare module '*.pdf';
 
 // We need these two to be able to import/export svgs as ReactComponent,
@@ -46,4 +54,11 @@ declare module '*.svg' {
 declare module '*.svg?react' {
     const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
     export default ReactComponent;
+}
+
+declare module 'opencv' {
+    import OpenCVTypes from '@geti/smart-tools/opencv-types';
+
+    const OpenCV: Promise<OpenCVTypes>;
+    export default OpenCV;
 }
