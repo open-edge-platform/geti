@@ -76,12 +76,8 @@ class ProjectConfigurationRepo(ProjectBasedSessionRepo[ProjectConfiguration]):
         if project_config is None:
             raise ValueError(f"Project configuration with ID {task_config.id_} not found.")
 
-        for i, config in enumerate(project_config.task_configs):
-            if config.task_id == task_config.task_id:
-                project_config.task_configs[i] = task_config
-                self.save(project_config)
-                return
-        raise ValueError(f"Task configuration with ID {task_config.task_id} not found.")
+        project_config.update_task_config(task_config=task_config)
+        self.save(project_config)
 
     def create_default_configuration(self, task_ids: Sequence[ID]) -> None:
         """
