@@ -3,15 +3,18 @@
 
 import {
     DATASET_IMPORT_STATUSES,
+    DATASET_IMPORT_TASK_TYPE,
     DATASET_IMPORT_TO_NEW_PROJECT_STEP,
     DATASET_IMPORT_WARNING_TYPE,
 } from '../../core/datasets/dataset.enum';
 import { getFileSize } from '../../shared/utils';
+import { getMockedSupportedProjectTypes } from '../../test-utils/mocked-items-factory/mocked-dataset-import';
 import {
     formatDatasetPrepareImportResponse,
     getBytesRemaining,
     getDatasetImportInitialState,
     getTimeRemaining,
+    hasKeypointStructure,
 } from './utils';
 
 jest.mock('../../shared/utils', () => ({
@@ -91,6 +94,49 @@ describe('import to new project utils', () => {
 
         it('calculating', () => {
             expect(getTimeRemaining(Date.now(), 0, 0)).toEqual('Calculating...');
+        });
+    });
+    describe('hasKeypointStructure', () => {
+        it('return true when keypoint structure exists in supported project types', () => {
+            const activeDatasetImport = getMockedSupportedProjectTypes([
+                {
+                    projectType: DATASET_IMPORT_TASK_TYPE.KEYPOINT_DETECTION,
+                    pipeline: {
+                        connections: [],
+                        tasks: [
+                            {
+                                title: 'keypoint detection',
+                                labels: [],
+                                keypointStructure: { edges: [], positions: [] },
+                                taskType: DATASET_IMPORT_TASK_TYPE.KEYPOINT_DETECTION,
+                            },
+                        ],
+                    },
+                },
+            ]);
+
+            expect(hasKeypointStructure(activeDatasetImport)).toBe(true);
+        });
+
+        it('return false when project type is not KEYPOINT_DETECTION', () => {
+            expect(
+                hasKeypointStructure([
+                    {
+                        projectType: DATASET_IMPORT_TASK_TYPE.CLASSIFICATION,
+                        pipeline: {
+                            connections: [],
+                            tasks: [
+                                {
+                                    keypointStructure: { edges: [], positions: [] },
+                                    title: '',
+                                    taskType: DATASET_IMPORT_TASK_TYPE.ANOMALY_CLASSIFICATION,
+                                    labels: [],
+                                },
+                            ],
+                        },
+                    },
+                ])
+            ).toBe(false);
         });
     });
 });

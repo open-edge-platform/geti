@@ -18,6 +18,7 @@ import classes from './dataset-import-to-new-project.module.scss';
 interface BuildTreeProps {
     obj: Record<string, unknown>;
     disabled?: boolean;
+    hasCheckbox: boolean;
     labelsInitiallyCollapsed?: boolean;
     isLabelSelected: (labelName: string) => boolean;
     isLabelIndeterminate: (labelName: string) => boolean;
@@ -27,6 +28,7 @@ interface BuildTreeProps {
 }
 
 interface DatasetImportToNewProjectLabelsProps {
+    hasCheckbox: boolean;
     datasetImportItem: DatasetImportToNewProjectItem;
     patchDatasetImport: (item: Partial<DatasetImportToNewProjectItem>) => void;
     labelsInitiallyCollapsed?: boolean;
@@ -73,12 +75,13 @@ const getPaths = (
 const BuildTree = ({
     obj,
     disabled,
+    hasCheckbox,
     labelsInitiallyCollapsed,
-    isLabelSelected,
-    onToggleLabelSelection,
-    isLabelIndeterminate,
     labelColorMapSnapshot,
+    isLabelSelected,
+    isLabelIndeterminate,
     onColorChange,
+    onToggleLabelSelection,
 }: BuildTreeProps): JSX.Element => {
     const [isHidden, setIsHidden] = useState(labelsInitiallyCollapsed);
 
@@ -113,7 +116,7 @@ const BuildTree = ({
                             <ChevronRightSmallLight />
                         </ActionButton>
                     )}
-                    {!!obj.label && (
+                    {!!obj.label && hasCheckbox && (
                         <Checkbox
                             id={`select-${uid}-label`}
                             aria-label={`select-${uid}-label`}
@@ -158,6 +161,7 @@ const BuildTree = ({
                             obj={objChild}
                             disabled={disabled}
                             key={idx}
+                            hasCheckbox={hasCheckbox}
                             isLabelSelected={isLabelSelected}
                             labelsInitiallyCollapsed={labelsInitiallyCollapsed}
                             onColorChange={onColorChange}
@@ -173,6 +177,7 @@ const BuildTree = ({
 };
 
 export const DatasetImportToNewProjectLabels = ({
+    hasCheckbox,
     datasetImportItem,
     patchDatasetImport,
     labelsInitiallyCollapsed = false,
@@ -320,17 +325,19 @@ export const DatasetImportToNewProjectLabels = ({
                 </IllustratedMessage>
             ) : (
                 <Flex direction='column' height='100%'>
-                    <Flex alignItems='center' gap='size-200'>
-                        <Checkbox
-                            id='select-all-labels'
-                            aria-label='select-all-labels'
-                            onChange={selectAllLabels}
-                            isSelected={areAllLabelsSelected}
-                            isIndeterminate={areAllLabelsIndeterminate}
-                            UNSAFE_style={{ paddingRight: 0 }}
-                        />
-                        <Text>Select all labels</Text>
-                    </Flex>
+                    {hasCheckbox && (
+                        <Flex alignItems='center' gap='size-200'>
+                            <Checkbox
+                                id='select-all-labels'
+                                aria-label='select-all-labels'
+                                onChange={selectAllLabels}
+                                isSelected={areAllLabelsSelected}
+                                isIndeterminate={areAllLabelsIndeterminate}
+                                UNSAFE_style={{ paddingRight: 0 }}
+                            />
+                            <Text>Select all labels</Text>
+                        </Flex>
+                    )}
 
                     {isTaskChainedProject(taskType) && (
                         <View
@@ -346,6 +353,7 @@ export const DatasetImportToNewProjectLabels = ({
                                             obj={obj}
                                             disabled
                                             key={idx}
+                                            hasCheckbox={hasCheckbox}
                                             isLabelSelected={isLabelSelected}
                                             labelsInitiallyCollapsed={labelsInitiallyCollapsed}
                                             onColorChange={handleColorChangeEnd}
@@ -365,6 +373,7 @@ export const DatasetImportToNewProjectLabels = ({
                                 <BuildTree
                                     obj={obj}
                                     key={idx}
+                                    hasCheckbox={hasCheckbox}
                                     isLabelSelected={isLabelSelected}
                                     labelsInitiallyCollapsed={labelsInitiallyCollapsed}
                                     onColorChange={handleColorChangeEnd}

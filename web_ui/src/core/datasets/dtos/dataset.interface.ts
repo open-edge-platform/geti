@@ -2,6 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { CreateDatasetResponseDTO } from '../../projects/dataset.interface';
+import { KeypointStructureDTO } from '../../projects/dtos/task.interface';
 import { DATASET_IMPORT_WARNING_TYPE } from '../dataset.enum';
 import { DATASET_IMPORT_TASK_TYPE_DTO } from './dataset.enum';
 
@@ -28,6 +29,7 @@ export interface DatasetImportTaskDTO {
     title: string;
     task_type: DATASET_IMPORT_TASK_TYPE_DTO;
     labels: DatasetImportLabelDTO[];
+    keypoint_structure?: KeypointStructureDTO;
 }
 
 export interface DatasetImportConnectionDTO {

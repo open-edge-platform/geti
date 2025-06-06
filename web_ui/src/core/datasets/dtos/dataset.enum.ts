@@ -15,4 +15,5 @@ export enum DATASET_IMPORT_TASK_TYPE_DTO {
     CLASSIFICATION_HIERARCHICAL = 'classification_hierarchical',
     DETECTION_CLASSIFICATION = 'detection_classification',
     DETECTION_SEGMENTATION = 'detection_segmentation',
+    KEYPOINT_DETECTION = 'keypoint_detection',
 }

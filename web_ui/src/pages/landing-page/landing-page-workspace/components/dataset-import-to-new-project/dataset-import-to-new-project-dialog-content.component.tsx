@@ -8,6 +8,7 @@ import { isEmpty, isNil } from 'lodash-es';
 
 import { DATASET_IMPORT_TO_NEW_PROJECT_STEP } from '../../../../../core/datasets/dataset.enum';
 import { DatasetImportToNewProjectItem } from '../../../../../core/datasets/dataset.interface';
+import { hasKeypointStructure } from '../../../../../providers/dataset-import-to-new-project-provider/utils';
 import { DatasetImportDnd } from '../../../../../shared/components/dataset-import-dnd/dataset-import-dnd.component';
 import { DatasetImportProgress } from '../../../../../shared/components/dataset-import-progress/dataset-import-progress.component';
 import { DatasetImportWarnings } from '../../../../../shared/components/dataset-import-warnings/dataset-import-warnings.component';
@@ -48,6 +49,8 @@ export const DatasetImportToNewProjectDialogContent = ({
     setActiveDatasetImportId,
     anomalyRevamp,
 }: DatasetImportToNewProjectDialogContentProps): JSX.Element => {
+    const isKeypointImport = datasetImportItem && hasKeypointStructure(datasetImportItem.supportedProjectTypes);
+
     if (isNil(datasetImportItem)) {
         return (
             <DatasetImportToNewProjectDialogContentTabs>
@@ -76,6 +79,7 @@ export const DatasetImportToNewProjectDialogContent = ({
             )}
             {datasetImportItem.activeStep === DATASET_IMPORT_TO_NEW_PROJECT_STEP.LABELS && (
                 <DatasetImportToNewProjectLabels
+                    hasCheckbox={!isKeypointImport}
                     datasetImportItem={datasetImportItem}
                     patchDatasetImport={patchDatasetImport}
                 />
