@@ -9,9 +9,11 @@ from datetime import datetime
 from enum import IntEnum, auto
 from typing import Any
 
+from geti_feature_tools.feature_flags import FeatureFlagProvider
+
 from communication.views.media_identifier_rest_views import MediaIdentifierRESTViews
 from communication.views.scored_label_rest_views import ScoredLabelRESTViews
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from features.feature_flag import FeatureFlag
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID

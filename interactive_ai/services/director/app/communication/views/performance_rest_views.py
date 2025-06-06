@@ -6,7 +6,9 @@ This module implements REST mappers for Performance entities
 
 from typing import Any
 
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from geti_feature_tools.feature_flags import FeatureFlagProvider
+
+from features.feature_flag import FeatureFlag
 
 from iai_core.entities.metrics import AnomalyLocalizationPerformance, NullPerformance, Performance
 from iai_core.entities.project_performance import (

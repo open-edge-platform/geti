@@ -1,7 +1,9 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from geti_feature_tools.feature_flags import FeatureFlagProvider
+
+from features.feature_flag import FeatureFlag
 from service.configuration_service import ConfigurationService
 from service.job_submission.base import JobParams, ModelJobSubmitter
 from service.job_submission.job_creation_helpers import (

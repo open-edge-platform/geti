@@ -6,6 +6,8 @@
 import logging
 import os
 
+from geti_feature_tools.feature_flags import FeatureFlagProvider
+
 from communication.data_validator import TrainingRestValidator
 from communication.exceptions import (
     JobDuplicateFoundException,
@@ -19,7 +21,7 @@ from communication.jobs_client import JobsClient
 from communication.views.job_rest_views import JobRestViews
 from coordination.dataset_manager.missing_annotations_helper import MissingAnnotationsHelper
 from entities import TaskTrainReadiness, TrainingConfig
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from features.feature_flag import FeatureFlag
 from service.job_submission import ModelTrainingJobSubmitter
 from service.label_schema_service import LabelSchemaService
 from service.project_service import ProjectService
