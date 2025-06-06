@@ -140,10 +140,7 @@ export const CreateProjectMenu = ({ openImportDatasetDialog }: CreateProjectMenu
                                             keepOriginalDates: false,
                                             projectName: projectName.trim(),
                                         }}
-                                        onImportProject={() => {
-                                            setShowImportProjectDialog(false);
-                                            setProjectName('');
-                                        }}
+                                        onImportProject={dismissImportProject}
                                     />
                                 </View>
                             </Flex>
