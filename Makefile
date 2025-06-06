@@ -2,12 +2,10 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 .PHONY: build clean push static-code-analysis tests test-unit test-integration test-component
-
-PROJECTS = interactive_ai platform web_ui
-CHART_TEMPLATES_LIST = $(shell find . -name "Chart.yaml.template" | while read -r filepath; do dirname $$(dirname $$filepath); done)
 .DEFAULT_GOAL := build
+PROJECTS = interactive_ai platform web_ui
 
-build:
+build-image:
 	echo "Building images for all projects..."
 	@for dir in $(PROJECTS); do \
 		echo "Running make build-image in $$dir..."; \
@@ -16,16 +14,9 @@ build:
 
 build-chart:
 	echo "Building charts for all projects..."
-	@for dir in $(CHART_TEMPLATES_LIST); do \
+	@for dir in $(PROJECTS); do \
 		echo "Running make build-chart in $$dir..."; \
 		$(MAKE) -C $$dir build-chart; \
-	done
-
-clean-chart:
-	echo "Clean charts for all projects..."
-	@for dir in $(CHART_TEMPLATES_LIST); do \
-		echo "Running make build-chart in $$dir..."; \
-		$(MAKE) -C $$dir clean-chart; \
 	done
 
 clean:
@@ -35,7 +26,7 @@ clean:
 		$(MAKE) -C $$dir clean; \
 	done
 
-push:
+publish-image:
 	echo "Pushing all projects..."
 	@for dir in $(PROJECTS); do \
 		echo "Running make publish-image in $$dir..."; \
