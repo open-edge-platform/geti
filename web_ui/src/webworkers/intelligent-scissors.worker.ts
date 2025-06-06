@@ -4,8 +4,8 @@
 // Dependencies get bundled into the worker
 
 import { OpenCVLoader } from '@geti/smart-tools';
-import * as OpenCVTypes from '@geti/smart-tools/opencv-types';
 import { expose } from 'comlink';
+import type OpenCVTypes from 'OpenCVTypes';
 
 import { Point, Polygon } from '../core/annotations/shapes.interface';
 import { ShapeType } from '../core/annotations/shapetype.enum';
