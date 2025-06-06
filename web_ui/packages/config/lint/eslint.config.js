@@ -191,7 +191,7 @@ export default [
             'import/no-unresolved': [
                 2,
                 {
-                    ignore: ['^@.*', 'csstype', 'opencv'],
+                    ignore: ['csstype'],
                 },
             ],
 

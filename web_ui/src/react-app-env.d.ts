@@ -1,5 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+
 /// <reference types="@rsbuild/core/types" />
 
 /**
@@ -37,14 +38,19 @@ declare interface WindowEventHandlersEventMap {
 }
 
 declare module 'OpenCVTypes' {
-    import * as types from 'opencv-types';
+    import * as OpenCVTypes from '@geti/smart-tools/opencv-types';
 
-    export * from 'opencv-types';
-    export type cv = types;
+    export = OpenCVTypes;
 }
 
 declare const cv: Promise<OpenCVTypes.cv>;
-declare module '*.pdf';
+
+declare module 'opencv' {
+    import OpenCVTypes from '@geti/smart-tools/opencv-types';
+
+    const OpenCV: Promise<OpenCVTypes>;
+    export default OpenCV;
+}
 
 // We need these two to be able to import/export svgs as ReactComponent,
 // for instance: export { ReactComponent as Logo } from './logo.svg';
@@ -56,9 +62,4 @@ declare module '*.svg?react' {
     export default ReactComponent;
 }
 
-declare module 'opencv' {
-    import OpenCVTypes from '@geti/smart-tools/opencv-types';
-
-    const OpenCV: Promise<OpenCVTypes>;
-    export default OpenCV;
-}
+declare module '*.pdf';
