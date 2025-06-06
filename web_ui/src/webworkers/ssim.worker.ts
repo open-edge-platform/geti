@@ -3,6 +3,7 @@
 
 // Dependencies get bundled into the worker
 
+import { OpenCVLoader } from '@geti/smart-tools';
 import { expose } from 'comlink';
 import type OpenCVTypes from 'OpenCVTypes';
 
@@ -10,7 +11,6 @@ import { RegionOfInterest } from '../core/annotations/annotation.interface';
 import { Rect } from '../core/annotations/shapes.interface';
 import { Vec2 } from '../core/annotations/vec2';
 import { MINIMUM_THRESHOLD, RunSSIMProps, SSIMMatch } from '../pages/annotator/tools/ssim-tool/ssim-tool.interface';
-import cv from './opencv-loader';
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -113,7 +113,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return cv(self).then((cvInstance: OpenCVTypes.cv) => {
+        return OpenCVLoader(self).then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;

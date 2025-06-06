@@ -3,6 +3,7 @@
 
 //  Dependencies get bundled into the worker
 
+import { OpenCVLoader } from '@geti/smart-tools';
 import { expose } from 'comlink';
 import type OpenCVTypes from 'OpenCVTypes';
 
@@ -10,7 +11,6 @@ import { Point, Polygon, Rect } from '../core/annotations/shapes.interface';
 import { ShapeType } from '../core/annotations/shapetype.enum';
 import { GrabcutToolType } from '../pages/annotator/tools/grabcut-tool/grabcut-tool.enums';
 import { GrabcutData } from '../pages/annotator/tools/grabcut-tool/grabcut-tool.interface';
-import cv from './opencv-loader';
 import { approximateShape, getMatFromPoints, getPointsFromMat } from './utils';
 
 declare const self: DedicatedWorkerGlobalScope;
@@ -25,7 +25,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return cv(self).then((cvInstance: OpenCVTypes.cv) => {
+        return OpenCVLoader(self).then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;

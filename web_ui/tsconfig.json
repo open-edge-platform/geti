@@ -1,17 +1,9 @@
 {
   "extends": "@geti/config/typescript",
-  "compilerOptions": {
-    "paths": {
-      "opencv": ["./public/assets/opencv/4.9.0/opencv.js"],
-    }
-  },
   "include": [
     "src",
     "tests",
     "rsbuild.config.ts",
-    "dev-proxy.ts",
-  ],
-  "exclude": [
-    "./src/opencv-types/**"
+    "dev-proxy.ts"
   ]
 }
