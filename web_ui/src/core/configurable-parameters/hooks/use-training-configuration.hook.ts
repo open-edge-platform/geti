@@ -21,7 +21,7 @@ const trainingConfigurationQueryOptions = (
     queryOptions({
         queryKey: QUERY_KEYS.CONFIGURATION_PARAMETERS.TRAINING(projectIdentifier, queryParameters),
         queryFn: () => {
-            return service.getTrainingConfiguration(projectIdentifier);
+            return service.getTrainingConfiguration(projectIdentifier, queryParameters);
         },
     });
 

@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { isObject } from 'lodash-es';
 import { v4 as uuidV4 } from 'uuid';
 
 import {
@@ -17,6 +18,7 @@ import {
     StaticParameterDTO,
     TrainingConfigurationDTO,
     TrainingConfigurationUpdatePayloadDTO,
+    TrainingParametersDTO,
 } from '../dtos/configuration.interface';
 import {
     ConfigurableParametersComponents,
@@ -32,6 +34,7 @@ import {
     StaticParameter,
     TrainingConfiguration,
     TrainingConfigurationUpdatePayload,
+    TrainingParameters,
 } from './configuration.interface';
 
 const getConfigParametersField = (
@@ -277,21 +280,53 @@ export const getProjectConfigurationEntity = ({ task_configs }: ProjectConfigura
     };
 };
 
-export const getTrainingConfigurationEntity = (config: TrainingConfigurationDTO): TrainingConfiguration => {
-    const trainingConfiguration: TrainingConfiguration = {
-        datasetPreparation: Object.entries(config.dataset_preparation).reduce((acc, [key, value]) => {
-            const parameters = value.map(getParameter);
+const getParametersObject = (
+    parameters: Record<string, ConfigurationParameterDTO[]>
+): Record<string, ConfigurationParameter[]> => {
+    return Object.entries(parameters).reduce(
+        (acc, [key, value]) => {
+            acc[key] = value.map(getParameter);
+            return acc;
+        },
+        {} as Record<string, ConfigurationParameter[]>
+    );
+};
+
+const isParameterDTO = (input: unknown): input is ConfigurationParameterDTO => {
+    return isObject(input) && 'key' in input && 'name' in input && 'description' in input;
+};
+
+const getTrainingParameters = (config: TrainingParametersDTO): TrainingParameters => {
+    return config.map((item) => {
+        if (isParameterDTO(item)) {
+            return getParameter(item);
+        }
+
+        return Object.entries(item).reduce((acc, [key, parameters]) => {
             return {
                 ...acc,
-                [key]: parameters,
+                [key]: parameters.map(getParameter),
             };
-        }, {}),
-        training: config.training.map(getParameter),
-        evaluation: config.evaluation.map(getParameter),
+        }, {});
+    });
+};
+
+export const getTrainingConfigurationEntity = (config: TrainingConfigurationDTO): TrainingConfiguration => {
+    const { task_id, training, advanced_configuration, dataset_preparation, evaluation } = config;
+
+    const trainingConfiguration: TrainingConfiguration = {
+        taskId: task_id,
+        datasetPreparation: {
+            augmentation: getParametersObject(dataset_preparation.augmentation),
+            filtering: getParametersObject(dataset_preparation.filtering),
+            subsetSplit: dataset_preparation.subset_split.map(getParameter),
+        },
+        training: getTrainingParameters(training),
+        evaluation: evaluation.map(getParameter),
     };
 
-    if (config.advanced_configuration !== undefined) {
-        trainingConfiguration.advancedConfiguration = config.advanced_configuration.map(getStaticParameter);
+    if (advanced_configuration !== undefined) {
+        trainingConfiguration.advancedConfiguration = advanced_configuration.map(getStaticParameter);
     }
 
     return trainingConfiguration;

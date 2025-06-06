@@ -27,7 +27,11 @@ import {
     getTrainingConfigurationUpdatePayloadDTO,
 } from './utils';
 
-export type TrainingConfigurationQueryParameters = Partial<{ taskId: string; algorithmId: string; modelId: string }>;
+export type TrainingConfigurationQueryParameters = Partial<{
+    taskId: string;
+    modelManifestId: string | null;
+    modelId: string;
+}>;
 export type ProjectConfigurationQueryParameters = { taskId?: string };
 
 export interface CreateApiModelConfigParametersService {
@@ -112,7 +116,7 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
             params: {
                 task_id: queryParameters?.taskId,
                 model_id: queryParameters?.modelId,
-                algorithm_id: queryParameters?.algorithmId,
+                model_manifest_id: queryParameters?.modelManifestId,
             },
         });
 
@@ -138,7 +142,7 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
             params: {
                 task_id: queryParameters?.taskId,
                 model_id: queryParameters?.modelId,
-                algorithm_id: queryParameters?.algorithmId,
+                algorithm_id: queryParameters?.modelManifestId,
             },
         });
     };
