@@ -7,6 +7,7 @@ from service.utils import delete_none_from_dict, merge_deep_dict
 from storage.repos.partial_training_configuration_repo import PartialTrainingConfigurationRepo
 
 from geti_types import ID
+from iai_core.repos import ModelRepo, ModelStorageRepo
 
 
 class TestConfigurationService:
@@ -121,3 +122,35 @@ class TestConfigurationService:
             strict_validation=True,
         )
         assert full_config == expected_config
+
+    def test_get_configuration_from_model(
+        self,
+        request,
+        fxt_model_storage,
+        fxt_model,
+    ) -> None:
+        # Arrange
+        project_identifier = fxt_model_storage.project_identifier
+        model_storage_repo = ModelStorageRepo(project_identifier)
+        model_repo = ModelRepo(fxt_model_storage.identifier)
+
+        def cleanup() -> None:
+            model_storage_repo.delete_by_id(fxt_model_storage.id_)
+            model_repo.delete_by_id(fxt_model.id_)
+
+        request.addfinalizer(lambda: cleanup())
+
+        model_config_dict = {"key": "value"}
+        fxt_model.configuration.display_only_configuration = model_config_dict
+
+        model_storage_repo.save(fxt_model_storage)
+        model_repo.save(fxt_model)
+
+        # Act
+        model_hyperparams_dict, model_storage = ConfigurationService.get_configuration_from_model(
+            project_identifier=project_identifier, task_id=fxt_model_storage.task_node_id, model_id=fxt_model.id_
+        )
+
+        # Assert
+        assert model_hyperparams_dict == model_hyperparams_dict
+        assert model_storage == fxt_model_storage

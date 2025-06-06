@@ -6,6 +6,8 @@ import pytest
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
 
 from communication.controllers.training_configuration_controller import TrainingConfigurationRESTController
+from communication.views.training_configuration_rest_views import TrainingConfigurationRESTViews
+from service.configuration_service import ConfigurationService
 from storage.repos.partial_training_configuration_repo import PartialTrainingConfigurationRepo
 
 from geti_types import ID
@@ -133,6 +135,41 @@ class TestTrainingConfigurationController:
 
         # check that both task level and manifest level configuration are present
         assert config_rest == fxt_partial_training_configuration_rest_view
+
+    @patch.object(TaskNodeRepo, "exists", return_value=True)
+    def test_get_configuration_from_model_id(
+        self, fxt_project_identifier, fxt_partial_training_configuration_manifest_level, fxt_model_storage
+    ) -> None:
+        # Arrange
+        model_id = ID("model_id")
+        fxt_partial_training_configuration_manifest_level.model_manifest_id = (
+            fxt_model_storage.model_template.model_template_id
+        )
+        model_hyperparams_dict = fxt_partial_training_configuration_manifest_level.hyperparameters.model_dump()
+        fxt_partial_training_configuration_manifest_level.global_parameters = None
+        expected_rest_view = TrainingConfigurationRESTViews.training_configuration_to_rest(
+            fxt_partial_training_configuration_manifest_level
+        )
+
+        # Act
+        with patch.object(
+            ConfigurationService,
+            "get_configuration_from_model",
+            return_value=(model_hyperparams_dict, fxt_model_storage),
+        ) as mock_get_configuration_from_model:
+            config_rest = TrainingConfigurationRESTController.get_configuration(
+                project_identifier=fxt_project_identifier,
+                task_id=ID(fxt_partial_training_configuration_manifest_level.task_id),
+                model_id=model_id,
+            )
+
+        # Assert
+        mock_get_configuration_from_model.assert_called_once_with(
+            project_identifier=fxt_project_identifier,
+            task_id=ID(fxt_partial_training_configuration_manifest_level.task_id),
+            model_id=model_id,
+        )
+        assert config_rest == expected_rest_view
 
     @patch.object(TaskNodeRepo, "exists", return_value=True)
     def test_update_configuration(
