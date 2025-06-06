@@ -6,13 +6,13 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { createInMemoryMediaService } from '../../../../core/media/services/in-memory-media-service/in-memory-media-service';
-import { DatasetImportToExistingProjectProvider } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
+import { ExportImportDatasetDialogProvider } from '../../../../features/dataset-export/components/export-import-dataset-dialog-provider.component';
+import { DatasetImportToExistingProjectProvider } from '../../../../features/dataset-import/providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { DatasetProvider } from '../../../../providers/dataset-provider/dataset-provider.component';
 import { MediaUploadProvider } from '../../../../providers/media-upload-provider/media-upload-provider.component';
 import { projectRender as render } from '../../../../test-utils/project-provider-render';
 import { getById } from '../../../../test-utils/utils';
 import { MediaProvider } from '../../../media/providers/media-provider.component';
-import { ExportImportDatasetDialogProvider } from './export-dataset/export-import-dataset-dialog-provider.component';
 import { ProjectDataset } from './project-dataset.component';
 
 const mockWorkspaceId = 'workspace-id';
@@ -31,11 +31,11 @@ jest.mock('../../../annotator/hooks/use-dataset-identifier.hook', () => ({
 }));
 
 jest.mock(
-    '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
+    '../../../../features/dataset-import/providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component',
     () => {
         return {
             ...jest.requireActual(
-                '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
+                '../../../../features/dataset-import/providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component'
             ),
             useDatasetImportToExistingProject: jest.fn(() => ({
                 datasetImports: [],

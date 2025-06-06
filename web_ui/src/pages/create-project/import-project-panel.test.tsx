@@ -6,7 +6,7 @@ import { ReactNode } from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
-import { DatasetImportToNewProjectProvider } from '../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
+import { DatasetImportToNewProjectProvider } from '../../features/dataset-import/providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
 import { ProjectsImportProvider } from '../../providers/projects-import-provider/projects-import-provider.component';
 import { applicationRender as render } from '../../test-utils/application-provider-render';
 import { ProjectImportPanel } from './import-project-panel.component';

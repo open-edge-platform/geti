@@ -8,6 +8,7 @@ import { screen, waitFor } from '@testing-library/react';
 import { FeatureFlags } from '../../../../core/feature-flags/services/feature-flag-service.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
+import { ExportImportDatasetDialogProvider } from '../../../../features/dataset-export/components/export-import-dataset-dialog-provider.component';
 import {
     MEDIA_CONTENT_BUCKET,
     MediaUploadPerDataset,
@@ -20,7 +21,6 @@ import { getMockedProject } from '../../../../test-utils/mocked-items-factory/mo
 import { projectRender } from '../../../../test-utils/project-provider-render';
 import { MediaProvider, useMedia } from '../../../media/providers/media-provider.component';
 import { getMatchedMediaCounts, getTotalMediaCounts } from '../../utils';
-import { ExportImportDatasetDialogProvider } from '../project-dataset/export-dataset/export-import-dataset-dialog-provider.component';
 import { MediaContentBucket, MediaContentBucketProps } from './media-content-bucket.component';
 
 jest.mock('../../../media/providers/media-provider.component', () => ({

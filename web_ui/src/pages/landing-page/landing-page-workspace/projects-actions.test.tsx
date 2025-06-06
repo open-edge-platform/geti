@@ -7,7 +7,7 @@ import { useOverlayTriggerState } from '@react-stately/overlays';
 import { screen } from '@testing-library/react';
 
 import { ProjectSortingOptions } from '../../../core/projects/services/project-service.interface';
-import { DatasetImportToNewProjectProvider } from '../../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
+import { DatasetImportToNewProjectProvider } from '../../../features/dataset-import/providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
 import { ProjectsImportProvider } from '../../../providers/projects-import-provider/projects-import-provider.component';
 import { applicationRender as render } from '../../../test-utils/application-provider-render';
 import { getMockedOrganizationAdminUser } from '../../../test-utils/mocked-items-factory/mocked-users';
