@@ -7,7 +7,7 @@ dependencies = [
     "mlflow==2.19.0",
     "minio~=7.1.0",
     "numpy==1.26.4",
-    "pyarrow==14.0.2",
+    "pyarrow==17.0.0",
     "pydantic==2.5.3",
     "s3fs==2025.3.0",
 ]
