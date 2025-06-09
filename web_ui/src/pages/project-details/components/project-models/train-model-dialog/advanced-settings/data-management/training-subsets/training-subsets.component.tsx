@@ -7,6 +7,10 @@ import { ActionButton, Flex, Grid, minmax, Text, View } from '@geti/ui';
 import { Refresh } from '@geti/ui/icons';
 import { noop } from 'lodash-es';
 
+import {
+    NumberParameter,
+    TrainingConfiguration,
+} from '../../../../../../../../core/configurable-parameters/services/configuration.interface';
 import { Accordion } from '../../ui/accordion/accordion.component';
 import { SubsetsDistributionSlider } from './subsets-distribution-slider/subsets-distribution-slider.component';
 
@@ -121,21 +125,34 @@ const SubsetsDistribution: FC<SubsetsDistributionProps> = ({
 
 const MAX_RATIO_VALUE = 100;
 
-// eslint-disable-next-line
+type SubsetsConfiguration = TrainingConfiguration['datasetPreparation']['subsetSplit'];
+
 interface TrainingSubsetsProps {
-    // TODO: get props for subsets distribution
+    subsetsConfiguration: SubsetsConfiguration;
 }
 
-export const TrainingSubsets: FC<TrainingSubsetsProps> = ({}) => {
-    const testSubsetCount = 20;
-    const trainingSubsetCount = 70;
-    const validationSubsetCount = 10;
-    const trainingSubsetRatioProp = 0.7 * 100;
-    const validationSubsetRatioProp = 0.1 * 100;
+const getSubsets = (subsetsConfiguration: SubsetsConfiguration) => {
+    const testSubset = subsetsConfiguration.find((parameter) => parameter.key === 'test') as NumberParameter;
+    const validationSubset = subsetsConfiguration.find(
+        (parameter) => parameter.key === 'validation'
+    ) as NumberParameter;
+    const trainingSubset = subsetsConfiguration.find((parameter) => parameter.key === 'training') as NumberParameter;
+
+    return {
+        trainingSubset,
+        validationSubset,
+        testSubset,
+    };
+};
+
+export const TrainingSubsets: FC<TrainingSubsetsProps> = ({
+    subsetsConfiguration,
+}) => {
+    const { trainingSubset, validationSubset, testSubset } = getSubsets(subsetsConfiguration);
 
     const [subsetsDistribution, setSubsetsDistribution] = useState<number[]>([
-        trainingSubsetRatioProp,
-        trainingSubsetRatioProp + validationSubsetRatioProp,
+        trainingSubset.value,
+        trainingSubset.value + validationSubset.value,
     ]);
 
     const trainingSubsetRatio = subsetsDistribution[0];
@@ -160,9 +177,9 @@ export const TrainingSubsets: FC<TrainingSubsetsProps> = ({}) => {
                 <SubsetsDistribution
                     subsetsDistribution={subsetsDistribution}
                     onSubsetsDistributionChange={setSubsetsDistribution}
-                    testSubsetCount={testSubsetCount}
-                    trainingSubsetCount={trainingSubsetCount}
-                    validationSubsetCount={validationSubsetCount}
+                    testSubsetCount={testSubset.value}
+                    trainingSubsetCount={trainingSubset.value}
+                    validationSubsetCount={validationSubset.value}
                     onSubsetsDistributionChangeEnd={noop}
                     onSubsetsDistributionReset={noop}
                 />
