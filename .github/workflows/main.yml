@@ -76,7 +76,7 @@ jobs:
           echo "image-tag=$product_version-$ref-$short_sha" >> "$GITHUB_OUTPUT"
 
       - name: Get changed components dirs
-        id: component-list
+        id: components-list
         uses: ./.github/actions/change-detection
         with:
           path_filter: "./.github/components-path-filters.yml"
