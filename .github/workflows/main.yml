@@ -79,14 +79,14 @@ jobs:
         uses: ./.github/actions/change-detection
         with:
           path_filter: "./.github/components-path-filters.yml"
-          get_all: ${BUILD_ALL}
+          get_all: ${{ env.BUILD_ALL }}
 
       - name: Get changed libs dirs
         id: libs-list
         uses: ./.github/actions/change-detection
         with:
           path_filter: "./.github/libs-path-filters.yml"
-          get_all: ${BUILD_ALL}
+          get_all: ${{ env.BUILD_ALL }}
 
       - name: Filter components (exclude 'web_ui')
         id: filtered-components-list
