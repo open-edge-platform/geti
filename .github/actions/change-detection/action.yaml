@@ -26,7 +26,7 @@ runs:
       run: |
         if [[ ${{ inputs.get_all }} == "true" ]]; then
           paths=$(yq -r '... comments=""' "${{ inputs.path_filter }}" | yq -r 'keys[]')
-          paths_list=$(printf '%s\n' "${paths[@]}" | jq -R . | jq -s .)
+          paths_list=$(printf '%s\n' "${paths[@]}" | jq -R . | jq -sc .)
         else
           paths_list=$(python3 -c "print('$CHANGED_KEYS'.split())")
         fi
