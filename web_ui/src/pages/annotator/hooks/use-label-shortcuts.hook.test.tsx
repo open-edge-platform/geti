@@ -25,7 +25,6 @@ const backgroundLabel = getMockedLabel({
     id: '3',
     name: 'Background Label',
     behaviour: LABEL_BEHAVIOUR.BACKGROUND,
-    isBackground: true,
 });
 const exclusiveInSecondTaskLabel = getMockedLabel({
     id: '4',

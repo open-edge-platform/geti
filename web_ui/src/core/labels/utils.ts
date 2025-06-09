@@ -67,7 +67,6 @@ export const isBackgroundBehavior = <T extends { behaviour: LABEL_BEHAVIOUR }>(l
 
 interface EmptyOrBackground {
     isEmpty: boolean;
-    isBackground: boolean;
     behaviour: LABEL_BEHAVIOUR;
 }
 
@@ -75,7 +74,7 @@ export const isEmptyLabel = <T extends EmptyOrBackground>(label: T): boolean => 
 export const isNonEmptyLabel = negate(isEmptyLabel);
 
 export const isBackgroundLabel = <T extends EmptyOrBackground>(label: T): boolean => {
-    return isBackgroundBehavior(label) && label.isBackground;
+    return isBackgroundBehavior(label);
 };
 
 export const isNonBackgroundLabel = negate(isBackgroundLabel);
@@ -157,12 +156,11 @@ export const getNewLabelPayload = (label: LabelTreeLabelProps, revisit: boolean)
         parentLabelId,
         behaviour,
         isEmpty: false,
-        isBackground: false,
     };
 };
 
 export const getDeletedLabelPayload = (label: LabelTreeLabelProps): DeletedLabel => {
-    const { name, color, hotkey, group, behaviour, parentLabelId, id, isEmpty, isBackground } = label;
+    const { name, color, hotkey, group, behaviour, parentLabelId, id, isEmpty } = label;
 
     return {
         id,
@@ -174,12 +172,11 @@ export const getDeletedLabelPayload = (label: LabelTreeLabelProps): DeletedLabel
         behaviour,
         isDeleted: true,
         isEmpty,
-        isBackground,
     };
 };
 
 export const getLabelPayload = (label: LabelTreeLabelProps): Label => {
-    const { id, name, color, hotkey, group, parentLabelId, behaviour, isEmpty, isBackground } = label;
+    const { id, name, color, hotkey, group, parentLabelId, behaviour, isEmpty } = label;
 
     return {
         id,
@@ -190,7 +187,6 @@ export const getLabelPayload = (label: LabelTreeLabelProps): Label => {
         parentLabelId,
         behaviour,
         isEmpty,
-        isBackground,
     };
 };
 

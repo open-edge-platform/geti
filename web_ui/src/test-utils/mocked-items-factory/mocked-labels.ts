@@ -25,7 +25,6 @@ const mockedLabel: Label = {
     hotkey: undefined,
     behaviour: LABEL_BEHAVIOUR.LOCAL + LABEL_BEHAVIOUR.GLOBAL,
     isEmpty: false,
-    isBackground: false,
 };
 
 export const getMockedLabel = (label?: Partial<Label> & { isExclusive?: boolean }): Label => {

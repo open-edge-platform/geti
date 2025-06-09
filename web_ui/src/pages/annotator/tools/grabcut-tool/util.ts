@@ -38,5 +38,4 @@ export const getLabel = (name: string, color: string): Label => ({
     behaviour: LABEL_BEHAVIOUR.LOCAL,
     parentLabelId: '',
     isEmpty: false,
-    isBackground: false,
 });

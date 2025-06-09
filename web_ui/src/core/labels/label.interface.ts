@@ -9,7 +9,6 @@ interface LabelCommon {
     readonly hotkey?: string;
     readonly behaviour: LABEL_BEHAVIOUR;
     readonly isEmpty: boolean;
-    readonly isBackground: boolean;
 }
 
 export interface Label extends LabelCommon {

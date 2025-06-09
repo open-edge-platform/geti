@@ -57,7 +57,7 @@ const getDistinctiveData = (item: LabelTreeItem) => {
     let meaningfulData: Label | Group;
 
     if (item.type === LabelItemType.LABEL) {
-        const { name, parentLabelId, id, hotkey, group, color, behaviour, isEmpty, isBackground } = item;
+        const { name, parentLabelId, id, hotkey, group, color, behaviour, isEmpty } = item;
 
         meaningfulData = {
             name,
@@ -68,7 +68,6 @@ const getDistinctiveData = (item: LabelTreeItem) => {
             id,
             behaviour,
             isEmpty,
-            isBackground,
         };
     } else {
         const { name, parentLabelId, id, parentName } = item;
@@ -148,7 +147,6 @@ export const DEFAULT_LABEL = (options: {
         type: LabelItemType.LABEL,
         relation,
         isEmpty: false,
-        isBackground: false,
     };
 };
 

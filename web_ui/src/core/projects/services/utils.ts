@@ -69,7 +69,7 @@ import {
 import { getTaskTypeFromDomain, isKeypointTask } from '../utils';
 
 const getRevisitLabel = (label: RevisitLabelDTO, domain: DOMAIN): RevisitLabel => {
-    const { name, color, group, parent_id, hotkey, revisit_affected_annotations, id, is_empty, is_background } = label;
+    const { name, color, group, parent_id, hotkey, revisit_affected_annotations, id, is_empty } = label;
     const behaviour = getBehaviourFromDTO(label, domain);
 
     return {
@@ -82,7 +82,6 @@ const getRevisitLabel = (label: RevisitLabelDTO, domain: DOMAIN): RevisitLabel =
         behaviour,
         revisitAffectedAnnotations: revisit_affected_annotations,
         isEmpty: is_empty,
-        isBackground: is_background ?? false,
     };
 };
 
@@ -92,7 +91,7 @@ const getRevisitLabel = (label: RevisitLabelDTO, domain: DOMAIN): RevisitLabel =
 // Keeping in mind that model-labels don't have any functionality but render the tree-view,
 // this helper is a straightforward solution.
 export const getRawNewLabel = (label: LabelDTO): Label => {
-    const { id, name, color, group, parent_id, is_empty, is_background } = label;
+    const { id, name, color, group, parent_id, is_empty } = label;
 
     return {
         id,
@@ -103,12 +102,11 @@ export const getRawNewLabel = (label: LabelDTO): Label => {
         behaviour: is_empty ? LABEL_BEHAVIOUR.EXCLUSIVE : LABEL_BEHAVIOUR.LOCAL,
         parentLabelId: parent_id || null,
         isEmpty: is_empty,
-        isBackground: is_background ?? false,
     };
 };
 
 const getDeletedLabel = (label: DeletedLabelDTO, domain: DOMAIN): DeletedLabel => {
-    const { name, color, group, parent_id, hotkey, is_deleted, id, is_empty, is_background } = label;
+    const { name, color, group, parent_id, hotkey, is_deleted, id, is_empty } = label;
     const behaviour = getBehaviourFromDTO(label, domain);
 
     return {
@@ -121,12 +119,11 @@ const getDeletedLabel = (label: DeletedLabelDTO, domain: DOMAIN): DeletedLabel =
         behaviour,
         isDeleted: is_deleted,
         isEmpty: is_empty,
-        isBackground: is_background ?? false,
     };
 };
 
 const getLabel = (label: LabelDTO, domain: DOMAIN): Label => {
-    const { id, name, color, group, parent_id, hotkey, is_empty, is_background } = label;
+    const { id, name, color, group, parent_id, hotkey, is_empty } = label;
     const behaviour = getBehaviourFromDTO(label, domain);
 
     return {
@@ -138,7 +135,6 @@ const getLabel = (label: LabelDTO, domain: DOMAIN): Label => {
         hotkey,
         behaviour,
         isEmpty: is_empty,
-        isBackground: is_background ?? false,
     };
 };
 
@@ -343,7 +339,7 @@ export const getProjectEntity = (serverProject: ProjectDTO, router = API_URLS): 
 };
 
 const getLabelDTO = (label: EditedLabel): EditedLabelDTO => {
-    const { name, color, group, parentLabelId, hotkey, isEmpty, isBackground } = label;
+    const { name, color, group, parentLabelId, hotkey, isEmpty, behaviour } = label;
 
     const common = {
         name,
@@ -352,7 +348,7 @@ const getLabelDTO = (label: EditedLabel): EditedLabelDTO => {
         hotkey,
         parent_id: parentLabelId,
         is_empty: isEmpty,
-        is_background: isBackground,
+        is_background: behaviour === LABEL_BEHAVIOUR.BACKGROUND,
         is_anomalous: isAnomalous(label),
     };
 
