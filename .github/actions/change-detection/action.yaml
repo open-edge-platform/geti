@@ -6,7 +6,7 @@ inputs:
     description: 'Path to the components path-filter file'
     required: true
   get_all:
-    description: 'If set to true, returns all components defined in the path filter file, regardless of detected changes'
+    description: 'Return all components regardless of detected changes (used for full rebuilds)'
     type: boolean
     required: true
 outputs:
@@ -16,12 +16,15 @@ outputs:
 
 runs:
   using: composite
+  env:
+    PATH_FILTER: ${{ inputs.path_filter }}
+    GET_ALL: ${{ inputs.get_all }}
   steps:
     - name: Get changed files
       id: changed-files
       uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
       with:
-        files_yaml_from_source_file: "${{ inputs.path_filter }}"
+        files_yaml_from_source_file: "${PATH_FILTER}"
 
     - name: Get changed components
       id: components-list
@@ -29,15 +32,14 @@ runs:
       env:
         CHANGED_KEYS: ${{ steps.changed-files.outputs.changed_keys }}
       run: |
-        if [[ ${{ inputs.get_all }} == "true" ]]; then
-          paths=$(yq -r '... comments=""' "${{ inputs.path_filter }}" | yq -r 'keys[]')
-          paths_list=$(printf '%s\n' "${paths[@]}" | jq -R . | jq -sc .)
+        if [[ "$GET_ALL" == true ]]; then
+           paths_list=$(yq -r '... comments=""' "${PATH_FILTER}" | yq -r 'keys[]' | jq -R . | jq -sc .)
         else
-          paths_list=$(python3 -c "print('$CHANGED_KEYS'.split())")
+          paths_list=$(python3 -c "import json; print(json.dumps('$CHANGED_KEYS'.split()))")
         fi
 
         echo "::group::paths list"
         echo $paths_list
         echo "::endgroup::"
 
-        echo "paths_list=$(jq -c <<< "$paths_list")" >> "$GITHUB_OUTPUT"
+        echo "paths_list=${paths_list}" >> "$GITHUB_OUTPUT"
