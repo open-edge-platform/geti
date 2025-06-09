@@ -8,6 +8,7 @@ requires-python = ">=3.10, <3.14"
 
 dependencies = [
     "fastapi~=0.109",
+    "kubernetes==32.0.1",
     "uvicorn~=0.27.1",
     "geti-types",
     "geti-telemetry-tools[fastapi,grpc,logger,telemetry]"
@@ -26,6 +27,7 @@ dev = [
     "pytest-cov==2.11.1",
     "click==8.1.7",
     "pytest-html~=4.0.0",
+    "pytest-mock~=3.10",
     "httpx~=0.23",
 ]
 
