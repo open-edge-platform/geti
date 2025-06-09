@@ -3,7 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { Grid, Item, minmax, Picker, Text, View } from '@geti/ui';
+import { Grid, Item, minmax, Picker, Text, ToggleButtons, View } from '@geti/ui';
 import { noop } from 'lodash-es';
 
 import {
@@ -13,7 +13,6 @@ import {
 import { Accordion } from '../ui/accordion/accordion.component';
 import { NumberParameter } from '../ui/number-parameter.component';
 import { ResetButton } from '../ui/reset-button.component';
-import { ToggleButtons } from '../ui/toggle-buttons/toggle-buttons.component';
 import { Tooltip } from '../ui/tooltip.component';
 
 import styles from './evaluation.module.scss';
