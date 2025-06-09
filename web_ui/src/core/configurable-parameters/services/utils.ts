@@ -283,13 +283,10 @@ export const getProjectConfigurationEntity = ({ task_configs }: ProjectConfigura
 const getParametersObject = (
     parameters: Record<string, ConfigurationParameterDTO[]>
 ): Record<string, ConfigurationParameter[]> => {
-    return Object.entries(parameters).reduce(
-        (acc, [key, value]) => {
-            acc[key] = value.map(getParameter);
-            return acc;
-        },
-        {} as Record<string, ConfigurationParameter[]>
-    );
+    return Object.entries(parameters).reduce<Record<string, ConfigurationParameter[]>>((acc, [key, value]) => {
+        acc[key] = value.map(getParameter);
+        return acc;
+    }, {});
 };
 
 const isParameterDTO = (input: unknown): input is ConfigurationParameterDTO => {

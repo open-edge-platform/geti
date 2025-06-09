@@ -142,7 +142,7 @@ export const createApiModelConfigParametersService: CreateApiService<CreateApiMo
             params: {
                 task_id: queryParameters?.taskId,
                 model_id: queryParameters?.modelId,
-                algorithm_id: queryParameters?.modelManifestId,
+                model_manifest_id: queryParameters?.modelManifestId,
             },
         });
     };
