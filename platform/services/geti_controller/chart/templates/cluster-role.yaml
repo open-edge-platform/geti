@@ -1,17 +1,18 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: controller-admin-access
-rules:
-- apiGroups: [""]
-  resources: ["serviceaccounts"]
-  verbs: ["create", "get", "list", "watch"]
-- apiGroups: ["rbac.authorization.k8s.io"]
-  resources: ["clusterroles", "clusterrolebindings"]
-  verbs: ["create", "get", "list", "watch"]
-- apiGroups: ["batch"]
-  resources: ["jobs"]
-  verbs: ["create", "get", "list", "watch"]
-- apiGroups: ["helm.cattle.io"]
-  resources: ["helmcharts"]
-  verbs: ["create", "update"]
+# TODO uncomment when charts will be ready
+#apiVersion: rbac.authorization.k8s.io/v1
+#kind: ClusterRole
+#metadata:
+#  name: controller-admin-access
+#rules:
+#- apiGroups: [""]
+#  resources: ["serviceaccounts"]
+#  verbs: ["create", "get", "list", "watch"]
+#- apiGroups: ["rbac.authorization.k8s.io"]
+#  resources: ["clusterroles", "clusterrolebindings"]
+#  verbs: ["create", "get", "list", "watch"]
+#- apiGroups: ["batch"]
+#  resources: ["jobs"]
+#  verbs: ["create", "get", "list", "watch"]
+#- apiGroups: ["helm.cattle.io"]
+#  resources: ["helmcharts"]
+#  verbs: ["create", "update"]
