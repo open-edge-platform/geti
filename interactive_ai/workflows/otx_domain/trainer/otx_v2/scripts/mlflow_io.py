@@ -180,7 +180,7 @@ def download_model_artifact(
             finally:
                 response.close()
     else:
-        local_dst_path = client.download_artifacts(
+        local_dst_path = client.download_artifacts(  # type: ignore
             run_id=run.info.run_id,
             path=str(mlflow_src_path),
             dst_path=str(dst_dir_path),

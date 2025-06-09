@@ -1,6 +1,6 @@
 ---
-name: resource
-version: '{{VERSION}}'
+name: ${COMPONENT_NAME}
+version: ${TAG}
 apiVersion: v2
 description: resource
-appVersion: '{{VERSION}}'
+appVersion: ${TAG}

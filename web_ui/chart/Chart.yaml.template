@@ -1,6 +1,6 @@
 ---
-name: web
-version: '{{VERSION}}'
+name: ${COMPONENT_NAME}
+version: ${TAG}
 description: web chart
 apiVersion: v2
-appVersion: '{{VERSION}}'
+appVersion: ${TAG}

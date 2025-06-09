@@ -16,6 +16,7 @@ export enum LOCAL_STORAGE_KEYS {
     COPY_ANNOTATION = 'copy-annotation',
     LAST_LOGIN_INFO = 'lastLoginInfo',
     MEDIA_VIEW_MODE = 'media-view-mode',
+    LAST_SELECTED_ORGANIZATION_ID = 'last-selected-organization-id',
 }
 
 export const getPanelSettingsKey = (projectId: string) => {

@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { paths } from '@geti/core';
-import { screen, waitForElementToBeRemoved, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 
 import { providersRender } from '../../../test-utils/required-providers-render';
 import { LandingPageSidebar } from './landing-page-sidebar.component';
@@ -17,7 +17,6 @@ jest.mock('react-router-dom', () => ({
 describe('Landing page - sidebar', () => {
     it('Check if there are 3 options in sidebar menu - Projects, Account, About', async () => {
         providersRender(<LandingPageSidebar />);
-        await waitForElementToBeRemoved(screen.getByRole('progressbar'));
         const options = within(screen.getByRole('navigation')).getAllByRole('link');
 
         expect(options).toHaveLength(3);
@@ -32,7 +31,6 @@ describe('Landing page - sidebar', () => {
 
     it('Should should show terms of use and privacy', async () => {
         providersRender(<LandingPageSidebar />);
-        await waitForElementToBeRemoved(screen.getByRole('progressbar'));
 
         expect(screen.getByText(/Terms of use/)).toBeInTheDocument();
         expect(screen.getByText(/Privacy/)).toBeInTheDocument();

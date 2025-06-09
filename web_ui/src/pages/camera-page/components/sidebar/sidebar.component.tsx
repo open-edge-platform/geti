@@ -3,8 +3,7 @@
 
 import { useState } from 'react';
 
-import { ActionButton, Flex, Tooltip, TooltipTrigger } from '@geti/ui';
-import { ChevronDoubleLeft, ChevronDoubleRight } from '@geti/ui/icons';
+import { Flex } from '@geti/ui';
 
 import { Label } from '../../../../core/labels/label.interface';
 import { useCameraParams } from '../../hooks/camera-params.hook';
@@ -12,8 +11,7 @@ import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { getSortingHandler, SortingOptions } from '../../util';
 import { CloseSidebar } from './close-sidebar.component';
 import { OpenSidebar } from './open-sidebar.component';
-
-import classes from './sidebar.module.scss';
+import { ToggleSidebarButton } from './toggle-sidebar-button.component';
 
 interface SidebarProps {
     labels: Label[];
@@ -40,18 +38,7 @@ export const Sidebar = ({ labels }: SidebarProps): JSX.Element => {
 
             {!isOpen && <CloseSidebar screenshots={screenshots} isLivePrediction={isLivePrediction} />}
 
-            <TooltipTrigger placement={'bottom'}>
-                <ActionButton
-                    isQuiet
-                    onPress={() => setIsOpen((prev) => !prev)}
-                    aria-label={'toggle sidebar'}
-                    UNSAFE_className={classes.toggleSidebarButton}
-                    id='annotations-pane-sidebar-toggle-button'
-                >
-                    {isOpen ? <ChevronDoubleRight size='XS' /> : <ChevronDoubleLeft size='XS' />}
-                </ActionButton>
-                <Tooltip>{isOpen ? 'Collapse sidebar' : 'Open sidebar'}</Tooltip>
-            </TooltipTrigger>
+            <ToggleSidebarButton onIsOpenChange={() => setIsOpen((prev) => !prev)} isOpen={isOpen} />
         </Flex>
     );
 };

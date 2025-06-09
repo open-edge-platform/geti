@@ -20,18 +20,14 @@
 }
 
 .toggleSidebarButton {
-    border: none !important;
-    height: var(--spectrum-global-dimension-size-150) !important;
+    box-sizing: border-box;
+    border-color: transparent !important;
     border-top: 1px solid var(--spectrum-global-color-gray-50) !important;
     background: var(--spectrum-global-color-gray-100) !important;
     border-radius: 0px !important;
 
-    & > div {
-        height: var(--spectrum-global-dimension-size-150) !important;
-    }
-
     &[class*='is-hovered'] {
-        border: none !important;
+        border-color: transparent !important;
         border-top: 1px solid var(--spectrum-global-color-gray-50) !important;
     }
 }

@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import pytest
 
-from communication.controllers.utils import delete_none_from_dict, merge_deep_dict
+from service.utils import delete_none_from_dict, merge_deep_dict
 
 
 class TestUtils:

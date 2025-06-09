@@ -3,9 +3,8 @@
 
 import { FC } from 'react';
 
-import { Text } from '@geti/ui';
+import { Text, ToggleButtons } from '@geti/ui';
 
-import { ToggleButtons } from '../../ui/toggle-buttons/toggle-buttons.component';
 import { Tooltip } from '../../ui/tooltip.component';
 
 import styles from './tiling.module.scss';

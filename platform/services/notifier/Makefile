@@ -3,4 +3,5 @@
 
 include ../../../Makefile.shared-python
 
+COMPONENT_NAME := notifier
 DOCKER_BUILD_CONTEXT := --build-context libs=../../../libs
