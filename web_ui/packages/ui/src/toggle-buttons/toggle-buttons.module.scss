@@ -1,0 +1,17 @@
+.toggleButton {
+    &:not(:last-child):not(:first-child) {
+        border-radius: 0;
+        border-right-color: transparent !important;
+        border-left-color: transparent !important;
+    }
+
+    &:first-child {
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 0;
+    }
+
+    &:last-child {
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+    }
+}
