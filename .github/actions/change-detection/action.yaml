@@ -3,10 +3,10 @@ description: Change Detection
 
 inputs:
   path_filter:
-    description: 'Path to a path-filter.yaml'
+    description: 'Path to the components path-filter file'
     required: true
   get_all:
-    description: 'return all components defined in the path-filter.yaml regardless of changes'
+    description: 'If set to true, returns all components defined in the path filter file, regardless of detected changes'
     type: boolean
     required: true
 runs:
