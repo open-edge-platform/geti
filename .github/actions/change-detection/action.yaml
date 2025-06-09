@@ -9,6 +9,11 @@ inputs:
     description: 'If set to true, returns all components defined in the path filter file, regardless of detected changes'
     type: boolean
     required: true
+outputs:
+  paths_list:
+    description: "List of paths to changed components"
+    value: ${{ steps.components-list.outputs.paths_list }}
+
 runs:
   using: composite
   steps:
@@ -35,4 +40,4 @@ runs:
         echo $paths_list
         echo "::endgroup::"
 
-        echo "paths-list=$paths_list" >> "$GITHUB_OUTPUT"
+        echo "paths_list=$(jq -c <<< "$paths_list")" >> "$GITHUB_OUTPUT"

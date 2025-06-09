@@ -39,9 +39,9 @@ jobs:
     timeout-minutes: 10
     outputs:
       image-tag: "${{ steps.image-tag.outputs.image-tag }}"
-      components-list: ${{ steps.components-list.outputs.paths-list }}
+      components-list: ${{ steps.components-list.outputs.paths_list }}
       filtered-components-list: ${{ steps.filtered-components-list.outputs.filtered-list }}
-      libs-list: ${{ steps.libs-list.outputs.paths-list }}
+      libs-list: ${{ steps.libs-list.outputs.paths_list }}
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
@@ -103,7 +103,7 @@ jobs:
 
           echo "filtered-list=$filtered" >> $GITHUB_OUTPUT
         env:
-          CHANGES: ${{ steps.components-list.outputs.paths-list }}
+          CHANGES: ${{ steps.components-list.outputs.paths_list }}
 
   lib_test_workflow:
     name: Lib test workflow
