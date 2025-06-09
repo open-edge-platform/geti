@@ -28,7 +28,7 @@ export const DeviceSettings = () => {
     const { videoDevices, selectedDeviceId, deviceConfig, setSelectedDeviceId } = useDeviceSettings();
 
     return (
-        <View position={'relative'}>
+        <View position={'relative'} width={'28rem'}>
             <Header text={'Camera Settings'} />
 
             <Picker
