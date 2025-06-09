@@ -30,7 +30,7 @@ import { CustomTabItem } from '../../../shared/components/custom-tab-item/custom
 import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-dialog.component';
 import { EditNameDialog } from '../../../shared/components/edit-name-dialog/edit-name-dialog.component';
 import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';
-import { OPERATION_NEW } from '../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION_NEW, OPERATION_OLD } from '../../../shared/components/has-permission/has-permission.interface';
 import { TabItem } from '../../../shared/components/tabs/tabs.interface';
 import { getUniqueNameFromArray, hasEqualId } from '../../../shared/utils';
 import { MAX_LENGTH_OF_WORKSPACE_NAME, MIN_LENGTH_OF_WORKSPACE_NAME } from '../../user-management/workspaces/utils';
@@ -272,8 +272,11 @@ export const WorkspacesTabs = (): JSX.Element => {
                     {(item: TabItem) => (
                         <Item key={item.key}>
                             <HasPermission
-                                operations={[OPERATION_NEW.CAN_SEE_WORKSPACE]}
-                                specialCondition={!FEATURE_FLAG_WORKSPACE_ACTIONS || undefined}
+                                operations={[
+                                    FEATURE_FLAG_WORKSPACE_ACTIONS
+                                        ? OPERATION_NEW.CAN_SEE_WORKSPACE
+                                        : OPERATION_OLD.WORKSPACE_MANAGEMENT,
+                                ]}
                                 Fallback={<div data-testid='no-permission-to-tab'>TODO: no permission</div>}
                             >
                                 {item.children}
