@@ -91,15 +91,11 @@ jobs:
       - name: Filter components (exclude 'web_ui')
         id: filtered-components-list
         run: |
-          echo ${CHANGES}
           components=$(echo ${CHANGES} | sed "s/'/\"/g")
-          echo $components
           filtered=$(echo $components | jq -c '[.[] | select(. != "web_ui")]')
-
           echo "::group::Components to run"
           echo $filtered
           echo "::endgroup::"
-
           echo "filtered-list=$filtered" >> $GITHUB_OUTPUT
         env:
           CHANGES: ${{ steps.components-list.outputs.paths_list }}
