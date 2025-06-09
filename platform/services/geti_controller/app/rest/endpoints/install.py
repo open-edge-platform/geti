@@ -72,7 +72,7 @@ def install_platform(payload: InstallRequest) -> InstallResponse:
         )
 
     load_kube_config()
-    if check_config_map_exists(name="impt_configuration", namespace="impt"):
+    if check_config_map_exists(name="impt-configuration", namespace="impt"):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Platform is already installed.")
 
     sa = create_service_account(name="install-upgrade", namespace="default")

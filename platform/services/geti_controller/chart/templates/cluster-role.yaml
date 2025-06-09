@@ -1,4 +1,4 @@
-# TODO uncomment when charts will be ready
+# TODO uncomment when charts will be ready and check if can be replaced by Role
 #apiVersion: rbac.authorization.k8s.io/v1
 #kind: ClusterRole
 #metadata:
