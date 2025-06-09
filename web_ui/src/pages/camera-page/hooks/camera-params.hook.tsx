@@ -24,7 +24,6 @@ export const useCameraParams = () => {
         ...datasetIdentifier,
         defaultLabelId: defaultLabelId ? defaultLabelId : null,
         hasDefaultLabel: !isNil(defaultLabelId) && defaultLabelId !== 'undefined',
-        isLivePrediction: searchParams.get('isLivePrediction') === 'true',
         isPhotoCaptureMode: captureMode ? captureMode === CaptureMode.PHOTO : true,
     };
 };

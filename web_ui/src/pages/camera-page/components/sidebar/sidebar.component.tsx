@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { Flex } from '@geti/ui';
 
 import { Label } from '../../../../core/labels/label.interface';
-import { useCameraParams } from '../../hooks/camera-params.hook';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { getSortingHandler, SortingOptions } from '../../util';
 import { CloseSidebar } from './close-sidebar.component';
@@ -21,7 +20,6 @@ const sortingByMostRecent = getSortingHandler(SortingOptions.MOST_RECENT);
 
 export const Sidebar = ({ labels }: SidebarProps): JSX.Element => {
     const [isOpen, setIsOpen] = useState(true);
-    const { isLivePrediction } = useCameraParams();
     const { savedFilesQuery } = useCameraStorage();
 
     const screenshots = sortingByMostRecent(savedFilesQuery?.data ?? []);
@@ -34,9 +32,9 @@ export const Sidebar = ({ labels }: SidebarProps): JSX.Element => {
             justifyContent={'space-between'}
             UNSAFE_style={{ background: 'var(--spectrum-global-color-gray-200)' }}
         >
-            {isOpen && <OpenSidebar labels={labels} screenshots={screenshots} isLivePrediction={isLivePrediction} />}
+            {isOpen && <OpenSidebar labels={labels} screenshots={screenshots} />}
 
-            {!isOpen && <CloseSidebar screenshots={screenshots} isLivePrediction={isLivePrediction} />}
+            {!isOpen && <CloseSidebar screenshots={screenshots} />}
 
             <ToggleSidebarButton onIsOpenChange={() => setIsOpen((prev) => !prev)} isOpen={isOpen} />
         </Flex>
