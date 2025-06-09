@@ -31,7 +31,8 @@ runs:
         PATH_FILTER: ${{ inputs.path_filter }}
         GET_ALL: ${{ inputs.get_all }}
       run: |
-        if [[ "$GET_ALL" == true ]]; then
+        echo "GET_ALL ==> $GET_ALL"
+        if [[ "$GET_ALL" == "true" ]]; then
            paths_list=$(yq -r '... comments=""' "${PATH_FILTER}" | yq -r 'keys[]' | jq -R . | jq -sc .)
         else
           paths_list=$(python3 -c "import json; print(json.dumps('$CHANGED_KEYS'.split()))")
