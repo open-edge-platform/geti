@@ -31,15 +31,17 @@ permissions: {} # No permissions by default on workflow level
 jobs:
   get-vars:
     name: Get variables
+    env:
+      BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
     timeout-minutes: 10
     outputs:
       image-tag: "${{ steps.image-tag.outputs.image-tag }}"
-      components-list: ${{ steps.components-list.outputs.components-list }}
+      components-list: ${{ steps.components-list.outputs.paths-list }}
       filtered-components-list: ${{ steps.filtered-components-list.outputs.filtered-list }}
-      libs-list: ${{ steps.libs-list.outputs.libs-list }}
+      libs-list: ${{ steps.libs-list.outputs.paths-list }}
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
@@ -73,56 +75,19 @@ jobs:
 
           echo "image-tag=$product_version-$ref-$short_sha" >> "$GITHUB_OUTPUT"
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
-        with:
-          files_yaml_from_source_file: "./.github/components-path-filters.yml"
-
       - name: Get changed components dirs
-        id: components-list
-        env:
-          CHANGED_KEYS: ${{ steps.changed-files.outputs.changed_keys }}
-        run: |
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            components=$(yq -r '... comments=""' ./.github/components-path-filters.yml | yq -r 'keys[]')
-            components_changes=$(echo "$components" | sed ':a;N;$!ba;s/\n/, /g' )
-            components_list=$(echo "$components_changes" | sed 's/[^, ]\+/"&"/g; s/, /, /g; s/^/[&/; s/$/&]/')
-          else
-            components_list=$(python3 -c "print('$CHANGED_KEYS'.split())")
-          fi
-
-          echo "::group::Components to run"
-          echo $components_list
-          echo "::endgroup::"
-
-          echo "components-list=$components_list" >> "$GITHUB_OUTPUT"
-
-      - name: Get changed libs
-        id: changed-libs
-        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+        id: component-list
+        uses: ./.github/actions/change-detection
         with:
-          files_yaml_from_source_file: "./.github/libs-path-filters.yml"
+          path_filter: "./.github/components-path-filters.yml"
+          get_all: ${BUILD_ALL}
 
       - name: Get changed libs dirs
         id: libs-list
-        env:
-          CHANGED_LIBS: ${{ steps.changed-libs.outputs.changed_keys }}
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-        run: |
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            libs=$(yq -r '... comments=""' ./.github/libs-path-filters.yml | yq -r 'keys[]')
-            libs_changes=$(echo "$libs" | sed ':a;N;$!ba;s/\n/, /g' )
-            libs_list=$(echo "$libs_changes" | sed 's/[^, ]\+/"&"/g; s/, /, /g; s/^/[&/; s/$/&]/')
-          else
-              libs_list=$(python3 -c "print('$CHANGED_LIBS'.split())")
-          fi
-
-          echo "::group::Libriaries to run"
-          echo $libs_list
-          echo "::endgroup::"
-
-          echo "libs-list=$libs_list" >> "$GITHUB_OUTPUT"
+        uses: ./.github/actions/change-detection
+        with:
+          path_filter: "./.github/libs-path-filters.yml"
+          get_all: ${BUILD_ALL}
 
       - name: Filter components (exclude 'web_ui')
         id: filtered-components-list
@@ -136,7 +101,7 @@ jobs:
 
           echo "filtered-list=$filtered" >> $GITHUB_OUTPUT
         env:
-          CHANGES: ${{ steps.components-list.outputs.components-list }}
+          CHANGES: ${{ steps.components-list.outputs.paths-list }}
 
   lib_test_workflow:
     name: Lib test workflow

@@ -1,0 +1,37 @@
+name: Change Detection
+description: Change Detection
+
+inputs:
+  path_filter:
+    description: 'Path to a path-filter.yaml'
+    required: true
+  get_all:
+    description: 'return all components defined in the path-filter.yaml regardless of changes'
+    type: boolean
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+      with:
+        files_yaml_from_source_file: "${{ inputs.path_filter }}"
+
+    - name: Get changed components
+      id: components-list
+      env:
+        CHANGED_KEYS: ${{ steps.changed-files.outputs.changed_keys }}
+      run: |
+        if [[ ${{ inputs.get_all }} == "true" ]]; then
+          paths=$(yq -r '... comments=""' "${{ inputs.path_filter }}" | yq -r 'keys[]')
+          paths_list=$(printf '%s\n' "${paths[@]}" | jq -R . | jq -s .)
+        else
+          paths_list=$(python3 -c "print('$CHANGED_KEYS'.split())")
+        fi
+
+        echo "::group::paths list"
+        echo $paths_list
+        echo "::endgroup::"
+
+        echo "paths-list=$paths_list" >> "$GITHUB_OUTPUT"
