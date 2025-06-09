@@ -92,8 +92,7 @@ jobs:
       - name: Filter components (exclude 'web_ui')
         id: filtered-components-list
         run: |
-          components=$(echo ${CHANGES} | sed "s/'/\"/g")
-          filtered=$(echo $components | jq -c '[.[] | select(. != "web_ui")]')
+          filtered=$(echo ${CHANGES} | jq -c '[.[] | select(. != "web_ui")]')
 
           echo "::group::Components to run"
           echo $filtered
