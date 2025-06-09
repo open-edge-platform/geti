@@ -1,5 +1,5 @@
 name: Change Detection
-description: Change Detection
+description: Extends standard change detection by optionally returning all components, supporting full platform rebuilds for periodic runs, manual triggers, or release candidate preparation.
 
 inputs:
   path_filter:
