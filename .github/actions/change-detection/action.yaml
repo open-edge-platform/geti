@@ -20,6 +20,7 @@ runs:
 
     - name: Get changed components
       id: components-list
+      shell: bash
       env:
         CHANGED_KEYS: ${{ steps.changed-files.outputs.changed_keys }}
       run: |
