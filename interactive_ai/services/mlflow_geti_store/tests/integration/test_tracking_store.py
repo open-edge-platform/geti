@@ -45,7 +45,7 @@ class TestTrackingStore:
     def test_update_run_info(self, fxt_tracking_store: GetiTrackingStore, fxt_job_id):
         updated = fxt_tracking_store.update_run_info(
             run_id=fxt_job_id,
-            run_status=RunStatus.FINISHED,
+            run_status=RunStatus.FINISHED,  # type: ignore
             end_time=1000,
             run_name=None,
         )

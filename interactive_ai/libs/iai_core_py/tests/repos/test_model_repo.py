@@ -15,13 +15,25 @@ from iai_core.repos.storage.binary_repos import ModelBinaryRepo
 from tests.test_helpers import empty_model_configuration
 
 
-def create_model(project, storage, framework, model_format, opt_type, version, previous_model=None, precision=None):
+def create_model(
+    project,
+    storage,
+    framework,
+    model_format,
+    opt_type,
+    version,
+    previous_model=None,
+    precision=None,
+    display_only_configuration=None,
+):
     """Helper to create model instances with consistent settings"""
+    configuration = empty_model_configuration()
+    configuration.display_only_configuration = display_only_configuration
     return Model(
         project=project,
         model_storage=storage,
         train_dataset=NullDataset(),
-        configuration=empty_model_configuration(),
+        configuration=configuration,
         id_=ModelRepo.generate_id(),
         previous_trained_revision=previous_model,
         data_source_dict={"test_data": b"weights_data"},
@@ -681,3 +693,31 @@ class TestModelRepo:
         base_models = model_repo.get_non_purged_base_models()
         assert fxt_model_success in base_models
         assert fxt_model_failed not in base_models
+
+    def test_save_model_configuration(
+        self, request, fxt_model_storage, fxt_empty_project, fxt_training_framework
+    ) -> None:
+        # Assert
+        model_repo = ModelRepo(fxt_model_storage.identifier)
+        request.addfinalizer(lambda: model_repo.delete_all())
+        model_repo = ModelRepo(fxt_model_storage.identifier)
+        request.addfinalizer(lambda: model_repo.delete_all())
+        config_dict = {"key": "value"}
+
+        model = create_model(
+            fxt_empty_project,
+            fxt_model_storage,
+            fxt_training_framework,
+            ModelFormat.BASE_FRAMEWORK,
+            ModelOptimizationType.NONE,
+            version=1,
+            previous_model=None,
+            display_only_configuration=config_dict,
+        )
+
+        # Act
+        model_repo.save(model)
+        saved_model = model_repo.get_by_id(model.id_)
+
+        # Assert
+        assert saved_model.configuration.display_only_configuration == config_dict

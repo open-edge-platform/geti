@@ -33,6 +33,7 @@ def train_workflow(  # noqa: PLR0913
     # Training command
     command: list[str] = ["bash", "-c", "run"],
     keep_mlflow_artifacts: bool = False,
+    hyperparameters: Optional[dict] = None,  # noqa: UP007,
 ) -> None:
     """
     Task node train workflow
@@ -58,6 +59,7 @@ def train_workflow(  # noqa: PLR0913
     :param command: Command to be executed on the primary container, e.g., OTX2 trainer pod.
     :param keep_mlflow_artifacts: If true, do not remove the artifacts in mlflow bucket even if training succeeds.
         It would be useful for debugging.
+    :param hyperparameters: Dict containing the hyperparameters to be used for training.
     """
     # Prepare training data, model entities, and mlflow bucket directory
     train_data = prepare_training_data_model_and_start_training(
@@ -77,6 +79,7 @@ def train_workflow(  # noqa: PLR0913
         min_annotation_size=min_annotation_size,
         max_number_of_annotations=max_number_of_annotations,
         reshuffle_subsets=reshuffle_subsets,
+        hyperparameters=hyperparameters,
     )
 
     evaluate_and_infer(

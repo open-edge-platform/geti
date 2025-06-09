@@ -3,7 +3,7 @@
 
 import { FC, useState } from 'react';
 
-import { ActionButton, Checkbox, Flex, Grid, minmax, Text, View } from '@geti/ui';
+import { ActionButton, Flex, Grid, minmax, Text, View } from '@geti/ui';
 import { Refresh } from '@geti/ui/icons';
 import { noop } from 'lodash-es';
 
@@ -65,12 +65,9 @@ interface SubsetsDistributionProps {
     onSubsetsDistributionChange: (values: number[]) => void;
     onSubsetsDistributionChangeEnd: (values: number[]) => void;
     onSubsetsDistributionReset: () => void;
-    onReshufflingSubsetsEnabledChange: (isChecked: boolean) => void;
-    isReshufflingSubsetsEnabled: boolean;
 }
 
 const SubsetsDistribution: FC<SubsetsDistributionProps> = ({
-    isReshufflingSubsetsEnabled,
     subsetsDistribution,
     trainingSubsetCount,
     testSubsetCount,
@@ -78,7 +75,6 @@ const SubsetsDistribution: FC<SubsetsDistributionProps> = ({
     onSubsetsDistributionChange,
     onSubsetsDistributionChangeEnd,
     onSubsetsDistributionReset,
-    onReshufflingSubsetsEnabledChange,
 }) => {
     const handleSubsetDistributionChange = (values: number[] | number): void => {
         if (Array.isArray(values)) {
@@ -119,29 +115,18 @@ const SubsetsDistribution: FC<SubsetsDistributionProps> = ({
                     validationCount={validationSubsetCount}
                 />
             </Grid>
-            <Checkbox
-                isEmphasized
-                marginTop={'size-200'}
-                isSelected={isReshufflingSubsetsEnabled}
-                onChange={onReshufflingSubsetsEnabledChange}
-            >
-                Reshuffle subsets
-            </Checkbox>
         </View>
     );
 };
 
 const MAX_RATIO_VALUE = 100;
 
+// eslint-disable-next-line
 interface TrainingSubsetsProps {
-    isReshufflingSubsetsEnabled: boolean;
-    onReshufflingSubsetsEnabledChange: (reshufflingSubsetsEnabled: boolean) => void;
+    // TODO: get props for subsets distribution
 }
 
-export const TrainingSubsets: FC<TrainingSubsetsProps> = ({
-    isReshufflingSubsetsEnabled,
-    onReshufflingSubsetsEnabledChange,
-}) => {
+export const TrainingSubsets: FC<TrainingSubsetsProps> = ({}) => {
     const testSubsetCount = 20;
     const trainingSubsetCount = 70;
     const validationSubsetCount = 10;
@@ -178,8 +163,6 @@ export const TrainingSubsets: FC<TrainingSubsetsProps> = ({
                     testSubsetCount={testSubsetCount}
                     trainingSubsetCount={trainingSubsetCount}
                     validationSubsetCount={validationSubsetCount}
-                    isReshufflingSubsetsEnabled={isReshufflingSubsetsEnabled}
-                    onReshufflingSubsetsEnabledChange={onReshufflingSubsetsEnabledChange}
                     onSubsetsDistributionChangeEnd={noop}
                     onSubsetsDistributionReset={noop}
                 />

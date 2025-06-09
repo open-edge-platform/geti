@@ -4,12 +4,11 @@
 """This module implements the Model Storage entity"""
 
 import datetime
-from dataclasses import dataclass
 
 from iai_core.entities.model_template import ModelTemplate, NullModelTemplate
 from iai_core.utils.time_utils import now
 
-from geti_types import CTX_SESSION_VAR, ID, PersistentEntity, ProjectIdentifier
+from geti_types import CTX_SESSION_VAR, ID, ModelStorageIdentifier, PersistentEntity, ProjectIdentifier
 
 
 class ModelStorage(PersistentEntity):
@@ -101,16 +100,3 @@ class NullModelStorage(ModelStorage):
 
     def __repr__(self) -> str:
         return "NullModelStorage()"
-
-
-@dataclass(frozen=True, eq=True)
-class ModelStorageIdentifier:
-    """IDs necessary to uniquely identify a ModelStorage"""
-
-    workspace_id: ID
-    project_id: ID
-    model_storage_id: ID
-
-    @property
-    def project_identifier(self) -> ProjectIdentifier:
-        return ProjectIdentifier(workspace_id=self.workspace_id, project_id=self.project_id)

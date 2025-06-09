@@ -43,21 +43,25 @@ class ModelConfiguration:
         self,
         configurable_parameters: ConfigurableParameters,
         label_schema: LabelSchema,
+        display_only_configuration: dict | None = None,
     ) -> None:
         self.configurable_parameters = configurable_parameters
         self.__label_schema = label_schema
         self.__label_schema_adapter: IAdapter[LabelSchema] = ReferenceAdapter(label_schema)
+        self.display_only_configuration = display_only_configuration if display_only_configuration else {}
 
     @classmethod
     def with_adapters(
         cls,
         configurable_parameters: ConfigurableParameters,
         label_schema_adapter: IAdapter[LabelSchema],
+        display_only_configuration: dict | None = None,
     ):
         """Instantiate the ModelConfiguration with an adapter for the LabelSchema"""
         inst = cls(
             configurable_parameters=configurable_parameters,
             label_schema=NullLabelSchema(),
+            display_only_configuration=display_only_configuration,
         )
         inst.__label_schema_adapter = label_schema_adapter
         return inst

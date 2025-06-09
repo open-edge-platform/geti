@@ -3,4 +3,5 @@
 
 include ../../../Makefile.shared-python
 
+COMPONENT_NAME := onboarding-service
 DOCKER_BUILD_CONTEXT := --build-context libs=../../../libs \

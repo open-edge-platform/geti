@@ -2,15 +2,11 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 from typing import Any
 
-from geti_configuration_tools.training_configuration import (
-    NullTrainingConfiguration,
-    PartialTrainingConfiguration,
-    TrainingConfiguration,
-)
+from geti_configuration_tools.training_configuration import NullTrainingConfiguration, PartialTrainingConfiguration
 
-from communication.controllers.utils import delete_none_from_dict, merge_deep_dict
-from communication.exceptions import TaskNodeNotFoundException
+from communication.exceptions import MissingTaskIDException, TaskNodeNotFoundException
 from communication.views.training_configuration_rest_views import TrainingConfigurationRESTViews
+from service.configuration_service import ConfigurationService
 from storage.repos.partial_training_configuration_repo import PartialTrainingConfigurationRepo
 
 from geti_telemetry_tools import unified_tracing
@@ -20,43 +16,10 @@ from iai_core.repos import TaskNodeRepo
 
 class TrainingConfigurationRESTController:
     @staticmethod
-    def _overlay_configurations(
-        base_config: PartialTrainingConfiguration,
-        *overlaying_configs: PartialTrainingConfiguration,
-        validate_full_config: bool = True,
-    ) -> TrainingConfiguration | PartialTrainingConfiguration:
-        """
-        Overlays multiple configurations on top of a base configuration.
-
-        This method takes a base configuration and applies successive overlay configurations
-        on top of it, merging dictionaries deeply. The result can be validated as either
-        a full or partial training configuration.
-
-        :param base_config: The base configuration to start with
-        :param overlaying_configs: Variable number of configurations to overlay on the base
-        :param validate_full_config: If True, validates result as a full TrainingConfiguration,
-                                     otherwise as a PartialTrainingConfiguration
-        :return: The merged configuration, either as TrainingConfiguration or PartialTrainingConfiguration
-        """
-        base_config_dict = delete_none_from_dict(base_config.model_dump())
-
-        overlay_config_dict = base_config_dict
-        for config in overlaying_configs:
-            config_dict = delete_none_from_dict(config.model_dump())
-            overlay_config_dict = merge_deep_dict(overlay_config_dict, config_dict)
-
-        overlay_config_dict["id_"] = base_config.id_
-
-        if validate_full_config:
-            return TrainingConfiguration.model_validate(overlay_config_dict)
-        return PartialTrainingConfiguration.model_validate(overlay_config_dict)
-
-    @classmethod
     @unified_tracing
     def get_configuration(
-        cls,
         project_identifier: ProjectIdentifier,
-        task_id: ID,
+        task_id: ID | None = None,
         model_manifest_id: str | None = None,
         model_id: ID | None = None,
     ) -> dict[str, Any]:
@@ -72,29 +35,48 @@ class TrainingConfigurationRESTController:
         :return: Dictionary representation of the training configuration
         :raises TaskNotFoundException: If the task does not exist
         """
+        # task_id can be None if the project is single-task
+        if task_id is None:
+            task_ids = list(TaskNodeRepo(project_identifier).get_trainable_task_ids())
+            if len(task_ids) != 1:
+                raise MissingTaskIDException
+            task_id = task_ids[0]
+
         if not TaskNodeRepo(project_identifier).exists(task_id):
             raise TaskNodeNotFoundException(task_node_id=task_id)
 
         if model_id is not None:
-            # TODO ITEP-68215: if model_id is provided, load configuration from the model entity
-            pass
-
-        training_configuration_repo = PartialTrainingConfigurationRepo(project_identifier)
-        task_level_config = training_configuration_repo.get_task_only_configuration(task_id)
+            model_hyperparams_dict, model_storage = ConfigurationService.get_configuration_from_model(
+                project_identifier=project_identifier,
+                task_id=task_id,
+                model_id=model_id,
+            )
+            if model_hyperparams_dict is None:
+                # TODO ITEP-32067: add backward compatibility to display the old models configurable parameters
+                return {}
+            model_config = PartialTrainingConfiguration.model_validate(
+                {
+                    "task_id": task_id,
+                    "model_manifest_id": model_storage.model_template.model_template_id,
+                    "hyperparameters": model_hyperparams_dict,
+                }
+            )
+            return TrainingConfigurationRESTViews.training_configuration_to_rest(training_configuration=model_config)
 
         if model_manifest_id is None:
+            training_configuration_repo = PartialTrainingConfigurationRepo(project_identifier)
+            task_level_config = training_configuration_repo.get_task_only_configuration(task_id)
             # Only task level configuration can be retrieved
             return TrainingConfigurationRESTViews.training_configuration_to_rest(
                 training_configuration=task_level_config
             )
 
         # If model_manifest_id is available, the full configuration can be built
-        # TODO after ITEP-32190: Load model manifest hyperparameters when model manifests are added
-        algo_level_config = (
-            training_configuration_repo.get_by_model_manifest_id(model_manifest_id) if model_manifest_id else None
+        full_config = ConfigurationService.get_full_training_configuration(
+            project_identifier=project_identifier,
+            task_id=task_id,
+            model_manifest_id=model_manifest_id,
         )
-        full_config = cls._overlay_configurations(task_level_config, algo_level_config)
-
         return TrainingConfigurationRESTViews.training_configuration_to_rest(training_configuration=full_config)
 
     @classmethod
@@ -127,7 +109,9 @@ class TrainingConfigurationRESTController:
         # configuration is saved as "task level"
         if not update_configuration.model_manifest_id:
             task_config = training_configuration_repo.get_task_only_configuration(task_id)
-            new_config = cls._overlay_configurations(task_config, update_configuration)
+            new_config = ConfigurationService.overlay_training_configurations(
+                task_config, update_configuration, validate_full_config=False
+            )
             training_configuration_repo.save(new_config)
             return
 
@@ -141,7 +125,7 @@ class TrainingConfigurationRESTController:
             training_configuration_repo.save(update_configuration)
             return
 
-        new_config = cls._overlay_configurations(
+        new_config = ConfigurationService.overlay_training_configurations(
             current_config,
             update_configuration,
             validate_full_config=False,

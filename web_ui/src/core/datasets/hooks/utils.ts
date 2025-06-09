@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AxiosError } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { AxiosError, HttpStatusCode } from 'axios';
 import isFunction from 'lodash-es/isFunction';
 
 import { getFailedJobMessage } from '../../../../packages/core/src/services/utils';
@@ -31,7 +30,7 @@ export const getIntervalJobHandlers =
         if (isFunction(onError) && isJobFailed(jobResponse)) {
             onError({
                 message: getFailedJobMessage(jobResponse),
-                response: { status: StatusCodes.NOT_IMPLEMENTED },
+                response: { status: HttpStatusCode.NotImplemented },
             } as AxiosError);
 
             isFunction(onCancelOrFailed) && onCancelOrFailed();

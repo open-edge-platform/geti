@@ -7,6 +7,14 @@ on:
         description: "Docker image tag"
         type: string
         required: true
+      push:
+        description: "Enable pushing Docker images and Helm charts"
+        type:  boolean
+        default: false
+      ref:
+        description: 'The branch, tag or SHA to checkout'
+        type: string
+        default: ""
     secrets:
       AWS_ROLE:
         required: true
@@ -28,6 +36,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           persist-credentials: false
+          ref: ${{ inputs.ref || '' }}
 
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         id: setup-node
@@ -61,6 +70,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           persist-credentials: false
+          ref: ${{ inputs.ref || '' }}
 
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         id: setup-node
@@ -102,6 +112,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           persist-credentials: false
+          ref: ${{ inputs.ref || '' }}
 
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         id: setup-node
@@ -135,6 +146,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           persist-credentials: false
+          ref: ${{ inputs.ref || '' }}
 
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         id: setup-node
@@ -178,6 +190,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           persist-credentials: false
+          ref: ${{ inputs.ref || '' }}
 
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         id: setup-node
@@ -220,3 +233,4 @@ jobs:
     with:
       image-tag: ${{ inputs.image-tag }}
       component-dir: web_ui
+      push: ${{ inputs.push }}

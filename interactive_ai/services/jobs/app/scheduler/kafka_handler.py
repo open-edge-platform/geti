@@ -306,6 +306,9 @@ class ProgressHandler(BaseKafkaHandler, metaclass=Singleton):
             return
 
         job_id = Flyte.get_execution_job_id(execution)
+        job = StateMachine().get_by_id(job_id=ID(job_id))
+        if job.cancellation_info.is_cancelled:
+            return
 
         progress: float | None = value.get("progress")
         message: str | None = value.get("message")

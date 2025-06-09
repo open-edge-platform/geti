@@ -1,8 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { AxiosError } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { get } from 'lodash-es';
 
 import { VideoPaginationOptions } from '../../../../src/core/annotations/services/video-pagination-options.interface';
@@ -45,25 +44,25 @@ export const getErrorMessageByStatusCode = (error: AxiosError): string => {
     }
 
     switch (statusCode) {
-        case StatusCodes.UNPROCESSABLE_ENTITY:
+        case HttpStatusCode.UnprocessableEntity:
             // In case of a 422 error response, we need to show a specific message
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
             return get(error, 'response.data.detail') || UNPROCESSABLE_ENTITY_MESSAGE;
-        case StatusCodes.FORBIDDEN:
+        case HttpStatusCode.Forbidden:
             return FORBIDDEN_MESSAGE;
-        case StatusCodes.CONFLICT:
+        case HttpStatusCode.Conflict:
             return CONFLICT_MESSAGE;
-        case StatusCodes.BAD_REQUEST:
+        case HttpStatusCode.BadRequest:
             return BAD_REQUEST_MESSAGE;
-        case StatusCodes.NOT_FOUND:
+        case HttpStatusCode.NotFound:
             return NOT_FOUND_MESSAGE;
-        case StatusCodes.INTERNAL_SERVER_ERROR:
+        case HttpStatusCode.InternalServerError:
             return INTERNAL_SERVER_ERROR_MESSAGE;
-        case StatusCodes.BAD_GATEWAY:
+        case HttpStatusCode.BadGateway:
             return BAD_GATEWAY_MESSAGE;
-        case StatusCodes.GATEWAY_TIMEOUT:
+        case HttpStatusCode.GatewayTimeout:
             return GATEWAY_TIMEOUT_MESSAGE;
-        case StatusCodes.SERVICE_UNAVAILABLE:
+        case HttpStatusCode.ServiceUnavailable:
         default:
             return NETWORK_ERROR_MESSAGE;
     }
@@ -107,7 +106,7 @@ export const addVideoPaginationSearchParams = (
 };
 
 export const is404Error = (error: AxiosError) => {
-    return error?.response?.status === StatusCodes.NOT_FOUND;
+    return error?.response?.status === HttpStatusCode.NotFound;
 };
 
 export const isAdminLocation = () => {

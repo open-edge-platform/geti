@@ -3,13 +3,19 @@
 
 import { FC } from 'react';
 
-import { Radio, RadioGroup } from '@geti/ui';
+import { Checkbox, Flex, Radio, RadioGroup } from '@geti/ui';
 
+import { InfoTooltip } from '../../../../../../../shared/components/info-tooltip/info-tooltip.component';
 import { Accordion } from '../ui/accordion/accordion.component';
+
+import classes from '../../../legacy-train-model-dialog/train-model-settings-item/train-model-settings-item.module.scss';
 
 interface FineTuneParametersProps {
     trainFromScratch: boolean;
     onTrainFromScratchChange: (trainFromScratch: boolean) => void;
+
+    onReshufflingSubsetsEnabledChange: (isChecked: boolean) => void;
+    isReshufflingSubsetsEnabled: boolean;
 }
 
 enum TRAINING_WEIGHTS {
@@ -17,7 +23,12 @@ enum TRAINING_WEIGHTS {
     PREVIOUS_TRAINING_WEIGHTS = 'Previous training weights',
 }
 
-export const FineTuneParameters: FC<FineTuneParametersProps> = ({ trainFromScratch, onTrainFromScratchChange }) => {
+export const FineTuneParameters: FC<FineTuneParametersProps> = ({
+    trainFromScratch,
+    onTrainFromScratchChange,
+    isReshufflingSubsetsEnabled,
+    onReshufflingSubsetsEnabledChange,
+}) => {
     const trainingWeight = trainFromScratch
         ? TRAINING_WEIGHTS.PRE_TRAINED_WEIGHTS
         : TRAINING_WEIGHTS.PREVIOUS_TRAINING_WEIGHTS;
@@ -49,6 +60,24 @@ export const FineTuneParameters: FC<FineTuneParametersProps> = ({ trainFromScrat
                         Pre-trained weights - fine-tune the original model
                     </Radio>
                 </RadioGroup>
+
+                <Flex gap={'size-100'} alignItems={'center'} marginTop={'size-100'}>
+                    <Checkbox
+                        isEmphasized
+                        isSelected={isReshufflingSubsetsEnabled}
+                        onChange={onReshufflingSubsetsEnabledChange}
+                        UNSAFE_className={classes.trainModelCheckbox}
+                        isDisabled={trainingWeight === TRAINING_WEIGHTS.PREVIOUS_TRAINING_WEIGHTS}
+                    >
+                        Reshuffle subsets
+                    </Checkbox>
+                    <InfoTooltip
+                        tooltipText={
+                            // eslint-disable-next-line max-len
+                            'Reassign all dataset items to train, validation, and test subsets from scratch. Previous splits will not be retained. This option is accessible for Pre-trained weights.'
+                        }
+                    />
+                </Flex>
             </Accordion.Content>
         </Accordion>
     );

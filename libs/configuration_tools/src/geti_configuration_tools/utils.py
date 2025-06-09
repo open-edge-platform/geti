@@ -30,7 +30,7 @@ def partial_model(model: type[BaseModel]) -> type[BaseModel]:
     def make_field_optional(field: FieldInfo) -> tuple[Any, FieldInfo]:
         # use json_schema_extra to store the default value, since default has to be None
         if field.json_schema_extra:
-            field.json_schema_extra["default_value"] = field.default
+            field.json_schema_extra["default_value"] = field.default  # type: ignore
         else:
             field.json_schema_extra = {"default_value": field.default}
         field.default = None
