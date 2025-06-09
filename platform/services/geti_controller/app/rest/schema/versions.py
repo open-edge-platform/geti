@@ -8,8 +8,8 @@ from pydantic import BaseModel
 class PlatformVersion(BaseModel):
     version: str
     k3s_version: str
-    nvidia_drivers_version: str
-    intel_drivers_version: str
+    nvidia_drivers_version: str | None
+    intel_drivers_version: str | None
     is_current: bool
 
 
