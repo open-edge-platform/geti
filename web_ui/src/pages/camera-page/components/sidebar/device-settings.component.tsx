@@ -1,14 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useEffect } from 'react';
-
 import { Disclosure, DisclosurePanel, DisclosureTitle, Flex, Heading, Item, Key, Picker, View } from '@geti/ui';
 
 import { useDeviceSettings } from '../../providers/device-settings-provider.component';
 import { checkIfDisplaySetting } from '../../providers/util';
-import { DeviceSettingsConfig } from './device-settings-config.interface';
-import deviceSettingsConfig from './device-settings-config.json';
+import { DeviceSettingsDefaultCategory } from './device-settings-default-category.component';
+import { settingsMetadata } from './device-settings-metadata';
 import { SettingOption } from './setting-option.component';
 
 import classes from './device-settings.module.css';
@@ -25,14 +23,9 @@ const Header = ({ text }: { text: string }) => (
 //add tests!
 
 export const DeviceSettings = () => {
-    const { categories, defaultCategory, dependencies } = deviceSettingsConfig as DeviceSettingsConfig;
-    const deviceSettingsConfigFields = categories.reduce(
-        (list, category) => [...list, ...category.attributesKeys],
-        [] as string[]
-    );
+    const { categories, dependencies } = settingsMetadata;
 
     const { videoDevices, selectedDeviceId, deviceConfig, setSelectedDeviceId } = useDeviceSettings();
-    const otherConfigAttributes = deviceConfig?.filter(({ name }) => !deviceSettingsConfigFields.includes(name));
 
     return (
         <View position={'relative'}>
@@ -71,14 +64,7 @@ export const DeviceSettings = () => {
                 </Disclosure>
             ))}
 
-            <Disclosure isHidden={!otherConfigAttributes.length}>
-                <DisclosureTitle UNSAFE_className={classes.sectionHeader}>{defaultCategory}</DisclosureTitle>
-                <DisclosurePanel>
-                    {otherConfigAttributes.map(({ name, config, onChange }) => (
-                        <SettingOption key={name} label={name} config={config} onChange={onChange} />
-                    ))}
-                </DisclosurePanel>
-            </Disclosure>
+            <DeviceSettingsDefaultCategory deviceConfig={deviceConfig} />
         </View>
     );
 };

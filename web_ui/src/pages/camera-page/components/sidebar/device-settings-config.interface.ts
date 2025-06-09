@@ -12,7 +12,7 @@ export interface DeviceSettingsDependency {
     children: string[];
 }
 
-export interface DeviceSettingsConfig {
+export interface DeviceSettingsMetadata {
     categories: DeviceSettingsCategory[];
     defaultCategory: string;
     dependencies: DeviceSettingsDependency[];
