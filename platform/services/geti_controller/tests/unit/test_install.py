@@ -13,7 +13,7 @@ from rest.schema.install import InstallRequest
 
 @pytest.fixture
 def mock_environment(mocker):
-    mocker.patch.dict(os.environ, {"REGISTRY": "test-registry", "VERSION": "2.11.0"})
+    mocker.patch.dict(os.environ, {"GETI_REGISTRY": "test-registry", "VERSION": "2.11.0"})
 
 
 @pytest.mark.parametrize(

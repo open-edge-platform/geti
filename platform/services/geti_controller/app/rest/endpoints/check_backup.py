@@ -5,7 +5,7 @@ import logging
 
 from fastapi import HTTPException, status
 
-from platform_operations.checks.backup import is_backup_possible
+from platform_operations.backup import is_backup_possible
 from rest.schema.check_backup import CheckBackupResponse
 from routers import platform_router
 

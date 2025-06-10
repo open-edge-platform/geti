@@ -43,9 +43,7 @@ spec:
           image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
           imagePullPolicy: IfNotPresent
           env:
-            - name: REGISTRY
-              value: {{ .Values.global.registry_address }}
-            - name: VERSION
+            - name: INSTALL_VERSION
               # TODO change version to generated
               value: "2.10.0-test-20250528144400"
               #value: {{ .Values.global.tag | default .Chart.AppVersion }}
