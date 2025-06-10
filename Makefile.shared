@@ -19,6 +19,7 @@ IMAGES_REGISTRY                   ?= ${REGISTRY}/geti
 CHARTS_REGISTRY                   ?= ${REGISTRY}/geti/charts
 BASE_IMAGES_REGISTRY              ?= ${REGISTRY}/base-images
 
+
 ###
 # base images versions
 ###
