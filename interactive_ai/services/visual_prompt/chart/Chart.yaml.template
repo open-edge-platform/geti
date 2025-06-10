@@ -1,0 +1,6 @@
+---
+name: ${COMPONENT_NAME}
+version: ${TAG}
+apiVersion: v2
+description: visual prompt service
+appVersion: ${TAG}

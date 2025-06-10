@@ -3,12 +3,12 @@
 
 import { FormEvent, useRef, useState } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { User } from '@geti/core/src/users/users.interface';
 import { Button, Flex, Form, TextField, View } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 
-import QUERY_KEYS from '../../../core/requests/query-keys';
-import { useUsers } from '../../../core/users/hook/use-users.hook';
-import { User } from '../../../core/users/users.interface';
 import { useHistoryBlock } from '../../../hooks/use-history-block/use-history-block.hook';
 import { UnsavedChangesDialog } from '../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { getFullNameFromUser } from '../users/users-table/utils';

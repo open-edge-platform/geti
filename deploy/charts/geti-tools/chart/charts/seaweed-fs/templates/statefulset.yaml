@@ -1,0 +1,142 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "seaweed-fs.fullname" . }}
+  labels:
+    {{- include "seaweed-fs.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "seaweed-fs.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "seaweed-fs.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "seaweed-fs.fullname" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: volume-permissions
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - |
+              find /data -type d -exec chown -v {{ .Values.securityContext.runAsUser }} {} +
+          volumeMounts:
+            - name: data-storage
+              mountPath: /data
+              readOnly: false
+              subPath: seaweedfs
+          resources:
+            {{ toYaml .Values.init.resources | nindent 12 }}
+          securityContext:
+            {{ toYaml .Values.volumeSecurityContext | nindent 12 }}
+      containers:
+        - name: main
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ if .Values.image.repository }}{{ .Values.image.repository }}/{{ end }}{{ .Values.image.name }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - "/bin/sh"
+            - "-ec"
+            - |
+              exec /usr/bin/weed -logdir=/logs \
+              -v={{ .Values.loggingLevel }} \
+              server \
+              -dir=/data \
+              -s3 \
+              -s3.port={{ .Values.s3.port }} \
+              -s3.config=/etc/seaweedfs/weed.json \
+              -volume.max=2000 \  
+              -ip=${POD_IP}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - name: master
+              containerPort: {{ .Values.master.port }}
+            - name: s3
+              containerPort: {{ .Values.s3.port }}
+          livenessProbe:
+            httpGet:
+              path: /cluster/status
+              port: {{ .Values.master.port }}
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 4
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /cluster/status
+              port: {{ .Values.master.port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 45
+            successThreshold: 2
+            failureThreshold: 100
+            timeoutSeconds: 10
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: config-filer
+              mountPath: /etc/seaweedfs/filer.toml
+              subPath: filer.toml
+            - name: config-s3
+              mountPath: /etc/seaweedfs/weed.json
+              subPath: weed.json
+            - name: data-storage
+              mountPath: /data
+              readOnly: false
+              subPath: seaweedfs
+            - name: tmp
+              mountPath: /tmp
+            - name: logs
+              mountPath: /logs
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: config-filer
+          configMap:
+            defaultMode: 420
+            name: {{ include "seaweed-fs.fullname" . }}
+            items:
+              - key: filer.toml
+                path: filer.toml
+        - name: config-s3
+          secret:
+            secretName: {{ include "seaweed-fs.fullname" . }}
+            defaultMode: 420
+            items:
+              - key: weed.json
+                path: weed.json
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: data-storage-volume-claim
+        - name: tmp
+          emptyDir: {}

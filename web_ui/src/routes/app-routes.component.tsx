@@ -3,16 +3,15 @@
 
 import { Suspense, useEffect } from 'react';
 
+import { paths } from '@geti/core';
 import { IntelBrandedLoading } from '@geti/ui';
 import { negate } from 'lodash-es';
 import { Navigate, Outlet, Route, useLocation } from 'react-router-dom';
 
-import { AnalyticsProvider } from '../analytics/analytics-provider.component';
 import { useFeatureFlags } from '../core/feature-flags/hooks/use-feature-flags.hook';
 import { isKeypointTask } from '../core/projects/utils';
 import { useEventListener } from '../hooks/event-listener/event-listener.hook';
 import { useIsSaasEnv } from '../hooks/use-is-saas-env/use-is-saas-env.hook';
-import { useStorage } from '../hooks/use-storage/use-storage';
 import { Notifications, useNotification } from '../notification/notification.component';
 import { TaskProvider } from '../pages/annotator/providers/task-provider/task-provider.component';
 import { RouterErrorBoundary } from '../pages/errors/router-error-boundary.component';
@@ -20,15 +19,14 @@ import { WelcomeTrialModal } from '../pages/landing-page/welcome-trial-modal/wel
 import { ProjectDataset } from '../pages/project-details/components/project-dataset/project-dataset.component';
 import { RequestAccessConfirmation } from '../pages/sign-up/request-access-confirmation.component';
 import { SignUp } from '../pages/sign-up/sign-up.component';
+import { InstallationModeProvider } from '../providers/installation-mode-provider.component';
 import { TusUploadProvider } from '../providers/tus-upload-provider/tus-upload-provider.component';
-import { AccessDeniedDialog } from '../shared/components/access-denied-dialog/access-denied-dialog.component';
 import { LicenseModal } from '../shared/components/license-modal/license-modal.component';
 import { ForgotPassword } from '../sign-up/pages/forgot-password/forgot-password.component';
 import { InvalidLink } from '../sign-up/pages/invalid-link/invalid-link.component';
 import { Registration } from '../sign-up/pages/registration/registration.component';
 import { ResetPassword } from '../sign-up/pages/reset-password/reset-password.component';
 import { UserNotFound } from '../sign-up/pages/user-not-found/user-not-found.component';
-import { paths } from './../core/services/routes';
 import { MediaUploadProvider } from './../providers/media-upload-provider/media-upload-provider.component';
 import { ProjectsImportProvider } from './../providers/projects-import-provider/projects-import-provider.component';
 import { AboutRoute } from './about.route';
@@ -71,12 +69,6 @@ import { UsersRoute } from './users/index.route';
 // https://www.robinwieruch.de/react-router-lazy-loading/
 // https://github.com/remix-run/react-router/discussions/9393
 
-const ErrorsHandler = (): JSX.Element => {
-    const { isOpenDialogAccessDenied, handleClose } = useStorage();
-
-    return <AccessDeniedDialog isOpen={isOpenDialogAccessDenied} handleClose={handleClose} />;
-};
-
 const AppProviders = (): JSX.Element => {
     const isSaaS = useIsSaasEnv();
     const { FEATURE_FLAG_CREDIT_SYSTEM } = useFeatureFlags();
@@ -104,7 +96,7 @@ const AppProviders = (): JSX.Element => {
 
     return (
         <Suspense fallback={<IntelBrandedLoading />}>
-            <AnalyticsProvider>
+            <InstallationModeProvider>
                 <RoutesCollector>
                     <OrganizationsContext>
                         <LastLoginNotification />
@@ -119,8 +111,7 @@ const AppProviders = (): JSX.Element => {
                         </TusUploadProvider>
                     </OrganizationsContext>
                 </RoutesCollector>
-            </AnalyticsProvider>
-            <ErrorsHandler />
+            </InstallationModeProvider>
         </Suspense>
     );
 };

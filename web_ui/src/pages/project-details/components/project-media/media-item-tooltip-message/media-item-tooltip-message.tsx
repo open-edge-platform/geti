@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { Flex, Text } from '@geti/ui';
 
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
-import { useUsers } from '../../../../../core/users/hook/use-users.hook';
 import { useOrganizationIdentifier } from '../../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { FullnameWithLoading } from '../../../../../shared/components/users/fullname.component';
 import { formatDate, isNonEmptyString } from '../../../../../shared/utils';

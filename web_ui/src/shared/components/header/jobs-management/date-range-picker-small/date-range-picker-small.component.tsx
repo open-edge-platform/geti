@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { FC, ReactNode, useState } from 'react';
+import { FC, ReactNode, SetStateAction, useState } from 'react';
 
 import {
     ActionButton,
@@ -12,19 +12,22 @@ import {
     Flex,
     Heading,
     RangeCalendar,
+    RangeValue,
     Tooltip,
     TooltipTrigger,
     useDateFormatter,
+    type SpectrumRangeCalendarProps,
 } from '@geti/ui';
+import { Calendar } from '@geti/ui/icons';
 import { DateValue, getLocalTimeZone } from '@internationalized/date';
-import Calendar from '@spectrum-icons/workflow/Calendar';
 import { isFunction } from 'lodash-es';
 import isEmpty from 'lodash/isEmpty';
-import { RangeCalendarProps } from 'react-aria-components';
 
-interface DateRangePickerSmall extends Omit<RangeCalendarProps<DateValue>, 'focusedValue' | 'onFocusChange'> {
+interface DateRangePickerSmall
+    extends Omit<SpectrumRangeCalendarProps<DateValue>, 'focusedValue' | 'onFocusChange' | 'onChange'> {
     hasManualEdition?: boolean;
     headerContent?: ReactNode;
+    onChange: (value: SetStateAction<RangeValue<DateValue>> | null) => void;
 }
 
 export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({
@@ -38,7 +41,7 @@ export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({
     const [focusedDate, setFocusedDate] = useState<DateValue | undefined>();
 
     const rangeText = isEmpty(range)
-        ? ''
+        ? 'Open the calendar to select a date range.'
         : formatter.formatRange(range.start.toDate(getLocalTimeZone()), range.end.toDate(getLocalTimeZone()));
 
     const handleOnChange = (attribute: 'start' | 'end', value: DateValue | null | undefined) => {
@@ -70,7 +73,7 @@ export const DateRangePickerSmall: FC<DateRangePickerSmall> = ({
     return (
         <DialogTrigger type='popover'>
             <TooltipTrigger placement={'bottom'}>
-                <ActionButton isQuiet aria-label='Select date range'>
+                <ActionButton isQuiet aria-label='Select date range' isDisabled={props.isDisabled}>
                     <Calendar />
                 </ActionButton>
                 <Tooltip>{rangeText}</Tooltip>

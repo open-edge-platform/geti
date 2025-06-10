@@ -3,10 +3,10 @@
 
 import { FormEvent, useState } from 'react';
 
+import { paths } from '@geti/core';
+import { useForgotPassword } from '@geti/core/src/users/hook/use-users.hook';
 import { Button, Form, Heading, Text, TextField, View } from '@geti/ui';
 
-import { paths } from '../../../core/services/routes';
-import { useForgotPassword } from '../../../core/users/hook/use-users.hook';
 import { MAX_NUMBER_OF_CHARACTERS, validateEmail } from '../../../pages/user-management/users/utils';
 import { BackgroundLayout } from '../../shared/background-layout/background-layout.component';
 

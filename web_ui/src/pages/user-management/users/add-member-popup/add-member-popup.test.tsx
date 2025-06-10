@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { USER_ROLE } from '@geti/core/src/users/users.interface';
 import { fireEvent, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
-import { USER_ROLE } from '../../../../core/users/users.interface';
 import {
     CONFIRM_PASSWORD_ERROR_MESSAGE,
     MISSING_REQUIRED_CHARACTERS_MESSAGE,

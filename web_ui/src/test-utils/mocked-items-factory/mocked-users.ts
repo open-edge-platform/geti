@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { RESOURCE_TYPE, User, USER_ROLE } from '../../../packages/core/src/users/users.interface';
 import { AccountStatus } from '../../core/organizations/organizations.interface';
-import { RESOURCE_TYPE, User, USER_ROLE } from '../../core/users/users.interface';
 
 const mockedUser: User = {
     id: 'user-1-id',

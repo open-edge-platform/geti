@@ -1,15 +1,15 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { useNavigate } from 'react-router-dom';
 
-import { paths } from '../../../../../core/services/routes';
 import { useProjectIdentifier } from '../../../../../hooks/use-project-identifier/use-project-identifier';
 import { NOTIFICATION_TYPE } from '../../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../../notification/notification.component';
 import { QuietToggleButton } from '../../../../../shared/components/quiet-button/quiet-toggle-button.component';
-import { TrainModel } from '../../project-models/train-model-dialog/train-model-dialog.component';
+import { CreditBalanceTrainDialog } from '../../project-models/train-model-dialog/credit-balance-train-dialog.component';
 import { useShowStartTraining } from './use-show-start-training.hook';
 
 export const AnomalyProjectsNotification = () => {
@@ -21,7 +21,7 @@ export const AnomalyProjectsNotification = () => {
     useShowStartTraining(trainModelDialogState);
 
     return (
-        <TrainModel
+        <CreditBalanceTrainDialog
             isOpen={trainModelDialogState.isOpen}
             onClose={() => {
                 removeNotifications();
@@ -32,7 +32,7 @@ export const AnomalyProjectsNotification = () => {
                 addNotification({
                     message: 'Training has started',
                     type: NOTIFICATION_TYPE.DEFAULT,
-                    dismiss: { duration: 0 }, // We dont want the notification to be dismissed automatically
+                    dismiss: { duration: 0 }, // We don't want the notification to be dismissed automatically
                     actionButtons: [
                         <QuietToggleButton
                             key={'open-train-model'}

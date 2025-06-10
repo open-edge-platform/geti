@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceEntity } from '@geti/core/src/workspaces/services/workspaces.interface';
+
 import { Dataset } from '../../core/projects/dataset.interface';
-import { WorkspaceEntity } from '../../core/workspaces/services/workspaces.interface';
 
 export interface PinnedCollapsedItems<Entity extends Dataset | WorkspaceEntity> {
     pinnedItems: Entity[];

@@ -644,7 +644,7 @@ class ProjectRestValidator(RestApiValidator):
         :raises NodeNameNotInLabelsException: if a node name does not match any of the label names
         :raises NodePositionIsOutOfBoundsException: if a node is out of bounds (not in the range [0.0, 1.0])
         """
-        existing_labels = [label.name for label in labels] + [label.id for label in labels]
+        existing_labels = [label.name for label in labels] + [str(label.id) for label in labels]
         pipeline_data = data[PIPELINE]
         duplicate_list = []
         for task_data in pipeline_data[TASKS]:

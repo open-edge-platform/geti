@@ -3,12 +3,12 @@
 
 import { Key, useState } from 'react';
 
+import { useNavigateToAnnotatorRoute } from '@geti/core/src/services/use-navigate-to-annotator-route.hook';
 import { isEmpty, isEqual } from 'lodash-es';
 
 import { MediaItem } from '../../../../../core/media/media.interface';
 import { isVideo } from '../../../../../core/media/video.interface';
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
-import { useNavigateToAnnotatorRoute } from '../../../../../core/services/use-navigate-to-annotator-route.hook';
 import { useDeleteMediaMutation } from '../../../../media/hooks/media-delete/media-delete.hook';
 import { useProject } from '../../../../project-details/providers/project-provider/project-provider.component';
 import { useDatasetIdentifier } from '../../../hooks/use-dataset-identifier.hook';

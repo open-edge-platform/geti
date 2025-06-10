@@ -1,16 +1,22 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { FC } from 'react';
+
+import { paths } from '@geti/core';
 import { Button, Content, Heading, Text } from '@geti/ui';
 
 import { ConnectionLost } from '../../../assets/images';
-import { paths } from '../../../core/services/routes';
 import { CustomerSupportLink } from '../../../shared/components/customer-support-link/customer-support-link.component';
 import { redirectTo } from '../../../shared/utils';
 
 import classes from '../error-layout/error-layout.module.scss';
 
-export const InternalServerError = (): JSX.Element => {
+interface InternalServerErrorProps {
+    onReset: () => void;
+}
+
+export const InternalServerError: FC<InternalServerErrorProps> = ({ onReset }) => {
     return (
         <>
             <ConnectionLost />
@@ -29,6 +35,7 @@ export const InternalServerError = (): JSX.Element => {
                 variant={'accent'}
                 marginTop={'size-200'}
                 onPress={() => {
+                    onReset();
                     redirectTo(paths.root({}));
                 }}
             >

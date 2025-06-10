@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { screen } from '@testing-library/react';
+import { screen, waitForElementToBeRemoved } from '@testing-library/react';
 
-import { providersRender } from '../../../../../test-utils/required-providers-render';
+import { projectRender } from '../../../../../test-utils/project-provider-render';
 import { ProjectAnnotationsObjects } from './project-annotations-objects.component';
 import { reorderObjectsLabels } from './utils';
 
@@ -16,8 +16,12 @@ const mockObjectsPerLabel = (id = '1234', name = 'test-name', color = '#000', va
 
 describe('Project annotations objects', () => {
     it('should render correctly', async () => {
-        providersRender(<ProjectAnnotationsObjects objectsPerLabel={[]} gridArea='objects' />);
+        projectRender(<ProjectAnnotationsObjects objectsPerLabel={[]} gridArea='objects' />);
+
+        await waitForElementToBeRemoved(screen.getByRole('progressbar'));
+
         const objectsTitle = screen.getByText('Number of objects per label');
+
         expect(objectsTitle).toBeInTheDocument();
     });
 

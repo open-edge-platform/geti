@@ -98,9 +98,10 @@ func (m *RolesManager) WriteRelationship(relation string, subject *v1.SubjectRef
 		if ok {
 			grpcStatusCode := errStatus.Code()
 			grpcStatusMessage := errStatus.Message()
-			if grpcStatusCode == grpcCodes.FailedPrecondition {
+			switch grpcStatusCode {
+			case grpcCodes.FailedPrecondition:
 				return NewInvalidRoleError(grpcStatusMessage)
-			} else if grpcStatusCode == grpcCodes.AlreadyExists {
+			case grpcCodes.AlreadyExists:
 				return NewRoleAlreadyExistsError(grpcStatusMessage, &relationshipUpdate)
 			}
 		}

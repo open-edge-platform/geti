@@ -1,6 +1,0 @@
----
-apiVersion: v2
-name: platform-cleaner
-description: A Helm chart for automated platform cleanup cron job
-version: 0.0.4
-appVersion: v0.0.1

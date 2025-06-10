@@ -1,12 +1,12 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
+import { RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
+import { WorkspaceEntity } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { Button, Divider, Flex, Heading, View } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
-import { paths } from '../../../core/services/routes';
-import { RESOURCE_TYPE } from '../../../core/users/users.interface';
-import { WorkspaceEntity } from '../../../core/workspaces/services/workspaces.interface';
 import { ActionMenu } from '../../../shared/components/action-menu/action-menu.component';
 import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-dialog.component';
 import { EditNameDialog } from '../../../shared/components/edit-name-dialog/edit-name-dialog.component';

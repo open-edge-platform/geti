@@ -3,8 +3,9 @@
 
 import { Dispatch, useMemo, useReducer } from 'react';
 
+import { WorkspaceEntity } from '@geti/core/src/workspaces/services/workspaces.interface';
+
 import { Dataset } from '../../core/projects/dataset.interface';
-import { WorkspaceEntity } from '../../core/workspaces/services/workspaces.interface';
 import { hasDifferentId, hasEqualId } from '../../shared/utils';
 import { pinnedCollapsedReducer } from './reducer';
 import { PinnedCollapsedItemsActions } from './use-pinned-collapsed-items.interface';

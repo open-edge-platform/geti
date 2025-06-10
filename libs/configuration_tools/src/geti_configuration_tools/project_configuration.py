@@ -4,6 +4,8 @@
 from geti_types import ID, PersistentEntity
 from pydantic import BaseModel, Field
 
+from .utils import partial_model
+
 
 class TrainConstraints(BaseModel):
     """Constraints applied for model training."""
@@ -27,9 +29,9 @@ class AutoTrainingParameters(BaseModel):
         title="Enable dynamic required annotations",
         description="Whether to dynamically adjust the number of required annotations",
     )
-    min_images_per_label: int | None = Field(
-        gt=0,
-        default=None,
+    min_images_per_label: int = Field(
+        ge=0,
+        default=0,
         title="Minimum images per label",
         description="Minimum number of images needed for each label to trigger auto-training",
     )
@@ -112,3 +114,27 @@ class NullProjectConfiguration(ProjectConfiguration):
             task_configs=[],
             ephemeral=True,
         )
+
+
+@partial_model
+class PartialTaskConfig(TaskConfig):
+    """
+    A partial version of `TaskConfig` where all fields are optional.
+
+    This class is useful for update operations or PATCH endpoints, allowing clients
+    to provide only the fields they wish to modify, while leaving others unset.
+    """
+
+
+@partial_model
+class PartialProjectConfiguration(BaseModel):
+    """
+    A partial version of `ProjectConfiguration` where all fields are optional.
+
+    This class is useful for update operations or PATCH endpoints, allowing clients
+    to provide only the fields they wish to modify, while leaving others unset.
+    """
+
+    task_configs: list[PartialTaskConfig] = Field(
+        title="Task configurations", description="List of configurations for all tasks in this project"
+    )

@@ -9,6 +9,7 @@ from _pytest.fixtures import FixtureRequest
 from geti_types import ID
 from iai_core.algorithms import ModelTemplateList
 from iai_core.entities.color import Color
+from iai_core.entities.keypoint_structure import KeypointEdge, KeypointPosition, KeypointStructure
 from iai_core.entities.label import Domain, Label
 from iai_core.entities.label_schema import LabelGroup, LabelGroupType, LabelSchema, LabelSchemaView
 from iai_core.entities.model_template import HyperParameterData, InstantiationType, ModelTemplate, TaskFamily, TaskType
@@ -22,6 +23,7 @@ from iai_core.utils.project_factory import ProjectFactory
 from tests.test_helpers import (
     generate_ellipse_shape,
     generate_images_and_annotation_scenes,
+    generate_keypoint_shape,
     generate_polygon_shape,
     generate_random_video,
     generate_rectangle_shape,
@@ -744,3 +746,46 @@ def fxt_label_schema_classification() -> LabelSchema:
             ),
         ],
     )
+
+
+@pytest.fixture
+def fxt_keypoint_detection_project(request) -> Project:
+    name = "_test_keypoint_project"
+    model_template_id = "keypoint_detection"
+    register_model_template(request, type(None), model_template_id, trainable=True, task_type="KEYPOINT_DETECTION")
+
+    edges = []
+    positions = []
+    edges.append(KeypointEdge(node_1=ID("rectangle"), node_2=ID("ellipse")))
+    edges.append(KeypointEdge(node_1=ID("ellipse"), node_2=ID("triangle")))
+    positions.append(KeypointPosition(node=ID("rectangle"), x=0.3, y=0.3))
+    positions.append(KeypointPosition(node=ID("ellipse"), x=0.4, y=0.4))
+    positions.append(KeypointPosition(node=ID("triangle"), x=0.5, y=0.5))
+    keypoint_structure = KeypointStructure(edges=edges, positions=positions)
+
+    project = ProjectFactory.create_project_single_task(
+        name=name,
+        description=name,
+        creator_id="",
+        labels=[
+            {"name": "rectangle", "color": "#00ff00ff"},
+            {"name": "ellipse", "color": "#0000ffff"},
+            {"name": "triangle", "color": "#ff0000ff"},
+        ],
+        model_template_id=model_template_id,
+        keypoint_structure=keypoint_structure,
+    )
+    labels = get_project_labels(project)
+
+    generate_images_and_annotation_scenes(
+        project=project,
+        num_annotated_images=10,
+        num_unannotated_images=2,
+        labels=labels,
+        shape_generator=generate_keypoint_shape,
+    )
+
+    generate_random_video(project=project, video_name="Annotated Video", generate_annotations=True)
+    generate_random_video(project=project, video_name="Unannotated Video", generate_annotations=False)
+
+    return project

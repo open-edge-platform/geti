@@ -1,6 +1,8 @@
 # Copyright (C) 2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+PACKAGABLE_SUBPROJECTS := $(shell find . -name "Chart.yaml.template" | xargs dirname | xargs dirname)
+
 .PHONY: clean
 clean: clean-go clean-python
 
@@ -23,16 +25,22 @@ build-image-go:
 build-image-python:
 	@$(call run_for_each,$(PY_BUILDABLE_SUBPROJECTS),Building image for Python component,build-image)
 
-.PHONY: push-image
-push-image: push-image-go push-image-python
+.PHONY: publish-image
+publish-image: publish-image-go publish-image-python
 
-.PHONY: push-image-go
-push-image-go:
-	@$(call run_for_each,$(GO_BUILDABLE_SUBPROJECTS),Pushing image for Go component,push-image)
+.PHONY: publish-image-go
+publish-image-go:
+	@$(call run_for_each,$(GO_BUILDABLE_SUBPROJECTS),Pushing image for Go component,publish-image)
 
-.PHONY: push-image-python
-push-image-python:
-	@$(call run_for_each,$(PY_BUILDABLE_SUBPROJECTS),Pushing image for Python component,push-image)
+.PHONY: publish-image-python
+publish-image-python:
+	@$(call run_for_each,$(PY_BUILDABLE_SUBPROJECTS),Pushing image for Python component,publish-image)
+
+build-chart:
+	@$(call run_for_each,$(PACKAGABLE_SUBPROJECTS),Building charts for components,build-chart)
+
+publish-chart:
+	@$(call run_for_each,$(PACKAGABLE_SUBPROJECTS),Building charts for components,publish-chart)
 
 .PHONY: tests
 tests: tests-go tests-python

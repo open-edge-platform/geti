@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { Flex, Heading, Tag, Text, View } from '@geti/ui';
 import { Fps, Image, Tag as TagIcon } from '@geti/ui/icons';
 import { clsx } from 'clsx';
@@ -11,7 +12,6 @@ import { isExclusive } from '../../../../../../core/labels/utils';
 import { ModelFormat } from '../../../../../../core/models/dtos/model-details.interface';
 import { useModels } from '../../../../../../core/models/hooks/use-models.hook';
 import { isAnomalyDomain } from '../../../../../../core/projects/domains';
-import { paths } from '../../../../../../core/services/routes';
 import { useModelIdentifier } from '../../../../../../hooks/use-model-identifier/use-model-identifier.hook';
 import { formatDate, isNonEmptyString } from '../../../../../../shared/utils';
 import { useProject } from '../../../../providers/project-provider/project-provider.component';
@@ -20,32 +20,10 @@ import { ActiveModelTag } from './active-model-tag.component';
 import { CountWithIcon } from './count-with-icon.component';
 import { ModelCardMenu } from './model-card-menu.component';
 import { ModelCardProps } from './model-card.interface';
+import { ModelInfoFields } from './model-info-fields.component';
 import { ModelPerformance } from './model-performance.component';
 
 import classes from './model-card.module.scss';
-
-const ModelInfoFields = ({
-    modelSize,
-    totalDiskSize,
-    complexity,
-}: {
-    modelSize: string | undefined;
-    totalDiskSize: string | undefined;
-    complexity: number | undefined;
-}) => {
-    const fields = [];
-    if (modelSize !== undefined) {
-        fields.push(`Model weight size: ${modelSize}`);
-    }
-    if (totalDiskSize !== undefined) {
-        fields.push(`Total size: ${totalDiskSize}`);
-    }
-    if (complexity !== undefined) {
-        fields.push(`Complexity: ${complexity} GFlops`);
-    }
-
-    return <>{fields.join(' | ')}</>;
-};
 
 export const ModelCard = ({
     model,
@@ -95,21 +73,25 @@ export const ModelCard = ({
                 borderWidth={'thin'}
                 borderRadius={'small'}
                 borderColor={'gray-75'}
-                padding={'size-200'}
                 data-testid={`model-card-${id}`}
-                UNSAFE_className={clsx({ [classes.modelDeleted]: isModelDeleted(model) })}
+                UNSAFE_className={clsx({
+                    [classes.modelDeleted]: isModelDeleted(model),
+                    [classes.modelCardNotTraining]: true,
+                })}
             >
                 <Flex alignItems={'center'} gap={'size-200'}>
                     <ModelPerformance
                         genericId={genericId}
                         performance={performance}
                         isDisabled={isModelDeleted(model)}
+                        isModelTraining={false}
                     />
                     <Flex direction={'column'} width={'100%'} gap='size-100'>
                         <Flex alignItems={'center'} justifyContent={'space-between'}>
                             <Text UNSAFE_className={classes.modelInfo} data-testid={'trained-model-date-id'}>
-                                Trained: {formatDate(creationDate, 'DD MMM YYYY, hh:mm A')} |
+                                Trained: {formatDate(creationDate, 'DD MMM YYYY, hh:mm A')}
                             </Text>
+
                             <Flex alignItems={'center'} gap={'size-225'} height={'size-225'}>
                                 <CountWithIcon
                                     id={genericId}
@@ -164,6 +146,7 @@ export const ModelCard = ({
                                     !isLoadingModelDetails && !isModelDeleted(model) ? totalDiskSize : undefined
                                 }
                                 complexity={complexity}
+                                isModelTraining={false}
                             />
                         </Text>
                     </Flex>

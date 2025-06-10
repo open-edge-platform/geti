@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { paths } from '@geti/core';
 import { Page } from '@playwright/test';
 
 import { DatasetIdentifier } from '../../../src/core/projects/dataset.interface';
-import { paths } from '../../../src/core/services/routes';
 import { BarChartPage, ObjectSizeDistributionChartPage } from './chart-pages';
 
 export class DatasetStatisticsPage {

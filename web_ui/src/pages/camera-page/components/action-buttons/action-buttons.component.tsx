@@ -3,13 +3,13 @@
 
 import { useState } from 'react';
 
+import { paths } from '@geti/core';
 import { AlertDialog, Button, ButtonGroup, DialogTrigger } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { useIsMounted } from 'usehooks-ts';
 
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
-import { paths } from '../../../../core/services/routes';
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
 import { runWhen } from '../../../../shared/utils';
@@ -24,33 +24,26 @@ interface ActionButtonsProps {
 }
 
 interface ButtonCancelAction {
-    deleteAllItems: () => Promise<void>;
     navigate: NavigateFunction;
     datasetIdentifier: DatasetIdentifier;
 }
 
-const livePredictionPagePath = (datasetIdentifier: DatasetIdentifier) =>
-    paths.project.tests.livePrediction(datasetIdentifier);
+interface ButtonDiscardAction {
+    deleteAllItems: () => Promise<void>;
+    navigate: NavigateFunction;
+    datasetIdentifier: DatasetIdentifier;
+    isDisabled: boolean;
+}
 
 const datasetPagePath = (datasetIdentifier: DatasetIdentifier) => paths.project.dataset.index(datasetIdentifier);
 
-const CancelButton = ({
-    isLivePrediction,
-    datasetIdentifier,
-    navigate,
-    deleteAllItems,
-}: ButtonCancelAction & { isLivePrediction: boolean }) => {
+const CancelButton = ({ datasetIdentifier, navigate }: ButtonCancelAction) => {
     return (
         <Button
             variant={'primary'}
             marginEnd={'size-65'}
-            onPress={async () => {
-                if (isLivePrediction) {
-                    await deleteAllItems();
-                    navigate(livePredictionPagePath(datasetIdentifier));
-                } else {
-                    navigate(datasetPagePath(datasetIdentifier));
-                }
+            onPress={() => {
+                navigate(datasetPagePath(datasetIdentifier));
             }}
         >
             Cancel
@@ -58,12 +51,7 @@ const CancelButton = ({
     );
 };
 
-const DiscardAllButton = ({
-    isDisabled,
-    datasetIdentifier,
-    navigate,
-    deleteAllItems,
-}: ButtonCancelAction & { isDisabled: boolean }) => {
+const DiscardAllButton = ({ isDisabled, datasetIdentifier, navigate, deleteAllItems }: ButtonDiscardAction) => {
     const isMounted = useIsMounted();
     const [isDiscarding, setIsDiscarding] = useState(false);
 
@@ -101,13 +89,13 @@ const DiscardAllButton = ({
 
 export const ActionButtons = ({ isDisabled, canGoToCameraPage }: ActionButtonsProps): JSX.Element => {
     const navigate = useNavigate();
-    const { isLivePrediction, ...datasetIdentifier } = useCameraParams();
+    const { ...datasetIdentifier } = useCameraParams();
     const { deleteAllItems, savedFilesQuery } = useCameraStorage();
     const { addNotification } = useNotification();
     const [isPending, setIsPending] = useState(false);
 
     const isEmptyItems = isEmpty(savedFilesQuery.data);
-    const ButtonComponent = isLivePrediction || isEmptyItems ? CancelButton : DiscardAllButton;
+    const ButtonComponent = isEmptyItems ? CancelButton : DiscardAllButton;
 
     const handleOnPress = () => {
         setIsPending(true);
@@ -119,7 +107,6 @@ export const ActionButtons = ({ isDisabled, canGoToCameraPage }: ActionButtonsPr
             <ButtonComponent
                 navigate={navigate}
                 deleteAllItems={deleteAllItems}
-                isLivePrediction={isLivePrediction}
                 datasetIdentifier={datasetIdentifier}
                 isDisabled={isDisabled || isEmptyItems}
             />

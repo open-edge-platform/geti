@@ -87,10 +87,12 @@ spec:
                 secretKeyRef:
                   name: "{{ .Release.Namespace}}-seaweed-fs"
                   key: "inference_gateway_s3_presigned_url_secret_key"
+            {{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
             - name: ENABLE_TRACING
               value: "true"
             - name: ENABLE_METRICS
               value: "true"
+            {{- end }}
             - name: OTEL_SERVICE_NAME
               value: inference-gateway
             - name: OTLP_TRACES_RECEIVER

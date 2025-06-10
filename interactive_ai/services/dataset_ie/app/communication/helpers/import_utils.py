@@ -26,6 +26,7 @@ SUPPORTED_DOMAINS = [
     Domain.ANOMALY_SEGMENTATION,
     Domain.ANOMALY,
     Domain.ROTATED_DETECTION,
+    Domain.KEYPOINT_DETECTION,
 ]
 
 
@@ -130,6 +131,7 @@ class ImportUtils:
             TaskType.ANOMALY_SEGMENTATION,
             TaskType.ANOMALY,
             TaskType.ROTATED_DETECTION,
+            TaskType.KEYPOINT_DETECTION,
         ]
 
         trainable_tasks = project.get_trainable_task_nodes()

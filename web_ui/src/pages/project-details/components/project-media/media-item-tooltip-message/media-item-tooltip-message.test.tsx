@@ -1,16 +1,16 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { screen, waitFor } from '@testing-library/react';
 
 import { MEDIA_TYPE } from '../../../../../core/media/base-media.interface';
-import { useUsers } from '../../../../../core/users/hook/use-users.hook';
 import { getMockedUser } from '../../../../../test-utils/mocked-items-factory/mocked-users';
 import { providersRender as render } from '../../../../../test-utils/required-providers-render';
 import { MediaItemTooltipMessage, MediaItemTooltipMessageProps } from './media-item-tooltip-message';
 
 const mockedUser = getMockedUser({ id: 'user@intel.com' });
-jest.mock('../../../../../core/users/hook/use-users.hook', () => ({
+jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
     useUsers: jest.fn(() => ({
         useGetUserQuery: jest.fn(() => ({
             data: mockedUser,

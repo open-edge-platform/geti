@@ -90,6 +90,7 @@ export {
     type SpectrumDropZoneProps,
     type Key,
     type DimensionValue,
+    type SpectrumRangeCalendarProps,
 } from '@adobe/react-spectrum';
 
 export { dimensionValue, useStyleProps, useUnwrapDOMRef, useMediaQuery } from '@react-spectrum/utils';
@@ -141,3 +142,18 @@ export { Skeleton } from './src/skeleton/skeleton.component';
 export { Divider } from './src/divider/divider.component';
 export { VirtualizedListLayout } from './src/virtualize-list-layout/virtualize-list-layout';
 export { CornerIndicator } from './src/corner-indicator/corner-indicator.component';
+export { VirtualizedHorizontalGrid } from './src/virtualized-horizontal-grid/virtualized-horizontal-grid';
+export { ToggleButtons } from './src/toggle-buttons/toggle-buttons.component';
+
+export {
+    ListBox as AriaComponentsListBox,
+    GridLayout,
+    ListBoxItem,
+    ListLayout,
+    Size,
+    Virtualizer,
+    DropZone as AriaDropZone,
+    Pressable,
+    DropIndicator,
+    useDragAndDrop,
+} from 'react-aria-components';

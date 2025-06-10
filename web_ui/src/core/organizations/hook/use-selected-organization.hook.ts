@@ -3,21 +3,20 @@
 
 import { useEffect, useRef } from 'react';
 
+import { paths } from '@geti/core/src/services/routes';
+import { getErrorMessage } from '@geti/core/src/services/utils';
+import { useOnboardUserMutation } from '@geti/core/src/users/hook/use-onboard-user-mutation.hook';
+import { useProfileQuery } from '@geti/core/src/users/hook/use-profile.hook';
 import { isNil } from 'lodash-es';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocalStorage } from 'usehooks-ts';
 
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
 import { isActiveOrganization, isUserActivatedInOrg, isUserInvitedInOrg } from '../../../routes/organizations/util';
+import { LOCAL_STORAGE_KEYS } from '../../../shared/local-storage-keys';
 import { hasEqualId } from '../../../shared/utils';
-import { paths } from '../../services/routes';
-import { getErrorMessage } from '../../services/utils';
-import { GENERAL_SETTINGS_KEYS } from '../../user-settings/dtos/user-settings.interface';
-import { useUserGlobalSettings } from '../../user-settings/hooks/use-global-settings.hook';
-import { getSettingsOfType } from '../../user-settings/utils';
-import { useOnboardUserMutation } from '../../users/hook/use-onboard-user-mutation.hook';
-import { useProfileQuery } from '../../users/hook/use-profile.hook';
 
 const removeLastForwardSlash = (text: string) => text.replace(/\/$/, '');
 
@@ -26,14 +25,10 @@ export const useSelectedOrganization = () => {
     const navigate = useNavigate();
     const { organizationId } = useOrganizationIdentifier();
     const { addNotification } = useNotification();
-    const userGlobalSettings = useUserGlobalSettings();
     const onboardUserMutation = useOnboardUserMutation();
     const { data, ...profileResponse } = useProfileQuery();
 
     const isOnboarding = useRef(false);
-
-    const globalSettings = getSettingsOfType(userGlobalSettings.config, GENERAL_SETTINGS_KEYS);
-    const chosenOrganizationId: string | null = globalSettings[GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION].value;
 
     const organizations = data?.organizations ?? [];
     const originalUrl = `${removeLastForwardSlash(location.pathname)}${location.search}`;
@@ -42,7 +37,12 @@ export const useSelectedOrganization = () => {
     const hasMultipleOrganizations = organizations.length > 1;
     const hasAcceptedUserTermsAndConditions = data?.hasAcceptedUserTermsAndConditions ?? false;
     const isUserAutoOnboardingEnabled = hasAcceptedUserTermsAndConditions && !isOnboarding.current;
-    const chosenOrganization = organizations.find(hasEqualId(chosenOrganizationId));
+    const [lastSelectedOrganizationId, setLastSelectedOrganizationId] = useLocalStorage<string | null>(
+        LOCAL_STORAGE_KEYS.LAST_SELECTED_ORGANIZATION_ID,
+        null
+    );
+
+    const chosenOrganization = organizations.find(hasEqualId(lastSelectedOrganizationId));
     const hasChosenActiveOrganization =
         chosenOrganization && isActiveOrganization(chosenOrganization) && !originalUrl.includes(chosenOrganization.id);
 
@@ -111,10 +111,8 @@ export const useSelectedOrganization = () => {
                 return;
             }
 
-            userGlobalSettings.saveConfig({
-                ...userGlobalSettings.config,
-                [GENERAL_SETTINGS_KEYS.CHOSEN_ORGANIZATION]: { value: newOrganization.id },
-            });
+            setLastSelectedOrganizationId(newOrganization.id);
+
             navigate(paths.organization.index({ organizationId: newOrganization.id }));
         },
     };

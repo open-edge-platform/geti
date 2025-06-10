@@ -1,0 +1,6 @@
+---
+name: ${COMPONENT_NAME}
+version: ${TAG}
+description: web chart
+apiVersion: v2
+appVersion: ${TAG}

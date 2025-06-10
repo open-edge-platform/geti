@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Namespace }}-kafka-topics
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- if .Values.commonAnnotations }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
+    {{- end }}
+data:
+  topics.properties: |-
+    {{- printf "%s" "# topic, replicationFactor, numPartitions, config (list)"  | nindent 4 }}
+    {{- range $topic := .Values.provisioning.topics }}
+    {{- include "kafka.topic.line" (dict "topic" $topic "context" $)  | nindent 4 -}}
+    {{- end }}
+
+  acl.properties: |-
+    {{- printf "%s" "# topic, user, operations (list)"   | nindent 4}}
+    {{- range $acl := .Values.provisioning.acls }}
+    {{- include "kafka.acl.line" (dict "acl" $acl "context" $)  | nindent 4 -}}
+    {{- end }}

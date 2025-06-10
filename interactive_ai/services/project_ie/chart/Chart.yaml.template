@@ -1,0 +1,6 @@
+---
+name: ${COMPONENT_NAME}
+version: ${TAG}
+apiVersion: v2
+description: project import and export
+appVersion: ${TAG}

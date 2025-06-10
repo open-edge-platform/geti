@@ -270,7 +270,25 @@ class TestParseDatasetNewProject:
                 {"nodes": ["left_eye", "right_eye"]},  # [2,3]
                 {"nodes": ["left_ankle", "left_knee"]},  # [16,14]
             ],
-            "positions": [],  # TODO CVS-156570
+            "positions": [
+                {"label": "nose", "x": 0.1, "y": 0.4},
+                {"label": "left_eye", "x": 0.2, "y": 0.5},
+                {"label": "right_eye", "x": 0.3, "y": 0.6},
+                {"label": "left_ear", "x": 0.4, "y": 0.7},
+                {"label": "right_ear", "x": 0.5, "y": 0.8},
+                {"label": "left_shoulder", "x": 0.6, "y": 0.9},
+                {"label": "right_shoulder", "x": 0.7, "y": 1.0},
+                {"label": "left_elbow", "x": 0.8, "y": 0.9},
+                {"label": "right_elbow", "x": 0.9, "y": 0.8},
+                {"label": "left_wrist", "x": 1.0, "y": 0.7},
+                {"label": "right_wrist", "x": 0.9, "y": 0.6},
+                {"label": "left_hip", "x": 0.8, "y": 0.5},
+                {"label": "right_hip", "x": 0.7, "y": 0.4},
+                {"label": "left_knee", "x": 0.6, "y": 0.3},
+                {"label": "right_knee", "x": 0.5, "y": 0.2},
+                {"label": "left_ankle", "x": 0.4, "y": 0.1},
+                {"label": "right_ankle", "x": 0.3, "y": 0.0},
+            ],
         }
         if fxt_keypoint_detection:
             dataset_info = DatasetInfo(

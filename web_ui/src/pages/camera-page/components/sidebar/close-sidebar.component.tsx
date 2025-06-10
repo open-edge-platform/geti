@@ -15,10 +15,9 @@ import classes from './sidebar.module.scss';
 
 interface CloseSidebarProps {
     screenshots: Screenshot[];
-    isLivePrediction: boolean;
 }
 
-export const CloseSidebar = ({ screenshots, isLivePrediction }: CloseSidebarProps): JSX.Element => {
+export const CloseSidebar = ({ screenshots }: CloseSidebarProps): JSX.Element => {
     const triggerRef = useRef(null);
     const settingsPopoverState = useOverlayTriggerState({});
 
@@ -26,21 +25,11 @@ export const CloseSidebar = ({ screenshots, isLivePrediction }: CloseSidebarProp
         <View padding={'size-100'}>
             <SidebarThumbnail isCloseSidebar screenshots={screenshots} />
 
-            {!isLivePrediction && (
-                <>
-                    <Divider size={'S'} marginTop={'size-250'} />
-                    <Heading level={3} UNSAFE_className={classes.closeSidebarTitle}>
-                        Images
-                    </Heading>
-                    <Text UNSAFE_className={classes.closeSidebarValue}>{screenshots.length}</Text>
-
-                    <Divider size={'S'} marginTop={'size-250'} />
-                    <Heading level={3} UNSAFE_className={classes.closeSidebarTitle}>
-                        Videos
-                    </Heading>
-                    <Text UNSAFE_className={classes.closeSidebarValue}>13(12:10:22)</Text>
-                </>
-            )}
+            <Divider size={'S'} marginTop={'size-250'} />
+            <Heading level={3} UNSAFE_className={classes.closeSidebarTitle}>
+                Images
+            </Heading>
+            <Text UNSAFE_className={classes.closeSidebarValue}>{screenshots.length}</Text>
 
             <Divider size={'S'} marginTop={'size-250'} />
 

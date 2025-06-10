@@ -3,14 +3,14 @@
 
 import { apiClient } from '@geti/core';
 
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { MediaAdvancedFilterDTO, MediaItemDTO } from '../../media/dtos/media.interface';
 import { AdvancedFilterOptions, AdvancedFilterSortingOptions } from '../../media/media-filter.interface';
 import { MediaAdvancedFilterResponse } from '../../media/media.interface';
 import { getMediaItemFromDTO } from '../../media/services/utils';
 import { VideoFrame } from '../../media/video.interface';
 import { ProjectIdentifier } from '../../projects/core.interface';
-import { CreateApiService } from '../../services/create-api-service.interface';
-import { API_URLS } from '../../services/urls';
 import { NextPageURL } from '../../shared/infinite-query.interface';
 import { TrainingDatasetDTO } from '../dtos/training-dataset.interface';
 import { TrainingDatasetRevision, TrainingDatasetRevisionVideo } from './training-dataset.interface';

@@ -4,6 +4,8 @@
 CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
 include $(CWD)/Makefile.shared
 
+DOCKER_IMAGE_DESCRIPTION := $(shell grep "description =" pyproject.toml | sed -n 's/^description = "\(.*\)"/\1/p')
+
 .PHONY: tests test-unit-default test-component-default test-integration-default \
 		static-code-analysis-default ruff mypy style-fix \
 		pre-venv venv venv-lock
@@ -19,9 +21,10 @@ PIP_INSTALL_PARAMS   := --trusted-host pypi.org \
 					    --trusted-host pypi.python.org \
 					    --trusted-host files.pythonhosted.org \
 
-clean:
-	@rm -rf .venv .pytest_cache .coverage .ruff_cache .mypy_cache
-	@find . -name .pytest_cache -type d -prune -exec rm -rf {} \;
+CLEAN_DIRS := \
+    .venv .pytest_cache .coverage .ruff_cache .mypy_cache \
+    $(find . -name .pytest_cache -type d) \
+    ${CHART_BUILD_DIR}
 
 pre-venv:
 	@if ! uv --version | grep ${UV_VERSION}; then \
@@ -85,6 +88,7 @@ build-image:
 	@docker build \
 		${DOCKER_EXTRA_ARGS} \
 		${DOCKER_BUILD_CONTEXT} \
+		--label "org.opencontainers.image.description=${DOCKER_IMAGE_DESCRIPTION}" \
 		-t ${IMAGES_REGISTRY}/${COMPONENT_NAME}:${TAG} \
 		-f ./Dockerfile .
 

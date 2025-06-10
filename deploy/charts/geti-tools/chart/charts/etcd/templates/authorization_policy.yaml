@@ -1,0 +1,40 @@
+{{- if not .Values.global.istio_ambient_mesh }}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: etcd-auth-policy
+  labels:
+    {{- if .Values.global.istio_revision_name }}
+    istio.io/rev: "{{ .Values.global.istio_revision_name }}"
+    {{- end }}
+spec:
+  {{- if not .Values.global.istio_ambient_mesh }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: etcd
+{{/*  {{- else }}*/}}
+{{/*  targetRefs:*/}}
+{{/*    - kind: Gateway*/}}
+{{/*      group: gateway.networking.k8s.io*/}}
+{{/*      name: {{ .Values.global.waypoint.name }}*/}}
+  {{- end }}
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/{{ .Release.Namespace }}/sa/{{ .Release.Namespace }}-modelmesh"]
+        namespaces: ["impt"]
+    - source:
+        principals: ["cluster.local/ns/{{ .Release.Namespace }}/sa/modelmesh-controller"]
+        namespaces: ["impt"]
+    - source:
+        principals: ["cluster.local/ns/{{ .Release.Namespace }}/sa/modelmesh"]
+        namespaces: ["impt"]
+    - source:
+        principals: ["cluster.local/ns/{{ .Release.Namespace }}/sa/{{ .Release.Namespace }}-etcd"]
+        namespaces: ["impt"]
+{{/*    to:*/}}
+{{/*      paths:*/}}
+{{/*        - "?????"  # TODO*/}}
+{{- end }}

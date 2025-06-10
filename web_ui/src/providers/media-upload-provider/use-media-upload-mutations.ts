@@ -3,17 +3,16 @@
 
 import { Dispatch } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { getErrorMessage } from '@geti/core/src/services/utils';
 import { Query, useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query';
-import { AxiosError, AxiosResponse, isCancel } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { AxiosError, AxiosResponse, HttpStatusCode, isCancel } from 'axios';
 import { isArray, isEmpty } from 'lodash-es';
 
 import { AdvancedFilterOptions, SearchOptionsRule } from '../../core/media/media-filter.interface';
 import { UploadMediaMutationResponse } from '../../core/media/media.interface';
 import { MediaService } from '../../core/media/services/media-service.interface';
 import { DatasetIdentifier } from '../../core/projects/dataset.interface';
-import QUERY_KEYS from '../../core/requests/query-keys';
-import { getErrorMessage } from '../../core/services/utils';
 import { useDebouncedCallback } from '../../hooks/use-debounced-callback/use-debounced-callback.hook';
 import { MediaItemDTO } from './../../core/media/dtos/media.interface';
 import { DatasetMediaUploadActions, MediaUploadActionTypes } from './media-upload-reducer-actions';
@@ -141,7 +140,7 @@ export const useMediaUploadMutations = ({
                 return;
             }
 
-            if (response?.status === StatusCodes.INSUFFICIENT_STORAGE) {
+            if (response?.status === HttpStatusCode.InsufficientStorage) {
                 // cancel pending media upload
                 dispatch({
                     datasetId,

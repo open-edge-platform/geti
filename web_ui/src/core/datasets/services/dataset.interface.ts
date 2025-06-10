@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import {
     JobImportDatasetToExistingProjectStatus,
     JobImportDatasetToNewProjectStatus,
@@ -9,7 +10,6 @@ import {
     JobStatusIdentifier,
 } from '../../jobs/jobs.interface';
 import { CreateDatasetResponse } from '../../projects/dataset.interface';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import {
     DatasetImportIdentifier,
     DatasetImportPrepareForNewProjectResponse,

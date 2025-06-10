@@ -2,17 +2,16 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { apiClient } from '@geti/core';
-import { isAxiosError } from 'axios';
-import { StatusCodes } from 'http-status-codes';
+import { HttpStatusCode, isAxiosError } from 'axios';
 
+import { CreateApiService } from '../../../../packages/core/src/services/create-api-service.interface';
+import { API_URLS } from '../../../../packages/core/src/services/urls';
 import { getIds } from '../../../shared/utils';
 import { Label } from '../../labels/label.interface';
 import { MediaItem } from '../../media/media.interface';
 import { mediaIdentifierToDTO } from '../../media/services/utils';
 import { Video } from '../../media/video.interface';
 import { DatasetIdentifier } from '../../projects/dataset.interface';
-import { CreateApiService } from '../../services/create-api-service.interface';
-import { API_URLS } from '../../services/urls';
 import { Annotation } from '../annotation.interface';
 import {
     AnnotationResultDTO,
@@ -45,7 +44,7 @@ export const createApiAnnotationService: CreateApiService<AnnotationService> = (
 
             return getAnnotationsFromDTO(data.annotations, projectLabels);
         } catch (error) {
-            if (isAxiosError(error) && error.response?.status === StatusCodes.NOT_FOUND) {
+            if (isAxiosError(error) && error.response?.status === HttpStatusCode.NotFound) {
                 return [];
             }
 

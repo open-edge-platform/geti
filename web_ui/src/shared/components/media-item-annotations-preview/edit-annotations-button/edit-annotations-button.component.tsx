@@ -1,11 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { useAnnotatorRoutePath } from '@geti/core/src/services/use-navigate-to-annotator-route.hook';
 import { Button } from '@geti/ui';
 
 import { MediaItem } from '../../../../core/media/media.interface';
 import { DatasetIdentifier } from '../../../../core/projects/dataset.interface';
-import { useAnnotatorRoutePath } from '../../../../core/services/use-navigate-to-annotator-route.hook';
 
 interface EditAnnotationsButtonProps {
     datasetIdentifier: DatasetIdentifier;

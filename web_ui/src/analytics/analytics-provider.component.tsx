@@ -3,13 +3,12 @@
 
 import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { Meter } from '@opentelemetry/api';
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 
-import { usePlatformUtils } from '../core/platform-utils/hooks/use-platform-utils.hook';
-import { useApplicationServices } from '../core/services/application-services-provider.component';
+import { useWorkflowId } from '../core/platform-utils/hooks/use-platform-utils.hook';
 import { useEventListener } from '../hooks/event-listener/event-listener.hook';
-import { MissingProviderError } from '../shared/missing-provider-error';
 import { createPeriodicMetricExporter, initializeMetrics } from './metrics';
 import { initializeTracing } from './traces';
 import { SERVICE_DEFAULT_INFO } from './utils';
@@ -28,7 +27,6 @@ const AnalyticsContext = createContext<AnalyticsContextProps | undefined>(undefi
 const AnalyticsProvider = ({ children }: AnalyticsProviderProps): JSX.Element => {
     const [isWindowFocus, setIsWindowFocus] = useState<boolean>(true);
     const [isDocumentContentVisible, setIsDocumentContentVisible] = useState<boolean>(true);
-    const { useWorkflowId } = usePlatformUtils();
     const { data: workflowId } = useWorkflowId();
 
     const tracingRef = useRef<{ getTrace: (name: string) => void } | null>(null);
@@ -88,8 +86,7 @@ const AnalyticsProvider = ({ children }: AnalyticsProviderProps): JSX.Element =>
             meter: meterProviderRef.current?.getMeter('default', SERVICE_DEFAULT_INFO.serviceVersion),
             getTrace: tracingRef.current?.getTrace,
         }),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [meterProviderRef.current, tracingRef.current]
+        []
     );
 
     return <AnalyticsContext.Provider value={value}>{children}</AnalyticsContext.Provider>;
@@ -99,10 +96,18 @@ const useAnalytics = (): AnalyticsContextProps => {
     const context = useContext(AnalyticsContext);
 
     if (context === undefined) {
-        throw new MissingProviderError('useAnalytics', 'AnalyticsProvider');
+        return {
+            meter: undefined,
+            getTrace: undefined,
+        };
     }
 
     return context;
 };
 
-export { AnalyticsProvider, useAnalytics };
+const useIsAnalyticsEnabled = (): boolean => {
+    // TODO: Implement a more robust check for analytics enablement
+    return true;
+};
+
+export { AnalyticsProvider, useAnalytics, useIsAnalyticsEnabled };

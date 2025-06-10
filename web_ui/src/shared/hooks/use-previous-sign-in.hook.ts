@@ -1,8 +1,9 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useUsers } from '../../core/users/hook/use-users.hook';
-import { User } from '../../core/users/users.interface';
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { User } from '@geti/core/src/users/users.interface';
+
 import { useIsSaasEnv } from '../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { useOrganizationIdentifier } from '../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { formatDate } from '../utils';

@@ -3,7 +3,10 @@
 
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useMemo, useState } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQueryClient } from '@tanstack/react-query';
+import { HttpStatusCode } from 'axios';
 import { isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
@@ -11,8 +14,6 @@ import { DatasetImportToExistingProjectItem } from '../../core/datasets/dataset.
 import { useDatasetImportQueries } from '../../core/datasets/hooks/use-dataset-import-queries.hook';
 import { ProjectIdentifier } from '../../core/projects/core.interface';
 import { CreateDatasetResponse } from '../../core/projects/dataset.interface';
-import QUERY_KEYS from '../../core/requests/query-keys';
-import { useApplicationServices } from '../../core/services/application-services-provider.component';
 import { useLocalStorageDatasetImport } from '../../features/dataset-import/hooks/use-local-storage-dataset-import.hook';
 import { PinnedCollapsedItemsAction } from '../../hooks/use-pinned-collapsed-items/use-pinned-collapsed-items.interface';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
@@ -134,6 +135,13 @@ export const DatasetImportToExistingProjectProvider = ({ children }: DatasetImpo
             { workspaceId, organizationId, fileId: String(activeDatasetImport.uploadId) },
             {
                 onSuccess: () => deleteLsDatasetImport(activeDatasetImport.id),
+                onError: (error) => {
+                    if (error.response?.status === HttpStatusCode.NotFound) {
+                        deleteLsDatasetImport(activeDatasetImport.id);
+                    } else {
+                        addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR });
+                    }
+                },
             }
         );
     };

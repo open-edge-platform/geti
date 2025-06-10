@@ -90,8 +90,10 @@ spec:
               value: "{{ .Values.kafka.security_protocol }}"
             - name: KAFKA_SASL_MECHANISM
               value: "{{ .Values.kafka.sasl_mechanism }}"
+            {{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
             - name: ENABLE_TRACING
               value: "true"
+            {{- end }}
             - name: OTEL_SERVICE_NAME
               value: "{{ include "credit-system.name" . }}-microservice"
             - name: OTLP_TRACES_RECEIVER

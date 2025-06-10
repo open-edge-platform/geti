@@ -1,10 +1,10 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { createInMemoryUsersService } from '@geti/core/src/users/services/in-memory-users-service';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { screen } from '@testing-library/react';
 
-import { createInMemoryUsersService } from '../../../../../core/users/services/in-memory-users-service';
 import { getMockedAdminUser } from '../../../../../test-utils/mocked-items-factory/mocked-users';
 import { projectListRender as render } from '../../../../../test-utils/projects-list-providers-render';
 import { getById } from '../../../../../test-utils/utils';

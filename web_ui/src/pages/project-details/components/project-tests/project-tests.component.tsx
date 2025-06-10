@@ -3,9 +3,9 @@
 
 import { Key } from 'react';
 
+import { paths } from '@geti/core';
 import { useNavigate } from 'react-router-dom';
 
-import { paths } from '../../../../core/services/routes';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier/use-project-identifier';
 import { PageLayoutWithTabs } from '../../../../shared/components/page-layout/page-layout-with-tabs.component';
 import { TabItem } from '../../../../shared/components/tabs/tabs.interface';

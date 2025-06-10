@@ -3,11 +3,12 @@
 
 import { useEffect, useState } from 'react';
 
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
+
 import { Annotation } from '../../../../core/annotations/annotation.interface';
 import { getAnnotationsFromDTO } from '../../../../core/annotations/services/utils';
 import { MediaItem } from '../../../../core/media/media.interface';
 import { getAnnotationStatePerTaskFromDTO } from '../../../../core/media/services/utils';
-import { useApplicationServices } from '../../../../core/services/application-services-provider.component';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { useDatasetIdentifier } from '../../hooks/use-dataset-identifier.hook';
 import { useOptimisticallyUpdateAnnotationStatus } from '../dataset-provider/use-optimistically-update-annotation-status.hook';

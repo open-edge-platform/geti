@@ -3,6 +3,8 @@
 
 import { useMemo } from 'react';
 
+import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
+import { RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
 import { ActionButton, Flex, Tag } from '@geti/ui';
 import { BorderClose } from '@geti/ui/icons';
 import { getLocalTimeZone, parseAbsolute } from '@internationalized/date';
@@ -15,8 +17,6 @@ import {
     SearchRuleOperator,
     SearchRuleValue,
 } from '../../../core/media/media-filter.interface';
-import { useUsers } from '../../../core/users/hook/use-users.hook';
-import { RESOURCE_TYPE } from '../../../core/users/users.interface';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { hasEqualId } from '../../../shared/utils';
 import { useProject } from '../../project-details/providers/project-provider/project-provider.component';

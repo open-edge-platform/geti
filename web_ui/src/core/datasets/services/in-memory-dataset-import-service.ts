@@ -3,6 +3,7 @@
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { WorkspaceIdentifier } from '../../../../packages/core/src/workspaces/services/workspaces.interface';
 import { JobState, JobType } from '../../jobs/jobs.const';
 import {
     JobImportDatasetToExistingProjectStatus,
@@ -13,7 +14,6 @@ import {
 } from '../../jobs/jobs.interface';
 import { ProjectIdentifier } from '../../projects/core.interface';
 import { CreateDatasetResponse } from '../../projects/dataset.interface';
-import { WorkspaceIdentifier } from '../../workspaces/services/workspaces.interface';
 import { DATASET_IMPORT_TASK_TYPE } from '../dataset.enum';
 import {
     DatasetImportIdentifier,

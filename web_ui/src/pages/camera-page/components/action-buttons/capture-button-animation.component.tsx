@@ -3,11 +3,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { Button, type ButtonProps } from '@geti/ui';
+import { Button, dimensionValue, type ButtonProps } from '@geti/ui';
 import { isNil, throttle } from 'lodash-es';
 
 import { useEventListener } from '../../../../hooks/event-listener/event-listener.hook';
-import { useCameraParams } from '../../hooks/camera-params.hook';
 
 import classes from './action-buttons.module.scss';
 
@@ -41,7 +40,6 @@ export const CaptureButtonAnimation = ({
 }: CaptureButtonAnimationProps): JSX.Element => {
     const intervalId = useRef<ReturnType<typeof setInterval> | null>(null);
     const timerId = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const { isLivePrediction } = useCameraParams();
 
     const [isPressing, setIsPressing] = useState(false);
 
@@ -52,7 +50,7 @@ export const CaptureButtonAnimation = ({
 
         timerId.current = setTimeout(() => {
             setIsPressing(true);
-            !isLivePrediction ? handleLongPress() : onPress();
+            handleLongPress();
         }, MOUSE_HOLD_TIMER);
     };
 
@@ -101,6 +99,11 @@ export const CaptureButtonAnimation = ({
             isDisabled={isNil(videoTag)}
             onPressStart={handleOnPressStart}
             onPressEnd={handleOnPressEnd}
+            UNSAFE_style={{
+                borderRadius: '50%',
+                borderWidth: dimensionValue('size-50'),
+            }}
+            height={'size-900'}
         >
             {buttonProps.children}
         </Button>

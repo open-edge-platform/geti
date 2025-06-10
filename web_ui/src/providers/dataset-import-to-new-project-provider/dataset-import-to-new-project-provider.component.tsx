@@ -13,8 +13,10 @@ import {
     useState,
 } from 'react';
 
+import QUERY_KEYS from '@geti/core/src/requests/query-keys';
+import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
+import { AxiosError, HttpStatusCode } from 'axios';
 import { isEmpty, noop } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
@@ -25,8 +27,6 @@ import {
 } from '../../core/datasets/dataset.interface';
 import { useDatasetImportQueries } from '../../core/datasets/hooks/use-dataset-import-queries.hook';
 import { useFeatureFlags } from '../../core/feature-flags/hooks/use-feature-flags.hook';
-import QUERY_KEYS from '../../core/requests/query-keys';
-import { useApplicationServices } from '../../core/services/application-services-provider.component';
 import { useLocalStorageDatasetImport } from '../../features/dataset-import/hooks/use-local-storage-dataset-import.hook';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
@@ -191,7 +191,13 @@ export const DatasetImportToNewProjectProvider = ({ children }: DatasetImportToN
             { ...workspaceIdentifier, fileId: String(datasetImport.uploadId) },
             {
                 onSuccess: () => deleteLsDatasetImport(datasetImport.id),
-                onError: (error) => addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR }),
+                onError: (error) => {
+                    if (error.response?.status === HttpStatusCode.NotFound) {
+                        deleteLsDatasetImport(datasetImport.id);
+                    } else {
+                        addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR });
+                    }
+                },
             }
         );
     };
