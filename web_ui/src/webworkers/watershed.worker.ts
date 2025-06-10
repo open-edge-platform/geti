@@ -3,7 +3,7 @@
 
 import { OpenCVLoader, Watershed } from '@geti/smart-tools';
 import { WatershedMethods } from '@geti/smart-tools/src/watershed/interfaces';
-import { expose } from 'comlink';
+import { expose, proxy } from 'comlink';
 import type OpenCVTypes from 'OpenCVTypes';
 
 declare const self: DedicatedWorkerGlobalScope;
@@ -18,20 +18,18 @@ const waitForOpenCV = async () => {
     if ('ready' in opencv) {
         await opencv.ready;
     }
+};
 
-    return opencv;
+const initWatershed = async (imageData: ImageData): Promise<WatershedMethods> => {
+    if (!opencv) {
+        throw new Error('OpenCV is not loaded. Please load OpenCV before running Watershed.');
+    }
+
+    return proxy(new Watershed(opencv, imageData));
 };
 
 const WorkerApi = {
-    Watershed: async (imageData: ImageData): Promise<WatershedMethods> => {
-        const cv = waitForOpenCV();
-
-        if (!cv) {
-            throw new Error('OpenCV not loaded.');
-        }
-
-        return new Watershed(cv, imageData);
-    },
+    Watershed: initWatershed,
     terminate: self.close,
     waitForOpenCV,
 };

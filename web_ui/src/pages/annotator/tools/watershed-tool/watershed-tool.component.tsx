@@ -3,6 +3,8 @@
 
 import { ComponentProps, useEffect } from 'react';
 
+import { WatershedPolygon } from '@geti/smart-tools/src/watershed/interfaces';
+
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
 import { Line } from '../../annotation/shapes/line.component';
 import { Polygon } from '../../annotation/shapes/polygon.component';
@@ -18,7 +20,6 @@ import { drawingStyles, isPolygonValid } from '../utils';
 import { BrushSizeCursor } from './brush-size-cursor.component';
 import { BACKGROUND_LABEL_MARKER_ID, formatAndAddAnnotations, getScaleValue } from './utils';
 import { useWatershedState } from './watershed-state-provider.component';
-import { WatershedPolygon } from './watershed-tool.interface';
 
 const MIN_NUMBER_OF_REQUIRED_UNIQUE_MARKERS = 2;
 

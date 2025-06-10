@@ -18,5 +18,8 @@ export type Marker = {
 
 export interface WatershedMethods {
     executeWatershed(markers: Marker[], sensitivity: number): WatershedPolygon[];
+    drawMarkers(markers: Marker[]): void;
+    getPolygons(markers: Marker[]): WatershedPolygon[];
+    scaleImage(sensitivity: number): void;
     clearMemory: () => void;
 }
