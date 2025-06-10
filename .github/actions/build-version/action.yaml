@@ -27,5 +27,5 @@ runs:
         if [[ "$CHECKOUT_REF" != refs/tags/* ]]; then
           tag+="-$(git rev-parse --short HEAD)"
         fi
-
+        echo "version=$tag"
         echo "version=$tag" >> "$GITHUB_OUTPUT"
