@@ -2,7 +2,7 @@ name: Generate Build Version
 description: Generate Build Version
 
 inputs:
-  checkout_ref:
+  ref:
     description: 'The branch, tag or SHA to checkout'
     required: true
 outputs:
