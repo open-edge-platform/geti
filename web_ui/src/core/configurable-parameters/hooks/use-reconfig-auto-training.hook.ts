@@ -16,7 +16,7 @@ import {
 } from '../services/configurable-parameters.interface';
 import { getReconfigureParametersDTO, updateSelectedParameter } from '../utils';
 
-interface UseReconfigureParams {
+export interface UseReconfigureParams {
     configParameters: ConfigurableParametersTaskChain[];
     newConfigParameter: ConfigurableParametersParams;
     onOptimisticUpdate: (newConfig: ConfigurableParametersTaskChain[]) => ConfigurableParametersTaskChain[];

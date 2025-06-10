@@ -7,7 +7,7 @@ interface ParameterBase {
     description: string;
 }
 
-interface NumberParameter extends ParameterBase {
+export interface NumberParameter extends ParameterBase {
     type: 'int' | 'float';
     value: number;
     minValue: number;
