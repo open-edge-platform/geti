@@ -47,6 +47,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          ref: ${{ inputs.ref || '' }}
 
       - name: Prepare image tag
         id: image-tag
