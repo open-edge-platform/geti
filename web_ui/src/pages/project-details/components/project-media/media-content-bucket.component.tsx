@@ -246,10 +246,14 @@ export const MediaContentBucket = ({
                                 }
                                 mode='overlay'
                                 size={'M'}
-                                overlayHeight={'auto'}
-                                top={isFetchingNextPage ? 'auto' : 0}
-                                bottom={isFetchingNextPage ? 'size-100' : 0}
-                                backgroundColor={isFetchingNextPage ? 'transparent' : 'gray-50'}
+                                style={{
+                                    top: isFetchingNextPage ? 'auto' : 0,
+                                    bottom: isFetchingNextPage ? 'var(--spectrum-global-dimension-size-100)' : 0,
+                                    backgroundColor: isFetchingNextPage
+                                        ? 'transparent'
+                                        : 'var(--spectrum-global-color-gray-50)',
+                                    height: 'auto',
+                                }}
                             />
                         )}
                     </Flex>

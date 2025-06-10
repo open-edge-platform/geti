@@ -1,18 +1,22 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { CSSProperties } from 'react';
+
 import { DimensionValue, Flex, ProgressCircle, View } from '@adobe/react-spectrum';
 import { SpectrumProgressCircleProps } from '@react-types/progress';
-import { BoxAlignmentStyleProps, StyleProps } from '@react-types/shared';
 import { Responsive } from '@react-types/shared/src/style';
+import { clsx } from 'clsx';
+
+import classes from './loading.module.scss';
 
 /**
  * Props for the Loading component.
  *
- * Extends Adobe Spectrum's ProgressCircle props along with styling and alignment props
- * to provide a flexible loading indicator suitable for various use cases.
+ * Extends Adobe Spectrum's ProgressCircle props to provide a flexible loading indicator
+ * suitable for various use cases.
  */
-interface LoadingProps extends SpectrumProgressCircleProps, StyleProps, BoxAlignmentStyleProps {
+interface LoadingProps extends SpectrumProgressCircleProps {
     /**
      * The display mode for the loading component.
      * - 'inline': Renders as an inline element without overlay positioning
@@ -29,15 +33,13 @@ interface LoadingProps extends SpectrumProgressCircleProps, StyleProps, BoxAlign
     height?: Responsive<DimensionValue>;
 
     /**
-     * Height of the overlay container when in fullscreen or overlay mode.
-     * @default '100%'
+     * CSS styles for the overlay container.
+     * This allows full control over positioning, dimensions, spacing, and appearance.
      */
-    overlayHeight?: Responsive<DimensionValue>;
+    style?: CSSProperties;
 
     id?: string;
-    backgroundColor?: string;
     className?: string;
-    paddingTop?: Responsive<DimensionValue>;
 }
 
 /**
@@ -57,7 +59,16 @@ interface LoadingProps extends SpectrumProgressCircleProps, StyleProps, BoxAlign
  * <Loading mode="inline" size="M" />
  *
  * // Full-screen overlay with custom background
- * <Loading mode="overlay" backgroundColor="rgba(0,0,0,0.5)" />
+ * <Loading mode="overlay" style={{ backgroundColor: "rgba(0,0,0,0.5)" }} />
+ *
+ * // Custom positioned overlay
+ * <Loading mode="overlay" style={{
+ *   top: 100,
+ *   left: 50,
+ *   width: 200,
+ *   height: 200,
+ *   backgroundColor: "white"
+ * }} />
  *
  * // Conditional loading overlay
  * {isLoading && <Loading mode="overlay" />}
@@ -70,22 +81,13 @@ export const Loading = ({
     mode = 'fullscreen',
     size = 'L',
     height = '100%',
-    overlayHeight = '100%',
+    style = {},
     id,
-    backgroundColor,
     className,
-    alignItems = 'center',
-    justifyContent = 'center',
-    paddingTop,
-    marginTop,
-    left = 0,
-    right = 0,
-    top = 0,
-    bottom = 0,
     ...rest
 }: LoadingProps): JSX.Element => {
     const spinner = (
-        <Flex alignItems={alignItems} justifyContent={justifyContent} height={height}>
+        <Flex alignItems={'center'} justifyContent={'center'} height={height}>
             <ProgressCircle aria-label={'Loading...'} isIndeterminate size={size} {...rest} />
         </Flex>
     );
@@ -94,28 +96,11 @@ export const Loading = ({
         return spinner;
     }
 
+    // Determine CSS classes based on mode
+    const overlayClassName = clsx(classes.overlay, mode === 'overlay' ? classes.modal : classes.fullscreen, className);
+
     return (
-        <View
-            height={overlayHeight}
-            position={'absolute'}
-            left={left}
-            right={right}
-            top={top}
-            bottom={bottom}
-            zIndex={mode === 'overlay' ? 20 : undefined}
-            paddingTop={paddingTop}
-            marginTop={marginTop}
-            id={id}
-            data-testid={id}
-            UNSAFE_style={{
-                cursor: 'default',
-                // Use modal overlay background for overlay mode, or custom/default background for fullscreen
-                backgroundColor:
-                    backgroundColor ||
-                    (mode === 'overlay' ? 'var(--spectrum-alias-background-color-modal-overlay)' : 'gray-50'),
-            }}
-            UNSAFE_className={className}
-        >
+        <View id={id} data-testid={id} UNSAFE_style={style} UNSAFE_className={overlayClassName}>
             {spinner}
         </View>
     );
