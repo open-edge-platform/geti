@@ -50,32 +50,12 @@ const renderCameraStoreNameHook = ({
 };
 
 describe('useCameraStoreName', () => {
-    it('livePrediction false, use dataset id as store name', async () => {
+    it('use dataset id as store name', async () => {
         const datasetId = '123';
         const { result } = renderCameraStoreNameHook({ datasetId });
 
         await waitFor(() => {
             expect(result.current).toBe(`dataset-${datasetId}`);
-        });
-    });
-
-    it('livePrediction param true', async () => {
-        const { result } = renderCameraStoreNameHook({ initialEntries: ['?isLivePrediction=true'] });
-
-        await waitFor(() => {
-            expect(result.current).toContain(`project-live-inference-`);
-        });
-    });
-
-    it('livePrediction page', async () => {
-        const { result } = renderCameraStoreNameHook({
-            initialEntries: [
-                '/organizations/organization-id/workspaces/workspaces-id/projects/projects-id/tests/live-prediction',
-            ],
-        });
-
-        await waitFor(() => {
-            expect(result.current).toContain(`project-live-inference-`);
         });
     });
 });

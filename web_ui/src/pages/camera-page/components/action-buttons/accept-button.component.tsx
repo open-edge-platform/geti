@@ -18,23 +18,18 @@ interface AcceptButtonProps {
     onPress?: () => void;
 }
 
-const livePredictionPagePath = (datasetIdentifier: DatasetIdentifier) =>
-    paths.project.tests.livePrediction(datasetIdentifier);
-
 const datasetPagePath = (datasetIdentifier: DatasetIdentifier) => paths.project.dataset.index(datasetIdentifier);
 
 export const AcceptButton = ({ isDisabled, isPending, onPress }: AcceptButtonProps): JSX.Element => {
     const navigate = useNavigate();
-    const { isLivePrediction, ...datasetIdentifier } = useCameraParams();
+    const { ...datasetIdentifier } = useCameraParams();
     const { savedFilesQuery, updateMany } = useCameraStorage();
     const { mediaUploadState, onUploadMedia } = useDatasetMediaUpload();
 
     const savedFiles = savedFilesQuery.data ?? [];
 
     const handleRedirect = () => {
-        isLivePrediction
-            ? navigate(livePredictionPagePath(datasetIdentifier))
-            : navigate(datasetPagePath(datasetIdentifier));
+        navigate(datasetPagePath(datasetIdentifier));
     };
 
     const handleStorageCheck = async () => {

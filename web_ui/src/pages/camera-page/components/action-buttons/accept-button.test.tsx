@@ -32,7 +32,6 @@ const mockedScreenshot = getMockedScreenshot({});
 describe('AcceptButton', () => {
     const renderApp = async ({
         filesData,
-        isLivePrediction = false,
         updateMany = jest.fn().mockResolvedValue(''),
         deleteAllItems = jest.fn().mockResolvedValue(''),
         onPress = undefined,
@@ -44,9 +43,7 @@ describe('AcceptButton', () => {
         deleteAllItems?: jest.Mock;
         mockedGetBrowserPermissions?: jest.Mock;
     }) => {
-        jest.mocked(useCameraParams).mockReturnValue(
-            getUseCameraParams({ isLivePrediction, ...mockedDatasetIdentifier })
-        );
+        jest.mocked(useCameraParams).mockReturnValue(getUseCameraParams({ ...mockedDatasetIdentifier }));
 
         configUseCameraStorage({ deleteAllItems, updateMany, filesData });
 
@@ -71,22 +68,10 @@ describe('AcceptButton', () => {
 
     const filesData = [mockedScreenshot];
 
-    it('livePrediction is true', async () => {
-        const mockedUpdateMany = jest.fn().mockResolvedValue('');
-        await renderApp({ isLivePrediction: true, updateMany: mockedUpdateMany, filesData });
-
-        await waitFor(() => {
-            fireEvent.click(screen.getByRole('button', { name: /accept/i }));
-        });
-
-        expect(mockedNavigate).toHaveBeenCalledWith(expect.stringContaining('/tests/live-prediction'));
-        expect(mockedUpdateMany).toHaveBeenCalledWith([mockedScreenshot.id], { isAccepted: true });
-    });
-
-    it('livePrediction is false and custom onPress function is passed', async () => {
+    it('custom onPress function is passed', async () => {
         const mockedUpdateMany = jest.fn().mockResolvedValue('');
         const mockedOnPress = jest.fn();
-        await renderApp({ isLivePrediction: false, updateMany: mockedUpdateMany, filesData, onPress: mockedOnPress });
+        await renderApp({ updateMany: mockedUpdateMany, filesData, onPress: mockedOnPress });
 
         await waitFor(() => {
             fireEvent.click(screen.getByRole('button', { name: /accept/i }));

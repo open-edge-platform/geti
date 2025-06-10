@@ -33,18 +33,10 @@ const pressHoldButton = async (videoTag: HTMLVideoElement, time = MOUSE_HOLD_TIM
 };
 
 describe('CaptureButtonAnimation', () => {
-    const renderApp = async ({
-        onPress = jest.fn(),
-        isLivePrediction = 'false',
-    }: {
-        onPress?: jest.Mock;
-
-        isLivePrediction?: 'false' | 'true';
-    }) => {
+    const renderApp = async ({ onPress = jest.fn() }: { onPress?: jest.Mock }) => {
         const videoTag = document.createElement('video');
         const searchParams = new URLSearchParams();
 
-        searchParams.set('isLivePrediction', isLivePrediction);
         jest.mocked(useSearchParams).mockImplementation(() => [searchParams, jest.fn()]);
 
         await render(<CaptureButtonAnimation onPress={onPress} videoTag={videoTag} />);
@@ -85,14 +77,5 @@ describe('CaptureButtonAnimation', () => {
         await waitFor(() => {
             expect(mockedPress.mock.calls.length).toBeGreaterThanOrEqual(10);
         });
-    });
-
-    it('burst mode is disabled on uniqueScreenshot mode', async () => {
-        const mockedPress = jest.fn();
-        const mockedVideoTag = await renderApp({ onPress: mockedPress, isLivePrediction: 'true' });
-
-        await pressHoldButton(mockedVideoTag);
-
-        expect(mockedPress).toHaveBeenCalledTimes(1);
     });
 });

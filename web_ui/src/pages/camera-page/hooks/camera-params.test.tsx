@@ -35,24 +35,6 @@ describe('useCameraParams', () => {
         jest.clearAllMocks();
     });
 
-    describe('live prediction', () => {
-        it('true', async () => {
-            const { result } = renderCameraParamsHook({ initialEntries: ['?isLivePrediction=true'] });
-
-            await waitFor(() => {
-                expect(result.current.isLivePrediction).toBe(true);
-            });
-        });
-
-        it('false', async () => {
-            const { result } = renderCameraParamsHook({ initialEntries: ['?isLivePrediction=false'] });
-
-            await waitFor(() => {
-                expect(result.current.isLivePrediction).toBe(false);
-            });
-        });
-    });
-
     it('hasDefaultLabel', async () => {
         const defaultLabelId = '123';
         const { result } = renderCameraParamsHook({ initialEntries: [`?defaultLabelId=${defaultLabelId}`] });
@@ -85,7 +67,7 @@ describe('useCameraParams', () => {
         const { result } = renderCameraParamsHook({ initialEntries: [''] });
 
         await waitFor(() => {
-            expect(result.current.isLivePrediction).toBe(false);
+            expect(result.current).not.toBeNull();
         });
 
         expect(result.current.hasDefaultLabel).toBe(false);
