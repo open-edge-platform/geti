@@ -7,7 +7,9 @@ from geti_configuration_tools.hyperparameters import (
     Hyperparameters,
     TrainingHyperParameters,
 )
-from geti_configuration_tools.training_configuration import PartialTrainingConfiguration, TrainingConfiguration
+from geti_configuration_tools.training_configuration import PartialTrainingConfiguration, TrainingConfiguration, \
+    GlobalParameters, GlobalDatasetPreparationParameters, SubsetSplit, Filtering, MinAnnotationPixels, \
+    MaxAnnotationPixels, MaxAnnotationObjects
 
 from service.utils import delete_none_from_dict, merge_deep_dict
 from storage.repos.partial_training_configuration_repo import PartialTrainingConfigurationRepo
@@ -81,11 +83,22 @@ class ConfigurationService:
             training=TrainingHyperParameters(),
             evaluation=EvaluationParameters(),
         )
+        base_global_params = GlobalParameters(
+            dataset_preparation=GlobalDatasetPreparationParameters(
+                subset_split=SubsetSplit(),
+                filtering=Filtering(
+                    min_annotation_pixels=MinAnnotationPixels(),
+                    max_annotation_pixels=MaxAnnotationPixels(),
+                    max_annotation_objects=MaxAnnotationObjects(),
+                )
+            ),
+        )
         base_config = PartialTrainingConfiguration.model_validate(
             {
                 "id_": ID(f"full_training_configuration_{model_manifest_id}"),
                 "task_id": str(task_id),
                 "hyperparameters": base_hyperparameters.model_dump(),
+                "global_parameters": base_global_params.model_dump(),
             }
         )
         training_configuration_repo = PartialTrainingConfigurationRepo(project_identifier)
