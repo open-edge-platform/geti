@@ -101,8 +101,13 @@ spec:
             - name: data-storage
               mountPath: {{ .Values.mountPath }}
               readOnly: false
+            - name: tmp
+              mountPath: /tmp
+              readOnly: false
       volumes:
         - name: data-storage
           persistentVolumeClaim:
             claimName: data-storage-volume-claim
+        - name: tmp
+          emptyDir: {}
 {{- end }}

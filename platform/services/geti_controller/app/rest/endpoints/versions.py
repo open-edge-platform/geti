@@ -89,7 +89,7 @@ def fetch_available_versions() -> list[str]:
     try:
         oc = OrasClient(tls_verify=False)
         tags = oc.get_tags(f"{GETI_REGISTRY}/geti/geti-manifest")
-        logger.info(f"Available Geti versions in the registry: {tags}")  #TODO debug
+        logger.debug(f"Available Geti versions in the registry: {tags}")
 
         # extract the semver part of the PLATFORM_VERSION
         current_version = Version(re.match(r"^\d+\.\d+\.\d+", PLATFORM_VERSION).group())
@@ -119,7 +119,7 @@ def fetch_manifest(version: str) -> dict:
     try:
         target = f"{GETI_REGISTRY}/geti/geti-manifest:{version}"
         oc = OrasClient(tls_verify=False)
-        response = oc.pull(target=target, outdir=".")
+        response = oc.pull(target=target, outdir="/tmp")
         manifest_file = response[0]
         logger.info(f"Geti manifest for version {version} downloaded successfully.")
         logger.debug(f"Downloaded manifest file: {manifest_file}")
