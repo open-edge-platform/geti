@@ -8,6 +8,7 @@ import os
 
 from communication.data_validator import TrainingRestValidator
 from communication.exceptions import (
+    JobDuplicateFoundException,
     JobInsufficientBalanceException,
     NotEnoughDatasetItemsException,
     NotEnoughSpaceHTTPException,
@@ -26,7 +27,7 @@ from service.project_service import ProjectService
 from geti_fastapi_tools.exceptions import BadRequestException
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, DatasetStorageIdentifier
-from grpc_interfaces.job_submission.client import InsufficientBalanceException
+from grpc_interfaces.job_submission.client import DuplicateFoundException, InsufficientBalanceException
 from iai_core.algorithms import ModelTemplateList
 from iai_core.entities.annotation_scene_state import AnnotationState
 from iai_core.entities.project import Project
@@ -201,6 +202,9 @@ class TrainingController:
         except InsufficientBalanceException:
             logger.error("Insufficient balance for job execution")
             raise JobInsufficientBalanceException("Insufficient balance for job execution")
+        except DuplicateFoundException:
+            logger.error("Duplicate running job has been found")
+            raise JobDuplicateFoundException("Duplicate running job has been found")
 
     @staticmethod
     def _get_task_readiness_status_by_project(
