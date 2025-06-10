@@ -6,7 +6,6 @@ import { getMockedDatasetIdentifier } from '../../../test-utils/mocked-items-fac
 export const getUseCameraParams = ({ ...options } = {}) => ({
     defaultLabelId: '',
     hasDefaultLabel: false,
-    isLivePrediction: false,
     isPhotoCaptureMode: true,
     ...getMockedDatasetIdentifier(),
     ...options,

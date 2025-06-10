@@ -11,14 +11,14 @@ export class ProjectModelsPage {
     constructor(private page: Page) {}
 
     async goToModel(architectureName: string, version: string) {
-        const listItem = this.page.getByLabel(`${architectureName} version ${version}`);
+        const listItem = this.page.getByLabel(`${architectureName} version ${version}`, { exact: true });
         await listItem.click();
 
         return new ProjectModelPage(this.page);
     }
 
     async openTestDialog(architectureName: string, version: string) {
-        const listItem = this.page.getByLabel(`${architectureName} version ${version}`);
+        const listItem = this.page.getByLabel(`${architectureName} version ${version}`, { exact: true });
 
         const menu = listItem.getByRole('button', { name: /model action menu/i });
         await menu.click();
@@ -45,7 +45,7 @@ class ProjectModelPage {
     constructor(private page: Page) {}
 
     async openTestDialog(optimization: string) {
-        const row = this.page.getByRole('row', { name: new RegExp(optimization, 'i') });
+        const row = this.page.getByRole('row', { name: optimization, exact: true });
         const menu = row.getByRole('button', { name: /model action menu/i });
 
         await menu.click();

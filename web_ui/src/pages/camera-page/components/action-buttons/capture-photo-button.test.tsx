@@ -32,17 +32,15 @@ jest.mock('../../hooks/camera-params.hook', () => ({
 const renderApp = async ({
     mockedSaveMedia = jest.fn(),
     mockedDeleteAllItems = jest.fn(),
-    isLivePrediction = false,
 }: {
     tasks?: Task[];
-    isLivePrediction?: boolean;
 
     mockedSaveMedia?: jest.Mock;
     mockedDeleteAllItems?: jest.Mock;
 }) => {
     configUseCamera({});
 
-    jest.mocked(useCameraParams).mockReturnValue(getUseCameraParams({ isLivePrediction }));
+    jest.mocked(useCameraParams).mockReturnValue(getUseCameraParams({}));
 
     configUseCameraStorage({ saveMedia: mockedSaveMedia, deleteAllItems: mockedDeleteAllItems });
 
@@ -60,7 +58,7 @@ const renderApp = async ({
 };
 
 describe('CapturePhotoButton', () => {
-    it('live prediction is off, calls SaveMedia', async () => {
+    it('calls SaveMedia', async () => {
         const mockedSaveMedia = jest.fn(() => Promise.resolve());
         const mockedDeleteAllItems = jest.fn(() => Promise.resolve());
         await renderApp({ mockedSaveMedia, mockedDeleteAllItems });
@@ -77,18 +75,5 @@ describe('CapturePhotoButton', () => {
         });
 
         expect(mockedDeleteAllItems).not.toHaveBeenCalled();
-    });
-
-    it('live prediction is on, calls DeleteAllItems', async () => {
-        const mockedSaveMedia = jest.fn(() => Promise.resolve());
-        const mockedDeleteAllItems = jest.fn(() => Promise.resolve());
-        await renderApp({ mockedSaveMedia, mockedDeleteAllItems, isLivePrediction: true });
-
-        fireEvent.click(screen.getByRole('button', { name: /capture photo/i }));
-
-        await waitFor(() => {
-            expect(mockedDeleteAllItems).toHaveBeenCalled();
-            expect(mockedSaveMedia).toHaveBeenCalled();
-        });
     });
 });

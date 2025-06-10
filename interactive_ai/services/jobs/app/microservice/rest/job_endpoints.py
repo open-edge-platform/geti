@@ -32,6 +32,8 @@ def get_jobs_endpoint(  # noqa: PLR0913
     author_id: str | None = None,
     start_time_from: str | None = None,
     start_time_to: str | None = None,
+    creation_time_from: str | None = None,
+    creation_time_to: str | None = None,
     skip: int | None = None,
     limit: int | None = None,
     sort_by: str | None = None,
@@ -50,26 +52,27 @@ def get_jobs_endpoint(  # noqa: PLR0913
     :param author_id: The author_id of the job to filter by
     :param start_time_from: The start time from which to filter jobs by
     :param start_time_to: The start time to which to filter jobs by
+    :param creation_time_from: The creation time from which to filter jobs by
+    :param creation_time_to: The creation time to which to filter jobs by
     :param skip: The number of jobs to skip
     :param limit: The maximum number of jobs to return
     :param sort_by: Sorting field to sort by
     :param sort_direction: Sorting direction
     :return: A list of jobs.
     """
-    start_time_from_ = datetime.fromisoformat(start_time_from) if start_time_from is not None else None
-    start_time_to_ = datetime.fromisoformat(start_time_to) if start_time_to is not None else None
-
     return JobController().get_jobs(
         user_id=user_id,
-        project_id=ID(project_id) if project_id is not None else None,
+        project_id=ID(project_id) if project_id else None,
         state=state,
         job_types=job_type,
         key=key,
         author_uid=author_id,
-        start_time_from=start_time_from_,
-        start_time_to=start_time_to_,
-        skip=int(skip) if skip is not None else None,
-        limit=int(limit) if limit is not None else None,
+        start_time_from=datetime.fromisoformat(start_time_from) if start_time_from else None,
+        start_time_to=datetime.fromisoformat(start_time_to) if start_time_to else None,
+        creation_time_from=datetime.fromisoformat(creation_time_from) if creation_time_from else None,
+        creation_time_to=datetime.fromisoformat(creation_time_to) if creation_time_to else None,
+        skip=skip,
+        limit=limit,
         sort_by=sort_by,
         sort_direction=sort_direction,
     )

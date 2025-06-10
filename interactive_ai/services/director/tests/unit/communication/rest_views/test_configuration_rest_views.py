@@ -9,7 +9,7 @@ from iai_core.configuration.elements.entity_identifiers import ComponentEntityId
 
 
 class TestSCConfigurationRESTViews:
-    def test_config_to_rest(self, fxt_configuration, fxt_configuration_rest):
+    def test_config_to_rest(self, fxt_configuration, fxt_configuration_rest) -> None:
         result = ConfigurationRESTViews._config_to_rest(config=fxt_configuration)
 
         assert result == fxt_configuration_rest
@@ -21,7 +21,7 @@ class TestSCConfigurationRESTViews:
         fxt_model_entity_identifier,
         fxt_mongo_id,
         fxt_project,
-    ):
+    ) -> None:
         (
             restructured_dict,
             entity_identifier,
@@ -42,7 +42,7 @@ class TestSCConfigurationRESTViews:
         fxt_configuration_rest_1,
         fxt_configuration_2,
         fxt_configuration_rest_2,
-    ):
+    ) -> None:
         # arrange
         config_list = [fxt_configuration_1, fxt_configuration_2]
 
@@ -60,7 +60,7 @@ class TestSCConfigurationRESTViews:
         fxt_configuration_rest_restructured_2,
         fxt_model_entity_identifier,
         fxt_component_entity_identifier,
-    ):
+    ) -> None:
         configs = {"components": [fxt_configuration_rest_1, fxt_configuration_rest_2]}
 
         result = ConfigurationRESTViews.config_list_from_rest_dict(
@@ -82,7 +82,7 @@ class TestSCConfigurationRESTViews:
         fxt_configuration_2,
         fxt_configuration_rest_2,
         fxt_task,
-    ):
+    ) -> None:
         config_list = [fxt_configuration_1, fxt_configuration_2]
 
         result = ConfigurationRESTViews.task_config_list_to_rest(task=fxt_task, configs=config_list)
@@ -98,7 +98,7 @@ class TestSCConfigurationRESTViews:
         fxt_hyper_parameters_with_groups,
         fxt_default_learning_parameters_rest_response,
         fxt_dummy_parameter_group_rest_response,
-    ):
+    ) -> None:
         result_list = ConfigurationRESTViews._hyper_parameters_to_rest(fxt_hyper_parameters_with_groups)
 
         assert fxt_hyper_parameters_with_groups.data is not None
@@ -131,7 +131,7 @@ class TestSCConfigurationRESTViews:
         fxt_dummy_parameter_group_rest_response,
         fxt_hyper_parameter_group_entity_identifier_rest,
         fxt_task,
-    ):
+    ) -> None:
         # Arrange
         config_list = [fxt_hyper_parameters_with_groups, fxt_configuration_2]
         learning_parameters_rest = fxt_default_learning_parameters_rest_response
@@ -168,7 +168,7 @@ class TestSCConfigurationRESTViews:
         fxt_hyper_parameters_with_groups_rest_request_restructured,
         fxt_task,
         fxt_project,
-    ):
+    ) -> None:
         configs = {
             "components": [
                 fxt_default_learning_parameters_rest_request,

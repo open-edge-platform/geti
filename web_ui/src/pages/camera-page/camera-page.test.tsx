@@ -33,14 +33,12 @@ jest.mock('./hooks/camera-params.hook', () => ({
 describe('CameraPage', () => {
     const renderApp = async ({
         cameraPermission,
-        isLivePrediction = false,
         mockedGetBrowserPermissions = jest.fn(),
     }: {
-        isLivePrediction?: boolean;
         cameraPermission: UserCameraPermission;
         mockedGetBrowserPermissions?: jest.Mock;
     }) => {
-        jest.mocked(useCameraParams).mockReturnValue(getUseCameraParams({ isLivePrediction }));
+        jest.mocked(useCameraParams).mockReturnValue(getUseCameraParams({}));
 
         configUseCamera({
             userPermissions: cameraPermission,

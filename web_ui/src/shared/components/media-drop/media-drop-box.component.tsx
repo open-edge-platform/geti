@@ -38,7 +38,7 @@ interface MediaDropBoxProps {
     UNSAFE_className?: string;
     multiple?: boolean;
     headerInfo?: DropBoxHeaderInfo;
-    onCameraSelected: () => void;
+    onCameraSelected?: () => void;
     footerInfo?: ReactNode;
     dropBoxHeader: ReactNode;
     children?: ReactNode;

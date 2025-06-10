@@ -6,6 +6,7 @@ import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffe
 import QUERY_KEYS from '@geti/core/src/requests/query-keys';
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
 import { useQueryClient } from '@tanstack/react-query';
+import { HttpStatusCode } from 'axios';
 import { isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES } from '../../core/datasets/dataset.enum';
@@ -134,6 +135,13 @@ export const DatasetImportToExistingProjectProvider = ({ children }: DatasetImpo
             { workspaceId, organizationId, fileId: String(activeDatasetImport.uploadId) },
             {
                 onSuccess: () => deleteLsDatasetImport(activeDatasetImport.id),
+                onError: (error) => {
+                    if (error.response?.status === HttpStatusCode.NotFound) {
+                        deleteLsDatasetImport(activeDatasetImport.id);
+                    } else {
+                        addNotification({ message: error.message, type: NOTIFICATION_TYPE.ERROR });
+                    }
+                },
             }
         );
     };

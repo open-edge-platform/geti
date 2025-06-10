@@ -102,6 +102,7 @@ def prepare_training_data_model_and_start_training(  # noqa: PLR0913
     min_annotation_size: typing.Optional[int] = None,  # noqa: UP007
     max_number_of_annotations: typing.Optional[int] = None,  # noqa: UP007
     reshuffle_subsets: bool = False,
+    hyperparameters: typing.Optional[dict] = None,  # noqa: UP007
 ) -> TrainWorkflowDataForFlyteTaskTrainer:
     """
     Prepare data and model for the consecutive model training Flyte task.
@@ -125,6 +126,7 @@ def prepare_training_data_model_and_start_training(  # noqa: PLR0913
     :param max_number_of_annotations: Maximum number of annotation allowed in one annotation scene. If exceeded, the
     annotation scene will be ignored during training.
     :param reshuffle_subsets: Whether to reassign/shuffle all the items to subsets including Test set from scratch
+    :param hyperparameters: Dict containing the hyperparameters to be used for training.
     :return TrainWorkflowDataForFlyteTaskTrainer: train workflow data class and others needed
         the next model training Flyte task.
     """
@@ -154,6 +156,7 @@ def prepare_training_data_model_and_start_training(  # noqa: PLR0913
         min_annotation_size=min_annotation_size,
         max_number_of_annotations=max_number_of_annotations,
         reshuffle_subsets=reshuffle_subsets,
+        hyperparameters=hyperparameters,
     )
     report_retrieve_train_data_progress(progress=100, message="Train data retrieved")
 

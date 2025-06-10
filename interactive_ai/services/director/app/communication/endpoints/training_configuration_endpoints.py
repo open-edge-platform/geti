@@ -9,9 +9,10 @@ from fastapi import APIRouter, Depends, Query
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
 
 from communication.controllers.training_configuration_controller import TrainingConfigurationRESTController
+from communication.views.training_configuration_rest_views import TrainingConfigurationRESTViews
 from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 
-from geti_fastapi_tools.dependencies import get_project_identifier, setup_session_fastapi
+from geti_fastapi_tools.dependencies import get_project_identifier, get_request_json, setup_session_fastapi
 from geti_fastapi_tools.exceptions import GetiBaseException
 from geti_types import ID, ProjectIdentifier
 
@@ -25,6 +26,13 @@ training_configuration_router = APIRouter(
     tags=["Configuration"],
     dependencies=[Depends(setup_session_fastapi)],
 )
+
+
+def get_training_configuration_from_request(
+    request_json: Annotated[dict, Depends(get_request_json)],
+) -> PartialTrainingConfiguration:
+    """Dependency to convert REST request body to PartialTrainingConfiguration."""
+    return TrainingConfigurationRESTViews.training_configuration_from_rest(rest_input=request_json)
 
 
 @training_configuration_router.get("/training_configuration")
@@ -52,7 +60,7 @@ def get_training_configuration(
 @training_configuration_router.patch("/training_configuration", status_code=HTTPStatus.NO_CONTENT)
 def update_training_configuration(
     project_identifier: Annotated[ProjectIdentifier, Depends(get_project_identifier)],
-    update_configuration: PartialTrainingConfiguration,
+    update_configuration: Annotated[PartialTrainingConfiguration, Depends(get_training_configuration_from_request)],
 ) -> None:
     """Update the configuration for a specific project."""
     if not FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):

@@ -32,14 +32,18 @@ Feature: dataset import and export
       | Datumaro       | polygon               | instance segmentation       |
       | Datumaro       | polygon               | semantic segmentation       |
       | Datumaro       | anomaly label         | anomaly detection           |
-      | COCO           | bounding box          | detection                   |
-      | COCO           | polygon               | instance segmentation       |
-      | YOLO           | bounding box          | detection                   |
       | VOC            | label                 | multiclass classification   |
       | VOC            | bounding box          | detection                   |
       | VOC            | polygon               | instance segmentation       |
 
-    @xfail  # Issue: CVS-161846
+    @xfail
     Examples:
       | dataset_format | annotation_type       | project_type                |
+      # Issue: ITEP-36161
       | VOC            | multi label           | multilabel classification   |
+      # Issue: ITEP-68811
+      | COCO           | bounding box          | detection                   |
+      # Issue: ITEP-68813
+      | COCO           | polygon               | instance segmentation       |
+      # Issue: ITEP-68810
+      | YOLO           | bounding box          | detection                   |

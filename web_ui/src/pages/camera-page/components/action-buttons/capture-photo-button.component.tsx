@@ -1,13 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { dimensionValue } from '@geti/ui';
 import Webcam from 'react-webcam';
 import { v4 as uuid } from 'uuid';
 
 import { Label } from '../../../../core/labels/label.interface';
 import { getIds } from '../../../../shared/utils';
-import { useCameraParams } from '../../hooks/camera-params.hook';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { CaptureButtonAnimation } from './capture-button-animation.component';
 
@@ -17,8 +15,7 @@ interface CapturePhotoButtonProps {
 }
 
 export const CapturePhotoButton = ({ webcamRef, selectedLabels }: CapturePhotoButtonProps) => {
-    const { isLivePrediction } = useCameraParams();
-    const { savedFilesQuery, deleteAllItems, saveMedia } = useCameraStorage();
+    const { savedFilesQuery, saveMedia } = useCameraStorage();
 
     const saveItems = async () => {
         const dataUrl = webcamRef.current?.getScreenshot();
@@ -28,19 +25,9 @@ export const CapturePhotoButton = ({ webcamRef, selectedLabels }: CapturePhotoBu
         saveMedia({ id, dataUrl, labelIds: getIds(selectedLabels), labelName });
     };
 
-    const saveLivePredictionItem = () => deleteAllItems(false).then(saveItems);
-
     return (
-        <CaptureButtonAnimation
-            height={'size-900'}
-            videoTag={webcamRef.current?.video}
-            UNSAFE_style={{
-                borderRadius: '50%',
-                borderWidth: dimensionValue('size-50'),
-            }}
-            onPress={isLivePrediction ? saveLivePredictionItem : saveItems}
-        >
-            {isLivePrediction ? '' : savedFilesQuery.data?.length || 0}
+        <CaptureButtonAnimation videoTag={webcamRef.current?.video} onPress={saveItems}>
+            {savedFilesQuery.data?.length || 0}
         </CaptureButtonAnimation>
     );
 };

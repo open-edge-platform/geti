@@ -1,6 +1,6 @@
 ---
-name: media-ms
-version: '{{VERSION}}'
+name: ${COMPONENT_NAME}
+version: ${TAG}
 apiVersion: v2
 description: media
-appVersion: '{{VERSION}}'
+appVersion: ${TAG}

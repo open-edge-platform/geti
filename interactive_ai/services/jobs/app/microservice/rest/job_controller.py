@@ -47,6 +47,8 @@ class JobController(metaclass=Singleton):
         author_uid: str | None = None,
         start_time_from: datetime | None = None,
         start_time_to: datetime | None = None,
+        creation_time_from: datetime | None = None,
+        creation_time_to: datetime | None = None,
         skip: int | None = None,
         limit: int | None = None,
         sort_by: str | None = None,
@@ -63,6 +65,8 @@ class JobController(metaclass=Singleton):
         :param author_uid: filter on author
         :param start_time_from: filter jobs that started after the specified time
         :param start_time_to: filter jobs that started before the specified time
+        :param creation_time_from: filter jobs that were created after the specified time
+        :param creation_time_to: filter jobs that were created before the specified time
         :param skip: number of jobs to skip for pagination
         :param limit: number of jobs to retrieve for pagination
         :param sort_by: Sorting field to sort by
@@ -71,6 +75,7 @@ class JobController(metaclass=Singleton):
         :raises: BadRequestException if the specified state is invalid
         """
         start_time_filter = TimestampFilter(from_val=start_time_from, to_val=start_time_to)
+        creation_time_filter = TimestampFilter(from_val=creation_time_from, to_val=creation_time_to)
         # Make sure pagination attributes are valid
         skip_ = max(skip, 0) if skip is not None else 0
         limit_ = min(max(limit, 1), MAX_N_JOBS_RETURNED) if limit is not None else DEFAULT_N_JOBS_RETURNED
@@ -123,6 +128,7 @@ class JobController(metaclass=Singleton):
             key=key,
             author_uid=author_uid,
             start_time=start_time_filter,
+            creation_time=creation_time_filter,
             acl=acl,
         )
         jobs = self.job_manager.find(
@@ -132,6 +138,7 @@ class JobController(metaclass=Singleton):
             key=key,
             author_uid=author_uid,
             start_time=start_time_filter,
+            creation_time=creation_time_filter,
             pagination=pagination,
             acl=acl,
             sort_by=_sort_by,
@@ -142,6 +149,7 @@ class JobController(metaclass=Singleton):
             project_id=project_id,
             author_uid=author_uid,
             start_time=start_time_filter,
+            creation_time=creation_time_filter,
             acl=acl,
         )
 
@@ -155,6 +163,8 @@ class JobController(metaclass=Singleton):
             author_uid=author_uid,
             start_time_from=start_time_from,
             start_time_to=start_time_to,
+            creation_time_from=creation_time_from,
+            creation_time_to=creation_time_to,
             pagination=pagination,
             sort_by=_sort_by,
             sort_direction=_sort_direction,
