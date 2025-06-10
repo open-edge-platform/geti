@@ -23,19 +23,16 @@ describe('SidebarThumbnail', () => {
         screenshots = [],
         defaultLabelId = '',
         isCloseSidebar = false,
-        isLivePrediction = false,
         hasDefaultLabel = false,
     }: {
         screenshots?: Screenshot[];
         isCloseSidebar?: boolean;
         defaultLabelId?: string;
-        isLivePrediction?: boolean;
         hasDefaultLabel?: boolean;
     }) => {
         const mockedProjectIdentifier = getMockedProjectIdentifier({});
 
         jest.mocked(useCameraParams).mockReturnValue({
-            isLivePrediction,
             defaultLabelId,
             hasDefaultLabel,
             datasetId: 'data-id-test',
@@ -55,17 +52,10 @@ describe('SidebarThumbnail', () => {
     };
 
     it('empty screenshots', async () => {
-        await renderApp({ isLivePrediction: true });
+        await renderApp({});
+
         await waitFor(() => {
             expect(screen.getByText('No media items available')).toBeVisible();
-        });
-    });
-
-    it('unique screenshot', async () => {
-        await renderApp({ screenshots: [mockedScreenshot], isLivePrediction: true });
-
-        await waitFor(() => {
-            expect(screen.getByRole('button', { name: 'open preview' })).toBeVisible();
         });
     });
 

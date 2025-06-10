@@ -98,6 +98,8 @@ class TestJobRESTEndpoint:
         author_id = "author_id"
         start_time_from = now()
         start_time_to = now()
+        creation_time_from = now()
+        creation_time_to = now()
         skip = 1
         limit = 10
         sort_by = "start_time"
@@ -109,6 +111,8 @@ class TestJobRESTEndpoint:
             "author_id": author_id,
             "start_time_from": start_time_from.isoformat(),
             "start_time_to": start_time_to.isoformat(),
+            "creation_time_from": creation_time_from.isoformat(),
+            "creation_time_to": creation_time_to.isoformat(),
             "skip": skip,
             "limit": limit,
             "sort_by": sort_by,
@@ -130,6 +134,8 @@ class TestJobRESTEndpoint:
             author_uid=author_id,
             start_time_from=start_time_from,
             start_time_to=start_time_to,
+            creation_time_from=creation_time_from,
+            creation_time_to=creation_time_to,
             skip=skip,
             limit=limit,
             sort_by=sort_by,

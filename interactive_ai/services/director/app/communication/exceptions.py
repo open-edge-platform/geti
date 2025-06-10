@@ -594,3 +594,16 @@ class TaskNodeNotFoundException(GetiBaseException):
             error_code="task_node_not_found",
             http_status=http.HTTPStatus.NOT_FOUND,
         )
+
+
+class MissingTaskIDException(GetiBaseException):
+    """
+    Exception raised when a task ID is required but not provided in the request.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            message="The required task ID was not provided in the request.",
+            error_code="missing_task_id",
+            http_status=http.HTTPStatus.BAD_REQUEST,
+        )

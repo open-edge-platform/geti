@@ -30,7 +30,7 @@ interface UploadMediaButtonProps {
     customClasses?: string;
     isDisabled?: boolean;
     uploadCallback: (files: File[]) => void;
-    onCameraSelected: () => void;
+    onCameraSelected?: () => void;
 }
 
 export const UploadMediaButton = ({
@@ -65,9 +65,19 @@ export const UploadMediaButton = ({
         onMenuAction(key, fileInputRef);
     };
 
-    const menuItems = multiple
-        ? [MenuItemsKey.FILES, MenuItemsKey.FOLDER, MenuItemsKey.CAMERA]
-        : [MenuItemsKey.FILE, MenuItemsKey.CAMERA];
+    const getMenuItems = () => {
+        const menuItems = multiple
+            ? [MenuItemsKey.FILES, MenuItemsKey.FOLDER, MenuItemsKey.CAMERA]
+            : [MenuItemsKey.FILE, MenuItemsKey.CAMERA];
+
+        if (onCameraSelected === undefined) {
+            return menuItems.filter((item) => item !== MenuItemsKey.CAMERA);
+        }
+
+        return menuItems;
+    };
+
+    const menuItems = getMenuItems();
 
     return (
         <>
@@ -84,21 +94,31 @@ export const UploadMediaButton = ({
                 accept={mediaExtensionHandler(acceptedFormats ?? VALID_MEDIA_TYPES_DISPLAY)}
                 disabled={isDisabled || isUploadMediaDisabled}
             />
-            <MenuTriggerButton
-                id={id}
-                title={title}
-                isQuiet={isQuiet}
-                variant={variant}
-                onAction={onMenuActionHandler}
-                ariaLabel={ariaLabel ?? UPLOAD_MEDIA_LABEL}
-                isDisabled={isDisabled || isUploadMediaDisabled}
-                menuTooltip={CANT_UPLOAD_FOLDER_FIREFOX}
-                icon={isQuiet ? <Share /> : undefined}
-                items={menuItems}
-                menuTriggerClasses={customClasses}
-                disabledKeys={isFolderOptionDisabled ? [MenuItemsKey.FOLDER.toLocaleLowerCase()] : undefined}
-                tooltipPlacement={'top'}
-            />
+            {menuItems.length === 1 && menuItems.at(0) === MenuItemsKey.FILE ? (
+                <Button
+                    variant={'secondary'}
+                    onPress={() => onMenuAction(MenuItemsKey.FILE, fileInputRef)}
+                    isDisabled={isDisabled}
+                >
+                    Upload file
+                </Button>
+            ) : (
+                <MenuTriggerButton
+                    id={id}
+                    title={title}
+                    isQuiet={isQuiet}
+                    variant={variant}
+                    onAction={onMenuActionHandler}
+                    ariaLabel={ariaLabel ?? UPLOAD_MEDIA_LABEL}
+                    isDisabled={isDisabled || isUploadMediaDisabled}
+                    menuTooltip={CANT_UPLOAD_FOLDER_FIREFOX}
+                    icon={isQuiet ? <Share /> : undefined}
+                    items={menuItems}
+                    menuTriggerClasses={customClasses}
+                    disabledKeys={isFolderOptionDisabled ? [MenuItemsKey.FOLDER.toLocaleLowerCase()] : undefined}
+                    tooltipPlacement={'top'}
+                />
+            )}
         </>
     );
 };

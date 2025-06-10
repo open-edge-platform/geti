@@ -13,9 +13,18 @@ interface TrainingProps {
     trainFromScratch: boolean;
     onTrainFromScratchChange: (trainFromScratch: boolean) => void;
     configParameters: ConfigurableParametersTaskChain;
+
+    isReshufflingSubsetsEnabled: boolean;
+    onReshufflingSubsetsEnabledChange: (reshufflingSubsetsEnabled: boolean) => void;
 }
 
-export const Training: FC<TrainingProps> = ({ trainFromScratch, onTrainFromScratchChange, configParameters }) => {
+export const Training: FC<TrainingProps> = ({
+    trainFromScratch,
+    onTrainFromScratchChange,
+    configParameters,
+    onReshufflingSubsetsEnabledChange,
+    isReshufflingSubsetsEnabled,
+}) => {
     const learningParameters = configParameters.components.find(
         (component) => component.header === 'Learning Parameters'
     );
@@ -25,6 +34,8 @@ export const Training: FC<TrainingProps> = ({ trainFromScratch, onTrainFromScrat
             <FineTuneParameters
                 trainFromScratch={trainFromScratch}
                 onTrainFromScratchChange={onTrainFromScratchChange}
+                isReshufflingSubsetsEnabled={isReshufflingSubsetsEnabled}
+                onReshufflingSubsetsEnabledChange={onReshufflingSubsetsEnabledChange}
             />
             {learningParameters?.parameters !== undefined && (
                 <LearningParameters parameters={learningParameters.parameters} />

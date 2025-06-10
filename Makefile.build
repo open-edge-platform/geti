@@ -1,6 +1,8 @@
 # Copyright (C) 2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+PACKAGABLE_SUBPROJECTS := $(shell find . -name "Chart.yaml.template" | xargs dirname | xargs dirname)
+
 .PHONY: clean
 clean: clean-go clean-python
 
@@ -33,6 +35,12 @@ publish-image-go:
 .PHONY: publish-image-python
 publish-image-python:
 	@$(call run_for_each,$(PY_BUILDABLE_SUBPROJECTS),Pushing image for Python component,publish-image)
+
+build-chart:
+	@$(call run_for_each,$(PACKAGABLE_SUBPROJECTS),Building charts for components,build-chart)
+
+publish-chart:
+	@$(call run_for_each,$(PACKAGABLE_SUBPROJECTS),Building charts for components,publish-chart)
 
 .PHONY: tests
 tests: tests-go tests-python

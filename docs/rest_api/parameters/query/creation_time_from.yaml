@@ -1,0 +1,6 @@
+in: query
+name: creation_time_from
+style: form
+description: Filter jobs which were created after this time. If time is not specified (only date), it defaults to the beginning of the day.
+schema:
+  $ref: "../../../../interactive_ai/services/api/schemas/parameters/timestamp.yaml"

@@ -8,9 +8,9 @@ from geti_configuration_tools.project_configuration import (
     TaskConfig,
 )
 
-from communication.controllers.utils import delete_none_from_dict, merge_deep_dict
 from communication.exceptions import ProjectConfigurationNotFoundException
 from communication.views.project_configuration_rest_views import ProjectConfigurationRESTViews
+from service.utils import delete_none_from_dict, merge_deep_dict
 from storage.repos.project_configuration_repo import ProjectConfigurationRepo
 
 from geti_telemetry_tools import unified_tracing

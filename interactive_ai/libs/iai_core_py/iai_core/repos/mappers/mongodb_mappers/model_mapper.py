@@ -71,6 +71,7 @@ class ModelConfigurationToMongo(
         return {
             "configurable_parameters": serialized_params,
             "label_schema": LabelSchemaToMongo.forward(instance.get_label_schema()),
+            "display_only_configuration": instance.display_only_configuration,
         }
 
     @staticmethod
@@ -97,6 +98,7 @@ class ModelConfigurationToMongo(
         return ModelConfiguration.with_adapters(
             configurable_parameters=configurable_parameters,  # type: ignore
             label_schema_adapter=label_schema_adapter,
+            display_only_configuration=instance.get("display_only_configuration"),
         )
 
 

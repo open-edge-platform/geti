@@ -15,10 +15,9 @@ import classes from './sidebar.module.scss';
 interface OpenSidebarProps {
     labels: Label[];
     screenshots: Screenshot[];
-    isLivePrediction: boolean;
 }
 
-export const OpenSidebar = ({ labels, screenshots, isLivePrediction }: OpenSidebarProps): JSX.Element => {
+export const OpenSidebar = ({ labels, screenshots }: OpenSidebarProps): JSX.Element => {
     const allLabelIds = screenshots.flatMap((screenshot) => screenshot.labelIds);
     const countedLabels = countBy(allLabelIds, identity);
 
@@ -27,7 +26,7 @@ export const OpenSidebar = ({ labels, screenshots, isLivePrediction }: OpenSideb
             <SidebarThumbnail screenshots={screenshots} />
             <Divider size={'S'} />
 
-            {isNonEmptyArray(labels) && !isLivePrediction && (
+            {isNonEmptyArray(labels) && (
                 <>
                     <Heading level={3}>Images</Heading>
                     <View

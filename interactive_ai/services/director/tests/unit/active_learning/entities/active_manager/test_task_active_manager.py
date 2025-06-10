@@ -1,7 +1,7 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 import contextlib
-from contextlib import AbstractContextManager, nullcontext
+from contextlib import nullcontext
 from copy import copy
 from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
@@ -19,8 +19,6 @@ from iai_core.entities.annotation_scene_state import AnnotationState
 from iai_core.repos.dataset_storage_filter_repo import DatasetStorageFilterRepo
 
 if TYPE_CHECKING:
-    from _pytest.python_api import RaisesContext
-
     from active_learning.entities.active_manager.task_active_manager import TaskActiveManager
 
     from iai_core.entities.datasets import Dataset
@@ -101,11 +99,10 @@ class TestTaskActiveManager:
         else:
             raise ValueError(f"Invalid task type {task_type}")
 
-        exception_context: AbstractContextManager | RaisesContext
         if expected_functions is None:
             exception_context = pytest.raises(NoActiveLearningAlgorithmSupported)
         else:
-            exception_context = contextlib.nullcontext()
+            exception_context = contextlib.nullcontext()  # type: ignore
 
         with exception_context:
             scoring_functions = active_manager._get_enabled_scoring_functions(

@@ -60,9 +60,15 @@ class TestModelConfiguration:
         """
         parameters = ConfigurableParameters(header="Test header")
         label_schema = LabelSchema(id_=ID("label_schema_id"))
-        model_configuration = ModelConfiguration(configurable_parameters=parameters, label_schema=label_schema)
+        display_only_configuration = {"display_only_param": "value"}
+        model_configuration = ModelConfiguration(
+            configurable_parameters=parameters,
+            label_schema=label_schema,
+            display_only_configuration=display_only_configuration,
+        )
         assert model_configuration.configurable_parameters == parameters
         assert model_configuration.get_label_schema() == label_schema
+        assert model_configuration.display_only_configuration == display_only_configuration
 
 
 class TestModel:

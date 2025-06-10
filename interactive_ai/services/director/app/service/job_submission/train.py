@@ -2,6 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from service.configuration_service import ConfigurationService
 from service.job_submission.base import JobParams, ModelJobSubmitter
 from service.job_submission.job_creation_helpers import (
     TRAIN_JOB_PRIORITY,
@@ -77,6 +78,17 @@ class ModelTrainingJobSubmitter(ModelJobSubmitter):
 
         keep_mlflow_artifacts = FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_RETAIN_TRAINING_ARTIFACTS)
 
+        full_training_configuration = (
+            ConfigurationService.get_full_training_configuration(
+                project_identifier=project.identifier,
+                task_id=task_node.id_,
+                model_manifest_id=model_storage.model_template.model_template_id,
+                strict_validation=False,
+            )
+            if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS)
+            else None
+        )
+
         train_job_data = TrainTaskJobData(
             model_storage=model_storage,
             project=project,
@@ -85,6 +97,7 @@ class ModelTrainingJobSubmitter(ModelJobSubmitter):
             from_scratch=from_scratch,
             workspace_id=project.workspace_id,
             dataset_storage=project.get_training_dataset_storage(),
+            training_configuration=full_training_configuration,
             hyper_parameters_id=hyper_parameters_id,
             max_training_dataset_size=max_training_dataset_size,
             min_annotation_size=min_annotation_size,

@@ -35,24 +35,26 @@ def get_train_data(  # noqa: PLR0913
     min_annotation_size: int | None = None,
     max_number_of_annotations: int | None = None,
     reshuffle_subsets: bool = False,
+    hyperparameters: dict[str, str] | None = None,
 ) -> TrainWorkflowData:
     """
     Create and return a TrainWorkflowData object containing data needed for training
 
     :param project_id: Project ID
     :param task_id: Task ID
+    :param model_storage_id: ID of model storage to train model in, use active model if empty string
     :param from_scratch: Whether to train the task from scratch.
     :param should_activate_model: Whether to activate model after training
     :param infer_on_pipeline: Whether to infer on pipeline
-    :param model_storage_id: ID of model storage to train model in, use active model if empty string
     :param hyper_parameters_id: ID of the hyper-parameters configuration to use for this job.
         If empty string, it defaults to the current configuration of the model storage.
     :param min_annotation_size: Minimum size of an annotation in pixels. Any annotation smaller than this will be
         ignored during training
     :param max_number_of_annotations: Maximum number of annotation allowed in one annotation scene. If exceeded, the
-    annotation scene will be ignored during training.
+        annotation scene will be ignored during training.
     :param reshuffle_subsets: Whether to reassign/shuffle all the items to subsets including Test set from scratch
-    :return tuple[TrainWorkflowData, bool]: train workflow data class object & flag if there's an active model
+    :param hyperparameters: Dictionary of model hyperparameters
+    :return: TrainWorkflowData object containing the data needed for training
     """
     # Validate task is in project
     project = ProjectRepo().get_by_id(ID(project_id))
@@ -104,4 +106,5 @@ def get_train_data(  # noqa: PLR0913
         min_annotation_size=min_annotation_size,
         max_number_of_annotations=max_number_of_annotations,
         reshuffle_subsets=reshuffle_subsets,
+        hyperparameters=hyperparameters,
     )

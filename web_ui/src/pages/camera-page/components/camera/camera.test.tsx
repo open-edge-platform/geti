@@ -30,19 +30,17 @@ jest.mock('../../hooks/camera-params.hook', () => ({
 
 const renderApp = async ({
     webcamRef = { current: { stream: {} } } as React.RefObject<Webcam>,
-    isLivePrediction = false,
     isPhotoCaptureMode = true,
     loadDeviceCapabilities = jest.fn(),
 }: {
     webcamRef?: React.RefObject<Webcam>;
     loadDeviceCapabilities?: jest.Mock;
-    isLivePrediction?: boolean;
     isPhotoCaptureMode?: boolean;
 }) => {
     configUseCamera({});
     configUseCameraStorage({});
     jest.mocked(useDeviceSettings).mockReturnValue(getUseCameraSettings({ loadDeviceCapabilities, webcamRef }));
-    jest.mocked(useCameraParams).mockReturnValue(getUseCameraParams({ isLivePrediction, isPhotoCaptureMode }));
+    jest.mocked(useCameraParams).mockReturnValue(getUseCameraParams({ isPhotoCaptureMode }));
 
     render(
         <VideoRecordingProvider>
@@ -57,18 +55,11 @@ const renderApp = async ({
 describe('Camera', () => {
     const loadStartEvent = new Event('loadstart', { bubbles: true });
 
-    it('live prediction is off, capture switch is visible', async () => {
-        await renderApp({ isLivePrediction: false });
+    it('capture switch is visible', async () => {
+        await renderApp({});
 
         expect(screen.getByRole('button', { name: /video mode/i })).toBeVisible();
         expect(screen.getByRole('button', { name: /Photo mode/i })).toBeVisible();
-    });
-
-    it('live prediction is on, capture switch is hidden', async () => {
-        await renderApp({ isLivePrediction: true });
-
-        expect(screen.queryByRole('button', { name: /video mode/i })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: /Photo mode/i })).not.toBeInTheDocument();
     });
 
     it('render video capture button', async () => {

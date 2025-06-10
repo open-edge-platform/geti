@@ -71,7 +71,6 @@ def fxt_dummy_model_manifest(fxt_dummy_model_stats, fxt_dummy_supported_gpu, fxt
     )
 
 
-@pytest.mark.ScSdkComponent
 class TestModelManifest:
     """
     Test class for parsing model manifest files.

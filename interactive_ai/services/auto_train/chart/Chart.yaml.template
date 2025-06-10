@@ -1,6 +1,6 @@
 ---
-name: auto-train-controller
-version: '{{VERSION}}'
+name: ${COMPONENT_NAME}
+version: ${TAG}
 apiVersion: v1
 description: Periodic service that schedules auto-train jobs for the ready tasks
-appVersion: '{{VERSION}}'
+appVersion: ${TAG}

@@ -3,14 +3,13 @@
 
 import { FC, ReactNode } from 'react';
 
-import { Grid, minmax, Text, View } from '@geti/ui';
+import { Grid, minmax, Text, ToggleButtons, View } from '@geti/ui';
 import { isFunction } from 'lodash-es';
 
 import { ConfigurableParametersParams } from '../../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { BooleanParameter } from './boolean-parameter.component';
 import { NumberParameter } from './number-parameter.component';
 import { ResetButton } from './reset-button.component';
-import { ToggleButtons } from './toggle-buttons/toggle-buttons.component';
 import { Tooltip } from './tooltip.component';
 
 interface ParametersProps {

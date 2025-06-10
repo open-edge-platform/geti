@@ -182,6 +182,7 @@ class TestJobController:
         key = DUMMY_JOB_KEY
         author_uid = DUMMY_AUTHOR
         start_time = TimestampFilter(from_val=now(), to_val=now())
+        creation_time = TimestampFilter(from_val=now(), to_val=now())
         expected_pagination = Pagination(skip=expected_skip, limit=expected_limit)
         sort_by = "start_time"
         sort_direction = "desc"
@@ -195,6 +196,8 @@ class TestJobController:
             author_uid=author_uid,
             start_time_from=start_time.from_val,
             start_time_to=start_time.to_val,
+            creation_time_from=creation_time.from_val,
+            creation_time_to=creation_time.to_val,
             pagination=expected_pagination,
             sort_by=JobSortingField[sort_by.upper()],
             sort_direction=SortDirection[sort_direction.upper()],
@@ -237,6 +240,8 @@ class TestJobController:
                 author_uid=author_uid,
                 start_time_from=start_time.from_val,
                 start_time_to=start_time.to_val,
+                creation_time_from=creation_time.from_val,
+                creation_time_to=creation_time.to_val,
                 skip=skip,
                 limit=limit,
                 sort_by=sort_by,
@@ -251,6 +256,7 @@ class TestJobController:
             key=key,
             author_uid=author_uid,
             start_time=start_time,
+            creation_time=creation_time,
             pagination=expected_pagination,
             acl=JobsAcl(
                 permitted_projects=[],
@@ -266,6 +272,7 @@ class TestJobController:
             key=key,
             author_uid=author_uid,
             start_time=start_time,
+            creation_time=creation_time,
             acl=JobsAcl(
                 permitted_projects=[],
                 workspace_jobs_author=None if view_all_workspace_jobs else DUMMY_AUTHOR,
@@ -276,6 +283,7 @@ class TestJobController:
             job_types=[job_type],
             author_uid=author_uid,
             start_time=start_time,
+            creation_time=creation_time,
             acl=JobsAcl(
                 permitted_projects=[],
                 workspace_jobs_author=None if view_all_workspace_jobs else DUMMY_AUTHOR,
