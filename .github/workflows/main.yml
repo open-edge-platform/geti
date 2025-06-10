@@ -53,16 +53,9 @@ jobs:
 
       - name: Debug workflow context
         run: |
-          echo "GitHub ref: ${{ github.ref }}"
-          echo "GitHub SHA: ${{ github.sha }}"
-          echo "Event name: ${{ github.event_name }}"
-          echo "Input ref: ${{ inputs.ref }}"
-          echo "Workspace contents:"
-          ls -la .github/actions/
-          echo "Current branch:"
-          git branch -a
-          echo "Current commit:"
-          git log -1 --oneline    
+          echo "github.ref_name => ${{ github.ref_name }}"
+          echo "github.ref => ${{ github.ref }}"    
+          echo "inputs.ref => ${{ inputs.ref }}"    
 
       - name: Prepare build version
         id: prepare-build-version

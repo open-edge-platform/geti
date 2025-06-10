@@ -16,19 +16,16 @@ runs:
     - name: Prepare build version
       id: prepare-build-version
       shell: bash
-      env:
-        CHECKOUT_REF: ${{ inputs.ref }}
       run: |
-        echo "github.ref_name => ${{ github.ref_name }}"
-        echo "github.ref => ${{ github.ref }}"
-        echo "inputs.ref => ${{ inputs.ref }}"
+        ref_name=${{ github.ref_name }}"
+        ref=${{ github.ref }}"
         
         base_version=$(<VERSION)
-        ref_sanitized=${CHECKOUT_REF//\//-}
+        ref_sanitized=${ref_name//\//-}
         tag="${base_version}-${ref_sanitized}"
 
         # If not a tag build, append the short SHA
-        if [[ "$CHECKOUT_REF" != refs/tags/* ]]; then
+        if [[ "$ref" != refs/tags/* ]]; then
           tag+="-$(git rev-parse --short HEAD)"
         fi
         echo "version=$tag"
