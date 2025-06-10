@@ -38,9 +38,17 @@ export const getEditLabelsPayload = (
 
         if (isNewState(state)) {
             const parentElement = validLabels.find(({ id }) => parentLabelId === id);
-            const newLabel = parentElement ? { ...label, parentLabelId: parentElement.name } : label;
 
-            return getNewLabelPayload(newLabel, shouldRevisit);
+            const updatedLabel = parentElement
+                ? {
+                      ...label,
+                      // We only want to use the id of the parent if it is not new, which
+                      // means it has already been saved to the backend so it's an ObjectID and not UUID.
+                      parentLabelId: isNewState(parentElement.state) ? parentElement.name : parentElement.id,
+                  }
+                : label;
+
+            return getNewLabelPayload(updatedLabel, shouldRevisit);
         }
 
         if (state === LabelItemEditionState.REMOVED) {
