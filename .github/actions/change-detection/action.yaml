@@ -26,21 +26,16 @@ runs:
     - name: Get changed components
       id: components-list
       shell: bash
-      env:
+
+      run: |
+        
         CHANGED_KEYS: ${{ steps.changed-files.outputs.changed_keys }}
         ALL_CHANGED: ${{ steps.changed-files.outputs.all_changed_files }}
         BASE_SHA: ${{ steps.changed-files.outputs.base }}
         HEAD_SHA: ${{ steps.changed-files.outputs.head }}
         GET_ALL: ${{ inputs.get_all }}
-
-      run: |
+        
         echo "GET_ALL ==> $GET_ALL"
-        
-        echo "PWD: $(pwd)"
-        ls -al
-        ls -al .git
-        
-        git status
         
         echo "ALL_CHANGED ==> $ALL_CHANGED"
         echo "BASE_SHA ==> $BASE_SHA"
