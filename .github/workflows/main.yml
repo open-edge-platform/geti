@@ -46,11 +46,10 @@ jobs:
     steps:
       - name: Verify action exists
         run: |
-          ls -la .github/actions/build-version/
-          
           echo "GitHub ref: ${{ github.ref }}"
           echo "GitHub SHA: ${{ github.sha }}"
           echo "Event name: ${{ github.event_name }}"
+          ls -la .github/actions/build-version/
 
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
