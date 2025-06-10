@@ -31,7 +31,7 @@ runs:
         PATH_FILTER: ${{ inputs.path_filter }}
         GET_ALL: ${{ inputs.get_all }}
       run: |
-        echo "GET_ALL ==> $GET_ALL"
+        GET_ALL=false
         if [[ "$GET_ALL" == "true" ]]; then
            paths_list=$(yq -r '... comments=""' "${PATH_FILTER}" | yq -r 'keys[]' | jq -R . | jq -sc .)
         else
