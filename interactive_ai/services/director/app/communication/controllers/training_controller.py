@@ -6,7 +6,7 @@
 import logging
 import os
 
-from geti_feature_tools.feature_flags import FeatureFlagProvider
+from geti_feature_tools import FeatureFlagProvider
 
 from communication.data_validator import TrainingRestValidator
 from communication.exceptions import (

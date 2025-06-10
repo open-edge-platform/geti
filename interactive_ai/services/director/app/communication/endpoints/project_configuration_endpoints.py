@@ -7,7 +7,7 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
 from geti_configuration_tools.project_configuration import PartialProjectConfiguration
-from geti_feature_tools.feature_flags import FeatureFlagProvider
+from geti_feature_tools import FeatureFlagProvider
 
 from communication.controllers.project_configuration_controller import ProjectConfigurationRESTController
 from communication.views.project_configuration_rest_views import ProjectConfigurationRESTViews

@@ -6,7 +6,7 @@
 import logging
 from typing import Any
 
-from geti_feature_tools.feature_flags import FeatureFlagProvider
+from geti_feature_tools import FeatureFlagProvider
 
 from communication.jobs_client import JobsClient
 from communication.views.status_rest_views import StatusRestViews

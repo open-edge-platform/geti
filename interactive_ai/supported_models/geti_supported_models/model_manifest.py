@@ -41,16 +41,16 @@ class PerformanceRatings(BaseModel):
     """Ratings for different performance aspects of a model."""
 
     accuracy: int = Field(
-        ge=1, le=3, title="Accuracy rating",
-        description="Rating of model accuracy from 1 (low) to 3 (high)"
+        ge=1, le=3, title="Accuracy rating", description="Rating of model accuracy from 1 (low) to 3 (high)"
     )
     training_time: int = Field(
-        ge=1, le=3, title="Training time rating",
-        description="Rating of training efficiency from 1 (slow) to 3 (fast)"
+        ge=1, le=3, title="Training time rating", description="Rating of training efficiency from 1 (slow) to 3 (fast)"
     )
     inference_speed: int = Field(
-        ge=1, le=3, title="Inference speed rating",
-        description="Rating of inference performance from 1 (slow) to 3 (fast)"
+        ge=1,
+        le=3,
+        title="Inference speed rating",
+        description="Rating of inference performance from 1 (slow) to 3 (fast)",
     )
 
 

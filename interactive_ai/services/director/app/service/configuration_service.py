@@ -7,9 +7,17 @@ from geti_configuration_tools.hyperparameters import (
     Hyperparameters,
     TrainingHyperParameters,
 )
-from geti_configuration_tools.training_configuration import PartialTrainingConfiguration, TrainingConfiguration, \
-    GlobalParameters, GlobalDatasetPreparationParameters, SubsetSplit, Filtering, MinAnnotationPixels, \
-    MaxAnnotationPixels, MaxAnnotationObjects
+from geti_configuration_tools.training_configuration import (
+    Filtering,
+    GlobalDatasetPreparationParameters,
+    GlobalParameters,
+    MaxAnnotationObjects,
+    MaxAnnotationPixels,
+    MinAnnotationPixels,
+    PartialTrainingConfiguration,
+    SubsetSplit,
+    TrainingConfiguration,
+)
 
 from service.utils import delete_none_from_dict, merge_deep_dict
 from storage.repos.partial_training_configuration_repo import PartialTrainingConfigurationRepo
@@ -90,7 +98,7 @@ class ConfigurationService:
                     min_annotation_pixels=MinAnnotationPixels(),
                     max_annotation_pixels=MaxAnnotationPixels(),
                     max_annotation_objects=MaxAnnotationObjects(),
-                )
+                ),
             ),
         )
         base_config = PartialTrainingConfiguration.model_validate(

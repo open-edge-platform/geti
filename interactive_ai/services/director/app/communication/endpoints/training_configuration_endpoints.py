@@ -7,7 +7,7 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, Query
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
-from geti_feature_tools.feature_flags import FeatureFlagProvider
+from geti_feature_tools import FeatureFlagProvider
 
 from communication.controllers.training_configuration_controller import TrainingConfigurationRESTController
 from communication.views.training_configuration_rest_views import TrainingConfigurationRESTViews
