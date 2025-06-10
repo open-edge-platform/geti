@@ -64,7 +64,7 @@ export class Watershed {
         for (let markerIndex = 0; markerIndex < markers.length; markerIndex++) {
             let shapeMat: OpenCVTypes.Mat | null = null;
             const contours: OpenCVTypes.MatVector = new this.CV.MatVector();
-            const hierachy: OpenCVTypes.Mat = new this.CV.Mat();
+            const hierarchy: OpenCVTypes.Mat = new this.CV.Mat();
 
             try {
                 const markerPolygon = polygons.find((polygon) => polygon.id === markers[markerIndex].id);
@@ -81,7 +81,7 @@ export class Watershed {
                 this.CV.threshold(shapeMat, shapeMat, markers[markerIndex].id - 1, 0, this.CV.THRESH_TOZERO);
                 this.CV.threshold(shapeMat, shapeMat, markers[markerIndex].id, 0, this.CV.THRESH_TOZERO_INV);
 
-                this.CV.findContours(shapeMat, contours, hierachy, this.CV.RETR_CCOMP, this.CV.CHAIN_APPROX_NONE);
+                this.CV.findContours(shapeMat, contours, hierarchy, this.CV.RETR_CCOMP, this.CV.CHAIN_APPROX_NONE);
 
                 for (let idx = 0; idx < contours.size(); idx++) {
                     const optimizedContours = approximateShape(this.CV, contours.get(idx));
@@ -100,7 +100,7 @@ export class Watershed {
                 // Cleanup
                 shapeMat?.delete();
                 contours?.delete();
-                hierachy?.delete();
+                hierarchy?.delete();
             }
         }
 

@@ -10,7 +10,7 @@ import { WebWorker } from '../../../../webworkers/web-worker.interface';
 import { Marker } from '../marker-tool/marker-tool.interface';
 
 export interface WatershedWorker extends WebWorker<Polygon> {
-    Watershed: (imageData: ImageData) => WatershedMethods;
+    Watershed: (imageData: ImageData) => Promise<WatershedMethods>;
     type: AlgorithmType.WATERSHED;
 }
 
