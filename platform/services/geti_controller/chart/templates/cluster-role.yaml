@@ -1,25 +1,28 @@
-# TODO uncomment when charts will be ready and check if can be replaced by Role
+# TODO uncomment and adjust conditions when charts will be ready + check if can be replaced by a separate Role
+{{- if .Values.global.ingress_enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: geti-controller-admin-access
 rules:
+#- apiGroups: [""]
+#  resources: ["serviceaccounts"]
+#  verbs: ["create", "get", "list", "watch"]
+#
+#- apiGroups: ["rbac.authorization.k8s.io"]
+#  resources: ["clusterroles", "clusterrolebindings"]
+#  verbs: ["create", "get", "list", "watch"]
+#
+#- apiGroups: ["batch"]
+#  resources: ["jobs"]
+#  verbs: ["create", "get", "list", "watch"]
+#
+#- apiGroups: ["helm.cattle.io"]
+#  resources: ["helmcharts"]
+#  verbs: ["create", "update"]
+
 - apiGroups: [""]
-  resources: ["serviceaccounts"]
-  verbs: ["create", "get", "list", "watch"]
-
-- apiGroups: ["rbac.authorization.k8s.io"]
-  resources: ["clusterroles", "clusterrolebindings"]
-  verbs: ["create", "get", "list", "watch"]
-
-- apiGroups: ["batch"]
-  resources: ["jobs"]
-  verbs: ["create", "get", "list", "watch"]
-
-- apiGroups: ["helm.cattle.io"]
-  resources: ["helmcharts"]
-  verbs: ["create", "update"]
-
-- apiGroups: [""]
-  resources: ["pods", "pods/exec"]
+  resources: ["pods", "pods/exec"]  # needed for nvidia device plugin communication (different namespace)
   verbs: ["get", "watch", "list"]
+
+{{- end }}

@@ -1,10 +1,10 @@
-# TODO uncomment when charts will be ready
+{{- if .Values.global.ingress_enabled }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: geti-controller-admin-access
   labels:
-    { { - include "geti-controller.labels" . | nindent 4 } }
+    {{ - include "geti-controller.labels" . | nindent 4 }}
 subjects:
   - kind: ServiceAccount
     name: {{ include "geti-controller.name" . }}
@@ -13,3 +13,5 @@ roleRef:
   kind: ClusterRole
   name: geti-controller-admin-access
   apiGroup: rbac.authorization.k8s.io
+
+{{- end }}

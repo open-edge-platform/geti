@@ -1,4 +1,4 @@
----
+{{- if .Values.global.ingress_enabled }}
 apiVersion: networking.istio.io/v1
 kind: ServiceEntry
 metadata:
@@ -17,3 +17,4 @@ spec:
     name: https-port
     protocol: HTTPS
   resolution: DNS
+{{- end }}
