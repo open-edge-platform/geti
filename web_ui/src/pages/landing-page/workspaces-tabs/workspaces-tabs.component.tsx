@@ -272,11 +272,8 @@ export const WorkspacesTabs = (): JSX.Element => {
                     {(item: TabItem) => (
                         <Item key={item.key}>
                             <HasPermission
-                                operations={[
-                                    FEATURE_FLAG_WORKSPACE_ACTIONS
-                                        ? OPERATION_NEW.CAN_SEE_WORKSPACE
-                                        : OPERATION_OLD.WORKSPACE_MANAGEMENT,
-                                ]}
+                                operations={[OPERATION_NEW.CAN_SEE_WORKSPACE]}
+                                specialCondition={!FEATURE_FLAG_WORKSPACE_ACTIONS || undefined}
                                 Fallback={<div data-testid='no-permission-to-tab'>TODO: no permission</div>}
                             >
                                 {item.children}
