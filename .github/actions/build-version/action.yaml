@@ -17,7 +17,7 @@ runs:
       id: prepare-build-version
       shell: bash
       env:
-        CHECKOUT_REF: ${{ inputs.checkout_ref }}
+        CHECKOUT_REF: ${{ inputs.ref }}
       run: |
         base_version=$(<VERSION)
         ref_sanitized=${CHECKOUT_REF//\//-}

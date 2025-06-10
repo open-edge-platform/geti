@@ -44,17 +44,17 @@ jobs:
       libs-list: ${{ steps.libs-list.outputs.paths_list }}
 
     steps:
-      - name: Prepare build version
-        id: prepare-build-version
-        uses: ./.github/actions/build-version
-        with:
-          ref: ${{ env.CHECKOUT_REF }}
-
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           fetch-depth: 0
           persist-credentials: false
+          ref: ${{ env.CHECKOUT_REF }}
+
+      - name: Prepare build version
+        id: prepare-build-version
+        uses: ./.github/actions/build-version
+        with:
           ref: ${{ env.CHECKOUT_REF }}
 
       - name: Get changed components dirs
