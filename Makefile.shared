@@ -11,12 +11,6 @@ CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
 PRODUCT_VERSION                    ?= $(shell cat $(CWD)/VERSION)
 TAG                                ?= $(PRODUCT_VERSION)-$(shell git rev-parse --short HEAD)
 
-
-
-
-
-
-
 ###
 # registries
 ###
