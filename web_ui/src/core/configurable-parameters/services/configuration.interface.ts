@@ -42,7 +42,6 @@ interface ProjectConfigurationTaskConfigs {
     taskId: string;
     training: ProjectConfigurationTaskConfigsTraining;
     autoTraining: ConfigurationParameter[];
-    predictions: ConfigurationParameter[];
 }
 
 type KeyValueParameter = Pick<ConfigurationParameter, 'key' | 'value'>;
@@ -52,7 +51,6 @@ export interface ProjectConfigurationUploadPayload {
         constraints: KeyValueParameter[];
     };
     autoTraining?: KeyValueParameter[];
-    predictions?: KeyValueParameter[];
 }
 
 export interface ProjectConfiguration {

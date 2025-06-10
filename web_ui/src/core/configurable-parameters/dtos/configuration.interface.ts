@@ -42,7 +42,6 @@ interface ProjectConfigurationTaskConfigsDTO {
     task_id: string;
     training: ProjectConfigurationTaskConfigsTrainingDTO;
     auto_training: ConfigurationParameterDTO[];
-    predictions: ConfigurationParameterDTO[];
 }
 
 type KeyValueParameterDTO = Pick<ConfigurationParameterDTO, 'key' | 'value'>;
@@ -50,7 +49,6 @@ type KeyValueParameterDTO = Pick<ConfigurationParameterDTO, 'key' | 'value'>;
 export interface ProjectConfigurationUploadPayloadDTO {
     training?: { constraints: KeyValueParameterDTO[] };
     auto_training?: KeyValueParameterDTO[];
-    predictions?: KeyValueParameterDTO[];
 }
 
 export interface ProjectConfigurationDTO {
