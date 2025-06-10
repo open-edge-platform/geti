@@ -98,6 +98,15 @@ class ProjectConfiguration(BaseModel, PersistentEntity):
         return self.task_configs[idx]
 
     def update_task_config(self, task_config: TaskConfig) -> None:
+        """
+        Updates an existing task configuration in-place with the provided configuration.
+
+        This method modifies the project configuration directly by replacing the
+        task configuration for the specified task ID with the new configuration.
+
+        :param task_config: The new task configuration to update with
+        :raises ValueError: If a task configuration with the specified task_id does not exist
+        """
         if task_config.task_id not in self._task_idx_mapping:
             raise ValueError(f"Task configuration with ID {task_config.task_id} not found.")
 
