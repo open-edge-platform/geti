@@ -51,6 +51,19 @@ jobs:
           persist-credentials: false
           ref: ${{ env.CHECKOUT_REF }}
 
+      - name: Debug workflow context
+        run: |
+          echo "GitHub ref: ${{ github.ref }}"
+          echo "GitHub SHA: ${{ github.sha }}"
+          echo "Event name: ${{ github.event_name }}"
+          echo "Input ref: ${{ inputs.ref }}"
+          echo "Workspace contents:"
+          ls -la .github/actions/
+          echo "Current branch:"
+          git branch -a
+          echo "Current commit:"
+          git log -1 --oneline    
+
       - name: Prepare build version
         id: prepare-build-version
         uses: ./.github/actions/build-version
