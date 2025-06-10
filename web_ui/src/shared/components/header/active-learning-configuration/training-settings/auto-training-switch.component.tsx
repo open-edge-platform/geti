@@ -194,7 +194,7 @@ export const AutoTrainingSwitch: FC<AutoTrainingSwitchProps> = ({
             onOptimisticUpdate: (config) => {
                 const autoTrainingConfig = findAutoTrainingConfig(task.id, config);
                 if (autoTrainingConfig !== undefined) {
-                    autoTrainingConfig.value = !autoTrainingConfig.value;
+                    autoTrainingConfig.value = value;
                 }
 
                 return config;
