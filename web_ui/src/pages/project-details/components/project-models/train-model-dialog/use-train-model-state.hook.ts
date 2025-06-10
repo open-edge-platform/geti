@@ -67,6 +67,8 @@ export const useTrainModelState = () => {
         taskId: selectedTask.id,
     });
 
+    console.log({ trainingConfiguration });
+
     const { useGetModelConfigParameters } = useConfigParameters(projectIdentifier);
     const { data: configParameters } = useGetModelConfigParameters({
         taskId: selectedTask.id,
