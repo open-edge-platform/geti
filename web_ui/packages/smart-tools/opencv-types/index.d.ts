@@ -23,3 +23,5 @@ declare module 'opencv-types' {
     export * from 'emscripten';
     export * from 'helpers';
 }
+
+declare const cv: Promise<OpenCVTypes.cv>;
