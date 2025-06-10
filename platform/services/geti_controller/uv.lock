@@ -288,6 +288,7 @@ dependencies = [
     { name = "geti-types" },
     { name = "kubernetes" },
     { name = "oras" },
+    { name = "packaging" },
     { name = "uvicorn" },
 ]
 
@@ -311,6 +312,7 @@ requires-dist = [
     { name = "geti-types", editable = "../../../libs/types" },
     { name = "kubernetes", specifier = "==32.0.1" },
     { name = "oras", specifier = "==0.2.31" },
+    { name = "packaging", specifier = "==25.0" },
     { name = "uvicorn", specifier = "~=0.27.1" },
 ]
 

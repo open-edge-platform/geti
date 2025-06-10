@@ -42,11 +42,11 @@ def get_nvidia_driver_version() -> str | None:
             stdout=True,
             tty=False,
         )
+        logger.debug(f"NVIDIA driver version: {response}")
         driver_version = response.strip()
         if not driver_version:
             raise Exception("Failed to retrieve NVIDIA driver version.")
         return driver_version
-
     except Exception as e:
         logger.warning(f"Failed to retrieve NVIDIA driver version: {e}")
         return None
@@ -66,6 +66,7 @@ def get_system_versions() -> dict:
     try:
         version_info = client.VersionApi().get_code()
         versions["k3s_version"] = version_info.git_version
+        logger.debug(f"Retrieved k3s version: {versions['k3s_version']}")
     except Exception as e:
         logger.warning(f"Failed to get k3s version: {e}")
 
@@ -88,6 +89,7 @@ def fetch_available_versions() -> list[str]:
     try:
         oc = OrasClient(tls_verify=False)
         tags = oc.get_tags(f"{GETI_REGISTRY}/geti/geti-manifest")
+        logger.info(f"Available Geti versions in the registry: {tags}")  #TODO debug
 
         # extract the semver part of the PLATFORM_VERSION
         current_version = Version(re.match(r"^\d+\.\d+\.\d+", PLATFORM_VERSION).group())
