@@ -1,0 +1,45 @@
+name: Change Detection
+description: Extends standard change detection by optionally returning all components, supporting full platform rebuilds for periodic runs, manual triggers, or release candidate preparation.
+
+inputs:
+  path_filter:
+    description: 'Path to the components path-filter file'
+    required: true
+  get_all:
+    description: 'Return all components regardless of detected changes (used for full rebuilds)'
+    type: boolean
+    required: true
+outputs:
+  paths_list:
+    description: "List of paths to changed components"
+    value: ${{ steps.components-list.outputs.paths_list }}
+
+runs:
+  using: composite
+  steps:
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46.0.5
+      with:
+        files_yaml_from_source_file: "${{ inputs.path_filter }}"
+
+    - name: Get changed components
+      id: components-list
+      shell: bash
+      env:
+        CHANGED_KEYS: ${{ steps.changed-files.outputs.changed_keys }}
+        PATH_FILTER: ${{ inputs.path_filter }}
+        GET_ALL: ${{ inputs.get_all }}
+      run: |
+        echo "GET_ALL ==> $GET_ALL"
+        if [[ "$GET_ALL" == "true" ]]; then
+           paths_list=$(yq -r '... comments=""' "${PATH_FILTER}" | yq -r 'keys[]' | jq -R . | jq -sc .)
+        else
+          paths_list=$(python3 -c "import json; print(json.dumps('$CHANGED_KEYS'.split()))")
+        fi
+
+        echo "::group::paths list"
+        echo $paths_list
+        echo "::endgroup::"
+
+        echo "paths_list=${paths_list}" >> "$GITHUB_OUTPUT"

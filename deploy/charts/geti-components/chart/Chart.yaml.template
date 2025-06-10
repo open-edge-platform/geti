@@ -5,106 +5,106 @@ description: Chart that contains all the components of Geti
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 0.0.1
+version: ${TAG}
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "v2.11.0"
+appVersion: ${TAG}
 
 dependencies:
   - name: migration-job
-    version: 0.0.1
-    repository: "file://../../interactive_ai/migration_job/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/migration_job/.build"
     condition: enabled.migration_job
   - name: auto-train-controller
-    version: 0.0.2
-    repository: "file://../../interactive_ai/services/auto_train/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/auto_train/.build"
     condition: enabled.auto_train
   - name: dataset-ie
-    version: 0.0.11
-    repository: "file://../../interactive_ai/services/dataset_ie/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/dataset_ie/.build"
     condition: enabled.dataset_ie
   - name: director
-    version: 0.0.8
-    repository: "file://../../interactive_ai/services/director/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/director/.build"
     condition: enabled.director
   - name: inference-gateway
-    version: 0.0.1
-    repository: "file://../../interactive_ai/services/inference_gateway/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/inference_gateway/.build"
     condition: enabled.inference_gateway
   - name: jobs
-    version: 0.0.1
-    repository: "file://../../interactive_ai/services/jobs/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/jobs/.build"
     condition: enabled.jobs
   - name: media-ms
-    version: 0.0.8
-    repository: "file://../../interactive_ai/services/media/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/media/.build"
     condition: enabled.media
   - name: mlflow-geti-store
-    version: 0.0.1
-    repository: "file://../../interactive_ai/services/mlflow_geti_store/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/mlflow_geti_store/.build"
     condition: enabled.mlflow_geti_store
   - name: modelregistration
-    version: 0.0.3
-    repository: "file://../../interactive_ai/services/model_registration/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/model_registration/.build"
     condition: enabled.model_registration
   - name: project-ie
-    version: 0.0.10
-    repository: "file://../../interactive_ai/services/project_ie/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/project_ie/.build"
     condition: enabled.project_ie
   - name: resource
-    version: 0.0.12
-    repository: "file://../../interactive_ai/services/resource/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/resource/.build"
     condition: enabled.resource
   - name: visual-prompt
-    version: 0.0.1
-    repository: "file://../../interactive_ai/services/visual_prompt/chart"
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/visual_prompt/.build"
     condition: enabled.visual_prompt
   - name: account-service
-    version: 0.0.2
-    repository: "file://../../platform/services/account/chart"
+    version: ${TAG}
+    repository: "file://../../../../platform/services/account/.build"
     condition: enabled.account
   - name: auth-proxy
-    version: 0.1.0
-    repository: "file://../../platform/services/auth_proxy/chart"
+    version: ${TAG}
+    repository: "file://../../../../platform/services/auth_proxy/.build"
     condition: enabled.auth_proxy
   - name: credit-system
-    version: 0.1.0
-    repository: "file://../../platform/services/credit/chart"
+    version: ${TAG}
+    repository: "file://../../../../platform/services/credit/.build"
     condition: enabled.credit
   - name: initial-user
-    version: 0.0.1
-    repository: "file://../../platform/services/initial_user/chart"
+    version: ${TAG}
+    repository: "file://../../../../platform/services/initial_user/.build"
     condition: enabled.initial_user
   - name: notifier
-    version: 0.0.1
-    repository: "file://../../platform/services/notifier/chart"
+    version: ${TAG}
+    repository: "file://../../../../platform/services/notifier/.build"
     condition: enabled.notifier
   - name: observability
-    version: 0.0.1
-    repository: "file://../../platform/services/observability/chart"
+    version: ${TAG}
+    repository: "file://../../../../platform/services/observability/.build"
     condition: enabled.observability
   - name: onboarding-service
-    version: 0.0.1
-    repository: "file://../../platform/services/onboarding/chart"
+    version: ${TAG}
+    repository: "file://../../../../platform/services/onboarding/.build"
     condition: enabled.onboarding
   - name: platform-cleaner
-    version: 0.0.4
-    repository: "file://../../platform/services/platform_cleaner/chart"
+    version: ${TAG}
+    repository: "file://../../../../platform/services/platform_cleaner/.build"
     condition: enabled.platform_cleaner
   - name: user-directory
-    version: 0.0.1
-    repository: "file://../../platform/services/user_directory/chart"
+    version: ${TAG}
+    repository: "file://../../../../platform/services/user_directory/.build"
     condition: enabled.user_directory
   - name: weights_uploader
-    version: 0.0.1
-    repository: "file://../../platform/services/weights_uploader/chart"
+    version: ${TAG}
+    repository: "file://../../../../platform/services/weights_uploader/.build"
     condition: enabled.weights_uploader
   - name: web
-    version: 0.0.5
-    repository: "file://../../web_ui/chart"
+    version: ${TAG}
+    repository: "file://../../../../web_ui/.build"
     condition: enabled.web_ui
   - name: configuration
     version: 0.0.1
