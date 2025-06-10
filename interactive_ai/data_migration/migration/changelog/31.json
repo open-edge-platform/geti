@@ -1,0 +1,4 @@
+{
+  "script": "reduce_anomaly_tasks.py",
+  "metadata": "reduce_anomaly_tasks.json"
+}
