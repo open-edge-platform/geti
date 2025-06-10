@@ -32,7 +32,6 @@ jobs:
     name: Get variables
     env:
       BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' }}
-      CHECKOUT_REF: ${{ inputs.ref || github.ref_name }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
