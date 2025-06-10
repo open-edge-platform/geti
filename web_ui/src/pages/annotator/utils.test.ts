@@ -173,6 +173,7 @@ describe('Annotator utils', () => {
             hotkey: '',
             behaviour: 2,
             isEmpty: false,
+            isBackground: false,
         };
         const labelWithExtras = {
             ...label,

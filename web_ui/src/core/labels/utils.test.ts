@@ -81,6 +81,7 @@ describe('Label behaviour based on task type', () => {
         hotkey: 'ctrl+1',
         parent_id: null,
         is_empty: false,
+        is_background: false,
         is_anomalous: false,
     };
 

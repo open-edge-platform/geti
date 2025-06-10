@@ -56,6 +56,8 @@ export enum LABEL_BEHAVIOUR {
     // Used to guarantee that when an anomalous annotation is added, its roi is
     // also given a global anomalous label
     ANOMALOUS = 1 << 4,
+
+    BACKGROUND = 1 << 5,
 }
 
 export enum LabelsRelationType {
