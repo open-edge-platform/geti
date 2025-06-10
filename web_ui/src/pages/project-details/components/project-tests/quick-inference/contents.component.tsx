@@ -61,7 +61,7 @@ export const Contents = () => {
                     {imageWasUploaded && (
                         <>
                             <ImageSection />
-                            {isLoading && <Loading overlay />}
+                            {isLoading && <Loading mode='overlay' />}
                         </>
                     )}
                 </MediaDropBox>

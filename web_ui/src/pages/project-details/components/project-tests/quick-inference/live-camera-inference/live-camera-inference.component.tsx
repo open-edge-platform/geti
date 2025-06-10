@@ -63,7 +63,7 @@ const InferencedImage = () => {
     return (
         <View position={'relative'} height={'100%'} width={'100%'}>
             <ImageSection />
-            {isLoading && <Loading overlay />}
+            {isLoading && <Loading mode='overlay' />}
         </View>
     );
 };
