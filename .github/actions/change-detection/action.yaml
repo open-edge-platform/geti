@@ -41,7 +41,7 @@ runs:
         echo "GET_ALL ==> $HEAD_SHA"
         
         echo "PATH FILTER CONTENTS:"
-        cat "$INPUTS"
+        cat "$PATH_FILTER"
     
         if [[ "$GET_ALL" == "true" ]]; then
            paths_list=$(yq -r '... comments=""' "${PATH_FILTER}" | yq -r 'keys[]' | jq -R . | jq -sc .)
