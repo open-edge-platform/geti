@@ -35,6 +35,7 @@ runs:
         if [[ "$GET_ALL" == "true" ]]; then
            paths_list=$(yq -r '... comments=""' "${PATH_FILTER}" | yq -r 'keys[]' | jq -R . | jq -sc .)
         else
+          echo "CHANGED_KEYS=>$CHANGED_KEYS"
           paths_list=$(python3 -c "import json; print(json.dumps('$CHANGED_KEYS'.split()))")
         fi
 
