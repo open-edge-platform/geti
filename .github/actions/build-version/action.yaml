@@ -19,6 +19,10 @@ runs:
       env:
         CHECKOUT_REF: ${{ inputs.ref }}
       run: |
+        echo "github.ref_name => ${{ github.ref_name }}"
+        echo "github.ref => ${{ github.ref }}"
+        echo "inputs.ref => ${{ inputs.ref }}"
+        
         base_version=$(<VERSION)
         ref_sanitized=${CHECKOUT_REF//\//-}
         tag="${base_version}-${ref_sanitized}"
