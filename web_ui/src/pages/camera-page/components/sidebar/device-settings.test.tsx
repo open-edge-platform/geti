@@ -74,6 +74,7 @@ describe('Settings', () => {
         const mockedDeviceConfig = {
             name: 'frameRate',
             config: { type: 'minMax' as const, value: 0, max: 30, min: 0 },
+            onChange: jest.fn(),
         };
 
         renderApp({ deviceConfig: [mockedDeviceConfig], stream: mockedStream });

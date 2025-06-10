@@ -20,7 +20,14 @@ import { MissingProviderError } from '../../../shared/missing-provider-error';
 import { getVideoDevices } from '../../../shared/navigator-utils';
 import { runWhen } from '../../../shared/utils';
 import { UserCameraPermission } from '../../camera-support/camera.interface';
-import { DeviceConfiguration, getBrowserPermissions, getValidCapabilities, mergeSettingAndCapabilities } from './util';
+import {
+    applySettings,
+    DeviceConfiguration,
+    getBrowserPermissions,
+    getValidCapabilities,
+    mergeSettingAndCapabilities,
+    SettingSelection,
+} from './util';
 
 export interface SettingsContextProps {
     webcamRef: RefObject<Webcam>;
@@ -47,6 +54,18 @@ export const DeviceSettingsProvider = ({ children }: { children: ReactNode }) =>
 
     const onComponentIsMounted = runWhen<MediaDeviceInfo[]>(isMounted);
 
+    const mirrorOption = {
+        name: 'Mirror camera',
+        config: {
+            type: 'selection',
+            options: ['Off', 'On'],
+            value: isMirrored ? 'On' : 'Off',
+        } as SettingSelection,
+        onChange: (value: number | string) => {
+            setIsMirrored(value === 'On');
+        },
+    };
+
     useEffect(() => {
         getBrowserPermissions().then(({ permissions, stream }) => {
             // Stop the stream because react-webcam starts its own stream
@@ -67,8 +86,18 @@ export const DeviceSettingsProvider = ({ children }: { children: ReactNode }) =>
         const [videoTrack] = stream.getVideoTracks();
         const filteredValidCapabilities = getValidCapabilities(videoTrack.getCapabilities());
         const newDevicesConfig = mergeSettingAndCapabilities(filteredValidCapabilities, videoTrack.getSettings());
-
-        setDeviceConfig(newDevicesConfig);
+        const fullDevicesConfig = [
+            ...newDevicesConfig.map((config) => ({
+                ...config,
+                onChange: (value: number | string) => {
+                    if (webcamRef.current?.stream) {
+                        applySettings(webcamRef.current?.stream, { [config.name]: value });
+                    }
+                },
+            })),
+            mirrorOption,
+        ];
+        setDeviceConfig(fullDevicesConfig);
     };
 
     return (
