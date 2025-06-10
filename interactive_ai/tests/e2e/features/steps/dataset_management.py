@@ -9,10 +9,7 @@ from behave import given, then, when
 from behave.runner import Context
 from file_management import download_file_from_remote_archive
 from geti_client import (
-    CreateDatasetRequest,
     DatasetImportExportApi,
-    DatasetsApi,
-    ImportDatasetToProjectRequest,
     ImportProjectBody,
     ImportProjectBodyLabelsInner,
     MetadataOfPerformImportToNewProjectJob1,
@@ -172,42 +169,4 @@ def step_then_import_type_recognized(context: Context, project_type: str) -> Non
     assert expected_supported_project_type in supported_project_types, (
         f"Expected project type {expected_supported_project_type} "
         f"not found in supported project types: {supported_project_types}"
-    )
-
-
-@when("the user creates a new dataset with name 'Test'")
-def step_when_user_creates_a_new_dataset_with_name_test(context):
-    DatasetsApi.create_dataset(
-        organization_id=context.organization.id,
-        workspace_id=context.workspace.id,
-        project_id=context.project.id,
-        create_dataset_request=CreateDatasetRequest(name="Test"),
-    )
-
-
-@then("the project has a dataset with name 'Test'")
-def step_then_the_project_has_a_dataset_with_name_test(context):
-    datasets = DatasetsApi.get_datasets_info(
-        organization_id=context.organization.id, workspace_id=context.workspace.id, project_id=context.project.id
-    ).datasets
-    for dataset in datasets:
-        if dataset.name == "Test":
-            context.dataset = dataset
-            break
-    else:
-        raise AssertionError("Expected dataset 'Test' not found in the project")
-
-
-@when("the user uploads a testing set into dataset 'Test'")
-def step_upload_a_testing_set(context):
-    file_id = _upload_dataset_with_tus(context)
-
-    DatasetImportExportApi.import_dataset_to_project(
-        organization_id=context.organization.id,
-        workspace_id=context.workspace.id,
-        project_id=context.project.id,
-        import_dataset_to_project_request=ImportDatasetToProjectRequest(
-            dataset_id=context.dataset.id,
-            file_id=file_id,
-        ),
     )
