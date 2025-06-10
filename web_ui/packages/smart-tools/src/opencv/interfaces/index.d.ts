@@ -24,4 +24,10 @@ declare module 'opencv-types' {
     export * from 'helpers';
 }
 
+declare module 'OpenCVTypes' {
+    import * as OpenCVTypes from '.';
+
+    export = OpenCVTypes;
+}
+
 declare const cv: Promise<OpenCVTypes.cv>;

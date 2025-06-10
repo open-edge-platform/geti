@@ -6,6 +6,6 @@ import sharedConfig from '@geti/config/lint';
 export default [
     ...sharedConfig,
     {
-        ignores: ['opencv-types']
+        ignores: ['./src/opencv/interfaces']
     }
 ];
