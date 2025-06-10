@@ -3,8 +3,8 @@ name: Web UI checks
 on:
   workflow_call:
     inputs:
-      image-tag:
-        description: "Docker image tag"
+      build-version:
+        description: "Specifies the build version to apply to all binaries produced by this workflow"
         type: string
         required: true
       push:
@@ -231,6 +231,6 @@ jobs:
       REGISTRY: ${{ secrets.REGISTRY }}
     uses: ./.github/workflows/component.yml
     with:
-      image-tag: ${{ inputs.image-tag }}
+      build-version: ${{ inputs.build-version }}
       component-dir: web_ui
       push: ${{ inputs.push }}
