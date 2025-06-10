@@ -32,7 +32,7 @@ jobs:
     name: Prepare build metadata
     env:
       BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}
-      CHECKOUT_REF: ${{ github.ref }}
+      CHECKOUT_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
