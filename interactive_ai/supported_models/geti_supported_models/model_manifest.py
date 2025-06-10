@@ -41,14 +41,19 @@ class PerformanceRatings(BaseModel):
     """Ratings for different performance aspects of a model."""
 
     accuracy: int = Field(
-        ge=1, le=3, title="Accuracy rating", description="Rating of model accuracy from 1 (low) to 3 (high)"
+        ge=1, le=3, default=1, title="Accuracy rating", description="Rating of model accuracy from 1 (low) to 3 (high)"
     )
     training_time: int = Field(
-        ge=1, le=3, title="Training time rating", description="Rating of training efficiency from 1 (slow) to 3 (fast)"
+        ge=1,
+        le=3,
+        default=1,
+        title="Training time rating",
+        description="Rating of training efficiency from 1 (slow) to 3 (fast)",
     )
     inference_speed: int = Field(
         ge=1,
         le=3,
+        default=1,
         title="Inference speed rating",
         description="Rating of inference performance from 1 (slow) to 3 (fast)",
     )
@@ -114,7 +119,13 @@ class NullModelManifest(ModelManifest):
     name: str = Field(default="null")
     description: str = Field(default="null")
     task: str = Field(default="null")
-    stats: ModelStats = Field(default=ModelStats(gigaflops=1, trainable_parameters=1))
+    stats: ModelStats = Field(
+        default=ModelStats(
+            gigaflops=1,
+            trainable_parameters=1,
+            performance_ratings=PerformanceRatings(),
+        )
+    )
     support_status: ModelManifestDeprecationStatus = Field(default=ModelManifestDeprecationStatus.OBSOLETE)
     supported_gpus: dict[GPUMaker, bool] = Field(default={})
     hyperparameters: Hyperparameters = Field(
