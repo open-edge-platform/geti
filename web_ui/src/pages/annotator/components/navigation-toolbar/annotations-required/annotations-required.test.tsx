@@ -56,7 +56,7 @@ describe('Required annotations', () => {
                 task,
                 trainingConfig: { value: isAutoTrainingOn } as BooleanGroupParams,
             })),
-            isLoading: false,
+            isPending: false,
         });
         const projectService = createInMemoryProjectService();
         projectService.getProject = async () =>

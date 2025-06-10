@@ -67,7 +67,7 @@ export const AnnotationsRequired = ({ id, selectedTask }: AnnotationsRequiredPro
     const containerRef = useRef<HTMLDivElement>({} as HTMLDivElement);
     const isTaskTraining = useIsTaskTraining(projectIdentifier);
     const requiredAnnotations = useRequiredAnnotations(selectedTask);
-    const { autoTrainingTasks, isLoading: isTasksConfigLoading } = useAutoTrainingTasksConfig(
+    const { autoTrainingTasks, isPending: isTasksConfigLoading } = useAutoTrainingTasksConfig(
         projectIdentifier,
         project.tasks
     );
@@ -75,7 +75,9 @@ export const AnnotationsRequired = ({ id, selectedTask }: AnnotationsRequiredPro
     const { clientWidth } = containerRef?.current ?? {};
     const isAllTasks = isNil(selectedTask);
     const autoTrainingSelectedTask = autoTrainingTasks.find(({ task }) => isEqual(task.id, selectedTask?.id));
-    const allAutoTrainingValue = getAllAutoTrainingValue(autoTrainingTasks);
+    const allAutoTrainingValue = getAllAutoTrainingValue(
+        autoTrainingTasks.map(({ trainingConfig }) => Boolean(trainingConfig?.value))
+    );
     const isAutoTrainingOn = isAllTasks
         ? Boolean(allAutoTrainingValue)
         : Boolean(autoTrainingSelectedTask?.trainingConfig?.value);

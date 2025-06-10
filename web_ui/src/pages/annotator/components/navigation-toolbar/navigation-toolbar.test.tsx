@@ -160,7 +160,7 @@ describe('Navigation toolbar', () => {
                 task,
                 trainingConfig: { value: isAutoTrainingOn } as BooleanGroupParams,
             })),
-            isLoading: false,
+            isPending: false,
         });
 
         (useTask as jest.Mock).mockImplementation(() => ({

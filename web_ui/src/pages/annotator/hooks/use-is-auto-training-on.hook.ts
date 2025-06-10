@@ -12,7 +12,7 @@ export const useIsAutoTrainingOn = ({
     project: ProjectProps;
     projectIdentifier: ProjectIdentifier;
 }) => {
-    const { autoTrainingTasks, isLoading } = useAutoTrainingTasksConfig(projectIdentifier, project.tasks);
+    const { autoTrainingTasks, isPending } = useAutoTrainingTasksConfig(projectIdentifier, project.tasks);
 
-    return !isLoading && autoTrainingTasks.some(({ trainingConfig }) => trainingConfig?.value === true);
+    return !isPending && autoTrainingTasks.some(({ trainingConfig }) => trainingConfig?.value === true);
 };

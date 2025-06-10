@@ -109,12 +109,12 @@ describe('CornerIndicator Status', () => {
 
     describe('Indicator Off', () => {
         it('trainingConfig is undefined', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(undefined)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[mockParams(undefined)]} />);
 
             expect(screen.getByLabelText(/Active learning configuration off/i)).toBeVisible();
         });
         it('multiple tasks', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(false), mockParams(false)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[mockParams(false), mockParams(false)]} />);
 
             expect(screen.getByLabelText(/Active learning configuration off/i)).toBeVisible();
         });
@@ -122,12 +122,12 @@ describe('CornerIndicator Status', () => {
 
     describe('Indicator On', () => {
         it('trainingConfig is true', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(true)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[mockParams(true)]} />);
 
             expect(screen.getByLabelText(/Active learning configuration on/i)).toBeVisible();
         });
         it('multiple tasks', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(true), mockParams(true)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[mockParams(true), mockParams(true)]} />);
 
             expect(screen.getByLabelText(/Active learning configuration on/i)).toBeVisible();
         });
@@ -135,19 +135,19 @@ describe('CornerIndicator Status', () => {
 
     describe('Indicator Split', () => {
         it('trainingConfig true and false', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(true), mockParams(false)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[mockParams(true), mockParams(false)]} />);
 
             expect(screen.getByLabelText(/Active learning configuration split/i)).toBeVisible();
         });
 
         it('trainingConfig true and undefined', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(true), mockParams(undefined)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[mockParams(true), mockParams(undefined)]} />);
 
             expect(screen.getByLabelText(/Active learning configuration split/i)).toBeVisible();
         });
 
         it('trainingConfig false and undefined', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(true), mockParams(undefined)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[mockParams(true), mockParams(undefined)]} />);
 
             expect(screen.getByLabelText(/Active learning configuration split/i)).toBeVisible();
         });

@@ -72,7 +72,7 @@ describe('AutoTrainingCreditsModal', () => {
         const jobsService = createInMemoryJobsService();
 
         jest.mocked(useAutoTrainingTasksConfig).mockReturnValue({
-            isLoading: isLoadingAutoTrainingConfig,
+            isPending: isLoadingAutoTrainingConfig,
             autoTrainingTasks: [{ task: getMockedTask({}), trainingConfig: getMockedAutoTraining(isTrainingConfigOn) }],
         });
 

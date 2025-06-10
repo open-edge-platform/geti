@@ -10,6 +10,7 @@ import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { hasActiveModels } from '../../../../../core/models/utils';
 import { Task } from '../../../../../core/projects/task.interface';
 import { useProject } from '../../../../../pages/project-details/providers/project-provider/project-provider.component';
+import { useActiveLearningConfiguration } from '../use-active-learning-configuratrion.hook';
 import { useAutoTrainingTasksConfig } from '../use-tasks-auto-training-config.hook';
 import { AutoTrainingSwitch } from './auto-training-switch.component';
 
@@ -47,7 +48,7 @@ export const TrainingSettings = ({ selectedTask: defaultSelectedTask }: { select
 
     const { useProjectModelsQuery } = useModels();
     const { data: modelsData = [], isLoading: isLoadingModels } = useProjectModelsQuery();
-    const { autoTrainingTasks, isLoading, configParameters } = useAutoTrainingTasksConfig(
+    const { autoTrainingTasks, isPending, updateTrainingParameters } = useActiveLearningConfiguration(
         projectIdentifier,
         project.tasks
     );
@@ -59,7 +60,7 @@ export const TrainingSettings = ({ selectedTask: defaultSelectedTask }: { select
     const autoTrainingTask = filteredAutoTrainingTask.find(({ task }) => task.id === selectedTask);
     const activeModel = modelsData.filter(hasActiveModels).find(({ taskId }) => taskId === autoTrainingTask?.task.id);
 
-    if (isLoading || isLoadingModels || configParameters === undefined || autoTrainingTask === undefined) {
+    if (isPending || isLoadingModels || autoTrainingTask === undefined) {
         return <Loading />;
     }
 
@@ -81,8 +82,8 @@ export const TrainingSettings = ({ selectedTask: defaultSelectedTask }: { select
                 trainingConfig={autoTrainingTask.trainingConfig}
                 dynamicRequiredAnnotationsConfig={autoTrainingTask.dynamicRequiredAnnotationsConfig}
                 requiredImagesAutoTrainingConfig={autoTrainingTask.requiredImagesAutoTrainingConfig}
-                configParameters={configParameters}
                 projectIdentifier={projectIdentifier}
+                updateTrainingParametersLegacy={updateTrainingParameters}
             />
         </View>
     );

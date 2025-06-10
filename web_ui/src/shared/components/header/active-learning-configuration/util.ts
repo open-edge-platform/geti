@@ -24,12 +24,13 @@ export interface AutoTrainingTask {
     requiredImagesAutoTrainingConfig?: NumberGroupParams;
 }
 
-export const getAllAutoTrainingValue = (autoTrainingTasks: AutoTrainingTask[]) => {
-    const [firstTask, ...otherTasks] = autoTrainingTasks;
-    const firstValue = firstTask?.trainingConfig?.value;
-    const allEqualsValues = otherTasks.every(({ trainingConfig }) => isEqual(firstValue, trainingConfig?.value));
+export const getAllAutoTrainingValue = (autoTrainingValues: boolean[]) => {
+    const [firstTaskAutoTrainingValue, ...otherTasks] = autoTrainingValues;
+    const allEqualsValues = otherTasks.every((otherAutoTrainingValue) =>
+        isEqual(firstTaskAutoTrainingValue, otherAutoTrainingValue)
+    );
 
-    return allEqualsValues ? Boolean(firstValue) : null;
+    return allEqualsValues ? firstTaskAutoTrainingValue : null;
 };
 
 export const getNotificationConfig = (value: boolean | null): AutoTrainingNotificationConfig => {

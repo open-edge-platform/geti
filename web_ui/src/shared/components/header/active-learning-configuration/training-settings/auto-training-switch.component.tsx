@@ -7,15 +7,15 @@ import { paths } from '@geti/core';
 import { Divider, Flex, Text, View } from '@geti/ui';
 import { isEmpty, isEqual } from 'lodash-es';
 
-import {
-    useReconfigAutoTraining,
-    UseReconfigureParams,
-} from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
+import { UseReconfigureParams } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
 import {
     BooleanGroupParams,
-    ConfigurableParametersTaskChain,
     NumberGroupParams,
 } from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import {
+    BoolParameter,
+    NumberParameter,
+} from '../../../../../core/configurable-parameters/services/configuration.interface';
 import {
     findAutoTrainingConfig,
     findDynamicRequiredAnnotationsConfig,
@@ -42,10 +42,13 @@ interface AutoTrainingSwitchProps {
     task: Task;
     activeModel?: ModelsGroups;
     projectIdentifier: ProjectIdentifier;
-    trainingConfig: BooleanGroupParams | undefined;
-    dynamicRequiredAnnotationsConfig: BooleanGroupParams | undefined;
-    requiredImagesAutoTrainingConfig?: NumberGroupParams | undefined;
-    configParameters: ConfigurableParametersTaskChain[];
+    trainingConfig: BooleanGroupParams | BoolParameter | undefined;
+    dynamicRequiredAnnotationsConfig: BooleanGroupParams | BoolParameter | undefined;
+    requiredImagesAutoTrainingConfig?: NumberGroupParams | NumberParameter | undefined;
+    updateTrainingParametersLegacy: ({
+        newConfigParameter,
+        onOptimisticUpdate,
+    }: Pick<UseReconfigureParams, 'newConfigParameter' | 'onOptimisticUpdate'>) => void;
     isTaskChainMode: boolean; // project is task chain (project details page) or all tasks mode (annotator page)
 }
 
@@ -107,30 +110,18 @@ export const AutoTrainingSwitch: FC<AutoTrainingSwitchProps> = ({
     activeModel,
     trainingConfig,
     isTaskChainMode,
-    configParameters,
     projectIdentifier,
     dynamicRequiredAnnotationsConfig,
     requiredImagesAutoTrainingConfig,
+    updateTrainingParametersLegacy,
 }) => {
     const [requiredAnnotations] = useRequiredAnnotations(task);
-    const autoTrainingOptimisticUpdates = useReconfigAutoTraining(projectIdentifier);
 
     const { data } = useGetRunningJobs({ projectId: projectIdentifier.projectId });
 
     const runningTaskJobs = (getAllJobs(data) as RunningTrainingJob[]).filter(
         hasEqualProjectAndTask(projectIdentifier.projectId, task.title)
     );
-
-    const updateTrainingParametersLegacy = ({
-        newConfigParameter,
-        onOptimisticUpdate,
-    }: Pick<UseReconfigureParams, 'newConfigParameter' | 'onOptimisticUpdate'>) => {
-        autoTrainingOptimisticUpdates.mutate({
-            configParameters,
-            onOptimisticUpdate,
-            newConfigParameter,
-        });
-    };
 
     const updateDynamicRequiredAnnotations = (value: boolean) => {
         if (dynamicRequiredAnnotationsConfig === undefined) {
@@ -139,7 +130,7 @@ export const AutoTrainingSwitch: FC<AutoTrainingSwitchProps> = ({
 
         updateTrainingParametersLegacy({
             newConfigParameter: {
-                ...dynamicRequiredAnnotationsConfig,
+                ...(dynamicRequiredAnnotationsConfig as BooleanGroupParams),
                 value,
             },
             onOptimisticUpdate: (config) => {
@@ -163,7 +154,7 @@ export const AutoTrainingSwitch: FC<AutoTrainingSwitchProps> = ({
 
         updateTrainingParametersLegacy({
             newConfigParameter: {
-                ...requiredImagesAutoTrainingConfig,
+                ...(requiredImagesAutoTrainingConfig as NumberGroupParams),
                 value: newNumberOfRequiredAnnotations,
             },
             onOptimisticUpdate: (config) => {
@@ -188,7 +179,7 @@ export const AutoTrainingSwitch: FC<AutoTrainingSwitchProps> = ({
 
         updateTrainingParametersLegacy({
             newConfigParameter: {
-                ...trainingConfig,
+                ...(trainingConfig as BooleanGroupParams),
                 value,
             },
             onOptimisticUpdate: (config) => {
