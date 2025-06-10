@@ -30,7 +30,7 @@ import { CustomTabItem } from '../../../shared/components/custom-tab-item/custom
 import { DeleteDialog } from '../../../shared/components/delete-dialog/delete-dialog.component';
 import { EditNameDialog } from '../../../shared/components/edit-name-dialog/edit-name-dialog.component';
 import { HasPermission } from '../../../shared/components/has-permission/has-permission.component';
-import { OPERATION_NEW, OPERATION_OLD } from '../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION_NEW } from '../../../shared/components/has-permission/has-permission.interface';
 import { TabItem } from '../../../shared/components/tabs/tabs.interface';
 import { getUniqueNameFromArray, hasEqualId } from '../../../shared/utils';
 import { MAX_LENGTH_OF_WORKSPACE_NAME, MIN_LENGTH_OF_WORKSPACE_NAME } from '../../user-management/workspaces/utils';
