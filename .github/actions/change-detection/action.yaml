@@ -29,17 +29,15 @@ runs:
 
       run: |
         
-        CHANGED_KEYS=${{ steps.changed-files.outputs.changed_keys }}
-        ALL_CHANGED=${{ steps.changed-files.outputs.all_changed_files }}
-        BASE_SHA=${{ steps.changed-files.outputs.base }}
-        HEAD_SHA=${{ steps.changed-files.outputs.head }}
-        GET_ALL=${{ inputs.get_all }}
+        CHANGED_KEYS="${{ steps.changed-files.outputs.changed_keys }}"
+        ALL_CHANGED="${{ steps.changed-files.outputs.all_changed_files }}"
+        GET_ALL="${{ inputs.get_all }}"
         
-        echo "GET_ALL ==> $GET_ALL"
-        
+        echo "CHANGED_KEYS ==> $CHANGED_KEYS"
         echo "ALL_CHANGED ==> $ALL_CHANGED"
-        echo "BASE_SHA ==> $BASE_SHA"
-        echo "GET_ALL ==> $HEAD_SHA"
+        echo "steps.changed-files.outputs.changed_keys ${{ steps.changed-files.outputs.changed_keys }}"
+        
+        
 
         if [[ "$GET_ALL" == "true" ]]; then
            paths_list=$(yq -r '... comments=""' "${PATH_FILTER}" | yq -r 'keys[]' | jq -R . | jq -sc .)
