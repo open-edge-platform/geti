@@ -96,18 +96,22 @@ export const useProjectConfigurationMutation = () => {
                 const updatedConfiguration: ProjectConfiguration = {
                     taskConfigs: previousConfiguration.taskConfigs.map((taskConfig) => {
                         if (taskConfig.taskId === queryParameters?.taskId || queryParameters?.taskId === undefined) {
+                            const payloadTaskConfig = payload.taskConfigs.find(
+                                (config) => config.taskId === taskConfig.taskId
+                            );
+
                             return {
                                 ...taskConfig,
                                 autoTraining:
-                                    payload.autoTraining === undefined
+                                    payloadTaskConfig?.autoTraining === undefined
                                         ? taskConfig.autoTraining
-                                        : getUpdatedParameters(payload.autoTraining, taskConfig.autoTraining),
+                                        : getUpdatedParameters(payloadTaskConfig.autoTraining, taskConfig.autoTraining),
                                 training:
-                                    payload.training === undefined
+                                    payloadTaskConfig?.training === undefined
                                         ? taskConfig.training
                                         : {
                                               constraints: getUpdatedParameters(
-                                                  payload.training.constraints,
+                                                  payloadTaskConfig.training.constraints,
                                                   taskConfig.training.constraints
                                               ),
                                           },

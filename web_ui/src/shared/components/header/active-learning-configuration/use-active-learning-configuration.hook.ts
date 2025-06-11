@@ -47,10 +47,15 @@ export const useActiveLearningConfiguration = (
         updateProjectConfiguration({
             taskId,
             payload: {
-                autoTraining: [
+                taskConfigs: [
                     {
-                        key: 'enable',
-                        value,
+                        taskId,
+                        autoTraining: [
+                            {
+                                key: 'enable',
+                                value,
+                            },
+                        ],
                     },
                 ],
             },
@@ -61,10 +66,15 @@ export const useActiveLearningConfiguration = (
         updateProjectConfiguration({
             taskId,
             payload: {
-                autoTraining: [
+                taskConfigs: [
                     {
-                        key: 'enable_dynamic_required_annotations',
-                        value,
+                        taskId,
+                        autoTraining: [
+                            {
+                                key: 'enable_dynamic_required_annotations',
+                                value,
+                            },
+                        ],
                     },
                 ],
             },
@@ -75,10 +85,15 @@ export const useActiveLearningConfiguration = (
         updateProjectConfiguration({
             taskId,
             payload: {
-                autoTraining: [
+                taskConfigs: [
                     {
-                        key: 'required_images_auto_training',
-                        value,
+                        taskId,
+                        autoTraining: [
+                            {
+                                key: 'required_images_auto_training',
+                                value,
+                            },
+                        ],
                     },
                 ],
             },

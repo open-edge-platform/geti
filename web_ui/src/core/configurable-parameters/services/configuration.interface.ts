@@ -47,10 +47,13 @@ interface ProjectConfigurationTaskConfigs {
 export type KeyValueParameter = Pick<ConfigurationParameter, 'key' | 'value'>;
 
 export interface ProjectConfigurationUploadPayload {
-    training?: {
-        constraints: KeyValueParameter[];
-    };
-    autoTraining?: KeyValueParameter[];
+    taskConfigs: {
+        taskId: string;
+        training?: {
+            constraints: KeyValueParameter[];
+        };
+        autoTraining?: KeyValueParameter[];
+    }[];
 }
 
 export interface ProjectConfiguration {

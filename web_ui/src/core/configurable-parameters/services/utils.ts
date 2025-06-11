@@ -368,23 +368,27 @@ export const getTrainingConfigurationUpdatePayloadDTO = (
 export const getProjectConfigurationUploadPayloadDTO = (
     payload: ProjectConfigurationUploadPayload
 ): ProjectConfigurationUploadPayloadDTO => {
-    const projectConfigurationUploadPayloadDTO: ProjectConfigurationUploadPayloadDTO = {};
+    const projectConfigurationUploadPayloadDTO: ProjectConfigurationUploadPayloadDTO = {
+        task_configs: payload.taskConfigs.map((taskConfig) => {
+            const { taskId, training, autoTraining } = taskConfig;
 
-    if (payload.training !== undefined) {
-        projectConfigurationUploadPayloadDTO.training = {
-            constraints: payload.training.constraints.map((parameter) => ({
-                key: parameter.key,
-                value: parameter.value,
-            })),
-        };
-    }
-
-    if (payload.autoTraining !== undefined) {
-        projectConfigurationUploadPayloadDTO.auto_training = payload.autoTraining.map((parameter) => ({
-            key: parameter.key,
-            value: parameter.value,
-        }));
-    }
+            return {
+                task_id: taskId,
+                training: training
+                    ? {
+                          constraints: training.constraints.map((parameter) => ({
+                              key: parameter.key,
+                              value: parameter.value,
+                          })),
+                      }
+                    : undefined,
+                auto_training: autoTraining?.map((parameter) => ({
+                    key: parameter.key,
+                    value: parameter.value,
+                })),
+            };
+        }),
+    };
 
     return projectConfigurationUploadPayloadDTO;
 };

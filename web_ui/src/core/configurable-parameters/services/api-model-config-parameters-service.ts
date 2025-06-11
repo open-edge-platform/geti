@@ -11,10 +11,11 @@ import {
     ConfigurableParametersReconfigureDTO,
     ConfigurableParametersTaskChainDTO,
 } from '../dtos/configurable-parameters.interface';
-import { ProjectConfigurationDTO, ProjectConfigurationUploadPayloadDTO } from '../dtos/configuration.interface';
+import { ProjectConfigurationDTO } from '../dtos/configuration.interface';
 import { ConfigurableParametersTaskChain } from './configurable-parameters.interface';
 import {
     ProjectConfiguration,
+    ProjectConfigurationUploadPayload,
     TrainingConfiguration,
     TrainingConfigurationUpdatePayload,
 } from './configuration.interface';
@@ -59,7 +60,7 @@ export interface CreateApiModelConfigParametersService {
     getProjectConfiguration: (projectIdentifier: ProjectIdentifier) => Promise<ProjectConfiguration>;
     updateProjectConfiguration: (
         projectIdentifier: ProjectIdentifier,
-        payload: ProjectConfigurationUploadPayloadDTO,
+        payload: ProjectConfigurationUploadPayload,
         queryParameters?: ProjectConfigurationQueryParameters
     ) => Promise<void>;
 
