@@ -2,6 +2,10 @@ name: Package distribution workflow
 on:
   workflow_call:
     inputs:
+      build-all:
+        description: "If the triggering workflow is running in build-all-components mode"
+        type: boolean
+        required: true
       build-version:
         description: "Specifies the build version to apply to all binaries produced by this workflow"
         type: string
@@ -26,6 +30,7 @@ jobs:
   package-distribution-workflow:
     name: Build platform distribution binaries
     runs-on: ubuntu-latest
+    if: ${{ inputs.build-all }}
     permissions:
       contents: read
       id-token: write
