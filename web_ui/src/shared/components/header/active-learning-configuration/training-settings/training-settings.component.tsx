@@ -10,8 +10,7 @@ import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { hasActiveModels } from '../../../../../core/models/utils';
 import { Task } from '../../../../../core/projects/task.interface';
 import { useProject } from '../../../../../pages/project-details/providers/project-provider/project-provider.component';
-import { useActiveLearningConfiguration } from '../use-active-learning-configuratrion.hook';
-import { useAutoTrainingTasksConfig } from '../use-tasks-auto-training-config.hook';
+import { useActiveLearningConfiguration } from '../use-active-learning-configuration.hook';
 import { AutoTrainingSwitch } from './auto-training-switch.component';
 
 interface TaskPickerProps {
@@ -48,10 +47,13 @@ export const TrainingSettings = ({ selectedTask: defaultSelectedTask }: { select
 
     const { useProjectModelsQuery } = useModels();
     const { data: modelsData = [], isLoading: isLoadingModels } = useProjectModelsQuery();
-    const { autoTrainingTasks, isPending, updateTrainingParameters } = useActiveLearningConfiguration(
-        projectIdentifier,
-        project.tasks
-    );
+    const {
+        autoTrainingTasks,
+        isPending,
+        updateRequiredImagesAutoTraining,
+        updateDynamicRequiredAnnotations,
+        updateAutoTraining,
+    } = useActiveLearningConfiguration(projectIdentifier, project.tasks);
 
     const filteredAutoTrainingTask = isNil(defaultSelectedTask)
         ? autoTrainingTasks
@@ -83,7 +85,13 @@ export const TrainingSettings = ({ selectedTask: defaultSelectedTask }: { select
                 dynamicRequiredAnnotationsConfig={autoTrainingTask.dynamicRequiredAnnotationsConfig}
                 requiredImagesAutoTrainingConfig={autoTrainingTask.requiredImagesAutoTrainingConfig}
                 projectIdentifier={projectIdentifier}
-                updateTrainingParametersLegacy={updateTrainingParameters}
+                onUpdateDynamicRequiredAnnotations={(value) =>
+                    updateDynamicRequiredAnnotations(autoTrainingTask.task.id, value)
+                }
+                onUpdateRequiredImagesAutoTraining={(value) =>
+                    updateRequiredImagesAutoTraining(autoTrainingTask.task.id, value)
+                }
+                onUpdateAutoTraining={(value) => updateAutoTraining(autoTrainingTask.task.id, value)}
             />
         </View>
     );

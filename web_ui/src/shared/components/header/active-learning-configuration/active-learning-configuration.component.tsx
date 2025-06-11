@@ -21,8 +21,7 @@ import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { Task } from '../../../../core/projects/task.interface';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
 import { ActiveLearningConfigurationContent } from './active-learning-configuration-content.component';
-import { useActiveLearningConfiguration } from './use-active-learning-configuratrion.hook';
-import { useAutoTrainingTasksConfig } from './use-tasks-auto-training-config.hook';
+import { useActiveLearningConfiguration } from './use-active-learning-configuration.hook';
 import { getAllAutoTrainingValue, getNotificationConfig } from './util';
 
 import classes from './auto-training.module.scss';
@@ -41,7 +40,7 @@ const ActiveLearningConfigurationDialog = ({ selectedTask }: { selectedTask: Tas
     const { project, projectIdentifier } = useProject();
     const { useProjectModelsQuery } = useModels();
     const { isLoading: isLoadingModels } = useProjectModelsQuery();
-    const { isPending } = useAutoTrainingTasksConfig(projectIdentifier, project.tasks);
+    const { isPending } = useActiveLearningConfiguration(projectIdentifier, project.tasks);
 
     const isLoadingData = isPending || isLoadingModels;
 
@@ -74,8 +73,7 @@ export const ActiveLearningConfiguration = ({
     selectedTask,
 }: ActiveLearningConfigurationProps): JSX.Element => {
     const { project, projectIdentifier } = useProject();
-    const { autoTrainingTasks, isPending } = useAutoTrainingTasksConfig(projectIdentifier, project.tasks);
-    useActiveLearningConfiguration(projectIdentifier, project.tasks);
+    const { autoTrainingTasks, isPending } = useActiveLearningConfiguration(projectIdentifier, project.tasks);
 
     const filteredTaskAutoTraining = autoTrainingTasks.filter(({ task }) => task.id === selectedTask?.id);
     const filteredAutoTrainingTask = isNil(selectedTask) ? autoTrainingTasks : filteredTaskAutoTraining;

@@ -15,19 +15,16 @@ import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-featur
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { Task } from '../../../../core/projects/task.interface';
 import { isNotCropTask } from '../../../utils';
-import { AutoTrainingTask } from './util';
+import { UseActiveLearningConfigurationReturnType } from './util';
 
+/**
+ * @deprecated
+ * This hook is deprecated, please use `useActiveLearningConfiguration` instead.
+ * */
 export const useAutoTrainingTasksConfig = (
     projectIdentifier: ProjectIdentifier,
     tasks: Task[]
-): {
-    isPending: boolean;
-    autoTrainingTasks: AutoTrainingTask[];
-    updateTrainingParameters: ({
-        newConfigParameter,
-        onOptimisticUpdate,
-    }: Pick<UseReconfigureParams, 'newConfigParameter' | 'onOptimisticUpdate'>) => void;
-} => {
+): UseActiveLearningConfigurationReturnType => {
     const { FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS } = useFeatureFlags();
 
     const { useGetConfigParameters } = useConfigParameters(projectIdentifier);
@@ -35,7 +32,7 @@ export const useAutoTrainingTasksConfig = (
 
     const autoTrainingOptimisticUpdates = useReconfigAutoTraining(projectIdentifier);
 
-    const updateTrainingParameters = ({
+    const updateProjectConfiguration = ({
         newConfigParameter,
         onOptimisticUpdate,
     }: Pick<UseReconfigureParams, 'newConfigParameter' | 'onOptimisticUpdate'>) => {
@@ -43,6 +40,90 @@ export const useAutoTrainingTasksConfig = (
             configParameters: configParameters ?? [],
             onOptimisticUpdate,
             newConfigParameter,
+        });
+    };
+
+    const updateAutoTraining = (taskId: string, value: boolean) => {
+        if (configParameters === undefined) {
+            return;
+        }
+
+        const autoTrainingConfig = findAutoTrainingConfig(taskId, configParameters);
+
+        if (autoTrainingConfig === undefined) {
+            return;
+        }
+
+        updateProjectConfiguration({
+            newConfigParameter: {
+                ...autoTrainingConfig,
+                value,
+            },
+            onOptimisticUpdate: (config) => {
+                const autoTrainingConfigOptimistic = findAutoTrainingConfig(taskId, config);
+
+                if (autoTrainingConfigOptimistic !== undefined) {
+                    autoTrainingConfigOptimistic.value = value;
+                }
+
+                return config;
+            },
+        });
+    };
+
+    const updateDynamicRequiredAnnotations = (taskId: string, value: boolean) => {
+        if (configParameters === undefined) {
+            return;
+        }
+
+        const dynamicRequiredAnnotationsConfig = findDynamicRequiredAnnotationsConfig(taskId, configParameters);
+
+        if (dynamicRequiredAnnotationsConfig === undefined) {
+            return;
+        }
+
+        updateProjectConfiguration({
+            newConfigParameter: {
+                ...dynamicRequiredAnnotationsConfig,
+                value,
+            },
+            onOptimisticUpdate: (config) => {
+                const dynamicRequiredAnnotationsConfigOptimistic = findDynamicRequiredAnnotationsConfig(taskId, config);
+
+                if (dynamicRequiredAnnotationsConfigOptimistic !== undefined) {
+                    dynamicRequiredAnnotationsConfigOptimistic.value = value;
+                }
+
+                return config;
+            },
+        });
+    };
+
+    const updateRequiredImagesAutoTraining = (taskId: string, value: number) => {
+        if (configParameters === undefined) {
+            return;
+        }
+
+        const requiredImagesAutoTrainingConfig = findRequiredImagesAutoTrainingConfig(taskId, configParameters);
+
+        if (requiredImagesAutoTrainingConfig === undefined) {
+            return;
+        }
+
+        updateProjectConfiguration({
+            newConfigParameter: {
+                ...requiredImagesAutoTrainingConfig,
+                value,
+            },
+            onOptimisticUpdate: (config) => {
+                const requiredImagesAutoTrainingConfigOptimistic = findRequiredImagesAutoTrainingConfig(taskId, config);
+
+                if (requiredImagesAutoTrainingConfigOptimistic !== undefined) {
+                    requiredImagesAutoTrainingConfigOptimistic.value = value;
+                }
+
+                return config;
+            },
         });
     };
 
@@ -59,5 +140,11 @@ export const useAutoTrainingTasksConfig = (
                 : findRequiredImagesAutoTrainingConfig(task.id, configParameters),
     }));
 
-    return { autoTrainingTasks, isPending, updateTrainingParameters };
+    return {
+        autoTrainingTasks,
+        isPending,
+        updateAutoTraining,
+        updateDynamicRequiredAnnotations,
+        updateRequiredImagesAutoTraining,
+    };
 };

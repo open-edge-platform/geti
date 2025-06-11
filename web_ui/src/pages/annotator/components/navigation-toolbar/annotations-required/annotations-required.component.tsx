@@ -9,7 +9,7 @@ import { isEmpty, isEqual, isNil } from 'lodash-es';
 import { ProjectIdentifier } from '../../../../../core/projects/core.interface';
 import { useProjectStatus } from '../../../../../core/projects/hooks/use-project-status.hook';
 import { Task } from '../../../../../core/projects/task.interface';
-import { useAutoTrainingTasksConfig } from '../../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
+import { useActiveLearningConfiguration } from '../../../../../shared/components/header/active-learning-configuration/use-active-learning-configuration.hook';
 import { getAllAutoTrainingValue } from '../../../../../shared/components/header/active-learning-configuration/util';
 import { hasEqualId } from '../../../../../shared/utils';
 import { useProject } from '../../../../project-details/providers/project-provider/project-provider.component';
@@ -67,7 +67,7 @@ export const AnnotationsRequired = ({ id, selectedTask }: AnnotationsRequiredPro
     const containerRef = useRef<HTMLDivElement>({} as HTMLDivElement);
     const isTaskTraining = useIsTaskTraining(projectIdentifier);
     const requiredAnnotations = useRequiredAnnotations(selectedTask);
-    const { autoTrainingTasks, isPending: isTasksConfigLoading } = useAutoTrainingTasksConfig(
+    const { autoTrainingTasks, isPending: isTasksConfigLoading } = useActiveLearningConfiguration(
         projectIdentifier,
         project.tasks
     );

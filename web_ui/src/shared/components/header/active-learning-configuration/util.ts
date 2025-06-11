@@ -9,6 +9,10 @@ import {
     BooleanGroupParams,
     NumberGroupParams,
 } from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import {
+    BoolParameter,
+    NumberParameter,
+} from '../../../../core/configurable-parameters/services/configuration.interface';
 import { Task } from '../../../../core/projects/task.interface';
 
 interface AutoTrainingNotificationConfig {
@@ -17,11 +21,19 @@ interface AutoTrainingNotificationConfig {
     styles: CSSProperties;
 }
 
-export interface AutoTrainingTask {
+interface AutoTrainingTask {
     task: Task;
-    trainingConfig?: BooleanGroupParams;
-    dynamicRequiredAnnotationsConfig?: BooleanGroupParams;
-    requiredImagesAutoTrainingConfig?: NumberGroupParams;
+    trainingConfig?: BooleanGroupParams | BoolParameter;
+    dynamicRequiredAnnotationsConfig?: BooleanGroupParams | BoolParameter;
+    requiredImagesAutoTrainingConfig?: NumberGroupParams | NumberParameter;
+}
+
+export interface UseActiveLearningConfigurationReturnType {
+    autoTrainingTasks: AutoTrainingTask[];
+    isPending: boolean;
+    updateAutoTraining: (taskId: string, value: boolean) => void;
+    updateDynamicRequiredAnnotations: (taskId: string, value: boolean) => void;
+    updateRequiredImagesAutoTraining: (taskId: string, value: number) => void;
 }
 
 export const getAllAutoTrainingValue = (autoTrainingValues: boolean[]) => {

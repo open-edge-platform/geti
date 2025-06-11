@@ -7,15 +7,19 @@ import {
 } from '../../../../core/configurable-parameters/hooks/use-project-configuration.hook';
 import {
     BoolParameter,
-    NumberParameter,
+    ProjectConfigurationUploadPayload,
 } from '../../../../core/configurable-parameters/services/configuration.interface';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { Task } from '../../../../core/projects/task.interface';
 import { isNotCropTask } from '../../../utils';
 import { useAutoTrainingTasksConfig } from './use-tasks-auto-training-config.hook';
+import { UseActiveLearningConfigurationReturnType } from './util';
 
-export const useActiveLearningConfiguration = (projectIdentifier: ProjectIdentifier, tasks: Task[]) => {
+export const useActiveLearningConfiguration = (
+    projectIdentifier: ProjectIdentifier,
+    tasks: Task[]
+): UseActiveLearningConfigurationReturnType => {
     const { FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS } = useFeatureFlags();
     const { data: projectConfiguration, isPending } = useProjectConfigurationQuery(projectIdentifier, {
         enabled: FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS,
@@ -25,20 +29,59 @@ export const useActiveLearningConfiguration = (projectIdentifier: ProjectIdentif
     const notCropTasks = tasks.filter(isNotCropTask);
     const istTaskChain = notCropTasks.length > 1;
 
-    // TODO: check if we can use KeyValueParameter
-    // Decide if we can do updateAutoTraining, updateDynamicRequiredAnnotations, and updateRequiredImagesAutoTraining here
-    // so we can share the same interface for all updates: taskId?: string, value: boolean | number
-    const updateTrainingParameters = ({
+    const updateProjectConfiguration = ({
         taskId,
+        payload,
     }: {
         taskId?: string;
-        key: string;
-        value: string | number | boolean;
+        payload: ProjectConfigurationUploadPayload;
     }) => {
         projectConfigurationMutation.mutate({
             projectIdentifier,
+            payload,
             queryParameters: istTaskChain ? { taskId } : undefined,
-            payload: {},
+        });
+    };
+
+    const updateAutoTraining = (taskId: string, value: boolean) => {
+        updateProjectConfiguration({
+            taskId,
+            payload: {
+                autoTraining: [
+                    {
+                        key: 'enable',
+                        value,
+                    },
+                ],
+            },
+        });
+    };
+
+    const updateDynamicRequiredAnnotations = (taskId: string, value: boolean) => {
+        updateProjectConfiguration({
+            taskId,
+            payload: {
+                autoTraining: [
+                    {
+                        key: 'enable_dynamic_required_annotations',
+                        value,
+                    },
+                ],
+            },
+        });
+    };
+
+    const updateRequiredImagesAutoTraining = (taskId: string, value: number) => {
+        updateProjectConfiguration({
+            taskId,
+            payload: {
+                autoTraining: [
+                    {
+                        key: 'required_images_auto_training',
+                        value,
+                    },
+                ],
+            },
         });
     };
 
@@ -74,7 +117,9 @@ export const useActiveLearningConfiguration = (projectIdentifier: ProjectIdentif
         return {
             isPending,
             autoTrainingTasks,
-            updateTrainingParameters: () => {},
+            updateAutoTraining,
+            updateDynamicRequiredAnnotations,
+            updateRequiredImagesAutoTraining,
         };
     }
 
