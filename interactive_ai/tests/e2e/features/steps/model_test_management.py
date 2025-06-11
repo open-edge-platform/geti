@@ -1,4 +1,4 @@
-from behave import step, when
+from behave import then, when
 from geti_client import TriggerModelTestJobRequest
 
 
