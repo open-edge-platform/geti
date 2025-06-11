@@ -233,4 +233,4 @@ jobs:
     with:
       build-version: ${{ inputs.build-version }}
       component-dir: web_ui
-      push: ${{ inputs.publish_binaries }}
+      publish_binaries: ${{ inputs.publish_binaries }}
