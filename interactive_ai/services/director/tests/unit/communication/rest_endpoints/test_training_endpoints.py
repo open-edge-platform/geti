@@ -6,7 +6,6 @@ from http import HTTPStatus
 from unittest.mock import patch
 
 import numpy as np
-import pytest
 
 from communication.controllers.training_controller import TrainingController
 
@@ -38,17 +37,12 @@ def do_nothing(self, *args, **kwargs) -> None:
 
 
 class TestTrainingRESTEndpoint:
-    @pytest.mark.parametrize(
-        "endpoint_path",
-        [API_TRAIN_PATTERN, API_TRAIN_PATTERN_LEGACY],
-        ids=[":train", "/train (legacy)"],
-    )
-    def test_train_endpoint(self, fxt_director_app, endpoint_path) -> None:
+    def test_train_endpoint(self, fxt_director_app) -> None:
         request_data = DUMMY_DATA
         dummy_job_rest = {"dummy_job_rest_key": "dummy_job_rest_value"}
 
         with patch.object(TrainingController, "train_task", return_value=dummy_job_rest) as mock_train_task:
-            result = fxt_director_app.post(endpoint_path, json=request_data)
+            result = fxt_director_app.post(API_TRAIN_PATTERN, json=request_data)
 
         mock_train_task.assert_called_once_with(
             project_id=ID(DUMMY_PROJECT_ID), raw_train_config=DUMMY_DATA, author=DUMMY_USER
@@ -63,25 +57,3 @@ class TestTrainingRESTEndpoint:
         mock_train_task.assert_called_once_with(project_id=ID(DUMMY_PROJECT_ID), raw_train_config={}, author=DUMMY_USER)
         assert result.status_code == HTTPStatus.OK
         assert json.loads(result.content) == dummy_job_rest
-
-    @pytest.mark.parametrize(
-        "endpoint_path",
-        [API_TRAIN_PATTERN_LEGACY, API_TRAIN_PATTERN],
-        ids=["/train (legacy)", ":train"],
-    )
-    def test_train_endpoint_deprecated_headers(self, fxt_director_app, endpoint_path) -> None:
-        """
-        Tests if the headers are added correctly when the deprecated endpoint is used.
-        """
-        dummy_job_rest = {"dummy_job_rest_key": "dummy_job_rest_value"}
-        with patch.object(TrainingController, "train_task", return_value=dummy_job_rest):
-            result = fxt_director_app.post(endpoint_path)
-            # Check if the Deprecation and Warning headers are added
-        if endpoint_path == API_TRAIN_PATTERN_LEGACY:
-            assert "Deprecation" in result.headers
-            assert "Sunset" in result.headers
-            assert "Link" in result.headers
-        else:
-            assert "Deprecation" not in result.headers
-            assert "Sunset" not in result.headers
-            assert "Link" not in result.headers

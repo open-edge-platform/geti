@@ -5,7 +5,6 @@ import json
 from http import HTTPStatus
 from unittest.mock import patch
 
-import pytest
 from testfixtures import compare
 
 from communication.controllers.optimization_controller import OptimizationController
@@ -32,12 +31,7 @@ def do_nothing(self, *args, **kwargs) -> None:
 
 
 class TestOptimizationRESTEndpoint:
-    @pytest.mark.parametrize(
-        "endpoint_path",
-        [API_OPTIMIZE_PATTERN, API_OPTIMIZE_PATTERN_LEGACY],
-        ids=[":optimize", "/optimize (legacy)"],
-    )
-    def test_model_optimization_endpoint(self, fxt_director_app, endpoint_path) -> None:
+    def test_model_optimization_endpoint(self, fxt_director_app) -> None:
         dummy_jobs_rest = {"dummy_job_rest_key": "dummy_job_rest_value"}
 
         with (
@@ -48,7 +42,7 @@ class TestOptimizationRESTEndpoint:
                 return_value=dummy_jobs_rest,
             ) as mock_optimization_result,
         ):
-            result = fxt_director_app.post(endpoint_path)
+            result = fxt_director_app.post(API_OPTIMIZE_PATTERN)
 
         mock_optimization_result.assert_called_once_with(
             project_id=ID(DUMMY_PROJECT_ID),
@@ -58,29 +52,3 @@ class TestOptimizationRESTEndpoint:
         )
         assert result.status_code == HTTPStatus.OK
         compare(json.loads(result.content), dummy_jobs_rest, ignore_eq=True)
-
-    @pytest.mark.parametrize(
-        "endpoint_path",
-        [API_OPTIMIZE_PATTERN, API_OPTIMIZE_PATTERN_LEGACY],
-        ids=[":optimize", "/optimize (legacy)"],
-    )
-    def test_optimize_endpoint_deprecated_headers(self, fxt_director_app, endpoint_path) -> None:
-        dummy_jobs_rest = {"dummy_job_rest_key": "dummy_job_rest_value"}
-
-        with (
-            patch.object(OptimizationController, "__init__", new=do_nothing),
-            patch.object(
-                OptimizationController,
-                "start_optimization",
-                return_value=dummy_jobs_rest,
-            ),
-        ):
-            result = fxt_director_app.post(endpoint_path)
-            if endpoint_path == API_OPTIMIZE_PATTERN_LEGACY:
-                assert "Deprecation" in result.headers
-                assert "Sunset" in result.headers
-                assert "Link" in result.headers
-            else:
-                assert "Deprecation" not in result.headers
-                assert "Sunset" not in result.headers
-                assert "Link" not in result.headers
