@@ -206,6 +206,7 @@ export const WorkspacesTabs = (): JSX.Element => {
                                                 <CornerIndicator
                                                     isActive={defaultWorkspaceId === item.key}
                                                     position='left'
+                                                    containerStyle={{ display: 'flex' }}
                                                 >
                                                     <CustomTabItemWithMenu
                                                         name={item.name as string}
