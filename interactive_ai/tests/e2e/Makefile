@@ -49,11 +49,11 @@ tests: venv
 		echo "Selected tags: $(BDD_TAG)"; \
 		TAG_OPTION='--tags=$(BDD_TAG)'; \
 	fi; \
-		export no_proxy=localhost,127.0.0.1,10.0.0.1/8 && uv run -m behave $$TAG_OPTION $$TARGET --no-skipped --junit --junit-directory $(MAKEFILE_DIR)/reports/junit
+		uv run -m behave $$TAG_OPTION $$TARGET --no-skipped --junit --junit-directory $(MAKEFILE_DIR)/reports/junit
 
 test_wip: venv
 	@echo "Running WIP tests..."
-	export no_proxy=localhost,127.0.0.1,10.0.0.1/8 && uv run behave --wip features
+	uv run behave --wip features
 
 test_smoke: venv
 	@$(MAKE) tests BDD_TAG=@smoke
