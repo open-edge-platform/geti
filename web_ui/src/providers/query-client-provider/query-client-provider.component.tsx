@@ -16,6 +16,19 @@ import { isAxiosError } from 'axios';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
 
+declare module '@tanstack/react-query' {
+    interface Register {
+        queryMeta: {
+            notifyOnError?: boolean;
+            errorMessage?: string;
+            disableGlobalErrorHandling?: boolean;
+        };
+        mutationMeta: {
+            notifyOnError?: boolean;
+        };
+    }
+}
+
 export const QueryClientProvider = ({
     children,
     defaultQueryOptions,
