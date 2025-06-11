@@ -4,6 +4,7 @@
 .PHONY: build clean push static-code-analysis tests test-unit test-integration test-component
 .DEFAULT_GOAL := build
 PROJECTS = interactive_ai platform web_ui
+DISTRIB_CHARTS := deploy/charts
 
 build-image:
 	echo "Building images for all projects..."
@@ -19,6 +20,10 @@ build-chart:
 		$(MAKE) -C $$dir build-chart; \
 	done
 
+build-umbrella-chart: build-chart
+	echo "Building umbrella charts for..."
+	$(MAKE) -C $(DISTRIB_CHARTS) build-chart
+
 clean:
 	echo "Cleaning all projects..."	
 	@for dir in $(PROJECTS); do \
@@ -32,6 +37,10 @@ publish-image:
 		echo "Running make publish-image in $$dir..."; \
 		$(MAKE) -C $$dir publish-image; \
 	done
+
+publish-umbrella-chart: build-umbrella-chart
+	echo "publishing umbrella charts for..."
+	$(MAKE) -C $(UMBRELLA_CHARTS) publish-chart
 
 static-code-analysis:
 	echo "Running static code analysis for all projects..."

@@ -25,7 +25,7 @@ const VideoTiming = () => {
 };
 
 export const Camera = ({ selectedLabels }: CameraFactoryProps): JSX.Element => {
-    const { isLivePrediction, isPhotoCaptureMode } = useCameraParams();
+    const { isPhotoCaptureMode } = useCameraParams();
     const { webcamRef } = useDeviceSettings();
 
     const CaptureButton = isPhotoCaptureMode ? CapturePhotoButton : CaptureVideoButton;
@@ -36,7 +36,7 @@ export const Camera = ({ selectedLabels }: CameraFactoryProps): JSX.Element => {
             <CameraView className={classes.webCam} />
             <Flex width={'100%'} marginTop={'size-250'} direction={'row'}>
                 <Flex width={'20%'} alignSelf={'center'}>
-                    {!isLivePrediction && <CaptureModeButton />}
+                    <CaptureModeButton />
                 </Flex>
                 <Flex width={'60%'} justifyContent={'center'}>
                     <CaptureButton webcamRef={webcamRef} selectedLabels={selectedLabels} />

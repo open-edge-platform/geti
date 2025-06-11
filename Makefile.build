@@ -39,6 +39,9 @@ publish-image-python:
 build-chart:
 	@$(call run_for_each,$(PACKAGABLE_SUBPROJECTS),Building charts for components,build-chart)
 
+publish-chart:
+	@$(call run_for_each,$(PACKAGABLE_SUBPROJECTS),Building charts for components,publish-chart)
+
 .PHONY: tests
 tests: tests-go tests-python
 
