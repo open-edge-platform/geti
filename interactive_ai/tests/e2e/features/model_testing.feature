@@ -3,7 +3,7 @@
 
 
 Feature: Model Testing
-  The user can test and evaluate trained models on different datasets.
+  The user can test and evaluate trained models on a dataset.
 
   Background: Geti platform with a workspace
     Given a workspace
