@@ -37,6 +37,38 @@ class ModelManifestDeprecationStatus(str, Enum):
         return str(self.name)
 
 
+class PerformanceRatings(BaseModel):
+    """Ratings for different performance aspects of a model."""
+
+    accuracy: int = Field(
+        ge=1,
+        le=3,
+        default=1,
+        title="Accuracy rating",
+        description="Rating of the model accuracy. "
+        "The value should be interpreted relatively to the other available models, "
+        "and it ranges from 1 (below average) to 3 (above average).",
+    )
+    training_time: int = Field(
+        ge=1,
+        le=3,
+        default=1,
+        title="Training time rating",
+        description="Rating of the model training time. "
+        "The value should be interpreted relatively to the other available models, "
+        "and it ranges from 1 (below average/slower) to 3 (above average/faster).",
+    )
+    inference_speed: int = Field(
+        ge=1,
+        le=3,
+        default=1,
+        title="Inference speed rating",
+        description="Rating of the model inference speed. "
+        "The value should be interpreted relatively to the other available models, "
+        "and it ranges from 1 (below average/slower) to 3 (above average/faster).",
+    )
+
+
 class ModelStats(BaseModel):
     """Information about a machine learning model."""
 
@@ -45,6 +77,9 @@ class ModelStats(BaseModel):
     )
     trainable_parameters: int = Field(
         gt=0, title="Trainable parameters", description="Number of trainable parameters in the model"
+    )
+    performance_ratings: PerformanceRatings = Field(
+        title="Performance ratings", description="Standardized ratings for model performance metrics"
     )
 
 
@@ -94,7 +129,13 @@ class NullModelManifest(ModelManifest):
     name: str = Field(default="null")
     description: str = Field(default="null")
     task: str = Field(default="null")
-    stats: ModelStats = Field(default=ModelStats(gigaflops=1, trainable_parameters=1))
+    stats: ModelStats = Field(
+        default=ModelStats(
+            gigaflops=1,
+            trainable_parameters=1,
+            performance_ratings=PerformanceRatings(),
+        )
+    )
     support_status: ModelManifestDeprecationStatus = Field(default=ModelManifestDeprecationStatus.OBSOLETE)
     supported_gpus: dict[GPUMaker, bool] = Field(default={})
     hyperparameters: Hyperparameters = Field(
