@@ -10,6 +10,7 @@ import {
     GeneralSettingsConfig,
     GlobalModalsConfig,
     TutorialConfig,
+    WorkspacesConfig,
 } from '../dtos/user-settings.interface';
 
 export type UserGlobalSettings =
@@ -17,7 +18,8 @@ export type UserGlobalSettings =
     | GeneralSettingsConfig
     | TutorialConfig
     | FuxNotificationsConfig
-    | FuxSettingsConfig;
+    | FuxSettingsConfig
+    | WorkspacesConfig;
 
 export type UserProjectSettings = AnnotatorSettingsConfig & CanvasSettingsConfig;
 

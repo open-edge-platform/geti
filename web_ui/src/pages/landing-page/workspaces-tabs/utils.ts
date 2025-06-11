@@ -3,4 +3,5 @@
 export enum WorkspaceMenuActions {
     DELETE = 'Delete workspace',
     EDIT = 'Edit workspace',
+    SET_AS_DEFAULT = 'Set as a default',
 }

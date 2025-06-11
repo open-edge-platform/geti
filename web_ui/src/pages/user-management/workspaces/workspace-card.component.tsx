@@ -4,7 +4,7 @@
 import { paths } from '@geti/core';
 import { RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
 import { WorkspaceEntity } from '@geti/core/src/workspaces/services/workspaces.interface';
-import { Button, Divider, Flex, Heading, View } from '@geti/ui';
+import { Button, CornerIndicator, Divider, Flex, Heading, View } from '@geti/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
@@ -20,14 +20,18 @@ import { MAX_LENGTH_OF_WORKSPACE_NAME, MIN_LENGTH_OF_WORKSPACE_NAME } from './ut
 interface WorkspaceCardProps {
     workspace: WorkspaceEntity;
     workspaces: WorkspaceEntity[];
+    isDefaultWorkspace: boolean;
 }
 
-export const WorkspaceCard = ({ workspace, workspaces }: WorkspaceCardProps): JSX.Element => {
+export const WorkspaceCard = ({ workspace, workspaces, isDefaultWorkspace }: WorkspaceCardProps): JSX.Element => {
     const navigate = useNavigate();
-    const { items, handleMenuAction, deleteDialog, editDialog } = useWorkspaceActions(workspaces.length);
+    const { getAvailableItems, handleMenuAction, deleteDialog, editDialog } = useWorkspaceActions(workspaces.length);
     const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
 
-    const workspaceActions = items.map((item) => ({ name: item, id: item }));
+    const workspaceActions = getAvailableItems(isDefaultWorkspace).map((item) => ({
+        name: item,
+        id: item,
+    }));
     const handleSeeMore = (): void => {
         navigate(paths.workspace({ organizationId: workspace.organizationId, workspaceId: workspace.id }));
     };
@@ -56,7 +60,12 @@ export const WorkspaceCard = ({ workspace, workspaces }: WorkspaceCardProps): JS
 
     return (
         <View borderWidth={'thin'} borderColor={'gray-200'} paddingY={'size-100'} paddingX={'size-200'} height={'100%'}>
-            <Heading margin={0}>{workspace.name}</Heading>
+            <CornerIndicator
+                testId={`${workspace.name}-default-workspace-indicator`}
+                isActive={FEATURE_FLAG_WORKSPACE_ACTIONS && isDefaultWorkspace}
+            >
+                <Heading margin={0}>{workspace.name}</Heading>
+            </CornerIndicator>
             <Divider size={'S'} marginY={'size-150'} />
             <Flex justifyContent={'space-between'}>
                 <Button
@@ -77,7 +86,7 @@ export const WorkspaceCard = ({ workspace, workspaces }: WorkspaceCardProps): JS
                     <ActionMenu<WorkspaceMenuActions>
                         items={workspaceActions}
                         id={`${workspace.name}-action-menu`}
-                        onAction={handleMenuAction}
+                        onAction={(key) => handleMenuAction(key, workspace.id)}
                     />
                 </HasPermission>
             </Flex>
