@@ -19,7 +19,7 @@ COPY --link --from=ghcr.io/astral-sh/uv:0.6.12 /uv /bin/uv
 
 COPY --link app .
 COPY --link --from=geti_controller_chart . geti_controller_chart
-COPY --link --from=libs . libs
+COPY --link --from=libs . ../../../libs
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \

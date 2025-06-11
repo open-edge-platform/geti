@@ -61,11 +61,11 @@ global:
   debian:
     registry: docker.io
     repository: bitnami
-    name: bitnami-shell:11-debian-11-r136
+    name: os-shell:12-debian-12-r42
   kubectl:
     registry: docker.io
     repository: bitnami
-    name: kubectl:1.31.0
+    name: kubectl:1.33.1
 
 # To meet Intel crypto compliance,
 # use ECDSA P-521 for the CA and P-384 for the leafs.

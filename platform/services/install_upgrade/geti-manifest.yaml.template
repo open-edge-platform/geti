@@ -12,7 +12,8 @@ metadata:
   namespace: default
 spec:
   version: $VERSION
-  chart: $REGISTRY/geti/helm/geti-namespaces
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/geti-namespaces
 ---
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
@@ -20,7 +21,8 @@ metadata:
   name: reloader
   namespace: kube-system
 spec:
-  chart: $REGISTRY/geti/helm/reloader
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/reloader
   version: $VERSION
   targetNamespace: kube-system
 ---
@@ -30,7 +32,8 @@ metadata:
   name: geti-pv-creation
   namespace: impt
 spec:
-  chart: $REGISTRY/geti/helm/geti-pv-creation
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/geti-pv-creation
   version: $VERSION
   valuesContent: |-
     dataStoragePath: {{ data_folder }}
@@ -41,7 +44,8 @@ metadata:
   name: cert-manager
   namespace: cert-manager
 spec:
-  chart: $REGISTRY/geti/helm/cert-manager
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/cert-manager
   version: $VERSION
   targetNamespace: cert-manager
 ---
@@ -51,7 +55,8 @@ metadata:
   name: cert-manager-istio-csr
   namespace: cert-manager
 spec:
-  chart: $REGISTRY/geti/helm/cert-manager-istio-csr
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/cert-manager-istio-csr
   version: $VERSION
   targetNamespace: cert-manager
 ---
@@ -61,7 +66,8 @@ metadata:
   name: istio-base
   namespace: istio-system
 spec:
-  chart: $REGISTRY/geti/helm/istio-base
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/istio-base
   version: $VERSION
   targetNamespace: istio-system
 ---
@@ -71,7 +77,8 @@ metadata:
   name: istio-istiod
   namespace: istio-system
 spec:
-  chart: $REGISTRY/geti/helm/istio-istiod
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/istio-istiod
   version: $VERSION
   targetNamespace: istio-system
   valuesContent: |-
@@ -85,7 +92,8 @@ metadata:
   name: istio-gateway
   namespace: istio-system
 spec:
-  chart: $REGISTRY/geti/helm/istio-gateway
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/istio-gateway
   version: $VERSION
   targetNamespace: istio-system
   valuesContent: |-
@@ -103,7 +111,8 @@ metadata:
   name: geti-tools
   namespace: impt
 spec:
-  chart: $REGISTRY/geti/helm/geti-tools
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/geti-tools
   version: $VERSION
   targetNamespace: impt
   timeout: 20m
@@ -117,12 +126,14 @@ metadata:
   name: geti-components
   namespace: impt
 spec:
-  chart: $REGISTRY/geti/helm/geti-components
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/geti-components
   version: $VERSION
   targetNamespace: impt
   timeout: 60m
   valuesContent: |-
-    dataStoragePath: {{ data_folder }}
+    configuration:
+      dataStoragePath: {{ data_folder }}
     global:
       registry_address: "$REGISTRY"
       initial_admin_user_login: "{{ username }}"
@@ -134,7 +145,8 @@ metadata:
   name: flyte-core
   namespace: flyte
 spec:
-  chart: $REGISTRY/geti/helm/flyte-core
+  insecureSkipTLSVerify: true
+  chart: https://$REGISTRY/geti/helm/flyte-core
   version: $VERSION
   targetNamespace: flyte
   valuesContent: |-

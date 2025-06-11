@@ -88,11 +88,11 @@ global:
   debian:
     registry: docker.io
     repository: bitnami
-    name: bitnami-shell:11-debian-11-r136
+    name: os-shell:12-debian-12-r42
   kubectl: 
     registry: docker.io
     repository: bitnami
-    name: kubectl:1.31.0
+    name: kubectl:1.33.1
   busybox:
     registry: quay.io
     repository: prometheus

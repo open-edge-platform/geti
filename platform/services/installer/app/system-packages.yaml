@@ -7,9 +7,9 @@ shared:
     - name: k3s
       destination: tools/k3s
       urls:
-        - https://github.com/k3s-io/k3s/releases/download/v1.31.0+k3s1/k3s
-        - https://github.com/k3s-io/k3s/releases/download/v1.31.0+k3s1/k3s-airgap-images-amd64.tar.gz
-        - https://raw.githubusercontent.com/k3s-io/k3s/refs/tags/v1.31.0+k3s1/install.sh
+        - https://github.com/k3s-io/k3s/releases/download/v1.33.1+k3s1/k3s
+        - https://github.com/k3s-io/k3s/releases/download/v1.33.1+k3s1/k3s-airgap-images-amd64.tar.gz
+        - https://raw.githubusercontent.com/k3s-io/k3s/refs/tags/v1.33.1+k3s1/install.sh
 ubuntu:
   packages:
     - name: pigz

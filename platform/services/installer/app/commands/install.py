@@ -46,6 +46,7 @@ from constants.paths import (
 
 # from platform_configuration.versions import get_target_product_build
 from constants.platform import DEFAULT_USERNAME
+from geti_controller.communication import call_install_endpoint
 from geti_controller.install import deploy_geti_controller_chart
 from geti_controller.uninstall import uninstall_geti_controller_chart
 from k3s.detect_ip import get_first_public_ip, get_master_node_ip_address
@@ -215,17 +216,15 @@ def execute_installation(config: InstallationConfig) -> None:  # noqa: C901, RUF
 
     try:
         deploy_geti_controller_chart(config=config)
-        # TODO uncomment when charts will be ready
-        # controller_response = call_install_endpoint(kube_config=config.kube_config.value)
-        # logger.info(f"Response from the GetiController installation endpoint: {controller_response}")
-        install_platform(config=config)  # TODO remove once installation via GetiController is implemented
+        controller_response = call_install_endpoint(kube_config=config.kube_config.value)
+        logger.info(f"Response from the GetiController installation endpoint: {controller_response}")
     except StepsError:
         logger.exception("Error during installation.")
         click.secho("\n" + InstallCmdTexts.installation_failed, fg="red")
         cluster_info_dump(kubeconfig=config.kube_config.value)
         sys.exit(1)
     finally:
-        uninstall_geti_controller_chart(config=config)
+        # uninstall_geti_controller_chart(config=config)
         # shutil.rmtree(PLATFORM_INSTALL_PATH, ignore_errors=True)  # TODO uncomment
         if config.lightweight_installer.value:
             # remove 'tools' dir on failure,

@@ -106,7 +106,7 @@ class K3sConfiguration:
 
 k3s_configuration = K3sConfiguration(
     # in case of version update, update also 'kubectl_image' (charts)
-    version=os.getenv("PLATFORM_K3S_VERSION", default="v1.31.0+k3s1"),
+    version=os.getenv("PLATFORM_K3S_VERSION", default="v1.33.1+k3s1"),
     disable_components=["traefik", "runtimes"],
     kube_apiserver_args={
         "enable-admission-plugins": "NodeRestriction,ServiceAccount",
