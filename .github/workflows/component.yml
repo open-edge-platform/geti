@@ -7,12 +7,12 @@ on:
         description: "Dir in root directory"
         type: string
         required: true
-      image-tag:
-        description: "Docker image tag"
+      build-version:
+        description: "Specifies the build version to apply to all binaries produced by this workflow"
         type: string
         required: true
-      push:
-        description: "Enable pushing Docker images and Helm charts"
+      publish_binaries:
+        description: "Enable publishing binaries to repos"
         type:  boolean
         default: false
       ref:
@@ -50,7 +50,7 @@ jobs:
       id-token: write
     timeout-minutes: 30
     env:
-      TAG: ${{ inputs.image-tag || github.sha }}
+      TAG: ${{ inputs.build-version || github.sha }}
       REGISTRY: ${{ secrets.REGISTRY }}
       PYTHON_BUILDER_IMAGE: builder-images/python-builder:v0.1
       GO_BUILDER_IMAGE: builder-images/go-builder:v0.1

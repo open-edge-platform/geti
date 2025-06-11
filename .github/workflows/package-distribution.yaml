@@ -1,0 +1,55 @@
+name: Package distribution workflow
+on:
+  workflow_call:
+    inputs:
+      build-version:
+        description: "Specifies the build version to apply to all binaries produced by this workflow"
+        type: string
+        required: true
+      publish_binaries:
+        description: "Enable pushing Docker images and Helm charts"
+        type: boolean
+        default: false
+      ref:
+        description: 'The branch, tag or SHA to checkout'
+        type: string
+        default: ""
+    secrets:
+      AWS_ROLE:
+        required: true
+      AWS_REGION:
+        required: true
+      REGISTRY:
+        required: true
+
+jobs:
+  package-distribution-workflow:
+    name: Build platform distribution binaries
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.build-version }}
+      REGISTRY: ${{ secrets.REGISTRY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
+        with:
+          persist-credentials: false
+          ref: ${{ inputs.ref || '' }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE }}
+          role-session-name: Github
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+
+      - name: Build umbrella charts
+        run: make build-umbrella-chart
+
+      - name: Publish umbrella charts
+        if: ${{ inputs.publish_binaries }}
+        run: make publish-umbrella-chart

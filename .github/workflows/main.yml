@@ -10,10 +10,13 @@ on:
   push:
     branches:
       - main
+    tags:
+      - v[0-9]+\.[0-9]+\.[0-9]+-RC[0-9]+
+
   workflow_dispatch:
     inputs:
-      push:
-        description: "Enable pushing Docker images and Helm charts"
+      publish_binaries:
+        description: "Enable publishing binaries"
         type: boolean
         default: true
       ref:
@@ -27,51 +30,37 @@ concurrency:
 
 permissions: {} # No permissions by default on workflow level
 
+env:
+  BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}
+  CHECKOUT_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref || github.ref }}
+
+
 jobs:
   get-vars:
-    name: Get variables
-    env:
-      BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' }}
+    name: Prepare build metadata
     runs-on: ubuntu-latest
     permissions:
       contents: read
     timeout-minutes: 10
     outputs:
-      image-tag: "${{ steps.image-tag.outputs.image-tag }}"
+      build-version: "${{ steps.prepare-build-version.outputs.version }}"
       components-list: ${{ steps.components-list.outputs.paths_list }}
       filtered-components-list: ${{ steps.filtered-components-list.outputs.filtered-list }}
       libs-list: ${{ steps.libs-list.outputs.paths_list }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           fetch-depth: 0
           persist-credentials: false
+          ref: ${{ env.CHECKOUT_REF }}
 
-      - name: Prepare image tag
-        id: image-tag
-        env:
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          GITHUB_EVENT_NUMBER: ${{ github.event.number }}
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-          REF: ${{ inputs.ref }}
-        run: |
-          short_sha=$(git rev-parse --short HEAD)
-          product_version=$(sed -ne 's/^.*PRODUCT_VERSION.*?= //p' Makefile.shared)
-          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-              ref=$(echo "${GITHUB_REF_NAME}" | tr '/' '-')
-          elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-              ref=pr-"${GITHUB_EVENT_NUMBER}"
-          elif [[ "${GITHUB_EVENT_NAME}" == "merge_group" ]]; then
-              ref=mr
-          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-              ref=$(echo "${REF}" | tr '/_' '-')
-          else
-              echo "unknown event ${github_event_name}!"
-              exit 1
-          fi
-
-          echo "image-tag=$product_version-$ref-$short_sha" >> "$GITHUB_OUTPUT"
+      - name: Prepare build version
+        id: prepare-build-version
+        uses: ./.github/actions/build-version
+        with:
+          ref: ${{ env.CHECKOUT_REF }}
 
       - name: Get changed components dirs
         id: components-list
@@ -133,10 +122,10 @@ jobs:
         # therefore we filter out the web_ui component here
         component: ${{ fromJSON(needs.get-vars.outputs.filtered-components-list) }}
     with:
-      image-tag: ${{ needs.get-vars.outputs.image-tag }}
+      build-version: ${{ needs.get-vars.outputs.build-version }}
       component-dir: ${{ matrix.component }}
-      push: ${{ inputs.push || false }}
-      ref: ${{ inputs.ref || '' }}
+      publish_binaries: ${{ inputs.publish_binaries || false }}
+      ref: ${{ env.CHECKOUT_REF }}
 
   web-ui-workflow:
     name: Web UI workflow
@@ -151,15 +140,32 @@ jobs:
     uses: ./.github/workflows/web-ui.yml
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:
-      image-tag: ${{ needs.get-vars.outputs.image-tag }}
-      push: ${{ inputs.push || false }}
-      ref: ${{ inputs.ref || '' }}
+      build-version: ${{ needs.get-vars.outputs.build-version }}
+      publish_binaries: ${{ inputs.publish_binaries || false }}
+      ref: ${{ env.CHECKOUT_REF }}
+
+  package-distribution-workflow:
+    name: Build platform distribution binaries
+    needs:
+      - get-vars
+      - component-workflow
+      - web-ui-workflow
+    uses: ./.github/workflows/package-distribution.yaml
+    with:
+      build-version: ${{ needs.get-vars.outputs.build-version }}
+      publish_binaries: ${{ inputs.publish_binaries || false }}
+      ref: ${{ env.CHECKOUT_REF }}
+    secrets:
+      AWS_ROLE: ${{ secrets.AWS_ROLE }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      REGISTRY: ${{ secrets.REGISTRY }}
 
   success:
     name: Required status checks
     needs:
       - component-workflow
       - web-ui-workflow
+      - package-distribution-workflow
     runs-on: ubuntu-latest
     if: ${{ always() && !cancelled() }}
     env:
