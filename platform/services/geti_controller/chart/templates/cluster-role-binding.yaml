@@ -4,7 +4,7 @@ kind: ClusterRoleBinding
 metadata:
   name: geti-controller-admin-access
   labels:
-    {{ - include "geti-controller.labels" . | nindent 4 }}
+    {{- include "geti-controller.labels" . | nindent 4 }}
 subjects:
   - kind: ServiceAccount
     name: {{ include "geti-controller.name" . }}

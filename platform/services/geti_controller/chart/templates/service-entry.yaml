@@ -6,7 +6,7 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - dev-registry.toolbox.iotg.sclab.intel.com
+  - {{ .Values.global.registry_address }}
   location: MESH_EXTERNAL
   ports:
   - number: 80
