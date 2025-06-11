@@ -16,7 +16,6 @@ import { DeleteProjectDialog } from '../../../landing-page/landing-page-workspac
 
 export const ProjectActionCell = ({ name, id }: { name: string; id: string }): JSX.Element => {
     const workspaceIdentifier = useFirstWorkspaceIdentifier();
-
     const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState<boolean>(false);
     const canDeleteProject = useCheckPermission([OPERATION.PROJECT_DELETION], [{ type: RESOURCE_TYPE.PROJECT, id }]);
     const { deleteProjectMutation } = useProjectActions();

@@ -31,7 +31,6 @@ interface ProjectSidebarProps {
 
 export const ProjectSidebar = ({ project }: ProjectSidebarProps): JSX.Element => {
     const datasetIdentifier = useDatasetIdentifier();
-
     const canEditProjectName = useCheckPermission(
         [OPERATION.PROJECT_NAME_EDITION],
         [
