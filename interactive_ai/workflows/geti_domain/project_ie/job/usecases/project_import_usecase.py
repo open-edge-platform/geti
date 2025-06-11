@@ -15,7 +15,6 @@ from functools import partial
 
 from bson.binary import UuidRepresentation
 from bson.json_util import DatetimeRepresentation, JSONOptions, loads
-
 from geti_kafka_tools import publish_event
 from geti_spicedb_tools import SpiceDB
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, Session
