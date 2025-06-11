@@ -11,6 +11,10 @@ global:
   registry_address: ghcr.io
   workflow_versions: 2.10.1
   manage_users_roles: true
+  proxy_enabled: true
+  http_proxy: http://proxy-dmz.intel.com:912
+  https_proxy: http://proxy-dmz.intel.com:912
+  no_proxy: "127.0.0.1,localhost,.test,.svc,.cluster.local"
 
 spice-db:
   fullnameOverride: impt-spice-db
@@ -57,8 +61,8 @@ jobs-execution-namespace:
 
 impt-configuration:
   accelerator:
-    type: gpu
-    name: gpu.intel.com/i915
+    type: cpu
+    name: ""
   feature_flags_data:
     FEATURE_FLAG_MANAGE_USERS: "true"
 

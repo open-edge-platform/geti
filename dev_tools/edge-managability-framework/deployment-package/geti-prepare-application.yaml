@@ -6,7 +6,7 @@ schemaVersion: "0.1"
 $schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
 
 name: geti-prepare
-version: 2.9.0
+version: 2.10.1
 description: Global network policies for Intel® Geti™
 
 helmRegistry: ghcr-geti-oci

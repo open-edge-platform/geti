@@ -6,12 +6,12 @@ schemaVersion: "0.1"
 $schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
 
 name: geti-kubelet-csr-approver
-version: 2.9.0
+version: 2.10.1
 description: Kubelet CSR Approver for Intel® Geti™
 
 helmRegistry: ghcr-geti-oci
 chartName: kubelet-csr-approver
-chartVersion: 2.9.0
+chartVersion: 2.10.1
 
 profiles:
   - name: default

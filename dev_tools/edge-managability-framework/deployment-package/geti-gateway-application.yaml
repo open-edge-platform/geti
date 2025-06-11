@@ -6,12 +6,12 @@ schemaVersion: "0.1"
 $schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
 
 name: geti-gateway
-version: 2.9.0
+version: 2.10.1
 description: Istio Gateway for Intel® Geti™
 
 helmRegistry: ghcr-geti-oci
 chartName: istio-gateway
-chartVersion: 2.9.0
+chartVersion: 2.10.1
 
 profiles:
   - name: default

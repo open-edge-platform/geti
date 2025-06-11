@@ -9,7 +9,7 @@ enabled:
 global:
   docker_namespace: open-edge-platform/geti
   registry_address: ghcr.io
-  workflow_versions: 2.9.0
+  workflow_versions: 2.10.1
   manage_users_roles: true
 
 spice-db:

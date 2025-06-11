@@ -8,41 +8,41 @@ $schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
 name: geti
 displayName: Intel® Geti™ Platform
 description: Intel® Geti™ Computer Vision System
-version: 2.9.0
+version: 2.10.1
 
 kind: normal
 
 applications:
   - name: geti-cm-istio-csr
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-control-plane
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-impt
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-istiod
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-istio-base
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-istio-crds
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-flyte-crds
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-gateway
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-kubelet-csr-approver
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-migration-job
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-modelmesh-serving-crd
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-opa
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-prepare
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-pv-creation
-    version: 2.9.0
+    version: 2.10.1
   - name: geti-seaweed-fs
-    version: 2.9.0
+    version: 2.10.1
 
 defaultNamespaces:
   geti-cm-istio-csr: cert-manager
@@ -60,7 +60,7 @@ defaultNamespaces:
 
 deploymentProfiles:
   - name: default
-    description: CPU only and 50GB data
+    description: CPU only and 50GB data with no proxy
     applicationProfiles:
       - application: geti-cm-istio-csr
         profile: geti
@@ -92,15 +92,48 @@ deploymentProfiles:
         profile: small
       - application: geti-seaweed-fs
         profile: default
-  - name: large
-    description: CPU only and 500GB data
+  - name: cpu-intel-proxy
+    description: CPU only and 50GB data with Intel proxy
     applicationProfiles:
       - application: geti-cm-istio-csr
         profile: geti
       - application: geti-control-plane
         profile: default
       - application: geti-impt
-        profile: cpu
+        profile: cpu-intel-proxy
+      - application: geti-istiod
+        profile: geti
+      - application: geti-istio-base
+        profile: default
+      - application: geti-istio-crds
+        profile: default
+      - application: geti-flyte-crds
+        profile: default
+      - application: geti-gateway
+        profile: default
+      - application: geti-kubelet-csr-approver
+        profile: default
+      - application: geti-migration-job
+        profile: default
+      - application: geti-modelmesh-serving-crd
+        profile: default
+      - application: geti-opa
+        profile: default
+      - application: geti-prepare
+        profile: default
+      - application: geti-pv-creation
+        profile: small
+      - application: geti-seaweed-fs
+        profile: intel-proxy
+  - name: large
+    description: CPU only and 500GB data with Intel proxy
+    applicationProfiles:
+      - application: geti-cm-istio-csr
+        profile: geti
+      - application: geti-control-plane
+        profile: default
+      - application: geti-impt
+        profile: cpu-intel-proxy
       - application: geti-istiod
         profile: geti
       - application: geti-istio-base
@@ -124,7 +157,40 @@ deploymentProfiles:
       - application: geti-pv-creation
         profile: large
       - application: geti-seaweed-fs
+        profile: intel-proxy
+  - name: nvidia-intel-proxy
+    description: Nvidia GPU and 500GB data with Intel proxy
+    applicationProfiles:
+      - application: geti-cm-istio-csr
+        profile: geti
+      - application: geti-control-plane
         profile: default
+      - application: geti-impt
+        profile: nvidia-gpu-intel-proxy
+      - application: geti-istiod
+        profile: geti
+      - application: geti-istio-base
+        profile: default
+      - application: geti-istio-crds
+        profile: default
+      - application: geti-flyte-crds
+        profile: default
+      - application: geti-gateway
+        profile: default
+      - application: geti-kubelet-csr-approver
+        profile: default
+      - application: geti-migration-job
+        profile: default
+      - application: geti-modelmesh-serving-crd
+        profile: default
+      - application: geti-opa
+        profile: default
+      - application: geti-prepare
+        profile: default
+      - application: geti-pv-creation
+        profile: large
+      - application: geti-seaweed-fs
+        profile: intel-proxy
 
 applicationDependencies:
   - name: geti-control-plane

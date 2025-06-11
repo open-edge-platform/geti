@@ -6,13 +6,15 @@ schemaVersion: "0.1"
 $schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
 
 name: geti-seaweed-fs
-version: 2.9.0
+version: 2.10.1
 description: Seaweed FS for Intel® Geti™
 
 helmRegistry: ghcr-geti-oci
 chartName: seaweed-fs
-chartVersion: 2.9.0
+chartVersion: 2.10.1
 
 profiles:
   - name: default
     valuesFileName: geti-seaweed-fs-values.yaml
+  - name: intel-proxy
+    valuesFileName: geti-seaweed-fs-intel-proxy-values.yaml

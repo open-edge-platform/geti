@@ -6,12 +6,12 @@ schemaVersion: "0.1"
 $schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
 
 name: geti-istio-base
-version: 2.9.0
+version: 2.10.1
 description: Istio Base for Intel® Geti™
 
 helmRegistry: ghcr-geti-oci
 chartName: istio-base
-chartVersion: 2.9.0
+chartVersion: 2.10.1
 
 profiles:
   - name: default
