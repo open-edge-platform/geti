@@ -73,7 +73,7 @@ runs:
               TAG_BASE=$(echo "$TAG_VERSION_CLEAN" | sed 's/-RC[0-9]*$//')
         
               if [[ "$BASE_VERSION" == "$TAG_BASE" ]]; then
-                VERSION="$TAG_VERSION"
+                VERSION="$GITHUB_REF_NAME"
                 echo "Generated version for RC tag: $VERSION"
               else
                 echo "Error: Version mismatch. File version: $BASE_VERSION, Tag base version: $TAG_BASE"
