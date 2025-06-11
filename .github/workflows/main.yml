@@ -11,7 +11,7 @@ on:
     branches:
       - main
     tags:
-      - v*
+      - v[0-9]+\.[0-9]+\.[0-9]+-RC[0-9]+
 
   workflow_dispatch:
     inputs:
@@ -186,6 +186,9 @@ jobs:
       - get-vars
       - component-workflow
       - web-ui-workflow
+    permissions:
+      contents: read
+      id-token: write # is required by nested component-check
     uses: ./.github/workflows/package-distribution.yaml
     with:
       build-all: ${{ needs.get-vars.outputs.build_all }}
