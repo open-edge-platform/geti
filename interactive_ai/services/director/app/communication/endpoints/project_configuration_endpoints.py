@@ -2,10 +2,12 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import logging
+import json
 from http import HTTPStatus
 from typing import Annotated, Any
 
-from fastapi import APIRouter, Depends
+import pydantic
+from fastapi import APIRouter, Depends, HTTPException
 from geti_configuration_tools.project_configuration import PartialProjectConfiguration
 from geti_feature_tools import FeatureFlagProvider
 
@@ -33,7 +35,10 @@ def get_project_configuration_from_request(
     request_json: Annotated[dict, Depends(get_request_json)],
 ) -> PartialProjectConfiguration:
     """Dependency to convert REST request body to PartialProjectConfiguration."""
-    return ProjectConfigurationRESTViews.project_configuration_from_rest(rest_input=request_json)
+    try:
+        return ProjectConfigurationRESTViews.project_configuration_from_rest(rest_input=request_json)
+    except pydantic.ValidationError as e:
+        raise HTTPException(status_code=400, detail={"errors": json.loads(e.json())}) from e
 
 
 @project_configuration_router.get("/project_configuration")
