@@ -54,14 +54,18 @@ class PerformanceRatings(BaseModel):
         le=3,
         default=1,
         title="Training time rating",
-        description="Rating of training efficiency from 1 (slow) to 3 (fast)",
+        description="Rating of the model training time. "
+        "The value should be interpreted relatively to the other available models, "
+        "and it ranges from 1 (below average/slower) to 3 (above average/faster).",
     )
     inference_speed: int = Field(
         ge=1,
         le=3,
         default=1,
         title="Inference speed rating",
-        description="Rating of inference performance from 1 (slow) to 3 (fast)",
+        description="Rating of the model inference speed. "
+        "The value should be interpreted relatively to the other available models, "
+        "and it ranges from 1 (below average/slower) to 3 (above average/faster).",
     )
 
 

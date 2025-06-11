@@ -15,6 +15,8 @@ from functools import partial
 
 from bson.binary import UuidRepresentation
 from bson.json_util import DatetimeRepresentation, JSONOptions, loads
+
+from geti_kafka_tools import publish_event
 from geti_spicedb_tools import SpiceDB
 from geti_types import CTX_SESSION_VAR, ID, ProjectIdentifier, Session
 from grpc_interfaces.model_registration.client import ModelRegistrationClient
@@ -490,6 +492,16 @@ class ProjectImportUseCase:
             },
         }
         publish_metadata_update(metadata)
+        # publish project created kafka event
+        publish_event(
+            topic="project_creations",
+            body={
+                "workspace_id": str(project_identifier.workspace_id),
+                "project_id": str(project_identifier.project_id),
+            },
+            key=str(project_identifier.project_id).encode(),
+            headers_getter=lambda: CTX_SESSION_VAR.get().as_list_bytes(),
+        )
 
         # Register project in SpiceDB
         logger.info("Creating project in SpiceDB")
