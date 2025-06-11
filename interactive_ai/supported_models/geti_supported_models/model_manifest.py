@@ -41,7 +41,13 @@ class PerformanceRatings(BaseModel):
     """Ratings for different performance aspects of a model."""
 
     accuracy: int = Field(
-        ge=1, le=3, default=1, title="Accuracy rating", description="Rating of model accuracy from 1 (low) to 3 (high)"
+        ge=1,
+        le=3,
+        default=1,
+        title="Accuracy rating",
+        description="Rating of the model accuracy. "
+        "The value should be interpreted relatively to the other available models, "
+        "and it ranges from 1 (below average) to 3 (above average).",
     )
     training_time: int = Field(
         ge=1,
