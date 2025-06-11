@@ -11,7 +11,7 @@ on:
     branches:
       - main
     tags:
-      - v*
+      - v[0-9]+\.[0-9]+\.[0-9]+-RC[0-9]+
 
   workflow_dispatch:
     inputs:
@@ -43,38 +43,74 @@ jobs:
       contents: read
     timeout-minutes: 10
     outputs:
-      build-version: "${{ steps.prepare-build-version.outputs.version }}"
+      build_all: ${{ steps.set-vars.outputs.build_all }}
+      publish_binaries: ${{ steps.set-vars.outputs.publish_binaries }}
+      checkout_ref: ${{ steps.set-vars.outputs.checkout_ref }}
+      build_version: "${{ steps.prepare-build-version.outputs.version }}"
       components-list: ${{ steps.components-list.outputs.paths_list }}
       filtered-components-list: ${{ steps.filtered-components-list.outputs.filtered-list }}
       libs-list: ${{ steps.libs-list.outputs.paths_list }}
 
     steps:
+      - name: Prepare environment variables
+        id: set-vars
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REF: ${{ github.ref }}
+          DISPATCH_PUB: ${{ github.event.inputs.publish_binaries }}
+          DISPATCH_REF: ${{ github.event.inputs.ref }}
+        run: |
+          # BUILD_ALL: true on manual dispatch or any tag
+          if [[ "$EVENT_NAME" == "workflow_dispatch" || "$GITHUB_REF" == refs/tags/* ]]; then
+            build_all=true
+          else
+            build_all=false
+          fi
+          
+          # PUBLISH_BINARIES: only if manual & publish=true, or on any tag
+          if [[ ( "$EVENT_NAME" == "workflow_dispatch" && "$DISPATCH_PUB" == "true" ) || "$GITHUB_REF" == refs/tags/* ]]; then
+            publish_binaries=true
+          else
+            publish_binaries=false
+          fi
+          
+          # CHECKOUT_REF: use manual input if provided, else real ref
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && -n "$DISPATCH_REF" ]]; then
+            checkout_ref="$DISPATCH_REF"
+          else
+            checkout_ref="$GITHUB_REF"
+          fi
+
+          echo "build_all=$build_all"               >> $GITHUB_OUTPUT
+          echo "publish_binaries=$publish_binaries" >> $GITHUB_OUTPUT
+          echo "checkout_ref=$checkout_ref"         >> $GITHUB_OUTPUT
+
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           fetch-depth: 0
           persist-credentials: false
-          ref: ${{ env.CHECKOUT_REF }}
+          ref: ${{ steps.set-vars.outputs.checkout_ref }}
 
       - name: Prepare build version
         id: prepare-build-version
         uses: ./.github/actions/build-version
         with:
-          ref: ${{ env.CHECKOUT_REF }}
+          ref: ${{ steps.set-vars.outputs.checkout_ref }}
 
       - name: Get changed components dirs
         id: components-list
         uses: ./.github/actions/change-detection
         with:
           path_filter: "./.github/components-path-filters.yml"
-          get_all: ${{ env.BUILD_ALL }}
+          get_all: ${{ steps.set-vars.outputs.build_all }}
 
       - name: Get changed libs dirs
         id: libs-list
         uses: ./.github/actions/change-detection
         with:
           path_filter: "./.github/libs-path-filters.yml"
-          get_all: ${{ env.BUILD_ALL }}
+          get_all: ${{ steps.set-vars.outputs.build_all }}
 
       - name: Filter components (exclude 'web_ui')
         id: filtered-components-list
@@ -101,7 +137,7 @@ jobs:
         component: ${{ fromJSON(needs.get-vars.outputs.libs-list) }}
     with:
       component-dir: ${{ matrix.component }}
-      ref: ${{ env.CHECKOUT_REF }}
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
   component-workflow:
     name: Component workflow
@@ -122,10 +158,10 @@ jobs:
         # therefore we filter out the web_ui component here
         component: ${{ fromJSON(needs.get-vars.outputs.filtered-components-list) }}
     with:
-      build-version: ${{ needs.get-vars.outputs.build-version }}
+      build-version: ${{ needs.get-vars.outputs.build_version }}
       component-dir: ${{ matrix.component }}
-      publish_binaries: ${{ env.PUBLISH_BINARIES }}
-      ref: ${{ env.CHECKOUT_REF }}
+      publish_binaries: ${{ needs.get-vars.outputs.publish_binaries }}
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
   web-ui-workflow:
     name: Web UI workflow
@@ -140,9 +176,9 @@ jobs:
     uses: ./.github/workflows/web-ui.yml
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:
-      build-version: ${{ needs.get-vars.outputs.build-version }}
-      publish_binaries: ${{ env.PUBLISH_BINARIES }}
-      ref: ${{ env.CHECKOUT_REF }}
+      build-version: ${{ needs.get-vars.outputs.build_version }}
+      publish_binaries: ${{ needs.get-vars.outputs.publish_binaries }}
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
   package-distribution-workflow:
     name: Build platform distribution binaries
@@ -152,10 +188,11 @@ jobs:
       - web-ui-workflow
     uses: ./.github/workflows/package-distribution.yaml
     with:
-      build-all: ${{ env.BUILD_ALL }}
-      build-version: ${{ needs.get-vars.outputs.build-version }}
-      publish_binaries: ${{ env.PUBLISH_BINARIES }}
-      ref: ${{ env.CHECKOUT_REF }}
+      build-all: ${{ needs.get-vars.outputs.build_all }}
+      build-version: ${{ needs.get-vars.outputs.build_version }}
+      publish_binaries: ${{ needs.get-vars.outputs.publish_binaries }}
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
+
     secrets:
       AWS_ROLE: ${{ secrets.AWS_ROLE }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
