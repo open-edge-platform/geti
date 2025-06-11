@@ -12,7 +12,7 @@ import { useParams } from 'react-router-dom';
 import { AccountStatusDTO } from '../../../core/organizations/dtos/organizations.interface';
 import { RequiredProviders } from '../../../test-utils/required-providers-render';
 import { useCheckPermission } from './has-permission.component';
-import { OPERATION_OLD } from './has-permission.interface';
+import { OPERATION } from './has-permission.interface';
 
 jest.mock('react-router-dom', () => ({ ...jest.requireActual('react-router-dom'), useParams: jest.fn() }));
 
@@ -110,7 +110,7 @@ describe('useCheckPermission', () => {
     describe('project creation', () => {
         it('workspace params does not match user roles', async () => {
             jest.mocked(useParams).mockReturnValue({ workspaceId: '111111' });
-            const { result } = renderHook(() => useCheckPermission([OPERATION_OLD.PROJECT_CREATION]), {
+            const { result } = renderHook(() => useCheckPermission([OPERATION.PROJECT_CREATION]), {
                 wrapper,
             });
 
@@ -121,7 +121,7 @@ describe('useCheckPermission', () => {
 
         it('workspace params match user roles', async () => {
             jest.mocked(useParams).mockReturnValue({ workspaceId: resources.workspaceThree });
-            const { result } = renderHook(() => useCheckPermission([OPERATION_OLD.PROJECT_CREATION]), {
+            const { result } = renderHook(() => useCheckPermission([OPERATION.PROJECT_CREATION]), {
                 wrapper,
             });
 
@@ -134,7 +134,7 @@ describe('useCheckPermission', () => {
             const { result } = renderHook(
                 () =>
                     useCheckPermission(
-                        [OPERATION_OLD.PROJECT_CREATION],
+                        [OPERATION.PROJECT_CREATION],
                         [{ type: RESOURCE_TYPE.WORKSPACE, id: resources.workspaceThree }]
                     ),
                 { wrapper }

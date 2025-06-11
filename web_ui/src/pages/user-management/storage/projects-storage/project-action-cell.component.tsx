@@ -6,23 +6,19 @@ import { useState } from 'react';
 import { RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
 import { DialogContainer } from '@geti/ui';
 
-import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { useProjectActions } from '../../../../core/projects/hooks/use-project-actions.hook';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { ActionMenu } from '../../../../shared/components/action-menu/action-menu.component';
 import { useCheckPermission } from '../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION_NEW, OPERATION_OLD } from '../../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION } from '../../../../shared/components/has-permission/has-permission.interface';
 import { DeleteProjectDialog } from '../../../landing-page/landing-page-workspace/components/projects-list/components/project/components/project-action-menu/delete-project-dialog.component';
 
 export const ProjectActionCell = ({ name, id }: { name: string; id: string }): JSX.Element => {
     const workspaceIdentifier = useFirstWorkspaceIdentifier();
-    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
+
     const [isDeleteAlertVisible, setIsDeleteAlertVisible] = useState<boolean>(false);
-    const canDeleteProject = useCheckPermission(
-        FEATURE_FLAG_WORKSPACE_ACTIONS ? [OPERATION_NEW.PROJECT_DELETION] : [OPERATION_OLD.PROJECT_DELETION],
-        [{ type: RESOURCE_TYPE.PROJECT, id }]
-    );
+    const canDeleteProject = useCheckPermission([OPERATION.PROJECT_DELETION], [{ type: RESOURCE_TYPE.PROJECT, id }]);
     const { deleteProjectMutation } = useProjectActions();
 
     if (!canDeleteProject) {

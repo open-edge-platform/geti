@@ -7,13 +7,13 @@ import { Resource, RESOURCE_TYPE, Role } from '@geti/core/src/users/users.interf
 
 export interface HasPermissionProps {
     children: ReactNode;
-    operations: (OPERATION_NEW | OPERATION_OLD)[];
+    operations: OPERATION[];
     Fallback?: ReactNode;
     resources?: Resource[];
     specialCondition?: boolean;
 }
 
-export enum OPERATION_NEW {
+export enum OPERATION {
     ADD_USER_TO_WORKSPACE,
     ADD_USER_TO_PROJECT,
     ANALYTICS_TAB,
@@ -31,28 +31,10 @@ export enum OPERATION_NEW {
     WORKSPACE_CREATION,
 }
 
-export enum OPERATION_OLD {
-    INVITE_USER,
-    MANAGE_USER,
-    WORKSPACE_MANAGEMENT,
-    IMPORT_PROJECT,
-    ADD_USER_TO_PROJECT,
-    PROJECT_CREATION,
-    PROJECT_DELETION,
-    CAN_VIEW_CREDITS_USAGE,
-    PROJECT_NAME_EDITION,
-    USAGE_TAB,
-    ANALYTICS_TAB,
-}
-
 type PermissionEntity = Omit<Role, 'resourceId'>;
 
-export type OperationPermissionOld = Record<OPERATION_OLD, PermissionEntity[]>;
-export type OperationPermissionNew = Record<OPERATION_NEW, PermissionEntity[]>;
+export type OperationPermission = Record<OPERATION, PermissionEntity[]>;
 
 export type UsePermissionType = {
-    verifyPermission: (
-        operation: OPERATION_NEW | OPERATION_OLD,
-        resources: Record<RESOURCE_TYPE, string | undefined>
-    ) => boolean;
+    verifyPermission: (operation: OPERATION, resources: Record<RESOURCE_TYPE, string | undefined>) => boolean;
 };

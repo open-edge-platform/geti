@@ -5,7 +5,8 @@ import { ComponentProps, useState } from 'react';
 
 import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { RESOURCE_TYPE, User, UsersQueryParams } from '@geti/core/src/users/users.interface';
-import { Flex } from '@geti/ui';
+import { Button, Flex } from '@geti/ui';
+import { Add } from '@geti/ui/icons';
 import { motion } from 'framer-motion';
 import { isEmpty } from 'lodash-es';
 
@@ -71,23 +72,31 @@ export const Users = ({
                     setUsersQueryParams={setUsersQueryParams}
                     isProjectUsersTable={isProjectUsersTable}
                 />
-                <UsersTable
-                    isFetchingNextPage={isFetchingNextPage}
-                    isLoading={isLoading}
-                    totalCount={totalCount}
-                    users={users}
-                    hasFilters={hasFilters}
-                    activeUser={activeUser}
-                    getNextPage={getNextPage}
-                    usersQueryParams={usersQueryParams}
-                    setUsersQueryParams={setUsersQueryParams}
-                    UserActions={UserActions}
-                    ignoredColumns={ignoredColumns}
-                    resourceId={resourceId}
-                    workspaces={workspaces}
-                    isProjectUsersTable={isProjectUsersTable}
-                    organizationId={organizationId}
-                />
+                {totalMatchedCount > 0 ? (
+                    <UsersTable
+                        isFetchingNextPage={isFetchingNextPage}
+                        isLoading={isLoading}
+                        totalCount={totalCount}
+                        users={users}
+                        hasFilters={hasFilters}
+                        activeUser={activeUser}
+                        getNextPage={getNextPage}
+                        usersQueryParams={usersQueryParams}
+                        setUsersQueryParams={setUsersQueryParams}
+                        UserActions={UserActions}
+                        ignoredColumns={ignoredColumns}
+                        resourceId={resourceId}
+                        workspaces={workspaces}
+                        isProjectUsersTable={isProjectUsersTable}
+                        organizationId={organizationId}
+                    />
+                ) : (
+                    <div>PLACEHOLDER</div>
+                )}
+
+                <Button variant={'secondary'} width='100%'>
+                    <Add />
+                </Button>
             </Flex>
         </motion.div>
     );

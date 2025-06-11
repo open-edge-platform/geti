@@ -4,10 +4,9 @@
 import { useUsers } from '@geti/core/src/users/hook/use-users.hook';
 import { RESOURCE_TYPE, User } from '@geti/core/src/users/users.interface';
 
-import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useIsSaasEnv } from '../../../../hooks/use-is-saas-env/use-is-saas-env.hook';
 import { HasPermission } from '../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION_NEW, OPERATION_OLD } from '../../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION } from '../../../../shared/components/has-permission/has-permission.interface';
 import { PageLayout } from '../../../../shared/components/page-layout/page-layout.component';
 import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { USERS_TABLE_COLUMNS } from '../users-table/users-table.component';
@@ -22,7 +21,6 @@ export const ProjectUsers = (): JSX.Element => {
     const { useActiveUser } = useUsers();
     const { data: activeUser } = useActiveUser(organizationId);
     const isSaasEnv = useIsSaasEnv();
-    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
 
     const ignoredColumns = isSaasEnv
         ? [USERS_TABLE_COLUMNS.REGISTRATION_STATUS]
@@ -37,11 +35,7 @@ export const ProjectUsers = (): JSX.Element => {
             breadcrumbs={[{ id: 'users-id', breadcrumb: 'Users' }]}
             header={
                 <HasPermission
-                    operations={
-                        FEATURE_FLAG_WORKSPACE_ACTIONS
-                            ? [OPERATION_NEW.ADD_USER_TO_PROJECT]
-                            : [OPERATION_OLD.ADD_USER_TO_PROJECT]
-                    }
+                    operations={[OPERATION.ADD_USER_TO_PROJECT]}
                     resources={[{ type: RESOURCE_TYPE.PROJECT, id: projectId }]}
                 >
                     <Header />

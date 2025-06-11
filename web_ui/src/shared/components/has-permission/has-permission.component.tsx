@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 
 import { useFeatureFlags } from '../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useOrganizationIdentifier } from '../../../hooks/use-organization-identifier/use-organization-identifier.hook';
-import { HasPermissionProps, OPERATION_NEW, OPERATION_OLD, UsePermissionType } from './has-permission.interface';
+import { HasPermissionProps, OPERATION, UsePermissionType } from './has-permission.interface';
 import { OPERATION_PERMISSION_NEW, OPERATION_PERMISSION_OLD } from './utils';
 
 const useResource = (selectedResources?: Resource[]): Record<RESOURCE_TYPE, string | undefined> => {
@@ -29,13 +29,10 @@ const usePermission = (): UsePermissionType => {
     const { organizationId } = useOrganizationIdentifier();
     const { data: activeUser } = useActiveUser(organizationId);
 
-    const verifyPermission = (
-        operation: OPERATION_NEW | OPERATION_OLD,
-        resources: Record<RESOURCE_TYPE, string | undefined>
-    ): boolean => {
+    const verifyPermission = (operation: OPERATION, resources: Record<RESOURCE_TYPE, string | undefined>): boolean => {
         const requiredPermissions = FEATURE_FLAG_WORKSPACE_ACTIONS
-            ? OPERATION_PERMISSION_NEW[operation as OPERATION_NEW]
-            : OPERATION_PERMISSION_OLD[operation as OPERATION_OLD];
+            ? OPERATION_PERMISSION_NEW[operation]
+            : OPERATION_PERMISSION_OLD[operation];
 
         return (
             activeUser?.roles.some((userRole) =>
@@ -59,7 +56,7 @@ const usePermission = (): UsePermissionType => {
 };
 
 export const useCheckPermission = (
-    operations: (OPERATION_NEW | OPERATION_OLD)[],
+    operations: OPERATION[],
     selectedResources?: Resource[],
     specialCondition = false
 ) => {
