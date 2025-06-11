@@ -39,7 +39,7 @@ const renderApp = async ({
 };
 
 describe('ActiveLearningConfiguration', () => {
-    describe('FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS: false', () => {
+    describe('with FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS disabled', () => {
         const projectService = createInMemoryProjectService();
         const configParametersService = createInMemoryApiModelConfigParametersService();
 
@@ -102,7 +102,7 @@ describe('ActiveLearningConfiguration', () => {
         });
     });
 
-    describe('FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS: true', () => {
+    describe('with FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS enabled', () => {
         const projectService = createInMemoryProjectService();
         const configParametersService = createInMemoryApiModelConfigParametersService();
 
