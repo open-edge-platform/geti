@@ -158,9 +158,9 @@ jobs:
         # therefore we filter out the web_ui component here
         component: ${{ fromJSON(needs.get-vars.outputs.filtered-components-list) }}
     with:
-      build-version: ${{ needs.get-vars.outputs.build_version }}
+      image-tag: ${{ needs.get-vars.outputs.build_version }}
       component-dir: ${{ matrix.component }}
-      publish_binaries: ${{ needs.get-vars.outputs.publish_binaries }}
+      push: ${{ needs.get-vars.outputs.publish_binaries }}
       ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
   web-ui-workflow:
@@ -176,8 +176,8 @@ jobs:
     uses: ./.github/workflows/web-ui.yml
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:
-      build-version: ${{ needs.get-vars.outputs.build_version }}
-      publish_binaries: ${{ needs.get-vars.outputs.publish_binaries }}
+      image-tag: ${{ needs.get-vars.outputs.build_version }}
+      push: ${{ needs.get-vars.outputs.publish_binaries }}
       ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
   package-distribution-workflow:

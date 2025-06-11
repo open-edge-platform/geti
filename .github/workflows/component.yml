@@ -7,12 +7,12 @@ on:
         description: "Dir in root directory"
         type: string
         required: true
-      build-version:
-        description: "Specifies the build version to apply to all binaries produced by this workflow"
+      image-tag:
+        description: "Docker image tag"
         type: string
         required: true
-      publish_binaries:
-        description: "Enable publishing binaries to repos"
+      push:
+        description: "Enable pushing Docker images and Helm charts"
         type:  boolean
         default: false
       ref:
@@ -50,7 +50,7 @@ jobs:
       id-token: write
     timeout-minutes: 30
     env:
-      TAG: ${{ inputs.build-version || github.sha }}
+      TAG: ${{ inputs.image-tag || github.sha }}
       REGISTRY: ${{ secrets.REGISTRY }}
       PYTHON_BUILDER_IMAGE: builder-images/python-builder:v0.1
       GO_BUILDER_IMAGE: builder-images/go-builder:v0.1
@@ -109,7 +109,7 @@ jobs:
           fi
 
       - name: Push image
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.publish_binaries
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.push
         run: make -C "${COMPONENT_DIR}" publish-image
 
       - name: Lint chart
@@ -117,5 +117,5 @@ jobs:
         run: make -C "${COMPONENT_DIR}" lint-chart
 
       - name: Publish chart
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.publish_binaries
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.push
         run: make -C "${COMPONENT_DIR}" publish-chart

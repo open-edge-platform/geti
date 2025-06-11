@@ -3,12 +3,12 @@ name: Web UI checks
 on:
   workflow_call:
     inputs:
-      build-version:
-        description: "Specifies the build version to apply to all binaries produced by this workflow"
+      image-tag:
+        description: "Docker image tag"
         type: string
         required: true
-      publish_binaries:
-        description: "Enable publishing binaries to repos"
+      push:
+        description: "Enable pushing Docker images and Helm charts"
         type:  boolean
         default: false
       ref:
@@ -231,6 +231,6 @@ jobs:
       REGISTRY: ${{ secrets.REGISTRY }}
     uses: ./.github/workflows/component.yml
     with:
-      build-version: ${{ inputs.build-version }}
+      image-tag: ${{ inputs.image-tag }}
       component-dir: web_ui
-      publish_binaries: ${{ inputs.publish_binaries }}
+      push: ${{ inputs.push }}
