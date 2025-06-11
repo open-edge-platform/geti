@@ -7,8 +7,8 @@ on:
         description: "Specifies the build version to apply to all binaries produced by this workflow"
         type: string
         required: true
-      push:
-        description: "Enable pushing Docker images and Helm charts"
+      publish_binaries:
+        description: "Enable publishing binaries to repos"
         type:  boolean
         default: false
       ref:

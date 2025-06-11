@@ -15,8 +15,8 @@ on:
 
   workflow_dispatch:
     inputs:
-      push:
-        description: "Enable pushing Docker images and Helm charts"
+      publish_binaries:
+        description: "Enable publishing binaries to repos"
         type: boolean
         default: true
       ref:
@@ -30,12 +30,14 @@ concurrency:
 
 permissions: {} # No permissions by default on workflow level
 
+env:
+  BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}
+  CHECKOUT_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref || github.ref }}
+
+
 jobs:
   get-vars:
     name: Prepare build metadata
-    env:
-      BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}
-      CHECKOUT_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -86,8 +88,6 @@ jobs:
         env:
           CHANGES: ${{ steps.components-list.outputs.paths_list }}
 
-
-
   lib_test_workflow:
     name: Lib test workflow
     needs: get-vars
@@ -124,8 +124,8 @@ jobs:
     with:
       build-version: ${{ needs.get-vars.outputs.build-version }}
       component-dir: ${{ matrix.component }}
-      push: ${{ inputs.push || false }}
-      ref: ${{ inputs.ref || '' }}
+      publish_binaries: ${{ inputs.publish_binaries || false }}
+      ref: ${{ env.CHECKOUT_REF }}
 
   web-ui-workflow:
     name: Web UI workflow
@@ -141,14 +141,31 @@ jobs:
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:
       build-version: ${{ needs.get-vars.outputs.build-version }}
-      push: ${{ inputs.push || false }}
-      ref: ${{ inputs.ref || '' }}
+      publish_binaries: ${{ inputs.publish_binaries || false }}
+      ref: ${{ env.CHECKOUT_REF }}
+
+  package-distribution-workflow:
+    name: Build platform distribution binaries
+    needs:
+      - get-vars
+      - component-workflow
+      - web-ui-workflow
+    uses: ./.github/workflows/package-distribution.yaml
+    with:
+      build-version: ${{ needs.get-vars.outputs.build-version }}
+      publish_binaries: ${{ inputs.publish_binaries || false }}
+      ref: ${{ env.CHECKOUT_REF }}
+    secrets:
+      AWS_ROLE: ${{ secrets.AWS_ROLE }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      REGISTRY: ${{ secrets.REGISTRY }}
 
   success:
     name: Required status checks
     needs:
       - component-workflow
       - web-ui-workflow
+      - package-distribution-workflow
     runs-on: ubuntu-latest
     if: ${{ always() && !cancelled() }}
     env:
