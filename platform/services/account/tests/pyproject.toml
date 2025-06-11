@@ -10,7 +10,7 @@ dependencies = [
     "PyJWT[crypto]==2.9.0",
     "pyhumps==3.8.0",
     "pytest==8.3.3",
-    "requests==2.32.3"
+    "requests==2.32.4"
 ]
 
 [dependency-groups]
