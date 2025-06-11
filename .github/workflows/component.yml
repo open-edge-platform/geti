@@ -109,7 +109,7 @@ jobs:
           fi
 
       - name: Push image
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.push
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.publish_binaries
         run: make -C "${COMPONENT_DIR}" publish-image
 
       - name: Lint chart
@@ -117,5 +117,5 @@ jobs:
         run: make -C "${COMPONENT_DIR}" lint-chart
 
       - name: Publish chart
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.push
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.publish_binaries
         run: make -C "${COMPONENT_DIR}" publish-chart
