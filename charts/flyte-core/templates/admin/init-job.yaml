@@ -90,7 +90,7 @@ spec:
                 - ALL
           env:
             - name: "POSTGRES_HOST"
-              value: "{{ .Release.Namespace }}-postgresql.{{ .Release.Namespace }}"
+              value: "impt-postgresql.{{ .Values.main_namespace }}"
             - name: "POSTGRES_PORT"
               value: "5432"
       containers:
@@ -110,38 +110,38 @@ spec:
               mountPath: "/opt/psql-script"
           env:
             - name: PGHOST
-              value: {{ .Release.Namespace }}-postgresql.{{ .Release.Namespace }}
+              value: impt-postgresql.{{ .Values.main_namespace }}
             - name: PGPORT
               value: "5432"
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Release.Namespace }}-postgresql
+                  name: impt-postgresql
                   key: postgresql-db
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Namespace }}-postgresql
+                  name: impt-postgresql
                   key: postgresql-username
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Namespace }}-postgresql
+                  name: impt-postgresql
                   key: postgresql-password
             - name: TARGET_POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Namespace }}-postgresql
+                  name: impt-postgresql
                   key: flyte-postgresql-username
             - name: TARGET_POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Namespace }}-postgresql
+                  name: impt-postgresql
                   key: flyte-postgresql-password
             - name: TARGET_POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
-                  name: {{ .Release.Namespace }}-postgresql
+                  name: impt-postgresql
                   key: flyte-postgresql-db
           securityContext:
             allowPrivilegeEscalation: false

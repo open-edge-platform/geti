@@ -32,7 +32,7 @@ image:
 imagePullSecrets:
   - name: regcred
 nameOverride: ""
-fullnameOverride: ""
+fullnameOverride: "kubelet-csr-approver"
 
 metrics:
   enable: false

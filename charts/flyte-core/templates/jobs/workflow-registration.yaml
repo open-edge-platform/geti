@@ -91,7 +91,7 @@ spec:
             --domain production
             --image $IMAGE_TAG
             --service-account impt-jobs
-            --version {{ $.Values.global.workflow_versions }}
+            --version {{ $.Values.global.workflow_versions | default $.Chart.Version }}
             --non-fast
             /interactive_ai/workflows/geti_domain/workflow/job;
             retVal=$?;

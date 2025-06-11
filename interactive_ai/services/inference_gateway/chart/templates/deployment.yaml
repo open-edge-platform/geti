@@ -20,7 +20,7 @@ spec:
         opa_envoy_filter: enabled
     spec:
       terminationGracePeriodSeconds: 90
-      serviceAccountName: {{ include "inference-gateway.serviceAccountName" . }}
+      serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}
       containers:
         - name: &containerName {{ .Chart.Name }}
           image: "{{ .Values.global.registry_address }}/{{ .Values.global.docker_namespace }}/{{ .Values.image }}:{{ .Values.global.tag | default .Chart.AppVersion }}"
