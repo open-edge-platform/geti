@@ -8,7 +8,6 @@ from testfixtures import compare
 
 from communication.views.annotation_rest_views import AnnotationRESTViews, RestShapeType
 from communication.views.scored_label_rest_views import ScoredLabelRESTViews
-from features.feature_flag_provider import FeatureFlag
 
 from iai_core.entities.annotation import Annotation
 from iai_core.entities.shapes import Point, Polygon
@@ -65,9 +64,7 @@ class TestAnnotationRESTViews:
         fxt_annotation_scene_anomaly_reduced,
         fxt_annotation_scene_anomaly_reduced_rest_response,
         fxt_annotation_scene_state,
-        fxt_enable_feature_flag_name,
     ):
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
         with (
             patch.object(
                 ScoredLabelRESTViews,

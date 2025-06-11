@@ -14,7 +14,6 @@ from communication.exceptions import (
 )
 from communication.rest_data_validator import AnnotationRestValidator
 from communication.rest_views.annotation_rest_views import RestShapeType
-from features.feature_flags import FeatureFlag
 from service.label_schema_service import LabelSchemaService
 from tests.fixtures.values import DummyValues
 
@@ -1040,47 +1039,6 @@ class TestAnnotationRestValidator:
         ):
             AnnotationRestValidator().validate_annotation_scene(
                 annotation_scene_rest=fxt_annotation_scene_rest_anomaly_label_conflict,
-                project=fxt_project_with_anomaly_detection_task,
-                media_identifier=fxt_image_identifier_1,
-                media_width=DummyValues.MEDIA_WIDTH,
-                media_height=DummyValues.MEDIA_HEIGHT,
-                label_schema_by_task=label_schema_by_task,
-            )
-
-    def test_validate_annotation_scene_anomalous_global_local(
-        self,
-        fxt_project_with_anomaly_detection_task,
-        fxt_anomaly_segmentation_label_schema,
-        fxt_anomaly_segmentation_labels,
-        fxt_annotation_scene_rest_anomaly_reduced_full_box,
-        fxt_annotation_scene_rest_anomaly_reduced_local_box,
-        fxt_image_identifier_1,
-        fxt_enable_feature_flag_name,
-    ) -> None:
-        """
-        Test validate_annotation_scene on a detection project that contains two
-        annotations with the same ID.
-        """
-        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION.name)
-        label_schema_by_task = label_schema_by_task_for_single_task_project(
-            fxt_project_with_anomaly_detection_task,
-            fxt_anomaly_segmentation_label_schema,
-        )
-
-        AnnotationRestValidator().validate_annotation_scene(
-            annotation_scene_rest=fxt_annotation_scene_rest_anomaly_reduced_full_box,
-            project=fxt_project_with_anomaly_detection_task,
-            media_identifier=fxt_image_identifier_1,
-            media_width=DummyValues.MEDIA_WIDTH,
-            media_height=DummyValues.MEDIA_HEIGHT,
-            label_schema_by_task=label_schema_by_task,
-        )
-
-        with pytest.raises(
-            BadRequestException,
-        ):
-            AnnotationRestValidator().validate_annotation_scene(
-                annotation_scene_rest=fxt_annotation_scene_rest_anomaly_reduced_local_box,
                 project=fxt_project_with_anomaly_detection_task,
                 media_identifier=fxt_image_identifier_1,
                 media_width=DummyValues.MEDIA_WIDTH,

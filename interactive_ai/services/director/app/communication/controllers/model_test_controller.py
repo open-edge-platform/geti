@@ -19,7 +19,6 @@ from communication.jobs_client import JobsClient
 from communication.views.job_rest_views import JobRestViews
 from communication.views.model_test_result_rest_views import ModelTestResultRestViews
 from communication.views.prediction_rest_views import PredictionRESTViews
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
 from service.job_submission import ModelTestingJobSubmitter
 from service.label_schema_service import LabelSchemaService
 
@@ -71,16 +70,8 @@ class ModelTestController:
         project = ProjectRepo().get_by_id(project_id)
         if isinstance(project, NullProject):
             raise ProjectNotFoundException(project_id)
-        model_test_results = list(ModelTestResultRepo(project.identifier).get_all())
-        is_anomaly_reduced = FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-        is_anomaly_task = [node for node in project.get_trainable_task_nodes() if node.task_properties.is_anomaly]
-        if is_anomaly_reduced and is_anomaly_task:
-            model_test_results = [
-                model_test_result
-                for model_test_result in model_test_results
-                if not [score for score in model_test_result.performance.scores if score.name != "Accuracy"]
-            ]
 
+        model_test_results = list(ModelTestResultRepo(project.identifier).get_all())
         # Count the number of media per type in each model test
         datasets_counts_per_model_test = {}
         for model_test_result in model_test_results:
@@ -116,12 +107,10 @@ class ModelTestController:
         if isinstance(model_test_result, NullModelTestResult):
             raise ModelTestResultNotFoundException(model_test_result_id)
 
-        is_anomaly_reduced = FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-        if is_anomaly_reduced:
-            is_anomaly_task = [node for node in project.get_trainable_task_nodes() if node.task_properties.is_anomaly]
-            is_local_test = [score for score in model_test_result.performance.scores if score.name != "Accuracy"]
-            if is_anomaly_task and is_local_test:
-                raise DeprecatedModelTestException(model_test_id=model_test_result_id)
+        is_anomaly_task = [node for node in project.get_trainable_task_nodes() if node.task_properties.is_anomaly]
+        is_local_test = [score for score in model_test_result.performance.scores if score.name != "Accuracy"]
+        if is_anomaly_task and is_local_test:
+            raise DeprecatedModelTestException(model_test_id=model_test_result_id)
 
         # Count the number of media per type in each dataset storage of the model test
         datasets_counts: dict[ID, dict] = {}

@@ -83,10 +83,7 @@ class RestProjectParser(ProjectParser):
 
     def get_task_type_by_name(self, task_name: str) -> TaskType:
         task_rest = self._get_task_rest(task_name=task_name)
-        task_type = task_rest[TASK_TYPE].upper()
-        if task_type == "ANOMALY":
-            return TaskType.ANOMALY_CLASSIFICATION
-        return TaskType[task_type]
+        return TaskType[task_rest[TASK_TYPE].upper()]
 
     def get_custom_labels_names_by_task(self, task_name: str) -> tuple[str, ...]:
         task_rest = self._get_task_rest(task_name=task_name)

@@ -12,6 +12,5 @@ logger = logging.getLogger(__name__)
 
 
 class FeatureFlag(Enum):
-    FEATURE_FLAG_ANOMALY_REDUCTION = auto()
     FEATURE_FLAG_KEYPOINT_DETECTION = auto()
     FEATURE_FLAG_KEYPOINT_DETECTION_DATASET_IE = auto()

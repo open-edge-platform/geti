@@ -33,7 +33,7 @@ class MetricsHelper:
         ground_truth_dataset = evaluation_result.ground_truth_dataset
         prediction_dataset = evaluation_result.prediction_dataset
         label_schema = evaluation_result.get_model().get_label_schema()
-        if task_type in [TaskType.CLASSIFICATION, TaskType.ANOMALY_CLASSIFICATION]:
+        if task_type in [TaskType.CLASSIFICATION, TaskType.ANOMALY]:
             return AccuracyMetric(
                 ground_truth_dataset=ground_truth_dataset,
                 prediction_dataset=prediction_dataset,

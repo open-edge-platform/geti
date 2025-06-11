@@ -6,16 +6,8 @@ This module implements REST mappers for Performance entities
 
 from typing import Any
 
-from features.feature_flags import FeatureFlag
-
-from geti_feature_tools import FeatureFlagProvider
 from iai_core.entities.metrics import AnomalyLocalizationPerformance, NullPerformance, Performance
-from iai_core.entities.project_performance import (
-    GlobalLocalTaskPerformance,
-    ProjectPerformance,
-    TaskPerformance,
-    TaskPerformanceScore,
-)
+from iai_core.entities.project_performance import ProjectPerformance, TaskPerformance, TaskPerformanceScore
 
 GLOBAL_SCORE = "global_score"
 LOCAL_SCORE = "local_score"
@@ -63,17 +55,10 @@ class PerformanceRESTViews:
 
     @staticmethod
     def _task_performance_to_rest(task_performance: TaskPerformance) -> dict[str, Any]:
-        result = {
+        return {
             TASK_ID: str(task_performance.task_node_id),
             SCORE: PerformanceRESTViews._task_performance_score_to_rest(task_performance.score),
         }
-
-        is_anomaly_reduced = FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-        if not is_anomaly_reduced and isinstance(task_performance, GlobalLocalTaskPerformance):
-            result[GLOBAL_SCORE] = PerformanceRESTViews._task_performance_score_to_rest(task_performance.global_score)
-            result[LOCAL_SCORE] = PerformanceRESTViews._task_performance_score_to_rest(task_performance.local_score)
-
-        return result
 
     @staticmethod
     def _task_performance_score_to_rest(
@@ -93,15 +78,7 @@ class PerformanceRESTViews:
         """
         performance_dict: dict
         if isinstance(performance, AnomalyLocalizationPerformance):
-            is_anomaly_reduced = FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-            if is_anomaly_reduced:
-                performance_dict = {SCORE: performance.global_score.value}
-            else:
-                local_score = performance.local_score.value if performance.local_score is not None else None
-                performance_dict = {
-                    LOCAL_SCORE: local_score,
-                    GLOBAL_SCORE: performance.global_score.value,
-                }
+            performance_dict = {SCORE: performance.global_score.value}
         elif isinstance(performance, NullPerformance):
             performance_dict = {SCORE: None}
         elif isinstance(performance, Performance):

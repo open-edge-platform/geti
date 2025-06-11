@@ -264,6 +264,10 @@ class TaskType(Enum):
         17,
         TaskInfo(domain=Domain.KEYPOINT_DETECTION, is_trainable=True, is_anomaly=False, is_global=False, is_local=True),
     )
+    ANOMALY = (
+        18,
+        TaskInfo(domain=Domain.ANOMALY, is_trainable=True, is_anomaly=True, is_global=True, is_local=False),
+    )
 
     def __str__(self) -> str:
         """Returns name."""
@@ -294,6 +298,7 @@ def task_type_to_label_domain(task_type: TaskType) -> Domain:
         TaskType.ANOMALY_CLASSIFICATION: Domain.ANOMALY_CLASSIFICATION,
         TaskType.ANOMALY_DETECTION: Domain.ANOMALY_DETECTION,
         TaskType.ANOMALY_SEGMENTATION: Domain.ANOMALY_SEGMENTATION,
+        TaskType.ANOMALY: Domain.ANOMALY,
         TaskType.ROTATED_DETECTION: Domain.ROTATED_DETECTION,
         TaskType.ACTION_CLASSIFICATION: Domain.ACTION_CLASSIFICATION,
         TaskType.ACTION_DETECTION: Domain.ACTION_DETECTION,
@@ -634,6 +639,7 @@ class NullModelTemplate(ModelTemplate):
 
 
 ANOMALY_TASK_TYPES: Sequence[TaskType] = (
+    TaskType.ANOMALY,
     TaskType.ANOMALY_DETECTION,
     TaskType.ANOMALY_CLASSIFICATION,
     TaskType.ANOMALY_SEGMENTATION,
@@ -645,6 +651,7 @@ TRAINABLE_TASK_TYPES: Sequence[TaskType] = (
     TaskType.DETECTION,
     TaskType.SEGMENTATION,
     TaskType.INSTANCE_SEGMENTATION,
+    TaskType.ANOMALY,
     TaskType.ANOMALY_DETECTION,
     TaskType.ANOMALY_CLASSIFICATION,
     TaskType.ANOMALY_SEGMENTATION,

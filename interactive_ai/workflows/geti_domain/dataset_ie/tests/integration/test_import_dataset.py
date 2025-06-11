@@ -25,7 +25,7 @@ from iai_core.repos import AnnotationSceneRepo, ImageRepo, LabelSchemaRepo, Proj
 from iai_core.repos.base import SessionBasedRepo
 from iai_core.utils.deletion_helpers import DeletionHelpers
 from iai_core.utils.project_builder import ModelTemplateError
-from jobs_common.features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from jobs_common.features.feature_flag_provider import FeatureFlag
 from jobs_common.tasks.utils.secrets import JobMetadata
 from jobs_common_extras.datumaro_conversion.definitions import (
     ANOMALY_PROJECT_TYPES,
@@ -940,24 +940,22 @@ class TestImportDataset:
         candidate_projects = self._get_candidate_project_types(supported_project_types)
         assert project_type_to in candidate_projects, candidate_projects
         assert len(warnings) == n_warnings, warnings
-        is_anomaly_reduced = FeatureFlagProvider.is_enabled(feature_flag=FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-        if is_anomaly_reduced:
-            # check names in pipeline (need "anomaly" instead of "anomaly_classification")
-            for project_meta in supported_project_types:
-                ptype = ImportUtils.rest_task_type_to_project_type(project_meta["project_type"])
-                assert ptype not in [
-                    GetiProjectType.ANOMALY_DETECTION,
-                    GetiProjectType.ANOMALY_SEGMENTATION,
-                ]
-                if ptype == GetiProjectType.ANOMALY_CLASSIFICATION:
-                    assert project_meta["project_type"] == "anomaly"
-                    pipeline = project_meta["pipeline"]
-                    assert pipeline["connections"][0]["to"] == "Anomaly"
-                    anomaly_task = pipeline["tasks"][1]
-                    assert anomaly_task["title"] == "Anomaly"
-                    assert anomaly_task["task_type"] == "anomaly"
-                    assert anomaly_task["labels"][0]["group"] == "Anomaly Task Labels"
-                    assert anomaly_task["labels"][1]["group"] == "Anomaly Task Labels"
+        for project_meta in supported_project_types:
+            ptype = ImportUtils.rest_task_type_to_project_type(project_meta["project_type"])
+            assert ptype not in [
+                GetiProjectType.ANOMALY_CLASSIFICATION,
+                GetiProjectType.ANOMALY_DETECTION,
+                GetiProjectType.ANOMALY_SEGMENTATION,
+            ]
+            if ptype == GetiProjectType.ANOMALY:
+                assert project_meta["project_type"] == "anomaly"
+                pipeline = project_meta["pipeline"]
+                assert pipeline["connections"][0]["to"] == "Anomaly"
+                anomaly_task = pipeline["tasks"][1]
+                assert anomaly_task["title"] == "Anomaly"
+                assert anomaly_task["task_type"] == "anomaly"
+                assert anomaly_task["labels"][0]["group"] == "Anomaly Task Labels"
+                assert anomaly_task["labels"][1]["group"] == "Anomaly Task Labels"
 
         # import dataset
         labels_to_keep = self._get_all_label_names_from_supported_project_types(
@@ -977,8 +975,8 @@ class TestImportDataset:
         label_schema = get_latest_label_schema_for_project(ID(project_id))
         if project_type_from != project_type_to:
             # check if group name is reset(need "<task type> Task Labels")
-            trainalbe_task_types = ImportUtils.get_trainable_tasks_of_project_type(project_type=project_type_to)
-            task_name = ImportUtils.task_type_to_rest_api_string(trainalbe_task_types[0]).replace("_", " ").title()
+            trainable_task_types = ImportUtils.get_trainable_tasks_of_project_type(project_type=project_type_to)
+            task_name = ImportUtils.task_type_to_rest_api_string(trainable_task_types[0]).replace("_", " ").title()
             label_groups = label_schema.get_groups()
             if project_type_from == GetiProjectType.DETECTION and project_type_to == GetiProjectType.CLASSIFICATION:
                 # multi-label classification
@@ -990,7 +988,7 @@ class TestImportDataset:
                 assert len(label_groups) == 1
                 if project_type_to in ANOMALY_PROJECT_TYPES:
                     # default name is decided by project_builder, not dataset-ie
-                    domain_name = "anomaly" if is_anomaly_reduced else trainalbe_task_types[0].name.lower()
+                    domain_name = trainable_task_types[0].name.lower()
                     assert label_groups[0].name == f"default - {domain_name}"
                 else:
                     assert label_groups[0].name == f"{task_name} Task Labels"
@@ -1088,17 +1086,17 @@ class TestImportDataset:
             [
                 "fxt_anomaly_classification_dataset_definition",
                 GetiProjectType.ANOMALY_CLASSIFICATION,
-                GetiProjectType.ANOMALY_CLASSIFICATION,
+                GetiProjectType.ANOMALY,
             ],
             [
                 "fxt_anomaly_detection_dataset_definition",
                 GetiProjectType.ANOMALY_DETECTION,
-                GetiProjectType.ANOMALY_DETECTION,
+                GetiProjectType.ANOMALY,
             ],
             [
                 "fxt_anomaly_segmentation_dataset_definition",
                 GetiProjectType.ANOMALY_SEGMENTATION,
-                GetiProjectType.ANOMALY_SEGMENTATION,
+                GetiProjectType.ANOMALY,
             ],
             [
                 "fxt_anomaly_classification_dataset_definition",
@@ -1113,22 +1111,22 @@ class TestImportDataset:
             [
                 "fxt_anomaly_detection_dataset_definition",
                 GetiProjectType.ANOMALY_DETECTION,
-                GetiProjectType.ANOMALY_CLASSIFICATION,
+                GetiProjectType.ANOMALY,
             ],
             [
                 "fxt_anomaly_segmentation_dataset_definition",
                 GetiProjectType.ANOMALY_SEGMENTATION,
-                GetiProjectType.CLASSIFICATION,
+                GetiProjectType.ANOMALY,
             ],
             [
                 "fxt_anomaly_segmentation_dataset_definition",
                 GetiProjectType.ANOMALY_SEGMENTATION,
-                GetiProjectType.ANOMALY_CLASSIFICATION,
+                GetiProjectType.ANOMALY,
             ],
             [
                 "fxt_anomaly_segmentation_dataset_definition",
                 GetiProjectType.ANOMALY_SEGMENTATION,
-                GetiProjectType.ANOMALY_DETECTION,
+                GetiProjectType.ANOMALY,
             ],
         ],
     )
@@ -1138,7 +1136,6 @@ class TestImportDataset:
         project_type_from,
         project_type_to,
         fxt_import_data_repo,
-        fxt_anomaly_reduction,
         request,
     ):
         """
@@ -1148,18 +1145,15 @@ class TestImportDataset:
             GetiProjectType.ANOMALY_DETECTION,
             GetiProjectType.ANOMALY_SEGMENTATION,
         ]
-        if fxt_anomaly_reduction and project_type_to in anomaly_det_seg:
-            pytest.skip(
-                f"Mapping from '{project_type_from.name}' to '{project_type_to.name}' deosn't exist "
-                "when FEATURE_FLAG_ANOMALY_REDUCTION is enabled."
-            )
+        if project_type_to in anomaly_det_seg:
+            pytest.skip(f"Mapping from '{project_type_from.name}' to '{project_type_to.name}' doesn't exist.")
         self._test_import_dataset_for_cross_project(
             dataset_definition=dataset_definition,
             project_type_from=project_type_from,
             project_type_to=project_type_to,
             import_data_repo=fxt_import_data_repo,
             request=request,
-            n_warnings=(1 if fxt_anomaly_reduction and project_type_from in anomaly_det_seg else 0),
+            n_warnings=(1 if project_type_from in anomaly_det_seg else 0),
         )
 
     @patch.object(
@@ -2321,7 +2315,6 @@ class TestImportDataset:
         project_type_from,
         project_type_to,
         fxt_import_data_repo,
-        fxt_anomaly_reduction,
         request,
     ):
         """
@@ -2329,9 +2322,8 @@ class TestImportDataset:
         This function tests cross-project mapping among anomaly projects.
         """
         if (
-            fxt_anomaly_reduction
-            and project_type_from in [GetiProjectType.ANOMALY_DETECTION, GetiProjectType.ANOMALY_SEGMENTATION]
-            and project_type_to == GetiProjectType.ANOMALY_CLASSIFICATION
+            project_type_from in [GetiProjectType.ANOMALY_DETECTION, GetiProjectType.ANOMALY_SEGMENTATION]
+            and project_type_to == GetiProjectType.ANOMALY
         ):
             n_warnings = 1
         else:

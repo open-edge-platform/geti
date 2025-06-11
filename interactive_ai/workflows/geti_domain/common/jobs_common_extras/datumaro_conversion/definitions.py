@@ -25,6 +25,7 @@ ANNOTATION_TYPE_TO_SUPPORTED_DOMAINS: dict[dm.AnnotationType, list[Domain]] = {
         Domain.ANOMALY_CLASSIFICATION,
         Domain.ANOMALY_DETECTION,
         Domain.ANOMALY_SEGMENTATION,
+        Domain.ANOMALY,
     ],
     dm.AnnotationType.bbox: [
         Domain.DETECTION,
@@ -73,6 +74,7 @@ class GetiProjectType(Enum):
     ANOMALY_CLASSIFICATION = auto()
     ANOMALY_DETECTION = auto()
     ANOMALY_SEGMENTATION = auto()
+    ANOMALY = auto()
     ROTATED_DETECTION = auto()  # ui project name is Detection Oriented
     CHAINED_DETECTION_CLASSIFICATION = auto()
     CHAINED_DETECTION_SEGMENTATION = auto()
@@ -88,6 +90,7 @@ SUPPORTED_IMPORT_PROJECT_TYPE = [
 ]
 
 ANOMALY_PROJECT_TYPES = [
+    GetiProjectType.ANOMALY,
     GetiProjectType.ANOMALY_CLASSIFICATION,
     GetiProjectType.ANOMALY_DETECTION,
     GetiProjectType.ANOMALY_SEGMENTATION,

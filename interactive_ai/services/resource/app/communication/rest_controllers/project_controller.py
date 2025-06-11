@@ -8,12 +8,10 @@ from communication.limit_check_helpers import check_max_number_of_projects
 from communication.rest_data_validator import ProjectRestValidator
 from communication.rest_parsers import RestProjectParser, RestProjectUpdateParser
 from communication.rest_views.project_rest_views import ProjectRESTViews
-from features.feature_flags import FeatureFlag
 from managers.project_manager import ProjectManager
 from service.label_schema_service import LabelSchemaService
 
 from geti_fastapi_tools.responses import success_response_rest
-from geti_feature_tools import FeatureFlagProvider
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID
 from iai_core.entities.label_schema import LabelSchemaView
@@ -55,11 +53,9 @@ class ProjectRESTController:
             parser_kwargs={"rest_data": data},
         )
 
-        is_anomaly_reduced = FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-        label_schema_per_task: dict[ID, LabelSchemaView] = {}
-        for task_node in project.get_trainable_task_nodes():
-            task_title = "Anomaly" if is_anomaly_reduced and task_node.task_properties.is_anomaly else task_node.title
-            label_schema_per_task[task_node.id_] = tasks_schema[task_title]
+        label_schema_per_task: dict[ID, LabelSchemaView] = {
+            task_node.id_: tasks_schema[task_node.title] for task_node in project.get_trainable_task_nodes()
+        }
 
         return ProjectRESTViews.project_to_rest(
             organization_id=organization_id,
@@ -91,11 +87,9 @@ class ProjectRESTController:
             parser_kwargs={"rest_data": data},
         )
 
-        is_anomaly_reduced = FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_ANOMALY_REDUCTION)
-        label_schema_per_task: dict[ID, LabelSchemaView] = {}
-        for task_node in project.get_trainable_task_nodes():
-            task_title = "Anomaly" if is_anomaly_reduced and task_node.task_properties.is_anomaly else task_node.title
-            label_schema_per_task[task_node.id_] = tasks_schema[task_title]
+        label_schema_per_task: dict[ID, LabelSchemaView] = {
+            task_node.id_: tasks_schema[task_node.title] for task_node in project.get_trainable_task_nodes()
+        }
 
         return ProjectRESTViews.project_to_rest(
             organization_id=organization_id,
