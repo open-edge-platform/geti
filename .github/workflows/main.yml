@@ -152,6 +152,7 @@ jobs:
       - web-ui-workflow
     uses: ./.github/workflows/package-distribution.yaml
     with:
+      build-all: ${{ env.BUILD_ALL }}
       build-version: ${{ needs.get-vars.outputs.build-version }}
       publish_binaries: ${{ env.PUBLISH_BINARIES }}
       ref: ${{ env.CHECKOUT_REF }}
