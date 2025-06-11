@@ -101,7 +101,7 @@ jobs:
         component: ${{ fromJSON(needs.get-vars.outputs.libs-list) }}
     with:
       component-dir: ${{ matrix.component }}
-      ref: ${{ inputs.ref || '' }}
+      ref: ${{ env.CHECKOUT_REF }}
 
   component-workflow:
     name: Component workflow
