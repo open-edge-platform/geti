@@ -2,11 +2,10 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import json
-import pytest
 from http import HTTPStatus
 from unittest.mock import patch
-from pydantic import ValidationError
 
+import pytest
 from geti_configuration_tools.project_configuration import PartialProjectConfiguration
 from testfixtures import compare
 
@@ -159,7 +158,7 @@ class TestProjectConfigurationEndpoints:
                                         "name": "Minimum images per label",
                                     }
                                 ]
-                            }
+                            },
                         }
                     ]
                 },
@@ -187,7 +186,7 @@ class TestProjectConfigurationEndpoints:
                                         "value": -5,  # invalid negative value
                                     }
                                 ]
-                            }
+                            },
                         }
                     ]
                 },

@@ -1,13 +1,13 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import logging
 import json
+import logging
 from http import HTTPStatus
 from typing import Annotated, Any
 
 import pydantic
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
 from geti_feature_tools import FeatureFlagProvider
 

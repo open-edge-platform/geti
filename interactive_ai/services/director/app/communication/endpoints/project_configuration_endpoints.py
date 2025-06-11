@@ -1,8 +1,8 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import logging
 import json
+import logging
 from http import HTTPStatus
 from typing import Annotated, Any
 

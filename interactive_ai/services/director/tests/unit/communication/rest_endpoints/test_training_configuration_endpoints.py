@@ -2,10 +2,10 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import json
-import pytest
 from http import HTTPStatus
 from unittest.mock import patch
 
+import pytest
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
 from testfixtures import compare
 
@@ -156,7 +156,7 @@ class TestTrainingConfigurationEndpoints:
                             "validation": 20,
                             "test": 10,
                         }
-                    }
+                    },
                 },
                 "value_error",
             ),
@@ -165,9 +165,7 @@ class TestTrainingConfigurationEndpoints:
                 {
                     "task_id": "detection_1",
                     "model_manifest_id": "model_manifest_123",
-                    "training": [
-                        {"key": "max_epochs", "value": "not_an_integer", "type": "int", "name": "Epochs"}
-                    ]
+                    "training": [{"key": "max_epochs", "value": "not_an_integer", "type": "int", "name": "Epochs"}],
                 },
                 "int_parsing",
             ),
@@ -182,7 +180,7 @@ class TestTrainingConfigurationEndpoints:
                             "validation": 20,
                             "test": 20,  # Total: 110%
                         }
-                    }
+                    },
                 },
                 "value_error",
             ),
@@ -191,9 +189,7 @@ class TestTrainingConfigurationEndpoints:
                 {
                     "task_id": "detection_1",
                     "model_manifest_id": "model_manifest_123",
-                    "training": [
-                        {"key": "learning_rate", "value": -0.01, "type": "float", "name": "Learning rate"}
-                    ]
+                    "training": [{"key": "learning_rate", "value": -0.01, "type": "float", "name": "Learning rate"}],
                 },
                 "greater_than",
             ),
