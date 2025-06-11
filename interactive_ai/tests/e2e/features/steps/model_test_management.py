@@ -21,7 +21,7 @@ def step_user_requests_model_test(context):
             optimized_model_id = optimized_model.id
             break
     else:
-        raise ValueError("No FP16 optimized model found in the model group")
+        raise RuntimeError("No FP16 optimized model found in the model group")
 
     trigger_model_test = TriggerModelTestJobRequest(
         name="Test 1", dataset_ids=[context.dataset_id], model_group_id=model_group_id, model_id=optimized_model_id
@@ -35,7 +35,7 @@ def step_user_requests_model_test(context):
     context.job_id = model_test_response.job_id
 
 
-@step("a model test report is created")
+@then("a model test report is created")
 def step_a_model_test_report_is_created(context):
     model_test_results = context.tests_api.get_all_tests_in_a_project(
         organization_id=context.organization_id, workspace_id=context.workspace_id, project_id=context.project_id
@@ -43,7 +43,7 @@ def step_a_model_test_report_is_created(context):
     assert len(model_test_results) == 1, "Expected one model test report to be created"
 
 
-@step("the model test report has a non-null score")
+@then("the model test report has a non-null score")
 def step_the_model_test_report_has_non_null_score(context):
     model_test_result = context.tests_api.get_all_tests_in_a_project(
         organization_id=context.organization_id, workspace_id=context.workspace_id, project_id=context.project_id
@@ -51,7 +51,7 @@ def step_the_model_test_report_has_non_null_score(context):
     assert model_test_result.scores[0].value > 0, "Expected a model test score greater than 0"
 
 
-@step("the model test report has a number of media greater than 0")
+@then("the model test report has a number of media greater than 0")
 def step_the_model_test_report_has_more_than_0_media(context):
     model_test_result = context.tests_api.get_all_tests_in_a_project(
         organization_id=context.organization_id, workspace_id=context.workspace_id, project_id=context.project_id
