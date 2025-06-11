@@ -10,6 +10,9 @@ on:
   push:
     branches:
       - main
+    tags:
+      - v[0-9]+\.[0-9]+\.[0-9]+-RC[0-9]+
+
   workflow_dispatch:
     inputs:
       push:
@@ -50,12 +53,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
           ref: ${{ env.CHECKOUT_REF }}
-
-      - name: Debug workflow context
-        run: |
-          echo "github.ref_name => ${{ github.ref_name }}"
-          echo "github.ref => ${{ github.ref }}"    
-          echo "inputs.ref => ${{ inputs.ref }}"    
 
       - name: Prepare build version
         id: prepare-build-version

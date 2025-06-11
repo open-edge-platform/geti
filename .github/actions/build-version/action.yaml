@@ -1,32 +1,116 @@
-name: Generate Build Version
-description: Generate Build Version
-
+name: 'Generate Build Version'
+description: 'Generates build version based on workflow context'
 inputs:
+  version-file-path:
+    description: 'Path to file containing the base platform version'
+    required: false
+    default: 'VERSION'
   ref:
-    description: 'The branch, tag or SHA to checkout'
-    required: true
+    description: 'Reference (branch/tag/SHA) for manual workflow dispatch'
+    required: false
+    default: ''
 outputs:
-  build_version:
-    description: "Build version"
-    value: ${{ steps.prepare-build-version.outputs.version }}
+  version:
+    description: 'Generated version string'
+    value: ${{ steps.generate-version.outputs.version }}
 
 runs:
-  using: composite
+  using: 'composite'
   steps:
-    - name: Prepare build version
-      id: prepare-build-version
+    - name: Read base version
+      id: read-version
       shell: bash
       run: |
-        ref_name=${{ github.ref_name }}"
-        ref=${{ github.ref }}"
-        
-        base_version=$(<VERSION)
-        ref_sanitized=${ref_name//\//-}
-        tag="${base_version}-${ref_sanitized}"
-
-        # If not a tag build, append the short SHA
-        if [[ "$ref" != refs/tags/* ]]; then
-          tag+="-$(git rev-parse --short HEAD)"
+        if [ -f "${{ inputs.version-file-path }}" ]; then
+          VERSION=$(cat "${{ inputs.version-file-path }}" | tr -d '\n\r')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Base version: $VERSION"
+        else
+          echo "Error: Version file '${{ inputs.version-file-path }}' not found"
+          exit 1
         fi
-        echo "version=$tag"
-        echo "version=$tag" >> "$GITHUB_OUTPUT"
+
+    - name: Get short SHA
+      id: short-sha
+      shell: bash
+      run: |
+        SHORT_SHA=$(git rev-parse --short HEAD)
+        echo "short-sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+        echo "Short SHA: $SHORT_SHA"
+
+    - name: Generate version
+      id: generate-version
+      shell: bash
+      run: |
+        BASE_VERSION="${{ steps.read-version.outputs.version }}"
+        SHORT_SHA="${{ steps.short-sha.outputs.short-sha }}"
+        
+        echo "Event: ${{ github.event_name }}"
+        echo "Ref: ${{ github.ref }}"
+        echo "Ref Name: ${{ github.ref_name }}"
+        echo "Manual ref input: ${{ inputs.ref }}"
+        
+        case "${{ github.event_name }}" in
+          "push")
+            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+              VERSION="${BASE_VERSION}-${{ github.ref_name }}-${SHORT_SHA}"
+              echo "Generated version for push to main: $VERSION"
+        
+            # Release candidates builds
+            elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+              # Release candidate tag on release branch
+              TAG_VERSION="${{ github.ref_name }}"
+        
+              # Insure the RC tag version matches the platform version (remove 'v' prefix)
+              TAG_VERSION_CLEAN=$(echo "$TAG_VERSION" | sed 's/^v//')
+              TAG_BASE=$(echo "$TAG_VERSION_CLEAN" | sed 's/-RC[0-9]*$//')
+        
+              if [[ "$BASE_VERSION" == "$TAG_BASE" ]]; then
+                VERSION="$TAG_VERSION"
+                echo "Generated version for RC tag: $VERSION"
+              else
+                echo "Error: Version mismatch. File version: $BASE_VERSION, Tag base version: $TAG_BASE"
+                exit 1
+              fi
+            else
+              # Other push events
+              VERSION="${BASE_VERSION}-${{ github.ref_name }}-${SHORT_SHA}"
+              echo "Generated version for push: $VERSION"
+            fi
+            ;;
+        
+          "pull_request")
+            PR_NUMBER="${{ github.event.number }}"
+            VERSION="${BASE_VERSION}-PR-${PR_NUMBER}-${SHORT_SHA}"
+            echo "Generated version for PR: $VERSION"
+            ;;
+        
+          "merge_group")
+            VERSION="${BASE_VERSION}-MR-${SHORT_SHA}"
+            echo "Generated version for merge queue (no PR number): $VERSION"
+            ;;
+        
+          "workflow_dispatch")
+            if [[ -n "${{ inputs.ref }}" && "${{ inputs.ref }}" != "true" ]]; then
+        
+              # A ref was provided:
+              REF_NAME=$(echo "${{ inputs.ref }}" | sed 's|refs/heads/||' | sed 's|refs/tags/||' | sed 's|/|_|g')
+              VERSION="${BASE_VERSION}-${REF_NAME}-${SHORT_SHA}"
+              echo "Generated version for manual dispatch with ref: $VERSION"
+            else
+              # Use current ref
+              REF_NAME=$(echo "${{ github.ref_name }}" | sed 's|/|_|g')
+              VERSION="${BASE_VERSION}-REF-${SHORT_SHA}"
+              echo "Generated version for manual dispatch: $VERSION"
+            fi
+            ;;
+        
+          *)
+            # Default case
+            VERSION="${BASE_VERSION}-${SHORT_SHA}"
+            echo "Generated default version: $VERSION"
+            ;;
+        esac
+        
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Final version: $VERSION"
