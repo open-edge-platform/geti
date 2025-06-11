@@ -40,7 +40,7 @@ publish-image:
 
 publish-umbrella-chart: build-umbrella-chart
 	echo "publishing umbrella charts for..."
-	$(MAKE) -C $(UMBRELLA_CHARTS) publish-chart
+	$(MAKE) -C $(DISTRIB_CHARTS) publish-chart
 
 static-code-analysis:
 	echo "Running static code analysis for all projects..."

@@ -10,10 +10,13 @@ on:
   push:
     branches:
       - main
+    tags:
+      - v[0-9]+\.[0-9]+\.[0-9]+-RC[0-9]+
+
   workflow_dispatch:
     inputs:
-      push:
-        description: "Enable pushing Docker images and Helm charts"
+      publish_binaries:
+        description: "Enable publishing binaries"
         type: boolean
         default: true
       ref:
@@ -25,67 +28,88 @@ concurrency:
   group: ${{ github.head_ref || github.ref_name }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-permissions: {} # No permissions by default on workflow level
+permissions: { } # No permissions by default on workflow level
 
 jobs:
   get-vars:
-    name: Get variables
-    env:
-      BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' }}
+    name: Prepare build metadata
     runs-on: ubuntu-latest
     permissions:
       contents: read
     timeout-minutes: 10
     outputs:
-      image-tag: "${{ steps.image-tag.outputs.image-tag }}"
+      build_all: ${{ steps.set-vars.outputs.build_all }}
+      build_version: "${{ steps.prepare-build-version.outputs.version }}"
+      checkout_ref: ${{ steps.set-vars.outputs.checkout_ref }}
+      publish_binaries: ${{ steps.set-vars.outputs.publish_binaries }}
       components-list: ${{ steps.components-list.outputs.paths_list }}
       filtered-components-list: ${{ steps.filtered-components-list.outputs.filtered-list }}
       libs-list: ${{ steps.libs-list.outputs.paths_list }}
+
     steps:
+      - name: Prepare build variables
+        id: set-vars
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REF: ${{ github.ref }}
+          DISPATCH_PUB: ${{ github.event.inputs.publish_binaries }}
+          DISPATCH_REF: ${{ github.event.inputs.ref }}
+        run: |
+          # BUILD_ALL: true on manual dispatch or any tag
+          if [[ "$EVENT_NAME" == "workflow_dispatch" || "$GITHUB_REF" == refs/tags/* ]]; then
+            build_all=true
+          else
+            build_all=false
+          fi
+          
+          # PUBLISH_BINARIES: only if manual & publish=true, or on any tag
+          if [[ ( "$EVENT_NAME" == "workflow_dispatch" && "$DISPATCH_PUB" == "true" ) || "$GITHUB_REF" == refs/tags/* ]]; then
+            publish_binaries=true
+          else
+            publish_binaries=false
+          fi
+          
+          # CHECKOUT_REF: use manual input if provided, else real ref
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && -n "$DISPATCH_REF" ]]; then
+            checkout_ref="$DISPATCH_REF"
+          else
+            checkout_ref="$GITHUB_REF"
+          fi
+
+          echo "build_all=$build_all"               >> $GITHUB_OUTPUT
+          echo "publish_binaries=$publish_binaries" >> $GITHUB_OUTPUT
+          echo "checkout_ref=$checkout_ref"         >> $GITHUB_OUTPUT
+          
+          echo "build_all=$build_all"
+          echo "publish_binaries=$publish_binaries"
+          echo "checkout_ref=$checkout_ref"
+
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           fetch-depth: 0
           persist-credentials: false
+          ref: ${{ steps.set-vars.outputs.checkout_ref }}
 
-      - name: Prepare image tag
-        id: image-tag
-        env:
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          GITHUB_EVENT_NUMBER: ${{ github.event.number }}
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-          REF: ${{ inputs.ref }}
-        run: |
-          short_sha=$(git rev-parse --short HEAD)
-          product_version=$(sed -ne 's/^.*PRODUCT_VERSION.*?= //p' Makefile.shared)
-          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-              ref=$(echo "${GITHUB_REF_NAME}" | tr '/' '-')
-          elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-              ref=pr-"${GITHUB_EVENT_NUMBER}"
-          elif [[ "${GITHUB_EVENT_NAME}" == "merge_group" ]]; then
-              ref=mr
-          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-              ref=$(echo "${REF}" | tr '/_' '-')
-          else
-              echo "unknown event ${github_event_name}!"
-              exit 1
-          fi
-
-          echo "image-tag=$product_version-$ref-$short_sha" >> "$GITHUB_OUTPUT"
+      - name: Prepare build version
+        id: prepare-build-version
+        uses: ./.github/actions/build-version
+        with:
+          ref: ${{ steps.set-vars.outputs.checkout_ref }}
 
       - name: Get changed components dirs
         id: components-list
         uses: ./.github/actions/change-detection
         with:
           path_filter: "./.github/components-path-filters.yml"
-          get_all: ${{ env.BUILD_ALL }}
+          get_all: ${{ fromJSON(steps.set-vars.outputs.build_all) }} # fromJSON is required to cast string to boolean
 
       - name: Get changed libs dirs
         id: libs-list
         uses: ./.github/actions/change-detection
         with:
           path_filter: "./.github/libs-path-filters.yml"
-          get_all: ${{ env.BUILD_ALL }}
+          get_all: ${{ fromJSON(steps.set-vars.outputs.build_all) }} # fromJSON is required to cast string to boolean
 
       - name: Filter components (exclude 'web_ui')
         id: filtered-components-list
@@ -112,7 +136,7 @@ jobs:
         component: ${{ fromJSON(needs.get-vars.outputs.libs-list) }}
     with:
       component-dir: ${{ matrix.component }}
-      ref: ${{ inputs.ref || '' }}
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
   component-workflow:
     name: Component workflow
@@ -133,10 +157,10 @@ jobs:
         # therefore we filter out the web_ui component here
         component: ${{ fromJSON(needs.get-vars.outputs.filtered-components-list) }}
     with:
-      image-tag: ${{ needs.get-vars.outputs.image-tag }}
-      component-dir: ${{ matrix.component }}
-      push: ${{ inputs.push || false }}
-      ref: ${{ inputs.ref || '' }}
+      build_version: ${{ needs.get-vars.outputs.build_version }}
+      component_dir: ${{ matrix.component }}
+      publish_binaries: ${{ fromJSON(needs.get-vars.outputs.publish_binaries) }} # fromJSON is required to cast string to boolean
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
   web-ui-workflow:
     name: Web UI workflow
@@ -151,15 +175,37 @@ jobs:
     uses: ./.github/workflows/web-ui.yml
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:
-      image-tag: ${{ needs.get-vars.outputs.image-tag }}
-      push: ${{ inputs.push || false }}
-      ref: ${{ inputs.ref || '' }}
+      build_version: ${{ needs.get-vars.outputs.build_version }}
+      publish_binaries: ${{ fromJSON(needs.get-vars.outputs.publish_binaries) }} # fromJSON is required to cast string to boolean
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
+
+  package-distribution-workflow:
+    name: Build platform distribution binaries
+    needs:
+      - get-vars
+      - component-workflow
+      - web-ui-workflow
+    permissions:
+      contents: read
+      id-token: write # is required by nested component-check
+    uses: ./.github/workflows/package-distribution.yaml
+    with:
+      build-all: ${{ fromJSON(needs.get-vars.outputs.build_all) }} # fromJSON is required to cast string to boolean
+      build-version: ${{ needs.get-vars.outputs.build_version }}
+      publish_binaries: ${{ fromJSON(needs.get-vars.outputs.publish_binaries) }} # fromJSON is required to cast string to boolean
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
+
+    secrets:
+      AWS_ROLE: ${{ secrets.AWS_ROLE }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      REGISTRY: ${{ secrets.REGISTRY }}
 
   success:
     name: Required status checks
     needs:
       - component-workflow
       - web-ui-workflow
+      - package-distribution-workflow
     runs-on: ubuntu-latest
     if: ${{ always() && !cancelled() }}
     env:

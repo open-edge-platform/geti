@@ -3,16 +3,16 @@ name: Components workflow
 on:
   workflow_call:
     inputs:
-      component-dir:
+      component_dir:
         description: "Dir in root directory"
         type: string
         required: true
-      image-tag:
-        description: "Docker image tag"
+      build_version:
+        description: "Specifies the build version to apply to all binaries produced by this workflow"
         type: string
         required: true
-      push:
-        description: "Enable pushing Docker images and Helm charts"
+      publish_binaries:
+        description: "Enable publishing binaries to repos"
         type:  boolean
         default: false
       ref:
@@ -32,14 +32,14 @@ on:
         description: 'The branch, tag or SHA to checkout'
         required: true
         default: "main"
-      component-dir:
+      component_dir:
         description: "Path to the component (relative to the root of the repository)"
         required: true
 
 permissions: {} # No permissions by default on workflow level
 
 env:
-  COMPONENT_DIR: ${{ inputs.component-dir }}
+  COMPONENT_DIR: ${{ inputs.component_dir }}
 
 jobs:
   component-check:
@@ -50,7 +50,7 @@ jobs:
       id-token: write
     timeout-minutes: 30
     env:
-      TAG: ${{ inputs.image-tag || github.sha }}
+      TAG: ${{ inputs.build_version || github.sha }}
       REGISTRY: ${{ secrets.REGISTRY }}
       PYTHON_BUILDER_IMAGE: builder-images/python-builder:v0.1
       GO_BUILDER_IMAGE: builder-images/go-builder:v0.1
@@ -109,7 +109,7 @@ jobs:
           fi
 
       - name: Push image
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.push
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.publish_binaries
         run: make -C "${COMPONENT_DIR}" publish-image
 
       - name: Lint chart
@@ -117,5 +117,5 @@ jobs:
         run: make -C "${COMPONENT_DIR}" lint-chart
 
       - name: Publish chart
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.push
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.publish_binaries
         run: make -C "${COMPONENT_DIR}" publish-chart
