@@ -7,6 +7,7 @@ import { useApplicationServices } from '@geti/core/src/services/application-serv
 import { Meter } from '@opentelemetry/api';
 import { MeterProvider, PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 
+import { useFeatureFlags } from '../core/feature-flags/hooks/use-feature-flags.hook';
 import { useWorkflowId } from '../core/platform-utils/hooks/use-platform-utils.hook';
 import { useEventListener } from '../hooks/event-listener/event-listener.hook';
 import { createPeriodicMetricExporter, initializeMetrics } from './metrics';
@@ -106,8 +107,9 @@ const useAnalytics = (): AnalyticsContextProps => {
 };
 
 const useIsAnalyticsEnabled = (): boolean => {
-    // TODO: Implement a more robust check for analytics enablement
-    return true;
+    const { FEATURE_FLAG_TELEMETRY_STACK } = useFeatureFlags();
+
+    return FEATURE_FLAG_TELEMETRY_STACK;
 };
 
 export { AnalyticsProvider, useAnalytics, useIsAnalyticsEnabled };
