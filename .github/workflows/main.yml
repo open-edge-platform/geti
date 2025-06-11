@@ -31,9 +31,9 @@ concurrency:
 permissions: {} # No permissions by default on workflow level
 
 env:
-  BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) }}
+  BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/') }}
+  PUBLISH_BINARIES: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_binaries || startsWith(github.ref, 'refs/tags/') }}
   CHECKOUT_REF: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.ref || github.ref }}
-
 
 jobs:
   get-vars:
@@ -124,7 +124,7 @@ jobs:
     with:
       build-version: ${{ needs.get-vars.outputs.build-version }}
       component-dir: ${{ matrix.component }}
-      publish_binaries: ${{ inputs.publish_binaries || false }}
+      publish_binaries: ${{ env.PUBLISH_BINARIES }}
       ref: ${{ env.CHECKOUT_REF }}
 
   web-ui-workflow:
@@ -141,7 +141,7 @@ jobs:
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:
       build-version: ${{ needs.get-vars.outputs.build-version }}
-      publish_binaries: ${{ inputs.publish_binaries || false }}
+      publish_binaries: ${{ env.PUBLISH_BINARIES }}
       ref: ${{ env.CHECKOUT_REF }}
 
   package-distribution-workflow:
@@ -153,7 +153,7 @@ jobs:
     uses: ./.github/workflows/package-distribution.yaml
     with:
       build-version: ${{ needs.get-vars.outputs.build-version }}
-      publish_binaries: ${{ inputs.publish_binaries || false }}
+      publish_binaries: ${{ env.PUBLISH_BINARIES }}
       ref: ${{ env.CHECKOUT_REF }}
     secrets:
       AWS_ROLE: ${{ secrets.AWS_ROLE }}
