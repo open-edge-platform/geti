@@ -26,6 +26,9 @@ jobs:
   package-distribution-workflow:
     name: Build platform distribution binaries
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     env:
       TAG: ${{ inputs.build-version }}
       REGISTRY: ${{ secrets.REGISTRY }}
