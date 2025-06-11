@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       publish_binaries:
-        description: "Enable publishing binaries to repos"
+        description: "Enable publishing binaries"
         type: boolean
         default: true
       ref:
