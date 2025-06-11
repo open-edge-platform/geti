@@ -20,13 +20,15 @@ runs:
     - name: Read base version
       id: read-version
       shell: bash
+      env:
+        VERSION_FILE_PATH: ${{ inputs.version-file-path }}
       run: |
-        if [ -f "${{ inputs.version-file-path }}" ]; then
-          VERSION=$(cat "${{ inputs.version-file-path }}" | tr -d '\n\r')
+        if [ -f "$VERSION_FILE_PATH" ]; then
+          VERSION=$(cat "$VERSION_FILE_PATH" | tr -d '\n\r')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Base version: $VERSION"
         else
-          echo "Error: Version file '${{ inputs.version-file-path }}' not found"
+          echo "Error: Version file '$VERSION_FILE_PATH' not found"
           exit 1
         fi
 
@@ -41,28 +43,33 @@ runs:
     - name: Generate version
       id: generate-version
       shell: bash
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_REF_NAME: ${{ github.ref_name }}
+        INPUT_REF: ${{ inputs.ref }}
+        BASE_VERSION: ${{ steps.read-version.outputs.version }}
+        SHORT_SHA: ${{ steps.short-sha.outputs.short-sha }}
+        PR_NUMBER: ${{ github.event.number }}
+
       run: |
-        BASE_VERSION="${{ steps.read-version.outputs.version }}"
-        SHORT_SHA="${{ steps.short-sha.outputs.short-sha }}"
         
-        echo "Event: ${{ github.event_name }}"
-        echo "Ref: ${{ github.ref }}"
-        echo "Ref Name: ${{ github.ref_name }}"
-        echo "Manual ref input: ${{ inputs.ref }}"
+        echo "Event: $EVENT_NAME"
+        echo "Ref: $GITHUB_REF"
+        echo "Ref Name: $GITHUB_REF_NAME"
+        echo "Manual ref input: $INPUT_REF"
         
-        case "${{ github.event_name }}" in
+        case "$EVENT_NAME" in
           "push")
-            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-              VERSION="${BASE_VERSION}-${{ github.ref_name }}-${SHORT_SHA}"
+            if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+              VERSION="${BASE_VERSION}-${GITHUB_REF_NAME}-${SHORT_SHA}"
               echo "Generated version for push to main: $VERSION"
         
             # Release candidates builds
-            elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
-              # Release candidate tag on release branch
-              TAG_VERSION="${{ github.ref_name }}"
-        
-              # Insure the RC tag version matches the platform version (remove 'v' prefix)
-              TAG_VERSION_CLEAN=$(echo "$TAG_VERSION" | sed 's/^v//')
+            elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+              
+              # Check if versions in TAG (ignoring RC suffix for base version) matches teh VERSION in file 
+              TAG_VERSION_CLEAN=$(echo "$GITHUB_REF_NAME" | sed 's/^v//')
               TAG_BASE=$(echo "$TAG_VERSION_CLEAN" | sed 's/-RC[0-9]*$//')
         
               if [[ "$BASE_VERSION" == "$TAG_BASE" ]]; then
@@ -74,13 +81,12 @@ runs:
               fi
             else
               # Other push events
-              VERSION="${BASE_VERSION}-${{ github.ref_name }}-${SHORT_SHA}"
+              VERSION="${BASE_VERSION}-${GITHUB_REF_NAME}-${SHORT_SHA}"
               echo "Generated version for push: $VERSION"
             fi
             ;;
         
           "pull_request")
-            PR_NUMBER="${{ github.event.number }}"
             VERSION="${BASE_VERSION}-PR-${PR_NUMBER}-${SHORT_SHA}"
             echo "Generated version for PR: $VERSION"
             ;;
@@ -91,15 +97,15 @@ runs:
             ;;
         
           "workflow_dispatch")
-            if [[ -n "${{ inputs.ref }}" && "${{ inputs.ref }}" != "true" ]]; then
+            if [[ -n "$INPUT_REF" ]]; then
         
               # A ref was provided:
-              REF_NAME=$(echo "${{ inputs.ref }}" | sed 's|refs/heads/||' | sed 's|refs/tags/||' | sed 's|/|_|g')
+              REF_NAME=$(echo "$INPUT_REF" | sed 's|refs/heads/||' | sed 's|refs/tags/||' | sed 's|/|_|g')
               VERSION="${BASE_VERSION}-${REF_NAME}-${SHORT_SHA}"
               echo "Generated version for manual dispatch with ref: $VERSION"
             else
               # Use current ref
-              REF_NAME=$(echo "${{ github.ref_name }}" | sed 's|/|_|g')
+              REF_NAME=$(echo "$GITHUB_REF_NAME" | sed 's|/|_|g')
               VERSION="${BASE_VERSION}-REF-${SHORT_SHA}"
               echo "Generated version for manual dispatch: $VERSION"
             fi
