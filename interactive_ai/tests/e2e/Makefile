@@ -49,7 +49,7 @@ tests: venv
 		echo "Selected tags: $(BDD_TAG)"; \
 		TAG_OPTION='--tags=$(BDD_TAG)'; \
 	fi; \
-	uv run -m behave $$TAG_OPTION $$TARGET --junit --junit-directory $(MAKEFILE_DIR)/reports/junit
+	uv run -m behave $$TAG_OPTION $$TARGET --no-skipped --junit --junit-directory $(MAKEFILE_DIR)/reports/junit
 
 test_wip: venv
 	@echo "Running WIP tests..."

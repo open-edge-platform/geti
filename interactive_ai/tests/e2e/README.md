@@ -41,3 +41,8 @@ For more details about the usage of behave, check its [official documentation](h
 
 `make tests` will generate a JUnit report for each feature in the `bdd/reports` folder.
 You can convert these reports to HTML with `make report` and open them in your browser.
+
+## Troubleshooting
+
+If you encounter issues when downloading test files from https://storage.geti.intel.com/, make sure that your NO_PROXY environment variable
+does not contain `intel.com`. 
