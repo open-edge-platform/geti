@@ -215,7 +215,7 @@ async def pydantic_validation_exception_handler(request: Request, exc: pydantic.
     Converts a pydantic ValidationError to a better readable Bad request exception.
     """
 
-    def format_location(loc):
+    def format_location(loc: list) -> str:
         """
         Format location path with proper dot notation and array indices.
 
@@ -231,11 +231,7 @@ async def pydantic_validation_exception_handler(request: Request, exc: pydantic.
         return result
 
     errors = [
-        {
-            "message": error["msg"],
-            "type": error["type"],
-            **({"location": format_location(error.get("loc", []))})
-        }
+        {"message": error["msg"], "type": error["type"], "location": format_location(error.get("loc", []))}
         for error in exc.errors()
     ]
 
