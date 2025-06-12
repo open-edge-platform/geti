@@ -79,12 +79,7 @@ export const Loading = ({
 }: LoadingProps): JSX.Element => {
     if (mode === 'inline') {
         return (
-            <Flex
-                alignItems={'center'}
-                justifyContent={'center'}
-                UNSAFE_style={style}
-                UNSAFE_className={className}
-            >
+            <Flex alignItems={'center'} justifyContent={'center'} UNSAFE_style={style} UNSAFE_className={className}>
                 <ProgressCircle aria-label={'Loading...'} isIndeterminate size={size} {...rest} />
             </Flex>
         );

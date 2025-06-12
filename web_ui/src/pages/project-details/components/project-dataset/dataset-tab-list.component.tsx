@@ -61,11 +61,7 @@ export const DatasetTabList = () => {
                     isDisabled={createDataset.isPending}
                     aria-label={'Create dataset'}
                 >
-                    {createDataset.isPending ? (
-                        <Loading mode='inline' size='S' />
-                    ) : (
-                        <Add color='white' />
-                    )}
+                    {createDataset.isPending ? <Loading mode='inline' size='S' /> : <Add color='white' />}
                 </ActionButton>
                 <Tooltip>Create new testing set</Tooltip>
             </TooltipTrigger>

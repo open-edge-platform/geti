@@ -18,7 +18,7 @@ export const Balance = ({
     const numberFormatter = useNumberFormatter({});
 
     if (isLoading) {
-        return <Loading mode='inline' size={'S'} style={{ height: 'initial'}} />;
+        return <Loading mode='inline' size={'S'} style={{ height: 'initial' }} />;
     }
 
     if (isNil(organizationBalance)) {
