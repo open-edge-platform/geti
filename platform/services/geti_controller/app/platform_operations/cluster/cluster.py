@@ -1,3 +1,4 @@
+import os
 import logging
 
 from kubernetes import client, config
@@ -127,6 +128,9 @@ def deploy_cluster_role_binding(cluster_role_binding: V1ClusterRoleBinding) -> N
 
 def create_job(name: str, image: str, registry: str, manifest_version: str) -> V1Job:
     """Create a Job object."""
+    http_proxy = os.getenv("HTTP_PROXY")
+    https_proxy = os.getenv("HTTPS_PROXY")
+    no_proxy = os.getenv("NO_PROXY") or ""
     container = V1Container(
         name=name,
         image=image,
@@ -154,6 +158,28 @@ def create_job(name: str, image: str, registry: str, manifest_version: str) -> V
                 value_from=V1EnvVarSource(
                     secret_key_ref=V1SecretKeySelector(name="geti-install-data", key="password", optional=True)
                 ),
+            ),
+            V1EnvVar(
+                name="PASSWORD_HASH",
+                value_from=V1EnvVarSource(
+                    secret_key_ref=V1SecretKeySelector(name="geti-install-data", key="passwordHash", optional=True)
+                ),
+            ),
+            V1EnvVar(
+                name="PROXY_ENABLED",
+                value=str(bool(http_proxy or https_proxy)),
+            ),
+            V1EnvVar(
+                name="HTTPS_PROXY",
+                value=https_proxy,
+            ),
+            V1EnvVar(
+                name="HTTP_PROXY",
+                value=http_proxy,
+            ),
+            V1EnvVar(
+                name="NO_PROXY",
+                value=no_proxy,
             ),
             V1EnvVar(
                 name="TLS_CERT",

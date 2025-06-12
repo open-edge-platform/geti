@@ -18,6 +18,7 @@ accelerator:
 dataStoragePath: ""
 
 global:
+  installation_profile: standard
   serverAddress: ''
   grafana_enabled: ''
   s3_credentials_provider: local

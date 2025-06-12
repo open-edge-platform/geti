@@ -57,7 +57,10 @@ def install_platform(payload: InstallRequest) -> InstallResponse:
     """
     Starts the installation of the specified platform version.
     """
+    # TODO: remove payload when version will contain proper value
     logger.debug(f"POST install request received. Payload: {payload}")
+    registry = os.environ.get('REGISTRY')
+    version = os.environ.get("VERSION")
 
     if not payload.version_number:
         raise HTTPException(
@@ -83,12 +86,11 @@ def install_platform(payload: InstallRequest) -> InstallResponse:
     deploy_service_account(sa, namespace="default")
     deploy_cluster_role(cr)
     deploy_cluster_role_binding(crb)
-    # TODO change tag to generated one
     job = create_job(
         name="install-upgrade",
-        registry=f"{os.environ.get('REGISTRY')}/open-edge-platform",
-        image=f"{os.environ.get('REGISTRY')}/open-edge-platform/geti/install-upgrade:michala",
-        manifest_version=os.environ.get("VERSION"),
+        registry=f"{registry}/open-edge-platform",
+        image=f"{registry}/open-edge-platform/geti/install-upgrade:{payload.version_number}",
+        manifest_version=version,
     )
     deploy_job(job, namespace="default")
 

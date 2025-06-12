@@ -7,7 +7,7 @@ from http import HTTPStatus
 
 import requests
 
-from platform_configuration.versions import get_target_platform_version
+from platform_configuration.versions import get_target_product_build
 
 
 class GetiControllerCommunicationError(Exception):
@@ -42,7 +42,7 @@ def call_install_endpoint(kube_config: str) -> dict:
         time.sleep(3)  # wait for port-forwarding to establish
 
         url = f"http://localhost:{local_port}/api/v1/platform/install"
-        payload = {"version_number": get_target_platform_version()}
+        payload = {"version_number": get_target_product_build()}
         response = requests.post(url, json=payload, timeout=10)
 
         if response.status_code != HTTPStatus.OK:

@@ -9,6 +9,7 @@ import yaml
 from configuration_models.install_config import InstallationConfig
 from constants.charts import GETI_CONTROLLER_CHART
 from constants.paths import GETI_CONTROLLER_CHART_PATH
+from constants.platform import PLATFORM_NAMESPACE
 from platform_configuration.versions import get_target_product_build
 from platform_stages.steps.errors import ChartInstallationError, GetiControllerInstallationError
 from platform_utils.helm import upsert_chart
@@ -23,11 +24,16 @@ def deploy_geti_controller_chart(config: InstallationConfig, charts_dir: str = G
 
     try:
         chart_version = get_target_product_build() if config.lightweight_installer.value else None
+        http_proxy = os.getenv("http_proxy") or os.getenv("HTTP_PROXY")
+        https_proxy = os.getenv("https_proxy") or os.getenv("HTTPS_PROXY")
+        no_proxy = os.getenv("no_proxy") or os.getenv("NO_PROXY") or ""
+        no_proxy += f",127.0.0.1,localhost,.{PLATFORM_NAMESPACE},.svc,.cluster.local"
 
         configuration_data = {
             "configuration": {
                 "login": config.username.value,
                 "passwordHash": config.password_sha.value,
+                "password": config.password.value,
                 "dataFolder": config.data_folder.value,
                 "tlsCert": "",
                 "tlsKey": "",
@@ -36,6 +42,12 @@ def deploy_geti_controller_chart(config: InstallationConfig, charts_dir: str = G
                 "ingress_enabled": False,
                 "registry_address": config.geti_image_registry.value,
                 "tag": get_target_product_build(),
+                "proxy": {
+                    "enabled": bool(http_proxy or https_proxy),
+                    "httpProxy": http_proxy if http_proxy is not None else "",
+                    "httpsProxy": https_proxy if https_proxy is not None else "",
+                    "noProxy": no_proxy if no_proxy is not None else "",
+                },
             },
         }
 

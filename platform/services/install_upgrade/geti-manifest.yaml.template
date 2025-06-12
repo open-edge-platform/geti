@@ -9,7 +9,6 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: geti-namespaces
-  namespace: default
 spec:
   version: $VERSION
   insecureSkipTLSVerify: true
@@ -19,7 +18,6 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: reloader
-  namespace: kube-system
 spec:
   insecureSkipTLSVerify: true
   chart: oci://$REGISTRY/geti/helm/reloader
@@ -30,11 +28,11 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: geti-pv-creation
-  namespace: impt
 spec:
   insecureSkipTLSVerify: true
   chart: oci://$REGISTRY/geti/helm/geti-pv-creation
   version: $VERSION
+  targetNamespace: impt
   valuesContent: |-
     dataStoragePath: {{ data_folder }}
 ---
@@ -42,7 +40,6 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: cert-manager
-  namespace: cert-manager
 spec:
   insecureSkipTLSVerify: true
   chart: oci://$REGISTRY/geti/helm/cert-manager
@@ -53,9 +50,9 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: cert-manager-addon
-  namespace: cert-manager
 spec:
-  chart: $REGISTRY/geti/helm/cert-manager-addon
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/cert-manager-addon
   version: $VERSION
   targetNamespace: cert-manager
 ---
@@ -63,7 +60,6 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: cert-manager-istio-csr
-  namespace: cert-manager
 spec:
   insecureSkipTLSVerify: true
   chart: oci://$REGISTRY/geti/helm/cert-manager-istio-csr
@@ -74,7 +70,6 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: istio-base
-  namespace: istio-system
 spec:
   insecureSkipTLSVerify: true
   chart: oci://$REGISTRY/geti/helm/istio-base
@@ -85,7 +80,6 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: istio-istiod
-  namespace: istio-system
 spec:
   insecureSkipTLSVerify: true
   chart: oci://$REGISTRY/geti/helm/istio-istiod
@@ -100,17 +94,12 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: istio-gateway
-  namespace: istio-system
 spec:
   insecureSkipTLSVerify: true
   chart: oci://$REGISTRY/geti/helm/istio-gateway
   version: $VERSION
   targetNamespace: istio-system
   valuesContent: |-
-    env:
-      WASM_INSECURE_REGISTRIES: "$REGISTRY"
-    global:
-      registry_address: "$REGISTRY"
     tls:
       key_file: {{ tls_key_file }}
       cert_file: {{ tls_cert_file }}
@@ -119,7 +108,6 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: geti-tools
-  namespace: impt
 spec:
   insecureSkipTLSVerify: true
   chart: oci://$REGISTRY/geti/helm/geti-tools
@@ -134,7 +122,6 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: geti-components
-  namespace: impt
 spec:
   insecureSkipTLSVerify: true
   chart: oci://$REGISTRY/geti/helm/geti-components
@@ -148,14 +135,20 @@ spec:
       registry_address: "$REGISTRY"
       initial_admin_user_login: "{{ username }}"
       initial_admin_user_password: "{{ password }}"
+      installation_profile: "standard"
+      proxy:
+        enabled: "{{ proxy_enabled }}"
+        https_proxy: "{{ https_proxy }}"
+        http_proxy: "{{ http_proxy }}"
+        no_proxy: "{{ no_proxy }}"
 ---
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: modelmesh-serving-addon
-  namespace: impt
 spec:
-  chart: $REGISTRY/geti/helm/modelmesh-serving-addon
+  insecureSkipTLSVerify: true
+  chart: oci://$REGISTRY/geti/helm/modelmesh-serving-addon
   version: $VERSION
   targetNamespace: impt
 ---
@@ -163,7 +156,6 @@ apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
   name: flyte-core
-  namespace: flyte
 spec:
   insecureSkipTLSVerify: true
   chart: https://$REGISTRY/geti/helm/flyte-core

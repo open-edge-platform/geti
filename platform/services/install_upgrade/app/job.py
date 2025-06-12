@@ -13,7 +13,9 @@ from oras.client import OrasClient
 
 from error import FailedJobError, HelmChartDeployError, ParseDurationError, TimeoutJobError, UnknownJobError
 
-logging.basicConfig(level=logging.INFO)
+LOGGER_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+LOGGER_FORMAT = "%(asctime)s,%(msecs)03d [%(levelname)-8s] [%(name)s:%(lineno)d]: %(message)s"
+logging.basicConfig(level=logging.INFO, format=LOGGER_FORMAT, datefmt=LOGGER_DATE_FORMAT, force=True)
 logger = logging.getLogger(__name__)
 
 
@@ -24,7 +26,10 @@ USERNAME = os.getenv("USERNAME", "")
 PASSWORD = os.getenv("PASSWORD", "")
 TLS_CERT = os.getenv("TLS_CERT", "")
 TLS_KEY = os.getenv("TLS_KEY", "")
-
+PROXY_ENABLED = os.getenv("PROXY_ENABLED", "")
+HTTPS_PROXY = os.getenv("HTTPS_PROXY", "")
+HTTP_PROXY = os.getenv("HTTP_PROXY", "")
+NO_PROXY = os.getenv("NO_PROXY", "")
 
 def download_manifest() -> str:
     """
@@ -73,6 +78,10 @@ def render_jinja_template(template_string: str) -> dict:
         "password": PASSWORD,
         "tls_cert_file": TLS_CERT,
         "tls_key_file": TLS_KEY,
+        "proxy_enabled": PROXY_ENABLED,
+        "https_proxy": HTTPS_PROXY,
+        "http_proxy": HTTP_PROXY,
+        "no_proxy": NO_PROXY,
     }
 
     # Render the template with the variable
@@ -89,14 +98,14 @@ def deploy_helm_charts(manifest: dict) -> None:
     In case of conflict (e.g., chart already exists), it will log an error.
     """
     logger.info(
-        f"Deploying helm chart CR: '{manifest['metadata']['name']}' in namespace '{manifest['metadata']['namespace']}'."
+        f"Deploying helm chart CR: '{manifest['metadata']['name']}'."
     )
 
     with client.ApiClient() as api_client:
         custom_api = client.CustomObjectsApi(api_client)
         try:
             custom_api.create_namespaced_custom_object(
-                namespace=manifest["metadata"]["namespace"],
+                namespace="default",
                 group="helm.cattle.io",
                 plural="helmcharts",
                 version="v1",
@@ -185,7 +194,7 @@ def main() -> None:
             sys.exit(1)
 
         job_name = f"helm-install-{rendered_helm['metadata']['name']}"
-        namespace = rendered_helm["metadata"]["namespace"]
+        namespace = "default"
         parsed_timeout = parse_timeout(rendered_helm["spec"]["timeout"]) if "timeout" in rendered_helm["spec"] else None
         try:
             wait_for_job_completion(
