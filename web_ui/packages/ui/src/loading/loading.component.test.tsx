@@ -40,7 +40,9 @@ describe('Loading', () => {
             renderLoading({
                 mode: 'inline',
                 size: 'S',
-                height: '150px',
+                style: {
+                    height: '150px',
+                },
                 'aria-label': 'Custom loading message',
                 value: 50,
             });
@@ -64,18 +66,16 @@ describe('Loading', () => {
             expect(progressbar).toHaveAttribute('aria-label', 'Loading...');
 
             // Should render overlay container with CSS classes and default background
-            const container = progressbar.parentElement?.parentElement;
+            const container = progressbar.parentElement;
             expect(container).toBeInTheDocument();
             expect(container).toHaveClass('overlay', 'fullscreen');
             expect(container).toHaveStyle({ backgroundColor: 'var(--spectrum-global-color-gray-50)' });
         });
 
-        it('supports custom styling, attributes, and spinner height', () => {
+        it('supports custom styling and spinner height', () => {
             renderLoading({
                 mode: 'fullscreen',
-                id: 'custom-loading-id',
                 className: 'custom-loading-class',
-                height: '200px',
                 style: {
                     backgroundColor: 'rgba(255, 0, 0, 0.5)',
                     left: 10,
@@ -88,9 +88,11 @@ describe('Loading', () => {
                 },
             });
 
-            const container = screen.getByTestId('custom-loading-id');
+            const progressbar = screen.getByRole('progressbar');
+            expect(progressbar).toBeInTheDocument();
+
+            const container = progressbar.parentElement;
             expect(container).toBeInTheDocument();
-            expect(container).toHaveAttribute('id', 'custom-loading-id');
             expect(container).toHaveClass('custom-loading-class', 'overlay', 'fullscreen');
             expect(container).toHaveStyle({
                 backgroundColor: 'rgba(255, 0, 0, 0.5)',
@@ -102,11 +104,6 @@ describe('Loading', () => {
                 marginTop: '1rem',
                 height: '50vh',
             });
-
-            // Check spinner container height
-            const progressbar = screen.getByRole('progressbar');
-            const flexContainer = progressbar.parentElement;
-            expect(flexContainer).toHaveStyle({ height: '200px' });
         });
     });
 
@@ -114,32 +111,25 @@ describe('Loading', () => {
         it('renders with modal styling, custom props, and multiple style properties', () => {
             renderLoading({
                 mode: 'overlay',
-                id: 'test-overlay',
                 style: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
                     height: '100vh',
                     paddingTop: '50px',
                 },
                 className: 'test-class',
-                height: '300px',
             });
 
             const progressbar = screen.getByRole('progressbar');
             expect(progressbar).toBeInTheDocument();
 
-            const container = screen.getByTestId('test-overlay');
+            const container = progressbar.parentElement;
             expect(container).toBeInTheDocument();
-            expect(container).toHaveAttribute('id', 'test-overlay');
             expect(container).toHaveClass('test-class', 'overlay', 'modal');
             expect(container).toHaveStyle({
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
                 height: '100vh',
                 paddingTop: '50px',
             });
-
-            // Check spinner container height
-            const flexContainer = progressbar.parentElement;
-            expect(flexContainer).toHaveStyle({ height: '300px' });
         });
     });
 

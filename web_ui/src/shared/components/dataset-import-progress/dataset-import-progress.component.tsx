@@ -66,7 +66,7 @@ export const DatasetImportProgress = ({ progressItem }: DatasetImportProgressPro
                     />
                 )}
 
-                {isPreparingJobLoading && <Loading mode='inline' size='L' height={'auto'} />}
+                {isPreparingJobLoading && <Loading mode='inline' size='L' style={{ height: 'auto' }} />}
 
                 <Flex direction='column' alignItems='center' justifyContent='center'>
                     <Text id='dataset-import-progress-header' UNSAFE_style={{ fontSize: '2.5em' }}>

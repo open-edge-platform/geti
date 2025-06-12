@@ -62,7 +62,7 @@ export const AnnotationList = ({ annotations, isLoading, isDragDisabled }: Annot
     if (isLoading) {
         return (
             <Content position={'relative'} UNSAFE_style={{ height: '100%' }}>
-                <Loading size='M' id={'annotation-list-loader'} />
+                <Loading size='M' />
             </Content>
         );
     }

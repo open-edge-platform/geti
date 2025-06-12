@@ -3,9 +3,8 @@
 
 import { CSSProperties } from 'react';
 
-import { DimensionValue, Flex, ProgressCircle, View } from '@adobe/react-spectrum';
+import { Flex, ProgressCircle, View } from '@adobe/react-spectrum';
 import { SpectrumProgressCircleProps } from '@react-types/progress';
-import { Responsive } from '@react-types/shared/src/style';
 import { clsx } from 'clsx';
 
 import classes from './loading.module.scss';
@@ -27,18 +26,12 @@ interface LoadingProps extends SpectrumProgressCircleProps {
     mode?: 'inline' | 'fullscreen' | 'overlay';
 
     /**
-     * Height of the spinner container (not the overlay itself).
-     * @default '100%'
-     */
-    height?: Responsive<DimensionValue>;
-
-    /**
-     * CSS styles for the overlay container.
-     * This allows full control over positioning, dimensions, spacing, and appearance.
+     * CSS styles for the container.
+     * For inline mode: styles the Flex container
+     * For overlay modes: styles the overlay View container
      */
     style?: CSSProperties;
 
-    id?: string;
     className?: string;
 }
 
@@ -80,28 +73,29 @@ interface LoadingProps extends SpectrumProgressCircleProps {
 export const Loading = ({
     mode = 'fullscreen',
     size = 'L',
-    height = '100%',
     style = {},
-    id,
     className,
     ...rest
 }: LoadingProps): JSX.Element => {
-    const spinner = (
-        <Flex alignItems={'center'} justifyContent={'center'} height={height}>
-            <ProgressCircle aria-label={'Loading...'} isIndeterminate size={size} {...rest} />
-        </Flex>
-    );
-
     if (mode === 'inline') {
-        return spinner;
+        return (
+            <Flex
+                alignItems={'center'}
+                justifyContent={'center'}
+                UNSAFE_style={style}
+                UNSAFE_className={className}
+            >
+                <ProgressCircle aria-label={'Loading...'} isIndeterminate size={size} {...rest} />
+            </Flex>
+        );
     }
 
     // Determine CSS classes based on mode
     const overlayClassName = clsx(classes.overlay, mode === 'overlay' ? classes.modal : classes.fullscreen, className);
 
     return (
-        <View id={id} data-testid={id} UNSAFE_style={style} UNSAFE_className={overlayClassName}>
-            {spinner}
+        <View UNSAFE_style={style} UNSAFE_className={overlayClassName}>
+            <ProgressCircle aria-label={'Loading...'} isIndeterminate size={size} {...rest} />
         </View>
     );
 };

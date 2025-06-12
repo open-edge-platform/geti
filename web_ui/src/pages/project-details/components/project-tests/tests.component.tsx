@@ -48,7 +48,7 @@ export const Tests = (): JSX.Element => {
     const successfulTests = tests.filter(filterOutUnsuccessfulTest);
 
     if (areTestsLoading) {
-        return <Loading mode='inline' />;
+        return <Loading />;
     }
 
     return (

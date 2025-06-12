@@ -87,7 +87,7 @@ export const DatasetList = ({
     if (isMediaItemsLoading) {
         return (
             <Flex position={'relative'} justifyContent='center' alignItems='center' height={'100%'}>
-                <Loading size={'M'} id={'dataset-main-loader-id'} />
+                <Loading size={'M'} />
             </Flex>
         );
     }

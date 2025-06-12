@@ -16,7 +16,7 @@ export const StorageUsage = (): JSX.Element => {
     const { data } = useStatus();
 
     if (isNil(data)) {
-        return <Loading id={'storage-usage-loading-id'} />;
+        return <Loading />;
     }
 
     const DISK_USAGE = data.totalSpace - data.freeSpace;

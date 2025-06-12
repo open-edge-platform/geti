@@ -32,7 +32,7 @@ describe('Storage', () => {
     it('storage usage should not be visible when FEATURE_FLAG_STORAGE_SIZE_COMPUTATION is true', async () => {
         renderStorage({ FEATURE_FLAG_STORAGE_SIZE_COMPUTATION: true });
 
-        await waitForElementToBeRemoved(screen.getByTestId('storage-usage-loading-id'));
+        await waitForElementToBeRemoved(screen.getByLabelText('Loading...'));
 
         expect(screen.getByRole('heading', { name: 'Storage usage' })).toBeInTheDocument();
     });
