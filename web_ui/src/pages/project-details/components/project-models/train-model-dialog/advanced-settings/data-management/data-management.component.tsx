@@ -14,6 +14,9 @@ import { TrainingSubsets } from './training-subsets/training-subsets.component';
 
 interface DataManagementProps {
     trainingConfiguration: TrainingConfiguration;
+    onUpdateTrainingConfiguration: (
+        updateFunction: (config: TrainingConfiguration | undefined) => TrainingConfiguration | undefined
+    ) => void;
 }
 
 const getTilingParameters = (_configParameters: TrainingConfiguration) => {
@@ -22,6 +25,7 @@ const getTilingParameters = (_configParameters: TrainingConfiguration) => {
 
 export const DataManagement: FC<DataManagementProps> = ({
     trainingConfiguration,
+    onUpdateTrainingConfiguration,
 }) => {
     const tilingParameters = getTilingParameters(trainingConfiguration);
 
@@ -30,6 +34,7 @@ export const DataManagement: FC<DataManagementProps> = ({
             {/* Not supported in v1 of training flow revamp <BalanceLabelsDistribution /> */}
             <TrainingSubsets
                 subsetsConfiguration={trainingConfiguration.datasetPreparation.subsetSplit}
+                onUpdateTrainingConfiguration={onUpdateTrainingConfiguration}
             />
             {tilingParameters !== undefined && <Tiling tilingParameters={tilingParameters} />}
             {!isEmpty(trainingConfiguration.datasetPreparation.augmentation) && <DataAugmentation />}

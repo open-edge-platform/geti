@@ -51,6 +51,7 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
         changeTrainFromScratch,
         trainFromScratch,
         trainingConfiguration,
+        updateTrainingConfiguration,
     } = useTrainModelState();
 
     const { canTrainModel, numberOfRequiredAnnotations } = isAllowedToTrainModel(selectedTask);
@@ -98,6 +99,7 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
                 ) : (
                     <AdvancedSettings
                         trainingConfiguration={trainingConfiguration}
+                        onUpdateTrainingConfiguration={updateTrainingConfiguration}
                         configParameters={configParameters}
                         selectedTask={selectedTask}
                         tasks={tasks}
