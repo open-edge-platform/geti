@@ -128,17 +128,3 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
             console.warn('No internet connection found. App is running in offline mode.');
         });
 }
-
-// Not used for now, might be needed later
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function unregister(): void {
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.ready
-            .then((registration) => {
-                registration.unregister();
-            })
-            .catch((error) => {
-                console.error(error.message);
-            });
-    }
-}
