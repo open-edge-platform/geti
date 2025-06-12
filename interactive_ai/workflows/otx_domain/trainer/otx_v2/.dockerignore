@@ -2,5 +2,7 @@
 !scripts
 !run
 !download_pretrained_weights.py
-!pyproject.toml
-!uv.lock
+!gpu/pyproject.toml
+!xpu/pyproject.toml
+!gpu/uv.lock
+!xpu/uv.lock
