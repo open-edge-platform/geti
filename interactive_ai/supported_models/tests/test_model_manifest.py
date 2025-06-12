@@ -25,6 +25,7 @@ from geti_supported_models.model_manifest import (
     ModelManifestDeprecationStatus,
     ModelStats,
     NullModelManifest,
+    PerformanceRatings,
 )
 from geti_supported_models.parser import parse_manifest
 
@@ -39,6 +40,11 @@ def fxt_dummy_model_stats():
     yield ModelStats(
         gigaflops=0.39,
         trainable_parameters=5288548,
+        performance_ratings=PerformanceRatings(
+            accuracy=1,
+            training_time=2,
+            inference_speed=3,
+        ),
     )
 
 
@@ -93,7 +99,15 @@ class TestModelManifest:
             "name": "Test Model",
             "description": "Test",
             "task": "detection",
-            "stats": {"gigaflops": 1.0, "trainable_parameters": 1000},
+            "stats": {
+                "gigaflops": 1.0,
+                "trainable_parameters": 1000,
+                "performance_ratings": {
+                    "accuracy": 1,
+                    "training_time": 2,
+                    "inference_time": 3,
+                },
+            },
             "support_status": "active",
             "supported_gpus": {"intel": True},
             "hyperparameters": {

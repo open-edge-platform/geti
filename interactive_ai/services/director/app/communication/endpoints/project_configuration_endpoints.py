@@ -7,10 +7,11 @@ from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends
 from geti_configuration_tools.project_configuration import PartialProjectConfiguration
+from geti_feature_tools import FeatureFlagProvider
 
 from communication.controllers.project_configuration_controller import ProjectConfigurationRESTController
 from communication.views.project_configuration_rest_views import ProjectConfigurationRESTViews
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from features.feature_flag import FeatureFlag
 
 from geti_fastapi_tools.dependencies import get_project_identifier, get_request_json, setup_session_fastapi
 from geti_fastapi_tools.exceptions import GetiBaseException

@@ -5,6 +5,11 @@ task: classification
 stats:
   gigaflops: 0.39
   trainable_parameters: 5288548
+  performance_ratings:
+    accuracy: 1
+    training_time: 2
+    inference_speed: 3
+
 supported_gpus:
   intel: true
   nvidia: true

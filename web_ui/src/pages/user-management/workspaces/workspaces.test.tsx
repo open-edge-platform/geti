@@ -20,11 +20,6 @@ jest.mock('../../../providers/workspaces-provider/workspaces-provider.component'
     useWorkspaces: jest.fn(),
 }));
 
-jest.mock('../../../core/user-settings/hooks/use-global-settings.hook', () => ({
-    ...jest.requireActual('../../../core/user-settings/hooks/use-global-settings.hook'),
-    useUserGlobalSettings: jest.fn(),
-}));
-
 jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
     useUsers: jest.fn(() => ({
         useGetUserQuery: jest.fn(),
@@ -35,6 +30,15 @@ jest.mock('@geti/core/src/users/hook/use-users.hook', () => ({
 jest.mock('react-router-dom', () => ({
     ...jest.requireActual('react-router-dom'),
     useParams: jest.fn(() => ({})),
+}));
+
+jest.mock('../../landing-page/workspaces-tabs/use-default-workspace.hook', () => ({
+    useDefaultWorkspace: jest.fn(),
+}));
+
+jest.mock('../../../core/user-settings/hooks/use-global-settings.hook', () => ({
+    ...jest.requireActual('../../../core/user-settings/hooks/use-global-settings.hook'),
+    useUserGlobalSettings: jest.fn(),
 }));
 
 jest.mock('../../landing-page/workspaces-tabs/use-default-workspace.hook', () => ({

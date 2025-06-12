@@ -10,7 +10,14 @@ from kubernetes_asyncio.config import ConfigException
 
 ClusterResources = namedtuple(  # noqa: PYI024
     "ClusterResources",
-    ["cpu_available", "memory_available", "cpu_capacity", "memory_capacity", "accelerator_type", "accelerator_name"],
+    [
+        "cpu_available",
+        "memory_available",
+        "cpu_capacity",
+        "memory_capacity",
+        "accelerator_type",
+        "accelerator_name",
+    ],
 )
 
 ClusterCapacity = namedtuple("ClusterCapacity", ["cpu_capacity", "memory_capacity", "gpu_capacity"])  # noqa: PYI024
@@ -123,6 +130,7 @@ async def calculate_available_resources_per_node(
         nodes = await core_api.list_node()
         pods = await core_api.list_pod_for_all_namespaces()
         cm = await core_api.read_namespaced_config_map(namespace="impt", name="accelerator-configuration")
+
     pods = [pod for pod in pods.items if pod.status.phase == "Running"]
 
     available_cpus_per_node = []

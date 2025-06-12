@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import axios from 'axios';
-import OpenCVTypes from 'OpenCVTypes';
+import type OpenCVTypes from 'OpenCVTypes';
 
 import { Point } from '../core/annotations/shapes.interface';
 

@@ -1,0 +1,10 @@
+{
+  "extends": "@geti/config/typescript",
+  "include": [
+    "utils/*.ts",
+    "opencv-types"
+  ],
+  "exclude": [
+    "opencv"
+  ],
+}

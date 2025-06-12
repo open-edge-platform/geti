@@ -81,8 +81,6 @@ paths:
     $ref: "./endpoints/models/supported_algorithms_endpoint.yaml"
   /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}:train:
     $ref: "./endpoints/models/train_model_endpoint.yaml"
-  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/train:
-    $ref: "./endpoints/models/train_model_endpoint_deprecated.yaml"
   /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups:
     $ref: "./endpoints/models/model_groups_endpoint.yaml"
   /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}:
@@ -99,8 +97,6 @@ paths:
     $ref: "./endpoints/models/export_optimized_model_endpoint.yaml"
   /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}/models/{model_id}:optimize:
     $ref: "./endpoints/models/optimize_model_endpoint.yaml"
-  /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}/models/{model_id}/optimize:
-    $ref: "./endpoints/models/optimize_model_endpoint_deprecated.yaml"
   /organizations/{organization_id}/workspaces/{workspace_id}/projects/{project_id}/model_groups/{model_group_id}/models/{model_id}:purge:
     $ref: "./endpoints/models/model_purge_endpoint.yaml"
 #prediction endpoints
