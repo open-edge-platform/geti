@@ -5,52 +5,21 @@ import { FC, useState } from 'react';
 
 import { Flex, Slider, Text, View } from '@geti/ui';
 
-import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
-import {
-    ConfigurableParametersTaskChain,
-    NumberGroupParams,
-} from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
-import { findRequiredImagesAutoTrainingConfig } from '../../../../../core/configurable-parameters/utils';
-import { Task } from '../../../../../core/projects/task.interface';
+import { NumberGroupParams } from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import { NumberParameter } from '../../../../../core/configurable-parameters/services/configuration.interface';
 
 interface RequiredAnnotationsSliderProps {
-    task: Task;
-    requiredImagesAutoTrainingConfig: NumberGroupParams;
-    autoTrainingOptimisticUpdates: ReturnType<typeof useReconfigAutoTraining>;
-    configParameters: ConfigurableParametersTaskChain[];
+    requiredImagesAutoTrainingConfig: NumberGroupParams | NumberParameter;
+    onUpdateRequiredAnnotations: (newNumberOfRequiredAnnotations: number) => void;
 }
 
 export const RequiredAnnotationsSlider: FC<RequiredAnnotationsSliderProps> = ({
-    task,
     requiredImagesAutoTrainingConfig,
-    autoTrainingOptimisticUpdates,
-    configParameters,
+    onUpdateRequiredAnnotations,
 }) => {
     const [numberOfRequiredAnnotations, setNumberOfRequiredAnnotations] = useState<number>(
         requiredImagesAutoTrainingConfig.value
     );
-
-    const handleRequiredAnnotationsChange = (newNumberOfRequiredAnnotations: number) => {
-        autoTrainingOptimisticUpdates.mutate({
-            configParameters,
-            newConfigParameter: {
-                ...requiredImagesAutoTrainingConfig,
-                value: newNumberOfRequiredAnnotations,
-            },
-            onOptimisticUpdate: (config) => {
-                const requiredImagesAutoTrainingConfigOptimistic = findRequiredImagesAutoTrainingConfig(
-                    task.id,
-                    config
-                );
-
-                if (requiredImagesAutoTrainingConfigOptimistic !== undefined) {
-                    requiredImagesAutoTrainingConfigOptimistic.value = newNumberOfRequiredAnnotations;
-                }
-
-                return config;
-            },
-        });
-    };
 
     return (
         <Flex alignItems={'center'} gap={'size-100'}>
@@ -60,7 +29,7 @@ export const RequiredAnnotationsSlider: FC<RequiredAnnotationsSliderProps> = ({
                 minValue={requiredImagesAutoTrainingConfig.minValue}
                 maxValue={requiredImagesAutoTrainingConfig.maxValue}
                 onChange={setNumberOfRequiredAnnotations}
-                onChangeEnd={handleRequiredAnnotationsChange}
+                onChangeEnd={onUpdateRequiredAnnotations}
                 label={'Number of required annotations'}
                 getValueLabel={() => ''}
                 isFilled

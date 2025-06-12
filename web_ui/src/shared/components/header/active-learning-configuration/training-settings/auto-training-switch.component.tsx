@@ -7,12 +7,20 @@ import { paths } from '@geti/core';
 import { Divider, Flex, Text, View } from '@geti/ui';
 import { isEmpty, isEqual } from 'lodash-es';
 
-import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
+import {
+    useReconfigAutoTraining,
+    UseReconfigureParams,
+} from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
 import {
     BooleanGroupParams,
     ConfigurableParametersTaskChain,
     NumberGroupParams,
 } from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import {
+    findAutoTrainingConfig,
+    findDynamicRequiredAnnotationsConfig,
+    findRequiredImagesAutoTrainingConfig,
+} from '../../../../../core/configurable-parameters/utils';
 import { useGetRunningJobs } from '../../../../../core/jobs/hooks/use-jobs.hook';
 import { RunningJobProps, RunningTrainingJob } from '../../../../../core/jobs/jobs.interface';
 import { ModelsGroups } from '../../../../../core/models/models.interface';
@@ -113,6 +121,87 @@ export const AutoTrainingSwitch: FC<AutoTrainingSwitchProps> = ({
         hasEqualProjectAndTask(projectIdentifier.projectId, task.title)
     );
 
+    const updateTrainingParametersLegacy = ({
+        newConfigParameter,
+        onOptimisticUpdate,
+    }: Pick<UseReconfigureParams, 'newConfigParameter' | 'onOptimisticUpdate'>) => {
+        autoTrainingOptimisticUpdates.mutate({
+            configParameters,
+            onOptimisticUpdate,
+            newConfigParameter,
+        });
+    };
+
+    const updateDynamicRequiredAnnotations = (value: boolean) => {
+        if (dynamicRequiredAnnotationsConfig === undefined) {
+            return;
+        }
+
+        updateTrainingParametersLegacy({
+            newConfigParameter: {
+                ...dynamicRequiredAnnotationsConfig,
+                value,
+            },
+            onOptimisticUpdate: (config) => {
+                const dynamicRequiredAnnotationsConfigOptimistic = findDynamicRequiredAnnotationsConfig(
+                    task.id,
+                    config
+                );
+                if (dynamicRequiredAnnotationsConfigOptimistic !== undefined) {
+                    dynamicRequiredAnnotationsConfigOptimistic.value = value;
+                }
+
+                return config;
+            },
+        });
+    };
+
+    const updateNumberOfRequiredAnnotations = (newNumberOfRequiredAnnotations: number) => {
+        if (requiredImagesAutoTrainingConfig === undefined) {
+            return;
+        }
+
+        updateTrainingParametersLegacy({
+            newConfigParameter: {
+                ...requiredImagesAutoTrainingConfig,
+                value: newNumberOfRequiredAnnotations,
+            },
+            onOptimisticUpdate: (config) => {
+                const requiredImagesAutoTrainingConfigOptimistic = findRequiredImagesAutoTrainingConfig(
+                    task.id,
+                    config
+                );
+
+                if (requiredImagesAutoTrainingConfigOptimistic !== undefined) {
+                    requiredImagesAutoTrainingConfigOptimistic.value = newNumberOfRequiredAnnotations;
+                }
+
+                return config;
+            },
+        });
+    };
+
+    const updateAutoTraining = (value: boolean) => {
+        if (trainingConfig === undefined) {
+            return;
+        }
+
+        updateTrainingParametersLegacy({
+            newConfigParameter: {
+                ...trainingConfig,
+                value,
+            },
+            onOptimisticUpdate: (config) => {
+                const autoTrainingConfig = findAutoTrainingConfig(task.id, config);
+                if (autoTrainingConfig !== undefined) {
+                    autoTrainingConfig.value = value;
+                }
+
+                return config;
+            },
+        });
+    };
+
     const isAutotrainingOn = Boolean(trainingConfig?.value);
 
     const hasRunningJobs = !isEmpty(runningTaskJobs);
@@ -132,9 +221,8 @@ export const AutoTrainingSwitch: FC<AutoTrainingSwitchProps> = ({
                         <AutoTrainingConfigSwitch
                             task={task}
                             isDisabled={hasRunningJobs}
-                            autoTrainingOptimisticUpdates={autoTrainingOptimisticUpdates}
-                            configParameters={configParameters}
-                            trainingConfig={trainingConfig}
+                            isAutoTrainingEnabled={trainingConfig.value}
+                            onAutoTraining={updateAutoTraining}
                         />
                     )}
 
@@ -142,11 +230,10 @@ export const AutoTrainingSwitch: FC<AutoTrainingSwitchProps> = ({
                         requiredImagesAutoTrainingConfig !== undefined &&
                         dynamicRequiredAnnotationsConfig !== undefined && (
                             <AutoTrainingThreshold
-                                task={task}
-                                autoTrainingOptimisticUpdates={autoTrainingOptimisticUpdates}
-                                configParameters={configParameters}
                                 requiredImagesAutoTrainingConfig={requiredImagesAutoTrainingConfig}
-                                dynamicRequiredAnnotationsConfig={dynamicRequiredAnnotationsConfig}
+                                dynamicRequiredAnnotations={dynamicRequiredAnnotationsConfig.value}
+                                onUpdateDynamicRequiredAnnotations={updateDynamicRequiredAnnotations}
+                                onUpdateRequiredAnnotations={updateNumberOfRequiredAnnotations}
                             />
                         )}
                 </Flex>

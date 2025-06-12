@@ -159,6 +159,96 @@ describe('Projects hooks utils', () => {
                 expect(getEditLabelsPayload(labels, relation, shouldRevisit)).toEqual(expectedLabels);
             });
 
+            it('sets parentLabelId equal to parent name if parent is new', () => {
+                const labels: LabelTreeItem[] = [
+                    {
+                        id: 'parent-id',
+                        name: 'ParentName',
+                        type: LabelItemType.LABEL,
+                        parentLabelId: null,
+                        color: '#f7dab3ff',
+                        open: true,
+                        children: [
+                            {
+                                id: 'child-id',
+                                name: 'ChildName',
+                                color: '#708541ff',
+                                type: LabelItemType.LABEL,
+                                parentLabelId: 'parent-id',
+                                open: true,
+                                children: [],
+                                inEditMode: false,
+                                state: LabelItemEditionState.NEW,
+                                relation: LabelsRelationType.SINGLE_SELECTION,
+                                behaviour: LABEL_BEHAVIOUR.LOCAL,
+                                isEmpty: false,
+                                hotkey: '',
+                                group: '',
+                            },
+                        ],
+                        inEditMode: false,
+                        state: LabelItemEditionState.NEW,
+                        relation: LabelsRelationType.SINGLE_SELECTION,
+                        behaviour: LABEL_BEHAVIOUR.LOCAL,
+                        isEmpty: false,
+                        hotkey: '',
+                        group: '',
+                    },
+                ];
+
+                const relation = LabelsRelationType.SINGLE_SELECTION;
+                const shouldRevisit = false;
+
+                const result = getEditLabelsPayload(labels, relation, shouldRevisit);
+
+                expect(result.find((l) => l.name === 'ChildName')?.parentLabelId).toBe('ParentName');
+            });
+
+            it('sets parentLabelId equal to parent id if parent is NOT new', () => {
+                const labels: LabelTreeItem[] = [
+                    {
+                        id: 'parent-id',
+                        name: 'ParentName',
+                        type: LabelItemType.LABEL,
+                        parentLabelId: null,
+                        color: '#f7dab3ff',
+                        open: true,
+                        children: [
+                            {
+                                id: 'child-id',
+                                name: 'ChildName',
+                                color: '#708541ff',
+                                type: LabelItemType.LABEL,
+                                parentLabelId: 'parent-id',
+                                open: true,
+                                children: [],
+                                inEditMode: false,
+                                state: LabelItemEditionState.NEW,
+                                relation: LabelsRelationType.SINGLE_SELECTION,
+                                behaviour: LABEL_BEHAVIOUR.LOCAL,
+                                isEmpty: false,
+                                hotkey: '',
+                                group: '',
+                            },
+                        ],
+                        inEditMode: false,
+                        state: LabelItemEditionState.IDLE,
+                        relation: LabelsRelationType.SINGLE_SELECTION,
+                        behaviour: LABEL_BEHAVIOUR.LOCAL,
+                        isEmpty: false,
+                        hotkey: '',
+                        group: '',
+                    },
+                ];
+
+                const relation = LabelsRelationType.SINGLE_SELECTION;
+                const shouldRevisit = false;
+
+                const result = getEditLabelsPayload(labels, relation, shouldRevisit);
+
+                expect(result.find((l) => l.name === 'ChildName')?.parentLabelId).toBe('parent-id');
+            });
+
             it('returns "isDeleted" flag for deleted labels', () => {
                 const labels: LabelTreeItem[] = [
                     {

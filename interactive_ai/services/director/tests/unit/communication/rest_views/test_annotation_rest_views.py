@@ -8,7 +8,7 @@ from testfixtures import compare
 
 from communication.views.annotation_rest_views import AnnotationRESTViews, RestShapeType
 from communication.views.scored_label_rest_views import ScoredLabelRESTViews
-from features.feature_flag_provider import FeatureFlag
+from features.feature_flag import FeatureFlag
 
 from iai_core.entities.annotation import Annotation
 from iai_core.entities.shapes import Point, Polygon

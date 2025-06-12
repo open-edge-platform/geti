@@ -135,3 +135,82 @@ class TestProjectConfiguration:
         assert partial_task_config.task_id == "partial_task"
         assert partial_task_config.training.constraints.min_images_per_label == 5
         assert partial_task_config.auto_training is None
+
+    def test_get_task_config(self) -> None:
+        # Create a project configuration with multiple tasks
+        project_config = ProjectConfiguration(
+            project_id=ID("test_project"),
+            task_configs=[
+                TaskConfig(
+                    task_id="task_1",
+                    training=TrainingParameters(constraints=TrainConstraints(min_images_per_label=10)),
+                    auto_training=AutoTrainingParameters(enable=True, min_images_per_label=5),
+                ),
+                TaskConfig(
+                    task_id="task_2",
+                    training=TrainingParameters(constraints=TrainConstraints(min_images_per_label=20)),
+                    auto_training=AutoTrainingParameters(enable=False, min_images_per_label=0),
+                ),
+            ],
+        )
+
+        # Test retrieving a valid task config
+        task_config = project_config.get_task_config("task_1")
+        assert task_config is not None
+        assert task_config.task_id == "task_1"
+        assert task_config.training.constraints.min_images_per_label == 10
+        assert task_config.auto_training.enable is True
+        assert task_config.auto_training.min_images_per_label == 5
+
+        # Test retrieving another valid task config
+        task_config = project_config.get_task_config("task_2")
+        assert task_config is not None
+        assert task_config.task_id == "task_2"
+        assert task_config.training.constraints.min_images_per_label == 20
+        assert task_config.auto_training.enable is False
+
+        # Test retrieving a non-existent task config
+        with pytest.raises(ValueError, match="Task configuration with ID non_existent_task not found"):
+            project_config.get_task_config("non_existent_task")
+
+    def test_update_task_config(self) -> None:
+        # Create a project configuration with a task
+        project_config = ProjectConfiguration(
+            project_id=ID("test_project"),
+            task_configs=[
+                TaskConfig(
+                    task_id="task_1",
+                    training=TrainingParameters(constraints=TrainConstraints(min_images_per_label=10)),
+                    auto_training=AutoTrainingParameters(enable=True, min_images_per_label=5),
+                ),
+            ],
+        )
+
+        # Create updated task config
+        updated_task_config = TaskConfig(
+            task_id="task_1",
+            training=TrainingParameters(constraints=TrainConstraints(min_images_per_label=20)),
+            auto_training=AutoTrainingParameters(
+                enable=False, enable_dynamic_required_annotations=True, min_images_per_label=15
+            ),
+        )
+
+        # Update the task config
+        project_config.update_task_config(updated_task_config)
+
+        # Verify the task config was updated
+        task_config = project_config.get_task_config("task_1")
+        assert task_config.training.constraints.min_images_per_label == 20
+        assert task_config.auto_training.enable is False
+        assert task_config.auto_training.enable_dynamic_required_annotations is True
+        assert task_config.auto_training.min_images_per_label == 15
+
+        # Test updating a non-existent task config
+        non_existent_task = TaskConfig(
+            task_id="non_existent_task",
+            training=TrainingParameters(constraints=TrainConstraints(min_images_per_label=5)),
+            auto_training=AutoTrainingParameters(enable=True, min_images_per_label=2),
+        )
+
+        with pytest.raises(ValueError, match="Task configuration with ID non_existent_task not found"):
+            project_config.update_task_config(non_existent_task)
