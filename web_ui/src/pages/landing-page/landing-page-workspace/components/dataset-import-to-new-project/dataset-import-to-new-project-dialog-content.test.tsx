@@ -9,10 +9,13 @@ import {
     DATASET_IMPORT_TO_NEW_PROJECT_STEP,
 } from '../../../../../core/datasets/dataset.enum';
 import { DatasetImportToNewProjectItem, DatasetImportWarning } from '../../../../../core/datasets/dataset.interface';
+import { getMockedSupportedProjectTypes } from '../../../../../test-utils/mocked-items-factory/mocked-dataset-import';
 import { getMockedProjectIdentifier } from '../../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { providersRender as render } from '../../../../../test-utils/required-providers-render';
 import { ProjectProvider } from '../../../../project-details/providers/project-provider/project-provider.component';
 import { DatasetImportToNewProjectDialogContent } from './dataset-import-to-new-project-dialog-content.component';
+
+const MOCKED_LABELS_FLAT = [{ name: 'cat' }, { name: 'dog' }];
 
 const mockDatasetImportItem: DatasetImportToNewProjectItem = {
     id: '987-654-321',
@@ -100,11 +103,43 @@ describe(DatasetImportToNewProjectDialogContent, () => {
         expect(screen.getByLabelText('dataset-import-to-new-project-domain')).toBeVisible();
     });
 
-    it('should render DatasetImportToNewProjectLabels component when datasetImportItem exists, active step is "labels"', async () => {
-        await renderMockedComponent({
-            ...mockDatasetImportItem,
-            activeStep: DATASET_IMPORT_TO_NEW_PROJECT_STEP.LABELS,
+    describe('DatasetImportToNewProjectLabels', () => {
+        it('datasetImportItem exists, active step is "labels"', async () => {
+            await renderMockedComponent({
+                ...mockDatasetImportItem,
+                labelsToSelect: MOCKED_LABELS_FLAT,
+                activeStep: DATASET_IMPORT_TO_NEW_PROJECT_STEP.LABELS,
+            });
+            expect(screen.getByLabelText('dataset-import-to-new-project-labels')).toBeVisible();
+            expect(screen.queryByRole('checkbox', { name: 'select-all-labels' })).toBeInTheDocument();
         });
-        expect(screen.getByLabelText('dataset-import-to-new-project-labels')).toBeVisible();
+
+        it('not render select label for keypoint detection', async () => {
+            const supportedProjectTypes = getMockedSupportedProjectTypes([
+                {
+                    projectType: DATASET_IMPORT_TASK_TYPE.KEYPOINT_DETECTION,
+                    pipeline: {
+                        connections: [],
+                        tasks: [
+                            {
+                                title: 'keypoint detection',
+                                labels: MOCKED_LABELS_FLAT,
+                                keypointStructure: { edges: [], positions: [] },
+                                taskType: DATASET_IMPORT_TASK_TYPE.KEYPOINT_DETECTION,
+                            },
+                        ],
+                    },
+                },
+            ]);
+
+            await renderMockedComponent({
+                ...mockDatasetImportItem,
+                labelsToSelect: MOCKED_LABELS_FLAT,
+                supportedProjectTypes,
+                activeStep: DATASET_IMPORT_TO_NEW_PROJECT_STEP.LABELS,
+            });
+            expect(screen.getByLabelText('dataset-import-to-new-project-labels')).toBeVisible();
+            expect(screen.queryByRole('checkbox', { name: 'select-all-labels' })).not.toBeInTheDocument();
+        });
     });
 });
