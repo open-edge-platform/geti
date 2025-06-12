@@ -153,7 +153,7 @@ jobs:
     with:
       image-tag: "${{ needs.get-vars.outputs.image-tag }}"
       component-dir: "${{ matrix.component }}"
-      push: "${{ needs.get-vars.outputs.publish_binaries }}"
+      push: ${{ false }}
       ref: "${{ needs.get-vars.outputs.checkout_ref }}"
 
   web-ui-workflow:
@@ -170,7 +170,7 @@ jobs:
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:
       image-tag: "${{ needs.get-vars.outputs.image-tag }}"
-      push: "${{ needs.get-vars.outputs.publish_binaries }}"
+      push: ${{ false }}
       ref: "${{ needs.get-vars.outputs.checkout_ref }}"
 
   success:
