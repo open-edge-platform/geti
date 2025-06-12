@@ -47,7 +47,7 @@ spec:
               value: {{ .Values.global.registry_address }}
             - name: VERSION
               # TODO change version to generated
-              value: "2.10.0-test-20250528144400"
+              value: "2.11.0-test-20250606102739"
               #value: {{ .Values.global.tag | default .Chart.AppVersion }}
             - name: DATA_FOLDER
               value: {{ .Values.mountPath }}
