@@ -49,7 +49,7 @@ RUN npm run build
 # web_ui
 #######
 
-FROM nginx:1.27-bookworm@sha256:fb39280b7b9eba5727c884a3c7810002e69e8f961cc373b89c92f14961d903a0 AS web_ui
+FROM nginx:1.27-bookworm@sha256:6784fb0834aa7dbbe12e3d7471e69c290df3e6ba810dc38b34ae33d3c1c05f7d AS web_ui
 
 COPY --link --from=web_ui_deps /home/app/web_ui/build/app/ /usr/share/nginx/webui/
 COPY --link --from=web_ui_deps /home/app/web_ui/build/admin/ /usr/share/nginx/admin-app/

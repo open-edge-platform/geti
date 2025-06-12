@@ -53,22 +53,7 @@ def _resolve_dataset_to_import(
     return local_dataset_path
 
 
-@given("a '{dataset_format}' dataset with '{annotation_type}'-like annotations")
-def step_given_dataset_with_custom_format_and_annotations(
-    context: Context, dataset_format: str, annotation_type: str
-) -> None:
-    context.dataset_format = ExportedDatasetFormat(dataset_format)
-    context.annotation_type = AnnotationType(annotation_type)
-
-    context.dataset_to_import_path = _resolve_dataset_to_import(
-        datasets_dir=context.datasets_dir,
-        dataset_format=context.dataset_format,
-        annotation_type=context.annotation_type,
-    )
-
-
-@when("the user uploads the dataset to the platform to create a new project")
-def step_when_user_uploads_dataset_to_new_project(context: Context) -> None:
+def _upload_dataset_with_tus(context: Context) -> str:
     dataset_ie_api: DatasetImportExportApi = context.dataset_import_export_api
 
     # Create TUS upload
@@ -106,6 +91,27 @@ def step_when_user_uploads_dataset_to_new_project(context: Context) -> None:
                 body=chunk,
             )
             current_offset += len(chunk)
+    return file_id
+
+
+@given("a '{dataset_format}' dataset with '{annotation_type}'-like annotations")
+def step_given_dataset_with_custom_format_and_annotations(
+    context: Context, dataset_format: str, annotation_type: str
+) -> None:
+    context.dataset_format = ExportedDatasetFormat(dataset_format)
+    context.annotation_type = AnnotationType(annotation_type)
+
+    context.dataset_to_import_path = _resolve_dataset_to_import(
+        datasets_dir=context.datasets_dir,
+        dataset_format=context.dataset_format,
+        annotation_type=context.annotation_type,
+    )
+
+
+@when("the user uploads the dataset to the platform to create a new project")
+def step_when_user_uploads_dataset_to_new_project(context: Context) -> None:
+    dataset_ie_api: DatasetImportExportApi = context.dataset_import_export_api
+    file_id = _upload_dataset_with_tus(context)
 
     # Prepare for import to new project
     prepare_for_import_response = dataset_ie_api.prepare_dataset_for_import(

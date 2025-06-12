@@ -6,6 +6,8 @@
 import logging
 from typing import Any
 
+from geti_feature_tools import FeatureFlagProvider
+
 from communication.data_validator import ModelTestRestValidator
 from communication.exceptions import (
     DatasetStorageHasNoAnnotationsException,
@@ -19,7 +21,7 @@ from communication.jobs_client import JobsClient
 from communication.views.job_rest_views import JobRestViews
 from communication.views.model_test_result_rest_views import ModelTestResultRestViews
 from communication.views.prediction_rest_views import PredictionRESTViews
-from features.feature_flag_provider import FeatureFlag, FeatureFlagProvider
+from features.feature_flag import FeatureFlag
 from service.job_submission import ModelTestingJobSubmitter
 from service.label_schema_service import LabelSchemaService
 

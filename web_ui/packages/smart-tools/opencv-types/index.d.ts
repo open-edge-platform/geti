@@ -1,6 +1,7 @@
-// Code generated using https://github.com/peteruhnak/opencv-ts
-// License: Apache-2.0
+// Copyright (C) 2022-2025 Intel Corporation
+// LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+/// <reference lib="webworker" />
 /// <reference path="scalars.d.ts" />
 /// <reference path="constants.d.ts" />
 /// <reference path="Mat.d.ts" />
@@ -22,3 +23,5 @@ declare module 'opencv-types' {
     export * from 'emscripten';
     export * from 'helpers';
 }
+
+declare const cv: Promise<OpenCVTypes.cv>;

@@ -8,7 +8,7 @@ Training related endpoints
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 
 from communication.controllers.training_controller import TrainingController
 
@@ -18,7 +18,6 @@ from geti_fastapi_tools.dependencies import (
     get_user_id_fastapi,
     setup_session_fastapi,
 )
-from geti_fastapi_tools.deprecation import RestApiDeprecation
 from geti_types import ID
 
 logger = logging.getLogger(__name__)
@@ -31,17 +30,9 @@ training_router = APIRouter(
     dependencies=[Depends(setup_session_fastapi)],
 )
 
-# Deprecation information for the /train endpoint
-LEGACY_TRAIN_ENDPOINT = "/train"
-LEGACY_TRAIN_ENDPOINT_DEPRECATION_DATE = "2024-11-01"
-LEGACY_TRAIN_ENDPOINT_SUNSET_DATE = "2025-03-31"
-LEGACY_TRAIN_ENDPOINT_INFO = "Deprecated Endpoint. Use the new endpoint `:train` instead."
 
-
-@training_router.post("/train")
 @training_router.post(":train")
 def train_endpoint(
-    request: Request,
     project_id: Annotated[ID, Depends(get_project_id)],
     request_json: Annotated[dict, Depends(get_optional_request_json)],
     user_id: ID = Depends(get_user_id_fastapi),  # noqa: FAST002
@@ -58,15 +49,4 @@ def train_endpoint(
         request_json = {}
 
     # Perform the training task
-    response = TrainingController.train_task(project_id=project_id, author=user_id, raw_train_config=request_json)
-
-    # If the deprecated /train endpoint is used, add deprecation headers
-    if request.url.path.endswith(LEGACY_TRAIN_ENDPOINT):
-        headers = RestApiDeprecation(
-            deprecation_date=LEGACY_TRAIN_ENDPOINT_DEPRECATION_DATE,
-            sunset_date=LEGACY_TRAIN_ENDPOINT_SUNSET_DATE,
-            additional_info=LEGACY_TRAIN_ENDPOINT_INFO,
-        )
-        response = headers.add_headers(response)
-
-    return response
+    return TrainingController.train_task(project_id=project_id, author=user_id, raw_train_config=request_json)
