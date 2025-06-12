@@ -9,13 +9,12 @@ import { useNavigate } from 'react-router-dom';
 import { OrganizationBalance } from '../../../../core/credits/credits.interface';
 import { useCreditsQueries } from '../../../../core/credits/hooks/use-credits-api.hook';
 import { useTransactionsQueries } from '../../../../core/credits/transactions/hooks/use-transactions.hook';
-import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { useOrganizationIdentifier } from '../../../../hooks/use-organization-identifier/use-organization-identifier.hook';
 import { useFirstWorkspaceIdentifier } from '../../../../providers/workspaces-provider/use-first-workspace-identifier.hook';
 import { formatDate, ONE_MINUTE } from '../../../utils';
 import { CustomerSupportLink } from '../../customer-support-link/customer-support-link.component';
 import { HasPermission } from '../../has-permission/has-permission.component';
-import { OPERATION_NEW, OPERATION_OLD } from '../../has-permission/has-permission.interface';
+import { OPERATION } from '../../has-permission/has-permission.interface';
 import { Balance } from './balance.component';
 import { CreditBalanceButton } from './credit-balance-button.component';
 import { getClassServiceName, getProjectName, isBalanceLow } from './util';
@@ -100,7 +99,6 @@ const RecentUsage = ({ close }: { close: () => void }) => {
 export const CreditBalanceStatus = ({ isDarkMode }: CreditBalanceStatusProps) => {
     const { organizationId } = useOrganizationIdentifier();
     const { useGetOrganizationBalanceQuery } = useCreditsQueries();
-    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
 
     const { data: organizationBalance, isPending: isOrganizationBalanceLoading } = useGetOrganizationBalanceQuery(
         { organizationId },
@@ -133,13 +131,7 @@ export const CreditBalanceStatus = ({ isDarkMode }: CreditBalanceStatusProps) =>
                         <Balance isLoading={isOrganizationBalanceLoading} organizationBalance={organizationBalance} />
                     </Heading>
 
-                    <HasPermission
-                        operations={
-                            FEATURE_FLAG_WORKSPACE_ACTIONS
-                                ? [OPERATION_NEW.CAN_VIEW_CREDITS_USAGE]
-                                : [OPERATION_OLD.CAN_VIEW_CREDITS_USAGE]
-                        }
-                    >
+                    <HasPermission operations={[OPERATION.CAN_VIEW_CREDITS_USAGE]}>
                         <Divider />
 
                         <Content>

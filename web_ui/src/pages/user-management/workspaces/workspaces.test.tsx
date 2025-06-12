@@ -66,7 +66,7 @@ describe('Workspaces', () => {
         // @ts-expect-error We only care about data property
         jest.mocked(useUsers).mockReturnValue({ useActiveUser: () => ({ data: getMockedUser() }) });
 
-        await render(<Workspaces />);
+        render(<Workspaces />);
 
         expect(screen.getByText('Workspace 1')).toBeInTheDocument();
         expect(screen.getByText('Workspace 2')).toBeInTheDocument();
@@ -94,7 +94,7 @@ describe('Workspaces', () => {
         // @ts-expect-error We only care about data property
         jest.mocked(useUsers).mockReturnValue({ useActiveUser: () => ({ data: mockedContributorUser }) });
 
-        await render(<Workspaces />, { featureFlags: { FEATURE_FLAG_WORKSPACE_ACTIONS: true } });
+        render(<Workspaces />, { featureFlags: { FEATURE_FLAG_WORKSPACE_ACTIONS: true } });
         expect(screen.getByRole('button', { name: 'Create new workspace' })).toBeInTheDocument();
     });
 
@@ -118,7 +118,7 @@ describe('Workspaces', () => {
         // @ts-expect-error We only care about data property
         jest.mocked(useUsers).mockReturnValue({ useActiveUser: () => ({ data: mockedAdminUser }) });
 
-        await render(<Workspaces />, { featureFlags: { FEATURE_FLAG_WORKSPACE_ACTIONS: true } });
+        render(<Workspaces />, { featureFlags: { FEATURE_FLAG_WORKSPACE_ACTIONS: true } });
         expect(screen.getByRole('button', { name: 'Create new workspace' })).toBeInTheDocument();
     });
 
@@ -136,7 +136,7 @@ describe('Workspaces', () => {
         // @ts-expect-error We only care about data property
         jest.mocked(useUsers).mockReturnValue({ useActiveUser: () => ({ data: mockedUserFromOutsideTheOrg }) });
 
-        await render(<Workspaces />, { featureFlags: { FEATURE_FLAG_WORKSPACE_ACTIONS: true } });
+        render(<Workspaces />, { featureFlags: { FEATURE_FLAG_WORKSPACE_ACTIONS: true } });
         expect(screen.queryByRole('button', { name: 'Create new workspace' })).not.toBeInTheDocument();
     });
 });

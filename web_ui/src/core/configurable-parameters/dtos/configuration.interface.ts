@@ -57,11 +57,20 @@ export interface ProjectConfigurationDTO {
     task_configs: ProjectConfigurationTaskConfigsDTO[];
 }
 
+export type DatasetPreparationParametersDTO = {
+    subset_split: ConfigurationParameterDTO[];
+    filtering: Record<string, ConfigurationParameterDTO[]>;
+    augmentation: Record<string, ConfigurationParameterDTO[]>;
+};
+
+export type TrainingParametersDTO = ConfigurationParameterDTO[] | Record<string, ConfigurationParameterDTO[]>[];
+
 export interface TrainingConfigurationDTO {
-    dataset_preparation: Record<string, ConfigurationParameterDTO[]>;
-    training: ConfigurationParameterDTO[];
+    dataset_preparation: DatasetPreparationParametersDTO;
+    training: TrainingParametersDTO;
     evaluation: ConfigurationParameterDTO[];
     advanced_configuration?: StaticParameterDTO[];
+    task_id: string;
 }
 
 export interface TrainingConfigurationUpdatePayloadDTO {

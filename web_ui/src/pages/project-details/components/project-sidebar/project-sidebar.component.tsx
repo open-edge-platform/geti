@@ -6,14 +6,13 @@ import { RESOURCE_TYPE } from '@geti/core/src/users/users.interface';
 import { Flex, Text } from '@geti/ui';
 import { Datasets, Deployments, Model, Shield, Tag, Users } from '@geti/ui/icons';
 
-import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { ProjectProps } from '../../../../core/projects/project.interface';
 import { isKeypointTask } from '../../../../core/projects/utils';
 import { Arrow } from '../../../../shared/components/arrow/arrow.component';
 import { DomainName } from '../../../../shared/components/domain-name/domain-name.component';
 import { useCheckPermission } from '../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION_NEW, OPERATION_OLD } from '../../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION } from '../../../../shared/components/has-permission/has-permission.interface';
 import { MenuItemImage } from '../../../../shared/components/menu-item-image/menu-item-image.component';
 import { MenuOption, MenuOptionTextAndIcon } from '../../../../shared/components/menu-option.interface';
 import { SidebarMenu } from '../../../../shared/components/sidebar-menu/sidebar-menu.component';
@@ -32,9 +31,8 @@ interface ProjectSidebarProps {
 
 export const ProjectSidebar = ({ project }: ProjectSidebarProps): JSX.Element => {
     const datasetIdentifier = useDatasetIdentifier();
-    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
     const canEditProjectName = useCheckPermission(
-        [FEATURE_FLAG_WORKSPACE_ACTIONS ? OPERATION_NEW.PROJECT_NAME_EDITION : OPERATION_OLD.PROJECT_NAME_EDITION],
+        [OPERATION.PROJECT_NAME_EDITION],
         [
             {
                 type: RESOURCE_TYPE.PROJECT,

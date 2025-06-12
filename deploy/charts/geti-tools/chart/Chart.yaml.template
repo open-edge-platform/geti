@@ -1,8 +1,8 @@
 name: geti-tools
 apiVersion: v2
 description: Geti external tools Helm chart
-version: 0.0.1
-appVersion: v0.0.1
+version: ${TAG}
+appVersion: ${TAG}
 
 dependencies:
   - name: opa

@@ -10,17 +10,10 @@ import { useNotification } from '../../../notification/notification.component';
 import { isVideoFile, loadImageFromFile, loadVideoFromFile } from '../../../shared/media-utils';
 import { assertIsNotNullable } from '../../../types-utils/utils';
 import { Screenshot } from '../../camera-support/camera.interface';
-import { useCameraParams } from './camera-params.hook';
 import { useLoadCameraWebworker } from './use-load-camera-webworker';
 
-const CAMERA_DATASET_MEDIA_ITEMS = (projectId: string, datasetId: string, isLivePrediction: boolean) => {
-    const key = ['camera-items', projectId, datasetId] as const;
-
-    if (isLivePrediction) {
-        return [...key, 'live-prediction'] as const;
-    }
-
-    return key;
+const CAMERA_DATASET_MEDIA_ITEMS = (projectId: string, datasetId: string) => {
+    return ['camera-items', projectId, datasetId] as const;
 };
 
 export interface UseCameraStorage {
@@ -38,7 +31,6 @@ export interface UseCameraStorage {
 const useSavedFilesQuery = () => {
     const { worker: cameraWorker } = useLoadCameraWebworker();
     const { projectId, datasetId } = useParams<{ projectId: string; datasetId: string }>();
-    const { isLivePrediction } = useCameraParams();
 
     const queryFn = async () => {
         assertIsNotNullable(cameraWorker);
@@ -56,7 +48,7 @@ const useSavedFilesQuery = () => {
     };
 
     return useQuery<Required<Screenshot[]>>({
-        queryKey: CAMERA_DATASET_MEDIA_ITEMS(String(projectId), String(datasetId), isLivePrediction),
+        queryKey: CAMERA_DATASET_MEDIA_ITEMS(String(projectId), String(datasetId)),
         queryFn,
         enabled: cameraWorker !== null,
     });
@@ -66,7 +58,6 @@ export const useCameraStorage = (): UseCameraStorage => {
     const queryClient = useQueryClient();
     const { worker: cameraWorker } = useLoadCameraWebworker();
     const { addNotification } = useNotification();
-    const { isLivePrediction } = useCameraParams();
     const { projectId, datasetId } = useParams<{ projectId: string; datasetId: string }>();
 
     const savedFilesQuery = useSavedFilesQuery();
@@ -120,7 +111,7 @@ export const useCameraStorage = (): UseCameraStorage => {
 
     const invalidateCameraStorageQuery = () => {
         return queryClient.invalidateQueries({
-            queryKey: CAMERA_DATASET_MEDIA_ITEMS(String(projectId), String(datasetId), isLivePrediction),
+            queryKey: CAMERA_DATASET_MEDIA_ITEMS(String(projectId), String(datasetId)),
         });
     };
 

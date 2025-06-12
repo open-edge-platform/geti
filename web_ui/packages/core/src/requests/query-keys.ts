@@ -506,7 +506,7 @@ const CONFIGURATION_PARAMETERS = {
             projectIdentifier.projectId,
             queryParameters?.taskId,
             queryParameters?.modelId,
-            queryParameters?.algorithmId,
+            queryParameters?.modelManifestId,
         ] as const,
 };
 

@@ -60,17 +60,13 @@ export const useTrainModelState = () => {
     const [selectedModelTemplateId, setSelectedModelTemplateId] = useState<string | null>(activeModelTemplateId);
 
     const isBasicMode = mode === TrainModelMode.BASIC;
-    const isAdvancedSettingsMode = mode === TrainModelMode.ADVANCED_SETTINGS;
 
     const { useGetModelConfigParameters } = useConfigParameters(projectIdentifier);
-    const { data: configParameters } = useGetModelConfigParameters(
-        {
-            taskId: selectedTask.id,
-            modelTemplateId: selectedModelTemplateId,
-            editable: true,
-        },
-        { enabled: isAdvancedSettingsMode }
-    );
+    const { data: configParameters } = useGetModelConfigParameters({
+        taskId: selectedTask.id,
+        modelTemplateId: selectedModelTemplateId,
+        editable: true,
+    });
 
     const [isReshufflingSubsetsEnabled, setIsReshufflingSubsetsEnabled] = useState<boolean>(false);
     const [trainFromScratch, setTrainFromScratch] = useState<boolean>(false);

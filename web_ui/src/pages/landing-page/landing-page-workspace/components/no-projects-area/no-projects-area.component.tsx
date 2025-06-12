@@ -5,10 +5,9 @@ import { Flex, Heading, Image, Text, View } from '@geti/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
 import NoProjectsPlaceholder from '../../../../../assets/images/no-projects-placeholder.webp';
-import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { CustomWell } from '../../../../../shared/components/custom-well/custom-well.component';
 import { HasPermission } from '../../../../../shared/components/has-permission/has-permission.component';
-import { OPERATION_NEW, OPERATION_OLD } from '../../../../../shared/components/has-permission/has-permission.interface';
+import { OPERATION } from '../../../../../shared/components/has-permission/has-permission.interface';
 import { NewProjectDialog } from '../../../../create-project/new-project-dialog.component';
 
 import workspaceClasses from '../../landing-page-workspace.module.scss';
@@ -21,8 +20,6 @@ interface NoProjectsAreaProps {
 export const NoProjectArea = ({ openImportDatasetDialog }: NoProjectsAreaProps): JSX.Element => {
     const TITLE = 'Create your first project';
     const DESCRIPTION = 'Create new project to leverage AI to automate your Computer Vision task';
-
-    const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
 
     return (
         <Flex width={'100%'} gap={'size-300'}>
@@ -57,13 +54,7 @@ export const NoProjectArea = ({ openImportDatasetDialog }: NoProjectsAreaProps):
                             <Text id={'no-projects-area-description'}>{DESCRIPTION}</Text>
                         </View>
                         <View marginBottom={'size-300'}>
-                            <HasPermission
-                                operations={
-                                    FEATURE_FLAG_WORKSPACE_ACTIONS
-                                        ? [OPERATION_NEW.PROJECT_CREATION]
-                                        : [OPERATION_OLD.PROJECT_CREATION]
-                                }
-                            >
+                            <HasPermission operations={[OPERATION.PROJECT_CREATION]}>
                                 <NewProjectDialog
                                     buttonText={'Create new project'}
                                     openImportDatasetDialog={openImportDatasetDialog}
