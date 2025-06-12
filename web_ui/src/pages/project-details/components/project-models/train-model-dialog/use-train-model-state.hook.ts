@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import { keepPreviousData } from '@tanstack/react-query';
 import { isEmpty, isNumber } from 'lodash-es';
 
 import { useConfigParameters } from '../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
@@ -62,11 +63,16 @@ export const useTrainModelState = () => {
     const isBasicMode = mode === TrainModelMode.BASIC;
 
     const { useGetModelConfigParameters } = useConfigParameters(projectIdentifier);
-    const { data: configParameters } = useGetModelConfigParameters({
-        taskId: selectedTask.id,
-        modelTemplateId: selectedModelTemplateId,
-        editable: true,
-    });
+    const { data: configParameters } = useGetModelConfigParameters(
+        {
+            taskId: selectedTask.id,
+            modelTemplateId: selectedModelTemplateId,
+            editable: true,
+        },
+        {
+            placeholderData: keepPreviousData,
+        }
+    );
 
     const [isReshufflingSubsetsEnabled, setIsReshufflingSubsetsEnabled] = useState<boolean>(false);
     const [trainFromScratch, setTrainFromScratch] = useState<boolean>(false);
