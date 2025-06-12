@@ -3,12 +3,11 @@
 
 import { useEffect, useRef } from 'react';
 
-import { WatershedPolygon } from '@geti/smart-tools/src/watershed/interfaces';
-
 import { Annotation } from '../../../core/annotations/annotation.interface';
 import { Shape } from '../../../core/annotations/shapes.interface';
 import { useAnnotationScene } from '../providers/annotation-scene-provider/annotation-scene-provider.component';
 import { useSubmitAnnotations } from '../providers/submit-annotations-provider/submit-annotations-provider.component';
+import { WatershedPolygon } from '../tools/watershed-tool/watershed-tool.interface';
 
 interface useAddUnfinishedShapeProps {
     reset: () => void;

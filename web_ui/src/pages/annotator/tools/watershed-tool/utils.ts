@@ -1,7 +1,6 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { WatershedPolygon } from '@geti/smart-tools/src/watershed/interfaces';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
@@ -11,6 +10,7 @@ import { labelFromUser } from '../../../../core/annotations/utils';
 import { Label, LABEL_BEHAVIOUR } from '../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { getLabeledShape } from '../../utils';
+import { WatershedPolygon } from './watershed-tool.interface';
 
 export const WATERSHED_SUPPORTED_DOMAINS = [
     DOMAIN.SEGMENTATION,

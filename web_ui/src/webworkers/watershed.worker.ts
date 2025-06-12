@@ -2,7 +2,6 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { OpenCVLoader, Watershed } from '@geti/smart-tools';
-import { WatershedMethods } from '@geti/smart-tools/src/watershed/interfaces';
 import { expose, proxy } from 'comlink';
 import type OpenCVTypes from 'OpenCVTypes';
 
@@ -22,7 +21,7 @@ const waitForOpenCV = async () => {
     return false;
 };
 
-const initWatershed = async (imageData: ImageData): Promise<WatershedMethods> => {
+const initWatershed = async (imageData: ImageData) => {
     if (!opencv) {
         throw new Error('OpenCV is not loaded. Please load OpenCV before running Watershed.');
     }

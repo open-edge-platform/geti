@@ -3,7 +3,6 @@
 
 import { createContext, Dispatch, SetStateAction, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
-import { WatershedMethods, WatershedPolygon } from '@geti/smart-tools/src/watershed/interfaces';
 import { UseMutateFunction, useMutation } from '@tanstack/react-query';
 
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
@@ -21,7 +20,7 @@ import { StateProviderProps } from '../tools.interface';
 import UndoRedoProvider from '../undo-redo/undo-redo-provider.component';
 import useUndoRedoState, { SetStateWrapper } from '../undo-redo/use-undo-redo-state';
 import { removeOffLimitPointsPolygon } from '../utils';
-import { RunWatershedProps } from './watershed-tool.interface';
+import { RunWatershedProps, WatershedMethods, WatershedPolygon } from './watershed-tool.interface';
 
 interface WatershedState {
     markers: Marker[];
