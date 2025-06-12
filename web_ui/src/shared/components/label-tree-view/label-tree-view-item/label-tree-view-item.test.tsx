@@ -34,6 +34,7 @@ describe('LabelTreeViewItem', () => {
     const defaultItemProps: Omit<LabelTreeViewItemProps, 'item'> = {
         actions: mockedActions,
         projectLabels: [],
+        siblings: [],
         isEditable: true,
         isMixedRelation: false,
         isCreationInNewProject: false,
@@ -58,6 +59,7 @@ describe('LabelTreeViewItem', () => {
                 item={mockedLabel}
                 actions={{ ...mockedActions, save: saveHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isEditable={true}
                 domains={[DOMAIN.CLASSIFICATION]}
                 isMixedRelation={true}
@@ -79,6 +81,7 @@ describe('LabelTreeViewItem', () => {
                 item={mockedLabel}
                 actions={{ ...mockedActions, save: saveHandler, deleteItem: deleteItemHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isEditable={true}
                 domains={domains}
                 isMixedRelation={true}
@@ -106,6 +109,7 @@ describe('Delete group', () => {
         projectLabels: [],
         isCreationInNewProject: false,
         domains,
+        siblings: [],
         isEditable: true,
         isMixedRelation: false,
         validationErrors: {},
@@ -165,6 +169,7 @@ describe('Delete labels', () => {
                 item={item}
                 actions={{ ...mockedActions, save: saveHandler, deleteItem: deleteItemHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isCreationInNewProject={true}
                 domains={domains}
                 isEditable={true}
@@ -186,6 +191,7 @@ describe('Delete labels', () => {
                 item={item}
                 actions={{ ...mockedActions, save: saveHandler, deleteItem: deleteItemHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isCreationInNewProject={false}
                 domains={domains}
                 isEditable={true}
@@ -207,6 +213,7 @@ describe('Delete labels', () => {
                 item={item}
                 actions={{ ...mockedActions, save: saveHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isCreationInNewProject={false}
                 domains={domains}
                 isEditable={true}
@@ -249,6 +256,7 @@ describe('Open close nodes', () => {
                 item={item}
                 actions={{ ...mockedActions, save: saveHandler, addChild: addChildHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isCreationInNewProject={false}
                 domains={domains}
                 isEditable={true}
@@ -285,6 +293,7 @@ describe('LabelTreeViewItem - menu', () => {
                 item={item}
                 actions={{ ...mockedActions, save: saveHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isCreationInNewProject={true}
                 domains={domains}
                 isEditable={true}
@@ -349,6 +358,7 @@ describe('LabelTreeViewItem - menu', () => {
                 item={item}
                 actions={{ ...mockedActions, save: saveHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isCreationInNewProject={false}
                 domains={domains}
                 isEditable={true}
