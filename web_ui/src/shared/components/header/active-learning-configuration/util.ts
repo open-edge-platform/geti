@@ -11,6 +11,7 @@ import {
 } from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import {
     BoolParameter,
+    ConfigurationParameter,
     NumberParameter,
 } from '../../../../core/configurable-parameters/services/configuration.interface';
 import { Task } from '../../../../core/projects/task.interface';
@@ -75,4 +76,40 @@ export const getNotificationConfig = (value: boolean | null): AutoTrainingNotifi
                 },
             };
     }
+};
+
+export const getAutoTrainingEnabledParameter = (parameters: ConfigurationParameter[]): BoolParameter | undefined => {
+    const autoTrainingParameter = parameters.find((config) => config.key === 'enable');
+
+    if (autoTrainingParameter !== undefined && autoTrainingParameter.type === 'bool') {
+        return autoTrainingParameter;
+    }
+
+    return undefined;
+};
+
+export const getDynamicRequiredAnnotationsParameter = (
+    parameters: ConfigurationParameter[]
+): BoolParameter | undefined => {
+    const dynamicRequiredAnnotationsParameter = parameters.find(
+        (config) => config.key === 'enable_dynamic_required_annotations'
+    );
+
+    if (dynamicRequiredAnnotationsParameter !== undefined && dynamicRequiredAnnotationsParameter.type === 'bool') {
+        return dynamicRequiredAnnotationsParameter;
+    }
+
+    return undefined;
+};
+
+export const getRequiredImagesAutoTrainingParameter = (
+    parameters: ConfigurationParameter[]
+): NumberParameter | undefined => {
+    const requiredImagesAutoTrainingParameter = parameters.find((config) => config.key === 'min_images_per_label');
+
+    if (requiredImagesAutoTrainingParameter !== undefined && requiredImagesAutoTrainingParameter.type === 'int') {
+        return requiredImagesAutoTrainingParameter;
+    }
+
+    return undefined;
 };

@@ -5,16 +5,18 @@ import {
     useProjectConfigurationMutation,
     useProjectConfigurationQuery,
 } from '../../../../core/configurable-parameters/hooks/use-project-configuration.hook';
-import {
-    BoolParameter,
-    ProjectConfigurationUploadPayload,
-} from '../../../../core/configurable-parameters/services/configuration.interface';
+import { ProjectConfigurationUploadPayload } from '../../../../core/configurable-parameters/services/configuration.interface';
 import { useFeatureFlags } from '../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { ProjectIdentifier } from '../../../../core/projects/core.interface';
 import { Task } from '../../../../core/projects/task.interface';
 import { isNotCropTask } from '../../../utils';
 import { useAutoTrainingTasksConfig } from './use-tasks-auto-training-config.hook';
-import { UseActiveLearningConfigurationReturnType } from './util';
+import {
+    getAutoTrainingEnabledParameter,
+    getDynamicRequiredAnnotationsParameter,
+    getRequiredImagesAutoTrainingParameter,
+    UseActiveLearningConfigurationReturnType,
+} from './util';
 
 export const useActiveLearningConfiguration = (
     projectIdentifier: ProjectIdentifier,
@@ -90,7 +92,7 @@ export const useActiveLearningConfiguration = (
                         taskId,
                         autoTraining: [
                             {
-                                key: 'required_images_auto_training',
+                                key: 'min_images_per_label',
                                 value,
                             },
                         ],
@@ -119,13 +121,13 @@ export const useActiveLearningConfiguration = (
 
             return {
                 task,
-                trainingConfig: taskProjectConfiguration.autoTraining.find(
-                    (config) => config.key === 'enable'
-                ) as BoolParameter,
-                dynamicRequiredAnnotationsConfig: taskProjectConfiguration.autoTraining.find(
-                    (config) => config.key === '"enable_dynamic_required_annotations"'
-                ) as BoolParameter,
-                requiredImagesAutoTrainingConfig: undefined,
+                trainingConfig: getAutoTrainingEnabledParameter(taskProjectConfiguration.autoTraining),
+                dynamicRequiredAnnotationsConfig: getDynamicRequiredAnnotationsParameter(
+                    taskProjectConfiguration.autoTraining
+                ),
+                requiredImagesAutoTrainingConfig: getRequiredImagesAutoTrainingParameter(
+                    taskProjectConfiguration.autoTraining
+                ),
             };
         });
 
