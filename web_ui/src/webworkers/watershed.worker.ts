@@ -11,13 +11,15 @@ declare const self: DedicatedWorkerGlobalScope;
 let opencv: OpenCVTypes;
 
 const waitForOpenCV = async () => {
-    if (opencv) return opencv;
+    if (opencv) return true;
 
     opencv = await OpenCVLoader();
 
     if ('ready' in opencv) {
         await opencv.ready;
     }
+
+    return false;
 };
 
 const initWatershed = async (imageData: ImageData): Promise<WatershedMethods> => {
