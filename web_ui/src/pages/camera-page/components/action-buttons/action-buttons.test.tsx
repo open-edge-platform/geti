@@ -32,19 +32,15 @@ const mockedScreenshot = getMockedScreenshot({});
 describe('ActionButtons', () => {
     const renderApp = async ({
         canGoToCameraPage = false,
-        isLivePrediction = false,
         filesData = [mockedScreenshot],
         deleteAllItems = jest.fn().mockResolvedValue(''),
     }: {
         filesData?: Screenshot[];
         canGoToCameraPage?: boolean;
-        isLivePrediction?: boolean;
         deleteAllItems?: jest.Mock;
         mockedGetBrowserPermissions?: jest.Mock;
     }) => {
-        jest.mocked(useCameraParams).mockReturnValue(
-            getUseCameraParams({ isLivePrediction, ...mockedDatasetIdentifier })
-        );
+        jest.mocked(useCameraParams).mockReturnValue(getUseCameraParams({ ...mockedDatasetIdentifier }));
 
         configUseCameraStorage({ deleteAllItems, filesData });
 
@@ -68,7 +64,7 @@ describe('ActionButtons', () => {
     });
 
     it('savedFilesQuery is empty, buttons are disabled', async () => {
-        await renderApp({ isLivePrediction: true, filesData: [] });
+        await renderApp({ filesData: [] });
 
         await waitFor(() => {
             expect(screen.getByRole('button', { name: /cancel/i })).toBeEnabled();
@@ -77,7 +73,7 @@ describe('ActionButtons', () => {
     });
 
     it('"take shots" redirects to "camera" page', async () => {
-        await renderApp({ isLivePrediction: true, canGoToCameraPage: true });
+        await renderApp({ canGoToCameraPage: true });
 
         await waitFor(() => {
             fireEvent.click(screen.getByRole('button', { name: /take shots/i }));
@@ -88,7 +84,7 @@ describe('ActionButtons', () => {
 
     it('"discard all" calls deleteAllItems', async () => {
         const mockedDeleteAllItems = jest.fn().mockResolvedValue('');
-        await renderApp({ isLivePrediction: false, deleteAllItems: mockedDeleteAllItems });
+        await renderApp({ deleteAllItems: mockedDeleteAllItems });
 
         await waitFor(() => {
             fireEvent.click(screen.getByRole('button', { name: /discard all/i }));
@@ -104,21 +100,9 @@ describe('ActionButtons', () => {
     });
 
     describe('cancel button', () => {
-        it('live prediction mode on, redirects to "tests/live-prediction"', async () => {
+        it('redirects to dataset page', async () => {
             const mockedDeleteAllItems = jest.fn().mockResolvedValue('');
-            await renderApp({ isLivePrediction: true, deleteAllItems: mockedDeleteAllItems });
-
-            await waitFor(() => {
-                fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
-            });
-
-            expect(mockedDeleteAllItems).toHaveBeenCalled();
-            expect(mockedNavigate).toHaveBeenCalledWith(expect.stringContaining('/tests/live-prediction'));
-        });
-
-        it('live prediction mode off, redirects to dataset page', async () => {
-            const mockedDeleteAllItems = jest.fn().mockResolvedValue('');
-            await renderApp({ isLivePrediction: false, filesData: [], deleteAllItems: mockedDeleteAllItems });
+            await renderApp({ filesData: [], deleteAllItems: mockedDeleteAllItems });
 
             await waitFor(() => {
                 fireEvent.click(screen.getByRole('button', { name: /cancel/i }));

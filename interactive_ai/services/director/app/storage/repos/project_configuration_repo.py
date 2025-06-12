@@ -1,15 +1,22 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 
-from geti_configuration_tools.project_configuration import NullProjectConfiguration, ProjectConfiguration, TaskConfig
+from geti_configuration_tools.project_configuration import (
+    AutoTrainingParameters,
+    NullProjectConfiguration,
+    ProjectConfiguration,
+    TaskConfig,
+    TrainConstraints,
+    TrainingParameters,
+)
 from pymongo.command_cursor import CommandCursor
 from pymongo.cursor import Cursor
 
 from storage.mappers.project_configuration_mapper import ProjectConfigurationToMongo
 
-from geti_types import ProjectIdentifier, Session
+from geti_types import ID, ProjectIdentifier, Session
 from iai_core.repos.base import ProjectBasedSessionRepo
 from iai_core.repos.mappers.cursor_iterator import CursorIterator
 
@@ -69,9 +76,40 @@ class ProjectConfigurationRepo(ProjectBasedSessionRepo[ProjectConfiguration]):
         if project_config is None:
             raise ValueError(f"Project configuration with ID {task_config.id_} not found.")
 
-        for i, config in enumerate(project_config.task_configs):
-            if config.task_id == task_config.task_id:
-                project_config.task_configs[i] = task_config
-                self.save(project_config)
-                return
-        raise ValueError(f"Task configuration with ID {task_config.task_id} not found.")
+        project_config.update_task_config(task_config=task_config)
+        self.save(project_config)
+
+    def create_default_configuration(self, task_ids: Sequence[ID]) -> None:
+        """
+        Create a default project configuration if one doesn't already exist.
+
+        This method checks if a project configuration already exists and creates
+        a new configuration with default parameters for the provided task IDs
+        only if no configuration is found.
+
+        :param task_ids: Sequence of task IDs to include in the default configuration
+        :return: None
+        """
+        exists = not isinstance(self.get_project_configuration(), NullProjectConfiguration)
+        if exists:
+            return
+
+        default_task_configs = []
+
+        for task_id in task_ids:
+            default_task_configs.append(
+                TaskConfig(
+                    task_id=task_id,
+                    training=TrainingParameters(
+                        constraints=TrainConstraints(),
+                    ),
+                    auto_training=AutoTrainingParameters(),
+                )
+            )
+
+        default_config = ProjectConfiguration(
+            id_=self.generate_id(),
+            project_id=self.identifier.project_id,
+            task_configs=default_task_configs,
+        )
+        self.save(default_config)

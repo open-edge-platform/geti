@@ -12,8 +12,6 @@ import { Tiling } from './tiling/tiling.component';
 import { TrainingSubsets } from './training-subsets/training-subsets.component';
 
 interface DataManagementProps {
-    isReshufflingSubsetsEnabled: boolean;
-    onReshufflingSubsetsEnabledChange: (reshufflingSubsetsEnabled: boolean) => void;
     configParameters: ConfigurableParametersTaskChain;
 }
 
@@ -21,20 +19,13 @@ const getTilingParameters = (configParameters: ConfigurableParametersTaskChain) 
     return configParameters.components.find((component) => component.header === 'Tiling');
 };
 
-export const DataManagement: FC<DataManagementProps> = ({
-    isReshufflingSubsetsEnabled,
-    onReshufflingSubsetsEnabledChange,
-    configParameters,
-}) => {
+export const DataManagement: FC<DataManagementProps> = ({ configParameters }) => {
     const tilingParameters = getTilingParameters(configParameters);
 
     return (
         <View>
             {/* Not supported in v1 of training flow revamp <BalanceLabelsDistribution /> */}
-            <TrainingSubsets
-                isReshufflingSubsetsEnabled={isReshufflingSubsetsEnabled}
-                onReshufflingSubsetsEnabledChange={onReshufflingSubsetsEnabledChange}
-            />
+            <TrainingSubsets />
             {tilingParameters !== undefined && <Tiling tilingParameters={tilingParameters} />}
             <DataAugmentation />
             <Filters />

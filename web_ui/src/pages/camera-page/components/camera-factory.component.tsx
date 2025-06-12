@@ -30,7 +30,7 @@ export const CameraFactory = ({
     isPermissionPending = true,
 }: CameraFactoryProps): JSX.Element => {
     const { tasks } = useTask();
-    const { isLivePrediction, defaultLabelId, hasDefaultLabel } = useCameraParams();
+    const { defaultLabelId, hasDefaultLabel } = useCameraParams();
 
     const [selectedLabels, setSelectedLabels] = useState<Label[]>([]);
 
@@ -59,7 +59,7 @@ export const CameraFactory = ({
     return (
         <Flex gridArea={'content'} UNSAFE_style={{ background: 'var(--spectrum-global-color-gray-50)' }}>
             <Flex margin={'size-250'} flexGrow={1} direction={'column'} position={'relative'}>
-                {isValidTask && !isLivePrediction && (
+                {isValidTask && (
                     <LabelSelector
                         name={'Select label'}
                         maxWidth={'size-3000'}

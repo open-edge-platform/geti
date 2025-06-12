@@ -5,10 +5,11 @@ import json
 from http import HTTPStatus
 from unittest.mock import patch
 
+from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
 from testfixtures import compare
 
 from communication.controllers.training_configuration_controller import TrainingConfigurationRESTController
-from features.feature_flag_provider import FeatureFlag
+from features.feature_flag import FeatureFlag
 
 from geti_types import ID, ProjectIdentifier
 
@@ -64,3 +65,78 @@ class TestTrainingConfigurationEndpoints:
         result = fxt_director_app.get(f"{API_PROJECT_PATTERN}/training_configuration")
 
         assert result.status_code == HTTPStatus.FORBIDDEN
+
+        result = fxt_director_app.patch(
+            f"{API_PROJECT_PATTERN}/training_configuration",
+            json={
+                "task_id": "dummy_task_id",
+                "model_manifest_id": "dummy_model_manifest_id",
+            },
+        )
+
+        assert result.status_code == HTTPStatus.FORBIDDEN
+
+    def test_update_training_configuration(self, fxt_director_app, fxt_enable_feature_flag_name) -> None:
+        # Arrange
+        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS.name)
+
+        # Create a sample REST input payload
+        rest_input = {
+            "task_id": "detection_1",
+            "model_manifest_id": "model_manifest_123",
+            "dataset_preparation": {
+                "subset_split": {
+                    "training": 70,
+                    "validation": 20,
+                    "test": 10,
+                    "auto_selection": True,
+                }
+            },
+            "training": [
+                {"key": "max_epochs", "value": 100, "type": "int", "name": "Epochs"},
+                {"key": "learning_rate", "value": 0.042, "type": "float", "name": "Learning rate"},
+                {"early_stopping": {"enable": True, "patience": 5}},
+            ],
+            "evaluation": [],
+        }
+
+        # Act
+        with patch.object(
+            TrainingConfigurationRESTController,
+            "update_configuration",
+            return_value=None,
+        ) as mock_update_training_config:
+            result = fxt_director_app.patch(
+                f"{API_PROJECT_PATTERN}/training_configuration",
+                json=rest_input,
+            )
+
+        # Assert
+        mock_update_training_config.assert_called_once()
+
+        # Capture the update_configuration argument
+        update_config = mock_update_training_config.call_args[1]["update_configuration"]
+
+        # Verify it's a PartialTrainingConfiguration with expected values
+        assert isinstance(update_config, PartialTrainingConfiguration)
+        assert update_config.task_id == "detection_1"
+        assert update_config.model_manifest_id == "model_manifest_123"
+
+        # Check global parameters
+        assert hasattr(update_config, "global_parameters")
+        assert hasattr(update_config.global_parameters, "dataset_preparation")
+        assert update_config.global_parameters.dataset_preparation.subset_split.training == 70
+        assert update_config.global_parameters.dataset_preparation.subset_split.validation == 20
+        assert update_config.global_parameters.dataset_preparation.subset_split.test == 10
+        assert update_config.global_parameters.dataset_preparation.subset_split.auto_selection is True
+
+        # Check hyperparameters
+        assert hasattr(update_config, "hyperparameters")
+        assert hasattr(update_config.hyperparameters, "training")
+        assert update_config.hyperparameters.training.max_epochs == 100
+        assert update_config.hyperparameters.training.learning_rate == 0.042
+        assert update_config.hyperparameters.training.early_stopping.enable
+        assert update_config.hyperparameters.training.early_stopping.patience == 5
+
+        assert result.status_code == HTTPStatus.NO_CONTENT
+        assert not result.content  # 204 responses must not include a response body

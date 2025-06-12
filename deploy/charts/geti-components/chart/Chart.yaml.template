@@ -1,0 +1,123 @@
+name: geti-components
+apiVersion: v2
+type: application
+description: Chart that contains all the components of Geti
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: ${TAG}
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application. Versions are not expected to
+# follow Semantic Versioning. They should reflect the version the application is using.
+# It is recommended to use it with quotes.
+appVersion: ${TAG}
+
+dependencies:
+  - name: migration-job
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/migration_job/.build"
+    condition: enabled.migration_job
+  - name: auto-train-controller
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/auto_train/.build"
+    condition: enabled.auto_train
+  - name: dataset-ie
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/dataset_ie/.build"
+    condition: enabled.dataset_ie
+  - name: director
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/director/.build"
+    condition: enabled.director
+  - name: inference-gateway
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/inference_gateway/.build"
+    condition: enabled.inference_gateway
+  - name: jobs
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/jobs/.build"
+    condition: enabled.jobs
+  - name: media-ms
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/media/.build"
+    condition: enabled.media
+  - name: mlflow-geti-store
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/mlflow_geti_store/.build"
+    condition: enabled.mlflow_geti_store
+  - name: modelregistration
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/model_registration/.build"
+    condition: enabled.model_registration
+  - name: project-ie
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/project_ie/.build"
+    condition: enabled.project_ie
+  - name: resource
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/resource/.build"
+    condition: enabled.resource
+  - name: visual-prompt
+    version: ${TAG}
+    repository: "file://../../../../interactive_ai/services/visual_prompt/.build"
+    condition: enabled.visual_prompt
+  - name: account-service
+    version: ${TAG}
+    repository: "file://../../../../platform/services/account/.build"
+    condition: enabled.account
+  - name: auth-proxy
+    version: ${TAG}
+    repository: "file://../../../../platform/services/auth_proxy/.build"
+    condition: enabled.auth_proxy
+  - name: credit-system
+    version: ${TAG}
+    repository: "file://../../../../platform/services/credit/.build"
+    condition: enabled.credit
+  - name: initial-user
+    version: ${TAG}
+    repository: "file://../../../../platform/services/initial_user/.build"
+    condition: enabled.initial_user
+  - name: notifier
+    version: ${TAG}
+    repository: "file://../../../../platform/services/notifier/.build"
+    condition: enabled.notifier
+  - name: observability
+    version: ${TAG}
+    repository: "file://../../../../platform/services/observability/.build"
+    condition: enabled.observability
+  - name: onboarding-service
+    version: ${TAG}
+    repository: "file://../../../../platform/services/onboarding/.build"
+    condition: enabled.onboarding
+  - name: platform-cleaner
+    version: ${TAG}
+    repository: "file://../../../../platform/services/platform_cleaner/.build"
+    condition: enabled.platform_cleaner
+  - name: user-directory
+    version: ${TAG}
+    repository: "file://../../../../platform/services/user_directory/.build"
+    condition: enabled.user_directory
+  - name: weights_uploader
+    version: ${TAG}
+    repository: "file://../../../../platform/services/weights_uploader/.build"
+    condition: enabled.weights_uploader
+  - name: web
+    version: ${TAG}
+    repository: "file://../../../../web_ui/.build"
+    condition: enabled.web_ui
+  - name: configuration
+    version: 0.0.1
+    condition: enabled.configuration
+  - name: jobs-execution-namespace
+    version: v0.1.15
+    condition: enabled.jobs_execution_namespace
+  - name: modelmesh-serving
+    version: 0.1.0
+    condition: enabled.modelmesh_serving
+  - name: opa-bundle
+    version: 0.0.1
+    condition: enabled.opa_bundle
+  - name: telemetry-compression
+    version: 0.0.1
+    condition: enabled.telemetry_compression

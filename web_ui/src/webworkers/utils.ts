@@ -1,7 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import OpenCVTypes from 'OpenCVTypes';
+import axios from 'axios';
+import type OpenCVTypes from 'OpenCVTypes';
 
 import { Point } from '../core/annotations/shapes.interface';
 
@@ -174,4 +175,30 @@ export const stackPlanes = (CV: OpenCVTypes.cv, mat: OpenCVTypes.Mat) => {
         stackedPlanes.map((p) => p.delete());
         matPlanes?.delete();
     }
+};
+
+export const getBlobFromDataUrl = async (dataUrl: string): Promise<Blob> => {
+    const response = await axios.get(dataUrl, {
+        responseType: 'blob',
+    });
+
+    return response.data;
+};
+
+/*
+    1) Gets the blob from the source data url
+    2) Converts the .webp blob to .jpeg blob if necessary
+    3) Creates and returns a new file based on the blob
+*/
+export const fetchMediaAndConvertToFile = async (id: string, dataUrl: string) => {
+    const blob = await getBlobFromDataUrl(dataUrl);
+
+    if (blob === undefined) {
+        return;
+    }
+
+    const fileType = blob.type.split('/').pop();
+    const fileName = `${id}.${fileType}`;
+
+    return new File([blob], fileName, { type: blob.type });
 };

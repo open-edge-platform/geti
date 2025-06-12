@@ -17,8 +17,7 @@ properties:
   dataset_name:
     title: Dataset name
     type: string
-    enum: [""]
-    example: ""
+    example: "Test"
   labels_map:
     title: Map of dataset label names to project label ids
     type: object

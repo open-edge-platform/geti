@@ -20,18 +20,11 @@ jest.mock('../../hooks/camera-params.hook', () => ({
 describe('CloseSidebar', () => {
     const mockedScreenshot = getMockedScreenshot({});
 
-    const renderApp = async ({
-        screenshots = [],
-        isLivePrediction = false,
-    }: {
-        screenshots?: Screenshot[];
-        isLivePrediction?: boolean;
-    }) => {
+    const renderApp = async ({ screenshots = [] }: { screenshots?: Screenshot[] }) => {
         const mockedProjectIdentifier = getMockedProjectIdentifier({});
 
         jest.mocked(useCameraParams).mockReturnValue(
             getUseCameraParams({
-                isLivePrediction,
                 projectId: mockedProjectIdentifier.projectId,
                 workspaceId: mockedProjectIdentifier.workspaceId,
                 organizationId: mockedProjectIdentifier.organizationId,
@@ -40,17 +33,11 @@ describe('CloseSidebar', () => {
 
         providersRender(
             <ProjectProvider projectIdentifier={mockedProjectIdentifier}>
-                <CloseSidebar screenshots={screenshots} isLivePrediction={isLivePrediction} />
+                <CloseSidebar screenshots={screenshots} />
             </ProjectProvider>
         );
         await waitForElementToBeRemoved(screen.getAllByRole('progressbar'));
     };
-
-    it('unique screenshot mode', async () => {
-        await renderApp({ screenshots: [mockedScreenshot], isLivePrediction: true });
-
-        expect(screen.getByRole('button', { name: 'open preview' })).toBeVisible();
-    });
 
     it('unique screenshot mode false', async () => {
         const screenshots = [
@@ -58,7 +45,7 @@ describe('CloseSidebar', () => {
             { ...mockedScreenshot, id: '321' },
         ];
 
-        await renderApp({ screenshots, isLivePrediction: false });
+        await renderApp({ screenshots });
 
         expect(screen.getByText(screenshots.length)).toBeVisible();
         expect(screen.queryByRole('button', { name: 'open preview' })).not.toBeInTheDocument();

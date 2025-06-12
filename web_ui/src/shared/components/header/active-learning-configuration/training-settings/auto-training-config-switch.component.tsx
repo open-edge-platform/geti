@@ -5,46 +5,24 @@ import { FC } from 'react';
 
 import { Flex, Switch, Text } from '@geti/ui';
 
-import { useReconfigAutoTraining } from '../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook';
-import {
-    BooleanGroupParams,
-    ConfigurableParametersTaskChain,
-} from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
-import { findAutoTrainingConfig } from '../../../../../core/configurable-parameters/utils';
 import { Task } from '../../../../../core/projects/task.interface';
 import { idMatchingFormat } from '../../../../../test-utils/id-utils';
 
 interface AutoTrainingConfigSwitchProps {
     task: Task;
     isDisabled: boolean;
-    trainingConfig: BooleanGroupParams;
-    autoTrainingOptimisticUpdates: ReturnType<typeof useReconfigAutoTraining>;
-    configParameters: ConfigurableParametersTaskChain[];
+    isAutoTrainingEnabled: boolean;
+    onAutoTraining: (value: boolean) => void;
 }
 
 export const AutoTrainingConfigSwitch: FC<AutoTrainingConfigSwitchProps> = ({
     task,
     isDisabled,
-    autoTrainingOptimisticUpdates,
-    configParameters,
-    trainingConfig,
+    onAutoTraining,
+    isAutoTrainingEnabled,
 }) => {
     const onChange = () => {
-        autoTrainingOptimisticUpdates.mutate({
-            configParameters,
-            newConfigParameter: {
-                ...trainingConfig,
-                value: !trainingConfig.value,
-            },
-            onOptimisticUpdate: (config) => {
-                const autoTrainingConfig = findAutoTrainingConfig(task.id, config);
-                if (autoTrainingConfig !== undefined) {
-                    autoTrainingConfig.value = !autoTrainingConfig.value;
-                }
-
-                return config;
-            },
-        });
+        onAutoTraining(!isAutoTrainingEnabled);
     };
 
     return (
@@ -53,7 +31,7 @@ export const AutoTrainingConfigSwitch: FC<AutoTrainingConfigSwitchProps> = ({
                 isEmphasized
                 justifySelf={'end'}
                 aria-label={`Toggle auto training for ${task.title}`}
-                isSelected={trainingConfig.value}
+                isSelected={isAutoTrainingEnabled}
                 isDisabled={isDisabled}
                 onChange={onChange}
                 id={`training-switch-${idMatchingFormat(task.title)}`}

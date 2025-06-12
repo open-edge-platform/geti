@@ -47,7 +47,7 @@ import {
 } from '../project.interface';
 import { TaskMetadata } from '../task.interface';
 import { getFormattedTimeRemaining, getRoundedProgress } from '../utils';
-import { ProjectService, ProjectsQueryOptions } from './project-service.interface';
+import { ImportOptions, ProjectService, ProjectsQueryOptions } from './project-service.interface';
 import {
     getConnectionsByTaskNames,
     getDatasetEntity,
@@ -125,13 +125,17 @@ export const createApiProjectService: CreateApiService<ProjectService> = (
         return getProjectEntity(data, router);
     };
 
-    const importProject = async (projectIdentifier: ProjectImportIdentifier): Promise<ProjectImport> => {
+    const importProject = async (
+        projectIdentifier: ProjectImportIdentifier,
+        options: ImportOptions
+    ): Promise<ProjectImport> => {
         const { importProjectId, ...workspaceIdentifier } = projectIdentifier;
 
         const { data } = await instance.post<ProjectImportDTO>(
             router.PROJECT_IMPORT.IMPORT_PROJECT(workspaceIdentifier),
             {
                 file_id: importProjectId,
+                project_name: options.projectName,
             }
         );
 

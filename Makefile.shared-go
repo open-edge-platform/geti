@@ -22,14 +22,15 @@ CGO_ENABLED    ?= 0
 GO_BUILD_FLAGS ?= -trimpath -mod=readonly -gcflags="all=-spectre=all" -asmflags="all=-spectre=all" -ldflags="all=-s -w" -a
 OUTPUT_BINARY  ?= service
 
+CLEAN_DIRS := \
+    $(OUTPUT_BINARY) coverage.out \
+    ${CHART_BUILD_DIR}
+
 deps: ## Clean up and verify modules
 	$(GOCMD) mod tidy
 
 build-default: ## Build the Go binary
 	GOOS=$(GOOS) CGO_ENABLED=$(CGO_ENABLED) $(GOBUILD) $(GO_BUILD_FLAGS) -o $(OUTPUT_BINARY) .
-
-clean: ## Remove binary and coverage artifacts
-	rm -f $(OUTPUT_BINARY) coverage.out
 
 tests: test-unit test-integration
 

@@ -172,6 +172,22 @@ class JobInsufficientBalanceException(GetiBaseException):
         )
 
 
+class JobDuplicateFoundException(GetiBaseException):
+    """
+    This error can be raised if there is a running duplicate job is found during submission and job policy is set
+    to REJECT
+
+    :param message: str containing a custom error message
+    """
+
+    def __init__(self, message: str) -> None:
+        super().__init__(
+            message=message,
+            error_code="job_duplicate_found",
+            http_status=http.HTTPStatus.PRECONDITION_FAILED,
+        )
+
+
 class NotReadyForTrainingException(GetiBaseException):
     """
     Exception raised when a manual training trigger is received for a task that is not
@@ -593,4 +609,17 @@ class TaskNodeNotFoundException(GetiBaseException):
             message=f"The requested task node could not be found. Task Node ID: `{task_node_id}`.",
             error_code="task_node_not_found",
             http_status=http.HTTPStatus.NOT_FOUND,
+        )
+
+
+class MissingTaskIDException(GetiBaseException):
+    """
+    Exception raised when a task ID is required but not provided in the request.
+    """
+
+    def __init__(self) -> None:
+        super().__init__(
+            message="The required task ID was not provided in the request.",
+            error_code="missing_task_id",
+            http_status=http.HTTPStatus.BAD_REQUEST,
         )

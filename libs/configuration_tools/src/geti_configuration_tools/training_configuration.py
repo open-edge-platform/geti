@@ -179,6 +179,15 @@ class PartialTrainingConfiguration(TrainingConfiguration):
     where only a subset of the configuration needs to be specified or changed.
     """
 
+    def __init__(self, id_: ID = ID(), ephemeral: bool = True, **data):
+        super().__init__(id_, ephemeral, **data)
+
+    @model_validator(mode="after")
+    def validate_identifiers(self) -> "PartialTrainingConfiguration":
+        if not self.task_id:
+            raise ValueError("task_id must be provided in the configuration.")
+        return self
+
 
 @partial_model
 class PartialGlobalParameters(GlobalParameters):

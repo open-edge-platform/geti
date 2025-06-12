@@ -11,6 +11,14 @@ on:
         description: "Docker image tag"
         type: string
         required: true
+      push:
+        description: "Enable pushing Docker images and Helm charts"
+        type:  boolean
+        default: false
+      ref:
+        description: 'The branch, tag or SHA to checkout'
+        type: string
+        default: ""
     secrets:
       AWS_ROLE:
         required: true
@@ -20,8 +28,8 @@ on:
         required: true
   workflow_dispatch:
     inputs:
-      branch:
-        description: "Branch to checkout"
+      ref:
+        description: 'The branch, tag or SHA to checkout'
         required: true
         default: "main"
       component-dir:
@@ -54,7 +62,7 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           persist-credentials: false
-          ref: ${{ inputs.branch || '' }}
+          ref: ${{ inputs.ref || '' }}
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502 # v4.0.2
@@ -101,7 +109,7 @@ jobs:
           fi
 
       - name: Push image
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.push
         run: make -C "${COMPONENT_DIR}" publish-image
 
       - name: Lint chart
@@ -109,5 +117,5 @@ jobs:
         run: make -C "${COMPONENT_DIR}" lint-chart
 
       - name: Publish chart
-        if: steps.build-image.outputs.SKIP_IMAGE != 'true'
+        if: steps.build-image.outputs.SKIP_IMAGE != 'true' && inputs.push
         run: make -C "${COMPONENT_DIR}" publish-chart

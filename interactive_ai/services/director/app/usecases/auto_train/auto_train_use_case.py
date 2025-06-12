@@ -12,6 +12,7 @@ import os
 from threading import Thread
 from typing import TYPE_CHECKING
 
+from geti_feature_tools import FeatureFlagProvider
 from rx.operators import debounce
 from rx.scheduler import EventLoopScheduler
 from rx.subject import Subject
@@ -19,7 +20,9 @@ from rx.subject import Subject
 from coordination.configuration_manager.task_node_config import AnomalyTaskNodeConfig, TaskNodeConfig
 from coordination.dataset_manager.missing_annotations_helper import MissingAnnotationsHelper
 from entities.auto_train_activation import AutoTrainActivation
+from features.feature_flag import FeatureFlag
 from storage.repos.auto_train_activation_repo import ProjectBasedAutoTrainActivationRepo
+from storage.repos.project_configuration_repo import ProjectConfigurationRepo
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import (
@@ -217,6 +220,12 @@ class AutoTrainUseCase:
         :param task_node: The task node to check
         :returns: True if auto-training is enabled for the task node, False otherwise.
         """
+        if FeatureFlagProvider.is_enabled(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS):
+            # use revamped project configuration
+            repo = ProjectConfigurationRepo(project_identifier)
+            project_config = repo.get_project_configuration()
+            return project_config.get_task_config(task_id=str(task_node.id_)).auto_training.enable
+
         task_configuration_type = AnomalyTaskNodeConfig if task_node.task_properties.is_anomaly else TaskNodeConfig
         task_configuration = ConfigurableParametersRepo(project_identifier).get_or_create_component_parameters(
             data_instance_of=task_configuration_type,

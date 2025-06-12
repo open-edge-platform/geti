@@ -44,19 +44,10 @@ describe('OpenSidebar', () => {
     const mockedScreenshotTwo = getMockedScreenshot({ id: 'id-test-2', labelIds: [mockedLabel.id] });
     const mockedScreenshotThree = getMockedScreenshot({ id: 'id-test-3' });
 
-    const renderApp = ({
-        labels = [],
-        screenshots = [],
-        isLivePrediction = false,
-    }: {
-        labels?: Label[];
-        screenshots?: Screenshot[];
-        isLivePrediction?: boolean;
-    }) => {
+    const renderApp = ({ labels = [], screenshots = [] }: { labels?: Label[]; screenshots?: Screenshot[] }) => {
         const mockedProjectIdentifier = getMockedProjectIdentifier({});
 
         jest.mocked(useCameraParams).mockReturnValue({
-            isLivePrediction,
             defaultLabelId: '',
             hasDefaultLabel: false,
             datasetId: 'data-id-test',
@@ -69,20 +60,11 @@ describe('OpenSidebar', () => {
         providersRender(
             <ProjectProvider projectIdentifier={mockedProjectIdentifier}>
                 <DeviceSettingsProvider>
-                    <OpenSidebar labels={labels} screenshots={screenshots} isLivePrediction={isLivePrediction} />
+                    <OpenSidebar labels={labels} screenshots={screenshots} />
                 </DeviceSettingsProvider>
             </ProjectProvider>
         );
     };
-
-    it('unique screenshot mode', async () => {
-        renderApp({ screenshots: [mockedScreenshotOne, mockedScreenshotTwo], isLivePrediction: true });
-
-        await waitFor(() => {
-            expect(screen.getByText('Camera Settings')).toBeVisible();
-            expect(screen.getByRole('button', { name: 'open preview' })).toBeVisible();
-        });
-    });
 
     it('shows total labeled images ', async () => {
         const unlabeledScreenshots = [mockedScreenshotThree];
@@ -92,7 +74,6 @@ describe('OpenSidebar', () => {
         renderApp({
             labels: [mockedLabel],
             screenshots,
-            isLivePrediction: false,
         });
 
         await waitFor(() => {

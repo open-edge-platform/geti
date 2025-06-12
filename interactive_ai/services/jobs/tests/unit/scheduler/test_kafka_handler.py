@@ -7,7 +7,14 @@ import pytest
 from bson import ObjectId
 from flytekit.models.core.workflow import NodeMetadata
 
-from model.job import JobConsumedResource, JobCost, JobResource, JobStepDetails, JobTaskExecutionBranch
+from model.job import (
+    JobCancellationInfo,
+    JobConsumedResource,
+    JobCost,
+    JobResource,
+    JobStepDetails,
+    JobTaskExecutionBranch,
+)
 from model.job_state import JobTaskState
 from scheduler.flyte import Flyte
 from scheduler.jobs_templates import JobsTemplates, JobTemplateStep
@@ -1314,8 +1321,11 @@ def test_on_job_step_details_missing_execution(
 @patch.object(Flyte, "__init__", new=mock_flyte_client)
 @patch.object(ProgressHandler, "__init__", new=mock_progress_handler)
 @patch.object(StateMachine, "set_step_details")
+@patch.object(StateMachine, "get_by_id")
 @patch.object(Flyte, "fetch_workflow_execution")
-def test_on_job_step_details(mock_flyte_fetch_workflow_execution, mock_sm_set_step_details, request) -> None:
+def test_on_job_step_details(
+    mock_flyte_fetch_workflow_execution, mock_sm_get_by_id, mock_sm_set_step_details, request
+) -> None:
     request.addfinalizer(lambda: reset_singletons())
 
     # Arrange
@@ -1346,6 +1356,10 @@ def test_on_job_step_details(mock_flyte_fetch_workflow_execution, mock_sm_set_st
     }
     mock_flyte_fetch_workflow_execution.return_value = execution
 
+    job = MagicMock()
+    job.cancellation_info = JobCancellationInfo(is_cancelled=False)
+    mock_sm_get_by_id.return_value = job
+
     # Act
     ProgressHandler().on_job_step_details(message)
 
@@ -1359,6 +1373,56 @@ def test_on_job_step_details(mock_flyte_fetch_workflow_execution, mock_sm_set_st
         message="Custom message",
         warning=None,
     )
+
+
+@patch.object(Flyte, "__init__", new=mock_flyte_client)
+@patch.object(ProgressHandler, "__init__", new=mock_progress_handler)
+@patch.object(StateMachine, "set_step_details")
+@patch.object(StateMachine, "get_by_id")
+@patch.object(Flyte, "fetch_workflow_execution")
+def test_on_job_step_details_cancelled(
+    mock_flyte_fetch_workflow_execution, mock_sm_get_by_id, mock_sm_set_step_details, request
+) -> None:
+    request.addfinalizer(lambda: reset_singletons())
+
+    # Arrange
+    message: KafkaRawMessage = KafkaRawMessage(
+        "test_topic",
+        0,
+        0,
+        int(now().timestamp()),
+        0,
+        "key",
+        {
+            "execution_id": "execution",
+            "task_id": "task_id",
+            "progress": 45,
+            "message": "Custom message",
+        },
+        [
+            ("organization_id", b"000000000000000000000001"),
+            ("workspace_id", b"63b183d00000000000000001"),
+        ],
+    )
+
+    execution = MagicMock()
+    execution.spec.annotations.values = {
+        "workspace_id": "workspace_id",
+        "organization_id": str(ORG),
+        "job_id": "job_id",
+    }
+    mock_flyte_fetch_workflow_execution.return_value = execution
+
+    job = MagicMock()
+    job.cancellation_info = JobCancellationInfo(is_cancelled=True)
+    mock_sm_get_by_id.return_value = job
+
+    # Act
+    ProgressHandler().on_job_step_details(message)
+
+    # Assert
+    mock_flyte_fetch_workflow_execution.assert_called_once_with(execution_name="execution")
+    mock_sm_set_step_details.assert_not_called()
 
 
 @patch.object(Flyte, "__init__", new=mock_flyte_client)

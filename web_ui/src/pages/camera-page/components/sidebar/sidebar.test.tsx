@@ -40,7 +40,6 @@ describe('Sidebar', () => {
         jest.mocked(useCameraParams).mockReturnValue({
             defaultLabelId: '',
             hasDefaultLabel: false,
-            isLivePrediction: false,
             isPhotoCaptureMode: true,
             ...getMockedDatasetIdentifier(),
         });

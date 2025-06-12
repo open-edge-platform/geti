@@ -1,6 +1,6 @@
 ---
-name: user-directory
-version: '{{VERSION}}'
+name: ${COMPONENT_NAME}
+version: ${TAG}
 description: user-directory chart
 apiVersion: v2
-appVersion: '{{VERSION}}'
+appVersion: ${TAG}

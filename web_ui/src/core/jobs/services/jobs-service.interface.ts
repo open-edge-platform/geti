@@ -13,6 +13,8 @@ export interface JobsQueryParams {
     jobTypes?: JobType[];
     key?: string;
     author?: string;
+    creationTimeFrom?: string;
+    creationTimeTo?: string;
     startTimeFrom?: string;
     startTimeTo?: string;
     skip?: number;

@@ -12,7 +12,6 @@ import { Screenshot } from '../../../camera-support/camera.interface';
 import { useCameraParams } from '../../hooks/camera-params.hook';
 import { useCameraStorage } from '../../hooks/use-camera-storage.hook';
 import { AnimatedThumbnail } from './animated-thumbnail';
-import { ThumbnailPreview } from './thumbnail-preview.component';
 
 interface SidebarThumbnailProps {
     screenshots: Screenshot[];
@@ -21,22 +20,18 @@ interface SidebarThumbnailProps {
 
 export const SidebarThumbnail = ({ screenshots, isCloseSidebar = false }: SidebarThumbnailProps): JSX.Element => {
     const { deleteMany } = useCameraStorage();
-    const { isLivePrediction, defaultLabelId, hasDefaultLabel, ...identifier } = useCameraParams();
+    const { defaultLabelId, hasDefaultLabel, ...identifier } = useCameraParams();
 
     const mediaGalleryPath = paths.project.dataset.capturedMediaGallery(identifier);
 
     if (isEmpty(screenshots)) {
-        const height = isCloseSidebar ? 'size-800' : isLivePrediction ? 'size-3000' : 'size-2000';
+        const height = isCloseSidebar ? 'size-800' : 'size-2000';
 
         return (
             <Flex alignItems={'center'} justifyContent={'center'} height={height}>
                 <Text>No media items available</Text>
             </Flex>
         );
-    }
-
-    if (isLivePrediction) {
-        return <ThumbnailPreview screenshots={screenshots} isCloseSidebar={isCloseSidebar} />;
     }
 
     const handleDeleteItem = (id: string) => {

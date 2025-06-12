@@ -1,4 +1,3 @@
-{{- if eq (default "standard" .Values.global.installation_profile) "standard" }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
@@ -13,7 +12,7 @@ spec:
   minReplicas: 1
   maxReplicas: 1
   {{- else }}
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 20
   {{- end }}
   metrics:
@@ -31,4 +30,3 @@ spec:
         target:
           type: Utilization
           averageUtilization: 70
-{{- end }}

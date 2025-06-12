@@ -45,6 +45,7 @@ class TrainWorkflowData:
     :param max_number_of_annotations: Maximum number of annotation allowed in one annotation scene. If exceeded, the
     annotation scene will be ignored during training.
     :param reshuffle_subsets: Whether to reassign/shuffle all the items to subsets including Test set from scratch
+    :param hyperparameters: Dict containing the hyperparameters to be used for training.
     """
 
     workspace_id: str
@@ -62,6 +63,7 @@ class TrainWorkflowData:
     min_annotation_size: typing.Optional[int] = None  # noqa: UP007
     max_number_of_annotations: typing.Optional[int] = None  # noqa: UP007
     reshuffle_subsets: bool = False
+    hyperparameters: typing.Optional[dict] = None  # noqa: UP007
 
     def get_common_entities(self) -> tuple[Project, TaskNode]:
         """

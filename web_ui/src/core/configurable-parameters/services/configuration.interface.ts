@@ -7,7 +7,7 @@ interface ParameterBase {
     description: string;
 }
 
-interface NumberParameter extends ParameterBase {
+export interface NumberParameter extends ParameterBase {
     type: 'int' | 'float';
     value: number;
     minValue: number;
@@ -59,11 +59,20 @@ export interface ProjectConfiguration {
     taskConfigs: ProjectConfigurationTaskConfigs[];
 }
 
+export type DatasetPreparationParameters = {
+    subsetSplit: ConfigurationParameter[];
+    filtering: Record<string, ConfigurationParameter[]>;
+    augmentation: Record<string, ConfigurationParameter[]>;
+};
+
+export type TrainingParameters = ConfigurationParameter[] | Record<string, ConfigurationParameter[]>[];
+
 export interface TrainingConfiguration {
-    datasetPreparation?: Record<string, ConfigurationParameter[]>;
-    training?: ConfigurationParameter[];
-    evaluation?: ConfigurationParameter[];
+    datasetPreparation: DatasetPreparationParameters;
+    training: TrainingParameters;
+    evaluation: ConfigurationParameter[];
     advancedConfiguration?: StaticParameter[];
+    taskId: string;
 }
 
 export interface TrainingConfigurationUpdatePayload {

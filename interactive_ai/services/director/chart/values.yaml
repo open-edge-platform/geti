@@ -2,16 +2,9 @@ image: director
 
 imagePullPolicy: IfNotPresent
 
-standardResources:
+resources:
   requests:
-    cpu: 1000m
-    memory: 1Gi
-  limits:
-    memory: 1Gi
-
-liteResources:
-  requests:
-    cpu: 1000m
+    cpu: 300m
     memory: 500Mi
   limits:
     memory: 1Gi
@@ -43,6 +36,7 @@ ingress:
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/model_groups/(.*)/models/(.*):optimize
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/supported_algorithms
   - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/project_configuration
+  - /api/v(.*)/organizations/([^/]*)/workspaces/(.*)/projects/(.*)/training_configuration
 
 serviceAccount:
   create: true

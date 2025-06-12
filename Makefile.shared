@@ -9,7 +9,7 @@ CWD = $(abspath $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST))))))
 # version
 ###
 PRODUCT_VERSION                    ?= $(shell cat $(CWD)/VERSION)
-TAG                                ?= $(PRODUCT_VERSION)-$(shell git branch --show-current)-$(shell git rev-parse --short HEAD)
+TAG                                ?= $(PRODUCT_VERSION)-$(shell git rev-parse --short HEAD)
 
 ###
 # registries
@@ -60,6 +60,11 @@ DOCKER_PROXY                      := \
     $(if $(NO_PROXY),-e NO_PROXY=$(NO_PROXY))
 
 ###
+# A space-separated list of build directories to be removed by the 'clean' target
+###
+CLEAN_DIRS :=
+
+###
 # docker images
 ###
 build-image-default:
@@ -79,12 +84,13 @@ publish-image:
 ###
 # helm charts
 ###
-build-chart:
+build-chart-default:
 	mkdir -p ${CHART_BUILD_DIR}
 	cp -r ${CHART_DIR}/* ${CHART_BUILD_DIR}/
-	mv ${CHART_BUILD_DIR}/Chart.yaml.template ${CHART_BUILD_DIR}/Chart.yaml
-	yq e '.version = "${TAG}"' -i ${CHART_YAML}
-	yq e '.appVersion = "${TAG}"' -i ${CHART_YAML}
+	TAG=$(TAG) COMPONENT_NAME=$(COMPONENT_NAME) envsubst < ${CHART_BUILD_DIR}/Chart.yaml.template > ${CHART_YAML}
+	rm "${CHART_BUILD_DIR}/Chart.yaml.template"
+	helm dependency update ${CHART_BUILD_DIR}
+	helm package ${CHART_BUILD_DIR} --version ${TAG} --destination ${CHART_BUILD_DIR}
 
 lint-chart-default: build-chart
 	@echo "Running chart linter for component: ${COMPONENT_NAME}"
@@ -92,11 +98,13 @@ lint-chart-default: build-chart
 
 publish-chart-default: build-chart
 	@echo "Publishing chart for component: ${COMPONENT_NAME}"
-	helm package $(dir ${CHART_YAML}) --version ${TAG}
-	helm push ${COMPONENT_NAME}-${TAG}.tgz oci://${CHARTS_REGISTRY}
+	helm push ${CHART_BUILD_DIR}/${COMPONENT_NAME}-${TAG}.tgz oci://${CHARTS_REGISTRY}
 
-clean-chart:
-	rm -rf ${CHART_BUILD_DIR}
+clean:
+	@if [ -n "$(CLEAN_DIRS)" ]; then \
+        echo "Removing: $(CLEAN_DIRS)"; \
+        rm -rf $(CLEAN_DIRS); \
+    fi
 
 # To suppress warnings when overriding Makefile targets, declare the abstract targets as <name>-default
 %:  %-default
@@ -111,7 +119,7 @@ ifeq (builder,$(firstword $(MAKECMDGOALS)))
 endif
 
 # Run builder container when do "make builder -C <directory> <args>"
-builder:
+builder-default:
 	@docker run --rm -u $(shell id -u):$(shell getent group docker | cut -d: -f3) \
 		-v "$(ROOT_DIR):/app" \
 		-v /var/run/docker.sock:/var/run/docker.sock \

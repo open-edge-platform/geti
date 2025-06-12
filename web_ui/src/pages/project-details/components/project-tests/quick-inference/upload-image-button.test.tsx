@@ -51,69 +51,20 @@ describe('UploadImageButton', () => {
     it('upload button calls "onMenuAction"', async () => {
         await renderApp({});
 
-        const uploadButton = screen.getByRole('button', { name: /upload/i });
+        const uploadButton = screen.getByRole('button', { name: /upload file/i });
 
         await waitFor(() => {
             expect(uploadButton).toBeEnabled();
         });
 
         fireEvent.click(uploadButton);
-        fireEvent.click(screen.getByRole('menuitem', { name: /file/i }));
 
-        expect(onMenuAction).toHaveBeenCalledWith(MenuItemsKey.FILE.toLowerCase(), expect.any(Object));
+        expect(onMenuAction).toHaveBeenCalledWith(MenuItemsKey.FILE, expect.any(Object));
     });
 
     it('is disabled when passing disable', async () => {
         await renderApp({ mockedHandleUploadImage: jest.fn(), isDisabled: true });
 
         expect(screen.getByRole('button')).toBeDisabled();
-    });
-
-    describe('Camera options', () => {
-        it('render menu options', async () => {
-            await renderApp({});
-
-            const uploadButton = screen.getByRole('button', { name: /upload/i });
-
-            await waitFor(() => {
-                expect(uploadButton).toBeEnabled();
-            });
-
-            fireEvent.click(uploadButton);
-
-            expect(screen.getByRole('menuitem', { name: /file/i })).toBeVisible();
-            expect(screen.getByRole('menuitem', { name: /camera/i })).toBeVisible();
-        });
-
-        it('file option calls "onMenuAction"', async () => {
-            await renderApp({});
-
-            const uploadButton = screen.getByRole('button', { name: /upload/i });
-
-            await waitFor(() => {
-                expect(uploadButton).toBeEnabled();
-            });
-
-            fireEvent.click(uploadButton);
-
-            fireEvent.click(screen.getByRole('menuitem', { name: /file/i }));
-
-            expect(onMenuAction).toHaveBeenCalledWith(MenuItemsKey.FILE.toLowerCase(), expect.any(Object));
-        });
-
-        it('camera option redirects to camera page on livePrediction mode', async () => {
-            await renderApp({});
-
-            const uploadButton = screen.getByRole('button', { name: /upload/i });
-
-            await waitFor(() => {
-                expect(uploadButton).toBeEnabled();
-            });
-
-            fireEvent.click(uploadButton);
-            fireEvent.click(screen.getByRole('menuitem', { name: /camera/i }));
-
-            expect(mockedNavigate).toHaveBeenCalledWith(expect.stringContaining('/camera?isLivePrediction=true'));
-        });
     });
 });

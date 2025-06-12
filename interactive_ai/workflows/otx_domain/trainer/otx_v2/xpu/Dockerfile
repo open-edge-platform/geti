@@ -1,10 +1,10 @@
-FROM python:3.10-slim-bookworm@sha256:49454d2bf78a48f217eb25ecbcb4b5face313fea6a6e82706465a6990303ada2 AS base
+FROM python:3.10-slim-bookworm@sha256:99d6b199420e2a3588649813218bef3e727fac9642d5da66c1c24ec96f7ec87d AS base
 
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
 ENV UV_PYTHON_DOWNLOADS=0
 
-# Install runtime dependencies and intel graphics libs
+# Step 1: Install runtime dependencies and intel graphics libs
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libgl1=1.6.* \
@@ -31,11 +31,15 @@ RUN apt-get purge -y --auto-remove gpg wget && \
     /tmp/* \
     /usr/share/man/* /usr/share/doc/*
 
+# step 2: get python dependencies
+FROM base AS build
+
 # Copy the service dependencies
 COPY --link --from=libs . libs
-COPY --link --from=ghcr.io/astral-sh/uv:0.6.12@sha256:515b886e8eb99bcf9278776d8ea41eb4553a794195ef5803aa7ca6258653100d /uv /bin/uv
 
 WORKDIR /interactive_ai/workflows/otx_domain/trainer/otx_v2
+
+COPY --link --from=ghcr.io/astral-sh/uv:0.6.12@sha256:515b886e8eb99bcf9278776d8ea41eb4553a794195ef5803aa7ca6258653100d /uv /bin/uv
 
 COPY --link scripts/ scripts
 COPY --link run run
@@ -48,6 +52,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-dev --no-editable
+
+# step 3: build final runtime image
+FROM base AS runtime
+
+# Copy the application from the builder
+COPY --link --from=build --chown=10001 /interactive_ai/workflows/otx_domain/trainer/otx_v2 /interactive_ai/workflows/otx_domain/trainer/otx_v2
 
 # Place executables in the environment at the front of the path
 ENV PATH="/interactive_ai/workflows/otx_domain/trainer/otx_v2/.venv/bin:/interactive_ai/workflows/otx_domain/trainer/otx_v2:$PATH"
