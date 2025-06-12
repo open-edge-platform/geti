@@ -1,7 +1,7 @@
 [project]
 name = "otx-v2-trainer"
 version = "1.0.0"
-description = "OTX trainer"
+description = "OTX trainer XPU"
 requires-python = ">=3.10, <3.11"
 
 dependencies = [
@@ -17,8 +17,14 @@ dependencies = [
 ]
 
 [tool.uv.sources]
-geti-kafka-tools = { path = "../../../../../libs/kafka_tools" }
-geti-telemetry-tools = { path = "../../../../../libs/telemetry_tools" }
+geti-kafka-tools = { path = "../../../../../../libs/kafka_tools" }
+geti-telemetry-tools = { path = "../../../../../../libs/telemetry_tools" }
+
+
+[[tool.uv.index]]
+name = "torch"
+url = "https://download.pytorch.org/whl/xpu"
+explicit = true
 
 [dependency-groups]
 dev = [

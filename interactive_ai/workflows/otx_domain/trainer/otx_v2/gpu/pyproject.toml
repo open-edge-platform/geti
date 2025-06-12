@@ -1,0 +1,79 @@
+[project]
+name = "otx-v2-trainer"
+version = "1.0.0"
+description = "OTX trainer GPU"
+requires-python = ">=3.10, <3.11"
+
+dependencies = [
+    "mlflow==2.19.0",
+    "minio~=7.1.0",
+    "numpy==1.26.4",
+    "requests==2.32.3",
+    "tqdm==4.67.1",
+    "otx[base]==2.4.4",
+    "geti-kafka-tools",
+    "geti-telemetry-tools[telemetry,kafka]",
+    "torchmetrics<1.7.0",
+]
+
+[tool.uv.sources]
+geti-kafka-tools = { path = "../../../../../../libs/kafka_tools" }
+geti-telemetry-tools = { path = "../../../../../../libs/telemetry_tools" }
+
+[dependency-groups]
+dev = [
+    "pytest~=8.3",
+    "ruff~=0.11",
+    "pre-commit~=4.1",
+    "testfixtures~=7.2",
+    "requests~=2.32",
+    "pytest-freezegun",
+    "mypy~=1.15",
+    "types-cachetools",
+    "types-PyYAML",
+    "types-requests",
+    "testcontainers[mongodb]~=4.9",
+]
+
+[build-system]
+requires = [
+    "numpy~=1.26.0",
+    "hatchling"
+]
+
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["otx_v2"]
+
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+exclude = [".venv*"]
+
+
+[tool.ruff.lint]
+select = ["ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST"]
+
+ignore = ["N801", "N805","N806","N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001",  "RUF012", "RUF046", "PLW1508"]
+
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"*test*.py" = ["S", "ANN", "ARG", "SIM", "RUF", "TC", "PL", "C90", "D103", "RET504"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pylint]
+max-args=7
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+show_error_codes = true

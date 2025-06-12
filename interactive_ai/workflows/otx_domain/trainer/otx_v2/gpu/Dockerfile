@@ -49,12 +49,12 @@ COPY --link --from=ghcr.io/astral-sh/uv:0.6.12@sha256:515b886e8eb99bcf9278776d8e
 
 COPY --link scripts/ scripts
 COPY --link run run
+COPY --link gpu/uv.lock gpu/uv.lock
+COPY --link gpu/pyproject.toml gpu/pyproject.toml
 COPY --link download_pretrained_weights.py download_pretrained_weights.py
 
-RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-dev --no-editable
+WORKDIR /interactive_ai/workflows/otx_domain/trainer/otx_v2/gpu
+RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev --no-editable
 
 # step 3: build final runtime image
 FROM base AS runtime
