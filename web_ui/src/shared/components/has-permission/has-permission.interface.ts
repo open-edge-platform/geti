@@ -34,6 +34,16 @@ export enum OPERATION {
 type PermissionEntity = Omit<Role, 'resourceId'>;
 
 export type OperationPermission = Record<OPERATION, PermissionEntity[]>;
+export type OperationPermissionOld = Record<
+    Exclude<
+        OPERATION,
+        | OPERATION.ADD_USER_TO_WORKSPACE
+        | OPERATION.CAN_SEE_PROJECT
+        | OPERATION.CAN_SEE_WORKSPACE
+        | OPERATION.WORKSPACE_CREATION
+    >,
+    PermissionEntity[]
+>;
 
 export type UsePermissionType = {
     verifyPermission: (operation: OPERATION, resources: Record<RESOURCE_TYPE, string | undefined>) => boolean;
