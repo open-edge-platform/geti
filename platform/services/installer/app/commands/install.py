@@ -10,6 +10,7 @@ import os
 import shutil
 import signal
 import sys
+import time
 from functools import partial
 from typing import TYPE_CHECKING
 
@@ -46,6 +47,12 @@ from constants.paths import (
 
 # from platform_configuration.versions import get_target_product_build
 from constants.platform import DEFAULT_USERNAME
+from geti_controller.communication import (
+    OperationStatus,
+    call_install_endpoint,
+    get_installation_status,
+)
+from geti_controller.errors import GetiControllerError
 from geti_controller.install import deploy_geti_controller_chart
 from geti_controller.uninstall import uninstall_geti_controller_chart
 from k3s.detect_ip import get_first_public_ip, get_master_node_ip_address
@@ -172,6 +179,40 @@ def run_installation_checks(config: InstallationConfig) -> None:
         sys.exit(1)
 
 
+def monitor_installation_progress(config: InstallationConfig) -> (str, str):
+    """
+    Monitor the installation progress and update the user with the current status.
+    """
+    total_progress = 100  # progress is reported as a percentage
+    previous_progress = 0
+    status, message = "", ""
+
+    while True:
+        installation_status = get_installation_status(kube_config=config.kube_config.value)
+
+        if installation_status.status == OperationStatus.NOT_RUNNING:
+            # waiting for installation to start
+            time.sleep(1)
+            continue
+
+        if installation_status.status == OperationStatus.RUNNING:
+            with click.progressbar(
+                length=total_progress, label=InstallCmdTexts.installation_start, show_eta=False
+            ) as progress_bar:
+                while installation_status.status == OperationStatus.RUNNING:
+                    installation_status = get_installation_status(kube_config=config.kube_config.value)
+                    progress_bar.update(installation_status.progress - previous_progress)
+                    previous_progress = installation_status.progress
+                    if installation_status.progress == total_progress:
+                        break
+                    time.sleep(1)
+
+        status, message = installation_status.status, installation_status.message
+        break
+
+    return status, message
+
+
 def execute_installation(config: InstallationConfig) -> None:  # noqa: C901, RUF100
     """
     Execute platform installation with passed configuration.
@@ -218,8 +259,12 @@ def execute_installation(config: InstallationConfig) -> None:  # noqa: C901, RUF
         # TODO uncomment when charts will be ready
         # controller_response = call_install_endpoint(kube_config=config.kube_config.value)
         # logger.info(f"Response from the GetiController installation endpoint: {controller_response}")
+        # status, message = monitor_installation_progress(config=config)
+        # if status != OperationStatus.SUCCEEDED:
+        #     raise GetiControllerError(f"Installation failed with status: {status}, message: {message}")
         install_platform(config=config)  # TODO remove once installation via GetiController is implemented
-    except StepsError:
+
+    except (StepsError, GetiControllerError):
         logger.exception("Error during installation.")
         click.secho("\n" + InstallCmdTexts.installation_failed, fg="red")
         cluster_info_dump(kubeconfig=config.kube_config.value)

@@ -35,18 +35,6 @@ class ChartInstallationError(StepsError):
     """
 
 
-class GetiControllerInstallationError(ChartInstallationError):
-    """
-    Error raised by function used to deploy Geti Controller chart.
-    """
-
-
-class GetiControllerUninstallationError(ChartInstallationError):
-    """
-    Error raised by function used to remove Geti Controller chart.
-    """
-
-
 class ChartPullError(StepsError):
     """
     Error raised by function used to pull charts.

@@ -270,14 +270,14 @@ wheels = [
 
 [[package]]
 name = "click"
-version = "8.1.7"
+version = "8.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/96/d3/f04c7bfcf5c1862a2a5b845c6b2b360488cf47af55dfa79c98f6a6bf98b5/click-8.1.7.tar.gz", hash = "sha256:ca9853ad459e787e2192211578cc907e7594e294c7ccc834310722b41b9ca6de", size = 336121 }
+sdist = { url = "https://files.pythonhosted.org/packages/60/6c/8ca2efa64cf75a977a0d7fac081354553ebe483345c734fb6b6515d96bbc/click-8.2.1.tar.gz", hash = "sha256:27c491cc05d968d271d5a1db13e3b5a184636d9d930f148c50b038f0d0646202", size = 286342 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/00/2e/d53fa4befbf2cfa713304affc7ca780ce4fc1fd8710527771b58311a3229/click-8.1.7-py3-none-any.whl", hash = "sha256:ae74fb96c20a0277a1d615f1e4d73c8414f5a98db8b799a7931d1582f3390c28", size = 97941 },
+    { url = "https://files.pythonhosted.org/packages/85/32/10bb5764d90a8eee674e9dc6f4db6a0ab47c8c4d0d83c27f7c39ac415a4d/click-8.2.1-py3-none-any.whl", hash = "sha256:61a3265b914e850b85317d0b3109c7f8cd35a670f963866005d6ef1d5175a12b", size = 102215 },
 ]
 
 [[package]]
@@ -437,7 +437,7 @@ wheels = [
 [[package]]
 name = "geti-k8s-tools"
 version = "1.0.1"
-source = { editable = "libs/k8s_tools" }
+source = { editable = "../../../libs/k8s_tools" }
 dependencies = [
     { name = "kubernetes-asyncio" },
 ]
@@ -538,10 +538,10 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "click", specifier = "==8.1.7" },
+    { name = "click", specifier = "==8.2.1" },
     { name = "click-spinner", specifier = "==0.1.10" },
     { name = "cryptography", specifier = "==43.0.1" },
-    { name = "geti-k8s-tools", editable = "libs/k8s_tools" },
+    { name = "geti-k8s-tools", editable = "../../../libs/k8s_tools" },
     { name = "gputil", specifier = "==1.4.0" },
     { name = "ifaddr", specifier = "==0.2.0" },
     { name = "jinja2", specifier = "==3.1.4" },
@@ -552,7 +552,7 @@ requires-dist = [
     { name = "pyinstaller", specifier = "==6.6.0" },
     { name = "pytz", specifier = "==2022.5" },
     { name = "pyyaml", specifier = "==6.0.1" },
-    { name = "rich-click", specifier = "==1.4" },
+    { name = "rich-click", specifier = "==1.8.9" },
     { name = "setuptools", specifier = "==75.1.0" },
     { name = "tenacity", specifier = "==8.2.1" },
 ]
@@ -1228,15 +1228,16 @@ wheels = [
 
 [[package]]
 name = "rich-click"
-version = "1.4"
+version = "1.8.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "rich" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6c/dc/54815135802296705747dd5ec9dbadf408865eeb08e31ae6b786cd1b4ac2/rich-click-1.4.tar.gz", hash = "sha256:bcb4662aaf0ac15edf8863e95c72ef3608a1ef346a8cc1a505115ba5eeeb0260", size = 23174 }
+sdist = { url = "https://files.pythonhosted.org/packages/b7/a8/dcc0a8ec9e91d76ecad9413a84b6d3a3310c6111cfe012d75ed385c78d96/rich_click-1.8.9.tar.gz", hash = "sha256:fd98c0ab9ddc1cf9c0b7463f68daf28b4d0033a74214ceb02f761b3ff2af3136", size = 39378 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/a3/b0184241b838ed8932f16cb5300a402498b8c167e0465f0184faec80c8f0/rich_click-1.4-py3-none-any.whl", hash = "sha256:35b42aa8933894b17de0f2a6c5ca4aeed429e660b39d34fc29567684d58d3c6b", size = 19892 },
+    { url = "https://files.pythonhosted.org/packages/b6/c2/9fce4c8a9587c4e90500114d742fe8ef0fd92d7bad29d136bb9941add271/rich_click-1.8.9-py3-none-any.whl", hash = "sha256:c3fa81ed8a671a10de65a9e20abf642cfdac6fdb882db1ef465ee33919fbcfe2", size = 36082 },
 ]
 
 [[package]]

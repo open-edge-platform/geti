@@ -7,7 +7,7 @@ description = "Installer for Geti"
 requires-python = ">=3.10, <3.14"
 
 dependencies = [
-    "click==8.1.7",
+    "click==8.2.1",
     "click-spinner==0.1.10",
     "cryptography==43.0.1",
     "geti-k8s-tools==1.0.0",
@@ -19,7 +19,7 @@ dependencies = [
     "psutil==5.9.1",  # neeeded for check/resources
     "pyinstaller==6.6.0",
     "PyYAML==6.0.1",
-    "rich-click==1.4",
+    "rich-click==1.8.9",
     "tenacity==8.2.1",
     "pytz==2022.5",
     "jinja2==3.1.4",
