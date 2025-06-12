@@ -151,10 +151,10 @@ jobs:
         # therefore we filter out the web_ui component here
         component: ${{ fromJSON(needs.get-vars.outputs.filtered-components-list) }}
     with:
-      image-tag: ${{ needs.get-vars.outputs.image-tag }}
-      component-dir: ${{ matrix.component }}
-      push: ${{ inputs.push || false }}
-      ref: ${{ needs.get-vars.outputs.checkout_ref }}
+      image-tag: "${{ needs.get-vars.outputs.image-tag }}"
+      component-dir: "${{ matrix.component }}"
+      push: "${{ needs.get-vars.outputs.publish_binaries }}"
+      ref: "${{ needs.get-vars.outputs.checkout_ref }}"
 
   web-ui-workflow:
     name: Web UI workflow
@@ -169,9 +169,9 @@ jobs:
     uses: ./.github/workflows/web-ui.yml
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:
-      image-tag: ${{ needs.get-vars.outputs.image-tag }}
-      push: ${{ needs.get-vars.outputs.publish_binaries }}
-      ref: ${{ needs.get-vars.outputs.checkout_ref }}
+      image-tag: "${{ needs.get-vars.outputs.image-tag }}"
+      push: "${{ needs.get-vars.outputs.publish_binaries }}"
+      ref: "${{ needs.get-vars.outputs.checkout_ref }}"
 
   success:
     name: Required status checks
