@@ -92,7 +92,7 @@ export class Watershed {
                         this.originalHeight
                     );
                     optimizedContours?.delete();
-                    polygons.push({ id: markers[markerIndex].id, label: markers[markerIndex].label, points });
+                    polygons.push({ id: markers[markerIndex].id, labelId: markers[markerIndex].labelId, points });
                 }
             } catch (error) {
                 console.warn('Something went wrong while trying to execute getPolygons.\n Error: ', error);
