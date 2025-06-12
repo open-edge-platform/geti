@@ -154,7 +154,7 @@ jobs:
       image-tag: ${{ needs.get-vars.outputs.image-tag }}
       component-dir: ${{ matrix.component }}
       push: ${{ inputs.push || false }}
-      ref: ${{ inputs.ref || '' }}
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
   web-ui-workflow:
     name: Web UI workflow
