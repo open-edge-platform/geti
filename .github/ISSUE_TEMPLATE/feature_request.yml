@@ -1,0 +1,39 @@
+name: ✨ Feature Request
+description: Suggest a new feature or improvement
+title: "[Feature] <short description>"
+labels: [feature-request]
+assignees: []
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: 📄 Description
+      description: Provide a brief overview of the proposed feature.
+    validations:
+      required: true
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: 🎯 Objective
+      description: What is the main goal of this feature?
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: 🧑‍💻 User Story
+      description: Describe this feature from the user’s perspective.
+      placeholder: "As a <type of user>, I want to <do something> so that <benefit>."
+    validations:
+      required: false
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: 📌 Requirements Covered
+      description: Mention any specific requirements, use cases, or problems this feature addresses.
+    validations:
+      required: false
