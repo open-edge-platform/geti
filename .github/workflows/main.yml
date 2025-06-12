@@ -12,10 +12,6 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      push:
-        description: "Enable pushing Docker images and Helm charts"
-        type: boolean
-        default: true
       ref:
         description: 'The branch, tag or SHA to checkout'
         required: true
@@ -30,62 +26,54 @@ permissions: {} # No permissions by default on workflow level
 jobs:
   get-vars:
     name: Get variables
-    env:
-      BUILD_ALL: ${{ github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
     timeout-minutes: 10
     outputs:
-      image-tag: "${{ steps.image-tag.outputs.image-tag }}"
+
+      build_all: ${{ steps.set-vars.outputs.build_all }}
+      publish_binaries: ${{ steps.set-vars.outputs.publish_binaries }}
+      checkout_ref: ${{ steps.set-vars.outputs.checkout_ref }}
+
+      image-tag: "${{ steps.prepare-build-version.outputs.version }}"
       components-list: ${{ steps.components-list.outputs.paths_list }}
       filtered-components-list: ${{ steps.filtered-components-list.outputs.filtered-list }}
       libs-list: ${{ steps.libs-list.outputs.paths_list }}
+
     steps:
+      - name: Prepare variables
+        id: set-vars
+        uses: ./.github/actions/set-vars
+        with:
+          publish_binaries: ${{ inputs.publish_binaries }}
+          ref: ${{ inputs.ref }}
+
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
         with:
           fetch-depth: 0
           persist-credentials: false
 
-      - name: Prepare image tag
-        id: image-tag
-        env:
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          GITHUB_EVENT_NUMBER: ${{ github.event.number }}
-          GITHUB_REF_NAME: ${{ github.ref_name }}
-          REF: ${{ inputs.ref }}
-        run: |
-          short_sha=$(git rev-parse --short HEAD)
-          product_version=$(sed -ne 's/^.*PRODUCT_VERSION.*?= //p' Makefile.shared)
-          if [[ "${GITHUB_EVENT_NAME}" == "push" ]]; then
-              ref=$(echo "${GITHUB_REF_NAME}" | tr '/' '-')
-          elif [[ "${GITHUB_EVENT_NAME}" == "pull_request" ]]; then
-              ref=pr-"${GITHUB_EVENT_NUMBER}"
-          elif [[ "${GITHUB_EVENT_NAME}" == "merge_group" ]]; then
-              ref=mr
-          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-              ref=$(echo "${REF}" | tr '/_' '-')
-          else
-              echo "unknown event ${github_event_name}!"
-              exit 1
-          fi
-
-          echo "image-tag=$product_version-$ref-$short_sha" >> "$GITHUB_OUTPUT"
+      - name: Prepare build version
+        id: prepare-build-version
+        uses: ./.github/actions/build-version
+        with:
+          ref: ${{ steps.set-vars.outputs.checkout_ref }}
 
       - name: Get changed components dirs
         id: components-list
         uses: ./.github/actions/change-detection
         with:
           path_filter: "./.github/components-path-filters.yml"
-          get_all: ${{ env.BUILD_ALL }}
+          get_all: ${{ steps.set-vars.outputs.build_all }}
 
       - name: Get changed libs dirs
         id: libs-list
         uses: ./.github/actions/change-detection
         with:
           path_filter: "./.github/libs-path-filters.yml"
-          get_all: ${{ env.BUILD_ALL }}
+          get_all: ${{ steps.set-vars.outputs.build_all }}
 
       - name: Filter components (exclude 'web_ui')
         id: filtered-components-list
@@ -98,8 +86,6 @@ jobs:
           echo "filtered-list=$filtered" >> $GITHUB_OUTPUT
         env:
           CHANGES: ${{ steps.components-list.outputs.paths_list }}
-
-
 
   lib_test_workflow:
     name: Lib test workflow
@@ -137,8 +123,8 @@ jobs:
     with:
       image-tag: ${{ needs.get-vars.outputs.image-tag }}
       component-dir: ${{ matrix.component }}
-      push: ${{ inputs.push || false }}
-      ref: ${{ inputs.ref || '' }}
+      push: ${{ needs.get-vars.outputs.publish_binaries }}
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
   web-ui-workflow:
     name: Web UI workflow
@@ -154,8 +140,8 @@ jobs:
     if: ${{ contains(needs.get-vars.outputs.components-list, 'web_ui') }}
     with:
       image-tag: ${{ needs.get-vars.outputs.image-tag }}
-      push: ${{ inputs.push || false }}
-      ref: ${{ inputs.ref || '' }}
+      push: ${{ needs.get-vars.outputs.publish_binaries }}
+      ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
   success:
     name: Required status checks
