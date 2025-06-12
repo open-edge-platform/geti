@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 @step("the user waits for {seconds:d} seconds")
-def step_wait_seconds(seconds: int) -> None:
+def step_wait_seconds(context: Context, seconds: int) -> None:  # noqa: ARG001
     time.sleep(seconds)
 
 
