@@ -153,8 +153,8 @@ jobs:
     with:
       image-tag: ${{ needs.get-vars.outputs.image-tag }}
       component-dir: ${{ matrix.component }}
-      push: ${{ needs.get-vars.outputs.publish_binaries }}
-      ref: ${{ needs.get-vars.outputs.checkout_ref }}
+      push: ${{ inputs.push || false }}
+      ref: ${{ inputs.ref || '' }}
 
   web-ui-workflow:
     name: Web UI workflow
