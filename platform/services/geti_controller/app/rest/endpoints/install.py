@@ -87,7 +87,7 @@ def install_platform(payload: InstallRequest) -> InstallResponse:
     job = create_job(
         name="install-upgrade",
         registry=f"{os.environ.get('REGISTRY')}/open-edge-platform",
-        image=f"{os.environ.get('REGISTRY')}/open-edge-platform/geti/install-upgrade:michala",
+        image=f"{os.environ.get('REGISTRY')}/open-edge-platform/geti/install-upgrade:2.11.0-test-20250612140230",
         manifest_version=os.environ.get("VERSION"),
     )
     deploy_job(job, namespace="default")
