@@ -23,7 +23,7 @@ RESOURCES_MULTIPLIER = 0.9
 RESOURCES_CONFIGURATION: dict = {
     "VM": {"requests": {"cpu": "1", "memory": "8GB"}, "limits": {"cpu": "100"}},
     "BM": {
-        "requests": {"cpu": "2", "memory": "1GB"},
+        "requests": {"cpu": "2", "memory": "3GB"},
         "limits": {"cpu": "100", "memory": "50GB"},
     },
 }
