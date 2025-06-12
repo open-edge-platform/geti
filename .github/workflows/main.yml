@@ -42,12 +42,42 @@ jobs:
       libs-list: ${{ steps.libs-list.outputs.paths_list }}
 
     steps:
-      - name: Prepare variables
+      - name: Prepare environment variables
         id: set-vars
-        uses: ./.github/actions/set-vars
-        with:
-          publish_binaries: ${{ inputs.publish_binaries }}
-          ref: ${{ inputs.ref }}
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REF: ${{ github.ref }}
+          DISPATCH_PUB: ${{ github.event.inputs.publish_binaries }}
+          DISPATCH_REF: ${{ github.event.inputs.ref }}
+        run: |
+          # BUILD_ALL: true on manual dispatch or any tag
+          if [[ "$EVENT_NAME" == "workflow_dispatch" || "$GITHUB_REF" == refs/tags/* ]]; then
+            build_all=true
+          else
+            build_all=false
+          fi
+          
+          # PUBLISH_BINARIES: only if manual & publish=true, or on any tag
+          if [[ ( "$EVENT_NAME" == "workflow_dispatch" && "$DISPATCH_PUB" == "true" ) || "$GITHUB_REF" == refs/tags/* ]]; then
+            publish_binaries=true
+          else
+            publish_binaries=false
+          fi
+          
+          # CHECKOUT_REF: use manual input if provided, else real ref
+          if [[ "$EVENT_NAME" == "workflow_dispatch" && -n "$DISPATCH_REF" ]]; then
+            checkout_ref="$DISPATCH_REF"
+          else
+            checkout_ref="$GITHUB_REF"
+          fi
+          
+          echo "build_all=$build_all"               >> $GITHUB_OUTPUT
+          echo "publish_binaries=$publish_binaries" >> $GITHUB_OUTPUT
+          echo "checkout_ref=$checkout_ref"         >> $GITHUB_OUTPUT
+          
+          echo "build_all=$build_all"
+          echo "publish_binaries=$publish_binaries"
+          echo "checkout_ref=$checkout_ref"
 
       - name: Checkout code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.2
