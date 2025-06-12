@@ -27,3 +27,45 @@ enabled:
   modelmesh_serving: true
   opa_bundle: true
   telemetry_compression: true
+
+global:
+  istio_ambient_mesh: false
+  istio_gateway_name: "istio-gateway"
+  istio_ingress_namespace: "istio-system"
+  logging_config_dir: "/mnt/logging_config"
+  logs_dir: "/mnt/logs"
+  enable_object_storage: true
+  s3_endpoint: impt-seaweed-fs.impt:8333
+  enable_mongodb_credentials: true
+  ldap_service_user_secret_name: "impt-ldap-service-user"
+  enable_local_image_pull_secret: false
+  docker_namespace: geti
+  security_headers: |
+    X-Frame-Options: "DENY"
+    Content-Security-Policy: "frame-ancestors 'none'; default-src 'self'; media-src 'self' https://docs.geti.intel.com/on-prem/2.6/; connect-src 'self' data: https://consumerdev.intel.com/ https://login.microsoftonline.com/; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' blob:; img-src 'self' data:; frame-src 'none'; object-src 'none'; form-action 'self'; worker-src 'self' blob:"
+    cross-origin-embedder-policy: require-corp
+    cross-origin-opener-policy: same-origin
+    X-Content-Type-Options: "nosniff"
+  stripped_headers: |
+    - "X-Envoy-Decorator-Operation"
+  cors_policy:
+    enabled: true
+    allowed_origins:
+      - exact: "https://docs.geti.intel.com"
+    allowed_headers:
+      - Authorization
+      - Content-Type
+      - tus-resumable
+      - upload-length
+      - upload-length
+      - x-geti-csrf-protection
+      - cookie
+      - x-api-key
+    allowed_methods:
+      - GET
+      - POST
+      - PUT
+      - PATCH
+      - DELETE
+    max_age: 86400s
+    allow_credentials: true

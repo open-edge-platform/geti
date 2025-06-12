@@ -52,6 +52,16 @@ spec:
 apiVersion: helm.cattle.io/v1
 kind: HelmChart
 metadata:
+  name: cert-manager-addon
+  namespace: cert-manager
+spec:
+  chart: $REGISTRY/geti/helm/cert-manager-addon
+  version: $VERSION
+  targetNamespace: cert-manager
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
   name: cert-manager-istio-csr
   namespace: cert-manager
 spec:
@@ -138,6 +148,16 @@ spec:
       registry_address: "$REGISTRY"
       initial_admin_user_login: "{{ username }}"
       initial_admin_user_password: "{{ password }}"
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: modelmesh-serving-addon
+  namespace: impt
+spec:
+  chart: $REGISTRY/geti/helm/modelmesh-serving-addon
+  version: $VERSION
+  targetNamespace: impt
 ---
 apiVersion: helm.cattle.io/v1
 kind: HelmChart

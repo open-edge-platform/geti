@@ -58,10 +58,11 @@ global:
   project_ie_key_source: "cert-manager"
   overwrite_resources_cpu_limits: "100"
   num_models_to_keep_in_storage: "-1"
-  proxy_enabled: false
-  http_proxy: ""
-  https_proxy: ""
-  no_proxy: ""
+  proxy:
+    enabled: false
+    http_proxy: ""
+    https_proxy: ""
+    no_proxy: ""
 
 spicedb:
   fullname: impt-spice-db

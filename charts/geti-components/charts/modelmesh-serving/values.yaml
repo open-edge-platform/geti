@@ -40,11 +40,9 @@ runtimeadapter:
     name: modelmesh-runtime-adapter
     tag: v0.12.0
 
-modelserver:
-  image:
-    registry: docker.io
-    repository: openvino
-    name: model_server:2025.1
+modelRegistration:
+  namespace: impt
+  serviceAccount: impt-modelregistration
 
 controllerResources:
   requests:
@@ -52,36 +50,6 @@ controllerResources:
     memory: 96Mi
   limits:
     memory: 512Mi
-
-ovmsMemBufferBytes: 134217728
-ovmsRuntimeResources:
-  requests:
-    cpu: 1
-    memory: 8Gi
-  limits:
-    memory: 8Gi
-
-modelRegistration:
-  namespace: impt
-  serviceAccount: impt-modelregistration
-
-ovmsRuntimeNodeSelector:
-
-ovmsRuntimeTolerations:
-
-ovmsLivenessProbe:
-  exec:
-    command:
-      - curl
-      - --fail
-      - --silent
-      - --show-error
-      - --max-time
-      - "9"
-      - http://localhost:8888/v2/health/live
-  initialDelaySeconds: 60
-  periodSeconds: 30
-  timeoutSeconds: 10
 
 autoscalerEnabled: false
 autoscalerResources:
@@ -91,7 +59,7 @@ autoscalerResources:
   limits:
     memory: 256Mi
 
-s3_endpoint_url:
+s3_endpoint_url: "http://impt-seaweed-fs.impt.svc.cluster.local:8333"
 s3_default_bucket: modelmesh
 s3_region: eu-central-1
 

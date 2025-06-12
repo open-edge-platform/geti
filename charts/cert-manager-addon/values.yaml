@@ -1,0 +1,11 @@
+# To meet Intel crypto compliance,
+# use ECDSA P-521 for the CA and P-384 for the leafs.
+# use 5y for the CA and 1y for the leafs.
+tls:
+  algorithm: ECDSA
+  ca:
+    secret_name: ca-cert
+    name: ca-issuer
+    size: 521
+    duration: 8760h0m0s
+    renewBefore: 4380h0m0s

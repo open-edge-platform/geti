@@ -6,7 +6,7 @@ global:
   istio_gateway_name: "istio-gateway"
   istio_ingress_namespace: "istio-system"
   s3_endpoint: impt-seaweed-fs.impt:8333
-  docker_namespace: impp
+  docker_namespace: geti
   enable_local_image_pull_secret: false
   istio_ambient_mesh: false
   busybox:

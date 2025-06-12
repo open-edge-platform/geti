@@ -38,7 +38,7 @@ resources:
     memory: 1Gi
 global:
   enable_master_node_selector: true
-  docker_namespace: impp
+  docker_namespace: geti
   storage_volume_claim_name: data-storage-volume-claim
   logging_config_dir: ""
   busybox:

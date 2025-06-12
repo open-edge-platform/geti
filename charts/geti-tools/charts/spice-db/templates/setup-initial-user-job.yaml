@@ -8,8 +8,6 @@ metadata:
   labels: {{- include "spice-db.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": "post-install"
-    "helm.sh/hook-weight": "-4"
-    "helm.sh/hook-delete-policy": "hook-succeeded"
 spec:
   backoffLimit: {{ .Values.jobs.backoffLimit }}
   template:

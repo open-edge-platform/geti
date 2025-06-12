@@ -40,12 +40,12 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
-            resources:
-              requests:
-                cpu: 50m
-                memory: 100Mi
-              limits:
-                memory: 100Mi
+          resources:
+            requests:
+              cpu: 50m
+              memory: 100Mi
+            limits:
+              memory: 100Mi
           command: [ 'sh', '-c', "until nc -w 5 -z $FLYTE_ADMIN_HOST $FLYTE_ADMIN_PORT; do echo wait...; sleep 2; done;" ]
           env:
             - name: "FLYTE_ADMIN_HOST"
