@@ -180,7 +180,6 @@ def handle_base_exception(request: Request, e: GetiBaseException) -> Response:
 
 
 @app.exception_handler(RequestValidationError)
-@app.exception_handler(pydantic.ValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:  # noqa: ARG001
     """
     Converts a RequestValidationError to a better readable Bad request exception.
@@ -211,17 +210,33 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 
 @app.exception_handler(pydantic.ValidationError)
-async def pydantic_validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:  # noqa: ARG001
+async def pydantic_validation_exception_handler(request: Request, exc: pydantic.ValidationError) -> JSONResponse:  # noqa: ARG001
     """
     Converts a pydantic ValidationError to a better readable Bad request exception.
     """
+
+    def format_location(loc):
+        """
+        Format location path with proper dot notation and array indices.
+
+        Example:
+            format_location(['a', 0, 'b', 1, 'c']) -> 'a[0].b[1].c'
+        """
+        result = ""
+        for i, item in enumerate(loc):
+            if isinstance(item, int):
+                result += f"[{item}]"
+            else:
+                result += f".{item}" if i > 0 else str(item)
+        return result
+
     errors = [
         {
-            "location": pydantic_error["loc"],
-            "message": pydantic_error["msg"],
-            "type": pydantic_error["type"],
+            "message": error["msg"],
+            "type": error["type"],
+            **({"location": format_location(error.get("loc", []))})
         }
-        for pydantic_error in exc.errors()
+        for error in exc.errors()
     ]
 
     headers = {"Cache-Control": "no-cache"}  # always revalidate

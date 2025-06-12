@@ -48,7 +48,8 @@ class MinAnnotationPixels(BaseModel):
         gt=0,
         le=200000000,  # reasonable upper limit for pixel count to 200MP
         default=1,
-        title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
+        title="Minimum annotation pixels",
+        description="Minimum number of pixels in an annotation",
     )
 
 
