@@ -23,10 +23,7 @@ const getTilingParameters = (_configParameters: TrainingConfiguration) => {
     return undefined;
 };
 
-export const DataManagement: FC<DataManagementProps> = ({
-    trainingConfiguration,
-    onUpdateTrainingConfiguration,
-}) => {
+export const DataManagement: FC<DataManagementProps> = ({ trainingConfiguration, onUpdateTrainingConfiguration }) => {
     const tilingParameters = getTilingParameters(trainingConfiguration);
 
     return (

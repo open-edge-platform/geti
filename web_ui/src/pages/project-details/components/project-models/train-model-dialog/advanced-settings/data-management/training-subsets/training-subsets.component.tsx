@@ -154,10 +154,7 @@ const getSubsets = (subsetsConfiguration: SubsetsConfiguration) => {
     };
 };
 
-export const TrainingSubsets: FC<TrainingSubsetsProps> = ({
-    subsetsConfiguration,
-    onUpdateTrainingConfiguration,
-}) => {
+export const TrainingSubsets: FC<TrainingSubsetsProps> = ({ subsetsConfiguration, onUpdateTrainingConfiguration }) => {
     const { trainingSubset, validationSubset, testSubset } = getSubsets(subsetsConfiguration);
 
     const [subsetsDistribution, setSubsetsDistribution] = useState<number[]>([
