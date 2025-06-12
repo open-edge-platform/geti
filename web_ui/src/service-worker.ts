@@ -53,19 +53,24 @@ self.addEventListener('activate', async (event: ExtendableEvent) => {
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
 self.addEventListener('message', (event: ExtendableMessageEvent) => {
+    // Only accept messages from the same origin
+    if (event.origin !== self.origin) {
+        return;
+    }
+
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     }
 });
 
 self.addEventListener('fetch', (event: FetchEvent) => {
-    // NOTE: workerFetch means to a request within the web worker with self.importScripts(...)
-    // TODO: once we switch to Vite, webworkers will become modules, which means self.importScripts
-    // wont be used anymore, so we might need to adjust this code.
-    if (isValidStaticFileOrWorkerFetch(event.request)) {
+    if (isValidStaticFileRequest(event.request)) {
         event.respondWith(fromCacheOrFetch(event));
     }
 });
+
+const isValidStaticFileRequest = (request: Request) =>
+    isValidHttpRequest(request) && /\.(js|css|svg|html|wasm|onnx|gif)$/.test(request.url);
 
 const fromCacheOrFetch = (event: FetchEvent) =>
     caches.match(event.request, { ignoreSearch: true }).then((cacheResponse) => {
@@ -81,14 +86,8 @@ const fetchAndCatchWebWorker = (event: FetchEvent) =>
         });
     });
 
-const isValidStaticFileOrWorkerFetch = (request: Request) =>
-    isValidHttpRequest(request) && isStaticFileOrWorkerFetch(request);
-
 const isValidHttpRequest = (request: Request) => {
     const { protocol } = new URL(request.url);
 
     return protocol.startsWith('http');
 };
-
-const isStaticFileOrWorkerFetch = (request: Request) =>
-    /\.(js|css|svg|html|wasm|onnx|gif)$/.test(request.url) || /\.worker.js$/.test(request.referrer);
