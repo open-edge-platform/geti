@@ -105,7 +105,7 @@ export const useActiveLearningConfiguration = (
     const autoTrainingTaskConfigLegacy = useAutoTrainingTasksConfig(projectIdentifier, tasks);
 
     if (FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS) {
-        const autoTrainingTasks = tasks.filter(isNotCropTask).map((task) => {
+        const autoTrainingTasks = notCropTasks.map((task) => {
             const taskProjectConfiguration = projectConfiguration?.taskConfigs.find(
                 (taskConfig) => taskConfig.taskId === task.id
             );

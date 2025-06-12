@@ -48,9 +48,9 @@ export const useProjectConfigurationMutation = () => {
 
     const getUpdatedParameters = (
         updatedParameter: KeyValueParameter[],
-        previousParameter: ConfigurationParameter[]
+        previousParameters: ConfigurationParameter[]
     ): ConfigurationParameter[] => {
-        return previousParameter.map((parameter) => {
+        return previousParameters.map((parameter) => {
             const updatedParam = updatedParameter.find((param) => param.key === parameter.key);
             if (updatedParam === undefined) {
                 return parameter;
