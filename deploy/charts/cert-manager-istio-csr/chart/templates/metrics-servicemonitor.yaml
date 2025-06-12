@@ -1,0 +1,27 @@
+{{- if .Values.app.metrics.service.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "cert-manager-istio-csr.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ include "cert-manager-istio-csr.name" . }}
+    {{- include "cert-manager-istio-csr.labels" . | nindent 4 }}
+    prometheus: {{ .Values.app.metrics.service.servicemonitor.prometheusInstance }}
+{{- if .Values.app.metrics.service.servicemonitor.labels }}
+{{ toYaml .Values.app.metrics.service.servicemonitor.labels | indent 4}}
+{{- end }}
+spec:
+  jobLabel: {{ include "cert-manager-istio-csr.name" . }}
+  selector:
+    matchLabels:
+      app: {{ include "cert-manager-istio-csr.name" . }}-metrics
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  endpoints:
+  - targetPort: {{ .Values.app.metrics.port }}
+    path: "/metrics"
+    interval: {{ .Values.app.metrics.service.servicemonitor.interval }}
+    scrapeTimeout: {{ .Values.app.metrics.service.servicemonitor.scrapeTimeout }}
+{{- end }}

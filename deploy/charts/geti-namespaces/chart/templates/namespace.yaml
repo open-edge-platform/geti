@@ -1,0 +1,50 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    istio-injection: {{ .Values.labels.istioInjection }}
+    opa-istio-injection: {{ .Values.labels.opaIstioInjection }}
+    name: impt
+  name: impt
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    istio-injection: {{ .Values.labels.istioInjection }}
+    app.kubernetes.io/managed-by: {{ .Values.labels.managedBy }}
+    name: opa-istio
+  name: opa-istio
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: {{ .Values.labels.managedBy }}
+    name: istio-system
+  name: istio-system
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    name: cert-manager
+  name: cert-manager
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    istio-injection: {{ .Values.labels.istioInjection }}
+    name: flyte
+  name: flyte
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    istio-injection: {{ .Values.labels.istioInjection }}
+    app.kubernetes.io/managed-by: {{ .Values.labels.managedBy }}
+  # TODO Make sure training work without impt annotations
+  name: impt-jobs-production

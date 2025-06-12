@@ -1,0 +1,60 @@
+{{- if eq (toString .Values.app.tls.istiodCertificateEnable) "true" }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: istiod
+  namespace: {{ .Values.app.istio.namespace }}
+  labels:
+    {{- include "cert-manager-istio-csr.labels" . | nindent 4 }}
+{{- if .Values.app.certmanager.additionalAnnotations }}
+  annotations:
+    {{- range $annotation := .Values.app.certmanager.additionalAnnotations }}
+    {{ $annotation.name }}: {{ $annotation.value }}
+    {{- end }}
+{{- end }}
+spec:
+  commonName: istiod.{{ .Values.app.istio.namespace }}.svc
+  dnsNames:
+  {{- $revisions := dict -}}
+  {{- if .Values.app.istio.revisions }}
+  {{- $namespace := .Values.app.istio.namespace }}
+  {{- /* We want to add a DNS SAN for every requested revision. The default revision is a special case since it doesn't have "default" in the name. */ -}}
+  {{- range $revision := .Values.app.istio.revisions -}}
+  {{- if eq $revision "default" }}{{ $revision = "" }}{{ end }}
+  {{- if hasKey $revisions $revision }}
+  {{- printf "Duplicate revisions defined %s" $revision | fail -}}
+  {{- else -}}
+  {{- /* https://helm.sh/docs/chart_template_guide/function_list/#set */ -}}
+  {{- $_ := set $revisions $revision $revision -}}
+  {{- end -}}
+  {{- if ne $revision "" }}{{ $revision = print "-" $revision }}{{ end }}
+  - istiod{{$revision}}.{{$namespace}}.svc
+  {{- end }}
+  {{- else }}
+  - istiod.{{ .Values.app.istio.namespace }}.svc
+  {{- end }}
+  {{- if .Values.app.tls.istiodAdditionalDNSNames }}
+  {{- range .Values.app.tls.istiodAdditionalDNSNames }}
+  - {{ . | quote }}
+  {{- end }}
+  {{- end }}
+  uris:
+  - spiffe://{{.Values.app.tls.trustDomain}}/ns/{{ .Values.app.istio.namespace }}/sa/istiod-service-account
+  secretName: istiod-tls
+  # Here we use a duration of 1 hour by default based on NIST 800-204A
+  # recommendations (SM-DR13).
+  # https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-204A.pdf
+  # Warning: cert-manager does not allow a duration on Certificates of less
+  # than 1 hour.
+  duration: {{ .Values.app.tls.istiodCertificateDuration }}
+  renewBefore: {{ .Values.app.tls.istiodCertificateRenewBefore }}
+  privateKey:
+    rotationPolicy: Always
+    algorithm: {{ default .Values.app.server.serving.signatureAlgorithm .Values.app.tls.istiodPrivateKeyAlgorithm }}
+    size: {{ .Values.app.tls.istiodPrivateKeySize }}
+  revisionHistoryLimit: 1
+  issuerRef:
+    name: {{ .Values.app.certmanager.issuer.name }}
+    kind: {{ .Values.app.certmanager.issuer.kind }}
+    group: {{ .Values.app.certmanager.issuer.group }}
+{{- end }}

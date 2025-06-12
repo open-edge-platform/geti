@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Namespace }}-{{ .Chart.Name }}-flyte-config
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "jobs.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    admin:
+      endpoint: dns:///{{ template "flyteadmin.name" . }}:81
+      authType: Pkce
+      insecure: true
+    logger:
+      show-source: true
+      level: 0

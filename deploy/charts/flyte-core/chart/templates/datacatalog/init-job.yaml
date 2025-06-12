@@ -1,0 +1,118 @@
+{{- if .Values.datacatalog.enabled }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-job-{{ template "datacatalog.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+    app: {{ template "datacatalog.name" . }}
+spec:
+  backoffLimit: 10
+  template:
+    metadata:
+      {{- if not .Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+      labels:
+        app: {{ template "datacatalog.name" . }}
+    spec:
+      serviceAccountName: {{ template "datacatalog.name" . }}
+      restartPolicy: Never
+      initContainers:
+        - name: init-datacatalog-db-config
+          volumeMounts:
+            - mountPath: /config-source
+              name: config-projected-volume
+            - mountPath: /config-destination
+              name: config-volume
+          {{- include "flyte.init-flyte-db-container" . | nindent 10 }}
+        - name: wait-for-flyte-admin
+          image: "{{ .Values.global.busybox.registry }}/{{ if .Values.global.busybox.repository }}{{ .Values.global.busybox.repository }}/{{ end }}{{ .Values.global.busybox.name }}"
+          command: [ 'sh', '-c', "until nc -w 5 -z $FLYTE_ADMIN_HOST $FLYTE_ADMIN_PORT; do echo wait...; sleep 2; done;" ]
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 100Mi
+            limits:
+              memory: 100Mi
+          env:
+            - name: "FLYTE_ADMIN_HOST"
+              value: {{ template "flyteadmin.name" . }}
+            - name: "FLYTE_ADMIN_PORT"
+              value: "81"
+      containers:
+        - command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              datacatalog migrate run
+              --config {{ .Values.datacatalog.configPath }};
+              retVal=$?;
+              echo "done" > /init/1; 
+              exit $retVal
+          image: "{{ .Values.datacatalog.image.registry }}/{{ if .Values.datacatalog.image.repository }}{{ .Values.datacatalog.image.repository }}/{{ end }}{{ .Values.datacatalog.image.name }}"
+          imagePullPolicy: "{{ .Values.datacatalog.imagePullPolicy }}"
+          name: run-migrations
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - mountPath: /etc/datacatalog/config
+              name: config-volume
+              readOnly: true
+            - name: "init"
+              mountPath: "/init"
+        {{- if not .Values.global.istio_ambient_mesh }}
+        - name: "istio-sidecar-quit"
+          image: "{{ .Values.global.debian.registry }}/{{ if .Values.global.debian.repository }}{{ .Values.global.debian.repository }}/{{ end }}{{ .Values.global.debian.name }}"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          resources:
+            {{- toYaml .Values.initResources | nindent 12 }}
+          command: [ "/bin/sh", "-c" ]
+          args:
+            - >-
+              while [ ! -f /init/1 ]; do
+                sleep 1
+              done;
+              curl -XPOST 127.0.0.1:15020/quitquitquit
+          volumeMounts:
+            - name: "init"
+              mountPath: "/init"
+        {{- end }}
+      volumes:
+        - name: config-volume
+          emptyDir: {}
+        - name: config-projected-volume
+          projected:
+            sources:
+              - configMap:
+                  name: datacatalog-config
+              - secret:
+                  name: flyte-storage-yaml
+                  items:
+                    - key: storage.yaml
+                      path: ./storage.yaml
+        - name: "init"
+          emptyDir: {}
+{{- end }}

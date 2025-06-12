@@ -1,0 +1,12 @@
+global:
+  weights_url: "https://storage.geti.intel.com/weights"
+  docker_namespace: "geti"
+  proxy:
+    enabled: false
+    http_proxy: ""
+    https_proxy: ""
+    no_proxy: ""
+  kubectl:
+    registry: docker.io
+    repository: bitnami
+    name: kubectl:1.31.0

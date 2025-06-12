@@ -1,0 +1,12 @@
+{{- if .Values.reloader.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "reloader-fullname" . }}
+  namespace: {{ .Values.namespace | default .Release.Namespace }}
+spec:
+  minAvailable: {{ .Values.reloader.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      app: {{ template "reloader-fullname" . }}
+{{- end }}

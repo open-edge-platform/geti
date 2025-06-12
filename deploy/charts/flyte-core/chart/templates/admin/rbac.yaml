@@ -1,0 +1,61 @@
+{{- if or .Values.flyteadmin.enabled .Values.flyteadmin.serviceAccount.alwaysCreate }}
+---
+{{- if .Values.flyteadmin.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "flyteadmin.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+  {{- with .Values.flyteadmin.serviceAccount.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+{{- if .Values.global.enable_local_image_pull_secret  }}
+{{- with .Values.flyteadmin.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+---
+{{- if .Values.flyteadmin.serviceAccount.createClusterRole }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "flyte.namespace" . -}}-{{- template "flyteadmin.name" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - "batch"
+  resources:
+  - jobs
+  verbs:
+  - watch
+  - get
+  - list
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  verbs:
+  - create
+  - delete
+---
+{{- if $.Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- end }}
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "flyte.namespace" . -}}-{{- template "flyteadmin.name" . }}-binding
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "flyte.namespace" . -}}-{{- template "flyteadmin.name" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "flyteadmin.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+{{- end }}
+{{- end }}

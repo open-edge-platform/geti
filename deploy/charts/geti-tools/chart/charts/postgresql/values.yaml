@@ -1,4 +1,5 @@
-image: 
+fullnameOverride: impt-postgresql
+image:
   registry: docker.io
   repository: 
   name: postgres:14.13
@@ -13,6 +14,12 @@ creditsystem_postgresql_db: creditsystem
 
 flyte_db_enabled: true
 flyte_postgresql_db: flyte
+
+flyte_db_config:
+  port: 5432
+  host: impt-postgresql.impt
+  dbname: flyte
+  options: "sslmode=disable"
 
 resources:
   requests:
@@ -72,15 +79,3 @@ global:
 config:
   max_connections: 1000
   shared_buffers: 512MB
-
-postgresql:
-  auth:
-    init_database: spicedb
-  accountservice_postgresql_db: accountservice
-  creditsystem_postgresql_db: creditsystem
-  flyte_db_enabled: true
-  flyte_db_config:
-    port: 5432
-    host: impt-postgresql.impt
-    dbname: flyte
-    options: "sslmode=disable"

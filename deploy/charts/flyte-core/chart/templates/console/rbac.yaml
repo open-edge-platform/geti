@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "flyteconsole.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteconsole.labels" . | nindent 4 }}
+  {{- with .Values.flyteconsole.serviceAccount.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+{{- if .Values.global.enable_local_image_pull_secret  }}
+{{- with .Values.flyteconsole.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
+{{- end }}
+{{- end }}

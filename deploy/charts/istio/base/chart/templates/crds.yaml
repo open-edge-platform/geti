@@ -1,0 +1,3 @@
+{{- if .Values.base.enableCRDTemplates }}
+{{ .Files.Get "files/crd-all.yaml" }}
+{{- end }}

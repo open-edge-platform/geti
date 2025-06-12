@@ -1,0 +1,4 @@
+labels:
+  istioInjection: enabled
+  opaIstioInjection: enabled
+  managedBy: Helm
