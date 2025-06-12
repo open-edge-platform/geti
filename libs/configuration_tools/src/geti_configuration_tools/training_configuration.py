@@ -16,12 +16,14 @@ class SubsetSplit(BaseModel):
     """
 
     training: int = Field(
-        ge=1, default=70, title="Training percentage", description="Percentage of data to use for training"
+        ge=1, le=100, default=70, title="Training percentage", description="Percentage of data to use for training"
     )
     validation: int = Field(
-        ge=1, default=20, title="Validation percentage", description="Percentage of data to use for validation"
+        ge=1, le=100, default=20, title="Validation percentage", description="Percentage of data to use for validation"
     )
-    test: int = Field(ge=1, default=10, title="Test percentage", description="Percentage of data to use for testing")
+    test: int = Field(
+        ge=1, le=100, default=10, title="Test percentage", description="Percentage of data to use for testing"
+    )
     auto_selection: bool = Field(
         default=True, title="Auto selection", description="Whether to automatically select data for each subset"
     )
@@ -43,7 +45,10 @@ class MinAnnotationPixels(BaseModel):
         description="Whether to apply minimum annotation pixels filtering",
     )
     min_annotation_pixels: int = Field(
-        gt=0, default=1, title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
+        gt=0,
+        le=200000000,  # reasonable upper limit for pixel count to 200MP
+        default=1,
+        title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
     )
 
 

@@ -215,7 +215,7 @@ class TestTrainingConfigurationEndpoints:
 
         # Assert
         assert result.status_code == HTTPStatus.BAD_REQUEST
-        error_detail = json.loads(result.content)["detail"]
-        assert "errors" in error_detail
-        assert len(error_detail["errors"]) == 1
-        assert error_detail["errors"][0]["type"] == expected_error_type
+        response = json.loads(result.content)
+        assert "errors" in response
+        assert len(response["errors"]) == 1
+        assert response["errors"][0]["type"] == expected_error_type

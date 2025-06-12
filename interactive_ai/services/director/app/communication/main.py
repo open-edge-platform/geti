@@ -12,6 +12,7 @@ from collections import defaultdict
 from contextlib import asynccontextmanager
 
 import jsonschema
+import pydantic
 import uvicorn
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
@@ -179,6 +180,7 @@ def handle_base_exception(request: Request, e: GetiBaseException) -> Response:
 
 
 @app.exception_handler(RequestValidationError)
+@app.exception_handler(pydantic.ValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:  # noqa: ARG001
     """
     Converts a RequestValidationError to a better readable Bad request exception.
@@ -201,6 +203,34 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             {
                 "error_code": "bad_request",
                 "message": reformatted_message,
+                "http_status": http.HTTPStatus.BAD_REQUEST.value,
+            }
+        ),
+        headers=headers,
+    )
+
+
+@app.exception_handler(pydantic.ValidationError)
+async def pydantic_validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:  # noqa: ARG001
+    """
+    Converts a pydantic ValidationError to a better readable Bad request exception.
+    """
+    errors = [
+        {
+            "location": pydantic_error["loc"],
+            "message": pydantic_error["msg"],
+            "type": pydantic_error["type"],
+        }
+        for pydantic_error in exc.errors()
+    ]
+
+    headers = {"Cache-Control": "no-cache"}  # always revalidate
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content=jsonable_encoder(
+            {
+                "error_code": "bad_request",
+                "errors": errors,
                 "http_status": http.HTTPStatus.BAD_REQUEST.value,
             }
         ),

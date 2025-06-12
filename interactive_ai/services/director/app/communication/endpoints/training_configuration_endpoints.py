@@ -1,13 +1,11 @@
 # Copyright (C) 2022-2025 Intel Corporation
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import json
 import logging
 from http import HTTPStatus
 from typing import Annotated, Any
 
-import pydantic
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
 from geti_feature_tools import FeatureFlagProvider
 
@@ -35,10 +33,7 @@ def get_training_configuration_from_request(
     request_json: Annotated[dict, Depends(get_request_json)],
 ) -> PartialTrainingConfiguration:
     """Dependency to convert REST request body to PartialTrainingConfiguration."""
-    try:
-        return TrainingConfigurationRESTViews.training_configuration_from_rest(rest_input=request_json)
-    except pydantic.ValidationError as e:
-        raise HTTPException(status_code=400, detail={"errors": json.loads(e.json())}) from e
+    return TrainingConfigurationRESTViews.training_configuration_from_rest(rest_input=request_json)
 
 
 @training_configuration_router.get("/training_configuration")
