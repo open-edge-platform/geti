@@ -16,15 +16,15 @@ build-image: install_common_libs
 		-f ./Dockerfile ..
 
 ruff: venv
-	uv run ruff check .. --config ../pyproject.toml
-	uv run ruff format --check .. --config ../pyproject.toml
+	uv run ruff check .. --config pyproject.toml
+	uv run ruff format --check .. --config pyproject.toml
 
 mypy: venv
-	uv run mypy .. --config-file=../pyproject.toml
+	uv run mypy .. --config-file=pyproject.toml
 
 style-fix: venv
-	uv run ruff check .. --config ../pyproject.toml --fix
-	uv run ruff format .. --config ../pyproject.toml
+	uv run ruff check .. --config pyproject.toml --fix
+	uv run ruff format .. --config pyproject.toml
 
 # TODO CVS-166188 remove the '-' and 'true' workaround after fixing the tests
 test-unit: venv
