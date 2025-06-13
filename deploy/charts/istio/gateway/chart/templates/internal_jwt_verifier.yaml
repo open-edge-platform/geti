@@ -1,0 +1,31 @@
+#  INTEL CONFIDENTIAL
+#
+#  Copyright (C) 2023 Intel Corporation
+#
+#  This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+#  the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+#  you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+#  without Intel's prior written permission.
+#
+#  This software and the related documents are provided as is, with no express or implied warranties,
+#  other than those that are expressly stated in the License.
+
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: "internal-jwt-verifier"
+  namespace: {{ include "gateway.namespace" . }}
+spec:
+  jwtRules:
+  - forwardOriginalToken: true
+    fromHeaders:
+    - name: x-auth-request-access-token
+    issuer: Intel Geti
+    {{- if not .Values.auth_proxy.enabled }}
+    jwksUri: http://gateway.impt.svc.cluster.local:9000/api/v1/keys/
+    {{- else }}
+    jwksUri: http://auth-proxy.impt.svc.cluster.local:7002/api/v1/keys/
+    {{- end}}
+    outputClaimToHeaders:
+    - claim: sub
+      header: x-auth-request-preferred-username

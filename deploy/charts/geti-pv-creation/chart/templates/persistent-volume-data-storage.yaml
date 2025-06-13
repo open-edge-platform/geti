@@ -1,0 +1,18 @@
+{{- if eq .Values.storageClassName "local-storage" }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: data-storage-volume
+  labels:
+    type: local
+    {{- include "geti-pv-creation.labels" . | nindent 4 }}
+spec:
+  storageClassName: {{ .Values.storageClassName }}
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: {{ .Values.storageLimit }}
+  hostPath:
+    path: "{{ .Values.dataStoragePath }}"
+    type: DirectoryOrCreate
+ {{- end }}

@@ -1,4 +1,6 @@
-image: 
+fullnameOverride: impt-mongodb
+
+image:
   registry: docker.io
   repository: 
   name: mongo:6

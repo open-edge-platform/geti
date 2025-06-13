@@ -1,0 +1,130 @@
+{{- if .Values.flytepropeller.enabled }}
+---
+{{- if .Values.flytepropeller.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+  {{- with .Values.flytepropeller.serviceAccount.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end}}
+{{- if .Values.global.enable_local_image_pull_secret  }}
+{{- with .Values.flytepropeller.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+---
+{{- if $.Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- end }}
+kind: Role
+metadata:
+  name: {{ template "flyte.namespace" . -}}-{{- template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - update
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - watch
+  - get
+  - create
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - update
+  - create
+---
+{{- if $.Capabilities.APIVersions.Has "rbac.authorization.k8s.io/v1" }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- else }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+{{- end }}
+kind: ClusterRole
+metadata:
+  name: {{ template "flyte.namespace" . -}}-{{- template "flytepropeller.name" . }}
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - list
+  - get
+  - watch
+  - create
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - podtemplates
+  verbs:
+  - list
+  - watch
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - list
+- apiGroups:
+  - flyte.lyft.com
+  resources:
+  - flyteworkflows
+  verbs:
+  - list
+  - update
+  - watch
+  - get
+  - deletecollection
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "flyte.namespace" . -}}-{{- template "flytepropeller.name" . }}
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "flyte.namespace" . -}}-{{- template "flytepropeller.name" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "flyte.namespace" . -}}-{{- template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "flyte.namespace" . -}}-{{- template "flytepropeller.name" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+{{- end }}

@@ -1,0 +1,127 @@
+{{- if .Values.flytepropeller.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ template "flyte.namespace" . }}
+  {{- if .Values.flytepropeller.manager }}
+  name: {{ template "flytepropeller-manager.name" . }}
+  labels: {{ include "flytepropeller-manager.labels" . | nindent 4 }}
+  {{- else }}
+  name: {{ template "flytepropeller.name" . }}
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.flytepropeller.replicaCount }}
+  selector:
+    {{- if .Values.flytepropeller.manager }}
+    matchLabels: {{ include "flytepropeller-manager.selectorLabels" . | nindent 6 }}
+    {{- else }}
+    matchLabels: {{ include "flytepropeller.selectorLabels" . | nindent 6 }}
+    {{- end }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/propeller/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.flytepropeller.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        # using this param as it is being used on on-prem only
+        {{- if and (not (eq .Values.global.seaweed_fs_enabled nil)) .Values.global.seaweed_fs_enabled }}
+        rollme: {{ randAlphaNum 5 | quote }}
+        {{- end }}
+      {{- if .Values.flytepropeller.manager }}
+      labels: {{ include "flytepropeller-manager.labels" . | nindent 8 }}
+      {{- else }}
+      labels: {{ include "flytepropeller.labels" . | nindent 8 }}
+      {{- end }}
+    spec:
+      securityContext:
+        fsGroup: 65534
+        runAsUser: 10001
+        fsGroupChangePolicy: "Always"
+      {{- if .Values.flytepropeller.priorityClassName }}
+      priorityClassName: {{ .Values.flytepropeller.priorityClassName }}
+      {{- end }}
+      containers:
+      - command:
+        {{- if .Values.flytepropeller.manager }}
+        - flytepropeller-manager
+        - --manager.pod-template-namespace
+        - {{ template "flyte.namespace" . }}
+        {{- else }}
+        - flytepropeller
+        {{- end }}
+        - --config
+        - {{ .Values.flytepropeller.configPath }}
+        {{- with .Values.flytepropeller.clusterName }}
+        - --propeller.cluster-id
+        - {{ tpl (toYaml .) $ }}
+        {{- end -}}
+        {{- with .Values.flytepropeller.extraArgs }}
+        {{- tpl (toYaml .) $ | nindent 8 }}
+        {{- end }}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: "{{ .Values.flytepropeller.image.registry }}/{{ if .Values.flytepropeller.image.repository }}{{ .Values.flytepropeller.image.repository }}/{{ end }}{{ .Values.flytepropeller.image.name }}"
+        imagePullPolicy: "{{ .Values.flytepropeller.imagePullPolicy }}"
+        {{- if .Values.flytepropeller.manager }}
+        name: flytepropeller-manager
+        {{- else }}
+        name: flytepropeller
+        {{- end }}
+        ports:
+        - containerPort: {{ index .Values.configmap.core.propeller "prof-port" }}
+        resources: {{ toYaml .Values.flytepropeller.resources | nindent 10 }}
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/flyte/config
+          - name: auth
+            mountPath: /etc/secrets/
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - ALL
+        {{- if .Values.flytepropeller.terminationMessagePolicy }}
+        terminationMessagePolicy: "{{ .Values.flytepropeller.terminationMessagePolicy }}"
+        {{- end }}
+      serviceAccountName: {{ template "flytepropeller.name" . }}
+      volumes:
+      - name: config-volume
+        projected:
+          sources:
+            - configMap:
+                name: flyte-propeller-config
+            - secret:
+                name: flyte-storage-yaml
+                items:
+                  - key: storage.yaml
+                    path: ./storage.yaml
+            - secret:
+                name: flyte-k8s-yaml
+                items:
+                  - key: k8s.yaml
+                    path: ./k8s.yaml
+      - name: auth
+        secret:
+          secretName: flyte-secret-auth
+      {{- with .Values.flytepropeller.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flytepropeller.affinity }}
+      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flytepropeller.tolerations }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+{{- end }}

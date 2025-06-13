@@ -1,0 +1,366 @@
+# nameOverride replaces the name of the chart in the Chart.yaml file, when this
+# is used to construct Kubernetes object names.
+# +docs:property
+# nameOverride: approver-policy
+
+# Number of replicas of istio-csr to run.
+replicaCount: 1
+
+image:
+  # Target image registry. This value is prepended to the target image repository, if set.
+  # For example:
+  #   registry: quay.io
+  #   repository: jetstack/cert-manager-istio-csr
+  # +docs:property
+  # registry: quay.io
+
+  # Target image repository.
+#  repository: quay.io/jetstack/cert-manager-istio-csr
+  # Override the image tag to deploy by setting this variable.
+  # If no value is set, the chart's appVersion is used.
+  # +docs:property
+  # tag: vX.Y.Z
+
+  # Target image digest. Override any tag, if set.
+  # For example:
+  #   digest: sha256:0e072dddd1f7f8fc8909a2ca6f65e76c5f0d2fcfb8be47935ae3457e8bbceb20
+  # +docs:property
+  # digest: sha256:...
+
+  # Kubernetes imagePullPolicy on Deployment.
+#  pullPolicy: IfNotPresent
+#  tag: v0.13.0
+  registry: quay.io
+  repository: jetstack
+  name: cert-manager-istio-csr:v0.13.0
+
+  # Kubernetes imagePullPolicy on Deployment.
+  pullPolicy: IfNotPresent
+
+# Optional secrets used for pulling the istio-csr container image.
+imagePullSecrets: []
+service:
+  # Service type to expose istio-csr gRPC service.
+  type: ClusterIP
+  # Service port to expose istio-csr gRPC service.
+  port: 443
+  # Service nodePort to expose istio-csr gRPC service.
+  # +docs:type=number
+  # +docs:property
+  # nodePort:
+app:
+  # Verbosity of istio-csr logging.
+  logLevel: 1 # 1-5
+  # Output format of istio-csr logging.
+  logFormat: text # text or json
+  metrics:
+    # Port for exposing Prometheus metrics on 0.0.0.0 on path '/metrics'.
+    port: 9402
+    # Service to expose metrics endpoint.
+    service:
+      # Create a Service resource to expose metrics endpoint.
+      enabled: false
+      # Service type to expose metrics.
+      type: ClusterIP
+      # The ServiceMonitor resource for this Service.
+      servicemonitor:
+        # Create Prometheus ServiceMonitor resource for approver-policy.
+        enabled: false
+        # The value for the "prometheus" label on the ServiceMonitor. This allows
+        # for multiple Prometheus instances selecting difference ServiceMonitors
+        # using label selectors.
+        prometheusInstance: default
+        # The interval that the Prometheus will scrape for metrics.
+        interval: 10s
+        # The timeout on each metric probe request.
+        scrapeTimeout: 5s
+        # Additional labels to give the ServiceMonitor resource.
+        labels: {}
+  # DEPRECATED: moved to app.runtimeConfiguration.name
+  #
+  # Name of a ConfigMap in the installation namespace to watch, providing
+  # runtime configuration of an issuer to use.
+  #
+  # The "issuer-name", "issuer-kind" and "issuer-group" keys must be present in
+  # the ConfigMap for it to be used.
+  #
+  # +docs:hidden
+  runtimeIssuanceConfigMap: ""
+  runtimeConfiguration:
+    # Create the runtime-configuration ConfigMap
+    create: false
+    # Name of a ConfigMap in the installation namespace to watch, providing
+    # runtime configuration of an issuer to use.
+    #
+    # If create is set to true then this name is used to create the ConfigMap,
+    # otherwise the ConfigMap must exist and the "issuer-name", "issuer-kind"
+    # and "issuer-group" keys must be present in it.
+    name: ""
+    issuer:
+      # Issuer name set on created CertificateRequests for both istio-csr's
+      # serving certificate and incoming gRPC CSRs.
+      name: istio-ca
+      # Issuer kind set on created CertificateRequests for both istio-csr's
+      # serving certificate and incoming gRPC CSRs.
+      kind: Issuer
+      # Issuer group name set on created CertificateRequests for both
+      # istio-csr's serving certificate and incoming gRPC CSRs.
+      group: cert-manager.io
+  readinessProbe:
+    # Container port to expose istio-csr HTTP readiness probe on default network interface.
+    port: 6060
+    # Path to expose istio-csr HTTP readiness probe on default network interface.
+    path: "/readyz"
+  certmanager:
+    # Namespace to create CertificateRequests for both istio-csr's serving
+    # certificate and incoming gRPC CSRs.
+    namespace: cert-manager
+    # Don't delete created CertificateRequests once they have been signed.
+    # WARNING: do not enable this option in production, or environments with
+    # any non-trivial number of workloads for an extended period of time. Doing
+    # so will balloon the resource consumption of both ETCD and the API server,
+    # leading to errors and slow down. This option is intended for debugging
+    # purposes only, for limited periods of time.
+    preserveCertificateRequests: false
+    # Additional annotations to include on certificate requests.
+    # Takes key/value pairs in the format:
+    #  additionalAnnotations:
+    #    - name: custom.cert-manager.io/policy-name
+    #      value: istio-csr
+    additionalAnnotations: []
+    issuer:
+      # Enable the default issuer, this is the issuer used when no runtime 
+      # configuration is provided.
+      #
+      # When enabled the istio-csr Pod will not be "Ready" until the issuer
+      # has been used to issue the istio-csr GRPC certificate.
+      #
+      # For istio-csr to function either this or runtime configuration must be
+      # enabled.
+      enabled: true
+      # Issuer name set on created CertificateRequests for both istio-csr's
+      # serving certificate and incoming gRPC CSRs.
+      name: ca-issuer
+      # Issuer kind set on created CertificateRequests for both istio-csr's
+      # serving certificate and incoming gRPC CSRs.
+      kind: ClusterIssuer
+      # Issuer group name set on created CertificateRequests for both
+      # istio-csr's serving certificate and incoming gRPC CSRs.
+      group: cert-manager.io
+  tls:
+    # The Istio cluster's trust domain.
+    trustDomain: "cluster.local"
+    # An optional file location to a PEM encoded root CA that the root CA
+    # ConfigMap in all namespaces will be populated with. If empty, the CA
+    # returned from cert-manager for the serving certificate will be used.
+    rootCAFile: /var/run/secrets/istio-csr/ca.pem
+    # The DNS names to request for the server's serving certificate which is
+    # presented to istio-agents. istio-agents must route to istio-csr using one
+    # of these DNS names.
+    certificateDNSNames:
+      - cert-manager-istio-csr.cert-manager.svc
+    # Requested duration of gRPC serving certificate. Will be automatically
+    # renewed.
+    # Based on NIST 800-204A recommendations (SM-DR13).
+    # https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-204A.pdf
+#    certificateDuration: 1h
+    certificateDuration: 8760h0m0s
+    # If true, create the istiod certificate using a cert-manager certificate as part
+    # of the install. If set to "dynamic", will create the cert dynamically when
+    # istio-csr pods start up. If false, no cert is created.
+    # +docs:type=boolean,string,null
+    istiodCertificateEnable: true
+    # Requested duration of istio's Certificate. Will be automatically renewed.
+    # Default is based on NIST 800-204A recommendations (SM-DR13).
+    # https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-204A.pdf
+    # Warning: cert-manager does not allow a duration on Certificates less than 1 hour.
+#    istiodCertificateDuration: 1h
+    istiodCertificateDuration: 4380h0m0s
+    # Amount of time to wait before trying to renew the istiod certificate.
+    # Must be smaller than the certificate's duration.
+#    istiodCertificateRenewBefore: 30m
+    istiodCertificateRenewBefore: 24h0m0s
+    # Private key algorithm to use. For backwards compatibility, defaults to the same value as app.server.serving.signatureAlgorithm
+    istiodPrivateKeyAlgorithm: ""
+    # Parameter for istiod certificate key. For RSA, must be a number of bits >= 2048. For ECDSA, can only be 256 or 384, corresponding to P-256 and P-384 respectively.
+#    istiodPrivateKeySize: 2048
+    istiodPrivateKeySize: 384
+    # Provide additional DNS names to request on the istiod certificate. Useful if istiod
+    # should be accessible via multiple DNS names and/or outside of the cluster.
+    istiodAdditionalDNSNames: []
+    secretName: ca-cert
+  server:
+    authenticators:
+      # Enable the client certificate authenticator. This will allow workloads to use preexisting certificates to
+      # authenticate with istio-csr when rotating their certificate.
+      enableClientCert: false
+    # The istio cluster ID to verify incoming CSRs.
+    clusterID: "Kubernetes"
+    # Maximum validity duration that can be requested for a certificate.
+    # istio-csr will request a duration of the smaller of this value, and that of
+    # the incoming gRPC CSR.
+    # Based on NIST 800-204A recommendations (SM-DR13).
+    # https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-204A.pdf
+#    maxCertificateDuration: 1h
+    maxCertificateDuration: 43830h0m0s
+    serving:
+      # Container address to serve istio-csr gRPC service.
+      address: 0.0.0.0
+      # Container port to serve istio-csr gRPC service.
+      port: 6443
+      # Parameter for serving certificate key. For RSA, must be a number of bits >= 2048. For ECDSA, can only be 256 or 384, corresponding to P-256 and P-384 respectively.
+#      certificateKeySize: 2048
+      certificateKeySize: 384
+      # The type of private key to generate for the serving certificate. Only RSA (default) and ECDSA are supported.
+      # NB: This variable is named incorrectly; it controls private key algorithm, not signature algorithm.
+#      signatureAlgorithm: "RSA"
+      signatureAlgorithm: "ECDSA"
+    # A comma-separated list of service accounts that are allowed to use node authentication for CSRs, eg. "istio-system/ztunnel"
+    caTrustedNodeAccounts: ""
+  istio:
+    # The istio revisions that are currently installed in the cluster.
+    # Changing this field will modify the DNS names that will be requested for
+    # the istiod certificate (if enabled).
+    # The common name for the istiod certificate is hard coded to the `default` revision
+    # DNS name.
+    # Some issuers may require that the common name on certificates match one
+    # of the DNS names. If 1. Your issuer has this constraint, and 2. You are
+    # not using `default` as a revision, add the `default` revision here
+    # anyway. The resulting certificate will include a DNS name that won't be
+    # used, but will pass this constraint.
+    revisions: ["default"]
+    # The namespace where the istio control-plane is running.
+    namespace: istio-system
+  controller:
+#    leaderElectionNamespace: istio-system
+    leaderElectionNamespace: cert-manager
+    # If set, limit where istio-csr creates configmaps with root ca certificates. If unset, configmap created in ALL namespaces.
+    # Example: maistra.io/member-of=istio-system
+    # +docs:type=string
+    # +docs:property
+    # configmapNamespaceSelector:
+
+    # Allows you to disable the default Kubernetes client rate limiter if
+    # istio-csr is exceeding the default QPS (5) and Burst (10) limits.
+    # For example in large clusters with many Istio workloads, restarting the Pods may cause
+    # istio-csr to send bursts Kubernetes API requests that exceed the limits of
+    # the default Kubernetes client rate limiter and istio-csr will become slow to issue
+    # certificates for your workloads.
+    # Only disable client rate limiting if the Kubernetes API server supports
+    # [API Priority and Fairness](https://kubernetes.io/docs/concepts/cluster-administration/flow-control/),
+    # to avoid overloading the server.
+    disableKubernetesClientRateLimiter: false
+# Optional extra labels for deployment.
+deploymentLabels: {}
+# Optional extra annotations for deployment.
+deploymentAnnotations:
+  secret.reloader.stakater.com/reload: "ca-cert"
+# Optional extra labels for pod.
+podLabels: {}
+# Optional extra annotations for pod.
+podAnnotations: {}
+# Optional extra volumes. Useful for mounting custom root CAs
+#
+# For example:
+#  volumes:
+#  - name: root-ca
+#    secret:
+#      secretName: root-cert
+volumes:
+- name: root-ca
+  secret:
+    secretName: ca-cert
+    items:
+      - key: tls.crt
+        path: ca.pem
+# Optional extra volume mounts. Useful for mounting custom root CAs
+#
+# For example:
+#  volumeMounts:
+#  - name: root-ca
+#    mountPath: /etc/tls
+volumeMounts:
+- name: root-ca
+  mountPath: /var/run/secrets/istio-csr
+# Kubernetes pod resources
+# ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+#
+# For example:
+#  resources:
+#    limits:
+#      cpu: 100m
+#      memory: 128Mi
+#    requests:
+#      cpu: 100m
+#      memory: 128Mi
+resources:
+  # -- Kubernetes pod resource limits for istio-csr.
+  limits:
+    cpu: 100m
+    memory: 128Mi
+   # -- Kubernetes pod memory resource requests for istio-csr.
+  requests:
+   memory: 128Mi
+# Kubernetes security context
+# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+#
+# See the default values for an example.
+securityContext:
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsUser: 10001
+  capabilities:
+    drop:
+      - ALL
+
+# Expects input structure as per specification https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11/#affinity-v1-core
+#
+# For example:
+#   affinity:
+#     nodeAffinity:
+#      requiredDuringSchedulingIgnoredDuringExecution:
+#        nodeSelectorTerms:
+#        - matchExpressions:
+#          - key: foo.bar.com/role
+#            operator: In
+#            values:
+#            - master
+affinity: {}
+# Expects input structure as per specification https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11/#toleration-v1-core
+#
+# For example:
+#   tolerations:
+#   - key: foo.bar.com/role
+#     operator: Equal
+#     value: master
+#     effect: NoSchedule
+tolerations: []
+# List of Kubernetes TopologySpreadConstraints. For more information, see [TopologySpreadConstraint v1 core](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#topologyspreadconstraint-v1-core).
+# For example:
+#   topologySpreadConstraints:
+#   - maxSkew: 2
+#     topologyKey: topology.kubernetes.io/zone
+#     whenUnsatisfiable: ScheduleAnyway
+#     labelSelector:
+#       matchLabels:
+#         app.kubernetes.io/name: cert-manager-istio-csr
+#         app.kubernetes.io/instance: istio-csr
+topologySpreadConstraints: []
+# Kubernetes node selector: node labels for pod assignment.
+# +docs:property=nodeSelector
+nodeSelector:
+  kubernetes.io/os: linux
+# Labels to apply to all resources
+commonLabels: {}
+# Create resources alongside installing istio-csr, via Helm values. Can accept an array of YAML-formatted
+# resources. Each array entry can include multiple YAML documents, separated by '---'
+#
+# For example:
+# extraObjects:
+#   - |
+#     apiVersion: v1
+#     kind: ConfigMap
+#     metadata:
+#       name: '{{ template "cert-manager-istio-csr.fullname" . }}-extra-configmap'
+extraObjects: []

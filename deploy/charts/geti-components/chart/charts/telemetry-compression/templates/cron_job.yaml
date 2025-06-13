@@ -13,6 +13,11 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          {{- if not .Values.global.istio_ambient_mesh }}
+          annotations:
+            proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+          {{- end }}
         spec:
           serviceAccountName: {{ .Release.Namespace }}-{{ .Chart.Name }}
           initContainers:

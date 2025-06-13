@@ -1,0 +1,104 @@
+{{ $backoffLimit := .Values.jobs.backoffLimit }}
+{{- range .Values.workflows_to_register }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Release.Namespace }}-{{ $.Chart.Name }}-{{ .name }}
+  namespace: {{ template "flyte.namespace" $ }}
+  labels: {{- include "jobs.labels" $ | nindent 4 }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "2"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+spec:
+  backoffLimit: {{ $backoffLimit }}
+  template:
+    metadata:
+      labels: {{- include "jobs.labels" $ | nindent 8 }}
+      {{- if not $.Values.global.istio_ambient_mesh }}
+      annotations:
+        proxy.istio.io/config: '{ "holdApplicationUntilProxyStarts": true }'
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "jobs.name" $ }}
+      restartPolicy: Never
+      volumes:
+        - name: config
+          configMap:
+            name: {{ $.Release.Namespace }}-{{ $.Chart.Name }}-flyte-config
+        - name: tmp
+          emptyDir: {}
+      initContainers:
+        - name: wait-for-flyte-admin
+          image: "{{ $.Values.global.busybox.registry }}/{{ if $.Values.global.busybox.repository }}{{ $.Values.global.busybox.repository }}/{{ end }}{{ $.Values.global.busybox.name }}"
+          command: [ 'sh', '-c', "until nc -w 5 -z $FLYTE_ADMIN_HOST $FLYTE_ADMIN_PORT; do echo wait...; sleep 2; done;" ]
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 10001
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          resources:
+              requests:
+                cpu: 50m
+                memory: 100Mi
+              limits:
+                memory: 100Mi
+          env:
+            - name: "FLYTE_ADMIN_HOST"
+              value: {{ template "flyteadmin.name" . }}
+            - name: "FLYTE_ADMIN_PORT"
+              value: "81"
+      containers:
+      - name: flyte-init
+        volumeMounts:
+          - name: config
+            mountPath: "/etc/flyte/config"
+            readOnly: true
+          - name: tmp
+            mountPath: "/tmp"
+        image: "{{ $.Values.global.registry_address }}/{{ $.Values.global.docker_namespace }}/{{ .image }}:{{ $.Values.global.tag | default $.Chart.Version }}"
+        env:
+        - name: IMAGE_TAG
+          value: "{{ $.Values.global.registry_address }}/{{ $.Values.global.docker_namespace }}/{{ .image }}:{{ $.Values.global.tag | default $.Chart.Version }}"
+        {{- if $.Values.workload_node_selector_key }}
+        - name: WORKLOAD_NODE_SELECTOR_KEY
+          value: "{{ $.Values.workload_node_selector_key }}"
+        {{- end }}
+        {{- if $.Values.workload_node_selector_value }}
+        - name: WORKLOAD_NODE_SELECTOR_VALUE
+          value: "{{ $.Values.workload_node_selector_value }}"
+        {{- end }}
+        resources: {{ toYaml $.Values.jobs.resources | nindent 10 }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop:
+              - ALL
+        command: ["/bin/sh", "-c"]
+        args:
+          - >-
+            pyflyte
+            --config /etc/flyte/config/config.yaml
+            register
+            --project impt-jobs
+            --domain production
+            --image $IMAGE_TAG
+            --service-account impt-jobs
+            --version {{ $.Values.global.workflow_versions | default $.Chart.Version }}
+            --non-fast
+            /interactive_ai/workflows/geti_domain/workflow/job;
+            retVal=$?;
+            {{- if not $.Values.global.istio_ambient_mesh }}
+            until curl -XPOST 127.0.0.1:15020/quitquitquit; 
+              do sleep 3
+            done;
+            {{- end }}
+            exit $retVal
+{{- end }}

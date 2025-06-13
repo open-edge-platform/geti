@@ -60,8 +60,3 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{- define "modelmesh-serving.featureFlags" -}}
-{{- $featureFlags := kindIs "map" .Values.feature_flags_data | ternary .Values.feature_flags_data (fromYaml (.Values.feature_flags_data | toString)) }}
-{{- printf ($featureFlags | toYaml) | nindent 2 }}
-{{- end }}

@@ -1,0 +1,155 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cert-manager-istio-csr.name" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "cert-manager-istio-csr.labels" . | nindent 4 }}
+    {{- with .Values.deploymentLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- with .Values.deploymentAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "cert-manager-istio-csr.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "cert-manager-istio-csr.name" . }}
+        {{- include "cert-manager-istio-csr.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "cert-manager-istio-csr.name" . }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with  .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: {{ include "cert-manager-istio-csr.name" . }}
+        image: "{{ template "image" (tuple .Values.image $.Chart.AppVersion) }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.app.server.serving.port }}
+        - containerPort: {{ .Values.app.metrics.port }}
+        readinessProbe:
+          httpGet:
+            port: {{ .Values.app.readinessProbe.port }}
+            path: {{ .Values.app.readinessProbe.path }}
+          initialDelaySeconds: 3
+          periodSeconds: 7
+        args:
+          - "--log-level={{.Values.app.logLevel}}"
+          - "--log-format={{.Values.app.logFormat}}"
+          - "--metrics-port={{.Values.app.metrics.port}}"
+          - "--readiness-probe-port={{.Values.app.readinessProbe.port}}"
+          - "--readiness-probe-path={{.Values.app.readinessProbe.path}}"
+
+            # cert-manager
+          - "--certificate-namespace={{.Values.app.certmanager.namespace}}"
+          - "--issuer-enabled={{.Values.app.certmanager.issuer.enabled}}"
+          - "--issuer-name={{.Values.app.certmanager.issuer.name}}"
+          - "--issuer-kind={{.Values.app.certmanager.issuer.kind}}"
+          - "--issuer-group={{.Values.app.certmanager.issuer.group}}"
+          - "--preserve-certificate-requests={{.Values.app.certmanager.preserveCertificateRequests}}"
+
+            # AdditionalAnnotations
+          {{- if .Values.app.certmanager.additionalAnnotations }}
+            {{- $annotations := list }}
+            {{- range $annotation := .Values.app.certmanager.additionalAnnotations }}
+              {{- $x := list $annotation.name $annotation.value | join "=" }}
+              {{- $annotations = append $annotations $x }}
+            {{- end }}
+          - "--certificate-request-additional-annotations={{ join "," $annotations }}"
+          {{- end }}
+
+            # tls
+          - "--root-ca-file={{.Values.app.tls.rootCAFile}}"
+        {{- range .Values.app.tls.certificateDNSNames }}
+          - "--serving-certificate-dns-names={{ . }}"
+        {{- end  }}
+          - "--serving-certificate-duration={{.Values.app.tls.certificateDuration}}"
+          - "--trust-domain={{.Values.app.tls.trustDomain}}"
+
+          # server
+          - "--cluster-id={{.Values.app.server.clusterID}}"
+          - "--max-client-certificate-duration={{.Values.app.server.maxCertificateDuration}}"
+          - "--serving-address={{.Values.app.server.serving.address}}:{{.Values.app.server.serving.port}}"
+          - "--serving-certificate-key-size={{.Values.app.server.serving.certificateKeySize}}"
+          - "--serving-signature-algorithm={{ .Values.app.server.serving.signatureAlgorithm }}"
+
+          # server authenticators
+          - "--enable-client-cert-authenticator={{.Values.app.server.authenticators.enableClientCert}}"
+
+          # trusted node accounts
+          {{- if .Values.app.server.caTrustedNodeAccounts }}
+          - "--ca-trusted-node-accounts={{.Values.app.server.caTrustedNodeAccounts }}"
+          {{- end }}
+          # controller
+          - "--leader-election-namespace={{.Values.app.controller.leaderElectionNamespace}}"
+          {{- if .Values.app.controller.configmapNamespaceSelector }}
+          - "--configmap-namespace-selector={{ .Values.app.controller.configmapNamespaceSelector }}"
+          {{- end }}
+          - "--disable-kubernetes-client-rate-limiter={{ .Values.app.controller.disableKubernetesClientRateLimiter }}"
+
+          - "--runtime-issuance-config-map-name={{ include "cert-manager-istio-csr.runtimeConfigurationName" . }}"
+          - "--runtime-issuance-config-map-namespace={{.Release.Namespace}}"
+
+          # dynamic istiod cert
+          - "--istiod-cert-enabled={{ eq (toString .Values.app.tls.istiodCertificateEnable) "dynamic" }}"
+          - "--istiod-cert-name=istiod-dynamic"
+          - "--istiod-cert-namespace={{ .Values.app.istio.namespace }}"
+          - "--istiod-cert-duration={{ .Values.app.tls.istiodCertificateDuration }}"
+          - "--istiod-cert-renew-before={{ .Values.app.tls.istiodCertificateRenewBefore }}"
+          - "--istiod-cert-key-algorithm={{ default .Values.app.server.serving.signatureAlgorithm .Values.app.tls.istiodPrivateKeyAlgorithm }}"
+          - "--istiod-cert-key-size={{ .Values.app.tls.istiodPrivateKeySize }}"
+          - "--istiod-cert-additional-dns-names={{ join "," .Values.app.tls.istiodAdditionalDNSNames }}"
+          {{- if .Values.app.certmanager.additionalAnnotations }}
+          {{- $annotationList := list }}
+          {{- range $annotation := .Values.app.certmanager.additionalAnnotations }}
+          {{ $annotationList = append $annotationList (printf "%s=%s" $annotation.name $annotation.value) }}
+          {{- end }}
+          - "--istiod-cert-additional-annotations={{ join "," $annotationList }}"
+          {{- end }}
+          - "--istiod-cert-istio-revisions={{ join "," .Values.app.istio.revisions }}"
+        {{- if .Values.volumeMounts }}
+        volumeMounts:
+{{ toYaml .Values.volumeMounts | indent 10 }}
+       {{- end }}
+
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+
+      {{- if .Values.volumes }}
+      volumes:
+{{ toYaml .Values.volumes | indent 6 }}
+      {{- end }}

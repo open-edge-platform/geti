@@ -69,46 +69,6 @@ ldapSecurityContext:
 
 config:
   impt_ldif: |-
-    # dn: dc=example,dc=org
-    # objectClass: dcObject
-    # objectClass: organization
-    # o: Example Company
-    # dc: example
-
-    dn: ou=People,dc=example,dc=org
-    objectClass: organizationalUnit
-    ou: People
-
-    dn: cn=Jane Doe,ou=People,dc=example,dc=org
-    cn: Jane Doe
-    gidnumber: 500
-    givenname: Jane
-    homedirectory: /home/users/janedoe
-    mail: janedoe@example.org
-    loginshell: /bin/bash
-    objectclass: inetOrgPerson
-    objectclass: posixAccount
-    objectclass: top
-    sn: Doe
-    uid: janedoe
-    uidnumber: 1000
-    userpassword: foo
-
-    dn: cn=John Doe,ou=People,dc=example,dc=org
-    cn: John Doe
-    gidnumber: 500
-    givenname: John
-    homedirectory: /home/users/johndoe
-    mail: johndoe@example.org
-    loginshell: /bin/bash
-    objectclass: inetOrgPerson
-    objectclass: posixAccount
-    objectclass: top
-    sn: Doe
-    uid: johndoe
-    uidnumber: 1001
-    userpassword: bar
-
     # Group definitions.
     dn: ou=Groups,dc=example,dc=org
     objectClass: organizationalUnit
@@ -117,15 +77,18 @@ config:
     dn: cn=Admins,ou=Groups,dc=example,dc=org
     cn: Admins
     gidnumber: 500
-    memberuid: janedoe
     objectclass: posixGroup
     objectclass: top
 
-    dn: cn=Google Analytics,ou=Groups,dc=example,dc=org
-    cn: Google Analytics
+    dn: cn=Users,ou=Groups,dc=example,dc=org
+    cn: Users
     gidnumber: 501
-    memberuid: johndoe
-    memberuid: janedoe
+    objectclass: posixGroup
+    objectclass: top
+
+    dn: cn=ServiceAccounts,ou=Groups,dc=example,dc=org
+    cn: ServiceAccounts
+    gidnumber: 502
     objectclass: posixGroup
     objectclass: top
   service_accounts_group_ldif: |-

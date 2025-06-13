@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-storage-volume-claim
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "geti-pv-creation.labels" . | nindent 4 }}
+spec:
+  storageClassName: {{ .Values.storageClassName }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.storageLimit }}
+  {{- if eq .Values.storageClassName "local-storage" }}
+  volumeName: "data-storage-volume"
+  {{- end }}

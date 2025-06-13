@@ -1,0 +1,56 @@
+---
+#  INTEL CONFIDENTIAL
+#
+#  Copyright (C) 2023 Intel Corporation
+#
+#  This software and the related documents are Intel copyrighted materials, and your use of them is governed by
+#  the express license under which they were provided to you ("License"). Unless the License provides otherwise,
+#  you may not use, modify, copy, publish, distribute, disclose or transmit this software or the related documents
+#  without Intel's prior written permission.
+#
+#  This software and the related documents are provided as is, with no express or implied warranties,
+#  other than those that are expressly stated in the License.
+
+{{- if not .Values.auth_proxy.enabled }}
+apiVersion: extensions.istio.io/v1alpha1
+kind: WasmPlugin
+metadata:
+  name: api-gateway
+  namespace: {{ include "gateway.namespace" . }}
+spec:
+  selector:
+    matchLabels:
+      istio: gateway
+  url: "file://{{ .Values.api_gateway.mountPath }}/plugin.wasm"
+  imagePullPolicy: Always
+  vmConfig:
+    env:
+      - name: CLUSTER_NAME_ACCOUNT_SERVICE
+        valueFrom: HOST
+      - name: ROUTE_GET_USER_BY_EXT_ID
+        valueFrom: HOST
+      - name: ROUTE_GET_PAT_BY_HASH
+        valueFrom: HOST
+      - name: JWT_SIGNING_KEY_GETI
+        valueFrom: HOST
+      - name: JWT_VERIFICATION_KEY_GETI
+        valueFrom: HOST
+      - name: JWT_TTL_GETI
+        valueFrom: HOST
+      - name: CACHE_TTL
+        valueFrom: HOST
+      - name: UNAUTHORIZED_URLS
+        valueFrom: HOST
+      - name: GOMAXPROCS
+        value: '1'
+      - name: ISS_INTERNAL
+        valueFrom: HOST
+      - name: AUD_INTERNAL
+        valueFrom: HOST
+      - name: ISS_EXTERNAL
+        valueFrom: HOST
+      - name: AUD_EXTERNAL
+        valueFrom: HOST
+      - name: REQUIRED_ROLES
+        valueFrom: HOST
+{{- end }}

@@ -1,0 +1,54 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "flytescheduler.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flytescheduler.labels" . | nindent 4 }}
+  {{- with .Values.flytescheduler.serviceAccount.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+{{- if .Values.global.enable_local_image_pull_secret  }}
+  {{- with .Values.flytescheduler.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
+  {{- end }}
+{{- end }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "flytescheduler.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+rules:
+  - apiGroups:
+      - "batch"
+    resources:
+      - jobs
+    verbs:
+      - watch
+      - get
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "flytescheduler.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+    app: {{ .Chart.Name }}
+    release: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    heritage: {{ .Release.Service }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "flytescheduler.name" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "flytescheduler.name" . }}
+    namespace: {{ template "flyte.namespace" . }}

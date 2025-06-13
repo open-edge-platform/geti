@@ -1,0 +1,347 @@
+certificate:
+  issuerRef:
+    name: ca-issuer
+
+auth_proxy:
+  enabled: true
+
+main_namespace: impt
+
+# "_internal_defaults_do_not_set" is a workaround for Helm limitations. Users should NOT set "._internal_defaults_do_not_set" explicitly, but rather directly set the fields internally.
+# For instance, instead of `--set _internal_defaults_do_not_set.foo=bar``, just set `--set foo=bar`.
+_internal_defaults_do_not_set:
+  # Name allows overriding the release name. Generally this should not be set
+  name: ""
+  # revision declares which revision this gateway is a part of
+  revision: ""
+
+  # Controls the spec.replicas setting for the Gateway deployment if set.
+  # Otherwise defaults to Kubernetes Deployment default (1).
+  replicaCount:
+
+  kind: Deployment
+
+  istio_gateway_name: "istio-gateway"
+  istio_ingress_namespace: "istio-system"
+
+  rbac:
+    # If enabled, roles will be created to enable accessing certificates from Gateways. This is not needed
+    # when using http://gateway-api.org/.
+    enabled: true
+
+  istioProxy:
+    name: istio-router
+
+  serviceAccount:
+    # If set, a service account will be created. Otherwise, the default is used
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set, the release name is used
+    name: ""
+
+  podAnnotations:
+    prometheus.io/port: "15020"
+    prometheus.io/scrape: "true"
+    prometheus.io/path: "/stats/prometheus"
+    inject.istio.io/templates: "gateway"
+    proxy.istio.io/config: |
+      terminationDrainDuration: 60s
+
+  # Define the security context for the pod.
+  # If unset, this will be automatically set to the minimum privileges required to bind to port 80 and 443.
+  # On Kubernetes 1.22+, this only requires the `net.ipv4.ip_unprivileged_port_start` sysctl.
+  securityContext: {}
+  containerSecurityContext: {}
+
+  service:
+    # Type of service. Set to "None" to disable the service entirely
+    type: LoadBalancer
+    ports:
+    - name: status-port
+      nodePort: 30011
+      port: 15021
+      targetPort: 15021
+    - name: http2
+      nodePort: 30012
+      port: 80
+      targetPort: 8080
+    - name: https
+      port: 443
+      targetPort: 8443
+      nodePort: 30013
+    annotations: {}
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    externalTrafficPolicy: ""
+    externalIPs: []
+    ipFamilyPolicy: ""
+    ipFamilies: []
+    ## Whether to automatically allocate NodePorts (only for LoadBalancers).
+    # allocateLoadBalancerNodePorts: false
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 2000m
+      memory: 1024Mi
+
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 1
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: {}
+    autoscaleBehavior: {}
+    
+  tls:
+    key_file: ""
+    cert_file: ""
+
+  # Pod environment variables
+  env:
+    WASM_INSECURE_REGISTRIES: docker.io
+    CLUSTER_NAME_ACCOUNT_SERVICE: outbound_account_service
+    CLUSTER_NAME_GATEWAY: outbound_gateway
+    ROUTE_GET_USER_BY_EXT_ID: /api/v1/organizations/users/external
+    ROUTE_GET_PAT_BY_HASH: /api/v1/personal_access_tokens
+    JWT_TTL_GETI: 60m
+    CACHE_TTL: 1m
+    UNAUTHORIZED_URLS: /api/v1/profile,/api/v1/logout,/api/v1/onboarding/user,/api/v1/feature_flags
+    
+  # Deployment Update strategy
+  strategy: {}
+
+  # Sets the Deployment minReadySeconds value
+  minReadySeconds:
+
+  # Optionally configure a custom readinessProbe. By default the control plane
+  # automatically injects the readinessProbe. If you wish to override that
+  # behavior, you may define your own readinessProbe here.
+  readinessProbe: {}
+
+  # Labels to apply to all resources
+  labels: {}
+
+  # Annotations to apply to all resources
+  annotations: {}
+
+  nodeSelector: {}
+
+  tolerations: []
+
+  topologySpreadConstraints: []
+
+  affinity: {}
+
+  # If specified, the gateway will act as a network gateway for the given network.
+  networkGateway: ""
+
+  # Specify image pull policy if default behavior isn't desired.
+  # Default behavior: latest images will be Always else IfNotPresent
+  imagePullPolicy: "IfNotPresent"
+
+  imagePullSecrets:
+    - regcred
+
+  # This value is used to configure a Kubernetes PodDisruptionBudget for the gateway.
+  #
+  # By default, the `podDisruptionBudget` is disabled (set to `{}`),
+  # which means that no PodDisruptionBudget resource will be created.
+  #
+  # To enable the PodDisruptionBudget, configure it by specifying the
+  # `minAvailable` or `maxUnavailable`. For example, to set the
+  # minimum number of available replicas to 1, you can update this value as follows:
+  #
+  # podDisruptionBudget:
+  #   minAvailable: 1
+  #
+  # Or, to allow a maximum of 1 unavailable replica, you can set:
+  #
+  # podDisruptionBudget:
+  #   maxUnavailable: 1
+  #
+  # You can also specify the `unhealthyPodEvictionPolicy` field, and the valid values are `IfHealthyBudget` and `AlwaysAllow`.
+  # For example, to set the `unhealthyPodEvictionPolicy` to `AlwaysAllow`, you can update this value as follows:
+  #
+  # podDisruptionBudget:
+  #   minAvailable: 1
+  #   unhealthyPodEvictionPolicy: AlwaysAllow
+  #
+  # To disable the PodDisruptionBudget, you can leave it as an empty object `{}`:
+  #
+  # podDisruptionBudget: {}
+  #
+  podDisruptionBudget: {}
+
+  # Sets the per-pod terminationGracePeriodSeconds setting.
+  terminationGracePeriodSeconds: 70
+
+  # A list of `Volumes` added into the Gateway Pods. See
+  # https://kubernetes.io/docs/concepts/storage/volumes/.
+  volumes:
+    - name: plugin-storage
+      emptyDir: {}
+
+  # A list of `VolumeMounts` added into the Gateway Pods. See
+  # https://kubernetes.io/docs/concepts/storage/volumes/.
+  volumeMounts:
+    - name: plugin-storage
+      mountPath: "/api_gateway"
+      readOnly: true
+
+  # Configure this to a higher priority class in order to make sure your Istio gateway pods
+  # will not be killed because of low priority class.
+  # Refer to https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/#priorityclass
+  # for more detail.
+  priorityClassName: ""
+
+  global:
+    registry_address: ""
+
+  api_gateway:
+    mountPath: "/api_gateway"
+    feature_flags_data:
+      "FEATURE_FLAG_ALLOW_EXTERNAL_KEY_PROJECT_IMPORT": "true"
+      "FEATURE_FLAG_AMBIENT_MESH": "false"
+      "FEATURE_FLAG_ANALYTICS_WORKFLOW_ID": "true"
+      "FEATURE_FLAG_ANOMALY_REDUCTION": "true"
+      "FEATURE_FLAG_CAMERA_VIDEO_UPLOAD": "false"
+      "FEATURE_FLAG_CLASSIFICATION_RANGES": "true"
+      "FEATURE_FLAG_CREDIT_SYSTEM": "false"
+      "FEATURE_FLAG_DECORD_VIDEO_DECODER": "false"
+      "FEATURE_FLAG_KEYPOINT_DETECTION": "false"
+      "FEATURE_FLAG_KEYPOINT_DETECTION_DATASET_IE": "false"
+      "FEATURE_FLAG_MAINTENANCE_BANNER": "false"
+      "FEATURE_FLAG_OBJECT_STORAGE_OP": "true"
+      "FEATURE_FLAG_OFFLINE_INSTALLATION": "true"
+      "FEATURE_FLAG_OIDC_CIDAAS": "false"
+      "FEATURE_FLAG_ORG_QUOTAS": "false"
+      "FEATURE_FLAG_OTX_VERSION_SELECTION": "true"
+      "FEATURE_FLAG_OVMS_DEPLOYMENT_PACKAGE": "true"
+      "FEATURE_FLAG_SAAS_REQUIRE_INVITATION_LINK": "true"
+      "FEATURE_FLAG_MANAGE_USERS": "false"
+      "FEATURE_FLAG_MANAGE_USERS_ROLES": "true"
+      "FEATURE_FLAG_ACC_SVC_MOD": "false"
+      "FEATURE_FLAG_STORAGE_SIZE_COMPUTATION": "true"
+      "FEATURE_FLAG_SUPPORT_CORS": "false"
+      "FEATURE_FLAG_UPLOAD_OTE_WEIGHTS": "true"
+      "FEATURE_FLAG_USER_ONBOARDING": "false"
+      "FEATURE_FLAG_VISUAL_PROMPT_SERVICE": "true"
+      "FEATURE_FLAG_WORKSPACE_ACTIONS": "false"
+      "FEATURE_FLAG_REQ_ACCESS": "false"
+      "FEATURE_FLAG_RETAIN_TRAINING_ARTIFACTS": "false"
+      "FEATURE_FLAG_ASYNCHRONOUS_MEDIA_PREPROCESSING": "false"
+
+  jwtRules:
+    issuer: "https://127.0.0.1/dex"
+    jwksUri: "http://impt-dex.impt.svc.cluster.local:5556/dex/keys"
+    audiences: []
+
+  external_token_auth_policy:
+    rules:
+      - to:
+          - operation:
+              methods: [ "GET", "HEAD" ]
+              notPaths:
+                - "/api/v1/feature_flags*"
+                - "/api/v1/users/request_password_reset*"
+                - "/api/v1/users/reset_password*"
+                - "/api/v1/users/confirm_registration*"
+                - "/api/v1/service_accounts/access_token*"
+                - "/confirm-action/registration/reset-password"
+                - "/robots.txt"
+                - "/registration*"
+                - "/user_email_form.html"
+                - "/smtp4dev/*"
+                - "/deployment-config.json"
+                - "/intel-admin/deployment-config.json"
+              notPorts:
+                - "8080"
+        from:
+          - source:
+              requestPrincipals:
+                - '*'  # require ANY JWT Token (RequestAuthentication ensures that only Dex JWT is allowed)
+      - to:
+          - operation:
+              methods: [ "POST", "PUT", "DELETE", "PATCH" ]
+              notPaths:
+                - "/api/v1/feature_flags*"
+                - "/api/v1/users/request_password_reset*"
+                - "/api/v1/users/reset_password*"
+                - "/api/v1/users/confirm_registration*"
+                - "/api/v1/service_accounts/access_token*"
+                - "/confirm-action/registration/reset-password"
+                - "/robots.txt"
+                - "/registration*"
+                - "/user_email_form.html"
+                - "/smtp4dev/*"
+                - "/deployment-config.json"
+                - "/intel-admin/deployment-config.json"
+              notPorts:
+                - "8080"
+        from:
+          - source:
+              requestPrincipals:
+                - '*'  # require ANY JWT Token (RequestAuthentication ensures that only Dex JWT is allowed)
+        when:
+          - key: request.headers[x-geti-csrf-protection]
+            values: [ "1" ]
+      - to:
+          - operation:
+              methods: [ "POST", "PUT", "DELETE", "PATCH" ]
+              paths:
+                - "/api/v1/grafana*"
+              notPorts:
+                - "8080"
+        from:
+          - source:
+              requestPrincipals:
+                - '*'  # require ANY JWT Token (RequestAuthentication ensures that only Dex JWT is allowed)
+
+  anonymous_auth_policy:
+    rules:
+      - to:
+          - operation:
+              notPaths:
+                - "/api/*"
+          - operation:
+              methods: [ "GET", "HEAD" ]
+              paths:
+                - "/api/v1/feature_flags*"
+                - "/api/v1/users/request_password_reset*"
+                - "/api/v1/users/reset_password*"
+                - "/api/v1/users/confirm_registration*"
+                - "/api/v1/service_accounts/access_token*"
+                - "/confirm-action/registration/reset-password"
+                - "/robots.txt"
+                - "/registration*"
+                - "/user_email_form.html"
+                - "/smtp4dev/*"
+                - "/deployment-config.json"
+                - "/intel-admin/deployment-config.json"
+      - to:
+          - operation:
+              notPaths:
+                - "/api/*"
+          - operation:
+              methods: [ "POST", "PUT", "DELETE", "PATCH" ]
+              paths:
+                - "/api/v1/feature_flags*"
+                - "/api/v1/users/request_password_reset*"
+                - "/api/v1/users/reset_password*"
+                - "/api/v1/users/confirm_registration*"
+                - "/api/v1/service_accounts/access_token*"
+                - "/confirm-action/registration/reset-password"
+                - "/robots.txt"
+                - "/registration*"
+                - "/user_email_form.html"
+                - "/smtp4dev/*"
+                - "/deployment-config.json"
+                - "/intel-admin/deployment-config.json"
+        when:
+          - key: request.headers[x-geti-csrf-protection]
+            values: [ "1" ]
