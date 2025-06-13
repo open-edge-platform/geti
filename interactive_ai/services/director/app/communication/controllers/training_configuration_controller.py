@@ -11,13 +11,15 @@ from storage.repos.partial_training_configuration_repo import PartialTrainingCon
 
 from geti_telemetry_tools import unified_tracing
 from geti_types import ID, ProjectIdentifier
-from iai_core.repos import TaskNodeRepo
+from iai_core.entities.annotation_scene_state import AnnotationState
+from iai_core.repos import AnnotationSceneStateRepo, DatasetStorageRepo, TaskNodeRepo
 
 
 class TrainingConfigurationRESTController:
-    @staticmethod
+    @classmethod
     @unified_tracing
     def get_configuration(
+        cls,
         project_identifier: ProjectIdentifier,
         task_id: ID | None = None,
         model_manifest_id: str | None = None,
@@ -63,9 +65,14 @@ class TrainingConfigurationRESTController:
             )
             return TrainingConfigurationRESTViews.training_configuration_to_rest(training_configuration=model_config)
 
+        dataset_size = cls._get_dataset_size(
+            project_identifier=project_identifier,
+            task_id=task_id,
+        )
         if model_manifest_id is None:
             training_configuration_repo = PartialTrainingConfigurationRepo(project_identifier)
             task_level_config = training_configuration_repo.get_task_only_configuration(task_id)
+            task_level_config.global_parameters.dataset_preparation.subset_split.dataset_size = dataset_size
             # Only task level configuration can be retrieved
             return TrainingConfigurationRESTViews.training_configuration_to_rest(
                 training_configuration=task_level_config
@@ -77,6 +84,7 @@ class TrainingConfigurationRESTController:
             task_id=task_id,
             model_manifest_id=model_manifest_id,
         )
+        full_config.global_parameters.dataset_preparation.subset_split.dataset_size = dataset_size
         return TrainingConfigurationRESTViews.training_configuration_to_rest(training_configuration=full_config)
 
     @classmethod
@@ -131,3 +139,17 @@ class TrainingConfigurationRESTController:
             validate_full_config=False,
         )
         training_configuration_repo.save(new_config)
+
+    @staticmethod
+    def _get_dataset_size(project_identifier: ProjectIdentifier, task_id: ID) -> int:
+        annotation_states = [
+            AnnotationState.ANNOTATED,
+            AnnotationState.PARTIALLY_ANNOTATED,
+        ]
+        dataset_storage = DatasetStorageRepo(project_identifier).get_one(extra_filter={"used_for_training": True})
+        repo = AnnotationSceneStateRepo(dataset_storage.identifier)
+        n_annotated_images = repo.count_images_state_for_task(annotation_states=annotation_states, task_id=task_id)
+        n_annotated_frames = repo.count_video_frames_state_for_task(
+            annotation_states=annotation_states, task_id=task_id
+        )
+        return n_annotated_images + n_annotated_frames

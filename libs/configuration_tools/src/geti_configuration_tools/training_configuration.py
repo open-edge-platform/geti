@@ -28,6 +28,14 @@ class SubsetSplit(BaseModel):
         default=True, title="Auto selection", description="Whether to automatically select data for each subset"
     )
     remixing: bool = Field(default=False, title="Remixing", description="Whether to remix data between subsets")
+    dataset_size: int | None = Field(
+        ge=0,
+        default=None,
+        title="Dataset size",
+        description="Total size of the dataset (read-only parameter, not configurable by users)",
+        exclude=True,
+        json_schema_extra={"default_value": None},
+    )
 
     @model_validator(mode="after")
     def validate_subsets(self) -> "SubsetSplit":
@@ -66,6 +74,22 @@ class MaxAnnotationPixels(BaseModel):
     )
 
 
+class MinAnnotationObjects(BaseModel):
+    """Parameters for maximum annotation objects."""
+
+    enable: bool = Field(
+        default=False,
+        title="Enable minimum annotation objects filtering",
+        description="Whether to apply minimum annotation objects filtering",
+    )
+    min_annotation_objects: int = Field(
+        gt=0,
+        default=1,
+        title="Minimum annotation objects",
+        description="Minimum number of objects in an annotation",
+    )
+
+
 class MaxAnnotationObjects(BaseModel):
     """Parameters for maximum annotation objects."""
 
@@ -90,6 +114,9 @@ class Filtering(BaseModel):
     )
     max_annotation_pixels: MaxAnnotationPixels = Field(
         title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+    )
+    min_annotation_objects: MinAnnotationObjects = Field(
+        title="Minimum annotation objects", description="Minimum number of objects in an annotation"
     )
     max_annotation_objects: MaxAnnotationObjects = Field(
         title="Maximum annotation objects", description="Maximum number of objects in an annotation"

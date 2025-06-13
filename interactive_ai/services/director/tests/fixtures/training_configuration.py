@@ -17,6 +17,7 @@ from geti_configuration_tools.training_configuration import (
     GlobalParameters,
     MaxAnnotationObjects,
     MaxAnnotationPixels,
+    MinAnnotationObjects,
     MinAnnotationPixels,
     PartialTrainingConfiguration,
     SubsetSplit,
@@ -51,10 +52,12 @@ def fxt_global_parameters():
                 test=10,
                 auto_selection=True,
                 remixing=False,
+                dataset_size=256,  # This is a read-only parameter, not configurable by users
             ),
             filtering=Filtering(
                 min_annotation_pixels=MinAnnotationPixels(enable=True, min_annotation_pixels=10),
                 max_annotation_pixels=MaxAnnotationPixels(enable=True, max_annotation_pixels=1000),
+                min_annotation_objects=MinAnnotationObjects(enable=True, min_annotation_objects=5),
                 max_annotation_objects=MaxAnnotationObjects(enable=True, max_annotation_objects=100),
             ),
         )
@@ -159,6 +162,26 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                         "value": 10,
                     },
                 ],
+                "min_annotation_objects": [
+                    {
+                        "default_value": False,
+                        "description": "Whether to apply minimum annotation objects filtering",
+                        "key": "enable",
+                        "name": "Enable minimum annotation objects filtering",
+                        "type": "bool",
+                        "value": True,
+                    },
+                    {
+                        "default_value": 1,
+                        "description": "Minimum number of objects in an annotation",
+                        "key": "min_annotation_objects",
+                        "max_value": None,
+                        "min_value": 0,
+                        "name": "Minimum annotation objects",
+                        "type": "int",
+                        "value": 5,
+                    },
+                ],
             },
             "subset_split": [
                 {
@@ -206,6 +229,16 @@ def fxt_training_configuration_task_level_rest_view(fxt_training_configuration_t
                     "name": "Remixing",
                     "type": "bool",
                     "value": False,
+                },
+                {
+                    "default_value": None,
+                    "description": "Total size of the dataset (read-only parameter, not configurable by users)",
+                    "key": "dataset_size",
+                    "max_value": None,
+                    "min_value": 0,
+                    "name": "Dataset size",
+                    "type": "int",
+                    "value": 256,
                 },
             ],
         },
@@ -292,6 +325,7 @@ def fxt_partial_training_configuration_manifest_level(fxt_mongo_id):
                     "training": 80,
                     "validation": 10,
                     "test": 10,
+                    "dataset_size": 256,  # Note: this is a read-only parameter, not configurable by users
                 }
             }
         },
@@ -499,6 +533,26 @@ def fxt_training_configuration_full_rest_view(
                         "value": 10,
                     },
                 ],
+                "min_annotation_objects": [
+                    {
+                        "default_value": False,
+                        "description": "Whether to apply minimum annotation objects filtering",
+                        "key": "enable",
+                        "name": "Enable minimum annotation objects filtering",
+                        "type": "bool",
+                        "value": True,
+                    },
+                    {
+                        "default_value": 1,
+                        "description": "Minimum number of objects in an annotation",
+                        "key": "min_annotation_objects",
+                        "max_value": None,
+                        "min_value": 0,
+                        "name": "Minimum annotation objects",
+                        "type": "int",
+                        "value": 5,
+                    },
+                ],
             },
             "subset_split": [
                 {
@@ -546,6 +600,16 @@ def fxt_training_configuration_full_rest_view(
                     "name": "Remixing",
                     "type": "bool",
                     "value": False,
+                },
+                {
+                    "default_value": None,
+                    "description": "Total size of the dataset (read-only parameter, not configurable by users)",
+                    "key": "dataset_size",
+                    "max_value": None,
+                    "min_value": 0,
+                    "name": "Dataset size",
+                    "type": "int",
+                    "value": 256,
                 },
             ],
         },
