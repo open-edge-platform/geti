@@ -161,6 +161,7 @@ spec:
   chart: oci://$REGISTRY/geti/helm/flyte-core
   version: $VERSION
   targetNamespace: flyte
+  timeout: 20m
   valuesContent: |-
     global:
       registry_address: "$REGISTRY"
