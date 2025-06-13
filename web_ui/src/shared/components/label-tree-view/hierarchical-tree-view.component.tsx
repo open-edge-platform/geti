@@ -9,11 +9,9 @@ import { LabelTreeViewItem, LabelTreeViewItemProps } from './label-tree-view-ite
 import classes from './hierarchical-tree-view.module.scss';
 
 export const HierarchicalTreeView = ({
-    labels,
+    treeItems,
     isEditable,
-    save,
-    addChild,
-    deleteItem,
+    actions,
     projectLabels,
     level = 0,
     options,
@@ -21,8 +19,6 @@ export const HierarchicalTreeView = ({
     treeValidationErrors,
     setValidationError,
 }: HierarchicalLabelTreeViewProps): JSX.Element => {
-    const reversedLabelList = [...labels].reverse();
-
     return (
         <ul
             className={`spectrum-TreeView ${isEditable ? 'spectrum-TreeView--thumbnail' : ''} ${classes.item}`}
@@ -31,13 +27,12 @@ export const HierarchicalTreeView = ({
                 paddingLeft: level && 'var(--spectrum-global-dimension-size-500)',
             }}
         >
-            {reversedLabelList.map((item: LabelTreeItem) => {
+            {treeItems.map((item: LabelTreeItem) => {
                 const labelTreeViewItemProps: LabelTreeViewItemProps = {
-                    save,
-                    addChild,
-                    deleteItem,
+                    actions,
                     setValidationError,
                     item,
+                    siblings: treeItems,
                     domains,
                     isEditable,
                     projectLabels,
@@ -53,12 +48,10 @@ export const HierarchicalTreeView = ({
                 return (
                     <LabelTreeViewItem key={item.id} {...labelTreeViewItemProps}>
                         <HierarchicalTreeView
-                            labels={item.children}
+                            treeItems={item.children}
                             isEditable={isEditable}
                             options={options}
-                            save={save}
-                            addChild={addChild}
-                            deleteItem={deleteItem}
+                            actions={actions}
                             projectLabels={projectLabels}
                             level={++level}
                             domains={domains}

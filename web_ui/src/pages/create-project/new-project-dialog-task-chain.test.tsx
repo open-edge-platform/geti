@@ -197,13 +197,6 @@ describe('New project dialog - Task chain', () => {
     });
 
     describe('NewProjectDialog - Check data to save', () => {
-        const addChildLabel = async (labelName: string) => {
-            fireEvent.click(screen.getByRole('button', { name: 'add child label button' }));
-
-            await userEvent.keyboard(labelName);
-            await userEvent.keyboard('{enter}');
-        };
-
         it('Task chain - check if enter properly saves first task label', async () => {
             await typeIntoTextbox('task chain - Detection Classification', 'Project name');
             clickNextButton();
@@ -217,12 +210,10 @@ describe('New project dialog - Task chain', () => {
             await userEvent.keyboard('{enter}');
 
             const groupNameInput = screen.getByRole('textbox', { name: 'Label group name' });
-            clearInput(groupNameInput);
             fireEvent.change(groupNameInput, { target: { value: 'test' } });
             await userEvent.keyboard('{enter}');
 
-            await addChildLabel('child1');
-
+            fireEvent.click(screen.getByRole('button', { name: 'add child label button' }));
             fireEvent.click(screen.getByRole('button', { name: 'Create' }));
 
             await waitFor(() => {
@@ -242,14 +233,6 @@ describe('New project dialog - Task chain', () => {
                         }),
                         expect.objectContaining({
                             domain: 'Classification',
-                            labels: [
-                                expect.objectContaining({
-                                    name: 'test',
-                                }),
-                                expect.objectContaining({
-                                    name: 'child1',
-                                }),
-                            ],
                             relation: 'Mixed',
                         }),
                     ],

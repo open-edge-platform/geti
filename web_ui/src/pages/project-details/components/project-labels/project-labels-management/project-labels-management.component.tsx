@@ -12,6 +12,7 @@ import {
     SetValidationProps,
     ValidationErrorType,
 } from '../../../../../core/labels/label-tree-view.interface';
+//TODO: przenieść to do folderu komponentu
 import { LabelsRelationType } from '../../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { isAnomalyDomain } from '../../../../../core/projects/domains';
@@ -19,6 +20,7 @@ import { LabelTreeView } from '../../../../../shared/components/label-tree-view/
 import {
     getLabelsWithAddedChild,
     getLabelWithoutDeleted,
+    getReorderedTree,
     getTreeWithUpdatedItem,
 } from '../../../../../shared/components/label-tree-view/utils';
 import { LABEL_TREE_TYPE } from '../../../../create-project/components/project-labels-management/label-tree-type.enum';
@@ -60,16 +62,22 @@ export const ProjectLabelsManagement = ({
     };
 
     const addItemHandler = (item?: LabelTreeItem) => {
-        item && setTaskLabelsHandler([...labelsTree, { ...item, state: LabelItemEditionState.NEW }]);
+        item && setTaskLabelsHandler([{ ...item, state: LabelItemEditionState.NEW }, ...labelsTree]);
     };
 
-    const addChild = (parentId: string, groupName: string, type: LabelItemType) => {
+    const addChild = (parentId: string | null, groupName: string, type: LabelItemType) => {
         setTaskLabelsHandler(getLabelsWithAddedChild(labelsTree, labelsTree, parentId, groupName, type));
     };
 
     const deleteItem = (deletedItem: LabelTreeItem) => {
         const updated = getLabelWithoutDeleted(labelsTree, deletedItem);
 
+        setTaskLabelsHandler(updated);
+    };
+
+    const reorder = (item: LabelTreeItem, mode: 'up' | 'down') => {
+        //TODO: there is also reordering in annotations! - maybe worth to share some code!
+        const updated = getReorderedTree(labelsTree, item, mode);
         setTaskLabelsHandler(updated);
     };
 
@@ -133,11 +141,14 @@ export const ProjectLabelsManagement = ({
             >
                 <LabelTreeView
                     labelsTree={labelsTree}
-                    save={saveHandler}
-                    deleteItem={deleteItem}
+                    actions={{
+                        save: saveHandler,
+                        deleteItem,
+                        addChild,
+                        reorder,
+                    }}
                     isInEditMode={isInEdition}
                     isHierarchicalMode={isHierarchicalMode}
-                    addChild={addChild}
                     domains={domains}
                     setValidationError={setValidationError}
                     type={Readonly.NO}

@@ -3,7 +3,12 @@
 
 import { fireEvent, screen, within } from '@testing-library/dom';
 
-import { LabelItemEditionState, LabelItemType, LabelTreeItem } from '../../../../core/labels/label-tree-view.interface';
+import {
+    LabelItemEditionState,
+    LabelItemType,
+    LabelTreeItem,
+    TreeItemActions,
+} from '../../../../core/labels/label-tree-view.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { getMockedTreeGroup, getMockedTreeLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
 import { providersRender as render } from '../../../../test-utils/required-providers-render';
@@ -14,7 +19,12 @@ const checkNumberOfMenuActions = (itemId: string, type: 'label' | 'group', quant
         quantity
     );
 };
-
+const mockedActions: TreeItemActions = {
+    save: jest.fn,
+    addChild: jest.fn(),
+    deleteItem: jest.fn(),
+    reorder: jest.fn(),
+};
 const saveHandler = jest.fn();
 const deleteItemHandler = jest.fn();
 
@@ -22,10 +32,9 @@ describe('LabelTreeViewItem', () => {
     const domains = [DOMAIN.DETECTION];
 
     const defaultItemProps: Omit<LabelTreeViewItemProps, 'item'> = {
-        save: jest.fn(),
-        addChild: jest.fn(),
+        actions: mockedActions,
         projectLabels: [],
-        deleteItem: jest.fn(),
+        siblings: [],
         isEditable: true,
         isMixedRelation: false,
         isCreationInNewProject: false,
@@ -48,10 +57,9 @@ describe('LabelTreeViewItem', () => {
         render(
             <LabelTreeViewItem
                 item={mockedLabel}
-                save={saveHandler}
-                addChild={jest.fn()}
-                deleteItem={jest.fn()}
+                actions={{ ...mockedActions, save: saveHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isEditable={true}
                 domains={[DOMAIN.CLASSIFICATION]}
                 isMixedRelation={true}
@@ -71,10 +79,9 @@ describe('LabelTreeViewItem', () => {
         render(
             <LabelTreeViewItem
                 item={mockedLabel}
-                save={saveHandler}
-                addChild={jest.fn()}
-                deleteItem={deleteItemHandler}
+                actions={{ ...mockedActions, save: saveHandler, deleteItem: deleteItemHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isEditable={true}
                 domains={domains}
                 isMixedRelation={true}
@@ -98,12 +105,11 @@ describe('Delete group', () => {
     const domains = [DOMAIN.DETECTION];
 
     const defaultItemProps: Omit<LabelTreeViewItemProps, 'item'> = {
-        save: saveHandler,
-        addChild: jest.fn(),
+        actions: { save: saveHandler, addChild: jest.fn(), deleteItem: deleteItemHandler, reorder: jest.fn() },
         projectLabels: [],
         isCreationInNewProject: false,
-        deleteItem: deleteItemHandler,
         domains,
+        siblings: [],
         isEditable: true,
         isMixedRelation: false,
         validationErrors: {},
@@ -161,10 +167,9 @@ describe('Delete labels', () => {
         render(
             <LabelTreeViewItem
                 item={item}
-                save={saveHandler}
-                addChild={jest.fn()}
-                deleteItem={deleteItemHandler}
+                actions={{ ...mockedActions, save: saveHandler, deleteItem: deleteItemHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isCreationInNewProject={true}
                 domains={domains}
                 isEditable={true}
@@ -184,10 +189,9 @@ describe('Delete labels', () => {
         render(
             <LabelTreeViewItem
                 item={item}
-                save={saveHandler}
-                addChild={jest.fn()}
-                deleteItem={deleteItemHandler}
+                actions={{ ...mockedActions, save: saveHandler, deleteItem: deleteItemHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isCreationInNewProject={false}
                 domains={domains}
                 isEditable={true}
@@ -207,10 +211,9 @@ describe('Delete labels', () => {
         render(
             <LabelTreeViewItem
                 item={item}
-                save={saveHandler}
-                addChild={jest.fn()}
+                actions={{ ...mockedActions, save: saveHandler }}
                 projectLabels={[]}
-                deleteItem={jest.fn()}
+                siblings={[]}
                 isCreationInNewProject={false}
                 domains={domains}
                 isEditable={true}
@@ -251,10 +254,9 @@ describe('Open close nodes', () => {
         render(
             <LabelTreeViewItem
                 item={item}
-                save={saveHandler}
-                addChild={addChildHandler}
-                deleteItem={jest.fn()}
+                actions={{ ...mockedActions, save: saveHandler, addChild: addChildHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isCreationInNewProject={false}
                 domains={domains}
                 isEditable={true}
@@ -279,14 +281,19 @@ describe('Open close nodes', () => {
 });
 
 describe('LabelTreeViewItem - menu', () => {
+    const services = {
+        featureFlags: {
+            FEATURE_FLAG_LABELS_REORDERING: false,
+        },
+    };
+
     describe('Creation', () => {
         const getItemComponent = (item: LabelTreeItem, domains: DOMAIN[], isMixedRelation = false): JSX.Element => (
             <LabelTreeViewItem
                 item={item}
-                save={saveHandler}
-                addChild={jest.fn()}
+                actions={{ ...mockedActions, save: saveHandler }}
                 projectLabels={[]}
-                deleteItem={jest.fn()}
+                siblings={[]}
                 isCreationInNewProject={true}
                 domains={domains}
                 isEditable={true}
@@ -299,7 +306,7 @@ describe('LabelTreeViewItem - menu', () => {
         it('Classification flat structure - delete', async () => {
             const item = getMockedTreeLabel({ name: 'test' });
 
-            render(getItemComponent(item, [DOMAIN.CLASSIFICATION]));
+            render(getItemComponent(item, [DOMAIN.CLASSIFICATION]), services);
 
             expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
 
@@ -309,7 +316,7 @@ describe('LabelTreeViewItem - menu', () => {
         it('Classification hierarchical structure - label - add group, delete', async () => {
             const item = getMockedTreeLabel({ name: 'test' });
 
-            render(getItemComponent(item, [DOMAIN.CLASSIFICATION], true));
+            render(getItemComponent(item, [DOMAIN.CLASSIFICATION], true), services);
 
             expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: 'add child group button' })).toBeInTheDocument();
@@ -319,7 +326,7 @@ describe('LabelTreeViewItem - menu', () => {
         it('Classification hierarchical structure - group - add label, delete', async () => {
             const item = getMockedTreeGroup({ name: 'test' });
 
-            render(getItemComponent(item, [DOMAIN.CLASSIFICATION], true));
+            render(getItemComponent(item, [DOMAIN.CLASSIFICATION], true), services);
 
             expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
             expect(screen.getByRole('button', { name: 'add child label button' })).toBeInTheDocument();
@@ -329,7 +336,7 @@ describe('LabelTreeViewItem - menu', () => {
         it('Detection - delete', async () => {
             const item = getMockedTreeLabel({ name: 'test' });
 
-            render(getItemComponent(item, [DOMAIN.DETECTION]));
+            render(getItemComponent(item, [DOMAIN.DETECTION]), services);
 
             expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
             checkNumberOfMenuActions(item.id, 'label', 1);
@@ -338,7 +345,7 @@ describe('LabelTreeViewItem - menu', () => {
         it('Segmentation - delete', async () => {
             const item = getMockedTreeLabel({ name: 'test' });
 
-            render(getItemComponent(item, [DOMAIN.SEGMENTATION]));
+            render(getItemComponent(item, [DOMAIN.SEGMENTATION]), services);
 
             expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
             checkNumberOfMenuActions(item.id, 'label', 1);
@@ -349,10 +356,9 @@ describe('LabelTreeViewItem - menu', () => {
         const getItemComponent = (item: LabelTreeItem, domains: DOMAIN[], isMixedRelation = false): JSX.Element => (
             <LabelTreeViewItem
                 item={item}
-                save={saveHandler}
-                addChild={jest.fn()}
-                deleteItem={jest.fn()}
+                actions={{ ...mockedActions, save: saveHandler }}
                 projectLabels={[]}
+                siblings={[]}
                 isCreationInNewProject={false}
                 domains={domains}
                 isEditable={true}
@@ -366,7 +372,7 @@ describe('LabelTreeViewItem - menu', () => {
             it('New group - add, delete', async () => {
                 const item = getMockedTreeGroup({ name: 'test', state: LabelItemEditionState.NEW });
 
-                render(getItemComponent(item, [DOMAIN.CLASSIFICATION]));
+                render(getItemComponent(item, [DOMAIN.CLASSIFICATION]), services);
 
                 expect(screen.getByRole('button', { name: 'add child label button' })).toBeInTheDocument();
                 expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
@@ -376,7 +382,7 @@ describe('LabelTreeViewItem - menu', () => {
             it('Group - add, delete', async () => {
                 const item = getMockedTreeGroup({ name: 'test', state: LabelItemEditionState.IDLE });
 
-                render(getItemComponent(item, [DOMAIN.CLASSIFICATION]));
+                render(getItemComponent(item, [DOMAIN.CLASSIFICATION]), services);
 
                 expect(screen.getByRole('button', { name: 'add child label button' })).toBeInTheDocument();
                 expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
@@ -397,7 +403,7 @@ describe('LabelTreeViewItem - menu', () => {
         it('Edition - Detection - delete', async () => {
             const item = getMockedTreeLabel({ name: 'test' });
 
-            render(getItemComponent(item, [DOMAIN.DETECTION]));
+            render(getItemComponent(item, [DOMAIN.DETECTION]), services);
 
             expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
             checkNumberOfMenuActions(item.id, 'label', 1);
@@ -406,7 +412,7 @@ describe('LabelTreeViewItem - menu', () => {
         it('Edition - Segmentation - delete', async () => {
             const item = getMockedTreeLabel({ name: 'test' });
 
-            render(getItemComponent(item, [DOMAIN.SEGMENTATION]));
+            render(getItemComponent(item, [DOMAIN.SEGMENTATION]), services);
 
             expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
             checkNumberOfMenuActions(item.id, 'label', 1);
@@ -424,7 +430,7 @@ describe('LabelTreeViewItem - menu', () => {
             it('First task - label - delete', async () => {
                 const item = getMockedTreeLabel({ name: 'test' });
 
-                render(getItemComponent(item, [DOMAIN.DETECTION]));
+                render(getItemComponent(item, [DOMAIN.DETECTION]), services);
 
                 expect(screen.getByRole('button', { name: 'delete' })).toBeInTheDocument();
                 checkNumberOfMenuActions(item.id, 'label', 1);

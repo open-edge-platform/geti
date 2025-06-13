@@ -5,11 +5,9 @@ import { FlatLabelTreeViewProps, LabelItemType, LabelTreeItem } from '../../../c
 import { LabelTreeViewItem } from './label-tree-view-item/label-tree-view-item.component';
 
 export const FlatTreeView = ({
-    labels,
+    treeItems,
     isEditable,
-    save,
-    addChild,
-    deleteItem,
+    actions,
     projectLabels,
     width,
     isCreationInNewProject = false,
@@ -17,23 +15,21 @@ export const FlatTreeView = ({
     treeValidationErrors,
     setValidationError,
 }: FlatLabelTreeViewProps): JSX.Element => {
-    const onlyLabels = labels.length > 0 ? (labels[0].type === LabelItemType.GROUP ? labels[0].children : labels) : [];
-
-    const reversedLabelList = [...onlyLabels].reverse();
+    const labels =
+        treeItems.length > 0 ? (treeItems[0].type === LabelItemType.GROUP ? treeItems[0].children : treeItems) : [];
 
     return (
         <ul
             className={`spectrum-TreeView ${isEditable ? 'spectrum-TreeView--thumbnail' : ''}`}
             style={{ margin: 0, maxWidth: width || '100%' }}
         >
-            {reversedLabelList.map((label: LabelTreeItem) => {
+            {labels.map((label: LabelTreeItem) => {
                 return (
                     <LabelTreeViewItem
                         key={label.id}
                         item={label}
-                        save={save}
-                        addChild={addChild}
-                        deleteItem={deleteItem}
+                        siblings={labels}
+                        actions={actions}
                         projectLabels={projectLabels}
                         isCreationInNewProject={isCreationInNewProject}
                         domains={domains}
