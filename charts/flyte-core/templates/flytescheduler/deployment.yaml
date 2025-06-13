@@ -100,7 +100,7 @@ spec:
               - configMap:
                   name: flyte-scheduler-config
               - secret:
-                  name: "{{ .Release.Namespace }}-postgresql"
+                  name: "impt-postgresql"
         - name: auth
           secret:
             secretName: flyte-secret-auth

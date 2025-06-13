@@ -48,7 +48,7 @@ imagePullSecrets: []
 nameOverride: ""
 
 # Overrides the chart's computed fullname
-fullnameOverride: ""
+fullnameOverride: "dcgm-exporter"
 
 # Overrides the deployment namespace
 namespaceOverride: ""

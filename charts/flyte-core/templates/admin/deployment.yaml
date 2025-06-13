@@ -76,7 +76,7 @@ spec:
           command: [ 'sh', '-c', "until nc -w 5 -z $KAFKA_HOST $KAFKA_PORT; do echo wait...; sleep 2; done;" ]
           env:
             - name: "KAFKA_HOST"
-              value: "{{ .Release.Namespace }}-kafka.{{ .Release.Namespace }}.svc.cluster.local"
+              value: "impt-kafka.{{ .Values.main_namespace }}.svc.cluster.local"
             - name: "KAFKA_PORT"
               value: "9092"
       containers:
