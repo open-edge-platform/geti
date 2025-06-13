@@ -27,12 +27,12 @@ evaluation = [
 ]
 
 shard-dataset = [
-    "datumaro==1.10.0",
+    "datumaro==1.8.0",
 ]
 
 datumaro-conversion = [
     "media-utils",
-    "datumaro==1.10.0",
+    "datumaro==1.8.0",
 ]
 
 

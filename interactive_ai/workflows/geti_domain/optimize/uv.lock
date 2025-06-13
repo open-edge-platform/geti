@@ -563,7 +563,7 @@ wheels = [
 
 [[package]]
 name = "datumaro"
-version = "1.10.0"
+version = "1.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -584,7 +584,6 @@ dependencies = [
     { name = "ovmsclient" },
     { name = "pandas" },
     { name = "pillow" },
-    { name = "portalocker" },
     { name = "protobuf" },
     { name = "pyarrow" },
     { name = "pycocotools" },
@@ -602,11 +601,11 @@ dependencies = [
     { name = "tritonclient", extra = ["all"] },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/50/62/a915845b2d650ec2e2dc9f07716872228f898ff4ee7c45a729304295b3b7/datumaro-1.10.0.tar.gz", hash = "sha256:408a07fb4c74a2d832d4493c9c8001283cc0f40b02fdddc26b9e05ffb6ee8477", size = 567726 }
+sdist = { url = "https://files.pythonhosted.org/packages/12/7c/0d29f21a68e9e1543f87cb78213e5870f499cf28bee850fa519ba491e31a/datumaro-1.8.0.tar.gz", hash = "sha256:2a8ef4bd36f968ded6b6f4f56fe974431cd7bd4d1e3d9f75e447b1c928fa1dbc", size = 564692 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/46/62/3bb463635ebac05b2603416e7c79e56ac6af7c401056246ab448dc09c8f8/datumaro-1.10.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1e7cee5d990cf85c246e33b8dfe21a67298fbb2a8886aa5607d97924087a0b97", size = 1167120 },
-    { url = "https://files.pythonhosted.org/packages/fc/a1/3aa0975be54a51480f83a6f7315e2d6dc31b1b446847faa4cc34589db2f8/datumaro-1.10.0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:d2f41647ed54bb09ca306614203ae90f69e65e89e18d7c36ed0f75c69278ee6a", size = 1682767 },
-    { url = "https://files.pythonhosted.org/packages/84/46/035835142298a8eacea7bdc19a7b0949a7d5d33a480814666741c39a63ba/datumaro-1.10.0-cp310-cp310-win_amd64.whl", hash = "sha256:2823e930c1e4ca2c75046354d6214401498eff5f3c27c63d7a62d84958be56d5", size = 981121 },
+    { url = "https://files.pythonhosted.org/packages/04/a0/ada181dd1cb3d05f88ef24e6eb39c30e0065cfc27758f2c404fdcb715b9c/datumaro-1.8.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:74a4f3f5a0acecb331c91a4eac2127bf28fea90ece75fc98a51f81eaa65d8a4a", size = 1137441 },
+    { url = "https://files.pythonhosted.org/packages/77/54/e1d97265dfbd6024b5166bda01289a4f630b6bae727d1dcb408b2ae4c1b2/datumaro-1.8.0-cp310-cp310-musllinux_1_1_x86_64.whl", hash = "sha256:f3fe0af8d503e36479e97a53295571008d38826d2a6483fb3747ae1ff24dde96", size = 1654376 },
+    { url = "https://files.pythonhosted.org/packages/d4/25/5ad4d1f77ee40860b8e78265f128c69b4aa28c9011f4d8b12968c91ec342/datumaro-1.8.0-cp310-cp310-win_amd64.whl", hash = "sha256:673556ebc0090956029a67ef29c0fe76681c4414d2c3a3ffb5890851946c4b0d", size = 954511 },
 ]
 
 [[package]]
@@ -2282,20 +2281,19 @@ dev = [
 
 [[package]]
 name = "orjson"
-version = "3.10.7"
+version = "3.10.5"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/9e/03/821c8197d0515e46ea19439f5c5d5fd9a9889f76800613cfac947b5d7845/orjson-3.10.7.tar.gz", hash = "sha256:75ef0640403f945f3a1f9f6400686560dbfb0fb5b16589ad62cd477043c4eee3", size = 5056450 }
+sdist = { url = "https://files.pythonhosted.org/packages/f9/ba/a506ace6d9e4cb96cb4bed678fddc2605b8befe7fbbbecc309af1364b7c4/orjson-3.10.5.tar.gz", hash = "sha256:7a5baef8a4284405d96c90c7c62b755e9ef1ada84c2406c24a9ebec86b89f46d", size = 5249974 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/49/12/60931cf808b9334f26210ab496442f4a7a3d66e29d1cf12e0a01857e756f/orjson-3.10.7-cp310-cp310-macosx_10_15_x86_64.macosx_11_0_arm64.macosx_10_15_universal2.whl", hash = "sha256:74f4544f5a6405b90da8ea724d15ac9c36da4d72a738c64685003337401f5c12", size = 251312 },
-    { url = "https://files.pythonhosted.org/packages/fe/0e/efbd0a2d25f8e82b230eb20b6b8424be6dd95b6811b669be9af16234b6db/orjson-3.10.7-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:34a566f22c28222b08875b18b0dfbf8a947e69df21a9ed5c51a6bf91cfb944ac", size = 148124 },
-    { url = "https://files.pythonhosted.org/packages/dd/47/1ddff6e23fe5f4aeaaed996a3cde422b3eaac4558c03751723e106184c68/orjson-3.10.7-cp310-cp310-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:bf6ba8ebc8ef5792e2337fb0419f8009729335bb400ece005606336b7fd7bab7", size = 147277 },
-    { url = "https://files.pythonhosted.org/packages/04/da/d03d72b54bdd60d05de372114abfbd9f05050946895140c6ff5f27ab8f49/orjson-3.10.7-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:ac7cf6222b29fbda9e3a472b41e6a5538b48f2c8f99261eecd60aafbdb60690c", size = 152955 },
-    { url = "https://files.pythonhosted.org/packages/7f/7e/ef8522dbba112af6cc52227dcc746dd3447c7d53ea8cea35740239b547ee/orjson-3.10.7-cp310-cp310-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:de817e2f5fc75a9e7dd350c4b0f54617b280e26d1631811a43e7e968fa71e3e9", size = 163955 },
-    { url = "https://files.pythonhosted.org/packages/b6/bc/fbd345d771a73cacc5b0e774d034cd081590b336754c511f4ead9fdc4cf1/orjson-3.10.7-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:348bdd16b32556cf8d7257b17cf2bdb7ab7976af4af41ebe79f9796c218f7e91", size = 141896 },
-    { url = "https://files.pythonhosted.org/packages/82/0a/1f09c12d15b1e83156b7f3f621561d38650fe5b8f39f38f04a64de1a87fc/orjson-3.10.7-cp310-cp310-musllinux_1_2_aarch64.whl", hash = "sha256:479fd0844ddc3ca77e0fd99644c7fe2de8e8be1efcd57705b5c92e5186e8a250", size = 170166 },
-    { url = "https://files.pythonhosted.org/packages/a6/d8/eee30caba21a8d6a9df06d2519bb0ecd0adbcd57f2e79d360de5570031cf/orjson-3.10.7-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:fdf5197a21dd660cf19dfd2a3ce79574588f8f5e2dbf21bda9ee2d2b46924d84", size = 167804 },
-    { url = "https://files.pythonhosted.org/packages/44/fe/d1d89d3f15e343511417195f6ccd2bdeb7ebc5a48a882a79ab3bbcdf5fc7/orjson-3.10.7-cp310-none-win32.whl", hash = "sha256:d374d36726746c81a49f3ff8daa2898dccab6596864ebe43d50733275c629175", size = 143010 },
-    { url = "https://files.pythonhosted.org/packages/88/8c/0e7b8d5a523927774758ac4ce2de4d8ca5dda569955ba3aeb5e208344eda/orjson-3.10.7-cp310-none-win_amd64.whl", hash = "sha256:cb61938aec8b0ffb6eef484d480188a1777e67b05d58e41b435c74b9d84e0b9c", size = 137306 },
+    { url = "https://files.pythonhosted.org/packages/b3/7e/df5ca5a663af11e1b825c7909c31ed7db2dad8aaf0cced81ac03d1dabc2b/orjson-3.10.5-cp310-cp310-macosx_10_15_x86_64.macosx_11_0_arm64.macosx_10_15_universal2.whl", hash = "sha256:545d493c1f560d5ccfc134803ceb8955a14c3fcb47bbb4b2fee0232646d0b932", size = 258729 },
+    { url = "https://files.pythonhosted.org/packages/7b/6d/7aafbe1f7e3c6e314c34e2201d7a0c09670753446351edbd939aa5efcd4e/orjson-3.10.5-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f4324929c2dd917598212bfd554757feca3e5e0fa60da08be11b4aa8b90013c1", size = 152635 },
+    { url = "https://files.pythonhosted.org/packages/88/e3/adfce728f25dd40afaa54f90d193b3cd9892d8b0037fe8af057aa00c0957/orjson-3.10.5-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:8c13ca5e2ddded0ce6a927ea5a9f27cae77eee4c75547b4297252cb20c4d30e6", size = 155820 },
+    { url = "https://files.pythonhosted.org/packages/12/6c/69cd85db2486a4372525b5174a274ef9bbc0c997c0b74520e1b8d895a69e/orjson-3.10.5-cp310-cp310-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:b6c8e30adfa52c025f042a87f450a6b9ea29649d828e0fec4858ed5e6caecf63", size = 168867 },
+    { url = "https://files.pythonhosted.org/packages/6c/4d/313dcbecc7ab7d9d3590dba4be613e3e8b7df821d6ab77a6cb17e58fc7ae/orjson-3.10.5-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:338fd4f071b242f26e9ca802f443edc588fa4ab60bfa81f38beaedf42eda226c", size = 144984 },
+    { url = "https://files.pythonhosted.org/packages/19/2f/66c02f10bdf5989d2ffb6e0b65975ae2eea286547b01115cffb552bd81dd/orjson-3.10.5-cp310-cp310-musllinux_1_2_aarch64.whl", hash = "sha256:6970ed7a3126cfed873c5d21ece1cd5d6f83ca6c9afb71bbae21a0b034588d96", size = 176029 },
+    { url = "https://files.pythonhosted.org/packages/cf/c7/b150a843e7aa30e3bd5fb5f00377a720ae0aaba4231db636c0726777d2da/orjson-3.10.5-cp310-cp310-musllinux_1_2_x86_64.whl", hash = "sha256:235dadefb793ad12f7fa11e98a480db1f7c6469ff9e3da5e73c7809c700d746b", size = 171438 },
+    { url = "https://files.pythonhosted.org/packages/28/89/243a52595958f62a0dae47450c8bb1e87945e71a1ac3af88f7f99ca73e16/orjson-3.10.5-cp310-none-win32.whl", hash = "sha256:be79e2393679eda6a590638abda16d167754393f5d0850dcbca2d0c3735cebe2", size = 144390 },
+    { url = "https://files.pythonhosted.org/packages/a5/38/9f6537686f78de066688d6f2629963a645f0cbe6e79375b3f6b6b176f4e7/orjson-3.10.5-cp310-none-win_amd64.whl", hash = "sha256:c4a65310ccb5c9910c47b078ba78e2787cb3878cdded1702ac3d0da71ddc5228", size = 141289 },
 ]
 
 [[package]]
@@ -2382,18 +2380,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f9/e2/3e91f31a7d2b083fe6ef3fa267035b518369d9511ffab804f839851d2779/pluggy-1.6.0.tar.gz", hash = "sha256:7dcc130b76258d33b90f61b658791dede3486c3e6bfb003ee5c9bfb396dd22f3", size = 69412 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/54/20/4d324d65cc6d9205fabedc306948156824eb9f0ee1633355a8f7ec5c66bf/pluggy-1.6.0-py3-none-any.whl", hash = "sha256:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746", size = 20538 },
-]
-
-[[package]]
-name = "portalocker"
-version = "3.1.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pywin32", marker = "sys_platform == 'win32'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ac/91/8bfe23e1f7f630f2061ef38b5225d9fda9068d6a30fcbc187951e678e630/portalocker-3.1.1.tar.gz", hash = "sha256:ec20f6dda2ad9ce89fa399a5f31f4f1495f515958f0cb7ca6543cef7bb5a749e", size = 43708 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f7/60/1974cfdd5bb770568ddc6f89f3e0df4cfdd1acffd5a609dff5e95f48c6e2/portalocker-3.1.1-py3-none-any.whl", hash = "sha256:80e984e24de292ff258a5bea0e4f3f778fff84c0ae1275dbaebc4658de4aacb3", size = 19661 },
 ]
 
 [[package]]
@@ -3311,8 +3297,8 @@ shard-dataset = [
 [package.metadata]
 requires-dist = [
     { name = "dataclasses-json", specifier = "==0.5.7" },
-    { name = "datumaro", marker = "extra == 'datumaro-conversion'", specifier = "==1.10.0" },
-    { name = "datumaro", marker = "extra == 'shard-dataset'", specifier = "==1.10.0" },
+    { name = "datumaro", marker = "extra == 'datumaro-conversion'", specifier = "==1.8.0" },
+    { name = "datumaro", marker = "extra == 'shard-dataset'", specifier = "==1.8.0" },
     { name = "flytekit", specifier = "==1.10.2" },
     { name = "flytekitplugins-pod", specifier = "==1.2.4" },
     { name = "geti-k8s-tools", editable = "../../../../libs/k8s_tools" },
