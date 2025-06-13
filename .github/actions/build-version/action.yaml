@@ -1,0 +1,105 @@
+name: 'Generate Build Version'
+description: 'Generates build version based on workflow context'
+inputs:
+  version-file-path:
+    description: 'Path to file containing the base platform version'
+    required: false
+    default: 'VERSION'
+  ref:
+    description: 'Reference (branch/tag/SHA) for manual workflow dispatch'
+    required: false
+    default: ''
+outputs:
+  version:
+    description: 'Generated version string'
+    value: ${{ steps.generate-version.outputs.version }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Read base version
+      id: read-version
+      shell: bash
+      env:
+        VERSION_FILE_PATH: ${{ inputs.version-file-path }}
+      run: |
+        if [ -f "$VERSION_FILE_PATH" ]; then
+          VERSION=$(cat "$VERSION_FILE_PATH" | tr -d '\n\r')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Base version: $VERSION"
+        else
+          echo "Error: Version file '$VERSION_FILE_PATH' not found"
+          exit 1
+        fi
+
+    - name: Get short SHA
+      id: short-sha
+      shell: bash
+      run: |
+        SHORT_SHA=$(git rev-parse --short HEAD)
+        echo "short-sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+        echo "Short SHA: $SHORT_SHA"
+
+    - name: Generate version
+      id: generate-version
+      shell: bash
+      env:
+        EVENT_NAME: ${{ github.event_name }}
+        GITHUB_REF: ${{ github.ref }}
+        GITHUB_REF_NAME: ${{ github.ref_name }}
+        INPUT_REF: ${{ inputs.ref }}
+        BASE_VERSION: ${{ steps.read-version.outputs.version }}
+        SHORT_SHA: ${{ steps.short-sha.outputs.short-sha }}
+        PR_NUMBER: ${{ github.event.number }}
+
+      run: |
+        
+        echo "Event: $EVENT_NAME"
+        echo "Ref: $GITHUB_REF"
+        echo "Ref Name: $GITHUB_REF_NAME"
+        echo "Manual ref input: $INPUT_REF"
+        
+        case "$EVENT_NAME" in
+          "push")
+            if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+              VERSION="${BASE_VERSION}-dev-${SHORT_SHA}"
+              echo "Generated version for push to main: $VERSION"
+            elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
+              # Check if versions in TAG (ignoring RC suffix) match the file version
+              TAG_VERSION_CLEAN=$(echo "$GITHUB_REF_NAME" | sed 's/^v//')
+              TAG_BASE=$(echo "$TAG_VERSION_CLEAN" | sed 's/-RC[0-9]*$//')
+
+              if [[ "$BASE_VERSION" == "$TAG_BASE" ]]; then
+                VERSION="$GITHUB_REF_NAME"
+                echo "Generated version for RC tag: $VERSION"
+              else
+                echo "Error: Version mismatch. File version: $BASE_VERSION, Tag base version: $TAG_BASE"
+                exit 1
+              fi
+            else
+              VERSION="${BASE_VERSION}-feature-${SHORT_SHA}"
+              echo "Generated version for push to other branch: $VERSION"
+            fi
+            ;;
+        
+          "pull_request")
+            VERSION="${BASE_VERSION}-pr-${PR_NUMBER}-${SHORT_SHA}"
+            echo "Generated version for PR: $VERSION"
+            ;;
+        
+          "merge_group")
+            VERSION="${BASE_VERSION}-mr-${SHORT_SHA}"
+            echo "Generated version for merge queue: $VERSION"
+            ;;
+        
+          "workflow_dispatch")
+            VERSION="${BASE_VERSION}-manual-${SHORT_SHA}"
+            echo "Generated version for manual dispatch with ref: $VERSION"
+            ;;
+          *)
+            VERSION="${BASE_VERSION}-${SHORT_SHA}"
+            echo "Generated default version: $VERSION"
+            ;;
+        esac
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Final version: $VERSION"
