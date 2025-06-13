@@ -1023,7 +1023,9 @@ class ProjectBuilder:
             new_label_schema.previous_schema_revision_id = label_schema.previous_schema_revision_id
             for task_title, new_task_label_schema_view in new_task_to_label_schema_view.items():
                 new_task_label_schema_view.id_ = task_to_label_schema_view[task_title].id_
-                new_task_label_schema_view.previous_schema_revision_id = task_to_label_schema_view[task_title].previous_schema_revision_id
+                new_task_label_schema_view.previous_schema_revision_id = task_to_label_schema_view[
+                    task_title
+                ].previous_schema_revision_id
 
         label_schema_repo.save(instance=new_label_schema)
         for new_task_label_schema in new_task_to_label_schema_view.values():
@@ -1032,8 +1034,8 @@ class ProjectBuilder:
         project_repo.save(instance=project)
         return (
             project,
-            label_schema,
-            task_to_label_schema_view,
+            new_label_schema,
+            new_task_to_label_schema_view,
             tuple(labels_to_revisit),
             modified_scene_ids_by_storage,
             labels_structure_changed,
