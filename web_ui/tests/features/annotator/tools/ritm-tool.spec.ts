@@ -36,6 +36,7 @@ const waitForRITMtoProcess = async (page: Page, variant: string, index: number) 
 
 const setupDetectionSegmentation = async (page: Page, registerApiResponse: OpenApiFixtures['registerApiResponse']) => {
     registerApiResponse('GetProjectInfo', (_, res, ctx) => res(ctx.json(detectionSegmentationProject)));
+
     const detectionTask = detectionSegmentationProject.pipeline.tasks[1];
     const detectionLabels = detectionTask.labels;
     const segmentationTask = detectionSegmentationProject.pipeline.tasks[3];

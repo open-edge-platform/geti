@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { PointerEvent, useEffect, useRef, useState } from 'react';
+import { PointerEvent, useRef, useState } from 'react';
 
 import { RegionOfInterest } from '../../../../core/annotations/annotation.interface';
 import { clampBox, clampPointBetweenImage, isPointInShape, pointInRectangle } from '../../../../core/annotations/math';
@@ -55,7 +55,7 @@ export const RITMTool = ({ annotationToolContext }: ToolAnnotationContextProps):
 
     const ref = useRef<SVGRectElement>(null);
 
-    const { result, loadImage, execute, reset, box, setBox, isProcessing, isLoading, cancel } = useRITMState();
+    const { result, execute, reset, box, setBox, isProcessing, isLoading, cancel } = useRITMState();
 
     const lowestImageSide = Math.min(image.width, image.height);
 
@@ -69,14 +69,6 @@ export const RITMTool = ({ annotationToolContext }: ToolAnnotationContextProps):
     const [lastPoint, setLastPoint] = useState<RITMPoint | null>(null);
 
     const cursorOffset = ritmConfig.rightClickMode ? '7 8' : '16 16';
-
-    useEffect(() => {
-        if (image && !isLoading) {
-            loadImage(image);
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [image, isLoading]);
 
     const onPointerUp = (event: PointerEvent<SVGSVGElement>) => {
         if (!ref.current || isLoading) {
@@ -142,7 +134,7 @@ export const RITMTool = ({ annotationToolContext }: ToolAnnotationContextProps):
         const newPoint = { x, y, positive };
         const points = result ? [...result.points, newPoint] : [newPoint];
 
-        execute(clampBox(currentBox, ROI), points, outputShape);
+        execute(image, clampBox(currentBox, ROI), points, outputShape);
     };
 
     const renderResult = ({ shape }: RITMResult): JSX.Element => {

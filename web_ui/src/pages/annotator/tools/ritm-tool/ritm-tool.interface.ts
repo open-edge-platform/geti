@@ -24,16 +24,13 @@ export interface RITMResult {
     shape: Shape | undefined;
 }
 
-interface RITMInstance {
-    new (): Promise<RITMMethods>;
-}
-
 export interface RITMWorker extends WebWorker<Polygon> {
-    RITM: RITMInstance;
+    RITM: (imageData: ImageData) => Promise<RITMMethods>;
     type: AlgorithmType.RITM;
 }
 
 export interface RITMData {
+    imageData: ImageData;
     area: RegionOfInterest;
     givenPoints: RITMPoint[];
     outputShape: ShapeType;
