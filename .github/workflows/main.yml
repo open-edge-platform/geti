@@ -190,8 +190,8 @@ jobs:
       id-token: write # is required by nested component-check
     uses: ./.github/workflows/package-distribution.yaml
     with:
-      build-all: ${{ fromJSON(needs.get-vars.outputs.build_all) }} # fromJSON is required to cast string to boolean
-      build-version: ${{ needs.get-vars.outputs.build_version }}
+      build_all: ${{ fromJSON(needs.get-vars.outputs.build_all) }} # fromJSON is required to cast string to boolean
+      build_version: ${{ needs.get-vars.outputs.build_version }}
       publish_binaries: ${{ fromJSON(needs.get-vars.outputs.publish_binaries) }} # fromJSON is required to cast string to boolean
       ref: ${{ needs.get-vars.outputs.checkout_ref }}
 
