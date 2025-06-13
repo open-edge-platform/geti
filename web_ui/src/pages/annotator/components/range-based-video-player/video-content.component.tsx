@@ -46,7 +46,7 @@ export const VideoContent = ({ mediaItem, video, setFrameNumber, onPlay, onPause
                             onSeeked={() => setIsVideoFrameLoading(false)}
                             preload={'auto'}
                         />
-                        {showLoading && <Loading overlay />}
+                        {showLoading && <Loading mode='overlay' />}
                     </View>
                 </TransformZoom>
             </View>

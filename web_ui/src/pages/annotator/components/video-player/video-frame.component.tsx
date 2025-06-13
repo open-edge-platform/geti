@@ -3,7 +3,7 @@
 
 import { RefObject } from 'react';
 
-import { LoadingIndicator } from '@geti/ui';
+import { Loading } from '@geti/ui';
 import { useSpinDelay } from 'spin-delay';
 
 import { VideoFrame as VideoFrameInterface } from '../../../../core/media/video.interface';
@@ -46,7 +46,7 @@ export const VideoFrame = ({
     if (showBufferingIsInProgress) {
         return (
             <div style={{ position: 'absolute', inset: 0, backgroundColor: 'var(--white-hover)' }}>
-                <LoadingIndicator size='L' />
+                <Loading mode='inline' size='L' />
             </div>
         );
     }

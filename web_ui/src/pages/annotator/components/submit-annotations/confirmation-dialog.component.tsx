@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, LoadingIndicator } from '@geti/ui';
+import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Heading, Loading } from '@geti/ui';
 import { MutationStatus } from '@tanstack/react-query';
 
 import { useSelectedMediaItem } from '../../providers/selected-media-item-provider/selected-media-item-provider.component';
@@ -21,7 +21,7 @@ const SubmitButtonBody = ({ status }: { status: MutationStatus }) => {
         case 'pending':
             return (
                 <>
-                    <LoadingIndicator size='S' marginEnd='size-100' />
+                    <Loading mode='inline' size='S' marginEnd='size-100' />
                     Submit
                 </>
             );

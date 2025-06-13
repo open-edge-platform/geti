@@ -3,7 +3,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { ActionButton, Flex, LoadingIndicator, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
+import { ActionButton, Flex, Loading, PressableElement, Text, Tooltip, TooltipTrigger, View } from '@geti/ui';
 import { Alert, ChevronDownSmallLight } from '@geti/ui/icons';
 import { motion } from 'framer-motion';
 import { isFunction, maxBy } from 'lodash-es';
@@ -49,7 +49,7 @@ export const JobsListItemStatus = ({ expanded = false, job, onExpandChange }: Jo
             <Flex marginX='size-250' gap={'size-100'}>
                 {!jobStepsExpanded && stepToDisplay !== undefined && (
                     <Flex flexGrow={1} flexShrink={0} alignItems='center' gap='size-100'>
-                        <LoadingIndicator size='S' />
+                        <Loading mode='inline' size='S' />
                         <Text>{`${stepToDisplay.stepName} (${stepToDisplay.index} of ${job.steps.length})`}</Text>
                     </Flex>
                 )}

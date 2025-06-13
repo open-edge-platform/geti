@@ -109,9 +109,7 @@ export const MainContent = ({ labels, annotationToolContext }: MainContentProps)
                 </AnnotatorCanvasSettings>
             </TransformZoomAnnotation>
 
-            {(isLoading || isSaving) && (
-                <Loading overlay data-testid={'main-content-loader-id'} id={'main-content-loader-id'} />
-            )}
+            {(isLoading || isSaving) && <Loading mode='overlay' />}
 
             {annotationToolContext.tool === ToolType.SegmentAnythingTool && <SegmentAnythingLoader />}
 

@@ -3,7 +3,7 @@
 
 import { FC } from 'react';
 
-import { Flex, LoadingIndicator, Text, View } from '@geti/ui';
+import { Flex, Loading, Text, View } from '@geti/ui';
 import { CanceledIcon, CheckCircleOutlined, ExclamationCircleOutlined, SkippedIcon, WaitingIcon } from '@geti/ui/icons';
 import { COLOR_MODE } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
@@ -54,7 +54,7 @@ const getStepStateColor = (state: string): string => {
 const getStepStateIcon = (state: string): JSX.Element => {
     switch (state) {
         case JobStepState.RUNNING:
-            return <LoadingIndicator size='S' />;
+            return <Loading mode='inline' size='S' />;
         case JobStepState.FINISHED:
             return <CheckCircleOutlined className={classes.iconFinished} />;
         case JobStepState.FAILED:

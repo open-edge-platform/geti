@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, LoadingIndicator, Text } from '@geti/ui';
+import { Flex, Loading, Text } from '@geti/ui';
 
 import {
     DATASET_IMPORT_DESCRIPTION,
@@ -66,7 +66,7 @@ export const DatasetImportProgress = ({ progressItem }: DatasetImportProgressPro
                     />
                 )}
 
-                {isPreparingJobLoading && <LoadingIndicator size='L' height={'auto'} />}
+                {isPreparingJobLoading && <Loading mode='inline' size='L' style={{ height: 'auto' }} />}
 
                 <Flex direction='column' alignItems='center' justifyContent='center'>
                     <Text id='dataset-import-progress-header' UNSAFE_style={{ fontSize: '2.5em' }}>

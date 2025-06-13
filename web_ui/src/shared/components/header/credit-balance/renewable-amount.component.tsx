@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { LoadingIndicator, Text } from '@geti/ui';
+import { Loading, Text } from '@geti/ui';
 
 import { useProducts } from '../../../../core/credits/products/hooks/use-products.hook';
 import { findPolicy, hasRenewableAmount } from '../../../../core/credits/products/hooks/utils';
@@ -18,7 +18,7 @@ export const RenewableAmount = () => {
     const recurringCredits = findPolicy(productsResponse?.products, hasRenewableAmount);
 
     if (isFetching) {
-        return <LoadingIndicator size={'S'} height={'initial'} />;
+        return <Loading mode='inline' size={'S'} style={{ height: 'initial' }} />;
     }
 
     if (!recurringCredits?.renewableAmount) {

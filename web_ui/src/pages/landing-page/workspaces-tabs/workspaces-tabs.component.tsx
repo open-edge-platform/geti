@@ -5,17 +5,7 @@ import { Key } from 'react';
 
 import { paths } from '@geti/core';
 import { useWorkspacesApi } from '@geti/core/src/workspaces/hooks/use-workspaces.hook';
-import {
-    ActionButton,
-    Flex,
-    Item,
-    LoadingIndicator,
-    TabList,
-    TabPanels,
-    Tabs,
-    Tooltip,
-    TooltipTrigger,
-} from '@geti/ui';
+import { ActionButton, Flex, Item, Loading, TabList, TabPanels, Tabs, Tooltip, TooltipTrigger } from '@geti/ui';
 import { Add } from '@geti/ui/icons';
 import { useNavigate } from 'react-router-dom';
 
@@ -261,7 +251,7 @@ export const WorkspacesTabs = (): JSX.Element => {
                                     onPress={handleCreateWorkspace}
                                     isDisabled={createWorkspace.isPending}
                                 >
-                                    {createWorkspace.isPending ? <LoadingIndicator size={'S'} /> : <Add />}
+                                    {createWorkspace.isPending ? <Loading mode='inline' size={'S'} /> : <Add />}
                                 </ActionButton>
                                 <Tooltip>Create a new workspace</Tooltip>
                             </TooltipTrigger>

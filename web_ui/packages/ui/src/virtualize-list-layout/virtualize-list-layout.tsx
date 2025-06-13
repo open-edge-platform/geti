@@ -15,7 +15,7 @@ import {
     Virtualizer,
 } from 'react-aria-components';
 
-import { LoadingIndicator } from '../loading/loading-indicator.component';
+import { Loading } from '../loading/loading.component';
 
 import classes from './virtualize-list-layout.module.scss';
 
@@ -40,7 +40,7 @@ export const VirtualizedListLayout = <T,>({
     ariaLabel,
     layoutOptions,
     containerHeight,
-    renderLoading = () => <LoadingIndicator size={'M'} />,
+    renderLoading = () => <Loading mode='inline' size={'M'} />,
     renderItem,
     onLoadMore,
     idFormatter,

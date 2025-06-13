@@ -1,4 +1,22 @@
-.loadingBackground {
-    background-color: var(--spectrum-alias-background-color-modal-overlay);
-    z-index: 10;
+.overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  cursor: default;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.fullscreen {
+  background-color: var(--spectrum-global-color-gray-50);
+}
+
+.modal {
+  background-color: var(--spectrum-alias-background-color-modal-overlay);
+  z-index: 20;
+}
+

@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 
-import { Flex } from '@geti/ui';
+import { Flex, Loading } from '@geti/ui';
 import { useParams } from 'react-router-dom';
 
 import { Annotation } from '../../../../../core/annotations/annotation.interface';
@@ -32,7 +32,6 @@ import { usePrediction } from '../../../../annotator/providers/prediction-provid
 import { sortExplanationsByName } from '../../../../annotator/providers/prediction-provider/utils';
 import { useProject } from '../../../providers/project-provider/project-provider.component';
 import { DetailsPreviewHeader } from '../../common/details-preview-header/details-preview-header.component';
-import { LoadingOverlay } from '../../project-media/loading-overlay.component';
 import { TestMediaItemsList } from '../test-media-items-list.component';
 import { AnnotatorProviders } from './annotator-providers.component';
 import { useTestResultsQuery } from './use-test-results-query.hook';
@@ -158,7 +157,7 @@ const TestDetailsPreviewContent = ({
                 />
 
                 <Flex direction='column' height='100%' position='relative' minHeight={0}>
-                    <LoadingOverlay visible={isLoading} />
+                    {isLoading && <Loading mode='overlay' />}
 
                     <PreviewCanvasContent
                         annotations={annotations}

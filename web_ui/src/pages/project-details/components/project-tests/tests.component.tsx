@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, LoadingIndicator, View } from '@geti/ui';
+import { Flex, Loading, View } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { useModels } from '../../../../core/models/hooks/use-models.hook';
@@ -48,7 +48,7 @@ export const Tests = (): JSX.Element => {
     const successfulTests = tests.filter(filterOutUnsuccessfulTest);
 
     if (areTestsLoading) {
-        return <LoadingIndicator />;
+        return <Loading />;
     }
 
     return (

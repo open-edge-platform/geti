@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Flex, LoadingIndicator, useNumberFormatter } from '@geti/ui';
+import { Flex, Loading, useNumberFormatter } from '@geti/ui';
 import { isNil } from 'lodash-es';
 
 import { OrganizationBalance } from '../../../../core/credits/credits.interface';
@@ -18,7 +18,7 @@ export const Balance = ({
     const numberFormatter = useNumberFormatter({});
 
     if (isLoading) {
-        return <LoadingIndicator size={'S'} height={'initial'} />;
+        return <Loading mode='inline' size={'S'} style={{ height: 'initial' }} />;
     }
 
     if (isNil(organizationBalance)) {

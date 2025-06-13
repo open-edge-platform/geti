@@ -3,7 +3,7 @@
 
 import { Key } from 'react';
 
-import { Item, LoadingIndicator, Picker, Text, View } from '@geti/ui';
+import { Item, Loading, Picker, Text, View } from '@geti/ui';
 
 import { hasEqualId } from '../../../../shared/utils';
 import { idMatchingFormat } from '../../../../test-utils/id-utils';
@@ -34,7 +34,7 @@ export const SelectOptimization = ({
         <View>
             {isLoading ? (
                 <View marginY={'size-225'}>
-                    <LoadingIndicator size={'M'} />
+                    <Loading mode='inline' size={'M'} />
                 </View>
             ) : (
                 <Picker

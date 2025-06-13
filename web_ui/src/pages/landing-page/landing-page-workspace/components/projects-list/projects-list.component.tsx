@@ -3,13 +3,12 @@
 
 import { useEffect, useState } from 'react';
 
-import { VirtualizedListLayout, type Selection } from '@geti/ui';
+import { Loading, VirtualizedListLayout, type Selection } from '@geti/ui';
 import { isEmpty } from 'lodash-es';
 
 import { ProjectsQueryResult } from '../../../../../core/projects/hooks/use-project-actions.hook';
 import { ProjectProps } from '../../../../../core/projects/project.interface';
 import { NotFound } from '../../../../../shared/components/not-found/not-found.component';
-import { LoadingOverlay } from '../../../../project-details/components/project-media/loading-overlay.component';
 import { ProjectListItemSkeletonLoader } from './components/project-list-item-skeleton-loader.component';
 import { Project } from './components/project/project.component';
 
@@ -39,7 +38,7 @@ export const ProjectsList = ({ projects, projectsQuery }: ProjectsListProps): JS
 
     if (isEmpty(projects)) {
         if (projectsQuery.isFetchingNextPage) {
-            return <LoadingOverlay visible />;
+            return <Loading mode='overlay' />;
         }
 
         return <NotFound />;

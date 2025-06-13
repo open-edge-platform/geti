@@ -13,7 +13,6 @@ import {
     Flex,
     Heading,
     Loading,
-    LoadingIndicator,
     Text,
     Tooltip,
     TooltipTrigger,
@@ -95,7 +94,7 @@ export const ReconfigureModels = (): JSX.Element => {
                                 isDisabled={isReconfigureButtonDisabled}
                             >
                                 <Flex alignItems={'center'} gap={'size-65'}>
-                                    {isReconfiguring ? <LoadingIndicator size={'S'} /> : <></>}
+                                    {isReconfiguring ? <Loading mode='inline' size={'S'} /> : <></>}
                                     <Text>Reconfigure</Text>
                                 </Flex>
                             </Button>

@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { ActionButton, Flex, LoadingIndicator, Text } from '@geti/ui';
+import { ActionButton, Flex, Loading, Text } from '@geti/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { ANIMATION_PARAMETERS } from '../../../../../shared/animation-parameters/animation-parameters';
@@ -30,7 +30,7 @@ export const WaitingInference = ({ isVisible, dismiss }: WaitingInferenceProps) 
                         position={'relative'}
                         UNSAFE_className={classes.waitingWraper}
                     >
-                        <LoadingIndicator size={'S'} marginEnd={'size-200'} />
+                        <Loading mode='inline' size={'S'} marginEnd={'size-200'} />
                         <Text>Retrieving inference results may take some time</Text>
                         <ActionButton isQuiet UNSAFE_className={classes.cancelInference} onPress={dismiss}>
                             Dismiss

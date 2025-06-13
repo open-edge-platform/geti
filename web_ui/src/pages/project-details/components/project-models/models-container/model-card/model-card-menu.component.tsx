@@ -7,7 +7,7 @@ import {
     ActionButton,
     dimensionValue,
     Item,
-    LoadingIndicator,
+    Loading,
     Menu,
     MenuTrigger,
     PressableElement,
@@ -196,7 +196,7 @@ export const ModelCardMenu = ({
     const menuOptions = getMenuOptions();
 
     return isActiveModelLoading ? (
-        <LoadingIndicator size='S' />
+        <Loading mode='inline' size='S' />
     ) : (
         <>
             <MenuTrigger>

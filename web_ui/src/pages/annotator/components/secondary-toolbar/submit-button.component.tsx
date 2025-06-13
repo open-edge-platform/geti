@@ -4,7 +4,7 @@
 import { CSSProperties, useEffect } from 'react';
 
 import QUERY_KEYS from '@geti/core/src/requests/query-keys';
-import { Button, LoadingIndicator } from '@geti/ui';
+import { Button, Loading } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { isEmpty, isFunction, isNil } from 'lodash-es';
 
@@ -162,7 +162,7 @@ export const SubmitButton = ({
             id='secondary-toolbar-submit'
             aria-label='Submit annotations'
         >
-            {submitAnnotationsMutation.isPending ? <LoadingIndicator size='S' marginEnd='size-100' /> : <></>}
+            {submitAnnotationsMutation.isPending ? <Loading mode='inline' size='S' marginEnd='size-100' /> : <></>}
             {buttonText} {!isNil(nextMediaItem) && '»'}
         </Button>
     );

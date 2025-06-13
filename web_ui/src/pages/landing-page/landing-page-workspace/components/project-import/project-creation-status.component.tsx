@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import QUERY_KEYS from '@geti/core/src/requests/query-keys';
-import { Flex, LoadingIndicator, Text } from '@geti/ui';
+import { Flex, Loading, Text } from '@geti/ui';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { useImportProjectStatusQuery } from '../../../../../core/projects/hooks/use-import-project-status.hook';
@@ -45,7 +45,7 @@ export const ProjectCreationStatus = ({ importItem }: ProjectCreationStatusProps
         <>
             <ProjectStatusHeader fileName={fileName} fileSize={fileSize} />
             <Flex gap={'size-300'} alignItems='center' UNSAFE_className={classes.importContent}>
-                <LoadingIndicator size={'S'} />
+                <Loading mode='inline' size={'S'} />
                 <Text>Creating...</Text>
             </Flex>
         </>
