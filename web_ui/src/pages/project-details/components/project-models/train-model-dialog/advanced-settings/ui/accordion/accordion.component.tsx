@@ -9,7 +9,7 @@ import clsx from 'clsx';
 
 import styles from './accordion.module.scss';
 
-type DisclosureProps = Omit<ComponentProps<typeof Disclosure>, 'isQuiet'>;
+type DisclosureProps = Omit<ComponentProps<typeof Disclosure>, 'isQuiet' | 'defaultExpanded'>;
 type DisclosureTitleProps = ComponentProps<typeof DisclosureTitle>;
 type DisclosurePanelProps = ComponentProps<typeof DisclosurePanel>;
 
@@ -55,7 +55,9 @@ const AccordionWarning: FC<{ children: ReactNode }> = ({ children }) => {
 };
 
 export const Accordion = ({ UNSAFE_className, ...props }: DisclosureProps) => {
-    return <Disclosure isQuiet {...props} UNSAFE_className={clsx(UNSAFE_className, styles.accordion)} />;
+    return (
+        <Disclosure isQuiet defaultExpanded {...props} UNSAFE_className={clsx(UNSAFE_className, styles.accordion)} />
+    );
 };
 
 Accordion.Title = AccordionTitle;
