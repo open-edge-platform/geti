@@ -49,14 +49,14 @@ spec:
               #value: {{ .Values.global.tag | default .Chart.AppVersion }}
             - name: DATA_FOLDER
               value: {{ .Values.mountPath }}
+            - name: GETI_REGISTRY
+              value: {{ .Values.global.registry_address }}/open-edge-platform  # TODO move OEP part into a var???
+{{- if .Values.global.ingress_enabled }}
             - name: PLATFORM_VERSION
               valueFrom:
                 configMapKeyRef:
                   name: {{ .Release.Namespace }}-configuration
                   key: platformVersion
-            - name: GETI_REGISTRY
-              value: {{ .Values.global.registry_address }}
-{{- if .Values.global.ingress_enabled }}
             - name: ENABLE_TRACING
               value: "true"
             - name: OTEL_SERVICE_NAME
