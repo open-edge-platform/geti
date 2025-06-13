@@ -3,6 +3,7 @@
 
 import { createContext, Dispatch, SetStateAction, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
+import { type WatershedInstance, type WatershedPolygon } from '@geti/smart-tools';
 import { UseMutateFunction, useMutation } from '@tanstack/react-query';
 
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
@@ -11,6 +12,7 @@ import { useLoadAIWebworker } from '../../../../hooks/use-load-ai-webworker/use-
 import { NOTIFICATION_TYPE } from '../../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../../notification/notification.component';
 import { MissingProviderError } from '../../../../shared/missing-provider-error';
+import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { UndoRedoActions } from '../../core/undo-redo-actions.interface';
 import { useAnnotationToolContext } from '../../providers/annotation-tool-provider/annotation-tool-provider.component';
@@ -20,11 +22,12 @@ import { StateProviderProps } from '../tools.interface';
 import UndoRedoProvider from '../undo-redo/undo-redo-provider.component';
 import useUndoRedoState, { SetStateWrapper } from '../undo-redo/use-undo-redo-state';
 import { removeOffLimitPointsPolygon } from '../utils';
-import { RunWatershedProps, WatershedMethods, WatershedPolygon } from './watershed-tool.interface';
+import { mapPolygonsToWatershedPolygons, WatershedPolygonWithLabel } from './utils';
+import { RunWatershedProps } from './watershed-tool.interface';
 
 interface WatershedState {
     markers: Marker[];
-    watershedPolygons: WatershedPolygon[];
+    watershedPolygons: WatershedPolygonWithLabel[];
 }
 
 interface WatershedStateContextProps {
@@ -33,7 +36,7 @@ interface WatershedStateContextProps {
     watershedPolygons?: WatershedPolygon[];
     undoRedoActions: UndoRedoActions<WatershedState>;
     onComplete: (markers: Marker[]) => void;
-    runWatershed: UseMutateFunction<WatershedPolygon[], unknown, RunWatershedProps, unknown>;
+    runWatershed: UseMutateFunction<WatershedPolygonWithLabel[], unknown, RunWatershedProps, unknown>;
     reset: () => Promise<void>;
     rejectAnnotation: () => Promise<void>;
 
@@ -84,10 +87,13 @@ const useWatershedUndoRedoState = (): [
 export const WatershedStateProvider = ({ children }: StateProviderProps): JSX.Element => {
     const { worker } = useLoadAIWebworker(AlgorithmType.WATERSHED);
 
-    const wsInstance = useRef<WatershedMethods | null>(null);
+    const wsInstance = useRef<WatershedInstance | null>(null);
 
     const { addNotification } = useNotification();
     const { getToolSettings } = useAnnotationToolContext();
+    const {
+        project: { labels },
+    } = useProject();
 
     const [shapes, setShapes, undoRedoActions] = useWatershedUndoRedoState();
 
@@ -98,12 +104,18 @@ export const WatershedStateProvider = ({ children }: StateProviderProps): JSX.El
 
     const { mutate, reset: resetMutation } = useMutation({
         mutationFn: async (runWatershedProps: RunWatershedProps) => {
+            let polygons: WatershedPolygon[] = [];
             if (worker && !wsInstance.current) {
-                wsInstance.current = await new worker.Watershed(runWatershedProps.imageData);
+                wsInstance.current = await worker.Watershed(runWatershedProps.imageData);
             }
 
             if (wsInstance.current) {
-                return wsInstance.current.executeWatershed(runWatershedProps.markers, runWatershedProps.sensitivity);
+                polygons = await wsInstance.current.executeWatershed(
+                    runWatershedProps.markers,
+                    runWatershedProps.sensitivity
+                );
+
+                return mapPolygonsToWatershedPolygons(polygons, labels);
             }
 
             return [];

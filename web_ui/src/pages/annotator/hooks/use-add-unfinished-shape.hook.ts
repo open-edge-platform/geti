@@ -7,16 +7,16 @@ import { Annotation } from '../../../core/annotations/annotation.interface';
 import { Shape } from '../../../core/annotations/shapes.interface';
 import { useAnnotationScene } from '../providers/annotation-scene-provider/annotation-scene-provider.component';
 import { useSubmitAnnotations } from '../providers/submit-annotations-provider/submit-annotations-provider.component';
-import { WatershedPolygon } from '../tools/watershed-tool/watershed-tool.interface';
+import { WatershedPolygonWithLabel } from '../tools/watershed-tool/utils';
 
 interface useAddUnfinishedShapeProps {
     reset: () => void;
-    shapes: Shape[] | WatershedPolygon[];
-    addShapes: (shape: Shape[] | WatershedPolygon[]) => Annotation[];
+    shapes: Shape[] | WatershedPolygonWithLabel[];
+    addShapes: (shape: Shape[] | WatershedPolygonWithLabel[]) => Annotation[];
 }
 
 export const useAddUnfinishedShape = ({ addShapes, shapes, reset }: useAddUnfinishedShapeProps): void => {
-    const prevShape = useRef<Shape[] | WatershedPolygon[] | null>(null);
+    const prevShape = useRef<Shape[] | WatershedPolygonWithLabel[] | null>(null);
     const { setUnfinishedShapeCallback } = useSubmitAnnotations();
     const { annotations } = useAnnotationScene();
 

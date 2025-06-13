@@ -156,7 +156,7 @@ const waitForOpenCV = async (): Promise<boolean> => {
     if (CV) {
         return true;
     } else {
-        return OpenCVLoader(self).then((cvInstance: OpenCVTypes.cv) => {
+        return OpenCVLoader().then((cvInstance: OpenCVTypes.cv) => {
             CV = cvInstance;
 
             return true;

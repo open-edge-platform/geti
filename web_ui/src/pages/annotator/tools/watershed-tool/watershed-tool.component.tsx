@@ -16,9 +16,8 @@ import { Marker } from '../marker-tool/marker-tool.interface';
 import { ToolAnnotationContextProps } from '../tools.interface';
 import { drawingStyles, isPolygonValid } from '../utils';
 import { BrushSizeCursor } from './brush-size-cursor.component';
-import { BACKGROUND_LABEL_MARKER_ID, formatAndAddAnnotations, getScaleValue } from './utils';
+import { BACKGROUND_LABEL_MARKER_ID, formatAndAddAnnotations, getScaleValue, WatershedPolygonWithLabel } from './utils';
 import { useWatershedState } from './watershed-state-provider.component';
-import { WatershedPolygon } from './watershed-tool.interface';
 
 const MIN_NUMBER_OF_REQUIRED_UNIQUE_MARKERS = 2;
 
@@ -35,7 +34,7 @@ export const WatershedTool = ({ annotationToolContext }: ToolAnnotationContextPr
     useAddUnfinishedShape({
         shapes: shapes.watershedPolygons,
         addShapes: (watershedPolygons) =>
-            formatAndAddAnnotations(watershedPolygons as WatershedPolygon[], scene.addAnnotations),
+            formatAndAddAnnotations(watershedPolygons as WatershedPolygonWithLabel[], scene.addAnnotations),
         reset,
     });
 
@@ -45,7 +44,7 @@ export const WatershedTool = ({ annotationToolContext }: ToolAnnotationContextPr
         sensitivity: selectedSensitivity,
     } = getToolSettings(ToolType.WatershedTool);
 
-    const getValidPolygons = (watershedPolygon: WatershedPolygon[]) =>
+    const getValidPolygons = (watershedPolygon: WatershedPolygonWithLabel[]) =>
         watershedPolygon.filter(({ points }) => isPolygonValid({ shapeType: ShapeType.Polygon, points }));
 
     const triggerWatershed = (markers: Marker[]) => {

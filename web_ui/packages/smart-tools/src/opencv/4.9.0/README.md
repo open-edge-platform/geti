@@ -15,7 +15,7 @@ Following instructions below, but make sure you install and activate emscripten 
 ## Build
 
 Execute `emcmake python ./opencv/platforms/js/build_js.py build_js` to build OpenCV.
-You can then copy over `./build_js/bin/opencv.js` to the project's `/src/web_ui/public/assets/opencv/` folder.
+You can then copy over `./build_js/bin/opencv.js` to `opencv` folder.
 
 In order to select the features that openCV is built with you need to edit `./opencv/platforms/js/opencv_js.config.py`.
 There you can append the following and replace the `white_list` variable. When adding features do _not_ forget to update this list below so we can keep track of the used functionality.

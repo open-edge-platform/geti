@@ -21,7 +21,7 @@
   },
   "exports": {
     ".": "./index.ts",
-    "./opencv-types": "./opencv-types/index.d.ts"
+    "./opencv": "./src/opencv/interfaces/index.d.ts"
   },
   "scripts": {
     "type-check": "tsc --noEmit -p tsconfig.json",

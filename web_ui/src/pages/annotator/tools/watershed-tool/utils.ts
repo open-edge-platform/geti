@@ -1,6 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { type WatershedPolygon } from '@geti/smart-tools';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Annotation } from '../../../../core/annotations/annotation.interface';
@@ -10,7 +11,6 @@ import { labelFromUser } from '../../../../core/annotations/utils';
 import { Label, LABEL_BEHAVIOUR } from '../../../../core/labels/label.interface';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { getLabeledShape } from '../../utils';
-import { WatershedPolygon } from './watershed-tool.interface';
 
 export const WATERSHED_SUPPORTED_DOMAINS = [
     DOMAIN.SEGMENTATION,
@@ -56,7 +56,37 @@ export const brushSizeSliderConfig = {
     step: 1,
 };
 
-const formatToPolygonShapesWithLabel = (watershedPolygons: WatershedPolygon[]): [Shape, Label][] => {
+export type WatershedPolygonWithLabel = Omit<WatershedPolygon, 'label'> & { label: Label };
+export const mapPolygonsToWatershedPolygons = (
+    watershedPolygons: WatershedPolygon[],
+    projectLabels: Label[]
+): WatershedPolygonWithLabel[] => {
+    if (watershedPolygons.length === 0) {
+        return [];
+    }
+
+    const mappedPolygons: (WatershedPolygon & { label: Label })[] = watershedPolygons.map((polygon) => {
+        const foundLabel = projectLabels.find((l) => l.id === polygon.label.id);
+
+        return {
+            ...polygon,
+            label: foundLabel ?? {
+                id: polygon.label.id,
+                name: 'Unknown',
+                color: '#000000',
+                parentLabelId: '',
+                group: '',
+                behaviour: LABEL_BEHAVIOUR.LOCAL,
+                hotkey: '',
+                isEmpty: false,
+            },
+        };
+    });
+
+    return mappedPolygons;
+};
+
+const formatToPolygonShapesWithLabel = (watershedPolygons: WatershedPolygonWithLabel[]): [Shape, Label][] => {
     return watershedPolygons.map((polygon) => [
         { shapeType: ShapeType.Polygon, points: polygon.points },
         polygon.label,
@@ -64,7 +94,7 @@ const formatToPolygonShapesWithLabel = (watershedPolygons: WatershedPolygon[]): 
 };
 
 export const formatAndAddAnnotations = (
-    watershedPolygons: WatershedPolygon[],
+    watershedPolygons: WatershedPolygonWithLabel[],
     addAnnotations: (annotations: Annotation[]) => void
 ): Annotation[] => {
     const newAnnotations = formatToPolygonShapesWithLabel(watershedPolygons).map(([shape, label], index) => {
