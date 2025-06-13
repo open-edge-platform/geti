@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-enum ShapeType {
+export enum ShapeType {
     RotatedRect,
     Rect,
     Circle,
@@ -41,6 +41,13 @@ export interface RotatedRect {
     readonly width: number;
     readonly height: number;
     readonly angle: number; //degrees
+}
+
+export interface RegionOfInterest {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
 }
 
 export type Shape = Rect | RotatedRect | Circle | Polygon;
