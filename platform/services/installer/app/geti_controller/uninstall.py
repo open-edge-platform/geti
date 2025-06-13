@@ -8,7 +8,7 @@ from cli_utils.platform_logs import subprocess_run
 from configuration_models.install_config import InstallationConfig
 from constants.charts import GETI_CONTROLLER_CHART
 from constants.paths import HELM_BINARY, INSTALL_LOG_FILE_PATH
-from platform_stages.steps.errors import GetiControllerUninstallationError
+from geti_controller.errors import GetiControllerUninstallationError
 
 logger = logging.getLogger(__name__)
 
