@@ -158,7 +158,7 @@ metadata:
   name: flyte-core
 spec:
   insecureSkipTLSVerify: true
-  chart: https://$REGISTRY/geti/helm/flyte-core
+  chart: oci://$REGISTRY/geti/helm/flyte-core
   version: $VERSION
   targetNamespace: flyte
   valuesContent: |-
