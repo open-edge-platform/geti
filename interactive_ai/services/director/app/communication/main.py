@@ -9,6 +9,7 @@ import http
 import logging
 import os
 from collections import defaultdict
+from collections.abc import Sequence
 from contextlib import asynccontextmanager
 
 import jsonschema
@@ -215,7 +216,7 @@ async def pydantic_validation_exception_handler(request: Request, exc: pydantic.
     Converts a pydantic ValidationError to a better readable Bad request exception.
     """
 
-    def format_location(loc: list) -> str:
+    def format_location(loc: Sequence[str | int]) -> str:
         """
         Format location path with proper dot notation and array indices.
 
