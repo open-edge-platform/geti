@@ -6,8 +6,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 import rest.endpoints  # noqa: F401, pylint: disable=unused-import  # Importing for endpoint registration
+from geti_logger_tools.logger_config import initialize_logger
 from geti_telemetry_tools import ENABLE_TRACING, FastAPITelemetry
 from routers import platform_router
+
+logger = initialize_logger(__name__)
 
 
 @asynccontextmanager

@@ -1,0 +1,20 @@
+{{- if .Values.global.ingress_enabled }}
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: geti-registry
+  namespace: istio-system
+spec:
+  hosts:
+  - {{ .Values.global.registry_address }}
+  location: MESH_EXTERNAL
+  ports:
+  - number: 80
+    name: http-port
+    protocol: HTTP
+    targetPort: 443
+  - number: 443
+    name: https-port
+    protocol: HTTPS
+  resolution: DNS
+{{- end }}
