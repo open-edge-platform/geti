@@ -14,7 +14,7 @@ data:
         },
         "docsUrl": "https://docs.geti.intel.com/",
         "dataPlaneUrl": null,
-        "controlPlaneUrl": null,
+        "controlPlaneUrl": null
     }
   admin-deployment: |
     {
