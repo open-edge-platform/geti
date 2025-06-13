@@ -33,7 +33,7 @@ class SubsetSplit(BaseModel):
         default=None,
         title="Dataset size",
         description="Total size of the dataset (read-only parameter, not configurable by users)",
-        exclude=True,
+        exclude=True,  # exclude read-only parameter from serialization
         json_schema_extra={"default_value": None},
     )
 
