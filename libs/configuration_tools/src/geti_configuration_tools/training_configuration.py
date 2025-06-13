@@ -16,16 +16,26 @@ class SubsetSplit(BaseModel):
     """
 
     training: int = Field(
-        ge=1, default=70, title="Training percentage", description="Percentage of data to use for training"
+        ge=1, le=100, default=70, title="Training percentage", description="Percentage of data to use for training"
     )
     validation: int = Field(
-        ge=1, default=20, title="Validation percentage", description="Percentage of data to use for validation"
+        ge=1, le=100, default=20, title="Validation percentage", description="Percentage of data to use for validation"
     )
-    test: int = Field(ge=1, default=10, title="Test percentage", description="Percentage of data to use for testing")
+    test: int = Field(
+        ge=1, le=100, default=10, title="Test percentage", description="Percentage of data to use for testing"
+    )
     auto_selection: bool = Field(
         default=True, title="Auto selection", description="Whether to automatically select data for each subset"
     )
     remixing: bool = Field(default=False, title="Remixing", description="Whether to remix data between subsets")
+    dataset_size: int | None = Field(
+        ge=0,
+        default=None,
+        title="Dataset size",
+        description="Total size of the dataset (read-only parameter, not configurable by users)",
+        exclude=True,  # exclude read-only parameter from serialization
+        json_schema_extra={"default_value": None},
+    )
 
     @model_validator(mode="after")
     def validate_subsets(self) -> "SubsetSplit":
@@ -43,7 +53,11 @@ class MinAnnotationPixels(BaseModel):
         description="Whether to apply minimum annotation pixels filtering",
     )
     min_annotation_pixels: int = Field(
-        gt=0, default=1, title="Minimum annotation pixels", description="Minimum number of pixels in an annotation"
+        gt=0,
+        le=200000000,  # reasonable upper limit for pixel count to 200MP
+        default=1,
+        title="Minimum annotation pixels",
+        description="Minimum number of pixels in an annotation",
     )
 
 
@@ -57,6 +71,22 @@ class MaxAnnotationPixels(BaseModel):
     )
     max_annotation_pixels: int = Field(
         gt=0, default=10000, title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+    )
+
+
+class MinAnnotationObjects(BaseModel):
+    """Parameters for maximum annotation objects."""
+
+    enable: bool = Field(
+        default=False,
+        title="Enable minimum annotation objects filtering",
+        description="Whether to apply minimum annotation objects filtering",
+    )
+    min_annotation_objects: int = Field(
+        gt=0,
+        default=1,
+        title="Minimum annotation objects",
+        description="Minimum number of objects in an annotation",
     )
 
 
@@ -84,6 +114,9 @@ class Filtering(BaseModel):
     )
     max_annotation_pixels: MaxAnnotationPixels = Field(
         title="Maximum annotation pixels", description="Maximum number of pixels in an annotation"
+    )
+    min_annotation_objects: MinAnnotationObjects = Field(
+        title="Minimum annotation objects", description="Minimum number of objects in an annotation"
     )
     max_annotation_objects: MaxAnnotationObjects = Field(
         title="Maximum annotation objects", description="Maximum number of objects in an annotation"

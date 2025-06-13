@@ -5,6 +5,7 @@ import json
 from http import HTTPStatus
 from unittest.mock import patch
 
+import pytest
 from geti_configuration_tools.training_configuration import PartialTrainingConfiguration
 from testfixtures import compare
 
@@ -140,3 +141,81 @@ class TestTrainingConfigurationEndpoints:
 
         assert result.status_code == HTTPStatus.NO_CONTENT
         assert not result.content  # 204 responses must not include a response body
+
+    @pytest.mark.parametrize(
+        "payload, expected_error_type",
+        [
+            # Missing task_id
+            (
+                {
+                    # missing task_id
+                    "model_manifest_id": "model_manifest_123",
+                    "dataset_preparation": {
+                        "subset_split": {
+                            "training": 70,
+                            "validation": 20,
+                            "test": 10,
+                        }
+                    },
+                },
+                "value_error",
+            ),
+            # Invalid data type
+            (
+                {
+                    "task_id": "detection_1",
+                    "model_manifest_id": "model_manifest_123",
+                    "training": [{"key": "max_epochs", "value": "not_an_integer", "type": "int", "name": "Epochs"}],
+                },
+                "int_parsing",
+            ),
+            # Invalid split percentages (sum > 100)
+            (
+                {
+                    "task_id": "detection_1",
+                    "model_manifest_id": "model_manifest_123",
+                    "dataset_preparation": {
+                        "subset_split": {
+                            "training": 70,
+                            "validation": 20,
+                            "test": 20,  # Total: 110%
+                        }
+                    },
+                },
+                "value_error",
+            ),
+            # Negative value error
+            (
+                {
+                    "task_id": "detection_1",
+                    "model_manifest_id": "model_manifest_123",
+                    "training": [{"key": "learning_rate", "value": -0.01, "type": "float", "name": "Learning rate"}],
+                },
+                "greater_than",
+            ),
+        ],
+        ids=[
+            "missing_task_id",
+            "invalid_data_type",
+            "invalid_split_percentages",
+            "negative_value",
+        ],
+    )
+    def test_update_training_configuration_validation_errors(
+        self, fxt_director_app, fxt_enable_feature_flag_name, payload, expected_error_type
+    ) -> None:
+        # Arrange
+        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS.name)
+
+        # Act
+        result = fxt_director_app.patch(
+            f"{API_PROJECT_PATTERN}/training_configuration",
+            json=payload,
+        )
+
+        # Assert
+        assert result.status_code == HTTPStatus.BAD_REQUEST
+        response = json.loads(result.content)
+        assert "errors" in response
+        assert len(response["errors"]) == 1
+        assert response["errors"][0]["type"] == expected_error_type

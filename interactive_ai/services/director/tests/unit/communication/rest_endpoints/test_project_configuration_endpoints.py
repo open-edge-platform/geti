@@ -5,6 +5,7 @@ import json
 from http import HTTPStatus
 from unittest.mock import patch
 
+import pytest
 from geti_configuration_tools.project_configuration import PartialProjectConfiguration
 from testfixtures import compare
 
@@ -117,3 +118,103 @@ class TestProjectConfigurationEndpoints:
 
         assert result.status_code == HTTPStatus.NO_CONTENT
         assert not result.content  # 204 responses must not include a response body
+
+    @pytest.mark.parametrize(
+        "payload, expected_error_type",
+        [
+            # Missing task_id
+            (
+                {
+                    "task_configs": [
+                        {
+                            # missing task_id
+                            "training": {
+                                "constraints": [
+                                    {
+                                        "key": "min_images_per_label",
+                                        "value": 15,
+                                        "type": "int",
+                                        "name": "Minimum images per label",
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "value_error",
+            ),
+            # Invalid data type
+            (
+                {
+                    "task_configs": [
+                        {
+                            "task_id": "detection_1",
+                            "training": {
+                                "constraints": [
+                                    {
+                                        "key": "min_images_per_label",
+                                        "value": "not_an_integer",  # invalid type
+                                        "type": "int",
+                                        "name": "Minimum images per label",
+                                    }
+                                ]
+                            },
+                        }
+                    ]
+                },
+                "int_parsing",
+            ),
+            # Invalid task_configs type
+            (
+                {
+                    "task_configs": {  # should be a list
+                        "task_id": "detection_1",
+                    }
+                },
+                "model_type",
+            ),
+            # Invalid value (negative number)
+            (
+                {
+                    "task_configs": [
+                        {
+                            "task_id": "detection_1",
+                            "training": {
+                                "constraints": [
+                                    {
+                                        "key": "min_images_per_label",
+                                        "value": -5,  # invalid negative value
+                                    }
+                                ]
+                            },
+                        }
+                    ]
+                },
+                "greater_than_equal",
+            ),
+        ],
+        ids=[
+            "missing_task_id",
+            "invalid_data_type",
+            "invalid_task_configs_type",
+            "invalid_negative_value",
+        ],
+    )
+    def test_update_project_configuration_validation_errors(
+        self, fxt_director_app, fxt_enable_feature_flag_name, payload, expected_error_type
+    ) -> None:
+        # Arrange
+        fxt_enable_feature_flag_name(FeatureFlag.FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS.name)
+
+        # Act
+        result = fxt_director_app.patch(
+            f"{API_PROJECT_PATTERN}/project_configuration",
+            json=payload,
+        )
+
+        # Assert
+        assert result.status_code == HTTPStatus.BAD_REQUEST
+        response = json.loads(result.content)
+        assert "errors" in response
+        assert len(response["errors"]) == 1
+        assert response["errors"][0]["type"] == expected_error_type

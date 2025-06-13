@@ -20,6 +20,7 @@ from geti_configuration_tools.training_configuration import (
     GlobalParameters,
     MaxAnnotationObjects,
     MaxAnnotationPixels,
+    MinAnnotationObjects,
     MinAnnotationPixels,
     NullTrainingConfiguration,
     PartialGlobalParameters,
@@ -60,6 +61,7 @@ def fxt_global_parameters():
             filtering=Filtering(
                 min_annotation_pixels=MinAnnotationPixels(enable=True, min_annotation_pixels=10),
                 max_annotation_pixels=MaxAnnotationPixels(enable=True, max_annotation_pixels=1000),
+                min_annotation_objects=MinAnnotationObjects(enable=True, min_annotation_objects=5),
                 max_annotation_objects=MaxAnnotationObjects(enable=True, max_annotation_objects=100),
             ),
         )
@@ -102,6 +104,7 @@ class TestTrainingConfiguration:
                         filtering=Filtering(
                             min_annotation_pixels=MinAnnotationPixels(),
                             max_annotation_pixels=MaxAnnotationPixels(),
+                            min_annotation_objects=MinAnnotationObjects(),
                             max_annotation_objects=MaxAnnotationObjects(),
                         ),
                     )
@@ -126,6 +129,7 @@ class TestTrainingConfiguration:
                                 min_annotation_pixels=0,  # Invalid: must be > 0
                             ),
                             max_annotation_pixels=MaxAnnotationPixels(),
+                            min_annotation_objects=MinAnnotationObjects(),
                             max_annotation_objects=MaxAnnotationObjects(),
                         ),
                     )

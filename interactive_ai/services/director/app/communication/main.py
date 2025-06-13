@@ -9,9 +9,11 @@ import http
 import logging
 import os
 from collections import defaultdict
+from collections.abc import Sequence
 from contextlib import asynccontextmanager
 
 import jsonschema
+import pydantic
 import uvicorn
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
@@ -201,6 +203,46 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             {
                 "error_code": "bad_request",
                 "message": reformatted_message,
+                "http_status": http.HTTPStatus.BAD_REQUEST.value,
+            }
+        ),
+        headers=headers,
+    )
+
+
+@app.exception_handler(pydantic.ValidationError)
+async def pydantic_validation_exception_handler(request: Request, exc: pydantic.ValidationError) -> JSONResponse:  # noqa: ARG001
+    """
+    Converts a pydantic ValidationError to a better readable Bad request exception.
+    """
+
+    def format_location(loc: Sequence[str | int]) -> str:
+        """
+        Format location path with proper dot notation and array indices.
+
+        Example:
+            format_location(['a', 0, 'b', 1, 'c']) -> 'a[0].b[1].c'
+        """
+        result = ""
+        for i, item in enumerate(loc):
+            if isinstance(item, int):
+                result += f"[{item}]"
+            else:
+                result += f".{item}" if i > 0 else str(item)
+        return result
+
+    errors = [
+        {"message": error["msg"], "type": error["type"], "location": format_location(error.get("loc", []))}
+        for error in exc.errors()
+    ]
+
+    headers = {"Cache-Control": "no-cache"}  # always revalidate
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content=jsonable_encoder(
+            {
+                "error_code": "bad_request",
+                "errors": errors,
                 "http_status": http.HTTPStatus.BAD_REQUEST.value,
             }
         ),

@@ -7,6 +7,7 @@ from geti_configuration_tools.training_configuration import (
     GlobalParameters,
     MaxAnnotationObjects,
     MaxAnnotationPixels,
+    MinAnnotationObjects,
     MinAnnotationPixels,
     NullTrainingConfiguration,
     SubsetSplit,
@@ -22,6 +23,7 @@ class TestTrainingConfigurationRepo:
         # Arrange
         repo = PartialTrainingConfigurationRepo(fxt_project_identifier)
         request.addfinalizer(lambda: repo.delete_all())
+        fxt_training_configuration_task_level.global_parameters.dataset_preparation.subset_split.dataset_size = 10
 
         # Save the configuration to the repository
         repo.save(fxt_training_configuration_task_level)
@@ -33,6 +35,8 @@ class TestTrainingConfigurationRepo:
         assert retrieved_config.id_ == fxt_training_configuration_task_level.id_
         assert retrieved_config.task_id == fxt_training_configuration_task_level.task_id
         assert retrieved_config.model_dump() == fxt_training_configuration_task_level.model_dump()
+        # dataset_size field should not be saved
+        assert retrieved_config.global_parameters.dataset_preparation.subset_split.dataset_size is None
 
         # Test with non-existent task ID
         non_existent_task_id = ID("non_existent_task_id")
@@ -71,6 +75,7 @@ class TestTrainingConfigurationRepo:
                 filtering=Filtering(
                     min_annotation_pixels=MinAnnotationPixels(),
                     max_annotation_pixels=MaxAnnotationPixels(),
+                    min_annotation_objects=MinAnnotationObjects(),
                     max_annotation_objects=MaxAnnotationObjects(),
                 ),
             )

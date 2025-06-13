@@ -2,7 +2,7 @@
 # LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 from geti_types import ID, PersistentEntity
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from .utils import partial_model
 
@@ -55,6 +55,12 @@ class TaskConfig(BaseModel):
     auto_training: AutoTrainingParameters = Field(
         title="Auto-training parameters", description="Parameters controlling auto-training"
     )
+
+    @model_validator(mode="after")
+    def task_id_not_empty(self) -> "TaskConfig":
+        if not self.task_id:
+            raise ValueError("Task ID must be provided as part of the task configuration and cannot be empty.")
+        return self
 
 
 class ProjectConfiguration(BaseModel, PersistentEntity):

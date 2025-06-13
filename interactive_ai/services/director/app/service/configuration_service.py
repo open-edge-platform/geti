@@ -13,6 +13,7 @@ from geti_configuration_tools.training_configuration import (
     GlobalParameters,
     MaxAnnotationObjects,
     MaxAnnotationPixels,
+    MinAnnotationObjects,
     MinAnnotationPixels,
     PartialTrainingConfiguration,
     SubsetSplit,
@@ -97,6 +98,7 @@ class ConfigurationService:
                 filtering=Filtering(
                     min_annotation_pixels=MinAnnotationPixels(),
                     max_annotation_pixels=MaxAnnotationPixels(),
+                    min_annotation_objects=MinAnnotationObjects(),
                     max_annotation_objects=MaxAnnotationObjects(),
                 ),
             ),
