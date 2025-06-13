@@ -97,10 +97,6 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
                 ) : (
                     <AdvancedSettings
                         configParameters={configParameters}
-                        selectedTask={selectedTask}
-                        tasks={tasks}
-                        onTaskChange={changeTask}
-                        isTaskChainProject={isTaskChainProject}
                         selectedModelTemplateId={selectedModelTemplateId}
                         onChangeSelectedTemplateId={changeSelectedTemplateId}
                         algorithms={algorithms}
