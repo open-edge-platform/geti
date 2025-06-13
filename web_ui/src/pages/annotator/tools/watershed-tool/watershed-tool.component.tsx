@@ -3,10 +3,7 @@
 
 import { ComponentProps, useEffect } from 'react';
 
-import { type WatershedPolygon } from '@geti/smart-tools';
-
 import { ShapeType } from '../../../../core/annotations/shapetype.enum';
-import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { Line } from '../../annotation/shapes/line.component';
 import { Polygon } from '../../annotation/shapes/polygon.component';
 import { CircleSizePreview } from '../../components/circle-size-preview/circle-size-preview.component';
@@ -19,12 +16,7 @@ import { Marker } from '../marker-tool/marker-tool.interface';
 import { ToolAnnotationContextProps } from '../tools.interface';
 import { drawingStyles, isPolygonValid } from '../utils';
 import { BrushSizeCursor } from './brush-size-cursor.component';
-import {
-    BACKGROUND_LABEL_MARKER_ID,
-    formatAndAddAnnotations,
-    getScaleValue,
-    mapPolygonsToWatershedPolygons,
-} from './utils';
+import { BACKGROUND_LABEL_MARKER_ID, formatAndAddAnnotations, getScaleValue, WatershedPolygonWithLabel } from './utils';
 import { useWatershedState } from './watershed-state-provider.component';
 
 const MIN_NUMBER_OF_REQUIRED_UNIQUE_MARKERS = 2;
@@ -35,9 +27,6 @@ export const WatershedTool = ({ annotationToolContext }: ToolAnnotationContextPr
         zoomState: { zoom },
     } = useZoom();
     const { roi, image } = useROI();
-    const {
-        project: { labels },
-    } = useProject();
 
     const { shapes, onComplete, runWatershed, reset, setShapes, brushSize, isBrushSizePreviewVisible } =
         useWatershedState();
@@ -45,7 +34,7 @@ export const WatershedTool = ({ annotationToolContext }: ToolAnnotationContextPr
     useAddUnfinishedShape({
         shapes: shapes.watershedPolygons,
         addShapes: (watershedPolygons) =>
-            formatAndAddAnnotations(watershedPolygons as WatershedPolygon[], scene.addAnnotations, labels),
+            formatAndAddAnnotations(watershedPolygons as WatershedPolygonWithLabel[], scene.addAnnotations),
         reset,
     });
 
@@ -55,7 +44,7 @@ export const WatershedTool = ({ annotationToolContext }: ToolAnnotationContextPr
         sensitivity: selectedSensitivity,
     } = getToolSettings(ToolType.WatershedTool);
 
-    const getValidPolygons = (watershedPolygon: WatershedPolygon[]) =>
+    const getValidPolygons = (watershedPolygon: WatershedPolygonWithLabel[]) =>
         watershedPolygon.filter(({ points }) => isPolygonValid({ shapeType: ShapeType.Polygon, points }));
 
     const triggerWatershed = (markers: Marker[]) => {
@@ -72,7 +61,7 @@ export const WatershedTool = ({ annotationToolContext }: ToolAnnotationContextPr
                 onSuccess: (result) => {
                     setShapes((previousShapes) => ({
                         markers: [...previousShapes.markers, ...markers],
-                        watershedPolygons: mapPolygonsToWatershedPolygons(getValidPolygons(result), labels),
+                        watershedPolygons: getValidPolygons(result),
                     }));
                 },
             }

@@ -5,11 +5,9 @@ import { fireEvent, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
 import { DOMAIN } from '../../../../core/projects/core.interface';
-import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedAnnotation } from '../../../../test-utils/mocked-items-factory/mocked-annotations';
 import { getMockedLabel } from '../../../../test-utils/mocked-items-factory/mocked-labels';
-import { getMockedProject } from '../../../../test-utils/mocked-items-factory/mocked-project';
 import { projectRender as render } from '../../../../test-utils/project-provider-render';
 import { getMockedImage, getMockedROI } from '../../../../test-utils/utils';
 import { ToolType } from '../../core/annotation-tool-context.interface';
@@ -82,12 +80,6 @@ const mockAnnotationToolContext = fakeAnnotationToolContext({
 
 const updateToolSettings = mockAnnotationToolContext.updateToolSettings as jest.Mock;
 
-const projectService = createInMemoryProjectService();
-projectService.getProject = async () =>
-    getMockedProject({
-        labels: [getMockedLabel()],
-    });
-
 const renderMockApp = async () =>
     await render(
         <AnnotationSceneProvider annotations={[getMockedAnnotation({})]} labels={[]}>
@@ -96,8 +88,7 @@ const renderMockApp = async () =>
                     <SecondaryToolbar annotationToolContext={mockAnnotationToolContext} />
                 </WatershedStateProvider>
             </TaskProvider>
-        </AnnotationSceneProvider>,
-        { services: { projectService } }
+        </AnnotationSceneProvider>
     );
 
 describe('Secondary Toolbar', () => {
@@ -232,8 +223,8 @@ describe('Secondary Toolbar', () => {
             shapes: {
                 markers: [],
                 watershedPolygons: [
-                    { id: 1, label: { id: 11 }, points: [123, 456] },
-                    { id: 2, label: { id: 12 }, points: [222, 444] },
+                    { id: 1, points: [123, 456] },
+                    { id: 2, points: [222, 444] },
                 ],
             },
             undoRedoActions: {

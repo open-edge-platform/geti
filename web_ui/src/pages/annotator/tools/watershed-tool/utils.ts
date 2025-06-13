@@ -94,12 +94,10 @@ const formatToPolygonShapesWithLabel = (watershedPolygons: WatershedPolygonWithL
 };
 
 export const formatAndAddAnnotations = (
-    watershedPolygons: WatershedPolygon[],
-    addAnnotations: (annotations: Annotation[]) => void,
-    projectLabels: Label[]
+    watershedPolygons: WatershedPolygonWithLabel[],
+    addAnnotations: (annotations: Annotation[]) => void
 ): Annotation[] => {
-    const mappedPolygons = mapPolygonsToWatershedPolygons(watershedPolygons, projectLabels);
-    const newAnnotations = formatToPolygonShapesWithLabel(mappedPolygons).map(([shape, label], index) => {
+    const newAnnotations = formatToPolygonShapesWithLabel(watershedPolygons).map(([shape, label], index) => {
         return getLabeledShape(uuidv4(), shape, [labelFromUser(label)], false, index);
     });
 
