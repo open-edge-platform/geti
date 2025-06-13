@@ -4,30 +4,37 @@
 import { FC } from 'react';
 
 import { View } from '@geti/ui';
+import { isEmpty } from 'lodash-es';
 
-import { ConfigurableParametersTaskChain } from '../../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import { TrainingConfiguration } from '../../../../../../../core/configurable-parameters/services/configuration.interface';
 import { DataAugmentation } from './data-augmentation/data-augmentation.component';
 import { Filters } from './filters/filters.component';
 import { Tiling } from './tiling/tiling.component';
 import { TrainingSubsets } from './training-subsets/training-subsets.component';
 
 interface DataManagementProps {
-    configParameters: ConfigurableParametersTaskChain;
+    trainingConfiguration: TrainingConfiguration;
+    onUpdateTrainingConfiguration: (
+        updateFunction: (config: TrainingConfiguration | undefined) => TrainingConfiguration | undefined
+    ) => void;
 }
 
-const getTilingParameters = (configParameters: ConfigurableParametersTaskChain) => {
-    return configParameters.components.find((component) => component.header === 'Tiling');
+const getTilingParameters = (_configParameters: TrainingConfiguration) => {
+    return undefined;
 };
 
-export const DataManagement: FC<DataManagementProps> = ({ configParameters }) => {
-    const tilingParameters = getTilingParameters(configParameters);
+export const DataManagement: FC<DataManagementProps> = ({ trainingConfiguration, onUpdateTrainingConfiguration }) => {
+    const tilingParameters = getTilingParameters(trainingConfiguration);
 
     return (
         <View>
             {/* Not supported in v1 of training flow revamp <BalanceLabelsDistribution /> */}
-            <TrainingSubsets />
+            <TrainingSubsets
+                subsetsConfiguration={trainingConfiguration.datasetPreparation.subsetSplit}
+                onUpdateTrainingConfiguration={onUpdateTrainingConfiguration}
+            />
             {tilingParameters !== undefined && <Tiling tilingParameters={tilingParameters} />}
-            <DataAugmentation />
+            {!isEmpty(trainingConfiguration.datasetPreparation.augmentation) && <DataAugmentation />}
             <Filters />
             {/* Not supported in v1 of training flow revamp <RemovingDuplicates /> */}
         </View>

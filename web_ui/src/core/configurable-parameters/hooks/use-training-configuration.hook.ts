@@ -2,7 +2,7 @@
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
 import { useApplicationServices } from '@geti/core/src/services/application-services-provider.component';
-import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { keepPreviousData, queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 
 import QUERY_KEYS from '../../../../packages/core/src/requests/query-keys';
@@ -23,6 +23,7 @@ const trainingConfigurationQueryOptions = (
         queryFn: () => {
             return service.getTrainingConfiguration(projectIdentifier, queryParameters);
         },
+        placeholderData: keepPreviousData,
     });
 
 export const useTrainingConfigurationQuery = (

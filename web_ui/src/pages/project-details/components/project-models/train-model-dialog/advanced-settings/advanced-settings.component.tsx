@@ -6,6 +6,7 @@ import { FC, ReactNode } from 'react';
 import { Flex, Item, TabList, TabPanels, Tabs, Text, View } from '@geti/ui';
 
 import { ConfigurableParametersTaskChain } from '../../../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import { TrainingConfiguration } from '../../../../../../core/configurable-parameters/services/configuration.interface';
 import { Task } from '../../../../../../core/projects/task.interface';
 import { SupportedAlgorithm } from '../../../../../../core/supported-algorithms/supported-algorithms.interface';
 import { TaskSelection } from '../model-types/task-selection.component';
@@ -39,6 +40,10 @@ interface AdvancedSettingsProps {
     isReshufflingSubsetsEnabled: boolean;
     onReshufflingSubsetsEnabledChange: (reshufflingSubsetsEnabled: boolean) => void;
     configParameters: ConfigurableParametersTaskChain;
+    trainingConfiguration: TrainingConfiguration;
+    onUpdateTrainingConfiguration: (
+        updateFunction: (config: TrainingConfiguration | undefined) => TrainingConfiguration | undefined
+    ) => void;
     trainFromScratch: boolean;
     onTrainFromScratchChange: (trainFromScratch: boolean) => void;
 }
@@ -62,6 +67,8 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
     onReshufflingSubsetsEnabledChange,
     trainFromScratch,
     onTrainFromScratchChange,
+    trainingConfiguration,
+    onUpdateTrainingConfiguration,
 }) => {
     const TABS: TabProps[] = [
         {
@@ -77,7 +84,12 @@ export const AdvancedSettings: FC<AdvancedSettingsProps> = ({
         },
         {
             name: 'Data management',
-            children: <DataManagement configParameters={configParameters} />,
+            children: (
+                <DataManagement
+                    trainingConfiguration={trainingConfiguration}
+                    onUpdateTrainingConfiguration={onUpdateTrainingConfiguration}
+                />
+            ),
         },
         {
             name: 'Training',

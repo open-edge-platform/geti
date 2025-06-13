@@ -1,17 +1,20 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { keepPreviousData } from '@tanstack/react-query';
 import { isEmpty, isNumber } from 'lodash-es';
 
 import { useConfigParameters } from '../../../../../core/configurable-parameters/hooks/use-config-parameters.hook';
+import { useTrainingConfigurationQuery } from '../../../../../core/configurable-parameters/hooks/use-training-configuration.hook';
+import { TrainingConfiguration } from '../../../../../core/configurable-parameters/services/configuration.interface';
 import { useFeatureFlags } from '../../../../../core/feature-flags/hooks/use-feature-flags.hook';
 import { TrainingBodyDTO } from '../../../../../core/models/dtos/train-model.interface';
 import { useModels } from '../../../../../core/models/hooks/use-models.hook';
 import { ModelsGroups } from '../../../../../core/models/models.interface';
 import { isActiveModel } from '../../../../../core/models/utils';
+import { ProjectIdentifier } from '../../../../../core/projects/core.interface';
 import { Task } from '../../../../../core/projects/task.interface';
 import { useTasksWithSupportedAlgorithms } from '../../../../../core/supported-algorithms/hooks/use-tasks-with-supported-algorithms';
 import { SupportedAlgorithm } from '../../../../../core/supported-algorithms/supported-algorithms.interface';
@@ -41,6 +44,33 @@ const getActiveModelTemplateId = (
     );
 };
 
+const useTrainingConfiguration = ({
+    projectIdentifier,
+    selectedTaskId,
+    selectedModelTemplateId,
+}: {
+    projectIdentifier: ProjectIdentifier;
+    selectedTaskId: string;
+    selectedModelTemplateId: string | null;
+}) => {
+    const { data } = useTrainingConfigurationQuery(projectIdentifier, {
+        modelManifestId: selectedModelTemplateId,
+        taskId: selectedTaskId,
+    });
+
+    const [trainingConfiguration, setTrainingConfiguration] = useState<TrainingConfiguration | undefined>(data);
+
+    useEffect(() => {
+        if (data === undefined) {
+            return;
+        }
+
+        setTrainingConfiguration(data);
+    }, [data]);
+
+    return [trainingConfiguration, setTrainingConfiguration] as const;
+};
+
 export const useTrainModelState = () => {
     const [mode, setMode] = useState<TrainModelMode>(TrainModelMode.BASIC);
 
@@ -61,6 +91,12 @@ export const useTrainModelState = () => {
     const [selectedModelTemplateId, setSelectedModelTemplateId] = useState<string | null>(activeModelTemplateId);
 
     const isBasicMode = mode === TrainModelMode.BASIC;
+
+    const [trainingConfiguration, setTrainingConfiguration] = useTrainingConfiguration({
+        projectIdentifier,
+        selectedTaskId: selectedTask.id,
+        selectedModelTemplateId,
+    });
 
     const { useGetModelConfigParameters } = useConfigParameters(projectIdentifier);
     const { data: configParameters } = useGetModelConfigParameters(
@@ -131,5 +167,7 @@ export const useTrainModelState = () => {
         configParameters,
         trainFromScratch,
         changeTrainFromScratch: handleTrainFromScratchChange,
+        trainingConfiguration,
+        updateTrainingConfiguration: setTrainingConfiguration,
     } as const;
 };
