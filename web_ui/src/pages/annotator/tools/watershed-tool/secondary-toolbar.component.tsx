@@ -8,6 +8,7 @@ import { isLargeSizeQuery } from '@geti/ui/theme';
 import { isEmpty } from 'lodash-es';
 
 import { filterOutExclusiveLabel } from '../../../../core/labels/utils';
+import { useProject } from '../../../project-details/providers/project-provider/project-provider.component';
 import { AcceptRejectButtonGroup } from '../../components/accept-reject-button-group/accept-reject-button-group.component';
 import { ToolType } from '../../core/annotation-tool-context.interface';
 import { useAnnotationScene } from '../../providers/annotation-scene-provider/annotation-scene-provider.component';
@@ -35,6 +36,9 @@ export const SecondaryToolbar = ({ annotationToolContext }: ToolAnnotationContex
     const isLargeSize = useMediaQuery(isLargeSizeQuery);
     const { shapes, setShapes, undoRedoActions, rejectAnnotation } = useWatershedState();
     const { updateToolSettings, getToolSettings, scene } = annotationToolContext;
+    const {
+        project: { labels },
+    } = useProject();
 
     const taskLabels = tasks
         .filter((task) => WATERSHED_SUPPORTED_DOMAINS.includes(task.domain))
@@ -94,7 +98,7 @@ export const SecondaryToolbar = ({ annotationToolContext }: ToolAnnotationContex
     };
 
     const handleConfirmAnnotation = (): void => {
-        formatAndAddAnnotations(shapes.watershedPolygons, scene.addAnnotations);
+        formatAndAddAnnotations(shapes.watershedPolygons, scene.addAnnotations, labels);
 
         // After we make an annotation we should reset the markers and polygons
         setShapes({ markers: [], watershedPolygons: [] });

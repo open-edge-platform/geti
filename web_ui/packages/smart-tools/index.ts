@@ -3,3 +3,4 @@
 
 export { default as OpenCVLoader } from './src/utils/opencv-loader';
 export { Watershed } from './src/watershed/watershed';
+export { type WatershedInstance, type WatershedPolygon } from './src/watershed/interfaces';

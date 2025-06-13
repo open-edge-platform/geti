@@ -38,7 +38,7 @@ declare interface WindowEventHandlersEventMap {
 }
 
 declare module 'OpenCVTypes' {
-    import * as OpenCVTypes from '@geti/smart-tools/opencv-types';
+    import * as OpenCVTypes from '@geti/smart-tools/opencv';
 
     export = OpenCVTypes;
 }
@@ -46,7 +46,7 @@ declare module 'OpenCVTypes' {
 declare const cv: Promise<OpenCVTypes.cv>;
 
 declare module 'opencv' {
-    import OpenCVTypes from '@geti/smart-tools/opencv-types';
+    import OpenCVTypes from '@geti/smart-tools/opencv';
 
     const OpenCV: Promise<OpenCVTypes>;
     export default OpenCV;

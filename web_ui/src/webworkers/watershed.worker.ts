@@ -1,8 +1,8 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { OpenCVLoader, Watershed } from '@geti/smart-tools';
-import { expose, proxy } from 'comlink';
+import { OpenCVLoader, Watershed, WatershedInstance } from '@geti/smart-tools';
+import { expose, proxy, ProxyMarked } from 'comlink';
 import type OpenCVTypes from 'OpenCVTypes';
 
 declare const self: DedicatedWorkerGlobalScope;
@@ -21,7 +21,7 @@ const waitForOpenCV = async () => {
     return false;
 };
 
-const initWatershed = async (imageData: ImageData) => {
+const initWatershed = async (imageData: ImageData): Promise<WatershedInstance & ProxyMarked> => {
     if (!opencv) {
         throw new Error('OpenCV is not loaded. Please load OpenCV before running Watershed.');
     }
