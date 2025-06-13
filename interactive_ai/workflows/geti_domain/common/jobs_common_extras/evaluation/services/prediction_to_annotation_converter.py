@@ -65,6 +65,10 @@ class IPredictionToAnnotationConverter(metaclass=abc.ABCMeta):
             self.idx_to_label[i] = self.__get_label(label_str, pos_idx=self.model_api_label_map_counts[label_str])
             self.model_api_label_map_counts[label_str] += 1
 
+        print(f"DEBUG: converter labels:")
+        for idx, label in self.idx_to_label.items():
+            print(f"DEBUG:   idx={idx}, label={label.name} (id={label.id_}, is_empty={label.is_empty})")
+
     def __get_label(self, label_str: str, pos_idx: int) -> Label:
         if label_str in self.label_map_ids:
             return self.label_map_ids[label_str]
@@ -101,6 +105,7 @@ class ClassificationToAnnotationConverter(IPredictionToAnnotationConverter):
         for label_idx, label_name, prob in predictions.top_labels:
             _prob = float(prob)
             label = self.get_label_by_idx(label_idx)
+            print(f"DEBUG: label_idx: {label_idx}, label: {label}")
             labels.append(ScoredLabel(label_id=label.id_, is_empty=label.is_empty, probability=_prob))
 
         if not labels and self.empty_label:
