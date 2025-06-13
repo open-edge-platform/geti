@@ -985,38 +985,57 @@ class ProjectBuilder:
                 if label_parent:
                     child_to_parent_id[label] = label_parent
                 group_name_by_label[label.id_] = label_group
-            labels_by_task[task_node.id_] = updated_labels
+
+            # Sort labels according to ordering in request
+            ordered_label_names = parser.get_custom_labels_names_by_task(task_name=task_name)
+            ordered_updated_labels = []
+            for label_name in ordered_label_names:
+                for label in updated_labels:
+                    if label_name == label.name:
+                        ordered_updated_labels.append(label)
+
+            labels_by_task[task_node.id_] = ordered_updated_labels
 
             if is_keypoint_detection_enabled and task_node.task_properties.task_type == TaskType.KEYPOINT_DETECTION:
                 keypoint_structure_data = parser.get_keypoint_structure_data(task_name=task_name)
                 keypoint_structure = cls._build_keypoint_structure(
                     keypoint_structure_data=keypoint_structure_data,
-                    labels=updated_labels,
+                    labels=ordered_updated_labels,
                 )
                 project.keypoint_structure = keypoint_structure
 
-        if labels_structure_changed:
-            # Labels structure changed, so the label_schema and task_to_label_schema_view are recomputed from scratch.
-            (
-                label_schema,
-                task_to_label_schema_view,
-            ) = ProjectBuilder._build_label_schema(  # type: ignore[assignment]
-                project=project,
-                labels_by_task=labels_by_task,
-                group_name_by_label_id=group_name_by_label,
-                child_to_parent_id=child_to_parent_id,  # type: ignore
-                previous_schema_revision_id=label_schema.id_,
-                previous_task_id_to_schema_revision_id=task_id_to_schema_revision_id,
-            )
-            label_schema_repo.save(instance=label_schema)
-            for _, task_label_schema in task_to_label_schema_view.items():
-                label_schema_repo.save(instance=task_label_schema)
+        (
+            new_label_schema,
+            new_task_to_label_schema_view,
+        ) = ProjectBuilder._build_label_schema(  # type: ignore[assignment]
+            project=project,
+            labels_by_task=labels_by_task,
+            group_name_by_label_id=group_name_by_label,
+            child_to_parent_id=child_to_parent_id,  # type: ignore
+            previous_schema_revision_id=label_schema.id_,
+            previous_task_id_to_schema_revision_id=task_id_to_schema_revision_id,
+        )
+
+        # Reset label schema (view) ids if no structural change was made to the label topology
+        # Note that we always have to regenerate and save the schemas to ensure the order of the labels is updated
+        if not labels_structure_changed:
+            new_label_schema.id_ = label_schema.id_
+            new_label_schema.previous_schema_revision_id = label_schema.previous_schema_revision_id
+            for task_title, new_task_label_schema_view in new_task_to_label_schema_view.items():
+                new_task_label_schema_view.id_ = task_to_label_schema_view[task_title].id_
+                new_task_label_schema_view.previous_schema_revision_id = task_to_label_schema_view[
+                    task_title
+                ].previous_schema_revision_id
+
+        label_schema_repo.save(instance=new_label_schema)
+        for new_task_label_schema in new_task_to_label_schema_view.values():
+            label_schema_repo.save(instance=new_task_label_schema)
 
         project_repo.save(instance=project)
         return (
             project,
-            label_schema,
-            task_to_label_schema_view,
+            new_label_schema,
+            new_task_to_label_schema_view,
             tuple(labels_to_revisit),
             modified_scene_ids_by_storage,
             labels_structure_changed,

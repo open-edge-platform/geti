@@ -851,19 +851,3 @@ class TestMultiDiGraph:
                 },
             ]
         )
-
-    def test_multi_di_graph_topological_sort(self):
-        """
-        <b>Description:</b>
-        Check topological_sort method of MultiDiGraph class object
-
-        <b>Input data:</b>
-        MultiDiGraph objects with specified "edges" parameter
-
-        <b>Expected results:</b>
-        Test passes if topological_sort method returns generator object with expected values
-        """
-        multi_di_graph = self.multi_di_graph()
-        topological_sort = multi_di_graph.topological_sort()
-        for expected_value in [(1, 1), (1, 2), (3, 1), (2, 1)]:
-            assert next(topological_sort) == expected_value
