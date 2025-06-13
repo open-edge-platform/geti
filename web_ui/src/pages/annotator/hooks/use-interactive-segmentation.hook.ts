@@ -66,9 +66,7 @@ export const useInteractiveSegmentation = ({
             return wsInstance.current.execute(area, givenPoints, outputShape);
         },
 
-        onError: (error) => {
-            showNotificationError(error);
-        },
+        onError: showNotificationError,
 
         onSuccess: (shape, { givenPoints }: RITMData) => {
             if (cancelRequested.current) {

@@ -144,9 +144,11 @@ export class RITM {
         if (!this.mask) {
             throw 'Cannot buildContour without pointmask';
         }
+
         if (!this.image) {
             throw 'Cannot buildContour without image';
         }
+
         const isClose = true;
 
         const contours = new this.CV.MatVector();
@@ -154,10 +156,12 @@ export class RITM {
         const hierarchy = new this.CV.Mat();
         const contourMask = new this.CV.Mat();
         let resultContour: RITMContour | undefined = undefined;
+
         try {
             contourArea.convertTo(contourMask, this.CV.CV_8UC1, 255);
             this.CV.threshold(contourMask, contourMask, 120, 250, this.CV.THRESH_BINARY);
             this.CV.findContours(contourMask, contours, hierarchy, this.CV.RETR_EXTERNAL, this.CV.CHAIN_APPROX_SIMPLE);
+
             for (let i = 0; i < contours.size(); ++i) {
                 const rawContour = contours.get(i);
                 const contour = approximateShape(this.CV, rawContour, isClose);
@@ -167,15 +171,18 @@ export class RITM {
                         new this.CV.Point(x - imageArea.x, y - imageArea.y),
                         false
                     );
+
                     return collector + pointScore * (positive ? 5 : -1);
                 }, 0);
                 const area = this.CV.contourArea(contour);
+
                 if (
                     !resultContour ||
                     score > resultContour.score ||
                     (score === resultContour.score && area > resultContour.area)
                 ) {
                     const contourPoints: Point[] = [];
+
                     for (let row = 0; row < contour.rows; row++) {
                         contourPoints.push({
                             x: (contour.intAt(row, 0) / contourMask.cols) * imageArea.width + imageArea.x,
