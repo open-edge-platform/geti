@@ -264,7 +264,7 @@ export const getStaticParameter = (parameter: StaticParameterDTO): StaticParamet
 
 export const getProjectConfigurationEntity = ({ task_configs }: ProjectConfigurationDTO): ProjectConfiguration => {
     const taskConfigs = task_configs.map((taskConfig) => {
-        const { task_id, training, auto_training, predictions } = taskConfig;
+        const { task_id, training, auto_training } = taskConfig;
 
         return {
             taskId: task_id,
@@ -272,7 +272,6 @@ export const getProjectConfigurationEntity = ({ task_configs }: ProjectConfigura
                 constraints: training.constraints.map(getParameter),
             },
             autoTraining: auto_training.map(getParameter),
-            predictions: predictions.map(getParameter),
         };
     });
     return {
@@ -369,30 +368,27 @@ export const getTrainingConfigurationUpdatePayloadDTO = (
 export const getProjectConfigurationUploadPayloadDTO = (
     payload: ProjectConfigurationUploadPayload
 ): ProjectConfigurationUploadPayloadDTO => {
-    const projectConfigurationUploadPayloadDTO: ProjectConfigurationUploadPayloadDTO = {};
+    const projectConfigurationUploadPayloadDTO: ProjectConfigurationUploadPayloadDTO = {
+        task_configs: payload.taskConfigs.map((taskConfig) => {
+            const { taskId, training, autoTraining } = taskConfig;
 
-    if (payload.training !== undefined) {
-        projectConfigurationUploadPayloadDTO.training = {
-            constraints: payload.training.constraints.map((parameter) => ({
-                key: parameter.key,
-                value: parameter.value,
-            })),
-        };
-    }
-
-    if (payload.predictions !== undefined) {
-        projectConfigurationUploadPayloadDTO.predictions = payload.predictions.map((parameter) => ({
-            key: parameter.key,
-            value: parameter.value,
-        }));
-    }
-
-    if (payload.autoTraining !== undefined) {
-        projectConfigurationUploadPayloadDTO.auto_training = payload.autoTraining.map((parameter) => ({
-            key: parameter.key,
-            value: parameter.value,
-        }));
-    }
+            return {
+                task_id: taskId,
+                training: training
+                    ? {
+                          constraints: training.constraints.map((parameter) => ({
+                              key: parameter.key,
+                              value: parameter.value,
+                          })),
+                      }
+                    : undefined,
+                auto_training: autoTraining?.map((parameter) => ({
+                    key: parameter.key,
+                    value: parameter.value,
+                })),
+            };
+        }),
+    };
 
     return projectConfigurationUploadPayloadDTO;
 };

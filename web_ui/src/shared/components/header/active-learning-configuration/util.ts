@@ -9,6 +9,11 @@ import {
     BooleanGroupParams,
     NumberGroupParams,
 } from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import {
+    BoolParameter,
+    ConfigurationParameter,
+    NumberParameter,
+} from '../../../../core/configurable-parameters/services/configuration.interface';
 import { Task } from '../../../../core/projects/task.interface';
 
 interface AutoTrainingNotificationConfig {
@@ -17,19 +22,28 @@ interface AutoTrainingNotificationConfig {
     styles: CSSProperties;
 }
 
-export interface AutoTrainingTask {
+interface AutoTrainingTask {
     task: Task;
-    trainingConfig?: BooleanGroupParams;
-    dynamicRequiredAnnotationsConfig?: BooleanGroupParams;
-    requiredImagesAutoTrainingConfig?: NumberGroupParams;
+    trainingConfig?: BooleanGroupParams | BoolParameter;
+    dynamicRequiredAnnotationsConfig?: BooleanGroupParams | BoolParameter;
+    requiredImagesAutoTrainingConfig?: NumberGroupParams | NumberParameter;
 }
 
-export const getAllAutoTrainingValue = (autoTrainingTasks: AutoTrainingTask[]) => {
-    const [firstTask, ...otherTasks] = autoTrainingTasks;
-    const firstValue = firstTask?.trainingConfig?.value;
-    const allEqualsValues = otherTasks.every(({ trainingConfig }) => isEqual(firstValue, trainingConfig?.value));
+export interface UseActiveLearningConfigurationReturnType {
+    autoTrainingTasks: AutoTrainingTask[];
+    isPending: boolean;
+    updateAutoTraining: (taskId: string, value: boolean) => void;
+    updateDynamicRequiredAnnotations: (taskId: string, value: boolean) => void;
+    updateRequiredImagesAutoTraining: (taskId: string, value: number) => void;
+}
 
-    return allEqualsValues ? Boolean(firstValue) : null;
+export const getAllAutoTrainingValue = (autoTrainingValues: boolean[]) => {
+    const [firstTaskAutoTrainingValue, ...otherTasks] = autoTrainingValues;
+    const allEqualsValues = otherTasks.every((otherAutoTrainingValue) =>
+        isEqual(firstTaskAutoTrainingValue, otherAutoTrainingValue)
+    );
+
+    return allEqualsValues ? firstTaskAutoTrainingValue : null;
 };
 
 export const getNotificationConfig = (value: boolean | null): AutoTrainingNotificationConfig => {
@@ -62,4 +76,40 @@ export const getNotificationConfig = (value: boolean | null): AutoTrainingNotifi
                 },
             };
     }
+};
+
+export const getAutoTrainingEnabledParameter = (parameters: ConfigurationParameter[]): BoolParameter | undefined => {
+    const autoTrainingParameter = parameters.find((config) => config.key === 'enable');
+
+    if (autoTrainingParameter !== undefined && autoTrainingParameter.type === 'bool') {
+        return autoTrainingParameter;
+    }
+
+    return undefined;
+};
+
+export const getDynamicRequiredAnnotationsParameter = (
+    parameters: ConfigurationParameter[]
+): BoolParameter | undefined => {
+    const dynamicRequiredAnnotationsParameter = parameters.find(
+        (config) => config.key === 'enable_dynamic_required_annotations'
+    );
+
+    if (dynamicRequiredAnnotationsParameter !== undefined && dynamicRequiredAnnotationsParameter.type === 'bool') {
+        return dynamicRequiredAnnotationsParameter;
+    }
+
+    return undefined;
+};
+
+export const getRequiredImagesAutoTrainingParameter = (
+    parameters: ConfigurationParameter[]
+): NumberParameter | undefined => {
+    const requiredImagesAutoTrainingParameter = parameters.find((config) => config.key === 'min_images_per_label');
+
+    if (requiredImagesAutoTrainingParameter !== undefined && requiredImagesAutoTrainingParameter.type === 'int') {
+        return requiredImagesAutoTrainingParameter;
+    }
+
+    return undefined;
 };

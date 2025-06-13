@@ -15,7 +15,7 @@ export interface NumberParameter extends ParameterBase {
     defaultValue: number;
 }
 
-interface BoolParameter extends ParameterBase {
+export interface BoolParameter extends ParameterBase {
     type: 'bool';
     value: boolean;
     defaultValue: boolean;
@@ -42,17 +42,18 @@ interface ProjectConfigurationTaskConfigs {
     taskId: string;
     training: ProjectConfigurationTaskConfigsTraining;
     autoTraining: ConfigurationParameter[];
-    predictions: ConfigurationParameter[];
 }
 
-type KeyValueParameter = Pick<ConfigurationParameter, 'key' | 'value'>;
+export type KeyValueParameter = Pick<ConfigurationParameter, 'key' | 'value'>;
 
 export interface ProjectConfigurationUploadPayload {
-    training?: {
-        constraints: KeyValueParameter[];
-    };
-    autoTraining?: KeyValueParameter[];
-    predictions?: KeyValueParameter[];
+    taskConfigs: {
+        taskId: string;
+        training?: {
+            constraints: KeyValueParameter[];
+        };
+        autoTraining?: KeyValueParameter[];
+    }[];
 }
 
 export interface ProjectConfiguration {

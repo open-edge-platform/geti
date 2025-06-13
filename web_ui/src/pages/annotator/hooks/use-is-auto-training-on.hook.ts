@@ -3,7 +3,7 @@
 
 import { ProjectIdentifier } from '../../../core/projects/core.interface';
 import { ProjectProps } from '../../../core/projects/project.interface';
-import { useAutoTrainingTasksConfig } from '../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
+import { useActiveLearningConfiguration } from '../../../shared/components/header/active-learning-configuration/use-active-learning-configuration.hook';
 
 export const useIsAutoTrainingOn = ({
     project,
@@ -12,7 +12,7 @@ export const useIsAutoTrainingOn = ({
     project: ProjectProps;
     projectIdentifier: ProjectIdentifier;
 }) => {
-    const { autoTrainingTasks, isLoading } = useAutoTrainingTasksConfig(projectIdentifier, project.tasks);
+    const { autoTrainingTasks, isPending } = useActiveLearningConfiguration(projectIdentifier, project.tasks);
 
-    return !isLoading && autoTrainingTasks.some(({ trainingConfig }) => trainingConfig?.value === true);
+    return !isPending && autoTrainingTasks.some(({ trainingConfig }) => trainingConfig?.value === true);
 };

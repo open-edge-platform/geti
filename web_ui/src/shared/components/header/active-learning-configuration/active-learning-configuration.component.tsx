@@ -21,13 +21,13 @@ import { useModels } from '../../../../core/models/hooks/use-models.hook';
 import { Task } from '../../../../core/projects/task.interface';
 import { useProject } from '../../../../pages/project-details/providers/project-provider/project-provider.component';
 import { ActiveLearningConfigurationContent } from './active-learning-configuration-content.component';
-import { useAutoTrainingTasksConfig } from './use-tasks-auto-training-config.hook';
-import { AutoTrainingTask, getAllAutoTrainingValue, getNotificationConfig } from './util';
+import { useActiveLearningConfiguration } from './use-active-learning-configuration.hook';
+import { getAllAutoTrainingValue, getNotificationConfig } from './util';
 
 import classes from './auto-training.module.scss';
 
-export const CornerIndicator = ({ autoTrainingTasks }: { autoTrainingTasks: AutoTrainingTask[] }) => {
-    const { isVisible, styles, text } = getNotificationConfig(getAllAutoTrainingValue(autoTrainingTasks));
+export const CornerIndicator = ({ allAutoTrainingValues }: { allAutoTrainingValues: boolean[] }) => {
+    const { isVisible, styles, text } = getNotificationConfig(getAllAutoTrainingValue(allAutoTrainingValues));
 
     return (
         <div style={styles} className={classes.cornerIndicator} aria-label={`Active learning configuration ${text}`}>
@@ -40,9 +40,9 @@ const ActiveLearningConfigurationDialog = ({ selectedTask }: { selectedTask: Tas
     const { project, projectIdentifier } = useProject();
     const { useProjectModelsQuery } = useModels();
     const { isLoading: isLoadingModels } = useProjectModelsQuery();
-    const { isLoading } = useAutoTrainingTasksConfig(projectIdentifier, project.tasks);
+    const { isPending } = useActiveLearningConfiguration(projectIdentifier, project.tasks);
 
-    const isLoadingData = isLoading || isLoadingModels;
+    const isLoadingData = isPending || isLoadingModels;
 
     return (
         <Dialog width={'size-6000'}>
@@ -73,10 +73,7 @@ export const ActiveLearningConfiguration = ({
     selectedTask,
 }: ActiveLearningConfigurationProps): JSX.Element => {
     const { project, projectIdentifier } = useProject();
-    const { autoTrainingTasks, isLoading, configParameters } = useAutoTrainingTasksConfig(
-        projectIdentifier,
-        project.tasks
-    );
+    const { autoTrainingTasks, isPending } = useActiveLearningConfiguration(projectIdentifier, project.tasks);
 
     const filteredTaskAutoTraining = autoTrainingTasks.filter(({ task }) => task.id === selectedTask?.id);
     const filteredAutoTrainingTask = isNil(selectedTask) ? autoTrainingTasks : filteredTaskAutoTraining;
@@ -87,14 +84,20 @@ export const ActiveLearningConfiguration = ({
                 <ActionButton
                     isQuiet
                     width={15}
-                    isDisabled={isLoading}
+                    isDisabled={isPending}
                     id={'active-learning-configuration-button'}
                     aria-label={'Active learning configuration'}
                     colorVariant={isDarkMode ? 'dark' : 'light'}
                     zIndex={1}
                 >
                     <AutoTraining width={15} aria-label={'tasks in progress'} />
-                    {configParameters && <CornerIndicator autoTrainingTasks={filteredAutoTrainingTask} />}
+                    {!isPending && (
+                        <CornerIndicator
+                            allAutoTrainingValues={filteredAutoTrainingTask.map((filteredTask) =>
+                                Boolean(filteredTask.trainingConfig?.value)
+                            )}
+                        />
+                    )}
                 </ActionButton>
 
                 <Tooltip>Active learning configuration</Tooltip>

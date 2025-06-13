@@ -1,120 +1,176 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { UseQueryResult } from '@tanstack/react-query';
-import { fireEvent, screen } from '@testing-library/react';
-import { AxiosError } from 'axios';
+import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 
-import {
-    BooleanGroupParams,
-    ConfigurableParametersTaskChain,
-} from '../../../../core/configurable-parameters/services/configurable-parameters.interface';
+import { CreateApiModelConfigParametersService } from '../../../../core/configurable-parameters/services/api-model-config-parameters-service';
+import { createInMemoryApiModelConfigParametersService } from '../../../../core/configurable-parameters/services/in-memory-api-model-config-parameters-service';
 import { DOMAIN } from '../../../../core/projects/core.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
 import { ProjectService } from '../../../../core/projects/services/project-service.interface';
 import { Task } from '../../../../core/projects/task.interface';
+import { getMockedProjectConfiguration } from '../../../../test-utils/mocked-items-factory/mocked-configuration-parameters';
 import { getMockedProject } from '../../../../test-utils/mocked-items-factory/mocked-project';
 import { getMockedTask } from '../../../../test-utils/mocked-items-factory/mocked-tasks';
 import { projectRender as render } from '../../../../test-utils/project-provider-render';
 import { ActiveLearningConfiguration, CornerIndicator } from './active-learning-configuration.component';
 
-const mockedUseGetConfigParameters = jest.fn();
-jest.mock('../../../../core/configurable-parameters/hooks/use-config-parameters.hook', () => ({
-    useConfigParameters: jest.fn(() => ({
-        useGetConfigParameters: mockedUseGetConfigParameters,
-        reconfigureParametersMutation: { isLoading: true },
-    })),
-}));
-
-const mockConfigParamData = ({
-    tasks,
-    autoTraining = true,
-    dynamicRequiredAnnotations = true,
+const renderApp = async ({
+    isDarkMode = true,
+    selectedTask = null,
+    projectService,
+    configParametersService = createInMemoryApiModelConfigParametersService(),
+    FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS,
 }: {
-    tasks: Task[];
-    autoTraining: boolean;
-    dynamicRequiredAnnotations: boolean;
+    isDarkMode: boolean;
+    selectedTask: Task | null;
+    projectService: ProjectService;
+    configParametersService?: CreateApiModelConfigParametersService;
+    FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS: boolean;
 }) => {
-    return {
-        isLoading: false,
-        data: tasks.map(({ id }) => ({
-            taskId: id,
-            components: [
-                {
-                    header: 'General',
-                    parameters: [
-                        {
-                            header: 'Auto-training',
-                            value: autoTraining,
-                        },
-                    ],
-                },
-                {
-                    header: 'Annotation requirements',
-                    parameters: [
-                        {
-                            header: 'Dynamic required annotations',
-                            value: dynamicRequiredAnnotations,
-                        },
-                    ],
-                },
-            ],
-        })),
-    } as unknown as UseQueryResult<ConfigurableParametersTaskChain[], AxiosError>;
-};
+    await render(<ActiveLearningConfiguration isDarkMode={isDarkMode} selectedTask={selectedTask} />, {
+        services: { projectService, configParametersService },
+        featureFlags: { FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS },
+    });
 
-const renderApp = async (isDarkMode = true, selectedTask: Task | null = null, projectService: ProjectService) => {
-    return render(<ActiveLearningConfiguration isDarkMode={isDarkMode} selectedTask={selectedTask} />, {
-        services: { projectService },
+    await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Active learning configuration' })).toBeEnabled();
     });
 };
 
 describe('ActiveLearningConfiguration', () => {
-    const projectService = createInMemoryProjectService();
+    describe('with FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS disabled', () => {
+        const projectService = createInMemoryProjectService();
+        const configParametersService = createInMemoryApiModelConfigParametersService();
 
-    const project = getMockedProject({
-        tasks: [
-            getMockedTask({ title: 'detection', id: 'detection', domain: DOMAIN.DETECTION }),
-            getMockedTask({ title: 'classification', id: 'classification', domain: DOMAIN.CLASSIFICATION }),
-        ],
+        const project = getMockedProject({
+            tasks: [
+                getMockedTask({ title: 'detection', id: 'detection', domain: DOMAIN.DETECTION }),
+                getMockedTask({ title: 'classification', id: 'classification', domain: DOMAIN.CLASSIFICATION }),
+            ],
+        });
+
+        // @ts-expect-error We don't need to mock all the parameter's fields
+        configParametersService.getConfigParameters = async () => {
+            return Promise.resolve(
+                project.tasks.map(({ id }) => ({
+                    taskId: id,
+                    components: [
+                        {
+                            header: 'General',
+                            parameters: [
+                                {
+                                    header: 'Auto-training',
+                                    value: true,
+                                },
+                            ],
+                        },
+                        {
+                            header: 'Annotation requirements',
+                            parameters: [
+                                {
+                                    header: 'Dynamic required annotations',
+                                    value: true,
+                                },
+                            ],
+                        },
+                    ],
+                }))
+            );
+        };
+
+        projectService.getProject = async () => project;
+
+        it('renders training settings tabs for each task', async () => {
+            await renderApp({
+                isDarkMode: false,
+                selectedTask: null,
+                projectService,
+                configParametersService,
+                FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS: false,
+            });
+
+            fireEvent.click(screen.getByRole('button', { name: 'Active learning configuration' }));
+
+            expect(await screen.findByRole('heading', { name: 'Training' })).toBeInTheDocument();
+
+            fireEvent.click(screen.getByRole('button', { name: /Select a task to configure its training settings/ }));
+
+            for (const task of project.tasks) {
+                expect(await screen.findByRole('option', { name: task.title })).toBeVisible();
+            }
+        });
     });
-    projectService.getProject = async () => project;
 
-    beforeEach(() => {
-        jest.mocked(mockedUseGetConfigParameters).mockReturnValue(
-            mockConfigParamData({ tasks: project.tasks, autoTraining: true, dynamicRequiredAnnotations: true })
-        );
-    });
+    describe('with FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS enabled', () => {
+        const projectService = createInMemoryProjectService();
+        const configParametersService = createInMemoryApiModelConfigParametersService();
 
-    it('renders training settings tabs for each task', async () => {
-        await renderApp(false, null, projectService);
+        const project = getMockedProject({
+            tasks: [
+                getMockedTask({ title: 'detection', id: 'detection', domain: DOMAIN.DETECTION }),
+                getMockedTask({ title: 'classification', id: 'classification', domain: DOMAIN.CLASSIFICATION }),
+            ],
+        });
 
-        fireEvent.click(screen.getByRole('button', { name: 'Active learning configuration' }));
+        configParametersService.getProjectConfiguration = async () => {
+            const projectConfiguration = getMockedProjectConfiguration();
 
-        expect(await screen.findByRole('heading', { name: 'Training' })).toBeInTheDocument();
+            return Promise.resolve(
+                getMockedProjectConfiguration({
+                    taskConfigs: [
+                        {
+                            taskId: project.tasks[0].id,
+                            training: { constraints: [] },
+                            autoTraining: projectConfiguration.taskConfigs[0].autoTraining,
+                        },
+                        {
+                            taskId: project.tasks[1].id,
+                            training: { constraints: [] },
+                            autoTraining: projectConfiguration.taskConfigs[0].autoTraining,
+                        },
+                    ],
+                })
+            );
+        };
 
-        fireEvent.click(screen.getByRole('button', { name: /Select a task to configure its training settings/ }));
+        projectService.getProject = async () => project;
 
-        for (const task of project.tasks) {
-            expect(await screen.findByRole('option', { name: task.title })).toBeVisible();
-        }
+        it('renders training settings tabs for each task', async () => {
+            await renderApp({
+                isDarkMode: false,
+                selectedTask: null,
+                FEATURE_FLAG_NEW_CONFIGURABLE_PARAMETERS: true,
+                projectService,
+                configParametersService,
+            });
+
+            fireEvent.click(screen.getByRole('button', { name: 'Active learning configuration' }));
+
+            await waitForElementToBeRemoved(screen.getByRole('progressbar', { name: 'Loading' }));
+
+            screen.debug();
+
+            expect(await screen.findByRole('heading', { name: 'Training' })).toBeInTheDocument();
+
+            fireEvent.click(screen.getByRole('button', { name: /Select a task to configure its training settings/ }));
+
+            for (const task of project.tasks) {
+                expect(await screen.findByRole('option', { name: task.title })).toBeVisible();
+            }
+        });
     });
 });
 
 describe('CornerIndicator Status', () => {
-    const mockParams = (value: boolean | undefined) => ({
-        task: getMockedTask({}),
-        trainingConfig: { value } as BooleanGroupParams,
-    });
-
     describe('Indicator Off', () => {
-        it('trainingConfig is undefined', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(undefined)]} />);
+        it('trainingConfig is false', async () => {
+            await render(<CornerIndicator allAutoTrainingValues={[false]} />);
 
             expect(screen.getByLabelText(/Active learning configuration off/i)).toBeVisible();
         });
         it('multiple tasks', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(false), mockParams(false)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[false, false]} />);
 
             expect(screen.getByLabelText(/Active learning configuration off/i)).toBeVisible();
         });
@@ -122,12 +178,12 @@ describe('CornerIndicator Status', () => {
 
     describe('Indicator On', () => {
         it('trainingConfig is true', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(true)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[true]} />);
 
             expect(screen.getByLabelText(/Active learning configuration on/i)).toBeVisible();
         });
         it('multiple tasks', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(true), mockParams(true)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[true, true]} />);
 
             expect(screen.getByLabelText(/Active learning configuration on/i)).toBeVisible();
         });
@@ -135,19 +191,7 @@ describe('CornerIndicator Status', () => {
 
     describe('Indicator Split', () => {
         it('trainingConfig true and false', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(true), mockParams(false)]} />);
-
-            expect(screen.getByLabelText(/Active learning configuration split/i)).toBeVisible();
-        });
-
-        it('trainingConfig true and undefined', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(true), mockParams(undefined)]} />);
-
-            expect(screen.getByLabelText(/Active learning configuration split/i)).toBeVisible();
-        });
-
-        it('trainingConfig false and undefined', async () => {
-            await render(<CornerIndicator autoTrainingTasks={[mockParams(true), mockParams(undefined)]} />);
+            await render(<CornerIndicator allAutoTrainingValues={[true, false]} />);
 
             expect(screen.getByLabelText(/Active learning configuration split/i)).toBeVisible();
         });

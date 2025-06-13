@@ -1,23 +1,23 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { screen, waitForElementToBeRemoved, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 
 import { BooleanGroupParams } from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { DOMAIN } from '../../../../../core/projects/core.interface';
 import { ProjectStatusTaskDTO } from '../../../../../core/projects/dtos/status.interface';
 import { createInMemoryProjectService } from '../../../../../core/projects/services/in-memory-project-service';
 import { PerformanceType, Task } from '../../../../../core/projects/task.interface';
-import { useAutoTrainingTasksConfig } from '../../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
+import { useActiveLearningConfiguration } from '../../../../../shared/components/header/active-learning-configuration/use-active-learning-configuration.hook';
 import { getMockedLabel } from '../../../../../test-utils/mocked-items-factory/mocked-labels';
 import { getMockedProject } from '../../../../../test-utils/mocked-items-factory/mocked-project';
 import { annotatorRender as render } from '../../../test-utils/annotator-render';
 import { AnnotationsRequired } from './annotations-required.component';
 
 jest.mock(
-    '../../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook',
+    '../../../../../shared/components/header/active-learning-configuration/use-active-learning-configuration.hook',
     () => ({
-        useAutoTrainingTasksConfig: jest.fn(() => ({ autoTrainingTasks: [] })),
+        useActiveLearningConfiguration: jest.fn(() => ({ autoTrainingTasks: [] })),
     })
 );
 
@@ -51,12 +51,15 @@ describe('Required annotations', () => {
     ) => {
         const domains = tasksConfig.map(({ task }) => task.domain);
 
-        jest.mocked(useAutoTrainingTasksConfig).mockReturnValue({
+        jest.mocked(useActiveLearningConfiguration).mockReturnValue({
             autoTrainingTasks: tasksConfig.map(({ task, isAutoTrainingOn }) => ({
                 task,
                 trainingConfig: { value: isAutoTrainingOn } as BooleanGroupParams,
             })),
-            isLoading: false,
+            isPending: false,
+            updateAutoTraining: jest.fn(),
+            updateDynamicRequiredAnnotations: jest.fn(),
+            updateRequiredImagesAutoTraining: jest.fn(),
         });
         const projectService = createInMemoryProjectService();
         projectService.getProject = async () =>
@@ -87,10 +90,9 @@ describe('Required annotations', () => {
             })) as unknown as ProjectStatusTaskDTO[],
         });
 
-        render(<AnnotationsRequired id={'test-id'} selectedTask={selectedTask} />, {
+        await render(<AnnotationsRequired id={'test-id'} selectedTask={selectedTask} />, {
             services: { projectService },
         });
-        await waitForElementToBeRemoved(screen.getAllByRole('progressbar'));
     };
 
     it('Displays the correct required annotations for single task project', async () => {

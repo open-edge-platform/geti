@@ -5,7 +5,6 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 
 import {
     BooleanGroupParams,
-    ConfigurableParametersTaskChain,
     NumberGroupParams,
 } from '../../../../../core/configurable-parameters/services/configurable-parameters.interface';
 import { JobState } from '../../../../../core/jobs/jobs.const';
@@ -24,12 +23,6 @@ const mockInvalidateQueries = jest.fn();
 jest.mock('@tanstack/react-query', () => ({
     ...jest.requireActual('@tanstack/react-query'),
     useQueryClient: () => ({ invalidateQueries: mockInvalidateQueries }),
-}));
-
-const mockedMutation = jest.fn();
-
-jest.mock('../../../../../core/configurable-parameters/hooks/use-reconfig-auto-training.hook', () => ({
-    useReconfigAutoTraining: jest.fn(() => ({ mutate: mockedMutation })),
 }));
 
 jest.mock('../../../../../core/jobs/hooks/use-jobs.hook', () => ({
@@ -73,7 +66,6 @@ describe('AutoTrainingSwitch', () => {
         minValue: 3,
         maxValue: 10000,
     } as NumberGroupParams;
-    const generalConfig = [] as ConfigurableParametersTaskChain[];
     const mockModel: ModelsGroups = {
         taskId: '649c6f6cc7bf707395ca76db',
         groupId: '649d8910272a022ea4686875',
@@ -119,9 +111,11 @@ describe('AutoTrainingSwitch', () => {
                 activeModel={undefined}
                 task={task}
                 projectIdentifier={projectIdentifier}
-                configParameters={generalConfig}
                 trainingConfig={mockAutoTrainingEnabled}
                 dynamicRequiredAnnotationsConfig={adaptiveRequiredAnnotationsEnabled}
+                onUpdateRequiredImagesAutoTraining={jest.fn()}
+                onUpdateDynamicRequiredAnnotations={jest.fn()}
+                onUpdateAutoTraining={jest.fn()}
             />
         );
 
@@ -135,9 +129,11 @@ describe('AutoTrainingSwitch', () => {
                 activeModel={mockModel}
                 task={task}
                 projectIdentifier={projectIdentifier}
-                configParameters={generalConfig}
                 trainingConfig={mockAutoTrainingEnabled}
                 dynamicRequiredAnnotationsConfig={adaptiveRequiredAnnotationsEnabled}
+                onUpdateRequiredImagesAutoTraining={jest.fn()}
+                onUpdateDynamicRequiredAnnotations={jest.fn()}
+                onUpdateAutoTraining={jest.fn()}
             />
         );
 
@@ -152,27 +148,26 @@ describe('AutoTrainingSwitch', () => {
     });
 
     it('toggling auto training updates the configurable parameters', async () => {
+        const mockUpdateAutoTraining = jest.fn();
+
         await render(
             <AutoTrainingSwitch
                 isTaskChainMode={false}
                 activeModel={mockModel}
                 task={task}
                 projectIdentifier={projectIdentifier}
-                configParameters={generalConfig}
                 trainingConfig={mockAutoTrainingEnabled}
                 dynamicRequiredAnnotationsConfig={adaptiveRequiredAnnotationsEnabled}
+                onUpdateRequiredImagesAutoTraining={jest.fn()}
+                onUpdateDynamicRequiredAnnotations={jest.fn()}
+                onUpdateAutoTraining={mockUpdateAutoTraining}
             />
         );
 
         fireEvent.click(getAutoTrainingSwitch());
 
         await waitFor(() => {
-            expect(mockedMutation).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    configParameters: generalConfig,
-                    newConfigParameter: { ...mockAutoTrainingEnabled, value: false },
-                })
-            );
+            expect(mockUpdateAutoTraining).toHaveBeenCalledWith(false);
         });
     });
 
@@ -185,10 +180,12 @@ describe('AutoTrainingSwitch', () => {
                 activeModel={mockModel}
                 task={task}
                 projectIdentifier={projectIdentifier}
-                configParameters={generalConfig}
                 trainingConfig={autoTrainingNotEnabled}
                 dynamicRequiredAnnotationsConfig={adaptiveRequiredAnnotationsEnabled}
                 requiredImagesAutoTrainingConfig={mockRequiredAnnotationsConfig}
+                onUpdateRequiredImagesAutoTraining={jest.fn()}
+                onUpdateDynamicRequiredAnnotations={jest.fn()}
+                onUpdateAutoTraining={jest.fn()}
             />
         );
 
@@ -203,10 +200,12 @@ describe('AutoTrainingSwitch', () => {
                 activeModel={mockModel}
                 task={task}
                 projectIdentifier={projectIdentifier}
-                configParameters={generalConfig}
                 trainingConfig={mockAutoTrainingEnabled}
                 dynamicRequiredAnnotationsConfig={adaptiveRequiredAnnotationsEnabled}
                 requiredImagesAutoTrainingConfig={mockRequiredAnnotationsConfig}
+                onUpdateRequiredImagesAutoTraining={jest.fn()}
+                onUpdateDynamicRequiredAnnotations={jest.fn()}
+                onUpdateAutoTraining={jest.fn()}
             />
         );
 
@@ -217,16 +216,20 @@ describe('AutoTrainingSwitch', () => {
     });
 
     it('selecting auto training threshold updates the configurable parameters', async () => {
+        const mockUpdateDynamicRequiredAnnotations = jest.fn();
+
         await render(
             <AutoTrainingSwitch
                 isTaskChainMode={false}
                 activeModel={mockModel}
                 task={task}
                 projectIdentifier={projectIdentifier}
-                configParameters={generalConfig}
                 trainingConfig={mockAutoTrainingEnabled}
                 dynamicRequiredAnnotationsConfig={adaptiveRequiredAnnotationsEnabled}
                 requiredImagesAutoTrainingConfig={mockRequiredAnnotationsConfig}
+                onUpdateDynamicRequiredAnnotations={mockUpdateDynamicRequiredAnnotations}
+                onUpdateRequiredImagesAutoTraining={jest.fn()}
+                onUpdateAutoTraining={jest.fn()}
             />
         );
 
@@ -238,12 +241,7 @@ describe('AutoTrainingSwitch', () => {
         fireEvent.click(fixedThreshold);
 
         await waitFor(() => {
-            expect(mockedMutation).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    configParameters: generalConfig,
-                    newConfigParameter: { ...adaptiveRequiredAnnotationsEnabled, value: false },
-                })
-            );
+            expect(mockUpdateDynamicRequiredAnnotations).toHaveBeenCalledWith(false);
         });
     });
 
@@ -254,10 +252,12 @@ describe('AutoTrainingSwitch', () => {
                 activeModel={mockModel}
                 task={task}
                 projectIdentifier={projectIdentifier}
-                configParameters={generalConfig}
                 trainingConfig={mockAutoTrainingEnabled}
                 dynamicRequiredAnnotationsConfig={adaptiveRequiredAnnotationsEnabled}
                 requiredImagesAutoTrainingConfig={mockRequiredAnnotationsConfig}
+                onUpdateRequiredImagesAutoTraining={jest.fn()}
+                onUpdateDynamicRequiredAnnotations={jest.fn()}
+                onUpdateAutoTraining={jest.fn()}
             />
         );
 
@@ -272,10 +272,12 @@ describe('AutoTrainingSwitch', () => {
                 activeModel={mockModel}
                 task={task}
                 projectIdentifier={projectIdentifier}
-                configParameters={generalConfig}
                 trainingConfig={mockAutoTrainingEnabled}
                 dynamicRequiredAnnotationsConfig={adaptiveRequiredAnnotationsNotEnabled}
                 requiredImagesAutoTrainingConfig={mockRequiredAnnotationsConfig}
+                onUpdateRequiredImagesAutoTraining={jest.fn()}
+                onUpdateDynamicRequiredAnnotations={jest.fn()}
+                onUpdateAutoTraining={jest.fn()}
             />
         );
 
@@ -285,16 +287,20 @@ describe('AutoTrainingSwitch', () => {
     });
 
     it('changes required images annotations config', async () => {
+        const mockUpdateRequiredImagesAutoTraining = jest.fn();
+
         await render(
             <AutoTrainingSwitch
                 isTaskChainMode={false}
                 activeModel={mockModel}
                 task={task}
                 projectIdentifier={projectIdentifier}
-                configParameters={generalConfig}
                 trainingConfig={mockAutoTrainingEnabled}
                 dynamicRequiredAnnotationsConfig={adaptiveRequiredAnnotationsNotEnabled}
                 requiredImagesAutoTrainingConfig={mockRequiredAnnotationsConfig}
+                onUpdateRequiredImagesAutoTraining={mockUpdateRequiredImagesAutoTraining}
+                onUpdateDynamicRequiredAnnotations={jest.fn()}
+                onUpdateAutoTraining={jest.fn()}
             />
         );
 
@@ -302,15 +308,7 @@ describe('AutoTrainingSwitch', () => {
         fireEvent.keyDown(slider, { key: 'Right' });
 
         await waitFor(() => {
-            expect(mockedMutation).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    configParameters: generalConfig,
-                    newConfigParameter: {
-                        ...mockRequiredAnnotationsConfig,
-                        value: mockRequiredAnnotationsConfig.value + 1,
-                    },
-                })
-            );
+            expect(mockUpdateRequiredImagesAutoTraining).toHaveBeenCalledWith(mockRequiredAnnotationsConfig.value + 1);
         });
     });
 
@@ -337,9 +335,11 @@ describe('AutoTrainingSwitch', () => {
                 task={task}
                 activeModel={mockModel}
                 projectIdentifier={projectIdentifier}
-                configParameters={generalConfig}
                 trainingConfig={{ ...mockAutoTrainingEnabled, value: false }}
                 dynamicRequiredAnnotationsConfig={adaptiveRequiredAnnotationsEnabled}
+                onUpdateAutoTraining={jest.fn()}
+                onUpdateDynamicRequiredAnnotations={jest.fn()}
+                onUpdateRequiredImagesAutoTraining={jest.fn()}
             />
         );
 

@@ -10,7 +10,7 @@ import { DOMAIN } from '../../../../core/projects/core.interface';
 import { useProjectStatus } from '../../../../core/projects/hooks/use-project-status.hook';
 import { Performance, PerformanceType, Task } from '../../../../core/projects/task.interface';
 import { UserProjectSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
-import { useAutoTrainingTasksConfig } from '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
+import { useActiveLearningConfiguration } from '../../../../shared/components/header/active-learning-configuration/use-active-learning-configuration.hook';
 import { fakeAnnotationToolContext } from '../../../../test-utils/fake-annotator-context';
 import { getMockedProjectIdentifier } from '../../../../test-utils/mocked-items-factory/mocked-identifiers';
 import { getMockedJob } from '../../../../test-utils/mocked-items-factory/mocked-jobs';
@@ -60,9 +60,9 @@ jest.mock('../../providers/task-provider/task-provider.component', () => ({
 }));
 
 jest.mock(
-    '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook',
+    '../../../../shared/components/header/active-learning-configuration/use-active-learning-configuration.hook',
     () => ({
-        useAutoTrainingTasksConfig: jest.fn(() => ({ autoTrainingTasks: [] })),
+        useActiveLearningConfiguration: jest.fn(() => ({ autoTrainingTasks: [] })),
     })
 );
 
@@ -155,12 +155,15 @@ describe('Navigation toolbar', () => {
             },
         }));
 
-        jest.mocked(useAutoTrainingTasksConfig).mockReturnValue({
+        jest.mocked(useActiveLearningConfiguration).mockReturnValue({
             autoTrainingTasks: tasksConfig.map(({ task, isAutoTrainingOn }) => ({
                 task,
                 trainingConfig: { value: isAutoTrainingOn } as BooleanGroupParams,
             })),
-            isLoading: false,
+            isPending: false,
+            updateDynamicRequiredAnnotations: jest.fn(),
+            updateRequiredImagesAutoTraining: jest.fn(),
+            updateAutoTraining: jest.fn(),
         });
 
         (useTask as jest.Mock).mockImplementation(() => ({

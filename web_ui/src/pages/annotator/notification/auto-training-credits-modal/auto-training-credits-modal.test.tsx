@@ -9,7 +9,7 @@ import { createInMemoryJobsService } from '../../../../core/jobs/services/in-mem
 import { FUX_NOTIFICATION_KEYS, FUX_SETTINGS_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
 import { UserGlobalSettings, UseSettings } from '../../../../core/user-settings/services/user-settings.interface';
 import { INITIAL_GLOBAL_SETTINGS } from '../../../../core/user-settings/utils';
-import { useAutoTrainingTasksConfig } from '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook';
+import { useActiveLearningConfiguration } from '../../../../shared/components/header/active-learning-configuration/use-active-learning-configuration.hook';
 import { getFuxSetting } from '../../../../shared/components/tutorials/utils';
 import { getMockedJob, getMockedJobCount } from '../../../../test-utils/mocked-items-factory/mocked-jobs';
 import {
@@ -30,12 +30,12 @@ jest.mock('./util', () => ({
 }));
 
 jest.mock(
-    '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook',
+    '../../../../shared/components/header/active-learning-configuration/use-active-learning-configuration.hook',
     () => ({
         ...jest.requireActual(
-            '../../../../shared/components/header/active-learning-configuration/use-tasks-auto-training-config.hook'
+            '../../../../shared/components/header/active-learning-configuration/use-active-learning-configuration.hook'
         ),
-        useAutoTrainingTasksConfig: jest.fn(),
+        useActiveLearningConfiguration: jest.fn(),
     })
 );
 
@@ -71,9 +71,12 @@ describe('AutoTrainingCreditsModal', () => {
         const getJobsService = jest.fn();
         const jobsService = createInMemoryJobsService();
 
-        jest.mocked(useAutoTrainingTasksConfig).mockReturnValue({
-            isLoading: isLoadingAutoTrainingConfig,
+        jest.mocked(useActiveLearningConfiguration).mockReturnValue({
+            isPending: isLoadingAutoTrainingConfig,
             autoTrainingTasks: [{ task: getMockedTask({}), trainingConfig: getMockedAutoTraining(isTrainingConfigOn) }],
+            updateDynamicRequiredAnnotations: jest.fn(),
+            updateAutoTraining: jest.fn(),
+            updateRequiredImagesAutoTraining: jest.fn(),
         });
 
         jobsService.getJobs = getJobsService.mockResolvedValue({

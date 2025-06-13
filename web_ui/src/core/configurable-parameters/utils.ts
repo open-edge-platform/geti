@@ -27,6 +27,9 @@ const hasEqualHeader =
 
 const getConfigByTaskId = (taskId: string) => (task: ConfigurableParametersTaskChain) => taskId === task.taskId;
 
+/**
+ * @deprecated
+ */
 export const findAutoTrainingConfig = (
     taskId: string,
     config: ConfigurableParametersTaskChain[]
@@ -43,6 +46,9 @@ export const findAutoTrainingConfig = (
     return parameterGroup;
 };
 
+/**
+ * @deprecated
+ */
 export const findDynamicRequiredAnnotationsConfig = (
     taskId: string,
     config: ConfigurableParametersTaskChain[]
@@ -59,6 +65,9 @@ export const findDynamicRequiredAnnotationsConfig = (
     return parameterGroup;
 };
 
+/**
+ * @deprecated
+ */
 export const findRequiredImagesAutoTrainingConfig = (
     taskId: string,
     config: ConfigurableParametersTaskChain[]
