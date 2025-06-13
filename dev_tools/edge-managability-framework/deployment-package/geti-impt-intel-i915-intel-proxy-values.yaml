@@ -14,7 +14,7 @@ global:
   proxy_enabled: true
   http_proxy: http://proxy-dmz.intel.com:912
   https_proxy: http://proxy-dmz.intel.com:912
-  no_proxy: "127.0.0.1,localhost,.test,.svc,.cluster.local"
+  no_proxy: "127.0.0.1,localhost,.impt,.svc,.cluster.local"
 
 spice-db:
   fullnameOverride: impt-spice-db
