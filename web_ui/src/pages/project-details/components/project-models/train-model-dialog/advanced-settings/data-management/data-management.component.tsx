@@ -35,7 +35,10 @@ export const DataManagement: FC<DataManagementProps> = ({ trainingConfiguration,
             />
             {tilingParameters !== undefined && <Tiling tilingParameters={tilingParameters} />}
             {!isEmpty(trainingConfiguration.datasetPreparation.augmentation) && <DataAugmentation />}
-            <Filters />
+            <Filters
+                filtersConfiguration={trainingConfiguration.datasetPreparation.filtering}
+                onUpdateTrainingConfiguration={onUpdateTrainingConfiguration}
+            />
             {/* Not supported in v1 of training flow revamp <RemovingDuplicates /> */}
         </View>
     );

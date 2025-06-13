@@ -1,7 +1,7 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { isEqual } from 'lodash-es';
+import { isEqual, isObject } from 'lodash-es';
 
 import { isNonEmptyArray } from '../../shared/utils';
 import {
@@ -19,6 +19,7 @@ import {
     EntityIdentifier,
     NumberGroupParams,
 } from './services/configurable-parameters.interface';
+import { BoolParameter, NumberParameter } from './services/configuration.interface';
 
 const hasEqualHeader =
     <T extends { header: string }>(toFind: string | null | undefined) =>
@@ -238,4 +239,24 @@ export const getNewParameterValue = <T extends string | boolean | number>(
         return { ...parameter, value };
     }
     return parameter;
+};
+
+export const isBoolParameter = (input: unknown): input is BoolParameter => {
+    return (
+        isObject(input) &&
+        'type' in input &&
+        input.type === 'bool' &&
+        'value' in input &&
+        typeof input.value === 'boolean'
+    );
+};
+
+export const isNumberParameter = (input: unknown): input is NumberParameter => {
+    return (
+        isObject(input) &&
+        'type' in input &&
+        (input.type === 'float' || input.type === 'int') &&
+        'value' in input &&
+        typeof input.value === 'number'
+    );
 };

@@ -15,7 +15,7 @@ export interface NumberParameter extends ParameterBase {
     defaultValue: number;
 }
 
-interface BoolParameter extends ParameterBase {
+export interface BoolParameter extends ParameterBase {
     type: 'bool';
     value: boolean;
     defaultValue: boolean;

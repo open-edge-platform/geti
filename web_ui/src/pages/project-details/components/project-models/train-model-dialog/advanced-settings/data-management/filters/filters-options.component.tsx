@@ -6,21 +6,16 @@ import { FC } from 'react';
 import { ActionButton, Checkbox, Flex, NumberField, Text } from '@geti/ui';
 import { Refresh } from '@geti/ui/icons';
 
+import {
+    BoolParameter,
+    NumberParameter,
+} from '../../../../../../../../core/configurable-parameters/services/configuration.interface';
 import { Tooltip } from '../../ui/tooltip.component';
 
-export interface FilterOption {
-    key: string;
-    name: string;
-    value: number;
-    unlimited?: boolean;
-    defaultValue: number;
-    maxValue: number;
-    minValue: number;
-    description: string;
-}
+export type FilterOption = [BoolParameter, NumberParameter];
 
 interface FilterOptionProps {
-    option: FilterOption;
+    option: [BoolParameter, NumberParameter];
     onOptionChange: (option: FilterOption) => void;
 }
 
@@ -33,19 +28,24 @@ const FilterOptionTooltip: FC<FilterOptionTooltipProps> = ({ description }) => {
 };
 
 const FilterOption: FC<FilterOptionProps> = ({ option, onOptionChange }) => {
-    const { name, defaultValue, maxValue, minValue, value, unlimited, description } = option;
+    const [enableParameter, configParameter] = option;
+    const { name, description, minValue, maxValue, value } = configParameter;
+    const isUnlimited = !enableParameter.value;
 
     const handleRest = () => {
-        onOptionChange({ ...option, value: defaultValue });
+        onOptionChange([
+            { ...enableParameter, value: enableParameter.defaultValue },
+            { ...configParameter, value: configParameter.defaultValue },
+        ]);
     };
 
     const handleFilterValueChange = (inputValue: number) => {
-        const updatedOption = { ...option, value: inputValue };
+        const updatedOption: FilterOption = [enableParameter, { ...configParameter, value: inputValue }];
         onOptionChange(updatedOption);
     };
 
-    const handleUnlimitedChange = (isUnlimited: boolean) => {
-        const updatedOption = { ...option, unlimited: isUnlimited };
+    const handleUnlimitedChange = (inputValue: boolean) => {
+        const updatedOption: FilterOption = [{ ...enableParameter, value: !inputValue }, configParameter];
         onOptionChange(updatedOption);
     };
 
@@ -57,18 +57,16 @@ const FilterOption: FC<FilterOptionProps> = ({ option, onOptionChange }) => {
             <Flex gap={'size-200'} gridColumn={'2/3'}>
                 <NumberField
                     minValue={minValue}
-                    maxValue={maxValue}
+                    maxValue={maxValue ?? undefined}
                     step={1}
                     value={value}
-                    isDisabled={unlimited}
-                    defaultValue={defaultValue}
+                    isDisabled={isUnlimited}
                     onChange={handleFilterValueChange}
                 />
-                {unlimited !== undefined && (
-                    <Checkbox isEmphasized isSelected={unlimited} onChange={handleUnlimitedChange}>
-                        Unlimited
-                    </Checkbox>
-                )}
+
+                <Checkbox isEmphasized isSelected={isUnlimited} onChange={handleUnlimitedChange}>
+                    Unlimited
+                </Checkbox>
             </Flex>
             <ActionButton gridColumn={'3/4'} isQuiet aria-label={`Reset ${name}`} onPress={handleRest}>
                 <Refresh />
@@ -79,7 +77,7 @@ const FilterOption: FC<FilterOptionProps> = ({ option, onOptionChange }) => {
 
 interface FiltersOptionsProps {
     options: FilterOption[];
-    onOptionsChange: (options: FilterOption[]) => void;
+    onOptionsChange: (option: FilterOption) => void;
 }
 
 export const FiltersOptions: FC<FiltersOptionsProps> = ({ options, onOptionsChange }) => {
@@ -87,12 +85,9 @@ export const FiltersOptions: FC<FiltersOptionsProps> = ({ options, onOptionsChan
         <>
             {options.map((option) => (
                 <FilterOption
-                    key={option.key}
+                    key={`${option.at(0)?.key}-${option.at(1)?.key}`}
                     option={option}
-                    onOptionChange={(updatedOption) => {
-                        const updatedOptions = options.map((opt) => (opt.key === option.key ? updatedOption : opt));
-                        onOptionsChange(updatedOptions);
-                    }}
+                    onOptionChange={onOptionsChange}
                 />
             ))}
         </>
