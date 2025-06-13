@@ -27,9 +27,7 @@ import { defaultRITMConfig } from './ritm-tool.interface';
 const mockRITM = () => {
     const mockedRITMState: RITMStateContextProps = {
         result: null,
-
         isLoading: false,
-        loadImage: jest.fn(),
         cancel: jest.fn(),
         execute: jest.fn(),
         box: null,
@@ -133,7 +131,7 @@ describe('RITMTool', () => {
         jest.clearAllMocks();
     });
 
-    afterAll(() => {
+    afterEach(() => {
         jest.clearAllMocks();
     });
 
@@ -151,6 +149,7 @@ describe('RITMTool', () => {
 
             await waitFor(() => {
                 expect(mockedRITMState.execute).toHaveBeenCalledWith(
+                    mockImage,
                     { x: 0, y: 0, width: 300, height: 300 },
                     [{ x: 50, y: 50, positive: true }],
                     ShapeType.Polygon
@@ -183,7 +182,7 @@ describe('RITMTool', () => {
             fireEvent.mouseUp(editor, { buttons: 0, ...pointTwo });
 
             await waitFor(() => {
-                expect(mockedRITMState.execute).not.toBeCalled();
+                expect(mockedRITMState.execute).not.toHaveBeenCalled();
             });
         });
 
@@ -228,6 +227,7 @@ describe('RITMTool', () => {
 
                 await waitFor(() => {
                     expect(mockedRITMState.execute).toHaveBeenCalledWith(
+                        mockImage,
                         { x: 100, y: 50, width: 100, height: 100 },
                         [{ x: 150, y: 100, positive: true }],
                         ShapeType.Polygon
@@ -250,6 +250,7 @@ describe('RITMTool', () => {
 
                 await waitFor(() => {
                     expect(mockedRITMState.execute).toHaveBeenCalledWith(
+                        mockImage,
                         taskChainROI,
                         [{ x: 150, y: 100, positive: true }],
                         ShapeType.Polygon
@@ -271,7 +272,7 @@ describe('RITMTool', () => {
                 fireEvent.mouseUp(editor, { buttons: 0, ...point });
 
                 await waitFor(() => {
-                    expect(mockedRITMState.execute).not.toBeCalled();
+                    expect(mockedRITMState.execute).not.toHaveBeenCalled();
                 });
             });
         });
@@ -348,6 +349,7 @@ describe('RITMTool', () => {
 
             await waitFor(() => {
                 expect(mockedRITMState.execute).toHaveBeenCalledWith(
+                    mockImage,
                     { x: 0, y: 0, width: 360, height: 300 },
                     [
                         { x: 30, y: 50, positive: true },
@@ -376,6 +378,7 @@ describe('RITMTool', () => {
 
             await waitFor(() => {
                 expect(mockedRITMState.execute).toHaveBeenCalledWith(
+                    mockImage,
                     { x: 0, y: 0, width: 300, height: 300 },
                     [
                         { x: 30, y: 50, positive: true },
@@ -406,6 +409,7 @@ describe('RITMTool', () => {
 
             await waitFor(() => {
                 expect(mockedRITMState.execute).toHaveBeenCalledWith(
+                    mockImage,
                     { x: 0, y: 0, width: 360, height: 300 },
                     [
                         { x: 30, y: 50, positive: true },

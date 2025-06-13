@@ -17,7 +17,6 @@ const mockRITM = () => {
     const mockedRITMState: RITMStateContextProps = {
         result: null,
         isLoading: false,
-        loadImage: jest.fn(),
         execute: jest.fn(),
         cancel: jest.fn(),
         box: null,
