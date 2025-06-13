@@ -1,0 +1,17 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+app:
+  certmanager:
+    namespace: cert-manager
+    issuer:
+      name: edge-node-cluster-issuer
+  controller:
+    leaderElectionNamespace: cert-manager
+volumes:
+  - name: root-ca
+    secret:
+      secretName: edgenode-root-secret
+      items:
+        - key: tls.crt
+          path: ca.pem

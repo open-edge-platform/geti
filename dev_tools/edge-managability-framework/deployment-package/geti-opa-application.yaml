@@ -1,0 +1,22 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-opa
+version: 2.10.1
+description: Open Policy Agent for Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: opa
+chartVersion: 2.10.1
+
+profiles:
+  - name: default
+    valuesFileName: geti-opa-values.yaml
+
+ignoredResources:
+  - name: opa-istio-admission-controller
+    kind: MutatingWebhookConfiguration

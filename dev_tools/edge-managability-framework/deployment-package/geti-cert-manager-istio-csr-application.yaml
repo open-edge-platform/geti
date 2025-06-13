@@ -1,0 +1,21 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-cm-istio-csr
+version: 2.10.1
+description: Cert Manager Istio CSR  for Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: cert-manager-istio-csr
+chartVersion: 2.10.1
+
+profiles:
+  - name: default
+    displayName: "Default"
+    valuesFileName: "empty-values.yaml"
+  - name: geti
+    valuesFileName: geti-cert-manager-istio-csr-values.yaml

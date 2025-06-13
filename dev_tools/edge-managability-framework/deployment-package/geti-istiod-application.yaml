@@ -1,0 +1,31 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-istiod
+version: 2.10.1
+description: Istio Discovery for Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: istio-istiod
+chartVersion: 2.10.1
+
+profiles:
+  - name: default
+    displayName: "Default"
+    valuesFileName: "empty-values.yaml"
+  - name: geti
+    valuesFileName: geti-istiod-values.yaml
+    parameterTemplates:
+      - name: global.proxy.excludeIPRanges
+        displayName: Node IP CIDR
+        type: string
+        mandatory: true
+ignoredResources:
+  - name: istio-validator-istio-system
+    kind: ValidatingWebhookConfiguration
+  - name: istiod-default-validator
+    kind: ValidatingWebhookConfiguration

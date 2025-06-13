@@ -1,0 +1,30 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-prepare
+version: 2.10.1
+description: Global network policies for Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: emf-geti
+chartVersion: 2.9.0
+
+profiles:
+  - name: default
+    valuesFileName: geti-prepare-values.yaml
+    parameterTemplates:
+      - name: metallb.address
+        displayName: IP address of target Edge Node
+        type: string
+      - name: metallb.enabled
+        displayName: Enable extra metallb address
+        type: string
+        default: "false"
+      - name: gateway.interconnectService.enabled
+        displayName: Enable Interconnect Service
+        type: string
+        default: "false"

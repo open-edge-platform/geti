@@ -1,0 +1,27 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-gateway
+version: 2.10.1
+description: Istio Gateway for Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: istio-gateway
+chartVersion: 2.10.1
+
+profiles:
+  - name: default
+    valuesFileName: geti-gateway-values.yaml
+    parameterTemplates:
+      - name: use_generated_cert
+        displayName: Autogenerate TLS Certificate
+        type: boolean
+
+ignoredResources:
+  - name: gzip
+    namespace: istio-system
+    kind: EnvoyFilter

@@ -1,0 +1,18 @@
+# Copyright (C) 2025 Intel Corporation
+# LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
+---
+specSchema: "Application"
+schemaVersion: "0.1"
+$schema: "https://schema.intel.com/catalog.orchestrator/0.1/schema"
+
+name: geti-migration-job
+version: 2.10.1
+description: Migration Job for Intel® Geti™
+
+helmRegistry: ghcr-geti-oci
+chartName: migration-job
+chartVersion: 2.10.1
+
+profiles:
+  - name: default
+    valuesFileName: geti-migration-job-values.yaml
