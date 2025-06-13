@@ -34,12 +34,12 @@ export const TrainModelBasic: FC<TrainModelBasicProps> = ({
     isTaskChainProject,
 }) => {
     return (
-        <Flex direction={'column'} gap={'size-200'}>
+        <Flex direction={'column'} gap={'size-200'} height={'100%'}>
             {isTaskChainProject && (
                 <TaskSelection tasks={tasks} onTaskChange={onTaskChange} selectedTask={selectedTask} />
             )}
 
-            <View padding={'size-250'} backgroundColor={'gray-50'}>
+            <View padding={'size-250'} backgroundColor={'gray-50'} flex={1} minHeight={0}>
                 <Text UNSAFE_className={classes.title} marginBottom={'size-100'}>
                     Model type
                 </Text>

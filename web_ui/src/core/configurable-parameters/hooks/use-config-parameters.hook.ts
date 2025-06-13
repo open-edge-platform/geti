@@ -22,7 +22,7 @@ interface UseConfigParameters {
             modelTemplateId?: string | null;
             editable?: boolean;
         },
-        options?: Pick<UseQueryOptions<ConfigurableParametersTaskChain, AxiosError>, 'enabled'>
+        options?: Pick<UseQueryOptions<ConfigurableParametersTaskChain, AxiosError>, 'enabled' | 'placeholderData'>
     ) => UseQueryResult<ConfigurableParametersTaskChain, AxiosError>;
     reconfigureParametersMutation: UseMutationResult<void, AxiosError, ConfigurableParametersReconfigureDTO, unknown>;
 }

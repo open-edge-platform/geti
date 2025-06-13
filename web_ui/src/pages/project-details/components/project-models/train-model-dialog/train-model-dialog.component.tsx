@@ -79,7 +79,7 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
     }
 
     return (
-        <Dialog maxWidth={'100rem'} width={'80vw'}>
+        <Dialog maxWidth={'100rem'} width={'80vw'} height={isBasicMode ? undefined : '80vh'}>
             <Heading>Train Model</Heading>
             <Divider />
             <Content>
