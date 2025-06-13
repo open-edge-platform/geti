@@ -50,6 +50,8 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
         configParameters,
         changeTrainFromScratch,
         trainFromScratch,
+        trainingConfiguration,
+        updateTrainingConfiguration,
     } = useTrainModelState();
 
     const { canTrainModel, numberOfRequiredAnnotations } = isAllowedToTrainModel(selectedTask);
@@ -83,7 +85,7 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
             <Heading>Train Model</Heading>
             <Divider />
             <Content>
-                {isBasicMode || configParameters === undefined ? (
+                {isBasicMode || configParameters === undefined || trainingConfiguration === undefined ? (
                     <TrainModelBasic
                         selectedTask={selectedTask}
                         tasks={tasks}
@@ -96,6 +98,8 @@ const TrainModelDialog: FC<TrainModelDialogProps> = ({ onClose, onSuccess, isAll
                     />
                 ) : (
                     <AdvancedSettings
+                        trainingConfiguration={trainingConfiguration}
+                        onUpdateTrainingConfiguration={updateTrainingConfiguration}
                         configParameters={configParameters}
                         selectedTask={selectedTask}
                         tasks={tasks}
