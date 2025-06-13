@@ -6,10 +6,13 @@ import { RESOURCE_TYPE, USER_ROLE } from '@geti/core/src/users/users.interface';
 import { screen } from '@testing-library/react';
 import { useParams } from 'react-router-dom';
 
+import { WorkspacesConfig } from '../../../core/user-settings/dtos/user-settings.interface';
+import { useUserGlobalSettings } from '../../../core/user-settings/hooks/use-global-settings.hook';
 import { useWorkspaces } from '../../../providers/workspaces-provider/workspaces-provider.component';
 import { getMockedUser } from '../../../test-utils/mocked-items-factory/mocked-users';
 import { getMockedWorkspace } from '../../../test-utils/mocked-items-factory/mocked-workspace';
 import { providersRender as render } from '../../../test-utils/required-providers-render';
+import { useDefaultWorkspace } from '../../landing-page/workspaces-tabs/use-default-workspace.hook';
 import { Workspaces } from './workspaces.component';
 
 jest.mock('../../../providers/workspaces-provider/workspaces-provider.component', () => ({
@@ -29,16 +32,41 @@ jest.mock('react-router-dom', () => ({
     useParams: jest.fn(() => ({})),
 }));
 
+jest.mock('../../landing-page/workspaces-tabs/use-default-workspace.hook', () => ({
+    useDefaultWorkspace: jest.fn(),
+}));
+
+jest.mock('../../../core/user-settings/hooks/use-global-settings.hook', () => ({
+    ...jest.requireActual('../../../core/user-settings/hooks/use-global-settings.hook'),
+    useUserGlobalSettings: jest.fn(),
+}));
+
+jest.mock('../../landing-page/workspaces-tabs/use-default-workspace.hook', () => ({
+    useDefaultWorkspace: jest.fn(),
+}));
+
 describe('Workspaces', () => {
     const mockedWorkspace = getMockedWorkspace({ id: '1', name: 'Workspace 1' });
     const mockedWorkspace2 = getMockedWorkspace({ id: '2', name: 'Workspace 2' });
 
     it('Check if there are two workspaces displayed', async () => {
+        const mockedWorkspaces = [mockedWorkspace, mockedWorkspace2];
+
         jest.mocked(useWorkspaces).mockReturnValue({
             workspaceId: '1',
-            workspaces: [mockedWorkspace, mockedWorkspace2],
+            workspaces: mockedWorkspaces,
         });
 
+        jest.mocked(useDefaultWorkspace).mockReturnValue({
+            defaultWorkspaceId: undefined,
+            reorderedWorkspaces: mockedWorkspaces,
+        });
+
+        jest.mocked(useUserGlobalSettings).mockReturnValue({
+            saveConfig: jest.fn(),
+            isSavingConfig: false,
+            config: {} as WorkspacesConfig,
+        });
         // @ts-expect-error We only care about data property
         jest.mocked(useUsers).mockReturnValue({ useActiveUser: () => ({ data: getMockedUser() }) });
 

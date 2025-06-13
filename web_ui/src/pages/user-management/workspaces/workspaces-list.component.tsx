@@ -4,6 +4,7 @@
 import { WorkspaceEntity } from '@geti/core/src/workspaces/services/workspaces.interface';
 import { Grid, repeat } from '@geti/ui';
 
+import { useDefaultWorkspace } from '../../landing-page/workspaces-tabs/use-default-workspace.hook';
 import { WorkspaceCard } from './workspace-card.component';
 
 interface WorkspacesListProps {
@@ -11,6 +12,8 @@ interface WorkspacesListProps {
 }
 
 export const WorkspacesList = ({ workspaces }: WorkspacesListProps): JSX.Element => {
+    const { defaultWorkspaceId, reorderedWorkspaces } = useDefaultWorkspace(workspaces);
+
     return (
         <Grid
             columns={repeat('auto-fit', 'size-3400')}
@@ -20,8 +23,13 @@ export const WorkspacesList = ({ workspaces }: WorkspacesListProps): JSX.Element
             alignItems={'center'}
             flex={1}
         >
-            {workspaces.map((workspace) => (
-                <WorkspaceCard key={workspace.id} workspace={workspace} workspaces={workspaces} />
+            {reorderedWorkspaces.map((workspace) => (
+                <WorkspaceCard
+                    key={workspace.id}
+                    workspace={workspace}
+                    workspaces={reorderedWorkspaces}
+                    isDefaultWorkspace={defaultWorkspaceId === workspace.id}
+                />
             ))}
         </Grid>
     );

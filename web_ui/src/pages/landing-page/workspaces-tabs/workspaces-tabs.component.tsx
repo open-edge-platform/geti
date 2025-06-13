@@ -7,6 +7,7 @@ import { paths } from '@geti/core';
 import { useWorkspacesApi } from '@geti/core/src/workspaces/hooks/use-workspaces.hook';
 import {
     ActionButton,
+    CornerIndicator,
     Flex,
     Item,
     LoadingIndicator,
@@ -35,6 +36,7 @@ import { TabItem } from '../../../shared/components/tabs/tabs.interface';
 import { getUniqueNameFromArray, hasEqualId } from '../../../shared/utils';
 import { MAX_LENGTH_OF_WORKSPACE_NAME, MIN_LENGTH_OF_WORKSPACE_NAME } from '../../user-management/workspaces/utils';
 import { LandingPageWorkspace as Workspace } from '../landing-page-workspace/landing-page-workspace.component';
+import { useDefaultWorkspace } from './use-default-workspace.hook';
 import { useWorkspaceActions } from './use-workspace-actions.hook';
 
 import classes from '../../../shared/components/custom-tab-item/custom-tab-item.module.scss';
@@ -97,16 +99,15 @@ export const WorkspacesTabs = (): JSX.Element => {
     } = usePinnedCollapsedWorkspaces();
     const { FEATURE_FLAG_WORKSPACE_ACTIONS } = useFeatureFlags();
     const numberOfWorkspaces = pinnedWorkspaces.length + collapsedWorkspaces.length;
-
-    const { items, handleMenuAction, deleteDialog, editDialog } = useWorkspaceActions(numberOfWorkspaces);
+    const { defaultWorkspaceId, reorderedWorkspaces } = useDefaultWorkspace(pinnedWorkspaces);
+    const { handleMenuAction, getAvailableItems, deleteDialog, editDialog } = useWorkspaceActions(numberOfWorkspaces);
     const { useCreateWorkspaceMutation } = useWorkspacesApi(organizationId);
     const createWorkspace = useCreateWorkspaceMutation();
 
     const workspacesNames = workspaces.map(({ name }) => name);
-
     const hasSelectedPinnedItem = pinnedWorkspaces.find(hasEqualId(selectedWorkspaceId)) !== undefined;
 
-    const pinnedItems: TabItem[] = pinnedWorkspaces.map(({ id, name }) => ({
+    const pinnedItems: TabItem[] = reorderedWorkspaces.map(({ id, name }) => ({
         name,
         id: `${id === selectedWorkspaceId ? 'selected-' : ''}workspace-${id}`,
         key: id,
@@ -202,16 +203,29 @@ export const WorkspacesTabs = (): JSX.Element => {
                                                     />
                                                 }
                                             >
-                                                <CustomTabItemWithMenu
-                                                    name={item.name as string}
-                                                    isMoreIconVisible={item.key === selectedWorkspaceId}
-                                                    id={item.id as string}
-                                                    items={items}
-                                                    onAction={handleMenuAction}
-                                                />
+                                                <CornerIndicator
+                                                    isActive={defaultWorkspaceId === item.key}
+                                                    position='left'
+                                                    containerStyle={{ display: 'flex' }}
+                                                >
+                                                    <CustomTabItemWithMenu
+                                                        name={item.name as string}
+                                                        isMoreIconVisible={item.key === selectedWorkspaceId}
+                                                        id={item.id as string}
+                                                        items={getAvailableItems(defaultWorkspaceId === item.key)}
+                                                        onAction={(key) => handleMenuAction(key, selectedWorkspaceId)}
+                                                    />
+                                                </CornerIndicator>
                                             </HasPermission>
                                         ) : (
-                                            <CustomTabItem name={item.name as string} isMoreIconVisible={false} />
+                                            <CornerIndicator
+                                                isActive={
+                                                    FEATURE_FLAG_WORKSPACE_ACTIONS && defaultWorkspaceId === item.key
+                                                }
+                                                position='left'
+                                            >
+                                                <CustomTabItem name={item.name as string} isMoreIconVisible={false} />
+                                            </CornerIndicator>
                                         )}
                                     </Flex>
                                     {FEATURE_FLAG_WORKSPACE_ACTIONS && (

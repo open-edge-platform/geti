@@ -16,6 +16,7 @@ import {
     GlobalModalsConfig,
     TUTORIAL_CARD_KEYS,
     TutorialConfig,
+    WORKSPACES_SETTINGS_KEYS,
 } from './dtos/user-settings.interface';
 import { UserGlobalSettings, UserProjectSettings } from './services/user-settings.interface';
 
@@ -243,6 +244,7 @@ export const getSettingsOfType = (
         | typeof FUX_SETTINGS_KEYS
         | typeof GLOBAL_MODALS_KEYS
         | typeof GENERAL_SETTINGS_KEYS
+        | typeof WORKSPACES_SETTINGS_KEYS
 ) => {
     return Object.fromEntries(
         Object.entries(settings).filter(([key]) => {

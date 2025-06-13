@@ -71,6 +71,10 @@ export enum GENERAL_SETTINGS_KEYS {
     MAINTENANCE_BANNER = 'maintenanceBanner',
 }
 
+export enum WORKSPACES_SETTINGS_KEYS {
+    DEFAULT_WORKSPACE = 'defaultWorkspace',
+}
+
 export type TutorialKeys = TUTORIAL_CARD_KEYS | FUX_NOTIFICATION_KEYS | FUX_SETTINGS_KEYS;
 export type SettingsKeys = FEATURES_KEYS | TutorialKeys;
 
@@ -91,6 +95,7 @@ export type GeneralSettingsConfig = {
 
 export type GlobalModalsConfig = Record<GLOBAL_MODALS_KEYS, { isEnabled: boolean }>;
 export type TutorialConfig = Record<TUTORIAL_CARD_KEYS, { isEnabled: boolean }>;
+export type WorkspacesConfig = Record<WORKSPACES_SETTINGS_KEYS, { id: string }>;
 export type FuxNotificationsConfig = Record<FUX_NOTIFICATION_KEYS, { isEnabled: boolean }>;
 export type FuxSettingsConfig = Record<FUX_SETTINGS_KEYS, { value: boolean | null | string }>;
 export type AnnotatorSettingsConfig = Record<FEATURES_KEYS, SettingsFeature>;
