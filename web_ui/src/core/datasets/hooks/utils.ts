@@ -1,10 +1,11 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
+import { getFailedJobMessage } from '@geti/core/src/services/utils';
 import { AxiosError, HttpStatusCode } from 'axios';
-import isFunction from 'lodash-es/isFunction';
+import { isFunction } from 'lodash-es';
 
-import { getFailedJobMessage } from '../../../../packages/core/src/services/utils';
+import { IntervalJobHandlers } from '../../../features/dataset-import/types/dataset-import.interface';
 import {
     isJobCancel,
     isJobDone,
@@ -12,7 +13,6 @@ import {
     isJobSettled,
 } from '../../../shared/components/header/jobs-management/utils';
 import { JobGeneralProps } from '../../jobs/jobs.interface';
-import { IntervalJobHandlers } from './dataset-import.interface';
 
 export const getIntervalJobHandlers =
     <T extends JobGeneralProps>({

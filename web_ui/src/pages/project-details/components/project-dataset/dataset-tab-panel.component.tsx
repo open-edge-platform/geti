@@ -12,6 +12,10 @@ import { useOverlayTriggerState } from 'react-stately';
 import { Dataset } from '../../../../core/projects/dataset.interface';
 import { isAnomalyDomain } from '../../../../core/projects/domains';
 import { FUX_NOTIFICATION_KEYS } from '../../../../core/user-settings/dtos/user-settings.interface';
+import { ExportDatasetNotification } from '../../../../features/dataset-export/components/export-dataset-notification.component';
+import { ExportImportDatasetButtons } from '../../../../features/dataset-export/components/export-import-dataset-buttons.component';
+import { useLocalStorageExportDataset } from '../../../../features/dataset-export/hooks/use-local-storage-export-dataset.hook';
+import { DatasetImports } from '../../../../features/dataset-import/components/dataset-import-to-existing-project/dataset-imports.component';
 import { CoachMark } from '../../../../shared/components/coach-mark/coach-mark.component';
 import { TooltipWithDisableButton } from '../../../../shared/components/custom-tooltip/tooltip-with-disable-button';
 import { TabItem } from '../../../../shared/components/tabs/tabs.interface';
@@ -19,12 +23,8 @@ import { TruncatedText } from '../../../../shared/components/truncated-text/trun
 import { useActiveTab } from '../../../../shared/hooks/use-active-tab.hook';
 import { useDatasetIdentifier } from '../../../annotator/hooks/use-dataset-identifier.hook';
 import { useMedia } from '../../../media/providers/media-provider.component';
-import { useLocalStorageExportDataset } from '../../hooks/use-local-storage-export-dataset.hook';
 import { useProject } from '../../providers/project-provider/project-provider.component';
 import { ChildrenTabs } from './children-tabs.component';
-import { DatasetImports } from './dataset-imports.component';
-import { ExportDatasetNotification } from './export-dataset/export-dataset-notification.component';
-import { ExportImportDatasetButtons } from './export-dataset/export-import-dataset-buttons.component';
 import { useOpenNotificationToast } from './hooks/open-notification-toast.hook';
 import { DATASET_TABS_TO_PATH, DatasetChapters, NO_MEDIA_MESSAGE } from './utils';
 

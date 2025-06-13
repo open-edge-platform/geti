@@ -9,11 +9,14 @@ import { DetailedError, Upload } from 'tus-js-client';
 
 import { useImportProject } from '../../core/projects/hooks/use-import-project.hook';
 import { ImportOptions } from '../../core/projects/services/project-service.interface';
+import {
+    getBytesRemaining,
+    getTimeRemaining,
+} from '../../features/dataset-import/providers/dataset-import-to-new-project-provider/utils';
 import { NOTIFICATION_TYPE } from '../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../notification/notification.component';
 import { MissingProviderError } from '../../shared/missing-provider-error';
 import { idMatchingFormat } from '../../test-utils/id-utils';
-import { getBytesRemaining, getTimeRemaining } from '../dataset-import-to-new-project-provider/utils';
 import { useTusUpload } from '../tus-upload-provider/tus-upload-provider.component';
 import { getTUSErrorMessage } from '../tus-upload-provider/util';
 import { useWorkspaceIdentifier } from '../workspaces-provider/use-workspace-identifier.hook';

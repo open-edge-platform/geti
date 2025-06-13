@@ -10,7 +10,11 @@ import { DOMAIN } from '../../../../core/projects/core.interface';
 import { createInMemoryProjectService } from '../../../../core/projects/services/in-memory-project-service';
 import { TOO_LOW_FREE_DISK_SPACE_IN_BYTES } from '../../../../core/status/hooks/utils';
 import { createInMemoryStatusService } from '../../../../core/status/services/in-memory-status-service';
-import { DatasetImportToExistingProjectProvider } from '../../../../providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
+import {
+    ExportImportDatasetDialogProvider,
+    useExportImportDatasetDialogStates,
+} from '../../../../features/dataset-export/components/export-import-dataset-dialog-provider.component';
+import { DatasetImportToExistingProjectProvider } from '../../../../features/dataset-import/providers/dataset-import-to-existing-project-provider/dataset-import-to-existing-project-provider.component';
 import { DatasetProvider } from '../../../../providers/dataset-provider/dataset-provider.component';
 import { MediaUploadProvider } from '../../../../providers/media-upload-provider/media-upload-provider.component';
 import { applicationRender as render } from '../../../../test-utils/application-provider-render';
@@ -21,15 +25,13 @@ import { getMockedTask } from '../../../../test-utils/mocked-items-factory/mocke
 import { getById } from '../../../../test-utils/utils';
 import { MediaProvider } from '../../../media/providers/media-provider.component';
 import { ProjectProvider } from '../../providers/project-provider/project-provider.component';
-import {
-    ExportImportDatasetDialogProvider,
-    useExportImportDatasetDialogStates,
-} from './export-dataset/export-import-dataset-dialog-provider.component';
 import { ProjectDatasetTabActions, ProjectDatasetTabActionsProps } from './project-dataset-tab-actions.component';
 import { DatasetTabActions } from './utils';
 
-jest.mock('./export-dataset/export-import-dataset-dialog-provider.component', () => ({
-    ...jest.requireActual('./export-dataset/export-import-dataset-dialog-provider.component'),
+jest.mock('../../../../features/dataset-export/components/export-import-dataset-dialog-provider.component', () => ({
+    ...jest.requireActual(
+        '../../../../features/dataset-export/components/export-import-dataset-dialog-provider.component'
+    ),
     useExportImportDatasetDialogStates: jest.fn(),
 }));
 

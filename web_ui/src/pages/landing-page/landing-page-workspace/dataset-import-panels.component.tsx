@@ -12,17 +12,17 @@ import { isEmpty } from 'lodash-es';
 
 import { DATASET_IMPORT_STATUSES } from '../../../core/datasets/dataset.enum';
 import { DatasetImportItem, DatasetImportToNewProjectItem } from '../../../core/datasets/dataset.interface';
-import { useDatasetImportQueries } from '../../../core/datasets/hooks/use-dataset-import-queries.hook';
 import { getCurrentJob, isImportingNewProjectJob, isPreparingJob } from '../../../core/datasets/utils';
 import { useJobs } from '../../../core/jobs/hooks/use-jobs.hook';
+import { DatasetImportPanel } from '../../../features/dataset-import/components/dataset-import-panel/dataset-import-panel.component';
+import { DatasetImportToNewProjectDialog } from '../../../features/dataset-import/components/dataset-import-to-new-project/dataset-import-to-new-project-dialog.component';
+import { useDatasetImportQueries } from '../../../features/dataset-import/hooks/use-dataset-import-queries.hook';
+import { useDatasetImportToNewProject } from '../../../features/dataset-import/providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
+import { formatDatasetPrepareImportResponse } from '../../../features/dataset-import/providers/dataset-import-to-new-project-provider/utils';
 import { NOTIFICATION_TYPE } from '../../../notification/notification-toast/notification-type.enum';
 import { useNotification } from '../../../notification/notification.component';
-import { useDatasetImportToNewProject } from '../../../providers/dataset-import-to-new-project-provider/dataset-import-to-new-project-provider.component';
-import { formatDatasetPrepareImportResponse } from '../../../providers/dataset-import-to-new-project-provider/utils';
 import { useWorkspaceIdentifier } from '../../../providers/workspaces-provider/use-workspace-identifier.hook';
-import { DatasetImportPanel } from '../../../shared/components/dataset-import-panel/dataset-import-panel.component';
 import { isNonEmptyString } from '../../../shared/utils';
-import { DatasetImportToNewProjectDialog } from './components/dataset-import-to-new-project/dataset-import-to-new-project-dialog.component';
 
 import classes from './landing-page-workspace.module.scss';
 

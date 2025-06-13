@@ -10,6 +10,7 @@ import { MediaItem } from '../../../../core/media/media.interface';
 import { useStatus } from '../../../../core/status/hooks/use-status.hook';
 import { TOO_LOW_FREE_DISK_SPACE_IN_BYTES } from '../../../../core/status/hooks/utils';
 import { StatusProps } from '../../../../core/status/status.interface';
+import { ExportImportDatasetDialogProvider } from '../../../../features/dataset-export/components/export-import-dataset-dialog-provider.component';
 import { INITIAL_VIEW_MODE, VIEW_MODE_LABEL } from '../../../../shared/components/media-view-modes/utils';
 import {
     getMockedImageMediaItem,
@@ -18,7 +19,6 @@ import {
 import { projectRender as render } from '../../../../test-utils/project-provider-render';
 import { checkTooltip } from '../../../../test-utils/utils';
 import { MediaProvider, useMedia } from '../../../media/providers/media-provider.component';
-import { ExportImportDatasetDialogProvider } from '../project-dataset/export-dataset/export-import-dataset-dialog-provider.component';
 import { ProjectMediaControlPanel } from './project-media-control-panel.component';
 import {
     DELETE_SELECTED_MEDIA_LABEL,
