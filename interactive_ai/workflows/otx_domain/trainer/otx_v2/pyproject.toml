@@ -8,7 +8,7 @@ dependencies = [
     "mlflow==2.19.0",
     "minio~=7.1.0",
     "numpy==1.26.4",
-    "requests==2.32.3",
+    "requests==2.32.4",
     "tqdm==4.67.1",
     "otx[base]==2.4.4",
     "geti-kafka-tools",
