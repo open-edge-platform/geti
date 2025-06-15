@@ -30,12 +30,13 @@ export const SettingOption = ({ label, config, onChange }: SettingOptionProps) =
     return (
         <>
             <Flex
-                marginTop={'size-200'}
+                marginTop={'size-50'}
                 marginBottom={'size-50'}
+                marginStart={'size-250'}
                 justifyContent={'space-between'}
                 alignItems={'center'}
             >
-                <Heading level={4} margin={0}>
+                <Heading level={4} margin={0} UNSAFE_style={{ fontWeight: 400 }}>
                     {capitalize(unFormatText(label))}
                 </Heading>
 
@@ -49,6 +50,7 @@ export const SettingOption = ({ label, config, onChange }: SettingOptionProps) =
 
             {config.type === 'selection' ? (
                 <Picker
+                    marginStart={'size-250'}
                     width={'100%'}
                     aria-label={`${label} selection options`}
                     items={config.options.map((name) => ({ id: name, name }))}
@@ -59,6 +61,7 @@ export const SettingOption = ({ label, config, onChange }: SettingOptionProps) =
                 </Picker>
             ) : (
                 <Slider
+                    marginStart={'size-250'}
                     label=' '
                     width={'100%'}
                     value={Number(value)}

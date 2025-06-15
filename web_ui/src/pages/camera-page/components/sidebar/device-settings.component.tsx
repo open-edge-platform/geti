@@ -1,23 +1,35 @@
 // Copyright (C) 2022-2025 Intel Corporation
 // LIMITED EDGE SOFTWARE DISTRIBUTION LICENSE
 
-import { Divider, Flex, Heading, Item, Key, Picker, View } from '@geti/ui';
-import { orderBy } from 'lodash-es';
+import { Disclosure, DisclosurePanel, DisclosureTitle, Flex, Heading, Item, Key, Picker, View } from '@geti/ui';
 
 import { useDeviceSettings } from '../../providers/device-settings-provider.component';
-import { applySettings } from '../../providers/util';
+import { checkIfDisplaySetting } from '../../providers/util';
+import { DeviceSettingsDefaultCategory } from './device-settings-default-category.component';
+import { settingsMetadata } from './device-settings-metadata';
 import { SettingOption } from './setting-option.component';
 
+import classes from './device-settings.module.css';
+
+const Header = ({ text }: { text: string }) => (
+    <Flex alignItems={'center'} justifyContent={'space-between'}>
+        <Heading level={3}>{text}</Heading>
+    </Flex>
+);
+
+//TODO:
+//fixbug dependencies - changed
+//show after the standup!
+//add tests!
+
 export const DeviceSettings = () => {
-    const { webcamRef, videoDevices, selectedDeviceId, deviceConfig, setSelectedDeviceId, isMirrored, setIsMirrored } =
-        useDeviceSettings();
-    const sortedByOptions = orderBy(deviceConfig, ['config.options'], 'desc');
+    const { categories, dependencies } = settingsMetadata;
+
+    const { videoDevices, selectedDeviceId, deviceConfig, setSelectedDeviceId } = useDeviceSettings();
 
     return (
-        <View position={'relative'}>
-            <Flex alignItems={'center'} justifyContent={'space-between'}>
-                <Heading level={3}>Camera Settings</Heading>
-            </Flex>
+        <View position={'relative'} width={'28rem'}>
+            <Header text={'Camera Settings'} />
 
             <Picker
                 width={'100%'}
@@ -31,28 +43,28 @@ export const DeviceSettings = () => {
                 {({ deviceId, label }) => <Item key={deviceId}>{label}</Item>}
             </Picker>
 
-            <Divider size={'S'} marginTop={'size-250'} marginBottom={'size-250'} />
+            {categories.map(({ categoryName, attributesKeys }) => (
+                <Disclosure key={categoryName}>
+                    <DisclosureTitle UNSAFE_className={classes.sectionHeader}>{categoryName}</DisclosureTitle>
+                    <DisclosurePanel>
+                        {attributesKeys.map((key) => {
+                            const currentOption = deviceConfig.find((option) => option.name === key);
+                            if (currentOption) {
+                                const shouldDisplay = checkIfDisplaySetting(currentOption, deviceConfig, dependencies);
+                                const { name, config, onChange } = currentOption;
 
-            <SettingOption
-                label='Mirror camera'
-                config={{ type: 'selection', options: ['Off', 'On'], value: isMirrored ? 'On' : 'Off' }}
-                onChange={(value) => {
-                    setIsMirrored(value === 'On');
-                }}
-            />
-
-            {sortedByOptions.map(({ name, config }) => (
-                <SettingOption
-                    key={name}
-                    label={name}
-                    config={config}
-                    onChange={(value) => {
-                        if (webcamRef.current?.stream) {
-                            applySettings(webcamRef.current?.stream, { [name]: value });
-                        }
-                    }}
-                />
+                                return (
+                                    shouldDisplay && (
+                                        <SettingOption key={name} label={name} config={config} onChange={onChange} />
+                                    )
+                                );
+                            }
+                        })}
+                    </DisclosurePanel>
+                </Disclosure>
             ))}
+
+            <DeviceSettingsDefaultCategory deviceConfig={deviceConfig} />
         </View>
     );
 };

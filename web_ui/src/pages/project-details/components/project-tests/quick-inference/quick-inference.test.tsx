@@ -382,6 +382,7 @@ describe('QuickInference', () => {
                                 max: 30,
                                 min: 0,
                             },
+                            onChange: jest.fn(),
                         },
                         {
                             name: 'height',
@@ -391,6 +392,7 @@ describe('QuickInference', () => {
                                 max: 1920,
                                 min: 1,
                             },
+                            onChange: jest.fn(),
                         },
                         {
                             name: 'resizeMode',
@@ -399,6 +401,7 @@ describe('QuickInference', () => {
                                 value: 'none',
                                 options: ['none', 'crop-and-scale'],
                             },
+                            onChange: jest.fn(),
                         },
                         {
                             name: 'width',
@@ -408,6 +411,7 @@ describe('QuickInference', () => {
                                 max: 1920,
                                 min: 1,
                             },
+                            onChange: jest.fn(),
                         },
                     ],
                     userPermissions: UserCameraPermission.GRANTED,
