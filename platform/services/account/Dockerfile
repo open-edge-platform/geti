@@ -22,7 +22,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 	CGO_ENABLED=0 go build -trimpath -mod=readonly -gcflags="all=-spectre=all" -asmflags="all=-spectre=all" -ldflags="all=-s -w" -a -o account_service .
 
 # Production image
-FROM gcr.io/distroless/static-debian12:nonroot@sha256:188ddfb9e497f861177352057cb21913d840ecae6c843d39e00d44fa64daa51c AS runtime
+FROM gcr.io/distroless/static-debian12:nonroot@sha256:627d6c5a23ad24e6bdff827f16c7b60e0289029b0c79e9f7ccd54ae3279fb45f AS runtime
 
 COPY --link --from=build /build/control_plane/account_service/account_service .
 
