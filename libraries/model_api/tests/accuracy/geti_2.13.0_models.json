@@ -1,0 +1,4684 @@
+[
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/PADIM/onnx/model.onnx",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:192 max:255;pred_score:1.0;pred_label:Anomaly;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/PADIM/openvino_fp16/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:192 max:255;pred_score:1.0;pred_label:Anomaly;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/PADIM/openvino_fp32/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:192 max:255;pred_score:1.0;pred_label:Anomaly;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/PADIM/openvino_int8/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:196 max:247;pred_score:0.8;pred_label:Normal;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/PADIM/openvino_xai_fp16/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:192 max:255;pred_score:1.0;pred_label:Anomaly;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/STFPM/onnx/model.onnx",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:129 max:203;pred_score:0.7;pred_label:Anomaly;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/STFPM/openvino_fp16/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:129 max:203;pred_score:0.7;pred_label:Anomaly;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/STFPM/openvino_fp32/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:129 max:203;pred_score:0.7;pred_label:Anomaly;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/STFPM/openvino_int8/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:129 max:147;pred_score:0.5;pred_label:Normal;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/STFPM/openvino_xai_fp16/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:129 max:203;pred_score:0.7;pred_label:Anomaly;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/U-FLOW/onnx/model.onnx",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:125 max:255;pred_score:0.9;pred_label:Anomaly;pred_mask min:0 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/U-FLOW/openvino_fp16/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:125 max:255;pred_score:0.9;pred_label:Anomaly;pred_mask min:0 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/U-FLOW/openvino_fp32/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:125 max:255;pred_score:0.9;pred_label:Anomaly;pred_mask min:0 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/U-FLOW/openvino_int8/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:130 max:255;pred_score:0.7;pred_label:Anomaly;pred_mask min:1 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/AnomalyDetection/U-FLOW/openvino_xai_fp16/model.xml",
+    "type": "AnomalyDetection",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "anomaly_map min:125 max:255;pred_score:0.9;pred_label:Anomaly;pred_mask min:0 max:1;"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/DeiT-Tiny/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 1.0
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.9995660185813904
+            }
+          ],
+          "raw_scores": [
+            0.0004340099112596363, 0.9995660185813904, 1.2432556095731684e-9,
+            2.806482823913825e-9, 1.0
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/DeiT-Tiny/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 1.0
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.9995731711387634
+            }
+          ],
+          "raw_scores": [
+            0.00042678863974288106, 0.9995731711387634, 1.2321149656102648e-9,
+            2.771554541425303e-9, 1.0
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/DeiT-Tiny/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 1.0
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.9995660185813904
+            }
+          ],
+          "raw_scores": [
+            0.00043402682058513165, 0.9995660185813904, 1.2432935792006106e-9,
+            2.806365140273215e-9, 1.0
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/DeiT-Tiny/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9999827146530151
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.9376516938209534
+            }
+          ],
+          "raw_scores": [
+            0.062348317354917526, 0.9376516938209534, 4.446972923233261e-8,
+            1.7239970475202426e-5, 0.9999827146530151
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/DeiT-Tiny/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 1.0
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.9995731711387634
+            }
+          ],
+          "raw_scores": [
+            0.00042678863974288106, 0.9995731711387634, 1.2321149656102648e-9,
+            2.771554541425303e-9, 1.0
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-B0/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.7981534004211426
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.621908962726593
+            }
+          ],
+          "raw_scores": [
+            0.2596023678779602, 0.621908962726593, 0.11848866939544678,
+            0.2018466591835022, 0.7981534004211426
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-B0/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.7981191277503967
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.6220411658287048
+            }
+          ],
+          "raw_scores": [
+            0.25937649607658386, 0.6220411658287048, 0.1185823306441307,
+            0.20188084244728088, 0.7981191277503967
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-B0/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.7981535196304321
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.6219091415405273
+            }
+          ],
+          "raw_scores": [
+            0.2596021890640259, 0.6219091415405273, 0.11848869919776917,
+            0.20184649527072906, 0.7981535196304321
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-B0/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9157181978225708
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.6836422681808472
+            }
+          ],
+          "raw_scores": [
+            0.21445240080356598, 0.6836422681808472, 0.10190532356500626,
+            0.0842818170785904, 0.9157181978225708
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-B0/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.7981191277503967
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.6220411658287048
+            }
+          ],
+          "raw_scores": [
+            0.25937649607658386, 0.6220411658287048, 0.1185823306441307,
+            0.20188084244728088, 0.7981191277503967
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-B3/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.8072364330291748
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.580940306186676
+            }
+          ],
+          "raw_scores": [
+            0.28251969814300537, 0.580940306186676, 0.1365399807691574,
+            0.192763552069664, 0.8072364330291748
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-B3/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.8070695400238037
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.5809533596038818
+            }
+          ],
+          "raw_scores": [
+            0.28232690691947937, 0.5809533596038818, 0.1367197483778,
+            0.1929304450750351, 0.8070695400238037
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-B3/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.80723637342453
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.5809402465820312
+            }
+          ],
+          "raw_scores": [
+            0.28251975774765015, 0.5809402465820312, 0.1365399956703186,
+            0.19276361167430878, 0.80723637342453
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-B3/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.7708662152290344
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.5590543746948242
+            }
+          ],
+          "raw_scores": [
+            0.3357127010822296, 0.5590543746948242, 0.10523286461830139,
+            0.22913381457328796, 0.7708662152290344
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-B3/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.8070695400238037
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.5809533596038818
+            }
+          ],
+          "raw_scores": [
+            0.28232690691947937, 0.5809533596038818, 0.1367197483778,
+            0.1929304450750351, 0.8070695400238037
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-V2-L/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9566987156867981
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.6439645886421204
+            }
+          ],
+          "raw_scores": [
+            0.31177225708961487, 0.6439645886421204, 0.04426312819123268,
+            0.04330126568675041, 0.9566987156867981
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-V2-L/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9567152857780457
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.6441488265991211
+            }
+          ],
+          "raw_scores": [
+            0.31161263585090637, 0.6441488265991211, 0.04423857107758522,
+            0.04328468441963196, 0.9567152857780457
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-V2-L/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9566987156867981
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.6439647674560547
+            }
+          ],
+          "raw_scores": [
+            0.3117721378803253, 0.6439647674560547, 0.04426310583949089,
+            0.0433012954890728, 0.9566987156867981
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-V2-L/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9635509252548218
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.6908327341079712
+            }
+          ],
+          "raw_scores": [
+            0.2655159533023834, 0.6908327341079712, 0.04365134611725807,
+            0.036449044942855835, 0.9635509252548218
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-V2-L/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9567152857780457
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.6441488265991211
+            }
+          ],
+          "raw_scores": [
+            0.31161263585090637, 0.6441488265991211, 0.04423857107758522,
+            0.04328468441963196, 0.9567152857780457
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-V2-S/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9541687369346619
+            },
+            {
+              "id": 0,
+              "name": "inside",
+              "confidence": 0.4934975802898407
+            }
+          ],
+          "raw_scores": [
+            0.4934975802898407, 0.3930470943450928, 0.11345534026622772,
+            0.04583129659295082, 0.9541687369346619
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-V2-S/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9542422294616699
+            },
+            {
+              "id": 0,
+              "name": "inside",
+              "confidence": 0.4930516481399536
+            }
+          ],
+          "raw_scores": [
+            0.4930516481399536, 0.3934609591960907, 0.11348743736743927,
+            0.045757781714200974, 0.9542422294616699
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-V2-S/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9541687369346619
+            },
+            {
+              "id": 0,
+              "name": "inside",
+              "confidence": 0.4934976398944855
+            }
+          ],
+          "raw_scores": [
+            0.4934976398944855, 0.3930470943450928, 0.11345530301332474,
+            0.045831259340047836, 0.9541687369346619
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-V2-S/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9460054636001587
+            },
+            {
+              "id": 0,
+              "name": "inside",
+              "confidence": 0.5132704973220825
+            }
+          ],
+          "raw_scores": [
+            0.5132704973220825, 0.3514685332775116, 0.13526102900505066,
+            0.05399449169635773, 0.9460054636001587
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/EfficientNet-V2-S/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9542422294616699
+            },
+            {
+              "id": 0,
+              "name": "inside",
+              "confidence": 0.4930516481399536
+            }
+          ],
+          "raw_scores": [
+            0.4930516481399536, 0.3934609591960907, 0.11348743736743927,
+            0.045757781714200974, 0.9542422294616699
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/MobileNet-V3-large-1x/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5713164210319519
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.42000895738601685
+            }
+          ],
+          "raw_scores": [
+            0.26569658517837524, 0.42000895738601685, 0.3142944276332855,
+            0.4286835789680481, 0.5713164210319519
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/MobileNet-V3-large-1x/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5714322924613953
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.41985875368118286
+            }
+          ],
+          "raw_scores": [
+            0.26576101779937744, 0.41985875368118286, 0.3143802583217621,
+            0.42856767773628235, 0.5714322924613953
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/MobileNet-V3-large-1x/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5713164210319519
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.42000892758369446
+            }
+          ],
+          "raw_scores": [
+            0.26569658517837524, 0.42000892758369446, 0.3142944872379303,
+            0.42868363857269287, 0.5713164210319519
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/MobileNet-V3-large-1x/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5880841016769409
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.4367189109325409
+            }
+          ],
+          "raw_scores": [
+            0.23817238211631775, 0.4367189109325409, 0.32510867714881897,
+            0.4119158685207367, 0.5880841016769409
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/MobileNet-V3-large-1x/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5714322924613953
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.41985875368118286
+            }
+          ],
+          "raw_scores": [
+            0.26576101779937744, 0.41985875368118286, 0.3143802583217621,
+            0.42856767773628235, 0.5714322924613953
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/MobileNet-V3-small/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.8130664825439453
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.5477104187011719
+            }
+          ],
+          "raw_scores": [
+            0.22652596235275269, 0.5477104187011719, 0.22576364874839783,
+            0.1869334727525711, 0.8130664825439453
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/MobileNet-V3-small/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.8131321668624878
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.5473816394805908
+            }
+          ],
+          "raw_scores": [
+            0.22700215876102448, 0.5473816394805908, 0.2256162166595459,
+            0.1868678778409958, 0.8131321668624878
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/MobileNet-V3-small/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.8130664229393005
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.5477102994918823
+            }
+          ],
+          "raw_scores": [
+            0.22652597725391388, 0.5477102994918823, 0.22576367855072021,
+            0.18693360686302185, 0.8130664229393005
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/MobileNet-V3-small/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.804233193397522
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.5585412383079529
+            }
+          ],
+          "raw_scores": [
+            0.22594331204891205, 0.5585412383079529, 0.21551546454429626,
+            0.19576683640480042, 0.804233193397522
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationHierarchical/MobileNet-V3-small/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.8131321668624878
+            },
+            {
+              "id": 1,
+              "name": "outside",
+              "confidence": 0.5473816394805908
+            }
+          ],
+          "raw_scores": [
+            0.22700215876102448, 0.5473816394805908, 0.2256162166595459,
+            0.1868678778409958, 0.8131321668624878
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/DeiT-Tiny/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "inside",
+              "confidence": 0.5192329287528992
+            },
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.9097111821174622
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9750664830207825
+            }
+          ],
+          "raw_scores": [
+            0.24218815565109253, 0.5192329287528992, 0.9097111821174622,
+            0.4285067617893219, 0.9750664830207825, 0.10727697610855103
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/DeiT-Tiny/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "inside",
+              "confidence": 0.5187600255012512
+            },
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.9098359942436218
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9750276207923889
+            }
+          ],
+          "raw_scores": [
+            0.24216385185718536, 0.5187600255012512, 0.9098359942436218,
+            0.42839863896369934, 0.9750276207923889, 0.1072716936469078
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/DeiT-Tiny/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "inside",
+              "confidence": 0.5192335844039917
+            },
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.9097110033035278
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9750664830207825
+            }
+          ],
+          "raw_scores": [
+            0.24218828976154327, 0.5192335844039917, 0.9097110033035278,
+            0.4285065233707428, 0.9750664830207825, 0.10727689415216446
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/DeiT-Tiny/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "inside",
+              "confidence": 0.5612392425537109
+            },
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.9172236323356628
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9701837301254272
+            }
+          ],
+          "raw_scores": [
+            0.22782911360263824, 0.5612392425537109, 0.9172236323356628,
+            0.48290354013442993, 0.9701837301254272, 0.10515786707401276
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/DeiT-Tiny/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "inside",
+              "confidence": 0.5187600255012512
+            },
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.9098359942436218
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.9750276207923889
+            }
+          ],
+          "raw_scores": [
+            0.24216385185718536, 0.5187600255012512, 0.9098359942436218,
+            0.42839863896369934, 0.9750276207923889, 0.1072716936469078
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-B0/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5970104336738586
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.650637686252594
+            }
+          ],
+          "raw_scores": [
+            0.4608972370624542, 0.45636245608329773, 0.5970104336738586,
+            0.42311835289001465, 0.650637686252594, 0.4392175078392029
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-B0/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.597006618976593
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6506818532943726
+            }
+          ],
+          "raw_scores": [
+            0.4609382450580597, 0.4563237130641937, 0.597006618976593,
+            0.4230595827102661, 0.6506818532943726, 0.4392147362232208
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-B0/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5970104336738586
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.650637686252594
+            }
+          ],
+          "raw_scores": [
+            0.4608972370624542, 0.4563624858856201, 0.5970104336738586,
+            0.42311838269233704, 0.650637686252594, 0.4392175078392029
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-B0/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5976037383079529
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6492298245429993
+            }
+          ],
+          "raw_scores": [
+            0.45428210496902466, 0.45743581652641296, 0.5976037383079529,
+            0.42379823327064514, 0.6492298245429993, 0.4444277286529541
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-B0/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.597006618976593
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6506818532943726
+            }
+          ],
+          "raw_scores": [
+            0.4609382450580597, 0.4563237130641937, 0.597006618976593,
+            0.4230595827102661, 0.6506818532943726, 0.4392147362232208
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-B3/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5669705867767334
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5811112523078918
+            }
+          ],
+          "raw_scores": [
+            0.4820452928543091, 0.48709094524383545, 0.5669705867767334,
+            0.4663589894771576, 0.5811112523078918, 0.44530725479125977
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-B3/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5668460130691528
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5812063217163086
+            }
+          ],
+          "raw_scores": [
+            0.48207327723503113, 0.48721444606781006, 0.5668460130691528,
+            0.4663914442062378, 0.5812063217163086, 0.4451849162578583
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-B3/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5669706463813782
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5811112523078918
+            }
+          ],
+          "raw_scores": [
+            0.4820452928543091, 0.48709094524383545, 0.5669706463813782,
+            0.4663589894771576, 0.5811112523078918, 0.44530728459358215
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-B3/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5392977595329285
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5714854598045349
+            }
+          ],
+          "raw_scores": [
+            0.4972307085990906, 0.49887433648109436, 0.5392977595329285,
+            0.4692690670490265, 0.5714854598045349, 0.4509527087211609
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-B3/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5668460130691528
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5812063217163086
+            }
+          ],
+          "raw_scores": [
+            0.48207327723503113, 0.48721444606781006, 0.5668460130691528,
+            0.4663914442062378, 0.5812063217163086, 0.4451849162578583
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-V2-L/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.6280241012573242
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6011207103729248
+            }
+          ],
+          "raw_scores": [
+            0.4296453893184662, 0.4707491099834442, 0.6280241012573242,
+            0.4675343930721283, 0.6011207103729248, 0.4306431710720062
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-V2-L/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.6280432939529419
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6010627150535583
+            }
+          ],
+          "raw_scores": [
+            0.4296188950538635, 0.4707626402378082, 0.6280432939529419,
+            0.46759575605392456, 0.6010627150535583, 0.43063676357269287
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-V2-L/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.6280241012573242
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6011207103729248
+            }
+          ],
+          "raw_scores": [
+            0.4296453893184662, 0.4707491099834442, 0.6280241012573242,
+            0.4675343632698059, 0.6011207103729248, 0.43064314126968384
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-V2-L/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.6256459355354309
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5903835892677307
+            }
+          ],
+          "raw_scores": [
+            0.4292323887348175, 0.4756009578704834, 0.6256459355354309,
+            0.46885502338409424, 0.5903835892677307, 0.43823352456092834
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-V2-L/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.6280432939529419
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6010627150535583
+            }
+          ],
+          "raw_scores": [
+            0.4296188950538635, 0.4707626402378082, 0.6280432939529419,
+            0.46759575605392456, 0.6010627150535583, 0.43063676357269287
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-V2-S/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5501821041107178
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5601801872253418
+            }
+          ],
+          "raw_scores": [
+            0.4664395749568939, 0.49888157844543457, 0.5501821041107178,
+            0.4995848536491394, 0.5601801872253418, 0.455502450466156
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-V2-S/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5500993728637695
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5601934790611267
+            }
+          ],
+          "raw_scores": [
+            0.4664437174797058, 0.4989291727542877, 0.5500993728637695,
+            0.4995180368423462, 0.5601934790611267, 0.45553985238075256
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-V2-S/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5501821041107178
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5601801872253418
+            }
+          ],
+          "raw_scores": [
+            0.4664395749568939, 0.49888157844543457, 0.5501821041107178,
+            0.49958479404449463, 0.5601801872253418, 0.455502450466156
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-V2-S/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5594047904014587
+            },
+            {
+              "id": 3,
+              "name": "cat",
+              "confidence": 0.5012239217758179
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5634059906005859
+            }
+          ],
+          "raw_scores": [
+            0.463392436504364, 0.4950887858867645, 0.5594047904014587,
+            0.5012239217758179, 0.5634059906005859, 0.45111140608787537
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/EfficientNet-V2-S/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5500993728637695
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5601934790611267
+            }
+          ],
+          "raw_scores": [
+            0.4664437174797058, 0.4989291727542877, 0.5500993728637695,
+            0.4995180368423462, 0.5601934790611267, 0.45553985238075256
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/MobileNet-V3-large-1x/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "inside",
+              "confidence": 0.5317322015762329
+            },
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5421338677406311
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6366594433784485
+            }
+          ],
+          "raw_scores": [
+            0.4453333020210266, 0.5317322015762329, 0.5421338677406311,
+            0.4043675363063812, 0.6366594433784485, 0.46472203731536865
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/MobileNet-V3-large-1x/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "inside",
+              "confidence": 0.5317105650901794
+            },
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5420862436294556
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6365987658500671
+            }
+          ],
+          "raw_scores": [
+            0.44537946581840515, 0.5317105650901794, 0.5420862436294556,
+            0.4043958783149719, 0.6365987658500671, 0.4647485017776489
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/MobileNet-V3-large-1x/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "inside",
+              "confidence": 0.5317322015762329
+            },
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5421338677406311
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6366594433784485
+            }
+          ],
+          "raw_scores": [
+            0.4453333020210266, 0.5317322015762329, 0.5421338677406311,
+            0.4043675363063812, 0.6366594433784485, 0.4647219777107239
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/MobileNet-V3-large-1x/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "inside",
+              "confidence": 0.5367164611816406
+            },
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5546934008598328
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6308700442314148
+            }
+          ],
+          "raw_scores": [
+            0.4350590705871582, 0.5367164611816406, 0.5546934008598328,
+            0.4202575087547302, 0.6308700442314148, 0.44943177700042725
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/MobileNet-V3-large-1x/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "inside",
+              "confidence": 0.5317105650901794
+            },
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5420862436294556
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6365987658500671
+            }
+          ],
+          "raw_scores": [
+            0.44537946581840515, 0.5317105650901794, 0.5420862436294556,
+            0.4043958783149719, 0.6365987658500671, 0.4647485017776489
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/MobileNet-V3-small/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5289269685745239
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6081633567810059
+            }
+          ],
+          "raw_scores": [
+            0.46969136595726013, 0.49655237793922424, 0.5289269685745239,
+            0.4512603282928467, 0.6081633567810059, 0.4342156946659088
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/MobileNet-V3-small/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5286858677864075
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6083118319511414
+            }
+          ],
+          "raw_scores": [
+            0.46965745091438293, 0.4967147409915924, 0.5286858677864075,
+            0.4510480463504791, 0.6083118319511414, 0.43423911929130554
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/MobileNet-V3-small/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5289270281791687
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6081632971763611
+            }
+          ],
+          "raw_scores": [
+            0.4696914255619049, 0.4965522587299347, 0.5289270281791687,
+            0.4512602686882019, 0.6081632971763611, 0.4342156946659088
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/MobileNet-V3-small/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5427511930465698
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.5972496867179871
+            }
+          ],
+          "raw_scores": [
+            0.4717657268047333, 0.4745117127895355, 0.5427511930465698,
+            0.45767879486083984, 0.5972496867179871, 0.44160962104797363
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationMultiLabel/MobileNet-V3-small/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 2,
+              "name": "outside",
+              "confidence": 0.5286858677864075
+            },
+            {
+              "id": 4,
+              "name": "dog",
+              "confidence": 0.6083118319511414
+            }
+          ],
+          "raw_scores": [
+            0.46965745091438293, 0.4967147409915924, 0.5286858677864075,
+            0.4510480463504791, 0.6083118319511414, 0.43423911929130554
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/DeiT-Tiny/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9661258459091187
+            }
+          ],
+          "raw_scores": [0.03387409448623657, 0.9661258459091187]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/DeiT-Tiny/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9661222100257874
+            }
+          ],
+          "raw_scores": [0.03387779742479324, 0.9661222100257874]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/DeiT-Tiny/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9661258459091187
+            }
+          ],
+          "raw_scores": [0.03387409448623657, 0.9661258459091187]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/DeiT-Tiny/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9654262661933899
+            }
+          ],
+          "raw_scores": [0.0345737561583519, 0.9654262661933899]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/DeiT-Tiny/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9661222100257874
+            }
+          ],
+          "raw_scores": [0.03387779742479324, 0.9661222100257874]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-B0/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9836701154708862
+            }
+          ],
+          "raw_scores": [0.016329867765307426, 0.9836701154708862]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-B0/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9837675094604492
+            }
+          ],
+          "raw_scores": [0.016232525929808617, 0.9837675094604492]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-B0/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9836701154708862
+            }
+          ],
+          "raw_scores": [0.01632986031472683, 0.9836701154708862]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-B0/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9832952618598938
+            }
+          ],
+          "raw_scores": [0.016704734414815903, 0.9832952618598938]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-B0/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9837675094604492
+            }
+          ],
+          "raw_scores": [0.016232525929808617, 0.9837675094604492]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-B3/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.6800236701965332
+            }
+          ],
+          "raw_scores": [0.3199763298034668, 0.6800236701965332]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-B3/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.6803337931632996
+            }
+          ],
+          "raw_scores": [0.31966617703437805, 0.6803337931632996]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-B3/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.6800236701965332
+            }
+          ],
+          "raw_scores": [0.3199763298034668, 0.6800236701965332]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-B3/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.6874678730964661
+            }
+          ],
+          "raw_scores": [0.3125321567058563, 0.6874678730964661]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-B3/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.6803337931632996
+            }
+          ],
+          "raw_scores": [0.31966617703437805, 0.6803337931632996]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-V2-L/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9999783039093018
+            }
+          ],
+          "raw_scores": [2.1702137019019574e-5, 0.9999783039093018]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-V2-L/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9999784231185913
+            }
+          ],
+          "raw_scores": [2.1627654859912582e-5, 0.9999784231185913]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-V2-L/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9999783039093018
+            }
+          ],
+          "raw_scores": [2.1702198864659294e-5, 0.9999783039093018]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-V2-L/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9999547004699707
+            }
+          ],
+          "raw_scores": [4.5328877604333684e-5, 0.9999547004699707]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-V2-L/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9999784231185913
+            }
+          ],
+          "raw_scores": [2.1627654859912582e-5, 0.9999784231185913]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-V2-S/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9740546345710754
+            }
+          ],
+          "raw_scores": [0.025945385918021202, 0.9740546345710754]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-V2-S/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.973962664604187
+            }
+          ],
+          "raw_scores": [0.02603728510439396, 0.973962664604187]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-V2-S/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9740546345710754
+            }
+          ],
+          "raw_scores": [0.025945337489247322, 0.9740546345710754]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-V2-S/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.9511551260948181
+            }
+          ],
+          "raw_scores": [0.0488448366522789, 0.9511551260948181]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/EfficientNet-V2-S/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.973962664604187
+            }
+          ],
+          "raw_scores": [0.02603728510439396, 0.973962664604187]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/MobileNet-V3-large-1x/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.8473217487335205
+            }
+          ],
+          "raw_scores": [0.15267826616764069, 0.8473217487335205]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/MobileNet-V3-large-1x/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.8470059633255005
+            }
+          ],
+          "raw_scores": [0.1529940813779831, 0.8470059633255005]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/MobileNet-V3-large-1x/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.8473217487335205
+            }
+          ],
+          "raw_scores": [0.15267828106880188, 0.8473217487335205]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/MobileNet-V3-large-1x/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.8792282938957214
+            }
+          ],
+          "raw_scores": [0.12077173590660095, 0.8792282938957214]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/MobileNet-V3-large-1x/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.8470059633255005
+            }
+          ],
+          "raw_scores": [0.1529940813779831, 0.8470059633255005]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/MobileNet-V3-small/onnx/model.onnx",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.8695344924926758
+            }
+          ],
+          "raw_scores": [0.1304655522108078, 0.8695344924926758]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/MobileNet-V3-small/openvino_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.8688372373580933
+            }
+          ],
+          "raw_scores": [0.13116273283958435, 0.8688372373580933]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/MobileNet-V3-small/openvino_fp32/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.8695343136787415
+            }
+          ],
+          "raw_scores": [0.13046568632125854, 0.8695343136787415]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/MobileNet-V3-small/openvino_int8/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.8383836150169373
+            }
+          ],
+          "raw_scores": [0.1616164594888687, 0.8383836150169373]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/ClassificationSingleLabel/MobileNet-V3-small/openvino_xai_fp16/model.xml",
+    "type": "ClassificationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "top_labels": [
+            {
+              "id": 1,
+              "name": "dog",
+              "confidence": 0.8688372373580933
+            }
+          ],
+          "raw_scores": [0.13116273283958435, 0.8688372373580933]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/ATSS-MobileNetV2/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[90, 61, 339, 300]],
+          "labels": [1],
+          "scores": [0.605266273021698],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/ATSS-MobileNetV2/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[90, 61, 339, 300]],
+          "labels": [1],
+          "scores": [0.6045332551002502],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/ATSS-MobileNetV2/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[90, 61, 339, 300]],
+          "labels": [1],
+          "scores": [0.6052664518356323],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/ATSS-MobileNetV2/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[91, 59, 339, 300]],
+          "labels": [1],
+          "scores": [0.6574531197547913],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/ATSS-MobileNetV2/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[90, 61, 339, 300]],
+          "labels": [1],
+          "scores": [0.6045332551002502],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/ATSS-ResNeXt101/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[101, 60, 332, 300]],
+          "labels": [1],
+          "scores": [0.7311218976974487],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/ATSS-ResNeXt101/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[101, 60, 332, 300]],
+          "labels": [1],
+          "scores": [0.7311151027679443],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/ATSS-ResNeXt101/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[101, 60, 332, 300]],
+          "labels": [1],
+          "scores": [0.7311219573020935],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/ATSS-ResNeXt101/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[100, 60, 336, 300]],
+          "labels": [1],
+          "scores": [0.7124019861221313],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/ATSS-ResNeXt101/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[101, 60, 332, 300]],
+          "labels": [1],
+          "scores": [0.7311151027679443],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-L/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[100, 63, 336, 300]],
+          "labels": [1],
+          "scores": [0.8786922097206116],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-L/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[100, 63, 336, 300]],
+          "labels": [1],
+          "scores": [0.879804790019989],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-L/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[100, 63, 336, 300]],
+          "labels": [1],
+          "scores": [0.878692090511322],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-L/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[88, 59, 333, 297]],
+          "labels": [1],
+          "scores": [0.8135271668434143],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-L/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[100, 63, 336, 300]],
+          "labels": [1],
+          "scores": [0.879804790019989],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-M/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[97, 61, 336, 300]],
+          "labels": [1],
+          "scores": [0.6880279779434204],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-M/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[97, 61, 336, 300]],
+          "labels": [1],
+          "scores": [0.6911171674728394],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-M/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[97, 61, 336, 300]],
+          "labels": [1],
+          "scores": [0.6880275011062622],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-M/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-M/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[97, 61, 336, 300]],
+          "labels": [1],
+          "scores": [0.6911171674728394],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-X/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[99, 61, 337, 300]],
+          "labels": [1],
+          "scores": [0.5722445249557495],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-X/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[99, 61, 337, 300]],
+          "labels": [1],
+          "scores": [0.5715287327766418],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-X/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[99, 61, 337, 300]],
+          "labels": [1],
+          "scores": [0.5722460746765137],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-X/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[98, 63, 336, 300]],
+          "labels": [1],
+          "scores": [0.5758538842201233],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/Deim-DFine-X/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[99, 61, 337, 300]],
+          "labels": [1],
+          "scores": [0.5715287327766418],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/DFine-X/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[96, 63, 336, 300]],
+          "labels": [1],
+          "scores": [0.729743242263794],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/DFine-X/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[96, 63, 336, 300]],
+          "labels": [1],
+          "scores": [0.7303683757781982],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/DFine-X/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[96, 63, 336, 300]],
+          "labels": [1],
+          "scores": [0.7297437787055969],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/DFine-X/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/DFine-X/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[96, 63, 336, 300]],
+          "labels": [1],
+          "scores": [0.7303683757781982],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-EfficientNetB2B/onnx/model.onnx",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "206, 153, 242, 179, 2 (dog): 0.341, 927, RotatedRect: 223.000 165.500 25.000 36.000 90.000; 197, 149, 249, 191, 2 (dog): 0.280, 2170, RotatedRect: 222.500 169.500 51.000 41.000 0.000; 118, 24, 357, 220, 2 (dog): 0.277, 33017, RotatedRect: 230.500 134.000 223.000 172.000 -0.000; 67, 40, 369, 266, 1 (cat): 0.275, 40718, RotatedRect: 222.045 156.369 220.298 227.177 13.870; 210, 145, 241, 171, 2 (dog): 0.240, 778, RotatedRect: 225.000 157.500 25.000 32.000 90.000; 0; [0]; dog: 0.341, 116, 0; dog: 0.280, 181, 0; dog: 0.277, 644, 0; cat: 0.275, 690, 0; dog: 0.240, 99, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-EfficientNetB2B/openvino_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "207, 153, 242, 179, 2 (dog): 0.340, 902, RotatedRect: 223.500 165.500 25.000 35.000 90.000; 197, 149, 249, 191, 2 (dog): 0.277, 2170, RotatedRect: 222.500 169.500 51.000 41.000 0.000; 118, 24, 358, 221, 2 (dog): 0.276, 33340, RotatedRect: 230.500 134.000 223.000 174.000 -0.000; 67, 39, 369, 266, 1 (cat): 0.276, 40796, RotatedRect: 221.201 155.620 219.593 228.354 14.931; 210, 145, 241, 171, 2 (dog): 0.238, 779, RotatedRect: 225.000 157.500 25.000 32.000 90.000; 0; [0]; dog: 0.340, 114, 0; dog: 0.277, 181, 0; dog: 0.276, 647, 0; cat: 0.276, 693, 0; dog: 0.238, 99, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-EfficientNetB2B/openvino_fp32/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "206, 153, 242, 179, 2 (dog): 0.341, 927, RotatedRect: 223.000 165.500 25.000 36.000 90.000; 197, 149, 249, 191, 2 (dog): 0.280, 2170, RotatedRect: 222.500 169.500 51.000 41.000 0.000; 118, 24, 357, 220, 2 (dog): 0.277, 33017, RotatedRect: 230.500 134.000 223.000 172.000 -0.000; 67, 40, 369, 266, 1 (cat): 0.275, 40718, RotatedRect: 222.045 156.369 220.298 227.177 13.870; 210, 145, 241, 171, 2 (dog): 0.240, 778, RotatedRect: 225.000 157.500 25.000 32.000 90.000; 0; [0]; dog: 0.341, 116, 0; dog: 0.280, 181, 0; dog: 0.277, 644, 0; cat: 0.275, 690, 0; dog: 0.240, 99, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-EfficientNetB2B/openvino_int8/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "118, 33, 356, 214, 2 (dog): 0.284, 31966, RotatedRect: 230.500 130.000 166.000 223.000 90.000; 196, 149, 243, 192, 2 (dog): 0.264, 2021, RotatedRect: 219.000 170.000 42.000 46.000 90.000; 207, 151, 240, 180, 2 (dog): 0.260, 1031, RotatedRect: 223.000 165.000 30.000 34.000 90.000; 82, 32, 354, 276, 1 (cat): 0.244, 43334, RotatedRect: 217.885 159.923 217.247 240.051 15.255; 0; [0]; dog: 0.284, 636, 0; dog: 0.264, 176, 0; dog: 0.260, 116, 0; cat: 0.244, 725, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-EfficientNetB2B/openvino_xai_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "207, 153, 242, 179, 2 (dog): 0.340, 902, RotatedRect: 223.500 165.500 25.000 35.000 90.000; 197, 149, 249, 191, 2 (dog): 0.277, 2170, RotatedRect: 222.500 169.500 51.000 41.000 0.000; 118, 24, 358, 221, 2 (dog): 0.276, 33340, RotatedRect: 230.500 134.000 223.000 174.000 -0.000; 67, 39, 369, 266, 1 (cat): 0.276, 40796, RotatedRect: 221.201 155.620 219.593 228.354 14.931; 210, 145, 241, 171, 2 (dog): 0.238, 779, RotatedRect: 225.000 157.500 25.000 32.000 90.000; 2; [1,400]; dog: 0.340, 114, 0; dog: 0.277, 181, 0; dog: 0.276, 647, 0; cat: 0.276, 693, 0; dog: 0.238, 99, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-ResNet50-V1/onnx/model.onnx",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "86, 68, 352, 300, 2 (dog): 0.161, 36688, RotatedRect: 228.000 166.500 199.000 240.000 90.000; 0; [0]; dog: 0.161, 695, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-ResNet50-V1/openvino_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "86, 68, 352, 300, 2 (dog): 0.161, 36629, RotatedRect: 228.000 166.000 198.000 240.000 90.000; 0; [0]; dog: 0.161, 694, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-ResNet50-V1/openvino_fp32/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "86, 68, 352, 300, 2 (dog): 0.161, 36688, RotatedRect: 228.000 166.500 199.000 240.000 90.000; 0; [0]; dog: 0.161, 695, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-ResNet50-V1/openvino_int8/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": ["0; [0]; ; "]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-ResNet50-V1/openvino_xai_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "86, 68, 352, 300, 2 (dog): 0.161, 36629, RotatedRect: 228.000 166.000 198.000 240.000 90.000; 1; [1,1280]; dog: 0.161, 694, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-ResNet50-V2/onnx/model.onnx",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "85, 57, 324, 287, 2 (dog): 0.221, 44239, RotatedRect: 204.000 171.000 230.000 238.000 90.000; 81, 58, 318, 295, 1 (cat): 0.106, 38290, RotatedRect: 209.000 172.000 216.000 228.000 0.000; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-ResNet50-V2/openvino_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "85, 57, 324, 287, 2 (dog): 0.221, 44231, RotatedRect: 204.000 171.000 230.000 238.000 90.000; 81, 58, 318, 295, 1 (cat): 0.106, 38292, RotatedRect: 208.500 172.000 228.000 217.000 90.000; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-ResNet50-V2/openvino_fp32/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "85, 57, 324, 287, 2 (dog): 0.221, 44239, RotatedRect: 204.000 171.000 230.000 238.000 90.000; 81, 58, 318, 295, 1 (cat): 0.106, 38290, RotatedRect: 209.000 172.000 216.000 228.000 0.000; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-ResNet50-V2/openvino_int8/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "79, 59, 328, 288, 2 (dog): 0.241, 44637, RotatedRect: 203.500 172.500 229.000 247.000 90.000; 76, 61, 322, 296, 1 (cat): 0.114, 38080, RotatedRect: 214.000 173.500 227.000 214.000 90.000; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/DetectionRotated/MackRCNN-ResNet50-V2/openvino_xai_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "85, 57, 324, 287, 2 (dog): 0.221, 44231, RotatedRect: 204.000 171.000 230.000 238.000 90.000; 81, 58, 318, 295, 1 (cat): 0.106, 38292, RotatedRect: 208.500 172.000 228.000 217.000 90.000; 2; [1,1280]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/RTMdet-Tiny/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/RTMdet-Tiny/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/RTMdet-Tiny/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/RTMdet-Tiny/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/RTMdet-Tiny/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/SSD-MobilenetV2/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [118, 22, 374, 300],
+            [0, 21, 351, 298]
+          ],
+          "labels": [1, 0],
+          "scores": [0.9981312155723572, 0.8724134564399719],
+          "label_names": ["dog", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/SSD-MobilenetV2/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [118, 22, 374, 300],
+            [0, 21, 351, 298]
+          ],
+          "labels": [1, 0],
+          "scores": [0.9981437921524048, 0.8729411363601685],
+          "label_names": ["dog", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/SSD-MobilenetV2/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [118, 22, 374, 300],
+            [0, 21, 351, 298]
+          ],
+          "labels": [1, 0],
+          "scores": [0.9981312155723572, 0.8724136352539062],
+          "label_names": ["dog", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/SSD-MobilenetV2/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [123, 40, 373, 300],
+            [0, 24, 345, 299]
+          ],
+          "labels": [1, 0],
+          "scores": [0.9971006512641907, 0.8536375164985657],
+          "label_names": ["dog", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/SSD-MobilenetV2/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [118, 22, 374, 300],
+            [0, 21, 351, 298]
+          ],
+          "labels": [1, 0],
+          "scores": [0.9981437921524048, 0.8729411363601685],
+          "label_names": ["dog", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-L/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-L/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-L/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-L/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-L/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [],
+          "labels": [],
+          "scores": [],
+          "label_names": []
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-S/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [14, 62, 348, 296],
+            [5, 57, 368, 295],
+            [10, 187, 395, 300]
+          ],
+          "labels": [1, 0, 0],
+          "scores": [
+            0.8407946228981018, 0.3989197611808777, 0.22831308841705322
+          ],
+          "label_names": ["dog", "cat", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-S/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [14, 62, 348, 296],
+            [5, 57, 368, 296],
+            [10, 187, 395, 300]
+          ],
+          "labels": [1, 0, 0],
+          "scores": [0.841036319732666, 0.3987918794155121, 0.2283603549003601],
+          "label_names": ["dog", "cat", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-S/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [14, 62, 348, 296],
+            [5, 57, 368, 295],
+            [10, 187, 395, 300]
+          ],
+          "labels": [1, 0, 0],
+          "scores": [
+            0.8407946228981018, 0.3989197611808777, 0.22831308841705322
+          ],
+          "label_names": ["dog", "cat", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-S/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [21, 63, 355, 297],
+            [9, 56, 369, 298],
+            [7, 188, 396, 300]
+          ],
+          "labels": [1, 0, 0],
+          "scores": [
+            0.8926340341567993, 0.23384703695774078, 0.22025303542613983
+          ],
+          "label_names": ["dog", "cat", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-S/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [14, 62, 348, 296],
+            [5, 57, 368, 296],
+            [10, 187, 395, 300]
+          ],
+          "labels": [1, 0, 0],
+          "scores": [0.841036319732666, 0.3987918794155121, 0.2283603549003601],
+          "label_names": ["dog", "cat", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-Tiny/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [112, 63, 367, 300],
+            [0, 0, 400, 300]
+          ],
+          "labels": [1, 0],
+          "scores": [0.8967000246047974, 0.25308260321617126],
+          "label_names": ["dog", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-Tiny/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [112, 63, 367, 300],
+            [0, 0, 400, 300]
+          ],
+          "labels": [1, 0],
+          "scores": [0.896433413028717, 0.2537277042865753],
+          "label_names": ["dog", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-Tiny/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [112, 63, 367, 300],
+            [0, 0, 400, 300]
+          ],
+          "labels": [1, 0],
+          "scores": [0.8967000246047974, 0.25308260321617126],
+          "label_names": ["dog", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-Tiny/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [31, 54, 375, 300],
+            [0, 0, 399, 300]
+          ],
+          "labels": [1, 0],
+          "scores": [0.7641829252243042, 0.13213935494422913],
+          "label_names": ["dog", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-Tiny/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [
+            [112, 63, 367, 300],
+            [0, 0, 400, 300]
+          ],
+          "labels": [1, 0],
+          "scores": [0.896433413028717, 0.2537277042865753],
+          "label_names": ["dog", "cat"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-X/onnx/model.onnx",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[96, 65, 340, 300]],
+          "labels": [1],
+          "scores": [0.9315186738967896],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-X/openvino_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[96, 65, 340, 300]],
+          "labels": [1],
+          "scores": [0.931570827960968],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-X/openvino_fp32/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[96, 65, 340, 300]],
+          "labels": [1],
+          "scores": [0.9315186738967896],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-X/openvino_int8/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[95, 57, 339, 300]],
+          "labels": [1],
+          "scores": [0.9153797626495361],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/Detection/YOLOX-X/openvino_xai_fp16/model.xml",
+    "type": "DetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": {
+          "bboxes": [[96, 65, 340, 300]],
+          "labels": [1],
+          "scores": [0.931570827960968],
+          "label_names": ["dog"]
+        }
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/KeypointDetection/RTMPose-Tiny/onnx/model.onnx",
+    "type": "KeypointDetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "keypoints: (17, 2), keypoints_x_sum: 3500.391, scores: (17,) 15.087"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/KeypointDetection/RTMPose-Tiny/openvino_fp32/model.xml",
+    "type": "KeypointDetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "keypoints: (17, 2), keypoints_x_sum: 3500.391, scores: (17,) 15.087"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/KeypointDetection/RTMPose-Tiny/openvino_int8/model.xml",
+    "type": "KeypointDetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "keypoints: (17, 2), keypoints_x_sum: 3709.766, scores: (17,) 15.141"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/KeypointDetection/RTMPose-Tiny/openvino_xai_fp16/model.xml",
+    "type": "KeypointDetectionModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "keypoints: (17, 2), keypoints_x_sum: 3500.391, scores: (17,) 15.117"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-EfficientNetB2B/onnx/model.onnx",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "72, 51, 365, 300, 2 (dog): 0.559, 37739, RotatedRect: 201.478 186.633 207.833 307.242 31.293; 34, 45, 341, 300, 1 (cat): 0.408, 60697, RotatedRect: 187.000 171.500 255.000 306.000 90.000; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-EfficientNetB2B/openvino_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "72, 51, 365, 300, 2 (dog): 0.558, 37709, RotatedRect: 201.695 186.483 207.654 306.925 31.452; 33, 45, 341, 300, 1 (cat): 0.409, 61090, RotatedRect: 187.000 171.500 255.000 308.000 90.000; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-EfficientNetB2B/openvino_fp32/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "72, 51, 365, 300, 2 (dog): 0.559, 37739, RotatedRect: 201.478 186.633 207.833 307.242 31.293; 34, 45, 341, 300, 1 (cat): 0.408, 60697, RotatedRect: 187.000 171.500 255.000 306.000 90.000; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-EfficientNetB2B/openvino_int8/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "61, 14, 370, 300, 2 (dog): 0.551, 40131, RotatedRect: 207.500 158.000 282.000 293.000 90.000; 29, 42, 352, 300, 1 (cat): 0.410, 64177, RotatedRect: 190.341 169.484 323.444 256.690 0.535; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-EfficientNetB2B/openvino_xai_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "72, 51, 365, 300, 2 (dog): 0.558, 37709, RotatedRect: 201.695 186.483 207.654 306.925 31.452; 33, 45, 341, 300, 1 (cat): 0.409, 61090, RotatedRect: 187.000 171.500 255.000 308.000 90.000; 2; [1,400]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-ResNet50-V1/onnx/model.onnx",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "98, 56, 354, 300, 2 (dog): 0.466, 37969, RotatedRect: 223.408 159.229 218.224 227.527 33.179; 116, 21, 334, 296, 1 (cat): 0.385, 38846, RotatedRect: 224.324 175.206 209.793 235.017 14.036; 0; [0]; dog: 0.466, 681, 0; cat: 0.385, 683, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-ResNet50-V1/openvino_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "98, 56, 354, 300, 2 (dog): 0.467, 37977, RotatedRect: 223.408 159.229 218.224 227.527 33.179; 116, 21, 334, 296, 1 (cat): 0.386, 38859, RotatedRect: 224.324 175.206 209.793 235.017 14.036; 0; [0]; dog: 0.467, 683, 0; cat: 0.386, 683, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-ResNet50-V1/openvino_fp32/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "98, 56, 354, 300, 2 (dog): 0.466, 37969, RotatedRect: 223.408 159.229 218.224 227.527 33.179; 116, 21, 334, 296, 1 (cat): 0.385, 38846, RotatedRect: 224.324 175.206 209.793 235.017 14.036; 0; [0]; dog: 0.466, 681, 0; cat: 0.385, 683, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-ResNet50-V1/openvino_int8/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "96, 53, 354, 295, 2 (dog): 0.472, 39560, RotatedRect: 230.671 175.526 224.613 235.090 15.322; 116, 21, 336, 296, 1 (cat): 0.398, 39334, RotatedRect: 224.987 175.587 211.439 236.082 13.815; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-ResNet50-V1/openvino_xai_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "98, 56, 354, 300, 2 (dog): 0.467, 37977, RotatedRect: 223.408 159.229 218.224 227.527 33.179; 116, 21, 334, 296, 1 (cat): 0.386, 38859, RotatedRect: 224.324 175.206 209.793 235.017 14.036; 2; [1,1280]; dog: 0.467, 683, 0; cat: 0.386, 683, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-ResNet50-V2/onnx/model.onnx",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "121, 70, 378, 300, 2 (dog): 0.740, 36354, RotatedRect: 225.500 172.500 211.000 207.000 0.000; 24, 18, 329, 300, 2 (dog): 0.602, 42298, RotatedRect: 176.588 178.175 297.013 239.755 0.796; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-ResNet50-V2/openvino_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "121, 71, 377, 300, 2 (dog): 0.740, 36085, RotatedRect: 225.500 173.000 211.000 206.000 0.000; 25, 18, 329, 300, 2 (dog): 0.603, 42186, RotatedRect: 177.088 178.178 296.004 239.753 0.799; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-ResNet50-V2/openvino_fp32/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "121, 70, 378, 300, 2 (dog): 0.740, 36354, RotatedRect: 225.500 172.500 211.000 207.000 0.000; 24, 18, 329, 300, 2 (dog): 0.602, 42298, RotatedRect: 176.588 178.175 297.013 239.755 0.796; 0; [0]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-ResNet50-V2/openvino_int8/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "77, 57, 371, 291, 2 (dog): 0.759, 41661, RotatedRect: 210.031 182.590 197.990 257.040 17.745; 0; [0]; dog: 0.759, 730, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-ResNet50-V2/openvino_xai_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "121, 71, 377, 300, 2 (dog): 0.740, 36085, RotatedRect: 225.500 173.000 211.000 206.000 0.000; 25, 18, 329, 300, 2 (dog): 0.603, 42186, RotatedRect: 177.088 178.178 296.004 239.753 0.799; 1; [1,1280]; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-Swin-T/onnx/model.onnx",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "85, 52, 339, 300, 2 (dog): 0.627, 34810, RotatedRect: 218.550 166.655 193.394 219.594 14.237; 0; [0]; dog: 0.627, 687, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-Swin-T/openvino_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "86, 52, 339, 300, 2 (dog): 0.628, 34696, RotatedRect: 219.168 166.192 192.917 218.856 14.237; 0; [0]; dog: 0.628, 685, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-Swin-T/openvino_fp32/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "85, 52, 339, 300, 2 (dog): 0.627, 34810, RotatedRect: 218.550 166.655 193.394 219.594 14.237; 0; [0]; dog: 0.627, 687, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-Swin-T/openvino_int8/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "57, 53, 345, 300, 2 (dog): 0.609, 36724, RotatedRect: 206.954 169.800 229.346 224.161 6.782; 0; [0]; dog: 0.609, 868, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/MaskRCNN-Swin-T/openvino_xai_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "86, 52, 339, 300, 2 (dog): 0.628, 34696, RotatedRect: 219.168 166.192 192.917 218.856 14.237; 1; [1,1280]; dog: 0.628, 685, 0; "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/RTMDet-Tiny/onnx/model.onnx",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": ["0; [0]; ; "]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/RTMDet-Tiny/openvino_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": ["0; [0]; ; "]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/RTMDet-Tiny/openvino_fp32/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": ["0; [0]; ; "]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/RTMDet-Tiny/openvino_int8/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": ["0; [0]; ; "]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationInstance/RTMDet-Tiny/openvino_xai_fp16/model.xml",
+    "type": "MaskRCNNModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": ["0; [1,288]; ; "]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/Dino-V2-Small/onnx/model.onnx",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.649, 2: 0.351, [300,400,3], [0], [0]; dog: 0.546, 13, 0, dog: 0.959, 846, 3, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/Dino-V2-Small/openvino_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.649, 2: 0.351, [300,400,3], [0], [0]; dog: 0.545, 13, 0, dog: 0.959, 846, 3, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/Dino-V2-Small/openvino_fp32/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.649, 2: 0.351, [300,400,3], [0], [0]; dog: 0.546, 13, 0, dog: 0.959, 846, 3, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/Dino-V2-Small/openvino_int8/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.653, 2: 0.347, [300,400,3], [0], [0]; dog: 0.552, 15, 0, dog: 0.630, 37, 0, dog: 0.958, 860, 3, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/Dino-V2-Small/openvino_xai_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.649, 2: 0.351, [300,400,3], [300,400,3], [1,1536]; dog: 0.545, 13, 0, dog: 0.959, 846, 3, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-18/onnx/model.onnx",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.602, 1: 0.038, 2: 0.361, [300,400,3], [0], [0]; cat: 0.398, 8, 0, cat: 0.402, 16, 0, cat: 0.433, 34, 0, cat: 0.429, 32, 0, cat: 0.392, 2, 0, cat: 0.443, 27, 0, cat: 0.366, 6, 0, cat: 0.405, 4, 0, cat: 0.382, 6, 0, cat: 0.355, 6, 0, cat: 0.358, 10, 0, cat: 0.339, 1, 0, cat: 0.355, 9, 0, cat: 0.565, 375, 1, cat: 0.448, 1, 0, cat: 0.353, 2, 0, cat: 0.341, 4, 0, cat: 0.357, 26, 0, cat: 0.444, 2, 0, cat: 0.375, 18, 0, cat: 0.378, 9, 0, cat: 0.382, 13, 0, cat: 0.384, 26, 0, cat: 0.401, 4, 0, cat: 0.407, 64, 0, cat: 0.458, 18, 0, cat: 0.391, 37, 0, cat: 0.357, 8, 0, cat: 0.436, 67, 0, dog: 0.399, 1, 0, dog: 0.362, 5, 0, dog: 0.442, 4, 0, dog: 0.392, 13, 0, dog: 0.451, 38, 0, dog: 0.461, 312, 1, dog: 0.385, 45, 0, dog: 0.423, 2, 0, dog: 0.403, 32, 0, dog: 0.358, 1, 0, dog: 0.381, 15, 0, dog: 0.416, 7, 0, dog: 0.427, 30, 0, dog: 0.431, 20, 0, dog: 0.404, 35, 0, dog: 0.506, 299, 2, dog: 0.407, 1, 0, dog: 0.428, 36, 0, dog: 0.424, 8, 0, dog: 0.413, 13, 0, dog: 0.761, 906, 7, dog: 0.346, 2, 0, dog: 0.437, 44, 0, dog: 0.400, 34, 0, dog: 0.391, 37, 0, dog: 0.337, 1, 0, dog: 0.347, 2, 0, dog: 0.414, 27, 0, dog: 0.390, 9, 0, dog: 0.443, 6, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-18/openvino_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.602, 1: 0.037, 2: 0.361, [300,400,3], [0], [0]; cat: 0.397, 8, 0, cat: 0.402, 16, 0, cat: 0.434, 34, 0, cat: 0.429, 32, 0, cat: 0.389, 3, 0, cat: 0.440, 27, 0, cat: 0.366, 6, 0, cat: 0.405, 4, 0, cat: 0.381, 6, 0, cat: 0.354, 8, 0, cat: 0.359, 11, 0, cat: 0.337, 1, 0, cat: 0.353, 9, 0, cat: 0.563, 379, 0, cat: 0.443, 1, 0, cat: 0.351, 2, 0, cat: 0.340, 2, 0, cat: 0.357, 21, 0, cat: 0.348, 2, 0, cat: 0.444, 2, 0, cat: 0.373, 18, 0, cat: 0.380, 9, 0, cat: 0.384, 11, 0, cat: 0.383, 26, 0, cat: 0.400, 4, 0, cat: 0.348, 2, 0, cat: 0.407, 56, 0, cat: 0.460, 17, 0, cat: 0.390, 37, 0, cat: 0.357, 6, 0, cat: 0.434, 68, 0, dog: 0.397, 1, 0, dog: 0.359, 5, 0, dog: 0.436, 4, 0, dog: 0.394, 13, 0, dog: 0.449, 38, 0, dog: 0.460, 310, 1, dog: 0.386, 44, 0, dog: 0.401, 32, 0, dog: 0.423, 6, 0, dog: 0.357, 1, 0, dog: 0.380, 15, 0, dog: 0.417, 8, 0, dog: 0.427, 30, 0, dog: 0.430, 20, 0, dog: 0.405, 34, 0, dog: 0.506, 297, 2, dog: 0.406, 1, 0, dog: 0.427, 36, 0, dog: 0.423, 8, 0, dog: 0.412, 12, 0, dog: 0.762, 899, 6, dog: 0.345, 2, 0, dog: 0.434, 43, 0, dog: 0.400, 34, 0, dog: 0.393, 39, 0, dog: 0.336, 1, 0, dog: 0.347, 2, 0, dog: 0.413, 27, 0, dog: 0.390, 9, 0, dog: 0.442, 6, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-18/openvino_fp32/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.602, 1: 0.038, 2: 0.361, [300,400,3], [0], [0]; cat: 0.398, 8, 0, cat: 0.402, 16, 0, cat: 0.433, 34, 0, cat: 0.429, 32, 0, cat: 0.392, 2, 0, cat: 0.443, 27, 0, cat: 0.366, 6, 0, cat: 0.405, 4, 0, cat: 0.382, 6, 0, cat: 0.355, 6, 0, cat: 0.358, 10, 0, cat: 0.339, 1, 0, cat: 0.355, 9, 0, cat: 0.565, 375, 1, cat: 0.448, 1, 0, cat: 0.353, 2, 0, cat: 0.341, 4, 0, cat: 0.357, 26, 0, cat: 0.444, 2, 0, cat: 0.375, 18, 0, cat: 0.378, 9, 0, cat: 0.382, 13, 0, cat: 0.384, 26, 0, cat: 0.401, 4, 0, cat: 0.407, 64, 0, cat: 0.458, 18, 0, cat: 0.391, 37, 0, cat: 0.357, 8, 0, cat: 0.436, 67, 0, dog: 0.399, 1, 0, dog: 0.362, 5, 0, dog: 0.442, 4, 0, dog: 0.392, 13, 0, dog: 0.451, 38, 0, dog: 0.461, 312, 1, dog: 0.385, 45, 0, dog: 0.423, 2, 0, dog: 0.403, 32, 0, dog: 0.358, 1, 0, dog: 0.381, 15, 0, dog: 0.416, 7, 0, dog: 0.427, 30, 0, dog: 0.431, 20, 0, dog: 0.404, 35, 0, dog: 0.506, 299, 2, dog: 0.407, 1, 0, dog: 0.428, 36, 0, dog: 0.424, 8, 0, dog: 0.413, 13, 0, dog: 0.761, 906, 7, dog: 0.346, 2, 0, dog: 0.437, 44, 0, dog: 0.400, 34, 0, dog: 0.391, 37, 0, dog: 0.337, 1, 0, dog: 0.347, 2, 0, dog: 0.414, 27, 0, dog: 0.390, 9, 0, dog: 0.443, 6, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-18/openvino_int8/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.330, 1: 0.026, 2: 0.645, [300,400,3], [0], [0]; cat: 0.350, 1, 0, cat: 0.429, 32, 0, cat: 0.491, 26, 0, cat: 0.479, 2, 0, cat: 0.392, 16, 0, cat: 0.388, 20, 0, cat: 0.496, 32, 0, cat: 0.582, 288, 5, cat: 0.380, 8, 0, cat: 0.525, 30, 0, cat: 0.373, 12, 0, cat: 0.429, 10, 0, cat: 0.429, 19, 0, cat: 0.500, 27, 0, cat: 0.443, 9, 0, cat: 0.452, 5, 0, cat: 0.358, 16, 0, cat: 0.447, 24, 0, cat: 0.403, 2, 0, cat: 0.498, 28, 0, cat: 0.367, 51, 0, cat: 0.349, 5, 0, cat: 0.458, 27, 0, cat: 0.380, 6, 0, cat: 0.435, 2, 0, cat: 0.358, 17, 0, cat: 0.409, 118, 0, cat: 0.455, 30, 0, dog: 0.413, 24, 0, dog: 0.484, 8, 0, dog: 0.465, 1, 0, dog: 0.461, 24, 0, dog: 0.483, 5, 0, dog: 0.437, 8, 0, dog: 0.451, 2, 0, dog: 0.367, 1, 0, dog: 0.433, 1, 0, dog: 0.420, 4, 0, dog: 0.432, 1, 0, dog: 0.427, 15, 0, dog: 0.433, 27, 0, dog: 0.418, 7, 0, dog: 0.427, 13, 0, dog: 0.386, 6, 0, dog: 0.426, 9, 0, dog: 0.425, 3, 0, dog: 0.423, 10, 0, dog: 0.415, 1, 0, dog: 0.454, 111, 0, dog: 0.405, 2, 0, dog: 0.421, 6, 0, dog: 0.436, 2, 0, dog: 0.403, 4, 0, dog: 0.433, 5, 0, dog: 0.417, 4, 0, dog: 0.388, 1, 0, dog: 0.397, 15, 0, dog: 0.376, 4, 0, dog: 0.375, 1, 0, dog: 0.390, 18, 0, dog: 0.418, 5, 0, dog: 0.447, 28, 0, dog: 0.410, 1, 0, dog: 0.442, 6, 0, dog: 0.387, 20, 0, dog: 0.433, 4, 0, dog: 0.406, 34, 0, dog: 0.423, 2, 0, dog: 0.371, 9, 0, dog: 0.421, 15, 0, dog: 0.443, 18, 0, dog: 0.421, 93, 0, dog: 0.442, 10, 0, dog: 0.439, 51, 0, dog: 0.422, 1, 0, dog: 0.365, 3, 0, dog: 0.383, 90, 0, dog: 0.679, 2233, 43, dog: 0.429, 10, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-18/openvino_xai_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.602, 1: 0.037, 2: 0.361, [300,400,3], [300,400,3], [1,600]; cat: 0.397, 8, 0, cat: 0.402, 16, 0, cat: 0.434, 34, 0, cat: 0.429, 32, 0, cat: 0.389, 3, 0, cat: 0.440, 27, 0, cat: 0.366, 6, 0, cat: 0.405, 4, 0, cat: 0.381, 6, 0, cat: 0.354, 8, 0, cat: 0.359, 11, 0, cat: 0.337, 1, 0, cat: 0.353, 9, 0, cat: 0.563, 379, 0, cat: 0.443, 1, 0, cat: 0.351, 2, 0, cat: 0.340, 2, 0, cat: 0.357, 21, 0, cat: 0.348, 2, 0, cat: 0.444, 2, 0, cat: 0.373, 18, 0, cat: 0.380, 9, 0, cat: 0.384, 11, 0, cat: 0.383, 26, 0, cat: 0.400, 4, 0, cat: 0.348, 2, 0, cat: 0.407, 56, 0, cat: 0.460, 17, 0, cat: 0.390, 37, 0, cat: 0.357, 6, 0, cat: 0.434, 68, 0, dog: 0.397, 1, 0, dog: 0.359, 5, 0, dog: 0.436, 4, 0, dog: 0.394, 13, 0, dog: 0.449, 38, 0, dog: 0.460, 310, 1, dog: 0.386, 44, 0, dog: 0.401, 32, 0, dog: 0.423, 6, 0, dog: 0.357, 1, 0, dog: 0.380, 15, 0, dog: 0.417, 8, 0, dog: 0.427, 30, 0, dog: 0.430, 20, 0, dog: 0.405, 34, 0, dog: 0.506, 297, 2, dog: 0.406, 1, 0, dog: 0.427, 36, 0, dog: 0.423, 8, 0, dog: 0.412, 12, 0, dog: 0.762, 899, 6, dog: 0.345, 2, 0, dog: 0.434, 43, 0, dog: 0.400, 34, 0, dog: 0.393, 39, 0, dog: 0.336, 1, 0, dog: 0.347, 2, 0, dog: 0.413, 27, 0, dog: 0.390, 9, 0, dog: 0.442, 6, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-S/onnx/model.onnx",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.545, 1: 0.331, 2: 0.124, [300,400,3], [0], [0]; cat: 0.418, 96, 0, cat: 0.510, 2, 0, cat: 0.509, 5, 0, cat: 0.505, 18, 0, cat: 0.501, 4, 0, cat: 0.663, 416, 1, cat: 0.700, 478, 1, cat: 0.805, 1128, 1, cat: 0.509, 81, 0, cat: 0.444, 1, 0, dog: 0.413, 2, 0, dog: 0.413, 3, 0, dog: 0.504, 2, 0, dog: 0.638, 955, 4, dog: 0.561, 190, 0, dog: 0.424, 3, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-S/openvino_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.545, 1: 0.330, 2: 0.125, [300,400,3], [0], [0]; cat: 0.418, 97, 0, cat: 0.507, 2, 0, cat: 0.511, 4, 0, cat: 0.505, 16, 0, cat: 0.501, 2, 0, cat: 0.663, 415, 1, cat: 0.700, 478, 1, cat: 0.805, 1119, 1, cat: 0.509, 81, 0, cat: 0.445, 1, 0, dog: 0.409, 6, 0, dog: 0.413, 3, 0, dog: 0.505, 2, 0, dog: 0.639, 953, 4, dog: 0.561, 191, 0, dog: 0.425, 3, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-S/openvino_fp32/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.545, 1: 0.331, 2: 0.124, [300,400,3], [0], [0]; cat: 0.418, 96, 0, cat: 0.510, 2, 0, cat: 0.509, 5, 0, cat: 0.505, 18, 0, cat: 0.501, 4, 0, cat: 0.663, 416, 1, cat: 0.700, 478, 1, cat: 0.805, 1128, 1, cat: 0.509, 81, 0, cat: 0.444, 1, 0, dog: 0.413, 2, 0, dog: 0.413, 3, 0, dog: 0.504, 2, 0, dog: 0.638, 955, 4, dog: 0.561, 190, 0, dog: 0.424, 3, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-S/openvino_int8/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.439, 1: 0.434, 2: 0.128, [300,400,3], [0], [0]; cat: 0.662, 32, 0, cat: 0.577, 25, 0, cat: 0.451, 2, 0, cat: 0.621, 90, 0, cat: 0.596, 43, 0, cat: 0.406, 9, 0, cat: 0.507, 75, 0, cat: 0.418, 12, 0, cat: 0.622, 61, 0, cat: 0.620, 85, 0, cat: 0.469, 6, 0, cat: 0.578, 15, 0, cat: 0.521, 12, 0, cat: 0.480, 93, 0, cat: 0.512, 4, 0, cat: 0.456, 10, 0, cat: 0.522, 71, 0, cat: 0.517, 29, 0, cat: 0.520, 8, 0, cat: 0.489, 10, 0, cat: 0.515, 34, 0, cat: 0.522, 20, 0, cat: 0.391, 8, 0, cat: 0.517, 6, 0, cat: 0.480, 7, 0, cat: 0.541, 41, 0, cat: 0.379, 5, 0, cat: 0.718, 764, 7, cat: 0.561, 34, 0, cat: 0.511, 42, 0, cat: 0.435, 1, 0, cat: 0.379, 18, 0, cat: 0.353, 7, 0, cat: 0.482, 6, 0, cat: 0.544, 23, 0, cat: 0.487, 6, 0, cat: 0.455, 4, 0, cat: 0.430, 1, 0, cat: 0.517, 2, 0, cat: 0.542, 9, 0, cat: 0.576, 358, 1, cat: 0.481, 57, 0, cat: 0.466, 18, 0, cat: 0.396, 6, 0, cat: 0.540, 85, 1, cat: 0.480, 21, 0, cat: 0.517, 7, 0, cat: 0.497, 4, 0, cat: 0.415, 13, 0, cat: 0.383, 16, 0, cat: 0.551, 32, 0, cat: 0.584, 15, 0, cat: 0.386, 14, 0, cat: 0.402, 3, 0, cat: 0.546, 111, 1, cat: 0.498, 20, 0, cat: 0.500, 9, 0, cat: 0.369, 2, 0, cat: 0.425, 22, 0, cat: 0.530, 16, 0, cat: 0.507, 10, 0, cat: 0.378, 1, 0, cat: 0.412, 8, 0, cat: 0.690, 1978, 60, cat: 0.463, 8, 0, dog: 0.383, 12, 0, dog: 0.377, 1, 0, dog: 0.582, 12, 0, dog: 0.604, 31, 0, dog: 0.483, 1, 0, dog: 0.535, 15, 0, dog: 0.506, 36, 0, dog: 0.748, 11, 0, dog: 0.704, 73, 0, dog: 0.479, 1, 0, dog: 0.532, 2, 0, dog: 0.519, 2, 0, dog: 0.453, 41, 0, dog: 0.562, 72, 0, dog: 0.650, 173, 0, dog: 0.483, 50, 0, dog: 0.469, 40, 0, dog: 0.404, 15, 0, dog: 0.423, 20, 0, dog: 0.665, 37, 0, dog: 0.576, 96, 0, dog: 0.343, 1, 0, dog: 0.390, 4, 0, dog: 0.489, 32, 0, dog: 0.516, 52, 0, dog: 0.686, 31, 0, dog: 0.419, 40, 0, dog: 0.499, 32, 0, dog: 0.347, 1, 0, dog: 0.592, 15, 0, dog: 0.588, 18, 0, dog: 0.491, 15, 0, dog: 0.557, 42, 0, dog: 0.604, 46, 0, dog: 0.544, 5, 0, dog: 0.513, 33, 0, dog: 0.639, 38, 0, dog: 0.554, 12, 0, dog: 0.567, 5, 0, dog: 0.493, 61, 0, dog: 0.443, 32, 0, dog: 0.356, 10, 0, dog: 0.638, 74, 0, dog: 0.634, 295, 2, dog: 0.404, 19, 0, dog: 0.632, 26, 0, dog: 0.358, 4, 0, dog: 0.530, 20, 0, dog: 0.485, 12, 0, dog: 0.590, 20, 0, dog: 0.583, 45, 0, dog: 0.475, 22, 0, dog: 0.497, 6, 0, dog: 0.419, 23, 0, dog: 0.475, 32, 0, dog: 0.762, 15, 0, dog: 0.553, 16, 0, dog: 0.404, 15, 0, dog: 0.564, 34, 0, dog: 0.506, 10, 0, dog: 0.553, 25, 0, dog: 0.353, 4, 0, dog: 0.462, 2, 0, dog: 0.509, 33, 0, dog: 0.499, 52, 0, dog: 0.343, 1, 0, dog: 0.618, 49, 0, dog: 0.419, 28, 0, dog: 0.610, 135, 0, dog: 0.528, 27, 0, dog: 0.485, 6, 0, dog: 0.444, 31, 0, dog: 0.365, 12, 0, dog: 0.450, 2, 0, dog: 0.515, 20, 0, dog: 0.460, 1, 0, dog: 0.609, 65, 0, dog: 0.498, 5, 0, dog: 0.616, 20, 0, dog: 0.542, 6, 0, dog: 0.557, 2, 0, dog: 0.606, 19, 0, dog: 0.675, 20, 0, dog: 0.557, 6, 0, dog: 0.776, 36, 0, dog: 0.460, 15, 0, dog: 0.546, 17, 0, dog: 0.580, 205, 1, dog: 0.601, 321, 0, dog: 0.570, 20, 0, dog: 0.513, 59, 0, dog: 0.366, 5, 0, dog: 0.524, 26, 0, dog: 0.511, 20, 0, dog: 0.566, 190, 0, dog: 0.447, 24, 0, dog: 0.481, 14, 0, dog: 0.531, 21, 0, dog: 0.478, 13, 0, dog: 0.542, 24, 0, dog: 0.677, 127, 0, dog: 0.384, 1, 0, dog: 0.447, 13, 0, dog: 0.596, 201, 0, dog: 0.499, 2, 0, dog: 0.445, 6, 0, dog: 0.577, 7, 0, dog: 0.597, 55, 0, dog: 0.737, 33, 0, dog: 0.579, 16, 0, dog: 0.544, 14, 0, dog: 0.596, 48, 0, dog: 0.644, 25, 0, dog: 0.505, 105, 0, dog: 0.493, 19, 0, dog: 0.493, 1, 0, dog: 0.455, 12, 0, dog: 0.531, 4, 0, dog: 0.523, 23, 0, dog: 0.349, 4, 0, dog: 0.491, 15, 0, dog: 0.553, 19, 0, dog: 0.625, 18, 0, dog: 0.554, 39, 0, dog: 0.451, 5, 0, dog: 0.659, 29, 0, dog: 0.726, 34, 0, dog: 0.653, 45, 0, dog: 0.596, 31, 0, dog: 0.538, 33, 0, dog: 0.550, 20, 0, dog: 0.507, 8, 0, dog: 0.390, 3, 0, dog: 0.599, 19, 0, dog: 0.519, 21, 0, dog: 0.392, 3, 0, dog: 0.472, 2, 0, dog: 0.369, 4, 0, dog: 0.533, 1, 0, dog: 0.561, 29, 0, dog: 0.604, 26, 0, dog: 0.529, 8, 0, dog: 0.507, 10, 0, dog: 0.591, 99, 1, dog: 0.631, 57, 0, dog: 0.370, 8, 0, dog: 0.460, 16, 0, dog: 0.362, 3, 0, dog: 0.426, 14, 0, dog: 0.383, 2, 0, dog: 0.440, 18, 0, dog: 0.359, 4, 0, dog: 0.535, 18, 0, dog: 0.461, 31, 1, dog: 0.433, 10, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-S/openvino_xai_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.545, 1: 0.330, 2: 0.125, [300,400,3], [300,400,3], [1,420]; cat: 0.418, 97, 0, cat: 0.507, 2, 0, cat: 0.511, 4, 0, cat: 0.505, 16, 0, cat: 0.501, 2, 0, cat: 0.663, 415, 1, cat: 0.700, 478, 1, cat: 0.805, 1119, 1, cat: 0.509, 81, 0, cat: 0.445, 1, 0, dog: 0.409, 6, 0, dog: 0.413, 3, 0, dog: 0.505, 2, 0, dog: 0.639, 953, 4, dog: 0.561, 191, 0, dog: 0.425, 3, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-X/onnx/model.onnx",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.467, 1: 0.077, 2: 0.455, [300,400,3], [0], [0]; cat: 0.503, 2, 0, cat: 0.522, 8, 0, cat: 0.527, 1, 0, cat: 0.707, 166, 1, cat: 0.511, 25, 0, cat: 0.370, 1, 0, cat: 0.508, 9, 0, cat: 0.485, 7, 0, cat: 0.379, 1, 0, cat: 0.409, 2, 0, cat: 0.543, 3, 0, cat: 0.468, 1, 0, cat: 0.506, 1, 0, cat: 0.660, 62, 0, cat: 0.589, 14, 0, cat: 0.515, 2, 0, cat: 0.482, 5, 0, cat: 0.481, 1, 0, cat: 0.532, 8, 0, cat: 0.527, 3, 0, cat: 0.566, 70, 1, cat: 0.628, 42, 0, cat: 0.480, 5, 0, cat: 0.577, 11, 0, cat: 0.538, 8, 0, cat: 0.567, 5, 0, cat: 0.554, 6, 0, cat: 0.674, 14, 0, cat: 0.503, 3, 0, cat: 0.644, 86, 0, cat: 0.632, 83, 1, cat: 0.543, 14, 0, cat: 0.657, 14, 0, cat: 0.470, 9, 0, cat: 0.624, 33, 0, cat: 0.559, 1, 0, cat: 0.594, 12, 0, cat: 0.472, 5, 0, cat: 0.574, 4, 0, cat: 0.754, 88, 1, cat: 0.517, 1, 0, cat: 0.529, 2, 0, cat: 0.607, 4, 0, cat: 0.553, 40, 0, cat: 0.639, 30, 0, cat: 0.669, 14, 0, cat: 0.516, 4, 0, cat: 0.846, 259, 6, cat: 0.729, 87, 0, cat: 0.603, 5, 0, cat: 0.588, 4, 0, cat: 0.501, 1, 0, cat: 0.557, 1, 0, cat: 0.532, 3, 0, cat: 0.606, 46, 0, cat: 0.560, 2, 0, cat: 0.521, 3, 0, cat: 0.480, 42, 0, cat: 0.523, 3, 0, cat: 0.650, 76, 0, cat: 0.773, 77, 1, cat: 0.611, 22, 0, cat: 0.835, 281, 3, cat: 0.742, 55, 0, cat: 0.403, 2, 0, cat: 0.396, 1, 0, cat: 0.751, 41, 0, cat: 0.729, 28, 0, cat: 0.570, 9, 0, cat: 0.589, 98, 1, cat: 0.546, 19, 0, cat: 0.424, 1, 0, cat: 0.589, 42, 0, cat: 0.496, 1, 0, cat: 0.496, 1, 0, cat: 0.561, 5, 0, cat: 0.548, 4, 0, cat: 0.548, 22, 0, cat: 0.542, 13, 0, cat: 0.356, 2, 0, cat: 0.592, 24, 0, cat: 0.615, 6, 0, cat: 0.347, 2, 0, cat: 0.577, 6, 0, cat: 0.615, 71, 0, cat: 0.507, 1, 0, cat: 0.502, 1, 0, cat: 0.523, 4, 0, cat: 0.724, 183, 1, cat: 0.474, 2, 0, cat: 0.507, 3, 0, cat: 0.705, 125, 1, dog: 0.534, 1, 0, dog: 0.528, 1, 0, dog: 0.523, 1, 0, dog: 0.583, 9, 0, dog: 0.565, 14, 0, dog: 0.509, 4, 0, dog: 0.573, 19, 0, dog: 0.546, 4, 0, dog: 0.383, 4, 0, dog: 0.536, 16, 0, dog: 0.544, 10, 0, dog: 0.664, 50, 0, dog: 0.533, 2, 0, dog: 0.566, 2, 0, dog: 0.549, 3, 0, dog: 0.521, 1, 0, dog: 0.535, 6, 0, dog: 0.532, 14, 0, dog: 0.561, 6, 0, dog: 0.501, 4, 0, dog: 0.518, 6, 0, dog: 0.653, 28, 0, dog: 0.918, 2329, 66, dog: 0.565, 15, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-X/openvino_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.467, 1: 0.076, 2: 0.457, [300,400,3], [0], [0]; cat: 0.503, 2, 0, cat: 0.513, 8, 0, cat: 0.516, 1, 0, cat: 0.709, 165, 1, cat: 0.506, 25, 0, cat: 0.370, 2, 0, cat: 0.523, 8, 0, cat: 0.483, 7, 0, cat: 0.383, 1, 0, cat: 0.414, 2, 0, cat: 0.533, 3, 0, cat: 0.511, 1, 0, cat: 0.476, 2, 0, cat: 0.448, 1, 0, cat: 0.656, 62, 0, cat: 0.591, 14, 0, cat: 0.514, 2, 0, cat: 0.481, 5, 0, cat: 0.539, 2, 0, cat: 0.546, 5, 0, cat: 0.572, 71, 1, cat: 0.622, 43, 0, cat: 0.484, 5, 0, cat: 0.583, 12, 0, cat: 0.542, 8, 0, cat: 0.559, 5, 0, cat: 0.543, 6, 0, cat: 0.666, 14, 0, cat: 0.650, 83, 0, cat: 0.505, 1, 0, cat: 0.631, 83, 1, cat: 0.561, 8, 0, cat: 0.645, 14, 0, cat: 0.465, 9, 0, cat: 0.634, 30, 0, cat: 0.541, 1, 0, cat: 0.591, 11, 0, cat: 0.465, 5, 0, cat: 0.567, 4, 0, cat: 0.755, 85, 1, cat: 0.503, 1, 0, cat: 0.540, 1, 0, cat: 0.595, 4, 0, cat: 0.548, 40, 0, cat: 0.630, 28, 0, cat: 0.654, 14, 0, cat: 0.526, 1, 0, cat: 0.844, 264, 4, cat: 0.724, 89, 0, cat: 0.601, 4, 0, cat: 0.563, 4, 0, cat: 0.518, 1, 0, cat: 0.513, 2, 0, cat: 0.554, 2, 0, cat: 0.588, 11, 0, cat: 0.602, 44, 0, cat: 0.529, 2, 0, cat: 0.510, 3, 0, cat: 0.478, 42, 0, cat: 0.512, 3, 0, cat: 0.505, 2, 0, cat: 0.671, 50, 0, cat: 0.774, 77, 2, cat: 0.562, 4, 0, cat: 0.614, 13, 0, cat: 0.832, 280, 3, cat: 0.735, 57, 0, cat: 0.397, 1, 0, cat: 0.747, 41, 0, cat: 0.721, 28, 0, cat: 0.572, 9, 0, cat: 0.584, 97, 1, cat: 0.549, 19, 0, cat: 0.414, 1, 0, cat: 0.590, 40, 0, cat: 0.491, 1, 0, cat: 0.553, 1, 0, cat: 0.561, 5, 0, cat: 0.551, 4, 0, cat: 0.548, 23, 0, cat: 0.542, 12, 0, cat: 0.348, 1, 0, cat: 0.595, 23, 0, cat: 0.608, 6, 0, cat: 0.346, 2, 0, cat: 0.574, 6, 0, cat: 0.613, 71, 0, cat: 0.503, 1, 0, cat: 0.516, 4, 0, cat: 0.722, 184, 1, cat: 0.472, 2, 0, cat: 0.498, 3, 0, cat: 0.705, 121, 1, dog: 0.536, 1, 0, dog: 0.528, 1, 0, dog: 0.561, 29, 0, dog: 0.600, 25, 1, dog: 0.549, 4, 0, dog: 0.506, 1, 0, dog: 0.394, 4, 0, dog: 0.543, 16, 0, dog: 0.559, 6, 0, dog: 0.666, 52, 0, dog: 0.558, 2, 0, dog: 0.569, 2, 0, dog: 0.547, 5, 0, dog: 0.531, 1, 0, dog: 0.535, 6, 0, dog: 0.531, 14, 0, dog: 0.537, 6, 0, dog: 0.498, 4, 0, dog: 0.497, 8, 0, dog: 0.664, 29, 0, dog: 0.918, 2346, 67, dog: 0.567, 15, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-X/openvino_fp32/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.467, 1: 0.077, 2: 0.455, [300,400,3], [0], [0]; cat: 0.503, 2, 0, cat: 0.522, 8, 0, cat: 0.527, 1, 0, cat: 0.707, 166, 1, cat: 0.511, 25, 0, cat: 0.370, 1, 0, cat: 0.508, 9, 0, cat: 0.485, 7, 0, cat: 0.379, 1, 0, cat: 0.409, 2, 0, cat: 0.543, 3, 0, cat: 0.468, 1, 0, cat: 0.506, 1, 0, cat: 0.660, 62, 0, cat: 0.589, 14, 0, cat: 0.515, 2, 0, cat: 0.482, 5, 0, cat: 0.481, 1, 0, cat: 0.532, 8, 0, cat: 0.527, 3, 0, cat: 0.566, 70, 1, cat: 0.628, 42, 0, cat: 0.480, 5, 0, cat: 0.577, 11, 0, cat: 0.538, 8, 0, cat: 0.567, 5, 0, cat: 0.554, 6, 0, cat: 0.674, 14, 0, cat: 0.503, 3, 0, cat: 0.644, 86, 0, cat: 0.632, 83, 1, cat: 0.543, 14, 0, cat: 0.657, 14, 0, cat: 0.470, 9, 0, cat: 0.624, 33, 0, cat: 0.559, 1, 0, cat: 0.594, 12, 0, cat: 0.472, 5, 0, cat: 0.574, 4, 0, cat: 0.754, 88, 1, cat: 0.517, 1, 0, cat: 0.529, 2, 0, cat: 0.607, 4, 0, cat: 0.553, 40, 0, cat: 0.639, 30, 0, cat: 0.669, 14, 0, cat: 0.516, 4, 0, cat: 0.846, 259, 6, cat: 0.729, 87, 0, cat: 0.603, 5, 0, cat: 0.588, 4, 0, cat: 0.501, 1, 0, cat: 0.557, 1, 0, cat: 0.532, 3, 0, cat: 0.606, 46, 0, cat: 0.560, 2, 0, cat: 0.521, 3, 0, cat: 0.480, 42, 0, cat: 0.523, 3, 0, cat: 0.650, 76, 0, cat: 0.773, 77, 1, cat: 0.611, 22, 0, cat: 0.835, 281, 3, cat: 0.742, 55, 0, cat: 0.403, 2, 0, cat: 0.396, 1, 0, cat: 0.751, 41, 0, cat: 0.729, 28, 0, cat: 0.570, 9, 0, cat: 0.589, 98, 1, cat: 0.546, 19, 0, cat: 0.424, 1, 0, cat: 0.589, 42, 0, cat: 0.496, 1, 0, cat: 0.496, 1, 0, cat: 0.561, 5, 0, cat: 0.548, 4, 0, cat: 0.548, 22, 0, cat: 0.542, 13, 0, cat: 0.356, 2, 0, cat: 0.592, 24, 0, cat: 0.615, 6, 0, cat: 0.347, 2, 0, cat: 0.577, 6, 0, cat: 0.615, 71, 0, cat: 0.507, 1, 0, cat: 0.502, 1, 0, cat: 0.523, 4, 0, cat: 0.724, 183, 1, cat: 0.474, 2, 0, cat: 0.507, 3, 0, cat: 0.705, 125, 1, dog: 0.534, 1, 0, dog: 0.528, 1, 0, dog: 0.523, 1, 0, dog: 0.583, 9, 0, dog: 0.565, 14, 0, dog: 0.509, 4, 0, dog: 0.573, 19, 0, dog: 0.546, 4, 0, dog: 0.383, 4, 0, dog: 0.536, 16, 0, dog: 0.544, 10, 0, dog: 0.664, 50, 0, dog: 0.533, 2, 0, dog: 0.566, 2, 0, dog: 0.549, 3, 0, dog: 0.521, 1, 0, dog: 0.535, 6, 0, dog: 0.532, 14, 0, dog: 0.561, 6, 0, dog: 0.501, 4, 0, dog: 0.518, 6, 0, dog: 0.653, 28, 0, dog: 0.918, 2329, 66, dog: 0.565, 15, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-X/openvino_int8/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.319, 1: 0.663, 2: 0.018, [300,400,3], [0], [0]; cat: 0.502, 2, 0, cat: 0.525, 4, 0, cat: 0.549, 10, 0, cat: 0.537, 3, 0, cat: 0.562, 4, 0, cat: 0.506, 1, 0, cat: 0.605, 4, 0, cat: 0.524, 1, 0, cat: 0.499, 2, 0, cat: 0.457, 1, 0, cat: 0.503, 2, 0, cat: 0.520, 3, 0, cat: 0.520, 2, 0, cat: 0.442, 3, 0, cat: 0.534, 2, 0, cat: 0.514, 1, 0, cat: 0.527, 4, 0, cat: 0.533, 1, 0, cat: 0.521, 1, 0, cat: 0.568, 3, 0, cat: 0.527, 4, 0, cat: 0.684, 105, 3, cat: 0.527, 1, 0, cat: 0.524, 1, 0, cat: 0.573, 3, 0, cat: 0.498, 1, 0, cat: 0.504, 2, 0, cat: 0.570, 21, 0, cat: 0.516, 11, 0, cat: 0.545, 2, 0, cat: 0.558, 6, 0, cat: 0.531, 1, 0, cat: 0.556, 1, 0, cat: 0.546, 2, 0, cat: 0.498, 1, 0, cat: 0.499, 1, 0, cat: 0.515, 3, 0, cat: 0.508, 2, 0, cat: 0.540, 1, 0, cat: 0.644, 16, 0, cat: 0.597, 1, 0, cat: 0.494, 1, 0, cat: 0.533, 2, 0, cat: 0.515, 1, 0, cat: 0.529, 5, 0, cat: 0.515, 6, 0, cat: 0.551, 3, 0, cat: 0.703, 11, 0, cat: 0.559, 4, 0, cat: 0.508, 1, 0, cat: 0.531, 2, 0, cat: 0.502, 8, 0, cat: 0.652, 26, 0, cat: 0.537, 2, 0, cat: 0.496, 1, 0, cat: 0.657, 30, 0, cat: 0.540, 1, 0, cat: 0.747, 134, 0, cat: 0.559, 12, 0, cat: 0.553, 4, 0, cat: 0.501, 1, 0, cat: 0.550, 6, 0, cat: 0.664, 22, 0, cat: 0.571, 9, 0, cat: 0.937, 2318, 75, dog: 0.460, 4, 0, dog: 0.623, 56, 1, dog: 0.718, 31, 0, dog: 0.496, 3, 0, dog: 0.594, 40, 0, dog: 0.635, 9, 0, dog: 0.548, 4, 0, dog: 0.661, 13, 0, dog: 0.509, 1, 0, dog: 0.728, 39, 0, dog: 0.422, 1, 0, dog: 0.634, 2, 0, dog: 0.556, 2, 0, dog: 0.772, 242, 2, dog: 0.496, 4, 0, dog: 0.559, 31, 0, dog: 0.580, 42, 0, dog: 0.569, 1, 0, dog: 0.732, 2, 0, dog: 0.634, 83, 0, dog: 0.452, 4, 0, dog: 0.414, 2, 0, dog: 0.541, 15, 0, dog: 0.509, 9, 0, dog: 0.599, 15, 0, dog: 0.552, 15, 0, dog: 0.656, 43, 0, dog: 0.605, 16, 0, dog: 0.747, 59, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/LiteHRNet-X/openvino_xai_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.467, 1: 0.076, 2: 0.457, [300,400,3], [300,400,3], [1,638]; cat: 0.503, 2, 0, cat: 0.513, 8, 0, cat: 0.516, 1, 0, cat: 0.709, 165, 1, cat: 0.506, 25, 0, cat: 0.370, 2, 0, cat: 0.523, 8, 0, cat: 0.483, 7, 0, cat: 0.383, 1, 0, cat: 0.414, 2, 0, cat: 0.533, 3, 0, cat: 0.511, 1, 0, cat: 0.476, 2, 0, cat: 0.448, 1, 0, cat: 0.656, 62, 0, cat: 0.591, 14, 0, cat: 0.514, 2, 0, cat: 0.481, 5, 0, cat: 0.539, 2, 0, cat: 0.546, 5, 0, cat: 0.572, 71, 1, cat: 0.622, 43, 0, cat: 0.484, 5, 0, cat: 0.583, 12, 0, cat: 0.542, 8, 0, cat: 0.559, 5, 0, cat: 0.543, 6, 0, cat: 0.666, 14, 0, cat: 0.650, 83, 0, cat: 0.505, 1, 0, cat: 0.631, 83, 1, cat: 0.561, 8, 0, cat: 0.645, 14, 0, cat: 0.465, 9, 0, cat: 0.634, 30, 0, cat: 0.541, 1, 0, cat: 0.591, 11, 0, cat: 0.465, 5, 0, cat: 0.567, 4, 0, cat: 0.755, 85, 1, cat: 0.503, 1, 0, cat: 0.540, 1, 0, cat: 0.595, 4, 0, cat: 0.548, 40, 0, cat: 0.630, 28, 0, cat: 0.654, 14, 0, cat: 0.526, 1, 0, cat: 0.844, 264, 4, cat: 0.724, 89, 0, cat: 0.601, 4, 0, cat: 0.563, 4, 0, cat: 0.518, 1, 0, cat: 0.513, 2, 0, cat: 0.554, 2, 0, cat: 0.588, 11, 0, cat: 0.602, 44, 0, cat: 0.529, 2, 0, cat: 0.510, 3, 0, cat: 0.478, 42, 0, cat: 0.512, 3, 0, cat: 0.505, 2, 0, cat: 0.671, 50, 0, cat: 0.774, 77, 2, cat: 0.562, 4, 0, cat: 0.614, 13, 0, cat: 0.832, 280, 3, cat: 0.735, 57, 0, cat: 0.397, 1, 0, cat: 0.747, 41, 0, cat: 0.721, 28, 0, cat: 0.572, 9, 0, cat: 0.584, 97, 1, cat: 0.549, 19, 0, cat: 0.414, 1, 0, cat: 0.590, 40, 0, cat: 0.491, 1, 0, cat: 0.553, 1, 0, cat: 0.561, 5, 0, cat: 0.551, 4, 0, cat: 0.548, 23, 0, cat: 0.542, 12, 0, cat: 0.348, 1, 0, cat: 0.595, 23, 0, cat: 0.608, 6, 0, cat: 0.346, 2, 0, cat: 0.574, 6, 0, cat: 0.613, 71, 0, cat: 0.503, 1, 0, cat: 0.516, 4, 0, cat: 0.722, 184, 1, cat: 0.472, 2, 0, cat: 0.498, 3, 0, cat: 0.705, 121, 1, dog: 0.536, 1, 0, dog: 0.528, 1, 0, dog: 0.561, 29, 0, dog: 0.600, 25, 1, dog: 0.549, 4, 0, dog: 0.506, 1, 0, dog: 0.394, 4, 0, dog: 0.543, 16, 0, dog: 0.559, 6, 0, dog: 0.666, 52, 0, dog: 0.558, 2, 0, dog: 0.569, 2, 0, dog: 0.547, 5, 0, dog: 0.531, 1, 0, dog: 0.535, 6, 0, dog: 0.531, 14, 0, dog: 0.537, 6, 0, dog: 0.498, 4, 0, dog: 0.497, 8, 0, dog: 0.664, 29, 0, dog: 0.918, 2346, 67, dog: 0.567, 15, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-B/onnx/model.onnx",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.682, 2: 0.318, [300,400,3], [0], [0]; dog: 0.634, 154, 0, dog: 0.948, 699, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-B/openvino_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.682, 2: 0.318, [300,400,3], [0], [0]; dog: 0.637, 155, 0, dog: 0.948, 701, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-B/openvino_fp32/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.682, 2: 0.318, [300,400,3], [0], [0]; dog: 0.634, 154, 0, dog: 0.948, 699, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-B/openvino_int8/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.718, 2: 0.282, [300,400,3], [0], [0]; dog: 0.507, 58, 0, dog: 0.925, 675, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-B/openvino_xai_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.682, 2: 0.318, [300,400,3], [300,400,3], [1,1024]; dog: 0.637, 155, 0, dog: 0.948, 701, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-S/onnx/model.onnx",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.655, 2: 0.345, [300,400,3], [0], [0]; dog: 0.592, 213, 0, dog: 0.946, 708, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-S/openvino_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.655, 2: 0.345, [300,400,3], [0], [0]; dog: 0.593, 218, 0, dog: 0.456, 1, 0, dog: 0.480, 21, 0, dog: 0.946, 704, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-S/openvino_fp32/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.655, 2: 0.345, [300,400,3], [0], [0]; dog: 0.592, 213, 0, dog: 0.946, 708, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-S/openvino_int8/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.656, 2: 0.344, [300,400,3], [0], [0]; dog: 0.606, 180, 0, dog: 0.528, 43, 0, dog: 0.944, 714, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-S/openvino_xai_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.655, 2: 0.345, [300,400,3], [300,400,3], [1,1024]; dog: 0.593, 218, 0, dog: 0.456, 1, 0, dog: 0.480, 21, 0, dog: 0.946, 704, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-T/onnx/model.onnx",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.656, 1: 0.058, 2: 0.286, [300,400,3], [0], [0]; cat: 0.366, 97, 0, cat: 0.474, 211, 0, cat: 0.376, 207, 0, cat: 0.358, 68, 0, cat: 0.372, 105, 0, cat: 0.411, 132, 0, dog: 0.655, 780, 0, dog: 0.378, 93, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-T/openvino_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.657, 1: 0.058, 2: 0.286, [300,400,3], [0], [0]; cat: 0.340, 2, 0, cat: 0.367, 100, 0, cat: 0.475, 215, 0, cat: 0.377, 209, 0, cat: 0.357, 68, 0, cat: 0.372, 109, 0, cat: 0.409, 133, 0, dog: 0.655, 789, 0, dog: 0.383, 93, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-T/openvino_fp32/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.656, 1: 0.058, 2: 0.286, [300,400,3], [0], [0]; cat: 0.366, 97, 0, cat: 0.474, 211, 0, cat: 0.376, 207, 0, cat: 0.358, 68, 0, cat: 0.372, 105, 0, cat: 0.411, 132, 0, dog: 0.655, 780, 0, dog: 0.378, 93, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-T/openvino_int8/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.671, 1: 0.043, 2: 0.285, [300,400,3], [0], [0]; cat: 0.415, 212, 0, cat: 0.386, 70, 0, cat: 0.378, 350, 1, cat: 0.363, 93, 0, dog: 0.634, 791, 1, dog: 0.381, 73, 0, "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "geti_2.13.0_models/SegmentationSemantic/SegNext-T/openvino_xai_fp16/model.xml",
+    "type": "SegmentationModel",
+    "test_data": [
+      {
+        "image": "images/dog_50.jpg",
+        "reference": [
+          "0: 0.657, 1: 0.058, 2: 0.286, [300,400,3], [300,400,3], [1,512]; cat: 0.340, 2, 0, cat: 0.367, 100, 0, cat: 0.475, 215, 0, cat: 0.377, 209, 0, cat: 0.357, 68, 0, cat: 0.372, 109, 0, cat: 0.409, 133, 0, dog: 0.655, 789, 0, dog: 0.383, 93, 0, "
+        ]
+      }
+    ]
+  }
+]
