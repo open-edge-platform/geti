@@ -9,7 +9,7 @@ import cv2 as cv
 import numpy as np
 
 from model_api.models import InstanceSegmentationResult
-from model_api.models.instance_segmentation import MaskRCNNModel, _segm_postprocess
+from model_api.models.instance_segmentation import InstanceSegmentationModel, _segm_postprocess
 from model_api.models.utils import multiclass_nms
 
 from .detection import DetectionTiler
@@ -194,13 +194,13 @@ class InstanceSegmentationTiler(DetectionTiler):
         @contextmanager
         def setup_maskrcnn(*args, **kwds):
             postprocess_state = None
-            if isinstance(self.model, MaskRCNNModel):
+            if isinstance(self.model, InstanceSegmentationModel):
                 postprocess_state = self.model.params.postprocess_semantic_masks
                 self.model._postprocess_semantic_masks = False  # noqa: SLF001
             try:
                 yield
             finally:
-                if isinstance(self.model, MaskRCNNModel):
+                if isinstance(self.model, InstanceSegmentationModel):
                     self.model._postprocess_semantic_masks = postprocess_state  # noqa: SLF001
 
         with setup_maskrcnn():

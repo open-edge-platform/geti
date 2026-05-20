@@ -84,12 +84,14 @@ class Model:
             ONNXRuntimeAdapter,
         ) and self.__model__ not in {
             "Classification",
+            "DETRInstSeg",
             "MaskRCNN",
             "SSD",
             "Segmentation",
         }:
             self.raise_error(
-                "ONNXRuntimeAdapter is only supported for Classification, MaskRCNN, SSD, and Segmentation wrappers",
+                "ONNXRuntimeAdapter is only supported for Classification, DETRInstSeg, MaskRCNN, SSD,"
+                " and Segmentation wrappers",
             )
 
         self.inputs = self.inference_adapter.get_input_layers()

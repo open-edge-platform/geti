@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+from abc import abstractmethod
+
 import cv2
 import numpy as np
 
@@ -14,8 +16,13 @@ from .result import InstanceSegmentationResult
 from .utils import ResizeMetadata, calculate_nms, load_labels
 
 
-class MaskRCNNModel(ImageModel):
-    __model__ = "MaskRCNN"
+class InstanceSegmentationModel(ImageModel):
+    """Base class for instance segmentation models.
+
+    Handles common initialization, output detection, preprocessing, box rescaling,
+    confidence filtering, and NMS. Subclasses implement mask-specific postprocessing
+    via `_postprocess_single_mask`.
+    """
 
     def __init__(self, inference_adapter: InferenceAdapter, configuration: dict = {}, preload: bool = False) -> None:
         super().__init__(inference_adapter, configuration, preload)
@@ -106,6 +113,20 @@ class MaskRCNNModel(ImageModel):
             )
             dict_inputs[self.image_info_blob_names[0]] = input_image_info
         return dict_inputs, meta
+
+    @abstractmethod
+    def _postprocess_single_mask(self, box: np.ndarray, raw_cls_mask: np.ndarray, im_h: int, im_w: int) -> np.ndarray:
+        """Process a single raw mask into a full-image binary mask.
+
+        Args:
+            box: Bounding box [x1, y1, x2, y2] in original image coordinates.
+            raw_cls_mask: Raw mask output from the model (2D array).
+            im_h: Original image height.
+            im_w: Original image width.
+
+        Returns:
+            Binary mask of shape (im_h, im_w) with dtype uint8.
+        """
 
     def postprocess(self, outputs: dict, meta: dict) -> InstanceSegmentationResult:
         if (
@@ -213,7 +234,7 @@ class MaskRCNNModel(ImageModel):
 
             raw_cls_mask = raw_mask[label_idx, ...] if self.is_segmentoly else raw_mask
             if self.params.postprocess_semantic_masks or has_feature_vector_name:
-                resized_mask = _segm_postprocess(
+                resized_mask = self._postprocess_single_mask(
                     box,
                     raw_cls_mask,
                     *meta["original_shape"][:-1],
@@ -226,16 +247,42 @@ class MaskRCNNModel(ImageModel):
             if has_feature_vector_name:
                 saliency_maps[label_idx - 1].append(resized_mask)
 
-        _masks = np.stack(resized_masks) if len(resized_masks) > 0 else np.empty((0, 16, 16), dtype=np.uint8)
+        result_masks = np.stack(resized_masks) if len(resized_masks) > 0 else np.empty((0, 16, 16), dtype=np.uint8)
         return InstanceSegmentationResult(
             bboxes=boxes,
             labels=labels,
             scores=scores,
-            masks=_masks,
+            masks=result_masks,
             label_names=label_names or None,
             saliency_map=_average_and_normalize(saliency_maps),
             feature_vector=outputs.get(_feature_vector_name, np.ndarray(0)),
         )
+
+
+class MaskRCNNModel(InstanceSegmentationModel):
+    """Instance segmentation model for Mask R-CNN-style architectures.
+
+    Uses per-box-crop mask postprocessing: resizes the small mask (e.g. 28x28)
+    to the bounding box dimensions and places it at the box position.
+    """
+
+    __model__ = "MaskRCNN"
+
+    def _postprocess_single_mask(self, box: np.ndarray, raw_cls_mask: np.ndarray, im_h: int, im_w: int) -> np.ndarray:
+        return _segm_postprocess(box, raw_cls_mask, im_h, im_w)
+
+
+class DETRInstanceSegmentation(InstanceSegmentationModel):
+    """Instance segmentation model for DETR-family architectures (e.g. RF-DETR-Seg).
+
+    Uses full-image mask postprocessing: resizes the mask (e.g. 96x96 covering the
+    entire image) to the original image dimensions and applies a threshold.
+    """
+
+    __model__ = "DETRInstSeg"
+
+    def _postprocess_single_mask(self, box: np.ndarray, raw_cls_mask: np.ndarray, im_h: int, im_w: int) -> np.ndarray:
+        return _full_image_mask_postprocess(raw_cls_mask, im_h, im_w)
 
 
 def _average_and_normalize(saliency_maps: list) -> list:
@@ -284,6 +331,12 @@ def _segm_postprocess(box: np.ndarray, raw_cls_mask: np.ndarray, im_h: int, im_w
         (x0 - extended_box[0]) : (x1 - extended_box[0]),
     ]
     return im_mask
+
+
+def _full_image_mask_postprocess(raw_cls_mask: np.ndarray, im_h: int, im_w: int) -> np.ndarray:
+    """Resize a full-image mask to original dimensions and threshold."""
+    resized = cv2.resize(raw_cls_mask.astype(np.float32), (im_w, im_h), interpolation=cv2.INTER_LINEAR)
+    return (resized > 0.5).astype(np.uint8)
 
 
 _saliency_map_name = "saliency_map"
