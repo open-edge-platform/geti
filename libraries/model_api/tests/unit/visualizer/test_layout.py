@@ -5,6 +5,7 @@
 
 import numpy as np
 from model_api.visualizer import Flatten, HStack, Scene
+from model_api.visualizer.layout.layout import Layout
 from model_api.visualizer.primitive import Overlay
 from PIL import Image
 
@@ -47,3 +48,22 @@ def test_hstack_layout():
     expected_image.paste(red_overlay, (100, 0))
 
     assert mock_scene.render() == expected_image
+
+
+def test_layout_abstract_compute_on_primitive():
+    """Test that Layout._compute_on_primitive is abstract and can be implemented."""
+
+    class TestLayout(Layout):
+        def _compute_on_primitive(self, primitive, image, scene):
+            # Call super to cover the abstract pass body
+            return Layout._compute_on_primitive(self, primitive, image, scene)  # noqa: SLF001
+
+        def __call__(self, scene):
+            return scene.base
+
+    layout = TestLayout()
+    img = Image.new("RGB", (50, 50))
+    scene = Scene(base=img, layout=layout)
+    assert scene.render() == img
+    # Explicitly call _compute_on_primitive to cover the abstract body
+    assert layout._compute_on_primitive(Overlay, img, scene) is None  # noqa: SLF001

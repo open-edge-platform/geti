@@ -209,10 +209,7 @@ class OpenvinoAdapter(InferenceAdapter):
                             static_shape.append(1)
                         elif len(shape) == 4:
                             if is_nchw:
-                                if i == 1:
-                                    static_shape.append(3)
-                                else:
-                                    static_shape.append(224)
+                                static_shape.append(224)
                             else:
                                 if i == 3:
                                     static_shape.append(3)

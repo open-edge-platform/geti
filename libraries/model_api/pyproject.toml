@@ -274,6 +274,6 @@ pythonpath = ["src"]
 skips = ["B101", "B310"]
 
 [tool.coverage.report]
-# Fail if total coverage is below 50%
-fail_under = 50
+# Fail if total coverage is below 100%
+fail_under = 100
 show_missing = true

@@ -235,7 +235,7 @@ def _get_simcc_maximum(
         msg = f"Invalid shape {simcc_y.shape}"
         raise ValueError(msg)
     if simcc_x.ndim != simcc_y.ndim:
-        msg = f"{simcc_x.shape} != {simcc_y.shape}"
+        msg = f"Invalid shape: {simcc_x.shape} != {simcc_y.shape}"
         raise ValueError(msg)
 
     if simcc_x.ndim == 3:

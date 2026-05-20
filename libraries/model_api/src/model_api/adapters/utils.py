@@ -250,11 +250,14 @@ def crop_resize_graph(input: Output, size: tuple[int, int], input_dtype: str = "
         cropped_frame = if_node.set_output(then_body_res_1, else_body_res_1)
 
     elif desired_aspect_ratio < 1:
-        new_width = opset.floor(
-            opset.multiply(
-                opset.convert(ih, destination_type="f32"),
-                desired_aspect_ratio,
+        new_width = opset.convert(
+            opset.floor(
+                opset.multiply(
+                    opset.convert(ih, destination_type="f32"),
+                    np.float32(desired_aspect_ratio),
+                ),
             ),
+            destination_type="i32",
         )
         offset = opset.unsqueeze(
             opset.divide(
@@ -272,11 +275,14 @@ def crop_resize_graph(input: Output, size: tuple[int, int], input_dtype: str = "
             axes=[w_axis],
         )
     elif desired_aspect_ratio > 1:
-        new_hight = opset.floor(
-            opset.multiply(
-                opset.convert(iw, destination_type="f32"),
-                desired_aspect_ratio,
+        new_hight = opset.convert(
+            opset.floor(
+                opset.multiply(
+                    opset.convert(iw, destination_type="f32"),
+                    np.float32(desired_aspect_ratio),
+                ),
             ),
+            destination_type="i32",
         )
         offset = opset.unsqueeze(
             opset.divide(
@@ -461,6 +467,7 @@ def window_preprocess_graph(
     """OV graph: window intensity scaling [center-width/2, center+width/2] to [0, 1]."""
     low = window_center - window_width / 2.0
     span = window_width
+    # opset.clamp requires scalar float min/max, not opset.constant nodes
     return opset.clamp(
         opset.divide(
             opset.subtract(
@@ -469,8 +476,8 @@ def window_preprocess_graph(
             ),
             opset.constant(span, dtype=Type.f32),
         ),
-        opset.constant(0.0, dtype=Type.f32),
-        opset.constant(1.0, dtype=Type.f32),
+        0.0,
+        1.0,
     )
 
 
@@ -500,13 +507,14 @@ def range_scale_preprocess_graph(
     Multiplies by *scale_factor*, clamps to [min_value, max_value], then
     normalises to [0, 1] via ``(clamped - min) / (max - min)``.
     """
+    # opset.clamp requires scalar float min/max, not opset.constant nodes
     clamped = opset.clamp(
         opset.multiply(
             opset.convert(output, destination_type="f32"),
             opset.constant(scale_factor, dtype=Type.f32),
         ),
-        opset.constant(min_value, dtype=Type.f32),
-        opset.constant(max_value, dtype=Type.f32),
+        min_value,
+        max_value,
     )
     range = max_value - min_value
     if range == 0:

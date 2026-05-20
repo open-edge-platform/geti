@@ -3,8 +3,11 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import logging
+
 import numpy as np
 import PIL
+import pytest
 from model_api.visualizer import BoundingBox, Keypoint, Label, Overlay, Polygon
 from PIL import ImageDraw
 
@@ -74,3 +77,54 @@ def test_keypoint(mock_image: PIL.Image):
     draw = ImageDraw.Draw(mock_image)
     draw.ellipse((97, 97, 103, 103), fill="red")
     assert keypoint.compute(mock_image) == mock_image
+
+
+def test_polygon_both_points_and_mask_raises(mock_image: PIL.Image):
+    """Providing both points and mask should raise ValueError."""
+    mask = np.zeros((100, 100), dtype=np.uint8)
+    mask[10:50, 10:50] = 255
+    with pytest.raises(ValueError, match="Either points or mask should be provided"):
+        Polygon(points=[(10, 10), (50, 10), (50, 50)], mask=mask)
+
+
+def test_polygon_neither_points_nor_mask_warns(mock_image: PIL.Image, caplog):
+    """Providing neither points nor mask should warn and produce empty polygon."""
+    with caplog.at_level(logging.WARNING):
+        polygon = Polygon()
+    assert "Neither points nor mask provided" in caplog.text
+    assert polygon.points == []
+    # compute should return the image unchanged
+    result = polygon.compute(mock_image)
+    assert result == mock_image
+
+
+def test_polygon_mask_multiple_contours(mock_image: PIL.Image, caplog):
+    """Mask with multiple contours should log debug and use the largest one."""
+    mask = np.zeros((100, 100), dtype=np.uint8)
+    # Two separate blobs
+    mask[10:30, 10:30] = 255  # smaller
+    mask[50:90, 50:90] = 255  # larger
+    with caplog.at_level(logging.DEBUG):
+        polygon = Polygon(mask=mask)
+    assert "Multiple contours found" in caplog.text
+    assert len(polygon.points) > 0
+    result = polygon.compute(mock_image.copy())
+    assert isinstance(result, PIL.Image.Image)
+
+
+def test_keypoint_with_scores(mock_image: PIL.Image):
+    """Keypoint primitive draws scores when provided."""
+    kp = Keypoint(
+        keypoints=np.array([[50, 50], [70, 70]]),
+        scores=np.array([0.95, 0.80]),
+        color="blue",
+        keypoint_size=3,
+    )
+    result = kp.compute(mock_image.copy())
+    assert isinstance(result, PIL.Image.Image)
+
+
+def test_keypoint_wrong_shape_raises():
+    """Keypoints with wrong shape should raise ValueError."""
+    with pytest.raises(ValueError, match="Keypoints must have shape"):
+        Keypoint(keypoints=np.array([[1, 2, 3]]))  # shape (1, 3) instead of (N, 2)

@@ -41,6 +41,50 @@ def test_anomaly_scene(mock_image: Image, tmpdir: Path):
     assert Path(tmpdir / "anomaly_scene.jpg").exists()
 
 
+def test_anomaly_scene_none_anomaly_map(mock_image: Image):
+    """Test AnomalyScene when anomaly_map is None (returns [])."""
+    anomaly_result = AnomalyResult(
+        anomaly_map=None,
+        pred_boxes=np.array([[0, 0, 50, 50]]),
+        pred_label="Anomaly",
+        pred_mask=np.zeros(mock_image.size, dtype=np.uint8),
+        pred_score=0.85,
+    )
+    visualizer = Visualizer()
+    rendered = visualizer.render(mock_image, anomaly_result)
+    assert isinstance(rendered, Image.Image)
+
+
+def test_anomaly_scene_none_pred_boxes(mock_image: Image):
+    """Test AnomalyScene when pred_boxes is None (returns [])."""
+    heatmap = np.ones(mock_image.size, dtype=np.uint8) * 255
+    anomaly_result = AnomalyResult(
+        anomaly_map=heatmap,
+        pred_boxes=None,
+        pred_label="Anomaly",
+        pred_mask=np.zeros(mock_image.size, dtype=np.uint8),
+        pred_score=0.85,
+    )
+    visualizer = Visualizer()
+    rendered = visualizer.render(mock_image, anomaly_result)
+    assert isinstance(rendered, Image.Image)
+
+
+def test_anomaly_scene_none_pred_mask(mock_image: Image):
+    """Test AnomalyScene when pred_mask is None (returns [])."""
+    heatmap = np.ones(mock_image.size, dtype=np.uint8) * 255
+    anomaly_result = AnomalyResult(
+        anomaly_map=heatmap,
+        pred_boxes=np.array([[0, 0, 50, 50]]),
+        pred_label="Anomaly",
+        pred_mask=None,
+        pred_score=0.85,
+    )
+    visualizer = Visualizer()
+    rendered = visualizer.render(mock_image, anomaly_result)
+    assert isinstance(rendered, Image.Image)
+
+
 def test_classification_scene(mock_image: Image, tmpdir: Path):
     """Test if the classification scene is created."""
     classification_result = ClassificationResult(
@@ -119,3 +163,27 @@ def test_segmentation_scene(mock_image: Image, tmpdir: Path, with_saliency_map: 
         tmpdir / "soft_prediction_scene.jpg",
     )
     assert Path(tmpdir / "soft_prediction_scene.jpg").exists()
+
+
+def test_instance_segmentation_bounding_boxes(mock_image: Image):
+    """Test InstanceSegmentationScene._get_bounding_boxes() with actual data."""
+    from model_api.visualizer.scene.segmentation.instance_segmentation import InstanceSegmentationScene
+
+    result = InstanceSegmentationResult(
+        bboxes=np.array([[10, 20, 80, 90], [30, 30, 60, 60]]),
+        labels=np.array([0, 1]),
+        masks=np.array([
+            np.ones((100, 100), dtype=np.uint8),
+            np.ones((100, 100), dtype=np.uint8),
+        ]),
+        scores=np.array([0.85, 0.75]),
+        label_names=["person", "car"],
+        saliency_map=None,
+        feature_vector=np.array([1, 2, 3]),
+    )
+
+    scene = InstanceSegmentationScene(mock_image, result)
+    bboxes = scene._get_bounding_boxes(result)  # noqa: SLF001
+    assert len(bboxes) == 2
+    assert bboxes[0].label == "person (0.85)"
+    assert bboxes[1].label == "car (0.75)"
