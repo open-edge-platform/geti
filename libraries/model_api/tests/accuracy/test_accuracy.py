@@ -5,6 +5,7 @@
 import ast
 import contextlib
 import json
+import operator
 import os
 from pathlib import Path
 
@@ -24,6 +25,7 @@ from model_api.models import (
     AnomalyResult,
     ClassificationModel,
     ClassificationResult,
+    Contour,
     DetectedKeypoints,
     DetectionModel,
     DetectionResult,
@@ -77,7 +79,15 @@ def read_config(fname):
         return json.load(f)
 
 
-def create_models(model_type, model_path, download_dir, force_onnx_adapter=False, device="CPU", configuration=None):
+def create_models(
+    model_type,
+    model_path,
+    download_dir,
+    force_onnx_adapter=False,
+    device="CPU",
+    configuration=None,
+    dump: bool = False,
+):
     if model_path.endswith(".onnx") and force_onnx_adapter:
         wrapper_type = model_type.get_model_class(
             load_parameters_from_onnx(onnx.load(model_path))["model_info"]["model_type"],
@@ -96,7 +106,7 @@ def create_models(model_type, model_path, download_dir, force_onnx_adapter=False
     models = [
         model_type.create_model(model_path, device=device, download_dir=download_dir, configuration=configuration),
     ]
-    if model_path.endswith(".xml"):
+    if model_path.endswith(".xml") and not dump:
         model = create_core().read_model(model_path)
         if model.has_rt_info(["model_info", "model_type"]):
             wrapper_type = model_type.get_model_class(
@@ -277,6 +287,56 @@ def create_detection_result_dump(outputs: DetectionResult) -> dict:
     }
 
 
+def create_semantic_segmentation_result_dump(outputs: ImageResultWithSoftPrediction, contours: list[Contour]) -> dict:
+    return {
+        "hist": outputs.hist(),
+        "soft_prediction_shape": outputs.soft_prediction.shape,
+        "contours": sorted_contours_dicts(contours),
+    }
+
+
+def sorted_contours_dicts(contours: list[Contour]) -> list[dict]:
+    return sorted(
+        [contour.summarized_dict() for contour in contours],
+        key=operator.itemgetter("probability", "label", "length", "num_children"),
+        reverse=True,
+    )
+
+
+def compare_semantic_segmentation_result(
+    outputs: ImageResultWithSoftPrediction,
+    contours: list[Contour],
+    reference: dict,
+) -> None:
+    assert "hist" in reference
+    assert outputs.hist() == pytest.approx(reference["hist"], abs=1e-3), "hist values mismatch"
+
+    assert "soft_prediction_shape" in reference
+    assert (
+        list(outputs.soft_prediction.shape) == reference["soft_prediction_shape"]
+    ), f"soft_prediction shape mismatch {list(outputs.soft_prediction.shape)} vs {reference['soft_prediction_shape']}"
+
+    assert "contours" in reference
+    assert len(reference["contours"]) == len(
+        contours,
+    ), f"Number of contours mismatch: {len(contours)} vs {len(reference['contours'])}"
+    for idx, actual_contour in enumerate(sorted_contours_dicts(contours)):
+        expected_contour = reference["contours"][idx]
+        assert (
+            actual_contour["label"] == expected_contour["label"]
+        ), f"Contour {idx} label mismatch: '{actual_contour['label']}' vs '{expected_contour['label']}'"
+        assert (
+            abs(actual_contour["probability"] - expected_contour["probability"]) < 1e-3
+        ), f"Contour {idx} probability mismatch: {actual_contour['probability']} vs {expected_contour['probability']}"
+        assert (
+            actual_contour["length"] == expected_contour["length"]
+        ), f"Contour {idx} length mismatch: {actual_contour['length']} vs {expected_contour['length']}"
+        assert actual_contour["num_children"] == expected_contour["num_children"], (
+            f"Contour {idx} num_children mismatch: "
+            f"{actual_contour['num_children']} vs {expected_contour['num_children']}"
+        )
+
+
 def test_image_models(data, device, dump, result, model_data, results_dir):  # noqa: C901
     name = model_data["name"]
     if name.endswith((".xml", ".onnx")):
@@ -289,6 +349,7 @@ def test_image_models(data, device, dump, result, model_data, results_dir):  # n
         model_data.get("force_ort", False),
         device=device,
         configuration=model_data.get("configuration", None),
+        dump=dump,
     ):
         if "tiler" in model_data:
             if "extra_model" in model_data:
@@ -378,40 +439,40 @@ def test_image_models(data, device, dump, result, model_data, results_dir):  # n
             store_outputs(name, image, device, outputs, results_dir)
 
             if isinstance(outputs, ClassificationResult):
-                compare_classification_result(outputs, test_data["reference"])
+                if not dump:
+                    compare_classification_result(outputs, test_data["reference"])
                 image_result = create_classification_result_dump(outputs)
             elif type(outputs) is DetectionResult:
-                compare_detection_result(outputs, test_data["reference"])
+                if not dump:
+                    compare_detection_result(outputs, test_data["reference"])
                 image_result = create_detection_result_dump(outputs)
             elif isinstance(outputs, ImageResultWithSoftPrediction):
-                assert len(test_data["reference"]) == 1
-                if hasattr(model, "get_contours"):
-                    contours = model.get_contours(outputs)
-                else:
-                    contours = model.model.get_contours(outputs)
-                contour_str = "; "
-                for contour in contours:
-                    contour_str += str(contour) + ", "
-                output_str = str(outputs) + contour_str
-                assert test_data["reference"][0] == output_str
-                image_result = [output_str]
+                contours: list[Contour] = (
+                    model.get_contours(outputs) if hasattr(model, "get_contours") else model.model.get_contours(outputs)
+                )
+                if not dump:
+                    compare_semantic_segmentation_result(outputs, contours, test_data["reference"])
+                image_result = create_semantic_segmentation_result_dump(outputs, contours)
             elif type(outputs) is InstanceSegmentationResult:
-                assert len(test_data["reference"]) == 1
                 output_str = str(add_rotated_rects(outputs)) + "; "
                 with contextlib.suppress(RuntimeError):
                     # getContours() assumes each instance generates only one contour.
                     # That doesn't hold for some models
                     output_str += "; ".join(str(contour) for contour in get_contours(outputs)) + "; "
-                assert test_data["reference"][0] == output_str
+                if not dump:
+                    assert len(test_data["reference"]) == 1
+                    assert test_data["reference"][0] == output_str
                 image_result = [output_str]
             elif isinstance(outputs, AnomalyResult):
-                assert len(test_data["reference"]) == 1
                 output_str = str(outputs)
-                assert test_data["reference"][0] == output_str
+                if not dump:
+                    assert len(test_data["reference"]) == 1
+                    assert test_data["reference"][0] == output_str
                 image_result = [output_str]
             elif isinstance(outputs, (ZSLVisualPromptingResult, VisualPromptingResult, DetectedKeypoints)):
                 output_str = str(outputs)
-                assert test_data["reference"][0] == output_str
+                if not dump:
+                    assert test_data["reference"][0] == output_str
                 image_result = [output_str]
             else:
                 pytest.fail(f"Unexpected output type: {type(outputs)}")

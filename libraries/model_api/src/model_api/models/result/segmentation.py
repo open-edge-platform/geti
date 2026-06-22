@@ -172,9 +172,18 @@ class Contour:
         self.probability = probability
         self.excluded_shapes = [np.array(x) for x in excluded_shapes] if excluded_shapes is not None else None
 
-    def __str__(self):
+    def summarized_dict(self):
         num_children = len(self.excluded_shapes) if self.excluded_shapes is not None else 0
-        return f"{self.label}: {self.probability:.3f}, {len(self.shape)}, {num_children}"
+        return {
+            "label": self.label,
+            "probability": self.probability.item() if isinstance(self.probability, np.generic) else self.probability,
+            "length": len(self.shape),
+            "num_children": num_children,
+        }
+
+    def __str__(self):
+        summary = self.summarized_dict()
+        return f"{summary['label']}: {summary['probability']:.3f}, {summary['length']}, {summary['num_children']}"
 
     def __repr__(self):
         return self.__str__()
@@ -194,7 +203,7 @@ class ImageResultWithSoftPrediction(Result):
         self.saliency_map = saliency_map  # Requires return_soft_prediction==True
         self.feature_vector = feature_vector
 
-    def __str__(self):
+    def hist(self) -> dict[str, float]:
         outHist = cv2.calcHist(
             [self.resultImage.astype(np.uint8)],
             channels=None,
@@ -202,10 +211,17 @@ class ImageResultWithSoftPrediction(Result):
             histSize=[256],
             ranges=[0, 255],
         )
-        hist = ""
+        hist = {}
         for i, count in enumerate(outHist):
             if count > 0:
-                hist += f"{i}: {count[0] / self.resultImage.size:.3f}, "
+                hist[str(i)] = count[0].item() / self.resultImage.size
+
+        return hist
+
+    def __str__(self):
+        hist = ", ".join([f"{idx}: {value:.3f}" for idx, value in self.hist().items()])
+        if hist:
+            hist += ", "
         return (
             f"{hist}{array_shape_to_str(self.soft_prediction)}, "
             f"{array_shape_to_str(self.saliency_map)}, "
