@@ -3,10 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 import ast
-import contextlib
 import json
 import operator
-import os
 from pathlib import Path
 
 import cv2
@@ -34,7 +32,6 @@ from model_api.models import (
     InstanceSegmentationResult,
     KeypointDetectionModel,
     MaskRCNNModel,
-    PredictedMask,
     Prompt,
     SAMDecoder,
     SAMImageEncoder,
@@ -303,6 +300,83 @@ def sorted_contours_dicts(contours: list[Contour]) -> list[dict]:
     )
 
 
+def compare_instance_segmentation_result(outputs: InstanceSegmentationResult, expected: dict) -> None:
+    """Compare InstanceSegmentationResult with reference data.
+
+    Args:
+        outputs: The InstanceSegmentationResult to validate
+        expected: Dictionary containing expected 'objects' and 'contours'
+    """
+    actual = create_instance_segmentation_result_dump(outputs)
+    assert "objects" in actual, "Actual data must contain 'objects' key"
+
+    assert "objects" in expected, "Expected data must contain 'objects' key"
+    assert len(actual["objects"]) == len(
+        expected["objects"],
+    ), f'Number of objects mismatch: {len(actual["objects"])} vs {len(expected["objects"])}'
+
+    for i, (actual_object, expected_object) in enumerate(zip(actual["objects"], expected["objects"])):
+        assert abs(actual_object["x1"] - expected_object["x1"]) < 1, f"Object {i} x1 mismatch"
+        assert abs(actual_object["y1"] - expected_object["y1"]) < 1, f"Object {i} y1 mismatch"
+        assert abs(actual_object["x2"] - expected_object["x2"]) < 1, f"Object {i} x2 mismatch"
+        assert abs(actual_object["y2"] - expected_object["y2"]) < 1, f"Object {i} y2 mismatch"
+        assert actual_object["class_id"] == expected_object["class_id"], f"Object {i} class_id mismatch"
+        assert actual_object["label"] == expected_object["label"], f"Object {i} label mismatch"
+        assert abs(actual_object["score"] - expected_object["score"]) < 1e-3, f"Object {i} score mismatch"
+        assert abs(actual_object["cx"] - expected_object["cx"]) < 1e-3, f"Object {i} cx mismatch"
+        assert abs(actual_object["cy"] - expected_object["cy"]) < 1e-3, f"Object {i} cy mismatch"
+        assert abs(actual_object["w"] - expected_object["w"]) < 1e-3, f"Object {i} w mismatch"
+        assert abs(actual_object["h"] - expected_object["h"]) < 1e-3, f"Object {i} h mismatch"
+        assert abs(actual_object["angle"] - expected_object["angle"]) < 1e-3, f"Object {i} angle mismatch"
+
+    assert "contours" in actual, "Actual data must contain 'contours' key"
+    assert "contours" in expected, "Expected data must contain 'contours' key"
+    assert_contours_match(actual["contours"], expected["contours"])
+
+
+def create_instance_segmentation_result_dump(outputs: InstanceSegmentationResult) -> dict:
+    """Create a JSON-serializable dump of InstanceSegmentationResult.
+
+    Args:
+        outputs: The InstanceSegmentationResult to serialize
+
+    Returns:
+        Dictionary containing 'objects' (bboxes with rotated rects) and 'contours'
+    """
+    rotated_outputs = add_rotated_rects(outputs)
+
+    objects = []
+    for i in range(len(rotated_outputs.bboxes)):
+        x1, y1, x2, y2 = rotated_outputs.bboxes[i]
+        (cx, cy), (w, h), angle = rotated_outputs.rotated_rects[i]
+        objects.append({
+            "x1": float(x1),
+            "y1": float(y1),
+            "x2": float(x2),
+            "y2": float(y2),
+            "class_id": int(rotated_outputs.labels[i]),
+            "label": rotated_outputs.label_names[i],
+            "score": float(rotated_outputs.scores[i]),
+            "cx": float(cx),
+            "cy": float(cy),
+            "w": float(w),
+            "h": float(h),
+            "angle": float(angle),
+        })
+
+    try:
+        contours = get_contours(outputs)
+    except RuntimeError:
+        # getContours() assumes each instance generates only one contour.
+        # That doesn't hold for some models
+        contours = []
+
+    return {
+        "objects": sorted(objects, key=operator.itemgetter("score", "class_id", "x1", "y1", "x2", "y2"), reverse=True),
+        "contours": sorted_contours_dicts(contours),
+    }
+
+
 def compare_semantic_segmentation_result(
     outputs: ImageResultWithSoftPrediction,
     contours: list[Contour],
@@ -317,11 +391,16 @@ def compare_semantic_segmentation_result(
     ), f"soft_prediction shape mismatch {list(outputs.soft_prediction.shape)} vs {reference['soft_prediction_shape']}"
 
     assert "contours" in reference
-    assert len(reference["contours"]) == len(
-        contours,
-    ), f"Number of contours mismatch: {len(contours)} vs {len(reference['contours'])}"
-    for idx, actual_contour in enumerate(sorted_contours_dicts(contours)):
-        expected_contour = reference["contours"][idx]
+    assert_contours_match(sorted_contours_dicts(contours), reference["contours"])
+
+
+def assert_contours_match(actual: list[dict], expected: list[dict]) -> None:
+    """Assert that actual contours match expected contours."""
+    assert len(expected) == len(
+        actual,
+    ), f"Number of contours mismatch: {len(actual)} vs {len(expected)}"
+    for idx, actual_contour in enumerate(actual):
+        expected_contour = expected[idx]
         assert (
             actual_contour["label"] == expected_contour["label"]
         ), f"Contour {idx} label mismatch: '{actual_contour['label']}' vs '{expected_contour['label']}'"
@@ -454,15 +533,9 @@ def test_image_models(data, device, dump, result, model_data, results_dir):  # n
                     compare_semantic_segmentation_result(outputs, contours, test_data["reference"])
                 image_result = create_semantic_segmentation_result_dump(outputs, contours)
             elif type(outputs) is InstanceSegmentationResult:
-                output_str = str(add_rotated_rects(outputs)) + "; "
-                with contextlib.suppress(RuntimeError):
-                    # getContours() assumes each instance generates only one contour.
-                    # That doesn't hold for some models
-                    output_str += "; ".join(str(contour) for contour in get_contours(outputs)) + "; "
                 if not dump:
-                    assert len(test_data["reference"]) == 1
-                    assert test_data["reference"][0] == output_str
-                image_result = [output_str]
+                    compare_instance_segmentation_result(outputs, test_data["reference"])
+                image_result = create_instance_segmentation_result_dump(outputs)
             elif isinstance(outputs, AnomalyResult):
                 output_str = str(outputs)
                 if not dump:
