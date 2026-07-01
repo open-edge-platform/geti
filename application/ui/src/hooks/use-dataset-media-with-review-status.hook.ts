@@ -8,16 +8,25 @@ import { useGetDatasetItemsById } from './use-get-dataset-items-by-id.hook';
 import { useGetDatasetMediaItems } from './use-get-dataset-media-items.hook';
 
 export const useDatasetMediaWithReviewStatus = () => {
-    const { selectedLabelIds, annotationStatus, startDate, endDate } = useDatasetFiltersSearchParams();
+    const { selectedLabelIds, annotationStatus, startDate, endDate, selectedSubsets } =
+        useDatasetFiltersSearchParams();
+
+    // The backend filtering endpoints only accept a single `subset` value. Until they support
+    // filtering by multiple subsets, we only forward the filter when exactly one subset is selected.
+    const subset = selectedSubsets.length === 1 ? selectedSubsets[0] : undefined;
 
     const mediaItemsResponse = useGetDatasetMediaItems({
         annotationStatus: annotationStatus ?? undefined,
         labelIds: isEmpty(selectedLabelIds) ? undefined : selectedLabelIds,
         startDate: startDate ?? undefined,
         endDate: endDate ?? undefined,
+        subset,
     });
 
-    const datasetItemsResponse = useGetDatasetItemsById({ annotationStatus: annotationStatus ?? undefined });
+    const datasetItemsResponse = useGetDatasetItemsById({
+        annotationStatus: annotationStatus ?? undefined,
+        subset,
+    });
 
     const fetchNextPage = () => {
         if (mediaItemsResponse.hasNextPage && !mediaItemsResponse.isFetchingNextPage) {

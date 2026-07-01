@@ -6,15 +6,17 @@ import { isEmpty } from 'lodash-es';
 import { useSearchParams, type SetURLSearchParams } from 'react-router-dom';
 import { parse, stringify } from 'zipson/lib';
 
-import type { DatasetItemAnnotationStatus, FilterByStatusKey } from '../constants/shared-types';
+import type { DatasetItemAnnotationStatus, DatasetSubset, FilterByStatusKey } from '../constants/shared-types';
 import { isNonEmptyString } from '../shared/util';
 
 export const LABELS_PARAM = 'labelsFilter';
 export const ANNOTATION_STATUS_PARAM = 'annotationStatusFilter';
 export const START_DATE_PARAM = 'startDateFilter';
 export const END_DATE_PARAM = 'endDateFilter';
+export const SUBSET_PARAM = 'subsetFilter';
 
 const VALID_ANNOTATION_STATUSES = new Set<DatasetItemAnnotationStatus>(['with_annotations', 'missing_annotations']);
+const VALID_SUBSETS = new Set<DatasetSubset>(['unassigned', 'training', 'validation', 'testing']);
 
 const parseAnnotationStatus = (value: string | null): DatasetItemAnnotationStatus | null => {
     if (value !== null && VALID_ANNOTATION_STATUSES.has(value as DatasetItemAnnotationStatus)) {
@@ -22,6 +24,14 @@ const parseAnnotationStatus = (value: string | null): DatasetItemAnnotationStatu
     }
 
     return null;
+};
+
+const parseSubsets = (value: string | null): DatasetSubset[] => {
+    if (!isNonEmptyString(value)) {
+        return [];
+    }
+
+    return value.split(',').filter((item): item is DatasetSubset => VALID_SUBSETS.has(item as DatasetSubset));
 };
 
 // The `decodeFromBinary` and `encodeToBinary` functions are taken from,
@@ -84,6 +94,7 @@ export const useDatasetFiltersSearchParams = () => {
     const annotationStatus = parseAnnotationStatus(searchParams.get(ANNOTATION_STATUS_PARAM));
     const startDate = parseDateFromURL(searchParams.get(START_DATE_PARAM));
     const endDate = parseDateFromURL(searchParams.get(END_DATE_PARAM));
+    const selectedSubsets = parseSubsets(searchParams.get(SUBSET_PARAM));
 
     const setSelectedLabelIds = (ids: string[]) => {
         const newValue = isEmpty(ids) ? null : encodeToBinary(encodeURIComponent(stringify(ids.join(','))));
@@ -102,6 +113,11 @@ export const useDatasetFiltersSearchParams = () => {
         updateSearchParam(setSearchParams, END_DATE_PARAM, date);
     };
 
+    const setSelectedSubsets = (subsets: DatasetSubset[]) => {
+        const newValue = isEmpty(subsets) ? null : subsets.join(',');
+        updateSearchParam(setSearchParams, SUBSET_PARAM, newValue);
+    };
+
     return {
         selectedLabelIds,
         setSelectedLabelIds,
@@ -111,5 +127,7 @@ export const useDatasetFiltersSearchParams = () => {
         setStartDate,
         endDate,
         setEndDate,
+        selectedSubsets,
+        setSelectedSubsets,
     };
 };

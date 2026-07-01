@@ -3,15 +3,16 @@
 
 import { useMemo, useRef } from 'react';
 
-import type { DatasetItemAnnotationStatus } from '../constants/shared-types';
+import type { DatasetItemAnnotationStatus, DatasetSubset } from '../constants/shared-types';
 import { useGetDatasetItems } from './use-get-dataset-items.hook';
 
 type UseGetDatasetItemsByIdOptions = {
     annotationStatus?: DatasetItemAnnotationStatus;
+    subset?: DatasetSubset;
 };
 
-export const useGetDatasetItemsById = ({ annotationStatus }: UseGetDatasetItemsByIdOptions) => {
-    const { items, ...response } = useGetDatasetItems({ annotationStatus });
+export const useGetDatasetItemsById = ({ annotationStatus, subset }: UseGetDatasetItemsByIdOptions) => {
+    const { items, ...response } = useGetDatasetItems({ annotationStatus, subset });
 
     const accumulatedReviewStatusRef = useRef(new Map<string, boolean>());
 
