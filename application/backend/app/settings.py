@@ -72,7 +72,7 @@ class Settings(BaseSettings):
     coturn_port: int = Field(default=443, alias="COTURN_PORT")
     coturn_username: str = Field(default="user", alias="COTURN_USERNAME")
     coturn_password: str = Field(default="password", alias="COTURN_PASSWORD")
-    stun_server: str | None = Field(default=None, alias="STUN_SERVER")
+    stun_server: str | None = Field(default="stun:stun.l.google.com:19302", alias="STUN_SERVER")
 
     # Inference
     inference_media_limit: int = Field(
