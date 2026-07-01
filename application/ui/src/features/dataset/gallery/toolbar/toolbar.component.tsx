@@ -28,6 +28,7 @@ import { useSelectDatasetItem } from '../hooks/use-select-dataset-item.hook';
 import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
 import { DateFilter } from './date-filter/date-filter.component';
+import { FilterBySubset } from './filter-by-subset/filter-by-subset.component';
 import { FilterByStatus } from './filter-by-status/filter-by-status.component';
 import { FilterBySubset } from './filter-by-subset/filter-by-subset.component';
 import { MediaFilterLabels } from './media-filter-labels/media-filter-labels.component';
