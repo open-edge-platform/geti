@@ -11,6 +11,7 @@ import {
     END_DATE_PARAM,
     LABELS_PARAM,
     START_DATE_PARAM,
+    SUBSET_PARAM,
     useDatasetFiltersSearchParams,
 } from './use-dataset-filters-search-params.hook';
 
@@ -150,8 +151,99 @@ describe('useDatasetFiltersSearchParams', () => {
         });
     });
 
-    describe('date filters', () => {
-        it('returns null startDate and endDate when no params are present', () => {
+    describe('subset filter', () => {
+        it.each(['training', 'validation', 'testing', 'unassigned'] as const)(
+            'returns subset "%s" from search param',
+            (subset) => {
+                const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                    route: `/projects/123?${SUBSET_PARAM}=${subset}`,
+                    path: '/projects/:projectId',
+                });
+
+                expect(result.current.selectedSubsets).toEqual([subset]);
+            }
+        );
+
+        it('returns multiple subsets from a comma-separated search param', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: `/projects/123?${SUBSET_PARAM}=training,validation`,
+                path: '/projects/:projectId',
+            });
+
+            expect(result.current.selectedSubsets).toEqual(['training', 'validation']);
+        });
+
+        it('returns empty array when no param is present', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: '/projects/123',
+                path: '/projects/:projectId',
+            });
+
+            expect(result.current.selectedSubsets).toEqual([]);
+        });
+
+        it('ignores invalid values while keeping valid ones', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: `/projects/123?${SUBSET_PARAM}=training,invalid`,
+                path: '/projects/:projectId',
+            });
+
+            expect(result.current.selectedSubsets).toEqual(['training']);
+        });
+
+        it('returns empty array when the param is entirely invalid', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: `/projects/123?${SUBSET_PARAM}=invalid`,
+                path: '/projects/:projectId',
+            });
+
+            expect(result.current.selectedSubsets).toEqual([]);
+        });
+
+        it('sets a single subset in the search params', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: '/projects/123',
+                path: '/projects/:projectId',
+            });
+
+            act(() => {
+                result.current.setSelectedSubsets(['training']);
+            });
+
+            expect(result.current.selectedSubsets).toEqual(['training']);
+        });
+
+        it('sets multiple subsets in the search params', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: '/projects/123',
+                path: '/projects/:projectId',
+            });
+
+            act(() => {
+                result.current.setSelectedSubsets(['training', 'validation', 'testing']);
+            });
+
+            expect(result.current.selectedSubsets).toEqual(['training', 'validation', 'testing']);
+        });
+
+        it('clears subsets when set to an empty array', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: `/projects/123?${SUBSET_PARAM}=training,validation`,
+                path: '/projects/:projectId',
+            });
+
+            expect(result.current.selectedSubsets).toEqual(['training', 'validation']);
+
+            act(() => {
+                result.current.setSelectedSubsets([]);
+            });
+
+            expect(result.current.selectedSubsets).toEqual([]);
+        });
+    });
+
+
+    describe('date filters', () => {        it('returns null startDate and endDate when no params are present', () => {
             const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
                 route: '/projects/123',
                 path: '/projects/:projectId',
