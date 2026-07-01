@@ -8,12 +8,19 @@ from sqlalchemy.orm import Session
 
 from app.db.schema import DatasetItemDB, MediaDB
 from app.models import MediaType
+from app.models.media import MediaSortBy, SortDirection
 
 from .filters import (
     _apply_annotation_status_filter_with_video_support,
     _apply_label_filter_with_video_support,
     _apply_subset_filter,
 )
+
+# Maps each sortable field to its underlying DB column. Extend this when a new
+# `MediaSortBy` member is introduced.
+_SORT_BY_COLUMN = {
+    MediaSortBy.UPLOAD_DATE: MediaDB.created_at,
+}
 
 
 class MediaRepository:
@@ -81,6 +88,8 @@ class MediaRepository:
         label_ids: list[str] | None = None,
         subset: str | None = None,
         exclude_types: list[MediaType] | None = None,
+        sort_by: MediaSortBy = MediaSortBy.UPLOAD_DATE,
+        sort_direction: SortDirection = SortDirection.DESC,
     ) -> list[MediaDB]:
         stmt = self._base_select().join(DatasetItemDB, DatasetItemDB.id == MediaDB.id, isouter=True)
         if exclude_types:
@@ -89,7 +98,9 @@ class MediaRepository:
         stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
         stmt = _apply_subset_filter(stmt, subset)
         stmt = _apply_label_filter_with_video_support(stmt, label_ids)
-        stmt = stmt.order_by(MediaDB.created_at.desc()).offset(offset).limit(limit)
+        sort_column = _SORT_BY_COLUMN[sort_by]
+        order_by_column = sort_column.asc() if sort_direction == SortDirection.ASC else sort_column.desc()
+        stmt = stmt.order_by(order_by_column).offset(offset).limit(limit)
         return list(self.db.scalars(stmt).all())
 
     def get_earliest(self) -> MediaDB | None:

@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 
 from app.db.schema import MediaDB
 from app.models import DatasetItem, DatasetItemAnnotationStatus, Media, MediaType, Project, Video, VideoFrame
-from app.models.media import ImageFormat, MediaAdapter, VideoFormat
+from app.models.media import ImageFormat, MediaAdapter, MediaSortBy, SortDirection, VideoFormat
 from app.repositories import MediaRepository
 from app.services.video import VideoService
 from app.utils.images import convert_to_jpeg_compatible, crop_to_thumbnail
@@ -46,6 +46,8 @@ class MediaFilters:
     annotation_status: DatasetItemAnnotationStatus | None = None
     label_ids: list[UUID] | None = None
     subset: str | None = None
+    sort_by: MediaSortBy = MediaSortBy.UPLOAD_DATE
+    sort_direction: SortDirection = SortDirection.DESC
 
 
 @dataclass(frozen=True)
@@ -270,6 +272,8 @@ class MediaService(BaseSessionManagedService):
             label_ids=label_ids_str,
             subset=filters.subset,
             exclude_types=exclude_types,
+            sort_by=filters.sort_by,
+            sort_direction=filters.sort_direction,
         )
         return [
             Video.model_validate(media_db).model_copy(

@@ -33,7 +33,15 @@ from app.api.schemas.media import (
 from app.api.validators import MediaID, normalize_datetime_to_utc
 from app.core.models import Pagination
 from app.models import BatchInferenceResult, DatasetItemAnnotationStatus, DatasetItemSubset, Media, Project, Video
-from app.models.media import ImageFormat, MediaListPredictionRequest, MediaType, NotAnnotatedVideoFrame, VideoFormat
+from app.models.media import (
+    ImageFormat,
+    MediaListPredictionRequest,
+    MediaSortBy,
+    MediaType,
+    NotAnnotatedVideoFrame,
+    SortDirection,
+    VideoFormat,
+)
 from app.services import DatasetService, MediaPredictionService, MediaService, SystemService
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
@@ -222,6 +230,8 @@ def list_media(  # noqa: PLR0913
     annotation_status: Annotated[DatasetItemAnnotationStatus | None, Query()] = None,
     labels: Annotated[list[UUID] | None, Query()] = None,
     subset: Annotated[DatasetItemSubset | None, Query()] = None,
+    sort_by: Annotated[MediaSortBy, Query()] = MediaSortBy.UPLOAD_DATE,
+    sort_direction: Annotated[SortDirection, Query()] = SortDirection.DESC,
 ) -> MediaWithPagination:
     """List the available media and their metadata. This endpoint supports pagination."""
     start_date = normalize_datetime_to_utc(start_date)
@@ -250,6 +260,8 @@ def list_media(  # noqa: PLR0913
             annotation_status=annotation_status,
             label_ids=labels,
             subset=subset,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
         ),
         exclude_types=[MediaType.VIDEO_FRAME],
     )
