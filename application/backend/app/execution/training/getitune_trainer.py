@@ -369,6 +369,13 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                     dataset=getitune_testing_dataset, tile_config=tile_config
                 )
 
+            logger.info(
+                "Training dataset size: {}, Validation dataset size: {}, Testing dataset size: {}",
+                len(getitune_training_dataset),
+                len(getitune_validation_dataset),
+                len(getitune_testing_dataset),
+            )
+            logger.info("Augmentations applied {}", getitune_training_config["data"])
             return DatasetInfo(
                 getitune_training_dataset=getitune_training_dataset,
                 getitune_validation_dataset=getitune_validation_dataset,
