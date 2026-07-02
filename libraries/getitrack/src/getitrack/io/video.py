@@ -43,6 +43,7 @@ class VideoReader:
             raise FileNotFoundError(msg)
         self._cap = cv2.VideoCapture(str(self.path))
         if not self._cap.isOpened():
+            self._cap.release()
             msg = f"OpenCV could not open video: {self.path}"
             raise ValueError(msg)
 
