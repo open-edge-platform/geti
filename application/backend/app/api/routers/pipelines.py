@@ -123,7 +123,7 @@ def get_pipeline(
 
 
 @router.get(
-    ":health",
+    "/health",
     response_model=PipelineHealth,
     responses={
         status.HTTP_200_OK: {"description": "Pipeline health status", "model": PipelineHealth},

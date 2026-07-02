@@ -24,12 +24,12 @@ from .source import SourceView
 
 class Status(BaseModel):
     status: str
-    timestamp: datetime
+    updated_at: datetime
     message: str | None = None
 
     @staticmethod
     def unavailable() -> Status:
-        return Status(status="unavailable", message=None, timestamp=datetime.now(UTC))
+        return Status(status="unavailable", message=None, updated_at=datetime.now(UTC))
 
 
 class PipelineComponentsHealth(BaseModel):
@@ -56,15 +56,17 @@ class PipelineHealth(BaseModel):
             status=PipelineStatus.RUNNING,
             components=PipelineComponentsHealth(
                 source=Status(
-                    status=source_status.code, message=source_status.message, timestamp=source_status.timestamp
+                    status=source_status.code, message=source_status.message, updated_at=source_status.timestamp
                 )
                 if source_status
                 else Status.unavailable(),
-                sink=Status(status=sink_status.code, message=sink_status.message, timestamp=sink_status.timestamp)
+                sink=Status(status=sink_status.code, message=sink_status.message, updated_at=sink_status.timestamp)
                 if sink_status
                 else Status.unavailable(),
                 model=Status(
-                    status=inference_status.code, message=inference_status.message, timestamp=inference_status.timestamp
+                    status=inference_status.code,
+                    message=inference_status.message,
+                    updated_at=inference_status.timestamp,
                 )
                 if inference_status
                 else Status.unavailable(),

@@ -13,6 +13,7 @@ from multiprocessing.synchronize import Lock
 from uuid import uuid4
 
 import pytest
+from pydantic import BaseModel
 
 from app.models.inference import InferenceWorkerStatus, InferenceWorkerStatusCode
 from app.models.sink import SinkStatus, SinkStatusCode
@@ -107,6 +108,34 @@ class TestShmStatusIntegration:
         assert result.code == SourceStatusCode.ERROR
         assert result.source_id == status.source_id
         assert result.message == oversized_message[: len(oversized_message) // 2]
+
+    def test_hugely_oversized_message_is_truncated_over_multiple_rounds(self, shm, lock):
+        """A message many times the buffer size is halved repeatedly until the payload fits and reads back."""
+        oversized_message = "x" * (shm.size * 8)
+        status = SourceStatus(code=SourceStatusCode.ERROR, source_id=uuid4(), message=oversized_message)
+
+        write_status(status, shm, lock)
+        result = read_status(SourceStatus, shm, lock)
+
+        assert result is not None
+        assert result.code == SourceStatusCode.ERROR
+        assert result.source_id == status.source_id
+        # The message is a (repeatedly halved) prefix of the original that now fits in the buffer.
+        assert result.message is not None
+        assert result.message == oversized_message[: len(result.message)]
+        assert len(result.message) < len(oversized_message)
+
+    def test_oversized_payload_without_message_raises(self, shm, lock):
+        """A payload that exceeds the buffer and has no message to truncate raises a clear ValueError."""
+
+        class NoMessageStatus(BaseModel):
+            code: str
+            payload: str
+
+        status = NoMessageStatus(code="error", payload="x" * (shm.size + 100))
+
+        with pytest.raises(ValueError, match="exceeds shared memory capacity"):
+            write_status(status, shm, lock)
 
     def test_cross_process_write_and_read(self, shm, lock, mp_ctx):
         """A status written by a spawned process is read back in the parent process (real IPC path)."""
