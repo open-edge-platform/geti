@@ -403,6 +403,22 @@ def _fmt_memory(mb: float | None) -> str:
     return f"{mb:.0f} MB"
 
 
+def _fmt_latency(seconds: float | None) -> str:
+    """Format a per-sample latency into a human-readable string.
+
+    Unlike :func:`_fmt_time` (built for run-length durations such as train
+    time), per-sample test latency is typically well under a second. Reusing
+    ``_fmt_time``'s single-decimal-second precision collapses nearly every
+    real value into ``0.0s`` or ``0.1s``, so sub-second values are rendered
+    in milliseconds instead to preserve meaningful precision.
+    """
+    if seconds is None:
+        return "—"
+    if seconds < 1:
+        return f"{seconds * 1000:.1f} ms"
+    return f"{seconds:.2f}s"
+
+
 def generate_markdown(report: BenchmarkReport) -> str:
     """Render a :class:`BenchmarkReport` as a Markdown string."""
     lines: list[str] = []
@@ -598,7 +614,7 @@ def _detect_metric_columns(
         columns.append(("GPU Mem ↓", "training:gpu_mem", _fmt_memory))
 
     if rewrite_metric_key("torch:test/latency") in all_keys:
-        columns.append(("Test Latency ↓", rewrite_metric_key("torch:test/latency"), _fmt_time))
+        columns.append(("Test Latency ↓", rewrite_metric_key("torch:test/latency"), _fmt_latency))
 
     return columns
 
