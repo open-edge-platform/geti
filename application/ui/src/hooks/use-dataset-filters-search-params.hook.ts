@@ -36,7 +36,7 @@ const parseSubsets = (value: string | null): DatasetSubset[] => {
         .map((item) => item.trim())
         .filter((item): item is DatasetSubset => VALID_SUBSETS.has(item as DatasetSubset));
 
-    return [...new Set(subsets)];
+    return subsets;
 };
 
 // The `decodeFromBinary` and `encodeToBinary` functions are taken from,
