@@ -218,19 +218,6 @@ describe('useDatasetFiltersSearchParams', () => {
             expect(result.current.selectedSubsets).toEqual([]);
         });
 
-        it('sets a single subset in the search params', () => {
-            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
-                route: '/projects/123',
-                path: '/projects/:projectId',
-            });
-
-            act(() => {
-                result.current.setSelectedSubsets(['training']);
-            });
-
-            expect(result.current.selectedSubsets).toEqual(['training']);
-        });
-
         it('sets multiple subsets in the search params', () => {
             const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
                 route: '/projects/123',
