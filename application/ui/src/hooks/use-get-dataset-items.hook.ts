@@ -13,7 +13,7 @@ const DATASET_ITEMS_LIMIT = 40;
 type SortBy = 'creation_date';
 
 type UseGetDatasetItemsOptions = {
-    subset?: DatasetSubset;
+    subset?: DatasetSubset[];
     annotationStatus?: DatasetItemAnnotationStatus;
     sortDirection?: SortDirection;
 };
@@ -24,7 +24,7 @@ export const useGetDatasetItems = ({ subset, annotationStatus, sortDirection }: 
     const query: {
         offset: number;
         limit: number;
-        subset?: DatasetSubset;
+        subset?: DatasetSubset[];
         annotation_status?: DatasetItemAnnotationStatus;
         sort_direction?: SortDirection;
         sort_by?: SortBy;
@@ -33,7 +33,7 @@ export const useGetDatasetItems = ({ subset, annotationStatus, sortDirection }: 
         limit: DATASET_ITEMS_LIMIT,
     };
 
-    if (subset !== undefined) {
+    if (subset !== undefined && subset.length > 0) {
         query.subset = subset;
     }
 

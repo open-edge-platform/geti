@@ -10,7 +10,7 @@ import { useGetDatasetItems } from './use-get-dataset-items.hook';
 type UseGetDatasetItemsByIdOptions = {
     annotationStatus?: DatasetItemAnnotationStatus;
     sortDirection?: SortDirection;
-    subset?: DatasetSubset;
+    subset?: DatasetSubset[];
 };
 
 export const useGetDatasetItemsById = ({ annotationStatus, sortDirection, subset }: UseGetDatasetItemsByIdOptions) => {

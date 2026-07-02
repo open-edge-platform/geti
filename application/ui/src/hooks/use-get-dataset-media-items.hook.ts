@@ -14,7 +14,7 @@ const DATASET_ITEMS_LIMIT = 40;
 type SortBy = 'upload_date';
 
 interface UseGetDatasetMediaItemsOptions {
-    subset?: DatasetSubset;
+    subset?: DatasetSubset[];
     annotationStatus?: DatasetItemAnnotationStatus;
     labelIds?: string[];
     startDate?: string;
@@ -48,7 +48,7 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
     const query: {
         limit: number;
         offset: number;
-        subset?: DatasetSubset;
+        subset?: DatasetSubset[];
         labels?: string[];
         end_date?: string;
         start_date?: string;
@@ -60,7 +60,7 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
         limit: DATASET_ITEMS_LIMIT,
     };
 
-    if (options?.subset !== undefined) {
+    if (options?.subset !== undefined && options.subset.length > 0) {
         query.subset = options.subset;
     }
 

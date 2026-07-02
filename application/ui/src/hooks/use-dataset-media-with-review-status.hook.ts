@@ -11,9 +11,7 @@ export const useDatasetMediaWithReviewStatus = () => {
     const { selectedLabelIds, annotationStatus, startDate, endDate, sortDirection, selectedSubsets } =
         useDatasetFiltersSearchParams();
 
-    // The backend filtering endpoints only accept a single `subset` value. Until they support
-    // filtering by multiple subsets, we only forward the filter when exactly one subset is selected.
-    const subset = selectedSubsets.length === 1 ? selectedSubsets[0] : undefined;
+    const subset = isEmpty(selectedSubsets) ? undefined : selectedSubsets;
 
     const mediaItemsResponse = useGetDatasetMediaItems({
         annotationStatus: annotationStatus ?? undefined,

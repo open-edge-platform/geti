@@ -15,22 +15,22 @@ export const useTrainModelDisabledReason = () => {
     const { totalCount, isPending: isTotalPending } = useGetDatasetItems({ annotationStatus: 'with_annotations' });
     const { totalCount: trainingSubsetSize, isPending: isTrainingPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
-        subset: 'training',
+        subset: ['training'],
     });
     const { totalCount: testingSubsetSize, isPending: isTestingPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
-        subset: 'testing',
+        subset: ['testing'],
     });
     const { totalCount: validationSubsetSize, isPending: isValidationPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
-        subset: 'validation',
+        subset: ['validation'],
     });
     const { totalCount: reviewedUnassignedSubsetSize, isPending: isReviewedUnassignedPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
-        subset: 'unassigned',
+        subset: ['unassigned'],
     });
     const { totalCount: unassignedSubsetSize, isPending: isUnassignedPending } = useGetDatasetItems({
-        subset: 'unassigned',
+        subset: ['unassigned'],
     });
 
     if (
