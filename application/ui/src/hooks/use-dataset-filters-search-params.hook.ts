@@ -99,6 +99,7 @@ export const useDatasetFiltersSearchParams = () => {
     const annotationStatus = parseAnnotationStatus(searchParams.get(ANNOTATION_STATUS_PARAM));
     const startDate = parseDateFromURL(searchParams.get(START_DATE_PARAM));
     const endDate = parseDateFromURL(searchParams.get(END_DATE_PARAM));
+    const sortDirection = searchParams.get('sortDirection') === 'asc' ? 'asc' : 'desc';
     const selectedSubsets = parseSubsets(searchParams.get(SUBSET_PARAM));
 
     const setSelectedLabelIds = (ids: string[]) => {
@@ -118,6 +119,10 @@ export const useDatasetFiltersSearchParams = () => {
         updateSearchParam(setSearchParams, END_DATE_PARAM, date);
     };
 
+    const setSortDirection = (direction: 'asc' | 'desc') => {
+        updateSearchParam(setSearchParams, 'sortDirection', direction);
+    };
+
     const setSelectedSubsets = (subsets: DatasetSubset[]) => {
         const newValue = isEmpty(subsets) ? null : subsets.join(',');
         updateSearchParam(setSearchParams, SUBSET_PARAM, newValue);
@@ -132,7 +137,9 @@ export const useDatasetFiltersSearchParams = () => {
         setStartDate,
         endDate,
         setEndDate,
+        sortDirection,
+        setSortDirection,
         selectedSubsets,
         setSelectedSubsets,
-    };
+    } as const;
 };

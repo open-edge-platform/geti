@@ -3,7 +3,19 @@
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
-import { Button, ButtonGroup, Checkbox, dimensionValue, Divider, Flex, MediaViewModes, ViewModes } from '@geti-ui/ui';
+import {
+    ActionButton,
+    Button,
+    ButtonGroup,
+    Checkbox,
+    dimensionValue,
+    Divider,
+    Flex,
+    MediaViewModes,
+    ViewModes,
+} from '@geti-ui/ui';
+import { SortDown, SortUp } from '@geti-ui/ui/icons';
+import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { isString } from 'lodash-es';
 
 import type { Media } from '../../../../constants/shared-types';
@@ -39,6 +51,28 @@ const AnnotateButton = ({ isDisabled, onClick }: AnnotateButtonProps) => {
         <Button margin={0} variant={'primary'} onPress={onClick} isDisabled={isDisabled}>
             Annotate
         </Button>
+    );
+};
+
+const SortMediaByUploadDate = () => {
+    const { sortDirection, setSortDirection } = useDatasetFiltersSearchParams();
+
+    if (sortDirection === 'asc') {
+        return (
+            <ActionButton
+                isQuiet
+                onPress={() => setSortDirection('desc')}
+                aria-label={'sort by upload date descending'}
+            >
+                Oldest first <SortUp />
+            </ActionButton>
+        );
+    }
+
+    return (
+        <ActionButton isQuiet onPress={() => setSortDirection('asc')} aria-label={'sort by upload date ascending'}>
+            Newest first <SortDown />
+        </ActionButton>
     );
 };
 
@@ -102,6 +136,8 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                         onChange={handleToggleManyItemSelection}
                         isSelected={hasSelectedElements && totalSelectedElements === items.length}
                     />
+
+                    <SortMediaByUploadDate />
 
                     <Divider orientation={'vertical'} size={'S'} />
 
