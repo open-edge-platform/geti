@@ -119,7 +119,7 @@ class TestPipelineEndpoints:
         fxt_pipeline.status = PipelineStatus.IDLE
         fxt_pipeline_service.get_pipeline_by_id.return_value = fxt_pipeline
 
-        response = fxt_client.get(f"/api/projects/{fxt_pipeline.project_id}/pipeline:health")
+        response = fxt_client.get(f"/api/projects/{fxt_pipeline.project_id}/pipeline/health")
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -159,7 +159,7 @@ class TestPipelineEndpoints:
             code=InferenceWorkerStatusCode.OK, model_id=model_id, message="inferring"
         )
 
-        response = fxt_client.get(f"/api/projects/{project_id}/pipeline:health")
+        response = fxt_client.get(f"/api/projects/{project_id}/pipeline/health")
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
@@ -198,7 +198,7 @@ class TestPipelineEndpoints:
         fxt_sink_status_service.get_status.return_value = None
         fxt_inference_status_service.get_status.return_value = None
 
-        response = fxt_client.get(f"/api/projects/{project_id}/pipeline:health")
+        response = fxt_client.get(f"/api/projects/{project_id}/pipeline/health")
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
