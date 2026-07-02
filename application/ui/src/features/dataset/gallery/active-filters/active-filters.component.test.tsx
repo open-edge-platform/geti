@@ -23,6 +23,7 @@ const mockSetSelectedLabelIds = vi.fn();
 const mockSetAnnotationStatus = vi.fn();
 const mockSetStartDate = vi.fn();
 const mockSetEndDate = vi.fn();
+const mockSetSelectedSubsets = vi.fn();
 
 const mockUseDatasetFiltersSearchParams = (overrides?: Partial<ReturnType<typeof useDatasetFiltersSearchParams>>) => {
     vi.mocked(useDatasetFiltersSearchParams).mockReturnValue({
@@ -34,6 +35,8 @@ const mockUseDatasetFiltersSearchParams = (overrides?: Partial<ReturnType<typeof
         setStartDate: mockSetStartDate,
         endDate: null,
         setEndDate: mockSetEndDate,
+        selectedSubsets: [],
+        setSelectedSubsets: mockSetSelectedSubsets,
         ...overrides,
     });
 };
@@ -89,6 +92,15 @@ describe('ActiveFilters', () => {
         expect(screen.getByText('to 31/01/2026')).toBeVisible();
     });
 
+    it('renders chips for the selected subsets', () => {
+        mockUseDatasetFiltersSearchParams({ selectedSubsets: ['training', 'validation'] });
+
+        render(<ActiveFilters />);
+
+        expect(screen.getByText('training')).toBeVisible();
+        expect(screen.getByText('validation')).toBeVisible();
+    });
+
     it('removes only the clicked label when its chip is closed', () => {
         mockUseDatasetFiltersSearchParams({ selectedLabelIds: ['label-1', 'label-2'] });
 
@@ -105,6 +117,7 @@ describe('ActiveFilters', () => {
             annotationStatus: 'with_annotations',
             startDate: '2026-01-01',
             endDate: '2026-01-31',
+            selectedSubsets: ['training', 'validation'],
         });
 
         render(<ActiveFilters />);
@@ -115,5 +128,6 @@ describe('ActiveFilters', () => {
         expect(mockSetAnnotationStatus).toHaveBeenCalledWith(null);
         expect(mockSetStartDate).toHaveBeenCalledWith(null);
         expect(mockSetEndDate).toHaveBeenCalledWith(null);
+        expect(mockSetSelectedSubsets).toHaveBeenCalledWith([]);
     });
 });
