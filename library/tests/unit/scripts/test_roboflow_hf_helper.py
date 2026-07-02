@@ -1,7 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Unit tests for ``getitune.benchmark.roboflow_hf``.
+"""Unit tests for the ``roboflow_hf`` benchmark-dataset helper.
 
 These tests build a small synthetic parquet that mimics the Roboflow-100
 HuggingFace mirror schema and run the conversion offline (no network), so they
@@ -10,8 +10,10 @@ execute as part of the default test suite.
 
 from __future__ import annotations
 
+import importlib.util
 import io
 import shutil
+import sys
 from pathlib import Path
 
 import pyarrow as pa
@@ -22,9 +24,19 @@ from datumaro.experimental.export_import import import_dataset
 from datumaro.experimental.fields import Subset
 from PIL import Image
 
-from getitune.benchmark import roboflow_hf
 from getitune.benchmark.dataset_helpers import DatasetArgs
 from getitune.data.entity.sample import DetectionSample
+
+# ``roboflow_hf_helper`` is a standalone helper module that lives next to the
+# ``prepare_*.py`` scripts (not part of the installed ``getitune`` package), so
+# load it directly from the scripts directory.
+_SCRIPTS_DIR = Path(__file__).resolve().parents[3] / "scripts" / "benchmark_datasets"
+_spec = importlib.util.spec_from_file_location("roboflow_hf_helper", _SCRIPTS_DIR / "roboflow_hf_helper.py")
+assert _spec is not None
+assert _spec.loader is not None
+roboflow_hf = importlib.util.module_from_spec(_spec)
+sys.modules["roboflow_hf_helper"] = roboflow_hf
+_spec.loader.exec_module(roboflow_hf)
 
 # Arrow type mirroring the RF100 ``objects`` struct (struct-of-arrays).
 _OBJECTS_TYPE = pa.struct(

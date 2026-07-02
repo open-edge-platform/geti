@@ -16,8 +16,9 @@ Mirror: https://huggingface.co/datasets/Francesco/cable-damage
 
 from __future__ import annotations
 
+from roboflow_hf_helper import prepare_roboflow_hf_dataset
+
 from getitune.benchmark.dataset_helpers import parse_args
-from getitune.benchmark.roboflow_hf import prepare_roboflow_hf_dataset
 
 # Pinned revision of the HuggingFace mirror for reproducibility.
 _REPO = "Francesco/cable-damage"
