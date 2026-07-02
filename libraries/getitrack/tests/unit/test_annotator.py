@@ -104,9 +104,9 @@ class TestVideoAnnotator:
             show_score=False,
             thickness=3,
         ) as out:
-            assert out.annotator.class_names == {0: "thing"}
-            assert out.annotator.show_score is False
-            assert out.annotator.thickness == 3
+            assert out._annotator.class_names == {0: "thing"}
+            assert out._annotator.show_score is False
+            assert out._annotator.thickness == 3
             out.write(_frame(), _tracked([[10, 10, 50, 50]]))
 
     def test_path_property(self, tmp_path):

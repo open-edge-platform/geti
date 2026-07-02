@@ -169,7 +169,7 @@ class VideoAnnotator:
             show_score: Append the detection score to each label when true.
             class_names: Optional class-id-to-name lookup for labels.
         """
-        self.annotator = TrackAnnotator(
+        self._annotator = TrackAnnotator(
             thickness=thickness,
             font_scale=font_scale,
             show_score=show_score,
@@ -189,7 +189,7 @@ class VideoAnnotator:
 
     def write(self, frame: np.ndarray, tracked: TrackedDetections) -> None:
         """Annotate one frame and append it to the video."""
-        self._writer.write(self.annotator.annotate(frame, tracked))
+        self._writer.write(self._annotator.annotate(frame, tracked))
 
     def close(self) -> None:
         """Finalise the container and release the writer handle."""
