@@ -10,13 +10,18 @@ duck-typed and works on any prediction-batch-shaped object.
 from __future__ import annotations
 
 import re
-from typing import Any
+from typing import TYPE_CHECKING, Literal
 
 import cv2
 import numpy as np
 
 from getitrack.adapters.base import DetectionAdapter
 from getitrack.core.detection import Detections
+
+if TYPE_CHECKING:
+    import torch
+    from getitune.backend.lightning.models.detection.base import LightningDetectionModel
+    from getitune.data.entity import PredictionBatch, SampleBatch
 
 # Matches getitune placeholder class names like "label_0", "label_1".
 _PLACEHOLDER_NAME = re.compile(r"^label_\d+$")
@@ -34,7 +39,7 @@ class GetiAdapter(DetectionAdapter):
         >>> detections = adapter.detect(frame, frame_id=0)
     """
 
-    def __init__(self, model: Any, device: str = "cpu") -> None:  # noqa: ANN401
+    def __init__(self, model: LightningDetectionModel, device: Literal["cpu", "cuda", "mps"] = "cpu") -> None:
         """Wrap a getitune detection model.
 
         Args:
@@ -79,7 +84,7 @@ class GetiAdapter(DetectionAdapter):
             preds = self.model.predict_step(self.preprocess(frame_bgr), batch_idx=0)
         return self.to_detections(preds, frame_id=frame_id)
 
-    def preprocess(self, frame_bgr: np.ndarray) -> Any:  # noqa: ANN401
+    def preprocess(self, frame_bgr: np.ndarray) -> SampleBatch:
         """Preprocess a BGR frame into a getitune ``SampleBatch``.
 
         Applies the resize and normalization described by the model's
@@ -119,7 +124,7 @@ class GetiAdapter(DetectionAdapter):
         return SampleBatch(images=tensor.unsqueeze(0).to(self.device), imgs_info=[img_info])
 
     @staticmethod
-    def to_detections(batch: Any, frame_id: int, image_index: int = 0) -> Detections:  # noqa: ANN401
+    def to_detections(batch: PredictionBatch, frame_id: int, image_index: int = 0) -> Detections:
         """Convert one image's predictions from a getitune ``PredictionBatch``.
 
         Duck-typed: works without getitune or torch installed, on any
@@ -149,8 +154,8 @@ class GetiAdapter(DetectionAdapter):
         )
 
 
-def _to_numpy(value: Any) -> np.ndarray:  # noqa: ANN401
-    """Convert a torch tensor (possibly on an accelerator) or array-like to numpy."""
+def _to_numpy(value: torch.Tensor | np.ndarray) -> np.ndarray:
+    """Convert a torch tensor (possibly on an accelerator) or array to numpy."""
     if hasattr(value, "cpu"):
         value = value.cpu()
     if hasattr(value, "numpy"):
