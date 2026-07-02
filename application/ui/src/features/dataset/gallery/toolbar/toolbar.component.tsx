@@ -17,6 +17,7 @@ import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
 import { DateFilter } from './date-filter/date-filter.component';
 import { FilterByStatus } from './filter-by-status/filter-by-status.component';
+import { FilterBySubset } from './filter-by-subset/filter-by-subset.component';
 import { MediaFilterLabels } from './media-filter-labels/media-filter-labels.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
@@ -118,6 +119,8 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                     {noMediaSelected && (
                         <>
                             <FilterByStatus />
+
+                            <FilterBySubset />
 
                             <MediaFilterLabels />
 
