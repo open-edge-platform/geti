@@ -45,7 +45,7 @@ class MediaFilters:
     end_date: datetime | None = None
     annotation_status: DatasetItemAnnotationStatus | None = None
     label_ids: list[UUID] | None = None
-    subset: str | None = None
+    subset: list[str] | None = None
     sort_by: MediaSortBy = MediaSortBy.UPLOAD_DATE
     sort_direction: SortDirection = SortDirection.DESC
 
@@ -237,7 +237,7 @@ class MediaService(BaseSessionManagedService):
         end_date: datetime | None = None,
         annotation_status: DatasetItemAnnotationStatus | None = None,
         label_ids: list[UUID] | None = None,
-        subset: str | None = None,
+        subset: list[str] | None = None,
         exclude_types: list[MediaType] | None = None,
     ) -> int:
         """Get number of available media (within date range if specified)"""

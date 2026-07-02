@@ -57,7 +57,7 @@ class MediaRepository:
         end_date: datetime | None = None,
         annotation_status: str | None = None,
         label_ids: list[str] | None = None,
-        subset: str | None = None,
+        subset: list[str] | None = None,
         exclude_types: list[MediaType] | None = None,
     ) -> int:
         stmt = (
@@ -86,7 +86,7 @@ class MediaRepository:
         end_date: datetime | None = None,
         annotation_status: str | None = None,
         label_ids: list[str] | None = None,
-        subset: str | None = None,
+        subset: list[str] | None = None,
         exclude_types: list[MediaType] | None = None,
         sort_by: MediaSortBy = MediaSortBy.UPLOAD_DATE,
         sort_direction: SortDirection = SortDirection.DESC,

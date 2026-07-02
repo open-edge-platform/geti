@@ -1286,17 +1286,18 @@ class TestDatasetServiceIntegration:
         "subset, expected_count",
         [
             (None, 8),  # All items
-            ("unassigned", 2),  # 2 unassigned items
-            ("training", 3),  # 3 training items
-            ("validation", 2),  # 2 validation items
-            ("testing", 1),  # 1 testing item
+            (["unassigned"], 2),  # 2 unassigned items
+            (["training"], 3),  # 3 training items
+            (["validation"], 2),  # 2 validation items
+            (["testing"], 1),  # 1 testing item
+            (["training", "validation"], 5),  # 3 training + 2 validation items
         ],
     )
     def test_count_dataset_items_with_subset(
         self,
         fxt_dataset_service: DatasetService,
         fxt_project_with_subset_items: tuple[Project, list[DatasetItemDB]],
-        subset: str | None,
+        subset: list[str] | None,
         expected_count: int,
     ) -> None:
         """Test counting dataset items with subset filter."""
@@ -1322,17 +1323,18 @@ class TestDatasetServiceIntegration:
                     "testing1",
                 ],
             ),
-            ("unassigned", ["unassigned1", "unassigned2"]),
-            ("training", ["training1", "training2", "training3"]),
-            ("validation", ["validation1", "validation2"]),
-            ("testing", ["testing1"]),
+            (["unassigned"], ["unassigned1", "unassigned2"]),
+            (["training"], ["training1", "training2", "training3"]),
+            (["validation"], ["validation1", "validation2"]),
+            (["testing"], ["testing1"]),
+            (["validation", "testing"], ["validation1", "validation2", "testing1"]),
         ],
     )
     def test_list_dataset_items_with_subset(
         self,
         fxt_dataset_service: DatasetService,
         fxt_project_with_subset_items: tuple[Project, list[DatasetItemDB]],
-        subset: str | None,
+        subset: list[str] | None,
         expected_names: list[str],
     ) -> None:
         """Test listing dataset items with subset filter."""
@@ -1352,20 +1354,20 @@ class TestDatasetServiceIntegration:
     @pytest.mark.parametrize(
         "subset, limit, offset, expected_count",
         [
-            ("unassigned", 1, 0, 1),  # First page of unassigned
-            ("unassigned", 1, 1, 1),  # Second page of unassigned
-            ("unassigned", 1, 2, 0),  # Beyond available unassigned items
-            ("training", 2, 0, 2),  # First page of training
-            ("training", 2, 2, 1),  # Second page of training (only 1 left)
-            ("validation", 10, 0, 2),  # All validation items
-            ("testing", 10, 0, 1),  # All testing items
+            (["unassigned"], 1, 0, 1),  # First page of unassigned
+            (["unassigned"], 1, 1, 1),  # Second page of unassigned
+            (["unassigned"], 1, 2, 0),  # Beyond available unassigned items
+            (["training"], 2, 0, 2),  # First page of training
+            (["training"], 2, 2, 1),  # Second page of training (only 1 left)
+            (["validation"], 10, 0, 2),  # All validation items
+            (["testing"], 10, 0, 1),  # All testing items
         ],
     )
     def test_list_dataset_items_with_subset_pagination(
         self,
         fxt_dataset_service: DatasetService,
         fxt_project_with_subset_items: tuple[Project, list[DatasetItemDB]],
-        subset: str | None,
+        subset: list[str] | None,
         limit: int,
         offset: int,
         expected_count: int,
@@ -1398,7 +1400,7 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=20,
                 offset=0,
-                subset="unassigned",
+                subset=["unassigned"],
             ),
         )
         assert len(unassigned_items) == 2
@@ -1411,7 +1413,7 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=20,
                 offset=0,
-                subset="training",
+                subset=["training"],
             ),
         )
         assert len(training_items) == 3
@@ -1424,7 +1426,7 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=20,
                 offset=0,
-                subset="validation",
+                subset=["validation"],
             ),
         )
         assert len(validation_items) == 2
@@ -1437,12 +1439,23 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=20,
                 offset=0,
-                subset="testing",
+                subset=["testing"],
             ),
         )
         assert len(testing_items) == 1
         for item in testing_items:
             assert item.subset == DatasetItemSubset.TESTING
+
+        # Multiple subsets should return the union of matching items
+        training_and_testing_items = fxt_dataset_service.list_dataset_items(
+            project_id=project.id,
+            filters=DatasetItemFilters(
+                limit=20,
+                offset=0,
+                subset=["training", "testing"],
+            ),
+        )
+        assert len(training_and_testing_items) == 4
 
     def test_get_dataset_statistics(
         self,

@@ -60,7 +60,7 @@ class DatasetItemFilters:
     end_date: datetime | None = None
     annotation_status: DatasetItemAnnotationStatus | None = None
     label_ids: list[UUID] | None = None
-    subset: str | None = None
+    subset: list[str] | None = None
     sort_by: DatasetItemSortBy = DatasetItemSortBy.CREATION_DATE
     sort_direction: SortDirection = SortDirection.DESC
 
@@ -122,7 +122,7 @@ class DatasetService(BaseSessionManagedService):
         end_date: datetime | None = None,
         annotation_status: DatasetItemAnnotationStatus | None = None,
         label_ids: list[UUID] | None = None,
-        subset: str | None = None,
+        subset: list[str] | None = None,
     ) -> int:
         """Get number of available dataset items (within date range if specified)"""
         repo = DatasetItemRepository(project_id=str(project.id), db=self.db_session)

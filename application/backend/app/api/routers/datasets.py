@@ -38,7 +38,7 @@ def list_dataset_items(  # noqa: PLR0913
     end_date: Annotated[datetime | None, Query()] = None,
     annotation_status: Annotated[DatasetItemAnnotationStatus | None, Query()] = None,
     labels: Annotated[list[UUID] | None, Query()] = None,
-    subset: Annotated[DatasetItemSubset | None, Query()] = None,
+    subset: Annotated[list[DatasetItemSubset] | None, Query()] = None,
     sort_by: Annotated[DatasetItemSortBy, Query()] = DatasetItemSortBy.CREATION_DATE,
     sort_direction: Annotated[SortDirection, Query()] = SortDirection.DESC,
 ) -> DatasetItemsWithPagination:

@@ -56,7 +56,7 @@ class DatasetItemRepository:
         end_date: datetime | None = None,
         annotation_status: str | None = None,
         label_ids: list[str] | None = None,
-        subset: str | None = None,
+        subset: list[str] | None = None,
     ) -> int:
         # When the query involves a JOIN (e.g. when filtering by labels), count distinct items to avoid duplicates
         if label_ids:
@@ -79,7 +79,7 @@ class DatasetItemRepository:
         end_date: datetime | None = None,
         annotation_status: str | None = None,
         label_ids: list[str] | None = None,
-        subset: str | None = None,
+        subset: list[str] | None = None,
         sort_by: DatasetItemSortBy = DatasetItemSortBy.CREATION_DATE,
         sort_direction: SortDirection = SortDirection.DESC,
     ) -> list[DatasetItemDB]:
@@ -102,7 +102,7 @@ class DatasetItemRepository:
         end_date: datetime | None = None,
         annotation_status: str | None = None,
         label_ids: list[str] | None = None,
-        subset: str | None = None,
+        subset: list[str] | None = None,
     ) -> list[tuple[DatasetItemDB, MediaDB]]:
         stmt = (
             select(DatasetItemDB, MediaDB)

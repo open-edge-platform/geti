@@ -453,7 +453,7 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=subset,
+            subset=[subset],
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -465,7 +465,39 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=subset,
+                subset=[subset],
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+
+    def test_list_media_with_multiple_subsets(
+        self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client
+    ):
+        fxt_media_service.count_media.return_value = 2
+        fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subset=training&subset=validation")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_media_service.count_media.assert_called_once_with(
+            project=fxt_get_project,
+            start_date=None,
+            end_date=None,
+            annotation_status=None,
+            label_ids=None,
+            subset=["training", "validation"],
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+        fxt_media_service.list_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subset=["training", "validation"],
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )

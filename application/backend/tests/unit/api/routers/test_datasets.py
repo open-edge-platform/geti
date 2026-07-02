@@ -211,7 +211,7 @@ class TestDatasetItemEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=subset,
+            subset=[subset],
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -222,7 +222,37 @@ class TestDatasetItemEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=subset,
+                subset=[subset],
+            ),
+        )
+
+    def test_list_dataset_items_with_multiple_subsets(
+        self, fxt_get_project, fxt_dataset_item, fxt_dataset_service, fxt_client
+    ):
+        fxt_dataset_service.count_dataset_items.return_value = 1
+        fxt_dataset_service.list_dataset_items.return_value = [fxt_dataset_item]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items?subset=training&subset=validation")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_dataset_service.count_dataset_items.assert_called_once_with(
+            project=fxt_get_project,
+            start_date=None,
+            end_date=None,
+            annotation_status=None,
+            label_ids=None,
+            subset=["training", "validation"],
+        )
+        fxt_dataset_service.list_dataset_items.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=DatasetItemFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subset=["training", "validation"],
             ),
         )
 
