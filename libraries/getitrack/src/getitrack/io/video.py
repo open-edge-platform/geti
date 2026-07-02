@@ -139,8 +139,12 @@ class VideoWriter:
                 ``frame_size`` given at construction.
 
         Raises:
-            ValueError: If the frame shape does not match ``frame_size``.
+            ValueError: If the frame dtype is not uint8 or its shape does not
+                match ``frame_size``.
         """
+        if frame.dtype != "uint8":
+            msg = f"frame dtype {frame.dtype} does not match expected uint8"
+            raise ValueError(msg)
         expected = (self._frame_size[1], self._frame_size[0], _FRAME_CHANNELS)
         if frame.shape != expected:
             msg = f"frame shape {frame.shape} does not match expected {expected}"

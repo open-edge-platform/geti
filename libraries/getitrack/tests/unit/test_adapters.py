@@ -104,9 +104,11 @@ class TestClassNames:
 class TestPreprocess:
     """Requires torch + getitune; skipped in getitrack-only environments."""
 
-    def _adapter(self, input_size=(64, 96), mean=(0.0, 0.0, 0.0), std=(1.0, 1.0, 1.0)) -> GetiAdapter:
-        model = SimpleNamespace(data_input_params=SimpleNamespace(input_size=input_size, mean=mean, std=std))
-        return GetiAdapter(model)
+    def _adapter(
+        self, input_size=(64, 96), mean=(0.0, 0.0, 0.0), std=(1.0, 1.0, 1.0), intensity_config=None
+    ) -> GetiAdapter:
+        params = SimpleNamespace(input_size=input_size, mean=mean, std=std, intensity_config=intensity_config)
+        return GetiAdapter(SimpleNamespace(data_input_params=params))
 
     def _frame(self, h=480, w=640) -> np.ndarray:
         return np.random.default_rng(0).integers(0, 255, size=(h, w, 3), dtype=np.uint8)
@@ -124,16 +126,20 @@ class TestPreprocess:
         assert float(batch.images.min()) >= -1.0
         assert float(batch.images.max()) <= 1.0
 
-    def test_raw_pixel_range_for_large_means(self):
-        batch = self._adapter(mean=(123.0, 117.0, 104.0), std=(58.0, 57.0, 57.0)).preprocess(self._frame())
-        # Raw 0-255 pixels minus a ~100 mean over a ~57 std exceeds 1.5.
-        assert float(batch.images.max()) > 1.5
+    def test_uint16_scaled_by_intensity_config(self):
+        from getitune.config.data import IntensityConfig
+
+        cfg = IntensityConfig(storage_dtype="uint16", max_value=65535.0)
+        frame = np.full((10, 10, 3), 30000, dtype=np.uint16)
+        batch = self._adapter(input_size=(10, 10), intensity_config=cfg).preprocess(frame)
+        # Raw uint16 value scaled by max_value, not 255.
+        assert float(batch.images.max()) == pytest.approx(30000 / 65535, abs=1e-4)
 
     def test_bgr_to_rgb_conversion(self):
         frame = np.zeros((10, 10, 3), dtype=np.uint8)
         frame[:, :, 0] = 255  # blue channel in BGR
         batch = self._adapter(input_size=(10, 10)).preprocess(frame)
-        # mean 0.0 < 1.0 triggers the 0-1 branch, so blue becomes 1.0 in channel 2.
+        # No intensity config -> uint8 scaling, so blue (255/255) becomes 1.0 in channel 2.
         assert float(batch.images[0, 2].min()) == 1.0
         assert float(batch.images[0, 0].max()) == 0.0
 
@@ -142,7 +148,9 @@ class TestPreprocess:
 class TestDetect:
     def test_full_round_trip(self):
         class _FakeModel:
-            data_input_params = SimpleNamespace(input_size=(32, 32), mean=(0.0, 0.0, 0.0), std=(1.0, 1.0, 1.0))
+            data_input_params = SimpleNamespace(
+                input_size=(32, 32), mean=(0.0, 0.0, 0.0), std=(1.0, 1.0, 1.0), intensity_config=None
+            )
 
             def predict_step(self, batch, batch_idx) -> SimpleNamespace:
                 assert tuple(batch.images.shape) == (1, 3, 32, 32)

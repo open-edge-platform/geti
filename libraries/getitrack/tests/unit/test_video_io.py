@@ -64,6 +64,12 @@ class TestVideoWriter:
             with pytest.raises(ValueError, match="does not match"):
                 writer.write(bad)
 
+    def test_wrong_frame_dtype_raises(self, tmp_path):
+        with VideoWriter(tmp_path / "out.mp4", fps=30.0, frame_size=(_W, _H)) as writer:
+            bad = np.zeros((_H, _W, 3), dtype=np.float32)
+            with pytest.raises(ValueError, match="dtype"):
+                writer.write(bad)
+
     def test_creates_parent_directories(self, tmp_path):
         nested = tmp_path / "a" / "b" / "out.mp4"
         with VideoWriter(nested, fps=30.0, frame_size=(_W, _H)) as writer:

@@ -21,10 +21,31 @@ from getitrack.core.detection import Detections
 if TYPE_CHECKING:
     import torch
     from getitune.backend.lightning.models.detection.base import LightningDetectionModel
+    from getitune.config.data import IntensityConfig
     from getitune.data.entity import PredictionBatch, SampleBatch
 
 # Matches getitune placeholder class names like "label_0", "label_1".
 _PLACEHOLDER_NAME = re.compile(r"^label_\d+$")
+
+# Raw-value divisor per storage dtype for ``scale_to_unit`` intensity mapping.
+_DTYPE_MAX_VALUE = {"uint8": 255.0, "uint16": 65535.0, "int16": 32767.0, "float32": 1.0}
+
+
+def _intensity_scale(intensity_config: IntensityConfig | None) -> float:
+    """Return the divisor mapping raw pixels to ``[0, 1]`` for the model's inputs.
+
+    Reads the getitune ``intensity_config``; defaults to uint8 (255) when unset.
+    Only ``scale_to_unit`` mode is supported, with the raw max taken from
+    ``max_value`` or the storage dtype.
+    """
+    if intensity_config is None:
+        return 255.0
+    if intensity_config.mode != "scale_to_unit":
+        msg = f"GetiAdapter supports intensity mode 'scale_to_unit', got '{intensity_config.mode}'"
+        raise NotImplementedError(msg)
+    if intensity_config.max_value is not None:
+        return float(intensity_config.max_value)
+    return _DTYPE_MAX_VALUE.get(intensity_config.storage_dtype, 255.0)
 
 
 class GetiAdapter(DetectionAdapter):
@@ -49,6 +70,9 @@ class GetiAdapter(DetectionAdapter):
         """
         self.model = model
         self.device = device
+        # (mean, std) normalization tensors, built lazily on the first frame and
+        # reused since the model's mean/std are fixed. None keeps torch out of __init__.
+        self._norm: tuple[torch.Tensor, torch.Tensor] | None = None
 
     @property
     def class_names(self) -> dict[int, str] | None:
@@ -87,14 +111,14 @@ class GetiAdapter(DetectionAdapter):
     def preprocess(self, frame_bgr: np.ndarray) -> SampleBatch:
         """Preprocess a BGR frame into a getitune ``SampleBatch``.
 
-        Applies the resize and normalization described by the model's
-        ``data_input_params`` and sets ``scale_factor`` so predicted
-        boxes map back to the original frame coordinates. Requires
-        getitune and torch.
+        Resizes to the model's input size, maps raw pixels to ``[0, 1]`` using
+        the model's ``intensity_config`` (uint8 or uint16 inputs), applies the
+        model's mean/std, and sets ``scale_factor`` so predicted boxes map back
+        to the original frame coordinates. Requires getitune and torch.
 
         Args:
-            frame_bgr: ``(H, W, 3)`` uint8 frame in BGR order, e.g. from
-                ``cv2.VideoCapture``.
+            frame_bgr: ``(H, W, 3)`` uint8 or uint16 frame in BGR order, e.g.
+                from ``cv2.VideoCapture``.
 
         Returns:
             A single-image getitune ``SampleBatch`` on ``self.device``.
@@ -102,18 +126,19 @@ class GetiAdapter(DetectionAdapter):
         import torch
         from getitune.data.entity import ImageInfo, SampleBatch
 
-        inp_h, inp_w = self.model.data_input_params.input_size
-        mean = self.model.data_input_params.mean
-        std = self.model.data_input_params.std
+        params = self.model.data_input_params
+        inp_h, inp_w = params.input_size
         ori_h, ori_w = frame_bgr.shape[:2]
 
+        if self._norm is None:
+            self._norm = (torch.tensor(params.mean).view(3, 1, 1), torch.tensor(params.std).view(3, 1, 1))
+        mean_t, std_t = self._norm
+
         rgb = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
-        tensor = torch.from_numpy(cv2.resize(rgb, (inp_w, inp_h))).permute(2, 0, 1).float()
-        # Mean values below 1.0 indicate the model expects 0-1 normalized pixels
-        # (e.g. RF-DETR); otherwise it expects the raw 0-255 range (e.g. YOLOX).
-        if all(m < 1.0 for m in mean):
-            tensor = tensor / 255.0
-        tensor = (tensor - torch.tensor(mean).view(3, 1, 1)) / torch.tensor(std).view(3, 1, 1)
+        resized = cv2.resize(rgb, (inp_w, inp_h)).astype(np.float32)
+        tensor = torch.from_numpy(resized).permute(2, 0, 1)
+        tensor = tensor / _intensity_scale(params.intensity_config)
+        tensor = (tensor - mean_t) / std_t
 
         img_info = ImageInfo(
             img_idx=0,
