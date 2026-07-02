@@ -145,8 +145,15 @@ def get_pipeline_health(
     source_status = source_status_service.get_status(source_id=pipeline.source_id) if pipeline.source_id else None
     sink_status = sink_status_service.get_status(sink_id=pipeline.sink_id) if pipeline.sink_id else None
     inference_status = inference_status_service.get_status(model_id=pipeline.model_id) if pipeline.model_id else None
-    return PipelineHealth.running(
-        source_status=source_status, sink_status=sink_status, inference_status=inference_status
+    if not source_status or not sink_status or not inference_status:
+        return PipelineHealth.idle()
+    status = (
+        PipelineStatus.ERROR
+        if source_status.is_error() or sink_status.is_error() or inference_status.is_error()
+        else PipelineStatus.RUNNING
+    )
+    return PipelineHealth.create(
+        status=status, source_status=source_status, sink_status=sink_status, inference_status=inference_status
     )
 
 

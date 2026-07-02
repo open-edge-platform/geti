@@ -176,6 +176,50 @@ class TestPipelineEndpoints:
         fxt_sink_status_service.get_status.assert_called_once_with(sink_id=sink_id)
         fxt_inference_status_service.get_status.assert_called_once_with(model_id=model_id)
 
+    def test_get_pipeline_health_error(
+        self,
+        fxt_pipeline,
+        fxt_pipeline_service,
+        fxt_source_status_service,
+        fxt_sink_status_service,
+        fxt_inference_status_service,
+        fxt_client,
+    ):
+        """When any component reports an error, the overall health status is 'error'."""
+        project_id = fxt_pipeline.project_id
+        source_id, sink_id, model_id = uuid4(), uuid4(), uuid4()
+        running_pipeline = MagicMock()
+        running_pipeline.status = PipelineStatus.RUNNING
+        running_pipeline.source_id = source_id
+        running_pipeline.sink_id = sink_id
+        running_pipeline.model_id = model_id
+        fxt_pipeline_service.get_pipeline_by_id.return_value = running_pipeline
+
+        fxt_source_status_service.get_status.return_value = SourceStatus(
+            code=SourceStatusCode.OK, source_id=source_id, message="streaming"
+        )
+        fxt_sink_status_service.get_status.return_value = SinkStatus(
+            code=SinkStatusCode.ERROR, sink_id=sink_id, message="connection refused"
+        )
+        fxt_inference_status_service.get_status.return_value = InferenceWorkerStatus(
+            code=InferenceWorkerStatusCode.OK, model_id=model_id, message="inferring"
+        )
+
+        response = fxt_client.get(f"/api/projects/{project_id}/pipeline/health")
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data["status"] == PipelineStatus.ERROR
+        assert response_data["components"]["source"]["status"] == SourceStatusCode.OK
+        assert response_data["components"]["sink"]["status"] == SinkStatusCode.ERROR
+        assert response_data["components"]["sink"]["message"] == "connection refused"
+        assert response_data["components"]["model"]["status"] == InferenceWorkerStatusCode.OK
+
+        fxt_pipeline_service.get_pipeline_by_id.assert_called_once_with(project_id)
+        fxt_source_status_service.get_status.assert_called_once_with(source_id=source_id)
+        fxt_sink_status_service.get_status.assert_called_once_with(sink_id=sink_id)
+        fxt_inference_status_service.get_status.assert_called_once_with(model_id=model_id)
+
     def test_get_pipeline_health_running_components_unavailable(
         self,
         fxt_pipeline,
@@ -185,7 +229,7 @@ class TestPipelineEndpoints:
         fxt_inference_status_service,
         fxt_client,
     ):
-        """When the pipeline is running but a status is missing, the component reports 'unavailable'."""
+        """When the pipeline is running but a component status is missing, health falls back to 'idle'."""
         project_id = fxt_pipeline.project_id
         running_pipeline = MagicMock()
         running_pipeline.status = PipelineStatus.RUNNING
@@ -202,10 +246,8 @@ class TestPipelineEndpoints:
 
         assert response.status_code == status.HTTP_200_OK
         response_data = response.json()
-        assert response_data["status"] == PipelineStatus.RUNNING
-        assert response_data["components"]["source"]["status"] == "unavailable"
-        assert response_data["components"]["sink"]["status"] == "unavailable"
-        assert response_data["components"]["model"]["status"] == "unavailable"
+        assert response_data["status"] == PipelineStatus.IDLE
+        assert response_data["components"] is None
 
     def test_update_pipeline_success(self, fxt_pipeline, fxt_pipeline_service, fxt_client):
         project_id, sink_id = fxt_pipeline.project_id, str(uuid4())

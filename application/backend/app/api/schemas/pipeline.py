@@ -47,13 +47,14 @@ class PipelineHealth(BaseModel):
         return PipelineHealth(status=PipelineStatus.IDLE)
 
     @staticmethod
-    def running(
+    def create(
+        status: PipelineStatus,
         source_status: SourceStatus | None,
         sink_status: SinkStatus | None,
         inference_status: InferenceWorkerStatus | None,
     ) -> PipelineHealth:
         return PipelineHealth(
-            status=PipelineStatus.RUNNING,
+            status=status,
             components=PipelineComponentsHealth(
                 source=Status(
                     status=source_status.code, message=source_status.message, updated_at=source_status.timestamp

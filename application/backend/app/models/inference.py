@@ -91,3 +91,6 @@ class InferenceWorkerStatus(BaseModel):
     model_id: UUID
     message: str | None = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    def is_error(self) -> bool:
+        return self.code == InferenceWorkerStatusCode.ERROR
