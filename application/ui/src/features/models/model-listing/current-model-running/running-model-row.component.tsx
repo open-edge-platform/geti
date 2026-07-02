@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { AlertDialog, Button, DialogContainer, Flex, Grid, Loading, Tag, Text } from '@geti/ui';
+import { AlertDialog, Button, DialogContainer, Flex, Grid, Loading, Tag, Text } from '@geti-ui/ui';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
@@ -11,6 +11,7 @@ import { isTrainJob } from 'hooks/api/util';
 import { capitalize } from 'lodash-es';
 
 import { DatasetRevision, Job, ModelArchitectureWithPerformanceCategory } from '../../../../constants/shared-types';
+import { formatDateTime } from '../../../../shared/date-utils';
 import { useGetModel } from '../../hooks/api/use-get-model.hook';
 import { TrainingLogsDialog } from '../../training-logs/training-logs-dialog.component';
 import { ArchitectureColumn } from '../components/model-row/architecture-column.component';
@@ -116,9 +117,7 @@ export const RunningModelRow = ({
             ? labelSchemaRevision.labels.length
             : undefined;
 
-    const formattedStartedAt = job.started_at
-        ? dayjs(job.started_at).format('DD MMM YYYY, hh:mm A')
-        : 'Waiting to start...';
+    const formattedStartedAt = job.started_at ? formatDateTime(job.started_at) : 'Waiting to start...';
 
     const statusMessage = job.message || (job.status === 'PENDING' ? 'Pending...' : 'Running...');
 

@@ -1,18 +1,18 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Badge, Flex, Grid, Text } from '@geti/ui';
+import { Badge, Flex, Grid, Text } from '@geti-ui/ui';
 
 import type {
     DatasetRevision,
     Model,
     ModelArchitectureWithPerformanceCategory,
 } from '../../../../../constants/shared-types';
+import { formatTrainingDateTime } from '../../../../../shared/date-utils';
 import { formatBytes } from '../../../../../shared/util';
 import { GRID_COLUMNS } from '../../constants';
 import { AccuracyIndicator } from '../../model-variants/accuracy-indicator/accuracy-indicator.component';
 import { type GroupByMode } from '../../types';
-import { formatTrainingDateTime } from '../../utils/date-formatting';
 import { hasDeletedWeights, isFailedModel } from '../../utils/utils';
 import { ParentRevisionModel } from '../parent-revision-model.component';
 import { ArchitectureColumn } from './architecture-column.component';
