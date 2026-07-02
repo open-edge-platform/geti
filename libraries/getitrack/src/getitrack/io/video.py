@@ -126,6 +126,7 @@ class VideoWriter:
         fourcc = cv2.VideoWriter.fourcc(*codec)
         self._writer = cv2.VideoWriter(str(self.path), fourcc, fps, frame_size)
         if not self._writer.isOpened():
+            self._writer.release()
             msg = f"OpenCV could not open video for writing: {self.path} (codec '{codec}')"
             raise ValueError(msg)
         self.frames_written = 0
