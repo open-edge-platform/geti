@@ -355,8 +355,10 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             # Build a TileConfig, and wrap each subset dataset with the tiling factory (if tiling is enabled).
             tile_cfg_data = getitune_training_config["data"].get("tile_config", {})
             tile_config = TileConfig(**tile_cfg_data)
+            logger.info("Tiling is set to {}", tile_config.enable_tiler)
             if tile_config.enable_tiler and getitune_task_type in (TaskType.DETECTION, TaskType.INSTANCE_SEGMENTATION):
-                logger.info("Tiling is enabled - wrapping subset datasets with TileDatasetFactory")
+                logger.info("TileConfig for training: {}", tile_config)
+                logger.info("Wrapping subset datasets with TileDatasetFactory")
                 getitune_training_dataset = TileDatasetFactory.create(
                     dataset=getitune_training_dataset, tile_config=tile_config
                 )

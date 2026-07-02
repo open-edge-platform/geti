@@ -146,6 +146,19 @@ class TileConfig:
     object_tile_ratio: float = 0.03
     sampling_ratio: float = 1.0
 
+    def __repr__(self):
+        """Return a string representation of the TileConfig instance."""
+        return (
+            f"TileConfig(enable_tiler={self.enable_tiler}, "
+            f"enable_adaptive_tiling={self.enable_adaptive_tiling}, "
+            f"tile_size={self.tile_size}, "
+            f"overlap={self.overlap}, "
+            f"iou_threshold={self.iou_threshold}, "
+            f"max_num_instances={self.max_num_instances}, "
+            f"object_tile_ratio={self.object_tile_ratio}, "
+            f"sampling_ratio={self.sampling_ratio})"
+        )
+
     def clone(self) -> TileConfig:
         """Return a deep copied one of this instance."""
         return deepcopy(self)
