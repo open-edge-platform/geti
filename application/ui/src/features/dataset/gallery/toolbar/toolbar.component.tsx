@@ -59,18 +59,14 @@ const SortMediaByUploadDate = () => {
 
     if (sortDirection === 'asc') {
         return (
-            <ActionButton
-                isQuiet
-                onPress={() => setSortDirection('desc')}
-                aria-label={'sort by upload date descending'}
-            >
+            <ActionButton isQuiet onPress={() => setSortDirection('desc')}>
                 Oldest first <SortUp />
             </ActionButton>
         );
     }
 
     return (
-        <ActionButton isQuiet onPress={() => setSortDirection('asc')} aria-label={'sort by upload date ascending'}>
+        <ActionButton isQuiet onPress={() => setSortDirection('asc')}>
             Newest first <SortDown />
         </ActionButton>
     );

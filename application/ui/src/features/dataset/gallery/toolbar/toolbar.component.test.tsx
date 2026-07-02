@@ -240,7 +240,7 @@ describe('Toolbar', () => {
     it('shows "Newest first" sort button by default', async () => {
         await renderToolbar();
 
-        const sortButton = screen.getByRole('button', { name: 'sort by upload date ascending' });
+        const sortButton = screen.getByRole('button', { name: 'Newest first' });
 
         expect(sortButton).toHaveTextContent('Newest first');
     });
@@ -248,15 +248,15 @@ describe('Toolbar', () => {
     it('toggles the sort button label between "Newest first" and "Oldest first" when clicked', async () => {
         await renderToolbar();
 
-        const newestFirstButton = screen.getByRole('button', { name: 'sort by upload date ascending' });
+        const newestFirstButton = screen.getByRole('button', { name: 'Newest first' });
         fireEvent.click(newestFirstButton);
 
-        const oldestFirstButton = await screen.findByRole('button', { name: 'sort by upload date descending' });
+        const oldestFirstButton = await screen.findByRole('button', { name: 'Oldest first' });
         expect(oldestFirstButton).toHaveTextContent('Oldest first');
 
         fireEvent.click(oldestFirstButton);
 
-        const newestFirstButton2 = await screen.findByRole('button', { name: 'sort by upload date ascending' });
+        const newestFirstButton2 = await screen.findByRole('button', { name: 'Newest first' });
         expect(newestFirstButton2).toHaveTextContent('Newest first');
     });
 });
