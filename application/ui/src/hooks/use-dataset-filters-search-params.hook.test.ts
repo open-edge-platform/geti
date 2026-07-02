@@ -191,6 +191,24 @@ describe('useDatasetFiltersSearchParams', () => {
             expect(result.current.selectedSubsets).toEqual(['training']);
         });
 
+        it('trims whitespace around each value before validating', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: `/projects/123?${SUBSET_PARAM}=${encodeURIComponent('training, validation , testing')}`,
+                path: '/projects/:projectId',
+            });
+
+            expect(result.current.selectedSubsets).toEqual(['training', 'validation', 'testing']);
+        });
+
+        it('deduplicates repeated values', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: `/projects/123?${SUBSET_PARAM}=training,validation,training`,
+                path: '/projects/:projectId',
+            });
+
+            expect(result.current.selectedSubsets).toEqual(['training', 'validation']);
+        });
+
         it('returns empty array when the param is entirely invalid', () => {
             const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
                 route: `/projects/123?${SUBSET_PARAM}=invalid`,
