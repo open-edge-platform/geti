@@ -26,6 +26,8 @@ export const ActiveFilters = () => {
         setStartDate,
         endDate,
         setEndDate,
+        selectedSubsets,
+        setSelectedSubsets,
     } = useDatasetFiltersSearchParams();
 
     const selectedLabels = selectedLabelIds
@@ -33,7 +35,11 @@ export const ActiveFilters = () => {
         .filter(Boolean) as Label[];
 
     const hasActiveFilters =
-        !isEmpty(selectedLabelIds) || annotationStatus !== null || startDate !== null || endDate !== null;
+        !isEmpty(selectedLabelIds) ||
+        annotationStatus !== null ||
+        startDate !== null ||
+        endDate !== null ||
+        !isEmpty(selectedSubsets);
 
     if (!hasActiveFilters) {
         return null;
@@ -48,6 +54,7 @@ export const ActiveFilters = () => {
         setAnnotationStatus(null);
         setStartDate(null);
         setEndDate(null);
+        setSelectedSubsets([]);
     };
 
     return (
@@ -74,6 +81,15 @@ export const ActiveFilters = () => {
             )}
 
             {endDate !== null && <FilterChips name={formatDateRangeEnd(endDate)} onClose={() => setEndDate(null)} />}
+
+            {!isEmpty(selectedSubsets) &&
+                selectedSubsets.map((subset) => (
+                    <FilterChips
+                        key={subset}
+                        name={subset}
+                        onClose={() => setSelectedSubsets(selectedSubsets.filter((sub) => sub !== subset))}
+                    />
+                ))}
         </Flex>
     );
 };

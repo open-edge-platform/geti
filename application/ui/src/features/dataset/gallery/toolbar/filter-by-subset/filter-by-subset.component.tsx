@@ -7,7 +7,6 @@ import { isEmpty } from 'lodash-es';
 
 import { MultiSelectList } from '../../../../../components/multi-select-list/multi-select-list.component';
 import { DatasetSubset } from '../../../../../constants/shared-types';
-import { FilterChips } from '../filter-chips/filter-chips.component';
 
 import classes from './filter-by-subset.module.scss';
 
@@ -18,20 +17,16 @@ const SUBSET_OPTIONS: { id: DatasetSubset; name: string }[] = [
     { id: 'unassigned', name: 'Unassigned' },
 ];
 
+const pluralRules = new Intl.PluralRules('en');
+
 export const FilterBySubset = () => {
     const { selectedSubsets, setSelectedSubsets } = useDatasetFiltersSearchParams();
 
     const handleSelectionChange = (selectedKeys: Set<string> | 'all') => {
         const subsets =
-            selectedKeys === 'all'
-                ? SUBSET_OPTIONS.map(({ id }) => id)
-                : (Array.from(selectedKeys) as DatasetSubset[]);
+            selectedKeys === 'all' ? SUBSET_OPTIONS.map(({ id }) => id) : (Array.from(selectedKeys) as DatasetSubset[]);
 
         setSelectedSubsets(subsets);
-    };
-
-    const handleRemoveFilter = (subset: DatasetSubset) => {
-        setSelectedSubsets(selectedSubsets.filter((selectedSubset) => selectedSubset !== subset));
     };
 
     const selectedOptions = SUBSET_OPTIONS.filter(({ id }) => selectedSubsets.includes(id));
@@ -48,16 +43,12 @@ export const FilterBySubset = () => {
                         alignItems={'center'}
                         UNSAFE_className={classes.filterContainer}
                     >
-                        {selectedOptions.map((option) => (
-                            <FilterChips
-                                key={option.id}
-                                name={option.name}
-                                onClose={() => handleRemoveFilter(option.id)}
-                            />
-                        ))}
-
-                        {isEmpty(selectedOptions) && (
-                            <Text UNSAFE_className={classes.searchPlaceholder}>All subsets</Text>
+                        {isEmpty(selectedOptions) ? (
+                            <Text UNSAFE_className={classes.searchPlaceholder}>Filter by subset</Text>
+                        ) : (
+                            <Text>{`${selectedSubsets.length} ${
+                                pluralRules.select(selectedSubsets.length) === 'one' ? 'subset' : 'subsets'
+                            } selected`}</Text>
                         )}
                     </Flex>
                 </div>
@@ -77,4 +68,3 @@ export const FilterBySubset = () => {
         </DialogTrigger>
     );
 };
-
