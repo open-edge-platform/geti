@@ -437,18 +437,28 @@ def generate_markdown(report: BenchmarkReport) -> str:
         # Use a standard set: primary accuracy metric, train time, GPU mem, test latency
         metric_cols = _detect_metric_columns(comps)
 
-        header = "| Model | Dataset | Scenario "
+        header = "| Model | Dataset | Status "
         separator = "| --- | --- | --- "
         for col_label, _, _ in metric_cols:
             header += f"| {col_label} "
             separator += "| --- "
-        header += "| Status |"
-        separator += "| --- |"
+        header += "|"
+        separator += "|"
         lines.append(header)
         lines.append(separator)
 
         for comp in sorted(comps, key=lambda c: (c.model, c.dataset, c.scenario)):
-            row = f"| {comp.model} | {comp.dataset} | {comp.scenario} "
+            # Status column with regression details
+            status_detail = comp.status_emoji
+            regression_details = [r for r in comp.regressions if r.status == "regression"]
+            if regression_details:
+                detail_parts = []
+                for r in regression_details:
+                    short_metric = r.metric.rsplit("/", 1)[-1] if "/" in r.metric else r.metric
+                    detail_parts.append(f"{short_metric} {r.delta_pct}")
+                status_detail += " " + ", ".join(detail_parts)
+
+            row = f"| {comp.model} | {comp.dataset} | {status_detail} "
 
             for _col_label, metric_key, fmt_fn in metric_cols:
                 value = comp.current_metrics.get(metric_key)
@@ -465,17 +475,7 @@ def generate_markdown(report: BenchmarkReport) -> str:
 
                 row += f"| {formatted}{delta_str} "
 
-            # Status column with regression details
-            status_detail = comp.status_emoji
-            regression_details = [r for r in comp.regressions if r.status == "regression"]
-            if regression_details:
-                detail_parts = []
-                for r in regression_details:
-                    short_metric = r.metric.rsplit("/", 1)[-1] if "/" in r.metric else r.metric
-                    detail_parts.append(f"{short_metric} {r.delta_pct}")
-                status_detail += " " + ", ".join(detail_parts)
-
-            row += f"| {status_detail} |"
+            row += "|"
             lines.append(row)
 
         lines.append("")
