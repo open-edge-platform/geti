@@ -242,8 +242,8 @@ describe('useDatasetFiltersSearchParams', () => {
         });
     });
 
-
-    describe('date filters', () => {        it('returns null startDate and endDate when no params are present', () => {
+    describe('date filters', () => {
+        it('returns null startDate and endDate when no params are present', () => {
             const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
                 route: '/projects/123',
                 path: '/projects/:projectId',

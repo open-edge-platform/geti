@@ -8,8 +8,7 @@ import { useGetDatasetItemsById } from './use-get-dataset-items-by-id.hook';
 import { useGetDatasetMediaItems } from './use-get-dataset-media-items.hook';
 
 export const useDatasetMediaWithReviewStatus = () => {
-    const { selectedLabelIds, annotationStatus, startDate, endDate, selectedSubsets } =
-        useDatasetFiltersSearchParams();
+    const { selectedLabelIds, annotationStatus, startDate, endDate, selectedSubsets } = useDatasetFiltersSearchParams();
 
     // The backend filtering endpoints only accept a single `subset` value. Until they support
     // filtering by multiple subsets, we only forward the filter when exactly one subset is selected.
