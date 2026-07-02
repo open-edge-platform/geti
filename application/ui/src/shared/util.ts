@@ -25,6 +25,9 @@ export const formatBytes = (bytes: number): string => prettyBytes(bytes);
 
 export const pluralizeItems = (count: number) => (pluralRules.select(count) === 'one' ? 'item' : 'items');
 
+export const pluralize = (count: number, singular: string, plural: string): string =>
+    pluralRules.select(count) === 'one' ? singular : plural;
+
 export function assertIsNotNullable<T>(value: T | null | undefined, name = 'value'): asserts value is T {
     if (value === null || value === undefined) {
         throw new Error(`${name} must not be null or undefined`);

@@ -20,7 +20,7 @@ interface MultiSelectListProps
     label?: string;
     selectAllLabel?: string;
     defaultSelectedKeys: Set<string>;
-    onSelectionChange?: (selectedKeys: Set<string> | 'all') => void;
+    onSelectionChange?: (selectedIds: string[]) => void;
     items: { id: string; name: string }[];
 }
 
@@ -40,13 +40,13 @@ export const MultiSelectList = ({
     const handleSelectAllItems = (isSelected: boolean) => {
         const selectedItems = isSelected ? new Set(items.map(({ id }) => id)) : new Set<string>();
         setSelectedLabels(selectedItems);
-        onSelectionChange?.(selectedItems);
+        onSelectionChange?.(Array.from(selectedItems));
     };
 
     const handleSelectChange = (keys: Selection) => {
         const selection = keys === 'all' ? new Set(items.map(({ id }) => id)) : new Set(keys as Set<string>);
         setSelectedLabels(selection);
-        onSelectionChange?.(selection);
+        onSelectionChange?.(Array.from(selection));
     };
 
     return (

@@ -97,8 +97,8 @@ describe('ActiveFilters', () => {
 
         render(<ActiveFilters />);
 
-        expect(screen.getByText('training')).toBeVisible();
-        expect(screen.getByText('validation')).toBeVisible();
+        expect(screen.getByText('Subset: training')).toBeVisible();
+        expect(screen.getByText('Subset: validation')).toBeVisible();
     });
 
     it('removes only the clicked label when its chip is closed', () => {

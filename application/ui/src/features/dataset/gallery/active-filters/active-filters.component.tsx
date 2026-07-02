@@ -86,7 +86,7 @@ export const ActiveFilters = () => {
                 selectedSubsets.map((subset) => (
                     <FilterChips
                         key={subset}
-                        name={subset}
+                        name={`Subset: ${subset}`}
                         onClose={() => setSelectedSubsets(selectedSubsets.filter((sub) => sub !== subset))}
                     />
                 ))}
