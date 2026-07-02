@@ -10,8 +10,16 @@ from sqlalchemy.orm import Session
 
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB
 from app.models import DatasetItemSubset
+from app.models.dataset_item import DatasetItemSortBy
+from app.models.media import SortDirection
 
 from .filters import _apply_annotation_status_filter, _apply_subset_filter
+
+# Maps each sortable field to its underlying DB column. Extend this when a new
+# `DatasetItemSortBy` member is introduced.
+_SORT_BY_COLUMN = {
+    DatasetItemSortBy.CREATION_DATE: DatasetItemDB.created_at,
+}
 
 
 class DatasetItemRepository:
@@ -63,7 +71,7 @@ class DatasetItemRepository:
             stmt = stmt.join(DatasetItemLabelDB).where(DatasetItemLabelDB.label_id.in_(label_ids))
         return self.db.scalar(stmt) or 0
 
-    def list_items(
+    def list_items(  # noqa: PLR0913
         self,
         limit: int,
         offset: int,
@@ -72,6 +80,8 @@ class DatasetItemRepository:
         annotation_status: str | None = None,
         label_ids: list[str] | None = None,
         subset: str | None = None,
+        sort_by: DatasetItemSortBy = DatasetItemSortBy.CREATION_DATE,
+        sort_direction: SortDirection = SortDirection.DESC,
     ) -> list[DatasetItemDB]:
         stmt = self._base_select()
         stmt = self._apply_date_filters(stmt, start_date, end_date)
@@ -79,7 +89,9 @@ class DatasetItemRepository:
         stmt = _apply_subset_filter(stmt, subset)
         if label_ids:
             stmt = stmt.join(DatasetItemLabelDB).where(DatasetItemLabelDB.label_id.in_(label_ids)).distinct()
-        stmt = stmt.order_by(DatasetItemDB.created_at.desc()).offset(offset).limit(limit)
+        sort_column = _SORT_BY_COLUMN[sort_by]
+        order_by_column = sort_column.asc() if sort_direction == SortDirection.ASC else sort_column.desc()
+        stmt = stmt.order_by(order_by_column).offset(offset).limit(limit)
         return list(self.db.scalars(stmt).all())
 
     def list_items_with_media(

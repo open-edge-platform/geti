@@ -26,7 +26,8 @@ from app.models import (
     TaskType,
 )
 from app.models.dataset import DatasetStatistics
-from app.models.media import MediaAdapter, VideoFrame
+from app.models.dataset_item import DatasetItemSortBy
+from app.models.media import MediaAdapter, SortDirection, VideoFrame
 from app.repositories import DatasetItemRepository
 from app.services.media_service import MediaService
 
@@ -60,6 +61,8 @@ class DatasetItemFilters:
     annotation_status: DatasetItemAnnotationStatus | None = None
     label_ids: list[UUID] | None = None
     subset: str | None = None
+    sort_by: DatasetItemSortBy = DatasetItemSortBy.CREATION_DATE
+    sort_direction: SortDirection = SortDirection.DESC
 
 
 class DatasetService(BaseSessionManagedService):
@@ -158,6 +161,8 @@ class DatasetService(BaseSessionManagedService):
                 annotation_status=filters.annotation_status,
                 label_ids=label_ids_str,
                 subset=filters.subset,
+                sort_by=filters.sort_by,
+                sort_direction=filters.sort_direction,
             )
         ]
 

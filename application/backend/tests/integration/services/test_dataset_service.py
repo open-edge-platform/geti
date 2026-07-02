@@ -23,7 +23,8 @@ from app.models import (
     Video,
     VideoFrame,
 )
-from app.models.media import MediaAdapter
+from app.models.dataset_item import DatasetItemSortBy
+from app.models.media import MediaAdapter, SortDirection
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.dataset_service import DatasetItemFilters, DatasetService, SubsetAlreadyAssignedError
 from app.services.media_service import MediaService
@@ -707,6 +708,44 @@ class TestDatasetServiceIntegration:
             if start_date_out_of_range or end_date_out_of_range or limit_out_of_range or offset_out_of_range
             else len(db_dataset_items)
         )
+
+    def test_list_dataset_items_default_sort_direction_is_newest_first(
+        self,
+        fxt_dataset_service: DatasetService,
+        fxt_project_with_subset_items: tuple[Project, list[DatasetItemDB]],
+    ) -> None:
+        """Test that dataset items are sorted newest-first by default."""
+        project, db_dataset_items = fxt_project_with_subset_items
+
+        dataset_items = fxt_dataset_service.list_dataset_items(
+            project_id=project.id,
+            filters=DatasetItemFilters(limit=len(db_dataset_items)),
+        )
+
+        assert [str(item.id) for item in dataset_items] == [
+            str(db_dataset_item.id) for db_dataset_item in reversed(db_dataset_items)
+        ]
+
+    def test_list_dataset_items_sort_direction_ascending(
+        self,
+        fxt_dataset_service: DatasetService,
+        fxt_project_with_subset_items: tuple[Project, list[DatasetItemDB]],
+    ) -> None:
+        """Test that dataset items can be sorted oldest-first."""
+        project, db_dataset_items = fxt_project_with_subset_items
+
+        dataset_items = fxt_dataset_service.list_dataset_items(
+            project_id=project.id,
+            filters=DatasetItemFilters(
+                limit=len(db_dataset_items),
+                sort_by=DatasetItemSortBy.CREATION_DATE,
+                sort_direction=SortDirection.ASC,
+            ),
+        )
+
+        assert [str(item.id) for item in dataset_items] == [
+            str(db_dataset_item.id) for db_dataset_item in db_dataset_items
+        ]
 
     @pytest.mark.parametrize("limit, limit_out_of_range", [(10, False), (0, True)])
     @pytest.mark.parametrize("offset, offset_out_of_range", [(0, False), (10, True)])
