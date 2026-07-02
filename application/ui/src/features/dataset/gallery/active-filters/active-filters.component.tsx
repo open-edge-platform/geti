@@ -8,6 +8,7 @@ import { isEmpty } from 'lodash-es';
 
 import type { DatasetItemAnnotationStatus, Label } from '../../../../constants/shared-types';
 import { formatDateRangeEnd, formatDateRangeStart } from '../../../../shared/date-utils';
+import { isNonEmptyArray } from '../../../../shared/util';
 import { FilterChips } from '../toolbar/filter-chips/filter-chips.component';
 
 const ANNOTATION_STATUS_LABELS: Record<DatasetItemAnnotationStatus, string> = {
@@ -26,6 +27,8 @@ export const ActiveFilters = () => {
         setStartDate,
         endDate,
         setEndDate,
+        selectedSubsets,
+        setSelectedSubsets,
     } = useDatasetFiltersSearchParams();
 
     const selectedLabels = selectedLabelIds
@@ -33,7 +36,11 @@ export const ActiveFilters = () => {
         .filter(Boolean) as Label[];
 
     const hasActiveFilters =
-        !isEmpty(selectedLabelIds) || annotationStatus !== null || startDate !== null || endDate !== null;
+        !isEmpty(selectedLabelIds) ||
+        annotationStatus !== null ||
+        startDate !== null ||
+        endDate !== null ||
+        !isEmpty(selectedSubsets);
 
     if (!hasActiveFilters) {
         return null;
@@ -48,6 +55,7 @@ export const ActiveFilters = () => {
         setAnnotationStatus(null);
         setStartDate(null);
         setEndDate(null);
+        setSelectedSubsets([]);
     };
 
     return (
@@ -74,6 +82,15 @@ export const ActiveFilters = () => {
             )}
 
             {endDate !== null && <FilterChips name={formatDateRangeEnd(endDate)} onClose={() => setEndDate(null)} />}
+
+            {isNonEmptyArray(selectedSubsets) &&
+                selectedSubsets.map((subset) => (
+                    <FilterChips
+                        key={subset}
+                        name={`Subset: ${subset}`}
+                        onClose={() => setSelectedSubsets(selectedSubsets.filter((sub) => sub !== subset))}
+                    />
+                ))}
         </Flex>
     );
 };

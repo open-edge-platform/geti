@@ -25,7 +25,8 @@ export const Dataset = () => {
         datasetFilters.annotationStatus !== null ||
         datasetFilters.selectedLabelIds.length > 0 ||
         datasetFilters.startDate !== null ||
-        datasetFilters.endDate !== null;
+        datasetFilters.endDate !== null ||
+        datasetFilters.selectedSubsets.length > 0;
 
     return (
         <MediaUploadProvider>
