@@ -17,6 +17,7 @@ from .source import Source
 class PipelineStatus(StrEnum):
     IDLE = "idle"
     RUNNING = "running"
+    ERROR = "error"
 
     @classmethod
     def from_bool(cls, is_running: bool) -> "PipelineStatus":
