@@ -10,10 +10,10 @@ import { DatasetSubset } from '../../../../../constants/shared-types';
 import { pluralize } from '../../../../../shared/util';
 
 const SUBSET_OPTIONS: { id: DatasetSubset; name: string }[] = [
-    { id: 'training', name: 'Training' },
-    { id: 'validation', name: 'Validation' },
-    { id: 'testing', name: 'Testing' },
-    { id: 'unassigned', name: 'Unassigned' },
+    { id: 'training', name: 'Training subset' },
+    { id: 'validation', name: 'Validation subset' },
+    { id: 'testing', name: 'Testing subset' },
+    { id: 'unassigned', name: 'No subset' },
 ];
 
 export const FilterBySubset = () => {
@@ -36,7 +36,7 @@ export const FilterBySubset = () => {
             <MultiSelectList
                 name='subsets'
                 items={SUBSET_OPTIONS}
-                selectAllLabel='Toggle all'
+                selectAllLabel='All subsets'
                 onSelectionChange={handleSelectionChange}
                 defaultSelectedKeys={new Set(selectedSubsets)}
             />

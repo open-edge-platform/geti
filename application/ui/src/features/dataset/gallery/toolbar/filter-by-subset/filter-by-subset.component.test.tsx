@@ -38,8 +38,8 @@ describe('FilterBySubset', () => {
 
         const dialog = await openSubsetFilter(user);
 
-        await user.click(within(dialog).getByText('Training'));
-        await user.click(within(dialog).getByText('Testing'));
+        await user.click(within(dialog).getByText('Training subset'));
+        await user.click(within(dialog).getByText('Testing subset'));
 
         await waitFor(() => {
             expect(screen.getByText('2 subsets selected')).toBeVisible();
@@ -48,7 +48,7 @@ describe('FilterBySubset', () => {
         expect(screen.queryByText('Filter by subset')).not.toBeInTheDocument();
     });
 
-    it('selects every subset when "Toggle all" is checked', async () => {
+    it('selects every subset when "All subsets" is checked', async () => {
         const user = userEvent.setup();
 
         render(<FilterBySubset />, { route: '/projects/123', path: '/projects/:projectId' });
@@ -61,9 +61,9 @@ describe('FilterBySubset', () => {
             expect(screen.getByText('4 subsets selected')).toBeVisible();
         });
 
-        expect(within(dialog).getByText('Unassigned')).toBeVisible();
-        expect(within(dialog).getByText('Training')).toBeVisible();
-        expect(within(dialog).getByText('Validation')).toBeVisible();
-        expect(within(dialog).getByText('Testing')).toBeVisible();
+        expect(within(dialog).getByText('No subset')).toBeVisible();
+        expect(within(dialog).getByText('Training subset')).toBeVisible();
+        expect(within(dialog).getByText('Validation subset')).toBeVisible();
+        expect(within(dialog).getByText('Testing subset')).toBeVisible();
     });
 });
