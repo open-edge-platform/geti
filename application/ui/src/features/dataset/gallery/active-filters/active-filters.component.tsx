@@ -8,6 +8,7 @@ import { isEmpty } from 'lodash-es';
 
 import type { DatasetItemAnnotationStatus, Label } from '../../../../constants/shared-types';
 import { formatDateRangeEnd, formatDateRangeStart } from '../../../../shared/date-utils';
+import { isNonEmptyArray } from '../../../../shared/util';
 import { FilterChips } from '../toolbar/filter-chips/filter-chips.component';
 
 const ANNOTATION_STATUS_LABELS: Record<DatasetItemAnnotationStatus, string> = {
@@ -82,7 +83,7 @@ export const ActiveFilters = () => {
 
             {endDate !== null && <FilterChips name={formatDateRangeEnd(endDate)} onClose={() => setEndDate(null)} />}
 
-            {!isEmpty(selectedSubsets) &&
+            {isNonEmptyArray(selectedSubsets) &&
                 selectedSubsets.map((subset) => (
                     <FilterChips
                         key={subset}

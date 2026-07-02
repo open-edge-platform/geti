@@ -8,6 +8,7 @@ import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-
 
 import { FilterPopoverButton } from '../../../../../components/filter-popover-button/filter-popover-button.component';
 import { formatFilterDate } from '../../../../../shared/date-utils';
+import { isNonEmptyArray } from '../../../../../shared/util';
 
 const MIN_DATE = parseAbsoluteToLocal(dayjs('2020-01-30').startOf('d').toISOString());
 const MAX_DATE = parseAbsoluteToLocal(dayjs('9999-11-30').endOf('d').toISOString());
@@ -40,7 +41,7 @@ export const DateFilter = () => {
         <FilterPopoverButton
             ariaLabel='Filter by date'
             placeholder='Filter by upload date'
-            summary={dates.length > 0 ? dates.map(({ name }) => name).join(', ') : null}
+            summary={isNonEmptyArray(dates) ? dates.map(({ name }) => name).join(', ') : null}
             gap='size-75'
             minWidth='size-2400'
             maxWidth='size-5000'
