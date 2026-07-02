@@ -158,15 +158,16 @@ experiments:
       - name: dino_v2
         priority: extended
         recipe: semantic_segmentation/dino_v2.yaml
-      - name: segnext_t
-        priority: extended
-        recipe: semantic_segmentation/segnext_t.yaml
-      - name: segnext_s
-        priority: extended
-        recipe: semantic_segmentation/segnext_s.yaml
-      - name: segnext_b
-        priority: extended
-        recipe: semantic_segmentation/segnext_b.yaml
+      # SegNeXt models are currently disabled due to https://github.com/open-edge-platform/geti/issues/6694.
+      #      - name: segnext_t
+      #        priority: extended
+      #        recipe: semantic_segmentation/segnext_t.yaml
+      #      - name: segnext_s
+      #        priority: extended
+      #        recipe: semantic_segmentation/segnext_s.yaml
+      #      - name: segnext_b
+      #        priority: extended
+      #        recipe: semantic_segmentation/segnext_b.yaml
       - name: litehrnet_s
         priority: extended
         recipe: semantic_segmentation/litehrnet_s.yaml
