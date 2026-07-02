@@ -236,4 +236,27 @@ describe('Toolbar', () => {
         expect(screen.getByRole('button', { name: /media status/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View mode' })).toBeInTheDocument();
     });
+
+    it('shows "Newest first" sort button by default', async () => {
+        await renderToolbar();
+
+        const sortButton = screen.getByRole('button', { name: 'sort by upload date ascending' });
+
+        expect(sortButton).toHaveTextContent('Newest first');
+    });
+
+    it('toggles the sort button label between "Newest first" and "Oldest first" when clicked', async () => {
+        await renderToolbar();
+
+        const newestFirstButton = screen.getByRole('button', { name: 'sort by upload date ascending' });
+        fireEvent.click(newestFirstButton);
+
+        const oldestFirstButton = await screen.findByRole('button', { name: 'sort by upload date descending' });
+        expect(oldestFirstButton).toHaveTextContent('Oldest first');
+
+        fireEvent.click(oldestFirstButton);
+
+        const newestFirstButton2 = await screen.findByRole('button', { name: 'sort by upload date ascending' });
+        expect(newestFirstButton2).toHaveTextContent('Newest first');
+    });
 });
