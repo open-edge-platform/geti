@@ -229,7 +229,7 @@ def list_media(  # noqa: PLR0913
     end_date: Annotated[datetime | None, Query()] = None,
     annotation_status: Annotated[DatasetItemAnnotationStatus | None, Query()] = None,
     labels: Annotated[list[UUID] | None, Query()] = None,
-    subset: Annotated[list[DatasetItemSubset] | None, Query()] = None,
+    subsets: Annotated[list[DatasetItemSubset] | None, Query()] = None,
     sort_by: Annotated[MediaSortBy, Query()] = MediaSortBy.UPLOAD_DATE,
     sort_direction: Annotated[SortDirection, Query()] = SortDirection.DESC,
 ) -> MediaWithPagination:
@@ -241,7 +241,7 @@ def list_media(  # noqa: PLR0913
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Start date must be before end date."
         )
-    subset_values = [item.value for item in subset] if subset else None
+    subset_values = [item.value for item in subsets] if subsets else None
     total = media_service.count_media(
         project=project,
         start_date=start_date,

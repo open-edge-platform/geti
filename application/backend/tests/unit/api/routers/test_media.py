@@ -444,7 +444,7 @@ class TestMediaEndpoints:
         fxt_media_service.count_media.return_value = 2
         fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
 
-        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subset={subset}")
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subsets={subset}")
 
         assert response.status_code == status.HTTP_200_OK
         fxt_media_service.count_media.assert_called_once_with(
@@ -476,7 +476,7 @@ class TestMediaEndpoints:
         fxt_media_service.count_media.return_value = 2
         fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
 
-        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subset=training&subset=validation")
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subsets=training&subsets=validation")
 
         assert response.status_code == status.HTTP_200_OK
         fxt_media_service.count_media.assert_called_once_with(

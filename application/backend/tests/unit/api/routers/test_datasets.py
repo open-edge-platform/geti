@@ -202,7 +202,7 @@ class TestDatasetItemEndpoints:
         fxt_dataset_service.count_dataset_items.return_value = 1
         fxt_dataset_service.list_dataset_items.return_value = [fxt_dataset_item]
 
-        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items?subset={subset}")
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items?subsets={subset}")
 
         assert response.status_code == status.HTTP_200_OK
         fxt_dataset_service.count_dataset_items.assert_called_once_with(
@@ -232,7 +232,7 @@ class TestDatasetItemEndpoints:
         fxt_dataset_service.count_dataset_items.return_value = 1
         fxt_dataset_service.list_dataset_items.return_value = [fxt_dataset_item]
 
-        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items?subset=training&subset=validation")
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items?subsets=training&subsets=validation")
 
         assert response.status_code == status.HTTP_200_OK
         fxt_dataset_service.count_dataset_items.assert_called_once_with(
