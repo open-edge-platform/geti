@@ -204,7 +204,10 @@ class OVDetectionModel(OVModel):
                     dtype=torch.float32,
                 ),
             )
-            scores.append(torch.tensor(output.scores.reshape(-1)))
+            # Cast scores to float32 to match the float32 bboxes. ModelAPI returns numpy
+            # arrays whose default float dtype is float64; a float64/float32 mismatch makes
+            # torchvision NMS fail ("dets should have the same type as scores") during tile merge.
+            scores.append(torch.tensor(output.scores.reshape(-1), dtype=torch.float32))
             labels.append(torch.tensor(output.labels.reshape(-1) - label_shift, dtype=torch.long))
 
         if outputs and outputs[0].saliency_map.size > 1:

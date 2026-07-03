@@ -101,6 +101,32 @@ class TestOVDetectionModelCoordinateRescaling:
         torch.testing.assert_close(result_bboxes.data, expected_bboxes)
         assert result_bboxes.canvas_size == ori_shape
 
+    def test_scores_are_float32_when_modelapi_returns_float64(self, detection_model):
+        """Scores must be float32 to match float32 bboxes.
+
+        ModelAPI returns numpy arrays whose default float dtype is float64. If scores were
+        left as float64, torchvision NMS during tile merge fails with
+        "dets should have the same type as scores". This regression test locks the dtype.
+        """
+        img_shape = (640, 640)
+        ori_shape = (640, 640)
+
+        bboxes = np.array([[10.0, 20.0, 30.0, 40.0]], dtype=np.float32)
+        # ModelAPI default float dtype is float64.
+        scores = np.array([0.9], dtype=np.float64)
+        labels = np.array([0], dtype=np.int64)
+
+        outputs = [_FakeDetectionResult(bboxes, scores, labels)]
+        inputs = self._make_sample_batch(batch_size=1, img_shape=img_shape, ori_shape=ori_shape)
+
+        result = detection_model._customize_outputs(outputs, inputs)
+
+        assert result.scores is not None
+        assert result.bboxes is not None
+        assert result.scores[0].dtype == torch.float32
+        # Scores and bboxes share a dtype so torchvision NMS won't raise during tile merge.
+        assert result.scores[0].dtype == result.bboxes[0].dtype
+
     def test_no_rescaling_when_shapes_equal(self, detection_model):
         """When img_shape == ori_shape, bboxes should remain unchanged."""
         shape = (640, 640)
