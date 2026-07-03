@@ -127,7 +127,7 @@ class VisionTransformerWeightsLoader:
     def load_pretrained(self: _HasViTBackboneWithUrls, weights: PathLike | None = None) -> None:
         """Load weights: a local checkpoint if given, else torchvision's official set."""
         if weights is not None and Path(weights).exists():
-            self.model.backbone.load_checkpoint(checkpoint_path=Path(weights))  # pyrefly: ignore[not-callable]
+            load_checkpoint(self.model.backbone, str(weights))
         elif self.model_name in self.pretrained_urls:
             pretrained_url = self.pretrained_urls[self.model_name]
             logger.info("init weight - %s", pretrained_url)
