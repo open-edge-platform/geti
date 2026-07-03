@@ -10,11 +10,11 @@ import { useGetDatasetItems } from './use-get-dataset-items.hook';
 type UseGetDatasetItemsByIdOptions = {
     annotationStatus?: DatasetItemAnnotationStatus;
     sortDirection?: SortDirection;
-    subset?: DatasetSubset[];
+    subsets?: DatasetSubset[];
 };
 
-export const useGetDatasetItemsById = ({ annotationStatus, sortDirection, subset }: UseGetDatasetItemsByIdOptions) => {
-    const { items, ...response } = useGetDatasetItems({ annotationStatus, sortDirection, subset });
+export const useGetDatasetItemsById = ({ annotationStatus, sortDirection, subsets }: UseGetDatasetItemsByIdOptions) => {
+    const { items, ...response } = useGetDatasetItems({ annotationStatus, sortDirection, subsets });
 
     const accumulatedReviewStatusRef = useRef(new Map<string, boolean>());
 

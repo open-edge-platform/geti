@@ -10,15 +10,16 @@ const DATASET_ITEMS_LIMIT = 20;
 
 interface UseGetDatasetRevisionItemsOptions {
     datasetRevisionId: string;
-    subset?: DatasetSubset;
+    subsets?: DatasetSubset[];
 }
 
-export const useGetDatasetRevisionItems = ({ datasetRevisionId, subset }: UseGetDatasetRevisionItemsOptions) => {
+export const useGetDatasetRevisionItems = ({ datasetRevisionId, subsets }: UseGetDatasetRevisionItemsOptions) => {
     const project_id = useProjectIdentifier();
 
-    const query = subset
-        ? { offset: 0, limit: DATASET_ITEMS_LIMIT, subset }
-        : { offset: 0, limit: DATASET_ITEMS_LIMIT };
+    const query =
+        subsets !== undefined && subsets.length > 0
+            ? { offset: 0, limit: DATASET_ITEMS_LIMIT, subsets }
+            : { offset: 0, limit: DATASET_ITEMS_LIMIT };
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = $api.useInfiniteQuery(
         'get',

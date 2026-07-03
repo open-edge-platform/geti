@@ -11,7 +11,7 @@ export const useDatasetMediaWithReviewStatus = () => {
     const { selectedLabelIds, annotationStatus, startDate, endDate, sortDirection, selectedSubsets } =
         useDatasetFiltersSearchParams();
 
-    const subset = isEmpty(selectedSubsets) ? undefined : selectedSubsets;
+    const subsets = isEmpty(selectedSubsets) ? undefined : selectedSubsets;
 
     const mediaItemsResponse = useGetDatasetMediaItems({
         annotationStatus: annotationStatus ?? undefined,
@@ -19,13 +19,13 @@ export const useDatasetMediaWithReviewStatus = () => {
         startDate: startDate ?? undefined,
         endDate: endDate ?? undefined,
         sortDirection: sortDirection ?? undefined,
-        subset,
+        subsets,
     });
 
     const datasetItemsResponse = useGetDatasetItemsById({
         annotationStatus: annotationStatus ?? undefined,
         sortDirection: sortDirection ?? undefined,
-        subset,
+        subsets,
     });
 
     const fetchNextPage = () => {
