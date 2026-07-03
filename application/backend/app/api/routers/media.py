@@ -248,7 +248,7 @@ def list_media(  # noqa: PLR0913
         end_date=end_date,
         annotation_status=annotation_status,
         label_ids=labels,
-        subset=subset_values,
+        subsets=subset_values,
         exclude_types=[MediaType.VIDEO_FRAME],
     )
     media_list = media_service.list_media(
@@ -260,7 +260,7 @@ def list_media(  # noqa: PLR0913
             end_date=end_date,
             annotation_status=annotation_status,
             label_ids=labels,
-            subset=subset_values,
+            subsets=subset_values,
             sort_by=sort_by,
             sort_direction=sort_direction,
         ),

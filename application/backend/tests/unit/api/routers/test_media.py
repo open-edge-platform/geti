@@ -296,13 +296,13 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
             filters=MediaFilters(
-                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subset=None
+                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -324,7 +324,7 @@ class TestMediaEndpoints:
             end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -336,7 +336,7 @@ class TestMediaEndpoints:
                 end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -358,7 +358,7 @@ class TestMediaEndpoints:
             end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC),
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -370,7 +370,7 @@ class TestMediaEndpoints:
                 end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC),
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -420,7 +420,7 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=annotation_status,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -432,7 +432,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=annotation_status,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -453,7 +453,7 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=[subset],
+            subsets=[subset],
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -465,7 +465,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=[subset],
+                subsets=[subset],
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -485,7 +485,7 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=["training", "validation"],
+            subsets=["training", "validation"],
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -497,7 +497,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=["training", "validation"],
+                subsets=["training", "validation"],
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -520,7 +520,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
                 sort_by=MediaSortBy.UPLOAD_DATE,
                 sort_direction=SortDirection.DESC,
             ),
@@ -546,7 +546,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
                 sort_by=MediaSortBy.UPLOAD_DATE,
                 sort_direction=sort_direction,
             ),
@@ -572,7 +572,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
                 sort_by=sort_by,
                 sort_direction=SortDirection.DESC,
             ),

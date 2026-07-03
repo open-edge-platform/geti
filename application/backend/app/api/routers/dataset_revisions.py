@@ -135,7 +135,7 @@ def list_dataset_revision_items(
         dataset_revision=dataset_revision,
         limit=limit,
         offset=offset,
-        subset=subsets,
+        subsets=subsets,
     )
 
     return DatasetRevisionItemsWithPagination(

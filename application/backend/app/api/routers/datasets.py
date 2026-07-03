@@ -57,7 +57,7 @@ def list_dataset_items(  # noqa: PLR0913
         end_date=end_date,
         annotation_status=annotation_status,
         label_ids=labels,
-        subset=subset_values,
+        subsets=subset_values,
     )
     dataset_items = dataset_service.list_dataset_items(
         project_id=project.id,
@@ -68,7 +68,7 @@ def list_dataset_items(  # noqa: PLR0913
             end_date=end_date,
             annotation_status=annotation_status,
             label_ids=labels,
-            subset=subset_values,
+            subsets=subset_values,
             sort_by=sort_by,
             sort_direction=sort_direction,
         ),

@@ -200,7 +200,7 @@ class TestDatasetRevisionItemEndpoints:
             dataset_revision=fxt_dataset_revision_service.get_dataset_revision(),
             limit=10,
             offset=0,
-            subset=None,
+            subsets=None,
         )
 
     def test_list_dataset_revision_items_with_pagination(
@@ -231,7 +231,7 @@ class TestDatasetRevisionItemEndpoints:
             dataset_revision=fxt_dataset_revision_service.get_dataset_revision(),
             limit=50,
             offset=10,
-            subset=None,
+            subsets=None,
         )
 
     @pytest.mark.parametrize(
@@ -267,7 +267,7 @@ class TestDatasetRevisionItemEndpoints:
             dataset_revision=fxt_dataset_revision_service.get_dataset_revision(),
             limit=10,
             offset=0,
-            subset=[DatasetItemSubset(subset) for subset in subsets],
+            subsets=[DatasetItemSubset(subset) for subset in subsets],
         )
 
     @pytest.mark.parametrize("limit", [1000, 0, -20])

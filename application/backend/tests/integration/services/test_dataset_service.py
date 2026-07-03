@@ -1303,7 +1303,7 @@ class TestDatasetServiceIntegration:
         """Test counting dataset items with subset filter."""
         project, db_dataset_items = fxt_project_with_subset_items
 
-        count = fxt_dataset_service.count_dataset_items(project=project, subset=subset)
+        count = fxt_dataset_service.count_dataset_items(project=project, subsets=subset)
 
         assert count == expected_count
 
@@ -1345,7 +1345,7 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=20,
                 offset=0,
-                subset=subset,
+                subsets=subset,
             ),
         )
 
@@ -1380,7 +1380,7 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=limit,
                 offset=offset,
-                subset=subset,
+                subsets=subset,
             ),
         )
 
@@ -1400,7 +1400,7 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=20,
                 offset=0,
-                subset=["unassigned"],
+                subsets=["unassigned"],
             ),
         )
         assert len(unassigned_items) == 2
@@ -1413,7 +1413,7 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=20,
                 offset=0,
-                subset=["training"],
+                subsets=["training"],
             ),
         )
         assert len(training_items) == 3
@@ -1426,7 +1426,7 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=20,
                 offset=0,
-                subset=["validation"],
+                subsets=["validation"],
             ),
         )
         assert len(validation_items) == 2
@@ -1439,7 +1439,7 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=20,
                 offset=0,
-                subset=["testing"],
+                subsets=["testing"],
             ),
         )
         assert len(testing_items) == 1
@@ -1452,7 +1452,7 @@ class TestDatasetServiceIntegration:
             filters=DatasetItemFilters(
                 limit=20,
                 offset=0,
-                subset=["training", "testing"],
+                subsets=["training", "testing"],
             ),
         )
         assert len(training_and_testing_items) == 4

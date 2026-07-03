@@ -62,12 +62,12 @@ class TestDatasetItemEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
             filters=DatasetItemFilters(
-                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subset=None
+                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
             ),
         )
 
@@ -88,7 +88,7 @@ class TestDatasetItemEndpoints:
             end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -99,7 +99,7 @@ class TestDatasetItemEndpoints:
                 end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
         )
 
@@ -120,7 +120,7 @@ class TestDatasetItemEndpoints:
             end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC),
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -131,7 +131,7 @@ class TestDatasetItemEndpoints:
                 end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC),
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
         )
 
@@ -180,7 +180,7 @@ class TestDatasetItemEndpoints:
             end_date=None,
             annotation_status=annotation_status,
             label_ids=None,
-            subset=None,
+            subsets=None,
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -191,7 +191,7 @@ class TestDatasetItemEndpoints:
                 end_date=None,
                 annotation_status=annotation_status,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
         )
 
@@ -211,7 +211,7 @@ class TestDatasetItemEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=[subset],
+            subsets=[subset],
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -222,7 +222,7 @@ class TestDatasetItemEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=[subset],
+                subsets=[subset],
             ),
         )
 
@@ -241,7 +241,7 @@ class TestDatasetItemEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=["training", "validation"],
+            subsets=["training", "validation"],
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -252,7 +252,7 @@ class TestDatasetItemEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=["training", "validation"],
+                subsets=["training", "validation"],
             ),
         )
 
@@ -272,7 +272,7 @@ class TestDatasetItemEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
                 sort_by=DatasetItemSortBy.CREATION_DATE,
                 sort_direction=SortDirection.DESC,
             ),
@@ -297,7 +297,7 @@ class TestDatasetItemEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
                 sort_by=DatasetItemSortBy.CREATION_DATE,
                 sort_direction=sort_direction,
             ),
@@ -322,7 +322,7 @@ class TestDatasetItemEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
                 sort_by=sort_by,
                 sort_direction=SortDirection.DESC,
             ),
