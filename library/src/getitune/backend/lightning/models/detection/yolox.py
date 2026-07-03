@@ -64,6 +64,7 @@ class YOLOX(LightningDetectionModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to MeanAveragePrecisionFMeasureCallable.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
     pretrained_urls = YOLOX_PRETRAINED_URLS
@@ -80,6 +81,7 @@ class YOLOX(LightningDetectionModel):
         metric: MetricCallable = MeanAveragePrecisionFMeasureCallable,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -90,6 +92,7 @@ class YOLOX(LightningDetectionModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
         )
 
         # Raw uint8 models expect [0, 255] inputs; reject 16-bit data.

@@ -65,6 +65,7 @@ class SSD(LightningDetectionModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to MeanAveragePrecisionFMeasureCallable.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
     pretrained_urls = SSD_PRETRAINED_URLS
@@ -79,6 +80,7 @@ class SSD(LightningDetectionModel):
         metric: MetricCallable = MeanAveragePrecisionFMeasureCallable,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -89,6 +91,7 @@ class SSD(LightningDetectionModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
         )
 
     def _create_model(self, num_classes: int | None = None) -> SingleStageDetector:
