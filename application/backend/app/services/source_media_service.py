@@ -31,15 +31,24 @@ class SourceMediaService:
 
         Args:
             filename: Target filename of the uploaded video within its dedicated subdirectory.
+                Only the final path component is used, so any directory separators or
+                traversal segments (e.g. '../../etc/passwd.mp4') are stripped.
             file_obj: A readable binary stream (such as SpooledTemporaryFile) containing the
                 video payload.
 
         Returns:
             The absolute path to the stored video file.
+
+        Raises:
+            ValueError: If the filename has no usable name component once sanitized.
         """
+        safe_name = Path(filename).name
+        if not safe_name or safe_name in {".", ".."}:
+            raise ValueError(f"Invalid filename: {filename!r}")
+
         target_dir = self._source_media_dir / str(uuid4())
         target_dir.mkdir(parents=True, exist_ok=True)
-        target_path = target_dir / filename
+        target_path = target_dir / safe_name
 
         def _perform_copy() -> None:
             try:
@@ -57,6 +66,10 @@ class SourceMediaService:
                 temp_path.unlink(missing_ok=True)
                 raise
 
-        await to_thread.run_sync(_perform_copy)
+        try:
+            await to_thread.run_sync(_perform_copy)
+        except Exception:
+            shutil.rmtree(target_dir, ignore_errors=True)
+            raise
 
         return target_path.resolve()

@@ -1,6 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 import io
+from collections.abc import Generator
 from pathlib import Path
 from unittest.mock import AsyncMock
 
@@ -13,10 +14,11 @@ from app.services import SourceMediaService
 
 
 @pytest.fixture
-def fxt_source_media_service() -> AsyncMock:
+def fxt_source_media_service() -> Generator[AsyncMock]:
     source_media_service = AsyncMock(spec=SourceMediaService)
     app.dependency_overrides[get_source_media_service] = lambda: source_media_service
-    return source_media_service
+    yield source_media_service
+    app.dependency_overrides.pop(get_source_media_service, None)
 
 
 class TestSourceMediaEndpoints:
