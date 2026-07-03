@@ -5,7 +5,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from 'test-utils/render';
 
-import { SUBSET_PARAM } from '../../../../../hooks/use-dataset-filters-search-params.hook';
+import { SUBSET_PARAM } from '../../../../../../hooks/use-dataset-filters-search-params.hook';
 import { FilterBySubset } from './filter-by-subset.component';
 
 const openSubsetFilter = async (user: ReturnType<typeof userEvent.setup>) => {

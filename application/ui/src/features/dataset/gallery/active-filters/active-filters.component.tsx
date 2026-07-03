@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash-es';
 import type { DatasetItemAnnotationStatus, Label } from '../../../../constants/shared-types';
 import { formatDateRangeEnd, formatDateRangeStart } from '../../../../shared/date-utils';
 import { isNonEmptyArray } from '../../../../shared/util';
-import { FilterChips } from '../toolbar/filter-chips/filter-chips.component';
+import { FilterChips } from '../toolbar/media-filtering/filter-chips/filter-chips.component';
 
 const ANNOTATION_STATUS_LABELS: Record<DatasetItemAnnotationStatus, string> = {
     with_annotations: 'Media with annotations',
