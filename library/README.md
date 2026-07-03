@@ -10,7 +10,7 @@
 [Supported Tasks & Models](#supported-tasks--models) •
 [Installation](#installation) •
 [Quick Start](#quick-start) •
-[Docs](https://docs.geti.intel.com/docs/user-guide/library/) •
+[Docs](https://docs.geti.intel.com/docs/user-guide/library/get-started/intro) •
 [License](#license)
 
 [![PyPI](https://img.shields.io/pypi/v/getitune)](https://pypi.org/project/getitune)
