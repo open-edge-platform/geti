@@ -348,6 +348,28 @@ class TestScrapeCsvMetrics:
         metrics = _scrape_csv_metrics(csv_path, prefix="training:")
         assert metrics["training:gpu_mem"] == 500.0
 
+    def test_test_metric_is_captured(self, tmp_path: Path) -> None:
+        """Regression test: test/* accuracy columns must not be dropped.
+
+        Previously the if/elif chain only recognized "val/", "iter_time",
+        "epoch" and "gpu_mem"/"gpu" columns, so test-phase accuracy metrics
+        like "test/map_50" (written by test/torch, test/export, and
+        test/optimize phases) fell through silently and never reached the
+        benchmark report/CSV/MLflow.
+        """
+        csv_path = tmp_path / "metrics.csv"
+        csv_path.write_text("test/map_50,test/f1-score\n0.9,0.75\n")
+        metrics = _scrape_csv_metrics(csv_path, prefix="torch:")
+        assert metrics["torch:test/map_50"] == pytest.approx(0.9)
+        assert metrics["torch:test/f1-score"] == pytest.approx(0.75)
+
+    def test_test_iter_time_still_averaged(self, tmp_path: Path) -> None:
+        """A ``test/iter_time`` column must keep the iter_time averaging behavior."""
+        csv_path = tmp_path / "metrics.csv"
+        csv_path.write_text("test/iter_time\n10.0\n2.0\n4.0\n")
+        metrics = _scrape_csv_metrics(csv_path, prefix="torch:")
+        assert metrics["torch:test/iter_time"] == pytest.approx(3.0)
+
 
 # ---------------------------------------------------------------------------
 # ExperimentExecutor — construction only (no engine)
