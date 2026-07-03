@@ -19,33 +19,24 @@ capabilities:
 
 hyperparameters:
   training:
-    learning_rate: 0.0002
+    learning_rate: 0.0005
     weight_decay: 0.0001
+    batch_size: 4
+    accumulate_grad_batches: 8
     early_stopping:
-      patience: 15
+      patience: 10
     scheduler:
-      factor: 0.1
+      factor: 0.5
       patience: 10
     gradient_clip:
       enable: true
       max_grad_norm: 0.1
     allowed_values_input_size:
-      - 320
-      - 448
-      - 512
-      - 576
       - 640
-      - 704
-      - 768
-      - 896
     input_size_width: 640
     input_size_height: 640
   dataset_preparation:
     augmentation:
+      deim_framework: true
       random_zoom_out:
         enable: true
-        fill: 0
-        side_range:
-          - 1.0
-          - 4.0
-        probability: 0.5
