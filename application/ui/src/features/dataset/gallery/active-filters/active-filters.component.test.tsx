@@ -35,6 +35,8 @@ const mockUseDatasetFiltersSearchParams = (overrides?: Partial<ReturnType<typeof
         setStartDate: mockSetStartDate,
         endDate: null,
         setEndDate: mockSetEndDate,
+        setSortDirection: vi.fn(),
+        sortDirection: 'desc',
         selectedSubsets: [],
         setSelectedSubsets: mockSetSelectedSubsets,
         ...overrides,

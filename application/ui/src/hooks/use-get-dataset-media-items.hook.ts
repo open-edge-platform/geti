@@ -7,8 +7,11 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { $api } from '../api/client';
 import { DatasetItemAnnotationStatus, DatasetSubset, Media, MediaDTO, Pagination } from '../constants/shared-types';
+import { type SortDirection } from './sort-direction.interface';
 
 const DATASET_ITEMS_LIMIT = 40;
+
+type SortBy = 'upload_date';
 
 interface UseGetDatasetMediaItemsOptions {
     subset?: DatasetSubset;
@@ -16,6 +19,7 @@ interface UseGetDatasetMediaItemsOptions {
     labelIds?: string[];
     startDate?: string;
     endDate?: string;
+    sortDirection?: SortDirection;
 }
 
 const getMediaEntities = (items: MediaDTO[]): Media[] => {
@@ -49,6 +53,8 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
         end_date?: string;
         start_date?: string;
         annotation_status?: DatasetItemAnnotationStatus;
+        sort_direction?: SortDirection;
+        sort_by?: SortBy;
     } = {
         offset: 0,
         limit: DATASET_ITEMS_LIMIT,
@@ -72,6 +78,11 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
 
     if (options?.endDate !== undefined) {
         query.end_date = options.endDate;
+    }
+
+    if (options?.sortDirection !== undefined) {
+        query.sort_direction = options.sortDirection;
+        query.sort_by = 'upload_date';
     }
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = $api.useInfiniteQuery(

@@ -37,7 +37,15 @@ from app.models import (
     Video,
     VideoFrame,
 )
-from app.models.media import ImageFormat, MediaListPredictionRequest, MediaPredictionRequest, VideoFormat, VideoRange
+from app.models.media import (
+    ImageFormat,
+    MediaListPredictionRequest,
+    MediaPredictionRequest,
+    MediaSortBy,
+    SortDirection,
+    VideoFormat,
+    VideoRange,
+)
 from app.models.system import DeviceInfo, DeviceType
 from app.services import DatasetService, MediaPredictionService, MediaService, ResourceNotFoundError, ResourceType
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
@@ -461,6 +469,95 @@ class TestMediaEndpoints:
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
+
+    def test_list_media_default_sort_direction(
+        self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client
+    ):
+        fxt_media_service.count_media.return_value = 2
+        fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_media_service.list_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subset=None,
+                sort_by=MediaSortBy.UPLOAD_DATE,
+                sort_direction=SortDirection.DESC,
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+
+    @pytest.mark.parametrize("sort_direction", [SortDirection.ASC, SortDirection.DESC])
+    def test_list_media_with_sort_direction(
+        self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client, sort_direction
+    ):
+        fxt_media_service.count_media.return_value = 2
+        fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?sort_direction={sort_direction.value}")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_media_service.list_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subset=None,
+                sort_by=MediaSortBy.UPLOAD_DATE,
+                sort_direction=sort_direction,
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+
+    @pytest.mark.parametrize("sort_by", list(MediaSortBy))
+    def test_list_media_with_sort_by(
+        self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client, sort_by
+    ):
+        fxt_media_service.count_media.return_value = 2
+        fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?sort_by={sort_by.value}")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_media_service.list_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subset=None,
+                sort_by=sort_by,
+                sort_direction=SortDirection.DESC,
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+
+    def test_list_media_wrong_sort_by(self, fxt_get_project, fxt_media_service, fxt_client):
+        response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/media?sort_by=bogus")
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_media_service.list_media.assert_not_called()
+
+    def test_list_media_wrong_sort_direction(self, fxt_get_project, fxt_media_service, fxt_client):
+        response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/media?sort_direction=bogus")
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_media_service.list_media.assert_not_called()
 
     @pytest.mark.parametrize(
         "http_method, http_path, service_name, service_method",

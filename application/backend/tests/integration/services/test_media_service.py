@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB, PipelineDB
 from app.models import DatasetItemAnnotationStatus, DatasetItemSubset, Pipeline, Project, Video
-from app.models.media import ImageFormat, MediaType, VideoFormat
+from app.models.media import ImageFormat, MediaSortBy, MediaType, SortDirection, VideoFormat
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters, MediaService
 
@@ -517,6 +517,40 @@ def fxt_project_with_subset_items(fxt_project_with_pipeline, db_session) -> tupl
     db_session.flush()
 
     return project, db_dataset_items
+
+
+@pytest.fixture
+def fxt_project_with_media_at_distinct_dates(fxt_project_with_pipeline, db_session) -> tuple[Project, list[MediaDB]]:
+    """Fixture with three images uploaded on distinct, known dates (test1 oldest, test3 newest)."""
+    project, _ = fxt_project_with_pipeline
+
+    db_media_list = [
+        MediaDB(
+            type="image",
+            name=name,
+            format="jpg",
+            size=1024,
+            width=1024,
+            height=768,
+            project_id=str(project.id),
+        )
+        for name in ("test1", "test2", "test3")
+    ]
+    db_session.add_all(db_media_list)
+    db_session.flush()
+    for db_media, created_at in zip(
+        db_media_list,
+        [
+            datetime.fromisoformat("2025-02-01T00:00:00Z"),
+            datetime.fromisoformat("2025-02-02T00:00:00Z"),
+            datetime.fromisoformat("2025-02-03T00:00:00Z"),
+        ],
+    ):
+        db_media.created_at = created_at
+    db_session.add_all(db_media_list)
+    db_session.flush()
+
+    return project, db_media_list
 
 
 @pytest.fixture
@@ -1072,6 +1106,44 @@ class TestMediaServiceIntegration:
         )
 
         assert len(media_list) == count
+
+    @pytest.mark.parametrize(
+        "sort_direction, expected_order",
+        [
+            (None, ["test3", "test2", "test1"]),
+            (SortDirection.DESC, ["test3", "test2", "test1"]),
+            (SortDirection.ASC, ["test1", "test2", "test3"]),
+        ],
+    )
+    def test_list_media_sort_direction(
+        self,
+        fxt_media_service: MediaService,
+        fxt_project_with_media_at_distinct_dates: tuple[Project, list[MediaDB]],
+        sort_direction: SortDirection | None,
+        expected_order: list[str],
+    ) -> None:
+        """Test listing media ordered by upload date, ascending and descending."""
+        project, _ = fxt_project_with_media_at_distinct_dates
+
+        filters = MediaFilters() if sort_direction is None else MediaFilters(sort_direction=sort_direction)
+        media_list = fxt_media_service.list_media(project_id=project.id, filters=filters)
+
+        assert [media.name for media in media_list] == expected_order
+
+    def test_list_media_sort_by_and_sort_direction_combined(
+        self,
+        fxt_media_service: MediaService,
+        fxt_project_with_media_at_distinct_dates: tuple[Project, list[MediaDB]],
+    ) -> None:
+        """Test sorting by specified sort_by and sort_direction."""
+        project, _ = fxt_project_with_media_at_distinct_dates
+
+        media_list = fxt_media_service.list_media(
+            project_id=project.id,
+            filters=MediaFilters(sort_by=MediaSortBy.UPLOAD_DATE, sort_direction=SortDirection.ASC),
+        )
+
+        assert [media.name for media in media_list] == ["test1", "test2", "test3"]
 
     def test_get_media_by_id(
         self,

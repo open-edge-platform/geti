@@ -8,11 +8,13 @@ import { parse, stringify } from 'zipson/lib';
 
 import type { DatasetItemAnnotationStatus, DatasetSubset, FilterByStatusKey } from '../constants/shared-types';
 import { isNonEmptyString } from '../shared/util';
+import type { SortDirection } from './sort-direction.interface';
 
 export const LABELS_PARAM = 'labelsFilter';
 export const ANNOTATION_STATUS_PARAM = 'annotationStatusFilter';
 export const START_DATE_PARAM = 'startDateFilter';
 export const END_DATE_PARAM = 'endDateFilter';
+export const SORT_DIRECTION_PARAM = 'sortDirection';
 export const SUBSET_PARAM = 'subsetFilter';
 
 const VALID_ANNOTATION_STATUSES = new Set<DatasetItemAnnotationStatus>(['with_annotations', 'missing_annotations']);
@@ -99,6 +101,7 @@ export const useDatasetFiltersSearchParams = () => {
     const annotationStatus = parseAnnotationStatus(searchParams.get(ANNOTATION_STATUS_PARAM));
     const startDate = parseDateFromURL(searchParams.get(START_DATE_PARAM));
     const endDate = parseDateFromURL(searchParams.get(END_DATE_PARAM));
+    const sortDirection: SortDirection = searchParams.get(SORT_DIRECTION_PARAM) === 'asc' ? 'asc' : 'desc';
     const selectedSubsets = parseSubsets(searchParams.get(SUBSET_PARAM));
 
     const setSelectedLabelIds = (ids: string[]) => {
@@ -118,6 +121,10 @@ export const useDatasetFiltersSearchParams = () => {
         updateSearchParam(setSearchParams, END_DATE_PARAM, date);
     };
 
+    const setSortDirection = (direction: SortDirection) => {
+        updateSearchParam(setSearchParams, SORT_DIRECTION_PARAM, direction);
+    };
+
     const setSelectedSubsets = (subsets: DatasetSubset[]) => {
         const newValue = isEmpty(subsets) ? null : subsets.join(',');
         updateSearchParam(setSearchParams, SUBSET_PARAM, newValue);
@@ -132,7 +139,9 @@ export const useDatasetFiltersSearchParams = () => {
         setStartDate,
         endDate,
         setEndDate,
+        sortDirection,
+        setSortDirection,
         selectedSubsets,
         setSelectedSubsets,
-    };
+    } as const;
 };
