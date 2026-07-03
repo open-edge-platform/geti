@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING, ClassVar, Literal
+from typing import TYPE_CHECKING, Literal
 
 from torch import nn
 
@@ -24,8 +24,8 @@ from getitune.backend.lightning.models.instance_segmentation.base import Lightni
 from getitune.backend.lightning.models.instance_segmentation.heads import RTMDetInstSepBNHead
 from getitune.backend.lightning.models.instance_segmentation.losses import DiceLoss, RTMDetInstCriterion
 from getitune.backend.lightning.models.instance_segmentation.necks import CSPNeXtPAFPN
+from getitune.backend.lightning.models.instance_segmentation.utils.pretrained_urls import RTMDET_PRETRAINED_URLS
 from getitune.backend.lightning.models.modules.norm import build_norm_layer
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
 
@@ -53,14 +53,10 @@ class RTMDetInst(LightningInstanceSegModel):
             Defaults to MaskRLEMeanAPFMeasureCallable.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
-        explain_mode (bool, optional): Whether to enable explainable AI mode. Defaults to False.
+        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
-        "rtmdet_inst_tiny": (
-            "https://storage.geti.intel.com/weights/rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth"
-        ),
-    }
+    pretrained_urls = RTMDET_PRETRAINED_URLS
 
     def __init__(
         self,
@@ -72,6 +68,7 @@ class RTMDetInst(LightningInstanceSegModel):
         metric: MetricCallable = MaskRLEMeanAPFMeasureCallable,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -82,6 +79,7 @@ class RTMDetInst(LightningInstanceSegModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
         )
 
     def _create_model(self, num_classes: int | None = None) -> RTMDetInst:
@@ -148,7 +146,6 @@ class RTMDetInst(LightningInstanceSegModel):
         )
 
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
 
         return model
 

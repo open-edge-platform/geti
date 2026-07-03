@@ -419,6 +419,8 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
 
         logger.info("Instantiating model for training (model_id={})", model_id)
         model_cfg = training_config["model"]
+        # Disable loading via pre-configured library urls since weights are managed via Engine
+        model_cfg["init_args"]["pretrained"] = False
         model_cfg["init_args"]["label_info"] = datamodule.label_info.label_names
         model_cfg["init_args"]["data_input_params"] = DataInputParams(
             input_size=cast(tuple[int, int], datamodule.input_size),
@@ -441,7 +443,6 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             "device": getitune_device_type,
             "checkpoint": weights_path if is_ultralytics or has_model_revision else None,
             "pretrained_weights": weights_path if not (is_ultralytics and has_model_revision) else None,
-            "pretrained": False,  # Disable library loading since weights are managed in the App
         }
 
         model_parser = ArgumentParser()
