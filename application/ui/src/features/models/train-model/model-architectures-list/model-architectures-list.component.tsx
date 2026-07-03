@@ -1,6 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useState } from 'react';
+
 import { Button, Flex } from '@geti-ui/ui';
 
 import { useTrainModelState } from '../train-model-provider.component';
@@ -11,14 +13,8 @@ import { getRecommendedArchitectures } from './utils';
 const SHOW_MORE_THRESHOLD = 4;
 
 export const ModelArchitecturesList = () => {
-    const {
-        modelArchitectures,
-        selectedModelArchitectureId,
-        onSelectModelArchitectureId,
-        showMoreModelArchitectures,
-        onToggleShowMoreModelArchitectures,
-    } = useTrainModelState();
-
+    const { modelArchitectures, selectedModelArchitectureId, onSelectModelArchitectureId } = useTrainModelState();
+    const [showMoreModelArchitectures, setShowMoreModelArchitectures] = useState<boolean>(false);
     const recommendedArchitectures = getRecommendedArchitectures(modelArchitectures);
     const collapsedArchitectures = recommendedArchitectures.slice(0, SHOW_MORE_THRESHOLD);
     const canToggleArchitecturesList = modelArchitectures.length > SHOW_MORE_THRESHOLD;
@@ -43,7 +39,7 @@ export const ModelArchitecturesList = () => {
                 <Button
                     alignSelf={'start'}
                     variant={'primary'}
-                    onPress={() => onToggleShowMoreModelArchitectures(!showMoreModelArchitectures)}
+                    onPress={() => setShowMoreModelArchitectures(!showMoreModelArchitectures)}
                 >
                     {showMoreModelArchitectures ? 'Show less' : 'Show more'}
                 </Button>
