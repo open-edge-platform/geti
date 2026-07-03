@@ -21,7 +21,7 @@
 
 ## Data & State
 
-- The backend stores persistent data in `application/backend/data/`.
+- The backend stores persistent data under `application/backend/data/` by default (i.e., `data/` when running from `application/backend/`); override via the `DATA_DIR` setting. The directory is git-ignored and may not exist until the server runs.
 - This includes the SQLite database (`geti.db`) and media artifacts (images, videos) under `projects/`.
 
 ## Choose the Right Workflow
