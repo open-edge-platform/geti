@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { isEmpty } from 'lodash-es';
 
 import { $api } from '../api/client';
 import type { DatasetRevisionItem, DatasetSubset, Pagination } from '../constants/shared-types';
@@ -16,10 +17,9 @@ interface UseGetDatasetRevisionItemsOptions {
 export const useGetDatasetRevisionItems = ({ datasetRevisionId, subsets }: UseGetDatasetRevisionItemsOptions) => {
     const project_id = useProjectIdentifier();
 
-    const query =
-        subsets !== undefined && subsets.length > 0
-            ? { offset: 0, limit: DATASET_ITEMS_LIMIT, subsets }
-            : { offset: 0, limit: DATASET_ITEMS_LIMIT };
+    const query = !isEmpty(subsets)
+        ? { offset: 0, limit: DATASET_ITEMS_LIMIT, subsets }
+        : { offset: 0, limit: DATASET_ITEMS_LIMIT };
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = $api.useInfiniteQuery(
         'get',

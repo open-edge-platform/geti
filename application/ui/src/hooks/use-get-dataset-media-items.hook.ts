@@ -4,6 +4,7 @@
 import { useMemo } from 'react';
 
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import isEmpty from 'lodash-es/isEmpty';
 
 import { $api } from '../api/client';
 import { DatasetItemAnnotationStatus, DatasetSubset, Media, MediaDTO, Pagination } from '../constants/shared-types';
@@ -60,7 +61,7 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
         limit: DATASET_ITEMS_LIMIT,
     };
 
-    if (options?.subsets !== undefined && options.subsets.length > 0) {
+    if (options !== undefined && !isEmpty(options?.subsets)) {
         query.subsets = options.subsets;
     }
 
