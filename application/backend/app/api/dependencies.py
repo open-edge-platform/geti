@@ -27,6 +27,7 @@ from app.services import (
     PipelineService,
     ProjectService,
     SinkService,
+    SourceMediaService,
     SourceUpdateService,
     StagedDatasetService,
     SystemService,
@@ -92,6 +93,11 @@ def get_staged_datasets_dir(request: Request) -> Path:
     return request.app.state.settings.staged_datasets_dir
 
 
+def get_source_media_dir(request: Request) -> Path:
+    """Provides the path to the folder where uploaded source videos are saved. Defined in the app settings."""
+    return request.app.state.settings.source_media_dir
+
+
 def get_ice_servers(request: Request) -> list[dict]:
     """Provides the ICE servers from settings."""
     return request.app.state.settings.ice_servers
@@ -149,6 +155,13 @@ def get_source_update_service(
 ) -> SourceUpdateService:
     """Provides a SourceUpdateService instance."""
     return SourceUpdateService(event_bus=event_bus, db_session=db)
+
+
+def get_source_media_service(
+    source_media_dir: Annotated[Path, Depends(get_source_media_dir)],
+) -> SourceMediaService:
+    """Provides a SourceMediaService instance for storing uploaded source videos."""
+    return SourceMediaService(source_media_dir)
 
 
 def get_source_status_service(
