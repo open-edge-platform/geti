@@ -194,7 +194,7 @@ class TestAggregateMetrics:
         ]
 
         averaged = aggregate_metrics_across_seeds(results)
-        key = "det/m/d/default"
+        key = ("det", "m", "d", "default")
         assert key in averaged
         assert abs(averaged[key]["acc"] - 0.85) < 1e-6
 
@@ -227,8 +227,8 @@ class TestAggregateMetrics:
             ),
         ]
         averaged = aggregate_metrics_across_seeds(results)
-        assert "det/m1/d/default" in averaged
-        assert "det/m2/d/default" in averaged
+        assert ("det", "m1", "d", "default") in averaged
+        assert ("det", "m2", "d", "default") in averaged
 
 
 # ---------------------------------------------------------------------------
@@ -382,6 +382,45 @@ class TestBuildReport:
         assert report.comparisons[0].model == "m"
         assert report.failures[0].model == "m2"
 
+    def test_task_containing_slash_is_not_misparsed(self) -> None:
+        """Regression test: task identifiers like ``classification/multi_class_cls``
+        contain a ``/`` themselves. Previously ``build_report`` reconstructed
+        task/model/dataset/scenario by splitting a ``"/"``-joined string, which
+        shifted every field by one and merged the dataset and scenario into a
+        single value whenever the task contained a slash.
+        """
+        results = [
+            ExperimentResult(
+                task="classification/multi_class_cls",
+                model="dino_v2",
+                dataset="flowers102",
+                scenario="default",
+                seed=0,
+                success=True,
+                phases=[PhaseResult(phase="train", metrics={"training:val/accuracy": 0.96})],
+            ),
+        ]
+        criteria_by_task = {
+            "classification/multi_class_cls": CriteriaConfig(
+                accuracy_metric="accuracy",
+                thresholds={},
+            ),
+        }
+
+        report = build_report(
+            results=results,
+            failures=[],
+            baselines={},
+            criteria_by_task=criteria_by_task,
+        )
+
+        assert len(report.comparisons) == 1
+        comp = report.comparisons[0]
+        assert comp.task == "classification/multi_class_cls"
+        assert comp.model == "dino_v2"
+        assert comp.dataset == "flowers102"
+        assert comp.scenario == "default"
+
 
 # ---------------------------------------------------------------------------
 # generate_markdown
@@ -482,6 +521,36 @@ class TestGenerateMarkdown:
         md = generate_markdown(report)
         assert "GetiTune Benchmark Report" in md
         assert "**0** passed" in md
+
+    def test_test_metric_columns_shown_for_all_backends(self) -> None:
+        """torch/export/optimize test accuracy metrics must all render as columns.
+
+        Regression test: the ``optimize:`` bucket was previously missing from
+        ``_detect_metric_columns``, so post-quantization test accuracy never
+        appeared in the Markdown table even when present in current_metrics.
+        """
+        report = BenchmarkReport(
+            comparisons=[
+                ExperimentComparison(
+                    task="detection",
+                    model="yolox_s",
+                    dataset="pothole",
+                    scenario="default",
+                    current_metrics={
+                        "training:val/mAP": 0.85,
+                        "torch:test/map_50": 0.80,
+                        "export:test/map_50": 0.79,
+                        "optimize:test/map_50": 0.77,
+                    },
+                    baseline_metrics=None,
+                ),
+            ],
+            failures=[],
+        )
+        md = generate_markdown(report)
+        assert "Test map_50" in md
+        assert "Export map_50" in md
+        assert "Optimize map_50" in md
 
 
 # ---------------------------------------------------------------------------
