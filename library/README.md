@@ -10,7 +10,7 @@
 [Supported Tasks & Models](#supported-tasks--models) •
 [Installation](#installation) •
 [Quick Start](#quick-start) •
-[Docs](https://open-edge-platform.github.io/geti/latest/index.html) •
+[Docs](https://docs.geti.intel.com/docs/user-guide/library/) •
 [License](#license)
 
 [![PyPI](https://img.shields.io/pypi/v/getitune)](https://pypi.org/project/getitune)
