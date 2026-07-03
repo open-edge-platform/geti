@@ -26,11 +26,23 @@
 
 ## Choose the Right Workflow
 
+Contributor/development skills (changing the codebase):
+
 - Use the `library` workflow for changes under `library/src`, `library/tests`, or model, training, export, and CLI logic.
 - Use the `backend` workflow for changes under `application/backend/app`, backend tests, backend packaging, or backend API schemas.
 - Use the `ui` workflow for changes under `application/ui/src`, frontend tests, build config, or generated API client types.
 - Use the OpenAPI sync workflow whenever backend API contracts change and the UI consumes those changes.
 - Use the documentation update workflow to keep `README.md`, `CHANGELOG.md`, or `library/docs/` in sync with code changes.
+
+User-facing skills (using Geti, not changing it):
+
+- Use `getitune-discovering-models` to list available models, recipes, and tasks before training.
+- Use `getitune-preparing-datasets` to lay out and point a dataset at the library (COCO/YOLO/VOC/native).
+- Use `getitune-training-a-model` to train or evaluate a model with `create_engine` / the `getitune` CLI.
+- Use `getitune-exporting-a-model` to export a trained model to OpenVINO IR or ONNX.
+- Use `getitune-optimizing-a-model` to quantize an exported model to INT8 with NNCF.
+- Use `getitune-running-inference` to run predictions/evaluation with PyTorch, OpenVINO, or ONNX models.
+- Use `geti-using-the-pipeline` to drive the Geti application end to end (project → dataset → train → deploy) via its REST API.
 
 ## Commands: Library
 
