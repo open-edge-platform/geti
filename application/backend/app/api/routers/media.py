@@ -241,13 +241,14 @@ def list_media(  # noqa: PLR0913
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Start date must be before end date."
         )
+    subset_values = [item.value for item in subset] if subset else None
     total = media_service.count_media(
         project=project,
         start_date=start_date,
         end_date=end_date,
         annotation_status=annotation_status,
         label_ids=labels,
-        subset=subset,
+        subset=subset_values,
         exclude_types=[MediaType.VIDEO_FRAME],
     )
     media_list = media_service.list_media(
@@ -259,7 +260,7 @@ def list_media(  # noqa: PLR0913
             end_date=end_date,
             annotation_status=annotation_status,
             label_ids=labels,
-            subset=subset,
+            subset=subset_values,
             sort_by=sort_by,
             sort_direction=sort_direction,
         ),
