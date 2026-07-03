@@ -3,7 +3,7 @@ name: geti-openapi-sync
 description: Regenerate and validate the OpenAPI contract between `application/backend/` and `application/ui/`. Use when backend endpoints, schemas, request or response models, or API surface change, or when `application/ui/src/api/openapi-spec.json` or `openapi-spec.d.ts` is stale. Handles backend spec generation, UI spec placement, TypeScript type regeneration, and the smallest backend and UI checks needed to confirm the contract still matches.
 ---
 
-# OTX OpenAPI Sync
+# Geti OpenAPI Sync
 
 ## Goal
 

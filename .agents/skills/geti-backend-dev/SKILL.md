@@ -3,7 +3,11 @@ name: geti-backend-dev
 description: Develop and validate changes in `application/backend/` for the FastAPI `geti` service. Use when touching `application/backend/app/**`, backend tests, backend packaging, backend configuration, API routers, schemas, services, repositories, or database code, or when the UI contract depends on a backend API change. Helps with `uv` and `just` setup, targeted pytest or behave runs, OpenAPI generation, and local server workflows.
 ---
 
-# OTX Backend Development
+# Geti Backend Development
+
+> For the full architecture reference (layered design, app/ layout, adding an
+> endpoint end-to-end, library integration and job execution) read
+> [`application/backend/AGENTS.md`](../../../application/backend/AGENTS.md).
 
 ## Quick Start
 
@@ -21,9 +25,17 @@ description: Develop and validate changes in `application/backend/` for the Fast
 
 ## Architecture Reminders
 
-- Respect the import-linter layering in `pyproject.toml`.
-- Keep `app.api` above `app.services`, `app.repositories`, and `app.db`.
-- Keep `app.api.routers` above `app.api.schemas`, and `app.api.schemas` above `app.api.dependencies`.
+- The request flow is layered: `app.api` → `app.services` → `app.repositories`
+  → `app.db`. Respect the import-linter contracts in `pyproject.toml`.
+- Keep `app.api.routers` above `app.api.schemas`, and `app.api.schemas` above
+  `app.api.dependencies`.
+- Pydantic API schemas (`app/api/schemas/`), domain models (`app/models/`), and
+  SQLAlchemy ORM models (`app/db/schema.py`) are separate layers — never return
+  raw ORM models from a router.
+- Schema changes require an Alembic migration under `app/alembic/versions/`.
+- Long-running work (training, quantization, dataset import/export) runs
+  out-of-process via `app/core/jobs/` and lazily-imported builders in
+  `app/execution/`; training calls into the `getitune` library.
 - Treat `run-server --clean` and `_clean_data` as destructive helpers.
 
 ## Verification
@@ -36,5 +48,5 @@ description: Develop and validate changes in `application/backend/` for the Fast
 
 ## Coordination Notes
 
-- `application/backend` depends on the local editable `../../library`. Validate `library/` too when shared OTX behavior changes.
+- `application/backend` depends on the local editable `../../library`. Validate `library/` too when shared model or training behavior changes.
 - Prefer project `just` targets over custom shell commands so local work matches CI.

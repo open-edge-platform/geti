@@ -1,18 +1,20 @@
-# Training Extensions Agent Guide
+# Geti Agent Guide
 
 ## Role of This File
 
 - `AGENTS.md` is the canonical repo-wide instruction file for agentic tools.
 - `CLAUDE.md` imports this file for Claude Code compatibility.
+- Per-component guides live in `library/AGENTS.md`, `application/backend/AGENTS.md`,
+  and `application/ui/AGENTS.md`; read the matching one before working in that area.
 - Portable task skills live in `.agents/skills/`.
 - Claude-native mirrors live in `.claude/skills/`.
 - Keep always-on repository rules here; keep task-specific workflows in skills.
 
 ## Repository Map
 
-- `library/`: `getitune` Python package (OTX training library, `src/getitune/`; legacy `src/otx/` re-exports), recipes, and tests.
-- `application/backend/`: FastAPI backend named `geti`; consumes `../../library` as an editable `uv` source.
-- `application/ui/`: React 19 + TypeScript + RSBuild frontend.
+- `library/`: `getitune` Python package (the Geti training library; source in `src/getitune/`), recipes, and tests. See `library/AGENTS.md`.
+- `application/backend/`: FastAPI backend named `geti`; consumes `../../library` as an editable `uv` source. See `application/backend/AGENTS.md`.
+- `application/ui/`: React 19 + TypeScript + RSBuild frontend. See `application/ui/AGENTS.md`.
 - `library/docs/`: Sphinx-based documentation source.
 - `README.md` & `CHANGELOG.md`: root-level project documentation.
 - `.github/workflows/`: CI source of truth for path-based checks and required jobs.
@@ -24,7 +26,7 @@
 
 ## Choose the Right Workflow
 
-- Use the `library` workflow for changes under `library/src`, `library/tests`, or OTX model, training, export, and CLI logic.
+- Use the `library` workflow for changes under `library/src`, `library/tests`, or model, training, export, and CLI logic.
 - Use the `backend` workflow for changes under `application/backend/app`, backend tests, backend packaging, or backend API schemas.
 - Use the `ui` workflow for changes under `application/ui/src`, frontend tests, build config, or generated API client types.
 - Use the OpenAPI sync workflow whenever backend API contracts change and the UI consumes those changes.

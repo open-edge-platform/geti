@@ -4,8 +4,7 @@ applyTo: "library/**"
 
 ## Conventions
 
-- Source under `library/src/getitune/` (legacy `src/otx/` re-exports exist).
-  Prefer editing `getitune`.
+- Source under `library/src/getitune/`.
 - Recipes (YAML) define task + model + training config. When adding a model,
   add or update its recipe under the appropriate task directory.
 - Public API entry points must stay stable — consumed by `application/backend/`.

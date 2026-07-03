@@ -3,7 +3,11 @@ name: geti-ui-dev
 description: Develop and validate changes in `application/ui/` for the React and TypeScript frontend. Use when touching `application/ui/src/**`, frontend tests, RSBuild or Vitest config, Playwright setup, package scripts, or generated API typings under `src/api`. Helps with Node and npm requirements, install and build commands, lint, typecheck, test workflows, and coordination with backend OpenAPI changes.
 ---
 
-# OTX UI Development
+# Geti UI Development
+
+> For the full architecture reference (feature-folder layout, data fetching,
+> generated API types, and vendored packages) read
+> [`application/ui/AGENTS.md`](../../../application/ui/AGENTS.md).
 
 ## Quick Start
 
