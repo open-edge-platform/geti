@@ -3,18 +3,16 @@
 
 import { Flex } from '@geti-ui/ui';
 
-import { DateFilter } from './date-filter/date-filter.component';
 import { FilterByStatus } from './filter-by-status/filter-by-status.component';
-import { FilterBySubset } from './filter-by-subset/filter-by-subset.component';
 import { MediaFilterLabels } from './media-filter-labels/media-filter-labels.component';
+import { MoreMediaFilters } from './more-media-filters.component';
 
 export const MediaFiltering = () => {
     return (
         <Flex direction={'row'} gap={'size-200'} alignItems={'center'}>
             <FilterByStatus />
             <MediaFilterLabels />
-            <FilterBySubset />
-            <DateFilter />
+            <MoreMediaFilters />
         </Flex>
     );
 };

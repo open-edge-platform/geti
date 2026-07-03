@@ -1,13 +1,14 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
-import { isEmpty } from 'lodash-es';
+import { useState } from 'react';
 
-import { FilterPopoverButton } from '../../../../../../components/filter-popover-button/filter-popover-button.component';
-import { MultiSelectList } from '../../../../../../components/multi-select-list/multi-select-list.component';
+import { Checkbox, CheckboxGroup, Flex, Text } from '@geti-ui/ui';
+import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
+
 import { DatasetSubset } from '../../../../../../constants/shared-types';
-import { pluralize } from '../../../../../../shared/util';
+
+import classes from './filter-by-subset.module.scss';
 
 const SUBSET_OPTIONS: { id: DatasetSubset; name: string }[] = [
     { id: 'training', name: 'Training subset' },
@@ -19,25 +20,45 @@ const SUBSET_OPTIONS: { id: DatasetSubset; name: string }[] = [
 export const FilterBySubset = () => {
     const { selectedSubsets, setSelectedSubsets } = useDatasetFiltersSearchParams();
 
-    const summary = isEmpty(selectedSubsets)
-        ? null
-        : `${selectedSubsets.length} ${pluralize(selectedSubsets.length, 'subset', 'subsets')} selected`;
+    const [selectedSubsetsKeys, setSelectedSubsetsKeys] = useState<string[]>(selectedSubsets);
+
+    const handleSelectionChange = (values: string[]) => {
+        setSelectedSubsetsKeys(values);
+        setSelectedSubsets(values as DatasetSubset[]);
+    };
+
+    const handleSelectAll = (isSelected: boolean) => {
+        if (isSelected) {
+            setSelectedSubsets(SUBSET_OPTIONS.map((option) => option.id));
+            setSelectedSubsetsKeys(SUBSET_OPTIONS.map((option) => option.id));
+            return;
+        }
+
+        setSelectedSubsets([]);
+        setSelectedSubsetsKeys([]);
+    };
 
     return (
-        <FilterPopoverButton
-            ariaLabel='Filter by subset'
-            placeholder='Filter by subset'
-            summary={summary}
-            width='size-3000'
-            dialogWidth='size-3000'
-        >
-            <MultiSelectList
-                name='subsets'
-                items={SUBSET_OPTIONS}
-                selectAllLabel='All subsets'
-                onSelectionChange={setSelectedSubsets}
-                defaultSelectedKeys={new Set(selectedSubsets)}
-            />
-        </FilterPopoverButton>
+        <Flex direction='column' gap='size-100'>
+            <Text UNSAFE_className={classes.label}>Filter by subset</Text>
+            <Flex direction='column'>
+                <Checkbox
+                    value='all'
+                    isSelected={selectedSubsetsKeys.length === SUBSET_OPTIONS.length}
+                    onChange={handleSelectAll}
+                >
+                    All subsets
+                </Checkbox>
+                <CheckboxGroup value={selectedSubsetsKeys} onChange={handleSelectionChange}>
+                    <>
+                        {SUBSET_OPTIONS.map((item) => (
+                            <Checkbox key={item.id} value={item.id}>
+                                {item.name}
+                            </Checkbox>
+                        ))}
+                    </>
+                </CheckboxGroup>
+            </Flex>
+        </Flex>
     );
 };
