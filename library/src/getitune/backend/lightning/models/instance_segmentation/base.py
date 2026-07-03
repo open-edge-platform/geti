@@ -27,6 +27,7 @@ from getitune.backend.lightning.models.base import (
 )
 from getitune.backend.lightning.models.instance_segmentation.segmentors.maskrcnn_tv import MaskRCNN
 from getitune.backend.lightning.models.instance_segmentation.segmentors.two_stage import TwoStageDetector
+from getitune.backend.lightning.models.utils.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.models.utils.utils import InstanceData
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.backend.lightning.tools.explain.explain_algo import InstSegExplainAlgo, feature_vector_fn
@@ -48,10 +49,9 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
-    from getitune.types import PathLike
 
 
-class LightningInstanceSegModel(LightningModel):
+class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
     """Base class for the Instance Segmentation models used in getitune.
 
     NOTE: LightningInstanceSegModel has many duplicate methods to LightningDetectionModel,
@@ -613,16 +613,3 @@ class LightningInstanceSegModel(LightningModel):
     def task(self) -> TaskType:
         """Return task type."""
         return TaskType.INSTANCE_SEGMENTATION
-
-    def load_pretrained(self, weights: PathLike | None = None) -> None:
-        """Load pretrained weights into the model.
-
-        Args:
-            weights (PathLike | None): Path to the pretrained weights file. If None, uses default weights.
-        """
-        from getitune.backend.lightning.models.utils.utils import load_checkpoint
-
-        if weights is None:
-            weights = self.pretrained_urls[self.model_name]
-
-        load_checkpoint(self.model, str(weights))

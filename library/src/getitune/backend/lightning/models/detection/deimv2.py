@@ -14,7 +14,6 @@ from getitune.backend.lightning.models.detection.heads.deim_decoder import DEIMT
 from getitune.backend.lightning.models.detection.losses.deim_loss import DEIMCriterion
 from getitune.backend.lightning.models.detection.necks.dfine_hybrid_encoder import HybridEncoder
 from getitune.backend.lightning.models.detection.utils.pretrained_urls import DEIMV2_PRETRAINED_URLS
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 
@@ -25,7 +24,6 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
-    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -162,20 +160,16 @@ class DEIMV2(DEIMDFine):
     def _default_preprocessing_params(self) -> DataInputParams | dict[str, DataInputParams]:
         return DataInputParams(input_size=(640, 640), mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
 
-    def load_pretrained(self, weights: PathLike | None = None) -> None:
-        """Load pretrained weights into the model.
+    @property
+    def pretrained_key_mapping(self) -> dict[str, str] | None:
+        """Map DEIMv2 checkpoint decoder attention keys to getitune decoder keys.
 
-        Args:
-            weights (PathLike | None): Path to the pretrained weights file. If None, uses default weights.
+        Remap decoder self-attention keys: checkpoint uses nn.MultiheadAttention naming,
+        our decoder uses fused qkv_proj/out_proj. Scoped to decoder layers only.
         """
-        if weights is None:
-            weights = self.pretrained_urls[self.model_name]
-
-        # Remap decoder self-attention keys: checkpoint uses nn.MultiheadAttention naming,
-        # our decoder uses fused qkv_proj/out_proj. Scoped to decoder layers only.
         key_mapping: dict[str, str] = {}
         for i in range(self._decoder.num_layers):
             prefix = f"decoder.decoder.layers.{i}."
             key_mapping[f"{prefix}self_attn.in_proj_"] = f"{prefix}qkv_proj."
             key_mapping[f"{prefix}self_attn.out_proj."] = f"{prefix}out_proj."
-        load_checkpoint(self.model, str(weights), key_mapping=key_mapping)
+        return key_mapping

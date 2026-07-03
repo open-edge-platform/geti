@@ -23,6 +23,7 @@ from getitune.backend.lightning.models.base import (
     DefaultSchedulerCallable,
     LightningModel,
 )
+from getitune.backend.lightning.models.utils.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.models.utils.utils import InstanceData
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.backend.lightning.tools.explain.explain_algo import feature_vector_fn
@@ -42,10 +43,9 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.backend.lightning.models.detection.detectors import SingleStageDetector
-    from getitune.types import PathLike
 
 
-class LightningDetectionModel(LightningModel):
+class LightningDetectionModel(PretrainedWeightsMixin, LightningModel):
     """Base class for the detection models used in getitune.
 
     This class is a subclass of LightningModel and provides common functionality for detection models.
@@ -570,16 +570,3 @@ class LightningDetectionModel(LightningModel):
     def task(self) -> TaskType:
         """Return task type."""
         return TaskType.DETECTION
-
-    def load_pretrained(self, weights: PathLike | None = None) -> None:
-        """Load pretrained weights into the model.
-
-        Args:
-            weights (PathLike | None): Path to the pretrained weights file. If None, uses default weights.
-        """
-        from getitune.backend.lightning.models.utils.utils import load_checkpoint
-
-        if weights is None:
-            weights = self.pretrained_urls[self.model_name]
-
-        load_checkpoint(self.model, str(weights))

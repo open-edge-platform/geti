@@ -14,7 +14,6 @@ from getitune.backend.lightning.models.keypoint_detection.base import LightningK
 from getitune.backend.lightning.models.keypoint_detection.detectors.topdown import TopdownPoseEstimator
 from getitune.backend.lightning.models.keypoint_detection.heads.rtmcc_head import RTMCCHead
 from getitune.backend.lightning.models.keypoint_detection.losses.kl_discret_loss import KLDiscretLoss
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.metrics.pck import PCKMeasureCallable
 
 if TYPE_CHECKING:
@@ -31,7 +30,7 @@ if TYPE_CHECKING:
 class RTMPose(LightningKeypointDetectionModel):
     """RTMPose Model."""
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "rtmpose_tiny": "https://storage.geti.intel.com/weights/cspnext-tiny_udp-aic-coco_210e-256x192-cbed682d_20230130.pth",
     }
 
@@ -44,6 +43,7 @@ class RTMPose(LightningKeypointDetectionModel):
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = PCKMeasureCallable,
         torch_compile: bool = False,
+        pretrained: bool = True,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -53,6 +53,7 @@ class RTMPose(LightningKeypointDetectionModel):
             scheduler=scheduler,
             metric=metric,
             torch_compile=torch_compile,
+            pretrained=pretrained,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:
@@ -95,7 +96,6 @@ class RTMPose(LightningKeypointDetectionModel):
             head=head,
         )
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
 
         return model
 

@@ -17,6 +17,7 @@ from getitune.backend.lightning.models.base import (
     DefaultSchedulerCallable,
     LightningModel,
 )
+from getitune.backend.lightning.models.utils.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.data.entity.base import BatchLoss, ImageInfo
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
@@ -30,7 +31,7 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
 
-class LightningKeypointDetectionModel(LightningModel):
+class LightningKeypointDetectionModel(PretrainedWeightsMixin, LightningModel):
     """Base class for the keypoint detection models used in getitune.
 
     Args:
@@ -45,6 +46,7 @@ class LightningKeypointDetectionModel(LightningModel):
             Defaults to DefaultSchedulerCallable.
         metric (MetricCallable, optional): Callable for the metric. Defaults to PCKMeasureCallable.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
+        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
 
     """
 
@@ -57,6 +59,7 @@ class LightningKeypointDetectionModel(LightningModel):
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = PCKMeasureCallable,
         torch_compile: bool = False,
+        pretrained: bool = True,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -66,6 +69,7 @@ class LightningKeypointDetectionModel(LightningModel):
             scheduler=scheduler,
             metric=metric,
             torch_compile=torch_compile,
+            pretrained=pretrained,
         )
 
     def _customize_inputs(self, entity: SampleBatch) -> dict[str, Any]:
