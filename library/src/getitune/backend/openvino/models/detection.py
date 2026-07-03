@@ -11,9 +11,11 @@ import torch
 from model_api.tilers import DetectionTiler
 from torchvision import tv_tensors
 
+from getitune.backend.lightning.tools.tile_merge import DetectionTileMerge
 from getitune.backend.openvino.models.base import OVModel
 from getitune.backend.openvino.models.utils import rescale_bboxes_to_original
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
+from getitune.data.entity.tile import TileBatchData
 from getitune.metrics import MetricCallable, MetricInput
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 from getitune.types.task import TaskType
@@ -268,9 +270,42 @@ class OVDetectionModel(OVModel):
         compute_kwargs = {"best_confidence_threshold": best_confidence_threshold}
         return super()._compute_metrics(metric, **compute_kwargs)
 
+    def forward_tiles(self, inputs: TileBatchData) -> PredictionBatch:
+        """Run tiled detection inference and merge tile predictions to full-image predictions.
+
+        Unbinds the tile batch into per-tile ``SampleBatch`` inputs, runs inference on
+        each, and merges the per-tile predictions back to the original image coordinate
+        space using :class:`DetectionTileMerge`, mirroring the Lightning tiling path.
+
+        Args:
+            inputs (TileBatchData): Batch of tiles wrapping the original images.
+
+        Returns:
+            PredictionBatch: Merged full-image detection predictions.
+        """
+        tile_preds: list[PredictionBatch] = []
+        tile_infos: list = []
+        merger = DetectionTileMerge(
+            inputs.imgs_info,
+            self.label_info.num_classes,
+            self.tile_config,
+        )
+        for batch_tile_infos, batch_tile_input in inputs.unbind():
+            tile_preds.append(self(batch_tile_input))
+            tile_infos.append(batch_tile_infos)
+
+        pred_entities = merger.merge(tile_preds, tile_infos)
+        return PredictionBatch(
+            images=[pred_entity.image for pred_entity in pred_entities],
+            imgs_info=[pred_entity.img_info for pred_entity in pred_entities],
+            scores=[pred_entity.scores for pred_entity in pred_entities],  # pyrefly: ignore[bad-argument-type]
+            bboxes=[pred_entity.bboxes for pred_entity in pred_entities],  # pyrefly: ignore[bad-argument-type]
+            labels=[pred_entity.label for pred_entity in pred_entities],  # pyrefly: ignore[bad-argument-type]
+        )
+
     def predict_step(self, data_batch: SampleBatch) -> PredictionBatch:
         """Run detection inference and filter by confidence threshold."""
-        predictions = self(data_batch)
+        predictions = self.forward_tiles(data_batch) if isinstance(data_batch, TileBatchData) else self(data_batch)
         threshold = self.hparams.get("best_confidence_threshold", None)
         if not threshold:
             return predictions

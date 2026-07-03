@@ -21,10 +21,12 @@ from model_api.models import ImageModel, Model
 from model_api.tilers import Tiler
 from torch import Tensor
 
+from getitune.config.data import TileConfig
 from getitune.data.entity.base import (
     ImageInfo,
 )
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
+from getitune.data.entity.tile import TileBatchData
 from getitune.metrics import NullMetricCallable
 from getitune.types.label import LabelInfo
 from getitune.types.task import TaskType
@@ -93,6 +95,10 @@ class OVModel:
         self.metric_callable = metric
         self._label_info = self._create_label_info_from_model()
         self._task: TaskType | None = None
+        # Tile configuration used to merge tile predictions back to the original image
+        # during tile-based evaluation/prediction. Populated by the engine from the
+        # datamodule when tiling is enabled; defaults to a disabled configuration.
+        self.tile_config: TileConfig = TileConfig(enable_tiler=False)
         tile_enabled = False
         with contextlib.suppress(RuntimeError):
             if isinstance(self.model, Model):
@@ -630,7 +636,7 @@ class OVModel:
 
         Override in subclasses for task-specific inference logic.
         """
-        preds = self(data_batch)
+        preds = self.forward_tiles(data_batch) if isinstance(data_batch, TileBatchData) else self(data_batch)
         metric_inputs = self.prepare_metric_inputs(preds, data_batch)
         if isinstance(metric_inputs, list):
             for metric_input in metric_inputs:
@@ -643,7 +649,23 @@ class OVModel:
 
         Override in subclasses to apply task-specific post-filtering (e.g. confidence threshold).
         """
+        if isinstance(data_batch, TileBatchData):
+            return self.forward_tiles(data_batch)
         return self(data_batch)
+
+    def forward_tiles(self, inputs: TileBatchData) -> PredictionBatch:
+        """Run tile-based inference and merge tile predictions to full-image predictions.
+
+        The datamodule produces a ``TileBatchData`` entity (a batch of tiles wrapping
+        the original images) when tiling is enabled. This method unbinds the tiles,
+        runs inference on each tile batch and merges the per-tile predictions back to
+        the original image coordinate space, mirroring the Lightning ``forward_tiles``
+        behaviour.
+
+        Must be overridden by task-specific subclasses that support tiling.
+        """
+        msg = f"Tile-based inference is not supported for {type(self).__name__}."
+        raise NotImplementedError(msg)
 
     def __call__(self, *args, **kwds):
         """Call the model for inference.

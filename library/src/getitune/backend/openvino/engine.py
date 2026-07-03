@@ -261,6 +261,11 @@ class OVEngine(Engine):
         model = self._update_checkpoint(checkpoint)
         metric = metric or model.metric_callable
 
+        # Propagate the datamodule tiling configuration to the model so that tile
+        # predictions can be merged back to the original image during evaluation.
+        if getattr(datamodule, "tile_config", None) is not None:
+            model.tile_config = datamodule.tile_config
+
         datamodule = self._auto_configurator.update_ov_subset_pipeline(
             datamodule=datamodule,
             subset="test",

@@ -12,8 +12,10 @@ import torch
 from torchvision import tv_tensors
 
 from getitune.backend.openvino.models.detection import OVDetectionModel
+from getitune.config.data import TileConfig
 from getitune.data.entity.base import ImageInfo
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
+from getitune.data.entity.tile import TileBatchData
 
 
 class _FakeDetectionResult:
@@ -277,3 +279,127 @@ class TestOVDetectionModelCoordinateRescaling:
         expected = torch.tensor([[expected_x1, expected_y1, expected_x2, expected_y2]], dtype=torch.float32)
         torch.testing.assert_close(result_bboxes.data, expected, atol=1e-4, rtol=1e-4)
         assert result_bboxes.canvas_size == ori_shape
+
+
+class _FakeTileBatchDet(TileBatchData):
+    """Minimal TileBatchData subclass exposing detection ground-truth fields for tests."""
+
+    def __init__(self, imgs_info, unbind_result):
+        # Bypass the dataclass __init__: we only need imgs_info and unbind() for these tests.
+        self.imgs_info = imgs_info
+        self._unbind_result = unbind_result
+        self.bboxes = [
+            tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+                torch.empty((0, 4)),
+                format="XYXY",
+                canvas_size=info.ori_shape,
+            )
+            for info in imgs_info
+        ]
+        self.labels = [torch.empty((0,), dtype=torch.long) for _ in imgs_info]
+
+    def unbind(self) -> list:
+        return self._unbind_result
+
+
+class TestOVDetectionModelTiling:
+    """Tests for tile-aware inference in OVDetectionModel (forward_tiles / test_step routing)."""
+
+    @pytest.fixture
+    def detection_model(self):
+        with patch.object(OVDetectionModel, "__init__", lambda *_args, **_kwargs: None):
+            model = OVDetectionModel.__new__(OVDetectionModel)
+            model.model = MagicMock()
+            model.tile_config = TileConfig(enable_tiler=True, tile_size=(200, 200))
+            model._label_info = MagicMock()
+            model._label_info.num_classes = 3
+            model.hparams = {}
+            return model
+
+    def _make_tile_batch(self) -> _FakeTileBatchDet:
+        ori_info = ImageInfo(  # pyrefly: ignore[no-matching-overload]
+            img_idx=0,
+            img_shape=(256, 256),
+            ori_shape=(256, 256),
+        )
+        tile_info = ImageInfo(  # pyrefly: ignore[no-matching-overload]
+            img_idx=0,
+            img_shape=(200, 200),
+            ori_shape=(200, 200),
+        )
+        # A single unbound tile batch (one SampleBatch of tile images) with matching tile infos.
+        tile_sample_batch = SampleBatch(
+            images=[torch.rand(3, 200, 200)],
+            imgs_info=[tile_info],
+        )
+        tile_infos = [MagicMock()]  # opaque to the (mocked) merger
+        return _FakeTileBatchDet(imgs_info=[ori_info], unbind_result=[(tile_infos, tile_sample_batch)])
+
+    def test_forward_tiles_unbinds_and_merges(self, detection_model):
+        """forward_tiles should run per-tile inference and merge results back to the original image."""
+        tile_batch = self._make_tile_batch()
+
+        # Per-tile forward returns an (arbitrary) prediction batch.
+        per_tile_pred = PredictionBatch(images=[], imgs_info=[])
+        detection_model.forward = MagicMock(return_value=per_tile_pred)
+
+        # Merged full-image prediction returned by the tile merger.
+        merged = MagicMock()
+        merged.image = torch.empty(3, 256, 256)
+        merged.img_info = tile_batch.imgs_info[0]
+        merged.scores = torch.tensor([0.9])
+        merged.bboxes = tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+            torch.tensor([[10.0, 10.0, 50.0, 50.0]]),
+            format="XYXY",
+            canvas_size=(256, 256),
+        )
+        merged.label = torch.tensor([1], dtype=torch.long)
+
+        with patch(
+            "getitune.backend.openvino.models.detection.DetectionTileMerge",
+        ) as mock_merge_cls:
+            mock_merger = mock_merge_cls.return_value
+            mock_merger.merge.return_value = [merged]
+            result = detection_model.forward_tiles(tile_batch)
+
+        # The merger was constructed with original image infos, num_classes and tile_config.
+        mock_merge_cls.assert_called_once_with(
+            tile_batch.imgs_info,
+            detection_model._label_info.num_classes,
+            detection_model.tile_config,
+        )
+        # Per-tile inference ran once for the single unbound tile batch.
+        detection_model.forward.assert_called_once()
+        # merge() received the collected per-tile predictions and infos.
+        merge_args = mock_merger.merge.call_args.args
+        assert merge_args[0] == [per_tile_pred]
+
+        # The returned batch contains the merged full-image prediction.
+        assert isinstance(result, PredictionBatch)
+        torch.testing.assert_close(result.bboxes[0].data, merged.bboxes.data)  # pyrefly: ignore[unsupported-operation]
+        torch.testing.assert_close(result.labels[0], merged.label)  # pyrefly: ignore[unsupported-operation]
+        torch.testing.assert_close(result.scores[0], merged.scores)  # pyrefly: ignore[unsupported-operation]
+
+    def test_test_step_routes_tile_batch_to_forward_tiles(self, detection_model):
+        """test_step must dispatch TileBatchData inputs to forward_tiles, not the plain forward path."""
+        tile_batch = self._make_tile_batch()
+        merged_preds = PredictionBatch(
+            images=[torch.empty(3, 256, 256)],
+            imgs_info=[tile_batch.imgs_info[0]],
+            scores=[torch.tensor([0.9])],
+            bboxes=[
+                tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+                    torch.tensor([[1.0, 2.0, 3.0, 4.0]]), format="XYXY", canvas_size=(256, 256)
+                )
+            ],
+            labels=[torch.tensor([0], dtype=torch.long)],
+        )
+        detection_model.forward_tiles = MagicMock(return_value=merged_preds)
+        detection_model.forward = MagicMock()
+        metric = MagicMock()
+
+        detection_model.test_step(tile_batch, metric)
+
+        detection_model.forward_tiles.assert_called_once_with(tile_batch)
+        detection_model.forward.assert_not_called()
+        metric.update.assert_called_once()

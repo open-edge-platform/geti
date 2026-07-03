@@ -22,6 +22,14 @@ CHECKPOINT_CALLBACK = {
     "class_path": "lightning.pytorch.callbacks.ModelCheckpoint",
     "init_args": {"dirpath": "", "monitor": "val/map_50"},
 }
+AUG_SCHEDULER_CLASS_PATH = "getitune.backend.lightning.callbacks.aug_scheduler.AugmentationSchedulerCallback"
+
+AUG_SCHEDULER_CALLBACK = {
+    "class_path": AUG_SCHEDULER_CLASS_PATH,
+    "init_args": {
+        "data_aug_switch": {"class_path": "getitune.backend.lightning.callbacks.aug_scheduler.DataAugSwitch"}
+    },
+}
 
 
 def _make_getitune_config(**overrides: Any) -> dict:
@@ -249,6 +257,69 @@ class TestGetiConfigConverterConvert:
 
         idx = GetiConfigConverter.get_callback_idx(result["callbacks"], EARLY_STOPPING_CLASS_PATH)
         assert idx == -1
+
+    def test_convert_excludes_deim_framework_when_tiling_enabled(self) -> None:
+        """DEIM is incompatible with tiling: enabling tiling must exclude the DEIM scheduler callback."""
+        getitune_cfg = _make_getitune_config(
+            callbacks=[
+                copy.deepcopy(EARLY_STOPPING_CALLBACK),
+                copy.deepcopy(CHECKPOINT_CALLBACK),
+                copy.deepcopy(AUG_SCHEDULER_CALLBACK),
+            ]
+        )
+        geti_cfg = _make_geti_config(
+            model_manifest_id="object-detection-dfine-m",
+            hyper_parameters={
+                "dataset_preparation": {
+                    "augmentation": {
+                        "deim_framework": True,
+                        "tiling": {
+                            "enable": True,
+                            "enable_adaptive_tiling": True,
+                            "tile_size": 512,
+                            "tile_overlap": 0.3,
+                        },
+                    }
+                }
+            },
+        )
+
+        with patch("getitune.tools.auto_configurator.AutoConfigurator") as MockAutoConfigurator:
+            MockAutoConfigurator.return_value.config = getitune_cfg
+            result = GetiConfigConverter.convert(geti_cfg)
+
+        # Tiling is enabled ...
+        assert result["data"]["tile_config"]["enable_tiler"] is True
+        # ... and the DEIM augmentation scheduler callback has been excluded.
+        assert GetiConfigConverter.get_callback_idx(result["callbacks"], AUG_SCHEDULER_CLASS_PATH) == -1
+
+    def test_convert_keeps_deim_framework_when_tiling_disabled(self) -> None:
+        """When tiling is disabled and DEIM is enabled, the DEIM scheduler callback is retained."""
+        getitune_cfg = _make_getitune_config(
+            callbacks=[
+                copy.deepcopy(EARLY_STOPPING_CALLBACK),
+                copy.deepcopy(CHECKPOINT_CALLBACK),
+                copy.deepcopy(AUG_SCHEDULER_CALLBACK),
+            ]
+        )
+        geti_cfg = _make_geti_config(
+            model_manifest_id="object-detection-dfine-m",
+            hyper_parameters={
+                "dataset_preparation": {
+                    "augmentation": {
+                        "deim_framework": True,
+                        "tiling": {"enable": False},
+                    }
+                }
+            },
+        )
+
+        with patch("getitune.tools.auto_configurator.AutoConfigurator") as MockAutoConfigurator:
+            MockAutoConfigurator.return_value.config = getitune_cfg
+            result = GetiConfigConverter.convert(geti_cfg)
+
+        assert result["data"]["tile_config"]["enable_tiler"] is False
+        assert GetiConfigConverter.get_callback_idx(result["callbacks"], AUG_SCHEDULER_CLASS_PATH) >= 0
 
     def test_convert_applies_input_size(self) -> None:
         getitune_cfg = _make_getitune_config()
