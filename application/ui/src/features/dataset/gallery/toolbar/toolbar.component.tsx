@@ -31,6 +31,7 @@ import { DateFilter } from './media-filtering/date-filter/date-filter.component'
 import { FilterByStatus } from './media-filtering/filter-by-status/filter-by-status.component';
 import { FilterBySubset } from './media-filtering/filter-by-subset/filter-by-subset.component';
 import { MediaFilterLabels } from './media-filtering/media-filter-labels/media-filter-labels.component';
+import { MediaFiltering } from './media-filtering/media-filtering.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
 import { toggleMultipleSelection } from './util';
@@ -150,13 +151,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     {noMediaSelected && (
                         <>
-                            <FilterByStatus />
-
-                            <FilterBySubset />
-
-                            <MediaFilterLabels />
-
-                            <DateFilter />
+                            <MediaFiltering />
 
                             <DatasetStatistics />
 
