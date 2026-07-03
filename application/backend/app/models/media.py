@@ -44,6 +44,19 @@ class MediaType(StrEnum):
     VIDEO_FRAME = "video_frame"
 
 
+class MediaSortBy(StrEnum):
+    """Field to sort media listing by."""
+
+    UPLOAD_DATE = "upload_date"
+
+
+class SortDirection(StrEnum):
+    """Direction to sort media listing in."""
+
+    ASC = "asc"
+    DESC = "desc"
+
+
 class BaseMedia(BaseEntity):
     """
     Media represents an uploaded or fetched media within a dataset, it can be one of Image, Video or VideoFrame.

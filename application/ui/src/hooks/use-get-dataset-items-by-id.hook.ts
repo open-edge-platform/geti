@@ -3,15 +3,18 @@
 
 import { useMemo, useRef } from 'react';
 
-import type { DatasetItemAnnotationStatus } from '../constants/shared-types';
+import type { DatasetItemAnnotationStatus, DatasetSubset } from '../constants/shared-types';
+import { type SortDirection } from './sort-direction.interface';
 import { useGetDatasetItems } from './use-get-dataset-items.hook';
 
 type UseGetDatasetItemsByIdOptions = {
     annotationStatus?: DatasetItemAnnotationStatus;
+    sortDirection?: SortDirection;
+    subsets?: DatasetSubset[];
 };
 
-export const useGetDatasetItemsById = ({ annotationStatus }: UseGetDatasetItemsByIdOptions) => {
-    const { items, ...response } = useGetDatasetItems({ annotationStatus });
+export const useGetDatasetItemsById = ({ annotationStatus, sortDirection, subsets }: UseGetDatasetItemsByIdOptions) => {
+    const { items, ...response } = useGetDatasetItems({ annotationStatus, sortDirection, subsets });
 
     const accumulatedReviewStatusRef = useRef(new Map<string, boolean>());
 

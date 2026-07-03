@@ -105,7 +105,7 @@ xpu = [
     "torchvision==0.25.0+xpu"
 ]
 ultralytics = [
-    "ultralytics~=8.4.41",
+    "ultralytics~=8.4.82",
 ]
 
 docs = [
@@ -414,6 +414,7 @@ notice-rgx = """
     "ANN201",   # Skip return type hint in test codes
     "D",     # Test skips missing docstring argument with magic (fixture) methods.
     "ARG001",   # Some arguments are passed for executing fixture
+    "PT019",    # False positive on `@patch`-injected mock parameters, which aren't pytest fixtures.
 ]
 "src/getitune/**/*.py" = [
     "ERA001",
