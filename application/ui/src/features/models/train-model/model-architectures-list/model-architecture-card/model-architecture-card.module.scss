@@ -4,8 +4,8 @@
     background-color: var(--spectrum-global-color-gray-200);
     display: grid;
     grid-template-rows: subgrid;
-    grid-row: span 3;
-    gap: var(--spectrum-global-dimension-size-200);
+    grid-row: span 2;
+    gap: var(--spectrum-global-dimension-size-150);
     transition:
         border-color 0.3s ease-in-out,
         background-color 0.3s ease-in-out;
