@@ -50,7 +50,7 @@ class _HasBackboneModelWithUrls(Protocol):
     model_name: str
 
 
-class PytorchcvLoaderMixin:
+class PytorchcvWeightsLoader:
     """Load backbone weights via pytorchcv's model store (EfficientNet)."""
 
     def load_pretrained(self: _HasBackboneModel, weights: PathLike | None = None) -> None:
@@ -66,7 +66,7 @@ class PytorchcvLoaderMixin:
         logger.info("Loaded backbone weights from %s", cache_dir)
 
 
-class CheckpointLoaderMixin:
+class CheckpointWeightsLoader:
     """Load backbone weights from an HTTP checkpoint URL (MobileNetV3)."""
 
     def load_pretrained(self: _HasBackboneModelWithUrls, weights: PathLike | None = None) -> None:
@@ -77,7 +77,7 @@ class CheckpointLoaderMixin:
         logger.info("Loaded backbone weights from %s", weights)
 
 
-class TorchvisionLoaderMixin:
+class TorchvisionWeightsLoader:
     """Load backbone weights from Torchvision (EfficientNet)."""
 
     def load_pretrained(self: _HasBackboneModel, weights: PathLike | None = None) -> None:
@@ -92,7 +92,7 @@ class TorchvisionLoaderMixin:
         self.model.backbone.features.load_state_dict(ref.features.state_dict())  # pyrefly: ignore[missing-attribute]
 
 
-class TimmLoaderMixin:
+class TimmWeightsLoader:
     """Load backbone weights via ``timm.models.load_pretrained``."""
 
     def load_pretrained(self: _HasBackboneModel, weights: PathLike | None = None) -> None:
@@ -121,7 +121,7 @@ class _HasViTBackboneWithUrls(Protocol):
     model_name: str
 
 
-class VisionTransformerLoaderMixin:
+class VisionTransformerWeightsLoader:
     """Load backbone weights for ViT architecture."""
 
     def load_pretrained(self: _HasViTBackboneWithUrls, weights: PathLike | None = None) -> None:

@@ -15,7 +15,7 @@ from getitune.backend.lightning.models.classification.classifier import ImageCla
 from getitune.backend.lightning.models.classification.heads import LinearClsHead
 from getitune.backend.lightning.models.classification.multiclass_models.base import LightningMulticlassClsModel
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
-from getitune.backend.lightning.models.classification.utils.loaders import CheckpointLoaderMixin
+from getitune.backend.lightning.models.classification.utils.load_weights import CheckpointWeightsLoader
 from getitune.backend.lightning.models.classification.utils.pretrained_urls import MOBILENETV3_PRETRAINED_URLS
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiClassClsMetricCallable
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from getitune.metrics import MetricCallable
 
 
-class MobileNetV3MulticlassCls(CheckpointLoaderMixin, LightningMulticlassClsModel):
+class MobileNetV3MulticlassCls(CheckpointWeightsLoader, LightningMulticlassClsModel):
     """MobileNetV3MulticlassCls is a class that represents a MobileNetV3 model for multiclass classification.
 
     Args:

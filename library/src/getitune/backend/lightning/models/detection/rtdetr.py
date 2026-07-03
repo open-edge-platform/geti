@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import copy
 import re
-from typing import TYPE_CHECKING, Any, ClassVar, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import torch
 from torch import Tensor, nn
@@ -23,7 +23,7 @@ from getitune.backend.lightning.models.detection.base import LightningDetectionM
 from getitune.backend.lightning.models.detection.detectors import DETR
 from getitune.backend.lightning.models.detection.heads import RTDETRTransformer
 from getitune.backend.lightning.models.detection.necks import HybridEncoder
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
+from getitune.backend.lightning.models.detection.utils.pretrained_urls import RTDETR_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.data.entity.base import BatchLoss
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
@@ -42,7 +42,7 @@ class RTDETR(LightningDetectionModel):
     """getitune Detection model class for RTDETR.
 
     Attributes:
-        pretrained_weights (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
+        pretrained_urls (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
         input_size_multiplier (int): Multiplier for the input size.
 
     Args:
@@ -57,14 +57,10 @@ class RTDETR(LightningDetectionModel):
         multi_scale (bool, optional): Whether to use multi-scale training. Defaults to False.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
-        "rtdetr_18": "https://storage.geti.intel.com/weights/rtdetr_r18vd_5x_coco_objects365_from_paddle.pth",
-        "rtdetr_50": "https://storage.geti.intel.com/weights/rtdetr_r50vd_2x_coco_objects365_from_paddle.pth",
-        "rtdetr_101": "https://storage.geti.intel.com/weights/rtdetr_r101vd_2x_coco_objects365_from_paddle.pth",
-    }
-
+    pretrained_urls = RTDETR_PRETRAINED_URLS
     input_size_multiplier = 32
 
     def __init__(
@@ -78,6 +74,7 @@ class RTDETR(LightningDetectionModel):
         multi_scale: bool = False,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
     ) -> None:
         self.multi_scale = multi_scale
         super().__init__(
@@ -89,6 +86,7 @@ class RTDETR(LightningDetectionModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
         )
 
     def _create_model(self, num_classes: int | None = None) -> DETR:
@@ -126,7 +124,6 @@ class RTDETR(LightningDetectionModel):
             input_size=self.data_input_params.input_size[0],
         )
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
 
         return model
 

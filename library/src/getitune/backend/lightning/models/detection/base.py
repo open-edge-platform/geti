@@ -11,7 +11,7 @@ import inspect
 import logging as log
 import types
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Iterator, Literal, Sequence, cast
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Iterator, Literal, Sequence, cast
 
 import torch
 from torchmetrics import Metric, MetricCollection
@@ -42,6 +42,7 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.backend.lightning.models.detection.detectors import SingleStageDetector
+    from getitune.types import PathLike
 
 
 class LightningDetectionModel(LightningModel):
@@ -67,10 +68,12 @@ class LightningDetectionModel(LightningModel):
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
         explain_mode (bool, optional): Whether to enable explain mode.
-            The model will return feature vectors need for XAI visualization.
+            The model will return feature vectors needed for XAI visualization.
             Defaults to False.
-
+        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
+
+    pretrained_urls: ClassVar[dict[str, str]]
 
     def __init__(
         self,
@@ -83,6 +86,7 @@ class LightningDetectionModel(LightningModel):
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
         explain_mode: bool = False,
+        pretrained: bool = True,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -93,6 +97,7 @@ class LightningDetectionModel(LightningModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
         )
 
         self.explain_mode = explain_mode
@@ -565,3 +570,16 @@ class LightningDetectionModel(LightningModel):
     def task(self) -> TaskType:
         """Return task type."""
         return TaskType.DETECTION
+
+    def load_pretrained(self, weights: PathLike | None = None) -> None:
+        """Load pretrained weights into the model.
+
+        Args:
+            weights (PathLike | None): Path to the pretrained weights file. If None, uses default weights.
+        """
+        from getitune.backend.lightning.models.utils.utils import load_checkpoint
+
+        if weights is None:
+            weights = self.pretrained_urls[self.model_name]
+
+        load_checkpoint(self.model, str(weights))

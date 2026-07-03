@@ -18,7 +18,7 @@ from getitune.backend.lightning.models.classification.multilabel_models.base imp
     LightningMultilabelClsModel,
 )
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
-from getitune.backend.lightning.models.classification.utils.loaders import TimmLoaderMixin
+from getitune.backend.lightning.models.classification.utils.load_weights import TimmWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiLabelClsMetricCallable
 from getitune.types.label import LabelInfoTypes
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from getitune.metrics import MetricCallable
 
 
-class TimmModelMultilabelCls(TimmLoaderMixin, LightningMultilabelClsModel):
+class TimmModelMultilabelCls(TimmWeightsLoader, LightningMultilabelClsModel):
     """TimmModel for multi-label classification task.
 
     Args:

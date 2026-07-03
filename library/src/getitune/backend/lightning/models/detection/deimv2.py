@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Literal
+from typing import TYPE_CHECKING, Literal
 
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
 from getitune.backend.lightning.models.detection.backbones.dinov3sta import DINOv3STAs
@@ -13,6 +13,7 @@ from getitune.backend.lightning.models.detection.detectors import DETR
 from getitune.backend.lightning.models.detection.heads.deim_decoder import DEIMTransformer
 from getitune.backend.lightning.models.detection.losses.deim_loss import DEIMCriterion
 from getitune.backend.lightning.models.detection.necks.dfine_hybrid_encoder import HybridEncoder
+from getitune.backend.lightning.models.detection.utils.pretrained_urls import DEIMV2_PRETRAINED_URLS
 from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
@@ -24,6 +25,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -41,7 +43,7 @@ class DEIMV2(DEIMDFine):
     for dynamic augmentation scheduling.
 
     Attributes:
-        _pretrained_weights (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
+        pretrained_urls (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
         input_size_multiplier (int): Multiplier for the input size.
 
     Args:
@@ -56,15 +58,10 @@ class DEIMV2(DEIMDFine):
         multi_scale (bool, optional): Whether to use multi-scale training. Defaults to False.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
-        "deimv2_x": "https://storage.geti.intel.com/weights/deimv2_dinov3_x_coco.pth",
-        "deimv2_l": "https://storage.geti.intel.com/weights/deimv2_dinov3_l_coco.pth",
-        "deimv2_m": "https://storage.geti.intel.com/weights/deimv2_dinov3_m_coco.pth",
-        "deimv2_s": "https://storage.geti.intel.com/weights/deimv2_dinov3_s_coco.pth",
-    }
-
+    pretrained_urls = DEIMV2_PRETRAINED_URLS
     input_size_multiplier = 32
 
     def __init__(
@@ -83,6 +80,7 @@ class DEIMV2(DEIMDFine):
         multi_scale: bool = False,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
     ) -> None:
         super().__init__(
             model_name=model_name,  # type: ignore[arg-type]
@@ -94,6 +92,7 @@ class DEIMV2(DEIMDFine):
             torch_compile=torch_compile,
             tile_config=tile_config,
             multi_scale=multi_scale,
+            pretrained=pretrained,
         )
 
     def _create_model(self, num_classes: int | None = None) -> DETR:
@@ -109,6 +108,7 @@ class DEIMV2(DEIMDFine):
             num_classes=num_classes,
             eval_spatial_size=self.data_input_params.input_size,
         )
+        self._decoder = decoder
 
         criterion = DEIMCriterion(
             weight_dict={
@@ -155,16 +155,27 @@ class DEIMV2(DEIMDFine):
             input_size=self.data_input_params.input_size[0],
         )
         model.init_weights()
-        # Remap decoder self-attention keys: checkpoint uses nn.MultiheadAttention naming,
-        # our decoder uses fused qkv_proj/out_proj. Scoped to decoder layers only.
-        key_mapping: dict[str, str] = {}
-        for i in range(decoder.num_layers):
-            prefix = f"decoder.decoder.layers.{i}."
-            key_mapping[f"{prefix}self_attn.in_proj_"] = f"{prefix}qkv_proj."
-            key_mapping[f"{prefix}self_attn.out_proj."] = f"{prefix}out_proj."
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu", key_mapping=key_mapping)
+
         return model
 
     @property
     def _default_preprocessing_params(self) -> DataInputParams | dict[str, DataInputParams]:
         return DataInputParams(input_size=(640, 640), mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+
+    def load_pretrained(self, weights: PathLike | None = None) -> None:
+        """Load pretrained weights into the model.
+
+        Args:
+            weights (PathLike | None): Path to the pretrained weights file. If None, uses default weights.
+        """
+        if weights is None:
+            weights = self.pretrained_urls[self.model_name]
+
+        # Remap decoder self-attention keys: checkpoint uses nn.MultiheadAttention naming,
+        # our decoder uses fused qkv_proj/out_proj. Scoped to decoder layers only.
+        key_mapping: dict[str, str] = {}
+        for i in range(self._decoder.num_layers):
+            prefix = f"decoder.decoder.layers.{i}."
+            key_mapping[f"{prefix}self_attn.in_proj_"] = f"{prefix}qkv_proj."
+            key_mapping[f"{prefix}self_attn.out_proj."] = f"{prefix}out_proj."
+        load_checkpoint(self.model, str(weights), key_mapping=key_mapping)

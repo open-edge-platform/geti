@@ -12,7 +12,7 @@ Reference : https://github.com/open-mmlab/mmdetection/blob/v3.2.0/mmdet/models/d
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, ClassVar, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 from torch.export import Dim
@@ -26,8 +26,8 @@ from getitune.backend.lightning.models.detection.base import LightningDetectionM
 from getitune.backend.lightning.models.detection.detectors import SingleStageDetector
 from getitune.backend.lightning.models.detection.heads import SSDHead
 from getitune.backend.lightning.models.detection.losses import SSDCriterion
+from getitune.backend.lightning.models.detection.utils.pretrained_urls import SSD_PRETRAINED_URLS
 from getitune.backend.lightning.models.detection.utils.prior_generators import SSDAnchorGeneratorClustered
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 
@@ -49,7 +49,7 @@ class SSD(LightningDetectionModel):
     """getitune Detection model class for SSD.
 
     Attributes:
-        pretrained_weights (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
+        pretrained_urls (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
 
     Args:
         label_info (LabelInfoTypes): Information about the labels.
@@ -67,9 +67,7 @@ class SSD(LightningDetectionModel):
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
-        "ssd_mobilenetv2": "https://storage.geti.intel.com/weights/mobilenet_v2-2s_ssd-992x736.pth",
-    }
+    pretrained_urls = SSD_PRETRAINED_URLS
 
     def __init__(
         self,
@@ -157,7 +155,6 @@ class SSD(LightningDetectionModel):
             test_cfg=test_cfg,  # TODO (sungchul, kirill): remove
         )
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
 
         return model
 
@@ -171,7 +168,6 @@ class SSD(LightningDetectionModel):
                     "out_indices": [4, 5],
                     "frozen_stages": -1,
                     "norm_eval": False,
-                    "pretrained": True,
                 },
             )
 

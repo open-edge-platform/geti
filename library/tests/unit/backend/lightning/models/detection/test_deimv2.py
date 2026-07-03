@@ -32,12 +32,13 @@ class TestDEIMV2:
             model_name=model_name,
             label_info=3,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         assert model.model_name == model_name
         assert model.num_classes == 3
         assert model.data_input_params.input_size == (640, 640)
         assert model.input_size_multiplier == 32
-        assert model_name in model._pretrained_weights
+        assert model_name in model.pretrained_urls
 
     @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
     def test_create_model(self, mock_load_checkpoint: MagicMock) -> None:
@@ -95,6 +96,7 @@ class TestDEIMV2:
             model_name="deimv2_s",
             label_info=5,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         created_model = model._create_model()
 
@@ -118,6 +120,7 @@ class TestDEIMV2:
             model_name=model_name,
             label_info=5,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         created_model = model._create_model()
 
@@ -132,6 +135,7 @@ class TestDEIMV2:
         model = DEIMV2(
             model_name="deimv2_s",
             label_info=10,
+            pretrained=False,
         )
 
         # Set model to training mode
@@ -163,6 +167,7 @@ class TestDEIMV2:
             model_name=model_name,
             label_info=3,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         # Set model to evaluation mode
@@ -189,6 +194,7 @@ class TestDEIMV2:
         model = DEIMV2(
             model_name=model_name,
             label_info=3,
+            pretrained=False,
         )
 
         # Set model to evaluation mode
@@ -212,6 +218,7 @@ class TestDEIMV2:
             model_name="deimv2_s",
             label_info=5,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         created_model = model._create_model()
@@ -230,6 +237,7 @@ class TestDEIMV2:
             model_name="deimv2_s",
             label_info=5,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         created_model = model._create_model()
@@ -248,6 +256,7 @@ class TestDEIMV2:
             model_name="deimv2_s",
             label_info=5,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         created_model = model._create_model()
@@ -266,6 +275,7 @@ class TestDEIMV2:
             model_name="deimv2_s",
             label_info=5,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         created_model = model._create_model()

@@ -18,7 +18,7 @@ from getitune.backend.lightning.models.classification.multiclass_models.vit impo
 from getitune.backend.lightning.models.classification.multilabel_models.base import (
     LightningMultilabelClsModel,
 )
-from getitune.backend.lightning.models.classification.utils.loaders import VisionTransformerLoaderMixin
+from getitune.backend.lightning.models.classification.utils.load_weights import VisionTransformerWeightsLoader
 from getitune.backend.lightning.models.classification.utils.pretrained_urls import VIT_PRETRAINED_URLS
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiLabelClsMetricCallable
@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 
 
 class VisionTransformerMultilabelCls(
-    VisionTransformerLoaderMixin, ForwardExplainMixInForViT, LightningMultilabelClsModel
+    VisionTransformerWeightsLoader, ForwardExplainMixInForViT, LightningMultilabelClsModel
 ):
     """ViT Model for multi-label classification task."""
 

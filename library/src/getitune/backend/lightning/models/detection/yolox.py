@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from torch.export import Dim
 
@@ -20,7 +20,7 @@ from getitune.backend.lightning.models.detection.heads import YOLOXHead
 from getitune.backend.lightning.models.detection.losses import YOLOXCriterion
 from getitune.backend.lightning.models.detection.necks import YOLOXPAFPN
 from getitune.backend.lightning.models.detection.utils.assigners import SimOTAAssigner
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
+from getitune.backend.lightning.models.detection.utils.pretrained_urls import YOLOX_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.data.entity.sample import SampleBatch
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
@@ -48,7 +48,7 @@ class YOLOX(LightningDetectionModel):
     """getitune Detection model class for YOLOX.
 
     Attributes:
-        pretrained_weights (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
+        pretrained_urls (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
 
     Args:
         label_info (LabelInfoTypes): Information about the labels.
@@ -66,12 +66,7 @@ class YOLOX(LightningDetectionModel):
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
-        "yolox_tiny": "https://storage.geti.intel.com/weights/yolox_tiny_8x8.pth",
-        "yolox_s": "https://storage.geti.intel.com/weights/yolox_s_8x8_300e_coco_20211121_095711-4592a793.pth",
-        "yolox_l": "https://storage.geti.intel.com/weights/yolox_l_8x8_300e_coco_20211126_140236-d3bd2b23.pth",
-        "yolox_x": "https://storage.geti.intel.com/weights/yolox_x_8x8_300e_coco_20211126_140254-1ef88d67.pth",
-    }
+    pretrained_urls = YOLOX_PRETRAINED_URLS
 
     input_size_multiplier = 32
 
@@ -142,7 +137,6 @@ class YOLOX(LightningDetectionModel):
             test_cfg=test_cfg,
         )
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
 
         return model
 

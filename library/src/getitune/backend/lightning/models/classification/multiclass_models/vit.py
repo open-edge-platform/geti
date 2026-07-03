@@ -21,7 +21,7 @@ from getitune.backend.lightning.models.classification.heads import (
 from getitune.backend.lightning.models.classification.multiclass_models.base import (
     LightningMulticlassClsModel,
 )
-from getitune.backend.lightning.models.classification.utils.loaders import VisionTransformerLoaderMixin
+from getitune.backend.lightning.models.classification.utils.load_weights import VisionTransformerWeightsLoader
 from getitune.backend.lightning.models.classification.utils.pretrained_urls import VIT_PRETRAINED_URLS
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.backend.lightning.tools.explain.explain_algo import ViTReciproCAM, feature_vector_fn
@@ -179,7 +179,7 @@ class ForwardExplainMixInForViT:
 
 
 class VisionTransformerMulticlassCls(
-    VisionTransformerLoaderMixin, ForwardExplainMixInForViT, LightningMulticlassClsModel
+    VisionTransformerWeightsLoader, ForwardExplainMixInForViT, LightningMulticlassClsModel
 ):
     """ViT Model for multi-class classification task."""
 

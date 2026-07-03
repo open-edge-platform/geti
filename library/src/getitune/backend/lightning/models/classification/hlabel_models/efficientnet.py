@@ -20,7 +20,7 @@ from getitune.backend.lightning.models.classification.losses.asymmetric_angular_
     AsymmetricAngularLossWithIgnore,
 )
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
-from getitune.backend.lightning.models.classification.utils.loaders import PytorchcvLoaderMixin
+from getitune.backend.lightning.models.classification.utils.load_weights import PytorchcvWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import HLabelClsMetricCallable
 from getitune.types.label import HLabelInfo
@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from getitune.metrics import MetricCallable
 
 
-class EfficientNetHLabelCls(PytorchcvLoaderMixin, LightningHlabelClsModel):
+class EfficientNetHLabelCls(PytorchcvWeightsLoader, LightningHlabelClsModel):
     """EfficientNet Model for hierarchical label classification task."""
 
     def __init__(
