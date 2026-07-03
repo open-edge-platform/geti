@@ -323,7 +323,9 @@ def _cmd_report(args: argparse.Namespace) -> int:
     branch = args.branch or get_git_branch()
     git_sha = get_git_sha()
 
-    # Query MLflow for the most recent successful runs in this experiment
+    # Query MLflow for the most recent successful AND failed runs in this
+    # experiment. Skip "rollup" parent runs — only leaf "seed" runs carry
+    # per-run status/metrics.
     client = mlflow.tracking.MlflowClient(args.mlflow_uri)
 
     experiment_name = tracking_config.experiment_name
@@ -332,15 +334,21 @@ def _cmd_report(args: argparse.Namespace) -> int:
         logger.error("MLflow experiment '%s' not found.", experiment_name)
         return 1
 
-    runs = client.search_runs(
+    success_runs = client.search_runs(
         experiment_ids=[exp.experiment_id],
-        filter_string="tags.status = 'success'",
+        filter_string="tags.status = 'success' AND tags.run_type = 'seed'",
+        order_by=["attributes.start_time DESC"],
+        max_results=1000,
+    )
+    failed_runs = client.search_runs(
+        experiment_ids=[exp.experiment_id],
+        filter_string="tags.status = 'failed' AND tags.run_type = 'seed'",
         order_by=["attributes.start_time DESC"],
         max_results=1000,
     )
 
-    if not runs:
-        logger.warning("No successful runs found in experiment '%s'.", experiment_name)
+    if not success_runs and not failed_runs:
+        logger.warning("No runs found in experiment '%s'.", experiment_name)
         return 0
 
     # Convert MLflow runs into ExperimentResult objects for reuse by report.py
@@ -358,7 +366,7 @@ def _cmd_report(args: argparse.Namespace) -> int:
     }
 
     results: list[ExperimentResult] = []
-    for run in runs:
+    for run in success_runs:
         tags = run.data.tags
         metrics = dict(run.data.metrics)
         # MLflow stores total wall time under ``duration_seconds`` (see
@@ -395,6 +403,36 @@ def _cmd_report(args: argparse.Namespace) -> int:
             )
         )
 
+    failures: list[ExperimentResult] = []
+    for run in failed_runs:
+        tags = run.data.tags
+
+        # The full traceback is stored as an artifact (see
+        # ``BenchmarkTracker.log_run``) rather than a tag, to keep tag values
+        # short. Best-effort download; missing artifacts must not break the
+        # report.
+        traceback_text: str | None = None
+        try:
+            local_path = client.download_artifacts(run.info.run_id, "traceback.txt")
+            traceback_text = Path(local_path).read_text()
+        except Exception:
+            logger.debug("Could not download traceback artifact for run %s.", run.info.run_id, exc_info=True)
+
+        failures.append(
+            ExperimentResult(
+                task=tags.get("task", "unknown"),
+                model=tags.get("model", "unknown"),
+                dataset=tags.get("dataset", "unknown"),
+                scenario=tags.get("scenario", "default"),
+                seed=int(tags.get("seed", "0")),
+                success=False,
+                phases=[],
+                error=tags.get("error", "Unknown error"),
+                traceback=traceback_text,
+                failed_phase=tags.get("error_phase"),
+            )
+        )
+
     # Resolve baselines using the tracker
     baselines = tracker.resolve_baselines_for_results(results)
 
@@ -404,7 +442,7 @@ def _cmd_report(args: argparse.Namespace) -> int:
     output_dir = args.output_root
     report = generate_report(
         results=results,
-        failures=[],
+        failures=failures,
         baselines=baselines,
         criteria_by_task=criteria_by_task,
         output_dir=output_dir,

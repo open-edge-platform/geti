@@ -1,8 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Flex, Text } from '@geti-ui/ui';
-import { CloseSmall } from '@geti-ui/ui/icons';
+import { ActionButton, Flex, Text } from '@geti-ui/ui';
+import { BorderClose } from '@geti-ui/ui/icons';
 
 import classes from './filter-chips.module.scss';
 
@@ -13,16 +13,20 @@ type FilterChipsProps = {
 
 export const FilterChips = ({ name, onClose }: FilterChipsProps) => {
     return (
-        <Flex UNSAFE_className={classes.container} alignItems={'center'} gap={'size-75'}>
-            <Text UNSAFE_className={classes.name}>{name}</Text>
+        <Flex UNSAFE_className={classes.container} alignItems={'center'}>
+            <Text>{name}</Text>
 
-            <CloseSmall
-                className={classes.closeIcon}
-                onClick={(event) => {
-                    event.stopPropagation();
-                    onClose();
-                }}
-            />
+            <ActionButton
+                UNSAFE_className={classes.closeIcon}
+                isQuiet
+                aria-label={`Remove ${name} filter`}
+                onPress={onClose}
+            >
+                <BorderClose
+                    width={'var(--spectrum-global-dimension-size-175)'}
+                    height={'var(--spectrum-global-dimension-size-175)'}
+                />
+            </ActionButton>
         </Flex>
     );
 };
