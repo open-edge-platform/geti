@@ -113,6 +113,16 @@ describe('ActiveFilters', () => {
         expect(mockSetSelectedLabelIds).toHaveBeenCalledWith(['label-2']);
     });
 
+    it('removes only the clicked subset when its chip is closed', () => {
+        mockUseDatasetFiltersSearchParams({ selectedSubsets: ['training', 'validation'] });
+
+        render(<ActiveFilters />);
+
+        fireEvent.click(screen.getByRole('button', { name: 'Remove Subset: training filter' }));
+
+        expect(mockSetSelectedSubsets).toHaveBeenCalledWith(['validation']);
+    });
+
     it('clears all filters when "Clear all" is pressed', () => {
         mockUseDatasetFiltersSearchParams({
             selectedLabelIds: ['label-1'],

@@ -19,6 +19,7 @@ type FilterPopoverButtonProps = {
     maxWidth?: DimensionValue;
     dialogWidth?: DimensionValue;
     dialogMaxWidth?: DimensionValue;
+    dialogAriaLabel?: string;
     children: ReactNode;
 };
 
@@ -32,6 +33,7 @@ export const FilterPopoverButton = ({
     maxWidth,
     dialogWidth,
     dialogMaxWidth,
+    dialogAriaLabel = ariaLabel,
     children,
 }: FilterPopoverButtonProps) => {
     return (
@@ -61,7 +63,7 @@ export const FilterPopoverButton = ({
                 width={dialogWidth}
                 maxWidth={dialogMaxWidth}
                 UNSAFE_className={classes.dialog}
-                aria-label='Filter media items'
+                aria-label={dialogAriaLabel}
             >
                 <Content>{children}</Content>
             </Dialog>

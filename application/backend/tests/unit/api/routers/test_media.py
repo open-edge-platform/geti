@@ -296,13 +296,13 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
             filters=MediaFilters(
-                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subset=None
+                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -324,7 +324,7 @@ class TestMediaEndpoints:
             end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -336,7 +336,7 @@ class TestMediaEndpoints:
                 end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -358,7 +358,7 @@ class TestMediaEndpoints:
             end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC),
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -370,7 +370,7 @@ class TestMediaEndpoints:
                 end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC),
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -420,7 +420,7 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=annotation_status,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -432,7 +432,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=annotation_status,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -444,7 +444,7 @@ class TestMediaEndpoints:
         fxt_media_service.count_media.return_value = 2
         fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
 
-        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subset={subset}")
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subsets={subset}")
 
         assert response.status_code == status.HTTP_200_OK
         fxt_media_service.count_media.assert_called_once_with(
@@ -453,7 +453,7 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=subset,
+            subsets=[subset],
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -465,7 +465,39 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=subset,
+                subsets=[subset],
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+
+    def test_list_media_with_multiple_subsets(
+        self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client
+    ):
+        fxt_media_service.count_media.return_value = 2
+        fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subsets=training&subsets=validation")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_media_service.count_media.assert_called_once_with(
+            project=fxt_get_project,
+            start_date=None,
+            end_date=None,
+            annotation_status=None,
+            label_ids=None,
+            subsets=["training", "validation"],
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+        fxt_media_service.list_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=["training", "validation"],
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -488,7 +520,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
                 sort_by=MediaSortBy.UPLOAD_DATE,
                 sort_direction=SortDirection.DESC,
             ),
@@ -514,7 +546,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
                 sort_by=MediaSortBy.UPLOAD_DATE,
                 sort_direction=sort_direction,
             ),
@@ -540,7 +572,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
                 sort_by=sort_by,
                 sort_direction=SortDirection.DESC,
             ),

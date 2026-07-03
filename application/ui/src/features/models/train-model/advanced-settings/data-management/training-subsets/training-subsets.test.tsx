@@ -156,7 +156,7 @@ const mockSubsetsNetworkRequest = ({
 }) => {
     server.use(
         http.get('/api/projects/{project_id}/dataset/items', ({ query }) => {
-            const subset = query.get('subset');
+            const subset = query.get('subsets');
 
             if (subset === 'testing') {
                 return HttpResponse.json({

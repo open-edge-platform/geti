@@ -11,7 +11,7 @@ import { FilterBySubset } from './filter-by-subset.component';
 const openSubsetFilter = async (user: ReturnType<typeof userEvent.setup>) => {
     await user.click(screen.getByRole('button', { name: 'Filter by subset' }));
 
-    return screen.findByRole('dialog', { name: 'Filter media items' });
+    return screen.findByRole('dialog', { name: 'Filter by subset' });
 };
 
 describe('FilterBySubset', () => {

@@ -136,7 +136,7 @@ test.describe('Model Details', () => {
             }),
             http.get('/api/projects/{project_id}/dataset_revisions/{dataset_revision_id}/items', ({ request }) => {
                 const url = new URL(request.url);
-                const subset = url.searchParams.get('subset');
+                const subset = url.searchParams.get('subsets');
 
                 const countsBySubset: Record<string, number> = {
                     training: 70,

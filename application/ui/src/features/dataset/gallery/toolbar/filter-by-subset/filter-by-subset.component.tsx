@@ -19,8 +19,6 @@ const SUBSET_OPTIONS: { id: DatasetSubset; name: string }[] = [
 export const FilterBySubset = () => {
     const { selectedSubsets, setSelectedSubsets } = useDatasetFiltersSearchParams();
 
-    const handleSelectionChange = (ids: string[]) => setSelectedSubsets(ids as DatasetSubset[]);
-
     const summary = isEmpty(selectedSubsets)
         ? null
         : `${selectedSubsets.length} ${pluralize(selectedSubsets.length, 'subset', 'subsets')} selected`;
@@ -37,7 +35,7 @@ export const FilterBySubset = () => {
                 name='subsets'
                 items={SUBSET_OPTIONS}
                 selectAllLabel='All subsets'
-                onSelectionChange={handleSelectionChange}
+                onSelectionChange={setSelectedSubsets}
                 defaultSelectedKeys={new Set(selectedSubsets)}
             />
         </FilterPopoverButton>
