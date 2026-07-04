@@ -16,33 +16,21 @@ _NEEDS_GETITUNE = pytest.mark.skipif(
 )
 
 
-class _FakeTensor:
-    """Mimics a torch tensor on an accelerator: needs .cpu().numpy()."""
-
-    def __init__(self, data):
-        self._data = np.asarray(data)
-        self.moved = False
-
-    def cpu(self) -> "_FakeTensor":
-        self.moved = True
-        return self
-
-    def numpy(self) -> np.ndarray:
-        assert self.moved, "numpy() requires cpu() first, like a real cuda/mps tensor"
-        return self._data
-
-
-def _batch(n=2, wrap=_FakeTensor) -> SimpleNamespace:
-    return SimpleNamespace(
-        bboxes=[wrap([[10.0, 10.0, 50.0, 50.0], [60.0, 60.0, 90.0, 90.0]][:n])],
-        scores=[wrap([0.9, 0.4][:n])],
-        labels=[wrap([3, 8][:n])],
-    )
-
-
+@_NEEDS_GETITUNE
 class TestToDetections:
-    def test_converts_fake_tensors(self):
-        d = GetiAdapter.to_detections(_batch(), frame_id=7)
+    """Requires torch; ``to_detections`` converts ``PredictionBatch`` tensors."""
+
+    def _batch(self, n=2) -> SimpleNamespace:
+        import torch
+
+        return SimpleNamespace(
+            bboxes=[torch.tensor([[10.0, 10.0, 50.0, 50.0], [60.0, 60.0, 90.0, 90.0]][:n])],
+            scores=[torch.tensor([0.9, 0.4][:n])],
+            labels=[torch.tensor([3, 8][:n])],
+        )
+
+    def test_converts_tensors(self):
+        d = GetiAdapter.to_detections(self._batch(), frame_id=7)
         assert d.frame_id == 7
         assert d.bboxes.dtype == np.float32
         assert d.scores.dtype == np.float32
@@ -50,16 +38,13 @@ class TestToDetections:
         assert d.bboxes.shape == (2, 4)
         assert d.class_ids.tolist() == [3, 8]
 
-    def test_converts_plain_numpy(self):
-        d = GetiAdapter.to_detections(_batch(wrap=np.asarray), frame_id=0)
-        assert len(d) == 2
-        assert d.scores.tolist() == pytest.approx([0.9, 0.4])
-
     def test_empty_image(self):
+        import torch
+
         batch = SimpleNamespace(
-            bboxes=[np.empty((0, 4))],
-            scores=[np.empty((0,))],
-            labels=[np.empty((0,))],
+            bboxes=[torch.empty((0, 4))],
+            scores=[torch.empty((0,))],
+            labels=[torch.empty((0,))],
         )
         d = GetiAdapter.to_detections(batch, frame_id=1)
         assert len(d) == 0
@@ -70,10 +55,12 @@ class TestToDetections:
             GetiAdapter.to_detections(batch, frame_id=0)
 
     def test_image_index_selects_batch_element(self):
+        import torch
+
         batch = SimpleNamespace(
-            bboxes=[np.zeros((1, 4)), np.array([[5.0, 5.0, 9.0, 9.0]])],
-            scores=[np.array([0.5]), np.array([0.7])],
-            labels=[np.array([0]), np.array([2])],
+            bboxes=[torch.zeros((1, 4)), torch.tensor([[5.0, 5.0, 9.0, 9.0]])],
+            scores=[torch.tensor([0.5]), torch.tensor([0.7])],
+            labels=[torch.tensor([0]), torch.tensor([2])],
         )
         d = GetiAdapter.to_detections(batch, frame_id=0, image_index=1)
         assert d.class_ids.tolist() == [2]
@@ -153,11 +140,13 @@ class TestDetect:
             )
 
             def predict_step(self, batch, batch_idx) -> SimpleNamespace:
+                import torch
+
                 assert tuple(batch.images.shape) == (1, 3, 32, 32)
                 return SimpleNamespace(
-                    bboxes=[np.array([[1.0, 2.0, 3.0, 4.0]])],
-                    scores=[np.array([0.9])],
-                    labels=[np.array([1])],
+                    bboxes=[torch.tensor([[1.0, 2.0, 3.0, 4.0]])],
+                    scores=[torch.tensor([0.9])],
+                    labels=[torch.tensor([1])],
                 )
 
         frame = np.zeros((48, 64, 3), dtype=np.uint8)

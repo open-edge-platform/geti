@@ -3,8 +3,7 @@
 """Adapter for getitune detection models.
 
 getitune and torch are imported lazily inside the methods that need them, so
-getitrack imports without either installed. `GetiAdapter.to_detections` is
-duck-typed and works on any prediction-batch-shaped object.
+getitrack imports without either installed.
 """
 
 from __future__ import annotations
@@ -152,12 +151,9 @@ class GetiAdapter(DetectionAdapter):
     def to_detections(batch: PredictionBatch, frame_id: int, image_index: int = 0) -> Detections:
         """Convert one image's predictions from a getitune ``PredictionBatch``.
 
-        Duck-typed: works without getitune or torch installed, on any
-        object with per-image ``bboxes``, ``scores``, and ``labels`` lists.
-
         Args:
             batch: A getitune ``PredictionBatch`` with per-image ``bboxes``,
-                ``scores``, and ``labels`` lists (torch tensors or arrays).
+                ``scores``, and ``labels`` torch tensors.
             frame_id: Frame index to stamp on the returned `Detections`.
             image_index: Which image of the batch to convert.
 
@@ -172,17 +168,8 @@ class GetiAdapter(DetectionAdapter):
             msg = "PredictionBatch must carry bboxes, scores, and labels"
             raise ValueError(msg)
         return Detections(
-            bboxes=_to_numpy(batch.bboxes[image_index]).reshape(-1, 4).astype(np.float32),
-            scores=_to_numpy(batch.scores[image_index]).reshape(-1).astype(np.float32),
-            class_ids=_to_numpy(batch.labels[image_index]).reshape(-1).astype(np.int64),
+            bboxes=batch.bboxes[image_index].detach().cpu().numpy().reshape(-1, 4).astype(np.float32),
+            scores=batch.scores[image_index].detach().cpu().numpy().reshape(-1).astype(np.float32),
+            class_ids=batch.labels[image_index].detach().cpu().numpy().reshape(-1).astype(np.int64),
             frame_id=frame_id,
         )
-
-
-def _to_numpy(value: torch.Tensor | np.ndarray) -> np.ndarray:
-    """Convert a torch tensor (possibly on an accelerator) or array to numpy."""
-    if hasattr(value, "cpu"):
-        value = value.cpu()
-    if hasattr(value, "numpy"):
-        value = value.numpy()
-    return np.asarray(value)
