@@ -256,25 +256,25 @@ def check_regressions(
 
 def aggregate_metrics_across_seeds(
     results: list[ExperimentResult],
-) -> dict[str, dict[str, float]]:
-    """Average metrics across seeds for each ``(task/model/dataset/scenario)`` key.
+) -> dict[tuple[str, str, str, str], dict[str, float]]:
+    """Average metrics across seeds for each ``(task, model, dataset, scenario)`` group.
 
     Per-seed metric keys are normalized via :func:`rewrite_metric_key` so they
     share the same shape as MLflow-stored baseline metrics.
 
     Returns:
-        ``{key: averaged_metrics}``
+        ``{(task, model, dataset, scenario): averaged_metrics}``
     """
-    grouped: dict[str, list[dict[str, float]]] = defaultdict(list)
+    grouped: dict[tuple[str, str, str, str], list[dict[str, float]]] = defaultdict(list)
 
     for result in results:
         if not result.success:
             continue
-        key = f"{result.task}/{result.model}/{result.dataset}/{result.scenario}"
+        key = (result.task, result.model, result.dataset, result.scenario)
         normalized = {rewrite_metric_key(k): v for k, v in result.all_metrics().items()}
         grouped[key].append(normalized)
 
-    averaged: dict[str, dict[str, float]] = {}
+    averaged: dict[tuple[str, str, str, str], dict[str, float]] = {}
     for key, metric_dicts in grouped.items():
         if not metric_dicts:
             continue
@@ -321,14 +321,9 @@ def build_report(
     averaged = aggregate_metrics_across_seeds(results)
 
     comparisons: list[ExperimentComparison] = []
-    for key, current_metrics in averaged.items():
-        parts = key.split("/", 3)
-        task = parts[0] if len(parts) > 0 else "unknown"
-        model = parts[1] if len(parts) > 1 else "unknown"
-        dataset = parts[2] if len(parts) > 2 else "unknown"
-        scenario = parts[3] if len(parts) > 3 else "default"
-
-        baseline_metrics = baselines.get(key)
+    for (task, model, dataset, scenario), current_metrics in averaged.items():
+        baseline_key = f"{task}/{model}/{dataset}/{scenario}"
+        baseline_metrics = baselines.get(baseline_key)
         criteria = criteria_by_task.get(task)
         thresholds = criteria.thresholds if criteria else {}
 
@@ -605,6 +600,12 @@ def _detect_metric_columns(
         if key.startswith("export:") and "test/" in key and "latency" not in key and "e2e_time" not in key:
             label_short = key.split("test/", 1)[1] if "test/" in key else key
             columns.append((f"Export {label_short} {_arrow_for(key)}", key, _fmt_metric))
+
+    # Optimize (quantized) test metrics
+    for key in sorted(all_keys):
+        if key.startswith("optimize:") and "test/" in key and "latency" not in key and "e2e_time" not in key:
+            label_short = key.split("test/", 1)[1] if "test/" in key else key
+            columns.append((f"Optimize {label_short} {_arrow_for(key)}", key, _fmt_metric))
 
     # Timing metrics — keys are stored in their rewritten form.
     if rewrite_metric_key("training:e2e_time") in all_keys:

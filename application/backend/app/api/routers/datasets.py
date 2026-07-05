@@ -38,7 +38,7 @@ def list_dataset_items(  # noqa: PLR0913
     end_date: Annotated[datetime | None, Query()] = None,
     annotation_status: Annotated[DatasetItemAnnotationStatus | None, Query()] = None,
     labels: Annotated[list[UUID] | None, Query()] = None,
-    subset: Annotated[DatasetItemSubset | None, Query()] = None,
+    subsets: Annotated[list[DatasetItemSubset] | None, Query()] = None,
     sort_by: Annotated[DatasetItemSortBy, Query()] = DatasetItemSortBy.CREATION_DATE,
     sort_direction: Annotated[SortDirection, Query()] = SortDirection.DESC,
 ) -> DatasetItemsWithPagination:
@@ -50,13 +50,14 @@ def list_dataset_items(  # noqa: PLR0913
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Start date must be before end date."
         )
+    subset_values = [item.value for item in subsets] if subsets else None
     total = dataset_service.count_dataset_items(
         project=project,
         start_date=start_date,
         end_date=end_date,
         annotation_status=annotation_status,
         label_ids=labels,
-        subset=subset,
+        subsets=subset_values,
     )
     dataset_items = dataset_service.list_dataset_items(
         project_id=project.id,
@@ -67,7 +68,7 @@ def list_dataset_items(  # noqa: PLR0913
             end_date=end_date,
             annotation_status=annotation_status,
             label_ids=labels,
-            subset=subset,
+            subsets=subset_values,
             sort_by=sort_by,
             sort_direction=sort_direction,
         ),

@@ -3,6 +3,8 @@
 
 import { useMemo } from 'react';
 
+import { isEmpty } from 'lodash-es';
+
 import { $api } from '../api/client';
 import type { DatasetItemAnnotationStatus, DatasetSubset, Pagination } from '../constants/shared-types';
 import { type SortDirection } from './sort-direction.interface';
@@ -13,18 +15,18 @@ const DATASET_ITEMS_LIMIT = 40;
 type SortBy = 'creation_date';
 
 type UseGetDatasetItemsOptions = {
-    subset?: DatasetSubset;
+    subsets?: DatasetSubset[];
     annotationStatus?: DatasetItemAnnotationStatus;
     sortDirection?: SortDirection;
 };
 
-export const useGetDatasetItems = ({ subset, annotationStatus, sortDirection }: UseGetDatasetItemsOptions = {}) => {
+export const useGetDatasetItems = ({ subsets, annotationStatus, sortDirection }: UseGetDatasetItemsOptions = {}) => {
     const project_id = useProjectIdentifier();
 
     const query: {
         offset: number;
         limit: number;
-        subset?: DatasetSubset;
+        subsets?: DatasetSubset[];
         annotation_status?: DatasetItemAnnotationStatus;
         sort_direction?: SortDirection;
         sort_by?: SortBy;
@@ -33,8 +35,8 @@ export const useGetDatasetItems = ({ subset, annotationStatus, sortDirection }: 
         limit: DATASET_ITEMS_LIMIT,
     };
 
-    if (subset !== undefined) {
-        query.subset = subset;
+    if (!isEmpty(subsets)) {
+        query.subsets = subsets;
     }
 
     if (annotationStatus !== undefined) {

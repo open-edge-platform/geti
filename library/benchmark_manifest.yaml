@@ -43,7 +43,7 @@ experiments:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
         "export:test/{metric}": { compare: ">=", margin: 0.10 }
-        "training:e2e_time": { compare: "<=", margin: 0.20 }
+        "training:train/iter_time": { compare: "<=", margin: 0.10 }
         "training:gpu_mem": { compare: "<=", margin: 0.10 }
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   classification/multi_label_cls:
@@ -74,7 +74,7 @@ experiments:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
         "export:test/{metric}": { compare: ">=", margin: 0.10 }
-        "training:e2e_time": { compare: "<=", margin: 0.20 }
+        "training:train/iter_time": { compare: "<=", margin: 0.10 }
         "training:gpu_mem": { compare: "<=", margin: 0.10 }
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   detection:
@@ -177,7 +177,7 @@ experiments:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
         "export:test/{metric}": { compare: ">=", margin: 0.10 }
-        "training:e2e_time": { compare: "<=", margin: 0.20 }
+        "training:train/iter_time": { compare: "<=", margin: 0.10 }
         "training:gpu_mem": { compare: "<=", margin: 0.10 }
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   semantic_segmentation:
@@ -215,7 +215,7 @@ experiments:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
         "export:test/{metric}": { compare: ">=", margin: 0.10 }
-        "training:e2e_time": { compare: "<=", margin: 0.20 }
+        "training:train/iter_time": { compare: "<=", margin: 0.10 }
         "training:gpu_mem": { compare: "<=", margin: 0.10 }
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   instance_segmentation:
@@ -282,6 +282,6 @@ experiments:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
         "export:test/{metric}": { compare: ">=", margin: 0.10 }
-        "training:e2e_time": { compare: "<=", margin: 0.20 }
+        "training:train/iter_time": { compare: "<=", margin: 0.10 }
         "training:gpu_mem": { compare: "<=", margin: 0.10 }
         "torch:test/latency": { compare: "<=", margin: 0.15 }

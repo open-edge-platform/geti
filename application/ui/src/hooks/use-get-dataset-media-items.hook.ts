@@ -4,6 +4,7 @@
 import { useMemo } from 'react';
 
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import isEmpty from 'lodash-es/isEmpty';
 
 import { $api } from '../api/client';
 import { DatasetItemAnnotationStatus, DatasetSubset, Media, MediaDTO, Pagination } from '../constants/shared-types';
@@ -14,7 +15,7 @@ const DATASET_ITEMS_LIMIT = 40;
 type SortBy = 'upload_date';
 
 interface UseGetDatasetMediaItemsOptions {
-    subset?: DatasetSubset;
+    subsets?: DatasetSubset[];
     annotationStatus?: DatasetItemAnnotationStatus;
     labelIds?: string[];
     startDate?: string;
@@ -48,7 +49,7 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
     const query: {
         limit: number;
         offset: number;
-        subset?: DatasetSubset;
+        subsets?: DatasetSubset[];
         labels?: string[];
         end_date?: string;
         start_date?: string;
@@ -60,8 +61,8 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
         limit: DATASET_ITEMS_LIMIT,
     };
 
-    if (options?.subset !== undefined) {
-        query.subset = options.subset;
+    if (options !== undefined && !isEmpty(options?.subsets)) {
+        query.subsets = options.subsets;
     }
 
     if (options?.annotationStatus !== undefined) {

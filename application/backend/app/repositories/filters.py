@@ -126,8 +126,8 @@ def _apply_label_filter_with_video_support(stmt: Select, label_ids: list[str] | 
     )
 
 
-def _apply_subset_filter(stmt: Select, subset: str | None = None) -> Select:
+def _apply_subset_filter(stmt: Select, subsets: list[str] | None = None) -> Select:
     """Apply subset filter to a select statement."""
-    if subset is not None:
-        stmt = stmt.where(DatasetItemDB.subset == subset)
+    if subsets:
+        stmt = stmt.where(DatasetItemDB.subset.in_(subsets))
     return stmt
