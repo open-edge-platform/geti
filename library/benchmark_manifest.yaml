@@ -175,7 +175,10 @@ experiments:
         priority: extended
         recipe: semantic_segmentation/litehrnet_x.yaml
     datasets:
-      - oxford_pets
+      - corrosion
+      - pcb_defect
+      - satellite_building
+      - crack_semantic
     criteria:
       accuracy_metric: Dice
       thresholds:
@@ -221,6 +224,9 @@ experiments:
         priority: extended
         recipe: instance_segmentation/yolo26_m_seg.yaml
     datasets:
+      - pothole
+      - pcb_defect
+      - satellite_building
       - wgisd
     criteria:
       accuracy_metric: map_50

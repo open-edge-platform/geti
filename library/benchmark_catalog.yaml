@@ -37,6 +37,30 @@ datasets:
     compatible_tasks:
       - classification/multi_class_cls
 
+  - name: paddy_disease
+    script: "scripts/benchmark_datasets/prepare_paddy_disease.py"
+    size_tier: small
+    url: "https://huggingface.co/datasets/anthony2261/paddy-disease-classification"
+    description: "Paddy Disease Classification — public HF mirror of a rice disease dataset with image-level class labels."
+    compatible_tasks:
+      - classification/multi_class_cls
+
+  - name: chest_ct
+    script: "scripts/benchmark_datasets/prepare_chest_ct.py"
+    size_tier: medium
+    url: "https://huggingface.co/datasets/Mahadih534/Chest_CT-Scan_images-Dataset"
+    description: "Chest CT Scan Images — public HF mirror of a 4-class chest CT classification dataset."
+    compatible_tasks:
+      - classification/multi_class_cls
+
+  - name: indoor_scene
+    script: "scripts/benchmark_datasets/prepare_indoor_scene.py"
+    size_tier: large
+    url: "https://huggingface.co/datasets/Voxel51/IndoorSceneRecognition"
+    description: "Indoor Scene Recognition — public HF mirror of a large indoor scene classification dataset."
+    compatible_tasks:
+      - classification/multi_class_cls
+
   - name: oxford_pets_hlabel
     script: "scripts/benchmark_datasets/prepare_oxford_pets_hlabel.py"
     size_tier: large
@@ -94,3 +118,49 @@ datasets:
     description: "Vehicles (Roboflow-100) — 4,058 road-scene images with bounding-box annotations across 12 vehicle types (cars, buses, trucks). Large multi-class on-road detection benchmark."
     compatible_tasks:
       - detection
+
+  - name: pothole
+    script: "scripts/benchmark_datasets/prepare_pothole.py"
+    size_tier: tiny
+    url: "https://huggingface.co/datasets/keremberke/pothole-segmentation"
+    description: "Pothole Segmentation — 90 road-surface images with polygon annotations for potholes. Tiny real-world segmentation benchmark."
+    compatible_tasks:
+      - instance_segmentation
+      - semantic_segmentation
+      - detection # polygons -> bounding boxes
+
+  - name: pcb_defect
+    script: "scripts/benchmark_datasets/prepare_pcb_defect.py"
+    size_tier: small
+    url: "https://huggingface.co/datasets/keremberke/pcb-defect-segmentation"
+    description: "PCB Defect Segmentation — 189 close-up PCB images with polygon annotations across 4 defect classes. Small industrial segmentation benchmark."
+    compatible_tasks:
+      - instance_segmentation
+      - semantic_segmentation
+      - detection # polygons -> bounding boxes
+
+  - name: satellite_building
+    script: "scripts/benchmark_datasets/prepare_satellite_building.py"
+    size_tier: large
+    url: "https://huggingface.co/datasets/keremberke/satellite-building-segmentation"
+    description: "Satellite Building Segmentation — 9,665 aerial images with polygon annotations for building footprints. Medium-scale segmentation benchmark."
+    compatible_tasks:
+      - instance_segmentation
+      - semantic_segmentation
+      - detection # polygons -> bounding boxes
+
+  - name: corrosion
+    script: "scripts/benchmark_datasets/prepare_corrosion.py"
+    size_tier: tiny
+    url: "https://huggingface.co/datasets/rkumari/corrosion_segment"
+    description: "Corrosion segmentation — 44 images with per-pixel severity masks across 4 classes. Tiny semantic-segmentation benchmark."
+    compatible_tasks:
+      - semantic_segmentation
+
+  - name: crack_semantic
+    script: "scripts/benchmark_datasets/prepare_crack_semantic.py"
+    size_tier: large
+    url: "https://huggingface.co/datasets/varcoder/crack-segmentation-dataset"
+    description: "Crack segmentation — 11,298 images with binary crack masks. Large semantic-segmentation benchmark."
+    compatible_tasks:
+      - semantic_segmentation

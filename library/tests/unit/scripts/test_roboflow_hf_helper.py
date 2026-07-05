@@ -25,7 +25,7 @@ from datumaro.experimental.fields import Subset
 from PIL import Image
 
 from getitune.benchmark.dataset_helpers import DatasetArgs
-from getitune.data.entity.sample import DetectionSample
+from getitune.data.entity.sample import DetectionSample, SegmentationSample
 
 # ``roboflow_hf_helper`` is a standalone helper module that lives next to the
 # ``prepare_*.py`` scripts (not part of the installed ``getitune`` package), so
@@ -47,6 +47,17 @@ _OBJECTS_TYPE = pa.struct(
         ("category", pa.list_(pa.int64())),
     ],
 )
+# Arrow type mirroring mirrors that additionally carry polygon ``segmentation``
+# (e.g. ``keremberke/*`` roboflow2huggingface exports).
+_OBJECTS_TYPE_WITH_SEG = pa.struct(
+    [
+        ("id", pa.list_(pa.int64())),
+        ("area", pa.list_(pa.int64())),
+        ("bbox", pa.list_(pa.list_(pa.float32(), 4))),
+        ("category", pa.list_(pa.int64())),
+        ("segmentation", pa.list_(pa.list_(pa.list_(pa.float32())))),
+    ],
+)
 _IMAGE_TYPE = pa.struct([("bytes", pa.binary()), ("path", pa.string())])
 
 _LABEL_NAMES = ("placeholder", "cat_a", "cat_b")
@@ -59,7 +70,7 @@ def _jpeg_bytes(color: tuple[int, int, int]) -> bytes:
     return buf.getvalue()
 
 
-def _write_parquet(path: Path, rows: list[dict]) -> None:
+def _write_parquet(path: Path, rows: list[dict], *, objects_type: pa.DataType = _OBJECTS_TYPE) -> None:
     """Write *rows* to a parquet file using the RF100 mirror schema."""
     table = pa.table(
         {
@@ -67,7 +78,7 @@ def _write_parquet(path: Path, rows: list[dict]) -> None:
             "image": pa.array([r["image"] for r in rows], type=_IMAGE_TYPE),
             "width": pa.array([r["width"] for r in rows], type=pa.int32()),
             "height": pa.array([r["height"] for r in rows], type=pa.int32()),
-            "objects": pa.array([r["objects"] for r in rows], type=_OBJECTS_TYPE),
+            "objects": pa.array([r["objects"] for r in rows], type=objects_type),
         },
     )
     pq.write_table(table, path)
@@ -143,9 +154,11 @@ def test_prepare_roboflow_hf_dataset(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The helper converts the synthetic parquet splits into a Datumaro dataset."""
+    seen_urls: list[str] = []
 
     def fake_download(url: str, dest_dir: Path, filename: str | None = None) -> Path:
         assert filename is not None
+        seen_urls.append(url)
         dest_dir.mkdir(parents=True, exist_ok=True)
         dest = dest_dir / filename
         for split, src in synthetic_splits.items():
@@ -166,10 +179,17 @@ def test_prepare_roboflow_hf_dataset(
         revision="deadbeef",
         label_names=_LABEL_NAMES,
         split_files={
-            "train": "train-x.parquet",
-            "validation": "validation-x.parquet",
-            "test": "test-x.parquet",
+            "train": "data/train-x.parquet",
+            "validation": "data/validation-x.parquet",
+            "test": "data/test-x.parquet",
         },
+    )
+
+    # The repo-relative path must be resolved against the pinned revision, not
+    # hardcoded to a ``data/`` prefix inside the helper.
+    assert any(
+        u == "https://huggingface.co/datasets/Francesco/example/resolve/deadbeef/data/train-x.parquet"
+        for u in seen_urls
     )
 
     dataset_dir = output_dir / "synthetic"
@@ -196,3 +216,84 @@ def test_prepare_roboflow_hf_dataset(
     detection_dataset = dataset.convert_to_schema(DetectionSample)
     total_boxes = sum(0 if s.bboxes is None else len(s.bboxes) for s in detection_dataset)
     assert total_boxes == 4  # 1 + 2 + 1 + 0 across the four images
+
+
+@pytest.fixture
+def synthetic_splits_with_segmentation(tmp_path: Path) -> dict[str, Path]:
+    """Create a single train parquet with polygon ``segmentation``, mimicking ``keremberke/*``."""
+    src = tmp_path / "src_seg"
+    src.mkdir()
+
+    img = _jpeg_bytes((10, 200, 10))
+
+    # A 4x4 image with two 2x2 instances: cat_a (label idx 0) in the top-left quadrant,
+    # cat_b (label idx 1) in the bottom-right quadrant. No placeholder category here,
+    # matching the ``keremberke/*`` convention (real classes start at index 0).
+    train = [
+        {
+            "image_id": 0,
+            "image": {"bytes": img, "path": "a.jpg"},
+            "width": 4,
+            "height": 4,
+            "objects": {
+                "id": [1, 2],
+                "area": [4, 4],
+                "bbox": [[0.0, 0.0, 2.0, 2.0], [2.0, 2.0, 2.0, 2.0]],
+                "category": [0, 1],
+                "segmentation": [
+                    [[0.0, 0.0, 2.0, 0.0, 2.0, 2.0, 0.0, 2.0]],
+                    [[2.0, 2.0, 4.0, 2.0, 4.0, 4.0, 2.0, 4.0]],
+                ],
+            },
+        },
+    ]
+    paths = {"train": src / "train.parquet"}
+    _write_parquet(paths["train"], train, objects_type=_OBJECTS_TYPE_WITH_SEG)
+    return paths
+
+
+def test_prepare_roboflow_hf_dataset_with_segmentation(
+    tmp_path: Path,
+    synthetic_splits_with_segmentation: dict[str, Path],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``include_segmentation=True`` preserves polygons and they rasterize correctly."""
+
+    def fake_download(url: str, dest_dir: Path, filename: str | None = None) -> Path:  # noqa: ARG001
+        assert filename is not None
+        dest_dir.mkdir(parents=True, exist_ok=True)
+        dest = dest_dir / filename
+        shutil.copy(synthetic_splits_with_segmentation["train"], dest)
+        return dest
+
+    monkeypatch.setattr(roboflow_hf, "download", fake_download)
+
+    output_dir = tmp_path / "out"
+    args = DatasetArgs(output_dir=output_dir, name="synthetic_seg")
+
+    roboflow_hf.prepare_roboflow_hf_dataset(
+        args,
+        repo="keremberke/example-segmentation",
+        revision="deadbeef",
+        label_names=("cat_a", "cat_b"),
+        split_files={"train": "full/train/0000.parquet"},
+        include_segmentation=True,
+    )
+
+    dataset = import_dataset(output_dir / "synthetic_seg")
+    assert len(dataset) == 1
+
+    sample = dataset[0]
+    assert sample.polygons is not None
+    assert len(sample.polygons) == 2
+
+    # Polygons must rasterize into a per-pixel mask (background=0, cat_a=1, cat_b=2),
+    # not a bbox-derived rectangle approximation.
+    seg_dataset = dataset.convert_to_schema(SegmentationSample)
+    mask_labels = seg_dataset.schema.attributes["masks"].categories.labels
+    assert tuple(mask_labels) == ("background", "cat_a", "cat_b")
+
+    mask = seg_dataset[0].masks[0].numpy()
+    assert mask[0, 0] == 1  # inside the cat_a quadrant
+    assert mask[3, 3] == 2  # inside the cat_b quadrant
+    assert mask[0, 3] == 0  # background (untouched corner)
