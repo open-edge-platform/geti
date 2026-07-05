@@ -33,6 +33,9 @@ experiments:
         priority: extended
         recipe: classification/multi_class_cls/efficientnet_b0.yaml
     datasets:
+      - paddy_disease
+      - chest_ct
+      - indoor_scene
       - flowers102
     criteria:
       accuracy_metric: accuracy
@@ -76,6 +79,9 @@ experiments:
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   detection:
     models:
+      - name: rfdetr_nano
+        priority: core
+        recipe: detection/rfdetr_nano.yaml
       - name: yolox_s
         priority: core
         recipe: detection/yolox_s.yaml
@@ -139,8 +145,32 @@ experiments:
       - name: yolo26_m
         priority: extended
         recipe: detection/yolo26_m.yaml
+      - name: yolo11_n
+        priority: extended
+        recipe: detection/yolo11_n.yaml
+      - name: yolo11_s
+        priority: extended
+        recipe: detection/yolo11_s.yaml
+      - name: yolo11_m
+        priority: extended
+        recipe: detection/yolo11_m.yaml
+      - name: yolo11_l
+        priority: extended
+        recipe: detection/yolo11_l.yaml
+      - name: yolo11_x
+        priority: extended
+        recipe: detection/yolo11_x.yaml
+      - name: rfdetr_2xlarge
+        priority: extended
+        recipe: detection/rfdetr_2xlarge.yaml
     datasets:
+      - axial_mri
+      - wgisd
       - bccd
+      - cable_damage
+      - vehicles
+      - pothole
+      - pcb_defect
     criteria:
       accuracy_metric: map_50
       thresholds:
@@ -177,8 +207,8 @@ experiments:
     datasets:
       - corrosion
       - pcb_defect
-      - satellite_building
       - crack_semantic
+      - satellite_building
     criteria:
       accuracy_metric: Dice
       thresholds:
@@ -190,6 +220,9 @@ experiments:
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   instance_segmentation:
     models:
+      - name: rfdetr_seg_nano
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_nano.yaml
       - name: rfdetr_seg_small
         priority: core
         recipe: instance_segmentation/rfdetr_seg_small.yaml
@@ -223,11 +256,26 @@ experiments:
       - name: yolo26_m_seg
         priority: extended
         recipe: instance_segmentation/yolo26_m_seg.yaml
+      - name: yolo11_n_seg
+        priority: extended
+        recipe: instance_segmentation/yolo11_n_seg.yaml
+      - name: yolo11_s_seg
+        priority: extended
+        recipe: instance_segmentation/yolo11_s_seg.yaml
+      - name: yolo11_m_seg
+        priority: extended
+        recipe: instance_segmentation/yolo11_m_seg.yaml
+      - name: yolo11_l_seg
+        priority: extended
+        recipe: instance_segmentation/yolo11_l_seg.yaml
+      - name: yolo11_x_seg
+        priority: extended
+        recipe: instance_segmentation/yolo11_x_seg.yaml
     datasets:
+      - wgisd
       - pothole
       - pcb_defect
       - satellite_building
-      - wgisd
     criteria:
       accuracy_metric: map_50
       thresholds:
