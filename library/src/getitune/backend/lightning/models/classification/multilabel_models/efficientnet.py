@@ -17,7 +17,7 @@ from getitune.backend.lightning.models.classification.losses.asymmetric_angular_
 )
 from getitune.backend.lightning.models.classification.multilabel_models.base import LightningMultilabelClsModel
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
-from getitune.backend.lightning.models.classification.utils.load_weights import PytorchcvWeightsLoader
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import PytorchcvWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiLabelClsMetricCallable
 from getitune.types.label import LabelInfoTypes

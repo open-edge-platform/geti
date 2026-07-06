@@ -145,6 +145,10 @@ def create_engine(
     from getitune.backend.lightning.engine import LightningEngine
     from getitune.backend.openvino.engine import OVEngine
 
+    if checkpoint is not None and pretrained_weights is not None:
+        msg = "Cannot specify both checkpoint and pretrained_weights; choose one."
+        raise ValueError(msg)
+
     backend_to_engine: dict[str, type[Engine]] = {
         "lightning": LightningEngine,
         "openvino": OVEngine,

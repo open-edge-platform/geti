@@ -39,21 +39,23 @@ class _ClassifierModel(Protocol):
     backbone: nn.Module
 
 
-class _HasBackboneModel(Protocol):
+class _SupportsBackboneWeights(Protocol):
+    """Lightning classification model wrapper exposing a classifier backbone."""
+
     model: _ClassifierModel
     model_name: str
 
 
-class _HasBackboneModelWithUrls(Protocol):
+class _SupportsBackboneWeightsWithUrls(_SupportsBackboneWeights, Protocol):
+    """Backbone wrapper that also exposes pretrained URLs."""
+
     pretrained_urls: dict[str, str]
-    model: _ClassifierModel
-    model_name: str
 
 
 class PytorchcvWeightsLoader:
     """Load backbone weights via pytorchcv's model store (EfficientNet)."""
 
-    def load_pretrained(self: _HasBackboneModel, weights: PathLike | None = None) -> None:
+    def load_pretrained(self: _SupportsBackboneWeights, weights: PathLike | None = None) -> None:
         """Download EfficientNet backbone weights into the cache dir."""
         from pytorchcv.models.common.model_store import download_model
 
@@ -69,7 +71,7 @@ class PytorchcvWeightsLoader:
 class CheckpointWeightsLoader:
     """Load backbone weights from an HTTP checkpoint URL (MobileNetV3)."""
 
-    def load_pretrained(self: _HasBackboneModelWithUrls, weights: PathLike | None = None) -> None:
+    def load_pretrained(self: _SupportsBackboneWeightsWithUrls, weights: PathLike | None = None) -> None:
         """Download an HTTP checkpoint and load it into the backbone."""
         if weights is None:
             weights = self.pretrained_urls[self.model_name]
@@ -80,7 +82,7 @@ class CheckpointWeightsLoader:
 class TorchvisionWeightsLoader:
     """Load backbone weights from Torchvision (EfficientNet)."""
 
-    def load_pretrained(self: _HasBackboneModel, weights: PathLike | None = None) -> None:
+    def load_pretrained(self: _SupportsBackboneWeights, weights: PathLike | None = None) -> None:
         """Load weights: a local checkpoint if given, else torchvision's official set."""
         if weights is not None and Path(weights).exists():
             load_checkpoint(self.model.backbone, str(weights))
@@ -95,7 +97,7 @@ class TorchvisionWeightsLoader:
 class TimmWeightsLoader:
     """Load backbone weights via ``timm.models.load_pretrained``."""
 
-    def load_pretrained(self: _HasBackboneModel, weights: PathLike | None = None) -> None:
+    def load_pretrained(self: _SupportsBackboneWeights, weights: PathLike | None = None) -> None:
         """Load weights: a local checkpoint if given, else timm's pretrained source."""
         if weights is not None and Path(weights).exists():
             load_checkpoint(self.model.backbone, str(weights))
@@ -112,10 +114,14 @@ class TimmWeightsLoader:
 
 
 class _ViTClassifierModel(Protocol):
+    """A classifier exposing a ViT backbone."""
+
     backbone: VisionTransformerBackbone
 
 
-class _HasViTBackboneWithUrls(Protocol):
+class _SupportsViTBackboneWeights(Protocol):
+    """Lightning classification model wrapper exposing a ViT backbone."""
+
     pretrained_urls: dict[str, str]
     model: _ViTClassifierModel
     model_name: str
@@ -124,23 +130,28 @@ class _HasViTBackboneWithUrls(Protocol):
 class VisionTransformerWeightsLoader:
     """Load backbone weights for ViT architecture."""
 
-    def load_pretrained(self: _HasViTBackboneWithUrls, weights: PathLike | None = None) -> None:
+    def load_pretrained(self: _SupportsViTBackboneWeights, weights: PathLike | None = None) -> None:
         """Load weights: a local checkpoint if given, else torchvision's official set."""
         if weights is not None and Path(weights).exists():
             load_checkpoint(self.model.backbone, str(weights))
-        elif self.model_name in self.pretrained_urls:
-            pretrained_url = self.pretrained_urls[self.model_name]
-            logger.info("init weight - %s", pretrained_url)
-            parts = urlparse(pretrained_url)
-            filename = Path(parts.path).name
+            logger.info("Loaded ViT backbone weights from %s", weights)
+            return
 
-            cache_dir = Path(os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"])
-            cache_file = cache_dir / filename
-            if not Path.exists(cache_file):
-                download_url_to_file(pretrained_url, str(cache_file), "", progress=True)
-            self.model.backbone.load_checkpoint(checkpoint_path=cache_file)  # pyrefly: ignore[not-callable]
-        else:
+        if self.model_name not in self.pretrained_urls:
             warnings.warn(
                 "No pretrained weights found for the specified model. Initializing model with random weights.",
                 stacklevel=1,
             )
+            return
+
+        pretrained_url = self.pretrained_urls[self.model_name]
+        logger.info("init weight - %s", pretrained_url)
+        parts = urlparse(pretrained_url)
+        filename = Path(parts.path).name
+
+        cache_dir = Path(os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"])
+        cache_file = cache_dir / filename
+        if not Path.exists(cache_file):
+            download_url_to_file(pretrained_url, str(cache_file), "", progress=True)
+        self.model.backbone.load_checkpoint(checkpoint_path=cache_file)  # pyrefly: ignore[not-callable]
+        logger.info("Loaded ViT backbone weights from %s", cache_file)

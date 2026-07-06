@@ -25,7 +25,7 @@ DFINE_PRETRAINED_URLS: dict[str, str] = {
     "dfine_hgnetv2_n": f"{_BASE_STORAGE_URL}/dfine_n_coco.pth",
     "dfine_hgnetv2_s": f"{_BASE_STORAGE_URL}/dfine_s_coco.pth",
     "dfine_hgnetv2_m": f"{_BASE_STORAGE_URL}/dfine_m_coco.pth",
-    "fdffifne_hgnetv2_l": f"{_BASE_STORAGE_URL}/dfine_l_coco.pth",
+    "dfine_hgnetv2_l": f"{_BASE_STORAGE_URL}/dfine_l_coco.pth",
     "dfine_hgnetv2_x": f"{_BASE_STORAGE_URL}/dfine_x_coco.pth",
 }
 

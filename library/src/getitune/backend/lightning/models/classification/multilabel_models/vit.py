@@ -18,8 +18,8 @@ from getitune.backend.lightning.models.classification.multiclass_models.vit impo
 from getitune.backend.lightning.models.classification.multilabel_models.base import (
     LightningMultilabelClsModel,
 )
-from getitune.backend.lightning.models.classification.utils.load_weights import VisionTransformerWeightsLoader
 from getitune.backend.lightning.models.classification.utils.pretrained_urls import VIT_PRETRAINED_URLS
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import VisionTransformerWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiLabelClsMetricCallable
 from getitune.types.label import LabelInfoTypes

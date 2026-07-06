@@ -19,8 +19,8 @@ from getitune.backend.lightning.models.classification.losses.asymmetric_angular_
 )
 from getitune.backend.lightning.models.classification.multilabel_models.base import LightningMultilabelClsModel
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
-from getitune.backend.lightning.models.classification.utils.load_weights import CheckpointWeightsLoader
 from getitune.backend.lightning.models.classification.utils.pretrained_urls import MOBILENETV3_PRETRAINED_URLS
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import CheckpointWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.data.entity.base import BatchLoss
 from getitune.data.entity.sample import PredictionBatch, SampleBatch

@@ -16,7 +16,7 @@ from getitune.backend.lightning.models.classification.classifier import ImageCla
 from getitune.backend.lightning.models.classification.heads import LinearClsHead
 from getitune.backend.lightning.models.classification.multiclass_models.base import LightningMulticlassClsModel
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
-from getitune.backend.lightning.models.classification.utils.load_weights import PytorchcvWeightsLoader
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import PytorchcvWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiClassClsMetricCallable
 from getitune.types.label import LabelInfoTypes

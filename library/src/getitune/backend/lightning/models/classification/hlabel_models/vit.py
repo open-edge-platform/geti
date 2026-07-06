@@ -18,8 +18,8 @@ from getitune.backend.lightning.models.classification.heads import (
 from getitune.backend.lightning.models.classification.hlabel_models.base import LightningHlabelClsModel
 from getitune.backend.lightning.models.classification.losses import AsymmetricAngularLossWithIgnore
 from getitune.backend.lightning.models.classification.multiclass_models.vit import ForwardExplainMixInForViT
-from getitune.backend.lightning.models.classification.utils.load_weights import VisionTransformerWeightsLoader
 from getitune.backend.lightning.models.classification.utils.pretrained_urls import VIT_PRETRAINED_URLS
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import VisionTransformerWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import HLabelClsMetricCallable
 from getitune.types.label import HLabelInfo

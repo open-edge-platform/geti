@@ -21,23 +21,23 @@ Note:
 # ViT / DINOv2 ImageNet-21k checkpoints (shared by multiclass, multilabel, hlabel).
 from __future__ import annotations
 
-_BASE_STORAGE_URL = "https://storage.geti.intel.com/weights/"
+_BASE_STORAGE_URL = "https://storage.geti.intel.com/weights"
 
 VIT_PRETRAINED_URLS: dict[str, str] = {
     "vit-tiny": (
-        f"{_BASE_STORAGE_URL}"
+        f"{_BASE_STORAGE_URL}/"
         "Ti_16-i21k-300ep-lr_0.001-aug_none-wd_0.03-do_0.0-sd_0.0--imagenet2012-steps_20k-lr_0.03-res_224.npz"
     ),
     "vit-small": (
-        f"{_BASE_STORAGE_URL}"
+        f"{_BASE_STORAGE_URL}/"
         "S_16-i21k-300ep-lr_0.001-aug_light1-wd_0.03-do_0.0-sd_0.0--imagenet2012-steps_20k-lr_0.03-res_224.npz"
     ),
     "vit-base": (
-        f"{_BASE_STORAGE_URL}"
+        f"{_BASE_STORAGE_URL}/"
         "B_16-i21k-300ep-lr_0.001-aug_medium1-wd_0.1-do_0.0-sd_0.0--imagenet2012-steps_20k-lr_0.01-res_224.npz"
     ),
     "vit-large": (
-        f"{_BASE_STORAGE_URL}"
+        f"{_BASE_STORAGE_URL}/"
         "L_16-i21k-300ep-lr_0.001-aug_medium1-wd_0.1-do_0.1-sd_0.1--imagenet2012-steps_20k-lr_0.01-res_224.npz"
     ),
     "dinov2-small": f"{_BASE_STORAGE_URL}/dinov2_vits14_reg4_pretrain.pth",

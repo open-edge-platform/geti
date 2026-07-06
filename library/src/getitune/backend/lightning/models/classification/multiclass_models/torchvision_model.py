@@ -20,7 +20,7 @@ from getitune.backend.lightning.models.classification.multiclass_models.base imp
     LightningMulticlassClsModel,
 )
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
-from getitune.backend.lightning.models.classification.utils.load_weights import TorchvisionWeightsLoader
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import TorchvisionWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiClassClsMetricCallable
 from getitune.types.label import LabelInfoTypes

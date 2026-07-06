@@ -18,7 +18,7 @@ from getitune.backend.lightning.models.classification.multilabel_models.base imp
     LightningMultilabelClsModel,
 )
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
-from getitune.backend.lightning.models.classification.utils.load_weights import TimmWeightsLoader
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import TimmWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiLabelClsMetricCallable
 from getitune.types.label import LabelInfoTypes
