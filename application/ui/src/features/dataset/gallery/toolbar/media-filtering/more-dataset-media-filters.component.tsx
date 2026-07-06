@@ -17,7 +17,7 @@ import { Filter } from '@geti-ui/ui/icons';
 import { DateFilter } from './date-filter/date-filter.component';
 import { FilterBySubset } from './filter-by-subset/filter-by-subset.component';
 
-export const MoreMediaFilters = () => {
+export const MoreDatasetMediaFilters = () => {
     return (
         <DialogTrigger type={'popover'} placement={'bottom'}>
             <TooltipTrigger>
