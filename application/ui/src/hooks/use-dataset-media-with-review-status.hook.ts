@@ -24,6 +24,9 @@ export const useDatasetMediaWithReviewStatus = () => {
 
     const datasetItemsResponse = useGetDatasetItemsById({
         annotationStatus: annotationStatus ?? undefined,
+        labelIds: isEmpty(selectedLabelIds) ? undefined : selectedLabelIds,
+        startDate: startDate ?? undefined,
+        endDate: endDate ?? undefined,
         sortDirection: sortDirection ?? undefined,
         subsets,
     });

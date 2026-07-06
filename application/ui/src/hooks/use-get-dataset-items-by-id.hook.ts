@@ -11,6 +11,9 @@ type UseGetDatasetItemsByIdOptions = {
     annotationStatus?: DatasetItemAnnotationStatus;
     sortDirection?: SortDirection;
     subsets?: DatasetSubset[];
+    labelIds?: string[];
+    startDate?: string;
+    endDate?: string;
 };
 
 export const useGetDatasetItemsById = ({ annotationStatus, sortDirection, subsets }: UseGetDatasetItemsByIdOptions) => {

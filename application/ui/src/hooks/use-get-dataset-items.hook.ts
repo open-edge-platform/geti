@@ -30,6 +30,9 @@ export const useGetDatasetItems = ({ subsets, annotationStatus, sortDirection }:
         annotation_status?: DatasetItemAnnotationStatus;
         sort_direction?: SortDirection;
         sort_by?: SortBy;
+        labels?: string[];
+        start_date?: string;
+        end_date?: string;
     } = {
         offset: 0,
         limit: DATASET_ITEMS_LIMIT,
@@ -46,6 +49,18 @@ export const useGetDatasetItems = ({ subsets, annotationStatus, sortDirection }:
     if (sortDirection !== undefined) {
         query.sort_direction = sortDirection;
         query.sort_by = 'creation_date';
+    }
+
+    if (!isEmpty(labelIds)) {
+        query.labels = labelIds;
+    }
+
+    if (startDate !== undefined) {
+        query.start_date = startDate;
+    }
+
+    if (endDate !== undefined) {
+        query.end_date = endDate;
     }
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = $api.useInfiniteQuery(
