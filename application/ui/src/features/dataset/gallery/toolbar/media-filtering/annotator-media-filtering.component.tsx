@@ -19,7 +19,7 @@ import { FilterByStatus } from './filter-by-status/filter-by-status.component';
 import { FilterBySubset } from './filter-by-subset/filter-by-subset.component';
 import { MediaFilterLabels } from './media-filter-labels/media-filter-labels.component';
 
-export const AnnotatorMediaFilteringCompact = () => {
+export const AnnotatorMediaFiltering = () => {
     return (
         <DialogTrigger type={'popover'} placement={'bottom'}>
             <TooltipTrigger>

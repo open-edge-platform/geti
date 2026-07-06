@@ -8,7 +8,7 @@ import {
     useClearAllFilters,
     useHasActiveFilters,
 } from '../../gallery/active-filters/active-filters.component';
-import { AnnotatorMediaFilteringCompact } from '../../gallery/toolbar/media-filtering/annotator-media-filtering-compact.component';
+import { AnnotatorMediaFiltering } from '../../gallery/toolbar/media-filtering/annotator-media-filtering.component';
 
 export const SidebarMediaFilter = () => {
     const hasActiveFilters = useHasActiveFilters();
@@ -17,7 +17,7 @@ export const SidebarMediaFilter = () => {
     return (
         <Flex direction={'column'} gap={'size-100'}>
             <Flex justifyContent={'space-between'} alignItems={'center'}>
-                <AnnotatorMediaFilteringCompact />
+                <AnnotatorMediaFiltering />
                 {hasActiveFilters && (
                     <ActionButton isQuiet onPress={handleClearAll}>
                         Clear all
