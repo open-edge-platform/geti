@@ -47,6 +47,7 @@ export const useDatasetMediaWithReviewStatus = () => {
 
     return {
         items: mediaItemsResponse.items,
+        datasetItems: datasetItemsResponse.items,
         // Wait for both the media-items and review-status queries to settle
         // before declaring "ready". Otherwise the gallery flashes thumbnails
         // first and pops in the annotation-status badges a moment later, which

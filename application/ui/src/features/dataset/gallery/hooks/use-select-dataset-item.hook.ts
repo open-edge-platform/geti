@@ -1,11 +1,11 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
 import { paths } from '../../../../constants/paths';
 import { Media } from '../../../../constants/shared-types';
-import { useGetDatasetMediaItems } from '../../../../hooks/use-get-dataset-media-items.hook';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';
 import { isVideo, isVideoFrame } from '../../../../shared/media-item-utils';
 
@@ -13,7 +13,7 @@ export const useSelectDatasetItem = () => {
     const navigate = useNavigate();
     const { search } = useLocation();
     const projectId = useProjectIdentifier();
-    const { items } = useGetDatasetMediaItems();
+    const { items } = useDatasetMediaWithReviewStatus();
     const { datasetItemId: selectedDatasetItemId } = useParams<{ datasetItemId: string }>();
 
     const onSelectedMediaItemChange = (item: Media | null) => {
