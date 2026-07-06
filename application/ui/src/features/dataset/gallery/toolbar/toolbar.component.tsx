@@ -27,10 +27,7 @@ import { DeleteMediaItem } from '../delete-media-item/delete-media-item.componen
 import { useSelectDatasetItem } from '../hooks/use-select-dataset-item.hook';
 import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
-import { DateFilter } from './date-filter/date-filter.component';
-import { FilterByStatus } from './filter-by-status/filter-by-status.component';
-import { FilterBySubset } from './filter-by-subset/filter-by-subset.component';
-import { MediaFilterLabels } from './media-filter-labels/media-filter-labels.component';
+import { MediaFiltering } from './media-filtering/media-filtering.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
 import { toggleMultipleSelection } from './util';
@@ -150,13 +147,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     {noMediaSelected && (
                         <>
-                            <FilterByStatus />
-
-                            <FilterBySubset />
-
-                            <MediaFilterLabels />
-
-                            <DateFilter />
+                            <MediaFiltering />
 
                             <DatasetStatistics />
 
