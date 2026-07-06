@@ -27,5 +27,5 @@ uv run python run.py <path_to_model> <path_to_image>
 
 In the root directory of the repository:
 
-- download sample models and images by running `uv run python tests/accuracy/download_models.py -d data -j tests/accuracy/examples.json -l`
+- download sample models and images by running `uv run python tests/functional/download_models.py -d data -j tests/functional/examples.json -l`
 - run the example with the following command: `uv run python examples/asynchronous_api/run.py data/otx_models/ssd-card-detection.xml data/cards.png`

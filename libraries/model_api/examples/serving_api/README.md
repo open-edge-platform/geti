@@ -17,7 +17,7 @@ This example demonstrates how to use a Python API of OpenVINO Model API for a re
 
 - Install Docker. Please refer to the [official documentation](https://docs.docker.com/get-docker/) for details.
 
-- Download sample models and images by running `uv run python tests/accuracy/download_models.py -d data -j tests/accuracy/examples.json -l` and resave a configured model at OVMS friendly folder layout:
+- Download sample models and images by running `uv run python tests/functional/download_models.py -d data -j tests/functional/examples.json -l` and resave a configured model at OVMS friendly folder layout:
 
   ```bash
   mkdir -p data/ovms/ssd-card-detection/1

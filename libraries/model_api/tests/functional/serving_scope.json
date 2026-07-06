@@ -1,0 +1,6 @@
+[
+  {
+    "name": "otx_models/ssd-card-detection.xml",
+    "type": "DetectionModel"
+  }
+]

@@ -54,7 +54,7 @@ uv run python benchmark.py --help
 
 In the root directory of the repository:
 
-- download sample models and images by running `uv run python tests/accuracy/download_models.py -d data -j tests/accuracy/examples.json -l`
+- download sample models and images by running `uv run python tests/functional/download_models.py -d data -j tests/functional/examples.json -l`
 - run the example with the following command: `uv run python examples/metrics/benchmark.py data/otx_models/ssd-card-detection.xml data/coco128/images/train2017`
 
 ## Expected Output

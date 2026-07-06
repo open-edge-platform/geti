@@ -28,7 +28,7 @@ where prompts are in X Y format.
 To run the pipeline out-of-the box you can download the test data by running the following command from the repo root:
 
 ```bash
-uv run python tests/accuracy/download_models.py -d data -j tests/accuracy/examples.json -l
+uv run python tests/functional/download_models.py -d data -j tests/functional/examples.json -l
 ```
 
 and then run
