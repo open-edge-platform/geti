@@ -21,7 +21,7 @@ description: Develop and validate changes in `application/ui/` for the React and
 1. Keep the change inside the existing UI structure under `src/` unless the task explicitly calls for build or tooling updates.
 2. Use existing component, routing, testing, and styling patterns instead of introducing a new structure.
 3. Regenerate API types instead of hand-editing them when the backend contract changes.
-4. Escalate to component or e2e tests only when the change affects rendered browser behavior.
+4. Escalate to component (Playwright) or e2e tests only when the change affects rendered browser behavior, i.e. prefer unit over Playwright over e2e tests.
 
 ## Verification
 
