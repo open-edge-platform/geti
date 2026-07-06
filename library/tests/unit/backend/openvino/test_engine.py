@@ -220,6 +220,16 @@ class TestEngine:
         fxt_engine.optimize(max_data_subset_size=100, checkpoint="path/to/exported_model.xml")
         assert mock_ov_model.return_value.optimize.call_args[0][2]["subset_size"] == 100
 
+        # With max_drop and max_num_iterations (accuracy-aware quantization)
+        fxt_engine.optimize(max_drop=0.01, max_num_iterations=5, checkpoint="path/to/exported_model.xml")
+        ptq_config = mock_ov_model.return_value.optimize.call_args[0][2]
+        assert ptq_config["max_drop"] == 0.01
+        assert ptq_config["max_num_iterations"] == 5
+
+        # Without max_num_iterations it should not be part of the PTQ config
+        fxt_engine.optimize(max_drop=0.01, checkpoint="path/to/exported_model.xml")
+        assert "max_num_iterations" not in mock_ov_model.return_value.optimize.call_args[0][2]
+
     def test_optimize_rejects_onnx(self, fxt_engine, fxt_onnx_model_path) -> None:
         """Test that optimize() raises RuntimeError for ONNX models."""
         with pytest.raises(RuntimeError, match="does not support ONNX models"):

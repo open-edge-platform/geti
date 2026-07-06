@@ -343,6 +343,7 @@ class TestGetiTuneQuantizerRunQuantization:
         mock_engine.optimize.assert_called_once_with(
             max_data_subset_size=150,
             max_drop=None,
+            max_num_iterations=None,
         )
 
     def test_run_quantization_accuracy_aware(
@@ -359,12 +360,14 @@ class TestGetiTuneQuantizerRunQuantization:
             ov_engine=mock_engine,
             subset_size=200,
             max_drop=0.01,
+            max_num_iterations=5,
         )
 
         assert result == expected_path
         mock_engine.optimize.assert_called_once_with(
             max_data_subset_size=200,
             max_drop=0.01,
+            max_num_iterations=5,
         )
 
     def test_run_quantization_propagates_engine_error(
@@ -869,6 +872,7 @@ class TestGetiTuneQuantizerExecute:
         mock_engine.optimize.assert_called_once_with(
             max_data_subset_size=50,
             max_drop=None,
+            max_num_iterations=10,
         )
         fxt_model_service.create_variant.assert_called_once_with(
             model_revision_id=model_id,
@@ -878,6 +882,7 @@ class TestGetiTuneQuantizerExecute:
                 "type": "PTQ",
                 "max_calibration_subset_size": 50,
                 "max_drop": None,
+                "max_num_iterations": None,
             },
             model_variant_id=model_variant_id,
         )
@@ -927,6 +932,7 @@ class TestGetiTuneQuantizerExecute:
             model_variant_id=model_variant_id,
             max_calibration_subset_size=200,
             max_drop=0.02,
+            max_num_iterations=5,
         )
 
         model = _make_model_revision(model_id)
@@ -981,11 +987,13 @@ class TestGetiTuneQuantizerExecute:
         mock_engine.optimize.assert_called_once_with(
             max_data_subset_size=200,
             max_drop=0.02,
+            max_num_iterations=5,
         )
         fxt_model_service.create_variant.assert_called_once()
         call_kwargs = fxt_model_service.create_variant.call_args.kwargs
         assert call_kwargs["quantization_info"]["type"] == "Accuracy-aware PTQ"
         assert call_kwargs["quantization_info"]["max_drop"] == 0.02
+        assert call_kwargs["quantization_info"]["max_num_iterations"] == 5
 
     def test_execute_cleans_workspace_on_failure(
         self,

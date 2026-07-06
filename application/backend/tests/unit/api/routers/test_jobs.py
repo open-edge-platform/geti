@@ -129,6 +129,7 @@ class TestJobEndpoints:
                     "model_id": model_id,
                     "max_calibration_subset_size": 200,
                     "max_drop": 0.01,
+                    "max_num_iterations": 5,
                 },
             }
         )
@@ -145,6 +146,7 @@ class TestJobEndpoints:
         assert submitted_job.params.model_id == model_id
         assert submitted_job.params.max_calibration_subset_size == 200
         assert submitted_job.params.max_drop == 0.01
+        assert submitted_job.params.max_num_iterations == 5
         assert submitted_job.project_id == project.id
 
     def test_submit_quantize_job_defaults(self, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service):
@@ -177,6 +179,7 @@ class TestJobEndpoints:
         assert submitted_job.params.model_id == model_id
         assert submitted_job.params.max_calibration_subset_size == 100
         assert submitted_job.params.max_drop is None
+        assert submitted_job.params.max_num_iterations == 10
 
     def test_list_jobs(self, fxt_client, fxt_jobs_queue, fxt_job):
         fxt_jobs_queue.list_all.return_value = [fxt_job(), fxt_job()]
