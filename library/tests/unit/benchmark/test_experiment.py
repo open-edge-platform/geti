@@ -492,6 +492,14 @@ class TestScrapeCsvMetricsEdgeCases:
         metrics = _scrape_csv_metrics(csv_path, prefix="t:")
         assert "t:val/f1" not in metrics
 
+    def test_non_numeric_column_skipped(self, tmp_path: Path) -> None:
+        """Non-scalar metrics (e.g. confusion matrices) are skipped, not fatal."""
+        csv_path = tmp_path / "metrics.csv"
+        csv_path.write_text('test/confusion_matrix,test/accuracy\n"[tensor([[431,   4],\n        [  0,  15]])]",0.95\n')
+        metrics = _scrape_csv_metrics(csv_path, prefix="export:")
+        assert "export:test/confusion_matrix" not in metrics
+        assert metrics["export:test/accuracy"] == 0.95
+
 
 # ---------------------------------------------------------------------------
 # detect_resume_point — additional edge cases
