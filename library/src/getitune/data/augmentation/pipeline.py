@@ -561,6 +561,34 @@ class GPUAugmentationPipeline(nn.Module):
         """Get data keys used by the pipeline."""
         return self._data_keys
 
+    def apply_image_only(self, images: torch.Tensor) -> torch.Tensor:
+        """Apply only image-level (non-geometric) augmentations to a batch of images.
+
+        Unlike :meth:`forward`, this does not require (or transform) annotations and
+        therefore does not depend on the Kornia ``AugmentationSequential`` data-keys.
+        It is used for tile batches during validation/testing, where the tiles carry
+        no per-tile annotations (predictions are merged back to the original image
+        afterwards) and only intensity transforms such as ``Normalize`` are relevant.
+
+        Geometric augmentations are skipped because applying them without annotation
+        tracking would desynchronise boxes/masks; validation/test pipelines only
+        contain intensity transforms in practice.
+
+        Args:
+            images: Batched images tensor in BCHW format, values in [0, 1].
+
+        Returns:
+            The transformed images tensor.
+        """
+        if not self._augmentations_list:
+            return images
+        out = images
+        for aug in self._augmentations_list:
+            if isinstance(aug, K.GeometricAugmentationBase2D):
+                continue
+            out = aug(out)
+        return out
+
     @classmethod
     def list_available_transforms(cls) -> list[type]:
         """List available Kornia augmentation classes."""
