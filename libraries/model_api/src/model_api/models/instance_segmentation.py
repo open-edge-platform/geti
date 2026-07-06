@@ -4,6 +4,7 @@
 #
 
 from abc import abstractmethod
+from typing import ClassVar
 
 import cv2
 import numpy as np
@@ -23,6 +24,8 @@ class InstanceSegmentationModel(ImageModel):
     confidence filtering, and NMS. Subclasses implement mask-specific postprocessing
     via `_postprocess_single_mask`.
     """
+
+    _labels_shift: ClassVar[int] = 1
 
     def __init__(self, inference_adapter: InferenceAdapter, configuration: dict = {}, preload: bool = False) -> None:
         super().__init__(inference_adapter, configuration, preload)
@@ -156,7 +159,7 @@ class InstanceSegmentationModel(ImageModel):
         labels = outputs[self.output_blob_name["labels"]]
         masks = outputs[self.output_blob_name["masks"]]
         if not self.is_segmentoly:
-            labels += 1
+            labels += self._labels_shift
 
         inputImgWidth, inputImgHeight = (
             meta["original_shape"][1],
@@ -277,9 +280,13 @@ class DETRInstanceSegmentation(InstanceSegmentationModel):
 
     Uses full-image mask postprocessing: resizes the mask (e.g. 96x96 covering the
     entire image) to the original image dimensions and applies a threshold.
+
+    Unlike MaskRCNN, this model outputs native COCO-91 category IDs directly, so
+    no labels += 1 shift is applied (``_labels_shift = 0``).
     """
 
     __model__ = "DETRInstSeg"
+    _labels_shift: ClassVar[int] = 0
 
     def _postprocess_single_mask(self, box: np.ndarray, raw_cls_mask: np.ndarray, im_h: int, im_w: int) -> np.ndarray:
         return _full_image_mask_postprocess(raw_cls_mask, im_h, im_w)

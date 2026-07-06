@@ -156,6 +156,11 @@ class ParameterRegistry:
             choices=tuple(RESIZE_TYPES.keys()),
             description="Type of input image resizing",
         ),
+        "interpolation_mode": StringValue(
+            default_value="LINEAR",
+            choices=("LINEAR", "CUBIC", "NEAREST"),
+            description="Interpolation method used when resizing the input image",
+        ),
         "pad_value": NumericalValue(
             int,
             min=0,

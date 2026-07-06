@@ -182,25 +182,30 @@ class TestDETRInstanceSegmentationPostprocess:
         assert len(result.bboxes) == 0
         assert result.masks.shape == (0, 16, 16)
 
-    def test_labels_incremented(self, model):
-        """Non-segmentoly models should have labels incremented by 1."""
+    def test_labels_not_shifted_for_detr(self, model):
+        """DETRInstanceSegmentation does not apply labels += 1 (unlike MaskRCNN).
+
+        The model outputs native COCO-91 category IDs directly, so no shift is needed.
+        Raw label 0 stays as label_idx 0.
+        """
         boxes = np.array([[100, 100, 300, 300, 0.9]], dtype=np.float32)
         labels = np.array([0], dtype=np.int64)
         masks = np.ones((1, 96, 96), dtype=np.float32)
 
         result = model.postprocess(_make_outputs(boxes, labels, masks), _make_meta())
 
-        assert result.labels[0] == 1
+        assert result.labels[0] == 0
 
     def test_label_names_assigned(self, model):
-        """Label names should be resolved from params.labels."""
+        """Label names should be resolved from params.labels using raw label index directly."""
         boxes = np.array([[100, 100, 300, 300, 0.9]], dtype=np.float32)
         labels = np.array([0], dtype=np.int64)
         masks = np.ones((1, 96, 96), dtype=np.float32)
 
         result = model.postprocess(_make_outputs(boxes, labels, masks), _make_meta())
 
-        assert result.label_names == ["horse"]
+        # raw label 0 → label_idx 0 → params.labels[0] = "background"
+        assert result.label_names == ["background"]
 
     def test_mask_uses_full_image_not_crop(self, model):
         """Verify masks are resized to full image dims, not placed at box position."""

@@ -112,6 +112,17 @@ def test_polygon_mask_multiple_contours(mock_image: PIL.Image, caplog):
     assert isinstance(result, PIL.Image.Image)
 
 
+def test_polygon_mask_single_pixel_contour_does_not_raise(mock_image: PIL.Image):
+    """Mask with a single-pixel contour should not fail while extracting points."""
+    mask = np.zeros((100, 100), dtype=np.uint8)
+    mask[50, 50] = 255
+
+    polygon = Polygon(mask=mask)
+    result = polygon.compute(mock_image.copy())
+
+    assert isinstance(result, PIL.Image.Image)
+
+
 def test_keypoint_with_scores(mock_image: PIL.Image):
     """Keypoint primitive draws scores when provided."""
     kp = Keypoint(

@@ -119,7 +119,7 @@ class ImageModel(Model):
             inference_adapter.embed_preprocessing(
                 layout=layout,
                 resize_mode=self.params.resize_type,
-                interpolation_mode="LINEAR",
+                interpolation_mode=self.params.interpolation_mode,
                 target_shape=(self.w, self.h),
                 pad_value=self.params.pad_value,
                 brg2rgb=self.params.reverse_input_channels,

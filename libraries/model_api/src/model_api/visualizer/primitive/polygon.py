@@ -92,7 +92,10 @@ class Polygon(Primitive):
         if len(contours) == 0:
             logger.warning("No contours found in the mask. Skipping polygon drawing.")
             return []
-        points_ = contours[0].squeeze().tolist()
+        points_ = contours[0].reshape(-1, 2).tolist()
+        if len(points_) < 2:
+            logger.warning("Contour has fewer than 2 points. Skipping polygon drawing.")
+            return []
         return [tuple(point) for point in points_]
 
     def compute(self, image: Image) -> Image:
