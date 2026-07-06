@@ -54,7 +54,7 @@ export class DatasetPage {
     }
 
     getUploadInput() {
-        return this.page.getByLabel('Upload media files');
+        return this.page.getByTestId('upload-media-input');
     }
 
     getUploadButton() {

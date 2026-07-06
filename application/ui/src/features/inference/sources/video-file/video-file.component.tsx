@@ -44,12 +44,16 @@ export const VideoFile = ({ defaultState }: VideoFileProps) => {
         const formData = new FormData();
         formData.append('file', file);
 
-        const result = await uploadMutation.mutateAsync({
-            // @ts-expect-error There is an incorrect type in OpenAPI
-            body: formData,
-        });
+        try {
+            const result = await uploadMutation.mutateAsync({
+                // @ts-expect-error There is an incorrect type in OpenAPI
+                body: formData,
+            });
 
-        setVideoPath(result.video_path);
+            setVideoPath(result.video_path);
+        } catch {
+            // Error state is handled via uploadMutation.isError
+        }
     };
 
     return (
