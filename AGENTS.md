@@ -6,8 +6,12 @@
 - `CLAUDE.md` imports this file for Claude Code compatibility.
 - Per-component guides live in `library/AGENTS.md`, `application/backend/AGENTS.md`,
   and `application/ui/AGENTS.md`; read the matching one before working in that area.
-- Portable task skills live in `.agents/skills/`.
-- Claude-native mirrors live in `.claude/skills/`.
+- Canonical task skills live in `skills/`, grouped into `skills/library/` and
+  `skills/application/` buckets.
+- `.agents/skills/` and `.claude/skills/` are committed symlink adapters pointing
+  back at `skills/<bucket>/<name>`; do not edit them directly. Run
+  `python3 .github/scripts/skills/agent_skills.py sync` after adding or renaming a
+  skill.
 - Keep always-on repository rules here; keep task-specific workflows in skills.
 
 ## Repository Map
