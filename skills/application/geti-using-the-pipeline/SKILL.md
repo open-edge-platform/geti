@@ -13,7 +13,7 @@ sink). This skill is about _using_ that API; to change backend code use the
 `geti-backend-dev` skill instead.
 
 Start the server from `application/backend/` with `just run-server` (default
-`http://localhost:7860`). The full endpoint reference is
+`https://localhost:7860`). The full endpoint reference is
 `application/docs/api.md`; interactive docs are the generated OpenAPI spec.
 
 ## End-to-end pipeline
