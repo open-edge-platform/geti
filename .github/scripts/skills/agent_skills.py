@@ -16,7 +16,9 @@ import argparse
 import os
 import platform
 import re
-import subprocess
+
+# subprocess is only used for a fixed `cmd /c mklink /J` fallback with no shell.
+import subprocess  # nosec B404
 import sys
 from pathlib import Path
 
@@ -110,7 +112,8 @@ def _create_windows_link(link: Path, target: str, abs_target: Path) -> None:
     except OSError:
         pass
 
-    subprocess.run(
+    # Fixed argument list, no shell, and paths are repo-internal.
+    subprocess.run(  # nosec B603
         ["cmd", "/c", "mklink", "/J", str(link), str(abs_target)],
         check=True,
         capture_output=True,
