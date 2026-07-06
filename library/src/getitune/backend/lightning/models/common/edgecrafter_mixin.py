@@ -353,7 +353,7 @@ class EdgeCrafterMixin:
 
     @staticmethod
     def _make_is_export_prediction(
-        _inputs: SampleBatch,
+        _inputs: SampleBatch | Tensor,
         result: dict[str, Tensor],
     ) -> dict[str, Tensor]:
         """Reformat deploy-mode dict for MaskRCNN-compatible ONNX export.

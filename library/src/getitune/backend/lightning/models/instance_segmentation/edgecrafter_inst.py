@@ -152,7 +152,7 @@ class EdgeCrafterInst(EdgeCrafterMixin, LightningInstanceSegModel):  # pyrefly: 
         """
         meta_info_list = self._default_is_meta(inputs)
         result = self.model.export(inputs, meta_info_list)  # type: ignore[attr-defined]  # pyrefly: ignore[not-callable]
-        return self._make_is_export_prediction(inputs, result)  # type: ignore[arg-type]
+        return self._make_is_export_prediction(inputs, result)
 
     @property
     def _default_preprocessing_params(self) -> dict[str, DataInputParams]:

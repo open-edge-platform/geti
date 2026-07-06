@@ -246,6 +246,7 @@ class SegmentationHead(nn.Module):
         sf = F.interpolate(spatial_features, size=(h_out, w_out), mode="bilinear", align_corners=False)
         for block in self.blocks:
             sf = block(sf)
+        sf = self.spatial_features_proj(sf)
         qf = self.query_features_proj(self.query_features_block(query_features[0]))
         return [torch.einsum("bchw,bnc->bnhw", sf, qf) + self.bias]
 
