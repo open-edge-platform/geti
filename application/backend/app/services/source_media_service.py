@@ -20,6 +20,8 @@ class SourceMediaService:
     def __init__(self, source_media_dir: Path) -> None:
         self._source_media_dir = source_media_dir
 
+    # TODO: We already used a similar method in staged_dataset_service.py.
+    # Consider refactoring to avoid code duplication.
     async def upload(self, filename: str, file_obj: BinaryIO) -> Path:
         """
         Store an uploaded video file using a high-speed threaded block copy.
