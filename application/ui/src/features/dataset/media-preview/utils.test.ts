@@ -2,18 +2,31 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { act } from '@testing-library/react';
+import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useFetchNextUnannotatedMediaItem } from 'hooks/use-get-dataset-items.hook';
+import { getMockedDatasetItem } from 'mocks/mock-dataset-item';
 import { getMockedMediaImage, getMockedVideoFrame, getMultipleMockedMediaImage } from 'mocks/mock-media';
 import { renderHook } from 'test-utils/render';
 
 import type { AnnotationDTO } from '../../../constants/shared-types';
 import { useVideoPlayerContext } from '../../annotator/video-player/video-player-provider.component';
-import { getInitialAnnotations, getNextMediaItem, usePlayPauseVideoBySystem } from './utils';
+import { getInitialAnnotations, getNextMediaItem, useNextMediaItem, usePlayPauseVideoBySystem } from './utils';
 
 vi.mock('../../annotator/video-player/video-player-provider.component', () => ({
     useVideoPlayerContext: vi.fn(),
 }));
 
+vi.mock('hooks/use-dataset-media-with-review-status.hook', () => ({
+    useDatasetMediaWithReviewStatus: vi.fn(),
+}));
+
+vi.mock('hooks/use-get-dataset-items.hook', () => ({
+    useFetchNextUnannotatedMediaItem: vi.fn(),
+}));
+
 const mockUseVideoPlayerContext = vi.mocked(useVideoPlayerContext);
+const mockUseDatasetMediaWithReviewStatus = vi.mocked(useDatasetMediaWithReviewStatus);
+const mockUseFetchNextUnannotatedMediaItem = vi.mocked(useFetchNextUnannotatedMediaItem);
 
 const createVideoPlayerContext = (isPlaying: boolean) => {
     const play = vi.fn().mockResolvedValue(undefined);
@@ -116,6 +129,103 @@ describe('getNextMediaItem', () => {
             const result = getNextMediaItem(frame, [frame], 3);
             expect(result).toEqual({ ...frame, frame_number: 6 });
         });
+    });
+});
+
+describe('useNextMediaItem', () => {
+    const mockFetchNextPage = vi.fn();
+
+    beforeEach(() => {
+        mockUseVideoPlayerContext.mockReturnValue(null);
+        mockUseDatasetMediaWithReviewStatus.mockReturnValue({ fetchNextPage: mockFetchNextPage } as never);
+        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({ data: { items: [] }, isPending: false } as never);
+        vi.clearAllMocks();
+    });
+
+    it('prefers the next unannotated media item over the positional next item', () => {
+        const items = getMultipleMockedMediaImage(3);
+        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            data: { items: [getMockedDatasetItem({ id: items[2].id })] },
+            isPending: false,
+        } as never);
+
+        const { result } = renderHook(() => useNextMediaItem(items[0], items));
+
+        expect(result.current).toEqual(items[2]);
+    });
+
+    it('falls back to the positional next item when every media item is annotated', () => {
+        const items = getMultipleMockedMediaImage(3);
+
+        const { result } = renderHook(() => useNextMediaItem(items[0], items));
+
+        expect(result.current).toEqual(items[1]);
+    });
+
+    it('ignores annotation status and advances by frame when the current item is a video frame', () => {
+        const frame = getMockedVideoFrame({ id: 'video-1', frame_number: 0, frame_count: 10 });
+        const nextImage = getMockedMediaImage({ id: 'image-1' });
+        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            data: { items: [getMockedDatasetItem({ id: nextImage.id })] },
+            isPending: false,
+        } as never);
+
+        const { result } = renderHook(() => useNextMediaItem(frame, [frame, nextImage]));
+
+        expect(result.current).toEqual({ ...frame, frame_number: 1 });
+    });
+
+    it('advances video frames using the step size from the video player context', () => {
+        mockUseVideoPlayerContext.mockReturnValue({ step: 60 } as never);
+        const frame = getMockedVideoFrame({ id: 'video-1', frame_number: 0, frame_count: 10 });
+
+        const { result } = renderHook(() => useNextMediaItem(frame, [frame]));
+
+        expect(result.current).toEqual({ ...frame, frame_number: 60 });
+    });
+
+    it('excludes the current item from the unannotated candidates', () => {
+        const items = getMultipleMockedMediaImage(2);
+        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            data: { items: [getMockedDatasetItem({ id: items[0].id })] },
+            isPending: false,
+        } as never);
+
+        const { result } = renderHook(() => useNextMediaItem(items[0], items));
+
+        expect(result.current).toEqual(items[1]);
+    });
+
+    it('fetches the next page when the next unannotated item is not among the already-fetched items', () => {
+        const alreadyFetchedItems = getMultipleMockedMediaImage(2);
+        const nextUnannotatedItem = getMockedDatasetItem({ id: 'not-loaded-item' });
+        const nextUnannotatedMediaImage = getMockedMediaImage({ id: nextUnannotatedItem.id });
+        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            data: { items: [nextUnannotatedItem] },
+            isPending: false,
+        } as never);
+
+        const { result, rerender } = renderHook(() => useNextMediaItem(alreadyFetchedItems[0], alreadyFetchedItems));
+
+        expect(mockFetchNextPage).toHaveBeenCalledTimes(1);
+
+        alreadyFetchedItems.push(nextUnannotatedMediaImage);
+
+        rerender();
+
+        expect(result.current).toEqual(nextUnannotatedMediaImage);
+    });
+
+    it('does not fetch the next page when the next unannotated item is already among the fetched items', () => {
+        const alreadyFetchedItems = getMultipleMockedMediaImage(2);
+        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            data: { items: [getMockedDatasetItem({ id: alreadyFetchedItems[1].id })] },
+            isPending: false,
+        } as never);
+
+        renderHook(() => useNextMediaItem(alreadyFetchedItems[0], alreadyFetchedItems));
+
+        expect(mockFetchNextPage).not.toHaveBeenCalled();
     });
 });
 
