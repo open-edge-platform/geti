@@ -22,7 +22,7 @@ type VideoFileProps = {
 const ACCEPTED_VIDEO_EXTENSIONS = [acceptedVideoExtensions, '.flv', '.wmv', '.mpg', '.mpeg'];
 
 export const VideoFile = ({ defaultState }: VideoFileProps) => {
-    const [videoPath, setVideoPath] = useState(defaultState?.video_path ? String(defaultState.video_path) : '');
+    const [videoPath, setVideoPath] = useState(defaultState?.video_path ? defaultState.video_path : '');
     const [isPathTouched, setIsPathTouched] = useState(false);
 
     const uploadMutation = useUploadSourceMedia();
