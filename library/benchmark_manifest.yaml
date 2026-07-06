@@ -139,6 +139,9 @@ experiments:
       - name: yolo26_m
         priority: extended
         recipe: detection/yolo26_m.yaml
+      - name: edgecrafter_m
+        priority: extended
+        recipe: detection/edgecrafter_m.yaml
     datasets:
       - bccd
     criteria:

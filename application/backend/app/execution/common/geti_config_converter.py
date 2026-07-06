@@ -938,26 +938,6 @@ class GetiConfigConverter:
                 "status": ModelStatus.ACCURACY,
                 "default": False,
             },
-            "instance-segmentation-edgecrafter-s": {
-                "recipe_path": RECIPE_PATH / "instance_segmentation" / "edgecrafter_inst_s.yaml",
-                "status": ModelStatus.ACTIVE,
-                "default": False,
-            },
-            "instance-segmentation-edgecrafter-m": {
-                "recipe_path": RECIPE_PATH / "instance_segmentation" / "edgecrafter_inst_m.yaml",
-                "status": ModelStatus.ACTIVE,
-                "default": False,
-            },
-            "instance-segmentation-edgecrafter-l": {
-                "recipe_path": RECIPE_PATH / "instance_segmentation" / "edgecrafter_inst_l.yaml",
-                "status": ModelStatus.ACTIVE,
-                "default": False,
-            },
-            "instance-segmentation-edgecrafter-x": {
-                "recipe_path": RECIPE_PATH / "instance_segmentation" / "edgecrafter_inst_x.yaml",
-                "status": ModelStatus.ACTIVE,
-                "default": False,
-            },
             "instance-segmentation-yolo26-n": {
                 "recipe_path": RECIPE_PATH / "instance_segmentation" / "yolo26_n_seg.yaml",
                 "status": ModelStatus.ACTIVE,

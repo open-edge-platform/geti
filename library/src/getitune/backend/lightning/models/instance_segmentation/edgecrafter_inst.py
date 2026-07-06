@@ -160,7 +160,7 @@ class EdgeCrafterInst(EdgeCrafterMixin, LightningInstanceSegModel):  # pyrefly: 
         imagenet_mean = (0.485, 0.456, 0.406)
         imagenet_std = (0.229, 0.224, 0.225)
         return {
-            "edgecrafter_s": DataInputParams(input_size=(512, 512), mean=imagenet_mean, std=imagenet_std),
+            "edgecrafter_s": DataInputParams(input_size=(640, 640), mean=imagenet_mean, std=imagenet_std),
             "edgecrafter_m": DataInputParams(input_size=(640, 640), mean=imagenet_mean, std=imagenet_std),
             "edgecrafter_l": DataInputParams(input_size=(640, 640), mean=imagenet_mean, std=imagenet_std),
             "edgecrafter_x": DataInputParams(input_size=(640, 640), mean=imagenet_mean, std=imagenet_std),
