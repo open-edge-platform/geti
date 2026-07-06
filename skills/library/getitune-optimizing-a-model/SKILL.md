@@ -31,7 +31,7 @@ predictions = ov_engine.predict()    # run inference with the quantized model
    checkpoint, export it first with the `getitune-exporting-a-model` skill.
    - Done when: `create_engine(model="....xml", data=...)` builds an `OVEngine`.
 2. **Provide a calibration dataset.** Calibration images are taken automatically
-   from the training subset; ~300 images is the recommended calibration size.
+   from the training subset; 200-500 images is the recommended calibration size.
    - Done when: `optimize()` runs without a "not enough calibration data" issue.
 3. **Run `optimize()`.** This replaces the engine's model in place with the INT8
    version.
