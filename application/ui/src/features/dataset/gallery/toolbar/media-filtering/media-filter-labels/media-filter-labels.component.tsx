@@ -22,7 +22,7 @@ export const MediaFilterLabels = () => {
             ariaLabel='Filter by labels'
             placeholder='Search labels'
             summary={summary}
-            width='size-3000'
+            minWidth='size-3000'
             dialogWidth='size-5000'
         >
             <MultiSelectList

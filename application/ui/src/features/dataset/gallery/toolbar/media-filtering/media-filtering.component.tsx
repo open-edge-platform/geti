@@ -10,7 +10,7 @@ import { MoreMediaFilters } from './more-media-filters.component';
 export const MediaFiltering = () => {
     return (
         <Flex direction={'row'} gap={'size-200'} alignItems={'center'}>
-            <FilterByStatus />
+            <FilterByStatus width={'size-3000'} />
             <MediaFilterLabels />
             <MoreMediaFilters />
         </Flex>
