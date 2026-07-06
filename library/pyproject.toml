@@ -127,6 +127,10 @@ ci_publish = [
     "build==1.2.2.post1",
 ]
 
+benchmark = [
+    "kagglehub>=0.4.1",
+]
+
 [project.scripts]
 getitune = "getitune.cli:main"
 otx = "getitune.cli:main"

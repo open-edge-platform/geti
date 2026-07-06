@@ -122,7 +122,9 @@ Per-seed work directories are created under:
 
 Dataset provisioning writes readiness markers at:
 
-- `data/<dataset>/.ready`
+- `data/<dataset>/.ready` (script-provisioned datasets only — `local_path` datasets are
+  externally managed and never get a `.ready` marker; see "Datasets requiring
+  credentials or manual placement" below)
 
 ## Add a new dataset or model
 
@@ -171,7 +173,102 @@ Provisioning script contract:
 - `provision` runs the script as `python <script> --output-dir <data_root> --name <dataset_name>`.
 - The script should create `data/<dataset_name>/`; the runner writes `data/<dataset_name>/.ready` after success.
 
+### Datasets requiring credentials or manual placement
+
+Some datasets can't be auto-downloaded by CI: they're gated behind an account/license
+(e.g. Kaggle), or they're large enough that re-downloading on every run is impractical.
+Two catalog fields cover this, and can be combined or used independently.
+
+#### Option A — `local_path`: reference an already-prepared directory directly
+
+Use this when the dataset was (or will be) fully prepared out-of-band — manually, on a
+different machine, or copied once from a prior script run — and should simply be reused
+as-is, with **no script execution at all**.
+
+```yaml
+datasets:
+  - name: my_private_dataset
+    local_path: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/my_private_dataset"
+    size_tier: medium
+```
+
+- `local_path` supports `${VAR}`/`~` expansion, so the same catalog entry resolves to a
+  different location per machine/CI runner — set `GETITUNE_BENCHMARK_EXTERNAL_DATA` (or
+  whatever variable name you choose) to wherever that machine keeps such datasets.
+- The directory must already contain a dataset in a format the engine can load (native
+  Datumaro `metadata.json`+`data.parquet`, or a recognizable COCO/YOLO/VOC layout) —
+  nothing converts it.
+- No `.ready` sentinel is written and no existence check is cached: the directory is
+  assumed to be externally managed.
+- Mutually exclusive with `script` — a catalog entry must declare exactly one of the two.
+- If the path doesn't resolve (unset environment variable) or doesn't exist, provisioning
+  logs a clear error and skips just that dataset's experiments (see "Provisioning
+  resilience" below) — it does not abort the whole run.
+
+#### Option B — `raw_dir`: let a script skip its own network download
+
+Use this when you still want the script's transform/export logic to run (kept shared,
+version-controlled, and testable) but need to skip a credentialed or slow network fetch.
+
+```yaml
+datasets:
+  - name: brain_tumor_instseg
+    script: "scripts/benchmark_datasets/prepare_brain_tumor_instseg.py"
+    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_instseg_raw"
+    size_tier: small
+```
+
+- `raw_dir` is only valid together with `script`, and is forwarded to it as `--raw-dir
+  <resolved-path>`.
+- It's a **best-effort accelerant, not a requirement**: if the variable is unset or the
+  path doesn't exist, provisioning logs a warning and falls back to the script's normal
+  (e.g. network/credentialed) download path instead of failing.
+- In the script, use `getitune.benchmark.dataset_helpers.resolve_raw_source(args,
+  download_fn)` — it returns `args.raw_dir` directly (extracting it first if it's a
+  single archive file) when set, or calls `download_fn` otherwise. See
+  `scripts/benchmark_datasets/prepare_brain_tumor_instseg.py` for a full example.
+
+#### Kaggle-sourced datasets
+
+For datasets hosted on Kaggle (like `brain_tumor_instseg`), use
+`getitune.benchmark.dataset_helpers.download_kaggle_dataset()` instead of calling the
+`kaggle` CLI directly — it gives a clear, actionable error (instead of a subprocess
+traceback) when the CLI isn't installed or credentials aren't configured, and points at
+`--raw-dir` as an alternative.
+
+Setup:
+
+- Install the downloader: `uv sync --group kagglehub` (from `library/`; not installed
+  by default) or `pip install kagglehub`.
+- Configure credentials, either:
+  - Environment variable: `KAGGLE_API_TOKEN`, or
+  - A credentials file: `~/.kaggle/access_token` — see https://www.kaggle.com/docs/api.
+- Alternatively, skip credentials entirely and use `--raw-dir` / `local_path` with a
+  manually-downloaded copy.
+
+**CI:** the `benchmark-dataset-scripts` job in `.github/workflows/lib-lint-and-test.yaml`
+reads `KAGGLE_API_TOKEN` from a repository secret of the same name. Set it with
+(requires a Kaggle account and repo admin access):
+
+```bash
+gh secret set KAGGLE_API_TOKEN
+```
+
+GitHub never exposes secrets to `pull_request` workflows triggered from forks, so the
+real-download test is additionally skipped (not failed) whenever credentials aren't
+present — see `tests/unit/scripts/test_prepare_brain_tumor_instseg.py`. A future
+scheduled benchmark workflow (see "CI benchmark schedule" above) should reuse the same
+token secret.
+
+#### Provisioning resilience
+
+A single dataset failing to provision (missing credentials, transient network error, a
+`local_path`/`raw_dir` that doesn't resolve) is logged and that dataset is skipped —
+`python -m getitune.benchmark run`/`provision` continues with everything else rather than
+aborting the whole invocation.
+
 ### Add a new model
+
 
 1. Ensure the model recipe exists under `src/getitune/recipe/<task>/...`.
 2. Add a model entry under `experiments.<task>.models` in `benchmark_manifest.yaml`.

@@ -23,6 +23,7 @@ from datumaro.experimental.data_formats.coco.sample import CocoCategories, CocoS
 from datumaro.experimental.export_import import export_dataset
 from datumaro.experimental.fields import ImageInfo, Subset
 from PIL import Image
+from sklearn.model_selection import train_test_split
 
 from getitune.benchmark.dataset_helpers import download, parse_args
 
@@ -54,37 +55,64 @@ def _build_dataset(parquet_paths: dict[Subset, Path], images_dir: Path) -> Datas
     images_dir.mkdir(parents=True, exist_ok=True)
     dataset: Dataset = Dataset(CocoSample, categories={"labels": CocoCategories(labels=_LABEL_NAMES)})
 
-    image_id = 0
-    for subset in (Subset.TRAINING, Subset.VALIDATION):
-        parquet_path = parquet_paths[subset]
+    examples: list[tuple[dict, int]] = []
+    for parquet_path in parquet_paths.values():
         parquet_file = pq.ParquetFile(str(parquet_path))
         for batch in parquet_file.iter_batches(batch_size=256):
             images = batch.column("image").to_pylist()
             labels = batch.column("label").to_pylist()
-            for image_struct, label in zip(images, labels, strict=True):
-                img_bytes = image_struct["bytes"]
-                suffix = image_struct.get("path", "image.jpg").rsplit(".", 1)[-1].lower()
-                img_path = images_dir / f"paddy_{image_id:05d}.{suffix}"
-                img_path.write_bytes(img_bytes)
-                with Image.open(img_path) as im:
-                    width, height = im.size
-                dataset.append(
-                    CocoSample(
-                        image=LazyImage(img_path),
-                        image_info=ImageInfo(width=width, height=height),
-                        image_id=image_id,
-                        subset=subset,
-                        bboxes=None,
-                        labels=np.asarray([int(label)], dtype=np.int64),
-                        polygons=None,
-                        areas=None,
-                        iscrowd=None,
-                        caption_group_ids=None,
-                        captions=None,
-                        keypoints=None,
-                    ),
-                )
-                image_id += 1
+            examples.extend(zip(images, (int(label) for label in labels), strict=True))
+
+    if not examples:
+        return dataset
+
+    labels = [label for _, label in examples]
+    train_examples, temp_examples = train_test_split(
+        examples,
+        test_size=0.4,
+        random_state=42,
+        shuffle=True,
+        stratify=labels,
+    )
+    temp_labels = [label for _, label in temp_examples]
+    validation_examples, testing_examples = train_test_split(
+        temp_examples,
+        test_size=0.5,
+        random_state=42,
+        shuffle=True,
+        stratify=temp_labels,
+    )
+
+    image_id = 0
+    for subset, subset_examples in (
+        (Subset.TRAINING, train_examples),
+        (Subset.VALIDATION, validation_examples),
+        (Subset.TESTING, testing_examples),
+    ):
+        for image_struct, label in subset_examples:
+            img_bytes = image_struct["bytes"]
+            suffix = image_struct.get("path", "image.jpg").rsplit(".", 1)[-1].lower()
+            img_path = images_dir / f"paddy_{image_id:05d}.{suffix}"
+            img_path.write_bytes(img_bytes)
+            with Image.open(img_path) as im:
+                width, height = im.size
+            dataset.append(
+                CocoSample(
+                    image=LazyImage(img_path),
+                    image_info=ImageInfo(width=width, height=height),
+                    image_id=image_id,
+                    subset=subset,
+                    bboxes=None,
+                    labels=np.asarray([label], dtype=np.int64),
+                    polygons=None,
+                    areas=None,
+                    iscrowd=None,
+                    caption_group_ids=None,
+                    captions=None,
+                    keypoints=None,
+                ),
+            )
+            image_id += 1
     return dataset
 
 

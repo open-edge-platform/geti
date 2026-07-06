@@ -35,8 +35,8 @@ experiments:
     datasets:
       - paddy_disease
       - chest_ct
-      - indoor_scene
-      - flowers102
+      - aircraft
+      - food41
     criteria:
       accuracy_metric: accuracy
       thresholds:
@@ -169,10 +169,8 @@ experiments:
       - bccd
       - cable_damage
       - vehicles
-      - pothole
-      - pcb_defect
     criteria:
-      accuracy_metric: map_50
+      accuracy_metric: map
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
@@ -275,9 +273,11 @@ experiments:
       - wgisd
       - pothole
       - pcb_defect
-      - satellite_building
+      - brain_tumor_instseg
+      - cardd
+
     criteria:
-      accuracy_metric: map_50
+      accuracy_metric: map
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }

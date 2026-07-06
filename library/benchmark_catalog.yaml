@@ -10,9 +10,26 @@
 #
 # Fields:
 #   name        – unique identifier (referenced from benchmark_manifest.yaml)
-#   script      – path to preparation script (relative to library/ root)
+#   script      – path to preparation script (relative to library/ root).
+#                 Mutually exclusive with `local_path` — exactly one must be set.
+#   local_path  – path to an already-prepared dataset directory, used as-is
+#                 with no script execution. Supports ${VAR}/~ expansion so the
+#                 same entry resolves differently per machine/CI runner (e.g.
+#                 "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/my_dataset"). Use this
+#                 for datasets that were prepared out-of-band (manually, or on
+#                 a shared/network mount) and should never be re-downloaded.
+#   raw_dir     – optional, only valid together with `script`. Path (also
+#                 supports ${VAR}/~ expansion) to a pre-fetched raw archive or
+#                 directory, forwarded to the script as `--raw-dir` so it can
+#                 skip its own network download step (e.g. for credentialed
+#                 sources like Kaggle) while still running the same
+#                 transform/export logic. If the path doesn't exist, the
+#                 script falls back to its normal download behavior.
 #   size_tier   – tiny | small | medium | large
 #   url         – upstream source the preparation script downloads from
+#
+# See src/getitune/benchmark/README.md ("Datasets requiring credentials or
+# manual placement") for a walkthrough of `local_path` / `raw_dir` usage.
 
 version: 1
 
@@ -53,11 +70,29 @@ datasets:
     compatible_tasks:
       - classification/multi_class_cls
 
-  - name: indoor_scene
-    script: "scripts/benchmark_datasets/prepare_indoor_scene.py"
+  - name: aircraft
+    script: "scripts/benchmark_datasets/prepare_aircraft.py"
+    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/aircraft_raw"
     size_tier: large
-    url: "https://huggingface.co/datasets/Voxel51/IndoorSceneRecognition"
-    description: "Indoor Scene Recognition — public HF mirror of a large indoor scene classification dataset."
+    url: "https://www.kaggle.com/datasets/seryouxblaster764/fgvc-aircraft"
+    description: >-
+      FGVC-Aircraft — 10,200 aircraft images with official train/val/test splits and
+      hierarchical labels (variant / family / manufacturer). This benchmark uses the
+      variant level and requires a Kaggle account for automatic download, or a
+      pre-extracted raw directory at $GETITUNE_BENCHMARK_EXTERNAL_DATA/aircraft_raw.
+    compatible_tasks:
+      - classification/multi_class_cls
+
+  - name: food41
+    script: "scripts/benchmark_datasets/prepare_food41.py"
+    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/food41_raw"
+    size_tier: large
+    url: "https://www.kaggle.com/datasets/kmader/food41"
+    description: >-
+      Food-101 — 101 food categories with official train/test splits, sourced from
+      a Kaggle mirror. This benchmark uses a stratified validation split from the
+      training set and supports Kaggle auto-download or a pre-extracted raw
+      directory at $GETITUNE_BENCHMARK_EXTERNAL_DATA/food41_raw.
     compatible_tasks:
       - classification/multi_class_cls
 
@@ -164,3 +199,33 @@ datasets:
     description: "Crack segmentation — 11,298 images with binary crack masks. Large semantic-segmentation benchmark."
     compatible_tasks:
       - semantic_segmentation
+
+  - name: brain_tumor_instseg
+    script: "scripts/benchmark_datasets/prepare_brain_tumor_instseg.py"
+    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_instseg_raw"
+    size_tier: large
+    url: "https://www.kaggle.com/datasets/pkdarabi/medical-image-dataset-brain-tumor-segmentation"
+    description: >-
+      Brain Tumor instance segmentation — ~1,744 MRI images with polygon annotations
+      (3 tumor-likelihood classes) from a Kaggle-gated Roboflow YOLO export. Requires a
+      Kaggle account: either configure Kaggle API credentials (see the preparation
+      script's docstring) for automatic download, or place a pre-fetched copy at
+      $GETITUNE_BENCHMARK_EXTERNAL_DATA/brain_tumor_instseg_raw (raw_dir is forwarded to
+      the script and used instead of downloading when present).
+    compatible_tasks:
+      - instance_segmentation
+
+  - name: cardd
+    script: "scripts/benchmark_datasets/prepare_cardd_instseg.py"
+    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/cardd_instseg_raw"
+    size_tier: large
+    url: "https://www.kaggle.com/datasets/issamjebnouni/cardd"
+    description: >-
+      CarDD instance segmentation — 4,000 images with COCO polygon annotations across 6
+      damage classes (dent, scratch, crack, glass shatter, lamp broken, tire flat), from
+      a Kaggle-gated COCO-format mirror. Requires a Kaggle account: either configure
+      Kaggle API credentials (see the preparation script's docstring) for automatic
+      download, or place a pre-fetched copy at $GETITUNE_BENCHMARK_EXTERNAL_DATA/cardd_instseg_raw
+      (raw_dir is forwarded to the script and used instead of downloading when present).
+    compatible_tasks:
+      - instance_segmentation
