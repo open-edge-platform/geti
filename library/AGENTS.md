@@ -13,20 +13,20 @@ skill `.agents/skills/geti-library-dev/`.
 
 ## Package Layout (`src/getitune/`)
 
-| Directory   | Responsibility |
-| ----------- | -------------- |
-| `backend/`  | Multi-backend implementations: `lightning/` (training), `openvino/` (inference), optional `ultralytics/`. |
-| `models/`   | Central re-export hub that exposes model classes from every backend under one namespace. |
-| `recipe/`   | YAML recipe configs organized by task (`classification/`, `detection/`, `instance_segmentation/`, `keypoint_detection/`, `rotated_detection/`, `semantic_segmentation/`, shared `_base_/`). |
-| `engine/`   | Abstract `Engine` base class defining the `train` / `test` / `predict` / `export` interface. |
-| `cli/`      | Command-line entry points (jsonargparse) for `train`, `test`, `predict`, `export`, `benchmark`, `find`. |
-| `data/`     | Lightning `DataModule`, dataset factories, augmentation pipelines, samplers. |
-| `config/`   | Typed dataclasses for configuration (`device.py`, data, explain, …) plus YAML helpers. |
-| `types/`    | Enums and type aliases (`TaskType`, `DeviceType`, `ExportFormat`, `Precision`, …). |
-| `tools/`    | `AutoConfigurator` (model → recipe mapping), exporters, explainability tooling. |
-| `metrics/`  | Metric callables and evaluation logic. |
-| `utils/`    | Shared utilities: recipe discovery (`recipes.py`), device helpers (`device.py`), caching. |
-| `benchmark/`| Benchmark manifest parsing and regression runner. |
+| Directory    | Responsibility                                                                                                                                                                              |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `backend/`   | Multi-backend implementations: `lightning/` (training), `openvino/` (inference), optional `ultralytics/`.                                                                                   |
+| `models/`    | Central re-export hub that exposes model classes from every backend under one namespace.                                                                                                    |
+| `recipe/`    | YAML recipe configs organized by task (`classification/`, `detection/`, `instance_segmentation/`, `keypoint_detection/`, `rotated_detection/`, `semantic_segmentation/`, shared `_base_/`). |
+| `engine/`    | Abstract `Engine` base class defining the `train` / `test` / `predict` / `export` interface.                                                                                                |
+| `cli/`       | Command-line entry points (jsonargparse) for `train`, `test`, `predict`, `export`, `benchmark`, `find`.                                                                                     |
+| `data/`      | Lightning `DataModule`, dataset factories, augmentation pipelines, samplers.                                                                                                                |
+| `config/`    | Typed dataclasses for configuration (`device.py`, data, explain, …) plus YAML helpers.                                                                                                      |
+| `types/`     | Enums and type aliases (`TaskType`, `DeviceType`, `ExportFormat`, `Precision`, …).                                                                                                          |
+| `tools/`     | `AutoConfigurator` (model → recipe mapping), exporters, explainability tooling.                                                                                                             |
+| `metrics/`   | Metric callables and evaluation logic.                                                                                                                                                      |
+| `utils/`     | Shared utilities: recipe discovery (`recipes.py`), device helpers (`device.py`), caching.                                                                                                   |
+| `benchmark/` | Benchmark manifest parsing and regression runner.                                                                                                                                           |
 
 ## Multi-Backend Design
 
@@ -102,8 +102,27 @@ Both model implementations (`backend/lightning/models/<task>/`) and recipes
 
 ## Model Manifests
 
-- The user-facing "model config" is the **recipe** — there is no separate
-  per-model manifest file.
+- Inside `library/` the model config **is the recipe** — there is no per-model
+  manifest file in this package.
+- **Per-model manifests live in the backend, not the library**, but the two are
+  tightly connected. `application/backend/app/supported_models/manifests/<task>/<model>.yaml`
+  holds the Geti-facing model manifest (`id`, `name`, `pretrained_weights`,
+  `stats`, and a Geti-style `hyperparameters`/augmentation block). These are
+  loaded by `app/services/model_manifest_service.py` into the
+  `app/models/model_manifest.py::ModelManifest` model and surfaced through the
+  `model_architectures` API. Recommended architectures per task are declared in
+  `app/supported_models/model_recommendations.py`.
+- The bridge from a backend manifest to a library recipe is
+  **`GetiConfigConverter`** (`application/backend/app/execution/common/geti_config_converter.py`).
+  `GetiConfigConverter.convert(config)` takes the Geti manifest/config dict and
+  produces a `getitune` recipe dictionary: it resolves the manifest `id` to a
+  library recipe path via its internal `TEMPLATE_ID_MAPPING` (which points at
+  `get_getitune_root_path() / "recipe" / <task> / <model>.yaml`), then maps
+  Geti hyperparameter and augmentation names onto the getitune/kornia/torchvision
+  class paths and args (see `HyperparametersUpdater` and `TransformsUpdater` in
+  the same module). So when you rename or restructure a recipe or its
+  hyperparameters here, keep the backend manifest and `GetiConfigConverter`
+  mapping in sync or backend training breaks.
 - A **benchmark manifest** (`library/benchmark_manifest.yaml`,
   `library/benchmark_catalog.yaml`) drives regression/benchmark runs. It is
   parsed by `src/getitune/benchmark/manifest.py` into dataclasses
