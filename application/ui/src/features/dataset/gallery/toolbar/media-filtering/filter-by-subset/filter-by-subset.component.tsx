@@ -21,10 +21,7 @@ const SUBSET_OPTIONS: { name: DatasetSubset }[] = [
 export const FilterBySubset = () => {
     const { selectedSubsets, setSelectedSubsets } = useDatasetFiltersSearchParams();
 
-    const [selectedSubsetsKeys, setSelectedSubsetsKeys] = useState<string[]>(selectedSubsets);
-
     const handleSelectionChange = (values: string[]) => {
-        setSelectedSubsetsKeys(values);
         setSelectedSubsets(values as DatasetSubset[]);
     };
 
@@ -32,7 +29,7 @@ export const FilterBySubset = () => {
         <Flex direction='column' gap='size-100'>
             <Text UNSAFE_className={classes.label}>Filter by subset</Text>
             <Flex direction='column'>
-                <CheckboxGroup value={selectedSubsetsKeys} onChange={handleSelectionChange}>
+                <CheckboxGroup value={selectedSubsets} onChange={handleSelectionChange}>
                     <>
                         {SUBSET_OPTIONS.map((item) => (
                             <Checkbox key={item.name} value={item.name}>
