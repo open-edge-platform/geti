@@ -5,13 +5,8 @@
 
 from __future__ import annotations
 
-import os
 from functools import partial
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Literal
-from urllib.parse import urlparse
-
-from torch.hub import download_url_to_file
 
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
 from getitune.backend.lightning.models.classification.backbones.vision_transformer import VisionTransformerBackbone
@@ -44,9 +39,10 @@ class DinoV2Seg(LightningSegmentationModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to SegmCallable.
         torch_compile (bool, optional): Flag to indicate whether to use torch.compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_weights: ClassVar[dict[str, str]] = {
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "dinov2-small-seg": "https://storage.geti.intel.com/weights/dinov2_vits14_reg4_pretrain.pth",
     }
 
@@ -60,6 +56,7 @@ class DinoV2Seg(LightningSegmentationModel):
         metric: MetricCallable = SegmCallable,  # type: ignore[assignment]
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
     ):
         super().__init__(
             label_info=label_info,
@@ -70,6 +67,7 @@ class DinoV2Seg(LightningSegmentationModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:
@@ -89,17 +87,6 @@ class DinoV2Seg(LightningSegmentationModel):
         criterion = CrossEntropyLossWithIgnore(ignore_index=self.label_info.ignore_index)  # type: ignore[attr-defined]
 
         backbone.init_weights()
-        if self.model_name in self.pretrained_weights:
-            print(f"init weight - {self.pretrained_weights[self.model_name]}")
-            parts = urlparse(self.pretrained_weights[self.model_name])
-            filename = Path(parts.path).name
-
-            cache_dir = Path(os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"])
-            cache_file = cache_dir / filename
-            if not Path.exists(cache_file):
-                download_url_to_file(self.pretrained_weights[self.model_name], cache_file, "", progress=True)
-            backbone.load_pretrained(checkpoint_path=cache_file)
-
         # freeze backbone
         for _, v in backbone.named_parameters():
             v.requires_grad = False
