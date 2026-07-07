@@ -135,21 +135,6 @@ export default defineConfig({
                 // is never used — switch to 'mock' to keep the (identical) runtime
                 // behavior without the noisy build warning.
                 node: { ...config.node, __dirname: 'mock', __filename: 'mock' },
-                optimization: {
-                    ...config.optimization,
-                    // Force deterministic (numeric) chunk IDs in dev too. Rspack's
-                    // dev default is `chunkIds: 'named'`, which makes our module
-                    // web workers (SAM / intelligent-scissors / SSIM) request a
-                    // shared async vendor chunk by a long derived name
-                    // (`vendors-node_modules_onnxruntime-web…polylabel_js.js`) that
-                    // is never emitted under that name -> the dev server's SPA
-                    // fallback returns index.html -> the worker's importScripts
-                    // fails with "MIME type ('text/html') is not executable".
-                    // Production already uses deterministic IDs (numeric chunks),
-                    // which is why `npm run build` is unaffected. Matching dev to
-                    // production keeps the worker chunk names consistent.
-                    chunkIds: 'deterministic',
-                },
             };
         },
     },
