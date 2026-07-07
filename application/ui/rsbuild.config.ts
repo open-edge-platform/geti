@@ -135,7 +135,11 @@ export default defineConfig({
         headers: {
             'Cross-Origin-Embedder-Policy': 'credentialless',
             'Cross-Origin-Opener-Policy': 'same-origin',
-            'Cache-Control': 'public, max-age=31536000, immutable',
+            // Must NOT be 'immutable': dev async chunks are not content-hashed, so an
+            // immutable cache causes the browser to keep serving stale chunk/HMR runtime
+            // URLs after a rebuild (stale worker imports, mismatched hmr.js client). See
+            // /memories/repo/dev-server-immutable-cache-stale-worker.md.
+            'Cache-Control': 'no-cache',
             'Content-Security-Policy':
                 "default-src 'self'; " +
                 "script-src 'self' 'unsafe-eval' blob:; " +
