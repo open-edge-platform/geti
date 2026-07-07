@@ -137,17 +137,20 @@ describe('useNextMediaItem', () => {
 
     beforeEach(() => {
         mockUseVideoPlayerContext.mockReturnValue(null);
-        mockUseDatasetMediaWithReviewStatus.mockReturnValue({ fetchNextPage: mockFetchNextPage } as never);
-        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({ data: { items: [] }, isPending: false } as never);
+        // @ts-expect-error We only care about mocking part of the context for this test.
+        mockUseDatasetMediaWithReviewStatus.mockReturnValue({ fetchNextPage: mockFetchNextPage });
+        // @ts-expect-error We only care about mocking data and isPending for this test.
+        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({ data: { items: [] }, isPending: false });
         vi.clearAllMocks();
     });
 
     it('prefers the next unannotated media item over the positional next item', () => {
         const items = getMultipleMockedMediaImage(3);
         mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            // @ts-expect-error We only care about mocking data and isPending for this test.
             data: { items: [getMockedDatasetItem({ id: items[2].id })] },
             isPending: false,
-        } as never);
+        });
 
         const { result } = renderHook(() => useNextMediaItem(items[0], items));
 
@@ -166,18 +169,20 @@ describe('useNextMediaItem', () => {
         const frame = getMockedVideoFrame({ id: 'video-1', frame_number: 0, frame_count: 10 });
         const nextImage = getMockedMediaImage({ id: 'image-1' });
         mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            // @ts-expect-error We only care about mocking data and isPending for this test.
             data: { items: [getMockedDatasetItem({ id: nextImage.id })] },
             isPending: false,
-        } as never);
+        });
 
         const { result } = renderHook(() => useNextMediaItem(frame, [frame, nextImage]));
 
         expect(result.current).toEqual({ ...frame, frame_number: 1 });
     });
 
-    it('advances video frames using the step size from the video player context', () => {
-        mockUseVideoPlayerContext.mockReturnValue({ step: 60 } as never);
-        const frame = getMockedVideoFrame({ id: 'video-1', frame_number: 0, frame_count: 10 });
+    it('advances video frames using the step size from the video player context', async () => {
+        // @ts-expect-error We only care about mocking only step for this test.
+        mockUseVideoPlayerContext.mockReturnValue({ step: 60 });
+        const frame = getMockedVideoFrame({ id: 'video-1', frame_number: 0, frame_count: 70 });
 
         const { result } = renderHook(() => useNextMediaItem(frame, [frame]));
 
@@ -187,9 +192,10 @@ describe('useNextMediaItem', () => {
     it('excludes the current item from the unannotated candidates', () => {
         const items = getMultipleMockedMediaImage(2);
         mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            // @ts-expect-error We only care about mocking data and isPending for this test.
             data: { items: [getMockedDatasetItem({ id: items[0].id })] },
             isPending: false,
-        } as never);
+        });
 
         const { result } = renderHook(() => useNextMediaItem(items[0], items));
 
@@ -201,9 +207,10 @@ describe('useNextMediaItem', () => {
         const nextUnannotatedItem = getMockedDatasetItem({ id: 'not-loaded-item' });
         const nextUnannotatedMediaImage = getMockedMediaImage({ id: nextUnannotatedItem.id });
         mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            // @ts-expect-error We only care about mocking data and isPending for this test.
             data: { items: [nextUnannotatedItem] },
             isPending: false,
-        } as never);
+        });
 
         const { result, rerender } = renderHook(() => useNextMediaItem(alreadyFetchedItems[0], alreadyFetchedItems));
 
@@ -219,9 +226,10 @@ describe('useNextMediaItem', () => {
     it('does not fetch the next page when the next unannotated item is already among the fetched items', () => {
         const alreadyFetchedItems = getMultipleMockedMediaImage(2);
         mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            // @ts-expect-error We only care about mocking data and isPending for this test.
             data: { items: [getMockedDatasetItem({ id: alreadyFetchedItems[1].id })] },
             isPending: false,
-        } as never);
+        });
 
         renderHook(() => useNextMediaItem(alreadyFetchedItems[0], alreadyFetchedItems));
 
@@ -236,7 +244,8 @@ describe('usePlayPauseVideoBySystem', () => {
 
     it('does not call play or pause when not loading and video is not playing', () => {
         const context = createVideoPlayerContext(false);
-        mockUseVideoPlayerContext.mockReturnValue(context as never);
+        // @ts-expect-error We only care about mocking part of the context for this test.
+        mockUseVideoPlayerContext.mockReturnValue(context);
 
         renderHook(() => usePlayPauseVideoBySystem(false));
 
@@ -246,7 +255,8 @@ describe('usePlayPauseVideoBySystem', () => {
 
     it('calls pause when range predictions are loading and video is playing', () => {
         const context = createVideoPlayerContext(true);
-        mockUseVideoPlayerContext.mockReturnValue(context as never);
+        // @ts-expect-error We only care about mocking part of the context for this test.
+        mockUseVideoPlayerContext.mockReturnValue(context);
 
         renderHook(() => usePlayPauseVideoBySystem(true));
 
@@ -256,7 +266,8 @@ describe('usePlayPauseVideoBySystem', () => {
 
     it('calls play when range predictions stop loading after system paused the video', () => {
         const context = createVideoPlayerContext(true);
-        mockUseVideoPlayerContext.mockReturnValue(context as never);
+        // @ts-expect-error We only care about mocking part of the context for this test.
+        mockUseVideoPlayerContext.mockReturnValue(context);
 
         let isLoading = true;
         const { rerender } = renderHook(() => usePlayPauseVideoBySystem(isLoading));
@@ -273,7 +284,8 @@ describe('usePlayPauseVideoBySystem', () => {
 
     it('does not call play when range predictions stop loading but video was paused by user', () => {
         const context = createVideoPlayerContext(false);
-        mockUseVideoPlayerContext.mockReturnValue(context as never);
+        // @ts-expect-error We only care about mocking part of the context for this test.
+        mockUseVideoPlayerContext.mockReturnValue(context);
 
         let isLoading = true;
         const { rerender } = renderHook(() => usePlayPauseVideoBySystem(isLoading));
@@ -290,7 +302,8 @@ describe('usePlayPauseVideoBySystem', () => {
 
     it('does not call pause when video is not playing and range predictions are loading', () => {
         const context = createVideoPlayerContext(false);
-        mockUseVideoPlayerContext.mockReturnValue(context as never);
+        // @ts-expect-error We only care about mocking part of the context for this test.
+        mockUseVideoPlayerContext.mockReturnValue(context);
 
         renderHook(() => usePlayPauseVideoBySystem(true));
 
