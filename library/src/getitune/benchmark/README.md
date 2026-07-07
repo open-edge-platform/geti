@@ -238,8 +238,8 @@ traceback) when the CLI isn't installed or credentials aren't configured, and po
 
 Setup:
 
-- Install the downloader: `uv sync --group kagglehub` (from `library/`; not installed
-  by default) or `pip install kagglehub`.
+- Install the downloader: `uv sync --extra benchmark` (from `library/`; not installed
+  by default) or `uv pip install kagglehub`.
 - Configure credentials, either:
   - Environment variable: `KAGGLE_API_TOKEN`, or
   - A credentials file: `~/.kaggle/access_token` — see https://www.kaggle.com/docs/api.
