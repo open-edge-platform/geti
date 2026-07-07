@@ -84,7 +84,7 @@ experiments:
         recipe: detection/yolox_tiny.yaml
       - name: yolox_s_tile
         priority: core # one tiling model to always check Tiling
-        recipe: detection/yolox_tiny_tile.yaml
+        recipe: detection/yolox_s_tile.yaml
       - name: yolox_l
         priority: extended
         recipe: detection/yolox_l.yaml
