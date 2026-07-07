@@ -547,7 +547,7 @@ class ECTransformer(nn.Module):
         eval_spatial_size: tuple[int, int] | list[int] = (640, 640),
         num_queries: int = 300,
         num_levels: int = 3,
-        num_points: int | list[int] = 4,
+        num_points: int | list[int] = (3, 6, 3),
         dropout: float = 0.0,
         activation: str = "silu",
         num_denoising: int = 100,

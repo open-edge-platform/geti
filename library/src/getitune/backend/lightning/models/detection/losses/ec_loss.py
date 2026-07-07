@@ -121,7 +121,6 @@ class ECCriterion(DEIMCriterion):
     def _available_losses(self) -> tuple[Callable]:  # type: ignore[return-value]
         return (  # pyrefly: ignore[bad-return]
             self.loss_boxes,
-            self.loss_labels_vfl,
             self.loss_labels_mal,
             self.loss_local,
             self.loss_masks,
