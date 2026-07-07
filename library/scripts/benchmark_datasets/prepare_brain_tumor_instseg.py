@@ -29,7 +29,7 @@ instead of delegating to a generic YOLO importer.
 This dataset is gated behind a Kaggle account. Two ways to provide it:
 
 1. Automatic download — requires the ``kagglehub`` package (``pip install kagglehub`` or
-   ``uv sync --group kagglehub`` from ``library/``) and API credentials
+   ``uv sync --extra benchmark`` from ``library/``) and API credentials
    configured via the ``KAGGLE_API_TOKEN`` environment variable, or a
    ``~/.kaggle/access_token`` file. See https://www.kaggle.com/docs/api.
 2. Manual placement — download the dataset yourself (e.g. from

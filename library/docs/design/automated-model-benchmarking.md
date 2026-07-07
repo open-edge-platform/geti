@@ -374,8 +374,8 @@ datasets:
 Scripts sourcing from Kaggle use `getitune.benchmark.dataset_helpers.download_kaggle_dataset()`,
 which checks for `kagglehub` and API credentials (`KAGGLE_API_TOKEN` or
 `~/.kaggle/access_token`) up front and raises a clear, actionable error rather than a
-bare dependency failure. `kagglehub` itself is an opt-in `uv` dependency-group
-(`uv sync --group kagglehub`), not installed by default. In CI, a `KAGGLE_API_TOKEN`
+bare dependency failure. `kagglehub` itself is an opt-in optional dependency extra
+(`benchmark`; e.g. `uv sync --extra benchmark`), not installed by default. In CI, a `KAGGLE_API_TOKEN`
 repository secret is wired into the `benchmark-dataset-scripts` job; the corresponding
 real-download test is additionally `skipif`-gated on credentials being present, so
 forked-repo PRs (which never receive secrets) skip it instead of failing.

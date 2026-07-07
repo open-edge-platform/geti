@@ -14,9 +14,11 @@ from __future__ import annotations
 
 import shutil
 from typing import TYPE_CHECKING
-from pathlib import Path
 
 import numpy as np
+
+if TYPE_CHECKING:
+    from pathlib import Path
 from datumaro.experimental import Dataset, LazyImage
 from datumaro.experimental.data_formats.coco.sample import CocoCategories, CocoSample
 from datumaro.experimental.export_import import export_dataset
@@ -25,14 +27,9 @@ from PIL import Image
 
 from getitune.benchmark.dataset_helpers import download, extract_archive, parse_args
 
-if TYPE_CHECKING:
-    pass
-
-_REPO = "Mahadih534/Chest_CT-Scan_images-Dataset"
-_REVISION = "main"
 _ARCHIVE_URL = "https://github.com/shreyabandyopadhyay/CTScanImageClassification/raw/main/DS3.zip"
 
-_LABEL_NAMES = ("adenocarcinoma", "large.cell.carcinoma", "normal", "squamous.cell.carcinoma")
+_LABEL_NAMES = ("abdomen", "chest", "head")
 _SPLIT_RATIOS = (0.7, 0.15, 0.15)
 
 
@@ -85,6 +82,7 @@ def _build_dataset(extracted_root: Path) -> Dataset:
 
 
 def main() -> None:
+    """Prepare the chest_ct benchmark dataset."""
     args = parse_args(description="Prepare the chest_ct benchmark dataset.")
     staging = args.archive_dir / f"{args.name}_raw"
     archive = download(_ARCHIVE_URL, dest_dir=args.archive_dir, filename=f"{args.name}.zip")
@@ -100,6 +98,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
-

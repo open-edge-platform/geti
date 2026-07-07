@@ -269,11 +269,11 @@ def download_kaggle_dataset(dataset_id: str) -> Path:
     ----------
     dataset_id:
         Kaggle dataset identifier, e.g. ``"owner/dataset-slug"``.
-    Requires the ``kagglehub`` package to be installed (the ``kagglehub``
-    optional dependency-group — see ``pyproject.toml``) and API credentials to
-    be configured. Raises a clear, actionable :class:`RuntimeError` up front
-    rather than letting the download fail deep inside the dependency, and
-    points at ``--raw-dir`` as an alternative for anyone who already has the
+    Requires the ``kagglehub`` package to be installed (provided by the
+    ``benchmark`` optional dependency extra — see ``pyproject.toml``) and API
+    credentials to be configured. Raises a clear, actionable :class:`RuntimeError`
+    up front rather than letting the download fail deep inside the dependency,
+    and points at ``--raw-dir`` as an alternative for anyone who already has the
     data locally.
     """
     try:
@@ -281,7 +281,7 @@ def download_kaggle_dataset(dataset_id: str) -> Path:
     except ImportError as exc:  # pragma: no cover - exercised via unit tests
         msg = (
             "The 'kagglehub' package is not installed. Install it with `pip install kagglehub` "
-            "(or `uv sync --group kagglehub` from library/), or pass --raw-dir with a "
+            "(or `uv sync --extra benchmark` from library/), or pass --raw-dir with a "
             "manually pre-downloaded copy of this dataset."
         )
         raise RuntimeError(msg) from exc
@@ -296,7 +296,7 @@ def download_kaggle_dataset(dataset_id: str) -> Path:
         )
         raise RuntimeError(msg)
 
-    print(f"Downloading Kaggle dataset {dataset_id}")
+    logger.info("Downloading Kaggle dataset %s", dataset_id)
     path = Path(kagglehub.dataset_download(dataset_id))
     if not path.exists():
         msg = f"kagglehub did not produce an expected path for {dataset_id}: {path}"
