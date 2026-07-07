@@ -12,7 +12,8 @@ from pydantic import ValidationError
 
 import getitrack.algorithms  # noqa: F401  -> registers ByteTrack
 from getitrack.algorithms import ByteTrackTracker
-from getitrack.algorithms.bytetrack import ByteTrackConfig, _subset
+from getitrack.algorithms.bytetrack import _subset
+from getitrack.algorithms.configs.bytetrack import ByteTrackConfig
 from getitrack.config import LifecycleConfig, TrackerConfig
 from getitrack.core.base import BaseTracker
 from getitrack.core.detection import Detections
