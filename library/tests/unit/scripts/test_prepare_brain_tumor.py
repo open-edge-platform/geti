@@ -1,7 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Tests for ``scripts/benchmark_datasets/prepare_brain_tumor_instseg.py``.
+"""Tests for ``scripts/benchmark_datasets/prepare_brain_tumor.py``.
 
 Two test tiers:
 
@@ -25,7 +25,7 @@ from pathlib import Path
 import pytest
 from datumaro.experimental.export_import import import_dataset
 from PIL import Image
-from scripts.benchmark_datasets.prepare_brain_tumor_instseg import (
+from scripts.benchmark_datasets.prepare_brain_tumor import (
     _find_yolo_root,
     _load_label_names,
     _parse_yolo_segmentation_label,
@@ -33,7 +33,7 @@ from scripts.benchmark_datasets.prepare_brain_tumor_instseg import (
 
 from getitune.benchmark.dataset_helpers import _has_kaggle_credentials
 
-_SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "benchmark_datasets" / "prepare_brain_tumor_instseg.py"
+_SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "benchmark_datasets" / "prepare_brain_tumor.py"
 
 # A simple square polygon (4 points) in normalized [0, 1] coordinates.
 _POLYGON_LINE = "0 0.25 0.25 0.75 0.25 0.75 0.75 0.25 0.75\n"
@@ -110,7 +110,7 @@ class TestParseYoloSegmentationLabel:
         assert result == (None, None, None, None, None)
 
 
-class TestPrepareBrainTumorInstsegRawDir:
+class TestPrepareBrainTumorRawDir:
     """Exercises the --raw-dir path — no network, no Kaggle credentials required."""
 
     def test_prepares_dataset_from_raw_dir(self, tmp_path: Path) -> None:
@@ -127,7 +127,7 @@ class TestPrepareBrainTumorInstsegRawDir:
                 "--output-dir",
                 str(output_dir),
                 "--name",
-                "brain_tumor_instseg",
+                "brain_tumor",
                 "--raw-dir",
                 str(raw_dir),
             ],
@@ -140,7 +140,7 @@ class TestPrepareBrainTumorInstsegRawDir:
             f"Script failed (exit {result.returncode})\n--- stdout ---\n{result.stdout}\n--- stderr ---\n{result.stderr}"
         )
 
-        dataset_dir = output_dir / "brain_tumor_instseg"
+        dataset_dir = output_dir / "brain_tumor"
         assert dataset_dir.is_dir(), f"Expected output directory not found: {dataset_dir}"
 
         # A manually-supplied --raw-dir is externally owned and must never be deleted.
@@ -163,7 +163,7 @@ class TestPrepareBrainTumorInstsegRawDir:
                 "--output-dir",
                 str(output_dir),
                 "--name",
-                "brain_tumor_instseg",
+                "brain_tumor",
                 "--raw-dir",
                 str(tmp_path / "does_not_exist"),
             ],
@@ -181,7 +181,7 @@ class TestPrepareBrainTumorInstsegRawDir:
     not _has_kaggle_credentials(),
     reason="Kaggle API token not configured (set KAGGLE_API_TOKEN or ~/.kaggle/access_token)",
 )
-class TestPrepareBrainTumorInstsegKaggleDownload:
+class TestPrepareBrainTumorKaggleDownload:
     """Real Kaggle download — requires --run-network and configured credentials.
 
     In CI this only exercises on same-repo runs where the KAGGLE_API_TOKEN secret
@@ -189,11 +189,11 @@ class TestPrepareBrainTumorInstsegKaggleDownload:
     forked-repo PRs skip it via the `skipif` above rather than failing.
     """
 
-    def test_prepare_brain_tumor_instseg_end_to_end(self, tmp_path: Path) -> None:
+    def test_prepare_brain_tumor_end_to_end(self, tmp_path: Path) -> None:
         assert _SCRIPT.is_file(), f"Script not found: {_SCRIPT}"
 
         result = subprocess.run(
-            [sys.executable, str(_SCRIPT), "--output-dir", str(tmp_path), "--name", "brain_tumor_instseg"],
+            [sys.executable, str(_SCRIPT), "--output-dir", str(tmp_path), "--name", "brain_tumor"],
             check=False,
             capture_output=True,
             text=True,
@@ -203,7 +203,7 @@ class TestPrepareBrainTumorInstsegKaggleDownload:
             f"Script failed (exit {result.returncode})\n--- stdout ---\n{result.stdout}\n--- stderr ---\n{result.stderr}"
         )
 
-        dataset_dir = tmp_path / "brain_tumor_instseg"
+        dataset_dir = tmp_path / "brain_tumor"
         assert dataset_dir.is_dir(), f"Expected output directory not found: {dataset_dir}"
 
         dataset = import_dataset(dataset_dir)

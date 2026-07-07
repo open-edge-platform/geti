@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Download and prepare the brain tumor instance segmentation benchmark.
+"""Download and prepare the brain tumor benchmark.
 
 Uses the Kaggle dataset "medical-image-dataset-brain-tumor-segmentation" and
 exports it in the experimental Datumaro format.
@@ -216,8 +216,8 @@ def _build_dataset(yolo_root: Path) -> Dataset:
 
 
 def main() -> None:
-    """Prepare the brain_tumor_instseg dataset (Kaggle download or --raw-dir) and export it."""
-    args = parse_args(description="Prepare the brain_tumor_instseg benchmark dataset.")
+    """Prepare the brain_tumor dataset (Kaggle download or --raw-dir) and export it."""
+    args = parse_args(description="Prepare the brain_tumor benchmark dataset.")
 
     def _download() -> Path:
         return download_kaggle_dataset(_KAGGLE_DATASET_ID)

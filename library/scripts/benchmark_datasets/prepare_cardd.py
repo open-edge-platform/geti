@@ -79,7 +79,7 @@ def _find_coco_root(root: Path) -> Path:
 
     "split" layout: ``<root>/<split>.json`` + ``<root>/<split>/`` image
     directory, anchored on the always-present ``train`` split — see
-    ``prepare_cardd.py``/``prepare_brain_tumor_instseg.py`` for the analogous
+    ``prepare_cardd.py``/``prepare_brain_tumor.py`` for the analogous
     Roboflow/YOLO-layout root finder used by other Kaggle-sourced datasets.
     """
     candidates = sorted(

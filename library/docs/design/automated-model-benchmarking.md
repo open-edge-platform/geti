@@ -365,9 +365,9 @@ gets two additional, optional fields that compose with the existing script contr
 
 ```yaml
 datasets:
-  - name: brain_tumor_instseg
-    script: "scripts/benchmark_datasets/prepare_brain_tumor_instseg.py"
-    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_instseg_raw"
+  - name: brain_tumor
+    script: "scripts/benchmark_datasets/prepare_brain_tumor.py"
+    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_raw"
     size_tier: small
 ```
 

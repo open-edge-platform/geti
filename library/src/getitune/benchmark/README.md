@@ -60,6 +60,7 @@ The `Model Benchmark` GitHub workflow runs in two modes: a weekly scheduled run 
 - Rotation group is computed as `ISO week number % extended_groups`.
 - `extended_groups` is read from `benchmark_manifest.yaml` (`defaults.rotation.extended_groups`, currently `2`).
 - `core` models are not rotated and are always included when `priority=core,extended`.
+- `deferred` models are never included in an unfiltered/automated run (including rotation-group runs) — they only run when explicitly requested via `--priority deferred` or `--model <name>`.
 
 Practical effect with `extended_groups: 2`:
 
@@ -212,9 +213,9 @@ version-controlled, and testable) but need to skip a credentialed or slow networ
 
 ```yaml
 datasets:
-  - name: brain_tumor_instseg
-    script: "scripts/benchmark_datasets/prepare_brain_tumor_instseg.py"
-    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_instseg_raw"
+  - name: brain_tumor
+    script: "scripts/benchmark_datasets/prepare_brain_tumor.py"
+    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_raw"
     size_tier: small
 ```
 
@@ -226,11 +227,11 @@ datasets:
 - In the script, use `getitune.benchmark.dataset_helpers.resolve_raw_source(args,
   download_fn)` — it returns `args.raw_dir` directly (extracting it first if it's a
   single archive file) when set, or calls `download_fn` otherwise. See
-  `scripts/benchmark_datasets/prepare_brain_tumor_instseg.py` for a full example.
+  `scripts/benchmark_datasets/prepare_brain_tumor.py` for a full example.
 
 #### Kaggle-sourced datasets
 
-For datasets hosted on Kaggle (like `brain_tumor_instseg`), use
+For datasets hosted on Kaggle (like `brain_tumor`), use
 `getitune.benchmark.dataset_helpers.download_kaggle_dataset()` instead of calling the
 `kaggle` CLI directly — it gives a clear, actionable error (instead of a subprocess
 traceback) when the CLI isn't installed or credentials aren't configured, and points at
@@ -256,7 +257,7 @@ gh secret set KAGGLE_API_TOKEN
 
 GitHub never exposes secrets to `pull_request` workflows triggered from forks, so the
 real-download test is additionally skipped (not failed) whenever credentials aren't
-present — see `tests/unit/scripts/test_prepare_brain_tumor_instseg.py`. A future
+present — see `tests/unit/scripts/test_prepare_brain_tumor.py`. A future
 scheduled benchmark workflow (see "CI benchmark schedule" above) should reuse the same
 token secret.
 
@@ -270,7 +271,8 @@ aborting the whole invocation.
 ### Add a new model
 
 
-1. Ensure the model recipe exists under `src/getitune/recipe/<task>/...`.
+1. Ensure the model recipe exists under `src/getitune/recipe/<task>/<name>.yaml` — the recipe path is
+   always derived from the model's `name` and its task, there's no separate path to configure.
 2. Add a model entry under `experiments.<task>.models` in `benchmark_manifest.yaml`.
 3. Run a focused benchmark slice for the new model.
 
@@ -282,8 +284,13 @@ experiments:
     models:
       - name: my_detector
         priority: extended
-        recipe: detection/my_detector.yaml
 ```
+
+`priority` is one of `core`, `extended`, or `deferred`:
+
+- `core` / `extended` models are included in unfiltered/automated runs (see "Rotation and timeline details" above).
+- `deferred` models are declared for completeness but are never picked up by an unfiltered/automated run — only
+  when explicitly requested via `--priority deferred` or `--model my_detector`.
 
 Focused run command (from `library/`):
 

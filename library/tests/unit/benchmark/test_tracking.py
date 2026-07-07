@@ -213,7 +213,7 @@ class TestBenchmarkTrackerLogRun:
     def _make_experiment(self) -> Experiment:
         return Experiment(
             task="detection",
-            model=ModelEntry(name="yolox_s", priority="core", recipe="detection/yolox_s.yaml"),
+            model=ModelEntry(name="yolox_s", task="detection", priority="core"),
             dataset_name="pothole_tiny",
             scenario=Scenario.default(),
             eval_upto="train",

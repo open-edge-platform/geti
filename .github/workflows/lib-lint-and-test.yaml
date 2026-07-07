@@ -203,7 +203,7 @@ jobs:
     if: needs.check-paths.outputs.run_benchmark_dataset_scripts == 'true'
     timeout-minutes: 30
     # Kaggle API token for the (optional, credential-gated) real-download
-    # test in test_prepare_brain_tumor_instseg.py. Only set for same-repo runs —
+    # test in test_prepare_brain_tumor.py. Only set for same-repo runs —
     # GitHub never exposes secrets to `pull_request` workflows triggered from
     # forks, so that one test skips itself gracefully (via a `skipif` check)
     # rather than failing on external contributors' PRs.

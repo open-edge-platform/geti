@@ -200,9 +200,9 @@ datasets:
     compatible_tasks:
       - semantic_segmentation
 
-  - name: brain_tumor_instseg
-    script: "scripts/benchmark_datasets/prepare_brain_tumor_instseg.py"
-    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_instseg_raw"
+  - name: brain_tumor
+    script: "scripts/benchmark_datasets/prepare_brain_tumor.py"
+    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_raw"
     size_tier: large
     url: "https://www.kaggle.com/datasets/pkdarabi/medical-image-dataset-brain-tumor-segmentation"
     description: >-
@@ -210,10 +210,12 @@ datasets:
       (3 tumor-likelihood classes) from a Kaggle-gated Roboflow YOLO export. Requires a
       Kaggle account: either configure Kaggle API credentials (see the preparation
       script's docstring) for automatic download, or place a pre-fetched copy at
-      $GETITUNE_BENCHMARK_EXTERNAL_DATA/brain_tumor_instseg_raw (raw_dir is forwarded to
+      $GETITUNE_BENCHMARK_EXTERNAL_DATA/brain_tumor_raw (raw_dir is forwarded to
       the script and used instead of downloading when present).
     compatible_tasks:
       - instance_segmentation
+      - detection # polygons → bounding boxes
+      - semantic_segmentation # polygons → pixel masks
 
   - name: cardd
     script: "scripts/benchmark_datasets/prepare_cardd_instseg.py"
@@ -229,3 +231,5 @@ datasets:
       (raw_dir is forwarded to the script and used instead of downloading when present).
     compatible_tasks:
       - instance_segmentation
+      - detection # polygons → bounding boxes
+      - semantic_segmentation # polygons → pixel masks
