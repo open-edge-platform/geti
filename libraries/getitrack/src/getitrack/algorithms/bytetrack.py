@@ -316,9 +316,9 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
 def _subset(dets: Detections, indices: list[int] | np.ndarray) -> Detections:
     idx = np.asarray(indices, dtype=np.int64)
     return Detections(
-        bboxes=dets.bboxes[idx] if idx.size else np.empty((0, 4), dtype=np.float32),
-        scores=dets.scores[idx] if idx.size else np.empty((0,), dtype=np.float32),
-        class_ids=dets.class_ids[idx] if idx.size else np.empty((0,), dtype=np.int64),
+        bboxes=dets.bboxes[idx],
+        scores=dets.scores[idx],
+        class_ids=dets.class_ids[idx],
         frame_id=dets.frame_id,
-        embeddings=None if dets.embeddings is None or not idx.size else dets.embeddings[idx],
+        embeddings=None if dets.embeddings is None else dets.embeddings[idx],
     )

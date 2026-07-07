@@ -12,7 +12,7 @@ from pydantic import ValidationError
 
 import getitrack.algorithms  # noqa: F401  -> registers ByteTrack
 from getitrack.algorithms import ByteTrackTracker
-from getitrack.algorithms.bytetrack import ByteTrackConfig
+from getitrack.algorithms.bytetrack import ByteTrackConfig, _subset
 from getitrack.config import LifecycleConfig, TrackerConfig
 from getitrack.core.base import BaseTracker
 from getitrack.core.detection import Detections
@@ -210,3 +210,26 @@ class TestDetIndices:
         out = bt.update(_dets([], [], frame_id=0))
         assert out.det_indices is not None
         assert len(out.det_indices) == 0
+
+
+class TestSubset:
+    def _dets_with_embeddings(self, dim: int = 128) -> Detections:
+        return Detections(
+            bboxes=np.zeros((3, 4), dtype=np.float32),
+            scores=np.ones(3, dtype=np.float32),
+            class_ids=np.zeros(3, dtype=np.int64),
+            frame_id=0,
+            embeddings=np.zeros((3, dim), dtype=np.float32),
+        )
+
+    def test_empty_subset_preserves_embedding_dim(self):
+        empty = _subset(self._dets_with_embeddings(dim=128), [])
+        assert len(empty) == 0
+        assert empty.embeddings is not None
+        assert empty.embeddings.shape == (0, 128)
+
+    def test_subset_keeps_selected_rows(self):
+        subset = _subset(self._dets_with_embeddings(), [0, 2])
+        assert len(subset) == 2
+        assert subset.embeddings is not None
+        assert subset.embeddings.shape == (2, 128)
