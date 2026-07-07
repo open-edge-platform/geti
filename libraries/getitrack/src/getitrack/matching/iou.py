@@ -17,6 +17,18 @@ _EPS = 1e-7
 _INVALID_COST = 1e6
 
 
+def _check_shape(arr: np.ndarray, name: str) -> None:
+    if arr.ndim != 2 or arr.shape[1] != _BBOX_COLS:
+        msg = f"{name} must have shape (N, {_BBOX_COLS}); got {arr.shape}"
+        raise ValueError(msg)
+
+
+def _check_finite(arr: np.ndarray, name: str) -> None:
+    if arr.size and not np.isfinite(arr).all():
+        msg = f"{name} contains non-finite values (NaN or inf)"
+        raise ValueError(msg)
+
+
 def iou_matrix(boxes_a: np.ndarray, boxes_b: np.ndarray) -> np.ndarray:
     """Compute pairwise IoU between two sets of ``xyxy`` boxes.
 
@@ -142,15 +154,3 @@ def linear_assignment(
     unmatched_rows = np.array([i for i in range(n_rows) if i not in matched_row_set], dtype=np.int64)
     unmatched_cols = np.array([j for j in range(n_cols) if j not in matched_col_set], dtype=np.int64)
     return matches, unmatched_rows, unmatched_cols
-
-
-def _check_shape(arr: np.ndarray, name: str) -> None:
-    if arr.ndim != 2 or arr.shape[1] != _BBOX_COLS:
-        msg = f"{name} must have shape (N, {_BBOX_COLS}); got {arr.shape}"
-        raise ValueError(msg)
-
-
-def _check_finite(arr: np.ndarray, name: str) -> None:
-    if arr.size and not np.isfinite(arr).all():
-        msg = f"{name} contains non-finite values (NaN or inf)"
-        raise ValueError(msg)

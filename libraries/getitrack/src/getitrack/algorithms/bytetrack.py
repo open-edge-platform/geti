@@ -72,6 +72,17 @@ class ByteTrackConfig(TrackerConfig):
         return self
 
 
+def _subset(dets: Detections, indices: list[int] | np.ndarray) -> Detections:
+    idx = np.asarray(indices, dtype=np.int64)
+    return Detections(
+        bboxes=dets.bboxes[idx],
+        scores=dets.scores[idx],
+        class_ids=dets.class_ids[idx],
+        frame_id=dets.frame_id,
+        embeddings=None if dets.embeddings is None else dets.embeddings[idx],
+    )
+
+
 @register_algorithm("bytetrack", config=ByteTrackConfig)
 class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
     """ByteTrack multi-object tracker.
@@ -311,14 +322,3 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
             frame_id=frame_id,
             det_indices=np.array([self._frame_det_index.get(t.track_id, -1) for t in active], dtype=np.int64),
         )
-
-
-def _subset(dets: Detections, indices: list[int] | np.ndarray) -> Detections:
-    idx = np.asarray(indices, dtype=np.int64)
-    return Detections(
-        bboxes=dets.bboxes[idx],
-        scores=dets.scores[idx],
-        class_ids=dets.class_ids[idx],
-        frame_id=dets.frame_id,
-        embeddings=None if dets.embeddings is None else dets.embeddings[idx],
-    )
