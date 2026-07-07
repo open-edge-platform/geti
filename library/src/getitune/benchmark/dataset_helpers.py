@@ -53,8 +53,6 @@ import logging
 import os
 import shutil
 import tarfile
-import time
-import urllib.error
 import urllib.request
 import zipfile
 from dataclasses import dataclass
@@ -140,8 +138,6 @@ def parse_args(*, description: str = "Prepare a benchmark dataset.") -> DatasetA
 # ---------------------------------------------------------------------------
 
 _CHUNK_SIZE = 1 << 20  # 1 MiB
-_DOWNLOAD_MAX_ATTEMPTS = 3
-_DOWNLOAD_RETRY_BASE_DELAY_SEC = 2
 
 
 def download(url: str, dest_dir: Path, filename: str | None = None) -> Path:
@@ -163,28 +159,7 @@ def download(url: str, dest_dir: Path, filename: str | None = None) -> Path:
     dest = dest_dir / filename
 
     print(f"Downloading {url} → {dest}")
-    for attempt in range(1, _DOWNLOAD_MAX_ATTEMPTS + 1):
-        try:
-            urllib.request.urlretrieve(url, dest)  # noqa: S310  # nosec B310 - URLs come from trusted in-repo benchmark catalog
-            break
-        except urllib.error.ContentTooShortError:
-            # ``urlretrieve`` may leave a truncated file behind on incomplete
-            # transfers; remove it before retrying to avoid consuming bad data.
-            dest.unlink(missing_ok=True)
-
-            if attempt >= _DOWNLOAD_MAX_ATTEMPTS:
-                raise
-
-            delay_sec = _DOWNLOAD_RETRY_BASE_DELAY_SEC * attempt
-            logger.warning(
-                "Incomplete download for %s (attempt %d/%d). Retrying in %ds...",
-                url,
-                attempt,
-                _DOWNLOAD_MAX_ATTEMPTS,
-                delay_sec,
-            )
-            time.sleep(delay_sec)
-
+    urllib.request.urlretrieve(url, dest)  # noqa: S310  # nosec B310 - URLs come from trusted in-repo benchmark catalog
     return dest
 
 
@@ -305,8 +280,8 @@ def download_kaggle_dataset(dataset_id: str) -> Path:
         import kagglehub
     except ImportError as exc:  # pragma: no cover - exercised via unit tests
         msg = (
-            "The 'kagglehub' package is not installed. Install it with `pip install kagglehub` "
-            "(or `uv sync --extra benchmark` from library/), or pass --raw-dir with a "
+            "The 'kagglehub' package is not installed. Install benchmark dependencies with "
+            "`just venv-benchmark` or `uv sync --extra benchmark` (from library/), or pass --raw-dir with a "
             "manually pre-downloaded copy of this dataset."
         )
         raise RuntimeError(msg) from exc

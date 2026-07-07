@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
@@ -76,10 +77,11 @@ def _build_dataset(data_root: Path, annotation_level: str) -> Dataset:
     dataset: Dataset = Dataset(CocoSample, categories={"labels": CocoCategories(labels=label_names)})
 
     image_root = data_root / "images"
+    image_id = 0
     for split_name, subset in _SPLITS.items():
         split_file = data_root / _LABEL_LEVELS[annotation_level].format(split=split_name)
         with split_file.open(encoding="utf-8") as f:
-            for image_id, line in enumerate(f):
+            for line in f:
                 image_name, label_name = line.strip().split(" ", 1)
                 img_path = image_root / f"{image_name}.jpg"
                 if not img_path.is_file():
@@ -102,6 +104,7 @@ def _build_dataset(data_root: Path, annotation_level: str) -> Dataset:
                         keypoints=None,
                     ),
                 )
+                image_id += 1
     return dataset
 
 
