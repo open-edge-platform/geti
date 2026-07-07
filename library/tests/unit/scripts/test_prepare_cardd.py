@@ -1,7 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Tests for ``scripts/benchmark_datasets/prepare_cardd_instseg.py``.
+"""Tests for ``scripts/benchmark_datasets/prepare_cardd.py``.
 
 Two test tiers:
 
@@ -26,11 +26,11 @@ import pytest
 from datumaro.experimental.export_import import import_dataset
 from datumaro.experimental.fields import Subset
 from PIL import Image
-from scripts.benchmark_datasets.prepare_cardd_instseg import _build_dataset, _find_coco_root, _polygon_to_array
+from scripts.benchmark_datasets.prepare_cardd import _build_dataset, _find_coco_root, _polygon_to_array
 
 from getitune.benchmark.dataset_helpers import _has_kaggle_credentials
 
-_SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "benchmark_datasets" / "prepare_cardd_instseg.py"
+_SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "benchmark_datasets" / "prepare_cardd.py"
 
 
 def _make_synthetic_coco_dataset(root: Path) -> None:
@@ -227,7 +227,7 @@ class TestPrepareCarddInstsegRawDir:
     reason="Kaggle API token not configured (set KAGGLE_API_TOKEN or ~/.kaggle/access_token)",
 )
 class TestPrepareCarddInstsegKaggleDownload:
-    def test_prepare_cardd_instseg_end_to_end(self, tmp_path: Path) -> None:
+    def test_prepare_cardd_end_to_end(self, tmp_path: Path) -> None:
         assert _SCRIPT.is_file(), f"Script not found: {_SCRIPT}"
 
         result = subprocess.run(

@@ -218,7 +218,7 @@ datasets:
       - semantic_segmentation # polygons → pixel masks
 
   - name: cardd
-    script: "scripts/benchmark_datasets/prepare_cardd_instseg.py"
+    script: "scripts/benchmark_datasets/prepare_cardd.py"
     raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/cardd_instseg_raw"
     size_tier: large
     url: "https://www.kaggle.com/datasets/issamjebnouni/cardd"
