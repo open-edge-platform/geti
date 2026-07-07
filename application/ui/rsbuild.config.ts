@@ -128,6 +128,28 @@ export default defineConfig({
                 ...config,
                 resolve: { ...config.resolve, extensions },
                 watchOptions: { ...config.watchOptions, ignored: ['**/src-tauri/**'] },
+                // opencv.js (emscripten, under src/ so it's parsed) references
+                // `__dirname` for Node environment detection. Rspack's default
+                // `warn-mock` mocks it to '/' AND warns on every build. In the
+                // browser opencv takes the non-Node code path, so the mock value
+                // is never used — switch to 'mock' to keep the (identical) runtime
+                // behavior without the noisy build warning.
+                node: { ...config.node, __dirname: 'mock', __filename: 'mock' },
+                optimization: {
+                    ...config.optimization,
+                    // Force deterministic (numeric) chunk IDs in dev too. Rspack's
+                    // dev default is `chunkIds: 'named'`, which makes our module
+                    // web workers (SAM / intelligent-scissors / SSIM) request a
+                    // shared async vendor chunk by a long derived name
+                    // (`vendors-node_modules_onnxruntime-web…polylabel_js.js`) that
+                    // is never emitted under that name -> the dev server's SPA
+                    // fallback returns index.html -> the worker's importScripts
+                    // fails with "MIME type ('text/html') is not executable".
+                    // Production already uses deterministic IDs (numeric chunks),
+                    // which is why `npm run build` is unaffected. Matching dev to
+                    // production keeps the worker chunk names consistent.
+                    chunkIds: 'deterministic',
+                },
             };
         },
     },
