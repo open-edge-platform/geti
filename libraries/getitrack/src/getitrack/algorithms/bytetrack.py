@@ -88,8 +88,9 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
         cfg = self.config
         lifecycle = cfg.lifecycle
 
-        # high = score > high split; low = score_threshold < score < high split.
-        # Scores exactly on a bound are dropped.
+        # Partition detections by score: high (score > high_score_threshold) and
+        # low (score_threshold < score < high_score_threshold). Bounds are strict,
+        # so scores equal to a threshold fall outside both bands and are dropped.
         scores = detections.scores
         high_src = np.flatnonzero(scores > cfg.high_score_threshold)
         low_src = np.flatnonzero((scores > cfg.score_threshold) & (scores < cfg.high_score_threshold))
@@ -246,8 +247,7 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
     def _remove_duplicate_tracks(self) -> None:
         """Drop the younger of any ACTIVE/LOST track pair with near-identical boxes.
 
-        Mirrors the reference ``remove_duplicate_stracks``, keeping the
-        longer-lived track. Cross-class pairs are skipped when
+        The longer-lived track is kept. Cross-class pairs are skipped when
         ``match_class_only`` is set, since they are distinct objects.
         """
         active = [tid for tid, t in self._tracks.items() if t.state == TrackState.ACTIVE]
