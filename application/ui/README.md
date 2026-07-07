@@ -29,10 +29,12 @@ The `preinstall` script clones `@geti/config` and `@geti/smart-tools` from the `
 
 ```bash
 npm start            # Start dev server at http://localhost:3000
-npm run server       # Start FastAPI backend at http://localhost:7860 (separate terminal, requires `uv`)
+npm run server       # Start backend (Hypercorn, HTTP/2 + TLS) at https://localhost:7860 (separate terminal, requires `uv` and `just`)
 ```
 
-The dev server proxies API requests to `PUBLIC_API_BASE_URL` (defaults to `http://localhost:7860`). The `PUBLIC_` prefix is required for Rsbuild client exposure.
+The backend serves HTTP/2 over TLS using a self-signed certificate, auto-generated on first run into `application/backend/data/certs/` (see `just gen-certs`). Your browser/OS may need to trust this cert, or you can accept the self-signed warning when visiting `https://localhost:7860` directly.
+
+The dev server proxies API requests to `PUBLIC_API_BASE_URL` (set in `.env.development`, defaults to `https://localhost:7860`). The `PUBLIC_` prefix is required for Rsbuild client exposure.
 While the backend is running on `localhost:7860`, use `npm run update-spec` to download a fresh OpenAPI spec and regenerate types.
 
 ```bash
