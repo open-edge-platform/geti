@@ -70,10 +70,37 @@ MANIFEST_YAML = textwrap.dedent("""\
           - name: efficientnet_b0
             priority: core
             recipe: classification/multi_class_cls/efficientnet_b0.yaml
+          - name: mobilenet_v3_large
+            priority: extended
+            recipe: classification/multi_class_cls/mobilenet_v3_large.yaml
         datasets:
           - pneumonia_tiny
         criteria:
-          accuracy_metric: accuracy
+          accuracy_metric: f1-score
+          thresholds:
+            "training:val/{metric}": { compare: ">=", margin: 0.10 }
+
+      instance_segmentation:
+        models:
+          - name: rfdetr_seg_nano
+            priority: core
+            recipe: instance_segmentation/rfdetr_seg_nano.yaml
+          - name: rfdetr_seg_small
+            priority: extended
+            recipe: instance_segmentation/rfdetr_seg_small.yaml
+          - name: rfdetr_seg_medium
+            priority: extended
+            recipe: instance_segmentation/rfdetr_seg_medium.yaml
+          - name: rfdetr_seg_xlarge
+            priority: extended
+            recipe: instance_segmentation/rfdetr_seg_xlarge.yaml
+          - name: rfdetr_seg_2xl
+            priority: extended
+            recipe: instance_segmentation/rfdetr_seg_2xlarge.yaml
+        datasets:
+          - grapes
+        criteria:
+          accuracy_metric: mAP
           thresholds:
             "training:val/{metric}": { compare: ">=", margin: 0.10 }
 """)
@@ -106,7 +133,7 @@ class TestLoadManifest:
         assert manifest.defaults.deterministic is True
 
     def test_tasks(self, manifest: BenchmarkManifest) -> None:
-        assert set(manifest.all_tasks()) == {"detection", "classification"}
+        assert set(manifest.all_tasks()) == {"detection", "classification", "instance_segmentation"}
 
     def test_models_parsed(self, manifest: BenchmarkManifest) -> None:
         det = manifest.get_task("detection")
@@ -127,7 +154,16 @@ class TestLoadManifest:
 
     def test_classification_metric(self, manifest: BenchmarkManifest) -> None:
         cls_ = manifest.get_task("classification")
-        assert "training:val/accuracy" in cls_.criteria.thresholds
+        assert cls_.criteria.accuracy_metric == "f1-score"
+        assert "training:val/f1-score" in cls_.criteria.thresholds
+        assert "training:val/accuracy" not in cls_.criteria.thresholds
+
+    def test_instance_segmentation_models_parsed(self, manifest: BenchmarkManifest) -> None:
+        inst = manifest.get_task("instance_segmentation")
+        names = [m.name for m in inst.models]
+        assert names[0] == "rfdetr_seg_nano"
+        assert "rfdetr_seg_small" in names
+        assert "rfdetr_seg_2xl" in names
 
     def test_unknown_task_raises(self, manifest: BenchmarkManifest) -> None:
         with pytest.raises(KeyError, match="segmentation"):
@@ -142,7 +178,7 @@ class TestLoadManifest:
 class TestIterExperiments:
     def test_total_count_no_filters(self, manifest: BenchmarkManifest) -> None:
         """detection: 2 models x 2 ds x default + tiling(1 ds x 2 models) + lr_high(1 model x 2 ds)
-        + classification: 1 x 1 x default
+        + classification: 2 x 1 x default + instance seg: 5 x 1 x default
         """
         exps = list(iter_experiments(manifest))
         # detection:
@@ -150,8 +186,10 @@ class TestIterExperiments:
         #   tiling:  2 models x 1 dataset (wgisd_small) = 2
         #   lr_high: 1 model (yolox_s) x 2 datasets = 2
         # classification:
-        #   default: 1 x 1 = 1
-        assert len(exps) == 9
+        #   default: 2 x 1 = 2
+        # instance_segmentation:
+        #   default: 5 x 1 = 5
+        assert len(exps) == 15
 
     def test_filter_by_task(self, manifest: BenchmarkManifest) -> None:
         f = ManifestFilters(tasks=["classification"])
@@ -217,7 +255,7 @@ class TestIterExperiments:
         assert exps[0].run_id == "classification/efficientnet_b0/pneumonia_tiny"
 
     def test_count_experiments(self, manifest: BenchmarkManifest) -> None:
-        assert count_experiments(manifest) == 9
+        assert count_experiments(manifest) == 15
 
 
 # ---------------------------------------------------------------------------

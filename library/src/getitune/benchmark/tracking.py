@@ -178,12 +178,12 @@ def _get_cpu_info() -> str:
 # ``criteria.accuracy_metric`` (see ``register_primary_metrics``); the static
 # table is only consulted for tasks not declared in the manifest.
 _PRIMARY_METRIC: dict[str, str] = {
-    "classification/multi_class_cls": "training:val/accuracy",
-    "classification/multi_label_cls": "training:val/accuracy",
+    "classification/multi_class_cls": "training:val/f1-score",
+    "classification/multi_label_cls": "training:val/mAP",
     "classification/h_label_cls": "training:val/accuracy",
-    "detection": "training:val/map_50",
-    "instance_segmentation": "training:val/map_50",
-    "rotated_detection": "training:val/map_50",
+    "detection": "training:val/map",
+    "instance_segmentation": "training:val/map",
+    "rotated_detection": "training:val/map",
     "semantic_segmentation": "training:val/mIoU",
     "keypoint_detection": "training:val/PCK",
 }
