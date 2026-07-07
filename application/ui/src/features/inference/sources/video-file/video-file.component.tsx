@@ -8,6 +8,8 @@ import { Button, Flex, Switch, Text, TextField } from '@geti-ui/ui';
 import type { VideoFileSourceConfig } from '../../../../constants/shared-types';
 import { acceptedVideoExtensions } from '../../../dataset/gallery/utils';
 
+import classes from './video-file.module.scss';
+
 type VideoFileProps = {
     defaultState?: VideoFileSourceConfig;
 };
@@ -70,7 +72,7 @@ export const VideoFile = ({ defaultState }: VideoFileProps) => {
 
                 {selectedFile !== null && (
                     <Flex alignItems='center' gap='size-100'>
-                        <Text>Selected: {selectedFile.name}</Text>
+                        <Text UNSAFE_className={classes.selectedRow}>Selected: {selectedFile.name}</Text>
                     </Flex>
                 )}
             </Flex>
