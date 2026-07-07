@@ -65,10 +65,12 @@ const useNextUnannotatedMediaItem = (currentMediaItem: Media, allMediaItems: Med
     const isInsideFetchedMediaItems = nextUnannotatedMediaItem !== undefined;
 
     useEffect(() => {
-        if (!isInsideFetchedMediaItems) {
-            fetchNextPage();
+        if (isPending || isInsideFetchedMediaItems) {
+            return;
         }
-    }, [isInsideFetchedMediaItems, fetchNextPage]);
+
+        fetchNextPage();
+    }, [isInsideFetchedMediaItems, fetchNextPage, isPending]);
 
     if (isPending) {
         return undefined;
