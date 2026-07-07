@@ -11,7 +11,7 @@ from pathlib import Path
 
 from datumaro.experimental.fields import Subset
 from PIL import Image
-from scripts.benchmark_datasets.prepare_food41 import _build_dataset, _find_food_root
+from scripts.benchmark_datasets.prepare_food41 import _build_dataset, _find_food_root, _resolve_split_file
 
 
 def _make_food_root(root: Path) -> Path:
@@ -33,9 +33,48 @@ def _make_food_root(root: Path) -> Path:
     return root
 
 
+def _make_direct_food_root(root: Path) -> Path:
+    (root / "images").mkdir(parents=True)
+    (root / "meta").mkdir(parents=True)
+    (root / "meta" / "train.txt").write_text("apple_pie/00000001\n", encoding="utf-8")
+    (root / "meta" / "test.txt").write_text("apple_pie/00000002\n", encoding="utf-8")
+    img_dir = root / "images" / "apple_pie"
+    img_dir.mkdir(parents=True, exist_ok=True)
+    Image.new("RGB", (8, 8), color=(0, 0, 0)).save(img_dir / "00000001.jpg")
+    Image.new("RGB", (8, 8), color=(0, 0, 0)).save(img_dir / "00000002.jpg")
+    return root
+
+
+def _make_nested_meta_food_root(root: Path) -> Path:
+    (root / "images").mkdir(parents=True)
+    (root / "meta" / "meta").mkdir(parents=True)
+    (root / "meta" / "meta" / "train.txt").write_text("apple_pie/00000001\n", encoding="utf-8")
+    (root / "meta" / "meta" / "test.txt").write_text("apple_pie/00000002\n", encoding="utf-8")
+    img_dir = root / "images" / "apple_pie"
+    img_dir.mkdir(parents=True, exist_ok=True)
+    Image.new("RGB", (8, 8), color=(0, 0, 0)).save(img_dir / "00000001.jpg")
+    Image.new("RGB", (8, 8), color=(0, 0, 0)).save(img_dir / "00000002.jpg")
+    return root
+
+
 def test_find_food_root(tmp_path: Path) -> None:
     root = _make_food_root(tmp_path)
     assert _find_food_root(root) == root / "food-101"
+
+
+def test_find_food_root_direct_layout(tmp_path: Path) -> None:
+    root = _make_direct_food_root(tmp_path)
+    assert _find_food_root(root) == root
+
+
+def test_find_food_root_nested_meta_layout(tmp_path: Path) -> None:
+    root = _make_nested_meta_food_root(tmp_path)
+    assert _find_food_root(root) == root
+
+
+def test_resolve_split_file_nested_meta_layout(tmp_path: Path) -> None:
+    root = _make_nested_meta_food_root(tmp_path)
+    assert _resolve_split_file(root, "train") == root / "meta" / "meta" / "train.txt"
 
 
 def test_build_dataset(tmp_path: Path) -> None:

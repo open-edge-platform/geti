@@ -43,10 +43,12 @@ _TRAIN_SPLIT_RATIO = 0.9
 
 def _find_food_root(root: Path) -> Path:
     """Find the Food-101 root directory under *root*."""
-    candidates = [root, *root.rglob("food-101")]
-    for candidate in candidates:
-        if (candidate / "images").is_dir() and (candidate / "meta" / "train.txt").is_file():
-            return candidate
+    for train_txt in root.rglob("train.txt"):
+        for candidate in (train_txt.parent, train_txt.parent.parent, train_txt.parent.parent.parent):
+            if (candidate / "images").is_dir() and (candidate / "meta" / "train.txt").is_file():
+                return candidate
+            if (candidate / "images").is_dir() and (candidate / "meta" / "meta" / "train.txt").is_file():
+                return candidate
     msg = f"Could not find a Food-101 dataset root under {root}"
     raise RuntimeError(msg)
 
@@ -60,10 +62,24 @@ def _read_split_lines(path: Path) -> list[tuple[str, str]]:
     return entries
 
 
+def _resolve_split_file(data_root: Path, split_name: str) -> Path:
+    """Find a Food-101 split file in either the flat or nested Kaggle layout."""
+    candidates = [
+        data_root / "meta" / f"{split_name}.txt",
+        data_root / "meta" / "meta" / f"{split_name}.txt",
+        data_root / f"{split_name}.txt",
+    ]
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    msg = f"Could not find {split_name}.txt under {data_root}"
+    raise RuntimeError(msg)
+
+
 def _build_dataset(data_root: Path) -> Dataset:
     """Parse Food-101 split files and build a Datumaro dataset."""
-    train_entries = _read_split_lines(data_root / "meta" / "train.txt")
-    test_entries = _read_split_lines(data_root / "meta" / "test.txt")
+    train_entries = _read_split_lines(_resolve_split_file(data_root, "train"))
+    test_entries = _read_split_lines(_resolve_split_file(data_root, "test"))
     label_names = sorted({label for _, label in (*train_entries, *test_entries)})
     label_to_idx = {label: idx for idx, label in enumerate(label_names)}
     dataset: Dataset = Dataset(CocoSample, categories={"labels": CocoCategories(labels=label_names)})
