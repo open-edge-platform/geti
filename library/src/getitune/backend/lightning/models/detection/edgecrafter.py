@@ -34,8 +34,8 @@ class EdgeCrafter(EdgeCrafterMixin, LightningDetectionModel):  # pyrefly: ignore
     deployment via task-specialised distillation.  Four sizes are available:
     S (small), M (medium), L (large), and X (extra-large).
 
-    Original paper / repository:
-    https://github.com/Intellindust-AI-Lab/EdgeCrafter
+    Original repository: https://github.com/Intellindust-AI-Lab/EdgeCrafter
+    Paper: https://arxiv.org/abs/2603.18739
 
     The model should be used with
     :class:`~getitune.backend.lightning.callbacks.aug_scheduler.AdaptiveTrainScheduling`
@@ -65,6 +65,15 @@ class EdgeCrafter(EdgeCrafterMixin, LightningDetectionModel):  # pyrefly: ignore
         "edgecrafter_m": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecdet_m.pth",
         "edgecrafter_l": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecdet_l.pth",
         "edgecrafter_x": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecdet_x.pth",
+    }
+
+    # Detection loss weights (matcher/backbone-key/mask-ratio use EdgeCrafterMixin defaults).
+    _loss_weights: ClassVar[dict[str, float]] = {
+        "loss_mal": 1.0,
+        "loss_bbox": 5.0,
+        "loss_giou": 2.0,
+        "loss_fgl": 0.15,
+        "loss_ddf": 1.5,
     }
 
     input_size_multiplier = 16
@@ -110,7 +119,7 @@ class EdgeCrafter(EdgeCrafterMixin, LightningDetectionModel):  # pyrefly: ignore
             Configured :class:`ECDETRDetector`.
         """
         num_classes = num_classes if num_classes is not None else self.num_classes
-        return self._build_ec_model(num_classes, with_seg=False, backbone_lr=self.backbone_lr)
+        return self._build_ec_model(num_classes, backbone_lr=self.backbone_lr)
 
     def forward_for_tracing(self, inputs: Tensor) -> dict[str, Tensor]:
         """Export-mode forward.

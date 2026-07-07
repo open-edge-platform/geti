@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import copy
 from collections import OrderedDict
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 import torch
 import torch.nn.functional as F  # noqa: N812
@@ -22,12 +22,24 @@ from torch import Tensor, nn
 from torch.nn import init
 
 from getitune.backend.lightning.models.common.layers.transformer_layers import (
+    LQE,
+    MLP,
+    Gate,
+    Integral,
     MSDeformableAttentionV2,
     get_contrastive_denoising_training_group,
 )
 from getitune.backend.lightning.models.common.utils.utils import inverse_sigmoid
 from getitune.backend.lightning.models.detection.utils.utils import dfine_distance2bbox, dfine_weighting_function
 from getitune.backend.lightning.models.utils.weight_init import bias_init_with_prob
+
+if TYPE_CHECKING:
+    # Deferred: importing the *package* `instance_segmentation.heads` eagerly executes
+    # `instance_segmentation/__init__.py`, which re-exports `EdgeCrafterInst`, which in
+    # turn imports `EdgeCrafterMixin` -> this module, completing a circular import.
+    # Safe here because `from __future__ import annotations` makes every annotation in
+    # this file lazy; the real class is imported locally where it is instantiated below.
+    from getitune.backend.lightning.models.instance_segmentation.heads import SegmentationHead
 
 __all__ = ["ECTransformer"]
 
@@ -67,191 +79,6 @@ _MODEL_CFGS: dict[str, dict[str, Any]] = {
 }
 
 # ---------------------------------------------------------------------------
-# Sub-modules
-# ---------------------------------------------------------------------------
-
-
-class MLP(nn.Module):
-    """Simple multi-layer perceptron."""
-
-    def __init__(
-        self,
-        input_dim: int,
-        hidden_dim: int,
-        output_dim: int,
-        num_layers: int = 3,
-        act: str = "silu",
-    ) -> None:
-        super().__init__()
-        self.num_layers = num_layers
-        h = [hidden_dim] * (num_layers - 1)
-        self.layers = nn.ModuleList(nn.Linear(n, k) for n, k in zip([input_dim, *h], [*h, output_dim]))
-        self._act = nn.SiLU() if act == "silu" else nn.ReLU()
-
-    def forward(self, x: Tensor) -> Tensor:
-        """Forward pass."""
-        for i, layer in enumerate(self.layers):
-            x = self._act(layer(x)) if i < self.num_layers - 1 else layer(x)
-        return x
-
-
-class Gate(nn.Module):
-    """Gated cross-attention fusion (LayerNorm variant)."""
-
-    def __init__(self, d_model: int) -> None:
-        super().__init__()
-        self.gate = nn.Linear(2 * d_model, 2 * d_model)
-        bias = bias_init_with_prob(0.5)
-        init.constant_(self.gate.bias, bias)
-        init.constant_(self.gate.weight, 0)
-        self.norm = nn.LayerNorm(d_model)
-
-    def forward(self, x1: Tensor, x2: Tensor) -> Tensor:
-        """Forward pass."""
-        gates = torch.sigmoid(self.gate(torch.cat([x1, x2], dim=-1)))
-        g1, g2 = gates.chunk(2, dim=-1)
-        return self.norm(g1 * x1 + g2 * x2)
-
-
-class Integral(nn.Module):
-    """Distribution-to-distance integral (non-uniform weighting)."""
-
-    def __init__(self, reg_max: int = 32) -> None:
-        super().__init__()
-        self.reg_max = reg_max
-
-    def forward(self, x: Tensor, project: Tensor) -> Tensor:
-        """Forward pass."""
-        shape = x.shape
-        x = F.softmax(x.reshape(-1, self.reg_max + 1), dim=1)
-        x = F.linear(x, project.to(x.device)).reshape(-1, 4)
-        return x.reshape([*list(shape[:-1]), -1])
-
-
-class LQE(nn.Module):
-    """Localization Quality Estimator."""
-
-    def __init__(self, k: int, hidden_dim: int, num_layers: int, reg_max: int, act: str = "silu") -> None:
-        super().__init__()
-        self.k = k
-        self.reg_max = reg_max
-        self.reg_conf = MLP(4 * (k + 1), hidden_dim, 1, num_layers, act=act)
-        _reg_last = cast("nn.Linear", self.reg_conf.layers[-1])
-        init.constant_(_reg_last.bias, 0)
-        init.constant_(_reg_last.weight, 0)
-
-    def forward(self, scores: Tensor, pred_corners: Tensor) -> Tensor:
-        """Forward pass."""
-        B, L, _ = pred_corners.size()  # noqa: N806
-        prob = F.softmax(pred_corners.reshape(B, L, 4, self.reg_max + 1), dim=-1)
-        prob_topk, _ = prob.topk(self.k, dim=-1)
-        stat = torch.cat([prob_topk, prob_topk.mean(dim=-1, keepdim=True)], dim=-1)
-        quality_score = self.reg_conf(stat.reshape(B, L, -1))
-        return scores + quality_score
-
-
-# ---------------------------------------------------------------------------
-# Segmentation Head
-# ---------------------------------------------------------------------------
-
-
-class _DepthwiseConvBlock(nn.Module):
-    def __init__(self, dim: int) -> None:
-        super().__init__()
-        self.dwconv = nn.Conv2d(dim, dim, kernel_size=3, padding=1, groups=dim)
-        self.norm = nn.LayerNorm(dim, eps=1e-6)
-        self.pwconv1 = nn.Linear(dim, dim)
-        self.act = nn.GELU()
-
-    def forward(self, x: Tensor) -> Tensor:
-        """Forward pass."""
-        res = x
-        x = self.dwconv(x)
-        x = x.permute(0, 2, 3, 1)
-        x = self.act(self.pwconv1(self.norm(x)))
-        return x.permute(0, 3, 1, 2) + res
-
-
-class _MLPBlock(nn.Module):
-    def __init__(self, dim: int) -> None:
-        super().__init__()
-        self.norm_in = nn.LayerNorm(dim)
-        # Named "layers" to match checkpoint key layout (layers.0, layers.2).
-        self.layers = nn.Sequential(
-            nn.Linear(dim, dim * 4),
-            nn.GELU(),
-            nn.Linear(dim * 4, dim),
-        )
-
-    def forward(self, x: Tensor) -> Tensor:
-        """Forward pass."""
-        return x + self.layers(self.norm_in(x))
-
-
-class SegmentationHead(nn.Module):
-    """Lightweight dot-product segmentation head.
-
-    Args:
-        in_dim: Feature dimension.
-        num_blocks: Number of DepthwiseConvBlocks applied to spatial features.
-        downsample_ratio: Spatial downsampling ratio for the mask output.
-        image_size: Reference image size ``(H, W)`` (used to compute mask target size).
-    """
-
-    def __init__(
-        self,
-        in_dim: int,
-        num_blocks: int,
-        downsample_ratio: int = 4,
-        image_size: tuple[int, int] | list[int] = (640, 640),
-    ) -> None:
-        super().__init__()
-        self.downsample_ratio = downsample_ratio
-        self.image_size = tuple(image_size)
-        self.blocks = nn.ModuleList([_DepthwiseConvBlock(in_dim) for _ in range(num_blocks)])
-        # 1x1 conv projects spatial features channel-wise (matches checkpoint key layout).
-        self.spatial_features_proj = nn.Conv2d(in_dim, in_dim, 1)
-        self.query_features_block = _MLPBlock(in_dim)
-        # Linear projection on query features (matches checkpoint key layout).
-        self.query_features_proj = nn.Linear(in_dim, in_dim)
-        self.bias = nn.Parameter(torch.zeros(1))
-
-    def forward(
-        self,
-        spatial_features: Tensor,
-        query_features: list[Tensor],
-    ) -> list[Tensor]:
-        """Forward pass during training (one mask per decoder layer)."""
-        h_out = self.image_size[0] // self.downsample_ratio
-        w_out = self.image_size[1] // self.downsample_ratio
-        sf = F.interpolate(spatial_features, size=(h_out, w_out), mode="bilinear", align_corners=False)
-
-        mask_logits = []
-        for block, qf_in in zip(self.blocks, query_features):
-            sf = block(sf)
-            sf_proj = self.spatial_features_proj(sf)
-            qf = self.query_features_proj(self.query_features_block(qf_in))
-            mask_logits.append(torch.einsum("bchw,bnc->bnhw", sf_proj, qf) + self.bias)
-        return mask_logits
-
-    def forward_export(
-        self,
-        spatial_features: Tensor,
-        query_features: list[Tensor],
-    ) -> list[Tensor]:
-        """Forward at export time (single query feature, no dropout)."""
-        assert len(query_features) == 1  # noqa: S101
-        h_out = self.image_size[0] // self.downsample_ratio
-        w_out = self.image_size[1] // self.downsample_ratio
-        sf = F.interpolate(spatial_features, size=(h_out, w_out), mode="bilinear", align_corners=False)
-        for block in self.blocks:
-            sf = block(sf)
-        sf = self.spatial_features_proj(sf)
-        qf = self.query_features_proj(self.query_features_block(query_features[0]))
-        return [torch.einsum("bchw,bnc->bnhw", sf, qf) + self.bias]
-
-
-# ---------------------------------------------------------------------------
 # Transformer Decoder Layer
 # ---------------------------------------------------------------------------
 
@@ -273,7 +100,7 @@ class ECTransformerDecoderLayer(nn.Module):
         n_levels: Number of feature levels.
         n_points: Number of deformable sampling points per level (int or list).
         layer_scale: Optional scale factor for enlarged wide layers.
-        activation: Activation name.
+        activation: Activation layer class.
     """
 
     def __init__(
@@ -285,7 +112,7 @@ class ECTransformerDecoderLayer(nn.Module):
         n_levels: int = 3,
         n_points: int | list[int] = 4,
         layer_scale: float | None = None,
-        activation: str = "silu",
+        activation: Callable[..., nn.Module] = nn.SiLU,
     ) -> None:
         super().__init__()
 
@@ -305,9 +132,8 @@ class ECTransformerDecoderLayer(nn.Module):
         self.gateway = Gate(d_model)
 
         # FFN
-        _act = nn.SiLU if activation == "silu" else nn.ReLU
         self.linear1 = nn.Linear(d_model, dim_feedforward)
-        self.activation = _act()
+        self.activation = activation()
         self.dropout3 = nn.Dropout(dropout)
         self.linear2 = nn.Linear(dim_feedforward, d_model)
         self.dropout4 = nn.Dropout(dropout)
@@ -367,7 +193,7 @@ class ECTransformerDecoder(nn.Module):
         up: Tensor,
         eval_idx: int = -1,
         layer_scale: int = 1,
-        act: str = "silu",
+        act: Callable[..., nn.Module] = nn.SiLU,
     ) -> None:
         super().__init__()
         self.hidden_dim = hidden_dim
@@ -384,7 +210,9 @@ class ECTransformerDecoder(nn.Module):
             + [copy.deepcopy(decoder_layer_wide) for _ in range(num_layers - self.eval_idx - 1)]
         )
         self.segmentation_head = segmentation_head
-        self.lqe_layers = nn.ModuleList([copy.deepcopy(LQE(4, 64, 2, reg_max, act=act)) for _ in range(num_layers)])
+        self.lqe_layers = nn.ModuleList(
+            [copy.deepcopy(LQE(4, 64, 2, reg_max, activation=act)) for _ in range(num_layers)],
+        )
 
     def _value_op(
         self,
@@ -529,7 +357,7 @@ class ECTransformer(nn.Module):
         num_levels: Number of encoder feature levels.
         num_points: Deformable attention points per level (int or list).
         dropout: Dropout rate.
-        activation: FFN activation (``"silu"`` or ``"relu"``).
+        activation: FFN activation layer class.
         num_denoising: Number of denoising groups.
         label_noise_ratio: Label noise ratio for CDN.
         box_noise_scale: Box noise scale for CDN.
@@ -547,9 +375,9 @@ class ECTransformer(nn.Module):
         eval_spatial_size: tuple[int, int] | list[int] = (640, 640),
         num_queries: int = 300,
         num_levels: int = 3,
-        num_points: int | list[int] = (3, 6, 3),
+        num_points: int | list[int] = [3, 6, 3],  # noqa: B006
         dropout: float = 0.0,
-        activation: str = "silu",
+        activation: Callable[..., nn.Module] = nn.SiLU,
         num_denoising: int = 100,
         label_noise_ratio: float = 0.5,
         box_noise_scale: float = 1.0,
@@ -609,7 +437,11 @@ class ECTransformer(nn.Module):
 
         seg_head: SegmentationHead | None = None
         if mask_downsample_ratio is not None:
-            seg_head = SegmentationHead(
+            from getitune.backend.lightning.models.instance_segmentation.heads import (
+                SegmentationHead as _SegmentationHead,
+            )
+
+            seg_head = _SegmentationHead(
                 in_dim=hidden_dim,
                 num_blocks=num_layers,
                 downsample_ratio=mask_downsample_ratio,
@@ -641,9 +473,9 @@ class ECTransformer(nn.Module):
 
         # Encoder output heads
         self.enc_score_head = nn.Linear(hidden_dim, num_classes)
-        self.enc_bbox_head = MLP(hidden_dim, hidden_dim, 4, 3, act=activation)
-        self.query_pos_head = MLP(4, hidden_dim, hidden_dim, 3, act=activation)
-        self.pre_bbox_head = MLP(hidden_dim, hidden_dim, 4, 3, act=activation)
+        self.enc_bbox_head = MLP(hidden_dim, hidden_dim, 4, 3, activation=activation)
+        self.query_pos_head = MLP(4, hidden_dim, hidden_dim, 3, activation=activation)
+        self.pre_bbox_head = MLP(hidden_dim, hidden_dim, 4, 3, activation=activation)
         self.integral = Integral(reg_max)
 
         actual_eval_idx = eval_idx if eval_idx >= 0 else num_layers + eval_idx
@@ -656,8 +488,8 @@ class ECTransformer(nn.Module):
         )
 
         scaled_dim = round(layer_scale * hidden_dim)
-        dec_bbox_head = MLP(hidden_dim, hidden_dim, 4 * (reg_max + 1), 3, act=activation)
-        wide_bbox_head = MLP(scaled_dim, scaled_dim, 4 * (reg_max + 1), 3, act=activation)
+        dec_bbox_head = MLP(hidden_dim, hidden_dim, 4 * (reg_max + 1), 3, activation=activation)
+        wide_bbox_head = MLP(scaled_dim, scaled_dim, 4 * (reg_max + 1), 3, activation=activation)
         self.dec_bbox_head = nn.ModuleList(
             [copy.deepcopy(dec_bbox_head) for _ in range(actual_eval_idx + 1)]
             + [

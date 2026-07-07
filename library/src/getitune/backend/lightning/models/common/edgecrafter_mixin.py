@@ -9,10 +9,10 @@ Modified from EdgeCrafter (https://github.com/Intellindust-AI-Lab/EdgeCrafter).
 from __future__ import annotations
 
 import copy
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Protocol, cast
 
 import torch
-from torch import Tensor
+from torch import Tensor, nn
 from torchvision import tv_tensors
 from torchvision.ops import box_convert
 from torchvision.tv_tensors import BoundingBoxFormat
@@ -26,6 +26,53 @@ from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.data.entity.base import BatchLoss
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
 
+if TYPE_CHECKING:
+    from lightning.pytorch.cli import OptimizerCallable
+
+    from getitune.backend.lightning.models.base import DataInputParams
+
+
+class _EdgeCrafterHost(Protocol):
+    """Attributes/behaviour :class:`EdgeCrafterMixin` expects from its host class.
+
+    Concrete host classes (:class:`~getitune.backend.lightning.models.detection.edgecrafter.EdgeCrafter`
+    and :class:`~getitune.backend.lightning.models.instance_segmentation.edgecrafter_inst.EdgeCrafterInst`)
+    provide these either directly (as instance/class attributes) or by inheriting them from
+    :class:`~getitune.backend.lightning.models.base.LightningModel`.
+    """
+
+    model: nn.Module
+    model_name: str
+    data_input_params: DataInputParams
+    optimizer_callable: OptimizerCallable
+    # NOTE: typed permissively (rather than `LRSchedulerCallable | LRSchedulerListCallable`)
+    # because pyrefly infers a narrower concrete type for this read-write attribute on the
+    # host classes, and Protocol attribute matching is invariant; `configure_optimizers`
+    # below already handles both the single-scheduler and list-of-schedulers cases.
+    scheduler_callable: Callable[..., Any]
+    multi_scale: bool
+    training: bool
+
+    @property
+    def explain_mode(self) -> bool:
+        """Whether the host model is in explain (XAI) mode; read-only from the Mixin's perspective."""
+        ...
+
+    @property
+    def num_classes(self) -> int:
+        """Number of target classes; read-only from the Mixin's perspective."""
+        ...
+
+    # Per-variant backbone/proj_dim/LR config; shared, read-only lookup table.
+    _EC_MODEL_CFGS: ClassVar[dict[str, dict[str, Any]]]
+
+    # Per-task configuration, defined as ClassVars on concrete subclasses.
+    _pretrained_weights: ClassVar[dict[str, str]]
+    _loss_weights: ClassVar[dict[str, float]]
+    _matcher_cost_dict: ClassVar[dict[str, int | float] | None]
+    _mask_downsample_ratio: ClassVar[int | None]
+    _backbone_key: ClassVar[str]
+
 
 class EdgeCrafterMixin:
     """Mixin providing shared EdgeCrafter functionality for detection and instance segmentation.
@@ -33,18 +80,32 @@ class EdgeCrafterMixin:
     Concrete sub-classes must set:
 
     * ``_pretrained_weights`` — ``{model_name: url}`` for checkpoint downloading.
+    * ``_loss_weights`` — per-task loss weight dict passed to :class:`ECCriterion`.
     * ``model_name`` — one of ``"edgecrafter_{s,m,l,x}"``.
     * ``data_input_params`` — :class:`DataInputParams` with ``input_size``.
     * ``multi_scale`` — whether multi-scale training is enabled.
     * ``num_classes`` — number of target classes.
 
+    Concrete sub-classes may override (defaults below suit plain detection):
+
+    * ``_matcher_cost_dict`` — Hungarian matcher cost overrides. Defaults to ``None``.
+    * ``_mask_downsample_ratio`` — mask head output stride ratio. Defaults to ``None``
+      (no segmentation head).
+    * ``_backbone_key`` — key into ``_EC_MODEL_CFGS`` selecting the backbone variant.
+      Defaults to ``"backbone_name"``.
+
     The mixin overrides ``_customize_inputs``, ``_customize_outputs``, and
     ``configure_optimizers`` so that both :class:`EdgeCrafter`
     (detection) and :class:`EdgeCrafterInst` (instance segmentation) can share
-    the same core logic.
+    the same core logic. The mixin itself stays agnostic to which concrete task
+    it is serving — everything task-specific is read from the host class's
+    ClassVar configuration (see :class:`_EdgeCrafterHost`).
     """
 
     _pretrained_weights: ClassVar[dict[str, str]]
+    _matcher_cost_dict: ClassVar[dict[str, int | float] | None] = None
+    _mask_downsample_ratio: ClassVar[int | None] = None
+    _backbone_key: ClassVar[str] = "backbone_name"
 
     # Per-variant backbone, proj_dim, and per-layer LR config.
     _EC_MODEL_CFGS: ClassVar[dict[str, dict[str, Any]]] = {
@@ -75,83 +136,55 @@ class EdgeCrafterMixin:
     }
 
     def _build_ec_model(
-        self,
+        self: _EdgeCrafterHost,
         num_classes: int,
         *,
-        with_seg: bool = False,
         backbone_lr: float | None = None,
     ) -> ECDETRDetector:
         """Construct the full EdgeCrafter model for detection or instance segmentation.
 
         Steps:
-        1. Build :class:`ECViTAdapter` backbone (det or seg weights variant).
+        1. Build :class:`ECViTAdapter` backbone (det or seg weights variant, selected
+           via ``self._backbone_key``).
         2. Build :class:`HybridEncoder` neck.
-        3. Build :class:`ECTransformer` decoder (with seg head for ECSeg).
-        4. Build :class:`ECCriterion` with mask losses added for ECSeg.
+        3. Build :class:`ECTransformer` decoder (with seg head when
+           ``self._mask_downsample_ratio`` is set).
+        4. Build :class:`ECCriterion` from ``self._loss_weights`` /
+           ``self._matcher_cost_dict``.
         5. Wrap everything in :class:`ECDETRDetector`.
         6. Load pretrained checkpoint via :func:`load_checkpoint`.
 
         Args:
             num_classes: Number of target classes.
-            with_seg: When ``True``, builds the ECSeg variant (adds segmentation
-                head and mask losses).
             backbone_lr: Optional override for the backbone learning rate.
                 Defaults to the per-variant value in ``_EC_MODEL_CFGS``.
 
         Returns:
             Configured :class:`ECDETRDetector` instance.
         """
-        cfg = self._EC_MODEL_CFGS[self.model_name]  # type: ignore[attr-defined]
-        backbone_key = "seg_backbone_name" if with_seg else "backbone_name"
+        cfg = self._EC_MODEL_CFGS[self.model_name]
 
-        if self.data_input_params.input_size is None:  # type: ignore[attr-defined]
+        if self.data_input_params.input_size is None:
             msg = "input_size must not be None."
             raise ValueError(msg)
-        input_size: tuple[int, int] = self.data_input_params.input_size  # type: ignore[attr-defined]
+        input_size: tuple[int, int] = self.data_input_params.input_size
 
-        backbone = ECViTAdapter(model_name=cfg[backbone_key], proj_dim=cfg["proj_dim"])
-        encoder = HybridEncoder(model_name=self.model_name)  # type: ignore[attr-defined]
+        backbone = ECViTAdapter(model_name=cfg[self._backbone_key], proj_dim=cfg["proj_dim"])
+        encoder = HybridEncoder(model_name=self.model_name)
         decoder = ECTransformer(
-            model_name=self.model_name,  # type: ignore[attr-defined]
+            model_name=self.model_name,
             num_classes=num_classes,
             eval_spatial_size=input_size,
-            mask_downsample_ratio=4 if with_seg else None,
+            mask_downsample_ratio=self._mask_downsample_ratio,
         )
 
-        if with_seg:
-            weight_dict: dict[str, float] = {
-                "loss_mal": 2.0,
-                "loss_bbox": 1.0,
-                "loss_giou": 1.0,
-                "loss_fgl": 0.15,
-                "loss_ddf": 1.5,
-                "loss_mask_ce": 5.0,
-                "loss_mask_dice": 5.0,
-            }
-            matcher_cost_dict: dict[str, int | float] | None = {
-                "cost_class": 2,
-                "cost_bbox": 1,
-                "cost_giou": 1,
-                "cost_mask": 5,
-                "cost_dice": 5,
-            }
-        else:
-            weight_dict = {
-                "loss_mal": 1.0,
-                "loss_bbox": 5.0,
-                "loss_giou": 2.0,
-                "loss_fgl": 0.15,
-                "loss_ddf": 1.5,
-            }
-            matcher_cost_dict = None
-
         criterion = ECCriterion(
-            weight_dict=weight_dict,
+            weight_dict=self._loss_weights,
             alpha=0.75,
             gamma=1.5,
             reg_max=32,
             num_classes=num_classes,
-            matcher_cost_dict=matcher_cost_dict,
+            matcher_cost_dict=self._matcher_cost_dict,
         )
 
         backbone_lr = backbone_lr if backbone_lr is not None else cfg["backbone_lr"]
@@ -168,15 +201,15 @@ class EdgeCrafterMixin:
             criterion=criterion,
             num_classes=num_classes,
             optimizer_configuration=optimizer_configuration,
-            multi_scale=self.multi_scale,  # type: ignore[attr-defined]
+            multi_scale=self.multi_scale,
             input_size=input_size[0],
         )
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")  # type: ignore[attr-defined]
+        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
         return model
 
     def _customize_inputs(  # pyrefly: ignore[bad-override]
-        self,
+        self: _EdgeCrafterHost,
         entity: SampleBatch,
     ) -> dict[str, Any]:
         """Convert getitune :class:`SampleBatch` to EdgeCrafter input format.
@@ -227,7 +260,7 @@ class EdgeCrafterMixin:
 
                 targets.append(target)
 
-        if self.explain_mode:  # type: ignore[attr-defined]
+        if self.explain_mode:
             return {"entity": entity}
 
         return {
@@ -236,7 +269,7 @@ class EdgeCrafterMixin:
         }
 
     def _customize_outputs(  # pyrefly: ignore[bad-override]
-        self,
+        self: _EdgeCrafterHost,
         outputs: dict[str, Any] | tuple | list,
         inputs: SampleBatch,
     ) -> PredictionBatch | BatchLoss:
@@ -254,7 +287,7 @@ class EdgeCrafterMixin:
         Returns:
             :class:`BatchLoss` during training, :class:`PredictionBatch` during inference.
         """
-        if self.training:  # type: ignore[attr-defined]
+        if self.training:
             if not isinstance(outputs, dict):
                 msg = f"Expected dict during training, got {type(outputs)}"
                 raise TypeError(msg)
@@ -272,7 +305,8 @@ class EdgeCrafterMixin:
             return losses
 
         original_sizes = [img_info.ori_shape for img_info in inputs.imgs_info]  # type: ignore[union-attr]
-        result = self.model.postprocess(outputs, original_sizes)  # type: ignore[attr-defined]
+        model = cast("ECDETRDetector", self.model)
+        result = model.postprocess(cast("dict[str, Tensor]", outputs), original_sizes)
 
         prediction_kwargs: dict[str, Any] = {
             "images": inputs.images,
@@ -308,7 +342,7 @@ class EdgeCrafterMixin:
         return PredictionBatch(**prediction_kwargs)
 
     def configure_optimizers(  # pyrefly: ignore[bad-override]
-        self,
+        self: _EdgeCrafterHost,
     ) -> tuple[list[torch.optim.Optimizer], list[dict[str, Any]]]:
         """Configure optimizer and learning-rate schedulers.
 
@@ -322,11 +356,11 @@ class EdgeCrafterMixin:
         from getitune.backend.lightning.models.detection.rtdetr import RTDETR
 
         param_groups = RTDETR._get_optim_params(  # noqa: SLF001
-            self.model.optimizer_configuration,  # type: ignore[attr-defined]
-            self.model,  # type: ignore[attr-defined]
+            cast("ECDETRDetector", self.model).optimizer_configuration,
+            self.model,
         )
-        optimizer = self.optimizer_callable(param_groups)  # type: ignore[attr-defined]
-        schedulers = self.scheduler_callable(optimizer)  # type: ignore[attr-defined]
+        optimizer = self.optimizer_callable(param_groups)
+        schedulers = self.scheduler_callable(optimizer)
 
         def _ensure_list(item: Any) -> list:  # noqa: ANN401
             return item if isinstance(item, list) else [item]

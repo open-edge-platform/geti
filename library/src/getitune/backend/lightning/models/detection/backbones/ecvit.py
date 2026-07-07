@@ -11,184 +11,19 @@ Modified from https://huggingface.co/spaces/Hila/RobustViT/blob/main/ViT/ViT_new
 from __future__ import annotations
 
 import math
-import warnings
 from functools import partial
-from typing import Callable, ClassVar, Literal
+from typing import Callable, ClassVar
 
-import numpy as np
 import torch
 import torch.nn.functional as F  # noqa: N812
 from torch import nn
 
+from getitune.backend.lightning.models.common.layers.position_embed import RopePositionEmbedding
+from getitune.backend.lightning.models.common.layers.vit_blocks import Block
 from getitune.backend.lightning.models.detection.necks.dfine_hybrid_encoder import ConvNormLayerFusable
+from getitune.backend.lightning.models.utils.weight_init import trunc_normal_
 
 __all__ = ["ECViTAdapter"]
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-
-def _trunc_normal_(tensor: torch.Tensor, mean: float, std: float, a: float, b: float) -> torch.Tensor:
-    def _norm_cdf(x: float) -> float:
-        return (1.0 + math.erf(x / math.sqrt(2.0))) / 2.0
-
-    if (mean < a - 2 * std) or (mean > b + 2 * std):
-        warnings.warn(
-            "mean is more than 2 std from [a, b] in nn.init.trunc_normal_. "
-            "The distribution of values may be incorrect.",
-            stacklevel=2,
-        )
-    with torch.no_grad():
-        lo = _norm_cdf((a - mean) / std)
-        hi = _norm_cdf((b - mean) / std)
-        tensor.uniform_(2 * lo - 1, 2 * hi - 1)
-        tensor.erfinv_()
-        tensor.mul_(std * math.sqrt(2.0))
-        tensor.add_(mean)
-        tensor.clamp_(min=a, max=b)
-        return tensor
-
-
-def trunc_normal_(
-    tensor: torch.Tensor, mean: float = 0.0, std: float = 1.0, a: float = -2.0, b: float = 2.0
-) -> torch.Tensor:
-    """Fill tensor with truncated normal values."""
-    return _trunc_normal_(tensor, mean, std, a, b)
-
-
-def drop_path(x: torch.Tensor, drop_prob: float = 0.0, training: bool = False) -> torch.Tensor:
-    """Stochastic depth drop path."""
-    if drop_prob == 0.0 or not training:
-        return x
-    keep_prob = 1 - drop_prob
-    shape = (x.shape[0],) + (1,) * (x.ndim - 1)
-    random_tensor = keep_prob + torch.rand(shape, dtype=x.dtype, device=x.device)
-    return x.div(keep_prob) * random_tensor.floor()
-
-
-class DropPath(nn.Module):
-    """Drop paths (stochastic depth) per sample."""
-
-    def __init__(self, drop_prob: float = 0.0) -> None:
-        super().__init__()
-        self.drop_prob = drop_prob
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass."""
-        return drop_path(x, self.drop_prob, self.training)
-
-
-# ---------------------------------------------------------------------------
-# RoPE
-# ---------------------------------------------------------------------------
-
-
-class RopePositionEmbedding(nn.Module):
-    """2-D Rotary Position Embedding for ViT.
-
-    Args:
-        embed_dim: Transformer embedding dimension.
-        num_heads: Number of attention heads.
-        base: RoPE base period (used when min/max_period are None).
-        min_period: Minimum period (used together with max_period).
-        max_period: Maximum period (used together with min_period).
-        normalize_coords: Coordinate normalisation strategy.
-        shift_coords: Optional coordinate shift jitter during training.
-        jitter_coords: Optional coordinate scale jitter during training.
-        rescale_coords: Optional global scale jitter during training.
-    """
-
-    def __init__(
-        self,
-        embed_dim: int,
-        *,
-        num_heads: int,
-        base: float | None = 100.0,
-        min_period: float | None = None,
-        max_period: float | None = None,
-        normalize_coords: Literal["min", "max", "separate"] = "separate",
-        shift_coords: float | None = None,
-        jitter_coords: float | None = None,
-        rescale_coords: float | None = None,
-    ) -> None:
-        super().__init__()
-        head_dim = embed_dim // num_heads
-        if head_dim % 4 != 0:
-            msg = "Head dimension must be divisible by 4 for 2D RoPE"
-            raise ValueError(msg)
-        both = min_period is not None and max_period is not None
-        if (base is None and not both) or (base is not None and both):
-            msg = "Either `base` or both `min_period`+`max_period` must be provided."
-            raise ValueError(msg)
-
-        self.base = base
-        self.min_period = min_period
-        self.max_period = max_period
-        self.D_head = head_dim
-        self.normalize_coords = normalize_coords
-        self.shift_coords = shift_coords
-        self.jitter_coords = jitter_coords
-        self.rescale_coords = rescale_coords
-        self.register_buffer("periods", torch.empty(head_dim // 4), persistent=True)
-        self._init_weights()
-
-    def forward(self, *, H: int, W: int) -> tuple[torch.Tensor, torch.Tensor]:  # noqa: N803
-        """Compute sin/cos RoPE tables for an HxW feature map."""
-        device = self.periods.device  # type: ignore[union-attr]
-        dtype = torch.get_default_dtype()
-        dd: dict = {"device": device, "dtype": dtype}
-
-        if self.normalize_coords == "max":
-            m = max(H, W)
-            coords_h = torch.arange(0.5, H, **dd) / m
-            coords_w = torch.arange(0.5, W, **dd) / m
-        elif self.normalize_coords == "separate":
-            coords_h = torch.arange(0.5, H, **dd) / H
-            coords_w = torch.arange(0.5, W, **dd) / W
-        else:  # min
-            m = min(H, W)
-            coords_h = torch.arange(0.5, H, **dd) / m
-            coords_w = torch.arange(0.5, W, **dd) / m
-
-        coords = torch.stack(torch.meshgrid(coords_h, coords_w, indexing="ij"), dim=-1)
-        coords = coords.flatten(0, 1)
-        coords = 2.0 * coords - 1.0
-
-        if self.training and self.shift_coords is not None:
-            coords = coords + torch.empty(2, **dd).uniform_(-self.shift_coords, self.shift_coords)[None, :]
-        if self.training and self.jitter_coords is not None:
-            j = torch.empty(2, **dd).uniform_(-np.log(self.jitter_coords), np.log(self.jitter_coords)).exp()
-            coords = coords * j[None, :]
-        if self.training and self.rescale_coords is not None:
-            r = torch.empty(1, **dd).uniform_(-np.log(self.rescale_coords), np.log(self.rescale_coords)).exp()
-            coords = coords * r
-
-        angles = 2 * math.pi * coords[:, :, None] / self.periods[None, None, :]  # type: ignore[index]
-        angles = angles.flatten(1, 2).repeat(1, 2)
-        return torch.sin(angles).unsqueeze(0).unsqueeze(0), torch.cos(angles).unsqueeze(0).unsqueeze(0)
-
-    def _init_weights(self) -> None:
-        """Initialise period buffer."""
-        device: torch.device = self.periods.device  # type: ignore[union-attr]
-        dtype = torch.get_default_dtype()
-        if self.base is not None:
-            periods = self.base ** (2 * torch.arange(self.D_head // 4, device=device, dtype=dtype) / (self.D_head // 2))
-        else:
-            base_ratio = self.max_period / self.min_period  # type: ignore[operator]
-            exponents = torch.linspace(0, 1, self.D_head // 4, device=device, dtype=dtype)
-            periods = self.max_period * (base_ratio ** (exponents - 1))  # type: ignore[operator]
-        self.periods.data.copy_(periods)  # type: ignore[union-attr]
-
-
-def _rotate_half(x: torch.Tensor) -> torch.Tensor:
-    x1, x2 = x[..., : x.shape[-1] // 2], x[..., x.shape[-1] // 2 :]
-    return torch.cat((-x2, x1), dim=-1)
-
-
-def _apply_rope(x: torch.Tensor, sin: torch.Tensor, cos: torch.Tensor) -> torch.Tensor:
-    return (x * cos) + (_rotate_half(x) * sin)
 
 
 # ---------------------------------------------------------------------------
@@ -274,75 +109,6 @@ class Mlp(nn.Module):
         return self.fc2(self.drop(self.act(self.fc1(x))))
 
 
-class Attention(nn.Module):
-    """Multi-head self-attention with optional RoPE."""
-
-    def __init__(
-        self,
-        dim: int,
-        num_heads: int = 8,
-        qkv_bias: bool = False,
-        attn_drop: float = 0.0,
-        proj_drop: float = 0.0,
-    ) -> None:
-        super().__init__()
-        self.num_heads = num_heads
-        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
-        self.attn_drop = attn_drop
-        self.proj = nn.Linear(dim, dim)
-        self.proj_drop = nn.Dropout(proj_drop)
-
-    def forward(self, x: torch.Tensor, rope_sincos: tuple[torch.Tensor, torch.Tensor] | None = None) -> torch.Tensor:
-        """Forward pass."""
-        B, N, C = x.shape  # noqa: N806
-        head_dim = C // self.num_heads
-        qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, head_dim)
-        q, k, v = qkv.unbind(2)
-        q, k, v = q.transpose(1, 2), k.transpose(1, 2), v.transpose(1, 2)
-
-        if rope_sincos is not None:
-            sin, cos = rope_sincos
-            # register token is at index 0; apply RoPE only to patch tokens
-            q_cls, q_patch = q[:, :, :1, :], q[:, :, 1:, :]
-            k_cls, k_patch = k[:, :, :1, :], k[:, :, 1:, :]
-            q_patch = _apply_rope(q_patch, sin, cos)
-            k_patch = _apply_rope(k_patch, sin, cos)
-            q = torch.cat((q_cls, q_patch), dim=2)
-            k = torch.cat((k_cls, k_patch), dim=2)
-
-        x = F.scaled_dot_product_attention(q, k, v, dropout_p=self.attn_drop if self.training else 0.0)
-        x = x.transpose(1, 2).reshape(B, N, C)
-        return self.proj_drop(self.proj(x))
-
-
-class Block(nn.Module):
-    """ViT transformer block."""
-
-    def __init__(
-        self,
-        dim: int,
-        num_heads: int,
-        ffn_ratio: float = 4.0,
-        qkv_bias: bool = False,
-        drop: float = 0.0,
-        attn_drop: float = 0.0,
-        drop_path_rate: float = 0.0,
-        act_layer: type[nn.Module] = nn.GELU,
-        norm_layer: type[nn.Module] = nn.LayerNorm,
-    ) -> None:
-        super().__init__()
-        self.norm1 = norm_layer(dim)  # type: ignore[call-arg]
-        self.attn = Attention(dim, num_heads, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop)
-        self.drop_path = DropPath(drop_path_rate) if drop_path_rate > 0.0 else nn.Identity()
-        self.norm2 = norm_layer(dim)  # type: ignore[call-arg]
-        self.mlp = Mlp(dim, int(dim * ffn_ratio), act_layer=act_layer, drop=drop)
-
-    def forward(self, x: torch.Tensor, rope_sincos: tuple[torch.Tensor, torch.Tensor] | None = None) -> torch.Tensor:
-        """Forward pass."""
-        x = x + self.drop_path(self.attn(self.norm1(x), rope_sincos=rope_sincos))
-        return x + self.drop_path(self.mlp(self.norm2(x)))
-
-
 class VisionTransformer(nn.Module):
     """ViT backbone used by EC-ViT models.
 
@@ -391,13 +157,14 @@ class VisionTransformer(nn.Module):
                 Block(
                     dim=embed_dim,
                     num_heads=num_heads,
-                    ffn_ratio=ffn_ratio,
+                    mlp_ratio=ffn_ratio,
                     qkv_bias=qkv_bias,
                     drop=drop_rate,
                     attn_drop=attn_drop_rate,
-                    drop_path_rate=dpr[i],
+                    drop_path=dpr[i],
                     act_layer=nn.GELU,
                     norm_layer=norm_layer,  # type: ignore[arg-type]
+                    mlp_layer=Mlp,
                 )
                 for i in range(depth)
             ]
@@ -433,7 +200,7 @@ class VisionTransformer(nn.Module):
         x_embed = x_embed.flatten(2).transpose(1, 2)  # [B, N, C]
         reg = self.register_token.expand(x_embed.shape[0], -1, -1)
         x = torch.cat((reg, x_embed), dim=1)
-        rope = self.rope_embed(H=H, W=W)
+        rope = self.rope_embed(h=H, w=W)
 
         outs: list[torch.Tensor] = []
         for i, blk in enumerate(self.blocks):

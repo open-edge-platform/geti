@@ -35,8 +35,8 @@ class EdgeCrafterInst(EdgeCrafterMixin, LightningInstanceSegModel):  # pyrefly: 
     (``ecseg_vitt/vittplus/vits/vitsplus``) which are trained jointly for
     detection and segmentation.
 
-    Original paper / repository:
-    https://github.com/Intellindust-AI-Lab/EdgeCrafter
+    Original repository: https://github.com/Intellindust-AI-Lab/EdgeCrafter
+    Paper: https://arxiv.org/abs/2603.18739
 
     Args:
         label_info: Information about the labels.
@@ -61,6 +61,26 @@ class EdgeCrafterInst(EdgeCrafterMixin, LightningInstanceSegModel):  # pyrefly: 
         "edgecrafter_l": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecseg_l.pth",
         "edgecrafter_x": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecseg_x.pth",
     }
+
+    # Instance-segmentation loss weights + matcher costs (adds mask terms on top of detection).
+    _loss_weights: ClassVar[dict[str, float]] = {
+        "loss_mal": 2.0,
+        "loss_bbox": 1.0,
+        "loss_giou": 1.0,
+        "loss_fgl": 0.15,
+        "loss_ddf": 1.5,
+        "loss_mask_ce": 5.0,
+        "loss_mask_dice": 5.0,
+    }
+    _matcher_cost_dict: ClassVar[dict[str, int | float]] = {
+        "cost_class": 2,
+        "cost_bbox": 1,
+        "cost_giou": 1,
+        "cost_mask": 5,
+        "cost_dice": 5,
+    }
+    _mask_downsample_ratio: ClassVar[int] = 4
+    _backbone_key: ClassVar[str] = "seg_backbone_name"
 
     input_size_multiplier = 16
 
@@ -105,7 +125,7 @@ class EdgeCrafterInst(EdgeCrafterMixin, LightningInstanceSegModel):  # pyrefly: 
             Configured :class:`ECDETRDetector` with instance-segmentation head.
         """
         num_classes = num_classes if num_classes is not None else self.num_classes
-        return self._build_ec_model(num_classes, with_seg=True, backbone_lr=self.backbone_lr)
+        return self._build_ec_model(num_classes, backbone_lr=self.backbone_lr)
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
