@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
 from getitune.backend.lightning.models.segmentation.backbones import MSCAN
@@ -40,6 +40,13 @@ class SegNext(LightningSegmentationModel):
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
+
+    pretrained_weights_target = "backbone"
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "segnext_tiny": "https://storage.geti.intel.com/weights/mscan_t_20230227-119e8c9f.pth",
+        "segnext_small": "https://storage.geti.intel.com/weights/mscan_s_20230227-f33ccdf2.pth",
+        "segnext_base": "https://storage.geti.intel.com/weights/mscan_b_20230227-3ab7d230.pth",
+    }
 
     def __init__(
         self,

@@ -42,6 +42,7 @@ class DinoV2Seg(LightningSegmentationModel):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
+    # TODO(vitalii): merge with FCNHead weights <- https://storage.geti.intel.com/weights/dinov2_vits14_ade20k_linear_head.pth
     pretrained_urls: ClassVar[dict[str, str]] = {
         "dinov2-small-seg": "https://storage.geti.intel.com/weights/dinov2_vits14_reg4_pretrain.pth",
     }

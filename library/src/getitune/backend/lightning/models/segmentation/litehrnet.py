@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 from torch.onnx import OperatorExportTypes
 
@@ -44,6 +44,13 @@ class LiteHRNet(LightningSegmentationModel):
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
+
+    pretrained_weights_target = "backbone"
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "lite_hrnet_s": "https://storage.geti.intel.com/weights/litehrnetsv2_imagenet1k_rsc.pth",
+        "lite_hrnet_18": "https://storage.geti.intel.com/weights/litehrnet18_imagenet1k_rsc.pth",
+        "lite_hrnet_x": "https://storage.geti.intel.com/weights/litehrnetxv3_imagenet1k_rsc.pth",
+    }
 
     def __init__(
         self,
