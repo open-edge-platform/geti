@@ -460,8 +460,8 @@ class OVEngine(Engine):
             ptq_config["subset_size"] = max_data_subset_size
         if max_drop is not None:
             ptq_config["max_drop"] = max_drop
-        if max_num_iterations is not None:
-            ptq_config["max_num_iterations"] = max_num_iterations
+            if max_num_iterations is not None:
+                ptq_config["max_num_iterations"] = max_num_iterations
         logger.debug(f"PTQ configuration: {ptq_config}")
 
         return model.optimize(

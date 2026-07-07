@@ -335,18 +335,23 @@ class GetiTuneQuantizer(Execution[QuantizationJobParams]):
 
         datamodule = self.prepare_calibration_dataset(params=params, model=model)
         ov_engine = self.initialize_engine(params=params, model=model, datamodule=datamodule)
+
+        # max_num_iterations only applies to accuracy-aware quantization (max_drop set).
+        # For standard PTQ it must always be None regardless of the configured value.
+        max_num_iterations = params.max_num_iterations if params.max_drop is not None else None
+
         quantized_model_path = self.run_quantization(
             ov_engine=ov_engine,
             subset_size=params.max_calibration_subset_size,
             max_drop=params.max_drop,
-            max_num_iterations=params.max_num_iterations,
+            max_num_iterations=max_num_iterations,
         )
 
         quantization_info = {
             "type": "PTQ" if params.max_drop is None else "Accuracy-aware PTQ",
             "max_calibration_subset_size": params.max_calibration_subset_size,
             "max_drop": params.max_drop,
-            "max_num_iterations": params.max_num_iterations if params.max_drop is not None else None,
+            "max_num_iterations": max_num_iterations,
         }
 
         with self._db_session_factory() as db:

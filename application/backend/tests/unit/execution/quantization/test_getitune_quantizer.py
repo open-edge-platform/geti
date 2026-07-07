@@ -872,7 +872,7 @@ class TestGetiTuneQuantizerExecute:
         mock_engine.optimize.assert_called_once_with(
             max_data_subset_size=50,
             max_drop=None,
-            max_num_iterations=10,
+            max_num_iterations=None,
         )
         fxt_model_service.create_variant.assert_called_once_with(
             model_revision_id=model_id,
