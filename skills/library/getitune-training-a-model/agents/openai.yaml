@@ -1,0 +1,4 @@
+interface:
+  display_name: "Train a Model (getitune)"
+  short_description: "Train or evaluate a CV model with the getitune API or CLI"
+  default_prompt: "Use $getitune-training-a-model to train or evaluate a model with getitune."
