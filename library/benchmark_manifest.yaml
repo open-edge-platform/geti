@@ -35,7 +35,7 @@ experiments:
     datasets:
       - flowers102
     criteria:
-      accuracy_metric: accuracy
+      accuracy_metric: f1-score
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
@@ -66,7 +66,7 @@ experiments:
     datasets:
       - aid_multilabel
     criteria:
-      accuracy_metric: accuracy
+      accuracy_metric: mAP
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
@@ -79,36 +79,36 @@ experiments:
       - name: yolox_s
         priority: core
         recipe: detection/yolox_s.yaml
-      - name: deim_dfine_l
-        priority: core
-        recipe: detection/deim_dfine_l.yaml
-      - name: deim_dfine_m
-        priority: core
-        recipe: detection/deim_dfine_m.yaml
-      - name: atss_mobilenetv2
-        priority: extended
-        recipe: detection/atss_mobilenetv2.yaml
-      - name: yolox_s_tile
-        priority: extended
-        recipe: detection/yolox_tiny_tile.yaml
-      - name: dfine_x
-        priority: extended
-        recipe: detection/dfine_x.yaml
-      - name: ssd_mobilenetv2
-        priority: extended
-        recipe: detection/ssd_mobilenetv2.yaml
       - name: yolox_tiny
         priority: extended
         recipe: detection/yolox_tiny.yaml
+      - name: yolox_s_tile
+        priority: core # one tiling model to always check Tiling
+        recipe: detection/yolox_tiny_tile.yaml
       - name: yolox_l
         priority: extended
         recipe: detection/yolox_l.yaml
       - name: yolox_x
         priority: extended
         recipe: detection/yolox_x.yaml
-      - name: rtdetr_50
+      - name: yolo11_n
+        priority: core
+        recipe: detection/yolo11_n.yaml
+      - name: yolo11_s
         priority: extended
-        recipe: detection/rtdetr_50.yaml
+        recipe: detection/yolo11_s.yaml
+      - name: yolo11_m
+        priority: extended
+        recipe: detection/yolo11_m.yaml
+      - name: yolo12_n
+        priority: core
+        recipe: detection/yolo12_n.yaml
+      - name: yolo26_n
+        priority: core
+        recipe: detection/yolo26_n.yaml
+      - name: rfdetr_nano
+        priority: core
+        recipe: detection/rfdetr_nano.yaml
       - name: rfdetr_small
         priority: extended
         recipe: detection/rfdetr_small.yaml
@@ -118,31 +118,64 @@ experiments:
       - name: rfdetr_large
         priority: extended
         recipe: detection/rfdetr_large.yaml
+      - name: deim_dfine_m
+        priority: core
+        recipe: detection/deim_dfine_m.yaml
+      - name: deim_dfine_l
+        priority: extended
+        recipe: detection/deim_dfine_l.yaml
       - name: deim_dfine_x
         priority: extended
         recipe: detection/deim_dfine_x.yaml
-      - name: deimv2_l
-        priority: extended
-        recipe: detection/deimv2_l.yaml
+      - name: deimv2_s
+        priority: core
+        recipe: detection/deimv2_s.yaml
       - name: deimv2_m
         priority: extended
         recipe: detection/deimv2_m.yaml
-      - name: deimv2_s
+      - name: deimv2_l
         priority: extended
-        recipe: detection/deimv2_s.yaml
-      - name: yolo26_n
+        recipe: detection/deimv2_l.yaml
+      - name: atss_mobilenetv2
         priority: extended
-        recipe: detection/yolo26_n.yaml
+        recipe: detection/atss_mobilenetv2.yaml
+      - name: rtdetr_50
+        priority: extended
+        recipe: detection/rtdetr_50.yaml
+      - name: yolo11_l
+        priority: extended
+        recipe: detection/yolo11_l.yaml
+      - name: yolo11_x
+        priority: extended
+        recipe: detection/yolo11_x.yaml
+      - name: yolo12_s
+        priority: extended
+        recipe: detection/yolo12_s.yaml
+      - name: yolo12_m
+        priority: extended
+        recipe: detection/yolo12_m.yaml
+      - name: yolo12_l
+        priority: extended
+        recipe: detection/yolo12_l.yaml
+      - name: yolo12_x
+        priority: extended
+        recipe: detection/yolo12_x.yaml
       - name: yolo26_s
         priority: extended
         recipe: detection/yolo26_s.yaml
       - name: yolo26_m
         priority: extended
         recipe: detection/yolo26_m.yaml
+      - name: yolo26_l
+        priority: extended
+        recipe: detection/yolo26_l.yaml
+      - name: yolo26_x
+        priority: extended
+        recipe: detection/yolo26_x.yaml
     datasets:
       - bccd
     criteria:
-      accuracy_metric: map_50
+      accuracy_metric: map
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
@@ -187,15 +220,21 @@ experiments:
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   instance_segmentation:
     models:
-      - name: rfdetr_seg_small
+      - name: rfdetr_seg_nano
         priority: core
+        recipe: instance_segmentation/rfdetr_seg_nano.yaml
+      - name: rfdetr_seg_small
+        priority: extended
         recipe: instance_segmentation/rfdetr_seg_small.yaml
       - name: rfdetr_seg_medium
-        priority: core
+        priority: extended
         recipe: instance_segmentation/rfdetr_seg_medium.yaml
       - name: rfdetr_seg_xlarge
-        priority: core
+        priority: extended
         recipe: instance_segmentation/rfdetr_seg_xlarge.yaml
+      - name: rfdetr_seg_2xl
+        priority: extended
+        recipe: instance_segmentation/rfdetr_seg_2xlarge.yaml
       - name: maskrcnn_r50
         priority: extended
         recipe: instance_segmentation/maskrcnn_r50.yaml
@@ -211,8 +250,23 @@ experiments:
       - name: rfdetr_seg_large
         priority: extended
         recipe: instance_segmentation/rfdetr_seg_large.yaml
-      - name: yolo26_n_seg
+      - name: yolo11_n_seg
+        priority: core
+        recipe: instance_segmentation/yolo11_n_seg.yaml
+      - name: yolo11_s_seg
         priority: extended
+        recipe: instance_segmentation/yolo11_s_seg.yaml
+      - name: yolo11_m_seg
+        priority: extended
+        recipe: instance_segmentation/yolo11_m_seg.yaml
+      - name: yolo11_l_seg
+        priority: extended
+        recipe: instance_segmentation/yolo11_l_seg.yaml
+      - name: yolo11_x_seg
+        priority: extended
+        recipe: instance_segmentation/yolo11_x_seg.yaml
+      - name: yolo26_n_seg
+        priority: core
         recipe: instance_segmentation/yolo26_n_seg.yaml
       - name: yolo26_s_seg
         priority: extended
@@ -220,10 +274,16 @@ experiments:
       - name: yolo26_m_seg
         priority: extended
         recipe: instance_segmentation/yolo26_m_seg.yaml
+      - name: yolo26_l_seg
+        priority: extended
+        recipe: instance_segmentation/yolo26_l_seg.yaml
+      - name: yolo26_x_seg
+        priority: extended
+        recipe: instance_segmentation/yolo26_x_seg.yaml
     datasets:
       - wgisd
     criteria:
-      accuracy_metric: map_50
+      accuracy_metric: map
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }

@@ -52,6 +52,14 @@ class TestAccuracy:
         assert fxt_multiclass_labelinfo.num_classes > 1
         metric = MultiClassClsMetricCallable(fxt_multiclass_labelinfo)
         assert isinstance(metric.accuracy, MulticlassAccuracy)
+        assert "f1-score" in metric
+
+        preds = torch.tensor([0, 1, 2, 2])
+        targets = torch.tensor([0, 1, 1, 2])
+        metric.update(preds, targets)
+        result = metric.compute()
+        assert "f1-score" in result
+        assert result["f1-score"].item() == pytest.approx(0.7777778, rel=1e-5)
 
         one_class_label_info = LabelInfo(label_names=["class1"], label_groups=[["class1"]], label_ids=["0"])
         assert one_class_label_info.num_classes == 1

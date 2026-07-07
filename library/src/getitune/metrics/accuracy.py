@@ -14,6 +14,8 @@ from torchmetrics.classification.accuracy import Accuracy as TorchmetricAcc
 from torchmetrics.classification.accuracy import (
     MultilabelAccuracy as TorchmetricMultilabelAcc,
 )
+from torchmetrics.classification import BinaryF1Score as TorchmetricBinaryF1
+from torchmetrics.classification import MulticlassF1Score as TorchmetricMulticlassF1
 from torchmetrics.collections import MetricCollection
 
 from getitune.metrics.types import MetricCallable
@@ -354,9 +356,16 @@ class MixedHLabelAccuracy(Metric):
 
 def _multi_class_cls_metric_callable(label_info: LabelInfo) -> MetricCollection:
     num_classes = label_info.num_classes
-    task = "binary" if num_classes == 1 else "multiclass"
+    f1_metric: Metric
+    if num_classes == 1:
+        f1_metric = TorchmetricBinaryF1()
+    else:
+        f1_metric = TorchmetricMulticlassF1(num_classes=num_classes, average="macro")
     return MetricCollection(
-        {"accuracy": TorchmetricAcc(task=task, num_classes=num_classes)},
+        {
+            "accuracy": TorchmetricAcc(task="binary" if num_classes == 1 else "multiclass", num_classes=num_classes),
+            "f1-score": f1_metric,
+        },
     )
 
 
