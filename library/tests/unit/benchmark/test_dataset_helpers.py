@@ -5,9 +5,11 @@
 
 from __future__ import annotations
 
+import http.client
 import io
 import sys
 import tarfile
+import urllib.error
 import zipfile
 from pathlib import Path
 from types import ModuleType
@@ -115,6 +117,55 @@ class TestDownload:
             download("https://example.com/a.zip", dest_dir)
 
         assert dest_dir.exists()
+
+    @staticmethod
+    def _content_too_short_error() -> urllib.error.ContentTooShortError:
+        msg = "incomplete"
+        headers = http.client.HTTPMessage()
+        return urllib.error.ContentTooShortError(msg, ("", headers))
+
+    def test_retries_on_content_too_short_then_succeeds(self, tmp_path: Path) -> None:
+        dest_dir = tmp_path / "archives"
+        attempts = 0
+
+        def fake_urlretrieve(url: str, dest: str | Path) -> None:
+            nonlocal attempts
+            attempts += 1
+            if attempts == 1:
+                Path(dest).write_text("partial")
+                raise self._content_too_short_error()
+            Path(dest).write_text("final")
+
+        with (
+            patch("getitune.benchmark.dataset_helpers.urllib.request.urlretrieve", side_effect=fake_urlretrieve),
+            patch("getitune.benchmark.dataset_helpers.time.sleep") as sleep_mock,
+        ):
+            result = download("https://example.com/retry.parquet", dest_dir)
+
+        assert attempts == 2
+        sleep_mock.assert_called_once_with(2)
+        assert result.read_text() == "final"
+
+    def test_raises_after_max_retries_on_content_too_short(self, tmp_path: Path) -> None:
+        dest_dir = tmp_path / "archives"
+        attempts = 0
+
+        def fake_urlretrieve(url: str, dest: str | Path) -> None:
+            nonlocal attempts
+            attempts += 1
+            Path(dest).write_text("partial")
+            raise self._content_too_short_error()
+
+        with (
+            patch("getitune.benchmark.dataset_helpers.urllib.request.urlretrieve", side_effect=fake_urlretrieve),
+            patch("getitune.benchmark.dataset_helpers.time.sleep") as sleep_mock,
+            pytest.raises(urllib.error.ContentTooShortError),
+        ):
+            download("https://example.com/fail.parquet", dest_dir)
+
+        assert attempts == 3
+        assert sleep_mock.call_count == 2
+        assert not (dest_dir / "fail.parquet").exists()
 
 
 # ---------------------------------------------------------------------------

@@ -31,6 +31,13 @@ def _parse_key_value_pairs(items: list[str] | None) -> dict[str, str]:
     return result
 
 
+def _normalize_data_group_filter(data_group: str | None) -> list[str] | None:
+    """Convert the user-facing CLI value into backend filter semantics."""
+    if data_group in (None, "all"):
+        return None
+    return [data_group]
+
+
 def _add_common_args(parser: argparse.ArgumentParser) -> None:
     """Arguments shared by multiple sub-commands."""
     parser.add_argument(
@@ -94,7 +101,13 @@ def _build_parser() -> argparse.ArgumentParser:
     _add_common_args(prov)
     prov.add_argument("--dataset", type=str, nargs="*", default=None, help="Filter by dataset name(s).")
     prov.add_argument("--size-tier", type=str, nargs="*", default=None, help="Filter by size tier(s).")
-    prov.add_argument("--data-group", type=str, nargs="*", default=None, help="Filter by data group(s) (weekly, extended, all).")
+    prov.add_argument(
+        "--data-group",
+        type=str,
+        default="all",
+        choices=("weekly", "extended", "all"),
+        help="Filter by data group (weekly, extended, all; default: all).",
+    )
 
     # -- run ---------------------------------------------------------------
     run = sub.add_parser("run", help="Execute benchmark experiments.")
@@ -112,7 +125,13 @@ def _build_parser() -> argparse.ArgumentParser:
     run.add_argument("--dataset", type=str, nargs="*", default=None, help="Dataset name filter.")
     run.add_argument("--priority", type=str, nargs="*", default=None, help="Model priority filter.")
     run.add_argument("--size-tier", type=str, nargs="*", default=None, help="Dataset size tier filter.")
-    run.add_argument("--data-group", type=str, nargs="*", default=None, help="Dataset data group filter (weekly, extended, all).")
+    run.add_argument(
+        "--data-group",
+        type=str,
+        default="all",
+        choices=("weekly", "extended", "all"),
+        help="Dataset data group filter (weekly, extended, all; default: all).",
+    )
     run.add_argument("--scenario", type=str, nargs="*", default=None, help="Scenario name filter.")
     run.add_argument("--scenario-tag", type=str, nargs="*", default=None, help="Scenario tag filter.")
     run.add_argument("--accelerator", type=str, default="gpu", help="Device: gpu, xpu, or cpu.")
@@ -229,7 +248,8 @@ def _cmd_provision(args: argparse.Namespace) -> int:
 
     catalog = load_catalog(args.catalog)
     names = set(args.dataset) if args.dataset else None
-    entries = catalog.filter(size_tiers=args.size_tier, data_groups=args.data_group, names=names)
+    data_groups = _normalize_data_group_filter(args.data_group)
+    entries = catalog.filter(size_tiers=args.size_tier, data_groups=data_groups, names=names)
     if not entries:
         logger.warning("No datasets match the given filters.")
         return 0
@@ -254,7 +274,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
         datasets=args.dataset,
         priorities=args.priority,
         size_tiers=args.size_tier,
-        data_groups=args.data_group,
+        data_groups=_normalize_data_group_filter(args.data_group),
         scenarios=args.scenario,
         scenario_tags=args.scenario_tag,
         dry_run=args.dry_run,

@@ -126,13 +126,28 @@ class TestBuildParser:
         assert args.dataset == ["ds_a"]
         assert args.priority == ["core"]
         assert args.size_tier == ["small"]
-        assert args.data_group == ["weekly"]
+        assert args.data_group == "weekly"
         assert args.scenario == ["default"]
         assert args.scenario_tag == ["configurable"]
         assert args.num_seeds == 5
         assert args.max_epochs == 10
         assert args.eval_upto == "export"
         assert args.dry_run is True
+
+    def test_run_subcommand_data_group_defaults_to_all(self) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(["run"])
+        assert args.data_group == "all"
+
+    def test_run_subcommand_rejects_invalid_data_group(self) -> None:
+        parser = _build_parser()
+        with pytest.raises(SystemExit):
+            parser.parse_args(["run", "--data-group", "extend"])
+
+    def test_run_subcommand_requires_data_group_value(self) -> None:
+        parser = _build_parser()
+        with pytest.raises(SystemExit):
+            parser.parse_args(["run", "--data-group"])
 
     def test_run_no_deterministic(self) -> None:
         parser = _build_parser()
