@@ -6,11 +6,8 @@ import { FormEvent } from 'react';
 import { Form } from '@geti-ui/ui';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import { http } from '../../../../api/utils';
-import { server } from '../../../../msw-node-setup';
 import { VideoFile } from './video-file.component';
 
 describe('VideoFile', () => {
@@ -25,6 +22,14 @@ describe('VideoFile', () => {
         );
 
         return { handleSubmit };
+    };
+
+    const uploadFile = async (name = 'sample.mp4') => {
+        const file = new File(['fake-video-bytes'], name, { type: 'video/mp4' });
+        const fileInput = screen.getByTestId('upload-video-file');
+        await userEvent.upload(fileInput, file);
+
+        return file;
     };
 
     beforeEach(() => {
@@ -61,50 +66,93 @@ describe('VideoFile', () => {
         expect(pathField.checkValidity()).toBe(false);
     });
 
-    it('uploads a file, prefills the path input, and allows submission afterwards', async () => {
-        const resolvedPath = '/data/source_media/uuid/sample.mp4';
-        server.use(
-            http.post('/api/sources/media', () => {
-                return HttpResponse.json({ video_path: resolvedPath }, { status: 201 });
-            })
-        );
+    it('gives the hidden file input a `video_file` name so it is included in the native FormData', async () => {
+        renderApp();
 
-        const { handleSubmit } = renderApp();
+        const fileInput = screen.getByTestId('upload-video-file') as HTMLInputElement;
 
-        const file = new File(['fake-video-bytes'], 'sample.mp4', { type: 'video/mp4' });
-        const fileInput = screen.getByTestId('upload-video-file');
-        await userEvent.upload(fileInput, file);
-
-        const pathField = screen.getByRole('textbox', { name: /Video file path/ }) as HTMLInputElement;
         await waitFor(() => {
-            expect(pathField).toHaveValue(resolvedPath);
+            expect(fileInput).toHaveAttribute('name', 'video_file');
+        });
+    });
+
+    it('selecting a file stores it locally without making any network request', async () => {
+        renderApp();
+
+        const file = await uploadFile();
+
+        expect(screen.getByText('Selected: sample.mp4')).toBeVisible();
+
+        const fileInput = screen.getByTestId('upload-video-file') as HTMLInputElement;
+        expect(fileInput.files?.[0]).toBe(file);
+    });
+
+    it('un-requires and clears the path input once a file is selected', async () => {
+        renderApp({
+            defaultState: {
+                id: '1',
+                name: 'My source',
+                source_type: 'video_file',
+                video_path: '/a/b.mp4',
+                loop: false,
+            },
         });
 
-        expect(screen.getByText('Uploaded')).toBeVisible();
+        await uploadFile();
+
+        const pathField = screen.getByRole('textbox', { name: /Video file path/ }) as HTMLInputElement;
+        expect(pathField).toBeEnabled();
+        expect(pathField).toHaveValue('');
         expect(pathField.checkValidity()).toBe(true);
+    });
+
+    it('typing a path clears a previously selected file', async () => {
+        renderApp();
+
+        await uploadFile();
+        expect(screen.getByText('Selected: sample.mp4')).toBeVisible();
+
+        const pathField = screen.getByRole('textbox', { name: /Video file path/ });
+        await userEvent.type(pathField, '/a/b.mp4');
+
+        expect(screen.queryByText('Selected: sample.mp4')).not.toBeInTheDocument();
+        expect(pathField).toHaveValue('/a/b.mp4');
+
+        const fileInput = screen.getByTestId('upload-video-file') as HTMLInputElement;
+        expect(fileInput.files?.length ?? 0).toBe(0);
+    });
+
+    it('selecting a file clears a previously typed path', async () => {
+        renderApp();
+
+        const pathField = screen.getByRole('textbox', { name: /Video file path/ });
+        await userEvent.type(pathField, '/a/b.mp4');
+        expect(pathField).toHaveValue('/a/b.mp4');
+
+        await uploadFile();
+
+        expect(pathField).toHaveValue('');
+        expect(screen.getByText('Selected: sample.mp4')).toBeVisible();
+    });
+
+    it('allows submission right after selecting a file, without typing a path', async () => {
+        const { handleSubmit } = renderApp();
+
+        await uploadFile();
 
         await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
         expect(handleSubmit).toHaveBeenCalled();
     });
 
-    it('shows an inline error when the upload fails', async () => {
-        server.use(
-            http.post('/api/sources/media', () => {
-                // The 422 response has no documented schema in the OpenAPI spec (description only).
-                // @ts-expect-error There is an incorrect type in OpenAPI
-                return HttpResponse.json({ detail: 'Unsupported video format' }, { status: 422 });
-            })
-        );
+    it('allows submission after typing a path, without selecting a file', async () => {
+        const { handleSubmit } = renderApp();
 
-        renderApp();
+        const pathField = screen.getByRole('textbox', { name: /Video file path/ });
+        await userEvent.type(pathField, '/a/b.mp4');
 
-        const file = new File(['fake-video-bytes'], 'sample.mp4', { type: 'video/mp4' });
-        const fileInput = screen.getByTestId('upload-video-file');
-        await userEvent.upload(fileInput, file);
+        await userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
-        await waitFor(() => {
-            expect(screen.getByText(/upload failed: unsupported video format/i)).toBeVisible();
-        });
+        expect(handleSubmit).toHaveBeenCalled();
     });
 });

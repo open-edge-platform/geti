@@ -128,4 +128,60 @@ describe('useSourceAction', () => {
             });
         });
     });
+
+    describe('async bodyFormatter', () => {
+        it('awaits an async bodyFormatter before submitting', async () => {
+            const asyncBodyFormatter = async (formData: FormData) => {
+                await Promise.resolve();
+                return bodyFormatter(formData);
+            };
+
+            server.use(
+                http.post('/api/sources', () => HttpResponse.json({ ...mockedConfig, id: 'new-id-test' })),
+                http.patch('/api/projects/{project_id}/pipeline', () =>
+                    HttpResponse.json({ project_id: '', status: 'idle', device: 'images_folder' })
+                )
+            );
+
+            const { result } = renderHook(() =>
+                useSourceAction({ config: mockedConfig, isNewSource: true, bodyFormatter: asyncBodyFormatter })
+            );
+            const [, submitAction] = result.current;
+
+            const formData = new FormData();
+            formData.append('name', mockedConfig.name);
+            formData.append('source_type', mockedConfig.source_type);
+            formData.append('images_folder_path', mockedConfig.images_folder_path);
+            formData.append('ignore_existing_images', String(mockedConfig.ignore_existing_images));
+
+            await act(async () => {
+                startTransition(async () => submitAction(formData));
+            });
+
+            await waitFor(() => {
+                expect(screen.getByText('Source configuration created successfully.')).toBeVisible();
+                expect(result.current[0].id).toBe('new-id-test');
+            });
+        });
+
+        it('falls back to the previous state (not a partial body) when bodyFormatter rejects', async () => {
+            const failingBodyFormatter = async (): Promise<ImagesFolderSourceConfig> => {
+                throw { detail: 'invalid form data' };
+            };
+
+            const { result } = renderHook(() =>
+                useSourceAction({ config: mockedConfig, isNewSource: true, bodyFormatter: failingBodyFormatter })
+            );
+            const [, submitAction] = result.current;
+
+            await act(async () => {
+                startTransition(async () => submitAction(new FormData()));
+            });
+
+            await waitFor(() => {
+                expect(screen.getByText('Failed to save source configuration, invalid form data')).toBeVisible();
+                expect(result.current[0]).toEqual(mockedConfig);
+            });
+        });
+    });
 });
