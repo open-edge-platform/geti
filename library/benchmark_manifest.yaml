@@ -160,9 +160,6 @@ experiments:
       - name: yolo11_x
         priority: extended
         recipe: detection/yolo11_x.yaml
-      - name: rfdetr_2xlarge
-        priority: extended
-        recipe: detection/rfdetr_2xlarge.yaml
     datasets:
       - axial_mri
       - wgisd
@@ -230,6 +227,9 @@ experiments:
       - name: rfdetr_seg_xlarge
         priority: core
         recipe: instance_segmentation/rfdetr_seg_xlarge.yaml
+      - name: rfdetr_2xlarge
+        priority: extended
+        recipe: instance_segmentation/rfdetr_seg_2xlarge.yaml
       - name: maskrcnn_r50
         priority: extended
         recipe: instance_segmentation/maskrcnn_r50.yaml

@@ -23,7 +23,6 @@ from datumaro.experimental.data_formats.coco.sample import CocoCategories, CocoS
 from datumaro.experimental.export_import import export_dataset
 from datumaro.experimental.fields import ImageInfo, Subset
 from PIL import Image
-from sklearn.model_selection import train_test_split
 
 from getitune.benchmark.dataset_helpers import download, parse_args
 
@@ -31,7 +30,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 _REPO = "anthony2261/paddy-disease-classification"
-_REVISION = "main"
+_REVISION = "774edfc6bf92e9ca0ad29aeb5c1eccf4e9968182"
 _SPLIT_FILES = {
     "train": "data/train-00000-of-00002-a929229f3aaf7166.parquet",
     "validation": "data/train-00001-of-00002-4c2a20b9469e90df.parquet",
@@ -51,6 +50,34 @@ _LABEL_NAMES = (
 )
 
 
+def _stratified_split(
+    examples: list[tuple[dict, int]],
+    *,
+    train_ratio: float = 0.6,
+    val_ratio: float = 0.2,
+    seed: int = 42,
+) -> tuple[list[tuple[dict, int]], list[tuple[dict, int]], list[tuple[dict, int]]]:
+    """Deterministically split examples into train/val/test stratified by label."""
+    rng = np.random.default_rng(seed)
+    per_label: dict[int, list[tuple[dict, int]]] = {}
+    for example in examples:
+        per_label.setdefault(example[1], []).append(example)
+
+    train_examples: list[tuple[dict, int]] = []
+    validation_examples: list[tuple[dict, int]] = []
+    testing_examples: list[tuple[dict, int]] = []
+    for label in sorted(per_label):
+        group = per_label[label]
+        rng.shuffle(group)
+        total = len(group)
+        train_end = round(total * train_ratio)
+        val_end = train_end + round(total * val_ratio)
+        train_examples.extend(group[:train_end])
+        validation_examples.extend(group[train_end:val_end])
+        testing_examples.extend(group[val_end:])
+    return train_examples, validation_examples, testing_examples
+
+
 def _build_dataset(parquet_paths: dict[Subset, Path], images_dir: Path) -> Dataset:
     images_dir.mkdir(parents=True, exist_ok=True)
     dataset: Dataset = Dataset(CocoSample, categories={"labels": CocoCategories(labels=_LABEL_NAMES)})
@@ -66,22 +93,7 @@ def _build_dataset(parquet_paths: dict[Subset, Path], images_dir: Path) -> Datas
     if not examples:
         return dataset
 
-    labels = [label for _, label in examples]
-    train_examples, temp_examples = train_test_split(
-        examples,
-        test_size=0.4,
-        random_state=42,
-        shuffle=True,
-        stratify=labels,
-    )
-    temp_labels = [label for _, label in temp_examples]
-    validation_examples, testing_examples = train_test_split(
-        temp_examples,
-        test_size=0.5,
-        random_state=42,
-        shuffle=True,
-        stratify=temp_labels,
-    )
+    train_examples, validation_examples, testing_examples = _stratified_split(examples)
 
     image_id = 0
     for subset, subset_examples in (
@@ -117,6 +129,7 @@ def _build_dataset(parquet_paths: dict[Subset, Path], images_dir: Path) -> Datas
 
 
 def main() -> None:
+    """Prepare the paddy_disease benchmark dataset."""
     args = parse_args(description="Prepare the paddy_disease benchmark dataset.")
     parquet_paths: dict[Subset, Path] = {}
     for split, path in _SPLIT_FILES.items():

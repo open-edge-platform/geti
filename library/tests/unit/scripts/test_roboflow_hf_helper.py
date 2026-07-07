@@ -19,7 +19,7 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
-from datumaro.experimental.categories import LabelCategories
+from datumaro.experimental.categories import LabelCategories, MaskCategories
 from datumaro.experimental.export_import import import_dataset
 from datumaro.experimental.fields import Subset
 from PIL import Image
@@ -259,7 +259,7 @@ def test_prepare_roboflow_hf_dataset_with_segmentation(
 ) -> None:
     """``include_segmentation=True`` preserves polygons and they rasterize correctly."""
 
-    def fake_download(url: str, dest_dir: Path, filename: str | None = None) -> Path:  # noqa: ARG001
+    def fake_download(url: str, dest_dir: Path, filename: str | None = None) -> Path:
         assert filename is not None
         dest_dir.mkdir(parents=True, exist_ok=True)
         dest = dest_dir / filename
@@ -290,8 +290,9 @@ def test_prepare_roboflow_hf_dataset_with_segmentation(
     # Polygons must rasterize into a per-pixel mask (background=0, cat_a=1, cat_b=2),
     # not a bbox-derived rectangle approximation.
     seg_dataset = dataset.convert_to_schema(SegmentationSample)
-    mask_labels = seg_dataset.schema.attributes["masks"].categories.labels
-    assert tuple(mask_labels) == ("background", "cat_a", "cat_b")
+    mask_categories = seg_dataset.schema.attributes["masks"].categories
+    assert isinstance(mask_categories, MaskCategories)
+    assert tuple(mask_categories.labels) == ("background", "cat_a", "cat_b")
 
     mask = seg_dataset[0].masks[0].numpy()
     assert mask[0, 0] == 1  # inside the cat_a quadrant

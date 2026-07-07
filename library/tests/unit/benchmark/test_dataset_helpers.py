@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 import io
-import subprocess
 import sys
 import tarfile
 import zipfile
@@ -280,13 +279,15 @@ class TestHasKaggleCredentials:
 
 class TestDownloadKaggleDataset:
     def test_raises_when_cli_missing(self, tmp_path: Path) -> None:
-        with patch.dict(sys.modules, {"kagglehub": None}):
-            with pytest.raises(RuntimeError, match="not installed"):
-                download_kaggle_dataset("owner/dataset")
+        with (
+            patch.dict(sys.modules, {"kagglehub": None}),
+            pytest.raises(RuntimeError, match="not installed"),
+        ):
+            download_kaggle_dataset("owner/dataset")
 
     def test_raises_when_credentials_missing(self, tmp_path: Path) -> None:
         kagglehub = ModuleType("kagglehub")
-        kagglehub.dataset_download = lambda dataset_id: tmp_path / "unused"  # type: ignore[assignment]
+        kagglehub.dataset_download = lambda _: tmp_path / "unused"  # type: ignore[assignment]
         with (
             patch.dict(sys.modules, {"kagglehub": kagglehub}),
             patch("getitune.benchmark.dataset_helpers._has_kaggle_credentials", return_value=False),
@@ -298,7 +299,7 @@ class TestDownloadKaggleDataset:
         kagglehub = ModuleType("kagglehub")
         kagglehub_path = tmp_path / "kagglehub_dataset"
         kagglehub_path.mkdir()
-        kagglehub.dataset_download = lambda dataset_id: str(kagglehub_path)  # type: ignore[assignment]
+        kagglehub.dataset_download = lambda _: str(kagglehub_path)  # type: ignore[assignment]
 
         with (
             patch.dict(sys.modules, {"kagglehub": kagglehub}),

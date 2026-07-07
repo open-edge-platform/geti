@@ -65,8 +65,8 @@ datasets:
   - name: chest_ct
     script: "scripts/benchmark_datasets/prepare_chest_ct.py"
     size_tier: medium
-    url: "https://huggingface.co/datasets/Mahadih534/Chest_CT-Scan_images-Dataset"
-    description: "Chest CT Scan Images — public HF mirror of a 4-class chest CT classification dataset."
+    url: "https://github.com/shreyabandyopadhyay/CTScanImageClassification/blob/main/DS3.zip"
+    description: "Chest CT Scan Images — public 3-class (abdomen/chest/head) body-part CT classification dataset."
     compatible_tasks:
       - classification/multi_class_cls
 

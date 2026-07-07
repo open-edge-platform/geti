@@ -231,7 +231,7 @@ jobs:
         working-directory: library
         env:
           GIT_LFS_SKIP_SMUDGE: "1"
-        run: just venv
+        run: just venv-benchmark
 
       - name: Run benchmark dataset script tests
         working-directory: library

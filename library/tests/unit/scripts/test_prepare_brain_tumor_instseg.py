@@ -25,13 +25,13 @@ from pathlib import Path
 import pytest
 from datumaro.experimental.export_import import import_dataset
 from PIL import Image
-
-from getitune.benchmark.dataset_helpers import _has_kaggle_credentials
 from scripts.benchmark_datasets.prepare_brain_tumor_instseg import (
     _find_yolo_root,
     _load_label_names,
     _parse_yolo_segmentation_label,
 )
+
+from getitune.benchmark.dataset_helpers import _has_kaggle_credentials
 
 _SCRIPT = Path(__file__).resolve().parents[3] / "scripts" / "benchmark_datasets" / "prepare_brain_tumor_instseg.py"
 

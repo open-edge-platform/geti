@@ -23,12 +23,16 @@ Mirror: https://huggingface.co/datasets/varcoder/crack-segmentation-dataset
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
-from hf_mask_helper import prepare_hf_mask_dataset
 from datumaro.experimental.fields import Subset
-from PIL import Image as PILImage
+from hf_mask_helper import prepare_hf_mask_dataset
 
 from getitune.benchmark.dataset_helpers import parse_args
+
+if TYPE_CHECKING:
+    from PIL import Image as PILImage
 
 # Pinned commit of the mirror's ``main`` branch for reproducibility.
 _REPO = "varcoder/crack-segmentation-dataset"

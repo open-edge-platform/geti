@@ -91,10 +91,12 @@ def _segmentation_to_polygons(segmentation: list[list[list[float]]] | None, num_
         return None
 
     polygons = np.empty(num_instances, dtype=object)
-    for idx, rings in enumerate(segmentation):
-        polygons[idx] = (
-            np.asarray(rings[0], dtype=np.float32).reshape(-1, 2) if rings else np.zeros((0, 2), dtype=np.float32)
-        )
+    for idx in range(num_instances):
+        if idx < len(segmentation) and segmentation[idx]:
+            rings = segmentation[idx]
+            polygons[idx] = np.asarray(rings[0], dtype=np.float32).reshape(-1, 2)
+        else:
+            polygons[idx] = np.zeros((0, 2), dtype=np.float32)
     return polygons
 
 
