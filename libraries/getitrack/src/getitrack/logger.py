@@ -24,3 +24,4 @@ def enable_logging(level: int = logging.INFO) -> None:
         handler = logging.StreamHandler()
         handler.setFormatter(logging.Formatter("%(message)s"))
         LOGGER.addHandler(handler)
+        LOGGER.propagate = False
