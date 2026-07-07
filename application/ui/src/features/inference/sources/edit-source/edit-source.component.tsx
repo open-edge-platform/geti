@@ -20,6 +20,7 @@ interface EditSourceProps<T> {
     onBackToList: () => void;
     componentFields: (state: Awaited<T>) => ReactNode;
     bodyFormatter: (formData: FormData) => T;
+    prepareFormData?: (formData: FormData) => Promise<void>;
     isConnected: boolean;
 }
 
@@ -28,6 +29,7 @@ export const EditSource = <T extends SourceConfigPayload>({
     onSaved,
     onBackToList,
     bodyFormatter,
+    prepareFormData,
     componentFields,
     isConnected,
 }: EditSourceProps<T>) => {
@@ -45,6 +47,7 @@ export const EditSource = <T extends SourceConfigPayload>({
             void queryClient.fetchQuery(testSourceQueryOptions(sourceId)).catch(() => undefined);
         },
         bodyFormatter,
+        prepareFormData,
     });
 
     return (
