@@ -13,7 +13,7 @@ interface useSourceActionProps<T> {
     config: Awaited<T>;
     isNewSource: boolean;
     onSaved?: (source_id: string) => void;
-    bodyFormatter: (formData: FormData) => T;
+    bodyFormatter: (formData: FormData) => T | Promise<T>;
 }
 
 export const useSourceAction = <T extends SourceConfigPayload>({
@@ -24,10 +24,9 @@ export const useSourceAction = <T extends SourceConfigPayload>({
 }: useSourceActionProps<T>) => {
     const addOrUpdateSource = useSourceMutation(isNewSource);
 
-    return useActionState<T, FormData>(async (_prevState: T, formData: FormData) => {
-        const body = bodyFormatter(formData);
-
+    return useActionState<T, FormData>(async (prevState: T, formData: FormData) => {
         try {
+            const body = await bodyFormatter(formData);
             const source_id = await addOrUpdateSource(body);
 
             toast({
@@ -46,6 +45,6 @@ export const useSourceAction = <T extends SourceConfigPayload>({
             });
         }
 
-        return body;
+        return prevState;
     }, config);
 };

@@ -13,7 +13,7 @@ interface AddSourceProps<T> {
     config: Awaited<T>;
     onSaved: () => void;
     componentFields: (state: Awaited<T>) => ReactNode;
-    bodyFormatter: (formData: FormData) => T;
+    bodyFormatter: (formData: FormData) => T | Promise<T>;
 }
 
 export const AddSource = <T extends SourceConfigPayload>({

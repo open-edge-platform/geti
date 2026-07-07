@@ -19,7 +19,7 @@ interface EditSourceProps<T> {
     onSaved: () => void;
     onBackToList: () => void;
     componentFields: (state: Awaited<T>) => ReactNode;
-    bodyFormatter: (formData: FormData) => T;
+    bodyFormatter: (formData: FormData) => T | Promise<T>;
     isConnected: boolean;
 }
 

@@ -74,11 +74,3 @@ export const useSourceMutation = (isNewSource: boolean) => {
         return sourceId;
     };
 };
-
-export const useUploadSourceMedia = () => {
-    return $api.useMutation('post', '/api/sources/media', {
-        meta: {
-            invalidateQueries: [['get', '/api/sources']],
-        },
-    });
-};
