@@ -23,7 +23,8 @@ from getitrack.core.detection import Detections, TrackedDetections
 from getitrack.core.registry import register_algorithm
 from getitrack.core.track import Track, TrackState
 from getitrack.matching import fuse_score, iou_distance, linear_assignment
-from getitrack.motion import KalmanFilter, xyah_to_xyxy, xyxy_to_xyah
+from getitrack.motion import KalmanFilter
+from getitrack.utils import xyah_to_xyxy, xyxy_to_xyah
 
 if TYPE_CHECKING:
     from getitrack.config import LifecycleConfig
