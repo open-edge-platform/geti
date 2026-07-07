@@ -455,6 +455,24 @@ class TestIterExperimentsAdvanced:
         # Without size_tier_map, size_tiers filter is a no-op
         assert len(exps_filtered) == len(exps_all)
 
+    def test_data_group_filter(self, manifest: BenchmarkManifest) -> None:
+        """Data group filter should exclude datasets restricted to another lane."""
+        data_group_map = {"pothole_tiny": "weekly", "wgisd_small": "extended", "pneumonia_tiny": "all"}
+        f = ManifestFilters(data_groups=["weekly"])
+        exps = list(iter_experiments(manifest, f, data_group_map=data_group_map))
+        ds_names = {e.dataset_name for e in exps}
+        # "weekly" explicitly matches; "all" (default) always matches; "extended" is excluded.
+        assert "wgisd_small" not in ds_names
+        assert "pothole_tiny" in ds_names
+        assert "pneumonia_tiny" in ds_names
+
+    def test_data_group_filter_no_map(self, manifest: BenchmarkManifest) -> None:
+        """Data group filter without a map should not filter anything."""
+        f = ManifestFilters(data_groups=["weekly"])
+        exps_filtered = list(iter_experiments(manifest, f))
+        exps_all = list(iter_experiments(manifest))
+        assert len(exps_filtered) == len(exps_all)
+
 
 # ---------------------------------------------------------------------------
 # Scenario details

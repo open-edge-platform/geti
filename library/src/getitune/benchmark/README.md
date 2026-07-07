@@ -49,14 +49,15 @@ Run commands from `library/`.
 
 The `Model Benchmark` GitHub workflow runs in two modes: a weekly scheduled run and a manual run.
 
-| Trigger             | Timeline                  | Source ref                   | Model groups / categories                                            | Dataset size tiers          | Scenario                   | Eval phase                                    | Seeds                       | Accelerators                   |
-| ------------------- | ------------------------- | ---------------------------- | -------------------------------------------------------------------- | --------------------------- | -------------------------- | --------------------------------------------- | --------------------------- | ------------------------------ |
-| `schedule`          | Every Friday, `19:00 UTC` | `develop`                    | `core,extended`                                                      | `tiny,small,medium,large`   | `default`                  | `optimize`                                    | `2`                         | `gpu` and `xpu`                |
-| `workflow_dispatch` | On demand                 | User-selected (`source_ref`) | User-selected (`core`, `core,extended`, `core,extended,exploratory`) | User-selected (`size_tier`) | User-selected (`scenario`) | User-selected (`train`, `export`, `optimize`) | User-selected (`num_seeds`) | User-selected (`gpu` or `xpu`) |
+| Trigger             | Timeline                  | Source ref                   | Model groups / categories                                            | Dataset size tiers          | Dataset data group          | Scenario                   | Eval phase                                    | Seeds                       | Accelerators                   |
+| ------------------- | ------------------------- | ---------------------------- | -------------------------------------------------------------------- | --------------------------- | ---------------------------- | --------------------------- | --------------------------------------------- | --------------------------- | ------------------------------ |
+| `schedule`          | Every Friday, `19:00 UTC` | `develop`                    | `core,extended`                                                      | `tiny,small,medium,large`   | `weekly`                    | `default`                  | `optimize`                                    | `2`                         | `gpu` and `xpu`                |
+| `workflow_dispatch` | On demand                 | User-selected (`source_ref`) | User-selected (`core`, `core,extended`, `core,extended,deferred`)    | User-selected (`size_tier`) | User-selected (`data_group`) | User-selected (`scenario`) | User-selected (`train`, `export`, `optimize`) | User-selected (`num_seeds`) | User-selected (`gpu` or `xpu`) |
 
 ### Rotation and timeline details
 
 - Weekly runs use model rotation for `extended` priority models.
+- Weekly runs use `--data-group weekly`, which selects only datasets explicitly marked `data_group: weekly` in the catalog rather than every dataset.
 - Rotation group is computed as `ISO week number % extended_groups`.
 - `extended_groups` is read from `benchmark_manifest.yaml` (`defaults.rotation.extended_groups`, currently `2`).
 - `core` models are not rotated and are always included when `priority=core,extended`.
@@ -150,6 +151,11 @@ datasets:
     compatible_tasks:
       - detection
 ```
+
+`size_tier` normally reflects rough dataset size (`tiny`, `small`, `medium`, `large`).
+`data_group` (`weekly`, `extended`, or `all` — default `all` when omitted) controls which
+benchmark lane(s) include the dataset: `weekly` datasets only run in weekly-scheduled
+benchmarks, `extended` datasets only run in extended/full runs, and `all` runs in both.
 
 Manifest reference example (`benchmark_manifest.yaml`):
 

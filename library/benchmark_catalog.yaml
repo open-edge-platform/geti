@@ -26,6 +26,11 @@
 #                 transform/export logic. If the path doesn't exist, the
 #                 script falls back to its normal download behavior.
 #   size_tier   – tiny | small | medium | large
+#                 rough dataset size.
+#   data_group  – weekly | extended | all (default: all, may be omitted)
+#                 `weekly` datasets are only included in weekly-benchmark runs;
+#                 `extended` datasets are only included in extended/full runs;
+#                 `all` (the default) is included in both.
 #   url         – upstream source the preparation script downloads from
 #
 # See src/getitune/benchmark/README.md ("Datasets requiring credentials or
@@ -37,6 +42,7 @@ datasets:
   - name: wgisd
     script: "scripts/benchmark_datasets/prepare_wgisd.py"
     size_tier: small
+    data_group: weekly
     url: "https://github.com/thsant/wgisd"
     description: "Wine Grape Instance Segmentation Dataset — 137 images of grape clusters with COCO-style polygon annotations (5 varieties)."
     compatible_tasks:
@@ -57,6 +63,7 @@ datasets:
   - name: paddy_disease
     script: "scripts/benchmark_datasets/prepare_paddy_disease.py"
     size_tier: small
+    data_group: weekly
     url: "https://huggingface.co/datasets/anthony2261/paddy-disease-classification"
     description: "Paddy Disease Classification — public HF mirror of a rice disease dataset with image-level class labels."
     compatible_tasks:
@@ -74,6 +81,7 @@ datasets:
     script: "scripts/benchmark_datasets/prepare_aircraft.py"
     raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/aircraft_raw"
     size_tier: large
+    data_group: weekly
     url: "https://www.kaggle.com/datasets/seryouxblaster764/fgvc-aircraft"
     description: >-
       FGVC-Aircraft — 10,200 aircraft images with official train/val/test splits and
@@ -117,6 +125,7 @@ datasets:
   - name: bccd
     script: "scripts/benchmark_datasets/prepare_bccd.py"
     size_tier: small
+    data_group: weekly
     url: "https://github.com/Shenggan/BCCD_Dataset"
     description: "Blood Cell Count and Detection — 364 microscopy blood-smear images with Pascal VOC bounding-box annotations for 3 cell types (RBC, WBC, Platelets)."
     compatible_tasks:
@@ -125,6 +134,7 @@ datasets:
   - name: aid_multilabel
     script: "scripts/benchmark_datasets/prepare_aid_multilabel.py"
     size_tier: medium
+    data_group: weekly
     url: "https://huggingface.co/datasets/jonathan-roberts1/AID_MultiLabel"
     description: "AID Multi-Label — 3,000 overhead aerial-scene images (600×600) with multi-label annotations across 17 co-occurring land-cover classes."
     compatible_tasks:
@@ -157,6 +167,7 @@ datasets:
   - name: pothole
     script: "scripts/benchmark_datasets/prepare_pothole.py"
     size_tier: tiny
+    data_group: weekly
     url: "https://huggingface.co/datasets/keremberke/pothole-segmentation"
     description: "Pothole Segmentation — 90 road-surface images with polygon annotations for potholes. Tiny real-world segmentation benchmark."
     compatible_tasks:
@@ -167,6 +178,7 @@ datasets:
   - name: pcb_defect
     script: "scripts/benchmark_datasets/prepare_pcb_defect.py"
     size_tier: small
+    data_group: weekly
     url: "https://huggingface.co/datasets/keremberke/pcb-defect-segmentation"
     description: "PCB Defect Segmentation — 189 close-up PCB images with polygon annotations across 4 defect classes. Small industrial segmentation benchmark."
     compatible_tasks:
@@ -187,6 +199,7 @@ datasets:
   - name: corrosion
     script: "scripts/benchmark_datasets/prepare_corrosion.py"
     size_tier: tiny
+    data_group: weekly
     url: "https://huggingface.co/datasets/rkumari/corrosion_segment"
     description: "Corrosion segmentation — 44 images with per-pixel severity masks across 4 classes. Tiny semantic-segmentation benchmark."
     compatible_tasks:
@@ -195,6 +208,7 @@ datasets:
   - name: crack_semantic
     script: "scripts/benchmark_datasets/prepare_crack_semantic.py"
     size_tier: large
+    data_group: weekly
     url: "https://huggingface.co/datasets/varcoder/crack-segmentation-dataset"
     description: "Crack segmentation — 11,298 images with binary crack masks. Large semantic-segmentation benchmark."
     compatible_tasks:

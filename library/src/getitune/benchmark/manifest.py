@@ -165,6 +165,7 @@ class ManifestFilters:
     models: list[str] | None = None
     datasets: list[str] | None = None
     size_tiers: list[str] | None = None
+    data_groups: list[str] | None = None
     priorities: list[str] | None = None
     scenarios: list[str] | None = None
     scenario_tags: list[str] | None = None
@@ -268,6 +269,7 @@ def iter_experiments(
     catalog_names: set[str] | None = None,
     *,
     size_tier_map: dict[str, str] | None = None,
+    data_group_map: dict[str, str] | None = None,
 ) -> Iterator[Experiment]:
     """Yield :class:`Experiment` instances after applying runtime filters.
 
@@ -281,6 +283,10 @@ def iter_experiments(
             catalog.  When provided together with
             ``filters.size_tiers``, datasets whose tier is not in the
             filter are excluded.
+        data_group_map: Mapping of ``{dataset_name: data_group}`` from the
+            catalog.  When provided together with ``filters.data_groups``,
+            datasets whose data_group is not ``"all"`` and not in the filter
+            are excluded.
     """
     f = filters or ManifestFilters()
 
@@ -321,6 +327,12 @@ def iter_experiments(
                     if f.size_tiers and size_tier_map:
                         tier = size_tier_map.get(ds_name)
                         if tier is None or tier not in f.size_tiers:
+                            continue
+                    # Data-group filtering: cross-reference the catalog data_group;
+                    # entries with data_group "all" (the default) always pass.
+                    if f.data_groups and data_group_map:
+                        group = data_group_map.get(ds_name, "all")
+                        if group != "all" and group not in f.data_groups:
                             continue
                     # Scenario may restrict datasets
                     if scenario.datasets and ds_name not in scenario.datasets:

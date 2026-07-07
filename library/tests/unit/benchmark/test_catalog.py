@@ -33,6 +33,10 @@ def catalog_yaml(tmp_path: Path) -> Path:
     content = textwrap.dedent("""\
         version: 1
         datasets:
+          - name: ds_weekly
+            script: "scripts/benchmark_datasets/prepare_ds_weekly.py"
+            size_tier: medium
+            data_group: weekly
           - name: ds_tiny
             script: "scripts/benchmark_datasets/prepare_ds_tiny.py"
             size_tier: tiny
@@ -63,16 +67,22 @@ class TestLoadCatalog:
         assert catalog.version == 1
 
     def test_parses_all_entries(self, catalog: DatasetCatalog) -> None:
-        assert len(catalog.all_entries()) == 3
+        assert len(catalog.all_entries()) == 4
 
     def test_dataset_keys(self, catalog: DatasetCatalog) -> None:
-        assert set(catalog.datasets.keys()) == {"ds_tiny", "ds_small", "cls_tiny"}
+        assert set(catalog.datasets.keys()) == {"ds_weekly", "ds_tiny", "ds_small", "cls_tiny"}
 
     def test_entry_fields(self, catalog: DatasetCatalog) -> None:
         entry = catalog.get("ds_tiny")
         assert entry.name == "ds_tiny"
         assert entry.script == "scripts/benchmark_datasets/prepare_ds_tiny.py"
         assert entry.size_tier == "tiny"
+
+    def test_data_group_defaults_to_all(self, catalog: DatasetCatalog) -> None:
+        assert catalog.get("ds_tiny").data_group == "all"
+
+    def test_data_group_explicit_value(self, catalog: DatasetCatalog) -> None:
+        assert catalog.get("ds_weekly").data_group == "weekly"
 
     def test_get_unknown_raises(self, catalog: DatasetCatalog) -> None:
         with pytest.raises(KeyError, match="not_real"):
@@ -103,6 +113,17 @@ class TestCatalogFilter:
 
     def test_no_match_returns_empty(self, catalog: DatasetCatalog) -> None:
         assert catalog.filter(size_tiers=["large"]) == []
+
+    def test_filter_by_data_group_weekly_matches_explicit_and_default(self, catalog: DatasetCatalog) -> None:
+        results = catalog.filter(data_groups=["weekly"])
+        names = {e.name for e in results}
+        # ds_weekly is explicitly "weekly"; the rest default to "all" and always match.
+        assert names == {"ds_weekly", "ds_tiny", "ds_small", "cls_tiny"}
+
+    def test_filter_by_data_group_extended_excludes_weekly_only(self, catalog: DatasetCatalog) -> None:
+        results = catalog.filter(data_groups=["extended"])
+        names = {e.name for e in results}
+        assert names == {"ds_tiny", "ds_small", "cls_tiny"}
 
 
 # ---------------------------------------------------------------------------
@@ -501,7 +522,7 @@ class TestLoadCatalogExtras:
     def test_filter_no_args_returns_all(self, catalog: DatasetCatalog) -> None:
         """Calling filter with no arguments returns everything."""
         results = catalog.filter()
-        assert len(results) == 3
+        assert len(results) == 4
 
 
 # ---------------------------------------------------------------------------

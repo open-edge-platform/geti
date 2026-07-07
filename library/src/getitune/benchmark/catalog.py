@@ -51,6 +51,7 @@ class DatasetEntry:
     script: str | None = None  # path to preparation script (relative to repo root)
     local_path: str | None = None  # pre-existing directory; alternative to `script`
     raw_dir: str | None = None  # optional pre-fetched raw input, forwarded to `script` as --raw-dir
+    data_group: str = "all"  # weekly | extended | all - which benchmark lane(s) include this dataset
     extra: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -87,12 +88,20 @@ class DatasetCatalog:
         self,
         *,
         size_tiers: list[str] | None = None,
+        data_groups: list[str] | None = None,
         names: set[str] | None = None,
     ) -> list[DatasetEntry]:
-        """Return entries matching **all** supplied filters."""
+        """Return entries matching **all** supplied filters.
+
+        A dataset with ``data_group: all`` (the default) always matches any
+        requested *data_groups* filter; only entries explicitly restricted to
+        ``weekly`` or ``extended`` are excluded from the other lane.
+        """
         results: list[DatasetEntry] = []
         for entry in self.datasets.values():
             if size_tiers and entry.size_tier not in size_tiers:
+                continue
+            if data_groups and entry.data_group != "all" and entry.data_group not in data_groups:
                 continue
             if names and entry.name not in names:
                 continue
