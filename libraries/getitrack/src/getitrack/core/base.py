@@ -92,7 +92,7 @@ class BaseTracker(ABC, Generic[ConfigT]):
             )
         )
         LOGGER.info(
-            "frame {:4}: {} detections, {} tracks [id:class:score {}]",
+            "frame %4d: %d detections, %d tracks [id:class:score %s]",
             detections.frame_id,
             len(detections),
             len(tracked),

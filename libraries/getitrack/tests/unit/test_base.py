@@ -4,17 +4,18 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterator
 from pathlib import Path
 
 import numpy as np
 import pytest
-from loguru import logger
 
 from getitrack.config import AlgorithmType, LifecycleConfig, TrackerConfig
 from getitrack.core.base import BaseTracker
 from getitrack.core.detection import Detections, TrackedDetections
 from getitrack.core.registry import ALGORITHM_REGISTRY, register_algorithm
+from getitrack.logger import LOGGER
 
 
 class _DummyConfig(TrackerConfig):
@@ -41,18 +42,18 @@ class _Recording(BaseTracker):
 
 @pytest.fixture(autouse=True)
 def _clean_registry() -> Iterator[None]:
-    """Snapshot and restore the registry around each test.
+    """Restore the registry and reset the getitrack logger after each test.
 
-    Also restores loguru's default-disabled state for ``getitrack``, since
-    a ``verbose`` tracker enables it process-wide.
+    A ``verbose`` tracker mutates the process-wide logger, so its handlers and
+    level are reset to the silent default.
     """
     snapshot = dict(ALGORITHM_REGISTRY)
     ALGORITHM_REGISTRY.clear()
-    logger.disable("getitrack")
     yield
     ALGORITHM_REGISTRY.clear()
     ALGORITHM_REGISTRY.update(snapshot)
-    logger.disable("getitrack")
+    LOGGER.handlers = [h for h in LOGGER.handlers if isinstance(h, logging.NullHandler)]
+    LOGGER.setLevel(logging.NOTSET)
 
 
 def _register_dummy(name: str = "bytetrack") -> type[BaseTracker]:
@@ -203,42 +204,26 @@ class TestVerboseLogging:
             frame_id=4,
         )
 
-    def _capture(self, level: str = "INFO") -> tuple[list[str], int]:
-        messages: list[str] = []
-        sink_id = logger.add(messages.append, level=level, format="{message}")
-        return messages, sink_id
-
-    def test_verbose_logs_frame_summary(self):
+    def test_verbose_logs_frame_summary(self, caplog: pytest.LogCaptureFixture):
         _register_dummy("bytetrack")
-        messages, sink_id = self._capture()
-        try:
+        with caplog.at_level(logging.INFO, logger="getitrack"):
             BaseTracker.from_config(_DummyConfig(verbose=True)).update(self._dets())
-        finally:
-            logger.remove(sink_id)
-        assert len(messages) == 1
-        msg = messages[0]
+        assert len(caplog.records) == 1
+        msg = caplog.records[0].getMessage()
         assert "frame    4" in msg
         assert "2 detections" in msg
         assert "1:3:0.90, 2:8:0.30" in msg
 
-    def test_default_is_silent(self):
+    def test_default_is_silent(self, caplog: pytest.LogCaptureFixture):
         _register_dummy("bytetrack")
-        messages, sink_id = self._capture(level="DEBUG")
-        try:
+        with caplog.at_level(logging.DEBUG, logger="getitrack"):
             BaseTracker.from_config(_DummyConfig()).update(self._dets())
-        finally:
-            logger.remove(sink_id)
-        assert not messages
+        assert not caplog.records
 
-    def test_verbose_enables_package_logging(self):
+    def test_verbose_enables_package_logging(self, caplog: pytest.LogCaptureFixture):
         _register_dummy("bytetrack")
-        messages, sink_id = self._capture()
-        try:
-            # A non-verbose tracker stays suppressed even with a sink attached.
+        with caplog.at_level(logging.INFO, logger="getitrack"):
             BaseTracker.from_config(_DummyConfig()).update(self._dets())
-            assert not messages
-            # A verbose tracker lifts the package-level suppression.
+            assert not caplog.records
             BaseTracker.from_config(_DummyConfig(verbose=True)).update(self._dets())
-            assert len(messages) == 1
-        finally:
-            logger.remove(sink_id)
+            assert len(caplog.records) == 1
