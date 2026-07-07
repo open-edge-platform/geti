@@ -44,7 +44,7 @@ datasets:
       - detection # polygons → bounding boxes
       - rotated_detection # polygons → oriented bounding boxes
       - semantic_segmentation # polygons → pixel masks
-      - classification/multi_class_cls # crop-level or image-level class from category
+      - classification/multi_label_cls # crop-level or image-level class from category
 
   - name: flowers102
     script: "scripts/benchmark_datasets/prepare_flowers102.py"
@@ -64,7 +64,7 @@ datasets:
 
   - name: chest_ct
     script: "scripts/benchmark_datasets/prepare_chest_ct.py"
-    size_tier: medium
+    size_tier: large
     url: "https://github.com/shreyabandyopadhyay/CTScanImageClassification/blob/main/DS3.zip"
     description: "Chest CT Scan Images — public 3-class (abdomen/chest/head) body-part CT classification dataset."
     compatible_tasks:
@@ -132,7 +132,7 @@ datasets:
 
   - name: axial_mri
     script: "scripts/benchmark_datasets/prepare_axial_mri.py"
-    size_tier: tiny
+    size_tier: small
     url: "https://huggingface.co/datasets/Francesco/axial-mri"
     description: "Axial MRI (Roboflow-100) — 371 brain axial-MRI slices with tumour bounding-box annotations (negative/positive). Tiny, privacy-safe medical detection benchmark."
     compatible_tasks:
