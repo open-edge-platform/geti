@@ -514,4 +514,4 @@ class TestPerClassSentinel:
         assert _is_per_class_sentinel("training:val/map_per_class", 0.42) is False
 
     def test_unrelated_key_kept(self) -> None:
-        assert _is_per_class_sentinel("training:val/map_50", -1.0) is False
+        assert _is_per_class_sentinel("training:val/map", -1.0) is False

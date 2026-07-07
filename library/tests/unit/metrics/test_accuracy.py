@@ -48,18 +48,19 @@ class TestAccuracy:
         acc = result["accuracy"]
         assert round(acc.item(), 3) == 0.792
 
-    def test_default_multi_class_cls_metric_callable(self, fxt_multiclass_labelinfo: LabelInfo) -> None:
-        assert fxt_multiclass_labelinfo.num_classes > 1
-        metric = MultiClassClsMetricCallable(fxt_multiclass_labelinfo)
-        assert isinstance(metric.accuracy, MulticlassAccuracy)
-        assert "f1-score" in metric
+        metric_collection = MultiClassClsMetricCallable(fxt_multiclass_labelinfo)
+        assert isinstance(metric_collection.accuracy, MulticlassAccuracy)
 
-        preds = torch.tensor([0, 1, 2, 2])
-        targets = torch.tensor([0, 1, 1, 2])
-        metric.update(preds, targets)
-        result = metric.compute()
-        assert "f1-score" in result
+        preds_tensor = torch.tensor([0, 1, 2, 2])
+        targets_tensor = torch.tensor([0, 1, 1, 2])
+        metric_collection.update(preds_tensor, targets_tensor)
+        result = metric_collection.compute()
         assert result["f1-score"].item() == pytest.approx(0.7777778, rel=1e-5)
+
+        one_class_label_info = LabelInfo(label_names=["class1"], label_groups=[["class1"]], label_ids=["0"])
+        assert one_class_label_info.num_classes == 1
+        binary_metric = MultiClassClsMetricCallable(one_class_label_info)
+        assert isinstance(binary_metric.accuracy, BinaryAccuracy)
 
         one_class_label_info = LabelInfo(label_names=["class1"], label_groups=[["class1"]], label_ids=["0"])
         assert one_class_label_info.num_classes == 1

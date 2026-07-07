@@ -10,12 +10,12 @@ from typing import TYPE_CHECKING, Any, Callable, Literal, Sequence
 import torch
 from torch import nn
 from torchmetrics import ConfusionMatrix, Metric
+from torchmetrics.classification import BinaryF1Score as TorchmetricBinaryF1
+from torchmetrics.classification import MulticlassF1Score as TorchmetricMulticlassF1
 from torchmetrics.classification.accuracy import Accuracy as TorchmetricAcc
 from torchmetrics.classification.accuracy import (
     MultilabelAccuracy as TorchmetricMultilabelAcc,
 )
-from torchmetrics.classification import BinaryF1Score as TorchmetricBinaryF1
-from torchmetrics.classification import MulticlassF1Score as TorchmetricMulticlassF1
 from torchmetrics.collections import MetricCollection
 
 from getitune.metrics.types import MetricCallable
