@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Any, Callable, Literal, Sequence
 import torch
 from torch import nn
 from torchmetrics import ConfusionMatrix, Metric
-from torchmetrics.classification import BinaryF1Score as TorchmetricBinaryF1
 from torchmetrics.classification import MulticlassF1Score as TorchmetricMulticlassF1
 from torchmetrics.classification.accuracy import Accuracy as TorchmetricAcc
 from torchmetrics.classification.accuracy import (
@@ -356,14 +355,17 @@ class MixedHLabelAccuracy(Metric):
 
 def _multi_class_cls_metric_callable(label_info: LabelInfo) -> MetricCollection:
     num_classes = label_info.num_classes
-    f1_metric: Metric
-    if num_classes == 1:
-        f1_metric = TorchmetricBinaryF1()
-    else:
-        f1_metric = TorchmetricMulticlassF1(num_classes=num_classes, average="macro")
+    if num_classes < 2:
+        msg = (
+            "Multiclass classification requires at least 2 classes. "
+            "Use Multilabel classification for single class problems."
+        )
+        raise ValueError(msg)
+
+    f1_metric: Metric = TorchmetricMulticlassF1(num_classes=num_classes, average="macro")
     return MetricCollection(
         {
-            "accuracy": TorchmetricAcc(task="binary" if num_classes == 1 else "multiclass", num_classes=num_classes),
+            "accuracy": TorchmetricAcc(task="multiclass", num_classes=num_classes),
             "f1-score": f1_metric,
         },
     )

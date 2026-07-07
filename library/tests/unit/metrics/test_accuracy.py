@@ -57,15 +57,10 @@ class TestAccuracy:
         result = metric_collection.compute()
         assert result["f1-score"].item() == pytest.approx(0.7777778, rel=1e-5)
 
-        one_class_label_info = LabelInfo(label_names=["class1"], label_groups=[["class1"]], label_ids=["0"])
-        assert one_class_label_info.num_classes == 1
-        binary_metric = MultiClassClsMetricCallable(one_class_label_info)
-        assert isinstance(binary_metric.accuracy, BinaryAccuracy)
-
-        one_class_label_info = LabelInfo(label_names=["class1"], label_groups=[["class1"]], label_ids=["0"])
-        assert one_class_label_info.num_classes == 1
-        binary_metric = MultiClassClsMetricCallable(one_class_label_info)
-        assert isinstance(binary_metric.accuracy, BinaryAccuracy)
+    def test_single_class_multiclass_metric_rejected(self) -> None:
+        label_info = LabelInfo(label_names=["class1"], label_groups=[["class1"]], label_ids=["0"])
+        with pytest.raises(ValueError, match="Multiclass classification requires at least 2 classes"):
+            MultiClassClsMetricCallable(label_info)
 
     def test_multilabel_accuracy(self, fxt_multilabel_labelinfo: LabelInfo) -> None:
         """Check whether accuracy is same with getitune 1.x version."""
