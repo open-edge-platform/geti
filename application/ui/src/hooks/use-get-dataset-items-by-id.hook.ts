@@ -11,20 +11,37 @@ type UseGetDatasetItemsByIdOptions = {
     annotationStatus?: DatasetItemAnnotationStatus;
     sortDirection?: SortDirection;
     subsets?: DatasetSubset[];
+    labelIds?: string[];
+    startDate?: string;
+    endDate?: string;
 };
 
-export const useGetDatasetItemsById = ({ annotationStatus, sortDirection, subsets }: UseGetDatasetItemsByIdOptions) => {
-    const { items, ...response } = useGetDatasetItems({ annotationStatus, sortDirection, subsets });
+export const useGetDatasetItemsById = ({
+    annotationStatus,
+    sortDirection,
+    subsets,
+    labelIds,
+    startDate,
+    endDate,
+}: UseGetDatasetItemsByIdOptions) => {
+    const datasetItemsQuery = useGetDatasetItems({
+        annotationStatus,
+        sortDirection,
+        subsets,
+        labelIds,
+        startDate,
+        endDate,
+    });
 
     const accumulatedReviewStatusRef = useRef(new Map<string, boolean>());
 
     const reviewStatus = useMemo(() => {
-        items.forEach(({ id, user_reviewed }) => {
+        datasetItemsQuery.items.forEach(({ id, user_reviewed }) => {
             accumulatedReviewStatusRef.current.set(id, user_reviewed);
         });
 
         return new Map(accumulatedReviewStatusRef.current);
-    }, [items]);
+    }, [datasetItemsQuery.items]);
 
-    return { reviewStatus, ...response };
+    return { reviewStatus, ...datasetItemsQuery };
 };

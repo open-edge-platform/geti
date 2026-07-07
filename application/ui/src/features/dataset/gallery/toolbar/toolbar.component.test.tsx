@@ -117,7 +117,7 @@ describe('Toolbar', () => {
 
         await renderToolbar();
 
-        const input = screen.getByLabelText(/Upload media files/);
+        const input = screen.getByTestId('upload-media-input');
         fireEvent.change(input, { target: { files: [file] } });
 
         expect(uploadMediaMock).toHaveBeenCalledWith([file]);
@@ -221,7 +221,7 @@ describe('Toolbar', () => {
         expect(screen.queryByRole('button', { name: 'dataset statistics' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /media status/i })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Filter by labels' })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: 'Filter by date' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'More filters' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'View mode' })).not.toBeInTheDocument();
     });
 
@@ -232,7 +232,7 @@ describe('Toolbar', () => {
 
         expect(await screen.findByRole('button', { name: 'dataset statistics' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Filter by labels' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Filter by date' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'More filters' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /media status/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View mode' })).toBeInTheDocument();
     });

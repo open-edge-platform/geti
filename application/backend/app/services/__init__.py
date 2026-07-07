@@ -25,6 +25,7 @@ from .pipeline_metrics_service import PipelineMetricsService
 from .pipeline_service import PipelineService
 from .project_service import ProjectService
 from .sink_service import SinkService
+from .source_media_service import SourceMediaService
 from .source_service import SourceService, SourceUpdateService
 from .staged_dataset_service import StagedDatasetService
 from .subset_assignment import SplitRatios, SubsetAssigner, SubsetService
@@ -56,6 +57,7 @@ __all__ = [
     "ResourceWithIdAlreadyExistsError",
     "ResourceWithNameAlreadyExistsError",
     "SinkService",
+    "SourceMediaService",
     "SourceService",
     "SourceUpdateService",
     "SplitRatios",
