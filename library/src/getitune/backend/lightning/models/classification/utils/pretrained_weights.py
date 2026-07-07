@@ -90,7 +90,7 @@ class TorchvisionWeightsLoader:
 
         from torchvision.models import get_model, get_model_weights
 
-        ref = get_model(name=self.model_name, weights=get_model_weights(self.model_name))
+        ref = get_model(name=self.model_name, weights=get_model_weights(self.model_name).verify("DEFAULT"))
         self.model.backbone.features.load_state_dict(ref.features.state_dict())  # pyrefly: ignore[missing-attribute]
 
 

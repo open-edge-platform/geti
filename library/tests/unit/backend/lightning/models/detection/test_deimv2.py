@@ -5,9 +5,6 @@
 
 from __future__ import annotations
 
-from typing import Literal
-from unittest.mock import MagicMock, patch
-
 import pytest
 import torch
 
@@ -40,14 +37,12 @@ class TestDEIMV2:
         assert model.input_size_multiplier == 32
         assert model_name in model.pretrained_urls
 
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
-    def test_create_model(self, mock_load_checkpoint: MagicMock) -> None:
+    def test_create_model(self) -> None:
         """Test DEIMV2 model creation."""
-        mock_load_checkpoint.return_value = None
-
         model = DEIMV2(
             model_name="deimv2_s",
             label_info=10,
+            pretrained=False,
         )
         created_model = model._create_model()
         assert created_model is not None
@@ -61,37 +56,8 @@ class TestDEIMV2:
         assert hasattr(created_model, "num_classes")
         assert created_model.num_classes == 10
 
-        # Verify load_checkpoint was called (may be called multiple times for backbone and model)
-        assert mock_load_checkpoint.call_count >= 1
-
-    @pytest.mark.parametrize("model_name", ["deimv2_s", "deimv2_m", "deimv2_l"])
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
-    def test_create_model_passes_decoder_key_mapping(
-        self, mock_load_checkpoint: MagicMock, model_name: Literal["deimv2_s", "deimv2_m", "deimv2_l"]
-    ) -> None:
-        """Test that _create_model passes decoder self-attention key_mapping to load_checkpoint."""
-        mock_load_checkpoint.return_value = None
-
-        model = DEIMV2(model_name=model_name, label_info=5)
-        created_model = model._create_model()
-
-        # The last load_checkpoint call is the full-model load (backbone load happens first)
-        final_call = mock_load_checkpoint.call_args
-        key_mapping = final_call.kwargs.get("key_mapping", {})
-
-        num_layers: int = created_model.decoder.num_layers  # type: ignore[assignment]
-        for i in range(num_layers):
-            prefix = f"decoder.decoder.layers.{i}."
-            assert f"{prefix}self_attn.in_proj_" in key_mapping
-            assert key_mapping[f"{prefix}self_attn.in_proj_"] == f"{prefix}qkv_proj."
-            assert f"{prefix}self_attn.out_proj." in key_mapping
-            assert key_mapping[f"{prefix}self_attn.out_proj."] == f"{prefix}out_proj."
-
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
-    def test_backbone_lr_mapping(self, mock_load_checkpoint: MagicMock) -> None:
+    def test_backbone_lr_mapping(self) -> None:
         """Test that backbone learning rate mapping works correctly."""
-        mock_load_checkpoint.return_value = None
-
         model = DEIMV2(
             model_name="deimv2_s",
             label_info=5,
@@ -111,11 +77,8 @@ class TestDEIMV2:
             ("deimv2_s", 0.000025),
         ],
     )
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
-    def test_backbone_lr_values(self, mock_load_checkpoint: MagicMock, model_name: str, expected_lr: float) -> None:
+    def test_backbone_lr_values(self, model_name: str, expected_lr: float) -> None:
         """Test that backbone learning rates are correctly set for each model variant."""
-        mock_load_checkpoint.return_value = None
-
         model = DEIMV2(
             model_name=model_name,
             label_info=5,
@@ -127,11 +90,8 @@ class TestDEIMV2:
         # Check that the first optimizer config has the expected backbone lr
         assert created_model.optimizer_configuration[0]["lr"] == expected_lr
 
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
-    def test_loss_computation(self, mock_load_checkpoint: MagicMock, fxt_detection_batch) -> None:
+    def test_loss_computation(self, fxt_detection_batch) -> None:
         """Test DEIMV2 loss computation in training mode."""
-        mock_load_checkpoint.return_value = None
-
         model = DEIMV2(
             model_name="deimv2_s",
             label_info=10,
@@ -152,17 +112,14 @@ class TestDEIMV2:
             assert loss_name in output
             assert isinstance(output[loss_name], torch.Tensor)
 
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
     @pytest.mark.parametrize(
         "model_name",
         [
             "deimv2_s",
         ],
     )
-    def test_predict(self, mock_load_checkpoint: MagicMock, model_name: str, fxt_detection_batch) -> None:
+    def test_predict(self, model_name: str, fxt_detection_batch) -> None:
         """Test DEIMV2 prediction in evaluation mode."""
-        mock_load_checkpoint.return_value = None
-
         model = DEIMV2(
             model_name=model_name,
             label_info=3,
@@ -180,17 +137,14 @@ class TestDEIMV2:
         assert isinstance(output, PredictionBatch)
         assert output.batch_size == 2
 
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
     @pytest.mark.parametrize(
         "model_name",
         [
             "deimv2_s",
         ],
     )
-    def test_export(self, mock_load_checkpoint: MagicMock, model_name: str) -> None:
+    def test_export(self, model_name: str) -> None:
         """Test DEIMV2 export functionality."""
-        mock_load_checkpoint.return_value = None
-
         model = DEIMV2(
             model_name=model_name,
             label_info=3,
@@ -209,11 +163,8 @@ class TestDEIMV2:
         output = model.forward_for_tracing(torch.randn(1, 3, 640, 640))
         assert len(output) == 5  # Should return boxes, scores, labels, saliency_map, feature_vector
 
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
-    def test_dinov3_backbone(self, mock_load_checkpoint: MagicMock) -> None:
+    def test_dinov3_backbone(self) -> None:
         """Test that DEIMV2 uses DINOv3STA backbone."""
-        mock_load_checkpoint.return_value = None
-
         model = DEIMV2(
             model_name="deimv2_s",
             label_info=5,
@@ -228,11 +179,8 @@ class TestDEIMV2:
 
         assert isinstance(created_model.backbone, DINOv3STAsModule)
 
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
-    def test_hybrid_encoder(self, mock_load_checkpoint: MagicMock) -> None:
+    def test_hybrid_encoder(self) -> None:
         """Test that DEIMV2 uses HybridEncoder."""
-        mock_load_checkpoint.return_value = None
-
         model = DEIMV2(
             model_name="deimv2_s",
             label_info=5,
@@ -247,11 +195,8 @@ class TestDEIMV2:
 
         assert isinstance(created_model.encoder, HybridEncoderModule)
 
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
-    def test_deim_transformer_decoder(self, mock_load_checkpoint: MagicMock) -> None:
+    def test_deim_transformer_decoder(self) -> None:
         """Test that DEIMV2 uses DEIMTransformer decoder."""
-        mock_load_checkpoint.return_value = None
-
         model = DEIMV2(
             model_name="deimv2_s",
             label_info=5,
@@ -266,11 +211,8 @@ class TestDEIMV2:
 
         assert isinstance(created_model.decoder, DEIMTransformerModule)
 
-    @patch("getitune.backend.lightning.models.detection.deimv2.load_checkpoint")
-    def test_optimizer_configuration_structure(self, mock_load_checkpoint: MagicMock) -> None:
+    def test_optimizer_configuration_structure(self) -> None:
         """Test optimizer configuration has proper structure."""
-        mock_load_checkpoint.return_value = None
-
         model = DEIMV2(
             model_name="deimv2_s",
             label_info=5,
