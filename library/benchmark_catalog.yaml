@@ -55,6 +55,7 @@ datasets:
   - name: flowers102
     script: "scripts/benchmark_datasets/prepare_flowers102.py"
     size_tier: large
+    data_group: extended
     url: "https://www.robots.ox.ac.uk/~vgg/data/flowers/102/"
     description: "Oxford Flowers 102 — 8,189 images across 102 flower categories with official train/val/test splits."
     compatible_tasks:
@@ -72,6 +73,7 @@ datasets:
   - name: chest_ct
     script: "scripts/benchmark_datasets/prepare_chest_ct.py"
     size_tier: large
+    data_group: extended
     url: "https://github.com/shreyabandyopadhyay/CTScanImageClassification/blob/main/DS3.zip"
     description: "Chest CT Scan Images — public 3-class (abdomen/chest/head) body-part CT classification dataset."
     compatible_tasks:
@@ -95,6 +97,7 @@ datasets:
     script: "scripts/benchmark_datasets/prepare_food41.py"
     raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/food41_raw"
     size_tier: large
+    data_group: extended
     url: "https://www.kaggle.com/datasets/kmader/food41"
     description: >-
       Food-101 — 101 food categories with official train/test splits, sourced from
@@ -107,6 +110,7 @@ datasets:
   - name: oxford_pets_hlabel
     script: "scripts/benchmark_datasets/prepare_oxford_pets_hlabel.py"
     size_tier: large
+    data_group: extended
     url: "https://www.robots.ox.ac.uk/~vgg/data/pets/"
     description: "Oxford-IIIT Pet with hierarchical labels — 7,349 images with natural 2-level hierarchy: species (cat/dog) → 37 breeds."
     compatible_tasks:
@@ -115,6 +119,7 @@ datasets:
   - name: oxford_pets
     script: "scripts/benchmark_datasets/prepare_oxford_pets.py"
     size_tier: large
+    data_group: extended
     url: "https://www.robots.ox.ac.uk/~vgg/data/pets/"
     description: "Oxford-IIIT Pet — 7,349 images of 37 pet breeds with pixel-level trimap segmentation masks."
     compatible_tasks:
@@ -143,6 +148,7 @@ datasets:
   - name: axial_mri
     script: "scripts/benchmark_datasets/prepare_axial_mri.py"
     size_tier: small
+    data_group: extended
     url: "https://huggingface.co/datasets/Francesco/axial-mri"
     description: "Axial MRI (Roboflow-100) — 371 brain axial-MRI slices with tumour bounding-box annotations (negative/positive). Tiny, privacy-safe medical detection benchmark."
     compatible_tasks:
@@ -151,6 +157,7 @@ datasets:
   - name: cable_damage
     script: "scripts/benchmark_datasets/prepare_cable_damage.py"
     size_tier: medium
+    data_group: extended
     url: "https://huggingface.co/datasets/Francesco/cable-damage"
     description: "Cable Damage (Roboflow-100) — 1,318 close-up cable images with damage bounding-box annotations (break/thunderbolt). Industrial damage-inspection detection benchmark."
     compatible_tasks:
@@ -159,6 +166,7 @@ datasets:
   - name: vehicles
     script: "scripts/benchmark_datasets/prepare_vehicles.py"
     size_tier: large
+    data_group: extended
     url: "https://huggingface.co/datasets/Francesco/vehicles-q0x2v"
     description: "Vehicles (Roboflow-100) — 4,058 road-scene images with bounding-box annotations across 12 vehicle types (cars, buses, trucks). Large multi-class on-road detection benchmark."
     compatible_tasks:
@@ -189,6 +197,7 @@ datasets:
   - name: satellite_building
     script: "scripts/benchmark_datasets/prepare_satellite_building.py"
     size_tier: large
+    data_group: extended
     url: "https://huggingface.co/datasets/keremberke/satellite-building-segmentation"
     description: "Satellite Building Segmentation — 9,665 aerial images with polygon annotations for building footprints. Medium-scale segmentation benchmark."
     compatible_tasks:
@@ -218,6 +227,7 @@ datasets:
     script: "scripts/benchmark_datasets/prepare_brain_tumor.py"
     raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_raw"
     size_tier: large
+    data_group: extended
     url: "https://www.kaggle.com/datasets/pkdarabi/medical-image-dataset-brain-tumor-segmentation"
     description: >-
       Brain Tumor instance segmentation — ~1,744 MRI images with polygon annotations
@@ -235,6 +245,7 @@ datasets:
     script: "scripts/benchmark_datasets/prepare_cardd.py"
     raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/cardd_instseg_raw"
     size_tier: large
+    data_group: extended
     url: "https://www.kaggle.com/datasets/issamjebnouni/cardd"
     description: >-
       CarDD instance segmentation — 4,000 images with COCO polygon annotations across 6
