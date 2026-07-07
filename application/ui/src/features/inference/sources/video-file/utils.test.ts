@@ -5,7 +5,7 @@ import { HttpResponse } from 'msw';
 
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
-import { getVideoFileInitialConfig, videoFileBodyFormatter } from './utils';
+import { getVideoFileInitialConfig, prepareVideoFileFormData, videoFileBodyFormatter } from './utils';
 
 const buildFormData = (fields: Record<string, string | Blob>): FormData => {
     const formData = new FormData();
@@ -30,7 +30,7 @@ describe('getVideoFileInitialConfig', () => {
 });
 
 describe('videoFileBodyFormatter', () => {
-    it('uses the typed video_path when no file was selected', async () => {
+    it('reads video_path as-is from the FormData', () => {
         const formData = buildFormData({
             id: '1',
             name: 'My source',
@@ -38,7 +38,7 @@ describe('videoFileBodyFormatter', () => {
             loop: 'on',
         });
 
-        await expect(videoFileBodyFormatter(formData)).resolves.toEqual({
+        expect(videoFileBodyFormatter(formData)).toEqual({
             id: '1',
             name: 'My source',
             source_type: 'video_file',
@@ -46,8 +46,23 @@ describe('videoFileBodyFormatter', () => {
             loop: true,
         });
     });
+});
 
-    it('uploads the selected file and uses the returned video_path', async () => {
+describe('prepareVideoFileFormData', () => {
+    it('does nothing when no file was selected, leaving the typed video_path untouched', async () => {
+        const formData = buildFormData({
+            id: '1',
+            name: 'My source',
+            video_path: '/a/b.mp4',
+            loop: '',
+        });
+
+        await prepareVideoFileFormData(formData);
+
+        expect(formData.get('video_path')).toBe('/a/b.mp4');
+    });
+
+    it('uploads the selected file and overwrites video_path with the returned path', async () => {
         const resolvedPath = '/data/source_media/uuid/sample.mp4';
         server.use(
             http.post('/api/sources/media', () => {
@@ -64,13 +79,9 @@ describe('videoFileBodyFormatter', () => {
             loop: '',
         });
 
-        await expect(videoFileBodyFormatter(formData)).resolves.toEqual({
-            id: '1',
-            name: 'My source',
-            source_type: 'video_file',
-            video_path: resolvedPath,
-            loop: false,
-        });
+        await prepareVideoFileFormData(formData);
+
+        expect(formData.get('video_path')).toBe(resolvedPath);
     });
 
     it('rejects when the upload fails', async () => {
@@ -91,6 +102,6 @@ describe('videoFileBodyFormatter', () => {
             loop: '',
         });
 
-        await expect(videoFileBodyFormatter(formData)).rejects.toBeTruthy();
+        await expect(prepareVideoFileFormData(formData)).rejects.toBeTruthy();
     });
 });

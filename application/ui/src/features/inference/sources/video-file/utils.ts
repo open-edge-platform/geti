@@ -29,19 +29,22 @@ const uploadVideoFile = async (file: File): Promise<string> => {
     return data.video_path;
 };
 
-export const videoFileBodyFormatter = async (formData: FormData): Promise<VideoFileSourceConfig> => {
+// Uploads the selected file (if any) and writes the resulting path back into `video_path`, so
+// `videoFileBodyFormatter` can stay a plain, synchronous formatter like its sibling sources.
+export const prepareVideoFileFormData = async (formData: FormData): Promise<void> => {
     const file = formData.get('video_file');
 
     // An untouched file input still yields a File entry (empty filename) once it has a `name`,
     // so only treat it as "a file was selected" when it actually has a name.
-    const video_path =
-        file instanceof File && file.name !== '' ? await uploadVideoFile(file) : String(formData.get('video_path'));
-
-    return {
-        id: String(formData.get('id')),
-        name: String(formData.get('name')),
-        source_type: 'video_file',
-        video_path,
-        loop: formData.get('loop') === 'on' ? true : false,
-    };
+    if (file instanceof File && file.name !== '') {
+        formData.set('video_path', await uploadVideoFile(file));
+    }
 };
+
+export const videoFileBodyFormatter = (formData: FormData): VideoFileSourceConfig => ({
+    id: String(formData.get('id')),
+    name: String(formData.get('name')),
+    source_type: 'video_file',
+    video_path: String(formData.get('video_path')),
+    loop: formData.get('loop') === 'on' ? true : false,
+});

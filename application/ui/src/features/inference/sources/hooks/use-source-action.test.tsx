@@ -8,8 +8,9 @@ import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
-import type { ImagesFolderSourceConfig } from '../../../../constants/shared-types';
+import type { ImagesFolderSourceConfig, VideoFileSourceConfig } from '../../../../constants/shared-types';
 import { server } from '../../../../msw-node-setup';
+import { prepareVideoFileFormData, videoFileBodyFormatter } from '../video-file/utils';
 import { useSourceAction } from './use-source-action.hook';
 
 const mockedConfig: ImagesFolderSourceConfig = {
@@ -129,11 +130,11 @@ describe('useSourceAction', () => {
         });
     });
 
-    describe('async bodyFormatter', () => {
-        it('awaits an async bodyFormatter before submitting', async () => {
-            const asyncBodyFormatter = async (formData: FormData) => {
+    describe('prepareFormData', () => {
+        it('awaits prepareFormData and lets bodyFormatter read its mutations to the FormData', async () => {
+            const prepareFormData = async (formData: FormData) => {
                 await Promise.resolve();
-                return bodyFormatter(formData);
+                formData.set('images_folder_path', '/mutated/by/prepare');
             };
 
             server.use(
@@ -144,7 +145,7 @@ describe('useSourceAction', () => {
             );
 
             const { result } = renderHook(() =>
-                useSourceAction({ config: mockedConfig, isNewSource: true, bodyFormatter: asyncBodyFormatter })
+                useSourceAction({ config: mockedConfig, isNewSource: true, bodyFormatter, prepareFormData })
             );
             const [, submitAction] = result.current;
 
@@ -161,16 +162,23 @@ describe('useSourceAction', () => {
             await waitFor(() => {
                 expect(screen.getByText('Source configuration created successfully.')).toBeVisible();
                 expect(result.current[0].id).toBe('new-id-test');
+                expect(result.current[0].images_folder_path).toBe('/mutated/by/prepare');
             });
         });
 
-        it('falls back to the previous state (not a partial body) when bodyFormatter rejects', async () => {
-            const failingBodyFormatter = async (): Promise<ImagesFolderSourceConfig> => {
-                throw { detail: 'invalid form data' };
+        it('falls back to the previous state (not a partial body) and never calls bodyFormatter when prepareFormData rejects', async () => {
+            const prepareFormData = async (): Promise<void> => {
+                throw { detail: 'upload failed' };
             };
+            const bodyFormatterSpy = vi.fn(bodyFormatter);
 
             const { result } = renderHook(() =>
-                useSourceAction({ config: mockedConfig, isNewSource: true, bodyFormatter: failingBodyFormatter })
+                useSourceAction({
+                    config: mockedConfig,
+                    isNewSource: true,
+                    bodyFormatter: bodyFormatterSpy,
+                    prepareFormData,
+                })
             );
             const [, submitAction] = result.current;
 
@@ -179,9 +187,64 @@ describe('useSourceAction', () => {
             });
 
             await waitFor(() => {
-                expect(screen.getByText('Failed to save source configuration, invalid form data')).toBeVisible();
+                expect(screen.getByText('Failed to save source configuration, upload failed')).toBeVisible();
                 expect(result.current[0]).toEqual(mockedConfig);
             });
+
+            expect(bodyFormatterSpy).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('video-file integration (real prepareVideoFileFormData + videoFileBodyFormatter)', () => {
+        it('does not create the source when the video upload fails', async () => {
+            const videoConfig: VideoFileSourceConfig = {
+                id: '',
+                name: 'My video source',
+                source_type: 'video_file',
+                video_path: '',
+                loop: false,
+            };
+            let sourceWasCreated = false;
+
+            server.use(
+                http.post('/api/sources/media', () => {
+                    // The 422 response has no documented schema in the OpenAPI spec (description only).
+                    // @ts-expect-error There is an incorrect type in OpenAPI
+                    return HttpResponse.json({ detail: 'Unsupported video format' }, { status: 422 });
+                }),
+                http.post('/api/sources', () => {
+                    sourceWasCreated = true;
+                    return HttpResponse.json({ ...videoConfig, id: 'should-not-be-used' });
+                })
+            );
+
+            const { result } = renderHook(() =>
+                useSourceAction({
+                    config: videoConfig,
+                    isNewSource: true,
+                    bodyFormatter: videoFileBodyFormatter,
+                    prepareFormData: prepareVideoFileFormData,
+                })
+            );
+            const [, submitAction] = result.current;
+
+            const formData = new FormData();
+            formData.append('id', videoConfig.id);
+            formData.append('name', videoConfig.name);
+            formData.append('video_path', '');
+            formData.append('video_file', new File(['fake-video-bytes'], 'sample.mp4', { type: 'video/mp4' }));
+            formData.append('loop', '');
+
+            await act(async () => {
+                startTransition(async () => submitAction(formData));
+            });
+
+            await waitFor(() => {
+                expect(screen.getByText('Failed to save source configuration, Unsupported video format')).toBeVisible();
+            });
+
+            expect(sourceWasCreated).toBe(false);
+            expect(result.current[0]).toEqual(videoConfig);
         });
     });
 });
