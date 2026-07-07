@@ -5,9 +5,115 @@ import { getMockedAnnotation } from 'mocks/mock-annotation';
 import { getMockedAnnotationLabelRef, getMockedLabel } from 'mocks/mock-labels';
 import { describe, expect, it } from 'vitest';
 
-import { toggleLabel } from './util';
+import { getIsSubmitDisabled, toggleLabel } from './util';
 
 describe('secondary toolbar utils', () => {
+    describe('getIsSubmitDisabled', () => {
+        const defaultParams = {
+            mode: 'annotation' as const,
+            canSubmit: false,
+            hasInvalidAnnotation: false,
+            hasSubsetChanged: false,
+            isSaving: false,
+            isLoadingPredictions: false,
+        };
+
+        it('annotation mode: enabled when there is a new annotation', () => {
+            const result = getIsSubmitDisabled({ ...defaultParams, canSubmit: true, hasSubsetChanged: false });
+
+            expect(result).toBe(false);
+        });
+
+        it('annotation mode: enabled when annotations are unchanged but subset changed', () => {
+            const result = getIsSubmitDisabled({ ...defaultParams, canSubmit: false, hasSubsetChanged: true });
+
+            expect(result).toBe(false);
+        });
+
+        it('annotation mode: disabled when annotations and subset are both unchanged', () => {
+            const result = getIsSubmitDisabled({ ...defaultParams, canSubmit: false, hasSubsetChanged: false });
+
+            expect(result).toBe(true);
+        });
+
+        it('annotation mode: disabled when annotation is invalid, even if subset changed', () => {
+            const result = getIsSubmitDisabled({
+                ...defaultParams,
+                canSubmit: false,
+                hasInvalidAnnotation: true,
+                hasSubsetChanged: true,
+            });
+
+            expect(result).toBe(true);
+        });
+
+        it('annotation mode: disabled while saving, regardless of other flags', () => {
+            const result = getIsSubmitDisabled({
+                ...defaultParams,
+                canSubmit: true,
+                hasSubsetChanged: true,
+                isSaving: true,
+            });
+
+            expect(result).toBe(true);
+        });
+
+        it('prediction mode: enabled when a prediction is present and subset is unchanged', () => {
+            const result = getIsSubmitDisabled({
+                ...defaultParams,
+                mode: 'prediction',
+                canSubmit: true,
+                hasSubsetChanged: false,
+            });
+
+            expect(result).toBe(false);
+        });
+
+        it('prediction mode: enabled when a prediction is present and subset changed', () => {
+            const result = getIsSubmitDisabled({
+                ...defaultParams,
+                mode: 'prediction',
+                canSubmit: true,
+                hasSubsetChanged: true,
+            });
+
+            expect(result).toBe(false);
+        });
+
+        it('prediction mode: disabled when there is no prediction, even if subset changed', () => {
+            const result = getIsSubmitDisabled({
+                ...defaultParams,
+                mode: 'prediction',
+                canSubmit: false,
+                hasSubsetChanged: true,
+            });
+
+            expect(result).toBe(true);
+        });
+
+        it('prediction mode: disabled when there is no prediction and subset is unchanged', () => {
+            const result = getIsSubmitDisabled({
+                ...defaultParams,
+                mode: 'prediction',
+                canSubmit: false,
+                hasSubsetChanged: false,
+            });
+
+            expect(result).toBe(true);
+        });
+
+        it('prediction mode: disabled while loading predictions, regardless of other flags', () => {
+            const result = getIsSubmitDisabled({
+                ...defaultParams,
+                mode: 'prediction',
+                canSubmit: true,
+                isLoadingPredictions: true,
+            });
+
+            expect(result).toBe(true);
+        });
+    });
+
     describe('toggleLabel', () => {
         const mockLabel1 = getMockedLabel({ id: 'label-1', name: 'Label 1' });
         const mockLabel2 = getMockedLabel({ id: 'label-2', name: 'Label 2' });
