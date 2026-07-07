@@ -35,6 +35,7 @@ class Settings(BaseSettings):
     worker_dir: Path | None = None
     job_dir: Path | None = None
     staged_datasets_dir: Path | None = None
+    source_media_dir: Path | None = None
 
     # Server
     host: str = Field(default="0.0.0.0", alias="HOST")  # noqa: S104
@@ -109,6 +110,18 @@ class Settings(BaseSettings):
         description="Interval in seconds between cache cleanup sweeps",
     )
 
+    # Certificates
+    certfile: Path = Field(
+        default=Path("certs/localhost.pem"),
+        alias="CERTFILE",
+        description="Path to certificate file",
+    )
+    keyfile: Path = Field(
+        default=Path("certs/localhost-key.pem"),
+        alias="KEYFILE",
+        description="Path to private key file",
+    )
+
     @property
     def ice_servers(self) -> list[dict]:
         """Compute ICE servers from coturn and STUN configuration."""
@@ -156,12 +169,21 @@ class Settings(BaseSettings):
             self.job_dir = self.log_dir / "jobs"
         if self.staged_datasets_dir is None:
             self.staged_datasets_dir = self.data_dir / "staged_datasets"
+        if self.source_media_dir is None:
+            self.source_media_dir = self.data_dir / "source_media"
 
         return self
 
     def ensure_dirs_exist(self) -> None:
         """Create all directories if they don't exist."""
-        for d in [self.data_dir, self.log_dir, self.worker_dir, self.job_dir, self.staged_datasets_dir]:
+        for d in [
+            self.data_dir,
+            self.log_dir,
+            self.worker_dir,
+            self.job_dir,
+            self.staged_datasets_dir,
+            self.source_media_dir,
+        ]:
             if d:
                 d.mkdir(parents=True, exist_ok=True)
 

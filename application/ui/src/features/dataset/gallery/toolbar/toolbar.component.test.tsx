@@ -221,7 +221,7 @@ describe('Toolbar', () => {
         expect(screen.queryByRole('button', { name: 'dataset statistics' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /media status/i })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Filter by labels' })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: 'Filter by date' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'More filters' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'View mode' })).not.toBeInTheDocument();
     });
 
@@ -232,8 +232,31 @@ describe('Toolbar', () => {
 
         expect(await screen.findByRole('button', { name: 'dataset statistics' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Filter by labels' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Filter by date' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'More filters' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /media status/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View mode' })).toBeInTheDocument();
+    });
+
+    it('shows "Newest first" sort button by default', async () => {
+        await renderToolbar();
+
+        const sortButton = screen.getByRole('button', { name: 'Newest first' });
+
+        expect(sortButton).toHaveTextContent('Newest first');
+    });
+
+    it('toggles the sort button label between "Newest first" and "Oldest first" when clicked', async () => {
+        await renderToolbar();
+
+        const newestFirstButton = screen.getByRole('button', { name: 'Newest first' });
+        fireEvent.click(newestFirstButton);
+
+        const oldestFirstButton = await screen.findByRole('button', { name: 'Oldest first' });
+        expect(oldestFirstButton).toHaveTextContent('Oldest first');
+
+        fireEvent.click(oldestFirstButton);
+
+        const newestFirstButton2 = await screen.findByRole('button', { name: 'Newest first' });
+        expect(newestFirstButton2).toHaveTextContent('Newest first');
     });
 });
