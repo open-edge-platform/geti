@@ -193,11 +193,11 @@ class TransformsUpdater:
 
         for aug_name, aug_value in augmentation_params.items():
             if tiling and aug_name in cls.TILING_INCOMPATIBLE_AUGMENTATIONS:
-                logger.info("Augmentation '%s' is incompatible with the Tiling pipeline and will be skipped", aug_name)
+                logger.info("Augmentation '{}' is incompatible with the Tiling pipeline and will be skipped", aug_name)
                 continue
             if aug_name not in cls.AUGMENTATION_REGISTRY:
                 if tiling:
-                    logger.info("Augmentation '%s' is not applicable in Tiling pipeline", aug_name)
+                    logger.info("Augmentation '{}' is not applicable in Tiling pipeline", aug_name)
                     continue
                 msg = f"Unknown augmentation: '{aug_name}'. Available: {list(cls.AUGMENTATION_REGISTRY.keys())}"
                 raise ValueError(msg)

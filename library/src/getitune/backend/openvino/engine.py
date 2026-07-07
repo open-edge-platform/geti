@@ -368,6 +368,10 @@ class OVEngine(Engine):
                         f"datamodule.label_info={self.datamodule.label_info}"
                     )
                     raise ValueError(msg)
+
+                # Propagate the datamodule tiling configuration to the model for predictions.
+                if getattr(datamodule, "tile_config", None) is not None:
+                    model.tile_config = datamodule.tile_config
                 datamodule = self._auto_configurator.update_ov_subset_pipeline(
                     datamodule=datamodule,
                     subset="test",
