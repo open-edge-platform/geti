@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 import numpy as np
 
-from getitrack.algorithms.configs.bytetrack import _NEW_TRACK_MARGIN, ByteTrackConfig
+from getitrack.algorithms.configs.bytetrack import ByteTrackConfig
 from getitrack.core.base import BaseTracker
 from getitrack.core.detection import Detections, TrackedDetections
 from getitrack.core.registry import register_algorithm
@@ -27,15 +27,6 @@ from getitrack.motion import KalmanFilter, xyah_to_xyxy, xyxy_to_xyah
 
 if TYPE_CHECKING:
     from getitrack.config import LifecycleConfig
-
-_UNMATCHABLE_COST = np.nextafter(np.float32(1.0), np.float32(2.0))
-
-# Cost limits for the second-stage and tentative association passes.
-_SECOND_STAGE_COST_LIMIT = 0.5
-_TENTATIVE_COST_LIMIT = 0.7
-
-# IoU distance below which an ACTIVE and a LOST track are treated as duplicates.
-_DUPLICATE_IOU_DIST = 0.15
 
 
 def _subset(dets: Detections, indices: list[int] | np.ndarray) -> Detections:
@@ -63,6 +54,13 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
     """
 
     algorithm_name: ClassVar[str] = "bytetrack"
+
+    _UNMATCHABLE_COST: ClassVar[np.float32] = np.nextafter(np.float32(1.0), np.float32(2.0))
+    # Cost limits for the second-stage and tentative association passes.
+    _SECOND_STAGE_COST_LIMIT: ClassVar[float] = 0.5
+    _TENTATIVE_COST_LIMIT: ClassVar[float] = 0.7
+    # IoU distance below which an ACTIVE and a LOST track are treated as duplicates.
+    _DUPLICATE_IOU_DIST: ClassVar[float] = 0.15
 
     def __init__(self, config: ByteTrackConfig) -> None:
         super().__init__(config)
@@ -121,7 +119,7 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
         matches_b, unmatched_track_b, _ = self._associate(
             remaining_confirmed_ids,
             low_dets,
-            cost_limit=_SECOND_STAGE_COST_LIMIT,
+            cost_limit=self._SECOND_STAGE_COST_LIMIT,
             apply_fuse_score=False,
         )
         for ti, di in matches_b:
@@ -139,7 +137,7 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
         matches_c, unmatched_track_c, unmatched_det_c = self._associate(
             tentative_ids,
             _subset(high_dets, leftover_high_idx),
-            _TENTATIVE_COST_LIMIT,
+            self._TENTATIVE_COST_LIMIT,
             apply_fuse_score=True,
         )
         for ti, di in matches_c:
@@ -150,7 +148,7 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
             self._tracks[tid].mark_miss(lifecycle)
 
         # A new track needs a score clear of the high/low split by the margin.
-        new_track_floor = cfg.high_score_threshold + _NEW_TRACK_MARGIN
+        new_track_floor = cfg.new_track_floor
         for di in unmatched_det_c:
             real_di = leftover_high_idx[di]
             if float(high_dets.scores[real_di]) >= new_track_floor:
@@ -202,7 +200,7 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
         if apply_fuse_score:
             cost = fuse_score(cost, dets.scores)
         if cls_mismatch is not None:
-            cost[cls_mismatch] = _UNMATCHABLE_COST
+            cost[cls_mismatch] = self._UNMATCHABLE_COST
         return linear_assignment(cost, cost_limit)
 
     def _apply_hit(
@@ -262,7 +260,7 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
         # Collect duplicates first, then remove, so a track shared across
         # several pairs is not popped mid-iteration.
         drop_ids: set[int] = set()
-        for ai, li in np.argwhere(dist < _DUPLICATE_IOU_DIST):
+        for ai, li in np.argwhere(dist < self._DUPLICATE_IOU_DIST):
             a_track, l_track = self._tracks[active[ai]], self._tracks[lost[li]]
             if self.config.match_class_only and a_track.class_id != l_track.class_id:
                 continue

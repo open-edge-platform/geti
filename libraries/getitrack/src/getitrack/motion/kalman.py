@@ -13,19 +13,13 @@ velocity-decay factor (1.0 applies no damping; values below 1.0 damp velocity).
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 import numpy as np
 import scipy.linalg
 
 if TYPE_CHECKING:
     from getitrack.config import MotionConfig
-
-_NDIM = 4
-_STATE_DIM = 2 * _NDIM
-_STD_WEIGHT_POSITION = 1.0 / 20.0
-_STD_WEIGHT_VELOCITY = 1.0 / 160.0
-_DEFAULT_VELOCITY_DECAY = 1.0
 
 
 class KalmanFilter:
@@ -43,24 +37,30 @@ class KalmanFilter:
         velocity_decay: Per-frame velocity damping in ``(0, 1]``.
     """
 
+    _NDIM: ClassVar[int] = 4
+    _STATE_DIM: ClassVar[int] = 2 * _NDIM
+    _STD_WEIGHT_POSITION: ClassVar[float] = 1.0 / 20.0
+    _STD_WEIGHT_VELOCITY: ClassVar[float] = 1.0 / 160.0
+    _DEFAULT_VELOCITY_DECAY: ClassVar[float] = 1.0
+
     def __init__(
         self,
         process_noise: float = 1.0,
         measurement_noise: float = 1.0,
-        velocity_decay: float = _DEFAULT_VELOCITY_DECAY,
+        velocity_decay: float | None = None,
     ) -> None:
         self.process_noise = process_noise
         self.measurement_noise = measurement_noise
-        self.velocity_decay = velocity_decay
+        self.velocity_decay = self._DEFAULT_VELOCITY_DECAY if velocity_decay is None else velocity_decay
 
-        self._motion_mat = np.eye(_STATE_DIM, _STATE_DIM)
-        for i in range(_NDIM):
-            self._motion_mat[i, _NDIM + i] = 1.0
-        if velocity_decay != _DEFAULT_VELOCITY_DECAY:
-            for i in range(_NDIM):
-                self._motion_mat[_NDIM + i, _NDIM + i] = velocity_decay
+        self._motion_mat = np.eye(self._STATE_DIM, self._STATE_DIM)
+        for i in range(self._NDIM):
+            self._motion_mat[i, self._NDIM + i] = 1.0
+        if self.velocity_decay != self._DEFAULT_VELOCITY_DECAY:
+            for i in range(self._NDIM):
+                self._motion_mat[self._NDIM + i, self._NDIM + i] = self.velocity_decay
 
-        self._update_mat = np.eye(_NDIM, _STATE_DIM)
+        self._update_mat = np.eye(self._NDIM, self._STATE_DIM)
 
     @classmethod
     def from_config(cls, config: MotionConfig) -> KalmanFilter:
@@ -89,14 +89,14 @@ class KalmanFilter:
         h = mean_pos[3]
         std = np.array(
             [
-                2 * _STD_WEIGHT_POSITION * h,
-                2 * _STD_WEIGHT_POSITION * h,
+                2 * self._STD_WEIGHT_POSITION * h,
+                2 * self._STD_WEIGHT_POSITION * h,
                 1e-2,
-                2 * _STD_WEIGHT_POSITION * h,
-                10 * _STD_WEIGHT_VELOCITY * h,
-                10 * _STD_WEIGHT_VELOCITY * h,
+                2 * self._STD_WEIGHT_POSITION * h,
+                10 * self._STD_WEIGHT_VELOCITY * h,
+                10 * self._STD_WEIGHT_VELOCITY * h,
                 1e-5,
-                10 * _STD_WEIGHT_VELOCITY * h,
+                10 * self._STD_WEIGHT_VELOCITY * h,
             ],
         )
         covariance = np.diag(np.square(std))
@@ -191,14 +191,14 @@ class KalmanFilter:
     def _predict_noise_cov(self, h: float) -> np.ndarray:
         std = np.array(
             [
-                _STD_WEIGHT_POSITION * h,
-                _STD_WEIGHT_POSITION * h,
+                self._STD_WEIGHT_POSITION * h,
+                self._STD_WEIGHT_POSITION * h,
                 1e-2,
-                _STD_WEIGHT_POSITION * h,
-                _STD_WEIGHT_VELOCITY * h,
-                _STD_WEIGHT_VELOCITY * h,
+                self._STD_WEIGHT_POSITION * h,
+                self._STD_WEIGHT_VELOCITY * h,
+                self._STD_WEIGHT_VELOCITY * h,
                 1e-5,
-                _STD_WEIGHT_VELOCITY * h,
+                self._STD_WEIGHT_VELOCITY * h,
             ],
         )
         return np.diag(np.square(std)) * self.process_noise
@@ -206,10 +206,10 @@ class KalmanFilter:
     def _measurement_noise_cov(self, h: float) -> np.ndarray:
         std = np.array(
             [
-                _STD_WEIGHT_POSITION * h,
-                _STD_WEIGHT_POSITION * h,
+                self._STD_WEIGHT_POSITION * h,
+                self._STD_WEIGHT_POSITION * h,
                 1e-1,
-                _STD_WEIGHT_POSITION * h,
+                self._STD_WEIGHT_POSITION * h,
             ],
         )
         return np.diag(np.square(std)) * self.measurement_noise
