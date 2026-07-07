@@ -47,6 +47,7 @@ from app.api.routers import (
     pipelines,
     projects,
     sinks,
+    source_media,
     sources,
     system,
     training_configurations,
@@ -91,6 +92,7 @@ app.include_router(models.router)
 app.include_router(pipelines.router)
 app.include_router(projects.router)
 app.include_router(sinks.router)
+app.include_router(source_media.router)
 app.include_router(sources.router)
 app.include_router(system.router)
 app.include_router(training_configurations.router)

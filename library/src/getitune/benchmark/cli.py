@@ -305,7 +305,13 @@ def _cmd_report(args: argparse.Namespace) -> int:
 
     from getitune.benchmark.manifest import load_manifest
     from getitune.benchmark.report import generate_report
-    from getitune.benchmark.tracking import BenchmarkTracker, TrackingConfig, get_git_branch, get_git_sha
+    from getitune.benchmark.tracking import (
+        BenchmarkTracker,
+        TrackingConfig,
+        get_benchmark_run_id,
+        get_git_branch,
+        get_git_sha,
+    )
 
     manifest = load_manifest(args.manifest)
 
@@ -323,9 +329,14 @@ def _cmd_report(args: argparse.Namespace) -> int:
     branch = args.branch or get_git_branch()
     git_sha = get_git_sha()
 
-    # Query MLflow for the most recent successful AND failed runs in this
-    # experiment. Skip "rollup" parent runs — only leaf "seed" runs carry
-    # per-run status/metrics.
+    # Query MLflow for the successful AND failed seed runs produced by *this*
+    # invocation. Skip "rollup" parent runs — only leaf "seed" runs carry
+    # per-run status/metrics. Scope to the current benchmark run id so that
+    # seed runs left in the persistent tracking store by *previous* executions
+    # (which share the same branch/trigger experiment) don't leak into this
+    # report — otherwise ``aggregate_metrics_across_seeds`` would average them
+    # into the current numbers.
+    benchmark_run_id = get_benchmark_run_id()
     client = mlflow.tracking.MlflowClient(args.mlflow_uri)
 
     experiment_name = tracking_config.experiment_name
@@ -336,13 +347,17 @@ def _cmd_report(args: argparse.Namespace) -> int:
 
     success_runs = client.search_runs(
         experiment_ids=[exp.experiment_id],
-        filter_string="tags.status = 'success' AND tags.run_type = 'seed'",
+        filter_string=(
+            f"tags.status = 'success' AND tags.run_type = 'seed' AND tags.benchmark_run_id = '{benchmark_run_id}'"
+        ),
         order_by=["attributes.start_time DESC"],
         max_results=1000,
     )
     failed_runs = client.search_runs(
         experiment_ids=[exp.experiment_id],
-        filter_string="tags.status = 'failed' AND tags.run_type = 'seed'",
+        filter_string=(
+            f"tags.status = 'failed' AND tags.run_type = 'seed' AND tags.benchmark_run_id = '{benchmark_run_id}'"
+        ),
         order_by=["attributes.start_time DESC"],
         max_results=1000,
     )

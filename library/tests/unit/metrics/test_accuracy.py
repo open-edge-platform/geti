@@ -48,15 +48,19 @@ class TestAccuracy:
         acc = result["accuracy"]
         assert round(acc.item(), 3) == 0.792
 
-    def test_default_multi_class_cls_metric_callable(self, fxt_multiclass_labelinfo: LabelInfo) -> None:
-        assert fxt_multiclass_labelinfo.num_classes > 1
-        metric = MultiClassClsMetricCallable(fxt_multiclass_labelinfo)
-        assert isinstance(metric.accuracy, MulticlassAccuracy)
+        metric_collection = MultiClassClsMetricCallable(fxt_multiclass_labelinfo)
+        assert isinstance(metric_collection.accuracy, MulticlassAccuracy)
 
-        one_class_label_info = LabelInfo(label_names=["class1"], label_groups=[["class1"]], label_ids=["0"])
-        assert one_class_label_info.num_classes == 1
-        binary_metric = MultiClassClsMetricCallable(one_class_label_info)
-        assert isinstance(binary_metric.accuracy, BinaryAccuracy)
+        preds_tensor = torch.tensor([0, 1, 2, 2])
+        targets_tensor = torch.tensor([0, 1, 1, 2])
+        metric_collection.update(preds_tensor, targets_tensor)
+        result = metric_collection.compute()
+        assert result["f1-score"].item() == pytest.approx(0.7777778, rel=1e-5)
+
+    def test_single_class_multiclass_metric_rejected(self) -> None:
+        label_info = LabelInfo(label_names=["class1"], label_groups=[["class1"]], label_ids=["0"])
+        with pytest.raises(ValueError, match="Multiclass classification requires at least 2 classes"):
+            MultiClassClsMetricCallable(label_info)
 
     def test_multilabel_accuracy(self, fxt_multilabel_labelinfo: LabelInfo) -> None:
         """Check whether accuracy is same with getitune 1.x version."""
