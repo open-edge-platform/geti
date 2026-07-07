@@ -77,7 +77,7 @@ describe('VideoFile', () => {
     });
 
     it('selecting a file stores it locally without making any network request', async () => {
-        renderApp();
+        const { handleSubmit } = renderApp();
 
         const file = await uploadFile();
 
@@ -85,6 +85,7 @@ describe('VideoFile', () => {
 
         const fileInput = screen.getByTestId('upload-video-file') as HTMLInputElement;
         expect(fileInput.files?.[0]).toBe(file);
+        expect(handleSubmit).not.toHaveBeenCalled();
     });
 
     it('un-requires and clears the path input once a file is selected', async () => {
