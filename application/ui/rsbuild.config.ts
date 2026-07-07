@@ -144,8 +144,7 @@ export default defineConfig({
             'Cross-Origin-Opener-Policy': 'same-origin',
             // Must NOT be 'immutable': dev async chunks are not content-hashed, so an
             // immutable cache causes the browser to keep serving stale chunk/HMR runtime
-            // URLs after a rebuild (stale worker imports, mismatched hmr.js client). See
-            // /memories/repo/dev-server-immutable-cache-stale-worker.md.
+            // URLs after a rebuild (stale worker imports, mismatched hmr.js client).
             'Cache-Control': 'no-cache',
             'Content-Security-Policy':
                 "default-src 'self'; " +
