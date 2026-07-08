@@ -50,6 +50,21 @@ export const usePipelineMetrics = () => {
     );
 };
 
+export const usePipelineHealth = () => {
+    const projectId = useProjectIdentifier();
+
+    return $api.useQuery(
+        'get',
+        '/api/projects/{project_id}/pipeline/health',
+        {
+            params: { path: { project_id: projectId } },
+        },
+        {
+            refetchInterval: POLLING_INTERVAL,
+        }
+    );
+};
+
 export const usePatchPipeline = () => {
     const queryClient = useQueryClient();
 

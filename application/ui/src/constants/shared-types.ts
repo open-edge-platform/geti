@@ -142,3 +142,7 @@ export type MediaWithPagination = components['schemas']['MediaWithPagination'];
 export type DatasetFormat = components['schemas']['DatasetFormat'];
 export type DeviceInfo = components['schemas']['DeviceInfoView'];
 export type MediaListPredictionRequest = components['schemas']['MediaListPredictionRequest'];
+
+export type PipelineHealth = components['schemas']['PipelineHealth'];
+export type PipelineComponentsHealth = components['schemas']['PipelineComponentsHealth'];
+export type PipelineStatus = components['schemas']['Status'];
