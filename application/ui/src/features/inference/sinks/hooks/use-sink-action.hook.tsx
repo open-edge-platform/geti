@@ -6,7 +6,7 @@ import { useActionState } from 'react';
 import { isFunction } from 'lodash-es';
 
 import { toast } from '../../../../components/toast/toast.component';
-import { SinkConfig } from '../utils';
+import type { SinkConfig } from '../../../../constants/shared-types';
 import { useSinkMutation } from './use-sink-mutation.hook';
 
 interface useSinkActionProps<T> {

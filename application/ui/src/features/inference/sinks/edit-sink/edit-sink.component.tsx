@@ -7,10 +7,10 @@ import { ActionButton, Button, ButtonGroup, Divider, Flex, Form, Text, View } fr
 import { Back } from '@geti-ui/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
 
+import type { SinkConfig } from '../../../../constants/shared-types';
 import { useConnectSinkToPipeline } from '../../../../hooks/api/pipeline.hook';
 import { testSinkQueryOptions } from '../api/use-test-sink';
 import { useSinkAction } from '../hooks/use-sink-action.hook';
-import { SinkConfig } from '../utils';
 
 import classes from './edit-sink.module.scss';
 

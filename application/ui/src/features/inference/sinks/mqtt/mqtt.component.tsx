@@ -3,9 +3,9 @@
 
 import { Flex, NumberField, Switch, TextField } from '@geti-ui/ui';
 
+import type { MqttSinkConfig } from '../../../../constants/shared-types';
 import { OutputFormats } from '../output-formats/output-formats.component';
 import { RateLimitFields } from '../rate-limit/rate-limit-fields.component';
-import { MqttSinkConfig } from '../utils';
 
 type MqttProps = {
     defaultState: MqttSinkConfig;

@@ -8,8 +8,8 @@ import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
+import type { LocalFolderSinkConfig, SinkOutputFormats } from '../../../../constants/shared-types';
 import { server } from '../../../../msw-node-setup';
-import { LocalFolderSinkConfig, SinkOutputFormats } from '../utils';
 import { useSinkAction } from './use-sink-action.hook';
 
 const mockedConfig: LocalFolderSinkConfig = {
