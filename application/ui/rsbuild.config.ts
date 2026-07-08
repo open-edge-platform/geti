@@ -78,6 +78,7 @@ export default defineConfig({
                   css: false,
               }
             : undefined,
+        copy: [{ from: 'node_modules/onnxruntime-web/dist/*.{wasm,mjs}', to: 'ort/[name][ext]' }],
     },
     source: {
         define: {
