@@ -75,3 +75,30 @@ class SourceMediaService:
             raise
 
         return target_path.resolve()
+
+    def delete_video(self, video_path: str) -> None:
+        """
+        Remove a previously uploaded video and its dedicated UUID subdirectory.
+
+        This is a best-effort cleanup helper: it only removes files that live inside the
+        configured source media root, in their own UUID subdirectory (as created by
+        `upload`). Any path outside that root, or sitting directly at its root without a
+        subdirectory, is left untouched.
+
+        Args:
+            video_path: Absolute or relative path to the video file to remove, as previously
+                returned by `upload` (and stored as a video_file source's 'video_path').
+
+        Raises:
+            OSError: If removing the subdirectory fails (e.g. permissions, file in use).
+                Callers are expected to treat this as best-effort and handle it themselves.
+        """
+        resolved = Path(video_path).resolve()
+        base = self._source_media_dir.resolve()
+
+        if not resolved.is_relative_to(base):
+            return
+        if resolved.parent == base:
+            return
+
+        shutil.rmtree(resolved.parent)
