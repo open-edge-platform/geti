@@ -37,14 +37,16 @@ export const mapLocalAnnotationsToServer = (
 
         const hasProbabilities = filteredLabels.some((ref) => ref.probability !== undefined);
 
+        const confidences = hasProbabilities
+            ? filteredLabels
+                  .filter((labelRef): labelRef is Required<AnnotationLabelRef> => labelRef.probability !== undefined)
+                  .map((labelRef) => labelRef.probability)
+            : null;
+
         return {
             labels: filteredLabels.map(({ id }) => ({ id })),
             shape: annotation.shape,
-            ...(hasProbabilities && {
-                confidences: filteredLabels
-                    .filter((labelRef): labelRef is Required<AnnotationLabelRef> => labelRef.probability !== undefined)
-                    .map((labelRef) => labelRef.probability),
-            }),
+            confidences,
         };
     });
 };

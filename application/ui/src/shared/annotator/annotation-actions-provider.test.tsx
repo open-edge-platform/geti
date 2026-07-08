@@ -196,3 +196,54 @@ describe('Label normalization', () => {
         });
     });
 });
+
+describe('canSubmit on initial load', () => {
+    it('is false when initial annotations are unchanged, including a null confidences field from the server', async () => {
+        const label1 = getMockedLabel({ id: 'label-1', name: 'Cat', color: '#FF0000' });
+
+        // This is the exact shape the backend returns for a human annotation with no confidence
+        // scores: `confidences` is present and `null` (see DatasetItemAnnotation), never omitted.
+        const annotationsDTO: AnnotationDTO[] = [
+            { labels: [{ id: label1.id }], shape: getMockedShape({ type: 'rectangle' }), confidences: null },
+        ];
+
+        const { result } = renderAnnotationActions({
+            mode: 'annotation',
+            labels: [label1],
+            initialAnnotationsDTO: annotationsDTO,
+        });
+
+        await waitFor(() => expect(result.current).not.toBeNull());
+
+        await waitFor(() => {
+            expect(result.current.annotations).toHaveLength(1);
+            expect(result.current.canSubmit).toBe(false);
+        });
+    });
+
+    it('is true once an unchanged annotation set is actually edited', async () => {
+        const label1 = getMockedLabel({ id: 'label-1', name: 'Cat', color: '#FF0000' });
+        const label2 = getMockedLabel({ id: 'label-2', name: 'Dog', color: '#00FF00' });
+
+        const annotationsDTO: AnnotationDTO[] = [
+            { labels: [{ id: label1.id }], shape: getMockedShape({ type: 'rectangle' }), confidences: null },
+        ];
+
+        const { result } = renderAnnotationActions({
+            mode: 'annotation',
+            labels: [label1, label2],
+            initialAnnotationsDTO: annotationsDTO,
+        });
+
+        await waitFor(() => expect(result.current.canSubmit).toBe(false));
+
+        act(() => {
+            result.current.addAnnotations([getMockedShape({ type: 'rectangle' })], [{ id: label2.id }]);
+        });
+
+        await waitFor(() => {
+            expect(result.current.annotations).toHaveLength(2);
+            expect(result.current.canSubmit).toBe(true);
+        });
+    });
+});
