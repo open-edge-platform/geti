@@ -1,11 +1,23 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Content, ContextualHelp, Flex, StatusLight, Text } from '@geti-ui/ui';
+import {
+    ActionButton,
+    Content,
+    Dialog,
+    DialogTrigger,
+    dimensionValue,
+    Flex,
+    Grid,
+    StatusLight,
+    Text,
+} from '@geti-ui/ui';
+import { InfoOutline } from '@geti-ui/ui/icons';
 import { usePipelineHealth } from 'hooks/api/pipeline.hook';
+import { Fragment } from 'react/jsx-runtime';
 
 import { PipelineComponentsHealth } from '../../../constants/shared-types';
-import { getComponentStatusMeta, getOverallStatusMeta, hasComponentMessage } from './utils';
+import { getComponentStatusMeta, getOverallStatusMeta, shouldShowPipelineHealthDetails } from './utils';
 
 const COMPONENT_ORDER = ['source', 'sink', 'model'] as const;
 
@@ -15,28 +27,39 @@ const COMPONENT_LABELS: Record<(typeof COMPONENT_ORDER)[number], string> = {
     model: 'Model',
 };
 
-interface PipelineComponentsHelpProps {
+interface PipelineComponentsDetailsInfoProps {
     components: PipelineComponentsHealth;
 }
 
-const PipelineComponentsHelp = ({ components }: PipelineComponentsHelpProps) => {
+const PipelineComponentsDetailsInfo = ({ components }: PipelineComponentsDetailsInfoProps) => {
     return (
-        <ContextualHelp variant={'info'} aria-label={'Pipeline component health'}>
-            <Content>
-                <Flex direction={'column'} gap={'size-100'}>
-                    {COMPONENT_ORDER.map((key) => {
-                        const { label, variant } = getComponentStatusMeta(components[key]);
+        <DialogTrigger type={'popover'} placement={'top'}>
+            <ActionButton isQuiet aria-label={'Pipeline component health'}>
+                <InfoOutline />
+            </ActionButton>
+            <Dialog>
+                <Content>
+                    <Grid gap={'size-50'} columns={['max-content', 'max-content', 'auto']} alignContent={'start'}>
+                        {COMPONENT_ORDER.map((key) => {
+                            const { label, variant, message } = getComponentStatusMeta(components[key]);
 
-                        return (
-                            <Flex key={key} alignItems={'center'} gap={'size-100'}>
-                                <Text>{COMPONENT_LABELS[key]}</Text>
-                                <StatusLight variant={variant}>{label}</StatusLight>
-                            </Flex>
-                        );
-                    })}
-                </Flex>
-            </Content>
-        </ContextualHelp>
+                            return (
+                                <Fragment key={key}>
+                                    <Text>{COMPONENT_LABELS[key]}</Text>
+                                    <StatusLight
+                                        variant={variant}
+                                        UNSAFE_style={{ padding: 0, paddingRight: dimensionValue('size-50') }}
+                                    >
+                                        {label}
+                                    </StatusLight>
+                                    <Text marginStart={'size-150'}>{message}</Text>
+                                </Fragment>
+                            );
+                        })}
+                    </Grid>
+                </Content>
+            </Dialog>
+        </DialogTrigger>
     );
 };
 
@@ -49,15 +72,15 @@ export const PipelineHealth = () => {
 
     const { label, variant } = getOverallStatusMeta(data.status);
     const components = data.components;
-    const showComponentsHelp = components != null && hasComponentMessage(components);
+    const showPipelineHealthDetails = components != null && shouldShowPipelineHealthDetails(components);
 
     return (
-        <Flex alignItems={'center'} gap={'size-100'}>
-            <StatusLight role={'status'} variant={variant}>
+        <Flex alignItems={'center'} gap={'size-100'} height={'100%'}>
+            <StatusLight role='status' variant={variant} UNSAFE_style={{ padding: 0, alignItems: 'center' }}>
                 {label}
             </StatusLight>
 
-            {showComponentsHelp && <PipelineComponentsHelp components={components} />}
+            {showPipelineHealthDetails && <PipelineComponentsDetailsInfo components={components} />}
         </Flex>
     );
 };

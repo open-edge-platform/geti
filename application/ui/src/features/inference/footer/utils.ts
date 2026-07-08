@@ -8,6 +8,12 @@ import { PipelineComponentsHealth, PipelineStatus } from '../../../constants/sha
 
 export type StatusVariant = StatusLightProps['variant'];
 
+export type ComponentStatusMeta = {
+    label: string;
+    variant: StatusVariant;
+    message: string | null | undefined;
+};
+
 export interface StatusMeta {
     label: string;
     variant: StatusVariant;
@@ -26,26 +32,30 @@ export const getOverallStatusMeta = (status: string): StatusMeta => {
     }
 };
 
-export const getComponentStatusMeta = (component: PipelineStatus): StatusMeta => {
-    if (component.message != null) {
-        return { label: component.message, variant: 'negative' };
-    }
-
+export const getComponentStatusMeta = (component: PipelineStatus): ComponentStatusMeta => {
     switch (component.status) {
         case 'ok':
-            return { label: 'Healthy', variant: 'positive' };
+            return { label: 'Healthy', variant: 'positive', message: component.message };
         case 'finished':
-            return { label: 'Finished', variant: 'info' };
+            return { label: 'Finished', variant: 'info', message: component.message };
         case 'unavailable':
-            return { label: 'Unavailable', variant: 'neutral' };
+            return { label: 'Unavailable', variant: 'neutral', message: component.message };
         case 'error':
-            return { label: 'Error', variant: 'negative' };
+            return { label: 'Error', variant: 'negative', message: component.message };
         default:
-            return { label: capitalize(component.status), variant: 'neutral' };
+            return { label: capitalize(component.status), variant: 'neutral', message: component.message };
     }
 };
 
 export const hasComponentMessage = (components: PipelineComponentsHealth | null | undefined): boolean => {
+    if (components == null) {
+        return false;
+    }
+
+    return [components.source, components.sink, components.model].some((component) => component.message != null);
+};
+
+export const shouldShowPipelineHealthDetails = (components: PipelineComponentsHealth | null | undefined): boolean => {
     if (components == null) {
         return false;
     }

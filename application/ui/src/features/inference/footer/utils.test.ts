@@ -1,10 +1,10 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SchemaStatus } from '../../../api/openapi-spec';
-import { getComponentStatusMeta, getOverallStatusMeta, hasComponentMessage } from './utils';
+import { PipelineStatus } from '../../../constants/shared-types';
+import { getComponentStatusMeta, getOverallStatusMeta, shouldShowPipelineHealthDetails } from './utils';
 
-const getStatus = (custom?: Partial<SchemaStatus>): SchemaStatus => ({
+const getStatus = (custom?: Partial<PipelineStatus>): PipelineStatus => ({
     status: 'ok',
     updated_at: '2026-01-01T00:00:00Z',
     message: null,
@@ -32,41 +32,46 @@ describe('getComponentStatusMeta', () => {
         ['unavailable', 'Unavailable', 'neutral'],
         ['error', 'Error', 'negative'],
     ])('maps known status "%s" (no message) to label "%s" and variant "%s"', (status, label, variant) => {
-        expect(getComponentStatusMeta(getStatus({ status, message: null }))).toEqual({ label, variant });
+        expect(getComponentStatusMeta(getStatus({ status, message: null }))).toEqual({ label, variant, message: null });
     });
 
     it('falls back to a capitalized label and neutral variant for an unknown status', () => {
         expect(getComponentStatusMeta(getStatus({ status: 'mystery_state', message: null }))).toEqual({
             label: 'Mystery_state',
             variant: 'neutral',
+            message: null,
         });
     });
 
     it('prefers the raw message over the friendly status label when a message is present', () => {
         const component = getStatus({ status: 'error', message: 'Connection refused' });
 
-        expect(getComponentStatusMeta(component)).toEqual({ label: 'Connection refused', variant: 'negative' });
+        expect(getComponentStatusMeta(component)).toEqual({
+            label: 'Error',
+            variant: 'negative',
+            message: 'Connection refused',
+        });
     });
 
     it('falls back to the friendly "Error" label when status is error but message is null', () => {
         const component = getStatus({ status: 'error', message: null });
 
-        expect(getComponentStatusMeta(component)).toEqual({ label: 'Error', variant: 'negative' });
+        expect(getComponentStatusMeta(component)).toEqual({ label: 'Error', variant: 'negative', message: null });
     });
 });
 
-describe('hasComponentMessage', () => {
+describe('shouldShowPipelineHealthDetails', () => {
     it('returns false when components is null', () => {
-        expect(hasComponentMessage(null)).toBe(false);
+        expect(shouldShowPipelineHealthDetails(null)).toBe(false);
     });
 
     it('returns false when components is undefined', () => {
-        expect(hasComponentMessage(undefined)).toBe(false);
+        expect(shouldShowPipelineHealthDetails(undefined)).toBe(false);
     });
 
     it('returns false when no component has a message', () => {
         expect(
-            hasComponentMessage({
+            shouldShowPipelineHealthDetails({
                 source: getStatus({ message: null }),
                 sink: getStatus({ message: null }),
                 model: getStatus({ message: null }),
@@ -76,7 +81,7 @@ describe('hasComponentMessage', () => {
 
     it('returns false when status is error but the message is null (edge case)', () => {
         expect(
-            hasComponentMessage({
+            shouldShowPipelineHealthDetails({
                 source: getStatus({ status: 'error', message: null }),
                 sink: getStatus({ message: null }),
                 model: getStatus({ message: null }),
@@ -86,7 +91,7 @@ describe('hasComponentMessage', () => {
 
     it.each(['source', 'sink', 'model'] as const)('returns true when the %s component has a message', (key) => {
         expect(
-            hasComponentMessage({
+            shouldShowPipelineHealthDetails({
                 source: getStatus({ message: null }),
                 sink: getStatus({ message: null }),
                 model: getStatus({ message: null }),
@@ -97,7 +102,7 @@ describe('hasComponentMessage', () => {
 
     it('returns true when multiple components have messages simultaneously', () => {
         expect(
-            hasComponentMessage({
+            shouldShowPipelineHealthDetails({
                 source: getStatus({ status: 'error', message: 'Camera disconnected' }),
                 sink: getStatus({ message: null }),
                 model: getStatus({ status: 'error', message: 'Model load failed' }),
