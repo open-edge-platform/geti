@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 from getitune.backend.lightning.exporter.base import ModelExporter
 from getitune.backend.lightning.exporter.native import LightningModelExporter
@@ -16,7 +16,6 @@ from getitune.backend.lightning.models.detection.heads.dfine_decoder import DFIN
 from getitune.backend.lightning.models.detection.losses.dfine_loss import DFINECriterion
 from getitune.backend.lightning.models.detection.necks.dfine_hybrid_encoder import HybridEncoder
 from getitune.backend.lightning.models.detection.rtdetr import RTDETR
-from getitune.backend.lightning.models.detection.utils.pretrained_urls import DFINE_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 
@@ -50,7 +49,14 @@ class DFine(RTDETR):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_urls = DFINE_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "dfine_hgnetv2_n": "https://storage.geti.intel.com/weights/dfine_n_coco.pth",
+        "dfine_hgnetv2_s": "https://storage.geti.intel.com/weights/dfine_s_coco.pth",
+        "dfine_hgnetv2_m": "https://storage.geti.intel.com/weights/dfine_m_coco.pth",
+        "dfine_hgnetv2_l": "https://storage.geti.intel.com/weights/dfine_l_coco.pth",
+        "dfine_hgnetv2_x": "https://storage.geti.intel.com/weights/dfine_x_coco.pth",
+    }
+
     input_size_multiplier = 32
 
     def __init__(

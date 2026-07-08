@@ -25,7 +25,6 @@ from getitune.backend.lightning.models.base import DataInputParams, DefaultOptim
 from getitune.backend.lightning.models.common.rfdetr_mixin import RFDETRMixin
 from getitune.backend.lightning.models.detection.base import LightningDetectionModel
 from getitune.backend.lightning.models.detection.detectors.rfdetr import RFDETRDetector
-from getitune.backend.lightning.models.detection.utils.pretrained_urls import RFDETR_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 from getitune.types.export import TaskLevelExportParameters
@@ -75,7 +74,12 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
         Input sizes must be compatible with patch_size * num_windows.
     """
 
-    pretrained_urls = RFDETR_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "rfdetr_nano": "https://storage.geti.intel.com/weights/rf-detr-nano-2026.pth",
+        "rfdetr_small": "https://storage.geti.intel.com/weights/rf-detr-small-2026.pth",
+        "rfdetr_medium": "https://storage.geti.intel.com/weights/rf-detr-medium-2026.pth",
+        "rfdetr_large": "https://storage.geti.intel.com/weights/rf-detr-large-2026.pth",
+    }
 
     _model_config_mapping: ClassVar[dict[str, type]] = {
         "rfdetr_large": RFDETRLargeConfig,

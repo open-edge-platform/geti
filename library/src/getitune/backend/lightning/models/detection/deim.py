@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
 from getitune.backend.lightning.exporter.base import ModelExporter
 from getitune.backend.lightning.exporter.native import LightningModelExporter
@@ -15,7 +15,6 @@ from getitune.backend.lightning.models.detection.detectors import DETR
 from getitune.backend.lightning.models.detection.heads.dfine_decoder import DFINETransformer
 from getitune.backend.lightning.models.detection.losses.deim_loss import DEIMCriterion
 from getitune.backend.lightning.models.detection.necks.dfine_hybrid_encoder import HybridEncoder
-from getitune.backend.lightning.models.detection.utils.pretrained_urls import DEIM_DFINE_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 
@@ -61,7 +60,14 @@ class DEIMDFine(RTDETR):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_urls = DEIM_DFINE_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "deim_dfine_hgnetv2_n": "https://storage.geti.intel.com/weights/deim_dfine_hgnetv2_n_coco_160e.pth",
+        "deim_dfine_hgnetv2_s": "https://storage.geti.intel.com/weights/deim_dfine_hgnetv2_s_coco_120e.pth",
+        "deim_dfine_hgnetv2_m": "https://storage.geti.intel.com/weights/deim_dfine_hgnetv2_m_coco_90e.pth",
+        "deim_dfine_hgnetv2_l": "https://storage.geti.intel.com/weights/deim_dfine_hgnetv2_l_coco_50e.pth",
+        "deim_dfine_hgnetv2_x": "https://storage.geti.intel.com/weights/deim_dfine_hgnetv2_x_coco_50e.pth",
+    }
+
     input_size_multiplier = 32
 
     def __init__(

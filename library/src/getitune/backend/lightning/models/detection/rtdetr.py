@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import copy
 import re
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 import torch
 from torch import Tensor, nn
@@ -23,7 +23,6 @@ from getitune.backend.lightning.models.detection.base import LightningDetectionM
 from getitune.backend.lightning.models.detection.detectors import DETR
 from getitune.backend.lightning.models.detection.heads import RTDETRTransformer
 from getitune.backend.lightning.models.detection.necks import HybridEncoder
-from getitune.backend.lightning.models.detection.utils.pretrained_urls import RTDETR_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.data.entity.base import BatchLoss
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
@@ -60,7 +59,12 @@ class RTDETR(LightningDetectionModel):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_urls = RTDETR_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "rtdetr_18": "https://storage.geti.intel.com/weights/rtdetr_r18vd_5x_coco_objects365_from_paddle.pth",
+        "rtdetr_50": "https://storage.geti.intel.com/weights/rtdetr_r50vd_2x_coco_objects365_from_paddle.pth",
+        "rtdetr_101": "https://storage.geti.intel.com/weights/rtdetr_r101vd_2x_coco_objects365_from_paddle.pth",
+    }
+
     input_size_multiplier = 32
 
     def __init__(

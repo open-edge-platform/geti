@@ -7,13 +7,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 import torch
 from torch import Tensor
 from torchvision import tv_tensors
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor, _default_anchorgen
-from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
+from torchvision.models.detection.mask_rcnn import MaskRCNN_ResNet50_FPN_V2_Weights, MaskRCNNPredictor
 
 from getitune.backend.lightning.exporter.base import ModelExporter
 from getitune.backend.lightning.exporter.native import LightningModelExporter
@@ -28,7 +28,6 @@ from getitune.backend.lightning.models.instance_segmentation.segmentors.maskrcnn
     MaskRCNNHeads,
     RPNHead,
 )
-from getitune.backend.lightning.models.instance_segmentation.utils.pretrained_urls import MASKRCNNTV_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.data.entity.base import BatchLoss
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
@@ -62,7 +61,9 @@ class MaskRCNNTV(LightningInstanceSegModel):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_urls = MASKRCNNTV_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "maskrcnn_resnet_50": MaskRCNN_ResNet50_FPN_V2_Weights.verify("DEFAULT").url,
+    }
 
     def __init__(
         self,

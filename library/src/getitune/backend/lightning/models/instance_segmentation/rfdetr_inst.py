@@ -23,7 +23,6 @@ from getitune.backend.lightning.models.base import DataInputParams, DefaultOptim
 from getitune.backend.lightning.models.common.rfdetr_mixin import RFDETRMixin
 from getitune.backend.lightning.models.detection.detectors.rfdetr import RFDETRDetector
 from getitune.backend.lightning.models.instance_segmentation.base import LightningInstanceSegModel
-from getitune.backend.lightning.models.instance_segmentation.utils.pretrained_urls import RFDETR_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
 from getitune.types.export import TaskLevelExportParameters
@@ -69,8 +68,14 @@ class RFDETRInst(RFDETRMixin, LightningInstanceSegModel):  # pyrefly: ignore[inc
         RF-DETR Segmentation uses patch_size=12 with 2 windows for 432x432 input resolution.
     """
 
-    pretrained_urls = RFDETR_PRETRAINED_URLS
-
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "rfdetr_seg_n": "https://storage.geti.intel.com/weights/rf-detr-seg-n-ft.pth",
+        "rfdetr_seg_s": "https://storage.geti.intel.com/weights/rf-detr-seg-s-ft.pth",
+        "rfdetr_seg_m": "https://storage.geti.intel.com/weights/rf-detr-seg-m-ft.pth",
+        "rfdetr_seg_l": "https://storage.geti.intel.com/weights/rf-detr-seg-l-ft.pth",
+        "rfdetr_seg_xl": "https://storage.geti.intel.com/weights/rf-detr-seg-xl-ft.pth",
+        "rfdetr_seg_2xl": "https://storage.geti.intel.com/weights/rf-detr-seg-2xl-ft.pth",
+    }
     _model_config_mapping: ClassVar[dict[str, type]] = {
         "rfdetr_seg_n": RFDETRSegNanoConfig,
         "rfdetr_seg_s": RFDETRSegSmallConfig,

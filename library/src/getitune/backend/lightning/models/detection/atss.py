@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
 from torch.export import Dim
 
@@ -22,7 +22,6 @@ from getitune.backend.lightning.models.detection.heads import ATSSHead
 from getitune.backend.lightning.models.detection.losses import ATSSCriterion
 from getitune.backend.lightning.models.detection.necks import FPN
 from getitune.backend.lightning.models.detection.utils.assigners import ATSSAssigner
-from getitune.backend.lightning.models.detection.utils.pretrained_urls import ATSS_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 
@@ -55,7 +54,10 @@ class ATSS(LightningDetectionModel):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_urls = ATSS_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "atss_mobilenetv2": "https://storage.geti.intel.com/weights/mobilenet_v2-atss.pth",
+        "atss_resnext101": "https://storage.geti.intel.com/weights/resnext101_atss_070623.pth",
+    }
 
     def __init__(
         self,

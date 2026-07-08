@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 from torch.export import Dim
 
@@ -20,7 +20,6 @@ from getitune.backend.lightning.models.detection.heads import YOLOXHead
 from getitune.backend.lightning.models.detection.losses import YOLOXCriterion
 from getitune.backend.lightning.models.detection.necks import YOLOXPAFPN
 from getitune.backend.lightning.models.detection.utils.assigners import SimOTAAssigner
-from getitune.backend.lightning.models.detection.utils.pretrained_urls import YOLOX_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.data.entity.sample import SampleBatch
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
@@ -67,7 +66,12 @@ class YOLOX(LightningDetectionModel):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_urls = YOLOX_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "yolox_tiny": "https://storage.geti.intel.com/weights/yolox_tiny_8x8.pth",
+        "yolox_s": "https://storage.geti.intel.com/weights/yolox_s_8x8_300e_coco_20211121_095711-4592a793.pth",
+        "yolox_l": "https://storage.geti.intel.com/weights/yolox_l_8x8_300e_coco_20211126_140236-d3bd2b23.pth",
+        "yolox_x": "https://storage.geti.intel.com/weights/yolox_x_8x8_300e_coco_20211126_140254-1ef88d67.pth",
+    }
 
     input_size_multiplier = 32
 

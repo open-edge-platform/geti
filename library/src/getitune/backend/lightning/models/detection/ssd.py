@@ -12,7 +12,7 @@ Reference : https://github.com/open-mmlab/mmdetection/blob/v3.2.0/mmdet/models/d
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 import numpy as np
 from torch.export import Dim
@@ -26,7 +26,6 @@ from getitune.backend.lightning.models.detection.base import LightningDetectionM
 from getitune.backend.lightning.models.detection.detectors import SingleStageDetector
 from getitune.backend.lightning.models.detection.heads import SSDHead
 from getitune.backend.lightning.models.detection.losses import SSDCriterion
-from getitune.backend.lightning.models.detection.utils.pretrained_urls import SSD_PRETRAINED_URLS
 from getitune.backend.lightning.models.detection.utils.prior_generators import SSDAnchorGeneratorClustered
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
@@ -68,7 +67,9 @@ class SSD(LightningDetectionModel):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_urls = SSD_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "ssd_mobilenetv2": "https://storage.geti.intel.com/weights/mobilenet_v2-2s_ssd-992x736.pth",
+    }
 
     def __init__(
         self,

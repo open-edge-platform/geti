@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
 from getitune.backend.lightning.models.detection.backbones.dinov3sta import DINOv3STAs
@@ -13,7 +13,6 @@ from getitune.backend.lightning.models.detection.detectors import DETR
 from getitune.backend.lightning.models.detection.heads.deim_decoder import DEIMTransformer
 from getitune.backend.lightning.models.detection.losses.deim_loss import DEIMCriterion
 from getitune.backend.lightning.models.detection.necks.dfine_hybrid_encoder import HybridEncoder
-from getitune.backend.lightning.models.detection.utils.pretrained_urls import DEIMV2_PRETRAINED_URLS
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 
@@ -59,7 +58,13 @@ class DEIMV2(DEIMDFine):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_urls = DEIMV2_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "deimv2_x": "https://storage.geti.intel.com/weights/deimv2_dinov3_x_coco.pth",
+        "deimv2_l": "https://storage.geti.intel.com/weights/deimv2_dinov3_l_coco.pth",
+        "deimv2_m": "https://storage.geti.intel.com/weights/deimv2_dinov3_m_coco.pth",
+        "deimv2_s": "https://storage.geti.intel.com/weights/deimv2_dinov3_s_coco.pth",
+    }
+
     input_size_multiplier = 32
 
     def __init__(

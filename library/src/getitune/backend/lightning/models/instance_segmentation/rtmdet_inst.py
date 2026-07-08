@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal
 
 from torch import nn
 
@@ -24,7 +24,6 @@ from getitune.backend.lightning.models.instance_segmentation.base import Lightni
 from getitune.backend.lightning.models.instance_segmentation.heads import RTMDetInstSepBNHead
 from getitune.backend.lightning.models.instance_segmentation.losses import DiceLoss, RTMDetInstCriterion
 from getitune.backend.lightning.models.instance_segmentation.necks import CSPNeXtPAFPN
-from getitune.backend.lightning.models.instance_segmentation.utils.pretrained_urls import RTMDET_PRETRAINED_URLS
 from getitune.backend.lightning.models.modules.norm import build_norm_layer
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
@@ -56,7 +55,9 @@ class RTMDetInst(LightningInstanceSegModel):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_urls = RTMDET_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "rtmdet_inst_tiny": "https://storage.geti.intel.com/weights/rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth"
+    }
 
     def __init__(
         self,

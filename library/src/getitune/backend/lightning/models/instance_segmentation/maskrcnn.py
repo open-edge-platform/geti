@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 import torch
 from torch import nn
@@ -28,7 +28,6 @@ from getitune.backend.lightning.models.instance_segmentation.heads import ConvFC
 from getitune.backend.lightning.models.instance_segmentation.losses import ROICriterion, RPNCriterion
 from getitune.backend.lightning.models.instance_segmentation.rotated_det import RotatedPredictMixin
 from getitune.backend.lightning.models.instance_segmentation.segmentors.two_stage import TwoStageDetector
-from getitune.backend.lightning.models.instance_segmentation.utils.pretrained_urls import MASKRCNN_PRETRAINED_URLS
 from getitune.backend.lightning.models.instance_segmentation.utils.roi_extractors import SingleRoIExtractor
 from getitune.backend.lightning.models.modules.norm import build_norm_layer
 from getitune.config.data import TileConfig
@@ -61,7 +60,10 @@ class MaskRCNN(LightningInstanceSegModel):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    pretrained_urls = MASKRCNN_PRETRAINED_URLS
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "maskrcnn_efficientnet_b2b": "https://storage.geti.intel.com/weights/efficientnet_b2b-mask_rcnn-576x576.pth",
+        "maskrcnn_swin_tiny": "https://storage.geti.intel.com/weights/mask_rcnn_swin-t-p4-w7_fpn_fp16_ms-crop-3x_coco_20210908_165006-90a4008c.pth",
+    }
 
     def __init__(
         self,
