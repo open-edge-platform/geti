@@ -46,7 +46,7 @@ const ProjectGrid = () => {
 
     return (
         <Flex direction={'column'} gap={'size-100'} height={'100%'}>
-            <Flex justifyContent={'space-between'} alignItems={'end'} gap={'size-200'} wrap>
+            <Flex justifyContent={'space-between'} alignItems={'center'} gap={'size-200'} wrap>
                 <ProjectFilters
                     searchName={searchName}
                     onSearchChange={setSearchName}

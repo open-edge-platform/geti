@@ -1,44 +1,28 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Project } from '../../../../constants/shared-types';
-import { isMultiLabelClassificationTask } from '../../task-type-guards';
+import { Project, TaskType } from '../../../../constants/shared-types';
 
-export type TaskCategory =
-    | 'classification'
-    | 'multi_label_classification'
-    | 'detection'
-    | 'instance_segmentation';
+export type TaskCategory = TaskType;
 
 export const TASK_CATEGORY_LABELS: Record<TaskCategory, string> = {
     classification: 'Classification',
-    multi_label_classification: 'Multi-label classification',
-    detection: 'Object detection',
-    instance_segmentation: 'Instance segmentation',
+    detection: 'Detection',
+    instance_segmentation: 'Segmentation',
 };
 
 // Each task category has its own colour so filtered projects are easily distinguishable.
 // Colours are chosen to keep enough contrast with white text.
 export const TASK_CATEGORY_COLORS: Record<TaskCategory, string> = {
     classification: '#7454c9',
-    multi_label_classification: '#c93f9e',
     detection: '#0e8a7d',
     instance_segmentation: '#b5651d',
 };
 
-export const TASK_CATEGORY_OPTIONS: TaskCategory[] = [
-    'classification',
-    'multi_label_classification',
-    'detection',
-    'instance_segmentation',
-];
+export const TASK_CATEGORY_OPTIONS: TaskCategory[] = ['classification', 'detection', 'instance_segmentation'];
 
 export const getProjectTaskCategory = (project: Project): TaskCategory => {
-    if (isMultiLabelClassificationTask(project.task)) {
-        return 'multi_label_classification';
-    }
-
-    return project.task.task_type as TaskCategory;
+    return project.task.task_type;
 };
 
 export const filterProjects = (

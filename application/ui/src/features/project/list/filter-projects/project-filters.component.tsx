@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Flex, SearchField, ToggleButton } from '@geti-ui/ui';
+import { Flex, Responsive, SearchField, ToggleButton } from '@geti-ui/ui';
 
 import { TASK_CATEGORY_COLORS, TASK_CATEGORY_LABELS, TASK_CATEGORY_OPTIONS, TaskCategory } from './utils';
 
@@ -12,7 +12,7 @@ interface ProjectFiltersProps {
     onSearchChange: (value: string) => void;
     selectedCategories: TaskCategory[];
     onToggleCategory: (category: TaskCategory) => void;
-    searchWidth?: string;
+    searchWidth?: Responsive<string | number>;
 }
 
 export const ProjectFilters = ({
@@ -20,10 +20,10 @@ export const ProjectFilters = ({
     onSearchChange,
     selectedCategories,
     onToggleCategory,
-    searchWidth = 'size-3000',
+    searchWidth = { base: '100%', M: 'size-3000' },
 }: ProjectFiltersProps) => {
     return (
-        <Flex gap={'size-100'} alignItems={'center'} wrap>
+        <Flex gap={'size-100'} alignItems={'center'} wrap UNSAFE_className={classes.filtersRow}>
             <SearchField
                 value={searchName}
                 onChange={onSearchChange}

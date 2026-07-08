@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router';
 
 import { paths } from '../../../constants/paths';
 import { Project } from '../../../constants/shared-types';
-import { getProjectTaskCategory, TASK_CATEGORY_COLORS } from '../../../features/project/list/filter-projects/utils';
 import {
     ProjectActionsMenu,
     type ProjectActionMetadata,
@@ -34,7 +33,6 @@ export const ProjectListItem = ({
     const navigate = useNavigate();
 
     const taskType = getProjectTypeTitle(project.task);
-    const taskColor = TASK_CATEGORY_COLORS[getProjectTaskCategory(project)];
 
     const handleNavigateToProject = () => {
         navigate(paths.project.dataset.index({ projectId: project.id }));
@@ -49,11 +47,7 @@ export const ProjectListItem = ({
                         <span title={project.name}>{project.name}</span>
                     </Text>
                     {taskType !== undefined && (
-                        <Badge
-                            variant={'neutral'}
-                            UNSAFE_className={classes.itemTag}
-                            UNSAFE_style={{ backgroundColor: taskColor, color: '#fff' }}
-                        >
+                        <Badge variant={'neutral'} UNSAFE_className={classes.itemTag}>
                             <Text>{taskType}</Text>
                         </Badge>
                     )}
