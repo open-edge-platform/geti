@@ -22,7 +22,8 @@ import { AnnotatorModes } from './annotator-modes/annotator-modes-toggle.compone
 import { PredictionInferenceDevices } from './annotator-modes/prediction-inference-devices.component';
 import { PredictionModelSelector } from './annotator-modes/prediction-model-selector.component';
 import { PredictionButtons } from './annotator-modes/predictions-buttons.component';
-import { getIsSubmitDisabled, getNextItem } from './util';
+import { useIsSubmitDisabled } from './use-is-submit-disabled.hook';
+import { getNextItem } from './util';
 
 import classes from './secondary-toolbar.module.scss';
 
@@ -95,15 +96,8 @@ export const SecondaryToolbar = ({
     const { selectableModels } = usePredictionSetup();
     const isPlaying = videoPlayerContext?.videoControls?.isPlaying ?? false;
 
-    const {
-        canSubmit,
-        hasInvalidAnnotation,
-        isSaving,
-        submitAnnotations,
-        submitPredictions,
-        initialAnnotations,
-        initialPredictions,
-    } = useAnnotationActions();
+    const { isSaving, submitAnnotations, submitPredictions, initialAnnotations, initialPredictions } =
+        useAnnotationActions();
 
     const handleSubmit = async () => {
         await submitAnnotations(subset);
@@ -128,12 +122,9 @@ export const SecondaryToolbar = ({
     const isPredictionMode = mode === 'prediction';
     const isAnnotationMode = mode === 'annotation';
 
-    const isSubmitDisabled = getIsSubmitDisabled({
+    const isSubmitDisabled = useIsSubmitDisabled({
         mode,
-        canSubmit,
-        hasInvalidAnnotation,
         hasSubsetChanged,
-        isSaving,
         isLoadingPredictions,
     });
 
