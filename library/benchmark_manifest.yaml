@@ -166,6 +166,18 @@ experiments:
       - name: yolo26_m
         priority: extended
         recipe: detection/yolo26_m.yaml
+      - name: edgecrafter_s
+        priority: extended
+        recipe: detection/edgecrafter_s.yaml
+      - name: edgecrafter_m
+        priority: extended
+        recipe: detection/edgecrafter_m.yaml
+      - name: edgecrafter_l
+        priority: extended
+        recipe: detection/edgecrafter_l.yaml
+      - name: edgecrafter_x
+        priority: extended
+        recipe: detection/edgecrafter_x.yaml
       - name: yolo26_l
         priority: extended
         recipe: detection/yolo26_l.yaml

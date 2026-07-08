@@ -16,6 +16,7 @@ from getitune.backend.lightning.models.detection.backbones.vit_tiny import (
     drop_path,
     rotate_half,
 )
+from getitune.backend.lightning.models.modules.drop import DropPath as SharedDropPath
 
 
 class TestHelperFunctions:
@@ -244,7 +245,11 @@ class TestBlock:
 
     def test_init_with_droppath(self, block_with_droppath):
         """Test block with drop path initialization."""
-        assert isinstance(block_with_droppath.drop_path, DropPath)
+        # `Block` is now shared (common/layers/vit_blocks.py) and uses the canonical
+        # `modules.drop.DropPath` internally, not vit_tiny's own standalone `DropPath`
+        # (the two are behaviorally identical; `vit_tiny.DropPath` is kept for its own
+        # direct unit tests below and is no longer used internally by `Block`).
+        assert isinstance(block_with_droppath.drop_path, SharedDropPath)
         assert block_with_droppath.drop_path.drop_prob == 0.1
 
     def test_forward_without_rope(self, block):
