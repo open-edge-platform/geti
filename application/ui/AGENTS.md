@@ -54,11 +54,11 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
 ## Conventions
 
 - TypeScript: no `any` — use `unknown` and narrow.
-- Prefer `interface` for object shapes, and compose them with `extends` instead of
+- Prefer `interface` for object shapes that do composition with `extends` instead of
   `type` intersections (`A & B`): interfaces flatten to a single object type, catch
   property conflicts, display better in errors, and let the compiler cache type
   relationships.
-- Use `type` for what an interface can't express: unions, tuples, function
+- Use `type` for what an interface can't express: object shapes, unions, tuples, function
   signatures, and mapped/conditional or other computed types. Give a complex or
   reused computed type a named `type` alias so the compiler can cache the result.
 - Function components + hooks only. Co-locate styles as CSS Modules

@@ -3,7 +3,7 @@
 
 import { isEmpty } from 'lodash-es';
 
-import { Pipeline } from '../constants/shared-types';
+import type { Pipeline } from '../constants/shared-types';
 
 export const useIsPipelineConfigured = (pipeline?: Pipeline) => {
     if (!pipeline) return false;
