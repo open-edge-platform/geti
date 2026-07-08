@@ -61,6 +61,7 @@ export const usePipelineHealth = () => {
         },
         {
             refetchInterval: POLLING_INTERVAL,
+            retry: false,
         }
     );
 };

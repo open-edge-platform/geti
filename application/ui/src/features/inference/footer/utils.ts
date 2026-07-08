@@ -47,14 +47,6 @@ export const getComponentStatusMeta = (component: PipelineStatus): ComponentStat
     }
 };
 
-export const hasComponentMessage = (components: PipelineComponentsHealth | null | undefined): boolean => {
-    if (components == null) {
-        return false;
-    }
-
-    return [components.source, components.sink, components.model].some((component) => component.message != null);
-};
-
 export const shouldShowPipelineHealthDetails = (components: PipelineComponentsHealth | null | undefined): boolean => {
     if (components == null) {
         return false;

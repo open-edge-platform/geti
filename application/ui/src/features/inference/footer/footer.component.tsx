@@ -7,7 +7,7 @@ import { PipelineHealth } from './pipeline-health.component';
 
 export const Footer = () => {
     return (
-        <View backgroundColor={'gray-100'} paddingY={'size-150'} paddingX={'size-100'}>
+        <View gridArea={'footer'} backgroundColor={'gray-100'} paddingY={'size-150'} paddingX={'size-100'}>
             <PipelineHealth />
         </View>
     );

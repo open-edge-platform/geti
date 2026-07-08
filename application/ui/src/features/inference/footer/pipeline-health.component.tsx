@@ -1,6 +1,8 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { Fragment } from 'react';
+
 import {
     ActionButton,
     Content,
@@ -14,7 +16,6 @@ import {
 } from '@geti-ui/ui';
 import { InfoOutline } from '@geti-ui/ui/icons';
 import { usePipelineHealth } from 'hooks/api/pipeline.hook';
-import { Fragment } from 'react/jsx-runtime';
 
 import { PipelineComponentsHealth } from '../../../constants/shared-types';
 import { getComponentStatusMeta, getOverallStatusMeta, shouldShowPipelineHealthDetails } from './utils';
