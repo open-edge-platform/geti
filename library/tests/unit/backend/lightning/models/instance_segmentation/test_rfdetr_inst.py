@@ -233,3 +233,69 @@ class TestRFDETRInst:
             assert "masks" in target
             assert "size" in target
             assert "orig_size" in target
+
+    def test_customize_inputs_aligns_mismatched_annotation_counts(self) -> None:
+        """Mismatched per-image boxes/labels/masks are aligned to a common count.
+
+        Regression test for a crash inside the RF-DETR Hungarian matcher
+        (``RuntimeError: The size of tensor a (N) must match the size of tensor
+        b (M) ...``) that occurred when a geometric/tiling transform dropped one
+        annotation type (e.g. boxes) without dropping the paired masks. The
+        criterion concatenates boxes/labels/masks per target and requires their
+        counts to match, so ``_customize_inputs`` must align them.
+        """
+        from torchvision import tv_tensors
+
+        from getitune.data.entity.base import ImageInfo
+        from getitune.data.entity.sample import SampleBatch
+
+        model = RFDETRInst(model_name="rfdetr_seg_n", label_info=3)
+
+        # Image 0: 1 box / 1 label but 3 masks (masks not dropped with boxes).
+        # Image 1: 2 masks / 2 labels but only 1 box.
+        batch = SampleBatch(
+            images=torch.stack([torch.randn(3, 320, 320), torch.randn(3, 320, 320)]),
+            bboxes=[
+                tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+                    torch.tensor([[10, 10, 50, 50]], dtype=torch.float32),
+                    format=tv_tensors.BoundingBoxFormat.XYXY,
+                    canvas_size=(320, 320),
+                ),
+                tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+                    torch.tensor([[20, 20, 80, 80]], dtype=torch.float32),
+                    format=tv_tensors.BoundingBoxFormat.XYXY,
+                    canvas_size=(320, 320),
+                ),
+            ],
+            labels=[
+                torch.tensor([0], dtype=torch.long),
+                torch.tensor([1, 2], dtype=torch.long),
+            ],
+            masks=[
+                tv_tensors.Mask(torch.zeros((3, 320, 320), dtype=torch.uint8)),
+                tv_tensors.Mask(torch.zeros((2, 320, 320), dtype=torch.uint8)),
+            ],
+            imgs_info=[
+                ImageInfo(  # pyrefly: ignore[no-matching-overload]
+                    img_idx=0, img_shape=(320, 320), ori_shape=(320, 320)
+                ),
+                ImageInfo(  # pyrefly: ignore[no-matching-overload]
+                    img_idx=1, img_shape=(320, 320), ori_shape=(320, 320)
+                ),
+            ],
+        )
+
+        customized = model._customize_inputs(batch)
+        targets = customized["targets"]
+        assert len(targets) == 2
+
+        # Every target must have matching boxes/labels/masks counts so the
+        # criterion's per-target concatenation does not raise.
+        for target in targets:
+            n_boxes = target["boxes"].shape[0]
+            assert target["labels"].shape[0] == n_boxes
+            assert target["masks"].shape[0] == n_boxes
+
+        # Counts are aligned to the per-image minimum (1 for both images here).
+        assert targets[0]["boxes"].shape[0] == 1
+        assert targets[1]["boxes"].shape[0] == 1

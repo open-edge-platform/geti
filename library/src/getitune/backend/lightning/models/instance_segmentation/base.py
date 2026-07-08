@@ -25,6 +25,7 @@ from getitune.backend.lightning.models.base import (
     DefaultSchedulerCallable,
     LightningModel,
 )
+from getitune.backend.lightning.models.common.target_utils import align_sample_batch_annotations
 from getitune.backend.lightning.models.instance_segmentation.segmentors.maskrcnn_tv import MaskRCNN
 from getitune.backend.lightning.models.instance_segmentation.segmentors.two_stage import TwoStageDetector
 from getitune.backend.lightning.models.utils.utils import InstanceData, load_checkpoint
@@ -115,6 +116,11 @@ class LightningInstanceSegModel(LightningModel):
         return detector
 
     def _customize_inputs(self, entity: SampleBatch) -> dict[str, Any]:
+        # Defensively realign per-image boxes/labels/masks counts so a divergence
+        # (e.g. from tiling or crop augmentations) does not crash mmdet's
+        # InstanceData, which requires all instance-level fields to share length.
+        if self.training:
+            align_sample_batch_annotations(entity)
         if isinstance(entity.images, list):
             entity.images, entity.imgs_info = stack_batch(entity.images, entity.imgs_info, pad_size_divisor=32)  # type: ignore[assignment,arg-type]
         inputs: dict[str, Any] = {}

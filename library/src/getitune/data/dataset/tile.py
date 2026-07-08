@@ -23,6 +23,7 @@ from getitune.data.entity.tile import (
 )
 from getitune.types.task import TaskType
 
+from ._tiling_patches import patch_instance_mask_tiler
 from .base import VisionDataset, _ensure_chw_format
 
 if TYPE_CHECKING:
@@ -30,6 +31,12 @@ if TYPE_CHECKING:
     from getitune.data.dataset.detection import DetectionDataset
     from getitune.data.dataset.instance_segmentation import InstanceSegDataset
     from getitune.data.dataset.segmentation import SegmentationDataset
+
+# Fix Datumaro's InstanceMaskTiler so instance masks are filtered in sync with
+# bounding boxes/labels during tiling (see ``_tiling_patches`` for details).
+# Applied at import time so every tiling transform created via this module uses
+# the corrected tiler.
+patch_instance_mask_tiler()
 
 # ruff: noqa: SLF001
 # NOTE: Disable private-member-access (SLF001).

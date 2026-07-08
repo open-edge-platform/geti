@@ -9,6 +9,7 @@ RFDETRInst (instance segmentation) models.
 
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, cast
@@ -35,6 +36,9 @@ if TYPE_CHECKING:
 
     from rfdetr.models.backbone import Backbone
     from rfdetr.models.lwdetr import LWDETR
+
+
+logger = logging.getLogger(__name__)
 
 
 def _get_param_dict(args: SimpleNamespace, model_without_ddp: torch.nn.Module) -> list[dict[str, Any]]:
@@ -178,6 +182,34 @@ class RFDETRMixin:
                     h, w = entity.images.shape[2:]  # pyrefly: ignore[missing-attribute]
                     device = getattr(entity.images, "device", torch.device("cpu"))
                     scaled_bboxes = torch.zeros((0, 4), device=device, dtype=torch.float32)
+
+                # Defensive safeguard: the RF-DETR criterion (and the Hungarian
+                # matcher) concatenate boxes, labels and masks per target and
+                # require their per-image counts to match. The data pipeline
+                # should already guarantee this, but geometric transforms
+                # (cropping, tiling, box sanitization) can occasionally drop one
+                # annotation type without the others. If counts ever diverge we
+                # align boxes/labels/masks to their common length rather than
+                # crash deep inside the matcher. This runs unconditionally so it
+                # also protects the detection path (boxes vs labels), not only
+                # instance segmentation (boxes vs labels vs masks).
+                n_boxes = int(scaled_bboxes.shape[0])
+                n_labels = int(ll.shape[0])
+                n_masks = int(mm.shape[0]) if mm is not None else n_boxes
+                if not (n_boxes == n_labels == n_masks):
+                    n = min(n_boxes, n_labels, n_masks)
+                    logger.warning(
+                        "RF-DETR target has mismatched annotation counts "
+                        "(boxes=%d, labels=%d, masks=%d); aligning to %d.",
+                        n_boxes,
+                        n_labels,
+                        n_masks,
+                        n,
+                    )
+                    scaled_bboxes = scaled_bboxes[:n]
+                    ll = ll[:n]
+                    if mm is not None:
+                        mm = mm[:n]
 
                 target: dict[str, Any] = {
                     "boxes": scaled_bboxes,

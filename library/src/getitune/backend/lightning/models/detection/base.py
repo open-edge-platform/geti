@@ -23,6 +23,7 @@ from getitune.backend.lightning.models.base import (
     DefaultSchedulerCallable,
     LightningModel,
 )
+from getitune.backend.lightning.models.common.target_utils import align_sample_batch_annotations
 from getitune.backend.lightning.models.utils.utils import InstanceData
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.backend.lightning.tools.explain.explain_algo import feature_vector_fn
@@ -189,6 +190,12 @@ class LightningDetectionModel(LightningModel):
         entity: SampleBatch,
     ) -> dict[str, Any]:
         inputs: dict[str, Any] = {}
+
+        # Defensively realign per-image annotation counts before the head/criterion
+        # consumes them, so a boxes/labels divergence (e.g. from tiling or crop
+        # augmentations) does not crash the loss during training.
+        if self.training:
+            align_sample_batch_annotations(entity)
 
         inputs["entity"] = entity
         inputs["mode"] = "loss" if self.training else "predict"
