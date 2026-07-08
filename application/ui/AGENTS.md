@@ -13,22 +13,22 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
 
 ## Source Layout (`src/`)
 
-| Path             | Responsibility |
-| ---------------- | -------------- |
-| `index.tsx`      | App bootstrap. |
-| `providers.tsx`  | Global providers (React Query, theming, routing context). |
-| `router.tsx` / `routes/` | Routing configuration and route components. |
-| `layout.tsx`     | Top-level layout shell. |
-| `features/`      | Feature modules: `annotator/`, `dataset/`, `inference/`, `license/`, `models/`, `project/`. Each groups components, hooks, and tests for a domain. |
-| `components/`    | Shared, reusable UI components. |
-| `hooks/`         | Shared React hooks. |
-| `api/`           | **Generated** OpenAPI client (`openapi-spec.json`, `openapi-spec.d.ts`) and API access helpers. |
-| `query-client/`  | React Query client setup. |
-| `shared/`        | Cross-feature utilities and types. |
-| `constants/`     | App-wide constants. |
-| `platform/`      | Platform/environment abstractions (web vs. desktop). |
-| `test-utils/`    | Testing helpers. |
-| `assets/`        | Static assets. |
+| Path                     | Responsibility                                                                                                                                     |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `index.tsx`              | App bootstrap.                                                                                                                                     |
+| `providers.tsx`          | Global providers (React Query, theming, routing context).                                                                                          |
+| `router.tsx` / `routes/` | Routing configuration and route components.                                                                                                        |
+| `layout.tsx`             | Top-level layout shell.                                                                                                                            |
+| `features/`              | Feature modules: `annotator/`, `dataset/`, `inference/`, `license/`, `models/`, `project/`. Each groups components, hooks, and tests for a domain. |
+| `components/`            | Shared, reusable UI components.                                                                                                                    |
+| `hooks/`                 | Shared React hooks.                                                                                                                                |
+| `api/`                   | **Generated** OpenAPI client (`openapi-spec.json`, `openapi-spec.d.ts`) and API access helpers.                                                    |
+| `query-client/`          | React Query client setup.                                                                                                                          |
+| `shared/`                | Cross-feature utilities and types.                                                                                                                 |
+| `constants/`             | App-wide constants.                                                                                                                                |
+| `platform/`              | Platform/environment abstractions (web vs. desktop).                                                                                               |
+| `test-utils/`            | Testing helpers.                                                                                                                                   |
+| `assets/`                | Static assets.                                                                                                                                     |
 
 ## Vendored `@geti` Packages
 
@@ -42,18 +42,25 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
   `fetch` / `axios` directly from components, and do not add another data-fetching
   library.
 - **API types are generated** from the backend OpenAPI spec:
-  - `src/api/openapi-spec.json` — the spec.
-  - `src/api/openapi-spec.d.ts` — generated TypeScript types (**never hand-edit**).
+    - `src/api/openapi-spec.json` — the spec.
+    - `src/api/openapi-spec.d.ts` — generated TypeScript types (**never hand-edit**).
+- Only `src/constants/shared-types.ts` and the client-building layer (`src/api/**`, `src/query-client/**`) may import types from `src/api/openapi-spec.d.ts` directly; everywhere else, import domain types from `src/constants/shared-types.ts`.
 - Regenerate types with:
-  - `npm run update-spec` — pull the spec from a running backend on `:7860`, then rebuild types.
-  - `npm run build:api` — rebuild types from an existing local `openapi-spec.json`.
+    - `npm run update-spec` — pull the spec from a running backend on `:7860`, then rebuild types.
+    - `npm run build:api` — rebuild types from an existing local `openapi-spec.json`.
 - When the backend contract changes, use the `geti-openapi-sync` skill and keep the
   generated spec, generated `.d.ts`, and consuming UI changes in one change set.
 
 ## Conventions
 
-- TypeScript: no `any` — use `unknown` and narrow. `type` for unions, `interface`
-  for extensible object shapes.
+- TypeScript: no `any` — use `unknown` and narrow.
+- Prefer `interface` for object shapes, and compose them with `extends` instead of
+  `type` intersections (`A & B`): interfaces flatten to a single object type, catch
+  property conflicts, display better in errors, and let the compiler cache type
+  relationships.
+- Use `type` for what an interface can't express: unions, tuples, function
+  signatures, and mapped/conditional or other computed types. Give a complex or
+  reused computed type a named `type` alias so the compiler can cache the result.
 - Function components + hooks only. Co-locate styles as CSS Modules
   (`*.module.scss`); do not add CSS-in-JS beyond what `@geti/ui` already uses.
 - Group new code by feature under `src/features/` or share it via `src/components/`,
@@ -73,22 +80,22 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
 Work from `application/ui/`. See `.github/instructions/ui.instructions.md` for the
 full table.
 
-| Task                | Command                  |
-| ------------------- | ------------------------ |
-| Install deps        | `npm ci`                 |
-| Dev server          | `npm run start`          |
-| Desktop dev (Tauri) | `npm run start:desktop`  |
-| Production build    | `npm run build`          |
-| Format check        | `npm run format:check`   |
-| Lint                | `npm run lint`           |
-| Lint + fix          | `npm run lint:fix`       |
+| Task                | Command                     |
+| ------------------- | --------------------------- |
+| Install deps        | `npm ci`                    |
+| Dev server          | `npm run start`             |
+| Desktop dev (Tauri) | `npm run start:desktop`     |
+| Production build    | `npm run build`             |
+| Format check        | `npm run format:check`      |
+| Lint                | `npm run lint`              |
+| Lint + fix          | `npm run lint:fix`          |
 | Cyclic-deps check   | `npm run cyclic-deps-check` |
-| Type-check          | `npm run type-check`     |
-| Unit tests          | `npm run test:unit`      |
-| Component tests     | `npm run test:component` |
-| E2E tests           | `npm run test:e2e`       |
-| Update API types    | `npm run update-spec`    |
-| Rebuild API types   | `npm run build:api`      |
+| Type-check          | `npm run type-check`        |
+| Unit tests          | `npm run test:unit`         |
+| Component tests     | `npm run test:component`    |
+| E2E tests           | `npm run test:e2e`          |
+| Update API types    | `npm run update-spec`       |
+| Rebuild API types   | `npm run build:api`         |
 
 ## Guardrails
 
