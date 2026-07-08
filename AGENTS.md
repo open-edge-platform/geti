@@ -13,7 +13,7 @@
   `python3 .github/scripts/skills/agent_skills.py sync` after adding or renaming a
   skill (each skill directory must contain a `SKILL.md`). Adapters and layout are
   CI-enforced via `.github/workflows/skills.yaml`; verify locally with
-  `agent_skills.py validate`.
+  `python3 .github/scripts/skills/agent_skills.py validate`.
 - Keep always-on repository rules here; keep task-specific workflows in skills.
 
 ## Repository Map
