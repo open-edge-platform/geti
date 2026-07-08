@@ -41,10 +41,8 @@ MANIFEST_YAML = textwrap.dedent("""\
         models:
           - name: yolox_s
             priority: core
-            recipe: detection/yolox_s.yaml
           - name: ssd_mobilenetv2
             priority: extended
-            recipe: detection/ssd_mobilenetv2.yaml
         datasets:
           - pothole_tiny
           - wgisd_small
@@ -69,10 +67,8 @@ MANIFEST_YAML = textwrap.dedent("""\
         models:
           - name: efficientnet_b0
             priority: core
-            recipe: classification/multi_class_cls/efficientnet_b0.yaml
           - name: mobilenet_v3_large
             priority: extended
-            recipe: classification/multi_class_cls/mobilenet_v3_large.yaml
         datasets:
           - pneumonia_tiny
         criteria:
@@ -84,19 +80,14 @@ MANIFEST_YAML = textwrap.dedent("""\
         models:
           - name: rfdetr_seg_nano
             priority: core
-            recipe: instance_segmentation/rfdetr_seg_nano.yaml
           - name: rfdetr_seg_small
             priority: extended
-            recipe: instance_segmentation/rfdetr_seg_small.yaml
           - name: rfdetr_seg_medium
             priority: extended
-            recipe: instance_segmentation/rfdetr_seg_medium.yaml
           - name: rfdetr_seg_xlarge
             priority: extended
-            recipe: instance_segmentation/rfdetr_seg_xlarge.yaml
           - name: rfdetr_seg_2xl
             priority: extended
-            recipe: instance_segmentation/rfdetr_seg_2xlarge.yaml
         datasets:
           - grapes
         criteria:
@@ -288,9 +279,9 @@ class TestModelEntry:
         assert str(model.recipe_path).endswith("detection/yolox_s.yaml")
 
     def test_default_values(self) -> None:
-        m = ModelEntry(name="test_model")
+        m = ModelEntry(name="test_model", task="detection")
         assert m.priority == "core"
-        assert m.recipe == ""
+        assert str(m.recipe_path).endswith("detection/test_model.yaml")
 
 
 # ---------------------------------------------------------------------------
@@ -301,7 +292,7 @@ class TestModelEntry:
 class TestExperiment:
     def test_recipe_path(self) -> None:
         """Experiment.recipe_path should return the model's recipe path."""
-        model = ModelEntry(name="yolox_s", recipe="detection/yolox_s.yaml")
+        model = ModelEntry(name="yolox_s", task="detection")
         scenario = Scenario(name="default")
         exp = Experiment(
             task="detection",
@@ -315,7 +306,7 @@ class TestExperiment:
         assert str(exp.recipe_path).endswith("detection/yolox_s.yaml")
 
     def test_recipe_path_no_suffix(self) -> None:
-        model = ModelEntry(name="yolox_s", recipe="detection/yolox_s.yaml")
+        model = ModelEntry(name="yolox_s", task="detection")
         scenario = Scenario.default()
         exp = Experiment(
             task="detection",
@@ -329,7 +320,7 @@ class TestExperiment:
         assert str(exp.recipe_path).endswith("detection/yolox_s.yaml")
 
     def test_run_id_with_scenario(self) -> None:
-        model = ModelEntry(name="m")
+        model = ModelEntry(name="m", task="det")
         scenario = Scenario(name="tiling")
         exp = Experiment(
             task="det",
@@ -343,7 +334,7 @@ class TestExperiment:
         assert exp.run_id == "det/m/ds/tiling"
 
     def test_run_id_default_scenario(self) -> None:
-        model = ModelEntry(name="m")
+        model = ModelEntry(name="m", task="det")
         exp = Experiment(
             task="det",
             model=model,
@@ -408,7 +399,6 @@ class TestIterExperimentsAdvanced:
               detection:
                 models:
                   - name: m
-                    recipe: detection/m.yaml
                 datasets:
                   - ds
                 scenarios:
@@ -463,6 +453,24 @@ class TestIterExperimentsAdvanced:
         exps_filtered = list(iter_experiments(manifest, f))
         exps_all = list(iter_experiments(manifest))
         # Without size_tier_map, size_tiers filter is a no-op
+        assert len(exps_filtered) == len(exps_all)
+
+    def test_data_group_filter(self, manifest: BenchmarkManifest) -> None:
+        """Data group filter should exclude datasets restricted to another lane."""
+        data_group_map = {"pothole_tiny": "weekly", "wgisd_small": "extended", "pneumonia_tiny": "all"}
+        f = ManifestFilters(data_groups=["weekly"])
+        exps = list(iter_experiments(manifest, f, data_group_map=data_group_map))
+        ds_names = {e.dataset_name for e in exps}
+        # "weekly" explicitly matches; "all" (default) always matches; "extended" is excluded.
+        assert "wgisd_small" not in ds_names
+        assert "pothole_tiny" in ds_names
+        assert "pneumonia_tiny" in ds_names
+
+    def test_data_group_filter_no_map(self, manifest: BenchmarkManifest) -> None:
+        """Data group filter without a map should not filter anything."""
+        f = ManifestFilters(data_groups=["weekly"])
+        exps_filtered = list(iter_experiments(manifest, f))
+        exps_all = list(iter_experiments(manifest))
         assert len(exps_filtered) == len(exps_all)
 
 

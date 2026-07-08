@@ -1041,6 +1041,7 @@ requires-dist = [
     { name = "furo", marker = "extra == 'docs'" },
     { name = "importlib-resources", specifier = "==6.5.2" },
     { name = "jsonargparse", specifier = "==4.35.0" },
+    { name = "kagglehub", marker = "extra == 'benchmark'", specifier = ">=0.4.1" },
     { name = "kornia", specifier = "~=0.8.2" },
     { name = "lightning", specifier = "==2.6.0" },
     { name = "linkify-it-py", marker = "extra == 'docs'" },
@@ -1086,7 +1087,7 @@ requires-dist = [
     { name = "typeguard", specifier = ">=4.3,<4.5" },
     { name = "ultralytics", marker = "extra == 'ultralytics'", specifier = "~=8.4.82" },
 ]
-provides-extras = ["cpu", "cuda", "xpu", "ultralytics", "docs", "ci-publish"]
+provides-extras = ["cpu", "cuda", "xpu", "ultralytics", "docs", "ci-publish", "benchmark"]
 
 [package.metadata.requires-dev]
 dev = [

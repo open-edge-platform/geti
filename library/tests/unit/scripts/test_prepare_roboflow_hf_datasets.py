@@ -59,6 +59,21 @@ _CASES = {
             "truck-xl-",
         ),
     ),
+    "pothole": (
+        "prepare_pothole.py",
+        {Subset.TRAINING: 80, Subset.VALIDATION: 5, Subset.TESTING: 5},
+        ("pothole",),
+    ),
+    "pcb_defect": (
+        "prepare_pcb_defect.py",
+        {Subset.TRAINING: 128, Subset.VALIDATION: 25, Subset.TESTING: 36},
+        ("dry_joint", "incorrect_installation", "pcb_damage", "short_circuit"),
+    ),
+    "satellite_building": (
+        "prepare_satellite_building.py",
+        {Subset.TRAINING: 6764, Subset.VALIDATION: 1934, Subset.TESTING: 967},
+        ("building",),
+    ),
 }
 
 
