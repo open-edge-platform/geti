@@ -28,9 +28,9 @@ const COMPONENT_LABELS: Record<(typeof COMPONENT_ORDER)[number], string> = {
     model: 'Model',
 };
 
-interface PipelineComponentsDetailsInfoProps {
+type PipelineComponentsDetailsInfoProps = {
     components: PipelineComponentsHealth;
-}
+};
 
 const PipelineComponentsDetailsInfo = ({ components }: PipelineComponentsDetailsInfoProps) => {
     return (

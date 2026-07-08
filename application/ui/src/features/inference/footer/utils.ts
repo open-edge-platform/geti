@@ -14,10 +14,10 @@ export type ComponentStatusMeta = {
     message: string | null | undefined;
 };
 
-export interface StatusMeta {
+export type StatusMeta = {
     label: string;
     variant: StatusVariant;
-}
+};
 
 export const getOverallStatusMeta = (status: string): StatusMeta => {
     switch (status) {

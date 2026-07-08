@@ -1,9 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { SchemaPipelineHealth, SchemaStatus } from './../src/api/openapi-spec.d';
+import type { PipelineHealth, PipelineStatus } from '../src/constants/shared-types';
 
-export const getMockedStatus = (customStatus?: Partial<SchemaStatus>): SchemaStatus => {
+export const getMockedStatus = (customStatus?: Partial<PipelineStatus>): PipelineStatus => {
     return {
         status: 'ok',
         updated_at: '2026-01-01T00:00:00Z',
@@ -12,7 +12,7 @@ export const getMockedStatus = (customStatus?: Partial<SchemaStatus>): SchemaSta
     };
 };
 
-export const getMockedPipelineHealth = (customHealth?: Partial<SchemaPipelineHealth>): SchemaPipelineHealth => {
+export const getMockedPipelineHealth = (customHealth?: Partial<PipelineHealth>): PipelineHealth => {
     return {
         status: 'running',
         components: {
