@@ -1,0 +1,8 @@
+.categoryDot {
+    display: inline-block;
+    width: var(--spectrum-global-dimension-size-100);
+    height: var(--spectrum-global-dimension-size-100);
+    border-radius: 50%;
+    margin-inline-end: var(--spectrum-global-dimension-size-75);
+    flex-shrink: 0;
+}

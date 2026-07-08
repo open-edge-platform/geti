@@ -11,6 +11,7 @@ import placeholderThumbnailIconUrl from '../../../assets/icons/image-icon.svg?ur
 import { paths } from '../../../constants/paths';
 import { Project } from '../../../constants/shared-types';
 import { getProjectThumbnailUrl } from '../../../shared/media-url.utils';
+import { getProjectTaskCategory, TASK_CATEGORY_COLORS } from './filter-projects/utils';
 import { MenuActions } from './menu-actions/menu-actions.component';
 import { formatCreationDate, getProjectTypeTitle } from './util';
 
@@ -20,11 +21,12 @@ const cardPadding = 'size-200';
 
 type ProjectTypeBadgeProps = {
     type: string;
+    color: string;
 };
 
-const ProjectTypeBadge = ({ type }: ProjectTypeBadgeProps) => {
+const ProjectTypeBadge = ({ type, color }: ProjectTypeBadgeProps) => {
     return (
-        <Badge variant={'neutral'} UNSAFE_className={classes.tag}>
+        <Badge variant={'neutral'} UNSAFE_className={classes.tag} UNSAFE_style={{ backgroundColor: color, color: '#fff' }}>
             <Text>{type}</Text>
         </Badge>
     );
@@ -69,6 +71,7 @@ type ProjectCardProps = {
 export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: ProjectCardProps) => {
     const isActive = item.active_pipeline;
     const taskType = getProjectTypeTitle(item.task);
+    const taskColor = TASK_CATEGORY_COLORS[getProjectTaskCategory(item)];
 
     return (
         <div style={{ position: 'relative' }} aria-label={`Project: ${item.name}`}>
@@ -94,7 +97,7 @@ export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: Pro
                         </Flex>
 
                         <Flex gap={'size-50'}>
-                            {taskType !== undefined && <ProjectTypeBadge type={taskType} />}
+                            {taskType !== undefined && <ProjectTypeBadge type={taskType} color={taskColor} />}
                             {isActive && <ActiveProjectBadge />}
                         </Flex>
 
