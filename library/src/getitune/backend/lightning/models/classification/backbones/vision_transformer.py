@@ -97,8 +97,8 @@ class VisionTransformerBackbone(BaseModule):
                 "embed_dim": 384,
                 "depth": 12,
                 "num_heads": 6,
-                "reg_tokens": 0,
-                "no_embed_class": False,
+                "reg_tokens": 4,
+                "no_embed_class": True,
                 "init_values": 1e-05,
             }
             for key in ["dinov2-small-seg"]

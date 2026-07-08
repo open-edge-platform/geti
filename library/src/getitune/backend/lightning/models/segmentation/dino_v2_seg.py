@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING, Any, ClassVar, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, cast
 
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
 from getitune.backend.lightning.models.classification.backbones.vision_transformer import VisionTransformerBackbone
@@ -16,6 +16,7 @@ from getitune.backend.lightning.models.segmentation.losses import CrossEntropyLo
 from getitune.backend.lightning.models.segmentation.segmentors import BaseSegmentationModel
 from getitune.config.data import TileConfig
 from getitune.metrics.dice import SegmCallable
+from getitune.types import PathLike
 
 if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
@@ -42,9 +43,8 @@ class DinoV2Seg(LightningSegmentationModel):
         pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
-    # TODO(vitalii): merge with FCNHead weights <- https://storage.geti.intel.com/weights/dinov2_vits14_ade20k_linear_head.pth
     pretrained_urls: ClassVar[dict[str, str]] = {
-        "dinov2-small-seg": "https://storage.geti.intel.com/weights/dinov2_vits14_reg4_pretrain.pth",
+        "dinov2-small-seg": "https://storage.geti.intel.com/weights/dinov2_vits14_reg4_with_ade20k_linear_head_pretrain.pth",
     }
 
     def __init__(
@@ -88,9 +88,6 @@ class DinoV2Seg(LightningSegmentationModel):
         criterion = CrossEntropyLossWithIgnore(ignore_index=self.label_info.ignore_index)  # type: ignore[attr-defined]
 
         backbone.init_weights()
-        # freeze backbone
-        for _, v in backbone.named_parameters():
-            v.requires_grad = False
 
         return BaseSegmentationModel(
             backbone=backbone,
@@ -102,3 +99,21 @@ class DinoV2Seg(LightningSegmentationModel):
     def _optimization_config(self) -> dict[str, Any]:
         """PTQ config for DinoV2Seg."""
         return {"model_type": "transformer"}
+
+    @property
+    def pretrained_key_mapping(self) -> dict[str, str] | None:
+        """Mapping used to rename checkpoint keys before loading pretrained weights."""
+        return {"model.": ""}
+
+    def load_pretrained(self, weights: PathLike | None = None) -> None:
+        """Load pretrained weights for the model.
+
+        Args:
+            weights (PathLike | None, optional): Path to the pretrained weights. If None, uses default weights.
+            Defaults to None.
+        """
+        super().load_pretrained(weights)
+        # freeze backbone
+        backbone = cast("nn.Module", self.model.backbone)
+        for _, v in backbone.named_parameters():
+            v.requires_grad = False

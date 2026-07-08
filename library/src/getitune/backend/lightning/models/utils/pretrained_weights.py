@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Protocol, cast
+from typing import TYPE_CHECKING, ClassVar, Literal, Protocol, cast
 
 if TYPE_CHECKING:
     from torch import nn
@@ -26,7 +26,7 @@ class _SupportsPretrainedWeights(Protocol):
         model_name: Name used to resolve the default pretrained checkpoint.
     """
 
-    pretrained_urls: dict[str, str]
+    pretrained_urls: ClassVar[dict[str, str]]
     pretrained_weights_target: Literal["model", "backbone"]
     model: nn.Module
     model_name: str
