@@ -81,3 +81,66 @@ class TestSourceMediaService:
 
         # The whole per-upload UUID subdirectory should be removed, not just the temp file.
         assert list(tmp_path.iterdir()) == []
+
+    @pytest.mark.asyncio
+    async def test_delete_video_removes_upload_subdirectory(
+        self, tmp_path: Path, fxt_source_media_service: SourceMediaService
+    ):
+        video_path = await fxt_source_media_service.upload(filename="sample.mp4", file_obj=BytesIO(b"data"))
+        upload_dir = video_path.parent
+        assert upload_dir.is_dir()
+
+        fxt_source_media_service.delete_video(str(video_path))
+
+        assert not upload_dir.exists()
+        assert list(tmp_path.iterdir()) == []
+
+    def test_delete_video_noop_when_outside_source_media_dir(
+        self, tmp_path: Path, fxt_source_media_service: SourceMediaService
+    ):
+        outside_dir = tmp_path.parent / f"outside-{tmp_path.name}"
+        outside_dir.mkdir()
+        outside_file = outside_dir / "video.mp4"
+        outside_file.write_bytes(b"data")
+
+        fxt_source_media_service.delete_video(str(outside_file))
+
+        assert outside_file.exists()
+
+    def test_delete_video_noop_when_path_is_directly_under_root(
+        self, tmp_path: Path, fxt_source_media_service: SourceMediaService
+    ):
+        root_level_file = tmp_path / "video.mp4"
+        root_level_file.write_bytes(b"data")
+
+        fxt_source_media_service.delete_video(str(root_level_file))
+
+        # No UUID subdirectory boundary, so nothing should be removed (avoids ever
+        # rmtree-ing the whole source_media_dir root).
+        assert root_level_file.exists()
+
+    def test_delete_video_noop_when_path_is_source_media_root_itself(self, tmp_path: Path):
+        # Use a nested dir so a buggy implementation can't accidentally delete pytest's temp root.
+        source_media_root = tmp_path / "source_media"
+        source_media_root.mkdir()
+
+        service = SourceMediaService(source_media_dir=source_media_root)
+        service.delete_video(str(source_media_root))
+
+        assert source_media_root.exists()
+
+    @pytest.mark.asyncio
+    async def test_delete_video_propagates_oserror(
+        self,
+        fxt_source_media_service: SourceMediaService,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        video_path = await fxt_source_media_service.upload(filename="sample.mp4", file_obj=BytesIO(b"data"))
+
+        def _boom(*args, **kwargs):
+            raise OSError("permission denied")
+
+        monkeypatch.setattr("shutil.rmtree", _boom)
+
+        with pytest.raises(OSError, match="permission denied"):
+            fxt_source_media_service.delete_video(str(video_path))

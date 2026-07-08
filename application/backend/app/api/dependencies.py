@@ -150,18 +150,20 @@ def get_sink_service(
     return SinkService(event_bus=event_bus, db_session=db)
 
 
-def get_source_update_service(
-    event_bus: Annotated[EventBus, Depends(get_event_bus)], db: Annotated[Session, Depends(get_db)]
-) -> SourceUpdateService:
-    """Provides a SourceUpdateService instance."""
-    return SourceUpdateService(event_bus=event_bus, db_session=db)
-
-
 def get_source_media_service(
     source_media_dir: Annotated[Path, Depends(get_source_media_dir)],
 ) -> SourceMediaService:
     """Provides a SourceMediaService instance for storing uploaded source videos."""
     return SourceMediaService(source_media_dir)
+
+
+def get_source_update_service(
+    event_bus: Annotated[EventBus, Depends(get_event_bus)],
+    db: Annotated[Session, Depends(get_db)],
+    source_media_service: Annotated[SourceMediaService, Depends(get_source_media_service)],
+) -> SourceUpdateService:
+    """Provides a SourceUpdateService instance."""
+    return SourceUpdateService(event_bus=event_bus, db_session=db, source_media_service=source_media_service)
 
 
 def get_source_status_service(

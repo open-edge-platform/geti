@@ -3,12 +3,13 @@
 import time
 from uuid import UUID
 
+from loguru import logger
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.db.schema import ProjectDB, SourceDB
 from app.models import Source, SourceType
-from app.models.source import SourceAdapter, SourceConfig, SourceTestResult
+from app.models.source import SourceAdapter, SourceConfig, SourceTestResult, VideoFileConfig
 from app.repositories import SourceRepository
 from app.repositories.base import PrimaryKeyIntegrityError, UniqueConstraintIntegrityError
 from app.repositories.pipeline_repo import PipelineRepository
@@ -22,12 +23,14 @@ from .base import (
 )
 from .event.event_bus import EventBus, EventType
 from .parent_process_guard import parent_process_only
+from .source_media_service import SourceMediaService
 from .video_stream_service import VideoStreamService
 
 
 class SourceService:
-    def __init__(self, db_session: Session):
+    def __init__(self, db_session: Session, source_media_service: SourceMediaService | None = None):
         self._db_session = db_session
+        self._source_media_service = source_media_service
 
     @parent_process_only
     def create_source(
@@ -89,6 +92,12 @@ class SourceService:
         except IntegrityError:
             raise ResourceInUseError(ResourceType.SOURCE, str(source.id))
 
+        match source.source_type:
+            case SourceType.VIDEO_FILE:
+                self._delete_video_best_effort(source.config_data.video_path)
+            case _:
+                pass
+
     def get_active_source(self) -> Source | None:
         db_source = SourceRepository(self._db_session).get_active_source()
         return SourceAdapter.validate_python(db_source, from_attributes=True) if db_source else None
@@ -97,11 +106,25 @@ class SourceService:
         id = SourceRepository(self._db_session).get_active_source_id()
         return UUID(id) if id else None
 
+    def _delete_video_best_effort(self, video_path: str) -> None:
+        """Delete an uploaded video file, tolerating any filesystem failure."""
+        if self._source_media_service is None:
+            return
+        try:
+            self._source_media_service.delete_video(video_path)
+        except OSError as e:
+            logger.warning("Failed to delete video file '{}': {}", video_path, e)
+
 
 class SourceUpdateService(SourceService):
-    def __init__(self, event_bus: EventBus, db_session: Session):
+    def __init__(
+        self,
+        event_bus: EventBus,
+        db_session: Session,
+        source_media_service: SourceMediaService | None = None,
+    ):
         self._event_bus: EventBus = event_bus
-        super().__init__(db_session)
+        super().__init__(db_session, source_media_service)
 
     @parent_process_only
     def update_source(
@@ -122,9 +145,17 @@ class SourceUpdateService(SourceService):
             active_source_id = self.get_active_source_id()
             if active_source_id == UUID(db_source.id):
                 self._event_bus.emit_event(EventType.SOURCE_CHANGED)
-            return SourceAdapter.validate_python(db_source, from_attributes=True)
         except UniqueConstraintIntegrityError:
             raise ResourceWithNameAlreadyExistsError(ResourceType.SOURCE, new_name)
+
+        match source.source_type:
+            case SourceType.VIDEO_FILE if isinstance(new_config_data, VideoFileConfig):
+                if source.config_data.video_path != new_config_data.video_path:
+                    self._delete_video_best_effort(source.config_data.video_path)
+            case _:
+                pass
+
+        return SourceAdapter.validate_python(db_source, from_attributes=True)
 
     _TEST_TIMEOUT_MS = 5000
 
