@@ -123,7 +123,7 @@ class TestSourceMediaService:
         # Use a nested dir so a buggy implementation can't accidentally delete pytest's temp root.
         source_media_root = tmp_path / "source_media"
         source_media_root.mkdir()
-        
+
         service = SourceMediaService(source_media_dir=source_media_root)
         service.delete_video(str(source_media_root))
 
