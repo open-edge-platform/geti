@@ -11,7 +11,9 @@
 - `.agents/skills/` and `.claude/skills/` are committed symlink adapters pointing
   back at `skills/<bucket>/<name>`; do not edit them directly. Run
   `python3 .github/scripts/skills/agent_skills.py sync` after adding or renaming a
-  skill.
+  skill (each skill directory must contain a `SKILL.md`). Adapters and layout are
+  CI-enforced via `.github/workflows/skills.yaml`; verify locally with
+  `python3 .github/scripts/skills/agent_skills.py validate`.
 - Keep always-on repository rules here; keep task-specific workflows in skills.
 
 ## Repository Map
@@ -28,7 +30,8 @@
 - The backend stores persistent data under `application/backend/data/` by default (i.e., `data/` when running from `application/backend/`); override via the `DATA_DIR` setting. The directory is git-ignored and may not exist until the server runs.
 - This includes:
   - the SQLite database (`geti.db`)
-  - datasets with media artifacts (images, videos) + trained models with logs under `projects/` 
+  - datasets with media artifacts (images, videos) + trained models with logs under `projects/`
+  - job outputs (e.g. dataset exports) under `output/` and in-progress imports under `staged_datasets/`
   - SSL certificates under `certs/`
   - pretrained weights downloaded as per manifest urls under `pretrained_weights/`
 
@@ -71,6 +74,7 @@ User-facing skills (using Geti, not changing it):
 - Run BDD tests with `just test-bdd -- <behave args>`.
 - Generate an OpenAPI spec with `just gen-api-spec --output-path openapi-spec.json`.
 - Start the local server with `just run-server`.
+- Seed demo projects/sources/sinks on startup with `just run-server --setup-demo` (add `--force-import` to bypass schema-version checks).
 - Treat `_clean_data` and `run-server --clean` as destructive operations; use them only when the task explicitly calls for data reset.
 
 ## Commands: UI
@@ -86,7 +90,7 @@ User-facing skills (using Geti, not changing it):
 - Run unit tests with `npm run test:unit` or `npm run test:unit:coverage`.
 - Use `npm run test:component` and `npm run test:e2e` only when the change actually affects those layers.
 - Build API typings from an existing spec with `npm run build:api`.
-- Pull a spec from a running backend with `npm run update-spec` when `http://localhost:7860` is available.
+- Pull a spec from a running backend with `npm run update-spec` when `https://localhost:7860` is available (the backend serves self-signed TLS).
 
 ## Cross-Area Rules
 
@@ -94,7 +98,7 @@ User-facing skills (using Geti, not changing it):
 - Backend changes can require validating `library/` because `application/backend` depends on the local editable package.
 - Do not hand-edit generated UI OpenAPI typings when regeneration is possible.
 - When backend request or response schemas change, regenerate the UI OpenAPI spec and TypeScript definitions in the same change set.
-- Use `.github/workflows/lib-lint-and-test.yaml` and `.github/workflows/ui-lint-and-test.yaml` as the source of truth for CI expectations if local commands are ambiguous.
+- Use `.github/workflows/lib-lint-and-test.yaml`, `.github/workflows/backend-lint-and-test.yaml`, and `.github/workflows/ui-lint-and-test.yaml` as the source of truth for CI expectations if local commands are ambiguous.
 
 ## Change Discipline
 

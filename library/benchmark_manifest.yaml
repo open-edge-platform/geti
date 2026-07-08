@@ -146,6 +146,15 @@ experiments:
         priority: deferred
       - name: yolo26_x
         priority: extended
+      - name: edgecrafter_s
+        priority: core
+      - name: edgecrafter_m
+        priority: deferred
+      - name: edgecrafter_l
+        priority: deferred
+      - name: edgecrafter_x
+        priority: extended
+
     datasets:
       - pothole
       - wgisd

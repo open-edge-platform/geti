@@ -87,6 +87,20 @@ export type SourceConfig =
 
 export type SourceConfigPayload = Exclude<SourceConfig, DisconnectedSourceConfig>;
 
+export type LocalFolderSinkConfig = components['schemas']['FolderSinkConfigView'];
+export type MqttSinkConfig = components['schemas']['MqttSinkConfigView'];
+export type WebhookSinkConfig = components['schemas']['WebhookSinkConfigView'];
+export type DisconnectedSinkConfig = components['schemas']['RosSinkConfigView'];
+export type RosSinkConfig = components['schemas']['RosSinkConfigView'];
+export type SinkOutputFormats = LocalFolderSinkConfig['output_formats'];
+
+export type SinkConfig =
+    | LocalFolderSinkConfig
+    | MqttSinkConfig
+    | WebhookSinkConfig
+    | DisconnectedSinkConfig
+    | RosSinkConfig;
+
 export type AnnotationDTO = components['schemas']['DatasetItemAnnotation'];
 export type PredictionDTO = components['schemas']['DatasetItemAnnotation'];
 export type DatasetItemAnnotationStatus = components['schemas']['DatasetItemAnnotationStatus'];
@@ -101,6 +115,13 @@ export type VideoFramePrediction = {
 export type PredictionVideoRangePayload = components['schemas']['VideoRange'];
 
 export type AnnotationType = components['schemas']['AnnotationType'];
+
+export type Point = components['schemas']['Point'];
+export type Rect = components['schemas']['Rectangle'];
+export type Polygon = components['schemas']['Polygon'];
+export type FullImage = components['schemas']['FullImage'];
+
+export type Shape = Rect | Polygon | FullImage;
 
 export type BoolConfigurableParameter = components['schemas']['BoolParameterView'];
 export type StringConfigurableParameter = components['schemas']['StringParameterView'];
@@ -142,3 +163,7 @@ export type MediaWithPagination = components['schemas']['MediaWithPagination'];
 export type DatasetFormat = components['schemas']['DatasetFormat'];
 export type DeviceInfo = components['schemas']['DeviceInfoView'];
 export type MediaListPredictionRequest = components['schemas']['MediaListPredictionRequest'];
+
+export type PipelineHealth = components['schemas']['PipelineHealth'];
+export type PipelineComponentsHealth = components['schemas']['PipelineComponentsHealth'];
+export type PipelineStatus = components['schemas']['Status'];

@@ -22,6 +22,7 @@ import { AnnotatorModes } from './annotator-modes/annotator-modes-toggle.compone
 import { PredictionInferenceDevices } from './annotator-modes/prediction-inference-devices.component';
 import { PredictionModelSelector } from './annotator-modes/prediction-model-selector.component';
 import { PredictionButtons } from './annotator-modes/predictions-buttons.component';
+import { useIsSubmitDisabled } from './use-is-submit-disabled.hook';
 import { getNextItem } from './util';
 
 import classes from './secondary-toolbar.module.scss';
@@ -95,7 +96,7 @@ export const SecondaryToolbar = ({
     const { selectableModels } = usePredictionSetup();
     const isPlaying = videoPlayerContext?.videoControls?.isPlaying ?? false;
 
-    const { canSubmit, isSaving, submitAnnotations, submitPredictions, initialAnnotations, initialPredictions } =
+    const { isSaving, submitAnnotations, submitPredictions, initialAnnotations, initialPredictions } =
         useAnnotationActions();
 
     const handleSubmit = async () => {
@@ -121,8 +122,11 @@ export const SecondaryToolbar = ({
     const isPredictionMode = mode === 'prediction';
     const isAnnotationMode = mode === 'annotation';
 
-    // If annotations are not changed but subset has changed we want to allow user to submit
-    const isSubmitDisabled = (!canSubmit && !hasSubsetChanged) || isSaving || isLoadingPredictions;
+    const isSubmitDisabled = useIsSubmitDisabled({
+        mode,
+        hasSubsetChanged,
+        isLoadingPredictions,
+    });
 
     useHotkeys(
         HOTKEYS.submit,

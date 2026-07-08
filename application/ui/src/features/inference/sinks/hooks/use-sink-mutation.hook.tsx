@@ -5,9 +5,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { omit } from 'lodash-es';
 
 import { $api } from '../../../../api/client';
+import type { SinkConfig } from '../../../../constants/shared-types';
 import { getQueryKey } from '../../../../query-client/query-client';
 import { testSinkQueryOptions } from '../api/use-test-sink';
-import { SinkConfig } from '../utils';
 
 const useUpdateSink = () => {
     const queryClient = useQueryClient();

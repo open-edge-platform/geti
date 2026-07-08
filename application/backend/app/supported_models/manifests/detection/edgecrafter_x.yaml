@@ -1,0 +1,42 @@
+id: object-detection-edgecrafter-x
+name: ECDet-X
+
+pretrained_weights:
+  url: https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecdet_x.pth
+  mirror_url: https://huggingface.co/Intellindust/ECDet_X/resolve/main/model.safetensors
+  sha_sum: c87394be021b573fd8e25969b85a8670127120c9d0209ac7807fbadae1a5cec6
+
+description: "EdgeCrafter detection model (ECDet-X) combines an efficient ECViT backbone with a hybrid encoder and transformer decoder for real-time, high-accuracy object detection with low latency."
+
+stats:
+  gigaflops: 151.0
+  trainable_parameters: 49.0
+  benchmark_metrics:
+    coco_map_50_95: 57.9
+
+capabilities:
+  tiling: false
+
+hyperparameters:
+  training:
+    learning_rate: 0.0005
+    weight_decay: 0.0001
+    batch_size: 4
+    accumulate_grad_batches: 8
+    early_stopping:
+      patience: 10
+    scheduler:
+      factor: 0.5
+      patience: 10
+    gradient_clip:
+      enable: true
+      max_grad_norm: 0.1
+    allowed_values_input_size:
+      - 640
+    input_size_width: 640
+    input_size_height: 640
+  dataset_preparation:
+    augmentation:
+      deim_framework: true
+      random_zoom_out:
+        enable: true

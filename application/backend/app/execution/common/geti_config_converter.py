@@ -777,6 +777,26 @@ class GetiConfigConverter:
                 "status": ModelStatus.ACTIVE,
                 "default": False,
             },
+            "object-detection-edgecrafter-s": {
+                "recipe_path": RECIPE_PATH / "detection" / "edgecrafter_s.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "object-detection-edgecrafter-m": {
+                "recipe_path": RECIPE_PATH / "detection" / "edgecrafter_m.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "object-detection-edgecrafter-l": {
+                "recipe_path": RECIPE_PATH / "detection" / "edgecrafter_l.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "object-detection-edgecrafter-x": {
+                "recipe_path": RECIPE_PATH / "detection" / "edgecrafter_x.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
             "object-detection-dinov3-detr-s": {
                 "recipe_path": RECIPE_PATH / "detection" / "deimv2_s.yaml",
                 "status": ModelStatus.ACTIVE,

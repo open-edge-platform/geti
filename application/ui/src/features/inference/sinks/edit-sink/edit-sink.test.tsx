@@ -7,12 +7,13 @@ import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
+import type { LocalFolderSinkConfig } from '../../../../constants/shared-types';
 import { useConnectSinkToPipeline } from '../../../../hooks/api/pipeline.hook';
 import { server } from '../../../../msw-node-setup';
 import { useSinkMutation } from '../hooks/use-sink-mutation.hook';
 import { LocalFolder } from '../local-folder/local-folder.component';
 import { getLocalFolderInitialConfig, localFolderBodyFormatter } from '../local-folder/utils';
-import { LocalFolderSinkConfig, OutputFormat } from '../utils';
+import { OutputFormat } from '../utils';
 import { EditSink } from './edit-sink.component';
 
 vi.mock('../hooks/use-sink-mutation.hook');
