@@ -13,8 +13,6 @@
         "build:api": "npx openapi-typescript ./src/api/openapi-spec.json -o ./src/api/openapi-spec.d.ts  --root-types && prettier --write src/api/openapi-spec.d.ts",
         "build:api:download": "curl --fail --insecure -o ./src/api/openapi-spec.json https://localhost:7860/api/openapi.json && prettier --write src/api/openapi-spec.json",
         "update-spec": "npm run build:api:download && npm run build:api",
-        "clone-geti-ui-packages": "npx tiged --force --mode=git https://github.com/open-edge-platform/geti_v2.git/web_ui/packages/config#02d99ef600635d3c49ad9a52ca3f7aade829053e packages/config && npx tiged --force --mode=git https://github.com/open-edge-platform/geti_v2.git/web_ui/packages/smart-tools#02d99ef600635d3c49ad9a52ca3f7aade829053e packages/smart-tools && npm run patch-geti-ui-packages",
-        "patch-geti-ui-packages": "cd packages/smart-tools && (git --git-dir=.no-git apply -p1 -R --check --ignore-whitespace ../../patches/smart-tools-webview2-single-thread.patch || git --git-dir=.no-git apply -p1 --ignore-whitespace --whitespace=nowarn ../../patches/smart-tools-webview2-single-thread.patch) && git --git-dir=.no-git apply -p1 -R --check --ignore-whitespace ../../patches/smart-tools-webview2-single-thread.patch",
         "cyclic-deps-check": "npx madge --circular src/**/*.ts*",
         "start": "rsbuild dev",
         "start:tauri": "cross-env BUILD_TARGET=tauri rsbuild dev",
@@ -24,7 +22,6 @@
         "format:check": "prettier --check --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\"",
         "lint": "eslint \"src/**/*.ts*\" --max-warnings 0",
         "lint:fix": "eslint --fix \"./src/**/*.ts*\"",
-        "preinstall": "npm run clone-geti-ui-packages",
         "preview": "npm run build && rsbuild preview",
         "preview:tauri": "cross-env BUILD_TARGET=tauri rsbuild preview --port 3001",
         "test:unit": "vitest --config vitest.config.ts",
@@ -37,7 +34,7 @@
     },
     "dependencies": {
         "@geti-ui/ui": "^1.5.3",
-        "@geti/smart-tools": "*",
+        "@geti-ui/smart-tools": "^1.5.3",
         "@react-aria/utils": "^3.34.1",
         "@react-stately/overlays": "^3.7.1",
         "@tanstack/react-query": "~5.101.4",
@@ -51,8 +48,10 @@
         "dayjs": "^1.11.19",
         "dotenv": "^17.3.1",
         "lodash-es": "~4.18.0",
+        "onnxruntime-web": "~1.24.3",
         "openapi-fetch": "~0.14.0",
-        "openapi-react-query": "0.5.0",
+        "openapi-react-query": "~0.5.0",
+        "polylabel": "~2.0.1",
         "pretty-bytes": "^7.1.0",
         "react": "~19.2.8",
         "react-aria": "^3.49.0",
@@ -127,8 +126,5 @@
         "vite-plugin-svgr": "~4.3.0",
         "vite-tsconfig-paths": "^5.1.4",
         "vitest": "~4.1.7"
-    },
-    "workspaces": [
-        "packages/*"
-    ]
+    }
 }
