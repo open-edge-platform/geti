@@ -98,7 +98,11 @@ class SourceMediaService:
 
         if not resolved.is_relative_to(base):
             return
-        if resolved.parent == base:
+
+        upload_dir = resolved.parent
+
+        # Only remove per-upload UUID subdirectories created by `upload` (base/<uuid>/<filename>).
+        if upload_dir.parent != base:
             return
 
-        shutil.rmtree(resolved.parent)
+        shutil.rmtree(upload_dir)

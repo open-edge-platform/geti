@@ -119,6 +119,16 @@ class TestSourceMediaService:
         # rmtree-ing the whole source_media_dir root).
         assert root_level_file.exists()
 
+    def test_delete_video_noop_when_path_is_source_media_root_itself(self, tmp_path: Path):
+        # Use a nested dir so a buggy implementation can't accidentally delete pytest's temp root.
+        source_media_root = tmp_path / "source_media"
+        source_media_root.mkdir()
+        
+        service = SourceMediaService(source_media_dir=source_media_root)
+        service.delete_video(str(source_media_root))
+
+        assert source_media_root.exists()
+
     @pytest.mark.asyncio
     async def test_delete_video_propagates_oserror(
         self,
