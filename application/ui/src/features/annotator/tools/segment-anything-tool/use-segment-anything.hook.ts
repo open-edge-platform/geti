@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Media } from '@/api/types';
-import { EncodingOutput } from '@geti/smart-tools/segment-anything';
+import { EncodingOutput } from '@geti-ui/smart-tools/segment-anything';
 import { queryOptions, skipToken, useQuery } from '@tanstack/react-query';
 import { Remote, wrap } from 'comlink';
 import { useProject } from 'hooks/api/project.hook';
@@ -182,7 +182,11 @@ const useDecodingFn = (model: SegmentAnythingRemoteInstance | undefined, encodin
             model.processDecoder(encoding, {
                 points,
                 boxes: [],
-                outputConfig: {
+                // Decoding runs against the already-computed `encoding`; no image is needed.
+                image: undefined,
+                // TODO[geti-ui]: @geti-ui/smart-tools@1.5.0's `SegmentAnythingPrompt` type has a
+                // typo (`ouputConfig` instead of `outputConfig`). Rename back once fixed upstream.
+                ouputConfig: {
                     type: decoderOutput,
                 },
             }),
