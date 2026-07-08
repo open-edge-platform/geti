@@ -1,12 +1,12 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SinkConfig } from '../../../constants/shared-types';
 import { EditSink } from './edit-sink/edit-sink.component';
 import { LocalFolder } from './local-folder/local-folder.component';
 import { localFolderBodyFormatter } from './local-folder/utils';
 import { Mqtt } from './mqtt/mqtt.component';
 import { mqttBodyFormatter } from './mqtt/utils';
-import { SinkConfig } from './utils';
 import { webhookBodyFormatter } from './webhook/utils';
 import { Webhook } from './webhook/webhook.component';
 
