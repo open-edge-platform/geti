@@ -14,12 +14,14 @@ interface AddSourceProps<T> {
     onSaved: () => void;
     componentFields: (state: Awaited<T>) => ReactNode;
     bodyFormatter: (formData: FormData) => T;
+    prepareFormData?: (formData: FormData) => Promise<void>;
 }
 
 export const AddSource = <T extends SourceConfigPayload>({
     config,
     onSaved,
     bodyFormatter,
+    prepareFormData,
     componentFields,
 }: AddSourceProps<T>) => {
     const connectToPipelineMutation = useConnectSourceToPipeline();
@@ -32,6 +34,7 @@ export const AddSource = <T extends SourceConfigPayload>({
             onSaved();
         },
         bodyFormatter,
+        prepareFormData,
     });
 
     return (

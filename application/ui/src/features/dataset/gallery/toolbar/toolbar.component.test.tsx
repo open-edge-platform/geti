@@ -117,7 +117,7 @@ describe('Toolbar', () => {
 
         await renderToolbar();
 
-        const input = screen.getByLabelText(/Upload media files/);
+        const input = screen.getByTestId('upload-media-input');
         fireEvent.change(input, { target: { files: [file] } });
 
         expect(uploadMediaMock).toHaveBeenCalledWith([file]);

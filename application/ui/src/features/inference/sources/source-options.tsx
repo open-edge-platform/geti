@@ -13,7 +13,7 @@ import { IpCamera } from './ip-camera/ip-camera.component';
 import { getIpCameraInitialConfig, ipCameraBodyFormatter } from './ip-camera/utils';
 import { UsbCamera } from './usb-camera/usb-camera-fields.component';
 import { getUsbCameraInitialConfig, usbCameraBodyFormatter } from './usb-camera/utils';
-import { getVideoFileInitialConfig, videoFileBodyFormatter } from './video-file/utils';
+import { getVideoFileInitialConfig, prepareVideoFileFormData, videoFileBodyFormatter } from './video-file/utils';
 import { VideoFile } from './video-file/video-file.component';
 
 interface SourceOptionsProps {
@@ -85,6 +85,7 @@ export const SourceOptions = ({ onSaved, hasHeader, children, existingNames = []
                                 config={getVideoFileInitialConfig(existingNames)}
                                 componentFields={(state: VideoFileSourceConfig) => <VideoFile defaultState={state} />}
                                 bodyFormatter={videoFileBodyFormatter}
+                                prepareFormData={prepareVideoFileFormData}
                             />
                         ),
                     },

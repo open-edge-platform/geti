@@ -18,7 +18,7 @@
         "start": "rsbuild dev",
         "start:tauri": "cross-env BUILD_TARGET=tauri rsbuild dev",
         "start:desktop": "tauri dev",
-        "server": "uv --directory ../ run fastapi run --port 7860",
+        "server": "cd ../backend && just run-server",
         "format": "prettier --write .",
         "format:check": "prettier --check --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\"",
         "lint": "eslint \"src/**/*.ts*\" --max-warnings 0",

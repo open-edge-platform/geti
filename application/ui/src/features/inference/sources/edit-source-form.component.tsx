@@ -9,7 +9,7 @@ import { IpCamera } from './ip-camera/ip-camera.component';
 import { ipCameraBodyFormatter } from './ip-camera/utils';
 import { UsbCamera } from './usb-camera/usb-camera-fields.component';
 import { usbCameraBodyFormatter } from './usb-camera/utils';
-import { videoFileBodyFormatter } from './video-file/utils';
+import { prepareVideoFileFormData, videoFileBodyFormatter } from './video-file/utils';
 import { VideoFile } from './video-file/video-file.component';
 
 interface EditSourceFormProps {
@@ -54,6 +54,7 @@ export const EditSourceForm = ({ config, connectedSourceId, onSaved, onBackToLis
                 onBackToList={onBackToList}
                 componentFields={(state: VideoFileSourceConfig) => <VideoFile defaultState={state} />}
                 bodyFormatter={videoFileBodyFormatter}
+                prepareFormData={prepareVideoFileFormData}
                 isConnected={connectedSourceId === config.id}
             />
         );
