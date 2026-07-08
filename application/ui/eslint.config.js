@@ -56,6 +56,16 @@ const tauriRestrictedImportPattern = {
         'swap implementations per build target.',
 };
 
+// Containment rule for generated OpenAPI types. Only the client-building layer
+// (src/api/**, src/query-client/**) and the shared type re-export barrel
+// (src/constants/shared-types.ts) may import the generated spec directly.
+// Everywhere else must import domain types from src/constants/shared-types.ts.
+const openapiSpecRestrictedImportPattern = {
+    group: ['**/openapi-spec'],
+    message:
+        'Do not import generated OpenAPI types directly. Import them from `src/constants/shared-types.ts` instead.',
+};
+
 export default [
     {
         ignores: [...sharedEslintConfig[0].ignores, 'src/api/openapi-spec.d.ts'],
@@ -111,6 +121,36 @@ export default [
                 {
                     paths: restrictedImportPaths,
                     patterns: [...restrictedImportPatterns, tauriRestrictedImportPattern],
+                },
+            ],
+        },
+    },
+    {
+        files: ['src/**/*.{ts,tsx}'],
+        ignores: ['src/**/*.tauri.{ts,tsx}', 'src/constants/shared-types.ts', 'src/api/**', 'src/query-client/**'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: restrictedImportPaths,
+                    patterns: [
+                        ...restrictedImportPatterns,
+                        tauriRestrictedImportPattern,
+                        openapiSpecRestrictedImportPattern,
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ['src/**/*.tauri.{ts,tsx}'],
+        ignores: ['src/constants/shared-types.ts', 'src/api/**', 'src/query-client/**'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: restrictedImportPaths,
+                    patterns: [...restrictedImportPatterns, openapiSpecRestrictedImportPattern],
                 },
             ],
         },
