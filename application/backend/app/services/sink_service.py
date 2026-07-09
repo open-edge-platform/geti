@@ -64,8 +64,9 @@ class SinkService:
         output_formats: list[OutputFormat],
         sink_id: UUID | None = None,
     ) -> Sink:
+        effective_sink_id = sink_id or uuid4()
         self._validate_candidate(
-            sink_id=sink_id or uuid4(),
+            sink_id=effective_sink_id,
             name=name,
             sink_type=sink_type,
             rate_limit=rate_limit,
@@ -75,7 +76,7 @@ class SinkService:
         try:
             db_sink = SinkRepository(self._db_session).save(
                 SinkDB(
-                    id=str(sink_id) if sink_id is not None else None,
+                    id=str(effective_sink_id),
                     name=name,
                     sink_type=sink_type,
                     rate_limit=rate_limit,

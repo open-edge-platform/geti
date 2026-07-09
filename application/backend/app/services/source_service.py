@@ -154,10 +154,13 @@ class SourceUpdateService(SourceService):
         config_data: SourceConfig,
         source_id: UUID | None = None,
     ) -> Source:
+        effective_source_id = source_id or uuid4()
         self._validate_candidate(
-            source_id=source_id or uuid4(), name=name, source_type=source_type, config_data=config_data
+            source_id=effective_source_id, name=name, source_type=source_type, config_data=config_data
         )
-        return super().create_source(name=name, source_type=source_type, config_data=config_data, source_id=source_id)
+        return super().create_source(
+            name=name, source_type=source_type, config_data=config_data, source_id=effective_source_id
+        )
 
     @parent_process_only
     def update_source(
