@@ -1,42 +1,51 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Flex, SearchField, Text, ToggleButton } from '@geti-ui/ui';
+import { Checkbox, CheckboxGroup, SearchField } from '@geti-ui/ui';
+import { isEmpty } from 'lodash-es';
 
+import { FilterPopoverButton } from '../../../../components/filter-popover-button/filter-popover-button.component';
 import { TaskType } from '../../../../constants/shared-types';
+import { pluralize } from '../../../../shared/util';
 import { MAP_PROJECT_TYPE_TO_TITLE } from '../util';
-import { TASK_TYPE_COLORS, TASK_TYPE_OPTIONS } from './utils';
+import { TASK_TYPE_OPTIONS } from './utils';
 
 type ProjectFiltersProps = {
     searchName: string;
     onSearchChange: (value: string) => void;
     selectedTaskTypes: TaskType[];
-    onToggleTaskType: (taskType: TaskType) => void;
+    onSelectedTaskTypesChange: (taskTypes: TaskType[]) => void;
 };
 
 export const ProjectFilters = ({
     searchName,
     onSearchChange,
     selectedTaskTypes,
-    onToggleTaskType,
+    onSelectedTaskTypesChange,
 }: ProjectFiltersProps) => {
+    const summary = isEmpty(selectedTaskTypes)
+        ? null
+        : `${selectedTaskTypes.length} ${pluralize(selectedTaskTypes.length, 'type', 'types')} selected`;
+
     return (
         <>
-            <Flex gap={'size-75'} alignItems={'center'}>
-                {TASK_TYPE_OPTIONS.map((taskType) => (
-                    <ToggleButton
-                        key={taskType}
-                        isQuiet
-                        isSelected={selectedTaskTypes.includes(taskType)}
-                        onChange={() => onToggleTaskType(taskType)}
-                        aria-label={`Filter by ${MAP_PROJECT_TYPE_TO_TITLE[taskType]}`}
-                    >
-                        <Text UNSAFE_style={{ color: TASK_TYPE_COLORS[taskType] }}>
+            <FilterPopoverButton
+                ariaLabel={'Filter by task type'}
+                placeholder={'Filter by task type'}
+                summary={summary}
+            >
+                <CheckboxGroup
+                    aria-label={'Filter by task type'}
+                    value={selectedTaskTypes}
+                    onChange={(values) => onSelectedTaskTypesChange(values as TaskType[])}
+                >
+                    {TASK_TYPE_OPTIONS.map((taskType) => (
+                        <Checkbox key={taskType} value={taskType}>
                             {MAP_PROJECT_TYPE_TO_TITLE[taskType]}
-                        </Text>
-                    </ToggleButton>
-                ))}
-            </Flex>
+                        </Checkbox>
+                    ))}
+                </CheckboxGroup>
+            </FilterPopoverButton>
 
             <SearchField
                 value={searchName}

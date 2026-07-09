@@ -11,7 +11,6 @@ interface UseProjectFiltersResult {
     setSearchName: (value: string) => void;
     selectedTaskTypes: TaskType[];
     setSelectedTaskTypes: (taskTypes: TaskType[]) => void;
-    toggleTaskType: (taskType: TaskType) => void;
     filteredProjects: Project[];
     isFiltering: boolean;
 }
@@ -19,12 +18,6 @@ interface UseProjectFiltersResult {
 export const useProjectFilters = (projects: Project[]): UseProjectFiltersResult => {
     const [searchName, setSearchName] = useState<string>('');
     const [selectedTaskTypes, setSelectedTaskTypes] = useState<TaskType[]>([]);
-
-    const toggleTaskType = (taskType: TaskType) => {
-        setSelectedTaskTypes((current) =>
-            current.includes(taskType) ? current.filter((item) => item !== taskType) : [...current, taskType]
-        );
-    };
 
     const filteredProjects = useMemo(
         () => filterProjects(projects, searchName, selectedTaskTypes),
@@ -38,7 +31,6 @@ export const useProjectFilters = (projects: Project[]): UseProjectFiltersResult 
         setSearchName,
         selectedTaskTypes,
         setSelectedTaskTypes,
-        toggleTaskType,
         filteredProjects,
         isFiltering,
     };

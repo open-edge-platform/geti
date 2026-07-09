@@ -5,14 +5,6 @@ import { isEmpty } from 'lodash-es';
 
 import { Project, TaskType } from '../../../../constants/shared-types';
 
-// Each task type has its own colour so filtered projects are easily distinguishable.
-// Colours are chosen to keep enough contrast against the app's light background.
-export const TASK_TYPE_COLORS: Record<TaskType, string> = {
-    classification: '#7454c9',
-    detection: '#0e8a7d',
-    instance_segmentation: '#b5651d',
-};
-
 export const TASK_TYPE_OPTIONS: TaskType[] = ['classification', 'detection', 'instance_segmentation'];
 
 export const filterProjects = (projects: Project[], searchName: string, selectedTaskTypes: TaskType[]): Project[] => {

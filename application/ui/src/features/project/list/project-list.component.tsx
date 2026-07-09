@@ -26,7 +26,7 @@ const ProjectGrid = () => {
     const [sortBy, setSortBy] = useState<SortBy>('createdAt-descending');
     const hasProjects = isNonEmptyArray(projects.data);
 
-    const { searchName, setSearchName, selectedTaskTypes, toggleTaskType, filteredProjects, isFiltering } =
+    const { searchName, setSearchName, selectedTaskTypes, setSelectedTaskTypes, filteredProjects, isFiltering } =
         useProjectFilters(projects.data);
 
     const sortedProjects = useMemo(() => {
@@ -48,7 +48,6 @@ const ProjectGrid = () => {
     return (
         <Flex direction={'column'} gap={'size-100'} height={'100%'}>
             <Grid
-                justifyContent={'space-between'}
                 gap={'size-200'}
                 columns={['1fr', '1fr', '1fr']}
                 marginBottom={'size-200'}
@@ -59,7 +58,7 @@ const ProjectGrid = () => {
                     searchName={searchName}
                     onSearchChange={setSearchName}
                     selectedTaskTypes={selectedTaskTypes}
-                    onToggleTaskType={toggleTaskType}
+                    onSelectedTaskTypesChange={setSelectedTaskTypes}
                 />
             </Grid>
 
@@ -73,7 +72,7 @@ const ProjectGrid = () => {
                     gap={'size-300'}
                     autoRows={'size-2000'}
                     justifyContent={'center'}
-                    UNSAFE_style={{ overflowY: 'auto' }}
+                    UNSAFE_style={{ overflowY: 'auto', scrollbarGutter: 'stable' }}
                     columns={['1fr', '1fr']}
                 >
                     <NewProjectCard />

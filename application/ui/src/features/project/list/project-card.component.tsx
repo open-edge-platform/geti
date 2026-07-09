@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { CSSProperties, useState } from 'react';
+import { useState } from 'react';
 
 import { Badge, dimensionValue, Flex, Heading, Text, View } from '@geti-ui/ui';
 import { clsx } from 'clsx';
@@ -9,9 +9,8 @@ import { NavLink } from 'react-router-dom';
 
 import placeholderThumbnailIconUrl from '../../../assets/icons/image-icon.svg?url';
 import { paths } from '../../../constants/paths';
-import { Project, TaskType } from '../../../constants/shared-types';
+import { Project } from '../../../constants/shared-types';
 import { getProjectThumbnailUrl } from '../../../shared/media-url.utils';
-import { TASK_TYPE_COLORS } from './filter-projects/utils';
 import { MenuActions } from './menu-actions/menu-actions.component';
 import { formatCreationDate, getProjectTypeTitle } from './util';
 
@@ -21,16 +20,11 @@ const cardPadding = 'size-200';
 
 type ProjectTypeBadgeProps = {
     type: string;
-    taskType: TaskType;
 };
 
-const ProjectTypeBadge = ({ type, taskType }: ProjectTypeBadgeProps) => {
+const ProjectTypeBadge = ({ type }: ProjectTypeBadgeProps) => {
     return (
-        <Badge
-            variant={'neutral'}
-            UNSAFE_className={classes.tag}
-            UNSAFE_style={{ '--task-color': TASK_TYPE_COLORS[taskType] } as CSSProperties}
-        >
+        <Badge variant={'neutral'} UNSAFE_className={classes.tag}>
             <Text>{type}</Text>
         </Badge>
     );
@@ -100,9 +94,7 @@ export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: Pro
                         </Flex>
 
                         <Flex gap={'size-50'}>
-                            {taskType !== undefined && (
-                                <ProjectTypeBadge type={taskType} taskType={item.task.task_type} />
-                            )}
+                            {taskType !== undefined && <ProjectTypeBadge type={taskType} />}
                             {isActive && <ActiveProjectBadge />}
                         </Flex>
 

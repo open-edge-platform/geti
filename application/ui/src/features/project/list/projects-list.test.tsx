@@ -202,12 +202,57 @@ describe('ProjectList', () => {
 
             await screen.findByRole('heading', { name: 'Alpha Project' });
 
-            await user.click(screen.getByRole('button', { name: /filter by classification/i }));
+            await user.click(screen.getByRole('button', { name: 'Filter by task type' }));
 
+            const classificationCheckbox = await screen.findByRole('checkbox', { name: 'Classification' });
+            await user.click(classificationCheckbox);
+
+            expect(classificationCheckbox).toBeChecked();
+
+            await user.keyboard('{Escape}');
+
+            expect(await screen.findByText('1 type selected')).toBeInTheDocument();
             expect(await screen.findByText('1 of 3 projects')).toBeInTheDocument();
             expect(screen.getByRole('heading', { name: 'Beta Project' })).toBeInTheDocument();
             expect(screen.queryByRole('heading', { name: 'Alpha Project' })).not.toBeInTheDocument();
             expect(screen.queryByRole('heading', { name: 'Zeta Segmentation' })).not.toBeInTheDocument();
+        });
+
+        it('filters projects by both name search and task type together', async () => {
+            const user = userEvent.setup();
+            renderProjectList();
+
+            await screen.findByRole('heading', { name: 'Alpha Project' });
+
+            await user.click(screen.getByRole('button', { name: 'Filter by task type' }));
+            await user.click(await screen.findByRole('checkbox', { name: 'Object detection' }));
+            await user.keyboard('{Escape}');
+
+            await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'alpha');
+
+            expect(await screen.findByText('1 of 3 projects')).toBeInTheDocument();
+            expect(screen.getByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
+            expect(screen.queryByRole('heading', { name: 'Beta Project' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('heading', { name: 'Zeta Segmentation' })).not.toBeInTheDocument();
+        });
+
+        it('shows no matching projects when the name search and task type filters do not overlap', async () => {
+            const user = userEvent.setup();
+            renderProjectList();
+
+            await screen.findByRole('heading', { name: 'Alpha Project' });
+
+            await user.click(screen.getByRole('button', { name: 'Filter by task type' }));
+            await user.click(await screen.findByRole('checkbox', { name: 'Object detection' }));
+            await user.keyboard('{Escape}');
+
+            await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'beta');
+
+            expect(await screen.findByText('No projects match your filters')).toBeInTheDocument();
+            expect(screen.getByText('0 of 3 projects')).toBeInTheDocument();
+            expect(
+                screen.queryByRole('heading', { name: /Alpha Project|Beta Project|Zeta Segmentation/ })
+            ).not.toBeInTheDocument();
         });
 
         it('shows a "no matching projects" message when filters exclude all projects', async () => {

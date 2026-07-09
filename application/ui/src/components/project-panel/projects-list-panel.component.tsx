@@ -28,9 +28,6 @@ import { DeleteProjectDialog } from '../../components/project-dialogs/delete-pro
 import { EditProjectNameDialog } from '../../components/project-dialogs/edit-project-name-dialog.component';
 import { paths } from '../../constants/paths';
 import { Project } from '../../constants/shared-types';
-import { NoMatchingProjects } from '../../features/project/list/filter-projects/no-matching-projects.component';
-import { ProjectFilters } from '../../features/project/list/filter-projects/project-filters.component';
-import { useProjectFilters } from '../../features/project/list/filter-projects/use-project-filters.hook';
 import { ProjectActionsMenu } from '../../features/project/list/menu-actions/menu-actions.component';
 import { getProjectTypeTitle } from '../../features/project/list/util';
 import { ProjectThumbnail } from './project-thumbnail/project-thumbnail.component';
@@ -106,9 +103,6 @@ export const ProjectsListPanel = () => {
     const otherProjectNames = otherProjects.map(({ name }) => name);
 
     const taskType = getProjectTypeTitle(selectedProject?.task);
-
-    const { searchName, setSearchName, selectedTaskTypes, toggleTaskType, filteredProjects, isFiltering } =
-        useProjectFilters(otherProjects);
 
     const {
         projectActionMetadata,
@@ -207,30 +201,12 @@ export const ProjectsListPanel = () => {
                             <Divider size={'S'} marginBottom={'size-100'} marginTop={0} />
 
                             <Content margin={0}>
-                                <View paddingX={'size-200'} paddingBottom={'size-100'}>
-                                    <ProjectFilters
-                                        searchName={searchName}
-                                        onSearchChange={setSearchName}
-                                        selectedTaskTypes={selectedTaskTypes}
-                                        onToggleTaskType={toggleTaskType}
-                                    />
-                                    <Text UNSAFE_style={{ fontSize: 'var(--spectrum-global-dimension-font-size-75)' }}>
-                                        {filteredProjects.length} of {otherProjects.length} projects
-                                    </Text>
-                                </View>
-
-                                {filteredProjects.length === 0 && isFiltering ? (
-                                    <View paddingX={'size-200'} paddingBottom={'size-100'}>
-                                        <NoMatchingProjects />
-                                    </View>
-                                ) : (
-                                    <ProjectsList
-                                        projects={filteredProjects}
-                                        onRename={editProject}
-                                        onDelete={deleteProject}
-                                        onEnableBlocked={enablePipelineBlocked}
-                                    />
-                                )}
+                                <ProjectsList
+                                    projects={otherProjects}
+                                    onRename={editProject}
+                                    onDelete={deleteProject}
+                                    onEnableBlocked={enablePipelineBlocked}
+                                />
                             </Content>
                         </>
                     )}
