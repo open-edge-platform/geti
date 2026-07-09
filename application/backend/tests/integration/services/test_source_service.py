@@ -439,11 +439,14 @@ class TestSourceUpdateServiceIntegration:
 
         source = SourceAdapter.validate_python(db_source, from_attributes=True)
 
-        fxt_source_update_service_with_media.update_source(
-            source=source,
-            new_name=source.name,
-            new_config_data=VideoFileConfig(video_path="/new/path"),
-        )
+        with patch.object(
+            fxt_source_update_service_with_media, "_probe_reachability", return_value=SourceTestResult.success(1.0)
+        ):
+            fxt_source_update_service_with_media.update_source(
+                source=source,
+                new_name=source.name,
+                new_config_data=VideoFileConfig(video_path="/new/path"),
+            )
 
         fxt_source_media_service.delete_video.assert_called_once_with("/path/to/video.mp4")
 
@@ -461,11 +464,14 @@ class TestSourceUpdateServiceIntegration:
 
         source = SourceAdapter.validate_python(db_source, from_attributes=True)
 
-        fxt_source_update_service_with_media.update_source(
-            source=source,
-            new_name="Renamed Source",
-            new_config_data=VideoFileConfig(video_path="/path/to/video.mp4"),
-        )
+        with patch.object(
+            fxt_source_update_service_with_media, "_probe_reachability", return_value=SourceTestResult.success(1.0)
+        ):
+            fxt_source_update_service_with_media.update_source(
+                source=source,
+                new_name="Renamed Source",
+                new_config_data=VideoFileConfig(video_path="/path/to/video.mp4"),
+            )
 
         fxt_source_media_service.delete_video.assert_not_called()
 
@@ -483,11 +489,14 @@ class TestSourceUpdateServiceIntegration:
 
         source = SourceAdapter.validate_python(db_source, from_attributes=True)
 
-        fxt_source_update_service_with_media.update_source(
-            source=source,
-            new_name="Renamed Source",
-            new_config_data=USBCameraConfig(device_id=2, codec=None),
-        )
+        with patch.object(
+            fxt_source_update_service_with_media, "_probe_reachability", return_value=SourceTestResult.success(1.0)
+        ):
+            fxt_source_update_service_with_media.update_source(
+                source=source,
+                new_name="Renamed Source",
+                new_config_data=USBCameraConfig(device_id=2, codec=None),
+            )
 
         fxt_source_media_service.delete_video.assert_not_called()
 
