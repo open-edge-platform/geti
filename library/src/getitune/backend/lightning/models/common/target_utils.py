@@ -13,6 +13,9 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+import torch
+from torch import Tensor
+
 if TYPE_CHECKING:
     from getitune.data.entity.sample import SampleBatch
 
@@ -32,20 +35,36 @@ def align_sample_batch_annotations(entity: SampleBatch) -> SampleBatch:
       size of tensor b (M) ...`` deep inside the matcher.
     * mmdet-based models (Mask R-CNN, RTMDet-Inst, ATSS, SSD, YOLOX) build
       ``InstanceData`` which enforces that all instance-level fields share the
-      same length.
+      same length. For mask heads, positive proposals are matched to ground
+      truth by *box* IoU and the resulting index set is used to gather *masks*
+      (``gt_masks[pos_assigned_gt_inds]``); if a sample has more boxes than
+      masks this indexes out of range and triggers a CUDA device-side assert.
 
     The data pipeline should already guarantee consistent counts, but geometric
-    transforms (cropping, tiling, bounding-box sanitization) can occasionally
-    drop one annotation type without dropping the paired ones. When that
-    happens this helper realigns the affected image's annotations to their
-    common minimum length and logs a warning, so training degrades gracefully
-    instead of crashing inside the loss.
+    transforms can drop one annotation type without dropping the paired ones.
+    In particular, tiling filters bounding boxes (``BboxTiler``) and instance
+    masks with *independent* criteria — boxes by their stored (e.g. COCO)
+    coordinates and masks by their rasterised pixels — so an instance straddling
+    a tile boundary can be kept for one field and dropped for the other, leaving
+    ``len(boxes) != len(masks)``.
 
-    The trimming is a best-effort safety net: it keeps the first ``n`` entries
-    of each field (annotations are built per-instance in a consistent order, so
-    trailing extras are the most likely divergence). It only mutates images
-    whose counts actually diverge, leaving the common (consistent) path
-    untouched.
+    When counts diverge this helper realigns the affected image and logs a
+    warning so training degrades gracefully instead of crashing inside the loss.
+
+    Alignment strategy (only applied to images whose counts actually diverge —
+    the common consistent path is left completely untouched):
+
+    * **Instance segmentation** (masks present): the masks are treated as the
+      source of truth. Every field is trimmed to the common minimum count and
+      the boxes are then *recomputed from the (trimmed) masks*. This guarantees
+      ``box[i]`` is exactly the tight bounding box of ``mask[i]``, preserving the
+      box→mask correspondence the Mask R-CNN mask head relies on. Blindly
+      trimming boxes to the first ``n`` entries would instead risk pairing
+      ``box[i]`` with a *different* instance's mask when a middle instance was
+      dropped from only one of the two fields.
+    * **Detection / other** (no masks): each field is trimmed to the common
+      minimum count (boxes and labels are produced in the same instance order,
+      so trimming trailing extras keeps them aligned).
 
     Args:
         entity: The batch to align. Modified in place.
@@ -87,13 +106,51 @@ def align_sample_batch_annotations(entity: SampleBatch) -> SampleBatch:
             n,
         )
 
-        if bboxes is not None and bboxes[i] is not None:
-            bboxes[i] = bboxes[i][:n]  # pyrefly: ignore[unsupported-operation]
+        masks_present = masks is not None and i < len(masks) and masks[i] is not None
+
         if labels is not None and labels[i] is not None:
             labels[i] = labels[i][:n]
-        if masks is not None and masks[i] is not None:
-            masks[i] = masks[i][:n]  # pyrefly: ignore[unsupported-operation]
         if keypoints is not None and keypoints[i] is not None:
             keypoints[i] = keypoints[i][:n]
+        if masks_present:
+            masks[i] = masks[i][:n]  # type: ignore[index]  # pyrefly: ignore[unsupported-operation]
+
+        if bboxes is not None and bboxes[i] is not None:
+            if masks_present:
+                # Instance segmentation: rebuild boxes from the trimmed masks so
+                # box[i] is guaranteed to correspond to mask[i].
+                bboxes[i] = _boxes_from_masks(masks[i], bboxes[i])  # type: ignore[index]
+            else:
+                bboxes[i] = bboxes[i][:n]  # pyrefly: ignore[unsupported-operation]
 
     return entity
+
+
+def _boxes_from_masks(masks: Tensor, reference_bboxes: Tensor) -> Tensor:
+    """Return tight bounding boxes for ``masks`` as ``tv_tensors.BoundingBoxes``.
+
+    The result mirrors the format/canvas of ``reference_bboxes`` so it is a
+    drop-in replacement inside a :class:`~getitune.data.entity.sample.SampleBatch`.
+
+    Args:
+        masks: Instance masks of shape ``(N, H, W)``.
+        reference_bboxes: The existing (possibly mis-counted) boxes, used only to
+            copy ``format``/``canvas_size``/``dtype``/``device`` metadata.
+
+    Returns:
+        ``tv_tensors.BoundingBoxes`` of shape ``(N, 4)`` in XYXY format.
+    """
+    # Local imports keep this module import-light and avoid any import cycle
+    # between the model-common package and the data package.
+    from torchvision import tv_tensors
+
+    from getitune.data.utils.structures.mask.mask_target import masks_to_boxes
+
+    canvas_size = getattr(reference_bboxes, "canvas_size", tuple(masks.shape[-2:]))
+    xyxy = masks_to_boxes(masks, dtype=torch.float32).to(masks.device)
+    return tv_tensors.BoundingBoxes(
+        xyxy,
+        format=tv_tensors.BoundingBoxFormat.XYXY,
+        canvas_size=canvas_size,  # type: ignore[arg-type]
+        dtype=torch.float32,
+    )

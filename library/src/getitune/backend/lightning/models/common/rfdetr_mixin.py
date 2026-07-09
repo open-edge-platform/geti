@@ -206,10 +206,27 @@ class RFDETRMixin:
                         n_masks,
                         n,
                     )
-                    scaled_bboxes = scaled_bboxes[:n]
                     ll = ll[:n]
                     if mm is not None:
+                        # Instance segmentation: rebuild the boxes from the
+                        # (trimmed) masks so box[i] is the tight box of mask[i].
+                        # The RF-DETR matcher pairs per-target box and mask costs,
+                        # so preserving this correspondence is essential — a plain
+                        # trim could pair a box with a different instance's mask.
                         mm = mm[:n]
+                        if n > 0:
+                            from getitune.data.utils.structures.mask.mask_target import masks_to_boxes
+
+                            xyxy = masks_to_boxes(mm, dtype=torch.float32).to(device)
+                            scaled_bboxes = box_convert(xyxy, in_fmt="xyxy", out_fmt="cxcywh") / torch.tensor(
+                                [w, h, w, h],
+                                device=device,
+                                dtype=torch.float32,
+                            )
+                        else:
+                            scaled_bboxes = torch.zeros((0, 4), device=device, dtype=torch.float32)
+                    else:
+                        scaled_bboxes = scaled_bboxes[:n]
 
                 target: dict[str, Any] = {
                     "boxes": scaled_bboxes,

@@ -299,3 +299,58 @@ class TestRFDETRInst:
         # Counts are aligned to the per-image minimum (1 for both images here).
         assert targets[0]["boxes"].shape[0] == 1
         assert targets[1]["boxes"].shape[0] == 1
+
+    def test_customize_inputs_rebuilds_boxes_from_masks_on_mismatch(self) -> None:
+        """On a boxes/masks mismatch, RF-DETR targets keep box↔mask correspondence.
+
+        The matcher pairs per-target box and mask costs, so after alignment
+        ``box[i]`` must be the tight box of ``mask[i]``. Trimming boxes to the
+        first ``n`` would pair a box with the wrong mask when a middle instance
+        is dropped from only one field, so the boxes are recomputed from masks.
+        """
+        from torchvision import tv_tensors
+
+        from getitune.data.entity.base import ImageInfo
+        from getitune.data.entity.sample import SampleBatch
+
+        model = RFDETRInst(model_name="rfdetr_seg_n", label_info=3)
+        size = 320
+        # Two masks with distinct rectangles, but only one (unrelated) stored box.
+        mask_rects = [(10, 20, 60, 90), (100, 40, 180, 200)]
+        mask_data = torch.zeros((2, size, size), dtype=torch.uint8)
+        for idx, (x1, y1, x2, y2) in enumerate(mask_rects):
+            mask_data[idx, y1:y2, x1:x2] = 1
+        batch = SampleBatch(
+            images=torch.randn(1, 3, size, size),
+            bboxes=[
+                tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+                    torch.tensor([[0, 0, 5, 5]], dtype=torch.float32),
+                    format=tv_tensors.BoundingBoxFormat.XYXY,
+                    canvas_size=(size, size),
+                )
+            ],
+            labels=[torch.tensor([0], dtype=torch.long)],
+            masks=[tv_tensors.Mask(mask_data)],
+            imgs_info=[
+                ImageInfo(  # pyrefly: ignore[no-matching-overload]
+                    img_idx=0, img_shape=(size, size), ori_shape=(size, size)
+                )
+            ],
+        )
+
+        target = model._customize_inputs(batch)["targets"][0]
+        # Aligned to the common minimum (1 box vs 2 masks -> 1).
+        assert target["boxes"].shape[0] == 1
+        assert target["masks"].shape[0] == 1
+        # The single kept box must be the (normalized cxcywh) tight box of mask 0,
+        # NOT the unrelated stored [0, 0, 5, 5] box.
+        x1, y1, x2, y2 = mask_rects[0]
+        exp_cxcywh = torch.tensor(
+            [
+                (x1 + (x2 - 1)) / 2 / size,
+                (y1 + (y2 - 1)) / 2 / size,
+                (x2 - 1 - x1) / size,
+                (y2 - 1 - y1) / size,
+            ]
+        )
+        torch.testing.assert_close(target["boxes"][0].cpu(), exp_cxcywh, rtol=1e-4, atol=1e-4)
