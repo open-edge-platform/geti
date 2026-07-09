@@ -1,7 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 import time
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -18,6 +18,7 @@ from .base import (
     ResourceInUseError,
     ResourceNotFoundError,
     ResourceType,
+    ResourceValidationError,
     ResourceWithIdAlreadyExistsError,
     ResourceWithNameAlreadyExistsError,
 )
@@ -30,6 +31,29 @@ class SinkService:
         self._event_bus: EventBus = event_bus
         self._db_session = db_session
 
+    def _validate_candidate(
+        self,
+        *,
+        sink_id: UUID,
+        name: str,
+        sink_type: SinkType,
+        rate_limit: float | None,
+        config_data: SinkConfig,
+        output_formats: list[OutputFormat],
+    ) -> None:
+        """Assemble the post-change Sink and validate that it is reachable."""
+        candidate = SinkAdapter.validate_python(
+            {
+                "id": sink_id,
+                "name": name,
+                "sink_type": sink_type,
+                "rate_limit": rate_limit,
+                "output_formats": output_formats,
+                "config_data": config_data,
+            }
+        )
+        self.validate_sink(candidate)
+
     @parent_process_only
     def create_sink(
         self,
@@ -40,6 +64,14 @@ class SinkService:
         output_formats: list[OutputFormat],
         sink_id: UUID | None = None,
     ) -> Sink:
+        self._validate_candidate(
+            sink_id=sink_id or uuid4(),
+            name=name,
+            sink_type=sink_type,
+            rate_limit=rate_limit,
+            config_data=config_data,
+            output_formats=output_formats,
+        )
         try:
             db_sink = SinkRepository(self._db_session).save(
                 SinkDB(
@@ -66,6 +98,14 @@ class SinkService:
         new_config_data: SinkConfig,
         new_output_formats: list[OutputFormat],
     ) -> Sink:
+        self._validate_candidate(
+            sink_id=sink.id,
+            name=new_name,
+            sink_type=sink.sink_type,
+            rate_limit=new_rate_limit,
+            config_data=new_config_data,
+            output_formats=new_output_formats,
+        )
         try:
             sink_repo = SinkRepository(self._db_session)
             db_sink = sink_repo.update(
@@ -131,8 +171,9 @@ class SinkService:
 
     _TEST_TIMEOUT_SECONDS = 5
 
-    def test_sink(self, sink: Sink) -> SinkTestResult:
-        """Perform a connectivity check on the sink."""
+    def _probe_reachability(self, sink: Sink) -> SinkTestResult:
+        """Attempt to connect to the sink's destination. Never raises; failures are reported
+        via the returned result's `reachable`/`error` fields."""
         try:
             destination = DispatchService.get_destination(sink)
             if destination is None:
@@ -144,3 +185,24 @@ class SinkService:
             return SinkTestResult.success(latency_ms=round(elapsed_ms, 1))
         except Exception as e:
             return SinkTestResult.failure(str(e))
+
+    def test_sink(self, sink: Sink) -> SinkTestResult:
+        """Perform a connectivity check on the sink."""
+        return self._probe_reachability(sink)
+
+    def validate_sink(self, sink: Sink) -> None:
+        """Raise ResourceValidationError if the sink cannot be reached/used.
+
+        Reuses the same probe as `test_sink`; the resulting error message is expected
+        to already be a complete, user-facing sentence (see dispatcher `test()` methods).
+
+        ROS output is a known platform limitation (not implemented yet, see
+        DispatchService), not a user configuration error: the probe would always report
+        it as unreachable regardless of the supplied config, so create/update validation
+        is skipped for ROS sinks. Use `:test` to confirm ROS connectivity behavior.
+        """
+        if sink.sink_type == SinkType.ROS:
+            return
+        result = self._probe_reachability(sink)
+        if not result.reachable:
+            raise ResourceValidationError(ResourceType.SINK, str(sink.id), result.error)

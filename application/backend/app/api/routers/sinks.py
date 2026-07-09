@@ -18,6 +18,7 @@ from app.api.schemas.test_result import TestResult
 from app.models import Sink
 from app.services import (
     ResourceInUseError,
+    ResourceValidationError,
     ResourceWithIdAlreadyExistsError,
     ResourceWithNameAlreadyExistsError,
     SinkService,
@@ -93,7 +94,11 @@ def create_sink(
     ],
     sink_service: Annotated[SinkService, Depends(get_sink_service)],
 ) -> SinkView:
-    """Create and configure a new sink"""
+    """Create and configure a new sink.
+
+    Returns 422 if the request body fails validation, or if the sink configuration
+    is well-formed but not reachable (e.g. missing output folder, unreachable broker).
+    """
     try:
         sink = sink_service.create_sink(
             name=sink_create.name,
@@ -106,6 +111,8 @@ def create_sink(
         return SinkViewAdapter.validate_python(sink, from_attributes=True)
     except (ResourceWithNameAlreadyExistsError, ResourceWithIdAlreadyExistsError) as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    except ResourceValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
 
 
 @router.get(
@@ -155,7 +162,12 @@ def update_sink(
     ],
     sink_service: Annotated[SinkService, Depends(get_sink_service)],
 ) -> SinkView:
-    """Reconfigure an existing sink"""
+    """Reconfigure an existing sink.
+
+    Returns 422 if the request body fails validation, or if the updated sink
+    configuration is well-formed but not reachable (e.g. missing output folder,
+    unreachable broker).
+    """
     if "sink_type" in sink_config:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The 'sink_type' field cannot be changed")
     try:
@@ -173,6 +185,8 @@ def update_sink(
         return SinkViewAdapter.validate_python(sink, from_attributes=True)
     except ResourceWithNameAlreadyExistsError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    except ResourceValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
 
 
 @router.post(
@@ -233,6 +247,8 @@ def import_sink(
     except (ResourceWithNameAlreadyExistsError, ResourceWithIdAlreadyExistsError) as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     except ValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
+    except ResourceValidationError as e:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
 
 

@@ -1,7 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 import time
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from loguru import logger
 from sqlalchemy.exc import IntegrityError
@@ -18,6 +18,7 @@ from .base import (
     ResourceInUseError,
     ResourceNotFoundError,
     ResourceType,
+    ResourceValidationError,
     ResourceWithIdAlreadyExistsError,
     ResourceWithNameAlreadyExistsError,
 )
@@ -126,6 +127,38 @@ class SourceUpdateService(SourceService):
         self._event_bus: EventBus = event_bus
         super().__init__(db_session, source_media_service)
 
+    def _validate_candidate(
+        self,
+        *,
+        source_id: UUID,
+        name: str,
+        source_type: SourceType,
+        config_data: SourceConfig,
+    ) -> None:
+        """Assemble the post-change Source and validate that it is reachable."""
+        candidate = SourceAdapter.validate_python(
+            {
+                "id": source_id,
+                "name": name,
+                "source_type": source_type,
+                "config_data": config_data,
+            }
+        )
+        self.validate_source(candidate)
+
+    @parent_process_only
+    def create_source(
+        self,
+        name: str,
+        source_type: SourceType,
+        config_data: SourceConfig,
+        source_id: UUID | None = None,
+    ) -> Source:
+        self._validate_candidate(
+            source_id=source_id or uuid4(), name=name, source_type=source_type, config_data=config_data
+        )
+        return super().create_source(name=name, source_type=source_type, config_data=config_data, source_id=source_id)
+
     @parent_process_only
     def update_source(
         self,
@@ -133,6 +166,9 @@ class SourceUpdateService(SourceService):
         new_name: str,
         new_config_data: SourceConfig,
     ) -> Source:
+        self._validate_candidate(
+            source_id=source.id, name=new_name, source_type=source.source_type, config_data=new_config_data
+        )
         try:
             source_repo = SourceRepository(self._db_session)
             db_source = source_repo.update(
@@ -159,8 +195,9 @@ class SourceUpdateService(SourceService):
 
     _TEST_TIMEOUT_MS = 5000
 
-    def test_source(self, source: Source) -> SourceTestResult:
-        """Perform a connectivity check on the source."""
+    def _probe_reachability(self, source: Source) -> SourceTestResult:
+        """Attempt to open the source and read one frame. Never raises; failures are reported
+        via the returned result's `reachable`/`error` fields."""
         try:
             video_stream = VideoStreamService.get_video_stream(input_config=source, timeout=self._TEST_TIMEOUT_MS)
             if video_stream is None:
@@ -172,3 +209,17 @@ class SourceUpdateService(SourceService):
             return SourceTestResult.success(latency_ms=round(elapsed_ms, 1))
         except Exception as e:
             return SourceTestResult.failure(str(e))
+
+    def test_source(self, source: Source) -> SourceTestResult:
+        """Perform a connectivity check on the source."""
+        return self._probe_reachability(source)
+
+    def validate_source(self, source: Source) -> None:
+        """Raise ResourceValidationError if the source cannot be opened/reached.
+
+        Reuses the same probe as `test_source`; the resulting error message is expected
+        to already be a complete, user-facing sentence (see stream error messages).
+        """
+        result = self._probe_reachability(source)
+        if not result.reachable:
+            raise ResourceValidationError(ResourceType.SOURCE, str(source.id), result.error)
