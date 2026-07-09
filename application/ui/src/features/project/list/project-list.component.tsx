@@ -26,9 +26,8 @@ const ProjectGrid = () => {
     const [sortBy, setSortBy] = useState<SortBy>('createdAt-descending');
     const hasProjects = isNonEmptyArray(projects.data);
 
-    const { searchName, setSearchName, selectedCategories, toggleCategory, filteredProjects } = useProjectFilters(
-        projects.data
-    );
+    const { searchName, setSearchName, selectedTaskTypes, toggleTaskType, filteredProjects, isFiltering } =
+        useProjectFilters(projects.data);
 
     const sortedProjects = useMemo(() => {
         return SORT_BY_HANDLERS[sortBy](filteredProjects);
@@ -50,13 +49,13 @@ const ProjectGrid = () => {
                 <ProjectFilters
                     searchName={searchName}
                     onSearchChange={setSearchName}
-                    selectedCategories={selectedCategories}
-                    onToggleCategory={toggleCategory}
+                    selectedTaskTypes={selectedTaskTypes}
+                    onToggleTaskType={toggleTaskType}
                 />
                 <SortProjects sortBy={sortBy} onSort={setSortBy} />
             </Flex>
 
-            <Text UNSAFE_className={classes.projectMetadata}>{matchCountLabel}</Text>
+            {isFiltering && <Text UNSAFE_className={classes.projectMetadata}>{matchCountLabel}</Text>}
 
             {sortedProjects.length === 0 ? (
                 <NoMatchingProjects />

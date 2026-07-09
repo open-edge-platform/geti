@@ -1,29 +1,31 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Flex, Responsive, SearchField, ToggleButton } from '@geti-ui/ui';
+import { Flex, SearchField, SearchFieldProps, ToggleButton } from '@geti-ui/ui';
 
-import { TASK_CATEGORY_COLORS, TASK_CATEGORY_LABELS, TASK_CATEGORY_OPTIONS, TaskCategory } from './utils';
+import { TaskType } from '../../../../constants/shared-types';
+import { MAP_PROJECT_TYPE_TO_TITLE } from '../util';
+import { TASK_TYPE_COLORS, TASK_TYPE_OPTIONS } from './utils';
 
 import classes from './project-filters.module.scss';
 
-interface ProjectFiltersProps {
+type ProjectFiltersProps = {
     searchName: string;
     onSearchChange: (value: string) => void;
-    selectedCategories: TaskCategory[];
-    onToggleCategory: (category: TaskCategory) => void;
-    searchWidth?: Responsive<string | number>;
-}
+    selectedTaskTypes: TaskType[];
+    onToggleTaskType: (taskType: TaskType) => void;
+    searchWidth?: SearchFieldProps['width'];
+};
 
 export const ProjectFilters = ({
     searchName,
     onSearchChange,
-    selectedCategories,
-    onToggleCategory,
+    selectedTaskTypes,
+    onToggleTaskType,
     searchWidth = { base: '100%', M: 'size-3000' },
 }: ProjectFiltersProps) => {
     return (
-        <Flex gap={'size-100'} alignItems={'center'} wrap UNSAFE_className={classes.filtersRow}>
+        <Flex gap={'size-100'} alignItems={'center'} wrap>
             <SearchField
                 value={searchName}
                 onChange={onSearchChange}
@@ -33,19 +35,16 @@ export const ProjectFilters = ({
             />
 
             <Flex gap={'size-75'} alignItems={'center'} wrap>
-                {TASK_CATEGORY_OPTIONS.map((category) => (
+                {TASK_TYPE_OPTIONS.map((taskType) => (
                     <ToggleButton
-                        key={category}
+                        key={taskType}
                         isQuiet
-                        isSelected={selectedCategories.includes(category)}
-                        onChange={() => onToggleCategory(category)}
-                        aria-label={`Filter by ${TASK_CATEGORY_LABELS[category]}`}
+                        isSelected={selectedTaskTypes.includes(taskType)}
+                        onChange={() => onToggleTaskType(taskType)}
+                        UNSAFE_className={classes.taskButton}
+                        aria-label={`Filter by ${MAP_PROJECT_TYPE_TO_TITLE[taskType]}`}
                     >
-                        <span
-                            className={classes.categoryDot}
-                            style={{ backgroundColor: TASK_CATEGORY_COLORS[category] }}
-                        />
-                        {TASK_CATEGORY_LABELS[category]}
+                        <span style={{ color: TASK_TYPE_COLORS[taskType] }}>{MAP_PROJECT_TYPE_TO_TITLE[taskType]}</span>
                     </ToggleButton>
                 ))}
             </Flex>

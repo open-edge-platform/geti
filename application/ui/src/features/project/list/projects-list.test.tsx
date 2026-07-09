@@ -141,6 +141,87 @@ describe('ProjectList', () => {
         });
     });
 
+    describe('with search and task type filters', () => {
+        const filterableProjects = [
+            getMockedProject({
+                id: 'project-1',
+                name: 'Alpha Project',
+                created_at: '2026-01-01T10:00:00Z',
+                task: { exclusive_labels: true, labels: [], task_type: 'detection' },
+            }),
+            getMockedProject({
+                id: 'project-2',
+                name: 'Beta Project',
+                created_at: '2026-06-01T10:00:00Z',
+                task: { exclusive_labels: true, labels: [], task_type: 'classification' },
+            }),
+            getMockedProject({
+                id: 'project-3',
+                name: 'Zeta Segmentation',
+                created_at: '2026-03-01T10:00:00Z',
+                task: { exclusive_labels: true, labels: [], task_type: 'instance_segmentation' },
+            }),
+        ];
+
+        beforeEach(() => {
+            server.use(
+                http.get('/api/projects', () => {
+                    return HttpResponse.json(filterableProjects);
+                }),
+                http.get('/api/projects/{project_id}/pipeline', () => {
+                    return HttpResponse.json(getMockedPipeline({ status: 'idle' }));
+                })
+            );
+        });
+
+        it('does not show the match count label by default', async () => {
+            renderProjectList();
+
+            await screen.findByRole('heading', { name: 'Alpha Project' });
+
+            expect(screen.queryByText(/of 3 projects/i)).not.toBeInTheDocument();
+        });
+
+        it('filters projects by name search', async () => {
+            const user = userEvent.setup();
+            renderProjectList();
+
+            await screen.findByRole('heading', { name: 'Alpha Project' });
+
+            await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'beta');
+
+            expect(await screen.findByText('1 of 3 projects')).toBeInTheDocument();
+            expect(screen.getByRole('heading', { name: 'Beta Project' })).toBeInTheDocument();
+            expect(screen.queryByRole('heading', { name: 'Alpha Project' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('heading', { name: 'Zeta Segmentation' })).not.toBeInTheDocument();
+        });
+
+        it('filters projects by task type', async () => {
+            const user = userEvent.setup();
+            renderProjectList();
+
+            await screen.findByRole('heading', { name: 'Alpha Project' });
+
+            await user.click(screen.getByRole('button', { name: /filter by classification/i }));
+
+            expect(await screen.findByText('1 of 3 projects')).toBeInTheDocument();
+            expect(screen.getByRole('heading', { name: 'Beta Project' })).toBeInTheDocument();
+            expect(screen.queryByRole('heading', { name: 'Alpha Project' })).not.toBeInTheDocument();
+            expect(screen.queryByRole('heading', { name: 'Zeta Segmentation' })).not.toBeInTheDocument();
+        });
+
+        it('shows a "no matching projects" message when filters exclude all projects', async () => {
+            const user = userEvent.setup();
+            renderProjectList();
+
+            await screen.findByRole('heading', { name: 'Alpha Project' });
+
+            await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'does-not-exist');
+
+            expect(await screen.findByText('No projects match your filters')).toBeInTheDocument();
+        });
+    });
+
     describe('with no projects', () => {
         beforeEach(() => {
             server.use(

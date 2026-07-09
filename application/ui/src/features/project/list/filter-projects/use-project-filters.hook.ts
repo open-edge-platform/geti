@@ -3,44 +3,42 @@
 
 import { useMemo, useState } from 'react';
 
-import { Project } from '../../../../constants/shared-types';
-import { filterProjects, TaskCategory } from './utils';
+import { Project, TaskType } from '../../../../constants/shared-types';
+import { filterProjects } from './utils';
 
 interface UseProjectFiltersResult {
     searchName: string;
     setSearchName: (value: string) => void;
-    selectedCategories: TaskCategory[];
-    setSelectedCategories: (categories: TaskCategory[]) => void;
-    toggleCategory: (category: TaskCategory) => void;
+    selectedTaskTypes: TaskType[];
+    setSelectedTaskTypes: (taskTypes: TaskType[]) => void;
+    toggleTaskType: (taskType: TaskType) => void;
     filteredProjects: Project[];
     isFiltering: boolean;
 }
 
 export const useProjectFilters = (projects: Project[]): UseProjectFiltersResult => {
     const [searchName, setSearchName] = useState<string>('');
-    const [selectedCategories, setSelectedCategories] = useState<TaskCategory[]>([]);
+    const [selectedTaskTypes, setSelectedTaskTypes] = useState<TaskType[]>([]);
 
-    const toggleCategory = (category: TaskCategory) => {
-        setSelectedCategories((current) =>
-            current.includes(category)
-                ? current.filter((item) => item !== category)
-                : [...current, category]
+    const toggleTaskType = (taskType: TaskType) => {
+        setSelectedTaskTypes((current) =>
+            current.includes(taskType) ? current.filter((item) => item !== taskType) : [...current, taskType]
         );
     };
 
     const filteredProjects = useMemo(
-        () => filterProjects(projects, searchName, selectedCategories),
-        [projects, searchName, selectedCategories]
+        () => filterProjects(projects, searchName, selectedTaskTypes),
+        [projects, searchName, selectedTaskTypes]
     );
 
-    const isFiltering = searchName.trim() !== '' || selectedCategories.length > 0;
+    const isFiltering = searchName.trim() !== '' || selectedTaskTypes.length > 0;
 
     return {
         searchName,
         setSearchName,
-        selectedCategories,
-        setSelectedCategories,
-        toggleCategory,
+        selectedTaskTypes,
+        setSelectedTaskTypes,
+        toggleTaskType,
         filteredProjects,
         isFiltering,
     };

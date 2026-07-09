@@ -1,43 +1,27 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { isEmpty } from 'lodash-es';
+
 import { Project, TaskType } from '../../../../constants/shared-types';
 
-export type TaskCategory = TaskType;
-
-export const TASK_CATEGORY_LABELS: Record<TaskCategory, string> = {
-    classification: 'Classification',
-    detection: 'Detection',
-    instance_segmentation: 'Segmentation',
-};
-
-// Each task category has its own colour so filtered projects are easily distinguishable.
-// Colours are chosen to keep enough contrast with white text.
-export const TASK_CATEGORY_COLORS: Record<TaskCategory, string> = {
+// Each task type has its own colour so filtered projects are easily distinguishable.
+// Colours are chosen to keep enough contrast against the app's light background.
+export const TASK_TYPE_COLORS: Record<TaskType, string> = {
     classification: '#7454c9',
     detection: '#0e8a7d',
     instance_segmentation: '#b5651d',
 };
 
-export const TASK_CATEGORY_OPTIONS: TaskCategory[] = ['classification', 'detection', 'instance_segmentation'];
+export const TASK_TYPE_OPTIONS: TaskType[] = ['classification', 'detection', 'instance_segmentation'];
 
-export const getProjectTaskCategory = (project: Project): TaskCategory => {
-    return project.task.task_type;
-};
-
-export const filterProjects = (
-    projects: Project[],
-    searchName: string,
-    selectedCategories: TaskCategory[]
-): Project[] => {
+export const filterProjects = (projects: Project[], searchName: string, selectedTaskTypes: TaskType[]): Project[] => {
     const normalizedSearch = searchName.trim().toLocaleLowerCase();
 
     return projects.filter((project) => {
-        const matchesName =
-            normalizedSearch === '' || project.name.toLocaleLowerCase().includes(normalizedSearch);
+        const matchesName = isEmpty(normalizedSearch) || project.name.toLocaleLowerCase().includes(normalizedSearch);
 
-        const matchesTaskType =
-            selectedCategories.length === 0 || selectedCategories.includes(getProjectTaskCategory(project));
+        const matchesTaskType = isEmpty(selectedTaskTypes) || selectedTaskTypes.includes(project.task.task_type);
 
         return matchesName && matchesTaskType;
     });

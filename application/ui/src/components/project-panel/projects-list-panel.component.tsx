@@ -107,7 +107,7 @@ export const ProjectsListPanel = () => {
 
     const taskType = getProjectTypeTitle(selectedProject?.task);
 
-    const { searchName, setSearchName, selectedCategories, toggleCategory, filteredProjects, isFiltering } =
+    const { searchName, setSearchName, selectedTaskTypes, toggleTaskType, filteredProjects, isFiltering } =
         useProjectFilters(otherProjects);
 
     const {
@@ -211,8 +211,8 @@ export const ProjectsListPanel = () => {
                                     <ProjectFilters
                                         searchName={searchName}
                                         onSearchChange={setSearchName}
-                                        selectedCategories={selectedCategories}
-                                        onToggleCategory={toggleCategory}
+                                        selectedTaskTypes={selectedTaskTypes}
+                                        onToggleTaskType={toggleTaskType}
                                         searchWidth={'100%'}
                                     />
                                     <Text UNSAFE_style={{ fontSize: 'var(--spectrum-global-dimension-font-size-75)' }}>
