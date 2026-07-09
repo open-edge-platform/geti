@@ -217,7 +217,7 @@ def main() -> None:
     except MigrationFatalError as e:
         # A failed/incompatible database migration is fatal and non-restartable:
         # exit with a dedicated code so the launcher does NOT attempt a restart.
-        logger.error("Fatal database migration error; exiting without restart: {}", e)
+        logger.exception("Fatal database migration error; exiting without restart: {}", e)
         if e.backup_path is not None:
             logger.error(
                 "To recover, downgrade the application to the previous version and restore the "

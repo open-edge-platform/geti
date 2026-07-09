@@ -97,7 +97,7 @@ class MigrationManager:
             logger.info("No existing database file to back up (fresh install)")
             return None
 
-        timestamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
+        timestamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S%f")
         backup_path = db_path.with_name(f"{db_path.name}.{timestamp}.bak")
 
         logger.info(f"Backing up database to {backup_path} before migration...")
@@ -120,13 +120,16 @@ class MigrationManager:
         except OSError as e:
             logger.warning(f"Could not remove database backup {backup_path}: {e}")
 
-    def run_migrations(self, backup_path: Path | None = None) -> None:
+    def run_migrations(self, backup_path: Path | None = None) -> bool:
         """Run database migrations.
 
         Args:
             backup_path: Path to the pre-migration database backup, attached to
                 any raised :class:`MigrationFatalError` so the recovery point is
                 reported at the process boundary.
+
+        Returns:
+            ``True`` when the migration completes successfully.
 
         Raises:
             MigrationFatalError: if the migration fails. This is a fatal,
@@ -137,6 +140,7 @@ class MigrationManager:
             alembic_cfg = self.get_alembic_config()
             command.upgrade(alembic_cfg, "head")
             logger.info("✓ Database migrations completed successfully")
+            return True
         except Exception as e:
             logger.error(f"✗ Database migration failed: {e}")
             raise MigrationFatalError(f"Database migration failed: {e}", backup_path=backup_path) from e
