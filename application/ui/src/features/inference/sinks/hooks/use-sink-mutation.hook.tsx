@@ -15,6 +15,9 @@ const useUpdateSink = () => {
     return $api.useMutation('patch', '/api/sinks/{sink_id}', {
         meta: {
             invalidateQueries: [['get', '/api/sinks']],
+            error: {
+                notify: () => false,
+            },
         },
         onSuccess: (
             _,
@@ -37,6 +40,9 @@ export const useSinkMutation = (isNewSink: boolean) => {
     const addSink = $api.useMutation('post', '/api/sinks', {
         meta: {
             invalidateQueries: [['get', '/api/sinks']],
+        },
+        error: {
+            notify: () => false,
         },
     });
 

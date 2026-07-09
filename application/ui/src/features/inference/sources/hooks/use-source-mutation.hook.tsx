@@ -16,6 +16,9 @@ const useUpdateSource = () => {
     return $api.useMutation('patch', '/api/sources/{source_id}', {
         meta: {
             invalidateQueries: [['get', '/api/sources']],
+            error: {
+                notify: () => false,
+            },
         },
         onSuccess: (
             _,
@@ -38,6 +41,9 @@ export const useSourceMutation = (isNewSource: boolean) => {
     const addSource = $api.useMutation('post', '/api/sources', {
         meta: {
             invalidateQueries: [['get', '/api/sources']],
+            error: {
+                notify: () => false,
+            },
         },
     });
 
