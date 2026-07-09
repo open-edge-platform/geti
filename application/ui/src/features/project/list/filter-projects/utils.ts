@@ -20,7 +20,6 @@ export const filterProjects = (projects: Project[], searchName: string, selected
 
     return projects.filter((project) => {
         const matchesName = isEmpty(normalizedSearch) || project.name.toLocaleLowerCase().includes(normalizedSearch);
-
         const matchesTaskType = isEmpty(selectedTaskTypes) || selectedTaskTypes.includes(project.task.task_type);
 
         return matchesName && matchesTaskType;

@@ -7,7 +7,7 @@ import { Content, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
 
 import { version } from '../../../../package.json';
-import { isNonEmptyArray } from '../../../shared/util';
+import { isNonEmptyArray, pluralize } from '../../../shared/util';
 import { EmptyProjectList } from './empty-project-list/empty-project-list.component';
 import { NoMatchingProjects } from './filter-projects/no-matching-projects.component';
 import { ProjectFilters } from './filter-projects/project-filters.component';
@@ -39,21 +39,29 @@ const ProjectGrid = () => {
         return <EmptyProjectList />;
     }
 
-    const matchCountLabel = `${sortedProjects.length} of ${projects.data.length} ${
-        projects.data.length === 1 ? 'project' : 'projects'
-    }`;
+    const matchCountLabel = `${sortedProjects.length} of ${projects.data.length} ${pluralize(
+        projects.data.length,
+        'project',
+        'projects'
+    )}`;
 
     return (
         <Flex direction={'column'} gap={'size-100'} height={'100%'}>
-            <Flex justifyContent={'space-between'} alignItems={'center'} gap={'size-200'} wrap>
+            <Grid
+                justifyContent={'space-between'}
+                gap={'size-200'}
+                columns={['1fr', '1fr', '1fr']}
+                marginBottom={'size-200'}
+                UNSAFE_className={classes.filtersContainer}
+            >
+                <SortProjects sortBy={sortBy} onSort={setSortBy} />
                 <ProjectFilters
                     searchName={searchName}
                     onSearchChange={setSearchName}
                     selectedTaskTypes={selectedTaskTypes}
                     onToggleTaskType={toggleTaskType}
                 />
-                <SortProjects sortBy={sortBy} onSort={setSortBy} />
-            </Flex>
+            </Grid>
 
             {isFiltering && <Text UNSAFE_className={classes.projectMetadata}>{matchCountLabel}</Text>}
 

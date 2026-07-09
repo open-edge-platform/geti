@@ -213,7 +213,6 @@ export const ProjectsListPanel = () => {
                                         onSearchChange={setSearchName}
                                         selectedTaskTypes={selectedTaskTypes}
                                         onToggleTaskType={toggleTaskType}
-                                        searchWidth={'100%'}
                                     />
                                     <Text UNSAFE_style={{ fontSize: 'var(--spectrum-global-dimension-font-size-75)' }}>
                                         {filteredProjects.length} of {otherProjects.length} projects
