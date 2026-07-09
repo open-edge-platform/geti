@@ -10,8 +10,8 @@ import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
+import type { AnnotationDTO, Label } from '../../api/shared-types';
 import { http } from '../../api/utils';
-import type { AnnotationDTO, Label } from '../../constants/shared-types';
 import { server } from '../../msw-node-setup';
 import { renderHook } from '../../test-utils/render';
 import {

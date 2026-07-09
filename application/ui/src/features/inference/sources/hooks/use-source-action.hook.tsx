@@ -5,8 +5,8 @@ import { useActionState } from 'react';
 
 import { isFunction } from 'lodash-es';
 
+import type { SourceConfigPayload } from '../../../../api/shared-types';
 import { toast } from '../../../../components/toast/toast.component';
-import type { SourceConfigPayload } from '../../../../constants/shared-types';
 import { useSourceMutation } from './use-source-mutation.hook';
 
 interface useSourceActionProps<T> {

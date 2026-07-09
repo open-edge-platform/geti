@@ -11,7 +11,7 @@ import {
     NumberEnumConfigurableParameter,
     TrainingConfigurationRequestPayload,
     TrainingRequestPayload,
-} from '../../src/constants/shared-types';
+} from '../../src/api/shared-types';
 import { findGroupByKey } from '../../src/features/models/model-listing/model-training-parameters/utils';
 import {
     isInputSizeHeightParameter,

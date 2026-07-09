@@ -4,7 +4,7 @@
 import { getMockedShape } from 'mocks/mock-annotation';
 import { getMockedAnnotationLabelRef } from 'mocks/mock-labels';
 
-import type { AnnotationDTO } from '../../constants/shared-types';
+import type { AnnotationDTO } from '../../api/shared-types';
 import { mapLocalAnnotationsToServer, mapServerAnnotationsToLocal } from './annotation-mappers';
 
 describe('mapServerAnnotationsToLocal', () => {

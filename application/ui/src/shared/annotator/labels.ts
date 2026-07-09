@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { useProject } from 'hooks/api/project.hook';
 import { negate } from 'lodash-es';
 
-import type { Label, TaskType } from '../../constants/shared-types';
+import type { Label, TaskType } from '../../api/shared-types';
 import { isClassificationTask } from '../../features/project/task-type-guards';
 import type { AnnotationLabel, AnnotationLabelRef } from '../types';
 

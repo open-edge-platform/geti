@@ -3,7 +3,7 @@
 
 import { getMockedTrainingConfiguration } from 'mocks/mock-training-configuration';
 
-import { TrainingConfigurationParameter } from '../../../../constants/shared-types';
+import { TrainingConfigurationParameter } from '../../../../api/shared-types';
 import { findGroupByKey, flattenParameters, isParameterGroup } from './utils';
 
 describe('Training parameters utils', () => {

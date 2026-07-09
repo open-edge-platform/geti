@@ -7,7 +7,7 @@ import { Content, Flex, Heading, InlineAlert, View } from '@geti-ui/ui';
 import { useGetDatasetItems } from 'hooks/use-get-dataset-items.hook';
 import { isEqual } from 'lodash-es';
 
-import type { ConfigurableParameter, TrainingConfiguration } from '../../../../../../constants/shared-types';
+import type { ConfigurableParameter, TrainingConfiguration } from '../../../../../../api/shared-types';
 import { isParameterGroup } from '../../../../model-listing/model-training-parameters/utils';
 import { distributeByLargestRemainder } from '../../../../utils';
 import { Accordion } from '../../components/accordion/accordion.component';

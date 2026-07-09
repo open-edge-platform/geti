@@ -7,8 +7,8 @@ import { clsx } from 'clsx';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEqual } from 'lodash-es';
 
+import type { SourceConfig } from '../../../../api/shared-types';
 import { ConnectionStatusBadge } from '../../../../components/connection-status-badge/connection-status-badge.component';
-import type { SourceConfig } from '../../../../constants/shared-types';
 import { getErrorMessage } from '../../../../query-client/query-client';
 import { removeUnderscore } from '../../util';
 import { useTestSource } from '../api/use-test-source';

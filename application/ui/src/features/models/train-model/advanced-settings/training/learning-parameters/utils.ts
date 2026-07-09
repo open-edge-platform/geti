@@ -6,7 +6,7 @@ import {
     NumberEnumConfigurableParameter,
     TrainingConfiguration,
     TrainingConfigurationParameter,
-} from '../../../../../../constants/shared-types';
+} from '../../../../../../api/shared-types';
 import { findGroupByKey, isParameter } from '../../../../model-listing/model-training-parameters/utils';
 import { isEnumNumberParameter } from '../../utils';
 

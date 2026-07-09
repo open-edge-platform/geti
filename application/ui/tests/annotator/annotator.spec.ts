@@ -8,7 +8,7 @@ import { getMockedVariant } from 'mocks/mock-model-variant';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
-import { AnnotationDTO, DatasetSubset, PredictionDTO } from '../../src/constants/shared-types';
+import { AnnotationDTO, DatasetSubset, PredictionDTO } from '../../src/api/shared-types';
 import { Polygon } from '../../src/shared/types';
 import { http, test } from '../fixtures';
 import { blueLabel, candyBinaryHandler, redLabel } from './annotator-fixtures';

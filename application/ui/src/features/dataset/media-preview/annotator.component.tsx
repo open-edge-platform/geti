@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import { Key, View } from '@geti-ui/ui';
 import { useSpinDelay } from 'spin-delay';
 
-import type { DatasetSubset, Media } from '../../../constants/shared-types';
+import type { DatasetSubset, Media } from '../../../api/shared-types';
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
 import { isVideo, isVideoFrame } from '../../../shared/media-item-utils';
 import { AnnotatorCanvas } from '../../annotator/annotator-canvas/annotator-canvas';

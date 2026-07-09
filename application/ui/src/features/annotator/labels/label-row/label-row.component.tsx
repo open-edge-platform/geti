@@ -6,10 +6,10 @@ import { KeyboardEvent, useState } from 'react';
 import { ActionButton, Flex, Grid, TextField, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Delete, Pin, Unpin } from '@geti-ui/ui/icons';
 
+import type { Label } from '../../../../api/shared-types';
 import { HotkeyField } from '../../../../components/label-fields/hotkey-field.component';
 import { LabelColorPicker } from '../../../../components/label-fields/label-color-picker.component';
 import { SilentCheckbox } from '../../../../components/label-fields/silent-checkbox.component';
-import type { Label } from '../../../../constants/shared-types';
 import { useDebounce } from '../../../../hooks/use-debounce.hook';
 import { isNonEmptyString } from '../../../../shared/util';
 

@@ -6,7 +6,7 @@ import { MutableRefObject } from 'react';
 import { Flex } from '@geti-ui/ui';
 import { type Item } from 'react-cool-virtual';
 
-import { type Label } from '../../../../../../../constants/shared-types';
+import { type Label } from '../../../../../../../api/shared-types';
 import type { AnnotatorMode } from '../../../../../../../shared/annotator/annotator-mode';
 import { VideoFrameSegment } from './video-frame-segment.component';
 

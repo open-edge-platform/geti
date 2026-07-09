@@ -11,7 +11,7 @@ import {
 } from 'mocks/mock-training-configuration';
 import { render } from 'test-utils/render';
 
-import { ConfigurableParameterGroup, TrainingConfiguration } from '../../../../../../constants/shared-types';
+import { ConfigurableParameterGroup, TrainingConfiguration } from '../../../../../../api/shared-types';
 import { IntensityMapping } from './intensity-mapping.component';
 import { getIntensityMappingParameters } from './utils';
 

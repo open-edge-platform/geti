@@ -7,8 +7,8 @@ import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
+import { AnnotationType, DatasetFormat, TaskType } from '../../../../../api/shared-types';
 import { http } from '../../../../../api/utils';
-import { AnnotationType, DatasetFormat, TaskType } from '../../../../../constants/shared-types';
 import { server } from '../../../../../msw-node-setup';
 import { ImportTaskSelection } from './import-task-selection.component';
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Model } from '../../../constants/shared-types';
+import type { Model } from '../../../api/shared-types';
 
 export type GroupByMode = 'dataset' | 'architecture';
 

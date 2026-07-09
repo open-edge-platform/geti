@@ -6,7 +6,7 @@ import { useDeleteStagedDataset, useStagedDataset } from 'hooks/api/staged-datas
 import { isNil } from 'lodash-es';
 
 import { API_BASE_URL } from '../../../../../../api/client';
-import { ExportDatasetJob } from '../../../../../../constants/shared-types';
+import { ExportDatasetJob } from '../../../../../../api/shared-types';
 import { useExportDataset } from '../../../../../../hooks/storage/use-export-dataset.hook';
 import { downloadFile } from '../../../../../../shared/util';
 import { ExportJobDetails } from '../export-details/export-details.component';

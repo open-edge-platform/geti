@@ -3,11 +3,7 @@
 
 import { Badge, Flex, Grid, Text } from '@geti-ui/ui';
 
-import type {
-    DatasetRevision,
-    Model,
-    ModelArchitectureWithPerformanceCategory,
-} from '../../../../../constants/shared-types';
+import type { DatasetRevision, Model, ModelArchitectureWithPerformanceCategory } from '../../../../../api/shared-types';
 import { formatTrainingDateTime } from '../../../../../shared/date-utils';
 import { formatBytes } from '../../../../../shared/util';
 import { GRID_COLUMNS } from '../../constants';

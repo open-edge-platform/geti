@@ -4,7 +4,7 @@
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { Media } from '../../../constants/shared-types';
+import { Media } from '../../../api/shared-types';
 import { isVideoFrame } from '../../../shared/media-item-utils';
 import { getMediaBinaryUrl, getVideoFrameBinaryUrl } from '../../../shared/media-url.utils';
 import { getImageDataFromTiffUrl, isTiffFormat } from '../../../shared/media-utils';

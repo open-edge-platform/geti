@@ -4,7 +4,7 @@
 import { DimensionValue, Item, Picker } from '@geti-ui/ui';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 
-import { FilterByStatusKey } from '../../../../../../constants/shared-types';
+import { FilterByStatusKey } from '../../../../../../api/shared-types';
 
 const FILTER_BY_STATUS_OPTIONS: { name: string; key: FilterByStatusKey }[] = [
     { name: 'All media', key: 'all' },

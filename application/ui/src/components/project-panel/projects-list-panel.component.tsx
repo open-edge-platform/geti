@@ -23,11 +23,11 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { partition } from 'lodash-es';
 import { useNavigate } from 'react-router';
 
+import { Project } from '../../api/shared-types';
 import { EnablePipelineBlockedDialog } from '../../components/enable-pipeline-blocked-dialog/enable-pipeline-blocked-dialog.component';
 import { DeleteProjectDialog } from '../../components/project-dialogs/delete-project-dialog.component';
 import { EditProjectNameDialog } from '../../components/project-dialogs/edit-project-name-dialog.component';
 import { paths } from '../../constants/paths';
-import { Project } from '../../constants/shared-types';
 import { ProjectActionsMenu } from '../../features/project/list/menu-actions/menu-actions.component';
 import { getProjectTypeTitle } from '../../features/project/list/util';
 import { ProjectThumbnail } from './project-thumbnail/project-thumbnail.component';

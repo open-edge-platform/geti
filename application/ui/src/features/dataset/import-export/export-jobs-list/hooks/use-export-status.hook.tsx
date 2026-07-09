@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { isInvalidJob, isJobDone, isJobFailed } from 'hooks/api/util';
 
 import { $api } from '../../../../../api/client';
-import { ExportDatasetJob } from '../../../../../constants/shared-types';
+import { ExportDatasetJob } from '../../../../../api/shared-types';
 import { useExportDataset } from '../../../../../hooks/storage/use-export-dataset.hook';
 
 export const useExportStatus = (jobId: string) => {

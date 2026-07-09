@@ -3,7 +3,7 @@
 
 import { isEmpty } from 'lodash-es';
 
-import type { TrainingConfiguration, TrainingConfigurationParameter } from '../../../../constants/shared-types';
+import type { TrainingConfiguration, TrainingConfigurationParameter } from '../../../../api/shared-types';
 import { isParameterGroup } from '../../model-listing/model-training-parameters/utils';
 
 const createNewPrefix = (prefix: string, key: string) => (isEmpty(prefix) ? key : `${prefix}.${key}`);

@@ -5,7 +5,7 @@ import { queryOptions, useIsFetching, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { fetchClient } from '../../../api/client';
-import { PredictionDTO, PredictionVideoRangePayload } from '../../../constants/shared-types';
+import { PredictionDTO, PredictionVideoRangePayload } from '../../../api/shared-types';
 import { EMPTY_LABEL_ID } from '../../../shared/annotator/labels';
 import { isVideoFrame } from '../../../shared/media-item-utils';
 import { getModelIdentifierPayload, SelectableModel } from '../../models/utils';

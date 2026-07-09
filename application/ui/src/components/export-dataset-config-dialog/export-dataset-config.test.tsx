@@ -6,8 +6,8 @@ import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { getMockedProject } from '../../../mocks/mock-project';
+import type { Project } from '../../api/shared-types';
 import { http } from '../../api/utils';
-import type { Project } from '../../constants/shared-types';
 import { server } from '../../msw-node-setup';
 import { ExportDatasetConfig } from './export-dataset-config.component';
 

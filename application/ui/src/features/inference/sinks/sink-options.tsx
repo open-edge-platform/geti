@@ -3,10 +3,10 @@
 
 import { ReactNode } from 'react';
 
+import type { LocalFolderSinkConfig, MqttSinkConfig, WebhookSinkConfig } from '../../../api/shared-types';
 import { ReactComponent as FolderIcon } from '../../../assets/icons/folder.svg';
 import { ReactComponent as MqttIcon } from '../../../assets/icons/mqtt.svg';
 import { ReactComponent as WebhookIcon } from '../../../assets/icons/webhook.svg';
-import type { LocalFolderSinkConfig, MqttSinkConfig, WebhookSinkConfig } from '../../../constants/shared-types';
 import { DisclosureGroup } from '../sources/disclosure-group.component';
 import { AddSink } from './add-sink/add-sink.component';
 import { LocalFolder } from './local-folder/local-folder.component';

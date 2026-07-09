@@ -3,7 +3,7 @@
 
 import { useMemo, useRef } from 'react';
 
-import type { DatasetItemAnnotationStatus, DatasetSubset } from '../constants/shared-types';
+import type { DatasetItemAnnotationStatus, DatasetSubset } from '../api/shared-types';
 import { type SortDirection } from './sort-direction.interface';
 import { useGetDatasetItems } from './use-get-dataset-items.hook';
 

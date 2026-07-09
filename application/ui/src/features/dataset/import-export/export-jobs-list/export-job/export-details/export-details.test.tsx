@@ -7,8 +7,8 @@ import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
+import { ExportDatasetMetadata } from '../../../../../../api/shared-types';
 import { http } from '../../../../../../api/utils';
-import { ExportDatasetMetadata } from '../../../../../../constants/shared-types';
 import { server } from '../../../../../../msw-node-setup';
 import { ExportJobDetails } from './export-details.component';
 

@@ -11,7 +11,7 @@ import {
     ModelArchitectureWithPerformanceCategory,
     TrainingConfiguration,
     TrainingDevice,
-} from '../../../constants/shared-types';
+} from '../../../api/shared-types';
 import { useGetTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
 import { useGetSuccessfulModels } from '../hooks/api/use-get-models.hook';
 import { useGetTrainingDevices } from './api/use-get-training-devices';

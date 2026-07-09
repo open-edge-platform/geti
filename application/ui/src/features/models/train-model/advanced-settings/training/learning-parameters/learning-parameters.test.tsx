@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { render } from 'test-utils/render';
 import { describe } from 'vitest';
 
-import { NumberConfigurableParameter, TrainingConfiguration } from '../../../../../../constants/shared-types';
+import { NumberConfigurableParameter, TrainingConfiguration } from '../../../../../../api/shared-types';
 import { getStep } from '../../components/utils';
 import { isBoolEnableParameterGroup, isNumberParameter } from '../../utils';
 import { LearningParameters } from './learning-parameters.component';

@@ -8,7 +8,7 @@ import type {
     CreateProjectRequest,
     CreateProjectResponse,
     CreateProjectTaskType,
-} from '../../src/constants/shared-types';
+} from '../../src/api/shared-types';
 
 export type CreateProjectInput = {
     projectName?: CreateProjectRequest['name'];

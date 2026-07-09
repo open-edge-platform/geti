@@ -6,6 +6,7 @@ import { PointerEvent, SVGProps } from 'react';
 import { isPolygonValid } from '@geti/smart-tools/utils';
 import { isEmpty, isEqual, isNil, negate } from 'lodash-es';
 
+import type { Label } from '../../../../api/shared-types';
 import eraserToolCursor from '../../../../assets/icons/cursor/eraser-tool.png';
 import lassoClosingCursor from '../../../../assets/icons/cursor/lasso-closing.png';
 import lassoDrawingCursor from '../../../../assets/icons/cursor/lasso-drawing.png';
@@ -13,7 +14,6 @@ import magneticLassoClosingCursor from '../../../../assets/icons/cursor/magnetic
 import magneticLassoDrawingCursor from '../../../../assets/icons/cursor/magnetic-lasso-drawing.png';
 import polygonClosingCursor from '../../../../assets/icons/cursor/polygon-closing.png';
 import polygonDrawingCursor from '../../../../assets/icons/cursor/polygon-drawing.png';
-import type { Label } from '../../../../constants/shared-types';
 import { isEraserOrRightButton, isLeftButton } from '../../../../shared/buttons-utils';
 import { Point, Polygon as PolygonType } from '../../../../shared/types';
 import { DEFAULT_ANNOTATION_STYLES } from '../../utils';

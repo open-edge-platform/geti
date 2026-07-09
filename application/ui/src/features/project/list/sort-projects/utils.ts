@@ -3,7 +3,7 @@
 
 import { orderBy } from 'lodash-es';
 
-import { Project } from '../../../../constants/shared-types';
+import { Project } from '../../../../api/shared-types';
 
 export const SORT_BY_OPTIONS = [
     [

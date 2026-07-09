@@ -5,7 +5,7 @@ import { Checkbox, CheckboxGroup, Flex, Text } from '@geti-ui/ui';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import capitalize from 'lodash-es/capitalize';
 
-import { DatasetSubset } from '../../../../../../constants/shared-types';
+import { DatasetSubset } from '../../../../../../api/shared-types';
 
 import classes from './filter-by-subset.module.scss';
 

@@ -3,8 +3,8 @@
 
 import { expect, type Page } from '@playwright/test';
 
+import { DatasetSubset } from '../../src/api/shared-types';
 import { paths } from '../../src/constants/paths';
-import { DatasetSubset } from '../../src/constants/shared-types';
 
 export class AnnotatorPage {
     constructor(private readonly page: Page) {}

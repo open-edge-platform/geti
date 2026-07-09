@@ -4,7 +4,7 @@
 import { Image, View } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import type { MediaVideoFrame } from '../../../../../../../constants/shared-types';
+import type { MediaVideoFrame } from '../../../../../../../api/shared-types';
 import { getVideoFrameThumbnailUrl } from '../../../../../../../shared/media-url.utils';
 import { formatDurationText } from '../../../time-utils';
 import { FrameNumberIndicator } from './frame-number-indicator.component';

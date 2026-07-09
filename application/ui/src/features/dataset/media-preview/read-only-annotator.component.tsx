@@ -4,7 +4,7 @@
 import { ActionButton, Flex, Icon, Text, View } from '@geti-ui/ui';
 import { CloseSemiBold } from '@geti-ui/ui/icons';
 
-import type { DatasetSubset, Media } from '../../../constants/shared-types';
+import type { DatasetSubset, Media } from '../../../api/shared-types';
 import { ReadOnlyAnnotatorCanvas } from '../../annotator/annotator-canvas/read-only-annotator-canvas';
 import { BottomToolbar } from './bottom-toolbar/bottom-toolbar.component';
 import { AnnotatorCanvasSettings } from './primary-toolbar/settings/annotator-canvas-settings.component';

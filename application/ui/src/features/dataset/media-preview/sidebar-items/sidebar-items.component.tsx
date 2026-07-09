@@ -5,8 +5,8 @@ import { useRef } from 'react';
 
 import { Flex, Size, useUnwrapDOMRef, View } from '@geti-ui/ui';
 
+import type { Media } from '../../../../api/shared-types';
 import { VirtualizerGridLayout } from '../../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
-import type { Media } from '../../../../constants/shared-types';
 import { SIDEBAR_MEDIA_SIZE } from '../constants';
 import { Toolbar } from '../toolbar-container/toolbar-container.component';
 import { SidebarMediaFilter } from './sidebar-media-filtering.component';

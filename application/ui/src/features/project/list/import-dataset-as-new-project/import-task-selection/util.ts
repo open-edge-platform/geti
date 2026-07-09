@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { AnnotationType, TaskType } from '../../../../../constants/shared-types';
+import { AnnotationType, TaskType } from '../../../../../api/shared-types';
 
 export const TASK_SELECTION_FORM_ID = 'task-selection-form';
 

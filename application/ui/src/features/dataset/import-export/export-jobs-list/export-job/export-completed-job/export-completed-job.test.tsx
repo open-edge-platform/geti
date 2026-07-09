@@ -8,8 +8,8 @@ import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { getMockedJobExportJob } from '../../../../../../../mocks/mock-job';
+import { ExportDatasetJob } from '../../../../../../api/shared-types';
 import { http } from '../../../../../../api/utils';
-import { ExportDatasetJob } from '../../../../../../constants/shared-types';
 import { server } from '../../../../../../msw-node-setup';
 import { downloadFile } from '../../../../../../shared/util';
 import { ExportCompletedJob } from './export-completed-job.component';

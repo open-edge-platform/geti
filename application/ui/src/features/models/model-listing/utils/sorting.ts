@@ -4,7 +4,7 @@
 import dayjs from 'dayjs';
 import { orderBy } from 'lodash-es';
 
-import type { DatasetRevision, Model } from '../../../../constants/shared-types';
+import type { DatasetRevision, Model } from '../../../../api/shared-types';
 import { getTestingMetric } from '../components/model-row/utils';
 import type { GroupedModels, SortBy } from '../types';
 

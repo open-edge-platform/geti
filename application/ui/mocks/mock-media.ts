@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { MediaImage, MediaVideo, MediaVideoFrame } from '../src/constants/shared-types';
+import type { MediaImage, MediaVideo, MediaVideoFrame } from '../src/api/shared-types';
 
 export const getMockedMediaImage = (props: Partial<MediaImage> = {}): MediaImage => ({
     id: 'item-1',

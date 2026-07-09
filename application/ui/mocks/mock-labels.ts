@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Label } from '../src/constants/shared-types';
+import type { Label } from '../src/api/shared-types';
 import type { AnnotationLabel, AnnotationLabelRef } from '../src/shared/types';
 
 export const getMockedLabel = (label?: Partial<Label>): Label & { isPrediction: boolean } => {

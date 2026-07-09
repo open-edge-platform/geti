@@ -3,10 +3,10 @@
 
 import { ReactNode } from 'react';
 
+import { IPCameraSourceConfig, USBCameraSourceConfig, VideoFileSourceConfig } from '../../../api/shared-types';
 import { ReactComponent as IpCameraIcon } from '../../../assets/icons/ip-camera.svg';
 import { ReactComponent as Video } from '../../../assets/icons/video-file.svg';
 import { ReactComponent as WebcamIcon } from '../../../assets/icons/webcam.svg';
-import { IPCameraSourceConfig, USBCameraSourceConfig, VideoFileSourceConfig } from '../../../constants/shared-types';
 import { AddSource } from './add-source/add-source.component';
 import { DisclosureGroup } from './disclosure-group.component';
 import { IpCamera } from './ip-camera/ip-camera.component';

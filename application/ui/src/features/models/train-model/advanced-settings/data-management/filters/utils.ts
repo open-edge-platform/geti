@@ -7,7 +7,7 @@ import {
     NumberConfigurableParameter,
     TrainingConfiguration,
     TrainingConfigurationParameter,
-} from '../../../../../../constants/shared-types';
+} from '../../../../../../api/shared-types';
 import {
     findGroupByKey,
     isParameter,

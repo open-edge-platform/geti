@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { TrainingConfiguration } from '../../src/constants/shared-types';
+import { TrainingConfiguration } from '../../src/api/shared-types';
 
 export const MOCKED_TRAINING_CONFIGURATION: TrainingConfiguration = {
     parameters: [

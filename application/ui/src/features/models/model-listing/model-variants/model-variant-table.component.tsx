@@ -21,7 +21,7 @@ import { get } from 'lodash-es';
 import { useNumberFormatter } from 'react-aria';
 
 import { API_BASE_URL } from '../../../../api/client';
-import type { Model, ModelFormat, ModelVariant } from '../../../../constants/shared-types';
+import type { Model, ModelFormat, ModelVariant } from '../../../../api/shared-types';
 import { downloadFile, formatBytes } from '../../../../shared/util';
 import {
     getBaselineVariant,

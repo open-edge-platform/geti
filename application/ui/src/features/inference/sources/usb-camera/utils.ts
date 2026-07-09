@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { USBCameraSourceConfig } from '../../../../constants/shared-types';
+import type { USBCameraSourceConfig } from '../../../../api/shared-types';
 import { getUniqueName } from '../utils';
 
 export const getUsbCameraInitialConfig = (existingNames: string[] = []): USBCameraSourceConfig => ({

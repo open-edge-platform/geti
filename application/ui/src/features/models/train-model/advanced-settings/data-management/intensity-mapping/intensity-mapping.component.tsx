@@ -7,7 +7,7 @@ import {
     ConfigurableParameter,
     ConfigurableParameterGroup,
     TrainingConfiguration,
-} from '../../../../../../constants/shared-types';
+} from '../../../../../../api/shared-types';
 import { Accordion } from '../../components/accordion/accordion.component';
 import { Parameters } from '../../components/parameters.component';
 import { deepReplaceParameters, filterDependentParameters } from '../../utils';

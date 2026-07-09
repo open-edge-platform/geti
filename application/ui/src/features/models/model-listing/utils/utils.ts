@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Model } from '../../../../constants/shared-types';
+import { Model } from '../../../../api/shared-types';
 
 const TRAINING_STATUS = {
     Failed: 'failed',

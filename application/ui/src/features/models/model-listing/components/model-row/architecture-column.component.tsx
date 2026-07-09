@@ -3,7 +3,7 @@
 
 import { Flex, Text } from '@geti-ui/ui';
 
-import { type ModelArchitectureWithPerformanceCategory } from '../../../../../constants/shared-types';
+import { type ModelArchitectureWithPerformanceCategory } from '../../../../../api/shared-types';
 import { PerformanceCategoryBadge } from './performance-category-badge.component';
 
 import classes from './model-row.module.scss';

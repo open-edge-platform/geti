@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 
 import { Button, Flex, Switch, Text, TextField } from '@geti-ui/ui';
 
-import type { VideoFileSourceConfig } from '../../../../constants/shared-types';
+import type { VideoFileSourceConfig } from '../../../../api/shared-types';
 import { acceptedVideoExtensions } from '../../../dataset/gallery/utils';
 
 import classes from './video-file.module.scss';

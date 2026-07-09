@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { isEqual } from 'lodash-es';
 
-import { TrainingConfiguration } from '../../../../../../constants/shared-types';
+import { TrainingConfiguration } from '../../../../../../api/shared-types';
 import { Accordion } from '../../components/accordion/accordion.component';
 import { LearningParametersListContainer } from './learning-parameters-list.component';
 import { LearningConfigurationGroup } from './utils';

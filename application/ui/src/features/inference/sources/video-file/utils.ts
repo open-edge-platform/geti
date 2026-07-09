@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fetchClient } from '../../../../api/client';
-import type { VideoFileSourceConfig } from '../../../../constants/shared-types';
+import type { VideoFileSourceConfig } from '../../../../api/shared-types';
 import { getUniqueName } from '../utils';
 
 export const getVideoFileInitialConfig = (existingNames: string[] = []): VideoFileSourceConfig => ({

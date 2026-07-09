@@ -12,7 +12,7 @@ import type {
     StringConfigurableParameter,
     StringEnumConfigurableParameter,
     TrainingConfigurationParameter,
-} from '../../../../constants/shared-types';
+} from '../../../../api/shared-types';
 import { isParameter, isParameterGroup } from '../../model-listing/model-training-parameters/utils';
 
 export const isBoolEnableParameter = (parameter: ConfigurableParameter) => {

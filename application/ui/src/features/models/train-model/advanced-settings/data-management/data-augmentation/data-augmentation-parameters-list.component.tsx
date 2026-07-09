@@ -3,7 +3,7 @@
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
-import { ConfigurableParameter, type TrainingConfiguration } from '../../../../../../constants/shared-types';
+import { ConfigurableParameter, type TrainingConfiguration } from '../../../../../../api/shared-types';
 import { Parameters } from '../../components/parameters.component';
 import { deepReplaceParameters, filterDependentParameters } from '../../utils';
 import { DataAugmentationConfigurationParameters } from './utils';

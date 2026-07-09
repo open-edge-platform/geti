@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Flex, Grid, Loading, minmax, repeat } from '@geti-ui/ui';
 import { useIsVisible } from 'hooks/use-is-visible.hook';
 
-import type { LineMetric } from '../../../../constants/shared-types';
+import type { LineMetric } from '../../../../api/shared-types';
 import { Box } from '../components/box/box.component';
 import { MetricGraph, type MetricGraphPoint } from './metric-graph.component';
 

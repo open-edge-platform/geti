@@ -7,7 +7,7 @@ import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import type { DatasetSubset, Media } from '../../../../constants/shared-types';
+import type { DatasetSubset, Media } from '../../../../api/shared-types';
 import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';

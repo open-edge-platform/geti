@@ -7,7 +7,7 @@ import { ActionButton, AlertDialog, DialogContainer, Item, Key, Menu, MenuTrigge
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import type { Model } from '../../../../../constants/shared-types';
+import type { Model } from '../../../../../api/shared-types';
 import { useDeleteModel } from '../../../hooks/api/use-delete-model.hook';
 import { useRenameModel } from '../../../hooks/api/use-rename-model.hook';
 import { TrainingLogsDialog } from '../../../training-logs/training-logs-dialog.component';

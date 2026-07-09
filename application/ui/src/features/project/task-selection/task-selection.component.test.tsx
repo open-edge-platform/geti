@@ -4,7 +4,7 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import type { TaskType } from '../../../constants/shared-types';
+import type { TaskType } from '../../../api/shared-types';
 import { TaskSelection } from './task-selection.component';
 
 describe('TaskSelection', () => {

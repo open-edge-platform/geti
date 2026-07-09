@@ -6,7 +6,7 @@ import {
     getMockedConfigurationParameterGroup,
 } from 'mocks/mock-training-configuration';
 
-import { TrainingConfigurationParameter } from '../../../../../../constants/shared-types';
+import { TrainingConfigurationParameter } from '../../../../../../api/shared-types';
 import { isInputSizeHeightParameter, isInputSizeWidthParameter } from './utils';
 
 const buildEnumNumberParameter = (key: string): TrainingConfigurationParameter =>

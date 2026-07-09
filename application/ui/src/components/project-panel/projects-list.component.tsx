@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Project } from '../../constants/shared-types';
+import { Project } from '../../api/shared-types';
 import { type ProjectActionMetadata } from '../../features/project/list/menu-actions/menu-actions.component';
 import { ProjectListItem } from './project-list-item/project-list-item.component';
 

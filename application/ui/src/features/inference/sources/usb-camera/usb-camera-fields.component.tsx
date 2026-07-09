@@ -8,7 +8,7 @@ import { Refresh } from '@geti-ui/ui/icons';
 import { isEmpty } from 'lodash-es';
 
 import { $api } from '../../../../api/client';
-import type { USBCameraSourceConfig } from '../../../../constants/shared-types';
+import type { USBCameraSourceConfig } from '../../../../api/shared-types';
 
 type UsbCameraProps = {
     defaultState?: USBCameraSourceConfig;

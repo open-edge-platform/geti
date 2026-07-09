@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SinkConfig } from '../../../constants/shared-types';
+import type { SinkConfig } from '../../../api/shared-types';
 import { EditSink } from './edit-sink/edit-sink.component';
 import { LocalFolder } from './local-folder/local-folder.component';
 import { localFolderBodyFormatter } from './local-folder/utils';

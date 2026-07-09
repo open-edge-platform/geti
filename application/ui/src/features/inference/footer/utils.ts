@@ -4,7 +4,7 @@
 import type { StatusLightProps } from '@geti-ui/ui';
 import { capitalize } from 'lodash-es';
 
-import { PipelineComponentsHealth, PipelineStatus } from '../../../constants/shared-types';
+import { PipelineComponentsHealth, PipelineStatus } from '../../../api/shared-types';
 
 export type StatusVariant = StatusLightProps['variant'];
 

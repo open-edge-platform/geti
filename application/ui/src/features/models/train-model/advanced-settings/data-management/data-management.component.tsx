@@ -5,7 +5,7 @@ import { Dispatch, RefObject, SetStateAction } from 'react';
 
 import { View } from '@geti-ui/ui';
 
-import { TrainingConfiguration } from '../../../../../constants/shared-types';
+import { TrainingConfiguration } from '../../../../../api/shared-types';
 import { LazyLoadSection } from '../components/lazy-load-section.component';
 import { DataAugmentation } from './data-augmentation/data-augmentation.component';
 import { getDataAugmentationParameters } from './data-augmentation/utils';

@@ -3,7 +3,7 @@
 
 import { Flex, TextField } from '@geti-ui/ui';
 
-import type { LocalFolderSinkConfig } from '../../../../constants/shared-types';
+import type { LocalFolderSinkConfig } from '../../../../api/shared-types';
 import { OutputFormats } from '../output-formats/output-formats.component';
 import { RateLimitFields } from '../rate-limit/rate-limit-fields.component';
 

@@ -6,8 +6,8 @@ import userEvent from '@testing-library/user-event';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { render } from 'test-utils/render';
 
+import type { Label, TaskType } from '../../../api/shared-types';
 import { Toast } from '../../../components/toast/toast.component';
-import type { Label, TaskType } from '../../../constants/shared-types';
 import { LabelSelection } from './label-selection.component';
 
 const mockLabels = [getMockedLabel({ id: 'id-1', name: 'Car' })];

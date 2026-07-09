@@ -8,8 +8,8 @@ import { useCreateProject } from 'hooks/api/project.hook';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 
+import type { Label, Project, TaskType } from '../../../api/shared-types';
 import { paths } from '../../../constants/paths';
-import type { Label, Project, TaskType } from '../../../constants/shared-types';
 import { LabelSelection } from '../label-selection/label-selection.component';
 import { TASK_OPTIONS, TaskSelection } from '../task-selection/task-selection.component';
 import { isClassificationTask } from '../task-type-guards';

@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { View } from '@geti-ui/ui';
 
-import { TrainingConfiguration } from '../../../../../constants/shared-types';
+import { TrainingConfiguration } from '../../../../../api/shared-types';
 import { LearningParameters } from './learning-parameters/learning-parameters.component';
 import { getLearningParameters } from './learning-parameters/utils';
 

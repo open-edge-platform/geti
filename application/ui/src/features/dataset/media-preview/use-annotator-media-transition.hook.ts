@@ -3,7 +3,7 @@
 
 import { useCallback } from 'react';
 
-import type { Media } from '../../../constants/shared-types';
+import type { Media } from '../../../api/shared-types';
 import { useAnnotationActions } from '../../../shared/annotator/annotation-actions-provider.component';
 import { useSelectedAnnotations } from '../../../shared/annotator/select-annotation-provider.component';
 import { useSelectedMediaItem } from '../../annotator/selected-media-item-provider.component';

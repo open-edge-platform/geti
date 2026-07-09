@@ -6,8 +6,8 @@ import { PointerEvent, useRef, useState } from 'react';
 import { clampBox, clampPointBetweenImage, pointsToRect } from '@geti/smart-tools/utils';
 import { useEventListener } from 'hooks/event-listener.hook';
 
+import type { Label } from '../../../../api/shared-types';
 import selectionCursor from '../../../../assets/icons/selection.svg?url';
-import type { Label } from '../../../../constants/shared-types';
 import { isLeftButton } from '../../../../shared/buttons-utils';
 import type { Point, Rect as RectInterface, RegionOfInterest } from '../../../../shared/types';
 import { Rectangle } from '../../shapes/rectangle.component';

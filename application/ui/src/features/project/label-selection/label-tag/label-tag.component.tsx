@@ -4,7 +4,7 @@
 import { ActionButton, Flex, PressableElement, Text, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Cross } from '@geti-ui/ui/icons';
 
-import type { Label } from '../../../../constants/shared-types';
+import type { Label } from '../../../../api/shared-types';
 import { formatHotkeyForDisplay } from '../../../../shared/hotkeys-definition';
 
 import styles from './label-tag.module.scss';

@@ -10,7 +10,7 @@ import {
     ConfigurableParameter,
     ConfigurableParameterGroup,
     TrainingConfigurationParameter,
-} from '../../../../constants/shared-types';
+} from '../../../../api/shared-types';
 import { isParameter, isParameterGroup } from '../../model-listing/model-training-parameters/utils';
 import { learningParameters } from './training/learning-parameters/mocks';
 import { LearningConfigurationGroup } from './training/learning-parameters/utils';

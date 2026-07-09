@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Media, MediaImage, MediaVideo, MediaVideoFrame } from '../constants/shared-types';
+import type { Media, MediaImage, MediaVideo, MediaVideoFrame } from '../api/shared-types';
 
 export const isVideo = (media: Pick<Media, 'type'> | undefined): media is MediaVideo => media?.type === 'video';
 

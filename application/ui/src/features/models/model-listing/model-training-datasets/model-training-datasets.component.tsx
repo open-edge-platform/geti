@@ -4,7 +4,7 @@
 import { Flex, MediaViewModes, Text, ViewModes } from '@geti-ui/ui';
 import { useNumberFormatter } from 'react-aria';
 
-import type { DatasetRevision, DatasetSubset } from '../../../../constants/shared-types';
+import type { DatasetRevision, DatasetSubset } from '../../../../api/shared-types';
 import { useGetDatasetRevisionItems } from '../../../../hooks/use-get-dataset-revision-items.hook';
 import { useViewMode } from '../../../../hooks/use-view-mode.hook';
 import { GALLERY_VIEW_MODES, type GalleryViewMode } from '../../../../shared/gallery-view-modes';

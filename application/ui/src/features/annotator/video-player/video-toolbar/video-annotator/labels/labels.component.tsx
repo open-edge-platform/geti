@@ -3,7 +3,7 @@
 
 import { Flex, View } from '@geti-ui/ui';
 
-import { Label } from '../../../../../../constants/shared-types';
+import { Label } from '../../../../../../api/shared-types';
 
 import classes from './labels.module.scss';
 

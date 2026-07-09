@@ -5,7 +5,7 @@ import { Flex, Text } from '@geti-ui/ui';
 import { Image, Tag } from '@geti-ui/ui/icons';
 import { useNumberFormatter } from 'react-aria';
 
-import type { DatasetRevision } from '../../../../../constants/shared-types';
+import type { DatasetRevision } from '../../../../../api/shared-types';
 import { formatDateTime } from '../../../../../shared/date-utils';
 import { ModelBadge } from './model-badge.component';
 

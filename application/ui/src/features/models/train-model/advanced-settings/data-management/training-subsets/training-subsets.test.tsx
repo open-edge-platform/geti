@@ -11,8 +11,8 @@ import {
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
+import { TrainingConfiguration } from '../../../../../../api/shared-types';
 import { http } from '../../../../../../api/utils';
-import { TrainingConfiguration } from '../../../../../../constants/shared-types';
 import { server } from '../../../../../../msw-node-setup';
 import { distributeByLargestRemainder } from '../../../../utils';
 import { TrainingSubsets } from './training-subsets.component';

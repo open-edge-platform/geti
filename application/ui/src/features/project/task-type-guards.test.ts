@@ -3,7 +3,7 @@
 
 import { getMockedProject } from 'mocks/mock-project';
 
-import { TaskType } from '../../constants/shared-types';
+import { TaskType } from '../../api/shared-types';
 import {
     isClassificationTask,
     isDetectionTask,

@@ -7,8 +7,8 @@ import { getMockedPrepareImportDatasetJob } from 'mocks/mock-job';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
+import { Job } from '../../api/shared-types';
 import { http } from '../../api/utils';
-import { Job } from '../../constants/shared-types';
 import { server } from '../../msw-node-setup';
 import { formatBytes } from '../../shared/util';
 import { LoadingImportDataset } from './loading-import-dataset.component';

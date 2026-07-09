@@ -4,7 +4,7 @@
 import { usePrefetchQuery, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { VideoFramePrediction } from '../../../../constants/shared-types';
+import { VideoFramePrediction } from '../../../../api/shared-types';
 import { mediaPredictionsQueryOptions } from '../../api/use-media-predictions';
 import { usePredictionSetup } from '../../predictions-setup-provider.component';
 import { useVideoPlayer } from '../video-player-provider.component';

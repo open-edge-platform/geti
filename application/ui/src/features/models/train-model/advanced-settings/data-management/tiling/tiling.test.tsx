@@ -11,7 +11,7 @@ import {
 } from 'mocks/mock-training-configuration';
 import { render } from 'test-utils/render';
 
-import { TrainingConfiguration } from '../../../../../../constants/shared-types';
+import { TrainingConfiguration } from '../../../../../../api/shared-types';
 import { Tiling } from './tiling.component';
 import {
     getTilingMode,

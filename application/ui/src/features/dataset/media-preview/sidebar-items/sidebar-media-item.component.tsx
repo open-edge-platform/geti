@@ -3,9 +3,9 @@
 
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
+import type { Media } from '../../../../api/shared-types';
 import { MediaItem } from '../../../../components/media-item/media-item.component';
 import { MediaThumbnail } from '../../../../components/media-thumbnail/media-thumbnail.component';
-import type { Media } from '../../../../constants/shared-types';
 import { getThumbnailUrl } from '../../../../shared/media-url.utils';
 import { AnnotationStatusIcon } from '../../gallery/annotation-state-icon.component';
 

@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import { Flex, NumberField, RangeSlider, type RangeValue } from '@geti-ui/ui';
 import { isEqual } from 'lodash-es';
 
-import { FloatConfigurableRangeParameter } from '../../../../../../constants/shared-types';
+import { FloatConfigurableRangeParameter } from '../../../../../../api/shared-types';
 import { getStep } from '../utils';
 
 import classes from './range-parameter-field.module.scss';

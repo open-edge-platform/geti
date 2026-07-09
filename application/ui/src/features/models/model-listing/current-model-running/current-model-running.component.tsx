@@ -5,7 +5,7 @@ import { dimensionValue, Flex, Heading, View } from '@geti-ui/ui';
 import { useCancelJob, useGetCurrentRunningJobs } from 'hooks/api/jobs/jobs.hook';
 import { isEmpty, isNil } from 'lodash-es';
 
-import { type DatasetRevision } from '../../../../constants/shared-types';
+import { type DatasetRevision } from '../../../../api/shared-types';
 import { useGetTaskModelArchitectures } from '../../hooks/api/use-get-model-architectures.hook';
 import { GroupByMode } from '../types';
 import { RunningJobTableHeader } from './running-job-table-header.component';

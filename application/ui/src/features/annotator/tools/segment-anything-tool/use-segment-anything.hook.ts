@@ -7,7 +7,7 @@ import { Remote, wrap } from 'comlink';
 import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import type { Media } from '../../../../constants/shared-types';
+import type { Media } from '../../../../api/shared-types';
 import { isVideoFrame } from '../../../../shared/media-item-utils';
 import { isDetectionTask } from '../../../project/task-type-guards';
 import { loadImageQueryOptions } from '../../hooks/use-load-image-query.hook';

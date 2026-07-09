@@ -5,7 +5,7 @@ import { createContext, ReactNode, useContext, useState } from 'react';
 
 import { useProject } from 'hooks/api/project.hook';
 
-import type { Label } from '../../constants/shared-types';
+import type { Label } from '../../api/shared-types';
 import { useProjectLabelsWithEmptyLabel } from '../../shared/annotator/labels';
 import { isClassificationTask } from '../project/task-type-guards';
 

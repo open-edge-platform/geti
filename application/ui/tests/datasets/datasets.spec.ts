@@ -13,7 +13,7 @@ import { HttpResponse } from 'msw';
 import { v4 as uuid } from 'uuid';
 
 import { SchemaProjectView } from '../../src/api/openapi-spec';
-import { AnnotationDTO } from '../../src/constants/shared-types';
+import { AnnotationDTO } from '../../src/api/shared-types';
 import { expect, http, test } from '../fixtures';
 
 const mockedItems = getMultipleMockedMediaImage(40, '1');

@@ -12,7 +12,7 @@ import {
     ModelArchitectureWithPerformanceCategory,
     RecommendedModelArchitectures,
     TaskType,
-} from '../../../../constants/shared-types';
+} from '../../../../api/shared-types';
 
 const getModelArchitectures = (
     modelArchitectures: ModelArchitecture[],

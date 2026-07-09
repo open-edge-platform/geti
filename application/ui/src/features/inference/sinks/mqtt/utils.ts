@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { MqttSinkConfig, SinkOutputFormats } from '../../../../constants/shared-types';
+import type { MqttSinkConfig, SinkOutputFormats } from '../../../../api/shared-types';
 import { rateLimitFromFormData } from '../utils';
 
 export const getMqttInitialConfig = (): MqttSinkConfig => ({

@@ -3,7 +3,7 @@
 
 import { Flex } from '@geti-ui/ui';
 
-import { ConfigurableParameter, NumberEnumConfigurableParameter } from '../../../../../../constants/shared-types';
+import { ConfigurableParameter, NumberEnumConfigurableParameter } from '../../../../../../api/shared-types';
 import { NumberEnumParameterField, Parameter, Parameters } from '../../components/parameters.component';
 import { getInputSizeHeightParameter, getInputSizeWidthParameter } from './utils';
 

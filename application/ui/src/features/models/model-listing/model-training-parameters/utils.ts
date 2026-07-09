@@ -5,7 +5,7 @@ import {
     ConfigurableParameter,
     ConfigurableParameterGroup,
     TrainingConfigurationParameter,
-} from '../../../../constants/shared-types';
+} from '../../../../api/shared-types';
 
 export const isParameterGroup = (
     parameter: TrainingConfigurationParameter

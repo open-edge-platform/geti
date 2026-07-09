@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DatasetRevision, Model } from '../../../../constants/shared-types';
+import type { DatasetRevision, Model } from '../../../../api/shared-types';
 import type { GroupByMode, GroupedModels, SortBy } from '../types';
 import { groupModelsByArchitecture, groupModelsByDataset } from './grouping';
 import { sortModels } from './sorting';

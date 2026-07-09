@@ -4,7 +4,7 @@
 import { HttpResponse } from 'msw';
 
 import { getMockedProject } from '../../mocks/mock-project';
-import type { ProjectCreate } from '../../src/constants/shared-types';
+import type { ProjectCreate } from '../../src/api/shared-types';
 import { expect, http, test } from '../fixtures';
 import { stepCreateProject } from '../workflows/workflow-steps';
 import { ProjectPage } from './project-page';

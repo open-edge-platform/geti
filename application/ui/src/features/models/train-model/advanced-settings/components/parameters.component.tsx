@@ -24,7 +24,7 @@ import {
     NumberEnumConfigurableParameter,
     StringEnumConfigurableParameter,
     TrainingConfigurationParameter,
-} from '../../../../../constants/shared-types';
+} from '../../../../../api/shared-types';
 import { isParameter } from '../../../model-listing/model-training-parameters/utils';
 import {
     isBoolEnableParameterGroup,

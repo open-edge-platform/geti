@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { PipelineStatus } from '../../../constants/shared-types';
+import { PipelineStatus } from '../../../api/shared-types';
 import { getComponentStatusMeta, getOverallStatusMeta, shouldShowPipelineHealthDetails } from './utils';
 
 const getStatus = (custom?: Partial<PipelineStatus>): PipelineStatus => ({

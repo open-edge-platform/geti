@@ -5,7 +5,7 @@ import { getMockedJob } from 'mocks/mock-job';
 import { getMockedStagedDataset } from 'mocks/mock-staged-dataset';
 import { HttpResponse } from 'msw';
 
-import { Job } from '../../src/constants/shared-types';
+import { Job } from '../../src/api/shared-types';
 import { http } from '../fixtures';
 
 export const STAGED_DATASET_ID = 'staged-dataset-789';

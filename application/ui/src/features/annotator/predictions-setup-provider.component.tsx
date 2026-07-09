@@ -8,7 +8,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { orderBy } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
-import { Model } from '../../constants/shared-types';
+import { Model } from '../../api/shared-types';
 import { useGetActiveModel } from '../models/hooks/api/use-get-active-model.hook';
 import { useGetSuccessfulModels } from '../models/hooks/api/use-get-models.hook';
 import { getAllModelsWithOpenVINOVariants, SelectableModel } from '../models/utils';

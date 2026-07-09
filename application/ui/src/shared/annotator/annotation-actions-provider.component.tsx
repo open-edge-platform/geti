@@ -9,7 +9,7 @@ import { isEqual } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
 import { $api } from '../../api/client';
-import type { AnnotationDTO, DatasetSubset, Label, Media } from '../../constants/shared-types';
+import type { AnnotationDTO, DatasetSubset, Label, Media } from '../../api/shared-types';
 import { UndoRedoProvider } from '../../features/dataset/media-preview/primary-toolbar/undo-redo/undo-redo-provider.component';
 import useUndoRedoState from '../../features/dataset/media-preview/primary-toolbar/undo-redo/use-undo-redo-state';
 import { isVideoFrame } from '../media-item-utils';

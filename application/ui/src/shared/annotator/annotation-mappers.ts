@@ -3,7 +3,7 @@
 
 import { v4 as uuid } from 'uuid';
 
-import type { AnnotationDTO } from '../../constants/shared-types';
+import type { AnnotationDTO } from '../../api/shared-types';
 import type { Annotation, AnnotationLabelRef } from '../types';
 
 export const mapServerAnnotationsToLocal = (serverAnnotations: AnnotationDTO[]): Annotation[] => {

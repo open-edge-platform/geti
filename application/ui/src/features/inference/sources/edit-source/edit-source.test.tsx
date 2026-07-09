@@ -6,8 +6,8 @@ import userEvent from '@testing-library/user-event';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
+import type { IPCameraSourceConfig } from '../../../../api/shared-types';
 import { http } from '../../../../api/utils';
-import type { IPCameraSourceConfig } from '../../../../constants/shared-types';
 import { useConnectSourceToPipeline } from '../../../../hooks/api/pipeline.hook';
 import { server } from '../../../../msw-node-setup';
 import { useSourceMutation } from '../hooks/use-source-mutation.hook';

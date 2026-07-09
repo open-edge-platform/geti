@@ -7,10 +7,10 @@ import { Content, Dialog, DialogContainer, Flex, Grid, Loading, Size, Text, View
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { GridLayoutOptions } from 'react-aria-components';
 
+import type { DatasetRevisionItem } from '../../../../api/shared-types';
 import { MediaItem } from '../../../../components/media-item/media-item.component';
 import { MediaThumbnail } from '../../../../components/media-thumbnail/media-thumbnail.component';
 import { VirtualizerGridLayout } from '../../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
-import type { DatasetRevisionItem } from '../../../../constants/shared-types';
 import {
     SelectedMediaItemProvider,
     useSelectedMediaItem,

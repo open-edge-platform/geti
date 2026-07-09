@@ -7,7 +7,7 @@ import { ActionButton, AlertDialog, DialogContainer, DialogTrigger, Text, Toolti
 import { Add, Edit } from '@geti-ui/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
-import type { Label } from '../../../../constants/shared-types';
+import type { Label } from '../../../../api/shared-types';
 import { useLabels } from '../use-labels.hook';
 import { LabelsEditor } from './labels-editor.component';
 

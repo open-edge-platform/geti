@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { AnnotatedVideoFrame, VideoFramePrediction } from '../../../src/constants/shared-types';
+import { AnnotatedVideoFrame, VideoFramePrediction } from '../../../src/api/shared-types';
 
 export const ANNOTATIONS_MOCKS: AnnotatedVideoFrame[] = [
     {

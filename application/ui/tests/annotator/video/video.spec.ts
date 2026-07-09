@@ -13,7 +13,7 @@ import { getMockedVariant } from 'mocks/mock-model-variant';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
-import { AnnotationDTO, MediaListPredictionRequest } from '../../../src/constants/shared-types';
+import { AnnotationDTO, MediaListPredictionRequest } from '../../../src/api/shared-types';
 import { http, test } from '../../fixtures';
 import { candyPngBuffer, redLabel } from '../annotator-fixtures';
 import { ANNOTATIONS_MOCKS, PREDICTIONS_MOCKS } from './mocks';

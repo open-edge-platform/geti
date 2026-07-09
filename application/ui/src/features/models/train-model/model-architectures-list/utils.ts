@@ -3,7 +3,7 @@
 
 import { isNil } from 'lodash-es';
 
-import type { BenchmarkMetrics, ModelArchitectureWithPerformanceCategory } from '../../../../constants/shared-types';
+import type { BenchmarkMetrics, ModelArchitectureWithPerformanceCategory } from '../../../../api/shared-types';
 
 type AccuracyMetric = { label: string; value: number };
 

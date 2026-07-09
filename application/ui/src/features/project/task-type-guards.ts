@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Task, TaskType } from '../../constants/shared-types';
+import { Task, TaskType } from '../../api/shared-types';
 
 export const isClassificationTask = (taskType: TaskType | null): boolean => {
     return taskType === 'classification';

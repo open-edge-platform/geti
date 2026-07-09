@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 
 import { Flex, NumberField, Slider } from '@geti-ui/ui';
 
-import { NumberConfigurableParameter } from '../../../../../constants/shared-types';
+import { NumberConfigurableParameter } from '../../../../../api/shared-types';
 import { getStep } from './utils';
 
 type NumberGroupParamsProps = {

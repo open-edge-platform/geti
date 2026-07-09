@@ -4,8 +4,8 @@
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
+import { Media } from '../../../../api/shared-types';
 import { paths } from '../../../../constants/paths';
-import { Media } from '../../../../constants/shared-types';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';
 import { isVideo, isVideoFrame } from '../../../../shared/media-item-utils';
 

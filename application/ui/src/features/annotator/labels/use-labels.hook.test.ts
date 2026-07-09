@@ -7,8 +7,8 @@ import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
+import type { Label } from '../../../api/shared-types';
 import { http } from '../../../api/utils';
-import type { Label } from '../../../constants/shared-types';
 import { server } from '../../../msw-node-setup';
 import { useLabels } from './use-labels.hook';
 

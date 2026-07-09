@@ -3,7 +3,7 @@
 
 import { InfiniteData, QueryClient } from '@tanstack/react-query';
 
-import { Media, MediaWithPagination } from '../../constants/shared-types';
+import { Media, MediaWithPagination } from '../../api/shared-types';
 import { isVideo } from '../media-item-utils';
 
 export const incrementCachedAnnotatedFrameCount = (queryClient: QueryClient, mediaItem: Media) => {

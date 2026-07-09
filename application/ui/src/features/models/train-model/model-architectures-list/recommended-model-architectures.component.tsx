@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ModelArchitecture as ModelArchitectureType } from '../../../../constants/shared-types';
+import type { ModelArchitecture as ModelArchitectureType } from '../../../../api/shared-types';
 import { ModelArchitecture } from './model-architecture.component';
 import { ModelArchitecturesListLayout } from './model-architectures-list-layout/model-architectures-list-layout.component';
 

@@ -5,8 +5,8 @@ import { act } from '@testing-library/react';
 import { getMockedMediaImage, getMockedVideo, getMockedVideoFrame } from 'mocks/mock-media';
 import { renderHook } from 'test-utils/render';
 
+import { Media } from '../../../../api/shared-types';
 import { paths } from '../../../../constants/paths';
-import { Media } from '../../../../constants/shared-types';
 import { useGetDatasetMediaItems } from '../../../../hooks/use-get-dataset-media-items.hook';
 import { useSelectDatasetItem } from './use-select-dataset-item.hook';
 

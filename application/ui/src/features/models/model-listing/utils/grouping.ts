@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DatasetRevision, Model } from '../../../../constants/shared-types';
+import type { DatasetRevision, Model } from '../../../../api/shared-types';
 import { formatDateTime } from '../../../../shared/date-utils';
 import type { GroupedModels } from '../types';
 

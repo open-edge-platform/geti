@@ -3,7 +3,7 @@
 
 import isObject from 'lodash-es/isObject';
 
-import { Job, QuantizeJob, TrainJob } from '../../constants/shared-types';
+import { Job, QuantizeJob, TrainJob } from '../../api/shared-types';
 
 const INVALID_STAGED_FILE_REGEX = /^Staged dataset.*not found\.?$/i;
 

@@ -5,7 +5,7 @@ import {
     ConfigurableParameter,
     ConfigurableParameterGroup,
     TrainingConfiguration,
-} from '../../../../../../constants/shared-types';
+} from '../../../../../../api/shared-types';
 import { findGroupByKey, isParameter } from '../../../../model-listing/model-training-parameters/utils';
 import { isBoolParameter } from '../../utils';
 
