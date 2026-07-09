@@ -6,11 +6,32 @@
 import os
 import sys
 from functools import lru_cache
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _pkg_version
 from pathlib import Path
 from typing import Literal
 
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _read_version() -> str:
+    """Read the application version, preferring installed package metadata.
+
+    In the Docker image (and any installed environment) the ``geti`` package is
+    installed and its version is stamped from the ``VERSION`` file at build time,
+    so it can be read from the package metadata. When running from source without
+    an installed distribution, fall back to reading the ``VERSION`` file directly.
+    """
+    try:
+        return _pkg_version("geti")
+    except PackageNotFoundError:
+        # settings.py -> app -> backend -> application/VERSION
+        version_file = Path(__file__).resolve().parents[2] / "VERSION"
+        try:
+            return version_file.read_text(encoding="utf-8").strip()
+        except OSError:
+            return "0.0.0"
 
 
 class Settings(BaseSettings):
@@ -20,7 +41,7 @@ class Settings(BaseSettings):
 
     # Application
     app_name: str = "Geti"
-    version: str = "0.1.0"
+    version: str = Field(default_factory=_read_version)
     summary: str = "Geti server"
     description: str = (
         "Geti allows to fine-tune computer vision models at the edge. "
