@@ -47,6 +47,16 @@ const getPublicApiUrl = () => {
 const publicApiUrl = getPublicApiUrl();
 const publicApiUrlJson = JSON.stringify(publicApiUrl);
 
+// Static assets (including the `onnxruntime-web` wasm/mjs artifacts copied
+// below) are served from wherever the backend mounts the built UI — the
+// origin root in dev, but under `ASSET_PREFIX` (e.g. `/html`) in production
+// (see application/docker/Dockerfile, install.sh, and
+// application/backend/app/main.py's `static_dir` mount). Consumers that build
+// absolute asset URLs at runtime (e.g. the SAM worker's `setOrtWasmPaths`)
+// must prefix them with this value, or they 404 behind the `/html` mount.
+const assetPrefix = process.env.ASSET_PREFIX ?? '';
+const assetPrefixJson = JSON.stringify(assetPrefix);
+
 export default defineConfig({
     plugins: [
         pluginReact(),
@@ -85,6 +95,7 @@ export default defineConfig({
             ...publicVars,
             'import.meta.env.PUBLIC_API_BASE_URL': publicApiUrlJson,
             'process.env.PUBLIC_API_BASE_URL': publicApiUrlJson,
+            'process.env.ASSET_PREFIX': assetPrefixJson,
             // Needed to prevent an issue with spectrum's picker
             // eslint-disable-next-line max-len
             // https://github.com/adobe/react-spectrum/blob/6173beb4dad153aef74fc81575fd97f8afcf6cb3/packages/%40react-spectrum/overlays/src/OpenTransition.tsx#L40

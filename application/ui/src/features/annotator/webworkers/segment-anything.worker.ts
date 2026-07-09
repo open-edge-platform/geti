@@ -9,9 +9,12 @@ import type { SegmentAnythingWorkerApi } from './segment-anything.worker.interfa
 
 // `@geti-ui/smart-tools` doesn't hardcode ONNX Runtime's wasm location; the
 // consuming app must tell it where the `onnxruntime-web` wasm/mjs artifacts
-// are served from. rsbuild copies them to `/ort/` (see rsbuild.config.ts).
+// are served from. rsbuild copies them to `ort/` (see rsbuild.config.ts),
+// but the app is commonly served behind `ASSET_PREFIX` (e.g. `/html` in the
+// Docker/install.sh build — see application/backend/app/main.py's static
+// mount), so the absolute URL must include that prefix or it 404s in prod.
 // Must run before any SAM session is created.
-setOrtWasmPaths('/ort/');
+setOrtWasmPaths(`${process.env.ASSET_PREFIX}/ort/`);
 
 const WorkerApi: SegmentAnythingWorkerApi = {
     build: async () => {
