@@ -4,7 +4,7 @@
 import { usePrefetchQuery, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { $api } from '../../api/client';
+import { $api } from '@/api';
 import { getQueryKey } from '../../query-client/query-client';
 
 const getPipelineQueryOptions = (projectId: string) => {

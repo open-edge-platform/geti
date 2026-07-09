@@ -4,7 +4,7 @@
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
-import { $api } from '../api/client';
+import { $api } from '@/api';
 import type { DatasetRevisionItem, DatasetSubset, Pagination } from '@/api/types';
 
 const DATASET_ITEMS_LIMIT = 20;

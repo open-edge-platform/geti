@@ -20,7 +20,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { get } from 'lodash-es';
 import { useNumberFormatter } from 'react-aria';
 
-import { API_BASE_URL } from '../../../../api/client';
+import { API_BASE_URL } from '@/api';
 import type { Model, ModelFormat, ModelVariant } from '@/api/types';
 import { downloadFile, formatBytes } from '../../../../shared/util';
 import {

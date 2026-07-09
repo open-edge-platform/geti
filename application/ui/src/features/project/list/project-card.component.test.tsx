@@ -7,7 +7,7 @@ import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import { API_BASE_URL } from '../../../api/client';
+import { API_BASE_URL } from '@/api';
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
 import { ProjectCard } from './project-card.component';

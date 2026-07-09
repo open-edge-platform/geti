@@ -3,7 +3,7 @@
 
 import { usePrefetchQuery, useSuspenseQuery } from '@tanstack/react-query';
 
-import { $api } from '../../../../api/client';
+import { $api } from '@/api';
 
 const sinksQueryOptions = () => {
     return $api.queryOptions('get', '/api/sinks');

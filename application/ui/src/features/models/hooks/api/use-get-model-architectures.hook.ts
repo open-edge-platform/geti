@@ -12,7 +12,7 @@ import type {
 import { usePrefetchQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useProject } from 'hooks/api/project.hook';
 
-import { $api } from '../../../../api/client';
+import { $api } from '@/api';
 
 const getModelArchitectures = (
     modelArchitectures: ModelArchitecture[],

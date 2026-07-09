@@ -3,7 +3,7 @@
 
 import { usePrefetchQuery, useQuery } from '@tanstack/react-query';
 
-import { $api } from '../api/client';
+import { $api } from '@/api';
 import { useProjectIdentifier } from './use-project-identifier.hook';
 
 const getDatasetRevisionsQueryOptions = (projectId: string) => {

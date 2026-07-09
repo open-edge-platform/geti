@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 
 import { isFunction } from 'lodash-es';
 
-import { $api } from '../../../api/client';
+import { $api } from '@/api';
 import { toast } from '../../../components/toast/toast.component';
 import { isNonEmptyString } from '../../../shared/util';
 import { isInvalidJob, isJobDone, isJobFailed } from '../util';

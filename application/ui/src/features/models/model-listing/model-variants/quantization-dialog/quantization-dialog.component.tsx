@@ -8,7 +8,7 @@ import { InfoOutline } from '@geti-ui/ui/icons';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { $api } from '../../../../../api/client';
+import { $api } from '@/api';
 import { toast } from '../../../../../components/toast/toast.component';
 import {
     CalibrationDatasetSizeField,

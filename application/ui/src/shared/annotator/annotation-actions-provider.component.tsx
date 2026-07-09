@@ -8,7 +8,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEqual } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
-import { $api } from '../../api/client';
+import { $api } from '@/api';
 import type { AnnotationDTO, DatasetSubset, Label, Media } from '@/api/types';
 import { UndoRedoProvider } from '../../features/dataset/media-preview/primary-toolbar/undo-redo/undo-redo-provider.component';
 import useUndoRedoState from '../../features/dataset/media-preview/primary-toolbar/undo-redo/use-undo-redo-state';

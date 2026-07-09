@@ -3,7 +3,7 @@
 
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { $api } from '../../../../api/client';
+import { $api } from '@/api';
 
 export const useGetModelTrainingMetrics = (modelId: string | null | undefined) => {
     const projectId = useProjectIdentifier();

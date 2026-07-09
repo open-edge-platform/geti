@@ -3,7 +3,7 @@
 
 import { v4 as uuid } from 'uuid';
 
-import { fetchClient } from '../../../api/client';
+import { fetchClient } from '@/api';
 
 export type WebRTCConnectionStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'failed';
 

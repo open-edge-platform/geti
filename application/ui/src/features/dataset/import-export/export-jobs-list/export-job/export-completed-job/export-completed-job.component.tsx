@@ -5,7 +5,7 @@ import { Button, Divider, Flex, Text, View } from '@geti-ui/ui';
 import { useDeleteStagedDataset, useStagedDataset } from 'hooks/api/staged-dataset.hook';
 import { isNil } from 'lodash-es';
 
-import { API_BASE_URL } from '../../../../../../api/client';
+import { API_BASE_URL } from '@/api';
 import type { ExportDatasetJob } from '@/api/types';
 import { useExportDataset } from '../../../../../../hooks/storage/use-export-dataset.hook';
 import { downloadFile } from '../../../../../../shared/util';

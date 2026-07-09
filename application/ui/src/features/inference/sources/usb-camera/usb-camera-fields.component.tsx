@@ -7,7 +7,7 @@ import { ActionButton, Flex, Item, Loading, Picker, TextField } from '@geti-ui/u
 import { Refresh } from '@geti-ui/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { $api } from '../../../../api/client';
+import { $api } from '@/api';
 import type { USBCameraSourceConfig } from '@/api/types';
 
 type UsbCameraProps = {

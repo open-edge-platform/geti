@@ -4,7 +4,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { $api } from '../../api/client';
+import { $api } from '@/api';
 
 export const useProjects = () => {
     return $api.useSuspenseQuery('get', '/api/projects');

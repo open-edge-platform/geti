@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 
 import { isInvalidJob, isJobDone, isJobFailed } from 'hooks/api/util';
 
-import { $api } from '../../../../../api/client';
+import { $api } from '@/api';
 import type { ExportDatasetJob } from '@/api/types';
 import { useExportDataset } from '../../../../../hooks/storage/use-export-dataset.hook';
 

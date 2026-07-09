@@ -4,7 +4,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { API_BASE_URL, fetchClient } from '../../../../api/client';
+import { API_BASE_URL, fetchClient } from '@/api';
 import { getQueryKey } from '../../../../query-client/query-client';
 import { assertIsNotNullable, downloadFile } from '../../../../shared/util';
 import { type LogEntry } from '../log-types';

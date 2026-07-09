@@ -6,7 +6,7 @@ import { isJobDone, isJobFailed, isJobPending, isJobRunning } from 'hooks/api/ut
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isNil, isString } from 'lodash-es';
 
-import { $api } from '../../../../../api/client';
+import { $api } from '@/api';
 import { useExportStatus } from '../hooks/use-export-status.hook';
 import { ExportActiveJob } from './export-active-job.component';
 import { ExportCompletedJob } from './export-completed-job/export-completed-job.component';

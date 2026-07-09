@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import isEmpty from 'lodash-es/isEmpty';
 
-import { $api } from '../api/client';
+import { $api } from '@/api';
 import type { DatasetItemAnnotationStatus, DatasetSubset, Media, MediaDTO, Pagination } from '@/api/types';
 import { type SortDirection } from './sort-direction.interface';
 

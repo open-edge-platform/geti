@@ -5,7 +5,7 @@ import { Key } from 'react';
 
 import { Item, Picker } from '@geti-ui/ui';
 
-import { $api } from '../../api/client';
+import { $api } from '@/api';
 import type { DeviceInfo } from '@/api/types';
 
 // Generate device id based on type and index (if available) to ensure uniqueness

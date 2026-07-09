@@ -5,7 +5,7 @@ import { Button, Content, DropZone, FileTrigger, Flex, Heading, IllustratedMessa
 import { LinkOut } from '@geti-ui/ui/icons';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
 
-import { $api } from '../../api/client';
+import { $api } from '@/api';
 import { ReactComponent as EmptyDataset } from '../../assets/drop-files.svg';
 import { Link } from '../../platform/components/link.component';
 import { ThreeDotsFlashing } from '../../shared/components/three-dots-flashing/three-dots-flashing.component';

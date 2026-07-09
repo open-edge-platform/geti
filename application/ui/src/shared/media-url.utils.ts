@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { API_BASE_URL } from '../api/client';
+import { API_BASE_URL } from '@/api';
 
 // Use plain string concatenation instead of `new URL(path, base)`. The latter
 // requires an absolute base, but `API_BASE_URL` is an empty string when the UI
