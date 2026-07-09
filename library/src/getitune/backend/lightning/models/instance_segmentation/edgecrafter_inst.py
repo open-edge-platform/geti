@@ -52,10 +52,11 @@ class EdgeCrafterInst(EdgeCrafterMixin, LightningInstanceSegModel):  # pyrefly: 
             per-variant value in :class:`EdgeCrafterMixin`.
         torch_compile: Whether to use ``torch.compile``. Defaults to ``False``.
         tile_config: Tiling configuration. Defaults to disabled tiler.
+        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
     """
 
     # ECSeg weights - loaded in place of ECDet weights.
-    _pretrained_weights: ClassVar[dict[str, str]] = {
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "edgecrafter_s": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecseg_s.pth",
         "edgecrafter_m": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecseg_m.pth",
         "edgecrafter_l": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecseg_l.pth",
@@ -101,6 +102,7 @@ class EdgeCrafterInst(EdgeCrafterMixin, LightningInstanceSegModel):  # pyrefly: 
         backbone_lr: float | None = None,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
     ) -> None:
         self.multi_scale = multi_scale
         self.backbone_lr = backbone_lr
@@ -113,6 +115,7 @@ class EdgeCrafterInst(EdgeCrafterMixin, LightningInstanceSegModel):  # pyrefly: 
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
         )
 
     def _create_model(self, num_classes: int | None = None) -> ECDETRDetector:
