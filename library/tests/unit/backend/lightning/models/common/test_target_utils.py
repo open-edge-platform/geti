@@ -92,6 +92,33 @@ class TestAlignSampleBatchAnnotations:
         # Should not raise.
         assert align_sample_batch_annotations(batch) is batch
 
+    def test_trimmed_masks_preserve_tv_tensor_type(self) -> None:
+        """Trimming a mismatched sample must keep masks as ``tv_tensors.Mask``.
+
+        Slicing a ``tv_tensors.Mask`` returns a *plain* ``torch.Tensor``. If the
+        subclass is lost, the Mask R-CNN mask head (``mask_target_single``)
+        silently drops that image's mask targets and desynchronises the
+        prediction/target counts, crashing the mask BCE loss with
+        "Target size ... must be the same as input size ...". The alignment
+        helper must therefore re-wrap the trimmed masks.
+        """
+        batch = _batch(bbox_counts=[2], label_counts=[2], mask_counts=[3])
+        align_sample_batch_annotations(batch)
+        assert batch.masks is not None
+        assert isinstance(batch.masks[0], tv_tensors.Mask)
+        assert batch.masks[0].shape[0] == 2
+        assert batch.bboxes is not None
+        assert isinstance(batch.bboxes[0], tv_tensors.BoundingBoxes)
+
+    def test_trimmed_detection_boxes_preserve_tv_tensor_type(self) -> None:
+        """Detection box trimming must also preserve ``tv_tensors.BoundingBoxes``."""
+        batch = _batch(bbox_counts=[3], label_counts=[1])
+        align_sample_batch_annotations(batch)
+        assert batch.bboxes is not None
+        assert isinstance(batch.bboxes[0], tv_tensors.BoundingBoxes)
+        assert batch.bboxes[0].canvas_size == (64, 64)
+        assert batch.bboxes[0].shape[0] == 1
+
     def test_instance_seg_boxes_are_recomputed_from_masks(self) -> None:
         """On divergence, inst-seg boxes are rebuilt from masks (correct correspondence).
 

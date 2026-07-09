@@ -109,11 +109,11 @@ def align_sample_batch_annotations(entity: SampleBatch) -> SampleBatch:
         masks_present = masks is not None and i < len(masks) and masks[i] is not None
 
         if labels is not None and labels[i] is not None:
-            labels[i] = labels[i][:n]
+            labels[i] = _trim_preserving_type(labels[i], n)
         if keypoints is not None and keypoints[i] is not None:
-            keypoints[i] = keypoints[i][:n]
+            keypoints[i] = _trim_preserving_type(keypoints[i], n)
         if masks_present:
-            masks[i] = masks[i][:n]  # type: ignore[index]  # pyrefly: ignore[unsupported-operation]
+            masks[i] = _trim_preserving_type(masks[i], n)  # type: ignore[index]  # pyrefly: ignore[unsupported-operation]
 
         if bboxes is not None and bboxes[i] is not None:
             if masks_present:
@@ -121,9 +121,31 @@ def align_sample_batch_annotations(entity: SampleBatch) -> SampleBatch:
                 # box[i] is guaranteed to correspond to mask[i].
                 bboxes[i] = _boxes_from_masks(masks[i], bboxes[i])  # type: ignore[index]
             else:
-                bboxes[i] = bboxes[i][:n]  # pyrefly: ignore[unsupported-operation]
+                bboxes[i] = _trim_preserving_type(bboxes[i], n)  # pyrefly: ignore[unsupported-operation]
 
     return entity
+
+
+def _trim_preserving_type(field_value: Tensor, n: int) -> Tensor:
+    """Trim ``field_value`` to its first ``n`` rows, preserving any tv_tensor subclass.
+
+    Slicing a ``torchvision.tv_tensors`` instance (e.g. ``tv_tensors.Mask`` or
+    ``tv_tensors.BoundingBoxes``) returns a *plain* ``torch.Tensor`` — the
+    subclass and its metadata (``format``/``canvas_size`` for boxes) are lost.
+    Downstream consumers rely on the subclass: in particular the Mask R-CNN mask
+    head silently drops a whole image's mask targets when ``gt_masks`` is not a
+    ``tv_tensors.Mask`` (see ``mask_target_single``), which corrupts the
+    prediction/target counts and crashes the mask loss. Re-wrapping the sliced
+    tensor with :func:`torchvision.tv_tensors.wrap` keeps the type intact.
+    """
+    trimmed = field_value[:n]
+    from torchvision import tv_tensors
+
+    if isinstance(field_value, tv_tensors.TVTensor) and not isinstance(trimmed, type(field_value)):
+        # pyrefly mis-resolves ``tv_tensors.wrap`` to ``torch._dynamo`` due to a
+        # name collision and rejects the valid ``like=`` kwarg; the call is correct.
+        trimmed = tv_tensors.wrap(trimmed, like=field_value)  # pyrefly: ignore[bad-argument-type, unexpected-keyword]
+    return trimmed  # pyrefly: ignore[bad-return]
 
 
 def _boxes_from_masks(masks: Tensor, reference_bboxes: Tensor) -> Tensor:

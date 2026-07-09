@@ -82,8 +82,19 @@ def mask_target_single(
         return pos_proposals.new_zeros((0, *mask_size))
 
     if not isinstance(gt_masks, tv_tensors.Mask):
-        warnings.warn("Unsupported ground truth mask type! Expected tv_tensors.Mask.", stacklevel=2)
-        return pos_proposals.new_zeros((0, *mask_size))
+        # A plain ``torch.Tensor`` of shape (N, H, W) is a perfectly valid mask
+        # representation — it only lost its ``tv_tensors.Mask`` subclass (e.g. via
+        # slicing/indexing upstream, which returns a plain tensor). Re-wrap it and
+        # proceed, since returning zero targets here would silently drop this
+        # image's mask targets and desynchronise the mask prediction/target counts
+        # (raising "Target size must be the same as input size" in the mask loss).
+        # Only genuinely unsupported types (e.g. numpy arrays) fall through to the
+        # zero-target fallback.
+        if isinstance(gt_masks, Tensor) and gt_masks.dim() == 3:
+            gt_masks = tv_tensors.Mask(gt_masks)
+        else:
+            warnings.warn("Unsupported ground truth mask type! Expected tv_tensors.Mask.", stacklevel=2)
+            return pos_proposals.new_zeros((0, *mask_size))
 
     device = pos_proposals.device
     num_pos = pos_proposals.size(0)
