@@ -325,7 +325,6 @@ class MobileNetV3Backbone:
     Args:
         mode (Literal["small", "large"], optional): The mode of the backbone architecture. Defaults to "large".
         width_mult (float, optional): Width multiplier for the backbone architecture. Defaults to 1.0.
-        pretrained (bool, optional): Whether to load pretrained weights. Defaults to True.
         **kwargs: Additional keyword arguments to be passed to the MobileNetV3 model.
 
     Returns:
@@ -333,7 +332,7 @@ class MobileNetV3Backbone:
 
     Examples:
         # Create a MobileNetV3Backbone instance
-        backbone = MobileNetV3Backbone(mode="small", width_mult=0.75, pretrained=False)
+        backbone = MobileNetV3Backbone(mode="small", width_mult=0.75)
 
         # Create a MobileNetV3 model with the specified backbone
         model = MobileNetV3(backbone=backbone)

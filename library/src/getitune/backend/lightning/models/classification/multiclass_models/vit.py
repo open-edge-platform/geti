@@ -41,7 +41,6 @@ class ForwardExplainMixInForViT:
     explain_mode: bool
     num_classes: int
     model: ImageClassifier
-    pretrained_urls = VIT_PRETRAINED_URLS
 
     @torch.no_grad()
     def head_forward_fn(self, x: torch.Tensor) -> torch.Tensor:

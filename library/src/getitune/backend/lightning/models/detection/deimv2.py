@@ -111,7 +111,6 @@ class DEIMV2(DEIMDFine):
             num_classes=num_classes,
             eval_spatial_size=self.data_input_params.input_size,
         )
-        self._decoder = decoder
 
         criterion = DEIMCriterion(
             weight_dict={
@@ -173,7 +172,7 @@ class DEIMV2(DEIMDFine):
         our decoder uses fused qkv_proj/out_proj. Scoped to decoder layers only.
         """
         key_mapping: dict[str, str] = {}
-        for i in range(self._decoder.num_layers):
+        for i in range(self.model.decoder.num_layers):  # pyrefly: ignore[missing-attribute]
             prefix = f"decoder.decoder.layers.{i}."
             key_mapping[f"{prefix}self_attn.in_proj_"] = f"{prefix}qkv_proj."
             key_mapping[f"{prefix}self_attn.out_proj."] = f"{prefix}out_proj."

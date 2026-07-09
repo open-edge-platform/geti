@@ -13,7 +13,7 @@ import logging
 import os
 import warnings
 from pathlib import Path
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Protocol, cast
 from urllib.parse import urlparse
 
 from torch.hub import download_url_to_file
@@ -99,17 +99,15 @@ class TimmWeightsLoader:
 
     def load_pretrained(self: _SupportsBackboneWeights, weights: PathLike | None = None) -> None:
         """Load weights: a local checkpoint if given, else timm's pretrained source."""
+        timm_model = cast("nn.Module", self.model.backbone.model)  # the nn.Module created by timm.create_model
+
         if weights is not None and Path(weights).exists():
-            load_checkpoint(self.model.backbone, str(weights))
+            load_checkpoint(timm_model, str(weights))
             return
 
         from timm.models import load_pretrained
 
-        timm_model = self.model.backbone.model  # the nn.Module created by timm.create_model
-        load_pretrained(
-            timm_model,  # pyrefly: ignore[bad-argument-type]
-            pretrained_cfg=timm_model.pretrained_cfg,  # pyrefly: ignore[missing-attribute]
-        )
+        load_pretrained(timm_model, pretrained_cfg=timm_model.pretrained_cfg)  # pyrefly: ignore[bad-argument-type]
         logger.info("Loaded timm pretrained weights for %s", self.model_name)
 
 
@@ -133,7 +131,34 @@ class VisionTransformerWeightsLoader:
     def load_pretrained(self: _SupportsViTBackboneWeights, weights: PathLike | None = None) -> None:
         """Load weights: a local checkpoint if given, else torchvision's official set."""
         if weights is not None and Path(weights).exists():
-            load_checkpoint(self.model.backbone, str(weights))
+            key_mapping = {
+                "backbone.cls_token": "cls_token",
+                "backbone.pos_embed": "pos_embed",
+                "backbone.patch_embed.projection.weight": "patch_embed.proj.weight",
+                "backbone.patch_embed.projection.bias": "patch_embed.proj.bias",
+                "backbone.ln1.weight": "norm.weight",
+                "backbone.ln1.bias": "norm.bias",
+            }
+
+            for i in range(12):
+                # Normalization layers
+                key_mapping[f"backbone.layers.{i}.ln1.weight"] = f"blocks.{i}.norm1.weight"
+                key_mapping[f"backbone.layers.{i}.ln1.bias"] = f"blocks.{i}.norm1.bias"
+                key_mapping[f"backbone.layers.{i}.ln2.weight"] = f"blocks.{i}.norm2.weight"
+                key_mapping[f"backbone.layers.{i}.ln2.bias"] = f"blocks.{i}.norm2.bias"
+
+                # Attention blocks
+                key_mapping[f"backbone.layers.{i}.attn.qkv.weight"] = f"blocks.{i}.attn.qkv.weight"
+                key_mapping[f"backbone.layers.{i}.attn.qkv.bias"] = f"blocks.{i}.attn.qkv.bias"
+                key_mapping[f"backbone.layers.{i}.attn.proj.weight"] = f"blocks.{i}.attn.proj.weight"
+                key_mapping[f"backbone.layers.{i}.attn.proj.bias"] = f"blocks.{i}.attn.proj.bias"
+
+                # Feed-Forward / MLP blocks
+                key_mapping[f"backbone.layers.{i}.ffn.layers.0.0.weight"] = f"blocks.{i}.mlp.fc1.weight"
+                key_mapping[f"backbone.layers.{i}.ffn.layers.0.0.bias"] = f"blocks.{i}.mlp.fc1.bias"
+                key_mapping[f"backbone.layers.{i}.ffn.layers.1.weight"] = f"blocks.{i}.mlp.fc2.weight"
+
+            load_checkpoint(self.model.backbone, str(weights), key_mapping=key_mapping)
             logger.info("Loaded ViT backbone weights from %s", weights)
             return
 

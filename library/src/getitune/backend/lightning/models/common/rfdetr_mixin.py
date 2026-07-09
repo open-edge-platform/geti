@@ -97,7 +97,6 @@ class RFDETRMixin:
 
         lwdetr: LWDETR = build_model_from_config(model_config, train_config)
 
-        self._lwdetr = lwdetr
         self._model_config = model_config
 
         criterion, postprocessor = build_criterion_from_config(model_config, train_config)
@@ -368,9 +367,10 @@ class RFDETRMixin:
         else:
             self._model_config.pretrain_weights = str(weights)
 
-        load_pretrain_weights(self._lwdetr, self._model_config)
+        lwdetr = self.model.lwdetr  # pyrefly: ignore[missing-attribute]
+        load_pretrain_weights(lwdetr, self._model_config)
 
-        torch.nn.init.zeros_(self._lwdetr.class_embed.bias)
-        if self._lwdetr.two_stage:
-            for enc_cls_embed in self._lwdetr.transformer.enc_out_class_embed:
+        torch.nn.init.zeros_(lwdetr.class_embed.bias)
+        if lwdetr.two_stage:
+            for enc_cls_embed in lwdetr.transformer.enc_out_class_embed:
                 torch.nn.init.zeros_(enc_cls_embed.bias)
