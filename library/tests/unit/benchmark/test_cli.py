@@ -22,7 +22,7 @@ CATALOG_YAML = textwrap.dedent("""\
     datasets:
       - name: ds_a
         script: "scripts/benchmark_datasets/prepare_ds_a.py"
-        size_tier: tiny
+        size_tier: small
 """)
 
 MANIFEST_YAML = textwrap.dedent("""\
@@ -105,7 +105,9 @@ class TestBuildParser:
                 "--priority",
                 "core",
                 "--size-tier",
-                "tiny",
+                "small",
+                "--data-group",
+                "weekly",
                 "--scenario",
                 "default",
                 "--scenario-tag",
@@ -123,13 +125,29 @@ class TestBuildParser:
         assert args.model == ["yolox_s"]
         assert args.dataset == ["ds_a"]
         assert args.priority == ["core"]
-        assert args.size_tier == ["tiny"]
+        assert args.size_tier == ["small"]
+        assert args.data_group == "weekly"
         assert args.scenario == ["default"]
         assert args.scenario_tag == ["configurable"]
         assert args.num_seeds == 5
         assert args.max_epochs == 10
         assert args.eval_upto == "export"
         assert args.dry_run is True
+
+    def test_run_subcommand_data_group_defaults_to_all(self) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(["run"])
+        assert args.data_group == "all"
+
+    def test_run_subcommand_rejects_invalid_data_group(self) -> None:
+        parser = _build_parser()
+        with pytest.raises(SystemExit):
+            parser.parse_args(["run", "--data-group", "extend"])
+
+    def test_run_subcommand_requires_data_group_value(self) -> None:
+        parser = _build_parser()
+        with pytest.raises(SystemExit):
+            parser.parse_args(["run", "--data-group"])
 
     def test_run_no_deterministic(self) -> None:
         parser = _build_parser()
@@ -666,7 +684,31 @@ class TestCmdRunFilters:
                 "--data-root",
                 str(tmp_path / "data"),
                 "--size-tier",
-                "tiny",
+                "small",
+            ]
+        )
+        with patch("getitune.benchmark.catalog.provision_datasets", return_value={}) as mock_prov:
+            rc = _cmd_provision(args)
+        assert rc == 0
+        mock_prov.assert_called_once()
+
+    @patch("getitune.benchmark.runner.BenchmarkRunner")
+    def test_provision_with_data_group_filter(
+        self,
+        mock_runner_cls: MagicMock,
+        catalog_file: Path,
+        tmp_path: Path,
+    ) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(
+            [
+                "provision",
+                "--catalog",
+                str(catalog_file),
+                "--data-root",
+                str(tmp_path / "data"),
+                "--data-group",
+                "weekly",
             ]
         )
         with patch("getitune.benchmark.catalog.provision_datasets", return_value={}) as mock_prov:

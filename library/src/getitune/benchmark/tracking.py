@@ -45,6 +45,7 @@ class TrackingConfig:
     trigger: str = "manual"
     accelerator: str = "gpu"
     baseline_branch: str = "develop"
+    run_id: str = ""  # unique per-invocation id; resolved via get_benchmark_run_id() when empty
 
     @property
     def experiment_name(self) -> str:
@@ -86,6 +87,32 @@ def get_git_branch() -> str:
         )
     except Exception:
         return os.environ.get("GITHUB_REF_NAME", "unknown")
+
+
+def get_benchmark_run_id() -> str:
+    """Return a stable, unique identifier for the current benchmark invocation.
+
+    Scopes a report to the seed runs from *this* invocation only, so stale
+    runs left in a persistent MLflow store by previous executions (which share
+    the same branch/trigger experiment) are not averaged in. Branch and git
+    SHA are unsuitable: weekly runs always use ``develop`` and re-runs reuse
+    the same commit.
+
+    Resolution order (so the separate ``run`` and ``report`` steps of one CI
+    job agree without extra plumbing):
+
+    1. ``GETITUNE_BENCHMARK_RUN_ID`` — explicit override.
+    2. ``GITHUB_RUN_ID`` (+ ``GITHUB_RUN_ATTEMPT``) — unique per workflow run.
+    3. ``"local"`` — fallback for local, non-CI usage.
+    """
+    override = os.environ.get("GETITUNE_BENCHMARK_RUN_ID")
+    if override:
+        return override
+    gh_run_id = os.environ.get("GITHUB_RUN_ID")
+    if gh_run_id:
+        attempt = os.environ.get("GITHUB_RUN_ATTEMPT", "1")
+        return f"gh-{gh_run_id}-{attempt}"
+    return "local"
 
 
 def _get_getitune_version() -> str:
@@ -151,12 +178,12 @@ def _get_cpu_info() -> str:
 # ``criteria.accuracy_metric`` (see ``register_primary_metrics``); the static
 # table is only consulted for tasks not declared in the manifest.
 _PRIMARY_METRIC: dict[str, str] = {
-    "classification/multi_class_cls": "training:val/accuracy",
-    "classification/multi_label_cls": "training:val/accuracy",
+    "classification/multi_class_cls": "training:val/f1-score",
+    "classification/multi_label_cls": "training:val/mAP",
     "classification/h_label_cls": "training:val/accuracy",
-    "detection": "training:val/map_50",
-    "instance_segmentation": "training:val/map_50",
-    "rotated_detection": "training:val/map_50",
+    "detection": "training:val/map",
+    "instance_segmentation": "training:val/map",
+    "rotated_detection": "training:val/map",
     "semantic_segmentation": "training:val/mIoU",
     "keypoint_detection": "training:val/PCK",
 }
@@ -337,6 +364,7 @@ class RunTags:
     accelerator: str  # kept per-run because baseline resolution filters on it
     branch: str  # ditto
     status: str  # "success" | "failed"
+    benchmark_run_id: str  # per-invocation id so a report can be scoped to a single run
     run_type: str = "seed"  # "seed" (leaf) or "rollup" (parent aggregate)
     primary_metric_name: str = ""
     extra: dict[str, str] = field(default_factory=dict)
@@ -353,6 +381,7 @@ class RunTags:
             "accelerator": self.accelerator,
             "branch": self.branch,
             "status": self.status,
+            "benchmark_run_id": self.benchmark_run_id,
             "run_type": self.run_type,
         }
         if self.primary_metric_name:
@@ -382,6 +411,7 @@ class BenchmarkTracker:
         # Pre-compute immutable environment metadata once
         self._git_sha = get_git_sha()
         self._git_branch = config.branch or get_git_branch()
+        self._benchmark_run_id = config.run_id or get_benchmark_run_id()
         self._getitune_version = _get_getitune_version()
         self._accelerator_info = _get_accelerator_info(config.accelerator)
         self._machine_name = platform.node()
@@ -580,6 +610,7 @@ class BenchmarkTracker:
             accelerator=self.config.accelerator,
             branch=self._git_branch,
             status="success" if result.success else "failed",
+            benchmark_run_id=self._benchmark_run_id,
             run_type="seed",
             primary_metric_name=primary_key or "",
             extra=extra_tags,
@@ -665,6 +696,18 @@ class BenchmarkTracker:
         Queries for the latest run on the given branch matching the
         ``(model, dataset, scenario, accelerator)`` combination.
 
+        The current invocation's own seed runs are excluded (via
+        ``benchmark_run_id``) so the baseline represents the *previous* run,
+        not this one. This matters on the baseline branch (e.g. the weekly
+        ``develop`` benchmark): the ``run`` step logs this run's seeds to the
+        same experiment before the ``report`` step resolves baselines, so
+        without the exclusion the "compared to last run" delta would collapse
+        to ~0% by comparing the run against itself.
+
+        Note: runs logged before ``benchmark_run_id`` tagging was introduced
+        do not carry the tag and are therefore not matched by the ``!=``
+        filter; baselines self-heal once at least one newer tagged run exists.
+
         Returns the run's metrics dict, or ``None`` if no baseline exists.
         """
         acc = accelerator or self.config.accelerator
@@ -689,7 +732,9 @@ class BenchmarkTracker:
             f"AND tags.accelerator = '{acc}' "
             f"AND tags.status = 'success' "
             # Exclude rollup parents; baselines are individual seed runs.
-            f"AND tags.run_type = 'seed'"
+            f"AND tags.run_type = 'seed' "
+            # Exclude this invocation so the baseline is the *previous* run.
+            f"AND tags.benchmark_run_id != '{self._benchmark_run_id}'"
         )
 
         runs = client.search_runs(

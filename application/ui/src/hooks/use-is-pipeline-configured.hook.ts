@@ -3,9 +3,8 @@
 
 import { isEmpty } from 'lodash-es';
 
-import type { components } from '../api/openapi-spec';
+import type { Pipeline } from '../constants/shared-types';
 
-type Pipeline = components['schemas']['PipelineView'];
 export const useIsPipelineConfigured = (pipeline?: Pipeline) => {
     if (!pipeline) return false;
 

@@ -3,22 +3,6 @@
 
 import { isEmpty } from 'lodash-es';
 
-import type { components } from '../../../api/openapi-spec';
-
-export type LocalFolderSinkConfig = components['schemas']['FolderSinkConfigView'];
-export type MqttSinkConfig = components['schemas']['MqttSinkConfigView'];
-export type WebhookSinkConfig = components['schemas']['WebhookSinkConfigView'];
-type DisconnectedSinkConfig = components['schemas']['RosSinkConfigView'];
-type RosSinkConfig = components['schemas']['RosSinkConfigView'];
-export type SinkOutputFormats = LocalFolderSinkConfig['output_formats'];
-
-export type SinkConfig =
-    | LocalFolderSinkConfig
-    | MqttSinkConfig
-    | WebhookSinkConfig
-    | DisconnectedSinkConfig
-    | RosSinkConfig;
-
 export enum OutputFormat {
     IMAGE_ORIGINAL = 'image_original',
     IMAGE_WITH_PREDICTIONS = 'image_with_predictions',

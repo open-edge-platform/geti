@@ -5,10 +5,10 @@ import { ReactNode } from 'react';
 
 import { Button, Form } from '@geti-ui/ui';
 
+import type { SinkConfig } from '../../../../constants/shared-types';
 import { usePatchPipeline } from '../../../../hooks/api/pipeline.hook';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';
 import { useSinkAction } from '../hooks/use-sink-action.hook';
-import { SinkConfig } from '../utils';
 
 interface AddSinkProps<T> {
     config: Awaited<T>;

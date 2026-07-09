@@ -17,7 +17,7 @@ import torch
 from torch import Tensor, nn
 
 from getitune.backend.lightning.models.common.layers.position_embed import RopePositionEmbedding
-from getitune.backend.lightning.models.common.layers.transformer_layers import MLP2L as MLP
+from getitune.backend.lightning.models.common.layers.vit_blocks import Attention, Block  # noqa: F401
 from getitune.backend.lightning.models.utils.weight_init import trunc_normal_
 
 
@@ -133,122 +133,6 @@ class DropPath(nn.Module):
             Output tensor with drop path applied.
         """
         return drop_path(x, self.drop_prob or 0.0, self.training)
-
-
-class Attention(nn.Module):
-    """Multi-head self-attention module with optional RoPE support.
-
-    Args:
-        dim: Input dimension.
-        num_heads: Number of attention heads. Defaults to 8.
-        qkv_bias: Whether to add bias to QKV projection. Defaults to False.
-        attn_drop: Attention dropout rate. Defaults to 0.0.
-        proj_drop: Output projection dropout rate. Defaults to 0.0.
-    """
-
-    def __init__(
-        self,
-        dim: int,
-        num_heads: int = 8,
-        qkv_bias: bool = False,
-        attn_drop: float = 0.0,
-        proj_drop: float = 0.0,
-    ) -> None:
-        super().__init__()
-        self.num_heads = num_heads
-        head_dim = dim // num_heads
-        self.scale = head_dim**-0.5
-        self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
-        self.attn_drop = attn_drop
-        self.proj = nn.Linear(dim, dim)
-        self.proj_drop = nn.Dropout(proj_drop)
-
-    def forward(
-        self,
-        x: Tensor,
-        rope_sincos: tuple[Tensor, Tensor] | None = None,
-    ) -> Tensor:
-        """Forward pass for multi-head attention.
-
-        Args:
-            x: Input tensor of shape (B, N, C).
-            rope_sincos: Optional tuple of (sin, cos) tensors for RoPE.
-
-        Returns:
-            Output tensor of shape (B, N, C).
-        """
-        B, N, C = x.shape  # noqa: N806
-        qkv = self.qkv(x).reshape(B, N, 3, self.num_heads, C // self.num_heads).permute(2, 0, 3, 1, 4)
-        q, k, v = qkv.unbind(0)
-
-        if rope_sincos is not None:
-            sin, cos = rope_sincos
-            q_cls, q_patch = q[:, :, :1, :], q[:, :, 1:, :]
-            k_cls, k_patch = k[:, :, :1, :], k[:, :, 1:, :]
-
-            q_patch = apply_rope(q_patch, sin, cos)
-            k_patch = apply_rope(k_patch, sin, cos)
-
-            q = torch.cat((q_cls, q_patch), dim=2)
-            k = torch.cat((k_cls, k_patch), dim=2)
-
-        x = torch.nn.functional.scaled_dot_product_attention(q, k, v, dropout_p=self.attn_drop)
-        x = x.transpose(1, 2).reshape([B, N, C])
-        x = self.proj(x)
-        return self.proj_drop(x)
-
-
-class Block(nn.Module):
-    """Transformer block with attention and MLP.
-
-    Standard transformer encoder block with pre-normalization.
-
-    Args:
-        dim: Input dimension.
-        num_heads: Number of attention heads.
-        mlp_ratio: Ratio of MLP hidden dim to embedding dim. Defaults to 4.0.
-        qkv_bias: Whether to add bias to QKV projection. Defaults to False.
-        drop: Dropout rate for MLP. Defaults to 0.0.
-        attn_drop: Attention dropout rate. Defaults to 0.0.
-        drop_path: Drop path rate. Defaults to 0.0.
-        act_layer: Activation layer class. Defaults to nn.GELU.
-        norm_layer: Normalization layer class. Defaults to nn.LayerNorm.
-    """
-
-    def __init__(
-        self,
-        dim: int,
-        num_heads: int,
-        mlp_ratio: float = 4.0,
-        qkv_bias: bool = False,
-        attn_drop: float = 0.0,
-        drop_path: float = 0.0,
-        drop: float = 0.0,
-        act_layer: type[nn.Module] = nn.GELU,
-        norm_layer: type[nn.Module] | Callable[..., nn.Module] = nn.LayerNorm,
-    ) -> None:
-        super().__init__()
-        self.norm1 = norm_layer(dim)
-        self.attn = Attention(dim, num_heads=num_heads, qkv_bias=qkv_bias, attn_drop=attn_drop, proj_drop=drop)
-        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
-        self.norm2 = norm_layer(dim)
-        self.mlp = MLP(
-            in_features=dim, hidden_features=int(dim * mlp_ratio), out_features=dim, act_layer=act_layer, drop=drop
-        )
-
-    def forward(self, x: Tensor, rope_sincos: tuple[Tensor, Tensor] | None = None) -> Tensor:
-        """Forward pass through transformer block.
-
-        Args:
-            x: Input tensor of shape (B, N, C).
-            rope_sincos: Optional tuple of (sin, cos) tensors for RoPE.
-
-        Returns:
-            Output tensor of shape (B, N, C).
-        """
-        attn_output = self.attn(self.norm1(x), rope_sincos=rope_sincos)
-        x = x + self.drop_path(attn_output)
-        return x + self.drop_path(self.mlp(self.norm2(x)))
 
 
 class VisionTransformer(nn.Module):

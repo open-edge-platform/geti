@@ -1,15 +1,16 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SinkConfig, SinkOutputFormats, WebhookSinkConfig } from '../../../../../constants/shared-types';
 import { removeUnderscore } from '../../../util';
-import { formatRateLimit, SinkConfig, SinkOutputFormats, WebhookSinkConfig } from '../../utils';
+import { formatRateLimit } from '../../utils';
 import { getPairsFromObject } from '../../webhook/utils';
 
 import classes from './settings-list.module.scss';
 
-interface SettingsListProps {
+type SettingsListProps = {
     sink: SinkConfig;
-}
+};
 
 const OutputFormats = ({ outputFormats }: { outputFormats: SinkOutputFormats }) => {
     return (

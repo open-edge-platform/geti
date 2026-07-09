@@ -353,14 +353,14 @@ class TestScrapeCsvMetrics:
 
         Previously the if/elif chain only recognized "val/", "iter_time",
         "epoch" and "gpu_mem"/"gpu" columns, so test-phase accuracy metrics
-        like "test/map_50" (written by test/torch, test/export, and
+        like "test/map" (written by test/torch, test/export, and
         test/optimize phases) fell through silently and never reached the
         benchmark report/CSV/MLflow.
         """
         csv_path = tmp_path / "metrics.csv"
-        csv_path.write_text("test/map_50,test/f1-score\n0.9,0.75\n")
+        csv_path.write_text("test/map,test/f1-score\n0.9,0.75\n")
         metrics = _scrape_csv_metrics(csv_path, prefix="torch:")
-        assert metrics["torch:test/map_50"] == pytest.approx(0.9)
+        assert metrics["torch:test/map"] == pytest.approx(0.9)
         assert metrics["torch:test/f1-score"] == pytest.approx(0.75)
 
     def test_test_iter_time_still_averaged(self, tmp_path: Path) -> None:
@@ -491,6 +491,14 @@ class TestScrapeCsvMetricsEdgeCases:
         csv_path.write_text("val/f1\n\n\n\n")
         metrics = _scrape_csv_metrics(csv_path, prefix="t:")
         assert "t:val/f1" not in metrics
+
+    def test_non_numeric_column_skipped(self, tmp_path: Path) -> None:
+        """Non-scalar metrics (e.g. confusion matrices) are skipped, not fatal."""
+        csv_path = tmp_path / "metrics.csv"
+        csv_path.write_text('test/confusion_matrix,test/accuracy\n"[tensor([[431,   4],\n        [  0,  15]])]",0.95\n')
+        metrics = _scrape_csv_metrics(csv_path, prefix="export:")
+        assert "export:test/confusion_matrix" not in metrics
+        assert metrics["export:test/accuracy"] == 0.95
 
 
 # ---------------------------------------------------------------------------
@@ -670,13 +678,13 @@ class TestUltralyticsTorchMetric:
 
 class TestWritePhaseMetricsCsv:
     def test_writes_scalar_metrics(self, tmp_path: Path) -> None:
-        _write_phase_metrics_csv(tmp_path, {"test/map_50": 0.8, "test/f1-score": 0.7})
+        _write_phase_metrics_csv(tmp_path, {"test/map": 0.8, "test/f1-score": 0.7})
         csv_file = tmp_path / "csv" / "version_0" / "metrics.csv"
         assert csv_file.exists()
         import pandas as pd
 
         frame = pd.read_csv(csv_file)
-        assert frame["test/map_50"].iloc[0] == pytest.approx(0.8)
+        assert frame["test/map"].iloc[0] == pytest.approx(0.8)
 
     def test_empty_metrics_no_file(self, tmp_path: Path) -> None:
         _write_phase_metrics_csv(tmp_path, {})
@@ -716,7 +724,7 @@ class TestDetectResumePointUltralytics:
         """An Ultralytics ``best_checkpoint.pt`` is a valid train-completion marker."""
         seed_dir = tmp_path / "seed"
         (seed_dir / "train").mkdir(parents=True)
-        (seed_dir / "train" / "metrics.csv").write_text("epoch,val/map_50\n1,0.5\n")
+        (seed_dir / "train" / "metrics.csv").write_text("epoch,val/map\n1,0.5\n")
         (seed_dir / "train" / "best_checkpoint.pt").write_text("fake")
         skip, resume_from = detect_resume_point(seed_dir)
         assert skip is False

@@ -3,9 +3,9 @@
 
 import { Flex, TextField } from '@geti-ui/ui';
 
+import type { LocalFolderSinkConfig } from '../../../../constants/shared-types';
 import { OutputFormats } from '../output-formats/output-formats.component';
 import { RateLimitFields } from '../rate-limit/rate-limit-fields.component';
-import { LocalFolderSinkConfig } from '../utils';
 
 type LocalFolderProps = {
     defaultState: LocalFolderSinkConfig;

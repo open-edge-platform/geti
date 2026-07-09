@@ -7,11 +7,11 @@ import { clsx } from 'clsx';
 import { isEqual } from 'lodash-es';
 
 import { ConnectionStatusBadge } from '../../../../components/connection-status-badge/connection-status-badge.component';
+import type { SinkConfig } from '../../../../constants/shared-types';
 import { usePipeline } from '../../../../hooks/api/pipeline.hook';
 import { getErrorMessage } from '../../../../query-client/query-client';
 import { removeUnderscore } from '../../util';
 import { useTestSink } from '../api/use-test-sink';
-import { SinkConfig } from '../utils';
 import { SettingsList } from './settings-list/settings-list.component';
 import { SinkIcon } from './sink-icon/sink-icon.component';
 import { SinkMenu } from './sink-menu/sink-menu.component';

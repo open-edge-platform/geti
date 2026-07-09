@@ -18,6 +18,7 @@ from getitune.benchmark.tracking import (
     _get_getitune_version,
     _is_per_class_sentinel,
     _sanitize_error_message,
+    get_benchmark_run_id,
     get_git_branch,
     get_git_sha,
 )
@@ -61,6 +62,7 @@ class TestRunTags:
             branch="develop",
             accelerator="gpu",
             status="success",
+            benchmark_run_id="gh-123-1",
             extra={"override.lr": "0.01"},
         )
         d = tags.as_dict()
@@ -68,7 +70,8 @@ class TestRunTags:
         assert d["model"] == "yolox_s"
         assert d["override.lr"] == "0.01"
         assert "status" in d
-        assert len(d) == 11  # 10 base + 1 extra
+        assert d["benchmark_run_id"] == "gh-123-1"
+        assert len(d) == 12  # 11 base + 1 extra
 
 
 # ---------------------------------------------------------------------------
@@ -109,6 +112,37 @@ class TestGitHelpers:
     def test_get_cpu_info_returns_string(self) -> None:
         info = _get_cpu_info()
         assert isinstance(info, str)
+
+
+# ---------------------------------------------------------------------------
+# get_benchmark_run_id
+# ---------------------------------------------------------------------------
+
+
+class TestGetBenchmarkRunId:
+    def test_explicit_override_wins(self) -> None:
+        with patch.dict(
+            "os.environ",
+            {"GETITUNE_BENCHMARK_RUN_ID": "custom-42", "GITHUB_RUN_ID": "999"},
+            clear=True,
+        ):
+            assert get_benchmark_run_id() == "custom-42"
+
+    def test_github_run_id_with_attempt(self) -> None:
+        with patch.dict(
+            "os.environ",
+            {"GITHUB_RUN_ID": "12345", "GITHUB_RUN_ATTEMPT": "3"},
+            clear=True,
+        ):
+            assert get_benchmark_run_id() == "gh-12345-3"
+
+    def test_github_run_id_defaults_attempt_to_one(self) -> None:
+        with patch.dict("os.environ", {"GITHUB_RUN_ID": "12345"}, clear=True):
+            assert get_benchmark_run_id() == "gh-12345-1"
+
+    def test_local_fallback(self) -> None:
+        with patch.dict("os.environ", {}, clear=True):
+            assert get_benchmark_run_id() == "local"
 
 
 # ---------------------------------------------------------------------------
@@ -179,7 +213,7 @@ class TestBenchmarkTrackerLogRun:
     def _make_experiment(self) -> Experiment:
         return Experiment(
             task="detection",
-            model=ModelEntry(name="yolox_s", priority="core", recipe="detection/yolox_s.yaml"),
+            model=ModelEntry(name="yolox_s", task="detection", priority="core"),
             dataset_name="pothole_tiny",
             scenario=Scenario.default(),
             eval_upto="train",
@@ -294,6 +328,28 @@ class TestResolveBaseline:
         assert result is not None
         assert result["training:val/mAP"] == 0.90
         assert result["training:e2e_time"] == 100.0
+
+    @patch("getitune.benchmark.tracking.mlflow")
+    def test_excludes_current_invocation(self, mock_mlflow: MagicMock) -> None:
+        # The baseline must represent the *previous* run, not this one, even
+        # when the current run has already logged seeds to the same branch
+        # experiment (the weekly ``develop`` case).
+        with patch.dict("os.environ", {"GETITUNE_BENCHMARK_RUN_ID": "gh-999-1"}, clear=True):
+            config = TrackingConfig(branch="develop", trigger="weekly")
+            tracker = BenchmarkTracker(config)
+
+            mock_client = MagicMock()
+            mock_exp = MagicMock()
+            mock_exp.experiment_id = "1"
+            mock_exp.name = "getitune-benchmark/develop/weekly"
+            mock_client.search_experiments.return_value = [mock_exp]
+            mock_client.search_runs.return_value = []
+            mock_mlflow.tracking.MlflowClient.return_value = mock_client
+
+            tracker.resolve_baseline(model="m", dataset="d")
+
+            filter_string = mock_client.search_runs.call_args.kwargs["filter_string"]
+            assert "tags.benchmark_run_id != 'gh-999-1'" in filter_string
 
 
 # ---------------------------------------------------------------------------
@@ -514,4 +570,4 @@ class TestPerClassSentinel:
         assert _is_per_class_sentinel("training:val/map_per_class", 0.42) is False
 
     def test_unrelated_key_kept(self) -> None:
-        assert _is_per_class_sentinel("training:val/map_50", -1.0) is False
+        assert _is_per_class_sentinel("training:val/map", -1.0) is False

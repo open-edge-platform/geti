@@ -29,9 +29,9 @@ _REVISION = "0b502f037865f4cf9ec1254a8c34fc3f19caaeef"
 _LABEL_NAMES = ("axial-MRI", "negative", "positive")
 
 _SPLIT_FILES = {
-    "train": "train-00000-of-00001-62cf6bf015fef032.parquet",
-    "validation": "validation-00000-of-00001-bcd8291312ff472b.parquet",
-    "test": "test-00000-of-00001-7780878af8cf3e7b.parquet",
+    "train": "data/train-00000-of-00001-62cf6bf015fef032.parquet",
+    "validation": "data/validation-00000-of-00001-bcd8291312ff472b.parquet",
+    "test": "data/test-00000-of-00001-7780878af8cf3e7b.parquet",
 }
 
 

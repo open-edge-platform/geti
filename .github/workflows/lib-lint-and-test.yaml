@@ -202,6 +202,13 @@ jobs:
       - check-paths
     if: needs.check-paths.outputs.run_benchmark_dataset_scripts == 'true'
     timeout-minutes: 30
+    # Kaggle API token for the (optional, credential-gated) real-download
+    # test in test_prepare_brain_tumor.py. Only set for same-repo runs —
+    # GitHub never exposes secrets to `pull_request` workflows triggered from
+    # forks, so that one test skips itself gracefully (via a `skipif` check)
+    # rather than failing on external contributors' PRs.
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -224,7 +231,7 @@ jobs:
         working-directory: library
         env:
           GIT_LFS_SKIP_SMUDGE: "1"
-        run: just venv
+        run: just venv-benchmark
 
       - name: Run benchmark dataset script tests
         working-directory: library
