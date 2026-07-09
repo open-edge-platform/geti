@@ -3,7 +3,7 @@
 
 import { Flex, Switch, TextField } from '@geti-ui/ui';
 
-import type { ImagesFolderSourceConfig } from '../../../../api/shared-types';
+import type { ImagesFolderSourceConfig } from '@/api/types';
 
 type ImageFolderProps = {
     defaultState?: ImagesFolderSourceConfig;

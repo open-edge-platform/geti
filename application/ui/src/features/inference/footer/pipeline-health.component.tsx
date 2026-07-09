@@ -17,7 +17,7 @@ import {
 import { InfoOutline } from '@geti-ui/ui/icons';
 import { usePipelineHealth } from 'hooks/api/pipeline.hook';
 
-import { PipelineComponentsHealth } from '../../../api/shared-types';
+import type { PipelineComponentsHealth } from '@/api/types';
 import { getComponentStatusMeta, getOverallStatusMeta, shouldShowPipelineHealthDetails } from './utils';
 
 const COMPONENT_ORDER = ['source', 'sink', 'model'] as const;

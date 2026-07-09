@@ -8,7 +8,7 @@ import { getMockedDatasetItem } from 'mocks/mock-dataset-item';
 import { getMockedMediaImage, getMockedVideoFrame, getMultipleMockedMediaImage } from 'mocks/mock-media';
 import { renderHook } from 'test-utils/render';
 
-import type { AnnotationDTO } from '../../../api/shared-types';
+import type { AnnotationDTO } from '@/api/types';
 import { useVideoPlayerContext } from '../../annotator/video-player/video-player-provider.component';
 import { getInitialAnnotations, getNextMediaItem, useNextMediaItem, usePlayPauseVideoBySystem } from './utils';
 

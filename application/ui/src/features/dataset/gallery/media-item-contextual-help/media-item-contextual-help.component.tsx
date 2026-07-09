@@ -3,7 +3,7 @@
 
 import { Content, ContextualHelp, Divider, Text } from '@geti-ui/ui';
 
-import { Media, MediaVideo } from '../../../../api/shared-types';
+import type { Media, MediaVideo } from '@/api/types';
 import { isVideo } from '../../../../shared/media-item-utils';
 
 import classes from './media-item-contextual-help.module.scss';

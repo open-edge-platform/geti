@@ -7,7 +7,7 @@ import { Badge, dimensionValue, Flex, Heading, Text, View } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 import { NavLink } from 'react-router-dom';
 
-import { Project } from '../../../api/shared-types';
+import type { Project } from '@/api/types';
 import placeholderThumbnailIconUrl from '../../../assets/icons/image-icon.svg?url';
 import { paths } from '../../../constants/paths';
 import { getProjectThumbnailUrl } from '../../../shared/media-url.utils';

@@ -4,7 +4,7 @@
 import { Badge, Flex, Text } from '@geti-ui/ui';
 import { useNavigate } from 'react-router';
 
-import { Project } from '../../../api/shared-types';
+import type { Project } from '@/api/types';
 import { paths } from '../../../constants/paths';
 import {
     ProjectActionsMenu,

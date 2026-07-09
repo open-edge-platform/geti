@@ -4,7 +4,7 @@
 import { dimensionValue, Divider, Flex, Grid, Text } from '@geti-ui/ui';
 import { isEmpty, isNil } from 'lodash-es';
 
-import { ExportDatasetMetadata } from '../../../../../../api/shared-types';
+import type { ExportDatasetMetadata } from '@/api/types';
 import { useProject } from '../../../../../../hooks/api/project.hook';
 
 type ExportJobDetailsProps = {

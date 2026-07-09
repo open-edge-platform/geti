@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { render } from 'test-utils/render';
 
-import { Label } from '../../../../../api/shared-types';
+import type { Label } from '@/api/types';
 import { EMPTY_LABEL_ID } from '../../../../../shared/annotator/labels';
 import { LabelsList } from './labels-list.component';
 

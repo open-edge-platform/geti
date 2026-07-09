@@ -1,10 +1,10 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { VideoFramePrediction } from '@/api/types';
 import { usePrefetchQuery, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { VideoFramePrediction } from '../../../../api/shared-types';
 import { mediaPredictionsQueryOptions } from '../../api/use-media-predictions';
 import { usePredictionSetup } from '../../predictions-setup-provider.component';
 import { useVideoPlayer } from '../video-player-provider.component';

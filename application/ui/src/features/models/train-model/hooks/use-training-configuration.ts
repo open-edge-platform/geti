@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { TrainingConfiguration } from '../../../../api/shared-types';
+import type { TrainingConfiguration } from '@/api/types';
 import {
     useGetModelArchitectureTrainingConfiguration,
     useGetModelTrainingConfiguration,

@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { DatasetStatisticsView, type DatasetItem } from '../src/api/shared-types';
+import type { DatasetItem, DatasetStatisticsView } from '@/api/types';
 
 export const getMockedDatasetItem = (overrides: Partial<DatasetItem>): DatasetItem => ({
     id: '1',

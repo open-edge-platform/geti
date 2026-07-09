@@ -6,7 +6,7 @@ import { Key } from 'react';
 import { Item, Picker } from '@geti-ui/ui';
 
 import { $api } from '../../api/client';
-import { DeviceInfo } from '../../api/shared-types';
+import type { DeviceInfo } from '@/api/types';
 
 // Generate device id based on type and index (if available) to ensure uniqueness
 // in case of multiple devices of the same type (e.g., multiple GPUs)

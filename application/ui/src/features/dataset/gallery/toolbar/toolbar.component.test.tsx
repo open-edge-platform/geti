@@ -9,7 +9,7 @@ import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import type { Media } from '../../../../api/shared-types';
+import type { Media } from '@/api/types';
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
 import { isImage } from '../../../../shared/media-item-utils';

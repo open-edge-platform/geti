@@ -3,7 +3,7 @@
 
 import { Flex } from '@geti-ui/ui';
 
-import type { Media, MediaVideo } from '../../api/shared-types';
+import type { Media, MediaVideo } from '@/api/types';
 import { isVideo } from '../../shared/media-item-utils';
 import { formatCompactDuration } from './util';
 

@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Label } from '../../../../api/shared-types';
+import type { Label } from '@/api/types';
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import type { AnnotationLabelRef } from '../../../../shared/types';
 

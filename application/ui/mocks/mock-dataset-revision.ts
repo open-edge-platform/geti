@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { DatasetRevision } from '../src/api/shared-types';
+import type { DatasetRevision } from '@/api/types';
 
 export const getMockedDatasetRevision = (overrides: Partial<DatasetRevision> = {}): DatasetRevision => ({
     id: 'dataset-1',

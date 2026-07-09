@@ -4,7 +4,7 @@
 import { getMockedModel } from 'mocks/mock-model';
 import { describe, expect, it } from 'vitest';
 
-import type { Metric } from '../../../../../api/shared-types';
+import type { Metric } from '@/api/types';
 import {
     getFirstAvailableTestingMetric,
     getModelEvaluations,

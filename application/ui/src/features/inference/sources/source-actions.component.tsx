@@ -8,7 +8,7 @@ import { Back } from '@geti-ui/ui/icons';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEmpty, orderBy } from 'lodash-es';
 
-import type { SourceConfig } from '../../../api/shared-types';
+import type { SourceConfig } from '@/api/types';
 import { useSourcesQuery } from './api/use-sources';
 import { EditSourceForm } from './edit-source-form.component';
 import { SourcesList } from './source-list/source-list.component';

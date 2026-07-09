@@ -3,9 +3,9 @@
 
 import { useActionState } from 'react';
 
+import type { SinkConfig } from '@/api/types';
 import { isFunction } from 'lodash-es';
 
-import type { SinkConfig } from '../../../../api/shared-types';
 import { toast } from '../../../../components/toast/toast.component';
 import { useSinkMutation } from './use-sink-mutation.hook';
 

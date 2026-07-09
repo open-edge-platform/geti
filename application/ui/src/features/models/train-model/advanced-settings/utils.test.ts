@@ -6,11 +6,11 @@ import {
     getMockedConfigurationParameterGroup,
 } from 'mocks/mock-training-configuration';
 
-import {
+import type {
     ConfigurableParameter,
     ConfigurableParameterGroup,
     TrainingConfigurationParameter,
-} from '../../../../api/shared-types';
+} from '@/api/types';
 import { isParameter, isParameterGroup } from '../../model-listing/model-training-parameters/utils';
 import { learningParameters } from './training/learning-parameters/mocks';
 import { LearningConfigurationGroup } from './training/learning-parameters/utils';

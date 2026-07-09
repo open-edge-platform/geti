@@ -3,7 +3,7 @@
 
 import { isMac } from '@react-aria/utils';
 
-import { TaskType } from '../api/shared-types';
+import type { TaskType } from '@/api/types';
 
 const CTRL_KEY = 'ctrl';
 const COMMAND_KEY = 'meta';

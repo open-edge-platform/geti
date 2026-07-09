@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Model } from '../../api/shared-types';
+import type { Model } from '@/api/types';
 
 export type SelectableModel = { modelVariantId: string; name: string; modelId: string };
 

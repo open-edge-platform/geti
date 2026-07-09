@@ -1,13 +1,13 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import {
+import type {
     BoolConfigurableParameter,
     ConfigurableParameterGroup,
     NumberConfigurableParameter,
     TrainingConfiguration,
     TrainingConfigurationParameter,
-} from '../../../../../../api/shared-types';
+} from '@/api/types';
 import {
     findGroupByKey,
     isParameter,

@@ -6,7 +6,7 @@ import { Add as AddIcon } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { isEqual } from 'lodash-es';
 
-import type { SinkConfig } from '../../../../api/shared-types';
+import type { SinkConfig } from '@/api/types';
 import { ConnectionStatusBadge } from '../../../../components/connection-status-badge/connection-status-badge.component';
 import { usePipeline } from '../../../../hooks/api/pipeline.hook';
 import { getErrorMessage } from '../../../../query-client/query-client';

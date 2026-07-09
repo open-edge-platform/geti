@@ -3,7 +3,7 @@
 
 import { PointerEvent, useEffect, useRef, useState } from 'react';
 
-import type { Media } from '../../../api/shared-types';
+import type { Media } from '@/api/types';
 import { useAnnotationActions } from '../../../shared/annotator/annotation-actions-provider.component';
 import { useAnnotationVisibility } from '../../../shared/annotator/annotation-visibility-provider.component';
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';

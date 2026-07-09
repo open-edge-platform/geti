@@ -10,7 +10,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { range } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
-import type { AnnotationDTO, Media } from '../../../api/shared-types';
+import type { AnnotationDTO, Media } from '@/api/types';
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
 import { isVideoFrame } from '../../../shared/media-item-utils';
 import { loadImageQueryOptions } from '../../annotator/hooks/use-load-image-query.hook';

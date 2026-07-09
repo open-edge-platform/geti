@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { PhotoPlaceholder, View, type DimensionValue } from '@geti-ui/ui';
 
-import { type Project } from '../../../api/shared-types';
+import type { Project } from '@/api/types';
 import { getProjectThumbnailUrl } from '../../../shared/media-url.utils';
 
 import classes from './project-thumbnail.module.scss';

@@ -1,14 +1,13 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Page } from '@playwright/test';
-
 import type {
     CreateProjectLabelName,
     CreateProjectRequest,
     CreateProjectResponse,
     CreateProjectTaskType,
-} from '../../src/api/shared-types';
+} from '@/api/types';
+import { Page } from '@playwright/test';
 
 export type CreateProjectInput = {
     projectName?: CreateProjectRequest['name'];

@@ -6,7 +6,7 @@ import { useDeleteStagedDataset } from 'hooks/api/staged-dataset.hook';
 import { getJobProgress, isJobRunning } from 'hooks/api/util';
 import capitalize from 'lodash-es/capitalize';
 
-import { Job } from '../../../api/shared-types';
+import type { Job } from '@/api/types';
 import { CancelJobConfirmation } from '../../../features/dataset/import-export/cancel-job-confirmation/cancel-job-confirmation.component';
 import { BottomProgressBar } from '../../../features/models/model-listing/current-model-running/bottom-progress-bar.component';
 import { formatBytes } from '../../../shared/util';

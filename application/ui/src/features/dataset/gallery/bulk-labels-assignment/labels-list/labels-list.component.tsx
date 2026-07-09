@@ -6,7 +6,7 @@ import { useDeferredValue, useMemo, useState } from 'react';
 import { Flex, Item, ListView, Selection, Text, TextField, View } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
 
-import { Label } from '../../../../../api/shared-types';
+import type { Label } from '@/api/types';
 import { EMPTY_LABEL_ID } from '../../../../../shared/annotator/labels';
 
 type LabelsListProps = {

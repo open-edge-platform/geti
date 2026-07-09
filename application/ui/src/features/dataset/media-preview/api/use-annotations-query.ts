@@ -6,7 +6,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty, isObject } from 'lodash-es';
 
 import { fetchClient } from '../../../../api/client';
-import type { AnnotationDTO, DatasetSubset, Media } from '../../../../api/shared-types';
+import type { AnnotationDTO, DatasetSubset, Media } from '@/api/types';
 import { getQueryKey } from '../../../../query-client/query-client';
 import { EMPTY_LABEL_ID } from '../../../../shared/annotator/labels';
 import { isVideoFrame } from '../../../../shared/media-item-utils';

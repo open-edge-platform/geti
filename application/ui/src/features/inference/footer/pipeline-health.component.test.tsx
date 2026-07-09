@@ -7,7 +7,7 @@ import { getMockedPipelineHealth, getMockedStatus } from 'mocks/mock-pipeline-he
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import { type PipelineHealth as PipelineHealthType } from '../../../api/shared-types';
+import type { PipelineHealth as PipelineHealthType } from '@/api/types';
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
 import { PipelineHealth } from './pipeline-health.component';

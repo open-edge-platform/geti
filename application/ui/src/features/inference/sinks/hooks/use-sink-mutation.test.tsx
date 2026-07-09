@@ -5,7 +5,7 @@ import { act, waitFor } from '@testing-library/react';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
-import type { LocalFolderSinkConfig } from '../../../../api/shared-types';
+import type { LocalFolderSinkConfig } from '@/api/types';
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
 import { useSinkMutation } from './use-sink-mutation.hook';

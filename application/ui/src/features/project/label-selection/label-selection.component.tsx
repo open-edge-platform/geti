@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { Flex } from '@geti-ui/ui';
 
-import type { Label, TaskType } from '../../../api/shared-types';
+import type { Label, TaskType } from '@/api/types';
 import { toast } from '../../../components/toast/toast.component';
 import { CreateLabel } from './create-label/create-label.component';
 import { LabelTag } from './label-tag/label-tag.component';

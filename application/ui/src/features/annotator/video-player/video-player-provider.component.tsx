@@ -15,10 +15,10 @@ import {
     useState,
 } from 'react';
 
+import type { MediaVideoFrame } from '@/api/types';
 import { VisuallyHidden } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import type { MediaVideoFrame } from '../../../api/shared-types';
 import { getMediaBinaryUrl } from '../../../shared/media-url.utils';
 import { useVideoControls, VideoControls } from './use-video-controls';
 import { VideoPlayerErrorReason } from './video-player-error';

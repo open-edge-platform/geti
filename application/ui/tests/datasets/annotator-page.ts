@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DatasetSubset } from '@/api/types';
 import { expect, type Page } from '@playwright/test';
 
-import { DatasetSubset } from '../../src/api/shared-types';
 import { paths } from '../../src/constants/paths';
 
 export class AnnotatorPage {

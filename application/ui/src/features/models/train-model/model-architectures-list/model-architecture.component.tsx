@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ModelArchitectureWithPerformanceCategory } from '../../../../api/shared-types';
+import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { PerformanceCategoryBadge } from '../../model-listing/components/model-row/performance-category-badge.component';
 import { ModelArchitectureCard } from './model-architecture-card/model-architecture-card.component';
 

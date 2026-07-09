@@ -6,7 +6,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isFunction } from 'lodash-es';
 
 import { $api } from '../../../api/client';
-import { MediaDTO } from '../../../api/shared-types';
+import type { MediaDTO } from '@/api/types';
 import { getErrorMessage, getQueryKey } from '../../../query-client/query-client';
 import { useUploadProgress } from '../hooks/use-display-upload-progress';
 

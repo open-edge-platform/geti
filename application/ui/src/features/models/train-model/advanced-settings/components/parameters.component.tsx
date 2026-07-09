@@ -18,13 +18,13 @@ import {
 } from '@geti-ui/ui';
 import { isBoolean, isFunction } from 'lodash-es';
 
-import {
+import type {
     ConfigurableParameter,
     ConfigurableParameterGroup,
     NumberEnumConfigurableParameter,
     StringEnumConfigurableParameter,
     TrainingConfigurationParameter,
-} from '../../../../../api/shared-types';
+} from '@/api/types';
 import { isParameter } from '../../../model-listing/model-training-parameters/utils';
 import {
     isBoolEnableParameterGroup,

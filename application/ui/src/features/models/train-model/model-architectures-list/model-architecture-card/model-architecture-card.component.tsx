@@ -6,7 +6,7 @@ import { createContext, ReactNode, useContext } from 'react';
 import { Content, ContextualHelp, Divider, Flex, Heading, Radio, Text } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 
-import { type ModelArchitecture as ModelArchitectureType } from '../../../../../api/shared-types';
+import type { ModelArchitecture as ModelArchitectureType } from '@/api/types';
 import { UltralyticsLicense } from '../../../components/ultralytics-license.component';
 import { isUltralyticsModel } from '../../../utils';
 import { getAccuracyMetric } from '../utils';

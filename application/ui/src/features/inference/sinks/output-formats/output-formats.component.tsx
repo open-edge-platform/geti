@@ -3,7 +3,7 @@
 
 import { Checkbox, CheckboxGroup } from '@geti-ui/ui';
 
-import type { SinkOutputFormats } from '../../../../api/shared-types';
+import type { SinkOutputFormats } from '@/api/types';
 import { OutputFormat } from '../utils';
 
 import classes from './output-formats.module.scss';

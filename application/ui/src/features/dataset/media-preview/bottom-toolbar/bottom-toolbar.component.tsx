@@ -1,12 +1,12 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DatasetSubset, Media } from '@/api/types';
 import { Flex, Grid, Item, Key, Picker, Tag, Text } from '@geti-ui/ui';
 import { Accept, Search } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { capitalize } from 'lodash-es';
 
-import { DatasetSubset, Media } from '../../../../api/shared-types';
 import { Hotkeys } from '../primary-toolbar/hotkeys/hotkeys.component';
 import { Settings } from '../primary-toolbar/settings/settings.component';
 import { ToggleFocus } from '../primary-toolbar/toggle-focus.component';

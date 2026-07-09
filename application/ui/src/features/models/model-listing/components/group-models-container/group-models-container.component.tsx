@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Model } from '@/api/types';
 import { Disclosure, DisclosurePanel, DisclosureTitle, Flex } from '@geti-ui/ui';
 
-import { Model } from '../../../../../api/shared-types';
 import { useGetTaskModelArchitectures } from '../../../hooks/api/use-get-model-architectures.hook';
 import { ModelDetailsTabs } from '../../model-details/model-details-tabs.component';
 import { useModelListing } from '../../provider/model-listing-provider';

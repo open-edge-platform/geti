@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { dimensionValue, Flex, Heading, Text } from '@geti-ui/ui';
 
-import { type ModelArchitectureWithPerformanceCategory } from '../../../../../api/shared-types';
 import { PerformanceCategoryBadge } from '../model-row/performance-category-badge.component';
 
 type ArchitectureGroupHeaderProps = {

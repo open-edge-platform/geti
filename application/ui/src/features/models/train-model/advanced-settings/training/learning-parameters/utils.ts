@@ -1,12 +1,12 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import {
+import type {
     ConfigurableParameterGroup,
     NumberEnumConfigurableParameter,
     TrainingConfiguration,
     TrainingConfigurationParameter,
-} from '../../../../../../api/shared-types';
+} from '@/api/types';
 import { findGroupByKey, isParameter } from '../../../../model-listing/model-training-parameters/utils';
 import { isEnumNumberParameter } from '../../utils';
 

@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 
 import { Grid, Text } from '@geti-ui/ui';
 
-import { TrainingConfigurationParameter } from '../../../../api/shared-types';
+import type { TrainingConfigurationParameter } from '@/api/types';
 import { useGetModelTrainingConfiguration } from '../../hooks/api/use-get-model-training-configuration.hook';
 import { filterDependentParameters } from '../../train-model/advanced-settings/utils';
 import { Box } from '../components/box/box.component';

@@ -3,7 +3,7 @@
 
 import { orderBy } from 'lodash-es';
 
-import { Project } from '../../../../api/shared-types';
+import type { Project } from '@/api/types';
 
 export const SORT_BY_OPTIONS = [
     [

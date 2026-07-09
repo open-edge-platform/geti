@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DatasetRevisionItem, Media } from '../../../../api/shared-types';
+import type { DatasetRevisionItem, Media } from '@/api/types';
 
 /**
  * Converts a DatasetRevisionItem to Media format.

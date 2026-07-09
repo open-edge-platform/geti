@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DatasetRevision, Model, ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { Badge, Flex, Grid, Text } from '@geti-ui/ui';
 
-import type { DatasetRevision, Model, ModelArchitectureWithPerformanceCategory } from '../../../../../api/shared-types';
 import { formatTrainingDateTime } from '../../../../../shared/date-utils';
 import { formatBytes } from '../../../../../shared/util';
 import { GRID_COLUMNS } from '../../constants';
@@ -16,6 +16,9 @@ import { DatasetColumn } from './dataset-revision-column.component';
 import { getTestingMetric } from './utils';
 
 import classes from './model-row.module.scss';
+
+// Copyright (C) 2025-2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
 
 type ModelRowProps = {
     model: Model;

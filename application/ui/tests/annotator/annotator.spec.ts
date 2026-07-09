@@ -1,6 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AnnotationDTO, DatasetSubset, PredictionDTO } from '@/api/types';
 import { expect, type Locator } from '@playwright/test';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedModel } from 'mocks/mock-model';
@@ -8,7 +9,6 @@ import { getMockedVariant } from 'mocks/mock-model-variant';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
-import { AnnotationDTO, DatasetSubset, PredictionDTO } from '../../src/api/shared-types';
 import { Polygon } from '../../src/shared/types';
 import { http, test } from '../fixtures';
 import { blueLabel, candyBinaryHandler, redLabel } from './annotator-fixtures';

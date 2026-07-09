@@ -4,7 +4,7 @@
 import { getMockedDatasetRevision } from 'mocks/mock-dataset-revision';
 import { getMockedModel } from 'mocks/mock-model';
 
-import type { DatasetRevision } from '../../../../api/shared-types';
+import type { DatasetRevision } from '@/api/types';
 import type { DatasetGroup } from '../types';
 import { groupModelsByArchitecture, groupModelsByDataset } from './grouping';
 

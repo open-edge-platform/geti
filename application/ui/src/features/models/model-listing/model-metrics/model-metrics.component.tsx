@@ -3,7 +3,7 @@
 
 import { Flex, Loading, Text } from '@geti-ui/ui';
 
-import type { Evaluation } from '../../../../api/shared-types';
+import type { Evaluation } from '@/api/types';
 import { useGetModelTrainingMetrics } from '../../hooks/api/use-get-model-training-metrics.hook';
 import { ModelEvaluations } from './model-evaluations.component';
 import { ModelMetricsGraphs } from './model-metrics-graphs.component';

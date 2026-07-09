@@ -7,7 +7,7 @@ import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
-import type { Label } from '../../../api/shared-types';
+import type { Label } from '@/api/types';
 import { validateLabelHotkey, validateLabelName } from '../../../components/label-fields/label-validation';
 import { useAnnotationActions } from '../../../shared/annotator/annotation-actions-provider.component';
 import { EMPTY_LABEL_ID, filterOutEmptyLabels } from '../../../shared/annotator/labels';

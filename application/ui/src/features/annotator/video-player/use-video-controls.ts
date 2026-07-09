@@ -3,7 +3,7 @@
 
 import { RefObject, useState } from 'react';
 
-import type { MediaVideoFrame } from '../../../api/shared-types';
+import type { MediaVideoFrame } from '@/api/types';
 
 export type VideoControls = {
     canSelectPreviousFrame: boolean;

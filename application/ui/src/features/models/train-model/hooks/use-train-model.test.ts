@@ -7,7 +7,7 @@ import { renderHook } from 'test-utils/render';
 import { vi } from 'vitest';
 
 import { getMockedJob } from '../../../../../mocks/mock-job';
-import { ConfigurableParameter, ConfigurableParameterGroup } from '../../../../api/shared-types';
+import type { ConfigurableParameter, ConfigurableParameterGroup } from '@/api/types';
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
 import { findGroupByKey } from '../../model-listing/model-training-parameters/utils';

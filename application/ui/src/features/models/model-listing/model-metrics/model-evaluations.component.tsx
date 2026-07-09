@@ -3,7 +3,7 @@
 
 import { Grid, Text } from '@geti-ui/ui';
 
-import type { Evaluation } from '../../../../api/shared-types';
+import type { Evaluation } from '@/api/types';
 import { Box } from '../components/box/box.component';
 import { getTestingMetrics } from '../components/model-row/utils';
 

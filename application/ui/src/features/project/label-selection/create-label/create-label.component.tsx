@@ -8,7 +8,7 @@ import { Add } from '@geti-ui/ui/icons';
 import { useEventListener } from 'hooks/event-listener.hook';
 import { v4 as uuid } from 'uuid';
 
-import type { Label, TaskType } from '../../../../api/shared-types';
+import type { Label, TaskType } from '@/api/types';
 import { HotkeyField } from '../../../../components/label-fields/hotkey-field.component';
 import { LabelColorPicker } from '../../../../components/label-fields/label-color-picker.component';
 import { validateLabelHotkey, validateLabelName } from '../../../../components/label-fields/label-validation';

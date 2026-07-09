@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Flex, TextField } from '@geti-ui/ui';
 import { open } from '@tauri-apps/plugin-dialog';
 
-import type { LocalFolderSinkConfig } from '../../../../api/shared-types';
+import type { LocalFolderSinkConfig } from '@/api/types';
 import { normalizeSelectedPath } from '../../shared/tauri-dialog';
 import { OutputFormats } from '../output-formats/output-formats.component';
 import { RateLimitFields } from '../rate-limit/rate-limit-fields.component';

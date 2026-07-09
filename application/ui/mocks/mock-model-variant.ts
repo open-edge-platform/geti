@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ModelVariant } from '../src/api/shared-types';
+import type { ModelVariant } from '@/api/types';
 
 export const getMockedVariant = (overrides: Partial<ModelVariant> = {}): ModelVariant => ({
     id: 'variant-id',

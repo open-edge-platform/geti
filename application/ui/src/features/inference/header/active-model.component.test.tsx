@@ -8,7 +8,7 @@ import { getMockedPipeline } from 'mocks/mock-pipeline';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import { Model, Pipeline } from '../../../api/shared-types';
+import type { Model, Pipeline } from '@/api/types';
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
 import { ActiveModel } from './active-model.component';

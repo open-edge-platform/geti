@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Evaluation, Metric, Model, TaskType } from '../../../../../api/shared-types';
+import type { Evaluation, Metric, Model, TaskType } from '@/api/types';
 import { isClassificationTask } from '../../../../project/task-type-guards';
 
 export const getModelEvaluations = (model: Model): Evaluation[] => {

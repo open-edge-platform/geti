@@ -1,7 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ModelArchitectureWithPerformanceCategory } from '../../../../../api/shared-types';
+import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
+
 import { useModelListing } from '../../provider/model-listing-provider';
 import type { ArchitectureGroup, DatasetGroup } from '../../types';
 import { ArchitectureGroupHeader } from './architecture-group-header.component';

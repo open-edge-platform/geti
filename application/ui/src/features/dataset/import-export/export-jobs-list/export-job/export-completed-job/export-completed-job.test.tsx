@@ -8,7 +8,7 @@ import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { getMockedJobExportJob } from '../../../../../../../mocks/mock-job';
-import { ExportDatasetJob } from '../../../../../../api/shared-types';
+import type { ExportDatasetJob } from '@/api/types';
 import { http } from '../../../../../../api/utils';
 import { server } from '../../../../../../msw-node-setup';
 import { downloadFile } from '../../../../../../shared/util';

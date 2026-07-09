@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { TaskType } from '../../api/shared-types';
+import type { TaskType } from '@/api/types';
 import { ImportDatasetAsNewProjectState } from '../../features/dataset/import-export/import-dataset/util';
 import { useDatasetImportStorage } from './use-dataset-import-storage.hook';
 import { DatasetImportState } from './utils';

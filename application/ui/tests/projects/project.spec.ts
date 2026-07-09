@@ -1,10 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ProjectCreate } from '@/api/types';
 import { HttpResponse } from 'msw';
 
 import { getMockedProject } from '../../mocks/mock-project';
-import type { ProjectCreate } from '../../src/api/shared-types';
 import { expect, http, test } from '../fixtures';
 import { stepCreateProject } from '../workflows/workflow-steps';
 import { ProjectPage } from './project-page';

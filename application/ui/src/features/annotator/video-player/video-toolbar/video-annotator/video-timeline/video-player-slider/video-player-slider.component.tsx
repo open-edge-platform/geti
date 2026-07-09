@@ -3,11 +3,11 @@
 
 import { PointerEvent, RefObject, useEffect, useRef, useState } from 'react';
 
+import type { MediaVideoFrame } from '@/api/types';
 import { useDebouncedCallback } from 'hooks/use-debounced-callback/use-debounced-callback.hook';
 import { defer } from 'lodash-es';
 import { useHover } from 'react-aria';
 
-import type { MediaVideoFrame } from '../../../../../../../api/shared-types';
 import { FRAME_STEP_TO_DISPLAY_ALL_FRAMES } from '../../../frame-step/utils';
 import { ThumbnailPreview } from './thumbnail-preview.component';
 import { VideoSlider } from './video-slider.component';

@@ -6,7 +6,7 @@ import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-
 import { useProjectLabels } from 'hooks/use-project-labels.hook';
 import { capitalize, isEmpty } from 'lodash-es';
 
-import type { DatasetItemAnnotationStatus, Label } from '../../../../api/shared-types';
+import type { DatasetItemAnnotationStatus, Label } from '@/api/types';
 import { formatDateRangeEnd, formatDateRangeStart } from '../../../../shared/date-utils';
 import { isNonEmptyArray } from '../../../../shared/util';
 import { FilterChips } from '../toolbar/media-filtering/filter-chips/filter-chips.component';

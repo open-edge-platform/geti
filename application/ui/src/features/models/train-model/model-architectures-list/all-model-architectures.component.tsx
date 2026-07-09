@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { Flex } from '@geti-ui/ui';
 
-import type { ModelArchitecture as ModelArchitectureType } from '../../../../api/shared-types';
+import type { ModelArchitecture as ModelArchitectureType } from '@/api/types';
 import { SortModelArchitectures } from '../sort-model-architectures/sort-model-architectures.component';
 import { SORT_OPTIONS, SORTING_HANDLERS, SortingOptions } from '../sort-model-architectures/utils';
 import { DetailedModelArchitecture } from './model-architecture.component';

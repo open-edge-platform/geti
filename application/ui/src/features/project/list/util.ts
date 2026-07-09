@@ -3,7 +3,7 @@
 
 import dayjs from 'dayjs';
 
-import { Task, TaskType } from '../../../api/shared-types';
+import type { Task, TaskType } from '@/api/types';
 import { isMultiLabelClassificationTask } from '../task-type-guards';
 
 export const formatCreationDate = (creationDate: string) => {

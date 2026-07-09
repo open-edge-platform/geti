@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { getMockedModelArchitecture } from 'mocks/mock-model';
 import { render } from 'test-utils/render';
 
-import { ModelArchitectureWithPerformanceCategory } from '../../../../api/shared-types';
+import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { DetailedModelArchitecture, ModelArchitecture } from './model-architecture.component';
 import { ModelArchitecturesListLayout } from './model-architectures-list-layout/model-architectures-list-layout.component';
 

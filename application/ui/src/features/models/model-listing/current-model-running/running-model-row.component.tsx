@@ -10,7 +10,7 @@ import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
 import { isTrainJob } from 'hooks/api/util';
 import { capitalize } from 'lodash-es';
 
-import { DatasetRevision, Job, ModelArchitectureWithPerformanceCategory } from '../../../../api/shared-types';
+import type { DatasetRevision, Job, ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { formatDateTime } from '../../../../shared/date-utils';
 import { useGetModel } from '../../hooks/api/use-get-model.hook';
 import { TrainingLogsDialog } from '../../training-logs/training-logs-dialog.component';

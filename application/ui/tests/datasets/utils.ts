@@ -1,11 +1,11 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Job } from '@/api/types';
 import { getMockedJob } from 'mocks/mock-job';
 import { getMockedStagedDataset } from 'mocks/mock-staged-dataset';
 import { HttpResponse } from 'msw';
 
-import { Job } from '../../src/api/shared-types';
 import { http } from '../fixtures';
 
 export const STAGED_DATASET_ID = 'staged-dataset-789';

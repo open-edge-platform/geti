@@ -11,7 +11,7 @@ import {
 } from 'mocks/mock-training-configuration';
 import { render } from 'test-utils/render';
 
-import { TrainingConfiguration } from '../../../../../../api/shared-types';
+import type { TrainingConfiguration } from '@/api/types';
 import { isParameter, isParameterGroup } from '../../../../model-listing/model-training-parameters/utils';
 import { isBoolEnableParameter, isBoolParameter } from '../../utils';
 import { DataAugmentation } from './data-augmentation.component';

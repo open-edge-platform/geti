@@ -4,7 +4,7 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import type { TrainingDevice } from '../../../../api/shared-types';
+import type { TrainingDevice } from '@/api/types';
 import { SelectTrainingDevice } from './select-training-device.component';
 
 const mockOnSelectTrainingDevice = vi.hoisted(() => vi.fn());

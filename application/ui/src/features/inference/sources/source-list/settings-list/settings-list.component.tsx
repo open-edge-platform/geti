@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { $api } from '../../../../../api/client';
-import type { SourceConfig } from '../../../../../api/shared-types';
+import type { SourceConfig } from '@/api/types';
 
 import classes from './settings-list.module.scss';
 

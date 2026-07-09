@@ -1,17 +1,17 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type {
+    NumberEnumConfigurableParameter,
+    TrainingConfigurationRequestPayload,
+    TrainingRequestPayload,
+} from '@/api/types';
 import { NetworkFixture } from '@msw/playwright';
 import { getMockedDatasetRevision } from 'mocks/mock-dataset-revision';
 import { getMockedJob } from 'mocks/mock-job';
 import { getMockedModel, getMockedModelArchitecture } from 'mocks/mock-model';
 import { HttpResponse } from 'msw';
 
-import {
-    NumberEnumConfigurableParameter,
-    TrainingConfigurationRequestPayload,
-    TrainingRequestPayload,
-} from '../../src/api/shared-types';
 import { findGroupByKey } from '../../src/features/models/model-listing/model-training-parameters/utils';
 import {
     isInputSizeHeightParameter,

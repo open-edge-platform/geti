@@ -3,7 +3,7 @@
 
 import { useProject } from 'hooks/api/project.hook';
 
-import type { Label } from '../api/shared-types';
+import type { Label } from '@/api/types';
 
 export const useProjectLabels = (): Label[] => {
     const { data: project } = useProject();

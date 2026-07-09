@@ -7,7 +7,7 @@ import { getMockedPrepareImportDatasetJob } from 'mocks/mock-job';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import { Job } from '../../api/shared-types';
+import type { Job } from '@/api/types';
 import { http } from '../../api/utils';
 import { server } from '../../msw-node-setup';
 import { formatBytes } from '../../shared/util';
