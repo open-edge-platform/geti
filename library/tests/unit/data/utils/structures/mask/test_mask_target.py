@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import numpy as np
 import torch
 from torchvision import tv_tensors
 
@@ -73,3 +74,39 @@ class TestMaskTargetSingle:
             meta_info={"img_shape": (32, 32)},
         )
         assert targets.shape[0] == 0
+
+    def test_empty_masks_with_positive_proposals_keep_count(self) -> None:
+        """Empty gt_masks but N positive proposals must yield N (empty) targets.
+
+        ``mask_preds`` is produced for every positive proposal, so returning zero
+        targets here would desync the counts and crash the mask loss with
+        "Target size ... must be the same as input size ...".
+        """
+        gt_masks = tv_tensors.Mask(torch.zeros((0, 32, 32), dtype=torch.uint8))
+        targets = mask_target_single(
+            _proposals(2),
+            torch.zeros((2,), dtype=torch.long),
+            gt_masks,
+            mask_size=[28, 28],
+            meta_info={"img_shape": (32, 32)},
+        )
+        # One (empty) target per positive proposal, not zero.
+        assert targets.shape == (2, 28, 28)
+
+    def test_unsupported_mask_type_keeps_count(self) -> None:
+        """A genuinely unsupported gt_masks type must still return N targets.
+
+        Even when the mask type cannot be interpreted, the target count must match
+        the number of positive proposals so the mask loss does not crash.
+        """
+        gt_masks = np.zeros((2, 32, 32), dtype=np.uint8)  # numpy: unsupported type
+
+        targets = mask_target_single(
+            _proposals(3),
+            torch.tensor([0, 1, 0]),
+            gt_masks,  # type: ignore[arg-type]
+            mask_size=[28, 28],
+            meta_info={"img_shape": (32, 32)},
+        )
+        # One (empty) target per positive proposal, keeping counts in sync.
+        assert targets.shape == (3, 28, 28)
