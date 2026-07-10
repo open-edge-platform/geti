@@ -7,8 +7,9 @@ import { QuantizationDialog } from './quantization-dialog/quantization-dialog.co
 
 type QuantizationRowProps = {
     modelId: string;
+    modelArchitectureId: string;
 };
-export const QuantizationRow = ({ modelId }: QuantizationRowProps) => {
+export const QuantizationRow = ({ modelId, modelArchitectureId }: QuantizationRowProps) => {
     return (
         <Flex marginTop={'size-150'} alignItems={'center'} justifyContent={'space-between'}>
             <Flex>
@@ -22,7 +23,13 @@ export const QuantizationRow = ({ modelId }: QuantizationRowProps) => {
             </Flex>
             <DialogTrigger>
                 <Button variant={'secondary'}>Start quantization</Button>
-                {(close) => <QuantizationDialog modelId={modelId} onClose={close} />}
+                {(close) => (
+                    <QuantizationDialog
+                        modelId={modelId}
+                        modelArchitectureId={modelArchitectureId}
+                        onClose={close}
+                    />
+                )}
             </DialogTrigger>
         </Flex>
     );

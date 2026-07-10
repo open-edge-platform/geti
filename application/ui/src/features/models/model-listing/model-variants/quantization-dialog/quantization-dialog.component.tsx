@@ -35,10 +35,11 @@ const useDatasetItemsCount = () => {
 
 type QuantizationDialogProps = {
     modelId: string;
+    modelArchitectureId: string;
     onClose: () => void;
 };
 
-export const QuantizationDialog = ({ modelId, onClose }: QuantizationDialogProps) => {
+export const QuantizationDialog = ({ modelId, modelArchitectureId, onClose }: QuantizationDialogProps) => {
     const [accuracyDrop, setAccuracyDrop] = useState(DEFAULT_QUANTIZATION_PARAMETERS.accuracyDrop);
     const [hasNoMaxAccuracyDrop, setHasNoMaxAccuracyDrop] = useState(
         DEFAULT_QUANTIZATION_PARAMETERS.hasNoMaxAccuracyDrop
@@ -66,6 +67,7 @@ export const QuantizationDialog = ({ modelId, onClose }: QuantizationDialogProps
                     job_type: 'quantize',
                     parameters: {
                         model_id: modelId,
+                        model_architecture_id: modelArchitectureId,
                         max_drop: hasNoMaxAccuracyDrop ? null : accuracyDrop / 100,
                         max_num_iterations: hasNoMaxAccuracyDrop ? null : maxNumIterations,
                         max_calibration_subset_size: usesFullCalibrationDataset ? totalCount : effectiveCalibrationSize,
