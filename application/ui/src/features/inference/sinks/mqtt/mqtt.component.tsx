@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { MqttSinkConfig } from '@/api/types';
 import { Flex, NumberField, Switch, TextField } from '@geti-ui/ui';
 
-import type { MqttSinkConfig } from '../../../../constants/shared-types';
 import { OutputFormats } from '../output-formats/output-formats.component';
 import { RateLimitFields } from '../rate-limit/rate-limit-fields.component';
 

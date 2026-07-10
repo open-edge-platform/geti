@@ -3,7 +3,8 @@
 
 import { useMemo, useState } from 'react';
 
-import { Project, TaskType } from '../../../../constants/shared-types';
+import type { Project, TaskType } from '@/api/types';
+
 import { filterProjects } from './utils';
 
 interface UseProjectFiltersResult {

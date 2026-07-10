@@ -1,7 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SinkOutputFormats, WebhookSinkConfig } from '../../../../constants/shared-types';
+import type { SinkOutputFormats, WebhookSinkConfig } from '@/api/types';
+
 import { getObjectFromFormData, rateLimitFromFormData, WebhookHttpMethod } from '../utils';
 
 export type Pair = Record<Fields, string>;

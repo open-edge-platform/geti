@@ -11,9 +11,9 @@ import {
     type SetStateAction,
 } from 'react';
 
+import type { TaskType } from '@/api/types';
 import { useProject } from 'hooks/api/project.hook';
 
-import type { TaskType } from '../../constants/shared-types';
 import type { ToolType } from '../../features/annotator/tools/interface';
 import { isClassificationTask, isSegmentationTask } from '../../features/project/task-type-guards';
 

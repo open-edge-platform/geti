@@ -3,12 +3,12 @@
 
 import { startTransition } from 'react';
 
+import type { ImagesFolderSourceConfig, VideoFileSourceConfig } from '@/api/types';
 import { act, screen, waitFor } from '@testing-library/react';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
-import type { ImagesFolderSourceConfig, VideoFileSourceConfig } from '../../../../constants/shared-types';
 import { server } from '../../../../msw-node-setup';
 import { prepareVideoFileFormData, videoFileBodyFormatter } from '../video-file/utils';
 import { useSourceAction } from './use-source-action.hook';

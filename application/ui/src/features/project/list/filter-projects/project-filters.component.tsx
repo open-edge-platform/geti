@@ -1,11 +1,11 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TaskType } from '@/api/types';
 import { Checkbox, CheckboxGroup, SearchField } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
 
 import { FilterPopoverButton } from '../../../../components/filter-popover-button/filter-popover-button.component';
-import { TaskType } from '../../../../constants/shared-types';
 import { pluralize } from '../../../../shared/util';
 import { MAP_PROJECT_TYPE_TO_TITLE } from '../util';
 import { TASK_TYPE_OPTIONS } from './utils';

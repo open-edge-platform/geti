@@ -1,6 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Project } from '@/api/types';
 import {
     ActionButton,
     Badge,
@@ -27,7 +28,6 @@ import { EnablePipelineBlockedDialog } from '../../components/enable-pipeline-bl
 import { DeleteProjectDialog } from '../../components/project-dialogs/delete-project-dialog.component';
 import { EditProjectNameDialog } from '../../components/project-dialogs/edit-project-name-dialog.component';
 import { paths } from '../../constants/paths';
-import { Project } from '../../constants/shared-types';
 import { ProjectActionsMenu } from '../../features/project/list/menu-actions/menu-actions.component';
 import { getProjectTypeTitle } from '../../features/project/list/util';
 import { ProjectThumbnail } from './project-thumbnail/project-thumbnail.component';

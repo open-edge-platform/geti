@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TrainingDevice } from '../../../../constants/shared-types';
+import type { TrainingDevice } from '@/api/types';
 
 const GPU_DEVICE_TYPES = ['xpu', 'cuda'];
 
