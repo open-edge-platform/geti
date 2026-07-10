@@ -3,7 +3,6 @@
 
 import type { Label } from '@/api/types';
 
-import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import type { AnnotationLabelRef } from '../../../../shared/types';
 
 export const toggleLabel = (newLabel: Label, labels: AnnotationLabelRef[]): AnnotationLabelRef[] => {
