@@ -23,12 +23,7 @@ export const QuantizationRow = ({ model }: QuantizationRowProps) => {
             </Flex>
             <DialogTrigger>
                 <Button variant={'secondary'}>Start quantization</Button>
-                {(close) => (
-                    <QuantizationDialog
-                        model={model}
-                        onClose={close}
-                    />
-                )}
+                {(close) => <QuantizationDialog model={model} onClose={close} />}
             </DialogTrigger>
         </Flex>
     );
