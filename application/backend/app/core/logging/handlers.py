@@ -45,14 +45,14 @@ class LoggerStdoutWriter:
             if char == "\r":
                 # Treat CRLF as a normal newline; only clear for in-line progress updates.
                 if i + 1 < len(msg) and msg[i + 1] == "\n":
-                    self._emit_buffer()
+                    self._emit_buffer(depth=2)
                     i += 2
                     continue
                 self._buffer.clear()
                 i += 1
                 continue
             if char == "\n":
-                self._emit_buffer()
+                self._emit_buffer(depth=2)
                 i += 1
                 continue
             self._buffer.append(char)
@@ -72,8 +72,11 @@ class LoggerStdoutWriter:
     def encoding(self) -> str:
         return getattr(self._original_stream, "encoding", "utf-8")
 
-    def _emit_buffer(self) -> None:
+    def _emit_buffer(self, depth: int = 1) -> None:
         msg = "".join(self._buffer).rstrip()
         if msg:
-            logger.log(self._level, msg)
+            logger.opt(depth=depth).log(self._level, msg)
         self._buffer.clear()
+
+    def close(self) -> None:
+        self.flush()
