@@ -183,7 +183,12 @@ def _asyncio_exception_handler(loop: asyncio.AbstractEventLoop, context: dict) -
 
 async def main_async() -> None:
     """Async main application entry point for Hypercorn"""
-    logger.info("Starting {} in {} mode via Hypercorn (HTTP/2)", settings.app_name, settings.environment)
+    logger.info(
+        "Starting {} version {} in {} mode via Hypercorn (HTTP/2)",
+        settings.app_name,
+        settings.version,
+        settings.environment,
+    )
 
     # WebView2 / browser clients frequently drop HTTP/2-over-TLS connections without a
     # clean TLS close, so asyncio's graceful SSL shutdown either times out or observes a
