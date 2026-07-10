@@ -487,7 +487,7 @@ class DFINECriterion(nn.Module):
 
         loss = loss_left + loss_right
 
-        if iou_weight is not None and iou_weight.sum() > 0:
+        if iou_weight is not None:
             iou_weight = iou_weight.float()
             loss = loss * iou_weight
 

@@ -8,11 +8,11 @@ import { Back } from '@geti-ui/ui/icons';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEmpty, orderBy } from 'lodash-es';
 
+import type { SinkConfig } from '../../../constants/shared-types';
 import { useSinksQuery } from './api/use-sinks-query';
 import { EditSinkForm } from './edit-sink-form.component';
 import { SinkList } from './sink-list/sink-list.component';
 import { SinkOptions } from './sink-options';
-import { SinkConfig } from './utils';
 
 export const SinkActions = () => {
     const [view, setView] = useState<'list' | 'options' | 'edit'>('list');

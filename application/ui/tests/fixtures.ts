@@ -212,6 +212,16 @@ const test = testBase.extend<Fixtures>({
                     http.get('/api/sinks', () => {
                         return HttpResponse.json([]);
                     }),
+                    http.get('/api/projects/{project_id}/pipeline/health', () => {
+                        return HttpResponse.json({
+                            status: 'running',
+                            components: {
+                                source: { status: 'ok', updated_at: '2026-01-01T00:00:00Z', message: null },
+                                sink: { status: 'ok', updated_at: '2026-01-01T00:00:00Z', message: null },
+                                model: { status: 'ok', updated_at: '2026-01-01T00:00:00Z', message: null },
+                            },
+                        });
+                    }),
                 ],
             });
 

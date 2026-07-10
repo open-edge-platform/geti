@@ -1,0 +1,43 @@
+id: object-detection-edgecrafter-s
+name: ECDet-S
+
+pretrained_weights:
+  url: https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecdet_s.pth
+  mirror_url: https://huggingface.co/Intellindust/ECDet_S/resolve/main/model.safetensors
+  sha_sum: 35340a45101d24a094becf8776aeaa327c9e6b37453e5e81dfd2923c134c4619
+
+description: "EdgeCrafter detection model (ECDet-S) combines an efficient ECViT backbone with a hybrid encoder and transformer decoder for real-time, high-accuracy object detection with low latency."
+
+stats:
+  gigaflops: 26.0
+  trainable_parameters: 10.0
+  benchmark_metrics:
+    coco_map_50_95: 51.7
+
+capabilities:
+  tiling: false
+
+hyperparameters:
+  training:
+    learning_rate: 0.0005
+    weight_decay: 0.0001
+    batch_size: 8
+    accumulate_grad_batches: 4
+    early_stopping:
+      patience: 10
+    scheduler:
+      factor: 0.5
+      patience: 10
+    gradient_clip:
+      enable: true
+      max_grad_norm: 0.1
+    allowed_values_input_size:
+      - 640
+    input_size_width: 640
+    input_size_height: 640
+  dataset_preparation:
+    augmentation:
+      deim_framework: true
+      random_zoom_out:
+        enable: true
+        fill: 0

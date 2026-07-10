@@ -49,17 +49,19 @@ Run commands from `library/`.
 
 The `Model Benchmark` GitHub workflow runs in two modes: a weekly scheduled run and a manual run.
 
-| Trigger             | Timeline                  | Source ref                   | Model groups / categories                                            | Dataset size tiers          | Scenario                   | Eval phase                                    | Seeds                       | Accelerators                   |
-| ------------------- | ------------------------- | ---------------------------- | -------------------------------------------------------------------- | --------------------------- | -------------------------- | --------------------------------------------- | --------------------------- | ------------------------------ |
-| `schedule`          | Every Friday, `19:00 UTC` | `develop`                    | `core,extended`                                                      | `tiny,small,medium,large`   | `default`                  | `optimize`                                    | `2`                         | `gpu` and `xpu`                |
-| `workflow_dispatch` | On demand                 | User-selected (`source_ref`) | User-selected (`core`, `core,extended`, `core,extended,exploratory`) | User-selected (`size_tier`) | User-selected (`scenario`) | User-selected (`train`, `export`, `optimize`) | User-selected (`num_seeds`) | User-selected (`gpu` or `xpu`) |
+| Trigger             | Timeline                  | Source ref                   | Model groups / categories                                            | Dataset size tiers          | Dataset data group          | Scenario                   | Eval phase                                    | Seeds                       | Accelerators                   |
+| ------------------- | ------------------------- | ---------------------------- | -------------------------------------------------------------------- | --------------------------- | ---------------------------- | --------------------------- | --------------------------------------------- | --------------------------- | ------------------------------ |
+| `schedule`          | Every Friday, `19:00 UTC` | `develop`                    | `core,extended`                                                      | `tiny,small,medium,large`   | `weekly`                    | `default`                  | `optimize`                                    | `2`                         | `gpu` and `xpu`                |
+| `workflow_dispatch` | On demand                 | User-selected (`source_ref`) | User-selected (`core`, `core,extended`, `core,extended,deferred`)    | User-selected (`size_tier`) | User-selected (`data_group`) | User-selected (`scenario`) | User-selected (`train`, `export`, `optimize`) | User-selected (`num_seeds`) | User-selected (`gpu` or `xpu`) |
 
 ### Rotation and timeline details
 
 - Weekly runs use model rotation for `extended` priority models.
+- Weekly runs use `--data-group weekly`, which selects only datasets explicitly marked `data_group: weekly` in the catalog rather than every dataset.
 - Rotation group is computed as `ISO week number % extended_groups`.
 - `extended_groups` is read from `benchmark_manifest.yaml` (`defaults.rotation.extended_groups`, currently `2`).
 - `core` models are not rotated and are always included when `priority=core,extended`.
+- `deferred` models are never included in an unfiltered/automated run (including rotation-group runs) — they only run when explicitly requested via `--priority deferred` or `--model <name>`.
 
 Practical effect with `extended_groups: 2`:
 
@@ -122,7 +124,9 @@ Per-seed work directories are created under:
 
 Dataset provisioning writes readiness markers at:
 
-- `data/<dataset>/.ready`
+- `data/<dataset>/.ready` (script-provisioned datasets only — `local_path` datasets are
+  externally managed and never get a `.ready` marker; see "Datasets requiring
+  credentials or manual placement" below)
 
 ## Add a new dataset or model
 
@@ -148,6 +152,11 @@ datasets:
       - detection
 ```
 
+`size_tier` normally reflects rough dataset size (`tiny`, `small`, `medium`, `large`).
+`data_group` (`weekly`, `extended`, or `all` — default `all` when omitted) controls which
+benchmark lane(s) include the dataset: `weekly` datasets only run in weekly-scheduled
+benchmarks, `extended` datasets only run in extended/full runs, and `all` runs in both.
+
 Manifest reference example (`benchmark_manifest.yaml`):
 
 ```yaml
@@ -171,9 +180,105 @@ Provisioning script contract:
 - `provision` runs the script as `python <script> --output-dir <data_root> --name <dataset_name>`.
 - The script should create `data/<dataset_name>/`; the runner writes `data/<dataset_name>/.ready` after success.
 
+### Datasets requiring credentials or manual placement
+
+Some datasets can't be auto-downloaded by CI: they're gated behind an account/license
+(e.g. Kaggle), or they're large enough that re-downloading on every run is impractical.
+Two catalog fields cover this, and can be combined or used independently.
+
+#### Option A — `local_path`: reference an already-prepared directory directly
+
+Use this when the dataset was (or will be) fully prepared out-of-band — manually, on a
+different machine, or copied once from a prior script run — and should simply be reused
+as-is, with **no script execution at all**.
+
+```yaml
+datasets:
+  - name: my_private_dataset
+    local_path: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/my_private_dataset"
+    size_tier: medium
+```
+
+- `local_path` supports `${VAR}`/`~` expansion, so the same catalog entry resolves to a
+  different location per machine/CI runner — set `GETITUNE_BENCHMARK_EXTERNAL_DATA` (or
+  whatever variable name you choose) to wherever that machine keeps such datasets.
+- The directory must already contain a dataset in a format the engine can load (native
+  Datumaro `metadata.json`+`data.parquet`, or a recognizable COCO/YOLO/VOC layout) —
+  nothing converts it.
+- No `.ready` sentinel is written and no existence check is cached: the directory is
+  assumed to be externally managed.
+- Mutually exclusive with `script` — a catalog entry must declare exactly one of the two.
+- If the path doesn't resolve (unset environment variable) or doesn't exist, provisioning
+  logs a clear error and skips just that dataset's experiments (see "Provisioning
+  resilience" below) — it does not abort the whole run.
+
+#### Option B — `raw_dir`: let a script skip its own network download
+
+Use this when you still want the script's transform/export logic to run (kept shared,
+version-controlled, and testable) but need to skip a credentialed or slow network fetch.
+
+```yaml
+datasets:
+  - name: brain_tumor
+    script: "scripts/benchmark_datasets/prepare_brain_tumor.py"
+    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_raw"
+    size_tier: small
+```
+
+- `raw_dir` is only valid together with `script`, and is forwarded to it as `--raw-dir
+  <resolved-path>`.
+- It's a **best-effort accelerant, not a requirement**: if the variable is unset or the
+  path doesn't exist, provisioning logs a warning and falls back to the script's normal
+  (e.g. network/credentialed) download path instead of failing.
+- In the script, use `getitune.benchmark.dataset_helpers.resolve_raw_source(args,
+  download_fn)` — it returns `args.raw_dir` directly (extracting it first if it's a
+  single archive file) when set, or calls `download_fn` otherwise. See
+  `scripts/benchmark_datasets/prepare_brain_tumor.py` for a full example.
+
+#### Kaggle-sourced datasets
+
+For datasets hosted on Kaggle (like `brain_tumor`), use
+`getitune.benchmark.dataset_helpers.download_kaggle_dataset()` instead of calling the
+`kaggle` CLI directly — it gives a clear, actionable error (instead of a subprocess
+traceback) when the CLI isn't installed or credentials aren't configured, and points at
+`--raw-dir` as an alternative.
+
+Setup:
+
+- Install the downloader: `just venv-benchmark` or `uv sync --extra benchmark`
+  (from `library/`; not installed by default).
+- Configure credentials, either:
+  - Environment variable: `KAGGLE_API_TOKEN`, or
+  - A credentials file: `~/.kaggle/access_token` — see https://www.kaggle.com/docs/api.
+- Alternatively, skip credentials entirely and use `--raw-dir` / `local_path` with a
+  manually-downloaded copy.
+
+**CI:** the `benchmark-dataset-scripts` job in `.github/workflows/lib-lint-and-test.yaml`
+reads `KAGGLE_API_TOKEN` from a repository secret of the same name. Set it with
+(requires a Kaggle account and repo admin access):
+
+```bash
+gh secret set KAGGLE_API_TOKEN
+```
+
+GitHub never exposes secrets to `pull_request` workflows triggered from forks, so the
+real-download test is additionally skipped (not failed) whenever credentials aren't
+present — see `tests/unit/scripts/test_prepare_brain_tumor.py`. A future
+scheduled benchmark workflow (see "CI benchmark schedule" above) should reuse the same
+token secret.
+
+#### Provisioning resilience
+
+A single dataset failing to provision (missing credentials, transient network error, a
+`local_path`/`raw_dir` that doesn't resolve) is logged and that dataset is skipped —
+`python -m getitune.benchmark run`/`provision` continues with everything else rather than
+aborting the whole invocation.
+
 ### Add a new model
 
-1. Ensure the model recipe exists under `src/getitune/recipe/<task>/...`.
+
+1. Ensure the model recipe exists under `src/getitune/recipe/<task>/<name>.yaml` — the recipe path is
+   always derived from the model's `name` and its task, there's no separate path to configure.
 2. Add a model entry under `experiments.<task>.models` in `benchmark_manifest.yaml`.
 3. Run a focused benchmark slice for the new model.
 
@@ -185,8 +290,13 @@ experiments:
     models:
       - name: my_detector
         priority: extended
-        recipe: detection/my_detector.yaml
 ```
+
+`priority` is one of `core`, `extended`, or `deferred`:
+
+- `core` / `extended` models are included in unfiltered/automated runs (see "Rotation and timeline details" above).
+- `deferred` models are declared for completeness but are never picked up by an unfiltered/automated run — only
+  when explicitly requested via `--priority deferred` or `--model my_detector`.
 
 Focused run command (from `library/`):
 

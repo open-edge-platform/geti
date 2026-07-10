@@ -20,6 +20,13 @@ venv device="cpu": _ensure_uv
     uv lock --check
     uv sync --frozen --extra {{ device }} --extra ultralytics
 
+# Create a virtual environment including benchmark-dataset dependencies (e.g. kagglehub).
+# Use this when running or testing the benchmark dataset preparation scripts.
+[arg("device", short="d", long="device")]
+venv-benchmark device="cpu": _ensure_uv
+    uv lock --check
+    uv sync --frozen --extra {{ device }} --extra ultralytics --extra benchmark
+
 # Generate or update the uv lock file
 venv-lock: _ensure_uv
     uv lock

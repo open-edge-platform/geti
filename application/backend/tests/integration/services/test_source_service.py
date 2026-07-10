@@ -21,12 +21,24 @@ from app.models.source import (
 from app.services import ResourceInUseError, ResourceType, SourceUpdateService
 from app.services.base import ResourceWithIdAlreadyExistsError, ResourceWithNameAlreadyExistsError
 from app.services.event.event_bus import EventType
+from app.services.source_media_service import SourceMediaService
 
 
 @pytest.fixture
 def fxt_source_update_service(fxt_event_bus, db_session) -> SourceUpdateService:
     """Fixture to provide a SourceUpdateService instance with mocked dependencies."""
     return SourceUpdateService(fxt_event_bus, db_session)
+
+
+@pytest.fixture
+def fxt_source_media_service() -> MagicMock:
+    return MagicMock(spec=SourceMediaService)
+
+
+@pytest.fixture
+def fxt_source_update_service_with_media(fxt_event_bus, db_session, fxt_source_media_service) -> SourceUpdateService:
+    """Fixture to provide a SourceUpdateService instance wired with a mocked SourceMediaService."""
+    return SourceUpdateService(fxt_event_bus, db_session, fxt_source_media_service)
 
 
 class TestSourceUpdateServiceIntegration:
@@ -225,6 +237,72 @@ class TestSourceUpdateServiceIntegration:
         assert db_source.config_data["video_path"] == "/new/path"
         fxt_event_bus.emit_event.assert_called_once_with(EventType.SOURCE_CHANGED)
 
+    def test_update_source_video_file_path_changed_deletes_old_video(
+        self,
+        fxt_db_sources,
+        fxt_source_update_service_with_media,
+        fxt_source_media_service,
+        db_session,
+    ):
+        """Changing a video_file source's video_path deletes the old (not the new) file."""
+        db_source = fxt_db_sources[0]  # video_file source, video_path="/path/to/video.mp4"
+        db_session.add(db_source)
+        db_session.flush()
+
+        source = SourceAdapter.validate_python(db_source, from_attributes=True)
+
+        fxt_source_update_service_with_media.update_source(
+            source=source,
+            new_name=source.name,
+            new_config_data=VideoFileConfig(video_path="/new/path"),
+        )
+
+        fxt_source_media_service.delete_video.assert_called_once_with("/path/to/video.mp4")
+
+    def test_update_source_video_file_path_unchanged_does_not_delete_video(
+        self,
+        fxt_db_sources,
+        fxt_source_update_service_with_media,
+        fxt_source_media_service,
+        db_session,
+    ):
+        """Updating a video_file source without changing video_path must not delete anything."""
+        db_source = fxt_db_sources[0]  # video_file source, video_path="/path/to/video.mp4"
+        db_session.add(db_source)
+        db_session.flush()
+
+        source = SourceAdapter.validate_python(db_source, from_attributes=True)
+
+        fxt_source_update_service_with_media.update_source(
+            source=source,
+            new_name="Renamed Source",
+            new_config_data=VideoFileConfig(video_path="/path/to/video.mp4"),
+        )
+
+        fxt_source_media_service.delete_video.assert_not_called()
+
+    def test_update_source_non_video_file_does_not_delete_video(
+        self,
+        fxt_db_sources,
+        fxt_source_update_service_with_media,
+        fxt_source_media_service,
+        db_session,
+    ):
+        """Updating a non-video_file source never touches the media service."""
+        db_source = fxt_db_sources[1]  # usb_camera source
+        db_session.add(db_source)
+        db_session.flush()
+
+        source = SourceAdapter.validate_python(db_source, from_attributes=True)
+
+        fxt_source_update_service_with_media.update_source(
+            source=source,
+            new_name="Renamed Source",
+            new_config_data=USBCameraConfig(device_id=2, codec=None),
+        )
+
+        fxt_source_media_service.delete_video.assert_not_called()
+
     def test_delete_source(self, fxt_db_sources, fxt_source_update_service, db_session):
         """Test deleting a source."""
         db_source = fxt_db_sources[0]
@@ -265,6 +343,64 @@ class TestSourceUpdateServiceIntegration:
         # Verify the error message includes the project name and state
         assert "Test Detection Project" in str(exc_info.value)
         assert "running" in str(exc_info.value)
+
+    def test_delete_source_video_file_deletes_video(
+        self,
+        fxt_db_sources,
+        fxt_source_update_service_with_media,
+        fxt_source_media_service,
+        db_session,
+    ):
+        """Deleting a video_file source removes its uploaded video file too."""
+        db_source = fxt_db_sources[0]  # video_file source, see fxt_db_sources
+        db_session.add(db_source)
+        db_session.flush()
+
+        source = SourceAdapter.validate_python(db_source, from_attributes=True)
+
+        fxt_source_update_service_with_media.delete_source(source)
+
+        assert db_session.query(SourceDB).count() == 0
+        fxt_source_media_service.delete_video.assert_called_once_with("/path/to/video.mp4")
+
+    def test_delete_source_non_video_file_does_not_delete_video(
+        self,
+        fxt_db_sources,
+        fxt_source_update_service_with_media,
+        fxt_source_media_service,
+        db_session,
+    ):
+        """Deleting a non-video_file source never touches the media service."""
+        db_source = fxt_db_sources[1]  # usb_camera source
+        db_session.add(db_source)
+        db_session.flush()
+
+        source = SourceAdapter.validate_python(db_source, from_attributes=True)
+
+        fxt_source_update_service_with_media.delete_source(source)
+
+        assert db_session.query(SourceDB).count() == 0
+        fxt_source_media_service.delete_video.assert_not_called()
+
+    def test_delete_source_video_file_delete_video_failure_is_best_effort(
+        self,
+        fxt_db_sources,
+        fxt_source_update_service_with_media,
+        fxt_source_media_service,
+        db_session,
+    ):
+        """A filesystem failure while deleting the video must not affect the DB delete."""
+        fxt_source_media_service.delete_video.side_effect = OSError("permission denied")
+        db_source = fxt_db_sources[0]  # video_file source
+        db_session.add(db_source)
+        db_session.flush()
+
+        source = SourceAdapter.validate_python(db_source, from_attributes=True)
+
+        fxt_source_update_service_with_media.delete_source(source)
+
+        assert db_session.query(SourceDB).count() == 0
+        fxt_source_media_service.delete_video.assert_called_once_with("/path/to/video.mp4")
 
     def test_test_source_video_file_exists(self, fxt_source_update_service, tmp_path):
         """Test test_source with a valid video file path (file exists but may not be a valid video)."""
