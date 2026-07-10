@@ -88,7 +88,10 @@ export default defineConfig({
                   css: false,
               }
             : undefined,
-        copy: [{ from: 'node_modules/onnxruntime-web/dist/*.{wasm,mjs}', to: 'ort/[name][ext]' }],
+        copy: [
+            { from: 'node_modules/onnxruntime-web/dist/*.{wasm,mjs}', to: 'ort/[name][ext]' },
+            { from: 'vendor/opencv/4.9.0/opencv.js', to: 'opencv/[name][ext]' },
+        ],
     },
     source: {
         define: {

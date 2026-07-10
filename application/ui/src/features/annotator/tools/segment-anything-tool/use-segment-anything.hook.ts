@@ -184,9 +184,7 @@ const useDecodingFn = (model: SegmentAnythingRemoteInstance | undefined, encodin
                 boxes: [],
                 // Decoding runs against the already-computed `encoding`; no image is needed.
                 image: undefined,
-                // TODO[geti-ui]: @geti-ui/smart-tools@1.5.0's `SegmentAnythingPrompt` type has a
-                // typo (`ouputConfig` instead of `outputConfig`). Rename back once fixed upstream.
-                ouputConfig: {
+                outputConfig: {
                     type: decoderOutput,
                 },
             }),

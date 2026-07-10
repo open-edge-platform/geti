@@ -7,6 +7,8 @@ import { expose, proxy } from 'comlink';
 
 import type { SegmentAnythingWorkerApi } from './segment-anything.worker.interface';
 
+import './opencv-source';
+
 // `@geti-ui/smart-tools` doesn't hardcode ONNX Runtime's wasm location; the
 // consuming app must tell it where the `onnxruntime-web` wasm/mjs artifacts
 // are served from. rsbuild copies them to `ort/` (see rsbuild.config.ts),

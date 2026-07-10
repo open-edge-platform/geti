@@ -25,6 +25,14 @@ npm install
 
 The UI library and smart tools are consumed as published [`@geti-ui/ui`](https://github.com/MarkRedeman/geti-ui) and `@geti-ui/smart-tools` npm packages (regular dependencies), not clones.
 
+#### OpenCV WASM binary
+
+`@geti-ui/smart-tools` uses a custom-compiled `opencv.js` build for GrabCut, Intelligent Scissors, Watershed, SSIM, RITM, and Segment Anything's mask-to-polygon postprocessing. The package doesn't bundle or serve that binary itself — it must be compiled separately (Docker + Emscripten, see [its README](https://github.com/MarkRedeman/geti-ui/blob/main/packages/smart-tools/README.md)) and vendored here at `vendor/opencv/4.9.0/opencv.js`; `rsbuild.config.ts`'s `output.copy` copies it to `dist/opencv/`.
+
+`src/features/annotator/webworkers/opencv-source.ts` calls `setOpenCVSourceUrl(...)` before any OpenCV-backed tool runs (imported for its side effect by every worker that needs it). Note: `setOpenCVSourceUrl` resolves string paths against the running app's origin (`location.origin`), not the configured asset prefix, so `ASSET_PREFIX` (e.g. `/html` in the Docker/`install.sh` production build) must be prepended manually — same handling as the ORT wasm path in `segment-anything.worker.ts`.
+
+If `@geti-ui/smart-tools` bumps its OpenCV version, update both the vendored binary and the version segment of the `output.copy` path in `rsbuild.config.ts`.
+
 ### Development
 
 ```bash

@@ -6,6 +6,8 @@ import { expose, proxy } from 'comlink';
 
 import type { SSIMWorkerApi } from './ssim-worker.interface';
 
+import './opencv-source';
+
 const WorkerApi: SSIMWorkerApi = {
     build: async () => {
         const instance = await buildSSIMInstance();

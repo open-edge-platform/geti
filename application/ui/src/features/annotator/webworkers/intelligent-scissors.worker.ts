@@ -6,6 +6,8 @@ import { expose, proxy } from 'comlink';
 
 import type { IntelligentScissorsWorkerApi } from './intelligent-scissors.worker.interface';
 
+import './opencv-source';
+
 const WorkerApi: IntelligentScissorsWorkerApi = {
     build: async () => {
         const instance = await buildIntelligentScissorsInstance();

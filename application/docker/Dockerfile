@@ -149,6 +149,7 @@ COPY --link application/ui/tsconfig.json ./
 COPY --link application/ui/rsbuild.config.ts ./
 COPY --link application/ui/src/ src/
 COPY --link application/ui/public/ public/
+COPY --link application/ui/vendor/ vendor/
 
 ########
 # Web UI
