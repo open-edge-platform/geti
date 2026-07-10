@@ -5,8 +5,14 @@
 
 from __future__ import annotations
 
+from collections import OrderedDict
 from functools import partial
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, cast
+from urllib.parse import urlparse
+
+import torch
+from torch.hub import download_url_to_file
 
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
 from getitune.backend.lightning.models.classification.backbones.vision_transformer import VisionTransformerBackbone
@@ -100,11 +106,6 @@ class DinoV2Seg(LightningSegmentationModel):
         """PTQ config for DinoV2Seg."""
         return {"model_type": "transformer"}
 
-    @property
-    def pretrained_key_mapping(self) -> dict[str, str] | None:
-        """Mapping used to rename checkpoint keys before loading pretrained weights."""
-        return {"model.": ""}
-
     def load_pretrained(self, weights: PathLike | None = None) -> None:
         """Load pretrained weights for the model.
 
@@ -112,8 +113,46 @@ class DinoV2Seg(LightningSegmentationModel):
             weights (PathLike | None, optional): Path to the pretrained weights. If None, uses default weights.
             Defaults to None.
         """
-        super().load_pretrained(weights)
+        if weights is None:
+            weights = self.pretrained_urls[self.model_name]
+
+        weights_path = Path(weights)
+        if not weights_path.exists():
+            import os
+
+            parts = urlparse(str(weights))
+            filename = Path(parts.path).name
+            weights_path = Path(os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"]) / filename
+            if not weights_path.exists():
+                download_url_to_file(str(weights), str(weights_path), "", progress=True)
+
+        backbone = cast("VisionTransformerBackbone", self.model.backbone)
+        backbone.load_checkpoint(weights_path, prefix="model.backbone")  # pyrefly: ignore[not-callable]
+        self._load_decode_head(weights_path)
+
         # freeze backbone
-        backbone = cast("nn.Module", self.model.backbone)
         for _, v in backbone.named_parameters():
             v.requires_grad = False
+
+    def _load_decode_head(self, weights_path: Path) -> None:
+        """Load compatible decode head weights from a full DinoV2Seg checkpoint.
+
+        Args:
+            weights_path: Path to the checkpoint containing ``model.decode_head.*`` keys.
+        """
+        state_dict = torch.load(weights_path, map_location="cpu")
+
+        prefix = "model.decode_head."
+        decode_head_state_dict = OrderedDict(
+            (key.removeprefix(prefix), value) for key, value in state_dict.items() if key.startswith(prefix)
+        )
+
+        decode_head = cast("nn.Module", self.model.decode_head)
+        target_state_dict = decode_head.state_dict()
+        compatible_state_dict = OrderedDict(
+            (key, value)
+            for key, value in decode_head_state_dict.items()
+            if key in target_state_dict and value.shape == target_state_dict[key].shape
+        )
+
+        decode_head.load_state_dict(compatible_state_dict, strict=False)
