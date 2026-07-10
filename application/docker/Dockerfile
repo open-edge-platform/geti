@@ -134,17 +134,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
         uv pip uninstall ultralytics ultralytics-thop nvidia-ml-py; \
     fi
 
-##################
-# Geti UI packages
-##################
-FROM node:24-alpine3.22@sha256:191c9f0080fcbbc6547a85dc0ff7988072214a355aabdc1d2ec55a7dae5eea8a AS geti-ui-packages
-
-WORKDIR /home/application/ui/
-RUN apk add --no-cache git=2.49.1-r0
-COPY --link application/ui/package.json ./
-COPY --link application/ui/patches/ ./patches/
-RUN npm run clone-geti-ui-packages
-
 #############
 # Web UI deps
 #############
@@ -154,8 +143,7 @@ WORKDIR /home/application/ui/
 
 COPY --link application/ui/package.json ./
 COPY --link application/ui/package-lock.json ./
-COPY --from=geti-ui-packages /home/application/ui/packages/ /home/application/ui/packages/
-RUN npm ci --audit=false --ignore-scripts
+RUN npm ci --audit=false
 
 COPY --link application/ui/tsconfig.json ./
 COPY --link application/ui/rsbuild.config.ts ./

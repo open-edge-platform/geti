@@ -6,7 +6,7 @@ description: Develop and validate changes in `application/ui/` for the React and
 # Geti UI Development
 
 > For the full architecture reference (feature-folder layout, data fetching,
-> generated API types, and vendored packages) read
+> and generated API types) read
 > [`application/ui/AGENTS.md`](../../../application/ui/AGENTS.md).
 
 ## Quick Start
@@ -39,5 +39,6 @@ description: Develop and validate changes in `application/ui/` for the React and
 
 ## Coordination Notes
 
-- The `preinstall` script clones pinned Geti UI workspace packages into `packages/`; do not edit those generated packages.
+- `@geti-ui/ui` and `@geti-ui/smart-tools` are consumed as regular published npm
+  dependencies (`npm install`/`npm ci`) — no clone/preinstall step, do not vendor them locally.
 - Keep generated API artifacts and the consuming UI changes in the same change set when the contract changes.
