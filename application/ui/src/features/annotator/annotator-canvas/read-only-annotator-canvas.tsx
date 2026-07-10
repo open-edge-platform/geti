@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Media } from '@/api/types';
+
 import { ReadOnlyAnnotations } from '../annotations/read-only-annotations.component';
 import { MediaCanvas } from './media-canvas';
 

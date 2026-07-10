@@ -3,9 +3,9 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
+import type { TrainingConfiguration } from '@/api/types';
 import { View } from '@geti-ui/ui';
 
-import type { TrainingConfiguration } from '@/api/types';
 import { LearningParameters } from './learning-parameters/learning-parameters.component';
 import { getLearningParameters } from './learning-parameters/utils';
 

@@ -1,12 +1,12 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Label, TaskType } from '@/api/types';
 import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { render } from 'test-utils/render';
 
-import type { Label, TaskType } from '@/api/types';
 import { Toast } from '../../../components/toast/toast.component';
 import { LabelSelection } from './label-selection.component';
 

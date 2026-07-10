@@ -3,11 +3,8 @@
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
-import type {
-    ConfigurableParameter,
-    ConfigurableParameterGroup,
-    TrainingConfiguration,
-} from '@/api/types';
+import type { ConfigurableParameter, ConfigurableParameterGroup, TrainingConfiguration } from '@/api/types';
+
 import { Accordion } from '../../components/accordion/accordion.component';
 import { Parameters } from '../../components/parameters.component';
 import { deepReplaceParameters, filterDependentParameters } from '../../utils';

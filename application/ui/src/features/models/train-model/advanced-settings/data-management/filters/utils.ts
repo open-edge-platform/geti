@@ -8,6 +8,7 @@ import type {
     TrainingConfiguration,
     TrainingConfigurationParameter,
 } from '@/api/types';
+
 import {
     findGroupByKey,
     isParameter,

@@ -1,11 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-import { isEmpty } from 'lodash-es';
-
 import { $api } from '@/api';
 import type { DatasetRevisionItem, DatasetSubset, Pagination } from '@/api/types';
+import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { isEmpty } from 'lodash-es';
 
 const DATASET_ITEMS_LIMIT = 20;
 

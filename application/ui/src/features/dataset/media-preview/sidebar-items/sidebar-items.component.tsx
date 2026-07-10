@@ -3,9 +3,9 @@
 
 import { useRef } from 'react';
 
+import type { Media } from '@/api/types';
 import { Flex, Size, useUnwrapDOMRef, View } from '@geti-ui/ui';
 
-import type { Media } from '@/api/types';
 import { VirtualizerGridLayout } from '../../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
 import { SIDEBAR_MEDIA_SIZE } from '../constants';
 import { Toolbar } from '../toolbar-container/toolbar-container.component';

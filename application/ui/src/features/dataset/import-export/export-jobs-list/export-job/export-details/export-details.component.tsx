@@ -1,10 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ExportDatasetMetadata } from '@/api/types';
 import { dimensionValue, Divider, Flex, Grid, Text } from '@geti-ui/ui';
 import { isEmpty, isNil } from 'lodash-es';
 
-import type { ExportDatasetMetadata } from '@/api/types';
 import { useProject } from '../../../../../../hooks/api/project.hook';
 
 type ExportJobDetailsProps = {

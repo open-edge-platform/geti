@@ -3,11 +3,11 @@
 
 import { startTransition } from 'react';
 
+import type { LocalFolderSinkConfig, SinkOutputFormats } from '@/api/types';
 import { act, screen, waitFor } from '@testing-library/react';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
-import type { LocalFolderSinkConfig, SinkOutputFormats } from '@/api/types';
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
 import { useSinkAction } from './use-sink-action.hook';

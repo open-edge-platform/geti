@@ -3,10 +3,10 @@
 
 import { useRef, useState } from 'react';
 
+import type { FloatConfigurableRangeParameter } from '@/api/types';
 import { Flex, NumberField, RangeSlider, type RangeValue } from '@geti-ui/ui';
 import { isEqual } from 'lodash-es';
 
-import type { FloatConfigurableRangeParameter } from '@/api/types';
 import { getStep } from '../utils';
 
 import classes from './range-parameter-field.module.scss';

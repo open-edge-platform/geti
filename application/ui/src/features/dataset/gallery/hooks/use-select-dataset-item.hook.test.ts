@@ -1,11 +1,11 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Media } from '@/api/types';
 import { act } from '@testing-library/react';
 import { getMockedMediaImage, getMockedVideo, getMockedVideoFrame } from 'mocks/mock-media';
 import { renderHook } from 'test-utils/render';
 
-import type { Media } from '@/api/types';
 import { paths } from '../../../../constants/paths';
 import { useGetDatasetMediaItems } from '../../../../hooks/use-get-dataset-media-items.hook';
 import { useSelectDatasetItem } from './use-select-dataset-item.hook';

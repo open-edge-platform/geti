@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Media, MediaVideo } from '@/api/types';
 import { Flex } from '@geti-ui/ui';
 
-import type { Media, MediaVideo } from '@/api/types';
 import { isVideo } from '../../shared/media-item-utils';
 import { formatCompactDuration } from './util';
 

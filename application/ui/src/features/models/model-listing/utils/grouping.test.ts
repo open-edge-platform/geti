@@ -1,10 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DatasetRevision } from '@/api/types';
 import { getMockedDatasetRevision } from 'mocks/mock-dataset-revision';
 import { getMockedModel } from 'mocks/mock-model';
 
-import type { DatasetRevision } from '@/api/types';
 import type { DatasetGroup } from '../types';
 import { groupModelsByArchitecture, groupModelsByDataset } from './grouping';
 

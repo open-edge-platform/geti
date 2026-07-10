@@ -3,10 +3,10 @@
 
 import { PointerEvent, useRef, useState } from 'react';
 
+import type { Label } from '@/api/types';
 import { clampBox, clampPointBetweenImage, pointsToRect } from '@geti/smart-tools/utils';
 import { useEventListener } from 'hooks/event-listener.hook';
 
-import type { Label } from '@/api/types';
 import selectionCursor from '../../../../assets/icons/selection.svg?url';
 import { isLeftButton } from '../../../../shared/buttons-utils';
 import type { Point, Rect as RectInterface, RegionOfInterest } from '../../../../shared/types';

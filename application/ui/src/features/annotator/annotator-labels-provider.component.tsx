@@ -3,9 +3,9 @@
 
 import { createContext, ReactNode, useContext, useState } from 'react';
 
+import type { Label } from '@/api/types';
 import { useProject } from 'hooks/api/project.hook';
 
-import type { Label } from '@/api/types';
 import { useProjectLabelsWithEmptyLabel } from '../../shared/annotator/labels';
 import { isClassificationTask } from '../project/task-type-guards';
 

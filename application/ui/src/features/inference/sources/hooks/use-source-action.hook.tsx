@@ -3,9 +3,9 @@
 
 import { useActionState } from 'react';
 
+import type { SourceConfigPayload } from '@/api/types';
 import { isFunction } from 'lodash-es';
 
-import type { SourceConfigPayload } from '@/api/types';
 import { toast } from '../../../../components/toast/toast.component';
 import { useSourceMutation } from './use-source-mutation.hook';
 

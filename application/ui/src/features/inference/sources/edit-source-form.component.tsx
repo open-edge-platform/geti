@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ImagesFolderSourceConfig, SourceConfig, VideoFileSourceConfig } from '@/api/types';
+
 import { EditSource } from './edit-source/edit-source.component';
 import { ImageFolder } from './image-folder/image-folder.component';
 import { imagesFolderBodyFormatter } from './image-folder/utils';

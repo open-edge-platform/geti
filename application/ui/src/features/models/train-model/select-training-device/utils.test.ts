@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TrainingDevice } from '@/api/types';
+
 import { createDeviceName, getDefaultTrainingDevice } from './utils';
 
 const makeDevice = (overrides: Partial<TrainingDevice> = {}): TrainingDevice => ({

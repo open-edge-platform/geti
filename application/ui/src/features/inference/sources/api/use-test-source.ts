@@ -1,9 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useQuery } from '@tanstack/react-query';
-
 import { $api } from '@/api';
+import { useQuery } from '@tanstack/react-query';
 
 export const testSourceQueryOptions = (sourceId: string) =>
     $api.queryOptions(

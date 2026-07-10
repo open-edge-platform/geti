@@ -3,9 +3,9 @@
 
 import { useCallback } from 'react';
 
+import type { Label } from '@/api/types';
 import { isEmpty } from 'lodash-es';
 
-import type { Label } from '@/api/types';
 import { useAnnotationActions } from '../../../shared/annotator/annotation-actions-provider.component';
 import { useSelectedAnnotations } from '../../../shared/annotator/select-annotation-provider.component';
 import type { Shape } from '../../../shared/types';

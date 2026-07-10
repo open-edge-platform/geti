@@ -1,10 +1,10 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Project } from '@/api/types';
 import { Badge, Flex, Text } from '@geti-ui/ui';
 import { useNavigate } from 'react-router';
 
-import type { Project } from '@/api/types';
 import { paths } from '../../../constants/paths';
 import {
     ProjectActionsMenu,

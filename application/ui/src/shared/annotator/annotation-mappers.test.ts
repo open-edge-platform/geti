@@ -1,10 +1,10 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AnnotationDTO } from '@/api/types';
 import { getMockedShape } from 'mocks/mock-annotation';
 import { getMockedAnnotationLabelRef } from 'mocks/mock-labels';
 
-import type { AnnotationDTO } from '@/api/types';
 import { mapLocalAnnotationsToServer, mapServerAnnotationsToLocal } from './annotation-mappers';
 
 describe('mapServerAnnotationsToLocal', () => {

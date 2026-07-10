@@ -3,6 +3,7 @@
 
 import { type ReactNode } from 'react';
 
+import type { AnnotationDTO, Label } from '@/api/types';
 import { act, waitFor } from '@testing-library/react';
 import { getMockedShape } from 'mocks/mock-annotation';
 import { getMockedAnnotationLabelRef, getMockedLabel } from 'mocks/mock-labels';
@@ -10,7 +11,6 @@ import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
-import type { AnnotationDTO, Label } from '@/api/types';
 import { http } from '../../api/utils';
 import { server } from '../../msw-node-setup';
 import { renderHook } from '../../test-utils/render';

@@ -3,9 +3,9 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
+import type { TrainingConfiguration } from '@/api/types';
 import { isEqual } from 'lodash-es';
 
-import type { TrainingConfiguration } from '@/api/types';
 import { Accordion } from '../../components/accordion/accordion.component';
 import { LearningParametersListContainer } from './learning-parameters-list.component';
 import { LearningConfigurationGroup } from './utils';

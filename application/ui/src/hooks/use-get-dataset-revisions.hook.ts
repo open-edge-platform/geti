@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { $api } from '@/api';
 import { usePrefetchQuery, useQuery } from '@tanstack/react-query';
 
-import { $api } from '@/api';
 import { useProjectIdentifier } from './use-project-identifier.hook';
 
 const getDatasetRevisionsQueryOptions = (projectId: string) => {

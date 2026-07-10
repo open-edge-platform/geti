@@ -1,10 +1,10 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TrainingDevice } from '@/api/types';
 import { fireEvent, screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import type { TrainingDevice } from '@/api/types';
 import { SelectTrainingDevice } from './select-training-device.component';
 
 const mockOnSelectTrainingDevice = vi.hoisted(() => vi.fn());

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { LocalFolderSinkConfig, SinkOutputFormats } from '@/api/types';
+
 import { rateLimitFromFormData } from '../utils';
 
 export const getLocalFolderInitialConfig = (): LocalFolderSinkConfig => ({

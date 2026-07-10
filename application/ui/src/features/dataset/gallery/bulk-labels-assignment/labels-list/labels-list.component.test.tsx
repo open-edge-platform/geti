@@ -3,12 +3,12 @@
 
 import { useState } from 'react';
 
+import type { Label } from '@/api/types';
 import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { render } from 'test-utils/render';
 
-import type { Label } from '@/api/types';
 import { EMPTY_LABEL_ID } from '../../../../../shared/annotator/labels';
 import { LabelsList } from './labels-list.component';
 

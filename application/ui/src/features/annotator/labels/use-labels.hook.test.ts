@@ -1,13 +1,13 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Label } from '@/api/types';
 import { waitFor } from '@testing-library/react';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
-import type { Label } from '@/api/types';
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
 import { useLabels } from './use-labels.hook';

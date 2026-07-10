@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AnnotationDTO } from '@/api/types';
 import { act } from '@testing-library/react';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useFetchNextUnannotatedMediaItem } from 'hooks/use-get-dataset-items.hook';
@@ -8,7 +9,6 @@ import { getMockedDatasetItem } from 'mocks/mock-dataset-item';
 import { getMockedMediaImage, getMockedVideoFrame, getMultipleMockedMediaImage } from 'mocks/mock-media';
 import { renderHook } from 'test-utils/render';
 
-import type { AnnotationDTO } from '@/api/types';
 import { useVideoPlayerContext } from '../../annotator/video-player/video-player-provider.component';
 import { getInitialAnnotations, getNextMediaItem, useNextMediaItem, usePlayPauseVideoBySystem } from './utils';
 

@@ -1,12 +1,12 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { $api } from '@/api';
+import type { SourceConfigPayload } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { omit } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
-import { $api } from '@/api';
-import type { SourceConfigPayload } from '@/api/types';
 import { getQueryKey } from '../../../../query-client/query-client';
 import { testSourceQueryOptions } from '../api/use-test-source';
 

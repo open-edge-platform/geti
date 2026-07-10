@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { TrainingConfiguration } from '@/api/types';
+
 import { mockedTrainingConfiguration } from './mocks';
 import { getTrainingConfigurationUpdatePayload } from './utils';
 

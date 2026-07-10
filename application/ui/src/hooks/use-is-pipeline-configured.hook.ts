@@ -1,9 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { isEmpty } from 'lodash-es';
-
 import type { Pipeline } from '@/api/types';
+import { isEmpty } from 'lodash-es';
 
 export const useIsPipelineConfigured = (pipeline?: Pipeline) => {
     if (!pipeline) return false;

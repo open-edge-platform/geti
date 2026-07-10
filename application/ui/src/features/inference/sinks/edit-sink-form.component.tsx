@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SinkConfig } from '@/api/types';
+
 import { EditSink } from './edit-sink/edit-sink.component';
 import { LocalFolder } from './local-folder/local-folder.component';
 import { localFolderBodyFormatter } from './local-folder/utils';

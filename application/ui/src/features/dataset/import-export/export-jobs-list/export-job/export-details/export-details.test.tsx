@@ -1,13 +1,13 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ExportDatasetMetadata } from '@/api/types';
 import { screen } from '@testing-library/react';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import type { ExportDatasetMetadata } from '@/api/types';
 import { http } from '../../../../../../api/utils';
 import { server } from '../../../../../../msw-node-setup';
 import { ExportJobDetails } from './export-details.component';

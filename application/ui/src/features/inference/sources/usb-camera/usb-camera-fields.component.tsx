@@ -3,12 +3,11 @@
 
 import { Key, useRef, useState } from 'react';
 
+import { $api } from '@/api';
+import type { USBCameraSourceConfig } from '@/api/types';
 import { ActionButton, Flex, Item, Loading, Picker, TextField } from '@geti-ui/ui';
 import { Refresh } from '@geti-ui/ui/icons';
 import { isEmpty } from 'lodash-es';
-
-import { $api } from '@/api';
-import type { USBCameraSourceConfig } from '@/api/types';
 
 type UsbCameraProps = {
     defaultState?: USBCameraSourceConfig;

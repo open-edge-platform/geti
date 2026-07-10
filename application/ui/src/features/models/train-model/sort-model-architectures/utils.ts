@@ -1,9 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { orderBy } from 'lodash-es';
-
 import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
+import { orderBy } from 'lodash-es';
 
 export const SortingOptions = {
     NAME_ASC: 'name-asc',

@@ -1,9 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { isNil } from 'lodash-es';
-
 import type { BenchmarkMetrics, ModelArchitectureWithPerformanceCategory } from '@/api/types';
+import { isNil } from 'lodash-es';
 
 type AccuracyMetric = { label: string; value: number };
 

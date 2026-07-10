@@ -3,9 +3,9 @@
 
 import { ReactNode } from 'react';
 
+import type { SinkConfig } from '@/api/types';
 import { Button, Form } from '@geti-ui/ui';
 
-import type { SinkConfig } from '@/api/types';
 import { usePatchPipeline } from '../../../../hooks/api/pipeline.hook';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';
 import { useSinkAction } from '../hooks/use-sink-action.hook';

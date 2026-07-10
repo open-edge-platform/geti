@@ -1,13 +1,13 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AnnotationType, DatasetFormat, TaskType } from '@/api/types';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import type { AnnotationType, DatasetFormat, TaskType } from '@/api/types';
 import { http } from '../../../../../api/utils';
 import { server } from '../../../../../msw-node-setup';
 import { ImportTaskSelection } from './import-task-selection.component';

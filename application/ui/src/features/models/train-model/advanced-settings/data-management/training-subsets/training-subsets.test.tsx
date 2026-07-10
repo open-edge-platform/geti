@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import type { TrainingConfiguration } from '@/api/types';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import {
     getMockedConfigurationParameter,
@@ -11,7 +12,6 @@ import {
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import type { TrainingConfiguration } from '@/api/types';
 import { http } from '../../../../../../api/utils';
 import { server } from '../../../../../../msw-node-setup';
 import { distributeByLargestRemainder } from '../../../../utils';

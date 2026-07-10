@@ -3,8 +3,6 @@
 
 import { createContext, Dispatch, ReactNode, SetStateAction, use, useMemo, useState } from 'react';
 
-import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
-
 import type {
     DatasetRevision,
     Model,
@@ -12,6 +10,8 @@ import type {
     TrainingConfiguration,
     TrainingDevice,
 } from '@/api/types';
+import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
+
 import { useGetTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
 import { useGetSuccessfulModels } from '../hooks/api/use-get-models.hook';
 import { useGetTrainingDevices } from './api/use-get-training-devices';

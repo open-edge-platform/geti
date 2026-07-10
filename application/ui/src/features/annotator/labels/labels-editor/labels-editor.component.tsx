@@ -3,11 +3,11 @@
 
 import { useState } from 'react';
 
+import type { Label } from '@/api/types';
 import { ActionButton, Flex, Loading, View } from '@geti-ui/ui';
 import { Add } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import type { Label } from '@/api/types';
 import { usePinnedLabels } from '../hooks/use-pinned-labels.hook';
 import { LabelRow } from '../label-row/label-row.component';
 import { NewLabelRow } from '../new-label-row/new-label-row.component';

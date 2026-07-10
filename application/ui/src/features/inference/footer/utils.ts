@@ -1,10 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { PipelineComponentsHealth, PipelineStatus } from '@/api/types';
 import type { StatusLightProps } from '@geti-ui/ui';
 import { capitalize } from 'lodash-es';
-
-import type { PipelineComponentsHealth, PipelineStatus } from '@/api/types';
 
 export type StatusVariant = StatusLightProps['variant'];
 

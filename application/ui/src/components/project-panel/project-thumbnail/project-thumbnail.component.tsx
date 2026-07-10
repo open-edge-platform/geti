@@ -3,9 +3,9 @@
 
 import { useState } from 'react';
 
+import type { Project } from '@/api/types';
 import { PhotoPlaceholder, View, type DimensionValue } from '@geti-ui/ui';
 
-import type { Project } from '@/api/types';
 import { getProjectThumbnailUrl } from '../../../shared/media-url.utils';
 
 import classes from './project-thumbnail.module.scss';

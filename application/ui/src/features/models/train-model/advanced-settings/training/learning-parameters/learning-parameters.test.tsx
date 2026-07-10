@@ -3,12 +3,12 @@
 
 import { useState } from 'react';
 
+import type { NumberConfigurableParameter, TrainingConfiguration } from '@/api/types';
 import { fireEvent, screen, Screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from 'test-utils/render';
 import { describe } from 'vitest';
 
-import type { NumberConfigurableParameter, TrainingConfiguration } from '@/api/types';
 import { getStep } from '../../components/utils';
 import { isBoolEnableParameterGroup, isNumberParameter } from '../../utils';
 import { LearningParameters } from './learning-parameters.component';

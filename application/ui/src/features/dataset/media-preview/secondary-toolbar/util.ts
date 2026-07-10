@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Label } from '@/api/types';
+
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import type { AnnotationLabelRef } from '../../../../shared/types';
 

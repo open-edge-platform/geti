@@ -1,10 +1,10 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Media } from '@/api/types';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
-import type { Media } from '@/api/types';
 import { paths } from '../../../../constants/paths';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';
 import { isVideo, isVideoFrame } from '../../../../shared/media-item-utils';

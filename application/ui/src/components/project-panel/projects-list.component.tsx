@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Project } from '@/api/types';
+
 import { type ProjectActionMetadata } from '../../features/project/list/menu-actions/menu-actions.component';
 import { ProjectListItem } from './project-list-item/project-list-item.component';
 

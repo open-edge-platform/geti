@@ -1,13 +1,13 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ConfigurableParameter, ConfigurableParameterGroup } from '@/api/types';
 import { act, waitFor } from '@testing-library/react';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 import { vi } from 'vitest';
 
 import { getMockedJob } from '../../../../../mocks/mock-job';
-import type { ConfigurableParameter, ConfigurableParameterGroup } from '@/api/types';
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
 import { findGroupByKey } from '../../model-listing/model-training-parameters/utils';

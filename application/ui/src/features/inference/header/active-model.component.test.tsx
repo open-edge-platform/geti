@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Model, Pipeline } from '@/api/types';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { getMockedModel } from 'mocks/mock-model';
 import { getMockedVariant } from 'mocks/mock-model-variant';
@@ -8,7 +9,6 @@ import { getMockedPipeline } from 'mocks/mock-pipeline';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import type { Model, Pipeline } from '@/api/types';
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
 import { ActiveModel } from './active-model.component';

@@ -1,9 +1,8 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Flex, View } from '@geti-ui/ui';
-
 import type { Label } from '@/api/types';
+import { Flex, View } from '@geti-ui/ui';
 
 import classes from './labels.module.scss';
 

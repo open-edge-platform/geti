@@ -7,6 +7,7 @@ import type {
     TrainingConfiguration,
     TrainingConfigurationParameter,
 } from '@/api/types';
+
 import { findGroupByKey, isParameter } from '../../../../model-listing/model-training-parameters/utils';
 import { isEnumNumberParameter } from '../../utils';
 

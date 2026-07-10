@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import type { DatasetRevision, Job, ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { AlertDialog, Button, DialogContainer, Flex, Grid, Loading, Tag, Text } from '@geti-ui/ui';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -10,7 +11,6 @@ import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
 import { isTrainJob } from 'hooks/api/util';
 import { capitalize } from 'lodash-es';
 
-import type { DatasetRevision, Job, ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { formatDateTime } from '../../../../shared/date-utils';
 import { useGetModel } from '../../hooks/api/use-get-model.hook';
 import { TrainingLogsDialog } from '../../training-logs/training-logs-dialog.component';

@@ -1,9 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Task, TaskType } from '@/api/types';
 import dayjs from 'dayjs';
 
-import type { Task, TaskType } from '@/api/types';
 import { isMultiLabelClassificationTask } from '../task-type-guards';
 
 export const formatCreationDate = (creationDate: string) => {

@@ -1,11 +1,11 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { AnnotationType } from '@/api/types';
 import { Divider, Flex, Text } from '@geti-ui/ui';
 import { Alert } from '@geti-ui/ui/icons';
 import { isNil } from 'lodash-es';
 
-import type { AnnotationType } from '@/api/types';
 import { useProject } from '../../../../../../hooks/api/project.hook';
 
 import classes from './format-warning.module.scss';

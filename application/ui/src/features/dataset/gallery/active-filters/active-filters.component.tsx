@@ -1,12 +1,12 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DatasetItemAnnotationStatus, Label } from '@/api/types';
 import { ActionButton, Divider, Flex } from '@geti-ui/ui';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { useProjectLabels } from 'hooks/use-project-labels.hook';
 import { capitalize, isEmpty } from 'lodash-es';
 
-import type { DatasetItemAnnotationStatus, Label } from '@/api/types';
 import { formatDateRangeEnd, formatDateRangeStart } from '../../../../shared/date-utils';
 import { isNonEmptyArray } from '../../../../shared/util';
 import { FilterChips } from '../toolbar/media-filtering/filter-chips/filter-chips.component';

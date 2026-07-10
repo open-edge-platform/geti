@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { PipelineStatus } from '@/api/types';
+
 import { getComponentStatusMeta, getOverallStatusMeta, shouldShowPipelineHealthDetails } from './utils';
 
 const getStatus = (custom?: Partial<PipelineStatus>): PipelineStatus => ({

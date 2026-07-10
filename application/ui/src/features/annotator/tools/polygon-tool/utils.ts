@@ -3,10 +3,10 @@
 
 import { PointerEvent, SVGProps } from 'react';
 
+import type { Label } from '@/api/types';
 import { isPolygonValid } from '@geti/smart-tools/utils';
 import { isEmpty, isEqual, isNil, negate } from 'lodash-es';
 
-import type { Label } from '@/api/types';
 import eraserToolCursor from '../../../../assets/icons/cursor/eraser-tool.png';
 import lassoClosingCursor from '../../../../assets/icons/cursor/lasso-closing.png';
 import lassoDrawingCursor from '../../../../assets/icons/cursor/lasso-drawing.png';

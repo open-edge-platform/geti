@@ -1,12 +1,12 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { $api } from '@/api';
+import type { MediaDTO } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isFunction } from 'lodash-es';
 
-import { $api } from '@/api';
-import type { MediaDTO } from '@/api/types';
 import { getErrorMessage, getQueryKey } from '../../../query-client/query-client';
 import { useUploadProgress } from '../hooks/use-display-upload-progress';
 

@@ -3,11 +3,11 @@
 
 import { useState } from 'react';
 
+import type { Label } from '@/api/types';
 import { ActionButton, AlertDialog, DialogContainer, DialogTrigger, Text, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Add, Edit } from '@geti-ui/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
-import type { Label } from '@/api/types';
 import { useLabels } from '../use-labels.hook';
 import { LabelsEditor } from './labels-editor.component';
 

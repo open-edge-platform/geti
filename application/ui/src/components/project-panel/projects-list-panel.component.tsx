@@ -1,6 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Project } from '@/api/types';
 import {
     ActionButton,
     Badge,
@@ -23,7 +24,6 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { partition } from 'lodash-es';
 import { useNavigate } from 'react-router';
 
-import type { Project } from '@/api/types';
 import { EnablePipelineBlockedDialog } from '../../components/enable-pipeline-blocked-dialog/enable-pipeline-blocked-dialog.component';
 import { DeleteProjectDialog } from '../../components/project-dialogs/delete-project-dialog.component';
 import { EditProjectNameDialog } from '../../components/project-dialogs/edit-project-name-dialog.component';

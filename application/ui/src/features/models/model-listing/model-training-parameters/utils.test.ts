@@ -1,9 +1,9 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TrainingConfigurationParameter } from '@/api/types';
 import { getMockedTrainingConfiguration } from 'mocks/mock-training-configuration';
 
-import type { TrainingConfigurationParameter } from '@/api/types';
 import { findGroupByKey, flattenParameters, isParameterGroup } from './utils';
 
 describe('Training parameters utils', () => {

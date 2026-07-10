@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 
+import type { AnnotationDTO, Media } from '@/api/types';
 import { useQuery } from '@tanstack/react-query';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useFetchNextUnannotatedMediaItem } from 'hooks/use-get-dataset-items.hook';
@@ -10,7 +11,6 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { range } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
-import type { AnnotationDTO, Media } from '@/api/types';
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
 import { isVideoFrame } from '../../../shared/media-item-utils';
 import { loadImageQueryOptions } from '../../annotator/hooks/use-load-image-query.hook';

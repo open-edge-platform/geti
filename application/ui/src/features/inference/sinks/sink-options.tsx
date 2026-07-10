@@ -4,6 +4,7 @@
 import { ReactNode } from 'react';
 
 import type { LocalFolderSinkConfig, MqttSinkConfig, WebhookSinkConfig } from '@/api/types';
+
 import { ReactComponent as FolderIcon } from '../../../assets/icons/folder.svg';
 import { ReactComponent as MqttIcon } from '../../../assets/icons/mqtt.svg';
 import { ReactComponent as WebhookIcon } from '../../../assets/icons/webhook.svg';

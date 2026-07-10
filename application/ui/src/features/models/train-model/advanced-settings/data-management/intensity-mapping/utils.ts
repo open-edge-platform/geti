@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ConfigurableParameterGroup, TrainingConfiguration } from '@/api/types';
+
 import { findGroupByKey } from '../../../../model-listing/model-training-parameters/utils';
 
 export const getIntensityMappingParameters = (

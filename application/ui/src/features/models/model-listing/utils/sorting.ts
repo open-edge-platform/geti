@@ -1,10 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DatasetRevision, Model } from '@/api/types';
 import dayjs from 'dayjs';
 import { orderBy } from 'lodash-es';
 
-import type { DatasetRevision, Model } from '@/api/types';
 import { getTestingMetric } from '../components/model-row/utils';
 import type { GroupedModels, SortBy } from '../types';
 

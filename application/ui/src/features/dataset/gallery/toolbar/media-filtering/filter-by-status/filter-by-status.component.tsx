@@ -1,10 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { FilterByStatusKey } from '@/api/types';
 import { DimensionValue, Item, Picker } from '@geti-ui/ui';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
-
-import type { FilterByStatusKey } from '@/api/types';
 
 const FILTER_BY_STATUS_OPTIONS: { name: string; key: FilterByStatusKey }[] = [
     { name: 'All media', key: 'all' },

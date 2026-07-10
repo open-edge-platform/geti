@@ -1,9 +1,8 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { orderBy } from 'lodash-es';
-
 import type { Project } from '@/api/types';
+import { orderBy } from 'lodash-es';
 
 export const SORT_BY_OPTIONS = [
     [

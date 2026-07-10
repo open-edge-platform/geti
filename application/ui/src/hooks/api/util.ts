@@ -1,9 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import isObject from 'lodash-es/isObject';
-
 import type { Job, QuantizeJob, TrainJob } from '@/api/types';
+import isObject from 'lodash-es/isObject';
 
 const INVALID_STAGED_FILE_REGEX = /^Staged dataset.*not found\.?$/i;
 

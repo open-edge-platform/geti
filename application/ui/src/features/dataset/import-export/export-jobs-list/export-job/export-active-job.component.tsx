@@ -1,11 +1,11 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ExportDatasetJob } from '@/api/types';
 import { Divider, Flex, Loading, Text, View } from '@geti-ui/ui';
 import { getJobProgress, isJobRunning } from 'hooks/api/util';
 import { useExportDataset } from 'hooks/storage/use-export-dataset.hook';
 
-import type { ExportDatasetJob } from '@/api/types';
 import { BottomProgressBar } from '../../../../models/model-listing/current-model-running/bottom-progress-bar.component';
 import { CancelJobConfirmation } from '../../cancel-job-confirmation/cancel-job-confirmation.component';
 import { ExportJobDetails } from './export-details/export-details.component';

@@ -1,11 +1,11 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { $api } from '@/api';
+import type { SinkConfig } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { omit } from 'lodash-es';
 
-import { $api } from '@/api';
-import type { SinkConfig } from '@/api/types';
 import { getQueryKey } from '../../../../query-client/query-client';
 import { testSinkQueryOptions } from '../api/use-test-sink';
 

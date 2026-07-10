@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 
 import type { TrainingConfiguration } from '@/api/types';
+
 import {
     useGetModelArchitectureTrainingConfiguration,
     useGetModelTrainingConfiguration,

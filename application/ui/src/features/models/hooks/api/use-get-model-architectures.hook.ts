@@ -3,6 +3,7 @@
 
 import { useMemo } from 'react';
 
+import { $api } from '@/api';
 import type {
     ModelArchitecture,
     ModelArchitectureWithPerformanceCategory,
@@ -11,8 +12,6 @@ import type {
 } from '@/api/types';
 import { usePrefetchQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useProject } from 'hooks/api/project.hook';
-
-import { $api } from '@/api';
 
 const getModelArchitectures = (
     modelArchitectures: ModelArchitecture[],

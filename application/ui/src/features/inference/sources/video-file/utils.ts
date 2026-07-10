@@ -3,6 +3,7 @@
 
 import { fetchClient } from '@/api';
 import type { VideoFileSourceConfig } from '@/api/types';
+
 import { getUniqueName } from '../utils';
 
 export const getVideoFileInitialConfig = (existingNames: string[] = []): VideoFileSourceConfig => ({
