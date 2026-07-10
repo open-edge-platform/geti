@@ -8,6 +8,7 @@ datas = [
     ('app/alembic.ini', 'app'),
     ('app/static/*', 'app/static'),
     ('app/supported_models/manifests/*', 'app/supported_models/manifests'),
+    *copy_metadata("geti"),
     *copy_metadata("optree"),
     *copy_metadata("torch"),
     *copy_metadata("tabulate"),
