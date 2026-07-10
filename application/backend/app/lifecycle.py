@@ -199,8 +199,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
                 "application to the previous version."
             )
         logger.error(
-            "If the problem persists, please create a ticket on GitHub or reach out to the "
-            "development team for assistance."
+            "If the problem persists, please create a ticket on https://github.com/open-edge-platform/geti or reach "
+            "out to the development team for assistance."
         )
         # loguru is configured with enqueue=True (see setup_logging), so records are emitted
         # from a background thread. os._exit() terminates immediately and would drop any
