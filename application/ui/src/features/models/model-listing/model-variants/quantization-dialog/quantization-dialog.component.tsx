@@ -10,6 +10,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { $api } from '../../../../../api/client';
 import { toast } from '../../../../../components/toast/toast.component';
+import type { Model } from '../../../../../constants/shared-types';
 import {
     CalibrationDatasetSizeField,
     DEFAULT_QUANTIZATION_PARAMETERS,
@@ -34,12 +35,11 @@ const useDatasetItemsCount = () => {
 };
 
 type QuantizationDialogProps = {
-    modelId: string;
-    modelArchitectureId: string;
+    model: Model;
     onClose: () => void;
 };
 
-export const QuantizationDialog = ({ modelId, modelArchitectureId, onClose }: QuantizationDialogProps) => {
+export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) => {
     const [accuracyDrop, setAccuracyDrop] = useState(DEFAULT_QUANTIZATION_PARAMETERS.accuracyDrop);
     const [hasNoMaxAccuracyDrop, setHasNoMaxAccuracyDrop] = useState(
         DEFAULT_QUANTIZATION_PARAMETERS.hasNoMaxAccuracyDrop
@@ -66,8 +66,8 @@ export const QuantizationDialog = ({ modelId, modelArchitectureId, onClose }: Qu
                     project_id: projectId,
                     job_type: 'quantize',
                     parameters: {
-                        model_id: modelId,
-                        model_architecture_id: modelArchitectureId,
+                        model_id: model.id,
+                        model_architecture_id: model.architecture,
                         max_drop: hasNoMaxAccuracyDrop ? null : accuracyDrop / 100,
                         max_num_iterations: hasNoMaxAccuracyDrop ? null : maxNumIterations,
                         max_calibration_subset_size: usesFullCalibrationDataset ? totalCount : effectiveCalibrationSize,

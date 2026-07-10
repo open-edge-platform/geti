@@ -3,13 +3,13 @@
 
 import { Button, Content, ContextualHelp, DialogTrigger, Flex, Text } from '@geti-ui/ui';
 
+import type { Model } from '../../../../constants/shared-types';
 import { QuantizationDialog } from './quantization-dialog/quantization-dialog.component';
 
 type QuantizationRowProps = {
-    modelId: string;
-    modelArchitectureId: string;
+    model: Model;
 };
-export const QuantizationRow = ({ modelId, modelArchitectureId }: QuantizationRowProps) => {
+export const QuantizationRow = ({ model }: QuantizationRowProps) => {
     return (
         <Flex marginTop={'size-150'} alignItems={'center'} justifyContent={'space-between'}>
             <Flex>
@@ -25,8 +25,7 @@ export const QuantizationRow = ({ modelId, modelArchitectureId }: QuantizationRo
                 <Button variant={'secondary'}>Start quantization</Button>
                 {(close) => (
                     <QuantizationDialog
-                        modelId={modelId}
-                        modelArchitectureId={modelArchitectureId}
+                        model={model}
                         onClose={close}
                     />
                 )}
