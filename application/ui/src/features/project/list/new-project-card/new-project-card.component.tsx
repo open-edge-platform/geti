@@ -36,6 +36,8 @@ export const NewProjectCard = () => {
                         new project
                     </Text>
                 </ActionButton>
+            </View>
+            <View UNSAFE_className={classes.card}>
                 <ActionButton onPress={handleCreateFromDataset} UNSAFE_className={classes.buttonText}>
                     <AddCircle />
                     <Text>
