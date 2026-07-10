@@ -279,6 +279,7 @@ test.describe('Model Details', () => {
 
             await modelsPage.getNoMaximumCheckbox().click();
             await modelsPage.getAccuracyDropInput().fill('5');
+            await modelsPage.getMaxNumIterationsInput().fill('7');
             await modelsPage.getCalibrationSizeInput().fill('300');
 
             await modelsPage.submitQuantization();
@@ -291,6 +292,7 @@ test.describe('Model Details', () => {
                 parameters: {
                     model_id: 'model-1',
                     max_drop: 0.05,
+                    max_num_iterations: 7,
                     max_calibration_subset_size: 300,
                 },
             });
