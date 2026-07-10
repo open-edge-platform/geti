@@ -198,10 +198,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
                 "No pre-migration database backup is available. To recover, downgrade the "
                 "application to the previous version."
             )
-        logger.error(
-            "If the problem persists, please create a ticket on https://github.com/open-edge-platform/geti or reach "
-            "out to the development team for assistance."
-        )
+        logger.error("If the problem persists, please create a ticket on https://github.com/open-edge-platform/geti.")
         # loguru is configured with enqueue=True (see setup_logging), so records are emitted
         # from a background thread. os._exit() terminates immediately and would drop any
         # records still on the queue, so drain the sinks before exiting.
