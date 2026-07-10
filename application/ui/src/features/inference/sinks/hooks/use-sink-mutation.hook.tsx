@@ -40,9 +40,9 @@ export const useSinkMutation = (isNewSink: boolean) => {
     const addSink = $api.useMutation('post', '/api/sinks', {
         meta: {
             invalidateQueries: [['get', '/api/sinks']],
-        },
-        error: {
-            notify: () => false,
+            error: {
+                notify: () => false,
+            },
         },
     });
 
