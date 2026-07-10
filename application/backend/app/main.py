@@ -54,7 +54,6 @@ from app.api.routers import (
     webrtc,
 )
 from app.core.logging import InterceptHandler
-from app.db import MigrationFatalError
 from app.lifecycle import lifespan
 from app.services.base import ResourceNotFoundError
 from app.settings import get_settings
@@ -62,10 +61,6 @@ from app.settings import get_settings
 settings = get_settings()
 logging.basicConfig(handlers=[InterceptHandler()], level=settings.log_level, force=True)
 
-# Dedicated process exit code for fatal, non-restartable migration failures.
-# A failed or incompatible schema migration will deterministically fail again,
-# so the launcher/supervisor must NOT restart the process when it sees this code.
-MIGRATION_FATAL_EXIT_CODE = 3
 
 app = FastAPI(
     title=settings.app_name,
@@ -214,26 +209,6 @@ def main() -> None:
         asyncio.run(main_async())
     except KeyboardInterrupt:
         logger.info("Application shutdown cleanly via KeyboardInterrupt")
-    except MigrationFatalError as e:
-        # A failed/incompatible database migration is fatal and non-restartable:
-        # exit with a dedicated code so the launcher does NOT attempt a restart.
-        logger.exception("Fatal database migration error; exiting without restart: {}", e)
-        if e.backup_path is not None:
-            logger.error(
-                "To recover, downgrade the application to the previous version and restore the "
-                "database from the pre-migration backup file: {}",
-                e.backup_path,
-            )
-        else:
-            logger.error(
-                "No pre-migration database backup is available. To recover, downgrade the "
-                "application to the previous version."
-            )
-        logger.error(
-            "If the problem persists, please create a ticket on GitHub or reach out to the "
-            "development team for assistance."
-        )
-        sys.exit(MIGRATION_FATAL_EXIT_CODE)
 
 
 if __name__ == "__main__":
