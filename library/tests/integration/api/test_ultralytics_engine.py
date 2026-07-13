@@ -61,6 +61,21 @@ _TASK_SPECS: list[_TaskSpec] = [
         recipe_name="yolo26_n_seg",
         dataset_dir="instance_segmentation_coco",
     ),
+    _TaskSpec(
+        task=TaskType.MULTI_CLASS_CLS,
+        recipe_name="yolo26_n_cls",
+        dataset_dir="classification_cifar10",
+    ),
+    _TaskSpec(
+        task=TaskType.MULTI_LABEL_CLS,
+        recipe_name="yolo26_n_cls",
+        dataset_dir="multilabel_classification_coco",
+    ),
+    _TaskSpec(
+        task=TaskType.SEMANTIC_SEGMENTATION,
+        recipe_name="yolo26_n_sem",
+        dataset_dir="segmentation_pets",
+    ),
 ]
 
 
@@ -68,6 +83,9 @@ def _resolve_recipe(spec: _TaskSpec) -> Path:
     task_to_subdir = {
         TaskType.DETECTION: "detection",
         TaskType.INSTANCE_SEGMENTATION: "instance_segmentation",
+        TaskType.MULTI_CLASS_CLS: "classification/multi_class_cls",
+        TaskType.MULTI_LABEL_CLS: "classification/multi_label_cls",
+        TaskType.SEMANTIC_SEGMENTATION: "semantic_segmentation",
     }
     subdir = task_to_subdir[spec.task]
     return RECIPE_ROOT / subdir / f"{spec.recipe_name}.yaml"
@@ -170,7 +188,8 @@ def test_ultralytics_engine_workflow(
     assert ov_xml_path.exists()
     assert ov_xml_path.suffix == ".xml"
 
-    dummy_input = np.zeros((640, 640, 3), dtype=np.uint8)
+    input_h, input_w = datamodule.input_size
+    dummy_input = np.zeros((input_h, input_w, 3), dtype=np.uint8)
     mapi_model = Model.create_model(str(ov_xml_path))
     assert mapi_model is not None
     fp32_result = mapi_model(dummy_input)
