@@ -16,7 +16,7 @@ type ProjectListProps = {
 export const ProjectsList = ({ projects, onRename, onDelete, onEnableBlocked }: ProjectListProps) => {
     const projectNames = projects.map(({ name }) => name);
     const projectsWithActiveProjectInFront = projects.toSorted((projectA, projectB) =>
-        projectA.active_pipeline ? -1 : projectB.active_pipeline ? -1 : 0
+        projectA.active_pipeline ? -1 : projectB.active_pipeline ? 1 : 0
     );
 
     return (
