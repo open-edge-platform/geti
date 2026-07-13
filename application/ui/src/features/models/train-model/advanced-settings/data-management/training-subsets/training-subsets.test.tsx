@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import type { TrainingConfiguration } from '@/api/types';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import {
     getMockedConfigurationParameter,
@@ -12,7 +13,6 @@ import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../../../../api/utils';
-import { TrainingConfiguration } from '../../../../../../constants/shared-types';
 import { server } from '../../../../../../msw-node-setup';
 import { distributeByLargestRemainder } from '../../../../utils';
 import { TrainingSubsets } from './training-subsets.component';
@@ -156,7 +156,7 @@ const mockSubsetsNetworkRequest = ({
 }) => {
     server.use(
         http.get('/api/projects/{project_id}/dataset/items', ({ query }) => {
-            const subset = query.get('subset');
+            const subset = query.get('subsets');
 
             if (subset === 'testing') {
                 return HttpResponse.json({

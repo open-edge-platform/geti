@@ -1,9 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TrainingConfiguration, TrainingConfigurationParameter } from '@/api/types';
 import { isEmpty } from 'lodash-es';
 
-import type { TrainingConfiguration, TrainingConfigurationParameter } from '../../../../constants/shared-types';
 import { isParameterGroup } from '../../model-listing/model-training-parameters/utils';
 
 const createNewPrefix = (prefix: string, key: string) => (isEmpty(prefix) ? key : `${prefix}.${key}`);

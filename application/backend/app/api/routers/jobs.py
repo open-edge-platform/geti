@@ -101,6 +101,7 @@ async def submit_job(
                         job_id=job_id,
                         max_calibration_subset_size=job_request.parameters.max_calibration_subset_size,
                         max_drop=job_request.parameters.max_drop,
+                        max_num_iterations=job_request.parameters.max_num_iterations,
                     ),
                 )
             case JobType.PREPARE_DATASET_FOR_IMPORT:

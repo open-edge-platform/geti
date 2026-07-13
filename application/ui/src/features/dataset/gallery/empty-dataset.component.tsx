@@ -15,7 +15,11 @@ export const EmptyDataset = ({ hasActiveFilter }: EmptyDatasetProps) => {
             <EmptyDatasetImage />
             <Heading level={2} UNSAFE_style={{ textAlign: 'center' }}>
                 {hasActiveFilter ? (
-                    'No media items match your filter. Remove or select a new filter.'
+                    <>
+                        No media items match your filter.
+                        <br />
+                        Remove or select a new filter.
+                    </>
                 ) : (
                     <>
                         Your dataset is empty.

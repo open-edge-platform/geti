@@ -1,32 +1,32 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { components } from '../api/openapi-spec';
+import type { AnnotationDTO, Label } from '@/api/types';
 
-export interface RegionOfInterest {
+export type RegionOfInterest = {
     x: number;
     y: number;
     width: number;
     height: number;
+};
+
+export type AnnotationLabelRef = {
+    id: string;
+    probability?: number;
+};
+
+export interface AnnotationLabel extends Label {
+    probability?: number;
 }
 
-export type Point = components['schemas']['Point'];
-export type Rect = components['schemas']['Rectangle'];
-export type Polygon = components['schemas']['Polygon'];
-type FullImage = components['schemas']['FullImage'];
-
-export type Shape = Rect | Polygon | FullImage;
-
-export type AnnotationLabelRef = { id: string; probability?: number };
-
-export type AnnotationLabel = components['schemas']['LabelView'] & { probability?: number };
-
-export type Annotation = Omit<components['schemas']['DatasetItemAnnotation'], 'labels' | 'confidences'> & {
+export interface Annotation extends Omit<AnnotationDTO, 'labels' | 'confidences'> {
     id: string;
     labels: AnnotationLabelRef[];
-};
+}
 
 export type ClipperPoint = {
     X: number;
     Y: number;
 };
+
+export type { Shape, Point, Rect, Polygon } from '@/api/types';

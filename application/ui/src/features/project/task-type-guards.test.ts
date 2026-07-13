@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TaskType } from '@/api/types';
 import { getMockedProject } from 'mocks/mock-project';
 
-import { TaskType } from '../../constants/shared-types';
 import {
     isClassificationTask,
     isDetectionTask,

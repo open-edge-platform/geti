@@ -38,6 +38,15 @@ def video_path(tmp_path: Path) -> Generator[str]:
 class TestVideoFileStream:
     """Integration tests for VideoFileStream end-of-stream semantics."""
 
+    def test_raises_specific_error_when_file_does_not_exist(self, tmp_path: Path):
+        """A missing file is rejected before ever touching cv2, with a specific message."""
+        missing_path = str(tmp_path / "does-not-exist.mp4")
+
+        with pytest.raises(RuntimeError) as excinfo:
+            VideoFileStream(video_path=missing_path)
+
+        assert str(excinfo.value) == f"Video file not found: {missing_path}"
+
     def test_is_not_real_time(self, video_path: str):
         with VideoFileStream(video_path=video_path) as stream:
             assert stream.is_real_time() is False

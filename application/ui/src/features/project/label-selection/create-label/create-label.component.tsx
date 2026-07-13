@@ -3,6 +3,7 @@
 
 import { useRef, useState } from 'react';
 
+import type { Label, TaskType } from '@/api/types';
 import { ActionButton, DOMRefValue, Grid, TextField, TextFieldRef, useUnwrapDOMRef, View } from '@geti-ui/ui';
 import { Add } from '@geti-ui/ui/icons';
 import { useEventListener } from 'hooks/event-listener.hook';
@@ -11,7 +12,6 @@ import { v4 as uuid } from 'uuid';
 import { HotkeyField } from '../../../../components/label-fields/hotkey-field.component';
 import { LabelColorPicker } from '../../../../components/label-fields/label-color-picker.component';
 import { validateLabelHotkey, validateLabelName } from '../../../../components/label-fields/label-validation';
-import type { Label, TaskType } from '../../../../constants/shared-types';
 import { TASK_HOTKEYS } from '../../../../shared/hotkeys-definition';
 import { getRandomDistinctColor } from '../../../annotator/label-utils';
 

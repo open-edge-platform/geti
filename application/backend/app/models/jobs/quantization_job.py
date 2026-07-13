@@ -18,6 +18,10 @@ class QuantizationJobParams(JobParams):
     model_variant_id: UUID = Field(default_factory=uuid4)
     max_calibration_subset_size: int = Field(default=100, description="Max samples for calibration")
     max_drop: float | None = Field(default=None, description="Max accuracy drop for accuracy-aware quantization")
+    max_num_iterations: int | None = Field(
+        default=10,
+        description="Max number of iterations for accuracy-aware quantization (None means unlimited)",
+    )
 
 
 class QuantizationJob(ProjectJob[QuantizationJobParams]):

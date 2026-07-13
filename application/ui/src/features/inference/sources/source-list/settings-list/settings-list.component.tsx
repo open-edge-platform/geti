@@ -1,8 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { $api } from '../../../../../api/client';
-import type { SourceConfig } from '../../../../../constants/shared-types';
+import { $api } from '@/api';
+import type { SourceConfig } from '@/api/types';
 
 import classes from './settings-list.module.scss';
 

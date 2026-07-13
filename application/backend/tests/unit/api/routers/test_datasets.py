@@ -13,6 +13,8 @@ from app.api.schemas.dataset_item import DatasetItemSubset, DatasetItemView
 from app.main import app
 from app.models import DatasetItem, DatasetItemAnnotationStatus
 from app.models.dataset import DatasetStatistics
+from app.models.dataset_item import DatasetItemSortBy
+from app.models.media import SortDirection
 from app.services import DatasetService, ResourceNotFoundError, ResourceType
 from app.services.dataset_service import DatasetItemFilters
 
@@ -60,12 +62,12 @@ class TestDatasetItemEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
             filters=DatasetItemFilters(
-                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subset=None
+                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
             ),
         )
 
@@ -86,7 +88,7 @@ class TestDatasetItemEndpoints:
             end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -97,7 +99,7 @@ class TestDatasetItemEndpoints:
                 end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
         )
 
@@ -118,7 +120,7 @@ class TestDatasetItemEndpoints:
             end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC),
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -129,7 +131,7 @@ class TestDatasetItemEndpoints:
                 end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC),
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
         )
 
@@ -178,7 +180,7 @@ class TestDatasetItemEndpoints:
             end_date=None,
             annotation_status=annotation_status,
             label_ids=None,
-            subset=None,
+            subsets=None,
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -189,7 +191,7 @@ class TestDatasetItemEndpoints:
                 end_date=None,
                 annotation_status=annotation_status,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
         )
 
@@ -200,7 +202,7 @@ class TestDatasetItemEndpoints:
         fxt_dataset_service.count_dataset_items.return_value = 1
         fxt_dataset_service.list_dataset_items.return_value = [fxt_dataset_item]
 
-        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items?subset={subset}")
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items?subsets={subset}")
 
         assert response.status_code == status.HTTP_200_OK
         fxt_dataset_service.count_dataset_items.assert_called_once_with(
@@ -209,7 +211,7 @@ class TestDatasetItemEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=subset,
+            subsets=[subset],
         )
         fxt_dataset_service.list_dataset_items.assert_called_once_with(
             project_id=fxt_get_project.id,
@@ -220,9 +222,123 @@ class TestDatasetItemEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=subset,
+                subsets=[subset],
             ),
         )
+
+    def test_list_dataset_items_with_multiple_subsets(
+        self, fxt_get_project, fxt_dataset_item, fxt_dataset_service, fxt_client
+    ):
+        fxt_dataset_service.count_dataset_items.return_value = 1
+        fxt_dataset_service.list_dataset_items.return_value = [fxt_dataset_item]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items?subsets=training&subsets=validation")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_dataset_service.count_dataset_items.assert_called_once_with(
+            project=fxt_get_project,
+            start_date=None,
+            end_date=None,
+            annotation_status=None,
+            label_ids=None,
+            subsets=["training", "validation"],
+        )
+        fxt_dataset_service.list_dataset_items.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=DatasetItemFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=["training", "validation"],
+            ),
+        )
+
+    def test_list_dataset_items_default_sort(self, fxt_get_project, fxt_dataset_item, fxt_dataset_service, fxt_client):
+        fxt_dataset_service.count_dataset_items.return_value = 1
+        fxt_dataset_service.list_dataset_items.return_value = [fxt_dataset_item]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_dataset_service.list_dataset_items.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=DatasetItemFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=None,
+                sort_by=DatasetItemSortBy.CREATION_DATE,
+                sort_direction=SortDirection.DESC,
+            ),
+        )
+
+    @pytest.mark.parametrize("sort_direction", [SortDirection.ASC, SortDirection.DESC])
+    def test_list_dataset_items_with_sort_direction(
+        self, fxt_get_project, fxt_dataset_item, fxt_dataset_service, fxt_client, sort_direction
+    ):
+        fxt_dataset_service.count_dataset_items.return_value = 1
+        fxt_dataset_service.list_dataset_items.return_value = [fxt_dataset_item]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items?sort_direction={sort_direction.value}")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_dataset_service.list_dataset_items.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=DatasetItemFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=None,
+                sort_by=DatasetItemSortBy.CREATION_DATE,
+                sort_direction=sort_direction,
+            ),
+        )
+
+    @pytest.mark.parametrize("sort_by", list(DatasetItemSortBy))
+    def test_list_dataset_items_with_sort_by(
+        self, fxt_get_project, fxt_dataset_item, fxt_dataset_service, fxt_client, sort_by
+    ):
+        fxt_dataset_service.count_dataset_items.return_value = 1
+        fxt_dataset_service.list_dataset_items.return_value = [fxt_dataset_item]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/items?sort_by={sort_by.value}")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_dataset_service.list_dataset_items.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=DatasetItemFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=None,
+                sort_by=sort_by,
+                sort_direction=SortDirection.DESC,
+            ),
+        )
+
+    def test_list_dataset_items_wrong_sort_by(self, fxt_get_project, fxt_dataset_service, fxt_client):
+        response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/items?sort_by=bogus")
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_dataset_service.list_dataset_items.assert_not_called()
+
+    def test_list_dataset_items_wrong_sort_direction(self, fxt_get_project, fxt_dataset_service, fxt_client):
+        response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/items?sort_direction=bogus")
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_dataset_service.list_dataset_items.assert_not_called()
 
     @pytest.mark.parametrize(
         "http_method, http_path, service_method",

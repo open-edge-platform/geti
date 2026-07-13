@@ -1,11 +1,11 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { LocalFolderSinkConfig } from '@/api/types';
 import { Flex, TextField } from '@geti-ui/ui';
 
 import { OutputFormats } from '../output-formats/output-formats.component';
 import { RateLimitFields } from '../rate-limit/rate-limit-fields.component';
-import { LocalFolderSinkConfig } from '../utils';
 
 type LocalFolderProps = {
     defaultState: LocalFolderSinkConfig;

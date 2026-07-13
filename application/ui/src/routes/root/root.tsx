@@ -3,10 +3,10 @@
 
 import { ReactNode, Suspense } from 'react';
 
+import { $api } from '@/api';
 import { Flex, Heading } from '@geti-ui/ui';
 import { Outlet } from 'react-router';
 
-import { $api } from '../../api/client';
 import { License } from '../../features/license/license.component';
 import { IntelBrandedLoading } from '../../shared/components/intel-branded-loading/intel-branded-loading.component';
 import { ServerErrorFallback } from './server-error-fallback.component';

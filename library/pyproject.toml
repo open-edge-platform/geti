@@ -41,7 +41,7 @@ dependencies = [
     "timm==1.0.3",
     "openvino~=2026.2.0",
     "openvino-model-api~=0.4.5",
-    "onnx==1.21.0",
+    "onnx==1.22.0",
     "onnxruntime==1.26.0",
     "onnxslim~=0.1.71",
     "onnxscript==0.6.2",
@@ -51,11 +51,7 @@ dependencies = [
     "tensorboard==2.20.0",
     "tensorboardx==2.6.4",
     "kornia~=0.8.2",
-    # NOTE: rf-detr is consumed from a specific commit that includes export fixes
-    # for torch>=2.10 and dynamo export support. Once the upstream roboflow/rf-detr
-    # repository publishes a tagged release with these changes, migrate to the
-    # official version pin.
-    "rfdetr @ git+https://github.com/kprokofi/rf-detr.git@bf69fe2d11ee6b7e0698e4a27af2081134f9b483",
+    "rfdetr==1.8.0",
     "certifi>=2026",
     "roboflow~=1.2",
 ]
@@ -109,7 +105,7 @@ xpu = [
     "torchvision==0.25.0+xpu"
 ]
 ultralytics = [
-    "ultralytics~=8.4.41",
+    "ultralytics~=8.4.82",
 ]
 
 docs = [
@@ -129,6 +125,10 @@ docs = [
 
 ci_publish = [
     "build==1.2.2.post1",
+]
+
+benchmark = [
+    "kagglehub>=0.4.1",
 ]
 
 [project.scripts]
@@ -418,6 +418,7 @@ notice-rgx = """
     "ANN201",   # Skip return type hint in test codes
     "D",     # Test skips missing docstring argument with magic (fixture) methods.
     "ARG001",   # Some arguments are passed for executing fixture
+    "PT019",    # False positive on `@patch`-injected mock parameters, which aren't pytest fixtures.
 ]
 "src/getitune/**/*.py" = [
     "ERA001",
