@@ -54,7 +54,20 @@ const publicApiUrlJson = JSON.stringify(publicApiUrl);
 // application/backend/app/main.py's `static_dir` mount). Consumers that build
 // absolute asset URLs at runtime (e.g. the SAM worker's `setOrtWasmPaths`)
 // must prefix them with this value, or they 404 behind the `/html` mount.
-const assetPrefix = process.env.ASSET_PREFIX ?? '';
+//
+// Runtime consumers (opencv-source.ts, segment-anything.worker.ts) prepend
+// this value to an already-leading-slash path (`` + `/opencv/opencv.js``),
+// so `''` is the correct "no prefix" default for them.
+// rsbuild's OWN `output.assetPrefix`, unlike the runtime value above, must
+// never be an empty string: rsbuild treats `''` as "emit relative asset
+// paths" in index.html (e.g. `static/js/index.js` instead of
+// `/static/js/index.js`). Relative paths resolve fine at `/`, but break on
+// any deep client-side route (e.g. `/projects/:id/dataset/:itemId`) because
+// the browser resolves them against the current URL path, 404s, and gets the
+// SPA's index.html fallback back instead of the script — `SyntaxError:
+// Unexpected token '<'` — which blanks the whole app. Fall back to the
+// root-absolute `/` when no explicit prefix is configured.
+const assetPrefix = process.env.ASSET_PREFIX ?? '/';
 const assetPrefixJson = JSON.stringify(assetPrefix);
 
 export default defineConfig({
