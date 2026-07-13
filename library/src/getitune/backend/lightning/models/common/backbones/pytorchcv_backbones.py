@@ -11,18 +11,16 @@ from typing import Callable
 
 import torch
 from pytorchcv.model_provider import _models
-from pytorchcv.models.common.model_store import download_model
-from torch import distributed, nn
+from torch import nn
 from torch.nn.modules.batchnorm import _BatchNorm
 
 from getitune.backend.lightning.models.modules.norm import build_norm_layer
-from getitune.backend.lightning.models.utils.utils import get_dist_info
 
 # ruff: noqa: SLF001
 
 
 def replace_activation(model: nn.Module, activation: Callable[..., nn.Module]) -> nn.Module:
-    """Replace activation funtion."""
+    """Replace activation function."""
     for name, module in model._modules.items():
         if len(list(module.children())) > 0:
             model._modules[name] = replace_activation(module, activation)
@@ -32,7 +30,7 @@ def replace_activation(model: nn.Module, activation: Callable[..., nn.Module]) -
 
 
 def replace_norm(model: nn.Module, normalization: Callable[..., nn.Module]) -> nn.Module:
-    """Replace norm funtion."""
+    """Replace norm function."""
     for name, module in model._modules.items():
         if len(list(module.children())) > 0:
             model._modules[name] = replace_norm(module, normalization)
@@ -75,21 +73,6 @@ def train(self: nn.Module, mode: bool = True) -> None:
             # trick: eval have effect on BatchNorm only
             if isinstance(module, _BatchNorm):
                 module.eval()
-
-
-def init_weights(self: nn.Module, pretrained: bool = True) -> None:
-    """Init weights function for new model (copy from mmdet)."""
-    if pretrained:
-        rank, world_size = get_dist_info()
-        if rank == 0:
-            # Make sure that model is fetched to the local storage.
-            download_model(net=self, model_name=self.model_name, local_model_store_dir_path=self.models_cache_root)
-            if world_size > 1:
-                distributed.barrier()
-        else:
-            # Wait for model to be in the local storage, then load it.
-            distributed.barrier()
-            download_model(net=self, model_name=self.model_name, local_model_store_dir_path=self.models_cache_root)
 
 
 def _pytorchcv_model_reduce(self) -> nn.Module:  # noqa: ANN001
@@ -144,7 +127,6 @@ def _build_pytorchcv_model(
         # Save original forward, just in case.
         model.forward_single_output = model.forward
         model.forward = multioutput_forward.__get__(model)
-        model.init_weights = init_weights.__get__(model)
         model.train = train.__get__(model)
 
         model.output = None
