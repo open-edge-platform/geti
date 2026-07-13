@@ -437,7 +437,7 @@ def _cmd_report(args: argparse.Namespace) -> int:
         traceback_text: str | None = None
         try:
             local_path = client.download_artifacts(run.info.run_id, "traceback.txt")
-            traceback_text = Path(local_path).read_text()
+            traceback_text = Path(local_path).read_text(encoding="utf-8", errors="replace")
         except Exception as exc:  # never let a bad or unreachable artifact break the report
             logger.warning(
                 "Could not download traceback artifact for run %s (%s on %s): %s. Falling back to the short error tag.",
