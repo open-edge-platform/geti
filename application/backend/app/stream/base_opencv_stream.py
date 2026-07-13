@@ -48,12 +48,29 @@ class BaseOpenCVStream(VideoStream, ABC):
         """Initialize the OpenCV VideoCapture."""
         self.cap = cv2.VideoCapture(self.source, self.api_preference)  # type: ignore[call-overload]
         if not self.cap.isOpened():
-            raise RuntimeError(f"Could not open video source: {self.source}")
+            raise RuntimeError(self._not_opened_message())
         if self.codec:
             self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*self.codec))  # type: ignore[attr-defined]
         if self.timeout:
             self.cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, self.timeout)
             self.cap.set(cv2.CAP_PROP_READ_TIMEOUT_MSEC, self.timeout)
+
+    def _not_opened_message(self) -> str:
+        """Build a user-facing message for a failed-to-open capture, tailored per source type.
+
+        For IP cameras, ``self.source`` is the connection URL actually passed to OpenCV, which
+        may embed credentials (see ``IPCameraConfig.get_configured_stream_url``). The original,
+        credential-free URL is preserved in ``metadata['stream_url']`` and used here instead, so
+        error text never leaks credentials.
+        """
+        match self.source_type:
+            case SourceType.VIDEO_FILE:
+                return f"Could not open video file: {self.source}"
+            case SourceType.IP_CAMERA:
+                display_url = self.metadata.get("stream_url", self.source)
+                return f"Could not connect to IP camera stream: {display_url}"
+            case _:
+                return f"Could not open video source: {self.source}"
 
     def _read_frame(self) -> np.ndarray:
         """Read a frame from the capture device."""
