@@ -1,13 +1,13 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Model } from '@/api/types';
 import { Flex, Item, TabList, TabPanels, Tabs, Text } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
 
 import { ReactComponent as ONNX } from '../../../../assets/icons/onnx-logo.svg';
 import { ReactComponent as OpenVINO } from '../../../../assets/icons/openvino-logo.svg';
 import { ReactComponent as Pytorch } from '../../../../assets/icons/pytorch-logo.svg';
-import type { Model } from '../../../../constants/shared-types';
 import { ModelVariantTable } from './model-variant-table.component';
 import { QuantizationRow } from './quantization-row.component';
 

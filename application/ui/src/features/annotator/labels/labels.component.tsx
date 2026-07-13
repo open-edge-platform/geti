@@ -3,13 +3,13 @@
 
 import { CSSProperties, Fragment, useMemo } from 'react';
 
+import type { Label } from '@/api/types';
 import { Divider, Flex, Pressable, Text, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import type { Label } from '../../../constants/shared-types';
 import { EMPTY_LABEL_ID } from '../../../shared/annotator/labels';
 import { formatHotkeyForDisplay } from '../../../shared/hotkeys-definition';
 import { usePinnedLabels } from './hooks/use-pinned-labels.hook';

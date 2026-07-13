@@ -1,11 +1,10 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DatasetSubset } from '@/api/types';
 import { Checkbox, CheckboxGroup, Flex, Text } from '@geti-ui/ui';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import capitalize from 'lodash-es/capitalize';
-
-import { DatasetSubset } from '../../../../../../constants/shared-types';
 
 import classes from './filter-by-subset.module.scss';
 

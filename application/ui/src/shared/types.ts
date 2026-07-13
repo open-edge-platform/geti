@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { AnnotationDTO, Label } from '../constants/shared-types';
+import type { AnnotationDTO, Label } from '@/api/types';
 
 export type RegionOfInterest = {
     x: number;
@@ -29,4 +29,4 @@ export type ClipperPoint = {
     Y: number;
 };
 
-export type { Shape, Point, Rect, Polygon } from '../constants/shared-types';
+export type { Shape, Point, Rect, Polygon } from '@/api/types';

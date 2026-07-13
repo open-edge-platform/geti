@@ -3,6 +3,7 @@
 
 import { Suspense } from 'react';
 
+import { $api } from '@/api';
 import { Flex, Grid, Item, Loading, TabList, Tabs, View } from '@geti-ui/ui';
 import { usePrefetchQuery } from '@tanstack/react-query';
 import { usePrefetchPipeline } from 'hooks/api/pipeline.hook';
@@ -10,7 +11,6 @@ import { useProject } from 'hooks/api/project.hook';
 import { Outlet, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import { $api } from './api/client';
 import getiLogo from './assets/icons/geti-logo.webp';
 import { ProjectsListPanel } from './components/project-panel/projects-list-panel.component';
 import { paths } from './constants/paths';

@@ -3,12 +3,12 @@
 
 import { useState } from 'react';
 
+import type { SinkConfig } from '@/api/types';
 import { ActionButton, Flex, Loading, Text } from '@geti-ui/ui';
 import { Back } from '@geti-ui/ui/icons';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEmpty, orderBy } from 'lodash-es';
 
-import type { SinkConfig } from '../../../constants/shared-types';
 import { useSinksQuery } from './api/use-sinks-query';
 import { EditSinkForm } from './edit-sink-form.component';
 import { SinkList } from './sink-list/sink-list.component';

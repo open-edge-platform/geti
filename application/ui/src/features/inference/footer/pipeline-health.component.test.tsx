@@ -1,6 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { PipelineHealth as PipelineHealthType } from '@/api/types';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedPipelineHealth, getMockedStatus } from 'mocks/mock-pipeline-health';
@@ -8,7 +9,6 @@ import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../api/utils';
-import { type PipelineHealth as PipelineHealthType } from '../../../constants/shared-types';
 import { server } from '../../../msw-node-setup';
 import { PipelineHealth } from './pipeline-health.component';
 

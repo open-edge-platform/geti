@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { components, operations } from '../api/openapi-spec';
+import type { components, operations } from './openapi-spec';
 
 export type Label = components['schemas']['LabelView'];
 

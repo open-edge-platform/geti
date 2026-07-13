@@ -166,8 +166,34 @@ class TestBenchmarkTrackerSetup:
 
         mock_mlflow.set_tracking_uri.assert_called_once_with("/tmp/test_mlruns")  # noqa: S108
         mock_mlflow.get_experiment_by_name.assert_called_once_with("getitune-benchmark/develop/manual")
-        mock_mlflow.create_experiment.assert_called_once_with("getitune-benchmark/develop/manual")
+        # Local file-store URI: no proxy scheme available, so artifact_location
+        # must fall back to MLflow's default (None).
+        mock_mlflow.create_experiment.assert_called_once_with(
+            "getitune-benchmark/develop/manual", artifact_location=None
+        )
         assert tracker._experiment_id == "1"
+
+    @patch("getitune.benchmark.tracking.mlflow")
+    def test_setup_creates_experiment_with_proxy_artifacts_for_http_server(self, mock_mlflow: MagicMock) -> None:
+        """Against a remote MLflow server, new experiments must pin the
+        ``mlflow-artifacts:/`` proxy scheme so artifacts upload/download over
+        HTTP regardless of the server's ``--default-artifact-root``.
+        """
+        config = TrackingConfig(
+            tracking_uri="http://mlflow.example:5000",
+            branch="develop",
+            trigger="weekly",
+        )
+        mock_mlflow.get_experiment_by_name.return_value = None
+        mock_mlflow.create_experiment.return_value = "7"
+
+        tracker = BenchmarkTracker(config)
+        tracker.setup()
+
+        mock_mlflow.create_experiment.assert_called_once_with(
+            "getitune-benchmark/develop/weekly", artifact_location="mlflow-artifacts:/"
+        )
+        assert tracker._experiment_id == "7"
 
     @patch("getitune.benchmark.tracking.mlflow")
     def test_setup_reuses_existing_experiment(self, mock_mlflow: MagicMock) -> None:

@@ -3,10 +3,10 @@
 
 import { useActionState } from 'react';
 
+import type { SinkConfig } from '@/api/types';
 import { isFunction } from 'lodash-es';
 
 import { toast } from '../../../../components/toast/toast.component';
-import type { SinkConfig } from '../../../../constants/shared-types';
 import { useSinkMutation } from './use-sink-mutation.hook';
 
 interface useSinkActionProps<T> {

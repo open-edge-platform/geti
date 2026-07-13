@@ -3,11 +3,11 @@
 
 import { useMemo } from 'react';
 
+import { $api } from '@/api';
+import type { DatasetItemAnnotationStatus, DatasetSubset, Pagination } from '@/api/types';
 import { useQuery } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 
-import { $api } from '../api/client';
-import type { DatasetItemAnnotationStatus, DatasetSubset, Pagination } from '../constants/shared-types';
 import { type SortDirection } from './sort-direction.interface';
 import { useDatasetFiltersSearchParams } from './use-dataset-filters-search-params.hook';
 import { useProjectIdentifier } from './use-project-identifier.hook';

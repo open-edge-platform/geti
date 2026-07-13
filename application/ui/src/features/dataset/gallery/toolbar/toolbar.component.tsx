@@ -3,6 +3,7 @@
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
+import type { Media } from '@/api/types';
 import {
     ActionButton,
     Button,
@@ -18,7 +19,6 @@ import { SortDown, SortUp } from '@geti-ui/ui/icons';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { isString } from 'lodash-es';
 
-import type { Media } from '../../../../constants/shared-types';
 import { isImage } from '../../../../shared/media-item-utils';
 import { TrainModel } from '../../../models/train-model/train-model.component';
 import { ImportExport } from '../../import-export/import-export.component';

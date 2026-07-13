@@ -1,8 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { fetchClient } from '../../../../api/client';
-import type { VideoFileSourceConfig } from '../../../../constants/shared-types';
+import { fetchClient } from '@/api';
+import type { VideoFileSourceConfig } from '@/api/types';
+
 import { getUniqueName } from '../utils';
 
 export const getVideoFileInitialConfig = (existingNames: string[] = []): VideoFileSourceConfig => ({

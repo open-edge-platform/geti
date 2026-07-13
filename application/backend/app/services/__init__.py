@@ -7,6 +7,7 @@ from .base import (
     ResourceInUseError,
     ResourceNotFoundError,
     ResourceType,
+    ResourceValidationError,
     ResourceWithIdAlreadyExistsError,
     ResourceWithNameAlreadyExistsError,
 )
@@ -54,6 +55,7 @@ __all__ = [
     "ResourceInUseError",
     "ResourceNotFoundError",
     "ResourceType",
+    "ResourceValidationError",
     "ResourceWithIdAlreadyExistsError",
     "ResourceWithNameAlreadyExistsError",
     "SinkService",

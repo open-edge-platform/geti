@@ -1,7 +1,8 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TrainingDevice } from '../../../../constants/shared-types';
+import type { TrainingDevice } from '@/api/types';
+
 import { createDeviceName, getDefaultTrainingDevice } from './utils';
 
 const makeDevice = (overrides: Partial<TrainingDevice> = {}): TrainingDevice => ({

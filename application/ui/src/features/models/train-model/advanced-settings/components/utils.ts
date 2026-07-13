@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { NumberConfigurableParameter } from '../../../../../constants/shared-types';
+import type { NumberConfigurableParameter } from '@/api/types';
 
 const DEFAULT_INT_STEP = 1;
 const DEFAULT_FLOAT_STEP = 0.1;

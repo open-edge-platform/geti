@@ -1,7 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { SinkConfig, SinkOutputFormats, WebhookSinkConfig } from '../../../../../constants/shared-types';
+import type { SinkConfig, SinkOutputFormats, WebhookSinkConfig } from '@/api/types';
+
 import { removeUnderscore } from '../../../util';
 import { formatRateLimit } from '../../utils';
 import { getPairsFromObject } from '../../webhook/utils';

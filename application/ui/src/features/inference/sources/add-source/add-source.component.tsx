@@ -3,9 +3,9 @@
 
 import { ReactNode } from 'react';
 
+import type { SourceConfigPayload } from '@/api/types';
 import { Button, Flex, Form } from '@geti-ui/ui';
 
-import type { SourceConfigPayload } from '../../../../constants/shared-types';
 import { useConnectSourceToPipeline } from '../../../../hooks/api/pipeline.hook';
 import { useSourceAction } from '../hooks/use-source-action.hook';
 
