@@ -117,3 +117,24 @@ class TestInferenceServerMonitorThread:
 
         assert monitor_thread._ttl_start_time > 0
         stop_method.assert_not_called()
+
+    def test_run_loop_survives_stop_error(self) -> None:
+        """A failure while unloading the model must not kill the monitor thread."""
+        mock_server = MagicMock()
+
+        stop_event = MagicMock()
+        stop_event.is_set.side_effect = [False, True]  # Run loop once then stop
+        monitor_thread = InferenceServerMonitorThread(server=mock_server, stop_event=stop_event)
+        monitor_thread.setup()
+        monitor_thread._ttl = 1
+        monitor_thread._ttl_start_time = 1
+        # Simulate the model unload raising an error.
+        monitor_thread._orig_stop = MagicMock(side_effect=RuntimeError("unload failed"))
+
+        with patch("time.perf_counter", return_value=100):
+            # Must not raise despite the unload failure.
+            monitor_thread.run_loop()
+
+        monitor_thread._orig_stop.assert_called_once_with()
+        # The countdown is reset so the failing unload is not retried on every tick.
+        assert monitor_thread._ttl_start_time < 0

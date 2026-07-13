@@ -17,6 +17,7 @@ from app.models.source import SourceStatus, SourceStatusCode, VideoFileConfig
 from app.stream.stream_data import StreamData
 from app.workers import StreamLoader
 from app.workers.shm_status import STATUS_SHM_SIZE, read_status
+from app.workers.stream_loading import MAX_CONSECUTIVE_FRAME_ERRORS
 
 
 class _FakeVideoStream:
@@ -510,7 +511,7 @@ class TestStreamLoaderStatusReporting:
     def test_reports_error_status_on_frame_acquisition_failure(
         self, frame_queue, status_shm, status_shm_lock, stop_event
     ):
-        """A failure while acquiring a frame reports an ERROR status to shared memory."""
+        """A sustained streak of frame-acquisition failures reports an ERROR status to shared memory."""
         stream = Mock()
         stream.get_data.side_effect = RuntimeError("boom")
         stream.is_real_time.return_value = False
@@ -518,6 +519,9 @@ class TestStreamLoaderStatusReporting:
 
         loader = self._make_loader(frame_queue, status_shm, status_shm_lock, stop_event)
         loader._video_stream = stream
+        # Neutralize the exponential backoff so the loop reaches the consecutive-error threshold
+        # quickly instead of sleeping for tens of seconds between retries.
+        loader.stop_aware_sleep = lambda *_args, **_kwargs: False  # type: ignore[method-assign]
 
         thread = Thread(target=loader.run_loop, daemon=True)
         thread.start()
@@ -537,6 +541,39 @@ class TestStreamLoaderStatusReporting:
         assert status.code == SourceStatusCode.ERROR
         assert status.message == "Error acquiring frame"
         assert status.source_id == loader._source.id
+        # The error is only reported once the failure streak is consistent, not on the first hiccup.
+        assert stream.get_data.call_count >= MAX_CONSECUTIVE_FRAME_ERRORS
+
+    def test_single_transient_failure_does_not_report_error(
+        self, frame_queue, status_shm, status_shm_lock, stop_event, sample_frame
+    ):
+        """A single failed read followed by a success must not surface an ERROR status."""
+        stream = Mock()
+        # Fail once, then keep succeeding.
+        stream.get_data.side_effect = [RuntimeError("transient")] + [
+            StreamData(frame_data=sample_frame, timestamp=time.time(), source_metadata={}) for _ in range(50)
+        ]
+        stream.is_real_time.return_value = False
+        stream.is_finished.return_value = False
+
+        loader = self._make_loader(frame_queue, status_shm, status_shm_lock, stop_event)
+        loader._video_stream = stream
+        loader.stop_aware_sleep = lambda *_args, **_kwargs: False  # type: ignore[method-assign]
+
+        thread = Thread(target=loader.run_loop, daemon=True)
+        thread.start()
+        try:
+            deadline = time.monotonic() + 5
+            while frame_queue.empty() and time.monotonic() < deadline:
+                time.sleep(0.02)
+        finally:
+            stop_event.set()
+            thread.join(timeout=3)
+
+        status = read_status(SourceStatus, status_shm, status_shm_lock)
+        assert status is not None
+        # After recovering, the latest reported status must be OK, never ERROR.
+        assert status.code == SourceStatusCode.OK
 
     @patch("app.workers.stream_loading.VideoStreamService.get_video_stream")
     def test_reset_stream_reports_error_status_on_open_failure(

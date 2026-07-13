@@ -88,11 +88,18 @@ class InferenceServerMonitorThread(BaseThreadWorker):
 
     def run_loop(self) -> None:
         while not self.should_stop():
-            if self._ttl_start_time > 0:
-                elapsed = time.perf_counter() - self._ttl_start_time
-                if 0 < self._ttl <= elapsed:
-                    logger.debug("TTL of {} seconds expired, unloading model", self._ttl)
-                    self._ttl_start_time = -1.0
-                    self._orig_stop()  # pyrefly: ignore[not-callable]
+            try:
+                if self._ttl_start_time > 0:
+                    elapsed = time.perf_counter() - self._ttl_start_time
+                    if 0 < self._ttl <= elapsed:
+                        logger.debug("TTL of {} seconds expired, unloading model", self._ttl)
+                        self._ttl_start_time = -1.0
+                        self._orig_stop()  # pyrefly: ignore[not-callable]
+            except Exception as e:
+                # A failure while unloading the model must not kill the monitor thread; otherwise
+                # models would never be unloaded again for the lifetime of the process. Reset the
+                # countdown so the model is not repeatedly retried every tick, then keep monitoring.
+                logger.exception("Error while monitoring inference server model TTL; continuing {}", e)
+                self._ttl_start_time = -1.0
 
             self.stop_aware_sleep(1)
