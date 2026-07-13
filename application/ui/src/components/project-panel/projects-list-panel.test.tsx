@@ -64,7 +64,7 @@ describe('ProjectsListPanel', () => {
         await screen.findByText('Manage projects');
     };
 
-    it('shows a small active badge on the selector button when the selected project has an active pipeline', async () => {
+    it('shows an active badge on the selector button when the selected project has an active pipeline', async () => {
         server.use(
             http.get('/api/projects', () =>
                 HttpResponse.json([{ ...selectedProject, active_pipeline: true }, otherProject])
