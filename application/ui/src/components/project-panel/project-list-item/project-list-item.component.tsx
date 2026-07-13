@@ -6,6 +6,7 @@ import { Badge, Flex, Text } from '@geti-ui/ui';
 import { useNavigate } from 'react-router';
 
 import { paths } from '../../../constants/paths';
+import { ActiveProjectBadge } from '../../../features/project/list/active-project-badge/active-project-badge.component';
 import {
     ProjectActionsMenu,
     type ProjectActionMetadata,
@@ -51,6 +52,7 @@ export const ProjectListItem = ({
                             <Text>{taskType}</Text>
                         </Badge>
                     )}
+                    {project.active_pipeline && <ActiveProjectBadge size='S' />}
                 </Flex>
 
                 <ProjectActionsMenu
