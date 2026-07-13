@@ -40,9 +40,9 @@ from .models.base import UltralyticsModel
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
 
+    from lightning_fabric.plugins.precision.precision import _PRECISION_INPUT
     from torch.utils.data import DataLoader
     from torchmetrics import Metric, MetricCollection
-    from lightning_fabric.plugins.precision.precision import _PRECISION_INPUT
     from ultralytics import YOLO
 
     from getitune.types import PathLike

@@ -81,6 +81,9 @@ class MultiLabelClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClas
 
     def update_metrics(self, preds: torch.Tensor, batch: dict[str, Any]) -> None:
         """Accumulate sigmoid predictions and multi-hot targets."""
+        if getattr(self, "metric", None) is None:
+            msg = "Metric is not initialized; call init_metrics() before update_metrics()."
+            raise RuntimeError(msg)
         target = batch["cls"].float()
         self.metric.update(preds=preds, target=target)
 
@@ -92,6 +95,9 @@ class MultiLabelClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClas
 
     def get_stats(self) -> dict[str, float]:
         """Compute and return multi-label accuracy and mAP."""
+        if getattr(self, "metric", None) is None:
+            msg = "Metric is not initialized; call init_metrics() before get_stats()."
+            raise RuntimeError(msg)
         results = self.metric.compute()
         accuracy = self._extract_scalar(results, "accuracy")
         mean_ap = self._extract_scalar(results, "mAP")

@@ -15,10 +15,8 @@ from ultralytics.utils.torch_utils import unwrap_model
 
 from getitune.backend.ultralytics.data.adapter import UltralyticsDatasetAdapter
 from getitune.backend.ultralytics.data.collate import classification_collate_fn, multilabel_collate_fn
-from getitune.backend.ultralytics.models.criterion import (
-    MultiLabelClassificationLoss,
-    configure_multilabel_classify_head,
-)
+from getitune.backend.ultralytics.models.criterion import MultiLabelClassificationLoss
+from getitune.backend.ultralytics.models.utils import patch_multilabel_classify_head
 from getitune.backend.ultralytics.plugins.xpu_mixin import XPUAwareTrainerMixin
 from getitune.backend.ultralytics.validators.classification import (
     ClassificationValidator,
@@ -178,7 +176,7 @@ class MultiLabelClassificationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin,
     def setup_model(self) -> None:
         """Build the classification model and rewire it for multi-label."""
         super().setup_model()
-        configure_multilabel_classify_head(unwrap_model(self.model))
+        patch_multilabel_classify_head(unwrap_model(self.model))
         unwrap_model(self.model).criterion = MultiLabelClassificationLoss()
 
     def preprocess_batch(self, batch: dict[str, Any]) -> dict[str, Any]:

@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 
 from getitune.backend.lightning.models.base import DataInputParams
-from getitune.backend.ultralytics.models.criterion import configure_multilabel_classify_head
+from getitune.backend.ultralytics.models.utils import patch_multilabel_classify_head
 from getitune.backend.ultralytics.trainers.classification import (
     ClassificationTrainer,
     MultiLabelClassificationTrainer,
@@ -74,7 +74,7 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
         """Multi-class classification export parameters."""
         label_info = self.label_info or LabelInfo(label_names=[], label_ids=[], label_groups=[])
         return TaskLevelExportParameters(
-            model_type="YOLO-cls",
+            model_type="Classification",
             model_name=self.model_name,
             task_type="classification",
             label_info=label_info,
@@ -188,7 +188,7 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
         """Multi-label classification export parameters."""
         label_info = self.label_info or LabelInfo(label_names=[], label_ids=[], label_groups=[])
         return TaskLevelExportParameters(
-            model_type="YOLO-cls",
+            model_type="Classification",
             model_name=self.model_name,
             task_type="classification",
             label_info=label_info,
@@ -219,7 +219,7 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
         if model is None:
             msg = "YOLO model was not built"
             raise RuntimeError(msg)
-        configure_multilabel_classify_head(model)
+        patch_multilabel_classify_head(model)
         return yolo
 
     metric_keys: ClassVar[dict[str, str]] = {

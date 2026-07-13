@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Any, cast
 
 import numpy as np
@@ -15,6 +16,8 @@ from getitune.data.dataset.base import VisionDataset
 from getitune.data.entity.base import ImageInfo
 
 from .geometry import build_ratio_pad, xyxy_abs_to_xywh_norm
+
+logger = logging.getLogger(__name__)
 
 
 class UltralyticsDatasetAdapter(TorchDataset):
@@ -50,19 +53,20 @@ class UltralyticsDatasetAdapter(TorchDataset):
             msg = f"Expected 3-D image tensor (CHW), got shape {img.shape}"
             raise ValueError(msg)
 
-        if self._task_kind == "classify":
-            return self._getitem_classify(sample, img)
-        if self._task_kind == "multilabel":
-            return self._getitem_multilabel(sample, img)
-        if self._task_kind == "segment":
-            return self._getitem_segment(sample, img)
-        if self._task_kind == "semantic":
-            return self._getitem_semantic(sample, img)
-        if self._task_kind == "detect":
-            return self._getitem_detect(sample, img)
-
-        msg = f"Unknown task_kind: {self._task_kind}"
-        raise ValueError(msg)
+        match self._task_kind:
+            case "classify":
+                return self._getitem_classify(sample, img)
+            case "multilabel":
+                return self._getitem_multilabel(sample, img)
+            case "segment":
+                return self._getitem_segment(sample, img)
+            case "semantic":
+                return self._getitem_semantic(sample, img)
+            case "detect":
+                return self._getitem_detect(sample, img)
+            case _:
+                msg = f"Unknown task_kind: {self._task_kind}"
+                raise ValueError(msg)
 
     def _extract_geometry(
         self,
@@ -199,6 +203,10 @@ class UltralyticsDatasetAdapter(TorchDataset):
             sem_masks = (mask_tensor.float() * cls_tensor[:, None, None]).max(0).values  # (H, W)
             result["sem_masks"] = sem_masks
         else:
+            logger.warning(
+                "Instance segmentation sample has no masks; falling back to empty masks/sem_masks. "
+                "This is unexpected unless the image genuinely contains no annotated instances.",
+            )
             result["masks"] = torch.zeros((0, tensor_h, tensor_w), dtype=torch.uint8)
             result["sem_masks"] = torch.zeros((tensor_h, tensor_w), dtype=torch.float32)
 
