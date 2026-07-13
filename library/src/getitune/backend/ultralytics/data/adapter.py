@@ -218,11 +218,10 @@ class UltralyticsDatasetAdapter(TorchDataset):
         ori_shape, resized_shape, _, ratio_pad = self._extract_geometry(sample, img)
 
         labels_raw = getattr(sample, "label", None)
-        cls_idx: int = (
-            (int(labels_raw.item()) if isinstance(labels_raw, torch.Tensor) else int(labels_raw))
-            if labels_raw is not None
-            else 0
-        )
+        if labels_raw is None:
+            msg = "Classification sample is missing a label"
+            raise ValueError(msg)
+        cls_idx = int(labels_raw.item()) if isinstance(labels_raw, torch.Tensor) else int(labels_raw)
 
         return {
             "im_file": "",
