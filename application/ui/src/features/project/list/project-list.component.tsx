@@ -100,7 +100,9 @@ const ProjectGrid = () => {
                 </>
             )}
             {sortedProjects.length === 0 ? (
-                <NoMatchingProjects />
+                isFiltering ? (
+                    <NoMatchingProjects />
+                ) : null
             ) : (
                 <Grid
                     flex={1}
