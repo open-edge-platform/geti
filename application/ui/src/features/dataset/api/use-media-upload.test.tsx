@@ -12,6 +12,21 @@ import { server } from '../../../msw-node-setup';
 import { MediaUploadProvider, useMediaUploadContext } from '../providers/media-upload-provider.component';
 import { MEDIA_UPLOAD_CONCURRENCY, useMediaUpload } from './use-media-upload';
 
+const mockedToast = vi.fn();
+const mockedRemoveToast = vi.fn();
+
+vi.mock('../../../components/toast/toast.component', async () => {
+    const actual = await vi.importActual<typeof import('../../../components/toast/toast.component')>(
+        '../../../components/toast/toast.component'
+    );
+
+    return {
+        ...actual,
+        toast: (params: unknown) => mockedToast(params),
+        removeToast: (id: string | number) => mockedRemoveToast(id),
+    };
+});
+
 const useMediaUploadProgress = () => {
     const upload = useMediaUpload();
     const { state } = useMediaUploadContext();
