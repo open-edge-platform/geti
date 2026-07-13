@@ -12,21 +12,6 @@ import { server } from '../../../msw-node-setup';
 import { MediaUploadProvider, useMediaUploadContext } from '../providers/media-upload-provider.component';
 import { MEDIA_UPLOAD_CONCURRENCY, useMediaUpload } from './use-media-upload';
 
-const mockedToast = vi.fn();
-const mockedRemoveToast = vi.fn();
-
-vi.mock('../../../components/toast/toast.component', async () => {
-    const actual = await vi.importActual<typeof import('../../../components/toast/toast.component')>(
-        '../../../components/toast/toast.component'
-    );
-
-    return {
-        ...actual,
-        toast: (params: unknown) => mockedToast(params),
-        removeToast: (id: string | number) => mockedRemoveToast(id),
-    };
-});
-
 const useMediaUploadProgress = () => {
     const upload = useMediaUpload();
     const { state } = useMediaUploadContext();
@@ -35,6 +20,19 @@ const useMediaUploadProgress = () => {
 };
 
 const renderUpload = () => renderHook(() => useMediaUploadProgress(), { wrapper: MediaUploadProvider });
+const uploadMediaAndWaitForCompletion = async (
+    uploadMedia: (files: File[]) => Promise<unknown>,
+    files: File[],
+    isUploading: () => boolean
+) => {
+    await act(async () => {
+        await uploadMedia(files);
+    });
+
+    await waitFor(() => {
+        expect(isUploading()).toBe(false);
+    });
+};
 
 describe('useMediaUpload', () => {
     it('uploads all selected files', async () => {
@@ -59,13 +57,11 @@ describe('useMediaUpload', () => {
             new File(['file-2'], 'image-2.jpg', { type: 'image/jpeg' }),
         ];
 
-        act(() => {
-            result.current.upload.uploadMedia(files);
-        });
-
-        await waitFor(() => {
-            expect(result.current.upload.uploadProgress.isUploading).toBe(false);
-        });
+        await uploadMediaAndWaitForCompletion(
+            result.current.upload.uploadMedia,
+            files,
+            () => result.current.upload.uploadProgress.isUploading
+        );
         expect(uploadedFileNames).toEqual(['image-1.jpg', 'image-2.jpg']);
     });
 
@@ -95,13 +91,11 @@ describe('useMediaUpload', () => {
             (_, index) => new File([`file-${index}`], `image-${index}.jpg`, { type: 'image/jpeg' })
         );
 
-        act(() => {
-            result.current.upload.uploadMedia(mockFiles);
-        });
-
-        await waitFor(() => {
-            expect(result.current.upload.uploadProgress.isUploading).toBe(false);
-        });
+        await uploadMediaAndWaitForCompletion(
+            result.current.upload.uploadMedia,
+            mockFiles,
+            () => result.current.upload.uploadProgress.isUploading
+        );
 
         expect(maxRunningUploads).toBeLessThanOrEqual(MEDIA_UPLOAD_CONCURRENCY);
         expect(result.current.upload.uploadProgress.completed).toBe(12);
@@ -131,13 +125,11 @@ describe('useMediaUpload', () => {
             new File(['broken-file'], 'broken.jpg', { type: 'image/jpeg' }),
         ];
 
-        act(() => {
-            result.current.upload.uploadMedia(files);
-        });
-
-        await waitFor(() => {
-            expect(result.current.upload.uploadProgress.isUploading).toBe(false);
-        });
+        await uploadMediaAndWaitForCompletion(
+            result.current.upload.uploadMedia,
+            files,
+            () => result.current.upload.uploadProgress.isUploading
+        );
 
         expect(result.current.upload.uploadProgress).toEqual({
             total: 2,
@@ -171,13 +163,11 @@ describe('useMediaUpload', () => {
             new File(['broken-file'], 'broken.jpg', { type: 'image/jpeg' }),
         ];
 
-        act(() => {
-            result.current.upload.uploadMedia(files);
-        });
-
-        await waitFor(() => {
-            expect(result.current.upload.uploadProgress.isUploading).toBe(false);
-        });
+        await uploadMediaAndWaitForCompletion(
+            result.current.upload.uploadMedia,
+            files,
+            () => result.current.upload.uploadProgress.isUploading
+        );
 
         const items = result.current.state.items;
         expect(items).toHaveLength(2);
