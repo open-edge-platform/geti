@@ -3,8 +3,9 @@
 
 import { Suspense, useMemo, useState } from 'react';
 
-import { Content, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
+import { Content, Divider, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
+import { partition } from 'lodash-es';
 
 import { version } from '../../../../package.json';
 import { isNonEmptyArray, pluralize } from '../../../shared/util';
@@ -21,62 +22,96 @@ import { SortBy } from './sort-projects/utils';
 import backgroundStyles from '../project-background.module.scss';
 import classes from './project-list.module.scss';
 
+const MIN_NUMBER_OF_PROJECTS_TO_SHOW_FILTERS = 8;
+
 const ProjectGrid = () => {
-    const projects = useProjects();
+    const projectsQuery = useProjects();
+    const projects = projectsQuery.data;
     const [sortBy, setSortBy] = useState<SortBy>('createdAt-descending');
-    const hasProjects = isNonEmptyArray(projects.data);
+    const hasProjects = isNonEmptyArray(projects);
+
+    const shouldShowFilters = projects.length >= MIN_NUMBER_OF_PROJECTS_TO_SHOW_FILTERS;
+
+    const [[activeProject], projectsWithoutActivePipeline] = partition(projects, (project) => project.active_pipeline);
 
     const { searchName, setSearchName, selectedTaskTypes, setSelectedTaskTypes, filteredProjects, isFiltering } =
-        useProjectFilters(projects.data);
+        useProjectFilters(projectsWithoutActivePipeline);
 
     const sortedProjects = useMemo(() => {
         return SORT_BY_HANDLERS[sortBy](filteredProjects);
     }, [filteredProjects, sortBy]);
 
-    const projectNames = projects.data.map((project) => project.name);
+    const projectNames = projectsQuery.data.map((project) => project.name);
 
     if (!hasProjects) {
         return <EmptyProjectList />;
     }
 
-    const matchCountLabel = `${sortedProjects.length} of ${projects.data.length} ${pluralize(
-        projects.data.length,
+    const matchCountLabel = `${sortedProjects.length} of ${projectsWithoutActivePipeline.length} ${pluralize(
+        projectsWithoutActivePipeline.length,
         'project',
         'projects'
     )}`;
 
+    const totalCountLabel = `${projectsWithoutActivePipeline.length} ${pluralize(
+        projectsWithoutActivePipeline.length,
+        'project',
+        'projects'
+    )}`;
+
+    const columns = activeProject === undefined ? ['1fr'] : ['1fr', '1fr'];
+
     return (
-        <Flex direction={'column'} gap={'size-100'} height={'100%'}>
-            <Grid
-                gap={'size-200'}
-                columns={['1fr', '1fr', '1fr']}
-                marginBottom={'size-200'}
-                UNSAFE_className={classes.filtersContainer}
-            >
-                <SortProjects sortBy={sortBy} onSort={setSortBy} />
-                <ProjectFilters
-                    searchName={searchName}
-                    onSearchChange={setSearchName}
-                    selectedTaskTypes={selectedTaskTypes}
-                    onSelectedTaskTypesChange={setSelectedTaskTypes}
-                />
+        <Flex direction={'column'} gap={'size-300'} height={'100%'}>
+            <Divider size={'S'} />
+            <Grid columns={columns} gap={'size-300'} rows={['size-2000']}>
+                <NewProjectCard />
+
+                {activeProject !== undefined && (
+                    <ProjectCard
+                        item={activeProject}
+                        prioritizeImage
+                        projectNames={projectNames.filter((projectName) => projectName !== activeProject.name)}
+                    />
+                )}
             </Grid>
+            {shouldShowFilters && (
+                <>
+                    <Divider size={'S'} />
 
-            {isFiltering && <Text UNSAFE_className={classes.projectMetadata}>{matchCountLabel}</Text>}
+                    <Flex width={'100%'} gap={'size-200'}>
+                        <SortProjects sortBy={sortBy} onSort={setSortBy} />
 
+                        <Divider size={'S'} orientation={'vertical'} />
+
+                        <Flex flex={1} alignItems={'center'} gap={'size-200'}>
+                            <Text UNSAFE_className={classes.projectMetadata}>
+                                {isFiltering ? matchCountLabel : totalCountLabel}
+                            </Text>
+
+                            <ProjectFilters
+                                searchName={searchName}
+                                onSearchChange={setSearchName}
+                                selectedTaskTypes={selectedTaskTypes}
+                                onSelectedTaskTypesChange={setSelectedTaskTypes}
+                            />
+                        </Flex>
+                    </Flex>
+                </>
+            )}
             {sortedProjects.length === 0 ? (
-                <NoMatchingProjects />
+                isFiltering ? (
+                    <NoMatchingProjects />
+                ) : null
             ) : (
                 <Grid
                     flex={1}
                     gap={'size-300'}
                     autoRows={'size-2000'}
                     justifyContent={'center'}
-                    UNSAFE_style={{ overflowY: 'auto', scrollbarGutter: 'stable' }}
+                    UNSAFE_style={{ overflowY: 'auto' }}
                     columns={['1fr', '1fr']}
                 >
-                    <NewProjectCard />
-
                     {sortedProjects.map((item, index) => (
                         <ProjectCard
                             key={item.id}
