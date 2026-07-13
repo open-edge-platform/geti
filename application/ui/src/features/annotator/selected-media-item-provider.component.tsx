@@ -3,10 +3,10 @@
 
 import { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
 
+import type { Media } from '@/api/types';
 import { isEqual } from 'lodash-es';
 import { useParams } from 'react-router';
 
-import type { Media } from '../../constants/shared-types';
 import { isVideo, isVideoFrame } from '../../shared/media-item-utils';
 import type { RegionOfInterest } from '../../shared/types';
 import { useLoadImageQuery } from './hooks/use-load-image-query.hook';

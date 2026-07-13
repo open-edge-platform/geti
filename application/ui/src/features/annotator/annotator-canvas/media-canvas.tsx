@@ -3,13 +3,13 @@
 
 import { MouseEvent, PointerEvent, ReactNode, RefObject, useRef } from 'react';
 
+import type { Media } from '@/api/types';
 import { Loading } from '@geti-ui/ui';
 import { useIsFetching } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { useSpinDelay } from 'spin-delay';
 
 import { ZoomTransform } from '../../../components/zoom/zoom-transform';
-import type { Media } from '../../../constants/shared-types';
 import { loadImageQueryOptions } from '../hooks/use-load-image-query.hook';
 import { MediaImage } from './media-image.component';
 

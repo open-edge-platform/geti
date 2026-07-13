@@ -1,13 +1,13 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { LocalFolderSinkConfig } from '@/api/types';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
-import type { LocalFolderSinkConfig } from '../../../../constants/shared-types';
 import { useConnectSinkToPipeline } from '../../../../hooks/api/pipeline.hook';
 import { server } from '../../../../msw-node-setup';
 import { useSinkMutation } from '../hooks/use-sink-mutation.hook';

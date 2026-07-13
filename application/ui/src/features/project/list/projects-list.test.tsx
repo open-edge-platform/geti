@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedPipeline } from 'mocks/mock-pipeline';
 import { getMockedProject } from 'mocks/mock-project';
@@ -59,7 +59,22 @@ const projects = [
         created_at: '2026-05-01T10:00:00Z',
         task: { exclusive_labels: true, labels: [], task_type: 'instance_segmentation' },
     }),
+    getMockedProject({
+        id: 'project-7',
+        name: 'Theta Project',
+        created_at: '2026-07-01T10:00:00Z',
+        task: { exclusive_labels: true, labels: [], task_type: 'instance_segmentation' },
+    }),
+    getMockedProject({
+        id: 'project-8',
+        name: 'Iota Project',
+        created_at: '2026-08-01T10:00:00Z',
+        task: { exclusive_labels: true, labels: [], task_type: 'detection' },
+    }),
 ];
+
+// Below MIN_NUMBER_OF_PROJECTS_TO_SHOW_FILTERS (8), sort/filter controls are hidden.
+const fewProjects = projects.slice(0, 6);
 
 describe('ProjectList', () => {
     describe('with projects', () => {
@@ -186,12 +201,13 @@ describe('ProjectList', () => {
             );
         });
 
-        it('does not show the match count label by default', async () => {
+        it('shows the project count label by default (not filtering)', async () => {
             renderProjectList();
 
             expect(await screen.findByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
 
-            expect(screen.queryByText(/of 6 projects/i)).not.toBeInTheDocument();
+            expect(screen.getByText('8 projects')).toBeInTheDocument();
+            expect(screen.queryByText(/of 8 projects/i)).not.toBeInTheDocument();
         });
 
         it('filters projects by name search', async () => {
@@ -202,7 +218,7 @@ describe('ProjectList', () => {
 
             await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'beta');
 
-            expect(await screen.findByText('1 of 6 projects')).toBeInTheDocument();
+            expect(await screen.findByText('1 of 8 projects')).toBeInTheDocument();
             expect(screen.getByRole('heading', { name: 'Beta Project' })).toBeInTheDocument();
             expect(screen.queryByRole('heading', { name: 'Alpha Project' })).not.toBeInTheDocument();
             expect(screen.queryByRole('heading', { name: 'Zeta Project' })).not.toBeInTheDocument();
@@ -224,7 +240,7 @@ describe('ProjectList', () => {
             await user.keyboard('{Escape}');
 
             expect(await screen.findByText('1 type selected')).toBeInTheDocument();
-            expect(await screen.findByText('2 of 6 projects')).toBeInTheDocument();
+            expect(await screen.findByText('2 of 8 projects')).toBeInTheDocument();
             expect(screen.getByRole('heading', { name: 'Beta Project' })).toBeInTheDocument();
             expect(screen.getByRole('heading', { name: 'Gamma Project' })).toBeInTheDocument();
             expect(screen.queryByRole('heading', { name: 'Alpha Project' })).not.toBeInTheDocument();
@@ -243,7 +259,7 @@ describe('ProjectList', () => {
 
             await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'alpha');
 
-            expect(await screen.findByText('1 of 6 projects')).toBeInTheDocument();
+            expect(await screen.findByText('1 of 8 projects')).toBeInTheDocument();
             expect(screen.getByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
             expect(screen.queryByRole('heading', { name: 'Beta Project' })).not.toBeInTheDocument();
             expect(screen.queryByRole('heading', { name: 'Zeta Project' })).not.toBeInTheDocument();
@@ -262,7 +278,7 @@ describe('ProjectList', () => {
             await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'beta');
 
             expect(await screen.findByText('No projects match your filters')).toBeInTheDocument();
-            expect(screen.getByText('0 of 6 projects')).toBeInTheDocument();
+            expect(screen.getByText('0 of 8 projects')).toBeInTheDocument();
             expect(
                 screen.queryByRole('heading', { name: /Alpha Project|Beta Project|Zeta Project/ })
             ).not.toBeInTheDocument();
@@ -275,6 +291,100 @@ describe('ProjectList', () => {
             expect(await screen.findByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
 
             await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'does-not-exist');
+
+            expect(await screen.findByText('No projects match your filters')).toBeInTheDocument();
+        });
+    });
+
+    describe('with fewer than 8 projects', () => {
+        beforeEach(() => {
+            server.use(
+                http.get('/api/projects', () => {
+                    return HttpResponse.json(fewProjects);
+                }),
+                http.get('/api/projects/{project_id}/pipeline', () => {
+                    return HttpResponse.json(getMockedPipeline({ status: 'idle' }));
+                })
+            );
+        });
+
+        it('hides the sort control', async () => {
+            renderProjectList();
+
+            expect(await screen.findByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
+
+            expect(screen.queryByRole('button', { name: /sort/i })).not.toBeInTheDocument();
+        });
+
+        it('hides the task type filter control', async () => {
+            renderProjectList();
+
+            expect(await screen.findByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
+
+            expect(screen.queryByRole('button', { name: 'Filter by task type' })).not.toBeInTheDocument();
+        });
+
+        it('hides the search box', async () => {
+            renderProjectList();
+
+            expect(await screen.findByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
+
+            expect(screen.queryByRole('searchbox', { name: /search projects by name/i })).not.toBeInTheDocument();
+        });
+
+        it('does not show a project count label', async () => {
+            renderProjectList();
+
+            expect(await screen.findByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
+
+            expect(screen.queryByText(/^\d+ projects?$/i)).not.toBeInTheDocument();
+        });
+    });
+
+    describe('with an active pipeline project', () => {
+        const activeProject = getMockedProject({
+            id: 'project-active',
+            name: 'Running Project',
+            created_at: '2026-09-01T10:00:00Z',
+            active_pipeline: true,
+            task: { exclusive_labels: true, labels: [], task_type: 'detection' },
+        });
+
+        beforeEach(() => {
+            server.use(
+                http.get('/api/projects', () => {
+                    return HttpResponse.json([...projects, activeProject]);
+                }),
+                http.get('/api/projects/{project_id}/pipeline', () => {
+                    return HttpResponse.json(getMockedPipeline({ status: 'idle' }));
+                })
+            );
+        });
+
+        it('pins the active project card next to the "create new project" card with an "Active" badge', async () => {
+            renderProjectList();
+
+            const activeCard = await screen.findByLabelText('Project: Running Project');
+            expect(activeCard).not.toBeNull();
+            expect(activeCard && within(activeCard as HTMLElement).getByText('Active')).toBeInTheDocument();
+        });
+
+        it('excludes the active project from the project count', async () => {
+            renderProjectList();
+
+            expect(await screen.findByRole('heading', { name: 'Running Project' })).toBeInTheDocument();
+
+            // 9 projects total, 1 is pinned as active, so 8 remain in the sortable/filterable list.
+            expect(await screen.findByText('8 projects')).toBeInTheDocument();
+        });
+
+        it('excludes the active project from name search results', async () => {
+            const user = userEvent.setup();
+            renderProjectList();
+
+            expect(await screen.findByRole('heading', { name: 'Running Project' })).toBeInTheDocument();
+
+            await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'running');
 
             expect(await screen.findByText('No projects match your filters')).toBeInTheDocument();
         });

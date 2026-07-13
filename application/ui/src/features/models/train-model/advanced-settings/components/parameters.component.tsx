@@ -3,6 +3,13 @@
 
 import { Key, ReactNode } from 'react';
 
+import type {
+    ConfigurableParameter,
+    ConfigurableParameterGroup,
+    NumberEnumConfigurableParameter,
+    StringEnumConfigurableParameter,
+    TrainingConfigurationParameter,
+} from '@/api/types';
 import {
     Content,
     ContextualHelp,
@@ -18,13 +25,6 @@ import {
 } from '@geti-ui/ui';
 import { isBoolean, isFunction } from 'lodash-es';
 
-import {
-    ConfigurableParameter,
-    ConfigurableParameterGroup,
-    NumberEnumConfigurableParameter,
-    StringEnumConfigurableParameter,
-    TrainingConfigurationParameter,
-} from '../../../../../constants/shared-types';
 import { isParameter } from '../../../model-listing/model-training-parameters/utils';
 import {
     isBoolEnableParameterGroup,

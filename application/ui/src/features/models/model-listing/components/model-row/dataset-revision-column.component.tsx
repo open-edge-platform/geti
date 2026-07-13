@@ -1,11 +1,11 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DatasetRevision } from '@/api/types';
 import { Flex, Text } from '@geti-ui/ui';
 import { Image, Tag } from '@geti-ui/ui/icons';
 import { useNumberFormatter } from 'react-aria';
 
-import type { DatasetRevision } from '../../../../../constants/shared-types';
 import { formatDateTime } from '../../../../../shared/date-utils';
 import { ModelBadge } from './model-badge.component';
 

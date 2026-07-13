@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ImagesFolderSourceConfig } from '../../../../constants/shared-types';
+import type { ImagesFolderSourceConfig } from '@/api/types';
 
 export const imagesFolderBodyFormatter = (formData: FormData): ImagesFolderSourceConfig => ({
     id: String(formData.get('id')),

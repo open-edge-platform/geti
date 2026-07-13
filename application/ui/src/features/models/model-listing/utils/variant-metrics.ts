@@ -1,7 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ModelVariant } from '../../../../constants/shared-types';
+import type { ModelVariant } from '@/api/types';
+
 import { getTestingMetrics } from '../components/model-row/utils';
 
 type PrimaryTestingMetricValue = {

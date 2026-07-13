@@ -1,7 +1,8 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Project } from '../../constants/shared-types';
+import type { Project } from '@/api/types';
+
 import { type ProjectActionMetadata } from '../../features/project/list/menu-actions/menu-actions.component';
 import { ProjectListItem } from './project-list-item/project-list-item.component';
 
@@ -14,10 +15,13 @@ type ProjectListProps = {
 
 export const ProjectsList = ({ projects, onRename, onDelete, onEnableBlocked }: ProjectListProps) => {
     const projectNames = projects.map(({ name }) => name);
+    const projectsWithActiveProjectInFront = projects.toSorted((projectA, projectB) =>
+        projectA.active_pipeline ? -1 : projectB.active_pipeline ? 1 : 0
+    );
 
     return (
         <ul>
-            {projects.map((project) => (
+            {projectsWithActiveProjectInFront.map((project) => (
                 <ProjectListItem
                     key={project.id}
                     project={project}

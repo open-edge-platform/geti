@@ -60,6 +60,8 @@ from app.settings import get_settings
 
 settings = get_settings()
 logging.basicConfig(handlers=[InterceptHandler()], level=settings.log_level, force=True)
+
+
 app = FastAPI(
     title=settings.app_name,
     version=settings.version,

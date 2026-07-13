@@ -1,8 +1,6 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { get, isBoolean, isNumber, isObject } from 'lodash-es';
-
 import type {
     BoolConfigurableParameter,
     ConfigurableParameter,
@@ -12,7 +10,9 @@ import type {
     StringConfigurableParameter,
     StringEnumConfigurableParameter,
     TrainingConfigurationParameter,
-} from '../../../../constants/shared-types';
+} from '@/api/types';
+import { get, isBoolean, isNumber, isObject } from 'lodash-es';
+
 import { isParameter, isParameterGroup } from '../../model-listing/model-training-parameters/utils';
 
 export const isBoolEnableParameter = (parameter: ConfigurableParameter) => {

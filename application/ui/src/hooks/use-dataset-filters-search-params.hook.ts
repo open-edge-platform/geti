@@ -1,12 +1,12 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DatasetItemAnnotationStatus, DatasetSubset, FilterByStatusKey } from '@/api/types';
 import { parseAbsoluteToLocal } from '@internationalized/date';
 import { isEmpty } from 'lodash-es';
 import { useSearchParams, type SetURLSearchParams } from 'react-router-dom';
 import { parse, stringify } from 'zipson/lib';
 
-import type { DatasetItemAnnotationStatus, DatasetSubset, FilterByStatusKey } from '../constants/shared-types';
 import { isNonEmptyString } from '../shared/util';
 import type { SortDirection } from './sort-direction.interface';
 

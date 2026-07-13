@@ -3,6 +3,7 @@
 
 import { Suspense, useState } from 'react';
 
+import type { DatasetRevisionItem } from '@/api/types';
 import { Content, Dialog, DialogContainer, Flex, Grid, Loading, Size, Text, View, ViewModes } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { GridLayoutOptions } from 'react-aria-components';
@@ -10,7 +11,6 @@ import { GridLayoutOptions } from 'react-aria-components';
 import { MediaItem } from '../../../../components/media-item/media-item.component';
 import { MediaThumbnail } from '../../../../components/media-thumbnail/media-thumbnail.component';
 import { VirtualizerGridLayout } from '../../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
-import type { DatasetRevisionItem } from '../../../../constants/shared-types';
 import {
     SelectedMediaItemProvider,
     useSelectedMediaItem,
