@@ -27,9 +27,15 @@ Licensing Information: Ultralytics YOLO models are distributed under the AGPL-3.
 | [YOLO26-N Cls](./../../recipe/classification/multi_class_cls/yolo26_n_cls.yaml) | Multi-class Classification | `yolo26n-cls` |
 | [YOLO26-S Cls](./../../recipe/classification/multi_class_cls/yolo26_s_cls.yaml) | Multi-class Classification | `yolo26s-cls` |
 | [YOLO26-M Cls](./../../recipe/classification/multi_class_cls/yolo26_m_cls.yaml) | Multi-class Classification | `yolo26m-cls` |
-| [YOLO26-N Cls](./../../recipe/classification/multi_label_cls/yolo26_n_cls.yaml) | Multi-label Classification | `yolo26n-cls` |
-| [YOLO26-S Cls](./../../recipe/classification/multi_label_cls/yolo26_s_cls.yaml) | Multi-label Classification | `yolo26s-cls` |
-| [YOLO26-M Cls](./../../recipe/classification/multi_label_cls/yolo26_m_cls.yaml) | Multi-label Classification | `yolo26m-cls` |
+| [YOLO26-L Cls](./../../recipe/classification/multi_class_cls/yolo26_l_cls.yaml) | Multi-class Classification | `yolo26l-cls` |
+| [YOLO26-X Cls](./../../recipe/classification/multi_class_cls/yolo26_x_cls.yaml) | Multi-class Classification | `yolo26x-cls` |
+| [YOLO26-N ML Cls](./../../recipe/classification/multi_label_cls/yolo26_n_cls.yaml) | Multi-label Classification | `yolo26n-cls` |
+| [YOLO26-S ML Cls](./../../recipe/classification/multi_label_cls/yolo26_s_cls.yaml) | Multi-label Classification | `yolo26s-cls` |
+| [YOLO26-M ML Cls](./../../recipe/classification/multi_label_cls/yolo26_m_cls.yaml) | Multi-label Classification | `yolo26m-cls` |
+| [YOLO26-L ML Cls](./../../recipe/classification/multi_label_cls/yolo26_l_cls.yaml) | Multi-label Classification | `yolo26l-cls` |
+| [YOLO26-X ML Cls](./../../recipe/classification/multi_label_cls/yolo26_x_cls.yaml) | Multi-label Classification | `yolo26x-cls` |
 | [YOLO26-N Sem](./../../recipe/semantic_segmentation/yolo26_n_sem.yaml) | Semantic Segmentation | `yolo26n-sem` |
 | [YOLO26-S Sem](./../../recipe/semantic_segmentation/yolo26_s_sem.yaml) | Semantic Segmentation | `yolo26s-sem` |
 | [YOLO26-M Sem](./../../recipe/semantic_segmentation/yolo26_m_sem.yaml) | Semantic Segmentation | `yolo26m-sem` |
+| [YOLO26-L Sem](./../../recipe/semantic_segmentation/yolo26_l_sem.yaml) | Semantic Segmentation | `yolo26l-sem` |
+| [YOLO26-X Sem](./../../recipe/semantic_segmentation/yolo26_x_sem.yaml) | Semantic Segmentation | `yolo26x-sem` |
