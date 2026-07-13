@@ -59,7 +59,7 @@ const ProjectGrid = () => {
         'projects'
     )}`;
 
-    const columns = activeProject === undefined ? ['1fr', '1fr'] : ['1fr', '1fr', '2fr'];
+    const columns = activeProject === undefined ? ['1fr'] : ['1fr', '1fr'];
 
     return (
         <Flex direction={'column'} gap={'size-300'} height={'100%'}>
