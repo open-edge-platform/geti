@@ -16,7 +16,7 @@ from getitune.backend.lightning.models.classification.heads import LinearClsHead
 from getitune.backend.lightning.models.classification.multiclass_models.base import LightningMulticlassClsModel
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
 from getitune.backend.lightning.models.classification.utils.pretrained_urls import MOBILENETV3_PRETRAINED_URLS
-from getitune.backend.lightning.models.classification.utils.pretrained_weights import CheckpointWeightsLoader
+from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiClassClsMetricCallable
 from getitune.types.label import LabelInfoTypes
@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from getitune.metrics import MetricCallable
 
 
-class MobileNetV3MulticlassCls(CheckpointWeightsLoader, LightningMulticlassClsModel):
+class MobileNetV3MulticlassCls(PretrainedWeightsMixin, LightningMulticlassClsModel):
     """MobileNetV3MulticlassCls is a class that represents a MobileNetV3 model for multiclass classification.
 
     Args:
@@ -45,6 +45,7 @@ class MobileNetV3MulticlassCls(CheckpointWeightsLoader, LightningMulticlassClsMo
         pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
     """
 
+    pretrained_weights_target = "backbone"
     pretrained_urls = MOBILENETV3_PRETRAINED_URLS
 
     def __init__(

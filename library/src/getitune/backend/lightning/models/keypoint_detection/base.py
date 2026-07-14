@@ -17,7 +17,7 @@ from getitune.backend.lightning.models.base import (
     DefaultSchedulerCallable,
     LightningModel,
 )
-from getitune.backend.lightning.models.utils.pretrained_weights import PretrainedWeightsMixin
+from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.data.entity.base import BatchLoss, ImageInfo
 from getitune.data.entity.sample import PredictionBatch, SampleBatch

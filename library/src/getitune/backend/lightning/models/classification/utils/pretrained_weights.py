@@ -46,10 +46,18 @@ class _SupportsBackboneWeights(Protocol):
     model_name: str
 
 
-class _SupportsBackboneWeightsWithUrls(_SupportsBackboneWeights, Protocol):
-    """Backbone wrapper that also exposes pretrained URLs."""
+class _ViTClassifierModel(Protocol):
+    """A classifier exposing a ViT backbone."""
+
+    backbone: VisionTransformerBackbone
+
+
+class _SupportsViTBackboneWeights(Protocol):
+    """Lightning classification model wrapper exposing a ViT backbone."""
 
     pretrained_urls: dict[str, str]
+    model: _ViTClassifierModel
+    model_name: str
 
 
 class PytorchcvWeightsLoader:
@@ -66,17 +74,6 @@ class PytorchcvWeightsLoader:
             local_model_store_dir_path=cache_dir,
         )
         logger.info("Loaded backbone weights from %s", cache_dir)
-
-
-class CheckpointWeightsLoader:
-    """Load backbone weights from an HTTP checkpoint URL (MobileNetV3)."""
-
-    def load_pretrained(self: _SupportsBackboneWeightsWithUrls, weights: PathLike | None = None) -> None:
-        """Download an HTTP checkpoint and load it into the backbone."""
-        if weights is None:
-            weights = self.pretrained_urls[self.model_name]
-        load_checkpoint(self.model.backbone, str(weights))
-        logger.info("Loaded backbone weights from %s", weights)
 
 
 class TorchvisionWeightsLoader:
@@ -109,20 +106,6 @@ class TimmWeightsLoader:
 
         load_pretrained(timm_model, pretrained_cfg=timm_model.pretrained_cfg)  # pyrefly: ignore[bad-argument-type]
         logger.info("Loaded timm pretrained weights for %s", self.model_name)
-
-
-class _ViTClassifierModel(Protocol):
-    """A classifier exposing a ViT backbone."""
-
-    backbone: VisionTransformerBackbone
-
-
-class _SupportsViTBackboneWeights(Protocol):
-    """Lightning classification model wrapper exposing a ViT backbone."""
-
-    pretrained_urls: dict[str, str]
-    model: _ViTClassifierModel
-    model_name: str
 
 
 class VisionTransformerWeightsLoader:

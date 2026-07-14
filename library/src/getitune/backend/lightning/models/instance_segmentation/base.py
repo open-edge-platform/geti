@@ -25,9 +25,9 @@ from getitune.backend.lightning.models.base import (
     DefaultSchedulerCallable,
     LightningModel,
 )
+from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.models.instance_segmentation.segmentors.maskrcnn_tv import MaskRCNN
 from getitune.backend.lightning.models.instance_segmentation.segmentors.two_stage import TwoStageDetector
-from getitune.backend.lightning.models.utils.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.models.utils.utils import InstanceData
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.backend.lightning.tools.explain.explain_algo import InstSegExplainAlgo, feature_vector_fn

@@ -22,7 +22,7 @@ from getitune.backend.lightning.models.classification.losses.asymmetric_angular_
 )
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
 from getitune.backend.lightning.models.classification.utils.pretrained_urls import MOBILENETV3_PRETRAINED_URLS
-from getitune.backend.lightning.models.classification.utils.pretrained_weights import CheckpointWeightsLoader
+from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.data.entity.base import BatchLoss
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
@@ -36,9 +36,10 @@ if TYPE_CHECKING:
     from getitune.metrics import MetricCallable
 
 
-class MobileNetV3HLabelCls(CheckpointWeightsLoader, LightningHlabelClsModel):
+class MobileNetV3HLabelCls(PretrainedWeightsMixin, LightningHlabelClsModel):
     """MobileNetV3 Model for hierarchical label classification task."""
 
+    pretrained_weights_target = "backbone"
     pretrained_urls = MOBILENETV3_PRETRAINED_URLS
 
     def __init__(

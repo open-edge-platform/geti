@@ -23,7 +23,7 @@ from getitune.backend.lightning.models.base import (
     DefaultSchedulerCallable,
     LightningModel,
 )
-from getitune.backend.lightning.models.utils.pretrained_weights import PretrainedWeightsMixin
+from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.backend.lightning.tools.tile_merge import SegmentationTileMerge
 from getitune.config.data import TileConfig
