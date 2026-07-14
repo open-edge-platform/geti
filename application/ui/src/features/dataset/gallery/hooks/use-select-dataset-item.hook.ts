@@ -1,7 +1,5 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
-// Copyright (C) 2025-2026 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
 
 import { useEffect } from 'react';
 
@@ -16,18 +14,20 @@ import { useGetDatasetMediaItem } from '../../api/use-get-dataset-media-item';
 
 const useFetchMediaItemsUntilSelectedMediaIsPresent = ({
     selectedMediaInTheFetchedList,
+    selectedDatasetItemId,
 }: {
     selectedMediaInTheFetchedList: Media | null;
+    selectedDatasetItemId: string | undefined;
 }) => {
     const { fetchNextPage } = useDatasetMediaWithReviewStatus();
 
     useEffect(() => {
-        if (selectedMediaInTheFetchedList) {
+        if (selectedDatasetItemId === undefined || selectedMediaInTheFetchedList === null) {
             return;
         }
 
         fetchNextPage();
-    }, [selectedMediaInTheFetchedList, fetchNextPage]);
+    }, [selectedMediaInTheFetchedList, selectedDatasetItemId, fetchNextPage]);
 };
 
 export const useSelectDatasetItem = () => {
@@ -48,7 +48,7 @@ export const useSelectDatasetItem = () => {
         enabled: selectedDatasetItemId != null && selectedMediaInTheFetchedList === null,
     });
 
-    useFetchMediaItemsUntilSelectedMediaIsPresent({ selectedMediaInTheFetchedList });
+    useFetchMediaItemsUntilSelectedMediaIsPresent({ selectedMediaInTheFetchedList, selectedDatasetItemId });
 
     const selectedMediaItem = selectedMediaInTheFetchedList ?? fetchedMediaItem ?? null;
 
