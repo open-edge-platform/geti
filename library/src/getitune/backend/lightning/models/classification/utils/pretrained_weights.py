@@ -123,7 +123,7 @@ class VisionTransformerWeightsLoader:
                 "backbone.ln1.bias": "norm.bias",
             }
 
-            for i in range(12):
+            for i in range(len(self.model.backbone.blocks)):
                 # Normalization layers
                 key_mapping[f"backbone.layers.{i}.ln1.weight"] = f"blocks.{i}.norm1.weight"
                 key_mapping[f"backbone.layers.{i}.ln1.bias"] = f"blocks.{i}.norm1.bias"
