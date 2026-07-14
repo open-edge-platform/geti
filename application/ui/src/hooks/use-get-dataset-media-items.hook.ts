@@ -3,19 +3,24 @@
 
 import { useMemo } from 'react';
 
+import { $api } from '@/api';
+import type { DatasetItemAnnotationStatus, DatasetSubset, Media, MediaDTO, Pagination } from '@/api/types';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import isEmpty from 'lodash-es/isEmpty';
 
-import { $api } from '../api/client';
-import { DatasetItemAnnotationStatus, DatasetSubset, Media, MediaDTO, Pagination } from '../constants/shared-types';
+import { type SortDirection } from './sort-direction.interface';
 
 const DATASET_ITEMS_LIMIT = 40;
 
+type SortBy = 'upload_date';
+
 interface UseGetDatasetMediaItemsOptions {
-    subset?: DatasetSubset;
+    subsets?: DatasetSubset[];
     annotationStatus?: DatasetItemAnnotationStatus;
     labelIds?: string[];
     startDate?: string;
     endDate?: string;
+    sortDirection?: SortDirection;
 }
 
 const getMediaEntities = (items: MediaDTO[]): Media[] => {
@@ -44,18 +49,20 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
     const query: {
         limit: number;
         offset: number;
-        subset?: DatasetSubset;
+        subsets?: DatasetSubset[];
         labels?: string[];
         end_date?: string;
         start_date?: string;
         annotation_status?: DatasetItemAnnotationStatus;
+        sort_direction?: SortDirection;
+        sort_by?: SortBy;
     } = {
         offset: 0,
         limit: DATASET_ITEMS_LIMIT,
     };
 
-    if (options?.subset !== undefined) {
-        query.subset = options.subset;
+    if (options !== undefined && !isEmpty(options?.subsets)) {
+        query.subsets = options.subsets;
     }
 
     if (options?.annotationStatus !== undefined) {
@@ -72,6 +79,11 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
 
     if (options?.endDate !== undefined) {
         query.end_date = options.endDate;
+    }
+
+    if (options?.sortDirection !== undefined) {
+        query.sort_direction = options.sortDirection;
+        query.sort_by = 'upload_date';
     }
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = $api.useInfiniteQuery(

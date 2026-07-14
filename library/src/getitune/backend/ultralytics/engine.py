@@ -9,6 +9,7 @@ import csv
 import logging
 import os
 import shutil
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Protocol, Sequence
 
@@ -35,6 +36,7 @@ from .models.base import UltralyticsModel
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
 
+    from lightning_fabric.plugins.precision.precision import _PRECISION_INPUT
     from torchmetrics import Metric
     from ultralytics import YOLO
 
@@ -128,6 +130,7 @@ class UltralyticsEngine(Engine):
         batch: int | None = None,
         lr0: float | None = None,
         patience: int | None = None,
+        precision: _PRECISION_INPUT | None = "16-mixed",
         callbacks: list[Any] | None = None,
         **kwargs,
     ) -> METRICS:
@@ -138,6 +141,13 @@ class UltralyticsEngine(Engine):
             batch: Batch size.
             lr0: Initial learning rate.
             patience: Early stopping patience (0 to disable).
+            precision: Training precision.  Accepted values: ``"16-mixed"``, ``"16"``, ``"bf16-mixed"``,
+                ``"bf16"`` (mixed precision / AMP), ``"32"``, ``"32-true"``
+                (full FP32).  ``None`` leaves the Ultralytics default
+                (``amp=True``, i.e. FP16).  On CPU any FP16/BF16 variant is
+                downgraded to FP32 (a warning is logged).  On XPU the mixin
+                converts the model to BF16 regardless of whether ``"16"`` or
+                ``"bf16"`` was requested.
             callbacks: Accepted for API compatibility; unused by Ultralytics.
             **kwargs: Additional overrides forwarded to Ultralytics training.
 
@@ -156,8 +166,6 @@ class UltralyticsEngine(Engine):
                 dev_type = self._device.type
                 if dev_type != "cpu":
                     self._device = torch.device(f"{dev_type}:{idx}")
-        # Drop Lightning-only kwargs that have no Ultralytics equivalent.
-        kwargs.pop("precision", None)
         explicit: dict[str, Any] = {}
         if max_epochs is not None:
             explicit["epochs"] = max_epochs
@@ -192,6 +200,11 @@ class UltralyticsEngine(Engine):
             "exist_ok": True,
             **merged,
         }
+
+        # Inject amp after **merged so it wins over recipe values.
+        amp_val = self._precision_to_amp(precision, self._device)
+        if amp_val is not None:
+            train_args["amp"] = amp_val
 
         logger.info(
             f"Starting Ultralytics training: model={self._model.model_name}, "
@@ -529,6 +542,8 @@ class UltralyticsEngine(Engine):
             f"metric={type(metric).__name__}, batches={len(dataloader)}"
         )
 
+        iter_times: list[float] = []
+        batch_start = time.perf_counter()
         for batch in dataloader:
             if not isinstance(batch, SampleBatch):
                 msg = f"Expected test_dataloader to yield SampleBatch, got {type(batch)}"
@@ -582,8 +597,28 @@ class UltralyticsEngine(Engine):
 
             metric.update(preds=preds_list, target=target_list)
 
+            now = time.perf_counter()
+            iter_times.append(now - batch_start)
+            batch_start = now
+
         results = metric.compute()
-        return self._format_torchmetrics_results(results)
+        formatted = self._format_torchmetrics_results(results)
+        formatted.update(self._summarize_iter_times(iter_times))
+        return formatted
+
+    @staticmethod
+    def _summarize_iter_times(iter_times: list[float]) -> dict[str, float]:
+        """Average per-batch wall times into a single ``test/iter_time`` metric.
+
+        Mirrors the trimmed-mean convention used elsewhere for iteration
+        timing: the first batch is excluded since it includes one-off
+        warmup costs (CUDA/XPU kernel compilation, first-call overhead)
+        that would otherwise skew the average.
+        """
+        if not iter_times:
+            return {}
+        trimmed = iter_times[1:] if len(iter_times) > 1 else iter_times
+        return {"test/iter_time": sum(trimmed) / len(trimmed)}
 
     def _compute_best_confidence_threshold(self) -> float | None:
         """Run FMeasure on the validation set to find the optimal confidence threshold.
@@ -897,7 +932,25 @@ class UltralyticsEngine(Engine):
             translated[gt_key] = float(value) if not isinstance(value, float) else value
 
         self._add_per_class_metrics(results, translated)
+        self._add_speed_metric(results, translated)
         return translated
+
+    @staticmethod
+    def _add_speed_metric(results: UMETRICS | dict[str, Any], metrics: dict[str, float]) -> None:
+        """Translate Ultralytics' per-image ``speed`` dict into ``val/iter_time``.
+
+        The Ultralytics validator (``BaseValidator``) tracks per-image
+        ``preprocess``/``inference``/``loss``/``postprocess`` timings (in
+        milliseconds) on a ``speed`` dict that is copied onto the returned
+        metrics object. Summing and converting to seconds gives a
+        cross-backend-comparable per-iteration time, mirroring Lightning's
+        ``IterationTimer`` (``val/iter_time`` / ``test/iter_time``).
+        """
+        speed = getattr(results, "speed", None)
+        if not isinstance(speed, dict) or not speed:
+            return
+        total_ms = sum(float(v) for v in speed.values())
+        metrics["val/iter_time"] = total_ms / 1000.0
 
     @staticmethod
     def _add_per_class_metrics(results: UMETRICS | dict[str, Any], metrics: dict[str, float]) -> None:
@@ -1082,3 +1135,41 @@ class UltralyticsEngine(Engine):
 
         # Anything else (e.g. "cuda:1", "cpu") — let torch.device parse it.
         return torch.device(device)
+
+    @staticmethod
+    def _precision_to_amp(precision: _PRECISION_INPUT | None, device: torch.device) -> bool | None:
+        """Map a Lightning-style precision string to Ultralytics' ``amp`` flag.
+
+        Args:
+            precision: One of Lightning supported precisions: ``64, 32, 16,
+                'transformer-engine', 'transformer-engine-float16',
+                '16-true', '16-mixed', 'bf16-true', 'bf16-mixed', '32-true',
+                '64-true', '64', '32', '16', 'bf16'``,
+                or ``None`` to leave the Ultralytics default (``amp=True``).
+            device: The training device.  CPU does not support AMP; any FP16/
+                BF16 variant is downgraded to FP32 with a warning.
+
+        Returns:
+            ``True`` to enable AMP, ``False`` to disable it, or ``None`` to
+            leave the Ultralytics default unchanged.
+        """
+        if precision is None:
+            return None
+
+        if precision in (
+            "16-mixed",
+            "16",
+            16,
+            "bf16-mixed",
+            "bf16",
+            "16-true",
+            "16-mix",
+            "transformer-engine-float16",
+            "bf16-true",
+        ):
+            if device.type == "cpu":
+                logger.warning(f"precision={precision!r} is not supported on CPU; falling back to FP32 (amp=False)")
+                return False
+            return True
+
+        return False

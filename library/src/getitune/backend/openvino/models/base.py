@@ -337,9 +337,17 @@ class OVModel:
 
         quantization_dataset = nncf.Dataset(train_dataset, self.transform_fn)
 
+        # max_num_iterations is not a direct argument of the NNCF quantization APIs; it is configured through
+        # AdvancedAccuracyRestorerParameters. Pop it here so it is never forwarded as an invalid kwarg.
+        max_num_iterations = ptq_config.pop("max_num_iterations", None)
+
         if ptq_config.get("max_drop") is not None:
             validation_dataset = nncf.Dataset(data_module.val_dataloader(), self.transform_fn)
             validation_fn = self._create_validation_fn(data_module)
+            if max_num_iterations is not None:
+                ptq_config["advanced_accuracy_restorer_parameters"] = nncf.AdvancedAccuracyRestorerParameters(
+                    max_num_iterations=max_num_iterations
+                )
             compressed_model = nncf.quantize_with_accuracy_control(
                 model=ov_model,
                 calibration_dataset=quantization_dataset,

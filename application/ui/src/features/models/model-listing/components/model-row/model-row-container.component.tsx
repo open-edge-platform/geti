@@ -1,7 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Model, ModelArchitectureWithPerformanceCategory } from '../../../../../constants/shared-types';
+import type { Model, ModelArchitectureWithPerformanceCategory } from '@/api/types';
+
 import { useGetModel } from '../../../hooks/api/use-get-model.hook';
 import { useModelListing } from '../../provider/model-listing-provider';
 import { ModelActions } from '../model-actions/model-actions.component';

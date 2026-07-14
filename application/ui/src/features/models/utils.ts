@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Model } from '../../constants/shared-types';
+import type { Model } from '@/api/types';
 
 export type SelectableModel = { modelVariantId: string; name: string; modelId: string };
 
@@ -50,5 +50,5 @@ export const getAllModelsWithOpenVINOVariants = (models: Model[]): SelectableMod
 };
 
 export const isUltralyticsModel = (identifier: string): boolean => {
-    return identifier.toLocaleLowerCase().includes('yolo26-');
+    return /yolo\d+-/.test(identifier.toLocaleLowerCase());
 };

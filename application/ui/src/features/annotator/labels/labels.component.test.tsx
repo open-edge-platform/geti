@@ -1,6 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Label } from '@/api/types';
 import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedLabel } from 'mocks/mock-labels';
@@ -9,7 +10,6 @@ import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../api/utils';
-import type { Label } from '../../../constants/shared-types';
 import { server } from '../../../msw-node-setup';
 import { EMPTY_LABEL_ID } from '../../../shared/annotator/labels';
 import type { AnnotationLabelRef } from '../../../shared/types';

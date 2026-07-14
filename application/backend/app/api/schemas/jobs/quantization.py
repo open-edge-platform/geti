@@ -26,6 +26,12 @@ class QuantizationRequestParams(BaseModel):
         description="Maximum allowed accuracy drop, expressed as a percentage in the range [0-1] "
         "where e.g. 0.03 means 3%",
     )
+    max_num_iterations: int | None = Field(
+        10,
+        gt=0,
+        description="Maximum number of iterations for accuracy-aware quantization. "
+        "A value of null means unlimited. Only used when max_drop is set.",
+    )
 
     model_config = {
         "json_schema_extra": {
@@ -33,6 +39,7 @@ class QuantizationRequestParams(BaseModel):
                 "model_id": "6b7bb928-5d6f-46ea-8fd2-5ce80dd1e12b",
                 "max_calibration_subset_size": 100,
                 "max_drop": 0.01,
+                "max_num_iterations": 10,
             }
         }
     }
@@ -53,6 +60,7 @@ class QuantizationRequest(BaseJobRequest):
                     "model_id": "6b7bb928-5d6f-46ea-8fd2-5ce80dd1e12b",
                     "max_calibration_subset_size": 100,
                     "max_drop": 0.01,
+                    "max_num_iterations": 10,
                 },
             }
         }
@@ -85,6 +93,9 @@ class QuantizationMetadata(BaseModel):
     model_variant: QuantizationModelVariantMetadata = Field(..., description="Model variant created by quantization")
     max_calibration_subset_size: int = Field(..., description="Maximum calibration subset size")
     max_drop: float | None = Field(None, description="Maximum allowed accuracy drop")
+    max_num_iterations: int | None = Field(
+        None, description="Maximum number of iterations for accuracy-aware quantization (null means unlimited)"
+    )
 
     @model_validator(mode="before")
     @classmethod
@@ -96,5 +107,6 @@ class QuantizationMetadata(BaseModel):
                 "model_variant": QuantizationModelVariantMetadata(id=data.params.model_variant_id),
                 "max_calibration_subset_size": data.params.max_calibration_subset_size,
                 "max_drop": data.params.max_drop,
+                "max_num_iterations": data.params.max_num_iterations,
             }
         return data

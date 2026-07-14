@@ -1,12 +1,12 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { fetchClient } from '@/api';
+import type { AnnotationDTO, DatasetSubset, Media } from '@/api/types';
 import { queryOptions, useQuery, type QueryKey } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty, isObject } from 'lodash-es';
 
-import { fetchClient } from '../../../../api/client';
-import type { AnnotationDTO, DatasetSubset, Media } from '../../../../constants/shared-types';
 import { getQueryKey } from '../../../../query-client/query-client';
 import { EMPTY_LABEL_ID } from '../../../../shared/annotator/labels';
 import { isVideoFrame } from '../../../../shared/media-item-utils';

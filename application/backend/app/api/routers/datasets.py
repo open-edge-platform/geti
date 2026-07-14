@@ -12,6 +12,8 @@ from app.api.schemas.dataset_item import DatasetItemsWithPagination, DatasetItem
 from app.api.validators import DatasetItemID, ProjectID, normalize_datetime_to_utc
 from app.core.models import Pagination
 from app.models import DatasetItemAnnotationStatus, DatasetItemSubset, Project
+from app.models.dataset_item import DatasetItemSortBy
+from app.models.media import SortDirection
 from app.services import DatasetService
 from app.services.dataset_service import DatasetItemFilters
 
@@ -36,7 +38,9 @@ def list_dataset_items(  # noqa: PLR0913
     end_date: Annotated[datetime | None, Query()] = None,
     annotation_status: Annotated[DatasetItemAnnotationStatus | None, Query()] = None,
     labels: Annotated[list[UUID] | None, Query()] = None,
-    subset: Annotated[DatasetItemSubset | None, Query()] = None,
+    subsets: Annotated[list[DatasetItemSubset] | None, Query()] = None,
+    sort_by: Annotated[DatasetItemSortBy, Query()] = DatasetItemSortBy.CREATION_DATE,
+    sort_direction: Annotated[SortDirection, Query()] = SortDirection.DESC,
 ) -> DatasetItemsWithPagination:
     """List the available dataset items and their metadata. This endpoint supports pagination."""
     start_date = normalize_datetime_to_utc(start_date)
@@ -46,13 +50,14 @@ def list_dataset_items(  # noqa: PLR0913
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Start date must be before end date."
         )
+    subset_values = [item.value for item in subsets] if subsets else None
     total = dataset_service.count_dataset_items(
         project=project,
         start_date=start_date,
         end_date=end_date,
         annotation_status=annotation_status,
         label_ids=labels,
-        subset=subset,
+        subsets=subset_values,
     )
     dataset_items = dataset_service.list_dataset_items(
         project_id=project.id,
@@ -63,7 +68,9 @@ def list_dataset_items(  # noqa: PLR0913
             end_date=end_date,
             annotation_status=annotation_status,
             label_ids=labels,
-            subset=subset,
+            subsets=subset_values,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
         ),
     )
     return DatasetItemsWithPagination(

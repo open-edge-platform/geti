@@ -1,23 +1,23 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { $api } from '@/api';
+import type { DatasetRevisionItem, DatasetSubset, Pagination } from '@/api/types';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-
-import { $api } from '../api/client';
-import type { DatasetRevisionItem, DatasetSubset, Pagination } from '../constants/shared-types';
+import { isEmpty } from 'lodash-es';
 
 const DATASET_ITEMS_LIMIT = 20;
 
 interface UseGetDatasetRevisionItemsOptions {
     datasetRevisionId: string;
-    subset?: DatasetSubset;
+    subsets?: DatasetSubset[];
 }
 
-export const useGetDatasetRevisionItems = ({ datasetRevisionId, subset }: UseGetDatasetRevisionItemsOptions) => {
+export const useGetDatasetRevisionItems = ({ datasetRevisionId, subsets }: UseGetDatasetRevisionItemsOptions) => {
     const project_id = useProjectIdentifier();
 
-    const query = subset
-        ? { offset: 0, limit: DATASET_ITEMS_LIMIT, subset }
+    const query = !isEmpty(subsets)
+        ? { offset: 0, limit: DATASET_ITEMS_LIMIT, subsets }
         : { offset: 0, limit: DATASET_ITEMS_LIMIT };
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = $api.useInfiniteQuery(

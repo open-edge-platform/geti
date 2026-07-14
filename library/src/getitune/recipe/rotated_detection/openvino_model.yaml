@@ -11,7 +11,7 @@ model:
 engine:
   device: cpu
 
-callback_monitor: val/map_50
+callback_monitor: val/map
 
 data: ../_base_/data/instance_segmentation.yaml
 

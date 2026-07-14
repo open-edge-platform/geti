@@ -62,6 +62,8 @@ def test_train_args_are_train_only(mocker, tmp_path) -> None:
     _, train_kwargs = yolo.train.call_args
     assert train_kwargs["epochs"] == 7
     assert train_kwargs["lr0"] == 0.01
+    # Default precision="16-mixed" on CPU is downgraded to FP32 → amp must be False.
+    assert train_kwargs["amp"] is False
 
     with patch.object(engine, "_test_with_datamodule", return_value={}) as test_with_datamodule:
         engine.test()
@@ -397,6 +399,77 @@ class TestExtractProgressCallback:
         assert max_p == 100.0
 
 
+class TestPrecisionToAmp:
+    """Tests for UltralyticsEngine._precision_to_amp."""
+
+    @pytest.mark.parametrize("precision", ["16-mixed", "16", "bf16-mixed", "bf16"])
+    def test_fp16_variants_return_true_on_cuda(self, precision) -> None:
+        assert UltralyticsEngine._precision_to_amp(precision, torch.device("cuda")) is True
+
+    @pytest.mark.parametrize("precision", ["16-mixed", "16", "bf16-mixed", "bf16"])
+    def test_fp16_variants_return_true_on_xpu(self, precision) -> None:
+        assert UltralyticsEngine._precision_to_amp(precision, torch.device("xpu")) is True
+
+    @pytest.mark.parametrize("precision", ["16-mixed", "16", "bf16-mixed", "bf16"])
+    def test_fp16_variants_return_false_on_cpu(self, precision) -> None:
+        # CPU does not support AMP; must downgrade to FP32 with a warning.
+        assert UltralyticsEngine._precision_to_amp(precision, torch.device("cpu")) is False
+
+    @pytest.mark.parametrize("precision", ["32", "32-true"])
+    def test_fp32_variants_return_false_on_all_devices(self, precision) -> None:
+        for dev in [torch.device("cpu"), torch.device("cuda"), torch.device("xpu")]:
+            assert UltralyticsEngine._precision_to_amp(precision, dev) is False
+
+    def test_none_returns_none(self) -> None:
+        for dev in [torch.device("cpu"), torch.device("cuda"), torch.device("xpu")]:
+            assert UltralyticsEngine._precision_to_amp(None, dev) is None
+
+    def test_none_precision_does_not_inject_amp_into_train_args(self, mocker, tmp_path) -> None:
+        """When precision=None, the 'amp' key must be absent from train kwargs."""
+        model = UltralyticsDetectionModel(model_name="yolo26n", label_info=_label_info())
+        datamodule = mocker.MagicMock(spec=DataModule)
+        engine = UltralyticsEngine(model=model, data=datamodule, work_dir=tmp_path, device="cpu")
+        engine._device = torch.device("cuda")  # no actual CUDA access needed
+        mocker.patch.object(engine, "_compute_best_confidence_threshold", return_value=None)
+
+        yolo = MagicMock()
+        model._yolo = yolo
+
+        engine.train(precision=None)
+        _, train_kwargs = yolo.train.call_args
+        assert "amp" not in train_kwargs
+
+    def test_fp32_precision_injects_amp_false(self, mocker, tmp_path) -> None:
+        """precision='32' must inject amp=False regardless of device."""
+        model = UltralyticsDetectionModel(model_name="yolo26n", label_info=_label_info())
+        datamodule = mocker.MagicMock(spec=DataModule)
+        engine = UltralyticsEngine(model=model, data=datamodule, work_dir=tmp_path, device="cpu")
+        engine._device = torch.device("cuda")
+        mocker.patch.object(engine, "_compute_best_confidence_threshold", return_value=None)
+
+        yolo = MagicMock()
+        model._yolo = yolo
+
+        engine.train(precision="32")
+        _, train_kwargs = yolo.train.call_args
+        assert train_kwargs["amp"] is False
+
+    def test_fp16_precision_injects_amp_true_on_cuda(self, mocker, tmp_path) -> None:
+        """precision='16-mixed' on CUDA must inject amp=True."""
+        model = UltralyticsDetectionModel(model_name="yolo26n", label_info=_label_info())
+        datamodule = mocker.MagicMock(spec=DataModule)
+        engine = UltralyticsEngine(model=model, data=datamodule, work_dir=tmp_path, device="cpu")
+        engine._device = torch.device("cuda")
+        mocker.patch.object(engine, "_compute_best_confidence_threshold", return_value=None)
+
+        yolo = MagicMock()
+        model._yolo = yolo
+
+        engine.train(precision="16-mixed")
+        _, train_kwargs = yolo.train.call_args
+        assert train_kwargs["amp"] is True
+
+
 class TestPerClassMetrics:
     """Tests for per-class metric extraction in _translate_metrics."""
 
@@ -448,6 +521,57 @@ class TestPerClassMetrics:
         assert metrics["val/map_50"] == 0.75
         # No per-class keys
         assert not any("/" in k and k.count("/") >= 2 for k in metrics)
+
+
+class TestSpeedMetric:
+    """Tests for ``val/iter_time`` extraction from Ultralytics' ``speed`` dict."""
+
+    def test_speed_dict_summed_and_converted_to_seconds(self, mocker, tmp_path) -> None:
+        engine, _ = _make_engine(tmp_path, mocker)
+
+        results = SimpleNamespace(
+            results_dict={"metrics/mAP50(B)": 0.75},
+            speed={"preprocess": 1.0, "inference": 8.0, "loss": 0.0, "postprocess": 1.0},
+        )
+
+        metrics = engine._translate_metrics(results)  # pyrefly: ignore[bad-argument-type]
+
+        # 10 ms total -> 0.01 s
+        assert metrics["val/iter_time"] == pytest.approx(0.01)
+
+    def test_missing_speed_attr_does_not_add_key(self, mocker, tmp_path) -> None:
+        engine, _ = _make_engine(tmp_path, mocker)
+
+        results = SimpleNamespace(results_dict={"metrics/mAP50(B)": 0.75})
+
+        metrics = engine._translate_metrics(results)  # pyrefly: ignore[bad-argument-type]
+
+        assert "val/iter_time" not in metrics
+
+    def test_empty_speed_dict_does_not_add_key(self, mocker, tmp_path) -> None:
+        engine, _ = _make_engine(tmp_path, mocker)
+
+        results = SimpleNamespace(results_dict={"metrics/mAP50(B)": 0.75}, speed={})
+
+        metrics = engine._translate_metrics(results)  # pyrefly: ignore[bad-argument-type]
+
+        assert "val/iter_time" not in metrics
+
+
+class TestSummarizeIterTimes:
+    """Tests for ``UltralyticsEngine._summarize_iter_times`` (test/torch phase timing)."""
+
+    def test_empty_list_returns_empty_dict(self) -> None:
+        assert UltralyticsEngine._summarize_iter_times([]) == {}
+
+    def test_single_sample_used_directly(self) -> None:
+        result = UltralyticsEngine._summarize_iter_times([5.0])
+        assert result["test/iter_time"] == pytest.approx(5.0)
+
+    def test_first_sample_excluded_as_warmup(self) -> None:
+        result = UltralyticsEngine._summarize_iter_times([10.0, 2.0, 3.0, 4.0])
+        # mean of [2.0, 3.0, 4.0] = 3.0
+        assert result["test/iter_time"] == pytest.approx(3.0)
 
 
 class TestTorchmetricsEval:
@@ -509,6 +633,8 @@ class TestTorchmetricsEval:
         assert result["test/map_50"] == pytest.approx(0.90)
         assert result["test/map_75"] == pytest.approx(0.60)
         assert "test/classes" not in result
+        assert "test/iter_time" in result
+        assert result["test/iter_time"] >= 0.0
 
     def test_test_falls_back_to_yolo_without_metric(self, mocker, tmp_path) -> None:
         """test() should use YOLO validator when no metric callable is provided."""

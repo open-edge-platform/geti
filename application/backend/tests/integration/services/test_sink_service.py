@@ -8,8 +8,16 @@ import pytest
 
 from app.db.schema import PipelineDB, SinkDB
 from app.models import OutputFormat, SinkAdapter, SinkType
-from app.models.sink import FolderConfig, FolderSinkConfig, MqttConfig, MqttSinkConfig, WebhookConfig, WebhookSinkConfig
-from app.services import ResourceInUseError, ResourceType, SinkService
+from app.models.sink import (
+    FolderConfig,
+    FolderSinkConfig,
+    MqttConfig,
+    MqttSinkConfig,
+    SinkTestResult,
+    WebhookConfig,
+    WebhookSinkConfig,
+)
+from app.services import ResourceInUseError, ResourceType, ResourceValidationError, SinkService
 from app.services.base import ResourceWithIdAlreadyExistsError, ResourceWithNameAlreadyExistsError
 from app.services.event.event_bus import EventType
 
@@ -25,14 +33,15 @@ class TestSinkServiceIntegration:
 
     def test_create_sink(self, fxt_mqtt_sink, fxt_sink_service, db_session):
         """Test creating a new sink."""
-        fxt_sink_service.create_sink(
-            name=fxt_mqtt_sink.name,
-            sink_type=fxt_mqtt_sink.sink_type,
-            rate_limit=fxt_mqtt_sink.rate_limit,
-            config_data=fxt_mqtt_sink.config_data,
-            output_formats=fxt_mqtt_sink.output_formats,
-            sink_id=fxt_mqtt_sink.id,
-        )
+        with patch.object(fxt_sink_service, "_probe_reachability", return_value=SinkTestResult.success(1.0)):
+            fxt_sink_service.create_sink(
+                name=fxt_mqtt_sink.name,
+                sink_type=fxt_mqtt_sink.sink_type,
+                rate_limit=fxt_mqtt_sink.rate_limit,
+                config_data=fxt_mqtt_sink.config_data,
+                output_formats=fxt_mqtt_sink.output_formats,
+                sink_id=fxt_mqtt_sink.id,
+            )
 
         assert db_session.query(SinkDB).count() == 1
         created = db_session.query(SinkDB).one()
@@ -55,7 +64,10 @@ class TestSinkServiceIntegration:
 
         fxt_mqtt_sink.name = fxt_db_sinks[0].name  # Set the same name as existing resource
 
-        with pytest.raises(ResourceWithNameAlreadyExistsError) as excinfo:
+        with (
+            patch.object(fxt_sink_service, "_probe_reachability", return_value=SinkTestResult.success(1.0)),
+            pytest.raises(ResourceWithNameAlreadyExistsError) as excinfo,
+        ):
             fxt_sink_service.create_sink(
                 name=fxt_mqtt_sink.name,
                 sink_type=fxt_mqtt_sink.sink_type,
@@ -81,7 +93,10 @@ class TestSinkServiceIntegration:
 
         fxt_mqtt_sink.id = UUID(fxt_db_sinks[0].id)  # Set the same ID as existing resource
 
-        with pytest.raises(ResourceWithIdAlreadyExistsError) as excinfo:
+        with (
+            patch.object(fxt_sink_service, "_probe_reachability", return_value=SinkTestResult.success(1.0)),
+            pytest.raises(ResourceWithIdAlreadyExistsError) as excinfo,
+        ):
             fxt_sink_service.create_sink(
                 name=fxt_mqtt_sink.name,
                 sink_type=fxt_mqtt_sink.sink_type,
@@ -93,6 +108,164 @@ class TestSinkServiceIntegration:
 
         assert excinfo.value.resource_type == ResourceType.SINK
         assert excinfo.value.resource_id == fxt_db_sinks[0].id
+
+    def test_create_sink_not_reachable_folder(self, fxt_sink_service, db_session):
+        """Test creating a folder sink that points at a non-existent folder is rejected."""
+        with pytest.raises(ResourceValidationError) as excinfo:
+            fxt_sink_service.create_sink(
+                name="Missing Folder Sink",
+                sink_type=SinkType.FOLDER,
+                rate_limit=None,
+                config_data=FolderConfig(folder_path="/nonexistent/output/folder"),
+                output_formats=[OutputFormat.PREDICTIONS],
+                sink_id=uuid4(),
+            )
+
+        assert excinfo.value.resource_type == ResourceType.SINK
+        assert "Directory not found" in str(excinfo.value)
+        assert db_session.query(SinkDB).count() == 0
+
+    def test_create_sink_not_reachable_mqtt(self, fxt_sink_service, db_session):
+        """Test creating an MQTT sink whose broker cannot be reached is rejected."""
+        with (
+            patch(
+                "app.services.dispatchers.mqtt.socket.create_connection",
+                side_effect=OSError("Connection timed out"),
+            ),
+            pytest.raises(ResourceValidationError) as excinfo,
+        ):
+            fxt_sink_service.create_sink(
+                name="Unreachable MQTT Sink",
+                sink_type=SinkType.MQTT,
+                rate_limit=None,
+                config_data=MqttConfig(broker_host="192.0.2.1", broker_port=1883, topic="test"),
+                output_formats=[OutputFormat.PREDICTIONS],
+                sink_id=uuid4(),
+            )
+
+        assert excinfo.value.resource_type == ResourceType.SINK
+        assert "Cannot connect" in str(excinfo.value)
+        assert db_session.query(SinkDB).count() == 0
+
+    def test_create_sink_not_reachable_webhook(self, fxt_sink_service, db_session):
+        """Test creating a webhook sink whose URL cannot be reached is rejected."""
+        import requests
+
+        with (
+            patch(
+                "app.services.dispatchers.webhook.requests.head",
+                side_effect=requests.ConnectionError("Connection refused"),
+            ),
+            pytest.raises(ResourceValidationError) as excinfo,
+        ):
+            fxt_sink_service.create_sink(
+                name="Unreachable Webhook Sink",
+                sink_type=SinkType.WEBHOOK,
+                rate_limit=None,
+                config_data=WebhookConfig(webhook_url="http://192.0.2.1:9999/hook"),
+                output_formats=[OutputFormat.PREDICTIONS],
+                sink_id=uuid4(),
+            )
+
+        assert excinfo.value.resource_type == ResourceType.SINK
+        assert "Cannot reach webhook" in str(excinfo.value)
+        assert db_session.query(SinkDB).count() == 0
+
+    def test_update_sink_not_reachable(self, fxt_db_sinks, fxt_sink_service, db_session):
+        """Test updating a sink to a non-existent folder is rejected and not persisted."""
+        db_sink = fxt_db_sinks[0]
+        db_session.add(db_sink)
+        db_session.flush()
+        original_config_data = dict(db_sink.config_data)
+
+        sink = SinkAdapter.validate_python(db_sink, from_attributes=True)
+
+        with pytest.raises(ResourceValidationError) as excinfo:
+            fxt_sink_service.update_sink(
+                sink=sink,
+                new_name="Updated Sink",
+                new_rate_limit=sink.rate_limit,
+                new_config_data=FolderConfig(folder_path="/nonexistent/output/folder"),
+                new_output_formats=sink.output_formats,
+            )
+
+        assert excinfo.value.resource_type == ResourceType.SINK
+        assert "Directory not found" in str(excinfo.value)
+        # Verify nothing changed in DB
+        db_session.refresh(db_sink)
+        assert db_sink.name == fxt_db_sinks[0].name
+        assert db_sink.config_data == original_config_data
+
+    def test_update_sink_not_reachable_mqtt(self, fxt_db_sinks, fxt_sink_service, db_session):
+        """Test updating a sink to an unreachable MQTT broker is rejected and not persisted."""
+        db_sink = fxt_db_sinks[1]  # MQTT sink
+        db_session.add(db_sink)
+        db_session.flush()
+        original_config_data = dict(db_sink.config_data)
+
+        sink = SinkAdapter.validate_python(db_sink, from_attributes=True)
+
+        with (
+            patch(
+                "app.services.dispatchers.mqtt.socket.create_connection",
+                side_effect=OSError("Connection timed out"),
+            ),
+            pytest.raises(ResourceValidationError) as excinfo,
+        ):
+            fxt_sink_service.update_sink(
+                sink=sink,
+                new_name="Updated Sink",
+                new_rate_limit=sink.rate_limit,
+                new_config_data=MqttConfig(broker_host="192.0.2.1", broker_port=1883, topic="test"),
+                new_output_formats=sink.output_formats,
+            )
+
+        assert excinfo.value.resource_type == ResourceType.SINK
+        assert "Cannot connect" in str(excinfo.value)
+        # Verify nothing changed in DB
+        db_session.refresh(db_sink)
+        assert db_sink.name == fxt_db_sinks[1].name
+        assert db_sink.config_data == original_config_data
+
+    def test_update_sink_not_reachable_webhook(self, fxt_sink_service, db_session):
+        """Test updating a webhook sink to an unreachable URL is rejected and not persisted."""
+        import requests
+
+        db_sink = SinkDB(
+            id=str(uuid4()),
+            sink_type=SinkType.WEBHOOK,
+            name="Existing Webhook Sink",
+            rate_limit=None,
+            output_formats=[OutputFormat.PREDICTIONS],
+            config_data={"webhook_url": "http://example.com/hook"},
+        )
+        db_session.add(db_sink)
+        db_session.flush()
+        original_config_data = dict(db_sink.config_data)
+
+        sink = SinkAdapter.validate_python(db_sink, from_attributes=True)
+
+        with (
+            patch(
+                "app.services.dispatchers.webhook.requests.head",
+                side_effect=requests.ConnectionError("Connection refused"),
+            ),
+            pytest.raises(ResourceValidationError) as excinfo,
+        ):
+            fxt_sink_service.update_sink(
+                sink=sink,
+                new_name="Updated Sink",
+                new_rate_limit=sink.rate_limit,
+                new_config_data=WebhookConfig(webhook_url="http://192.0.2.1:9999/hook"),
+                new_output_formats=sink.output_formats,
+            )
+
+        assert excinfo.value.resource_type == ResourceType.SINK
+        assert "Cannot reach webhook" in str(excinfo.value)
+        # Verify nothing changed in DB
+        db_session.refresh(db_sink)
+        assert db_sink.name == "Existing Webhook Sink"
+        assert db_sink.config_data == original_config_data
 
     @pytest.mark.parametrize("is_running", [True, False])
     def test_get_active_sink(
@@ -157,13 +330,14 @@ class TestSinkServiceIntegration:
 
         sink = SinkAdapter.validate_python(db_sink, from_attributes=True)
 
-        updated = fxt_sink_service.update_sink(
-            sink=sink,
-            new_name="Updated Sink",
-            new_rate_limit=db_sink.rate_limit,
-            new_config_data=FolderConfig(folder_path="/new/folder"),
-            new_output_formats=db_sink.output_formats,
-        )
+        with patch.object(fxt_sink_service, "_probe_reachability", return_value=SinkTestResult.success(1.0)):
+            updated = fxt_sink_service.update_sink(
+                sink=sink,
+                new_name="Updated Sink",
+                new_rate_limit=db_sink.rate_limit,
+                new_config_data=FolderConfig(folder_path="/new/folder"),
+                new_output_formats=db_sink.output_formats,
+            )
 
         assert updated.name == "Updated Sink"
         assert str(updated.id) == db_sink.id
@@ -181,7 +355,10 @@ class TestSinkServiceIntegration:
 
         sink = SinkAdapter.validate_python(db_sink, from_attributes=True)
 
-        with pytest.raises(ResourceWithNameAlreadyExistsError) as excinfo:
+        with (
+            patch.object(fxt_sink_service, "_probe_reachability", return_value=SinkTestResult.success(1.0)),
+            pytest.raises(ResourceWithNameAlreadyExistsError) as excinfo,
+        ):
             fxt_sink_service.update_sink(
                 sink=sink,
                 new_name=fxt_db_sinks[1].name,
@@ -213,13 +390,14 @@ class TestSinkServiceIntegration:
 
         sink = SinkAdapter.validate_python(db_sink, from_attributes=True)
 
-        updated = fxt_sink_service.update_sink(
-            sink=sink,
-            new_name="Updated Sink",
-            new_rate_limit=db_sink.rate_limit,
-            new_config_data=FolderConfig(folder_path="/new/folder"),
-            new_output_formats=db_sink.output_formats,
-        )
+        with patch.object(fxt_sink_service, "_probe_reachability", return_value=SinkTestResult.success(1.0)):
+            updated = fxt_sink_service.update_sink(
+                sink=sink,
+                new_name="Updated Sink",
+                new_rate_limit=db_sink.rate_limit,
+                new_config_data=FolderConfig(folder_path="/new/folder"),
+                new_output_formats=db_sink.output_formats,
+            )
 
         assert updated.name == "Updated Sink"
         assert str(updated.id) == db_sink.id

@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import type { TrainingConfiguration } from '@/api/types';
 import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
@@ -11,7 +12,6 @@ import {
 } from 'mocks/mock-training-configuration';
 import { render } from 'test-utils/render';
 
-import { TrainingConfiguration } from '../../../../../../constants/shared-types';
 import { Tiling } from './tiling.component';
 import {
     getTilingMode,

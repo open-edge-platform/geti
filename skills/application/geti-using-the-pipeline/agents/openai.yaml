@@ -1,0 +1,4 @@
+interface:
+  display_name: "Use the Geti Pipeline"
+  short_description: "Drive the Geti app end to end via its REST API (project→train→deploy)"
+  default_prompt: "Use $geti-using-the-pipeline to run the Geti project-to-deployment workflow via the API."

@@ -3,12 +3,14 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 
+import type { AnnotationDTO, Media } from '@/api/types';
 import { useQuery } from '@tanstack/react-query';
+import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useFetchNextUnannotatedMediaItem } from 'hooks/use-get-dataset-items.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { range } from 'lodash-es';
 import { useLocalStorage } from 'usehooks-ts';
 
-import type { AnnotationDTO, Media } from '../../../constants/shared-types';
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
 import { isVideoFrame } from '../../../shared/media-item-utils';
 import { loadImageQueryOptions } from '../../annotator/hooks/use-load-image-query.hook';
@@ -54,13 +56,41 @@ export const getNextMediaItem = (currentMediaItem: Media, allMediaItems: Media[]
     return allMediaItems[currentIndex + 1];
 };
 
+const useNextUnannotatedMediaItem = (currentMediaItem: Media, allMediaItems: Media[]) => {
+    const { fetchNextPage } = useDatasetMediaWithReviewStatus();
+    const { data, isPending } = useFetchNextUnannotatedMediaItem();
+
+    const nextUnannotatedDatasetMediaItem = data?.items?.find((item) => item.id !== currentMediaItem.id);
+    const nextUnannotatedMediaItem = allMediaItems.find((item) => item.id === nextUnannotatedDatasetMediaItem?.id);
+    const isInsideFetchedMediaItems = nextUnannotatedMediaItem !== undefined;
+
+    useEffect(() => {
+        if (isPending || isInsideFetchedMediaItems) {
+            return;
+        }
+
+        fetchNextPage();
+    }, [isInsideFetchedMediaItems, fetchNextPage, isPending]);
+
+    if (isPending) {
+        return undefined;
+    }
+
+    return nextUnannotatedMediaItem;
+};
+
 export const useNextMediaItem = (currentMediaItem: Media, allMediaItems: Media[]) => {
     const context = useVideoPlayerContext();
     const step = context?.step ?? 1;
+    const nextUnannotatedMediaItem = useNextUnannotatedMediaItem(currentMediaItem, allMediaItems);
 
     return useMemo(() => {
-        return getNextMediaItem(currentMediaItem, allMediaItems, step);
-    }, [allMediaItems, currentMediaItem, step]);
+        if (isVideoFrame(currentMediaItem) || nextUnannotatedMediaItem === undefined) {
+            return getNextMediaItem(currentMediaItem, allMediaItems, step);
+        }
+
+        return nextUnannotatedMediaItem;
+    }, [allMediaItems, currentMediaItem, step, nextUnannotatedMediaItem]);
 };
 
 // When the user navigates to next media, image data and annotations will be already in React Query cache,

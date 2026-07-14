@@ -1,11 +1,11 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { fetchClient } from '@/api';
+import type { PredictionDTO, PredictionVideoRangePayload } from '@/api/types';
 import { queryOptions, useIsFetching, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { fetchClient } from '../../../api/client';
-import { PredictionDTO, PredictionVideoRangePayload } from '../../../constants/shared-types';
 import { EMPTY_LABEL_ID } from '../../../shared/annotator/labels';
 import { isVideoFrame } from '../../../shared/media-item-utils';
 import { getModelIdentifierPayload, SelectableModel } from '../../models/utils';
@@ -121,7 +121,7 @@ export const useIsFetchingCurrentRangeFramesPredictions = (mediaId: string) => {
     return useIsFetching({ queryKey: rangeQueryKey, exact: true }) > 0;
 };
 
-export const useIsFetchingCurrentFramePredictions = (mediaId: string) => {
+const useIsFetchingCurrentFramePredictions = (mediaId: string) => {
     const projectId = useProjectIdentifier();
     const { selectedModel, selectedDevice } = usePredictionSetup();
     const { mediaItem } = useSelectedMediaItem();
