@@ -167,6 +167,10 @@ class DispatchingWorker(BaseThreadWorker):
     def _dispatch_to_sinks(self, stream_data: StreamData, image_with_visualization, prediction) -> None:  # noqa: ANN001
         """Dispatch results to every configured destination, isolating per-destination failures."""
         dispatch_error_message: str | None = None
+        if not self._destinations:
+            # Keep the last reported sink status (e.g. connect/build failure from _load_sink)
+            # instead of flipping it to OK when nothing is actually connected.
+            return
         for destination in self._destinations:
             try:
                 destination.dispatch(

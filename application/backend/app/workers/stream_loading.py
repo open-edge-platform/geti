@@ -133,12 +133,74 @@ class StreamLoader(BaseProcessWorker):
                     f"Failed to open video stream for source {self._source.name!r}",
                 )
 
-    def _release_stream(self) -> None:
-        """Release and clear the current video stream (thread-safe)."""
+    def _read_frame(self) -> tuple[str, StreamData | None, bool]:
+        """Read a single frame from the current stream while holding ``_stream_lock``.
+
+        The lock is held for the entire duration of the stream-backend calls
+        (``get_data``/``is_real_time``/``is_finished``/``release``) so the source-reload thread
+        cannot release or replace the stream while it is being read. This prevents both racey
+        access and use-after-release of the underlying stream backend.
+
+        The frame is intentionally *not* enqueued here: enqueuing may block (for non real-time
+        sources) and does not touch the stream, so it is done by the caller outside the lock using
+        the returned data and the captured ``is_real_time`` flag.
+
+        Returns:
+            A ``(result, stream_data, is_real_time)`` tuple where ``result`` is one of:
+            - ``"ok"``: a frame was read; ``stream_data`` and ``is_real_time`` are populated.
+            - ``"finished"``: a finite source was fully consumed; the stream has been released.
+            - ``"idle"``: no frame available right now, but the stream is still healthy.
+            - ``"closed"``: the stream is not currently open.
+        """
         with self._stream_lock:
-            if self._video_stream is not None:
-                self._video_stream.release()
+            stream = self._video_stream
+            if stream is None:
+                return "closed", None, False
+            stream_data = stream.get_data()
+            if stream_data is not None:
+                return "ok", stream_data, stream.is_real_time()
+            if stream.is_finished():
+                # Finite source fully consumed: release the stream instead of polling forever.
+                stream.release()
                 self._video_stream = None
+                self._source_exhausted = True
+                return "finished", None, False
+            return "idle", None, False
+
+    def _ensure_stream_open(self, consecutive_errors: int) -> tuple[bool, int]:
+        """Ensure the video stream is open, retrying to (re)open it with exponential backoff.
+
+        The stream may be closed because it failed to open at startup (e.g. an unreachable IP
+        camera when the pipeline was enabled) or because it dropped out. Retrying here lets the
+        pipeline recover automatically once the source becomes reachable again, instead of idling
+        forever.
+
+        Args:
+            consecutive_errors: The current failure streak.
+
+        Returns:
+            A ``(ready, consecutive_errors)`` tuple. ``ready`` is ``True`` when a stream is open
+            and the caller may proceed to read a frame; when ``False`` the caller should retry the
+            loop (a backoff sleep has already been performed). ``consecutive_errors`` is the updated
+            streak (reset to ``0`` once the stream is (re)opened).
+        """
+        if self._video_stream is not None:
+            return True, consecutive_errors
+        self._reset_stream()
+        if self._video_stream is None:
+            consecutive_errors += 1
+            backoff = _backoff_seconds(consecutive_errors)
+            logger.warning(
+                "Video stream for source id={} name={!r} is unavailable (consecutive failures: {}); retrying in {}s.",
+                self._source.id,
+                self._source.name,
+                consecutive_errors,
+                backoff,
+            )
+            self.stop_aware_sleep(backoff)
+            return False, consecutive_errors
+        # Successfully (re)opened the stream: clear the failure streak.
+        return True, 0
 
     def run_loop(self) -> None:
         consecutive_errors = 0
@@ -156,46 +218,28 @@ class StreamLoader(BaseProcessWorker):
                 self.stop_aware_sleep(1)
                 continue
 
-            if self._video_stream is None:
-                # The stream is not open: either it failed to open at startup (e.g. an unreachable
-                # IP camera when the pipeline was enabled) or it dropped out. Keep trying to
-                # (re)open it with an exponential backoff so the pipeline recovers automatically
-                # once the source becomes reachable again, instead of idling forever.
-                self._reset_stream()
-                if self._video_stream is None:
-                    consecutive_errors += 1
-                    backoff = _backoff_seconds(consecutive_errors)
-                    logger.warning(
-                        "Video stream for source id={} name={!r} is unavailable "
-                        "(consecutive failures: {}); retrying in {}s.",
-                        self._source.id,
-                        self._source.name,
-                        consecutive_errors,
-                        backoff,
-                    )
-                    self.stop_aware_sleep(backoff)
-                    continue
-                # Successfully (re)opened the stream: clear the failure streak.
-                consecutive_errors = 0
+            ready, consecutive_errors = self._ensure_stream_open(consecutive_errors)
+            if not ready:
+                continue
 
-            # Acquire a frame and enqueue it
+            # Acquire a frame (under the stream lock) and enqueue it (outside the lock)
             try:
-                stream_data = self._video_stream.get_data()
-                if stream_data is not None:
-                    _enqueue_frame_with_retry(
-                        self._frame_queue, stream_data, self._video_stream.is_real_time(), self._stop_event
-                    )
+                result, stream_data, is_real_time = self._read_frame()
+                if result == "closed":
+                    # The stream was released concurrently (e.g. by the source-reload thread).
+                    # Loop back so the top of the loop re-opens it.
+                    consecutive_errors = 0
+                    continue
+                if result == "ok" and stream_data is not None:
+                    _enqueue_frame_with_retry(self._frame_queue, stream_data, is_real_time, self._stop_event)
                     consecutive_errors = 0
                     self._report_status(SourceStatusCode.OK)
-                elif self._video_stream.is_finished():
-                    # Finite source fully consumed: stop the stream instead of polling forever.
+                elif result == "finished":
                     logger.info(
                         "Video stream finished for source id={} name={!r}; stopping stream until source changes.",
                         self._source.id,
                         self._source.name,
                     )
-                    self._release_stream()
-                    self._source_exhausted = True
                     consecutive_errors = 0
                     self._report_status(
                         SourceStatusCode.FINISHED,
@@ -222,9 +266,13 @@ class StreamLoader(BaseProcessWorker):
                 self.stop_aware_sleep(_backoff_seconds(consecutive_errors))
 
     def teardown(self) -> None:
-        if self._video_stream is not None:
-            logger.debug("Releasing video stream...")
-            self._video_stream.release()
+        # Release under the stream lock: the daemon source-reload thread may still be running and
+        # could otherwise concurrently (re)create/release the stream during shutdown.
+        with self._stream_lock:
+            if self._video_stream is not None:
+                logger.debug("Releasing video stream...")
+                self._video_stream.release()
+                self._video_stream = None
         if self._status_shm is not None:
             self._status_shm.close()
 

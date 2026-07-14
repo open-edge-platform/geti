@@ -3,6 +3,7 @@
 
 import multiprocessing as mp
 import queue
+import threading
 import time
 from multiprocessing.shared_memory import SharedMemory
 from threading import Thread
@@ -462,6 +463,79 @@ class TestStreamLoaderFinishedStream:
         assert loader._video_stream is looping_stream, "Reloading the source should re-create the stream"
         assert loader._video_stream.get_data() is not None, "Re-enabled stream should produce frames again"
         assert loader._video_stream.is_finished() is False
+
+
+class TestStreamLoaderStreamLockSafety:
+    """Tests that stream access and (re)creation/release are mutually exclusive.
+
+    ``run_loop`` reads frames while the source-reload thread may release/replace the stream. All
+    stream-backend calls must happen under ``_stream_lock`` so the stream can never be released
+    while it is being read (use-after-release).
+    """
+
+    def _make_loader(self, frame_queue, status_shm, status_shm_lock, stop_event):
+        loader = StreamLoader(
+            frame_queue=frame_queue,
+            status_shm_name=status_shm.name,
+            status_shm_lock=status_shm_lock,
+            stop_event=stop_event,
+            source_changed_condition=None,
+            logger_=Mock(),
+        )
+        loader._status_shm = status_shm
+        loader._source = _video_file_source()
+        return loader
+
+    def test_read_frame_holds_lock_during_stream_access(
+        self, frame_queue, status_shm, status_shm_lock, stop_event, sample_frame
+    ):
+        """While ``_read_frame`` is inside ``get_data``, the stream lock must be held so a concurrent
+        ``_reset_stream`` cannot release the stream mid-read."""
+        lock_held_during_get_data = {"value": False}
+        entered = threading.Event()
+        release_may_proceed = threading.Event()
+
+        stream = Mock()
+
+        def blocking_get_data():
+            entered.set()
+            # Check whether the loader's stream lock is currently held (it must be).
+            lock_held_during_get_data["value"] = loader._stream_lock.locked()
+            # Block until the test allows the read to complete.
+            release_may_proceed.wait(timeout=5)
+            return StreamData(frame_data=sample_frame, timestamp=time.time(), source_metadata={})
+
+        stream.get_data.side_effect = blocking_get_data
+        stream.is_real_time.return_value = False
+        stream.is_finished.return_value = False
+
+        loader = self._make_loader(frame_queue, status_shm, status_shm_lock, stop_event)
+        loader._video_stream = stream
+
+        reader = threading.Thread(target=loader._read_frame, daemon=True)
+        reader.start()
+        assert entered.wait(timeout=5), "get_data should have been entered"
+
+        # While the read is in-flight, a concurrent _reset_stream attempt must block on the lock.
+        reset_done = threading.Event()
+
+        def try_reset():
+            with patch("app.workers.stream_loading.VideoStreamService.get_video_stream", return_value=Mock()):
+                loader._reset_stream()
+            reset_done.set()
+
+        resetter = threading.Thread(target=try_reset, daemon=True)
+        resetter.start()
+
+        # The reset must NOT complete while the read still holds the lock.
+        assert not reset_done.wait(timeout=0.5), "_reset_stream must block while _read_frame holds the lock"
+
+        # Let the read finish; now the reset can acquire the lock and complete.
+        release_may_proceed.set()
+        reader.join(timeout=5)
+        assert reset_done.wait(timeout=5), "_reset_stream should proceed after the read releases the lock"
+
+        assert lock_held_during_get_data["value"] is True, "Stream lock must be held during get_data()"
 
 
 class TestStreamLoaderStatusReporting:

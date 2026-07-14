@@ -119,7 +119,8 @@ class TestInferenceServerMonitorThread:
         stop_method.assert_not_called()
 
     def test_run_loop_survives_stop_error(self) -> None:
-        """A failure while unloading the model must not kill the monitor thread."""
+        """A failure while unloading the model must not kill the monitor thread, and must keep the
+        countdown armed so the idle model is not left loaded indefinitely."""
         mock_server = MagicMock()
 
         stop_event = MagicMock()
@@ -136,5 +137,55 @@ class TestInferenceServerMonitorThread:
             monitor_thread.run_loop()
 
         monitor_thread._orig_stop.assert_called_once_with()
-        # The countdown is reset so the failing unload is not retried on every tick.
+        # The countdown stays armed (NOT disabled) so the unload is retried later; a transient
+        # failure must not leave an idle model loaded indefinitely.
+        assert monitor_thread._ttl_start_time > 0
+        assert monitor_thread._unload_failures == 1
+        # A backoff is scheduled so the failing unload is not retried on every single tick.
+        assert monitor_thread._next_unload_attempt > 100
+
+    def test_run_loop_retries_unload_after_backoff_until_success(self) -> None:
+        """After a transient unload failure, a later attempt (past the backoff) retries and succeeds."""
+        mock_server = MagicMock()
+        monitor_thread = InferenceServerMonitorThread(server=mock_server, stop_event=MagicMock())
+        monitor_thread.setup()
+        monitor_thread._ttl = 1
+        monitor_thread._ttl_start_time = 1
+        # Fail on the first unload attempt, then succeed on the next actual attempt.
+        monitor_thread._orig_stop = MagicMock(side_effect=[RuntimeError("transient"), None])
+
+        # First attempt: TTL expired, unload fails, backoff scheduled (2s -> next attempt at 102).
+        with patch("time.perf_counter", return_value=100):
+            monitor_thread._try_unload_expired_model()
+        assert monitor_thread._orig_stop.call_count == 1
+        assert monitor_thread._ttl_start_time > 0  # countdown stays armed
+        assert monitor_thread._unload_failures == 1
+        assert monitor_thread._next_unload_attempt == 102
+
+        # Still within the backoff window: no new unload attempt is made.
+        with patch("time.perf_counter", return_value=101):
+            monitor_thread._try_unload_expired_model()
+        assert monitor_thread._orig_stop.call_count == 1
+
+        # Past the backoff: the retry succeeds, disarming the countdown and clearing retry state.
+        with patch("time.perf_counter", return_value=200):
+            monitor_thread._try_unload_expired_model()
+        assert monitor_thread._orig_stop.call_count == 2
         assert monitor_thread._ttl_start_time < 0
+        assert monitor_thread._unload_failures == 0
+        assert monitor_thread._next_unload_attempt == 0.0
+
+    def test_reset_unload_retry_state_on_model_load(self) -> None:
+        """Loading a new model clears any pending failed-unload retry bookkeeping."""
+        mock_server = MagicMock()
+        mock_server.set_inference_model.return_value = True
+        monitor_thread = InferenceServerMonitorThread(server=mock_server, stop_event=MagicMock())
+        monitor_thread.setup()
+        # Simulate leftover failure state from a previous model.
+        monitor_thread._unload_failures = 3
+        monitor_thread._next_unload_attempt = 999.0
+
+        mock_server.set_inference_model(project_id=uuid4(), model_id=uuid4(), device="AUTO", ttl=60)
+
+        assert monitor_thread._unload_failures == 0
+        assert monitor_thread._next_unload_attempt == 0.0
