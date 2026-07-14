@@ -9,7 +9,7 @@ identifier passed to a model/backbone) and resolves to a downloadable checkpoint
 hosted on Intel's weight storage.
 
 These constants are consumed by the classification loader mixins (see
-:mod:`getitune.backend.lightning.models.classification.utils.load_weights.py`), which
+:mod:`getitune.backend.lightning.models.classification.utils.pretrained_weights`), which
 resolve the URL for a given ``model_name``, download the file into
 ``PRETRAINED_WEIGHTS_CACHE_DIR``, and load it into the backbone.
 
