@@ -4,7 +4,7 @@ task: MULTI_CLASS_CLS
 model:
   class_path: getitune.backend.ultralytics.models.classification.UltralyticsMultiClassClsModel
   init_args:
-    model_name: yolo26x-cls.yaml
+    model_name: yolo26x
     pretrained: true
     imgsz: 224
 

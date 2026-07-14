@@ -706,6 +706,31 @@ class GetiConfigConverter:
                 "status": ModelStatus.ACTIVE,
                 "default": False,
             },
+            "image-classification-yolo26-n": {
+                "recipe_path": RECIPE_PATH / "classification" / "multi_class_cls" / "yolo26_n_cls.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "image-classification-yolo26-s": {
+                "recipe_path": RECIPE_PATH / "classification" / "multi_class_cls" / "yolo26_s_cls.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "image-classification-yolo26-m": {
+                "recipe_path": RECIPE_PATH / "classification" / "multi_class_cls" / "yolo26_m_cls.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "image-classification-yolo26-l": {
+                "recipe_path": RECIPE_PATH / "classification" / "multi_class_cls" / "yolo26_l_cls.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "image-classification-yolo26-x": {
+                "recipe_path": RECIPE_PATH / "classification" / "multi_class_cls" / "yolo26_x_cls.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
             # DETECTION
             "object-detection-atss-mobilenet-v2": {
                 "recipe_path": RECIPE_PATH / "detection" / "atss_mobilenetv2.yaml",
