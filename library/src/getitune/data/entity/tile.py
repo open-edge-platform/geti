@@ -22,6 +22,18 @@ if TYPE_CHECKING:
     from torch import LongTensor
 
 
+# Number of tiles forwarded through the model at once during tiled inference.
+#
+# This is intentionally *decoupled* from the DataLoader batch size (i.e. the
+# number of original images collated per batch). During tiled validation/testing
+# a single original image expands into many tiles, so the tiled val/test/predict
+# dataloaders load only one original image per batch to keep the collated tile
+# batch small enough for the worker->main shared-memory transfer. The model,
+# however, still processes tiles in reasonably sized groups for GPU efficiency,
+# which is what this constant controls.
+TILE_INFERENCE_BATCH_SIZE = 8
+
+
 @dataclass
 class TileDataEntity:
     """Base data entity for tile task.
@@ -104,14 +116,14 @@ class TileBatchDetDataEntity(TileBatchData):
         tile_tile_infos = [tile_info for tile_infos in self.batch_tile_tile_infos for tile_info in tile_infos]
 
         batch_data_entities = []
-        for i in range(0, len(tiles), self.batch_size):
+        for i in range(0, len(tiles), TILE_INFERENCE_BATCH_SIZE):
             stacked_images, updated_img_info = stack_batch(
-                tiles[i : i + self.batch_size],
-                tile_img_infos[i : i + self.batch_size],
+                tiles[i : i + TILE_INFERENCE_BATCH_SIZE],
+                tile_img_infos[i : i + TILE_INFERENCE_BATCH_SIZE],
             )
             batch_data_entities.append(
                 (
-                    tile_tile_infos[i : i + self.batch_size],
+                    tile_tile_infos[i : i + TILE_INFERENCE_BATCH_SIZE],
                     SampleBatch(
                         images=stacked_images,
                         imgs_info=updated_img_info,
@@ -193,13 +205,13 @@ class TileBatchInstSegDataEntity(TileBatchData):
 
         batch_data_entities = [
             (
-                tile_tile_infos[i : i + self.batch_size],
+                tile_tile_infos[i : i + TILE_INFERENCE_BATCH_SIZE],
                 SampleBatch(
-                    images=tiles[i : i + self.batch_size],
-                    imgs_info=tile_img_infos[i : i + self.batch_size],
+                    images=tiles[i : i + TILE_INFERENCE_BATCH_SIZE],
+                    imgs_info=tile_img_infos[i : i + TILE_INFERENCE_BATCH_SIZE],
                 ),
             )
-            for i in range(0, len(tiles), self.batch_size)
+            for i in range(0, len(tiles), TILE_INFERENCE_BATCH_SIZE)
         ]
         return list(batch_data_entities)
 
@@ -270,14 +282,17 @@ class TileBatchSegDataEntity(TileBatchData):
 
         batch_data_entities = [
             (
-                tile_tile_infos[i : i + self.batch_size],
+                tile_tile_infos[i : i + TILE_INFERENCE_BATCH_SIZE],
                 SampleBatch(
-                    images=tv_tensors.wrap(torch.stack(tiles[i : i + self.batch_size]), like=tiles[0]),
-                    imgs_info=tile_img_infos[i : i + self.batch_size],
-                    masks=[torch.empty((1, 1, 1)) for _ in range(self.batch_size)],
+                    images=tv_tensors.wrap(
+                        torch.stack(tiles[i : i + TILE_INFERENCE_BATCH_SIZE]),  # pyrefly: ignore[bad-argument-type]
+                        like=tiles[0],  # pyrefly: ignore[unexpected-keyword]
+                    ),
+                    imgs_info=tile_img_infos[i : i + TILE_INFERENCE_BATCH_SIZE],
+                    masks=[torch.empty((1, 1, 1)) for _ in range(len(tiles[i : i + TILE_INFERENCE_BATCH_SIZE]))],
                 ),
             )
-            for i in range(0, len(tiles), self.batch_size)
+            for i in range(0, len(tiles), TILE_INFERENCE_BATCH_SIZE)
         ]
         return list(batch_data_entities)
 

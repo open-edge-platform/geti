@@ -478,7 +478,7 @@ class DataModule(LightningDataModule):
 
         return DataLoader(
             dataset=dataset,
-            batch_size=config.batch_size,
+            batch_size=self._eval_batch_size(dataset, config.batch_size),
             shuffle=False,
             num_workers=config.num_workers,
             pin_memory=True,
@@ -494,7 +494,7 @@ class DataModule(LightningDataModule):
 
         return DataLoader(
             dataset=dataset,
-            batch_size=config.batch_size,
+            batch_size=self._eval_batch_size(dataset, config.batch_size),
             shuffle=False,
             num_workers=config.num_workers,
             pin_memory=True,
@@ -510,7 +510,7 @@ class DataModule(LightningDataModule):
 
         return DataLoader(
             dataset=dataset,
-            batch_size=config.batch_size,
+            batch_size=self._eval_batch_size(dataset, config.batch_size),
             shuffle=False,
             num_workers=config.num_workers,
             pin_memory=True,
@@ -518,6 +518,26 @@ class DataModule(LightningDataModule):
             persistent_workers=config.num_workers > 0,
             multiprocessing_context=_MP_CONTEXT if config.num_workers > 0 else None,
         )
+
+    def _eval_batch_size(self, dataset: VisionDataset, configured_batch_size: int) -> int:
+        """Return the DataLoader batch size for a validation/test/predict dataset.
+
+        For tiled evaluation datasets a single original image already expands into
+        (potentially very many) tiles. Collating several original images per batch
+        would produce a huge nested tile batch that must be serialized through the
+        worker->main shared-memory channel; when this exceeds the available shared
+        memory (e.g. the small ``/dev/shm`` limit inside containers) the DataLoader
+        workers deadlock and evaluation hangs indefinitely.
+
+        Loading one original image per batch keeps the collated tile batch bounded.
+        The model still forwards tiles in groups of ``TILE_INFERENCE_BATCH_SIZE`` (see
+        ``getitune.data.entity.tile``), so GPU utilization is preserved.
+        """
+        # ``TileDataset`` instances expose ``_tiling_transform``; plain datasets do not.
+        is_tiled_dataset = hasattr(dataset, "_tiling_transform")
+        if self.tile_config.enable_tiler and is_tiled_dataset:
+            return 1
+        return configured_batch_size
 
     def setup(self, stage: str) -> None:
         """Setup for each stage."""
