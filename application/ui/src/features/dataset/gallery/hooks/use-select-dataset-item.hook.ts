@@ -1,14 +1,34 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
+// Copyright (C) 2025-2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+import { useEffect } from 'react';
 
 import type { Media } from '@/api/types';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { useLocation, useNavigate, useParams } from 'react-router';
 
 import { paths } from '../../../../constants/paths';
-import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';
 import { isVideo, isVideoFrame } from '../../../../shared/media-item-utils';
 import { useGetDatasetMediaItem } from '../../api/use-get-dataset-media-item';
+
+const useFetchMediaItemsUntilSelectedMediaIsPresent = ({
+    selectedMediaInTheFetchedList,
+}: {
+    selectedMediaInTheFetchedList: Media | null;
+}) => {
+    const { fetchNextPage } = useDatasetMediaWithReviewStatus();
+
+    useEffect(() => {
+        if (selectedMediaInTheFetchedList) {
+            return;
+        }
+
+        fetchNextPage();
+    }, [selectedMediaInTheFetchedList, fetchNextPage]);
+};
 
 export const useSelectDatasetItem = () => {
     const navigate = useNavigate();
@@ -17,16 +37,20 @@ export const useSelectDatasetItem = () => {
     const { items } = useDatasetMediaWithReviewStatus();
     const { datasetItemId: selectedDatasetItemId } = useParams<{ datasetItemId: string }>();
 
-    const fromList = items.find((item) => item.id === selectedDatasetItemId) ?? null;
+    const selectedMediaInTheFetchedList = items.find((item) => item.id === selectedDatasetItemId) ?? null;
 
     const {
         mediaItem: fetchedMediaItem,
         isPending: isFetchPending,
         isError,
         errorMessage,
-    } = useGetDatasetMediaItem(selectedDatasetItemId, { enabled: selectedDatasetItemId != null && fromList === null });
+    } = useGetDatasetMediaItem(selectedDatasetItemId, {
+        enabled: selectedDatasetItemId != null && selectedMediaInTheFetchedList === null,
+    });
 
-    const selectedMediaItem = fromList ?? fetchedMediaItem ?? null;
+    useFetchMediaItemsUntilSelectedMediaIsPresent({ selectedMediaInTheFetchedList });
+
+    const selectedMediaItem = selectedMediaInTheFetchedList ?? fetchedMediaItem ?? null;
 
     const isResolving = selectedDatasetItemId != null && selectedMediaItem === null && isFetchPending && !isError;
     const fetchErrorMessage =
