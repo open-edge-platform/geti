@@ -13,6 +13,11 @@ jobs:
       issues: write
       pull-requests: write
     steps:
+      - name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - uses: actions/stale@eb5cf3af3ac0a1aa4c9c45633dd1ae542a27a899 # v10.3.0
         with:
           stale-issue-message: "This issue is stale because it has been open 90 days with no activity. Remove stale label or comment or this will be closed in 30 days."

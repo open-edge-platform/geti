@@ -26,6 +26,11 @@ jobs:
       actions: read # Required to read branch activity
       pull-requests: read # Required to check if a branch has an open PR
     steps:
+      - name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - uses: fpicalausa/remove-stale-branches@9b829bc2975ade0c61e64e9613def53ec0732440 # v2.6.1
         with:
           dry-run: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run || 'false' }}
