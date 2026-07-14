@@ -1,9 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Model } from '@/api/types';
 import { Button, Content, ContextualHelp, DialogTrigger, Flex, Text } from '@geti-ui/ui';
 
-import type { Model } from '../../../../constants/shared-types';
 import { QuantizationDialog } from './quantization-dialog/quantization-dialog.component';
 
 type QuantizationRowProps = {
