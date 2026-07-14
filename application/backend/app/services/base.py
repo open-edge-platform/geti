@@ -64,6 +64,14 @@ class ResourceWithIdAlreadyExistsError(ResourceError):
         super().__init__(resource_type, resource_id, msg)
 
 
+class ResourceValidationError(ResourceError):
+    """Exception raised when a resource is well-formed but not reachable/usable."""
+
+    def __init__(self, resource_type: ResourceType, resource_id: str, message: str | None = None):
+        msg = message or f"{resource_type} is not reachable."
+        super().__init__(resource_type, resource_id, msg)
+
+
 class BaseSessionManagedService(ABC):
     """
     Base class for services that require a managed database session.

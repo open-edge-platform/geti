@@ -431,7 +431,17 @@ class BenchmarkTracker:
         experiment_name = self.config.experiment_name
         experiment = mlflow.get_experiment_by_name(experiment_name)
         if experiment is None:
-            self._experiment_id = mlflow.create_experiment(experiment_name)
+            # Against a remote tracking server, pin the artifact location to the
+            # ``mlflow-artifacts:/`` proxy scheme so every client uploads and
+            # downloads artifacts over HTTP through the server, independent of
+            # its ``--default-artifact-root``. A bare local path there makes
+            # remote clients silently fail to store artifacts (e.g.
+            # ``traceback.txt``). Local file-store URIs cannot use the proxy,
+            # so fall back to MLflow's default (None).
+            artifact_location = (
+                "mlflow-artifacts:/" if self.config.tracking_uri.startswith(("http://", "https://")) else None
+            )
+            self._experiment_id = mlflow.create_experiment(experiment_name, artifact_location=artifact_location)
             logger.info("Created MLflow experiment: %s (id=%s)", experiment_name, self._experiment_id)
         else:
             self._experiment_id = experiment.experiment_id
