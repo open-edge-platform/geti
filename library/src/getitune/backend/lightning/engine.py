@@ -110,7 +110,8 @@ class LightningEngine(Engine):
                 or root directory for the data.
             work_dir (PathLike, optional): Working directory for the engine. Defaults to "./getitune-workspace".
             checkpoint (PathLike | None, optional): Path to the checkpoint file (model weights). Defaults to None.
-            pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. Defaults to None.
+            pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
             device (DeviceType, optional): The device type to use. Defaults to DeviceType.auto.
             num_devices (int, optional): The number of devices to use. If it is 2 or more, it will behave as multi-gpu.
             task (TaskType | None, optional): The task type to use. Useful when you provide model name
