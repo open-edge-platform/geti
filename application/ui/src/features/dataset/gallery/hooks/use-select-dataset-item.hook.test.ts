@@ -2,12 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Media } from '@/api/types';
-import { act } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 import { getMockedMediaImage, getMockedVideo, getMockedVideoFrame } from 'mocks/mock-media';
+import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
+import { http } from '../../../../api/utils';
 import { paths } from '../../../../constants/paths';
 import { useGetDatasetMediaItems } from '../../../../hooks/use-get-dataset-media-items.hook';
+import { server } from '../../../../msw-node-setup';
 import { useSelectDatasetItem } from './use-select-dataset-item.hook';
 
 const mockNavigate = vi.fn();
@@ -170,6 +173,11 @@ describe('useSelectDatasetItem', () => {
         it('returns null when datasetItemId does not match any item', () => {
             const image = getMockedMediaImage({ id: 'img-other' });
             vi.mocked(useGetDatasetMediaItems).mockReturnValue({ ...mockDatasetMediaItems, items: [image] });
+            server.use(
+                http.get('/api/projects/{project_id}/dataset/media/{media_id}', () => {
+                    return new HttpResponse(null, { status: 404 });
+                })
+            );
 
             const route = `${paths.project.dataset.item.index({ projectId: MOCKED_PROJECT_ID, datasetItemId: `${image.id}-23` })}${SEARCH}`;
             const { result } = renderHook(() => useSelectDatasetItem(), {
@@ -180,8 +188,75 @@ describe('useSelectDatasetItem', () => {
             expect(result.current.selectedMediaItem).toBeNull();
         });
 
+        it('is resolving while the direct fetch for an off-list item is in flight', async () => {
+            const image = getMockedMediaImage({ id: 'img-off-page' });
+            vi.mocked(useGetDatasetMediaItems).mockReturnValue({ ...mockDatasetMediaItems, items: [] });
+            server.use(
+                http.get('/api/projects/{project_id}/dataset/media/{media_id}', async () => {
+                    return HttpResponse.json(image);
+                })
+            );
+
+            const route = `${paths.project.dataset.item.index({ projectId: MOCKED_PROJECT_ID, datasetItemId: image.id })}${SEARCH}`;
+            const { result } = renderHook(() => useSelectDatasetItem(), {
+                route,
+                path: paths.project.dataset.item.index.pattern,
+            });
+
+            expect(result.current.isResolving).toBe(true);
+            expect(result.current.fetchErrorMessage).toBeNull();
+
+            await waitFor(() => expect(result.current.selectedMediaItem).toEqual(image));
+        });
+
+        it('returns the fetched item when it is not in the loaded list but the direct fetch resolves it', async () => {
+            const image = getMockedMediaImage({ id: 'img-off-page' });
+            vi.mocked(useGetDatasetMediaItems).mockReturnValue({ ...mockDatasetMediaItems, items: [] });
+            server.use(
+                http.get('/api/projects/{project_id}/dataset/media/{media_id}', () => {
+                    return HttpResponse.json(image);
+                })
+            );
+
+            const route = `${paths.project.dataset.item.index({ projectId: MOCKED_PROJECT_ID, datasetItemId: image.id })}${SEARCH}`;
+            const { result } = renderHook(() => useSelectDatasetItem(), {
+                route,
+                path: paths.project.dataset.item.index.pattern,
+            });
+
+            await waitFor(() => expect(result.current.selectedMediaItem).toEqual(image));
+            expect(result.current.isResolving).toBe(false);
+            expect(result.current.fetchErrorMessage).toBeNull();
+        });
+
+        it('surfaces the server error message when the direct fetch errors', async () => {
+            vi.mocked(useGetDatasetMediaItems).mockReturnValue({ ...mockDatasetMediaItems, items: [] });
+            server.use(
+                http.get('/api/projects/{project_id}/dataset/media/{media_id}', () => {
+                    // @ts-expect-error MSW's typed response doesn't document a JSON body for 404s,
+                    // but the server does return one at runtime.
+                    return HttpResponse.json({ detail: 'Media or project not found' }, { status: 404 });
+                })
+            );
+
+            const route = `${paths.project.dataset.item.index({ projectId: MOCKED_PROJECT_ID, datasetItemId: 'deleted-item' })}${SEARCH}`;
+            const { result } = renderHook(() => useSelectDatasetItem(), {
+                route,
+                path: paths.project.dataset.item.index.pattern,
+            });
+
+            await waitFor(() => expect(result.current.fetchErrorMessage).toBe('Media or project not found'));
+            expect(result.current.selectedMediaItem).toBeNull();
+            expect(result.current.isResolving).toBe(false);
+        });
+
         it('returns null when there are no items', () => {
             vi.mocked(useGetDatasetMediaItems).mockReturnValue({ ...mockDatasetMediaItems, items: [] });
+            server.use(
+                http.get('/api/projects/{project_id}/dataset/media/{media_id}', () => {
+                    return new HttpResponse(null, { status: 404 });
+                })
+            );
 
             const route = `${paths.project.dataset.item.index({ projectId: MOCKED_PROJECT_ID, datasetItemId: `img-selected` })}${SEARCH}`;
             const { result } = renderHook(() => useSelectDatasetItem(), {

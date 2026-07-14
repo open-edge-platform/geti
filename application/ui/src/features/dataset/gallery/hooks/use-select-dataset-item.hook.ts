@@ -8,6 +8,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { paths } from '../../../../constants/paths';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';
 import { isVideo, isVideoFrame } from '../../../../shared/media-item-utils';
+import { useGetDatasetMediaItem } from '../../api/use-get-dataset-media-item';
 
 export const useSelectDatasetItem = () => {
     const navigate = useNavigate();
@@ -15,6 +16,21 @@ export const useSelectDatasetItem = () => {
     const projectId = useProjectIdentifier();
     const { items } = useDatasetMediaWithReviewStatus();
     const { datasetItemId: selectedDatasetItemId } = useParams<{ datasetItemId: string }>();
+
+    const fromList = items.find((item) => item.id === selectedDatasetItemId) ?? null;
+
+    const {
+        mediaItem: fetchedMediaItem,
+        isPending: isFetchPending,
+        isError,
+        errorMessage,
+    } = useGetDatasetMediaItem(selectedDatasetItemId, { enabled: selectedDatasetItemId != null && fromList === null });
+
+    const selectedMediaItem = fromList ?? fetchedMediaItem ?? null;
+
+    const isResolving = selectedDatasetItemId != null && selectedMediaItem === null && isFetchPending && !isError;
+    const fetchErrorMessage =
+        selectedDatasetItemId != null && selectedMediaItem === null && isError ? errorMessage : null;
 
     const onSelectedMediaItemChange = (item: Media | null) => {
         if (item === null) {
@@ -46,7 +62,10 @@ export const useSelectDatasetItem = () => {
     };
 
     return {
-        selectedMediaItem: items.find((item) => item.id === selectedDatasetItemId) ?? null,
+        selectedMediaItem,
+        selectedDatasetItemId,
+        isResolving,
+        fetchErrorMessage,
         onSelectedMediaItemChange,
     };
 };

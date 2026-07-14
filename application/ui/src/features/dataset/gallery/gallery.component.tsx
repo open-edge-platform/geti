@@ -12,6 +12,8 @@ import { MediaThumbnail } from '../../../components/media-thumbnail/media-thumbn
 import { VirtualizerGridLayout } from '../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
 import { type GalleryViewMode } from '../../../shared/gallery-view-modes';
 import { getMediaDownloadUrl, getThumbnailUrl } from '../../../shared/media-url.utils';
+import { MediaPreviewError } from '../media-preview/media-preview-error.component';
+import { MediaPreviewLoading } from '../media-preview/media-preview-loading.component';
 import { MediaPreview } from '../media-preview/media-preview.component';
 import { useSelectedData } from '../providers/selected-data-provider.component';
 import { AnnotationStatusIcon } from './annotation-state-icon.component';
@@ -134,7 +136,8 @@ export const Gallery = ({
     fetchNextPage,
     isMediaItemReviewedById,
 }: GalleryProps) => {
-    const { selectedMediaItem, onSelectedMediaItemChange } = useSelectDatasetItem();
+    const { selectedMediaItem, selectedDatasetItemId, isResolving, fetchErrorMessage, onSelectedMediaItemChange } =
+        useSelectDatasetItem();
 
     const { isClassification, uploadFiles, clearFilesForLabelAssignment, filesForLabelAssignment } = useUploadFiles();
 
@@ -159,13 +162,21 @@ export const Gallery = ({
                 {content}
 
                 <DialogContainer type={'fullscreenTakeover'} onDismiss={() => onSelectedMediaItemChange(null)}>
-                    {selectedMediaItem !== null && (
-                        <MediaPreview
-                            mediaItem={selectedMediaItem}
-                            close={() => onSelectedMediaItemChange(null)}
-                            onSelectedMediaItem={onSelectedMediaItemChange}
-                        />
-                    )}
+                    {selectedDatasetItemId != null &&
+                        (selectedMediaItem !== null ? (
+                            <MediaPreview
+                                mediaItem={selectedMediaItem}
+                                close={() => onSelectedMediaItemChange(null)}
+                                onSelectedMediaItem={onSelectedMediaItemChange}
+                            />
+                        ) : fetchErrorMessage !== null ? (
+                            <MediaPreviewError
+                                message={fetchErrorMessage}
+                                onClose={() => onSelectedMediaItemChange(null)}
+                            />
+                        ) : (
+                            isResolving && <MediaPreviewLoading />
+                        ))}
                 </DialogContainer>
             </DatasetDropZone>
 
