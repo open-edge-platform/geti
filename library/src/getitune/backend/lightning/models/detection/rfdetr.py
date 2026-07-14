@@ -35,6 +35,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -65,7 +66,9 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
             during training.
         gradient_checkpointing: Whether to enable gradient checkpointing to
             reduce GPU memory usage at the cost of slower training.
-        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
 
     Note:
         RF-DETR uses different patch sizes for different model variants:
@@ -109,6 +112,7 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
         max_total_objects_per_batch: int | None = None,
         gradient_checkpointing: bool = False,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         self.multi_scale = multi_scale
         self.max_total_objects_per_batch = max_total_objects_per_batch
@@ -123,6 +127,7 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
             torch_compile=torch_compile,
             tile_config=tile_config,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> RFDETRDetector:  # pyrefly: ignore[bad-override]

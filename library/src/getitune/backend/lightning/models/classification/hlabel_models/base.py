@@ -38,6 +38,7 @@ if TYPE_CHECKING:
     from torch import nn
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
 class LightningHlabelClsModel(LightningModel):
@@ -55,6 +56,8 @@ class LightningHlabelClsModel(LightningModel):
         torch_compile (bool, optional): Flag to indicate whether to use torch.compile. Defaults to False.
         kl_weight: The weight of tree-path KL divergence loss. Defaults to zero, use CrossEntropy only.
         pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     label_info: HLabelInfo
@@ -71,6 +74,7 @@ class LightningHlabelClsModel(LightningModel):
         torch_compile: bool = False,
         kl_weight: float = 0.0,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         self.kl_weight = kl_weight
         super().__init__(
@@ -82,6 +86,7 @@ class LightningHlabelClsModel(LightningModel):
             metric=metric,
             torch_compile=torch_compile,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
         if freeze_backbone:
             classification_layers = self._identify_classification_layers()

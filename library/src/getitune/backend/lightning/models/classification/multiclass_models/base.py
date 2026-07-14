@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
 class LightningMulticlassClsModel(LightningModel):
@@ -51,6 +52,8 @@ class LightningMulticlassClsModel(LightningModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to HLabelClsMetricCallable.
         torch_compile (bool, optional): Flag to indicate whether to use torch.compile. Defaults to False.
         pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     def __init__(
@@ -64,6 +67,7 @@ class LightningMulticlassClsModel(LightningModel):
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -74,6 +78,7 @@ class LightningMulticlassClsModel(LightningModel):
             metric=metric,
             torch_compile=torch_compile,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
         if freeze_backbone:

@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
 class MobileNetV3MulticlassCls(PretrainedWeightsMixin, LightningMulticlassClsModel):
@@ -43,6 +44,8 @@ class MobileNetV3MulticlassCls(PretrainedWeightsMixin, LightningMulticlassClsMod
         metric (MetricCallable, optional): The metric callable. Defaults to MultiClassClsMetricCallable.
         torch_compile (bool, optional): Whether to compile the model using TorchScript. Defaults to False.
         pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     pretrained_weights_target = "backbone"
@@ -59,6 +62,7 @@ class MobileNetV3MulticlassCls(PretrainedWeightsMixin, LightningMulticlassClsMod
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -70,6 +74,7 @@ class MobileNetV3MulticlassCls(PretrainedWeightsMixin, LightningMulticlassClsMod
             metric=metric,
             torch_compile=torch_compile,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:

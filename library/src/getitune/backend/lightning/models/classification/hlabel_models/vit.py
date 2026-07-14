@@ -28,6 +28,7 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
 class VisionTransformerHLabelCls(VisionTransformerWeightsLoader, ForwardExplainMixInForViT, LightningHlabelClsModel):
@@ -42,6 +43,8 @@ class VisionTransformerHLabelCls(VisionTransformerWeightsLoader, ForwardExplainM
         metric (MetricCallable): Callable for the metric.
         torch_compile (bool): Whether to use torch.compile for the model.
         pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     label_info: HLabelInfo
@@ -68,6 +71,7 @@ class VisionTransformerHLabelCls(VisionTransformerWeightsLoader, ForwardExplainM
         metric: MetricCallable = HLabelClsMetricCallable,
         torch_compile: bool = False,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         self.peft = peft
         super().__init__(
@@ -80,6 +84,7 @@ class VisionTransformerHLabelCls(VisionTransformerWeightsLoader, ForwardExplainM
             metric=metric,
             torch_compile=torch_compile,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, head_config: dict | None = None) -> nn.Module:  # type: ignore[override]

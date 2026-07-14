@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.export import TaskLevelExportParameters
     from getitune.types.label import LabelInfoTypes
 
@@ -44,6 +45,7 @@ class RTMPose(LightningKeypointDetectionModel):
         metric: MetricCallable = PCKMeasureCallable,
         torch_compile: bool = False,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -54,6 +56,7 @@ class RTMPose(LightningKeypointDetectionModel):
             metric=metric,
             torch_compile=torch_compile,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:

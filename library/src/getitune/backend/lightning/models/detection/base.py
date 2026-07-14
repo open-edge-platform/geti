@@ -43,6 +43,7 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.backend.lightning.models.detection.detectors import SingleStageDetector
+    from getitune.types import PathLike
 
 
 class LightningDetectionModel(PretrainedWeightsMixin, LightningModel):
@@ -70,7 +71,9 @@ class LightningDetectionModel(PretrainedWeightsMixin, LightningModel):
         explain_mode (bool, optional): Whether to enable explain mode.
             The model will return feature vectors needed for XAI visualization.
             Defaults to False.
-        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     pretrained_urls: ClassVar[dict[str, str]]
@@ -87,6 +90,7 @@ class LightningDetectionModel(PretrainedWeightsMixin, LightningModel):
         tile_config: TileConfig = TileConfig(enable_tiler=False),
         explain_mode: bool = False,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -98,6 +102,7 @@ class LightningDetectionModel(PretrainedWeightsMixin, LightningModel):
             torch_compile=torch_compile,
             tile_config=tile_config,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
         self.explain_mode = explain_mode

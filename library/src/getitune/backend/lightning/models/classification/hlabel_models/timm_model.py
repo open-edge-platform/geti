@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
 class TimmModelHLabelCls(TimmWeightsLoader, LightningHlabelClsModel):
@@ -47,6 +48,8 @@ class TimmModelHLabelCls(TimmWeightsLoader, LightningHlabelClsModel):
         torch_compile (bool, optional): Whether to compile the model using TorchScript. Defaults to False.
         kl_weight: The weight of tree-path KL divergence loss. Defaults to zero, use CrossEntropy only.
         pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     def __init__(
@@ -61,6 +64,7 @@ class TimmModelHLabelCls(TimmWeightsLoader, LightningHlabelClsModel):
         torch_compile: bool = False,
         kl_weight: float = 0.0,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -73,6 +77,7 @@ class TimmModelHLabelCls(TimmWeightsLoader, LightningHlabelClsModel):
             torch_compile=torch_compile,
             kl_weight=kl_weight,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, head_config: dict | None = None) -> nn.Module:  # type: ignore[override]

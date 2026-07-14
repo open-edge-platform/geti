@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
 class MobileNetV3HLabelCls(PretrainedWeightsMixin, LightningHlabelClsModel):
@@ -53,6 +54,7 @@ class MobileNetV3HLabelCls(PretrainedWeightsMixin, LightningHlabelClsModel):
         metric: MetricCallable = HLabelClsMetricCallable,
         torch_compile: bool = False,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -64,6 +66,7 @@ class MobileNetV3HLabelCls(PretrainedWeightsMixin, LightningHlabelClsModel):
             metric=metric,
             torch_compile=torch_compile,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, head_config: dict | None = None) -> nn.Module:  # type: ignore[override]

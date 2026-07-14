@@ -99,7 +99,6 @@ def create_engine(
     work_dir: PathLike | None = None,
     device: str | None = None,
     checkpoint: str | None = None,
-    pretrained_weights: str | None = None,
     task: TaskType | str | None = None,
     **kwargs,
 ) -> Engine:
@@ -126,7 +125,6 @@ def create_engine(
             Defaults to backend's default (auto).
         checkpoint: Optional path to a checkpoint to load model weights from
             before training (for pretrained or warm-start weights).
-        pretrained_weights: Optional path to the pretrained weights file.
         task: Task type for disambiguation when a model name matches recipes
             under multiple tasks. Optional.
         **kwargs: Additional backend-specific keyword arguments
@@ -144,10 +142,6 @@ def create_engine(
     """
     from getitune.backend.lightning.engine import LightningEngine
     from getitune.backend.openvino.engine import OVEngine
-
-    if checkpoint is not None and pretrained_weights is not None:
-        msg = "Cannot specify both checkpoint and pretrained_weights; choose one."
-        raise ValueError(msg)
 
     backend_to_engine: dict[str, type[Engine]] = {
         "lightning": LightningEngine,
@@ -177,8 +171,6 @@ def create_engine(
         common_kwargs["checkpoint"] = checkpoint
     if task is not None:
         common_kwargs["task"] = task
-    if pretrained_weights is not None:
-        common_kwargs["pretrained_weights"] = pretrained_weights
     # Merge with user-supplied kwargs (user kwargs take precedence).
     common_kwargs.update(kwargs)
 

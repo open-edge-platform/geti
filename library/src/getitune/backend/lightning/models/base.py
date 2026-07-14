@@ -41,7 +41,6 @@ from getitune.data.entity.base import (
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
 from getitune.data.entity.tile import TileBatchData
 from getitune.metrics import MetricInput, NullMetricCallable
-from getitune.types import PathLike
 from getitune.types.export import ExportFormat, TaskLevelExportParameters
 from getitune.types.label import LabelInfo, LabelInfoTypes
 from getitune.types.precision import Precision
@@ -59,6 +58,7 @@ if TYPE_CHECKING:
     from getitune.config.data import IntensityConfig
     from getitune.data.module import DataModule
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 logger = logging.getLogger()
 
@@ -174,6 +174,7 @@ class LightningModel(LightningModule):
         torch_compile: bool = False,
         tile_config: TileConfig | dict = TileConfig(enable_tiler=False),
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         """Initialize the base model with the given parameters.
 
@@ -192,7 +193,9 @@ class LightningModel(LightningModule):
             metric (MetricCallable, optional): Callable for the metric. Defaults to NullMetricCallable.
             torch_compile (bool, optional): Flag to indicate if torch.compile should be used. Defaults to False.
             tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
-            pretrained (bool, optional): Flag to indicate whether to use pretrained model. Defaults to True.
+            pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+            pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+                the default pretrained weights will be utilized for fine-tuning. Defaults to None.
 
         """
         super().__init__()
@@ -202,7 +205,7 @@ class LightningModel(LightningModule):
         self.data_input_params = self._configure_preprocessing_params(data_input_params)
         self.model = self._create_model()
         if pretrained:
-            self.load_pretrained()
+            self.load_pretrained(pretrained_weights)
         self.optimizer_callable = ensure_callable(optimizer)
         self.scheduler_callable = ensure_callable(scheduler)
         self.metric_callable = ensure_callable(metric)

@@ -32,6 +32,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -62,7 +63,9 @@ class RFDETRInst(RFDETRMixin, LightningInstanceSegModel):  # pyrefly: ignore[inc
             during training.
             Note: Recommended to keep it None to avoid unintended consequences on model performance,
             but it can be set for datasets with many objects per image to avoid OOM errors.
-        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
 
     Note:
         RF-DETR Segmentation uses patch_size=12 with 2 windows for 432x432 input resolution.
@@ -107,6 +110,7 @@ class RFDETRInst(RFDETRMixin, LightningInstanceSegModel):  # pyrefly: ignore[inc
         tile_config: TileConfig = TileConfig(enable_tiler=False),
         max_total_objects_per_batch: int | None = None,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         self.multi_scale = multi_scale
         self.max_total_objects_per_batch = max_total_objects_per_batch
@@ -120,6 +124,7 @@ class RFDETRInst(RFDETRMixin, LightningInstanceSegModel):  # pyrefly: ignore[inc
             torch_compile=torch_compile,
             tile_config=tile_config,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> RFDETRDetector:

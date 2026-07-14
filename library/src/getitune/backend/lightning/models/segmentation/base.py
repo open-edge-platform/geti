@@ -42,6 +42,7 @@ if TYPE_CHECKING:
     from torch import Tensor
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
 class LightningSegmentationModel(PretrainedWeightsMixin, LightningModel):
@@ -59,7 +60,9 @@ class LightningSegmentationModel(PretrainedWeightsMixin, LightningModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to SegmCallable.
         torch_compile (bool, optional): Flag to indicate whether to use torch.compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
-        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     def __init__(
@@ -73,6 +76,7 @@ class LightningSegmentationModel(PretrainedWeightsMixin, LightningModel):
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ):
         super().__init__(
             label_info=label_info,
@@ -84,6 +88,7 @@ class LightningSegmentationModel(PretrainedWeightsMixin, LightningModel):
             torch_compile=torch_compile,
             tile_config=tile_config,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _customize_inputs(self, entity: SampleBatch) -> dict[str, Any]:

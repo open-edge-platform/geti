@@ -29,6 +29,7 @@ if TYPE_CHECKING:
     from torch import nn
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
 class VisionTransformerMultilabelCls(
@@ -59,6 +60,7 @@ class VisionTransformerMultilabelCls(
         metric: MetricCallable = MultiLabelClsMetricCallable,
         torch_compile: bool = False,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         self.peft = peft
 
@@ -72,6 +74,7 @@ class VisionTransformerMultilabelCls(
             metric=metric,
             torch_compile=torch_compile,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:

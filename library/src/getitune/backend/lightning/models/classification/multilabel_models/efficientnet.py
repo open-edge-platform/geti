@@ -27,6 +27,7 @@ if TYPE_CHECKING:
     from torch import Tensor, nn
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
 logger = logging.getLogger(__name__)
@@ -56,6 +57,7 @@ class EfficientNetMultilabelCls(PytorchcvWeightsLoader, LightningMultilabelClsMo
         metric: MetricCallable = MultiLabelClsMetricCallable,
         torch_compile: bool = False,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -67,6 +69,7 @@ class EfficientNetMultilabelCls(PytorchcvWeightsLoader, LightningMultilabelClsMo
             metric=metric,
             torch_compile=torch_compile,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:

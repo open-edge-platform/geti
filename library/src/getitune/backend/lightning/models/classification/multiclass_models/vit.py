@@ -33,6 +33,7 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
 class ForwardExplainMixInForViT:
@@ -206,6 +207,7 @@ class VisionTransformerMulticlassCls(
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         self.peft = peft
 
@@ -219,6 +221,7 @@ class VisionTransformerMulticlassCls(
             metric=metric,
             torch_compile=torch_compile,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:

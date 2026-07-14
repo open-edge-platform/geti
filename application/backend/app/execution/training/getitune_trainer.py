@@ -414,8 +414,6 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
 
         logger.info("Instantiating model for training (model_id={})", model_id)
         model_cfg = training_config["model"]
-        # Disable loading via pre-configured library urls since weights are managed via Engine
-        model_cfg["init_args"]["pretrained"] = False
         model_cfg["init_args"]["label_info"] = datamodule.label_info.label_names
         model_cfg["init_args"]["data_input_params"] = DataInputParams(
             input_size=cast(tuple[int, int], datamodule.input_size),
@@ -435,12 +433,15 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         }
         # Ultralytics models load weights via engine's checkpoint param (for both
         # fresh training from base weights and resume from parent revision).
-        # Lightning models self-load pretrained weights during construction via
-        # PRETRAINED_WEIGHTS_CACHE_DIR, so a checkpoint is only needed for resume.
         if is_ultralytics or has_model_revision:
             engine_kwargs["checkpoint"] = weights_path
+        # Lightning models load base weights via model's pretrained_weights param;
+        # a checkpoint is only needed when resuming from a parent revision.
         if not is_ultralytics and not has_model_revision:
-            engine_kwargs["pretrained_weights"] = weights_path
+            model_cfg["init_args"]["pretrained_weights"] = weights_path
+        else:
+            # Disable default weight loading behavior since the model is loaded from the checkpoint
+            model_cfg["init_args"]["pretrained"] = False
 
         model_parser = ArgumentParser()
         model_type = UltralyticsModel if is_ultralytics else LightningModel

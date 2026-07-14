@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -38,7 +39,9 @@ class SegNext(LightningSegmentationModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to SegmCallable.
         torch_compile (bool, optional): Flag to indicate whether to use torch.compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
-        pretrained (bool, optional): Whether to use pretrained model. Defaults to True.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     pretrained_weights_target = "backbone"
@@ -59,6 +62,7 @@ class SegNext(LightningSegmentationModel):
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ):
         super().__init__(
             label_info=label_info,
@@ -70,6 +74,7 @@ class SegNext(LightningSegmentationModel):
             torch_compile=torch_compile,
             tile_config=tile_config,
             pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:
