@@ -10,7 +10,6 @@
 [![pytorch](https://img.shields.io/badge/pytorch-2.10-orange)]()
 [![openvino](https://img.shields.io/badge/openvino-2026.2-purple)]()
 
-[Quick start](#quick-start) •
 [Docs](#documentation) •
 [License](#license)
 
@@ -26,7 +25,6 @@ train and optimize models, and run real-time inference through configurable pipe
   <img src="../assets/application.gif" alt="Application demo" width="100%">
 </p>
 
-
 Main capabilities:
 
 - **No-code model lifecycle**: move from data upload and annotation to training, evaluation, and deployment in one UI.
@@ -34,16 +32,14 @@ Main capabilities:
 - **Pipeline-based deployment**: connect sources (cameras or files) to trained models and route predictions to sinks such as storage, MQTT, or webhooks.
 - **Edge-oriented optimization**: export OpenVINO-optimized models for efficient inference on Intel hardware, with support for other accelerators.
 
-
 ### Install as Windows app
 
 Installing Geti as a Windows app is the simplest way to run it on Windows:
 
 1. Download the `.msix` package from the official Geti release.
-- [Download CPU-only version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cpu-3.0.0.msix)
-- [Download Intel® XPU version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-xpu-3.0.0.msix)
-- [Download Nvidia® CUDA version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cuda-3.0.0.msix)
-
+   - [Download CPU-only version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cpu-3.0.0.msix)
+   - [Download Intel® XPU version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-xpu-3.0.0.msix)
+   - [Download Nvidia® CUDA version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cuda-3.0.0.msix)
 2. Double-click the package and click **Install** in the Windows installer dialog.
 3. Launch Geti from the **Start** menu.
 
@@ -53,7 +49,6 @@ If Windows shows a security prompt, verify that the package is from the official
 
 The easiest and most straightforward way to run Geti is through Docker.
 We provide pre-built images for Intel® XPU and NVIDIA® CUDA platforms, or you can build your own image from source.
-
 
 <details>
 <summary><strong>Prerequisites</strong></summary>
@@ -132,7 +127,6 @@ The cert directory is mounted read-only and is separate from the data volume - i
 > [!NOTE]
 > The self-signed certificate triggers a browser security warning. For a trusted local setup, generate a
 > locally-trusted cert with [mkcert](https://github.com/FiloSottile/mkcert) and pass it the same way.
-
 
 </details>
 
@@ -274,6 +268,10 @@ After the UI starts, you can access the Geti web application at [**http://localh
 
 Please check the [documentation website](https://docs.geti.intel.com/) for detailed guides, API reference,
 and other resources to help you get the most out of Geti.
+
+> **Upgrading an existing installation?** See the [Upgrade guide](./docs/upgrade.md) for how to move to a newer
+> version (Docker or Windows MSIX) while preserving your projects, datasets and models, with automatic rollback
+> if a migration fails.
 
 <details>
 <summary><strong>Advanced: generate the API spec from source </strong></summary>

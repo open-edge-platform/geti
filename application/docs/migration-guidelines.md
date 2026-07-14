@@ -34,6 +34,33 @@
 | File storage      | Local filesystem                               | `data/projects/<project_id>/…` |
 | Migration runner  | `app/db/migration.py` → `MigrationManager`     | Runs on app startup            |
 
+### Runtime upgrade behaviour
+
+`MigrationManager` runs on every startup and makes upgrades **safe and reversible**:
+
+- Before migrating, it takes a **backup of `geti.db`**.
+- If `alembic upgrade head` fails, it performs a **two-stage automatic rollback**:
+  it first `alembic downgrade`s back to the revision it started from (which also
+  reverts any in-script filesystem moves via your `downgrade()` functions), then
+  restores the database from the pre-upgrade backup as the authoritative safety
+  net. The process then exits with a dedicated fatal exit code (`3`) so it is not
+  restarted in a loop.
+- `UpgradeManager` (`app/upgrade/`) wraps this and records the application version
+  the data was last brought up to in a `.geti_data_version` stamp file (used for
+  support tooling and the deployment upgrade scripts; the Alembic revision remains
+  authoritative).
+
+The two consequences for **you as a migration author**:
+
+1. **Always provide a working `downgrade()`** — it is executed as part of the
+   automatic rollback, not just in tests. In particular, `downgrade()` must undo
+   any filesystem changes your `upgrade()` made.
+2. Because the DB is restored from a physical backup on failure, your `upgrade()`
+   only needs to keep the **filesystem** in a recoverable state; the database is
+   covered.
+
+See [`upgrade.md`](./upgrade.md) for the end-user upgrade/rollback procedures.
+
 ### File-Storage Layout
 
 ```
