@@ -330,6 +330,8 @@ class UltralyticsEngine(Engine):
             **merged,
         }
 
+        self._model.ensure_predict_ready()
+
         raw_results = yolo.predict(**predict_args)  # pyrefly: ignore[bad-argument-type]
 
         return self._convert_predictions(raw_results)  # pyrefly: ignore[bad-return]
@@ -660,6 +662,7 @@ class UltralyticsEngine(Engine):
         metric = metric_callable(label_info)
         metric = metric.to(device)
 
+        self._model.ensure_predict_ready()
         is_multilabel = getattr(self._model, "is_multilabel", False)
 
         for batch in dataloader:
@@ -834,6 +837,7 @@ class UltralyticsEngine(Engine):
 
         yolo = self._model.yolo
         device = self._device
+        self._model.ensure_predict_ready()
 
         predictions: list[Prediction] = []
         for batch in dataloader:
@@ -1197,7 +1201,11 @@ class UltralyticsEngine(Engine):
             # --- semantic segmentation ---
             semantic_mask = getattr(result, "semantic_mask", None)
             if semantic_mask is not None:
-                masks = tv_tensors.Mask(torch.as_tensor(semantic_mask).cpu().unsqueeze(0))
+                semantic_mask_data = getattr(semantic_mask, "data", semantic_mask)
+                semantic_tensor = torch.as_tensor(semantic_mask_data).cpu()
+                if semantic_tensor.ndim == 2:
+                    semantic_tensor = semantic_tensor.unsqueeze(0)
+                masks = tv_tensors.Mask(semantic_tensor)
 
             # --- detection / instance-segmentation ---
             elif result.boxes is not None and len(result.boxes):

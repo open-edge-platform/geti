@@ -41,6 +41,17 @@ class UltralyticsDatasetAdapter(TorchDataset):
         self._dataset = vision_dataset
         self._task_kind = task_kind
 
+        # Pre-populate cacheable augmentation caches (CachedMosaic, CachedMixUp)
+        # before multi-worker DataLoaders spawn workers via ``spawn`` context,
+        # so every worker inherits a full, diverse, frozen cache instead of
+        # independently building a fragmented one. Mirrors the pre-caching
+        # done by ``DataModule.train_dataloader()`` for the Lightning backend.
+        # No-op for pipelines without a ``CacheableMixin`` augmentation (e.g.
+        # val/test) or transforms without a ``prepare`` method.
+        transforms = getattr(vision_dataset, "transforms", None)
+        if hasattr(transforms, "prepare"):
+            transforms.prepare(vision_dataset)
+
     def __len__(self) -> int:
         return len(self._dataset)
 

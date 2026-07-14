@@ -91,16 +91,15 @@ class UltralyticsSemanticSegModel(UltralyticsModel):
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
         """Semantic segmentation export parameters."""
-        label_info = self.label_info or SegLabelInfo(label_names=[], label_ids=[], label_groups=[])
         return TaskLevelExportParameters(
             model_type="Segmentation",
             model_name=self.model_name,
             task_type="semantic_segmentation",
-            label_info=label_info,
+            label_info=self.label_info,
             optimization_config={},
             confidence_threshold=0.0,
             return_soft_prediction=True,
-            blur_strength=0,
+            blur_strength=-1,
             nms_execute=False,
         )
 

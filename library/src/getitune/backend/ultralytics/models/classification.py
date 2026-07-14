@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar
 
 from getitune.backend.lightning.models.base import DataInputParams
-from getitune.backend.ultralytics.models.utils import patch_multilabel_classify_head
+from getitune.backend.ultralytics.models.utils import ensure_classify_transforms, patch_multilabel_classify_head
 from getitune.backend.ultralytics.trainers.classification import (
     ClassificationTrainer,
     MultiLabelClassificationTrainer,
@@ -19,7 +19,6 @@ from getitune.backend.ultralytics.validators.classification import (
 )
 from getitune.config.data import IntensityConfig
 from getitune.types.export import TaskLevelExportParameters
-from getitune.types.label import LabelInfo, LabelInfoTypes
 
 from .base import UltralyticsModel
 
@@ -72,14 +71,15 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
         """Multi-class classification export parameters."""
-        label_info = self.label_info or LabelInfo(label_names=[], label_ids=[], label_groups=[])
         return TaskLevelExportParameters(
             model_type="Classification",
             model_name=self.model_name,
             task_type="classification",
-            label_info=label_info,
+            label_info=self.label_info,
             optimization_config={},
             confidence_threshold=None,
+            multilabel=False,
+            hierarchical=False,
             iou_threshold=None,
             nms_execute=False,
         )
@@ -103,6 +103,10 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
         "train/loss": "train/loss",
         "lr/pg0": "lr",
     }
+
+    def ensure_predict_ready(self) -> None:
+        """Backfill ``model.transforms`` required by Ultralytics' classification predictor."""
+        ensure_classify_transforms(self)
 
 
 class UltralyticsMultiLabelClsModel(UltralyticsModel):
@@ -129,40 +133,6 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
         "yolo26x-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26x-cls.pt",
     }
 
-    @staticmethod
-    def _dispatch_label_info(label_info: LabelInfoTypes) -> LabelInfo:
-        """Normalize label_info to a ``LabelInfo`` with per-label groups.
-
-        Multi-label metrics expect each label to form its own binary group.
-        """
-        if isinstance(label_info, LabelInfo):
-            if all(len(group) == 1 for group in label_info.label_groups):
-                return label_info
-            label_groups = [[name] for name in label_info.label_names]
-            return LabelInfo(
-                label_names=label_info.label_names,
-                label_groups=label_groups,
-                label_ids=label_info.label_ids,
-            )
-        if isinstance(label_info, dict):
-            info = LabelInfo(**label_info)
-            return UltralyticsMultiLabelClsModel._dispatch_label_info(info)
-        if isinstance(label_info, int):
-            names = [f"label_{i}" for i in range(label_info)]
-            return LabelInfo(
-                label_names=names,
-                label_groups=[[name] for name in names],
-                label_ids=[str(i) for i in range(label_info)],
-            )
-        if isinstance(label_info, (list, tuple)) and all(isinstance(name, str) for name in label_info):
-            names = list(label_info)
-            return LabelInfo(
-                label_names=names,
-                label_groups=[[name] for name in names],
-                label_ids=[str(i) for i in range(len(names))],
-            )
-        raise TypeError(label_info)
-
     @property
     def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
         """Per-variant preprocessing defaults.
@@ -186,15 +156,15 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
         """Multi-label classification export parameters."""
-        label_info = self.label_info or LabelInfo(label_names=[], label_ids=[], label_groups=[])
         return TaskLevelExportParameters(
             model_type="Classification",
             model_name=self.model_name,
             task_type="classification",
-            label_info=label_info,
+            label_info=self.label_info,
             optimization_config={},
             confidence_threshold=0.5,
             multilabel=True,
+            hierarchical=False,
             output_raw_scores=True,
             nms_execute=False,
         )
@@ -228,3 +198,7 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
         "train/loss": "train/loss",
         "lr/pg0": "lr",
     }
+
+    def ensure_predict_ready(self) -> None:
+        """Backfill ``model.transforms`` required by Ultralytics' classification predictor."""
+        ensure_classify_transforms(self)

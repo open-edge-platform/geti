@@ -20,7 +20,7 @@ from getitune.data.module import DataModule
 from getitune.types.label import LabelInfo
 from getitune.types.task import TaskType
 
-_RECIPE_DIR = Path(__file__).resolve().parents[4] / "src" / "getitune" / "recipe"
+_RECIPE_DIR = Path(__file__).resolve().parents[5] / "src" / "getitune" / "recipe"
 
 _DETECTION_MODEL_NAME = "yolo26_s"
 _DETECTION_RECIPE_FILE = _RECIPE_DIR / "detection" / "yolo26_s.yaml"
@@ -104,7 +104,7 @@ class TestInitData:
         from getitune.config.data import SubsetConfig, TileConfig
         from getitune.data.module import DataModule
 
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -768,7 +768,7 @@ class TestBuildDatamodule:
         from getitune.config.data import SubsetConfig, TileConfig
         from getitune.data.module import DataModule
 
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -789,7 +789,7 @@ class TestBuildDatamodule:
         assert cfg.build_datamodule() is dm
 
     def test_builds_from_recipe_data_config(self, tmp_path: Path) -> None:
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -809,7 +809,7 @@ class TestBuildDatamodule:
         assert dm.test_subset.batch_size == 16
 
     def test_uses_constructor_data_root_when_no_arg(self, tmp_path: Path) -> None:
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -826,7 +826,7 @@ class TestBuildDatamodule:
         assert dm.data_root == str(assets_dir)
 
     def test_explicit_data_root_overrides_constructor(self, tmp_path: Path) -> None:
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -919,7 +919,7 @@ class TestDataModuleToConfigDict:
         from getitune.config.data import SubsetConfig, TileConfig
         from getitune.data.module import DataModule
 
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -949,7 +949,7 @@ class TestDataModuleToConfigDict:
         from getitune.config.data import SubsetConfig, TileConfig
         from getitune.data.module import DataModule
 
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 

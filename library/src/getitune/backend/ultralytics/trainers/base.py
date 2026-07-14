@@ -139,9 +139,6 @@ class GetiTuneBaseTrainer:
         dataset = self.build_dataset(dataset_path, mode, batch_size)
         nw: int = self.args.workers  # type: ignore[attr-defined]
 
-        if mode == "train" and nw > 0:
-            self._warmup_mosaic_cache(dataset)
-
         shuffle = mode == "train"
         return InfiniteDataLoader(
             dataset,
@@ -156,50 +153,6 @@ class GetiTuneBaseTrainer:
             persistent_workers=nw > 0,
             worker_init_fn=seed_worker,
         )
-
-    @staticmethod
-    def _warmup_mosaic_cache(adapter: UltralyticsDatasetAdapter) -> None:
-        """Pre-populate CachedMosaic cache before workers spawn.
-
-        With spawn multiprocessing, each worker gets a copy of the dataset
-        (including transforms) at spawn time.  If the CachedMosaic cache is
-        empty, each worker independently builds its own cache from a
-        fragmented view of the data, significantly reducing mosaic diversity
-        for small datasets.
-
-        By iterating through samples in the main process before spawning
-        workers, we ensure every worker starts with a full, diverse cache.
-        The cache is then frozen to prevent workers from independently
-        replacing entries via FIFO eviction, which would re-fragment
-        diversity.
-        """
-        from getitune.data.augmentation.pipeline import CPUAugmentationPipeline
-        from getitune.data.augmentation.transforms import CachedMosaic
-
-        vision_dataset = adapter._dataset  # noqa: SLF001
-        transforms = vision_dataset.transforms
-        if not isinstance(transforms, CPUAugmentationPipeline):
-            return
-
-        mosaic_transform: CachedMosaic | None = None
-        for aug in transforms.augmentations:
-            if isinstance(aug, CachedMosaic):
-                mosaic_transform = aug
-                break
-
-        if mosaic_transform is None:
-            return
-
-        n_warmup = min(mosaic_transform.max_cached_images, len(vision_dataset))
-        if len(mosaic_transform.results_cache) >= n_warmup:
-            mosaic_transform.freeze_cache()
-            return
-
-        logger.info(f"Pre-warming CachedMosaic cache with {n_warmup} samples")
-        for i in range(n_warmup):
-            vision_dataset[i]
-        mosaic_transform.freeze_cache()
-        logger.info(f"CachedMosaic cache warmed and frozen: {len(mosaic_transform.results_cache)} entries")
 
     def _setup_train(self) -> None:
         """Restore workers, run parent setup, then fix warmup for small datasets.
