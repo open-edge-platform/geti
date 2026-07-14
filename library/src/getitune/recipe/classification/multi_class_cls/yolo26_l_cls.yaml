@@ -4,7 +4,7 @@ task: MULTI_CLASS_CLS
 model:
   class_path: getitune.backend.ultralytics.models.classification.UltralyticsMultiClassClsModel
   init_args:
-    model_name: yolo26l
+    model_name: yolo26l-cls
     pretrained: true
     imgsz: 224
 
@@ -13,13 +13,13 @@ engine:
 
 training:
   epochs: 90
-  batch: 64
+  batch: 16
   optimizer: AdamW
-  lr0: 0.001
+  lr0: 0.000714
   lrf: 0.01
   momentum: 0.9
   weight_decay: 0.0005
-  warmup_epochs: 0.0
+  warmup_epochs: 3.0
   patience: 0
 
 export:
@@ -34,13 +34,13 @@ overrides:
       - 224
       - 224
     train_subset:
-      batch_size: 64
+      batch_size: 16
       augmentations_cpu:
         - class_path: torchvision.transforms.v2.RandomResizedCrop
           init_args:
             size: $(input_size)
             scale:
-              - 0.08
+              - 0.5
               - 1.0
             ratio:
               - 0.75
@@ -54,11 +54,21 @@ overrides:
             contrast: 0.2
             saturation: 0.2
             hue: 0.05
+        - class_path: torchvision.transforms.v2.RandomErasing
+          init_args:
+            p: 0.4
+            scale:
+              - 0.02
+              - 0.33
+            ratio:
+              - 0.3
+              - 3.3
+            value: 0.0
       augmentations_gpu: []
       sampler:
         class_path: getitune.data.samplers.balanced_sampler.BalancedSampler
     val_subset:
-      batch_size: 64
+      batch_size: 16
       augmentations_cpu:
         - class_path: torchvision.transforms.v2.Resize
           init_args:
@@ -67,7 +77,7 @@ overrides:
       sampler:
         class_path: torch.utils.data.SequentialSampler
     test_subset:
-      batch_size: 64
+      batch_size: 16
       augmentations_cpu:
         - class_path: torchvision.transforms.v2.Resize
           init_args:
