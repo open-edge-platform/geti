@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import type { AnnotationDTO, Media } from '@/api/types';
 import { useQuery } from '@tanstack/react-query';
+import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useFetchNextUnannotatedMediaItem } from 'hooks/use-get-dataset-items.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
@@ -57,22 +58,51 @@ export const getNextMediaItem = (currentMediaItem: Media, allMediaItems: Media[]
 };
 
 const useNextUnannotatedMediaItem = (currentMediaItem: Media, allMediaItems: Media[]) => {
-    const { fetchNextPage } = useDatasetMediaWithReviewStatus();
+    const { annotationStatus } = useDatasetFiltersSearchParams();
+    const { fetchNextPage, hasNextPage, isFetchingNextPage } = useDatasetMediaWithReviewStatus();
     const { data, isPending } = useFetchNextUnannotatedMediaItem();
+    const items = data?.items ?? [];
 
-    const nextUnannotatedDatasetMediaItem = data?.items?.find((item) => item.id !== currentMediaItem.id);
+    // Only relevant when the gallery can actually contain unannotated media.
+    // When the active filter is restricted to "with_annotations", no unannotated
+    // item can ever appear in a list, so searching for one would just
+    // paginate through the entire filtered dataset looking for something that
+    // can never be found.
+    const canNavigateToUnannotated = annotationStatus !== 'with_annotations';
+
+    const nextUnannotatedDatasetMediaItem = canNavigateToUnannotated
+        ? items.find((item) => item.id !== currentMediaItem.id)
+        : undefined;
     const nextUnannotatedMediaItem = allMediaItems.find((item) => item.id === nextUnannotatedDatasetMediaItem?.id);
     const isInsideFetchedMediaItems = nextUnannotatedMediaItem !== undefined;
 
     useEffect(() => {
-        if (isPending || isInsideFetchedMediaItems) {
+        // Nothing to do if we can't/shouldn't look for an unannotated item, the
+        // candidate is already loaded, or there's no known candidate to look for
+        // (fetching further pages wouldn't help find something that doesn't exist).
+        if (
+            !canNavigateToUnannotated ||
+            isPending ||
+            isInsideFetchedMediaItems ||
+            nextUnannotatedDatasetMediaItem === undefined ||
+            !hasNextPage ||
+            isFetchingNextPage
+        ) {
             return;
         }
 
         fetchNextPage();
-    }, [isInsideFetchedMediaItems, fetchNextPage, isPending]);
+    }, [
+        canNavigateToUnannotated,
+        isPending,
+        isInsideFetchedMediaItems,
+        nextUnannotatedDatasetMediaItem,
+        hasNextPage,
+        isFetchingNextPage,
+        fetchNextPage,
+    ]);
 
-    if (isPending) {
+    if (isPending || !canNavigateToUnannotated) {
         return undefined;
     }
 
