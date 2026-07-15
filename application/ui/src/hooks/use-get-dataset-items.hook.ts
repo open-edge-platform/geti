@@ -78,6 +78,9 @@ const getDatasetItemsQueryParameter = ({
     return query;
 };
 
+// if case current media is also not unannotated, we get the next one
+const MAX_INTERESTED_MEDIA_ITEMS_LIMIT = 2;
+
 export const useFetchNextUnannotatedMediaItem = () => {
     const projectId = useProjectIdentifier();
 
@@ -89,6 +92,7 @@ export const useFetchNextUnannotatedMediaItem = () => {
         labelIds: selectedLabelIds,
         startDate: startDate ?? undefined,
         endDate: endDate ?? undefined,
+        limit: MAX_INTERESTED_MEDIA_ITEMS_LIMIT,
     });
 
     return useQuery({
