@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
@@ -27,6 +27,9 @@ class LoadedModelHandle:
     device: DeviceInfo
     model: "Model"
     loaded_at: datetime
+    # Mapping of label name -> hex color (e.g. "#RRGGBB") taken from the project definition,
+    # used to render the inference stream with colors matching the project's labels.
+    label_colors: dict[str, str] = field(default_factory=dict)
 
 
 class ModelLoader:
@@ -38,7 +41,13 @@ class ModelLoader:
     """
 
     @staticmethod
-    def load(model_id: UUID, variant_id: UUID, model_xml_path: Path, device: DeviceInfo) -> LoadedModelHandle:
+    def load(
+        model_id: UUID,
+        variant_id: UUID,
+        model_xml_path: Path,
+        device: DeviceInfo,
+        label_colors: dict[str, str] | None = None,
+    ) -> LoadedModelHandle:
         """
         Load a model from an OpenVINO IR file onto the given device.
 
@@ -47,6 +56,8 @@ class ModelLoader:
             variant_id: The identifier of the variant to load the model from.
             model_xml_path: Path to the .xml model file (the .bin must be alongside it).
             device: The device to load the model on.
+            label_colors: Optional mapping of label name -> hex color from the project definition,
+                used to render the inference stream with colors matching the project's labels.
 
         Returns:
             A LoadedModelHandle containing the ready-to-use Model API model.
@@ -69,6 +80,7 @@ class ModelLoader:
             device=device,
             model=model,
             loaded_at=datetime.now(),
+            label_colors=label_colors or {},
         )
 
     @staticmethod

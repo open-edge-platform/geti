@@ -140,8 +140,9 @@ class InferenceWorker(BaseProcessWorker):
             self._metrics_service.record_inference_end(model_id=model_id, start_time=start_time)  # type: ignore
 
             stream_data: StreamData = userdata["stream_data"]
+            label_colors = userdata.get("label_colors") or {}
             frame_with_predictions = Visualizer.overlay_predictions(
-                original_image=stream_data.frame_data, predictions=inf_result
+                original_image=stream_data.frame_data, predictions=inf_result, label_colors=label_colors
             )
             inference_data = InferenceData(
                 prediction=inf_result,
@@ -258,6 +259,7 @@ class InferenceWorker(BaseProcessWorker):
                             "stream_data": item,
                             "model_id": self._loaded_model.model_id,
                             "inference_start_time": inference_start_time,
+                            "label_colors": self._loaded_model.label_colors,
                         },
                     )
                 else:

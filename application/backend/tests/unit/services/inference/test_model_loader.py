@@ -67,6 +67,40 @@ class TestModelLoader:
         assert handle.model is fake_model
         assert isinstance(handle.loaded_at, datetime)
 
+    def test_load_stores_label_colors(self, fxt_device_cpu: DeviceInfo, tmp_path: Path) -> None:
+        """load() should store the provided project label colors on the returned handle."""
+        label_colors = {"cat": "#FF0000", "dog": "#00FF00"}
+        with (
+            patch("model_api.adapters.create_core"),
+            patch("model_api.adapters.OpenvinoAdapter", return_value=Mock(spec=OpenvinoAdapter)),
+            patch("model_api.models.Model.create_model", return_value=Mock(spec=Model)),
+        ):
+            handle = ModelLoader.load(
+                model_id=uuid4(),
+                variant_id=uuid4(),
+                model_xml_path=tmp_path / "model.xml",
+                device=fxt_device_cpu,
+                label_colors=label_colors,
+            )
+
+        assert handle.label_colors == label_colors
+
+    def test_load_defaults_label_colors_to_empty(self, fxt_device_cpu: DeviceInfo, tmp_path: Path) -> None:
+        """load() should default label_colors to an empty mapping when none is provided."""
+        with (
+            patch("model_api.adapters.create_core"),
+            patch("model_api.adapters.OpenvinoAdapter", return_value=Mock(spec=OpenvinoAdapter)),
+            patch("model_api.models.Model.create_model", return_value=Mock(spec=Model)),
+        ):
+            handle = ModelLoader.load(
+                model_id=uuid4(),
+                variant_id=uuid4(),
+                model_xml_path=tmp_path / "model.xml",
+                device=fxt_device_cpu,
+            )
+
+        assert handle.label_colors == {}
+
     def test_unload_deletes_async_queue_and_compiled_model(self, fxt_loaded_handle: LoadedModelHandle) -> None:
         """unload() should delete both async_queue and compiled_model from the adapter."""
         adapter = cast(OpenvinoAdapter, fxt_loaded_handle.model.inference_adapter)

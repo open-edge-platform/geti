@@ -61,6 +61,21 @@ class TestDetectionVisualizerCreator(unittest.TestCase):
         self.assertIsInstance(layout, Flatten)
         self.assertEqual(layout.children, (BoundingBox, VisualizerLabel))
 
+    def test_applies_project_label_colors(self):
+        creator = DetectionVisualizerCreator()
+        original_image = np.zeros((100, 100, 3), dtype=np.uint8)
+        predictions = DetectionResult(bboxes, labels)
+        # The result exposes numeric label names ("1", "2", "3"); map two of them to project colors.
+        label_colors = {"1": "#123456", "2": "#abcdef"}
+        with mock.patch("model_api.visualizer.scene.DetectionScene") as mock_scene:
+            scene = mock_scene.return_value
+            creator.create_visualization(original_image, predictions, label_colors=label_colors)
+        # The default palette is replaced with a mapping that honours the project colors.
+        self.assertEqual(scene.color_per_label["1"], "#123456")
+        self.assertEqual(scene.color_per_label["2"], "#abcdef")
+        # And the color-dependent bounding boxes are rebuilt with the new colors.
+        scene._get_bounding_boxes.assert_called_once_with(predictions)
+
 
 class TestInstanceSegmentationVisualizerCreator(unittest.TestCase):
     def test_creates_visualization(self):

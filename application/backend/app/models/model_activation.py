@@ -16,6 +16,11 @@ class ModelActivationState(BaseModel):
     )
     available_models: list[UUID] = Field(..., description="List of all available model IDs that can be activated")
     device: DeviceInfo = Field(..., description="Device information for inference")
+    label_colors: dict[str, str] = Field(
+        default_factory=dict,
+        description="Mapping of project label name to hex color, used to render the inference stream "
+        "with colors matching the project's labels",
+    )
 
     @field_validator("active_model_id")
     @classmethod

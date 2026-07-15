@@ -11,7 +11,7 @@ from PIL import Image
 from app.utils.singleton import Singleton
 
 if TYPE_CHECKING:
-    from model_api.models.result import ClassificationResult, DetectionResult, InstanceSegmentationResult, Result
+    from model_api.models.result import Result
 
 
 def _compute_scale(image: np.ndarray) -> float:
@@ -29,6 +29,24 @@ def _compute_scale(image: np.ndarray) -> float:
     return max(1.0, longer_edge / float(SCALE_BASELINE))
 
 
+def _merge_project_colors(label_names: list[str], project_colors: dict[str, str]) -> dict[str, str]:
+    """Build a label-name to color mapping that prefers the project colors.
+
+    Starts from the Model API default palette (so every predicted label is guaranteed a color)
+    and overrides it with the project-defined colors wherever the label name matches. This keeps
+    the inference stream colors consistent with the label colors used for human annotations and
+    AI predictions elsewhere in the project.
+    """
+    from model_api.visualizer.utils import get_label_color_mapping
+
+    color_per_label = get_label_color_mapping(label_names)
+    if project_colors:
+        for name in label_names:
+            if name in project_colors:
+                color_per_label[name] = project_colors[name]
+    return color_per_label
+
+
 class VisualizerCreator(ABC):
     """Abstract base class for visualizer creators."""
 
@@ -37,20 +55,37 @@ class VisualizerCreator(ABC):
         self,
         original_image: np.ndarray,
         predictions: "Result",
+        label_colors: dict[str, str] | None = None,
     ) -> np.ndarray:
-        """Create a visualization of the predictions on the original image."""
+        """Create a visualization of the predictions on the original image.
+
+        Args:
+            original_image: The image to draw the predictions on.
+            predictions: Model API prediction result.
+            label_colors: Optional mapping of label name to hex color (e.g. ``"#RRGGBB"``) coming
+                from the project definition. When provided, these colors are used so that the
+                inference stream matches the label colors shown elsewhere in the project
+                (human annotations and AI predictions). Labels absent from this mapping fall back
+                to the Model API default palette.
+        """
 
 
 class ClassificationVisualizerCreator(VisualizerCreator):
     """Creator for classification visualizations."""
 
-    def create_visualization(  # pyrefly: ignore[bad-override]
+    def create_visualization(
         self,
         original_image: np.ndarray,
-        predictions: "ClassificationResult",
+        predictions: "Result",
+        label_colors: dict[str, str] | None = None,
     ) -> np.ndarray:
+        from model_api.models.result import ClassificationResult
+        from model_api.visualizer.defaults import DEFAULT_FONT_SIZE
+        from model_api.visualizer.primitive import Label
         from model_api.visualizer.scene import ClassificationScene
 
+        if not isinstance(predictions, ClassificationResult):
+            raise TypeError(f"Expected a ClassificationResult, got {type(predictions)}.")
         image_pil = Image.fromarray(original_image)
         scale = _compute_scale(original_image)
         classification_scene = ClassificationScene(
@@ -58,6 +93,21 @@ class ClassificationVisualizerCreator(VisualizerCreator):
             result=predictions,
             scale=scale,
         )
+        # ClassificationScene draws every label with the same default background color. Recolor the
+        # labels with the project colors so the stream matches the project's label colors.
+        if label_colors and predictions.top_labels:
+            labels = []
+            for label in predictions.top_labels:
+                if label.name is None:
+                    continue
+                kwargs = {}
+                color = label_colors.get(label.name)
+                if color:
+                    kwargs["bg_color"] = color
+                labels.append(
+                    Label(label=label.name, score=label.confidence, size=int(DEFAULT_FONT_SIZE * scale), **kwargs)
+                )
+            classification_scene.label = classification_scene._to_label(labels)
         rendered = classification_scene.render()
         return np.array(rendered)
 
@@ -65,14 +115,18 @@ class ClassificationVisualizerCreator(VisualizerCreator):
 class DetectionVisualizerCreator(VisualizerCreator):
     """Creator for detection visualizations."""
 
-    def create_visualization(  # pyrefly: ignore[bad-override]
+    def create_visualization(
         self,
         original_image: np.ndarray,
-        predictions: "DetectionResult",
+        predictions: "Result",
+        label_colors: dict[str, str] | None = None,
     ) -> np.ndarray:
+        from model_api.models.result import DetectionResult
         from model_api.visualizer import BoundingBox, Flatten, Label
         from model_api.visualizer.scene import DetectionScene
 
+        if not isinstance(predictions, DetectionResult):
+            raise TypeError(f"Expected a DetectionResult, got {type(predictions)}.")
         image_pil = Image.fromarray(original_image)
         scale = _compute_scale(original_image)
         detection_scene = DetectionScene(
@@ -81,6 +135,13 @@ class DetectionVisualizerCreator(VisualizerCreator):
             layout=Flatten(BoundingBox, Label),
             scale=scale,
         )
+        # Replace the default palette with the project colors and rebuild the color-dependent
+        # bounding boxes so the stream matches the project's label colors.
+        if label_colors:
+            detection_scene.color_per_label = _merge_project_colors(predictions.label_names, label_colors)
+            detection_scene.bounding_box = detection_scene._to_bounding_box(
+                detection_scene._get_bounding_boxes(predictions)
+            )
         rendered = detection_scene.render()
         return np.array(rendered)
 
@@ -88,14 +149,18 @@ class DetectionVisualizerCreator(VisualizerCreator):
 class InstanceSegmentationVisualizerCreator(VisualizerCreator):
     """Creator for instance segmentation visualizations."""
 
-    def create_visualization(  # pyrefly: ignore[bad-override]
+    def create_visualization(
         self,
         original_image: np.ndarray,
-        predictions: "InstanceSegmentationResult",
+        predictions: "Result",
+        label_colors: dict[str, str] | None = None,
     ) -> np.ndarray:
+        from model_api.models.result import InstanceSegmentationResult
         from model_api.visualizer import Flatten, Label, Polygon
         from model_api.visualizer.scene import InstanceSegmentationScene
 
+        if not isinstance(predictions, InstanceSegmentationResult):
+            raise TypeError(f"Expected an InstanceSegmentationResult, got {type(predictions)}.")
         image_pil = Image.fromarray(original_image)
         scale = _compute_scale(original_image)
         segmentation_scene = InstanceSegmentationScene(
@@ -104,6 +169,12 @@ class InstanceSegmentationVisualizerCreator(VisualizerCreator):
             layout=Flatten(Polygon, Label),
             scale=scale,
         )
+        # Replace the default palette with the project colors and rebuild the color-dependent
+        # polygons and labels so the stream matches the project's label colors.
+        if label_colors:
+            segmentation_scene.color_per_label = _merge_project_colors(predictions.label_names, label_colors)
+            segmentation_scene.polygon = segmentation_scene._to_polygon(segmentation_scene._get_polygons(predictions))
+            segmentation_scene.label = segmentation_scene._to_label(segmentation_scene._get_labels(predictions))
         rendered = segmentation_scene.render()
         return np.array(rendered)
 
@@ -124,13 +195,14 @@ class VisualizationDispatcher(metaclass=Singleton):
         self,
         original_image: np.ndarray,
         predictions: "Result",
+        label_colors: dict[str, str] | None = None,
     ) -> np.ndarray | None:
         if original_image.size == 0:
             raise ValueError("The image provided through the 'original_image' parameter cannot be empty.")
 
         creator = self._creator_map.get(type(predictions))
         if creator is not None:
-            return creator.create_visualization(original_image, predictions)
+            return creator.create_visualization(original_image, predictions, label_colors=label_colors)
         logger.error("Visualization for {} is not supported.", type(predictions))
         return None
 
@@ -140,15 +212,20 @@ class Visualizer:
     def overlay_predictions(
         original_image: np.ndarray,
         predictions: "Result",
+        label_colors: dict[str, str] | None = None,
     ) -> np.ndarray:
         """Overlay predictions on the original image.
 
         Args:
             original_image: BGR/RGB numpy image.
             predictions: Model API prediction result.
+            label_colors: Optional mapping of label name to hex color (e.g. ``"#RRGGBB"``) from the
+                project definition, used so the inference stream colors match the project's labels.
         """
         try:
-            visualization = VisualizationDispatcher().create_visualization(original_image, predictions)
+            visualization = VisualizationDispatcher().create_visualization(
+                original_image, predictions, label_colors=label_colors
+            )
             if visualization is None:
                 return original_image
         except Exception:

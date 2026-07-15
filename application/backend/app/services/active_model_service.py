@@ -12,6 +12,7 @@ from app.models.model_revision import ModelFormat, ModelPrecision, TrainingStatu
 from app.models.system import DeviceInfo, DeviceType
 from app.repositories import ModelRevisionRepository, ModelVariantRepository
 from app.repositories.active_model_repo import ActiveModelRepo
+from app.repositories.label_repo import LabelRepository
 from app.services.inference.model_loader import LoadedModelHandle, ModelLoader
 
 from .system_service import SystemService
@@ -60,12 +61,15 @@ class ActiveModelService:
             if pipeline_device is None:
                 raise RuntimeError("Active pipeline must have a device configured")
             geti_device = SystemService().get_device_info(pipeline_device)
+            label_repo = LabelRepository(project_id=str(active_model.project_id), db=db)
+            label_colors = {label.name: label.color for label in label_repo.list_all()}
             return ModelActivationState(
                 project_id=UUID(active_model.project_id),
                 active_model_id=UUID(active_model.id),
                 active_model_variant_id=UUID(active_variant_id),
                 available_models=[UUID(m.id) for m in available_models],
                 device=geti_device,
+                label_colors=label_colors,
             )
 
     def _get_model_file_path(self, project_id: UUID, model_id: UUID, variant_id: UUID, extension: str = "xml") -> Path:
@@ -125,7 +129,11 @@ class ActiveModelService:
                     extension="bin",
                 )
                 self._loaded_model = ModelLoader.load(
-                    model_id=active_model_id, variant_id=active_variant_id, model_xml_path=model_xml_path, device=device
+                    model_id=active_model_id,
+                    variant_id=active_variant_id,
+                    model_xml_path=model_xml_path,
+                    device=device,
+                    label_colors=self._model_activation_state.label_colors,
                 )
             except FileNotFoundError:
                 logger.exception("Failed to load model with ID '{}'", active_model_id)
