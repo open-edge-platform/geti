@@ -30,7 +30,7 @@ export const EmptyDataset = ({ hasActiveFilter }: EmptyDatasetProps) => {
             </Heading>
             {!hasActiveFilter && (
                 <Content>
-                    <MediaUpload />
+                    <MediaUpload uploadMediaVariant={'text'} />
                 </Content>
             )}
         </Flex>

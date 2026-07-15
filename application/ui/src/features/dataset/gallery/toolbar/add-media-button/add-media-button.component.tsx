@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ActionButton, FileTrigger, Tooltip, TooltipTrigger } from '@geti-ui/ui';
+import { ActionButton, Button, FileTrigger, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Share } from '@geti-ui/ui/icons';
 
 import { acceptedExtensions } from '../../utils';
@@ -9,9 +9,12 @@ import { acceptedExtensions } from '../../utils';
 type AddMediaButtonProps = {
     onFileUpload: (files: File[]) => Promise<void>;
     isDisabled?: boolean;
+    variant?: 'icon' | 'text';
 };
 
-export const AddMediaButton = ({ onFileUpload, isDisabled = false }: AddMediaButtonProps) => {
+const LABEL = 'Upload media';
+
+export const AddMediaButton = ({ onFileUpload, isDisabled = false, variant = 'icon' }: AddMediaButtonProps) => {
     const handleFileSelect = async (files: FileList | null) => {
         if (files && files.length > 0) {
             await onFileUpload(Array.from(files));
@@ -25,12 +28,18 @@ export const AddMediaButton = ({ onFileUpload, isDisabled = false }: AddMediaBut
             allowsMultiple
             onSelect={handleFileSelect}
         >
-            <TooltipTrigger>
-                <ActionButton isQuiet aria-label='Upload media' isDisabled={isDisabled}>
-                    <Share />
-                </ActionButton>
-                <Tooltip>Upload media</Tooltip>
-            </TooltipTrigger>
+            {variant === 'text' ? (
+                <Button variant='primary' isDisabled={isDisabled}>
+                    {LABEL}
+                </Button>
+            ) : (
+                <TooltipTrigger>
+                    <ActionButton isQuiet aria-label={LABEL} isDisabled={isDisabled}>
+                        <Share />
+                    </ActionButton>
+                    <Tooltip>{LABEL}</Tooltip>
+                </TooltipTrigger>
+            )}
         </FileTrigger>
     );
 };
