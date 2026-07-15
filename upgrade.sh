@@ -244,6 +244,8 @@ wait_until_healthy() {
 # Rollback: restore the previous image + previous data, and restart.
 # ---------------------------------------------------------------------------
 rollback() {
+    trap - ERR
+    set +e
     log "──────────────────────────────────────────────"
     log "Rolling back to the previous version..."
 

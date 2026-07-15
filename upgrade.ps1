@@ -338,13 +338,18 @@ function Invoke-Rollback {
     if ($script:DataBackupEnabled -and (Test-Path $script:DataBackupFile)) {
         Write-Log "Restoring data volume '$DataVolume' from snapshot..."
         $backupName = Split-Path -Leaf $script:DataBackupFile
-        Invoke-Logged -Command "docker" -Arguments @(
-            "run", "--rm",
-            "-v", "${DataVolume}:/data",
-            "-v", "${BackupDir}:/backup",
-            "alpine", "sh", "-c",
-            "rm -rf /data/* /data/..?* /data/.[!.]* 2>/dev/null; tar xzf /backup/$backupName -C /data"
-        )
+         try {
+             Invoke-Logged -Command "docker" -Arguments @(
+                 "run", "--rm",
+                 "-v", "${DataVolume}:/data",
+                 "-v", "${BackupDir}:/backup",
+                 "alpine", "sh", "-c",
+                 "rm -rf /data/* /data/..?* /data/.[!.]* 2>/dev/null; tar xzf /backup/$backupName -C /data"
+             )
+             Write-Log "OK Data restored to its pre-upgrade state."
+         } catch {
+             Write-Log "FAIL Could not restore data snapshot: $_"
+         }
         Write-Log "OK Data restored to its pre-upgrade state."
     }
 

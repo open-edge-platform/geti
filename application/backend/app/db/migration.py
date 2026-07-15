@@ -16,7 +16,7 @@ from alembic.script import ScriptDirectory
 from loguru import logger
 from sqlalchemy import text
 
-from app.db import db_engine
+from app.db.engine import db_engine
 from app.settings import Settings
 
 
@@ -133,7 +133,9 @@ class MigrationManager:
         logger.info(f"Restoring database from backup {backup_path} → {db_path}...")
         # Drop any pooled connections so the file is not locked while we replace it.
         db_engine.dispose()
-        shutil.copyfile(backup_path, db_path)
+        tmp_db_path = db_path.with_name(f"{db_path.name}.restore_tmp")
+        shutil.copyfile(backup_path, tmp_db_path)
+        tmp_db_path.replace(db_path)
         for sidecar in (db_path.with_name(f"{db_path.name}-wal"), db_path.with_name(f"{db_path.name}-shm")):
             try:
                 sidecar.unlink(missing_ok=True)
