@@ -44,7 +44,7 @@ vi.mock('../../../models/train-model/train-model.component', () => ({
 }));
 
 vi.mock('../../import-export/import-export.component', () => ({
-    ImportExport: () => <button>Export/Import</button>,
+    ImportExport: () => <button aria-label='Export/Import dataset'>Export/Import</button>,
 }));
 
 vi.mock('hooks/use-project-identifier.hook', () => ({
@@ -185,7 +185,7 @@ describe('Toolbar', () => {
         expect(screen.queryByRole('button', { name: 'Upload media' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Annotate' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Train model' })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: 'Export/Import' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /export\/import dataset/i })).not.toBeInTheDocument();
     });
 
     it('shows "Export/Import", "Train model", "Annotate" buttons when no media is selected', async () => {
@@ -203,7 +203,7 @@ describe('Toolbar', () => {
         expect(screen.getByRole('button', { name: 'Upload media' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Annotate' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Train model' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Export/Import' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /export\/import dataset/i })).toBeInTheDocument();
     });
 
     it('hides filter and view controls when at least one media is selected', async () => {
