@@ -20,12 +20,11 @@ export const useSelectDatasetItem = () => {
 
     const prevSelectedMediaItem = useRef<Media | null>(null);
 
-    // This state is responsible for deciding that is the currently displayed media item in the annotator.
-    // This state is computed based on the `selectedDatasetItemId` param and the `items` list.
-    // If the `selectedDatasetItemId` is not found in the `items` list, we will keep the previous selected media item.
-    // That case might happen when we use filters, e.g. current media is annotated and user filters media by status
-    // "Media with missing annotations". It would cause the current media to be null (not found in the list) and would
-    // close the annotator unexpectedly.
+    // This state determines the currently displayed media item in the annotator.
+    // It is computed based on the `selectedDatasetItemId` param and the `items` list.
+    // If the `selectedDatasetItemId` is not found in the `items` list, we keep the previously selected media item.
+    // This can happen when filters change (e.g. opening an annotated item and then filtering by
+    // "Media with missing annotations"), which would otherwise close the annotator unexpectedly.
     const selectedMediaItem = useMemo(() => {
         if (selectedDatasetItemId === undefined) {
             return null;
@@ -34,7 +33,7 @@ export const useSelectDatasetItem = () => {
         const newSelectedMediaItem = items.find((item) => item.id === selectedDatasetItemId);
 
         if (newSelectedMediaItem === undefined) {
-            return prevSelectedMediaItem.current;
+            return prevSelectedMediaItem.current?.id === selectedDatasetItemId ? prevSelectedMediaItem.current : null;
         }
 
         return newSelectedMediaItem;
