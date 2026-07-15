@@ -476,68 +476,68 @@ class DataModule(LightningDataModule):
         config = self.val_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(
-            dataset=dataset,
-            batch_size=self._eval_batch_size(dataset, config.batch_size),
-            shuffle=False,
-            num_workers=config.num_workers,
-            pin_memory=True,
-            collate_fn=dataset.collate_fn,
-            persistent_workers=config.num_workers > 0,
-            multiprocessing_context=_MP_CONTEXT if config.num_workers > 0 else None,
-        )
+        return DataLoader(**self._eval_loader_kwargs(dataset, config))
 
     def test_dataloader(self) -> DataLoader:
         """Get test dataloader."""
         config = self.test_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(
-            dataset=dataset,
-            batch_size=self._eval_batch_size(dataset, config.batch_size),
-            shuffle=False,
-            num_workers=config.num_workers,
-            pin_memory=True,
-            collate_fn=dataset.collate_fn,
-            persistent_workers=config.num_workers > 0,
-            multiprocessing_context=_MP_CONTEXT if config.num_workers > 0 else None,
-        )
+        return DataLoader(**self._eval_loader_kwargs(dataset, config))
 
     def predict_dataloader(self) -> DataLoader:
         """Get predict dataloader."""
         config = self.test_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(
-            dataset=dataset,
-            batch_size=self._eval_batch_size(dataset, config.batch_size),
-            shuffle=False,
-            num_workers=config.num_workers,
-            pin_memory=True,
-            collate_fn=dataset.collate_fn,
-            persistent_workers=config.num_workers > 0,
-            multiprocessing_context=_MP_CONTEXT if config.num_workers > 0 else None,
-        )
+        return DataLoader(**self._eval_loader_kwargs(dataset, config))
 
-    def _eval_batch_size(self, dataset: VisionDataset, configured_batch_size: int) -> int:
-        """Return the DataLoader batch size for a validation/test/predict dataset.
+    def _eval_loader_kwargs(self, dataset: VisionDataset, config: SubsetConfig) -> dict:
+        """Build ``DataLoader`` keyword arguments for a val/test/predict dataset.
 
-        For tiled evaluation datasets a single original image already expands into
-        (potentially very many) tiles. Collating several original images per batch
-        would produce a huge nested tile batch that must be serialized through the
-        worker->main shared-memory channel; when this exceeds the available shared
-        memory (e.g. the small ``/dev/shm`` limit inside containers) the DataLoader
-        workers deadlock and evaluation hangs indefinitely.
+        Tiled evaluation needs special handling. For the test/predict subsets a
+        single original image expands into *every* grid tile (tiles are not
+        filtered by annotation at inference time), so one dataset item can become
+        a very large nested tile batch — hundreds of tiles, each resized to the
+        model input size.
 
-        Loading one original image per batch keeps the collated tile batch bounded.
-        The model still forwards tiles in groups of ``TILE_INFERENCE_BATCH_SIZE`` (see
-        ``getitune.data.entity.tile``), so GPU utilization is preserved.
+        If such a batch is produced inside a DataLoader worker it must be shipped
+        back to the main process through shared memory (``/dev/shm``). In
+        containers this is typically tiny (e.g. 64 MB), so the transfer overflows
+        it and the OS kills the worker, surfacing as
+        ``DataLoader worker (pid(s) ...) exited unexpectedly``. ``pin_memory``
+        makes this worse by adding an extra pinned copy of the giant batch.
+
+        For tiled evaluation we therefore:
+          * use ``batch_size=1`` so each collated tile batch is bounded to a
+            single original image's tiles, and
+          * run in the main process (``num_workers=0``, ``pin_memory=False``) so
+            the batch is never serialized across the worker->main shared-memory
+            channel.
+
+        GPU utilization is preserved because the model still forwards tiles in
+        groups of ``TILE_INFERENCE_BATCH_SIZE`` (see ``getitune.data.entity.tile``).
+
+        Non-tiled datasets keep the configured batch size / workers / pinned
+        memory for maximum throughput.
         """
         # ``TileDataset`` instances expose ``_tiling_transform``; plain datasets do not.
-        is_tiled_dataset = hasattr(dataset, "_tiling_transform")
-        if self.tile_config.enable_tiler and is_tiled_dataset:
-            return 1
-        return configured_batch_size
+        is_tiled_dataset = self.tile_config.enable_tiler and hasattr(dataset, "_tiling_transform")
+
+        batch_size = 1 if is_tiled_dataset else config.batch_size
+        num_workers = 0 if is_tiled_dataset else config.num_workers
+        pin_memory = not is_tiled_dataset
+
+        return {
+            "dataset": dataset,
+            "batch_size": batch_size,
+            "shuffle": False,
+            "num_workers": num_workers,
+            "pin_memory": pin_memory,
+            "collate_fn": dataset.collate_fn,
+            "persistent_workers": num_workers > 0,
+            "multiprocessing_context": _MP_CONTEXT if num_workers > 0 else None,
+        }
 
     def setup(self, stage: str) -> None:
         """Setup for each stage."""
