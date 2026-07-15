@@ -376,7 +376,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             )
 
     @step("Train Model", 80)
-    def train_model(  # noqa: C901, PLR0915 - training orchestration is intentionally centralized here
+    def train_model(  # noqa: PLR0915 - training orchestration is intentionally centralized here
         self,
         training_config: dict,
         dataset_info: DatasetInfo,
@@ -431,17 +431,15 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             "work_dir": self._data_dir / f"getitune-workspace-{model_id}",
             "device": getitune_device_type,
         }
-        # Ultralytics models load weights via engine's checkpoint param (for both
-        # fresh training from base weights and resume from parent revision).
-        if is_ultralytics or has_model_revision:
+        # Route weight loading through checkpoint for Ultralytics and for resume flows.
+        load_from_checkpoint = is_ultralytics or has_model_revision
+        if load_from_checkpoint:
             engine_kwargs["checkpoint"] = weights_path
-        # Lightning models load base weights via model's pretrained_weights param;
-        # a checkpoint is only needed when resuming from a parent revision.
-        if not is_ultralytics and not has_model_revision:
-            model_cfg["init_args"]["pretrained_weights"] = weights_path
-        else:
-            # Disable default weight loading behavior since the model is loaded from the checkpoint
+            # Disable default pretrained loading when checkpoint controls initialization.
             model_cfg["init_args"]["pretrained"] = False
+        else:
+            # Fresh Lightning training loads base weights via model init args.
+            model_cfg["init_args"]["pretrained_weights"] = weights_path
 
         model_parser = ArgumentParser()
         model_type = UltralyticsModel if is_ultralytics else LightningModel

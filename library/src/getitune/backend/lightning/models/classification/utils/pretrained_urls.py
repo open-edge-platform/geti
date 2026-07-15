@@ -18,11 +18,11 @@ Note:
     access at load time unless the checkpoint is already cached.
 """
 
-# ViT / DINOv2 ImageNet-21k checkpoints (shared by multiclass, multilabel, hlabel).
 from __future__ import annotations
 
 _BASE_STORAGE_URL = "https://storage.geti.intel.com/weights"
 
+# ViT / DINOv2 ImageNet-21k checkpoints (shared by multiclass, multilabel, hlabel).
 VIT_PRETRAINED_URLS: dict[str, str] = {
     "vit-tiny": (
         f"{_BASE_STORAGE_URL}/"
