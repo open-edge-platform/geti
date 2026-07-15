@@ -1077,6 +1077,6 @@ class LightningModel(LightningModule):
         Distinct from full getitune checkpoints (resume/fine-tune): this seeds the
         freshly-built architecture. A single combined file covers the whole model
         (backbone + neck + head). When ``weights`` is None, models load their own
-        default source. Base implementation is a no-op so models without pretrained
-        weights (e.g. most detectors) work unchanged.
+        default source. Base implementation is a no-op: if models do not have pretrained
+        weights it should work.
         """
