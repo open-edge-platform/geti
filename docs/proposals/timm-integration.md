@@ -11,6 +11,12 @@
 
 `timm` (PyTorch Image Models) exposes 1400+ pretrained classification backbones. This proposal describes how to make all of them selectable in Geti with minimal, maintainable code, without regressing the existing curated experience.
 
+This catalog is intended for experienced users who want a specific architecture from the full timm ecosystem. We would not recommend models from this list by default.
+
+The UI should include a short user-facing note on the timm card explaining what it is for: selecting and training a specific architecture from the timm Hub catalog.
+
+For users who do not want to reason about architecture details, we can additionally expose a smaller set of separately curated classic model manifests. Those models should be tested against the existing catalog and shipped with strong default hyperparameters before we recommend them.
+
 Decisions driving this design (agreed with stakeholders):
 
 1. Keep all existing models, manifests, and top-picks untouched — zero regression for curated architectures.
@@ -53,11 +59,12 @@ print(cfg.std)             # (0.5, 0.5, 0.5), model dependent
 print(cfg.interpolation)   # "bicubic", model dependent
 
 # The library creates a headless feature extractor and obtains its feature width.
+# global_pool is intentionally left at the architecture's own default (see 3.3):
+# forcing "avg" or "" is not universal across all 1400+ architectures.
 model = timm.create_model(
     "vit_base_patch16_224.augreg2_in21k_ft_in1k",
     pretrained=True,
     num_classes=0,
-    global_pool="",
 )
 print(model.num_features)
 
@@ -114,7 +121,6 @@ Blockers at scale:
 - `ModelManifestService.get_model_manifests()` is `@cache`d and eager: it parses every manifest once into `ModelManifest` (`app/models/model_manifest.py`). At 1400 models that is ~4200 file reads + 1400 Pydantic constructions on first call.
 - `ModelManifest` uses `extra="forbid"` on the top-level model and on `ModelStats`, `BenchmarkMetrics`, `Capabilities`, `PretrainedWeights`. Any unexpected auto-generated field hard-fails loading.
 - `pretrained_weights` is required with `{url, mirror_url, sha_sum}` — all required strings. timm downloads weights itself from HF Hub, so this model does not fit timm.
-- Classification metric rule (validator): `imagenet_top1_accuracy` required; COCO metrics forbidden.
 - `learning_rate` has no default in `AlgoLevelTrainingParameters` — effectively required per model.
 - No optimizer field exists anywhere — not in `AlgoLevelTrainingParameters`, the manifest schema, or the API view. `HyperparametersUpdater._update_learning_rate` only writes `optimizer["init_args"]["lr"]`; it never sets the optimizer `class_path`. This is convenient for us: it confirms the optimizer is already an internal recipe/library concern, so keeping it library-side is consistent with the current design.
 - `GetiConfigConverter.TEMPLATE_ID_MAPPING` (`app/execution/common/geti_config_converter.py`) is a hardcoded dict mapping manifest `id` → recipe path (~71 entries today). It also routes classification via `sub_task_type`. 1400 entries here is untenable.
@@ -205,12 +211,19 @@ class TimmModelMulticlassCls(LightningMulticlassClsModel):
 
 Required so defaults don't produce ~0 accuracy across families:
 
-- Replace `num_classes=1000` + `self.model.classifier = None` with timm's canonical feature-extractor mode:
+- Replace `num_classes=1000` + `self.model.classifier = None` with timm's canonical headless feature-extractor mode, without forcing a specific pooling mode:
   ```python
-  self.model = timm.create_model(model_name, pretrained=pretrained, num_classes=0, global_pool="")
+  self.model = timm.create_model(model_name, pretrained=pretrained, num_classes=0)
   ```
-  This is head-name agnostic (no reliance on `.classifier`).
-- Detect output shape and select the neck accordingly: CNN `[B, C, H, W]` → `GlobalAveragePooling(dim=2)`; transformer tokens `[B, N, C]` → token/CLS pooling.
+  `num_classes=0` is intentional and does not need the datamodule's real label count: Geti always attaches its own task head externally (`LinearClsHead` / `MultiLabelLinearClsHead`) on top of `backbone.num_features`, the same as every other Geti backbone. timm's own `fc` is pretrained for ImageNet-1000 and would have to be replaced anyway for any other label count, so setting `num_classes=0` simply turns `fc` into `Identity` and skips building a classifier head we would immediately discard. This keeps the backbone/head separation consistent with the rest of the codebase and is head-name agnostic (no reliance on `.classifier`).
+- `global_pool` is deliberately left at each model's own default rather than forced to `"avg"` (or `""`). Empirically, `global_pool="avg"` is not universal: `pit_b_224` asserts `global_pool in ("token",)` and rejects `"avg"` outright at construction time. Explicitly requesting `forward_head(x, pre_logits=True)` is not universal either — several families override `forward_head()` with a signature that does not accept `pre_logits` (e.g. `inception_v3`, `hgnet*`, `tiny_vit_*`), and others return a `list` of multi-branch features from `forward_features()` (e.g. `coat_*`, `crossvit_*`) that `SelectAdaptivePool2d` cannot pool directly.
+
+  The combination that works across the catalog is to keep `num_classes=0` (so `fc` becomes `Identity`) and simply call the model's own `forward(x)`, letting each architecture apply its own default pooling and head logic internally:
+  ```python
+  def extract_features(self, x: torch.Tensor) -> torch.Tensor:
+      return self.model(x)  # fc is Identity; each model pools with its own default global_pool
+  ```
+  This was verified against 180 randomly sampled architectures from the full `timm.list_models(pretrained=True)` catalog (two independent 80- and 100-model samples, batch size 2 to avoid batch-norm's batch=1 restriction): all 180 returned a flat `[B, num_features]` tensor with no changes beyond `num_classes=0`. No custom neck, output-shape detection, or per-family pooling logic is needed in `TimmBackbone`.
 - Read `model.pretrained_cfg` after creating the selected model and turn it into `DataInputParams`. This happens during model construction, so the selected architecture determines its own defaults:
   ```python
   cfg = self.model.pretrained_cfg
@@ -277,7 +290,7 @@ from getitune.utils.utils import measure_flops
 
 def collect_stats(model_name: str) -> dict[str, float]:
     cfg = timm.get_pretrained_cfg(model_name)
-    model = timm.create_model(model_name, pretrained=False, num_classes=0, global_pool="")
+    model = timm.create_model(model_name, pretrained=False, num_classes=0)  # default global_pool (see 3.3)
     params = sum(parameter.numel() for parameter in model.parameters())
     inputs = torch.zeros((1, *cfg.input_size))
     flops = measure_flops(lambda: model(inputs))
@@ -571,39 +584,11 @@ The selector stores the concrete architecture id. Changing the selection invalid
 
 - Library unit/model tests: for representative models from CNN and transformer families, verify the `timm.optim.create_optimizer_v2` options, then instantiate → 1-step train → export (OpenVINO/ONNX).
 - Backend unit tests: `model_name ↔ id` round-trip; `TimmManifestProvider.build_manifest` produces a schema-valid `ModelManifest` (respecting `extra="forbid"`); lazy `get_model_manifest_by_id` for timm ids; `GetiConfigConverter._resolve_recipe` + LR-injection fallback; `/timm/backbones` search/pagination/facets against a fixture snapshot.
-- Backend integration: `training_configuration` returns the snapshot's `default_lr`/`input_size` for a timm id; end-to-end train for a handful of families (one CNN, one ViT) confirming the correct optimizer is built.
+- E2E testing: each run should execute a small rotating sample of random timm architectures plus one basic baseline architecture, so we continuously validate representative coverage without trying to test all 1400 models every run.
 - UI: component tests for the selector (search, family filter, selection → id), and that the generic parameter panel renders the returned LR field; MSW handlers for both new endpoints.
 - Acceptance criteria (from the issue): model discovery, manifest correctness, basic instantiation flows covered; no regression in existing classification workflows.
 
 ---
-
-## 5.4 Phased Rollout
-
-1. Library — timm optimizer callable + `learning_rate` init-arg on timm model classes; harden `TimmBackbone` (`num_classes=0`, ViT/CNN neck, `pretrained_cfg` preprocessing); two `timm_generic.yaml` recipes.
-2. Snapshot — generation script + committed `timm_catalog_snapshot.json` (pins timm version; `default_lr` sourced from the library policy); CI drift check.
-3. Backend — schema additions (`family`, `variant`, optional `pretrained_weights`, `weights_source`); `TimmManifestProvider`; lazy `get_model_manifest_by_id`; `GetiConfigConverter` resolver + LR fallback; synthetic list entry; `/timm/backbones` endpoint; `weights_source: timm_managed` download path.
-4. API sync — regenerate OpenAPI + UI types.
-5. UI — `TimmBackboneCard` + searchable selector + pre-selection/default handling.
-6. Docs — offline weights; update `CHANGELOG.md` and library docs.
-
----
-
-## 5.5 Risks & Open Questions
-
-| Risk | Impact | Mitigation |
-| ---- | ------ | ---------- |
-| timm family incompatibility with `TimmBackbone`/export | Some architectures fail or train poorly | Representative family tests; `pretrained_cfg`-driven preprocessing; clear training errors |
-| Wrong optimizer for an exotic family | Poor accuracy despite good LR | Keep the family-to-timm-options mapping small, test CNN and transformer defaults, and extend it when a concrete family requires different options |
-| `default_lr` in snapshot drifts from library optimizer options | Misleading default LR in UI | Snapshot generation and the timm wrapper share the same family-to-options mapping; CI regenerates on a timm bump |
-| Offline/air-gapped weight download for `timm_managed` | Training fails without network | Documented cache pre-seeding; clear UI error |
-| Catalog drift on timm upgrade | Stale/incorrect metadata | Pin timm version; committed snapshot; CI drift check + regeneration script |
-| `extra="forbid"` rejects generated fields | Manifest load failure | `build_manifest` maps strictly to the schema; schema extended intentionally (`family`, `variant`, optional weights, `weights_source`) |
-| Synthetic `image-classification-timm` id accidentally used for training | Job with no concrete backbone | Backend rejects the synthetic id at train time; UI only ever submits a concrete `-<arch>` id |
-
-Open questions:
-
-- Ship the full catalog for multi-label in v1, or start with multi-class only?
-- Default `page_size` and default sort (top-1? params?) for the backbone selector.
 
 ### 5.6 Complete Flow Example
 
