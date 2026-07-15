@@ -94,6 +94,8 @@ def fxt_quantization_params() -> QuantizationJobParams:
         job_id=uuid4(),
         project_id=uuid4(),
         model_id=uuid4(),
+        model_architecture_id="test_arch",
+        model_architecture_name="Test Arch",
         max_calibration_subset_size=100,
         max_drop=None,
     )
@@ -793,6 +795,8 @@ class TestGetiTuneQuantizerExecute:
             job_id=uuid4(),
             project_id=project_id,
             model_id=model_id,
+            model_architecture_id="test_arch",
+            model_architecture_name="Test Arch",
             model_variant_id=model_variant_id,
             max_calibration_subset_size=50,
             max_drop=None,
@@ -929,6 +933,8 @@ class TestGetiTuneQuantizerExecute:
             job_id=uuid4(),
             project_id=project_id,
             model_id=model_id,
+            model_architecture_id="test_arch",
+            model_architecture_name="Test Arch",
             model_variant_id=model_variant_id,
             max_calibration_subset_size=200,
             max_drop=0.02,
@@ -1015,6 +1021,8 @@ class TestGetiTuneQuantizerExecute:
             job_id=uuid4(),
             project_id=project_id,
             model_id=model_id,
+            model_architecture_id="test_arch",
+            model_architecture_name="Test Arch",
             max_calibration_subset_size=100,
         )
 
