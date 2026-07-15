@@ -24,7 +24,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from pathlib import Path
 from time import perf_counter
-from typing import NamedTuple, cast
+from typing import Iterator, NamedTuple, cast
 
 import numpy as np
 import pytest
@@ -113,7 +113,7 @@ def _build_subset_config(data_config: dict, subset_name: str) -> SubsetConfig:
 
 
 @contextmanager
-def _timed_step(spec: _TaskSpec, step_name: str):
+def _timed_step(spec: _TaskSpec, step_name: str) -> Iterator[None]:
     """Log step start/end with execution time for workflow visibility."""
     start = perf_counter()
     logger.info("[%s] %s started", spec.task.value, step_name)
@@ -208,6 +208,7 @@ def test_ultralytics_engine_workflow(
     assert ov_xml_path.exists()
     assert ov_xml_path.suffix == ".xml"
 
+    assert datamodule.input_size is not None
     input_h, input_w = datamodule.input_size
     dummy_input = np.zeros((input_h, input_w, 3), dtype=np.uint8)
     with _timed_step(spec, "model_api_fp32_create"):

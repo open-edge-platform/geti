@@ -94,7 +94,7 @@ class UltralyticsSemanticSegModel(UltralyticsModel):
         return TaskLevelExportParameters(
             model_type="Segmentation",
             model_name=self.model_name,
-            task_type="semantic_segmentation",
+            task_type="segmentation",
             label_info=self.label_info,
             optimization_config={},
             confidence_threshold=0.0,

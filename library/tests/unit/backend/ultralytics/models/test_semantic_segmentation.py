@@ -43,6 +43,6 @@ class TestSemanticSegmentationModel:
         )
         params = model._export_parameters
         assert params.model_type == "Segmentation"
-        assert params.task_type == "semantic_segmentation"
+        assert params.task_type == "segmentation"
         assert params.nms_execute is False
         assert isinstance(params.label_info, SegLabelInfo)
