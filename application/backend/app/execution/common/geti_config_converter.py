@@ -159,7 +159,7 @@ class TransformsUpdater:
     # Augmentations that cannot be combined with the tiling pipeline.  Mosaic and
     # MixUp stitch/blend multiple full images together, which is fundamentally
     # incompatible with splitting an image into tiles, so they must never be added
-    # to a tiling recipe (see the tile recipe NOTE about the AugmentationScheduler).
+    # to a tiling recipe.
     TILING_INCOMPATIBLE_AUGMENTATIONS: ClassVar[set[str]] = {"mosaic", "mixup"}
 
     @classmethod
@@ -193,7 +193,17 @@ class TransformsUpdater:
 
         for aug_name, aug_value in augmentation_params.items():
             if tiling and aug_name in cls.TILING_INCOMPATIBLE_AUGMENTATIONS:
-                logger.info("Augmentation '{}' is incompatible with the Tiling pipeline and will be skipped", aug_name)
+                if aug_value.get("enable", True):
+                    # The user explicitly enabled an augmentation that cannot coexist with tiling. Warn so it is clear
+                    # we are overriding their request.
+                    logger.warning(
+                        "Augmentation '{}' is incompatible with the Tiling pipeline and will be overridden (disabled)",
+                        aug_name,
+                    )
+                else:
+                    logger.debug(
+                        "Augmentation '{}' is incompatible with the Tiling pipeline and will be skipped", aug_name
+                    )
                 continue
             if aug_name not in cls.AUGMENTATION_REGISTRY:
                 if tiling:
@@ -1086,13 +1096,11 @@ class GetiConfigConverter:
         # so DEIM must be treated as disabled whenever tiling is enabled, regardless
         # of the requested value. Otherwise the converter would silently ignore the
         # user's augmentations (deim=True) or add incompatible ones for a tiling run.
-        deim_enabled = deim_framework is True and not tile_enabled
-        if not deim_enabled:
+        if not deim_framework or tile_enabled:
+            # DEIM disabled by the user, or forced off because tiling is on ->
+            # remove the scheduler callback and fall back to the static pipeline.
             TransformsUpdater.update(augmentation_params, config)
-            if deim_framework is False or tile_enabled:
-                # DEIM disabled by the user, or forced off because tiling is on ->
-                # remove the scheduler callback and fall back to the static pipeline.
-                GetiConfigConverter._disable_deim_framework(config)
+            GetiConfigConverter._disable_deim_framework(config)
 
         # Update training hyperparameters
         hyperparams: dict[str, Any] = {
