@@ -521,8 +521,16 @@ class DataModule(LightningDataModule):
         Non-tiled datasets keep the configured batch size / workers / pinned
         memory for maximum throughput.
         """
-        # ``TileDataset`` instances expose ``_tiling_transform``; plain datasets do not.
-        is_tiled_dataset = self.tile_config.enable_tiler and hasattr(dataset, "_tiling_transform")
+        # A ``TileDataset`` always expands one image into every grid tile,
+        # independently of the datamodule's ``tile_config.enable_tiler`` flag.
+        # Notably, the OpenVINO evaluation path
+        # (``AutoConfigurator.update_ov_subset_pipeline``) rebuilds the datamodule
+        # with a fresh ``TileConfig(enable_tiler=False)`` while still reusing the
+        # pre-built tiled test dataset. Keying off ``enable_tiler`` would therefore
+        # miss those tiled datasets and spawn workers that collate huge tile
+        # batches, overflowing ``/dev/shm`` and killing the worker. Detect the
+        # tiled dataset by the dataset type itself instead.
+        is_tiled_dataset = hasattr(dataset, "_tiling_transform")
 
         batch_size = 1 if is_tiled_dataset else config.batch_size
         num_workers = 0 if is_tiled_dataset else config.num_workers
