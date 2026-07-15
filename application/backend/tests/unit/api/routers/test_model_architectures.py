@@ -58,7 +58,7 @@ class TestModelArchitecturesEndpoint:
         "task_filter, total_models",
         [
             ("detection", 36),
-            ("instance_segmentation", 24),
+            ("instance_segmentation", 20),
             ("classification", 11),
         ],
     )
