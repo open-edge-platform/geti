@@ -153,7 +153,7 @@ describe('Toolbar', () => {
 
         await renderToolbar([item1, item2]);
 
-        expect(await screen.findByText('2 selected')).toBeVisible();
+        expect(await screen.findByText('2/2 selected')).toBeVisible();
         expect(screen.getByLabelText(/delete media item/i)).toBeVisible();
     });
 
@@ -182,7 +182,7 @@ describe('Toolbar', () => {
 
         await renderToolbar([firstItem]);
 
-        expect(screen.getByRole('button', { name: 'Upload media' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Upload media' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Annotate' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Train model' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Export/Import' })).not.toBeInTheDocument();
@@ -219,9 +219,7 @@ describe('Toolbar', () => {
         await renderToolbar([firstItem]);
 
         expect(screen.queryByRole('button', { name: 'dataset statistics' })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: /media status/i })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: 'Filter by labels' })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: 'More filters' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Filters' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'View mode' })).not.toBeInTheDocument();
     });
 
@@ -231,32 +229,26 @@ describe('Toolbar', () => {
         await renderToolbar([firstItem]);
 
         expect(await screen.findByRole('button', { name: 'dataset statistics' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Filter by labels' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'More filters' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /media status/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View mode' })).toBeInTheDocument();
     });
 
-    it('shows "Newest first" sort button by default', async () => {
+    it('shows the sort menu trigger by default', async () => {
         await renderToolbar();
 
-        const sortButton = screen.getByRole('button', { name: 'Newest first' });
-
-        expect(sortButton).toHaveTextContent('Newest first');
+        expect(screen.getByRole('button', { name: 'Sort by upload date' })).toBeInTheDocument();
     });
 
-    it('toggles the sort button label between "Newest first" and "Oldest first" when clicked', async () => {
+    it('changes the sort direction when a menu option is selected', async () => {
         await renderToolbar();
 
-        const newestFirstButton = screen.getByRole('button', { name: 'Newest first' });
-        fireEvent.click(newestFirstButton);
+        fireEvent.click(screen.getByRole('button', { name: 'Sort by upload date' }));
 
-        const oldestFirstButton = await screen.findByRole('button', { name: 'Oldest first' });
-        expect(oldestFirstButton).toHaveTextContent('Oldest first');
+        const oldestFirstOption = await screen.findByRole('menuitemradio', { name: 'Oldest first' });
+        fireEvent.click(oldestFirstOption);
 
-        fireEvent.click(oldestFirstButton);
+        fireEvent.click(await screen.findByRole('button', { name: 'Sort by upload date' }));
 
-        const newestFirstButton2 = await screen.findByRole('button', { name: 'Newest first' });
-        expect(newestFirstButton2).toHaveTextContent('Newest first');
+        expect(await screen.findByRole('menuitemradio', { name: 'Newest first' })).toBeInTheDocument();
     });
 });

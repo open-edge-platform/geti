@@ -38,8 +38,7 @@ describe('TotalItems', () => {
     it('shows selected count and total when items are selected', async () => {
         await renderTotalItems(3, 10);
 
-        expect(await screen.findByText('3 selected')).toBeVisible();
-        expect(await screen.findByText('10 media items')).toBeVisible();
+        expect(await screen.findByText('3/10 selected')).toBeVisible();
     });
 
     it('shows total media count with plural when no items are selected', async () => {

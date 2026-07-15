@@ -36,7 +36,7 @@ describe('ImportExport', () => {
             </ImportDatasetDialogStateProvider>
         );
 
-        fireEvent.click(await screen.findByRole('button', { name: /import-export dataset/i }));
+        fireEvent.click(await screen.findByRole('button', { name: /export\/import dataset/i }));
         fireEvent.click(await screen.findByRole('menuitem', { name: /Export dataset/i }));
 
         expect(screen.getByRole('heading', { name: /Export settings/i })).toBeVisible();
