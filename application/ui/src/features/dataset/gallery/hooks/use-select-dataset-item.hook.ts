@@ -1,6 +1,8 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useEffect, useMemo, useRef } from 'react';
+
 import type { Media } from '@/api/types';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useLocation, useNavigate, useParams } from 'react-router';
@@ -15,6 +17,32 @@ export const useSelectDatasetItem = () => {
     const projectId = useProjectIdentifier();
     const { items } = useDatasetMediaWithReviewStatus();
     const { datasetItemId: selectedDatasetItemId } = useParams<{ datasetItemId: string }>();
+
+    const prevSelectedMediaItem = useRef<Media | null>(null);
+
+    // This state is responsible for deciding that is the currently displayed media item in the annotator.
+    // This state is computed based on the `selectedDatasetItemId` param and the `items` list.
+    // If the `selectedDatasetItemId` is not found in the `items` list, we will keep the previous selected media item.
+    // That case might happen when we use filters, e.g. current media is annotated and user filters media by status
+    // "Media with missing annotations". It would case the current media to be null (not found in the list) and would
+    // close the annotator unexpectedly.
+    const selectedMediaItem = useMemo(() => {
+        if (selectedDatasetItemId === undefined) {
+            return null;
+        }
+
+        const newSelectedMediaItem = items.find((item) => item.id === selectedDatasetItemId);
+
+        if (newSelectedMediaItem === undefined) {
+            return prevSelectedMediaItem.current;
+        }
+
+        return newSelectedMediaItem;
+    }, [selectedDatasetItemId, items]);
+
+    useEffect(() => {
+        prevSelectedMediaItem.current = selectedMediaItem;
+    }, [selectedMediaItem]);
 
     const onSelectedMediaItemChange = (item: Media | null) => {
         if (item === null) {
@@ -45,8 +73,5 @@ export const useSelectDatasetItem = () => {
         navigate({ pathname: paths.project.dataset.item.index({ projectId, datasetItemId: item.id }), search });
     };
 
-    return {
-        selectedMediaItem: items.find((item) => item.id === selectedDatasetItemId) ?? null,
-        onSelectedMediaItemChange,
-    };
+    return { selectedMediaItem, onSelectedMediaItemChange };
 };
