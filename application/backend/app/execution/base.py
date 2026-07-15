@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from functools import wraps
+from time import perf_counter
 from typing import Any, Generic, TypeVar
 
 from loguru import logger
@@ -37,14 +38,21 @@ def step(name: str, complete: float = 0.0) -> Callable[[Callable[..., T]], Calla
         @wraps(func)
         def wrapper(self: "Execution", *args: Any, **kwargs: Any) -> T:
             self.update_message(f"Started: {name}")
+            # Verbose diagnostic timing around every pipeline step. Helps pinpoint
+            # which step is slow / hanging when a job stalls or times out.
+            logger.debug("[step] ▶ '{}' started", name)
+            start = perf_counter()
             try:
                 result = func(self, *args, **kwargs)
             except ExecutionErr as e:
+                logger.debug("[step] ✖ '{}' failed after {:.3f}s", name, perf_counter() - start)
                 self.update_message(str(e), level="ERROR")
                 raise
             except Exception:
+                logger.debug("[step] ✖ '{}' crashed after {:.3f}s", name, perf_counter() - start)
                 self.update_message(f"Failed: {name}", level="ERROR")
                 raise
+            logger.debug("[step] ✔ '{}' completed in {:.3f}s", name, perf_counter() - start)
             if not self._pinned_message:
                 self._report_progress(f"Completed: {name}", percent=complete)
             else:

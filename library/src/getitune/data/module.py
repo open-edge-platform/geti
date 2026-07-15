@@ -536,6 +536,16 @@ class DataModule(LightningDataModule):
         num_workers = 0 if is_tiled_dataset else config.num_workers
         pin_memory = not is_tiled_dataset
 
+        logger.debug(
+            "Eval dataloader for subset '%s': dataset=%s tiled=%s -> batch_size=%s num_workers=%s pin_memory=%s",
+            config.subset_name,
+            type(dataset).__name__,
+            is_tiled_dataset,
+            batch_size,
+            num_workers,
+            pin_memory,
+        )
+
         return {
             "dataset": dataset,
             "batch_size": batch_size,

@@ -36,6 +36,14 @@ from app.execution.common.getitune_converters import (
     get_getitune_task_type_by_task,
     get_metric_by_task,
 )
+from app.execution.training.diagnostics import (
+    describe_dataloader,
+    log_duration,
+    log_environment,
+    log_gpu_memory,
+    log_shared_memory_usage,
+    log_system_resources,
+)
 from app.models import (
     DatasetItemAnnotationStatus,
     DatasetItemSubset,
@@ -152,13 +160,29 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 local_weights_path = self._base_weights_service.get_local_weights_path(
                     task=task.task_type, model_manifest_id=model_architecture_id
                 )
+                logger.info(
+                    "[weights] Using BASE weights for architecture '{}' (task={}): {} (exists={})",
+                    model_architecture_id,
+                    task.task_type,
+                    local_weights_path,
+                    local_weights_path.exists() if local_weights_path else None,
+                )
                 # Set PRETRAINED_WEIGHTS_CACHE_DIR to let getitune search the weights in the cache folder
                 # defined by the application rather than in the default location
                 os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"] = str(local_weights_path.parent)
+                logger.debug("[weights] PRETRAINED_WEIGHTS_CACHE_DIR set to {}", local_weights_path.parent)
                 return local_weights_path
 
+            logger.info(
+                "[weights] Using PARENT revision weights (parent_model_revision_id={})", parent_model_revision_id
+            )
             parent_variants = self._model_service.get_model_variants(
                 project_id=project_id, model_id=parent_model_revision_id
+            )
+            logger.debug(
+                "[weights] Parent revision has {} variant(s): {}",
+                len(parent_variants) if parent_variants else 0,
+                [getattr(v.format, "value", v.format) for v in parent_variants] if parent_variants else [],
             )
             if not parent_variants:
                 raise ExecutionErr(
@@ -177,6 +201,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             if not weights_path.exists():
                 raise FileNotFoundError(f"Parent model weights not found at {weights_path}")
 
+            logger.info("[weights] Resolved parent PyTorch weights at {}", weights_path)
             return weights_path
 
     @step("Assign Dataset Subsets")
@@ -240,6 +265,38 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             # Convert the configuration to the format adopted by getitune
             converter = GetiConfigConverter()
             getitune_training_config = converter.convert(geti_training_config)
+
+            # --- Verbose diagnostic summary of the resolved getitune config ---
+            try:
+                data_cfg = getitune_training_config.get("data", {})
+                model_cfg = getitune_training_config.get("model", {})
+                tile_cfg = data_cfg.get("tile_config", {})
+                logger.info(
+                    "[config] backend={} model.class_path={} max_epochs={} input_size={}",
+                    getitune_training_config.get("backend", "lightning"),
+                    model_cfg.get("class_path"),
+                    getitune_training_config.get("max_epochs"),
+                    data_cfg.get("input_size"),
+                )
+                logger.info(
+                    "[config] batch_size(train/val/test)={}/{}/{} num_workers(train/val/test)={}/{}/{}",
+                    data_cfg.get("train_subset", {}).get("batch_size"),
+                    data_cfg.get("val_subset", {}).get("batch_size"),
+                    data_cfg.get("test_subset", {}).get("batch_size"),
+                    data_cfg.get("train_subset", {}).get("num_workers"),
+                    data_cfg.get("val_subset", {}).get("num_workers"),
+                    data_cfg.get("test_subset", {}).get("num_workers"),
+                )
+                logger.info(
+                    "[config] tiling enabled={} tile_size={} overlap={} adaptive={}",
+                    tile_cfg.get("enable_tiler"),
+                    tile_cfg.get("tile_size"),
+                    tile_cfg.get("overlap"),
+                    tile_cfg.get("enable_adaptive_tiling"),
+                )
+                logger.debug("[config] full getitune config keys: {}", sorted(getitune_training_config.keys()))
+            except Exception as exc:  # never let diagnostics break config prep
+                logger.debug("[config] failed to summarise getitune config: {}", exc)
 
             return training_config, getitune_training_config
 
@@ -321,6 +378,16 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             dm_training_dataset = dm_dataset.filter_by_subset(Subset.TRAINING)
             dm_validation_dataset = dm_dataset.filter_by_subset(Subset.VALIDATION)
             dm_testing_dataset = dm_dataset.filter_by_subset(Subset.TESTING)
+            try:
+                logger.info(
+                    "[dataset] Raw subset item counts train={} val={} test={} (total={})",
+                    len(dm_training_dataset),
+                    len(dm_validation_dataset),
+                    len(dm_testing_dataset),
+                    len(dm_dataset),
+                )
+            except TypeError as exc:  # never let diagnostics break dataset prep
+                logger.debug("[dataset] could not determine raw subset counts: {}", exc)
 
             # Build a SubsetConfig for each subset based on the training configuration.
             # SubsetConfigs define the transformations applied to the subset, as well the parameters for data loaders.
@@ -330,6 +397,11 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
 
             # Detect storage dtype and propagate to subset configs.
             storage_dtype, num_channels = detect_storage_dtype(dm_training_dataset)
+            logger.info(
+                "[dataset] Detected storage_dtype={} num_channels={} (repeat_channels->3 for grayscale)",
+                storage_dtype,
+                num_channels,
+            )
             for cfg in (train_subset_config, val_subset_config, test_subset_config):
                 cfg.intensity.storage_dtype = storage_dtype
                 if num_channels == 1:
@@ -376,6 +448,13 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 len(getitune_testing_dataset),
             )
             logger.info("Augmentations applied {}", getitune_training_config["data"])
+            logger.debug(
+                "[dataset] getitune dataset types: train={} val={} test={}",
+                type(getitune_training_dataset).__name__,
+                type(getitune_validation_dataset).__name__,
+                type(getitune_testing_dataset).__name__,
+            )
+            log_system_resources("prepare_training_dataset:end")
             return DatasetInfo(
                 getitune_training_dataset=getitune_training_dataset,
                 getitune_validation_dataset=getitune_validation_dataset,
@@ -409,7 +488,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             )
 
     @step("Train Model", 80)
-    def train_model(
+    def train_model(  # noqa: C901, PLR0915
         self,
         training_config: dict,
         dataset_info: DatasetInfo,
@@ -446,6 +525,22 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         )
         # Ensure the datamodule (and downstream model) uses the resolved tiling configuration.
         datamodule.tile_config = dataset_info.tile_config
+        logger.debug(
+            "[train] DataModule ready: task={} input_size={} label_names={} tile_config={}",
+            datamodule.task,
+            datamodule.input_size,
+            datamodule.label_info.label_names,
+            datamodule.tile_config,
+        )
+        # Log the actual dataloader settings in effect for each subset (batch size,
+        # workers, pin_memory, dataset type) — useful for spotting tiled-eval safe
+        # settings and worker/shared-memory issues.
+        try:
+            logger.debug("[train] train_dataloader: {}", describe_dataloader(datamodule.train_dataloader()))
+            logger.debug("[train] val_dataloader:   {}", describe_dataloader(datamodule.val_dataloader()))
+            logger.debug("[train] test_dataloader:  {}", describe_dataloader(datamodule.test_dataloader()))
+        except Exception as exc:
+            logger.debug("[train] failed to describe dataloaders: {}", exc)
 
         logger.info("Instantiating model for training (model_id={})", model_id)
         model_cfg = training_config["model"]
@@ -504,7 +599,20 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         # Forward backend-specific training args (e.g. patience for Ultralytics).
         if "training" in training_config:
             train_kwargs.update(training_config["training"])
-        getitune_engine.train(**train_kwargs)  # pyrefly: ignore[bad-argument-type]
+        logger.debug(
+            "[train] engine={} model={} is_ultralytics={} work_dir={} device={} train_kwargs(keys)={}",
+            type(getitune_engine).__name__,
+            type(getitune_model).__name__,
+            is_ultralytics,
+            engine_kwargs.get("work_dir"),
+            getitune_device_type,
+            sorted(train_kwargs.keys()),
+        )
+        logger.debug("[train] callbacks: {}", [type(cb).__name__ for cb in callbacks_list])
+        log_system_resources("train_model:before_train")
+        log_gpu_memory("train_model:before_train")
+        with log_duration("train_model:engine.train", resources=True, gpu=True):
+            getitune_engine.train(**train_kwargs)  # pyrefly: ignore[bad-argument-type]
 
         trained_model_path = getitune_engine.best_checkpoint
         if trained_model_path is None:
@@ -515,6 +623,10 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         if not trained_model_path.exists():
             raise FileNotFoundError(f"Trained checkpoint not found at {trained_model_path}")
         logger.info("Model training completed. Trained model saved at {}", trained_model_path)
+        try:
+            logger.debug("[train] checkpoint size={:.1f} MiB", trained_model_path.stat().st_size / (1024 * 1024))
+        except OSError as exc:
+            logger.debug("[train] could not stat checkpoint: {}", exc)
         return trained_model_path, getitune_engine
 
     @step("Evaluate Model", 95)
@@ -542,8 +654,18 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         ov_work_dir_base = Path(getitune_engine.work_dir)
         datamodule = getitune_engine.datamodule
 
+        logger.info(
+            "[eval] Evaluating {} variant(s): {}",
+            len(model_variants),
+            [v.format.value for v in model_variants],
+        )
+        logger.debug("[eval] datamodule tile_config={}", getattr(datamodule, "tile_config", None))
+
         for variant in model_variants:
             logger.info("Evaluating the {} model...", variant.format.value)
+            logger.debug("[eval] variant id={} format={} path={}", variant.id, variant.format.value, variant.path)
+            log_system_resources(f"eval:{variant.format.value}:before")
+            log_shared_memory_usage(f"eval:{variant.format.value}:before")
             match variant.format:
                 case ModelFormat.PYTORCH:
                     engine = getitune_engine
@@ -562,13 +684,22 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 case _:
                     raise ExecutionErr(f"Unsupported model variant format for evaluation: {variant.format}")
 
-            metrics = engine.test(metric=metric_callable)
+            with log_duration(f"eval:{variant.format.value}:engine.test", resources=True, gpu=True):
+                metrics = engine.test(metric=metric_callable)
+            logger.info(
+                "[eval] {} metrics: {}",
+                variant.format.value,
+                {k: (round(float(v), 5) if isinstance(v, int | float) else v) for k, v in metrics.items()}
+                if isinstance(metrics, dict)
+                else metrics,
+            )
             self._save_evaluation_result(
                 metrics=metrics,
                 model_revision_id=model_revision_id,
                 model_variant_id=variant.id,
                 dataset_revision_id=dataset_revision_id,
             )
+            logger.debug("[eval] Persisted evaluation result for variant id={}", variant.id)
 
     def _save_evaluation_result(
         self,
@@ -597,19 +728,21 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
 
         """Export the trained model to desired OpenVINO and ONNX formats"""
         logger.info("Exporting the model to OpenVINO format (FP16 precision)...")
-        exported_ov_model_path = getitune_engine.export(
-            checkpoint=model_checkpoint_path,
-            export_format=ExportFormat.OPENVINO,
-            export_precision=Precision.FP16,
-        )
+        with log_duration("export_model:openvino", resources=True):
+            exported_ov_model_path = getitune_engine.export(
+                checkpoint=model_checkpoint_path,
+                export_format=ExportFormat.OPENVINO,
+                export_precision=Precision.FP16,
+            )
         logger.info("Model exported to OpenVINO format: {}", exported_ov_model_path)
 
         logger.info("Exporting the model to ONNX format (FP16 precision)...")
-        exported_onnx_model_path = getitune_engine.export(
-            checkpoint=model_checkpoint_path,
-            export_format=ExportFormat.ONNX,
-            export_precision=Precision.FP16,
-        )
+        with log_duration("export_model:onnx", resources=True):
+            exported_onnx_model_path = getitune_engine.export(
+                checkpoint=model_checkpoint_path,
+                export_format=ExportFormat.ONNX,
+                export_precision=Precision.FP16,
+            )
         logger.info("Model exported to ONNX format: {}", exported_onnx_model_path)
         return ExportedModels(openvino_model_path=exported_ov_model_path, onnx_model_path=exported_onnx_model_path)
 
@@ -717,6 +850,29 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             model_id=params.model_id,
         )
 
+        # --- Verbose diagnostic banner: capture the full training context up-front ---
+        logger.info(
+            "[train] ===== Starting training job ===== "
+            "project_id={} model_id={} architecture_id={} task={} parent_revision_id={} "
+            "dataset_revision_id={} has_model_revision={}",
+            project_id,
+            params.model_id,
+            params.model_architecture_id,
+            getattr(task, "task_type", task),
+            params.parent_model_revision_id,
+            params.dataset_revision_id,
+            params.has_model_revision,
+        )
+        logger.debug(
+            "[train] device: type={} index={} | model_dir={}",
+            params.device.type,
+            params.device.index,
+            model_dir,
+        )
+        log_environment("execute:start")
+        log_system_resources("execute:start")
+        log_gpu_memory("execute:start")
+
         weights_path = self.prepare_weights(training_params=params)
         training_config, getitune_training_config = self.prepare_training_configuration(
             training_params=params, task=task
@@ -797,7 +953,16 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 status=TrainingStatus.SUCCESSFUL,
                 training_finished_at=training_finish_time,
             )
+            logger.info(
+                "[train] ===== Training job completed successfully ===== project_id={} model_id={} duration={}",
+                project_id,
+                params.model_id,
+                training_finish_time - training_start_time,
+            )
+            log_system_resources("execute:success")
+            log_gpu_memory("execute:success")
         except CancelledExc:
+            logger.warning("[train] Training job cancelled (project_id={} model_id={})", project_id, params.model_id)
             try:
                 self.__delete_model_revision(project_id=project_id, model_id=params.model_id)
             except Exception as cleanup_exc:
@@ -810,6 +975,14 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             raise
         except Exception:
             training_finish_time = datetime.now(UTC)
+            logger.exception(
+                "[train] ===== Training job FAILED ===== project_id={} model_id={} duration={}",
+                project_id,
+                params.model_id,
+                training_finish_time - training_start_time,
+            )
+            log_system_resources("execute:failure")
+            log_gpu_memory("execute:failure")
             self.__update_model_revision_training_status(
                 project_id=project_id,
                 model_id=params.model_id,
