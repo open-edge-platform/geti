@@ -294,6 +294,25 @@ class OVModel:
 
         return self._customize_outputs(outputs, inputs)
 
+    def _forward_untiled(self, inputs: SampleBatch) -> PredictionBatch:
+        """Run inference on the raw model, bypassing any model_api ``Tiler`` wrapper.
+
+        The getitune-native tiling path (:meth:`forward_tiles`) is fed tiles that
+        were already produced by the datamodule (``TileBatchData``). For models
+        exported with tiling enabled, :meth:`_setup_tiler` wraps ``self.model`` in a
+        model_api ``Tiler`` so that a *full* image passed to :meth:`forward` is tiled
+        internally. Routing the already-tiled inputs through that wrapper would tile
+        each tile a **second** time, causing a combinatorial blow-up in the number of
+        inference calls (observed as multi-hour, effectively hung, tiled evaluation).
+
+        This helper therefore always targets the underlying, untiled model so each
+        pre-made tile is inferred exactly once, mirroring the Lightning tiling path.
+        """
+        raw_model = self.model.model if isinstance(self.model, Tiler) else self.model
+        numpy_inputs = self._customize_inputs(inputs)["inputs"]
+        outputs = raw_model.infer_batch(numpy_inputs)
+        return self._customize_outputs(outputs, inputs)
+
     def optimize(
         self,
         output_dir: Path,

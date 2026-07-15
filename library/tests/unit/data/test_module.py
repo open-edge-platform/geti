@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
+from typing import Callable
 from unittest.mock import MagicMock
 
 import pytest
@@ -122,6 +123,43 @@ class TestDataModule:
         assert fxt_config.train_subset.input_size == (240, 240)
         assert fxt_config.val_subset.input_size == (240, 240)
         assert fxt_config.test_subset.input_size == (240, 240)
+
+    def test_eval_loader_kwargs_tiled_vs_plain(self) -> None:
+        """Tiled eval subsets must fall back to safe single-process, single-image loading.
+
+        A ``TileDataset`` expands one image into every grid tile, so a collated
+        multi-image batch shipped from a worker through ``/dev/shm`` overflows the
+        (small, containerised) shared memory and kills the worker. The eval loaders
+        therefore use ``batch_size=1``, ``num_workers=0`` and ``pin_memory=False``
+        for tiled datasets only; plain datasets keep the configured throughput
+        settings.
+        """
+        from getitune.data.dataset.tile import TileDataset
+
+        class _FakeTiled(TileDataset):
+            def __init__(self):  # bypass heavy TileDataset construction
+                pass
+
+            @property
+            def collate_fn(self) -> Callable:
+                return lambda batch: batch
+
+        dm = DataModule.__new__(DataModule)
+        config = MagicMock(spec=SubsetConfig)
+        config.batch_size = 8
+        config.num_workers = 4
+
+        plain_dataset = MagicMock()
+        plain_dataset.collate_fn = lambda batch: batch
+        plain_kwargs = dm._eval_loader_kwargs(plain_dataset, config)
+        assert plain_kwargs["batch_size"] == 8
+        assert plain_kwargs["num_workers"] == 4
+        assert plain_kwargs["pin_memory"] is True
+
+        tiled_kwargs = dm._eval_loader_kwargs(_FakeTiled(), config)
+        assert tiled_kwargs["batch_size"] == 1
+        assert tiled_kwargs["num_workers"] == 0
+        assert tiled_kwargs["pin_memory"] is False
 
     def test_init_input_size(
         self,

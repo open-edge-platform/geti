@@ -18,7 +18,7 @@ from torch.utils.data import DataLoader, RandomSampler
 
 from getitune.config.data import SubsetConfig, TileConfig
 from getitune.data.augmentation import CPUAugmentationPipeline
-from getitune.data.dataset.tile import TileDatasetFactory
+from getitune.data.dataset.tile import TileDataset, TileDatasetFactory
 from getitune.data.entity.utils import detect_storage_dtype
 from getitune.data.factory import DatasetFactory
 from getitune.data.utils import get_adaptive_num_workers, instantiate_sampler
@@ -529,8 +529,8 @@ class DataModule(LightningDataModule):
         # pre-built tiled test dataset. Keying off ``enable_tiler`` would therefore
         # miss those tiled datasets and spawn workers that collate huge tile
         # batches, overflowing ``/dev/shm`` and killing the worker. Detect the
-        # tiled dataset by the dataset type itself instead.
-        is_tiled_dataset = hasattr(dataset, "_tiling_transform")
+        # tiled dataset by its concrete type instead.
+        is_tiled_dataset = isinstance(dataset, TileDataset)
 
         batch_size = 1 if is_tiled_dataset else config.batch_size
         num_workers = 0 if is_tiled_dataset else config.num_workers

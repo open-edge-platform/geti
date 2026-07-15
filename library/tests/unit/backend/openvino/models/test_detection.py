@@ -365,9 +365,12 @@ class TestOVDetectionModelTiling:
         """forward_tiles should run per-tile inference and merge results back to the original image."""
         tile_batch = self._make_tile_batch()
 
-        # Per-tile forward returns an (arbitrary) prediction batch.
+        # Per-tile inference must bypass the model_api Tiler wrapper (via _forward_untiled)
+        # so the datamodule-produced tiles are not tiled a second time.
         per_tile_pred = PredictionBatch(images=[], imgs_info=[])
-        detection_model.forward = MagicMock(return_value=per_tile_pred)
+        detection_model._forward_untiled = MagicMock(return_value=per_tile_pred)
+        # The plain tiling forward path must not be used for pre-made tiles.
+        detection_model.forward = MagicMock()
 
         # Merged full-image prediction returned by the tile merger.
         merged = MagicMock()
@@ -394,8 +397,10 @@ class TestOVDetectionModelTiling:
             detection_model._label_info.num_classes,
             detection_model.tile_config,
         )
-        # Per-tile inference ran once for the single unbound tile batch.
-        detection_model.forward.assert_called_once()
+        # Per-tile inference ran once for the single unbound tile batch, via the
+        # untiled path (never the plain tiling forward path).
+        detection_model._forward_untiled.assert_called_once()
+        detection_model.forward.assert_not_called()
         # merge() received the collected per-tile predictions and infos.
         merge_args = mock_merger.merge.call_args.args
         assert merge_args[0] == [per_tile_pred]
@@ -429,3 +434,32 @@ class TestOVDetectionModelTiling:
         detection_model.forward_tiles.assert_called_once_with(tile_batch)
         detection_model.forward.assert_not_called()
         metric.update.assert_called_once()
+
+    def test_forward_untiled_bypasses_model_api_tiler(self, detection_model):
+        """_forward_untiled must infer on the raw model, never the model_api Tiler wrapper.
+
+        Regression guard for the tiled-evaluation double-tiling bug: the datamodule
+        already produces the tiles, so routing them through the model_api ``Tiler``
+        (installed by ``_setup_tiler`` for tiling-aware IR models) would tile each
+        tile a second time, causing a combinatorial explosion of inference calls
+        and effectively hanging evaluation.
+        """
+        from model_api.tilers import DetectionTiler
+
+        raw_model = MagicMock(name="raw_model")
+        raw_model.infer_batch.return_value = [_FakeDetectionResult(np.empty((0, 4)), np.empty((0,)), np.empty((0,)))]
+
+        # Wrap the raw model in a real DetectionTiler instance (attribute access only,
+        # no inference), mirroring the state after ``_setup_tiler``.
+        tiler = DetectionTiler.__new__(DetectionTiler)
+        tiler.model = raw_model
+        detection_model.model = tiler
+
+        sample_batch = SampleBatch(images=[torch.rand(3, 200, 200)], imgs_info=[self._make_tile_batch().imgs_info[0]])
+        detection_model._customize_inputs = MagicMock(return_value={"inputs": [np.empty((200, 200, 3))]})
+        detection_model._customize_outputs = MagicMock(return_value=PredictionBatch(images=[], imgs_info=[]))
+
+        detection_model._forward_untiled(sample_batch)
+
+        # Inference ran on the underlying (untiled) model, not on the Tiler wrapper.
+        raw_model.infer_batch.assert_called_once()

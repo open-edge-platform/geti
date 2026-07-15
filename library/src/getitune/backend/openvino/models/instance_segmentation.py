@@ -281,7 +281,7 @@ class OVInstanceSegmentationModel(OVModel):
             self.tile_config,
         )
         for batch_tile_infos, batch_tile_input in inputs.unbind():
-            tile_preds.append(self(batch_tile_input))
+            tile_preds.append(self._forward_untiled(batch_tile_input))
             tile_infos.append(batch_tile_infos)
 
         pred_entities = merger.merge(tile_preds, tile_infos)
