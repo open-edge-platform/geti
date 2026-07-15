@@ -33,7 +33,6 @@ Decisions driving this design (agreed with stakeholders):
 - A single, searchable entry point in the Train dialog that scales to 1400+ architectures.
 - Per-architecture default hyperparameters resolved dynamically on selection.
 - Clear, architecture-specific defaults while retaining the existing curated-model experience.
-experience.
 
 ---
 
@@ -107,7 +106,7 @@ The snapshot generator records `model_name`, the fields from `get_pretrained_cfg
 - A generic timm backbone already exists: `TimmBackbone` (`src/getitune/backend/lightning/models/classification/backbones/timm.py`) wraps `timm.create_model(...)` and accepts any `model_name: str`.
 - Task models already exist and accept `model_name`:
   - `TimmModelMulticlassCls` and `TimmModelMultilabelCls` (`.../classification/{multiclass,multilabel}_models/timm_model.py`).
-  - A `TimmModel` factory (`.../classification/factory.py`) dispatches by task and exposes `TimmModel.list_models()` → `timm.list_models(pretrained=True)` ("over 900 models as of 2025").
+  - A `TimmModel` factory (`.../classification/factory.py`) dispatches by task and exposes `TimmModel.list_models()` → `timm.list_models(pretrained=True)`
 
 Blockers at scale:
 
@@ -580,7 +579,7 @@ All under `application/ui/src/features/models/train-model/`. Curated cards are u
 
 The selector stores the concrete architecture id. Changing the selection invalidates the previous training-configuration query and requests the newly selected id, so the backend builds a new dynamic manifest and returns new defaults.
 
-## 5.3 Testing
+### 5.3 Testing
 
 - Library unit/model tests: for representative models from CNN and transformer families, verify the `timm.optim.create_optimizer_v2` options, then instantiate → 1-step train → export (OpenVINO/ONNX).
 - Backend unit tests: `model_name ↔ id` round-trip; `TimmManifestProvider.build_manifest` produces a schema-valid `ModelManifest` (respecting `extra="forbid"`); lazy `get_model_manifest_by_id` for timm ids; `GetiConfigConverter._resolve_recipe` + LR-injection fallback; `/timm/backbones` search/pagination/facets against a fixture snapshot.
@@ -590,7 +589,7 @@ The selector stores the concrete architecture id. Changing the selection invalid
 
 ---
 
-### 5.6 Complete Flow Example
+### 5.4 Complete Flow Example
 
 ```text
 User opens the Train dialog
