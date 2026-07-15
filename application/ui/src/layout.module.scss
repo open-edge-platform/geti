@@ -4,6 +4,7 @@
 .tabList {
     --spectrum-tabs-rule-height: var(--spectrum-global-dimension-size-50);
     --spectrum-tabs-selection-indicator-color: var(--energy-blue);
+    --spectrum-tabs-text-size: var(--spectrum-global-dimension-size-200);
 
     div[class*='spectrum-Tabs'],
     div[class*='spectrum-TabList'] {
@@ -12,6 +13,6 @@
 }
 
 .logo {
-    width: var(--spectrum-global-dimension-size-200);
-    height: var(--spectrum-global-dimension-size-200);
+    width: var(--spectrum-global-dimension-size-400);
+    height: var(--spectrum-global-dimension-size-400);
 }

@@ -1,7 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button, FileTrigger } from '@geti-ui/ui';
+import { ActionButton, FileTrigger, Tooltip, TooltipTrigger } from '@geti-ui/ui';
+import { Share } from '@geti-ui/ui/icons';
 
 import { acceptedExtensions } from '../../utils';
 
@@ -24,9 +25,12 @@ export const AddMediaButton = ({ onFileUpload, isDisabled = false }: AddMediaBut
             allowsMultiple
             onSelect={handleFileSelect}
         >
-            <Button variant={'secondary'} isDisabled={isDisabled}>
-                Upload media
-            </Button>
+            <TooltipTrigger>
+                <ActionButton isQuiet aria-label='Upload media' isDisabled={isDisabled}>
+                    <Share />
+                </ActionButton>
+                <Tooltip>Upload media</Tooltip>
+            </TooltipTrigger>
         </FileTrigger>
     );
 };

@@ -1,18 +1,50 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Flex } from '@geti-ui/ui';
+import {
+    ActionButton,
+    Content,
+    Dialog,
+    DialogTrigger,
+    Divider,
+    Flex,
+    Heading,
+    Tooltip,
+    TooltipTrigger,
+} from '@geti-ui/ui';
+import { Filter } from '@geti-ui/ui/icons';
 
+import { DateFilter } from './date-filter/date-filter.component';
 import { FilterByStatus } from './filter-by-status/filter-by-status.component';
+import { FilterBySubset } from './filter-by-subset/filter-by-subset.component';
 import { MediaFilterLabels } from './media-filter-labels/media-filter-labels.component';
-import { MoreDatasetMediaFilters } from './more-dataset-media-filters.component';
 
 export const MediaFiltering = () => {
     return (
-        <Flex direction={'row'} gap={'size-200'} alignItems={'center'}>
-            <FilterByStatus width={'size-3000'} />
-            <MediaFilterLabels />
-            <MoreDatasetMediaFilters />
-        </Flex>
+        <DialogTrigger type={'popover'} placement={'bottom'}>
+            <TooltipTrigger>
+                <ActionButton isQuiet aria-label={'Filters'}>
+                    <Filter />
+                </ActionButton>
+                <Tooltip>Filters</Tooltip>
+            </TooltipTrigger>
+            <Dialog size='S'>
+                <Heading>Filters</Heading>
+                <Divider />
+                <Content>
+                    <Flex direction='column' gap='size-300'>
+                        <FilterByStatus width={'100%'} />
+
+                        <MediaFilterLabels />
+
+                        <DateFilter />
+
+                        <Divider size='M' />
+
+                        <FilterBySubset />
+                    </Flex>
+                </Content>
+            </Dialog>
+        </DialogTrigger>
     );
 };

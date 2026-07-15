@@ -1,7 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button, Item, Key, Menu, MenuTrigger } from '@geti-ui/ui';
+import { ActionButton, Item, Key, Menu, MenuTrigger } from '@geti-ui/ui';
+import { Datasets } from '@geti-ui/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
 import { ExportDatasetConfig } from '../../../components/export-dataset-config-dialog/export-dataset-config.component';
@@ -29,9 +30,9 @@ export const ImportExport = () => {
     return (
         <>
             <MenuTrigger>
-                <Button variant='secondary' aria-label='import-export dataset'>
-                    Export/Import
-                </Button>
+                <ActionButton isQuiet aria-label='Export/Import dataset'>
+                    <Datasets />
+                </ActionButton>
                 <Menu onAction={handleMenuAction}>
                     <Item key='export'>Export dataset</Item>
                     <Item key='import'>Import dataset</Item>

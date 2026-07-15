@@ -12,9 +12,10 @@ import classes from './delete-media-item.module.scss';
 type DeleteMediaItemProps = {
     itemsIds: string[];
     onDeleted?: (deletedIds: string[]) => void;
+    isDisabled?: boolean;
 };
 
-export const DeleteMediaItem = ({ itemsIds = [], onDeleted }: DeleteMediaItemProps) => {
+export const DeleteMediaItem = ({ itemsIds = [], onDeleted, isDisabled = false }: DeleteMediaItemProps) => {
     const { deleteMedia, openDeleteDialog, closeDeleteDialog, isPending, isDeleteDialogOpen } = useDeleteMediaItem();
 
     const handleDelete = async () => {
@@ -27,7 +28,7 @@ export const DeleteMediaItem = ({ itemsIds = [], onDeleted }: DeleteMediaItemPro
                 <ActionButton
                     isQuiet
                     aria-label='delete media item'
-                    isDisabled={isPending}
+                    isDisabled={isDisabled || isPending}
                     UNSAFE_className={classes.deleteButton}
                     onPress={openDeleteDialog}
                 >

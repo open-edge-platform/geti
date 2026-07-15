@@ -14,7 +14,9 @@ export const TrainModel = () => {
 
     return (
         <DialogTrigger>
-            <Button margin={0}>Train model</Button>
+            <Button variant={'accent'} margin={0}>
+                Train model
+            </Button>
             {(close) => (
                 <Suspense
                     fallback={
