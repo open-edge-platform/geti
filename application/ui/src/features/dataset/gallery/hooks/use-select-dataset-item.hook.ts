@@ -24,7 +24,7 @@ export const useSelectDatasetItem = () => {
     // This state is computed based on the `selectedDatasetItemId` param and the `items` list.
     // If the `selectedDatasetItemId` is not found in the `items` list, we will keep the previous selected media item.
     // That case might happen when we use filters, e.g. current media is annotated and user filters media by status
-    // "Media with missing annotations". It would case the current media to be null (not found in the list) and would
+    // "Media with missing annotations". It would cause the current media to be null (not found in the list) and would
     // close the annotator unexpectedly.
     const selectedMediaItem = useMemo(() => {
         if (selectedDatasetItemId === undefined) {
