@@ -2,11 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import shutil
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Any
 from uuid import UUID, uuid4
 
 import polars as pl
+from datumaro.experimental import Dataset
 from loguru import logger
 from PIL import Image, UnidentifiedImageError
 from sqlalchemy.exc import IntegrityError
@@ -24,9 +26,6 @@ from app.utils.images import convert_to_jpeg_compatible, crop_to_thumbnail
 from .base import BaseSessionManagedService, ResourceNotFoundError, ResourceType
 from .media_service import InvalidImageError
 
-if TYPE_CHECKING:
-    from datumaro.experimental import Dataset
-
 # Thumbnails for dataset revisions are generated on the fly and need to be smaller than pregenerated thumbnails
 DATASET_REVISION_ITEM_THUMBNAIL_SIZE = 128
 
@@ -36,7 +35,7 @@ class DatasetRevisionService(BaseSessionManagedService):
         super().__init__(db_session)
         self.projects_dir = data_dir / "projects"
 
-    def save_revision(self, project_id: UUID, dataset: "Dataset") -> UUID:
+    def save_revision(self, project_id: UUID, dataset: Dataset) -> UUID:
         """
         Saves the dataset as a new revision.
 
@@ -82,6 +81,7 @@ class DatasetRevisionService(BaseSessionManagedService):
                     validation_count=item_counts.validation,
                     testing_count=item_counts.testing,
                     size=size_in_bytes,
+                    created_at=datetime.now(UTC),  # Set created_at explicitly with microsecond precision.
                 )
             )
         except (IntegrityError, PrimaryKeyIntegrityError, UniqueConstraintIntegrityError):
@@ -93,7 +93,7 @@ class DatasetRevisionService(BaseSessionManagedService):
 
         return UUID(revision_db.id)
 
-    def load_revision(self, project_id: UUID, dataset_revision_id: UUID) -> "Dataset":
+    def load_revision(self, project_id: UUID, dataset_revision_id: UUID) -> Dataset:
         """
         Loads the Datumaro dataset belonging to the dataset revision.
 
@@ -282,7 +282,7 @@ class DatasetRevisionService(BaseSessionManagedService):
 
         return parquet_path
 
-    def _count_dataset_revision_items(self, dataset: "Dataset") -> DatasetRevisionCounts:
+    def _count_dataset_revision_items(self, dataset: Dataset) -> DatasetRevisionCounts:
         """
         Count the number of dataset items in a dataset revision, grouped by subset.
 
@@ -361,7 +361,7 @@ class DatasetRevisionService(BaseSessionManagedService):
         dataset_revision: DatasetRevision,
         limit: int = 10,
         offset: int = 0,
-        subset: DatasetItemSubset | None = None,
+        subsets: list[DatasetItemSubset] | None = None,
     ) -> tuple[list[DatasetRevisionItem], int]:
         """
         List items in a dataset revision with pagination and filtering.
@@ -371,7 +371,7 @@ class DatasetRevisionService(BaseSessionManagedService):
             dataset_revision: The dataset revision.
             limit: Maximum number of items to return.
             offset: Number of items to skip.
-            subset: Optional subset filter.
+            subsets: Optional list of subsets to filter by.
 
         Returns:
             Tuple of (list of items as dicts, total count).
@@ -380,8 +380,8 @@ class DatasetRevisionService(BaseSessionManagedService):
 
         df = pl.scan_parquet(parquet_path)
 
-        if subset is not None:
-            df = df.filter(pl.col("subset") == subset.name)
+        if subsets:
+            df = df.filter(pl.col("subset").is_in([s.name for s in subsets]))
 
         total_count = df.select(pl.len()).collect().item()
         df = df.slice(offset, limit).collect()

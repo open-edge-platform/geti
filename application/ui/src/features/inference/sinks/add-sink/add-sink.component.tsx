@@ -3,12 +3,12 @@
 
 import { ReactNode } from 'react';
 
-import { Button, Form } from '@geti/ui';
+import type { SinkConfig } from '@/api/types';
+import { Button, Form } from '@geti-ui/ui';
 
 import { usePatchPipeline } from '../../../../hooks/api/pipeline.hook';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';
 import { useSinkAction } from '../hooks/use-sink-action.hook';
-import { SinkConfig } from '../utils';
 
 interface AddSinkProps<T> {
     config: Awaited<T>;
@@ -40,7 +40,7 @@ export const AddSink = <T extends SinkConfig>({ config, onSaved, bodyFormatter, 
                 isDisabled={isPending || pipeline.isPending}
                 UNSAFE_style={{ maxWidth: 'fit-content' }}
             >
-                Add & Connect
+                Add & Use
             </Button>
         </Form>
     );

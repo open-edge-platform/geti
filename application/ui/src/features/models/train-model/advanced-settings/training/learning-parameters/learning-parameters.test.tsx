@@ -3,12 +3,12 @@
 
 import { useState } from 'react';
 
+import type { NumberConfigurableParameter, TrainingConfiguration } from '@/api/types';
 import { fireEvent, screen, Screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from 'test-utils/render';
 import { describe } from 'vitest';
 
-import { NumberConfigurableParameter, TrainingConfiguration } from '../../../../../../constants/shared-types';
 import { getStep } from '../../components/utils';
 import { isBoolEnableParameterGroup, isNumberParameter } from '../../utils';
 import { LearningParameters } from './learning-parameters.component';
@@ -52,10 +52,20 @@ const expectNumberParameter = async (parameter: NumberConfigurableParameter, gro
 
     expect(parameterInput).toHaveValue(parameter.value.toString());
 
-    await userEvent.click(parameterInput as HTMLElement);
-    await userEvent.keyboard('{ArrowUp}');
+    // Round to avoid floating-point noise (e.g. 0.004 + 0.0001).
+    const newValue = Math.round((parameter.value + step) * 1e6) / 1e6;
 
-    expect(parameterInput).toHaveValue((parameter.value + step).toString());
+    await userEvent.click(parameterInput as HTMLElement);
+
+    if (parameter.value_type === 'int') {
+        await userEvent.keyboard('{ArrowUp}');
+    } else {
+        await userEvent.clear(parameterInput as HTMLElement);
+        await userEvent.type(parameterInput as HTMLElement, newValue.toString());
+        await userEvent.tab();
+    }
+
+    expect(parameterInput).toHaveValue(newValue.toString());
 
     resetParameter(parameter.name, wrapper);
     expect(getParameter(parameter.name, wrapper)).toHaveValue(parameter.default_value.toString());

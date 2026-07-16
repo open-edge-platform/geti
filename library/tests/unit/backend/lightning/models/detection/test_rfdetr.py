@@ -407,6 +407,7 @@ class TestRFDETR:
         model = RFDETR(
             model_name=model_name,  # pyrefly: ignore[bad-argument-type]
             label_info=3,
+            pretrained=False,
         )
         assert model.model_name == model_name
         assert model.num_classes == 3
@@ -414,8 +415,9 @@ class TestRFDETR:
     def test_create_model(self) -> None:
         """Test RF-DETR model creation."""
         model = RFDETR(
-            model_name="rfdetr_base",
+            model_name="rfdetr_medium",
             label_info=10,
+            pretrained=False,
         )
         created_model = model._create_model()
         assert created_model is not None
@@ -429,23 +431,25 @@ class TestRFDETR:
     def test_default_preprocessing_params(self) -> None:
         """Test default preprocessing parameters for different model variants."""
         model = RFDETR(
-            model_name="rfdetr_base",
+            model_name="rfdetr_medium",
             label_info=3,
+            pretrained=False,
         )
 
         # Check that default params use 0-1 range normalization
         default_params = model._default_preprocessing_params
-        assert "rfdetr_base" in default_params
-        assert default_params["rfdetr_base"].input_size == (560, 560)
+        assert "rfdetr_medium" in default_params
+        assert default_params["rfdetr_medium"].input_size == (576, 576)
         # ImageNet mean in 0-1 range
-        assert default_params["rfdetr_base"].mean == (0.485, 0.456, 0.406)
-        assert default_params["rfdetr_base"].std == (0.229, 0.224, 0.225)
+        assert default_params["rfdetr_medium"].mean == (0.485, 0.456, 0.406)
+        assert default_params["rfdetr_medium"].std == (0.229, 0.224, 0.225)
 
     def test_optimizer_configuration(self) -> None:
         """Test that optimizer configuration is properly set."""
         model = RFDETR(
             model_name="rfdetr_nano",
             label_info=5,
+            pretrained=False,
         )
 
         # Test configure_optimizers method
@@ -471,11 +475,12 @@ class TestRFDETR:
         input_sizes = {
             "rfdetr_nano": (384, 384),
             "rfdetr_small": (512, 512),
-            "rfdetr_base": (560, 560),
+            "rfdetr_medium": (576, 576),
         }
         model = RFDETR(
             model_name=model_name,  # pyrefly: ignore[bad-argument-type]
             label_info=label_info,
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests
@@ -504,13 +509,14 @@ class TestRFDETR:
         input_sizes = {
             "rfdetr_nano": (384, 384),
             "rfdetr_small": (512, 512),
-            "rfdetr_base": (560, 560),
+            "rfdetr_medium": (576, 576),
         }
         input_size = input_sizes[model_name]
 
         model = RFDETR(
             model_name=model_name,  # pyrefly: ignore[bad-argument-type]
             label_info=3,
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests
@@ -540,13 +546,14 @@ class TestRFDETR:
         input_sizes = {
             "rfdetr_nano": (384, 384),
             "rfdetr_small": (512, 512),
-            "rfdetr_base": (560, 560),
+            "rfdetr_medium": (576, 576),
         }
         input_size = input_sizes[model_name]
 
         model = RFDETR(
             model_name=model_name,  # pyrefly: ignore[bad-argument-type]
             label_info=3,
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests
@@ -565,6 +572,7 @@ class TestRFDETR:
             model_name="rfdetr_nano",
             label_info=3,
             multi_scale=True,
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests

@@ -19,6 +19,7 @@ from app.services import (
     ResourceInUseError,
     ResourceNotFoundError,
     ResourceType,
+    ResourceValidationError,
     ResourceWithNameAlreadyExistsError,
     SourceUpdateService,
 )
@@ -100,6 +101,18 @@ class TestSourceEndpoints:
         assert response.status_code == status.HTTP_409_CONFLICT
         fxt_source_update_service.create_source.assert_called_once()
 
+    def test_create_source_not_reachable(self, fxt_usb_camera_source_create, fxt_source_update_service, fxt_client):
+        err = ResourceValidationError(
+            ResourceType.SOURCE, str(fxt_usb_camera_source_create.id), "Could not open USB camera device 1"
+        )
+        fxt_source_update_service.create_source.side_effect = err
+
+        response = fxt_client.post("/api/sources", json=fxt_usb_camera_source_create.model_dump(exclude={"id"}))
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        assert response.json()["detail"] == str(err)
+        fxt_source_update_service.create_source.assert_called_once()
+
     def test_list_sources(
         self, fxt_usb_camera_source_view, fxt_video_source_view, fxt_source_update_service, fxt_client, request
     ):
@@ -160,6 +173,16 @@ class TestSourceEndpoints:
         response = fxt_client.patch(f"/api/sources/{source_id}", json={"name": "Updated"})
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_update_source_not_reachable(self, fxt_get_source, fxt_source_update_service, fxt_client):
+        source_id = str(fxt_get_source.id)
+        err = ResourceValidationError(ResourceType.SOURCE, source_id, "Could not open USB camera device 5")
+        fxt_source_update_service.update_source.side_effect = err
+
+        response = fxt_client.patch(f"/api/sources/{source_id}", json={"device_id": 5})
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        assert response.json()["detail"] == str(err)
 
     def test_update_source_type_forbidden(self, fxt_usb_camera_source_create, fxt_source_update_service, fxt_client):
         source_id = str(fxt_usb_camera_source_create.id)
@@ -242,6 +265,21 @@ class TestSourceEndpoints:
         response = fxt_client.post("/api/sources:import", files=files)
 
         assert response.status_code == status.HTTP_409_CONFLICT
+        fxt_source_update_service.create_source.assert_called_once()
+
+    def test_import_source_not_reachable(self, fxt_usb_camera_source_view, fxt_source_update_service, fxt_client):
+        sink_data = fxt_usb_camera_source_view.model_dump(exclude={"id"}, mode="json")
+        yaml_content = yaml.safe_dump(sink_data)
+        err = ResourceValidationError(
+            ResourceType.SOURCE, str(fxt_usb_camera_source_view.id), "Could not open USB camera device 1"
+        )
+        fxt_source_update_service.create_source.side_effect = err
+
+        files = {"yaml_file": ("test.yaml", io.BytesIO(yaml_content.encode()), "application/x-yaml")}
+        response = fxt_client.post("/api/sources:import", files=files)
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        assert response.json()["detail"] == str(err)
         fxt_source_update_service.create_source.assert_called_once()
 
     def test_import_source_invalid_yaml(self, fxt_client):

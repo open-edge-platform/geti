@@ -1,12 +1,13 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { $api } from '@/api';
+import type { SinkConfig } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { omit } from 'lodash-es';
 
-import { $api } from '../../../../api/client';
 import { getQueryKey } from '../../../../query-client/query-client';
-import { SinkConfig } from '../utils';
+import { testSinkQueryOptions } from '../api/use-test-sink';
 
 const useUpdateSink = () => {
     const queryClient = useQueryClient();
@@ -14,6 +15,9 @@ const useUpdateSink = () => {
     return $api.useMutation('patch', '/api/sinks/{sink_id}', {
         meta: {
             invalidateQueries: [['get', '/api/sinks']],
+            error: {
+                notify: () => false,
+            },
         },
         onSuccess: (
             _,
@@ -31,26 +35,42 @@ const useUpdateSink = () => {
 };
 
 export const useSinkMutation = (isNewSink: boolean) => {
+    const queryClient = useQueryClient();
+
     const addSink = $api.useMutation('post', '/api/sinks', {
         meta: {
             invalidateQueries: [['get', '/api/sinks']],
+            error: {
+                notify: () => false,
+            },
         },
     });
 
     const updateSink = useUpdateSink();
 
     return async (body: SinkConfig) => {
+        let sinkId: string;
+
         if (isNewSink) {
             const response = await addSink.mutateAsync({ body: omit(body, 'id') as SinkConfig });
 
-            return String(response.id);
+            sinkId = String(response.id);
+        } else {
+            const response = await updateSink.mutateAsync({
+                params: { path: { sink_id: String(body.id) } },
+                body: omit(body, 'sink_type'),
+            });
+
+            sinkId = String(response.id);
         }
 
-        const response = await updateSink.mutateAsync({
-            params: { path: { sink_id: String(body.id) } },
-            body: omit(body, 'sink_type'),
-        });
+        void queryClient
+            .fetchQuery({
+                ...testSinkQueryOptions(sinkId),
+                staleTime: 0,
+            })
+            .catch(() => undefined);
 
-        return String(response.id);
+        return sinkId;
     };
 };

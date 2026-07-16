@@ -1,8 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ActionButton, Text, View } from '@geti/ui';
-import { AddCircle } from '@geti/ui/icons';
+import { ActionButton, Flex, Text, View } from '@geti-ui/ui';
+import { AddCircle } from '@geti-ui/ui/icons';
 import { useNavigate } from 'react-router-dom';
 
 import { paths } from '../../../../constants/paths';
@@ -26,8 +26,8 @@ export const NewProjectCard = () => {
     };
 
     return (
-        <>
-            <View UNSAFE_className={classes.card}>
+        <Flex gap={'size-300'}>
+            <View UNSAFE_className={classes.card} flex={1}>
                 <ActionButton onPress={handleCreateProject} UNSAFE_className={classes.buttonText}>
                     <AddCircle />
                     <Text>
@@ -36,6 +36,8 @@ export const NewProjectCard = () => {
                         new project
                     </Text>
                 </ActionButton>
+            </View>
+            <View UNSAFE_className={classes.card} flex={1}>
                 <ActionButton onPress={handleCreateFromDataset} UNSAFE_className={classes.buttonText}>
                     <AddCircle />
                     <Text>
@@ -46,6 +48,6 @@ export const NewProjectCard = () => {
                 </ActionButton>
             </View>
             <ImportDatasetAsNewProject dialogState={datasetImportDialogState} />
-        </>
+        </Flex>
     );
 };

@@ -1,9 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Flex, Switch, TextField } from '@geti/ui';
-
-import type { ImagesFolderSourceConfig } from '../../../../constants/shared-types';
+import type { ImagesFolderSourceConfig } from '@/api/types';
+import { Flex, Switch, TextField } from '@geti-ui/ui';
 
 type ImageFolderProps = {
     defaultState?: ImagesFolderSourceConfig;

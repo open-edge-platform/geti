@@ -3,10 +3,22 @@
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
-import { Button, ButtonGroup, Checkbox, dimensionValue, Divider, Flex, MediaViewModes, ViewModes } from '@geti/ui';
+import type { Media } from '@/api/types';
+import {
+    ActionButton,
+    Button,
+    ButtonGroup,
+    Checkbox,
+    dimensionValue,
+    Divider,
+    Flex,
+    MediaViewModes,
+    ViewModes,
+} from '@geti-ui/ui';
+import { SortDown, SortUp } from '@geti-ui/ui/icons';
+import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { isString } from 'lodash-es';
 
-import type { Media } from '../../../../constants/shared-types';
 import { isImage } from '../../../../shared/media-item-utils';
 import { TrainModel } from '../../../models/train-model/train-model.component';
 import { ImportExport } from '../../import-export/import-export.component';
@@ -15,9 +27,7 @@ import { DeleteMediaItem } from '../delete-media-item/delete-media-item.componen
 import { useSelectDatasetItem } from '../hooks/use-select-dataset-item.hook';
 import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
-import { DateFilter } from './date-filter/date-filter.component';
-import { FilterByStatus } from './filter-by-status/filter-by-status.component';
-import { MediaFilterLabels } from './media-filter-labels/media-filter-labels.component';
+import { MediaFiltering } from './media-filtering/media-filtering.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
 import { toggleMultipleSelection } from './util';
@@ -38,6 +48,24 @@ const AnnotateButton = ({ isDisabled, onClick }: AnnotateButtonProps) => {
         <Button margin={0} variant={'primary'} onPress={onClick} isDisabled={isDisabled}>
             Annotate
         </Button>
+    );
+};
+
+const SortMediaByUploadDate = () => {
+    const { sortDirection, setSortDirection } = useDatasetFiltersSearchParams();
+
+    if (sortDirection === 'asc') {
+        return (
+            <ActionButton isQuiet onPress={() => setSortDirection('desc')}>
+                Oldest first <SortUp />
+            </ActionButton>
+        );
+    }
+
+    return (
+        <ActionButton isQuiet onPress={() => setSortDirection('asc')}>
+            Newest first <SortDown />
+        </ActionButton>
     );
 };
 
@@ -102,6 +130,8 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                         isSelected={hasSelectedElements && totalSelectedElements === items.length}
                     />
 
+                    <SortMediaByUploadDate />
+
                     <Divider orientation={'vertical'} size={'S'} />
 
                     {hasSelectedElements && (
@@ -117,11 +147,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     {noMediaSelected && (
                         <>
-                            <FilterByStatus />
-
-                            <MediaFilterLabels />
-
-                            <DateFilter />
+                            <MediaFiltering />
 
                             <DatasetStatistics />
 

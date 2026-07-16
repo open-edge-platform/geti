@@ -1,14 +1,15 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Button, Content, ContextualHelp, DialogTrigger, Flex, Text } from '@geti/ui';
+import type { Model } from '@/api/types';
+import { Button, Content, ContextualHelp, DialogTrigger, Flex, Text } from '@geti-ui/ui';
 
 import { QuantizationDialog } from './quantization-dialog/quantization-dialog.component';
 
 type QuantizationRowProps = {
-    modelId: string;
+    model: Model;
 };
-export const QuantizationRow = ({ modelId }: QuantizationRowProps) => {
+export const QuantizationRow = ({ model }: QuantizationRowProps) => {
     return (
         <Flex marginTop={'size-150'} alignItems={'center'} justifyContent={'space-between'}>
             <Flex>
@@ -22,7 +23,7 @@ export const QuantizationRow = ({ modelId }: QuantizationRowProps) => {
             </Flex>
             <DialogTrigger>
                 <Button variant={'secondary'}>Start quantization</Button>
-                {(close) => <QuantizationDialog modelId={modelId} onClose={close} />}
+                {(close) => <QuantizationDialog model={model} onClose={close} />}
             </DialogTrigger>
         </Flex>
     );

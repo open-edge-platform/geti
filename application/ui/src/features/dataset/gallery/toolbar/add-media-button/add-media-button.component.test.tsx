@@ -4,7 +4,8 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import { acceptedExtensions, AddMediaButton } from './add-media-button.component';
+import { acceptedExtensions } from '../../utils';
+import { AddMediaButton } from './add-media-button.component';
 
 describe('AddMediaButton', () => {
     it('calls onFilesSelected correctly', () => {
@@ -16,7 +17,7 @@ describe('AddMediaButton', () => {
 
         render(<AddMediaButton onFileUpload={mockOnFilesSelected} />);
 
-        const input = screen.getByLabelText(/Upload media files/);
+        const input = screen.getByTestId('upload-media-input');
         fireEvent.change(input, { target: { files: [mockFile] } });
 
         expect(mockOnFilesSelected).toHaveBeenCalledWith([mockFile]);
@@ -25,7 +26,7 @@ describe('AddMediaButton', () => {
     it('sets the expected accepted file extensions', () => {
         render(<AddMediaButton onFileUpload={vi.fn()} />);
 
-        const input = screen.getByLabelText(/Upload media files/);
+        const input = screen.getByTestId('upload-media-input');
 
         expect(input).toHaveAttribute('accept', acceptedExtensions);
     });
@@ -36,7 +37,7 @@ describe('AddMediaButton', () => {
         render(<AddMediaButton onFileUpload={mockOnFilesSelected} />);
 
         const button = screen.getByRole('button', { name: /Upload media/ });
-        const input = screen.getByLabelText(/Upload media files/) as HTMLInputElement;
+        const input = screen.getByTestId('upload-media-input') as HTMLInputElement;
 
         const clickSpy = vi.spyOn(input, 'click');
         fireEvent.click(button);

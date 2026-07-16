@@ -39,7 +39,7 @@ const getPublicApiUrl = () => {
     }
 
     if (isTauriBuild) {
-        return 'http://localhost:7860';
+        return 'https://localhost:7860';
     }
 
     return '';
@@ -62,6 +62,7 @@ export default defineConfig({
         pluginSass(),
 
         pluginSvgr({
+            parallel: true,
             svgrOptions: {
                 exportType: 'named',
             },

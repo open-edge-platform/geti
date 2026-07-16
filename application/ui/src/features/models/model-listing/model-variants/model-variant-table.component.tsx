@@ -1,6 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { API_BASE_URL } from '@/api';
+import type { Model, ModelFormat, ModelVariant } from '@/api/types';
 import {
     ActionButton,
     Cell,
@@ -14,14 +16,12 @@ import {
     TableHeader,
     TableView,
     Text,
-} from '@geti/ui';
-import { DownloadIcon } from '@geti/ui/icons';
+} from '@geti-ui/ui';
+import { DownloadIcon } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { get } from 'lodash-es';
 import { useNumberFormatter } from 'react-aria';
 
-import { API_BASE_URL } from '../../../../api/client';
-import type { Model, ModelFormat, ModelVariant } from '../../../../constants/shared-types';
 import { downloadFile, formatBytes } from '../../../../shared/util';
 import {
     getBaselineVariant,

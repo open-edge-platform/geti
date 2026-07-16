@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 from functools import partial
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, ClassVar
 
 import torch
@@ -15,7 +14,6 @@ from torch.nn import SyncBatchNorm
 
 from getitune.backend.lightning.models.modules import build_norm_layer
 from getitune.backend.lightning.models.modules.base_module import BaseModule
-from getitune.backend.lightning.models.utils.utils import load_checkpoint_to_model, load_from_http
 
 if TYPE_CHECKING:
     from torch import Tensor
@@ -348,8 +346,6 @@ class MSCANModule(nn.Module):
             Defaults to ``nn.GELU``.
         normalization (Callable[..., nn.Module]): Normalization layer module.
             Defaults to ``partial(build_norm_layer, SyncBatchNorm, requires_grad=True)``.
-        init_cfg (Optional[Union[Dict[str, str], List[Dict[str, str]]]]): Initialization config dict.
-            Defaults to None.
     """
 
     def __init__(
@@ -365,7 +361,6 @@ class MSCANModule(nn.Module):
         attention_kernel_paddings: list[int | list[int]] = [2, [0, 3], [0, 5], [0, 10]],  # noqa: B006
         activation: Callable[..., nn.Module] = nn.GELU,
         normalization: Callable[..., nn.Module] = partial(build_norm_layer, nn.BatchNorm2d, requires_grad=True),
-        pretrained_weights: str | None = None,
     ) -> None:
         """Initialize a MSCAN backbone."""
         super().__init__()
@@ -408,9 +403,6 @@ class MSCANModule(nn.Module):
             setattr(self, f"block{i + 1}", block)
             setattr(self, f"norm{i + 1}", norm)
 
-        if pretrained_weights is not None:
-            self.load_pretrained_weights(pretrained_weights)
-
     def forward(self, x: torch.Tensor) -> list[torch.Tensor]:
         """Forward function."""
         outs = []
@@ -428,18 +420,6 @@ class MSCANModule(nn.Module):
 
         return outs
 
-    def load_pretrained_weights(self, pretrained: str | None = None, prefix: str = "") -> None:
-        """Initialize weights."""
-        checkpoint = None
-        if isinstance(pretrained, str) and Path(pretrained).exists():
-            checkpoint = torch.load(pretrained, "cpu")
-            print(f"init weight - {pretrained}")
-        elif pretrained is not None:
-            checkpoint = load_from_http(filename=pretrained, map_location="cpu")
-            print(f"init weight - {pretrained}")
-        if checkpoint is not None:
-            load_checkpoint_to_model(self, checkpoint, prefix=prefix)
-
 
 class MSCAN:
     """MSCAN backbone factory."""
@@ -448,15 +428,12 @@ class MSCAN:
         "segnext_tiny": {
             "depths": [3, 3, 5, 2],
             "embed_dims": [32, 64, 160, 256],
-            "pretrained_weights": "https://storage.geti.intel.com/weights/mscan_t_20230227-119e8c9f.pth",
         },
         "segnext_small": {
             "depths": [2, 2, 4, 2],
-            "pretrained_weights": "https://storage.geti.intel.com/weights/mscan_s_20230227-f33ccdf2.pth",
         },
         "segnext_base": {
             "depths": [3, 3, 12, 3],
-            "pretrained_weights": "https://storage.geti.intel.com/weights/mscan_b_20230227-3ab7d230.pth",
         },
     }
 

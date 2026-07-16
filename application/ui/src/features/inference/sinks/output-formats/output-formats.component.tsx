@@ -1,9 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Checkbox, CheckboxGroup } from '@geti/ui';
+import type { SinkOutputFormats } from '@/api/types';
+import { Checkbox, CheckboxGroup } from '@geti-ui/ui';
 
-import { OutputFormat, SinkOutputFormats } from '../utils';
+import { OutputFormat } from '../utils';
 
 import classes from './output-formats.module.scss';
 

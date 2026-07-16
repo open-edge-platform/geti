@@ -3,10 +3,10 @@
 
 import { useMemo } from 'react';
 
+import type { Label, TaskType } from '@/api/types';
 import { useProject } from 'hooks/api/project.hook';
 import { negate } from 'lodash-es';
 
-import type { Label, TaskType } from '../../constants/shared-types';
 import { isClassificationTask } from '../../features/project/task-type-guards';
 import type { AnnotationLabel, AnnotationLabelRef } from '../types';
 
@@ -17,7 +17,7 @@ const NO_OBJECT_LABEL: Label = { id: EMPTY_LABEL_ID, name: 'No object', color: '
 export const isEmptyLabel = <T extends { id: string }>({ id }: T): boolean => id === EMPTY_LABEL_ID;
 export const isNonEmptyLabel = negate(isEmptyLabel);
 
-const getEmptyLabel = (taskType: TaskType, exclusiveLabels: boolean): Label | null => {
+export const getEmptyLabel = (taskType: TaskType, exclusiveLabels: boolean): Label | null => {
     if (isClassificationTask(taskType)) {
         const isMultiLabel = exclusiveLabels === false;
 

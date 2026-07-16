@@ -3,10 +3,10 @@
 
 import { useMemo } from 'react';
 
-import { Content, Dialog, Grid, View } from '@geti/ui';
+import type { DatasetSubset, Media } from '@/api/types';
+import { Content, Dialog, Grid, View } from '@geti-ui/ui';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 
-import type { DatasetSubset, Media } from '../../../constants/shared-types';
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
 import { ToolProvider } from '../../../shared/annotator/tool-provider.component';
 import { isVideoFrame } from '../../../shared/media-item-utils';

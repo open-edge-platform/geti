@@ -1,7 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Checkbox, DialogContainer, dimensionValue, Flex, Size, ViewModes } from '@geti/ui';
+import type { Media } from '@/api/types';
+import { Checkbox, DialogContainer, dimensionValue, Flex, Size, ViewModes } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 import { GridLayoutOptions } from 'react-aria-components';
@@ -9,7 +10,6 @@ import { GridLayoutOptions } from 'react-aria-components';
 import { MediaItem } from '../../../components/media-item/media-item.component';
 import { MediaThumbnail } from '../../../components/media-thumbnail/media-thumbnail.component';
 import { VirtualizerGridLayout } from '../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
-import type { Media } from '../../../constants/shared-types';
 import { type GalleryViewMode } from '../../../shared/gallery-view-modes';
 import { getMediaDownloadUrl, getThumbnailUrl } from '../../../shared/media-url.utils';
 import { MediaPreview } from '../media-preview/media-preview.component';

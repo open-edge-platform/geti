@@ -3,11 +3,11 @@
 
 import { Dispatch, SetStateAction, useState } from 'react';
 
-import { Content, Flex, Heading, InlineAlert, View } from '@geti/ui';
+import type { ConfigurableParameter, TrainingConfiguration } from '@/api/types';
+import { Content, Flex, Heading, InlineAlert, View } from '@geti-ui/ui';
 import { useGetDatasetItems } from 'hooks/use-get-dataset-items.hook';
 import { isEqual } from 'lodash-es';
 
-import type { ConfigurableParameter, TrainingConfiguration } from '../../../../../../constants/shared-types';
 import { isParameterGroup } from '../../../../model-listing/model-training-parameters/utils';
 import { distributeByLargestRemainder } from '../../../../utils';
 import { Accordion } from '../../components/accordion/accordion.component';
@@ -81,19 +81,19 @@ const updateSubsetSplitValues = (
 const useSubsetDatasetSizes = () => {
     const { totalCount: trainingSubsetSize } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
-        subset: 'training',
+        subsets: ['training'],
     });
     const { totalCount: testingSubsetSize } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
-        subset: 'testing',
+        subsets: ['testing'],
     });
     const { totalCount: validationSubsetSize } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
-        subset: 'validation',
+        subsets: ['validation'],
     });
     const { totalCount: unassignedSubsetSize } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
-        subset: 'unassigned',
+        subsets: ['unassigned'],
     });
 
     const assignedDatasetItemsSize = trainingSubsetSize + testingSubsetSize + validationSubsetSize;

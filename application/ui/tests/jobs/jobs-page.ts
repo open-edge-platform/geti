@@ -16,12 +16,12 @@ export class JobsPage {
         return this.page.getByRole('heading', { name: 'Currently running' });
     }
 
-    getRunningTag() {
-        return this.page.getByRole('button', { name: 'Running', exact: true });
+    getRunningBadge() {
+        return this.page.getByText('Running', { exact: true });
     }
 
-    getStatusTag() {
-        return this.page.getByRole('button', { name: 'Training in progress...' });
+    getStatusBadge() {
+        return this.page.getByText('Training in progress...');
     }
 
     getCancelButton() {

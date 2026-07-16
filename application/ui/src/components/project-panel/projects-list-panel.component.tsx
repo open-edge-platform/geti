@@ -1,6 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Project } from '@/api/types';
 import {
     ActionButton,
     Badge,
@@ -13,11 +14,10 @@ import {
     Flex,
     Header,
     Heading,
-    Tag,
     Text,
     View,
-} from '@geti/ui';
-import { Edit } from '@geti/ui/icons';
+} from '@geti-ui/ui';
+import { Edit } from '@geti-ui/ui/icons';
 import { useProjects } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { partition } from 'lodash-es';
@@ -27,7 +27,7 @@ import { EnablePipelineBlockedDialog } from '../../components/enable-pipeline-bl
 import { DeleteProjectDialog } from '../../components/project-dialogs/delete-project-dialog.component';
 import { EditProjectNameDialog } from '../../components/project-dialogs/edit-project-name-dialog.component';
 import { paths } from '../../constants/paths';
-import { Project } from '../../constants/shared-types';
+import { ActiveProjectBadge } from '../../features/project/list/active-project-badge/active-project-badge.component';
 import { ProjectActionsMenu } from '../../features/project/list/menu-actions/menu-actions.component';
 import { getProjectTypeTitle } from '../../features/project/list/util';
 import { ProjectThumbnail } from './project-thumbnail/project-thumbnail.component';
@@ -60,11 +60,11 @@ const SelectedProjectButton = ({ name, id, isActive }: SelectedProjectProps) => 
                     width={'size-400'}
                 />
             </View>
-            <Flex direction={'column'} minWidth={0}>
+            <Flex direction={'column'} minWidth={0} alignItems={'start'}>
                 <View paddingStart={'size-50'} width={'100%'} UNSAFE_className={classes.selectedProjectName}>
                     <span title={name}>{name}</span>
                 </View>
-                {isActive ? <Tag className={classes.statusTag} text={'Active'} /> : null}
+                <View paddingStart={'size-50'}>{isActive ? <ActiveProjectBadge size='S' /> : null}</View>
             </Flex>
         </ActionButton>
     );
@@ -168,11 +168,14 @@ export const ProjectsListPanel = () => {
                                             {selectedProjectName}
                                         </Heading>
 
-                                        {taskType !== undefined && (
-                                            <Badge variant={'neutral'}>
-                                                <Text>{taskType}</Text>
-                                            </Badge>
-                                        )}
+                                        <Flex gap={'size-100'}>
+                                            {taskType !== undefined && (
+                                                <Badge variant={'neutral'}>
+                                                    <Text>{taskType}</Text>
+                                                </Badge>
+                                            )}
+                                            {hasActivePipeline ? <ActiveProjectBadge /> : null}
+                                        </Flex>
                                     </Flex>
 
                                     <ProjectActionsMenu
@@ -191,7 +194,6 @@ export const ProjectsListPanel = () => {
                                         }}
                                     />
                                 </View>
-                                {hasActivePipeline ? <Tag text={'Active'} /> : null}
                             </Flex>
                         </Header>
                     )}

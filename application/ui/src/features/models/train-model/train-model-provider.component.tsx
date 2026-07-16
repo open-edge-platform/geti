@@ -3,15 +3,15 @@
 
 import { createContext, Dispatch, ReactNode, SetStateAction, use, useMemo, useState } from 'react';
 
-import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
-
-import {
+import type {
     DatasetRevision,
     Model,
     ModelArchitectureWithPerformanceCategory,
     TrainingConfiguration,
     TrainingDevice,
-} from '../../../constants/shared-types';
+} from '@/api/types';
+import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
+
 import { useGetTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
 import { useGetSuccessfulModels } from '../hooks/api/use-get-models.hook';
 import { useGetTrainingDevices } from './api/use-get-training-devices';
@@ -45,6 +45,9 @@ export type TrainModelContextProps = {
     trainingConfiguration: TrainingConfiguration | undefined;
     defaultTrainingConfiguration: TrainingConfiguration | undefined;
     onTrainingConfigurationChange: Dispatch<SetStateAction<TrainingConfiguration | undefined>>;
+
+    showMoreModelArchitectures: boolean;
+    onToggleShowMoreModelArchitectures: (showMore: boolean) => void;
 };
 
 const TrainModelContext = createContext<TrainModelContextProps | null>(null);
@@ -139,6 +142,8 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
         modelRevisionId: selectedModelRevision?.value ?? null,
     });
 
+    const [showMoreModelArchitectures, setShowMoreModelArchitectures] = useState<boolean>(false);
+
     const onSelectModelArchitectureId = (modelArchitectureId: string | null) => {
         setSelectedModelArchitectureId(modelArchitectureId);
         setSelectedModelRevisionId(getDefaultModelRevisionIdForArchitecture(allModelRevisions, modelArchitectureId));
@@ -166,6 +171,9 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
                 isAdvancedSettingsMode,
                 onToggleAdvancedSettingsMode: setIsAdvancedSettingsMode,
+
+                showMoreModelArchitectures,
+                onToggleShowMoreModelArchitectures: setShowMoreModelArchitectures,
 
                 trainingConfiguration,
                 defaultTrainingConfiguration,

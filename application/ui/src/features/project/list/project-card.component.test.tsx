@@ -1,13 +1,13 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { API_BASE_URL } from '@/api';
 import { screen } from '@testing-library/react';
 import { getMockedPipeline } from 'mocks/mock-pipeline';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
-import { API_BASE_URL } from '../../../api/client';
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
 import { ProjectCard } from './project-card.component';

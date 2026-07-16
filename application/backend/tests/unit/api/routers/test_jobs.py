@@ -121,19 +121,24 @@ class TestJobEndpoints:
         fxt_project_service.get_project_by_id.return_value = project
 
         model_id = uuid4()
+        mock_manifest = Mock()
+        mock_manifest.name = "ViT Tiny"
         job_request = JobRequestAdapter.validate_python(
             {
                 "project_id": project.id,
                 "job_type": JobType.QUANTIZE,
                 "parameters": {
                     "model_id": model_id,
+                    "model_architecture_id": "image-classification-vit-tiny",
                     "max_calibration_subset_size": 200,
                     "max_drop": 0.01,
+                    "max_num_iterations": 5,
                 },
             }
         )
 
-        response = fxt_client.post("/api/jobs", json=job_request.model_dump(mode="json"))
+        with patch("app.api.routers.jobs.ModelManifestService.get_model_manifest_by_id", return_value=mock_manifest):
+            response = fxt_client.post("/api/jobs", json=job_request.model_dump(mode="json"))
 
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.json()["job_id"]
@@ -143,8 +148,11 @@ class TestJobEndpoints:
         submitted_job = fxt_jobs_queue.submit.call_args[0][0]
         assert submitted_job.job_type == JobType.QUANTIZE
         assert submitted_job.params.model_id == model_id
+        assert submitted_job.params.model_architecture_id == "image-classification-vit-tiny"
+        assert submitted_job.params.model_architecture_name == "ViT Tiny"
         assert submitted_job.params.max_calibration_subset_size == 200
         assert submitted_job.params.max_drop == 0.01
+        assert submitted_job.params.max_num_iterations == 5
         assert submitted_job.project_id == project.id
 
     def test_submit_quantize_job_defaults(self, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service):
@@ -159,17 +167,21 @@ class TestJobEndpoints:
         fxt_project_service.get_project_by_id.return_value = project
 
         model_id = uuid4()
+        mock_manifest = Mock()
+        mock_manifest.name = "ViT Tiny"
         job_request = JobRequestAdapter.validate_python(
             {
                 "project_id": project.id,
                 "job_type": JobType.QUANTIZE,
                 "parameters": {
                     "model_id": model_id,
+                    "model_architecture_id": "image-classification-vit-tiny",
                 },
             }
         )
 
-        response = fxt_client.post("/api/jobs", json=job_request.model_dump(mode="json"))
+        with patch("app.api.routers.jobs.ModelManifestService.get_model_manifest_by_id", return_value=mock_manifest):
+            response = fxt_client.post("/api/jobs", json=job_request.model_dump(mode="json"))
 
         assert response.status_code == status.HTTP_202_ACCEPTED
         submitted_job = fxt_jobs_queue.submit.call_args[0][0]
@@ -177,6 +189,7 @@ class TestJobEndpoints:
         assert submitted_job.params.model_id == model_id
         assert submitted_job.params.max_calibration_subset_size == 100
         assert submitted_job.params.max_drop is None
+        assert submitted_job.params.max_num_iterations == 10
 
     def test_list_jobs(self, fxt_client, fxt_jobs_queue, fxt_job):
         fxt_jobs_queue.list_all.return_value = [fxt_job(), fxt_job()]

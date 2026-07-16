@@ -1,10 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { $api } from '@/api';
 import { usePrefetchQuery, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { $api } from '../../api/client';
 import { getQueryKey } from '../../query-client/query-client';
 
 const getPipelineQueryOptions = (projectId: string) => {
@@ -45,6 +45,22 @@ export const usePipelineMetrics = () => {
         },
         {
             refetchInterval: (query) => (query.state.status === 'success' ? POLLING_INTERVAL : false),
+            retry: false,
+        }
+    );
+};
+
+export const usePipelineHealth = () => {
+    const projectId = useProjectIdentifier();
+
+    return $api.useQuery(
+        'get',
+        '/api/projects/{project_id}/pipeline/health',
+        {
+            params: { path: { project_id: projectId } },
+        },
+        {
+            refetchInterval: POLLING_INTERVAL,
             retry: false,
         }
     );

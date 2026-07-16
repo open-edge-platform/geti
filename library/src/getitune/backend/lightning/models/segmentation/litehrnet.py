@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 from torch.onnx import OperatorExportTypes
 
@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -42,7 +43,17 @@ class LiteHRNet(LightningSegmentationModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to SegmCallable.
         torch_compile (bool, optional): Flag to indicate whether to use torch.compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
+
+    pretrained_weights_target = "backbone"
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "lite_hrnet_s": "https://storage.geti.intel.com/weights/litehrnetsv2_imagenet1k_rsc.pth",
+        "lite_hrnet_18": "https://storage.geti.intel.com/weights/litehrnet18_imagenet1k_rsc.pth",
+        "lite_hrnet_x": "https://storage.geti.intel.com/weights/litehrnetxv3_imagenet1k_rsc.pth",
+    }
 
     def __init__(
         self,
@@ -54,6 +65,8 @@ class LiteHRNet(LightningSegmentationModel):
         metric: MetricCallable = SegmCallable,  # type: ignore[assignment]
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ):
         super().__init__(
             label_info=label_info,
@@ -64,6 +77,8 @@ class LiteHRNet(LightningSegmentationModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:

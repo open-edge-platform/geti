@@ -1,10 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback, useRef } from 'react';
-
-import { ActionButton, Flex, View } from '@geti/ui';
-import { DownloadIcon } from '@geti/ui/icons';
+import { Flex, View } from '@geti-ui/ui';
 import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { Box } from '../components/box/box.component';

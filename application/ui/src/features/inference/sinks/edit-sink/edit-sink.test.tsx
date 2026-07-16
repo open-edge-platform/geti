@@ -1,15 +1,19 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { LocalFolderSinkConfig } from '@/api/types';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
+import { http } from '../../../../api/utils';
 import { useConnectSinkToPipeline } from '../../../../hooks/api/pipeline.hook';
+import { server } from '../../../../msw-node-setup';
 import { useSinkMutation } from '../hooks/use-sink-mutation.hook';
 import { LocalFolder } from '../local-folder/local-folder.component';
 import { getLocalFolderInitialConfig, localFolderBodyFormatter } from '../local-folder/utils';
-import { LocalFolderSinkConfig, OutputFormat } from '../utils';
+import { OutputFormat } from '../utils';
 import { EditSink } from './edit-sink.component';
 
 vi.mock('../hooks/use-sink-mutation.hook');
@@ -18,6 +22,7 @@ vi.mock('../../../../hooks/api/pipeline.hook');
 describe('EditSink', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        server.use(http.post('/api/sinks/{sink_id}:test', () => HttpResponse.json({ reachable: true })));
     });
 
     const updatedConfig: LocalFolderSinkConfig = {

@@ -3,9 +3,9 @@
 
 import { Dispatch, ReactNode, SetStateAction } from 'react';
 
-import { Grid, minmax, Text, View } from '@geti/ui';
+import type { ConfigurableParameter, TrainingConfiguration } from '@/api/types';
+import { Grid, minmax, Text, View } from '@geti-ui/ui';
 
-import { ConfigurableParameter, TrainingConfiguration } from '../../../../../../constants/shared-types';
 import { Accordion } from '../../components/accordion/accordion.component';
 import { Parameters } from '../../components/parameters.component';
 import { deepReplaceParameters } from '../../utils';

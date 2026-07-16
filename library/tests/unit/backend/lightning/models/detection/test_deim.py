@@ -22,6 +22,7 @@ class TestDEIMDFine:
             model_name=request.param,
             label_info=3,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
     @pytest.mark.parametrize(
@@ -37,12 +38,13 @@ class TestDEIMDFine:
             model_name=model_name,
             label_info=3,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         assert model.model_name == model_name
         assert model.num_classes == 3
         assert model.data_input_params.input_size == (640, 640)
         assert model.input_size_multiplier == 32
-        assert model_name in model._pretrained_weights
+        assert model_name in model.pretrained_urls
 
     def test_create_model(self) -> None:
         """Test DEIM DFine model creation."""
@@ -50,6 +52,7 @@ class TestDEIMDFine:
             model_name="deim_dfine_hgnetv2_s",
             label_info=10,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         created_model = model._create_model()
         assert created_model is not None
@@ -69,6 +72,7 @@ class TestDEIMDFine:
             model_name="deim_dfine_hgnetv2_n",
             label_info=5,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         created_model = model._create_model()
 
@@ -128,6 +132,7 @@ class TestDEIMDFine:
             label_info=3,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
             multi_scale=True,
+            pretrained=False,
         )
 
         # Multi-scale should be created in the model
@@ -141,6 +146,7 @@ class TestDEIMDFine:
             model_name="deim_dfine_hgnetv2_s",
             label_info=5,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         created_model = model._create_model()
@@ -165,6 +171,7 @@ class TestDEIMDFine:
             model_name="deim_dfine_hgnetv2_s",
             label_info=10,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         created_model = model._create_model()

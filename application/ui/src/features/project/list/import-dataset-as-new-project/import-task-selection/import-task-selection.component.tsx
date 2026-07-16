@@ -3,13 +3,13 @@
 
 import { useActionState, useState } from 'react';
 
-import { Flex, Form, Item, Picker, Text, TextField, View } from '@geti/ui';
-import { InfoOutline } from '@geti/ui/icons';
+import type { TaskType } from '@/api/types';
+import { Flex, Form, Item, Picker, Text, TextField, View } from '@geti-ui/ui';
+import { InfoOutline } from '@geti-ui/ui/icons';
 import { useProjects } from 'hooks/api/project.hook';
 import { useStagedDatasetSuspense } from 'hooks/api/staged-dataset.hook';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';
 
-import { TaskType } from '../../../../../constants/shared-types';
 import { generateUniqueProjectName } from '../../../create/utils';
 import { useImportDatasetDialog } from '../../../providers/import-dataset-dialog-provider.component';
 import { validateProjectName } from '../../../validator';

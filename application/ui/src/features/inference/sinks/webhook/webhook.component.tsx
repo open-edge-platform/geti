@@ -1,11 +1,12 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Flex, Item, NumberField, Picker, TextField } from '@geti/ui';
+import type { WebhookSinkConfig } from '@/api/types';
+import { Flex, Item, NumberField, Picker, TextField } from '@geti-ui/ui';
 
 import { OutputFormats } from '../output-formats/output-formats.component';
 import { RateLimitFields } from '../rate-limit/rate-limit-fields.component';
-import { WebhookHttpMethod, WebhookSinkConfig } from '../utils';
+import { WebhookHttpMethod } from '../utils';
 import { HeaderKeyValueBuilder } from './header-key-value-builder.component';
 
 type WebhookProps = {

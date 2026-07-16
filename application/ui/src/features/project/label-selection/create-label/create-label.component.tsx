@@ -3,15 +3,15 @@
 
 import { useRef, useState } from 'react';
 
-import { ActionButton, DOMRefValue, Grid, TextField, TextFieldRef, useUnwrapDOMRef, View } from '@geti/ui';
-import { Add } from '@geti/ui/icons';
+import type { Label, TaskType } from '@/api/types';
+import { ActionButton, DOMRefValue, Grid, TextField, TextFieldRef, useUnwrapDOMRef, View } from '@geti-ui/ui';
+import { Add } from '@geti-ui/ui/icons';
 import { useEventListener } from 'hooks/event-listener.hook';
 import { v4 as uuid } from 'uuid';
 
 import { HotkeyField } from '../../../../components/label-fields/hotkey-field.component';
 import { LabelColorPicker } from '../../../../components/label-fields/label-color-picker.component';
 import { validateLabelHotkey, validateLabelName } from '../../../../components/label-fields/label-validation';
-import type { Label, TaskType } from '../../../../constants/shared-types';
 import { TASK_HOTKEYS } from '../../../../shared/hotkeys-definition';
 import { getRandomDistinctColor } from '../../../annotator/label-utils';
 
@@ -66,6 +66,7 @@ export const CreateLabel = ({ labels, onCreate, taskType }: CreateLabelProps) =>
             maxWidth={'640px'}
             width={'100%'}
             alignItems={'start'}
+            // @ts-expect-error TODO[geti-ui]: Grid wrapper not forwardRef-typed; ref works at runtime
             ref={containerRef}
         >
             <LabelColorPicker
@@ -76,6 +77,7 @@ export const CreateLabel = ({ labels, onCreate, taskType }: CreateLabelProps) =>
             />
             <View>
                 <TextField
+                    // @ts-expect-error TODO[geti-ui]: TextField wrapper not forwardRef-typed; ref works at runtime
                     ref={inputRef}
                     aria-label={'Create label input'}
                     placeholder={'Create label'}

@@ -3,11 +3,11 @@
 
 import { ReactNode } from 'react';
 
-import { Flex, View } from '@geti/ui';
+import type { AnnotatedVideoFrame, Label, VideoFramePrediction } from '@/api/types';
+import { Flex, View } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
 import { useNumberFormatter } from 'react-aria';
 
-import { AnnotatedVideoFrame, Label, VideoFramePrediction } from '../../../../../../../constants/shared-types';
 import type { AnnotatorMode } from '../../../../../../../shared/annotator/annotator-mode';
 import { EMPTY_LABEL_ID } from '../../../../../../../shared/annotator/labels';
 import { useVideoFramesAnnotations } from '../../../../api/use-video-frames-annotations';

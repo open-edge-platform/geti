@@ -1,7 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Label } from '../../constants/shared-types';
+import type { Label } from '@/api/types';
+
 import { convertHotkeyToOSFormat } from '../../shared/hotkeys-definition';
 
 export const validateLabelName = (name: string, existingLabels: Label[], excludeId?: string): string | undefined => {

@@ -3,7 +3,7 @@
 
 import { ComponentProps, useState } from 'react';
 
-import { Checkbox, Flex, Item, ListView, Selection, Text } from '@geti/ui';
+import { Checkbox, Flex, Item, ListView, Selection, Text } from '@geti-ui/ui';
 
 import { isNonEmptyString } from '../../shared/util';
 
@@ -11,7 +11,7 @@ import classes from './multi-select-list.module.scss';
 
 type ListViewProps = ComponentProps<typeof ListView>;
 
-interface MultiSelectListProps
+interface MultiSelectListProps<T extends string = string>
     extends Omit<
         ListViewProps,
         'selectionMode' | 'onSelectionChange' | 'items' | 'defaultSelectedKeys' | 'selectedKeys' | 'children'
@@ -19,12 +19,12 @@ interface MultiSelectListProps
     name: string;
     label?: string;
     selectAllLabel?: string;
-    defaultSelectedKeys: Set<string>;
-    onSelectionChange?: (selectedKeys: Set<string> | 'all') => void;
-    items: { id: string; name: string }[];
+    defaultSelectedKeys: Set<T>;
+    onSelectionChange?: (selectedIds: T[]) => void;
+    items: { id: T; name: string }[];
 }
 
-export const MultiSelectList = ({
+export const MultiSelectList = <T extends string = string>({
     name,
     label,
     selectAllLabel = 'Select all',
@@ -32,21 +32,21 @@ export const MultiSelectList = ({
     onSelectionChange,
     defaultSelectedKeys,
     ...listProps
-}: MultiSelectListProps) => {
-    const [selectedLabels, setSelectedLabels] = useState<Set<string>>(defaultSelectedKeys);
+}: MultiSelectListProps<T>) => {
+    const [selectedLabels, setSelectedLabels] = useState<Set<T>>(defaultSelectedKeys);
 
     const allItemSelected = selectedLabels.size === items.length && items.length > 0;
 
     const handleSelectAllItems = (isSelected: boolean) => {
-        const selectedItems = isSelected ? new Set(items.map(({ id }) => id)) : new Set<string>();
+        const selectedItems = isSelected ? new Set(items.map(({ id }) => id)) : new Set<T>();
         setSelectedLabels(selectedItems);
-        onSelectionChange?.(selectedItems);
+        onSelectionChange?.(Array.from(selectedItems));
     };
 
     const handleSelectChange = (keys: Selection) => {
-        const selection = keys === 'all' ? new Set(items.map(({ id }) => id)) : new Set(keys as Set<string>);
+        const selection = keys === 'all' ? new Set(items.map(({ id }) => id)) : (keys as Set<T>);
         setSelectedLabels(selection);
-        onSelectionChange?.(selection);
+        onSelectionChange?.(Array.from(selection));
     };
 
     return (

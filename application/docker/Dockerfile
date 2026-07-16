@@ -5,7 +5,7 @@
 ##############
 # Backend base
 ##############
-FROM python:3.13-slim@sha256:c33f0bc4364a6881bed1ec0cc2665e6c53c87a43e774aaeab88e6f17af105e4f AS backend-base
+FROM python:3.13-slim@sha256:eb43ff125d8d58d7449dcba7d336c23bcac412f526d861db493b9994d8010280 AS backend-base
 
 # uv / uvx
 COPY --from=docker.io/astral/uv:0.10.4@sha256:4cac394b6b72846f8a85a7a0e577c6d61d4e17fe2ccee65d9451a8b3c9efb4ac /uv /uvx /bin/
@@ -149,7 +149,7 @@ RUN npm run build
 #===========================================================================
 # pyav + ffmpeg
 # ===========================================================================
-FROM python:3.13-slim@sha256:c33f0bc4364a6881bed1ec0cc2665e6c53c87a43e774aaeab88e6f17af105e4f AS ffmpeg-builder
+FROM python:3.13-slim@sha256:eb43ff125d8d58d7449dcba7d336c23bcac412f526d861db493b9994d8010280 AS ffmpeg-builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -266,7 +266,7 @@ RUN python -m pip wheel --no-binary av "av==${PYAV_VERSION}" -w /dist
 #########################
 # Base for CPU, GPU and XPU runtime images
 #########################
-FROM python:3.13-slim@sha256:c33f0bc4364a6881bed1ec0cc2665e6c53c87a43e774aaeab88e6f17af105e4f AS runtime-base
+FROM python:3.13-slim@sha256:eb43ff125d8d58d7449dcba7d336c23bcac412f526d861db493b9994d8010280 AS runtime-base
 
 LABEL org.opencontainers.image.source="https://github.com/open-edge-platform/training_extensions"
 LABEL org.opencontainers.image.description="Geti – train, optimize and deploy deep-learning models"
@@ -305,7 +305,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         libv4l-0t64=1.30.1-1 \
         libva2=2.22.* \
         libva-drm2=2.22.* \
-        libvpx9=1.15.0*
+        libvpx9=1.15.0* \
+        openssl=3.5.6*
 
 # Place the venv at the front of PATH so we can call python directly (no uv needed at runtime)
 ENV PATH="/application/backend/.venv/bin:${PATH}"
@@ -329,9 +330,11 @@ ENV LD_LIBRARY_PATH="/opt/vpl/lib:/opt/vpl/lib64:/opt/ffmpeg-vpl/lib:/usr/local/
 ENV PATH="/opt/ffmpeg-vpl/bin:${PATH}"
 
 WORKDIR /application/backend
+COPY --link --chmod=755 application/docker/entrypoint.sh /entrypoint.sh
 
 USER ${USER_NAME}
 
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["python", "app/main.py"]
 
 ######################
