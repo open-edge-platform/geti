@@ -70,7 +70,7 @@ def logging_ctx(config: LogConfig) -> Generator[str]:
         raise RuntimeError(f"Failed to add log sink for {log_path}: {e}") from e
 
     try:
-        root_logger.addHandler(root_handler)
+        root_logger.handlers = [root_handler]
         root_logger.setLevel(getattr(logging, config.level.upper(), logging.INFO))
         sys.stdout = stdout_writer
         sys.stderr = stderr_writer
