@@ -33,7 +33,7 @@ class UltralyticsDatasetAdapter(TorchDataset):
 
         Args:
             vision_dataset: The getitune VisionDataset to wrap.
-        task_kind: Task kind — one of ``"detect"``, ``"segment"``,
+            task_kind: Task kind — one of ``"detect"``, ``"segment"``,
             ``"classify"``, ``"multilabel"``, or ``"semantic"``.  Each value
             dispatches to a dedicated ``_getitem_*`` method that builds the
             exact fields the corresponding Ultralytics trainer/validator needs.
