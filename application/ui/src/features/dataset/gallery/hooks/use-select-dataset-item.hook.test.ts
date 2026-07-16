@@ -191,5 +191,24 @@ describe('useSelectDatasetItem', () => {
 
             expect(result.current.selectedMediaItem).toBeNull();
         });
+
+        it('stays set once hydrated even after a filter shrinks items to exclude it', () => {
+            const image = getMockedMediaImage({ id: 'img-selected' });
+            vi.mocked(useGetDatasetMediaItems).mockReturnValue({ ...mockDatasetMediaItems, items: [image] });
+
+            const route = `${paths.project.dataset.item.index({ projectId: MOCKED_PROJECT_ID, datasetItemId: image.id })}${SEARCH}`;
+            const { result, rerender } = renderHook(() => useSelectDatasetItem(), {
+                route,
+                path: paths.project.dataset.item.index.pattern,
+            });
+
+            expect(result.current.selectedMediaItem).toEqual(image);
+
+            // Simulate an active filter now excluding the open item from the filtered list.
+            vi.mocked(useGetDatasetMediaItems).mockReturnValue({ ...mockDatasetMediaItems, items: [] });
+            rerender();
+
+            expect(result.current.selectedMediaItem).toEqual(image);
+        });
     });
 });

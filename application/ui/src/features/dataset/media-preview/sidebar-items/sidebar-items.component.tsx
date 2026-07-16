@@ -5,6 +5,7 @@ import { useRef } from 'react';
 
 import type { Media } from '@/api/types';
 import { Flex, Size, useUnwrapDOMRef, View } from '@geti-ui/ui';
+import { isEmpty } from 'lodash-es';
 
 import { VirtualizerGridLayout } from '../../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
 import { SIDEBAR_MEDIA_SIZE } from '../constants';
@@ -54,7 +55,7 @@ export const SidebarItems = ({
         <Toolbar.Container height={'100%'}>
             <Toolbar.Section height={'100%'}>
                 <Flex direction={'column'} height={'100%'} gap='size-100'>
-                    <SidebarMediaFilter />
+                    <SidebarMediaFilter hasMediaItems={!isEmpty(items)} />
                     <View ref={ref} width={'100%'} flex={1}>
                         <VirtualizerGridLayout
                             items={items}

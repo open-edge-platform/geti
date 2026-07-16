@@ -211,6 +211,14 @@ describe('useNextMediaItem', () => {
             data: { items: [nextUnannotatedItem] },
             isPending: false,
         });
+        // The candidate isn't among the already-fetched items, so there must be more
+        // pages available (and none currently in flight) for a fetch to be worthwhile.
+        // @ts-expect-error We only care about mocking these fields for this test.
+        mockUseDatasetMediaWithReviewStatus.mockReturnValue({
+            fetchNextPage: mockFetchNextPage,
+            hasNextPage: true,
+            isFetchingNextPage: false,
+        });
 
         const { result, rerender } = renderHook(() => useNextMediaItem(alreadyFetchedItems[0], alreadyFetchedItems));
 
