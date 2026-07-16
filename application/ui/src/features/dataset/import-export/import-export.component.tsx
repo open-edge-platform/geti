@@ -30,19 +30,6 @@ export const ImportExport = () => {
 
     return (
         <>
-            {/*<TooltipTrigger>
-                <MenuTrigger>
-                    <ActionButton isQuiet aria-label='Export/Import dataset'>
-                        <ImportExportIcon />
-                    </ActionButton>
-                    <Menu onAction={handleMenuAction}>
-                        <Item key='export'>Export dataset</Item>
-                        <Item key='import'>Import dataset</Item>
-                    </Menu>
-                </MenuTrigger>
-                <Tooltip>Export/import dataset</Tooltip>
-            </TooltipTrigger>*/}
-
             <TooltipTrigger>
                 <ActionButton isQuiet aria-label='Import dataset' onPress={datasetImportDialogState.open}>
                     <Share />
