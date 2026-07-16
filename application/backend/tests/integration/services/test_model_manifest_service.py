@@ -23,7 +23,7 @@ from app.models.training_configuration import (
     AlgoLevelTrainingParameters,
 )
 from app.models.training_configuration.training import EarlyStopping
-from app.services.model_manifest_service import ModelManifestService
+from app.services.model_manifest_service import ManifestNotFoundException, ModelManifestService
 from app.supported_models import manifests
 
 BASE_MANIFEST_PATH = str(resources.files(manifests).joinpath("base.yaml"))
@@ -173,3 +173,46 @@ class TestModelManifestService:
 
         assert model_manifest.id == model_manifest_id
         assert model_manifest.task == expected_task
+
+    def test_get_model_manifests_excludes_agpl_when_ultralytics_unavailable(self) -> None:
+        """AGPL-3.0 licensed manifests (Ultralytics models) should be skipped when 'ultralytics' isn't installed."""
+        ModelManifestService._is_ultralytics_available.cache_clear()
+        ModelManifestService.get_model_manifests.cache_clear()
+
+        with patch.object(ModelManifestService, "_is_ultralytics_available", return_value=False):
+            model_manifests = ModelManifestService.get_model_manifests()
+
+        assert len(model_manifests) > 0
+        assert all(manifest.license != "AGPL-3.0" for manifest in model_manifests.values())
+        assert "object-detection-yolo26-s" not in model_manifests
+
+        ModelManifestService._is_ultralytics_available.cache_clear()
+        ModelManifestService.get_model_manifests.cache_clear()
+
+    def test_get_model_manifests_includes_agpl_when_ultralytics_available(self) -> None:
+        """AGPL-3.0 licensed manifests (Ultralytics models) should be kept when 'ultralytics' is installed."""
+        ModelManifestService._is_ultralytics_available.cache_clear()
+        ModelManifestService.get_model_manifests.cache_clear()
+
+        with patch.object(ModelManifestService, "_is_ultralytics_available", return_value=True):
+            model_manifests = ModelManifestService.get_model_manifests()
+
+        assert any(manifest.license == "AGPL-3.0" for manifest in model_manifests.values())
+        assert "object-detection-yolo26-s" in model_manifests
+
+        ModelManifestService._is_ultralytics_available.cache_clear()
+        ModelManifestService.get_model_manifests.cache_clear()
+
+    def test_get_model_manifest_by_id_raises_when_agpl_and_ultralytics_unavailable(self) -> None:
+        """Fetching an AGPL-3.0 manifest by ID should raise if 'ultralytics' isn't installed."""
+        ModelManifestService._is_ultralytics_available.cache_clear()
+        ModelManifestService.get_model_manifests.cache_clear()
+
+        with (
+            patch.object(ModelManifestService, "_is_ultralytics_available", return_value=False),
+            pytest.raises(ManifestNotFoundException),
+        ):
+            ModelManifestService.get_model_manifest_by_id("object-detection-yolo26-s")
+
+        ModelManifestService._is_ultralytics_available.cache_clear()
+        ModelManifestService.get_model_manifests.cache_clear()

@@ -4,12 +4,16 @@
 import os
 from functools import cache
 from importlib import resources
+from importlib.util import find_spec
 from typing import Any
 
 import yaml
+from loguru import logger
 
 from app.models.model_manifest import ModelManifest
 from app.supported_models import manifests
+
+AGPL_LICENSE = "AGPL-3.0"
 
 
 class ManifestNotFoundException(Exception):
@@ -45,6 +49,17 @@ def _deep_merge(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any
 
 class ModelManifestService:
     """Service for loading and managing model manifests."""
+
+    @staticmethod
+    @cache
+    def _is_ultralytics_available() -> bool:
+        """
+        Check whether the ``ultralytics`` package is installed.
+
+        Returns:
+            bool: True if ``ultralytics`` is installed, False otherwise.
+        """
+        return find_spec("ultralytics") is not None
 
     @staticmethod
     def _parse_manifest(*manifest_sources, relative: bool = True) -> ModelManifest:
@@ -121,6 +136,9 @@ class ModelManifestService:
             - manifests/base.yaml: Base configuration for all models
             - manifests/task/base.yaml: Base configuration for specific task types
             - manifests/task/model.yaml: Model-specific configurations
+
+            Manifests of Ultralytics models (licensed under AGPL-3.0) are skipped if the
+            ``ultralytics`` package is not installed.
         """
         # Get the manifests directory path
         manifests_dir = resources.files(manifests)
@@ -128,6 +146,7 @@ class ModelManifestService:
 
         # Find all model-specific YAML files
         model_manifests = {}
+        ultralytics_available = cls._is_ultralytics_available()
 
         # Iterate through task type directories
         for task_dir in [d for d in manifests_dir.iterdir() if d.is_dir()]:
@@ -143,6 +162,11 @@ class ModelManifestService:
 
                     # Parse manifest with all dependencies in order
                     manifest = cls._parse_manifest(*dependency_chain, relative=True)
+                    if manifest.license == AGPL_LICENSE and not ultralytics_available:
+                        logger.info(
+                            f"Skipping manifest '{manifest.id}' since the 'ultralytics' package is not installed."
+                        )
+                        continue
                     model_manifests[manifest.id] = manifest
 
         return model_manifests

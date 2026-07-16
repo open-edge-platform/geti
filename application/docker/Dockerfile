@@ -2,6 +2,9 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+# If set to 1, uninstalls ultralytics and its AGPL-licensed dependencies after installation.
+ARG EXCLUDE_AGPL_MODELS=0
+
 ##############
 # Backend base
 ##############
@@ -40,6 +43,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 # CPU Base
 ##########
 FROM backend-base AS cpu-base
+ARG EXCLUDE_AGPL_MODELS
 
 # Step 1: Install all third-party dependencies (cache key = uv.lock + pyproject.toml + version only).
 # --no-install-project skips building/installing the local project and its path deps (getitune),
@@ -64,10 +68,17 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=library,target=/library,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra cpu
 
+# Optionally uninstall ultralytics and its AGPL-licensed dependencies.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
+        uv pip uninstall ultralytics ultralytics-thop nvidia-ml-py; \
+    fi
+
 ###########
 # CUDA Base
 ###########
 FROM backend-base AS cuda-base
+ARG EXCLUDE_AGPL_MODELS
 
 # Step 1: Install all third-party dependencies (cache key = uv.lock + pyproject.toml + version only).
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -87,10 +98,17 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=library,target=/library,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra cuda
 
+# Optionally uninstall ultralytics and its AGPL-licensed dependencies.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
+        uv pip uninstall ultralytics ultralytics-thop nvidia-ml-py; \
+    fi
+
 ##########
 # XPU Base
 ##########
 FROM backend-base AS xpu-base
+ARG EXCLUDE_AGPL_MODELS
 
 # Step 1: Install all third-party dependencies (cache key = uv.lock + pyproject.toml + version only).
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -109,6 +127,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=application/VERSION,target=../VERSION \
     --mount=type=bind,source=library,target=/library,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra xpu
+
+# Optionally uninstall ultralytics and its AGPL-licensed dependencies.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
+        uv pip uninstall ultralytics ultralytics-thop nvidia-ml-py; \
+    fi
 
 ##################
 # Geti UI packages
@@ -301,7 +325,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         git=1:2.47.3-0* \
         libgl1=1.7.0-1+b2 \
         libglib2.0-0t64=2.84.4-3~deb13u3 \
-        libglx-mesa0=25.0.7-2 \
+        libglx-mesa0=25.0.* \
         libv4l-0t64=1.30.1-1 \
         libva2=2.22.* \
         libva-drm2=2.22.* \

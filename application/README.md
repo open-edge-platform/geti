@@ -10,7 +10,7 @@
 [![pytorch](https://img.shields.io/badge/pytorch-2.10-orange)]()
 [![openvino](https://img.shields.io/badge/openvino-2026.2-purple)]()
 
-[Quick start](#quick-start) •
+[Application](#geti-application) •
 [Docs](#documentation) •
 [License](#license)
 
@@ -26,7 +26,6 @@ train and optimize models, and run real-time inference through configurable pipe
   <img src="../assets/application.gif" alt="Application demo" width="100%">
 </p>
 
-
 Main capabilities:
 
 - **No-code model lifecycle**: move from data upload and annotation to training, evaluation, and deployment in one UI.
@@ -34,12 +33,12 @@ Main capabilities:
 - **Pipeline-based deployment**: connect sources (cameras or files) to trained models and route predictions to sinks such as storage, MQTT, or webhooks.
 - **Edge-oriented optimization**: export OpenVINO-optimized models for efficient inference on Intel hardware, with support for other accelerators.
 
-
 ### Install as Windows app
 
 Installing Geti as a Windows app is the simplest way to run it on Windows:
 
 1. Download the `.msix` package from the official Geti release.
+
 - [Download CPU-only version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cpu-3.0.0.msix)
 - [Download Intel® XPU version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-xpu-3.0.0.msix)
 - [Download Nvidia® CUDA version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cuda-3.0.0.msix)
@@ -53,7 +52,6 @@ If Windows shows a security prompt, verify that the package is from the official
 
 The easiest and most straightforward way to run Geti is through Docker.
 We provide pre-built images for Intel® XPU and NVIDIA® CUDA platforms, or you can build your own image from source.
-
 
 <details>
 <summary><strong>Prerequisites</strong></summary>
@@ -82,6 +80,10 @@ docker pull ghcr.io/open-edge-platform/geti-cpu
 # Retag the pulled image as `geti-{cpu,xpu,cuda}:latest` for using with `just run-image`
 docker tag ghcr.io/open-edge-platform/geti-cpu:latest geti-cpu:latest
 ```
+
+> [!IMPORTANT]
+> Pre-built images do not include Ultralytics models, due to AGPL licensing constraints. If you need them, build
+> the image from source as described below.
 
 <details>
 <summary><strong>Advanced: Build the image</strong></summary>
@@ -132,7 +134,6 @@ The cert directory is mounted read-only and is separate from the data volume - i
 > [!NOTE]
 > The self-signed certificate triggers a browser security warning. For a trusted local setup, generate a
 > locally-trusted cert with [mkcert](https://github.com/FiloSottile/mkcert) and pass it the same way.
-
 
 </details>
 
