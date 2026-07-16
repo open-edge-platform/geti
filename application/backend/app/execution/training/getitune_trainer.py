@@ -439,6 +439,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             model_cfg["init_args"]["pretrained"] = False
         else:
             # Fresh Lightning training loads base weights via model init args.
+            model_cfg["init_args"]["pretrained"] = True
             model_cfg["init_args"]["pretrained_weights"] = weights_path
 
         model_parser = ArgumentParser()
