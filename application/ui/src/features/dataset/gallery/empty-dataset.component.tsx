@@ -1,10 +1,21 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Content, Flex, Heading } from '@geti-ui/ui';
+import { Button, Flex, Heading } from '@geti-ui/ui';
 
 import { ReactComponent as EmptyDatasetImage } from '../../../assets/empty-dataset.svg';
+import { useImportDatasetDialogState } from '../providers/export-import-dataset-dialog-provider.component';
 import { MediaUpload } from './toolbar/media-upload.component';
+
+const ImportDatasetButton = () => {
+    const { datasetImportDialogState } = useImportDatasetDialogState();
+
+    return (
+        <Button variant={'secondary'} onPress={() => datasetImportDialogState.open()}>
+            Import dataset
+        </Button>
+    );
+};
 
 type EmptyDatasetProps = {
     hasActiveFilter: boolean;
@@ -29,9 +40,10 @@ export const EmptyDataset = ({ hasActiveFilter }: EmptyDatasetProps) => {
                 )}
             </Heading>
             {!hasActiveFilter && (
-                <Content>
+                <Flex gap={'size-100'}>
                     <MediaUpload />
-                </Content>
+                    <ImportDatasetButton />
+                </Flex>
             )}
         </Flex>
     );
