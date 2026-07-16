@@ -11,7 +11,11 @@ unexpectedly`` crashes, shared-memory exhaustion, ...). It is meant to live in a
 throwaway diagnostic commit and is **not** intended to be merged to master.
 
 Everything here is defensive: diagnostics must never break or slow down the
-pipeline, so all collectors swallow their own exceptions and log at ``DEBUG``.
+pipeline, so all collectors swallow their own exceptions. Most collectors log
+at ``DEBUG``; the ``/dev/shm`` usage snapshot logs at ``INFO`` because
+shared-memory exhaustion is a common, high-signal failure mode (surfacing as
+``DataLoader worker exited unexpectedly``) that is worth capturing in
+operational, INFO-level runs.
 """
 
 from __future__ import annotations
@@ -87,16 +91,19 @@ def log_shared_memory_usage(context: str) -> None:
     back to the main process. In containers it is often small (e.g. 64 MiB);
     overflowing it surfaces as ``DataLoader worker (pid(s) ...) exited
     unexpectedly``, so tracking it around data loading is invaluable.
+
+    Logged at ``INFO`` so the shared-memory status is visible in normal
+    (INFO-level) operational runs, not just when debug logging is enabled.
     """
     try:
         usage = shutil.disk_usage("/dev/shm")  # noqa: S108 - reading tmpfs usage, not creating a temp file
     except FileNotFoundError:
-        logger.debug("[diag:{}] /dev/shm not present", context)
+        logger.info("[diag:{}] /dev/shm not present", context)
         return
     except Exception as exc:
         logger.debug("[diag:{}] failed to read /dev/shm usage: {}", context, exc)
         return
-    logger.debug(
+    logger.info(
         "[diag:{}] /dev/shm total={} used={} free={} ({:.1f}% used)",
         context,
         fmt_bytes(usage.total),
