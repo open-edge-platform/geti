@@ -12,162 +12,122 @@ defaults:
   rotation:
     extended_groups: 2
 experiments:
-  classification/multi_class_cls:
-    models:
-      - name: dino_v2
-        priority: core
-      - name: vit_tiny
-        priority: core
-      - name: mobilenet_v3_large
-        priority: core
-      - name: efficientnet_b3
-        priority: deferred
-      - name: efficientnet_v2
-        priority: extended
-      - name: efficientnet_b0
-        priority: extended
-    datasets:
-      - paddy_disease
-      - chest_ct
-      - aircraft
-      - flowers102
-      - food41
-    criteria:
-      accuracy_metric: f1-score
-      thresholds:
-        "training:val/{metric}": { compare: ">=", margin: 0.10 }
-        "torch:test/{metric}": { compare: ">=", margin: 0.10 }
-        "export:test/{metric}": { compare: ">=", margin: 0.10 }
-        "training:train/iter_time": { compare: "<=", margin: 0.10 }
-        "training:gpu_mem": { compare: "<=", margin: 0.10 }
-        "torch:test/latency": { compare: "<=", margin: 0.15 }
-  classification/multi_label_cls:
-    models:
-      - name: dino_v2
-        priority: core
-      - name: mobilenet_v3_large
-        priority: core
-      - name: vit_tiny
-        priority: extended
-      - name: efficientnet_b0
-        priority: extended
-      - name: efficientnet_b3
-        priority: deferred
-      - name: efficientnet_v2
-        priority: extended
-    datasets:
-      - aid_multilabel
-    criteria:
-      accuracy_metric: mAP
-      thresholds:
-        "training:val/{metric}": { compare: ">=", margin: 0.10 }
-        "torch:test/{metric}": { compare: ">=", margin: 0.10 }
-        "export:test/{metric}": { compare: ">=", margin: 0.10 }
-        "training:train/iter_time": { compare: "<=", margin: 0.10 }
-        "training:gpu_mem": { compare: "<=", margin: 0.10 }
-        "torch:test/latency": { compare: "<=", margin: 0.15 }
   detection:
     models:
+      # --- tiling disabled (base recipes) ---
+      - name: atss_mobilenetv2
+        priority: core
+        recipe: detection/atss_mobilenetv2.yaml
+      - name: ssd_mobilenetv2
+        priority: core
+        recipe: detection/ssd_mobilenetv2.yaml
       - name: yolox_tiny
-        priority: extended
-      - name: yolox_tiny_tile
-        priority: core # one tiling model to always check Tiling
+        priority: core
+        recipe: detection/yolox_tiny.yaml
       - name: yolox_s
         priority: core
-      - name: yolox_s_tile
-        priority: deferred
+        recipe: detection/yolox_s.yaml
       - name: yolox_l
-        priority: deferred
-      - name: yolox_l_tile
-        priority: deferred
+        priority: core
+        recipe: detection/yolox_l.yaml
       - name: yolox_x
-        priority: extended
-      - name: yolox_x_tile
-        priority: deferred
-      - name: yolo11_n
-        priority: extended
-      - name: yolo11_s
-        priority: deferred
-      - name: yolo11_m
-        priority: deferred
-      - name: yolo11_l
-        priority: deferred
-      - name: yolo11_x
-        priority: extended
+        priority: core
+        recipe: detection/yolox_x.yaml
+      - name: rtdetr_50
+        priority: core
+        recipe: detection/rtdetr_50.yaml
+      - name: deim_dfine_m
+        priority: core
+        recipe: detection/deim_dfine_m.yaml
+      - name: deim_dfine_l
+        priority: core
+        recipe: detection/deim_dfine_l.yaml
+      - name: deim_dfine_x
+        priority: core
+        recipe: detection/deim_dfine_x.yaml
+      - name: deimv2_s
+        priority: core
+        recipe: detection/deimv2_s.yaml
+      - name: deimv2_m
+        priority: core
+        recipe: detection/deimv2_m.yaml
+      - name: deimv2_l
+        priority: core
+        recipe: detection/deimv2_l.yaml
       - name: rfdetr_nano
         priority: core
+        recipe: detection/rfdetr_nano.yaml
       - name: rfdetr_small
-        priority: deferred
+        priority: core
+        recipe: detection/rfdetr_small.yaml
       - name: rfdetr_medium
-        priority: deferred
+        priority: core
+        recipe: detection/rfdetr_medium.yaml
       - name: rfdetr_large
-        priority: extended
-      - name: deim_dfine_m
-        priority: extended
-      - name: deim_dfine_l
-        priority: deferred
-      - name: deim_dfine_x
-        priority: extended
-      - name: deimv2_s
-        priority: extended
-      - name: deimv2_m
-        priority: deferred
-      - name: deimv2_l
-        priority: extended
-      - name: atss_mobilenetv2
-        priority: extended
+        priority: core
+        recipe: detection/rfdetr_large.yaml
+      - name: dfine_x
+        priority: core
+        recipe: detection/dfine_x.yaml
+      # --- tiling enabled (_tile recipes) ---
       - name: atss_mobilenetv2_tile
-        priority: deferred
-      - name: ssd_mobilenetv2
-        priority: deferred
+        priority: core
+        recipe: detection/atss_mobilenetv2_tile.yaml
       - name: ssd_mobilenetv2_tile
-        priority: deferred
-      - name: rtdetr_50
-        priority: extended
+        priority: core
+        recipe: detection/ssd_mobilenetv2_tile.yaml
+      - name: yolox_tiny_tile
+        priority: core
+        recipe: detection/yolox_tiny_tile.yaml
+      - name: yolox_s_tile
+        priority: core
+        recipe: detection/yolox_s_tile.yaml
+      - name: yolox_l_tile
+        priority: core
+        recipe: detection/yolox_l_tile.yaml
+      - name: yolox_x_tile
+        priority: core
+        recipe: detection/yolox_x_tile.yaml
       - name: rtdetr_50_tile
-        priority: deferred
-      - name: yolo12_n
-        priority: extended
-      - name: yolo12_s
-        priority: deferred
-      - name: yolo12_m
-        priority: deferred
-      - name: yolo12_l
-        priority: deferred
-      - name: yolo12_x
-        priority: extended
-      - name: yolo26_n
         priority: core
-      - name: yolo26_s
-        priority: deferred
-      - name: yolo26_m
-        priority: deferred
-      - name: yolo26_l
-        priority: deferred
-      - name: yolo26_x
-        priority: extended
-      - name: edgecrafter_s
+        recipe: detection/rtdetr_50_tile.yaml
+      - name: deim_dfine_m_tile
         priority: core
-      - name: edgecrafter_m
-        priority: deferred
-      - name: edgecrafter_l
-        priority: deferred
-      - name: edgecrafter_x
-        priority: extended
-
+        recipe: detection/deim_dfine_m_tile.yaml
+      - name: deim_dfine_l_tile
+        priority: core
+        recipe: detection/deim_dfine_l_tile.yaml
+      - name: deim_dfine_x_tile
+        priority: core
+        recipe: detection/deim_dfine_x_tile.yaml
+      - name: deimv2_s_tile
+        priority: core
+        recipe: detection/deimv2_s_tile.yaml
+      - name: deimv2_m_tile
+        priority: core
+        recipe: detection/deimv2_m_tile.yaml
+      - name: deimv2_l_tile
+        priority: core
+        recipe: detection/deimv2_l_tile.yaml
+      - name: rfdetr_nano_tile
+        priority: core
+        recipe: detection/rfdetr_nano_tile.yaml
+      - name: rfdetr_small_tile
+        priority: core
+        recipe: detection/rfdetr_small_tile.yaml
+      - name: rfdetr_medium_tile
+        priority: core
+        recipe: detection/rfdetr_medium_tile.yaml
+      - name: rfdetr_large_tile
+        priority: core
+        recipe: detection/rfdetr_large_tile.yaml
+      - name: dfine_x_tile
+        priority: core
+        recipe: detection/dfine_x_tile.yaml
     datasets:
-      - pothole
-      - wgisd
       - bccd
-      - pcb_defect
-      - axial_mri
-      - cable_damage
-      - brain_tumor
-      - oxford_pets
-      - vehicles
-      - cardd
     criteria:
-      accuracy_metric: map
+      accuracy_metric: map_50
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
@@ -179,8 +139,10 @@ experiments:
     models:
       - name: litehrnet_18
         priority: extended
+        recipe: semantic_segmentation/litehrnet_18.yaml
       - name: dino_v2
         priority: extended
+        recipe: semantic_segmentation/dino_v2.yaml
       # SegNeXt models are currently disabled due to https://github.com/open-edge-platform/geti/issues/6694.
       #      - name: segnext_t
       #        priority: extended
@@ -192,27 +154,13 @@ experiments:
       #        priority: extended
       #        recipe: semantic_segmentation/segnext_b.yaml
       - name: litehrnet_s
-        priority: deferred
+        priority: extended
+        recipe: semantic_segmentation/litehrnet_s.yaml
       - name: litehrnet_x
         priority: extended
-      - name: dino_v2_tile
-        priority: deferred
-      - name: litehrnet_18_tile
-        priority: deferred
-      - name: litehrnet_s_tile
-        priority: deferred
-      - name: litehrnet_x_tile
-        priority: deferred
+        recipe: semantic_segmentation/litehrnet_x.yaml
     datasets:
-      - pcb_defect
-      - corrosion
-      - crack_semantic
-      - wgisd
       - oxford_pets
-      - pothole
-      - satellite_building
-      - brain_tumor
-      - cardd
     criteria:
       accuracy_metric: Dice
       thresholds:
@@ -224,65 +172,72 @@ experiments:
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   instance_segmentation:
     models:
+      # --- tiling disabled (base recipes) ---
+      - name: maskrcnn_efficientnetb2b
+        priority: core
+        recipe: instance_segmentation/maskrcnn_efficientnetb2b.yaml
+      - name: maskrcnn_r50
+        priority: core
+        recipe: instance_segmentation/maskrcnn_r50.yaml
+      - name: maskrcnn_swint
+        priority: core
+        recipe: instance_segmentation/maskrcnn_swint.yaml
+      - name: rtmdet_inst_tiny
+        priority: core
+        recipe: instance_segmentation/rtmdet_inst_tiny.yaml
       - name: rfdetr_seg_nano
         priority: core
+        recipe: instance_segmentation/rfdetr_seg_nano.yaml
       - name: rfdetr_seg_small
-        priority: deferred
-      - name: rfdetr_seg_medium
-        priority: deferred
-      - name: rfdetr_seg_xlarge
-        priority: deferred
-      - name: rfdetr_seg_2xlarge
-        priority: extended
-      - name: maskrcnn_r50
-        priority: extended
-      - name: rtmdet_inst_tiny
-        priority: extended
-      - name: maskrcnn_efficientnetb2b
-        priority: extended
-      - name: maskrcnn_swint
-        priority: extended
-      - name: rfdetr_seg_large
-        priority: deferred
-      - name: yolo11_n_seg
-        priority: extended
-      - name: yolo11_s_seg
-        priority: deferred
-      - name: yolo11_m_seg
-        priority: deferred
-      - name: yolo11_l_seg
-        priority: deferred
-      - name: yolo11_x_seg
-        priority: extended
-      - name: yolo26_n_seg
         priority: core
-      - name: yolo26_s_seg
-        priority: deferred
-      - name: yolo26_m_seg
-        priority: deferred
-      - name: yolo26_l_seg
-        priority: deferred
-      - name: yolo26_x_seg
-        priority: extended
+        recipe: instance_segmentation/rfdetr_seg_small.yaml
+      - name: rfdetr_seg_medium
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_medium.yaml
+      - name: rfdetr_seg_large
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_large.yaml
+      - name: rfdetr_seg_xlarge
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_xlarge.yaml
+      - name: rfdetr_seg_2xlarge
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_2xlarge.yaml
+      # --- tiling enabled (_tile recipes) ---
       - name: maskrcnn_efficientnetb2b_tile
-        priority: deferred
+        priority: core
+        recipe: instance_segmentation/maskrcnn_efficientnetb2b_tile.yaml
       - name: maskrcnn_r50_tile
-        priority: deferred
+        priority: core
+        recipe: instance_segmentation/maskrcnn_r50_tile.yaml
       - name: maskrcnn_swint_tile
-        priority: deferred
+        priority: core
+        recipe: instance_segmentation/maskrcnn_swint_tile.yaml
       - name: rtmdet_inst_tiny_tile
-        priority: deferred
+        priority: core
+        recipe: instance_segmentation/rtmdet_inst_tiny_tile.yaml
+      - name: rfdetr_seg_nano_tile
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_nano_tile.yaml
+      - name: rfdetr_seg_small_tile
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_small_tile.yaml
+      - name: rfdetr_seg_medium_tile
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_medium_tile.yaml
+      - name: rfdetr_seg_large_tile
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_large_tile.yaml
+      - name: rfdetr_seg_xlarge_tile
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_xlarge_tile.yaml
+      - name: rfdetr_seg_2xlarge_tile
+        priority: core
+        recipe: instance_segmentation/rfdetr_seg_2xlarge_tile.yaml
     datasets:
-      - pothole
-      - pcb_defect
       - wgisd
-      - oxford_pets
-      - brain_tumor
-      - cardd
-      - satellite_building
-
     criteria:
-      accuracy_metric: map
+      accuracy_metric: map_50
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
