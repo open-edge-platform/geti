@@ -1,8 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { TaskType } from '@/api/types';
 import { isMac } from '@react-aria/utils';
+
+import { TaskType } from '../constants/shared-types';
 
 const CTRL_KEY = 'ctrl';
 const COMMAND_KEY = 'meta';
@@ -23,8 +24,7 @@ export const HOTKEYS = {
     magneticLassoTool: 'm',
     selectAllAnnotations: `${CTRL_OR_COMMAND_KEY}+a`,
     deselectAllAnnotations: `${CTRL_OR_COMMAND_KEY}+d`,
-    submit: `${CTRL_OR_COMMAND_KEY}+s`,
-    submitAlternative: 'enter',
+    submit: 'enter',
 } as const;
 
 const COMMON_HOTKEYS = {

@@ -27,7 +27,7 @@ export const HotkeysList = () => {
         <Grid columns={['2fr', '1fr']} rowGap={'size-100'}>
             <HotkeyItem
                 hotkeyName={'Submit annotations/predictions'}
-                hotkey={`${formatHotkeyForDisplay(HOTKEYS.submitAlternative)} or ${formatHotkeyForDisplay(HOTKEYS.submit)}`}
+                hotkey={formatHotkeyForDisplay(HOTKEYS.submit)}
             />
             <Divider size='S' gridColumn={'1/-1'} />
             <HotkeyItem hotkeyName={'Previous media'} hotkey={'ArrowUp or ArrowLeft'} />
