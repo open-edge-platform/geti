@@ -30,7 +30,14 @@ jobs:
     outputs:
       run_workflow: ${{ steps.check_paths.outputs.run }}
     steps:
-      - name: Checkout repository
+      - &harden-runner
+        name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - &checkout
+        name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
@@ -61,10 +68,10 @@ jobs:
       pull-requests: write # Post image size comments on PRs
       id-token: write # Use OIDC token to sign images
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          persist-credentials: false
+      - *harden-runner
+
+      - *checkout
+
 
       - name: Read application version
         id: version
@@ -149,7 +156,7 @@ jobs:
           # Wait up to 60 seconds for the /health endpoint to respond
           echo "Waiting for /health endpoint ..."
           for i in $(seq 1 30); do
-            if curl -sf http://localhost:7860/health; then
+            if curl -sf --insecure https://localhost:7860/health; then
               echo ""
               echo "Backend health check passed!"
               break
@@ -164,11 +171,11 @@ jobs:
           done
 
           # Verify the UI is being served
-          TEST_URL="http://localhost:7860"
+          TEST_URL="https://localhost:7860"
           EXPECTED_TITLE="Geti"
           echo "Checking HTML title..."
 
-          HTML_CONTENT=$(curl -sf $TEST_URL)
+          HTML_CONTENT=$(curl -sf --insecure $TEST_URL)
           if echo "$HTML_CONTENT" | grep -q "<title>.*$EXPECTED_TITLE.*</title>"; then
             echo "✅ HTML title check passed - found: $EXPECTED_TITLE"
           else
@@ -287,6 +294,8 @@ jobs:
       CHECKS: ${{ join(needs.*.result, ' ') }}
     if: always() && !cancelled()
     steps:
+      - *harden-runner
+
       - name: Check jobs results
         run: |
           for check in ${CHECKS}; do

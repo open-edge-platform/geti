@@ -56,6 +56,38 @@ const tauriRestrictedImportPattern = {
         'swap implementations per build target.',
 };
 
+// Containment rule for generated OpenAPI types. Only the client-building layer
+// (src/api/**, src/query-client/**) and the shared type re-export barrel
+// (src/api/shared-types.ts) may import the generated spec directly.
+// Everywhere else must import domain types from `@/api/types`.
+const openapiSpecRestrictedImportPattern = {
+    group: ['**/openapi-spec'],
+    message: 'Do not import generated OpenAPI types directly. Import them from `@/api/types` instead.',
+};
+
+// Containment rule for the shared-types re-export barrel. Only src/api/** and
+// src/query-client/** may reach it with a relative import (they sit next to
+// it or build the client). Everywhere else must go through the `@/api/types`
+// alias so the concrete file location stays an implementation detail.
+const sharedTypesRestrictedImportPattern = {
+    group: ['**/shared-types'],
+    message: 'Do not import `shared-types` with a relative path. Import domain types from `@/api/types` instead.',
+};
+
+const apiBarrelRestrictedImportPattern = {
+    group: ['**/api/client', '**/api/fetch-sse'],
+    message: 'Do not import the `@/api` barrel from within `src/api/`. Use a direct relative import instead.',
+};
+
+// Containment rule for the `@/api` barrel. Files inside src/api/ are the ones
+// building that barrel, so importing it back via the alias creates a
+// self-import / circular-reference risk. Use direct relative imports
+// (e.g. './client', './fetch-sse') from within src/api/ instead.
+const apiBarrelRestrictedImportPath = {
+    name: '@/api',
+    message: 'Do not import the `@/api` barrel from within `src/api/`. Use a direct relative import instead.',
+};
+
 export default [
     {
         ignores: [...sharedEslintConfig[0].ignores, 'src/api/openapi-spec.d.ts'],
@@ -110,6 +142,58 @@ export default [
                 'error',
                 {
                     paths: restrictedImportPaths,
+                    patterns: [...restrictedImportPatterns, tauriRestrictedImportPattern],
+                },
+            ],
+        },
+    },
+    {
+        files: ['src/**/*.{ts,tsx}'],
+        ignores: ['src/**/*.tauri.{ts,tsx}', 'src/api/**', 'src/query-client/**'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: restrictedImportPaths,
+                    patterns: [
+                        ...restrictedImportPatterns,
+                        tauriRestrictedImportPattern,
+                        openapiSpecRestrictedImportPattern,
+                        apiBarrelRestrictedImportPattern,
+                        sharedTypesRestrictedImportPattern,
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ['src/**/*.tauri.{ts,tsx}'],
+        ignores: ['src/api/**', 'src/query-client/**'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: restrictedImportPaths,
+                    patterns: [
+                        ...restrictedImportPatterns,
+                        openapiSpecRestrictedImportPattern,
+                        apiBarrelRestrictedImportPattern,
+                        sharedTypesRestrictedImportPattern,
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        // Files inside src/api/ build the `@/api` barrel; importing it back
+        // from here would be a self-import through the alias. Use direct
+        // relative imports to sibling modules instead (e.g. './client').
+        files: ['src/api/**/*.{ts,tsx}'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: [...restrictedImportPaths, apiBarrelRestrictedImportPath],
                     patterns: [...restrictedImportPatterns, tauriRestrictedImportPattern],
                 },
             ],

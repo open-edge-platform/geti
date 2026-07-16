@@ -3,17 +3,18 @@
 
 import { ReactNode } from 'react';
 
+import type { IPCameraSourceConfig, USBCameraSourceConfig, VideoFileSourceConfig } from '@/api/types';
+
 import { ReactComponent as IpCameraIcon } from '../../../assets/icons/ip-camera.svg';
 import { ReactComponent as Video } from '../../../assets/icons/video-file.svg';
 import { ReactComponent as WebcamIcon } from '../../../assets/icons/webcam.svg';
-import { IPCameraSourceConfig, USBCameraSourceConfig, VideoFileSourceConfig } from '../../../constants/shared-types';
 import { AddSource } from './add-source/add-source.component';
 import { DisclosureGroup } from './disclosure-group.component';
 import { IpCamera } from './ip-camera/ip-camera.component';
 import { getIpCameraInitialConfig, ipCameraBodyFormatter } from './ip-camera/utils';
 import { UsbCamera } from './usb-camera/usb-camera-fields.component';
 import { getUsbCameraInitialConfig, usbCameraBodyFormatter } from './usb-camera/utils';
-import { getVideoFileInitialConfig, videoFileBodyFormatter } from './video-file/utils';
+import { getVideoFileInitialConfig, prepareVideoFileFormData, videoFileBodyFormatter } from './video-file/utils';
 import { VideoFile } from './video-file/video-file.component';
 
 interface SourceOptionsProps {
@@ -85,6 +86,7 @@ export const SourceOptions = ({ onSaved, hasHeader, children, existingNames = []
                                 config={getVideoFileInitialConfig(existingNames)}
                                 componentFields={(state: VideoFileSourceConfig) => <VideoFile defaultState={state} />}
                                 bodyFormatter={videoFileBodyFormatter}
+                                prepareFormData={prepareVideoFileFormData}
                             />
                         ),
                     },

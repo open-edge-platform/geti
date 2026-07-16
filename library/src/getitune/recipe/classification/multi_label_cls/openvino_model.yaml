@@ -1,4 +1,4 @@
-callback_monitor: val/accuracy
+callback_monitor: val/mAP
 
 data: ../../_base_/data/classification.yaml
 

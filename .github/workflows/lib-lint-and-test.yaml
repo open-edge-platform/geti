@@ -29,6 +29,12 @@ jobs:
       run_workflow: ${{ steps.check_paths.outputs.run }}
       run_benchmark_dataset_scripts: ${{ steps.check_benchmark_dataset_scripts.outputs.run }}
     steps:
+      - &harden-runner
+        name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - &checkout
         name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -62,6 +68,8 @@ jobs:
     permissions:
       contents: read
     steps:
+      - *harden-runner
+
       - *checkout
 
       - name: Install Python, uv and Just
@@ -97,6 +105,11 @@ jobs:
     name: unit-tests-with-Python${{ matrix.python-version }}
     steps:
       # YAML anchors not used cause currently zizmor don't support them in matrix strategies
+      - name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
@@ -155,6 +168,11 @@ jobs:
     name: integration-tests-${{ matrix.task }}-py${{ matrix.python-version }}
     steps:
       # YAML anchors aren't used because Zizmor fails here and support for them is best-effort for now
+      - name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
@@ -202,7 +220,16 @@ jobs:
       - check-paths
     if: needs.check-paths.outputs.run_benchmark_dataset_scripts == 'true'
     timeout-minutes: 30
+    # Kaggle API token for the (optional, credential-gated) real-download
+    # test in test_prepare_brain_tumor.py. Only set for same-repo runs —
+    # GitHub never exposes secrets to `pull_request` workflows triggered from
+    # forks, so that one test skips itself gracefully (via a `skipif` check)
+    # rather than failing on external contributors' PRs.
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
     steps:
+      - *harden-runner
+
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
@@ -224,7 +251,7 @@ jobs:
         working-directory: library
         env:
           GIT_LFS_SKIP_SMUDGE: "1"
-        run: just venv
+        run: just venv-benchmark
 
       - name: Run benchmark dataset script tests
         working-directory: library
@@ -243,6 +270,8 @@ jobs:
       CHECKS: ${{ join(needs.*.result, ' ') }}
     if: always() && !cancelled()
     steps:
+      - *harden-runner
+
       - name: Check jobs results
         run: |
           for check in ${CHECKS}; do

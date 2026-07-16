@@ -218,13 +218,19 @@ def _scrape_csv_metrics(csv_path: Path, prefix: str) -> dict[str, float]:
         series = raw_metrics[col].dropna()
         if series.empty:
             continue
-        # For val metrics, take the max (best epoch).
-        # For timing metrics, take the mean (skip the first warmup step).
+        series = pd.to_numeric(series, errors="coerce").dropna()
+        if series.empty:
+            continue
+        # For val/test accuracy metrics, take the max (best epoch / the
+        # single logged value). For timing metrics, take the mean (skip
+        # the first warmup step).
         if "val/" in col:
             metrics[f"{prefix}{col}"] = float(series.max())
         elif "iter_time" in col:
             trimmed = series.iloc[min(1, len(series) - 1) :]
             metrics[f"{prefix}{col}"] = float(trimmed.mean())
+        elif "test/" in col:
+            metrics[f"{prefix}{col}"] = float(series.max())
         elif "epoch" in col:
             if not is_training_phase:
                 # Inference-only phases don't have a meaningful epoch count.

@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
-import os
 import shutil
 from collections.abc import Callable
 from contextlib import AbstractContextManager
@@ -148,13 +147,9 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             model_architecture_id = training_params.model_architecture_id
             project_id = training_params.project_id
             if parent_model_revision_id is None:
-                local_weights_path = self._base_weights_service.get_local_weights_path(
+                return self._base_weights_service.get_local_weights_path(
                     task=task.task_type, model_manifest_id=model_architecture_id
                 )
-                # Set PRETRAINED_WEIGHTS_CACHE_DIR to let getitune search the weights in the cache folder
-                # defined by the application rather than in the default location
-                os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"] = str(local_weights_path.parent)
-                return local_weights_path
 
             parent_variants = self._model_service.get_model_variants(
                 project_id=project_id, model_id=parent_model_revision_id
@@ -381,13 +376,14 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             )
 
     @step("Train Model", 80)
-    def train_model(
+    def train_model(  # noqa: PLR0915 - training orchestration is intentionally centralized here
         self,
         training_config: dict,
         dataset_info: DatasetInfo,
         weights_path: Path,
         model_id: UUID,
         device: DeviceInfo,
+        has_model_revision: bool,
     ) -> tuple[Path, Engine]:
         """Execute model training.
 
@@ -429,15 +425,25 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         getitune_device_type = (
             GetiTuneDeviceType.gpu if device.type is DeviceType.CUDA else GetiTuneDeviceType(device.type)
         )
+        class_path = model_cfg.get("class_path", "")
+        is_ultralytics = "ultralytics" in class_path
         engine_kwargs: dict[str, Any] = {
             "work_dir": self._data_dir / f"getitune-workspace-{model_id}",
             "device": getitune_device_type,
-            "checkpoint": weights_path,
         }
+        # Route weight loading through checkpoint for Ultralytics and for resume flows.
+        load_from_checkpoint = is_ultralytics or has_model_revision
+        if load_from_checkpoint:
+            engine_kwargs["checkpoint"] = weights_path
+            # Disable default pretrained loading when checkpoint controls initialization.
+            model_cfg["init_args"]["pretrained"] = False
+        else:
+            # Fresh Lightning training loads base weights via model init args.
+            model_cfg["init_args"]["pretrained"] = True
+            model_cfg["init_args"]["pretrained_weights"] = weights_path
 
         model_parser = ArgumentParser()
-        class_path = model_cfg.get("class_path", "")
-        model_type = UltralyticsModel if "ultralytics" in class_path else LightningModel
+        model_type = UltralyticsModel if is_ultralytics else LightningModel
         model_parser.add_argument("--model", type=model_type)
         getitune_model = model_parser.instantiate_classes(Namespace(model=model_cfg)).get("model")
 
@@ -709,6 +715,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 weights_path=weights_path,
                 model_id=params.model_id,
                 device=params.device,
+                has_model_revision=params.has_model_revision,
             )
             exported_model_paths = self.export_model(
                 getitune_engine=getitune_engine, model_checkpoint_path=trained_model_path

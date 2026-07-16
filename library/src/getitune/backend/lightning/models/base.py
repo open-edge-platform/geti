@@ -58,6 +58,7 @@ if TYPE_CHECKING:
     from getitune.config.data import IntensityConfig
     from getitune.data.module import DataModule
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 logger = logging.getLogger()
 
@@ -172,6 +173,8 @@ class LightningModel(LightningModule):
         metric: MetricCallable = NullMetricCallable,
         torch_compile: bool = False,
         tile_config: TileConfig | dict = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         """Initialize the base model with the given parameters.
 
@@ -190,6 +193,9 @@ class LightningModel(LightningModule):
             metric (MetricCallable, optional): Callable for the metric. Defaults to NullMetricCallable.
             torch_compile (bool, optional): Flag to indicate if torch.compile should be used. Defaults to False.
             tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+            pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+            pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+                the default pretrained weights will be utilized for fine-tuning. Defaults to None.
 
         """
         super().__init__()
@@ -198,13 +204,15 @@ class LightningModel(LightningModule):
         self.model_name = model_name
         self.data_input_params = self._configure_preprocessing_params(data_input_params)
         self.model = self._create_model()
+        if pretrained:
+            self.load_pretrained(pretrained_weights)
         self.optimizer_callable = ensure_callable(optimizer)
         self.scheduler_callable = ensure_callable(scheduler)
         self.metric_callable = ensure_callable(metric)
         self.torch_compile = torch_compile
         self._explain_mode = False
 
-        # NOTE: To guarantee immutablility of the default value
+        # NOTE: To guarantee immutability of the default value
         if isinstance(tile_config, dict):
             tile_config = TileConfig(**tile_config)
         self._tile_config = tile_config.clone()
@@ -1062,3 +1070,13 @@ class LightningModel(LightningModule):
     @abstractmethod
     def task(self) -> TaskType:
         """Get  task type."""
+
+    def load_pretrained(self, weights: PathLike | None = None) -> None:
+        """Load architecture-specific pretrained weights into ``self.model``.
+
+        Distinct from full getitune checkpoints (resume/fine-tune): this seeds the
+        freshly-built architecture. A single combined file covers the whole model
+        (backbone + neck + head). When ``weights`` is None, models load their own
+        default source. Base implementation is a no-op: if models do not have pretrained
+        weights it should work.
+        """

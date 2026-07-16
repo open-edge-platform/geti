@@ -26,7 +26,8 @@ from app.models import (
     TaskType,
 )
 from app.models.dataset import DatasetStatistics
-from app.models.media import MediaAdapter, VideoFrame
+from app.models.dataset_item import DatasetItemSortBy
+from app.models.media import MediaAdapter, SortDirection, VideoFrame
 from app.repositories import DatasetItemRepository
 from app.services.media_service import MediaService
 
@@ -59,7 +60,9 @@ class DatasetItemFilters:
     end_date: datetime | None = None
     annotation_status: DatasetItemAnnotationStatus | None = None
     label_ids: list[UUID] | None = None
-    subset: str | None = None
+    subsets: list[str] | None = None
+    sort_by: DatasetItemSortBy = DatasetItemSortBy.CREATION_DATE
+    sort_direction: SortDirection = SortDirection.DESC
 
 
 class DatasetService(BaseSessionManagedService):
@@ -119,7 +122,7 @@ class DatasetService(BaseSessionManagedService):
         end_date: datetime | None = None,
         annotation_status: DatasetItemAnnotationStatus | None = None,
         label_ids: list[UUID] | None = None,
-        subset: str | None = None,
+        subsets: list[str] | None = None,
     ) -> int:
         """Get number of available dataset items (within date range if specified)"""
         repo = DatasetItemRepository(project_id=str(project.id), db=self.db_session)
@@ -129,7 +132,7 @@ class DatasetService(BaseSessionManagedService):
             end_date=end_date,
             annotation_status=annotation_status,
             label_ids=label_ids_str,
-            subset=subset,
+            subsets=subsets,
         )
 
     def get_dataset_statistics(self, project_id: UUID) -> DatasetStatistics:
@@ -157,7 +160,9 @@ class DatasetService(BaseSessionManagedService):
                 end_date=filters.end_date,
                 annotation_status=filters.annotation_status,
                 label_ids=label_ids_str,
-                subset=filters.subset,
+                subsets=filters.subsets,
+                sort_by=filters.sort_by,
+                sort_direction=filters.sort_direction,
             )
         ]
 
@@ -180,7 +185,7 @@ class DatasetService(BaseSessionManagedService):
                 end_date=filters.end_date,
                 annotation_status=filters.annotation_status,
                 label_ids=label_ids_str,
-                subset=filters.subset,
+                subsets=filters.subsets,
             )
         ]
 

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import shutil
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from uuid import UUID, uuid4
@@ -80,6 +81,7 @@ class DatasetRevisionService(BaseSessionManagedService):
                     validation_count=item_counts.validation,
                     testing_count=item_counts.testing,
                     size=size_in_bytes,
+                    created_at=datetime.now(UTC),  # Set created_at explicitly with microsecond precision.
                 )
             )
         except (IntegrityError, PrimaryKeyIntegrityError, UniqueConstraintIntegrityError):
@@ -359,7 +361,7 @@ class DatasetRevisionService(BaseSessionManagedService):
         dataset_revision: DatasetRevision,
         limit: int = 10,
         offset: int = 0,
-        subset: DatasetItemSubset | None = None,
+        subsets: list[DatasetItemSubset] | None = None,
     ) -> tuple[list[DatasetRevisionItem], int]:
         """
         List items in a dataset revision with pagination and filtering.
@@ -369,7 +371,7 @@ class DatasetRevisionService(BaseSessionManagedService):
             dataset_revision: The dataset revision.
             limit: Maximum number of items to return.
             offset: Number of items to skip.
-            subset: Optional subset filter.
+            subsets: Optional list of subsets to filter by.
 
         Returns:
             Tuple of (list of items as dicts, total count).
@@ -378,8 +380,8 @@ class DatasetRevisionService(BaseSessionManagedService):
 
         df = pl.scan_parquet(parquet_path)
 
-        if subset is not None:
-            df = df.filter(pl.col("subset") == subset.name)
+        if subsets:
+            df = df.filter(pl.col("subset").is_in([s.name for s in subsets]))
 
         total_count = df.select(pl.len()).collect().item()
         df = df.slice(offset, limit).collect()

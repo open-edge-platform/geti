@@ -1,10 +1,10 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { API_BASE_URL, fetchClient } from '@/api';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { API_BASE_URL, fetchClient } from '../../../../api/client';
 import { getQueryKey } from '../../../../query-client/query-client';
 import { assertIsNotNullable, downloadFile } from '../../../../shared/util';
 import { type LogEntry } from '../log-types';

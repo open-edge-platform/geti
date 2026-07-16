@@ -12,8 +12,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
-from rfdetr import RFDETRBase, RFDETRLarge, RFDETRMedium, RFDETRNano, RFDETRSmall
-from torch.export import Dim
+from rfdetr.config import (
+    RFDETRLargeConfig,
+    RFDETRMediumConfig,
+    RFDETRNanoConfig,
+    RFDETRSmallConfig,
+)
 
 from getitune.backend.lightning.exporter.base import ModelExporter
 from getitune.backend.lightning.exporter.native import LightningModelExporter
@@ -31,6 +35,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -61,6 +66,9 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
             during training.
         gradient_checkpointing: Whether to enable gradient checkpointing to
             reduce GPU memory usage at the cost of slower training.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
 
     Note:
         RF-DETR uses different patch sizes for different model variants:
@@ -69,20 +77,18 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
         Input sizes must be compatible with patch_size * num_windows.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
-        "rfdetr_base": "https://storage.geti.intel.com/weights/rf-detr-base-2026.pth",
-        "rfdetr_large": "https://storage.geti.intel.com/weights/rf-detr-large-2026.pth",
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "rfdetr_nano": "https://storage.geti.intel.com/weights/rf-detr-nano-2026.pth",
         "rfdetr_small": "https://storage.geti.intel.com/weights/rf-detr-small-2026.pth",
         "rfdetr_medium": "https://storage.geti.intel.com/weights/rf-detr-medium-2026.pth",
+        "rfdetr_large": "https://storage.geti.intel.com/weights/rf-detr-large-2026.pth",
     }
 
-    _model_class_mapping: ClassVar[dict[str, type]] = {
-        "rfdetr_base": RFDETRBase,
-        "rfdetr_large": RFDETRLarge,
-        "rfdetr_medium": RFDETRMedium,
-        "rfdetr_nano": RFDETRNano,
-        "rfdetr_small": RFDETRSmall,
+    _model_config_mapping: ClassVar[dict[str, type]] = {
+        "rfdetr_large": RFDETRLargeConfig,
+        "rfdetr_medium": RFDETRMediumConfig,
+        "rfdetr_nano": RFDETRNanoConfig,
+        "rfdetr_small": RFDETRSmallConfig,
     }
 
     input_size_multiplier = 8
@@ -94,10 +100,9 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
         model_name: Literal[
             "rfdetr_nano",
             "rfdetr_small",
-            "rfdetr_base",
             "rfdetr_medium",
             "rfdetr_large",
-        ] = "rfdetr_base",
+        ] = "rfdetr_medium",
         optimizer: OptimizerCallable = DefaultOptimizerCallable,
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MeanAveragePrecisionFMeasureCallable,
@@ -106,6 +111,8 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
         tile_config: TileConfig = TileConfig(enable_tiler=False),
         max_total_objects_per_batch: int | None = None,
         gradient_checkpointing: bool = False,
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         self.multi_scale = multi_scale
         self.max_total_objects_per_batch = max_total_objects_per_batch
@@ -119,6 +126,8 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> RFDETRDetector:  # pyrefly: ignore[bad-override]
@@ -156,8 +165,9 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
             onnx_export_configuration={
                 "input_names": ["images"],
                 "output_names": ["bboxes", "labels", "scores"],
-                "dynamic_shapes": {"inputs": {0: Dim("batch")}},
-                "autograd_inlining": False,
+                "dynamic_axes": {"images": {0: "batch"}},
+                "dynamo": False,
+                "do_constant_folding": True,
                 "opset_version": 18,
             },
             output_names=["bboxes", "labels", "scores"],
@@ -182,11 +192,6 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
             ),
             "rfdetr_small": DataInputParams(
                 input_size=(512, 512),
-                mean=imagenet_mean,
-                std=imagenet_std,
-            ),
-            "rfdetr_base": DataInputParams(
-                input_size=(560, 560),
                 mean=imagenet_mean,
                 std=imagenet_std,
             ),

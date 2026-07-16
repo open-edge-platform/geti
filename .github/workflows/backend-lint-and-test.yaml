@@ -27,6 +27,12 @@ jobs:
     outputs:
       run_workflow: ${{ steps.check_paths.outputs.run }}
     steps:
+      - &harden-runner
+        name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - &checkout
         name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -56,6 +62,12 @@ jobs:
     permissions:
       contents: read # to checkout code
     steps:
+      - name: Harden the runner (audit all outbound calls)
+        if: matrix.os == 'ubuntu'
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - *checkout
 
       - name: Install Python, uv and Just
@@ -100,6 +112,8 @@ jobs:
       CHECKS: ${{ join(needs.*.result, ' ') }}
     if: always() && !cancelled()
     steps:
+      - *harden-runner
+
       - name: Check jobs results
         run: |
           for check in ${CHECKS}; do

@@ -8,7 +8,7 @@ import type {
     NumberConfigurableParameter,
     StringConfigurableParameter,
     TrainingConfigurationParameter,
-} from '../src/constants/shared-types';
+} from '@/api/types';
 
 export function getMockedConfigurationParameter(
     parameter: Partial<NumberConfigurableParameter> & Required<Pick<NumberConfigurableParameter, 'value_type'>>

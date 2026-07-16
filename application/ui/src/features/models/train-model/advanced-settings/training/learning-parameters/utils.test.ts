@@ -1,12 +1,12 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TrainingConfigurationParameter } from '@/api/types';
 import {
     getMockedConfigurationParameter,
     getMockedConfigurationParameterGroup,
 } from 'mocks/mock-training-configuration';
 
-import { TrainingConfigurationParameter } from '../../../../../../constants/shared-types';
 import { isInputSizeHeightParameter, isInputSizeWidthParameter } from './utils';
 
 const buildEnumNumberParameter = (key: string): TrainingConfigurationParameter =>

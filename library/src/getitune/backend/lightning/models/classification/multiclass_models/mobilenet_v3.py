@@ -15,6 +15,8 @@ from getitune.backend.lightning.models.classification.classifier import ImageCla
 from getitune.backend.lightning.models.classification.heads import LinearClsHead
 from getitune.backend.lightning.models.classification.multiclass_models.base import LightningMulticlassClsModel
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
+from getitune.backend.lightning.models.classification.utils.pretrained_urls import MOBILENETV3_PRETRAINED_URLS
+from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiClassClsMetricCallable
 from getitune.types.label import LabelInfoTypes
@@ -23,9 +25,10 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
-class MobileNetV3MulticlassCls(LightningMulticlassClsModel):
+class MobileNetV3MulticlassCls(PretrainedWeightsMixin, LightningMulticlassClsModel):
     """MobileNetV3MulticlassCls is a class that represents a MobileNetV3 model for multiclass classification.
 
     Args:
@@ -40,7 +43,13 @@ class MobileNetV3MulticlassCls(LightningMulticlassClsModel):
             Defaults to DefaultSchedulerCallable.
         metric (MetricCallable, optional): The metric callable. Defaults to MultiClassClsMetricCallable.
         torch_compile (bool, optional): Whether to compile the model using TorchScript. Defaults to False.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
+
+    pretrained_weights_target = "backbone"
+    pretrained_urls = MOBILENETV3_PRETRAINED_URLS
 
     def __init__(
         self,
@@ -52,6 +61,8 @@ class MobileNetV3MulticlassCls(LightningMulticlassClsModel):
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -62,12 +73,14 @@ class MobileNetV3MulticlassCls(LightningMulticlassClsModel):
             scheduler=scheduler,
             metric=metric,
             torch_compile=torch_compile,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:
         num_classes = num_classes if num_classes is not None else self.num_classes
         backbone = MobileNetV3Backbone(mode=self.model_name, input_size=self.data_input_params.input_size)
-        backbone_out_chennels = MobileNetV3Backbone.MV3_CFG[self.model_name]["out_channels"]
+        backbone_out_channels = MobileNetV3Backbone.MV3_CFG[self.model_name]["out_channels"]
         neck = GlobalAveragePooling(dim=2)
 
         return ImageClassifier(
@@ -75,7 +88,7 @@ class MobileNetV3MulticlassCls(LightningMulticlassClsModel):
             neck=neck,
             head=LinearClsHead(
                 num_classes=num_classes,
-                in_channels=backbone_out_chennels,
+                in_channels=backbone_out_channels,
             ),
             loss=nn.CrossEntropyLoss(),
         )

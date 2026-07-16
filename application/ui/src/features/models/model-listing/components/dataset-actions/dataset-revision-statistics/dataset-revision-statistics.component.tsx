@@ -1,9 +1,9 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { $api } from '@/api';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { $api } from '../../../../../../api/client';
 import { DatasetStatistics } from '../../../../../../components/dataset-statistics/dataset-statistics.component';
 
 type DatasetRevisionStatisticsProps = {
@@ -36,6 +36,6 @@ export const DatasetRevisionStatistics = ({ datasetRevisionId }: DatasetRevision
     const totalAnnotatedItems = annotatedItems?.pagination.total ?? 0;
 
     return (
-        <DatasetStatistics label='images' totalMediaItems={totalMediaItems} totalAnnotatedItems={totalAnnotatedItems} />
+        <DatasetStatistics label='items' totalMediaItems={totalMediaItems} totalAnnotatedItems={totalAnnotatedItems} />
     );
 };

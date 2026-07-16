@@ -200,7 +200,7 @@ class TestDatasetRevisionItemEndpoints:
             dataset_revision=fxt_dataset_revision_service.get_dataset_revision(),
             limit=10,
             offset=0,
-            subset=None,
+            subsets=None,
         )
 
     def test_list_dataset_revision_items_with_pagination(
@@ -231,10 +231,12 @@ class TestDatasetRevisionItemEndpoints:
             dataset_revision=fxt_dataset_revision_service.get_dataset_revision(),
             limit=50,
             offset=10,
-            subset=None,
+            subsets=None,
         )
 
-    @pytest.mark.parametrize("subset", ["unassigned", "training", "validation", "testing"])
+    @pytest.mark.parametrize(
+        "subsets", [["unassigned"], ["training"], ["validation"], ["testing"], ["training", "validation"]]
+    )
     def test_list_dataset_revision_items_with_subset_filter(
         self,
         fxt_get_project,
@@ -242,7 +244,7 @@ class TestDatasetRevisionItemEndpoints:
         fxt_dataset_item,
         fxt_dataset_revision_service,
         fxt_client,
-        subset,
+        subsets,
     ):
         fxt_dataset_revision_service.get_dataset_revision.return_value = MagicMock(id=fxt_dataset_revision_id)
         mock_item_data = {
@@ -254,8 +256,9 @@ class TestDatasetRevisionItemEndpoints:
         }
         fxt_dataset_revision_service.list_dataset_revision_items.return_value = ([mock_item_data], 1)
 
+        query_string = "&".join(f"subsets={subset}" for subset in subsets)
         response = fxt_client.get(
-            f"/api/projects/{str(fxt_get_project.id)}/dataset_revisions/{str(fxt_dataset_revision_id)}/items?subset={subset}"
+            f"/api/projects/{str(fxt_get_project.id)}/dataset_revisions/{str(fxt_dataset_revision_id)}/items?{query_string}"
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -264,7 +267,7 @@ class TestDatasetRevisionItemEndpoints:
             dataset_revision=fxt_dataset_revision_service.get_dataset_revision(),
             limit=10,
             offset=0,
-            subset=DatasetItemSubset(subset),
+            subsets=[DatasetItemSubset(subset) for subset in subsets],
         )
 
     @pytest.mark.parametrize("limit", [1000, 0, -20])
