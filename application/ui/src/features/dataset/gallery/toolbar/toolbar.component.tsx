@@ -17,6 +17,8 @@ import {
     Menu,
     MenuTrigger,
     Selection,
+    Tooltip,
+    TooltipTrigger,
     ViewModes,
 } from '@geti-ui/ui';
 import { SortDown, SortUp } from '@geti-ui/ui/icons';
@@ -75,28 +77,34 @@ const SortMediaByUploadDate = () => {
     };
 
     return (
-        <MenuTrigger>
-            <ActionButton isQuiet aria-label='Sort by upload date'>
-                {sortDirection === 'asc' ? (
-                    <SortUp width={'var(--icon-size)'} height={'var(--icon-size)'} />
-                ) : (
-                    <SortDown
-                        width={'var(--spectrum-global-dimension-size-300)'}
-                        height={'var(--spectrum-global-dimension-size-300)'}
-                    />
-                )}
-            </ActionButton>
-            <Menu
-                selectionMode='single'
-                disallowEmptySelection
-                selectedKeys={[sortDirection]}
-                onSelectionChange={handleSelectionChange}
-            >
-                {SORT_OPTIONS.map((option) => (
-                    <Item key={option.key}>{option.label}</Item>
-                ))}
-            </Menu>
-        </MenuTrigger>
+        <TooltipTrigger>
+            <MenuTrigger>
+                <ActionButton isQuiet aria-label='Sort by upload date'>
+                    {sortDirection === 'asc' ? (
+                        <SortUp
+                            width={'var(--spectrum-global-dimension-size-300)'}
+                            height={'var(--spectrum-global-dimension-size-300)'}
+                        />
+                    ) : (
+                        <SortDown
+                            width={'var(--spectrum-global-dimension-size-300)'}
+                            height={'var(--spectrum-global-dimension-size-300)'}
+                        />
+                    )}
+                </ActionButton>
+                <Menu
+                    selectionMode='single'
+                    disallowEmptySelection
+                    selectedKeys={[sortDirection]}
+                    onSelectionChange={handleSelectionChange}
+                >
+                    {SORT_OPTIONS.map((option) => (
+                        <Item key={option.key}>{option.label}</Item>
+                    ))}
+                </Menu>
+            </MenuTrigger>
+            <Tooltip>Sort</Tooltip>
+        </TooltipTrigger>
     );
 };
 

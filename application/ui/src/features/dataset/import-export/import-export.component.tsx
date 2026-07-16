@@ -1,10 +1,11 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ActionButton, Item, Key, Menu, MenuTrigger } from '@geti-ui/ui';
-import { Datasets } from '@geti-ui/ui/icons';
+import { ActionButton, Item, Key, Menu, MenuTrigger, Tooltip, TooltipTrigger } from '@geti-ui/ui';
+import { DownloadIcon, Share } from '@geti-ui/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 
+import { ReactComponent as ImportExportIcon } from '../../../assets/icons/import-export.svg';
 import { ExportDatasetConfig } from '../../../components/export-dataset-config-dialog/export-dataset-config.component';
 import { useImportDatasetDialogState } from '../providers/export-import-dataset-dialog-provider.component';
 import { MainDatasetStatistics } from './export-dataset/dataset-statistics.component';
@@ -29,15 +30,32 @@ export const ImportExport = () => {
 
     return (
         <>
-            <MenuTrigger>
-                <ActionButton isQuiet aria-label='Export/Import dataset'>
-                    <Datasets />
+            {/*<TooltipTrigger>
+                <MenuTrigger>
+                    <ActionButton isQuiet aria-label='Export/Import dataset'>
+                        <ImportExportIcon />
+                    </ActionButton>
+                    <Menu onAction={handleMenuAction}>
+                        <Item key='export'>Export dataset</Item>
+                        <Item key='import'>Import dataset</Item>
+                    </Menu>
+                </MenuTrigger>
+                <Tooltip>Export/import dataset</Tooltip>
+            </TooltipTrigger>*/}
+
+            <TooltipTrigger>
+                <ActionButton isQuiet aria-label='Import dataset' onPress={datasetImportDialogState.open}>
+                    <Share />
                 </ActionButton>
-                <Menu onAction={handleMenuAction}>
-                    <Item key='export'>Export dataset</Item>
-                    <Item key='import'>Import dataset</Item>
-                </Menu>
-            </MenuTrigger>
+                <Tooltip>Import dataset</Tooltip>
+            </TooltipTrigger>
+
+            <TooltipTrigger>
+                <ActionButton isQuiet aria-label='Export dataset' onPress={exportDialogState.open}>
+                    <DownloadIcon />
+                </ActionButton>
+                <Tooltip>Export dataset</Tooltip>
+            </TooltipTrigger>
 
             <ImportDatasetToProject />
 
