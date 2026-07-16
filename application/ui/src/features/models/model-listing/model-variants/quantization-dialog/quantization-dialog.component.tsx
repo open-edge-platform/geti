@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 import { $api } from '@/api';
+import type { Model } from '@/api/types';
 import { Button, ButtonGroup, Content, Dialog, dimensionValue, Divider, Flex, Heading, Text, View } from '@geti-ui/ui';
 import { InfoOutline } from '@geti-ui/ui/icons';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
@@ -34,11 +35,11 @@ const useDatasetItemsCount = () => {
 };
 
 type QuantizationDialogProps = {
-    modelId: string;
+    model: Model;
     onClose: () => void;
 };
 
-export const QuantizationDialog = ({ modelId, onClose }: QuantizationDialogProps) => {
+export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) => {
     const [accuracyDrop, setAccuracyDrop] = useState(DEFAULT_QUANTIZATION_PARAMETERS.accuracyDrop);
     const [hasNoMaxAccuracyDrop, setHasNoMaxAccuracyDrop] = useState(
         DEFAULT_QUANTIZATION_PARAMETERS.hasNoMaxAccuracyDrop
@@ -65,7 +66,8 @@ export const QuantizationDialog = ({ modelId, onClose }: QuantizationDialogProps
                     project_id: projectId,
                     job_type: 'quantize',
                     parameters: {
-                        model_id: modelId,
+                        model_id: model.id,
+                        model_architecture_id: model.architecture,
                         max_drop: hasNoMaxAccuracyDrop ? null : accuracyDrop / 100,
                         max_num_iterations: hasNoMaxAccuracyDrop ? null : maxNumIterations,
                         max_calibration_subset_size: usesFullCalibrationDataset ? totalCount : effectiveCalibrationSize,

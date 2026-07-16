@@ -90,15 +90,19 @@ async def submit_job(
                 )
             case JobType.QUANTIZE:
                 project = project_service.get_project_by_id(job_request.project_id)
+                arch_id = job_request.parameters.model_architecture_id
+                arch_name = ModelManifestService.get_model_manifest_by_id(arch_id).name
                 job = QuantizationJob(
                     id=job_id,
                     project_id=project.id,
                     log_dir=job_dir,
                     data_dir=data_dir,
                     params=QuantizationJobParams(
-                        model_id=job_request.parameters.model_id,
-                        project_id=project.id,
                         job_id=job_id,
+                        project_id=project.id,
+                        model_id=job_request.parameters.model_id,
+                        model_architecture_id=arch_id,
+                        model_architecture_name=arch_name,
                         max_calibration_subset_size=job_request.parameters.max_calibration_subset_size,
                         max_drop=job_request.parameters.max_drop,
                         max_num_iterations=job_request.parameters.max_num_iterations,

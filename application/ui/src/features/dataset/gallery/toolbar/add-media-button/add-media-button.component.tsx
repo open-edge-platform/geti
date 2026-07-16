@@ -24,7 +24,7 @@ export const AddMediaButton = ({ onFileUpload, isDisabled = false }: AddMediaBut
             allowsMultiple
             onSelect={handleFileSelect}
         >
-            <Button variant={'secondary'} isDisabled={isDisabled}>
+            <Button variant={'secondary'} isDisabled={isDisabled} margin={0}>
                 Upload media
             </Button>
         </FileTrigger>

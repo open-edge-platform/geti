@@ -64,6 +64,25 @@ describe('ProjectsListPanel', () => {
         await screen.findByText('Manage projects');
     };
 
+    it('shows an active badge on the selector button when the selected project has an active pipeline', async () => {
+        server.use(
+            http.get('/api/projects', () =>
+                HttpResponse.json([{ ...selectedProject, active_pipeline: true }, otherProject])
+            )
+        );
+
+        renderPanel();
+
+        expect(await screen.findByText('Active')).toBeInTheDocument();
+    });
+
+    it('does not show an active badge on the selector button when the selected project has no active pipeline', async () => {
+        renderPanel();
+
+        await screen.findByRole('button', { name: new RegExp(`Selected project ${selectedProjectName}`, 'i') });
+        expect(screen.queryByText('Active')).not.toBeInTheDocument();
+    });
+
     it('rename from another project row closes selector and opens rename dialog prefilled with project name', async () => {
         renderPanel();
         await openSelector();

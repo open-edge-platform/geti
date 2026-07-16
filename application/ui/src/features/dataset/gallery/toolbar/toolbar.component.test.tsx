@@ -55,6 +55,7 @@ vi.mock('../../providers/selected-data-provider.component', () => ({
         selectedKeys: new Set(),
         setSelectedKeys: vi.fn(),
         toggleSelectedKeys: vi.fn(),
+        isSelected: vi.fn().mockReturnValue(false),
     })),
 }));
 
