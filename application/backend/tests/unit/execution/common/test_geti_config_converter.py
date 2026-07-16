@@ -742,9 +742,6 @@ class TestGetCallbackIdx:
         assert GetiConfigConverter.get_callback_idx(callbacks, "missing.Class") == -1
 
 
-AUG_SCHEDULER_CLASS_PATH = "getitune.backend.lightning.callbacks.aug_scheduler.AugmentationSchedulerCallback"
-
-
 def _make_deim_getitune_config() -> dict:
     """A getitune config that includes the DEIM AugmentationSchedulerCallback."""
     config = _make_getitune_config()
