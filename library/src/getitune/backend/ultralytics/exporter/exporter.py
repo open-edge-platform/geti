@@ -232,7 +232,7 @@ class UltralyticsModelExporter(ModelExporter):
             "detection": "detect",
             "instance_segmentation": "segment",
             "classification": "classify",
-            "semantic_segmentation": "semantic",
+            "segmentation": "semantic",
         }
         task = task_map.get(params.task_type, params.task_type)
 
