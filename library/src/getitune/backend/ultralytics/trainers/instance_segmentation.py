@@ -13,6 +13,7 @@ import torch.nn.functional as f
 from ultralytics.models.yolo.segment import SegmentationTrainer as _UltralyticsSegmentationTrainer
 from ultralytics.models.yolo.segment import SegmentationValidator as _UltralyticsSegmentationValidator
 
+from getitune.backend.ultralytics.data.collate import instance_seg_collate_fn
 from getitune.backend.ultralytics.plugins.xpu_mixin import XPUAwareTrainerMixin
 from getitune.backend.ultralytics.validators.instance_segmentation import SegmentationValidator
 
@@ -32,6 +33,7 @@ class SegmentationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _Ultralytic
     """
 
     _task_kind: ClassVar[str] = "segment"
+    _collate_fn = staticmethod(instance_seg_collate_fn)
 
     def preprocess_batch(self, batch: dict[str, Any]) -> dict[str, Any]:
         """Preprocess batch for training: move to device and downsample masks.

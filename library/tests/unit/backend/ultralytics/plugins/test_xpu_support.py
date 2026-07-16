@@ -387,8 +387,8 @@ class TestXPUAwareTrainerMixin:
         assert next(trainer.model.parameters()).dtype == torch.bfloat16, "model must be bf16"
         assert next(trainer.ema.ema.parameters()).dtype == torch.float32, "EMA must stay fp32"
 
-    def test_validate_converts_model_when_no_ema(self) -> None:
-        """On XPU without EMA, validate() must convert model to fp32 and back."""
+    def test_validate_does_not_convert_model_when_no_ema(self) -> None:
+        """On XPU without EMA, validate() should leave the model dtype alone."""
         from getitune.backend.ultralytics.plugins.xpu_mixin import XPUAwareTrainerMixin
 
         model_dtype_during_validation = {}
@@ -409,10 +409,34 @@ class TestXPUAwareTrainerMixin:
         trainer = TestTrainer()
         trainer.validate()
 
-        assert model_dtype_during_validation["dtype"] == torch.float32, "model must be fp32 during validation"
-        assert next(trainer.model.parameters()).dtype == torch.bfloat16, (
-            "model must be restored to bf16 after validation"
-        )
+        assert model_dtype_during_validation["dtype"] == torch.bfloat16, "model must stay bf16 during validation"
+        assert next(trainer.model.parameters()).dtype == torch.bfloat16, "model must remain bf16 after validation"
+
+    def test_validate_promotes_bf16_loss_to_fp32(self) -> None:
+        """On XPU, validate() must expose fp32 loss to Ultralytics metric code."""
+        from getitune.backend.ultralytics.plugins.xpu_mixin import XPUAwareTrainerMixin
+
+        loss_dtype_during_validation = {}
+
+        class FakeBaseTrainer:
+            def __init__(self):
+                self.device = torch.device("xpu:0")
+                self.args = SimpleNamespace(amp=True)
+                self.loss = torch.tensor(1.5, dtype=torch.bfloat16)
+                self.model = torch.nn.Linear(4, 2).bfloat16()
+
+            def validate(self) -> dict:
+                loss_dtype_during_validation["dtype"] = self.loss.dtype
+                return {"fitness": 0.7}
+
+        class TestTrainer(XPUAwareTrainerMixin, FakeBaseTrainer):  # pyrefly: ignore[inconsistent-inheritance]
+            pass
+
+        trainer = TestTrainer()
+        trainer.validate()
+
+        assert loss_dtype_during_validation["dtype"] == torch.float32, "Ultralytics must see fp32 loss"
+        assert trainer.loss.dtype == torch.float32, "loss stays fp32 after validate"
 
     def test_validate_skips_conversion_when_ema_exists(self) -> None:
         """On XPU with EMA, validate() should NOT convert model (EMA is already fp32)."""

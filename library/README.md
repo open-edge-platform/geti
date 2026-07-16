@@ -359,7 +359,7 @@ from getitune.backend.ultralytics.engine import UltralyticsEngine
 from getitune.backend.ultralytics.models import UltralyticsDetectionModel
 
 engine = UltralyticsEngine(
-    model=UltralyticsDetectionModel(model_name="yolo26s"),
+    model=UltralyticsDetectionModel(model_name="yolo26s", label_info=10),  # or datamodule.label_info
     data="/path/to/yolo_dataset/data.yaml",
     work_dir="./yolo_workspace",
     device="auto",

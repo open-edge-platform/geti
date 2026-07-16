@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
 from getitune.backend.ultralytics.data.adapter import UltralyticsDatasetAdapter
-from getitune.backend.ultralytics.data.collate import collate_fn
+from getitune.backend.ultralytics.data.collate import detection_collate_fn
 
 if TYPE_CHECKING:
     from getitune.data.module import DataModule
@@ -53,6 +53,7 @@ class GetiTuneBaseTrainer:
     _datamodule: DataModule | None = None
     _use_getitune_data: bool = False
     _task_kind: ClassVar[str] = "detect"
+    _collate_fn = staticmethod(detection_collate_fn)
     _progress_fn: Any = None
     _progress_min: float = 0.0
     _progress_max: float = 100.0
@@ -146,7 +147,7 @@ class GetiTuneBaseTrainer:
             shuffle=shuffle,
             num_workers=nw,
             prefetch_factor=4 if nw > 0 else None,
-            collate_fn=collate_fn,
+            collate_fn=self._collate_fn,
             pin_memory=True,
             drop_last=False,
             multiprocessing_context=_MP_CONTEXT if nw > 0 else None,

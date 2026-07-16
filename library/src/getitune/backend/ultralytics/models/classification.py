@@ -38,6 +38,12 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
     task: ClassVar[str] = "classify"
     trainer_cls: ClassVar[type] = ClassificationTrainer
     validator_cls: ClassVar[type] = ClassificationValidator
+    metric_keys: ClassVar[dict[str, str]] = {
+        "metrics/accuracy_top1": "val/accuracy_top1",
+        "metrics/accuracy_top5": "val/accuracy_top5",
+        "train/loss": "train/loss",
+        "lr/pg0": "lr",
+    }
 
     _pretrained_weights: ClassVar[dict[str, str]] = {
         "yolo26n-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n-cls.pt",
@@ -46,6 +52,12 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
         "yolo26l-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26l-cls.pt",
         "yolo26x-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26x-cls.pt",
     }
+    _DEFAULT_DATA_INPUT_PARAMS: ClassVar[DataInputParams] = DataInputParams(
+        input_size=(224, 224),
+        mean=(0.0, 0.0, 0.0),
+        std=(1.0, 1.0, 1.0),
+        intensity_config=IntensityConfig(mode="scale_to_unit", storage_dtype="uint8"),
+    )
 
     @property
     def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
@@ -54,19 +66,10 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
         All YOLO26-cls models use 224x224 input with identity mean/std (no
         additional normalization after intensity scaling to [0, 1]).
         """
-        default = DataInputParams(
-            input_size=(224, 224),
-            mean=(0.0, 0.0, 0.0),
-            std=(1.0, 1.0, 1.0),
-            intensity_config=IntensityConfig(mode="scale_to_unit", storage_dtype="uint8"),
+        return dict.fromkeys(
+            ("yolo26n-cls", "yolo26s-cls", "yolo26m-cls", "yolo26l-cls", "yolo26x-cls"),
+            self._DEFAULT_DATA_INPUT_PARAMS,
         )
-        return {
-            "yolo26n-cls": default,
-            "yolo26s-cls": default,
-            "yolo26m-cls": default,
-            "yolo26l-cls": default,
-            "yolo26x-cls": default,
-        }
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
@@ -97,13 +100,6 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
             swap_rgb=False,
         )
 
-    metric_keys: ClassVar[dict[str, str]] = {
-        "metrics/accuracy_top1": "val/accuracy_top1",
-        "metrics/accuracy_top5": "val/accuracy_top5",
-        "train/loss": "train/loss",
-        "lr/pg0": "lr",
-    }
-
     def ensure_predict_ready(self) -> None:
         """Backfill ``model.transforms`` required by Ultralytics' classification predictor."""
         ensure_classify_transforms(self)
@@ -124,6 +120,12 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
     trainer_cls: ClassVar[type] = MultiLabelClassificationTrainer
     validator_cls: ClassVar[type] = MultiLabelClassificationValidator
     is_multilabel: ClassVar[bool] = True
+    metric_keys: ClassVar[dict[str, str]] = {
+        "metrics/accuracy": "val/accuracy",
+        "metrics/mAP": "val/mAP",
+        "train/loss": "train/loss",
+        "lr/pg0": "lr",
+    }
 
     _pretrained_weights: ClassVar[dict[str, str]] = {
         "yolo26n-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n-cls.pt",
@@ -132,6 +134,12 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
         "yolo26l-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26l-cls.pt",
         "yolo26x-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26x-cls.pt",
     }
+    _DEFAULT_DATA_INPUT_PARAMS: ClassVar[DataInputParams] = DataInputParams(
+        input_size=(224, 224),
+        mean=(0.0, 0.0, 0.0),
+        std=(1.0, 1.0, 1.0),
+        intensity_config=IntensityConfig(mode="scale_to_unit", storage_dtype="uint8"),
+    )
 
     @property
     def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
@@ -139,19 +147,10 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
 
         All YOLO26-cls models use 224x224 input with identity mean/std.
         """
-        default = DataInputParams(
-            input_size=(224, 224),
-            mean=(0.0, 0.0, 0.0),
-            std=(1.0, 1.0, 1.0),
-            intensity_config=IntensityConfig(mode="scale_to_unit", storage_dtype="uint8"),
+        return dict.fromkeys(
+            ("yolo26n-cls", "yolo26s-cls", "yolo26m-cls", "yolo26l-cls", "yolo26x-cls"),
+            self._DEFAULT_DATA_INPUT_PARAMS,
         )
-        return {
-            "yolo26n-cls": default,
-            "yolo26s-cls": default,
-            "yolo26m-cls": default,
-            "yolo26l-cls": default,
-            "yolo26x-cls": default,
-        }
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
@@ -191,13 +190,6 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
             raise RuntimeError(msg)
         patch_multilabel_classify_head(model)
         return yolo
-
-    metric_keys: ClassVar[dict[str, str]] = {
-        "metrics/accuracy": "val/accuracy",
-        "metrics/mAP": "val/mAP",
-        "train/loss": "train/loss",
-        "lr/pg0": "lr",
-    }
 
     def ensure_predict_ready(self) -> None:
         """Backfill ``model.transforms`` required by Ultralytics' classification predictor."""

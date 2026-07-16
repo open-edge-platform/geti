@@ -13,7 +13,6 @@ from ultralytics.data.build import InfiniteDataLoader, seed_worker
 from ultralytics.models.yolo.classify import ClassificationTrainer as _UltralyticsClassificationTrainer
 from ultralytics.utils.torch_utils import unwrap_model
 
-from getitune.backend.ultralytics.data.adapter import UltralyticsDatasetAdapter
 from getitune.backend.ultralytics.data.collate import classification_collate_fn, multilabel_collate_fn
 from getitune.backend.ultralytics.models.criterion import MultiLabelClassificationLoss
 from getitune.backend.ultralytics.models.utils import patch_multilabel_classify_head
@@ -31,7 +30,9 @@ if TYPE_CHECKING:
 _MP_CONTEXT = multiprocessing.get_context("spawn")
 
 
-class ClassificationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _UltralyticsClassificationTrainer):
+class ClassificationTrainer(  # pyrefly: ignore[inconsistent-inheritance]
+    GetiTuneBaseTrainer, XPUAwareTrainerMixin, _UltralyticsClassificationTrainer
+):
     """Classification trainer that routes data through a getitune DataModule.
 
     When ``_datamodule`` is set (via the engine's dynamic subclass), data
@@ -43,32 +44,6 @@ class ClassificationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _Ultralyt
     """
 
     _task_kind: ClassVar[str] = "classify"
-
-    def build_dataset(  # pyrefly: ignore[bad-override]
-        self,
-        img_path: str,
-        mode: str = "train",
-        batch: int | None = None,
-    ) -> UltralyticsDatasetAdapter:
-        """Return a classification adapter wrapping the appropriate DataModule subset.
-
-        Args:
-            img_path: Ignored when DataModule is set.
-            mode: ``"train"`` or ``"val"``.
-            batch: Batch size (unused by adapter).
-        """
-        if not self._use_getitune_data:
-            return super().build_dataset(img_path, mode, batch)  # type: ignore[misc]
-
-        if self._datamodule is None:
-            msg = "DataModule is required when _use_getitune_data=True"
-            raise RuntimeError(msg)
-
-        subset_key = (
-            self._datamodule.train_subset.subset_name if mode == "train" else self._datamodule.val_subset.subset_name
-        )
-        vision_dataset = self._datamodule.subsets[subset_key]  # type: ignore[union-attr]
-        return UltralyticsDatasetAdapter(vision_dataset, task_kind="classify")
 
     def get_dataloader(  # pyrefly: ignore[bad-override]
         self,
@@ -120,30 +95,12 @@ class ClassificationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _Ultralyt
         return validator
 
 
-class MultiLabelClassificationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _UltralyticsClassificationTrainer):
+class MultiLabelClassificationTrainer(  # pyrefly: ignore[inconsistent-inheritance]
+    GetiTuneBaseTrainer, XPUAwareTrainerMixin, _UltralyticsClassificationTrainer
+):
     """Multi-label classification trainer with BCE loss and sigmoid inference."""
 
     _task_kind: ClassVar[str] = "multilabel"
-
-    def build_dataset(  # pyrefly: ignore[bad-override]
-        self,
-        img_path: str,
-        mode: str = "train",
-        batch: int | None = None,
-    ) -> UltralyticsDatasetAdapter:
-        """Return a multi-label adapter wrapping the appropriate DataModule subset."""
-        if not self._use_getitune_data:
-            return super().build_dataset(img_path, mode, batch)  # type: ignore[misc]
-
-        if self._datamodule is None:
-            msg = "DataModule is required when _use_getitune_data=True"
-            raise RuntimeError(msg)
-
-        subset_key = (
-            self._datamodule.train_subset.subset_name if mode == "train" else self._datamodule.val_subset.subset_name
-        )
-        vision_dataset = self._datamodule.subsets[subset_key]  # type: ignore[union-attr]
-        return UltralyticsDatasetAdapter(vision_dataset, task_kind="multilabel")
 
     def get_dataloader(  # pyrefly: ignore[bad-override]
         self,

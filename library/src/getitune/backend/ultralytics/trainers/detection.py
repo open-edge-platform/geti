@@ -11,6 +11,7 @@ from typing import Any, ClassVar
 from ultralytics.models.yolo.detect import DetectionTrainer as _UltralyticsDetectionTrainer
 from ultralytics.models.yolo.detect import DetectionValidator as _UltralyticsDetectionValidator
 
+from getitune.backend.ultralytics.data.collate import detection_collate_fn
 from getitune.backend.ultralytics.plugins.xpu_mixin import XPUAwareTrainerMixin
 from getitune.backend.ultralytics.validators.detection import DetectionValidator
 
@@ -28,6 +29,7 @@ class DetectionTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _UltralyticsDe
     """
 
     _task_kind: ClassVar[str] = "detect"
+    _collate_fn = staticmethod(detection_collate_fn)
 
     def preprocess_batch(self, batch: dict[str, Any]) -> dict[str, Any]:
         """Use upstream preprocessing unless the DataModule bridge is active."""

@@ -36,7 +36,7 @@ class ClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClassification
         test_key = self._datamodule.test_subset.subset_name
         val_key = self._datamodule.val_subset.subset_name
         subset = self._datamodule.subsets.get(test_key) or self._datamodule.subsets[val_key]
-        adapter = UltralyticsDatasetAdapter(subset, task_kind="classify")
+        adapter = UltralyticsDatasetAdapter(subset, task_kind=self._task_kind)
         return DataLoader(
             adapter,
             batch_size=self.args.batch,  # type: ignore[attr-defined]
@@ -129,7 +129,7 @@ class MultiLabelClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClas
         test_key = self._datamodule.test_subset.subset_name
         val_key = self._datamodule.val_subset.subset_name
         subset = self._datamodule.subsets.get(test_key) or self._datamodule.subsets[val_key]
-        adapter = UltralyticsDatasetAdapter(subset, task_kind="multilabel")
+        adapter = UltralyticsDatasetAdapter(subset, task_kind=self._task_kind)
         return DataLoader(
             adapter,
             batch_size=self.args.batch,  # type: ignore[attr-defined]

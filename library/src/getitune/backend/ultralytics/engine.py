@@ -1145,7 +1145,7 @@ class UltralyticsEngine(Engine):
                     else:
                         _add(f"{prefix}/{key}", nested)
                 return
-            if prefix in _skip_keys:
+            if prefix.rsplit("/", 1)[-1] in _skip_keys:
                 return
             if isinstance(value, torch.Tensor):
                 if value.numel() == 1:

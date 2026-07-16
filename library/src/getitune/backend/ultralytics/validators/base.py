@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, Callable, ClassVar
 
 import torch
 from torch.utils.data import DataLoader
@@ -16,7 +16,6 @@ from ultralytics.utils.ops import Profile
 from ultralytics.utils.torch_utils import select_device, unwrap_model
 
 from getitune.backend.ultralytics.data.adapter import UltralyticsDatasetAdapter
-from getitune.backend.ultralytics.data.collate import collate_fn
 
 if TYPE_CHECKING:
     from ultralytics.engine.trainer import BaseTrainer
@@ -36,6 +35,7 @@ class GetiTuneValidatorMixin:
 
     _datamodule: DataModule | None = None
     _task_kind: ClassVar[str] = "detect"
+    _collate_fn: ClassVar[Callable]
 
     def __call__(self, trainer: BaseTrainer | None = None, model: torch.nn.Module | None = None) -> dict:
         """Dispatch to upstream (training) or standalone DataModule validation."""
@@ -147,6 +147,6 @@ class GetiTuneValidatorMixin:
             adapter,
             batch_size=self.args.batch,  # type: ignore[attr-defined]
             shuffle=False,
-            collate_fn=collate_fn,
+            collate_fn=self._collate_fn,
             pin_memory=True,
         )

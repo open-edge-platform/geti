@@ -214,9 +214,8 @@ class UltralyticsDatasetAdapter(TorchDataset):
             sem_masks = (mask_tensor.float() * cls_tensor[:, None, None]).max(0).values  # (H, W)
             result["sem_masks"] = sem_masks
         else:
-            logger.warning(
-                "Instance segmentation sample has no masks; falling back to empty masks/sem_masks. "
-                "This is unexpected unless the image genuinely contains no annotated instances.",
+            logger.debug(
+                "Instance segmentation sample has no masks; returning empty masks/sem_masks.",
             )
             result["masks"] = torch.zeros((0, tensor_h, tensor_w), dtype=torch.uint8)
             result["sem_masks"] = torch.zeros((tensor_h, tensor_w), dtype=torch.float32)
