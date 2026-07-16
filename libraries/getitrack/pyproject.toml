@@ -23,6 +23,7 @@ classifiers = [
 dependencies = [
     "loguru~=0.7",
     "numpy~=2.0",
+    "opencv-python-headless~=4.11",
     "pydantic~=2.7",
     "pyyaml==6.0.3",
     "scipy~=1.13",
