@@ -639,7 +639,7 @@ class TestMetadataYaml:
         seg_params = TaskLevelExportParameters(
             model_type="YOLO-sem",
             model_name="yolo26n-sem",
-            task_type="semantic_segmentation",
+            task_type="segmentation",
             label_info=_label_info(),
             optimization_config={},
             confidence_threshold=0.0,
