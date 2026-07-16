@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -42,7 +43,7 @@ class EdgeCrafter(EdgeCrafterMixin, LightningDetectionModel):  # pyrefly: ignore
     and optional augmentation scheduling callbacks.
 
     Attributes:
-        _pretrained_weights: Mapping from model-name to pretrained weight URL.
+        pretrained_urls: Mapping from model-name to pretrained weight URL.
         input_size_multiplier: Patch-size aligned input divisor (16).
 
     Args:
@@ -58,9 +59,13 @@ class EdgeCrafter(EdgeCrafterMixin, LightningDetectionModel):  # pyrefly: ignore
             per-variant value in :class:`EdgeCrafterMixin`.
         torch_compile: Whether to use ``torch.compile``. Defaults to ``False``.
         tile_config: Tiling configuration. Defaults to disabled tiler.
+                pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "edgecrafter_s": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecdet_s.pth",
         "edgecrafter_m": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecdet_m.pth",
         "edgecrafter_l": "https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecdet_l.pth",
@@ -95,6 +100,8 @@ class EdgeCrafter(EdgeCrafterMixin, LightningDetectionModel):  # pyrefly: ignore
         backbone_lr: float | None = None,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         self.multi_scale = multi_scale
         self.backbone_lr = backbone_lr
@@ -107,6 +114,8 @@ class EdgeCrafter(EdgeCrafterMixin, LightningDetectionModel):  # pyrefly: ignore
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> ECDETRDetector:

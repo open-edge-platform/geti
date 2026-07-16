@@ -23,7 +23,7 @@ class SigmoidGeometricMean(Function):
 
     This implementation with analytical gradient function substitutes
     the autograd function of (x.sigmoid() * y.sigmoid()).sqrt(). The
-    original implementation incurs none during gradient backprapagation
+    original implementation incurs none during gradient backpropagation
     if both x and y are very small values.
     """
 

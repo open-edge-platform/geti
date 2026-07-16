@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import TYPE_CHECKING, Any, Callable, ClassVar
+from typing import Any, Callable, ClassVar
 
 import torch
 import torch.nn.functional as f
@@ -17,9 +17,6 @@ from getitune.backend.lightning.models.modules.norm import build_norm_layer
 from getitune.backend.lightning.models.segmentation.modules import resize
 
 from .base_segm_head import BaseSegmentationHead
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class Hamburger(nn.Module):
@@ -85,7 +82,6 @@ class LightHamHeadModule(BaseSegmentationHead):
         in_index: int | list[int] = [1, 2, 3],  # noqa: B006
         input_transform: str | None = "multiple_select",
         align_corners: bool = False,
-        pretrained_weights: Path | str | None = None,
         ham_channels: int = 512,
         ham_kwargs: dict[str, Any] | None = None,
     ) -> None:
@@ -119,7 +115,6 @@ class LightHamHeadModule(BaseSegmentationHead):
             activation=activation,
             in_index=in_index,
             align_corners=align_corners,
-            pretrained_weights=pretrained_weights,
         )
 
         if not isinstance(self.in_channels, list):
