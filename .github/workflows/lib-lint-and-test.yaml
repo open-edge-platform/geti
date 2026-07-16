@@ -115,12 +115,6 @@ jobs:
         with:
           persist-credentials: false
 
-      # TODO remove after switching to an official Datumaro release with pre-built wheels
-      - name: Installing Rust toolchain
-        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
-        with:
-          toolchain: stable
-
       - name: Install Python, uv and Just
         uses: ./.github/actions/install-common-deps
         with:
@@ -178,12 +172,6 @@ jobs:
         with:
           persist-credentials: false
 
-      # TODO remove after switching to an official Datumaro release with pre-built wheels
-      - name: Installing Rust toolchain
-        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
-        with:
-          toolchain: stable
-
       - name: Install Python, uv and Just
         uses: ./.github/actions/install-common-deps
         with:
@@ -234,12 +222,6 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
-
-      # TODO remove after switching to an official Datumaro release with pre-built wheels
-      - name: Installing Rust toolchain
-        uses: dtolnay/rust-toolchain@3c5f7ea28cd621ae0bf5283f0e981fb97b8a7af9
-        with:
-          toolchain: stable
 
       - name: Install Python, uv and Just
         uses: ./.github/actions/install-common-deps
