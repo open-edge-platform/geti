@@ -123,5 +123,5 @@ class SemanticSegmentationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _Ul
             args=copy(self.args),
             _callbacks=self.callbacks,
         )
-        validator._datamodule = self._datamodule  # noqa: SLF001
+        validator.set_datamodule(self._datamodule)
         return validator

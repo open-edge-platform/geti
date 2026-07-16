@@ -17,7 +17,6 @@ from getitune.backend.ultralytics.validators.classification import (
     ClassificationValidator,
     MultiLabelClassificationValidator,
 )
-from getitune.config.data import IntensityConfig
 from getitune.types.export import TaskLevelExportParameters
 
 from .base import UltralyticsModel
@@ -52,12 +51,6 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
         "yolo26l-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26l-cls.pt",
         "yolo26x-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26x-cls.pt",
     }
-    _DEFAULT_DATA_INPUT_PARAMS: ClassVar[DataInputParams] = DataInputParams(
-        input_size=(224, 224),
-        mean=(0.0, 0.0, 0.0),
-        std=(1.0, 1.0, 1.0),
-        intensity_config=IntensityConfig(mode="scale_to_unit", storage_dtype="uint8"),
-    )
 
     @property
     def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
@@ -66,10 +59,12 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
         All YOLO26-cls models use 224x224 input with identity mean/std (no
         additional normalization after intensity scaling to [0, 1]).
         """
-        return dict.fromkeys(
-            ("yolo26n-cls", "yolo26s-cls", "yolo26m-cls", "yolo26l-cls", "yolo26x-cls"),
-            self._DEFAULT_DATA_INPUT_PARAMS,
+        default = DataInputParams(
+            input_size=(224, 224),
+            mean=(0.0, 0.0, 0.0),
+            std=(1.0, 1.0, 1.0),
         )
+        return dict.fromkeys(self._pretrained_weights, default)
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
@@ -134,12 +129,6 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
         "yolo26l-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26l-cls.pt",
         "yolo26x-cls": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26x-cls.pt",
     }
-    _DEFAULT_DATA_INPUT_PARAMS: ClassVar[DataInputParams] = DataInputParams(
-        input_size=(224, 224),
-        mean=(0.0, 0.0, 0.0),
-        std=(1.0, 1.0, 1.0),
-        intensity_config=IntensityConfig(mode="scale_to_unit", storage_dtype="uint8"),
-    )
 
     @property
     def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
@@ -147,10 +136,12 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
 
         All YOLO26-cls models use 224x224 input with identity mean/std.
         """
-        return dict.fromkeys(
-            ("yolo26n-cls", "yolo26s-cls", "yolo26m-cls", "yolo26l-cls", "yolo26x-cls"),
-            self._DEFAULT_DATA_INPUT_PARAMS,
+        default = DataInputParams(
+            input_size=(224, 224),
+            mean=(0.0, 0.0, 0.0),
+            std=(1.0, 1.0, 1.0),
         )
+        return dict.fromkeys(self._pretrained_weights, default)
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:

@@ -39,6 +39,15 @@ class UltralyticsSemanticSegModel(UltralyticsModel):
         "yolo26x-sem": "https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26x-sem.pt",
     }
 
+    metric_keys: ClassVar[dict[str, str]] = {
+        "metrics/mIoU": "val/mIoU",
+        "metrics/pixel_acc": "val/pixel_accuracy",
+        "train/ce_loss": "train/ce_loss",
+        "train/dice_loss": "train/dice_loss",
+        "train/aux_loss": "train/aux_loss",
+        "lr/pg0": "lr",
+    }
+
     @staticmethod
     def _dispatch_label_info(label_info: LabelInfoTypes) -> SegLabelInfo:
         """Normalize label_info to a ``SegLabelInfo`` instance.
@@ -115,12 +124,3 @@ class UltralyticsSemanticSegModel(UltralyticsModel):
             pad_value=0,
             swap_rgb=False,
         )
-
-    metric_keys: ClassVar[dict[str, str]] = {
-        "metrics/mIoU": "val/mIoU",
-        "metrics/pixel_acc": "val/pixel_accuracy",
-        "train/ce_loss": "train/ce_loss",
-        "train/dice_loss": "train/dice_loss",
-        "train/aux_loss": "train/aux_loss",
-        "lr/pg0": "lr",
-    }

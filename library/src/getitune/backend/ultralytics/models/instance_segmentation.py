@@ -45,6 +45,17 @@ class UltralyticsInstSegModel(UltralyticsModel):
         "yolo11x-seg": f"{_BASE_URL}/yolo11x-seg.pt",
     }
 
+    metric_keys: ClassVar[dict[str, str]] = {
+        "metrics/mAP50(M)": "val/map_50",
+        "metrics/mAP50-95(M)": "val/map",
+        "metrics/precision(B)": "val/precision",
+        "metrics/recall(B)": "val/recall",
+        "train/box_loss": "train/loss_bbox",
+        "train/cls_loss": "train/loss_cls",
+        "train/dfl_loss": "train/loss_dfl",
+        "train/seg_loss": "train/loss_mask",
+    }
+
     @property
     def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
         """Per-variant preprocessing defaults.
@@ -83,14 +94,3 @@ class UltralyticsInstSegModel(UltralyticsModel):
             iou_threshold=float(iou),
             nms_execute=True,
         )
-
-    metric_keys: ClassVar[dict[str, str]] = {
-        "metrics/mAP50(M)": "val/map_50",
-        "metrics/mAP50-95(M)": "val/map",
-        "metrics/precision(B)": "val/precision",
-        "metrics/recall(B)": "val/recall",
-        "train/box_loss": "train/loss_bbox",
-        "train/cls_loss": "train/loss_cls",
-        "train/dfl_loss": "train/loss_dfl",
-        "train/seg_loss": "train/loss_mask",
-    }

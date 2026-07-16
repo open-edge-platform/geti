@@ -31,11 +31,24 @@ class GetiTuneValidatorMixin:
 
     Subclasses must set :attr:`_task_kind` to dispatch the adapter to the
     correct per-task ``_getitem_*`` method (e.g. ``"detect"``, ``"segment"``).
+
+    ``_datamodule`` is bound one of two ways:
+
+    - As a class attribute on a dynamically-created subclass (see
+      ``UltralyticsEngine._make_bound_validator``), for validators that
+      Ultralytics constructs internally (e.g. via ``model.val()``), where we
+      don't control the call site's arguments.
+    - Via :meth:`set_datamodule`, for validators we construct ourselves
+      (e.g. in a trainer's ``get_validator()``).
     """
 
     _datamodule: DataModule | None = None
     _task_kind: ClassVar[str] = "detect"
     _collate_fn: ClassVar[Callable]
+
+    def set_datamodule(self, datamodule: DataModule | None) -> None:
+        """Bind a DataModule instance, overriding any class-level default."""
+        self._datamodule = datamodule
 
     def __call__(self, trainer: BaseTrainer | None = None, model: torch.nn.Module | None = None) -> dict:
         """Dispatch to upstream (training) or standalone DataModule validation."""
