@@ -34,10 +34,9 @@ This skill is for configuration and validation, not backend code development.
    - Model: Verify the source format is compatible with the selected model (8b vs 16b).
    - Source: Verify connectivity.
    - Sink: Verify destination connectivity and configured formats.
-4. Enable or apply runtime mode.
-   - Activate the pipeline only after all three blocks validate.
+4. Enable the pipeline.
+   - Activate the pipeline only after all three components are fully validated.
    - Prefer a minimal-change rollout to isolate failures.
-5. Validate end to end.
-   - Verify frames are ingested from source.
-   - Verify inference output is produced for expected classes.
-   - Verify sink receives payloads or artifacts.
+5. Validate end-to-end.
+   - Verify that frames are successfully ingested from the source and rendered with predicted labels.
+   - Confirm that inference output is delivered to your configured sink in the expected format.

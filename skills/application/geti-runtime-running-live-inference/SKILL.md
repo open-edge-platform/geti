@@ -1,6 +1,6 @@
 ---
 name: geti-runtime-running-live-inference
-description: Run and operate live inference in the Geti application pipeline. Use when a user wants to start, monitor, stop, or recover source -> model -> sink runtime execution, track async job state, verify production readiness, or troubleshoot live pipeline behavior such as stalls, dropped outputs, and latency regressions.
+description: Run and operate live inference in the Geti application pipeline. Use when a user wants to start, monitor, stop, or recover source -> model -> sink runtime execution, verify production readiness, or troubleshoot live pipeline behavior such as stalls, dropped outputs, and latency regressions.
 ---
 
 # Geti Runtime: Running Live Inference
@@ -30,13 +30,13 @@ This skill is for runtime execution and monitoring, not code changes.
    - Enable runtime execution through the application pipeline workflow.
    - Capture execution identifiers and current status.
 3. Monitor execution.
-   - Track pipeline and job status transitions.
-   - Verify frame ingestion, inference output generation, and sink delivery.
-   - Record key runtime metrics if available (rate, latency, failures).
+   - Check the pipeline status (Idle vs Running).
+   - Verify frames are rendered with predictions, inference output is generated as per sink configuration.
+   - Record key runtime metrics if available (throughput & latency).
 4. Validate output quality.
    - Spot-check predictions against known scenes or samples.
    - Confirm class distribution and confidence values are reasonable.
 5. Handle degradation.
    - If source degrades: reconnect or switch to a known-good source.
    - If model output degrades: verify loaded model version and thresholds.
-   - If sink fails: apply fallback sink or queue strategy where available.
+   - If sink fails: apply fallback sink.
