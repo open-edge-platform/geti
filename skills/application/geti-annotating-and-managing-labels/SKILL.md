@@ -94,8 +94,9 @@ Match shapes to the project task type:
   `annotation_status`, `labels[]`, `subsets[]`).
 - **Statistics**: `GET /api/projects/<id>/dataset/statistics` for media and
   annotation counts.
-- Done when: enough items carry valid annotations for the task and labels — then
-  launch a `train` job (see `geti-using-the-pipeline`).
+- Done when: at least 3 annotated items exist in your dataset, although
+  annotating several more is recommended for better results — then launch a
+  `train` job (see `geti-using-the-pipeline`).
 
 ## Notes
 
