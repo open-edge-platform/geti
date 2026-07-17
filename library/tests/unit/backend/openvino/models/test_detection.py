@@ -307,13 +307,26 @@ class TestOVDetectionModelCoordinateRescaling:
         assert result_bboxes.canvas_size == ori_shape
 
 
-class _FakeTileBatchDet(TileBatchData):
-    """Minimal TileBatchData subclass exposing detection ground-truth fields for tests."""
+class _FakeTileInfo:
+    """Minimal datumaro-TileInfo stand-in exposing tile placement fields."""
 
-    def __init__(self, imgs_info, unbind_result):
-        # Bypass the dataclass __init__: we only need imgs_info and unbind() for these tests.
+    def __init__(self, x: int, y: int, width: int, height: int, source_sample_idx: int = 0):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.source_sample_idx = source_sample_idx
+
+
+class _FakeTileBatchDet(TileBatchData):
+    """Minimal TileBatchData subclass exposing the fields forward_tiles reads."""
+
+    def __init__(self, imgs_info, batch_tiles, batch_tile_tile_infos):
+        # Bypass the dataclass __init__: forward_tiles only reads these attributes.
         self.imgs_info = imgs_info
-        self._unbind_result = unbind_result
+        self.batch_tiles = batch_tiles
+        self.batch_tile_tile_infos = batch_tile_tile_infos
+        # Ground-truth fields consumed by prepare_metric_inputs during test_step.
         self.bboxes = [
             tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
                 torch.empty((0, 4)),
@@ -323,9 +336,6 @@ class _FakeTileBatchDet(TileBatchData):
             for info in imgs_info
         ]
         self.labels = [torch.empty((0,), dtype=torch.long) for _ in imgs_info]
-
-    def unbind(self, tile_batch_size: int) -> list:
-        return self._unbind_result
 
 
 class TestOVDetectionModelTiling:
@@ -348,68 +358,68 @@ class TestOVDetectionModelTiling:
             img_shape=(256, 256),
             ori_shape=(256, 256),
         )
-        tile_info = ImageInfo(  # pyrefly: ignore[no-matching-overload]
-            img_idx=0,
-            img_shape=(200, 200),
-            ori_shape=(200, 200),
+        # One original image expanded into two native-resolution tile crops.
+        batch_tiles = [[torch.rand(3, 200, 200), torch.rand(3, 200, 200)]]
+        tile_infos = [
+            _FakeTileInfo(x=0, y=0, width=200, height=200),
+            _FakeTileInfo(x=56, y=56, width=200, height=200),
+        ]
+        return _FakeTileBatchDet(
+            imgs_info=[ori_info],
+            batch_tiles=batch_tiles,
+            batch_tile_tile_infos=[tile_infos],
         )
-        # A single unbound tile batch (one SampleBatch of tile images) with matching tile infos.
-        tile_sample_batch = SampleBatch(
-            images=[torch.rand(3, 200, 200)],
-            imgs_info=[tile_info],
-        )
-        tile_infos = [MagicMock()]  # opaque to the (mocked) merger
-        return _FakeTileBatchDet(imgs_info=[ori_info], unbind_result=[(tile_infos, tile_sample_batch)])
 
-    def test_forward_tiles_unbinds_and_merges(self, detection_model):
-        """forward_tiles should run per-tile inference and merge results back to the original image."""
+    def test_forward_tiles_delegates_to_model_api_tiler(self, detection_model):
+        """forward_tiles feeds native tiles + coords to the ModelAPI tiler and converts the merged result."""
         tile_batch = self._make_tile_batch()
 
-        # Per-tile inference must bypass the model_api Tiler wrapper (via _forward_untiled)
-        # so the datamodule-produced tiles are not tiled a second time.
-        per_tile_pred = PredictionBatch(images=[], imgs_info=[])
-        detection_model._forward_untiled = MagicMock(return_value=per_tile_pred)
-        # The plain tiling forward path must not be used for pre-made tiles.
-        detection_model.forward = MagicMock()
-
-        # Merged full-image prediction returned by the tile merger.
-        merged = MagicMock()
-        merged.image = torch.empty(3, 256, 256)
-        merged.img_info = tile_batch.imgs_info[0]
-        merged.scores = torch.tensor([0.9])
-        merged.bboxes = tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
-            torch.tensor([[10.0, 10.0, 50.0, 50.0]]),
-            format="XYXY",
-            canvas_size=(256, 256),
+        # A ModelAPI DetectionResult (numpy) returned by the tiler's predict_tiles merge.
+        merged = _FakeDetectionResult(
+            bboxes=np.array([[10, 10, 50, 50]], dtype=np.int32),
+            scores=np.array([0.9], dtype=np.float32),
+            labels=np.array([1], dtype=np.int32),
         )
-        merged.label = torch.tensor([1], dtype=torch.long)
+        tiler = MagicMock()
+        tiler.model.get_label_name.return_value = "object"  # no "background" label shift
+        tiler.predict_tiles.return_value = merged
+        detection_model._get_tiler = MagicMock(return_value=tiler)
 
-        with patch(
-            "getitune.backend.openvino.models.detection.DetectionTileMerge",
-        ) as mock_merge_cls:
-            mock_merger = mock_merge_cls.return_value
-            mock_merger.merge.return_value = [merged]
-            result = detection_model.forward_tiles(tile_batch)
+        result = detection_model.forward_tiles(tile_batch)
 
-        # The merger was constructed with original image infos, num_classes and tile_config.
-        mock_merge_cls.assert_called_once_with(
-            tile_batch.imgs_info,
-            detection_model._label_info.num_classes,
-            detection_model.tile_config,
-        )
-        # Per-tile inference ran once for the single unbound tile batch, via the
-        # untiled path (never the plain tiling forward path).
-        detection_model._forward_untiled.assert_called_once()
-        detection_model.forward.assert_not_called()
-        # merge() received the collected per-tile predictions and infos.
-        merge_args = mock_merger.merge.call_args.args
-        assert merge_args[0] == [per_tile_pred]
+        # predict_tiles received the two native tiles (HWC numpy) and their absolute coords.
+        tiler.predict_tiles.assert_called_once()
+        call_tiles, call_coords, call_shape = tiler.predict_tiles.call_args.args
+        assert len(call_tiles) == 2
+        assert call_tiles[0].shape == (200, 200, 3)
+        assert call_coords == [[0, 0, 200, 200], [56, 56, 256, 256]]
+        assert call_shape == (256, 256, 3)
 
-        # The returned batch contains the merged full-image prediction.
+        # The merged ModelAPI result is converted to a getitune PredictionBatch.
         assert isinstance(result, PredictionBatch)
-        torch.testing.assert_close(result.bboxes[0].data, merged.bboxes.data)  # pyrefly: ignore[unsupported-operation]
-        torch.testing.assert_close(result.labels[0], merged.label)  # pyrefly: ignore[unsupported-operation]
-        torch.testing.assert_close(result.scores[0], merged.scores)  # pyrefly: ignore[unsupported-operation]
+        torch.testing.assert_close(
+            result.bboxes[0].data,  # pyrefly: ignore[unsupported-operation]
+            torch.tensor([[10.0, 10.0, 50.0, 50.0]]),
+        )
+        assert result.bboxes[0].canvas_size == (256, 256)  # pyrefly: ignore[unsupported-operation]
+        torch.testing.assert_close(result.scores[0], torch.tensor([0.9]))  # pyrefly: ignore[unsupported-operation]
+        torch.testing.assert_close(result.labels[0], torch.tensor([1]))  # pyrefly: ignore[unsupported-operation]
+
+    def test_forward_tiles_applies_background_label_shift(self, detection_model):
+        """A leading 'background' label must shift merged labels down by one."""
+        tile_batch = self._make_tile_batch()
+        merged = _FakeDetectionResult(
+            bboxes=np.array([[10, 10, 50, 50]], dtype=np.int32),
+            scores=np.array([0.9], dtype=np.float32),
+            labels=np.array([1], dtype=np.int32),
+        )
+        tiler = MagicMock()
+        tiler.model.get_label_name.return_value = "background"  # triggers label shift
+        tiler.predict_tiles.return_value = merged
+        detection_model._get_tiler = MagicMock(return_value=tiler)
+
+        result = detection_model.forward_tiles(tile_batch)
+        torch.testing.assert_close(result.labels[0], torch.tensor([0]))  # pyrefly: ignore[unsupported-operation]
 
     def test_test_step_routes_tile_batch_to_forward_tiles(self, detection_model):
         """test_step must dispatch TileBatchData inputs to forward_tiles, not the plain forward path."""
@@ -434,6 +444,14 @@ class TestOVDetectionModelTiling:
         detection_model.forward_tiles.assert_called_once_with(tile_batch)
         detection_model.forward.assert_not_called()
         metric.update.assert_called_once()
+
+    def test_get_tiler_reuses_existing_model_api_tiler(self, detection_model):
+        """_get_tiler returns the already-wrapped ModelAPI tiler without constructing a new one."""
+        from model_api.tilers import DetectionTiler
+
+        existing = DetectionTiler.__new__(DetectionTiler)
+        detection_model.model = existing
+        assert detection_model._get_tiler() is existing
 
     def test_forward_untiled_bypasses_model_api_tiler(self, detection_model):
         """_forward_untiled must infer on the raw model, never the model_api Tiler wrapper.
