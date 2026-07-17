@@ -1,6 +1,6 @@
 ---
 name: geti-runtime-configuring-inference-pipeline
-description: Configure and validate the Geti runtime inference pipeline in application mode. Use when a user needs to set up or troubleshoot source -> model -> sink configuration, tune pipeline parameters, diagnose bad predictions or throughput issues, verify deployment settings, or move a project from trained model to stable runtime inference without changing backend implementation code.
+description: Configure and validate the Geti runtime inference pipeline in application mode. Use when a user needs to set up or troubleshoot source → model → sink configuration, tune pipeline parameters, diagnose bad predictions or throughput issues, verify deployment settings, or move a project from trained model to stable runtime inference without changing backend implementation code.
 ---
 
 # Geti Runtime: Configuring Inference Pipeline
