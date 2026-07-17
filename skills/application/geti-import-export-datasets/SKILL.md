@@ -13,8 +13,10 @@ one project into another. This skill is about _using_ the API, not changing
 backend code (use `geti-backend-dev` for that).
 
 Start the server from `application/backend/` with `just run-server` (default
-`https://localhost:7860`). The endpoint reference is `application/docs/api.md`;
-the design background is `application/docs/dataset-ie.md`.
+`https://localhost:7860`). The live, authoritative API reference is the Scalar
+instance at `https://localhost:7860/api/docs`; `application/docs/api.md` guides
+development but defer to Scalar if the two diverge. Design background is
+`application/docs/dataset-ie.md`.
 
 ## When to Use
 
@@ -117,7 +119,9 @@ All operations return a job id from `POST /api/jobs` (HTTP 202). Poll
 ## Notes
 
 - The REST snippets in `application/docs/dataset-ie.md` are design-level; the
-  OpenAPI spec / `application/docs/api.md` is the definitive contract.
+  live Scalar API docs at `https://localhost:7860/api/docs` are the
+  authoritative contract (`application/docs/api.md` guides development but defer
+  to Scalar if they diverge).
 - Importing a *dataset* is supported; importing an externally trained *model*
   (BYOM) is not — pipeline models come only from in-project training/quantization.
 

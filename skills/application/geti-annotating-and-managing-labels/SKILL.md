@@ -12,8 +12,10 @@ about _using_ the API, not changing backend code (use `geti-backend-dev` for
 that).
 
 Start the server from `application/backend/` with `just run-server` (default
-`https://localhost:7860`). The endpoint reference is `application/docs/api.md`;
-task/label background is `application/docs/labels.md`.
+`https://localhost:7860`). The live, authoritative API reference is the Scalar
+instance at `https://localhost:7860/api/docs`; `application/docs/api.md` guides
+development but defer to Scalar if the two diverge. Task/label background is
+`application/docs/labels.md`.
 
 ## When to Use
 
@@ -102,9 +104,10 @@ Match shapes to the project task type:
 
 - To bring in an already-annotated dataset instead of annotating from scratch,
   use `geti-import-export-datasets`.
-- Endpoint paths and payloads are the contract in `application/docs/api.md` /
-  the OpenAPI spec. To add or change endpoints, use `geti-backend-dev` and
-  `geti-openapi-sync`.
+- The live Scalar API docs at `https://localhost:7860/api/docs` are the
+  authoritative contract for endpoint paths and payloads (`application/docs/api.md`
+  guides development but defer to Scalar if they diverge). To add or change
+  endpoints, use `geti-backend-dev` and `geti-openapi-sync`.
 
 ## Related skills
 
