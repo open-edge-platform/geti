@@ -23,24 +23,20 @@ This skill is for runtime execution and monitoring, not code changes.
 ## Procedure
 
 1. Pre-flight checks.
-- Confirm pipeline configuration is complete (source, model, sink).
-- Confirm model is loaded and selected.
-- Confirm endpoints for source and sink are reachable.
-
+   - Confirm pipeline configuration is complete (source, model, sink).
+   - Confirm model is loaded and selected.
+   - Confirm endpoints for source and sink are reachable.
 2. Start live inference.
-- Enable runtime execution through the application pipeline workflow.
-- Capture execution identifiers and current status.
-
+   - Enable runtime execution through the application pipeline workflow.
+   - Capture execution identifiers and current status.
 3. Monitor execution.
-- Track pipeline and job status transitions.
-- Verify frame ingestion, inference output generation, and sink delivery.
-- Record key runtime metrics if available (rate, latency, failures).
-
+   - Track pipeline and job status transitions.
+   - Verify frame ingestion, inference output generation, and sink delivery.
+   - Record key runtime metrics if available (rate, latency, failures).
 4. Validate output quality.
-- Spot-check predictions against known scenes or samples.
-- Confirm class distribution and confidence values are reasonable.
-
+   - Spot-check predictions against known scenes or samples.
+   - Confirm class distribution and confidence values are reasonable.
 5. Handle degradation.
-- If source degrades: reconnect or switch to a known-good source.
-- If model output degrades: verify loaded model version and thresholds.
-- If sink fails: apply fallback sink or queue strategy where available.
+   - If source degrades: reconnect or switch to a known-good source.
+   - If model output degrades: verify loaded model version and thresholds.
+   - If sink fails: apply fallback sink or queue strategy where available.

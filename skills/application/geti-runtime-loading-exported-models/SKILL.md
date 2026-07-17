@@ -23,24 +23,20 @@ This skill focuses on import and compatibility validation, not model retraining.
 ## Procedure
 
 1. Verify artifact completeness.
-- Confirm expected files for the chosen export format are present.
-- Confirm files are readable and not truncated.
-- Confirm the export target format matches runtime expectations.
-
+   - Confirm expected files for the chosen export format are present.
+   - Confirm files are readable and not truncated.
+   - Confirm the export target format matches runtime expectations.
 2. Verify metadata compatibility.
-- Confirm task type compatibility with the destination project.
-- Confirm label set alignment between model and project configuration.
-- Confirm input expectations (shape, color space, preprocessing assumptions).
-
+   - Confirm task type compatibility with the destination project.
+   - Confirm label set alignment between model and project configuration.
+   - Confirm input expectations (shape, color space, preprocessing assumptions).
 3. Import model into runtime.
-- Register or upload model package through the runtime workflow.
-- Record model identifier and version used for deployment.
-
+   - Register or upload model package through the runtime workflow.
+   - Record model identifier and version used for deployment.
 4. Bind model to pipeline.
-- Attach imported model to target pipeline configuration.
-- Ensure confidence and postprocessing defaults are sane for the task.
-
+   - Attach imported model to target pipeline configuration.
+   - Ensure confidence and postprocessing defaults are sane for the task.
 5. Run smoke validation.
-- Execute quick inference on known sample inputs.
-- Verify output classes and score ranges are plausible.
-- Verify no runtime loader errors remain.
+   - Execute quick inference on known sample inputs.
+   - Verify output classes and score ranges are plausible.
+   - Verify no runtime loader errors remain.
