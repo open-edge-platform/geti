@@ -176,8 +176,8 @@ uv pip install getitune # CPU-only by default
 > Install `getitune` from source to use them:
 >
 > ```bash
-> git clone https://github.com/open-edge-platform/training_extensions.git
-> cd training_extensions/library
+> git clone https://github.com/open-edge-platform/geti.git
+> cd geti/library
 > uv sync --extra xpu --extra ultralytics                              # Intel GPU + YOLO
 > uv sync --extra cuda --extra ultralytics                             # NVIDIA GPU + YOLO
 > uv sync --extra cpu --extra ultralytics                              # CPU + YOLO
