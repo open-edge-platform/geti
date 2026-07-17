@@ -3,7 +3,7 @@ ARG https_proxy
 ARG no_proxy
 
 
-FROM pytorch/pytorch:2.1.2-cuda11.8-cudnn8-runtime@sha256:971fbeae82c0a5a7a970a264a8b8ce1c3426aa79df7111004ad2bc2640f7d89c AS build_base
+FROM pytorch/pytorch:2.13.0-cuda13.0-cudnn9-runtime@sha256:db80a41f8428644cebcb3d75b0b62df334ab6c0e75785951eb25f48bfbd42407 AS build_base
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libsm6=2:1.2.3-1 \
@@ -52,7 +52,7 @@ RUN python download_pretrained_weights.py
 
 FROM build_base AS cuda
 
-ARG USER_SITE=/home/non-root/.local/lib/python3.10/site-packages
+ARG USER_SITE=/home/non-root/.local/lib/python3.12/site-packages
 ARG GETITUNE_INSTALL_PATH=/opt/getitune
 
 ENV PYTHONPATH=${GETITUNE_INSTALL_PATH}:${PYTHONPATH:+:${PYTHONPATH}}

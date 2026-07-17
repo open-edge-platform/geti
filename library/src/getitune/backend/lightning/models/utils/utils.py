@@ -36,6 +36,7 @@ def torch_hub_load(repo_or_dir: str, model: str) -> nn.Module:
     module = torch.hub.load(
         repo_or_dir=repo_or_dir,
         model=model,
+        trust_repo=True,
     )
 
     # support pickle

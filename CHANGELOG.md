@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## \[Unreleased\]
+
+### Enhancements
+
+- Bump PyTorch to 2.13.0 and TorchVision to 0.28.0 (CUDA wheels moved from cu128 to cu130)
+
 ## \[2.6.0\]
 
 ### New features
