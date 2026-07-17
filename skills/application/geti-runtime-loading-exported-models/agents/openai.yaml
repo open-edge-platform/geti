@@ -1,4 +1,0 @@
-interface:
-  display_name: "Load Exported Models into Geti Runtime"
-  short_description: "Import and validate OpenVINO/ONNX model artifacts for Geti runtime inference"
-  default_prompt: "Use $geti-runtime-loading-exported-models to load and validate an exported model in the Geti runtime pipeline."
