@@ -3,14 +3,14 @@
 
 import logging
 import os
-import sys
 from collections.abc import Generator
 from contextlib import contextmanager
 
 from loguru import logger
+from nncf.common.logging.logger import nncf_logger
 
 from .config import LogConfig
-from .handlers import InterceptHandler, LoggerStdoutWriter
+from .handlers import InterceptHandler
 
 
 @contextmanager
@@ -50,12 +50,12 @@ def logging_ctx(config: LogConfig) -> Generator[str]:
 
     root_logger = logging.getLogger()
     root_handler = InterceptHandler()
-    stdout_writer = LoggerStdoutWriter(sys.stdout)
-    stderr_writer = LoggerStdoutWriter(sys.stderr)
-    previous_handlers = list(root_logger.handlers)
-    previous_level = root_logger.level
-    previous_stdout = sys.stdout
-    previous_stderr = sys.stderr
+    previous_root_handlers = list(root_logger.handlers)
+    previous_root_level = root_logger.level
+
+    nncf_handler = InterceptHandler()
+    previous_nncf_handlers = list(nncf_logger.handlers)
+    previous_nncf_level = nncf_logger.level
 
     try:
         sink_id = logger.add(
@@ -69,20 +69,25 @@ def logging_ctx(config: LogConfig) -> Generator[str]:
     except Exception as e:
         raise RuntimeError(f"Failed to add log sink for {log_path}: {e}") from e
 
+    level = getattr(logging, config.level.upper(), logging.INFO)
+
     try:
         root_logger.addHandler(root_handler)
-        root_logger.setLevel(getattr(logging, config.level.upper(), logging.INFO))
-        sys.stdout = stdout_writer
-        sys.stderr = stderr_writer
+        root_logger.setLevel(level)
+
+        # nncf_logger doesn't propagate, so it needs its own handler
+        nncf_logger.handlers = [nncf_handler]
+        nncf_logger.setLevel(level)
+
         logger.debug("Started logging to {}", log_path)
         yield log_path
     finally:
-        stdout_writer.flush()
-        stderr_writer.flush()
-        sys.stdout = previous_stdout
-        sys.stderr = previous_stderr
         root_logger.removeHandler(root_handler)
-        root_logger.handlers = previous_handlers
-        root_logger.setLevel(previous_level)
+        root_logger.handlers = previous_root_handlers
+        root_logger.setLevel(previous_root_level)
+
+        nncf_logger.handlers = previous_nncf_handlers
+        nncf_logger.setLevel(previous_nncf_level)
+
         logger.debug("Stopped logging to {}", log_path)
         logger.remove(sink_id)

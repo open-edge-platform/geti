@@ -53,7 +53,7 @@ from app.api.routers import (
     training_configurations,
     webrtc,
 )
-from app.core.logging import InterceptHandler
+from app.core.logging import InterceptHandler, setup_hypercorn_logging
 from app.lifecycle import lifespan
 from app.services.base import ResourceNotFoundError
 from app.settings import get_settings
@@ -199,10 +199,13 @@ async def main_async() -> None:
     # exception handler that downgrades just these cases and delegates everything else.
     asyncio.get_running_loop().set_exception_handler(_asyncio_exception_handler)
 
+    setup_hypercorn_logging(settings.log_level)
     config = Config()
     config.bind = [f"{settings.host}:{settings.port}"]
     config.certfile = str(settings.data_dir / settings.certfile)
     config.keyfile = str(settings.data_dir / settings.keyfile)
+    config.accesslog = "-"
+    config.errorlog = "-"
     config.loglevel = settings.log_level.upper()
 
     await serve(cast(ASGIFramework, app), config)
