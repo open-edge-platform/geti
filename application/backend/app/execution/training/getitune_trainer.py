@@ -303,7 +303,6 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         Otherwise, it creates a new dataset from the current items in the database with user-verified annotations.
         """
 
-        from getitune import TaskType
         from getitune.config.data import SamplerConfig, SubsetConfig, TileConfig
         from getitune.data.dataset.tile import TileDatasetFactory
         from getitune.data.entity.utils import detect_storage_dtype
@@ -415,7 +414,9 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             tile_cfg_data = getitune_training_config["data"].get("tile_config", {})
             tile_config = TileConfig(**tile_cfg_data)
             logger.info("Tiling is set to {}", tile_config.enable_tiler)
-            if tile_config.enable_tiler and getitune_task_type in (TaskType.DETECTION, TaskType.INSTANCE_SEGMENTATION):
+            # Whether a task/model actually supports tiling is decided upstream by the
+            # application (tiling capabilities); here we simply honor the resolved flag.
+            if tile_config.enable_tiler:
                 logger.info("TileConfig for training: {}", tile_config)
                 logger.info("Wrapping subset datasets with TileDatasetFactory")
                 getitune_training_dataset = TileDatasetFactory.create(

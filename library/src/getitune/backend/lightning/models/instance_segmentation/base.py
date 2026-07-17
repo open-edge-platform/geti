@@ -220,7 +220,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             self.tile_config,
             self.explain_mode,
         )
-        for batch_tile_infos, batch_tile_input in inputs.unbind():
+        for batch_tile_infos, batch_tile_input in inputs.unbind(self.tile_config.tile_inference_batch_size):
             output = self.forward_explain(batch_tile_input) if self.explain_mode else self.forward(batch_tile_input)
             if isinstance(output, BatchLoss):
                 msg = "Loss output is not supported for tile merging"

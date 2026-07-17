@@ -570,9 +570,13 @@ class GPUAugmentationPipeline(nn.Module):
         no per-tile annotations (predictions are merged back to the original image
         afterwards) and only intensity transforms such as ``Normalize`` are relevant.
 
-        Geometric augmentations are skipped because applying them without annotation
-        tracking would desynchronise boxes/masks; validation/test pipelines only
-        contain intensity transforms in practice.
+        Design contract for tiling: geometric augmentations are applied in the CPU
+        pipeline (per-sample, with annotations) so that the GPU pipeline used for
+        tiles contains only intensity transforms. As a result ``sanitize_annotations``
+        is a no-op here (see ``_has_geometric_augs`` gating in :meth:`forward`). Any
+        geometric augmentation that still ends up on the GPU pipeline is skipped
+        defensively, since applying it without annotation tracking would desynchronise
+        boxes/masks.
 
         Args:
             images: Batched images tensor in BCHW format, values in [0, 1].

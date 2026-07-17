@@ -324,7 +324,7 @@ class _FakeTileBatchDet(TileBatchData):
         ]
         self.labels = [torch.empty((0,), dtype=torch.long) for _ in imgs_info]
 
-    def unbind(self) -> list:
+    def unbind(self, tile_batch_size: int) -> list:
         return self._unbind_result
 
 

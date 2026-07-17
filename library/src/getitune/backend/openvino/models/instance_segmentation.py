@@ -280,11 +280,12 @@ class OVInstanceSegmentationModel(OVModel):
             self.label_info.num_classes,
             self.tile_config,
         )
-        tile_groups = inputs.unbind()
+        tile_groups = inputs.unbind(self.tile_config.tile_inference_batch_size)
         log.debug(
-            "forward_tiles: %d image(s) -> %d tile group(s) of up to TILE_INFERENCE_BATCH_SIZE tiles each",
+            "forward_tiles: %d image(s) -> %d tile group(s) of up to %d tiles each",
             len(inputs.imgs_info),
             len(tile_groups),
+            self.tile_config.tile_inference_batch_size,
         )
         for batch_tile_infos, batch_tile_input in tile_groups:
             tile_preds.append(self._forward_untiled(batch_tile_input))

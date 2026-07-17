@@ -124,15 +124,13 @@ class TestDataModule:
         assert fxt_config.val_subset.input_size == (240, 240)
         assert fxt_config.test_subset.input_size == (240, 240)
 
-    def test_eval_loader_kwargs_tiled_vs_plain(self) -> None:
-        """Tiled eval subsets must fall back to safe single-process, single-image loading.
+    def test_eval_loader_kwargs_uses_recipe_settings(self) -> None:
+        """Eval loaders honor the recipe-configured batch size, workers and pinned memory.
 
-        A ``TileDataset`` expands one image into every grid tile, so a collated
-        multi-image batch shipped from a worker through ``/dev/shm`` overflows the
-        (small, containerised) shared memory and kills the worker. The eval loaders
-        therefore use ``batch_size=1``, ``num_workers=0`` and ``pin_memory=False``
-        for tiled datasets only; plain datasets keep the configured throughput
-        settings.
+        Tiled evaluation memory is bounded by the recipe (the tile recipes set a small
+        ``batch_size`` for the val/test subsets), so the DataModule no longer overrides
+        the loader settings based on the dataset type — the values come straight from
+        the subset config.
         """
         from getitune.data.dataset.tile import TileDataset
 
@@ -156,10 +154,11 @@ class TestDataModule:
         assert plain_kwargs["num_workers"] == 4
         assert plain_kwargs["pin_memory"] is True
 
+        # Tiled datasets are treated the same way: the recipe controls the settings.
         tiled_kwargs = dm._eval_loader_kwargs(_FakeTiled(), config)
-        assert tiled_kwargs["batch_size"] == 1
-        assert tiled_kwargs["num_workers"] == 0
-        assert tiled_kwargs["pin_memory"] is False
+        assert tiled_kwargs["batch_size"] == 8
+        assert tiled_kwargs["num_workers"] == 4
+        assert tiled_kwargs["pin_memory"] is True
 
     def test_init_input_size(
         self,

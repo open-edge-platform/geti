@@ -18,7 +18,7 @@ from torch.utils.data import DataLoader, RandomSampler
 
 from getitune.config.data import SubsetConfig, TileConfig
 from getitune.data.augmentation import CPUAugmentationPipeline
-from getitune.data.dataset.tile import TileDataset, TileDatasetFactory
+from getitune.data.dataset.tile import TileDatasetFactory
 from getitune.data.entity.utils import detect_storage_dtype
 from getitune.data.factory import DatasetFactory
 from getitune.data.utils import get_adaptive_num_workers, instantiate_sampler
@@ -495,63 +495,24 @@ class DataModule(LightningDataModule):
     def _eval_loader_kwargs(self, dataset: VisionDataset, config: SubsetConfig) -> dict:
         """Build ``DataLoader`` keyword arguments for a val/test/predict dataset.
 
-        Tiled evaluation needs special handling. For the test/predict subsets a
-        single original image expands into *every* grid tile (tiles are not
-        filtered by annotation at inference time), so one dataset item can become
-        a very large nested tile batch — hundreds of tiles, each resized to the
-        model input size.
+        The batch size, number of workers and pinned-memory behaviour are taken
+        directly from the subset config (i.e. the recipe). This keeps evaluation
+        loading configurable per recipe rather than hardcoded here.
 
-        If such a batch is produced inside a DataLoader worker it must be shipped
-        back to the main process through shared memory (``/dev/shm``). In
-        containers this is typically tiny (e.g. 64 MB), so the transfer overflows
-        it and the OS kills the worker, surfacing as
-        ``DataLoader worker (pid(s) ...) exited unexpectedly``. ``pin_memory``
-        makes this worse by adding an extra pinned copy of the giant batch.
-
-        For tiled evaluation we therefore:
-          * use ``batch_size=1`` so each collated tile batch is bounded to a
-            single original image's tiles, and
-          * run in the main process (``num_workers=0``, ``pin_memory=False``) so
-            the batch is never serialized across the worker->main shared-memory
-            channel.
-
-        GPU utilization is preserved because the model still forwards tiles in
-        groups of ``TILE_INFERENCE_BATCH_SIZE`` (see ``getitune.data.entity.tile``).
-
-        Non-tiled datasets keep the configured batch size / workers / pinned
-        memory for maximum throughput.
+        For tiled evaluation a single original image expands into *every* grid tile
+        (tiles are not filtered by annotation at inference time), so one dataset item
+        can become a large nested tile batch. Recipes therefore keep the tiled
+        val/test ``batch_size`` small (typically 1) so the collated tile batch stays
+        bounded; the model still forwards tiles in groups of
+        ``TileConfig.tile_inference_batch_size`` for GPU efficiency.
         """
-        # A ``TileDataset`` always expands one image into every grid tile,
-        # independently of the datamodule's ``tile_config.enable_tiler`` flag.
-        # Notably, the OpenVINO evaluation path
-        # (``AutoConfigurator.update_ov_subset_pipeline``) rebuilds the datamodule
-        # with a fresh ``TileConfig(enable_tiler=False)`` while still reusing the
-        # pre-built tiled test dataset. Keying off ``enable_tiler`` would therefore
-        # miss those tiled datasets and spawn workers that collate huge tile
-        # batches, overflowing ``/dev/shm`` and killing the worker. Detect the
-        # tiled dataset by its concrete type instead.
-        is_tiled_dataset = isinstance(dataset, TileDataset)
-
-        batch_size = 1 if is_tiled_dataset else config.batch_size
-        num_workers = 0 if is_tiled_dataset else config.num_workers
-        pin_memory = not is_tiled_dataset
-
-        logger.debug(
-            "Eval dataloader for subset '%s': dataset=%s tiled=%s -> batch_size=%s num_workers=%s pin_memory=%s",
-            config.subset_name,
-            type(dataset).__name__,
-            is_tiled_dataset,
-            batch_size,
-            num_workers,
-            pin_memory,
-        )
-
+        num_workers = config.num_workers
         return {
             "dataset": dataset,
-            "batch_size": batch_size,
+            "batch_size": config.batch_size,
             "shuffle": False,
             "num_workers": num_workers,
-            "pin_memory": pin_memory,
+            "pin_memory": True,
             "collate_fn": dataset.collate_fn,
             "persistent_workers": num_workers > 0,
             "multiprocessing_context": _MP_CONTEXT if num_workers > 0 else None,

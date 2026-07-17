@@ -192,18 +192,13 @@ class TransformsUpdater:
         is_ultralytics = config.get("backend") == "ultralytics"
 
         for aug_name, aug_value in augmentation_params.items():
-            if tiling and aug_name in cls.TILING_INCOMPATIBLE_AUGMENTATIONS:
-                if aug_value.get("enable", True):
-                    # The user explicitly enabled an augmentation that cannot coexist with tiling. Warn so it is clear
-                    # we are overriding their request.
-                    logger.warning(
-                        "Augmentation '{}' is incompatible with the Tiling pipeline and will be overridden (disabled)",
-                        aug_name,
-                    )
-                else:
-                    logger.debug(
-                        "Augmentation '{}' is incompatible with the Tiling pipeline and will be skipped", aug_name
-                    )
+            if tiling and aug_name in cls.TILING_INCOMPATIBLE_AUGMENTATIONS and aug_value.get("enable", True):
+                # The user explicitly enabled an augmentation that cannot coexist with tiling. Warn so it is clear
+                # we are overriding their request.
+                logger.warning(
+                    "Augmentation '{}' is incompatible with the Tiling pipeline and will be overridden (disabled)",
+                    aug_name,
+                )
                 continue
             if aug_name not in cls.AUGMENTATION_REGISTRY:
                 if tiling:

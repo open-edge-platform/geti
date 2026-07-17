@@ -135,7 +135,15 @@ class SubsetConfig:
 
 @dataclass
 class TileConfig:
-    """DTO for tiler configuration."""
+    """DTO for tiler configuration.
+
+    Attributes:
+        tile_inference_batch_size: Number of tiles forwarded through the model at once
+            during tiled inference. This is decoupled from the dataloader batch size
+            (the number of original images per batch): a single image expands into many
+            tiles, and this value controls how many of those tiles are grouped into a
+            single model forward pass for GPU efficiency. Configurable from the recipe.
+    """
 
     enable_tiler: bool = False
     enable_adaptive_tiling: bool = True
@@ -145,6 +153,7 @@ class TileConfig:
     max_num_instances: int = 1500
     object_tile_ratio: float = 0.03
     sampling_ratio: float = 1.0
+    tile_inference_batch_size: int = 8
 
     def __repr__(self):
         """Return a string representation of the TileConfig instance."""
@@ -156,7 +165,8 @@ class TileConfig:
             f"iou_threshold={self.iou_threshold}, "
             f"max_num_instances={self.max_num_instances}, "
             f"object_tile_ratio={self.object_tile_ratio}, "
-            f"sampling_ratio={self.sampling_ratio})"
+            f"sampling_ratio={self.sampling_ratio}, "
+            f"tile_inference_batch_size={self.tile_inference_batch_size})"
         )
 
     def clone(self) -> TileConfig:
