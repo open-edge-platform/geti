@@ -1,4 +1,4 @@
 interface:
   display_name: "Import & Export Geti Datasets"
-  short_description: "Import, export, and fork datasets in the Geti application via its REST API and async jobs"
-  default_prompt: "Use $geti-import-export-datasets to import, export, or fork a dataset in the Geti application."
+  short_description: "Import and export datasets in the Geti application via its REST API and async jobs"
+  default_prompt: "Use $geti-import-export-datasets to import or export a dataset in the Geti application."

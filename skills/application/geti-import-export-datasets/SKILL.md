@@ -1,16 +1,15 @@
 ---
 name: geti-import-export-datasets
-description: Import, export, and fork datasets in the Geti application via its REST API. Use when a user wants to bring an existing dataset into Geti (COCO/YOLO/VOC/Datumaro), migrate data from another tool, export a project's dataset or a dataset revision, copy/fork a dataset between projects, remap labels or filter subsets during transfer, or track the async jobs that perform these operations.
+description: Import and export datasets in the Geti application via its REST API. Use when a user wants to bring an existing dataset into Geti (COCO/YOLO/VOC/Datumaro), migrate data from another tool, export a project's dataset or a dataset revision, remap labels or filter subsets during transfer, or track the async jobs that perform these operations.
 ---
 
 # Geti Application: Import & Export Datasets
 
 Move datasets in and out of the Geti application through its REST API. This is
 the practical "migration to Geti" path: bring existing annotated data from Geti,
-CVAT, Label Studio, or any tool that emits a standard dataset archive, export a
-project's data for backup or reuse in other frameworks, or fork a dataset from
-one project into another. This skill is about _using_ the API, not changing
-backend code (use `geti-backend-dev` for that).
+CVAT, Label Studio, or any tool that emits a standard dataset archive, or export
+a project's data for backup or reuse in other frameworks. This skill is about
+_using_ the API, not changing backend code (use `geti-backend-dev` for that).
 
 Start the server from `application/backend/` with `just run-server` (default
 `https://localhost:7860`). The live, authoritative API reference is the Scalar
@@ -24,8 +23,6 @@ development but defer to Scalar if the two diverge. Design background is
 - User wants to migrate annotated data from another tool into a Geti project.
 - User needs to export a project's dataset or a dataset revision for backup or
   external use.
-- User wants to copy/fork a dataset from one project to another, possibly with a
-  different task type.
 - User needs to remap labels or filter subsets/labels while transferring data.
 
 ## Key concepts
@@ -84,15 +81,6 @@ flowchart LR
 2. **Download the archive.**
    - `GET /api/staged_datasets/<id>/zip`, or take it directly from
      `data/staged_datasets/<id>/`.
-
-## Copy / fork a dataset between projects
-
-- Stage the source: `POST /api/jobs` with job type `stage_dataset` (source
-  `project_id`/revision, optional `filters`) → produces an uncompressed Datumaro
-  staged dataset (no compress/decompress cycle).
-- Then import it into the destination with `import_dataset_to_existing_project`
-  or `import_dataset_as_new_project`, applying label remapping/filtering as
-  needed.
 
 ## Filtering & label remapping
 

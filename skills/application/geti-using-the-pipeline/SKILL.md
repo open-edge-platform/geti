@@ -63,7 +63,7 @@ flowchart LR
 Long-running work runs as **jobs** (`POST /api/jobs`), keeping the API
 responsive. Job types: `train`, `quantize`, `prepare_dataset_for_import`,
 `import_dataset_to_existing_project`, `import_dataset_as_new_project`,
-`export_dataset`, `stage_dataset`. Poll `GET /api/jobs/<id>` or stream
+`export_dataset`. Poll `GET /api/jobs/<id>` or stream
 `/status` and `/logs`; jobs are cancelable.
 
 ## Datasets: import instead of manual annotation
