@@ -1,0 +1,4 @@
+interface:
+  display_name: "Configure Geti Inference Pipeline"
+  short_description: "Set up and validate source → model → sink runtime pipeline configuration in Geti"
+  default_prompt: "Use $geti-runtime-configuring-inference-pipeline to configure the Geti runtime inference pipeline."

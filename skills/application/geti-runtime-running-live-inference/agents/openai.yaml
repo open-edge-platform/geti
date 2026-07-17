@@ -1,0 +1,4 @@
+interface:
+  display_name: "Run Live Inference in Geti"
+  short_description: "Start, monitor, stop, and recover live inference execution in the Geti application pipeline"
+  default_prompt: "Use $geti-runtime-running-live-inference to run and operate live inference in the Geti pipeline."
