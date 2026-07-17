@@ -22,7 +22,6 @@ from getitune.backend.lightning.models.detection.detectors.edgecrafter import EC
 from getitune.backend.lightning.models.detection.heads.ec_decoder import ECTransformer
 from getitune.backend.lightning.models.detection.losses.ec_loss import ECCriterion
 from getitune.backend.lightning.models.detection.necks.dfine_hybrid_encoder import HybridEncoder
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.data.entity.base import BatchLoss
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
 
@@ -67,7 +66,6 @@ class _EdgeCrafterHost(Protocol):
     _EC_MODEL_CFGS: ClassVar[dict[str, dict[str, Any]]]
 
     # Per-task configuration, defined as ClassVars on concrete subclasses.
-    _pretrained_weights: ClassVar[dict[str, str]]
     _loss_weights: ClassVar[dict[str, float]]
     _matcher_cost_dict: ClassVar[dict[str, int | float] | None]
     _mask_downsample_ratio: ClassVar[int | None]
@@ -79,7 +77,6 @@ class EdgeCrafterMixin:
 
     Concrete sub-classes must set:
 
-    * ``_pretrained_weights`` — ``{model_name: url}`` for checkpoint downloading.
     * ``_loss_weights`` — per-task loss weight dict passed to :class:`ECCriterion`.
     * ``model_name`` — one of ``"edgecrafter_{s,m,l,x}"``.
     * ``data_input_params`` — :class:`DataInputParams` with ``input_size``.
@@ -102,7 +99,6 @@ class EdgeCrafterMixin:
     ClassVar configuration (see :class:`_EdgeCrafterHost`).
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]]
     _matcher_cost_dict: ClassVar[dict[str, int | float] | None] = None
     _mask_downsample_ratio: ClassVar[int | None] = None
     _backbone_key: ClassVar[str] = "backbone_name"
@@ -152,7 +148,6 @@ class EdgeCrafterMixin:
         4. Build :class:`ECCriterion` from ``self._loss_weights`` /
            ``self._matcher_cost_dict``.
         5. Wrap everything in :class:`ECDETRDetector`.
-        6. Load pretrained checkpoint via :func:`load_checkpoint`.
 
         Args:
             num_classes: Number of target classes.
@@ -205,7 +200,6 @@ class EdgeCrafterMixin:
             input_size=input_size[0],
         )
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
         return model
 
     def _customize_inputs(  # pyrefly: ignore[bad-override]

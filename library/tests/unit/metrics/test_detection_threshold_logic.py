@@ -50,6 +50,7 @@ def detection_model():
     return MockDetectionModel(
         label_info=label_info,
         data_input_params=data_params,
+        pretrained=False,
     )
 
 

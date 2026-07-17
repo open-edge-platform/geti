@@ -60,7 +60,7 @@ const SelectedProjectButton = ({ name, id, isActive }: SelectedProjectProps) => 
                     width={'size-400'}
                 />
             </View>
-            <Flex direction={'column'} minWidth={0}>
+            <Flex direction={'column'} minWidth={0} alignItems={'start'}>
                 <View paddingStart={'size-50'} width={'100%'} UNSAFE_className={classes.selectedProjectName}>
                     <span title={name}>{name}</span>
                 </View>

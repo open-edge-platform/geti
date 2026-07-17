@@ -1,8 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ActionButton, Divider, Flex } from '@geti-ui/ui';
+import { ActionButton, Divider, Flex, Text, View } from '@geti-ui/ui';
 
+import { ReactComponent as EmptyDatasetImage } from '../../../../assets/empty-dataset.svg';
 import {
     ActiveFiltersList,
     useClearAllFilters,
@@ -10,7 +11,32 @@ import {
 } from '../../gallery/active-filters/active-filters.component';
 import { AnnotatorMediaFiltering } from '../../gallery/toolbar/media-filtering/annotator-media-filtering.component';
 
-export const SidebarMediaFilter = () => {
+const NoMediaItemsMessage = () => {
+    return (
+        <View
+            marginTop={'size-100'}
+            backgroundColor={'gray-100'}
+            padding={'size-50'}
+            borderColor={'transparent'}
+            borderRadius={'medium'}
+        >
+            <Flex direction={'column'} alignItems={'center'} gap={'size-50'}>
+                <View width={'size-1250'} height={'size-1250'}>
+                    <EmptyDatasetImage height={'100%'} width={'100%'} />
+                </View>
+                <Text UNSAFE_style={{ textAlign: 'center' }}>
+                    No media items match your filter. Remove or select a new filter.
+                </Text>
+            </Flex>
+        </View>
+    );
+};
+
+type SidebarMediaFilterProps = {
+    hasMediaItems: boolean;
+};
+
+export const SidebarMediaFilter = ({ hasMediaItems }: SidebarMediaFilterProps) => {
     const hasActiveFilters = useHasActiveFilters();
     const handleClearAll = useClearAllFilters();
 
@@ -30,6 +56,8 @@ export const SidebarMediaFilter = () => {
                     <ActiveFiltersList />
                 </Flex>
             )}
+
+            {hasActiveFilters && !hasMediaItems && <NoMediaItemsMessage />}
         </Flex>
     );
 };
