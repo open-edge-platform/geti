@@ -110,7 +110,7 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
     );
 
     const items = useMemo(() => {
-        const mediaItems = data?.pages.flatMap((page) => page.items) ?? [];
+        const mediaItems = data?.pages?.flatMap((page) => page.items) ?? [];
 
         return getMediaEntities(mediaItems);
     }, [data?.pages]);

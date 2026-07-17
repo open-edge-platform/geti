@@ -417,7 +417,6 @@ class HGNetv2Module(nn.Module):
         freeze_stem_only (bool, optional): Freeze Stem only. Defaults to True.
         freeze_at (int, optional): Freeze at which stage block. Defaults to 0.
         freeze_norm (bool, optional): Freeze normalization or not. Defaults to True.
-        pretrained (bool, optional): Use backbone pretrained weight. Defaults to False.
     """
 
     arch_configs: ClassVar[dict[str, dict[str, Any]]] = {
@@ -430,7 +429,6 @@ class HGNetv2Module(nn.Module):
                 "stage3": [256, 64, 512, 2, True, True, 5, 3],
                 "stage4": [512, 128, 1024, 1, True, True, 5, 3],
             },
-            "url": "https://storage.geti.intel.com/weights/PPHGNetV2_B0_stage1.pth",
         },
         "B2": {
             "stem_channels": [3, 24, 32],
@@ -441,7 +439,6 @@ class HGNetv2Module(nn.Module):
                 "stage3": [384, 128, 768, 3, True, True, 5, 4],
                 "stage4": [768, 256, 1536, 1, True, True, 5, 4],
             },
-            "url": "https://storage.geti.intel.com/weights/PPHGNetV2_B2_stage1.pth",
         },
         "B4": {
             "stem_channels": [3, 32, 48],
@@ -452,7 +449,6 @@ class HGNetv2Module(nn.Module):
                 "stage3": [512, 192, 1024, 3, True, True, 5, 6],
                 "stage4": [1024, 384, 2048, 1, True, True, 5, 6],
             },
-            "url": "https://storage.geti.intel.com/weights/PPHGNetV2_B4_stage1.pth",
         },
         "B5": {
             "stem_channels": [3, 32, 64],
@@ -463,7 +459,6 @@ class HGNetv2Module(nn.Module):
                 "stage3": [512, 256, 1024, 5, True, True, 5, 6],
                 "stage4": [1024, 512, 2048, 2, True, True, 5, 6],
             },
-            "url": "https://storage.geti.intel.com/weights/PPHGNetV2_B5_stage1.pth",
         },
     }
 
@@ -475,7 +470,6 @@ class HGNetv2Module(nn.Module):
         freeze_stem_only: bool = True,
         freeze_at: int = 0,
         freeze_norm: bool = True,
-        pretrained: bool = False,
     ) -> None:
         super().__init__()
         self.use_lab = use_lab
@@ -484,7 +478,6 @@ class HGNetv2Module(nn.Module):
         # Explicit type annotations for static analysis
         stem_channels: list[int] = list(self.arch_configs[name]["stem_channels"])
         stage_config: dict[str, list[int | bool]] = dict(self.arch_configs[name]["stage_config"])
-        download_url: str = str(self.arch_configs[name]["url"])
 
         self._out_strides = [4, 8, 16, 32]
         self._out_channels = [stage_config[k][2] for k in stage_config]
@@ -532,14 +525,6 @@ class HGNetv2Module(nn.Module):
 
         if freeze_norm:
             self._freeze_norm(self)
-
-        if pretrained:
-            state = torch.hub.load_state_dict_from_url(
-                download_url,
-                map_location="cpu",
-            )
-            print(f"Loaded stage1 {name} HGNetV2 from URL.")
-            self.load_state_dict(state)
 
     def _freeze_norm(self, m: nn.Module) -> nn.Module:
         """Freeze normalization layers.
@@ -597,7 +582,6 @@ class HGNetv2:
             "freeze_norm": False,
             "use_lab": True,
             "freeze_stem_only": True,
-            "pretrained": True,
         },
         "dfine_hgnetv2_s": {
             "name": "B0",
@@ -634,7 +618,6 @@ class HGNetv2:
             "freeze_norm": False,
             "use_lab": True,
             "freeze_stem_only": True,
-            "pretrained": True,
         },
         "deim_dfine_hgnetv2_s": {
             "name": "B0",

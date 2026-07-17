@@ -11,7 +11,7 @@ import inspect
 import logging as log
 import types
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Iterator, Literal, Sequence, cast
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Iterator, Literal, Sequence, cast
 
 import torch
 from torchmetrics import Metric, MetricCollection
@@ -23,6 +23,7 @@ from getitune.backend.lightning.models.base import (
     DefaultSchedulerCallable,
     LightningModel,
 )
+from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.models.common.target_utils import align_sample_batch_annotations
 from getitune.backend.lightning.models.utils.utils import InstanceData
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
@@ -43,9 +44,10 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.backend.lightning.models.detection.detectors import SingleStageDetector
+    from getitune.types import PathLike
 
 
-class LightningDetectionModel(LightningModel):
+class LightningDetectionModel(PretrainedWeightsMixin, LightningModel):
     """Base class for the detection models used in getitune.
 
     This class is a subclass of LightningModel and provides common functionality for detection models.
@@ -68,10 +70,14 @@ class LightningDetectionModel(LightningModel):
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
         explain_mode (bool, optional): Whether to enable explain mode.
-            The model will return feature vectors need for XAI visualization.
+            The model will return feature vectors needed for XAI visualization.
             Defaults to False.
-
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
+
+    pretrained_urls: ClassVar[dict[str, str]]
 
     def __init__(
         self,
@@ -84,6 +90,8 @@ class LightningDetectionModel(LightningModel):
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
         explain_mode: bool = False,
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -94,6 +102,8 @@ class LightningDetectionModel(LightningModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
         self.explain_mode = explain_mode

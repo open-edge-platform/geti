@@ -4,7 +4,7 @@
 import { useState } from 'react';
 
 import type { DatasetRevision, Job, ModelArchitectureWithPerformanceCategory } from '@/api/types';
-import { AlertDialog, Button, DialogContainer, Flex, Grid, Loading, Tag, Text } from '@geti-ui/ui';
+import { AlertDialog, Badge, Button, DialogContainer, Flex, Grid, Loading, Text } from '@geti-ui/ui';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
@@ -32,13 +32,26 @@ type RunningModelRowProps = {
     modelArchitectures: ModelArchitectureWithPerformanceCategory[];
 };
 
-const StatusTag = ({ status }: { status: string }) => (
-    <Tag prefix={<Loading size={'S'} mode={'inline'} />} className={classes.runningStatusTag} text={status} />
-);
+const StatusBadge = ({ status }: { status: string }) => {
+    return (
+        <Badge variant={'neutral'} UNSAFE_className={classes.runningStatusBadge}>
+            <Text>
+                <Flex alignItems={'center'} gap={'size-50'}>
+                    <Loading size={'S'} mode={'inline'} />
+                    {status}
+                </Flex>
+            </Text>
+        </Badge>
+    );
+};
 
-const StatusTagMessage = ({ status }: { status: string }) => (
-    <Tag className={classes.statusTag} withDot={false} text={status} />
-);
+const StatusBadgeMessage = ({ status }: { status: string }) => {
+    return (
+        <Badge variant={'neutral'} UNSAFE_className={classes.statusBadge}>
+            {status}
+        </Badge>
+    );
+};
 
 type CancelRunningJobProps = {
     job: Job;
@@ -138,9 +151,9 @@ export const RunningModelRow = ({
                         <Text UNSAFE_className={classes.modelName}>{modelName}</Text>
                     </Flex>
 
-                    <Flex alignItems={'start'}>
-                        <StatusTag status={capitalize(job.status)} />
-                        {showStatusTagMessage && <StatusTagMessage status={statusMessage} />}
+                    <Flex alignItems={'start'} gap={'size-100'}>
+                        <StatusBadge status={capitalize(job.status)} />
+                        {showStatusTagMessage && <StatusBadgeMessage status={statusMessage} />}
                     </Flex>
 
                     <Text UNSAFE_className={classes.metaText}>{`Started: ${formattedStartedAt}`}</Text>

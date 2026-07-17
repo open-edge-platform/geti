@@ -4,7 +4,7 @@
 import { Suspense } from 'react';
 
 import { $api } from '@/api';
-import { Flex, Grid, Item, Loading, TabList, Tabs, View } from '@geti-ui/ui';
+import { Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/ui';
 import { usePrefetchQuery } from '@tanstack/react-query';
 import { usePrefetchPipeline } from 'hooks/api/pipeline.hook';
 import { useProject } from 'hooks/api/project.hook';
@@ -38,7 +38,7 @@ const Header = () => {
                     <Link to={paths.project.index({})}>
                         <Flex alignItems='center' gap='size-50'>
                             <img src={getiLogo} alt={'Geti logo'} className={classes.logo} />
-                            Geti™
+                            <Text UNSAFE_className={classes.logoText}>Geti™</Text>
                         </Flex>
                     </Link>
                 </View>

@@ -22,6 +22,7 @@ class TestRFDETRInst:
         model = RFDETRInst(
             model_name="rfdetr_seg_n",
             label_info=3,
+            pretrained=False,
         )
         assert model.model_name == "rfdetr_seg_n"
         assert model.num_classes == 3
@@ -31,6 +32,7 @@ class TestRFDETRInst:
         model = RFDETRInst(
             model_name="rfdetr_seg_n",
             label_info=10,
+            pretrained=False,
         )
         created_model = model._create_model()
         assert created_model is not None
@@ -46,6 +48,7 @@ class TestRFDETRInst:
         model = RFDETRInst(
             model_name="rfdetr_seg_n",
             label_info=3,
+            pretrained=False,
         )
 
         # Check that default params use 0-1 range normalization
@@ -61,6 +64,7 @@ class TestRFDETRInst:
         model = RFDETRInst(
             model_name="rfdetr_seg_n",
             label_info=5,
+            pretrained=False,
         )
 
         # Test configure_optimizers method
@@ -81,6 +85,7 @@ class TestRFDETRInst:
             model_name="rfdetr_seg_n",
             label_info=3,
             data_input_params=DataInputParams((312, 312), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests
@@ -117,6 +122,7 @@ class TestRFDETRInst:
             model_name="rfdetr_seg_n",
             label_info=3,
             data_input_params=DataInputParams((312, 312), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests
@@ -145,6 +151,7 @@ class TestRFDETRInst:
         model = RFDETRInst(
             model_name="rfdetr_seg_n",
             label_info=3,
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests
@@ -170,7 +177,7 @@ class TestRFDETRInst:
 
     def test_exporter_output_names(self) -> None:
         """Exporter must publish ``boxes``/``labels``/``masks`` (no standalone ``scores``)."""
-        model = RFDETRInst(model_name="rfdetr_seg_n", label_info=3)
+        model = RFDETRInst(model_name="rfdetr_seg_n", label_info=3, pretrained=False)
         exporter = model._exporter
         assert isinstance(exporter, LightningModelExporter)
         assert exporter.output_names == ["boxes", "labels", "masks"]
@@ -189,6 +196,7 @@ class TestRFDETRInst:
             model_name="rfdetr_seg_n",
             label_info=3,
             data_input_params=DataInputParams((312, 312), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         model = model.cpu()
         model.eval()
@@ -216,6 +224,7 @@ class TestRFDETRInst:
         model = RFDETRInst(
             model_name="rfdetr_seg_n",
             label_info=3,
+            pretrained=False,
         )
 
         customized = model._customize_inputs(fxt_instance_seg_batch)

@@ -11,7 +11,7 @@ import copy
 import logging as log
 import types
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, Callable, Iterator, Literal, Sequence, cast
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Iterator, Literal, Sequence, cast
 
 import torch
 from torch import Tensor
@@ -25,10 +25,11 @@ from getitune.backend.lightning.models.base import (
     DefaultSchedulerCallable,
     LightningModel,
 )
+from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.models.common.target_utils import align_sample_batch_annotations
 from getitune.backend.lightning.models.instance_segmentation.segmentors.maskrcnn_tv import MaskRCNN
 from getitune.backend.lightning.models.instance_segmentation.segmentors.two_stage import TwoStageDetector
-from getitune.backend.lightning.models.utils.utils import InstanceData, load_checkpoint
+from getitune.backend.lightning.models.utils.utils import InstanceData
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.backend.lightning.tools.explain.explain_algo import InstSegExplainAlgo, feature_vector_fn
 from getitune.backend.lightning.tools.tile_merge import InstanceSegTileMerge
@@ -47,12 +48,12 @@ from getitune.types.task import TaskType
 if TYPE_CHECKING:
     from datumaro.experimental.fields import TileInfo
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
-    from torch import nn
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
-class LightningInstanceSegModel(LightningModel):
+class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
     """Base class for the Instance Segmentation models used in getitune.
 
     NOTE: LightningInstanceSegModel has many duplicate methods to LightningDetectionModel,
@@ -74,8 +75,12 @@ class LightningInstanceSegModel(LightningModel):
             Defaults to MaskRLEMeanAPFMeasureCallable.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
-        explain_mode (bool, optional): Whether to enable explainable AI mode. Defaults to False.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
+
+    pretrained_urls: ClassVar[dict[str, str]]
 
     def __init__(
         self,
@@ -87,6 +92,8 @@ class LightningInstanceSegModel(LightningModel):
         metric: MetricCallable = MaskRLEMeanAPFMeasureCallable,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -97,23 +104,13 @@ class LightningInstanceSegModel(LightningModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
         self.model.feature_vector_fn = feature_vector_fn
         self.model.explain_fn = self.get_explain_fn()
         self.model.get_results_from_head = self.get_results_from_head
-
-    def _create_model(self, num_classes: int | None = None) -> nn.Module:
-        num_classes = num_classes if num_classes is not None else self.num_classes
-        detector = self._build_model(num_classes)
-        if hasattr(detector, "init_weights"):
-            detector.init_weights()
-        if isinstance(self.load_from, dict):
-            load_checkpoint(detector, self.load_from[self.model_name], map_location="cpu")
-        elif self.load_from is not None:
-            load_checkpoint(detector, self.load_from, map_location="cpu")
-
-        return detector
 
     def _customize_inputs(self, entity: SampleBatch) -> dict[str, Any]:
         # Defensively realign per-image boxes/labels/masks counts so a divergence

@@ -56,6 +56,7 @@ export const useDatasetMediaWithReviewStatus = () => {
         // Only true for actual next-page fetches on either query — never for
         // initial loads — so pagination doesn't trigger the full overlay.
         isFetchingNextPage: mediaItemsResponse.isFetchingNextPage || datasetItemsResponse.isFetchingNextPage,
+        hasNextPage: mediaItemsResponse.hasNextPage || datasetItemsResponse.hasNextPage,
         totalCount: mediaItemsResponse.totalCount,
         fetchNextPage,
         isMediaItemReviewedById,

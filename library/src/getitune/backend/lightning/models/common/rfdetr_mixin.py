@@ -37,6 +37,8 @@ if TYPE_CHECKING:
     from rfdetr.models.backbone import Backbone
     from rfdetr.models.lwdetr import LWDETR
 
+    from getitune.types import PathLike
+
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +69,7 @@ def _get_param_dict(args: SimpleNamespace, model_without_ddp: torch.nn.Module) -
 class RFDETRMixin:
     """Mixin class providing shared RF-DETR functionality for detection and instance segmentation."""
 
-    _pretrained_weights: ClassVar[dict[str, str]]
+    pretrained_urls: ClassVar[dict[str, str]]
     _model_config_mapping: ClassVar[dict[str, type]]
 
     def _build_rfdetr_model(
@@ -80,10 +82,8 @@ class RFDETRMixin:
 
         Handles the full pipeline shared by both detection and instance segmentation:
         1. Build LWDETR from per-variant config.
-        2. Load & align pretrained weights (handles head resize internally).
-        3. Reinit classification biases to zero (sigmoid=0.5 neutral prior).
-        4. Build criterion and postprocessor.
-        5. Wrap in ``RFDETRDetector``.
+        2. Build criterion and postprocessor.
+        3. Wrap in ``RFDETRDetector``.
 
         Args:
             num_classes: Number of target classes.
@@ -101,31 +101,7 @@ class RFDETRMixin:
 
         lwdetr: LWDETR = build_model_from_config(model_config, train_config)
 
-        pretrain_url = self._pretrained_weights.get(self.model_name)  # type: ignore[attr-defined]
-        if pretrain_url:
-            cache_dir = Path(
-                os.environ.get(
-                    "PRETRAINED_WEIGHTS_CACHE_DIR",
-                    Path.home() / ".cache" / "torch" / "hub" / "checkpoints",
-                )
-            )
-            cache_dir.mkdir(parents=True, exist_ok=True)
-            local_path = cache_dir / Path(pretrain_url).name
-            is_distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
-            rank = torch.distributed.get_rank() if is_distributed else 0
-            if rank == 0 and not local_path.exists():
-                download_url_to_file(pretrain_url, str(local_path), progress=os.isatty(0))
-            if is_distributed:
-                torch.distributed.barrier()
-            model_config.pretrain_weights = str(local_path)
-        else:
-            model_config.pretrain_weights = None
-        load_pretrain_weights(lwdetr, model_config)
-
-        torch.nn.init.zeros_(lwdetr.class_embed.bias)
-        if lwdetr.two_stage:
-            for enc_cls_embed in lwdetr.transformer.enc_out_class_embed:
-                torch.nn.init.zeros_(enc_cls_embed.bias)
+        self._model_config = model_config
 
         criterion, postprocessor = build_criterion_from_config(model_config, train_config)
 
@@ -412,3 +388,38 @@ class RFDETRMixin:
     def _optimization_config(self) -> dict[str, Any]:
         """PTQ config for RF-DETR."""
         return {"model_type": "transformer"}
+
+    def load_pretrained(self, weights: PathLike | None = None) -> None:
+        """Load pretrained weights into the model.
+
+        Load & align pretrained weights (handles head resize internally).
+        Reinit classification biases to zero (sigmoid=0.5 neutral prior).
+
+        Args:
+            weights (PathLike | None): Path to the pretrained weights file. If None, uses default weights.
+        """
+        if weights is None:
+            pretrain_url = self.pretrained_urls.get(self.model_name)  # type: ignore[attr-defined]
+            if pretrain_url:
+                cache_dir = Path(os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"])
+                cache_dir.mkdir(parents=True, exist_ok=True)
+                local_path = cache_dir / Path(pretrain_url).name
+                is_distributed = torch.distributed.is_available() and torch.distributed.is_initialized()
+                rank = torch.distributed.get_rank() if is_distributed else 0
+                if rank == 0 and not local_path.exists():
+                    download_url_to_file(pretrain_url, str(local_path), progress=os.isatty(0))
+                if is_distributed:
+                    torch.distributed.barrier()
+                self._model_config.pretrain_weights = str(local_path)
+            else:
+                self._model_config.pretrain_weights = None
+        else:
+            self._model_config.pretrain_weights = str(weights)
+
+        lwdetr = self.model.lwdetr  # pyrefly: ignore[missing-attribute]
+        load_pretrain_weights(lwdetr, self._model_config)
+
+        torch.nn.init.zeros_(lwdetr.class_embed.bias)
+        if lwdetr.two_stage:
+            for enc_cls_embed in lwdetr.transformer.enc_out_class_embed:
+                torch.nn.init.zeros_(enc_cls_embed.bias)
