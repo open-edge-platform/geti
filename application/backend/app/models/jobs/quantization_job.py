@@ -6,7 +6,7 @@ from typing import Literal
 from uuid import UUID, uuid4
 
 from loguru import logger
-from pydantic import Field
+from pydantic import Field, computed_field
 
 from app.core.jobs.models import JobParams, JobType, ProjectJob
 
@@ -15,6 +15,8 @@ class QuantizationJobParams(JobParams):
     job_id: UUID
     project_id: UUID
     model_id: UUID  # Source model revision to quantize
+    model_architecture_id: str
+    model_architecture_name: str
     model_variant_id: UUID = Field(default_factory=uuid4)
     max_calibration_subset_size: int = Field(default=100, description="Max samples for calibration")
     max_drop: float | None = Field(default=None, description="Max accuracy drop for accuracy-aware quantization")
@@ -22,6 +24,12 @@ class QuantizationJobParams(JobParams):
         default=10,
         description="Max number of iterations for accuracy-aware quantization (None means unlimited)",
     )
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def model_name(self) -> str:
+        """User-friendly model name derived from architecture name and model ID."""
+        return f"{self.model_architecture_name} ({str(self.model_id).split('-')[0]})"
 
 
 class QuantizationJob(ProjectJob[QuantizationJobParams]):

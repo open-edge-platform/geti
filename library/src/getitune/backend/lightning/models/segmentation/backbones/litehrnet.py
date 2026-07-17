@@ -10,7 +10,6 @@ Modified from:
 from __future__ import annotations
 
 from functools import partial
-from pathlib import Path
 from typing import Any, Callable, ClassVar
 
 import torch
@@ -22,7 +21,6 @@ from getitune.backend.lightning.models.modules import Conv2dModule, build_activa
 from getitune.backend.lightning.models.segmentation.modules import (
     channel_shuffle,
 )
-from getitune.backend.lightning.models.utils.utils import load_checkpoint_to_model, load_from_http
 
 
 class NeighbourSupport(nn.Module):
@@ -508,7 +506,6 @@ class Stem(nn.Module):
         normalization (Callable[..., nn.Module] | None): Normalization layer module.
             Defaults to ``nn.BatchNorm2d``.
         with_cp (bool): Use checkpointing to save memory during forward pass.
-        num_stages (int): Number of stages in the backbone network.
         strides (tuple[int, int]): Strides of the first and subsequent stages.
         extra_stride (bool): Use an extra stride in the second stage.
         input_norm (bool): Use instance normalization on the input image.
@@ -1039,7 +1036,6 @@ class LiteHRNetModule(nn.Module):
         with_cp: bool = False,
         zero_init_residual: bool = False,
         dropout: float | None = None,
-        pretrained_weights: str | None = None,
     ) -> None:
         """Init."""
         super().__init__()
@@ -1073,9 +1069,6 @@ class LiteHRNetModule(nn.Module):
                 dropout=dropout,
             )
             setattr(self, f"stage{i}", stage)
-
-        if pretrained_weights is not None:
-            self.load_pretrained_weights(pretrained_weights, prefix="backbone")
 
     def _make_transition_layer(
         self,
@@ -1227,18 +1220,6 @@ class LiteHRNetModule(nn.Module):
 
         return y_list
 
-    def load_pretrained_weights(self, pretrained: str | None = None, prefix: str = "") -> None:
-        """Initialize weights."""
-        checkpoint = None
-        if isinstance(pretrained, str) and Path(pretrained).exists():
-            checkpoint = torch.load(pretrained, "cpu")
-            print(f"init weight - {pretrained}")
-        elif pretrained is not None:
-            checkpoint = load_from_http(filename=pretrained, map_location="cpu")
-            print(f"init weight - {pretrained}")
-        if checkpoint is not None:
-            load_checkpoint_to_model(self, checkpoint, prefix=prefix)
-
 
 class LiteHRNetBackbone:
     """LiteHRNet backbone factory."""
@@ -1256,7 +1237,6 @@ class LiteHRNetBackbone:
                 "reduce_ratios": [8, 8],
                 "num_channels": [[60, 120], [60, 120, 240]],
             },
-            "pretrained_weights": "https://storage.geti.intel.com/weights/litehrnetsv2_imagenet1k_rsc.pth",
         },
         "lite_hrnet_18": {
             "stem_configuration": {},
@@ -1270,7 +1250,6 @@ class LiteHRNetBackbone:
                 "reduce_ratios": [8, 8, 8],
                 "num_channels": [[40, 80], [40, 80, 160], [40, 80, 160, 320]],
             },
-            "pretrained_weights": "https://storage.geti.intel.com/weights/litehrnet18_imagenet1k_rsc.pth",
         },
         "lite_hrnet_x": {
             "stem_configuration": {"stem_channels": 60, "out_channels": 60, "strides": (2, 1)},
@@ -1285,7 +1264,6 @@ class LiteHRNetBackbone:
                 "reduce_ratios": [2, 4, 8, 8],
                 "num_channels": [[18, 60], [18, 60, 80], [18, 60, 80, 160], [18, 60, 80, 160, 320]],
             },
-            "pretrained_weights": "https://storage.geti.intel.com/weights/litehrnetxv3_imagenet1k_rsc.pth",
         },
     }
 

@@ -16,6 +16,7 @@ class QuantizationRequestParams(BaseModel):
     """Request parameters for the quantization job."""
 
     model_id: UUID = Field(..., description="ID of the model revision to quantize")
+    model_architecture_id: str = Field(..., description="Model architecture identifier")
     max_calibration_subset_size: int = Field(
         100, description="Maximum number of samples from the dataset revision to be used for calibration"
     )
@@ -58,6 +59,7 @@ class QuantizationRequest(BaseJobRequest):
                 "project_id": "7b073838-99d3-42ff-9018-4e901eb047fc",
                 "parameters": {
                     "model_id": "6b7bb928-5d6f-46ea-8fd2-5ce80dd1e12b",
+                    "model_architecture_id": "object-detection-atss-mobilenet-v2",
                     "max_calibration_subset_size": 100,
                     "max_drop": 0.01,
                     "max_num_iterations": 10,
@@ -77,6 +79,8 @@ class QuantizationModelMetadata(BaseModel):
     """Metadata about the model being quantized."""
 
     id: UUID = Field(..., description="Model revision identifier")
+    name: str = Field(..., description="Model name")
+    architecture: str = Field(..., description="Model architecture identifier")
 
 
 class QuantizationModelVariantMetadata(BaseModel):
@@ -103,7 +107,9 @@ class QuantizationMetadata(BaseModel):
         if isinstance(data, QuantizationJob):
             return {
                 "project": QuantizationProjectMetadata(id=data.project_id),
-                "model": QuantizationModelMetadata(id=data.params.model_id),
+                "model": QuantizationModelMetadata(
+                    id=data.params.model_id, name=data.params.model_name, architecture=data.params.model_architecture_id
+                ),
                 "model_variant": QuantizationModelVariantMetadata(id=data.params.model_variant_id),
                 "max_calibration_subset_size": data.params.max_calibration_subset_size,
                 "max_drop": data.params.max_drop,

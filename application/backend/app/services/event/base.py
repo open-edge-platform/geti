@@ -23,7 +23,14 @@ class BaseEventBus[E]:
                 logger.debug(f"registered event handler for event '{event_type}'")
 
     def emit_event(self, event_type: E) -> None:
-        logger.debug(f"Emitting event '{event_type}' to {len(self._event_handlers[event_type])} handlers")
         with self._lock:
-            for handler in self._event_handlers[event_type]:
+            handlers = list(self._event_handlers[event_type])
+        logger.debug(f"Emitting event '{event_type}' to {len(handlers)} handlers")
+        for handler in handlers:
+            try:
                 handler()
+            except Exception as e:
+                # A misbehaving subscriber must not prevent the remaining subscribers from being
+                # notified, nor propagate back to the caller that emitted the event (which could be
+                # a running pipeline worker or an API request). Log and continue.
+                logger.exception("Event handler for event '{}' raised an exception; continuing {}", event_type, e)

@@ -22,17 +22,15 @@ import { SortBy } from './sort-projects/utils';
 import backgroundStyles from '../project-background.module.scss';
 import classes from './project-list.module.scss';
 
-const MIN_NUMBER_OF_PROJECTS_TO_SHOW_FILTERS = 8;
-
 const ProjectGrid = () => {
     const projectsQuery = useProjects();
     const projects = projectsQuery.data;
     const [sortBy, setSortBy] = useState<SortBy>('createdAt-descending');
     const hasProjects = isNonEmptyArray(projects);
 
-    const shouldShowFilters = projects.length >= MIN_NUMBER_OF_PROJECTS_TO_SHOW_FILTERS;
-
     const [[activeProject], projectsWithoutActivePipeline] = partition(projects, (project) => project.active_pipeline);
+
+    const shouldShowFilters = projectsWithoutActivePipeline.length > 0;
 
     const { searchName, setSearchName, selectedTaskTypes, setSelectedTaskTypes, filteredProjects, isFiltering } =
         useProjectFilters(projectsWithoutActivePipeline);

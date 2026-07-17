@@ -21,6 +21,7 @@ class TestYOLOX:
             model_name=request.param,
             label_info=3,
             data_input_params=DataInputParams((320, 320), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
     def test_init(self) -> None:
@@ -28,6 +29,7 @@ class TestYOLOX:
             model_name="yolox_l",
             label_info=3,
             data_input_params=DataInputParams((320, 320), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         assert isinstance(yolox_l.model.backbone, CSPDarknetModule)
         assert isinstance(yolox_l.model.neck, YOLOXPAFPNModule)
@@ -38,6 +40,7 @@ class TestYOLOX:
             model_name="yolox_tiny",
             label_info=3,
             data_input_params=DataInputParams((320, 320), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         assert yolox_tiny.data_input_params.input_size == (320, 320)
 
@@ -45,6 +48,7 @@ class TestYOLOX:
             model_name="yolox_tiny",
             label_info=3,
             data_input_params=DataInputParams((416, 416), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         assert yolox_tiny.data_input_params.input_size == (416, 416)
 
@@ -53,6 +57,7 @@ class TestYOLOX:
             model_name="yolox_l",
             label_info=3,
             data_input_params=DataInputParams((320, 320), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         yolox_l_exporter = yolox_l._exporter
         assert isinstance(yolox_l_exporter, LightningModelExporter)
@@ -62,6 +67,7 @@ class TestYOLOX:
             model_name="yolox_tiny",
             label_info=3,
             data_input_params=DataInputParams((320, 320), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         yolox_tiny_exporter = yolox_tiny._exporter
         assert isinstance(yolox_tiny_exporter, LightningModelExporter)
@@ -104,7 +110,7 @@ class TestYOLOX:
         present) so export metadata is correct without hardcoding it in defaults.
         """
         # Use default params (no explicit data_input_params)
-        model = YOLOX(model_name=model_name, label_info=3)
+        model = YOLOX(model_name=model_name, label_info=3, pretrained=False)
         assert model.data_input_params.intensity_config is None
 
     @pytest.mark.parametrize("model_name", ["yolox_s", "yolox_l", "yolox_x"])
@@ -115,4 +121,4 @@ class TestYOLOX:
         intensity_cfg = IntensityConfig(storage_dtype=storage_dtype, mode="scale_to_unit")
         params = DataInputParams((320, 320), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0), intensity_config=intensity_cfg)
         with pytest.raises(ValueError, match="does not support high-bit-depth"):
-            YOLOX(model_name=model_name, label_info=3, data_input_params=params)
+            YOLOX(model_name=model_name, label_info=3, data_input_params=params, pretrained=False)

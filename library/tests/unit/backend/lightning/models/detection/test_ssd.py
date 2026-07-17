@@ -22,6 +22,7 @@ class TestSSD:
             model_name="ssd_mobilenetv2",
             label_info=3,
             data_input_params=DataInputParams((320, 320), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
     @pytest.fixture
@@ -59,6 +60,7 @@ class TestSSD:
             model_name="ssd_mobilenetv2",
             label_info=2,
             data_input_params=DataInputParams((320, 320), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         state_dict = prev_model.state_dict()
         fxt_model.model_classes = [1, 2, 3]

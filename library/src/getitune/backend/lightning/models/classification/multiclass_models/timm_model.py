@@ -18,6 +18,7 @@ from getitune.backend.lightning.models.classification.multiclass_models.base imp
     LightningMulticlassClsModel,
 )
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import TimmWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiClassClsMetricCallable
 from getitune.types.label import LabelInfoTypes
@@ -26,23 +27,26 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
-class TimmModelMulticlassCls(LightningMulticlassClsModel):
+class TimmModelMulticlassCls(TimmWeightsLoader, LightningMulticlassClsModel):
     """TimmModel for multi-class classification task.
 
     Args:
-        label_info (LabelInfoTypes): The label information for the classification task.
-        model_name (str): The name of the model.
-            You can find available models at timm.list_models() or timm.list_pretrained().
-        input_size (tuple[int, int], optional): Model input size in the order of height and width.
-            Defaults to (224, 224).
-        pretrained (bool, optional): Whether to load pretrained weights. Defaults to True.
-        optimizer (OptimizerCallable, optional): The optimizer callable for training the model.
-        scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): The learning rate scheduler callable.
-        metric (MetricCallable, optional): The metric callable for evaluating the model.
-            Defaults to MultiClassClsMetricCallable.
+        label_info (LabelInfoTypes): Information about the labels.
+        data_input_params (DataInputParams | dict | None, optional): The data input parameters
+            such as input size and normalization. If None is given,
+            default parameters for the specific model will be used.
+        model_name (str, optional): Backbone model name for feature extraction. Defaults to "efficientnet_v2_s".
+        optimizer (OptimizerCallable, optional): Optimizer for model training. Defaults to DefaultOptimizerCallable.
+        scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): Learning rate scheduler.
+            Defaults to DefaultSchedulerCallable.
+        metric (MetricCallable, optional): Metric for model evaluation. Defaults to MultiClassClsMetricCallable.
         torch_compile (bool, optional): Whether to compile the model using TorchScript. Defaults to False.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
 
     Example:
         1. API
@@ -66,6 +70,8 @@ class TimmModelMulticlassCls(LightningMulticlassClsModel):
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -76,6 +82,8 @@ class TimmModelMulticlassCls(LightningMulticlassClsModel):
             scheduler=scheduler,
             metric=metric,
             torch_compile=torch_compile,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:
