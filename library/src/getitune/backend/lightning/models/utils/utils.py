@@ -11,7 +11,7 @@ import os
 import re
 from collections import OrderedDict, abc, namedtuple
 from pathlib import Path
-from typing import Any, Callable, Iterator, Sequence, Union
+from typing import Any, Iterator, Sequence, Union
 from warnings import warn
 
 import numpy as np
@@ -25,24 +25,6 @@ LongTypeTensor = Union[torch.LongTensor, torch.cuda.LongTensor]
 IndexType = Union[str, slice, int, list, LongTypeTensor, BoolTypeTensor, np.ndarray]
 
 logger = logging.getLogger(__name__)
-
-
-def _torch_hub_model_reduce(self) -> tuple[Callable, tuple]:  # noqa: ANN001
-    return (torch_hub_load, self.torch_hub_load_args)
-
-
-def torch_hub_load(repo_or_dir: str, model: str) -> nn.Module:
-    """Load a module using from 'torch.hub'. The module is modified to support pickle."""
-    module = torch.hub.load(
-        repo_or_dir=repo_or_dir,
-        model=model,
-        trust_repo=True,
-    )
-
-    # support pickle
-    module.torch_hub_load_args = (repo_or_dir, model)
-    module.__class__.__reduce__ = _torch_hub_model_reduce.__get__(module, module.__class__)
-    return module
 
 
 def get_dist_info() -> tuple[int, int]:
