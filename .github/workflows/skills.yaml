@@ -56,7 +56,7 @@ jobs:
               - .claude/skills/**
               - .agents/skills/**
               - .github/scripts/skills/**
-              - .github/workflows/skills.yml
+              - .github/workflows/skills.yaml
 
   layout-check:
     name: Validate skills layout
@@ -105,8 +105,8 @@ jobs:
       - name: Run SkillSpector scan
         uses: open-edge-platform/geti-ci/actions/skill-scan@0745e2b1612e4c25c3e83eb37bddeba8743a2439 # skill-scan/v0.1.1
         with:
-          severity-level: ${{ github.event_name == 'pull_request' && 'HIGH' || github.event.inputs.severity || 'LOW' }}
-          fail-on-findings: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+          severity-level: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'HIGH' || github.event.inputs.severity || 'LOW' }}
+          fail-on-findings: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'true' || 'false' }}
           skills-path: skills
 
   skill-validator-scan:
@@ -134,8 +134,8 @@ jobs:
         uses: open-edge-platform/geti-ci/actions/skill-validator@dd2b6e59ed10c4937d18c0596502b0a9408ab52a # skill-validator/v0.1.1
         with:
           skills-path: skills
-          strict: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
-          fail-on-findings: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
+          strict: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'true' || 'false' }}
+          fail-on-findings: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'true' || 'false' }}
 
   required-check:
     name: Required Check skills
