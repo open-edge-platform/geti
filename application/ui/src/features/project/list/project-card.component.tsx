@@ -5,7 +5,9 @@ import { useState } from 'react';
 
 import type { Project } from '@/api/types';
 import { Badge, dimensionValue, Flex, Heading, Text, View } from '@geti-ui/ui';
+import { useQueryClient } from '@tanstack/react-query';
 import { clsx } from 'clsx';
+import { getProjectQueryOptions } from 'hooks/api/project.hook';
 import { NavLink } from 'react-router-dom';
 
 import placeholderThumbnailIconUrl from '../../../assets/icons/image-icon.svg?url';
@@ -62,10 +64,20 @@ type ProjectCardProps = {
 export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: ProjectCardProps) => {
     const isActive = item.active_pipeline;
     const taskType = getProjectTypeTitle(item.task);
+    const queryClient = useQueryClient();
+
+    const prefetchProject = () => {
+        queryClient.prefetchQuery(getProjectQueryOptions(item.id));
+    };
 
     return (
         <div style={{ position: 'relative' }} aria-label={`Project: ${item.name}`}>
-            <NavLink to={paths.project.dataset.index({ projectId: item.id })}>
+            <NavLink
+                to={paths.project.dataset.index({ projectId: item.id })}
+                viewTransition
+                onPointerEnter={prefetchProject}
+                onFocus={prefetchProject}
+            >
                 <Flex UNSAFE_className={clsx({ [classes.card]: true, [classes.activeCard]: isActive })}>
                     <View
                         height={'100%'}

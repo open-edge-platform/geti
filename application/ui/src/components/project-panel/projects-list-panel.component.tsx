@@ -74,7 +74,9 @@ const ManageProjects = () => {
     const navigate = useNavigate();
 
     const navigateToProjectsList = () => {
-        navigate(paths.project.index({}));
+        navigate(paths.project.index({}), {
+            viewTransition: true,
+        });
     };
 
     return (
