@@ -301,7 +301,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
         git=1:2.47.3-0* \
         libgl1=1.7.0-1+b2 \
         libglib2.0-0t64=2.84.4-3~deb13u3 \
-        libglx-mesa0=25.0.7-2 \
+        libglx-mesa0=25.0.* \
         libv4l-0t64=1.30.1-1 \
         libva2=2.22.* \
         libva-drm2=2.22.* \
