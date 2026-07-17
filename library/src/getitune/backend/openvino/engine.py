@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import logging
 import os
-import time
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 
@@ -293,36 +292,10 @@ class OVEngine(Engine):
         metric_callable = metric(datamodule.label_info)
         with Progress() as progress:
             dataloader = datamodule.test_dataloader()
-            num_batches = len(dataloader)
-            # Verbose diagnostic logging: the tiled-eval test loop has previously
-            # hung / crashed mid-iteration, so log per-batch progress and timing to
-            # pinpoint exactly where and how far it gets.
-            logger.info(
-                "OVEngine.test: starting test loop over %d batches (tiling=%s, test dataset=%s)",
-                num_batches,
-                getattr(getattr(datamodule, "tile_config", None), "enable_tiler", None),
-                type(datamodule.subsets.get(datamodule.test_subset.subset_name)).__name__
-                if getattr(datamodule, "subsets", None)
-                else "<unknown>",
-            )
-            task = progress.add_task("Testing", total=num_batches)
-            loop_start = time.perf_counter()
-            for batch_idx, data_batch in enumerate(dataloader):
-                batch_start = time.perf_counter()
+            task = progress.add_task("Testing", total=len(dataloader))
+            for data_batch in dataloader:
                 model.test_step(data_batch, metric_callable)
-                logger.debug(
-                    "OVEngine.test: batch %d/%d done in %.3fs (elapsed %.1fs)",
-                    batch_idx + 1,
-                    num_batches,
-                    time.perf_counter() - batch_start,
-                    time.perf_counter() - loop_start,
-                )
                 progress.update(task, advance=1)
-            logger.info(
-                "OVEngine.test: test loop finished (%d batches in %.1fs)",
-                num_batches,
-                time.perf_counter() - loop_start,
-            )
 
         metrics_result = model.compute_metrics(metric_callable)
 
