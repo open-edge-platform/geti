@@ -1,0 +1,4 @@
+interface:
+  display_name: "Annotate & Manage Geti Labels"
+  short_description: "Create projects, manage labels, upload media, and annotate data in the Geti application via its REST API"
+  default_prompt: "Use $geti-annotating-and-managing-labels to create projects, manage labels, and annotate media in the Geti application."
