@@ -124,7 +124,9 @@ export const ProjectsListPanel = () => {
 
     const handleDeleted = () => {
         if (selectedProject?.id === projectActionMetadata?.projectId) {
-            navigate(paths.project.index({}));
+            navigate(paths.project.index({}), {
+                viewTransition: true,
+            });
         }
 
         clearProjectActionMetadata();
