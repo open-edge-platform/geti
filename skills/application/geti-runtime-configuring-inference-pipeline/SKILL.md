@@ -24,16 +24,16 @@ This skill is for configuration and validation, not backend code development.
 
 1. Confirm prerequisites.
    - Get backend endpoint and auth details if needed.
-   - Confirm project exists and a deployable model is available.
+   - Confirm project exists and a trained model is available.
    - Confirm source and sink endpoints are reachable.
 2. Collect the current state first.
    - Read project state and current pipeline configuration.
-   - Capture source, selected model, sink, and runtime toggles before editing.
+   - Capture source, selected model, sink, and pipeline status before editing.
    - Avoid blind overwrite when partial updates are enough.
-3. Configure in dependency order.
-   - Set source first and verify connectivity.
-   - Set model second and verify compatibility with task and labels.
-   - Set sink last and verify destination connectivity and format.
+3. Configure the project pipeline.
+   - Model: Verify the source format is compatible with the selected model (8b vs 16b).
+   - Source: Verify connectivity.
+   - Sink: Verify destination connectivity and configured formats.
 4. Enable or apply runtime mode.
    - Activate the pipeline only after all three blocks validate.
    - Prefer a minimal-change rollout to isolate failures.
