@@ -48,14 +48,8 @@ def logging_ctx(config: LogConfig) -> Generator[str]:
     """
     log_path = os.path.join(config.log_folder, config.log_file)
 
-    root_logger = logging.getLogger()
-    root_handler = InterceptHandler()
-    previous_root_handlers = list(root_logger.handlers)
-    previous_root_level = root_logger.level
-
-    nncf_handler = InterceptHandler()
-    previous_nncf_handlers = list(nncf_logger.handlers)
-    previous_nncf_level = nncf_logger.level
+    prev_nncf_handlers = list(nncf_logger.handlers)
+    prev_nncf_level = nncf_logger.level
 
     try:
         sink_id = logger.add(
@@ -72,22 +66,15 @@ def logging_ctx(config: LogConfig) -> Generator[str]:
     level = getattr(logging, config.level.upper(), logging.INFO)
 
     try:
-        root_logger.addHandler(root_handler)
-        root_logger.setLevel(level)
-
         # nncf_logger doesn't propagate, so it needs its own handler
-        nncf_logger.handlers = [nncf_handler]
+        nncf_logger.handlers = [InterceptHandler()]
         nncf_logger.setLevel(level)
 
         logger.debug("Started logging to {}", log_path)
         yield log_path
     finally:
-        root_logger.removeHandler(root_handler)
-        root_logger.handlers = previous_root_handlers
-        root_logger.setLevel(previous_root_level)
-
-        nncf_logger.handlers = previous_nncf_handlers
-        nncf_logger.setLevel(previous_nncf_level)
+        nncf_logger.handlers = prev_nncf_handlers
+        nncf_logger.setLevel(prev_nncf_level)
 
         logger.debug("Stopped logging to {}", log_path)
         logger.remove(sink_id)
