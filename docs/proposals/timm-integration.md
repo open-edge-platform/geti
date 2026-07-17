@@ -95,7 +95,7 @@ print(f"{parameters / 1e6:.1f} M parameters")
 print(f"{flops / 1e9:.1f} GFLOPs")
 ```
 
-The snapshot generator records `model_name`, the fields from `get_pretrained_cfg`, calculated family/variant metadata, resolved optimizer name/options/default learning rate, and model statistics. The worker calls `timm.create_model` again at train time with the selected name; the snapshot is catalog metadata, not a serialized model.
+The snapshot generator records `model_name`, the fields from `get_pretrained_cfg`, calculated family/version metadata, resolved optimizer name/options/default learning rate, and model statistics. The worker calls `timm.create_model` again at train time with the selected name; the snapshot is catalog metadata, not a serialized model.
 
 ---
 
@@ -124,6 +124,9 @@ Blockers at scale:
 - No optimizer field exists anywhere — not in `AlgoLevelTrainingParameters`, the manifest schema, or the API view. `HyperparametersUpdater._update_learning_rate` only writes `optimizer["init_args"]["lr"]`; it never sets the optimizer `class_path`. This is convenient for us: it confirms the optimizer is already an internal recipe/library concern, so keeping it library-side is consistent with the current design.
 - `GetiConfigConverter.TEMPLATE_ID_MAPPING` (`app/execution/common/geti_config_converter.py`) is a hardcoded dict mapping manifest `id` → recipe path (~71 entries today). It also routes classification via `sub_task_type`. 1400 entries here is untenable.
 - API (`app/api/routers/model_architectures.py`): `GET /api/model_architectures?task=X` returns the entire flat list (`ModelArchitectureView`), unpaged; `top_picks` come from a hardcoded `RECOMMENDED_MODEL_ARCHITECTURES` map (`app/supported_models/model_recommendations.py`).
+
+Deployment note: most timm backbones should still go through the standard Geti export/inference path, so the proposal should treat exportability as a requirement to validate rather than assume. The first release should cover representative models with training, OpenVINO export, ModelAPI load, and optional NNCF optimization.
+For that I propose to create a simple script that runs through a set of timm models (2 per family (smallest and largest)) and validates that they can be exported and loaded in ModelAPI.
 
 ### UI baseline
 
@@ -247,7 +250,7 @@ The backend must never import `timm`/`torch` in the API process. A committed sna
     {
       "model_name": "tf_efficientnetv2_s.in21k",
       "family": "efficientnet",
-      "variant": "v2_s.in21k",
+      "version": "v2_s.in21k",
       "input_size": [3, 300, 300],   // from pretrained_cfg
       "mean": [0.485, 0.456, 0.406],
       "std": [0.229, 0.224, 0.225],
@@ -260,7 +263,7 @@ The backend must never import `timm`/`torch` in the API process. A committed sna
     {
       "model_name": "vit_base_patch16_224.augreg2_in21k_ft_in1k",
       "family": "vit",
-      "variant": "base_patch16_224",
+      "version": "base_patch16_224",
       "input_size": [3, 224, 224],
       "mean": [0.5, 0.5, 0.5],
       "std": [0.5, 0.5, 0.5],
@@ -357,7 +360,7 @@ class TimmManifestProvider:
             id=model_name_to_id(model_name),
             name=f"timm · {model_name}",
             family=e["family"],                 # new schema field (§5)
-            variant=e.get("variant"),           # new schema field (§5)
+            version=e.get("version"),           # new schema field (§5)
             task=TaskType.CLASSIFICATION,
             description=f"timm backbone '{model_name}'.",
             pretrained_weights=None,             # weights are timm-managed (§6)
@@ -475,8 +478,8 @@ def _update_learning_rate(param_value: float | None, config: dict) -> None:
 
 Because the UI is a single card + selector (§5.1), families are used to filter/group the selector list, not to render cards.
 
-- Derive `family` from timm's architecture prefix/module (`resnet`, `efficientnet`, `convnext`, `vit`, `swin`, `deit`, `regnet`, `mobilenet`, `beit`, `maxvit`, …); `variant` holds the size/tag (`b0`, `tiny`, `v2_s.in21k`, …). Both are precomputed in the snapshot.
-- Schema additions to `ModelManifest` (domain) and `ModelArchitectureView` (API DTO): `family: str`, `variant: str | None`.
+- Derive `family` from timm's architecture prefix/module (`resnet`, `efficientnet`, `convnext`, `vit`, `swin`, `deit`, `regnet`, `mobilenet`, `beit`, `maxvit`, …); `version` holds the size/tag (`b0`, `tiny`, `v2_s.in21k`, …). Both are precomputed in the snapshot.
+- Schema additions to `ModelManifest` (domain) and `ModelArchitectureView` (API DTO): `family: str`, `version: str | None`.
 
 ---
 
@@ -517,7 +520,6 @@ Two endpoints:
   "id": "image-classification-timm",       // synthetic entry point (not trainable directly)
   "name": "Custom backbone (timm)",
   "family": "timm",
-  "is_backbone_catalog": true,             // UI flag → render searchable selector
   "support_status": "active",
   "task": "classification",
   "description": "Choose any of 1400+ timm backbones.",
@@ -542,7 +544,7 @@ GET /api/model_architectures/timm/backbones?search=&family=&page=&page_size=
       "id": "image-classification-timm-tf-efficientnetv2-s--in21k",
       "model_name": "tf_efficientnetv2_s.in21k",
       "family": "efficientnet",
-      "variant": "v2_s.in21k",
+      "version": "v2_s.in21k",
       "stats": { "gigaflops": 8.4, "trainable_parameters": 21.5, "imagenet_top1_accuracy": 83.9 }
     }
     // ...
@@ -562,7 +564,7 @@ Process: implement in API/service, regenerate the OpenAPI spec (`just gen-api-sp
 
 All under `application/ui/src/features/models/train-model/`. Curated cards are unchanged.
 
-1. New timm card. When the architectures list contains the `is_backbone_catalog` entry, render a dedicated `TimmBackboneCard` instead of a plain radio card.
+1. New timm card. When the architectures list contains the `family: "timm"` entry, render a dedicated `TimmBackboneCard` instead of a plain radio card.
 2. Searchable selector inside the card. A `SearchField` + results list driven by the new `/timm/backbones` endpoint (debounced query, `family` facet filter, infinite scroll / pagination). Each result shows `model_name`, family, parameters, and top-1 when available. No support-status or verification labels are shown.
 3. Selection wiring. Picking a backbone sets the provider's `selectedModelArchitectureId = <concrete timm id>`:
    ```tsx
@@ -572,7 +574,7 @@ All under `application/ui/src/features/models/train-model/`. Curated cards are u
    ```
    Everything downstream (the `advanced-settings` config fetch and the train mutation) already keys off `selectedModelArchitectureId` and needs no change.
 4. Dynamic hyperparameters (no new widgets). On selection, `useGetModelArchitectureTrainingConfiguration({ modelArchitectureId })` refetches; the backend returns the arch-specific `learning_rate` and `input_size`, which the generic `Parameters`/`ParameterField` renderer displays automatically. Learning rate appears as an editable `FloatParameterView`; optimizer never appears.
-5. Pre-selection state. Until a backbone is chosen, disable the "Start training" action and show the Advanced Settings LR/input-size fields as disabled placeholders (they are arch-dependent).
+5. Pre-selection state. Until a backbone is chosen, disable the "Start training" action and either gray out the Advanced Settings LR/input-size fields or show explicit placeholder values. The UI team can choose the final presentation; both are acceptable as long as fields are clearly architecture-dependent.
 6. Default backbone. Pre-select a documented baseline architecture (for example, EfficientNetV2-S) so the card is trainable out of the box.
 
 ### 5.2 UI configuration behavior
@@ -583,7 +585,7 @@ The selector stores the concrete architecture id. Changing the selection invalid
 
 - Library unit/model tests: for representative models from CNN and transformer families, verify the `timm.optim.create_optimizer_v2` options, then instantiate → 1-step train → export (OpenVINO/ONNX).
 - Backend unit tests: `model_name ↔ id` round-trip; `TimmManifestProvider.build_manifest` produces a schema-valid `ModelManifest` (respecting `extra="forbid"`); lazy `get_model_manifest_by_id` for timm ids; `GetiConfigConverter._resolve_recipe` + LR-injection fallback; `/timm/backbones` search/pagination/facets against a fixture snapshot.
-- E2E testing: each run should execute a small rotating sample of random timm architectures plus one basic baseline architecture, so we continuously validate representative coverage without trying to test all 1400 models every run.
+- E2E testing: each run should execute a small rotating sample of random timm family architectures
 - UI: component tests for the selector (search, family filter, selection → id), and that the generic parameter panel renders the returned LR field; MSW handlers for both new endpoints.
 - Acceptance criteria (from the issue): model discovery, manifest correctness, basic instantiation flows covered; no regression in existing classification workflows.
 
