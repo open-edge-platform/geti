@@ -122,3 +122,23 @@ class TestEventBus:
 
         handler.assert_called_once_with()
         assert model_reload_event.is_set()
+
+    def test_emit_event_survives_failing_handler(self, fxt_event_bus: EventBusFactory) -> None:
+        """A failing subscriber must not stop other subscribers or the condition notification."""
+        failing_handler = MagicMock(spec=Callable, side_effect=RuntimeError("boom"))
+        ok_handler = MagicMock(spec=Callable)
+        source_changed_condition = mp.Condition()
+        model_reload_event = mp.Event()
+        event_bus = fxt_event_bus(source_changed_condition, None, model_reload_event)
+        # Subscribe the failing handler first so it would otherwise short-circuit the rest.
+        event_bus.subscribe(event_types=[EventType.PIPELINE_STATUS_CHANGED], handler=failing_handler)
+        event_bus.subscribe(event_types=[EventType.PIPELINE_STATUS_CHANGED], handler=ok_handler)
+
+        # Must not raise despite the first handler failing.
+        event_bus.emit_event(EventType.PIPELINE_STATUS_CHANGED)
+
+        failing_handler.assert_called_once_with()
+        # The remaining handler is still invoked ...
+        ok_handler.assert_called_once_with()
+        # ... and the side-effect notifications (model reload) still happen.
+        assert model_reload_event.is_set()

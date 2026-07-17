@@ -43,9 +43,9 @@ _LABEL_NAMES = (
 )
 
 _SPLIT_FILES = {
-    "train": "train-00000-of-00001-9656595db06ccb29.parquet",
-    "validation": "validation-00000-of-00001-ca8cc590e7de3d43.parquet",
-    "test": "test-00000-of-00001-033568a2b9f13ea2.parquet",
+    "train": "data/train-00000-of-00001-9656595db06ccb29.parquet",
+    "validation": "data/validation-00000-of-00001-ca8cc590e7de3d43.parquet",
+    "test": "data/test-00000-of-00001-033568a2b9f13ea2.parquet",
 }
 
 

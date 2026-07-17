@@ -1,22 +1,22 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { DatasetItemAnnotationStatus, Label } from '@/api/types';
 import { ActionButton, Divider, Flex } from '@geti-ui/ui';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { useProjectLabels } from 'hooks/use-project-labels.hook';
-import { isEmpty } from 'lodash-es';
+import { capitalize, isEmpty } from 'lodash-es';
 
-import type { DatasetItemAnnotationStatus, Label } from '../../../../constants/shared-types';
 import { formatDateRangeEnd, formatDateRangeStart } from '../../../../shared/date-utils';
 import { isNonEmptyArray } from '../../../../shared/util';
-import { FilterChips } from '../toolbar/filter-chips/filter-chips.component';
+import { FilterChips } from '../toolbar/media-filtering/filter-chips/filter-chips.component';
 
 const ANNOTATION_STATUS_LABELS: Record<DatasetItemAnnotationStatus, string> = {
     with_annotations: 'Media with annotations',
     missing_annotations: 'Media with missing annotations',
 };
 
-export const ActiveFilters = () => {
+export const ActiveFiltersList = () => {
     const labels = useProjectLabels();
     const {
         selectedLabelIds,
@@ -31,41 +31,16 @@ export const ActiveFilters = () => {
         setSelectedSubsets,
     } = useDatasetFiltersSearchParams();
 
-    const selectedLabels = selectedLabelIds
-        .map((id) => labels.find((label) => label.id === id))
-        .filter(Boolean) as Label[];
-
-    const hasActiveFilters =
-        !isEmpty(selectedLabelIds) ||
-        annotationStatus !== null ||
-        startDate !== null ||
-        endDate !== null ||
-        !isEmpty(selectedSubsets);
-
-    if (!hasActiveFilters) {
-        return null;
-    }
-
     const handleRemoveLabel = (id: string) => {
         setSelectedLabelIds(selectedLabelIds.filter((selectedId) => selectedId !== id));
     };
 
-    const handleClearAll = () => {
-        setSelectedLabelIds([]);
-        setAnnotationStatus(null);
-        setStartDate(null);
-        setEndDate(null);
-        setSelectedSubsets([]);
-    };
+    const selectedLabels = selectedLabelIds
+        .map((id) => labels.find((label) => label.id === id))
+        .filter(Boolean) as Label[];
 
     return (
-        <Flex gap={'size-150'} wrap={'wrap'} alignItems={'center'} aria-label='Active filters'>
-            <ActionButton isQuiet onPress={handleClearAll}>
-                Clear all
-            </ActionButton>
-
-            <Divider orientation={'vertical'} size={'S'} />
-
+        <>
             {selectedLabels.map((label) => (
                 <FilterChips key={label.id} name={label.name} onClose={() => handleRemoveLabel(label.id)} />
             ))}
@@ -87,10 +62,58 @@ export const ActiveFilters = () => {
                 selectedSubsets.map((subset) => (
                     <FilterChips
                         key={subset}
-                        name={`Subset: ${subset}`}
+                        name={capitalize(subset)}
                         onClose={() => setSelectedSubsets(selectedSubsets.filter((sub) => sub !== subset))}
                     />
                 ))}
+        </>
+    );
+};
+
+export const useHasActiveFilters = () => {
+    const { selectedLabelIds, annotationStatus, startDate, endDate, selectedSubsets } = useDatasetFiltersSearchParams();
+
+    return (
+        !isEmpty(selectedLabelIds) ||
+        annotationStatus !== null ||
+        startDate !== null ||
+        endDate !== null ||
+        !isEmpty(selectedSubsets)
+    );
+};
+
+export const useClearAllFilters = () => {
+    const { setSelectedLabelIds, setAnnotationStatus, setStartDate, setEndDate, setSelectedSubsets } =
+        useDatasetFiltersSearchParams();
+
+    const handleClearAll = () => {
+        setSelectedLabelIds([]);
+        setAnnotationStatus(null);
+        setStartDate(null);
+        setEndDate(null);
+        setSelectedSubsets([]);
+    };
+
+    return handleClearAll;
+};
+
+export const ActiveFilters = () => {
+    const hasActiveFilters = useHasActiveFilters();
+    const handleClearAll = useClearAllFilters();
+
+    if (!hasActiveFilters) {
+        return null;
+    }
+
+    return (
+        <Flex gap={'size-150'} wrap={'wrap'} alignItems={'center'} aria-label='Active filters'>
+            <ActionButton isQuiet onPress={handleClearAll}>
+                Clear all
+            </ActionButton>
+
+            <Divider orientation={'vertical'} size={'S'} />
+
+            <ActiveFiltersList />
         </Flex>
     );
 };

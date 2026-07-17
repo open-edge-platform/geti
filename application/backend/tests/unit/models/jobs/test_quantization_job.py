@@ -17,6 +17,8 @@ def fxt_quantization_params() -> Callable[[UUID, UUID], QuantizationJobParams]:
             job_id=job_id,
             project_id=project_id,
             model_id=uuid4(),
+            model_architecture_id="test_arch",
+            model_architecture_name="Test Arch",
         )
 
     return _make_quantization_job_params

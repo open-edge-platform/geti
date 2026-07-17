@@ -3,11 +3,11 @@
 
 import { useMemo } from 'react';
 
+import { $api } from '@/api';
+import type { DatasetItemAnnotationStatus, DatasetSubset, Media, MediaDTO, Pagination } from '@/api/types';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import isEmpty from 'lodash-es/isEmpty';
 
-import { $api } from '../api/client';
-import { DatasetItemAnnotationStatus, DatasetSubset, Media, MediaDTO, Pagination } from '../constants/shared-types';
 import { type SortDirection } from './sort-direction.interface';
 
 const DATASET_ITEMS_LIMIT = 40;
@@ -110,7 +110,7 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
     );
 
     const items = useMemo(() => {
-        const mediaItems = data?.pages.flatMap((page) => page.items) ?? [];
+        const mediaItems = data?.pages?.flatMap((page) => page.items) ?? [];
 
         return getMediaEntities(mediaItems);
     }, [data?.pages]);

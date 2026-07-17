@@ -7,9 +7,9 @@ const DATE_TIME_FORMAT = 'DD MMM YYYY, hh:mm A';
 
 export const formatFilterDate = (date: string): string => dayjs(date).format('DD/MM/YYYY');
 
-export const formatDateRangeStart = (date: string): string => `from ${formatFilterDate(date)}`;
+export const formatDateRangeStart = (date: string): string => `From ${formatFilterDate(date)}`;
 
-export const formatDateRangeEnd = (date: string): string => `to ${formatFilterDate(date)}`;
+export const formatDateRangeEnd = (date: string): string => `To ${formatFilterDate(date)}`;
 
 export const formatDateTime = (dateString: string | null | undefined, fallback = '-'): string => {
     if (!dateString) return fallback;

@@ -1,13 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ChangeEvent, useRef } from 'react';
+import { Button, FileTrigger } from '@geti-ui/ui';
 
-import { Button } from '@geti-ui/ui';
-
-import { VALID_EXT } from '../../utils';
-
-export const acceptedExtensions = VALID_EXT.map((ext) => `.${ext}`).join(',');
+import { acceptedExtensions } from '../../utils';
 
 type AddMediaButtonProps = {
     onFileUpload: (files: File[]) => Promise<void>;
@@ -15,41 +11,22 @@ type AddMediaButtonProps = {
 };
 
 export const AddMediaButton = ({ onFileUpload, isDisabled = false }: AddMediaButtonProps) => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-
+    const handleFileSelect = async (files: FileList | null) => {
         if (files && files.length > 0) {
-            const fileArray = Array.from(files);
-
-            await onFileUpload(fileArray);
+            await onFileUpload(Array.from(files));
         }
-
-        // Clear the input value to allow selecting the same file again
-        if (event.target) {
-            event.target.value = '';
-        }
-    };
-
-    const handleClick = () => {
-        fileInputRef.current?.click();
     };
 
     return (
-        <>
-            <input
-                ref={fileInputRef}
-                type='file'
-                multiple
-                onChange={handleFileChange}
-                style={{ display: 'none' }}
-                aria-label={'Upload media files'}
-                accept={acceptedExtensions}
-            />
-            <Button variant={'secondary'} isDisabled={isDisabled} onPress={handleClick}>
+        <FileTrigger
+            data-testid='upload-media-input'
+            acceptedFileTypes={[acceptedExtensions]}
+            allowsMultiple
+            onSelect={handleFileSelect}
+        >
+            <Button variant={'secondary'} isDisabled={isDisabled} margin={0}>
                 Upload media
             </Button>
-        </>
+        </FileTrigger>
     );
 };

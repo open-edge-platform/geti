@@ -13,10 +13,7 @@ import torch
 from torch import Tensor
 from torchvision import tv_tensors
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor, _default_anchorgen
-from torchvision.models.detection.mask_rcnn import (
-    MaskRCNN_ResNet50_FPN_V2_Weights,
-    MaskRCNNPredictor,
-)
+from torchvision.models.detection.mask_rcnn import MaskRCNN_ResNet50_FPN_V2_Weights, MaskRCNNPredictor
 
 from getitune.backend.lightning.exporter.base import ModelExporter
 from getitune.backend.lightning.exporter.native import LightningModelExporter
@@ -43,6 +40,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -61,11 +59,13 @@ class MaskRCNNTV(LightningInstanceSegModel):
             Defaults to MaskRLEMeanAPFMeasureCallable.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
-        explain_mode (bool, optional): Whether to enable explainable AI mode. Defaults to False.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
-    _pretrained_weights: ClassVar[dict[str, Any]] = {
-        "maskrcnn_resnet_50": MaskRCNN_ResNet50_FPN_V2_Weights.verify("DEFAULT"),
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "maskrcnn_resnet_50": MaskRCNN_ResNet50_FPN_V2_Weights.verify("DEFAULT").url,
     }
 
     def __init__(
@@ -78,6 +78,8 @@ class MaskRCNNTV(LightningInstanceSegModel):
         metric: MetricCallable = MaskRLEMeanAPFMeasureCallable,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -88,6 +90,8 @@ class MaskRCNNTV(LightningInstanceSegModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> MaskRCNN:
@@ -95,7 +99,6 @@ class MaskRCNNTV(LightningInstanceSegModel):
 
         # NOTE: Add 1 to num_classes to account for background class.
         num_classes = num_classes + 1
-        weights = self._pretrained_weights[self.model_name]
 
         # init model components, model itself and load weights
         rpn_anchor_generator = _default_anchorgen()
@@ -112,8 +115,6 @@ class MaskRCNNTV(LightningInstanceSegModel):
             box_head=box_head,
             mask_head=mask_head,
         )
-
-        model.load_state_dict(weights.get_state_dict(progress=True, check_hash=True))
 
         # Replace RoIHeads since torchvision does not allow customized roi_heads.
         model.roi_heads = TVRoIHeads(

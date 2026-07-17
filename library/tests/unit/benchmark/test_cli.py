@@ -22,7 +22,7 @@ CATALOG_YAML = textwrap.dedent("""\
     datasets:
       - name: ds_a
         script: "scripts/benchmark_datasets/prepare_ds_a.py"
-        size_tier: tiny
+        size_tier: small
 """)
 
 MANIFEST_YAML = textwrap.dedent("""\
@@ -105,7 +105,9 @@ class TestBuildParser:
                 "--priority",
                 "core",
                 "--size-tier",
-                "tiny",
+                "small",
+                "--data-group",
+                "weekly",
                 "--scenario",
                 "default",
                 "--scenario-tag",
@@ -123,13 +125,29 @@ class TestBuildParser:
         assert args.model == ["yolox_s"]
         assert args.dataset == ["ds_a"]
         assert args.priority == ["core"]
-        assert args.size_tier == ["tiny"]
+        assert args.size_tier == ["small"]
+        assert args.data_group == "weekly"
         assert args.scenario == ["default"]
         assert args.scenario_tag == ["configurable"]
         assert args.num_seeds == 5
         assert args.max_epochs == 10
         assert args.eval_upto == "export"
         assert args.dry_run is True
+
+    def test_run_subcommand_data_group_defaults_to_all(self) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(["run"])
+        assert args.data_group == "all"
+
+    def test_run_subcommand_rejects_invalid_data_group(self) -> None:
+        parser = _build_parser()
+        with pytest.raises(SystemExit):
+            parser.parse_args(["run", "--data-group", "extend"])
+
+    def test_run_subcommand_requires_data_group_value(self) -> None:
+        parser = _build_parser()
+        with pytest.raises(SystemExit):
+            parser.parse_args(["run", "--data-group"])
 
     def test_run_no_deterministic(self) -> None:
         parser = _build_parser()
@@ -405,6 +423,97 @@ class TestCmdReport:
     @patch("mlflow.create_experiment")
     @patch("mlflow.get_experiment_by_name")
     @patch("mlflow.set_tracking_uri")
+    def test_report_falls_back_to_error_tag_when_traceback_unavailable(
+        self,
+        _mock_set_uri: MagicMock,
+        mock_get_exp: MagicMock,
+        _mock_create_exp: MagicMock,
+        _mock_set_exp: MagicMock,
+        mock_client_cls: MagicMock,
+        _mock_git_branch: MagicMock,
+        _mock_git_sha: MagicMock,
+        mock_generate_report: MagicMock,
+        manifest_file: Path,
+        tmp_path: Path,
+    ) -> None:
+        """When the traceback artifact cannot be downloaded (e.g. the MLflow
+        server uses an unreachable local-filesystem artifact store), the report
+        must still surface the failure by falling back to the short ``error``
+        tag rather than dropping the traceback entirely.
+        """
+        mock_experiment = MagicMock()
+        mock_experiment.experiment_id = "1"
+        mock_get_exp.return_value = mock_experiment
+
+        mock_client = mock_client_cls.return_value
+        mock_client.get_experiment_by_name.return_value = mock_experiment
+        mock_client.search_experiments.return_value = []
+
+        failed_run = MagicMock()
+        failed_run.info.run_id = "run-failed-1"
+        failed_run.data.tags = {
+            "task": "detection",
+            "model": "model_a",
+            "dataset": "ds_a",
+            "scenario": "default",
+            "seed": "1",
+            "error": "RuntimeError: Masks are required for metric computation",
+            "error_phase": "test/export",
+        }
+        failed_run.data.metrics = {}
+
+        def _search_runs(
+            *,
+            experiment_ids: list[str],
+            filter_string: str,
+            order_by: list[str],
+            max_results: int,
+        ) -> list[MagicMock]:
+            if "status = 'failed'" in filter_string:
+                return [failed_run]
+            return []
+
+        mock_client.search_runs.side_effect = _search_runs
+
+        # Simulate an unreachable artifact store (HTTP 500 / missing file).
+        mock_client.download_artifacts.side_effect = RuntimeError("500 Internal Server Error")
+
+        parser = _build_parser()
+        args = parser.parse_args(
+            [
+                "report",
+                "--manifest",
+                str(manifest_file),
+                "--output-root",
+                str(tmp_path / "results"),
+                "--mlflow-uri",
+                "http://localhost:5000",
+                "--branch",
+                "develop",
+            ]
+        )
+
+        rc = _cmd_report(args)
+
+        assert rc == 0
+        call_kwargs = mock_generate_report.call_args.kwargs
+        failures = call_kwargs["failures"]
+        assert len(failures) == 1
+        failure = failures[0]
+        assert failure.success is False
+        assert failure.failed_phase == "test/export"
+        # Fallback: traceback is populated from the short error tag.
+        assert failure.error == "RuntimeError: Masks are required for metric computation"
+        assert failure.traceback == failure.error
+
+    @patch("getitune.benchmark.report.generate_report")
+    @patch("getitune.benchmark.tracking.get_git_sha", return_value="abc123")
+    @patch("getitune.benchmark.tracking.get_git_branch", return_value="develop")
+    @patch("mlflow.tracking.MlflowClient")
+    @patch("mlflow.set_experiment")
+    @patch("mlflow.create_experiment")
+    @patch("mlflow.get_experiment_by_name")
+    @patch("mlflow.set_tracking_uri")
     def test_report_no_runs_returns_zero(
         self,
         _mock_set_uri: MagicMock,
@@ -666,7 +775,31 @@ class TestCmdRunFilters:
                 "--data-root",
                 str(tmp_path / "data"),
                 "--size-tier",
-                "tiny",
+                "small",
+            ]
+        )
+        with patch("getitune.benchmark.catalog.provision_datasets", return_value={}) as mock_prov:
+            rc = _cmd_provision(args)
+        assert rc == 0
+        mock_prov.assert_called_once()
+
+    @patch("getitune.benchmark.runner.BenchmarkRunner")
+    def test_provision_with_data_group_filter(
+        self,
+        mock_runner_cls: MagicMock,
+        catalog_file: Path,
+        tmp_path: Path,
+    ) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(
+            [
+                "provision",
+                "--catalog",
+                str(catalog_file),
+                "--data-root",
+                str(tmp_path / "data"),
+                "--data-group",
+                "weekly",
             ]
         )
         with patch("getitune.benchmark.catalog.provision_datasets", return_value={}) as mock_prov:

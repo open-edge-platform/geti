@@ -3,10 +3,10 @@
 
 import { useActionState } from 'react';
 
+import type { SourceConfigPayload } from '@/api/types';
 import { isFunction } from 'lodash-es';
 
 import { toast } from '../../../../components/toast/toast.component';
-import type { SourceConfigPayload } from '../../../../constants/shared-types';
 import { useSourceMutation } from './use-source-mutation.hook';
 
 interface useSourceActionProps<T> {
@@ -14,6 +14,7 @@ interface useSourceActionProps<T> {
     isNewSource: boolean;
     onSaved?: (source_id: string) => void;
     bodyFormatter: (formData: FormData) => T;
+    prepareFormData?: (formData: FormData) => Promise<void>;
 }
 
 export const useSourceAction = <T extends SourceConfigPayload>({
@@ -21,13 +22,15 @@ export const useSourceAction = <T extends SourceConfigPayload>({
     isNewSource,
     onSaved,
     bodyFormatter,
+    prepareFormData,
 }: useSourceActionProps<T>) => {
     const addOrUpdateSource = useSourceMutation(isNewSource);
 
-    return useActionState<T, FormData>(async (_prevState: T, formData: FormData) => {
-        const body = bodyFormatter(formData);
-
+    return useActionState<T, FormData>(async (prevState: T, formData: FormData) => {
         try {
+            await prepareFormData?.(formData);
+
+            const body = bodyFormatter(formData);
             const source_id = await addOrUpdateSource(body);
 
             toast({
@@ -46,6 +49,6 @@ export const useSourceAction = <T extends SourceConfigPayload>({
             });
         }
 
-        return body;
+        return prevState;
     }, config);
 };

@@ -90,8 +90,8 @@ describe('ActiveFilters', () => {
 
         render(<ActiveFilters />);
 
-        expect(screen.getByText('from 01/01/2026')).toBeVisible();
-        expect(screen.getByText('to 31/01/2026')).toBeVisible();
+        expect(screen.getByText('From 01/01/2026')).toBeVisible();
+        expect(screen.getByText('To 31/01/2026')).toBeVisible();
     });
 
     it('renders chips for the selected subsets', () => {
@@ -99,8 +99,8 @@ describe('ActiveFilters', () => {
 
         render(<ActiveFilters />);
 
-        expect(screen.getByText('Subset: training')).toBeVisible();
-        expect(screen.getByText('Subset: validation')).toBeVisible();
+        expect(screen.getByText('Training')).toBeVisible();
+        expect(screen.getByText('Validation')).toBeVisible();
     });
 
     it('removes only the clicked label when its chip is closed', () => {
@@ -118,7 +118,7 @@ describe('ActiveFilters', () => {
 
         render(<ActiveFilters />);
 
-        fireEvent.click(screen.getByRole('button', { name: 'Remove Subset: training filter' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Remove Training filter' }));
 
         expect(mockSetSelectedSubsets).toHaveBeenCalledWith(['validation']);
     });

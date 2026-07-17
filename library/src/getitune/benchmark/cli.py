@@ -31,6 +31,13 @@ def _parse_key_value_pairs(items: list[str] | None) -> dict[str, str]:
     return result
 
 
+def _normalize_data_group_filter(data_group: str | None) -> list[str] | None:
+    """Convert the user-facing CLI value into backend filter semantics."""
+    if data_group in (None, "all"):
+        return None
+    return [data_group]
+
+
 def _add_common_args(parser: argparse.ArgumentParser) -> None:
     """Arguments shared by multiple sub-commands."""
     parser.add_argument(
@@ -94,6 +101,13 @@ def _build_parser() -> argparse.ArgumentParser:
     _add_common_args(prov)
     prov.add_argument("--dataset", type=str, nargs="*", default=None, help="Filter by dataset name(s).")
     prov.add_argument("--size-tier", type=str, nargs="*", default=None, help="Filter by size tier(s).")
+    prov.add_argument(
+        "--data-group",
+        type=str,
+        default="all",
+        choices=("weekly", "extended", "all"),
+        help="Filter by data group (weekly, extended, all; default: all).",
+    )
 
     # -- run ---------------------------------------------------------------
     run = sub.add_parser("run", help="Execute benchmark experiments.")
@@ -111,6 +125,13 @@ def _build_parser() -> argparse.ArgumentParser:
     run.add_argument("--dataset", type=str, nargs="*", default=None, help="Dataset name filter.")
     run.add_argument("--priority", type=str, nargs="*", default=None, help="Model priority filter.")
     run.add_argument("--size-tier", type=str, nargs="*", default=None, help="Dataset size tier filter.")
+    run.add_argument(
+        "--data-group",
+        type=str,
+        default="all",
+        choices=("weekly", "extended", "all"),
+        help="Dataset data group filter (weekly, extended, all; default: all).",
+    )
     run.add_argument("--scenario", type=str, nargs="*", default=None, help="Scenario name filter.")
     run.add_argument("--scenario-tag", type=str, nargs="*", default=None, help="Scenario tag filter.")
     run.add_argument("--accelerator", type=str, default="gpu", help="Device: gpu, xpu, or cpu.")
@@ -227,7 +248,8 @@ def _cmd_provision(args: argparse.Namespace) -> int:
 
     catalog = load_catalog(args.catalog)
     names = set(args.dataset) if args.dataset else None
-    entries = catalog.filter(size_tiers=args.size_tier, names=names)
+    data_groups = _normalize_data_group_filter(args.data_group)
+    entries = catalog.filter(size_tiers=args.size_tier, data_groups=data_groups, names=names)
     if not entries:
         logger.warning("No datasets match the given filters.")
         return 0
@@ -252,6 +274,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
         datasets=args.dataset,
         priorities=args.priority,
         size_tiers=args.size_tier,
+        data_groups=_normalize_data_group_filter(args.data_group),
         scenarios=args.scenario,
         scenario_tags=args.scenario_tag,
         dry_run=args.dry_run,
@@ -305,7 +328,13 @@ def _cmd_report(args: argparse.Namespace) -> int:
 
     from getitune.benchmark.manifest import load_manifest
     from getitune.benchmark.report import generate_report
-    from getitune.benchmark.tracking import BenchmarkTracker, TrackingConfig, get_git_branch, get_git_sha
+    from getitune.benchmark.tracking import (
+        BenchmarkTracker,
+        TrackingConfig,
+        get_benchmark_run_id,
+        get_git_branch,
+        get_git_sha,
+    )
 
     manifest = load_manifest(args.manifest)
 
@@ -323,9 +352,14 @@ def _cmd_report(args: argparse.Namespace) -> int:
     branch = args.branch or get_git_branch()
     git_sha = get_git_sha()
 
-    # Query MLflow for the most recent successful AND failed runs in this
-    # experiment. Skip "rollup" parent runs — only leaf "seed" runs carry
-    # per-run status/metrics.
+    # Query MLflow for the successful AND failed seed runs produced by *this*
+    # invocation. Skip "rollup" parent runs — only leaf "seed" runs carry
+    # per-run status/metrics. Scope to the current benchmark run id so that
+    # seed runs left in the persistent tracking store by *previous* executions
+    # (which share the same branch/trigger experiment) don't leak into this
+    # report — otherwise ``aggregate_metrics_across_seeds`` would average them
+    # into the current numbers.
+    benchmark_run_id = get_benchmark_run_id()
     client = mlflow.tracking.MlflowClient(args.mlflow_uri)
 
     experiment_name = tracking_config.experiment_name
@@ -336,13 +370,17 @@ def _cmd_report(args: argparse.Namespace) -> int:
 
     success_runs = client.search_runs(
         experiment_ids=[exp.experiment_id],
-        filter_string="tags.status = 'success' AND tags.run_type = 'seed'",
+        filter_string=(
+            f"tags.status = 'success' AND tags.run_type = 'seed' AND tags.benchmark_run_id = '{benchmark_run_id}'"
+        ),
         order_by=["attributes.start_time DESC"],
         max_results=1000,
     )
     failed_runs = client.search_runs(
         experiment_ids=[exp.experiment_id],
-        filter_string="tags.status = 'failed' AND tags.run_type = 'seed'",
+        filter_string=(
+            f"tags.status = 'failed' AND tags.run_type = 'seed' AND tags.benchmark_run_id = '{benchmark_run_id}'"
+        ),
         order_by=["attributes.start_time DESC"],
         max_results=1000,
     )
@@ -407,16 +445,31 @@ def _cmd_report(args: argparse.Namespace) -> int:
     for run in failed_runs:
         tags = run.data.tags
 
+        error_summary = tags.get("error", "Unknown error")
+
         # The full traceback is stored as an artifact (see
         # ``BenchmarkTracker.log_run``) rather than a tag, to keep tag values
-        # short. Best-effort download; missing artifacts must not break the
-        # report.
+        # short. Best-effort download; a missing or unreachable artifact must
+        # not break the report. This commonly fails when the MLflow server
+        # uses a local-filesystem artifact store (``artifact_uri`` without a
+        # scheme) that the reporting host cannot read, in which case the
+        # artifact endpoint returns an error. Log the reason at WARNING so the
+        # failure is diagnosable, and fall back to the one-line ``error`` tag
+        # so the report still surfaces the failure cause instead of silently
+        # dropping the entire Tracebacks section.
         traceback_text: str | None = None
         try:
             local_path = client.download_artifacts(run.info.run_id, "traceback.txt")
-            traceback_text = Path(local_path).read_text()
-        except Exception:
-            logger.debug("Could not download traceback artifact for run %s.", run.info.run_id, exc_info=True)
+            traceback_text = Path(local_path).read_text(encoding="utf-8", errors="replace")
+        except Exception as exc:  # never let a bad or unreachable artifact break the report
+            logger.warning(
+                "Could not download traceback artifact for run %s (%s on %s): %s. Falling back to the short error tag.",
+                run.info.run_id,
+                tags.get("model", "unknown"),
+                tags.get("dataset", "unknown"),
+                exc,
+            )
+            traceback_text = error_summary
 
         failures.append(
             ExperimentResult(
@@ -427,7 +480,7 @@ def _cmd_report(args: argparse.Namespace) -> int:
                 seed=int(tags.get("seed", "0")),
                 success=False,
                 phases=[],
-                error=tags.get("error", "Unknown error"),
+                error=error_summary,
                 traceback=traceback_text,
                 failed_phase=tags.get("error_phase"),
             )

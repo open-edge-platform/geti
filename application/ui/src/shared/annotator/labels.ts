@@ -3,10 +3,10 @@
 
 import { useMemo } from 'react';
 
+import type { Label, TaskType } from '@/api/types';
 import { useProject } from 'hooks/api/project.hook';
 import { negate } from 'lodash-es';
 
-import type { Label, TaskType } from '../../constants/shared-types';
 import { isClassificationTask } from '../../features/project/task-type-guards';
 import type { AnnotationLabel, AnnotationLabelRef } from '../types';
 

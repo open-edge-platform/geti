@@ -47,6 +47,7 @@ from app.api.routers import (
     pipelines,
     projects,
     sinks,
+    source_media,
     sources,
     system,
     training_configurations,
@@ -59,6 +60,8 @@ from app.settings import get_settings
 
 settings = get_settings()
 logging.basicConfig(handlers=[InterceptHandler()], level=settings.log_level, force=True)
+
+
 app = FastAPI(
     title=settings.app_name,
     version=settings.version,
@@ -91,6 +94,7 @@ app.include_router(models.router)
 app.include_router(pipelines.router)
 app.include_router(projects.router)
 app.include_router(sinks.router)
+app.include_router(source_media.router)
 app.include_router(sources.router)
 app.include_router(system.router)
 app.include_router(training_configurations.router)
@@ -181,7 +185,12 @@ def _asyncio_exception_handler(loop: asyncio.AbstractEventLoop, context: dict) -
 
 async def main_async() -> None:
     """Async main application entry point for Hypercorn"""
-    logger.info("Starting {} in {} mode via Hypercorn (HTTP/2)", settings.app_name, settings.environment)
+    logger.info(
+        "Starting {} version {} in {} mode via Hypercorn (HTTP/2)",
+        settings.app_name,
+        settings.version,
+        settings.environment,
+    )
 
     # WebView2 / browser clients frequently drop HTTP/2-over-TLS connections without a
     # clean TLS close, so asyncio's graceful SSL shutdown either times out or observes a

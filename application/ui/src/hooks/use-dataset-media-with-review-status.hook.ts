@@ -24,6 +24,9 @@ export const useDatasetMediaWithReviewStatus = () => {
 
     const datasetItemsResponse = useGetDatasetItemsById({
         annotationStatus: annotationStatus ?? undefined,
+        labelIds: isEmpty(selectedLabelIds) ? undefined : selectedLabelIds,
+        startDate: startDate ?? undefined,
+        endDate: endDate ?? undefined,
         sortDirection: sortDirection ?? undefined,
         subsets,
     });
@@ -44,6 +47,7 @@ export const useDatasetMediaWithReviewStatus = () => {
 
     return {
         items: mediaItemsResponse.items,
+        datasetItems: datasetItemsResponse.items,
         // Wait for both the media-items and review-status queries to settle
         // before declaring "ready". Otherwise the gallery flashes thumbnails
         // first and pops in the annotation-status badges a moment later, which
@@ -52,6 +56,7 @@ export const useDatasetMediaWithReviewStatus = () => {
         // Only true for actual next-page fetches on either query — never for
         // initial loads — so pagination doesn't trigger the full overlay.
         isFetchingNextPage: mediaItemsResponse.isFetchingNextPage || datasetItemsResponse.isFetchingNextPage,
+        hasNextPage: mediaItemsResponse.hasNextPage || datasetItemsResponse.hasNextPage,
         totalCount: mediaItemsResponse.totalCount,
         fetchNextPage,
         isMediaItemReviewedById,

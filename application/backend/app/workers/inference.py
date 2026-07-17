@@ -130,28 +130,42 @@ class InferenceWorker(BaseProcessWorker):
         return self.__prediction_buffer
 
     def _on_inference_completed(self, inf_result: "Result", userdata: dict[str, Any]) -> None:
-        start_time = float(userdata["inference_start_time"])
-        model_id = userdata["model_id"]
-        self._metrics_service.record_inference_end(model_id=model_id, start_time=start_time)  # type: ignore
+        # This callback runs on the Model API / OpenVINO inference thread. An unhandled exception
+        # here would be raised inside that thread and can wedge the async inference queue, so every
+        # failure is caught: the offending prediction is dropped and the model health is reported
+        # as ERROR, but the inference process keeps running.
+        try:
+            start_time = float(userdata["inference_start_time"])
+            model_id = userdata["model_id"]
+            self._metrics_service.record_inference_end(model_id=model_id, start_time=start_time)  # type: ignore
 
-        stream_data: StreamData = userdata["stream_data"]
-        frame_with_predictions = Visualizer.overlay_predictions(
-            original_image=stream_data.frame_data, predictions=inf_result
-        )
-        inference_data = InferenceData(
-            prediction=inf_result,
-            visualized_prediction=frame_with_predictions,
-            model_id=model_id,
-        )
-        stream_data.inference_data = inference_data
+            stream_data: StreamData = userdata["stream_data"]
+            frame_with_predictions = Visualizer.overlay_predictions(
+                original_image=stream_data.frame_data, predictions=inf_result
+            )
+            inference_data = InferenceData(
+                prediction=inf_result,
+                visualized_prediction=frame_with_predictions,
+                model_id=model_id,
+            )
+            stream_data.inference_data = inference_data
 
-        self._report_status(code=InferenceWorkerStatusCode.OK, model_id=model_id)
+            self._report_status(code=InferenceWorkerStatusCode.OK, model_id=model_id)
 
-        # Predictions are generated async, first add to buffer,
-        # then check if next expected predictions are ready to be queued
-        self._prediction_buffer.add_prediction_for_timestamp(timestamp=start_time, stream_data=stream_data)
-        for stream_data in self._prediction_buffer.get_ready_predictions():
-            self._enqueue_prediction(stream_data)
+            # Predictions are generated async, first add to buffer,
+            # then check if next expected predictions are ready to be queued
+            self._prediction_buffer.add_prediction_for_timestamp(timestamp=start_time, stream_data=stream_data)
+            for ready_stream_data in self._prediction_buffer.get_ready_predictions():
+                self._enqueue_prediction(ready_stream_data)
+        except Exception as e:
+            logger.exception("Error while processing inference result; dropping this prediction {}", e)
+            error_model_id = userdata.get("model_id") if isinstance(userdata, dict) else None
+            if isinstance(error_model_id, UUID):
+                self._report_status(
+                    code=InferenceWorkerStatusCode.ERROR,
+                    model_id=error_model_id,
+                    message="Error processing inference result",
+                )
 
     def _enqueue_prediction(self, stream_data: StreamData) -> None:
         """Push a prediction to the prediction queue without ever blocking.

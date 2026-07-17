@@ -538,9 +538,9 @@ class TestGenerateMarkdown:
                     scenario="default",
                     current_metrics={
                         "training:val/mAP": 0.85,
-                        "torch:test/map_50": 0.80,
-                        "export:test/map_50": 0.79,
-                        "optimize:test/map_50": 0.77,
+                        "torch:test/map": 0.80,
+                        "export:test/map": 0.79,
+                        "optimize:test/map": 0.77,
                     },
                     baseline_metrics=None,
                 ),
@@ -548,9 +548,9 @@ class TestGenerateMarkdown:
             failures=[],
         )
         md = generate_markdown(report)
-        assert "Test map_50" in md
-        assert "Export map_50" in md
-        assert "Optimize map_50" in md
+        assert "Test map" in md
+        assert "Export map" in md
+        assert "Optimize map" in md
 
 
 # ---------------------------------------------------------------------------

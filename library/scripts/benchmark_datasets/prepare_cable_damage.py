@@ -29,9 +29,9 @@ _REVISION = "b598e4ecc1e6492450ca86af9f85867d395ecd95"
 _LABEL_NAMES = ("cable-damage", "break", "thunderbolt")
 
 _SPLIT_FILES = {
-    "train": "train-00000-of-00001-8eedf0718cda8fe2.parquet",
-    "validation": "validation-00000-of-00001-34f26f83cd59a188.parquet",
-    "test": "test-00000-of-00001-b85b52944122e167.parquet",
+    "train": "data/train-00000-of-00001-8eedf0718cda8fe2.parquet",
+    "validation": "data/validation-00000-of-00001-34f26f83cd59a188.parquet",
+    "test": "data/test-00000-of-00001-b85b52944122e167.parquet",
 }
 
 

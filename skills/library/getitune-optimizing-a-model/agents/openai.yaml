@@ -1,0 +1,4 @@
+interface:
+  display_name: "Optimize a Model (getitune)"
+  short_description: "Quantize an exported getitune model to INT8 with NNCF"
+  default_prompt: "Use $getitune-optimizing-a-model to quantize an exported model with getitune."

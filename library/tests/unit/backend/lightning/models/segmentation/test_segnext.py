@@ -15,6 +15,7 @@ class TestSegNext:
             10,
             model_name="segnext_base",
             data_input_params=DataInputParams((518, 518), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
     def test_segnext_init(self, fxt_segnext):

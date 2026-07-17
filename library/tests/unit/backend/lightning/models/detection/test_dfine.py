@@ -18,6 +18,7 @@ class TestDFine:
             label_info=3,
             model_name="dfine_hgnetv2_x",
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
     def test_loss(self, fxt_model, fxt_detection_batch):

@@ -279,6 +279,7 @@ test.describe('Model Details', () => {
 
             await modelsPage.getNoMaximumCheckbox().click();
             await modelsPage.getAccuracyDropInput().fill('5');
+            await modelsPage.getMaxNumIterationsInput().fill('7');
             await modelsPage.getCalibrationSizeInput().fill('300');
 
             await modelsPage.submitQuantization();
@@ -290,7 +291,9 @@ test.describe('Model Details', () => {
                 project_id: 'id-1',
                 parameters: {
                     model_id: 'model-1',
+                    model_architecture_id: 'Object_Detection_YOLOX_X',
                     max_drop: 0.05,
+                    max_num_iterations: 7,
                     max_calibration_subset_size: 300,
                 },
             });

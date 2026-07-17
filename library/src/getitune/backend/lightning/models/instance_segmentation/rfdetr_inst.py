@@ -32,6 +32,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -62,12 +63,15 @@ class RFDETRInst(RFDETRMixin, LightningInstanceSegModel):  # pyrefly: ignore[inc
             during training.
             Note: Recommended to keep it None to avoid unintended consequences on model performance,
             but it can be set for datasets with many objects per image to avoid OOM errors.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
 
     Note:
         RF-DETR Segmentation uses patch_size=12 with 2 windows for 432x432 input resolution.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "rfdetr_seg_n": "https://storage.geti.intel.com/weights/rf-detr-seg-n-ft.pth",
         "rfdetr_seg_s": "https://storage.geti.intel.com/weights/rf-detr-seg-s-ft.pth",
         "rfdetr_seg_m": "https://storage.geti.intel.com/weights/rf-detr-seg-m-ft.pth",
@@ -75,7 +79,6 @@ class RFDETRInst(RFDETRMixin, LightningInstanceSegModel):  # pyrefly: ignore[inc
         "rfdetr_seg_xl": "https://storage.geti.intel.com/weights/rf-detr-seg-xl-ft.pth",
         "rfdetr_seg_2xl": "https://storage.geti.intel.com/weights/rf-detr-seg-2xl-ft.pth",
     }
-
     _model_config_mapping: ClassVar[dict[str, type]] = {
         "rfdetr_seg_n": RFDETRSegNanoConfig,
         "rfdetr_seg_s": RFDETRSegSmallConfig,
@@ -106,6 +109,8 @@ class RFDETRInst(RFDETRMixin, LightningInstanceSegModel):  # pyrefly: ignore[inc
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
         max_total_objects_per_batch: int | None = None,
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         self.multi_scale = multi_scale
         self.max_total_objects_per_batch = max_total_objects_per_batch
@@ -118,6 +123,8 @@ class RFDETRInst(RFDETRMixin, LightningInstanceSegModel):  # pyrefly: ignore[inc
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> RFDETRDetector:

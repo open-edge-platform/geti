@@ -16,26 +16,24 @@ experiments:
     models:
       - name: dino_v2
         priority: core
-        recipe: classification/multi_class_cls/dino_v2.yaml
       - name: vit_tiny
         priority: core
-        recipe: classification/multi_class_cls/vit_tiny.yaml
       - name: mobilenet_v3_large
         priority: core
-        recipe: classification/multi_class_cls/mobilenet_v3_large.yaml
       - name: efficientnet_b3
-        priority: extended
-        recipe: classification/multi_class_cls/efficientnet_b3.yaml
+        priority: deferred
       - name: efficientnet_v2
         priority: extended
-        recipe: classification/multi_class_cls/efficientnet_v2.yaml
       - name: efficientnet_b0
         priority: extended
-        recipe: classification/multi_class_cls/efficientnet_b0.yaml
     datasets:
+      - paddy_disease
+      - chest_ct
+      - aircraft
       - flowers102
+      - food41
     criteria:
-      accuracy_metric: accuracy
+      accuracy_metric: f1-score
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
@@ -45,28 +43,22 @@ experiments:
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   classification/multi_label_cls:
     models:
-      - name: dino_v2_ml
+      - name: dino_v2
         priority: core
-        recipe: classification/multi_label_cls/dino_v2.yaml
-      - name: mobilenet_v3_large_ml
+      - name: mobilenet_v3_large
         priority: core
-        recipe: classification/multi_label_cls/mobilenet_v3_large.yaml
-      - name: vit_tiny_ml
-        priority: core
-        recipe: classification/multi_label_cls/vit_tiny.yaml
-      - name: efficientnet_b0_ml
+      - name: vit_tiny
         priority: extended
-        recipe: classification/multi_label_cls/efficientnet_b0.yaml
-      - name: efficientnet_b3_ml
+      - name: efficientnet_b0
         priority: extended
-        recipe: classification/multi_label_cls/efficientnet_b3.yaml
-      - name: efficientnet_v2_ml
+      - name: efficientnet_b3
+        priority: deferred
+      - name: efficientnet_v2
         priority: extended
-        recipe: classification/multi_label_cls/efficientnet_v2.yaml
     datasets:
       - aid_multilabel
     criteria:
-      accuracy_metric: accuracy
+      accuracy_metric: mAP
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
@@ -76,73 +68,106 @@ experiments:
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   detection:
     models:
-      - name: yolox_s
-        priority: core
-        recipe: detection/yolox_s.yaml
-      - name: deim_dfine_l
-        priority: core
-        recipe: detection/deim_dfine_l.yaml
-      - name: deim_dfine_m
-        priority: core
-        recipe: detection/deim_dfine_m.yaml
-      - name: atss_mobilenetv2
-        priority: extended
-        recipe: detection/atss_mobilenetv2.yaml
-      - name: yolox_s_tile
-        priority: extended
-        recipe: detection/yolox_tiny_tile.yaml
-      - name: dfine_x
-        priority: extended
-        recipe: detection/dfine_x.yaml
-      - name: ssd_mobilenetv2
-        priority: extended
-        recipe: detection/ssd_mobilenetv2.yaml
       - name: yolox_tiny
         priority: extended
-        recipe: detection/yolox_tiny.yaml
+      - name: yolox_tiny_tile
+        priority: core # one tiling model to always check Tiling
+      - name: yolox_s
+        priority: core
+      - name: yolox_s_tile
+        priority: deferred
       - name: yolox_l
-        priority: extended
-        recipe: detection/yolox_l.yaml
+        priority: deferred
+      - name: yolox_l_tile
+        priority: deferred
       - name: yolox_x
         priority: extended
-        recipe: detection/yolox_x.yaml
-      - name: rtdetr_50
+      - name: yolox_x_tile
+        priority: deferred
+      - name: yolo11_n
         priority: extended
-        recipe: detection/rtdetr_50.yaml
+      - name: yolo11_s
+        priority: deferred
+      - name: yolo11_m
+        priority: deferred
+      - name: yolo11_l
+        priority: deferred
+      - name: yolo11_x
+        priority: extended
+      - name: rfdetr_nano
+        priority: core
       - name: rfdetr_small
-        priority: extended
-        recipe: detection/rfdetr_small.yaml
+        priority: deferred
       - name: rfdetr_medium
-        priority: extended
-        recipe: detection/rfdetr_medium.yaml
+        priority: deferred
       - name: rfdetr_large
         priority: extended
-        recipe: detection/rfdetr_large.yaml
+      - name: deim_dfine_m
+        priority: extended
+      - name: deim_dfine_l
+        priority: deferred
       - name: deim_dfine_x
         priority: extended
-        recipe: detection/deim_dfine_x.yaml
-      - name: deimv2_l
-        priority: extended
-        recipe: detection/deimv2_l.yaml
-      - name: deimv2_m
-        priority: extended
-        recipe: detection/deimv2_m.yaml
       - name: deimv2_s
         priority: extended
-        recipe: detection/deimv2_s.yaml
+      - name: deimv2_m
+        priority: deferred
+      - name: deimv2_l
+        priority: extended
+      - name: atss_mobilenetv2
+        priority: extended
+      - name: atss_mobilenetv2_tile
+        priority: deferred
+      - name: ssd_mobilenetv2
+        priority: deferred
+      - name: ssd_mobilenetv2_tile
+        priority: deferred
+      - name: rtdetr_50
+        priority: extended
+      - name: rtdetr_50_tile
+        priority: deferred
+      - name: yolo12_n
+        priority: extended
+      - name: yolo12_s
+        priority: deferred
+      - name: yolo12_m
+        priority: deferred
+      - name: yolo12_l
+        priority: deferred
+      - name: yolo12_x
+        priority: extended
       - name: yolo26_n
-        priority: extended
-        recipe: detection/yolo26_n.yaml
+        priority: core
       - name: yolo26_s
-        priority: extended
-        recipe: detection/yolo26_s.yaml
+        priority: deferred
       - name: yolo26_m
+        priority: deferred
+      - name: yolo26_l
+        priority: deferred
+      - name: yolo26_x
         priority: extended
-        recipe: detection/yolo26_m.yaml
+      - name: edgecrafter_s
+        priority: core
+      - name: edgecrafter_m
+        priority: deferred
+      - name: edgecrafter_l
+        priority: deferred
+      - name: edgecrafter_x
+        priority: extended
+
     datasets:
+      - pothole
+      - wgisd
       - bccd
+      - pcb_defect
+      - axial_mri
+      - cable_damage
+      - brain_tumor
+      - oxford_pets
+      - vehicles
+      - cardd
     criteria:
-      accuracy_metric: map_50
+      accuracy_metric: map
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
@@ -154,10 +179,8 @@ experiments:
     models:
       - name: litehrnet_18
         priority: extended
-        recipe: semantic_segmentation/litehrnet_18.yaml
       - name: dino_v2
         priority: extended
-        recipe: semantic_segmentation/dino_v2.yaml
       # SegNeXt models are currently disabled due to https://github.com/open-edge-platform/geti/issues/6694.
       #      - name: segnext_t
       #        priority: extended
@@ -169,13 +192,27 @@ experiments:
       #        priority: extended
       #        recipe: semantic_segmentation/segnext_b.yaml
       - name: litehrnet_s
-        priority: extended
-        recipe: semantic_segmentation/litehrnet_s.yaml
+        priority: deferred
       - name: litehrnet_x
         priority: extended
-        recipe: semantic_segmentation/litehrnet_x.yaml
+      - name: dino_v2_tile
+        priority: deferred
+      - name: litehrnet_18_tile
+        priority: deferred
+      - name: litehrnet_s_tile
+        priority: deferred
+      - name: litehrnet_x_tile
+        priority: deferred
     datasets:
+      - pcb_defect
+      - corrosion
+      - crack_semantic
+      - wgisd
       - oxford_pets
+      - pothole
+      - satellite_building
+      - brain_tumor
+      - cardd
     criteria:
       accuracy_metric: Dice
       thresholds:
@@ -187,43 +224,65 @@ experiments:
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   instance_segmentation:
     models:
+      - name: rfdetr_seg_nano
+        priority: core
       - name: rfdetr_seg_small
-        priority: core
-        recipe: instance_segmentation/rfdetr_seg_small.yaml
+        priority: deferred
       - name: rfdetr_seg_medium
-        priority: core
-        recipe: instance_segmentation/rfdetr_seg_medium.yaml
+        priority: deferred
       - name: rfdetr_seg_xlarge
-        priority: core
-        recipe: instance_segmentation/rfdetr_seg_xlarge.yaml
+        priority: deferred
+      - name: rfdetr_seg_2xlarge
+        priority: extended
       - name: maskrcnn_r50
         priority: extended
-        recipe: instance_segmentation/maskrcnn_r50.yaml
       - name: rtmdet_inst_tiny
         priority: extended
-        recipe: instance_segmentation/rtmdet_inst_tiny.yaml
       - name: maskrcnn_efficientnetb2b
         priority: extended
-        recipe: instance_segmentation/maskrcnn_efficientnetb2b.yaml
       - name: maskrcnn_swint
         priority: extended
-        recipe: instance_segmentation/maskrcnn_swint.yaml
       - name: rfdetr_seg_large
+        priority: deferred
+      - name: yolo11_n_seg
         priority: extended
-        recipe: instance_segmentation/rfdetr_seg_large.yaml
+      - name: yolo11_s_seg
+        priority: deferred
+      - name: yolo11_m_seg
+        priority: deferred
+      - name: yolo11_l_seg
+        priority: deferred
+      - name: yolo11_x_seg
+        priority: extended
       - name: yolo26_n_seg
-        priority: extended
-        recipe: instance_segmentation/yolo26_n_seg.yaml
+        priority: core
       - name: yolo26_s_seg
-        priority: extended
-        recipe: instance_segmentation/yolo26_s_seg.yaml
+        priority: deferred
       - name: yolo26_m_seg
+        priority: deferred
+      - name: yolo26_l_seg
+        priority: deferred
+      - name: yolo26_x_seg
         priority: extended
-        recipe: instance_segmentation/yolo26_m_seg.yaml
+      - name: maskrcnn_efficientnetb2b_tile
+        priority: deferred
+      - name: maskrcnn_r50_tile
+        priority: deferred
+      - name: maskrcnn_swint_tile
+        priority: deferred
+      - name: rtmdet_inst_tiny_tile
+        priority: deferred
     datasets:
+      - pothole
+      - pcb_defect
       - wgisd
+      - oxford_pets
+      - brain_tumor
+      - cardd
+      - satellite_building
+
     criteria:
-      accuracy_metric: map_50
+      accuracy_metric: map
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }

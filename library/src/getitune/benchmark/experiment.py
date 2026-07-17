@@ -218,6 +218,9 @@ def _scrape_csv_metrics(csv_path: Path, prefix: str) -> dict[str, float]:
         series = raw_metrics[col].dropna()
         if series.empty:
             continue
+        series = pd.to_numeric(series, errors="coerce").dropna()
+        if series.empty:
+            continue
         # For val/test accuracy metrics, take the max (best epoch / the
         # single logged value). For timing metrics, take the mean (skip
         # the first warmup step).

@@ -99,7 +99,7 @@ class TestCompiledModelsSegmentation:
             label_info=3,
             data_input_params=DataInputParams((518, 518), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
         )
-        _run_compile_test(model, (518, 518))
+        _run_compile_test(model, model.data_input_params.input_size)
 
     @pytest.mark.parametrize("model_name", ["segnext_tiny", "segnext_small", "segnext_base"])
     def test_segnext_compiled(self, model_name: str) -> None:

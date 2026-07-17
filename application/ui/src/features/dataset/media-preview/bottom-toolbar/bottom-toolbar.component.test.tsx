@@ -3,13 +3,13 @@
 
 import { useState } from 'react';
 
+import type { DatasetSubset, MediaImage } from '@/api/types';
 import { type Key } from '@geti-ui/ui';
 import { fireEvent, screen } from '@testing-library/react';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { render } from 'test-utils/render';
 
 import { ZoomProvider } from '../../../../components/zoom/zoom.provider';
-import type { DatasetSubset, MediaImage } from '../../../../constants/shared-types';
 import { AnnotationVisibilityProvider } from '../../../../shared/annotator/annotation-visibility-provider.component';
 import { CanvasSettingsProvider } from '../primary-toolbar/settings/canvas-settings-provider.component';
 import { BottomToolbar } from './bottom-toolbar.component';
