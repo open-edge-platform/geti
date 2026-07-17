@@ -29,6 +29,12 @@ jobs:
     outputs:
       run_workflow: ${{ steps.check_paths.outputs.run }}
     steps:
+      - &harden-runner
+        name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - &checkout
         name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -53,6 +59,8 @@ jobs:
     permissions:
       contents: read # to checkout code
     steps:
+      - *harden-runner
+
       - *checkout
 
       - name: Install Python, uv and Just
@@ -83,6 +91,8 @@ jobs:
     permissions:
       contents: read # to checkout code
     steps:
+      - *harden-runner
+
       - *checkout
 
       - &setup-node
@@ -122,6 +132,8 @@ jobs:
     permissions:
       contents: read # to checkout code
     steps:
+      - *harden-runner
+
       - *checkout
 
       - *setup-node
@@ -167,6 +179,8 @@ jobs:
       contents: read
       pull-requests: write
     steps:
+      - *harden-runner
+
       - *checkout
 
       - *setup-node
@@ -260,8 +274,10 @@ jobs:
     timeout-minutes: 60
     runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
     container:
-      image: mcr.microsoft.com/playwright:v1.61.0-jammy@sha256:264136758e43332108f6420f82c47f639f619ca65301065ceade677763f477ec
+      image: mcr.microsoft.com/playwright:v1.61.1-jammy@sha256:7b86926fff94374389e8e1f4fdc5c76d050d4a06a7886bb537bf412b20e2b71e
     steps:
+      # This job is running in a container. Such jobs can be monitored by installing Harden Runner in a custom VM image for GitHub-hosted runners.
+
       - *checkout
 
       - *setup-node
@@ -307,6 +323,8 @@ jobs:
       CHECKS: ${{ join(needs.*.result, ' ') }}
     if: always() && !cancelled()
     steps:
+      - *harden-runner
+
       - name: Check jobs results
         run: |
           for check in ${CHECKS}; do

@@ -5,6 +5,7 @@ import json
 import sys
 
 from app.core.logging import LogConfig, logging_ctx
+from app.core.logging.handlers import LoggerStdoutWriter
 
 
 def _read_messages(log_path) -> list[str]:
@@ -34,3 +35,14 @@ class TestLoggingCtx:
 
         assert "Collecting metrics 50%" not in messages
         assert "Collecting metrics 100%" in messages
+
+    def test_logger_stdout_writer_close_flushes_without_closing_original_stream(self, tmp_path):
+        log_path = tmp_path / "job.log"
+
+        with logging_ctx(LogConfig(log_folder=str(tmp_path), log_file=log_path.name, level="INFO", serialize=True)):
+            writer = LoggerStdoutWriter(sys.stdout)
+            writer.write("message flushed by close")
+            writer.close()
+
+        messages = _read_messages(log_path)
+        assert "message flushed by close" in messages

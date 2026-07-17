@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-import os
 from collections import OrderedDict
 from functools import partial
 from typing import Any, Callable, ClassVar
@@ -257,7 +256,6 @@ class PResNetModule(BaseModule):
         normalization (Callable[..., nn.Module] | None): Normalization layer module.
             Defaults to ``nn.BatchNorm2d``.
         freeze_at (int): The stage at which to freeze the parameters. Defaults to -1.
-        pretrained (bool): Whether to load pretrained weights. Defaults to False.
     """
 
     num_resnet_blocks: ClassVar = {
@@ -265,13 +263,6 @@ class PResNetModule(BaseModule):
         34: [3, 4, 6, 3],
         50: [3, 4, 6, 3],
         101: [3, 4, 23, 3],
-    }
-
-    download_url: ClassVar = {
-        18: "https://storage.geti.intel.com/weights/ResNet18_vd_pretrained_from_paddle.pth",
-        34: "https://storage.geti.intel.com/weights/ResNet34_vd_pretrained_from_paddle.pth",
-        50: "https://storage.geti.intel.com/weights/ResNet50_vd_ssld_v2_pretrained_from_paddle.pth",
-        101: "https://storage.geti.intel.com/weights/ResNet101_vd_ssld_pretrained_from_paddle.pth",
     }
 
     def __init__(
@@ -283,7 +274,6 @@ class PResNetModule(BaseModule):
         activation: Callable[..., nn.Module] | None = nn.ReLU,
         normalization: Callable[..., nn.Module] = partial(build_norm_layer, nn.BatchNorm2d, layer_name="norm"),
         freeze_at: int = -1,
-        pretrained: bool = False,
     ) -> None:
         """Initialize the PResNet backbone."""
         super().__init__()
@@ -351,14 +341,6 @@ class PResNetModule(BaseModule):
             for i in range(min(freeze_at, num_stages)):
                 self._freeze_parameters(self.res_layers[i])
 
-        if pretrained:
-            state = torch.hub.load_state_dict_from_url(
-                url=self.download_url[depth],
-                model_dir=os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"],
-            )
-            self.load_state_dict(state)
-            print(f"Load PResNet{depth} state_dict")
-
     def _freeze_parameters(self, m: nn.Module) -> None:
         for p in m.parameters():
             p.requires_grad = False
@@ -381,13 +363,11 @@ class PResNet:
     PRESNET_CFG: ClassVar[dict[str, Any]] = {
         "rtdetr_18": {
             "depth": 18,
-            "pretrained": True,
             "return_idx": [1, 2, 3],
         },
         "rtdetr_50": {
             "depth": 50,
             "return_idx": [1, 2, 3],
-            "pretrained": True,
             "freeze_at": 0,
             "normalization": partial(build_norm_layer, FrozenBatchNorm2d, layer_name="norm"),
         },
@@ -395,7 +375,6 @@ class PResNet:
             "depth": 101,
             "return_idx": [1, 2, 3],
             "normalization": partial(build_norm_layer, FrozenBatchNorm2d, layer_name="norm"),
-            "pretrained": True,
             "freeze_at": 0,
         },
     }
