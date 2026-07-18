@@ -6,6 +6,7 @@ import { getMockedMediaImage } from 'mocks/mock-media';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 import { v4 as uuid } from 'uuid';
+import { vi } from 'vitest';
 
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
@@ -34,7 +35,33 @@ const uploadMediaAndWaitForCompletion = async (
     });
 };
 
+vi.mock('sonner', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('sonner')>();
+    return {
+        ...actual,
+        toast: {
+            ...actual.toast,
+            success: vi.fn(),
+            error: vi.fn(),
+            warning: vi.fn(),
+            info: vi.fn(),
+            dismiss: vi.fn(),
+            custom: vi.fn(),
+        },
+    };
+});
+
 describe('useMediaUpload', () => {
+    beforeEach(() => {
+        vi.useFakeTimers({ shouldAdvanceTime: true });
+    });
+
+    afterEach(() => {
+        vi.runOnlyPendingTimers();
+        vi.useRealTimers();
+        vi.clearAllMocks();
+    });
+
     it('uploads all selected files', async () => {
         const uploadedFileNames: string[] = [];
 
@@ -62,6 +89,7 @@ describe('useMediaUpload', () => {
             files,
             () => result.current.upload.uploadProgress.isUploading
         );
+        await vi.runAllTimersAsync();
         expect(uploadedFileNames).toEqual(['image-1.jpg', 'image-2.jpg']);
     });
 
@@ -96,6 +124,7 @@ describe('useMediaUpload', () => {
             mockFiles,
             () => result.current.upload.uploadProgress.isUploading
         );
+        await vi.runAllTimersAsync();
 
         expect(maxRunningUploads).toBeLessThanOrEqual(MEDIA_UPLOAD_CONCURRENCY);
         expect(result.current.upload.uploadProgress.completed).toBe(12);
@@ -130,6 +159,7 @@ describe('useMediaUpload', () => {
             files,
             () => result.current.upload.uploadProgress.isUploading
         );
+        await vi.runAllTimersAsync();
 
         expect(result.current.upload.uploadProgress).toEqual({
             total: 2,
@@ -168,6 +198,7 @@ describe('useMediaUpload', () => {
             files,
             () => result.current.upload.uploadProgress.isUploading
         );
+        await vi.runAllTimersAsync();
 
         const items = result.current.state.items;
         expect(items).toHaveLength(2);

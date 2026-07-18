@@ -22,13 +22,12 @@ const HotkeyItem = ({ hotkeyName, hotkey }: HotkeyItemProps) => {
 
 export const HotkeysList = () => {
     const availableTools = useAvailableTools();
+    const submitHotkey =
+        `${formatHotkeyForDisplay(HOTKEYS.submitAlternative)} ` + `or ${formatHotkeyForDisplay(HOTKEYS.submit)}`;
 
     return (
         <Grid columns={['2fr', '1fr']} rowGap={'size-100'}>
-            <HotkeyItem
-                hotkeyName={'Submit annotations/predictions'}
-                hotkey={formatHotkeyForDisplay(HOTKEYS.submit)}
-            />
+            <HotkeyItem hotkeyName={'Submit annotations/predictions'} hotkey={submitHotkey} />
             <Divider size='S' gridColumn={'1/-1'} />
             <HotkeyItem hotkeyName={'Previous media'} hotkey={'ArrowUp or ArrowLeft'} />
             <HotkeyItem hotkeyName={'Next media'} hotkey={'ArrowDown or ArrowRight'} />
