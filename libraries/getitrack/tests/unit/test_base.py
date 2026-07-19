@@ -54,6 +54,7 @@ def _clean_registry() -> Iterator[None]:
     ALGORITHM_REGISTRY.update(snapshot)
     LOGGER.handlers = [h for h in LOGGER.handlers if isinstance(h, logging.NullHandler)]
     LOGGER.setLevel(logging.NOTSET)
+    LOGGER.propagate = True
 
 
 def _register_dummy(name: str = "bytetrack") -> type[BaseTracker]:

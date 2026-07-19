@@ -9,6 +9,7 @@ name. The registry is populated once the algorithm modules are imported.
 
 from __future__ import annotations
 
+import logging
 from abc import ABC, abstractmethod
 from dataclasses import replace
 from pathlib import Path
@@ -16,7 +17,9 @@ from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
 from getitrack.config import TrackerConfig
 from getitrack.core.registry import ALGORITHM_REGISTRY, resolve_tracker_config
-from getitrack.logger import LOGGER, enable_logging
+from getitrack.logger import enable_logging
+
+_LOGGER = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     import numpy as np
@@ -91,7 +94,7 @@ class BaseTracker(ABC, Generic[ConfigT]):
                 strict=True,
             )
         )
-        LOGGER.info(
+        _LOGGER.info(
             "frame %4d: %d detections, %d tracks [id:class:score %s]",
             detections.frame_id,
             len(detections),
