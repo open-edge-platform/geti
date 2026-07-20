@@ -164,7 +164,7 @@ override-dependencies = [
 ]
 
 [tool.uv.sources]
-# TODO: revert to a stable PyPI release once OpenVINO 2026.3 is officially published.
+# TODO(open-edge-platform/geti#7070): revert to a stable PyPI release once OpenVINO 2026.3 is officially published.
 openvino = [
     { index = "openvino-nightly" },
 ]
