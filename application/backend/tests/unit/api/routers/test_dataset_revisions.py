@@ -8,13 +8,12 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 import pytest
-from fastapi import status
+from fastapi import FastAPI, status
 from PIL import Image
 
 from app.api.dependencies import get_data_dir, get_dataset_revision, get_dataset_revision_service
 from app.api.schemas.dataset_item import DatasetItemSubset
 from app.api.schemas.dataset_revision import DatasetRevisionView, ItemCount
-from app.main import app
 from app.models import DatasetItem, DatasetRevision
 from app.models.dataset_revision import DatasetRevisionCounts
 from app.models.media import ImageFormat
@@ -52,7 +51,7 @@ def fxt_dataset_revision(fxt_get_project):
 
 
 @pytest.fixture
-def fxt_get_dataset_revision(fxt_dataset_revision):
+def fxt_get_dataset_revision(fxt_app, fxt_dataset_revision):
     # Convert DatasetRevisionView to DatasetRevision
     dataset_revision = DatasetRevision(
         id=fxt_dataset_revision.id,
@@ -67,15 +66,15 @@ def fxt_get_dataset_revision(fxt_dataset_revision):
             testing=1,
         ),
     )
-    app.dependency_overrides[get_dataset_revision] = lambda: dataset_revision
+    fxt_app.dependency_overrides[get_dataset_revision] = lambda: dataset_revision
     yield dataset_revision
-    app.dependency_overrides.pop(get_dataset_revision, None)
+    fxt_app.dependency_overrides.pop(get_dataset_revision, None)
 
 
 @pytest.fixture
-def fxt_dataset_revision_service() -> MagicMock:
+def fxt_dataset_revision_service(fxt_app: FastAPI) -> MagicMock:
     dataset_revision_service = MagicMock(spec=DatasetRevisionService)
-    app.dependency_overrides[get_dataset_revision_service] = lambda: dataset_revision_service
+    fxt_app.dependency_overrides[get_dataset_revision_service] = lambda: dataset_revision_service
     return dataset_revision_service
 
 
@@ -120,9 +119,9 @@ class TestDatasetRevisionItemEndpoints:
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_rename_dataset_revision_success(
-        self, tmp_path, fxt_get_dataset_revision, fxt_get_project, fxt_dataset_revision_service, fxt_client
+        self, tmp_path, fxt_app, fxt_get_dataset_revision, fxt_get_project, fxt_dataset_revision_service, fxt_client
     ):
-        app.dependency_overrides[get_data_dir] = lambda: tmp_path / "data"
+        fxt_app.dependency_overrides[get_data_dir] = lambda: tmp_path / "data"
 
         renamed_dataset_revision = DatasetRevision(
             id=fxt_get_dataset_revision.id,

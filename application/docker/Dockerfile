@@ -279,6 +279,7 @@ ENV STATIC_FILES_DIR="/application/html"
 ENV DATA_DIR="/application/data"
 ENV LOG_DIR="/application/logs"
 ENV PYTHONPATH=/application/backend
+ENV PYTHONUNBUFFERED=1
 
 # Create secure non-root user, add it to the 'video' group (for /dev/videoN access),
 # and remove unused package managers to reduce image size
