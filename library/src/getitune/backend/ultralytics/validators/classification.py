@@ -121,6 +121,21 @@ class MultiLabelClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClas
         LOGGER.info(f"{'multi-label accuracy':>20}: {stats['metrics/accuracy']:.3g}")
         LOGGER.info(f"{'multi-label mAP':>20}: {stats['metrics/mAP']:.3g}")
 
+    def plot_val_samples(self, batch: dict[str, Any], ni: int) -> None:
+        """Skip image plotting for multi-label batches.
+
+        Upstream ``ClassificationValidator.plot_val_samples``/``plot_predictions``
+        assume a single scalar class id per image (``batch["cls"]`` of shape
+        ``(N,)``). Multi-label ``cls`` is a multi-hot vector of shape
+        ``(N, num_labels)``, which crashes Ultralytics' ``plot_images`` /
+        ``colors()`` (expects a 0-d class id). There is no established
+        single-image rendering for multiple simultaneous tags, so plotting
+        is skipped rather than producing a misleading or crashing visualization.
+        """
+
+    def plot_predictions(self, batch: dict[str, Any], preds: torch.Tensor, ni: int) -> None:
+        """Skip prediction plotting for multi-label batches. See :meth:`plot_val_samples`."""
+
     def _build_adapter_dataloader(self) -> DataLoader:
         """Build a multi-label DataLoader from the DataModule's val/test subset."""
         if self._datamodule is None:
