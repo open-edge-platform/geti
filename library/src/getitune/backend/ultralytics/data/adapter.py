@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, Callable, ClassVar, cast
+from typing import Any, Callable, cast
 
 import numpy as np
 import torch
@@ -70,7 +70,7 @@ class UltralyticsDatasetAdapter(TorchDataset):
             "segment": self._getitem_segment,
             "semantic": self._getitem_semantic,
             "detect": self._getitem_detect,
-            }
+        }
         get_item_fn = _getitem_mapping.get(self._task_kind)
         if get_item_fn is None:
             msg = f"Unknown task_kind: {self._task_kind}"
