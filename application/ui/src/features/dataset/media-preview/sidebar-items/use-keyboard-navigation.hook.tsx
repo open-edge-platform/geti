@@ -3,9 +3,8 @@
 
 import type { RefObject } from 'react';
 
-import { useEventListener } from 'hooks/event-listener.hook';
-
 import type { Media } from '@/api/types';
+import { useEventListener } from 'hooks/event-listener.hook';
 
 export type UseKeyboardNavigationProps = {
     ref: RefObject<HTMLElement | null>;

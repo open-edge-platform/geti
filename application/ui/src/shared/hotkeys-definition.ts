@@ -1,9 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { isMac } from '@react-aria/utils';
-
 import { TaskType } from '@/api/types';
+import { isMac } from '@react-aria/utils';
 
 const CTRL_KEY = 'ctrl';
 const COMMAND_KEY = 'meta';
