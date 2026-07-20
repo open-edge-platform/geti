@@ -21,7 +21,6 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "loguru~=0.7",
     "numpy~=2.0",
     "opencv-python-headless~=4.11",
     "pydantic~=2.7",
