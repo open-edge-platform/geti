@@ -10,7 +10,6 @@ from fastapi import status
 
 from app.api.dependencies import get_dataset_service
 from app.api.schemas.dataset_item import DatasetItemSubset, DatasetItemView
-from app.main import app
 from app.models import DatasetItem, DatasetItemAnnotationStatus
 from app.models.dataset import DatasetStatistics
 from app.models.dataset_item import DatasetItemSortBy
@@ -33,9 +32,9 @@ def fxt_dataset_item():
 
 
 @pytest.fixture
-def fxt_dataset_service() -> MagicMock:
+def fxt_dataset_service(fxt_app) -> MagicMock:
     dataset_service = MagicMock(spec=DatasetService)
-    app.dependency_overrides[get_dataset_service] = lambda: dataset_service
+    fxt_app.dependency_overrides[get_dataset_service] = lambda: dataset_service
     return dataset_service
 
 

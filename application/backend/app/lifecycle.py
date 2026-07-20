@@ -17,7 +17,7 @@ from loguru import logger
 
 from app.core.jobs import JobController, JobQueue, ProcessRunnerFactory
 from app.core.jobs.models import JobType
-from app.core.logging import LogConfig, setup_logging, setup_uvicorn_logging
+from app.core.logging import LogConfig, setup_logging
 from app.core.run import Runnable, RunnableFactory
 from app.db import MigrationFatalError, MigrationManager, get_db_session
 from app.execution.builders import (
@@ -163,7 +163,7 @@ def setup_job_controller(
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     """FastAPI lifespan context manager"""
     # Startup
     settings = get_settings()
@@ -172,7 +172,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
 
     # Setup logging
     setup_logging(config=LogConfig(level=settings.log_level))
-    setup_uvicorn_logging(settings.log_level)
 
     # Initialize database and upgrade application data (DB schema + filesystem
     # layout) to the running version. On a failed upgrade the data is
