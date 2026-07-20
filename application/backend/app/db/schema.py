@@ -36,6 +36,7 @@ class ProjectDB(BaseID):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     task_type: Mapped[str] = mapped_column(String(50), nullable=False)
     exclusive_labels: Mapped[bool] = mapped_column(Boolean, default=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=False)
 
     model_revisions = relationship("ModelRevisionDB", back_populates="project")
 
