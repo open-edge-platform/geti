@@ -39,7 +39,7 @@ dependencies = [
     "torchmetrics==1.8.2",
     "pytorchcv==0.0.74",
     "timm==1.0.3",
-    "openvino~=2026.2.0",
+    "openvino==2026.3.0rc2",
     "openvino-model-api~=0.4.5",
     "onnx==1.22.0",
     "onnxruntime==1.26.0",
@@ -164,6 +164,10 @@ override-dependencies = [
 ]
 
 [tool.uv.sources]
+# TODO: revert to a stable PyPI release once OpenVINO 2026.3 is officially published.
+openvino = [
+    { index = "openvino-nightly" },
+]
 torch = [
     # Note: Pytorch indexes only provide pre-built wheels for Linux and Windows.
     # For other platforms (e.g., macOS), Pytorch has to be installed from the default PyPI index.
@@ -179,6 +183,11 @@ torchvision = [
     { index = "torch-xpu", extra = "xpu"},
     { index = "torch-cuda", extra = "cuda"},
 ]
+
+[[tool.uv.index]]
+name = "openvino-nightly"
+url = "https://storage.openvinotoolkit.org/simple/wheels/nightly"
+explicit = true
 
 [[tool.uv.index]]
 name = "torch-cpu"
