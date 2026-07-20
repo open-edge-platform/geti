@@ -5,7 +5,7 @@
 
 [Quick Start](#quick-start) •
 [Geti™ documentation](https://docs.geti.intel.com/) •
-[`getitune` documentation](library/README.md)
+[`getitune` documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/intro)
 
 [![Container build](https://github.com/open-edge-platform/geti/actions/workflows/build.yaml/badge.svg)](https://github.com/open-edge-platform/geti/actions/workflows/build.yaml)
 [![Codecov](https://codecov.io/gh/open-edge-platform/geti/branch/develop/graph/badge.svg?token=9HVFNMPFGD)](https://codecov.io/gh/open-edge-platform/geti)
@@ -180,7 +180,7 @@ uv pip install getitune # CPU-only by default
 > uv sync --extra cpu --extra ultralytics                              # CPU + YOLO
 > ```
 >
-> See the [library README](library/README.md#installation) for more details.
+> See the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/installation) for more details.
 >
 > ℹ️ Ultralytics YOLO models are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license).
 
@@ -223,8 +223,8 @@ metrics = ov_engine.test()
 predictions = ov_engine.predict()
 ```
 
-See the [library README](library/README.md) for the full list of recipes, advanced configuration, dataset support,
-backend-specific options, and deployment/optimization examples.
+See the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/quick-start) for the full list of recipes,
+advanced configuration, dataset support, backend-specific options, and deployment/optimization examples.
 
 ## Key Features
 
