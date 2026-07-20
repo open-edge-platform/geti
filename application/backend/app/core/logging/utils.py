@@ -7,7 +7,6 @@ from collections.abc import Generator
 from contextlib import contextmanager
 
 from loguru import logger
-from nncf.common.logging.logger import nncf_logger
 
 from .config import LogConfig
 from .handlers import InterceptHandler
@@ -55,6 +54,8 @@ def logging_ctx(config: LogConfig) -> Generator[str]:
         ...     # ... training code ...
         >>> # Sink removed, but logs/jobs/train-8f3e22f2.log persists
     """
+    from nncf.common.logging.logger import nncf_logger
+
     log_path = os.path.join(config.log_folder, config.log_file)
 
     root_logger = logging.getLogger()
