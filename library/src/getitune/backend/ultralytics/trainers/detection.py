@@ -49,5 +49,5 @@ class DetectionTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _UltralyticsDe
             args=copy(self.args),
             _callbacks=self.callbacks,
         )
-        validator.set_datamodule(self._datamodule)
+        validator.datamodule = self._datamodule
         return validator

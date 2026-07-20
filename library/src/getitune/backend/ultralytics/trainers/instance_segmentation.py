@@ -101,5 +101,5 @@ class SegmentationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _Ultralytic
             args=copy(self.args),
             _callbacks=self.callbacks,
         )
-        validator.set_datamodule(self._datamodule)
+        validator.datamodule = self._datamodule
         return validator

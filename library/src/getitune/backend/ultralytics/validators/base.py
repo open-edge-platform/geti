@@ -46,7 +46,13 @@ class GetiTuneValidatorMixin:
     _task_kind: ClassVar[str] = "detect"
     _collate_fn: ClassVar[Callable]
 
-    def set_datamodule(self, datamodule: DataModule | None) -> None:
+    @property
+    def datamodule(self) -> DataModule | None:
+        """Get the bound DataModule instance."""
+        return self._datamodule
+
+    @datamodule.setter
+    def datamodule(self, datamodule: DataModule | None) -> None:
         """Bind a DataModule instance, overriding any class-level default."""
         self._datamodule = datamodule
 
