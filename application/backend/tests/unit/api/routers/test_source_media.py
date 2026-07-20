@@ -9,16 +9,15 @@ import pytest
 from fastapi import status
 
 from app.api.dependencies import get_source_media_service
-from app.main import app
 from app.services import SourceMediaService
 
 
 @pytest.fixture
-def fxt_source_media_service() -> Generator[AsyncMock]:
+def fxt_source_media_service(fxt_app) -> Generator[AsyncMock]:
     source_media_service = AsyncMock(spec=SourceMediaService)
-    app.dependency_overrides[get_source_media_service] = lambda: source_media_service
+    fxt_app.dependency_overrides[get_source_media_service] = lambda: source_media_service
     yield source_media_service
-    app.dependency_overrides.pop(get_source_media_service, None)
+    fxt_app.dependency_overrides.pop(get_source_media_service, None)
 
 
 class TestSourceMediaEndpoints:

@@ -8,7 +8,7 @@ Provides centralized logging setup using loguru with:
 - Configurable log levels, rotation (default: 10MB), and retention (default: 10 days)
 - JSON serialization support for structured logging
 - Thread-safe async logging with multiprocessing support
-- Uvicorn log interception for unified application logging
+- Hypercorn log interception for unified application logging
 """
 
 import logging
@@ -68,34 +68,10 @@ def setup_logging(config: LogConfig | None = None) -> None:
         logger.exception("Failed to add log sink for {}", log_path)
 
 
-def setup_uvicorn_logging(log_level: str) -> None:
-    """Configure uvicorn logging to be handled by loguru.
-
-    Intercepts all uvicorn log messages (from uvicorn.error, uvicorn.access, etc.)
-    and redirects them to loguru for unified logging output. This ensures uvicorn
-    logs follow the same format and routing as application logs.
-
-    The function:
-    1. Attaches InterceptHandler to the main uvicorn logger
-    2. Sets propagate=False on uvicorn logger to prevent duplicate logs to root
-    3. Clears handlers from child loggers (uvicorn.access, uvicorn.error)
-    4. Enables propagation on child loggers so they forward to parent uvicorn logger
-
-    Note: This should be called during application startup, typically before
-    starting the uvicorn server.
-
-    Example:
-        >>> setup_uvicorn_logging("INFO")
-        # All uvicorn logs now flow through loguru
-    """
-    # Setup uvicorn logs to be handled by loguru
-    # Configure the main uvicorn logger with InterceptHandler
-    uvicorn_logger = logging.getLogger("uvicorn")
-    uvicorn_logger.handlers = [InterceptHandler()]
-    uvicorn_logger.setLevel(log_level)
-    uvicorn_logger.propagate = False  # Don't propagate to root to avoid duplicate logs
-    # Clear handlers from child loggers and let them propagate to parent uvicorn logger
-    for logger_name in ("uvicorn.access", "uvicorn.error"):
-        child_logger = logging.getLogger(logger_name)
-        child_logger.handlers.clear()
-        child_logger.propagate = True  # Propagate to parent uvicorn logger
+def setup_hypercorn_logging(log_level: str) -> None:
+    """Configure hypercorn logging to be handled by loguru."""
+    for logger_name in ("hypercorn.error", "hypercorn.access"):
+        logger_ = logging.getLogger(logger_name)
+        logger_.handlers = [InterceptHandler()]
+        logger_.setLevel(log_level)
+        logger_.propagate = False
