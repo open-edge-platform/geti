@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any, cast
+from typing import Any, Callable, ClassVar, cast
 
 import numpy as np
 import torch
@@ -64,20 +64,18 @@ class UltralyticsDatasetAdapter(TorchDataset):
             msg = f"Expected 3-D image tensor (CHW), got shape {img.shape}"
             raise ValueError(msg)
 
-        match self._task_kind:
-            case "classify":
-                return self._getitem_classify(sample, img)
-            case "multilabel":
-                return self._getitem_multilabel(sample, img)
-            case "segment":
-                return self._getitem_segment(sample, img)
-            case "semantic":
-                return self._getitem_semantic(sample, img)
-            case "detect":
-                return self._getitem_detect(sample, img)
-            case _:
-                msg = f"Unknown task_kind: {self._task_kind}"
-                raise ValueError(msg)
+        _getitem_mapping: dict[str, Callable[..., dict[str, Any]]] = {
+            "classify": self._getitem_classify,
+            "multilabel": self._getitem_multilabel,
+            "segment": self._getitem_segment,
+            "semantic": self._getitem_semantic,
+            "detect": self._getitem_detect,
+            }
+        get_item_fn = _getitem_mapping.get(self._task_kind)
+        if get_item_fn is None:
+            msg = f"Unknown task_kind: {self._task_kind}"
+            raise ValueError(msg)
+        return get_item_fn(sample, img)
 
     def _extract_geometry(
         self,
