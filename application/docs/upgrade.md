@@ -117,8 +117,8 @@ To restore the backup after a manual upgrade problem, see
 
 The MSIX package contains the UI and the bundled backend. Your projects and models
 live in a **per-user data directory** that is deliberately kept **outside** the
-install location (e.g. `%LOCALAPPDATA%\com.intel.geti`), so it survives app
-updates.
+install location (`%LOCALAPPDATA%\com.intel.geti`, resolved from the bundle
+identifier — see `ui/src-tauri/src/backend.rs`), so it survives app updates.
 
 To upgrade:
 
@@ -131,6 +131,29 @@ If the migration fails, the backend automatically rolls the data back to the
 previous version and exits. Because the previous package can be reinstalled and
 your data was reverted, the app remains usable — simply reinstall the previous
 `.msix` version (see [Downgrading](#downgrading)).
+
+### Requirements for in-place upgrade to work
+
+Windows performs an **in-place upgrade** (keeping the per-user data directory)
+**only** when the newer package satisfies all of the following, otherwise it is
+treated as a separate/side-by-side app or a same-version reinstall:
+
+- **Identical `Identity/Name`** — must stay `intel.geti` across releases.
+- **Identical `Publisher`** — must stay
+  `CN=Intel Corporation, O=Intel Corporation, S=California, C=US` (this is bound
+  to the signing certificate).
+- **A strictly higher 4-part `Version`** in
+  [`ui/src-tauri/msix/AppxManifest.xml`](../ui/src-tauri/msix/AppxManifest.xml)
+  — e.g. `3.1.0.0` > `3.0.0.0`.
+
+> **Maintainer note — the version is injected automatically at build time.** The
+> checked-in manifest carries a placeholder `Version` that
+> [`build_msix.py`](../ui/src-tauri/msix/build_msix.py) overwrites with the
+> release version (single source of truth: `tauri.conf.json`, normalised to the
+> 4-part form) when packaging via `just package-msix`. Bump the version in
+> `tauri.conf.json` (or set `GETI_MSIX_VERSION`) for each release so the new
+> package is recognised as an upgrade. See
+> [`packaging-msix.md`](./packaging-msix.md) for the full build/sign procedure.
 
 ---
 

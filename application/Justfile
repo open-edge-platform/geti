@@ -303,6 +303,28 @@ tauri-build:
 tauri-build:
     cd ui && npx tauri build
 
+# Build a versioned (and optionally signed) MSIX package for the Windows app.
+#
+# Runs `tauri build`, then `build_msix.py` injects the release version into the
+# MSIX manifest (single source of truth: ui/src-tauri/tauri.conf.json, normalised
+# to the 4-part Major.Minor.Build.Revision form), stages the payload and packs it
+# with the Windows SDK `makeappx`. The package is signed when a certificate is
+# supplied via env vars (GETI_MSIX_CERT / GETI_MSIX_CERT_PASSWORD or
+# GETI_MSIX_CERT_THUMBPRINT, optional GETI_MSIX_TIMESTAMP_URL); otherwise an
+# unsigned package is produced (a warning is printed).
+#
+# The `Name`/`Publisher` in the manifest are kept constant across releases so
+# Windows performs an in-place upgrade that preserves the per-user data
+# directory. Bump the version in tauri.conf.json (or set GETI_MSIX_VERSION) for
+# each release, otherwise the new package is not recognised as an upgrade.
+#
+# Requires the Windows 10 SDK (makeappx/signtool). Run
+# `uv run python ui/src-tauri/msix/build_msix.py build --help` for all options.
+[windows]
+package-msix:
+    cd ui && npx tauri build
+    uv run python ui/src-tauri/msix/build_msix.py build
+
 # run coturn server
 run-coturn:
     @echo "Running coturn server on port {{ coturn-port }} with external IP {{ host-ip }}..."
