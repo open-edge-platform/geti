@@ -96,9 +96,12 @@ To upgrade:
    version, taking a database backup first.
 
 If the migration fails, the backend automatically rolls the data back to the
-previous version and exits. Because the previous package can be reinstalled and
-your data was reverted, the app remains usable — simply reinstall the previous
-`.msix` version (see [Downgrading](#downgrading)).
+previous version and exits with the fatal code `3`. The desktop app detects this
+and shows a **detailed error dialog** explaining that the upgrade failed, that
+your data was restored, and where to find the logs, then closes. Because the
+previous package can be reinstalled and your data was reverted, the app remains
+usable — simply reinstall the previous `.msix` version (see
+[Downgrading](#downgrading)).
 
 ### Requirements for in-place upgrade to work
 
