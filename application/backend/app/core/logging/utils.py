@@ -3,14 +3,13 @@
 
 import logging
 import os
-import sys
 from collections.abc import Generator
 from contextlib import contextmanager
 
 from loguru import logger
 
 from .config import LogConfig
-from .handlers import InterceptHandler, LoggerStdoutWriter
+from .handlers import InterceptHandler
 
 
 @contextmanager
@@ -22,8 +21,17 @@ def logging_ctx(config: LogConfig) -> Generator[str]:
     persists. Logs continue to go to all other configured sinks (stdout, main
     log file, etc.).
 
-    Useful for capturing logs from specific operations (e.g., training jobs) into separate files while maintaining
-    application-wide logging.
+    While active, this also installs a fresh `InterceptHandler` on the root
+    stdlib logger and on `nncf`'s logger (which doesn't propagate to root),
+    so log records from third-party libraries using stdlib `logging` are
+    forwarded into loguru and captured by the job-specific sink too. Any
+    handlers/levels set on these loggers prior to entering the context are
+    saved and restored on exit, so this is safe to use regardless of whether
+    root logging was already configured (e.g. by `app.main`) in the current
+    process.
+
+    Useful for capturing logs from specific operations (e.g., training jobs) into
+    separate files while maintaining application-wide logging.
 
     Args:
         config: LogConfig instance specifying the log file path, rotation,
@@ -46,16 +54,16 @@ def logging_ctx(config: LogConfig) -> Generator[str]:
         ...     # ... training code ...
         >>> # Sink removed, but logs/jobs/train-8f3e22f2.log persists
     """
+    from nncf.common.logging.logger import nncf_logger
+
     log_path = os.path.join(config.log_folder, config.log_file)
 
     root_logger = logging.getLogger()
-    root_handler = InterceptHandler()
-    stdout_writer = LoggerStdoutWriter(sys.stdout)
-    stderr_writer = LoggerStdoutWriter(sys.stderr)
-    previous_handlers = list(root_logger.handlers)
-    previous_level = root_logger.level
-    previous_stdout = sys.stdout
-    previous_stderr = sys.stderr
+    prev_root_handlers = list(root_logger.handlers)
+    prev_root_level = root_logger.level
+
+    prev_nncf_handlers = list(nncf_logger.handlers)
+    prev_nncf_level = nncf_logger.level
 
     try:
         sink_id = logger.add(
@@ -69,20 +77,27 @@ def logging_ctx(config: LogConfig) -> Generator[str]:
     except Exception as e:
         raise RuntimeError(f"Failed to add log sink for {log_path}: {e}") from e
 
+    level = getattr(logging, config.level.upper(), logging.INFO)
+
     try:
-        root_logger.handlers = [root_handler]
-        root_logger.setLevel(getattr(logging, config.level.upper(), logging.INFO))
-        sys.stdout = stdout_writer
-        sys.stderr = stderr_writer
+        # Replace handlers so there's always exactly one InterceptHandler on root,
+        # regardless of whether basicConfig already ran in the process utilizing this
+        # function (e.g. via the multiprocessing "spawn" main-script reimport) or not.
+        root_logger.handlers = [InterceptHandler()]
+        root_logger.setLevel(level)
+
+        # nncf_logger doesn't propagate, so it needs its own handler
+        nncf_logger.handlers = [InterceptHandler()]
+        nncf_logger.setLevel(level)
+
         logger.debug("Started logging to {}", log_path)
         yield log_path
     finally:
-        stdout_writer.flush()
-        stderr_writer.flush()
-        sys.stdout = previous_stdout
-        sys.stderr = previous_stderr
-        root_logger.removeHandler(root_handler)
-        root_logger.handlers = previous_handlers
-        root_logger.setLevel(previous_level)
+        root_logger.handlers = prev_root_handlers
+        root_logger.setLevel(prev_root_level)
+
+        nncf_logger.handlers = prev_nncf_handlers
+        nncf_logger.setLevel(prev_nncf_level)
+
         logger.debug("Stopped logging to {}", log_path)
         logger.remove(sink_id)

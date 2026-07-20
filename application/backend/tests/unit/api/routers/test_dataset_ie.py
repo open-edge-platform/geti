@@ -11,7 +11,6 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from app.api.dependencies import get_staged_dataset_service
-from app.main import app
 from app.models import DatasetFormat, StagedDataset
 from app.services import StagedDatasetService
 
@@ -28,9 +27,9 @@ def fxt_staged_dataset(tmp_path: Path) -> StagedDataset:
 
 
 @pytest.fixture
-def fxt_staged_dataset_service() -> Mock:
+def fxt_staged_dataset_service(fxt_app) -> Mock:
     dataset_service = Mock(spec=StagedDatasetService)
-    app.dependency_overrides[get_staged_dataset_service] = lambda: dataset_service
+    fxt_app.dependency_overrides[get_staged_dataset_service] = lambda: dataset_service
     return dataset_service
 
 

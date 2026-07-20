@@ -7,17 +7,23 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 import pytest
+from fastapi import FastAPI
 
 from app.api.dependencies import get_project
 from app.api.schemas import LabelView, ProjectView, TaskView
-from app.main import app
+from app.main import create_app
 from app.models import TaskType
 from app.services import MetricsService
 from app.services.event.event_bus import EventBus
 
 
+@pytest.fixture(scope="session")
+def fxt_app() -> FastAPI:
+    return create_app()
+
+
 @pytest.fixture
-def fxt_get_project() -> Generator[ProjectView]:
+def fxt_get_project(fxt_app: FastAPI) -> Generator[ProjectView]:
     project = MagicMock(
         spec=ProjectView,
         id=uuid4(),
@@ -30,9 +36,9 @@ def fxt_get_project() -> Generator[ProjectView]:
             ],
         ),
     )
-    app.dependency_overrides[get_project] = lambda: project
+    fxt_app.dependency_overrides[get_project] = lambda: project
     yield project
-    del app.dependency_overrides[get_project]
+    del fxt_app.dependency_overrides[get_project]
 
 
 @pytest.fixture
