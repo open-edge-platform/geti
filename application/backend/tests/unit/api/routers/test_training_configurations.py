@@ -7,7 +7,6 @@ import pytest
 
 from app.api.dependencies import get_training_configuration_service
 from app.api.schemas import TrainingConfigurationView
-from app.main import app
 from app.models.training_configuration import (
     AlgoLevelDatasetPreparationParameters,
     AlgoLevelParameters,
@@ -87,9 +86,9 @@ def fxt_default_training_configuration() -> TrainingConfiguration:
 
 
 @pytest.fixture
-def fxt_training_configuration_service() -> MagicMock:
+def fxt_training_configuration_service(fxt_app) -> MagicMock:
     training_configuration_service = MagicMock(spec=TrainingConfigurationService)
-    app.dependency_overrides[get_training_configuration_service] = lambda: training_configuration_service
+    fxt_app.dependency_overrides[get_training_configuration_service] = lambda: training_configuration_service
     return training_configuration_service
 
 

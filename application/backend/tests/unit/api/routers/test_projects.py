@@ -12,7 +12,6 @@ from fastapi import status
 from app.api.dependencies import get_data_collector, get_label_service
 from app.api.schemas import LabelView, PatchLabels, ProjectView, TaskView
 from app.api.schemas.label import LabelCreate, LabelEdit, LabelRemove
-from app.main import app
 from app.models import Label, TaskType
 from app.services import ResourceInUseError, ResourceNotFoundError, ResourceType, ResourceWithIdAlreadyExistsError
 from app.services.data_collect import DataCollector
@@ -38,16 +37,16 @@ def fxt_project() -> ProjectView:
 
 
 @pytest.fixture
-def fxt_data_collector() -> MagicMock:
+def fxt_data_collector(fxt_app) -> MagicMock:
     data_collector = MagicMock(spec=DataCollector)
-    app.dependency_overrides[get_data_collector] = lambda: data_collector
+    fxt_app.dependency_overrides[get_data_collector] = lambda: data_collector
     return data_collector
 
 
 @pytest.fixture
-def fxt_label_service():
+def fxt_label_service(fxt_app):
     label_service = MagicMock(spec=LabelService)
-    app.dependency_overrides[get_label_service] = lambda: label_service
+    fxt_app.dependency_overrides[get_label_service] = lambda: label_service
     return label_service
 
 
