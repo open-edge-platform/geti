@@ -17,11 +17,12 @@ State transitions::
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from enum import IntEnum
 from typing import TYPE_CHECKING, assert_never
 
-from getitrack.logger import LOGGER
+_LOGGER = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     import numpy as np
@@ -90,8 +91,8 @@ class Track:
             case _:
                 assert_never(self.state)
         if self.state != prev_state:
-            LOGGER.debug(
-                "track {}: {} -> {} on hit (hits={})", self.track_id, prev_state.name, self.state.name, self.hits
+            _LOGGER.debug(
+                "track %s: %s -> %s on hit (hits=%s)", self.track_id, prev_state.name, self.state.name, self.hits
             )
 
     def mark_miss(self, lifecycle: LifecycleConfig) -> None:
@@ -113,8 +114,8 @@ class Track:
             case _:
                 assert_never(self.state)
         if self.state != prev_state:
-            LOGGER.debug(
-                "track {}: {} -> {} on miss (time_since_update={})",
+            _LOGGER.debug(
+                "track %s: %s -> %s on miss (time_since_update=%s)",
                 self.track_id,
                 prev_state.name,
                 self.state.name,
