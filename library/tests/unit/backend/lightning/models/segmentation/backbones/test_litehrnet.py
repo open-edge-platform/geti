@@ -1,7 +1,6 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from unittest.mock import MagicMock
 
 import pytest
 import torch
@@ -83,26 +82,6 @@ class TestLiteHRNetModule:
     def backbone(self, cfg) -> LiteHRNetModule:
         return LiteHRNetModule(**cfg)
 
-    @pytest.fixture
-    def mock_torch_load(self, mocker) -> MagicMock:
-        return mocker.patch("getitune.backend.lightning.models.segmentation.backbones.litehrnet.torch.load")
-
-    @pytest.fixture
-    def mock_load_from_http(self, mocker) -> MagicMock:
-        return mocker.patch("getitune.backend.lightning.models.segmentation.backbones.litehrnet.load_from_http")
-
-    @pytest.fixture
-    def mock_load_checkpoint_to_model(self, mocker) -> MagicMock:
-        return mocker.patch(
-            "getitune.backend.lightning.models.segmentation.backbones.litehrnet.load_checkpoint_to_model"
-        )
-
-    @pytest.fixture
-    def pretrained_weight(self, tmp_path) -> str:
-        weight = tmp_path / "pretrained.pth"
-        weight.touch()
-        return str(weight)
-
     def test_init(self, cfg) -> None:
         model = LiteHRNetModule(**cfg)
         assert model is not None
@@ -112,27 +91,3 @@ class TestLiteHRNetModule:
         inputs = torch.randn((1, 3, 224, 224))
         outputs = backbone(inputs)
         assert outputs is not None
-
-    def test_load_pretrained_weights_from_url(
-        self,
-        mock_load_from_http,
-        mock_load_checkpoint_to_model,
-        backbone,
-    ) -> None:
-        pretrained_weight = "www.fake.com/fake.pth"
-        backbone.load_pretrained_weights(pretrained=pretrained_weight)
-        mock_load_from_http.assert_called_once()
-        mock_load_checkpoint_to_model.assert_called_once()
-
-    def test_load_pretrained_weights(
-        self,
-        cfg,
-        pretrained_weight,
-        mock_torch_load,
-        mock_load_checkpoint_to_model,
-    ):
-        model = LiteHRNetModule(**cfg)
-        model.load_pretrained_weights(pretrained=pretrained_weight)
-
-        mock_torch_load.assert_called_once_with(pretrained_weight, "cpu")
-        mock_load_checkpoint_to_model.assert_called_once()

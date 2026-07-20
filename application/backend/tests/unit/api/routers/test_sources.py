@@ -12,7 +12,6 @@ from fastapi import status
 
 from app.api.dependencies import get_source, get_source_update_service
 from app.api.schemas.source import USBCameraSourceConfigCreate, USBCameraSourceConfigView, VideoFileSourceConfigView
-from app.main import app
 from app.models import SourceType
 from app.models.source import Source, SourceTestResult, USBCameraConfig, VideoFileConfig
 from app.services import (
@@ -43,10 +42,10 @@ def fxt_usb_camera_source_view() -> USBCameraSourceConfigView:
 
 
 @pytest.fixture
-def fxt_get_source(fxt_usb_camera_source_view) -> Generator[Source]:
-    app.dependency_overrides[get_source] = lambda: fxt_usb_camera_source_view
+def fxt_get_source(fxt_app, fxt_usb_camera_source_view) -> Generator[Source]:
+    fxt_app.dependency_overrides[get_source] = lambda: fxt_usb_camera_source_view
     yield fxt_usb_camera_source_view
-    del app.dependency_overrides[get_source]
+    del fxt_app.dependency_overrides[get_source]
 
 
 @pytest.fixture
@@ -60,9 +59,9 @@ def fxt_video_source_view() -> VideoFileSourceConfigView:
 
 
 @pytest.fixture
-def fxt_source_update_service() -> MagicMock:
+def fxt_source_update_service(fxt_app) -> MagicMock:
     source_update_service = MagicMock(spec=SourceUpdateService)
-    app.dependency_overrides[get_source_update_service] = lambda: source_update_service
+    fxt_app.dependency_overrides[get_source_update_service] = lambda: source_update_service
     return source_update_service
 
 

@@ -25,7 +25,6 @@ from getitune.backend.lightning.models.instance_segmentation.heads import RTMDet
 from getitune.backend.lightning.models.instance_segmentation.losses import DiceLoss, RTMDetInstCriterion
 from getitune.backend.lightning.models.instance_segmentation.necks import CSPNeXtPAFPN
 from getitune.backend.lightning.models.modules.norm import build_norm_layer
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
 
@@ -35,6 +34,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -53,13 +53,13 @@ class RTMDetInst(LightningInstanceSegModel):
             Defaults to MaskRLEMeanAPFMeasureCallable.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
-        explain_mode (bool, optional): Whether to enable explainable AI mode. Defaults to False.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
-        "rtmdet_inst_tiny": (
-            "https://storage.geti.intel.com/weights/rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth"
-        ),
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "rtmdet_inst_tiny": "https://storage.geti.intel.com/weights/rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth"
     }
 
     def __init__(
@@ -72,6 +72,8 @@ class RTMDetInst(LightningInstanceSegModel):
         metric: MetricCallable = MaskRLEMeanAPFMeasureCallable,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -82,6 +84,8 @@ class RTMDetInst(LightningInstanceSegModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> RTMDetInst:
@@ -148,7 +152,6 @@ class RTMDetInst(LightningInstanceSegModel):
         )
 
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
 
         return model
 

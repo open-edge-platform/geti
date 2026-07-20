@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Literal
 
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
@@ -16,6 +17,7 @@ from getitune.backend.lightning.models.classification.losses.asymmetric_angular_
 )
 from getitune.backend.lightning.models.classification.multilabel_models.base import LightningMultilabelClsModel
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import PytorchcvWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiLabelClsMetricCallable
 from getitune.types.label import LabelInfoTypes
@@ -25,9 +27,13 @@ if TYPE_CHECKING:
     from torch import Tensor, nn
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
-class EfficientNetMultilabelCls(LightningMultilabelClsModel):
+logger = logging.getLogger(__name__)
+
+
+class EfficientNetMultilabelCls(PytorchcvWeightsLoader, LightningMultilabelClsModel):
     """EfficientNet Model for multi-label classification task."""
 
     def __init__(
@@ -50,6 +56,8 @@ class EfficientNetMultilabelCls(LightningMultilabelClsModel):
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiLabelClsMetricCallable,
         torch_compile: bool = False,
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -60,6 +68,8 @@ class EfficientNetMultilabelCls(LightningMultilabelClsModel):
             scheduler=scheduler,
             metric=metric,
             torch_compile=torch_compile,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:

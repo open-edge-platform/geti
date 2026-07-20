@@ -92,7 +92,7 @@ class LightningEngine(Engine):
 
     def __init__(
         self,
-        model: LightningModel | PathLike | str,
+        model: LightningModel | PathLike,
         data: DataModule | PathLike,
         work_dir: PathLike = "./getitune-workspace",
         checkpoint: PathLike | None = None,
@@ -1255,7 +1255,7 @@ class LightningEngine(Engine):
                 ckpt = torch.load(checkpoint, map_location=map_location, weights_only=False)
         except Exception as e:
             msg = f"Failed to load checkpoint from {checkpoint}. Please check the file."
-            raise RuntimeError(e) from None
+            raise RuntimeError(msg) from e
 
         if "hyper_parameters" in ckpt and "label_info" in ckpt.get("hyper_parameters", {}):
             self._model.load_state_dict_incrementally(ckpt)

@@ -22,7 +22,6 @@ from getitune.backend.lightning.models.detection.heads import ATSSHead
 from getitune.backend.lightning.models.detection.losses import ATSSCriterion
 from getitune.backend.lightning.models.detection.necks import FPN
 from getitune.backend.lightning.models.detection.utils.assigners import ATSSAssigner
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 
@@ -32,6 +31,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -39,7 +39,7 @@ class ATSS(LightningDetectionModel):
     """getitune Detection model class for ATSS.
 
     Attributes:
-        pretrained_weights (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
+        pretrained_urls (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
 
     Args:
         label_info (LabelInfoTypes): Information about the labels.
@@ -52,9 +52,12 @@ class ATSS(LightningDetectionModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to MeanAveragePrecisionFMeasureCallable.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "atss_mobilenetv2": "https://storage.geti.intel.com/weights/mobilenet_v2-atss.pth",
         "atss_resnext101": "https://storage.geti.intel.com/weights/resnext101_atss_070623.pth",
     }
@@ -72,9 +75,11 @@ class ATSS(LightningDetectionModel):
         metric: MetricCallable = MeanAveragePrecisionFMeasureCallable,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
-        if model_name not in self._pretrained_weights:
-            msg = f"Unsupported model: {model_name}. Supported models: {list(self._pretrained_weights.keys())}"
+        if pretrained and model_name not in self.pretrained_urls:
+            msg = f"Unsupported model: {model_name}. Supported models: {list(self.pretrained_urls.keys())}"
             raise ValueError(msg)
 
         super().__init__(
@@ -86,6 +91,8 @@ class ATSS(LightningDetectionModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> SingleStageDetector:
@@ -147,7 +154,6 @@ class ATSS(LightningDetectionModel):
             test_cfg=test_cfg,  # TODO (Kirill): remove
         )
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
 
         return model
 
@@ -161,7 +167,6 @@ class ATSS(LightningDetectionModel):
                     "out_indices": [2, 3, 4, 5],
                     "frozen_stages": -1,
                     "norm_eval": False,
-                    "pretrained": True,
                 },
             )
 
@@ -172,7 +177,6 @@ class ATSS(LightningDetectionModel):
                 depth=101,
                 groups=64,
                 frozen_stages=1,
-                init_cfg={"type": "Pretrained", "checkpoint": "open-mmlab://resnext101_64x4d"},
             )
 
         msg = f"Unknown backbone name: {model_name}"

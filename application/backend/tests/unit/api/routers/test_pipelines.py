@@ -16,7 +16,6 @@ from app.api.dependencies import (
     get_source_status_service,
 )
 from app.api.schemas import PipelineView
-from app.main import app
 from app.models import DataCollectionConfig, FixedRateDataCollectionPolicy, PipelineStatus
 from app.models.inference import InferenceWorkerStatus, InferenceWorkerStatusCode
 from app.models.metrics import InferenceMetrics, LatencyMetrics, PipelineMetrics, ThroughputMetrics, TimeWindow
@@ -44,44 +43,44 @@ def fxt_pipeline() -> PipelineView:
 
 
 @pytest.fixture
-def fxt_pipeline_service() -> MagicMock:
+def fxt_pipeline_service(fxt_app) -> MagicMock:
     pipeline_service = MagicMock(spec=PipelineService)
-    app.dependency_overrides[get_pipeline_service] = lambda: pipeline_service
+    fxt_app.dependency_overrides[get_pipeline_service] = lambda: pipeline_service
     return pipeline_service
 
 
 @pytest.fixture
-def fxt_pipeline_metrics_service() -> MagicMock:
+def fxt_pipeline_metrics_service(fxt_app) -> MagicMock:
     pipeline_metrics_service = MagicMock(spec=PipelineMetricsService)
-    app.dependency_overrides[get_pipeline_metrics_service] = lambda: pipeline_metrics_service
+    fxt_app.dependency_overrides[get_pipeline_metrics_service] = lambda: pipeline_metrics_service
     return pipeline_metrics_service
 
 
 @pytest.fixture
-def fxt_source_status_service() -> MagicMock:
+def fxt_source_status_service(fxt_app) -> MagicMock:
     source_status_service = MagicMock(spec=SourceStatusService)
-    app.dependency_overrides[get_source_status_service] = lambda: source_status_service
+    fxt_app.dependency_overrides[get_source_status_service] = lambda: source_status_service
     return source_status_service
 
 
 @pytest.fixture
-def fxt_sink_status_service() -> MagicMock:
+def fxt_sink_status_service(fxt_app) -> MagicMock:
     sink_status_service = MagicMock(spec=SinkStatusService)
-    app.dependency_overrides[get_sink_status_service] = lambda: sink_status_service
+    fxt_app.dependency_overrides[get_sink_status_service] = lambda: sink_status_service
     return sink_status_service
 
 
 @pytest.fixture
-def fxt_inference_status_service() -> MagicMock:
+def fxt_inference_status_service(fxt_app) -> MagicMock:
     inference_status_service = MagicMock(spec=InferenceStatusService)
-    app.dependency_overrides[get_inference_status_service] = lambda: inference_status_service
+    fxt_app.dependency_overrides[get_inference_status_service] = lambda: inference_status_service
     return inference_status_service
 
 
 @pytest.fixture(autouse=True)
-def fxt_clear_overrides():
+def fxt_clear_overrides(fxt_app):
     yield
-    app.dependency_overrides.clear()
+    fxt_app.dependency_overrides.clear()
 
 
 class TestPipelineEndpoints:
