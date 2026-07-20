@@ -88,10 +88,7 @@ class Detections:
         return self._index(keep)
 
     def split_by_score(self, threshold: float) -> tuple[Detections, Detections]:
-        """Return ``(high, low)`` partitions split at ``threshold``.
-
-        Used by ByteTrack's two-stage association.
-        """
+        """Return ``(high, low)`` partitions split at ``threshold`` (``high`` is ``>=``)."""
         high = self.scores >= threshold
         return self._index(high), self._index(~high)
 
