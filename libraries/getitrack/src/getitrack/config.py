@@ -68,8 +68,9 @@ class MotionConfig(_StrictModel):
     measurement_noise: Annotated[float, Field(gt=0.0)] = 1.0
     """Multiplier on the measurement-noise covariance (R). Larger values weight the motion prior over observations."""
 
-    velocity_decay: Annotated[float, Field(gt=0.0, le=1.0)] = 0.99
-    """Per-frame velocity damping in ``(0, 1]``. Values below 1.0 simulate gradual deceleration."""
+    velocity_decay: Annotated[float, Field(gt=0.0, le=1.0)] = 1.0
+    """Per-frame velocity damping in ``(0, 1]``. The default 1.0 matches the
+    reference (no damping); values below 1.0 simulate gradual deceleration."""
 
 
 class InterpolationConfig(_StrictModel):
@@ -111,7 +112,7 @@ class TrackerConfig(_StrictModel):
     match tracks."""
 
     score_threshold: Annotated[float, Field(ge=0.0, le=1.0)] = 0.1
-    """Minimum detection confidence the tracking algorithm considers; lower-scoring detections are excluded."""
+    """Low-score floor for tracking; detections scoring at or below this are excluded."""
 
     lifecycle: LifecycleConfig = Field(default_factory=LifecycleConfig)
     """Track creation, confirmation, and removal parameters."""
