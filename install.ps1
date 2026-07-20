@@ -3,14 +3,16 @@
 
 <#
 .SYNOPSIS
-    Install Intel Geti application and its dependencies on Windows.
+    Install OR upgrade the Intel Geti application and its dependencies on Windows.
 
 .DESCRIPTION
     This script installs the Intel Geti application, including uv (Python package manager),
     Node.js/npm, and builds both the backend and frontend.
 
-.PARAMETER Verbose
-    Show detailed output from all commands.
+    Re-running the script on an existing installation upgrades it in place: the source is
+    updated to the target version and the backend migrates your data on startup. Existing
+    application data is backed up first and, if anything fails, the previous version and
+    data are automatically restored so the app stays usable.
 
 .PARAMETER Yes
     Assume yes to all prompts (non-interactive mode).
@@ -18,10 +20,27 @@
 .PARAMETER WorkDir
     Set the working directory (default: .\geti).
 
+.PARAMETER Upgrade
+    Force upgrade mode even if no existing data is detected.
+
+.PARAMETER NoDataBackup
+    Skip the pre-upgrade data backup (NOT recommended; relies solely on the backend's
+    own database rollback).
+
+.PARAMETER KeepBackup
+    Keep the pre-upgrade data backup after a successful upgrade.
+
+.PARAMETER BackupDir
+    Directory for pre-upgrade data backups (default: <WorkDir>\.geti-upgrade-backups).
+
+.PARAMETER HealthTimeout
+    Seconds to wait for the upgraded app to become healthy before rolling back (default: 300).
+
 .EXAMPLE
     .\install.ps1
     .\install.ps1 -Verbose -Yes
     .\install.ps1 -WorkDir "C:\my\custom\path"
+    .\install.ps1 -Upgrade
 #>
 
 [CmdletBinding()]
@@ -30,7 +49,18 @@ param(
     [switch]$Yes,
 
     [Alias("w")]
-    [string]$WorkDir = "$(Get-Location)\geti"
+    [string]$WorkDir = "$(Get-Location)\geti",
+
+    [Alias("u")]
+    [switch]$Upgrade,
+
+    [switch]$NoDataBackup,
+
+    [switch]$KeepBackup,
+
+    [string]$BackupDir = "",
+
+    [int]$HealthTimeout = 300
 )
 
 $ErrorActionPreference = "Stop"
@@ -38,10 +68,28 @@ $ErrorActionPreference = "Stop"
 $GIT_URL = "https://github.com/open-edge-platform/geti.git"
 $GIT_BRANCH = "nightly-2026.06.19"
 
+# Exit code the backend uses for a fatal, non-restartable migration failure
+# (see application/backend/app/lifecycle.py:MIGRATION_FATAL_EXIT_CODE). It lets
+# the upgrade path distinguish "the data could not be migrated" from an ordinary
+# crash so it can trigger a rollback.
+$MIGRATION_FATAL_EXIT_CODE = 3
+
 $BUILD_TOOLS_DIR = Join-Path $WorkDir ".build"
 $UV_DIR = Join-Path $BUILD_TOOLS_DIR "uv"
 $NVM_DIR = Join-Path $BUILD_TOOLS_DIR "nvm"
 $LOG_FILE = Join-Path $BUILD_TOOLS_DIR ".install.log"
+
+# Upgrade-related derived paths.
+$DATA_PATH = Join-Path $WorkDir "application\backend\data"
+if ([string]::IsNullOrEmpty($BackupDir)) {
+    $BackupDir = Join-Path $WorkDir ".geti-upgrade-backups"
+}
+# Use [DateTime]::UtcNow rather than 'Get-Date -AsUTC' for Windows PowerShell 5.1 compatibility.
+$script:Timestamp = ([DateTime]::UtcNow).ToString("yyyyMMddHHmmss")
+$script:DataBackupPath = Join-Path $BackupDir "geti-data-$($script:Timestamp)"
+# Populated during an upgrade so the rollback path knows what to restore.
+$script:PreviousSha = ""
+$script:DataBackedUp = $false
 
 $script:NPM_BIN = ""
 
@@ -53,6 +101,18 @@ function Write-Step {
 function Write-ErrorMessage {
     param([string]$Message)
     Write-Host "ERROR: $Message" -ForegroundColor Red
+}
+
+# Echo a timestamped message to the console and append it to the log file. Used
+# by the upgrade path so the sequence of upgrade/rollback actions is captured
+# for troubleshooting.
+function Write-Log {
+    param([string]$Message)
+    $line = "{0} {1}" -f ([DateTime]::UtcNow).ToString("HH:mm:ss"), $Message
+    Write-Host $line
+    if ($LOG_FILE -and (Test-Path (Split-Path $LOG_FILE -Parent))) {
+        Add-Content -Path $LOG_FILE -Value $line -ErrorAction SilentlyContinue
+    }
 }
 
 function Confirm-Prompt {
@@ -618,6 +678,253 @@ $endMarker
     Write-Host "Batch file also available at: $cmdPath"
 }
 
+# ─── Upgrade support ─────────────────────────────────────────────────────────
+
+function Invoke-BuildAndDeploy {
+    Install-BuildTools
+    Find-Hardware
+    Build-Backend
+    Build-Frontend
+    Deploy-Frontend
+}
+
+# Decide whether this run is a fresh install or an in-place upgrade. An upgrade
+# is any run against an existing source checkout that already holds application
+# data (or when the user forces it with -Upgrade). A checkout with no data is
+# still treated as a fresh install so first-time builds are never gated behind
+# the (heavier) upgrade path.
+function Test-UpgradeMode {
+    if (-not (Test-Path (Join-Path $WorkDir ".git"))) { return $false }
+    if ($Upgrade) { return $true }
+    if ((Test-Path $DATA_PATH) -and (Get-ChildItem -Path $DATA_PATH -Force -ErrorAction SilentlyContinue)) {
+        return $true
+    }
+    return $false
+}
+
+# Record everything needed to restore the current version: the git revision and
+# a full snapshot of the application data directory.
+function Save-RollbackPoint {
+    $prevEAP = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        $script:PreviousSha = (& git -C $WorkDir rev-parse HEAD 2>$null | Select-Object -First 1)
+    } finally {
+        $ErrorActionPreference = $prevEAP
+    }
+    if ($script:PreviousSha) {
+        Write-Log "Recorded current source version: $($script:PreviousSha)"
+    } else {
+        Write-Log "WARNING: could not determine current git revision; source rollback disabled."
+    }
+
+    if ($NoDataBackup) {
+        Write-Log "WARNING: -NoDataBackup set; skipping pre-upgrade data backup."
+        return
+    }
+    if (-not (Test-Path $DATA_PATH) -or -not (Get-ChildItem -Path $DATA_PATH -Force -ErrorAction SilentlyContinue)) {
+        Write-Log "No existing application data found; nothing to back up."
+        return
+    }
+
+    New-Item -ItemType Directory -Path $BackupDir -Force | Out-Null
+    Write-Log "Backing up application data -> $($script:DataBackupPath) ..."
+    Write-Log "(This may take a while and disk space proportional to your data size.)"
+    Copy-Item -Path $DATA_PATH -Destination $script:DataBackupPath -Recurse -Force
+    $script:DataBackedUp = $true
+    Write-Log "OK Data backup created."
+}
+
+# The backend serves /health over HTTPS with a self-signed cert, so certificate
+# validation must be bypassed. Prefer curl.exe (ships with Windows 10 1803+);
+# fall back to Invoke-WebRequest with a cert-check bypass.
+function Test-AppHealth {
+    param([string]$Port)
+    $url = "https://localhost:${Port}/health"
+
+    if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
+        & curl.exe -ksSf --max-time 5 $url *> $null
+        return ($LASTEXITCODE -eq 0)
+    }
+
+    try {
+        if ($PSVersionTable.PSVersion.Major -ge 6) {
+            $null = Invoke-WebRequest -Uri $url -TimeoutSec 5 -SkipCertificateCheck -UseBasicParsing
+        } else {
+            $prevCallback = [System.Net.ServicePointManager]::ServerCertificateValidationCallback
+            [System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
+            try {
+                $null = Invoke-WebRequest -Uri $url -TimeoutSec 5 -UseBasicParsing
+            } finally {
+                [System.Net.ServicePointManager]::ServerCertificateValidationCallback = $prevCallback
+            }
+        }
+        return $true
+    } catch {
+        return $false
+    }
+}
+
+# Start the freshly built backend and wait until it reports healthy, so a failed
+# data migration is caught before the upgrade is considered successful. The
+# verification instance is stopped once healthy; the app is (re)started normally
+# by Start-App afterwards.
+function Invoke-VerifyAppStart {
+    $port = if ($env:PORT) { $env:PORT } else { "7860" }
+    Write-Log "Verifying the upgraded application starts and migrates data (up to ${HealthTimeout}s)..."
+
+    $uvExe = Join-Path $UV_DIR "uv.exe"
+    $backendDir = Join-Path $WorkDir "application\backend"
+    $stdoutTmp = [System.IO.Path]::GetTempFileName()
+    $stderrTmp = [System.IO.Path]::GetTempFileName()
+
+    # uv spawns a child python process; kill the whole tree so nothing keeps
+    # holding the port before Start-App rebinds it.
+    $stopTree = {
+        param($p)
+        if (-not $p) { return }
+        try { & taskkill.exe /PID $p.Id /T /F *> $null } catch {}
+        try { if (-not $p.HasExited) { $p.Kill() } } catch {}
+        try { $p.WaitForExit(10000) | Out-Null } catch {}
+    }
+
+    $env:STATIC_FILES_DIR = "html"
+    try {
+        $proc = Start-Process -FilePath $uvExe -ArgumentList @("run", "app/main.py") `
+            -WorkingDirectory $backendDir -NoNewWindow -PassThru `
+            -RedirectStandardOutput $stdoutTmp -RedirectStandardError $stderrTmp
+        # Cache the handle so .ExitCode is reliably populated after exit.
+        $null = $proc.Handle
+
+        $deadline = (Get-Date).AddSeconds($HealthTimeout)
+        while ((Get-Date) -lt $deadline) {
+            if ($proc.HasExited) {
+                $code = $proc.ExitCode
+                if ($code -eq $MIGRATION_FATAL_EXIT_CODE) {
+                    Write-Log "FAIL Backend exited with fatal migration code ${code}: data could not be migrated."
+                } else {
+                    Write-Log "FAIL Backend exited unexpectedly (exit code ${code}) during verification."
+                }
+                return $false
+            }
+            if (Test-AppHealth -Port $port) {
+                Write-Log "OK Upgraded version is healthy."
+                & $stopTree $proc
+                return $true
+            }
+            Start-Sleep -Seconds 3
+        }
+
+        Write-Log "FAIL Timed out waiting for the upgraded app to become healthy."
+        & $stopTree $proc
+        return $false
+    } finally {
+        Get-Content -LiteralPath $stdoutTmp -ErrorAction SilentlyContinue | Add-Content -LiteralPath $LOG_FILE
+        Get-Content -LiteralPath $stderrTmp -ErrorAction SilentlyContinue | Add-Content -LiteralPath $LOG_FILE
+        Remove-Item -LiteralPath $stdoutTmp, $stderrTmp -ErrorAction SilentlyContinue
+    }
+}
+
+# Restore the previous version (source + data) and rebuild it so the app remains
+# usable after a failed upgrade.
+function Invoke-UpgradeRollback {
+    $ErrorActionPreference = "Continue"
+    Write-Host ""
+    Write-Log "----------------------------------------------"
+    Write-Log "Upgrade failed. Rolling back to the previous version..."
+
+    if ($script:DataBackedUp -and (Test-Path $script:DataBackupPath)) {
+        Write-Log "Restoring application data from backup..."
+        try {
+            if (Test-Path $DATA_PATH) { Remove-Item -Path $DATA_PATH -Recurse -Force }
+            Copy-Item -Path $script:DataBackupPath -Destination $DATA_PATH -Recurse -Force
+            Write-Log "OK Data restored to its pre-upgrade state."
+        } catch {
+            Write-Log "FAIL Could not restore data. Your backup is preserved at $($script:DataBackupPath)."
+        }
+    }
+
+    if ($script:PreviousSha) {
+        Write-Log "Restoring previous source version ($($script:PreviousSha))..."
+        & git -c advice.detachedHead=false -C $WorkDir checkout --force $script:PreviousSha 2>&1 | Out-Null
+        Write-Log "Rebuilding the previous version so the app stays usable..."
+        try {
+            Invoke-BuildAndDeploy
+            Write-Log "OK Previous version restored and rebuilt."
+        } catch {
+            Write-Log "FAIL Failed to rebuild the previous version. See $LOG_FILE."
+        }
+    } else {
+        Write-Log "No recorded source revision to restore."
+    }
+
+    Write-Log "Upgrade rolled back. See $LOG_FILE for details."
+    if ($script:DataBackedUp -and (Test-Path $script:DataBackupPath)) {
+        Write-Log "Your pre-upgrade data backup is preserved at $($script:DataBackupPath)."
+    }
+}
+
+# Drop (or keep) the pre-upgrade data backup after a successful upgrade.
+function Complete-UpgradeBackup {
+    if (-not ($script:DataBackedUp -and (Test-Path $script:DataBackupPath))) { return }
+    if ($KeepBackup) {
+        Write-Log "Pre-upgrade data backup kept at $($script:DataBackupPath)."
+    } else {
+        Remove-Item -Path $script:DataBackupPath -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Log "Removed pre-upgrade data backup (pass -KeepBackup to retain it)."
+    }
+}
+
+function Initialize-Logging {
+    if (-not (Test-Path $BUILD_TOOLS_DIR)) {
+        New-Item -ItemType Directory -Path $BUILD_TOOLS_DIR -Force | Out-Null
+    }
+    "" | Set-Content -Path $LOG_FILE
+}
+
+function Invoke-Install {
+    Invoke-EnsureSourceCode
+    Initialize-Logging
+
+    Invoke-BuildAndDeploy
+    Register-ShellCommand
+    Start-App
+}
+
+function Invoke-Upgrade {
+    # The checkout already exists, so logging can be initialized up front.
+    Initialize-Logging
+
+    Write-Host ""
+    Write-Host "Existing Intel Geti installation detected at $WorkDir - running in UPGRADE mode." -ForegroundColor Cyan
+    if (-not (Confirm-Prompt "Upgrade this installation to $GIT_BRANCH?")) {
+        Write-Host "Upgrade cancelled."
+        return
+    }
+
+    # Snapshot the current state before anything changes.
+    Save-RollbackPoint
+
+    try {
+        Invoke-EnsureSourceCode
+        Invoke-BuildAndDeploy
+
+        if (Invoke-VerifyAppStart) {
+            Complete-UpgradeBackup
+            Register-ShellCommand
+            Write-Log "OK Upgrade to $GIT_BRANCH completed successfully."
+            Start-App
+        } else {
+            Invoke-UpgradeRollback
+            exit 1
+        }
+    } catch {
+        Write-Log "FAIL Upgrade error: $_"
+        Invoke-UpgradeRollback
+        exit 1
+    }
+}
+
 # ─── Main ────────────────────────────────────────────────────────────────────
 
 function Main {
@@ -627,21 +934,12 @@ function Main {
     Write-Host ""
 
     Test-PreflightChecks
-    Invoke-EnsureSourceCode
 
-    # Initialize log file and build tools directory
-    if (-not (Test-Path $BUILD_TOOLS_DIR)) {
-        New-Item -ItemType Directory -Path $BUILD_TOOLS_DIR -Force | Out-Null
+    if (Test-UpgradeMode) {
+        Invoke-Upgrade
+    } else {
+        Invoke-Install
     }
-    "" | Set-Content -Path $LOG_FILE
-
-    Install-BuildTools
-    Find-Hardware
-    Build-Backend
-    Build-Frontend
-    Deploy-Frontend
-    Register-ShellCommand
-    Start-App
 }
 
 function Start-App {
