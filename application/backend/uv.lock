@@ -1074,7 +1074,7 @@ requires-dist = [
     { name = "onnxruntime", specifier = "==1.26.0" },
     { name = "onnxscript", specifier = "==0.6.2" },
     { name = "onnxslim", specifier = "~=0.1.71" },
-    { name = "openvino", specifier = "~=2026.2.0" },
+    { name = "openvino", specifier = "==2026.3.0rc2", index = "https://storage.openvinotoolkit.org/simple/wheels/nightly" },
     { name = "openvino-model-api", specifier = "~=0.4.5" },
     { name = "pydata-sphinx-theme", marker = "extra == 'docs'", specifier = "==0.12.0" },
     { name = "pytorchcv", specifier = "==0.0.74" },
@@ -2398,17 +2398,17 @@ wheels = [
 
 [[package]]
 name = "openvino"
-version = "2026.2.1"
-source = { registry = "https://pypi.org/simple" }
+version = "2026.3.0rc2"
+source = { registry = "https://storage.openvinotoolkit.org/simple/wheels/nightly" }
 dependencies = [
     { name = "numpy", marker = "(extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-cuda') or (extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cpu' and extra == 'extra-8-getitune-cpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-4-geti-xpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu')" },
     { name = "openvino-telemetry", marker = "(extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-cuda') or (extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cpu' and extra == 'extra-8-getitune-cpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-4-geti-xpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu')" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/64/b5/5788f1ce7906f33f003de3bb55c2477d9911c19f72d7ed3f7b719538d4a3/openvino-2026.2.1-21919-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:3ddd393566ab5cdcf106028e532f0f3789d7796fac848284c4d2ef31e3b81ef8", size = 31170279, upload-time = "2026-06-17T09:21:15.214Z" },
-    { url = "https://files.pythonhosted.org/packages/ba/41/7045a639e3879b0c858533f64c93e9c998f292b810dfaff58c23540c738a/openvino-2026.2.1-21919-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:00483723163c8d4d6f436ad0e4d05247494de4d280e4b065f67c537b440f4b56", size = 58367437, upload-time = "2026-06-17T09:21:20.215Z" },
-    { url = "https://files.pythonhosted.org/packages/ba/91/3f402a78755c1c848128126f145fc32a6d091c2257c543522d9ca979456a/openvino-2026.2.1-21919-cp313-cp313-manylinux_2_35_aarch64.whl", hash = "sha256:f9619c51027b6b0514e82ade09794b109a45553e8afcb073eedb1c8c1ffd43c4", size = 28344673, upload-time = "2026-06-17T09:21:23.873Z" },
-    { url = "https://files.pythonhosted.org/packages/ee/e5/13b9bfc20c02706d015e96e5b3e932227d658b3826b4aa5007cdc2455ed4/openvino-2026.2.1-21919-cp313-cp313-win_amd64.whl", hash = "sha256:197435104d18657a7cc4d05850615b913618ebb0d3baaec052fda25a2d831c74", size = 76171396, upload-time = "2026-06-17T09:21:29.03Z" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.3.0rc2-22446-cp313-cp313-macosx_11_0_arm64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.3.0rc2-22446-cp313-cp313-manylinux_2_28_x86_64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.3.0rc2-22446-cp313-cp313-manylinux_2_35_aarch64.whl" },
+    { url = "https://storage.openvinotoolkit.org/wheels/nightly/openvino/openvino-2026.3.0rc2-22446-cp313-cp313-win_amd64.whl" },
 ]
 
 [[package]]
