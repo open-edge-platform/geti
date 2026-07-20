@@ -109,12 +109,12 @@ class GetiTuneQuantizer(Execution[QuantizationJobParams]):
         params: QuantizationJobParams,
         model: ModelRevision,
     ) -> DataModule:
+        """Load and prepare the calibration dataset from the training dataset revision."""
         from getitune.config.data import SamplerConfig, SubsetConfig
         from getitune.data.entity.utils import detect_storage_dtype
         from getitune.data.factory import TransformLibFactory
         from getitune.data.module import DataModule
 
-        """Load and prepare the calibration dataset from the training dataset revision."""
         # Get the dataset revision used for training
         dataset_revision_id = model.training_info.dataset_revision_id if model.training_info else None
         if dataset_revision_id is None:
