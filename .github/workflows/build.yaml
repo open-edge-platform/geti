@@ -12,6 +12,10 @@ on:
         description: "Enable Docker build cache (set to false for cache-free verification builds)"
         type: boolean
         default: true
+      exclude-agpl-models:
+        description: "Exclude Ultralytics and other AGPL-licensed models from the image"
+        type: boolean
+        default: false
   workflow_dispatch:
 
 permissions: {} # No permissions by default on workflow level
@@ -72,7 +76,6 @@ jobs:
 
       - *checkout
 
-
       - name: Read application version
         id: version
         run: |
@@ -80,7 +83,7 @@ jobs:
           echo "short_sha=${GITHUB_SHA::8}" >> "$GITHUB_OUTPUT"
 
       - name: Login to GHCR
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -88,7 +91,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ghcr.io/open-edge-platform/geti-${{ matrix.device }}
           tags: |
@@ -108,10 +111,11 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name != 'pull_request' }}
-          use-cache: ${{ github.event_name != 'workflow_call' || inputs.use-cache }}
+          use-cache: ${{ github.event_name != 'workflow_call' || inputs.use-cache == true }}
           # Fork PRs cannot write packages to the upstream org, so disable
           # cache export to avoid 403 errors from GHCR.
           cache-write: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request' }}
+          exclude-agpl-models: ${{ github.event_name == 'workflow_call' && inputs.exclude-agpl-models }}
 
       - name: Resolve primary image tag for signing
         if: github.event_name != 'pull_request'

@@ -376,7 +376,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             )
 
     @step("Train Model", 80)
-    def train_model(  # noqa: PLR0915 - training orchestration is intentionally centralized here
+    def train_model(  # noqa: PLR0915, C901 - training orchestration is intentionally centralized here
         self,
         training_config: dict,
         dataset_info: DatasetInfo,
@@ -394,7 +394,6 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         parameter.
         """
         from getitune.backend.lightning.models.base import DataInputParams, LightningModel
-        from getitune.backend.ultralytics.models.base import UltralyticsModel
         from getitune.data.module import DataModule
         from getitune.engine import create_engine
         from getitune.types.device import DeviceType as GetiTuneDeviceType
@@ -443,7 +442,13 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             model_cfg["init_args"]["pretrained_weights"] = weights_path
 
         model_parser = ArgumentParser()
-        model_type = UltralyticsModel if is_ultralytics else LightningModel
+        if is_ultralytics:
+            # Lazy import because the Ultralytics backend is optional and may not be installed in all environments.
+            from getitune.backend.ultralytics.models.base import UltralyticsModel
+
+            model_type = UltralyticsModel
+        else:
+            model_type = LightningModel
         model_parser.add_argument("--model", type=model_type)
         getitune_model = model_parser.instantiate_classes(Namespace(model=model_cfg)).get("model")
 

@@ -104,7 +104,7 @@ INTRO_MARKDOWN = (
     "# getitune CLI Guide\n\n"
     "Github Repository: [https://github.com/open-edge-platform/training_extensions](https://github.com/open-edge-platform/training_extensions)."
     "\n\n"
-    "A better guide is provided by the [documentation](https://open-edge-platform.github.io/training_extensions/stable/)."
+    "A better guide is provided by the [documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/intro)."
 )
 
 VERBOSE_USAGE = (
