@@ -4,6 +4,7 @@
 mod backend;
 
 use std::process::Child;
+use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
@@ -43,6 +44,49 @@ const MIGRATION_FATAL_EXIT_CODE: i32 = 3;
 /// schema in sync with `application/backend/app/lifecycle.py:FATAL_STATUS_FILENAME`.
 const FATAL_STATUS_FILENAME: &str = "fatal_status.json";
 
+/// Per-user directory the **Windows** backend actually uses for both data and
+/// logs.
+///
+/// The frozen Windows backend's PyInstaller runtime hook
+/// (`application/backend/pyinstaller/windows/uwp.py`) unconditionally overrides
+/// `DATA_DIR` *and* `LOG_DIR` to `%LOCALAPPDATA%\Intel\Geti`, ignoring whatever
+/// the shell passed on the command line. If the shell resolved these paths from
+/// Tauri's bundle identifier (`com.intel.geti`) instead, its dialogs would point
+/// users at the wrong folder and `read_and_clear_fatal_status` would look for the
+/// backend's status file in the wrong place. Keep this in sync with `uwp.py`.
+#[cfg(windows)]
+fn backend_app_data_dir() -> Option<PathBuf> {
+    std::env::var_os("LOCALAPPDATA").map(|p| PathBuf::from(p).join("Intel").join("Geti"))
+}
+
+/// Resolve the directory the backend uses for persistent data, matching the
+/// backend's own precedence: an explicit `DATA_DIR` override wins, then (on
+/// Windows) the hard-coded `%LOCALAPPDATA%\Intel\Geti` from `uwp.py`, and finally
+/// Tauri's identifier-derived `app_local_data_dir()`.
+fn resolve_data_dir(app: &AppHandle) -> Option<PathBuf> {
+    if let Some(dir) = std::env::var_os("DATA_DIR") {
+        return Some(PathBuf::from(dir));
+    }
+    #[cfg(windows)]
+    if let Some(dir) = backend_app_data_dir() {
+        return Some(dir);
+    }
+    app.path().app_local_data_dir().ok()
+}
+
+/// Resolve the directory the backend writes logs to, mirroring [`resolve_data_dir`]
+/// (on Windows `uwp.py` points `LOG_DIR` at the same `Intel\Geti` folder).
+fn resolve_log_dir(app: &AppHandle) -> Option<PathBuf> {
+    if let Some(dir) = std::env::var_os("LOG_DIR") {
+        return Some(PathBuf::from(dir));
+    }
+    #[cfg(windows)]
+    if let Some(dir) = backend_app_data_dir() {
+        return Some(dir);
+    }
+    app.path().app_log_dir().ok()
+}
+
 /// Structured description of a fatal backend startup failure, deserialized from
 /// [`FATAL_STATUS_FILENAME`]. Unknown fields are ignored so the backend can
 /// extend the schema without breaking older shells.
@@ -59,13 +103,14 @@ struct FatalStatus {
     database_path: Option<String>,
 }
 
-/// Read and remove the backend's fatal-status file from `app_local_data_dir()`.
+/// Read and remove the backend's fatal-status file from the resolved data
+/// directory (see [`resolve_data_dir`]).
 ///
 /// Returns `None` if the file is absent or unreadable. The file is always
 /// deleted after a successful read so a stale status can't resurface on the next
 /// launch; the backend also clears it on a healthy start as a second safeguard.
 fn read_and_clear_fatal_status(app: &AppHandle) -> Option<FatalStatus> {
-    let path = app.path().app_local_data_dir().ok()?.join(FATAL_STATUS_FILENAME);
+    let path = resolve_data_dir(app)?.join(FATAL_STATUS_FILENAME);
     let contents = std::fs::read_to_string(&path).ok()?;
 
     let status = serde_json::from_str::<FatalStatus>(&contents)
@@ -132,9 +177,7 @@ fn shutdown_backend(control: &BackendControl) {
 /// Resolve the per-user log directory as a display string for user-facing
 /// messages, falling back to a generic phrase if it can't be resolved.
 fn log_dir_hint(app: &AppHandle) -> String {
-    app.path()
-        .app_log_dir()
-        .ok()
+    resolve_log_dir(app)
         .map(|p| p.display().to_string())
         .unwrap_or_else(|| "the application log directory".to_string())
 }
@@ -146,32 +189,38 @@ fn log_dir_hint(app: &AppHandle) -> String {
 fn show_migration_failure_dialog(app: &AppHandle, status: Option<&FatalStatus>) {
     let log_dir = log_dir_hint(app);
 
-    // Build the "how to recover your data" paragraph from whatever the backend
-    // told us. The backend restores the backup automatically on its side, but we
-    // still surface the exact file so a user can recover manually if that failed.
-    let recovery = match status.and_then(|s| s.backup_path.as_deref()) {
-        Some(backup_path) => {
-            let db_target = status
-                .and_then(|s| s.database_path.as_deref())
-                .map(|db| format!("'{db}' (the original database file)"))
-                .unwrap_or_else(|| "the original database file".to_string());
-            format!(
-                "To recover, restore the pre-migration database backup: rename the backup file \
+    // Assemble the body from independent paragraphs and join them with a single
+    // blank line. Building it this way (instead of interpolating optional
+    // fragments into one big format string) guarantees no stray empty line is
+    // left behind when the recovery paragraph is absent.
+    let mut paragraphs: Vec<String> = vec![
+        "Geti tried to upgrade your data to this newer version, but the upgrade did not \
+succeed."
+            .to_string(),
+        "The newer version of Geti cannot run with your existing data and will now close."
+            .to_string(),
+    ];
+
+    if let Some(backup_path) = status.and_then(|s| s.backup_path.as_deref()) {
+        let db_target = status
+            .and_then(|s| s.database_path.as_deref())
+            .map(|db| format!("'{db}' (the original database file)"))
+            .unwrap_or_else(|| "the original database file".to_string());
+        paragraphs.push(format!(
+            "To recover, restore the pre-migration database backup: rename the backup file \
 '{backup_path}' back to {db_target}, overwriting the partially migrated database. After \
 restoring the backup, downgrade the application to the previous version."
-            )
-        }
-        None => String::new(),
-    };
+        ));
+    }
 
-    let message = format!(
-        "Geti tried to upgrade your data to this newer version, but the upgrade did not \
-succeed.\n\n\
-The newer version of Geti cannot run with your existing data and will now close.\n\n\
-{recovery}\n\n\
-Logs are available at:\n  {log_dir}\n\n\
-If the problem persists, you can report it on our issue tracker and attach the log files."
+    paragraphs.push(format!("Logs are available at:\n  {log_dir}"));
+    paragraphs.push(
+        "If the problem persists, you can report it on our issue tracker and attach the log \
+files."
+            .to_string(),
     );
+
+    let message = paragraphs.join("\n\n");
 
     let report = app
         .dialog()
