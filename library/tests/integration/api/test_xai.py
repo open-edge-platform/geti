@@ -132,13 +132,14 @@ def test_predict_with_explain(
         if "saliency_map" in output.get_names():
             saliency_map_output = output
     assert saliency_map_output is not None
+    saliency_map_output_rank = saliency_map_output.get_partial_shape().rank.get_length()
     if "instance_segmentation" in recipe:
-        assert len(saliency_map_output.get_shape()) == 1
+        assert saliency_map_output_rank == 1
     else:
-        assert len(saliency_map_output.get_shape()) in [3, 4]
+        assert saliency_map_output_rank in [3, 4]
 
     assert feature_vector_output is not None
-    assert len(feature_vector_output.get_shape()) == 2
+    assert feature_vector_output.get_partial_shape().rank.get_length() == 2
 
     # Predict OV model with xai & process maps
     ov_engine = create_engine(model=exported_model_path, data=engine.datamodule, work_dir=engine.work_dir)

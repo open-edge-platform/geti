@@ -23,6 +23,7 @@ __pycache__/
 benchmark*.csv
 benchmark*.xlsx
 *.raw.csv
+csv/
 
 # ── IDE / OS ──────────────────────────────────────────────────────────
 .idea/
