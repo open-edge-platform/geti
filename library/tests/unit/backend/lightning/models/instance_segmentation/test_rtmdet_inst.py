@@ -15,6 +15,7 @@ class TestRTMDetInst:
             label_info=3,
             model_name="rtmdet_inst_tiny",
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         output = model(fxt_instance_seg_batch)
@@ -27,6 +28,7 @@ class TestRTMDetInst:
             label_info=3,
             model_name="rtmdet_inst_tiny",
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         model.eval()
         output = model(fxt_instance_seg_batch)
@@ -37,6 +39,7 @@ class TestRTMDetInst:
             label_info=3,
             model_name="rtmdet_inst_tiny",
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         model.eval()
         output = model.forward_for_tracing(torch.randn(1, 3, 32, 32))

@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import type { SinkConfig } from '@/api/types';
 import { ActionButton, Flex, Loading, Text } from '@geti-ui/ui';
 import { Back } from '@geti-ui/ui/icons';
 import { usePipeline } from 'hooks/api/pipeline.hook';
@@ -12,7 +13,6 @@ import { useSinksQuery } from './api/use-sinks-query';
 import { EditSinkForm } from './edit-sink-form.component';
 import { SinkList } from './sink-list/sink-list.component';
 import { SinkOptions } from './sink-options';
-import { SinkConfig } from './utils';
 
 export const SinkActions = () => {
     const [view, setView] = useState<'list' | 'options' | 'edit'>('list');

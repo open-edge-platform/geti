@@ -1,13 +1,13 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Model } from '@/api/types';
 import { Flex, Item, TabList, TabPanels, Tabs, Text } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
 
 import { ReactComponent as ONNX } from '../../../../assets/icons/onnx-logo.svg';
 import { ReactComponent as OpenVINO } from '../../../../assets/icons/openvino-logo.svg';
 import { ReactComponent as Pytorch } from '../../../../assets/icons/pytorch-logo.svg';
-import type { Model } from '../../../../constants/shared-types';
 import { ModelVariantTable } from './model-variant-table.component';
 import { QuantizationRow } from './quantization-row.component';
 
@@ -42,7 +42,7 @@ export const ModelVariantsTabs = ({ model }: ModelVariantsTabsProps) => {
             <TabPanels width={0} minWidth={'100%'} UNSAFE_className={classes.tabPanels}>
                 <Item key='openvino'>
                     <ModelVariantTable model={model} format='openvino' />
-                    <QuantizationRow modelId={model.id} />
+                    <QuantizationRow model={model} />
                 </Item>
                 <Item key='pytorch'>
                     <ModelVariantTable model={model} format='pytorch' />

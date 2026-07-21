@@ -1,10 +1,10 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Metric } from '@/api/types';
 import { getMockedModel } from 'mocks/mock-model';
 import { describe, expect, it } from 'vitest';
 
-import type { Metric } from '../../../../../constants/shared-types';
 import {
     getFirstAvailableTestingMetric,
     getModelEvaluations,

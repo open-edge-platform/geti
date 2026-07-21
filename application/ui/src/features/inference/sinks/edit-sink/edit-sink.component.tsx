@@ -3,6 +3,7 @@
 
 import { ReactNode, useRef } from 'react';
 
+import type { SinkConfig } from '@/api/types';
 import { ActionButton, Button, ButtonGroup, Divider, Flex, Form, Text, View } from '@geti-ui/ui';
 import { Back } from '@geti-ui/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
@@ -10,7 +11,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useConnectSinkToPipeline } from '../../../../hooks/api/pipeline.hook';
 import { testSinkQueryOptions } from '../api/use-test-sink';
 import { useSinkAction } from '../hooks/use-sink-action.hook';
-import { SinkConfig } from '../utils';
 
 import classes from './edit-sink.module.scss';
 

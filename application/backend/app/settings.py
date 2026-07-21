@@ -6,11 +6,32 @@
 import os
 import sys
 from functools import lru_cache
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _pkg_version
 from pathlib import Path
 from typing import Literal
 
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _read_version() -> str:
+    """Read the application version, preferring installed package metadata.
+
+    In the Docker image (and any installed environment) the ``geti`` package is
+    installed and its version is stamped from the ``VERSION`` file at build time,
+    so it can be read from the package metadata. When running from source without
+    an installed distribution, fall back to reading the ``VERSION`` file directly.
+    """
+    try:
+        return _pkg_version("geti")
+    except PackageNotFoundError:
+        # settings.py -> app -> backend -> application/VERSION
+        version_file = Path(__file__).resolve().parents[2] / "VERSION"
+        try:
+            return version_file.read_text(encoding="utf-8").strip()
+        except OSError:
+            return "0.0.0"
 
 
 class Settings(BaseSettings):
@@ -20,7 +41,7 @@ class Settings(BaseSettings):
 
     # Application
     app_name: str = "Geti"
-    version: str = "0.1.0"
+    version: str = Field(default_factory=_read_version)
     summary: str = "Geti server"
     description: str = (
         "Geti allows to fine-tune computer vision models at the edge. "
@@ -35,6 +56,7 @@ class Settings(BaseSettings):
     worker_dir: Path | None = None
     job_dir: Path | None = None
     staged_datasets_dir: Path | None = None
+    source_media_dir: Path | None = None
 
     # Server
     host: str = Field(default="0.0.0.0", alias="HOST")  # noqa: S104
@@ -47,7 +69,7 @@ class Settings(BaseSettings):
 
     # CORS
     cors_origins: str = Field(
-        default="http://localhost:3000, http://localhost:7860",
+        default="http://localhost:3000, https://localhost:7860",
         alias="CORS_ORIGINS",
     )
 
@@ -109,6 +131,18 @@ class Settings(BaseSettings):
         description="Interval in seconds between cache cleanup sweeps",
     )
 
+    # Certificates
+    certfile: Path = Field(
+        default=Path("certs/localhost.pem"),
+        alias="CERTFILE",
+        description="Path to certificate file",
+    )
+    keyfile: Path = Field(
+        default=Path("certs/localhost-key.pem"),
+        alias="KEYFILE",
+        description="Path to private key file",
+    )
+
     @property
     def ice_servers(self) -> list[dict]:
         """Compute ICE servers from coturn and STUN configuration."""
@@ -156,12 +190,21 @@ class Settings(BaseSettings):
             self.job_dir = self.log_dir / "jobs"
         if self.staged_datasets_dir is None:
             self.staged_datasets_dir = self.data_dir / "staged_datasets"
+        if self.source_media_dir is None:
+            self.source_media_dir = self.data_dir / "source_media"
 
         return self
 
     def ensure_dirs_exist(self) -> None:
         """Create all directories if they don't exist."""
-        for d in [self.data_dir, self.log_dir, self.worker_dir, self.job_dir, self.staged_datasets_dir]:
+        for d in [
+            self.data_dir,
+            self.log_dir,
+            self.worker_dir,
+            self.job_dir,
+            self.staged_datasets_dir,
+            self.source_media_dir,
+        ]:
             if d:
                 d.mkdir(parents=True, exist_ok=True)
 

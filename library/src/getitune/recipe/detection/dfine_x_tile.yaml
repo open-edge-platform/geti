@@ -23,12 +23,12 @@ model:
             mode: max
             factor: 0.1
             patience: 9
-            monitor: val/map_50
+            monitor: val/map
             min_lr: 2e-06
 engine:
   device: auto
 
-callback_monitor: val/map_50
+callback_monitor: val/map
 
 data: ../_base_/data/detection_tile.yaml
 
@@ -39,13 +39,13 @@ callbacks:
       patience: 10
       check_on_train_epoch_end: false
       min_delta: 0.001
-      monitor: val/map_50
+      monitor: val/map
       warmup_iters: 30
       warmup_epochs: 3
   - class_path: lightning.pytorch.callbacks.ModelCheckpoint
     init_args:
       dirpath: "" # use engine.work_dir
-      monitor: val/map_50
+      monitor: val/map
       mode: max
       save_top_k: 1
       save_last: true

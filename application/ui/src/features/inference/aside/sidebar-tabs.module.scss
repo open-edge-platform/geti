@@ -35,6 +35,7 @@
 
 .toggleButton {
     border: var(--spectrum-alias-border-size-thin) solid transparent !important;
+    color: var(--spectrum-global-color-gray-900) !important;
 
     &[class*='is-hovered'] {
         border: var(--spectrum-alias-border-size-thin) solid var(--spectrum-global-color-gray-300) !important;

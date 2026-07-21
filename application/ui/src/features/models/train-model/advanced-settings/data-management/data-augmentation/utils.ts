@@ -1,7 +1,8 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ConfigurableParameterGroup, TrainingConfiguration } from '../../../../../../constants/shared-types';
+import type { ConfigurableParameterGroup, TrainingConfiguration } from '@/api/types';
+
 import {
     findGroupByKey,
     isParameter,

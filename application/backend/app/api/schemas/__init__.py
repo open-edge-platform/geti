@@ -9,7 +9,7 @@ from .model import ModelView
 from .pipeline import PipelineView
 from .project import ProjectCreate, ProjectUpdateName, ProjectView, TaskView
 from .sink import SinkView
-from .source import SourceView
+from .source import SourceMediaUploadView, SourceView
 from .training_configuration import TrainingConfigurationView
 from .training_metrics import TrainingMetricsView
 from .webrtc import WebRTCConfigResponse, WebRTCIceServer
@@ -26,6 +26,7 @@ __all__ = [
     "ProjectUpdateName",
     "ProjectView",
     "SinkView",
+    "SourceMediaUploadView",
     "SourceView",
     "StagedDatasetView",
     "TaskView",

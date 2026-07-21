@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { SinkConfig } from '@/api/types';
 import { Button, dimensionValue, Flex, Text } from '@geti-ui/ui';
 import { Add as AddIcon } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
@@ -11,7 +12,6 @@ import { usePipeline } from '../../../../hooks/api/pipeline.hook';
 import { getErrorMessage } from '../../../../query-client/query-client';
 import { removeUnderscore } from '../../util';
 import { useTestSink } from '../api/use-test-sink';
-import { SinkConfig } from '../utils';
 import { SettingsList } from './settings-list/settings-list.component';
 import { SinkIcon } from './sink-icon/sink-icon.component';
 import { SinkMenu } from './sink-menu/sink-menu.component';

@@ -3,12 +3,12 @@
 
 import { useMemo, useState } from 'react';
 
+import type { SourceConfig } from '@/api/types';
 import { ActionButton, Flex, Loading, Text } from '@geti-ui/ui';
 import { Back } from '@geti-ui/ui/icons';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEmpty, orderBy } from 'lodash-es';
 
-import type { SourceConfig } from '../../../constants/shared-types';
 import { useSourcesQuery } from './api/use-sources';
 import { EditSourceForm } from './edit-source-form.component';
 import { SourcesList } from './source-list/source-list.component';

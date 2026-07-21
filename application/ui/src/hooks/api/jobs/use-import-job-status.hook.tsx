@@ -3,9 +3,9 @@
 
 import { useEffect } from 'react';
 
+import { $api } from '@/api';
 import { isFunction } from 'lodash-es';
 
-import { $api } from '../../../api/client';
 import { toast } from '../../../components/toast/toast.component';
 import { isNonEmptyString } from '../../../shared/util';
 import { isInvalidJob, isJobDone, isJobFailed } from '../util';

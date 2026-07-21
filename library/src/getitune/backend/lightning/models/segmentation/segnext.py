@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
 from getitune.backend.lightning.models.segmentation.backbones import MSCAN
@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -38,7 +39,17 @@ class SegNext(LightningSegmentationModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to SegmCallable.
         torch_compile (bool, optional): Flag to indicate whether to use torch.compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
+
+    pretrained_weights_target = "backbone"
+    pretrained_urls: ClassVar[dict[str, str]] = {
+        "segnext_tiny": "https://storage.geti.intel.com/weights/mscan_t_20230227-119e8c9f.pth",
+        "segnext_small": "https://storage.geti.intel.com/weights/mscan_s_20230227-f33ccdf2.pth",
+        "segnext_base": "https://storage.geti.intel.com/weights/mscan_b_20230227-3ab7d230.pth",
+    }
 
     def __init__(
         self,
@@ -50,6 +61,8 @@ class SegNext(LightningSegmentationModel):
         metric: MetricCallable = SegmCallable,  # type: ignore[assignment]
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ):
         super().__init__(
             label_info=label_info,
@@ -60,6 +73,8 @@ class SegNext(LightningSegmentationModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:

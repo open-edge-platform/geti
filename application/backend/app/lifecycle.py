@@ -4,6 +4,7 @@
 """Application lifecycle management"""
 
 import multiprocessing as mp
+import os
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from functools import partial
@@ -16,9 +17,9 @@ from loguru import logger
 
 from app.core.jobs import JobController, JobQueue, ProcessRunnerFactory
 from app.core.jobs.models import JobType
-from app.core.logging import LogConfig, setup_logging, setup_uvicorn_logging
+from app.core.logging import LogConfig, setup_logging
 from app.core.run import Runnable, RunnableFactory
-from app.db import MigrationManager, get_db_session
+from app.db import MigrationFatalError, MigrationManager, get_db_session
 from app.execution.builders import (
     build_export_dataset,
     build_import_as_new_project,
@@ -46,6 +47,11 @@ from app.services.subset_assignment import SubsetAssigner, SubsetService
 from app.services.video import CacheConfig, VideoService
 from app.settings import get_settings
 from app.webrtc import SDPHandler, WebRTCManager, WebRTCSettings
+
+# Dedicated process exit code for fatal, non-restartable migration failures.
+# A failed or incompatible schema migration will deterministically fail again,
+# so the launcher/supervisor must NOT restart the process when it sees this code.
+MIGRATION_FATAL_EXIT_CODE = 3
 
 
 def setup_job_controller(
@@ -156,21 +162,49 @@ def setup_job_controller(
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
     """FastAPI lifespan context manager"""
     # Startup
     settings = get_settings()
     settings.ensure_dirs_exist()
     app.state.settings = settings
-    logger.info("Starting {} application...", settings.app_name)
 
     # Setup logging
     setup_logging(config=LogConfig(level=settings.log_level))
-    setup_uvicorn_logging(settings.log_level)
 
     # Initialize database
     migration_manager = MigrationManager(settings)
-    if not migration_manager.initialize_database():
+    try:
+        initialized = migration_manager.initialize_database()
+    except MigrationFatalError as e:
+        # A failed/incompatible database migration is fatal and non-restartable.
+        # Log the traceback and recovery guidance, then terminate the process with a
+        # dedicated exit code. os._exit is used (instead of raising) so the exit code
+        # reliably reaches the launcher/supervisor rather than being swallowed by the
+        # ASGI server's lifespan error handling.
+        logger.exception("Fatal database migration error; exiting without restart: {}", e)
+        if e.backup_path is not None:
+            logger.error(
+                "To recover, restore the pre-migration database backup: rename the backup file "
+                "'{}' back to '{}' (the original database file), overwriting the partially "
+                "migrated database.",
+                e.backup_path,
+                migration_manager.database_path,
+            )
+            logger.error("After restoring the backup, downgrade the application to the previous version.")
+        else:
+            logger.error(
+                "No pre-migration database backup is available. To recover, downgrade the "
+                "application to the previous version."
+            )
+        logger.error("If the problem persists, please create a ticket on https://github.com/open-edge-platform/geti.")
+        # loguru is configured with enqueue=True (see setup_logging), so records are emitted
+        # from a background thread. os._exit() terminates immediately and would drop any
+        # records still on the queue, so drain the sinks before exiting.
+        await logger.complete()
+        os._exit(MIGRATION_FATAL_EXIT_CODE)
+
+    if not initialized:
         logger.error("Failed to initialize database. Application cannot start.")
         raise RuntimeError("Database initialization failed")
 

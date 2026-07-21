@@ -12,6 +12,10 @@ on:
         description: "Enable Docker build cache (set to false for cache-free verification builds)"
         type: boolean
         default: true
+      exclude-agpl-models:
+        description: "Exclude Ultralytics and other AGPL-licensed models from the image"
+        type: boolean
+        default: false
   workflow_dispatch:
 
 permissions: {} # No permissions by default on workflow level
@@ -30,7 +34,14 @@ jobs:
     outputs:
       run_workflow: ${{ steps.check_paths.outputs.run }}
     steps:
-      - name: Checkout repository
+      - &harden-runner
+        name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - &checkout
+        name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
           persist-credentials: false
@@ -61,10 +72,9 @@ jobs:
       pull-requests: write # Post image size comments on PRs
       id-token: write # Use OIDC token to sign images
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          persist-credentials: false
+      - *harden-runner
+
+      - *checkout
 
       - name: Read application version
         id: version
@@ -73,7 +83,7 @@ jobs:
           echo "short_sha=${GITHUB_SHA::8}" >> "$GITHUB_OUTPUT"
 
       - name: Login to GHCR
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -81,7 +91,7 @@ jobs:
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ghcr.io/open-edge-platform/geti-${{ matrix.device }}
           tags: |
@@ -101,10 +111,11 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name != 'pull_request' }}
-          use-cache: ${{ github.event_name != 'workflow_call' || inputs.use-cache }}
+          use-cache: ${{ github.event_name != 'workflow_call' || inputs.use-cache == true }}
           # Fork PRs cannot write packages to the upstream org, so disable
           # cache export to avoid 403 errors from GHCR.
           cache-write: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request' }}
+          exclude-agpl-models: ${{ github.event_name == 'workflow_call' && inputs.exclude-agpl-models }}
 
       - name: Resolve primary image tag for signing
         if: github.event_name != 'pull_request'
@@ -149,7 +160,7 @@ jobs:
           # Wait up to 60 seconds for the /health endpoint to respond
           echo "Waiting for /health endpoint ..."
           for i in $(seq 1 30); do
-            if curl -sf http://localhost:7860/health; then
+            if curl -sf --insecure https://localhost:7860/health; then
               echo ""
               echo "Backend health check passed!"
               break
@@ -164,11 +175,11 @@ jobs:
           done
 
           # Verify the UI is being served
-          TEST_URL="http://localhost:7860"
+          TEST_URL="https://localhost:7860"
           EXPECTED_TITLE="Geti"
           echo "Checking HTML title..."
 
-          HTML_CONTENT=$(curl -sf $TEST_URL)
+          HTML_CONTENT=$(curl -sf --insecure $TEST_URL)
           if echo "$HTML_CONTENT" | grep -q "<title>.*$EXPECTED_TITLE.*</title>"; then
             echo "✅ HTML title check passed - found: $EXPECTED_TITLE"
           else
@@ -287,6 +298,8 @@ jobs:
       CHECKS: ${{ join(needs.*.result, ' ') }}
     if: always() && !cancelled()
     steps:
+      - *harden-runner
+
       - name: Check jobs results
         run: |
           for check in ${CHECKS}; do

@@ -25,7 +25,7 @@ model:
 engine:
   device: auto
 
-callback_monitor: val/accuracy
+callback_monitor: val/mAP
 
 data: ../../_base_/data/classification.yaml
 
@@ -36,7 +36,7 @@ callbacks:
   - class_path: lightning.pytorch.callbacks.ModelCheckpoint
     init_args:
       dirpath: "" # use engine.work_dir
-      monitor: val/accuracy
+      monitor: val/mAP
       mode: max
       save_top_k: 1
       save_last: true

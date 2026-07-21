@@ -6,14 +6,12 @@
 from __future__ import annotations
 
 from abc import abstractmethod
-from pathlib import Path
 from typing import Callable
 
 import torch
 from torch import nn
 
 from getitune.backend.lightning.models.segmentation.modules import resize
-from getitune.backend.lightning.models.utils.utils import load_checkpoint_to_model, load_from_http
 
 
 class BaseSegmentationHead(nn.Module):
@@ -31,7 +29,6 @@ class BaseSegmentationHead(nn.Module):
         in_index (int, list[int], optional): Input index. Defaults to -1.
         input_transform (Optional[str], optional): Input transform type.
             Defaults to None.
-        ignore_index (int, optional): The index to be ignored. Defaults to 255.
         align_corners (bool, optional): Whether to align corners. Defaults to False.
     """
 
@@ -46,8 +43,6 @@ class BaseSegmentationHead(nn.Module):
         in_index: int | list[int] = -1,
         input_transform: str | None = None,
         align_corners: bool = False,
-        pretrained_weights: Path | str | None = None,
-        pretrained_prefix: str = "",
     ) -> None:
         """Initialize the BaseSegmHead."""
         super().__init__()
@@ -75,9 +70,6 @@ class BaseSegmentationHead(nn.Module):
             self.dropout = nn.Dropout2d(dropout_ratio)
         else:
             self.dropout = None
-
-        if pretrained_weights is not None:
-            self.load_pretrained_weights(pretrained_weights, prefix=pretrained_prefix)
 
     def _transform_inputs(
         self,
@@ -137,34 +129,3 @@ class BaseSegmentationHead(nn.Module):
             feat = self.dropout(feat)
         output: torch.Tensor = self.conv_seg(feat)
         return output
-
-    def load_pretrained_weights(
-        self,
-        pretrained: Path | str | None = None,
-        prefix: str = "",
-    ) -> None:
-        """Initialize weights.
-
-        Args:
-            pretrained (Optional[str]): Path to pretrained weights or URL.
-                If None, no weights are loaded. Defaults to None.
-            prefix (str): Prefix for state dict keys. Defaults to "".
-
-        Returns:
-            None
-        """
-        checkpoint = None
-        if isinstance(pretrained, str) and Path(pretrained).exists():
-            checkpoint = torch.load(pretrained, map_location=torch.device("cpu"))
-            print(f"Init weights - {pretrained}")
-        elif pretrained is not None:
-            if isinstance(pretrained, Path):
-                msg = "pretrained path doesn't exists"
-                raise ValueError(msg)
-            checkpoint = load_from_http(
-                filename=pretrained,
-                map_location="cpu",
-            )
-            print(f"Init weights - {pretrained}")
-        if checkpoint is not None:
-            load_checkpoint_to_model(self, checkpoint, prefix=prefix)

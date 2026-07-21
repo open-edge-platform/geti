@@ -18,6 +18,7 @@ from getitune.backend.lightning.models.classification.multilabel_models.base imp
     LightningMultilabelClsModel,
 )
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import TorchvisionWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiLabelClsMetricCallable
 from getitune.types.label import LabelInfoTypes
@@ -28,21 +29,26 @@ if TYPE_CHECKING:
     from torch import nn
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
-class TVModelMultilabelCls(LightningMultilabelClsModel):
+class TVModelMultilabelCls(TorchvisionWeightsLoader, LightningMultilabelClsModel):
     """Torchvision model for multilabel classification.
 
     Args:
         label_info (LabelInfoTypes): Information about the labels.
-        backbone (TVModelType): Backbone model for feature extraction.
-        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        data_input_params (DataInputParams | dict | None, optional): The data input parameters
+            such as input size and normalization. If None is given,
+            default parameters for the specific model will be used.
+        model_name (str, optional): Backbone model name for feature extraction. Defaults to "efficientnet_v2_s".
         optimizer (OptimizerCallable, optional): Optimizer for model training. Defaults to DefaultOptimizerCallable.
         scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): Learning rate scheduler.
             Defaults to DefaultSchedulerCallable.
-        metric (MetricCallable, optional): Metric for model evaluation. Defaults to MultiLabelClsMetricCallable.
+        metric (MetricCallable, optional): Metric for model evaluation. Defaults to MultiClassClsMetricCallable.
         torch_compile (bool, optional): Whether to compile the model using TorchScript. Defaults to False.
-        input_size (tuple[int, int], optional): Input size of the images. Defaults to (224, 224).
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     def __init__(
@@ -55,6 +61,8 @@ class TVModelMultilabelCls(LightningMultilabelClsModel):
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiLabelClsMetricCallable,
         torch_compile: bool = False,
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -65,6 +73,8 @@ class TVModelMultilabelCls(LightningMultilabelClsModel):
             scheduler=scheduler,
             metric=metric,
             torch_compile=torch_compile,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:
