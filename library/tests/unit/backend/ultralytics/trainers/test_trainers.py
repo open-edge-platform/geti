@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
-from typing import Callable
+from typing import Any, Callable
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -177,7 +177,7 @@ class TestProgressCallback:
 
     def test_progress_callback_emits_progress(self) -> None:
         """Progress callback should emit linearly interpolated values."""
-        trainer = object.__new__(DetectionTrainer)
+        trainer: Any = object.__new__(DetectionTrainer)
         trainer._use_getitune_data = True
         trainer._datamodule = MagicMock()
 
@@ -191,7 +191,7 @@ class TestProgressCallback:
         trainer.epochs = 10
 
         registered: list = []
-        trainer.add_callback = lambda event, fn: registered.append((event, fn))
+        trainer.add_callback = lambda event, callback: registered.append((event, callback))
 
         trainer._register_progress_callback()
 
@@ -209,12 +209,12 @@ class TestProgressCallback:
 
     def test_progress_callback_noop_when_no_fn(self) -> None:
         """No callback should be registered when _progress_fn is None."""
-        trainer = object.__new__(DetectionTrainer)
+        trainer: Any = object.__new__(DetectionTrainer)
         trainer._use_getitune_data = True
         trainer._progress_fn = None
 
         registered: list = []
-        trainer.add_callback = lambda event, fn: registered.append((event, fn))
+        trainer.add_callback = lambda event, callback: registered.append((event, callback))
 
         trainer._register_progress_callback()
 

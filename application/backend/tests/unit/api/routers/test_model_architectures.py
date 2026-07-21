@@ -59,7 +59,7 @@ class TestModelArchitecturesEndpoint:
         [
             ("detection", 36),
             ("instance_segmentation", 20),
-            ("classification", 6),
+            ("classification", 11),
         ],
     )
     def test_get_model_architectures_various_tasks(self, fxt_client: TestClient, task_filter, total_models):

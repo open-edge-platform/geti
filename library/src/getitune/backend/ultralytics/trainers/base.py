@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 import multiprocessing
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import numpy as np
 import torch
@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
 
 from getitune.backend.ultralytics.data.adapter import UltralyticsDatasetAdapter
-from getitune.backend.ultralytics.data.collate import collate_fn
+from getitune.backend.ultralytics.data.collate import detection_collate_fn
 
 if TYPE_CHECKING:
     from getitune.data.module import DataModule
@@ -52,7 +52,8 @@ class GetiTuneBaseTrainer:
 
     _datamodule: DataModule | None = None
     _use_getitune_data: bool = False
-    _include_masks: bool = False
+    _task_kind: ClassVar[str] = "detect"
+    _collate_fn = staticmethod(detection_collate_fn)
     _progress_fn: Any = None
     _progress_min: float = 0.0
     _progress_max: float = 100.0
@@ -123,7 +124,7 @@ class GetiTuneBaseTrainer:
             self._datamodule.train_subset.subset_name if mode == "train" else self._datamodule.val_subset.subset_name
         )
         vision_dataset = self._datamodule.subsets[subset_key]  # type: ignore[union-attr]
-        return UltralyticsDatasetAdapter(vision_dataset, include_masks=self._include_masks)
+        return UltralyticsDatasetAdapter(vision_dataset, task_kind=self._task_kind)
 
     def get_dataloader(
         self,
@@ -139,9 +140,6 @@ class GetiTuneBaseTrainer:
         dataset = self.build_dataset(dataset_path, mode, batch_size)
         nw: int = self.args.workers  # type: ignore[attr-defined]
 
-        if mode == "train" and nw > 0:
-            self._warmup_mosaic_cache(dataset)
-
         shuffle = mode == "train"
         return InfiniteDataLoader(
             dataset,
@@ -149,57 +147,13 @@ class GetiTuneBaseTrainer:
             shuffle=shuffle,
             num_workers=nw,
             prefetch_factor=4 if nw > 0 else None,
-            collate_fn=collate_fn,
+            collate_fn=self._collate_fn,
             pin_memory=True,
             drop_last=False,
             multiprocessing_context=_MP_CONTEXT if nw > 0 else None,
             persistent_workers=nw > 0,
             worker_init_fn=seed_worker,
         )
-
-    @staticmethod
-    def _warmup_mosaic_cache(adapter: UltralyticsDatasetAdapter) -> None:
-        """Pre-populate CachedMosaic cache before workers spawn.
-
-        With spawn multiprocessing, each worker gets a copy of the dataset
-        (including transforms) at spawn time.  If the CachedMosaic cache is
-        empty, each worker independently builds its own cache from a
-        fragmented view of the data, significantly reducing mosaic diversity
-        for small datasets.
-
-        By iterating through samples in the main process before spawning
-        workers, we ensure every worker starts with a full, diverse cache.
-        The cache is then frozen to prevent workers from independently
-        replacing entries via FIFO eviction, which would re-fragment
-        diversity.
-        """
-        from getitune.data.augmentation.pipeline import CPUAugmentationPipeline
-        from getitune.data.augmentation.transforms import CachedMosaic
-
-        vision_dataset = adapter._dataset  # noqa: SLF001
-        transforms = vision_dataset.transforms
-        if not isinstance(transforms, CPUAugmentationPipeline):
-            return
-
-        mosaic_transform: CachedMosaic | None = None
-        for aug in transforms.augmentations:
-            if isinstance(aug, CachedMosaic):
-                mosaic_transform = aug
-                break
-
-        if mosaic_transform is None:
-            return
-
-        n_warmup = min(mosaic_transform.max_cached_images, len(vision_dataset))
-        if len(mosaic_transform.results_cache) >= n_warmup:
-            mosaic_transform.freeze_cache()
-            return
-
-        logger.info(f"Pre-warming CachedMosaic cache with {n_warmup} samples")
-        for i in range(n_warmup):
-            vision_dataset[i]
-        mosaic_transform.freeze_cache()
-        logger.info(f"CachedMosaic cache warmed and frozen: {len(mosaic_transform.results_cache)} entries")
 
     def _setup_train(self) -> None:
         """Restore workers, run parent setup, then fix warmup for small datasets.

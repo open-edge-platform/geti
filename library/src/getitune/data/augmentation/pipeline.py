@@ -434,7 +434,7 @@ class CPUAugmentationPipeline(nn.Module):
     def forward(self, *inputs: BaseSample) -> BaseSample | None:
         """Forward with skipping None."""
         needs_unpacking = len(inputs) > 1
-        outputs: BaseSample | None = inputs[0]  # type: ignore[assignment]
+        outputs: BaseSample = inputs[0]  # type: ignore[assignment]
         for transform in self.augmentations:
             if self._is_native_torchvision_transform(transform):
                 # Apply native transforms only to image-related fields
@@ -444,6 +444,10 @@ class CPUAugmentationPipeline(nn.Module):
             if outputs is None:
                 return outputs
             inputs = outputs if needs_unpacking else (outputs,)  # type: ignore[assignment]
+
+        if isinstance(outputs.image, torch.Tensor):
+            outputs.image = outputs.image.clamp(0.0, 1.0)
+
         return outputs
 
     def __repr__(self) -> str:

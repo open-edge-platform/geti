@@ -26,6 +26,16 @@ experiments:
         priority: extended
       - name: efficientnet_b0
         priority: extended
+      - name: yolo26_n_cls
+        priority: core
+      - name: yolo26_s_cls
+        priority: deferred
+      - name: yolo26_m_cls
+        priority: deferred
+      - name: yolo26_l_cls
+        priority: deferred
+      - name: yolo26_x_cls
+        priority: extended
     datasets:
       - paddy_disease
       - chest_ct

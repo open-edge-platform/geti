@@ -705,6 +705,31 @@ class GetiConfigConverter:
                 "status": ModelStatus.ACTIVE,
                 "default": False,
             },
+            "image-classification-yolo26-n": {
+                "recipe_path": RECIPE_PATH / "classification" / "multi_class_cls" / "yolo26_n_cls.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "image-classification-yolo26-s": {
+                "recipe_path": RECIPE_PATH / "classification" / "multi_class_cls" / "yolo26_s_cls.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "image-classification-yolo26-m": {
+                "recipe_path": RECIPE_PATH / "classification" / "multi_class_cls" / "yolo26_m_cls.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "image-classification-yolo26-l": {
+                "recipe_path": RECIPE_PATH / "classification" / "multi_class_cls" / "yolo26_l_cls.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
+            "image-classification-yolo26-x": {
+                "recipe_path": RECIPE_PATH / "classification" / "multi_class_cls" / "yolo26_x_cls.yaml",
+                "status": ModelStatus.ACTIVE,
+                "default": False,
+            },
             # DETECTION
             "object-detection-atss-mobilenet-v2": {
                 "recipe_path": RECIPE_PATH / "detection" / "atss_mobilenetv2.yaml",
@@ -991,6 +1016,15 @@ class GetiConfigConverter:
 
         model_config_path: Path = TEMPLATE_ID_MAPPING[config["model_manifest_id"]]["recipe_path"]  # type: ignore[assignment]
 
+        # Classification task type (multi-class vs. multi-label) can't be deduced
+        # from the manifest's recipe path alone, since the architecture is shared
+        # across both. Resolve the sub-task recipe variant once, for both backends.
+        model_config_path = GetiConfigConverter._resolve_task_specific_recipe_path(
+            model_config_path,
+            config["sub_task_type"],
+            RECIPE_PATH,
+        )
+
         if not model_config_path.exists():
             msg = f"Recipe file not found: {model_config_path}"
             raise FileNotFoundError(msg)
@@ -1011,7 +1045,7 @@ class GetiConfigConverter:
                 GetiConfigConverter._update_intensity_mapping(config_dict, intensity_mapping)
             return config_dict
 
-        # Lightning-specific: resolve tile recipe variant and sub-task type.
+        # Lightning-specific: resolve tile recipe variant.
         tile_enabled = hyper_parameters and hyper_parameters.get("dataset_preparation", {}).get("augmentation", {}).get(
             "tiling",
             {},
@@ -1019,9 +1053,6 @@ class GetiConfigConverter:
         if tile_enabled and "_tile" not in model_config_path.stem:
             tile_name = model_config_path.stem + "_tile.yaml"
             model_config_path = model_config_path.parent / tile_name
-        # classification task type can't be deducted from template name, try to extract from config
-        if (sub_task_type := config["sub_task_type"]) and "_cls" in model_config_path.parent.name:
-            model_config_path = RECIPE_PATH / "classification" / sub_task_type.lower() / model_config_path.name
 
         default_config = AutoConfigurator(model=model_config_path).config
         if hyper_parameters:
@@ -1035,6 +1066,23 @@ class GetiConfigConverter:
 
         GetiConfigConverter._remove_unused_key(default_config)
         return default_config
+
+    @staticmethod
+    def _resolve_task_specific_recipe_path(
+        model_config_path: Path,
+        sub_task_type: str | None,
+        recipe_root: Path,
+    ) -> Path:
+        """Select the classification sub-task recipe variant, for either backend.
+
+        Classification manifests map to a single architecture recipe (e.g.
+        ``yolo26_m_cls.yaml``) shared by both multi-class and multi-label
+        tasks. ``sub_task_type`` (e.g. ``"MULTI_LABEL_CLS"``) picks the
+        matching recipe subdirectory.
+        """
+        if sub_task_type and "_cls" in model_config_path.parent.name:
+            return recipe_root / "classification" / sub_task_type.lower() / model_config_path.name
+        return model_config_path
 
     @staticmethod
     def _is_ultralytics_recipe(recipe_path: Path) -> bool:
