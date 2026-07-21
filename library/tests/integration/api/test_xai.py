@@ -30,6 +30,7 @@ UNSUPPORTED_MODEL_SUBSTRS = ("dino", "rfdetr")
 )
 def test_forward_explain(
     recipe: str,
+    tmp_path: Path,
     fxt_target_dataset_per_task: dict,
     fxt_accelerator: str,
 ) -> None:
@@ -38,6 +39,7 @@ def test_forward_explain(
 
     Args:
         recipe (str): The recipe to use for predicting. (eg. 'classification/mobilenet_v3_large.yaml')
+        tmp_path (Path): The temporary path for storing the outputs.
         fxt_target_dataset_per_task (dict): A dictionary mapping tasks to target datasets.
         fxt_accelerator (str): The accelerator used for predict.
 
@@ -56,6 +58,7 @@ def test_forward_explain(
         config_path=recipe,
         data=fxt_target_dataset_per_task[task],
         device=fxt_accelerator,
+        work_dir=tmp_path,
     )
 
     predict_result = engine.predict()
