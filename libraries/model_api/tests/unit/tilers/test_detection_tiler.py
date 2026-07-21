@@ -4,6 +4,7 @@
 from unittest.mock import MagicMock, patch
 
 import numpy as np
+import pytest
 from model_api.models import DetectionResult
 from model_api.tilers.detection import DetectionTiler, _non_linear_normalization
 
@@ -126,6 +127,28 @@ class TestDetectionTilerMergeResults:
         ]
         merged = tiler._merge_results(results, (200, 200, 3))  # noqa: SLF001
         assert isinstance(merged, DetectionResult)
+
+
+class TestDetectionTilerPredictTiles:
+    @patch("model_api.tilers.detection.multiclass_nms")
+    def test_predict_tiles_sync_end_to_end(self, mock_nms):
+        """predict_tiles infers each pre-cropped tile once and merges to a DetectionResult."""
+        model = _make_model()
+        mock_nms.return_value = np.array([0, 1])
+        tiler = DetectionTiler(model, execution_mode="sync")
+        # One detection per tile; the model is called once per provided tile.
+        model.side_effect = [_make_detection_result(n=1), _make_detection_result(n=1)]
+        tiles = [np.zeros((50, 50, 3), dtype=np.uint8), np.zeros((50, 50, 3), dtype=np.uint8)]
+        coords = [[0, 0, 50, 50], [50, 0, 100, 50]]
+        merged = tiler.predict_tiles(tiles, coords, (50, 100, 3))
+        assert isinstance(merged, DetectionResult)
+        assert model.call_count == 2
+
+    def test_predict_tiles_length_mismatch(self):
+        model = _make_model()
+        tiler = DetectionTiler(model, execution_mode="sync")
+        with pytest.raises(ValueError, match="same length"):
+            tiler.predict_tiles([np.zeros((5, 5, 3), dtype=np.uint8)], [], (5, 5, 3))
 
 
 class TestDetectionTilerMergeSaliencyMaps:

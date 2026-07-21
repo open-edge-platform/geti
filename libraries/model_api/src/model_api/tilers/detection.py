@@ -3,6 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
+from typing import TypeVar, cast
+
 import cv2 as cv
 import numpy as np
 
@@ -12,8 +14,12 @@ from model_api.models.utils import multiclass_nms
 
 from .tiler import Tiler
 
+# Bound to DetectionResult so subclasses (e.g. instance segmentation) can specialize
+# the tiler's result type while reusing this detection tiling/merging implementation.
+DetResultT = TypeVar("DetResultT", bound=DetectionResult)
 
-class DetectionTiler(Tiler):
+
+class DetectionTiler(Tiler[DetResultT]):
     """Tiler for object detection models.
     This tiler expects model to output a lsit of `Detection` objects
     or one `DetectionResult` object.
@@ -65,7 +71,7 @@ class DetectionTiler(Tiler):
 
         return output_dict
 
-    def _merge_results(self, results: list[dict], shape: tuple[int, int, int]) -> DetectionResult:
+    def _merge_results(self, results: list[dict], shape: tuple[int, int, int]) -> DetResultT:
         """Merge results from all tiles.
 
         To merge detections, per-class NMS is applied.
@@ -101,13 +107,16 @@ class DetectionTiler(Tiler):
         saliency_map = self._merge_saliency_maps(saliency_maps, shape, tiles_coords) if saliency_maps else np.ndarray(0)
         label_names = [self.model.get_label_name(int(label_idx)) for label_idx in detections_array[:, 0]]
 
-        return DetectionResult(
-            bboxes=detections_array[:, 2:].astype(np.int32),
-            labels=detections_array[:, 0].astype(np.int32),
-            scores=detections_array[:, 1],
-            label_names=label_names,
-            saliency_map=saliency_map,
-            feature_vector=merged_vector,
+        return cast(
+            "DetResultT",
+            DetectionResult(
+                bboxes=detections_array[:, 2:].astype(np.int32),
+                labels=detections_array[:, 0].astype(np.int32),
+                scores=detections_array[:, 1],
+                label_names=label_names,
+                saliency_map=saliency_map,
+                feature_vector=merged_vector,
+            ),
         )
 
     def _merge_saliency_maps(

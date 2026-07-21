@@ -1,6 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from contextlib import contextmanager
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -233,3 +234,86 @@ class TestTilerPredictAsync:
         assert mock_pipeline.submit_data.call_count == 2
         mock_pipeline.await_all.assert_called_once()
         assert len(results) == 2
+
+
+class TestTilerPredictTiles:
+    def test_predict_tiles_sync(self):
+        """Pre-cropped tiles are inferred once each and merged, skipping internal tiling."""
+        model = _make_model()
+        model.return_value = "pred"
+        tiler = ConcreteTiler(model, execution_mode="sync")
+        tiles = [np.zeros((10, 10, 3)), np.zeros((10, 10, 3))]
+        coords = [[0, 0, 10, 10], [10, 0, 20, 10]]
+        results = tiler.predict_tiles(tiles, coords, (10, 20, 3))
+        assert model.call_count == 2
+        assert len(results) == 2
+        assert results[0]["coord"] == coords[0]
+
+    @patch("model_api.tilers.tiler.AsyncPipeline")
+    def test_predict_tiles_async(self, mock_pipeline_cls):
+        model = _make_model()
+        mock_pipeline = MagicMock()
+        mock_pipeline_cls.return_value = mock_pipeline
+        mock_pipeline.get_result.return_value = ("pred", {})
+        tiler = ConcreteTiler(model, execution_mode="async")
+        tiles = [np.zeros((10, 10, 3)), np.zeros((10, 10, 3))]
+        coords = [[0, 0, 10, 10], [10, 0, 20, 10]]
+        results = tiler.predict_tiles(tiles, coords, (10, 20, 3))
+        assert mock_pipeline.submit_data.call_count == 2
+        mock_pipeline.await_all.assert_called_once()
+        assert len(results) == 2
+
+    def test_predict_tiles_length_mismatch(self):
+        model = _make_model()
+        tiler = ConcreteTiler(model, execution_mode="sync")
+        with pytest.raises(ValueError, match="same length"):
+            tiler.predict_tiles([np.zeros((5, 5, 3))], [], (5, 5, 3))
+
+    def test_predict_tiles_invokes_setup_model(self):
+        """predict_tiles must apply the _setup_model reconfiguration, like __call__."""
+        model = _make_model()
+        model.return_value = "pred"
+
+        class RecordingTiler(ConcreteTiler):
+            def __init__(self, *args, **kwargs):
+                self.setup_called = 0
+                super().__init__(*args, **kwargs)
+
+            @contextmanager
+            def _setup_model(self):
+                self.setup_called += 1
+                yield
+
+        tiler = RecordingTiler(model, execution_mode="sync")
+        tiler.predict_tiles([np.zeros((5, 5, 3))], [[0, 0, 5, 5]], (5, 5, 3))
+        assert tiler.setup_called == 1
+
+
+class TestTilerSetupModel:
+    def test_default_setup_model_is_noop(self):
+        model = _make_model()
+        tiler = ConcreteTiler(model)
+        with tiler._setup_model():  # noqa: SLF001
+            pass
+
+    def test_call_invokes_setup_model(self):
+        model = _make_model()
+        model.return_value = "pred"
+
+        class RecordingTiler(ConcreteTiler):
+            def __init__(self, *args, **kwargs):
+                self.setup_called = 0
+                super().__init__(*args, **kwargs)
+
+            @contextmanager
+            def _setup_model(self):
+                self.setup_called += 1
+                yield
+
+        tiler = RecordingTiler(
+            model,
+            configuration={"tile_size": 100, "tiles_overlap": 0.0, "tile_with_full_img": False},
+            execution_mode="sync",
+        )
+        tiler(np.zeros((100, 100, 3), dtype=np.uint8))
+        assert tiler.setup_called == 1

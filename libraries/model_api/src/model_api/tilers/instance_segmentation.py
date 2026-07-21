@@ -15,7 +15,7 @@ from model_api.models.utils import multiclass_nms
 from .detection import DetectionTiler
 
 
-class InstanceSegmentationTiler(DetectionTiler):
+class InstanceSegmentationTiler(DetectionTiler[InstanceSegmentationResult]):
     """Tiler for object instance segmentation models.
     This tiler expects model to output a list of `SegmentedObject` objects.
 
@@ -190,18 +190,21 @@ class InstanceSegmentationTiler(DetectionTiler):
 
         return merged_map
 
-    def __call__(self, inputs):
-        @contextmanager
-        def setup_maskrcnn(*args, **kwds):
-            postprocess_state = None
-            if isinstance(self.model, InstanceSegmentationModel):
-                postprocess_state = self.model.params.postprocess_semantic_masks
-                self.model._postprocess_semantic_masks = False  # noqa: SLF001
-            try:
-                yield
-            finally:
-                if isinstance(self.model, InstanceSegmentationModel):
-                    self.model._postprocess_semantic_masks = postprocess_state  # noqa: SLF001
+    @contextmanager
+    def _setup_model(self):
+        """Disable semantic-mask postprocessing on the underlying model while tiling.
 
-        with setup_maskrcnn():
-            return super().__call__(inputs)
+        Instance-segmentation masks are merged back to the full image by the tiler
+        (:meth:`_merge_results`), so per-tile semantic-mask postprocessing must be
+        turned off for both the full-image (:meth:`__call__`) and pre-tiled
+        (:meth:`predict_tiles`) inference paths.
+        """
+        postprocess_state = None
+        if isinstance(self.model, InstanceSegmentationModel):
+            postprocess_state = self.model.params.postprocess_semantic_masks
+            self.model._postprocess_semantic_masks = False  # noqa: SLF001
+        try:
+            yield
+        finally:
+            if isinstance(self.model, InstanceSegmentationModel):
+                self.model._postprocess_semantic_masks = postprocess_state  # noqa: SLF001

@@ -189,6 +189,43 @@ class TestInstanceSegmentationTilerMergeSaliencyMaps:
         assert result[0].shape == (0,)
 
 
+class TestInstanceSegmentationTilerPredictTiles:
+    @patch("model_api.tilers.instance_segmentation.multiclass_nms")
+    @patch("model_api.tilers.instance_segmentation._segm_postprocess")
+    def test_predict_tiles_sync_end_to_end(self, mock_segm, mock_nms):
+        """predict_tiles infers each pre-cropped tile once and merges masks + boxes."""
+        model = _make_model()
+        mock_nms.return_value = np.array([0])
+        mock_segm.return_value = np.ones((50, 100), dtype=np.uint8)
+        tiler = InstanceSegmentationTiler(model, execution_mode="sync")
+        model.side_effect = [_make_instance_seg_result(n=1), _make_instance_seg_result(n=1)]
+        tiles = [np.zeros((50, 50, 3), dtype=np.uint8), np.zeros((50, 50, 3), dtype=np.uint8)]
+        coords = [[0, 0, 50, 50], [50, 0, 100, 50]]
+        # Saliency-map merging is exercised separately; keep this focused on box/mask merging.
+        with patch.object(tiler, "_merge_saliency_maps", return_value=[]):
+            merged = tiler.predict_tiles(tiles, coords, (50, 100, 3))
+        assert isinstance(merged, InstanceSegmentationResult)
+        assert model.call_count == 2
+
+    def test_setup_model_toggles_postprocess_flag(self):
+        """_setup_model disables semantic-mask postprocessing while tiling, then restores it."""
+        from model_api.models.instance_segmentation import MaskRCNNModel
+
+        model = MagicMock(spec=MaskRCNNModel)
+        model.load = MagicMock()
+        model.inference_adapter = MagicMock()
+        model.inference_adapter.get_rt_info.side_effect = RuntimeError(
+            "Cannot get runtime attribute. Path to runtime attribute is incorrect.",
+        )
+        model.params = MagicMock()
+        model.params.postprocess_semantic_masks = True
+
+        tiler = InstanceSegmentationTiler(model, execution_mode="sync")
+        with tiler._setup_model():  # noqa: SLF001
+            assert model._postprocess_semantic_masks is False  # noqa: SLF001
+        assert model._postprocess_semantic_masks is True  # noqa: SLF001
+
+
 class TestInstanceSegmentationTilerCall:
     def test_call_with_maskrcnn(self):
         model = _make_model()

@@ -75,6 +75,39 @@ class TestSemanticSegmentationTilerMergeResults:
         np.testing.assert_array_almost_equal(merged.soft_prediction, soft)
 
 
+class TestSemanticSegmentationTilerPredictTiles:
+    def test_predict_tiles_sync_end_to_end(self):
+        """predict_tiles infers each pre-cropped tile once and merges soft predictions."""
+        model = _make_model(num_labels=2)
+        tiler = SemanticSegmentationTiler(model, execution_mode="sync")
+        model.side_effect = [_make_seg_result(50, 50, num_classes=2), _make_seg_result(50, 50, num_classes=2)]
+        tiles = [np.zeros((50, 50, 3), dtype=np.uint8), np.zeros((50, 50, 3), dtype=np.uint8)]
+        coords = [[0, 0, 50, 50], [50, 0, 100, 50]]
+        merged = tiler.predict_tiles(tiles, coords, (50, 100, 3))
+        assert isinstance(merged, ImageResultWithSoftPrediction)
+        assert merged.soft_prediction.shape == (50, 100, 2)
+        assert model.call_count == 2
+
+    def test_setup_model_toggles_soft_prediction_flag(self):
+        """_setup_model enables soft predictions while tiling, then restores the prior state."""
+        from model_api.models.segmentation import SegmentationModel
+
+        model = MagicMock(spec=SegmentationModel)
+        model.load = MagicMock()
+        model.inference_adapter = MagicMock()
+        model.inference_adapter.get_rt_info.side_effect = RuntimeError(
+            "Cannot get runtime attribute. Path to runtime attribute is incorrect.",
+        )
+        model.params = MagicMock()
+        model.params.labels = ["a", "b"]
+        model.params.return_soft_prediction = False
+
+        tiler = SemanticSegmentationTiler(model, execution_mode="sync")
+        with tiler._setup_model():  # noqa: SLF001
+            assert model._return_soft_prediction is True  # noqa: SLF001
+        assert model._return_soft_prediction is False  # noqa: SLF001
+
+
 class TestSemanticSegmentationTilerCall:
     def test_call_with_segmentation_model(self):
         from model_api.models.segmentation import SegmentationModel

@@ -5,13 +5,18 @@
 
 import abc
 import logging as log
+from contextlib import contextmanager
 from itertools import product
+from typing import Generic, TypeVar
 
 from model_api.models.parameters import ParameterRegistry
+from model_api.models.result import Result
 from model_api.pipelines import AsyncPipeline
 
+ResultT = TypeVar("ResultT", bound=Result)
 
-class Tiler(abc.ABC):
+
+class Tiler(abc.ABC, Generic[ResultT]):
     EXECUTION_MODES = ("async", "sync")
     """
     An abstract tiler
@@ -119,7 +124,7 @@ class Tiler(abc.ABC):
                     f'The parameter "{name}" not found in tiler, will be omitted',
                 )
 
-    def __call__(self, inputs):
+    def __call__(self, inputs) -> ResultT:
         """Applies full pipeline of tiling inference in one call.
 
         Args:
@@ -131,9 +136,70 @@ class Tiler(abc.ABC):
         tile_coords = self._tile(inputs)
         tile_coords = self._filter_tiles(inputs, tile_coords)
 
-        if self.execution_mode == "sync":
-            return self._predict_sync(inputs, tile_coords)
-        return self._predict_async(inputs, tile_coords)
+        with self._setup_model():
+            if self.execution_mode == "sync":
+                return self._predict_sync(inputs, tile_coords)
+            return self._predict_async(inputs, tile_coords)
+
+    def predict_tiles(self, tiles, tile_coords, shape) -> ResultT:
+        """Run tiled inference on externally provided (already cropped) tiles and merge.
+
+        This mirrors :meth:`__call__` but skips the internal tiling stage
+        (``_tile`` / ``_filter_tiles`` / ``_crop_tile``): the caller supplies the tile
+        crops together with their absolute coordinates in the full image. This supports
+        pipelines that perform tiling upstream (e.g. inside a data loader) while still
+        reusing the tiler's per-task ``_postprocess_tile`` and ``_merge_results`` logic.
+
+        The underlying model runs once per provided tile, so callers must not pass tiles
+        through a model that itself tiles internally (that would tile each tile a second
+        time).
+
+        Args:
+            tiles: sequence of pre-cropped tile images, each in the layout expected by
+                the underlying model wrapper (typically ``(H, W, C)`` arrays).
+            tile_coords: sequence of ``[x1, y1, x2, y2]`` absolute tile coordinates in the
+                full image, aligned with ``tiles``.
+            shape: full-resolution image shape (``(H, W, C)`` or ``(H, W)``) used to place
+                and merge the per-tile predictions.
+
+        Returns:
+            Merged prediction in the format produced by ``_merge_results``.
+
+        Raises:
+            ValueError: if ``tiles`` and ``tile_coords`` have different lengths.
+        """
+        tiles = list(tiles)
+        tile_coords = list(tile_coords)
+        if len(tiles) != len(tile_coords):
+            msg = "tiles and tile_coords must have the same length"
+            raise ValueError(msg)
+
+        with self._setup_model():
+            if self.execution_mode == "sync":
+                tile_results = [
+                    self._postprocess_tile(self.model(tile), coord) for tile, coord in zip(tiles, tile_coords)
+                ]
+            else:
+                for i, tile in enumerate(tiles):
+                    self.async_pipeline.submit_data(tile, i)
+                self.async_pipeline.await_all()
+                tile_results = [
+                    self._postprocess_tile(self.async_pipeline.get_result(j)[0], tile_coords[j])
+                    for j in range(len(tiles))
+                ]
+            return self._merge_results(tile_results, shape)
+
+    @contextmanager
+    def _setup_model(self):
+        """Temporarily reconfigure the underlying model for tiled inference.
+
+        The base implementation is a no-op. Subclasses override this to toggle
+        model-specific flags for the duration of tiled inference and merging (for
+        example, disabling semantic-mask postprocessing for instance segmentation or
+        enabling soft predictions for semantic segmentation). The reconfiguration is
+        applied consistently by both :meth:`__call__` and :meth:`predict_tiles`.
+        """
+        yield
 
     def _tile(self, image):
         """Tiles an input image to overlapping or non-overlapping patches.
@@ -173,7 +239,7 @@ class Tiler(abc.ABC):
         """
         return tile_coords
 
-    def _predict_sync(self, image, tile_coords):
+    def _predict_sync(self, image, tile_coords) -> ResultT:
         """Makes prediction by splitting the input image into tiles in synchronous mode.
 
         Args:
@@ -192,7 +258,7 @@ class Tiler(abc.ABC):
 
         return self._merge_results(tile_results, image.shape)
 
-    def _predict_async(self, image, tile_coords):
+    def _predict_async(self, image, tile_coords) -> ResultT:
         """Makes prediction by splitting the input image into tiles in asynchronous mode.
 
         Args:
@@ -228,7 +294,7 @@ class Tiler(abc.ABC):
         """
 
     @abc.abstractmethod
-    def _merge_results(self, results, shape):
+    def _merge_results(self, results, shape) -> ResultT:
         """Merge results from all tiles.
 
         Args:
