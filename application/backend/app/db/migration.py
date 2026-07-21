@@ -3,7 +3,6 @@
 
 """Database migration management"""
 
-import shutil
 import sqlite3
 from contextlib import closing
 from datetime import UTC, datetime
@@ -108,41 +107,6 @@ class MigrationManager:
         logger.info(f"✓ Database backup created at {backup_path}")
         return backup_path
 
-    def backup_database(self) -> Path | None:
-        """Public wrapper around :meth:`_backup_database`.
-
-        Used by the upgrade orchestration to take a single pre-upgrade backup
-        that spans both the database and filesystem migrations.
-        """
-        return self._backup_database()
-
-    def restore_database(self, backup_path: Path) -> None:
-        """Restore the SQLite database from ``backup_path`` (rollback).
-
-        The current (partially migrated) database file is overwritten with the
-        pre-migration backup, and the WAL/SHM sidecar files are removed so SQLite
-        does not replay a stale write-ahead log on top of the restored file.
-
-        The engine's connection pool is disposed first so no open handle keeps a
-        lock on the file being replaced.
-
-        Raises:
-            OSError: if the backup file cannot be copied over the database.
-        """
-        db_path = self.database_path
-        logger.info(f"Restoring database from backup {backup_path} → {db_path}...")
-        # Drop any pooled connections so the file is not locked while we replace it.
-        db_engine.dispose()
-        tmp_db_path = db_path.with_name(f"{db_path.name}.restore_tmp")
-        shutil.copyfile(backup_path, tmp_db_path)
-        tmp_db_path.replace(db_path)
-        for sidecar in (db_path.with_name(f"{db_path.name}-wal"), db_path.with_name(f"{db_path.name}-shm")):
-            try:
-                sidecar.unlink(missing_ok=True)
-            except OSError as e:
-                logger.warning(f"Could not remove stale SQLite sidecar {sidecar}: {e}")
-        logger.info("✓ Database restored from backup")
-
     @staticmethod
     def _remove_backup(backup_path: Path) -> None:
         """Delete a database backup file once it is no longer needed.
@@ -209,54 +173,6 @@ class MigrationManager:
             logger.warning(f"Could not check migration status: {e}")
             return True, "Unknown - assuming migration needed"
 
-    def get_current_revision(self) -> str | None:
-        """Return the Alembic revision the database is currently at, if any.
-
-        Captured before an upgrade so a failed upgrade can be rolled back to this
-        exact revision (which also reverts any in-script filesystem changes via
-        the migrations' ``downgrade`` functions). Returns ``None`` for a database
-        that has no Alembic version yet (fresh install).
-        """
-        try:
-            with db_engine.connect() as conn:
-                context = migration.MigrationContext.configure(conn)
-                return context.get_current_revision()
-        except Exception as e:
-            logger.warning(f"Could not determine current database revision: {e}")
-            return None
-
-    def _rollback_upgrade(self, start_revision: str | None, backup_path: Path | None) -> None:
-        """Revert a failed upgrade to its pre-upgrade state.
-
-        Two stages, both best effort:
-
-        1. ``alembic downgrade`` back to ``start_revision``. Because the project
-           convention keeps filesystem-layout changes inside the same migration
-           scripts (see ``docs/migration-guidelines.md``), this reverts on-disk
-           file moves performed by any migrations that had already committed.
-        2. Restore the pre-upgrade database file from ``backup_path``. This is the
-           authoritative safety net that guarantees a consistent database even if
-           the downgrade above could not fully run on a partially-migrated schema.
-        """
-        if start_revision is not None:
-            try:
-                logger.info(f"Rolling back database/storage to revision {start_revision}...")
-                command.downgrade(self.get_alembic_config(), start_revision)
-                logger.info("✓ Reverted migrations (including in-script filesystem changes)")
-            except Exception as e:
-                logger.warning(
-                    f"Could not cleanly downgrade to {start_revision}: {e}. "
-                    "The database backup will be restored instead."
-                )
-        if backup_path is not None:
-            try:
-                self.restore_database(backup_path)
-            except OSError as restore_error:
-                logger.error(
-                    f"✗ Automatic database rollback failed: {restore_error}. "
-                    f"The pre-upgrade backup is preserved at {backup_path}."
-                )
-
     def initialize_database(self) -> bool:
         """Initialize database with migrations if needed.
 
@@ -285,20 +201,10 @@ class MigrationManager:
             if needs_migration:
                 logger.info("Database needs migration")
                 backup_path = self._backup_database()
-                # Capture the revision we are upgrading *from* so a failed upgrade
-                # can be reverted to exactly this point.
-                start_revision = self.get_current_revision()
-                # run_migrations() raises MigrationFatalError on failure. The
-                # upgrade is then automatically rolled back — both the schema and
-                # any in-script filesystem changes are reverted and the database
-                # is restored from the backup — so the previous version stays
-                # usable. The backup is retained for diagnostics and its location
-                # is attached to the re-raised error.
-                try:
-                    self.run_migrations(backup_path=backup_path)
-                except MigrationFatalError:
-                    self._rollback_upgrade(start_revision, backup_path)
-                    raise
+                # run_migrations() raises MigrationFatalError on failure; the
+                # backup is intentionally retained for manual recovery and its
+                # location is attached to the raised error.
+                self.run_migrations(backup_path=backup_path)
                 if backup_path is not None:
                     self._remove_backup(backup_path)
                 return True

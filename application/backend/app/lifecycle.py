@@ -46,7 +46,6 @@ from app.services.inference import InferenceServer
 from app.services.subset_assignment import SubsetAssigner, SubsetService
 from app.services.video import CacheConfig, VideoService
 from app.settings import get_settings
-from app.upgrade import UpgradeManager
 from app.webrtc import SDPHandler, WebRTCManager, WebRTCSettings
 
 # Dedicated process exit code for fatal, non-restartable migration failures.
@@ -163,7 +162,7 @@ def setup_job_controller(
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
     """FastAPI lifespan context manager"""
     # Startup
     settings = get_settings()
@@ -173,32 +172,30 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     # Setup logging
     setup_logging(config=LogConfig(level=settings.log_level))
 
-    # Initialize database and upgrade application data (DB schema + filesystem
-    # layout) to the running version. On a failed upgrade the data is
-    # automatically rolled back to its pre-upgrade state before the error is
-    # surfaced here.
+    # Initialize database
     migration_manager = MigrationManager(settings)
-    upgrade_manager = UpgradeManager(settings, migration_manager=migration_manager)
     try:
-        initialized = upgrade_manager.run()
+        initialized = migration_manager.initialize_database()
     except MigrationFatalError as e:
-        # A failed/incompatible upgrade is fatal and non-restartable. The data has
-        # already been rolled back to the previous version; log the traceback and
-        # recovery guidance, then terminate the process with a dedicated exit code.
-        # os._exit is used (instead of raising) so the exit code reliably reaches
-        # the launcher/supervisor rather than being swallowed by the ASGI server's
-        # lifespan error handling.
-        logger.exception("Fatal application upgrade error; exiting without restart: {}", e)
-        logger.error(
-            "The application data has been rolled back to the previous version and remains usable. "
-            "Downgrade the application to the previous version to continue."
-        )
+        # A failed/incompatible database migration is fatal and non-restartable.
+        # Log the traceback and recovery guidance, then terminate the process with a
+        # dedicated exit code. os._exit is used (instead of raising) so the exit code
+        # reliably reaches the launcher/supervisor rather than being swallowed by the
+        # ASGI server's lifespan error handling.
+        logger.exception("Fatal database migration error; exiting without restart: {}", e)
         if e.backup_path is not None:
             logger.error(
-                "If the automatic rollback did not succeed, restore the pre-upgrade database backup "
-                "manually by renaming '{}' back to '{}' (the original database file).",
+                "To recover, restore the pre-migration database backup: rename the backup file "
+                "'{}' back to '{}' (the original database file), overwriting the partially "
+                "migrated database.",
                 e.backup_path,
                 migration_manager.database_path,
+            )
+            logger.error("After restoring the backup, downgrade the application to the previous version.")
+        else:
+            logger.error(
+                "No pre-migration database backup is available. To recover, downgrade the "
+                "application to the previous version."
             )
         logger.error("If the problem persists, please create a ticket on https://github.com/open-edge-platform/geti.")
         # loguru is configured with enqueue=True (see setup_logging), so records are emitted

@@ -303,7 +303,6 @@ tauri-build:
 tauri-build:
     cd ui && npx tauri build
 
-
 # run coturn server
 run-coturn:
     @echo "Running coturn server on port {{ coturn-port }} with external IP {{ host-ip }}..."
