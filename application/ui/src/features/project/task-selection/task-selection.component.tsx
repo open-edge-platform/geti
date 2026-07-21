@@ -3,12 +3,12 @@
 
 import type { Dispatch, SetStateAction } from 'react';
 
+import type { TaskType } from '@/api/types';
 import { Divider, Flex, Grid, Heading, Image, Radio, RadioGroup, Text, View } from '@geti-ui/ui';
 
 import classificationImageUrl from '../../../assets/classification.webp';
 import detectionImageUrl from '../../../assets/detection.webp';
 import segmentationImageUrl from '../../../assets/segmentation.webp';
-import type { TaskType } from '../../../constants/shared-types';
 import type { TaskOption } from './interface';
 
 import classes from './task-selection.module.scss';

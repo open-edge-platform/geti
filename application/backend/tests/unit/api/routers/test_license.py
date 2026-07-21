@@ -9,16 +9,15 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from app.api.dependencies import get_license_service
-from app.main import app
 from app.services.license_service import LicenseService
 
 
 @pytest.fixture
-def fxt_license_service() -> Generator[Mock]:
+def fxt_license_service(fxt_app) -> Generator[Mock]:
     license_service = Mock(spec=LicenseService)
-    app.dependency_overrides[get_license_service] = lambda: license_service
+    fxt_app.dependency_overrides[get_license_service] = lambda: license_service
     yield license_service
-    app.dependency_overrides.pop(get_license_service, None)
+    fxt_app.dependency_overrides.pop(get_license_service, None)
 
 
 class TestLicenseEndpoints:

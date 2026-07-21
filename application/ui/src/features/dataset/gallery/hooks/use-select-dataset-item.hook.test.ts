@@ -1,12 +1,12 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Media } from '@/api/types';
 import { act } from '@testing-library/react';
 import { getMockedMediaImage, getMockedVideo, getMockedVideoFrame } from 'mocks/mock-media';
 import { renderHook } from 'test-utils/render';
 
 import { paths } from '../../../../constants/paths';
-import { Media } from '../../../../constants/shared-types';
 import { useGetDatasetMediaItems } from '../../../../hooks/use-get-dataset-media-items.hook';
 import { useSelectDatasetItem } from './use-select-dataset-item.hook';
 
@@ -190,6 +190,25 @@ describe('useSelectDatasetItem', () => {
             });
 
             expect(result.current.selectedMediaItem).toBeNull();
+        });
+
+        it('stays set once hydrated even after a filter shrinks items to exclude it', () => {
+            const image = getMockedMediaImage({ id: 'img-selected' });
+            vi.mocked(useGetDatasetMediaItems).mockReturnValue({ ...mockDatasetMediaItems, items: [image] });
+
+            const route = `${paths.project.dataset.item.index({ projectId: MOCKED_PROJECT_ID, datasetItemId: image.id })}${SEARCH}`;
+            const { result, rerender } = renderHook(() => useSelectDatasetItem(), {
+                route,
+                path: paths.project.dataset.item.index.pattern,
+            });
+
+            expect(result.current.selectedMediaItem).toEqual(image);
+
+            // Simulate an active filter now excluding the open item from the filtered list.
+            vi.mocked(useGetDatasetMediaItems).mockReturnValue({ ...mockDatasetMediaItems, items: [] });
+            rerender();
+
+            expect(result.current.selectedMediaItem).toEqual(image);
         });
     });
 });

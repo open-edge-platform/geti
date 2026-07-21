@@ -27,17 +27,3 @@ class InterceptHandler(logging.Handler):
             depth += 1
 
         logger.opt(depth=depth, exception=record.exc_info).log(level, record.getMessage())
-
-
-class LoggerStdoutWriter:
-    """Wrapper for redirecting stdout to logger"""
-
-    @staticmethod
-    def write(msg: str) -> None:
-        msg = msg.rstrip("\n")
-        if msg:
-            logger.info(msg)
-
-    @staticmethod
-    def flush() -> None:
-        pass

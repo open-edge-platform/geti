@@ -1,6 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { LocalFolderSinkConfig } from '@/api/types';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { HttpResponse } from 'msw';
@@ -12,7 +13,7 @@ import { server } from '../../../../msw-node-setup';
 import { useSinkMutation } from '../hooks/use-sink-mutation.hook';
 import { LocalFolder } from '../local-folder/local-folder.component';
 import { getLocalFolderInitialConfig, localFolderBodyFormatter } from '../local-folder/utils';
-import { LocalFolderSinkConfig, OutputFormat } from '../utils';
+import { OutputFormat } from '../utils';
 import { EditSink } from './edit-sink.component';
 
 vi.mock('../hooks/use-sink-mutation.hook');

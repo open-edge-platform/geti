@@ -13,7 +13,6 @@ from getitune.backend.lightning.models.detection.detectors import DETR
 from getitune.backend.lightning.models.detection.heads.deim_decoder import DEIMTransformer
 from getitune.backend.lightning.models.detection.losses.deim_loss import DEIMCriterion
 from getitune.backend.lightning.models.detection.necks.dfine_hybrid_encoder import HybridEncoder
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 
@@ -24,6 +23,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -41,7 +41,7 @@ class DEIMV2(DEIMDFine):
     for dynamic augmentation scheduling.
 
     Attributes:
-        _pretrained_weights (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
+        pretrained_urls (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
         input_size_multiplier (int): Multiplier for the input size.
 
     Args:
@@ -56,9 +56,12 @@ class DEIMV2(DEIMDFine):
         multi_scale (bool, optional): Whether to use multi-scale training. Defaults to False.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "deimv2_x": "https://storage.geti.intel.com/weights/deimv2_dinov3_x_coco.pth",
         "deimv2_l": "https://storage.geti.intel.com/weights/deimv2_dinov3_l_coco.pth",
         "deimv2_m": "https://storage.geti.intel.com/weights/deimv2_dinov3_m_coco.pth",
@@ -83,6 +86,8 @@ class DEIMV2(DEIMDFine):
         multi_scale: bool = False,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             model_name=model_name,  # type: ignore[arg-type]
@@ -94,6 +99,8 @@ class DEIMV2(DEIMDFine):
             torch_compile=torch_compile,
             tile_config=tile_config,
             multi_scale=multi_scale,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> DETR:
@@ -155,16 +162,23 @@ class DEIMV2(DEIMDFine):
             input_size=self.data_input_params.input_size[0],
         )
         model.init_weights()
-        # Remap decoder self-attention keys: checkpoint uses nn.MultiheadAttention naming,
-        # our decoder uses fused qkv_proj/out_proj. Scoped to decoder layers only.
-        key_mapping: dict[str, str] = {}
-        for i in range(decoder.num_layers):
-            prefix = f"decoder.decoder.layers.{i}."
-            key_mapping[f"{prefix}self_attn.in_proj_"] = f"{prefix}qkv_proj."
-            key_mapping[f"{prefix}self_attn.out_proj."] = f"{prefix}out_proj."
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu", key_mapping=key_mapping)
+
         return model
 
     @property
     def _default_preprocessing_params(self) -> DataInputParams | dict[str, DataInputParams]:
         return DataInputParams(input_size=(640, 640), mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+
+    @property
+    def pretrained_key_mapping(self) -> dict[str, str] | None:
+        """Map DEIMv2 checkpoint decoder attention keys to getitune decoder keys.
+
+        Remap decoder self-attention keys: checkpoint uses nn.MultiheadAttention naming,
+        our decoder uses fused qkv_proj/out_proj. Scoped to decoder layers only.
+        """
+        key_mapping: dict[str, str] = {}
+        for i in range(self.model.decoder.num_layers):  # pyrefly: ignore[missing-attribute]
+            prefix = f"decoder.decoder.layers.{i}."
+            key_mapping[f"{prefix}self_attn.in_proj_"] = f"{prefix}qkv_proj."
+            key_mapping[f"{prefix}self_attn.out_proj."] = f"{prefix}out_proj."
+        return key_mapping

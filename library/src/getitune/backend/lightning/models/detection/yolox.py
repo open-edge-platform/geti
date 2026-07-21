@@ -20,7 +20,6 @@ from getitune.backend.lightning.models.detection.heads import YOLOXHead
 from getitune.backend.lightning.models.detection.losses import YOLOXCriterion
 from getitune.backend.lightning.models.detection.necks import YOLOXPAFPN
 from getitune.backend.lightning.models.detection.utils.assigners import SimOTAAssigner
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.data.entity.sample import SampleBatch
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
@@ -34,6 +33,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -48,7 +48,7 @@ class YOLOX(LightningDetectionModel):
     """getitune Detection model class for YOLOX.
 
     Attributes:
-        pretrained_weights (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
+        pretrained_urls (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
 
     Args:
         label_info (LabelInfoTypes): Information about the labels.
@@ -64,9 +64,12 @@ class YOLOX(LightningDetectionModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to MeanAveragePrecisionFMeasureCallable.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "yolox_tiny": "https://storage.geti.intel.com/weights/yolox_tiny_8x8.pth",
         "yolox_s": "https://storage.geti.intel.com/weights/yolox_s_8x8_300e_coco_20211121_095711-4592a793.pth",
         "yolox_l": "https://storage.geti.intel.com/weights/yolox_l_8x8_300e_coco_20211126_140236-d3bd2b23.pth",
@@ -85,6 +88,8 @@ class YOLOX(LightningDetectionModel):
         metric: MetricCallable = MeanAveragePrecisionFMeasureCallable,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -95,6 +100,8 @@ class YOLOX(LightningDetectionModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
         # Raw uint8 models expect [0, 255] inputs; reject 16-bit data.
@@ -142,7 +149,6 @@ class YOLOX(LightningDetectionModel):
             test_cfg=test_cfg,
         )
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
 
         return model
 

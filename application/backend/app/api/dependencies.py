@@ -27,6 +27,7 @@ from app.services import (
     PipelineService,
     ProjectService,
     SinkService,
+    SourceMediaService,
     SourceUpdateService,
     StagedDatasetService,
     SystemService,
@@ -35,7 +36,10 @@ from app.services.data_collect import DataCollector
 from app.services.demo_files_service import DemoFilesService
 from app.services.event.event_bus import EventBus
 from app.services.inference import InferenceServer
+from app.services.inference_status_service import InferenceStatusService
 from app.services.license_service import LicenseService
+from app.services.sink_status_service import SinkStatusService
+from app.services.source_status_service import SourceStatusService
 from app.services.training_configuration_service import TrainingConfigurationService
 from app.services.video import VideoService
 from app.webrtc.manager import WebRTCManager
@@ -87,6 +91,11 @@ def get_job_dir(request: Request) -> Path:
 def get_staged_datasets_dir(request: Request) -> Path:
     """Provides the path to the folder where the staged datasets are saved. This path is defined in the app settings."""
     return request.app.state.settings.staged_datasets_dir
+
+
+def get_source_media_dir(request: Request) -> Path:
+    """Provides the path to the folder where uploaded source videos are saved. Defined in the app settings."""
+    return request.app.state.settings.source_media_dir
 
 
 def get_ice_servers(request: Request) -> list[dict]:
@@ -141,11 +150,45 @@ def get_sink_service(
     return SinkService(event_bus=event_bus, db_session=db)
 
 
+def get_source_media_service(
+    source_media_dir: Annotated[Path, Depends(get_source_media_dir)],
+) -> SourceMediaService:
+    """Provides a SourceMediaService instance for storing uploaded source videos."""
+    return SourceMediaService(source_media_dir)
+
+
 def get_source_update_service(
-    event_bus: Annotated[EventBus, Depends(get_event_bus)], db: Annotated[Session, Depends(get_db)]
+    event_bus: Annotated[EventBus, Depends(get_event_bus)],
+    db: Annotated[Session, Depends(get_db)],
+    source_media_service: Annotated[SourceMediaService, Depends(get_source_media_service)],
 ) -> SourceUpdateService:
     """Provides a SourceUpdateService instance."""
-    return SourceUpdateService(event_bus=event_bus, db_session=db)
+    return SourceUpdateService(event_bus=event_bus, db_session=db, source_media_service=source_media_service)
+
+
+def get_source_status_service(
+    scheduler: Annotated[Scheduler, Depends(get_scheduler)],
+) -> SourceStatusService:
+    """Provides a SourceStatusService instance."""
+    return SourceStatusService(
+        source_status_shm=scheduler.source_status_shm, source_status_lock=scheduler.source_status_lock
+    )
+
+
+def get_sink_status_service(
+    scheduler: Annotated[Scheduler, Depends(get_scheduler)],
+) -> SinkStatusService:
+    """Provides a SinkStatusService instance."""
+    return SinkStatusService(sink_status_holder=scheduler.sink_status_holder)
+
+
+def get_inference_status_service(
+    scheduler: Annotated[Scheduler, Depends(get_scheduler)],
+) -> InferenceStatusService:
+    """Provides an InferenceStatusService instance."""
+    return InferenceStatusService(
+        inference_status_shm=scheduler.inference_status_shm, inference_status_lock=scheduler.inference_status_lock
+    )
 
 
 def get_system_service() -> SystemService:

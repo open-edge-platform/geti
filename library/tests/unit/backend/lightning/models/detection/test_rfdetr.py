@@ -407,6 +407,7 @@ class TestRFDETR:
         model = RFDETR(
             model_name=model_name,  # pyrefly: ignore[bad-argument-type]
             label_info=3,
+            pretrained=False,
         )
         assert model.model_name == model_name
         assert model.num_classes == 3
@@ -416,6 +417,7 @@ class TestRFDETR:
         model = RFDETR(
             model_name="rfdetr_medium",
             label_info=10,
+            pretrained=False,
         )
         created_model = model._create_model()
         assert created_model is not None
@@ -431,6 +433,7 @@ class TestRFDETR:
         model = RFDETR(
             model_name="rfdetr_medium",
             label_info=3,
+            pretrained=False,
         )
 
         # Check that default params use 0-1 range normalization
@@ -446,6 +449,7 @@ class TestRFDETR:
         model = RFDETR(
             model_name="rfdetr_nano",
             label_info=5,
+            pretrained=False,
         )
 
         # Test configure_optimizers method
@@ -476,6 +480,7 @@ class TestRFDETR:
         model = RFDETR(
             model_name=model_name,  # pyrefly: ignore[bad-argument-type]
             label_info=label_info,
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests
@@ -511,6 +516,7 @@ class TestRFDETR:
         model = RFDETR(
             model_name=model_name,  # pyrefly: ignore[bad-argument-type]
             label_info=3,
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests
@@ -547,6 +553,7 @@ class TestRFDETR:
         model = RFDETR(
             model_name=model_name,  # pyrefly: ignore[bad-argument-type]
             label_info=3,
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests
@@ -565,6 +572,7 @@ class TestRFDETR:
             model_name="rfdetr_nano",
             label_info=3,
             multi_scale=True,
+            pretrained=False,
         )
 
         # Move model to CPU for unit tests

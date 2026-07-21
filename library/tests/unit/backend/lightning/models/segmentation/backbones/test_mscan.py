@@ -1,12 +1,10 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from unittest.mock import MagicMock
 
 import pytest
 import torch
 
-from getitune.backend.lightning.models.segmentation.backbones import mscan as target_file
 from getitune.backend.lightning.models.segmentation.backbones.mscan import DropPath, MSCANModule, drop_path
 
 
@@ -76,34 +74,3 @@ class TestMSCABlock:
         out = mscan.forward(x)
 
         assert len(out) == num_stages
-
-    @pytest.fixture
-    def mock_load_from_http(self, mocker) -> MagicMock:
-        return mocker.patch.object(target_file, "load_from_http")
-
-    @pytest.fixture
-    def mock_load_checkpoint_to_model(self, mocker) -> MagicMock:
-        return mocker.patch.object(target_file, "load_checkpoint_to_model")
-
-    @pytest.fixture
-    def pretrained_weight(self, tmp_path) -> str:
-        weight = tmp_path / "pretrained.pth"
-        weight.touch()
-        return str(weight)
-
-    @pytest.fixture
-    def mock_torch_load(self, mocker) -> MagicMock:
-        return mocker.patch("getitune.backend.lightning.models.segmentation.backbones.mscan.torch.load")
-
-    def test_load_pretrained_weights(self, pretrained_weight, mock_torch_load, mock_load_checkpoint_to_model):
-        MSCANModule(pretrained_weights=pretrained_weight)
-
-        mock_torch_load.assert_called_once_with(pretrained_weight, "cpu")
-        mock_load_checkpoint_to_model.assert_called_once()
-
-    def test_load_pretrained_weights_from_url(self, mock_load_from_http, mock_load_checkpoint_to_model):
-        pretrained_weight = "www.fake.com/fake.pth"
-        MSCANModule(pretrained_weights=pretrained_weight)
-
-        mock_load_from_http.assert_called_once_with(filename=pretrained_weight, map_location="cpu")
-        mock_load_checkpoint_to_model.assert_called_once()

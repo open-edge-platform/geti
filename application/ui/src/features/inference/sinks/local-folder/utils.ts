@@ -1,7 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { LocalFolderSinkConfig, rateLimitFromFormData, SinkOutputFormats } from '../utils';
+import type { LocalFolderSinkConfig, SinkOutputFormats } from '@/api/types';
+
+import { rateLimitFromFormData } from '../utils';
 
 export const getLocalFolderInitialConfig = (): LocalFolderSinkConfig => ({
     id: '',

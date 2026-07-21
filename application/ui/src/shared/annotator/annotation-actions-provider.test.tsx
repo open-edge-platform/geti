@@ -3,6 +3,7 @@
 
 import { type ReactNode } from 'react';
 
+import type { AnnotationDTO, Label } from '@/api/types';
 import { act, waitFor } from '@testing-library/react';
 import { getMockedShape } from 'mocks/mock-annotation';
 import { getMockedAnnotationLabelRef, getMockedLabel } from 'mocks/mock-labels';
@@ -11,7 +12,6 @@ import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
 import { http } from '../../api/utils';
-import type { AnnotationDTO, Label } from '../../constants/shared-types';
 import { server } from '../../msw-node-setup';
 import { renderHook } from '../../test-utils/render';
 import {
@@ -193,6 +193,57 @@ describe('Label normalization', () => {
             expect(savedBody).toBeDefined();
             // Stale ref is filtered out at save time
             expect(savedBody?.annotations[0].labels).toEqual([]);
+        });
+    });
+});
+
+describe('canSubmit on initial load', () => {
+    it('is false when initial annotations are unchanged, including a null confidences field from the server', async () => {
+        const label1 = getMockedLabel({ id: 'label-1', name: 'Cat', color: '#FF0000' });
+
+        // This is the exact shape the backend returns for a human annotation with no confidence
+        // scores: `confidences` is present and `null` (see DatasetItemAnnotation), never omitted.
+        const annotationsDTO: AnnotationDTO[] = [
+            { labels: [{ id: label1.id }], shape: getMockedShape({ type: 'rectangle' }), confidences: null },
+        ];
+
+        const { result } = renderAnnotationActions({
+            mode: 'annotation',
+            labels: [label1],
+            initialAnnotationsDTO: annotationsDTO,
+        });
+
+        await waitFor(() => expect(result.current).not.toBeNull());
+
+        await waitFor(() => {
+            expect(result.current.annotations).toHaveLength(1);
+            expect(result.current.canSubmit).toBe(false);
+        });
+    });
+
+    it('is true once an unchanged annotation set is actually edited', async () => {
+        const label1 = getMockedLabel({ id: 'label-1', name: 'Cat', color: '#FF0000' });
+        const label2 = getMockedLabel({ id: 'label-2', name: 'Dog', color: '#00FF00' });
+
+        const annotationsDTO: AnnotationDTO[] = [
+            { labels: [{ id: label1.id }], shape: getMockedShape({ type: 'rectangle' }), confidences: null },
+        ];
+
+        const { result } = renderAnnotationActions({
+            mode: 'annotation',
+            labels: [label1, label2],
+            initialAnnotationsDTO: annotationsDTO,
+        });
+
+        await waitFor(() => expect(result.current.canSubmit).toBe(false));
+
+        act(() => {
+            result.current.addAnnotations([getMockedShape({ type: 'rectangle' })], [{ id: label2.id }]);
+        });
+
+        await waitFor(() => {
+            expect(result.current.annotations).toHaveLength(2);
+            expect(result.current.canSubmit).toBe(true);
         });
     });
 });

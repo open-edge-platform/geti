@@ -109,11 +109,12 @@ class GetiTuneQuantizer(Execution[QuantizationJobParams]):
         params: QuantizationJobParams,
         model: ModelRevision,
     ) -> DataModule:
+        """Load and prepare the calibration dataset from the training dataset revision."""
         from getitune.config.data import SamplerConfig, SubsetConfig
         from getitune.data.entity.utils import detect_storage_dtype
         from getitune.data.factory import TransformLibFactory
+        from getitune.data.module import DataModule
 
-        """Load and prepare the calibration dataset from the training dataset revision."""
         # Get the dataset revision used for training
         dataset_revision_id = model.training_info.dataset_revision_id if model.training_info else None
         if dataset_revision_id is None:
@@ -238,6 +239,7 @@ class GetiTuneQuantizer(Execution[QuantizationJobParams]):
         ov_engine: OVEngine,
         subset_size: int,
         max_drop: float | None = None,
+        max_num_iterations: int | None = None,
     ) -> Path:
         """Execute the quantization process using nncf.quantize() via OVEngine.optimize().
 
@@ -245,12 +247,18 @@ class GetiTuneQuantizer(Execution[QuantizationJobParams]):
             ov_engine: The OVEngine instance.
             subset_size: Maximum calibration subset size.
             max_drop: Optional maximum accuracy drop for accuracy-aware quantization.
+            max_num_iterations: Optional maximum number of iterations for accuracy-aware
+                quantization. ``None`` means unlimited. Only used when ``max_drop`` is set.
 
         Returns:
             Path to the quantized model XML file.
         """
         logger.info("Running quantization with max_calibration_subset_size={}", subset_size)
-        quantized_model_path = ov_engine.optimize(max_data_subset_size=subset_size, max_drop=max_drop)
+        quantized_model_path = ov_engine.optimize(
+            max_data_subset_size=subset_size,
+            max_drop=max_drop,
+            max_num_iterations=max_num_iterations,
+        )
         logger.info("Quantization completed. Model saved at {}", quantized_model_path)
         return quantized_model_path
 
@@ -328,16 +336,23 @@ class GetiTuneQuantizer(Execution[QuantizationJobParams]):
 
         datamodule = self.prepare_calibration_dataset(params=params, model=model)
         ov_engine = self.initialize_engine(params=params, model=model, datamodule=datamodule)
+
+        # max_num_iterations only applies to accuracy-aware quantization (max_drop set).
+        # For standard PTQ it must always be None regardless of the configured value.
+        max_num_iterations = params.max_num_iterations if params.max_drop is not None else None
+
         quantized_model_path = self.run_quantization(
             ov_engine=ov_engine,
             subset_size=params.max_calibration_subset_size,
             max_drop=params.max_drop,
+            max_num_iterations=max_num_iterations,
         )
 
         quantization_info = {
             "type": "PTQ" if params.max_drop is None else "Accuracy-aware PTQ",
             "max_calibration_subset_size": params.max_calibration_subset_size,
             "max_drop": params.max_drop,
+            "max_num_iterations": max_num_iterations,
         }
 
         with self._db_session_factory() as db:
