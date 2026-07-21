@@ -1,0 +1,4 @@
+interface:
+  display_name: "Run Inference (getitune)"
+  short_description: "Run predictions/eval with PyTorch, OpenVINO, or ONNX models"
+  default_prompt: "Use $getitune-running-inference to run inference or evaluation with getitune."

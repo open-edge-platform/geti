@@ -12,7 +12,6 @@ Modified from DEIMv2 (https://github.com/Intellindust-AI-Lab/DEIMv2)
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 from typing import Any, ClassVar
 
 import torch
@@ -112,7 +111,6 @@ class DINOv3STAsModule(nn.Module):
 
     Args:
         name: Model name. Use 'dinov3_*' for DINOv3 variants or other names for ViT-Tiny.
-        weights_path: Path to pretrained weights. Defaults to None.
         interaction_indexes: Layer indices to extract intermediate features from.
             Defaults to empty list.
         finetune: Whether to finetune the backbone. If False, backbone is frozen.
@@ -128,7 +126,6 @@ class DINOv3STAsModule(nn.Module):
     def __init__(
         self,
         name: str,
-        weights_path: str | None = None,
         interaction_indexes: list[int] | None = None,
         finetune: bool = True,
         embed_dim: int = 192,
@@ -145,22 +142,12 @@ class DINOv3STAsModule(nn.Module):
         self.dinov3: DinoVisionTransformer | VisionTransformer
         if "dinov3" in name:
             self.dinov3 = DinoVisionTransformer(name=name)
-            if weights_path is not None and Path(weights_path).exists():
-                logger.info("Loading checkpoint from %s...", weights_path)
-                self.dinov3.load_state_dict(torch.load(weights_path))
-            else:
-                logger.info("Training DINOv3 from scratch...")
         else:
             self.dinov3 = VisionTransformer(
                 embed_dim=embed_dim,
                 num_heads=num_heads,
                 return_layers=interaction_indexes,
             )
-            if weights_path is not None and Path(weights_path).exists():
-                logger.info("Loading checkpoint from %s...", weights_path)
-                self.dinov3._model.load_state_dict(torch.load(weights_path))  # noqa: SLF001
-            else:
-                logger.info("Training ViT-Tiny from scratch...")
 
         embed_dim = self.dinov3.embed_dim
         self.interaction_indexes = interaction_indexes
@@ -271,14 +258,12 @@ class DINOv3STAs(nn.Module):
     backbone_cfg: ClassVar[dict[str, dict[str, Any]]] = {
         "deimv2_x": {
             "name": "dinov3_vits16plus",
-            "weights_path": None,
             "interaction_indexes": [5, 8, 11],
             "conv_inplane": 64,
             "hidden_dim": 256,
         },
         "deimv2_l": {
             "name": "dinov3_vits16",
-            "weights_path": None,
             "interaction_indexes": [5, 8, 11],
             "conv_inplane": 32,
             "hidden_dim": 224,
@@ -286,14 +271,12 @@ class DINOv3STAs(nn.Module):
         "deimv2_m": {
             "name": "vit_tinyplus",
             "embed_dim": 256,
-            "weights_path": None,
             "interaction_indexes": [3, 7, 11],
             "num_heads": 4,
         },
         "deimv2_s": {
             "name": "vit_tiny",
             "embed_dim": 192,
-            "weights_path": None,
             "interaction_indexes": [3, 7, 11],
             "num_heads": 3,
         },

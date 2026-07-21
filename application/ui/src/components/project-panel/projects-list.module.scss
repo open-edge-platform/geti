@@ -32,22 +32,13 @@
     @include lineClamp.breakableText;
 
     text-align: start;
-    font-size: var(--spectrum-global-dimension-size-150);
+    font-size: var(--spectrum-global-dimension-size-175);
 }
 
 .dialogProjectName {
     @include lineClamp.breakableText;
 
     text-align: center;
-}
-
-.statusTag {
-    background-color: transparent !important;
-    width: fit-content !important;
-
-    span[class*='ActionButton-label'] {
-        padding: 0 !important;
-    }
 }
 
 .selectedProjectButton {

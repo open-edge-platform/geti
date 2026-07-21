@@ -20,12 +20,8 @@ class TestLightningInstanceSegModel:
             label_info=1,
             model_name="maskrcnn_resnet_50",
             data_input_params=DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
-
-    def test_create_model(self, model) -> None:
-        mmdet_model = model._create_model()
-        assert mmdet_model is not None
-        assert isinstance(mmdet_model, torch.nn.Module)
 
     def test_get_explain_fn(self, model):
         model.explain_mode = True

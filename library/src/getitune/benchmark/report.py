@@ -256,25 +256,25 @@ def check_regressions(
 
 def aggregate_metrics_across_seeds(
     results: list[ExperimentResult],
-) -> dict[str, dict[str, float]]:
-    """Average metrics across seeds for each ``(task/model/dataset/scenario)`` key.
+) -> dict[tuple[str, str, str, str], dict[str, float]]:
+    """Average metrics across seeds for each ``(task, model, dataset, scenario)`` group.
 
     Per-seed metric keys are normalized via :func:`rewrite_metric_key` so they
     share the same shape as MLflow-stored baseline metrics.
 
     Returns:
-        ``{key: averaged_metrics}``
+        ``{(task, model, dataset, scenario): averaged_metrics}``
     """
-    grouped: dict[str, list[dict[str, float]]] = defaultdict(list)
+    grouped: dict[tuple[str, str, str, str], list[dict[str, float]]] = defaultdict(list)
 
     for result in results:
         if not result.success:
             continue
-        key = f"{result.task}/{result.model}/{result.dataset}/{result.scenario}"
+        key = (result.task, result.model, result.dataset, result.scenario)
         normalized = {rewrite_metric_key(k): v for k, v in result.all_metrics().items()}
         grouped[key].append(normalized)
 
-    averaged: dict[str, dict[str, float]] = {}
+    averaged: dict[tuple[str, str, str, str], dict[str, float]] = {}
     for key, metric_dicts in grouped.items():
         if not metric_dicts:
             continue
@@ -321,14 +321,9 @@ def build_report(
     averaged = aggregate_metrics_across_seeds(results)
 
     comparisons: list[ExperimentComparison] = []
-    for key, current_metrics in averaged.items():
-        parts = key.split("/", 3)
-        task = parts[0] if len(parts) > 0 else "unknown"
-        model = parts[1] if len(parts) > 1 else "unknown"
-        dataset = parts[2] if len(parts) > 2 else "unknown"
-        scenario = parts[3] if len(parts) > 3 else "default"
-
-        baseline_metrics = baselines.get(key)
+    for (task, model, dataset, scenario), current_metrics in averaged.items():
+        baseline_key = f"{task}/{model}/{dataset}/{scenario}"
+        baseline_metrics = baselines.get(baseline_key)
         criteria = criteria_by_task.get(task)
         thresholds = criteria.thresholds if criteria else {}
 
@@ -403,6 +398,22 @@ def _fmt_memory(mb: float | None) -> str:
     return f"{mb:.0f} MB"
 
 
+def _fmt_latency(seconds: float | None) -> str:
+    """Format a per-sample latency into a human-readable string.
+
+    Unlike :func:`_fmt_time` (built for run-length durations such as train
+    time), per-sample test latency is typically well under a second. Reusing
+    ``_fmt_time``'s single-decimal-second precision collapses nearly every
+    real value into ``0.0s`` or ``0.1s``, so sub-second values are rendered
+    in milliseconds instead to preserve meaningful precision.
+    """
+    if seconds is None:
+        return "—"
+    if seconds < 1:
+        return f"{seconds * 1000:.1f} ms"
+    return f"{seconds:.2f}s"
+
+
 def generate_markdown(report: BenchmarkReport) -> str:
     """Render a :class:`BenchmarkReport` as a Markdown string."""
     lines: list[str] = []
@@ -437,18 +448,28 @@ def generate_markdown(report: BenchmarkReport) -> str:
         # Use a standard set: primary accuracy metric, train time, GPU mem, test latency
         metric_cols = _detect_metric_columns(comps)
 
-        header = "| Model | Dataset | Scenario "
+        header = "| Model | Dataset | Status "
         separator = "| --- | --- | --- "
         for col_label, _, _ in metric_cols:
             header += f"| {col_label} "
             separator += "| --- "
-        header += "| Status |"
-        separator += "| --- |"
+        header += "|"
+        separator += "|"
         lines.append(header)
         lines.append(separator)
 
         for comp in sorted(comps, key=lambda c: (c.model, c.dataset, c.scenario)):
-            row = f"| {comp.model} | {comp.dataset} | {comp.scenario} "
+            # Status column with regression details
+            status_detail = comp.status_emoji
+            regression_details = [r for r in comp.regressions if r.status == "regression"]
+            if regression_details:
+                detail_parts = []
+                for r in regression_details:
+                    short_metric = r.metric.rsplit("/", 1)[-1] if "/" in r.metric else r.metric
+                    detail_parts.append(f"{short_metric} {r.delta_pct}")
+                status_detail += " " + ", ".join(detail_parts)
+
+            row = f"| {comp.model} | {comp.dataset} | {status_detail} "
 
             for _col_label, metric_key, fmt_fn in metric_cols:
                 value = comp.current_metrics.get(metric_key)
@@ -465,17 +486,7 @@ def generate_markdown(report: BenchmarkReport) -> str:
 
                 row += f"| {formatted}{delta_str} "
 
-            # Status column with regression details
-            status_detail = comp.status_emoji
-            regression_details = [r for r in comp.regressions if r.status == "regression"]
-            if regression_details:
-                detail_parts = []
-                for r in regression_details:
-                    short_metric = r.metric.rsplit("/", 1)[-1] if "/" in r.metric else r.metric
-                    detail_parts.append(f"{short_metric} {r.delta_pct}")
-                status_detail += " " + ", ".join(detail_parts)
-
-            row += f"| {status_detail} |"
+            row += "|"
             lines.append(row)
 
         lines.append("")
@@ -590,6 +601,12 @@ def _detect_metric_columns(
             label_short = key.split("test/", 1)[1] if "test/" in key else key
             columns.append((f"Export {label_short} {_arrow_for(key)}", key, _fmt_metric))
 
+    # Optimize (quantized) test metrics
+    for key in sorted(all_keys):
+        if key.startswith("optimize:") and "test/" in key and "latency" not in key and "e2e_time" not in key:
+            label_short = key.split("test/", 1)[1] if "test/" in key else key
+            columns.append((f"Optimize {label_short} {_arrow_for(key)}", key, _fmt_metric))
+
     # Timing metrics — keys are stored in their rewritten form.
     if rewrite_metric_key("training:e2e_time") in all_keys:
         columns.append(("Train Time ↓", rewrite_metric_key("training:e2e_time"), _fmt_time))
@@ -598,7 +615,7 @@ def _detect_metric_columns(
         columns.append(("GPU Mem ↓", "training:gpu_mem", _fmt_memory))
 
     if rewrite_metric_key("torch:test/latency") in all_keys:
-        columns.append(("Test Latency ↓", rewrite_metric_key("torch:test/latency"), _fmt_time))
+        columns.append(("Test Latency ↓", rewrite_metric_key("torch:test/latency"), _fmt_latency))
 
     return columns
 

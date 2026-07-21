@@ -3,7 +3,9 @@
 
 import multiprocessing as mp
 import queue
+import threading
 import time
+from multiprocessing.shared_memory import SharedMemory
 from threading import Thread
 from unittest.mock import Mock, patch
 from uuid import uuid4
@@ -12,9 +14,11 @@ import numpy as np
 import pytest
 
 from app.models import SourceType, VideoFileSourceConfig
-from app.models.source import VideoFileConfig
+from app.models.source import SourceStatus, SourceStatusCode, VideoFileConfig
 from app.stream.stream_data import StreamData
 from app.workers import StreamLoader
+from app.workers.shm_status import STATUS_SHM_SIZE, read_status
+from app.workers.stream_loading import MAX_CONSECUTIVE_FRAME_ERRORS
 
 
 class _FakeVideoStream:
@@ -65,9 +69,13 @@ class _ExhaustibleVideoStream:
 
 
 class _TestableStreamLoader(StreamLoader):
-    def __init__(self, frame_queue, stop_event, source_changed_condition, fake_video_stream):
+    def __init__(
+        self, frame_queue, status_shm_name, status_shm_lock, stop_event, source_changed_condition, fake_video_stream
+    ):
         super().__init__(
             frame_queue=frame_queue,
+            status_shm_name=status_shm_name,
+            status_shm_lock=status_shm_lock,
             stop_event=stop_event,
             source_changed_condition=source_changed_condition,
             logger_=Mock(),  # Mock is only used in the parent; child re-creates via super().__init__
@@ -115,6 +123,27 @@ def source_changed_condition(mp_ctx):
 
 
 @pytest.fixture
+def status_shm():
+    """Real backing shared-memory block standing in for the scheduler-owned status shm.
+
+    A real SharedMemory (rather than a Mock) is required because the loader runs in a
+    spawned process and `setup()` opens the block by name; the name and lock must also be
+    picklable across the spawn boundary, which Mock objects are not.
+    """
+    shm = SharedMemory(create=True, size=STATUS_SHM_SIZE)
+    try:
+        yield shm
+    finally:
+        shm.close()
+        shm.unlink()
+
+
+@pytest.fixture
+def status_shm_lock(mp_ctx):
+    return mp_ctx.Lock()
+
+
+@pytest.fixture
 def sample_frame() -> np.ndarray:
     return np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
 
@@ -125,9 +154,20 @@ def fake_video_stream(sample_frame) -> _FakeVideoStream:
 
 
 class TestStreamLoader:
-    def _start_loader(self, request, frame_queue, stop_event, source_changed_condition, fake_video_stream):
+    def _start_loader(
+        self,
+        request,
+        frame_queue,
+        status_shm_name,
+        status_shm_lock,
+        stop_event,
+        source_changed_condition,
+        fake_video_stream,
+    ):
         """Helper that starts a _TestableStreamLoader and registers cleanup."""
-        process = _TestableStreamLoader(frame_queue, stop_event, source_changed_condition, fake_video_stream)
+        process = _TestableStreamLoader(
+            frame_queue, status_shm_name, status_shm_lock, stop_event, source_changed_condition, fake_video_stream
+        )
         process.start()
 
         def cleanup():
@@ -140,7 +180,15 @@ class TestStreamLoader:
         return process
 
     def test_queue_full(
-        self, request, frame_queue, stop_event, source_changed_condition, fake_video_stream, sample_frame
+        self,
+        request,
+        frame_queue,
+        status_shm,
+        status_shm_lock,
+        stop_event,
+        source_changed_condition,
+        fake_video_stream,
+        sample_frame,
     ):
         """Test that for real-time sources the loader drops stale frames and replaces with fresh ones."""
         sentinel = np.zeros_like(sample_frame)
@@ -149,7 +197,15 @@ class TestStreamLoader:
         frame_queue.put(data1)
         frame_queue.put(data2)
 
-        process = self._start_loader(request, frame_queue, stop_event, source_changed_condition, fake_video_stream)
+        process = self._start_loader(
+            request,
+            frame_queue,
+            status_shm.name,
+            status_shm_lock,
+            stop_event,
+            source_changed_condition,
+            fake_video_stream,
+        )
 
         time.sleep(1)
 
@@ -174,9 +230,19 @@ class TestStreamLoader:
         )
         assert not process.is_alive(), "Process should terminate cleanly"
 
-    def test_queue_empty(self, request, frame_queue, stop_event, source_changed_condition, fake_video_stream):
+    def test_queue_empty(
+        self, request, frame_queue, status_shm, status_shm_lock, stop_event, source_changed_condition, fake_video_stream
+    ):
         """Test that stream frames are acquired when queue is empty."""
-        process = self._start_loader(request, frame_queue, stop_event, source_changed_condition, fake_video_stream)
+        process = self._start_loader(
+            request,
+            frame_queue,
+            status_shm.name,
+            status_shm_lock,
+            stop_event,
+            source_changed_condition,
+            fake_video_stream,
+        )
 
         # Poll until the queue reaches the expected size (maxsize=2), with a timeout of 5 seconds
         deadline = time.monotonic() + 5
@@ -193,27 +259,33 @@ class TestStreamLoader:
 class TestStreamLoaderErrorHandling:
     """Tests for StreamLoader resilience when video stream fails to open."""
 
-    def _make_loader(self, frame_queue, stop_event, source_changed_condition):
+    def _make_loader(self, frame_queue, status_shm_name, status_shm_lock, stop_event, source_changed_condition):
         return StreamLoader(
             frame_queue=frame_queue,
+            status_shm_name=status_shm_name,
+            status_shm_lock=status_shm_lock,
             stop_event=stop_event,
             source_changed_condition=source_changed_condition,
             logger_=Mock(),
         )
 
     @patch("app.workers.stream_loading.VideoStreamService.get_video_stream")
-    def test_reset_stream_handles_runtime_error(self, mock_get_stream, frame_queue, stop_event):
+    def test_reset_stream_handles_runtime_error(
+        self, mock_get_stream, frame_queue, status_shm, status_shm_lock, stop_event
+    ):
         """_reset_stream should catch RuntimeError and set _video_stream to None."""
         mock_get_stream.side_effect = RuntimeError("Could not open video source: rtsp://bad")
-        loader = self._make_loader(frame_queue, stop_event, None)
+        loader = self._make_loader(frame_queue, status_shm.name, status_shm_lock, stop_event, None)
         loader._reset_stream()
         assert loader._video_stream is None
 
     @patch("app.workers.stream_loading.VideoStreamService.get_video_stream")
-    def test_reset_stream_releases_existing_stream_on_error(self, mock_get_stream, frame_queue, stop_event):
+    def test_reset_stream_releases_existing_stream_on_error(
+        self, mock_get_stream, frame_queue, status_shm, status_shm_lock, stop_event
+    ):
         """_reset_stream should release the old stream even when the new one fails."""
         mock_get_stream.side_effect = RuntimeError("Could not open video source")
-        loader = self._make_loader(frame_queue, stop_event, None)
+        loader = self._make_loader(frame_queue, status_shm.name, status_shm_lock, stop_event, None)
         old_stream = Mock()
         loader._video_stream = old_stream
         loader._reset_stream()
@@ -222,14 +294,16 @@ class TestStreamLoaderErrorHandling:
 
     @patch("app.workers.stream_loading.VideoStreamService.get_video_stream")
     @patch("app.workers.stream_loading.get_db_session")
-    def test_reload_source_loop_survives_error(self, mock_db, mock_get_stream, mp_ctx, frame_queue, stop_event):
+    def test_reload_source_loop_survives_error(
+        self, mock_db, mock_get_stream, mp_ctx, frame_queue, status_shm, status_shm_lock, stop_event
+    ):
         """_reload_source_loop should not crash when _load_source raises."""
         mock_db.return_value.__enter__ = Mock(return_value=Mock())
         mock_db.return_value.__exit__ = Mock(return_value=False)
         mock_get_stream.side_effect = RuntimeError("unreachable")
 
         condition = mp_ctx.Condition()
-        loader = self._make_loader(frame_queue, stop_event, condition)
+        loader = self._make_loader(frame_queue, status_shm.name, status_shm_lock, stop_event, condition)
 
         with patch("app.workers.stream_loading.SourceService") as mock_source_service:
             mock_source_service.return_value.get_active_source.return_value = VideoFileSourceConfig(
@@ -258,13 +332,15 @@ class TestStreamLoaderErrorHandling:
 
     @patch("app.workers.stream_loading.VideoStreamService.get_video_stream")
     @patch("app.workers.stream_loading.get_db_session")
-    def test_setup_survives_unreachable_source(self, mock_db, mock_get_stream, frame_queue, stop_event):
+    def test_setup_survives_unreachable_source(
+        self, mock_db, mock_get_stream, frame_queue, status_shm, status_shm_lock, stop_event
+    ):
         """StreamLoader.setup() should not raise when video source is unreachable."""
         mock_get_stream.side_effect = RuntimeError("Could not open video source: rtsp://bad")
         mock_db.return_value.__enter__ = Mock(return_value=Mock())
         mock_db.return_value.__exit__ = Mock(return_value=False)
 
-        loader = self._make_loader(frame_queue, stop_event, None)
+        loader = self._make_loader(frame_queue, status_shm.name, status_shm_lock, stop_event, None)
 
         with patch("app.workers.stream_loading.SourceService") as mock_source_service:
             mock_source_service.return_value.get_active_source.return_value = VideoFileSourceConfig(
@@ -295,19 +371,23 @@ def _video_file_source() -> VideoFileSourceConfig:
 class TestStreamLoaderFinishedStream:
     """Tests for stopping a finite stream once it has been fully consumed (e.g. non-looping video)."""
 
-    def _make_loader(self, frame_queue, stop_event, source_changed_condition=None):
+    def _make_loader(self, frame_queue, status_shm_name, status_shm_lock, stop_event, source_changed_condition=None):
         return StreamLoader(
             frame_queue=frame_queue,
+            status_shm_name=status_shm_name,
+            status_shm_lock=status_shm_lock,
             stop_event=stop_event,
             source_changed_condition=source_changed_condition,
             logger_=Mock(),
         )
 
-    def test_run_loop_releases_and_clears_finished_stream(self, mp_manager, stop_event, sample_frame):
+    def test_run_loop_releases_and_clears_finished_stream(
+        self, mp_manager, status_shm, status_shm_lock, stop_event, sample_frame
+    ):
         """When the stream finishes, run_loop releases it and clears it instead of polling forever."""
         frame_queue = mp_manager.Queue(maxsize=10)
         fake = _ExhaustibleVideoStream(frame=sample_frame, num_frames=3)
-        loader = self._make_loader(frame_queue, stop_event)
+        loader = self._make_loader(frame_queue, status_shm.name, status_shm_lock, stop_event)
         loader._source = _video_file_source()
         loader._video_stream = fake  # pyrefly: ignore[bad-assignment]
 
@@ -336,14 +416,16 @@ class TestStreamLoaderFinishedStream:
                 break
         assert len(drained) == 3
 
-    def test_run_loop_keeps_polling_when_not_finished(self, frame_queue, stop_event, sample_frame):
+    def test_run_loop_keeps_polling_when_not_finished(
+        self, frame_queue, status_shm, status_shm_lock, stop_event, sample_frame
+    ):
         """A transient None (stream not finished) must not stop the stream; it keeps the stream alive."""
         stream = Mock()
         stream.get_data.return_value = None
         stream.is_finished.return_value = False
         stream.is_real_time.return_value = False
 
-        loader = self._make_loader(frame_queue, stop_event)
+        loader = self._make_loader(frame_queue, status_shm.name, status_shm_lock, stop_event)
         loader._source = _video_file_source()
         loader._video_stream = stream
 
@@ -363,11 +445,11 @@ class TestStreamLoaderFinishedStream:
 
     @patch("app.workers.stream_loading.VideoStreamService.get_video_stream")
     def test_finished_stream_can_be_re_enabled_via_source_reload(
-        self, mock_get_stream, frame_queue, stop_event, sample_frame
+        self, mock_get_stream, frame_queue, status_shm, status_shm_lock, stop_event, sample_frame
     ):
         """After a non-looping stream finished and was stopped (cleared to None), reloading the source
         (e.g. with looping enabled) re-creates a working stream that produces frames again."""
-        loader = self._make_loader(frame_queue, stop_event)
+        loader = self._make_loader(frame_queue, status_shm.name, status_shm_lock, stop_event)
         # Simulate the state left behind after a finished stream was stopped.
         loader._source = _video_file_source()
         loader._video_stream = None
@@ -381,3 +463,204 @@ class TestStreamLoaderFinishedStream:
         assert loader._video_stream is looping_stream, "Reloading the source should re-create the stream"
         assert loader._video_stream.get_data() is not None, "Re-enabled stream should produce frames again"
         assert loader._video_stream.is_finished() is False
+
+
+class TestStreamLoaderStreamLockSafety:
+    """Tests that stream access and (re)creation/release are mutually exclusive.
+
+    ``run_loop`` reads frames while the source-reload thread may release/replace the stream. All
+    stream-backend calls must happen under ``_stream_lock`` so the stream can never be released
+    while it is being read (use-after-release).
+    """
+
+    def _make_loader(self, frame_queue, status_shm, status_shm_lock, stop_event):
+        loader = StreamLoader(
+            frame_queue=frame_queue,
+            status_shm_name=status_shm.name,
+            status_shm_lock=status_shm_lock,
+            stop_event=stop_event,
+            source_changed_condition=None,
+            logger_=Mock(),
+        )
+        loader._status_shm = status_shm
+        loader._source = _video_file_source()
+        return loader
+
+    def test_read_frame_holds_lock_during_stream_access(
+        self, frame_queue, status_shm, status_shm_lock, stop_event, sample_frame
+    ):
+        """While ``_read_frame`` is inside ``get_data``, the stream lock must be held so a concurrent
+        ``_reset_stream`` cannot release the stream mid-read."""
+        lock_held_during_get_data = {"value": False}
+        entered = threading.Event()
+        release_may_proceed = threading.Event()
+
+        stream = Mock()
+
+        def blocking_get_data():
+            entered.set()
+            # Check whether the loader's stream lock is currently held (it must be).
+            lock_held_during_get_data["value"] = loader._stream_lock.locked()
+            # Block until the test allows the read to complete.
+            release_may_proceed.wait(timeout=5)
+            return StreamData(frame_data=sample_frame, timestamp=time.time(), source_metadata={})
+
+        stream.get_data.side_effect = blocking_get_data
+        stream.is_real_time.return_value = False
+        stream.is_finished.return_value = False
+
+        loader = self._make_loader(frame_queue, status_shm, status_shm_lock, stop_event)
+        loader._video_stream = stream
+
+        reader = threading.Thread(target=loader._read_frame, daemon=True)
+        reader.start()
+        assert entered.wait(timeout=5), "get_data should have been entered"
+
+        # While the read is in-flight, a concurrent _reset_stream attempt must block on the lock.
+        reset_done = threading.Event()
+
+        def try_reset():
+            with patch("app.workers.stream_loading.VideoStreamService.get_video_stream", return_value=Mock()):
+                loader._reset_stream()
+            reset_done.set()
+
+        resetter = threading.Thread(target=try_reset, daemon=True)
+        resetter.start()
+
+        # The reset must NOT complete while the read still holds the lock.
+        assert not reset_done.wait(timeout=0.5), "_reset_stream must block while _read_frame holds the lock"
+
+        # Let the read finish; now the reset can acquire the lock and complete.
+        release_may_proceed.set()
+        reader.join(timeout=5)
+        assert reset_done.wait(timeout=5), "_reset_stream should proceed after the read releases the lock"
+
+        assert lock_held_during_get_data["value"] is True, "Stream lock must be held during get_data()"
+
+
+class TestStreamLoaderStatusReporting:
+    """Tests that the loader reports OK and ERROR source statuses to shared memory."""
+
+    def _make_loader(self, frame_queue, status_shm, status_shm_lock, stop_event):
+        loader = StreamLoader(
+            frame_queue=frame_queue,
+            status_shm_name=status_shm.name,
+            status_shm_lock=status_shm_lock,
+            stop_event=stop_event,
+            source_changed_condition=None,
+            logger_=Mock(),
+        )
+        # setup() would open the shared-memory block by name; assign the real block directly instead.
+        loader._status_shm = status_shm
+        loader._source = _video_file_source()
+        return loader
+
+    def test_reports_ok_status_after_successful_frame(
+        self, frame_queue, status_shm, status_shm_lock, stop_event, sample_frame
+    ):
+        """A successfully acquired and enqueued frame reports an OK status to shared memory."""
+        stream = Mock()
+        stream.get_data.return_value = StreamData(frame_data=sample_frame, timestamp=time.time(), source_metadata={})
+        stream.is_real_time.return_value = False
+        stream.is_finished.return_value = False
+
+        loader = self._make_loader(frame_queue, status_shm, status_shm_lock, stop_event)
+        loader._video_stream = stream
+
+        thread = Thread(target=loader.run_loop, daemon=True)
+        thread.start()
+        try:
+            deadline = time.monotonic() + 5
+            while frame_queue.empty() and time.monotonic() < deadline:
+                time.sleep(0.02)
+        finally:
+            stop_event.set()
+            thread.join(timeout=3)
+
+        status = read_status(SourceStatus, status_shm, status_shm_lock)
+        assert status is not None
+        assert status.code == SourceStatusCode.OK
+        assert status.source_id == loader._source.id
+
+    def test_reports_error_status_on_frame_acquisition_failure(
+        self, frame_queue, status_shm, status_shm_lock, stop_event
+    ):
+        """A sustained streak of frame-acquisition failures reports an ERROR status to shared memory."""
+        stream = Mock()
+        stream.get_data.side_effect = RuntimeError("boom")
+        stream.is_real_time.return_value = False
+        stream.is_finished.return_value = False
+
+        loader = self._make_loader(frame_queue, status_shm, status_shm_lock, stop_event)
+        loader._video_stream = stream
+        # Neutralize the exponential backoff so the loop reaches the consecutive-error threshold
+        # quickly instead of sleeping for tens of seconds between retries.
+        loader.stop_aware_sleep = lambda *_args, **_kwargs: False  # type: ignore[method-assign]
+
+        thread = Thread(target=loader.run_loop, daemon=True)
+        thread.start()
+        status = None
+        try:
+            deadline = time.monotonic() + 5
+            while time.monotonic() < deadline:
+                status = read_status(SourceStatus, status_shm, status_shm_lock)
+                if status is not None and status.code == SourceStatusCode.ERROR:
+                    break
+                time.sleep(0.02)
+        finally:
+            stop_event.set()
+            thread.join(timeout=3)
+
+        assert status is not None
+        assert status.code == SourceStatusCode.ERROR
+        assert status.message == "Error acquiring frame"
+        assert status.source_id == loader._source.id
+        # The error is only reported once the failure streak is consistent, not on the first hiccup.
+        assert stream.get_data.call_count >= MAX_CONSECUTIVE_FRAME_ERRORS
+
+    def test_single_transient_failure_does_not_report_error(
+        self, frame_queue, status_shm, status_shm_lock, stop_event, sample_frame
+    ):
+        """A single failed read followed by a success must not surface an ERROR status."""
+        stream = Mock()
+        # Fail once, then keep succeeding.
+        stream.get_data.side_effect = [RuntimeError("transient")] + [
+            StreamData(frame_data=sample_frame, timestamp=time.time(), source_metadata={}) for _ in range(50)
+        ]
+        stream.is_real_time.return_value = False
+        stream.is_finished.return_value = False
+
+        loader = self._make_loader(frame_queue, status_shm, status_shm_lock, stop_event)
+        loader._video_stream = stream
+        loader.stop_aware_sleep = lambda *_args, **_kwargs: False  # type: ignore[method-assign]
+
+        thread = Thread(target=loader.run_loop, daemon=True)
+        thread.start()
+        try:
+            deadline = time.monotonic() + 5
+            while frame_queue.empty() and time.monotonic() < deadline:
+                time.sleep(0.02)
+        finally:
+            stop_event.set()
+            thread.join(timeout=3)
+
+        status = read_status(SourceStatus, status_shm, status_shm_lock)
+        assert status is not None
+        # After recovering, the latest reported status must be OK, never ERROR.
+        assert status.code == SourceStatusCode.OK
+
+    @patch("app.workers.stream_loading.VideoStreamService.get_video_stream")
+    def test_reset_stream_reports_error_status_on_open_failure(
+        self, mock_get_stream, frame_queue, status_shm, status_shm_lock, stop_event
+    ):
+        """When opening the video stream fails, _reset_stream reports an ERROR status."""
+        mock_get_stream.side_effect = RuntimeError("Could not open video source")
+        loader = self._make_loader(frame_queue, status_shm, status_shm_lock, stop_event)
+
+        loader._reset_stream()
+
+        status = read_status(SourceStatus, status_shm, status_shm_lock)
+        assert status is not None
+        assert status.code == SourceStatusCode.ERROR
+        assert status.message is not None
+        assert loader._source.name in status.message

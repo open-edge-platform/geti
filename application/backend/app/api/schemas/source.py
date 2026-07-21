@@ -3,7 +3,7 @@
 
 from typing import Annotated, Literal
 
-from pydantic import Field, TypeAdapter, computed_field
+from pydantic import BaseModel, Field, TypeAdapter, computed_field
 
 from app.core.models import BaseIDNameModel
 from app.models import (
@@ -213,3 +213,17 @@ SourceCreate = Annotated[
 ]
 
 SourceCreateAdapter: TypeAdapter[SourceCreate] = TypeAdapter(SourceCreate)
+
+
+class SourceMediaUploadView(BaseModel):
+    """Response returned after uploading a video file for use as a 'video_file' source."""
+
+    video_path: str
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "video_path": "/data/source_media/712750b2-5a82-47ee-8fba-f3dc96cb615d/sample.mp4",
+            }
+        }
+    }

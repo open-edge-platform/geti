@@ -523,6 +523,57 @@ class TestPerClassMetrics:
         assert not any("/" in k and k.count("/") >= 2 for k in metrics)
 
 
+class TestSpeedMetric:
+    """Tests for ``val/iter_time`` extraction from Ultralytics' ``speed`` dict."""
+
+    def test_speed_dict_summed_and_converted_to_seconds(self, mocker, tmp_path) -> None:
+        engine, _ = _make_engine(tmp_path, mocker)
+
+        results = SimpleNamespace(
+            results_dict={"metrics/mAP50(B)": 0.75},
+            speed={"preprocess": 1.0, "inference": 8.0, "loss": 0.0, "postprocess": 1.0},
+        )
+
+        metrics = engine._translate_metrics(results)  # pyrefly: ignore[bad-argument-type]
+
+        # 10 ms total -> 0.01 s
+        assert metrics["val/iter_time"] == pytest.approx(0.01)
+
+    def test_missing_speed_attr_does_not_add_key(self, mocker, tmp_path) -> None:
+        engine, _ = _make_engine(tmp_path, mocker)
+
+        results = SimpleNamespace(results_dict={"metrics/mAP50(B)": 0.75})
+
+        metrics = engine._translate_metrics(results)  # pyrefly: ignore[bad-argument-type]
+
+        assert "val/iter_time" not in metrics
+
+    def test_empty_speed_dict_does_not_add_key(self, mocker, tmp_path) -> None:
+        engine, _ = _make_engine(tmp_path, mocker)
+
+        results = SimpleNamespace(results_dict={"metrics/mAP50(B)": 0.75}, speed={})
+
+        metrics = engine._translate_metrics(results)  # pyrefly: ignore[bad-argument-type]
+
+        assert "val/iter_time" not in metrics
+
+
+class TestSummarizeIterTimes:
+    """Tests for ``UltralyticsEngine._summarize_iter_times`` (test/torch phase timing)."""
+
+    def test_empty_list_returns_empty_dict(self) -> None:
+        assert UltralyticsEngine._summarize_iter_times([]) == {}
+
+    def test_single_sample_used_directly(self) -> None:
+        result = UltralyticsEngine._summarize_iter_times([5.0])
+        assert result["test/iter_time"] == pytest.approx(5.0)
+
+    def test_first_sample_excluded_as_warmup(self) -> None:
+        result = UltralyticsEngine._summarize_iter_times([10.0, 2.0, 3.0, 4.0])
+        # mean of [2.0, 3.0, 4.0] = 3.0
+        assert result["test/iter_time"] == pytest.approx(3.0)
+
+
 class TestTorchmetricsEval:
     """Tests for torchmetrics-based test() evaluation."""
 
@@ -582,6 +633,8 @@ class TestTorchmetricsEval:
         assert result["test/map_50"] == pytest.approx(0.90)
         assert result["test/map_75"] == pytest.approx(0.60)
         assert "test/classes" not in result
+        assert "test/iter_time" in result
+        assert result["test/iter_time"] >= 0.0
 
     def test_test_falls_back_to_yolo_without_metric(self, mocker, tmp_path) -> None:
         """test() should use YOLO validator when no metric callable is provided."""

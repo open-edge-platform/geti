@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import { $api } from '@/api';
 import {
     ActionButton,
     Button,
@@ -22,7 +23,6 @@ import { MoreMenu } from '@geti-ui/ui/icons';
 import { useDisablePipeline } from 'hooks/api/pipeline.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { $api } from '../../../../api/client';
 import { toast } from '../../../../components/toast/toast.component';
 import { useWebRTCConnection } from '../../stream/web-rtc-connection-provider';
 
