@@ -667,7 +667,6 @@ class GetiConfigConverter:
             dict: The default configuration dictionary.
 
         """
-        from getitune.backend.ultralytics.tools.configurator import Configurator as UltralyticsConfigurator
         from getitune.tools.auto_configurator import AutoConfigurator
         from getitune.utils import get_getitune_root_path
 
@@ -997,6 +996,8 @@ class GetiConfigConverter:
             raise FileNotFoundError(msg)
 
         if GetiConfigConverter._is_ultralytics_recipe(model_config_path):
+            from getitune.backend.ultralytics.tools.configurator import Configurator as UltralyticsConfigurator
+
             config_dict = UltralyticsConfigurator.convert(model_config_path, hyper_parameters)
             # Apply the standard augmentation / tiling updates to the data section.
             # This is the same TransformsUpdater path that Lightning recipes use,

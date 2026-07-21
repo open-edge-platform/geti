@@ -33,6 +33,12 @@ inputs:
       builds to ensure reproducibility and prevent cache poisoning attacks.
     required: false
     default: "true"
+  exclude-agpl-models:
+    description: >
+      Exclude Ultralytics and other AGPL-licensed models from the image (true/false).
+      Intended for RC and release builds; regular builds should leave this disabled.
+    required: false
+    default: "false"
 
 outputs:
   digest:
@@ -82,6 +88,7 @@ runs:
           HTTP_PROXY
           HTTPS_PROXY
           NO_PROXY
+          ${{ inputs.exclude-agpl-models == 'true' && 'EXCLUDE_AGPL_MODELS=1' || '' }}
         # Disable all caching (local and remote) when use-cache=false to
         # ensure reproducible builds for RC/release without any cached layers.
         no-cache: ${{ inputs.use-cache != 'true' }}
