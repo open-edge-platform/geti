@@ -15,8 +15,6 @@ from getitune.types.precision import Precision
 
 
 class TestLightningModelExporter:
-    BATCH_SIZE = 8
-
     @pytest.fixture
     def fxt_exporter(self):
         # Create an instance of LightningModelExporter with default params
@@ -93,7 +91,10 @@ class TestLightningModelExporter:
         onnx_model = onnx.load(str(exported_path))
         onnx.checker.check_model(onnx_model)
 
-    def test_to_openvino_export_dynamic_batch(self, fxt_exporter, fxt_dummy_model, fxt_dummy_input, tmp_path):
+    @pytest.mark.parametrize("batch_size", [1, 2, 4])
+    def test_to_openvino_export_dynamic_batch(
+        self, batch_size, fxt_exporter, fxt_dummy_model, fxt_dummy_input, tmp_path
+    ):
         """Exported OpenVINO model should accept batch sizes other than 1."""
         import openvino as ov
 
@@ -111,13 +112,16 @@ class TestLightningModelExporter:
         ov_model = core.read_model(exported_path)
         compiled_model = core.compile_model(ov_model, "CPU")
 
-        output = compiled_model(fxt_dummy_input(self.BATCH_SIZE))
+        output = compiled_model(fxt_dummy_input(batch_size))
 
         # Sanity check: output batch dim matches input batch dim
         result = next(iter(output.values()))
-        assert result.shape[0] == self.BATCH_SIZE
+        assert result.shape[0] == batch_size
 
-    def test_to_openvino_export_dynamic_batch_via_onnx(self, fxt_exporter, fxt_dummy_model, fxt_dummy_input, tmp_path):
+    @pytest.mark.parametrize("batch_size", [1, 2, 4])
+    def test_to_openvino_export_dynamic_batch_via_onnx(
+        self, batch_size, fxt_exporter, fxt_dummy_model, fxt_dummy_input, tmp_path
+    ):
         """Same dynamic-batch check for the via_onnx=True export path."""
         import openvino as ov
 
@@ -136,11 +140,12 @@ class TestLightningModelExporter:
         ov_model = core.read_model(exported_path)
         compiled_model = core.compile_model(ov_model, "CPU")
 
-        output = compiled_model(fxt_dummy_input(self.BATCH_SIZE))
+        output = compiled_model(fxt_dummy_input(batch_size))
         result = next(iter(output.values()))
-        assert result.shape[0] == self.BATCH_SIZE
+        assert result.shape[0] == batch_size
 
-    def test_to_onnx_export_dynamic_batch(self, fxt_exporter, fxt_dummy_model, fxt_dummy_input, tmp_path):
+    @pytest.mark.parametrize("batch_size", [1, 2, 4])
+    def test_to_onnx_export_dynamic_batch(self, batch_size, fxt_exporter, fxt_dummy_model, fxt_dummy_input, tmp_path):
         """Exported ONNX model's input/output batch axis should be dynamic (symbolic), not fixed to 1."""
         output_dir = tmp_path / "onnx_export_dynamic"
         output_dir.mkdir()
@@ -172,5 +177,5 @@ class TestLightningModelExporter:
 
         session = ort.InferenceSession(str(exported_path))
         input_name = session.get_inputs()[0].name
-        outputs = session.run(None, {input_name: fxt_dummy_input(self.BATCH_SIZE)})
-        assert outputs[0].shape[0] == self.BATCH_SIZE  # pyrefly: ignore[missing-attribute]
+        outputs = session.run(None, {input_name: fxt_dummy_input(batch_size)})
+        assert outputs[0].shape[0] == batch_size  # pyrefly: ignore[missing-attribute]
