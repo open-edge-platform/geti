@@ -10,6 +10,7 @@
 [![pytorch](https://img.shields.io/badge/pytorch-2.10-orange)]()
 [![openvino](https://img.shields.io/badge/openvino-2026.2-purple)]()
 
+[Application](#geti-application) •
 [Docs](#documentation) •
 [License](#license)
 
@@ -37,9 +38,11 @@ Main capabilities:
 Installing Geti as a Windows app is the simplest way to run it on Windows:
 
 1. Download the `.msix` package from the official Geti release.
-   - [Download CPU-only version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cpu-3.0.0.msix)
-   - [Download Intel® XPU version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-xpu-3.0.0.msix)
-   - [Download Nvidia® CUDA version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cuda-3.0.0.msix)
+
+- [Download CPU-only version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cpu-3.0.0.msix)
+- [Download Intel® XPU version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-xpu-3.0.0.msix)
+- [Download Nvidia® CUDA version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cuda-3.0.0.msix)
+
 2. Double-click the package and click **Install** in the Windows installer dialog.
 3. Launch Geti from the **Start** menu.
 
@@ -77,6 +80,10 @@ docker pull ghcr.io/open-edge-platform/geti-cpu
 # Retag the pulled image as `geti-{cpu,xpu,cuda}:latest` for using with `just run-image`
 docker tag ghcr.io/open-edge-platform/geti-cpu:latest geti-cpu:latest
 ```
+
+> [!IMPORTANT]
+> Pre-built images do not include Ultralytics models, due to AGPL licensing constraints. If you need them, build
+> the image from source as described below.
 
 <details>
 <summary><strong>Advanced: Build the image</strong></summary>
