@@ -15,7 +15,7 @@ from alembic.script import ScriptDirectory
 from loguru import logger
 from sqlalchemy import text
 
-from app.db.engine import db_engine
+from app.db import db_engine
 from app.settings import Settings
 
 
