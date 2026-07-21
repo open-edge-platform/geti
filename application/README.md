@@ -182,18 +182,40 @@ When deploying Geti in an air-gapped or restricted network environment, the appl
 pretrained model weights from remote repositories. You must manually preconfigure and populate the pretrained weights
 cache before running the application.
 
-#### 1. Locate the Download Links
+#### 1. Locate the download links
 
 To find the exact URLs for the pretrained weights required by a specific model:
 
-- Navigate to the model manifest files bundled with the Geti application backend (e.g., `backend/app/supported_models/manifests/classification/vit_tiny.yaml`).
+- Navigate to the model manifest files bundled with the Geti application backend (e.g., `application/backend/app/supported_models/manifests/classification/vit_tiny.yaml`).
 - Look for the `pretrained_weights.url` attribute within the manifest file to retrieve the direct download link.
+- Note the corresponding `pretrained_weights.sha_sum` attribute - you'll use it to verify the integrity of the downloaded
+  file before placing it in the cache.
 
-#### 2. Populate the Pretrained Weights Cache
+#### 2. Verify file integrity
 
-Once you have downloaded the required weights file on an internet-connected machine, transfer it to your air-gapped environment and place it in the application data directory.
+Before transferring the downloaded weights file into the air-gapped environment, verify it hasn't been tampered with or
+corrupted by comparing its SHA-256 checksum against the `sha_sum` value from the manifest:
 
-Because Geti stores its application data inside the `geti-data` Docker volume, you can use a temporary container to inject the downloaded file into the proper cache directory:
+```shell
+# Compute the SHA-256 checksum of the downloaded file
+shasum -a 256 /path/to/local/downloaded/<WEIGHTS_FILE_NAME>
+
+# Compare the output against the `pretrained_weights.sha_sum` value in the model manifest.
+# The two values must match exactly before proceeding.
+```
+
+> [!CAUTION]
+> Do not place a weights file into the cache if its checksum doesn't match the manifest's sha_sum. Geti performs this
+> verification automatically when loading cached weights, and a mismatch will cause the file to be treated as invalid -
+> but validating it upfront avoids wasting time transferring a corrupted or tampered file into an air-gapped environment.
+
+#### 3. Populate the pretrained weights cache
+
+Once you have downloaded and verified the integrity of the required weights file on an internet-connected machine,
+transfer it to your air-gapped environment and place it in the application data directory.
+
+Because Geti stores its application data inside the `geti-data` Docker volume, you can use a temporary container to
+inject the downloaded file into the proper cache directory:
 
 ```shell
 # Copy the downloaded weights file into the application's pretrained cache folder
@@ -204,8 +226,8 @@ docker run --rm -v geti-data:/data alpine ls -l /data/pretrained_weights/<TASK_T
 ```
 
 > [!NOTE]
-> Replace <TASK_TYPE> with the corresponding model task type (e.g., `classification`, `detection`, or `instance_segmentation`).
-> Replace <WEIGHTS_FILE_NAME> with the exact filename retrieved from the manifest.
+> Replace `<TASK_TYPE>` with the corresponding model task type (e.g., `classification`, `detection`, or `instance_segmentation`).
+> Replace `<WEIGHTS_FILE_NAME>` with the exact filename retrieved from the manifest.
 > Replace `/path/to/local/downloaded/` with the path to the file on your host machine.
 
 </details>
