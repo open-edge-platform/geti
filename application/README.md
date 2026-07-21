@@ -176,6 +176,41 @@ docker run --rm -v geti-data:/data alpine ls -l /data/projects/<PROJECT_ID>/data
 </details>
 
 <details>
+<summary><strong>Advanced: Air-gapped setup (Pretrained weights cache)</strong></summary>
+
+When deploying Geti in an air-gapped or restricted network environment, the application cannot automatically download
+pretrained model weights from remote repositories. You must manually preconfigure and populate the pretrained weights
+cache before running the application.
+
+#### 1. Locate the Download Links
+
+To find the exact URLs for the pretrained weights required by a specific model:
+
+- Navigate to the model manifest files bundled with the Geti application backend (e.g., `backend/app/supported_models/manifests/classification/vit_tiny.yaml`).
+- Look for the `pretrained_weights.url` attribute within the manifest file to retrieve the direct download link.
+
+#### 2. Populate the Pretrained Weights Cache
+
+Once you have downloaded the required weights file on an internet-connected machine, transfer it to your air-gapped environment and place it in the application data directory.
+
+Because Geti stores its application data inside the `geti-data` Docker volume, you can use a temporary container to inject the downloaded file into the proper cache directory:
+
+```shell
+# Copy the downloaded weights file into the application's pretrained cache folder
+docker run --rm -i -v geti-data:/data alpine sh -c "mkdir -p /data/pretrained_weights/<TASK_TYPE> && cat > /data/pretrained_weights/<TASK_TYPE>/<WEIGHTS_FILE_NAME>" < /path/to/local/downloaded/<WEIGHTS_FILE_NAME>
+
+# Verify that the file is correctly placed
+docker run --rm -v geti-data:/data alpine ls -l /data/pretrained_weights/<TASK_TYPE>
+```
+
+> [!NOTE]
+> Replace <TASK_TYPE> with the corresponding model task type (e.g., `classification`, `detection`, or `instance_segmentation`).
+> Replace <WEIGHTS_FILE_NAME> with the exact filename retrieved from the manifest.
+> Replace `/path/to/local/downloaded/` with the path to the file on your host machine.
+
+</details>
+
+<details>
 <summary><strong>Troubleshooting: View the logs</strong></summary>
 
 When running Geti with Docker, all logs are stored in the `geti-logs` Docker volume.
