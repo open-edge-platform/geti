@@ -4,15 +4,7 @@
          xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
          xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities">
 
-    <!--
-        This file is a TEMPLATE. The `Version` attribute below is a placeholder:
-        `build_msix.py` overwrites it at packaging time with the release version
-        (single source of truth: ui/src-tauri/tauri.conf.json), normalised to the
-        MSIX 4-part `Major.Minor.Build.Revision` form. The `Name` and `Publisher`
-        MUST stay constant across releases so Windows performs an in-place upgrade
-        (keeping the per-user data directory) instead of a side-by-side install.
-    -->
-    <Identity Name="intel.geti" Publisher="CN=Intel Corporation, O=Intel Corporation, S=California, C=US" Version="0.0.0.0"/>
+    <Identity Name="intel.geti" Publisher="CN=Intel Corporation, O=Intel Corporation, S=California, C=US" Version="3.1.0.0"/>
 
     <Properties>
         <DisplayName>Intel Geti</DisplayName>

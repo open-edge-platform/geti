@@ -117,14 +117,12 @@ treated as a separate/side-by-side app or a same-version reinstall:
   [`ui/src-tauri/msix/AppxManifest.xml`](../ui/src-tauri/msix/AppxManifest.xml)
   — e.g. `3.1.0.0` > `3.0.0.0`.
 
-> **Maintainer note — the version is injected automatically at build time.** The
-> checked-in manifest carries a placeholder `Version` that
-> [`build_msix.py`](../ui/src-tauri/msix/build_msix.py) overwrites with the
-> release version (single source of truth: `tauri.conf.json`, normalised to the
-> 4-part form) when packaging via `just package-msix`. Bump the version in
-> `tauri.conf.json` (or set `GETI_MSIX_VERSION`) for each release so the new
-> package is recognised as an upgrade. See
-> [`packaging-msix.md`](./packaging-msix.md) for the full build/sign procedure.
+> **Maintainer note — bump the version for every release.** The
+> [`AppxManifest.xml`](../ui/src-tauri/msix/AppxManifest.xml) `Version` must be
+> incremented (4-part `Major.Minor.Build.Revision` form, e.g. `3.1.0.0`) for each
+> release so the new package is recognised as an upgrade, while `Name` and
+> `Publisher` are kept constant. The MSIX package itself is produced by the
+> project's release/CI pipeline, not built locally.
 
 ---
 
