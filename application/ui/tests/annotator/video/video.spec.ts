@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import type { AnnotationDTO, MediaListPredictionRequest } from '@/api/types';
 import { expect } from '@playwright/test';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { getMockedVideoFrame } from 'mocks/mock-media';
@@ -13,7 +14,6 @@ import { getMockedVariant } from 'mocks/mock-model-variant';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
-import { AnnotationDTO, MediaListPredictionRequest } from '../../../src/constants/shared-types';
 import { http, test } from '../../fixtures';
 import { candyPngBuffer, redLabel } from '../annotator-fixtures';
 import { ANNOTATIONS_MOCKS, PREDICTIONS_MOCKS } from './mocks';

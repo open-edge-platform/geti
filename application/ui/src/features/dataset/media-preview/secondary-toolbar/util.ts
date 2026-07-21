@@ -1,7 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { Label } from '../../../../constants/shared-types';
+import type { Label } from '@/api/types';
+
 import type { AnnotationLabelRef } from '../../../../shared/types';
 
 export const toggleLabel = (newLabel: Label, labels: AnnotationLabelRef[]): AnnotationLabelRef[] => {

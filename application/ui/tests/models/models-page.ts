@@ -212,6 +212,10 @@ export class ModelsPage {
         return this.getQuantizationDialog().getByRole('textbox', { name: 'Change Max calibration size' });
     }
 
+    getMaxNumIterationsInput() {
+        return this.getQuantizationDialog().getByRole('textbox', { name: 'Change Max number of iterations' });
+    }
+
     getNoMaximumCheckbox() {
         return this.getQuantizationDialog().getByLabel('No maximum');
     }

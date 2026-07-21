@@ -1,10 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Media } from '@/api/types';
 import { keepPreviousData, queryOptions, useQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { Media } from '../../../constants/shared-types';
 import { isVideoFrame } from '../../../shared/media-item-utils';
 import { getMediaBinaryUrl, getVideoFrameBinaryUrl } from '../../../shared/media-url.utils';
 import { getImageDataFromTiffUrl, isTiffFormat } from '../../../shared/media-utils';

@@ -5,20 +5,24 @@ import multiprocessing as mp
 import queue
 import threading
 from dataclasses import dataclass
+from multiprocessing.shared_memory import SharedMemory
 from multiprocessing.synchronize import Event as EventClass
 from multiprocessing.synchronize import Lock
 from typing import TYPE_CHECKING, Any
+from uuid import UUID
 
 import cv2
 from loguru import logger
 from loguru._logger import Logger as LoguruLogger
 
+from app.models.inference import InferenceWorkerStatus, InferenceWorkerStatusCode
 from app.services import ActiveModelService, MetricsService
 from app.services.inference.model_loader import LoadedModelHandle
 from app.settings import Settings, get_settings
 from app.stream.stream_data import InferenceData, StreamData
 from app.utils import Visualizer
 from app.workers.base import BaseProcessWorker
+from app.workers.shm_status import write_status
 
 if TYPE_CHECKING:
     from model_api.models import Model
@@ -33,6 +37,8 @@ class InferenceWorkerConfig:
     model_reload_event: EventClass | None
     shm_name: str
     shm_lock: Lock
+    inference_status_shm_name: str
+    inference_status_shm_lock: Lock
     logger_: LoguruLogger
 
 
@@ -95,6 +101,9 @@ class InferenceWorker(BaseProcessWorker):
         self._model_reload_event = config.model_reload_event
         self._shm_name = config.shm_name
         self._shm_lock = config.shm_lock
+        self._inference_status_shm_name = config.inference_status_shm_name
+        self._inference_status_shm_lock = config.inference_status_shm_lock
+        self._inference_status_shm: SharedMemory | None = None
 
         self._settings: Settings | None = None
         self._metrics_service: MetricsService | None = None
@@ -109,6 +118,7 @@ class InferenceWorker(BaseProcessWorker):
 
     def setup(self) -> None:
         super().setup()
+        self._inference_status_shm = SharedMemory(name=self._inference_status_shm_name, create=False)
         self._metrics_service = MetricsService(self._shm_name, self._shm_lock)
         self._model_service = ActiveModelService(get_settings().data_dir)
         self.__prediction_buffer = PredictionReorderBuffer()
@@ -120,26 +130,42 @@ class InferenceWorker(BaseProcessWorker):
         return self.__prediction_buffer
 
     def _on_inference_completed(self, inf_result: "Result", userdata: dict[str, Any]) -> None:
-        start_time = float(userdata["inference_start_time"])
-        model_id = userdata["model_id"]
-        self._metrics_service.record_inference_end(model_id=model_id, start_time=start_time)  # type: ignore
+        # This callback runs on the Model API / OpenVINO inference thread. An unhandled exception
+        # here would be raised inside that thread and can wedge the async inference queue, so every
+        # failure is caught: the offending prediction is dropped and the model health is reported
+        # as ERROR, but the inference process keeps running.
+        try:
+            start_time = float(userdata["inference_start_time"])
+            model_id = userdata["model_id"]
+            self._metrics_service.record_inference_end(model_id=model_id, start_time=start_time)  # type: ignore
 
-        stream_data: StreamData = userdata["stream_data"]
-        frame_with_predictions = Visualizer.overlay_predictions(
-            original_image=stream_data.frame_data, predictions=inf_result
-        )
-        inference_data = InferenceData(
-            prediction=inf_result,
-            visualized_prediction=frame_with_predictions,
-            model_id=model_id,
-        )
-        stream_data.inference_data = inference_data
+            stream_data: StreamData = userdata["stream_data"]
+            frame_with_predictions = Visualizer.overlay_predictions(
+                original_image=stream_data.frame_data, predictions=inf_result
+            )
+            inference_data = InferenceData(
+                prediction=inf_result,
+                visualized_prediction=frame_with_predictions,
+                model_id=model_id,
+            )
+            stream_data.inference_data = inference_data
 
-        # Predictions are generated async, first add to buffer,
-        # then check if next expected predictions are ready to be queued
-        self._prediction_buffer.add_prediction_for_timestamp(timestamp=start_time, stream_data=stream_data)
-        for stream_data in self._prediction_buffer.get_ready_predictions():
-            self._enqueue_prediction(stream_data)
+            self._report_status(code=InferenceWorkerStatusCode.OK, model_id=model_id)
+
+            # Predictions are generated async, first add to buffer,
+            # then check if next expected predictions are ready to be queued
+            self._prediction_buffer.add_prediction_for_timestamp(timestamp=start_time, stream_data=stream_data)
+            for ready_stream_data in self._prediction_buffer.get_ready_predictions():
+                self._enqueue_prediction(ready_stream_data)
+        except Exception as e:
+            logger.exception("Error while processing inference result; dropping this prediction {}", e)
+            error_model_id = userdata.get("model_id") if isinstance(userdata, dict) else None
+            if isinstance(error_model_id, UUID):
+                self._report_status(
+                    code=InferenceWorkerStatusCode.ERROR,
+                    model_id=error_model_id,
+                    message="Error processing inference result",
+                )
 
     def _enqueue_prediction(self, stream_data: StreamData) -> None:
         """Push a prediction to the prediction queue without ever blocking.
@@ -238,4 +264,23 @@ class InferenceWorker(BaseProcessWorker):
                     model.inference_adapter.await_any()
             except Exception:
                 logger.exception("Unhandled error in inference loop")
+                if self._loaded_model is not None:
+                    self._report_status(
+                        code=InferenceWorkerStatusCode.ERROR,
+                        model_id=self._loaded_model.model_id,
+                        message="Unhandled error in inference loop",
+                    )
                 self.stop_aware_sleep(2)
+
+    def teardown(self) -> None:
+        if self._inference_status_shm is not None:
+            self._inference_status_shm.close()
+
+    def _report_status(self, code: InferenceWorkerStatusCode, model_id: UUID, message: str | None = None) -> None:
+        if self._inference_status_shm is None:
+            return
+        status = InferenceWorkerStatus(code=code, model_id=model_id, message=message)
+        try:
+            write_status(status, self._inference_status_shm, self._inference_status_shm_lock)
+        except Exception:
+            logger.debug("Failed to write inference status to shared memory")

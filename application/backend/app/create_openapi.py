@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 from fastapi.openapi.utils import get_openapi
-from main import app
+from main import create_app
 
 
 def create_openapi(target_path: str) -> None:
@@ -17,6 +17,7 @@ def create_openapi(target_path: str) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(output_path, "w") as file:
+        app = create_app()
         open_api = get_openapi(
             title=app.title,
             version=app.version,

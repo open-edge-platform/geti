@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Media, MediaWithPagination } from '@/api/types';
 import { InfiniteData, QueryClient } from '@tanstack/react-query';
 
-import { Media, MediaWithPagination } from '../../constants/shared-types';
 import { isVideo } from '../media-item-utils';
 
 export const incrementCachedAnnotatedFrameCount = (queryClient: QueryClient, mediaItem: Media) => {

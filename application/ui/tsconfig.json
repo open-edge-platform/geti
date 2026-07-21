@@ -28,7 +28,9 @@
         "paths": {
             "test-utils/*": ["./src/test-utils/*"],
             "hooks/*": ["./src/hooks/*"],
-            "mocks/*": ["./mocks/*"]
+            "mocks/*": ["./mocks/*"],
+            "@/api": ["./src/api/index.ts"],
+            "@/api/types": ["./src/api/shared-types.ts"]
         }
     }
 }

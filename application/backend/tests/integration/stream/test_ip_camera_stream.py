@@ -94,7 +94,7 @@ class TestIPCameraStream:
         )
 
         # Should raise exception during initialization
-        with pytest.raises(RuntimeError, match=f"Could not open video source: {invalid_url}"):
+        with pytest.raises(RuntimeError, match=f"Could not connect to IP camera stream: {invalid_url}"):
             IPCameraStream(config)
 
     def test_reconnects_after_transient_failure(self, config: IPCameraSourceConfig):

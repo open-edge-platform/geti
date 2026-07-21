@@ -1,10 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { MediaWithPagination, Pagination } from '@/api/types';
 import { InfiniteData, QueryClient } from '@tanstack/react-query';
 
 import { getMockedMediaImage, getMockedVideo } from '../../../mocks/mock-media';
-import { MediaWithPagination, Pagination } from '../../constants/shared-types';
 import { incrementCachedAnnotatedFrameCount } from './util';
 
 const createQueryClient = () => new QueryClient();

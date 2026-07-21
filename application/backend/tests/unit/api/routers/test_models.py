@@ -9,7 +9,6 @@ from fastapi import status
 
 from app.api.dependencies import get_media_service, get_model_service, get_training_configuration_service
 from app.api.schemas import TrainingConfigurationView
-from app.main import app
 from app.models import DatasetItemSubset, EvaluationResult, ModelRevision, ModelVariant, TrainingInfo, TrainingStatus
 from app.models.model_revision import ModelFormat, ModelPrecision
 from app.services import MediaService, ModelService, ResourceInUseError, ResourceNotFoundError, ResourceType
@@ -88,24 +87,24 @@ def fxt_model_variants() -> list[ModelVariant]:
 
 
 @pytest.fixture
-def fxt_model_service() -> MagicMock:
+def fxt_model_service(fxt_app) -> MagicMock:
     model_service = MagicMock(spec=ModelService)
-    app.dependency_overrides[get_model_service] = lambda: model_service
+    fxt_app.dependency_overrides[get_model_service] = lambda: model_service
     return model_service
 
 
 @pytest.fixture(autouse=True)
-def fxt_media_service() -> MagicMock:
+def fxt_media_service(fxt_app) -> MagicMock:
     media_service = MagicMock(spec=MediaService)
     media_service.list_media.return_value = []
-    app.dependency_overrides[get_media_service] = lambda: media_service
+    fxt_app.dependency_overrides[get_media_service] = lambda: media_service
     return media_service
 
 
 @pytest.fixture
-def fxt_training_configuration_service() -> MagicMock:
+def fxt_training_configuration_service(fxt_app) -> MagicMock:
     training_configuration_service = MagicMock(spec=TrainingConfigurationService)
-    app.dependency_overrides[get_training_configuration_service] = lambda: training_configuration_service
+    fxt_app.dependency_overrides[get_training_configuration_service] = lambda: training_configuration_service
     return training_configuration_service
 
 

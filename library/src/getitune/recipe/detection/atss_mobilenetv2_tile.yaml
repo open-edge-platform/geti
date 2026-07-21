@@ -22,19 +22,19 @@ model:
             mode: max
             factor: 0.1
             patience: 4
-            monitor: val/map_50
+            monitor: val/map
 
 engine:
   device: auto
 
-callback_monitor: val/map_50
+callback_monitor: val/map
 
 data: ../_base_/data/detection_tile.yaml
 
 callbacks:
   - class_path: getitune.backend.lightning.callbacks.adaptive_early_stopping.EarlyStoppingWithWarmup
     init_args:
-      monitor: val/map_50
+      monitor: val/map
       min_delta: 0.001
       mode: max
       patience: 10
@@ -44,7 +44,7 @@ callbacks:
   - class_path: lightning.pytorch.callbacks.ModelCheckpoint
     init_args:
       dirpath: "" # use engine.work_dir
-      monitor: val/map_50
+      monitor: val/map
       mode: max
       save_top_k: 1
       save_last: true

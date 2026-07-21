@@ -269,8 +269,10 @@ class BenchmarkRunner:
 
         # Build a lookup for dataset size tiers (for filtering and MLflow tags)
         size_tier_map: dict[str, str] = {}
+        data_group_map: dict[str, str] = {}
         for entry in catalog.all_entries():
             size_tier_map[entry.name] = entry.size_tier
+            data_group_map[entry.name] = entry.data_group
 
         experiments = list(
             iter_experiments(
@@ -278,6 +280,7 @@ class BenchmarkRunner:
                 self.config.filters,
                 catalog_names,
                 size_tier_map=size_tier_map,
+                data_group_map=data_group_map,
             )
         )
 

@@ -76,11 +76,6 @@
     color: var(--spectrum-global-color-gray-900);
 }
 
-.activeTag {
-    color: var(--spectrum-gray-50);
-    background-color: var(--energy-blue) !important;
-}
-
 .projectCardName {
     @include lineClamp.clamp(1);
     @include lineClamp.breakableText;
@@ -96,6 +91,7 @@
 
 .projectMetadata {
     line-height: var(--spectrum-global-dimension-font-size-200);
+    font-size: var(--spectrum-global-dimension-font-size-50);
 }
 
 .version {

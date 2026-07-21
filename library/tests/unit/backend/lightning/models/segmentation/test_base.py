@@ -27,6 +27,7 @@ class TestLightningSegmentationModel:
             scheduler,
             metric,
             torch_compile,
+            pretrained=False,
         )
 
     @pytest.fixture

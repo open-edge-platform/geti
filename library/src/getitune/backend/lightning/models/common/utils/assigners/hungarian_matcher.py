@@ -223,6 +223,11 @@ class HungarianMatcher(nn.Module):
         out_mask = output["pred_masks"]
         target_mask = output["target_mask"]
 
+        if out_mask is None:
+            num_queries = output["pred_logits"].shape[0]
+            num_targets = output["target_boxes"].shape[0]
+            return torch.zeros(num_queries, num_targets, device=output["pred_logits"].device)
+
         out_mask = out_mask[:, None]
         target_mask = target_mask[:, None]
 

@@ -338,6 +338,54 @@ def provision_datasets(
     ...
 ```
 
+Provisioning is resilient per-dataset: if one entry fails (missing credentials, a
+transient network error, an unresolvable `local_path`/`raw_dir`), the error is logged and
+that entry is simply omitted from the returned mapping rather than aborting the whole
+batch. The runner already treats a missing dataset name as "skip the experiments that
+need it" (§8), so a single problematic dataset never blocks unrelated experiments.
+
+#### 5.3.2 Credentialed, Manually-Placed, and Local Datasets
+
+Not every dataset can be freely auto-downloaded: some require an account/license
+(e.g. Kaggle), and some are large enough that re-fetching them on every run is wasteful.
+Rather than build a generic pluggable "dataset source" abstraction, the catalog schema
+gets two additional, optional fields that compose with the existing script contract:
+
+- **`local_path`** (alternative to `script`) — a directory that is already fully
+  prepared (placed manually, mounted from a shared/network location, or copied from a
+  prior script run). No script runs; the path is used as-is, after `${VAR}`/`~`
+  expansion so the same entry resolves differently per machine/CI runner. Mutually
+  exclusive with `script`.
+- **`raw_dir`** (optional, alongside `script`) — a pre-fetched raw archive/directory,
+  forwarded to the script as `--raw-dir`. This lets a script skip only its network fetch
+  step (e.g. because the raw data was obtained once, manually, with a person's own
+  Kaggle credentials) while still running its transform/export logic, keeping that logic
+  shared, version-controlled, and testable. It's a best-effort accelerant: if it doesn't
+  resolve, the script falls back to its normal download behavior instead of failing.
+
+```yaml
+datasets:
+  - name: brain_tumor
+    script: "scripts/benchmark_datasets/prepare_brain_tumor.py"
+    raw_dir: "${GETITUNE_BENCHMARK_EXTERNAL_DATA}/brain_tumor_raw"
+    size_tier: small
+```
+
+Scripts sourcing from Kaggle use `getitune.benchmark.dataset_helpers.download_kaggle_dataset()`,
+which checks for `kagglehub` and API credentials (`KAGGLE_API_TOKEN` or
+`~/.kaggle/access_token`) up front and raises a clear, actionable error rather than a
+bare dependency failure. `kagglehub` itself is an opt-in optional dependency extra
+(`benchmark`; e.g. `uv sync --extra benchmark`), not installed by default. In CI, a `KAGGLE_API_TOKEN`
+repository secret is wired into the `benchmark-dataset-scripts` job; the corresponding
+real-download test is additionally `skipif`-gated on credentials being present, so
+forked-repo PRs (which never receive secrets) skip it instead of failing.
+
+This directly answers §17 Open Question #1 for the credentialed/oversized subset of
+datasets: rather than depending on a single hosting service, `local_path` lets any
+externally-managed location (shared drive, network mount, manually-populated directory)
+serve as a dataset's source of truth, while `raw_dir` keeps the credentialed/huge case
+inside the same reviewable script pipeline as every other dataset.
+
 ---
 
 ## 6. Benchmark Manifest
@@ -1770,7 +1818,7 @@ results/
 
 | #   | Question                                            | Proposed Default                                                        | Notes                                                                                                                                                                                                                                                                                                                                                                                             |
 | --- | --------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Where to host benchmark datasets?                   | Produced by in-repo preparation scripts (`scripts/benchmark_datasets/`) | Scripts download from any source, transform, and place data locally. No dependency on a single hosting service.                                                                                                                                                                                                                                                                                   |
+| 1   | Where to host benchmark datasets?                   | Produced by in-repo preparation scripts (`scripts/benchmark_datasets/`) | Scripts download from any source, transform, and place data locally. No dependency on a single hosting service. Credentialed (e.g. Kaggle) or oversized datasets additionally support `local_path` (fully externally-managed, no script) and `raw_dir` (skip only the script's network fetch) — see §5.3.2.                                                                                    |
 | 2   | Remote MLflow server or local-only?                 | Start local (`mlruns/`), move to remote server in Phase 5               | Avoids infra dependency in early phases.                                                                                                                                                                                                                                                                                                                                                          |
 | 3   | How many seeds per experiment?                      | 3                                                                       | Balances statistical confidence vs. CI cost. 5 seeds would be better but almost doubles runtime.                                                                                                                                                                                                                                                                                                  |
 | 4   | Should the benchmark block PR merges on regression? | No (advisory only)                                                      | Flaky GPU tests + margin of error make hard-gating risky initially. Revisit after baseline stability is established.                                                                                                                                                                                                                                                                              |

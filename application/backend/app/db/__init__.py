@@ -2,6 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from app.db.engine import db_engine, get_db_session
-from app.db.migration import MigrationManager
+from app.db.migration import MigrationFatalError, MigrationManager
 
-__all__ = ["MigrationManager", "db_engine", "get_db_session"]
+__all__ = [
+    "MigrationFatalError",
+    "MigrationManager",
+    "db_engine",
+    "get_db_session",
+]

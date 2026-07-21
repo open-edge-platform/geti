@@ -5,7 +5,7 @@
 ## Python Environment with CUDA
 #########################################################
 
-FROM nvidia/cuda:12.1.0-runtime-ubuntu20.04@sha256:c1869c30f46fff478a37ed58d9dace7e08519541274f03424d0b78bd35b2c73a AS python_base_cuda
+FROM nvidia/cuda:12.9.2-cudnn-runtime-ubuntu20.04@sha256:6fb0b8b9fbae9d4283782f47eb7e0192c9f567d8e222194b14d6ad1bfc59e62c AS python_base_cuda
 LABEL maintainer="OpenVINO Training Extensions Development Team"
 
 ARG uid
@@ -53,7 +53,7 @@ FROM python_base_cuda as getitune_development_env
 
 RUN mkdir actions-runner
 WORKDIR /home/validation/actions-runner
-ARG ACTIONS_RUNNER_VER=2.333.1
+ARG ACTIONS_RUNNER_VER=2.335.1
 # download actions-runner and extract it
 RUN curl -o actions-runner-linux-x64.tar.gz -L https://github.com/actions/runner/releases/download/v${ACTIONS_RUNNER_VER}/actions-runner-linux-x64-${ACTIONS_RUNNER_VER}.tar.gz && \
     tar xzf ./actions-runner-linux-x64.tar.gz && \

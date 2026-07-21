@@ -16,6 +16,7 @@ class TestDinoV2Seg:
             label_info=10,
             model_name="dinov2-small-seg",
             data_input_params=DataInputParams((518, 518), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
     def test_dino_v2_seg_init(self, fxt_dino_v2_seg):

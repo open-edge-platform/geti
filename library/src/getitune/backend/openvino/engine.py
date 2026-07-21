@@ -412,6 +412,7 @@ class OVEngine(Engine):
         datamodule: DataModule | None = None,
         max_data_subset_size: int | None = None,
         max_drop: float | None = None,
+        max_num_iterations: int | None = None,
     ) -> Path:
         """Apply Post-Training Quantization (PTQ) to optimize the model.
 
@@ -428,6 +429,8 @@ class OVEngine(Engine):
                 Defaults to None.
             max_drop (float | None, optional): Maximum accuracy drop allowed for accuracy-aware quantization.
                 Defaults to None.
+            max_num_iterations (int | None, optional): Maximum number of iterations for accuracy-aware
+                quantization. ``None`` means unlimited. Only used when ``max_drop`` is set. Defaults to None.
 
         Returns:
             Path: Path to the optimized model.
@@ -457,6 +460,8 @@ class OVEngine(Engine):
             ptq_config["subset_size"] = max_data_subset_size
         if max_drop is not None:
             ptq_config["max_drop"] = max_drop
+            if max_num_iterations is not None:
+                ptq_config["max_num_iterations"] = max_num_iterations
         logger.debug(f"PTQ configuration: {ptq_config}")
 
         return model.optimize(

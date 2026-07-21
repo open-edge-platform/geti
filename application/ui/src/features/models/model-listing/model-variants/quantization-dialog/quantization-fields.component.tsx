@@ -3,12 +3,24 @@
 
 import { ReactNode, useState } from 'react';
 
-import { ActionButton, Checkbox, Content, ContextualHelp, Flex, Grid, NumberField, Slider, Text } from '@geti-ui/ui';
+import {
+    ActionButton,
+    Checkbox,
+    Content,
+    ContextualHelp,
+    Flex,
+    Grid,
+    NumberField,
+    Slider,
+    Text,
+    View,
+} from '@geti-ui/ui';
 import { Refresh } from '@geti-ui/ui/icons';
 
 export const DEFAULT_QUANTIZATION_PARAMETERS = {
     accuracyDrop: 1.0,
     calibrationSize: 200,
+    maxNumIterations: 10,
     hasNoMaxAccuracyDrop: true,
     usesFullCalibrationDataset: false,
 };
@@ -93,6 +105,48 @@ export const MaxAccuracyDropField = ({
             <Checkbox aria-label='No maximum' isSelected={isDisabled} onChange={onDisabledChange}>
                 No maximum
             </Checkbox>
+        </QuantizationFieldLayout>
+    );
+};
+
+type MaxNumIterationsFieldProps = {
+    value: number;
+    onChange: (value: number) => void;
+    isDisabled: boolean;
+    onReset: () => void;
+};
+
+export const MaxNumIterationsField = ({ value, onChange, isDisabled, onReset }: MaxNumIterationsFieldProps) => {
+    return (
+        <QuantizationFieldLayout onReset={onReset}>
+            <Text>Max number of iterations</Text>
+            <ContextualHelp>
+                <Content>
+                    Maximum number of iterations of accuracy-aware quantization.
+                    <br />
+                    <br />
+                    Accuracy-aware quantization iteratively removes model layers from the quantization scope until the
+                    max accuracy drop criteria is met. Limiting the number of iterations can significantly reduce the
+                    time it takes to quantize models with many layers.
+                    <br />
+                    <br />
+                    This parameter is only used when a max accuracy drop is set.
+                </Content>
+            </ContextualHelp>
+            <Flex gap={'size-100'}>
+                <NumberField
+                    hideStepper
+                    step={1}
+                    value={value}
+                    minValue={1}
+                    onChange={onChange}
+                    isDisabled={isDisabled}
+                    aria-label={'Change Max number of iterations'}
+                    formatOptions={{ maximumFractionDigits: 0 }}
+                    flex={1}
+                />
+            </Flex>
+            <View />
         </QuantizationFieldLayout>
     );
 };

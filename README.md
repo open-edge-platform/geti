@@ -3,9 +3,9 @@
 
 <img src="assets/geti-header.png" alt="Geti™ - A framework to rapidly build and deploy computer vision AI models">
 
-[Quick Start](#quick-start) •
+[Quick Start](#quick-start-with-geti) •
 [Geti™ documentation](https://docs.geti.intel.com/) •
-[`getitune` documentation](library/README.md)
+[`getitune` documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/intro)
 
 [![Container build](https://github.com/open-edge-platform/geti/actions/workflows/build.yaml/badge.svg)](https://github.com/open-edge-platform/geti/actions/workflows/build.yaml)
 [![Codecov](https://codecov.io/gh/open-edge-platform/geti/branch/develop/graph/badge.svg?token=9HVFNMPFGD)](https://codecov.io/gh/open-edge-platform/geti)
@@ -39,11 +39,11 @@ Geti™ is an end-to-end Vision AI application that takes you from raw images to
 
 Before you begin, make sure your machine meets the following requirements:
 
-| Component | Requirement                                            |
-| --------- | ------------------------------------------------------ |
-| CPU       | 8 threads                                              |
-| RAM       | 16 GB                                                  |
-| Disk      | 40 GB free                                             |
+| Component | Requirement                                              |
+| --------- | -------------------------------------------------------- |
+| CPU       | 8 threads                                                |
+| RAM       | 16 GB                                                    |
+| Disk      | 40 GB free                                               |
 | GPU       | Optional - Intel® XPU or NVIDIA® GPU for larger models |
 
 Geti can be installed as a **Windows application**, run as a **container**, or built **from source code**. Choose the option that best suits your environment below.
@@ -87,6 +87,10 @@ just run-image --accelerator ${ACCELERATOR}
 
 Then get access to Geti™ user interface at `http://localhost:7860`.
 
+> [!IMPORTANT]
+> Pre-built container images do not include Ultralytics models due to AGPL licensing constraints. See the
+> [application README](application/README.md#run-with-docker) for instructions on building an image that includes them.
+
 </details>
 
 <details>
@@ -96,15 +100,12 @@ Then get access to Geti™ user interface at `http://localhost:7860`.
 
 **Installing from source gives you access to the latest features not yet available in released builds, including Ultralytics YOLO26 support.**
 
-
 The installer clones the repository, sets up its own
 copy of `uv`, Node.js and npm under `.build/`, detects your accelerator (Intel® XPU, NVIDIA® CUDA, or CPU), builds the
 backend and UI, and starts the app. The first build downloads several GB of packages (PyTorch, OpenVINO, …) and can
 take a while — progress is shown for each step.
 
-
-> [!NOTE]
-> `git` is required on all platforms; `curl` is also required on Linux/WSL. Re-running the installer reuses the cached
+> [!NOTE] > `git` is required on all platforms; `curl` is also required on Linux/WSL. Re-running the installer reuses the cached
 > tools and dependencies, so only the first build is slow.
 
 **Linux / WSL2**:
@@ -170,19 +171,19 @@ uv pip install "getitune[cuda]" --extra-index-url https://download.pytorch.org/w
 uv pip install getitune # CPU-only by default
 ```
 
-> ⚠️ **Ultralytics YOLO Models**: The PyPI package does **not** include Ultralytics YOLO26 models. Install from source to use them:
+> [!IMPORTANT] > **Ultralytics YOLO Models**: The PyPI package does **not** include Ultralytics YOLO models, which are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license).
+>
+> Install `getitune` from source to use them:
 >
 > ```bash
-> git clone https://github.com/open-edge-platform/training_extensions.git
-> cd training_extensions/library
+> git clone https://github.com/open-edge-platform/geti.git
+> cd geti/library
 > uv sync --extra xpu --extra ultralytics                              # Intel GPU + YOLO
 > uv sync --extra cuda --extra ultralytics                             # NVIDIA GPU + YOLO
 > uv sync --extra cpu --extra ultralytics                              # CPU + YOLO
 > ```
 >
-> See the [library README](library/README.md#installation) for more details.
->
-> ℹ️ Ultralytics YOLO models are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license).
+> See the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/installation) for more details.
 
 **Discover available models and train a model in just a few lines of code:**
 
@@ -223,8 +224,8 @@ metrics = ov_engine.test()
 predictions = ov_engine.predict()
 ```
 
-See the [library README](library/README.md) for the full list of recipes, advanced configuration, dataset support,
-backend-specific options, and deployment/optimization examples.
+See the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/quick-start) for the full list of recipes,
+advanced configuration, dataset support, backend-specific options, and deployment/optimization examples.
 
 ## Key Features
 

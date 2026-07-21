@@ -22,12 +22,12 @@ model:
             mode: max
             factor: 0.5
             patience: 3
-            monitor: val/accuracy
+            monitor: val/f1-score
 
 engine:
   device: auto
 
-callback_monitor: val/accuracy
+callback_monitor: val/f1-score
 
 data: ../../_base_/data/classification.yaml
 
@@ -38,7 +38,7 @@ callbacks:
   - class_path: lightning.pytorch.callbacks.ModelCheckpoint
     init_args:
       dirpath: "" # use engine.work_dir
-      monitor: val/accuracy
+      monitor: val/f1-score
       mode: max
       save_top_k: 1
       save_last: true
