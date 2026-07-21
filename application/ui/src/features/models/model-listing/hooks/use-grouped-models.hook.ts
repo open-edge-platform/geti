@@ -3,7 +3,8 @@
 
 import { useMemo } from 'react';
 
-import type { DatasetRevision, Model } from '../../../../constants/shared-types';
+import type { DatasetRevision, Model } from '@/api/types';
+
 import { GroupByMode, GroupedModels, SortBy } from '../types';
 import {
     filterBySearch,

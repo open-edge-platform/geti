@@ -16,7 +16,6 @@ from getitune.backend.lightning.models.detection.heads.dfine_decoder import DFIN
 from getitune.backend.lightning.models.detection.losses.dfine_loss import DFINECriterion
 from getitune.backend.lightning.models.detection.necks.dfine_hybrid_encoder import HybridEncoder
 from getitune.backend.lightning.models.detection.rtdetr import RTDETR
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 
@@ -25,6 +24,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -32,7 +32,7 @@ class DFine(RTDETR):
     """getitune Detection model class for DFine.
 
     Attributes:
-        pretrained_weights (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
+        pretrained_urls (ClassVar[dict[str, str]]): Dictionary containing URLs for pretrained weights.
         input_size_multiplier (int): Multiplier for the input size.
 
     Args:
@@ -47,9 +47,12 @@ class DFine(RTDETR):
         multi_scale (bool, optional): Whether to use multi-scale training. Defaults to False.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
-    _pretrained_weights: ClassVar[dict[str, str]] = {
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "dfine_hgnetv2_n": "https://storage.geti.intel.com/weights/dfine_n_coco.pth",
         "dfine_hgnetv2_s": "https://storage.geti.intel.com/weights/dfine_s_coco.pth",
         "dfine_hgnetv2_m": "https://storage.geti.intel.com/weights/dfine_m_coco.pth",
@@ -76,6 +79,8 @@ class DFine(RTDETR):
         multi_scale: bool = False,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             model_name=model_name,  # type: ignore[arg-type]
@@ -87,6 +92,8 @@ class DFine(RTDETR):
             multi_scale=multi_scale,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> DETR:
@@ -149,7 +156,6 @@ class DFine(RTDETR):
             input_size=self.data_input_params.input_size[0],
         )
         model.init_weights()
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
 
         return model
 

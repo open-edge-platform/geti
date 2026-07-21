@@ -19,7 +19,6 @@ from app.api.schemas.jobs.training import TrainingRequest
 from app.core.jobs import JobQueue
 from app.core.jobs.control_plane import CancellationResult
 from app.core.jobs.models import Job, JobStatus, JobType
-from app.main import app
 from app.models import Project, Task, TaskType, TrainingJob, TrainingJobParams
 from app.models.system import DeviceInfo, DeviceType
 
@@ -35,9 +34,9 @@ async def stream_test(client: AsyncClient, job_id: UUID, path: str = "logs") -> 
 
 
 @pytest.fixture
-def fxt_jobs_queue() -> Mock:
+def fxt_jobs_queue(fxt_app) -> Mock:
     jobs_queue = Mock(spec=JobQueue)
-    app.dependency_overrides[get_job_queue] = lambda: jobs_queue
+    fxt_app.dependency_overrides[get_job_queue] = lambda: jobs_queue
     return jobs_queue
 
 
@@ -70,9 +69,9 @@ def fxt_job() -> Callable[[UUID | None, JobStatus, float], Job]:
 
 
 class TestJobEndpoints:
-    def test_submit_train_job(self, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service):
-        app.dependency_overrides[get_job_dir] = lambda: tmp_path / "logs" / "jobs"
-        app.dependency_overrides[get_data_dir] = lambda: tmp_path / "data"
+    def test_submit_train_job(self, fxt_app, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service):
+        fxt_app.dependency_overrides[get_job_dir] = lambda: tmp_path / "logs" / "jobs"
+        fxt_app.dependency_overrides[get_data_dir] = lambda: tmp_path / "data"
         project = Mock(spec=Project)
         project.id = uuid4()
         project.task = Mock(spec=Task)
@@ -110,9 +109,9 @@ class TestJobEndpoints:
             assert fxt_jobs_queue.submit.call_args[0][0].params.model_architecture_id == "image-classification-vit-tiny"
             assert fxt_jobs_queue.submit.call_args[0][0].params.task.task_type == TaskType.CLASSIFICATION
 
-    def test_submit_quantize_job(self, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service):
-        app.dependency_overrides[get_job_dir] = lambda: tmp_path / "logs" / "jobs"
-        app.dependency_overrides[get_data_dir] = lambda: tmp_path / "data"
+    def test_submit_quantize_job(self, fxt_app, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service):
+        fxt_app.dependency_overrides[get_job_dir] = lambda: tmp_path / "logs" / "jobs"
+        fxt_app.dependency_overrides[get_data_dir] = lambda: tmp_path / "data"
         project = Mock(spec=Project)
         project.id = uuid4()
         project.task = Mock(spec=Task)
@@ -121,19 +120,24 @@ class TestJobEndpoints:
         fxt_project_service.get_project_by_id.return_value = project
 
         model_id = uuid4()
+        mock_manifest = Mock()
+        mock_manifest.name = "ViT Tiny"
         job_request = JobRequestAdapter.validate_python(
             {
                 "project_id": project.id,
                 "job_type": JobType.QUANTIZE,
                 "parameters": {
                     "model_id": model_id,
+                    "model_architecture_id": "image-classification-vit-tiny",
                     "max_calibration_subset_size": 200,
                     "max_drop": 0.01,
+                    "max_num_iterations": 5,
                 },
             }
         )
 
-        response = fxt_client.post("/api/jobs", json=job_request.model_dump(mode="json"))
+        with patch("app.api.routers.jobs.ModelManifestService.get_model_manifest_by_id", return_value=mock_manifest):
+            response = fxt_client.post("/api/jobs", json=job_request.model_dump(mode="json"))
 
         assert response.status_code == status.HTTP_202_ACCEPTED
         assert response.json()["job_id"]
@@ -143,14 +147,17 @@ class TestJobEndpoints:
         submitted_job = fxt_jobs_queue.submit.call_args[0][0]
         assert submitted_job.job_type == JobType.QUANTIZE
         assert submitted_job.params.model_id == model_id
+        assert submitted_job.params.model_architecture_id == "image-classification-vit-tiny"
+        assert submitted_job.params.model_architecture_name == "ViT Tiny"
         assert submitted_job.params.max_calibration_subset_size == 200
         assert submitted_job.params.max_drop == 0.01
+        assert submitted_job.params.max_num_iterations == 5
         assert submitted_job.project_id == project.id
 
-    def test_submit_quantize_job_defaults(self, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service):
+    def test_submit_quantize_job_defaults(self, fxt_app, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service):
         """Quantize request without max_drop uses defaults (None for max_drop, 100 for subset size)."""
-        app.dependency_overrides[get_job_dir] = lambda: tmp_path / "logs" / "jobs"
-        app.dependency_overrides[get_data_dir] = lambda: tmp_path / "data"
+        fxt_app.dependency_overrides[get_job_dir] = lambda: tmp_path / "logs" / "jobs"
+        fxt_app.dependency_overrides[get_data_dir] = lambda: tmp_path / "data"
         project = Mock(spec=Project)
         project.id = uuid4()
         project.task = Mock(spec=Task)
@@ -159,17 +166,21 @@ class TestJobEndpoints:
         fxt_project_service.get_project_by_id.return_value = project
 
         model_id = uuid4()
+        mock_manifest = Mock()
+        mock_manifest.name = "ViT Tiny"
         job_request = JobRequestAdapter.validate_python(
             {
                 "project_id": project.id,
                 "job_type": JobType.QUANTIZE,
                 "parameters": {
                     "model_id": model_id,
+                    "model_architecture_id": "image-classification-vit-tiny",
                 },
             }
         )
 
-        response = fxt_client.post("/api/jobs", json=job_request.model_dump(mode="json"))
+        with patch("app.api.routers.jobs.ModelManifestService.get_model_manifest_by_id", return_value=mock_manifest):
+            response = fxt_client.post("/api/jobs", json=job_request.model_dump(mode="json"))
 
         assert response.status_code == status.HTTP_202_ACCEPTED
         submitted_job = fxt_jobs_queue.submit.call_args[0][0]
@@ -177,6 +188,7 @@ class TestJobEndpoints:
         assert submitted_job.params.model_id == model_id
         assert submitted_job.params.max_calibration_subset_size == 100
         assert submitted_job.params.max_drop is None
+        assert submitted_job.params.max_num_iterations == 10
 
     def test_list_jobs(self, fxt_client, fxt_jobs_queue, fxt_job):
         fxt_jobs_queue.list_all.return_value = [fxt_job(), fxt_job()]
@@ -269,7 +281,7 @@ class TestJobEndpoints:
         assert '"progress":100' in events[2]
 
     @pytest.mark.asyncio
-    async def test_stream_job_logs_yields_log_lines(self, tmp_path, fxt_async_client, fxt_jobs_queue, fxt_job):
+    async def test_stream_job_logs_yields_log_lines(self, fxt_app, tmp_path, fxt_async_client, fxt_jobs_queue, fxt_job):
         job_id = uuid4()
         job_dir = tmp_path / "logs" / "jobs"
         job_dir.mkdir(parents=True)
@@ -282,7 +294,7 @@ class TestJobEndpoints:
         log_file.write_text("Line 1\nLine 2\nLine 3\n")
         fxt_jobs_queue.get.side_effect = [job_v1, job_v1, job_v2, job_done, None]
 
-        app.dependency_overrides[get_job_dir] = lambda: job_dir
+        fxt_app.dependency_overrides[get_job_dir] = lambda: job_dir
 
         events = await asyncio.wait_for(stream_test(fxt_async_client, job_id), 2)
         assert len(events) == 3
@@ -291,14 +303,14 @@ class TestJobEndpoints:
         assert "Line 3" in events[2]
 
     @pytest.mark.asyncio
-    async def test_stream_job_logs_not_found(self, tmp_path, fxt_async_client, fxt_jobs_queue):
+    async def test_stream_job_logs_not_found(self, fxt_app, tmp_path, fxt_async_client, fxt_jobs_queue):
         job_id = uuid4()
         job_dir = tmp_path / "logs" / "jobs"
         job_dir.mkdir(parents=True)
 
         fxt_jobs_queue.get.return_value = None
 
-        app.dependency_overrides[get_job_dir] = lambda: job_dir
+        fxt_app.dependency_overrides[get_job_dir] = lambda: job_dir
 
         response = await fxt_async_client.get(f"/api/jobs/{job_id}/logs")
 
@@ -306,7 +318,7 @@ class TestJobEndpoints:
         fxt_jobs_queue.get.assert_called_once_with(job_id)
 
     @pytest.mark.asyncio
-    async def test_stream_job_logs_completed(self, tmp_path, fxt_async_client, fxt_jobs_queue, fxt_job):
+    async def test_stream_job_logs_completed(self, fxt_app, tmp_path, fxt_async_client, fxt_jobs_queue, fxt_job):
         job_id = uuid4()
         job_dir = tmp_path / "logs" / "jobs"
         job_dir.mkdir(parents=True)
@@ -317,7 +329,7 @@ class TestJobEndpoints:
         log_file = job_dir / job.log_file
         log_file.write_text("Line 1\nLine 2\nLine 3\n")
 
-        app.dependency_overrides[get_job_dir] = lambda: job_dir
+        fxt_app.dependency_overrides[get_job_dir] = lambda: job_dir
 
         response = await fxt_async_client.get(f"/api/jobs/{job_id}/logs")
 
@@ -330,7 +342,7 @@ class TestJobEndpoints:
         assert "Line 3" in events[2]
 
     @pytest.mark.asyncio
-    async def test_stream_job_logs_file_not_found(self, tmp_path, fxt_async_client, fxt_jobs_queue, fxt_job):
+    async def test_stream_job_logs_file_not_found(self, fxt_app, tmp_path, fxt_async_client, fxt_jobs_queue, fxt_job):
         job_id = uuid4()
         job_dir = tmp_path / "logs" / "jobs"
         job_dir.mkdir(parents=True)
@@ -339,7 +351,7 @@ class TestJobEndpoints:
         # Don't create the log file - it should not exist
         fxt_jobs_queue.get.return_value = job
 
-        app.dependency_overrides[get_job_dir] = lambda: job_dir
+        fxt_app.dependency_overrides[get_job_dir] = lambda: job_dir
 
         response = await fxt_async_client.get(f"/api/jobs/{job_id}/logs")
 

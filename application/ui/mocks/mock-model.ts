@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Model, ModelArchitectureWithPerformanceCategory } from '../src/constants/shared-types';
+import { Model, ModelArchitectureWithPerformanceCategory } from '@/api/types';
 
 export const getMockedModel = (overrides: Partial<Model> = {}): Model => {
     return {

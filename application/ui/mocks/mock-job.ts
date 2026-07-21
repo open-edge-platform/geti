@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ExportDatasetJob, Job, PrepareImportDatasetJob } from '../src/constants/shared-types';
+import type { ExportDatasetJob, Job, PrepareImportDatasetJob } from '@/api/types';
 
 export const getMockedJob = (job?: Partial<Job>): Job => {
     return {

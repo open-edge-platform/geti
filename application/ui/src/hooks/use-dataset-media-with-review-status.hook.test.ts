@@ -9,6 +9,7 @@ import { renderHook } from 'test-utils/render';
 
 import { http } from '../api/utils';
 import { server } from '../msw-node-setup';
+import { SORT_DIRECTION_PARAM } from './use-dataset-filters-search-params.hook';
 import { useDatasetMediaWithReviewStatus } from './use-dataset-media-with-review-status.hook';
 
 type HandlerOptions = {
@@ -25,6 +26,15 @@ const getOffsetFromRequest = (request: Request) => {
     const url = new URL(request.url);
 
     return Number(url.searchParams.get('offset') ?? '0');
+};
+
+const getSortParamsFromRequest = (request: Request) => {
+    const url = new URL(request.url);
+
+    return {
+        sortBy: url.searchParams.get('sort_by'),
+        sortDirection: url.searchParams.get('sort_direction'),
+    };
 };
 
 const applyDelayForOffset = async (offset: number, initialDelayMs: number, nextPageDelayMs: number) => {
@@ -182,6 +192,66 @@ describe('useDatasetMediaWithReviewStatus', () => {
             });
 
             expect(result.current.isFetchingNextPage).toBe(false);
+        });
+    });
+
+    describe('sort direction', () => {
+        const mockSortableResponses = () => {
+            let mediaSortParams: { sortBy: string | null; sortDirection: string | null } | undefined;
+            let datasetSortParams: { sortBy: string | null; sortDirection: string | null } | undefined;
+
+            server.use(
+                http.get('/api/projects/{project_id}/dataset/media', ({ request }) => {
+                    mediaSortParams = getSortParamsFromRequest(request);
+
+                    return HttpResponse.json({
+                        items: [getMockedMediaImage({ id: 'media-1' })],
+                        pagination: { offset: 0, count: 1, total: 1, limit: 0 },
+                    });
+                }),
+                http.get('/api/projects/{project_id}/dataset/items', ({ request }) => {
+                    datasetSortParams = getSortParamsFromRequest(request);
+
+                    return HttpResponse.json({
+                        items: [getMockedDatasetItem({ id: 'item-1', user_reviewed: false })],
+                        pagination: { offset: 0, count: 1, total: 1, limit: 0 },
+                    });
+                })
+            );
+
+            return {
+                getMediaSortParams: () => mediaSortParams,
+                getDatasetSortParams: () => datasetSortParams,
+            };
+        };
+
+        it('requests upload_date/creation_date sorted desc by default, for both media and dataset items', async () => {
+            const { getMediaSortParams, getDatasetSortParams } = mockSortableResponses();
+
+            const { result } = renderHook(() => useDatasetMediaWithReviewStatus());
+
+            await waitFor(() => {
+                expect(result.current.isPending).toBe(false);
+            });
+
+            expect(getMediaSortParams()).toEqual({ sortBy: 'upload_date', sortDirection: 'desc' });
+            expect(getDatasetSortParams()).toEqual({ sortBy: 'creation_date', sortDirection: 'desc' });
+        });
+
+        it('requests ascending order for both media and dataset items when the URL sort param is "asc"', async () => {
+            const { getMediaSortParams, getDatasetSortParams } = mockSortableResponses();
+
+            const { result } = renderHook(() => useDatasetMediaWithReviewStatus(), {
+                route: `/projects/123?${SORT_DIRECTION_PARAM}=asc`,
+                path: '/projects/:projectId',
+            });
+
+            await waitFor(() => {
+                expect(result.current.isPending).toBe(false);
+            });
+
+            expect(getMediaSortParams()).toEqual({ sortBy: 'upload_date', sortDirection: 'asc' });
+            expect(getDatasetSortParams()).toEqual({ sortBy: 'creation_date', sortDirection: 'asc' });
         });
     });
 });

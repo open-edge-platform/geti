@@ -12,13 +12,13 @@ from fastapi import status
 
 from app.api.dependencies import get_sink, get_sink_service
 from app.api.schemas.sink import FolderSinkConfigCreate, FolderSinkConfigView, MqttSinkConfigView
-from app.main import app
 from app.models import OutputFormat, SinkType
 from app.models.sink import FolderConfig, MqttConfig, Sink, SinkTestResult
 from app.services import (
     ResourceInUseError,
     ResourceNotFoundError,
     ResourceType,
+    ResourceValidationError,
     ResourceWithNameAlreadyExistsError,
     SinkService,
 )
@@ -49,10 +49,10 @@ def fxt_folder_sink_view() -> FolderSinkConfigView:
 
 
 @pytest.fixture
-def fxt_get_sink(fxt_folder_sink_view) -> Generator[Sink]:
-    app.dependency_overrides[get_sink] = lambda: fxt_folder_sink_view
+def fxt_get_sink(fxt_app, fxt_folder_sink_view) -> Generator[Sink]:
+    fxt_app.dependency_overrides[get_sink] = lambda: fxt_folder_sink_view
     yield fxt_folder_sink_view
-    del app.dependency_overrides[get_sink]
+    del fxt_app.dependency_overrides[get_sink]
 
 
 @pytest.fixture
@@ -72,9 +72,9 @@ def fxt_mqtt_sink_view() -> MqttSinkConfigView:
 
 
 @pytest.fixture
-def fxt_sink_service() -> MagicMock:
+def fxt_sink_service(fxt_app) -> MagicMock:
     sink_service = MagicMock(spec=SinkService)
-    app.dependency_overrides[get_sink_service] = lambda: sink_service
+    fxt_app.dependency_overrides[get_sink_service] = lambda: sink_service
     return sink_service
 
 
@@ -109,6 +109,18 @@ class TestSinkEndpoints:
         response = fxt_client.post("/api/sinks", json=fxt_folder_sink_create.model_dump(exclude={"id"}))
 
         assert response.status_code == status.HTTP_409_CONFLICT
+        fxt_sink_service.create_sink.assert_called_once()
+
+    def test_create_sink_not_reachable(self, fxt_folder_sink_create, fxt_sink_service, fxt_client):
+        err = ResourceValidationError(
+            ResourceType.SINK, str(fxt_folder_sink_create.id), "Directory not found: /test/path"
+        )
+        fxt_sink_service.create_sink.side_effect = err
+
+        response = fxt_client.post("/api/sinks", json=fxt_folder_sink_create.model_dump(exclude={"id"}))
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        assert response.json()["detail"] == str(err)
         fxt_sink_service.create_sink.assert_called_once()
 
     def test_list_sinks(self, fxt_folder_sink_view, fxt_mqtt_sink, fxt_sink_service, fxt_client):
@@ -172,6 +184,16 @@ class TestSinkEndpoints:
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "_type" in response.json()["detail"]
         fxt_sink_service.update_sink.assert_not_called()
+
+    def test_update_sink_not_reachable(self, fxt_get_sink, fxt_sink_service, fxt_client):
+        sink_id = str(fxt_get_sink.id)
+        err = ResourceValidationError(ResourceType.SINK, sink_id, "Directory not found: /new/path")
+        fxt_sink_service.update_sink.side_effect = err
+
+        response = fxt_client.patch(f"/api/sinks/{sink_id}", json={"folder_path": "/new/path"})
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        assert response.json()["detail"] == str(err)
 
     def test_delete_sink_success(self, fxt_folder_sink_view, fxt_get_sink, fxt_sink_service, fxt_client):
         sink_id = str(fxt_folder_sink_view.id)
@@ -246,6 +268,21 @@ class TestSinkEndpoints:
         response = fxt_client.post("/api/sinks:import", files=files)
 
         assert response.status_code == status.HTTP_409_CONFLICT
+        fxt_sink_service.create_sink.assert_called_once()
+
+    def test_import_sink_not_reachable(self, fxt_folder_sink_create, fxt_sink_service, fxt_client):
+        sink_data = fxt_folder_sink_create.model_dump(exclude={"id"}, mode="json")
+        yaml_content = yaml.safe_dump(sink_data)
+        err = ResourceValidationError(
+            ResourceType.SINK, str(fxt_folder_sink_create.id), "Directory not found: /test/path"
+        )
+        fxt_sink_service.create_sink.side_effect = err
+
+        files = {"yaml_file": ("test.yaml", io.BytesIO(yaml_content.encode()), "application/x-yaml")}
+        response = fxt_client.post("/api/sinks:import", files=files)
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        assert response.json()["detail"] == str(err)
         fxt_sink_service.create_sink.assert_called_once()
 
     def test_import_sink_invalid_yaml(self, fxt_client):

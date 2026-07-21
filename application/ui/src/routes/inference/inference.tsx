@@ -5,19 +5,20 @@ import { Grid } from '@geti-ui/ui';
 
 import { ZoomProvider } from '../../components/zoom/zoom.provider';
 import { Sidebar } from '../../features/inference/aside/sidebar-tabs.component';
+import { Footer } from '../../features/inference/footer/footer.component';
 import { Header } from '../../features/inference/header/inference-header.component';
 import { StreamContainer } from '../../features/inference/stream/stream-container';
 
 export const Inference = () => {
     return (
         <Grid
-            areas={['toolbar aside', 'canvas aside']}
+            areas={['toolbar aside', 'canvas aside', 'footer aside']}
+            rows={['size-800', 'minmax(0, 1fr)', 'size-600']}
+            columns={['minmax(0, 1fr)', 'auto']}
+            height={'100%'}
+            gap={'size-10'}
             UNSAFE_style={{
-                gridTemplateRows: 'var(--spectrum-global-dimension-size-800, 4rem) minmax(0, 1fr)',
-                gridTemplateColumns: 'minmax(0, 1fr) auto',
-                height: '100%',
                 overflow: 'hidden',
-                gap: 'var(--spectrum-global-dimension-size-10)',
             }}
         >
             <Header />
@@ -25,6 +26,7 @@ export const Inference = () => {
                 <StreamContainer />
             </ZoomProvider>
             <Sidebar />
+            <Footer />
         </Grid>
     );
 };

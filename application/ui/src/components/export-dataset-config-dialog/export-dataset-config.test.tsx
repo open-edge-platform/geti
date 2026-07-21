@@ -1,12 +1,12 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Project } from '@/api/types';
 import { fireEvent, screen } from '@testing-library/react';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { getMockedProject } from '../../../mocks/mock-project';
-import { SchemaProjectView } from '../../api/openapi-spec';
 import { http } from '../../api/utils';
 import { server } from '../../msw-node-setup';
 import { ExportDatasetConfig } from './export-dataset-config.component';
@@ -24,7 +24,7 @@ describe('ExportDatasetConfig', () => {
     const EMPTY_LABEL_WARNING_NO_OBJECT = /does not support empty labels.*"No object"/i;
     const EMPTY_LABEL_WARNING_NO_LABEL = /does not support empty labels.*"No label"/i;
 
-    const renderApp = (project: SchemaProjectView) => {
+    const renderApp = (project: Project) => {
         server.use(
             http.get('/api/projects/{project_id}', () => {
                 return HttpResponse.json(project);

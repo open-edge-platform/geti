@@ -44,8 +44,8 @@ test.describe('Jobs - Current Running', () => {
         await jobsPage.goto();
 
         await expect(jobsPage.getCurrentRunningSection()).toBeVisible();
-        await expect(jobsPage.getRunningTag()).toBeVisible();
-        await expect(jobsPage.getStatusTag()).toBeVisible();
+        await expect(jobsPage.getRunningBadge()).toBeVisible();
+        await expect(jobsPage.getStatusBadge()).toBeVisible();
     });
 
     test('shows model architecture in training row', async ({ jobsPage, network }) => {

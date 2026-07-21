@@ -19,6 +19,7 @@ class TestClassIncrementalMixin:
             3,
             model_name="lite_hrnet_18",
             data_input_params=DataInputParams((128, 128), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         seg_logits = torch.randn(1, 3, 128, 128)

@@ -25,6 +25,12 @@ jobs:
       run_actions: "${{ steps.prepare_outputs.outputs.run_actions }}"
       run_rust: "${{ steps.prepare_outputs.outputs.run_rust }}"
     steps:
+      - &harden-runner
+        name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
       - &checkout
         name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -102,11 +108,13 @@ jobs:
             run: ${{ needs.check_paths.outputs.run_rust || 'true' }}
 
     steps:
+      - *harden-runner
+
       - *checkout
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+        uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
         if: ${{ matrix.run == 'true' }}
         with:
           languages: ${{ matrix.language }}
@@ -114,7 +122,7 @@ jobs:
           queries: security-extended
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2
+        uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
         if: ${{ matrix.run == 'true' }}
         with:
           category: "/language:${{matrix.language}}"

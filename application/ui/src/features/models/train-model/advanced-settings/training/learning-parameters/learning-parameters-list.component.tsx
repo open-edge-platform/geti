@@ -3,10 +3,10 @@
 
 import { Dispatch, SetStateAction, useMemo } from 'react';
 
+import type { ConfigurableParameter, TrainingConfiguration } from '@/api/types';
 import { Flex } from '@geti-ui/ui';
 import { partition } from 'lodash-es';
 
-import { ConfigurableParameter, TrainingConfiguration } from '../../../../../../constants/shared-types';
 import { Parameters } from '../../components/parameters.component';
 import { deepReplaceParameters, filterDependentParameters } from '../../utils';
 import { InputSizeParameters } from './input-size-parameters.component';

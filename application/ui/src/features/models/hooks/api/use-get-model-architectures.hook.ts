@@ -3,16 +3,15 @@
 
 import { useMemo } from 'react';
 
-import { usePrefetchQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { useProject } from 'hooks/api/project.hook';
-
-import { $api } from '../../../../api/client';
-import {
+import { $api } from '@/api';
+import type {
     ModelArchitecture,
     ModelArchitectureWithPerformanceCategory,
     RecommendedModelArchitectures,
     TaskType,
-} from '../../../../constants/shared-types';
+} from '@/api/types';
+import { usePrefetchQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useProject } from 'hooks/api/project.hook';
 
 const getModelArchitectures = (
     modelArchitectures: ModelArchitecture[],

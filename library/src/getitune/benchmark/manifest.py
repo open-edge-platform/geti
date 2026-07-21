@@ -16,7 +16,6 @@ from getitune.utils import RECIPE_PATH
 
 logger = logging.getLogger(__name__)
 
-
 # ---------------------------------------------------------------------------
 # Data classes
 # ---------------------------------------------------------------------------
@@ -51,16 +50,20 @@ class Scenario:
 
 @dataclass(frozen=True)
 class ModelEntry:
-    """A model declared in the manifest."""
+    """A model declared in the manifest.
+
+    The recipe path is always derived from ``task`` and ``name`` as
+    ``<task>/<name>.yaml`` under ``RECIPE_PATH`` -- there is no manual override.
+    """
 
     name: str
+    task: str
     priority: str = "core"
-    recipe: str = ""  # relative path under RECIPE_PATH, e.g. "detection/yolox_s.yaml"
 
     @property
     def recipe_path(self) -> Path:
         """Absolute path to the recipe YAML."""
-        return RECIPE_PATH / self.recipe
+        return RECIPE_PATH / self.task / f"{self.name}.yaml"
 
 
 @dataclass(frozen=True)
@@ -162,6 +165,7 @@ class ManifestFilters:
     models: list[str] | None = None
     datasets: list[str] | None = None
     size_tiers: list[str] | None = None
+    data_groups: list[str] | None = None
     priorities: list[str] | None = None
     scenarios: list[str] | None = None
     scenario_tags: list[str] | None = None
@@ -224,8 +228,8 @@ def load_manifest(path: Path) -> BenchmarkManifest:
         models = [
             ModelEntry(
                 name=m["name"],
+                task=task_key,
                 priority=m.get("priority", "core"),
-                recipe=m.get("recipe", f"{task_key}/{m['name']}.yaml"),
             )
             for m in section_raw.get("models", [])
         ]
@@ -265,6 +269,7 @@ def iter_experiments(
     catalog_names: set[str] | None = None,
     *,
     size_tier_map: dict[str, str] | None = None,
+    data_group_map: dict[str, str] | None = None,
 ) -> Iterator[Experiment]:
     """Yield :class:`Experiment` instances after applying runtime filters.
 
@@ -278,6 +283,10 @@ def iter_experiments(
             catalog.  When provided together with
             ``filters.size_tiers``, datasets whose tier is not in the
             filter are excluded.
+        data_group_map: Mapping of ``{dataset_name: data_group}`` from the
+            catalog.  When provided together with ``filters.data_groups``,
+            datasets whose data_group is not ``"all"`` and not in the filter
+            are excluded.
     """
     f = filters or ManifestFilters()
 
@@ -289,6 +298,10 @@ def iter_experiments(
             if f.models and model.name not in f.models:
                 continue
             if f.priorities and model.priority not in f.priorities:
+                continue
+            # Deferred models are excluded from unfiltered/automated runs -- they only
+            # run when explicitly requested via --priority deferred or --model <name>.
+            if model.priority == "deferred" and not f.models and not (f.priorities and "deferred" in f.priorities):
                 continue
 
             for scenario in section.scenarios:
@@ -314,6 +327,12 @@ def iter_experiments(
                     if f.size_tiers and size_tier_map:
                         tier = size_tier_map.get(ds_name)
                         if tier is None or tier not in f.size_tiers:
+                            continue
+                    # Data-group filtering: cross-reference the catalog data_group;
+                    # entries with data_group "all" (the default) always pass.
+                    if f.data_groups and data_group_map:
+                        group = data_group_map.get(ds_name, "all")
+                        if group != "all" and group not in f.data_groups:
                             continue
                     # Scenario may restrict datasets
                     if scenario.datasets and ds_name not in scenario.datasets:

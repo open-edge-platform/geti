@@ -1,6 +1,8 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 import cv2
 import numpy as np
 
@@ -20,6 +22,12 @@ class VideoFileStream(BaseOpenCVStream):
             loop: If True, the video restarts from the beginning once it ends.
                   If False, the stream stops returning frames once the video has been fully read.
         """
+        if not os.path.isfile(video_path):
+            # Checked explicitly (rather than relying on cv2.VideoCapture.isOpened() to fail) so the
+            # user gets a specific, actionable message instead of BaseOpenCVStream's generic
+            # "Could not open video file" — which stays as the fallback for a file that exists but
+            # cv2 still can't decode (corrupt file, unsupported codec/container).
+            raise RuntimeError(f"Video file not found: {video_path}")
         self.loop = loop
         self._exhausted = False
         super().__init__(source=video_path, source_type=SourceType.VIDEO_FILE, video_path=video_path, loop=loop)

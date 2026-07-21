@@ -3,14 +3,14 @@
 
 import { Suspense } from 'react';
 
-import { Flex, Grid, Item, Loading, TabList, Tabs, View } from '@geti-ui/ui';
+import { $api } from '@/api';
+import { Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/ui';
 import { usePrefetchQuery } from '@tanstack/react-query';
 import { usePrefetchPipeline } from 'hooks/api/pipeline.hook';
 import { useProject } from 'hooks/api/project.hook';
 import { Outlet, useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import { $api } from './api/client';
 import getiLogo from './assets/icons/geti-logo.webp';
 import { ProjectsListPanel } from './components/project-panel/projects-list-panel.component';
 import { paths } from './constants/paths';
@@ -38,7 +38,7 @@ const Header = () => {
                     <Link to={paths.project.index({})}>
                         <Flex alignItems='center' gap='size-50'>
                             <img src={getiLogo} alt={'Geti logo'} className={classes.logo} />
-                            Geti™
+                            <Text UNSAFE_className={classes.logoText}>Geti™</Text>
                         </Flex>
                     </Link>
                 </View>
