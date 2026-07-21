@@ -21,10 +21,7 @@ dependencies = [
     "aiofiles==25.1.0",
     "pydantic-settings~=2.14.2",
     "aiortc~=1.14.0",
-    # Sourced from a git branch (see [tool.uv.sources]) until the datumaro release
-    # shipping the InstanceMaskTiler instance-filtering fix + bounded per-image
-    # tiling caches is published. Restore a versioned pin (e.g. "~=<version>") on release.
-    "datumaro[experimental]",
+    "datumaro[experimental]~=1.13.3",
     "scikit-learn~=1.7.2",
     "faster-coco-eval~=1.7.0",
     "scikit-multilearn~=0.2.0",
@@ -115,9 +112,6 @@ packages = ["app"]
 
 [tool.uv.sources]
 getitune = { path = "../../library", editable = true }
-# TODO(release): drop this git override and restore a versioned PyPI pin once the
-# datumaro tiling fix is released.
-datumaro = { git = "https://github.com/open-edge-platform/datumaro", branch = "aurelien/tiling-patch" }
 
 [tool.ruff]
 target-version = "py313"
