@@ -12,6 +12,7 @@ import torch
 if TYPE_CHECKING:
     from torchmetrics import Metric, MetricCollection
 from torch.utils.data import DataLoader
+from torchmetrics.classification import MulticlassF1Score
 from ultralytics.models.yolo.classify import ClassificationValidator as _UltralyticsClassificationValidator
 from ultralytics.utils import LOGGER
 
@@ -27,6 +28,23 @@ class ClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClassification
     """Classification validator for the getitune data bridge."""
 
     _task_kind: ClassVar[str] = "classify"
+
+    def get_stats(self) -> dict[str, float]:
+        """Add macro F1-score and iteration time to the upstream accuracy stats.
+
+        Upstream ``ClassificationValidator.get_stats`` only reports top-1/top-5
+        accuracy. ``self.pred``/``self.targets`` (accumulated by the upstream
+        ``update_metrics``) already hold everything needed for F1: the first
+        column of each top-N prediction tensor is the top-1 predicted class.
+        """
+        stats = super().get_stats()  # type: ignore[misc]
+        if self.pred and self.targets:  # type: ignore[attr-defined]
+            preds_top1 = torch.cat([p[:, 0] for p in self.pred])  # type: ignore[attr-defined]
+            targets_all = torch.cat(self.targets)  # type: ignore[attr-defined]
+            f1_metric = MulticlassF1Score(num_classes=self.nc, average="macro")  # type: ignore[attr-defined]
+            stats["metrics/f1-score"] = float(f1_metric(preds_top1, targets_all))
+        stats["metrics/iter_time"] = self._average_iter_time()
+        return stats
 
     def _build_adapter_dataloader(self) -> DataLoader:
         """Build a classification DataLoader from the DataModule's val/test subset."""
@@ -94,14 +112,18 @@ class MultiLabelClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClas
         """No-op: torchmetrics state is kept on the local rank."""
 
     def get_stats(self) -> dict[str, float]:
-        """Compute and return multi-label accuracy and mAP."""
+        """Compute and return multi-label accuracy, mAP, and iteration time."""
         if getattr(self, "metric", None) is None:
             msg = "Metric is not initialized; call init_metrics() before get_stats()."
             raise RuntimeError(msg)
         results = self.metric.compute()
         accuracy = self._extract_scalar(results, "accuracy")
         mean_ap = self._extract_scalar(results, "mAP")
-        return {"metrics/accuracy": accuracy, "metrics/mAP": mean_ap}
+        return {
+            "metrics/accuracy": accuracy,
+            "metrics/mAP": mean_ap,
+            "metrics/iter_time": self._average_iter_time(),
+        }
 
     @staticmethod
     def _extract_scalar(results: dict[str, Any], key: str) -> float:

@@ -102,6 +102,7 @@ class TestAccuracy:
         metric = MultilabelAccuracywithLabelGroup(label_info, average="MICRO")
         metric.update(preds, targets)
         result = metric.compute()
+        assert isinstance(result, dict)
         acc = result["accuracy"]
         assert round(acc.item(), 3) == 0.667
         assert len(result["conf_matrix"]) == len(label_names)

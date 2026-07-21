@@ -38,9 +38,10 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
     trainer_cls: ClassVar[type] = ClassificationTrainer
     validator_cls: ClassVar[type] = ClassificationValidator
     metric_keys: ClassVar[dict[str, str]] = {
-        "metrics/accuracy_top1": "val/accuracy_top1",
-        "metrics/accuracy_top5": "val/accuracy_top5",
-        "train/loss": "train/loss",
+        "metrics/accuracy_top1": "val/accuracy",
+        "metrics/f1-score": "val/f1-score",
+        "metrics/iter_time": "validation/iter_time",
+        "train/loss": "train/total_loss",
         "lr/pg0": "lr",
     }
 
@@ -117,8 +118,9 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
     is_multilabel: ClassVar[bool] = True
     metric_keys: ClassVar[dict[str, str]] = {
         "metrics/accuracy": "val/accuracy",
-        "metrics/mAP": "val/mAP",
-        "train/loss": "train/loss",
+        "metrics/mAP": "val/map",
+        "metrics/iter_time": "validation/iter_time",
+        "train/loss": "train/total_loss",
         "lr/pg0": "lr",
     }
 

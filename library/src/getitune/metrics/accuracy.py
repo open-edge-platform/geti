@@ -202,7 +202,6 @@ class MultilabelAccuracywithLabelGroup(AccuracywithLabelGroup):
         return conf_matrices
 
 
-
 class HlabelAccuracy(AccuracywithLabelGroup):
     """Accuracy class for the hierarchical-label classification.
 

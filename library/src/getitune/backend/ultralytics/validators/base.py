@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import time
 from typing import TYPE_CHECKING, Any, Callable, ClassVar
 
 import torch
@@ -63,7 +64,17 @@ class GetiTuneValidatorMixin:
         return self._run_standalone_eval(model)
 
     def preprocess(self, batch: dict[str, Any]) -> dict[str, Any]:
-        """Move tensors to device."""
+        """Move tensors to device, tracking per-batch wall time for ``iter_time`` metrics."""
+        now = time.perf_counter()
+        batch_times = getattr(self, "_batch_times", None)
+        if batch_times is None:
+            batch_times = []
+            self._batch_times = batch_times
+        batch_start = getattr(self, "_batch_start", None)
+        if batch_start is not None:
+            batch_times.append(now - batch_start)
+        self._batch_start = now
+
         for k, v in batch.items():
             if isinstance(v, torch.Tensor):
                 batch[k] = v.to(self.device, non_blocking=True)  # type: ignore[attr-defined]
@@ -72,6 +83,19 @@ class GetiTuneValidatorMixin:
         if "masks" in batch and isinstance(batch["masks"], torch.Tensor):
             batch["masks"] = batch["masks"].float()
         return batch
+
+    def _average_iter_time(self) -> float:
+        """Trimmed-mean per-batch wall time, excluding the first (warmup) batch.
+
+        Mirrors ``UltralyticsEngine._summarize_iter_times``: the first batch
+        includes one-off warmup costs (CUDA/XPU kernel compilation, first-call
+        overhead) that would otherwise skew the average.
+        """
+        batch_times: list[float] = getattr(self, "_batch_times", None) or []
+        if not batch_times:
+            return 0.0
+        trimmed = batch_times[1:] if len(batch_times) > 1 else batch_times
+        return sum(trimmed) / len(trimmed)
 
     def _run_standalone_eval(self, model: torch.nn.Module | None) -> dict:
         """Run validation using DataModule without YAML data config.
