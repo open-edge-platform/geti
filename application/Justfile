@@ -22,7 +22,8 @@ logs-volume := application-name + "-logs"
 # Build Geti Docker image for a specific training backend
 [arg("accelerator", long="accelerator", short="a", pattern="cpu|xpu|cuda")]
 [arg("tag", long="tag", short="t")]
-build-image accelerator="cpu" tag="latest": install-uv
+[arg("exclude-agpl-models", long="exclude-agpl-models", value="true", help="Exclude Ultralytics and other AGPL-licensed models from the image")]
+build-image accelerator="cpu" tag="latest" exclude-agpl-models="false": install-uv
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -44,6 +45,11 @@ build-image accelerator="cpu" tag="latest": install-uv
 
     TAG_ARGS="--tag ${IMAGE}:{{ tag }}"
 
+    EXCLUDE_AGPL_MODELS_ARG=""
+    if [[ "{{ exclude-agpl-models }}" == "true" ]]; then
+        EXCLUDE_AGPL_MODELS_ARG="--build-arg EXCLUDE_AGPL_MODELS=1"
+    fi
+
     echo "Building docker image for accelerator: {{ accelerator }}"
     docker buildx build \
         {{ docker-build-args }} \
@@ -54,6 +60,7 @@ build-image accelerator="cpu" tag="latest": install-uv
         ${TAG_ARGS} \
         ${CACHE_FROM_ARGS} \
         ${CACHE_TO_ARGS} \
+        ${EXCLUDE_AGPL_MODELS_ARG} \
         --load
 
 # Run Geti as a Docker container for a specific training backend
