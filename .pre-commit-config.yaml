@@ -37,3 +37,19 @@ repos:
     hooks:
       - id: markdownlint
         args: [--config=.markdownlint.yaml]
+
+  # Agent skills - keep client adapters in sync and validate the layout
+  - repo: local
+    hooks:
+      - id: agent-skills-sync
+        name: sync agent skill adapters
+        entry: python .github/scripts/skills/agent_skills.py sync
+        language: python
+        pass_filenames: false
+        files: ^skills/
+      - id: agent-skills-validate
+        name: validate agent skills layout
+        entry: python .github/scripts/skills/agent_skills.py validate
+        language: python
+        pass_filenames: false
+        files: ^skills/

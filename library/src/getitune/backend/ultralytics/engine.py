@@ -9,6 +9,7 @@ import csv
 import logging
 import os
 import shutil
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Protocol, Sequence
 
@@ -541,6 +542,8 @@ class UltralyticsEngine(Engine):
             f"metric={type(metric).__name__}, batches={len(dataloader)}"
         )
 
+        iter_times: list[float] = []
+        batch_start = time.perf_counter()
         for batch in dataloader:
             if not isinstance(batch, SampleBatch):
                 msg = f"Expected test_dataloader to yield SampleBatch, got {type(batch)}"
@@ -594,8 +597,28 @@ class UltralyticsEngine(Engine):
 
             metric.update(preds=preds_list, target=target_list)
 
+            now = time.perf_counter()
+            iter_times.append(now - batch_start)
+            batch_start = now
+
         results = metric.compute()
-        return self._format_torchmetrics_results(results)
+        formatted = self._format_torchmetrics_results(results)
+        formatted.update(self._summarize_iter_times(iter_times))
+        return formatted
+
+    @staticmethod
+    def _summarize_iter_times(iter_times: list[float]) -> dict[str, float]:
+        """Average per-batch wall times into a single ``test/iter_time`` metric.
+
+        Mirrors the trimmed-mean convention used elsewhere for iteration
+        timing: the first batch is excluded since it includes one-off
+        warmup costs (CUDA/XPU kernel compilation, first-call overhead)
+        that would otherwise skew the average.
+        """
+        if not iter_times:
+            return {}
+        trimmed = iter_times[1:] if len(iter_times) > 1 else iter_times
+        return {"test/iter_time": sum(trimmed) / len(trimmed)}
 
     def _compute_best_confidence_threshold(self) -> float | None:
         """Run FMeasure on the validation set to find the optimal confidence threshold.
@@ -909,7 +932,25 @@ class UltralyticsEngine(Engine):
             translated[gt_key] = float(value) if not isinstance(value, float) else value
 
         self._add_per_class_metrics(results, translated)
+        self._add_speed_metric(results, translated)
         return translated
+
+    @staticmethod
+    def _add_speed_metric(results: UMETRICS | dict[str, Any], metrics: dict[str, float]) -> None:
+        """Translate Ultralytics' per-image ``speed`` dict into ``val/iter_time``.
+
+        The Ultralytics validator (``BaseValidator``) tracks per-image
+        ``preprocess``/``inference``/``loss``/``postprocess`` timings (in
+        milliseconds) on a ``speed`` dict that is copied onto the returned
+        metrics object. Summing and converting to seconds gives a
+        cross-backend-comparable per-iteration time, mirroring Lightning's
+        ``IterationTimer`` (``val/iter_time`` / ``test/iter_time``).
+        """
+        speed = getattr(results, "speed", None)
+        if not isinstance(speed, dict) or not speed:
+            return
+        total_ms = sum(float(v) for v in speed.values())
+        metrics["val/iter_time"] = total_ms / 1000.0
 
     @staticmethod
     def _add_per_class_metrics(results: UMETRICS | dict[str, Any], metrics: dict[str, float]) -> None:

@@ -1,4 +1,4 @@
-callback_monitor: val/accuracy
+callback_monitor: val/f1-score
 
 data: ../../_base_/data/classification.yaml
 

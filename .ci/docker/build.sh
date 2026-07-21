@@ -1,7 +1,7 @@
 #!/bin/bash
 
-VER_CUDA="12.1.0"
-ACTIONS_RUNNER_VER="2.333.1"
+VER_CUDA="12.9.2"
+ACTIONS_RUNNER_VER="2.335.1"
 DOCKER_REG_ADDR="local"
 POSITIONAL=()
 while [[ $# -gt 0 ]]; do

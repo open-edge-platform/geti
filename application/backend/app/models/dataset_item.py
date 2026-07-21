@@ -20,6 +20,12 @@ class DatasetItemSubset(StrEnum):
     TESTING = "testing"
 
 
+class DatasetItemSortBy(StrEnum):
+    """Field to sort dataset item listing by."""
+
+    CREATION_DATE = "creation_date"
+
+
 class DatasetItemAnnotationStatus(StrEnum):
     """
     Annotation status filter for dataset items.

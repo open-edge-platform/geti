@@ -113,6 +113,7 @@ class TestLightningModel:
                     label_groups=[["label_1", "label_2"]],
                 ),
                 data_input_params={"input_size": (224, 224), "mean": (0.0, 0.0, 0.0), "std": (1.0, 1.0, 1.0)},
+                pretrained=False,
             )
             assert isinstance(label_info.label_info, LabelInfo)
 
@@ -155,6 +156,7 @@ class TestLightningModel:
                 label_info=SegLabelInfo.from_num_classes(3),
                 data_input_params={"input_size": (224, 224), "mean": (0.0, 0.0, 0.0), "std": (1.0, 1.0, 1.0)},
                 model_name="segmentation_model",
+                pretrained=False,
             )
             segmentation_model.load_state_dict_incrementally(
                 {"state_dict": segmentation_model.state_dict(), "hyper_parameters": {"label_info": label_info_dict}},

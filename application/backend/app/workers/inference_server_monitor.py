@@ -13,6 +13,12 @@ from app.models.system import DeviceInfo
 from app.services.inference import InferenceServer
 from app.workers.base import BaseThreadWorker
 
+# When unloading an expired model fails, the attempt is retried with an exponential backoff
+# (in seconds) capped at this value, instead of giving up. This prevents a single transient
+# failure from leaving an idle model loaded indefinitely, while avoiding hammering the server on
+# every monitor tick.
+MAX_UNLOAD_RETRY_BACKOFF_SECONDS = 30.0
+
 
 class InferenceServerMonitorThread(BaseThreadWorker):
     """
@@ -34,6 +40,11 @@ class InferenceServerMonitorThread(BaseThreadWorker):
         self._server = server
         self._ttl = 0
         self._ttl_start_time = -1.0
+
+        # Retry bookkeeping for failed model-unload attempts. While a TTL-expired model fails to
+        # unload, the countdown stays armed and the unload is retried after an exponential backoff.
+        self._unload_failures = 0
+        self._next_unload_attempt = 0.0
 
         self._orig_stop: Callable[[], None] | None = None
 
@@ -61,6 +72,7 @@ class InferenceServerMonitorThread(BaseThreadWorker):
                 self._ttl = ttl
                 logger.debug("Model loaded with TTL of {} seconds, starting countdown", self._ttl)
                 self._ttl_start_time = time.perf_counter()
+                self._reset_unload_retry_state()
             return model_loaded
 
         self._server.set_inference_model = wrapped_set_inference_model
@@ -71,6 +83,7 @@ class InferenceServerMonitorThread(BaseThreadWorker):
         def wrapped_infer_batch(*args, **kwargs):
             logger.debug("Batch inference requested, resetting TTL countdown")
             self._ttl_start_time = time.perf_counter()
+            self._reset_unload_retry_state()
             return orig_infer_batch(*args, **kwargs)
 
         self._server.infer_batch = wrapped_infer_batch
@@ -82,17 +95,65 @@ class InferenceServerMonitorThread(BaseThreadWorker):
         def wrapped_stop():
             logger.debug("Model stopped, stopping TTL countdown")
             self._ttl_start_time = -1.0
+            self._reset_unload_retry_state()
             orig_stop()
 
         self._server.stop = wrapped_stop
 
+    def _reset_unload_retry_state(self) -> None:
+        """Clear the failed-unload retry bookkeeping (called when the model lifecycle changes)."""
+        self._unload_failures = 0
+        self._next_unload_attempt = 0.0
+
+    def _try_unload_expired_model(self) -> None:
+        """Unload the model if its TTL has expired, retrying failed attempts with backoff.
+
+        Unlike simply disarming the countdown on failure, this keeps the countdown armed so a
+        transient stop failure does not leave an idle model loaded indefinitely. Repeated failures
+        are retried on later ticks with an exponential backoff to avoid hammering the server.
+        """
+        if self._ttl_start_time <= 0:
+            return
+        elapsed = time.perf_counter() - self._ttl_start_time
+        if not (0 < self._ttl <= elapsed):
+            return
+
+        # TTL expired: attempt to unload, but not more often than the current backoff allows.
+        now = time.perf_counter()
+        if now < self._next_unload_attempt:
+            return
+
+        try:
+            logger.debug("TTL of {} seconds expired, unloading model", self._ttl)
+            self._orig_stop()  # pyrefly: ignore[not-callable]
+        except Exception:
+            self._unload_failures += 1
+            backoff = min(2.0**self._unload_failures, MAX_UNLOAD_RETRY_BACKOFF_SECONDS)
+            self._next_unload_attempt = now + backoff
+            # Keep _ttl_start_time armed so the unload is retried after the backoff, rather than
+            # disabling further attempts (which would leave an idle model loaded indefinitely).
+            logger.exception(
+                "Failed to unload model after TTL expiry (attempt {}); retrying in {}s.",
+                self._unload_failures,
+                backoff,
+            )
+            return
+
+        # Unload succeeded: disarm the countdown and clear the retry bookkeeping.
+        self._ttl_start_time = -1.0
+        self._reset_unload_retry_state()
+
     def run_loop(self) -> None:
         while not self.should_stop():
-            if self._ttl_start_time > 0:
-                elapsed = time.perf_counter() - self._ttl_start_time
-                if 0 < self._ttl <= elapsed:
-                    logger.debug("TTL of {} seconds expired, unloading model", self._ttl)
-                    self._ttl_start_time = -1.0
-                    self._orig_stop()  # pyrefly: ignore[not-callable]
+            try:
+                self._try_unload_expired_model()
+            except Exception as e:
+                # Defensive catch: a failure here must not kill the monitor thread; otherwise
+                # models would never be unloaded again for the lifetime of the process. Schedule a
+                # backoff so the model is not repeatedly retried every tick, then keep monitoring.
+                self._unload_failures += 1
+                backoff = min(2.0**self._unload_failures, MAX_UNLOAD_RETRY_BACKOFF_SECONDS)
+                self._next_unload_attempt = time.perf_counter() + backoff
+                logger.exception("Error while monitoring inference server model TTL; continuing {}", e)
 
             self.stop_aware_sleep(1)

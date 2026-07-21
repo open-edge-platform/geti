@@ -1,6 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Media } from '@/api/types';
 import { ViewModes } from '@geti-ui/ui';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
@@ -10,7 +11,6 @@ import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
-import type { Media } from '../../../../constants/shared-types';
 import { server } from '../../../../msw-node-setup';
 import { isImage } from '../../../../shared/media-item-utils';
 import { useSelectedData } from '../../providers/selected-data-provider.component';
@@ -55,6 +55,7 @@ vi.mock('../../providers/selected-data-provider.component', () => ({
         selectedKeys: new Set(),
         setSelectedKeys: vi.fn(),
         toggleSelectedKeys: vi.fn(),
+        isSelected: vi.fn().mockReturnValue(false),
     })),
 }));
 
@@ -117,7 +118,7 @@ describe('Toolbar', () => {
 
         await renderToolbar();
 
-        const input = screen.getByLabelText(/Upload media files/);
+        const input = screen.getByTestId('upload-media-input');
         fireEvent.change(input, { target: { files: [file] } });
 
         expect(uploadMediaMock).toHaveBeenCalledWith([file]);
@@ -221,7 +222,7 @@ describe('Toolbar', () => {
         expect(screen.queryByRole('button', { name: 'dataset statistics' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /media status/i })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Filter by labels' })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: 'Filter by date' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'More filters' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'View mode' })).not.toBeInTheDocument();
     });
 
@@ -232,8 +233,31 @@ describe('Toolbar', () => {
 
         expect(await screen.findByRole('button', { name: 'dataset statistics' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Filter by labels' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Filter by date' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'More filters' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /media status/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View mode' })).toBeInTheDocument();
+    });
+
+    it('shows "Newest first" sort button by default', async () => {
+        await renderToolbar();
+
+        const sortButton = screen.getByRole('button', { name: 'Newest first' });
+
+        expect(sortButton).toHaveTextContent('Newest first');
+    });
+
+    it('toggles the sort button label between "Newest first" and "Oldest first" when clicked', async () => {
+        await renderToolbar();
+
+        const newestFirstButton = screen.getByRole('button', { name: 'Newest first' });
+        fireEvent.click(newestFirstButton);
+
+        const oldestFirstButton = await screen.findByRole('button', { name: 'Oldest first' });
+        expect(oldestFirstButton).toHaveTextContent('Oldest first');
+
+        fireEvent.click(oldestFirstButton);
+
+        const newestFirstButton2 = await screen.findByRole('button', { name: 'Newest first' });
+        expect(newestFirstButton2).toHaveTextContent('Newest first');
     });
 });

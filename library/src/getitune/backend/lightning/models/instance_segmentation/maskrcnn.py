@@ -30,7 +30,6 @@ from getitune.backend.lightning.models.instance_segmentation.rotated_det import 
 from getitune.backend.lightning.models.instance_segmentation.segmentors.two_stage import TwoStageDetector
 from getitune.backend.lightning.models.instance_segmentation.utils.roi_extractors import SingleRoIExtractor
 from getitune.backend.lightning.models.modules.norm import build_norm_layer
-from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.data.entity.sample import PredictionBatch
 from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
@@ -40,6 +39,7 @@ if TYPE_CHECKING:
 
     from getitune.backend.lightning.schedulers import LRSchedulerListCallable
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
 
 
@@ -58,10 +58,12 @@ class MaskRCNN(LightningInstanceSegModel):
             Defaults to MaskRLEMeanAPFMeasureCallable.
         torch_compile (bool, optional): Whether to use torch compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
-        explain_mode (bool, optional): Whether to enable explainable AI mode. Defaults to False.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
-    _pretrained_weights: ClassVar[dict[str, Any]] = {
+    pretrained_urls: ClassVar[dict[str, str]] = {
         "maskrcnn_efficientnet_b2b": "https://storage.geti.intel.com/weights/efficientnet_b2b-mask_rcnn-576x576.pth",
         "maskrcnn_swin_tiny": "https://storage.geti.intel.com/weights/mask_rcnn_swin-t-p4-w7_fpn_fp16_ms-crop-3x_coco_20210908_165006-90a4008c.pth",
     }
@@ -79,6 +81,8 @@ class MaskRCNN(LightningInstanceSegModel):
         metric: MetricCallable = MaskRLEMeanAPFMeasureCallable,
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -89,12 +93,14 @@ class MaskRCNN(LightningInstanceSegModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> MaskRCNN:
         num_classes = num_classes if num_classes is not None else self.num_classes
 
-        # TODO(Kirill): depricate train_cfg/test_cfg
+        # TODO(Kirill): deprecate train_cfg/test_cfg
         train_cfg = {
             "rpn": {
                 "allowed_border": -1,
@@ -287,7 +293,7 @@ class MaskRCNN(LightningInstanceSegModel):
             class_agnostic=False,
         )
 
-        model = TwoStageDetector(
+        return TwoStageDetector(
             backbone=backbone,
             neck=neck,
             rpn_head=rpn_head,
@@ -295,9 +301,6 @@ class MaskRCNN(LightningInstanceSegModel):
             roi_criterion=roi_criterion,
             rpn_criterion=rpn_criterion,
         )
-        load_checkpoint(model, self._pretrained_weights[self.model_name], map_location="cpu")
-
-        return model
 
     def _build_backbone(self) -> nn.Module:
         """Builds the backbone for the model."""
@@ -311,7 +314,6 @@ class MaskRCNN(LightningInstanceSegModel):
                 "type": "efficientnet_b2b",
                 "out_indices": [2, 3, 4, 5],
                 "frozen_stages": -1,
-                "pretrained": True,
                 "activation": nn.SiLU,
                 "normalization": partial(build_norm_layer, nn.BatchNorm2d, requires_grad=True),
             },

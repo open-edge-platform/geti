@@ -27,6 +27,7 @@ class TestMaskRCNN:
             label_info=3,
             model_name=model_name,
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
     def test_load_weights(self, mocker) -> None:
@@ -34,6 +35,7 @@ class TestMaskRCNN:
             label_info=2,
             model_name="maskrcnn_efficientnet_b2b",
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
 
         assert isinstance(model._export_parameters, TaskLevelExportParameters)
@@ -87,6 +89,7 @@ class TestMaskRCNN:
             label_info=3,
             model_name="maskrcnn_resnet_50",
             data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
         )
         cfg = model._optimization_config
         assert "ignored_scope" in cfg

@@ -127,7 +127,7 @@ class ResNet(BaseModule):
             it will be the same as `base_channels`. Default: None.
         base_channels (int): Number of base channels of res layer. Default: 64.
         in_channels (int): Number of input image channels. Default: 3.
-        num_stages (int): Resnet stages. Default: 4.
+        num_stages (int): ResNet stages. Default: 4.
         strides (Sequence[int]): Strides of the first block of each stage.
         dilations (Sequence[int]): Dilation of each stage.
         out_indices (Sequence[int]): Output from which stages.

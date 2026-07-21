@@ -1,12 +1,12 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { $api } from '@/api';
+import type { SourceConfigPayload } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { omit } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
-import { $api } from '../../../../api/client';
-import type { SourceConfigPayload } from '../../../../constants/shared-types';
 import { getQueryKey } from '../../../../query-client/query-client';
 import { testSourceQueryOptions } from '../api/use-test-source';
 
@@ -16,6 +16,9 @@ const useUpdateSource = () => {
     return $api.useMutation('patch', '/api/sources/{source_id}', {
         meta: {
             invalidateQueries: [['get', '/api/sources']],
+            error: {
+                notify: () => false,
+            },
         },
         onSuccess: (
             _,
@@ -38,6 +41,9 @@ export const useSourceMutation = (isNewSource: boolean) => {
     const addSource = $api.useMutation('post', '/api/sources', {
         meta: {
             invalidateQueries: [['get', '/api/sources']],
+            error: {
+                notify: () => false,
+            },
         },
     });
 

@@ -1,0 +1,42 @@
+id: object-detection-edgecrafter-m
+name: ECDet-M
+
+pretrained_weights:
+  url: https://storage.geti.intel.com/weights/ecdet_m.pth
+  mirror_url: https://github.com/capsule2077/edgecrafter/releases/download/edgecrafterv1/ecdet_m.pth
+  sha_sum: c4cdf8bcd3b27c7903e422acd03caf733b5e1bfd664550bce43e50e2a3bbdc6e
+
+description: "EdgeCrafter detection model (ECDet-M) combines an efficient ECViT backbone with a hybrid encoder and transformer decoder for real-time, high-accuracy object detection with low latency."
+
+stats:
+  gigaflops: 53.0
+  trainable_parameters: 18.0
+  benchmark_metrics:
+    coco_map_50_95: 54.3
+
+capabilities:
+  tiling: false
+
+hyperparameters:
+  training:
+    learning_rate: 0.0005
+    weight_decay: 0.0001
+    batch_size: 8
+    accumulate_grad_batches: 4
+    early_stopping:
+      patience: 10
+    scheduler:
+      factor: 0.5
+      patience: 10
+    gradient_clip:
+      enable: true
+      max_grad_norm: 0.1
+    allowed_values_input_size:
+      - 640
+    input_size_width: 640
+    input_size_height: 640
+  dataset_preparation:
+    augmentation:
+      deim_framework: true
+      random_zoom_out:
+        enable: true

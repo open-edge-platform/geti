@@ -8,20 +8,14 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from app.api.dependencies import get_system_service
-from app.main import app
 from app.models.system import DeviceInfo, DeviceType
 from app.services import SystemService
 
 
 @pytest.fixture
-def fxt_client():
-    return TestClient(app)
-
-
-@pytest.fixture
-def fxt_system_service() -> Mock:
+def fxt_system_service(fxt_app) -> Mock:
     system_service = Mock(spec=SystemService)
-    app.dependency_overrides[get_system_service] = lambda: system_service
+    fxt_app.dependency_overrides[get_system_service] = lambda: system_service
     return system_service
 
 

@@ -23,6 +23,7 @@ from getitune.backend.lightning.models.base import (
     DefaultSchedulerCallable,
     LightningModel,
 )
+from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.backend.lightning.tools.tile_merge import SegmentationTileMerge
 from getitune.config.data import TileConfig
@@ -41,9 +42,10 @@ if TYPE_CHECKING:
     from torch import Tensor
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
-class LightningSegmentationModel(LightningModel):
+class LightningSegmentationModel(PretrainedWeightsMixin, LightningModel):
     """Semantic Segmentation model used in getitune.
 
     Args:
@@ -58,6 +60,9 @@ class LightningSegmentationModel(LightningModel):
         metric (MetricCallable, optional): Callable for the metric. Defaults to SegmCallable.
         torch_compile (bool, optional): Flag to indicate whether to use torch.compile. Defaults to False.
         tile_config (TileConfig, optional): Configuration for tiling. Defaults to TileConfig(enable_tiler=False).
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     def __init__(
@@ -70,6 +75,8 @@ class LightningSegmentationModel(LightningModel):
         metric: MetricCallable = SegmCallable,  # type: ignore[assignment]
         torch_compile: bool = False,
         tile_config: TileConfig = TileConfig(enable_tiler=False),
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ):
         super().__init__(
             label_info=label_info,
@@ -80,6 +87,8 @@ class LightningSegmentationModel(LightningModel):
             metric=metric,
             torch_compile=torch_compile,
             tile_config=tile_config,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _customize_inputs(self, entity: SampleBatch) -> dict[str, Any]:

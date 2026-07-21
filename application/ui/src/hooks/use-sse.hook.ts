@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 
-import { connectSSE, type SSEOptions } from '../api/fetch-sse';
+import { connectSSE, type SSEOptions } from '@/api';
 
 type SSEConnection = {
     close: () => void;

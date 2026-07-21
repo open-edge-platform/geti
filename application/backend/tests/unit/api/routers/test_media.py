@@ -21,7 +21,6 @@ from app.api.dependencies import (
     get_media_service,
 )
 from app.api.schemas.media import ImageView, MediaViewAdapter, SetMediaAnnotations, VideoFrameView, VideoView
-from app.main import app
 from app.models import (
     BatchInferenceMedia,
     BatchInferencePrediction,
@@ -37,7 +36,15 @@ from app.models import (
     Video,
     VideoFrame,
 )
-from app.models.media import ImageFormat, MediaListPredictionRequest, MediaPredictionRequest, VideoFormat, VideoRange
+from app.models.media import (
+    ImageFormat,
+    MediaListPredictionRequest,
+    MediaPredictionRequest,
+    MediaSortBy,
+    SortDirection,
+    VideoFormat,
+    VideoRange,
+)
 from app.models.system import DeviceInfo, DeviceType
 from app.services import DatasetService, MediaPredictionService, MediaService, ResourceNotFoundError, ResourceType
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
@@ -97,30 +104,30 @@ def fxt_video_frame_media():
 
 
 @pytest.fixture
-def fxt_media_service() -> MagicMock:
+def fxt_media_service(fxt_app) -> MagicMock:
     media_service = MagicMock(spec=MediaService)
-    app.dependency_overrides[get_media_service] = lambda: media_service
+    fxt_app.dependency_overrides[get_media_service] = lambda: media_service
     return media_service
 
 
 @pytest.fixture
-def fxt_dataset_service() -> MagicMock:
+def fxt_dataset_service(fxt_app) -> MagicMock:
     dataset_service = MagicMock(spec=DatasetService)
-    app.dependency_overrides[get_dataset_service] = lambda: dataset_service
+    fxt_app.dependency_overrides[get_dataset_service] = lambda: dataset_service
     return dataset_service
 
 
 @pytest.fixture
-def fxt_media_prediction_service() -> MagicMock:
+def fxt_media_prediction_service(fxt_app) -> MagicMock:
     media_prediction_service = MagicMock(spec=MediaPredictionService)
-    app.dependency_overrides[get_media_prediction_service] = lambda: media_prediction_service
+    fxt_app.dependency_overrides[get_media_prediction_service] = lambda: media_prediction_service
     return media_prediction_service
 
 
 @pytest.fixture
-def fxt_inference_media_limit() -> Callable[[int], None]:
+def fxt_inference_media_limit(fxt_app) -> Callable[[int], None]:
     def set_limit(limit: int) -> None:
-        app.dependency_overrides[get_inference_media_limit] = lambda: limit
+        fxt_app.dependency_overrides[get_inference_media_limit] = lambda: limit
 
     return set_limit
 
@@ -288,13 +295,13 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
             project_id=fxt_get_project.id,
             filters=MediaFilters(
-                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subset=None
+                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -316,7 +323,7 @@ class TestMediaEndpoints:
             end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -328,7 +335,7 @@ class TestMediaEndpoints:
                 end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -350,7 +357,7 @@ class TestMediaEndpoints:
             end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC),
             annotation_status=None,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -362,7 +369,7 @@ class TestMediaEndpoints:
                 end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=UTC),
                 annotation_status=None,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -412,7 +419,7 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=annotation_status,
             label_ids=None,
-            subset=None,
+            subsets=None,
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -424,7 +431,7 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=annotation_status,
                 label_ids=None,
-                subset=None,
+                subsets=None,
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
@@ -436,7 +443,7 @@ class TestMediaEndpoints:
         fxt_media_service.count_media.return_value = 2
         fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
 
-        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subset={subset}")
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subsets={subset}")
 
         assert response.status_code == status.HTTP_200_OK
         fxt_media_service.count_media.assert_called_once_with(
@@ -445,7 +452,7 @@ class TestMediaEndpoints:
             end_date=None,
             annotation_status=None,
             label_ids=None,
-            subset=subset,
+            subsets=[subset],
             exclude_types=[MediaType.VIDEO_FRAME],
         )
         fxt_media_service.list_media.assert_called_once_with(
@@ -457,10 +464,131 @@ class TestMediaEndpoints:
                 end_date=None,
                 annotation_status=None,
                 label_ids=None,
-                subset=subset,
+                subsets=[subset],
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
+
+    def test_list_media_with_multiple_subsets(
+        self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client
+    ):
+        fxt_media_service.count_media.return_value = 2
+        fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?subsets=training&subsets=validation")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_media_service.count_media.assert_called_once_with(
+            project=fxt_get_project,
+            start_date=None,
+            end_date=None,
+            annotation_status=None,
+            label_ids=None,
+            subsets=["training", "validation"],
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+        fxt_media_service.list_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=["training", "validation"],
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+
+    def test_list_media_default_sort_direction(
+        self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client
+    ):
+        fxt_media_service.count_media.return_value = 2
+        fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_media_service.list_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=None,
+                sort_by=MediaSortBy.UPLOAD_DATE,
+                sort_direction=SortDirection.DESC,
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+
+    @pytest.mark.parametrize("sort_direction", [SortDirection.ASC, SortDirection.DESC])
+    def test_list_media_with_sort_direction(
+        self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client, sort_direction
+    ):
+        fxt_media_service.count_media.return_value = 2
+        fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?sort_direction={sort_direction.value}")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_media_service.list_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=None,
+                sort_by=MediaSortBy.UPLOAD_DATE,
+                sort_direction=sort_direction,
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+
+    @pytest.mark.parametrize("sort_by", list(MediaSortBy))
+    def test_list_media_with_sort_by(
+        self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client, sort_by
+    ):
+        fxt_media_service.count_media.return_value = 2
+        fxt_media_service.list_media.return_value = [fxt_image_media, fxt_video_media]
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media?sort_by={sort_by.value}")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_media_service.list_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=None,
+                sort_by=sort_by,
+                sort_direction=SortDirection.DESC,
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+
+    def test_list_media_wrong_sort_by(self, fxt_get_project, fxt_media_service, fxt_client):
+        response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/media?sort_by=bogus")
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_media_service.list_media.assert_not_called()
+
+    def test_list_media_wrong_sort_direction(self, fxt_get_project, fxt_media_service, fxt_client):
+        response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/media?sort_direction=bogus")
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_media_service.list_media.assert_not_called()
 
     @pytest.mark.parametrize(
         "http_method, http_path, service_name, service_method",

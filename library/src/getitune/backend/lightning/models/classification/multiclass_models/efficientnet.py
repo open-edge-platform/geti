@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Literal
 
 from torch import Tensor, nn
@@ -15,6 +16,7 @@ from getitune.backend.lightning.models.classification.classifier import ImageCla
 from getitune.backend.lightning.models.classification.heads import LinearClsHead
 from getitune.backend.lightning.models.classification.multiclass_models.base import LightningMulticlassClsModel
 from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
+from getitune.backend.lightning.models.classification.utils.pretrained_weights import PytorchcvWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiClassClsMetricCallable
 from getitune.types.label import LabelInfoTypes
@@ -23,9 +25,13 @@ if TYPE_CHECKING:
     from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
 
     from getitune.metrics import MetricCallable
+    from getitune.types import PathLike
 
 
-class EfficientNetMulticlassCls(LightningMulticlassClsModel):
+logger = logging.getLogger(__name__)
+
+
+class EfficientNetMulticlassCls(PytorchcvWeightsLoader, LightningMulticlassClsModel):
     """EfficientNet Model for multi-class classification task.
 
     Args:
@@ -40,6 +46,9 @@ class EfficientNetMulticlassCls(LightningMulticlassClsModel):
         metric (MetricCallable, optional): Callable for the evaluation metric.
             Defaults to MultiClassClsMetricCallable.
         torch_compile (bool, optional): Flag to indicate whether to use torch.compile. Defaults to False.
+        pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
+        pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
+            the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
     def __init__(
@@ -62,6 +71,8 @@ class EfficientNetMulticlassCls(LightningMulticlassClsModel):
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
+        pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -72,6 +83,8 @@ class EfficientNetMulticlassCls(LightningMulticlassClsModel):
             scheduler=scheduler,
             metric=metric,
             torch_compile=torch_compile,
+            pretrained=pretrained,
+            pretrained_weights=pretrained_weights,
         )
 
     def _create_model(self, num_classes: int | None = None) -> nn.Module:
