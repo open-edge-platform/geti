@@ -162,6 +162,7 @@ class TestLightningModelExporter:
             dim = value_info.type.tensor_type.shape.dim[0]
             # Symbolic dynamic dims have dim_param set, while dim_value stays at the default 0
             return (dim.dim_param != "") and (dim.dim_value == 0)
+
         assert batch_dim_is_dynamic(onnx_model.graph.input[0])
         for output in onnx_model.graph.output:
             assert batch_dim_is_dynamic(output)
