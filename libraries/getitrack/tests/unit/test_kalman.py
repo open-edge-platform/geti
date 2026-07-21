@@ -50,6 +50,18 @@ class TestKalmanPredictUpdate:
         np.testing.assert_allclose(mp_means[1], single_mean, atol=1e-8)
         np.testing.assert_allclose(mp_covs[0], single_cov, atol=1e-8)
 
+    def test_multi_update_matches_update_per_track(self):
+        kf, mean, cov = self._kf_state()
+        pred_mean, pred_cov = kf.predict(mean, cov)
+        measurements = np.array([[110.0, 60.0, 0.5, 80.0], [90.0, 40.0, 0.6, 70.0]])
+        means = np.stack([pred_mean, pred_mean], axis=0)
+        covs = np.stack([pred_cov, pred_cov], axis=0)
+        mu_means, mu_covs = kf.multi_update(means, covs, measurements)
+        for i in range(2):
+            single_mean, single_cov = kf.update(pred_mean, pred_cov, measurements[i])
+            np.testing.assert_allclose(mu_means[i], single_mean, atol=1e-8)
+            np.testing.assert_allclose(mu_covs[i], single_cov, atol=1e-8)
+
 
 class TestKalmanFromConfig:
     def test_velocity_decay_below_one_dampens_velocity(self):

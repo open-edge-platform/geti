@@ -109,10 +109,10 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
             cfg.match_threshold,
             apply_fuse_score=True,
         )
-        matched_high_dets: set[int] = set()
-        for ti, di in matches_a:
-            self._apply_hit(confirmed_ids[ti], high_dets, di, lifecycle, src_index=int(high_src[di]))
-            matched_high_dets.add(di)
+        matched_high_dets: set[int] = {int(di) for _, di in matches_a}
+        self._apply_hits(
+            [(confirmed_ids[ti], int(di), int(high_src[di])) for ti, di in matches_a], high_dets, lifecycle
+        )
 
         # Second association: unmatched ACTIVE tracks vs low-score detections (no fuse_score).
         remaining_confirmed_ids = [
@@ -124,8 +124,9 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
             cost_limit=self._SECOND_STAGE_COST_LIMIT,
             apply_fuse_score=False,
         )
-        for ti, di in matches_b:
-            self._apply_hit(remaining_confirmed_ids[ti], low_dets, di, lifecycle, src_index=int(low_src[di]))
+        self._apply_hits(
+            [(remaining_confirmed_ids[ti], int(di), int(low_src[di])) for ti, di in matches_b], low_dets, lifecycle
+        )
 
         missed_after_b = {remaining_confirmed_ids[i] for i in unmatched_track_b}
         confirmed_ids_set_b = set(remaining_confirmed_ids)
@@ -142,9 +143,11 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
             self._TENTATIVE_COST_LIMIT,
             apply_fuse_score=True,
         )
-        for ti, di in matches_c:
-            real_di = leftover_high_idx[di]
-            self._apply_hit(tentative_ids[ti], high_dets, real_di, lifecycle, src_index=int(high_src[real_di]))
+        self._apply_hits(
+            [(tentative_ids[ti], leftover_high_idx[di], int(high_src[leftover_high_idx[di]])) for ti, di in matches_c],
+            high_dets,
+            lifecycle,
+        )
         for i in unmatched_track_c:
             tid = tentative_ids[i]
             self._tracks[tid].mark_miss(lifecycle)
@@ -175,9 +178,10 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
             if self._tracks[tid].state != TrackState.ACTIVE:
                 means[i, 7] = 0.0
         means, covs = self._kalman.multi_predict(means, covs)
+        boxes = xyah_to_xyxy(means[:, :4]).astype(np.float32)
         for i, tid in enumerate(tids):
             self._kalman_states[tid] = (means[i], covs[i])
-            self._tracks[tid].bbox = xyah_to_xyxy(means[i, :4][None, :])[0].astype(np.float32)
+            self._tracks[tid].bbox = boxes[i]
 
     def _associate(
         self,
@@ -205,23 +209,28 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
             cost[cls_mismatch] = self._UNMATCHABLE_COST
         return linear_assignment(cost, cost_limit)
 
-    def _apply_hit(
+    def _apply_hits(
         self,
-        track_id: int,
+        hits: list[tuple[int, int, int]],
         dets: Detections,
-        det_idx: int,
         lifecycle: LifecycleConfig,
-        *,
-        src_index: int,
     ) -> None:
-        track = self._tracks[track_id]
-        bbox = dets.bboxes[det_idx]
-        score = float(dets.scores[det_idx])
-        track.mark_hit(bbox, score, lifecycle)
-        self._frame_det_index[track_id] = src_index
-        measurement = xyxy_to_xyah(bbox[None, :])[0]
-        mean, covariance = self._kalman_states[track_id]
-        self._kalman_states[track_id] = self._kalman.update(mean, covariance, measurement)
+        """Record matched detections: batch-update the filters and advance the lifecycles.
+
+        Each hit is a ``(track_id, det_index, src_index)`` triple, where
+        ``src_index`` is the row in the frame's input `Detections`.
+        """
+        if not hits:
+            return
+        det_rows = np.array([di for _, di, _ in hits], dtype=np.int64)
+        measurements = xyxy_to_xyah(dets.bboxes[det_rows])
+        means = np.stack([self._kalman_states[tid][0] for tid, _, _ in hits], axis=0)
+        covs = np.stack([self._kalman_states[tid][1] for tid, _, _ in hits], axis=0)
+        means, covs = self._kalman.multi_update(means, covs, measurements)
+        for i, (tid, di, src_index) in enumerate(hits):
+            self._kalman_states[tid] = (means[i], covs[i])
+            self._tracks[tid].mark_hit(dets.bboxes[di], float(dets.scores[di]), lifecycle)
+            self._frame_det_index[tid] = src_index
 
     def _spawn(self, dets: Detections, det_idx: int, *, src_index: int) -> None:
         track_id = self._allocate_id()

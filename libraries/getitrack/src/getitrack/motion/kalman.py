@@ -188,6 +188,35 @@ class KalmanFilter:
         new_covariance = covariance - kalman_gain @ projected_cov @ kalman_gain.T
         return new_mean, new_covariance
 
+    def multi_update(
+        self,
+        means: np.ndarray,
+        covariances: np.ndarray,
+        measurements: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Apply the Kalman correction step to ``N`` tracks in one batched call.
+
+        Args:
+            means: ``(N, 8)`` predicted state means.
+            covariances: ``(N, 8, 8)`` predicted state covariances.
+            measurements: ``(N, 4)`` observed ``[x, y, a, h]`` rows.
+
+        Returns:
+            ``(means, covariances)`` of the corrected posteriors.
+        """
+        if means.shape[0] == 0:
+            return means, covariances
+        innovation_covs = np.stack([self._measurement_noise_cov(h) for h in means[:, 3]], axis=0)
+        projected_means = np.einsum("ij,nj->ni", self._update_mat, means)
+        ph_t = np.einsum("nij,kj->nik", covariances, self._update_mat)
+        projected_covs = np.einsum("ij,njk->nik", self._update_mat, ph_t) + innovation_covs
+        # K = P H^T S^-1, obtained as solve(S, (P H^T)^T)^T per track.
+        gains = np.linalg.solve(projected_covs, ph_t.transpose(0, 2, 1)).transpose(0, 2, 1)
+        innovations = measurements - projected_means
+        new_means = means + np.einsum("nij,nj->ni", gains, innovations)
+        new_covariances = covariances - np.einsum("nij,njk,nlk->nil", gains, projected_covs, gains)
+        return new_means, new_covariances
+
     def _predict_noise_cov(self, h: float) -> np.ndarray:
         std = np.array(
             [
