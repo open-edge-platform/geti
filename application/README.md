@@ -333,6 +333,10 @@ After the UI starts, you can access the Geti web application at [**http://localh
 Please check the [documentation website](https://docs.geti.intel.com/) for detailed guides, API reference,
 and other resources to help you get the most out of Geti.
 
+> **Upgrading an existing installation?** See the [Upgrade guide](./docs/upgrade.md) for how to move to a newer
+> version (Docker or Windows MSIX) while preserving your projects, datasets and models, with automatic rollback
+> if a migration fails.
+
 <details>
 <summary><strong>Advanced: generate the API spec from source </strong></summary>
 
