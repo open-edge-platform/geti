@@ -3,7 +3,8 @@
 This guide explains how to upgrade an existing Intel Geti installation to a newer
 version while preserving your projects, datasets and models.
 
-> **Guarantee:** An upgrade never deletes your data and prepares a backup before the migration. 
+> [!IMPORTANT] 
+> An upgrade never deletes your data and prepares a backup before the migration. 
 > If migration fails, data can be easily restored.
 
 ## Table of contents
@@ -40,7 +41,7 @@ newer one and reusing the same volumes preserves all your data. Because the
 backend migrates data on startup, upgrading is a matter of pulling the newer image 
 and recreating the container against the same volumes.
 
-> **Recommended:** take a snapshot of the `geti-data` volume before upgrading so
+> [!WARNING] take a snapshot of the `geti-data` volume before upgrading so
 > you can restore the exact pre-upgrade state if needed.
 
 ```bash
@@ -48,12 +49,12 @@ and recreating the container against the same volumes.
 docker run --rm -v geti-data:/data -v "$PWD":/backup alpine \
     tar czf /backup/geti-data-backup.tar.gz -C /data .
 
-# 2. Pull the new image and retag it
+# 2. Pull the new image and retag it (available device choices: cpu, xpu, cuda)
 docker pull ghcr.io/open-edge-platform/geti-cpu:3.1.0
 docker tag  ghcr.io/open-edge-platform/geti-cpu:3.1.0 geti-cpu:latest
 
 # 3. Recreate the container against the SAME volumes (data is migrated on startup)
-just run-image --accelerator cpu --reload --detach true
+just run-image --accelerator cpu --reload --detach
 
 # 4. Verify (the backend serves /health over HTTPS with a self-signed cert)
 curl -k https://localhost:7860/health
