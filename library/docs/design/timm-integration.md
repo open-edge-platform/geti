@@ -152,8 +152,8 @@ model:
   class_path: getitune.backend.lightning.models.classification.multiclass_models.timm_model.TimmModelMulticlassCls
   init_args:
     label_info: 1000
-    model_name: tf_efficientnetv2_s.in21k   # <-- overwritten per user selection
-    learning_rate: 0.001                     # <-- overwritten from manifest/user (see §3.1)
+    model_name: DYNAMIC                     # <-- overwritten per user selection
+    learning_rate: DYNAMIC                  # <-- overwritten from manifest/user (see §3.1)
     # NOTE: no `optimizer:` block. The model supplies a timm optimizer callable.
 engine: { device: auto }
 callback_monitor: val/f1-score
@@ -332,12 +332,11 @@ from app.models import TaskType
 _ID_PREFIX = "image-classification-timm-"
 
 def model_name_to_id(model_name: str) -> str:
-    # timm names contain '.', '_' — encode to a URL/DB-safe id, reversibly.
-    return _ID_PREFIX + model_name.replace(".", "--").replace("_", "-")
+    # Dots and underscores are valid in URL paths and database identifiers.
+    return _ID_PREFIX + model_name
 
 def id_to_model_name(manifest_id: str) -> str:
-    core = manifest_id.removeprefix(_ID_PREFIX)
-    return core.replace("--", ".").replace("-", "_")
+    return manifest_id.removeprefix(_ID_PREFIX)
 
 @lru_cache(maxsize=1)
 def _snapshot() -> dict[str, dict]:
@@ -530,18 +529,18 @@ Two endpoints:
 4.7.2 New backbone-search endpoint - feeds the selector. Backed entirely by the snapshot - cheap, paginated, filterable:
 
 ```
-GET /api/model_architectures/timm/backbones?search=&family=&page=&page_size=
+GET /api/model_architectures/timm/backbones?search=&family=&limit=&offset=
 ```
 
 ```jsonc
 {
   "total": 1412,
-  "page": 1,
-  "page_size": 50,
+  "limit": 50,
+  "offset": 0,
   "families": [ { "name": "efficientnet", "count": 38 }, { "name": "vit", "count": 121 } ],
   "backbones": [
     {
-      "id": "image-classification-timm-tf-efficientnetv2-s--in21k",
+      "id": "image-classification-timm-tf_efficientnetv2_s.in21k",
       "model_name": "tf_efficientnetv2_s.in21k",
       "family": "efficientnet",
       "version": "v2_s.in21k",
@@ -555,6 +554,25 @@ GET /api/model_architectures/timm/backbones?search=&family=&page=&page_size=
 When the user selects a backbone, the UI uses its concrete `id` (`image-classification-timm-<arch>`) for the existing per-id flow: `GET .../training_configuration?model_architecture_id=<id>` and the training request. No other endpoint changes.
 
 Process: implement in API/service, regenerate the OpenAPI spec (`just gen-api-spec --output-path openapi-spec.json`), then UI types (`npm run build:api`). Use the `geti-openapi-sync` workflow.
+
+### 4.8 Export and optimization compatibility
+
+Architecture discovery and training support do not imply deployment support. A
+timm backbone is eligible for the first release only after a representative
+smoke test has completed the full path:
+
+1. instantiate the headless backbone and attach the Geti classification head;
+2. export the trained model to OpenVINO;
+3. load the exported model through ModelAPI and run one inference; and
+4. apply the supported NNCF optimization flow where the architecture is
+  compatible with it.
+
+The validation matrix should include at least the smallest and largest
+representative model from every discovered family. The catalog may still list
+architectures that fail this validation, but those entries must be marked
+unsupported for deployment and must not be presented as production-ready.
+Export or optimization failures should identify the selected `model_name` and
+the failed stage, rather than silently falling back to another architecture.
 
 ---
 
@@ -585,7 +603,11 @@ The selector stores the concrete architecture id. Changing the selection invalid
 
 - Library unit/model tests: for representative models from CNN and transformer families, verify the `timm.optim.create_optimizer_v2` options, then instantiate → 1-step train → export (OpenVINO/ONNX).
 - Backend unit tests: `model_name ↔ id` round-trip; `TimmManifestProvider.build_manifest` produces a schema-valid `ModelManifest` (respecting `extra="forbid"`); lazy `get_model_manifest_by_id` for timm ids; `GetiConfigConverter._resolve_recipe` + LR-injection fallback; `/timm/backbones` search/pagination/facets against a fixture snapshot.
-- E2E testing: each run should execute a small rotating sample of random timm family architectures
+- E2E testing: each run should execute a small rotating sample of random timm
+  architectures, while the complete validation matrix guarantees at least one
+  representative model from every discovered family. The smallest and largest
+  representative models from each family should be included in the export and
+  ModelAPI smoke tests described in §4.8.
 - UI: component tests for the selector (search, family filter, selection → id), and that the generic parameter panel renders the returned LR field; MSW handlers for both new endpoints.
 - Acceptance criteria (from the issue): model discovery, manifest correctness, basic instantiation flows covered; no regression in existing classification workflows.
 
@@ -599,7 +621,7 @@ User opens the Train dialog
   -> curated model cards + one "Custom backbone (timm)" card
 
 User searches for "vit"
-  -> GET /api/model_architectures/timm/backbones?search=vit&page=1
+  -> GET /api/model_architectures/timm/backbones?search=vit&limit=50&offset=0
   -> backend returns snapshot metadata:
        model_name = vit_base_patch16_224.augreg2_in21k_ft_in1k
        family = vit
@@ -608,7 +630,7 @@ User searches for "vit"
 
 User selects the architecture
   -> UI stores selectedModelArchitectureId =
-       image-classification-timm-vit-base-patch16-224--augreg2-in21k-ft-in1k
+  image-classification-timm-vit_base_patch16_224.augreg2_in21k_ft_in1k
   -> GET /api/projects/{project_id}/training_configuration
        ?model_architecture_id=<selected id>
   -> backend decodes the id to the timm model name
