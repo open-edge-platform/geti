@@ -50,7 +50,7 @@ class UltralyticsModel:
     def __init__(
         self,
         model_name: str,
-        label_info: LabelInfoTypes | None = None,
+        label_info: LabelInfoTypes,
         data_input_params: DataInputParams | dict | None = None,
         *,
         pretrained: bool = True,
@@ -58,7 +58,7 @@ class UltralyticsModel:
         extra_overrides: dict[str, Any] | None = None,
     ) -> None:
         self.model_name = model_name
-        self.label_info = self._dispatch_label_info(label_info) if label_info is not None else None
+        self.label_info = self._dispatch_label_info(label_info)
         self.pretrained = pretrained
         self.extra_overrides = extra_overrides or {}
 
@@ -161,6 +161,15 @@ class UltralyticsModel:
             raise ValueError(msg)
 
         return yolo
+
+    def ensure_predict_ready(self) -> None:
+        """Backfill state required by Ultralytics predictors before ``predict()``/``test()``.
+
+        Default is a no-op. Subclasses override this when the underlying
+        Ultralytics predictor/validator requires extra state that getitune's
+        DataModule-driven training/inference path does not otherwise set up.
+        """
+        return
 
     def load_checkpoint(self, weights_path: PathLike) -> None:
         """Load weights from a local checkpoint file.
@@ -281,7 +290,6 @@ class UltralyticsModel:
 
         Subclasses override to set model_type, task_type, and thresholds.
         """
-        label_info = self.label_info or LabelInfo(label_names=[], label_ids=[], label_groups=[])
         iou = self._export_args.get("iou_threshold")
         if iou is None:
             iou = self.extra_overrides.get("iou", 0.5)
@@ -290,7 +298,7 @@ class UltralyticsModel:
             model_type="YOLO11",
             model_name=self.model_name,
             task_type="detection",
-            label_info=label_info,
+            label_info=self.label_info,
             optimization_config={},
             confidence_threshold=float(conf) if conf is not None else None,
             iou_threshold=float(iou),
@@ -298,7 +306,7 @@ class UltralyticsModel:
         )
 
     def __repr__(self) -> str:
-        num_classes = self.label_info.num_classes if self.label_info is not None else None
+        num_classes = self.label_info.num_classes
         return (
             f"{self.__class__.__name__}("
             f"model_name={self.model_name!r}, "
