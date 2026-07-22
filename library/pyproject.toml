@@ -24,10 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    # Sourced from a git branch (see [tool.uv.sources]) until the datumaro release
-    # shipping the InstanceMaskTiler instance-filtering fix + bounded per-image
-    # tiling caches is published. Restore a versioned pin (e.g. "~=<version>") on release.
-    "datumaro[experimental]",
+    "datumaro[experimental]~=1.13.5",
     "omegaconf==2.3.0",
     "rich==14.0.0",
     "jsonargparse==4.35.0",
@@ -170,9 +167,6 @@ override-dependencies = [
 ]
 
 [tool.uv.sources]
-# TODO(release): drop these git overrides and restore versioned PyPI pins once the
-# datumaro tiling fix and the model_api forward-tiling API are released.
-datumaro = { git = "https://github.com/open-edge-platform/datumaro", branch = "develop" }
 openvino-model-api = { git = "https://github.com/open-edge-platform/model_api", branch = "master", subdirectory = "model_api" }
 # TODO(open-edge-platform/geti#7070): revert to a stable PyPI release once OpenVINO 2026.3 is officially published.
 openvino = [
