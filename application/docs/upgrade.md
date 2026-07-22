@@ -1,12 +1,10 @@
 # Upgrading Intel Geti
 
 This guide explains how to upgrade an existing Intel Geti installation to a newer
-version while preserving your projects, datasets and models, and how the upgrade
-is rolled back automatically if something goes wrong.
+version while preserving your projects, datasets and models.
 
-> **Guarantee:** An upgrade never deletes your data. If migration fails, both the
-> application and its data are reverted to the previous version, which stays fully
-> usable.
+> **Guarantee:** An upgrade never deletes your data and prepares a backup before the migration. 
+> If migration fails, data can be easily restored.
 
 ## Table of contents
 
@@ -28,21 +26,9 @@ the `geti-data` Docker volume or a per-user directory for the desktop app):
 - a SQLite database `geti.db` (project/model/dataset metadata), and
 - binary artifacts on the filesystem (media, model weights, dataset revisions).
 
-Every release pins the data layout to an Alembic **revision** — the single source
-of truth for both the database schema and the on-disk layout (see
-[`migration-guidelines.md`](./migration-guidelines.md)). When a newer version
-starts, it automatically:
-
-1. Records/checks the data version (a small `.geti_data_version` stamp file in the
-   data directory identifies which version the data was last brought up to).
-2. Takes a **backup of the database** before migrating.
-3. Runs the migrations (`alembic upgrade head`), which update the schema and move
-   any files in lockstep.
-4. Advances the recorded data version.
-
 Because migration runs on startup, **upgrading is simply a matter of replacing the
 application with the newer version and starting it** — the data migration happens
-by itself, with automatic rollback on failure.
+by itself.
 
 ---
 
@@ -51,10 +37,8 @@ by itself, with automatic rollback on failure.
 The Docker image bundles the whole application. The persistent `geti-data` and
 `geti-logs` volumes are **not** part of the image, so replacing the image with a
 newer one and reusing the same volumes preserves all your data. Because the
-backend migrates data on startup (with its own automatic database rollback on
-failure — see [What happens on failure](#what-happens-on-failure-rollback)),
-upgrading is a matter of pulling the newer image and recreating the container
-against the same volumes.
+backend migrates data on startup, upgrading is a matter of pulling the newer image 
+and recreating the container against the same volumes.
 
 > **Recommended:** take a snapshot of the `geti-data` volume before upgrading so
 > you can restore the exact pre-upgrade state if needed.
@@ -85,8 +69,7 @@ data snapshot, and recreate the container — see [Downgrading](#downgrading).
 
 The MSIX package contains the UI and the bundled backend. Your projects and models
 live in a **per-user data directory** that is deliberately kept **outside** the
-install location (`%LOCALAPPDATA%\com.intel.geti`, resolved from the bundle
-identifier — see `ui/src-tauri/src/backend.rs`), so it survives app updates.
+install location (`%LOCALAPPDATA%\Intel\Geti`), so it survives app updates.
 
 To upgrade:
 
@@ -95,13 +78,12 @@ To upgrade:
 2. Launch Geti. On first start the bundled backend migrates your data to the new
    version, taking a database backup first.
 
-If the migration fails, the backend automatically rolls the data back to the
-previous version and exits with the fatal code `3`. The desktop app detects this
-and shows a **detailed error dialog** explaining that the upgrade failed, that
-your data was restored, and where to find the logs, then closes. Because the
-previous package can be reinstalled and your data was reverted, the app remains
+If the migration fails, the backend exits with the fatal code `3`. 
+The desktop app detects this and shows a **detailed error dialog** explaining 
+that the upgrade failed and where to find the logs, then closes. Because the
+previous package can be reinstalled and backup is available, the app remains
 usable — simply reinstall the previous `.msix` version (see
-[Downgrading](#downgrading)).
+[Downgrading](#downgrading)) and restore the database from backup.
 
 ### Requirements for in-place upgrade to work
 
@@ -157,7 +139,7 @@ When an existing installation is detected (a checkout with application data, or
    300s).
 4. On success, launches the app (and drops the backup unless `--keep-backup` /
    `-KeepBackup` is given).
-5. On **any** failure, restores the data backup and the previous git revision,
+5. On **any** failure, restores the previous git revision,
    rebuilds the previous version, and leaves it usable.
 
 All steps are written to `<work-dir>/.build/.install.log`. Useful options:
@@ -177,30 +159,14 @@ list.
 
 ---
 
-## What happens on failure (rollback)
+## What happens on failure
 
 A migration failure is treated as **fatal and non-restartable** — retrying would
 fail identically — so the backend:
 
-1. Rolls the data back to the pre-upgrade state:
-   - reverts the migrations (`alembic downgrade` to the starting revision), which
-     also undoes any in-script file moves, then
-   - restores the database from the pre-upgrade backup as the authoritative safety
-     net.
-2. Logs detailed recovery guidance (including the backup location).
-3. Exits with the dedicated code `3` so launchers/supervisors do **not** restart
+1. Logs detailed recovery guidance (including the backup location).
+2. Exits with the dedicated code `3` so launchers/supervisors do **not** restart
    it in a loop.
-
-At the deployment level:
-
-- **Source installs** roll back further: the merged installer (`install.sh` /
-  `install.ps1`) restores the pre-upgrade `data/` backup and the previous git
-  revision, rebuilds it, and leaves the previous version running and usable.
-- **Docker/manual upgrades** rely on the backend's own rollback plus the data
-  snapshot you took beforehand; retag the previous image and restore the snapshot
-  to return to the previous version.
-
----
 
 ## Downgrading
 
@@ -216,14 +182,8 @@ At the deployment level:
   ```
 
 - **MSIX:** uninstall the current package and install the previous `.msix`. Your
-  per-user data directory is preserved. If you had upgraded and rolled back, the
-  data is already at the previous version.
-
-> **Note:** Downgrading across a version that changed the data layout requires a
-> data snapshot taken _before_ the upgrade — the newer layout is generally not
-> readable by older versions. Source upgrades create this snapshot automatically
-> (under `<work-dir>/.geti-upgrade-backups/`); for Docker, take the volume
-> snapshot shown above before upgrading.
+  per-user data directory is preserved. If you had upgraded and restored the database from backup, 
+  the data is already at the previous version.
 
 ---
 
@@ -232,11 +192,10 @@ At the deployment level:
 - **Where are the logs?**
   - Source install/upgrade: `<work-dir>/.build/.install.log`.
   - Docker: the container logs (`docker logs geti-cpu`) / the `geti-logs` volume.
-  - Desktop: the per-user log directory (e.g. `%LOCALAPPDATA%\com.intel.geti\logs`).
+  - Desktop: the per-user log directory (e.g. `%LOCALAPPDATA%\Intel\Geti`).
 - **The new version won't start after an upgrade.** Check the logs for a
-  `Fatal application upgrade error` message. The data has been rolled back; start
+  `Fatal application upgrade error` message. Restore the database from the backup; start
   the previous version to continue, and open an issue at
   https://github.com/open-edge-platform/geti with the log attached.
 - **A pre-upgrade database backup (`geti.db.<timestamp>.bak`) is left in the data
-  directory.** This is retained on purpose after a failed upgrade for diagnostics.
-  You can delete it once the previous version is confirmed working.
+  directory.**
