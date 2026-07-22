@@ -23,7 +23,7 @@ jobs:
   # If PR or merge_group -> run only if files in specified paths changed
   check_paths:
     name: Check if workflow should run
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     outputs:
       run_workflow: ${{ steps.check_paths.outputs.run }}
     steps:
@@ -56,7 +56,7 @@ jobs:
     # Use more descriptive job name for better visibility in CI results
     # Overflow labeled runner is equivalent to ubuntu-latest in terms of resources
     name: python-${{ matrix.os }}-checks
-    runs-on: ${{ matrix.os == 'ubuntu' && (github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest') || 'windows-latest' }}
+    runs-on: ${{ matrix.os == 'ubuntu' && 'ubuntu-latest' || 'windows-latest' }}
     needs: check_paths
     if: needs.check_paths.outputs.run_workflow == 'true'
     permissions:
@@ -107,7 +107,7 @@ jobs:
     needs:
       - check_paths
       - python-checks
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     env:
       CHECKS: ${{ join(needs.*.result, ' ') }}
     if: always() && !cancelled()

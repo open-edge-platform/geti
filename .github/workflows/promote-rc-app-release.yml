@@ -27,7 +27,7 @@ permissions: {} # No permissions by default
 jobs:
   validate:
     name: Validate inputs and RC tag
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     outputs:
@@ -150,7 +150,7 @@ jobs:
     needs: validate
     if: inputs.dry_run == false
     name: Create release git tag
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     environment: production
     permissions:
       contents: write # Permission to push release tag to git
@@ -197,7 +197,7 @@ jobs:
     needs: [validate, create-release-tag]
     if: inputs.dry_run == false
     name: Promote RC image to release image
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     environment: production
     permissions:
       packages: write # Permission to push packages to GHCR
