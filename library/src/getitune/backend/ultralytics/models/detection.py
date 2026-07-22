@@ -51,6 +51,17 @@ class UltralyticsDetectionModel(UltralyticsModel):
         "yolo12x": f"{_BASE_URL}/yolo12x.pt",
     }
 
+    metric_keys: ClassVar[dict[str, str]] = {
+        "metrics/mAP50(B)": "val/map_50",
+        "metrics/mAP50-95(B)": "val/map",
+        "metrics/precision(B)": "val/precision",
+        "metrics/recall(B)": "val/recall",
+        "train/box_loss": "train/loss_bbox",
+        "train/cls_loss": "train/loss_cls",
+        "train/dfl_loss": "train/loss_dfl",
+        "lr/pg0": "lr",
+    }
+
     @property
     def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
         """Per-variant preprocessing defaults.
@@ -65,14 +76,3 @@ class UltralyticsDetectionModel(UltralyticsModel):
             std=(1.0, 1.0, 1.0),
         )
         return dict.fromkeys(self._pretrained_weights, default)
-
-    metric_keys: ClassVar[dict[str, str]] = {
-        "metrics/mAP50(B)": "val/map_50",
-        "metrics/mAP50-95(B)": "val/map",
-        "metrics/precision(B)": "val/precision",
-        "metrics/recall(B)": "val/recall",
-        "train/box_loss": "train/loss_bbox",
-        "train/cls_loss": "train/loss_cls",
-        "train/dfl_loss": "train/loss_dfl",
-        "lr/pg0": "lr",
-    }

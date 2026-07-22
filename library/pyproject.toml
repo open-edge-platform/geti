@@ -42,7 +42,7 @@ dependencies = [
     "torchmetrics==1.8.2",
     "pytorchcv==0.0.74",
     "timm==1.0.3",
-    "openvino~=2026.2.0",
+    "openvino==2026.3.0rc2",
     # Sourced from a git branch (see [tool.uv.sources]) until the openvino-model-api
     # release shipping the tiler `predict_tiles` / `_setup_model` API is published.
     # Restore a versioned pin (e.g. "~=<version>") on release.
@@ -111,7 +111,7 @@ xpu = [
     "torchvision==0.28.0+xpu"
 ]
 ultralytics = [
-    "ultralytics~=8.4.82",
+    "ultralytics==8.4.86",
 ]
 
 docs = [
@@ -174,6 +174,10 @@ override-dependencies = [
 # datumaro tiling fix and the model_api forward-tiling API are released.
 datumaro = { git = "https://github.com/open-edge-platform/datumaro", branch = "develop" }
 openvino-model-api = { git = "https://github.com/open-edge-platform/model_api", branch = "master", subdirectory = "model_api" }
+# TODO(open-edge-platform/geti#7070): revert to a stable PyPI release once OpenVINO 2026.3 is officially published.
+openvino = [
+    { index = "openvino-nightly" },
+]
 torch = [
     # Note: Pytorch indexes only provide pre-built wheels for Linux and Windows.
     # For other platforms (e.g., macOS), Pytorch has to be installed from the default PyPI index.
@@ -189,6 +193,11 @@ torchvision = [
     { index = "torch-xpu", extra = "xpu"},
     { index = "torch-cuda", extra = "cuda"},
 ]
+
+[[tool.uv.index]]
+name = "openvino-nightly"
+url = "https://storage.openvinotoolkit.org/simple/wheels/nightly"
+explicit = true
 
 [[tool.uv.index]]
 name = "torch-cpu"

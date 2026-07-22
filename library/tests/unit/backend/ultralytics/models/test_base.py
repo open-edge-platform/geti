@@ -1,7 +1,14 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Unit tests for Ultralytics model wrappers."""
+"""Unit tests for the shared ``UltralyticsModel`` base behavior.
+
+Detection/instance-segmentation model wrappers are used as concrete
+stand-ins to exercise the generic behavior implemented in
+``getitune.backend.ultralytics.models.base.UltralyticsModel``
+(checkpoint loading, ``data_input_params``, ``_export_parameters``, and the
+``_pretrained_weights`` pattern).
+"""
 
 from __future__ import annotations
 
@@ -11,8 +18,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from getitune.backend.lightning.models.base import DataInputParams
-from getitune.backend.ultralytics.models import UltralyticsDetectionModel
-from getitune.backend.ultralytics.models.instance_segmentation import UltralyticsInstSegModel
+from getitune.backend.ultralytics.models import UltralyticsDetectionModel, UltralyticsInstSegModel
 from getitune.types.export import TaskLevelExportParameters
 from getitune.types.label import LabelInfo
 
@@ -23,18 +29,18 @@ def _label_info() -> LabelInfo:
 
 def test_model_rejects_checkpoint_name_for_scratch_training() -> None:
     with pytest.raises(ValueError, match="pretrained=False requires a model config"):
-        UltralyticsDetectionModel(model_name="yolo26n.pt", pretrained=False)
+        UltralyticsDetectionModel(model_name="yolo26n.pt", pretrained=False, label_info=_label_info())
 
 
 def test_model_allows_yaml_config_for_scratch_training() -> None:
-    model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False)
+    model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False, label_info=_label_info())
     assert model.model_name == "yolo26n.yaml"
     assert model.pretrained is False
 
 
 def test_load_checkpoint_creates_fresh_yolo(tmp_path: Path) -> None:
     """load_checkpoint should create a fresh YOLO instance from the checkpoint."""
-    model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False)
+    model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False, label_info=_label_info())
     fake_weights = tmp_path / "weights.pt"
     fake_weights.write_bytes(b"fake")
 
@@ -47,7 +53,7 @@ def test_load_checkpoint_creates_fresh_yolo(tmp_path: Path) -> None:
 
 
 def test_load_checkpoint_raises_on_missing_file() -> None:
-    model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False)
+    model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False, label_info=_label_info())
     with pytest.raises(FileNotFoundError, match="Checkpoint file not found"):
         model.load_checkpoint("/nonexistent/weights.pt")
 
@@ -56,28 +62,32 @@ class TestDataInputParams:
     """Tests for the data_input_params property on UltralyticsModel."""
 
     def test_returns_data_input_params(self) -> None:
-        model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False, imgsz=640)
+        model = UltralyticsDetectionModel(
+            model_name="yolo26n.yaml", pretrained=False, imgsz=640, label_info=_label_info()
+        )
         params = model.data_input_params
         assert isinstance(params, DataInputParams)
 
     def test_input_size_matches_imgsz(self) -> None:
-        model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False, imgsz=320)
+        model = UltralyticsDetectionModel(
+            model_name="yolo26n.yaml", pretrained=False, imgsz=320, label_info=_label_info()
+        )
         params = model.data_input_params
         assert params.input_size == (320, 320)
 
     def test_mean_is_zero(self) -> None:
         """YOLO expects identity normalization — mean should be (0, 0, 0)."""
-        model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False)
+        model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False, label_info=_label_info())
         assert model.data_input_params.mean == (0.0, 0.0, 0.0)
 
     def test_std_is_identity(self) -> None:
         """YOLO uses intensity_config for /255 scaling; std should be identity (1, 1, 1)."""
-        model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False)
+        model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False, label_info=_label_info())
         assert model.data_input_params.std == (1.0, 1.0, 1.0)
 
     def test_default_imgsz_from_preprocessing_params(self) -> None:
         """When imgsz is not specified, it should come from _default_preprocessing_params."""
-        model = UltralyticsDetectionModel(model_name="yolo26n", pretrained=False)
+        model = UltralyticsDetectionModel(model_name="yolo26n", pretrained=False, label_info=_label_info())
         assert model.imgsz == 640
         assert model.data_input_params.input_size == (640, 640)
 
@@ -108,13 +118,6 @@ class TestExportParameters:
         model = UltralyticsDetectionModel(model_name="yolo26n", label_info=li)
         assert model._export_parameters.label_info == li
 
-    def test_none_label_info_uses_empty(self) -> None:
-        """When label_info is None, should use an empty LabelInfo."""
-        model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False)
-        params = model._export_parameters
-        assert params.label_info.label_names == []
-        assert params.label_info.label_ids == []
-
     def test_default_thresholds(self) -> None:
         model = UltralyticsDetectionModel(model_name="yolo26n", label_info=_label_info())
         params = model._export_parameters
@@ -143,7 +146,7 @@ class TestPretrainedWeights:
         assert len(UltralyticsDetectionModel._pretrained_weights) > 0
 
     def test_build_yolo_loads_pretrained_when_enabled(self) -> None:
-        model = UltralyticsDetectionModel(model_name="yolo26n", pretrained=True)
+        model = UltralyticsDetectionModel(model_name="yolo26n", pretrained=True, label_info=_label_info())
         mock_yolo = MagicMock()
         with patch("getitune.backend.ultralytics.models.base.YOLO", return_value=mock_yolo):
             yolo = model._build_yolo()
@@ -152,7 +155,7 @@ class TestPretrainedWeights:
         assert yolo is mock_yolo
 
     def test_build_yolo_skips_pretrained_when_disabled(self) -> None:
-        model = UltralyticsDetectionModel(model_name="yolo26n", pretrained=False)
+        model = UltralyticsDetectionModel(model_name="yolo26n", pretrained=False, label_info=_label_info())
         mock_yolo = MagicMock()
         with patch("getitune.backend.ultralytics.models.base.YOLO", return_value=mock_yolo):
             yolo = model._build_yolo()
@@ -207,7 +210,7 @@ class TestPretrainedWeights:
 
     def test_detection_preprocessing_params_cover_all_variants(self) -> None:
         """Every entry in _pretrained_weights must have a preprocessing default."""
-        model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False)
+        model = UltralyticsDetectionModel(model_name="yolo26n.yaml", pretrained=False, label_info=_label_info())
         defaults = model._default_preprocessing_params
         assert isinstance(defaults, dict)
         for variant in UltralyticsDetectionModel._pretrained_weights:
@@ -215,7 +218,7 @@ class TestPretrainedWeights:
 
     def test_inst_seg_preprocessing_params_cover_all_variants(self) -> None:
         """Every entry in _pretrained_weights must have a preprocessing default."""
-        model = UltralyticsInstSegModel(model_name="yolo26n-seg.yaml", pretrained=False)
+        model = UltralyticsInstSegModel(model_name="yolo26n-seg.yaml", pretrained=False, label_info=_label_info())
         defaults = model._default_preprocessing_params
         assert isinstance(defaults, dict)
         for variant in UltralyticsInstSegModel._pretrained_weights:

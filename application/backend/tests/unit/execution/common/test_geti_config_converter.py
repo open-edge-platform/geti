@@ -162,6 +162,34 @@ class TestGetiConfigConverterConvert:
         assert result["training"]["epochs"] == 10
         assert result["data"]["train_subset"]["batch_size"] == 4
 
+    def test_convert_multilabel_yolo26_uses_multilabel_recipe(self) -> None:
+        """Non-exclusive YOLO26 classification must use the BCE-loss model recipe."""
+        geti_cfg = _make_geti_config(
+            model_manifest_id="image-classification-yolo26-m",
+            sub_task_type="MULTI_LABEL_CLS",
+        )
+
+        result = GetiConfigConverter.convert(geti_cfg)
+
+        assert result["task"] == "MULTI_LABEL_CLS"
+        assert result["model"]["class_path"] == (
+            "getitune.backend.ultralytics.models.classification.UltralyticsMultiLabelClsModel"
+        )
+
+    def test_convert_multiclass_yolo26_keeps_multiclass_recipe(self) -> None:
+        """Exclusive YOLO26 classification must retain the standard softmax recipe."""
+        geti_cfg = _make_geti_config(
+            model_manifest_id="image-classification-yolo26-m",
+            sub_task_type="MULTI_CLASS_CLS",
+        )
+
+        result = GetiConfigConverter.convert(geti_cfg)
+
+        assert result["task"] == "MULTI_CLASS_CLS"
+        assert result["model"]["class_path"] == (
+            "getitune.backend.ultralytics.models.classification.UltralyticsMultiClassClsModel"
+        )
+
     def test_convert_ultralytics_applies_augmentations_via_transforms_updater(self) -> None:
         """Augmentation hyper_parameters should flow through the shared TransformsUpdater for Ultralytics."""
         geti_cfg = _make_geti_config(

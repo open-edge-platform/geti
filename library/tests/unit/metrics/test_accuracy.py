@@ -78,6 +78,35 @@ class TestAccuracy:
         acc = result["accuracy"]
         assert round(acc.item(), 3) == 0.667
 
+    def test_multilabel_accuracy_with_single_combined_label_group(self) -> None:
+        """Multi-label ``label_info`` normally holds all labels in one combined group
+
+        (see ``MultilabelClsDataset.label_info`` / ``UltralyticsModel._dispatch_label_info``).
+        The metric must still evaluate every individual label column, not just
+        as many columns as there are entries in ``label_groups``.
+        """
+        label_names = ["class1", "class2", "class3"]
+        label_info = LabelInfo(
+            label_names=label_names,
+            label_groups=[label_names],
+            label_ids=["0", "1", "2"],
+        )
+        preds = [
+            torch.Tensor([0.2, 0.8, 0.9]),
+            torch.Tensor([0.8, 0.7, 0.7]),
+        ]
+        targets = [
+            torch.Tensor([0, 1, 1]),
+            torch.Tensor([0, 1, 0]),
+        ]
+        metric = MultilabelAccuracywithLabelGroup(label_info, average="MICRO")
+        metric.update(preds, targets)
+        result = metric.compute()
+        assert isinstance(result, dict)
+        acc = result["accuracy"]
+        assert round(acc.item(), 3) == 0.667
+        assert len(result["conf_matrix"]) == len(label_names)
+
     def test_hlabel_accuracy(self, fxt_hlabel_multilabel_info: HLabelInfo) -> None:
         """Check whether accuracy is same with getitune 1.x version."""
         preds = [

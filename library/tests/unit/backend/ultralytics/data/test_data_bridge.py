@@ -12,7 +12,12 @@ import numpy as np
 import torch
 from torchvision import tv_tensors
 
-from getitune.backend.ultralytics.data import UltralyticsDatasetAdapter, collate_fn
+from getitune.backend.ultralytics.data import (
+    UltralyticsDatasetAdapter,
+    detection_collate_fn,
+    instance_seg_collate_fn,
+    semantic_collate_fn,
+)
 from getitune.data.dataset.base import VisionDataset
 from getitune.data.entity.base import ImageInfo
 
@@ -138,7 +143,7 @@ def test_dataset_adapter_rescales_bboxes_with_letterbox_padding() -> None:
     np.testing.assert_allclose(result["bboxes"], np.array([[0.3, 0.1, 0.1, 0.2]], dtype=np.float32), atol=1e-6)
 
 
-def test_collate_fn_matches_expected_detection_contract() -> None:
+def test_detection_collate_fn_matches_expected_detection_contract() -> None:
     batch = [
         {
             "img": torch.rand(3, 16, 16),
@@ -160,10 +165,162 @@ def test_collate_fn_matches_expected_detection_contract() -> None:
         },
     ]
 
-    collated = collate_fn(batch)
+    collated = detection_collate_fn(batch)
 
     assert collated["img"].shape == (2, 3, 16, 16)
     assert collated["cls"].shape == (3, 1)
     assert collated["bboxes"].shape == (3, 4)
     assert torch.equal(collated["batch_idx"], torch.tensor([0.0, 0.0, 1.0]))
+    assert collated["im_file"] == ["a.jpg", "b.jpg"]
+
+
+def test_instance_seg_collate_fn_builds_overlap_maps_and_reorders_targets() -> None:
+    # One image with two masks: a small one (class 1) and a large one (class 2).
+    # Area-descending sort places the large mask first, so the small mask
+    # (painted last) must win the overlap and the cls/bboxes order must flip.
+    small_mask = torch.zeros((16, 16), dtype=torch.uint8)
+    small_mask[0:2, 0:2] = 1  # area 4
+    large_mask = torch.zeros((16, 16), dtype=torch.uint8)
+    large_mask[0:8, 0:8] = 1  # area 64, overlaps small_mask entirely
+
+    batch = [
+        {
+            "img": torch.rand(3, 16, 16),
+            "cls": np.array([[1.0], [2.0]], dtype=np.float32),
+            "bboxes": np.array([[0.1, 0.1, 0.1, 0.1], [0.3, 0.3, 0.3, 0.3]], dtype=np.float32),
+            "masks": torch.stack([small_mask, large_mask]),
+            "ori_shape": (16, 16),
+            "resized_shape": (16, 16),
+            "ratio_pad": ((1.0, 1.0), (0, 0)),
+            "im_file": "a.jpg",
+        },
+    ]
+
+    collated = instance_seg_collate_fn(batch)
+
+    assert collated["img"].shape == (1, 3, 16, 16)
+    assert collated["masks"].shape == (1, 16, 16)
+    assert collated["sem_masks"].shape == (1, 16, 16)
+    # Large mask painted first (index 1), small mask painted last (index 2)
+    # and wins the overlap region.
+    assert collated["masks"][0, 0, 0] == 2
+    assert collated["masks"][0, 6, 6] == 1
+    # sem_masks carries the class id of the owning instance at each pixel.
+    assert collated["sem_masks"][0, 0, 0] == 1.0
+    assert collated["sem_masks"][0, 6, 6] == 2.0
+    # cls/bboxes are reordered to match the area-descending mask order
+    # (large/class-2 first, small/class-1 second).
+    assert torch.equal(collated["cls"], torch.tensor([[2.0], [1.0]]))
+    np.testing.assert_allclose(
+        collated["bboxes"].numpy(), np.array([[0.3, 0.3, 0.3, 0.3], [0.1, 0.1, 0.1, 0.1]], dtype=np.float32)
+    )
+    assert torch.equal(collated["batch_idx"], torch.tensor([0.0, 0.0]))
+
+
+def test_dataset_adapter_segment_mode_includes_masks_and_sem_masks() -> None:
+    image = tv_tensors.Image(torch.rand(3, 16, 20, dtype=torch.float32))
+    bboxes = tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+        torch.tensor([[2.0, 4.0, 10.0, 12.0]], dtype=torch.float32),
+        format=tv_tensors.BoundingBoxFormat.XYXY,
+        canvas_size=(16, 20),
+    )
+    # Two non-overlapping instance masks for class 1 and class 2.
+    mask_0 = torch.zeros((16, 20), dtype=torch.uint8)
+    mask_0[4:8, 2:6] = 1
+    mask_1 = torch.zeros((16, 20), dtype=torch.uint8)
+    mask_1[10:14, 12:16] = 1
+    masks = tv_tensors.Mask(torch.stack([mask_0, mask_1]))
+
+    sample = SimpleNamespace(
+        image=image,
+        bboxes=bboxes,
+        label=torch.tensor([1, 2]),
+        masks=masks,
+        img_info=ImageInfo(  # pyrefly: ignore[no-matching-overload]
+            img_idx=0,
+            img_shape=(16, 20),
+            ori_shape=(16, 20),
+            padding=(0, 0, 0, 0),
+        ),
+    )
+
+    dataset = MagicMock(spec=VisionDataset)
+    dataset.__len__.return_value = 1
+    dataset.__getitem__.return_value = sample
+
+    adapter = UltralyticsDatasetAdapter(dataset, task_kind="segment")
+    result = adapter[0]
+
+    assert result["img"] is image
+    assert "masks" in result
+    assert "sem_masks" in result
+    assert result["masks"].shape == (2, 16, 20)
+    assert result["sem_masks"].shape == (16, 20)
+    # Overlap index map: smaller-area instance should overwrite larger.
+    # Both masks have equal area here, so sort is stable by original order.
+    assert result["masks"][0, 4, 2] == 1
+    assert result["masks"][1, 10, 12] == 1
+    # sem_masks pixels should carry the class id of the owning instance.
+    assert result["sem_masks"][4, 2] == 1.0
+    assert result["sem_masks"][10, 12] == 2.0
+
+
+def test_dataset_adapter_semantic_mode_extracts_mask() -> None:
+    image = tv_tensors.Image(torch.rand(3, 16, 20, dtype=torch.float32))
+    mask = torch.zeros((1, 16, 20), dtype=torch.uint8)
+    mask[0, 4:8, 2:6] = 1
+    mask[0, 10:14, 12:16] = 2
+    masks = tv_tensors.Mask(mask)
+
+    sample = SimpleNamespace(
+        image=image,
+        masks=masks,
+        img_info=ImageInfo(  # pyrefly: ignore[no-matching-overload]
+            img_idx=0,
+            img_shape=(16, 20),
+            ori_shape=(16, 20),
+            padding=(0, 0, 0, 0),
+        ),
+    )
+
+    dataset = MagicMock(spec=VisionDataset)
+    dataset.__len__.return_value = 1
+    dataset.__getitem__.return_value = sample
+
+    adapter = UltralyticsDatasetAdapter(dataset, task_kind="semantic")
+    result = adapter[0]
+
+    assert result["img"] is image
+    assert "semantic_mask" in result
+    assert result["semantic_mask"].shape == (16, 20)
+    assert result["semantic_mask"].dtype == torch.int32
+    assert result["semantic_mask"][4, 2] == 1
+    assert result["semantic_mask"][10, 12] == 2
+
+
+def test_semantic_collate_fn_stacks_masks() -> None:
+    batch = [
+        {
+            "img": torch.rand(3, 16, 16),
+            "semantic_mask": torch.randint(0, 3, (16, 16), dtype=torch.int32),
+            "ori_shape": (16, 16),
+            "resized_shape": (16, 16),
+            "ratio_pad": ((1.0, 1.0), (0, 0)),
+            "im_file": "a.jpg",
+        },
+        {
+            "img": torch.rand(3, 16, 16),
+            "semantic_mask": torch.randint(0, 3, (16, 16), dtype=torch.int32),
+            "ori_shape": (16, 16),
+            "resized_shape": (16, 16),
+            "ratio_pad": ((1.0, 1.0), (0, 0)),
+            "im_file": "b.jpg",
+        },
+    ]
+
+    collated = semantic_collate_fn(batch)
+
+    assert collated["img"].shape == (2, 3, 16, 16)
+    assert collated["semantic_mask"].shape == (2, 16, 16)
+    assert collated["semantic_mask"].dtype == torch.int32
     assert collated["im_file"] == ["a.jpg", "b.jpg"]

@@ -98,7 +98,7 @@ Both model implementations (`backend/lightning/models/<task>/`) and recipes
 4. **No registration is required** — the model appears in
    `list_models(task=...)` and is trainable immediately.
 5. Add or update unit tests (`tests/unit/`, mirroring the source tree) and, when
-   relevant, model tests (`just test-unit-models`).
+   relevant, Lightning backend tests (`just test-unit-lightning`).
 
 ## Model Manifests
 
@@ -153,7 +153,9 @@ full table.
 | Lint + type-check | `just lint`                         |
 | Auto-fix lint     | `just ruff-fix`                     |
 | Unit tests        | `just test-unit -- <pytest args>`   |
-| Model unit tests  | `just test-unit-models -- <args>`   |
+| Lightning backend tests | `just test-unit-lightning -- <args>` |
+| Ultralytics backend tests | `just test-unit-ultralytics -- <args>` |
+| OpenVINO backend tests | `just test-unit-openvino -- <args>` |
 | Integration tests | `just test-integration -- <args>`   |
 
 ## Conventions & Guardrails

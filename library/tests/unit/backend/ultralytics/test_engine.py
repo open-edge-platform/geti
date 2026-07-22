@@ -16,7 +16,11 @@ from torchvision import tv_tensors
 
 from getitune.backend.ultralytics.data.geometry import scale_boxes_to_letterbox
 from getitune.backend.ultralytics.engine import UltralyticsEngine
-from getitune.backend.ultralytics.models import UltralyticsDetectionModel, UltralyticsInstSegModel
+from getitune.backend.ultralytics.models import (
+    UltralyticsDetectionModel,
+    UltralyticsInstSegModel,
+    UltralyticsMultiClassClsModel,
+)
 from getitune.data.entity.base import ImageInfo
 from getitune.data.entity.sample import SampleBatch
 from getitune.data.module import DataModule
@@ -576,6 +580,48 @@ class TestSummarizeIterTimes:
 
 class TestTorchmetricsEval:
     """Tests for torchmetrics-based test() evaluation."""
+
+    def test_classification_passes_probabilities_and_labels_to_metric(self, mocker, tmp_path) -> None:
+        """Classification torchmetrics must receive class scores and class indices."""
+        model = UltralyticsMultiClassClsModel(model_name="yolo26n-cls", label_info=_label_info())
+        datamodule = mocker.MagicMock(spec=DataModule)
+        engine = UltralyticsEngine(model=model, data=datamodule, work_dir=tmp_path, device="cpu")
+
+        yolo = MagicMock()
+        model._yolo = yolo
+        model.ensure_predict_ready = MagicMock()
+        yolo.model = MagicMock()
+        yolo.model.to = MagicMock(return_value=yolo.model)
+        yolo.model.eval = MagicMock(return_value=yolo.model)
+        yolo.predict = MagicMock(
+            return_value=[
+                SimpleNamespace(probs=SimpleNamespace(data=torch.tensor([0.9, 0.1]))),
+                SimpleNamespace(probs=SimpleNamespace(data=torch.tensor([0.2, 0.8]))),
+            ]
+        )
+
+        batch = SampleBatch(
+            images=torch.rand(2, 3, 64, 64),
+            labels=[torch.tensor([0]), torch.tensor([1])],
+            imgs_info=[
+                ImageInfo(img_idx=0, img_shape=(64, 64), ori_shape=(64, 64)),  # pyrefly: ignore[no-matching-overload]
+                ImageInfo(img_idx=1, img_shape=(64, 64), ori_shape=(64, 64)),  # pyrefly: ignore[no-matching-overload]
+            ],
+        )
+        engine._datamodule.test_dataloader = MagicMock(return_value=[batch])  # pyrefly: ignore[missing-attribute]
+        engine._datamodule.label_info = _label_info()  # pyrefly: ignore[missing-attribute]
+
+        metric = MagicMock()
+        metric.to = MagicMock(return_value=metric)
+        metric.compute = MagicMock(return_value={"accuracy": torch.tensor(1.0)})
+
+        result = engine.test(metric=MagicMock(return_value=metric))
+
+        metric.update.assert_called_once()
+        _, update_kwargs = metric.update.call_args
+        torch.testing.assert_close(update_kwargs["preds"], torch.tensor([[0.9, 0.1], [0.2, 0.8]]))
+        torch.testing.assert_close(update_kwargs["target"], torch.tensor([0, 1]))
+        assert result["test/accuracy"] == pytest.approx(1.0)
 
     def test_test_uses_torchmetrics_when_metric_provided(self, mocker, tmp_path) -> None:
         """test() should use torchmetrics path when metric callable is provided."""
