@@ -36,7 +36,7 @@ export const AnnotationShape = ({ annotation }: AnnotationShapeProps) => {
     const { shape, labels } = annotation;
     const hasMultipleLabels = labels.length > 1;
     const firstResolved = labels.length ? resolveAnnotationLabel(labels[0]) : undefined;
-    const color = hasMultipleLabels ? 'white' : (firstResolved?.color ?? '--annotation-fill');
+    const color = hasMultipleLabels ? 'white' : (firstResolved?.color ?? 'var(--annotation-fill)');
     const hasPredictionLabel = labels.some(isPrediction);
     const strokeDasharray = hasPredictionLabel ? 'calc(10 / var(--zoom-scale)) calc(6 / var(--zoom-scale))' : undefined;
 
