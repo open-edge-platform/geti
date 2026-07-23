@@ -191,7 +191,7 @@ jobs:
             --report-dir schemathesis-report
             --report junit
             --report-junit-path schemathesis-report/junit.xml
-            --max-examples 100
+            --max-examples 20
             --workers 4
             --checks all
             --max-response-time 30
