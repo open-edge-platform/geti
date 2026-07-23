@@ -25,10 +25,11 @@
         "lint:fix": "eslint --fix \"./src/**/*.ts*\"",
         "preinstall": "npm run clone-geti-ui-packages",
         "preview": "npm run build && rsbuild preview",
+        "preview:tauri": "cross-env BUILD_TARGET=tauri rsbuild preview --port 3001",
         "test:unit": "vitest --config vitest.config.ts",
         "test:unit:watch": "vitest --config vitest.config.ts --reporter=tree --watch",
         "test:unit:coverage": "vitest --coverage",
-        "test:component": "npx playwright test --project=component",
+        "test:component": "npx playwright test --project=component --project=\"Tauri component tests\"",
         "test:e2e": "ENABLE_BACKEND=True npx playwright test --project=e2e",
         "type-check": "tsc --noEmit",
         "tauri": "tauri"

@@ -57,12 +57,23 @@ export default defineConfig({
         {
             name: 'component',
             testDir: './tests',
-            testIgnore: '**/e2e/**',
+            testIgnore: ['**/e2e/**', /.*\.tauri\.spec\.ts/],
             use: {
                 ...devices['Desktop Chrome'],
                 headless: true,
                 viewport: { width: 1280, height: 720 },
             },
+        },
+        {
+            name: 'Tauri component tests',
+            testDir: './tests',
+            use: {
+                ...devices['Desktop Chrome'],
+                headless: true,
+                viewport: { width: 1280, height: 720 },
+                baseURL: 'http://localhost:3001',
+            },
+            testMatch: /.*\.tauri\.spec\.ts$/,
         },
         {
             name: 'e2e',
@@ -75,13 +86,21 @@ export default defineConfig({
         },
     ],
 
-    /* Run your local dev server before starting the tests */
+    /* Run your local dev server(s) before starting the tests */
     webServer: !process.env.ENABLE_BACKEND
-        ? {
-              command: CI ? 'npm run preview -- --port 3000' : 'npm run start',
-              url: 'http://localhost:3000',
-              reuseExistingServer: true,
-              timeout: ACTION_TIMEOUT,
-          }
+        ? [
+              {
+                  command: CI ? 'npm run preview -- --port 3000' : 'npm run start',
+                  url: 'http://localhost:3000',
+                  reuseExistingServer: true,
+                  timeout: ACTION_TIMEOUT,
+              },
+              {
+                  command: CI ? 'npm run preview:tauri' : 'npm run start:tauri -- --port 3001',
+                  url: 'http://localhost:3001',
+                  reuseExistingServer: true,
+                  timeout: ACTION_TIMEOUT,
+              },
+          ]
         : undefined,
 });
