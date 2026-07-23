@@ -156,8 +156,14 @@ class TransformsUpdater:
         "max_shear_degree": "shear",
     }
 
+    # Augmentations that cannot be combined with the tiling pipeline.  Mosaic and
+    # MixUp stitch/blend multiple full images together, which is fundamentally
+    # incompatible with splitting an image into tiles, so they must never be added
+    # to a tiling recipe.
+    TILING_INCOMPATIBLE_AUGMENTATIONS: ClassVar[set[str]] = {"mosaic", "mixup"}
+
     @classmethod
-    def update(cls, augmentation_params: dict, config: dict) -> None:  # noqa: C901
+    def update(cls, augmentation_params: dict, config: dict) -> None:  # noqa: C901, PLR0912
         """Update augmentations in the config based on Geti model template.
 
         For each augmentation in augmentation_params:
@@ -186,9 +192,17 @@ class TransformsUpdater:
         is_ultralytics = config.get("backend") == "ultralytics"
 
         for aug_name, aug_value in augmentation_params.items():
+            if tiling and aug_name in cls.TILING_INCOMPATIBLE_AUGMENTATIONS and aug_value.get("enable", True):
+                # The user explicitly enabled an augmentation that cannot coexist with tiling. Warn so it is clear
+                # we are overriding their request.
+                logger.warning(
+                    "Augmentation '{}' is incompatible with the Tiling pipeline and will be overridden (disabled)",
+                    aug_name,
+                )
+                continue
             if aug_name not in cls.AUGMENTATION_REGISTRY:
                 if tiling:
-                    logger.info("Augmentation '%s' is not applicable in Tiling pipeline", aug_name)
+                    logger.info("Augmentation '{}' is not applicable in Tiling pipeline", aug_name)
                     continue
                 msg = f"Unknown augmentation: '{aug_name}'. Available: {list(cls.AUGMENTATION_REGISTRY.keys())}"
                 raise ValueError(msg)
@@ -1116,17 +1130,21 @@ class GetiConfigConverter:
         deim_framework = augmentation_params.pop("deim_framework", None)
         training_parameters = param_dict.get("training", {})
 
-        # Update tiling (always applied regardless of DEIM state)
+        # Update tiling first so downstream augmentation handling can react to it.
         TransformsUpdater.update_tiling(tiling, config)
+        tile_enabled = bool(config["data"].get("tile_config", {}).get("enable_tiler", False))
 
-        # When DEIM is enabled, the AugmentationSchedulerCallback owns the pipeline;
-        # user augmentation overrides must be ignored.
-        deim_enabled = deim_framework is True
-        if not deim_enabled:
+        # The DEIM adaptive augmentation scheduling framework (mosaic/mixup based)
+        # is incompatible with tiling. The tile recipe intentionally omits the
+        # AugmentationSchedulerCallback and ships a static tiling-friendly pipeline,
+        # so DEIM must be treated as disabled whenever tiling is enabled, regardless
+        # of the requested value. Otherwise the converter would silently ignore the
+        # user's augmentations (deim=True) or add incompatible ones for a tiling run.
+        if not deim_framework or tile_enabled:
+            # DEIM disabled by the user, or forced off because tiling is on ->
+            # remove the scheduler callback and fall back to the static pipeline.
             TransformsUpdater.update(augmentation_params, config)
-            if deim_framework is False:
-                # User explicitly disabled DEIM -> remove the scheduler callback
-                GetiConfigConverter._disable_deim_framework(config)
+            GetiConfigConverter._disable_deim_framework(config)
 
         # Update training hyperparameters
         hyperparams: dict[str, Any] = {

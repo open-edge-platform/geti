@@ -31,6 +31,7 @@ if TYPE_CHECKING:
     from getitune.data.dataset.instance_segmentation import InstanceSegDataset
     from getitune.data.dataset.segmentation import SegmentationDataset
 
+
 # ruff: noqa: SLF001
 # NOTE: Disable private-member-access (SLF001).
 # This is a workaround so we could apply the same transforms to tiles as the original dataset.

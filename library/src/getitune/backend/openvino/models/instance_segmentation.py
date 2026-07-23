@@ -7,6 +7,7 @@ from __future__ import annotations
 import logging as log
 from typing import TYPE_CHECKING, Any, Sequence, cast
 
+import numpy as np
 import torch
 from model_api.tilers import InstanceSegmentationTiler
 from torchvision import tv_tensors
@@ -14,6 +15,7 @@ from torchvision import tv_tensors
 from getitune.backend.openvino.models.base import OVModel
 from getitune.backend.openvino.models.utils import rescale_bboxes_to_original, rescale_masks_to_original
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
+from getitune.data.entity.tile import TileBatchData
 from getitune.data.utils.structures.mask.mask_util import encode_rle
 from getitune.metrics import MetricInput
 from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
@@ -150,7 +152,10 @@ class OVInstanceSegmentationModel(OVModel):
                     dtype=torch.float32,
                 ),
             )
-            scores.append(torch.tensor(output.scores.reshape(-1)))
+            # Cast scores to float32 to match the float32 bboxes. ModelAPI returns numpy
+            # arrays whose default float dtype is float64; a float64/float32 mismatch makes
+            # torchvision NMS fail ("dets should have the same type as scores") during tile merge.
+            scores.append(torch.tensor(output.scores.reshape(-1), dtype=torch.float32))
 
             raw_masks = torch.tensor(output.masks)
             if raw_masks.shape[-2:] == (ori_h, ori_w):
@@ -254,9 +259,95 @@ class OVInstanceSegmentationModel(OVModel):
         compute_kwargs = {"best_confidence_threshold": best_confidence_threshold}
         return super()._compute_metrics(metric, **compute_kwargs)
 
+    def forward_tiles(self, inputs: TileBatchData) -> PredictionBatch:
+        """Run tiled instance segmentation inference and merge tile predictions.
+
+        Delegates tiling to ModelAPI: the datamodule-produced tiles (native-resolution
+        crops) and their absolute coordinates are handed to the ModelAPI
+        :class:`~model_api.tilers.InstanceSegmentationTiler`, which runs inference on
+        each tile and merges the per-tile predictions (boxes, labels, scores and masks)
+        back to the original image coordinate space. The merged ModelAPI
+        :class:`InstanceSegmentationResult` is then converted to a getitune
+        :class:`PredictionBatch`.
+
+        Args:
+            inputs (TileBatchData): Batch of tiles wrapping the original images.
+
+        Returns:
+            PredictionBatch: Merged full-image instance segmentation predictions.
+        """
+        tiler = self._get_tiler()
+        imgs_info = cast("Sequence[ImageInfo]", inputs.imgs_info)
+
+        images: list[torch.Tensor] = []
+        bboxes: list[tv_tensors.BoundingBoxes] = []
+        scores: list[torch.Tensor] = []
+        labels: list[torch.Tensor] = []
+        masks: list[tv_tensors.Mask] = []
+        for img_tiles, tile_infos, ori_info in zip(
+            inputs.batch_tiles,
+            inputs.batch_tile_tile_infos,
+            imgs_info,
+            strict=True,
+        ):
+            ori_h, ori_w = ori_info.ori_shape
+            # ModelAPI expects HWC numpy tiles at their native crop resolution; it resizes
+            # each tile to the model input internally, produces raw per-instance masks and
+            # places them into the full image using the merged, offset boxes.
+            np_tiles = [tile.detach().cpu().numpy().transpose(1, 2, 0) for tile in img_tiles]
+            coords = [[t.x, t.y, t.x + t.width, t.y + t.height] for t in tile_infos]
+            merged: InstanceSegmentationResult = tiler.predict_tiles(np_tiles, coords, (ori_h, ori_w, 3))
+
+            images.append(torch.empty(3, ori_h, ori_w))
+            bboxes.append(
+                tv_tensors.BoundingBoxes(
+                    torch.as_tensor(np.asarray(merged.bboxes), dtype=torch.float32).reshape(-1, 4),
+                    format="XYXY",
+                    canvas_size=(ori_h, ori_w),
+                ),
+            )
+            scores.append(torch.as_tensor(np.asarray(merged.scores), dtype=torch.float32).reshape(-1))
+            # ModelAPI instance labels are 1-based (0 = background); shift to getitune 0-based.
+            labels.append(torch.as_tensor(np.asarray(merged.labels), dtype=torch.long).reshape(-1) - 1)
+            merged_masks = np.asarray(merged.masks)
+            if merged_masks.ndim == 3 and merged_masks.shape[0] > 0:
+                masks.append(tv_tensors.Mask(torch.as_tensor(merged_masks, dtype=torch.bool)))
+            else:
+                masks.append(tv_tensors.Mask(torch.zeros((0, ori_h, ori_w), dtype=torch.bool)))
+
+        return PredictionBatch(
+            images=images,
+            imgs_info=inputs.imgs_info,
+            scores=scores,
+            bboxes=bboxes,
+            labels=labels,
+            masks=masks if any(mask.numel() > 0 for mask in masks) else None,
+        )
+
+    def _get_tiler(self) -> InstanceSegmentationTiler:
+        """Return the ModelAPI instance-seg tiler used to merge tile predictions.
+
+        When the IR was exported with tiling metadata, :meth:`_setup_tiler` has already
+        wrapped ``self.model`` in a :class:`~model_api.tilers.InstanceSegmentationTiler`;
+        that instance (configured from the IR metadata) is reused. Otherwise a tiler is
+        created on demand and cached, configured from the datamodule ``tile_config``.
+        """
+        if isinstance(self.model, InstanceSegmentationTiler):
+            return self.model
+        if getattr(self, "_fallback_tiler", None) is None:
+            self._fallback_tiler = InstanceSegmentationTiler(
+                self.model,
+                configuration={
+                    "iou_threshold": self.tile_config.iou_threshold,
+                    "max_pred_number": self.tile_config.max_num_instances,
+                },
+                execution_mode="sync",
+            )
+        return self._fallback_tiler
+
     def predict_step(self, data_batch: SampleBatch) -> PredictionBatch:
         """Run instance segmentation inference and filter by confidence threshold."""
-        predictions = self(data_batch)
+        predictions = self.forward_tiles(data_batch) if isinstance(data_batch, TileBatchData) else self(data_batch)
         threshold = self.hparams.get("best_confidence_threshold", None)
         if not threshold:
             return predictions
