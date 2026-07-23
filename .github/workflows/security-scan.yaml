@@ -108,10 +108,8 @@ jobs:
     permissions:
       contents: read
     strategy:
-      fail-fast: false
       matrix:
         ai-device: [cpu]
-        scan-tool: [zap-api, zap-full, schemathesis]
     steps:
       - *harden-runner
 
@@ -164,7 +162,6 @@ jobs:
           echo "CONTAINER_NAME=${CONTAINER_NAME}" >> $GITHUB_ENV
 
       - name: Run ZAP API Scan
-        if: matrix.scan-tool == 'zap-api'
         uses: zaproxy/action-api-scan@5158fe4d9d8fcc75ea204db81317cce7f9e5453d # v0.10.0
         with:
           target: "https://localhost:7860/api/openapi.json"
@@ -175,7 +172,6 @@ jobs:
           artifact_name: zapapi
 
       - name: Run ZAP Full Scan
-        if: matrix.scan-tool == 'zap-full'
         uses: zaproxy/action-full-scan@3c58388149901b9a03b7718852c5ba889646c27c # v0.13.0
         with:
           target: "https://localhost:7860"
@@ -185,7 +181,6 @@ jobs:
           artifact_name: zapfull
 
       - name: Run Schemathesis Scan
-        if: matrix.scan-tool == 'schemathesis'
         uses: schemathesis/action@806cace2053cbbac93188e1281ff7da415643160 # v3
         continue-on-error: true
         with:
@@ -205,7 +200,7 @@ jobs:
             --no-color
 
       - name: Upload Schemathesis report
-        if: ${{ always() && matrix.scan-tool == 'schemathesis' }}
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: schemathesis-report-${{ matrix.ai-device }}
@@ -241,7 +236,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: always()
         with:
-          name: container-logs-${{ matrix.ai-device }}-${{ matrix.scan-tool }}
+          name: container-logs
           path: dast-scan-logs/
 
       - name: Stop and Cleanup Container
