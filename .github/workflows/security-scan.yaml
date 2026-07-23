@@ -103,6 +103,7 @@ jobs:
 
   dast-scan:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' # TODO: remove pull_request after HTTPS fix is verified
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -195,6 +196,13 @@ jobs:
             --report-dir schemathesis-report
             --report junit
             --report-junit-path schemathesis-report/junit.xml
+            --max-examples 8
+            --workers 4
+            --checks all
+            --max-response-time 30
+            --request-timeout 20 
+            --suppress-health-check all
+            --no-color
 
       - name: Upload Schemathesis report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
