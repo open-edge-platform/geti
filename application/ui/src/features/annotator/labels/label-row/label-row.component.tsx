@@ -111,6 +111,7 @@ export const LabelRow = ({
                     hotkey={hotkey}
                     onHotkeyChange={(newHotkey) => setHotkey(newHotkey ?? '')}
                     onEnter={handleHotkeyChange}
+                    onBlur={handleHotkeyChange}
                     aria-label={'Edited hotkey'}
                     errorMessage={hotkeyValidationError}
                 />
