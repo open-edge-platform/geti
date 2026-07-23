@@ -78,7 +78,6 @@ class UltralyticsMultiClassClsModel(UltralyticsModel):
             optimization_config={},
             confidence_threshold=None,
             multilabel=False,
-            hierarchical=False,
             iou_threshold=None,
             nms_execute=False,
         )
@@ -156,7 +155,6 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
             optimization_config={},
             confidence_threshold=0.5,
             multilabel=True,
-            hierarchical=False,
             output_raw_scores=True,
             nms_execute=False,
         )

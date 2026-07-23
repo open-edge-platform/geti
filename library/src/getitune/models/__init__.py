@@ -26,7 +26,6 @@ from getitune.backend.lightning.models import (
 )
 from getitune.backend.openvino.models import (
     OVDetectionModel,
-    OVHlabelClassificationModel,
     OVInstanceSegmentationModel,
     OVKeypointDetectionModel,
     OVModel,
@@ -63,7 +62,6 @@ __all__ = [
     "MaskRCNNTV",
     "MobileNetV3",
     "OVDetectionModel",
-    "OVHlabelClassificationModel",
     "OVInstanceSegmentationModel",
     "OVKeypointDetectionModel",
     # OpenVINO models

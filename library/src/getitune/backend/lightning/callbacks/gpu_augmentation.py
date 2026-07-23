@@ -54,7 +54,6 @@ class GPUAugmentationCallback(Callback):
     _DATA_KEYS_BY_TASK: ClassVar[dict[TaskType, tuple[str, ...]]] = {
         TaskType.MULTI_CLASS_CLS: ("label",),
         TaskType.MULTI_LABEL_CLS: ("label",),
-        TaskType.H_LABEL_CLS: ("label",),
         TaskType.DETECTION: ("bbox_xyxy", "label"),
         TaskType.INSTANCE_SEGMENTATION: ("bbox_xyxy", "mask", "label"),
         TaskType.KEYPOINT_DETECTION: ("keypoints", "label"),

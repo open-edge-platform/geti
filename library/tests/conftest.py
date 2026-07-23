@@ -16,7 +16,7 @@ from torchvision.tv_tensors import Mask
 
 from getitune.data.entity.base import ImageInfo
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
-from getitune.types.label import HLabelInfo, LabelInfo, NullLabelInfo, SegLabelInfo
+from getitune.types.label import LabelInfo, NullLabelInfo, SegLabelInfo
 from getitune.types.task import TaskType
 from getitune.utils.device import is_xpu_available
 from tests.utils import ExportCase2Test
@@ -462,73 +462,6 @@ def fxt_multilabel_labelinfo() -> LabelInfo:
             [label_names[2]],
         ],
         label_ids=["0", "1", "2"],
-    )
-
-
-@pytest.fixture
-def fxt_hlabel_multilabel_info() -> HLabelInfo:
-    return HLabelInfo(
-        label_names=[
-            "Heart",
-            "Spade",
-            "Heart_Queen",
-            "Heart_King",
-            "Spade_A",
-            "Spade_King",
-            "Black_Joker",
-            "Red_Joker",
-            "Extra_Joker",
-        ],
-        label_groups=[
-            ["Heart", "Spade"],
-            ["Heart_Queen", "Heart_King"],
-            ["Spade_A", "Spade_King"],
-            ["Black_Joker"],
-            ["Red_Joker"],
-            ["Extra_Joker"],
-        ],
-        num_multiclass_heads=3,
-        num_multilabel_classes=3,
-        head_idx_to_logits_range={"0": (0, 2), "1": (2, 4), "2": (4, 6)},
-        num_single_label_classes=3,
-        empty_multiclass_head_indices=[],
-        class_to_group_idx={
-            "Heart": (0, 0),
-            "Spade": (0, 1),
-            "Heart_Queen": (1, 0),
-            "Heart_King": (1, 1),
-            "Spade_A": (2, 0),
-            "Spade_King": (2, 1),
-            "Black_Joker": (3, 0),
-            "Red_Joker": (3, 1),
-            "Extra_Joker": (3, 2),
-        },
-        all_groups=[
-            ["Heart", "Spade"],
-            ["Heart_Queen", "Heart_King"],
-            ["Spade_A", "Spade_King"],
-            ["Black_Joker"],
-            ["Red_Joker"],
-            ["Extra_Joker"],
-        ],
-        label_to_idx={
-            "Heart": 0,
-            "Spade": 1,
-            "Heart_Queen": 2,
-            "Heart_King": 3,
-            "Spade_A": 4,
-            "Spade_King": 5,
-            "Black_Joker": 6,
-            "Red_Joker": 7,
-            "Extra_Joker": 8,
-        },
-        label_tree_edges=[
-            ["Heart_Queen", "Heart"],
-            ["Heart_King", "Heart"],
-            ["Spade_A", "Spade"],
-            ["Spade_King", "Spade"],
-        ],
-        label_ids=[str(i) for i in range(9)],
     )
 
 

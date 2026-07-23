@@ -4,22 +4,15 @@
 
 import pytest
 import torch
-from datumaro.experimental.categories import (
-    GroupType,
-    HierarchicalLabelCategories,
-    HierarchicalLabelCategory,
-    LabelGroup,
-)
 from lightning import Trainer
 from lightning.pytorch.utilities.types import LRSchedulerConfig
 from pytest_mock import MockerFixture
 
 from getitune.backend.lightning.models.base import DataInputParams, LightningModel
-from getitune.backend.lightning.models.classification.hlabel_models.base import LightningHlabelClsModel
 from getitune.backend.lightning.models.classification.multiclass_models.base import LightningMulticlassClsModel
 from getitune.backend.lightning.models.segmentation.base import LightningSegmentationModel
 from getitune.backend.lightning.schedulers.warmup_schedulers import LinearWarmupScheduler
-from getitune.types.label import HLabelInfo, LabelInfo, SegLabelInfo
+from getitune.types.label import LabelInfo, SegLabelInfo
 
 
 class MockNNModule(torch.nn.Module):
@@ -164,53 +157,6 @@ class TestLightningModel:
             assert isinstance(segmentation_model.label_info, SegLabelInfo)
             assert hasattr(segmentation_model.label_info, "ignore_index")
             assert segmentation_model.label_info.ignore_index == 255
-
-        # test hlabel classification model loading checkpoint with HLabelInfo
-        labels = (
-            HierarchicalLabelCategory(name="vehicle"),
-            HierarchicalLabelCategory(name="car", parent="vehicle"),
-            HierarchicalLabelCategory(name="truck", parent="vehicle"),
-            HierarchicalLabelCategory(name="plush toy", parent="plush toy"),
-            HierarchicalLabelCategory(name="No class"),
-        )
-        label_groups = (
-            LabelGroup(
-                name="Detection labels___vehicle",
-                labels=("car", "truck"),
-                group_type=GroupType.EXCLUSIVE,
-            ),
-            LabelGroup(
-                name="Detection labels___plush toy",
-                labels=("plush toy",),
-                group_type=GroupType.EXCLUSIVE,
-            ),
-            LabelGroup(name="No class", labels=("No class",), group_type=GroupType.RESTRICTED),
-        )
-        dm_label_categories = HierarchicalLabelCategories(items=labels, label_groups=label_groups)
-        hlabel_info = HLabelInfo.from_dm_label_groups(dm_label_categories)
-        hlabel_dict_label_info = hlabel_info.as_dict(normalize_label_names=True)
-
-        with mocker.patch.object(LightningHlabelClsModel, "_create_model", return_value=MockNNModule(3)):
-            hlabel_model = LightningHlabelClsModel(
-                hlabel_dict_label_info,
-                data_input_params={"input_size": (224, 224), "mean": (0.0, 0.0, 0.0), "std": (1.0, 1.0, 1.0)},
-            )
-            hlabel_model.load_state_dict_incrementally(
-                {"state_dict": hlabel_model.state_dict(), "hyper_parameters": {"label_info": hlabel_dict_label_info}},
-            )
-
-            with pytest.raises(TypeError, match=r"unexpected keyword argument.*num_multiclass_heads"):
-                segmentation_model.load_state_dict_incrementally(
-                    {
-                        "state_dict": segmentation_model.state_dict(),
-                        "hyper_parameters": {"label_info": hlabel_dict_label_info},
-                    },
-                )
-
-            with pytest.raises(TypeError, match=r"unexpected keyword argument.*num_multiclass_heads"):
-                cls_model.load_state_dict_incrementally(
-                    {"state_dict": cls_model.state_dict(), "hyper_parameters": {"label_info": hlabel_dict_label_info}},
-                )
 
     def test_lr_scheduler_step(self, mocker: MockerFixture) -> None:
         mock_linear_warmup_scheduler = mocker.create_autospec(spec=LinearWarmupScheduler)

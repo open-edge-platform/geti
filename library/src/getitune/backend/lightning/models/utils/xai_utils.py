@@ -21,11 +21,7 @@ import torch
 from getitune.config.explain import ExplainConfig
 from getitune.data.entity.sample import PredictionBatch
 from getitune.types.explain import TargetExplainGroup
-from getitune.types.label import HLabelInfo, LabelInfoTypes
-
-if TYPE_CHECKING:
-    from torch import LongTensor, Tensor
-
+from getitune.types.label import LabelInfoTypes
 
 ProcessedSaliencyMaps = list[dict[str, np.ndarray | torch.Tensor]]
 
@@ -60,9 +56,7 @@ def process_saliency_maps_in_pred_entity(
 
         pred_labels = []
         for labels, scores in zip(predict_result_per_batch.labels, predict_result_per_batch.scores):  # type: ignore[union-attr, arg-type]
-            if isinstance(label_info, HLabelInfo):
-                pred_labels.append(_convert_labels_from_hcls_format(labels, scores, label_info, conf_thr))
-            elif labels.shape == scores.shape:  # type: ignore[union-attr, attr-defined]
+            if labels.shape == scores.shape:  # type: ignore[union-attr, attr-defined]
                 # Filter out predictions with scores less than explain_config.predicted_maps_conf_thr
                 pred_labels.append(labels[scores > conf_thr].tolist())  # type: ignore[operator]
             else:
@@ -195,28 +189,3 @@ def _crop_padded_map(
     return batch_saliency_map
 
 
-def _convert_labels_from_hcls_format(
-    labels: list[LongTensor],
-    scores: list[Tensor],
-    label_info: HLabelInfo,
-    conf_thr: float,
-) -> list[int]:
-    """Convert the labels indexes from H-label classification label format: [0, 0, 1].
-
-    Based on the information from
-    src.getitune.core.data.dataset.classification.py:HlabelClsDataset:_convert_label_to_hlabel_format.
-    """
-    pred_labels = []
-    for i in range(label_info.num_multiclass_heads):
-        j = labels[i]
-        if scores[i] > conf_thr:
-            label_str = label_info.all_groups[i][j]
-            pred_labels.append(label_info.label_to_idx[label_str])
-    if label_info.num_multilabel_classes:
-        for i in range(label_info.num_multilabel_classes):
-            j = label_info.num_multiclass_heads + i
-            if labels[j] and scores[j] > conf_thr:
-                label_str = label_info.all_groups[j][0]
-                pred_labels.append(label_info.label_to_idx[label_str])
-
-    return pred_labels

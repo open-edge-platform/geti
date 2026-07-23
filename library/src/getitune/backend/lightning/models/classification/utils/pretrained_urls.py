@@ -22,7 +22,7 @@ from __future__ import annotations
 
 _BASE_STORAGE_URL = "https://storage.geti.intel.com/weights"
 
-# ViT / DINOv2 ImageNet-21k checkpoints (shared by multiclass, multilabel, hlabel).
+# ViT / DINOv2 ImageNet-21k checkpoints shared by classification models.
 VIT_PRETRAINED_URLS: dict[str, str] = {
     "vit-tiny": (
         f"{_BASE_STORAGE_URL}/"

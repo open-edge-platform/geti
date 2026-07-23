@@ -98,7 +98,6 @@ class OVEngine(Engine):
             ValueError: If the task type is unsupported or the XML file is invalid.
         """
         task_map = {
-            "classification_hcl": TaskType.H_LABEL_CLS,
             "classification_mlc": TaskType.MULTI_LABEL_CLS,
             "classification_mc": TaskType.MULTI_CLASS_CLS,
             "segmentation": TaskType.SEMANTIC_SEGMENTATION,
@@ -124,9 +123,7 @@ class OVEngine(Engine):
         task_type = task_type.attrib.get("value")
 
         if task_type == "classification":
-            if rt_info.find(".//hierarchical").attrib.get("value") == "True":
-                task_name = task_type + "_hcl"
-            elif rt_info.find(".//multilabel").attrib.get("value") == "True":
+            if rt_info.find(".//multilabel").attrib.get("value") == "True":
                 task_name = task_type + "_mlc"
             else:
                 task_name = task_type + "_mc"
@@ -152,7 +149,6 @@ class OVEngine(Engine):
             ValueError: If the task type is unsupported or the ONNX metadata is missing.
         """
         task_map = {
-            "classification_hcl": TaskType.H_LABEL_CLS,
             "classification_mlc": TaskType.MULTI_LABEL_CLS,
             "classification_mc": TaskType.MULTI_CLASS_CLS,
             "segmentation": TaskType.SEMANTIC_SEGMENTATION,
@@ -171,9 +167,7 @@ class OVEngine(Engine):
             raise ValueError(msg)
 
         if task_type == "classification":
-            if model_info.get("hierarchical") == "True":
-                task_name = task_type + "_hcl"
-            elif model_info.get("multilabel") == "True":
+            if model_info.get("multilabel") == "True":
                 task_name = task_type + "_mlc"
             else:
                 task_name = task_type + "_mc"
