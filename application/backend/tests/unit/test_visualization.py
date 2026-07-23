@@ -64,8 +64,8 @@ class TestDetectionVisualizerCreator(unittest.TestCase):
     def test_applies_project_label_colors(self):
         creator = DetectionVisualizerCreator()
         original_image = np.zeros((100, 100, 3), dtype=np.uint8)
-        predictions = DetectionResult(bboxes, labels)
-        # The result exposes numeric label names ("1", "2", "3"); map two of them to project colors.
+        predictions = DetectionResult(bboxes, labels, label_names=["1", "2", "3"])
+        # The result exposes label names ("1", "2", "3"); map two of them to project colors.
         label_colors = {"1": "#123456", "2": "#abcdef"}
         with mock.patch("model_api.visualizer.scene.DetectionScene") as mock_scene:
             scene = mock_scene.return_value
@@ -106,6 +106,25 @@ class TestClassificationVisualizerCreator(unittest.TestCase):
         result = creator.create_visualization(original_image, predictions)
         self.assertIsInstance(result, np.ndarray)
         self.assertFalse(np.array_equal(result, original_image))
+
+    def test_applies_project_label_colors_as_bg_color(self):
+        creator = ClassificationVisualizerCreator()
+        original_image = np.zeros((100, 100, 3), dtype=np.uint8)
+        classification_labels = [Label(id=1, name="1", confidence=0.9), Label(id=2, name="2", confidence=0.1)]
+        predictions = ClassificationResult(classification_labels)
+        # Only the first label has a project color; the second must keep the default bg_color.
+        label_colors = {"1": "#123456"}
+        with mock.patch("model_api.visualizer.scene.ClassificationScene") as mock_scene:
+            scene = mock_scene.return_value
+            creator.create_visualization(original_image, predictions, label_colors=label_colors)
+        # The recolored labels are handed to the scene via _to_label.
+        scene._to_label.assert_called_once()
+        recolored_labels = scene._to_label.call_args.args[0]
+        by_name = {visualizer_label.label.split(" ")[0]: visualizer_label for visualizer_label in recolored_labels}
+        # Matching label gets the project color as its background.
+        self.assertEqual(by_name["1"].bg_color, "#123456")
+        # Non-matching label keeps the Model API default background color.
+        self.assertEqual(by_name["2"].bg_color, "yellow")
 
 
 class TestVisualizationHelpers(unittest.TestCase):

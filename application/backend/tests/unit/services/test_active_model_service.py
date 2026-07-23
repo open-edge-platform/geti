@@ -101,6 +101,7 @@ class TestActiveModelServiceUnit:
                 variant_id=fxt_model_activation_state.active_model_variant_id,
                 model_xml_path=Path("model.xml"),
                 device=fxt_model_activation_state.device,
+                label_colors=fxt_model_activation_state.label_colors,
             )
 
     def test_force_reload_triggers_unload(self, fxt_active_model_service, tmp_path):
