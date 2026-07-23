@@ -2,8 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { expect, http, test } from '../fixtures';
+import { mockTauriRuntime } from '../utils/mock-tauri-runtime';
 
 test.describe('License agreement (Tauri)', () => {
+    test.beforeEach(async ({ page }) => {
+        // Provide the Tauri IPC bridge that the real desktop webview injects but
+        // Playwright's Chromium does not, so the desktop bundle can boot.
+        await mockTauriRuntime(page);
+    });
+
     test('shows the license screen and accepts the license on Windows', async ({ page, network }) => {
         let licenseAccepted = false;
 
