@@ -92,31 +92,102 @@ class TestBaseWeightsServiceRetryLogic:
             patch.object(fxt_base_weights_service, "_verify_file_integrity", return_value=True),
         ):
             fxt_base_weights_service._download_weights(
-                remote_url="https://example.com/weights.pth",
+                urls=["https://example.com/weights.pth"],
                 local_path=local_path,
                 sha_sum="dummy_sha",
             )
         assert proxy_session.get.called
         assert direct_session.get.called
 
-    def test_download_weights_raises_when_both_connections_fail(self, fxt_base_weights_service):
-        """Test that download raises RuntimeError when both proxy and direct connections fail."""
-        proxy_session = self._make_mock_session()
-        proxy_session.get.side_effect = requests.RequestException("proxy error")
-        direct_session = self._make_mock_session()
-        direct_session.get.side_effect = requests.RequestException("direct error")
+    def test_download_weights_falls_back_to_mirror_when_primary_fails(self, fxt_base_weights_service):
+        """Test that download falls back to the mirror URL when the primary URL fails entirely."""
         local_path = fxt_base_weights_service.pretrained_weights_dir / "detection" / "test_weights.pth"
         with (
             patch.object(fxt_base_weights_service, "_check_disk_space"),
             patch.object(
                 fxt_base_weights_service,
-                "_build_retry_session",
-                side_effect=[proxy_session, direct_session],
-            ),
-            pytest.raises(RuntimeError, match="weights.pth"),
+                "_download_from_url",
+                side_effect=[requests.RequestException("primary failed"), None],
+            ) as mock_download_from_url,
+            patch.object(fxt_base_weights_service, "_verify_file_integrity", return_value=True),
+            patch.object(Path, "rename"),
         ):
             fxt_base_weights_service._download_weights(
-                remote_url="https://example.com/weights.pth",
+                urls=["https://primary.example.com/weights.pth", "https://mirror.example.com/weights.pth"],
+                local_path=local_path,
+                sha_sum="dummy_sha",
+            )
+        assert mock_download_from_url.call_count == 2
+        mock_download_from_url.assert_any_call(
+            "https://primary.example.com/weights.pth", local_path.with_suffix(".tmp")
+        )
+        mock_download_from_url.assert_any_call("https://mirror.example.com/weights.pth", local_path.with_suffix(".tmp"))
+
+    def test_download_weights_falls_back_to_mirror_when_primary_fails_integrity_check(self, fxt_base_weights_service):
+        """Test that download falls back to the mirror URL when the primary URL's file fails checksum verification."""
+        local_path = fxt_base_weights_service.pretrained_weights_dir / "detection" / "test_weights.pth"
+        with (
+            patch.object(fxt_base_weights_service, "_check_disk_space"),
+            patch.object(fxt_base_weights_service, "_download_from_url", return_value=None) as mock_download_from_url,
+            patch.object(fxt_base_weights_service, "_verify_file_integrity", side_effect=[False, True]),
+            patch.object(Path, "rename"),
+            patch.object(Path, "unlink"),
+        ):
+            fxt_base_weights_service._download_weights(
+                urls=["https://primary.example.com/weights.pth", "https://mirror.example.com/weights.pth"],
+                local_path=local_path,
+                sha_sum="dummy_sha",
+            )
+        assert mock_download_from_url.call_count == 2
+
+    def test_download_weights_does_not_use_mirror_when_primary_succeeds(self, fxt_base_weights_service):
+        """Test that the mirror URL is never attempted when the primary URL succeeds."""
+        local_path = fxt_base_weights_service.pretrained_weights_dir / "detection" / "test_weights.pth"
+        with (
+            patch.object(fxt_base_weights_service, "_check_disk_space"),
+            patch.object(fxt_base_weights_service, "_download_from_url", return_value=None) as mock_download_from_url,
+            patch.object(fxt_base_weights_service, "_verify_file_integrity", return_value=True),
+            patch.object(Path, "rename"),
+        ):
+            fxt_base_weights_service._download_weights(
+                urls=["https://primary.example.com/weights.pth", "https://mirror.example.com/weights.pth"],
+                local_path=local_path,
+                sha_sum="dummy_sha",
+            )
+        mock_download_from_url.assert_called_once_with(
+            "https://primary.example.com/weights.pth", local_path.with_suffix(".tmp")
+        )
+
+    def test_download_weights_raises_when_primary_and_mirror_both_fail(self, fxt_base_weights_service):
+        """Test that RuntimeError is raised, naming both URLs, when primary and mirror both fail."""
+        local_path = fxt_base_weights_service.pretrained_weights_dir / "detection" / "test_weights.pth"
+        with (
+            patch.object(fxt_base_weights_service, "_check_disk_space"),
+            patch.object(
+                fxt_base_weights_service,
+                "_download_from_url",
+                side_effect=requests.RequestException("connection error"),
+            ),
+            pytest.raises(RuntimeError, match="primary.example.com.*mirror.example.com|weights.pth"),
+        ):
+            fxt_base_weights_service._download_weights(
+                urls=["https://primary.example.com/weights.pth", "https://mirror.example.com/weights.pth"],
+                local_path=local_path,
+                sha_sum="dummy_sha",
+            )
+
+    def test_download_weights_raises_when_primary_and_mirror_both_fail_integrity(self, fxt_base_weights_service):
+        """Test that RuntimeError is raised when both primary and mirror downloads fail integrity verification."""
+        local_path = fxt_base_weights_service.pretrained_weights_dir / "detection" / "test_weights.pth"
+        with (
+            patch.object(fxt_base_weights_service, "_check_disk_space"),
+            patch.object(fxt_base_weights_service, "_download_from_url", return_value=None),
+            patch.object(fxt_base_weights_service, "_verify_file_integrity", return_value=False),
+            patch.object(Path, "unlink"),
+            pytest.raises(RuntimeError),
+        ):
+            fxt_base_weights_service._download_weights(
+                urls=["https://primary.example.com/weights.pth", "https://mirror.example.com/weights.pth"],
                 local_path=local_path,
                 sha_sum="dummy_sha",
             )
