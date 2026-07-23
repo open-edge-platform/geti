@@ -6,20 +6,20 @@
 from getitune.backend.lightning.models import (
     ATSS,
     DEIMV2,
+    RFDETR,
     RTDETR,
     SSD,
     YOLOX,
     DEIMDFine,
     DFine,
-    RFDETR,
-    RFDETRInst,
-    EdgeCrafter,
     DinoV2Seg,
+    EdgeCrafter,
     EfficientNet,
     LiteHRNet,
     MaskRCNN,
     MaskRCNNTV,
     MobileNetV3,
+    RFDETRInst,
     RTMDetInst,
     RTMPose,
     SegNext,
@@ -47,27 +47,25 @@ try:
         UltralyticsSemanticSegModel,
     )
 except ImportError:
-    ULTRALYTICS_INSTALLED = False
-else:
-    ULTRALYTICS_INSTALLED = True
+    UltralyticsDetectionModel = None  # type: ignore[assignment]
+    UltralyticsInstSegModel = None  # type: ignore[assignment]
+    UltralyticsMultiClassClsModel = None  # type: ignore[assignment]
+    UltralyticsMultiLabelClsModel = None  # type: ignore[assignment]
+    UltralyticsSemanticSegModel = None  # type: ignore[assignment]
 
 __all__ = [
-    # detection
     "ATSS",
     "DEIMV2",
+    "RFDETR",
     "RTDETR",
     "SSD",
     "YOLOX",
     "DEIMDFine",
     "DFine",
-    "RFDETR",
-    "EdgeCrafter",
-    # semantic segmentation
     "DinoV2Seg",
-    # classification
+    "EdgeCrafter",
     "EfficientNet",
     "LiteHRNet",
-    # instance segmentation
     "MaskRCNN",
     "MaskRCNNTV",
     "MobileNetV3",
@@ -75,12 +73,11 @@ __all__ = [
     "OVHlabelClassificationModel",
     "OVInstanceSegmentationModel",
     "OVKeypointDetectionModel",
-    "RFDETRInst",
-    # OpenVINO models
     "OVModel",
     "OVMulticlassClassificationModel",
     "OVMultilabelClassificationModel",
     "OVSegmentationModel",
+    "RFDETRInst",
     "RTMDetInst",
     "RTMPose",
     "SegNext",
@@ -89,7 +86,7 @@ __all__ = [
     "VisionTransformer",
 ]
 
-if ULTRALYTICS_INSTALLED == True:
+if UltralyticsDetectionModel is not None:
     __all__.extend(
         [
             "UltralyticsDetectionModel",
