@@ -11,6 +11,9 @@ from getitune.backend.lightning.models import (
     YOLOX,
     DEIMDFine,
     DFine,
+    RFDETR,
+    RFDETRInst,
+    EdgeCrafter,
     DinoV2Seg,
     EfficientNet,
     LiteHRNet,
@@ -39,10 +42,14 @@ try:
     from getitune.backend.ultralytics.models import (
         UltralyticsDetectionModel,
         UltralyticsInstSegModel,
+        UltralyticsMultiClassClsModel,
+        UltralyticsMultiLabelClsModel,
+        UltralyticsSemanticSegModel,
     )
 except ImportError:
-    UltralyticsDetectionModel = None  # type: ignore[assignment]
-    UltralyticsInstSegModel = None  # type: ignore[assignment]
+    ULTRALYTICS_INSTALLED = False
+else:
+    ULTRALYTICS_INSTALLED = True
 
 __all__ = [
     # detection
@@ -53,6 +60,8 @@ __all__ = [
     "YOLOX",
     "DEIMDFine",
     "DFine",
+    "RFDETR",
+    "EdgeCrafter",
     # semantic segmentation
     "DinoV2Seg",
     # classification
@@ -66,6 +75,7 @@ __all__ = [
     "OVHlabelClassificationModel",
     "OVInstanceSegmentationModel",
     "OVKeypointDetectionModel",
+    "RFDETRInst",
     # OpenVINO models
     "OVModel",
     "OVMulticlassClassificationModel",
@@ -79,10 +89,13 @@ __all__ = [
     "VisionTransformer",
 ]
 
-if UltralyticsDetectionModel is not None:
+if ULTRALYTICS_INSTALLED == True:
     __all__.extend(
         [
             "UltralyticsDetectionModel",
             "UltralyticsInstSegModel",
+            "UltralyticsMultiClassClsModel",
+            "UltralyticsMultiLabelClsModel",
+            "UltralyticsSemanticSegModel",
         ]
     )

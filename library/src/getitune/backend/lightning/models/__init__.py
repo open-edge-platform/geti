@@ -10,8 +10,8 @@ from .classification import (
     TVModel,
     VisionTransformer,
 )
-from .detection import ATSS, DEIMV2, RTDETR, SSD, YOLOX, DEIMDFine, DFine
-from .instance_segmentation import MaskRCNN, MaskRCNNTV, RTMDetInst
+from .detection import ATSS, DEIMV2, RTDETR, SSD, YOLOX, DEIMDFine, DFine, RFDETR, EdgeCrafter
+from .instance_segmentation import MaskRCNN, MaskRCNNTV, RTMDetInst, RFDETRInst
 from .keypoint_detection import RTMPose
 from .segmentation import DinoV2Seg, LiteHRNet, SegNext
 
@@ -23,6 +23,8 @@ __all__ = [
     "YOLOX",
     "DEIMDFine",
     "DFine",
+    "RFDETR",
+    "EdgeCrafter",
     "DinoV2Seg",
     "EfficientNet",
     "LiteHRNet",
@@ -30,6 +32,7 @@ __all__ = [
     "MaskRCNNTV",
     "MobileNetV3",
     "RTMDetInst",
+    "RFDETRInst",
     "RTMPose",
     "SegNext",
     "TVModel",
