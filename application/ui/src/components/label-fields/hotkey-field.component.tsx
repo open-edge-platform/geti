@@ -23,9 +23,18 @@ const isBackspace = (event: KeyboardEvent) => {
     return event.key === 'Backspace';
 };
 
+const isTab = (event: KeyboardEvent) => {
+    return event.key === 'Tab';
+};
+
 export const HotkeyField = ({ hotkey, errorMessage, onEnter, onHotkeyChange, onBlur }: HotkeyFieldProps) => {
     const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         event.preventDefault();
+
+        // We want to allow keyboard navigation with tabs
+        if (isTab(event)) {
+            return;
+        }
 
         if (isBackspace(event)) {
             onHotkeyChange(null);
