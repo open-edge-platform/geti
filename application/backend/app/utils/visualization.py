@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from abc import ABC, abstractmethod
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -29,6 +30,26 @@ def _compute_scale(image: np.ndarray) -> float:
     return max(1.0, longer_edge / float(SCALE_BASELINE))
 
 
+@lru_cache(maxsize=32)
+def _merge_project_colors_cached(
+    label_names: tuple[str, ...], project_colors: tuple[tuple[str, str], ...]
+) -> dict[str, str]:
+    """Cached core of :func:`_merge_project_colors`.
+
+    Keyed on hashable, order-preserving representations of the inputs so that the (typically stable)
+    palette for a loaded model is only built once instead of on every streamed frame. Returns a copy
+    on each call so callers can safely mutate the result without corrupting the cache.
+    """
+    from model_api.visualizer.utils import get_label_color_mapping
+
+    color_per_label = get_label_color_mapping(list(label_names))
+    project_colors_map = dict(project_colors)
+    for name in label_names:
+        if name in project_colors_map:
+            color_per_label[name] = project_colors_map[name]
+    return color_per_label
+
+
 def _merge_project_colors(label_names: list[str], project_colors: dict[str, str]) -> dict[str, str]:
     """Build a label-name to color mapping that prefers the project colors.
 
@@ -36,15 +57,13 @@ def _merge_project_colors(label_names: list[str], project_colors: dict[str, str]
     and overrides it with the project-defined colors wherever the label name matches. This keeps
     the inference stream colors consistent with the label colors used for human annotations and
     AI predictions elsewhere in the project.
-    """
-    from model_api.visualizer.utils import get_label_color_mapping
 
-    color_per_label = get_label_color_mapping(label_names)
-    if project_colors:
-        for name in label_names:
-            if name in project_colors:
-                color_per_label[name] = project_colors[name]
-    return color_per_label
+    The merge is memoized on ``(label_names, project_colors)`` since both are typically stable for a
+    loaded model, avoiding repeated palette construction on every streamed frame. A fresh copy is
+    returned so the caller may mutate it freely.
+    """
+    merged = _merge_project_colors_cached(tuple(label_names), tuple(sorted((project_colors or {}).items())))
+    return dict(merged)
 
 
 class VisualizerCreator(ABC):
