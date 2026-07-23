@@ -65,6 +65,16 @@ experiments:
         priority: deferred
       - name: efficientnet_v2
         priority: extended
+      - name: yolo26_n_cls
+        priority: core
+      - name: yolo26_s_cls
+        priority: deferred
+      - name: yolo26_m_cls
+        priority: deferred
+      - name: yolo26_l_cls
+        priority: deferred
+      - name: yolo26_x_cls
+        priority: extended
     datasets:
       - aid_multilabel
     criteria:
