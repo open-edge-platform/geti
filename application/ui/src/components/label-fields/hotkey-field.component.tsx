@@ -19,9 +19,19 @@ const isEnter = (event: KeyboardEvent) => {
     return event.key === 'Enter';
 };
 
+const isBackspace = (event: KeyboardEvent) => {
+    return event.key === 'Backspace';
+};
+
 export const HotkeyField = ({ hotkey, errorMessage, onEnter, onHotkeyChange, onBlur }: HotkeyFieldProps) => {
     const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         event.preventDefault();
+
+        if (isBackspace(event)) {
+            onHotkeyChange(null);
+
+            return;
+        }
 
         const { key, ctrlKey, altKey, shiftKey, metaKey } = event;
 
