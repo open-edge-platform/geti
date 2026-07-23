@@ -8,6 +8,7 @@ from __future__ import annotations
 from unittest.mock import create_autospec
 
 import pytest
+import torch
 from lightning.pytorch.cli import ReduceLROnPlateau
 from torch import nn
 from torch.optim import Optimizer
@@ -139,6 +140,36 @@ class TestLightningMultilabelClsModel:
         assert isinstance(metric_input, dict)
         assert "preds" in metric_input
         assert "target" in metric_input
+
+    def test_logs_map_metric_under_lowercase_key(
+        self,
+        mocker,
+        mock_optimizer,
+        mock_scheduler,
+    ) -> None:
+        """`MultiLabelClsMetricCallable` reports the multi-label mAP metric under the collection
+
+        key ``"mAP"`` (see ``getitune.metrics.accuracy._multi_label_cls_metric_callable``). It must
+        be logged as ``val/map``/``test/map``, matching the lowercase convention used elsewhere
+        (torchmetrics' own ``MeanAveragePrecision`` keys, and the Ultralytics backend's remapped
+        keys), rather than duplicating a separate ``val/mAP`` display name in the application service.
+        """
+        model = LightningMultilabelClsModel(
+            label_info=1,
+            data_input_params=DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            torch_compile=False,
+            optimizer=mock_optimizer,
+            scheduler=mock_scheduler,
+        )
+        meter = mocker.Mock()
+        meter.compute.return_value = {"accuracy": torch.tensor(0.9), "mAP": torch.tensor(0.8)}
+        log_mock = mocker.patch.object(model, "log")
+
+        model._log_metrics(meter, "val")
+
+        logged_names = {call.args[0] for call in log_mock.call_args_list}
+        assert "val/map" in logged_names
+        assert "val/mAP" not in logged_names
 
 
 class TestLightningHlabelClsModel:

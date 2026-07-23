@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Sequence
+from typing import TYPE_CHECKING, Any, ClassVar, Sequence
 
 import torch
 from torch import Tensor
@@ -53,6 +53,12 @@ class LightningMultilabelClsModel(LightningModel):
         pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
             the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
+
+    # `MultiLabelClsMetricCallable` registers the multi-label mAP metric under the collection key
+    # "mAP" (see getitune.metrics.accuracy._multi_label_cls_metric_callable). Remap it to "map" when
+    # logging so it matches the lowercase convention used elsewhere (torchmetrics' own
+    # MeanAveragePrecision keys, and the Ultralytics backend's remapped keys).
+    _metric_key_mapping: ClassVar[dict[str, str]] = {"mAP": "map"}
 
     def __init__(
         self,

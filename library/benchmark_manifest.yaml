@@ -68,7 +68,7 @@ experiments:
     datasets:
       - aid_multilabel
     criteria:
-      accuracy_metric: mAP
+      accuracy_metric: map
       thresholds:
         "training:val/{metric}": { compare: ">=", margin: 0.10 }
         "torch:test/{metric}": { compare: ">=", margin: 0.10 }
