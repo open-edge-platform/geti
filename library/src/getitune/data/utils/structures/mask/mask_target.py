@@ -77,16 +77,32 @@ def mask_target_single(
         Tensor: Mask target, has shape (num_pos, w, h).
     """
     mask_size = _pair(mask_size)
+    # ``mask_preds`` is produced for *every* positive proposal, so the mask
+    # target count must always equal ``num_pos``. Every early-return below
+    # therefore returns exactly ``num_pos`` (empty) targets rather than zero —
+    # returning fewer would desynchronise the prediction/target counts and crash
+    # the mask loss with "Target size ... must be the same as input size ...".
+    num_pos = pos_proposals.size(0)
     if len(gt_masks) == 0:
         warnings.warn("No ground truth masks are provided!", stacklevel=2)
-        return pos_proposals.new_zeros((0, *mask_size))
+        return pos_proposals.new_zeros((num_pos, *mask_size))
 
     if not isinstance(gt_masks, tv_tensors.Mask):
-        warnings.warn("Unsupported ground truth mask type! Expected tv_tensors.Mask.", stacklevel=2)
-        return pos_proposals.new_zeros((0, *mask_size))
+        # A plain ``torch.Tensor`` of shape (N, H, W) is a perfectly valid mask
+        # representation — it only lost its ``tv_tensors.Mask`` subclass (e.g. via
+        # slicing/indexing upstream, which returns a plain tensor). Re-wrap it and
+        # proceed, since returning zero targets here would silently drop this
+        # image's mask targets and desynchronise the mask prediction/target counts
+        # (raising "Target size must be the same as input size" in the mask loss).
+        # Only genuinely unsupported types (e.g. numpy arrays) fall through to the
+        # count-preserving fallback below.
+        if isinstance(gt_masks, Tensor) and gt_masks.dim() == 3:
+            gt_masks = tv_tensors.Mask(gt_masks)
+        else:
+            warnings.warn("Unsupported ground truth mask type! Expected tv_tensors.Mask.", stacklevel=2)
+            return pos_proposals.new_zeros((num_pos, *mask_size))
 
     device = pos_proposals.device
-    num_pos = pos_proposals.size(0)
     if num_pos > 0:
         proposals_np = pos_proposals.cpu().numpy()
         maxh, maxw = meta_info["img_shape"]

@@ -1213,3 +1213,82 @@ class TestGPUAugmentationCallback:
         for task_type, expected in expected_keys.items():
             data_keys = ["input", *GPUAugmentationCallback._DATA_KEYS_BY_TASK.get(task_type, [])]
             assert data_keys == expected, f"Mismatch for {task_type}: {data_keys} != {expected}"
+
+    def _make_detection_tile_batch(self):  # noqa: ANN202
+        """Build a minimal TileBatchDetDataEntity with two samples of tiles."""
+        from getitune.data.entity.tile import TileBatchDetDataEntity
+
+        def _tile() -> tv_tensors.Image:
+            return tv_tensors.Image(torch.ones(3, 8, 8))
+
+        # Two original images, each split into two tiles.
+        batch_tiles = [[_tile(), _tile()], [_tile(), _tile()]]
+        return TileBatchDetDataEntity(
+            batch_size=2,
+            batch_tiles=batch_tiles,
+            batch_tile_img_infos=[[], []],
+            batch_tile_tile_infos=[[], []],
+            imgs_info=[],
+            bboxes=[],
+            labels=[],
+        )
+
+    def test_apply_pipeline_normalizes_tile_batch(self):
+        """A TileBatchData validation batch is normalized per-tile without error."""
+        from getitune.backend.lightning.callbacks.gpu_augmentation import GPUAugmentationCallback
+        from getitune.types.task import TaskType
+
+        val_config = SubsetConfig(
+            augmentations_gpu=[
+                {
+                    "class_path": "kornia.augmentation.Normalize",
+                    "init_args": {"mean": [0.5, 0.5, 0.5], "std": [0.5, 0.5, 0.5]},
+                },
+            ],
+        )
+        callback = GPUAugmentationCallback(val_config=val_config)
+
+        pl_module = MagicMock()
+        pl_module.task = TaskType.DETECTION
+        pl_module.data_input_params = MagicMock()
+        pl_module.data_input_params.mean = None
+        pl_module.data_input_params.std = None
+        callback.setup(MagicMock(), pl_module, stage="fit")
+
+        tile_batch = self._make_detection_tile_batch()
+
+        # Should not raise AttributeError on ``batch.images`` and should normalize
+        # every tile in place: (1.0 - 0.5) / 0.5 == 1.0 stays 1.0, so use a value
+        # that changes to prove the transform ran.
+        for tiles in tile_batch.batch_tiles:
+            for i in range(len(tiles)):
+                tiles[i] = tv_tensors.Image(torch.full((3, 8, 8), 0.75))
+
+        callback.on_validation_batch_start(MagicMock(), pl_module, tile_batch, batch_idx=0)
+
+        # Normalizing 0.75 with mean 0.5 and std 0.5 yields 0.5 for every tile.
+        for tiles in tile_batch.batch_tiles:
+            for tile in tiles:
+                assert isinstance(tile, tv_tensors.Image)
+                torch.testing.assert_close(tile, tv_tensors.Image(torch.full((3, 8, 8), 0.5)))
+
+    def test_apply_pipeline_tile_batch_no_pipeline_augs(self):
+        """A TileBatchData routed through an empty pipeline is left unchanged (no crash)."""
+        from getitune.backend.lightning.callbacks.gpu_augmentation import GPUAugmentationCallback
+        from getitune.types.task import TaskType
+
+        callback = GPUAugmentationCallback(val_config=SubsetConfig(augmentations_gpu=[]))
+        pl_module = MagicMock()
+        pl_module.task = TaskType.DETECTION
+        pl_module.data_input_params = MagicMock()
+        pl_module.data_input_params.mean = None
+        pl_module.data_input_params.std = None
+        callback.setup(MagicMock(), pl_module, stage="fit")
+
+        tile_batch = self._make_detection_tile_batch()
+        # Must not raise 'TileBatchDetDataEntity object has no attribute images'
+        callback.on_validation_batch_start(MagicMock(), pl_module, tile_batch, batch_idx=0)
+
+        for tiles in tile_batch.batch_tiles:
+            for tile in tiles:
+                torch.testing.assert_close(tile, tv_tensors.Image(torch.ones(3, 8, 8)))

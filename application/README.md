@@ -10,7 +10,7 @@
 [![pytorch](https://img.shields.io/badge/pytorch-2.10-orange)]()
 [![openvino](https://img.shields.io/badge/openvino-2026.2-purple)]()
 
-[Quick start](#quick-start) •
+[Application](#geti-application) •
 [Docs](#documentation) •
 [License](#license)
 
@@ -26,7 +26,6 @@ train and optimize models, and run real-time inference through configurable pipe
   <img src="../assets/application.gif" alt="Application demo" width="100%">
 </p>
 
-
 Main capabilities:
 
 - **No-code model lifecycle**: move from data upload and annotation to training, evaluation, and deployment in one UI.
@@ -34,12 +33,12 @@ Main capabilities:
 - **Pipeline-based deployment**: connect sources (cameras or files) to trained models and route predictions to sinks such as storage, MQTT, or webhooks.
 - **Edge-oriented optimization**: export OpenVINO-optimized models for efficient inference on Intel hardware, with support for other accelerators.
 
-
 ### Install as Windows app
 
 Installing Geti as a Windows app is the simplest way to run it on Windows:
 
 1. Download the `.msix` package from the official Geti release.
+
 - [Download CPU-only version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cpu-3.0.0.msix)
 - [Download Intel® XPU version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-xpu-3.0.0.msix)
 - [Download Nvidia® CUDA version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cuda-3.0.0.msix)
@@ -53,7 +52,6 @@ If Windows shows a security prompt, verify that the package is from the official
 
 The easiest and most straightforward way to run Geti is through Docker.
 We provide pre-built images for Intel® XPU and NVIDIA® CUDA platforms, or you can build your own image from source.
-
 
 <details>
 <summary><strong>Prerequisites</strong></summary>
@@ -82,6 +80,10 @@ docker pull ghcr.io/open-edge-platform/geti-cpu
 # Retag the pulled image as `geti-{cpu,xpu,cuda}:latest` for using with `just run-image`
 docker tag ghcr.io/open-edge-platform/geti-cpu:latest geti-cpu:latest
 ```
+
+> [!IMPORTANT]
+> Pre-built images do not include Ultralytics models, due to AGPL licensing constraints. If you need them, build
+> the image from source as described below.
 
 <details>
 <summary><strong>Advanced: Build the image</strong></summary>
@@ -133,7 +135,6 @@ The cert directory is mounted read-only and is separate from the data volume - i
 > The self-signed certificate triggers a browser security warning. For a trusted local setup, generate a
 > locally-trusted cert with [mkcert](https://github.com/FiloSottile/mkcert) and pass it the same way.
 
-
 </details>
 
 <details>
@@ -171,6 +172,63 @@ docker run --rm -v geti-data:/data alpine ls -l /data/projects/<PROJECT_ID>/mode
 # List the media files of a specific project (replace <PROJECT_ID> with the actual ID)
 docker run --rm -v geti-data:/data alpine ls -l /data/projects/<PROJECT_ID>/dataset
 ```
+
+</details>
+
+<details>
+<summary><strong>Advanced: Air-gapped setup (Pretrained weights cache)</strong></summary>
+
+When deploying Geti in an air-gapped or restricted network environment, the application cannot automatically download
+pretrained model weights from remote repositories. You must manually preconfigure and populate the pretrained weights
+cache before running the application.
+
+#### 1. Locate the download links
+
+To find the exact URLs for the pretrained weights required by a specific model:
+
+- Navigate to the model manifest files bundled with the Geti application backend (e.g., `application/backend/app/supported_models/manifests/classification/vit_tiny.yaml`).
+- Look for the `pretrained_weights.url` attribute within the manifest file to retrieve the direct download link.
+- Note the corresponding `pretrained_weights.sha_sum` attribute - you'll use it to verify the integrity of the downloaded file before placing it in the cache.
+- Note the `pretrained_weights.cache_filename` attribute, if present. This is the filename to use when placing the weights in the cache. If unspecified, use the same basename specified in the URL.
+
+#### 2. Verify file integrity
+
+Before transferring the downloaded weights file into the air-gapped environment, verify it hasn't been tampered with or
+corrupted by comparing its SHA-256 checksum against the `sha_sum` value from the manifest:
+
+```shell
+# Compute the SHA-256 checksum of the downloaded file
+shasum -a 256 /path/to/local/downloaded/<WEIGHTS_FILE_NAME>
+
+# Compare the output against the `pretrained_weights.sha_sum` value in the model manifest.
+# The two values must match exactly before proceeding.
+```
+
+> [!CAUTION]
+> Do not place a weights file into the cache if its checksum doesn't match the manifest's sha_sum. Geti performs this
+> verification automatically when loading cached weights, and a mismatch will cause the file to be treated as invalid -
+> but validating it upfront avoids wasting time transferring a corrupted or tampered file into an air-gapped environment.
+
+#### 3. Populate the pretrained weights cache
+
+Once you have downloaded and verified the integrity of the required weights file on an internet-connected machine,
+transfer it to your air-gapped environment and place it in the application data directory.
+
+Because Geti stores its application data inside the `geti-data` Docker volume, you can use a temporary container to
+inject the downloaded file into the proper cache directory:
+
+```shell
+# Copy the downloaded weights file into the application's pretrained cache folder
+docker run --rm -i -v geti-data:/data alpine sh -c "mkdir -p /data/pretrained_weights/<TASK_TYPE> && cat > /data/pretrained_weights/<TASK_TYPE>/<WEIGHTS_FILE_NAME>" < /path/to/local/downloaded/<WEIGHTS_FILE_NAME>
+
+# Verify that the file is correctly placed
+docker run --rm -v geti-data:/data alpine ls -l /data/pretrained_weights/<TASK_TYPE>
+```
+
+> [!NOTE]
+> Replace `<TASK_TYPE>` with the corresponding model task type (e.g., `classification`, `detection`, or `instance_segmentation`).
+> Replace `<WEIGHTS_FILE_NAME>` with the exact filename retrieved from the manifest.
+> Replace `/path/to/local/downloaded/` with the path to the file on your host machine.
 
 </details>
 
@@ -274,6 +332,10 @@ After the UI starts, you can access the Geti web application at [**http://localh
 
 Please check the [documentation website](https://docs.geti.intel.com/) for detailed guides, API reference,
 and other resources to help you get the most out of Geti.
+
+> **Upgrading an existing installation?** See the [Upgrade guide](./docs/upgrade.md) for how to move to a newer
+> version (Docker or Windows MSIX) while preserving your projects, datasets and models, with automatic rollback
+> if a migration fails.
 
 <details>
 <summary><strong>Advanced: generate the API spec from source </strong></summary>

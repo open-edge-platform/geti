@@ -476,48 +476,47 @@ class DataModule(LightningDataModule):
         config = self.val_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(
-            dataset=dataset,
-            batch_size=config.batch_size,
-            shuffle=False,
-            num_workers=config.num_workers,
-            pin_memory=True,
-            collate_fn=dataset.collate_fn,
-            persistent_workers=config.num_workers > 0,
-            multiprocessing_context=_MP_CONTEXT if config.num_workers > 0 else None,
-        )
+        return DataLoader(**self._eval_loader_kwargs(dataset, config))
 
     def test_dataloader(self) -> DataLoader:
         """Get test dataloader."""
         config = self.test_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(
-            dataset=dataset,
-            batch_size=config.batch_size,
-            shuffle=False,
-            num_workers=config.num_workers,
-            pin_memory=True,
-            collate_fn=dataset.collate_fn,
-            persistent_workers=config.num_workers > 0,
-            multiprocessing_context=_MP_CONTEXT if config.num_workers > 0 else None,
-        )
+        return DataLoader(**self._eval_loader_kwargs(dataset, config))
 
     def predict_dataloader(self) -> DataLoader:
         """Get predict dataloader."""
         config = self.test_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(
-            dataset=dataset,
-            batch_size=config.batch_size,
-            shuffle=False,
-            num_workers=config.num_workers,
-            pin_memory=True,
-            collate_fn=dataset.collate_fn,
-            persistent_workers=config.num_workers > 0,
-            multiprocessing_context=_MP_CONTEXT if config.num_workers > 0 else None,
-        )
+        return DataLoader(**self._eval_loader_kwargs(dataset, config))
+
+    def _eval_loader_kwargs(self, dataset: VisionDataset, config: SubsetConfig) -> dict:
+        """Build ``DataLoader`` keyword arguments for a val/test/predict dataset.
+
+        The batch size, number of workers and pinned-memory behaviour are taken
+        directly from the subset config (i.e. the recipe). This keeps evaluation
+        loading configurable per recipe rather than hardcoded here.
+
+        For tiled evaluation a single original image expands into *every* grid tile
+        (tiles are not filtered by annotation at inference time), so one dataset item
+        can become a large nested tile batch. Recipes therefore keep the tiled
+        val/test ``batch_size`` small (typically 1) so the collated tile batch stays
+        bounded; the model still forwards tiles in groups of
+        ``TileConfig.tile_inference_batch_size`` for GPU efficiency.
+        """
+        num_workers = config.num_workers
+        return {
+            "dataset": dataset,
+            "batch_size": config.batch_size,
+            "shuffle": False,
+            "num_workers": num_workers,
+            "pin_memory": True,
+            "collate_fn": dataset.collate_fn,
+            "persistent_workers": num_workers > 0,
+            "multiprocessing_context": _MP_CONTEXT if num_workers > 0 else None,
+        }
 
     def setup(self, stage: str) -> None:
         """Setup for each stage."""

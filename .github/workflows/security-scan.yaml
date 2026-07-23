@@ -34,7 +34,7 @@ concurrency:
 
 jobs:
   zizmor-scan:
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       security-events: write # Needed to upload the results to code-scanning dashboard
@@ -60,7 +60,7 @@ jobs:
           fail-on-findings: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
 
   bandit-scan:
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       security-events: write # Needed to upload the results to code-scanning dashboard
@@ -79,7 +79,7 @@ jobs:
           fail-on-findings: ${{ github.event_name == 'pull_request' && 'true' || 'false' }}
 
   trivy-scan:
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
     permissions:
       contents: read
@@ -103,7 +103,7 @@ jobs:
 
   dast-scan:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     strategy:
@@ -245,7 +245,7 @@ jobs:
 
   trivy-image-scan:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     strategy:

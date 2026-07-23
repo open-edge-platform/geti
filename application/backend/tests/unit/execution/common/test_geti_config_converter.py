@@ -22,6 +22,14 @@ CHECKPOINT_CALLBACK = {
     "class_path": "lightning.pytorch.callbacks.ModelCheckpoint",
     "init_args": {"dirpath": "", "monitor": "val/map_50"},
 }
+AUG_SCHEDULER_CLASS_PATH = "getitune.backend.lightning.callbacks.aug_scheduler.AugmentationSchedulerCallback"
+
+AUG_SCHEDULER_CALLBACK = {
+    "class_path": AUG_SCHEDULER_CLASS_PATH,
+    "init_args": {
+        "data_aug_switch": {"class_path": "getitune.backend.lightning.callbacks.aug_scheduler.DataAugSwitch"}
+    },
+}
 
 
 def _make_getitune_config(**overrides: Any) -> dict:
@@ -277,6 +285,69 @@ class TestGetiConfigConverterConvert:
 
         idx = GetiConfigConverter.get_callback_idx(result["callbacks"], EARLY_STOPPING_CLASS_PATH)
         assert idx == -1
+
+    def test_convert_excludes_deim_framework_when_tiling_enabled(self) -> None:
+        """DEIM is incompatible with tiling: enabling tiling must exclude the DEIM scheduler callback."""
+        getitune_cfg = _make_getitune_config(
+            callbacks=[
+                copy.deepcopy(EARLY_STOPPING_CALLBACK),
+                copy.deepcopy(CHECKPOINT_CALLBACK),
+                copy.deepcopy(AUG_SCHEDULER_CALLBACK),
+            ]
+        )
+        geti_cfg = _make_geti_config(
+            model_manifest_id="object-detection-dfine-m",
+            hyper_parameters={
+                "dataset_preparation": {
+                    "augmentation": {
+                        "deim_framework": True,
+                        "tiling": {
+                            "enable": True,
+                            "enable_adaptive_tiling": True,
+                            "tile_size": 512,
+                            "tile_overlap": 0.3,
+                        },
+                    }
+                }
+            },
+        )
+
+        with patch("getitune.tools.auto_configurator.AutoConfigurator") as MockAutoConfigurator:
+            MockAutoConfigurator.return_value.config = getitune_cfg
+            result = GetiConfigConverter.convert(geti_cfg)
+
+        # Tiling is enabled ...
+        assert result["data"]["tile_config"]["enable_tiler"] is True
+        # ... and the DEIM augmentation scheduler callback has been excluded.
+        assert GetiConfigConverter.get_callback_idx(result["callbacks"], AUG_SCHEDULER_CLASS_PATH) == -1
+
+    def test_convert_keeps_deim_framework_when_tiling_disabled(self) -> None:
+        """When tiling is disabled and DEIM is enabled, the DEIM scheduler callback is retained."""
+        getitune_cfg = _make_getitune_config(
+            callbacks=[
+                copy.deepcopy(EARLY_STOPPING_CALLBACK),
+                copy.deepcopy(CHECKPOINT_CALLBACK),
+                copy.deepcopy(AUG_SCHEDULER_CALLBACK),
+            ]
+        )
+        geti_cfg = _make_geti_config(
+            model_manifest_id="object-detection-dfine-m",
+            hyper_parameters={
+                "dataset_preparation": {
+                    "augmentation": {
+                        "deim_framework": True,
+                        "tiling": {"enable": False},
+                    }
+                }
+            },
+        )
+
+        with patch("getitune.tools.auto_configurator.AutoConfigurator") as MockAutoConfigurator:
+            MockAutoConfigurator.return_value.config = getitune_cfg
+            result = GetiConfigConverter.convert(geti_cfg)
+
+        assert result["data"]["tile_config"]["enable_tiler"] is False
+        assert GetiConfigConverter.get_callback_idx(result["callbacks"], AUG_SCHEDULER_CLASS_PATH) >= 0
 
     def test_convert_applies_input_size(self) -> None:
         getitune_cfg = _make_getitune_config()
@@ -618,6 +689,48 @@ class TestTransformsUpdater:
         tc = config["data"]["tile_config"]
         assert tc["enable_tiler"] is False
 
+    def test_mosaic_skipped_when_tiling_enabled(self) -> None:
+        """Mosaic must never be added to a tiling pipeline (it is incompatible)."""
+        config = _make_getitune_config()
+        config["data"]["tile_config"]["enable_tiler"] = True
+        TransformsUpdater.update(
+            {"mosaic": {"enable": True, "probability": 1.0}},
+            config,
+        )
+        cpu_augs = config["data"]["train_subset"]["augmentations_cpu"]
+        assert not any("CachedMosaic" in a["class_path"] for a in cpu_augs)
+
+    def test_mixup_skipped_when_tiling_enabled(self) -> None:
+        """MixUp must never be added to a tiling pipeline (it is incompatible)."""
+        config = _make_getitune_config()
+        config["data"]["tile_config"]["enable_tiler"] = True
+        TransformsUpdater.update(
+            {"mixup": {"enable": True, "probability": 0.5, "alpha": 1.5}},
+            config,
+        )
+        cpu_augs = config["data"]["train_subset"]["augmentations_cpu"]
+        assert not any("CachedMixUp" in a["class_path"] for a in cpu_augs)
+
+    def test_mosaic_added_when_tiling_disabled(self) -> None:
+        """Sanity check: mosaic is still added when tiling is off."""
+        config = _make_getitune_config()
+        TransformsUpdater.update(
+            {"mosaic": {"enable": True, "probability": 1.0}},
+            config,
+        )
+        cpu_augs = config["data"]["train_subset"]["augmentations_cpu"]
+        assert any("CachedMosaic" in a["class_path"] for a in cpu_augs)
+
+    def test_mixup_added_when_tiling_disabled(self) -> None:
+        """Sanity check: mixup is still added when tiling is off."""
+        config = _make_getitune_config()
+        TransformsUpdater.update(
+            {"mixup": {"enable": True, "probability": 0.5, "alpha": 1.5}},
+            config,
+        )
+        cpu_augs = config["data"]["train_subset"]["augmentations_cpu"]
+        assert any("CachedMixUp" in a["class_path"] for a in cpu_augs)
+
     def test_gaussian_noise_sigma_renamed_to_std(self) -> None:
         config = _make_getitune_config()
         TransformsUpdater.update(
@@ -655,6 +768,88 @@ class TestGetCallbackIdx:
     def test_not_found(self) -> None:
         callbacks = [{"class_path": "a.B"}]
         assert GetiConfigConverter.get_callback_idx(callbacks, "missing.Class") == -1
+
+
+def _make_deim_getitune_config() -> dict:
+    """A getitune config that includes the DEIM AugmentationSchedulerCallback."""
+    config = _make_getitune_config()
+    config["callbacks"].append({"class_path": AUG_SCHEDULER_CLASS_PATH, "init_args": {}})
+    return config
+
+
+class TestUpdateParamsDeimTiling:
+    """Tests for the DEIM framework / tiling interaction in _update_params.
+
+    Tiling is incompatible with the DEIM adaptive augmentation scheduling
+    framework (mosaic/mixup based). When tiling is enabled the converter must:
+      * force DEIM off (remove the AugmentationSchedulerCallback),
+      * apply the tiling-compatible user augmentations,
+      * never add tiling-incompatible augmentations (mosaic/mixup).
+    """
+
+    def _has_scheduler(self, config: dict) -> bool:
+        return GetiConfigConverter.get_callback_idx(config["callbacks"], AUG_SCHEDULER_CLASS_PATH) > -1
+
+    def test_deim_enabled_no_tiling_keeps_scheduler_and_ignores_augs(self) -> None:
+        config = _make_deim_getitune_config()
+        param_dict = {
+            "dataset_preparation": {
+                "augmentation": {
+                    "deim_framework": True,
+                    "tiling": {"enable": False, "enable_adaptive_tiling": False, "tile_size": 256, "tile_overlap": 0.5},
+                    "random_vertical_flip": {"enable": True, "probability": 0.3},
+                }
+            }
+        }
+        GetiConfigConverter._update_params(config, param_dict)
+
+        # Scheduler kept (DEIM owns the pipeline) and user aug override ignored.
+        assert self._has_scheduler(config)
+        gpu_augs = config["data"]["train_subset"]["augmentations_gpu"]
+        assert not any("VerticalFlip" in a["class_path"] for a in gpu_augs)
+
+    def test_deim_enabled_with_tiling_disables_scheduler(self) -> None:
+        config = _make_deim_getitune_config()
+        param_dict = {
+            "dataset_preparation": {
+                "augmentation": {
+                    "deim_framework": True,
+                    "tiling": {"enable": True, "enable_adaptive_tiling": True, "tile_size": 256, "tile_overlap": 0.5},
+                    "mosaic": {"enable": True, "probability": 1.0},
+                    "random_vertical_flip": {"enable": True, "probability": 0.3},
+                }
+            }
+        }
+        GetiConfigConverter._update_params(config, param_dict)
+
+        # Tiling forces DEIM off -> scheduler removed.
+        assert not self._has_scheduler(config)
+        # Tiling enabled in the data config.
+        assert config["data"]["tile_config"]["enable_tiler"] is True
+        # Mosaic (incompatible) must not be added.
+        cpu_augs = config["data"]["train_subset"]["augmentations_cpu"]
+        assert not any("CachedMosaic" in a["class_path"] for a in cpu_augs)
+        # Compatible augmentations are applied.
+        gpu_augs = config["data"]["train_subset"]["augmentations_gpu"]
+        assert any("VerticalFlip" in a["class_path"] for a in gpu_augs)
+
+    def test_deim_disabled_with_tiling_disables_scheduler_and_skips_mosaic(self) -> None:
+        config = _make_deim_getitune_config()
+        param_dict = {
+            "dataset_preparation": {
+                "augmentation": {
+                    "deim_framework": False,
+                    "tiling": {"enable": True, "enable_adaptive_tiling": True, "tile_size": 256, "tile_overlap": 0.5},
+                    "mixup": {"enable": True, "probability": 0.5, "alpha": 1.5},
+                }
+            }
+        }
+        GetiConfigConverter._update_params(config, param_dict)
+
+        assert not self._has_scheduler(config)
+        assert config["data"]["tile_config"]["enable_tiler"] is True
+        cpu_augs = config["data"]["train_subset"]["augmentations_cpu"]
+        assert not any("CachedMixUp" in a["class_path"] for a in cpu_augs)
 
 
 class TestFullConfigRoundTrip:

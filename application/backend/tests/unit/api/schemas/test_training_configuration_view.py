@@ -631,7 +631,7 @@ def fxt_training_configuration_view_json() -> dict:
                                 "description": (
                                     "Randomly crop images based on Intersection over Union (IoU) criteria. "
                                     "Applied before resize. Note: this augmentation is not supported when "
-                                    "Tiling algorithm is enabled."
+                                    "tiling is enabled."
                                 ),
                                 "depends_on": {"deim_framework": [False, None]},
                                 "parameters": [
@@ -702,7 +702,8 @@ def fxt_training_configuration_view_json() -> dict:
                                 "key": "mosaic",
                                 "name": "Mosaic",
                                 "description": (
-                                    "Combines 4 images into one mosaic for augmentation. Applied before resize."
+                                    "Combines 4 images into one mosaic for augmentation. Applied before resize. "
+                                    "Note: this augmentation is not supported when tiling is enabled."
                                 ),
                                 "depends_on": {"deim_framework": [False, None]},
                                 "parameters": [
@@ -882,7 +883,8 @@ def fxt_training_configuration_view_json() -> dict:
                                 "key": "mixup",
                                 "name": "Mixup",
                                 "description": (
-                                    "Blends two images and their labels for augmentation. Applied before resize."
+                                    "Blends two images and their labels for augmentation. Applied before resize. "
+                                    "Note: this augmentation is not supported when tiling is enabled."
                                 ),
                                 "depends_on": {"deim_framework": [False, None]},
                                 "parameters": [

@@ -61,7 +61,8 @@ class BaseWeightsService:
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
 
-        local_path = self.pretrained_weights_dir / task.name.lower() / Path(manifest.pretrained_weights.url).name
+        local_filename = manifest.pretrained_weights.local_filename
+        local_path = self.pretrained_weights_dir / task.name.lower() / local_filename
         if local_path.exists():
             if self._verify_file_integrity(file_path=local_path, sha_sum=manifest.pretrained_weights.sha_sum):
                 logger.info(f"Using cached weights for {model_manifest_id}: {local_path}")
@@ -94,7 +95,7 @@ class BaseWeightsService:
             bool: True if weights were successfully removed, False if they didn't exist
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
-        local_path = self.pretrained_weights_dir / task.name.lower() / Path(manifest.pretrained_weights.url).name
+        local_path = self.pretrained_weights_dir / task.name.lower() / manifest.pretrained_weights.local_filename
         if local_path.exists():
             try:
                 local_path.unlink()
