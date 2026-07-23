@@ -23,6 +23,7 @@ export const HOTKEYS = {
     magneticLassoTool: 'm',
     selectAllAnnotations: `${CTRL_OR_COMMAND_KEY}+a`,
     deselectAllAnnotations: `${CTRL_OR_COMMAND_KEY}+d`,
+    submitAlternative: `${CTRL_OR_COMMAND_KEY}+enter`,
     submit: 'enter',
 } as const;
 
@@ -35,6 +36,7 @@ const COMMON_HOTKEYS = {
     fitToScreen: HOTKEYS.fitToScreen,
     selectAllAnnotations: HOTKEYS.selectAllAnnotations,
     deselectAllAnnotations: HOTKEYS.deselectAllAnnotations,
+    submitAlternative: HOTKEYS.submitAlternative,
     submit: HOTKEYS.submit,
 } as const;
 
