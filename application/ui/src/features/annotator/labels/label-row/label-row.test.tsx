@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from 'test-utils/render';
 
@@ -120,6 +120,19 @@ describe('LabelRow', () => {
             await userEvent.keyboard('{Enter}');
 
             expect(onUpdate).toHaveBeenCalledWith(label.id, expect.objectContaining({ hotkey: 'a' }));
+        });
+
+        it('calls onUpdate when input is no longer focused', async () => {
+            const onUpdate = vi.fn();
+
+            renderApp({ label, onUpdate });
+
+            const hotkeyInput = screen.getByLabelText(/Hotkey input/i);
+            await userEvent.click(hotkeyInput);
+            await userEvent.keyboard('b');
+            fireEvent.blur(hotkeyInput);
+
+            expect(onUpdate).toHaveBeenCalledWith(label.id, expect.objectContaining({ hotkey: 'b' }));
         });
 
         it('does not call onUpdate when hotkey has validation error', async () => {
