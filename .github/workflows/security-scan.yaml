@@ -108,8 +108,10 @@ jobs:
     permissions:
       contents: read
     strategy:
+      fail-fast: false
       matrix:
         ai-device: [cpu]
+        scan-tool: [zap-api, zap-full, schemathesis]
     steps:
       - *harden-runner
 
@@ -117,11 +119,6 @@ jobs:
         uses: open-edge-platform/geti-ci/actions/cleanup-runner@7e686c1248b3939f8ee8e04e2612da727e379d91
         with:
           type: "initial"
-
-      - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          persist-credentials: false
 
       - name: Pull container image for ${{ matrix.ai-device }}
         env:
@@ -167,6 +164,7 @@ jobs:
           echo "CONTAINER_NAME=${CONTAINER_NAME}" >> $GITHUB_ENV
 
       - name: Run ZAP API Scan
+        if: matrix.scan-tool == 'zap-api'
         uses: zaproxy/action-api-scan@5158fe4d9d8fcc75ea204db81317cce7f9e5453d # v0.10.0
         with:
           target: "https://localhost:7860/api/openapi.json"
@@ -177,15 +175,17 @@ jobs:
           artifact_name: zapapi
 
       - name: Run ZAP Full Scan
+        if: matrix.scan-tool == 'zap-full'
         uses: zaproxy/action-full-scan@3c58388149901b9a03b7718852c5ba889646c27c # v0.13.0
         with:
           target: "https://localhost:7860"
-          cmd_options: '-a -z "-config connection.ssl.skipCertVerification=true"'
+          cmd_options: '-a -j -z "-config connection.ssl.skipCertVerification=true"'
           allow_issue_writing: false
           fail_action: false
           artifact_name: zapfull
 
       - name: Run Schemathesis Scan
+        if: matrix.scan-tool == 'schemathesis'
         uses: schemathesis/action@806cace2053cbbac93188e1281ff7da415643160 # v3
         continue-on-error: true
         with:
@@ -196,17 +196,17 @@ jobs:
             --report-dir schemathesis-report
             --report junit
             --report-junit-path schemathesis-report/junit.xml
-            --max-examples 8
+            --max-examples 100
             --workers 4
             --checks all
             --max-response-time 30
-            --request-timeout 20 
+            --request-timeout 20
             --suppress-health-check all
             --no-color
 
       - name: Upload Schemathesis report
+        if: ${{ always() && matrix.scan-tool == 'schemathesis' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        if: always()
         with:
           name: schemathesis-report-${{ matrix.ai-device }}
           path: schemathesis-report/junit.xml
@@ -241,7 +241,7 @@ jobs:
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: always()
         with:
-          name: container-logs
+          name: container-logs-${{ matrix.ai-device }}-${{ matrix.scan-tool }}
           path: dast-scan-logs/
 
       - name: Stop and Cleanup Container
