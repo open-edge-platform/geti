@@ -10,7 +10,7 @@
 [Supported Tasks & Models](#supported-tasks--models) •
 [Installation](#installation) •
 [Quick Start](#quick-start) •
-[Docs](https://open-edge-platform.github.io/geti/latest/index.html) •
+[Docs](https://docs.geti.intel.com/docs/user-guide/library/get-started/intro) •
 [License](#license)
 
 [![PyPI](https://img.shields.io/pypi/v/getitune)](https://pypi.org/project/getitune)
@@ -62,7 +62,7 @@ All recipes live under `src/getitune/recipe/<task>/`. Pass any of these YAMLs di
 
 | Task                                                      | Recipe directory                                                                                                                                                                                               | Example recipes                                                                                                                                                              |
 | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Classification (multi-class / multi-label / hierarchical) | [multi_class_cls](src/getitune/recipe/classification/multi_class_cls/), [multi_label_cls](src/getitune/recipe/classification/multi_label_cls/), [h_label_cls](src/getitune/recipe/classification/h_label_cls/) | `dino_v2`, `vit_tiny`, `efficientnet_b0`, `efficientnet_b3`, `efficientnet_v2`, `mobilenet_v3_large`                                                                         |
+| Classification (multi-class / multi-label / hierarchical) | [multi_class_cls](src/getitune/recipe/classification/multi_class_cls/), [multi_label_cls](src/getitune/recipe/classification/multi_label_cls/), [h_label_cls](src/getitune/recipe/classification/h_label_cls/) | `dino_v2`, `vit_tiny`, `efficientnet_b0`, `efficientnet_b3`, `efficientnet_v2`, `mobilenet_v3_large`, `yolo26_{n,s,m,l,x}_cls`                                                                         |
 | Object detection                                          | [detection](src/getitune/recipe/detection/)                                                                                                                                                                    | `atss_mobilenetv2`, `ssd_mobilenetv2`, `yolox_{tiny,s,l,x}`, `rtdetr_50`, `dfine_x`, `deim_dfine_{l,m,x}`, `deimv2_{s,m,l}`, `rfdetr_{nano,small,medium,large}`, `yolo26_{n,s,m}` |
 | Instance segmentation                                     | [instance_segmentation](src/getitune/recipe/instance_segmentation/)                                                                                                                                            | `maskrcnn_{r50,swint,efficientnetb2b}`, `rtmdet_inst_tiny`, `rfdetr_seg_{nano,small,medium,large,xlarge,2xlarge}`, `yolo26_{n,s,m}_seg`                                                   |
 | Semantic segmentation                                     | [semantic_segmentation](src/getitune/recipe/semantic_segmentation/)                                                                                                                                            | `dino_v2`, `litehrnet_{s,18,x}`, `segnext_{t,s,b}` (with `_tile` variants)                                                                                                   |
@@ -359,7 +359,7 @@ from getitune.backend.ultralytics.engine import UltralyticsEngine
 from getitune.backend.ultralytics.models import UltralyticsDetectionModel
 
 engine = UltralyticsEngine(
-    model=UltralyticsDetectionModel(model_name="yolo26s"),
+    model=UltralyticsDetectionModel(model_name="yolo26s", label_info=10),  # or datamodule.label_info
     data="/path/to/yolo_dataset/data.yaml",
     work_dir="./yolo_workspace",
     device="auto",

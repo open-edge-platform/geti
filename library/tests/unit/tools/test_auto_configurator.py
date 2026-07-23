@@ -158,6 +158,28 @@ class TestAutoConfigurator:
         assert "Resize" in updated_datamodule.test_subset.augmentations_cpu[0]["class_path"]
         assert not updated_datamodule.tile_config.enable_tiler
 
+    def test_update_ov_subset_pipeline_tiling_keeps_tiler_and_strips_resize(self) -> None:
+        """With tiling enabled, the OV pipeline keeps the tiler on and removes the tile Resize.
+
+        ModelAPI's tiler resizes native crops to the model input internally, so the
+        DataModule must not resize tiles (that would both duplicate the resize and
+        corrupt the tile-to-image coordinate mapping used by OVModel.forward_tiles).
+        """
+        data_root = "tests/assets/detection_coco"
+        auto_configurator = AutoConfigurator(data_root=data_root, task="DETECTION")
+
+        datamodule = auto_configurator.get_datamodule()
+        datamodule.tile_config.enable_tiler = True
+
+        updated_datamodule = auto_configurator.update_ov_subset_pipeline(datamodule, subset="test")
+
+        # Tiling stays enabled: ModelAPI performs tiled inference via forward_tiles.
+        assert updated_datamodule.tile_config.enable_tiler
+        # The model-input Resize is stripped so native-resolution crops reach ModelAPI.
+        assert all(
+            "Resize" not in aug.get("class_path", "") for aug in updated_datamodule.test_subset.augmentations_cpu
+        )
+
     def test_update_ov_subset_pipeline_from_pre_constructed_datasets(self) -> None:
         """Test that update_ov_subset_pipeline works when the datamodule was created via from_vision_datasets (no data_root)."""
         data_root = "tests/assets/detection_coco"

@@ -1,19 +1,22 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import hashlib
 from collections.abc import Generator
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
-from app.models import TaskType
+from app.models import ModelManifest, TaskType
 from app.services.base_weights_service import BaseWeightsService
-from app.services.model_manifest_service import ManifestNotFoundException
+from app.services.model_manifest_service import ManifestNotFoundException, ModelManifestService
 
-DETECTION_MODEL_MANIFEST_ID = "object-detection-ssd-mobilenet-v2"
-DETECTION_WEIGHTS_FILENAME = "mobilenet_v2-2s_ssd-992x736.pth"
+DETECTION_MODEL_MANIFEST_ID = "object-detection-atss-mobilenet-v2"
+DETECTION_WEIGHTS_FILENAME = "mobilenet_v2-atss.pth"
 CLASSIFICATION_MODEL_MANIFEST_ID = "image-classification-vit-tiny"
+CACHE_FILENAME_OVERRIDE = "custom-cache-name.pth"
+WEIGHTS_CONTENT = b"dummy pretrained weights content"
 
 
 @pytest.fixture()
@@ -30,6 +33,21 @@ def fxt_base_weights_service(fxt_pretrained_weights_dir: Path) -> BaseWeightsSer
     return BaseWeightsService(fxt_pretrained_weights_dir.parent)
 
 
+@pytest.fixture
+def fxt_manifest_with_cache_filename() -> ModelManifest:
+    """Manifest whose url/mirror_url filenames differ from its explicit cache_filename."""
+    manifest = ModelManifestService.get_model_manifest_by_id(DETECTION_MODEL_MANIFEST_ID)
+    new_weights = manifest.pretrained_weights.model_copy(
+        update={
+            "url": "https://example.com/some/remote-name.pth",
+            "mirror_url": "https://example.com/mirror/other-name.pth",
+            "cache_filename": CACHE_FILENAME_OVERRIDE,
+            "sha_sum": hashlib.sha256(WEIGHTS_CONTENT).hexdigest(),
+        }
+    )
+    return manifest.model_copy(update={"pretrained_weights": new_weights})
+
+
 class TestBaseWeightsService:
     """Test cases for the BaseWeightsService class."""
 
@@ -38,7 +56,10 @@ class TestBaseWeightsService:
         result = fxt_base_weights_service.get_remote_weights_path(
             task=TaskType.DETECTION, model_manifest_id=DETECTION_MODEL_MANIFEST_ID
         )
-        assert result == "https://storage.geti.intel.com/weights/mobilenet_v2-2s_ssd-992x736.pth"
+        assert result == (
+            "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions"
+            "/models/object_detection/v2/mobilenet_v2-atss.pth"
+        )
 
     def test_get_remote_weights_path_model_not_found(self, fxt_base_weights_service):
         """Test error when model manifest is not found."""
@@ -75,6 +96,52 @@ class TestBaseWeightsService:
 
         expected_path = fxt_base_weights_service.pretrained_weights_dir / "detection" / DETECTION_WEIGHTS_FILENAME
         assert result == expected_path
+
+    def test_get_local_weights_path_uses_cache_filename(
+        self, fxt_base_weights_service, fxt_manifest_with_cache_filename
+    ):
+        """Test that cache_filename, not the url's filename, is used to key the local cache."""
+        with (
+            patch.object(
+                ModelManifestService, "get_model_manifest_by_id", return_value=fxt_manifest_with_cache_filename
+            ),
+            patch.object(
+                fxt_base_weights_service,
+                "_download_weights",
+                side_effect=lambda remote_url, local_path, sha_sum: local_path.write_bytes(WEIGHTS_CONTENT),
+            ),
+        ):
+            result = fxt_base_weights_service.get_local_weights_path(
+                task=TaskType.DETECTION, model_manifest_id=DETECTION_MODEL_MANIFEST_ID, allow_download=True
+            )
+
+        expected_path = fxt_base_weights_service.pretrained_weights_dir / "detection" / CACHE_FILENAME_OVERRIDE
+        assert result == expected_path
+        assert result.exists()
+
+    def test_remove_local_weights_uses_cache_filename(self, fxt_base_weights_service, fxt_manifest_with_cache_filename):
+        """Test that remove_local_weights deletes the file cached under cache_filename, not a url-derived name."""
+        with (
+            patch.object(
+                ModelManifestService, "get_model_manifest_by_id", return_value=fxt_manifest_with_cache_filename
+            ),
+            patch.object(
+                fxt_base_weights_service,
+                "_download_weights",
+                side_effect=lambda remote_url, local_path, sha_sum: local_path.write_bytes(WEIGHTS_CONTENT),
+            ),
+        ):
+            result = fxt_base_weights_service.get_local_weights_path(
+                task=TaskType.DETECTION, model_manifest_id=DETECTION_MODEL_MANIFEST_ID, allow_download=True
+            )
+            assert result.exists()
+
+            is_deleted = fxt_base_weights_service.remove_local_weights(
+                task=TaskType.DETECTION, model_manifest_id=DETECTION_MODEL_MANIFEST_ID
+            )
+
+        assert is_deleted
+        assert not result.exists()
 
     def test_get_local_weights_path_download_required(self, fxt_base_weights_service):
         """Test redownloading when cached file does not exist."""

@@ -1,0 +1,46 @@
+id: image-classification-yolo26-x
+name: YOLO26-X
+license: AGPL-3.0
+
+pretrained_weights:
+  url: https://huggingface.co/Ultralytics/YOLO26/resolve/main/yolo26x-cls.pt
+  mirror_url: https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26x-cls.pt
+  sha_sum: "ee88a0c71e9596cdfdbb71892725929cb4489b874d24fb581d20bffe79724386"
+
+description: "YOLO26-X is the extra-large Ultralytics YOLO26 classification model. It targets maximum accuracy while using the Geti Tune data pipeline for preprocessing and dataset handling."
+stats:
+  gigaflops: 13.6
+  trainable_parameters: 29.6
+  benchmark_metrics:
+    imagenet_top1_accuracy: 79.9
+    imagenet_top5_accuracy: 95.0
+
+hyperparameters:
+  training:
+    learning_rate: 0.000714
+    weight_decay: 0.0005
+    max_epochs: 90
+    early_stopping:
+      enable: false
+    batch_size: 16
+    input_size_width: 224
+    input_size_height: 224
+    scheduler:
+      type: cosine_annealing
+      warmup:
+        enable: true
+        epochs: 3
+    gradient_clip:
+      enable: true
+      max_grad_norm: 10.0
+    gradient_accumulation:
+      enable: false
+  dataset_preparation:
+    augmentation:
+      random_resize_crop:
+        crop_ratio_range:
+          - 0.5
+          - 1.0
+      random_erasing:
+        enable: true
+        probability: 0.4

@@ -21,7 +21,6 @@ from app.api.dependencies import (
     get_media_service,
 )
 from app.api.schemas.media import ImageView, MediaViewAdapter, SetMediaAnnotations, VideoFrameView, VideoView
-from app.main import app
 from app.models import (
     BatchInferenceMedia,
     BatchInferencePrediction,
@@ -105,30 +104,30 @@ def fxt_video_frame_media():
 
 
 @pytest.fixture
-def fxt_media_service() -> MagicMock:
+def fxt_media_service(fxt_app) -> MagicMock:
     media_service = MagicMock(spec=MediaService)
-    app.dependency_overrides[get_media_service] = lambda: media_service
+    fxt_app.dependency_overrides[get_media_service] = lambda: media_service
     return media_service
 
 
 @pytest.fixture
-def fxt_dataset_service() -> MagicMock:
+def fxt_dataset_service(fxt_app) -> MagicMock:
     dataset_service = MagicMock(spec=DatasetService)
-    app.dependency_overrides[get_dataset_service] = lambda: dataset_service
+    fxt_app.dependency_overrides[get_dataset_service] = lambda: dataset_service
     return dataset_service
 
 
 @pytest.fixture
-def fxt_media_prediction_service() -> MagicMock:
+def fxt_media_prediction_service(fxt_app) -> MagicMock:
     media_prediction_service = MagicMock(spec=MediaPredictionService)
-    app.dependency_overrides[get_media_prediction_service] = lambda: media_prediction_service
+    fxt_app.dependency_overrides[get_media_prediction_service] = lambda: media_prediction_service
     return media_prediction_service
 
 
 @pytest.fixture
-def fxt_inference_media_limit() -> Callable[[int], None]:
+def fxt_inference_media_limit(fxt_app) -> Callable[[int], None]:
     def set_limit(limit: int) -> None:
-        app.dependency_overrides[get_inference_media_limit] = lambda: limit
+        fxt_app.dependency_overrides[get_inference_media_limit] = lambda: limit
 
     return set_limit
 

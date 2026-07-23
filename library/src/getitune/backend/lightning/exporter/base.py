@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 import logging as log
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Literal
 
 from onnxruntime.transformers.float16 import convert_float_to_float16
@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from getitune.backend.lightning.models.base import DataInputParams, LightningModel
 
 
-class ModelExporter:
+class ModelExporter(ABC):
     """Base class for the model exporters used in getitune.
 
     Args:

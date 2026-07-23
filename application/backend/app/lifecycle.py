@@ -3,6 +3,7 @@
 
 """Application lifecycle management"""
 
+import json
 import multiprocessing as mp
 import os
 from collections.abc import AsyncGenerator
@@ -17,7 +18,7 @@ from loguru import logger
 
 from app.core.jobs import JobController, JobQueue, ProcessRunnerFactory
 from app.core.jobs.models import JobType
-from app.core.logging import LogConfig, setup_logging, setup_uvicorn_logging
+from app.core.logging import LogConfig, setup_logging
 from app.core.run import Runnable, RunnableFactory
 from app.db import MigrationFatalError, MigrationManager, get_db_session
 from app.execution.builders import (
@@ -52,6 +53,55 @@ from app.webrtc import SDPHandler, WebRTCManager, WebRTCSettings
 # A failed or incompatible schema migration will deterministically fail again,
 # so the launcher/supervisor must NOT restart the process when it sees this code.
 MIGRATION_FATAL_EXIT_CODE = 3
+
+# Name of the machine-readable status file the backend drops into DATA_DIR right
+# before exiting with MIGRATION_FATAL_EXIT_CODE. The Tauri shell reads this file when it sees the
+# fatal exit code, presents the recovery guidance to the user, then deletes it.
+FATAL_STATUS_FILENAME = "fatal_status.json"
+
+
+def write_fatal_status(data_dir: Path, *, reason: str, backup_path: Path | None, database_path: Path) -> None:
+    """Persist a structured description of a fatal startup failure for the UI shell.
+
+    Written to ``<data_dir>/<FATAL_STATUS_FILENAME>`` as JSON so a front-end
+    process (the Tauri side-car supervisor) can surface the exact recovery
+    details — most importantly the backup file location — even when the backend
+    has no console (e.g. Windows release runs with CREATE_NO_WINDOW).
+
+    Failures to write are logged but never raised: the status file is a
+    best-effort convenience on top of the log output, not a hard dependency.
+
+    Args:
+        data_dir: Directory shared with the UI shell (the backend's DATA_DIR).
+        reason: Short machine-readable failure category, e.g. ``"migration"``.
+        backup_path: Location of the pre-migration backup, or ``None`` if none exists.
+        database_path: Path of the database file the backup should be restored to.
+    """
+    status_path = data_dir / FATAL_STATUS_FILENAME
+    payload = {
+        "fatal": reason,
+        "backup_path": str(backup_path) if backup_path is not None else None,
+        "database_path": str(database_path),
+    }
+    try:
+        status_path.write_text(json.dumps(payload), encoding="utf-8")
+        logger.info("Wrote fatal status file for the UI shell: {}", status_path)
+    except OSError as exc:
+        logger.warning("Could not write fatal status file {}: {}", status_path, exc)
+
+
+def clear_fatal_status(data_dir: Path) -> None:
+    """Remove any stale fatal-status file from a previous run.
+
+    Called on a successful startup so a leftover file (e.g. if the UI shell
+    exited before consuming it) can never trigger a spurious recovery dialog on
+    a later, healthy launch.
+    """
+    status_path = data_dir / FATAL_STATUS_FILENAME
+    try:
+        status_path.unlink(missing_ok=True)
+    except OSError as exc:
+        logger.warning("Could not remove stale fatal status file {}: {}", status_path, exc)
 
 
 def setup_job_controller(
@@ -171,7 +221,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
 
     # Setup logging
     setup_logging(config=LogConfig(level=settings.log_level))
-    setup_uvicorn_logging(settings.log_level)
 
     # Initialize database
     migration_manager = MigrationManager(settings)
@@ -199,6 +248,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
                 "application to the previous version."
             )
         logger.error("If the problem persists, please create a ticket on https://github.com/open-edge-platform/geti.")
+        # Drop a machine-readable status file next to the database so the
+        # UI shell can show the exact backup path to the user
+        write_fatal_status(
+            settings.data_dir,
+            reason="migration",
+            backup_path=e.backup_path,
+            database_path=migration_manager.database_path,
+        )
         # loguru is configured with enqueue=True (see setup_logging), so records are emitted
         # from a background thread. os._exit() terminates immediately and would drop any
         # records still on the queue, so drain the sinks before exiting.
@@ -208,6 +265,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
     if not initialized:
         logger.error("Failed to initialize database. Application cannot start.")
         raise RuntimeError("Database initialization failed")
+
+    # Startup succeeded: clear any stale fatal-status file from a previous failed run so
+    # it can't be mistaken for a fresh failure by the UI shell.
+    clear_fatal_status(settings.data_dir)
 
     # Worker processes are created with the "spawn" method to ensure a clean state and avoid issues with shared
     # resources, especially when the workers involve GPU usage or complex libraries that may not be fork-safe.

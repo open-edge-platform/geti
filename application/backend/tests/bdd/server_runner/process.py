@@ -36,7 +36,7 @@ class ProcessRunner(BaseServerRunner):
                 sys.executable,
                 "-m",
                 "hypercorn",
-                "app.main:app",
+                "app.main:create_app",
                 "--insecure-bind",
                 f"0.0.0.0:{port}",
                 "--certfile",
