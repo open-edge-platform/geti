@@ -67,7 +67,7 @@ export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: Pro
     const queryClient = useQueryClient();
 
     const prefetchProject = () => {
-        queryClient.prefetchQuery(getProjectQueryOptions(item.id));
+        void queryClient.prefetchQuery(getProjectQueryOptions(item.id));
     };
 
     return (
