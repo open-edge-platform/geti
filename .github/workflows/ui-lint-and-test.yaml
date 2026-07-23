@@ -293,6 +293,10 @@ jobs:
         working-directory: "application/ui"
         run: tar -xzf dist.tar.gz
 
+      - name: Build UI (Tauri target)
+        working-directory: "application/ui"
+        run: npm run build:tauri
+
       - *download-openapi-spec
 
       - *build-openapi-types
