@@ -8,7 +8,6 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
-import torch
 from torch import nn
 from torchvision.ops import RoIAlign
 
@@ -382,5 +381,3 @@ class MaskRCNN(LightningInstanceSegModel):
                 input_size=(1344, 1344), mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
             ),
         }
-
-

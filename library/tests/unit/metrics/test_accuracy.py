@@ -104,4 +104,3 @@ class TestAccuracy:
         acc = result["accuracy"]
         assert round(acc.item(), 3) == 0.667
         assert len(result["conf_matrix"]) == len(label_names)
-

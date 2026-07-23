@@ -24,5 +24,3 @@ def test_seg_label_info():
         [["background", "label_0"]],
     )
     assert SegLabelInfo.from_num_classes(0) == NullLabelInfo()
-
-

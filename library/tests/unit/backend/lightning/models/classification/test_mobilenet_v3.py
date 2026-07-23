@@ -154,4 +154,3 @@ class TestMobileNetV3MultilabelCls:
         )
 
         assert all(param.requires_grad for param in model.parameters())
-

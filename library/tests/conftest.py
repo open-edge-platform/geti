@@ -289,30 +289,6 @@ def fxt_multi_label_cls_data_entity() -> tuple[MockSample, SampleBatch, SampleBa
 
 
 @pytest.fixture(scope="session")
-def fxt_h_label_cls_data_entity() -> tuple[MockSample, SampleBatch, PredictionBatch]:
-    img_size = (64, 64)
-    fake_images = torch.zeros(size=(1, 3, *img_size), dtype=torch.float32)
-    fake_image_info = ImageInfo(img_idx=0, img_shape=img_size, ori_shape=img_size)
-    fake_labels = LongTensor([0])
-    fake_score = torch.Tensor([0.6])
-    # define data entity
-    single_data_entity = MockSample(image=fake_images[0], img_info=fake_image_info, label=fake_labels)
-    batch_data_entity = SampleBatch(
-        images=fake_images,
-        imgs_info=[fake_image_info],
-        labels=[fake_labels],
-    )
-    batch_pred_data_entity = PredictionBatch(
-        images=fake_images,
-        imgs_info=[fake_image_info],
-        labels=[fake_labels],
-        scores=[fake_score],
-    )
-
-    return single_data_entity, batch_pred_data_entity, batch_data_entity
-
-
-@pytest.fixture(scope="session")
 def fxt_det_data_entity() -> tuple[tuple, MockSample, SampleBatch]:
     img_size = (64, 64)
     fake_image = torch.zeros(size=(3, *img_size), dtype=torch.float32)

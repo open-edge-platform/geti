@@ -486,7 +486,7 @@ class LightningEngine(Engine):
             if explain_config is None:
                 explain_config = ExplainConfig()
 
-            predict_result = process_saliency_maps_in_pred_entity(predict_result, explain_config, datamodule.label_info)
+            predict_result = process_saliency_maps_in_pred_entity(predict_result, explain_config)
 
         return predict_result
 

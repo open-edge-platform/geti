@@ -65,11 +65,6 @@ _TASK_SPECS: list[_TaskSpec] = [
         dataset_dir="multilabel_classification_coco",
     ),
     _TaskSpec(
-        task=TaskType.H_LABEL_CLS,
-        recipe_name="mobilenet_v3_large",
-        dataset_dir="hierarchical_classification_cifar100",
-    ),
-    _TaskSpec(
         task=TaskType.DETECTION,
         recipe_name="ssd_mobilenetv2",
         dataset_dir="detection_coco",
@@ -105,9 +100,7 @@ def _resolve_recipe(spec: _TaskSpec) -> str:
     task_to_subdir = {
         TaskType.MULTI_CLASS_CLS: "classification/multi_class_cls",
         TaskType.MULTI_LABEL_CLS: "classification/multi_label_cls",
-        TaskType.H_LABEL_CLS: "classification/h_label_cls",
         TaskType.DETECTION: "detection",
-        TaskType.ROTATED_DETECTION: "rotated_detection",
         TaskType.INSTANCE_SEGMENTATION: "instance_segmentation",
         TaskType.SEMANTIC_SEGMENTATION: "semantic_segmentation",
         TaskType.KEYPOINT_DETECTION: "keypoint_detection",

@@ -198,5 +198,3 @@ class MultilabelClsDataset(VisionDataset):
             TaskType: The multi-label classification task type.
         """
         return TaskType.MULTI_LABEL_CLS
-
-

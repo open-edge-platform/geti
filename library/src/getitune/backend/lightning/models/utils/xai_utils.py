@@ -12,7 +12,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 import cv2
 import numpy as np
@@ -21,7 +21,6 @@ import torch
 from getitune.config.explain import ExplainConfig
 from getitune.data.entity.sample import PredictionBatch
 from getitune.types.explain import TargetExplainGroup
-from getitune.types.label import LabelInfoTypes
 
 ProcessedSaliencyMaps = list[dict[str, np.ndarray | torch.Tensor]]
 
@@ -29,7 +28,6 @@ ProcessedSaliencyMaps = list[dict[str, np.ndarray | torch.Tensor]]
 def process_saliency_maps_in_pred_entity(
     predict_result: list[PredictionBatch],
     explain_config: ExplainConfig,
-    label_info: LabelInfoTypes,
 ) -> list[PredictionBatch]:
     """Process saliency maps in PredEntity."""
     processed_predict_result = []
@@ -187,5 +185,3 @@ def _crop_padded_map(
             cropped_map = class_map[d_top : map_h - d_bottom, d_left : map_w - d_right]
             batch_saliency_map[i][class_idx] = cropped_map
     return batch_saliency_map
-
-

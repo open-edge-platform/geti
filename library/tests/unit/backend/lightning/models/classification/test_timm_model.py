@@ -130,5 +130,3 @@ class TestTimmModelForMultilabelCls:
             freeze_backbone=False,
         )
         assert all(param.requires_grad for param in model.parameters())
-
-

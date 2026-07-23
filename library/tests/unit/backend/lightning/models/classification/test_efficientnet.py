@@ -154,5 +154,3 @@ class TestEfficientNetForMultilabelCls:
         )
 
         assert all(param.requires_grad for param in model.parameters())
-
-

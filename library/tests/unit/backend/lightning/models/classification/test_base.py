@@ -135,5 +135,3 @@ class TestLightningMultilabelClsModel:
         assert isinstance(metric_input, dict)
         assert "preds" in metric_input
         assert "target" in metric_input
-
-

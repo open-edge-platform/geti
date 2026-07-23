@@ -29,7 +29,7 @@ from getitune.backend.lightning.models.instance_segmentation.segmentors.maskrcnn
 )
 from getitune.config.data import TileConfig
 from getitune.data.entity.base import BatchLoss
-from getitune.data.entity.sample import SampleBatch
+from getitune.data.entity.sample import PredictionBatch, SampleBatch
 from getitune.data.entity.utils import stack_batch
 from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
 
@@ -318,5 +318,3 @@ class MaskRCNNTV(LightningInstanceSegModel):
                 "validate": False,
             },
         }
-
-

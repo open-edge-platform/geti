@@ -123,10 +123,15 @@ class OVEngine(Engine):
         task_type = task_type.attrib.get("value")
 
         if task_type == "classification":
-            if rt_info.find(".//multilabel").attrib.get("value") == "True":
-                task_name = task_type + "_mlc"
-            else:
-                task_name = task_type + "_mc"
+            hierarchical = rt_info.find(".//hierarchical")
+            if hierarchical is not None and hierarchical.attrib.get("value") == "True":
+                msg = "Hierarchical classification models are no longer supported."
+                raise ValueError(msg)
+            multilabel = rt_info.find(".//multilabel")
+            if multilabel is None:
+                msg = "No <multilabel> found for the classification model in the IR metadata."
+                raise ValueError(msg)
+            task_name = task_type + ("_mlc" if multilabel.attrib.get("value") == "True" else "_mc")
         else:
             task_name = task_type
 
@@ -167,10 +172,13 @@ class OVEngine(Engine):
             raise ValueError(msg)
 
         if task_type == "classification":
-            if model_info.get("multilabel") == "True":
-                task_name = task_type + "_mlc"
-            else:
-                task_name = task_type + "_mc"
+            if model_info.get("hierarchical") == "True":
+                msg = "Hierarchical classification models are no longer supported."
+                raise ValueError(msg)
+            if "multilabel" not in model_info:
+                msg = "No 'multilabel' found for the classification model in ONNX metadata."
+                raise ValueError(msg)
+            task_name = task_type + ("_mlc" if model_info.get("multilabel") == "True" else "_mc")
         else:
             task_name = task_type
 
@@ -405,7 +413,7 @@ class OVEngine(Engine):
         if explain and isinstance(datamodule, DataModule):
             if explain_config is None:
                 explain_config = ExplainConfig()
-            predict_result = process_saliency_maps_in_pred_entity(predict_result, explain_config, datamodule.label_info)
+            predict_result = process_saliency_maps_in_pred_entity(predict_result, explain_config)
 
         return predict_result
 
