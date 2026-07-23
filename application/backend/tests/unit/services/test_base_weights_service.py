@@ -168,7 +168,10 @@ class TestBaseWeightsServiceRetryLogic:
                 "_download_from_url",
                 side_effect=requests.RequestException("connection error"),
             ),
-            pytest.raises(RuntimeError, match="primary.example.com.*mirror.example.com|weights.pth"),
+            pytest.raises(
+                RuntimeError,
+                match="https://primary.example.com/weights.pth.*https://mirror.example.com/weights.pth",
+            ),
         ):
             fxt_base_weights_service._download_weights(
                 urls=["https://primary.example.com/weights.pth", "https://mirror.example.com/weights.pth"],

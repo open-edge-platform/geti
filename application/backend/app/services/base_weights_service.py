@@ -213,7 +213,6 @@ class BaseWeightsService:
         Raises:
             RuntimeError: If none of the candidate URLs yield a file that passes integrity verification.
         """
-        self._check_disk_space(urls[0])
         local_path.parent.mkdir(parents=True, exist_ok=True)
         temp_path = local_path.with_suffix(".tmp")
 
@@ -222,6 +221,7 @@ class BaseWeightsService:
             for url in urls:
                 logger.info("Downloading pretrained weights from {}", url)
                 try:
+                    self._check_disk_space(url)
                     self._download_from_url(url, temp_path)
                 except requests.RequestException as e:
                     last_error = e
