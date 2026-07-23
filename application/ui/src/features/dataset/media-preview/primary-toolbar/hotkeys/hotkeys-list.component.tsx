@@ -22,8 +22,7 @@ const HotkeyItem = ({ hotkeyName, hotkey }: HotkeyItemProps) => {
 
 export const HotkeysList = () => {
     const availableTools = useAvailableTools();
-    const submitHotkey =
-        `${formatHotkeyForDisplay(HOTKEYS.submitAlternative)} ` + `or ${formatHotkeyForDisplay(HOTKEYS.submit)}`;
+    const submitHotkey = formatHotkeyForDisplay(HOTKEYS.submit);
 
     return (
         <Grid columns={['2fr', '1fr']} rowGap={'size-100'}>
