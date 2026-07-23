@@ -303,7 +303,7 @@ jobs:
 
       - name: Run Playwright tests
         working-directory: "application/ui"
-        run: npm run test:component -- --project "component" --project "Tauri component tests"
+        run: npm run test:component
 
       - name: Upload blob report to GitHub Actions Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
