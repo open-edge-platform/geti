@@ -102,7 +102,7 @@ jobs:
           ignore_unfixed: "false"
 
   dast-scan:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' # TODO: remove pull_request after HTTPS fix is verified
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -144,12 +144,12 @@ jobs:
             -p 7860:7860 \
             "$IMAGE_NAME"
 
-          TEST_URL="localhost:7860"
+          TEST_URL="https://localhost:7860"
           # Wait for container to be ready (max 60 seconds)
           echo "Waiting for container to be ready..."
           HEALTH_OK=false
           for i in {1..12}; do
-              if curl -sf $TEST_URL/health > /dev/null 2>&1; then
+              if curl -sf --insecure $TEST_URL/health > /dev/null 2>&1; then
                   echo "✅ Health check passed!"
                   HEALTH_OK=true
                   break
@@ -168,9 +168,9 @@ jobs:
       - name: Run ZAP API Scan
         uses: zaproxy/action-api-scan@5158fe4d9d8fcc75ea204db81317cce7f9e5453d # v0.10.0
         with:
-          target: "http://localhost:7860/api/openapi.json"
+          target: "https://localhost:7860/api/openapi.json"
           format: "openapi"
-          cmd_options: "-a"
+          cmd_options: "-a -config ssl.trustAllCerts=true"
           allow_issue_writing: false
           fail_action: false
           artifact_name: zapapi
@@ -178,8 +178,8 @@ jobs:
       - name: Run ZAP Full Scan
         uses: zaproxy/action-full-scan@3c58388149901b9a03b7718852c5ba889646c27c # v0.13.0
         with:
-          target: "http://localhost:7860"
-          cmd_options: "-a -j"
+          target: "https://localhost:7860"
+          cmd_options: "-a -j -config ssl.trustAllCerts=true"
           allow_issue_writing: false
           fail_action: false
           artifact_name: zapfull
@@ -188,9 +188,10 @@ jobs:
         uses: schemathesis/action@806cace2053cbbac93188e1281ff7da415643160 # v3
         continue-on-error: true
         with:
-          schema: "http://localhost:7860/api/openapi.json"
+          schema: "https://localhost:7860/api/openapi.json"
           args: >-
             --continue-on-failure
+            --tls-verify=false
             --report-dir schemathesis-report
             --report junit
             --report-junit-path schemathesis-report/junit.xml
@@ -205,10 +206,10 @@ jobs:
       - name: Re-check container health after testing
         if: always()
         run: |
-          TEST_URL="localhost:7860"
+          TEST_URL="https://localhost:7860"
 
           echo "Running post-scan health check..."
-          if curl -sf $TEST_URL/health > /dev/null 2>&1; then
+          if curl -sf --insecure $TEST_URL/health > /dev/null 2>&1; then
               echo "✅ Post-scan health check passed!"
           else
               echo "❌ Post-scan health check failed"
