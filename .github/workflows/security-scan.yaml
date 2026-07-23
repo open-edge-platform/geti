@@ -170,7 +170,7 @@ jobs:
         with:
           target: "https://localhost:7860/api/openapi.json"
           format: "openapi"
-          cmd_options: "-a -config ssl.trustAllCerts=true"
+          cmd_options: '-a -z "-config connection.ssl.skipCertVerification=true"'
           allow_issue_writing: false
           fail_action: false
           artifact_name: zapapi
@@ -179,7 +179,7 @@ jobs:
         uses: zaproxy/action-full-scan@3c58388149901b9a03b7718852c5ba889646c27c # v0.13.0
         with:
           target: "https://localhost:7860"
-          cmd_options: "-a -j -config ssl.trustAllCerts=true"
+          cmd_options: '-a -z "-config connection.ssl.skipCertVerification=true"'
           allow_issue_writing: false
           fail_action: false
           artifact_name: zapfull
