@@ -12,7 +12,7 @@ import logging
 import warnings
 from abc import abstractmethod
 from dataclasses import asdict, dataclass
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Literal, Sequence
+from typing import TYPE_CHECKING, Any, Callable, Literal, Sequence
 
 import torch
 from lightning import LightningModule, Trainer
@@ -162,11 +162,6 @@ class LightningModel(LightningModule):
 
     _OPTIMIZED_MODEL_BASE_NAME: str = "optimized_model"
     input_size_multiplier: int = 1
-    # Renames metric collection keys before logging (e.g. {"mAP": "map"}), so subclasses whose
-    # metric collection uses a non-standard key can still log under the cross-backend convention
-    # used elsewhere (torchmetrics' own MeanAveragePrecision keys, and the Ultralytics backend's
-    # remapped keys), without duplicating display-name entries in the application service.
-    _metric_key_mapping: ClassVar[dict[str, str]] = {}
 
     def __init__(
         self,
@@ -480,12 +475,11 @@ class LightningModel(LightningModule):
             "ious",
         }
 
-        for raw_name, value in results.items():
-            name = self._metric_key_mapping.get(raw_name, raw_name)
+        for name, value in results.items():
             log_metric_name = f"{key}/{name}"
 
             if not isinstance(value, Tensor) or value.numel() != 1:
-                if raw_name not in _known_non_scalar_keys:
+                if name not in _known_non_scalar_keys:
                     msg = f"Log metric name={log_metric_name} is not a scalar tensor. Skip logging it."
                     warnings.warn(msg, stacklevel=1)
                 continue

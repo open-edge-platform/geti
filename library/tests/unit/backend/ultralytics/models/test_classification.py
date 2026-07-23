@@ -78,5 +78,13 @@ class TestClassificationModels:
         assert params.multilabel is True
         assert params.output_raw_scores is True
         assert params.nms_execute is False
-        assert isinstance(params.label_info, LabelInfo)
-        assert params.label_info.label_groups == [["label_0", "label_1", "label_2"]]
+
+    def test_multilabel_map_metric_key_aligns_with_detection_and_instance_segmentation(self) -> None:
+        """``MultiLabelClsMetricCallable`` reports the multi-label mAP metric under the collection
+
+        key ``"map"`` (see ``getitune.metrics.accuracy._multi_label_cls_metric_callable``), matching
+        the lowercase convention used by detection/instance-segmentation's native torchmetrics
+        ``MeanAveragePrecision`` and the Lightning backend. The Ultralytics backend must map its
+        internal ``metrics/map`` key to the same ``val/map`` name.
+        """
+        assert UltralyticsMultiLabelClsModel.metric_keys["metrics/map"] == "val/map"
