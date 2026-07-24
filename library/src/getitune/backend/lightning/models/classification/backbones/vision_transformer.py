@@ -340,8 +340,9 @@ class VisionTransformerBackbone(BaseModule):
 
             if state_dict["pos_embed"].shape != self.pos_embed.shape:
                 pos_embed = state_dict.pop("pos_embed")
-                if not self.no_embed_class:
-                    pos_embed = pos_embed[:, 1:]
+                # The checkpoint's `pos_embed` always includes a leading position for the
+                # cls token
+                pos_embed = pos_embed[:, 1:]
 
                 state_dict["pos_embed"] = resize_positional_embeddings(
                     pos_embed,
