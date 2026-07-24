@@ -10,9 +10,9 @@ from typing import TYPE_CHECKING
 
 from getitune.types.task import TaskType
 
-from ._dataset_utils import fill_null_annotation_lists
 from .augmentation.pipeline import CPUAugmentationPipeline
 from .dataset.base import Transforms, VisionDataset
+from .utils.utils import fill_null_annotation_lists
 
 if TYPE_CHECKING:
     from datumaro.experimental import Dataset

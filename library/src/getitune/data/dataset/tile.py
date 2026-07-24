@@ -15,7 +15,6 @@ from datumaro.experimental.filtering.filter_registry import create_filtering_tra
 from datumaro.experimental.tiling.tiler_registry import TilingConfig, create_tiling_transform
 from torchvision import tv_tensors
 
-from getitune.data._dataset_utils import fill_null_annotation_lists as _fill_null_annotation_lists
 from getitune.data.entity.sample import BaseSample
 from getitune.data.entity.tile import (
     TileBatchDetDataEntity,
@@ -25,6 +24,7 @@ from getitune.data.entity.tile import (
     TileInstSegDataEntity,
     TileSegDataEntity,
 )
+from getitune.data.utils.utils import fill_null_annotation_lists as _fill_null_annotation_lists
 from getitune.types.task import TaskType
 
 from .base import VisionDataset, _ensure_chw_format
