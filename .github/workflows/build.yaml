@@ -111,11 +111,11 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name != 'pull_request' }}
-          use-cache: ${{ inputs.use-cache == 'true' || github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
+          use-cache: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' || inputs.use-cache == 'true' }}
           # Fork PRs cannot write packages to the upstream org, so disable
           # cache export to avoid 403 errors from GHCR.
           cache-write: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request' }}
-          exclude-agpl-models: ${{ inputs.exclude-agpl-models != 'false' && github.event_name != 'pull_request' && github.event_name != 'merge_group' }}
+          exclude-agpl-models: ${{ github.event_name != 'pull_request' && github.event_name != 'merge_group' && inputs.exclude-agpl-models != 'false' }}
 
       - name: Resolve primary image tag for signing
         if: github.event_name != 'pull_request'
