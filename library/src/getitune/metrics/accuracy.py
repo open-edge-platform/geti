@@ -382,7 +382,7 @@ def _multi_label_cls_metric_callable(label_info: LabelInfo) -> MetricCollection:
     return MetricCollection(
         {
             "accuracy": MultilabelAccuracywithLabelGroup(label_info=label_info),
-            "mAP": MultilabelmAP(label_info=label_info),
+            "map": MultilabelmAP(label_info=label_info),
         },
     )
 
