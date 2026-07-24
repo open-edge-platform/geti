@@ -7,15 +7,6 @@ on:
       - release/**
   pull_request:
   workflow_call:
-    inputs:
-      use-cache:
-        description: "Enable Docker build cache (set to false for cache-free verification builds)"
-        type: string
-        default: 'false'
-      exclude-agpl-models:
-        description: "Exclude Ultralytics and other AGPL-licensed models from the image"
-        type: boolean
-        default: false
   workflow_dispatch:
 
 permissions: {} # No permissions by default on workflow level
@@ -111,11 +102,11 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name != 'pull_request' }}
-          use-cache: ${{ github.event_name != 'workflow_call' || inputs.use-cache == 'true' }}
+          use-cache: ${{ github.event_name != 'workflow_call' }}
           # Fork PRs cannot write packages to the upstream org, so disable
           # cache export to avoid 403 errors from GHCR.
           cache-write: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request' }}
-          exclude-agpl-models: ${{ github.event_name == 'workflow_call' && inputs.exclude-agpl-models }}
+          exclude-agpl-models: ${{ github.event_name == 'workflow_call' }}
 
       - name: Resolve primary image tag for signing
         if: github.event_name != 'pull_request'
