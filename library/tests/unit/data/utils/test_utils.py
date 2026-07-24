@@ -5,7 +5,7 @@
 
 from __future__ import annotations
 
-from types import SimpleNamespace
+from unittest.mock import MagicMock
 
 import polars as pl
 import pytest
@@ -77,7 +77,7 @@ class TestFillNullAnnotationLists:
             },
             schema={"labels": pl.List(pl.UInt32), "areas": pl.List(pl.Float32)},
         )
-        dm_dataset = SimpleNamespace(df=dataframe)
+        dm_dataset = MagicMock(df=dataframe)
 
         result = fill_null_annotation_lists(dm_dataset)
 
@@ -98,7 +98,7 @@ class TestFillNullAnnotationLists:
                 "polygons": pl.List(pl.List(pl.Array(pl.Float32, shape=(2,)))),
             },
         )
-        dm_dataset = SimpleNamespace(df=dataframe)
+        dm_dataset = MagicMock(df=dataframe)
 
         result = fill_null_annotation_lists(dm_dataset)
 
@@ -107,13 +107,13 @@ class TestFillNullAnnotationLists:
 
     def test_leaves_non_list_columns_untouched(self) -> None:
         dataframe = pl.DataFrame({"image_id": [1, 2, 3]}, schema={"image_id": pl.Int32})
-        dm_dataset = SimpleNamespace(df=dataframe)
+        dm_dataset = MagicMock(df=dataframe)
 
         result = fill_null_annotation_lists(dm_dataset)
 
         assert result.df["image_id"].to_list() == [1, 2, 3]
 
-    @pytest.mark.parametrize("bad_dataset", [SimpleNamespace(dataframe=None), object(), "not-a-dataset", 42])
+    @pytest.mark.parametrize("bad_dataset", [MagicMock(df=None), object(), "not-a-dataset", 42])
     def test_defensive_on_non_dataframe_like_input(self, bad_dataset) -> None:
         """Should not raise for dataset-like test doubles without a real dataframe."""
         result = fill_null_annotation_lists(bad_dataset)

@@ -15,7 +15,7 @@ from datumaro.experimental.filtering.filter_registry import create_filtering_tra
 from datumaro.experimental.tiling.tiler_registry import TilingConfig, create_tiling_transform
 from torchvision import tv_tensors
 
-from getitune.data.entity.sample import BaseSample
+from getitune.data.entity.sample import BaseSample, DetectionSample, InstanceSegmentationSample
 from getitune.data.entity.tile import (
     TileBatchDetDataEntity,
     TileBatchInstSegDataEntity,
@@ -196,14 +196,19 @@ class TileDataset(VisionDataset):
                     if transformed is None:
                         continue
                     # Undo transform corruption of empty tensors (e.g. `Resize`
-                    # turns ``(0,4)`` into ``(1,0)``).
-                    label_tensor = getattr(transformed, "label", None)
-                    if label_tensor is not None and len(label_tensor) == 0:
+                    # turns ``(0,4)`` into ``(1,0)``). Only detection / instance
+                    # segmentation samples carry `bboxes`/`label` fields.
+                    if (
+                        isinstance(transformed, (DetectionSample, InstanceSegmentationSample))
+                        and transformed.label is not None
+                        and len(transformed.label) == 0
+                    ):
                         shape = transformed.img_info.img_shape
                         transformed.bboxes = tv_tensors.BoundingBoxes(
                             torch.zeros((0, 4), dtype=torch.float32),
-                            format="XYXY",
+                            format=tv_tensors.BoundingBoxFormat.XYXY,
                             canvas_size=shape,
+                            dtype=torch.float32,
                         )
                         transformed.label = torch.zeros(0, dtype=torch.long)
                     tile_entities.append(transformed)
