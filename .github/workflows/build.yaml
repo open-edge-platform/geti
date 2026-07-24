@@ -10,8 +10,8 @@ on:
     inputs:
       use-cache:
         description: "Enable Docker build cache (set to false for cache-free verification builds)"
-        type: boolean
-        default: true
+        type: string
+        default: 'true'
       exclude-agpl-models:
         description: "Exclude Ultralytics and other AGPL-licensed models from the image"
         type: boolean
@@ -111,7 +111,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           push: ${{ github.event_name != 'pull_request' }}
-          use-cache: ${{ github.event_name != 'workflow_call' || inputs.use-cache == true }}
+          use-cache: ${{ github.event_name != 'workflow_call' || inputs.use-cache != 'false' }}
           # Fork PRs cannot write packages to the upstream org, so disable
           # cache export to avoid 403 errors from GHCR.
           cache-write: ${{ github.event.pull_request.head.repo.full_name == github.repository || github.event_name != 'pull_request' }}
