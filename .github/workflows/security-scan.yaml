@@ -103,6 +103,7 @@ jobs:
 
   dast-scan:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 90
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -116,11 +117,6 @@ jobs:
         uses: open-edge-platform/geti-ci/actions/cleanup-runner@7e686c1248b3939f8ee8e04e2612da727e379d91
         with:
           type: "initial"
-
-      - name: Checkout code
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          persist-credentials: false
 
       - name: Pull container image for ${{ matrix.ai-device }}
         env:
@@ -144,12 +140,12 @@ jobs:
             -p 7860:7860 \
             "$IMAGE_NAME"
 
-          TEST_URL="localhost:7860"
+          TEST_URL="https://localhost:7860"
           # Wait for container to be ready (max 60 seconds)
           echo "Waiting for container to be ready..."
           HEALTH_OK=false
           for i in {1..12}; do
-              if curl -sf $TEST_URL/health > /dev/null 2>&1; then
+              if curl -sf --insecure $TEST_URL/health > /dev/null 2>&1; then
                   echo "✅ Health check passed!"
                   HEALTH_OK=true
                   break
@@ -168,9 +164,9 @@ jobs:
       - name: Run ZAP API Scan
         uses: zaproxy/action-api-scan@5158fe4d9d8fcc75ea204db81317cce7f9e5453d # v0.10.0
         with:
-          target: "http://localhost:7860/api/openapi.json"
+          target: "https://localhost:7860/api/openapi.json"
           format: "openapi"
-          cmd_options: "-a"
+          cmd_options: '-a -z "-config connection.ssl.skipCertVerification=true"'
           allow_issue_writing: false
           fail_action: false
           artifact_name: zapapi
@@ -178,8 +174,8 @@ jobs:
       - name: Run ZAP Full Scan
         uses: zaproxy/action-full-scan@3c58388149901b9a03b7718852c5ba889646c27c # v0.13.0
         with:
-          target: "http://localhost:7860"
-          cmd_options: "-a -j"
+          target: "https://localhost:7860"
+          cmd_options: '-a -j -z "-config connection.ssl.skipCertVerification=true"'
           allow_issue_writing: false
           fail_action: false
           artifact_name: zapfull
@@ -188,16 +184,24 @@ jobs:
         uses: schemathesis/action@806cace2053cbbac93188e1281ff7da415643160 # v3
         continue-on-error: true
         with:
-          schema: "http://localhost:7860/api/openapi.json"
+          schema: "https://localhost:7860/api/openapi.json"
           args: >-
             --continue-on-failure
+            --tls-verify=false
             --report-dir schemathesis-report
             --report junit
             --report-junit-path schemathesis-report/junit.xml
+            --max-examples 20
+            --workers 4
+            --checks all
+            --max-response-time 30
+            --request-timeout 20
+            --suppress-health-check all
+            --no-color
 
       - name: Upload Schemathesis report
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: schemathesis-report-${{ matrix.ai-device }}
           path: schemathesis-report/junit.xml
@@ -205,10 +209,10 @@ jobs:
       - name: Re-check container health after testing
         if: always()
         run: |
-          TEST_URL="localhost:7860"
+          TEST_URL="https://localhost:7860"
 
           echo "Running post-scan health check..."
-          if curl -sf $TEST_URL/health > /dev/null 2>&1; then
+          if curl -sf --insecure $TEST_URL/health > /dev/null 2>&1; then
               echo "✅ Post-scan health check passed!"
           else
               echo "❌ Post-scan health check failed"
