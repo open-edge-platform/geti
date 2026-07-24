@@ -547,6 +547,20 @@ class TestDatasetNeedsSingleProcessLoading:
 
         assert _dataset_needs_single_process_loading(dataset) is True
 
+    def test_detects_function_closure_in_later_row(self) -> None:
+        """A closure that only appears in a later row (not row 0) must still be detected."""
+        import polars as pl
+
+        from getitune.data.module import _dataset_needs_single_process_loading
+
+        def _closure() -> None:
+            """A nested function, structurally like datumaro's unpicklable lazy-image loader."""
+
+        dataframe = pl.DataFrame({"mask": pl.Series([None, 1, _closure], dtype=pl.Object)})
+        dataset = MagicMock(dm_subset=MagicMock(df=dataframe))
+
+        assert _dataset_needs_single_process_loading(dataset) is True
+
     def test_no_object_columns_returns_false(self) -> None:
         import polars as pl
 

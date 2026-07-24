@@ -59,8 +59,11 @@ def _dataset_needs_single_process_loading(dataset: VisionDataset) -> bool:
         for name, dtype in dataframe.schema.items():
             if str(dtype) != "Object":
                 continue
-            sample = dataframe[name][0]
-            if isinstance(sample, types.FunctionType):
+            # Scan the whole column (short-circuiting on the first hit): a closure
+            # may not appear in the first row (e.g. mixed lazy/eager samples), so
+            # only checking `dataframe[name][0]` could miss it and let a crash
+            # slip through on a later batch.
+            if any(isinstance(sample, types.FunctionType) for sample in dataframe[name]):
                 return True
     except (AttributeError, TypeError):
         # Defensive: don't let detection itself break dataloader construction for
