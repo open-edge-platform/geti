@@ -121,7 +121,7 @@ export default [
             'import/resolver': {
                 node: {
                     paths: ['src'],
-                    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+                    extensions: ['.d.ts', '.js', '.jsx', '.ts', '.tsx', '.json'],
                 },
 
                 typescript: {
