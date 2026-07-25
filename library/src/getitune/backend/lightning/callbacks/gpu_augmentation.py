@@ -15,6 +15,7 @@ from torchvision import tv_tensors
 
 from getitune.data.augmentation import GPUAugmentationPipeline
 from getitune.data.entity.sample import SampleBatch
+from getitune.data.entity.tile import TileBatchData
 from getitune.types.task import TaskType
 
 if TYPE_CHECKING:
@@ -129,7 +130,7 @@ class GPUAugmentationCallback(Callback):
     def _apply_pipeline(
         self,
         pipeline: GPUAugmentationPipeline,
-        batch: SampleBatch,
+        batch: SampleBatch | TileBatchData,
     ) -> None:
         """Apply GPU augmentation pipeline to batch (in-place).
 
@@ -138,8 +139,17 @@ class GPUAugmentationCallback(Callback):
 
         Args:
             pipeline: GPUAugmentationPipeline to apply.
-            batch: SampleBatch to transform.
+            batch: SampleBatch (or TileBatchData when tiling is enabled) to transform.
         """
+        # Tile batches (produced during validation/testing when tiling is enabled)
+        # store their images per-tile in ``batch_tiles`` and keep annotations at the
+        # original-image level, so they do not expose ``batch.images``.  Only image
+        # transforms such as normalization are meaningful for the individual tiles;
+        # their predictions are merged back to the original image afterwards.
+        if isinstance(batch, TileBatchData):
+            self._apply_pipeline_to_tiles(pipeline, batch)
+            return
+
         # Move pipeline to same device as batch
         device = batch.images.device if hasattr(batch.images, "device") else None
         if device is not None:
@@ -212,6 +222,35 @@ class GPUAugmentationCallback(Callback):
 
                 batch.keypoints = typing.cast("list[torch.Tensor] | None", restored_keypoints)
 
+    def _apply_pipeline_to_tiles(
+        self,
+        pipeline: GPUAugmentationPipeline,
+        batch: TileBatchData,
+    ) -> None:
+        """Apply image-only GPU augmentations (e.g. normalization) to each tile in-place.
+
+        During validation/testing with tiling, the batch is a ``TileBatchData`` whose
+        images are stored per-tile in ``batch_tiles`` (annotations are kept at the
+        original-image level and used only for tile-merging afterwards). The standard
+        ``SampleBatch`` path does not apply here since there is no ``batch.images``.
+
+        Each tile image is passed through the pipeline on its own (as a single-image
+        batch). Only image transforms such as normalization are relevant for tiles;
+        geometric annotation handling is intentionally skipped because tiles carry no
+        per-tile annotations at this stage.
+
+        Args:
+            pipeline: GPUAugmentationPipeline to apply.
+            batch: TileBatchData whose tiles are transformed in-place.
+        """
+        for tiles in batch.batch_tiles:
+            for tile_idx, tile in enumerate(tiles):
+                device = tile.device if hasattr(tile, "device") else None
+                tile_pipeline = pipeline.to(device) if device is not None else pipeline
+                augmented = tile_pipeline.apply_image_only(tile.unsqueeze(0)).squeeze(0)
+                # Re-wrap as an Image tv_tensor so downstream tile handling keeps its type.
+                tiles[tile_idx] = tv_tensors.Image(augmented)  # type: ignore[no-matching-overload]
+
     def on_train_batch_start(
         self,
         trainer: Trainer,
@@ -229,7 +268,7 @@ class GPUAugmentationCallback(Callback):
         self,
         trainer: Trainer,
         pl_module: LightningModule,
-        batch: SampleBatch,
+        batch: SampleBatch | TileBatchData,
         batch_idx: int,
         dataloader_idx: int = 0,
     ) -> None:
@@ -243,7 +282,7 @@ class GPUAugmentationCallback(Callback):
         self,
         trainer: Trainer,
         pl_module: LightningModule,
-        batch: SampleBatch,
+        batch: SampleBatch | TileBatchData,
         batch_idx: int,
         dataloader_idx: int = 0,
     ) -> None:

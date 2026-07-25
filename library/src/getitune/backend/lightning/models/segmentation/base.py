@@ -238,7 +238,7 @@ class LightningSegmentationModel(PretrainedWeightsMixin, LightningModel):
             self.tile_config,
             self.explain_mode,
         )
-        for batch_tile_infos, batch_tile_input in inputs.unbind():
+        for batch_tile_infos, batch_tile_input in inputs.unbind(self.tile_config.tile_inference_batch_size):
             tile_size = (batch_tile_infos[0].height, batch_tile_infos[0].width)
             output = self.model(
                 inputs=batch_tile_input.images,
