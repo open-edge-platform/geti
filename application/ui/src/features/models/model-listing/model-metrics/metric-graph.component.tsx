@@ -1,7 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Flex, View } from '@geti-ui/ui';
+import { ActionButton, DOMRefValue, Flex, useUnwrapDOMRef, View } from '@geti-ui/ui';
+import { DownloadIcon } from '@geti-ui/ui/icons';
+import { useCallback, useRef } from 'react';
 import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { Box } from '../components/box/box.component';
@@ -22,12 +24,13 @@ const X_AXIS_TICK_COUNT = 8;
 const Y_AXIS_TICK_COUNT = 4;
 
 export const MetricGraph = ({ title, data, xAxisLabel, yAxisLabel }: MetricGraphProps) => {
-    const graphRef = useRef<HTMLDivElement>(null);
+    const graphRef = useRef<DOMRefValue<HTMLDivElement>>(null);
+    const unwrappedGraphRef = useUnwrapDOMRef(graphRef);
 
     const handleDownload = useCallback(() => {
-        if (!graphRef.current) return;
+        if (!unwrappedGraphRef.current) return;
 
-        const svgElement = graphRef.current.querySelector('svg');
+        const svgElement = unwrappedGraphRef.current.querySelector('svg');
         if (!svgElement) return;
 
         // Clone the SVG so we don't modify the original
