@@ -23,7 +23,7 @@ permissions: {} # No permissions by default
 jobs:
   validate:
     name: Validate inputs and release tag
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     outputs:
@@ -98,7 +98,7 @@ jobs:
     needs: validate
     if: inputs.dry_run == false
     name: Tag release image as latest
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     environment: production
     permissions:
       packages: write # Permission to push packages to GHCR

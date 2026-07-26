@@ -564,7 +564,9 @@ class AugmentationParameters(BaseModel):
             "training time. When disabled, a simpler static augmentation pipeline "
             "is used instead, allowing direct control over individual augmentations. "
             "WARNING: when the DEIM framework is enabled, all other augmentation "
-            "parameters below are ignored and will have no effect on training."
+            "parameters below are ignored and will have no effect on training. "
+            "Note: the DEIM framework is not supported when tiling is "
+            "enabled and will be automatically disabled in that case."
         ),
     )
     random_zoom_out: RandomZoomOut | None = Field(
@@ -581,14 +583,17 @@ class AugmentationParameters(BaseModel):
         description=(
             "Randomly crop images based on Intersection over Union (IoU) criteria. "
             "Applied before resize. "
-            "Note: this augmentation is not supported when Tiling algorithm is enabled."
+            "Note: this augmentation is not supported when tiling is enabled."
         ),
         json_schema_extra={"depends_on": {"deim_framework": [False, None]}},
     )
     mosaic: Mosaic | None = Field(
         default=None,
         title="Mosaic",
-        description="Combines 4 images into one mosaic for augmentation. Applied before resize.",
+        description=(
+            "Combines 4 images into one mosaic for augmentation. Applied before resize. "
+            "Note: this augmentation is not supported when tiling is enabled."
+        ),
         json_schema_extra={"depends_on": {"deim_framework": [False, None]}},
     )
     random_resize_crop: RandomResizeCrop | None = Field(
@@ -597,7 +602,7 @@ class AugmentationParameters(BaseModel):
         description=(
             "Randomly resize and crop the image. Applied instead of resize. "
             "When disabled, a standard resize to the target input size is used instead. "
-            "Note: this augmentation is not supported when Tiling algorithm is enabled."
+            "Note: this augmentation is not supported when tiling is enabled."
         ),
         json_schema_extra={"depends_on": {"deim_framework": [False, None]}},
     )
@@ -613,7 +618,10 @@ class AugmentationParameters(BaseModel):
     mixup: Mixup | None = Field(
         default=None,
         title="Mixup",
-        description="Blends two images and their labels for augmentation. Applied before resize.",
+        description=(
+            "Blends two images and their labels for augmentation. Applied before resize. "
+            "Note: this augmentation is not supported when tiling is enabled."
+        ),
         json_schema_extra={"depends_on": {"deim_framework": [False, None]}},
     )
     random_horizontal_flip: RandomHorizontalFlip | None = Field(

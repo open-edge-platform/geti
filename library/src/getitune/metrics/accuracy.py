@@ -169,17 +169,21 @@ class MulticlassAccuracywithLabelGroup(AccuracywithLabelGroup):
 class MultilabelAccuracywithLabelGroup(AccuracywithLabelGroup):
     """Accuracy class for the multi-label classification with label_group.
 
-    For the multi-label classification, the number of label_groups should be the same with number of labels.
-    All lable_group represents whether the label exist or not (binary classification).
+    Each label is an independent binary presence/absence signal. ``label_info``
+    for multi-label tasks holds all label names in a single combined group
+    (see ``MultilabelClsDataset.label_info`` / ``UltralyticsModel._dispatch_label_info``),
+    so this metric evaluates one binary confusion matrix per individual label
+    (i.e. per column of ``preds``/``target``) via ``label_info.label_names``,
+    rather than per entry of ``label_info.label_groups``.
     """
 
     def _compute_unnormalized_confusion_matrices(self) -> list[NamedConfusionMatrix]:
-        """Compute an unnormalized confusion matrix for every label group."""
+        """Compute an unnormalized confusion matrix for every individual label."""
         preds = torch.stack(self.preds)
         targets = torch.stack(self.targets)
 
         conf_matrices = []
-        for i, label_group in enumerate(self.label_info.label_groups):
+        for i, label_name in enumerate(self.label_info.label_names):
             label_preds = (preds[:, i] >= self.threshold).long()
             label_targets = targets[:, i]
 
@@ -190,7 +194,7 @@ class MultilabelAccuracywithLabelGroup(AccuracywithLabelGroup):
             else:
                 continue
 
-            data_name = [label_group[0], "~" + label_group[0]]
+            data_name = [label_name, "~" + label_name]
             confmat = NamedConfusionMatrix(task="binary", num_classes=2, row_names=data_name, col_names=data_name).to(
                 self.device,
             )
@@ -378,7 +382,7 @@ def _multi_label_cls_metric_callable(label_info: LabelInfo) -> MetricCollection:
     return MetricCollection(
         {
             "accuracy": MultilabelAccuracywithLabelGroup(label_info=label_info),
-            "mAP": MultilabelmAP(label_info=label_info),
+            "map": MultilabelmAP(label_info=label_info),
         },
     )
 

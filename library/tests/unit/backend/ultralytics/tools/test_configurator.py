@@ -20,7 +20,7 @@ from getitune.data.module import DataModule
 from getitune.types.label import LabelInfo
 from getitune.types.task import TaskType
 
-_RECIPE_DIR = Path(__file__).resolve().parents[4] / "src" / "getitune" / "recipe"
+_RECIPE_DIR = Path(__file__).resolve().parents[5] / "src" / "getitune" / "recipe"
 
 _DETECTION_MODEL_NAME = "yolo26_s"
 _DETECTION_RECIPE_FILE = _RECIPE_DIR / "detection" / "yolo26_s.yaml"
@@ -104,7 +104,7 @@ class TestInitData:
         from getitune.config.data import SubsetConfig, TileConfig
         from getitune.data.module import DataModule
 
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -246,7 +246,7 @@ class TestInitTask:
             Configurator(
                 data=Path("dummy"),
                 model=_DETECTION_MODEL_NAME,
-                task="SEMANTIC_SEGMENTATION",
+                task="KEYPOINT_DETECTION",
             )
 
     def test_task_none_allowed(self) -> None:
@@ -329,7 +329,7 @@ class TestConvert:
             Configurator.convert(path)
 
     def test_convert_unsupported_task_raises(self, tmp_path: Path) -> None:
-        recipe = _minimal_recipe(task="SEMANTIC_SEGMENTATION")
+        recipe = _minimal_recipe(task="KEYPOINT_DETECTION")
         path = _write_recipe(tmp_path, recipe)
         with pytest.raises(ValueError, match="Unsupported task"):
             Configurator.convert(path)
@@ -551,6 +551,28 @@ class TestRealRecipes:
         assert "train_subset" in result["data"]
 
 
+class TestSemanticSegmentationRecipes:
+    """Verify the shipped YOLO26 semantic segmentation recipes parse correctly."""
+
+    @pytest.mark.parametrize("variant", ["yolo26_n", "yolo26_s", "yolo26_m", "yolo26_l", "yolo26_x"])
+    def test_semantic_recipe_loads(self, variant: str) -> None:
+        path = _RECIPE_DIR / "semantic_segmentation" / f"{variant}_sem.yaml"
+        if not path.exists():
+            pytest.skip(f"Recipe not found: {path}")
+        result = Configurator.convert(path)
+        assert result["backend"] == "ultralytics"
+        assert result["task"] == "SEMANTIC_SEGMENTATION"
+        assert (
+            result["model"]["class_path"]
+            == "getitune.backend.ultralytics.models.semantic_segmentation.UltralyticsSemanticSegModel"
+        )
+        assert result["model"]["init_args"]["model_name"].endswith("-sem.yaml")
+        assert result["data"]["input_size"] == [512, 512]
+        assert result["data"]["train_subset"]["augmentations_gpu"] == []
+        assert result["data"]["val_subset"]["augmentations_gpu"] == []
+        assert result["data"]["test_subset"]["augmentations_gpu"] == []
+
+
 class TestApplyOverrides:
     def test_training_override(self) -> None:
         cfg = Configurator(
@@ -746,7 +768,7 @@ class TestBuildDatamodule:
         from getitune.config.data import SubsetConfig, TileConfig
         from getitune.data.module import DataModule
 
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -767,7 +789,7 @@ class TestBuildDatamodule:
         assert cfg.build_datamodule() is dm
 
     def test_builds_from_recipe_data_config(self, tmp_path: Path) -> None:
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -787,7 +809,7 @@ class TestBuildDatamodule:
         assert dm.test_subset.batch_size == 16
 
     def test_uses_constructor_data_root_when_no_arg(self, tmp_path: Path) -> None:
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -804,7 +826,7 @@ class TestBuildDatamodule:
         assert dm.data_root == str(assets_dir)
 
     def test_explicit_data_root_overrides_constructor(self, tmp_path: Path) -> None:
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -897,7 +919,7 @@ class TestDataModuleToConfigDict:
         from getitune.config.data import SubsetConfig, TileConfig
         from getitune.data.module import DataModule
 
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 
@@ -927,7 +949,7 @@ class TestDataModuleToConfigDict:
         from getitune.config.data import SubsetConfig, TileConfig
         from getitune.data.module import DataModule
 
-        assets_dir = Path(__file__).resolve().parents[2] / "assets" / "detection_coco"
+        assets_dir = Path(__file__).resolve().parents[3] / "assets" / "detection_coco"
         if not assets_dir.exists():
             pytest.skip(f"Detection test assets not found at {assets_dir}")
 

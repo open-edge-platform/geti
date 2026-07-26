@@ -188,8 +188,8 @@ To find the exact URLs for the pretrained weights required by a specific model:
 
 - Navigate to the model manifest files bundled with the Geti application backend (e.g., `application/backend/app/supported_models/manifests/classification/vit_tiny.yaml`).
 - Look for the `pretrained_weights.url` attribute within the manifest file to retrieve the direct download link.
-- Note the corresponding `pretrained_weights.sha_sum` attribute - you'll use it to verify the integrity of the downloaded
-  file before placing it in the cache.
+- Note the corresponding `pretrained_weights.sha_sum` attribute - you'll use it to verify the integrity of the downloaded file before placing it in the cache.
+- Note the `pretrained_weights.cache_filename` attribute, if present. This is the filename to use when placing the weights in the cache. If unspecified, use the same basename specified in the URL.
 
 #### 2. Verify file integrity
 
@@ -332,6 +332,10 @@ After the UI starts, you can access the Geti web application at [**http://localh
 
 Please check the [documentation website](https://docs.geti.intel.com/) for detailed guides, API reference,
 and other resources to help you get the most out of Geti.
+
+> **Upgrading an existing installation?** See the [Upgrade guide](./docs/upgrade.md) for how to move to a newer
+> version (Docker or Windows MSIX) while preserving your projects, datasets and models, with automatic rollback
+> if a migration fails.
 
 <details>
 <summary><strong>Advanced: generate the API spec from source </strong></summary>

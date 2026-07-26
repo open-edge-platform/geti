@@ -354,6 +354,9 @@ class AutoConfigurator:
         subset_config = getattr(datamodule, f"{subset}_subset")
         ov_subset = ov_config.get(f"{subset}_subset", ov_config["test_subset"])
 
+        # Capture the tiling intent before overwriting the subset augmentations below.
+        tiling_enabled = datamodule.tile_config.enable_tiler
+
         if keep_aspect_ratio:
             subset_config.batch_size = ov_subset["batch_size"]
             subset_config.augmentations_cpu = ov_subset["augmentations_cpu"]
@@ -372,7 +375,20 @@ class AutoConfigurator:
             subset_config.batch_size = ov_subset["batch_size"]
             subset_config.augmentations_cpu = ov_subset["augmentations_cpu"]
             subset_config.augmentations_gpu = ov_subset.get("augmentations_gpu", [])
-        datamodule.tile_config.enable_tiler = False
+
+        if tiling_enabled:
+            # ModelAPI's tiler performs tiling, resizing and coordinate/mask mapping
+            # internally on native-resolution crops (see OVModel.forward_tiles ->
+            # Tiler.predict_tiles). Keep DataModule tiling enabled so the loader emits
+            # per-image tile batches, and strip the model-input Resize from the OV
+            # pipeline so tiles reach ModelAPI at their native resolution — resizing
+            # tiles here would both duplicate the resize and corrupt the tile-to-image
+            # coordinate mapping. Intensity scaling is preserved (the CPU augmentation
+            # pipeline prepends its intensity transform independently of Resize).
+            self._strip_resize_transforms(subset_config.augmentations_cpu)
+            self._strip_resize_transforms(subset_config.augmentations_gpu)
+        else:
+            datamodule.tile_config.enable_tiler = False
 
         # Resolve input size: prefer model IR metadata, fall back to
         # the training recipe's default, raise if neither is available.
@@ -392,7 +408,11 @@ class AutoConfigurator:
             f"For OpenVINO IR models, Update the following {subset} \n"
             f"\t augmentations_cpu: {subset_config.augmentations_cpu} \n"
             f"\t batch_size: {subset_config.batch_size} \n"
-            "And the tiler is disabled."
+            + (
+                "And the tiler is kept enabled; ModelAPI performs tiled inference on native crops."
+                if tiling_enabled
+                else "And the tiler is disabled."
+            )
         )
         warn(msg, stacklevel=1)
 
@@ -425,6 +445,20 @@ class AutoConfigurator:
             auto_num_workers=datamodule.auto_num_workers,
             device=datamodule.device,
         )
+
+    @staticmethod
+    def _strip_resize_transforms(augmentations: list[dict]) -> None:
+        """Remove every Resize step from an augmentation list, in place.
+
+        Used for the OpenVINO tiling path: ModelAPI's tiler resizes each native
+        crop to the model input internally, so a DataModule-side Resize would both
+        duplicate the resize and corrupt the tile-to-image coordinate mapping.
+
+        Args:
+            augmentations: List of augmentation config dicts, each with a
+                ``class_path`` key (and optionally ``init_args``).
+        """
+        augmentations[:] = [aug for aug in augmentations if "Resize" not in aug.get("class_path", "")]
 
     @staticmethod
     def _patch_resize_keep_aspect_ratio(

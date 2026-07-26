@@ -22,7 +22,7 @@ concurrency:
 jobs:
   remove-rc-images:
     name: Delete GHCR Application RC-tagged images
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       packages: write
     env:
