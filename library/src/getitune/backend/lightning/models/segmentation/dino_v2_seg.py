@@ -123,9 +123,17 @@ class DinoV2Seg(LightningSegmentationModel):
             weights (PathLike | None, optional): Comma-separated ``"<backbone_weights>,<head_weights>"``
                 string pointing to the backbone and decode head weights (local paths or URLs).
                 If None, falls back to ``self.pretrained_urls[self.model_name]``. Defaults to None.
+
+        Raises:
+            ValueError: If ``weights`` (or the resolved default from ``pretrained_urls``) is not a
+                comma-separated ``"<backbone_weights>,<head_weights>"`` string.
         """
         if weights is None:
             weights = self.pretrained_urls[self.model_name]
+
+        if "," not in str(weights):
+            msg = "weights must be a comma-separated string of the form '<backbone_weights>,<head_weights>'"
+            raise ValueError(msg)
 
         backbone_weights, head_weights = str(weights).split(",")
 

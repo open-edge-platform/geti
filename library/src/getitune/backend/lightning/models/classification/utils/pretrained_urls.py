@@ -22,7 +22,7 @@ from __future__ import annotations
 
 _AUGREG_BASE_URL = "https://storage.googleapis.com/vit_models/augreg"
 _DINOV2_BASE_URL = "https://dl.fbaipublicfiles.com/dinov2"
-_MOBILENETV3_BASE_URL = "https://github.com/d-li14/mobilenetv3.pytorch/blob/master/pretrained"
+_MOBILENETV3_BASE_URL = "https://raw.githubusercontent.com/d-li14/mobilenetv3.pytorch/master/pretrained"
 
 
 # ViT / DINOv2 ImageNet-21k checkpoints shared by classification models.
@@ -39,10 +39,10 @@ VIT_PRETRAINED_URLS: dict[str, str] = {
     "vit-large": (
         f"{_AUGREG_BASE_URL}/L_16-i21k-300ep-lr_0.001-aug_medium1-wd_0.1-do_0.1-sd_0.1--imagenet2012-steps_20k-lr_0.01-res_224.npz"
     ),
-    "dinov2-small": f"{_DINOV2_BASE_URL}/dinov2_vits14_reg4_pretrain.pth",
-    "dinov2-base": f"{_DINOV2_BASE_URL}/dinov2_vitb14_reg4_pretrain.pth",
-    "dinov2-large": f"{_DINOV2_BASE_URL}/dinov2_vitl14_reg4_pretrain.pth",
-    "dinov2-giant": f"{_DINOV2_BASE_URL}/dinov2_vitg14_reg4_pretrain.pth",
+    "dinov2-small": f"{_DINOV2_BASE_URL}/dinov2_vits14/dinov2_vits14_reg4_pretrain.pth",
+    "dinov2-base": f"{_DINOV2_BASE_URL}/dinov2_vitb14/dinov2_vitb14_reg4_pretrain.pth",
+    "dinov2-large": f"{_DINOV2_BASE_URL}/dinov2_vitl14/dinov2_vitl14_reg4_pretrain.pth",
+    "dinov2-giant": f"{_DINOV2_BASE_URL}/dinov2_vitg14/dinov2_vitg14_reg4_pretrain.pth",
 }
 
 # MobileNetV3 ImageNet checkpoints.
