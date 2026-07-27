@@ -35,7 +35,7 @@ const Header = () => {
                 alignItems={'center'}
             >
                 <View paddingEnd={'size-200'}>
-                    <Link to={paths.project.index({})}>
+                    <Link to={paths.project.index({})} viewTransition>
                         <Flex alignItems='center' gap='size-50'>
                             <img src={getiLogo} alt={'Geti logo'} className={classes.logo} />
                             <Text UNSAFE_className={classes.logoText}>Geti™</Text>
