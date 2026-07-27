@@ -22,13 +22,13 @@ There are several ways to run Geti™, choose the one that best fits your workfl
 - [**Run from source (for development)**](#run-from-source-for-development) - run the server and the UI as standalone components.
 - [**Install script**](#install-script) - download and run a script that builds and configures Geti™ automatically.
 
-For deployment-specific log collection and troubleshooting, see [Troubleshooting > Logs](#troubleshooting-view-the-logs).
+For deployment-specific log collection and troubleshooting, see [Troubleshooting > Logs](#troubleshooting-logs).
 
 ## Windows app
 
 Installing Geti™ as a Windows app is the simplest way to run it on Windows.
 
-1. Download the Windows Installer suitable for your hardware (prebuilt images for Intel® XPU, NVIDIA® CUDA, and CPU-only environments):
+1. Download the Windows Installer suitable for your hardware (prebuilt packages for Intel® XPU, NVIDIA® CUDA, and CPU-only environments):
    - [CPU-only](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cpu-3.0.0.msix)
    - [Intel® XPU](https://storage.geti.intel.com/geti/packages/3.0.0/geti-xpu-3.0.0.msix)
    - [NVIDIA® CUDA](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cuda-3.0.0.msix)
@@ -371,11 +371,11 @@ If a build step fails, re-run with `--verbose` (Linux) or `-Verbose` (Windows), 
 
 ### Launch Geti™
 
-When the script finishes, it adds a `geti` command to your shell profile. Reload your shell, then start the application:
+When the script finishes, it can add a `geti` command to your shell profile (on Windows, you’ll be prompted). Reload your shell profile, then start the application:
 
 ```bash
 # Reload your shell profile (use ~/.zshrc if you use zsh)
-source ~/.bashrc
+source ~/.bashrc  # or: source ~/.zshrc
 
 # Start Geti™ (optionally set HOST and PORT)
 HOST=0.0.0.0 PORT=8080 geti
@@ -468,6 +468,8 @@ docker run --rm -v geti-data:/data alpine ls -l /data/pretrained_weights/<TASK_T
 
 </details>
 
+<a id="troubleshooting-logs"></a>
+
 <details>
 <summary><strong>Troubleshooting: view the logs</strong></summary>
 
@@ -513,7 +515,7 @@ docker run --rm -v geti-logs:/logs alpine cat /logs/workers/inference.log | jq -
 
 - **Upgrading an existing installation?** See the [Upgrade guide](./upgrade.md) for how to move to a newer version
   (Docker or Windows MSIX) while preserving your projects, datasets and models, with automatic rollback if a migration fails.
-- For uninstallation instructions, refer to the Uninstallation Guide.
+- **Uninstalling:** For **MSIX**, uninstall the package from Windows Settings; for **Docker**, stop/remove the container and (optionally) delete the `geti-data` volume to remove stored data.
 - For legacy Geti™ v2 installation on servers or cloud, refer to the v2 documentation.
 
 ## Notes
