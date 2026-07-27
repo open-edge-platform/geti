@@ -108,7 +108,7 @@ class TestBaseWeightsService:
             patch.object(
                 fxt_base_weights_service,
                 "_download_weights",
-                side_effect=lambda remote_url, local_path, sha_sum: local_path.write_bytes(WEIGHTS_CONTENT),
+                side_effect=lambda urls, local_path, sha_sum: local_path.write_bytes(WEIGHTS_CONTENT),
             ),
         ):
             result = fxt_base_weights_service.get_local_weights_path(
@@ -128,7 +128,7 @@ class TestBaseWeightsService:
             patch.object(
                 fxt_base_weights_service,
                 "_download_weights",
-                side_effect=lambda remote_url, local_path, sha_sum: local_path.write_bytes(WEIGHTS_CONTENT),
+                side_effect=lambda urls, local_path, sha_sum: local_path.write_bytes(WEIGHTS_CONTENT),
             ),
         ):
             result = fxt_base_weights_service.get_local_weights_path(

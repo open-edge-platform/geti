@@ -70,6 +70,7 @@ export default defineConfig({
     ],
     output: {
         assetPrefix: process.env.ASSET_PREFIX,
+        distPath: { root: isTauriBuild ? 'dist-tauri' : 'dist' },
         minify: isTauriDebugBuild ? false : undefined,
         sourceMap: isTauriDebugBuild
             ? {
@@ -104,7 +105,7 @@ export default defineConfig({
         preload: {
             type: 'initial',
             include: [
-                /roboto-flex-v30-latin-regular.*\.woff2$/,
+                /inter-v20-latin-variable.*\.woff2$/,
                 // The branded loading spinner is the LCP element on the initial
                 // route (it's rendered by the root <Suspense> fallback while the
                 // route chunk loads). Without a preload, the browser can't

@@ -64,7 +64,8 @@ export const LabelRow = ({
     };
 
     const handleHotkeyChange = () => {
-        if (hasValidationErrors) return;
+        const isHotkeyChanged = label.hotkey !== trimmedHotkey;
+        if (hasValidationErrors || !isHotkeyChanged) return;
 
         onUpdate(label.id, { name: name.trim(), color, hotkey: trimmedHotkey });
     };
@@ -111,6 +112,7 @@ export const LabelRow = ({
                     hotkey={hotkey}
                     onHotkeyChange={(newHotkey) => setHotkey(newHotkey ?? '')}
                     onEnter={handleHotkeyChange}
+                    onBlur={handleHotkeyChange}
                     aria-label={'Edited hotkey'}
                     errorMessage={hotkeyValidationError}
                 />

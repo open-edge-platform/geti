@@ -117,7 +117,7 @@ class UltralyticsMultiLabelClsModel(UltralyticsModel):
     is_multilabel: ClassVar[bool] = True
     metric_keys: ClassVar[dict[str, str]] = {
         "metrics/accuracy": "val/accuracy",
-        "metrics/mAP": "val/map",
+        "metrics/map": "val/map",
         "metrics/iter_time": "validation/iter_time",
         "train/loss": "train/total_loss",
         "lr/pg0": "lr",

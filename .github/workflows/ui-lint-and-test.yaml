@@ -293,13 +293,17 @@ jobs:
         working-directory: "application/ui"
         run: tar -xzf dist.tar.gz
 
+      - name: Build UI (Tauri target)
+        working-directory: "application/ui"
+        run: npm run build:tauri
+
       - *download-openapi-spec
 
       - *build-openapi-types
 
       - name: Run Playwright tests
         working-directory: "application/ui"
-        run: npm run test:component -- --project "component"
+        run: npm run test:component
 
       - name: Upload blob report to GitHub Actions Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

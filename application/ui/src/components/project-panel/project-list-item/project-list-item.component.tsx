@@ -36,7 +36,9 @@ export const ProjectListItem = ({
     const taskType = getProjectTypeTitle(project.task);
 
     const handleNavigateToProject = () => {
-        navigate(paths.project.dataset.index({ projectId: project.id }));
+        navigate(paths.project.dataset.index({ projectId: project.id }), {
+            viewTransition: true,
+        });
     };
 
     return (

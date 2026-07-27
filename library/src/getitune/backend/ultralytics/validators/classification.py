@@ -118,10 +118,10 @@ class MultiLabelClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClas
             raise RuntimeError(msg)
         results = self.metric.compute()
         accuracy = self._extract_scalar(results, "accuracy")
-        mean_ap = self._extract_scalar(results, "mAP")
+        mean_ap = self._extract_scalar(results, "map")
         return {
             "metrics/accuracy": accuracy,
-            "metrics/mAP": mean_ap,
+            "metrics/map": mean_ap,
             "metrics/iter_time": self._average_iter_time(),
         }
 
@@ -141,7 +141,7 @@ class MultiLabelClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClas
         """Print multi-label validation metrics."""
         stats = self.get_stats()
         LOGGER.info(f"{'multi-label accuracy':>20}: {stats['metrics/accuracy']:.3g}")
-        LOGGER.info(f"{'multi-label mAP':>20}: {stats['metrics/mAP']:.3g}")
+        LOGGER.info(f"{'multi-label mAP':>20}: {stats['metrics/map']:.3g}")
 
     def plot_val_samples(self, batch: dict[str, Any], ni: int) -> None:
         """Skip image plotting for multi-label batches.

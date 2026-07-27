@@ -6,17 +6,20 @@
 from getitune.backend.lightning.models import (
     ATSS,
     DEIMV2,
+    RFDETR,
     RTDETR,
     SSD,
     YOLOX,
     DEIMDFine,
     DFine,
     DinoV2Seg,
+    EdgeCrafter,
     EfficientNet,
     LiteHRNet,
     MaskRCNN,
     MaskRCNNTV,
     MobileNetV3,
+    RFDETRInst,
     RTMDetInst,
     RTMPose,
     SegNext,
@@ -38,37 +41,41 @@ try:
     from getitune.backend.ultralytics.models import (
         UltralyticsDetectionModel,
         UltralyticsInstSegModel,
+        UltralyticsMultiClassClsModel,
+        UltralyticsMultiLabelClsModel,
+        UltralyticsSemanticSegModel,
     )
 except ImportError:
     UltralyticsDetectionModel = None  # type: ignore[assignment]
     UltralyticsInstSegModel = None  # type: ignore[assignment]
+    UltralyticsMultiClassClsModel = None  # type: ignore[assignment]
+    UltralyticsMultiLabelClsModel = None  # type: ignore[assignment]
+    UltralyticsSemanticSegModel = None  # type: ignore[assignment]
 
 __all__ = [
-    # detection
     "ATSS",
     "DEIMV2",
+    "RFDETR",
     "RTDETR",
     "SSD",
     "YOLOX",
     "DEIMDFine",
     "DFine",
-    # semantic segmentation
     "DinoV2Seg",
-    # classification
+    "EdgeCrafter",
     "EfficientNet",
     "LiteHRNet",
-    # instance segmentation
     "MaskRCNN",
     "MaskRCNNTV",
     "MobileNetV3",
     "OVDetectionModel",
     "OVInstanceSegmentationModel",
     "OVKeypointDetectionModel",
-    # OpenVINO models
     "OVModel",
     "OVMulticlassClassificationModel",
     "OVMultilabelClassificationModel",
     "OVSegmentationModel",
+    "RFDETRInst",
     "RTMDetInst",
     "RTMPose",
     "SegNext",
@@ -82,5 +89,8 @@ if UltralyticsDetectionModel is not None:
         [
             "UltralyticsDetectionModel",
             "UltralyticsInstSegModel",
+            "UltralyticsMultiClassClsModel",
+            "UltralyticsMultiLabelClsModel",
+            "UltralyticsSemanticSegModel",
         ]
     )
