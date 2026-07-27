@@ -19,6 +19,8 @@ const CI = !!process.env.CI;
 
 const ACTION_TIMEOUT = 30000;
 
+const E2E_BASE_URL = process.env.E2E_BASE_URL;
+
 // In CI we serve pre-built bundles via `rsbuild preview`, which requires the
 // output directories to already exist. Failing fast here produces a clearer
 // error than waiting for `webServer.timeout` to elapse on a 404-returning
@@ -98,6 +100,8 @@ export default defineConfig({
             testDir: './tests/e2e',
             use: {
                 ...devices['Desktop Chrome'],
+                baseURL: E2E_BASE_URL || 'http://localhost:3000',
+                ignoreHTTPSErrors: !!E2E_BASE_URL,
                 headless: CI,
                 viewport: { width: 1280, height: 720 },
             },
@@ -105,7 +109,7 @@ export default defineConfig({
     ],
 
     /* Run your local dev server(s) before starting the tests */
-    webServer: !process.env.ENABLE_BACKEND
+    webServer: !process.env.ENABLE_BACKEND && !E2E_BASE_URL
         ? [
               {
                   command: CI ? 'npm run preview -- --port 3000' : 'npm run start',
