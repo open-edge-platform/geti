@@ -93,6 +93,34 @@ gen-certs:
     fi
 
 # -------------------------------------------------------------------------------------------------
+# Timm catalog snapshot
+# -------------------------------------------------------------------------------------------------
+
+timm-imagenet-results-url := "https://raw.githubusercontent.com/huggingface/pytorch-image-models/main/results/results-imagenet.csv"
+
+# Regenerate app/supported_models/timm_catalog_snapshot.json from the pinned `timm`
+# version in ../../library. Requires the library venv (`just venv` from library/)
+# to already be set up.
+gen-timm-catalog: install-uv
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    OUTPUT="$(pwd)/app/supported_models/timm_catalog_snapshot.json"
+    TMP_CSV="$(mktemp -t results-imagenet-XXXXXX.csv)"
+    trap 'rm -f "$TMP_CSV"' EXIT
+
+    echo "Downloading ImageNet results table..."
+    curl -fL "{{ timm-imagenet-results-url }}" -o "$TMP_CSV"
+
+    echo "Generating timm catalog snapshot at ${OUTPUT}..."
+    cd ../../library
+    uv run python scripts/timm_catalog/generate_snapshot.py \
+        --output "$OUTPUT" \
+        --imagenet-results-csv "$TMP_CSV"
+
+    echo "Snapshot written to ${OUTPUT}"
+
+# -------------------------------------------------------------------------------------------------
 # Packaging
 # -------------------------------------------------------------------------------------------------
 
