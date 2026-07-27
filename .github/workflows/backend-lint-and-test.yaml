@@ -142,6 +142,7 @@ jobs:
     needs:
       - check_paths
       - python-checks
+      - timm-catalog-version-check
     runs-on: ubuntu-latest
     env:
       CHECKS: ${{ join(needs.*.result, ' ') }}
