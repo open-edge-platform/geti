@@ -121,7 +121,7 @@ jobs:
             exit 1
           fi
 
-          PINNED_VERSION=$(grep -oP '"timm==\K[0-9.]+(?=")' library/pyproject.toml)
+          PINNED_VERSION=$(python3 -c "import pathlib,re; m=re.search(r'\"timm==([^\"]+)\"', pathlib.Path('library/pyproject.toml').read_text(encoding='utf-8')); print(m.group(1) if m else '')")
           if [[ -z "$PINNED_VERSION" ]]; then
             echo "::error::Could not parse pinned timm version from library/pyproject.toml." >&2
             exit 1
