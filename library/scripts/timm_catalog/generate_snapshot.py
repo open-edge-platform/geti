@@ -129,7 +129,9 @@ def _compute_stats(model_name: str) -> dict[str, float]:
 
     params = sum(parameter.numel() for parameter in model.parameters())
     inputs = torch.zeros((1, *cfg.input_size))
-    flops = measure_flops(lambda: model(inputs))
+
+    with torch.no_grad():
+        flops = measure_flops(lambda: model(inputs))
 
     return {
         "trainable_parameters": round(params / 1_000_000, 1),
@@ -197,13 +199,11 @@ def generate_snapshot(
     family_map = _module_family_map()
     imagenet_top1 = _load_imagenet_top1(imagenet_results_csv)
 
-    model_names = timm.list_models(pretrained=True)
+    model_names = sorted(timm.list_models(pretrained=True))
     if limit is not None:
         model_names = model_names[:limit]
 
-    backbones = [
-        _build_entry(name, family_map, imagenet_top1, existing_by_name.get(name)) for name in sorted(model_names)
-    ]
+    backbones = [_build_entry(name, family_map, imagenet_top1, existing_by_name.get(name)) for name in model_names]
 
     return {"timm_version": timm_version, "backbones": backbones}
 
