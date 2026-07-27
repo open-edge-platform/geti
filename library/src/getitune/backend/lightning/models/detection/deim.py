@@ -64,11 +64,11 @@ class DEIMDFine(RTDETR):
     """
 
     pretrained_urls: ClassVar[dict[str, str]] = {
-        "deim_dfine_hgnetv2_n": "https://storage.geti.intel.com/weights/deim_dfine_hgnetv2_n_coco_160e.pth",
-        "deim_dfine_hgnetv2_s": "https://storage.geti.intel.com/weights/deim_dfine_hgnetv2_s_coco_120e.pth",
-        "deim_dfine_hgnetv2_m": "https://storage.geti.intel.com/weights/deim_dfine_hgnetv2_m_coco_90e.pth",
-        "deim_dfine_hgnetv2_l": "https://storage.geti.intel.com/weights/deim_dfine_hgnetv2_l_coco_50e.pth",
-        "deim_dfine_hgnetv2_x": "https://storage.geti.intel.com/weights/deim_dfine_hgnetv2_x_coco_50e.pth",
+        "deim_dfine_hgnetv2_n": "https://github.com/eugene123tw/DEIM/releases/download/poc/deim_dfine_hgnetv2_n_coco_160e.pth",
+        "deim_dfine_hgnetv2_s": "https://github.com/eugene123tw/DEIM/releases/download/poc/deim_dfine_hgnetv2_s_coco_120e.pth",
+        "deim_dfine_hgnetv2_m": "https://github.com/eugene123tw/DEIM/releases/download/poc/deim_dfine_hgnetv2_m_coco_90e.pth",
+        "deim_dfine_hgnetv2_l": "https://github.com/eugene123tw/DEIM/releases/download/poc/deim_dfine_hgnetv2_l_coco_50e.pth",
+        "deim_dfine_hgnetv2_x": "https://github.com/eugene123tw/DEIM/releases/download/poc/deim_dfine_hgnetv2_x_coco_50e.pth",
     }
 
     input_size_multiplier = 32

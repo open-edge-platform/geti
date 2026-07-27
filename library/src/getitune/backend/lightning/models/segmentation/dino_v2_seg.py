@@ -52,7 +52,8 @@ class DinoV2Seg(LightningSegmentationModel):
     """
 
     pretrained_urls: ClassVar[dict[str, str]] = {
-        "dinov2-small-seg": "https://storage.geti.intel.com/weights/dinov2_vits14_reg4_with_ade20k_linear_head_pretrain.pth",
+        "dinov2-small-seg": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vits14/dinov2_vits14_reg4_pretrain.pth,"
+        "https://dl.fbaipublicfiles.com/dinov2/dinov2_vits14/dinov2_vits14_ade20k_linear_head.pth"
     }
 
     def __init__(
@@ -113,26 +114,39 @@ class DinoV2Seg(LightningSegmentationModel):
     def load_pretrained(self, weights: PathLike | None = None) -> None:
         """Load pretrained weights for the model.
 
+        The DinoV2Seg backbone and decode head are pretrained separately, so ``weights`` is expected
+        to encode both locations as a single comma-separated string: ``"<backbone_weights>,<head_weights>"``.
+        Each part may be a local file path or a URL, and is downloaded to
+        ``$PRETRAINED_WEIGHTS_CACHE_DIR`` on first use if not already present locally.
+
         Args:
-            weights (PathLike | None, optional): Path to the pretrained weights. If None, uses default weights.
-            Defaults to None.
+            weights (PathLike | None, optional): Comma-separated ``"<backbone_weights>,<head_weights>"``
+                string pointing to the backbone and decode head weights (local paths or URLs).
+                If None, falls back to ``self.pretrained_urls[self.model_name]``. Defaults to None.
         """
         if weights is None:
             weights = self.pretrained_urls[self.model_name]
 
-        weights_path = Path(weights)
-        if not weights_path.exists():
+        backbone_weights, head_weights = str(weights).split(",")
+
+        def _download_from_url(weights: str) -> Path:
             import os
 
-            parts = urlparse(str(weights))
+            parts = urlparse(weights)
             filename = Path(parts.path).name
             weights_path = Path(os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"]) / filename
             if not weights_path.exists():
                 download_url_to_file(str(weights), str(weights_path), "", progress=True)
+            return weights_path
+
+        if not Path(backbone_weights).exists():
+            backbone_weights = _download_from_url(backbone_weights)
+        if not Path(head_weights).exists():
+            head_weights = _download_from_url(head_weights)
 
         backbone = cast("VisionTransformerBackbone", self.model.backbone)
-        backbone.load_checkpoint(weights_path, prefix="model.backbone")  # pyrefly: ignore[not-callable]
-        self._load_decode_head(weights_path)
+        backbone.load_checkpoint(backbone_weights)  # pyrefly: ignore[not-callable]
+        self._load_decode_head(Path(head_weights))
 
         # freeze backbone
         for _, v in backbone.named_parameters():
