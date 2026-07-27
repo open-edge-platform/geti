@@ -7,10 +7,6 @@ on:
         description: "Geti server base URL for E2E tests"
         required: false
         type: string
-      BRANCH:
-        description: "Branch to run E2E tests on"
-        required: false
-        type: string
   schedule:
     - cron: "0 2 * * *" # every day at 2 am
 
