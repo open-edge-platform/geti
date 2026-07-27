@@ -70,6 +70,7 @@ export default defineConfig({
     ],
     output: {
         assetPrefix: process.env.ASSET_PREFIX,
+        distPath: { root: isTauriBuild ? 'dist-tauri' : 'dist' },
         minify: isTauriDebugBuild ? false : undefined,
         sourceMap: isTauriDebugBuild
             ? {
