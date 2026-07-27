@@ -1,6 +1,9 @@
 name: E2E tests
 
 on:
+  push:
+    branches:
+      - dwesolow/4850-e2e
   workflow_dispatch:
     inputs:
       E2E_BASE_URL:
