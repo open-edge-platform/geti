@@ -76,13 +76,9 @@ html {
     font-family: 'Inter', system-ui, sans-serif;
 }
 
-#theme-provider,
-#theme-provider [class*='_i18nFontFamily'] {
-    font-family: inherit;
-}
-
 * {
     box-sizing: border-box;
+    font-family: 'Inter', system-ui, sans-serif;
 }
 
 body,
