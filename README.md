@@ -363,7 +363,7 @@ Geti™ supports [multiple computer vision tasks](https://docs.geti.intel.com/do
 <details>
 <summary>🧠 Smart annotations</summary>
 
-Smart annotations in Geti™ enable users to easily create bounding boxes, rotated bounding boxes, segmentation boundaries, and more. These smart annotation features coupled with the AI-assisted annotations and state-of-the-art AI models such as the Segment Anything Model keep human experts in the loop while massively reducing the total annotation efforts needed by a human.
+Smart annotations in Geti™ enable users to easily create bounding boxes and polygons. These smart annotation features coupled with the AI-assisted annotations and state-of-the-art AI models such as the Segment Anything Model keep human experts in the loop while massively reducing the total annotation efforts needed by a human.
 
 <p align="center">
   <img src="application/docs/assets/annotator.webp" width="600" alt="Smart Annotations">

@@ -8,7 +8,6 @@ from __future__ import annotations
 from functools import partial
 from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
-import torch
 from torch import nn
 from torchvision.ops import RoIAlign
 
@@ -26,12 +25,10 @@ from getitune.backend.lightning.models.instance_segmentation.backbones.swin impo
 from getitune.backend.lightning.models.instance_segmentation.base import LightningInstanceSegModel
 from getitune.backend.lightning.models.instance_segmentation.heads import ConvFCBBoxHead, FCNMaskHead, RoIHead, RPNHead
 from getitune.backend.lightning.models.instance_segmentation.losses import ROICriterion, RPNCriterion
-from getitune.backend.lightning.models.instance_segmentation.rotated_det import RotatedPredictMixin
 from getitune.backend.lightning.models.instance_segmentation.segmentors.two_stage import TwoStageDetector
 from getitune.backend.lightning.models.instance_segmentation.utils.roi_extractors import SingleRoIExtractor
 from getitune.backend.lightning.models.modules.norm import build_norm_layer
 from getitune.config.data import TileConfig
-from getitune.data.entity.sample import PredictionBatch
 from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
 
 if TYPE_CHECKING:
@@ -384,12 +381,3 @@ class MaskRCNN(LightningInstanceSegModel):
                 input_size=(1344, 1344), mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)
             ),
         }
-
-
-class RotatedMaskRCNNModel(RotatedPredictMixin, MaskRCNN):
-    """Base class for the rotated detection models used in getitune."""
-
-    def predict_step(self, *args: torch.Any, **kwargs: torch.Any) -> PredictionBatch:
-        """Perform prediction step for rotated detection."""
-        preds = super().predict_step(*args, **kwargs)
-        return self.rotated_predict_step(preds)

@@ -24,7 +24,6 @@ def fxt_data_root_per_task_type() -> dict:
         TaskType.MULTI_LABEL_CLS: "tests/assets/multilabel_classification_coco",
         TaskType.DETECTION: "tests/assets/detection_coco",
         TaskType.KEYPOINT_DETECTION: "tests/assets/keypoint_detection_coco",
-        TaskType.ROTATED_DETECTION: "tests/assets/detection_coco",
         TaskType.INSTANCE_SEGMENTATION: "tests/assets/instance_segmentation_coco",
         TaskType.SEMANTIC_SEGMENTATION: "tests/assets/segmentation_pets",
     }
@@ -108,9 +107,6 @@ class TestAutoConfigurator:
         assert datamodule.task == task
 
     def test_get_model(self, fxt_task: TaskType, fxt_data_root_per_task_type) -> None:
-        if fxt_task is TaskType.H_LABEL_CLS:
-            pytest.xfail(reason="Not working")
-
         auto_configurator = AutoConfigurator(task=fxt_task, data_root=fxt_data_root_per_task_type[fxt_task])
 
         # With label_info

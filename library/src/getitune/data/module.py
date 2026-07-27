@@ -381,9 +381,7 @@ class DataModule(LightningDataModule):
         task_to_data_config_file = {
             TaskType.MULTI_CLASS_CLS: "classification.yaml",
             TaskType.MULTI_LABEL_CLS: "classification.yaml",
-            TaskType.H_LABEL_CLS: "classification.yaml",
             TaskType.DETECTION: "detection.yaml",
-            TaskType.ROTATED_DETECTION: "detection.yaml",
             TaskType.INSTANCE_SEGMENTATION: "instance_segmentation.yaml",
             TaskType.SEMANTIC_SEGMENTATION: "semantic_segmentation.yaml",
             TaskType.KEYPOINT_DETECTION: "keypoint_detection.yaml",
