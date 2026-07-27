@@ -4,11 +4,10 @@
 import { ReactNode, Suspense } from 'react';
 
 import { $api } from '@/api';
-import { Flex, Heading } from '@geti-ui/ui';
+import { Flex, Heading, Loading } from '@geti-ui/ui';
 import { Outlet } from 'react-router';
 
-import { License } from '../../features/license/license.component';
-import { IntelBrandedLoading } from '../../shared/components/intel-branded-loading/intel-branded-loading.component';
+import { LicenseCheck } from '../../features/license/license-check.component';
 import { ServerErrorFallback } from './server-error-fallback.component';
 
 const REFETCH_INTERVAL = 5000;
@@ -27,7 +26,7 @@ const HealthCheck = ({ children }: { children: ReactNode }) => {
     if (isPending) {
         return (
             <Flex direction={'column'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
-                <IntelBrandedLoading height={'auto'} />
+                <Loading variant={'intel'} mode={'inline'} />
                 <Heading bottom={'size-4600'} level={2}>
                     Loading...Please wait.
                 </Heading>
@@ -43,35 +42,12 @@ const HealthCheck = ({ children }: { children: ReactNode }) => {
         return children;
     }
 
-    return <IntelBrandedLoading />;
-};
-
-const LicenseCheck = ({ children }: { children: ReactNode }) => {
-    const { data, isPending, isError } = $api.useQuery('get', '/api/system/info', undefined, {
-        retry: 2,
-        refetchInterval: (query) => {
-            return query.state.data?.license_accepted ? false : REFETCH_INTERVAL;
-        },
-    });
-
-    if (isPending) {
-        return <IntelBrandedLoading />;
-    }
-
-    if (isError) {
-        return <ServerErrorFallback />;
-    }
-
-    if (data && !data.license_accepted) {
-        return <License platform={data.platform} />;
-    }
-
-    return children;
+    return <Loading variant={'intel'} />;
 };
 
 export const RootLayout = () => {
     return (
-        <Suspense fallback={<IntelBrandedLoading />}>
+        <Suspense fallback={<Loading variant={'intel'} />}>
             <HealthCheck>
                 <LicenseCheck>
                     <Outlet />

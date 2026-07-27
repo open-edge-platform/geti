@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -17,6 +18,23 @@ dotenv.config({
 const CI = !!process.env.CI;
 
 const ACTION_TIMEOUT = 30000;
+
+// In CI we serve pre-built bundles via `rsbuild preview`, which requires the
+// output directories to already exist. Failing fast here produces a clearer
+// error than waiting for `webServer.timeout` to elapse on a 404-returning
+// preview server.
+if (CI) {
+    const requiredDirs = ['dist', 'dist-tauri'];
+    for (const dir of requiredDirs) {
+        const absolute = path.resolve(dirname, dir);
+        if (!existsSync(absolute)) {
+            throw new Error(
+                `Missing build output at ${absolute}. ` +
+                    `Run \`npm run build\` (web) and \`npm run build:tauri\` (tauri) before \`npm run test:component\`.`
+            );
+        }
+    }
+}
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -57,12 +75,23 @@ export default defineConfig({
         {
             name: 'component',
             testDir: './tests',
-            testIgnore: '**/e2e/**',
+            testIgnore: ['**/e2e/**', /.*\.tauri\.spec\.ts/],
             use: {
                 ...devices['Desktop Chrome'],
                 headless: true,
                 viewport: { width: 1280, height: 720 },
             },
+        },
+        {
+            name: 'Tauri component tests',
+            testDir: './tests',
+            use: {
+                ...devices['Desktop Chrome'],
+                headless: true,
+                viewport: { width: 1280, height: 720 },
+                baseURL: 'http://localhost:3001',
+            },
+            testMatch: /.*\.tauri\.spec\.ts$/,
         },
         {
             name: 'e2e',
@@ -75,13 +104,21 @@ export default defineConfig({
         },
     ],
 
-    /* Run your local dev server before starting the tests */
+    /* Run your local dev server(s) before starting the tests */
     webServer: !process.env.ENABLE_BACKEND
-        ? {
-              command: CI ? 'npm run preview -- --port 3000' : 'npm run start',
-              url: 'http://localhost:3000',
-              reuseExistingServer: true,
-              timeout: ACTION_TIMEOUT,
-          }
+        ? [
+              {
+                  command: CI ? 'npm run preview -- --port 3000' : 'npm run start',
+                  url: 'http://localhost:3000',
+                  reuseExistingServer: true,
+                  timeout: ACTION_TIMEOUT,
+              },
+              {
+                  command: CI ? 'npm run preview:tauri' : 'npm run start:tauri -- --port 3001',
+                  url: 'http://localhost:3001',
+                  reuseExistingServer: true,
+                  timeout: ACTION_TIMEOUT,
+              },
+          ]
         : undefined,
 });
