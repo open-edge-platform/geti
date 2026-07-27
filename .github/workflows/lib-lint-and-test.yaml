@@ -154,7 +154,6 @@ jobs:
         task:
           - "multi_class_cls"
           - "multi_label_cls"
-          - "h_label_cls"
           - "keypoint_detection"
           - "detection"
           - "instance_segmentation"

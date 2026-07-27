@@ -13,20 +13,20 @@ skill `.agents/skills/geti-library-dev/`.
 
 ## Package Layout (`src/getitune/`)
 
-| Directory    | Responsibility                                                                                                                                                                              |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `backend/`   | Multi-backend implementations: `lightning/` (training), `openvino/` (inference), optional `ultralytics/`.                                                                                   |
-| `models/`    | Central re-export hub that exposes model classes from every backend under one namespace.                                                                                                    |
-| `recipe/`    | YAML recipe configs organized by task (`classification/`, `detection/`, `instance_segmentation/`, `keypoint_detection/`, `rotated_detection/`, `semantic_segmentation/`, shared `_base_/`). |
-| `engine/`    | Abstract `Engine` base class defining the `train` / `test` / `predict` / `export` interface.                                                                                                |
-| `cli/`       | Command-line entry points (jsonargparse) for `train`, `test`, `predict`, `export`, `benchmark`, `find`.                                                                                     |
-| `data/`      | Lightning `DataModule`, dataset factories, augmentation pipelines, samplers.                                                                                                                |
-| `config/`    | Typed dataclasses for configuration (`device.py`, data, explain, …) plus YAML helpers.                                                                                                      |
-| `types/`     | Enums and type aliases (`TaskType`, `DeviceType`, `ExportFormat`, `Precision`, …).                                                                                                          |
-| `tools/`     | `AutoConfigurator` (model → recipe mapping), exporters, explainability tooling.                                                                                                             |
-| `metrics/`   | Metric callables and evaluation logic.                                                                                                                                                      |
-| `utils/`     | Shared utilities: recipe discovery (`recipes.py`), device helpers (`device.py`), caching.                                                                                                   |
-| `benchmark/` | Benchmark manifest parsing and regression runner.                                                                                                                                           |
+| Directory    | Responsibility                                                                                                                                                        |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `backend/`   | Multi-backend implementations: `lightning/` (training), `openvino/` (inference), optional `ultralytics/`.                                                             |
+| `models/`    | Central re-export hub that exposes model classes from every backend under one namespace.                                                                              |
+| `recipe/`    | YAML recipe configs organized by task (`classification/`, `detection/`, `instance_segmentation/`, `keypoint_detection/`, `semantic_segmentation/`, shared `_base_/`). |
+| `engine/`    | Abstract `Engine` base class defining the `train` / `test` / `predict` / `export` interface.                                                                          |
+| `cli/`       | Command-line entry points (jsonargparse) for `train`, `test`, `predict`, `export`, `benchmark`, `find`.                                                               |
+| `data/`      | Lightning `DataModule`, dataset factories, augmentation pipelines, samplers.                                                                                          |
+| `config/`    | Typed dataclasses for configuration (`device.py`, data, explain, …) plus YAML helpers.                                                                                |
+| `types/`     | Enums and type aliases (`TaskType`, `DeviceType`, `ExportFormat`, `Precision`, …).                                                                                    |
+| `tools/`     | `AutoConfigurator` (model → recipe mapping), exporters, explainability tooling.                                                                                       |
+| `metrics/`   | Metric callables and evaluation logic.                                                                                                                                |
+| `utils/`     | Shared utilities: recipe discovery (`recipes.py`), device helpers (`device.py`), caching.                                                                             |
+| `benchmark/` | Benchmark manifest parsing and regression runner.                                                                                                                     |
 
 ## Multi-Backend Design
 
@@ -59,8 +59,8 @@ skill `.agents/skills/geti-library-dev/`.
 
 Defined in `src/getitune/types/task.py`:
 
-- Classification: `MULTI_CLASS_CLS`, `MULTI_LABEL_CLS`, `H_LABEL_CLS`
-- Detection: `DETECTION`, `ROTATED_DETECTION`, `KEYPOINT_DETECTION`
+- Classification: `MULTI_CLASS_CLS`, `MULTI_LABEL_CLS`
+- Detection: `DETECTION`, `KEYPOINT_DETECTION`
 - Segmentation: `INSTANCE_SEGMENTATION`, `SEMANTIC_SEGMENTATION`
 
 Both model implementations (`backend/lightning/models/<task>/`) and recipes
@@ -146,17 +146,17 @@ Both model implementations (`backend/lightning/models/<task>/`) and recipes
 Work from `library/`. See `.github/instructions/library.instructions.md` for the
 full table.
 
-| Task              | Recipe                              |
-| ----------------- | ----------------------------------- |
-| Create venv       | `just venv --device cpu\|xpu\|cuda` |
-| Refresh lockfile  | `just venv-lock`                    |
-| Lint + type-check | `just lint`                         |
-| Auto-fix lint     | `just ruff-fix`                     |
-| Unit tests        | `just test-unit -- <pytest args>`   |
-| Lightning backend tests | `just test-unit-lightning -- <args>` |
+| Task                      | Recipe                                 |
+| ------------------------- | -------------------------------------- |
+| Create venv               | `just venv --device cpu\|xpu\|cuda`    |
+| Refresh lockfile          | `just venv-lock`                       |
+| Lint + type-check         | `just lint`                            |
+| Auto-fix lint             | `just ruff-fix`                        |
+| Unit tests                | `just test-unit -- <pytest args>`      |
+| Lightning backend tests   | `just test-unit-lightning -- <args>`   |
 | Ultralytics backend tests | `just test-unit-ultralytics -- <args>` |
-| OpenVINO backend tests | `just test-unit-openvino -- <args>` |
-| Integration tests | `just test-integration -- <args>`   |
+| OpenVINO backend tests    | `just test-unit-openvino -- <args>`    |
+| Integration tests         | `just test-integration -- <args>`      |
 
 ## Conventions & Guardrails
 
