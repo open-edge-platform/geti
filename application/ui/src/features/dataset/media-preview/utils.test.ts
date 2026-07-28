@@ -136,11 +136,17 @@ describe('useNextMediaItem', () => {
     const mockFetchNextPage = vi.fn();
 
     beforeEach(() => {
+        const refetchMock = vi.fn();
+
         mockUseVideoPlayerContext.mockReturnValue(null);
         // @ts-expect-error We only care about mocking part of the context for this test.
         mockUseDatasetMediaWithReviewStatus.mockReturnValue({ fetchNextPage: mockFetchNextPage });
-        // @ts-expect-error We only care about mocking data and isPending for this test.
-        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({ data: { items: [] }, isPending: false, refetch: vi.fn });
+        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            // @ts-expect-error We only care about mocking data and isPending for this test.
+            data: { items: [] },
+            isPending: false,
+            refetch: () => refetchMock(),
+        });
         vi.clearAllMocks();
     });
 
