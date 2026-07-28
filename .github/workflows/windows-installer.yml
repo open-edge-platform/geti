@@ -20,10 +20,10 @@ on:
       exclude-agpl-models:
         type: boolean
         description: >
-          Exclude Ultralytics and other AGPL-licensed models from the image (true/false).
+          Exclude Ultralytics and other AGPL-licensed models from the installer (true/false).
           Intended for RC and release builds; regular builds should leave this disabled.
         required: false
-        default: "false"
+        default: false
     secrets:
       MSIX_SIGN_CERTIFICATE:
         description: "Certificate for signing the MSIX package"

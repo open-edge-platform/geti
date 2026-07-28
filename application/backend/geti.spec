@@ -13,13 +13,20 @@ _AGPL_MODULES = ['ultralytics', 'thop', 'pynvml']
 _MANIFESTS_ROOT = 'app/supported_models/manifests'
 
 def _is_agpl_manifest(path):
-    """Return True if a manifest YAML declares an AGPL-3.0 license."""
+    """Return True if a manifest YAML declares an AGPL-3.0 license.
+
+    Fails closed: if the manifest cannot be read or parsed, it is treated as
+    AGPL so it is excluded rather than accidentally shipped when the
+    compliance-driven EXCLUDE_AGPL_MODELS flag is enabled.
+    """
     try:
         with open(path, 'r', encoding='utf-8') as f:
             manifest = yaml.safe_load(f)
     except (OSError, yaml.YAMLError):
-        return False
-    return isinstance(manifest, dict) and manifest.get('license') == 'AGPL-3.0'
+        return True
+    if not isinstance(manifest, dict):
+        return True
+    return manifest.get('license') == 'AGPL-3.0'
 
 def _collect_manifests(exclude_agpl):
     """Collect model manifests (recursively), preserving subdirectory layout.
