@@ -25,7 +25,7 @@ const E2E_BASE_URL = process.env.E2E_BASE_URL;
 // output directories to already exist. Failing fast here produces a clearer
 // error than waiting for `webServer.timeout` to elapse on a 404-returning
 // preview server.
-if (CI) {
+if (CI && !process.env.ENABLE_BACKEND && !E2E_BASE_URL) {
     const requiredDirs = ['dist', 'dist-tauri'];
     for (const dir of requiredDirs) {
         const absolute = path.resolve(dirname, dir);
@@ -109,20 +109,21 @@ export default defineConfig({
     ],
 
     /* Run your local dev server(s) before starting the tests */
-    webServer: !process.env.ENABLE_BACKEND && !E2E_BASE_URL
-        ? [
-              {
-                  command: CI ? 'npm run preview -- --port 3000' : 'npm run start',
-                  url: 'http://localhost:3000',
-                  reuseExistingServer: true,
-                  timeout: ACTION_TIMEOUT,
-              },
-              {
-                  command: CI ? 'npm run preview:tauri' : 'npm run start:tauri -- --port 3001',
-                  url: 'http://localhost:3001',
-                  reuseExistingServer: true,
-                  timeout: ACTION_TIMEOUT,
-              },
-          ]
-        : undefined,
+    webServer:
+        !process.env.ENABLE_BACKEND && !E2E_BASE_URL
+            ? [
+                  {
+                      command: CI ? 'npm run preview -- --port 3000' : 'npm run start',
+                      url: 'http://localhost:3000',
+                      reuseExistingServer: true,
+                      timeout: ACTION_TIMEOUT,
+                  },
+                  {
+                      command: CI ? 'npm run preview:tauri' : 'npm run start:tauri -- --port 3001',
+                      url: 'http://localhost:3001',
+                      reuseExistingServer: true,
+                      timeout: ACTION_TIMEOUT,
+                  },
+              ]
+            : undefined,
 });
