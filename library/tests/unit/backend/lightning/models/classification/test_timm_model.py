@@ -19,6 +19,7 @@ def fxt_multi_class_cls_model():
         label_info=10,
         model_name="tf_efficientnetv2_s.in21k",
         data_input_params=DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+        pretrained=False,
     )
 
 
@@ -59,6 +60,7 @@ class TestTimmModelForMulticlassCls:
             model_name="tf_efficientnetv2_s.in21k",
             data_input_params=data_input_params,
             freeze_backbone=True,
+            pretrained=False,
         )
 
         classification_layers = model._identify_classification_layers()
@@ -69,6 +71,7 @@ class TestTimmModelForMulticlassCls:
             model_name="tf_efficientnetv2_s.in21k",
             data_input_params=data_input_params,
             freeze_backbone=False,
+            pretrained=False,
         )
         assert all(param.requires_grad for param in model.parameters())
 
@@ -79,6 +82,7 @@ def fxt_multi_label_cls_model():
         label_info=10,
         model_name="tf_efficientnetv2_s.in21k",
         data_input_params=DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+        pretrained=False,
     )
 
 
@@ -119,6 +123,7 @@ class TestTimmModelForMultilabelCls:
             model_name="tf_efficientnetv2_s.in21k",
             data_input_params=data_input_params,
             freeze_backbone=True,
+            pretrained=False,
         )
 
         classification_layers = model._identify_classification_layers()
@@ -129,6 +134,7 @@ class TestTimmModelForMultilabelCls:
             model_name="tf_efficientnetv2_s.in21k",
             data_input_params=data_input_params,
             freeze_backbone=False,
+            pretrained=False,
         )
         assert all(param.requires_grad for param in model.parameters())
 
