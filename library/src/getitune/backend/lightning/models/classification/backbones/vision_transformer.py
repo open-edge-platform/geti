@@ -225,7 +225,7 @@ class VisionTransformerBackbone(BaseModule):
         self.cls_token = nn.Parameter(torch.zeros(1, 1, self.embed_dim)) if class_token else None
         self.reg_token = nn.Parameter(torch.zeros(1, reg_tokens, self.embed_dim)) if reg_tokens else None
 
-        embed_len = num_patches if no_embed_class else num_patches + self.num_prefix_tokens
+        embed_len = num_patches + (1 if class_token else 0) if no_embed_class else num_patches + self.num_prefix_tokens
         self.pos_embed = nn.Parameter(torch.zeros(1, embed_len, self.embed_dim))
 
         self.pos_drop = nn.Dropout(p=pos_drop_rate)

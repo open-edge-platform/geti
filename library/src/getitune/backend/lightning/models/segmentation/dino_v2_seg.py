@@ -5,13 +5,11 @@
 
 from __future__ import annotations
 
-from collections import OrderedDict
 from functools import partial
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, cast
 from urllib.parse import urlparse
 
-import torch
 from torch.hub import download_url_to_file
 
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
@@ -20,6 +18,7 @@ from getitune.backend.lightning.models.segmentation.base import LightningSegment
 from getitune.backend.lightning.models.segmentation.heads import FCNHead
 from getitune.backend.lightning.models.segmentation.losses import CrossEntropyLossWithIgnore
 from getitune.backend.lightning.models.segmentation.segmentors import BaseSegmentationModel
+from getitune.backend.lightning.models.utils.utils import load_checkpoint
 from getitune.config.data import TileConfig
 from getitune.metrics.dice import SegmCallable
 from getitune.types import PathLike
@@ -154,31 +153,8 @@ class DinoV2Seg(LightningSegmentationModel):
 
         backbone = cast("VisionTransformerBackbone", self.model.backbone)
         backbone.load_checkpoint(backbone_weights)  # pyrefly: ignore[not-callable]
-        self._load_decode_head(Path(head_weights))
+        load_checkpoint(cast("nn.Module", self.model.decode_head), str(head_weights), prefix="decode_head")
 
         # freeze backbone
         for _, v in backbone.named_parameters():
             v.requires_grad = False
-
-    def _load_decode_head(self, weights_path: Path) -> None:
-        """Load compatible decode head weights from a full DinoV2Seg checkpoint.
-
-        Args:
-            weights_path: Path to the checkpoint containing ``model.decode_head.*`` keys.
-        """
-        state_dict = torch.load(weights_path, map_location="cpu")
-
-        prefix = "model.decode_head."
-        decode_head_state_dict = OrderedDict(
-            (key.removeprefix(prefix), value) for key, value in state_dict.items() if key.startswith(prefix)
-        )
-
-        decode_head = cast("nn.Module", self.model.decode_head)
-        target_state_dict = decode_head.state_dict()
-        compatible_state_dict = OrderedDict(
-            (key, value)
-            for key, value in decode_head_state_dict.items()
-            if key in target_state_dict and value.shape == target_state_dict[key].shape
-        )
-
-        decode_head.load_state_dict(compatible_state_dict, strict=False)
