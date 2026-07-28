@@ -77,10 +77,13 @@ const useNextUnannotatedMediaItem = (currentMediaItem: Media, allMediaItems: Med
     const isInsideFetchedMediaItems = nextUnannotatedMediaItem !== undefined;
 
     useEffect(() => {
+        if (!canNavigateToUnannotated) {
+            return;
+        }
         // When we navigate to the next media item, we need to refresh the list of the next unannotated media items
         // because the current media item has changed, and it may affect the next unannotated media item.
         refetch();
-    }, [currentMediaItem.id, refetch]);
+    }, [currentMediaItem.id, refetch, canNavigateToUnannotated]);
 
     useEffect(() => {
         // Nothing to do if we can't/shouldn't look for an unannotated item, the
