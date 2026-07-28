@@ -150,13 +150,17 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
   </thead>
   <tbody>
     <tr>
-      <td rowspan="8"><b>Object Detection</b><br>Locate and classify objects with bounding boxes, e.g. counting items, defect localization, surveillance.</td>
+      <td rowspan="11"><b>Object Detection</b><br>Locate and classify objects with bounding boxes. Common use cases: counting items, defect localization, surveillance.</td>
       <td>D-FINE M / L / X</td>
       <td><a href="https://arxiv.org/abs/2412.04234">DEIM</a> + <a href="https://arxiv.org/abs/2410.13842">D-FINE</a></td>
     </tr>
     <tr>
       <td>DINOv3 DETR S / M / L</td>
       <td><a href="https://arxiv.org/abs/2508.10104">DINOv3</a> + <a href="https://arxiv.org/html/2509.20787v4">DEIMv2</a> + <a href="https://arxiv.org/abs/2005.12872">DETR</a></td>
+    </tr>
+    <tr>
+      <td>ECDet S / M / L / X</td>
+      <td><a href="https://arxiv.org/abs/2603.18739">EdgeCrafter</a></td>
     </tr>
     <tr>
       <td>MobileNet V2 ATSS</td>
@@ -167,7 +171,7 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/1801.04381">MobileNetV2</a> + <a href="https://arxiv.org/abs/1512.02325">SSD</a></td>
     </tr>
     <tr>
-      <td>RF-DETR S / M / L</td>
+      <td>RF-DETR N / S / M / L</td>
       <td><a href="https://arxiv.org/abs/2511.09554">RF-DETR</a></td>
     </tr>
     <tr>
@@ -175,15 +179,23 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2304.08069">RT-DETR</a></td>
     </tr>
     <tr>
-      <td>YOLO26 Nano / Small / Medium</td>
-      <td><a href="https://github.com/ultralytics/ultralytics">Ultralytics YOLO</a></td>
+      <td>YOLO11 N / S / M / L / X</td>
+      <td><a href="https://docs.ultralytics.com/models/yolo11#overview">Ultralytics YOLO11</a></td>
+    </tr>
+    <tr>
+      <td>YOLO12 N / S / M / L / X</td>
+      <td><a href="https://arxiv.org/abs/2502.12524">YOLOv12</a></td>
+    </tr>
+    <tr>
+      <td>YOLO26 Nano / Small / Medium / Large / XLarge</td>
+      <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
     </tr>
     <tr>
       <td>YOLOX Tiny / S / L / X</td>
       <td><a href="https://arxiv.org/abs/2107.08430">YOLOX</a></td>
     </tr>
     <tr>
-      <td rowspan="6"><b>Instance Segmentation</b><br>Detect objects and produce pixel-precise masks per instance, e.g. measuring object area, robotics, medical imaging.</td>
+      <td rowspan="7"><b>Instance Segmentation</b><br>Detect objects and produce pixel-precise masks per instance. Common use cases: medical imaging, robotics, area estimation.</td>
       <td>RTMDet Tiny</td>
       <td><a href="https://arxiv.org/abs/2212.07784">RTMDet</a></td>
     </tr>
@@ -200,15 +212,19 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2103.14030">Swin Transformer</a> + <a href="https://arxiv.org/abs/1703.06870">Mask R-CNN</a></td>
     </tr>
     <tr>
-      <td>RF-DETR S / M / L</td>
+      <td>RF-DETR N / S / M / L / XL / 2XL</td>
       <td><a href="https://arxiv.org/abs/2511.09554">RF-DETR</a></td>
     </tr>
     <tr>
-      <td>YOLO26 Nano / Small / Medium</td>
-      <td><a href="https://github.com/ultralytics/ultralytics">Ultralytics YOLO</a></td>
+      <td>YOLO11 N / S / M / L / X</td>
+      <td><a href="https://docs.ultralytics.com/models/yolo11#overview">Ultralytics YOLO11</a></td>
     </tr>
     <tr>
-      <td rowspan="5"><b>Classification</b> (multi-class, multi-label)<br>Assign one or more labels to an entire image, e.g. quality pass/fail, product categorization, content tagging.</td>
+      <td>YOLO26 Nano / Small / Medium / Large / XLarge</td>
+      <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
+    </tr>
+    <tr>
+      <td rowspan="6"><b>Classification</b> (multi-class, multi-label)<br>Assign one or more labels to an entire image. Common use cases: defect classification, product categorization, content tagging.</td>
       <td>ViT Tiny</td>
       <td><a href="https://arxiv.org/abs/2010.11929">ViT</a></td>
     </tr>
@@ -227,6 +243,10 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
     <tr>
       <td>MobileNet V3 Large</td>
       <td><a href="https://arxiv.org/abs/1905.02244">MobileNetV3</a></td>
+    </tr>
+    <tr>
+      <td>YOLO26 Nano / Small / Medium / Large / XLarge</td>
+      <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
     </tr>
   </tbody>
 </table>
