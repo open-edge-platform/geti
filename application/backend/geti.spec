@@ -1,13 +1,48 @@
 # -*- mode: python ; coding: utf-8 -*-
 import glob
 import platform
+import os
+import yaml
 from PyInstaller.utils.hooks import collect_all, collect_dynamic_libs, collect_submodules, collect_data_files, copy_metadata
+
+# When set to "1", exclude Ultralytics (AGPL-3.0) models from the bundle.
+EXCLUDE_AGPL_MODELS = os.environ.get("EXCLUDE_AGPL_MODELS", "0") == "1"
+
+_AGPL_MODULES = ['ultralytics', 'thop', 'pynvml']
+
+_MANIFESTS_ROOT = 'app/supported_models/manifests'
+
+def _is_agpl_manifest(path):
+    """Return True if a manifest YAML declares an AGPL-3.0 license."""
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            manifest = yaml.safe_load(f)
+    except (OSError, yaml.YAMLError):
+        return False
+    return isinstance(manifest, dict) and manifest.get('license') == 'AGPL-3.0'
+
+def _collect_manifests(exclude_agpl):
+    """Collect model manifests (recursively), preserving subdirectory layout.
+
+    When exclude_agpl is True, AGPL-3.0 licensed manifests are dropped to mirror
+    the manifest stripping done in docker/Dockerfile.
+    """
+    result = []
+    for path in glob.glob(os.path.join(_MANIFESTS_ROOT, '**', '*'), recursive=True):
+        if not os.path.isfile(path):
+            continue
+        if exclude_agpl and path.endswith(('.yaml', '.yml')) and _is_agpl_manifest(path):
+            continue  # skip AGPL-licensed model manifest
+        # Preserve the manifest's subdirectory structure in the bundle.
+        dest_dir = os.path.dirname(path)
+        result.append((path, dest_dir))
+    return result
 
 datas = [
     ('app/alembic', 'app/alembic'),
     ('app/alembic.ini', 'app'),
     ('app/static/*', 'app/static'),
-    ('app/supported_models/manifests/*', 'app/supported_models/manifests'),
+    *_collect_manifests(EXCLUDE_AGPL_MODELS),
     *copy_metadata("geti"),
     *copy_metadata("optree"),
     *copy_metadata("torch"),
@@ -206,7 +241,8 @@ a = Analysis(
     hooksconfig={},
     runtime_hooks=runtime_hooks,
     excludes=[
-        'torch.utils.benchmark'
+        'torch.utils.benchmark',
+        *(_AGPL_MODULES if EXCLUDE_AGPL_MODELS else []),
     ],
     noarchive=False,
     optimize=0,
@@ -224,6 +260,14 @@ a.datas = [d for d in a.datas if not _is_excluded(d[0], _excluded_triton_backend
 # Remove non-redistributable DLLs from MSIX distribution
 _excluded_dlls = ('torch/lib/cusolverMg64_11.dll', 'torch/lib/nvperf_host.dll')
 a.binaries = [b for b in a.binaries if not _is_excluded(b[0], _excluded_dlls)]
+
+# When excluding AGPL models, drop any data/binaries transitively collected from
+# the AGPL packages uninstalled in docker/Dockerfile (ultralytics,
+# ultralytics-thop -> thop, nvidia-ml-py -> pynvml/nvidia_ml_py).
+if EXCLUDE_AGPL_MODELS:
+    _excluded_agpl = ('ultralytics', 'thop', 'pynvml', 'nvidia_ml_py')
+    a.binaries = [b for b in a.binaries if not _is_excluded(b[0], _excluded_agpl)]
+    a.datas = [d for d in a.datas if not _is_excluded(d[0], _excluded_agpl)]
 
 pyz = PYZ(a.pure)
 
