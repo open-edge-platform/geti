@@ -48,7 +48,7 @@ jobs:
           files_yaml: |
             test:
               - library/**
-              - .github/**
+              - .github/workflows/lib-lint-and-test.yaml
 
       # Separate filter so we only run the (slow, network-bound) benchmark
       # dataset preparation tests when those scripts are touched.
