@@ -1,7 +1,7 @@
 # Installing Intel Geti™
 
 Geti™ is a full-stack web application to build and deploy computer vision AI models, powered by the
-[getitune](../../library) library. This guide consolidates all the ways to install and run Geti™ so you
+[getitune](../../library) library. This guide covers all the supported ways to install and run Geti™ so you
 can choose the method that best fits your workflow.
 
 ## System requirements
@@ -19,8 +19,8 @@ There are several ways to run Geti™, choose the one that best fits your workfl
 
 - [**Windows app**](#windows-app) - install as a native desktop application.
 - [**Docker**](#run-with-docker) - download and run one of the pre-built Docker images, or build one yourself.
-- [**Run from source (for development)**](#run-from-source-for-development) - run the server and the UI as standalone components.
 - [**Install script**](#install-script) - download and run a script that builds and configures Geti™ automatically.
+- [**Run from source (for development)**](#run-from-source-for-development) - run the server and the UI as standalone components.
 
 For deployment-specific log collection and troubleshooting, see [Troubleshooting > Logs](#troubleshooting-logs).
 
@@ -37,7 +37,12 @@ Installing Geti™ as a Windows app is the simplest way to run it on Windows.
 
 If Windows shows a security prompt, verify that the package is from the official Geti™ release before continuing.
 
-![Launch Geti™ from Start menu](media/geti-task-bar.webp)
+![Launch Geti™ from Start menu](media/geti-task-bar.jpg)
+
+> [!IMPORTANT]
+> Windows apps do not include Ultralytics models due to AGPL licensing constraints. If you need them,
+> please use the [install script](#install-script) or [build a Docker image from source](#option-2-build-the-image) 
+> as described below.
 
 ## Run with Docker
 
@@ -54,24 +59,14 @@ and NVIDIA® CUDA platforms; you can also build your own image from source.
 
 ### (Option 1) Download the image
 
-Choose the most suitable image for your system.
-
-If you have a modern Intel® CPU or GPU, the XPU image is the recommended choice to fully exploit its AI capabilities:
+Choose the most suitable image for your system:
 
 ```bash
+# Choose the right image based on your hardware. Available options:
+#  - xpu: best choice if you have a modern Intel® CPU or GPU
+#  - cuda: recommended if you have a CUDA-enabled platform
+#  - cpu: most lightweight option (CPU-only) if you don't have a compatible GPU
 docker pull ghcr.io/open-edge-platform/geti-xpu
-```
-
-If you have a CUDA-enabled platform, choose this image instead:
-
-```bash
-docker pull ghcr.io/open-edge-platform/geti-cuda
-```
-
-Even if you don't have a compatible GPU, you can still train models with the CPU-only image. This is also the most lightweight choice:
-
-```bash
-docker pull ghcr.io/open-edge-platform/geti-cpu
 ```
 
 Retag the pulled image as `geti-{cpu,xpu,cuda}:latest` for use with `just run-image`:
@@ -82,7 +77,7 @@ docker tag ghcr.io/open-edge-platform/geti-cpu:latest geti-cpu:latest
 
 > [!IMPORTANT]
 > Pre-built container images do not include Ultralytics models due to AGPL licensing constraints. If you need them,
-> build the image from source as described below.
+> [build the image from source](#option-2-build-the-image) as described below.
 
 ### (Option 2) Build the image
 
@@ -119,7 +114,8 @@ For a full list of runtime options, run `just --usage run-image`.
 After the container starts, you can access the Geti™ web application at `https://localhost:7860` (assuming default settings).
 If your browser warns about a self-signed certificate, choose to proceed.
 
-#### Custom port
+<details>
+<summary><strong>Custom port</strong></summary>
 
 By default, Geti™ publishes on host port `7860`. If that port is already in use on your machine, or you simply prefer a
 different one, pass `--port` to `just run-image`:
@@ -130,7 +126,10 @@ just run-image --accelerator xpu --port 8080
 
 The Geti™ web application is then reachable at `https://localhost:8080`.
 
-#### TLS certificates
+</details>
+
+<details>
+<summary><strong>TLS certificates</strong></summary>
 
 By default, the container generates a self-signed certificate at startup and serves over HTTPS on the configured port.
 For production deployments, mount your certificate and private key into the container using `--volumes`, then point
@@ -149,6 +148,27 @@ The cert directory is mounted read-only and is separate from the data volume - i
 > The self-signed certificate triggers a browser security warning. For a trusted local setup, generate a
 > locally-trusted cert with [mkcert](https://github.com/FiloSottile/mkcert) and pass it the same way.
 
+</details>
+
+<details>
+<summary><strong>Browse the app storage</strong></summary>
+
+The Geti™ application uses a Docker volume named `geti-data` to persistently store all datasets, models, and other objects.
+You can browse the contents of this volume by running a temporary container that mounts the volume and lists the files.
+
+```shell
+# List the contents of the root directory in the `geti-data` volume
+docker run --rm -v geti-data:/data alpine ls -l /data
+
+# List the model files of a specific project (replace <PROJECT_ID> with the actual ID)
+docker run --rm -v geti-data:/data alpine ls -l /data/projects/<PROJECT_ID>/models
+
+# List the media files of a specific project (replace <PROJECT_ID> with the actual ID)
+docker run --rm -v geti-data:/data alpine ls -l /data/projects/<PROJECT_ID>/dataset
+```
+
+</details>
+
 ### WebRTC preview networking and TURN
 
 Geti™ uses WebRTC for real-time inference streaming visualization in the UI. WebRTC requires the browser to establish a
@@ -162,7 +182,8 @@ NAT, load balancers, or restrictive firewall policies.
 | Public host behind load balancer with fixed public IP/DNS | Configure the advertised public endpoint in your runtime setup. |
 | Restrictive firewall (UDP blocked, only TCP 443 allowed) | Run a TURN relay and start Geti™ with TURN enabled. |
 
-#### Local machine or local network
+<details>
+<summary><strong>Local machine or local network</strong></summary>
 
 On localhost this often works without changes. For LAN clients, run with STUN:
 
@@ -170,7 +191,10 @@ On localhost this often works without changes. For LAN clients, run with STUN:
 just run-image --accelerator xpu --stun stun:stun.l.google.com:19302
 ```
 
-#### Dynamic public IP (cloud or ephemeral hosts)
+</details>
+
+<details>
+<summary><strong>Dynamic public IP (cloud or ephemeral hosts)</strong></summary>
 
 Use STUN-based discovery:
 
@@ -178,12 +202,18 @@ Use STUN-based discovery:
 just run-image --accelerator xpu --stun stun:stun.l.google.com:19302
 ```
 
-#### Fixed public IP or DNS
+</details>
+
+<details>
+<summary><strong>Fixed public IP or DNS</strong></summary>
 
 If your deployment has a stable public endpoint, set that endpoint in your runtime configuration so clients do not
 receive an internal/private address.
 
-#### Restrictive firewall: TURN relay
+</details>
+
+<details>
+<summary><strong>Restrictive firewall: TURN relay</strong></summary>
 
 When UDP media ports are blocked, relay media through TURN over TCP/443.
 
@@ -217,36 +247,7 @@ Notes:
 - The default TURN recipe is suitable for development/validation. For production, use short-lived credentials and hardened TURN settings.
 - If you run Docker directly (without `just`), publish the WebRTC UDP media port range and keep it reachable.
 
-#### WSL2: preview connects but video freezes after a few frames
-
-When the backend runs in **WSL2** and the browser runs on the **Windows host**, the WebRTC preview may show
-the first few frames and then freeze. Typical symptoms: the browser's `framesReceived` stops increasing while
-`bytesReceived` keeps growing and `packetsLost` climbs steadily. This means bytes reach the browser but complete
-video frames can never be reassembled — the classic signature of large RTP/UDP packets being dropped by WSL2's
-virtual NIC (an MTU/NAT issue), **not** an ICE candidate problem. Because the byte path itself is broken,
-`--webrtc-advertise-ip`, `--stun`, and `--coturn` all fail identically.
-
-Fixes, in order of preference:
-
-1. **Enable WSL2 mirrored networking (recommended).** This makes WSL share the Windows host network stack and
-   removes the virtual NAT/MTU boundary entirely. Add the following to `%UserProfile%\.wslconfig` on Windows and
-   restart WSL (`wsl --shutdown`):
-
-   ```ini
-   [wsl2]
-   networkingMode=mirrored
-   ```
-
-2. **Lower the WSL2 interface MTU** so RTP packets fit without fragmentation, then reconnect the stream:
-
-   ```bash
-   sudo ip link set dev eth0 mtu 1400
-   ```
-
-   If this helps, make it persistent (e.g. via a WSL boot command in `/etc/wsl.conf`).
-
-3. **Run the backend and browser on the same side** (both inside WSL, or use the Docker image on the Windows host)
-   to avoid crossing the WSL2 network boundary altogether.
+</details>
 
 ## Run from source (for development)
 
@@ -393,25 +394,6 @@ choose to proceed.
 ## Advanced
 
 <details>
-<summary><strong>Browse the app storage</strong></summary>
-
-The Geti™ application uses a Docker volume named `geti-data` to persistently store all datasets, models, and other objects.
-You can browse the contents of this volume by running a temporary container that mounts the volume and lists the files.
-
-```shell
-# List the contents of the root directory in the `geti-data` volume
-docker run --rm -v geti-data:/data alpine ls -l /data
-
-# List the model files of a specific project (replace <PROJECT_ID> with the actual ID)
-docker run --rm -v geti-data:/data alpine ls -l /data/projects/<PROJECT_ID>/models
-
-# List the media files of a specific project (replace <PROJECT_ID> with the actual ID)
-docker run --rm -v geti-data:/data alpine ls -l /data/projects/<PROJECT_ID>/dataset
-```
-
-</details>
-
-<details>
 <summary><strong>Air-gapped setup (pretrained weights cache)</strong></summary>
 
 When deploying Geti™ in an air-gapped or restricted network environment, the application cannot automatically download
@@ -468,10 +450,74 @@ docker run --rm -v geti-data:/data alpine ls -l /data/pretrained_weights/<TASK_T
 
 </details>
 
+## Upgrading
+
+- **Upgrading an existing Geti™ v3 installation to a newer release?** See the [Upgrade guide](./upgrade.md) for how to
+  move to a newer version (Docker or Windows MSIX) while preserving your projects, datasets and models, with automatic
+  rollback if a migration fails.
+- **Upgrading from Geti™ v2 to v3?** The two versions have different architectures and storage layouts. Follow the
+  dedicated [migration guidance](https://docs.geti.intel.com/docs/user-guide/getting-started/installation/migration-from-geti-2x)
+  in the Geti™ documentation.
+
+## Uninstalling
+
+- **Docker:** Stop and remove the running container, then remove the pulled image. To also delete all stored data,
+  remove the `geti-data` volume (this is irreversible):
+
+  ```bash
+  # Stop and remove the container (replace <container> with the container name or ID)
+  docker stop <container> && docker rm <container>
+
+  # (Optional) Remove the image (instead of xpu, use `geti-cuda` or `geti-cpu` if you pulled those images)
+  docker rmi ghcr.io/open-edge-platform/geti-xpu
+
+  # (Optional, irreversible) Delete all stored datasets, models, and logs
+  docker volume rm geti-data geti-logs
+  ```
+
+- **MSIX (Windows app):** Uninstall the package from the **Start** menu (right-click **Geti™ > Uninstall**) or via
+  **Settings > Apps > Installed apps > Geti™ > Uninstall**.
+
+## Troubleshooting
+
+<details>
+<summary><strong>WSL2: WebRTC preview connects but video freezes after a few frames</strong></summary>
+
+When the backend runs in **WSL2** and the browser runs on the **Windows host**, the WebRTC preview may show
+the first few frames and then freeze. Typical symptoms: the browser's `framesReceived` stops increasing while
+`bytesReceived` keeps growing and `packetsLost` climbs steadily. This means bytes reach the browser but complete
+video frames can never be reassembled — the classic signature of large RTP/UDP packets being dropped by WSL2's
+virtual NIC (an MTU/NAT issue), **not** an ICE candidate problem. Because the byte path itself is broken,
+`--webrtc-advertise-ip`, `--stun`, and `--coturn` all fail identically.
+
+Fixes, in order of preference:
+
+1. **Enable WSL2 mirrored networking (recommended).** This makes WSL share the Windows host network stack and
+   removes the virtual NAT/MTU boundary entirely. Add the following to `%UserProfile%\.wslconfig` on Windows and
+   restart WSL (`wsl --shutdown`):
+
+   ```ini
+   [wsl2]
+   networkingMode=mirrored
+   ```
+
+2. **Lower the WSL2 interface MTU** so RTP packets fit without fragmentation, then reconnect the stream:
+
+   ```bash
+   sudo ip link set dev eth0 mtu 1400
+   ```
+
+   If this helps, make it persistent (e.g. via a WSL boot command in `/etc/wsl.conf`).
+
+3. **Run the backend and browser on the same side** (both inside WSL, or use the Docker image on the Windows host)
+   to avoid crossing the WSL2 network boundary altogether.
+
+</details>
+
 <a id="troubleshooting-logs"></a>
 
 <details>
-<summary><strong>Troubleshooting: view the logs</strong></summary>
+<summary><strong>View the logs</strong></summary>
 
 When running Geti™ with Docker, all logs are stored in the `geti-logs` Docker volume. You can view these logs by running
 a temporary container that mounts the volume and prints the log files to the console.
@@ -510,13 +556,6 @@ docker run --rm -v geti-logs:/logs alpine cat /logs/workers/inference.log | jq -
 ```
 
 </details>
-
-## Upgrading and uninstalling
-
-- **Upgrading an existing installation?** See the [Upgrade guide](./upgrade.md) for how to move to a newer version
-  (Docker or Windows MSIX) while preserving your projects, datasets and models, with automatic rollback if a migration fails.
-- **Uninstalling:** For **MSIX**, uninstall the package from Windows Settings; for **Docker**, stop/remove the container and (optionally) delete the `geti-data` volume to remove stored data.
-- For legacy Geti™ v2 installation on servers or cloud, refer to the v2 documentation.
 
 ## Notes
 
