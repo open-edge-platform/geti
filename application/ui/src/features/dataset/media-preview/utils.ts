@@ -60,7 +60,7 @@ export const getNextMediaItem = (currentMediaItem: Media, allMediaItems: Media[]
 const useNextUnannotatedMediaItem = (currentMediaItem: Media, allMediaItems: Media[]) => {
     const { annotationStatus } = useDatasetFiltersSearchParams();
     const { fetchNextPage, hasNextPage, isFetchingNextPage } = useDatasetMediaWithReviewStatus();
-    const { data, isPending } = useFetchNextUnannotatedMediaItem();
+    const { data, isPending, refetch } = useFetchNextUnannotatedMediaItem();
     const items = data?.items ?? [];
 
     // Only relevant when the gallery can actually contain unannotated media.
@@ -75,6 +75,12 @@ const useNextUnannotatedMediaItem = (currentMediaItem: Media, allMediaItems: Med
         : undefined;
     const nextUnannotatedMediaItem = allMediaItems.find((item) => item.id === nextUnannotatedDatasetMediaItem?.id);
     const isInsideFetchedMediaItems = nextUnannotatedMediaItem !== undefined;
+
+    useEffect(() => {
+        // When we navigate to the next media item, we need to refresh the list of the next unannotated media items
+        // because the current media item has changed, and it may affect the next unannotated media item.
+        refetch();
+    }, [currentMediaItem.id, refetch]);
 
     useEffect(() => {
         // Nothing to do if we can't/shouldn't look for an unannotated item, the
