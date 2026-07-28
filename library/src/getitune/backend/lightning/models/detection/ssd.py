@@ -71,7 +71,8 @@ class SSD(LightningDetectionModel):
     """
 
     pretrained_urls: ClassVar[dict[str, str]] = {
-        "ssd_mobilenetv2": "https://storage.geti.intel.com/weights/mobilenet_v2-2s_ssd-992x736.pth",
+        "ssd_mobilenetv2": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/"
+        "object_detection/v2/mobilenet_v2-2s_ssd-992x736.pth",
     }
 
     def __init__(

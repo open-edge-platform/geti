@@ -78,10 +78,10 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
     """
 
     pretrained_urls: ClassVar[dict[str, str]] = {
-        "rfdetr_nano": "https://storage.geti.intel.com/weights/rf-detr-nano-2026.pth",
-        "rfdetr_small": "https://storage.geti.intel.com/weights/rf-detr-small-2026.pth",
-        "rfdetr_medium": "https://storage.geti.intel.com/weights/rf-detr-medium-2026.pth",
-        "rfdetr_large": "https://storage.geti.intel.com/weights/rf-detr-large-2026.pth",
+        "rfdetr_nano": "https://storage.googleapis.com/rfdetr/nano_coco/checkpoint_best_regular.pth",
+        "rfdetr_small": "https://storage.googleapis.com/rfdetr/small_coco/checkpoint_best_regular.pth",
+        "rfdetr_medium": "https://storage.googleapis.com/rfdetr/medium_coco/checkpoint_best_regular.pth",
+        "rfdetr_large": "https://storage.googleapis.com/rfdetr/rf-detr-large-2026.pth",
     }
 
     _model_config_mapping: ClassVar[dict[str, type]] = {
