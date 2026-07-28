@@ -17,6 +17,13 @@ on:
         type: string
         required: false
         default: ""
+      exclude-agpl-models:
+        type: boolean
+        description: >
+          Exclude Ultralytics and other AGPL-licensed models from the installer (true/false).
+          Intended for RC and release builds; regular builds should leave this disabled.
+        required: false
+        default: false
     secrets:
       MSIX_SIGN_CERTIFICATE:
         description: "Certificate for signing the MSIX package"
@@ -508,7 +515,14 @@ jobs:
         working-directory: application/backend
         env:
           DEVICE: ${{ inputs.device || 'xpu' }}
-        run: just pyinstaller --accelerator "$env:DEVICE"
+          EXCLUDE_AGPL_MODELS: ${{ inputs.exclude-agpl-models }}
+        run: |
+          $OPTIONS = @("--accelerator", "$env:DEVICE")
+          if ($env:EXCLUDE_AGPL_MODELS -eq "true") {
+            $OPTIONS += "--exclude-agpl-models"
+          }
+          Write-Host "Running: just pyinstaller $($OPTIONS -join ' ')"
+          just pyinstaller @OPTIONS
 
       # Copy backend artifacts to UI
 
