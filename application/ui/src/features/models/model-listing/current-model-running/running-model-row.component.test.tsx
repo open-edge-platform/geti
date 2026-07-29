@@ -3,13 +3,13 @@
 
 import { act, screen, waitFor, within } from '@testing-library/react';
 import { getMockedDatasetRevision } from 'mocks/mock-dataset-revision';
-import { getMockedJob } from 'mocks/mock-job';
+import { getMockedTrainJob } from 'mocks/mock-job';
 import { getMockedModel, getMockedModelArchitecture } from 'mocks/mock-model';
 import { HttpResponse } from 'msw';
 import { render, renderHook } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
-import { useGetCurrentRunningJobs, useStreamJobStatus } from '../../../../hooks/api/jobs/jobs.hook';
+import { useGetCurrentModelRunningJobs, useStreamJobStatus } from '../../../../hooks/api/jobs/jobs.hook';
 import { server } from '../../../../msw-node-setup';
 import {
     getLastEventSource,
@@ -52,7 +52,7 @@ describe('RunningModelRow', () => {
     });
 
     it('renders all fields correctly when grouped by dataset', async () => {
-        const job = getMockedJob({
+        const job = getMockedTrainJob({
             metadata: {
                 project: { id: '123' },
                 model: {
@@ -104,7 +104,7 @@ describe('RunningModelRow', () => {
     });
 
     it('renders all fields correctly when grouped by architecture', async () => {
-        const job = getMockedJob({
+        const job = getMockedTrainJob({
             metadata: {
                 project: { id: '123' },
                 model: {
@@ -166,7 +166,7 @@ describe('RunningModelRow', () => {
 
     it('renders Cancel button when onCancel is provided and job is running', async () => {
         const mockCancel = vi.fn();
-        const job = getMockedJob({
+        const job = getMockedTrainJob({
             metadata: {
                 project: { id: '123' },
                 model: {
@@ -201,7 +201,7 @@ describe('RunningModelRow', () => {
 
     it('disables Cancel button when job is not running', async () => {
         const mockCancel = vi.fn();
-        const job = getMockedJob({
+        const job = getMockedTrainJob({
             metadata: {
                 project: { id: '123' },
                 model: {
@@ -234,7 +234,7 @@ describe('RunningModelRow', () => {
     });
 
     describe('useStreamJobStatus', () => {
-        const job = getMockedJob({
+        const job = getMockedTrainJob({
             metadata: {
                 project: { id: '123' },
                 model: {
@@ -277,7 +277,7 @@ describe('RunningModelRow', () => {
 
             const { result: jobsResult } = renderHook(() => {
                 useStreamJobStatus(job.job_id);
-                return useGetCurrentRunningJobs();
+                return useGetCurrentModelRunningJobs();
             });
 
             await waitFor(() => {
