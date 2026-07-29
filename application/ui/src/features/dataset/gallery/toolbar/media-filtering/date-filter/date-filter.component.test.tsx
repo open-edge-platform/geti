@@ -64,7 +64,7 @@ describe('DateFilter', () => {
         expect(getAppliedFilters()).toBe(`${expectedStartDate}|${expectedEndDate}`);
     });
 
-    it('does not apply the filter and shows an error when the end date is earlier than the start date', async () => {
+    it('keeps the previously applied filters and shows an error when the end date is earlier than the start date', async () => {
         const user = userEvent.setup();
 
         renderDateFilter(search);
@@ -73,7 +73,7 @@ describe('DateFilter', () => {
         await user.keyboard('2023');
 
         expect(await screen.findByText('End date must be later than start date')).toBeVisible();
-        expect(getAppliedFilters()).toBe('none|none');
+        expect(getAppliedFilters()).toBe(`${START_DATE}|${END_DATE}`);
     });
 
     it('re-applies the filter once the range becomes valid again', async () => {
@@ -89,7 +89,10 @@ describe('DateFilter', () => {
         await user.click(getYearSegment('End date'));
         await user.keyboard('2025');
 
+        const expectedEndDate = new Date(END_DATE);
+        expectedEndDate.setFullYear(2025);
+
         expect(screen.queryByText('End date must be later than start date')).not.toBeInTheDocument();
-        expect(getAppliedFilters()).not.toBe('none|none');
+        expect(getAppliedFilters()).toBe(`${START_DATE}|${expectedEndDate.toISOString()}`);
     });
 });

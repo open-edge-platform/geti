@@ -33,10 +33,14 @@ export const DateFilter = () => {
     const hasInvalidRange = isInvalidRange(localStartDate, localEndDate);
 
     const applyFilters = (start: ZonedDateTime | null, end: ZonedDateTime | null) => {
-        const isInvalid = isInvalidRange(start, end);
+        // An invalid range is never written to the search params, the previously applied
+        // filters are kept untouched until the user enters a valid range again
+        if (isInvalidRange(start, end)) {
+            return;
+        }
 
-        setStartDate(isInvalid || start === null ? null : toISOString(start));
-        setEndDate(isInvalid || end === null ? null : toISOString(end));
+        setStartDate(start === null ? null : toISOString(start));
+        setEndDate(end === null ? null : toISOString(end));
     };
 
     const handleStartDateChange = (date: ZonedDateTime | null) => {
