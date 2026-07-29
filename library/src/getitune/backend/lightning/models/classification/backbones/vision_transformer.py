@@ -97,8 +97,8 @@ class VisionTransformerBackbone(BaseModule):
                 "embed_dim": 384,
                 "depth": 12,
                 "num_heads": 6,
-                "reg_tokens": 4,
-                "no_embed_class": True,
+                "reg_tokens": 0,
+                "no_embed_class": False,
                 "init_values": 1e-05,
             }
             for key in ["dinov2-small-seg"]
@@ -225,7 +225,7 @@ class VisionTransformerBackbone(BaseModule):
         self.cls_token = nn.Parameter(torch.zeros(1, 1, self.embed_dim)) if class_token else None
         self.reg_token = nn.Parameter(torch.zeros(1, reg_tokens, self.embed_dim)) if reg_tokens else None
 
-        embed_len = num_patches + (1 if class_token else 0) if no_embed_class else num_patches + self.num_prefix_tokens
+        embed_len = num_patches if no_embed_class else num_patches + self.num_prefix_tokens
         self.pos_embed = nn.Parameter(torch.zeros(1, embed_len, self.embed_dim))
 
         self.pos_drop = nn.Dropout(p=pos_drop_rate)
@@ -396,7 +396,6 @@ class VisionTransformerBackbone(BaseModule):
         if npatch == n and w == h:
             return self.pos_embed
         pos_embed = self.pos_embed.float()
-        patch_pos_embed = pos_embed[:, 1:]
         dim = x.shape[-1]
         w0 = w // self.patch_size
         h0 = h // self.patch_size
@@ -413,6 +412,7 @@ class VisionTransformerBackbone(BaseModule):
         else:
             # Simply specify an output size instead of a scale factor
             kwargs["size"] = (w0, h0)
+        patch_pos_embed = pos_embed[:, 1:]
         patch_pos_embed = nn.functional.interpolate(
             patch_pos_embed.reshape(1, m, m, dim).permute(0, 3, 1, 2),
             mode="bicubic",
