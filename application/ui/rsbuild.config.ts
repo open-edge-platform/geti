@@ -136,7 +136,14 @@ export default defineConfig({
         headers: {
             'Cross-Origin-Embedder-Policy': 'credentialless',
             'Cross-Origin-Opener-Policy': 'same-origin',
-            'Cache-Control': 'public, max-age=31536000, immutable',
+            // Must stay `no-cache` (revalidate via ETag). Dev assets — including the
+            // HMR client and async chunks — are not content-hashed, so an `immutable`
+            // policy makes the browser serve a stale HMR client that can no longer
+            // apply updates. It then falls back to a full reload, which loads the same
+            // stale client again: an infinite reload loop. Production assets are hashed
+            // and served with their own cache headers by the backend/Tauri, so this
+            // only affects the local rsbuild dev/preview server.
+            'Cache-Control': 'no-cache',
             'Content-Security-Policy':
                 "default-src 'self'; " +
                 "script-src 'self' 'unsafe-eval' blob:; " +
