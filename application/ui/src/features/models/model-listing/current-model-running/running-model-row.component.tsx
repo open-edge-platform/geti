@@ -3,12 +3,18 @@
 
 import { useState } from 'react';
 
-import type { DatasetRevision, Job, ModelArchitectureWithPerformanceCategory } from '@/api/types';
+import type {
+    DatasetRevision,
+    Job,
+    ModelArchitectureWithPerformanceCategory,
+    QuantizeJob,
+    TrainJob,
+} from '@/api/types';
 import { AlertDialog, Badge, Button, DialogContainer, Flex, Grid, Loading, Text } from '@geti-ui/ui';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
-import { isTrainJob } from 'hooks/api/util';
+import { isJobPending, isTrainJob } from 'hooks/api/util';
 import { capitalize } from 'lodash-es';
 
 import { formatDateTime } from '../../../../shared/date-utils';
@@ -25,7 +31,7 @@ import classes from './current-model-running.module.scss';
 dayjs.extend(duration);
 
 type RunningModelRowProps = {
-    job: Job;
+    job: TrainJob | QuantizeJob;
     onCancel?: () => void;
     groupBy: GroupByMode;
     datasetRevisions: DatasetRevision[];
@@ -112,14 +118,13 @@ export const RunningModelRow = ({
 }: RunningModelRowProps) => {
     useStreamJobStatus(job.job_id);
 
-    const modelId = 'model' in job.metadata ? job.metadata.model?.id : undefined;
-    const { data: trainingModel } = useGetModel(modelId);
+    const modelId = job.metadata.model.id;
+    const { data: trainingModel } = useGetModel(modelId, !isJobPending(job));
 
-    const device = isTrainJob(job) ? job.metadata.device.name : null;
+    const device = isTrainJob(job) ? job?.metadata.device.name : null;
 
-    const modelArchitectureId =
-        'model' in job.metadata && 'architecture' in job.metadata.model && job.metadata.model.architecture;
-    const modelName = trainingModel?.name;
+    const modelArchitectureId = job.metadata.model.architecture;
+    const modelName = trainingModel?.name || job.metadata.model.name;
 
     const modelArchitecture = modelArchitectures.find(({ id }) => id === modelArchitectureId);
 
