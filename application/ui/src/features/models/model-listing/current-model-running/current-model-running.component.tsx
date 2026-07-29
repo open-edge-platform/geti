@@ -4,6 +4,7 @@
 import type { DatasetRevision } from '@/api/types';
 import { dimensionValue, Flex, Heading, View } from '@geti-ui/ui';
 import { useCancelJob, useGetCurrentModelRunningJobs } from 'hooks/api/jobs/jobs.hook';
+import { useDismissedJobs } from 'hooks/storage/use-dismissed-jobs.hook';
 import { isEmpty, isNil } from 'lodash-es';
 
 import { useGetTaskModelArchitectures } from '../../hooks/api/use-get-model-architectures.hook';
@@ -20,6 +21,7 @@ export const CurrentModelRunning = ({ groupBy, datasetRevisions }: CurrentModelR
     const cancelJobMutation = useCancelJob();
     const activeRunningJobs = useGetCurrentModelRunningJobs();
     const { modelArchitectures } = useGetTaskModelArchitectures();
+    const { dismissJob } = useDismissedJobs();
 
     const handleCancelRunning = (jobId: string | undefined) => {
         if (jobId) {
@@ -39,7 +41,7 @@ export const CurrentModelRunning = ({ groupBy, datasetRevisions }: CurrentModelR
             UNSAFE_style={{ padding: 'var(--spectrum-global-dimension-size-300)' }}
         >
             <Heading level={2} UNSAFE_style={{ fontSize: dimensionValue('size-300') }}>
-                Currently running
+                Jobs
             </Heading>
 
             <View backgroundColor={'gray-75'}>
@@ -51,6 +53,7 @@ export const CurrentModelRunning = ({ groupBy, datasetRevisions }: CurrentModelR
                             key={job.job_id}
                             job={job}
                             onCancel={() => handleCancelRunning(job.job_id)}
+                            onDismiss={() => dismissJob(job.job_id)}
                             groupBy={groupBy}
                             datasetRevisions={datasetRevisions}
                             modelArchitectures={modelArchitectures}

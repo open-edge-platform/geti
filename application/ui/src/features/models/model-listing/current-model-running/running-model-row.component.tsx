@@ -14,7 +14,7 @@ import { AlertDialog, Badge, Button, DialogContainer, Flex, Grid, Loading, Text 
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
-import { isJobPending, isTrainJob } from 'hooks/api/util';
+import { isJobFailed, isJobPending, isTrainJob } from 'hooks/api/util';
 import { capitalize } from 'lodash-es';
 
 import { formatDateTime } from '../../../../shared/date-utils';
@@ -33,6 +33,7 @@ dayjs.extend(duration);
 type RunningModelRowProps = {
     job: TrainJob | QuantizeJob;
     onCancel?: () => void;
+    onDismiss?: () => void;
     groupBy: GroupByMode;
     datasetRevisions: DatasetRevision[];
     modelArchitectures: ModelArchitectureWithPerformanceCategory[];
@@ -48,6 +49,18 @@ const StatusBadge = ({ status }: { status: string }) => {
                 </Flex>
             </Text>
         </Badge>
+    );
+};
+
+const FailedStatusBadge = () => {
+    return <Badge variant={'negative'}>Failed</Badge>;
+};
+
+const DismissFailedJob = ({ onDismiss }: { onDismiss: () => void }) => {
+    return (
+        <Button variant={'negative'} onPress={onDismiss} aria-label={'Dismiss failed job'}>
+            Dismiss
+        </Button>
     );
 };
 
@@ -112,11 +125,15 @@ const ViewLogsButton = ({ jobId }: { jobId: string }) => {
 export const RunningModelRow = ({
     job,
     onCancel,
+    onDismiss,
     datasetRevisions,
     groupBy,
     modelArchitectures,
 }: RunningModelRowProps) => {
-    useStreamJobStatus(job.job_id);
+    // Annotated explicitly: `isJobFailed` is a type guard that would otherwise narrow `job` down to `Job`
+    const isFailed: boolean = isJobFailed(job);
+
+    useStreamJobStatus(isFailed ? undefined : job.job_id);
 
     const modelId = job.metadata.model.id;
     const { data: trainingModel } = useGetModel(modelId, !isJobPending(job));
@@ -139,11 +156,12 @@ export const RunningModelRow = ({
 
     const statusMessage = job.message || (job.status === 'PENDING' ? 'Pending...' : 'Running...');
 
+    // The failed job's error is not shown here, it can be an arbitrarily long traceback; the logs dialog has it
     const showStatusTagMessage =
-        job.status.toLocaleLowerCase() !== statusMessage.replace('...', '').toLocaleLowerCase();
+        !isFailed && job.status.toLocaleLowerCase() !== statusMessage.replace('...', '').toLocaleLowerCase();
 
     return (
-        <BottomProgressBar progress={job.progress}>
+        <BottomProgressBar progress={isFailed ? 0 : job.progress}>
             <Grid
                 columns={RUNNING_JOB_GRID_COLUMNS}
                 alignItems={'center'}
@@ -157,7 +175,7 @@ export const RunningModelRow = ({
                     </Flex>
 
                     <Flex alignItems={'start'} gap={'size-100'}>
-                        <StatusBadge status={capitalize(job.status)} />
+                        {isFailed ? <FailedStatusBadge /> : <StatusBadge status={capitalize(job.status)} />}
                         {showStatusTagMessage && <StatusBadgeMessage status={statusMessage} />}
                     </Flex>
 
@@ -175,7 +193,9 @@ export const RunningModelRow = ({
 
                 <Flex gap={'size-100'} direction={'column'} alignItems={'center'}>
                     <ViewLogsButton jobId={job.job_id} />
-                    {onCancel ? <CancelRunningJob onCancel={onCancel} job={job} /> : null}
+                    {isFailed
+                        ? onDismiss && <DismissFailedJob onDismiss={onDismiss} />
+                        : onCancel && <CancelRunningJob onCancel={onCancel} job={job} />}
                 </Flex>
             </Grid>
         </BottomProgressBar>
