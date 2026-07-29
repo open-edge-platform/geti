@@ -236,9 +236,7 @@ const { data } = $api.useQuery('get', '/api/sources');
 // Mutation
 const mutation = $api.useMutation('post', '/api/sources');
 mutation.mutate({
-    body: {
-        /* ... */
-    },
+    body: {/* ... */},
 });
 ```
 
@@ -255,9 +253,7 @@ const createProject = useCreateProject();
 createProject.mutate({
     body: {
         name: 'My Project',
-        task: {
-            /* ... */
-        },
+        task: {/* ... */},
     },
 });
 ```

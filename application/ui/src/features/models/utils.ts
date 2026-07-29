@@ -39,13 +39,11 @@ export const getAllModelsWithOpenVINOVariants = (models: Model[]): SelectableMod
     return models.flatMap((model) =>
         model.variants
             .filter((variant) => variant.format === 'openvino')
-            .map(
-                (variant): SelectableModel => ({
-                    modelVariantId: variant.id,
-                    modelId: model.id,
-                    name: `${model.name} [${variant.precision.toUpperCase()}]`,
-                })
-            )
+            .map((variant): SelectableModel => ({
+                modelVariantId: variant.id,
+                modelId: model.id,
+                name: `${model.name} [${variant.precision.toUpperCase()}]`,
+            }))
     );
 };
 
