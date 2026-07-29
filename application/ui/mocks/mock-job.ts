@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { ExportDatasetJob, Job, PrepareImportDatasetJob, TrainJob } from '@/api/types';
+import type { ExportDatasetJob, Job, PrepareImportDatasetJob, QuantizeJob, TrainJob } from '@/api/types';
 
 export const getMockedTrainJob = (job: Partial<TrainJob> = {}): TrainJob => {
     return {
@@ -56,6 +56,36 @@ export const getMockedJob = (job: Partial<Job> = {}): Job => {
         status: 'RUNNING',
         progress: 45,
         message: 'Training in progress...',
+        error: null,
+        started_at: '2026-01-19T08:15:00.000000+00:00',
+        finished_at: null,
+        ...job,
+    };
+};
+
+export const getMockedQuantizeJob = (job: Partial<QuantizeJob> = {}): QuantizeJob => {
+    return {
+        job_id: 'b2c3d4e5-f6a7-8901-bcde-f23456789012',
+        job_type: 'quantize',
+        metadata: {
+            project: {
+                id: '7b073838-99d3-42ff-9018-4e901eb047fc',
+            },
+            model: {
+                id: 'ef3983f1-cef0-4ebe-91db-7330f1dd6e27',
+                name: 'ATSS (ef3983f1)',
+                architecture: 'Custom_Object_Detection_Gen3_ATSS',
+            },
+            model_variant: {
+                id: '0a5c1a1b-6e9d-4a0f-9c1d-2b3e4f5a6b7c',
+            },
+            max_calibration_subset_size: 100,
+            max_drop: null,
+            max_num_iterations: null,
+        },
+        status: 'RUNNING',
+        progress: 45,
+        message: 'Quantization in progress...',
         error: null,
         started_at: '2026-01-19T08:15:00.000000+00:00',
         finished_at: null,
