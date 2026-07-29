@@ -47,7 +47,7 @@ def mock_modules_for_chkpt() -> Iterator[None]:
     import types
 
     import getitune
-    from getitune.types.label import HLabelInfo, LabelInfo, SegLabelInfo
+    from getitune.types.label import LabelInfo, SegLabelInfo
 
     # Save original sys.modules
     original_sys_modules = dict(sys.modules)
@@ -62,7 +62,6 @@ def mock_modules_for_chkpt() -> Iterator[None]:
         setattr(sys.modules["getitune.config.data"], "UnlabeledDataConfig", UnlabeledDataConfig)  # noqa: B010
         setattr(sys.modules["getitune.config.data"], "VisualPromptingConfig", VisualPromptingConfig)  # noqa: B010
         setattr(sys.modules["getitune.types.label"], "LabelInfo", LabelInfo)  # noqa: B010
-        setattr(sys.modules["getitune.types.label"], "HLabelInfo", HLabelInfo)  # noqa: B010
         setattr(sys.modules["getitune.types.label"], "SegLabelInfo", SegLabelInfo)  # noqa: B010
         setattr(sys.modules["getitune.types.task"], "OTXTrainType", OTXTrainType)  # noqa: B010
 

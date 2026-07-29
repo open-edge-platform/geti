@@ -5,7 +5,6 @@
 import pytest
 
 from getitune.backend.lightning.models.base import DataInputParams
-from getitune.backend.lightning.models.classification.hlabel_models.vit import VisionTransformerHLabelCls
 from getitune.backend.lightning.models.classification.multiclass_models.vit import VisionTransformerMulticlassCls
 from getitune.backend.lightning.models.classification.multilabel_models.vit import VisionTransformerMultilabelCls
 from getitune.data.entity.base import BatchLoss
@@ -16,9 +15,8 @@ class TestVitTiny:
         params=[
             (VisionTransformerMulticlassCls, "fxt_multiclass_cls_batch_data_entity", "fxt_multiclass_labelinfo"),
             (VisionTransformerMultilabelCls, "fxt_multilabel_cls_batch_data_entity", "fxt_multilabel_labelinfo"),
-            (VisionTransformerHLabelCls, "fxt_hlabel_cls_batch_data_entity", "fxt_hlabel_cifar"),
         ],
-        ids=["multiclass", "multilabel", "hlabel"],
+        ids=["multiclass", "multilabel"],
     )
     def fxt_model_and_input(self, request):
         model_cls, input_fxt_name, label_info_fxt_name = request.param
@@ -53,9 +51,8 @@ class TestVitTiny:
         [
             (VisionTransformerMulticlassCls, "fxt_multiclass_labelinfo"),
             (VisionTransformerMultilabelCls, "fxt_multilabel_labelinfo"),
-            (VisionTransformerHLabelCls, "fxt_hlabel_cifar"),
         ],
-        ids=["multiclass", "multilabel", "hlabel"],
+        ids=["multiclass", "multilabel"],
     )
     def test_freeze_backbone(self, model_cls, label_info_fxt_name, request):
         data_input_params = DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0))

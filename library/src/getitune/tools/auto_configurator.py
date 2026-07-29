@@ -33,9 +33,7 @@ RECIPE_PATH = get_getitune_root_path() / "recipe"
 DEFAULT_CONFIG_PER_TASK = {
     TaskType.MULTI_CLASS_CLS: RECIPE_PATH / "classification" / "multi_class_cls" / "mobilenet_v3_large.yaml",
     TaskType.MULTI_LABEL_CLS: RECIPE_PATH / "classification" / "multi_label_cls" / "mobilenet_v3_large.yaml",
-    TaskType.H_LABEL_CLS: RECIPE_PATH / "classification" / "h_label_cls" / "mobilenet_v3_large.yaml",
     TaskType.DETECTION: RECIPE_PATH / "detection" / "yolox_s.yaml",
-    TaskType.ROTATED_DETECTION: RECIPE_PATH / "rotated_detection" / "maskrcnn_r50.yaml",
     TaskType.SEMANTIC_SEGMENTATION: RECIPE_PATH / "semantic_segmentation" / "litehrnet_18.yaml",
     TaskType.INSTANCE_SEGMENTATION: RECIPE_PATH / "instance_segmentation" / "rfdetr_seg_small.yaml",
     TaskType.KEYPOINT_DETECTION: RECIPE_PATH / "keypoint_detection" / "rtmpose_tiny.yaml",
@@ -45,9 +43,7 @@ DEFAULT_CONFIG_PER_TASK = {
 OVMODEL_PER_TASK = {
     TaskType.MULTI_CLASS_CLS: "getitune.backend.openvino.models.OVMulticlassClassificationModel",
     TaskType.MULTI_LABEL_CLS: "getitune.backend.openvino.models.OVMultilabelClassificationModel",
-    TaskType.H_LABEL_CLS: "getitune.backend.openvino.models.OVHlabelClassificationModel",
     TaskType.DETECTION: "getitune.backend.openvino.models.OVDetectionModel",
-    TaskType.ROTATED_DETECTION: "getitune.backend.openvino.models.OVRotatedDetectionModel",
     TaskType.INSTANCE_SEGMENTATION: "getitune.backend.openvino.models.OVInstanceSegmentationModel",
     TaskType.SEMANTIC_SEGMENTATION: "getitune.backend.openvino.models.OVSegmentationModel",
     TaskType.KEYPOINT_DETECTION: "getitune.backend.openvino.models.OVKeypointDetectionModel",

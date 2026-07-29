@@ -22,7 +22,6 @@ OUT_SIZE = 224
 IMAGE_SHAPE = (OUT_SIZE, OUT_SIZE)
 PRED_LABELS = [[0, 2, 3], [1], []]
 PRED_LABELS_TOP_ONE = [[1], [0], [4]]
-HCLS_LABELS = [[0, 0, 0, 0, 0, 0], [1, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
 SALIENCY_MAPS = [torch.ones((NUM_CLASSES, RAW_SIZE, RAW_SIZE), dtype=torch.float32) for _ in range(BATCH_SIZE)]
 SALIENCY_MAPS_IMAGE = [torch.ones((RAW_SIZE, RAW_SIZE), dtype=torch.float32) for _ in range(BATCH_SIZE)]
 ORI_IMG_SHAPES = [(OUT_SIZE, OUT_SIZE)] * BATCH_SIZE
@@ -167,18 +166,7 @@ def _get_pred_result_multilabel(pred_labels, pred_scores) -> PredictionBatch:
     )
 
 
-def _get_pred_result_hcls(pred_labels, pred_scores) -> PredictionBatch:
-    return PredictionBatch(
-        images=torch.stack([torch.randn(3, OUT_SIZE, OUT_SIZE, dtype=torch.float32) for _ in range(BATCH_SIZE)]),
-        imgs_info=IMGS_INFO,
-        scores=pred_scores,
-        labels=pred_labels,
-        saliency_map=SALIENCY_MAPS,
-        feature_vector=None,
-    )
-
-
-def test_process_saliency_maps_in_pred_entity_multiclass(fxt_multiclass_labelinfo) -> None:
+def test_process_saliency_maps_in_pred_entity_multiclass() -> None:
     explain_config = ExplainConfig(target_explain_group=TargetExplainGroup.PREDICTIONS)
 
     pred_labels = [torch.tensor(labels) for labels in PRED_LABELS_TOP_ONE]
@@ -189,7 +177,6 @@ def test_process_saliency_maps_in_pred_entity_multiclass(fxt_multiclass_labelinf
     predict_result = process_saliency_maps_in_pred_entity(
         [predict_result_batch1, predict_result_batch2],
         explain_config,
-        fxt_multiclass_labelinfo,
     )
 
     for i in range(len(predict_result)):
@@ -199,7 +186,7 @@ def test_process_saliency_maps_in_pred_entity_multiclass(fxt_multiclass_labelinf
         assert all(len(s_map_dict) == 1 for s_map_dict in processed_saliency_maps)
 
 
-def test_process_saliency_maps_in_pred_entity_multilabel(fxt_multilabel_labelinfo) -> None:
+def test_process_saliency_maps_in_pred_entity_multilabel() -> None:
     explain_config = ExplainConfig(target_explain_group=TargetExplainGroup.PREDICTIONS)
 
     pred_labels = [torch.tensor(labels) for labels in PRED_LABELS]
@@ -210,7 +197,6 @@ def test_process_saliency_maps_in_pred_entity_multilabel(fxt_multilabel_labelinf
     predict_result = process_saliency_maps_in_pred_entity(
         [predict_result_batch1, predict_result_batch2],
         explain_config,
-        fxt_multilabel_labelinfo,
     )
 
     for i in range(len(predict_result)):
@@ -218,25 +204,6 @@ def test_process_saliency_maps_in_pred_entity_multilabel(fxt_multilabel_labelinf
         assert isinstance(predict_result[i].saliency_map[0], dict)
         processed_saliency_maps = predict_result[i].saliency_map
         assert all(len(s_map_dict) == len(PRED_LABELS[i]) for (i, s_map_dict) in enumerate(processed_saliency_maps))
-
-
-def test_process_saliency_maps_in_pred_entity_hcls(fxt_hlabel_multilabel_info) -> None:
-    explain_config = ExplainConfig(target_explain_group=TargetExplainGroup.PREDICTIONS)
-
-    pred_labels = [torch.tensor(labels) for labels in HCLS_LABELS]
-    pred_scores = [torch.tensor([0.7 for _ in labels]) for labels in HCLS_LABELS]
-    predict_result_batch1 = _get_pred_result_hcls(pred_labels, pred_scores)
-    predict_result_batch2 = _get_pred_result_hcls(pred_labels, pred_scores)
-
-    predict_result = process_saliency_maps_in_pred_entity(
-        [predict_result_batch1, predict_result_batch2],
-        explain_config,
-        fxt_hlabel_multilabel_info,
-    )
-
-    for i in range(len(predict_result)):
-        assert isinstance(predict_result[i].saliency_map, list)
-        assert isinstance(predict_result[i].saliency_map[0], dict)
 
 
 def test_process_crop_padded_map() -> None:

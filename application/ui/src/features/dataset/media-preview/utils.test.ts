@@ -136,20 +136,29 @@ describe('useNextMediaItem', () => {
     const mockFetchNextPage = vi.fn();
 
     beforeEach(() => {
+        const refetchMock = vi.fn();
+
         mockUseVideoPlayerContext.mockReturnValue(null);
         // @ts-expect-error We only care about mocking part of the context for this test.
         mockUseDatasetMediaWithReviewStatus.mockReturnValue({ fetchNextPage: mockFetchNextPage });
-        // @ts-expect-error We only care about mocking data and isPending for this test.
-        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({ data: { items: [] }, isPending: false });
+        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            // @ts-expect-error We only care about mocking data and isPending for this test.
+            data: { items: [] },
+            isPending: false,
+            refetch: () => refetchMock(),
+        });
         vi.clearAllMocks();
     });
 
     it('prefers the next unannotated media item over the positional next item', () => {
         const items = getMultipleMockedMediaImage(3);
+        const refetchMock = vi.fn();
+
         mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
             // @ts-expect-error We only care about mocking data and isPending for this test.
             data: { items: [getMockedDatasetItem({ id: items[2].id })] },
             isPending: false,
+            refetch: refetchMock,
         });
 
         const { result } = renderHook(() => useNextMediaItem(items[0], items));
@@ -168,10 +177,12 @@ describe('useNextMediaItem', () => {
     it('ignores annotation status and advances by frame when the current item is a video frame', () => {
         const frame = getMockedVideoFrame({ id: 'video-1', frame_number: 0, frame_count: 10 });
         const nextImage = getMockedMediaImage({ id: 'image-1' });
+        const refetchMock = vi.fn();
         mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
             // @ts-expect-error We only care about mocking data and isPending for this test.
             data: { items: [getMockedDatasetItem({ id: nextImage.id })] },
             isPending: false,
+            refetch: refetchMock,
         });
 
         const { result } = renderHook(() => useNextMediaItem(frame, [frame, nextImage]));
@@ -191,10 +202,12 @@ describe('useNextMediaItem', () => {
 
     it('excludes the current item from the unannotated candidates', () => {
         const items = getMultipleMockedMediaImage(2);
+        const refetchMock = vi.fn();
         mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
             // @ts-expect-error We only care about mocking data and isPending for this test.
             data: { items: [getMockedDatasetItem({ id: items[0].id })] },
             isPending: false,
+            refetch: refetchMock,
         });
 
         const { result } = renderHook(() => useNextMediaItem(items[0], items));
@@ -206,10 +219,12 @@ describe('useNextMediaItem', () => {
         const alreadyFetchedItems = getMultipleMockedMediaImage(2);
         const nextUnannotatedItem = getMockedDatasetItem({ id: 'not-loaded-item' });
         const nextUnannotatedMediaImage = getMockedMediaImage({ id: nextUnannotatedItem.id });
+        const refetchMock = vi.fn();
         mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
             // @ts-expect-error We only care about mocking data and isPending for this test.
             data: { items: [nextUnannotatedItem] },
             isPending: false,
+            refetch: refetchMock,
         });
         // The candidate isn't among the already-fetched items, so there must be more
         // pages available (and none currently in flight) for a fetch to be worthwhile.
@@ -233,15 +248,40 @@ describe('useNextMediaItem', () => {
 
     it('does not fetch the next page when the next unannotated item is already among the fetched items', () => {
         const alreadyFetchedItems = getMultipleMockedMediaImage(2);
+        const refetchMock = vi.fn();
+
         mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
             // @ts-expect-error We only care about mocking data and isPending for this test.
             data: { items: [getMockedDatasetItem({ id: alreadyFetchedItems[1].id })] },
             isPending: false,
+            refetch: refetchMock,
         });
 
         renderHook(() => useNextMediaItem(alreadyFetchedItems[0], alreadyFetchedItems));
 
         expect(mockFetchNextPage).not.toHaveBeenCalled();
+    });
+
+    it('refreshes the list of unannotated media items when current media item changes', () => {
+        const items = getMultipleMockedMediaImage(2);
+        const refetchMock = vi.fn();
+
+        let currentMediaItem = items[0];
+
+        mockUseFetchNextUnannotatedMediaItem.mockReturnValue({
+            // @ts-expect-error We only care about mocking data and isPending for this test.
+            data: { items: [getMockedDatasetItem({ id: items[1].id })] },
+            isPending: false,
+            refetch: refetchMock,
+        });
+
+        const { rerender } = renderHook(() => useNextMediaItem(currentMediaItem, items));
+
+        currentMediaItem = items[1];
+
+        rerender();
+
+        expect(refetchMock).toHaveBeenCalled();
     });
 });
 

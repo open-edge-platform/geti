@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { dimensionValue, Divider, Flex, Heading } from '@geti-ui/ui';
-import { useGetCurrentRunningJobs } from 'hooks/api/jobs/jobs.hook';
+import { useGetCurrentModelRunningJobs } from 'hooks/api/jobs/jobs.hook';
 import { isEmpty, isString } from 'lodash-es';
 
 import { ReactComponent as NoTrainedModels } from '../../../assets/no-trained-models.svg';
@@ -14,7 +14,7 @@ import { ModelListing } from './model-listing.component';
 import { ModelListingProvider, useModelListing } from './provider/model-listing-provider';
 
 const ModelListingContent = () => {
-    const runningJobs = useGetCurrentRunningJobs();
+    const runningJobs = useGetCurrentModelRunningJobs();
     const { groupedModels, searchBy, datasetRevisions, groupBy, showFailedModels } = useModelListing();
 
     const hasNoResults = groupedModels.length === 0 && (searchBy.length > 0 || !showFailedModels);
