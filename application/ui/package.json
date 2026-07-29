@@ -60,7 +60,7 @@
         "react-dom": "~19.1.1",
         "react-error-boundary": "~3.1.4",
         "react-hotkeys-hook": "^5.2.1",
-        "react-router": "~6.30.4",
+        "react-router": "~7.18.0",
         "react-router-dom": "~6.30.4",
         "react-stately": "^3.47.0",
         "recharts": "~3.7.0",
