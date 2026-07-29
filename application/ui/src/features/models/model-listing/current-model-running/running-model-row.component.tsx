@@ -8,7 +8,7 @@ import { AlertDialog, Badge, Button, DialogContainer, Flex, Grid, Loading, Text 
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
-import { isTrainJob } from 'hooks/api/util';
+import { isJobPending, isQuantizeJob, isTrainJob } from 'hooks/api/util';
 import { capitalize } from 'lodash-es';
 
 import { formatDateTime } from '../../../../shared/date-utils';
@@ -113,13 +113,15 @@ export const RunningModelRow = ({
     useStreamJobStatus(job.job_id);
 
     const modelId = 'model' in job.metadata ? job.metadata.model?.id : undefined;
-    const { data: trainingModel } = useGetModel(modelId);
+    const { data: trainingModel } = useGetModel(modelId, Boolean(modelId) && !isJobPending(job));
 
-    const device = isTrainJob(job) ? job.metadata.device.name : null;
+    const trainJob = isTrainJob(job) ? job : undefined;
+    const optimizationJob = isQuantizeJob(job) ? job : undefined;
+    const currentJob = trainJob || optimizationJob;
+    const device = trainJob?.metadata.device.name ?? null;
 
-    const modelArchitectureId =
-        'model' in job.metadata && 'architecture' in job.metadata.model && job.metadata.model.architecture;
-    const modelName = trainingModel?.name;
+    const modelArchitectureId = currentJob?.metadata.model.architecture;
+    const modelName = trainingModel?.name || currentJob?.metadata.model.name;
 
     const modelArchitecture = modelArchitectures.find(({ id }) => id === modelArchitectureId);
 
