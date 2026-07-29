@@ -1,8 +1,10 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useState } from 'react';
+
 import { DatePicker, Flex, Text } from '@geti-ui/ui';
-import { getLocalTimeZone, parseAbsoluteToLocal, type DateValue } from '@internationalized/date';
+import { parseAbsoluteToLocal, type ZonedDateTime } from '@internationalized/date';
 import dayjs from 'dayjs';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 
@@ -11,23 +13,42 @@ import classes from './date-filter.module.scss';
 const MIN_DATE = parseAbsoluteToLocal(dayjs('2020-01-30').startOf('d').toISOString());
 const MAX_DATE = parseAbsoluteToLocal(dayjs('9999-11-30').endOf('d').toISOString());
 
+const INVALID_RANGE_MESSAGE = 'End date must be later than start date';
+
+const toDateValue = (date: string | null): ZonedDateTime | null => (date === null ? null : parseAbsoluteToLocal(date));
+
+const toISOString = (date: ZonedDateTime): string => date.toDate().toISOString();
+
+const isInvalidRange = (start: ZonedDateTime | null, end: ZonedDateTime | null): boolean =>
+    start !== null && end !== null && end.compare(start) < 0;
+
 export const DateFilter = () => {
     const { startDate, endDate, setStartDate, setEndDate } = useDatasetFiltersSearchParams();
 
-    const handleStartDateChange = (date: DateValue | null) => {
-        if (date === null) {
-            return;
-        }
+    // The pickers are kept in local state so that an invalid range can be shown to the user
+    // without being applied to the dataset filters
+    const [localStartDate, setLocalStartDate] = useState<ZonedDateTime | null>(() => toDateValue(startDate));
+    const [localEndDate, setLocalEndDate] = useState<ZonedDateTime | null>(() => toDateValue(endDate));
 
-        setStartDate(date.toDate(getLocalTimeZone()).toISOString());
+    const hasInvalidRange = isInvalidRange(localStartDate, localEndDate);
+
+    const applyFilters = (start: ZonedDateTime | null, end: ZonedDateTime | null) => {
+        const isInvalid = isInvalidRange(start, end);
+
+        setStartDate(isInvalid || start === null ? null : toISOString(start));
+        setEndDate(isInvalid || end === null ? null : toISOString(end));
     };
 
-    const handleEndDateChange = (date: DateValue | null) => {
-        if (date === null) {
-            return;
-        }
+    const handleStartDateChange = (date: ZonedDateTime | null) => {
+        setLocalStartDate(date);
 
-        setEndDate(date.toDate(getLocalTimeZone()).toISOString());
+        applyFilters(date, localEndDate);
+    };
+
+    const handleEndDateChange = (date: ZonedDateTime | null) => {
+        setLocalEndDate(date);
+
+        applyFilters(localStartDate, date);
     };
 
     return (
@@ -42,9 +63,10 @@ export const DateFilter = () => {
                     labelPosition={'top'}
                     hourCycle={24}
                     minValue={MIN_DATE}
-                    maxValue={endDate === null ? MAX_DATE : parseAbsoluteToLocal(endDate)}
-                    value={startDate === null ? null : parseAbsoluteToLocal(startDate)}
+                    maxValue={MAX_DATE}
+                    value={localStartDate}
                     onChange={handleStartDateChange}
+                    validationState={hasInvalidRange ? 'invalid' : undefined}
                 />
 
                 <DatePicker
@@ -53,10 +75,12 @@ export const DateFilter = () => {
                     label='End date'
                     labelPosition={'top'}
                     hourCycle={24}
-                    minValue={startDate === null ? MIN_DATE : parseAbsoluteToLocal(startDate)}
+                    minValue={MIN_DATE}
                     maxValue={MAX_DATE}
-                    value={endDate === null ? null : parseAbsoluteToLocal(endDate)}
+                    value={localEndDate}
                     onChange={handleEndDateChange}
+                    validationState={hasInvalidRange ? 'invalid' : undefined}
+                    errorMessage={hasInvalidRange ? INVALID_RANGE_MESSAGE : undefined}
                 />
             </Flex>
         </Flex>
