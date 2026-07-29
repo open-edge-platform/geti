@@ -1,9 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useCallback, useRef } from 'react';
+
 import { ActionButton, DOMRefValue, Flex, useUnwrapDOMRef, View } from '@geti-ui/ui';
 import { DownloadIcon } from '@geti-ui/ui/icons';
-import { useCallback, useRef } from 'react';
 import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 
 import { Box } from '../components/box/box.component';
@@ -68,7 +69,7 @@ export const MetricGraph = ({ title, data, xAxisLabel, yAxisLabel }: MetricGraph
             URL.revokeObjectURL(url);
         };
         img.src = url;
-    }, [title]);
+    }, [title, unwrappedGraphRef]);
 
     return (
         <Flex flex={1} direction={'column'} minWidth={'size-5000'}>
