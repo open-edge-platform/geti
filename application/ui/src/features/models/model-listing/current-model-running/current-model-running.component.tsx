@@ -3,7 +3,7 @@
 
 import type { DatasetRevision } from '@/api/types';
 import { dimensionValue, Flex, Heading, View } from '@geti-ui/ui';
-import { useCancelJob, useGetCurrentRunningJobs } from 'hooks/api/jobs/jobs.hook';
+import { useCancelJob, useGetCurrentModelRunningJobs } from 'hooks/api/jobs/jobs.hook';
 import { isEmpty, isNil } from 'lodash-es';
 
 import { useGetTaskModelArchitectures } from '../../hooks/api/use-get-model-architectures.hook';
@@ -18,7 +18,7 @@ type CurrentModelRunningProps = {
 
 export const CurrentModelRunning = ({ groupBy, datasetRevisions }: CurrentModelRunningProps) => {
     const cancelJobMutation = useCancelJob();
-    const activeRunningJobs = useGetCurrentRunningJobs();
+    const activeRunningJobs = useGetCurrentModelRunningJobs();
     const { modelArchitectures } = useGetTaskModelArchitectures();
 
     const handleCancelRunning = (jobId: string | undefined) => {

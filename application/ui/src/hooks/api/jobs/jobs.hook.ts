@@ -4,7 +4,7 @@
 import { useRef } from 'react';
 
 import { $api } from '@/api';
-import type { Job } from '@/api/types';
+import type { Job, QuantizeJob, TrainJob } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
@@ -88,21 +88,17 @@ const useListJobs = () => {
     return $api.useQuery('get', '/api/jobs');
 };
 
-export const useGetCurrentRunningJobs = () => {
+const isTrainOrQuantizeJob = (job: Job): job is TrainJob | QuantizeJob => isTrainJob(job) || isQuantizeJob(job);
+
+export const useGetCurrentModelRunningJobs = (): (QuantizeJob | TrainJob)[] | undefined => {
     const projectId = useProjectIdentifier();
     const activeJobs = useListJobs();
 
-    const activeRunningJobs = activeJobs.data?.filter((job) => {
+    return activeJobs.data?.filter((job): job is TrainJob | QuantizeJob => {
         const isActive = job.status === 'RUNNING' || job.status === 'PENDING';
 
-        if (isActive && (isTrainJob(job) || isQuantizeJob(job))) {
-            return job.metadata.project.id === projectId;
-        }
-
-        return false;
+        return isActive && isTrainOrQuantizeJob(job) && job.metadata.project.id === projectId;
     });
-
-    return activeRunningJobs;
 };
 
 export const useCancelJob = () => {

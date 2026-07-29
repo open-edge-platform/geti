@@ -11,7 +11,7 @@ import { http } from '../../../api/utils';
 import * as toastModule from '../../../components/toast/toast.component';
 import { server } from '../../../msw-node-setup';
 import { MockEventSourceConstructor, resetMockEventSource } from '../../../test-utils/mock-event-source';
-import { useGetCurrentRunningJobs, useStreamJobStatus } from './jobs.hook';
+import { useGetCurrentModelRunningJobs, useStreamJobStatus } from './jobs.hook';
 
 const PROJECT_ID = '123';
 
@@ -41,7 +41,7 @@ describe('useGetCurrentRunningJobs', () => {
     it('returns an empty array when there are no active running jobs', async () => {
         server.use(http.get('/api/jobs', () => HttpResponse.json([])));
 
-        const { result } = renderHook(() => useGetCurrentRunningJobs());
+        const { result } = renderHook(() => useGetCurrentModelRunningJobs());
 
         await waitFor(() => {
             expect(result.current).toEqual([]);
@@ -52,7 +52,7 @@ describe('useGetCurrentRunningJobs', () => {
         const job = createMockJobForProject();
         server.use(http.get('/api/jobs', () => HttpResponse.json([job])));
 
-        const { result } = renderHook(() => useGetCurrentRunningJobs());
+        const { result } = renderHook(() => useGetCurrentModelRunningJobs());
 
         await waitFor(() => {
             expect(result.current).toHaveLength(1);
@@ -78,7 +78,7 @@ describe('useGetCurrentRunningJobs', () => {
         });
         server.use(http.get('/api/jobs', () => HttpResponse.json([otherProjectJob])));
 
-        const { result } = renderHook(() => useGetCurrentRunningJobs());
+        const { result } = renderHook(() => useGetCurrentModelRunningJobs());
 
         await waitFor(() => {
             expect(result.current).toEqual([]);
@@ -88,7 +88,7 @@ describe('useGetCurrentRunningJobs', () => {
     it('does not subscribe to SSE when no active running job matches the project', async () => {
         server.use(http.get('/api/jobs', () => HttpResponse.json([])));
 
-        renderHook(() => useGetCurrentRunningJobs());
+        renderHook(() => useGetCurrentModelRunningJobs());
 
         await waitFor(() => {
             expect(MockEventSourceConstructor).not.toHaveBeenCalled();
