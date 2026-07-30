@@ -3,90 +3,67 @@
 
 import { useState } from 'react';
 
-import { DatePicker, Flex, Text } from '@geti-ui/ui';
-import { parseAbsoluteToLocal, type ZonedDateTime } from '@internationalized/date';
-import dayjs from 'dayjs';
+import { DateRangePicker } from '@geti-ui/ui';
+import {
+    getLocalTimeZone,
+    parseAbsoluteToLocal,
+    parseDate,
+    Time,
+    toCalendarDate,
+    toCalendarDateTime,
+    today,
+    type CalendarDate,
+} from '@internationalized/date';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 
-import classes from './date-filter.module.scss';
+type DateRange = { start: CalendarDate; end: CalendarDate };
 
-const MIN_DATE = parseAbsoluteToLocal(dayjs('2020-01-30').startOf('d').toISOString());
-const MAX_DATE = parseAbsoluteToLocal(dayjs('9999-11-30').endOf('d').toISOString());
+const MIN_DATE = parseDate('2020-01-01');
+const END_OF_DAY = new Time(23, 59, 59, 999);
 
-const INVALID_RANGE_MESSAGE = 'End date must be later than start date';
+const toDateRange = (start: string | null, end: string | null): DateRange | null =>
+    start === null || end === null
+        ? null
+        : { start: toCalendarDate(parseAbsoluteToLocal(start)), end: toCalendarDate(parseAbsoluteToLocal(end)) };
 
-const toDateValue = (date: string | null): ZonedDateTime | null => (date === null ? null : parseAbsoluteToLocal(date));
+const toStartOfDay = (date: CalendarDate): string => date.toDate(getLocalTimeZone()).toISOString();
 
-const toISOString = (date: ZonedDateTime): string => date.toDate().toISOString();
+const toEndOfDay = (date: CalendarDate): string =>
+    toCalendarDateTime(date, END_OF_DAY).toDate(getLocalTimeZone()).toISOString();
 
-const isInvalidRange = (start: ZonedDateTime | null, end: ZonedDateTime | null): boolean =>
-    start !== null && end !== null && end.compare(start) < 0;
+const isApplicable = ({ start, end }: DateRange, maxDate: CalendarDate): boolean =>
+    end.compare(start) >= 0 && start.compare(MIN_DATE) >= 0 && end.compare(maxDate) <= 0;
 
 export const DateFilter = () => {
     const { startDate, endDate, setStartDate, setEndDate } = useDatasetFiltersSearchParams();
 
-    // The pickers are kept in local state so that an invalid range can be shown to the user
+    // The picker is kept in local state so that an invalid range can be shown to the user
     // without being applied to the dataset filters
-    const [localStartDate, setLocalStartDate] = useState<ZonedDateTime | null>(() => toDateValue(startDate));
-    const [localEndDate, setLocalEndDate] = useState<ZonedDateTime | null>(() => toDateValue(endDate));
+    const [range, setRange] = useState<DateRange | null>(() => toDateRange(startDate, endDate));
 
-    const hasInvalidRange = isInvalidRange(localStartDate, localEndDate);
+    const maxDate = today(getLocalTimeZone());
 
-    const applyFilters = (start: ZonedDateTime | null, end: ZonedDateTime | null) => {
-        // An invalid range is never written to the search params, the previously applied
-        // filters are kept untouched until the user enters a valid range again
-        if (isInvalidRange(start, end)) {
+    const handleChange = (value: DateRange | null) => {
+        setRange(value);
+
+        if (value !== null && !isApplicable(value, maxDate)) {
             return;
         }
 
-        setStartDate(start === null ? null : toISOString(start));
-        setEndDate(end === null ? null : toISOString(end));
-    };
-
-    const handleStartDateChange = (date: ZonedDateTime | null) => {
-        setLocalStartDate(date);
-
-        applyFilters(date, localEndDate);
-    };
-
-    const handleEndDateChange = (date: ZonedDateTime | null) => {
-        setLocalEndDate(date);
-
-        applyFilters(localStartDate, date);
+        setStartDate(value === null ? null : toStartOfDay(value.start));
+        setEndDate(value === null ? null : toEndOfDay(value.end));
     };
 
     return (
-        <Flex direction='column' gap='size-100'>
-            <Text UNSAFE_className={classes.label}>Filter by upload date</Text>
-
-            <Flex direction='column' gap='size-100'>
-                <DatePicker
-                    granularity={'second'}
-                    width={'100%'}
-                    label='Start date'
-                    labelPosition={'top'}
-                    hourCycle={24}
-                    minValue={MIN_DATE}
-                    maxValue={MAX_DATE}
-                    value={localStartDate}
-                    onChange={handleStartDateChange}
-                    validationState={hasInvalidRange ? 'invalid' : undefined}
-                />
-
-                <DatePicker
-                    granularity={'second'}
-                    width={'100%'}
-                    label='End date'
-                    labelPosition={'top'}
-                    hourCycle={24}
-                    minValue={MIN_DATE}
-                    maxValue={MAX_DATE}
-                    value={localEndDate}
-                    onChange={handleEndDateChange}
-                    validationState={hasInvalidRange ? 'invalid' : undefined}
-                    errorMessage={hasInvalidRange ? INVALID_RANGE_MESSAGE : undefined}
-                />
-            </Flex>
-        </Flex>
+        <DateRangePicker
+            label='Filter by upload date'
+            labelPosition='top'
+            width='100%'
+            granularity='minute'
+            minValue={MIN_DATE}
+            maxValue={maxDate}
+            value={range}
+            onChange={handleChange}
+        />
     );
 };
