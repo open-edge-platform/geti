@@ -139,8 +139,31 @@ export class AnnotatorPage {
         await this.page.getByRole('button', { name: 'Submit' }).click();
     }
 
+    async submitAndWaitForSave() {
+        const responsePromise = this.page.waitForResponse((response) => {
+            const url = new URL(response.url());
+
+            return response.request().method() === 'POST' && url.pathname.endsWith('/annotations');
+        });
+
+        await this.submit();
+
+        return responsePromise;
+    }
+
     async selectMediaItem(name: string) {
         const sidebarItems = this.page.getByRole('listbox', { name: 'sidebar-items' });
-        await sidebarItems.getByRole('img', { name }).click();
+        await sidebarItems.getByRole('img', { name, exact: true }).click();
+    }
+
+    getSelectedMediaItem() {
+        return this.page
+            .getByRole('listbox', { name: 'sidebar-items' })
+            .locator('[aria-selected="true"]')
+            .locator('img');
+    }
+
+    async close() {
+        await this.page.getByRole('dialog').getByRole('button', { name: 'Close' }).click();
     }
 }

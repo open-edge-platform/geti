@@ -142,7 +142,7 @@ test.describe('Project', () => {
         await projectPage.gotoList();
 
         // Open menu options
-        await projectPage.openProjectMenu('id-3');
+        await projectPage.openProjectMenu('Project 3');
 
         network.use(
             http.get('/api/projects', () => {
