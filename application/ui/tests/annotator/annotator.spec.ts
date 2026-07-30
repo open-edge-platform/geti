@@ -588,8 +588,8 @@ test.describe('Annotator', () => {
             // item-1: no annotations (404), has predictions
             // item-2: has 1 annotation, has predictions
             const mediaItems = [
-                getMockedMediaImage({ id: 'item-1', name: 'item-1.jpg', width: 1920, height: 1080 }),
-                getMockedMediaImage({ id: 'item-2', name: 'item-2.jpg', width: 1920, height: 1080 }),
+                getMockedMediaImage({ id: 'item-1', name: 'item-1', width: 1920, height: 1080 }),
+                getMockedMediaImage({ id: 'item-2', name: 'item-2', width: 1920, height: 1080 }),
             ];
 
             network.use(
