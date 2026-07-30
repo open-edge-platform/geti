@@ -237,6 +237,6 @@ export class ModelsPage {
     }
 
     getModelInTheList(modelArchitectureName: string) {
-        return this.page.getByTestId('model-listing').getByText(modelArchitectureName).first();
+        return this.page.getByTestId('models-listing').getByText(modelArchitectureName).first();
     }
 }
