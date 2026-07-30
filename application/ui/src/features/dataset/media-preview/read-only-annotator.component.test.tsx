@@ -20,9 +20,9 @@ const label = getMockedLabel({ id: 'label-1' });
 const mediaItem = getMockedMediaImage();
 const image = new ImageData(new Uint8ClampedArray(4), 1, 1);
 
-const annotationsDTO: AnnotationDTO[] = [getMockedAnnotation({ labels: [{ id: label.id }] })];
+const annotationsDTO = [getMockedAnnotation({ labels: [{ id: label.id }] })];
 
-const predictionsDTO: AnnotationDTO[] = [
+const predictionsDTO = [
     getMockedAnnotation({
         shape: getMockedShape({ type: 'rectangle', x: 0, y: 0, width: 10, height: 10 }),
         labels: [{ id: label.id }],
@@ -98,7 +98,7 @@ describe('ReadOnlyAnnotator', () => {
     });
 
     it('hides the media navigation when there is no adjacent item', async () => {
-        renderApp({ onModeChange: vi.fn() });
+        renderApp({ onModeChange: vi.fn(), onSelectNextMediaItem: undefined });
 
         expect(await screen.findByRole('button', { name: 'Close' })).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Next media item' })).not.toBeInTheDocument();
