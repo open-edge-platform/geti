@@ -22,7 +22,7 @@ type ReadOnlyAnnotatorProps = {
     onClose: () => void;
     subset: DatasetSubset;
     hasAnnotationStatus?: boolean;
-    mode?: AnnotatorMode;
+    mode: AnnotatorMode;
     onModeChange?: (mode: AnnotatorMode) => void;
     // Blocks navigation and dims the canvas while the content of the current media item is loading
     isLoading?: boolean;
