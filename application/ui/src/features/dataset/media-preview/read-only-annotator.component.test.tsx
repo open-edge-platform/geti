@@ -3,6 +3,7 @@
 
 import type { AnnotationDTO } from '@/api/types';
 import { fireEvent, screen } from '@testing-library/react';
+import { getMockedAnnotation, getMockedShape } from 'mocks/mock-annotation';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
@@ -19,12 +20,13 @@ const label = getMockedLabel({ id: 'label-1' });
 const mediaItem = getMockedMediaImage();
 const image = new ImageData(new Uint8ClampedArray(4), 1, 1);
 
-const annotationsDTO: AnnotationDTO[] = [
-    { shape: { type: 'rectangle', x: 10, y: 20, width: 100, height: 50 }, labels: [{ id: label.id }] },
-];
+const annotationsDTO: AnnotationDTO[] = [getMockedAnnotation({ labels: [{ id: label.id }] })];
 
 const predictionsDTO: AnnotationDTO[] = [
-    { shape: { type: 'rectangle', x: 0, y: 0, width: 10, height: 10 }, labels: [{ id: label.id }] },
+    getMockedAnnotation({
+        shape: getMockedShape({ type: 'rectangle', x: 0, y: 0, width: 10, height: 10 }),
+        labels: [{ id: label.id }],
+    }),
 ];
 
 const renderApp = ({
@@ -33,6 +35,7 @@ const renderApp = ({
     onSelectPreviousMediaItem,
     onSelectNextMediaItem,
     initialPredictionsDTO = predictionsDTO,
+    initialAnnotationsDTO = annotationsDTO,
     isLoading = false,
 }: {
     mode?: AnnotatorMode;
@@ -40,12 +43,13 @@ const renderApp = ({
     onSelectPreviousMediaItem?: () => void;
     onSelectNextMediaItem?: () => void;
     initialPredictionsDTO?: AnnotationDTO[];
+    initialAnnotationsDTO?: AnnotationDTO[];
     isLoading?: boolean;
 } = {}) => {
     return render(
         <ReadOnlyAnnotatorProviders
             mediaItem={mediaItem}
-            initialAnnotationsDTO={annotationsDTO}
+            initialAnnotationsDTO={initialAnnotationsDTO}
             initialPredictionsDTO={initialPredictionsDTO}
             isUserReviewed={false}
             mode={mode}

@@ -58,8 +58,11 @@ const ModelTrainingContent = ({ datasetRevision, model }: { datasetRevision: Dat
     const totalItems = datasetRevision.item_counts?.total ?? 0;
     const datasetRevisionId = String(datasetRevision.id);
 
-    // Predictions can only be run with an OpenVINO variant of the model being inspected
-    const selectedModel = useMemo(() => getAllModelsWithOpenVINOVariants([model]).at(0), [model]);
+    // Predictions need an OpenVINO variant of the model being inspected, and its weights must still be on disk
+    const selectedModel = useMemo(
+        () => (model.files_deleted ? undefined : getAllModelsWithOpenVINOVariants([model]).at(0)),
+        [model]
+    );
 
     return (
         <Flex gap={'size-300'} width={'100%'}>

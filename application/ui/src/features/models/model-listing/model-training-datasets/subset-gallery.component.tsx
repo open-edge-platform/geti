@@ -24,6 +24,9 @@ const VIEW_MODE_SETTINGS: Record<GalleryViewMode, GridLayoutOptions> = {
     [ViewModes.SMALL]: { minItemSize: new Size(80, 80), minSpace: new Size(4, 4), preserveAspectRatio: true },
 };
 
+// How many loaded items must remain ahead of the newly selected one before the next page is requested
+const LOAD_AHEAD_BUFFER = 1;
+
 type SubsetGalleryProps = {
     items: DatasetRevisionItem[];
     datasetRevisionId: string;
@@ -63,8 +66,10 @@ const useSubsetNavigation = ({
             : () => {
                   setSelectedItemId(nextItem.id);
 
+                  const remainingItems = items.length - 1 - (selectedItemIndex + 1);
+
                   // Keep loading ahead so the user can keep walking through the subset
-                  if (hasNextPage && !isFetchingNextPage && selectedItemIndex + 2 >= items.length) {
+                  if (hasNextPage && !isFetchingNextPage && remainingItems < LOAD_AHEAD_BUFFER) {
                       fetchNextPage();
                   }
               };
