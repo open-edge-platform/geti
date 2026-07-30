@@ -140,10 +140,13 @@ export class WebRTCConnection {
     private async sendOffer(): Promise<SessionData | undefined> {
         if (!this.peerConnection) return;
 
+        const localDescription = this.peerConnection.localDescription;
+        if (!localDescription) return;
+
         const { data } = await fetchClient.POST('/api/webrtc/offer', {
             body: {
-                sdp: this.peerConnection.localDescription?.sdp ?? '',
-                type: this.peerConnection.localDescription?.type ?? '',
+                sdp: localDescription.sdp,
+                type: localDescription.type,
                 webrtc_id: this.webrtcId,
             },
         });

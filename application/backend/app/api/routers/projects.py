@@ -3,11 +3,13 @@
 
 """Endpoints for managing projects"""
 
+import secrets
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, status
 from fastapi.exceptions import HTTPException
 from fastapi.openapi.models import Example
+from pydantic import ValidationError as PydanticValidationError
 from starlette.responses import FileResponse
 
 from app.api.dependencies import get_data_collector, get_label_service, get_project, get_project_service
@@ -20,6 +22,12 @@ from app.services.data_collect import DataCollector
 from app.services.label_service import DuplicateLabelsError
 
 router = APIRouter(prefix="/api/projects", tags=["Projects"])
+
+
+def _random_color() -> str:
+    """Return a random #RRGGBB hex color for label assignment when none is provided."""
+    return f"#{secrets.token_hex(3).upper()}"
+
 
 CREATE_PROJECT_BODY_DESCRIPTION = """
 Configuration for creating a new project. Specify the project name, problem type (classification, detection, 
@@ -87,10 +95,15 @@ def create_project(
         task = Task(
             exclusive_labels=project_config.task.exclusive_labels,
             task_type=project_config.task.task_type,
-            labels=[Label.model_validate(label) for label in project_config.task.labels],
+            labels=[
+                Label.model_validate({**label.model_dump(), "color": label.color or _random_color()})
+                for label in project_config.task.labels
+            ],
         )
         created_project = project_service.create_project(project_config.id, project_config.name, task)
         return ProjectView.model_validate(created_project, from_attributes=True)
+    except PydanticValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
     except (ResourceWithIdAlreadyExistsError, DuplicateLabelsError) as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
