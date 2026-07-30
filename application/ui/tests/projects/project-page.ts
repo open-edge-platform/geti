@@ -62,7 +62,7 @@ export class ProjectPage {
     }
 
     async openProjectMenu(projectName: string) {
-        await this.page.getByLabel(projectName).getByLabel('open project options').click();
+        await this.getProjectCard(projectName).getByLabel('open project options').click();
     }
 
     async clickDeleteMenuAction() {

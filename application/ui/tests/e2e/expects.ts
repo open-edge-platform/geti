@@ -16,10 +16,6 @@ export const expectMediaItemToChange = async (
 
         const selectedMediaItem = annotatorPage.getSelectedMediaItem();
 
-        if (selectedMediaItem === null) {
-            throw new Error('Selected media item does not exist');
-        }
-
         await expect(selectedMediaItem).not.toHaveAttribute('alt', prevImageName);
     }).toPass({ timeout });
 };

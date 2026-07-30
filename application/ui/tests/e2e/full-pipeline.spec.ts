@@ -26,7 +26,7 @@ test.describe('Full pipeline E2E', () => {
     });
 
     test('Full pipeline', async ({ projectPage, datasetPage, annotatorPage, boundingBoxTool, page }) => {
-        const filesToUpload = getFilesToUpload("./assets/lego-bricks-dataset'");
+        const filesToUpload = getFilesToUpload('./assets/lego-bricks-dataset');
 
         await test.step('Navigate to projects list', async () => {
             await projectPage.gotoList();

@@ -15,6 +15,5 @@ export const getFilesToUpload = (relativePathToAssetDirectory: string) => {
     const dirname = getDirname();
 
     const files = fs.readdirSync(path.join(dirname, relativePathToAssetDirectory));
-    console.log(files);
-    return files.map((file) => path.join(dirname, './assets/lego-bricks-dataset', file));
+    return files.map((file) => path.join(dirname, relativePathToAssetDirectory, file));
 };
