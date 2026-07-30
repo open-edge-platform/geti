@@ -26,7 +26,14 @@ test.describe('Model training flow E2E', () => {
         });
     });
 
-    test('Model training flow', async ({ projectPage, datasetPage, annotatorPage, boundingBoxTool, page }) => {
+    test('Model training flow', async ({
+        projectPage,
+        datasetPage,
+        annotatorPage,
+        boundingBoxTool,
+        modelsPage,
+        page,
+    }) => {
         const filesToUpload = getFilesToUpload('./assets/lego-bricks-dataset');
 
         await test.step('Navigate to projects list', async () => {
@@ -85,6 +92,33 @@ test.describe('Model training flow E2E', () => {
             }
 
             await annotatorPage.close();
+        });
+
+        await test.step('Train model', async () => {
+            await page.getByRole('tab', { name: 'Models' }).click();
+            await modelsPage.openTrainModelDialog();
+            const speedCard = modelsPage.getRecommendedModelArchitectures().getByLabel(/- speed/);
+
+            const selectedArchitectureName = await speedCard.getAttribute('data-architecture-name');
+
+            if (selectedArchitectureName === null) {
+                throw new Error('Missing selected architecture name');
+            }
+
+            await speedCard.click();
+            await modelsPage.startTraining();
+
+            await expect(modelsPage.getRunningModelJob(selectedArchitectureName)).toBeVisible({
+                timeout: TIMEOUTS.training,
+            });
+
+            await expect(modelsPage.getRunningModelJob(selectedArchitectureName)).toBeHidden({
+                timeout: TIMEOUTS.training,
+            });
+
+            await expect(modelsPage.getModelInTheList(selectedArchitectureName)).toBeVisible({
+                timeout: TIMEOUTS.training,
+            });
         });
     });
 });
