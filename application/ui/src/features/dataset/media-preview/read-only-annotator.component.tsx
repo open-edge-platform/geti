@@ -56,6 +56,38 @@ const ModesToggle = ({ mediaItem, mode, onModeChange }: ModesToggleProps) => {
     );
 };
 
+type NavigationButtonsProps = {
+    onSelectPreviousMediaItem?: () => void;
+    onSelectNextMediaItem?: () => void;
+    isLoading?: boolean;
+};
+const NavigationButtons = ({ onSelectPreviousMediaItem, onSelectNextMediaItem, isLoading }: NavigationButtonsProps) => {
+    return (
+        <>
+            <ActionButton
+                isQuiet
+                aria-label={'Previous media item'}
+                isDisabled={onSelectPreviousMediaItem === undefined || isLoading}
+                onPress={onSelectPreviousMediaItem}
+            >
+                <Icon height={'size-150'} width={'size-150'}>
+                    <ChevronLeft />
+                </Icon>
+            </ActionButton>
+            <ActionButton
+                isQuiet
+                aria-label={'Next media item'}
+                isDisabled={onSelectNextMediaItem === undefined || isLoading}
+                onPress={onSelectNextMediaItem}
+            >
+                <Icon height={'size-150'} width={'size-150'}>
+                    <ChevronRight />
+                </Icon>
+            </ActionButton>
+        </>
+    );
+};
+
 /**
  * Simplified read-only annotator for viewing annotations.
  *
@@ -94,28 +126,11 @@ export const ReadOnlyAnnotator = ({
                         <Toolbar.Section>
                             <Flex alignItems={'center'}>
                                 {hasMediaNavigation && (
-                                    <>
-                                        <ActionButton
-                                            isQuiet
-                                            aria-label={'Previous media item'}
-                                            isDisabled={onSelectPreviousMediaItem === undefined || isLoading}
-                                            onPress={onSelectPreviousMediaItem}
-                                        >
-                                            <Icon height={'size-150'} width={'size-150'}>
-                                                <ChevronLeft />
-                                            </Icon>
-                                        </ActionButton>
-                                        <ActionButton
-                                            isQuiet
-                                            aria-label={'Next media item'}
-                                            isDisabled={onSelectNextMediaItem === undefined || isLoading}
-                                            onPress={onSelectNextMediaItem}
-                                        >
-                                            <Icon height={'size-150'} width={'size-150'}>
-                                                <ChevronRight />
-                                            </Icon>
-                                        </ActionButton>
-                                    </>
+                                    <NavigationButtons
+                                        onSelectPreviousMediaItem={onSelectPreviousMediaItem}
+                                        onSelectNextMediaItem={onSelectNextMediaItem}
+                                        isLoading={isLoading}
+                                    />
                                 )}
 
                                 <ActionButton isQuiet onPress={onClose}>

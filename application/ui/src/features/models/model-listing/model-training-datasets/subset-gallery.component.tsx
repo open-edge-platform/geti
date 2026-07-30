@@ -35,22 +35,18 @@ type SubsetGalleryProps = {
     selectedModel: SelectableModel | undefined;
 };
 
-export const SubsetGallery = ({
+const useSubsetNavigation = ({
     items,
-    viewMode,
-    datasetRevisionId,
     hasNextPage,
     isFetchingNextPage,
-    isPending,
     fetchNextPage,
-    selectedModel,
-}: SubsetGalleryProps) => {
-    const projectId = useProjectIdentifier();
+}: Pick<SubsetGalleryProps, 'items' | 'hasNextPage' | 'isFetchingNextPage' | 'fetchNextPage'>) => {
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
     const selectedItemIndex = items.findIndex(({ id }) => id === selectedItemId);
     const selectedItem = selectedItemIndex === -1 ? null : items[selectedItemIndex];
     const nextItem = selectedItemIndex === -1 ? undefined : items[selectedItemIndex + 1];
+
     const nextMediaItem = useMemo(
         () => (nextItem === undefined ? undefined : datasetRevisionItemToMedia(nextItem)),
         [nextItem]
@@ -62,16 +58,43 @@ export const SubsetGallery = ({
         selectedItemIndex > 0 ? () => setSelectedItemId(items[selectedItemIndex - 1].id) : undefined;
 
     const selectNextItem =
-        selectedItemIndex !== -1 && selectedItemIndex < items.length - 1
-            ? () => {
-                  setSelectedItemId(items[selectedItemIndex + 1].id);
+        nextItem === undefined
+            ? undefined
+            : () => {
+                  setSelectedItemId(nextItem.id);
 
                   // Keep loading ahead so the user can keep walking through the subset
                   if (hasNextPage && !isFetchingNextPage && selectedItemIndex + 2 >= items.length) {
                       fetchNextPage();
                   }
-              }
-            : undefined;
+              };
+
+    return {
+        selectedItem,
+        selectItem: (id: string) => setSelectedItemId(id),
+        clearSelection: () => setSelectedItemId(null),
+        selectPreviousItem,
+        selectNextItem,
+    };
+};
+
+export const SubsetGallery = ({
+    items,
+    viewMode,
+    datasetRevisionId,
+    hasNextPage,
+    isFetchingNextPage,
+    isPending,
+    fetchNextPage,
+    selectedModel,
+}: SubsetGalleryProps) => {
+    const projectId = useProjectIdentifier();
+    const { selectedItem, selectItem, clearSelection, selectPreviousItem, selectNextItem } = useSubsetNavigation({
+        items,
+        hasNextPage,
+        isFetchingNextPage,
+        fetchNextPage,
+    });
 
     if (isPending) {
         return (
@@ -107,7 +130,7 @@ export const SubsetGallery = ({
                                     item={{ ...item, type: 'image' }}
                                     alt={`${item.subset} item`}
                                     url={getDatasetRevisionThumbnailUrl(projectId, datasetRevisionId, item.id)}
-                                    onDoubleClick={() => setSelectedItemId(item.id)}
+                                    onDoubleClick={() => selectItem(item.id)}
                                 />
                             )}
                         />
@@ -115,12 +138,12 @@ export const SubsetGallery = ({
                 />
             </View>
 
-            <DialogContainer type={'fullscreen'} onDismiss={() => setSelectedItemId(null)}>
+            <DialogContainer type={'fullscreen'} onDismiss={clearSelection}>
                 {selectedItem && (
                     <Suspense fallback={<Loading />}>
                         <SubsetMediaDialog
                             item={selectedItem}
-                            onClose={() => setSelectedItemId(null)}
+                            onClose={clearSelection}
                             selectedModel={selectedModel}
                             onSelectPreviousMediaItem={selectPreviousItem}
                             onSelectNextMediaItem={selectNextItem}
