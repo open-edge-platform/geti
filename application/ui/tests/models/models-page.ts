@@ -227,4 +227,16 @@ export class ModelsPage {
     getToast(message: string) {
         return this.page.getByLabel('toast').filter({ hasText: message });
     }
+
+    getRecommendedModelArchitectures() {
+        return this.page.getByLabel('Recommended model architectures');
+    }
+
+    getRunningModelJob(modelArchitectureName: string) {
+        return this.page.getByLabel('Currently running jobs').getByText(modelArchitectureName).first();
+    }
+
+    getModelInTheList(modelArchitectureName: string) {
+        return this.page.getByTestId('models-listing').getByText(modelArchitectureName).first();
+    }
 }

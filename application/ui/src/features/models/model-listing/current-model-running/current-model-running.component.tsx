@@ -45,7 +45,7 @@ export const CurrentModelRunning = ({ groupBy, datasetRevisions }: CurrentModelR
             <View backgroundColor={'gray-75'}>
                 <RunningJobTableHeader groupBy={groupBy} />
 
-                <View>
+                <div aria-label={'Currently running jobs'}>
                     {activeRunningJobs.map((job) => (
                         <RunningModelRow
                             key={job.job_id}
@@ -56,7 +56,7 @@ export const CurrentModelRunning = ({ groupBy, datasetRevisions }: CurrentModelR
                             modelArchitectures={modelArchitectures}
                         />
                     ))}
-                </View>
+                </div>
             </View>
         </Flex>
     );

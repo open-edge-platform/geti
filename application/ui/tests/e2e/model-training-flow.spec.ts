@@ -9,9 +9,10 @@ import { getFilesToUpload } from './utils';
 const TIMEOUTS = {
     training: 1000 * 60 * 60,
     nextMediaItem: 1000 * 30,
+    mediaUploaded: 1000 * 60,
 };
 
-test.describe('Full pipeline E2E', () => {
+test.describe('Model training flow E2E', () => {
     const projectName = `E2E Project - ${new Date().toISOString()}`;
 
     test.afterEach(async ({ projectPage }) => {
@@ -25,7 +26,14 @@ test.describe('Full pipeline E2E', () => {
         });
     });
 
-    test('Full pipeline', async ({ projectPage, datasetPage, annotatorPage, boundingBoxTool, page }) => {
+    test('Model training flow', async ({
+        projectPage,
+        datasetPage,
+        annotatorPage,
+        boundingBoxTool,
+        modelsPage,
+        page,
+    }) => {
         const filesToUpload = getFilesToUpload('./assets/lego-bricks-dataset');
 
         await test.step('Navigate to projects list', async () => {
@@ -47,7 +55,9 @@ test.describe('Full pipeline E2E', () => {
         await test.step('Upload media', async () => {
             await datasetPage.uploadFiles(filesToUpload);
 
-            await expect(datasetPage.getUploadFinishedText(filesToUpload.length)).toBeVisible();
+            await expect(datasetPage.getUploadFinishedText(filesToUpload.length)).toBeVisible({
+                timeout: TIMEOUTS.mediaUploaded,
+            });
         });
 
         await test.step('Annotate media', async () => {
@@ -82,6 +92,33 @@ test.describe('Full pipeline E2E', () => {
             }
 
             await annotatorPage.close();
+        });
+
+        await test.step('Train model', async () => {
+            await page.getByRole('tab', { name: 'Models' }).click();
+            await modelsPage.openTrainModelDialog();
+            const speedCard = modelsPage.getRecommendedModelArchitectures().getByLabel(/- speed/);
+
+            const selectedArchitectureName = await speedCard.getAttribute('data-architecture-name');
+
+            if (selectedArchitectureName === null) {
+                throw new Error('Missing selected architecture name');
+            }
+
+            await speedCard.click();
+            await modelsPage.startTraining();
+
+            await expect(modelsPage.getRunningModelJob(selectedArchitectureName)).toBeVisible({
+                timeout: TIMEOUTS.training,
+            });
+
+            await expect(modelsPage.getRunningModelJob(selectedArchitectureName)).toBeHidden({
+                timeout: TIMEOUTS.training,
+            });
+
+            await expect(modelsPage.getModelInTheList(selectedArchitectureName)).toBeVisible({
+                timeout: TIMEOUTS.training,
+            });
         });
     });
 });

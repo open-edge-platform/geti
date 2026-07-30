@@ -21,6 +21,14 @@ const ACTION_TIMEOUT = 30000;
 
 const E2E_BASE_URL = process.env.E2E_BASE_URL;
 
+const getTestTimeout = () => {
+    if (CI && E2E_BASE_URL) {
+        return 1000 * 60 * 60;
+    }
+
+    return CI ? 1000 * 60 * 2 : 1000 * 60;
+};
+
 // In CI we serve pre-built bundles via `rsbuild preview`, which requires the
 // output directories to already exist. Failing fast here produces a clearer
 // error than waiting for `webServer.timeout` to elapse on a 404-returning
@@ -51,7 +59,7 @@ export default defineConfig({
     /* Opt out of parallel tests on CI. */
     workers: process.env.CI ? 1 : undefined,
     /* Test timeout */
-    timeout: CI ? 120000 : 60000,
+    timeout: getTestTimeout(),
     /* Expect timeout */
     expect: {
         timeout: CI ? 10000 : 5000,
