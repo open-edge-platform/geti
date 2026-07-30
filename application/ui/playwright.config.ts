@@ -101,7 +101,7 @@ export default defineConfig({
             use: {
                 ...devices['Desktop Chrome'],
                 baseURL: E2E_BASE_URL || 'http://localhost:3000',
-                ignoreHTTPSErrors: !!E2E_BASE_URL,
+                ignoreHTTPSErrors: E2E_BASE_URL?.startsWith('https://') ?? false,
                 headless: CI,
                 viewport: { width: 1280, height: 720 },
             },
