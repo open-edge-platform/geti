@@ -3,12 +3,19 @@
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, StrictFloat
+from pydantic import BaseModel, Field, field_validator
 
 
 class InputData(BaseModel):
     webrtc_id: str
-    conf_threshold: StrictFloat = Field(ge=0, le=1)
+    conf_threshold: float = Field(ge=0, le=1)
+
+    @field_validator("conf_threshold", mode="before")
+    @classmethod
+    def reject_bool_threshold(cls, v: object) -> object:
+        if isinstance(v, bool):
+            raise ValueError("conf_threshold must be a number, not a boolean")
+        return v
 
 
 class Offer(BaseModel):
