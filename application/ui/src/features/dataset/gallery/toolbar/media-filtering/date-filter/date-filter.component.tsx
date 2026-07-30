@@ -4,44 +4,35 @@
 import { useState } from 'react';
 
 import { DateRangePicker } from '@geti-ui/ui';
-import {
-    getLocalTimeZone,
-    parseAbsoluteToLocal,
-    parseDate,
-    Time,
-    toCalendarDate,
-    toCalendarDateTime,
-    today,
-    type CalendarDate,
-} from '@internationalized/date';
+import { getLocalTimeZone, now, parseAbsoluteToLocal, type ZonedDateTime } from '@internationalized/date';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 
-type DateRange = { start: CalendarDate; end: CalendarDate };
+import classes from './date-filter.module.scss';
 
-const MIN_DATE = parseDate('2020-01-01');
-const END_OF_DAY = new Time(23, 59, 59, 999);
+type DateRange = { start: ZonedDateTime; end: ZonedDateTime };
 
 const toDateRange = (start: string | null, end: string | null): DateRange | null =>
-    start === null || end === null
-        ? null
-        : { start: toCalendarDate(parseAbsoluteToLocal(start)), end: toCalendarDate(parseAbsoluteToLocal(end)) };
+    start === null || end === null ? null : { start: parseAbsoluteToLocal(start), end: parseAbsoluteToLocal(end) };
 
-const toStartOfDay = (date: CalendarDate): string => date.toDate(getLocalTimeZone()).toISOString();
-
-const toEndOfDay = (date: CalendarDate): string =>
-    toCalendarDateTime(date, END_OF_DAY).toDate(getLocalTimeZone()).toISOString();
-
-const isApplicable = ({ start, end }: DateRange, maxDate: CalendarDate): boolean =>
-    end.compare(start) >= 0 && start.compare(MIN_DATE) >= 0 && end.compare(maxDate) <= 0;
+const isApplicable = ({ start, end }: DateRange, maxDate: ZonedDateTime): boolean =>
+    end.compare(start) >= 0 && end.compare(maxDate) <= 0;
 
 export const DateFilter = () => {
-    const { startDate, endDate, setStartDate, setEndDate } = useDatasetFiltersSearchParams();
+    const { startDate, endDate, setDateRange } = useDatasetFiltersSearchParams();
+
+    // Media cannot be uploaded in the future, the picker is mounted together with the popover so this stays fresh
+    const [maxDate] = useState(() => now(getLocalTimeZone()));
 
     // The picker is kept in local state so that an invalid range can be shown to the user
     // without being applied to the dataset filters
     const [range, setRange] = useState<DateRange | null>(() => toDateRange(startDate, endDate));
+    const [appliedRange, setAppliedRange] = useState(`${startDate}|${endDate}`);
 
-    const maxDate = today(getLocalTimeZone());
+    // Resets the picker when the filters are changed elsewhere, e.g. by clearing the chips
+    if (appliedRange !== `${startDate}|${endDate}`) {
+        setAppliedRange(`${startDate}|${endDate}`);
+        setRange(toDateRange(startDate, endDate));
+    }
 
     const handleChange = (value: DateRange | null) => {
         setRange(value);
@@ -50,8 +41,10 @@ export const DateFilter = () => {
             return;
         }
 
-        setStartDate(value === null ? null : toStartOfDay(value.start));
-        setEndDate(value === null ? null : toEndOfDay(value.end));
+        setDateRange(
+            value === null ? null : value.start.toDate().toISOString(),
+            value === null ? null : value.end.toDate().toISOString()
+        );
     };
 
     return (
@@ -60,10 +53,12 @@ export const DateFilter = () => {
             labelPosition='top'
             width='100%'
             granularity='minute'
-            minValue={MIN_DATE}
+            hourCycle={24}
+            hideTimeZone
             maxValue={maxDate}
             value={range}
             onChange={handleChange}
+            UNSAFE_className={classes.dateRangePicker}
         />
     );
 };

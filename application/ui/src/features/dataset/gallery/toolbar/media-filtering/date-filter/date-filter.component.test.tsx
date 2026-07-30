@@ -15,9 +15,14 @@ import { DateFilter } from './date-filter.component';
 const REVERSED_RANGE_MESSAGE = 'Start date must be before end date.';
 
 const AppliedFilters = () => {
-    const { startDate, endDate } = useDatasetFiltersSearchParams();
+    const { startDate, endDate, setDateRange } = useDatasetFiltersSearchParams();
 
-    return <div data-testid='applied-filters'>{`${startDate ?? 'none'}|${endDate ?? 'none'}`}</div>;
+    return (
+        <>
+            <div data-testid='applied-filters'>{`${startDate ?? 'none'}|${endDate ?? 'none'}`}</div>
+            <button onClick={() => setDateRange(null, null)}>Clear all</button>
+        </>
+    );
 };
 
 const renderDateFilter = (search = '') => {
@@ -35,7 +40,7 @@ const renderDateFilter = (search = '') => {
 const getSegment = (segmentName: RegExp) => screen.getByRole('spinbutton', { name: segmentName });
 
 // Fills every segment of a date field at once, the digits are expected to follow the
-// en-US segment order: month, day, year
+// en-US segment order: month, day, year, hour, minute
 const typeDate = async (user: UserEvent, fieldName: 'start' | 'end', digits: string) => {
     await user.click(getSegment(new RegExp(`month, ${fieldName} date`, 'i')));
     await user.keyboard(digits);
@@ -46,11 +51,6 @@ const getAppliedFilters = () => screen.getByTestId('applied-filters').textConten
 const START_DATE = '2024-05-10T10:00:00.000Z';
 const END_DATE = '2024-06-10T10:00:00.000Z';
 
-// The picker works with local calendar days, the applied filters span the whole day
-const startOfLocalDay = (year: number, month: number, day: number) => new Date(year, month, day).toISOString();
-const endOfLocalDay = (year: number, month: number, day: number) =>
-    new Date(year, month, day, 23, 59, 59, 999).toISOString();
-
 describe('DateFilter', () => {
     const search = `?${START_DATE_PARAM}=${START_DATE}&${END_DATE_PARAM}=${END_DATE}`;
 
@@ -59,10 +59,14 @@ describe('DateFilter', () => {
 
         renderDateFilter();
 
-        await typeDate(user, 'start', '05102024');
-        await typeDate(user, 'end', '06102024');
+        await typeDate(user, 'start', '051020241000');
+        await typeDate(user, 'end', '061020241200');
 
-        expect(getAppliedFilters()).toBe(`${startOfLocalDay(2024, 4, 10)}|${endOfLocalDay(2024, 5, 10)}`);
+        // The picker operates in the local time zone, so the expected values are built the same way
+        const expectedStartDate = new Date(2024, 4, 10, 10, 0).toISOString();
+        const expectedEndDate = new Date(2024, 5, 10, 12, 0).toISOString();
+
+        expect(getAppliedFilters()).toBe(`${expectedStartDate}|${expectedEndDate}`);
     });
 
     it('does not allow filtering by a date in the future', async () => {
@@ -102,15 +106,23 @@ describe('DateFilter', () => {
         await user.click(getSegment(/year, end date/i));
         await user.keyboard('2025');
 
-        const startDate = new Date(START_DATE);
-        const endDate = new Date(END_DATE);
+        const expectedEndDate = new Date(END_DATE);
+        expectedEndDate.setFullYear(2025);
 
         expect(screen.queryByText(REVERSED_RANGE_MESSAGE)).not.toBeInTheDocument();
-        expect(getAppliedFilters()).toBe(
-            [
-                startOfLocalDay(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()),
-                endOfLocalDay(2025, endDate.getMonth(), endDate.getDate()),
-            ].join('|')
-        );
+        expect(getAppliedFilters()).toBe(`${START_DATE}|${expectedEndDate.toISOString()}`);
+    });
+
+    it('resets the picker when the filters are cleared elsewhere', async () => {
+        const user = userEvent.setup();
+
+        renderDateFilter(search);
+
+        expect(getSegment(/year, start date/i)).toHaveTextContent('2024');
+
+        await user.click(screen.getByRole('button', { name: 'Clear all' }));
+
+        expect(getAppliedFilters()).toBe('none|none');
+        expect(getSegment(/year, start date/i)).toHaveTextContent('yyyy');
     });
 });

@@ -7,7 +7,7 @@ import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-
 import { useProjectLabels } from 'hooks/use-project-labels.hook';
 import { capitalize, isEmpty } from 'lodash-es';
 
-import { formatDateRangeEnd, formatDateRangeStart } from '../../../../shared/date-utils';
+import { formatDateRangeFilter } from '../../../../shared/date-utils';
 import { isNonEmptyArray } from '../../../../shared/util';
 import { FilterChips } from '../toolbar/media-filtering/filter-chips/filter-chips.component';
 
@@ -24,9 +24,8 @@ export const ActiveFiltersList = () => {
         annotationStatus,
         setAnnotationStatus,
         startDate,
-        setStartDate,
         endDate,
-        setEndDate,
+        setDateRange,
         selectedSubsets,
         setSelectedSubsets,
     } = useDatasetFiltersSearchParams();
@@ -34,6 +33,8 @@ export const ActiveFiltersList = () => {
     const handleRemoveLabel = (id: string) => {
         setSelectedLabelIds(selectedLabelIds.filter((selectedId) => selectedId !== id));
     };
+
+    const dateRangeLabel = formatDateRangeFilter(startDate, endDate);
 
     const selectedLabels = selectedLabelIds
         .map((id) => labels.find((label) => label.id === id))
@@ -52,11 +53,7 @@ export const ActiveFiltersList = () => {
                 />
             )}
 
-            {startDate !== null && (
-                <FilterChips name={formatDateRangeStart(startDate)} onClose={() => setStartDate(null)} />
-            )}
-
-            {endDate !== null && <FilterChips name={formatDateRangeEnd(endDate)} onClose={() => setEndDate(null)} />}
+            {dateRangeLabel !== null && <FilterChips name={dateRangeLabel} onClose={() => setDateRange(null, null)} />}
 
             {isNonEmptyArray(selectedSubsets) &&
                 selectedSubsets.map((subset) => (
@@ -83,14 +80,13 @@ export const useHasActiveFilters = () => {
 };
 
 export const useClearAllFilters = () => {
-    const { setSelectedLabelIds, setAnnotationStatus, setStartDate, setEndDate, setSelectedSubsets } =
+    const { setSelectedLabelIds, setAnnotationStatus, setDateRange, setSelectedSubsets } =
         useDatasetFiltersSearchParams();
 
     const handleClearAll = () => {
         setSelectedLabelIds([]);
         setAnnotationStatus(null);
-        setStartDate(null);
-        setEndDate(null);
+        setDateRange(null, null);
         setSelectedSubsets([]);
     };
 
