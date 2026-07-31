@@ -37,6 +37,9 @@ const createMockJobForProject = (overrides: Partial<ReturnType<typeof getMockedJ
 describe('useGetCurrentRunningJobs', () => {
     beforeEach(() => {
         resetMockEventSource();
+    });
+
+    afterEach(() => {
         sessionStorage.clear();
     });
 

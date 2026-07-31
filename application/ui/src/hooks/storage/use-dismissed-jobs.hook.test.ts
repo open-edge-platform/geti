@@ -6,7 +6,7 @@ import { act, renderHook } from '@testing-library/react';
 import { DISMISSED_JOBS_KEY, useDismissedJobs } from './use-dismissed-jobs.hook';
 
 describe('useDismissedJobs', () => {
-    beforeEach(() => {
+    afterEach(() => {
         sessionStorage.clear();
     });
 
