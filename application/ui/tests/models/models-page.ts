@@ -77,6 +77,10 @@ export class ModelsPage {
         return this.page.locator('[data-testid^="model-disclosure-"]');
     }
 
+    async getModelName() {
+        return this.page.getByTestId('model-name').textContent();
+    }
+
     getModelByName(name: string) {
         return this.page.getByTestId('model-name').filter({ hasText: name });
     }
@@ -232,11 +236,20 @@ export class ModelsPage {
         return this.page.getByLabel('Recommended model architectures');
     }
 
-    getRunningModelJob(modelArchitectureName: string) {
-        return this.page.getByLabel('Currently running jobs').getByText(modelArchitectureName).first();
+    getRunningModelJob(modelName: string) {
+        return this.page.getByLabel('Currently running jobs').getByText(modelName).first();
     }
 
-    getModelInTheList(modelArchitectureName: string) {
-        return this.page.getByTestId('models-listing').getByText(modelArchitectureName).first();
+    getModelVariantRow(modelName: string, propertyName: string) {
+        return this.page
+            .getByLabel(`Model details for ${modelName}`)
+            .getByLabel(/Model variants for/)
+            .getByRole('row', { name: propertyName });
+    }
+
+    getModelVariantAccuracy(modelName: string, propertyName: string, precision: string) {
+        return this.getModelVariantRow(modelName, propertyName)
+            .getByTestId(`model-variant-value-accuracy-${precision.toLocaleLowerCase()}`)
+            .getAttribute('data-value');
     }
 }
