@@ -38,7 +38,7 @@ export const distributeByLargestRemainder = (values: number[], total: number): n
 export const getAllModelsWithOpenVINOVariants = (models: Model[]): SelectableModel[] => {
     return models.flatMap((model) =>
         model.variants
-            .filter((variant) => variant.format === 'openvino')
+            .filter((variant) => variant.format === 'openvino' && model.files_deleted === false)
             .map((variant): SelectableModel => ({
                 modelVariantId: variant.id,
                 modelId: model.id,

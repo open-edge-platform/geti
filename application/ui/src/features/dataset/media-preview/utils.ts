@@ -4,7 +4,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 
 import type { AnnotationDTO, Media } from '@/api/types';
-import { useQuery } from '@tanstack/react-query';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useFetchNextUnannotatedMediaItem } from 'hooks/use-get-dataset-items.hook';
@@ -14,9 +13,8 @@ import { useLocalStorage } from 'usehooks-ts';
 
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
 import { isVideoFrame } from '../../../shared/media-item-utils';
-import { loadImageQueryOptions } from '../../annotator/hooks/use-load-image-query.hook';
+import { usePrefetchMediaItem } from '../../annotator/hooks/use-prefetch-media-item.hook';
 import { useVideoPlayerContext } from '../../annotator/video-player/video-player-provider.component';
-import { annotationsQueryOptions } from './api/use-annotations-query';
 
 export const getInitialAnnotations = (isUserReviewed: boolean, annotationsDTO: AnnotationDTO[]): AnnotationDTO[] => {
     return isUserReviewed ? annotationsDTO : [];
@@ -136,28 +134,12 @@ export const useNextMediaItem = (currentMediaItem: Media, allMediaItems: Media[]
 // so the UI will feel smoother whenever the user switches image unless the user changes to a random or item.
 // We could also consider those cases but I feel like it's overkill.
 // Let's see how this improvement performs and then we can iterate on it.
-//
-// We trigger next-item data prefetch through disabled/conditional query hooks,
-// so data is resolved from cache when available and fetched when needed.
 export const useNextMediaPrefetch = (currentMediaItem: Media, allMediaItems: Media[]) => {
-    const projectId = useProjectIdentifier();
     const nextMediaItem = useNextMediaItem(currentMediaItem, allMediaItems);
 
-    const nextImageQuery = useQuery({
-        ...loadImageQueryOptions(projectId, nextMediaItem ?? currentMediaItem),
-        enabled: nextMediaItem !== undefined,
-    });
+    usePrefetchMediaItem(nextMediaItem);
 
-    useQuery({
-        ...annotationsQueryOptions(projectId, nextMediaItem ?? currentMediaItem),
-        enabled: nextMediaItem !== undefined,
-    });
-
-    return {
-        nextMediaItem,
-        nextImage: nextImageQuery.data,
-        isNextImageReady: nextImageQuery.isSuccess,
-    };
+    return { nextMediaItem };
 };
 
 export const useAnnotatorMode = () => {
