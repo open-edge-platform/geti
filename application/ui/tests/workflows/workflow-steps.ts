@@ -150,7 +150,7 @@ export const stepTrainModel = async (page: Page, modelsPage: ModelsPage, project
     await modelsPage.startTraining();
 
     await expect(async () => {
-        const hasRunningHeading = await page.getByRole('heading', { name: 'Currently running' }).isVisible();
+        const hasRunningHeading = await page.getByRole('heading', { name: 'Jobs' }).isVisible();
         const hasTrainingMessage = await page
             .getByText(/Training in progress|running/i)
             .first()
