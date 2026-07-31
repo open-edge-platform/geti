@@ -384,15 +384,14 @@ RUN set -eu; \
     # Remove non-redistributable headers and binaries from triton nvidia backend
     find "$CLEANUP_ROOT" -type d -path "*/triton/backends/nvidia/include" -exec rm -rf {} + 2>/dev/null || true && \
     find "$CLEANUP_ROOT" -type d -path "*/triton/backends/nvidia/bin" -exec rm -rf {} + 2>/dev/null || true && \
-    # Remove specific non-redistributable CUPTI components
+    # Remove specific non-redistributable CUPTI components and cuSolver MG libraries (enterprise feature)
     find "$CLEANUP_ROOT" -type f \( \
     -name "libcheckpoint.so*" -o \
     -name "libnvperf_host.so*" -o \
     -name "libnvperf_target.so*" -o \
-    -name "libpcsamplingutil.so*" \
-    \) -path "*cupti*" -delete 2>/dev/null || true && \
-    # Remove cuSolver MG libraries (enterprise feature)
-    find "$CLEANUP_ROOT" -name "libcusolverMg.so*" -delete 2>/dev/null || true
+    -name "libpcsamplingutil.so*" -o \
+    -name "libcusolverMg.so*" \
+    \) -delete 2>/dev/null || true
 
 FROM xpu-base AS xpu-clean
 
