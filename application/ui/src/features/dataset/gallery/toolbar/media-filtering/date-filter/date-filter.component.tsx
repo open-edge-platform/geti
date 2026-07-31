@@ -14,30 +14,22 @@ type DateRange = { start: ZonedDateTime; end: ZonedDateTime };
 const toDateRange = (start: string | null, end: string | null): DateRange | null =>
     start === null || end === null ? null : { start: parseAbsoluteToLocal(start), end: parseAbsoluteToLocal(end) };
 
-const isApplicable = ({ start, end }: DateRange, maxDate: ZonedDateTime): boolean =>
+const isDateRangeValid = ({ start, end }: DateRange, maxDate: ZonedDateTime): boolean =>
     end.compare(start) >= 0 && end.compare(maxDate) <= 0;
 
 export const DateFilter = () => {
     const { startDate, endDate, setDateRange } = useDatasetFiltersSearchParams();
 
-    // Media cannot be uploaded in the future, the picker is mounted together with the popover so this stays fresh
-    const [maxDate] = useState(() => now(getLocalTimeZone()));
+    const maxDate = now(getLocalTimeZone());
 
     // The picker is kept in local state so that an invalid range can be shown to the user
     // without being applied to the dataset filters
     const [range, setRange] = useState<DateRange | null>(() => toDateRange(startDate, endDate));
-    const [appliedRange, setAppliedRange] = useState(`${startDate}|${endDate}`);
-
-    // Resets the picker when the filters are changed elsewhere, e.g. by clearing the chips
-    if (appliedRange !== `${startDate}|${endDate}`) {
-        setAppliedRange(`${startDate}|${endDate}`);
-        setRange(toDateRange(startDate, endDate));
-    }
 
     const handleChange = (value: DateRange | null) => {
         setRange(value);
 
-        if (value !== null && !isApplicable(value, maxDate)) {
+        if (value !== null && !isDateRangeValid(value, maxDate)) {
             return;
         }
 

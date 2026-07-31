@@ -268,6 +268,34 @@ describe('useDatasetFiltersSearchParams', () => {
             expect(result.current.endDate).toBe('2026-12-31T10:00:00.000Z');
         });
 
+        it('sets start date in the search params', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: '/projects/123',
+                path: '/projects/:projectId',
+            });
+
+            act(() => {
+                result.current.setDateRange('2026-03-15T22:00:00.000Z', null);
+            });
+
+            expect(result.current.startDate).toBe('2026-03-15T22:00:00.000Z');
+            expect(result.current.endDate).toBe(null);
+        });
+
+        it('sets end date in the search params', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: '/projects/123',
+                path: '/projects/:projectId',
+            });
+
+            act(() => {
+                result.current.setDateRange(null, '2026-03-15T22:00:00.000Z');
+            });
+
+            expect(result.current.startDate).toBe(null);
+            expect(result.current.endDate).toBe('2026-03-15T22:00:00.000Z');
+        });
+
         it('sets both dates in the search params', () => {
             const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
                 route: '/projects/123',
