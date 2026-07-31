@@ -103,7 +103,7 @@ def create_project(
         created_project = project_service.create_project(project_config.id, project_config.name, task)
         return ProjectView.model_validate(created_project, from_attributes=True)
     except PydanticValidationError as e:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=e.errors())
     except (ResourceWithIdAlreadyExistsError, DuplicateLabelsError) as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 

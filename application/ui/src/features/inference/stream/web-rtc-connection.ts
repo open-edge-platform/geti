@@ -141,7 +141,9 @@ export class WebRTCConnection {
         if (!this.peerConnection) return;
 
         const localDescription = this.peerConnection.localDescription;
-        if (!localDescription) return;
+        if (!localDescription) {
+            throw new Error('WebRTC localDescription is not set');
+        }
 
         const { data } = await fetchClient.POST('/api/webrtc/offer', {
             body: {
