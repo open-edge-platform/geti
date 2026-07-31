@@ -8,6 +8,7 @@ import { getFilesToUpload } from './utils';
 
 const TIMEOUTS = {
     training: 1000 * 60 * 60,
+    quantization: 1000 * 60 * 20,
     nextMediaItem: 1000 * 30,
     mediaUploaded: 1000 * 60,
 };
@@ -116,9 +117,43 @@ test.describe('Model training flow E2E', () => {
                 timeout: TIMEOUTS.training,
             });
 
-            await expect(modelsPage.getModelInTheList(selectedArchitectureName)).toBeVisible({
+            await expect(async () => {
+                const modelNames = await modelsPage.getModelNamesInOrder();
+                expect(modelNames).toHaveLength(1);
+                expect(modelNames).toContain(selectedArchitectureName);
+
+                const modelAccuracy = await modelsPage
+                    .getModelRows()
+                    .first()
+                    .getByLabel('Model accuracy')
+                    .getAttribute('aria-valuenow');
+
+                expect(Number(modelAccuracy)).toBeGreaterThan(0);
+            }).toPass({
                 timeout: TIMEOUTS.training,
             });
+        });
+
+        await test.step('Quantize model', async () => {
+            const modelName = (await modelsPage.getModelName()) as string;
+            await modelsPage.expandModel(modelName);
+            await modelsPage.openQuantizationDialog();
+            await modelsPage.submitQuantization();
+
+            await expect(modelsPage.getRunningModelJob(modelName)).toBeVisible({
+                timeout: TIMEOUTS.quantization,
+            });
+
+            await expect(modelsPage.getRunningModelJob(modelName)).toBeHidden({
+                timeout: TIMEOUTS.quantization,
+            });
+
+            const precision = 'INT8';
+            await expect(modelsPage.getModelVariantRow(modelName, precision)).toBeVisible({
+                timeout: TIMEOUTS.quantization,
+            });
+
+            expect(modelsPage.getModelVariantAccuracy(modelName, precision, precision)).toBeGreaterThan(0);
         });
     });
 });

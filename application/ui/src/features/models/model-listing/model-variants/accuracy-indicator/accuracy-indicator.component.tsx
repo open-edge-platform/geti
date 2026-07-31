@@ -42,6 +42,8 @@ export const AccuracyIndicator = ({ accuracy }: AccuracyIndicatorProps) => {
                     dominantBaseline={'middle'}
                     fill={'var(--spectrum-global-color-gray-900)'}
                     fontSize={'var(--spectrum-global-dimension-size-125)'}
+                    aria-label={'Model accuracy'}
+                    aria-valuenow={accuracy}
                 >
                     {`${accuracy}%`}
                 </text>
