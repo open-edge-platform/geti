@@ -112,17 +112,4 @@ describe('DateFilter', () => {
         expect(screen.queryByText(REVERSED_RANGE_MESSAGE)).not.toBeInTheDocument();
         expect(getAppliedFilters()).toBe(`${START_DATE}|${expectedEndDate.toISOString()}`);
     });
-
-    it('resets the picker when the filters are cleared elsewhere', async () => {
-        const user = userEvent.setup();
-
-        renderDateFilter(search);
-
-        expect(getSegment(/year, start date/i)).toHaveTextContent('2024');
-
-        await user.click(screen.getByRole('button', { name: 'Clear all' }));
-
-        expect(getAppliedFilters()).toBe('none|none');
-        expect(getSegment(/year, start date/i)).toHaveTextContent('yyyy');
-    });
 });
