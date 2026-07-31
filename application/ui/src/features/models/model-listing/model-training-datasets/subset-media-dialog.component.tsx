@@ -48,13 +48,11 @@ const SubsetMediaDialogContent = ({
 
     const isPredictionMode = mode === 'prediction';
 
-    // Inference is expensive, so it is only requested once the user asks for predictions
     const { data: predictionsData } = useMediaPredictions({
         mediaId: mediaItem.id,
         selectedModel,
         device: pipeline.device,
         range: null,
-        enabled: isPredictionMode,
     });
 
     const isFetchingPredictions = useIsFetchingMediaPredictions({

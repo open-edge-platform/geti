@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DatasetRevisionItem } from '@/api/types';
-import { fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { getMockedPipeline } from 'mocks/mock-pipeline';
 import { getMockedProject } from 'mocks/mock-project';
@@ -73,11 +73,7 @@ const renderApp = ({ selectedModel }: { selectedModel?: SelectableModel } = { se
 };
 
 describe('SubsetMediaDialog', () => {
-    let predictionRequests = 0;
-
     beforeEach(() => {
-        predictionRequests = 0;
-
         server.use(
             http.get('/api/projects/{project_id}', () =>
                 HttpResponse.json(
@@ -89,8 +85,6 @@ describe('SubsetMediaDialog', () => {
                 HttpResponse.json(annotationsResponse)
             ),
             http.post('/api/projects/{project_id}/dataset/media/media:predict', async () => {
-                predictionRequests += 1;
-
                 await delay(PREDICTION_DELAY_MS);
 
                 return HttpResponse.json({
@@ -111,22 +105,30 @@ describe('SubsetMediaDialog', () => {
         );
     });
 
-    it('shows a loading overlay on the canvas while predictions are being fetched', async () => {
-        renderApp();
-
-        fireEvent.click(await screen.findByRole('button', { name: 'Prediction' }));
-
-        const overlay = await screen.findByRole('progressbar', {}, { timeout: PREDICTION_DELAY_MS });
-
-        await waitForElementToBeRemoved(overlay, { timeout: 2 * PREDICTION_DELAY_MS });
-    });
-
-    it('shows a loading overlay on the canvas while the annotations are being fetched', async () => {
+    it('shows a loading overlay on the canvas while the annotations and predictions are being fetched', async () => {
         server.use(
             http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', async () => {
                 await delay(ANNOTATIONS_DELAY_MS);
 
                 return HttpResponse.json(annotationsResponse);
+            }),
+            http.post('/api/projects/{project_id}/dataset/media/media:predict', async () => {
+                await delay(PREDICTION_DELAY_MS);
+
+                return HttpResponse.json({
+                    predictions: [
+                        {
+                            media: { id: item.id },
+                            prediction: [
+                                {
+                                    shape: { type: 'rectangle', x: 0, y: 0, width: 50, height: 50 },
+                                    labels: [{ id: label.id }],
+                                    confidences: [0.9],
+                                },
+                            ],
+                        },
+                    ],
+                });
             })
         );
 
@@ -134,26 +136,9 @@ describe('SubsetMediaDialog', () => {
 
         expect(await screen.findByRole('button', { name: 'Close' })).toBeInTheDocument();
 
-        await waitForElementToBeRemoved(screen.getByRole('progressbar'), { timeout: 2 * ANNOTATIONS_DELAY_MS });
-    });
-
-    it('does not fetch predictions while the annotation mode is active', async () => {
-        renderApp();
-
-        expect(await screen.findByRole('button', { name: 'Annotation' })).toBeInTheDocument();
-        expect(predictionRequests).toBe(0);
-    });
-
-    it('hides the loading overlay when switching back to the annotation mode while inference is still running', async () => {
-        renderApp();
-
-        fireEvent.click(await screen.findByRole('button', { name: 'Prediction' }));
-
-        expect(await screen.findByRole('progressbar', {}, { timeout: PREDICTION_DELAY_MS })).toBeInTheDocument();
-
-        fireEvent.click(screen.getByRole('button', { name: 'Annotation' }));
-
-        expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+        await waitForElementToBeRemoved(screen.getByRole('progressbar'), {
+            timeout: 2 * (ANNOTATIONS_DELAY_MS + PREDICTION_DELAY_MS),
+        });
     });
 
     it('hides the annotation/prediction toggle when the model cannot run inference', async () => {
