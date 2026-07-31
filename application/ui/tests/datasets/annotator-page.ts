@@ -166,4 +166,8 @@ export class AnnotatorPage {
     async close() {
         await this.page.getByRole('dialog').getByRole('button', { name: 'Close' }).click();
     }
+
+    getMediaCanvasLoading() {
+        return this.page.getByRole('progressbar', { name: 'Media canvas loading' });
+    }
 }
