@@ -39,8 +39,8 @@ def _apply_annotation_status_filter_with_video_support(stmt: Select, annotation_
         # Videos: have no dataset_item themselves, but at least one annotated frame
         frame_alias = aliased(MediaDB)
         annotated_frame_exists = exists(
-            select(DatasetItemDB.id)
-            .join(frame_alias, frame_alias.id == DatasetItemDB.id)
+            select(frame_alias.id)
+            .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
             .where(
                 frame_alias.video_id == MediaDB.id,
                 DatasetItemDB.annotation_data.isnot(None),
@@ -57,8 +57,8 @@ def _apply_annotation_status_filter_with_video_support(stmt: Select, annotation_
     elif annotation_status == DatasetItemAnnotationStatus.MISSING_ANNOTATIONS:
         frame_alias = aliased(MediaDB)
         annotated_frame_count = (
-            select(func.count(DatasetItemDB.id))
-            .join(frame_alias, frame_alias.id == DatasetItemDB.id)
+            select(func.count(frame_alias.id))
+            .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
             .where(
                 frame_alias.video_id == MediaDB.id,
                 DatasetItemDB.annotation_data.isnot(None),
@@ -111,8 +111,8 @@ def _apply_label_filter_with_video_support(stmt: Select, label_ids: list[str] | 
     # Video: at least one of its frames has a dataset item carrying one of the requested labels
     frame_alias = aliased(MediaDB)
     frame_label_exists = exists(
-        select(DatasetItemLabelDB.dataset_item_id)
-        .join(frame_alias, frame_alias.id == DatasetItemLabelDB.dataset_item_id)
+        select(frame_alias.id)
+        .join(DatasetItemLabelDB, DatasetItemLabelDB.dataset_item_id == frame_alias.id)
         .where(
             frame_alias.video_id == MediaDB.id,
             DatasetItemLabelDB.label_id.in_(label_ids),
@@ -131,3 +131,52 @@ def _apply_subset_filter(stmt: Select, subsets: list[str] | None = None) -> Sele
     if subsets:
         stmt = stmt.where(DatasetItemDB.subset.in_(subsets))
     return stmt
+
+
+def _apply_subset_filter_with_video_support(stmt: Select, subsets: list[str] | None = None) -> Select:
+    """Apply a subset filter to a media query, accounting for the video/frame hierarchy.
+
+    Unlike a plain filter on ``DatasetItemDB.subset``, this also works for videos, which do
+    not have their own ``DatasetItemDB`` rows. A video is considered to match if at least
+    one of its frames has a ``DatasetItemDB`` belonging to one of the given subsets. In that
+    case the video itself is returned (not its individual frames).
+
+    Images and video frames match when their own dataset item belongs to one of the subsets.
+
+    Args:
+        stmt: The base SQLAlchemy select statement, expected to have ``MediaDB`` as its
+              primary entity.
+        subsets: The list of subsets to filter by, or ``None``/empty to skip filtering.
+
+    Returns:
+        The select statement with the subset condition applied.
+    """
+    if not subsets:
+        return stmt
+
+    # Image or frame: its own dataset item belongs to one of the requested subsets
+    own_subset_exists = exists(
+        select(DatasetItemDB.id)
+        .where(
+            DatasetItemDB.id == MediaDB.id,
+            DatasetItemDB.subset.in_(subsets),
+        )
+        .correlate(MediaDB)
+    )
+
+    # Video: at least one of its frames has a dataset item belonging to one of the requested subsets.
+    frame_alias = aliased(MediaDB)
+    frame_subset_exists = exists(
+        select(frame_alias.id)
+        .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
+        .where(
+            frame_alias.video_id == MediaDB.id,
+            DatasetItemDB.subset.in_(subsets),
+        )
+        .correlate(MediaDB)
+    )
+
+    return stmt.where(
+        ((MediaDB.type != MediaType.VIDEO) & own_subset_exists)
+        | ((MediaDB.type == MediaType.VIDEO) & frame_subset_exists)
+    )
