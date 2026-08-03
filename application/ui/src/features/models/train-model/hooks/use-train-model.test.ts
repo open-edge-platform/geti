@@ -21,12 +21,12 @@ const DEFAULT_STATE: Partial<TrainModelContextProps> = {
     selectedModelArchitectureId: 'arch-1',
     selectedTrainingDevice: 'cpu',
     selectedDatasetRevisionId: 'use-current-dataset-revision',
-    selectedInputWeightsId: 'default-pre-trained-weights',
+    selectedModelRevisionId: 'default-pre-trained-weights',
     isAdvancedSettingsMode: false,
     trainingConfiguration: mockedTrainingConfiguration,
     defaultTrainingConfiguration: mockedTrainingConfiguration,
     datasetRevisions: [{ id: 'use-current-dataset-revision', name: 'Use current dataset', value: null }],
-    inputWeights: [
+    modelRevisions: [
         { id: 'default-pre-trained-weights', name: 'Default pre-trained weights', architecture: '', value: null },
     ],
 };
@@ -160,24 +160,24 @@ describe('useTrainModel', () => {
 
         it('passes the correct job payload to the train mutation', async () => {
             const datasetRevisionId = 'dataset-rev-1';
-            const inputWeightsId = 'model-rev-1';
+            const modelRevisionId = 'model-rev-1';
 
             mockTrainModelState.mockReturnValue({
                 ...DEFAULT_STATE,
                 selectedDatasetRevisionId: 'ds-entry-1',
-                selectedInputWeightsId: 'weight-entry-1',
+                selectedModelRevisionId: 'model-entry-1',
                 datasetRevisions: [
                     { id: 'use-current-dataset-revision', name: 'Use current dataset', value: null },
                     { id: 'ds-entry-1', name: 'Rev 1', value: datasetRevisionId },
                 ],
-                inputWeights: [
+                modelRevisions: [
                     {
                         id: 'default-pre-trained-weights',
                         name: 'Default pre-trained weights',
                         architecture: '',
                         value: null,
                     },
-                    { id: 'weight-entry-1', name: 'Model Rev 1', architecture: 'arch-1', value: inputWeightsId },
+                    { id: 'model-entry-1', name: 'Model Rev 1', architecture: 'arch-1', value: modelRevisionId },
                 ],
             });
 
@@ -203,13 +203,13 @@ describe('useTrainModel', () => {
                 parameters: {
                     device: 'cpu',
                     model_architecture_id: 'arch-1',
-                    parent_model_revision_id: inputWeightsId,
+                    parent_model_revision_id: modelRevisionId,
                     dataset_revision_id: datasetRevisionId,
                 },
             });
         });
 
-        it('uses null for dataset/input weights when the Use current dataset / default pre-trained weights entries are selected', async () => {
+        it('uses null for dataset/model revision when the Use current dataset / default pre-trained weights entries are selected', async () => {
             let capturedBody: unknown;
             server.use(
                 http.post('/api/jobs', async ({ request }) => {

@@ -5,16 +5,16 @@ import { Content, ContextualHelp, Heading, Item, Picker } from '@geti-ui/ui';
 
 import { useTrainModelState } from './train-model-provider.component';
 
-export const SelectInputWeights = () => {
-    const { inputWeights, selectedInputWeightsId, onSelectInputWeightsId } = useTrainModelState();
+export const SelectModelRevision = () => {
+    const { modelRevisions, selectedModelRevisionId, onSelectModelRevisionId } = useTrainModelState();
 
     return (
         <Picker
             flex={1}
-            items={inputWeights}
+            items={modelRevisions}
             label={'Select input weights'}
-            selectedKey={selectedInputWeightsId}
-            onSelectionChange={(key) => onSelectInputWeightsId(String(key))}
+            selectedKey={selectedModelRevisionId}
+            onSelectionChange={(key) => onSelectModelRevisionId(String(key))}
             contextualHelp={
                 <ContextualHelp variant={'info'} placement={'top'}>
                     <Heading>Selecting input weights</Heading>
