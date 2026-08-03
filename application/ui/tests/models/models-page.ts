@@ -242,7 +242,7 @@ export class ModelsPage {
 
     getModelVariantRow(modelName: string, propertyName: string) {
         return this.page
-            .getByLabel(`Model details for ${modelName}`)
+            .getByRole('group', { name: modelName })
             .getByLabel(/Model variants for/)
             .getByRole('row', { name: propertyName });
     }

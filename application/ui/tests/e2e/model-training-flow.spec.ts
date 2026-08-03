@@ -7,8 +7,10 @@ import { expect, test } from './fixtures';
 import { getFilesToUpload } from './utils';
 
 const TIMEOUTS = {
-    training: 1000 * 60 * 60,
-    quantization: 1000 * 60 * 20,
+    trainedModelResults: 1000 * 20,
+    quantizationResults: 1000 * 20,
+    training: 1000 * 60 * 10,
+    quantization: 1000 * 60 * 5,
     nextMediaItem: 1000 * 30,
     mediaUploaded: 1000 * 60,
 };
@@ -67,6 +69,8 @@ test.describe('Model training flow E2E', () => {
             let prevImageName: string | null = null;
 
             for (let i = 0; i < filesToUpload.length; i++) {
+                await expect(annotatorPage.getMediaCanvasLoading()).toBeHidden({ timeout: TIMEOUTS.nextMediaItem });
+
                 await expectMediaItemToChange(annotatorPage, prevImageName, TIMEOUTS.nextMediaItem);
 
                 const imageName = (await annotatorPage.getSelectedMediaItem().getAttribute('alt')) as string;
@@ -120,7 +124,7 @@ test.describe('Model training flow E2E', () => {
             await expect(async () => {
                 const modelNames = await modelsPage.getModelNamesInOrder();
                 expect(modelNames).toHaveLength(1);
-                expect(modelNames).toContain(selectedArchitectureName);
+                expect(modelNames.some((name) => name.includes(selectedArchitectureName))).toBe(true);
 
                 const modelAccuracy = await modelsPage
                     .getModelRows()
@@ -130,7 +134,7 @@ test.describe('Model training flow E2E', () => {
 
                 expect(Number(modelAccuracy)).toBeGreaterThan(0);
             }).toPass({
-                timeout: TIMEOUTS.training,
+                timeout: TIMEOUTS.trainedModelResults,
             });
         });
 
@@ -149,11 +153,14 @@ test.describe('Model training flow E2E', () => {
             });
 
             const precision = 'INT8';
+
             await expect(modelsPage.getModelVariantRow(modelName, precision)).toBeVisible({
-                timeout: TIMEOUTS.quantization,
+                timeout: TIMEOUTS.quantizationResults,
             });
 
-            expect(modelsPage.getModelVariantAccuracy(modelName, precision, precision)).toBeGreaterThan(0);
+            expect(Number(await modelsPage.getModelVariantAccuracy(modelName, precision, precision))).toBeGreaterThan(
+                0
+            );
         });
     });
 });

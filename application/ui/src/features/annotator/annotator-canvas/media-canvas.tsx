@@ -62,7 +62,11 @@ export const MediaCanvas = ({
 
             {/* Rendered outside the zoom transform so it is not scaled along with the media */}
             {(isLoadingMedia || isLoadingOverlay) && (
-                <Loading mode={'overlay'} style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} />
+                <Loading
+                    mode={'overlay'}
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+                    aria-label={'Media canvas loading'}
+                />
             )}
         </div>
     );
