@@ -21,10 +21,10 @@ export const useGetModelTrainingConfiguration = (modelId: string | null) => {
 
 export const useGetModelArchitectureTrainingConfiguration = ({
     modelArchitectureId,
-    modelRevisionId,
+    modelInputWeightsId,
 }: {
     modelArchitectureId: string | null;
-    modelRevisionId: string | null;
+    modelInputWeightsId: string | null;
 }) => {
     const projectId = useProjectIdentifier();
 
@@ -42,7 +42,7 @@ export const useGetModelArchitectureTrainingConfiguration = ({
             },
         },
         {
-            enabled: modelArchitectureId !== null && modelRevisionId === null,
+            enabled: modelArchitectureId !== null && modelInputWeightsId === null,
         }
     );
 };

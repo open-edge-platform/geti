@@ -20,10 +20,10 @@ export const useTrainModel = () => {
         selectedModelArchitectureId,
         isAdvancedSettingsMode,
         trainingConfiguration,
-        selectedModelRevisionId,
+        selectedInputWeightsId,
         defaultTrainingConfiguration,
         datasetRevisions,
-        modelRevisions,
+        inputWeights,
     } = useTrainModelState();
 
     /**
@@ -48,7 +48,7 @@ export const useTrainModel = () => {
         const datasetRevisionId =
             datasetRevisions.find((revision) => revision.id === selectedDatasetRevisionId)?.value ?? null;
         const parentModelRevisionId =
-            modelRevisions.find((revision) => revision.id === selectedModelRevisionId)?.value ?? null;
+            inputWeights.find((weight) => weight.id === selectedInputWeightsId)?.value ?? null;
 
         const trainModelMutationBody = {
             body: {

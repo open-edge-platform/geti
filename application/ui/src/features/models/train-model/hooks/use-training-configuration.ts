@@ -12,16 +12,19 @@ import {
 
 type useTrainingConfigurationProps = {
     modelArchitectureId: string | null;
-    modelRevisionId: string | null;
+    modelInputWeightsId: string | null;
 };
 
-export const useTrainingConfiguration = ({ modelArchitectureId, modelRevisionId }: useTrainingConfigurationProps) => {
+export const useTrainingConfiguration = ({
+    modelArchitectureId,
+    modelInputWeightsId,
+}: useTrainingConfigurationProps) => {
     const modelArchitectureTrainingConfigurationQuery = useGetModelArchitectureTrainingConfiguration({
         modelArchitectureId,
-        modelRevisionId,
+        modelInputWeightsId,
     });
 
-    const modelTrainingConfigurationQuery = useGetModelTrainingConfiguration(modelRevisionId);
+    const modelTrainingConfigurationQuery = useGetModelTrainingConfiguration(modelInputWeightsId);
 
     useEffect(() => {
         if (modelTrainingConfigurationQuery.isSuccess) {
@@ -40,7 +43,7 @@ export const useTrainingConfiguration = ({ modelArchitectureId, modelRevisionId 
     return [
         trainingConfiguration,
         setTrainingConfiguration,
-        modelRevisionId === null
+        modelInputWeightsId === null
             ? modelArchitectureTrainingConfigurationQuery.data
             : modelTrainingConfigurationQuery.data,
     ] as const;

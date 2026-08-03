@@ -5,7 +5,7 @@ import { Divider, Flex, View } from '@geti-ui/ui';
 
 import { ModelArchitecturesList } from './model-architectures-list/model-architectures-list.component';
 import { SelectDatasetRevision } from './select-dataset-revision.component';
-import { SelectModelRevision } from './select-model-revision.component';
+import { SelectInputWeights } from './select-input-weights.component';
 import { SelectTrainingDevice } from './select-training-device/select-training-device.component';
 
 export const BasicTrainModelContent = () => {
@@ -20,7 +20,7 @@ export const BasicTrainModelContent = () => {
                 <Flex gap={'size-300'} width={'100%'}>
                     <SelectTrainingDevice />
                     <SelectDatasetRevision />
-                    <SelectModelRevision />
+                    <SelectInputWeights />
                 </Flex>
             </Flex>
         </View>
