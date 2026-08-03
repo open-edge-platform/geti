@@ -265,7 +265,7 @@ a.binaries = [b for b in a.binaries if not _is_excluded(b[0], _excluded_triton_b
 a.datas = [d for d in a.datas if not _is_excluded(d[0], _excluded_triton_backends)]
 
 # Remove non-redistributable DLLs from MSIX distribution
-_excluded_dlls = ('torch/lib/cusolverMg64_11.dll', 'torch/lib/nvperf_host.dll')
+_excluded_dlls = ('torch/lib/cusolverMg64_11.dll', 'torch/lib/cusolverMg64_12.dll', 'torch/lib/nvperf_host.dll')
 a.binaries = [b for b in a.binaries if not _is_excluded(b[0], _excluded_dlls)]
 
 # When excluding AGPL models, drop any data/binaries transitively collected from
