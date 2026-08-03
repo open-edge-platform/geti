@@ -1,15 +1,28 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 import multiprocessing as mp
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 from multiprocessing.synchronize import Condition, Event
 from unittest.mock import MagicMock
 
 import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.services.event.event_bus import EventBus, EventType
 
 type EventBusFactory = Callable[[Condition | None, Condition | None, Event | None], EventBus]
+
+
+@pytest.fixture
+def fxt_db_session() -> Generator[Session]:
+    """A real (in-memory) SQLAlchemy session to exercise the commit-deferred emission."""
+    engine = create_engine("sqlite://", poolclass=StaticPool)
+    session = sessionmaker(bind=engine)()
+    yield session
+    session.close()
+    engine.dispose()
 
 
 @pytest.fixture
@@ -142,3 +155,39 @@ class TestEventBus:
         ok_handler.assert_called_once_with()
         # ... and the side-effect notifications (model reload) still happen.
         assert model_reload_event.is_set()
+
+    def test_emit_event_after_commit_defers_until_commit(
+        self, fxt_event_bus: EventBusFactory, fxt_db_session: Session
+    ) -> None:
+        """`emit_event_after_commit` must not notify anyone until the session actually commits."""
+        handler = MagicMock(spec=Callable)
+        source_changed_condition = mp.Condition()
+        event_bus = fxt_event_bus(source_changed_condition, None, None)
+        event_bus.subscribe(event_types=[EventType.SOURCE_CHANGED], handler=handler)
+        fxt_db_session.begin()
+
+        event_bus.emit_event_after_commit(fxt_db_session, EventType.SOURCE_CHANGED)
+
+        # Nothing must happen before the commit: consumers would otherwise read stale data.
+        handler.assert_not_called()
+
+        fxt_db_session.commit()
+
+        handler.assert_called_once_with()
+        with source_changed_condition:
+            notified = source_changed_condition.acquire()
+        assert notified
+
+    def test_emit_event_after_commit_skipped_on_rollback(
+        self, fxt_event_bus: EventBusFactory, fxt_db_session: Session
+    ) -> None:
+        """If the transaction is rolled back, the event is never emitted."""
+        handler = MagicMock(spec=Callable)
+        event_bus = fxt_event_bus(None, None, None)
+        event_bus.subscribe(event_types=[EventType.SOURCE_CHANGED], handler=handler)
+        fxt_db_session.begin()
+
+        event_bus.emit_event_after_commit(fxt_db_session, EventType.SOURCE_CHANGED)
+        fxt_db_session.rollback()
+
+        handler.assert_not_called()
