@@ -192,7 +192,7 @@ test.describe('Model training flow', () => {
         await modelsPage.openTrainModelDialog();
         await modelsPage.selectModelArchitecture('Custom_Object_Detection_Gen3_ATSS');
         await modelsPage.selectPickerOption('Select dataset', 'Dataset Revision 2');
-        await modelsPage.selectPickerOption('Select model revision', 'ATSS Revision 1');
+        await modelsPage.selectPickerOption('Select input weights', 'ATSS Revision 1');
 
         await modelsPage.startTraining();
 
@@ -292,8 +292,8 @@ test.describe('Model training flow', () => {
             await modelsPage.selectPickerOption('Select dataset', 'Dataset Revision 2');
         });
 
-        await test.step('Select model revision', async () => {
-            await modelsPage.selectPickerOption('Select model revision', 'Default pre-trained weights');
+        await test.step('Select input weights', async () => {
+            await modelsPage.selectPickerOption('Select input weights', 'Default pre-trained weights');
         });
 
         await test.step('Select advanced settings', async () => {
