@@ -16,7 +16,7 @@ import { GroupByMode } from '../types';
 import { BottomProgressBar } from './bottom-progress-bar.component';
 import { RUNNING_JOB_GRID_COLUMNS } from './running-job-table-header.component';
 
-import classes from './current-model-running.module.scss';
+import classes from './current-running-jobs.module.scss';
 
 export type JobRowColumnsProps = {
     groupBy: GroupByMode;

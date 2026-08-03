@@ -3,7 +3,7 @@
 
 import type { DatasetRevision } from '@/api/types';
 import { dimensionValue, Flex, Heading, View } from '@geti-ui/ui';
-import { useCancelJob, useGetCurrentModelRunningJobs } from 'hooks/api/jobs/jobs.hook';
+import { useCancelJob, useGetCurrentRunningJobs } from 'hooks/api/jobs/jobs.hook';
 import { isJobFailed } from 'hooks/api/util';
 import { useDismissedJobs } from 'hooks/storage/use-dismissed-jobs.hook';
 import { isEmpty, isNil } from 'lodash-es';
@@ -11,17 +11,17 @@ import { isEmpty, isNil } from 'lodash-es';
 import { useGetTaskModelArchitectures } from '../../hooks/api/use-get-model-architectures.hook';
 import { GroupByMode } from '../types';
 import { FailedJobRow } from './failed-job-row.component';
+import { RunningJobRow } from './running-job-row.component';
 import { RunningJobTableHeader } from './running-job-table-header.component';
-import { RunningModelRow } from './running-model-row.component';
 
-type CurrentModelRunningProps = {
+type CurrentRunningJobsProps = {
     groupBy: GroupByMode;
     datasetRevisions: DatasetRevision[];
 };
 
-export const CurrentModelRunning = ({ groupBy, datasetRevisions }: CurrentModelRunningProps) => {
+export const CurrentRunningJobs = ({ groupBy, datasetRevisions }: CurrentRunningJobsProps) => {
     const cancelJobMutation = useCancelJob();
-    const activeRunningJobs = useGetCurrentModelRunningJobs();
+    const activeRunningJobs = useGetCurrentRunningJobs();
     const { modelArchitectures } = useGetTaskModelArchitectures();
     const { dismissJob } = useDismissedJobs();
 
@@ -49,7 +49,7 @@ export const CurrentModelRunning = ({ groupBy, datasetRevisions }: CurrentModelR
             <View backgroundColor={'gray-75'}>
                 <RunningJobTableHeader groupBy={groupBy} />
 
-                <div aria-label={'Currently running jobs'}>
+                <div aria-label={'Current jobs'}>
                     {activeRunningJobs.map((job) =>
                         isJobFailed(job) ? (
                             <FailedJobRow
@@ -61,7 +61,7 @@ export const CurrentModelRunning = ({ groupBy, datasetRevisions }: CurrentModelR
                                 modelArchitectures={modelArchitectures}
                             />
                         ) : (
-                            <RunningModelRow
+                            <RunningJobRow
                                 key={job.job_id}
                                 job={job}
                                 onCancel={() => handleCancelRunning(job.job_id)}

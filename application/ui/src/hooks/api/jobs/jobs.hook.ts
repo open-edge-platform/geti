@@ -91,7 +91,7 @@ const useListJobs = () => {
 
 const isTrainOrQuantizeJob = (job: Job): job is TrainJob | QuantizeJob => isTrainJob(job) || isQuantizeJob(job);
 
-export const useGetCurrentModelRunningJobs = (): (QuantizeJob | TrainJob)[] | undefined => {
+export const useGetCurrentRunningJobs = (): (QuantizeJob | TrainJob)[] | undefined => {
     const projectId = useProjectIdentifier();
     const activeJobs = useListJobs();
     const { isJobDismissed } = useDismissedJobs();

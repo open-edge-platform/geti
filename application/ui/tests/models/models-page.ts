@@ -236,8 +236,8 @@ export class ModelsPage {
         return this.page.getByLabel('Recommended model architectures');
     }
 
-    getRunningModelJob(modelName: string) {
-        return this.page.getByLabel('Currently running jobs').getByText(modelName).first();
+    getRunningJob(modelName: string) {
+        return this.page.getByLabel('Current jobs').getByText(modelName).first();
     }
 
     getModelVariantRow(modelName: string, propertyName: string) {

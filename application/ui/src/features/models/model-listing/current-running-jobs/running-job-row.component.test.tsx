@@ -9,7 +9,7 @@ import { HttpResponse } from 'msw';
 import { render, renderHook } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
-import { useGetCurrentModelRunningJobs, useStreamJobStatus } from '../../../../hooks/api/jobs/jobs.hook';
+import { useGetCurrentRunningJobs, useStreamJobStatus } from '../../../../hooks/api/jobs/jobs.hook';
 import { server } from '../../../../msw-node-setup';
 import {
     getLastEventSource,
@@ -17,9 +17,9 @@ import {
     resetMockEventSource,
     simulateSSEMessage,
 } from '../../../../test-utils/mock-event-source';
-import { RunningModelRow } from './running-model-row.component';
+import { RunningJobRow } from './running-job-row.component';
 
-describe('RunningModelRow', () => {
+describe('RunningJobRow', () => {
     const mockModel = getMockedModel({
         id: 'model-123',
         architecture: 'arch-123',
@@ -84,7 +84,7 @@ describe('RunningModelRow', () => {
         });
 
         render(
-            <RunningModelRow
+            <RunningJobRow
                 job={job}
                 groupBy={'dataset'}
                 datasetRevisions={[datasetRevision]}
@@ -136,7 +136,7 @@ describe('RunningModelRow', () => {
         });
 
         render(
-            <RunningModelRow
+            <RunningJobRow
                 job={job}
                 groupBy={'architecture'}
                 datasetRevisions={[datasetRevision]}
@@ -185,7 +185,7 @@ describe('RunningModelRow', () => {
         });
 
         render(
-            <RunningModelRow
+            <RunningJobRow
                 job={job}
                 onCancel={mockCancel}
                 datasetRevisions={[]}
@@ -220,7 +220,7 @@ describe('RunningModelRow', () => {
         });
 
         render(
-            <RunningModelRow
+            <RunningJobRow
                 job={job}
                 onCancel={mockCancel}
                 datasetRevisions={[]}
@@ -258,7 +258,7 @@ describe('RunningModelRow', () => {
 
         it('subscribes to SSE when the component mounts with a running job', async () => {
             render(
-                <RunningModelRow
+                <RunningJobRow
                     job={job}
                     datasetRevisions={[]}
                     groupBy={'dataset'}
@@ -277,7 +277,7 @@ describe('RunningModelRow', () => {
 
             const { result: jobsResult } = renderHook(() => {
                 useStreamJobStatus(job.job_id);
-                return useGetCurrentModelRunningJobs();
+                return useGetCurrentRunningJobs();
             });
 
             await waitFor(() => {

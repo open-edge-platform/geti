@@ -12,7 +12,7 @@ import * as toastModule from '../../../components/toast/toast.component';
 import { server } from '../../../msw-node-setup';
 import { MockEventSourceConstructor, resetMockEventSource } from '../../../test-utils/mock-event-source';
 import { useDismissedJobs } from '../../storage/use-dismissed-jobs.hook';
-import { useGetCurrentModelRunningJobs, useStreamJobStatus } from './jobs.hook';
+import { useGetCurrentRunningJobs, useStreamJobStatus } from './jobs.hook';
 
 const PROJECT_ID = '123';
 
@@ -46,7 +46,7 @@ describe('useGetCurrentRunningJobs', () => {
     it('returns an empty array when there are no active running jobs', async () => {
         server.use(http.get('/api/jobs', () => HttpResponse.json([])));
 
-        const { result } = renderHook(() => useGetCurrentModelRunningJobs());
+        const { result } = renderHook(() => useGetCurrentRunningJobs());
 
         await waitFor(() => {
             expect(result.current).toEqual([]);
@@ -57,7 +57,7 @@ describe('useGetCurrentRunningJobs', () => {
         const job = createMockJobForProject();
         server.use(http.get('/api/jobs', () => HttpResponse.json([job])));
 
-        const { result } = renderHook(() => useGetCurrentModelRunningJobs());
+        const { result } = renderHook(() => useGetCurrentRunningJobs());
 
         await waitFor(() => {
             expect(result.current).toHaveLength(1);
@@ -83,7 +83,7 @@ describe('useGetCurrentRunningJobs', () => {
         });
         server.use(http.get('/api/jobs', () => HttpResponse.json([otherProjectJob])));
 
-        const { result } = renderHook(() => useGetCurrentModelRunningJobs());
+        const { result } = renderHook(() => useGetCurrentRunningJobs());
 
         await waitFor(() => {
             expect(result.current).toEqual([]);
@@ -93,7 +93,7 @@ describe('useGetCurrentRunningJobs', () => {
     it('does not subscribe to SSE when no active running job matches the project', async () => {
         server.use(http.get('/api/jobs', () => HttpResponse.json([])));
 
-        renderHook(() => useGetCurrentModelRunningJobs());
+        renderHook(() => useGetCurrentRunningJobs());
 
         await waitFor(() => {
             expect(MockEventSourceConstructor).not.toHaveBeenCalled();
@@ -110,7 +110,7 @@ describe('useGetCurrentRunningJobs', () => {
         });
         server.use(http.get('/api/jobs', () => HttpResponse.json([failedQuantizeJob])));
 
-        const { result } = renderHook(() => useGetCurrentModelRunningJobs());
+        const { result } = renderHook(() => useGetCurrentRunningJobs());
 
         await waitFor(() => {
             expect(result.current).toHaveLength(1);
@@ -122,7 +122,7 @@ describe('useGetCurrentRunningJobs', () => {
         const failedTrainJob = createMockJobForProject({ status: 'FAILED' });
         server.use(http.get('/api/jobs', () => HttpResponse.json([failedTrainJob])));
 
-        const { result } = renderHook(() => useGetCurrentModelRunningJobs());
+        const { result } = renderHook(() => useGetCurrentRunningJobs());
 
         await waitFor(() => {
             expect(result.current).toEqual([]);
@@ -142,7 +142,7 @@ describe('useGetCurrentRunningJobs', () => {
         const { result } = renderHook(() => {
             const { dismissJob } = useDismissedJobs();
 
-            return { jobs: useGetCurrentModelRunningJobs(), dismissJob };
+            return { jobs: useGetCurrentRunningJobs(), dismissJob };
         });
 
         await waitFor(() => {

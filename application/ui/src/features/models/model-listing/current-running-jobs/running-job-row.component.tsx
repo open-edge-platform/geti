@@ -10,9 +10,9 @@ import { capitalize } from 'lodash-es';
 
 import { JobRow, type JobRowColumnsProps } from './job-row.component';
 
-import classes from './current-model-running.module.scss';
+import classes from './current-running-jobs.module.scss';
 
-type RunningModelRowProps = JobRowColumnsProps & {
+type RunningJobRowProps = JobRowColumnsProps & {
     job: TrainJob | QuantizeJob;
     onCancel?: () => void;
 };
@@ -73,13 +73,7 @@ const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
     );
 };
 
-export const RunningModelRow = ({
-    job,
-    onCancel,
-    datasetRevisions,
-    groupBy,
-    modelArchitectures,
-}: RunningModelRowProps) => {
+export const RunningJobRow = ({ job, onCancel, datasetRevisions, groupBy, modelArchitectures }: RunningJobRowProps) => {
     useStreamJobStatus(job.job_id);
 
     const statusMessage = job.message || (job.status === 'PENDING' ? 'Pending...' : 'Running...');
