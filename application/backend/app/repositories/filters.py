@@ -164,11 +164,11 @@ def _apply_subset_filter_with_video_support(stmt: Select, subsets: list[str] | N
         .correlate(MediaDB)
     )
 
-    # Video: at least one of its frames has a dataset item belonging to one of the requested subsets
+    # Video: at least one of its frames has a dataset item belonging to one of the requested subsets.
     frame_alias = aliased(MediaDB)
     frame_subset_exists = exists(
-        select(DatasetItemDB.id)
-        .join(frame_alias, frame_alias.id == DatasetItemDB.id)
+        select(frame_alias.id)
+        .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
         .where(
             frame_alias.video_id == MediaDB.id,
             DatasetItemDB.subset.in_(subsets),

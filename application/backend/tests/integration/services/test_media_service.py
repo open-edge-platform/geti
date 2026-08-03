@@ -1019,22 +1019,22 @@ class TestMediaServiceIntegration:
         assert len(videos) == 1
         assert videos[0].annotated_frame_count == 1
 
-    @pytest.mark.parametrize("subsets", [None, ["unassigned"]])
+    @pytest.mark.parametrize("subset", ["unassigned", "training"])
     def test_list_media_with_annotated_frame_subsets(
         self,
-        subsets: list[str] | None,
+        subset: str,
         fxt_media_service: MediaService,
         fxt_project_with_media: tuple[Project, list[MediaDB]],
         db_session: Session,
     ) -> None:
-        """Test listing media should include the video that have annotated frame with each filter option."""
+        """Test listing media should include the video that has annotated frame with each filter option."""
         project, db_media_list = fxt_project_with_media
 
         db_video_frame = next(db_media for db_media in db_media_list if db_media.type == MediaType.VIDEO_FRAME)
         db_dataset_item = DatasetItemDB(
             id=db_video_frame.id,
             project_id=str(project.id),
-            subset="unassigned",
+            subset=subset,
             annotation_data=[{"labels": [{"id": str(uuid4())}], "shape": {"type": "full_image"}}],
         )
         db_session.add(db_dataset_item)
@@ -1042,7 +1042,7 @@ class TestMediaServiceIntegration:
 
         media_list = fxt_media_service.list_media(
             project_id=project.id,
-            filters=MediaFilters(subsets=subsets),
+            filters=MediaFilters(subsets=[subset]),
         )
 
         videos = [m for m in media_list if isinstance(m, Video)]
