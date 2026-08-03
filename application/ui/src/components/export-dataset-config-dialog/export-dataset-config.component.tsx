@@ -21,39 +21,56 @@ import {
 } from '@geti-ui/ui';
 import { Alert, LinkOut } from '@geti-ui/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
+import { useDatasetStatisticsQuery } from 'hooks/api/dataset.hook';
 import { useProject } from 'hooks/api/project.hook';
 
 import { useExportDatasetJobAction } from '../../hooks/use-export-dataset-job-action.hook';
 import { Link } from '../../platform/components/link.component';
-import { getEmptyLabel } from '../../shared/annotator/labels';
+import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../shared/annotator/labels';
 import { MultiSelectList } from '../multi-select-list/multi-select-list.component';
 import { getFormatOptions } from '../util';
 
 import classes from './export-dataset-config.module.scss';
 
-type WarningMessagesProps = {
-    emptyLabelName: string | null;
-};
+const WarningMessages = ({ isVisible }: { isVisible: boolean }) => {
+    const { data: statistics } = useDatasetStatisticsQuery();
+    const emptyLabel = useProjectLabelsWithEmptyLabel().find(isEmptyLabel);
 
-const WarningMessages = ({ emptyLabelName }: WarningMessagesProps) => {
+    const hasVideos = (statistics?.media_counts.videos ?? 0) > 0;
+    // Media annotated with the empty label is reported by the API under a `null` label id
+    const emptyLabelName = statistics?.annotations_counts.instances_per_label.some(
+        ({ label_id, instances }) => label_id === null && instances > 0
+    )
+        ? emptyLabel?.name
+        : undefined;
+
+    if (!isVisible || (!hasVideos && emptyLabelName === undefined)) {
+        return null;
+    }
+
+    const unsupportedItems = [hasVideos && 'videos', emptyLabelName !== undefined && 'empty labels']
+        .filter(Boolean)
+        .join(' or ');
+
     return (
         <Flex alignItems={'start'} marginTop={'size-100'} gap={'size-100'}>
             <Flex>
                 <Alert className={classes.warningMessageIcon} />
             </Flex>
             <Flex direction={'column'} gap={'size-75'}>
-                <Text>
-                    Exporting videos is not supported by this dataset format. All annotated frames from videos will be
-                    exported as images.
-                </Text>
-                {emptyLabelName !== null && (
+                {hasVideos && (
                     <Text>
-                        {`The selected format does not support empty labels (e.g. "${emptyLabelName}"). Images
-                        and frames containing them will be exported as unannotated.`}
+                        Exporting videos is not supported by this dataset format. All annotated frames from videos will
+                        be exported as images.
                     </Text>
                 )}
-                <Text>{`To preserve videos${emptyLabelName !== null ? ' or empty labels' : ''}, please
-                use the Geti export format.`}</Text>
+                {emptyLabelName !== undefined && (
+                    <Text>
+                        {`The selected format does not support empty labels (e.g. "${emptyLabelName}"). ` +
+                            `Images and frames containing them will be exported as unannotated.`}
+                    </Text>
+                )}
+                <Text>{`To preserve ${unsupportedItems}, please use the Geti export format.`}</Text>
             </Flex>
         </Flex>
     );
@@ -91,7 +108,6 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
     const labels = selectedProject.task.labels?.map((label) => ({ id: label.name, name: label.name })) ?? [];
 
     const isNonGetiFormatSelected = selectedExportFormat !== 'geti';
-    const emptyLabel = getEmptyLabel(selectedProject.task.task_type, selectedProject.task.exclusive_labels);
 
     return (
         <Dialog size='L' width={{ base: '70vw' }}>
@@ -133,7 +149,8 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
                         </RadioGroup>
                     </Form>
 
-                    {isNonGetiFormatSelected && <WarningMessages emptyLabelName={emptyLabel?.name ?? null} />}
+                    {/* Mounted upfront so the statistics are fetched while the user picks a format */}
+                    <WarningMessages isVisible={isNonGetiFormatSelected} />
 
                     <Link
                         href={EXPORT_FORMATS_LINK}
