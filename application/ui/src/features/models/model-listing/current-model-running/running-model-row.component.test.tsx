@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import { getMockedDatasetRevision } from 'mocks/mock-dataset-revision';
-import { getMockedQuantizeJob, getMockedTrainJob } from 'mocks/mock-job';
+import { getMockedTrainJob } from 'mocks/mock-job';
 import { getMockedModel, getMockedModelArchitecture } from 'mocks/mock-model';
 import { HttpResponse } from 'msw';
 import { render, renderHook } from 'test-utils/render';
@@ -231,66 +231,6 @@ describe('RunningModelRow', () => {
 
         const cancelButton = await screen.findByRole('button', { name: /cancel job/i });
         expect(cancelButton).toBeDisabled();
-    });
-
-    describe('failed job', () => {
-        const failedJob = getMockedQuantizeJob({
-            status: 'FAILED',
-            error: 'Quantization failed unexpectedly',
-        });
-
-        it('renders the failed badge and a dismiss button instead of the cancel button', async () => {
-            render(
-                <RunningModelRow
-                    job={failedJob}
-                    onCancel={vi.fn()}
-                    onDismiss={vi.fn()}
-                    datasetRevisions={[]}
-                    groupBy={'dataset'}
-                    modelArchitectures={[modelArchitecture]}
-                />
-            );
-
-            expect(await screen.findByText('Failed')).toBeVisible();
-            expect(screen.queryByText(failedJob.error as string)).not.toBeInTheDocument();
-            expect(screen.getByRole('button', { name: /view logs/i })).toBeVisible();
-            expect(screen.getByRole('button', { name: /dismiss failed job/i })).toBeVisible();
-            expect(screen.queryByRole('button', { name: /cancel job/i })).not.toBeInTheDocument();
-        });
-
-        it('does not subscribe to SSE for a failed job', async () => {
-            resetMockEventSource();
-
-            render(
-                <RunningModelRow
-                    job={failedJob}
-                    datasetRevisions={[]}
-                    groupBy={'dataset'}
-                    modelArchitectures={[modelArchitecture]}
-                />
-            );
-
-            expect(await screen.findByText('Failed')).toBeVisible();
-            expect(MockEventSourceConstructor).not.toHaveBeenCalled();
-        });
-
-        it('calls onDismiss when the dismiss button is pressed', async () => {
-            const mockDismiss = vi.fn();
-
-            render(
-                <RunningModelRow
-                    job={failedJob}
-                    onDismiss={mockDismiss}
-                    datasetRevisions={[]}
-                    groupBy={'dataset'}
-                    modelArchitectures={[modelArchitecture]}
-                />
-            );
-
-            fireEvent.click(await screen.findByRole('button', { name: /dismiss failed job/i }));
-
-            expect(mockDismiss).toHaveBeenCalled();
-        });
     });
 
     describe('useStreamJobStatus', () => {

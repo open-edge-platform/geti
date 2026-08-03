@@ -4,11 +4,13 @@
 import type { DatasetRevision } from '@/api/types';
 import { dimensionValue, Flex, Heading, View } from '@geti-ui/ui';
 import { useCancelJob, useGetCurrentModelRunningJobs } from 'hooks/api/jobs/jobs.hook';
+import { isJobFailed } from 'hooks/api/util';
 import { useDismissedJobs } from 'hooks/storage/use-dismissed-jobs.hook';
 import { isEmpty, isNil } from 'lodash-es';
 
 import { useGetTaskModelArchitectures } from '../../hooks/api/use-get-model-architectures.hook';
 import { GroupByMode } from '../types';
+import { FailedJobRow } from './failed-job-row.component';
 import { RunningJobTableHeader } from './running-job-table-header.component';
 import { RunningModelRow } from './running-model-row.component';
 
@@ -48,17 +50,27 @@ export const CurrentModelRunning = ({ groupBy, datasetRevisions }: CurrentModelR
                 <RunningJobTableHeader groupBy={groupBy} />
 
                 <div aria-label={'Currently running jobs'}>
-                    {activeRunningJobs.map((job) => (
-                        <RunningModelRow
-                            key={job.job_id}
-                            job={job}
-                            onCancel={() => handleCancelRunning(job.job_id)}
-                            onDismiss={() => dismissJob(job.job_id)}
-                            groupBy={groupBy}
-                            datasetRevisions={datasetRevisions}
-                            modelArchitectures={modelArchitectures}
-                        />
-                    ))}
+                    {activeRunningJobs.map((job) =>
+                        isJobFailed(job) ? (
+                            <FailedJobRow
+                                key={job.job_id}
+                                job={job}
+                                onDismiss={() => dismissJob(job.job_id)}
+                                groupBy={groupBy}
+                                datasetRevisions={datasetRevisions}
+                                modelArchitectures={modelArchitectures}
+                            />
+                        ) : (
+                            <RunningModelRow
+                                key={job.job_id}
+                                job={job}
+                                onCancel={() => handleCancelRunning(job.job_id)}
+                                groupBy={groupBy}
+                                datasetRevisions={datasetRevisions}
+                                modelArchitectures={modelArchitectures}
+                            />
+                        )
+                    )}
                 </div>
             </View>
         </Flex>

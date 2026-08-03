@@ -3,40 +3,18 @@
 
 import { useState } from 'react';
 
-import type {
-    DatasetRevision,
-    Job,
-    ModelArchitectureWithPerformanceCategory,
-    QuantizeJob,
-    TrainJob,
-} from '@/api/types';
-import { AlertDialog, Badge, Button, DialogContainer, Flex, Grid, Loading, Text } from '@geti-ui/ui';
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
+import type { Job, QuantizeJob, TrainJob } from '@/api/types';
+import { AlertDialog, Badge, Button, DialogContainer, Flex, Loading, Text } from '@geti-ui/ui';
 import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
-import { isJobFailed, isJobPending, isTrainJob } from 'hooks/api/util';
 import { capitalize } from 'lodash-es';
 
-import { formatDateTime } from '../../../../shared/date-utils';
-import { useGetModel } from '../../hooks/api/use-get-model.hook';
-import { TrainingLogsDialog } from '../../training-logs/training-logs-dialog.component';
-import { ArchitectureColumn } from '../components/model-row/architecture-column.component';
-import { DatasetColumn } from '../components/model-row/dataset-revision-column.component';
-import { GroupByMode } from '../types';
-import { BottomProgressBar } from './bottom-progress-bar.component';
-import { RUNNING_JOB_GRID_COLUMNS } from './running-job-table-header.component';
+import { JobRow, type JobRowColumnsProps } from './job-row.component';
 
 import classes from './current-model-running.module.scss';
 
-dayjs.extend(duration);
-
-type RunningModelRowProps = {
+type RunningModelRowProps = JobRowColumnsProps & {
     job: TrainJob | QuantizeJob;
     onCancel?: () => void;
-    onDismiss?: () => void;
-    groupBy: GroupByMode;
-    datasetRevisions: DatasetRevision[];
-    modelArchitectures: ModelArchitectureWithPerformanceCategory[];
 };
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -49,18 +27,6 @@ const StatusBadge = ({ status }: { status: string }) => {
                 </Flex>
             </Text>
         </Badge>
-    );
-};
-
-const FailedStatusBadge = () => {
-    return <Badge variant={'negative'}>Failed</Badge>;
-};
-
-const DismissFailedJob = ({ onDismiss }: { onDismiss: () => void }) => {
-    return (
-        <Button variant={'negative'} onPress={onDismiss} aria-label={'Dismiss failed job'}>
-            Dismiss
-        </Button>
     );
 };
 
@@ -107,97 +73,33 @@ const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
     );
 };
 
-const ViewLogsButton = ({ jobId }: { jobId: string }) => {
-    const [isLogsDialogOpen, setIsLogsDialogOpen] = useState(false);
-
-    return (
-        <>
-            <Button variant={'secondary'} onPress={() => setIsLogsDialogOpen(true)} aria-label={'View logs'}>
-                Logs
-            </Button>
-            <DialogContainer type={'fullscreen'} onDismiss={() => setIsLogsDialogOpen(false)}>
-                {isLogsDialogOpen && <TrainingLogsDialog jobId={jobId} />}
-            </DialogContainer>
-        </>
-    );
-};
-
 export const RunningModelRow = ({
     job,
     onCancel,
-    onDismiss,
     datasetRevisions,
     groupBy,
     modelArchitectures,
 }: RunningModelRowProps) => {
-    // Annotated explicitly: `isJobFailed` is a type guard that would otherwise narrow `job` down to `Job`
-    const isFailed: boolean = isJobFailed(job);
-
-    useStreamJobStatus(isFailed ? undefined : job.job_id);
-
-    const modelId = job.metadata.model.id;
-    const { data: trainingModel } = useGetModel(modelId, !isJobPending(job));
-
-    const device = isTrainJob(job) ? job?.metadata.device.name : null;
-
-    const modelArchitectureId = job.metadata.model.architecture;
-    const modelName = trainingModel?.name || job.metadata.model.name;
-
-    const modelArchitecture = modelArchitectures.find(({ id }) => id === modelArchitectureId);
-
-    const datasetRevision = datasetRevisions.find(({ id }) => id === trainingModel?.training_info.dataset_revision_id);
-    const labelSchemaRevision = trainingModel?.training_info.label_schema_revision ?? {};
-    const labelsCount =
-        'labels' in labelSchemaRevision && Array.isArray(labelSchemaRevision.labels)
-            ? labelSchemaRevision.labels.length
-            : undefined;
-
-    const formattedStartedAt = job.started_at ? formatDateTime(job.started_at) : 'Waiting to start...';
+    useStreamJobStatus(job.job_id);
 
     const statusMessage = job.message || (job.status === 'PENDING' ? 'Pending...' : 'Running...');
-
-    // The failed job's error is not shown here, it can be an arbitrarily long traceback; the logs dialog has it
     const showStatusTagMessage =
-        !isFailed && job.status.toLocaleLowerCase() !== statusMessage.replace('...', '').toLocaleLowerCase();
+        job.status.toLocaleLowerCase() !== statusMessage.replace('...', '').toLocaleLowerCase();
 
     return (
-        <BottomProgressBar progress={isFailed ? 0 : job.progress}>
-            <Grid
-                columns={RUNNING_JOB_GRID_COLUMNS}
-                alignItems={'center'}
-                width={'100%'}
-                columnGap={'size-200'}
-                UNSAFE_className={classes.grid}
-            >
-                <Flex direction={'column'} justifyContent={'center'} gap={'size-50'}>
-                    <Flex alignItems={'center'}>
-                        <Text UNSAFE_className={classes.modelName}>{modelName}</Text>
-                    </Flex>
-
-                    <Flex alignItems={'start'} gap={'size-100'}>
-                        {isFailed ? <FailedStatusBadge /> : <StatusBadge status={capitalize(job.status)} />}
-                        {showStatusTagMessage && <StatusBadgeMessage status={statusMessage} />}
-                    </Flex>
-
-                    <Text UNSAFE_className={classes.metaText}>{`Started: ${formattedStartedAt}`}</Text>
-                    {device && <Text UNSAFE_className={classes.metaText}>{`Device: ${device}`}</Text>}
-                </Flex>
-
-                <Flex alignItems={'start'} direction={'column'} gap={'size-100'}>
-                    {groupBy === 'architecture' ? (
-                        <DatasetColumn datasetRevision={datasetRevision} labelsCount={labelsCount} />
-                    ) : (
-                        <ArchitectureColumn architecture={modelArchitecture} />
-                    )}
-                </Flex>
-
-                <Flex gap={'size-100'} direction={'column'} alignItems={'center'}>
-                    <ViewLogsButton jobId={job.job_id} />
-                    {isFailed
-                        ? onDismiss && <DismissFailedJob onDismiss={onDismiss} />
-                        : onCancel && <CancelRunningJob onCancel={onCancel} job={job} />}
-                </Flex>
-            </Grid>
-        </BottomProgressBar>
+        <JobRow
+            job={job}
+            progress={job.progress}
+            statusBadges={
+                <>
+                    <StatusBadge status={capitalize(job.status)} />
+                    {showStatusTagMessage && <StatusBadgeMessage status={statusMessage} />}
+                </>
+            }
+            actions={onCancel && <CancelRunningJob onCancel={onCancel} job={job} />}
+            groupBy={groupBy}
+            datasetRevisions={datasetRevisions}
+            modelArchitectures={modelArchitectures}
+        />
     );
 };
