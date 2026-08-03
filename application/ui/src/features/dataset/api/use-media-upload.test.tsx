@@ -35,22 +35,6 @@ const uploadMediaAndWaitForCompletion = async (
     });
 };
 
-vi.mock('sonner', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('sonner')>();
-    return {
-        ...actual,
-        toast: {
-            ...actual.toast,
-            success: vi.fn(),
-            error: vi.fn(),
-            warning: vi.fn(),
-            info: vi.fn(),
-            dismiss: vi.fn(),
-            custom: vi.fn(),
-        },
-    };
-});
-
 describe('useMediaUpload', () => {
     beforeEach(() => {
         vi.useFakeTimers({ shouldAdvanceTime: true });

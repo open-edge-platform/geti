@@ -23,7 +23,7 @@ describe('useKeyboardNavigation', () => {
         const mockedOnSelectedMediaItem = vi.fn();
         render(<App items={items} onSelectedMediaItem={mockedOnSelectedMediaItem} selectedIndex={1} />);
 
-        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowUp' });
+        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowUp', code: 'ArrowUp' });
         expect(mockedOnSelectedMediaItem).toHaveBeenCalledWith(items[0]);
     });
 
@@ -31,7 +31,7 @@ describe('useKeyboardNavigation', () => {
         const mockedOnSelectedMediaItem = vi.fn();
         render(<App items={items} onSelectedMediaItem={mockedOnSelectedMediaItem} selectedIndex={1} />);
 
-        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowLeft' });
+        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowLeft', code: 'ArrowLeft' });
         expect(mockedOnSelectedMediaItem).toHaveBeenCalledWith(items[0]);
     });
 
@@ -39,7 +39,7 @@ describe('useKeyboardNavigation', () => {
         const mockedOnSelectedMediaItem = vi.fn();
         render(<App items={items} onSelectedMediaItem={mockedOnSelectedMediaItem} selectedIndex={1} />);
 
-        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowDown' });
+        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowDown', code: 'ArrowDown' });
         expect(mockedOnSelectedMediaItem).toHaveBeenCalledWith(items[2]);
     });
 
@@ -47,7 +47,7 @@ describe('useKeyboardNavigation', () => {
         const mockedOnSelectedMediaItem = vi.fn();
         render(<App items={items} onSelectedMediaItem={mockedOnSelectedMediaItem} selectedIndex={1} />);
 
-        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowRight' });
+        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowRight', code: 'ArrowRight' });
         expect(mockedOnSelectedMediaItem).toHaveBeenCalledWith(items[2]);
     });
 
@@ -55,22 +55,22 @@ describe('useKeyboardNavigation', () => {
         const mockedOnSelectedMediaItem = vi.fn();
         render(<App items={items} onSelectedMediaItem={mockedOnSelectedMediaItem} selectedIndex={0} />);
 
-        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowUp' });
-        expect(mockedOnSelectedMediaItem).toHaveBeenCalledWith(items[0]);
+        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowUp', code: 'ArrowUp' });
+        expect(mockedOnSelectedMediaItem).not.toHaveBeenCalled();
 
-        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowLeft' });
-        expect(mockedOnSelectedMediaItem).toHaveBeenCalledWith(items[0]);
+        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowLeft', code: 'ArrowLeft' });
+        expect(mockedOnSelectedMediaItem).not.toHaveBeenCalled();
     });
 
     it('does not go above last index on ArrowDown or ArrowRight', async () => {
         const mockedOnSelectedMediaItem = vi.fn();
         render(<App items={items} onSelectedMediaItem={mockedOnSelectedMediaItem} selectedIndex={2} />);
 
-        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowDown' });
-        expect(mockedOnSelectedMediaItem).toHaveBeenCalledWith(items[2]);
+        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowDown', code: 'ArrowDown' });
+        expect(mockedOnSelectedMediaItem).not.toHaveBeenCalled();
 
-        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowRight' });
-        expect(mockedOnSelectedMediaItem).toHaveBeenCalledWith(items[2]);
+        fireEvent.keyDown(screen.getByTestId('target'), { key: 'ArrowRight', code: 'ArrowRight' });
+        expect(mockedOnSelectedMediaItem).not.toHaveBeenCalled();
     });
 
     it('does not call onSelectedMediaItem for other keys', async () => {

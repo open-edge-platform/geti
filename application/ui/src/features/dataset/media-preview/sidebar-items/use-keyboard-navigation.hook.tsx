@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { RefObject } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 import type { Media } from '@/api/types';
-import { useEventListener } from 'hooks/event-listener.hook';
+import { HOTKEYS } from '../../../../shared/hotkeys-definition';
 
 export type UseKeyboardNavigationProps = {
     ref: RefObject<HTMLElement | null>;
@@ -19,32 +20,33 @@ export const useKeyboardNavigation = ({
     selectedIndex,
     onSelectedMediaItem,
 }: UseKeyboardNavigationProps) => {
-    const getNewIndex = (key: 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight') => {
-        if (key === 'ArrowUp' || key === 'ArrowLeft') {
-            return Math.max(0, selectedIndex - 1);
-        }
-
-        if (key === 'ArrowDown' || key === 'ArrowRight') {
-            return Math.min(items.length - 1, selectedIndex + 1);
-        }
-
-        return selectedIndex;
-    };
-
-    useEventListener(
-        'keydown',
+    useHotkeys(
+        HOTKEYS.previousMedia,
         (event) => {
-            if (
-                event.key === 'ArrowUp' ||
-                event.key === 'ArrowDown' ||
-                event.key === 'ArrowLeft' ||
-                event.key === 'ArrowRight'
-            ) {
-                const newIndex = getNewIndex(event.key);
-
-                items[newIndex] && onSelectedMediaItem(items[newIndex]);
+            event.preventDefault();
+            if (selectedIndex > 0) {
+                const newIndex = selectedIndex - 1;
+                if (items[newIndex]) {
+                    onSelectedMediaItem(items[newIndex]);
+                }
             }
         },
-        ref
+        { target: ref },
+        [items, selectedIndex, onSelectedMediaItem, ref]
+    );
+
+    useHotkeys(
+        HOTKEYS.nextMedia,
+        (event) => {
+            event.preventDefault();
+            if (selectedIndex < items.length - 1) {
+                const newIndex = selectedIndex + 1;
+                if (items[newIndex]) {
+                    onSelectedMediaItem(items[newIndex]);
+                }
+            }
+        },
+        { target: ref },
+        [items, selectedIndex, onSelectedMediaItem, ref]
     );
 };
