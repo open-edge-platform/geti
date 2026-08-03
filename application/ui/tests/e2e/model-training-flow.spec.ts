@@ -153,11 +153,14 @@ test.describe('Model training flow E2E', () => {
             });
 
             const precision = 'INT8';
+
             await expect(modelsPage.getModelVariantRow(modelName, precision)).toBeVisible({
                 timeout: TIMEOUTS.quantizationResults,
             });
 
-            expect(modelsPage.getModelVariantAccuracy(modelName, precision, precision)).toBeGreaterThan(0);
+            expect(Number(await modelsPage.getModelVariantAccuracy(modelName, precision, precision))).toBeGreaterThan(
+                0
+            );
         });
     });
 });
