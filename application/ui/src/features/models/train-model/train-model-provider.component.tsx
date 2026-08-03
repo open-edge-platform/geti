@@ -19,7 +19,7 @@ import { useTrainingConfiguration } from './hooks/use-training-configuration';
 import { getDefaultTrainingDevice } from './select-training-device/utils';
 
 type DatasetRevisionWithValue = Pick<DatasetRevision, 'id' | 'name'> & { value: string | null };
-type InputWeightsWithValue = Pick<Model, 'id' | 'name' | 'architecture'> & { value: string | null };
+type ModelRevisionWithValue = Pick<Model, 'id' | 'name' | 'architecture'> & { value: string | null };
 
 export type TrainModelContextProps = {
     modelArchitectures: ModelArchitectureWithPerformanceCategory[];
@@ -35,9 +35,9 @@ export type TrainModelContextProps = {
     selectedDatasetRevisionId: string | null;
     onSelectDatasetRevisionId: (datasetRevision: string | null) => void;
 
-    inputWeights: InputWeightsWithValue[];
-    selectedInputWeightsId: string | null;
-    onSelectInputWeightsId: (inputWeightsId: string | null) => void;
+    modelRevisions: ModelRevisionWithValue[];
+    selectedModelRevisionId: string | null;
+    onSelectModelRevisionId: (modelRevisionId: string | null) => void;
 
     isAdvancedSettingsMode: boolean;
     onToggleAdvancedSettingsMode: (isAdvancedSettingsMode: boolean) => void;
@@ -68,38 +68,38 @@ const useDatasetRevisions = () => {
 };
 
 const DEFAULT_PRE_TRAINED_WEIGHTS = 'default-pre-trained-weights';
-const useInputWeights = () => {
+const useModelRevisions = () => {
     const { data: models } = useGetSuccessfulModels();
 
     return {
-        inputWeights: [
+        modelRevisions: [
             { id: DEFAULT_PRE_TRAINED_WEIGHTS, name: 'Default pre-trained weights', architecture: '', value: null },
             ...(models?.map(({ id, name, architecture }) => ({ id, name, architecture, value: String(id) })) ?? []),
         ],
     };
 };
 
-const getInputWeightsForArchitecture = (
-    inputWeights: InputWeightsWithValue[],
+const getModelRevisionsForArchitecture = (
+    modelRevisions: ModelRevisionWithValue[],
     architectureId: string | null
-): InputWeightsWithValue[] => {
-    return inputWeights.filter((inputWeight) => {
-        if (inputWeight.id === DEFAULT_PRE_TRAINED_WEIGHTS) {
+): ModelRevisionWithValue[] => {
+    return modelRevisions.filter((modelRevision) => {
+        if (modelRevision.id === DEFAULT_PRE_TRAINED_WEIGHTS) {
             return true;
         }
 
-        return inputWeight.architecture === architectureId;
+        return modelRevision.architecture === architectureId;
     });
 };
 
-const getDefaultInputWeightsIdForArchitecture = (
-    inputWeights: InputWeightsWithValue[],
+const getDefaultModelRevisionIdForArchitecture = (
+    modelRevisions: ModelRevisionWithValue[],
     architectureId: string | null
 ): string | null => {
-    const weightsForArchitecture = getInputWeightsForArchitecture(inputWeights, architectureId);
-    const firstWeight = weightsForArchitecture.find(({ id }) => id !== DEFAULT_PRE_TRAINED_WEIGHTS);
+    const revisionsForArchitecture = getModelRevisionsForArchitecture(modelRevisions, architectureId);
+    const firstRevision = revisionsForArchitecture.find(({ id }) => id !== DEFAULT_PRE_TRAINED_WEIGHTS);
 
-    return firstWeight?.id ?? weightsForArchitecture.at(0)?.id ?? null;
+    return firstRevision?.id ?? revisionsForArchitecture.at(0)?.id ?? null;
 };
 
 export const createTrainingDeviceKey = (trainingDevice: TrainingDevice): string => {
@@ -114,7 +114,7 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
     const { modelArchitectures } = useGetTaskModelArchitectures();
     const { data: trainingDevices } = useGetTrainingDevices();
     const { datasetRevisions } = useDatasetRevisions();
-    const { inputWeights: allInputWeights } = useInputWeights();
+    const { modelRevisions: allModelRevisions } = useModelRevisions();
 
     const [selectedModelArchitectureId, setSelectedModelArchitectureId] = useState<string | null>(null);
 
@@ -125,28 +125,28 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
     const [selectedDatasetRevisionId, setSelectedDatasetRevisionId] = useState<string | null>(
         datasetRevisions?.at(0)?.id ?? null
     );
-    const [selectedInputWeightsId, setSelectedInputWeightsId] = useState<string | null>(() =>
-        getDefaultInputWeightsIdForArchitecture(allInputWeights, selectedModelArchitectureId)
+    const [selectedModelRevisionId, setSelectedModelRevisionId] = useState<string | null>(() =>
+        getDefaultModelRevisionIdForArchitecture(allModelRevisions, selectedModelArchitectureId)
     );
 
     const [isAdvancedSettingsMode, setIsAdvancedSettingsMode] = useState<boolean>(false);
 
-    const inputWeights = useMemo(() => {
-        return getInputWeightsForArchitecture(allInputWeights, selectedModelArchitectureId);
-    }, [allInputWeights, selectedModelArchitectureId]);
+    const modelRevisions = useMemo(() => {
+        return getModelRevisionsForArchitecture(allModelRevisions, selectedModelArchitectureId);
+    }, [allModelRevisions, selectedModelArchitectureId]);
 
-    const selectedInputWeights = inputWeights.find((weight) => weight.id === selectedInputWeightsId);
+    const selectedModelRevision = modelRevisions.find((modelRevision) => modelRevision.id === selectedModelRevisionId);
 
     const [trainingConfiguration, setTrainingConfiguration, defaultTrainingConfiguration] = useTrainingConfiguration({
         modelArchitectureId: selectedModelArchitectureId,
-        modelInputWeightsId: selectedInputWeights?.value ?? null,
+        modelRevisionId: selectedModelRevision?.value ?? null,
     });
 
     const [showMoreModelArchitectures, setShowMoreModelArchitectures] = useState<boolean>(false);
 
     const onSelectModelArchitectureId = (modelArchitectureId: string | null) => {
         setSelectedModelArchitectureId(modelArchitectureId);
-        setSelectedInputWeightsId(getDefaultInputWeightsIdForArchitecture(allInputWeights, modelArchitectureId));
+        setSelectedModelRevisionId(getDefaultModelRevisionIdForArchitecture(allModelRevisions, modelArchitectureId));
     };
 
     return (
@@ -165,9 +165,9 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
                 selectedDatasetRevisionId,
                 onSelectDatasetRevisionId: setSelectedDatasetRevisionId,
 
-                inputWeights,
-                selectedInputWeightsId,
-                onSelectInputWeightsId: setSelectedInputWeightsId,
+                modelRevisions,
+                selectedModelRevisionId,
+                onSelectModelRevisionId: setSelectedModelRevisionId,
 
                 isAdvancedSettingsMode,
                 onToggleAdvancedSettingsMode: setIsAdvancedSettingsMode,
