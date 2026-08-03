@@ -39,8 +39,8 @@ def _apply_annotation_status_filter_with_video_support(stmt: Select, annotation_
         # Videos: have no dataset_item themselves, but at least one annotated frame
         frame_alias = aliased(MediaDB)
         annotated_frame_exists = exists(
-            select(DatasetItemDB.id)
-            .join(frame_alias, frame_alias.id == DatasetItemDB.id)
+            select(frame_alias.id)
+            .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
             .where(
                 frame_alias.video_id == MediaDB.id,
                 DatasetItemDB.annotation_data.isnot(None),
@@ -57,8 +57,8 @@ def _apply_annotation_status_filter_with_video_support(stmt: Select, annotation_
     elif annotation_status == DatasetItemAnnotationStatus.MISSING_ANNOTATIONS:
         frame_alias = aliased(MediaDB)
         annotated_frame_count = (
-            select(func.count(DatasetItemDB.id))
-            .join(frame_alias, frame_alias.id == DatasetItemDB.id)
+            select(func.count(frame_alias.id))
+            .join(DatasetItemDB, DatasetItemDB.id == frame_alias.id)
             .where(
                 frame_alias.video_id == MediaDB.id,
                 DatasetItemDB.annotation_data.isnot(None),
@@ -111,8 +111,8 @@ def _apply_label_filter_with_video_support(stmt: Select, label_ids: list[str] | 
     # Video: at least one of its frames has a dataset item carrying one of the requested labels
     frame_alias = aliased(MediaDB)
     frame_label_exists = exists(
-        select(DatasetItemLabelDB.dataset_item_id)
-        .join(frame_alias, frame_alias.id == DatasetItemLabelDB.dataset_item_id)
+        select(frame_alias.id)
+        .join(DatasetItemLabelDB, DatasetItemLabelDB.dataset_item_id == frame_alias.id)
         .where(
             frame_alias.video_id == MediaDB.id,
             DatasetItemLabelDB.label_id.in_(label_ids),
