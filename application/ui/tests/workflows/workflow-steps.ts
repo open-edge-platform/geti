@@ -145,7 +145,7 @@ export const stepTrainModel = async (page: Page, modelsPage: ModelsPage, project
     await firstArchitecture.click();
 
     await selectPickerOption(page, 'Select dataset');
-    await selectPickerOption(page, 'Select model revision');
+    await selectPickerOption(page, 'Select input weights');
 
     await modelsPage.startTraining();
 

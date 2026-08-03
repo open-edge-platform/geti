@@ -226,8 +226,8 @@ test.describe('Model training flow', () => {
             await modelsPage.selectPickerOption('Select dataset', 'Dataset Revision 2');
         });
 
-        await test.step('Select model revision', async () => {
-            await modelsPage.selectPickerOption('Select model revision', 'ATSS Revision 1');
+        await test.step('Select input weights', async () => {
+            await modelsPage.selectPickerOption('Select input weights', 'ATSS Revision 1');
         });
 
         await test.step('Select advanced settings', async () => {
@@ -293,7 +293,7 @@ test.describe('Model training flow', () => {
         });
 
         await test.step('Select model revision', async () => {
-            await modelsPage.selectPickerOption('Select model revision', 'Train from scratch');
+            await modelsPage.selectPickerOption('Select model revision', 'Default pre-trained weights');
         });
 
         await test.step('Select advanced settings', async () => {
