@@ -10,8 +10,9 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { toast } from '../../../components/toast/toast.component';
 import { getQueryKey } from '../../../query-client/query-client';
+import { useDismissedJobs } from '../../storage/use-dismissed-jobs.hook';
 import { useSSE } from '../../use-sse.hook';
-import { isQuantizeJob, isTrainJob } from '../util';
+import { isJobFailed, isQuantizeJob, isTrainJob } from '../util';
 
 const TERMINAL_STATUSES: string[] = ['DONE', 'FAILED', 'CANCELLED'];
 const ERROR_MESSAGE = 'Job failed. Please check the logs for details and try again.';
@@ -90,14 +91,23 @@ const useListJobs = () => {
 
 const isTrainOrQuantizeJob = (job: Job): job is TrainJob | QuantizeJob => isTrainJob(job) || isQuantizeJob(job);
 
-export const useGetCurrentModelRunningJobs = (): (QuantizeJob | TrainJob)[] | undefined => {
+export const useGetCurrentRunningJobs = (): (QuantizeJob | TrainJob)[] | undefined => {
     const projectId = useProjectIdentifier();
     const activeJobs = useListJobs();
+    const { isJobDismissed } = useDismissedJobs();
 
     return activeJobs.data?.filter((job): job is TrainJob | QuantizeJob => {
-        const isActive = job.status === 'RUNNING' || job.status === 'PENDING';
+        if (!isTrainOrQuantizeJob(job) || job.metadata.project.id !== projectId) {
+            return false;
+        }
 
-        return isActive && isTrainOrQuantizeJob(job) && job.metadata.project.id === projectId;
+        if (job.status === 'RUNNING' || job.status === 'PENDING') {
+            return true;
+        }
+
+        // A failed train job is already surfaced as a "Failed" model, the other job types are not,
+        // so they stay listed until the user dismisses them
+        return isJobFailed(job) && !isTrainJob(job) && !isJobDismissed(job.job_id);
     });
 };
 

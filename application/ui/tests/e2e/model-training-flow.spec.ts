@@ -113,11 +113,11 @@ test.describe('Model training flow E2E', () => {
             await speedCard.click();
             await modelsPage.startTraining();
 
-            await expect(modelsPage.getRunningModelJob(selectedArchitectureName)).toBeVisible({
+            await expect(modelsPage.getRunningJob(selectedArchitectureName)).toBeVisible({
                 timeout: TIMEOUTS.training,
             });
 
-            await expect(modelsPage.getRunningModelJob(selectedArchitectureName)).toBeHidden({
+            await expect(modelsPage.getRunningJob(selectedArchitectureName)).toBeHidden({
                 timeout: TIMEOUTS.training,
             });
 
@@ -144,11 +144,11 @@ test.describe('Model training flow E2E', () => {
             await modelsPage.openQuantizationDialog();
             await modelsPage.submitQuantization();
 
-            await expect(modelsPage.getRunningModelJob(modelName)).toBeVisible({
+            await expect(modelsPage.getRunningJob(modelName)).toBeVisible({
                 timeout: TIMEOUTS.quantization,
             });
 
-            await expect(modelsPage.getRunningModelJob(modelName)).toBeHidden({
+            await expect(modelsPage.getRunningJob(modelName)).toBeHidden({
                 timeout: TIMEOUTS.quantization,
             });
 

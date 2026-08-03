@@ -1,21 +1,11 @@
-// Copyright (C) 2025-2026 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
-import type {
-    DatasetRevision,
-    Job,
-    ModelArchitectureWithPerformanceCategory,
-    QuantizeJob,
-    TrainJob,
-} from '@/api/types';
-import { AlertDialog, Badge, Button, DialogContainer, Flex, Grid, Loading, Text } from '@geti-ui/ui';
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
-import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
+import type { DatasetRevision, ModelArchitectureWithPerformanceCategory, QuantizeJob, TrainJob } from '@/api/types';
+import { Button, DialogContainer, Flex, Grid, Text } from '@geti-ui/ui';
 import { isJobPending, isTrainJob } from 'hooks/api/util';
-import { capitalize } from 'lodash-es';
 
 import { formatDateTime } from '../../../../shared/date-utils';
 import { useGetModel } from '../../hooks/api/use-get-model.hook';
@@ -26,72 +16,19 @@ import { GroupByMode } from '../types';
 import { BottomProgressBar } from './bottom-progress-bar.component';
 import { RUNNING_JOB_GRID_COLUMNS } from './running-job-table-header.component';
 
-import classes from './current-model-running.module.scss';
+import classes from './current-running-jobs.module.scss';
 
-dayjs.extend(duration);
-
-type RunningModelRowProps = {
-    job: TrainJob | QuantizeJob;
-    onCancel?: () => void;
+export type JobRowColumnsProps = {
     groupBy: GroupByMode;
     datasetRevisions: DatasetRevision[];
     modelArchitectures: ModelArchitectureWithPerformanceCategory[];
 };
 
-const StatusBadge = ({ status }: { status: string }) => {
-    return (
-        <Badge variant={'neutral'} UNSAFE_className={classes.runningStatusBadge}>
-            <Text>
-                <Flex alignItems={'center'} gap={'size-50'}>
-                    <Loading size={'S'} mode={'inline'} />
-                    {status}
-                </Flex>
-            </Text>
-        </Badge>
-    );
-};
-
-const StatusBadgeMessage = ({ status }: { status: string }) => {
-    return (
-        <Badge variant={'neutral'} UNSAFE_className={classes.statusBadge}>
-            {status}
-        </Badge>
-    );
-};
-
-type CancelRunningJobProps = {
-    job: Job;
-    onCancel: () => void;
-};
-
-const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
-
-    return (
-        <>
-            <Button
-                isDisabled={job.status !== 'RUNNING' && job.status !== 'PENDING'}
-                variant={'negative'}
-                onPress={() => setIsDeleteDialogOpen(true)}
-                aria-label={'Cancel job'}
-            >
-                Cancel
-            </Button>
-            <DialogContainer onDismiss={() => setIsDeleteDialogOpen(false)}>
-                {isDeleteDialogOpen && (
-                    <AlertDialog
-                        title='Stop job'
-                        variant='destructive'
-                        primaryActionLabel='Cancel'
-                        onPrimaryAction={onCancel}
-                        cancelLabel='Close'
-                    >
-                        Are you sure you want to stop this job?
-                    </AlertDialog>
-                )}
-            </DialogContainer>
-        </>
-    );
+type JobRowProps = JobRowColumnsProps & {
+    job: TrainJob | QuantizeJob;
+    progress: number;
+    statusBadges: ReactNode;
+    actions?: ReactNode;
 };
 
 const ViewLogsButton = ({ jobId }: { jobId: string }) => {
@@ -109,19 +46,19 @@ const ViewLogsButton = ({ jobId }: { jobId: string }) => {
     );
 };
 
-export const RunningModelRow = ({
+export const JobRow = ({
     job,
-    onCancel,
-    datasetRevisions,
+    progress,
+    statusBadges,
+    actions,
     groupBy,
+    datasetRevisions,
     modelArchitectures,
-}: RunningModelRowProps) => {
-    useStreamJobStatus(job.job_id);
-
+}: JobRowProps) => {
     const modelId = job.metadata.model.id;
     const { data: trainingModel } = useGetModel(modelId, !isJobPending(job));
 
-    const device = isTrainJob(job) ? job?.metadata.device.name : null;
+    const device = isTrainJob(job) ? job.metadata.device.name : null;
 
     const modelArchitectureId = job.metadata.model.architecture;
     const modelName = trainingModel?.name || job.metadata.model.name;
@@ -137,13 +74,8 @@ export const RunningModelRow = ({
 
     const formattedStartedAt = job.started_at ? formatDateTime(job.started_at) : 'Waiting to start...';
 
-    const statusMessage = job.message || (job.status === 'PENDING' ? 'Pending...' : 'Running...');
-
-    const showStatusTagMessage =
-        job.status.toLocaleLowerCase() !== statusMessage.replace('...', '').toLocaleLowerCase();
-
     return (
-        <BottomProgressBar progress={job.progress}>
+        <BottomProgressBar progress={progress}>
             <Grid
                 columns={RUNNING_JOB_GRID_COLUMNS}
                 alignItems={'center'}
@@ -157,8 +89,7 @@ export const RunningModelRow = ({
                     </Flex>
 
                     <Flex alignItems={'start'} gap={'size-100'}>
-                        <StatusBadge status={capitalize(job.status)} />
-                        {showStatusTagMessage && <StatusBadgeMessage status={statusMessage} />}
+                        {statusBadges}
                     </Flex>
 
                     <Text UNSAFE_className={classes.metaText}>{`Started: ${formattedStartedAt}`}</Text>
@@ -175,7 +106,7 @@ export const RunningModelRow = ({
 
                 <Flex gap={'size-100'} direction={'column'} alignItems={'center'}>
                     <ViewLogsButton jobId={job.job_id} />
-                    {onCancel ? <CancelRunningJob onCancel={onCancel} job={job} /> : null}
+                    {actions}
                 </Flex>
             </Grid>
         </BottomProgressBar>
