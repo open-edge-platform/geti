@@ -131,3 +131,52 @@ def _apply_subset_filter(stmt: Select, subsets: list[str] | None = None) -> Sele
     if subsets:
         stmt = stmt.where(DatasetItemDB.subset.in_(subsets))
     return stmt
+
+
+def _apply_subset_filter_with_video_support(stmt: Select, subsets: list[str] | None = None) -> Select:
+    """Apply a subset filter to a media query, accounting for the video/frame hierarchy.
+
+    Unlike a plain filter on ``DatasetItemDB.subset``, this also works for videos, which do
+    not have their own ``DatasetItemDB`` rows. A video is considered to match if at least
+    one of its frames has a ``DatasetItemDB`` belonging to one of the given subsets. In that
+    case the video itself is returned (not its individual frames).
+
+    Images and video frames match when their own dataset item belongs to one of the subsets.
+
+    Args:
+        stmt: The base SQLAlchemy select statement, expected to have ``MediaDB`` as its
+              primary entity.
+        subsets: The list of subsets to filter by, or ``None``/empty to skip filtering.
+
+    Returns:
+        The select statement with the subset condition applied.
+    """
+    if not subsets:
+        return stmt
+
+    # Image or frame: its own dataset item belongs to one of the requested subsets
+    own_subset_exists = exists(
+        select(DatasetItemDB.id)
+        .where(
+            DatasetItemDB.id == MediaDB.id,
+            DatasetItemDB.subset.in_(subsets),
+        )
+        .correlate(MediaDB)
+    )
+
+    # Video: at least one of its frames has a dataset item belonging to one of the requested subsets
+    frame_alias = aliased(MediaDB)
+    frame_subset_exists = exists(
+        select(DatasetItemDB.id)
+        .join(frame_alias, frame_alias.id == DatasetItemDB.id)
+        .where(
+            frame_alias.video_id == MediaDB.id,
+            DatasetItemDB.subset.in_(subsets),
+        )
+        .correlate(MediaDB)
+    )
+
+    return stmt.where(
+        ((MediaDB.type != MediaType.VIDEO) & own_subset_exists)
+        | ((MediaDB.type == MediaType.VIDEO) & frame_subset_exists)
+    )

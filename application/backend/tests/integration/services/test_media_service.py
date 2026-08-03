@@ -990,7 +990,7 @@ class TestMediaServiceIntegration:
         "annotation_status",
         [None, DatasetItemAnnotationStatus.WITH_ANNOTATIONS, DatasetItemAnnotationStatus.MISSING_ANNOTATIONS],
     )
-    def test_list_media_with_annotated_frame(
+    def test_list_media_with_annotated_frame_annotation_status(
         self,
         annotation_status: DatasetItemAnnotationStatus | None,
         fxt_media_service: MediaService,
@@ -1013,6 +1013,36 @@ class TestMediaServiceIntegration:
         media_list = fxt_media_service.list_media(
             project_id=project.id,
             filters=MediaFilters(annotation_status=annotation_status),
+        )
+
+        videos = [m for m in media_list if isinstance(m, Video)]
+        assert len(videos) == 1
+        assert videos[0].annotated_frame_count == 1
+
+    @pytest.mark.parametrize("subsets", [None, ["unassigned"]])
+    def test_list_media_with_annotated_frame_subsets(
+        self,
+        subsets: list[str] | None,
+        fxt_media_service: MediaService,
+        fxt_project_with_media: tuple[Project, list[MediaDB]],
+        db_session: Session,
+    ) -> None:
+        """Test listing media should include the video that have annotated frame with each filter option."""
+        project, db_media_list = fxt_project_with_media
+
+        db_video_frame = next(db_media for db_media in db_media_list if db_media.type == MediaType.VIDEO_FRAME)
+        db_dataset_item = DatasetItemDB(
+            id=db_video_frame.id,
+            project_id=str(project.id),
+            subset="unassigned",
+            annotation_data=[{"labels": [{"id": str(uuid4())}], "shape": {"type": "full_image"}}],
+        )
+        db_session.add(db_dataset_item)
+        db_session.flush()
+
+        media_list = fxt_media_service.list_media(
+            project_id=project.id,
+            filters=MediaFilters(subsets=subsets),
         )
 
         videos = [m for m in media_list if isinstance(m, Video)]
