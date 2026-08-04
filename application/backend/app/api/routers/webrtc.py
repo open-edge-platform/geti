@@ -21,12 +21,20 @@ router = APIRouter(prefix="/api/webrtc", tags=["WebRTC"])
 @router.post(
     "/offer",
     response_model=Answer,
-    responses={status.HTTP_200_OK: {"description": "WebRTC Answer"}},
+    responses={
+        status.HTTP_200_OK: {"description": "WebRTC Answer"},
+        status.HTTP_400_BAD_REQUEST: {"description": "Invalid SDP type or parameters"},
+    },
 )
 async def create_webrtc_offer(offer: Offer, webrtc_manager: Annotated[WebRTCManager, Depends(get_webrtc)]) -> Answer:
     """Create a WebRTC offer"""
     try:
         return await webrtc_manager.handle_offer(offer)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid WebRTC offer parameters.",
+        )
     except Exception:
         logger.exception("Error processing WebRTC offer")
         raise HTTPException(
