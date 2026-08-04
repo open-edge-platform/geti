@@ -114,8 +114,12 @@ export class AnnotatorPage {
         await this.getAnnotatorMode('prediction').click();
     }
 
+    getPredictionSettingsButton() {
+        return this.page.getByRole('button', { name: 'Prediction settings' });
+    }
+
     async openPredictionSettings() {
-        await this.page.getByRole('button', { name: 'Prediction settings' }).click();
+        await this.getPredictionSettingsButton().click();
     }
 
     getPrimaryToolbar() {

@@ -171,6 +171,7 @@ test.describe('Annotator', () => {
         test('renders "No object" when server returns empty annotations list', async ({ page, annotatorPage }) => {
             await annotatorPage.goto(mockedDetectionProject.id, 'item-1');
 
+            await expect(annotatorPage.getAnnotationsList()).toBeVisible();
             await expect(page.getByLabel(`label No object background`)).toHaveCount(1);
         });
 
@@ -178,6 +179,7 @@ test.describe('Annotator', () => {
             await annotatorPage.goto(mockedDetectionProject.id, 'item-1');
 
             await test.step('Verify global "No object" annotation is visible initially', async () => {
+                await expect(annotatorPage.getAnnotationsList()).toBeVisible();
                 await expect(page.getByLabel('label No object background')).toHaveCount(1);
             });
 
@@ -654,7 +656,12 @@ test.describe('Annotator', () => {
             );
 
             await test.step('item-1 (annotation mode): prediction cue visible because there are no annotations but predictions exist', async () => {
+                const predictResponsePromise = page.waitForResponse((res) => res.url().includes('media:predict'));
+
                 await annotatorPage.goto(mockedDetectionProject.id, 'item-1');
+
+                await expect(annotatorPage.getAnnotationsList()).toBeVisible();
+                await predictResponsePromise;
 
                 await expect(page.getByLabel('Prediction available')).toBeVisible();
             });
@@ -1141,10 +1148,10 @@ test.describe('Annotator', () => {
 
             await test.step('open prediction mode', async () => {
                 await annotatorPage.openPredictionMode();
-                await annotatorPage.openPredictionSettings();
             });
 
-            await test.step('model selector is not visible when no models available', async () => {
+            await test.step('prediction settings are not available when no models available', async () => {
+                await expect(annotatorPage.getPredictionSettingsButton()).toBeHidden();
                 await expect(page.getByRole('button', { name: 'Select prediction model' })).toBeHidden();
             });
         });
@@ -1170,10 +1177,10 @@ test.describe('Annotator', () => {
 
             await test.step('open prediction mode', async () => {
                 await annotatorPage.openPredictionMode();
-                await annotatorPage.openPredictionSettings();
             });
 
-            await test.step('model selector is not visible when no OpenVINO models available', async () => {
+            await test.step('prediction settings are not available when no OpenVINO models available', async () => {
+                await expect(annotatorPage.getPredictionSettingsButton()).toBeHidden();
                 await expect(page.getByRole('button', { name: 'Select prediction model' })).toBeHidden();
             });
         });
@@ -1343,7 +1350,7 @@ test.describe('Annotator', () => {
                 const predictResponsePromise = page.waitForResponse((res) => res.url().includes('media:predict'));
 
                 await annotatorPage.openPredictionSettings();
-                await page.getByLabel('Inference devices').click();
+                await page.getByRole('button', { name: 'Inference devices' }).click();
                 await page.getByRole('option', { name: /XPU/i }).click();
 
                 await expect(page.getByRole('button', { name: /XPU/i })).toBeVisible();
