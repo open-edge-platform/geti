@@ -189,14 +189,14 @@ export const SecondaryToolbar = ({
 
                     {isPredictionMode && (
                         <DialogTrigger type={'popover'} placement={'bottom'}>
-                            <Toolbar.Section>
-                                <TooltipTrigger>
+                            <TooltipTrigger>
+                                <Toolbar.Section>
                                     <ActionButton isQuiet aria-label={'Annotator settings'}>
                                         <Gear />
                                     </ActionButton>
-                                    <Tooltip>Annotator settings</Tooltip>
-                                </TooltipTrigger>
-                            </Toolbar.Section>
+                                </Toolbar.Section>
+                                <Tooltip>Annotator settings</Tooltip>
+                            </TooltipTrigger>
                             <Dialog size='S'>
                                 <Heading>Annotator settings</Heading>
                                 <Divider />

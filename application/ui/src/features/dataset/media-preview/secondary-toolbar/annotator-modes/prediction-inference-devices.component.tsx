@@ -19,6 +19,7 @@ export const PredictionInferenceDevices = ({ isDisabled }: PredictionInferenceDe
         <Suspense fallback={<Loading mode={'inline'} />}>
             <InferenceDevices
                 ariaLabel={'Inference devices'}
+                label={'Inference accelerator'}
                 selectedKey={selectedDevice}
                 onSelectionChange={changeSelectedDevice}
                 isDisabled={isDisabled}

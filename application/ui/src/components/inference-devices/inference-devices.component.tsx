@@ -18,6 +18,7 @@ type InferenceDevicesProps = {
     isQuiet?: boolean;
     isDisabled?: boolean;
     ariaLabel?: string;
+    label?: string;
     maxWidth?: string;
     width?: string;
 };
@@ -28,6 +29,7 @@ export const InferenceDevices = ({
     isDisabled = false,
     isQuiet = false,
     ariaLabel,
+    label,
     maxWidth,
     width = '100%',
 }: InferenceDevicesProps) => {
@@ -53,7 +55,7 @@ export const InferenceDevices = ({
             selectedKey={selectedKey}
             isDisabled={isDisabled}
             aria-label={ariaLabel}
-            label={'Inference accelerator'}
+            label={label}
         >
             {(device) => <Item key={device.id}>{device.name}</Item>}
         </Picker>
