@@ -164,38 +164,24 @@ Tauri's `externalBin` mechanism requires the executable next to
 `_internal/` resources directory must be reachable from `src-tauri/`.
 
 We use **symlinks** so the side-car always reflects the latest PyInstaller
-run without copying gigabytes around.
-
-cd into `application/ui/src-tauri`, then:
+run without copying gigabytes around. From `application/`:
 
 ```sh
-# macOS — Apple silicon (M1/M2/M3/M4)
-ln -sf ../../backend/dist/geti-backend/geti-backend geti-backend-aarch64-apple-darwin
-ln -sf ../../backend/dist/geti-backend/_internal _internal
-
-# macOS — Intel
-ln -sf ../../backend/dist/geti-backend/geti-backend geti-backend-x86_64-apple-darwin
-ln -sf ../../backend/dist/geti-backend/_internal _internal
-
-# Linux
-ln -sf ../../backend/dist/geti-backend/geti-backend geti-backend-x86_64-unknown-linux-gnu
-ln -sf ../../backend/dist/geti-backend/_internal _internal
-
-# Windows (PowerShell, run as admin or with Developer Mode enabled)
-New-Item -ItemType SymbolicLink -Path .\geti-backend-x86_64-pc-windows-msvc.exe `
-    -Target ..\..\backend\dist\geti-backend\geti-backend.exe
-New-Item -ItemType SymbolicLink -Path .\_internal `
-    -Target ..\..\backend\dist\geti-backend\_internal
+just tauri-link-sidecar
 ```
 
-Find your host triple with `rustc -vV | grep host` if unsure.
+The recipe detects your host triple with `rustc -vV`, then creates
+`src-tauri/geti-backend-<triple>` and `src-tauri/_internal` pointing at
+`backend/dist/geti-backend/`. On **Windows** it needs Developer Mode
+enabled (or an elevated shell) to create symlinks.
 
-The symlinks are gitignored. Tauri stages both `geti-backend` (from
-`externalBin`) and `_internal/` (from `resources`) next to its own
-executable in `target/<profile>/` during `tauri dev`, so PyInstaller's
-frozen layout works in dev with no extra steps. The release `.app` on
-macOS needs the sidecar nested one level deeper — that's done by the
-`just tauri-build` recipe in [`../../Justfile`](../../Justfile); see
+The symlinks are gitignored and only need to be created once — they keep
+pointing at the latest `just pyinstaller` output. Tauri stages both
+`geti-backend` (from `externalBin`) and `_internal/` (from `resources`)
+next to its own executable in `target/<profile>/` during `tauri dev`, so
+PyInstaller's frozen layout works in dev with no extra steps. The release
+`.app` on macOS needs the sidecar nested one level deeper — that's done by
+the `just tauri-build` recipe in [`../../Justfile`](../../Justfile); see
 `spawn_backend()` and `locate_backend()` in [`src/backend.rs`](./src/backend.rs).
 
 ### macOS

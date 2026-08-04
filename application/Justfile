@@ -254,6 +254,58 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
 clean-volumes:
     docker volume rm {{ data-volume }} {{ logs-volume }} || true
 
+# Symlink the PyInstaller backend sidecar into `ui/src-tauri/` so that
+# `tauri dev` / `tauri build` can pick it up via `externalBin` + `resources`.
+#
+# Requires `just pyinstaller` to have been run in `backend/` first. The links
+# are gitignored and always point at the latest PyInstaller output, so they
+# only need to be created once.
+[macos]
+[linux]
+tauri-link-sidecar:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    DIST="{{ justfile_directory() }}/backend/dist/geti-backend"
+    # An interrupted PyInstaller COLLECT leaves a 0-byte executable, which execs
+    # as a no-op and makes the desktop app quit with "backend exited (code 0)".
+    if [[ ! -s "$DIST/geti-backend" || ! -x "$DIST/geti-backend" || ! -d "$DIST/_internal" ]]; then
+        echo "Backend sidecar missing or empty in $DIST — run 'just pyinstaller' in backend/ first" >&2
+        exit 1
+    fi
+
+    TRIPLE=$(rustc -vV | sed -n 's/^host: //p')
+    if [[ -z "$TRIPLE" ]]; then
+        echo "Could not determine the Rust host triple — is 'rustc' on PATH?" >&2
+        exit 1
+    fi
+
+    cd ui/src-tauri
+    ln -sfn ../../backend/dist/geti-backend/geti-backend "geti-backend-${TRIPLE}"
+    ln -sfn ../../backend/dist/geti-backend/_internal _internal
+    echo "✅ Linked geti-backend-${TRIPLE} and _internal in ui/src-tauri"
+
+# Symlink the PyInstaller backend sidecar into `ui\src-tauri\`.
+# Needs Developer Mode enabled (or an elevated shell) to create symlinks.
+[windows]
+tauri-link-sidecar:
+    #!powershell.exe
+    $ErrorActionPreference = 'Stop'
+
+    $dist = Join-Path '{{ justfile_directory() }}' 'backend\dist\geti-backend'
+    if (-not (Test-Path "$dist\geti-backend.exe") -or -not (Test-Path "$dist\_internal")) {
+        Write-Error "Backend sidecar not found in $dist - run 'just pyinstaller' in backend\ first"
+    }
+    if ((Get-Item "$dist\geti-backend.exe").Length -eq 0) {
+        Write-Error "Backend sidecar in $dist is empty - re-run 'just pyinstaller' in backend\"
+    }
+
+    $triple = (rustc -vV | Select-String '^host: ').Line -replace '^host: ', ''
+    Set-Location ui\src-tauri
+    New-Item -Force -ItemType SymbolicLink -Path ".\geti-backend-$triple.exe" -Target "$dist\geti-backend.exe" | Out-Null
+    New-Item -Force -ItemType SymbolicLink -Path '.\_internal' -Target "$dist\_internal" | Out-Null
+    Write-Host "Linked geti-backend-$triple.exe and _internal in ui\src-tauri"
+
 # Build the macOS .app distributable.
 #
 # Runs `tauri build` and then patches the bundle layout: the PyInstaller
@@ -287,6 +339,10 @@ tauri-build:
     if [[ -d "$APP/Contents/Resources/_internal" ]]; then
         echo "▶ Moving _internal into $BACKEND_DIR"
         mv "$APP/Contents/Resources/_internal" "$BACKEND_DIR/_internal"
+    fi
+    if [[ ! -s "$BACKEND_DIR/geti-backend" ]]; then
+        echo "Bundled sidecar $BACKEND_DIR/geti-backend is missing or empty — re-run 'just pyinstaller' in backend/ and 'just tauri-link-sidecar'" >&2
+        exit 1
     fi
     echo "✅ Bundle ready at $APP"
 
