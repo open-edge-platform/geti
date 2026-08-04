@@ -1,7 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
@@ -13,9 +14,15 @@ import { ImportExport } from './import-export.component';
 
 describe('ImportExport', () => {
     it('opens the export dialog when export option is selected', async () => {
+        let datasetStatisticsRequests = 0;
+
         server.use(
             http.get('/api/projects/{project_id}', () => {
                 return HttpResponse.json(getMockedProject({ id: '123' }));
+            }),
+            http.get('/api/projects/{project_id}/dataset/statistics', () => {
+                datasetStatisticsRequests++;
+                return HttpResponse.json(getMockedDatasetStatistics());
             }),
             http.get('/api/projects/{project_id}/dataset/items', () => {
                 return HttpResponse.json({
@@ -40,5 +47,9 @@ describe('ImportExport', () => {
         fireEvent.click(await screen.findByRole('menuitem', { name: /Export dataset/i }));
 
         expect(screen.getByRole('heading', { name: /Export settings/i })).toBeVisible();
+        expect(datasetStatisticsRequests).toBe(0);
+
+        fireEvent.click(screen.getByRole('radio', { name: 'COCO' }));
+        await waitFor(() => expect(datasetStatisticsRequests).toBe(1));
     });
 });

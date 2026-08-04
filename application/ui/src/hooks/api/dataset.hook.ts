@@ -14,8 +14,8 @@ export const useDatasetStatistics = () => {
 };
 
 // Non suspending variant, for places where the statistics are optional and should not block rendering
-export const useDatasetStatisticsQuery = () => {
+export const useDatasetStatisticsQuery = (enabled = true) => {
     const projectId = useProjectIdentifier();
 
-    return $api.useQuery(...datasetStatisticsQueryKey(projectId));
+    return $api.useQuery(...datasetStatisticsQueryKey(projectId), { enabled });
 };

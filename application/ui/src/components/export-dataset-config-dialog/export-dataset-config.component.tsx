@@ -33,7 +33,7 @@ import { getFormatOptions } from '../util';
 import classes from './export-dataset-config.module.scss';
 
 const WarningMessages = ({ isVisible }: { isVisible: boolean }) => {
-    const { data: statistics } = useDatasetStatisticsQuery();
+    const { data: statistics } = useDatasetStatisticsQuery(isVisible);
     const emptyLabel = useProjectLabelsWithEmptyLabel().find(isEmptyLabel);
 
     const hasVideos = (statistics?.media_counts.videos ?? 0) > 0;
@@ -149,7 +149,6 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
                         </RadioGroup>
                     </Form>
 
-                    {/* Mounted upfront so the statistics are fetched while the user picks a format */}
                     <WarningMessages isVisible={isNonGetiFormatSelected} />
 
                     <Link
