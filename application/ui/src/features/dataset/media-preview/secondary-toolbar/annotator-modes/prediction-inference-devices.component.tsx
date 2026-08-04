@@ -18,11 +18,11 @@ export const PredictionInferenceDevices = ({ isDisabled }: PredictionInferenceDe
     return (
         <Suspense fallback={<Loading mode={'inline'} />}>
             <InferenceDevices
-                isQuiet
                 ariaLabel={'Inference devices'}
                 selectedKey={selectedDevice}
                 onSelectionChange={changeSelectedDevice}
                 isDisabled={isDisabled}
+                width={'100%'}
             />
         </Suspense>
     );
