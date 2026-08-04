@@ -82,16 +82,32 @@ const VideoAnnotationButtons = ({ onSubmit, isDisabled, isSaving }: VideoAnnotat
 
 const PredictionActions = ({ hasModels, isDisabled }: { hasModels: boolean; isDisabled: boolean }) => {
     return (
-        <Flex gap={'size-50'} direction={'column'}>
-            {hasModels ? (
-                <Toolbar.Section minWidth={'size-2000'}>
-                    <PredictionModelSelector isDisabled={isDisabled} />
+        <DialogTrigger type={'popover'} placement={'bottom'}>
+            <TooltipTrigger>
+                <Toolbar.Section>
+                    <ActionButton isQuiet aria-label={'Prediction settings'}>
+                        <Gear />
+                    </ActionButton>
                 </Toolbar.Section>
-            ) : null}
-            <Toolbar.Section>
-                <PredictionInferenceDevices isDisabled={isDisabled} />
-            </Toolbar.Section>
-        </Flex>
+                <Tooltip>Prediction settings</Tooltip>
+            </TooltipTrigger>
+            <Dialog size='S'>
+                <Heading>Prediction settings</Heading>
+                <Divider />
+                <Content>
+                    <Flex gap={'size-50'} direction={'column'}>
+                        {hasModels ? (
+                            <Toolbar.Section minWidth={'size-2000'}>
+                                <PredictionModelSelector isDisabled={isDisabled} />
+                            </Toolbar.Section>
+                        ) : null}
+                        <Toolbar.Section>
+                            <PredictionInferenceDevices isDisabled={isDisabled} />
+                        </Toolbar.Section>
+                    </Flex>
+                </Content>
+            </Dialog>
+        </DialogTrigger>
     );
 };
 
@@ -188,26 +204,10 @@ export const SecondaryToolbar = ({
                     </Toolbar.Section>
 
                     {isPredictionMode && (
-                        <DialogTrigger type={'popover'} placement={'bottom'}>
-                            <TooltipTrigger>
-                                <Toolbar.Section>
-                                    <ActionButton isQuiet aria-label={'Annotator settings'}>
-                                        <Gear />
-                                    </ActionButton>
-                                </Toolbar.Section>
-                                <Tooltip>Annotator settings</Tooltip>
-                            </TooltipTrigger>
-                            <Dialog size='S'>
-                                <Heading>Annotator settings</Heading>
-                                <Divider />
-                                <Content>
-                                    <PredictionActions
-                                        hasModels={!isEmpty(selectableModels)}
-                                        isDisabled={isLoadingPredictions || isPlaying}
-                                    />
-                                </Content>
-                            </Dialog>
-                        </DialogTrigger>
+                        <PredictionActions
+                            hasModels={!isEmpty(selectableModels)}
+                            isDisabled={isLoadingPredictions || isPlaying}
+                        />
                     )}
                 </Flex>
             </Toolbar.Container>
