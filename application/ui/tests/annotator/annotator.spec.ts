@@ -107,7 +107,7 @@ test.describe('Annotator', () => {
                 await boundingBoxTool.drawBoundingBox(annotation);
             }
 
-            expect(await page.getByLabel(`label ${redLabel.name} background`).count()).toBe(annotations.length);
+            await expect(page.getByLabel(`label ${redLabel.name} background`)).toHaveCount(annotations.length);
         });
 
         await test.step('Remove labels', async () => {
@@ -127,7 +127,7 @@ test.describe('Annotator', () => {
 
             await page.getByRole('button', { name: `Label ${blueLabel.name}` }).click();
 
-            expect(await page.getByLabel(`label ${blueLabel.name} background`).count()).toBe(annotations.length);
+            await expect(page.getByLabel(`label ${blueLabel.name} background`)).toHaveCount(annotations.length);
         });
     });
 
@@ -171,6 +171,7 @@ test.describe('Annotator', () => {
         test('renders "No object" when server returns empty annotations list', async ({ page, annotatorPage }) => {
             await annotatorPage.goto(mockedDetectionProject.id, 'item-1');
 
+            await expect(annotatorPage.getAnnotationsList()).toBeVisible();
             await expect(page.getByLabel(`label No object background`)).toHaveCount(1);
         });
 
@@ -178,6 +179,7 @@ test.describe('Annotator', () => {
             await annotatorPage.goto(mockedDetectionProject.id, 'item-1');
 
             await test.step('Verify global "No object" annotation is visible initially', async () => {
+                await expect(annotatorPage.getAnnotationsList()).toBeVisible();
                 await expect(page.getByLabel('label No object background')).toHaveCount(1);
             });
 
@@ -654,7 +656,12 @@ test.describe('Annotator', () => {
             );
 
             await test.step('item-1 (annotation mode): prediction cue visible because there are no annotations but predictions exist', async () => {
+                const predictResponsePromise = page.waitForResponse((res) => res.url().includes('media:predict'));
+
                 await annotatorPage.goto(mockedDetectionProject.id, 'item-1');
+
+                await expect(annotatorPage.getAnnotationsList()).toBeVisible();
+                await predictResponsePromise;
 
                 await expect(page.getByLabel('Prediction available')).toBeVisible();
             });
@@ -1143,7 +1150,8 @@ test.describe('Annotator', () => {
                 await annotatorPage.openPredictionMode();
             });
 
-            await test.step('model selector is not visible when no models available', async () => {
+            await test.step('prediction settings are not available when no models available', async () => {
+                await expect(annotatorPage.getPredictionSettingsButton()).toBeHidden();
                 await expect(page.getByRole('button', { name: 'Select prediction model' })).toBeHidden();
             });
         });
@@ -1171,7 +1179,8 @@ test.describe('Annotator', () => {
                 await annotatorPage.openPredictionMode();
             });
 
-            await test.step('model selector is not visible when no OpenVINO models available', async () => {
+            await test.step('prediction settings are not available when no OpenVINO models available', async () => {
+                await expect(annotatorPage.getPredictionSettingsButton()).toBeHidden();
                 await expect(page.getByRole('button', { name: 'Select prediction model' })).toBeHidden();
             });
         });
@@ -1192,6 +1201,7 @@ test.describe('Annotator', () => {
 
             await test.step('open prediction mode', async () => {
                 await annotatorPage.openPredictionMode();
+                await annotatorPage.openPredictionSettings();
             });
 
             await test.step('the newer model is pre-selected in the picker', async () => {
@@ -1230,6 +1240,7 @@ test.describe('Annotator', () => {
 
             await test.step('open prediction mode', async () => {
                 await annotatorPage.openPredictionMode();
+                await annotatorPage.openPredictionSettings();
             });
 
             await test.step('the active model is pre-selected instead of the latest model', async () => {
@@ -1262,6 +1273,7 @@ test.describe('Annotator', () => {
 
             await test.step('open prediction mode — newer model should be selected by default', async () => {
                 await annotatorPage.openPredictionMode();
+                await annotatorPage.openPredictionSettings();
 
                 await expect(page.getByRole('button', { name: 'Select prediction model' })).toContainText(
                     'Newer_Model'
@@ -1337,7 +1349,8 @@ test.describe('Annotator', () => {
             await test.step('change device selection to XPU', async () => {
                 const predictResponsePromise = page.waitForResponse((res) => res.url().includes('media:predict'));
 
-                await page.getByRole('button', { name: /Inference devices/ }).click();
+                await annotatorPage.openPredictionSettings();
+                await page.getByRole('button', { name: 'Inference devices' }).click();
                 await page.getByRole('option', { name: /XPU/i }).click();
 
                 await expect(page.getByRole('button', { name: /XPU/i })).toBeVisible();
@@ -1362,6 +1375,7 @@ test.describe('Annotator', () => {
 
             await test.step('open prediction mode — newer model is auto-selected by default', async () => {
                 await annotatorPage.openPredictionMode();
+                await annotatorPage.openPredictionSettings();
 
                 await expect(page.getByRole('button', { name: 'Select prediction model' })).toContainText(
                     'Newer_Model'
@@ -1387,6 +1401,7 @@ test.describe('Annotator', () => {
 
             await test.step('open prediction mode after reload — older model is still selected', async () => {
                 await annotatorPage.openPredictionMode();
+                await annotatorPage.openPredictionSettings();
 
                 await expect(page.getByRole('button', { name: 'Select prediction model' })).toContainText(
                     'Older_Model'
