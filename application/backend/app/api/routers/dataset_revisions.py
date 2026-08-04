@@ -126,7 +126,7 @@ def list_dataset_revision_items(
     dataset_revision_service: Annotated[DatasetRevisionService, Depends(get_dataset_revision_service)],
     dataset_revision: Annotated[DatasetRevision, Depends(get_dataset_revision)],
     limit: Annotated[int, Query(ge=1, le=MAX_DATASET_ITEMS_NUMBER_RETURNED)] = DEFAULT_DATASET_ITEMS_NUMBER_RETURNED,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    offset: Annotated[int, Query(ge=0, le=2_147_483_647)] = 0,
     subsets: Annotated[list[DatasetItemSubset] | None, Query()] = None,
 ) -> DatasetRevisionItemsWithPagination:
     """List the items in a dataset revision. This endpoint supports pagination."""
