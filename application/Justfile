@@ -269,14 +269,22 @@ tauri-link-sidecar:
     DIST="{{ justfile_directory() }}/backend/dist/geti-backend"
     # An interrupted PyInstaller COLLECT leaves a 0-byte executable, which execs
     # as a no-op and makes the desktop app quit with "backend exited (code 0)".
-    if [[ ! -s "$DIST/geti-backend" || ! -x "$DIST/geti-backend" || ! -d "$DIST/_internal" ]]; then
+    if [[ ! -s "$DIST/geti-backend" || ! -x "$DIST/geti-backend" ]]; then
         echo "Backend sidecar missing or empty in $DIST — run 'just pyinstaller' in backend/ first" >&2
         exit 1
     fi
+    if [[ ! -d "$DIST/_internal" || -z "$(ls -A "$DIST/_internal" 2>/dev/null)" ]]; then
+        echo "Backend resources missing or empty in $DIST/_internal — run 'just pyinstaller' in backend/ first" >&2
+        exit 1
+    fi
 
+    if ! command -v rustc >/dev/null 2>&1; then
+        echo "'rustc' not found on PATH — install Rust via https://rustup.rs to resolve the host triple" >&2
+        exit 1
+    fi
     TRIPLE=$(rustc -vV | sed -n 's/^host: //p')
     if [[ -z "$TRIPLE" ]]; then
-        echo "Could not determine the Rust host triple — is 'rustc' on PATH?" >&2
+        echo "Could not determine the Rust host triple from 'rustc -vV'" >&2
         exit 1
     fi
 
@@ -293,13 +301,16 @@ tauri-link-sidecar:
     $ErrorActionPreference = 'Stop'
 
     $dist = Join-Path '{{ justfile_directory() }}' 'backend\dist\geti-backend'
-    if (-not (Test-Path "$dist\geti-backend.exe") -or -not (Test-Path "$dist\_internal")) {
-        Write-Error "Backend sidecar not found in $dist - run 'just pyinstaller' in backend\ first"
+    if (-not (Test-Path "$dist\geti-backend.exe") -or (Get-Item "$dist\geti-backend.exe").Length -eq 0) {
+        Write-Error "Backend sidecar missing or empty in $dist - run 'just pyinstaller' in backend\ first"
     }
-    if ((Get-Item "$dist\geti-backend.exe").Length -eq 0) {
-        Write-Error "Backend sidecar in $dist is empty - re-run 'just pyinstaller' in backend\"
+    if (-not (Test-Path "$dist\_internal") -or -not (Get-ChildItem -Force "$dist\_internal" | Select-Object -First 1)) {
+        Write-Error "Backend resources missing or empty in $dist\_internal - run 'just pyinstaller' in backend\ first"
     }
 
+    if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) {
+        Write-Error "'rustc' not found on PATH - install Rust via https://rustup.rs to resolve the host triple"
+    }
     $triple = (rustc -vV | Select-String '^host: ').Line -replace '^host: ', ''
     Set-Location ui\src-tauri
     New-Item -Force -ItemType SymbolicLink -Path ".\geti-backend-$triple.exe" -Target "$dist\geti-backend.exe" | Out-Null
@@ -342,6 +353,10 @@ tauri-build:
     fi
     if [[ ! -s "$BACKEND_DIR/geti-backend" ]]; then
         echo "Bundled sidecar $BACKEND_DIR/geti-backend is missing or empty — re-run 'just pyinstaller' in backend/ and 'just tauri-link-sidecar'" >&2
+        exit 1
+    fi
+    if [[ ! -d "$BACKEND_DIR/_internal" || -z "$(ls -A "$BACKEND_DIR/_internal" 2>/dev/null)" ]]; then
+        echo "Bundled resources $BACKEND_DIR/_internal are missing or empty — re-run 'just pyinstaller' in backend/ and 'just tauri-link-sidecar'" >&2
         exit 1
     fi
     echo "✅ Bundle ready at $APP"
