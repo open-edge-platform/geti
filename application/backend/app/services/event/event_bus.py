@@ -4,6 +4,10 @@
 from enum import StrEnum
 from multiprocessing.synchronize import Condition, Event
 
+from sqlalchemy.orm import Session
+
+from app.db.session_hooks import run_after_commit
+
 from .base import BaseEventBus
 
 
@@ -76,3 +80,15 @@ class EventBus(BaseEventBus[EventType]):
             self._should_notify_model(event_type) or self._should_notify_device(event_type)
         ) and self._model_reload_event:
             self._model_reload_event.set()
+
+    def emit_event_after_commit(self, db_session: Session, event_type: EventType) -> None:
+        """Emit ``event_type`` only after ``db_session`` successfully commits.
+
+        Prefer this over :meth:`emit_event` when the emission is triggered by a database write whose
+        result consumers must observe. Consumers (possibly in other processes, e.g. the
+        ``StreamLoader``) react by re-reading the affected entity from the database; emitting before
+        the write is durably committed would let that reload race the commit and read stale data
+        (e.g. the previous ``video_path`` of a source). If the transaction is rolled back instead,
+        the event is never emitted.
+        """
+        run_after_commit(db_session, lambda: self.emit_event(event_type))
