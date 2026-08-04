@@ -113,53 +113,23 @@ class VisionTransformerWeightsLoader:
 
     def load_pretrained(self: _SupportsViTBackboneWeights, weights: PathLike | None = None) -> None:
         """Load weights: a local checkpoint if given, else torchvision's official set."""
-        if weights is not None and Path(weights).exists():
-            key_mapping = {
-                "backbone.cls_token": "cls_token",
-                "backbone.pos_embed": "pos_embed",
-                "backbone.patch_embed.projection.weight": "patch_embed.proj.weight",
-                "backbone.patch_embed.projection.bias": "patch_embed.proj.bias",
-                "backbone.ln1.weight": "norm.weight",
-                "backbone.ln1.bias": "norm.bias",
-            }
+        if weights is None or not Path(weights).exists():
+            if self.model_name not in self.pretrained_urls:
+                warnings.warn(
+                    "No pretrained weights found for the specified model. Initializing model with random weights.",
+                    stacklevel=1,
+                )
+                return
 
-            for i in range(len(self.model.backbone.blocks)):
-                # Normalization layers
-                key_mapping[f"backbone.layers.{i}.ln1.weight"] = f"blocks.{i}.norm1.weight"
-                key_mapping[f"backbone.layers.{i}.ln1.bias"] = f"blocks.{i}.norm1.bias"
-                key_mapping[f"backbone.layers.{i}.ln2.weight"] = f"blocks.{i}.norm2.weight"
-                key_mapping[f"backbone.layers.{i}.ln2.bias"] = f"blocks.{i}.norm2.bias"
+            pretrained_url = self.pretrained_urls[self.model_name]
+            logger.info("init weight - %s", pretrained_url)
+            parts = urlparse(pretrained_url)
+            filename = Path(parts.path).name
 
-                # Attention blocks
-                key_mapping[f"backbone.layers.{i}.attn.qkv.weight"] = f"blocks.{i}.attn.qkv.weight"
-                key_mapping[f"backbone.layers.{i}.attn.qkv.bias"] = f"blocks.{i}.attn.qkv.bias"
-                key_mapping[f"backbone.layers.{i}.attn.proj.weight"] = f"blocks.{i}.attn.proj.weight"
-                key_mapping[f"backbone.layers.{i}.attn.proj.bias"] = f"blocks.{i}.attn.proj.bias"
+            cache_dir = Path(os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"])
+            weights = cache_dir / filename
+            if not Path.exists(weights):
+                download_url_to_file(pretrained_url, str(weights), "", progress=True)
 
-                # Feed-Forward / MLP blocks
-                key_mapping[f"backbone.layers.{i}.ffn.layers.0.0.weight"] = f"blocks.{i}.mlp.fc1.weight"
-                key_mapping[f"backbone.layers.{i}.ffn.layers.0.0.bias"] = f"blocks.{i}.mlp.fc1.bias"
-                key_mapping[f"backbone.layers.{i}.ffn.layers.1.weight"] = f"blocks.{i}.mlp.fc2.weight"
-
-            load_checkpoint(self.model.backbone, str(weights), key_mapping=key_mapping)
-            logger.info("Loaded ViT backbone weights from %s", weights)
-            return
-
-        if self.model_name not in self.pretrained_urls:
-            warnings.warn(
-                "No pretrained weights found for the specified model. Initializing model with random weights.",
-                stacklevel=1,
-            )
-            return
-
-        pretrained_url = self.pretrained_urls[self.model_name]
-        logger.info("init weight - %s", pretrained_url)
-        parts = urlparse(pretrained_url)
-        filename = Path(parts.path).name
-
-        cache_dir = Path(os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"])
-        cache_file = cache_dir / filename
-        if not Path.exists(cache_file):
-            download_url_to_file(pretrained_url, str(cache_file), "", progress=True)
-        self.model.backbone.load_checkpoint(checkpoint_path=cache_file)  # pyrefly: ignore[not-callable]
-        logger.info("Loaded ViT backbone weights from %s", cache_file)
+        self.model.backbone.load_checkpoint(checkpoint_path=Path(weights))  # pyrefly: ignore[not-callable]
+        logger.info("Loaded ViT backbone weights from %s", weights)
