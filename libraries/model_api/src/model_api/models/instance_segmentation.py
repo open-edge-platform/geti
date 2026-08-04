@@ -286,7 +286,7 @@ class DETRInstanceSegmentation(InstanceSegmentationModel):
     """
 
     __model__ = "DETRInstSeg"
-    _labels_shift: ClassVar[int] = 0
+    _labels_shift: ClassVar[int] = 1
 
     def _postprocess_single_mask(self, box: np.ndarray, raw_cls_mask: np.ndarray, im_h: int, im_w: int) -> np.ndarray:
         return _full_image_mask_postprocess(raw_cls_mask, im_h, im_w)
