@@ -406,7 +406,7 @@ class TestSinkServiceIntegration:
         db_sink = db_session.get(SinkDB, db_sink.id)
         assert db_sink.name == "Updated Sink"
         assert db_sink.config_data["folder_path"] == "/new/folder"
-        fxt_event_bus.emit_event.assert_called_once_with(EventType.SINK_CHANGED)
+        fxt_event_bus.emit_event_after_commit.assert_called_once_with(db_session, EventType.SINK_CHANGED)
 
     def test_delete_sink(self, fxt_db_sinks, fxt_sink_service, db_session):
         """Test deleting a sink."""
