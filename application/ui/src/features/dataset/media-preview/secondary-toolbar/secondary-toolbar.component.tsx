@@ -80,7 +80,7 @@ const VideoAnnotationButtons = ({ onSubmit, isDisabled, isSaving }: VideoAnnotat
     );
 };
 
-const PredictionActions = ({ hasModels, isDisabled }: { hasModels: boolean; isDisabled: boolean }) => {
+const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
     return (
         <DialogTrigger type={'popover'} placement={'bottom'}>
             <TooltipTrigger>
@@ -96,14 +96,8 @@ const PredictionActions = ({ hasModels, isDisabled }: { hasModels: boolean; isDi
                 <Divider />
                 <Content>
                     <Flex gap={'size-50'} direction={'column'}>
-                        {hasModels ? (
-                            <Toolbar.Section minWidth={'size-2000'}>
-                                <PredictionModelSelector isDisabled={isDisabled} />
-                            </Toolbar.Section>
-                        ) : null}
-                        <Toolbar.Section>
-                            <PredictionInferenceDevices isDisabled={isDisabled} />
-                        </Toolbar.Section>
+                        <PredictionModelSelector isDisabled={isDisabled} />
+                        <PredictionInferenceDevices isDisabled={isDisabled} />
                     </Flex>
                 </Content>
             </Dialog>
@@ -166,6 +160,7 @@ export const SecondaryToolbar = ({
 
     const isPredictionMode = mode === 'prediction';
     const isAnnotationMode = mode === 'annotation';
+    const showPredictionActions = isPredictionMode && !isEmpty(selectableModels);
 
     const isSubmitDisabled = useIsSubmitDisabled({
         mode,
@@ -203,12 +198,7 @@ export const SecondaryToolbar = ({
                         />
                     </Toolbar.Section>
 
-                    {isPredictionMode && (
-                        <PredictionActions
-                            hasModels={!isEmpty(selectableModels)}
-                            isDisabled={isLoadingPredictions || isPlaying}
-                        />
-                    )}
+                    {showPredictionActions && <PredictionActions isDisabled={isLoadingPredictions || isPlaying} />}
                 </Flex>
             </Toolbar.Container>
             {isAnnotationMode && (
