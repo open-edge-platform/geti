@@ -194,7 +194,11 @@ the `just tauri-build` recipe in [`../../Justfile`](../../Justfile); see
     ```sh
     brew install rustup-init && rustup-init
     ```
-3. From `application/ui`, run the desktop dev shell:
+3. Provide and trust a TLS certificate — see
+   [TLS certificates on macOS](#tls-certificates-on-macos) below. Without
+   this the window loads but every backend request fails with
+   _"The certificate for this server is invalid."_
+4. From `application/ui`, run the desktop dev shell:
 
     ```sh
     npm run start:desktop
@@ -204,7 +208,7 @@ the `just tauri-build` recipe in [`../../Justfile`](../../Justfile); see
     `BUILD_TARGET=tauri` and starts the Rspack dev server) and launches the
     native window once the dev server is ready.
 
-4. Build a distributable `.app` / `.dmg`:
+5. Build a distributable `.app` / `.dmg`:
     ```sh
     just tauri-build   # from application/
     ```
@@ -214,6 +218,55 @@ the `just tauri-build` recipe in [`../../Justfile`](../../Justfile); see
     to work around PyInstaller's `.app` bundle detection. Running
     `npx tauri build` directly produces a `.app` whose backend dies on
     launch with `Failed to load Python shared library 'libpython*.dylib'`.
+
+#### TLS certificates on macOS
+
+The backend always serves HTTPS (Hypercorn, HTTP/2) on
+`https://localhost:7860` and refuses to start without a certificate. Only
+the Windows build provisions one automatically — a PyInstaller runtime hook
+([`windows/certs.py`](../../backend/pyinstaller/windows/certs.py)) writes a
+self-signed certificate into `DATA_DIR` on first launch, and WebView2 is
+started with `--ignore-certificate-errors` (see `additionalBrowserArgs` in
+[`tauri.conf.json`](./tauri.conf.json)).
+
+Neither applies on macOS: there is no cert-generation hook, and WKWebView
+has no flag to skip certificate validation. Do both steps manually, once.
+
+Generate the certificate into the desktop `DATA_DIR` (from
+`application/backend`):
+
+```sh
+DATA_DIR="$HOME/Library/Application Support/com.intel.geti" just gen-certs
+```
+
+Then add it to your login keychain as a trusted SSL root:
+
+```sh
+security add-trusted-cert -r trustRoot -p ssl -s localhost \
+    "$HOME/Library/Application Support/com.intel.geti/certs/localhost.pem"
+```
+
+`-r trustRoot` is required because the certificate is self-signed and is
+therefore its own root. Using `-r trustAsRoot` fails with
+_"SecTrustSettingsSetTrustSettings: One or more parameters passed to a
+function were not valid."_ macOS will prompt for your login password.
+
+Verify (exit code `0`) and undo when you're done:
+
+```sh
+security verify-cert -p ssl -n localhost -L -q \
+    -c "$HOME/Library/Application Support/com.intel.geti/certs/localhost.pem"
+security remove-trusted-cert \
+    "$HOME/Library/Application Support/com.intel.geti/certs/localhost.pem"
+```
+
+`add-trusted-cert` records trust settings for the certificate without
+importing it into a keychain, so `security find-certificate` /
+`delete-certificate` will not find it — `remove-trusted-cert` is the undo.
+
+`just gen-certs` skips generation when the files already exist and issues
+certificates valid for 365 days; after regenerating you must re-run
+`add-trusted-cert` for the new certificate.
 
 ### Linux
 
@@ -234,13 +287,21 @@ the `just tauri-build` recipe in [`../../Justfile`](../../Justfile); see
         librsvg2-dev
     ```
 2. Install Rust via [rustup](https://rustup.rs).
-3. From `application/ui`, run the desktop dev shell:
+3. Provide a TLS certificate. As on macOS (see
+   [TLS certificates on macOS](#tls-certificates-on-macos)) nothing
+   generates one for you, so run
+   `DATA_DIR="$HOME/.local/share/com.intel.geti" just gen-certs` from
+   `application/backend`. WebKitGTK trusts the system CA store, so
+   installing the certificate requires root — e.g. copy it to
+   `/usr/local/share/ca-certificates/geti-localhost.crt` and run
+   `sudo update-ca-certificates`.
+4. From `application/ui`, run the desktop dev shell:
 
     ```sh
     npm run start:desktop
     ```
 
-4. Build a distributable AppImage / `.deb`:
+5. Build a distributable AppImage / `.deb`:
     ```sh
     just tauri-build   # from application/
     ```
