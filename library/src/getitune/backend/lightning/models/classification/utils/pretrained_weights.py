@@ -112,7 +112,7 @@ class VisionTransformerWeightsLoader:
     """Load backbone weights for ViT architecture."""
 
     def load_pretrained(self: _SupportsViTBackboneWeights, weights: PathLike | None = None) -> None:
-        """Load weights: a local checkpoint if given, else torchvision's official set."""
+        """Load weights: a local checkpoint if given, else download from ``self.pretrained_urls`` into the cache dir."""
         if weights is None or not Path(weights).exists():
             if self.model_name not in self.pretrained_urls:
                 warnings.warn(
