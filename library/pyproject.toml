@@ -39,11 +39,8 @@ dependencies = [
     "torchmetrics==1.8.2",
     "pytorchcv==0.0.74",
     "timm==1.0.3",
-    "openvino==2026.3.0rc2",
-    # Sourced from a git branch (see [tool.uv.sources]) until the openvino-model-api
-    # release shipping the tiler `predict_tiles` / `_setup_model` API is published.
-    # Restore a versioned pin (e.g. "~=<version>") on release.
-    "openvino-model-api",
+    "openvino==2026.3.0rc3",
+    "openvino-model-api==0.4.6",
     "onnx==1.22.0",
     "onnxruntime==1.26.0",
     "onnxslim~=0.1.71",
@@ -93,19 +90,19 @@ lint = [
 cpu = [
     # Note: platform-specific wheels are only available for Linux and Windows.
     # For macOS, there is only one version of torch (default) available via PyPI.
-    "torch==2.13.0+cpu ; sys_platform == 'linux' or sys_platform == 'win32'",
-    "torchvision==0.28.0+cpu ; sys_platform == 'linux' or sys_platform == 'win32'",
-    "torch==2.13.0 ; sys_platform != 'linux' and sys_platform != 'win32'",
-    "torchvision==0.28.0 ; sys_platform != 'linux' and sys_platform != 'win32'"
+    "torch==2.12.1+cpu ; sys_platform == 'linux' or sys_platform == 'win32'",
+    "torchvision==0.27.1+cpu ; sys_platform == 'linux' or sys_platform == 'win32'",
+    "torch==2.12.1 ; sys_platform != 'linux' and sys_platform != 'win32'",
+    "torchvision==0.27.1 ; sys_platform != 'linux' and sys_platform != 'win32'"
 ]
 cuda = [
-    "torch==2.13.0+cu130",
-    "torchvision==0.28.0+cu130"
+    "torch==2.12.1+cu130",
+    "torchvision==0.27.1+cu130"
 ]
 xpu = [
-    "torch==2.13.0+xpu",
-    "triton-xpu==3.7.2",
-    "torchvision==0.28.0+xpu"
+    "torch==2.12.1+xpu",
+    "triton-xpu==3.7.1",
+    "torchvision==0.27.1+xpu"
 ]
 ultralytics = [
     "ultralytics==8.4.86",
@@ -164,10 +161,11 @@ override-dependencies = [
     "pyarrow>=24.0,<25",
     # roboflow hard-pins idna==3.7; allow newer versions
     "idna>=3.15",
+    # torch==2.12.1 caps setuptools<82 but version lower than 83.0 have vulnerabilities of moderate severity
+    "setuptools>=83.0",
 ]
 
 [tool.uv.sources]
-openvino-model-api = { git = "https://github.com/open-edge-platform/model_api", branch = "master", subdirectory = "model_api" }
 # TODO(open-edge-platform/geti#7070): revert to a stable PyPI release once OpenVINO 2026.3 is officially published.
 openvino = [
     { index = "openvino-nightly" },
