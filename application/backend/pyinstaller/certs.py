@@ -3,14 +3,14 @@
 
 """PyInstaller runtime hook: generate self-signed TLS certificates at runtime.
 
-The MSIX-packaged backend serves HTTPS via Hypercorn but ships without any
+The frozen backend serves HTTPS via Hypercorn but ships without any
 certificate. This hook writes a self-signed certificate for ``localhost`` into the per-user data
 on first launch, so that ``app.main`` can bind Hypercorn over TLS.
 
-This hook must run after ``uwp.py`` (which sets ``DATA_DIR``) and before
-``app.main`` imports settings. Certificates are only generated once and reused
-on subsequent launches. Worker/child processes inherit ``DATA_DIR`` and see the
-files already present, so generation is skipped.
+On Windows this hook must run after ``windows/uwp.py`` (which sets ``DATA_DIR``)
+and before ``app.main`` imports settings. Certificates are only generated once
+and reused on subsequent launches. Worker/child processes inherit ``DATA_DIR``
+and see the files already present, so generation is skipped.
 """
 
 import datetime
@@ -26,10 +26,8 @@ def _data_dir() -> Path:
     """
     Resolve the per-user data directory used by the backend.
     """
-    data_dir = os.getenv("DATA_DIR")
-    if not data_dir:
-        raise OSError("DATA_DIR is not set; cannot place certificates.")
-    return Path(data_dir)
+    # Mirrors the `data_dir` default in app.settings when DATA_DIR is unset.
+    return Path(os.getenv("DATA_DIR") or "data")
 
 
 def _generate_self_signed(cert_path: Path, key_path: Path) -> None:

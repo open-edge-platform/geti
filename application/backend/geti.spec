@@ -225,7 +225,7 @@ hiddenimports += [
     'multiprocessing.resource_tracker',
 ]
 
-# Ensure cryptography is bundled so the runtime cert-generation hook (windows/certs.py)
+# Ensure cryptography is bundled so the runtime cert-generation hook (certs.py)
 # can create a self-signed TLS certificate on first launch.
 hiddenimports += collect_submodules('cryptography')
 
@@ -236,7 +236,9 @@ runtime_hooks = ['pyinstaller/pyi_rth_pkgmeta.py']
 system = platform.system()
 if system == "Windows":
     # uwp.py sets DATA_DIR; certs.py must run after it to generate TLS certs there.
-    runtime_hooks += ['pyinstaller/windows/uwp.py', 'pyinstaller/windows/certs.py', 'pyinstaller/windows/proxy.py']
+    runtime_hooks += ['pyinstaller/windows/uwp.py', 'pyinstaller/certs.py', 'pyinstaller/windows/proxy.py']
+else:
+    runtime_hooks += ['pyinstaller/certs.py']
 
 a = Analysis(
     ['app/main.py'],
