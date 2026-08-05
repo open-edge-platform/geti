@@ -14,8 +14,7 @@ applyTo: "application/ui/**"
   edit by hand. Regenerate: `npm run update-spec` (backend on `:7860`) or
   `npm run build:api` (if you already have a fresh local `openapi-spec.json`).
 - **Vendored packages** (`packages/config`, `packages/ui`, `packages/smart-tools`)
-  are cloned via `npm run clone-geti-ui-packages`. Do not edit locally — fixes go
-  in `patches/`, re-applied by `npm run patch-geti-ui-packages` after each clone.
+  are cloned via `npm run clone-geti-ui-packages`. Do not edit locally.
 
 ## Commands
 

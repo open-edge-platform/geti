@@ -25,8 +25,6 @@ npm install
 
 The `preinstall` script clones `@geti/config` and `@geti/smart-tools` from the `open-edge-platform/geti_v2` repository at a pinned commit using [`tiged`](https://github.com/tiged/tiged) (the maintained fork of Degit). These are workspace packages installed into `packages/` and are **gitignored** — never commit that directory. The UI library is consumed as the published [`@geti-ui/ui`](https://github.com/MarkRedeman/geti-ui) npm package (a regular dependency), not a clone.
 
-Because `geti_v2` is archived, local fixes to the vendored packages live as unified diffs in `patches/` and are re-applied by `npm run patch-geti-ui-packages` immediately after each clone. Never edit `packages/` directly — `tiged --force` overwrites it on every install. To change a vendored package, edit the file, regenerate the diff against the pristine copy, and update the patch in `patches/`.
-
 ### Development
 
 ```bash
