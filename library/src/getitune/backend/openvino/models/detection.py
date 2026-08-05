@@ -13,7 +13,7 @@ from model_api.tilers import DetectionTiler
 from torchvision import tv_tensors
 
 from getitune.backend.openvino.models.base import OVModel
-from getitune.backend.openvino.models.utils import rescale_bboxes_to_original
+from getitune.backend.openvino.models.utils import rescale_bboxes_to_original, skip_tiler_saliency_merge
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
 from getitune.data.entity.tile import TileBatchData
 from getitune.metrics import MetricCallable, MetricInput
@@ -297,30 +297,31 @@ class OVDetectionModel(OVModel):
         bboxes: list[tv_tensors.BoundingBoxes] = []
         scores: list[torch.Tensor] = []
         labels: list[torch.Tensor] = []
-        for img_tiles, tile_infos, ori_info in zip(
-            inputs.batch_tiles,
-            inputs.batch_tile_tile_infos,
-            imgs_info,
-            strict=True,
-        ):
-            ori_h, ori_w = ori_info.ori_shape
-            # ModelAPI expects HWC numpy tiles at their native crop resolution; it resizes
-            # each tile to the model input internally and maps predictions back to crop
-            # (and then original) coordinates using the supplied tile coordinates.
-            np_tiles = [tile.detach().cpu().numpy().transpose(1, 2, 0) for tile in img_tiles]
-            coords = [[t.x, t.y, t.x + t.width, t.y + t.height] for t in tile_infos]
-            merged: DetectionResult = tiler.predict_tiles(np_tiles, coords, (ori_h, ori_w, 3))
+        with skip_tiler_saliency_merge(tiler):
+            for img_tiles, tile_infos, ori_info in zip(
+                inputs.batch_tiles,
+                inputs.batch_tile_tile_infos,
+                imgs_info,
+                strict=True,
+            ):
+                ori_h, ori_w = ori_info.ori_shape
+                # ModelAPI expects HWC numpy tiles at their native crop resolution; it resizes
+                # each tile to the model input internally and maps predictions back to crop
+                # (and then original) coordinates using the supplied tile coordinates.
+                np_tiles = [tile.detach().cpu().numpy().transpose(1, 2, 0) for tile in img_tiles]
+                coords = [[t.x, t.y, t.x + t.width, t.y + t.height] for t in tile_infos]
+                merged: DetectionResult = tiler.predict_tiles(np_tiles, coords, (ori_h, ori_w, 3))
 
-            images.append(torch.empty(3, ori_h, ori_w))
-            bboxes.append(
-                tv_tensors.BoundingBoxes(
-                    torch.as_tensor(np.asarray(merged.bboxes), dtype=torch.float32).reshape(-1, 4),
-                    format="XYXY",
-                    canvas_size=(ori_h, ori_w),
-                ),
-            )
-            scores.append(torch.as_tensor(np.asarray(merged.scores), dtype=torch.float32).reshape(-1))
-            labels.append(torch.as_tensor(np.asarray(merged.labels), dtype=torch.long).reshape(-1) - label_shift)
+                images.append(torch.empty(3, ori_h, ori_w))
+                bboxes.append(
+                    tv_tensors.BoundingBoxes(  # type: ignore[no-matching-overload]
+                        torch.as_tensor(np.asarray(merged.bboxes), dtype=torch.float32).reshape(-1, 4),
+                        format="XYXY",
+                        canvas_size=(ori_h, ori_w),
+                    ),
+                )
+                scores.append(torch.as_tensor(np.asarray(merged.scores), dtype=torch.float32).reshape(-1))
+                labels.append(torch.as_tensor(np.asarray(merged.labels), dtype=torch.long).reshape(-1) - label_shift)
 
         return PredictionBatch(
             images=images,

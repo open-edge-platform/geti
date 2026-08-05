@@ -117,6 +117,11 @@ packages = ["app"]
 
 [tool.uv.sources]
 getitune = { path = "../../library", editable = true }
+# TODO: Pin back to a PyPI release once the tiler saliency-map merge fix
+# (https://github.com/open-edge-platform/model_api/pull/TODO) lands in a
+# published openvino-model-api release; then remove this override (must be kept
+# in sync with the equivalent override in ../../library/pyproject.toml).
+openvino-model-api = { git = "https://github.com/open-edge-platform/model_api.git", branch = "aurelien/fix-tiler", subdirectory = "model_api" }
 
 [tool.ruff]
 target-version = "py313"
