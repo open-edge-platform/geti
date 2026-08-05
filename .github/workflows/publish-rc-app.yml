@@ -203,3 +203,21 @@ jobs:
             --certificate-identity-regexp="^https://github\.com/${GITHUB_REPOSITORY}/\.github/workflows/.+" \
             --certificate-oidc-issuer='https://token.actions.githubusercontent.com'
           EOF
+
+  windows-installer:
+    name: Build Windows MSIX RC (${{ matrix.device }})
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [cpu, xpu, cuda]
+    uses: ./.github/workflows/windows-installer.yml
+    with:
+      device: ${{ matrix.device }}
+      tag: ${{ needs.validate.outputs.rc_version }}
+      exclude-agpl-models: true # RC installers must not bundle Ultralytics/AGPL-licensed models
+    secrets:
+      MSIX_SIGN_CERTIFICATE: ${{ secrets.MSIX_SIGN_CERTIFICATE }}
+      MSIX_SIGN_CERTIFICATE_PASSWORD: ${{ secrets.MSIX_SIGN_CERTIFICATE_PASSWORD }}
+    permissions:
+      contents: read
