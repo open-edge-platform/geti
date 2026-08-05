@@ -7,7 +7,7 @@ import threading
 
 from loguru import logger
 
-from app.core.jobs.models import Cancelled, Done, Failed, Job, JobStatus, JobType, Progress, Started
+from app.core.jobs.models import Cancelled, Done, Failed, Heartbeat, Job, JobStatus, JobType, Progress, Started
 from app.core.run import Runner, RunnerFactory
 
 from .capacity import Capacity
@@ -160,6 +160,8 @@ class JobController:
                     job.start()
                 case Progress(message=m, value=v, metadata=md):
                     job.advance(percent=v, msg=m, metadata=md)
+                case Heartbeat():
+                    job.touch()
                 case Done():
                     job.finish()
                     break

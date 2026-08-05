@@ -1,6 +1,8 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import logging
+import time
 from collections.abc import Callable
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -14,7 +16,14 @@ from getitune.metrics.mean_ap import MaskRLEMeanAPCallable, MeanAPCallable
 from getitune.metrics.types import MetricCallable
 
 from app.core.run import ExecutionContext
-from app.execution.quantization.getitune_quantizer import GetiTuneQuantizer, QuantizationDependencies
+from app.execution.quantization.getitune_quantizer import (
+    _QUANTIZATION_STEP_END_PERCENT,
+    _QUANTIZATION_STEP_START_PERCENT,
+    GetiTuneQuantizer,
+    QuantizationDependencies,
+    _AccuracyControlIterationLogHandler,
+    _track_accuracy_control_progress,
+)
 from app.models import DatasetItemSubset, ModelRevision, Project, Task, TaskType, TrainingStatus
 from app.models.jobs.quantization_job import QuantizationJobParams
 from app.models.model_revision import ModelFormat, ModelPrecision, ModelVariant, TrainingInfo
@@ -387,8 +396,176 @@ class TestGetiTuneQuantizerRunQuantization:
                 subset_size=100,
             )
 
+    def test_run_quantization_emits_heartbeats_while_blocking(
+        self,
+        fxt_getitune_quantizer: Callable[[], GetiTuneQuantizer],
+    ):
+        """OVEngine.optimize is wrapped with heartbeats so long-running, non-instrumented
+        quantization calls (e.g. accuracy-aware PTQ) don't get killed by the stale-job monitor
+        for apparent inactivity while genuinely still working.
+        """
+        quantizer = fxt_getitune_quantizer()
+        mock_engine = Mock(spec=OVEngine)
+        expected_path = Path("/some/quantized_model.xml")
+        mock_engine.optimize.return_value = expected_path
 
-class TestGetiTuneQuantizerInitializeEngine:
+        with patch.object(quantizer, "heartbeat_during", wraps=quantizer.heartbeat_during) as mock_heartbeat_during:
+            result = quantizer.run_quantization(
+                ov_engine=mock_engine,
+                subset_size=150,
+                max_drop=None,
+            )
+
+        assert result == expected_path
+        # run_quantization must wrap the blocking OVEngine.optimize() call with a heartbeat
+        # context so the job stays "alive" from the control plane's point of view even during
+        # arbitrarily long, non-instrumented quantization runs.
+        mock_heartbeat_during.assert_called_once()
+
+    def test_run_quantization_wires_accuracy_control_progress_tracking(
+        self,
+        fxt_getitune_quantizer: Callable[[], GetiTuneQuantizer],
+    ):
+        """run_quantization must wrap the blocking call with the log-derived progress tracker too,
+        passing through its own ``update_progress`` and the resolved ``max_num_iterations``.
+        """
+        quantizer = fxt_getitune_quantizer()
+        mock_engine = Mock(spec=OVEngine)
+        expected_path = Path("/some/quantized_model.xml")
+        mock_engine.optimize.return_value = expected_path
+
+        with patch(
+            "app.execution.quantization.getitune_quantizer._track_accuracy_control_progress"
+        ) as mock_track_progress:
+            result = quantizer.run_quantization(
+                ov_engine=mock_engine,
+                subset_size=150,
+                max_drop=0.02,
+                max_num_iterations=7,
+            )
+
+        assert result == expected_path
+        mock_track_progress.assert_called_once_with(quantizer.update_progress, 7)
+
+    def test_run_quantization_heartbeat_ticks_during_slow_optimize(
+        self,
+        fxt_getitune_quantizer: Callable[[], GetiTuneQuantizer],
+    ):
+        """The heartbeat callback fires at least once while a slow OVEngine.optimize() blocks."""
+        quantizer = fxt_getitune_quantizer()
+        mock_engine = Mock(spec=OVEngine)
+        expected_path = Path("/some/quantized_model.xml")
+
+        def _slow_optimize(**kwargs) -> Path:
+            time.sleep(0.05)
+            return expected_path
+
+        mock_engine.optimize.side_effect = _slow_optimize
+
+        # Use a short heartbeat interval (instead of the production default) so the background
+        # thread has time to tick at least once during this fast test.
+        original_heartbeat_during = quantizer.heartbeat_during
+        with (
+            patch.object(quantizer, "heartbeat_during", side_effect=lambda: original_heartbeat_during(interval=0.01)),
+            patch.object(quantizer, "heartbeat") as mock_heartbeat,
+        ):
+            result = quantizer.run_quantization(
+                ov_engine=mock_engine,
+                subset_size=150,
+                max_drop=None,
+            )
+
+        assert result == expected_path
+        mock_heartbeat.assert_called()
+
+
+class TestAccuracyControlIterationLogHandler:
+    """Tests for the log-derived real-progress mechanism used during accuracy-aware PTQ."""
+
+    def _make_record(self, message: str, level: int = logging.INFO) -> logging.LogRecord:
+        return logging.LogRecord(
+            name="nncf", level=level, pathname=__file__, lineno=1, msg=message, args=(), exc_info=None
+        )
+
+    def test_emit_matches_iteration_marker_and_counts_up(self):
+        """Each 'Reverted N operations...' record increments the iteration counter by one."""
+        seen: list[int] = []
+        handler = _AccuracyControlIterationLogHandler(on_iteration=seen.append)
+
+        handler.emit(self._make_record("Reverted 3 operations to the floating-point precision:\n<details>"))
+        handler.emit(self._make_record("Reverted 1 operation to the floating-point precision:\n<details>"))
+
+        assert seen == [1, 2]
+
+    def test_emit_ignores_unrelated_records(self):
+        """Records that don't match the known per-iteration marker are ignored."""
+        seen: list[int] = []
+        handler = _AccuracyControlIterationLogHandler(on_iteration=seen.append)
+
+        handler.emit(self._make_record("Accuracy drop: 0.01 (absolute)"))
+        handler.emit(self._make_record("Algorithm completed: some reason"))
+
+        assert seen == []
+
+    def test_emit_swallows_callback_errors(self):
+        """A failing callback must not raise out of emit() and break the quantization call."""
+        handler = _AccuracyControlIterationLogHandler(on_iteration=Mock(side_effect=RuntimeError("boom")))
+
+        handler.emit(self._make_record("Reverted 1 operations to the floating-point precision:"))  # must not raise
+
+    def test_track_accuracy_control_progress_noop_when_iterations_unbounded(self):
+        """No handler is attached when max_num_iterations is None (nothing to interpolate against)."""
+        report_progress = Mock()
+        nncf_logger = logging.getLogger("nncf")
+        handlers_before = list(nncf_logger.handlers)
+
+        with _track_accuracy_control_progress(report_progress, max_num_iterations=None):
+            assert nncf_logger.handlers == handlers_before
+            nncf_logger.info("Reverted 1 operations to the floating-point precision:")
+
+        report_progress.assert_not_called()
+
+    def test_track_accuracy_control_progress_reports_interpolated_percent(self):
+        """Iterations observed via NNCF's logger are mapped onto the step's progress range."""
+        report_progress = Mock()
+        nncf_logger = logging.getLogger("nncf")
+
+        with _track_accuracy_control_progress(report_progress, max_num_iterations=4):
+            nncf_logger.info("Reverted 2 operations to the floating-point precision:\n<details>")
+            nncf_logger.info("Reverted 1 operations to the floating-point precision:\n<details>")
+
+        # Handler must be detached again once the context exits.
+        assert not any(isinstance(h, _AccuracyControlIterationLogHandler) for h in nncf_logger.handlers)
+
+        span = _QUANTIZATION_STEP_END_PERCENT - _QUANTIZATION_STEP_START_PERCENT
+        expected_calls = [
+            _QUANTIZATION_STEP_START_PERCENT + span * (1 / 4),
+            _QUANTIZATION_STEP_START_PERCENT + span * (2 / 4),
+        ]
+        actual_calls = [call.args[0] for call in report_progress.call_args_list]
+        assert actual_calls == pytest.approx(expected_calls)
+
+    def test_track_accuracy_control_progress_caps_at_step_end_percent(self):
+        """More iterations than expected (edge case) never push progress past the step's bound."""
+        report_progress = Mock()
+        nncf_logger = logging.getLogger("nncf")
+
+        with _track_accuracy_control_progress(report_progress, max_num_iterations=1):
+            nncf_logger.info("Reverted 1 operations to the floating-point precision:\n<details>")
+            nncf_logger.info("Reverted 1 operations to the floating-point precision:\n<details>")  # extra, unexpected
+
+        actual_calls = [call.args[0] for call in report_progress.call_args_list]
+        assert all(percent <= _QUANTIZATION_STEP_END_PERCENT for percent in actual_calls)
+
+    def test_track_accuracy_control_progress_detaches_handler_on_exception(self):
+        """The handler is removed even if the wrapped block raises."""
+        nncf_logger = logging.getLogger("nncf")
+
+        with pytest.raises(RuntimeError), _track_accuracy_control_progress(Mock(), max_num_iterations=5):
+            raise RuntimeError("quantization blew up")
+
+        assert not any(isinstance(h, _AccuracyControlIterationLogHandler) for h in nncf_logger.handlers)
+
     """Tests for ``GetiTuneQuantizer.initialize_engine``."""
 
     def test_initialize_engine_success(

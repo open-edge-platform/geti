@@ -18,6 +18,7 @@ Functions:
 import asyncio
 import contextlib
 import multiprocessing as mp
+import threading
 from collections.abc import Iterator
 from multiprocessing.connection import Connection
 from multiprocessing.context import SpawnProcess
@@ -134,19 +135,36 @@ def _entrypoint(
     """
     import traceback
 
-    from app.core.jobs.models import Cancelled, Done, Failed, Progress
+    from app.core.jobs.models import Cancelled, Done, Failed, Heartbeat, Progress
+
+    # `report` and `heartbeat` may be called concurrently from different threads within the
+    # runnable (e.g. `Execution.heartbeat_during()` ticks on a background thread while the main
+    # thread may itself report real progress, such as via a log-derived progress hook during a
+    # long blocking call). `Connection.send()` is not guaranteed thread-safe for concurrent
+    # writers, so serialize access to it.
+    send_lock = threading.Lock()
 
     def report(msg: str, p: float, metadata: dict[str, Any] | None = None) -> None:
         if cancel_event.is_set():
             raise CancelledExc
-        conn.send(Progress(message=msg, value=p, metadata=metadata))
+        with send_lock:
+            conn.send(Progress(message=msg, value=p, metadata=metadata))
+
+    def heartbeat() -> None:
+        """Emit a liveness signal for long-running operations without structured progress.
+
+        Deliberately does not check ``cancel_event``: it is a passive keep-alive signal, not a
+        cooperative-cancellation checkpoint, so it can safely be called from a background thread.
+        """
+        with contextlib.suppress(Exception), send_lock:
+            conn.send(Heartbeat())
 
     runnable = get_runnable(JobType(job_type))
 
     try:
         conn.send(Started())
         with logging_ctx(LogConfig(log_folder=str(get_settings().job_dir), log_file=log_file)):
-            runnable.run(ExecutionContext(payload=payload, report=report))
+            runnable.run(ExecutionContext(payload=payload, report=report, heartbeat=heartbeat))
         conn.send(Done())
     except CancelledExc:
         conn.send(Cancelled())

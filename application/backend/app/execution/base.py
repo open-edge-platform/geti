@@ -1,8 +1,10 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+import threading
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from functools import wraps
 from typing import Any, Generic, TypeVar
 
@@ -12,6 +14,8 @@ from app.core.jobs.models import JobParams
 from app.core.run import ExecutionContext, Runnable
 
 T = TypeVar("T")
+
+DEFAULT_HEARTBEAT_INTERVAL_SECONDS = 60.0
 
 
 def step(name: str, complete: float = 0.0) -> Callable[[Callable[..., T]], Callable[..., T]]:
@@ -114,6 +118,47 @@ class Execution(Runnable, ABC, Generic[JobParamsT]):
     def update_metadata(self, metadata: dict[str, Any]) -> None:
         """Update the current progress metadata without changing the message or percentage."""
         self._report_progress(metadata=metadata)
+
+    def heartbeat(self) -> None:
+        """Signal that the execution is still alive, without changing message or percentage.
+
+        Some long-running operations (e.g. NNCF accuracy-aware quantization) delegate to
+        third-party libraries that offer no callback/hook to report incremental progress, yet can
+        legitimately keep working for far longer than the async task stale-job monitor's inactivity
+        threshold. Calling this periodically during such operations keeps the job's "last updated"
+        timestamp fresh so it isn't mistakenly killed for inactivity while genuinely progressing.
+        """
+        if self._ctx is not None:
+            self._ctx.heartbeat()
+
+    @contextmanager
+    def heartbeat_during(self, interval: float = DEFAULT_HEARTBEAT_INTERVAL_SECONDS) -> Iterator[None]:
+        """Emit periodic heartbeats on a background thread for the duration of the context.
+
+        Wrap blocking calls that offer no progress-reporting hooks (such as third-party library
+        calls) with this context manager so the job control plane keeps seeing signs of life and
+        doesn't mistake a slow-but-working operation for a stale/hung job.
+
+        Args:
+            interval: Seconds between heartbeats. Should be comfortably below the stale-job
+                monitor's inactivity threshold to leave margin for scheduling jitter.
+        """
+        stop_event = threading.Event()
+
+        def _beat() -> None:
+            while not stop_event.wait(interval):
+                try:
+                    self.heartbeat()
+                except Exception:
+                    logger.exception("Heartbeat reporting failed")
+
+        thread = threading.Thread(target=_beat, name="execution-heartbeat", daemon=True)
+        thread.start()
+        try:
+            yield
+        finally:
+            stop_event.set()
+            thread.join(timeout=interval)
 
     def _report_progress(
         self, msg: str = "", percent: float = 0.0, metadata: dict[str, Any] | None = None, level: str = "INFO"

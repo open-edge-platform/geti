@@ -19,12 +19,18 @@ from dataclasses import dataclass
 from typing import Any, Generic, Protocol, TypeVar
 
 ReportFn = Callable[[str, float, dict[str, Any] | None], None]
+HeartbeatFn = Callable[[], None]
+
+
+def _noop_heartbeat() -> None:
+    """Default no-op heartbeat, used when a runner doesn't wire up liveness signaling."""
 
 
 @dataclass(kw_only=True)
 class ExecutionContext:
     payload: str
     report: ReportFn
+    heartbeat: HeartbeatFn = _noop_heartbeat
 
 
 class Runnable(Protocol):  # ignore

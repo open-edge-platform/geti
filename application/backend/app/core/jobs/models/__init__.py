@@ -1,7 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from .events import Cancelled, Done, ExecutionEvent, Failed, Progress, Started
+from .events import Cancelled, Done, ExecutionEvent, Failed, Heartbeat, Progress, Started
 from .job import Job, JobParams, JobParamsT, JobStatus, JobType, ProjectJob, now_utc_ts
 
 __all__ = [
@@ -9,6 +9,7 @@ __all__ = [
     "Done",
     "ExecutionEvent",
     "Failed",
+    "Heartbeat",
     "Job",
     "JobParams",
     "JobParamsT",

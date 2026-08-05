@@ -1,11 +1,13 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from unittest.mock import call, patch
+import time
+from unittest.mock import Mock, call, patch
 
 import pytest
 
 from app.core.jobs.models import JobParams
+from app.core.run import ExecutionContext
 from app.execution.base import Execution, ExecutionErr, step
 
 
@@ -115,3 +117,75 @@ class TestStepDecorator:
             # Assert
             mock_update_message.assert_called_once_with("Started: Pinning Step")
             mock_pin_message.assert_called_once_with("Pinned message")
+
+
+class TestHeartbeat:
+    """Test suite for the heartbeat/liveness-signaling mechanism."""
+
+    class _DummyExecution(Execution[JobParams]):
+        def execute(self, params: JobParams) -> None:
+            pass
+
+    def test_heartbeat_forwards_to_context(self):
+        """heartbeat() delegates to the execution context's heartbeat callback, when set."""
+        execution = self._DummyExecution()
+        mock_ctx = Mock(spec=ExecutionContext)
+        execution._ctx = mock_ctx
+
+        execution.heartbeat()
+
+        mock_ctx.heartbeat.assert_called_once_with()
+
+    def test_heartbeat_noop_without_context(self):
+        """heartbeat() is a no-op when no execution context has been attached yet."""
+        execution = self._DummyExecution()
+        assert execution._ctx is None
+
+        execution.heartbeat()  # must not raise
+
+    def test_heartbeat_during_emits_periodic_heartbeats(self):
+        """heartbeat_during() emits heartbeats on an interval while the wrapped block runs."""
+        execution = self._DummyExecution()
+
+        with (
+            patch.object(execution, "heartbeat") as mock_heartbeat,
+            execution.heartbeat_during(interval=0.01),
+        ):
+            time.sleep(0.06)
+
+        assert mock_heartbeat.call_count >= 2
+
+    def test_heartbeat_during_stops_emitting_after_context_exits(self):
+        """No further heartbeats are emitted once the context manager has exited."""
+        execution = self._DummyExecution()
+
+        with (
+            patch.object(execution, "heartbeat") as mock_heartbeat,
+            execution.heartbeat_during(interval=0.01),
+        ):
+            time.sleep(0.03)
+
+        count_at_exit = mock_heartbeat.call_count
+        time.sleep(0.05)
+        assert mock_heartbeat.call_count == count_at_exit
+
+    def test_heartbeat_during_propagates_exceptions_from_wrapped_block(self):
+        """Exceptions raised inside the wrapped block propagate, and heartbeats stop."""
+        execution = self._DummyExecution()
+
+        class CustomError(Exception):
+            pass
+
+        with pytest.raises(CustomError), execution.heartbeat_during(interval=0.01):
+            raise CustomError("boom")
+
+    def test_heartbeat_during_swallows_reporting_errors(self):
+        """A failure while emitting a heartbeat must not crash the wrapped block."""
+        execution = self._DummyExecution()
+
+        with (
+            patch.object(execution, "heartbeat", side_effect=RuntimeError("pipe closed")),
+            execution.heartbeat_during(interval=0.01),
+        ):
+            time.sleep(0.03)
+        # No exception should have propagated from the context manager despite the failures above.

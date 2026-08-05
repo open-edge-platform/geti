@@ -78,6 +78,15 @@ class Job(BaseIDModel, Generic[JobParamsT]):
                 setattr(self.params, item[0], item[1])
         self.updated_at = now_utc_ts()
 
+    def touch(self) -> None:
+        """Record that the job is still alive without changing its message or progress.
+
+        Used for heartbeat signals emitted by long-running operations that don't have
+        structured, incremental progress to report, so the stale-job monitor doesn't
+        mistakenly consider the job inactive and terminate it.
+        """
+        self.updated_at = now_utc_ts()
+
     def finish(self) -> None:
         self.status = JobStatus.DONE
         self.progress = 100.0
