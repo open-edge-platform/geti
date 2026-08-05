@@ -276,3 +276,22 @@ jobs:
             echo "- ghcr.io/open-edge-platform/geti-${DEVICE}:${DOCKER_PATCH_TAG}"
             echo ""
           } >> "${GITHUB_STEP_SUMMARY}"
+
+  promote-windows-installer:
+    needs: [validate, create-release-tag]
+    if: inputs.dry_run == false
+    name: Build release Windows MSIX (${{ matrix.device }})
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [cpu, xpu, cuda]
+    uses: ./.github/workflows/windows-installer.yml
+    with:
+      device: ${{ matrix.device }}
+      checkout_sha: ${{ needs.validate.outputs.rc_sha }} # Build from the exact promoted RC commit
+      exclude-agpl-models: true # Release installers must not bundle Ultralytics/AGPL-licensed models
+    secrets:
+      MSIX_SIGN_CERTIFICATE: ${{ secrets.MSIX_SIGN_CERTIFICATE }}
+      MSIX_SIGN_CERTIFICATE_PASSWORD: ${{ secrets.MSIX_SIGN_CERTIFICATE_PASSWORD }}
+    permissions:
+      contents: read
