@@ -189,3 +189,39 @@ class TestHeartbeat:
         ):
             time.sleep(0.03)
         # No exception should have propagated from the context manager despite the failures above.
+
+    def test_heartbeat_during_stops_emitting_once_max_duration_elapses(self):
+        """A genuinely hung block must stop being vouched for once max_duration is exceeded.
+
+        This is the safeguard against a heartbeat being emitted forever for a call that has
+        actually deadlocked/hung rather than one that's merely slow: the ceiling bounds how long
+        heartbeat_during() may keep the job looking alive without any corroborating progress.
+        """
+        execution = self._DummyExecution()
+
+        with (
+            patch.object(execution, "heartbeat") as mock_heartbeat,
+            execution.heartbeat_during(interval=0.01, max_duration=0.03),
+        ):
+            # Simulate a hung wrapped block that never returns on its own within the test window.
+            time.sleep(0.09)
+
+        count_after_ceiling = mock_heartbeat.call_count
+        assert count_after_ceiling >= 2  # some heartbeats before the ceiling was hit
+
+        # No further heartbeats should be emitted even though the (simulated hung) block kept the
+        # context open well past max_duration.
+        time.sleep(0.03)
+        assert mock_heartbeat.call_count == count_after_ceiling
+
+    def test_heartbeat_during_none_max_duration_disables_ceiling(self):
+        """Passing max_duration=None restores the old unbounded-heartbeat behavior."""
+        execution = self._DummyExecution()
+
+        with (
+            patch.object(execution, "heartbeat") as mock_heartbeat,
+            execution.heartbeat_during(interval=0.01, max_duration=None),
+        ):
+            time.sleep(0.06)
+
+        assert mock_heartbeat.call_count >= 2

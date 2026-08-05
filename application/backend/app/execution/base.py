@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import threading
+import time
 from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
@@ -16,6 +17,17 @@ from app.core.run import ExecutionContext, Runnable
 T = TypeVar("T")
 
 DEFAULT_HEARTBEAT_INTERVAL_SECONDS = 60.0
+
+# Hard ceiling on how long a single `heartbeat_during()` window may vouch for liveness without any
+# corroborating evidence of real progress. This is deliberately generous (long-running operations
+# like accuracy-aware quantization or large-dataset evaluation can legitimately run for hours), but
+# it must NOT be unbounded: a heartbeat is only a *plausible* liveness signal, not proof of actual
+# progress, so a genuinely deadlocked/hung call (stuck lock, infinite loop in a third-party
+# library, etc.) must eventually stop being vouched for. Once this ceiling is exceeded, heartbeats
+# stop, the job's `updated_at` goes stale again, and the control plane's stale-job monitor (see
+# `JobController._monitor_stale_loop`, default 1h inactivity threshold) can reclaim it -- bounding
+# the worst case to roughly `max_duration + stale_threshold`.
+DEFAULT_HEARTBEAT_MAX_DURATION_SECONDS = 6 * 3600.0
 
 
 def step(name: str, complete: float = 0.0) -> Callable[[Callable[..., T]], Callable[..., T]]:
@@ -132,21 +144,49 @@ class Execution(Runnable, ABC, Generic[JobParamsT]):
             self._ctx.heartbeat()
 
     @contextmanager
-    def heartbeat_during(self, interval: float = DEFAULT_HEARTBEAT_INTERVAL_SECONDS) -> Iterator[None]:
+    def heartbeat_during(
+        self,
+        interval: float = DEFAULT_HEARTBEAT_INTERVAL_SECONDS,
+        max_duration: float | None = DEFAULT_HEARTBEAT_MAX_DURATION_SECONDS,
+    ) -> Iterator[None]:
         """Emit periodic heartbeats on a background thread for the duration of the context.
 
         Wrap blocking calls that offer no progress-reporting hooks (such as third-party library
         calls) with this context manager so the job control plane keeps seeing signs of life and
         doesn't mistake a slow-but-working operation for a stale/hung job.
 
+        A heartbeat is a *plausible* liveness signal, not proof of real progress: it only proves
+        the background thread scheduled a tick, not that the wrapped call is actually advancing.
+        To guard against vouching for a genuinely deadlocked/hung call forever, heartbeats stop
+        being emitted once ``max_duration`` has elapsed, even if the wrapped block hasn't returned
+        yet. This surfaces a warning and lets the job go stale again, so the control plane's
+        stale-job monitor can eventually reclaim it instead of trusting an indefinite heartbeat.
+
         Args:
             interval: Seconds between heartbeats. Should be comfortably below the stale-job
                 monitor's inactivity threshold to leave margin for scheduling jitter.
+            max_duration: Hard ceiling, in seconds, on how long heartbeats may be emitted for this
+                context. Pass ``None`` to disable the ceiling (heartbeat for as long as the block
+                runs); this should only be used when the wrapped call has its own independent
+                liveness/timeout guarantees.
         """
         stop_event = threading.Event()
 
         def _beat() -> None:
+            start = time.monotonic()
+            ceiling_logged = False
             while not stop_event.wait(interval):
+                if max_duration is not None and (time.monotonic() - start) >= max_duration:
+                    if not ceiling_logged:
+                        logger.warning(
+                            "heartbeat_during() reached its {}s max_duration ceiling without the "
+                            "wrapped block completing; no further heartbeats will be emitted, and "
+                            "this job may now be reclaimed by the stale-job monitor if it is "
+                            "genuinely hung.",
+                            max_duration,
+                        )
+                        ceiling_logged = True
+                    continue
                 try:
                     self.heartbeat()
                 except Exception:
