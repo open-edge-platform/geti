@@ -92,7 +92,7 @@ index bf1c33a..2f9f3e7 100644
          env.wasm.wasmPaths = this.params.wasmRoot;
          env.wasm.simd = true;
          // Suppress expected "some nodes not assigned to WebGPU EP" warnings —
-diff --git a/b/src/utils/wasm-utils.tauri.ts b/src/utils/wasm-utils.tauri.ts
+diff --git a/src/utils/wasm-utils.tauri.ts b/src/utils/wasm-utils.tauri.ts
 new file mode 100644
 index 0000000..ec40978
 --- /dev/null

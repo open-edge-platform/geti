@@ -43,6 +43,13 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
 - Upstream (`geti_v2`) is archived, so fixes are kept as unified diffs in
   `patches/`, re-applied by `npm run patch-geti-ui-packages` after each clone.
   Change a vendored package by updating its patch, not the cloned file.
+- The patch script must invoke `git --git-dir=.no-git apply`. `git apply` run from
+  a subdirectory of a repo silently **skips** every patch path that doesn't start
+  with that subdirectory's prefix — printing `Skipped patch '...'` and exiting `0`.
+  Since the patch paths are package-relative, a plain `git apply` is a silent no-op
+  here and the fix never reaches the build. Pointing `--git-dir` at a non-existent
+  directory makes git treat the CWD as the top level, which is also what the
+  (repo-less) Docker build sees.
 
 ## Data Fetching & API Types
 
