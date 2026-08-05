@@ -39,5 +39,5 @@ description: Develop and validate changes in `application/ui/` for the React and
 
 ## Coordination Notes
 
-- The `preinstall` script clones pinned Geti UI workspace packages into `packages/`; do not edit those generated packages.
+- The `preinstall` script clones pinned Geti UI workspace packages into `packages/`; do not edit those generated packages. Fixes belong in `application/ui/patches/`, re-applied by `npm run patch-geti-ui-packages`.
 - Keep generated API artifacts and the consuming UI changes in the same change set when the contract changes.

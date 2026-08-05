@@ -8,6 +8,11 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
 
 - React 19 + TypeScript single-page app, bundled with RSBuild.
 - Also packaged as a desktop app via Tauri (`src-tauri/`).
+- `additionalBrowserArgs` (`src-tauri/tauri.conf.json`) _replaces_ wry's default
+  `--disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection`, so that flag has
+  to be repeated there. Leave WebGPU on the Windows-native D3D12 backend — do not
+  re-add `--enable-features=Vulkan`, as hosts without a Vulkan ICD then find no
+  adapter and silently fall back to the much slower CPU EP.
 - Node `>=24.2.0`, npm `>=11.14.0`.
 - Talks to the `geti` backend through a generated, typed API client.
 
@@ -35,6 +40,9 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
 - `packages/config`, `packages/smart-tools`, and `packages/ui` are cloned by the
   `preinstall` / `npm run clone-geti-ui-packages` hook.
 - **Do not edit these locally** — they are overwritten on install.
+- Upstream (`geti_v2`) is archived, so fixes are kept as unified diffs in
+  `patches/`, re-applied by `npm run patch-geti-ui-packages` after each clone.
+  Change a vendored package by updating its patch, not the cloned file.
 
 ## Data Fetching & API Types
 
