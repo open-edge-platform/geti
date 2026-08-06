@@ -14,7 +14,7 @@ jobs:
   check-weights-urls:
     name: Check pretrained weights URLs
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 60
     permissions:
       contents: read
     outputs:
