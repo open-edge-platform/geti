@@ -5,11 +5,15 @@
 
 from typing import Annotated
 
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.api.dependencies import get_license_service
 from app.api.schemas.license import LicenseAcceptResponse
 from app.services.license_service import LicenseService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/license", tags=["License"])
 
@@ -22,8 +26,9 @@ async def accept_license(
     try:
         license_service.accept()
     except OSError as exc:
+        logger.error("Failed to persist license consent: %s", exc)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Could not persist license consent: {exc}",
+            detail="Could not persist license consent due to an internal server error.",
         ) from exc
     return LicenseAcceptResponse(license_accepted=True)
