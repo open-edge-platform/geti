@@ -142,6 +142,7 @@ FROM node:24-alpine3.22@sha256:191c9f0080fcbbc6547a85dc0ff7988072214a355aabdc1d2
 WORKDIR /home/application/ui/
 RUN apk add --no-cache git=2.49.1-r0
 COPY --link application/ui/package.json ./
+COPY --link application/ui/patches/ ./patches/
 RUN npm run clone-geti-ui-packages
 
 #############
