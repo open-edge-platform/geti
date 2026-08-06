@@ -130,12 +130,13 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
         REMOVE_FLAG="--rm"
     fi
 
+    HOST_IP=$(just resolve-host-ip)
     COTURN_ENV=""
     if [[ "{{ enable_coturn }}" == "true" ]]; then
         if [[ -n "{{ coturn_host }}" ]]; then
             COTURN_HOST="{{ coturn_host }}"
         else
-            COTURN_HOST=$(just resolve-host-ip)
+            COTURN_HOST="$HOST_IP"
         fi
         COTURN_ENV="--env COTURN_HOST=$COTURN_HOST --env COTURN_PORT={{ coturn_port }}"
     fi
@@ -154,8 +155,6 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
     if [[ -n "{{ keyfile }}" ]]; then
         KEYFILE_ENV="--env KEYFILE={{ keyfile }}"
     fi
-
-    HOST_IP=$(just resolve-host-ip)
 
     # For XPU acceleration, we need to pass through the appropriate render device and group permissions
     extra_render_args=()
