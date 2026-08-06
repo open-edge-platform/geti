@@ -28,6 +28,8 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        with:
+          persist-credentials: false
 
       - name: Probe pretrained weights URLs
         id: probe
@@ -141,7 +143,7 @@ jobs:
             core.info(`Found ${issues.data.length} open issue(s) with matching labels`);
 
             const matchingIssues = issues.data.filter(i =>
-              i.title.includes('[Weights Health Check]')
+              i.title.includes('[Weights URL health check]')
             );
             if (matchingIssues.length > 0) {
               core.info(`Found ${matchingIssues.length} matching issue(s):`);
@@ -185,19 +187,6 @@ jobs:
             const table = rows.length > 0
               ? `| Model | URL | HTTP Status |\n|-------|-----|-------------|\n${tableRows}`
               : `_No structured failure data — see the [workflow run](${workflowRunUrl}) for details._`;
-
-            // Ensure the weights-health label exists (creates it on first run)
-            try {
-              await github.rest.issues.createLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: 'weights-health',
-                color: 'e4e669',
-                description: 'Pretrained weights URL health check failures',
-              });
-            } catch (e) {
-              if (e.status !== 422) throw e; // 422 = label already exists
-            }
 
             const body = [
               '## Bug Report',
