@@ -57,8 +57,8 @@ jobs:
             else
               printf 'FAIL %-45s  http=%s  %.2fs  %s\n' \
                 "$model_name" "$code" "$time_s" "$url"
-              printf '%s\t%s\t%s\t%s\n' "$model_id" "$model_name" "$url" "$code" \
-                >> /tmp/failures.tsv
+              { flock 9; printf '%s\t%s\t%s\t%s\n' "$model_id" "$model_name" "$url" "$code" \
+                >> /tmp/failures.tsv; } 9>/tmp/failures.lock
             fi
           }
           export -f probe_url
@@ -89,7 +89,7 @@ jobs:
                    xargs yq -r '[.id, .name, .pretrained_weights.url] | @tsv')
           wait
 
-          FAILED=$(wc -l < /tmp/failures.tsv 2>/dev/null || echo 0)
+          FAILED=$(wc -l < /tmp/failures.tsv 2>/dev/null | tr -d '[:space:]' || echo 0)
           echo "Probed ${TOTAL} URL(s): $(( TOTAL - FAILED )) OK, ${FAILED} failed"
 
           if [[ -s /tmp/failures.tsv ]]; then
