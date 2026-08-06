@@ -6,8 +6,7 @@ description: Develop and validate changes in `application/ui/` for the React and
 # Geti UI Development
 
 > For the full architecture reference (feature-folder layout, data fetching,
-> and generated API types) read
-> [`application/ui/AGENTS.md`](../../../application/ui/AGENTS.md).
+> and generated API types) read the `application/ui/AGENTS.md` file.
 
 ## Quick Start
 
