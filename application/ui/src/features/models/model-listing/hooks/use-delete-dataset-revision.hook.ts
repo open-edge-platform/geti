@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { $api } from '@/api';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { $api } from '../../../../api/client';
 import { getQueryKey } from '../../../../query-client/query-client';
 
 export const useDeleteDatasetRevision = () => {

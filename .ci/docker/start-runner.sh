@@ -1,7 +1,7 @@
 #!/bin/bash
 
 GPU_ID="all"
-VER_CUDA="12.1.0"
+VER_CUDA="12.9.2"
 TAG_RUNNER="latest"
 ADDITIONAL_LABELS=""
 MOUNT_PATH=""
@@ -185,7 +185,7 @@ echo "Successfully started ci container - $CONTAINER_NAME"
 docker exec -it "$CONTAINER_NAME" bash -c \
     "./config.sh  \
     --unattended \
-    --url https://github.com/open-edge-platform/training_extensions \
+    --url https://github.com/open-edge-platform/geti \
     --token $GITHUB_TOKEN \
     --name $CONTAINER_NAME \
     --labels $LABELS \

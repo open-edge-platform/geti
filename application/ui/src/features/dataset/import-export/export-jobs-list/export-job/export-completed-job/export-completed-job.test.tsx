@@ -1,6 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { ExportDatasetJob } from '@/api/types';
 import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { getMockedProject } from 'mocks/mock-project';
@@ -9,7 +10,6 @@ import { render } from 'test-utils/render';
 
 import { getMockedJobExportJob } from '../../../../../../../mocks/mock-job';
 import { http } from '../../../../../../api/utils';
-import { ExportDatasetJob } from '../../../../../../constants/shared-types';
 import { server } from '../../../../../../msw-node-setup';
 import { downloadFile } from '../../../../../../shared/util';
 import { ExportCompletedJob } from './export-completed-job.component';

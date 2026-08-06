@@ -1,0 +1,5 @@
+@use '../../../../shared/styles/line-clamp' as lineClamp;
+
+.selectedRow {
+    @include lineClamp.clamp(3);
+}

@@ -3,13 +3,13 @@
 
 from .config import LogConfig
 from .handlers import InterceptHandler
-from .setup import setup_logging, setup_uvicorn_logging
+from .setup import setup_hypercorn_logging, setup_logging
 from .utils import logging_ctx
 
 __all__ = [
     "InterceptHandler",
     "LogConfig",
     "logging_ctx",
+    "setup_hypercorn_logging",
     "setup_logging",
-    "setup_uvicorn_logging",
 ]

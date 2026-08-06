@@ -5,6 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import type { AnnotationDTO } from '@/api/types';
 import { NetworkFixture } from '@msw/playwright';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { getMockedMediaImage, getMockedVideo, getMultipleMockedMediaImage } from 'mocks/mock-media';
@@ -13,7 +14,6 @@ import { HttpResponse } from 'msw';
 import { v4 as uuid } from 'uuid';
 
 import { SchemaProjectView } from '../../src/api/openapi-spec';
-import { AnnotationDTO } from '../../src/constants/shared-types';
 import { expect, http, test } from '../fixtures';
 
 const mockedItems = getMultipleMockedMediaImage(40, '1');

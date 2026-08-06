@@ -3,10 +3,10 @@
 
 import { useEffect, useRef } from 'react';
 
+import type { Label } from '@/api/types';
 import { useSizeHook } from 'hooks/use-size.hook';
 import useVirtual from 'react-cool-virtual';
 
-import { type Label } from '../../../../../../constants/shared-types';
 import type { AnnotatorMode } from '../../../../../../shared/annotator/annotator-mode';
 import { useVideoPlayer } from '../../../video-player-provider.component';
 import { VideoFrameSegments } from './video-frame-segment/video-frame-segments.component';

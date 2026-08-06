@@ -3,7 +3,8 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
-import { type TrainingConfiguration } from '../../../../../../constants/shared-types';
+import type { TrainingConfiguration } from '@/api/types';
+
 import { Accordion } from '../../components/accordion/accordion.component';
 import { DataAugmentationParametersList } from './data-augmentation-parameters-list.component';
 import { DataAugmentationConfigurationParameters, isDataAugmentationEnabled } from './utils';

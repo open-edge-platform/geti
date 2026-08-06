@@ -74,7 +74,7 @@ test.describe('Subset Gallery — read-only dialog', () => {
             http.get('/api/projects/{project_id}/dataset_revisions', () => HttpResponse.json([mockedDatasetRevision])),
             http.get('/api/projects/{project_id}/dataset_revisions/{dataset_revision_id}/items', ({ request }) => {
                 const url = new URL(request.url);
-                const subset = url.searchParams.get('subset');
+                const subset = url.searchParams.get('subsets');
                 const items = subset === 'training' ? [mockedTrainingItem] : [];
 
                 return HttpResponse.json({

@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB, PipelineDB
 from app.models import DatasetItemAnnotationStatus, DatasetItemSubset, Pipeline, Project, Video
-from app.models.media import ImageFormat, MediaType, VideoFormat
+from app.models.media import ImageFormat, MediaSortBy, MediaType, SortDirection, VideoFormat
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters, MediaService
 
@@ -517,6 +517,40 @@ def fxt_project_with_subset_items(fxt_project_with_pipeline, db_session) -> tupl
     db_session.flush()
 
     return project, db_dataset_items
+
+
+@pytest.fixture
+def fxt_project_with_media_at_distinct_dates(fxt_project_with_pipeline, db_session) -> tuple[Project, list[MediaDB]]:
+    """Fixture with three images uploaded on distinct, known dates (test1 oldest, test3 newest)."""
+    project, _ = fxt_project_with_pipeline
+
+    db_media_list = [
+        MediaDB(
+            type="image",
+            name=name,
+            format="jpg",
+            size=1024,
+            width=1024,
+            height=768,
+            project_id=str(project.id),
+        )
+        for name in ("test1", "test2", "test3")
+    ]
+    db_session.add_all(db_media_list)
+    db_session.flush()
+    for db_media, created_at in zip(
+        db_media_list,
+        [
+            datetime.fromisoformat("2025-02-01T00:00:00Z"),
+            datetime.fromisoformat("2025-02-02T00:00:00Z"),
+            datetime.fromisoformat("2025-02-03T00:00:00Z"),
+        ],
+    ):
+        db_media.created_at = created_at
+    db_session.add_all(db_media_list)
+    db_session.flush()
+
+    return project, db_media_list
 
 
 @pytest.fixture
@@ -1073,6 +1107,44 @@ class TestMediaServiceIntegration:
 
         assert len(media_list) == count
 
+    @pytest.mark.parametrize(
+        "sort_direction, expected_order",
+        [
+            (None, ["test3", "test2", "test1"]),
+            (SortDirection.DESC, ["test3", "test2", "test1"]),
+            (SortDirection.ASC, ["test1", "test2", "test3"]),
+        ],
+    )
+    def test_list_media_sort_direction(
+        self,
+        fxt_media_service: MediaService,
+        fxt_project_with_media_at_distinct_dates: tuple[Project, list[MediaDB]],
+        sort_direction: SortDirection | None,
+        expected_order: list[str],
+    ) -> None:
+        """Test listing media ordered by upload date, ascending and descending."""
+        project, _ = fxt_project_with_media_at_distinct_dates
+
+        filters = MediaFilters() if sort_direction is None else MediaFilters(sort_direction=sort_direction)
+        media_list = fxt_media_service.list_media(project_id=project.id, filters=filters)
+
+        assert [media.name for media in media_list] == expected_order
+
+    def test_list_media_sort_by_and_sort_direction_combined(
+        self,
+        fxt_media_service: MediaService,
+        fxt_project_with_media_at_distinct_dates: tuple[Project, list[MediaDB]],
+    ) -> None:
+        """Test sorting by specified sort_by and sort_direction."""
+        project, _ = fxt_project_with_media_at_distinct_dates
+
+        media_list = fxt_media_service.list_media(
+            project_id=project.id,
+            filters=MediaFilters(sort_by=MediaSortBy.UPLOAD_DATE, sort_direction=SortDirection.ASC),
+        )
+
+        assert [media.name for media in media_list] == ["test1", "test2", "test3"]
+
     def test_get_media_by_id(
         self,
         fxt_media_service: MediaService,
@@ -1557,23 +1629,24 @@ class TestMediaServiceIntegration:
         "subset, expected_count",
         [
             (None, 8),  # All items
-            ("unassigned", 2),  # 2 unassigned items
-            ("training", 3),  # 3 training items
-            ("validation", 2),  # 2 validation items
-            ("testing", 1),  # 1 testing item
+            (["unassigned"], 2),  # 2 unassigned items
+            (["training"], 3),  # 3 training items
+            (["validation"], 2),  # 2 validation items
+            (["testing"], 1),  # 1 testing item
+            (["training", "validation"], 5),  # 3 training + 2 validation items
         ],
     )
     def test_count_media_with_subset(
         self,
         fxt_media_service: MediaService,
         fxt_project_with_subset_items: tuple[Project, list[DatasetItemDB]],
-        subset: str | None,
+        subset: list[str] | None,
         expected_count: int,
     ) -> None:
         """Test counting media with subset filter."""
         project, db_dataset_items = fxt_project_with_subset_items
 
-        count = fxt_media_service.count_media(project=project, subset=subset)
+        count = fxt_media_service.count_media(project=project, subsets=subset)
 
         assert count == expected_count
 
@@ -1593,17 +1666,18 @@ class TestMediaServiceIntegration:
                     "testing1",
                 ],
             ),
-            ("unassigned", ["unassigned1", "unassigned2"]),
-            ("training", ["training1", "training2", "training3"]),
-            ("validation", ["validation1", "validation2"]),
-            ("testing", ["testing1"]),
+            (["unassigned"], ["unassigned1", "unassigned2"]),
+            (["training"], ["training1", "training2", "training3"]),
+            (["validation"], ["validation1", "validation2"]),
+            (["testing"], ["testing1"]),
+            (["validation", "testing"], ["validation1", "validation2", "testing1"]),
         ],
     )
     def test_list_media_with_subset(
         self,
         fxt_media_service: MediaService,
         fxt_project_with_subset_items: tuple[Project, list[DatasetItemDB]],
-        subset: str | None,
+        subset: list[str] | None,
         expected_names: list[str],
     ) -> None:
         """Test listing media with subset filter."""
@@ -1614,7 +1688,7 @@ class TestMediaServiceIntegration:
             filters=MediaFilters(
                 limit=20,
                 offset=0,
-                subset=subset,
+                subsets=subset,
             ),
         )
 
@@ -1625,20 +1699,20 @@ class TestMediaServiceIntegration:
     @pytest.mark.parametrize(
         "subset, limit, offset, expected_count",
         [
-            ("unassigned", 1, 0, 1),  # First page of unassigned
-            ("unassigned", 1, 1, 1),  # Second page of unassigned
-            ("unassigned", 1, 2, 0),  # Beyond available unassigned items
-            ("training", 2, 0, 2),  # First page of training
-            ("training", 2, 2, 1),  # Second page of training (only 1 left)
-            ("validation", 10, 0, 2),  # All validation items
-            ("testing", 10, 0, 1),  # All testing items
+            (["unassigned"], 1, 0, 1),  # First page of unassigned
+            (["unassigned"], 1, 1, 1),  # Second page of unassigned
+            (["unassigned"], 1, 2, 0),  # Beyond available unassigned items
+            (["training"], 2, 0, 2),  # First page of training
+            (["training"], 2, 2, 1),  # Second page of training (only 1 left)
+            (["validation"], 10, 0, 2),  # All validation items
+            (["testing"], 10, 0, 1),  # All testing items
         ],
     )
     def test_list_media_with_subset_pagination(
         self,
         fxt_media_service: MediaService,
         fxt_project_with_subset_items: tuple[Project, list[DatasetItemDB]],
-        subset: str | None,
+        subset: list[str] | None,
         limit: int,
         offset: int,
         expected_count: int,
@@ -1651,7 +1725,7 @@ class TestMediaServiceIntegration:
             filters=MediaFilters(
                 limit=limit,
                 offset=offset,
-                subset=subset,
+                subsets=subset,
             ),
         )
 
@@ -1671,7 +1745,7 @@ class TestMediaServiceIntegration:
             filters=MediaFilters(
                 limit=20,
                 offset=0,
-                subset="unassigned",
+                subsets=["unassigned"],
             ),
         )
         assert len(unassigned_items) == 2
@@ -1682,7 +1756,7 @@ class TestMediaServiceIntegration:
             filters=MediaFilters(
                 limit=20,
                 offset=0,
-                subset="training",
+                subsets=["training"],
             ),
         )
         assert len(training_items) == 3
@@ -1693,7 +1767,7 @@ class TestMediaServiceIntegration:
             filters=MediaFilters(
                 limit=20,
                 offset=0,
-                subset="validation",
+                subsets=["validation"],
             ),
         )
         assert len(validation_items) == 2
@@ -1704,10 +1778,21 @@ class TestMediaServiceIntegration:
             filters=MediaFilters(
                 limit=20,
                 offset=0,
-                subset="testing",
+                subsets=["testing"],
             ),
         )
         assert len(testing_items) == 1
+
+        # Multiple subsets should return the union of matching items
+        training_and_testing_items = fxt_media_service.list_media(
+            project_id=project.id,
+            filters=MediaFilters(
+                limit=20,
+                offset=0,
+                subsets=["training", "testing"],
+            ),
+        )
+        assert len(training_and_testing_items) == 4
 
     def test_save_video_frame(
         self,

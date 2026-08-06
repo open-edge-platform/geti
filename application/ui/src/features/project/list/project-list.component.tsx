@@ -3,12 +3,16 @@
 
 import { Suspense, useMemo, useState } from 'react';
 
-import { Content, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
+import { Content, Divider, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
+import { partition } from 'lodash-es';
 
 import { version } from '../../../../package.json';
-import { isNonEmptyArray } from '../../../shared/util';
+import { isNonEmptyArray, pluralize } from '../../../shared/util';
 import { EmptyProjectList } from './empty-project-list/empty-project-list.component';
+import { NoMatchingProjects } from './filter-projects/no-matching-projects.component';
+import { ProjectFilters } from './filter-projects/project-filters.component';
+import { useProjectFilters } from './filter-projects/use-project-filters.hook';
 import { ImportJobsList } from './import-jobs-list/import-jobs-list.component';
 import { NewProjectCard } from './new-project-card/new-project-card.component';
 import { ProjectCard } from './project-card.component';
@@ -19,43 +23,103 @@ import backgroundStyles from '../project-background.module.scss';
 import classes from './project-list.module.scss';
 
 const ProjectGrid = () => {
-    const projects = useProjects();
+    const projectsQuery = useProjects();
+    const projects = projectsQuery.data;
     const [sortBy, setSortBy] = useState<SortBy>('createdAt-descending');
-    const hasProjects = isNonEmptyArray(projects.data);
+    const hasProjects = isNonEmptyArray(projects);
+
+    const [[activeProject], projectsWithoutActivePipeline] = partition(projects, (project) => project.active_pipeline);
+
+    const shouldShowFilters = projectsWithoutActivePipeline.length > 0;
+
+    const { searchName, setSearchName, selectedTaskTypes, setSelectedTaskTypes, filteredProjects, isFiltering } =
+        useProjectFilters(projectsWithoutActivePipeline);
 
     const sortedProjects = useMemo(() => {
-        return SORT_BY_HANDLERS[sortBy](projects.data);
-    }, [projects.data, sortBy]);
+        return SORT_BY_HANDLERS[sortBy](filteredProjects);
+    }, [filteredProjects, sortBy]);
 
-    const projectNames = projects.data.map((project) => project.name);
+    const projectNames = projectsQuery.data.map((project) => project.name);
 
     if (!hasProjects) {
         return <EmptyProjectList />;
     }
 
-    return (
-        <Flex direction={'column'} gap={'size-100'} height={'100%'}>
-            <SortProjects sortBy={sortBy} onSort={setSortBy} />
+    const matchCountLabel = `${sortedProjects.length} of ${projectsWithoutActivePipeline.length} ${pluralize(
+        projectsWithoutActivePipeline.length,
+        'project',
+        'projects'
+    )}`;
 
-            <Grid
-                flex={1}
-                gap={'size-300'}
-                autoRows={'size-2000'}
-                justifyContent={'center'}
-                UNSAFE_style={{ overflowY: 'auto' }}
-                columns={['1fr', '1fr']}
-            >
+    const totalCountLabel = `${projectsWithoutActivePipeline.length} ${pluralize(
+        projectsWithoutActivePipeline.length,
+        'project',
+        'projects'
+    )}`;
+
+    const columns = activeProject === undefined ? ['1fr'] : ['1fr', '1fr'];
+
+    return (
+        <Flex direction={'column'} gap={'size-300'} height={'100%'}>
+            <Divider size={'S'} />
+            <Grid columns={columns} gap={'size-300'} rows={['size-2000']}>
                 <NewProjectCard />
 
-                {sortedProjects.map((item, index) => (
+                {activeProject !== undefined && (
                     <ProjectCard
-                        key={item.id}
-                        item={item}
-                        prioritizeImage={index === 0}
-                        projectNames={projectNames.filter((projectName) => projectName !== item.name)}
+                        item={activeProject}
+                        prioritizeImage
+                        projectNames={projectNames.filter((projectName) => projectName !== activeProject.name)}
                     />
-                ))}
+                )}
             </Grid>
+            {shouldShowFilters && (
+                <>
+                    <Divider size={'S'} />
+
+                    <Flex width={'100%'} gap={'size-200'}>
+                        <SortProjects sortBy={sortBy} onSort={setSortBy} />
+
+                        <Divider size={'S'} orientation={'vertical'} />
+
+                        <Flex flex={1} alignItems={'center'} gap={'size-200'}>
+                            <Text UNSAFE_className={classes.projectMetadata}>
+                                {isFiltering ? matchCountLabel : totalCountLabel}
+                            </Text>
+
+                            <ProjectFilters
+                                searchName={searchName}
+                                onSearchChange={setSearchName}
+                                selectedTaskTypes={selectedTaskTypes}
+                                onSelectedTaskTypesChange={setSelectedTaskTypes}
+                            />
+                        </Flex>
+                    </Flex>
+                </>
+            )}
+            {sortedProjects.length === 0 ? (
+                isFiltering ? (
+                    <NoMatchingProjects />
+                ) : null
+            ) : (
+                <Grid
+                    flex={1}
+                    gap={'size-300'}
+                    autoRows={'size-2000'}
+                    justifyContent={'center'}
+                    UNSAFE_style={{ overflowY: 'auto' }}
+                    columns={['1fr', '1fr']}
+                >
+                    {sortedProjects.map((item, index) => (
+                        <ProjectCard
+                            key={item.id}
+                            item={item}
+                            prioritizeImage={index === 0}
+                            projectNames={projectNames.filter((projectName) => projectName !== item.name)}
+                        />
+                    ))}
+                </Grid>
+            )}
         </Flex>
     );
 };

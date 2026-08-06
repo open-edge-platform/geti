@@ -18,6 +18,7 @@ from app.api.schemas.test_result import TestResult
 from app.models import Source
 from app.services import (
     ResourceInUseError,
+    ResourceValidationError,
     ResourceWithIdAlreadyExistsError,
     ResourceWithNameAlreadyExistsError,
     SourceUpdateService,
@@ -109,7 +110,11 @@ def create_source(
     ],
     source_update_service: Annotated[SourceUpdateService, Depends(get_source_update_service)],
 ) -> SourceView:
-    """Create and configure a new source"""
+    """Create and configure a new source.
+
+    Returns 422 if the request body fails validation, or if the source configuration
+    is well-formed but not reachable (e.g. missing video file, unreachable camera).
+    """
     try:
         source = source_update_service.create_source(
             name=source_create.name,
@@ -120,6 +125,8 @@ def create_source(
         return SourceViewAdapter.validate_python(source, from_attributes=True)
     except (ResourceWithNameAlreadyExistsError, ResourceWithIdAlreadyExistsError) as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    except ResourceValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
 
 
 @router.get(
@@ -169,7 +176,12 @@ def update_source(
     ],
     source_update_service: Annotated[SourceUpdateService, Depends(get_source_update_service)],
 ) -> SourceView:
-    """Reconfigure an existing source"""
+    """Reconfigure an existing source.
+
+    Returns 422 if the request body fails validation, or if the updated source
+    configuration is well-formed but not reachable (e.g. missing video file,
+    unreachable camera).
+    """
     if "source_type" in source_config:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="The 'source_type' field cannot be changed")
 
@@ -186,6 +198,8 @@ def update_source(
         return SourceViewAdapter.validate_python(source, from_attributes=True)
     except ResourceWithNameAlreadyExistsError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    except ResourceValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
 
 
 @router.post(
@@ -244,6 +258,8 @@ def import_source(
     except (ResourceWithNameAlreadyExistsError, ResourceWithIdAlreadyExistsError) as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     except ValidationError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
+    except ResourceValidationError as e:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e))
 
 

@@ -7,15 +7,14 @@ import pytest
 from fastapi import status
 
 from app.api.dependencies import get_ice_servers, get_webrtc_manager
-from app.main import app
 from app.models.webrtc import Answer, InputData, Offer
 from app.webrtc.manager import WebRTCManager
 
 
 @pytest.fixture
-def fxt_webrtc_manager():
+def fxt_webrtc_manager(fxt_app):
     webrtc_manager = MagicMock(spec=WebRTCManager)
-    app.dependency_overrides[get_webrtc_manager] = lambda: webrtc_manager
+    fxt_app.dependency_overrides[get_webrtc_manager] = lambda: webrtc_manager
     return webrtc_manager
 
 
@@ -62,14 +61,14 @@ class TestWebRTCEndpoints:
         resp = fxt_client.post("/api/webrtc/input_hook", json={"wrong": "field"})
         assert resp.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
 
-    def test_get_webrtc_config_empty(self, fxt_client):
-        app.dependency_overrides[get_ice_servers] = lambda: []  # noqa: PIE807
+    def test_get_webrtc_config_empty(self, fxt_app, fxt_client):
+        fxt_app.dependency_overrides[get_ice_servers] = lambda: []  # noqa: PIE807
         resp = fxt_client.get("/api/webrtc/config")
         assert resp.status_code == status.HTTP_200_OK
         assert resp.json() == {"iceServers": []}
 
-    def test_get_webrtc_config_with_servers(self, fxt_client):
-        app.dependency_overrides[get_ice_servers] = lambda: [
+    def test_get_webrtc_config_with_servers(self, fxt_app, fxt_client):
+        fxt_app.dependency_overrides[get_ice_servers] = lambda: [
             {"urls": "turn:192.168.1.100:443?transport=tcp", "username": "user", "credential": "password"},
             {"urls": "stun:stun.example.com:3478"},
         ]

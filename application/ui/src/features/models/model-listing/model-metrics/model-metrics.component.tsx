@@ -1,9 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Evaluation } from '@/api/types';
 import { Flex, Loading, Text } from '@geti-ui/ui';
 
-import type { Evaluation } from '../../../../constants/shared-types';
 import { useGetModelTrainingMetrics } from '../../hooks/api/use-get-model-training-metrics.hook';
 import { ModelEvaluations } from './model-evaluations.component';
 import { ModelMetricsGraphs } from './model-metrics-graphs.component';

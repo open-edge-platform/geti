@@ -3,9 +3,9 @@
 
 import { useEffect, useRef } from 'react';
 
+import type { Media } from '@/api/types';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import type { Media } from '../../../constants/shared-types';
 import { isVideo, isVideoFrame } from '../../../shared/media-item-utils';
 import { getMediaBinaryUrl } from '../../../shared/media-url.utils';
 import { VideoFrame } from '../video-player/video-frame.component';
