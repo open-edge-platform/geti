@@ -15,7 +15,6 @@ docker-run-args := "--env http_proxy --env https_proxy --env no_proxy --env HTTP
 webrtc-ports := "50100-50109"
 coturn-port := "443"
 coturn-image := "quay.io/coturn/coturn"
-host-ip := `uv run python -c "import socket; s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(s.getsockname()[0]); s.close()"`
 data-volume := application-name + "-data"
 logs-volume := application-name + "-logs"
 
@@ -23,7 +22,7 @@ logs-volume := application-name + "-logs"
 [arg("accelerator", long="accelerator", short="a", pattern="cpu|xpu|cuda")]
 [arg("tag", long="tag", short="t")]
 [arg("exclude-agpl-models", long="exclude-agpl-models", value="true", help="Exclude Ultralytics and other AGPL-licensed models from the image")]
-build-image accelerator="cpu" tag="latest" exclude-agpl-models="false": install-uv
+build-image accelerator="cpu" tag="latest" exclude-agpl-models="false":
     #!/usr/bin/env bash
     set -euo pipefail
 
@@ -131,22 +130,12 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
         REMOVE_FLAG="--rm"
     fi
 
-    # Resolve Python interpreter
-    if command -v uv > /dev/null && uv run python --version > /dev/null 2>&1; then
-        PYTHON="uv run python"
-    elif command -v python3 > /dev/null; then
-        PYTHON="python3"
-    else
-        echo "Error: No Python interpreter found. Run 'just install-uv' to install it through uv." >&2
-        exit 1
-    fi
-
     COTURN_ENV=""
     if [[ "{{ enable_coturn }}" == "true" ]]; then
         if [[ -n "{{ coturn_host }}" ]]; then
             COTURN_HOST="{{ coturn_host }}"
         else
-            COTURN_HOST=`$PYTHON -c "import socket; s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(s.getsockname()[0]); s.close()"`
+            COTURN_HOST=$(just resolve-host-ip)
         fi
         COTURN_ENV="--env COTURN_HOST=$COTURN_HOST --env COTURN_PORT={{ coturn_port }}"
     fi
@@ -166,7 +155,7 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
         KEYFILE_ENV="--env KEYFILE={{ keyfile }}"
     fi
 
-    HOST_IP=$($PYTHON -c "import socket; s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(s.getsockname()[0]); s.close()")
+    HOST_IP=$(just resolve-host-ip)
 
     # For XPU acceleration, we need to pass through the appropriate render device and group permissions
     extra_render_args=()
@@ -312,14 +301,17 @@ tauri-build:
 
 # run coturn server
 run-coturn:
-    @echo "Running coturn server on port {{ coturn-port }} with external IP {{ host-ip }}..."
-    @docker run --rm --detach \
+    #!/usr/bin/env bash
+    set -euo pipefail
+    HOST_IP=$(just resolve-host-ip)
+    echo "Running coturn server on port {{ coturn-port }} with external IP ${HOST_IP}..."
+    docker run --rm --detach \
         --network=host \
         --name coturn-server \
         {{ coturn-image }} \
         -n \
         --listening-port={{ coturn-port }} \
-        --external-ip={{ host-ip }} \
+        --external-ip="${HOST_IP}" \
         --user=user:password \
         --realm=my-realm \
         --no-udp \
