@@ -8,7 +8,7 @@ on:
     - cron: "0 4 * * *" # 04:00 UTC daily, after the main daily.yml at 02:00
   workflow_dispatch:
 
-permissions: {}
+permissions: {} # No permissions by default on workflow level
 
 jobs:
   check-weights-urls:
@@ -65,7 +65,7 @@ jobs:
           probe_url "__self_test__" "[self-test]" \
             "https://storage.googleapis.com/rfdetr/this-file-does-not-exist-geti-ci-test.pth"
           if ! grep -q "__self_test__" /tmp/failures.tsv 2>/dev/null; then
-            echo "::error::Self-test failed — probe_url did not detect a broken URL"
+            echo "::error::Self-test failed: probe_url did not detect a broken URL"
             exit 1
           fi
           : > /tmp/failures.tsv  # clear self-test entry before real probing
@@ -94,7 +94,7 @@ jobs:
             echo "failure_count=${FAILED}" >> "$GITHUB_OUTPUT"
             { echo "failures<<EOF"; cat /tmp/failures.tsv; echo "EOF"; } >> "$GITHUB_OUTPUT"
             {
-              echo "## :x: Pretrained Weights URL Health Check — ${FAILED} failure(s)"
+              echo "## :x: Pretrained weights URL health check: ${FAILED} failure(s)"
               echo ""
               echo "| Model | URL | HTTP Status |"
               echo "|-------|-----|-------------|"
@@ -106,5 +106,113 @@ jobs:
           fi
 
           echo "failure_count=0" >> "$GITHUB_OUTPUT"
-          echo "## :white_check_mark: Pretrained Weights URL Health Check — all URLs reachable" \
+          echo "## :white_check_mark: Pretrained weights URL health check: all URLs reachable" \
             >> "$GITHUB_STEP_SUMMARY"
+
+  check-existing-issue:
+    name: Check for existing weights-health issue
+    runs-on: ubuntu-latest
+    needs: check-weights-urls
+    if: failure()
+    permissions:
+      issues: read
+    outputs:
+      issue_exists: ${{ steps.check.outputs.issue_exists }}
+    steps:
+      - name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Check for existing open issue
+        id: check
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            core.info('Searching for existing open issues with labels: weights-health, automated');
+
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'weights-health,automated',
+              state: 'open',
+            });
+
+            core.info(`Found ${issues.data.length} open issue(s) with matching labels`);
+
+            const matchingIssues = issues.data.filter(i =>
+              i.title.includes('[Weights Health Check]')
+            );
+            if (matchingIssues.length > 0) {
+              core.info(`Found ${matchingIssues.length} matching issue(s):`);
+              for (const issue of matchingIssues) {
+                core.info(`  - #${issue.number} - "${issue.title}" (${issue.html_url})`);
+              }
+            } else {
+              core.info('No existing issue found, a new one will be created');
+            }
+            core.setOutput('issue_exists', matchingIssues.length > 0 ? 'true' : 'false');
+
+  create-issue-on-failure:
+    name: Create issue on weights health check failure
+    runs-on: ubuntu-latest
+    needs:
+      - check-weights-urls
+      - check-existing-issue
+    if: failure() && needs.check-existing-issue.outputs.issue_exists == 'false'
+    permissions:
+      issues: write # Permission to create issues
+    steps:
+      - name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Create GitHub Issue
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          FAILURES: ${{ needs.check-weights-urls.outputs.failures }}
+        with:
+          script: |
+            const workflowRunUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const today = new Date().toISOString().split('T')[0];
+
+            const rows = (process.env.FAILURES || '').trim().split('\n').filter(Boolean);
+            const tableRows = rows.map(row => {
+              const [, name, url, code] = row.split('\t');
+              return `| ${name} | ${url} | \`${code}\` |`;
+            }).join('\n');
+            const table = rows.length > 0
+              ? `| Model | URL | HTTP Status |\n|-------|-----|-------------|\n${tableRows}`
+              : `_No structured failure data — see the [workflow run](${workflowRunUrl}) for details._`;
+
+            // Ensure the weights-health label exists (creates it on first run)
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'weights-health',
+                color: 'e4e669',
+                description: 'Pretrained weights URL health check failures',
+              });
+            } catch (e) {
+              if (e.status !== 422) throw e; // 422 = label already exists
+            }
+
+            const body = [
+              '## Bug Report',
+              '',
+              '### Unreachable URLs',
+              '',
+              table,
+            ].join('\n');
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Weights URL health check] Unreachable pretrained weights URLs - ${today}`,
+              body,
+              labels: ['weights-health', 'automated'],
+              assignees: ['leoll2'],
+              type: 'Bug',
+            });
