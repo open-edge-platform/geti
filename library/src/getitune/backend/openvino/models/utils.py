@@ -6,14 +6,9 @@
 from __future__ import annotations
 
 import warnings
-from contextlib import contextmanager
-from typing import TYPE_CHECKING, Iterator
 
 import torch
 import torch.nn.functional as f
-
-if TYPE_CHECKING:
-    from model_api.tilers import Tiler
 
 
 def get_default_num_async_infer_requests() -> int:
@@ -128,42 +123,3 @@ def rescale_masks_to_original(
     return (f.interpolate(masks_4d, size=(ori_h, ori_w), mode="bilinear", align_corners=False).squeeze(1) > 0.5).to(
         torch.uint8
     )
-
-
-@contextmanager
-def skip_tiler_saliency_merge(tiler: Tiler) -> Iterator[None]:
-    """Temporarily disable a ModelAPI ``Tiler``'s per-tile saliency-map merge.
-
-    ``DetectionTiler`` (reused by ``InstanceSegmentationTiler``) can merge per-tile
-    saliency maps into the final result via ``_merge_saliency_maps``, but
-    ``getitune``'s tiled OpenVINO ``forward_tiles`` implementations never read the
-    merged ``saliency_map``/``feature_vector`` (tiled OpenVINO inference does not
-    currently expose XAI outputs), so that merge is pure wasted work. For detection
-    it is especially costly: ``DetectionTiler._merge_saliency_maps`` merges
-    pixel-by-pixel in a pure-Python nested loop with cost
-    ``O(num_tiles * num_classes * H * W)``. With the default tiling configuration
-    (``tile_size=400``, ``tiles_overlap=0.5``) a single large image can be split
-    into hundreds of tiles, making that merge take from many minutes to multiple
-    hours -- with no errors and no progress logged, it looks exactly like a hang
-    until the job is eventually killed.
-
-    ``model_api`` (>=0.4.7, see ``openvino-model-api`` changelog) exposes a public
-    ``Tiler.merge_saliency_maps`` attribute for exactly this purpose. This context
-    manager toggles it off for the duration of the tiled inference call and
-    restores the previous value afterwards.
-
-    Non-tiled evaluation and PyTorch tiled evaluation are unaffected: the former
-    merges a single "tile" (fast early-return in ``_merge_saliency_maps``) and the
-    latter (``getitune``'s own ``*TileMerge`` classes) already guard the equivalent
-    merge behind ``explain_mode``, which defaults to ``False`` for evaluation.
-
-    Note:
-        If tiled OpenVINO explain/XAI support is added in the future, this skip must
-        become conditional on whether saliency maps are actually needed.
-    """
-    original_merge_saliency_maps = tiler.merge_saliency_maps
-    tiler.merge_saliency_maps = False
-    try:
-        yield
-    finally:
-        tiler.merge_saliency_maps = original_merge_saliency_maps

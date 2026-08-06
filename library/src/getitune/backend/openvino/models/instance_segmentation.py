@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import logging as log
+import time
 from typing import TYPE_CHECKING, Any, Sequence, cast
 
 import numpy as np
@@ -13,11 +14,7 @@ from model_api.tilers import InstanceSegmentationTiler
 from torchvision import tv_tensors
 
 from getitune.backend.openvino.models.base import OVModel
-from getitune.backend.openvino.models.utils import (
-    rescale_bboxes_to_original,
-    rescale_masks_to_original,
-    skip_tiler_saliency_merge,
-)
+from getitune.backend.openvino.models.utils import rescale_bboxes_to_original, rescale_masks_to_original
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
 from getitune.data.entity.tile import TileBatchData
 from getitune.data.utils.structures.mask.mask_util import encode_rle
@@ -288,37 +285,51 @@ class OVInstanceSegmentationModel(OVModel):
         scores: list[torch.Tensor] = []
         labels: list[torch.Tensor] = []
         masks: list[tv_tensors.Mask] = []
-        with skip_tiler_saliency_merge(tiler):
-            for img_tiles, tile_infos, ori_info in zip(
+        num_images = len(imgs_info)
+        log.info(f"[forward_tiles] Starting tiled OV instance-segmentation inference for {num_images} image(s).")
+        for img_idx, (img_tiles, tile_infos, ori_info) in enumerate(
+            zip(
                 inputs.batch_tiles,
                 inputs.batch_tile_tile_infos,
                 imgs_info,
                 strict=True,
-            ):
-                ori_h, ori_w = ori_info.ori_shape
-                # ModelAPI expects HWC numpy tiles at their native crop resolution; it resizes
-                # each tile to the model input internally, produces raw per-instance masks and
-                # places them into the full image using the merged, offset boxes.
-                np_tiles = [tile.detach().cpu().numpy().transpose(1, 2, 0) for tile in img_tiles]
-                coords = [[t.x, t.y, t.x + t.width, t.y + t.height] for t in tile_infos]
-                merged: InstanceSegmentationResult = tiler.predict_tiles(np_tiles, coords, (ori_h, ori_w, 3))
+            ),
+        ):
+            ori_h, ori_w = ori_info.ori_shape
+            # ModelAPI expects HWC numpy tiles at their native crop resolution; it resizes
+            # each tile to the model input internally, produces raw per-instance masks and
+            # places them into the full image using the merged, offset boxes.
+            np_tiles = [tile.detach().cpu().numpy().transpose(1, 2, 0) for tile in img_tiles]
+            coords = [[t.x, t.y, t.x + t.width, t.y + t.height] for t in tile_infos]
+            log.info(
+                f"[forward_tiles] Image {img_idx + 1}/{num_images}: running {len(np_tiles)} tile(s) "
+                f"(execution_mode={tiler.execution_mode})...",
+            )
+            start_time = time.monotonic()
+            merged: InstanceSegmentationResult = tiler.predict_tiles(np_tiles, coords, (ori_h, ori_w, 3))
+            elapsed = time.monotonic() - start_time
+            log.info(
+                f"[forward_tiles] Image {img_idx + 1}/{num_images}: {len(np_tiles)} tile(s) merged into "
+                f"{len(merged.bboxes)} box(es) in {elapsed:.2f}s.",
+            )
 
-                images.append(torch.empty(3, ori_h, ori_w))
-                bboxes.append(
-                    tv_tensors.BoundingBoxes(  # type: ignore[no-matching-overload]
-                        torch.as_tensor(np.asarray(merged.bboxes), dtype=torch.float32).reshape(-1, 4),
-                        format="XYXY",
-                        canvas_size=(ori_h, ori_w),
-                    ),
-                )
-                scores.append(torch.as_tensor(np.asarray(merged.scores), dtype=torch.float32).reshape(-1))
-                # ModelAPI instance labels are 1-based (0 = background); shift to getitune 0-based.
-                labels.append(torch.as_tensor(np.asarray(merged.labels), dtype=torch.long).reshape(-1) - 1)
-                merged_masks = np.asarray(merged.masks)
-                if merged_masks.ndim == 3 and merged_masks.shape[0] > 0:
-                    masks.append(tv_tensors.Mask(torch.as_tensor(merged_masks, dtype=torch.bool)))
-                else:
-                    masks.append(tv_tensors.Mask(torch.zeros((0, ori_h, ori_w), dtype=torch.bool)))
+            images.append(torch.empty(3, ori_h, ori_w))
+            bboxes.append(
+                tv_tensors.BoundingBoxes(  # type: ignore[no-matching-overload]
+                    torch.as_tensor(np.asarray(merged.bboxes), dtype=torch.float32).reshape(-1, 4),
+                    format="XYXY",
+                    canvas_size=(ori_h, ori_w),
+                ),
+            )
+            scores.append(torch.as_tensor(np.asarray(merged.scores), dtype=torch.float32).reshape(-1))
+            # ModelAPI instance labels are 1-based (0 = background); shift to getitune 0-based.
+            labels.append(torch.as_tensor(np.asarray(merged.labels), dtype=torch.long).reshape(-1) - 1)
+            merged_masks = np.asarray(merged.masks)
+            if merged_masks.ndim == 3 and merged_masks.shape[0] > 0:
+                masks.append(tv_tensors.Mask(torch.as_tensor(merged_masks, dtype=torch.bool)))
+            else:
+                masks.append(tv_tensors.Mask(torch.zeros((0, ori_h, ori_w), dtype=torch.bool)))
+        log.info(f"[forward_tiles] Finished tiled OV instance-segmentation inference for {num_images} image(s).")
 
         return PredictionBatch(
             images=images,

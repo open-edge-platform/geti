@@ -40,10 +40,7 @@ dependencies = [
     "pytorchcv==0.0.74",
     "timm==1.0.3",
     "openvino~=2026.3.0",
-    # Pinned via [tool.uv.sources] to the aurelien/fix-tiler branch (tiler
-    # saliency-map merge fix) until a new PyPI release ships it; restore
-    # "==0.4.6" (or the new release version) and drop the source override once available.
-    "openvino-model-api",
+    "openvino-model-api==0.4.6",
     "onnx==1.22.0",
     "onnxruntime==1.26.0",
     "onnxslim~=0.1.71",
@@ -184,10 +181,6 @@ torchvision = [
     { index = "torch-xpu", extra = "xpu"},
     { index = "torch-cuda", extra = "cuda"},
 ]
-# TODO: Pin back to a PyPI release once the tiler saliency-map merge fix
-# (https://github.com/open-edge-platform/model_api/pull/TODO) lands in a
-# published openvino-model-api release; then remove this override.
-openvino-model-api = { git = "https://github.com/open-edge-platform/model_api.git", branch = "aurelien/fix-tiler", subdirectory = "model_api" }
 
 [[tool.uv.index]]
 name = "torch-cpu"

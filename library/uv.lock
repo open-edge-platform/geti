@@ -1474,7 +1474,7 @@ requires-dist = [
     { name = "onnxscript", specifier = "==0.6.2" },
     { name = "onnxslim", specifier = "~=0.1.71" },
     { name = "openvino", specifier = "~=2026.3.0" },
-    { name = "openvino-model-api", git = "https://github.com/open-edge-platform/model_api.git?subdirectory=model_api&branch=aurelien%2Ffix-tiler" },
+    { name = "openvino-model-api", specifier = "==0.4.6" },
     { name = "pydata-sphinx-theme", marker = "extra == 'docs'", specifier = "==0.12.0" },
     { name = "pytorchcv", specifier = "==0.0.74" },
     { name = "pyyaml", specifier = "==6.0.3" },
@@ -3686,12 +3686,16 @@ wheels = [
 [[package]]
 name = "openvino-model-api"
 version = "0.4.6"
-source = { git = "https://github.com/open-edge-platform/model_api.git?subdirectory=model_api&branch=aurelien%2Ffix-tiler#225830ad039fc89f430088f0a7b321ddf8de8ecd" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "opencv-python-headless" },
     { name = "openvino" },
     { name = "pillow" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/af/cc/a044a4d25f3a13a6bfd46cb07385062ddabc03f771428c6370ff72f52d5d/openvino_model_api-0.4.6.tar.gz", hash = "sha256:b2fdf67bd6f7bc3bef936d5472608b6f77208ab278b74a6d146f962de5690ab0", size = 550574, upload-time = "2026-08-04T12:23:40.351Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/01/76/5a4d84b16abfa52e35e4a779536186f00051a4ef1f17ae5d66f841f58ce4/openvino_model_api-0.4.6-py3-none-any.whl", hash = "sha256:5cd26931dccc89ac317e86e0b73eb53bf1d0a4bba87d5fdf80974d0e31e61259", size = 140621, upload-time = "2026-08-04T12:23:39.13Z" },
 ]
 
 [[package]]
