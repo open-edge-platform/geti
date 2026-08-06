@@ -37,18 +37,14 @@ jobs:
 
           probe_url() {
             local model_id="$1" model_name="$2" url="$3"
-            local code
-            code=$(curl --silent --head --output /dev/null --write-out "%{http_code}" \
-                        --location --max-time 30 --connect-timeout 10 \
-                        --retry 3 --retry-delay 2 "$url") || code="000"
-            # Some servers reject HEAD; fall back to a zero-byte range GET
-            if [[ "$code" == "405" ]]; then
-              code=$(curl --silent --output /dev/null --write-out "%{http_code}" \
-                          --header "Range: bytes=0-0" --location \
-                          --max-time 30 --connect-timeout 10 \
-                          --retry 3 --retry-delay 2 "$url") || code="000"
-            fi
-            if [[ "$code" =~ ^(200|206)$ ]]; then
+            local code curl_exit
+            # Download first 64 KB; 206 = Range honoured, 200 = Range ignored (full file sent)
+            # --max-filesize caps accidental full downloads at 128 KB; exit 63 = size exceeded
+            code=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+                        --range 0-65535 --max-filesize 131072 --location \
+                        --max-time 30 --connect-timeout 10 \
+                        --retry 3 --retry-delay 2 "$url") && curl_exit=0 || curl_exit=$?
+            if [[ "$code" =~ ^(200|206)$ ]] || [[ "$curl_exit" -eq 63 ]]; then
               echo "OK   $model_name"
             else
               echo "FAIL $model_name — HTTP $code — $url"
@@ -57,6 +53,15 @@ jobs:
             fi
           }
           export -f probe_url
+
+          # Negative self-test: a nonexistent GCS key in a known-public bucket must be detected as failed
+          probe_url "__self_test__" "[self-test]" \
+            "https://storage.googleapis.com/rfdetr/this-file-does-not-exist-geti-ci-test.pth"
+          if ! grep -q "__self_test__" /tmp/failures.tsv 2>/dev/null; then
+            echo "::error::Self-test failed — probe_url did not detect a broken URL"
+            exit 1
+          fi
+          : > /tmp/failures.tsv  # clear self-test entry before real probing
 
           # Process substitution keeps the while loop in the main shell so RUNNING stays in scope
           RUNNING=0
