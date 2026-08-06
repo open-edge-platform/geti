@@ -14,14 +14,14 @@ jobs:
   check-weights-urls:
     name: Check pretrained weights URLs
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     outputs:
       failure_count: ${{ steps.probe.outputs.failure_count }}
       failures: ${{ steps.probe.outputs.failures }}
     steps:
-      - &harden-runner
-        name: Harden the runner (audit all outbound calls)
+      - name: Harden the runner (audit all outbound calls)
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
         with:
           egress-policy: audit
@@ -72,23 +72,28 @@ jobs:
 
           # Process substitution keeps the while loop in the main shell so RUNNING stays in scope
           RUNNING=0
+          TOTAL=0
           while IFS=$'\t' read -r model_id model_name url; do
-            probe_url "$model_id" "$model_name" "$url" &
-            RUNNING=$(( RUNNING + 1 ))
-            if (( RUNNING >= 8 )); then
+            # Throttle before starting to never exceed 8 concurrent jobs
+            while (( RUNNING >= 8 )); do
               wait -n 2>/dev/null || true
               RUNNING=$(( RUNNING - 1 ))
-            fi
+            done
+            probe_url "$model_id" "$model_name" "$url" &
+            RUNNING=$(( RUNNING + 1 ))
+            TOTAL=$(( TOTAL + 1 ))
           done < <(find "$MANIFESTS_DIR" -name '*.yaml' ! -name 'base.yaml' | sort | \
-                   xargs -I{} yq -r '[.id, .name, .pretrained_weights.url] | @tsv' {})
+                   xargs yq -r '[.id, .name, .pretrained_weights.url] | @tsv')
           wait
 
+          FAILED=$(wc -l < /tmp/failures.tsv 2>/dev/null || echo 0)
+          echo "Probed ${TOTAL} URL(s): $(( TOTAL - FAILED )) OK, ${FAILED} failed"
+
           if [[ -s /tmp/failures.tsv ]]; then
-            FAILURE_COUNT=$(wc -l < /tmp/failures.tsv)
-            echo "failure_count=${FAILURE_COUNT}" >> "$GITHUB_OUTPUT"
+            echo "failure_count=${FAILED}" >> "$GITHUB_OUTPUT"
             { echo "failures<<EOF"; cat /tmp/failures.tsv; echo "EOF"; } >> "$GITHUB_OUTPUT"
             {
-              echo "## :x: Pretrained Weights URL Health Check — ${FAILURE_COUNT} failure(s)"
+              echo "## :x: Pretrained Weights URL Health Check — ${FAILED} failure(s)"
               echo ""
               echo "| Model | URL | HTTP Status |"
               echo "|-------|-----|-------------|"
