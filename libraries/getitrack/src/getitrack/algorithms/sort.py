@@ -73,24 +73,24 @@ class SortTracker(BaseTracker[SortConfig]):
         self._frame_det_index.clear()
         lifecycle = self.config.lifecycle
 
-        src = np.flatnonzero(detections.scores > self.config.score_threshold)
-        dets = detections.select(src)
+        kept_indices = np.flatnonzero(detections.scores > self.config.score_threshold)
+        dets = detections.select(kept_indices)
 
         self._predict_all()
         track_ids = list(self._tracks)
 
         matches, unmatched_track_idx, unmatched_det_idx = self._associate(track_ids, dets)
-        for ti, di in matches:
-            self._apply_hit(track_ids[ti], dets, di, lifecycle, src_index=int(src[di]))
+        for track_pos, det_pos in matches:
+            self._apply_hit(track_ids[track_pos], dets, det_pos, lifecycle, src_index=int(kept_indices[det_pos]))
         for i in unmatched_track_idx:
             self._tracks[track_ids[i]].mark_miss(lifecycle)
-        for di in unmatched_det_idx:
-            self._spawn(dets, int(di), src_index=int(src[di]))
+        for det_pos in unmatched_det_idx:
+            self._spawn_track(dets, int(det_pos), src_index=int(kept_indices[det_pos]))
 
-        for tid in list(self._tracks):
-            if self._tracks[tid].should_remove:
-                del self._tracks[tid]
-                self._kalman_states.pop(tid, None)
+        for track_id in list(self._tracks):
+            if self._tracks[track_id].should_remove:
+                del self._tracks[track_id]
+                self._kalman_states.pop(track_id, None)
 
         return self._compose_output(detections.frame_id)
 
@@ -98,17 +98,17 @@ class SortTracker(BaseTracker[SortConfig]):
         """Advance every track's Kalman state and refresh its predicted box."""
         if not self._kalman_states:
             return
-        tids = list(self._kalman_states)
-        means = np.stack([self._kalman_states[tid][0] for tid in tids], axis=0)
-        covs = np.stack([self._kalman_states[tid][1] for tid in tids], axis=0)
+        track_ids = list(self._kalman_states)
+        means = np.stack([self._kalman_states[track_id][0] for track_id in track_ids], axis=0)
+        covs = np.stack([self._kalman_states[track_id][1] for track_id in track_ids], axis=0)
         # Unobserved tracks predict with zero height velocity.
-        for i, tid in enumerate(tids):
-            if self._tracks[tid].state != TrackState.ACTIVE:
+        for i, track_id in enumerate(track_ids):
+            if self._tracks[track_id].state != TrackState.ACTIVE:
                 means[i, 7] = 0.0
         means, covs = self._kalman.multi_predict(means, covs)
-        for i, tid in enumerate(tids):
-            self._kalman_states[tid] = (means[i], covs[i])
-            self._tracks[tid].bbox = xyah_to_xyxy(means[i, :4][None, :])[0].astype(np.float32)
+        for i, track_id in enumerate(track_ids):
+            self._kalman_states[track_id] = (means[i], covs[i])
+            self._tracks[track_id].bbox = xyah_to_xyxy(means[i, :4][None, :])[0].astype(np.float32)
 
     def _associate(self, track_ids: list[int], dets: Detections) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Match tracks to detections on IoU cost gated by ``match_threshold``."""
@@ -118,10 +118,10 @@ class SortTracker(BaseTracker[SortConfig]):
                 np.arange(len(track_ids), dtype=np.int64),
                 np.arange(len(dets), dtype=np.int64),
             )
-        track_boxes = np.stack([self._tracks[tid].bbox for tid in track_ids], axis=0)
+        track_boxes = np.stack([self._tracks[track_id].bbox for track_id in track_ids], axis=0)
         cost = iou_distance(track_boxes, dets.bboxes)
         if self.config.match_class_only:
-            track_classes = np.array([self._tracks[tid].class_id for tid in track_ids])
+            track_classes = np.array([self._tracks[track_id].class_id for track_id in track_ids])
             cost[track_classes[:, None] != dets.class_ids[None, :]] = self._UNMATCHABLE_COST
         return linear_assignment(cost, self.config.match_threshold)
 
@@ -144,7 +144,7 @@ class SortTracker(BaseTracker[SortConfig]):
         mean, covariance = self._kalman_states[track_id]
         self._kalman_states[track_id] = self._kalman.update(mean, covariance, measurement)
 
-    def _spawn(self, dets: Detections, det_idx: int, *, src_index: int) -> None:
+    def _spawn_track(self, dets: Detections, det_idx: int, *, src_index: int) -> None:
         """Create a new track from an unmatched detection."""
         track_id = self._allocate_id()
         bbox = dets.bboxes[det_idx].astype(np.float32)
