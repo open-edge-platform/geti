@@ -1,0 +1,96 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+name: Pretrained Weights URL Health Check
+
+on:
+  schedule:
+    - cron: "0 4 * * *" # 04:00 UTC daily, after the main daily.yml at 02:00
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  check-weights-urls:
+    name: Check pretrained weights URLs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      failure_count: ${{ steps.probe.outputs.failure_count }}
+      failures: ${{ steps.probe.outputs.failures }}
+    steps:
+      - &harden-runner
+        name: Harden the runner (audit all outbound calls)
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+
+      - name: Probe pretrained weights URLs
+        id: probe
+        run: |
+          set -euo pipefail
+          MANIFESTS_DIR="application/backend/app/supported_models/manifests"
+          FAILURES="/tmp/failures.tsv"
+
+          probe_url() {
+            local model_id="$1" model_name="$2" url="$3"
+            local code
+            code=$(curl --silent --head --output /dev/null --write-out "%{http_code}" \
+                        --location --max-time 30 --connect-timeout 10 \
+                        --retry 3 --retry-delay 2 "$url") || code="000"
+            # Some servers reject HEAD; fall back to a zero-byte range GET
+            if [[ "$code" == "405" ]]; then
+              code=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+                          --header "Range: bytes=0-0" --location \
+                          --max-time 30 --connect-timeout 10 \
+                          --retry 3 --retry-delay 2 "$url") || code="000"
+            fi
+            if [[ "$code" =~ ^(200|206)$ ]]; then
+              echo "OK   $model_name"
+            else
+              echo "FAIL $model_name — HTTP $code — $url"
+              printf '%s\t%s\t%s\t%s\n' "$model_id" "$model_name" "$url" "$code" >> "$FAILURES"
+            fi
+          }
+          export -f probe_url
+
+          # Collect all URLs into a temp file first (avoids subshell variable-scoping issues)
+          find "$MANIFESTS_DIR" -name '*.yaml' ! -name 'base.yaml' | sort | \
+            xargs -I{} yq -r '[.id, .name, .pretrained_weights.url] | @tsv' {} \
+            > /tmp/urls.tsv
+
+          # Probe up to 8 URLs concurrently via background jobs
+          RUNNING=0
+          while IFS=$'\t' read -r model_id model_name url; do
+            probe_url "$model_id" "$model_name" "$url" &
+            RUNNING=$(( RUNNING + 1 ))
+            if (( RUNNING >= 8 )); then
+              wait -n 2>/dev/null || true
+              RUNNING=$(( RUNNING - 1 ))
+            fi
+          done < /tmp/urls.tsv
+          wait
+
+          if [[ -s "$FAILURES" ]]; then
+            FAILURE_COUNT=$(wc -l < "$FAILURES")
+            echo "failure_count=${FAILURE_COUNT}" >> "$GITHUB_OUTPUT"
+            { echo "failures<<EOF"; cat "$FAILURES"; echo "EOF"; } >> "$GITHUB_OUTPUT"
+            {
+              echo "## :x: Pretrained Weights URL Health Check — ${FAILURE_COUNT} failure(s)"
+              echo ""
+              echo "| Model | URL | HTTP Status |"
+              echo "|-------|-----|-------------|"
+              while IFS=$'\t' read -r _id name url code; do
+                echo "| ${name} | ${url} | \`${code}\` |"
+              done < "$FAILURES"
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+          echo "failure_count=0" >> "$GITHUB_OUTPUT"
+          echo "## :white_check_mark: Pretrained Weights URL Health Check — all URLs reachable" \
+            >> "$GITHUB_STEP_SUMMARY"
