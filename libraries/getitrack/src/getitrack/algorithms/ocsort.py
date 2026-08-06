@@ -90,10 +90,10 @@ def _direction_cost(
     scores: np.ndarray,
     inertia: float,
 ) -> np.ndarray:
-    """OCM bonus ``(num_tracks, num_dets)`` for direction-consistent pairs.
+    """OCM momentum_bonus ``(num_tracks, num_dets)`` for direction-consistent pairs.
 
     For each track velocity ``v`` and the direction ``u`` from its prior
-    observation to a detection, the bonus is ``(pi/2 - |angle(v, u)|) / pi``,
+    observation to a detection, the momentum_bonus is ``(pi/2 - |angle(v, u)|) / pi``,
     scaled by ``inertia`` and the detection score, and zero where the track
     has no velocity estimate.
     """
@@ -166,45 +166,47 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
         if self._first_frame_id is None:
             self._first_frame_id = detections.frame_id
         self._frame_det_index.clear()
-        cfg = self.config
-        lifecycle = cfg.lifecycle
+        config = self.config
+        lifecycle = config.lifecycle
 
         # Strict bounds: a score exactly on det_threshold falls outside both bands.
         scores = detections.scores
-        high_src = np.flatnonzero(scores > cfg.det_threshold)
-        high_dets = _subset(detections, high_src)
+        high_score_indices = np.flatnonzero(scores > config.det_threshold)
+        high_dets = _subset(detections, high_score_indices)
 
         self._predict_all()
         track_ids = list(self._tracks)
 
         # First association: all tracks vs high-score detections, IoU + OCM.
         matches, unmatched_track_idx, unmatched_det_idx = self._associate_first(track_ids, high_dets)
-        for ti, di in matches:
-            self._apply_hit(track_ids[ti], high_dets, di, lifecycle, src_index=int(high_src[di]))
+        for track_pos, det_pos in matches:
+            self._apply_hit(
+                track_ids[track_pos], high_dets, det_pos, lifecycle, src_index=int(high_score_indices[det_pos])
+            )
         unmatched_track_ids = [track_ids[i] for i in unmatched_track_idx]
 
         # Optional BYTE stage: leftover tracks vs low-score detections, IoU only.
-        if cfg.use_byte:
-            low_src = np.flatnonzero((scores > cfg.score_threshold) & (scores < cfg.det_threshold))
+        if config.use_byte:
+            low_score_indices = np.flatnonzero((scores > config.score_threshold) & (scores < config.det_threshold))
             unmatched_track_ids = self._associate_byte(
-                unmatched_track_ids, _subset(detections, low_src), low_src, lifecycle
+                unmatched_track_ids, _subset(detections, low_score_indices), low_score_indices, lifecycle
             )
 
         # OCR: leftover high detections vs unmatched tracks' last observation.
-        leftover_high = [int(i) for i in unmatched_det_idx]
-        unmatched_track_ids, leftover_high = self._associate_recovery(
-            unmatched_track_ids, high_dets, high_src, leftover_high, lifecycle
+        unmatched_high_indices = [int(i) for i in unmatched_det_idx]
+        unmatched_track_ids, unmatched_high_indices = self._associate_recovery(
+            unmatched_track_ids, high_dets, high_score_indices, unmatched_high_indices, lifecycle
         )
 
-        for tid in unmatched_track_ids:
-            self._tracks[tid].mark_miss(lifecycle)
+        for track_id in unmatched_track_ids:
+            self._tracks[track_id].mark_miss(lifecycle)
 
-        for di in leftover_high:
-            self._spawn(high_dets, di, src_index=int(high_src[di]))
+        for det_pos in unmatched_high_indices:
+            self._spawn_track(high_dets, det_pos, src_index=int(high_score_indices[det_pos]))
 
-        for tid in list(self._tracks):
-            if self._tracks[tid].should_remove:
-                self._forget(tid)
+        for track_id in list(self._tracks):
+            if self._tracks[track_id].should_remove:
+                self._remove_track(track_id)
 
         return self._compose_output(detections.frame_id)
 
@@ -212,35 +214,35 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
         """Advance every track's Kalman state and refresh its predicted box."""
         if not self._kalman_states:
             return
-        tids = list(self._kalman_states)
-        means = np.stack([self._kalman_states[tid][0] for tid in tids], axis=0)
-        covs = np.stack([self._kalman_states[tid][1] for tid in tids], axis=0)
+        track_ids = list(self._kalman_states)
+        means = np.stack([self._kalman_states[track_id][0] for track_id in track_ids], axis=0)
+        covs = np.stack([self._kalman_states[track_id][1] for track_id in track_ids], axis=0)
         # Unobserved tracks predict with zero height velocity.
-        for i, tid in enumerate(tids):
-            if self._tracks[tid].state != TrackState.ACTIVE:
+        for i, track_id in enumerate(track_ids):
+            if self._tracks[track_id].state != TrackState.ACTIVE:
                 means[i, 7] = 0.0
         means, covs = self._kalman.multi_predict(means, covs)
-        for i, tid in enumerate(tids):
-            self._kalman_states[tid] = (means[i], covs[i])
-            self._tracks[tid].bbox = xyah_to_xyxy(means[i, :4][None, :])[0].astype(np.float32)
+        for i, track_id in enumerate(track_ids):
+            self._kalman_states[track_id] = (means[i], covs[i])
+            self._tracks[track_id].bbox = xyah_to_xyxy(means[i, :4][None, :])[0].astype(np.float32)
 
     def _associate_first(self, track_ids: list[int], dets: Detections) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """First pass: IoU cost with the OCM momentum bonus, gated on pure IoU."""
+        """First pass: IoU cost with the OCM momentum momentum_bonus, gated on pure IoU."""
         if not track_ids or len(dets) == 0:
             return self._empty_association(len(track_ids), len(dets))
-        track_boxes = np.stack([self._tracks[tid].bbox for tid in track_ids], axis=0)
+        track_boxes = np.stack([self._tracks[track_id].bbox for track_id in track_ids], axis=0)
         iou_cost = iou_distance(track_boxes, dets.bboxes)
 
-        prev_boxes = np.stack([self._k_previous_obs(tid) for tid in track_ids], axis=0)
+        prev_boxes = np.stack([self._previous_observation(track_id) for track_id in track_ids], axis=0)
         velocities = np.stack(
-            [v if (v := self._obs[tid].velocity) is not None else np.zeros(2) for tid in track_ids],
+            [v if (v := self._obs[track_id].velocity) is not None else np.zeros(2) for track_id in track_ids],
             axis=0,
         )
-        valid = np.array([self._obs[tid].velocity is not None for tid in track_ids])
-        bonus = _direction_cost(dets.bboxes, prev_boxes, velocities, valid, dets.scores, self.config.inertia)
+        valid = np.array([self._obs[track_id].velocity is not None for track_id in track_ids])
+        momentum_bonus = _direction_cost(dets.bboxes, prev_boxes, velocities, valid, dets.scores, self.config.inertia)
 
-        cost = iou_cost - bonus
-        # Mask pairs failing the IoU or class gate; the bonus only reorders the rest.
+        cost = iou_cost - momentum_bonus
+        # Mask pairs failing the IoU or class gate; the momentum_bonus only reorders the rest.
         invalid = iou_cost > self.config.match_threshold
         class_mismatch = self._class_mismatch(track_ids, dets)
         if class_mismatch is not None:
@@ -249,44 +251,52 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
         return linear_assignment(cost, self._MATCH_COST_CEILING)
 
     def _associate_byte(
-        self, track_ids: list[int], low_dets: Detections, low_src: np.ndarray, lifecycle: LifecycleConfig
+        self, track_ids: list[int], low_dets: Detections, low_score_indices: np.ndarray, lifecycle: LifecycleConfig
     ) -> list[int]:
         """BYTE pass: unmatched tracks vs low-score detections, IoU only."""
         if not track_ids or len(low_dets) == 0:
             return track_ids
-        track_boxes = np.stack([self._tracks[tid].bbox for tid in track_ids], axis=0)
+        track_boxes = np.stack([self._tracks[track_id].bbox for track_id in track_ids], axis=0)
         cost = iou_distance(track_boxes, low_dets.bboxes)
         class_mismatch = self._class_mismatch(track_ids, low_dets)
         if class_mismatch is not None:
             cost[class_mismatch] = self._INVALID_COST
         matches, unmatched_track_idx, _ = linear_assignment(cost, self.config.match_threshold)
-        for ti, di in matches:
-            self._apply_hit(track_ids[ti], low_dets, di, lifecycle, src_index=int(low_src[di]))
+        for track_pos, det_pos in matches:
+            self._apply_hit(
+                track_ids[track_pos], low_dets, det_pos, lifecycle, src_index=int(low_score_indices[det_pos])
+            )
         return [track_ids[i] for i in unmatched_track_idx]
 
     def _associate_recovery(
         self,
         track_ids: list[int],
         high_dets: Detections,
-        high_src: np.ndarray,
-        leftover_high: list[int],
+        high_score_indices: np.ndarray,
+        unmatched_high_indices: list[int],
         lifecycle: LifecycleConfig,
     ) -> tuple[list[int], list[int]]:
         """OCR pass: leftover detections vs unmatched tracks' last observation."""
-        if not track_ids or not leftover_high:
-            return track_ids, leftover_high
-        left_dets = _subset(high_dets, leftover_high)
-        last_boxes = np.stack([self._obs[tid].last_obs for tid in track_ids], axis=0)
+        if not track_ids or not unmatched_high_indices:
+            return track_ids, unmatched_high_indices
+        left_dets = _subset(high_dets, unmatched_high_indices)
+        last_boxes = np.stack([self._obs[track_id].last_obs for track_id in track_ids], axis=0)
         cost = iou_distance(last_boxes, left_dets.bboxes)
         class_mismatch = self._class_mismatch(track_ids, left_dets)
         if class_mismatch is not None:
             cost[class_mismatch] = self._INVALID_COST
         matches, unmatched_track_idx, unmatched_det_idx = linear_assignment(cost, self.config.match_threshold)
-        for ti, di in matches:
-            real_di = leftover_high[di]
-            self._apply_hit(track_ids[ti], high_dets, real_di, lifecycle, src_index=int(high_src[real_di]))
+        for track_pos, det_pos in matches:
+            real_det_pos = unmatched_high_indices[det_pos]
+            self._apply_hit(
+                track_ids[track_pos],
+                high_dets,
+                real_det_pos,
+                lifecycle,
+                src_index=int(high_score_indices[real_det_pos]),
+            )
         remaining_tracks = [track_ids[i] for i in unmatched_track_idx]
-        remaining_dets = [leftover_high[i] for i in unmatched_det_idx]
+        remaining_dets = [unmatched_high_indices[i] for i in unmatched_det_idx]
         return remaining_tracks, remaining_dets
 
     def _apply_hit(
@@ -305,10 +315,10 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
         score = float(dets.scores[det_idx])
         gap_steps = track.time_since_update + 1
 
-        prev_box = self._k_previous_obs(track_id)
+        prev_box = self._previous_observation(track_id)
         obs.velocity = _speed_direction(prev_box, new_box)
 
-        self._reupdate(track_id, obs.last_obs, new_box, gap_steps)
+        self._reupdate_from_last_observation(track_id, obs.last_obs, new_box, gap_steps)
         obs.obs_state = self._kalman_states[track_id]
 
         track.mark_hit(new_box, score, lifecycle)
@@ -320,7 +330,9 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
         obs.last_obs = new_box
         self._frame_det_index[track_id] = src_index
 
-    def _reupdate(self, track_id: int, last_box: np.ndarray, new_box: np.ndarray, steps: int) -> None:
+    def _reupdate_from_last_observation(
+        self, track_id: int, last_box: np.ndarray, new_box: np.ndarray, steps: int
+    ) -> None:
         """Rewind the filter to the last observation and replay a virtual trajectory to ``new_box``.
 
         The virtual observations interpolate box center and size linearly across
@@ -342,7 +354,7 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
             mean, cov = self._kalman.update(mean, cov, measurement)
         self._kalman_states[track_id] = (mean, cov)
 
-    def _spawn(self, dets: Detections, det_idx: int, *, src_index: int) -> None:
+    def _spawn_track(self, dets: Detections, det_idx: int, *, src_index: int) -> None:
         """Create a new track from an unmatched high-score detection."""
         track_id = self._allocate_id()
         bbox = dets.bboxes[det_idx].astype(np.float32)
@@ -369,7 +381,7 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
         )
         self._frame_det_index[track_id] = src_index
 
-    def _k_previous_obs(self, track_id: int) -> np.ndarray:
+    def _previous_observation(self, track_id: int) -> np.ndarray:
         """Return the observation ``delta_t`` frames back, else the nearest newer one, else the most recent."""
         observations = self._obs[track_id].observations
         age = self._tracks[track_id].age
@@ -382,10 +394,10 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
         """Boolean ``(num_tracks, num_dets)`` mask of class-mismatched pairs, or None."""
         if not self.config.match_class_only:
             return None
-        track_classes = np.array([self._tracks[tid].class_id for tid in track_ids])
+        track_classes = np.array([self._tracks[track_id].class_id for track_id in track_ids])
         return track_classes[:, None] != dets.class_ids[None, :]
 
-    def _forget(self, track_id: int) -> None:
+    def _remove_track(self, track_id: int) -> None:
         """Drop all state for a removed track."""
         self._tracks.pop(track_id, None)
         self._kalman_states.pop(track_id, None)

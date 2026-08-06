@@ -235,13 +235,13 @@ class TestMomentum:
 
 
 class TestObservationHistory:
-    def test_k_previous_obs_returns_delta_t_frames_back(self, fast_confirm):
+    def test_previous_observation_returns_delta_t_frames_back(self, fast_confirm):
         ocs = OCSortTracker(fast_confirm)
         for f in range(5):
             ocs.update(_dets([[10 * f, 0, 10 * f + 40, 40]], [0.9], frame_id=f))
         age = ocs._tracks[1].age
         expected = ocs._obs[1].observations[age - ocs.config.delta_t]
-        np.testing.assert_array_equal(ocs._k_previous_obs(1), expected)
+        np.testing.assert_array_equal(ocs._previous_observation(1), expected)
 
     def test_observation_history_is_bounded(self, fast_confirm):
         ocs = OCSortTracker(fast_confirm)
