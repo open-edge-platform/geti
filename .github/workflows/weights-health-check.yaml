@@ -71,6 +71,7 @@ jobs:
           : > /tmp/failures.tsv  # clear self-test entry before real probing
 
           # Process substitution keeps the while loop in the main shell so RUNNING stays in scope
+          echo "Format: [OK|FAIL]  <model>  http=<code>  <time>  <bytes received>  -> <final URL after redirects>"
           RUNNING=0
           TOTAL=0
           while IFS=$'\t' read -r model_id model_name url; do
