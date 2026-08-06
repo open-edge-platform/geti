@@ -34,18 +34,6 @@ if TYPE_CHECKING:
     from getitrack.config import LifecycleConfig
 
 
-def _subset(dets: Detections, indices: list[int] | np.ndarray) -> Detections:
-    """Row-select a `Detections`."""
-    idx = np.asarray(indices, dtype=np.int64)
-    return Detections(
-        bboxes=dets.bboxes[idx],
-        scores=dets.scores[idx],
-        class_ids=dets.class_ids[idx],
-        frame_id=dets.frame_id,
-        embeddings=None if dets.embeddings is None else dets.embeddings[idx],
-    )
-
-
 @register_algorithm("sort", config=SortConfig)
 class SortTracker(BaseTracker[SortConfig]):
     """SORT multi-object tracker.
@@ -86,7 +74,7 @@ class SortTracker(BaseTracker[SortConfig]):
         lifecycle = self.config.lifecycle
 
         src = np.flatnonzero(detections.scores > self.config.score_threshold)
-        dets = _subset(detections, src)
+        dets = detections.select(src)
 
         self._predict_all()
         track_ids = list(self._tracks)
