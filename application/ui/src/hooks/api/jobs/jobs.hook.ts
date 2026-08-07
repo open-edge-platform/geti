@@ -23,6 +23,7 @@ export const useStreamJobStatus = (jobId: string | undefined) => {
     const modelIdRef = useRef<string | null>(null);
 
     const { close } = useSSE<Job>(jobId ? `/api/jobs/${jobId}/status` : undefined, {
+        retry: true,
         onMessage: (updatedJob) => {
             if (isQuantizeJob(updatedJob)) {
                 modelIdRef.current = updatedJob.metadata.model.id;
@@ -83,6 +84,7 @@ export const useStreamJobDetail = (jobId: string | undefined | null) => {
     const queryClient = useQueryClient();
 
     const { close } = useSSE<Job>(jobId ? `/api/jobs/${jobId}/status` : undefined, {
+        retry: true,
         onMessage: (updatedJob) => {
             queryClient.setQueryData<Job>(
                 getQueryKey(['get', '/api/jobs/{job_id}', { params: { path: { job_id: updatedJob.job_id } } }]),
@@ -91,6 +93,19 @@ export const useStreamJobDetail = (jobId: string | undefined | null) => {
 
             if (TERMINAL_STATUSES.includes(updatedJob.status)) {
                 close();
+            }
+        },
+        onClose: () => {
+            if (!jobId) {
+                return;
+            }
+
+            const jobKey = getQueryKey(['get', '/api/jobs/{job_id}', { params: { path: { job_id: jobId } } }]);
+            const cachedJob = queryClient.getQueryData<Job>(jobKey);
+
+            // The stream gave up before the job settled, so whatever is cached is stale
+            if (!cachedJob || !TERMINAL_STATUSES.includes(cachedJob.status)) {
+                queryClient.invalidateQueries({ queryKey: jobKey });
             }
         },
     });

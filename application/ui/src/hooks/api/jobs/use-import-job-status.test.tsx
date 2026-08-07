@@ -22,7 +22,7 @@ describe('useImportJobStatus', () => {
         resetMockEventSource();
     });
 
-    it('polls job status and calls onSuccess when job finishes successfully', async () => {
+    it('calls onSuccess when job finishes successfully', async () => {
         const onError = vi.fn();
         const onSuccess = vi.fn();
 
