@@ -112,7 +112,7 @@ export const DatasetViewSelector = () => {
             <DialogTrigger
                 hideArrow
                 type={'popover'}
-                placement={'bottom'}
+                placement={'bottom left'}
                 isOpen={isDatasetViewSelectorOpen}
                 onOpenChange={setIsDatasetViewSelectorOpen}
             >
