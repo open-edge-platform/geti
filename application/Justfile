@@ -254,6 +254,69 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
 clean-volumes:
     docker volume rm {{ data-volume }} {{ logs-volume }} || true
 
+# Symlink the PyInstaller backend sidecar into `ui/src-tauri/` so that
+# `tauri dev` / `tauri build` can pick it up via `externalBin` + `resources`.
+#
+# Requires `just pyinstaller` to have been run in `backend/` first. The links
+# are gitignored and always point at the latest PyInstaller output, so they
+# only need to be created once.
+[macos]
+[linux]
+tauri-link-sidecar:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    DIST="{{ justfile_directory() }}/backend/dist/geti-backend"
+    # An interrupted PyInstaller COLLECT leaves a 0-byte executable, which execs
+    # as a no-op and makes the desktop app quit with "backend exited (code 0)".
+    if [[ ! -s "$DIST/geti-backend" || ! -x "$DIST/geti-backend" ]]; then
+        echo "Backend sidecar missing or empty in $DIST — run 'just pyinstaller' in backend/ first" >&2
+        exit 1
+    fi
+    if [[ ! -d "$DIST/_internal" || -z "$(ls -A "$DIST/_internal" 2>/dev/null)" ]]; then
+        echo "Backend resources missing or empty in $DIST/_internal — run 'just pyinstaller' in backend/ first" >&2
+        exit 1
+    fi
+
+    if ! command -v rustc >/dev/null 2>&1; then
+        echo "'rustc' not found on PATH — install Rust via https://rustup.rs to resolve the host triple" >&2
+        exit 1
+    fi
+    TRIPLE=$(rustc -vV | sed -n 's/^host: //p')
+    if [[ -z "$TRIPLE" ]]; then
+        echo "Could not determine the Rust host triple from 'rustc -vV'" >&2
+        exit 1
+    fi
+
+    cd ui/src-tauri
+    ln -sfn ../../backend/dist/geti-backend/geti-backend "geti-backend-${TRIPLE}"
+    ln -sfn ../../backend/dist/geti-backend/_internal _internal
+    echo "✅ Linked geti-backend-${TRIPLE} and _internal in ui/src-tauri"
+
+# Symlink the PyInstaller backend sidecar into `ui\src-tauri\`.
+# Needs Developer Mode enabled (or an elevated shell) to create symlinks.
+[windows]
+tauri-link-sidecar:
+    #!powershell.exe
+    $ErrorActionPreference = 'Stop'
+
+    $dist = Join-Path '{{ justfile_directory() }}' 'backend\dist\geti-backend'
+    if (-not (Test-Path "$dist\geti-backend.exe") -or (Get-Item "$dist\geti-backend.exe").Length -eq 0) {
+        Write-Error "Backend sidecar missing or empty in $dist - run 'just pyinstaller' in backend\ first"
+    }
+    if (-not (Test-Path "$dist\_internal") -or -not (Get-ChildItem -Force "$dist\_internal" | Select-Object -First 1)) {
+        Write-Error "Backend resources missing or empty in $dist\_internal - run 'just pyinstaller' in backend\ first"
+    }
+
+    if (-not (Get-Command rustc -ErrorAction SilentlyContinue)) {
+        Write-Error "'rustc' not found on PATH - install Rust via https://rustup.rs to resolve the host triple"
+    }
+    $triple = (rustc -vV | Select-String '^host: ').Line -replace '^host: ', ''
+    Set-Location ui\src-tauri
+    New-Item -Force -ItemType SymbolicLink -Path ".\geti-backend-$triple.exe" -Target "$dist\geti-backend.exe" | Out-Null
+    New-Item -Force -ItemType SymbolicLink -Path '.\_internal' -Target "$dist\_internal" | Out-Null
+    Write-Host "Linked geti-backend-$triple.exe and _internal in ui\src-tauri"
+
 # Build the macOS .app distributable.
 #
 # Runs `tauri build` and then patches the bundle layout: the PyInstaller
@@ -287,6 +350,14 @@ tauri-build:
     if [[ -d "$APP/Contents/Resources/_internal" ]]; then
         echo "▶ Moving _internal into $BACKEND_DIR"
         mv "$APP/Contents/Resources/_internal" "$BACKEND_DIR/_internal"
+    fi
+    if [[ ! -s "$BACKEND_DIR/geti-backend" ]]; then
+        echo "Bundled sidecar $BACKEND_DIR/geti-backend is missing or empty — re-run 'just pyinstaller' in backend/ and 'just tauri-link-sidecar'" >&2
+        exit 1
+    fi
+    if [[ ! -d "$BACKEND_DIR/_internal" || -z "$(ls -A "$BACKEND_DIR/_internal" 2>/dev/null)" ]]; then
+        echo "Bundled resources $BACKEND_DIR/_internal are missing or empty — re-run 'just pyinstaller' in backend/ and 'just tauri-link-sidecar'" >&2
+        exit 1
     fi
     echo "✅ Bundle ready at $APP"
 
