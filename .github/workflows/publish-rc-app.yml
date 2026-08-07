@@ -16,6 +16,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       rc_version: "${{ steps.validate.outputs.rc_version }}"
+      rc_number: "${{ steps.validate.outputs.rc_number }}"
     steps:
       - name: Harden the runner (audit all outbound calls)
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
@@ -122,6 +123,7 @@ jobs:
           fi
 
           echo "rc_version=$RC_VERSION" >> "$GITHUB_OUTPUT"
+          echo "rc_number=$RC_NUMBER" >> "$GITHUB_OUTPUT"
 
   publish-rc:
     name: Build and push container RC (${{ matrix.device }})
@@ -214,7 +216,7 @@ jobs:
     uses: ./.github/workflows/windows-installer.yml
     with:
       device: ${{ matrix.device }}
-      tag: ${{ needs.validate.outputs.rc_version }}
+      tag: rc${{ needs.validate.outputs.rc_number }} # Suffix only; VERSION file already supplies the base version
       exclude-agpl-models: true # RC installers must not bundle Ultralytics/AGPL-licensed models
     secrets:
       MSIX_SIGN_CERTIFICATE: ${{ secrets.MSIX_SIGN_CERTIFICATE }}
