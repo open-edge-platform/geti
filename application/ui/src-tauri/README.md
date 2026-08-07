@@ -66,8 +66,32 @@ is the source of truth for the release build.
 | [Git for Windows](https://git-scm.com/download/win)                                         | Needed for `bash.exe` **and** `cygpath.exe` (see below).                                    |
 | [Node.js](https://nodejs.org) ≥ 24.2, npm ≥ 11.14.0                                         | Pinned in [`../.nvmrc`](../.nvmrc) and `engines` in [`../package.json`](../package.json).   |
 | [Rust](https://rustup.rs) stable ≥ 1.77.2                                                   | Install via `rustup-init.exe`, then `rustup default stable`.                                |
-| [`just`](https://just.systems)                                                              | `winget install Casey.Just`                                                                 |
+| [`just`](https://just.systems)                                                              | See _Package managers_ below.                                                               |
 | [`uv`](https://docs.astral.sh/uv/)                                                          | Installed automatically by the backend `Justfile` (see step 3).                             |
+
+**Package managers.** A clean image has none of the above — and on **Windows
+Server, no `winget` either**. `winget` ships as part of the _App Installer_
+Store package, which Server SKUs omit. Check with `winget --version`; if it
+isn't recognised, either install the `Microsoft.DesktopAppInstaller` bundle
+from the [winget-cli releases](https://github.com/microsoft/winget-cli/releases),
+or use [Chocolatey](https://chocolatey.org/install), which needs no Store and
+works on every SKU. Every prerequisite above also links to a plain installer if
+you'd rather skip the bootstrap entirely.
+
+| Tool | winget                             | Chocolatey                     |
+| ---- | ---------------------------------- | ------------------------------ |
+| Git  | `winget install Git.Git`           | `choco install git`            |
+| Node | `winget install OpenJS.NodeJS.LTS` | `choco install nodejs-lts`     |
+| Rust | `winget install Rustlang.Rustup`   | `choco install rustup.install` |
+| just | `winget install Casey.Just`        | `choco install just`           |
+
+**MSYS2 (alternative to Git for Windows).** `just` needs `bash.exe` and
+`cygpath.exe`; [MSYS2](https://www.msys2.org) provides both, as does Git for
+Windows. Either satisfies the requirement — but pick **one** and keep only its
+`usr\bin` on `PATH`. Both are MSYS2-derived and ship their own `msys-2.0.dll`;
+with both directories on `PATH` a binary from one installation can load the
+other's runtime, which fails with `Bad address` or fork errors rather than
+anything that names the real cause.
 
 **Git for Windows on `PATH`.** The installer's _"Git from the command line"_
 option adds only `cmd\`. `just` also needs `usr\bin\`, so add both:
@@ -197,6 +221,8 @@ only be installed with Developer Mode enabled.
 
 | Symptom                                                    | Cause and fix                                                     |
 | ---------------------------------------------------------- | ----------------------------------------------------------------- |
+| `winget` is not recognized                                 | App Installer missing — normal on Windows Server. See step 1.     |
+| `msys-2.0.dll` errors, `Bad address`, fork failures        | MSYS2 and Git for Windows `usr\bin` both on `PATH`. See step 1.   |
 | `error sending request ... (os error 10060)` from `rustup` | Proxy variables not set in the environment. See step 2.           |
 | `rustup could not choose a version of cargo to run`        | No default toolchain — run `rustup default stable`.               |
 | `link.exe not found`                                       | MSVC build tools missing, or wrong workload selected.             |
