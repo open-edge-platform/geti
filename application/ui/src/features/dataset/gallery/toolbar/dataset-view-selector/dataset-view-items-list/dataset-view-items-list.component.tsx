@@ -18,12 +18,13 @@ export type DatasetView = {
 type DatasetViewItemProps = {
     datasetView: DatasetView;
     isSelected: boolean;
+    onSelectDatasetView: (datasetViewId: string) => void;
     action?: ReactNode;
 };
 
-const DatasetViewItem = ({ datasetView, isSelected, action }: DatasetViewItemProps) => {
+const DatasetViewItem = ({ datasetView, isSelected, action, onSelectDatasetView }: DatasetViewItemProps) => {
     return (
-        <li aria-label={datasetView.name}>
+        <li aria-label={datasetView.name} onClick={() => onSelectDatasetView(datasetView.id)}>
             <View
                 padding={'size-200'}
                 borderRadius={'regular'}
@@ -45,12 +46,14 @@ type DatasetViewItemsListProps = {
     onOpenDeleteConfirmationDialog: (datasetView: DatasetView) => void;
     entireDatasetView: DatasetView;
     otherDatasetViews: DatasetView[];
+    onSelectDatasetView: (datasetViewId: string) => void;
 };
 
 export const DatasetViewItemsList = ({
     selectedDatasetViewId,
     entireDatasetView,
     otherDatasetViews,
+    onSelectDatasetView,
     onOpenDeleteConfirmationDialog,
 }: DatasetViewItemsListProps) => {
     return (
@@ -58,6 +61,7 @@ export const DatasetViewItemsList = ({
             <DatasetViewItem
                 datasetView={entireDatasetView}
                 isSelected={selectedDatasetViewId === entireDatasetView.id}
+                onSelectDatasetView={onSelectDatasetView}
             />
 
             {!isEmpty(otherDatasetViews) && <Divider size={'S'} />}
@@ -67,6 +71,7 @@ export const DatasetViewItemsList = ({
                     key={datasetView.id}
                     datasetView={datasetView}
                     isSelected={selectedDatasetViewId === datasetView.id}
+                    onSelectDatasetView={onSelectDatasetView}
                     action={
                         <ActionButton
                             isQuiet

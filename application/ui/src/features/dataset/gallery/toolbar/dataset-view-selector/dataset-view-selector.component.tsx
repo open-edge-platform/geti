@@ -124,6 +124,7 @@ export const DatasetViewSelector = () => {
                             otherDatasetViews={otherDatasetViews}
                             selectedDatasetViewId={selectedDatasetViewId}
                             onOpenDeleteConfirmationDialog={openDeleteConfirmationDialog}
+                            onSelectDatasetView={() => {}}
                         />
                     </Content>
                 </Dialog>
