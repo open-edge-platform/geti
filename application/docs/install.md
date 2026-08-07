@@ -11,7 +11,7 @@ can choose the method that best fits your workflow.
 | CPU       | 8 threads                                                |
 | RAM       | 16 GB                                                    |
 | Disk      | 40 GB free                                               |
-| GPU       | Optional - Intel® XPU or NVIDIA® GPU for larger models   |
+| GPU       | Optional - Intel® XPU or NVIDIA® GPU for larger models |
 
 > [!NOTE]
 > NVIDIA® GPUs with compute capability below 7.5 (e.g. Volta, Maxwell, Pascal) require a manual patch to work.
@@ -498,9 +498,7 @@ compute capability >= 5.0.
 
   ```bash
   git clone https://github.com/open-edge-platform/geti.git
-  cd geti/library
-  just patch-for-legacy-gpu-support
-  cd ../application
+  cd geti/application
   just patch-for-legacy-gpu-support
   # Then run install.sh / install.ps1 as usual, from the repo root
   ```
