@@ -1,18 +1,25 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
 import { getMockedPrepareImportDatasetJob } from '../../../../mocks/mock-job';
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
+import {
+    getLastEventSource,
+    MockEventSourceConstructor,
+    resetMockEventSource,
+    simulateSSEMessage,
+} from '../../../test-utils/mock-event-source';
 import { useImportJobStatus } from './use-import-job-status.hook';
 
 describe('useImportJobStatus', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        resetMockEventSource();
     });
 
     it('polls job status and calls onSuccess when job finishes successfully', async () => {
@@ -96,5 +103,55 @@ describe('useImportJobStatus', () => {
         expect(result.current.data).toBeUndefined();
         expect(onSuccess).not.toHaveBeenCalled();
         expect(onError).not.toHaveBeenCalled();
+    });
+
+    it('does not open an SSE connection when jobId is not provided', () => {
+        renderHook(() => useImportJobStatus({ jobId: undefined }));
+
+        expect(MockEventSourceConstructor).not.toHaveBeenCalled();
+    });
+
+    it('updates the job from the SSE status stream instead of polling', async () => {
+        server.use(
+            http.get('/api/jobs/{job_id}', ({ params }) => {
+                return HttpResponse.json(
+                    getMockedPrepareImportDatasetJob({ job_id: params.job_id, status: 'RUNNING', progress: 10 }),
+                    { status: 200 }
+                );
+            })
+        );
+
+        const onSuccess = vi.fn();
+        const { result } = renderHook(() => useImportJobStatus({ jobId: 'job-sse', onSuccess }));
+
+        await waitFor(() => {
+            expect(result.current.data?.progress).toBe(10);
+        });
+
+        expect(MockEventSourceConstructor).toHaveBeenCalledWith(expect.stringContaining('/api/jobs/job-sse/status'));
+
+        const eventSource = getLastEventSource();
+
+        act(() => {
+            simulateSSEMessage(
+                eventSource,
+                getMockedPrepareImportDatasetJob({ job_id: 'job-sse', status: 'RUNNING', progress: 75 })
+            );
+        });
+
+        await waitFor(() => {
+            expect(result.current.data?.progress).toBe(75);
+        });
+
+        act(() => {
+            simulateSSEMessage(eventSource, getMockedPrepareImportDatasetJob({ job_id: 'job-sse', status: 'DONE' }));
+        });
+
+        await waitFor(() => {
+            expect(onSuccess).toHaveBeenCalled();
+        });
+
+        // The stream is closed once the job reaches a terminal state
+        expect(eventSource.close).toHaveBeenCalled();
     });
 });

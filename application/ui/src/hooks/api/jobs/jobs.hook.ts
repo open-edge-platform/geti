@@ -77,6 +77,25 @@ export const useStreamJobStatus = (jobId: string | undefined) => {
     });
 };
 
+// Same stream as useStreamJobStatus, but writes to the single-job cache instead of the job-list
+// cache, so consumers that query a job by id (import/export) don't have to poll.
+export const useStreamJobDetail = (jobId: string | undefined | null) => {
+    const queryClient = useQueryClient();
+
+    const { close } = useSSE<Job>(jobId ? `/api/jobs/${jobId}/status` : undefined, {
+        onMessage: (updatedJob) => {
+            queryClient.setQueryData<Job>(
+                getQueryKey(['get', '/api/jobs/{job_id}', { params: { path: { job_id: updatedJob.job_id } } }]),
+                updatedJob
+            );
+
+            if (TERMINAL_STATUSES.includes(updatedJob.status)) {
+                close();
+            }
+        },
+    });
+};
+
 export const useSubmitJob = () => {
     return $api.useMutation('post', '/api/jobs', {
         meta: {
