@@ -42,7 +42,6 @@ const DeleteDatasetViewDialog = ({ datasetView, onDelete, onClose }: DeleteDatas
             onPrimaryAction={onDelete}
             onCancel={onClose}
             secondaryActionLabel={'Close'}
-            UNSAFE_className={classes.deleteDatasetView}
         >
             <Content>
                 <Text>Are you sure you want to delete the {`"${datasetView.name}"`} dataset view?</Text>
@@ -59,7 +58,12 @@ type DatasetViewSelectorProps = {
 const DatasetViewsTrigger = ({ selectedDatasetView, isDisabled }: DatasetViewSelectorProps) => {
     return (
         <PressableElement isDisabled={isDisabled}>
-            <div role={'button'} aria-label={'Select dataset view'} aria-disabled={isDisabled} tabIndex={0}>
+            <div
+                role={'button'}
+                aria-label={'Select dataset view'}
+                aria-disabled={isDisabled}
+                tabIndex={isDisabled ? -1 : 0}
+            >
                 <View
                     paddingX={'size-150'}
                     paddingY={'size-50'}
