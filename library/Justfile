@@ -4,7 +4,7 @@ default:
     @just --list --unsorted
 
 # -------------------------------------------------------------------------------------------------
-# Virtual environment management
+# Virtual environment and dependency management
 # -------------------------------------------------------------------------------------------------
 
 uv_version := `grep -A 3 '\[tool\.uv\]' pyproject.toml | grep 'required-version' | sed 's/.*= "[~=<>]*\(.*\)"/\1/'`
@@ -30,6 +30,12 @@ venv-benchmark device="cpu": _ensure_uv
 # Generate or update the uv lock file
 venv-lock: _ensure_uv
     uv lock
+
+# Patch pyproject.toml to build torch/torchvision against CUDA 12.6 instead of 13.0 for the 'cuda' target,
+# needed for legacy Nvidia GPUs (Volta, Maxwell, Pascal). See https://github.com/open-edge-platform/geti/issues/7163
+patch-for-legacy-gpu-support:
+    sed -i 's/cu130/cu126/g' pyproject.toml
+    just venv-lock
 
 # -------------------------------------------------------------------------------------------------
 # Linting and formatting

@@ -6,12 +6,16 @@ can choose the method that best fits your workflow.
 
 ## System requirements
 
-| Component | Requirement                                            |
-| --------- | ------------------------------------------------------ |
-| CPU       | 8 threads                                              |
-| RAM       | 16 GB                                                  |
-| Disk      | 40 GB free                                             |
-| GPU       | Optional - Intel® XPU or NVIDIA® GPU for larger models |
+| Component | Requirement                                              |
+| --------- | -------------------------------------------------------- |
+| CPU       | 8 threads                                                |
+| RAM       | 16 GB                                                    |
+| Disk      | 40 GB free                                               |
+| GPU       | Optional - Intel® XPU or NVIDIA® GPU for larger models   |
+
+> [!NOTE]
+> NVIDIA® GPUs with compute capability below 7.5 (e.g. Volta, Maxwell, Pascal) require a manual patch to work.
+> See [Troubleshooting > I have an old Nvidia GPU, does Geti support it?](#i-have-an-old-nvidia-gpu-does-geti-support-it).
 
 ## Installation methods
 
@@ -41,7 +45,7 @@ If Windows shows a security prompt, verify that the package is from the official
 
 > [!IMPORTANT]
 > Windows apps do not include Ultralytics models due to AGPL licensing constraints. If you need them,
-> please use the [install script](#install-script) or [build a Docker image from source](#option-2-build-the-image) 
+> please use the [install script](#install-script) or [build a Docker image from source](#option-2-build-the-image)
 > as described below.
 
 ## Run with Docker
@@ -175,12 +179,12 @@ Geti™ uses WebRTC for real-time inference streaming visualization in the UI. W
 direct connection to the backend's media server. Use these options when the in-app WebRTC preview does not connect under
 NAT, load balancers, or restrictive firewall policies.
 
-| Scenario | Recommended setup |
-|---|---|
-| Local machine / same LAN | Usually no extra setup. If needed, set a STUN server so the host advertises a reachable address. |
-| Public or cloud host with dynamic public IP | Use STUN so the host can discover and advertise its public address. |
-| Public host behind load balancer with fixed public IP/DNS | Configure the advertised public endpoint in your runtime setup. |
-| Restrictive firewall (UDP blocked, only TCP 443 allowed) | Run a TURN relay and start Geti™ with TURN enabled. |
+| Scenario                                                  | Recommended setup                                                                                |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Local machine / same LAN                                  | Usually no extra setup. If needed, set a STUN server so the host advertises a reachable address. |
+| Public or cloud host with dynamic public IP               | Use STUN so the host can discover and advertise its public address.                              |
+| Public host behind load balancer with fixed public IP/DNS | Configure the advertised public endpoint in your runtime setup.                                  |
+| Restrictive firewall (UDP blocked, only TCP 443 allowed)  | Run a TURN relay and start Geti™ with TURN enabled.                                             |
 
 <details>
 <summary><strong>Local machine or local network</strong></summary>
@@ -479,6 +483,49 @@ docker run --rm -v geti-data:/data alpine ls -l /data/pretrained_weights/<TASK_T
   **Settings > Apps > Installed apps > Geti™ > Uninstall**.
 
 ## Troubleshooting
+
+<details>
+<summary><strong>I have an old Nvidia GPU, does Geti support it?</strong></summary>
+
+<a id="i-have-an-old-nvidia-gpu-does-geti-support-it"></a>
+
+Geti's `cuda` builds use PyTorch wheels compiled against CUDA 13.0, which dropped support for NVIDIA GPU
+architectures older than Ampere (compute capability < 8.0), covering Volta, Turing, Maxwell, and Pascal cards. If
+your GPU falls in this range, you must patch the source to build against CUDA 12.6 instead, which still supports
+compute capability >= 5.0.
+
+- **Install script:** patch `pyproject.toml` before running the installer:
+
+  ```bash
+  git clone https://github.com/open-edge-platform/geti.git
+  cd geti/library
+  just patch-for-legacy-gpu-support
+  cd ../application
+  just patch-for-legacy-gpu-support
+  # Then run install.sh / install.ps1 as usual, from the repo root
+  ```
+
+- **Docker (build from source):** run the patch recipe from the `application` directory, then build the image as usual:
+
+  ```bash
+  cd application
+  just patch-for-legacy-gpu-support
+  just build-image --accelerator cuda
+  ```
+
+- **Run from source (development):** run the patch recipe from the `application` directory before initializing the backend environment:
+
+  ```bash
+  cd application
+  just patch-for-legacy-gpu-support
+  cd backend
+  just venv --accelerator cuda
+  ```
+
+> [!NOTE]
+> The Windows app (MSIX) is prebuilt and cannot be patched this way; it requires the newer PyTorch/CUDA wheels.
+
+</details>
 
 <details>
 <summary><strong>WSL2: WebRTC preview connects but video freezes after a few frames</strong></summary>
