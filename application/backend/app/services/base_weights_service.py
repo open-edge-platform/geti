@@ -76,8 +76,11 @@ class BaseWeightsService:
             raise FileNotFoundError(f"Weights not found locally for model {model_manifest_id} and download is disabled")
 
         logger.info("Downloading pretrained weights for {}", model_manifest_id)
+        urls = [manifest.pretrained_weights.url]
+        if manifest.pretrained_weights.mirror_url is not None:
+            urls.append(manifest.pretrained_weights.mirror_url)
         self._download_weights(
-            urls=[manifest.pretrained_weights.url, manifest.pretrained_weights.mirror_url],
+            urls=urls,
             local_path=local_path,
             sha_sum=manifest.pretrained_weights.sha_sum,
         )

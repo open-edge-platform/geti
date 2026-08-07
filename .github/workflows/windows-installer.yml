@@ -17,6 +17,11 @@ on:
         type: string
         required: false
         default: ""
+      checkout_sha:
+        description: "Optional commit SHA to build from; defaults to the caller's commit when empty"
+        type: string
+        required: false
+        default: ""
       exclude-agpl-models:
         type: boolean
         description: >
@@ -90,7 +95,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.checkout_sha || github.sha }}
+          ref: ${{ inputs.checkout_sha != '' && inputs.checkout_sha || github.sha }}
           persist-credentials: false
 
       - name: Get build version from application/VERSION
