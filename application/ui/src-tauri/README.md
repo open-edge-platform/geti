@@ -14,8 +14,8 @@ every platform depends on it.
 | ------------------------------------------- | ------------------------------------------------------------------ |
 | [The backend sidecar](#the-backend-sidecar) | What `tauri dev` / `tauri build` require before they will compile. |
 | [Windows](#windows)                         | Setup, dev shell, MSIX build, troubleshooting. **Primary target.** |
-| [macOS](#macos)                             | Setup, dev shell, `.app` / `.dmg` build. Development only.         |
-| [Linux](#linux)                             | Setup, dev shell, AppImage / `.deb` build. Development only.       |
+| [macOS](#macos)                             | Setup, TLS, dev shell, `.app` / `.dmg` build. Development only.    |
+| [Linux](#linux)                             | Setup, TLS, dev shell, AppImage / `.deb` build. Development only.  |
 | [Reference](#reference)                     | How the web/desktop source split works, data locations, cleanup.   |
 
 ---
@@ -33,15 +33,17 @@ will even start compiling:
 | `_internal/`                         | `resources`   | `just pyinstaller` |
 
 The target-triple suffix is mandatory — Tauri uses it to select the right
-binary per platform. Find yours in the `host:` line of `rustc -vV`. If
-either entry is missing the build fails with:
+binary per platform. If either entry is missing the build fails with:
 
 ```
 resource path `geti-backend-x86_64-pc-windows-msvc.exe` doesn't exist
 ```
 
-Both are gitignored, and the sidecar must be rebuilt whenever the backend
-Python source changes.
+Both are staged by `just tauri-link-sidecar` (from `application/`), which
+resolves the host triple from `rustc -vV` and symlinks both entries at the
+PyInstaller output. Both are gitignored, and the sidecar must be rebuilt
+whenever the backend Python source changes — the symlinks themselves only
+need to be created once.
 
 Tauri stages the binary and `_internal/` next to its own executable in
 `target/<profile>/`, which reproduces the layout PyInstaller expects. The
@@ -149,18 +151,19 @@ Output lands in `application\backend\dist\geti-backend\`.
 
 ### 4. Stage the sidecar into `src-tauri\`
 
-From `application\ui\src-tauri`. Symlinks avoid copying gigabytes after every
-backend rebuild, but need an elevated shell or Developer Mode enabled:
+From `application`. Symlinks avoid copying gigabytes after every backend
+rebuild, but need an elevated shell or Developer Mode enabled:
 
 ```powershell
-New-Item -ItemType SymbolicLink -Path .\geti-backend-x86_64-pc-windows-msvc.exe `
-    -Target ..\..\backend\dist\geti-backend\geti-backend.exe
-New-Item -ItemType SymbolicLink -Path .\_internal `
-    -Target ..\..\backend\dist\geti-backend\_internal
+just tauri-link-sidecar
 ```
 
-If you can't elevate, copy instead — this is what CI does, and it must be
-repeated after every `just pyinstaller`:
+The recipe validates the PyInstaller output, resolves the host triple with
+`rustc -vV`, and links `src-tauri\geti-backend-<triple>.exe` and
+`src-tauri\_internal` at `backend\dist\geti-backend\`.
+
+If you can't elevate, copy instead from `application\ui\src-tauri` — this is
+what CI does, and it must be repeated after every `just pyinstaller`:
 
 ```powershell
 Copy-Item ..\..\backend\dist\geti-backend\geti-backend.exe .\geti-backend-x86_64-pc-windows-msvc.exe
@@ -231,7 +234,7 @@ only be installed with Developer Mode enabled.
 | `curl: (28) Failed to connect to github.com`               | Proxy variables missing in the shell running `just`.              |
 | `resource path geti-backend-...exe doesn't exist`          | Sidecar not built or not staged. See steps 3 and 4.               |
 | Blank window on launch                                     | WebView2 runtime not installed.                                   |
-| `New-Item ... SymbolicLink` access denied                  | Run elevated, enable Developer Mode, or copy instead. See step 4. |
+| `tauri-link-sidecar` fails with access denied              | Run elevated, enable Developer Mode, or copy instead. See step 4. |
 
 ---
 
@@ -270,19 +273,69 @@ just fix-macho-signatures
 
 ### 3. Stage the sidecar into `src-tauri/`
 
-From `application/ui/src-tauri`, using your host triple:
+From `application/`:
 
 ```sh
-# Apple silicon (M1/M2/M3/M4)
-ln -sf ../../backend/dist/geti-backend/geti-backend geti-backend-aarch64-apple-darwin
-
-# Intel
-ln -sf ../../backend/dist/geti-backend/geti-backend geti-backend-x86_64-apple-darwin
-
-ln -sf ../../backend/dist/geti-backend/_internal _internal
+just tauri-link-sidecar
 ```
 
-### 4. Run the dev shell
+The recipe validates the PyInstaller output, resolves your host triple with
+`rustc -vV` (`aarch64-apple-darwin` on Apple silicon, `x86_64-apple-darwin`
+on Intel), and links `src-tauri/geti-backend-<triple>` and
+`src-tauri/_internal` at `backend/dist/geti-backend/`.
+
+### 4. Provide a TLS certificate
+
+The backend always serves HTTPS (Hypercorn, HTTP/2) on
+`https://localhost:7860` and refuses to start without a certificate. Only the
+Windows build provisions one automatically — a PyInstaller runtime hook
+([`windows/certs.py`](../../backend/pyinstaller/windows/certs.py)) writes a
+self-signed certificate into `DATA_DIR` on first launch, and WebView2 is
+started with `--ignore-certificate-errors` (see `additionalBrowserArgs` in
+[`tauri.conf.json`](./tauri.conf.json)).
+
+Neither applies on macOS: there is no cert-generation hook, and WKWebView has
+no flag to skip certificate validation. Without this step the window loads but
+every backend request fails with _"The certificate for this server is
+invalid."_ Do both steps manually, once.
+
+Generate the certificate into the desktop `DATA_DIR` (from
+`application/backend`):
+
+```sh
+DATA_DIR="$HOME/Library/Application Support/com.intel.geti" just gen-certs
+```
+
+Then add it to your login keychain as a trusted SSL root:
+
+```sh
+security add-trusted-cert -r trustRoot -p ssl -s localhost \
+    "$HOME/Library/Application Support/com.intel.geti/certs/localhost.pem"
+```
+
+`-r trustRoot` is required because the certificate is self-signed and is
+therefore its own root. Using `-r trustAsRoot` fails with
+_"SecTrustSettingsSetTrustSettings: One or more parameters passed to a
+function were not valid."_ macOS will prompt for your login password.
+
+Verify (exit code `0`) and undo when you're done:
+
+```sh
+security verify-cert -p ssl -n localhost -L -q \
+    -c "$HOME/Library/Application Support/com.intel.geti/certs/localhost.pem"
+security remove-trusted-cert \
+    "$HOME/Library/Application Support/com.intel.geti/certs/localhost.pem"
+```
+
+`add-trusted-cert` records trust settings for the certificate without
+importing it into a keychain, so `security find-certificate` /
+`delete-certificate` will not find it — `remove-trusted-cert` is the undo.
+
+`just gen-certs` skips generation when the files already exist and issues
+certificates valid for 365 days; after regenerating you must re-run
+`add-trusted-cert` for the new certificate.
+
+### 5. Run the dev shell
 
 From `application/ui`:
 
@@ -295,7 +348,7 @@ npm run start:desktop
 For UI-only work, `npm run start` serves the same app in a browser with no
 Rust toolchain and no sidecar required.
 
-### 5. Build a distributable `.app` / `.dmg`
+### 6. Build a distributable `.app` / `.dmg`
 
 ```sh
 just tauri-build   # from application/
@@ -344,12 +397,23 @@ Then install [Rust](https://rustup.rs), Node.js ≥ 24.2, and
 
 ```sh
 cd application/backend && just pyinstaller
-cd ../ui/src-tauri
-ln -sf ../../backend/dist/geti-backend/geti-backend geti-backend-x86_64-unknown-linux-gnu
-ln -sf ../../backend/dist/geti-backend/_internal _internal
+cd .. && just tauri-link-sidecar
 ```
 
-### 3. Run the dev shell
+### 3. Provide a TLS certificate
+
+As on macOS (see [Provide a TLS certificate](#4-provide-a-tls-certificate))
+nothing generates one for you, so run this from `application/backend`:
+
+```sh
+DATA_DIR="$HOME/.local/share/com.intel.geti" just gen-certs
+```
+
+WebKitGTK trusts the system CA store, so installing the certificate requires
+root — e.g. copy it to `/usr/local/share/ca-certificates/geti-localhost.crt`
+and run `sudo update-ca-certificates`.
+
+### 4. Run the dev shell
 
 From `application/ui`:
 
@@ -359,7 +423,7 @@ npm run build:api
 npm run start:desktop
 ```
 
-### 4. Build a distributable AppImage / `.deb`
+### 5. Build a distributable AppImage / `.deb`
 
 ```sh
 just tauri-build   # from application/
