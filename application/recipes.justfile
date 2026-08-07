@@ -91,3 +91,29 @@ setup-demo-sinks:
     set -euo pipefail
     echo "Setting up demo sinks..."
     PYTHONPATH=. uv run app/cli.py setup-demo-sinks
+
+# Resolve a Python interpreter: prefer `uv run python`, fall back to `python3`.
+[private]
+resolve-python:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if command -v uv > /dev/null && uv run python --version > /dev/null 2>&1; then
+        echo "uv run python"
+    elif command -v python3 > /dev/null; then
+        echo "python3"
+    else
+        echo "Error: No Python interpreter found. Run 'just install-uv' to install it through uv." >&2
+        exit 1
+    fi
+
+
+# Resolve the host's LAN IP address (used for WebRTC/coturn advertisement).
+# Connects to a public IP over UDP without sending data, just to let the OS
+# pick the outbound interface/IP; falls back through resolve-python for the
+# interpreter.
+[private]
+resolve-host-ip:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    PYTHON=$(just resolve-python)
+    $PYTHON -c "import socket; s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(s.getsockname()[0]); s.close()"
