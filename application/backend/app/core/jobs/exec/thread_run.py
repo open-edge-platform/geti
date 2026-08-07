@@ -102,6 +102,7 @@ class ThreadRun(Runner[Job, ExecutionEvent]):
         class ThreadAwareExecutionContext(ExecutionContext):
             def __init__(self, runner: "ThreadRun"):
                 self.runner = runner
+                self.payload = runner.job.params.model_dump_json()
                 self.report = self._report_impl
                 self.heartbeat = self._heartbeat_impl
 

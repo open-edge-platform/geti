@@ -162,14 +162,18 @@ def _entrypoint(
     runnable = get_runnable(JobType(job_type))
 
     try:
-        conn.send(Started())
+        with send_lock:
+            conn.send(Started())
         with logging_ctx(LogConfig(log_folder=str(get_settings().job_dir), log_file=log_file)):
             runnable.run(ExecutionContext(payload=payload, report=report, heartbeat=heartbeat))
-        conn.send(Done())
+        with send_lock:
+            conn.send(Done())
     except CancelledExc:
-        conn.send(Cancelled())
+        with send_lock:
+            conn.send(Cancelled())
     except Exception:
-        conn.send(Failed(traceback.format_exc()))
+        with send_lock:
+            conn.send(Failed(traceback.format_exc()))
     finally:
         with contextlib.suppress(Exception):
             conn.close()
