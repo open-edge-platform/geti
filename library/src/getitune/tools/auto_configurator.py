@@ -417,7 +417,13 @@ class AutoConfigurator:
         # This is useful for the quantization pipeline.
         if not datamodule.data_root and datamodule.subsets:
             datamodule.train_subset.input_size = actual_input_size
-            return DataModule.from_vision_datasets(
+            logger.info(
+                "update_ov_subset_pipeline: rebuilding DataModule via from_vision_datasets "
+                "(subset=%s, tiling_enabled=%s)...",
+                subset,
+                tiling_enabled,
+            )
+            rebuilt_datamodule = DataModule.from_vision_datasets(
                 train_dataset=datamodule.subsets[datamodule.train_subset.subset_name],
                 val_dataset=datamodule.subsets[datamodule.val_subset.subset_name],
                 test_dataset=datamodule.subsets.get(datamodule.test_subset.subset_name),
@@ -427,8 +433,16 @@ class AutoConfigurator:
                 auto_num_workers=datamodule.auto_num_workers,
                 device=datamodule.device,
             )
+            logger.info("update_ov_subset_pipeline: DataModule rebuilt via from_vision_datasets.")
+            return rebuilt_datamodule
 
-        return DataModule(
+        logger.info(
+            "update_ov_subset_pipeline: rebuilding DataModule from data_root=%s (subset=%s, tiling_enabled=%s)...",
+            datamodule.data_root,
+            subset,
+            tiling_enabled,
+        )
+        rebuilt_datamodule = DataModule(
             task=datamodule.task,
             data_root=datamodule.data_root,
             train_subset=datamodule.train_subset,
@@ -441,6 +455,8 @@ class AutoConfigurator:
             auto_num_workers=datamodule.auto_num_workers,
             device=datamodule.device,
         )
+        logger.info("update_ov_subset_pipeline: DataModule rebuilt from data_root.")
+        return rebuilt_datamodule
 
     @staticmethod
     def _strip_resize_transforms(augmentations: list[dict]) -> None:

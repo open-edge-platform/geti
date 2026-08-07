@@ -347,9 +347,15 @@ class DataModule(LightningDataModule):
 
         # Derive normalization params from the CPU pipeline's Normalize transform if available.
         if getattr(instance.train_subset, "augmentations_cpu", None):
+            logger.debug("from_vision_datasets: building CPU augmentation pipeline for train_subset...")
             _cpu_pipeline = CPUAugmentationPipeline.from_config(instance.train_subset)
             instance.input_mean = _cpu_pipeline.mean
             instance.input_std = _cpu_pipeline.std
+            logger.debug(
+                "from_vision_datasets: CPU augmentation pipeline built (mean=%s, std=%s).",
+                _cpu_pipeline.mean,
+                _cpu_pipeline.std,
+            )
         else:
             instance.input_mean = None
             instance.input_std = None
@@ -363,6 +369,7 @@ class DataModule(LightningDataModule):
             logger=False,
         )
 
+        logger.debug("from_vision_datasets: DataModule instance ready (task=%s).", instance.task)
         return instance
 
     def get_default_subset_configs(self, input_size: tuple[int, int] | None = None) -> dict[str, SubsetConfig]:
@@ -481,7 +488,20 @@ class DataModule(LightningDataModule):
         config = self.test_subset
         dataset = self._get_dataset(config.subset_name)
 
-        return DataLoader(**self._eval_loader_kwargs(dataset, config))
+        loader_kwargs = self._eval_loader_kwargs(dataset, config)
+        mp_context = loader_kwargs["multiprocessing_context"]
+        logger.info(
+            "Building test dataloader: dataset_size=%d, batch_size=%s, num_workers=%s, "
+            "persistent_workers=%s, multiprocessing_start_method=%s",
+            len(dataset),
+            loader_kwargs["batch_size"],
+            loader_kwargs["num_workers"],
+            loader_kwargs["persistent_workers"],
+            mp_context.get_start_method() if mp_context is not None else None,
+        )
+        dataloader = DataLoader(**loader_kwargs)
+        logger.info("Test dataloader built (num_batches=%d).", len(dataloader))
+        return dataloader
 
     def predict_dataloader(self) -> DataLoader:
         """Get predict dataloader."""

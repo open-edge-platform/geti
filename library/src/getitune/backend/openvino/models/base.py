@@ -663,7 +663,14 @@ class OVModel:
 
         Override in subclasses for task-specific inference logic.
         """
+        is_tiled = isinstance(data_batch, TileBatchData)
+        logger.debug(
+            "OVModel.test_step: received batch (tiled=%s); dispatching to %s...",
+            is_tiled,
+            "forward_tiles" if is_tiled else "forward",
+        )
         preds = self.forward_tiles(data_batch) if isinstance(data_batch, TileBatchData) else self(data_batch)
+        logger.debug("OVModel.test_step: inference complete, preparing metric inputs...")
         metric_inputs = self.prepare_metric_inputs(preds, data_batch)
         if isinstance(metric_inputs, list):
             for metric_input in metric_inputs:
@@ -676,6 +683,12 @@ class OVModel:
 
         Override in subclasses to apply task-specific post-filtering (e.g. confidence threshold).
         """
+        is_tiled = isinstance(data_batch, TileBatchData)
+        logger.debug(
+            "OVModel.predict_step: received batch (tiled=%s); dispatching to %s...",
+            is_tiled,
+            "forward_tiles" if is_tiled else "forward",
+        )
         if isinstance(data_batch, TileBatchData):
             return self.forward_tiles(data_batch)
         return self(data_batch)

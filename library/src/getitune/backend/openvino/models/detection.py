@@ -290,7 +290,9 @@ class OVDetectionModel(OVModel):
         Returns:
             PredictionBatch: Merged full-image detection predictions.
         """
+        log.debug("[forward_tiles] Entered forward_tiles; resolving tiler...")
         tiler = self._get_tiler()
+        log.debug(f"[forward_tiles] Tiler resolved: {type(tiler).__name__} (execution_mode={tiler.execution_mode}).")
         label_shift = 1 if tiler.model.get_label_name(0) == "background" else 0
         imgs_info = cast("Sequence[ImageInfo]", inputs.imgs_info)
 
@@ -369,6 +371,11 @@ class OVDetectionModel(OVModel):
 
     def predict_step(self, data_batch: SampleBatch) -> PredictionBatch:
         """Run detection inference and filter by confidence threshold."""
+        is_tiled = isinstance(data_batch, TileBatchData)
+        log.debug(
+            f"[predict_step] received batch (tiled={is_tiled}); dispatching to "
+            f"{'forward_tiles' if is_tiled else 'forward'}...",
+        )
         predictions = self.forward_tiles(data_batch) if isinstance(data_batch, TileBatchData) else self(data_batch)
         threshold = self.hparams.get("best_confidence_threshold", None)
         if not threshold:

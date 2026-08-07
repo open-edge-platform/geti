@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar
 
@@ -292,12 +293,37 @@ class OVEngine(Engine):
             )
             raise ValueError(msg)
         metric_callable = metric(datamodule.label_info)
+        logger.info("OVEngine.test: metric callable constructed (%s).", type(metric_callable).__name__)
         with Progress() as progress:
+            logger.info("OVEngine.test: building test dataloader...")
             dataloader = datamodule.test_dataloader()
-            task = progress.add_task("Testing", total=len(dataloader))
-            for data_batch in dataloader:
+            num_batches = len(dataloader)
+            task = progress.add_task("Testing", total=num_batches)
+            logger.info(
+                "OVEngine.test: test dataloader ready with %d batch(es). Creating dataloader "
+                "iterator (this spawns worker processes and blocks until num_workers>0 workers "
+                "are ready and the first batch is available)...",
+                num_batches,
+            )
+            start_time = time.monotonic()
+            for batch_idx, data_batch in enumerate(dataloader):
+                fetch_elapsed = time.monotonic() - start_time
+                logger.info(
+                    "OVEngine.test: fetched batch %d/%d from dataloader in %.2fs. Running model.test_step()...",
+                    batch_idx + 1,
+                    num_batches,
+                    fetch_elapsed,
+                )
+                step_start_time = time.monotonic()
                 model.test_step(data_batch, metric_callable)
+                logger.info(
+                    "OVEngine.test: model.test_step() for batch %d/%d completed in %.2fs.",
+                    batch_idx + 1,
+                    num_batches,
+                    time.monotonic() - step_start_time,
+                )
                 progress.update(task, advance=1)
+                start_time = time.monotonic()
 
         metrics_result = model.compute_metrics(metric_callable)
 
@@ -384,10 +410,34 @@ class OVEngine(Engine):
                     pad_value=model.pad_value,
                 )
                 dataloader = datamodule.test_dataloader()
-                task = progress.add_task("Predicting", total=len(dataloader))
-                for data_batch in dataloader:
+                num_batches = len(dataloader)
+                task = progress.add_task("Predicting", total=num_batches)
+                logger.info(
+                    "OVEngine.predict: test dataloader ready with %d batch(es). Creating dataloader "
+                    "iterator (this spawns worker processes and blocks until num_workers>0 workers "
+                    "are ready and the first batch is available)...",
+                    num_batches,
+                )
+                start_time = time.monotonic()
+                for batch_idx, data_batch in enumerate(dataloader):
+                    fetch_elapsed = time.monotonic() - start_time
+                    logger.info(
+                        "OVEngine.predict: fetched batch %d/%d from dataloader in %.2fs. "
+                        "Running model.predict_step()...",
+                        batch_idx + 1,
+                        num_batches,
+                        fetch_elapsed,
+                    )
+                    step_start_time = time.monotonic()
                     predict_result.append(model.predict_step(data_batch))
+                    logger.info(
+                        "OVEngine.predict: model.predict_step() for batch %d/%d completed in %.2fs.",
+                        batch_idx + 1,
+                        num_batches,
+                        time.monotonic() - step_start_time,
+                    )
                     progress.update(task, advance=1)
+                    start_time = time.monotonic()
 
             elif isinstance(datamodule, list):
                 task = progress.add_task("Predicting", total=1)
