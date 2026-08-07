@@ -64,7 +64,7 @@ is the source of truth for the release build.
 | [Visual Studio C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) | Select the **Desktop development with C++** workload — provides the MSVC linker Rust needs. |
 | [WebView2 runtime](https://developer.microsoft.com/microsoft-edge/webview2/)                | Preinstalled on Windows 11. **Absent on Windows Server** — install it manually.             |
 | [Git for Windows](https://git-scm.com/download/win)                                         | Needed for `bash.exe` **and** `cygpath.exe` (see below).                                    |
-| [Node.js](https://nodejs.org) ≥ 24.2, npm ≥ 11.3                                            | Pinned in [`../.nvmrc`](../.nvmrc) and `engines` in [`../package.json`](../package.json).   |
+| [Node.js](https://nodejs.org) ≥ 24.2, npm ≥ 11.14.0                                         | Pinned in [`../.nvmrc`](../.nvmrc) and `engines` in [`../package.json`](../package.json).   |
 | [Rust](https://rustup.rs) stable ≥ 1.77.2                                                   | Install via `rustup-init.exe`, then `rustup default stable`.                                |
 | [`just`](https://just.systems)                                                              | `winget install Casey.Just`                                                                 |
 | [`uv`](https://docs.astral.sh/uv/)                                                          | Installed automatically by the backend `Justfile` (see step 3).                             |
@@ -185,10 +185,9 @@ Copy-Item -Recurse -Force "src-tauri\msix\*" $msix
 Release packages are then signed with `signtool.exe`. An unsigned MSIX can
 only be installed with Developer Mode enabled.
 
-> The `start:tauri` and `build:tauri` npm scripts set `BUILD_TARGET=tauri`
-> using POSIX syntax. npm runs them through the `sh.exe` shipped with Git for
-> Windows, so they work from PowerShell. If you invoke Rspack directly, set
-> the variable yourself:
+> The `start:tauri` and `build:tauri` npm scripts set `BUILD_TARGET=tauri` using
+> `cross-env`, so they work from PowerShell, `cmd.exe`, and POSIX shells. If you
+> invoke Rspack directly, set the variable yourself:
 >
 > ```powershell
 > $env:BUILD_TARGET = 'tauri'; npx rsbuild build
@@ -427,17 +426,24 @@ production build via `beforeDevCommand` / `beforeBuildCommand` in
 
 ### Verifying the platform split
 
-Quick checks after changing anything under `src/platform/`:
+Quick checks after changing anything under `src/platform/`. Note the two builds
+write to **different** directories — `distPath.root` in
+[`../rsbuild.config.ts`](../rsbuild.config.ts) switches on `BUILD_TARGET`, and
+`frontendDist` in [`tauri.conf.json`](./tauri.conf.json) points at `../dist-tauri`:
 
 ```sh
-# Web build should not contain any @tauri-apps references.
+# Web build must not reach the Tauri runtime.
 npm run build
-grep -R "@tauri-apps" dist/ && echo "LEAK" || echo "clean"
+grep -Rl "__TAURI_INTERNALS__" dist/ && echo "LEAK" || echo "clean"
 
-# Tauri build must contain them.
+# Tauri build must.
 npm run build:tauri
-grep -R "tauri" dist/ >/dev/null && echo "ok" || echo "missing"
+grep -Rq "__TAURI_INTERNALS__" dist-tauri/ && echo "ok" || echo "missing"
 ```
+
+Grep for `__TAURI_INTERNALS__`, not `@tauri-apps` — the bundler erases import
+specifiers, so the package name does not survive into the output, but every
+`@tauri-apps/api` entry point calls through that global.
 
 ### Where is my data?
 
