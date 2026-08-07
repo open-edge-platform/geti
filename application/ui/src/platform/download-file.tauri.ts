@@ -15,7 +15,7 @@ const saveDownload = async (url: string, name?: string, startedMessage?: string)
         const filename = name ?? getFallbackFilename(url);
         const selectedPath = await save({
             defaultPath: filename,
-            filters: [{ name: 'All Files', extensions: ['*'] }],
+            filters: [getFilterForFilename(filename)],
         });
 
         if (selectedPath === null) {
@@ -37,6 +37,16 @@ const saveDownload = async (url: string, name?: string, startedMessage?: string)
         console.error('[tauri downloadFile] failed', error);
         toast({ type: 'error', message: 'Failed to download file' });
     }
+};
+
+const getFilterForFilename = (filename: string): { name: string; extensions: string[] } => {
+    const extension = filename.split('.').pop();
+
+    if (extension === undefined || extension === '' || extension === filename) {
+        return { name: 'All Files', extensions: ['*'] };
+    }
+
+    return { name: `${extension.toUpperCase()} File`, extensions: [extension.toLowerCase()] };
 };
 
 const getFallbackFilename = (url: string): string => {
