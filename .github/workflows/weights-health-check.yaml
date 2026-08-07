@@ -50,8 +50,8 @@ jobs:
             if [[ "$code" =~ ^(200|206)$ ]]; then
               printf 'OK   %-45s  http=%s  %.2fs  %d B  -> %s\n' \
                 "$model_name" "$code" "$time_s" "$bytes_dl" "$url_eff"
-            elif [[ "$curl_exit" -eq 63 ]]; then
-              # exit 63 = CURLE_FILESIZE_EXCEEDED: Range not honoured but server is live
+            elif [[ "$curl_exit" -eq 63 && "$code" =~ ^(200|206)$ ]]; then
+              # exit 63 = CURLE_FILESIZE_EXCEEDED: response exceeded --max-filesize (typically when Range is not honoured)
               printf 'OK   %-45s  http=%s  %.2fs  (range unsupported, capped)  -> %s\n' \
                 "$model_name" "$code" "$time_s" "$url_eff"
             else
