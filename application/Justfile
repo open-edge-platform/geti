@@ -17,20 +17,6 @@ coturn-image := "quay.io/coturn/coturn"
 data-volume := application-name + "-data"
 logs-volume := application-name + "-logs"
 
-[private]
-_host-ip:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    if command -v python3 > /dev/null 2>&1; then
-        PYTHON=python3
-    elif command -v python > /dev/null 2>&1; then
-        PYTHON=python
-    else
-        echo "Error: no Python interpreter found (tried 'python3' and 'python'). Install Python 3 to detect the host IP." >&2
-        exit 1
-    fi
-    "$PYTHON" -c "import socket; s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM); s.connect(('8.8.8.8',80)); print(s.getsockname()[0]); s.close()"
-
 # Build Geti Docker image for a specific training backend
 [arg("accelerator", long="accelerator", short="a", pattern="cpu|xpu|cuda")]
 [arg("tag", long="tag", short="t")]
@@ -159,20 +145,13 @@ coturn_port=coturn-port stun_server="" gpu-slots="1" certfile="" keyfile="":
         run_args+=(--rm)
     fi
 
-<<<<<<< HEAD
     HOST_IP=$(just resolve-host-ip)
-    COTURN_ENV=""
-=======
->>>>>>> 8048b5666 (Justfile cleanup)
+
     if [[ "{{ enable_coturn }}" == "true" ]]; then
         if [[ -n "{{ coturn_host }}" ]]; then
             COTURN_HOST="{{ coturn_host }}"
         else
-<<<<<<< HEAD
             COTURN_HOST="$HOST_IP"
-=======
-            COTURN_HOST=$(just _host-ip)
->>>>>>> 8048b5666 (Justfile cleanup)
         fi
         run_args+=(--env "COTURN_HOST=$COTURN_HOST" --env "COTURN_PORT={{ coturn_port }}")
     fi
@@ -189,12 +168,8 @@ coturn_port=coturn-port stun_server="" gpu-slots="1" certfile="" keyfile="":
         run_args+=(--env "KEYFILE={{ keyfile }}")
     fi
 
-<<<<<<< HEAD
-=======
-    HOST_IP=$(just _host-ip)
     run_args+=(--env "WEBRTC_ADVERTISE_IP=$HOST_IP")
 
->>>>>>> 8048b5666 (Justfile cleanup)
     # For XPU acceleration, we need to pass through the appropriate render device and group permissions
     if [[ "{{ accelerator }}" == "xpu" ]]; then
         RENDER_GID=$(getent group render | cut -d: -f3)
