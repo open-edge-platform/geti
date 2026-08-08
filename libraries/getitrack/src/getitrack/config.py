@@ -38,6 +38,21 @@ class InterpolationMethod(StrEnum):
     SPLINE = "spline"
 
 
+class DistanceMetric(StrEnum):
+    """Pairwise bbox distance used for detection-to-track association.
+
+    - ``IOU``: the reference ``1 - IoU`` cost.
+    - ``GIOU``: adds an enclosing-box penalty.
+    - ``DIOU``: adds a centre-distance term.
+    - ``CIOU``: adds both, plus an aspect-ratio term.
+    """
+
+    IOU = "iou"
+    GIOU = "giou"
+    DIOU = "diou"
+    CIOU = "ciou"
+
+
 class _StrictModel(BaseModel):
     """Base for config models: reject unknown keys and expose field docstrings."""
 
@@ -113,6 +128,12 @@ class TrackerConfig(_StrictModel):
 
     score_threshold: Annotated[float, Field(ge=0.0, le=1.0)] = 0.1
     """Low-score floor for tracking; detections scoring at or below this are excluded."""
+
+    distance_metric: DistanceMetric = DistanceMetric.IOU
+    """Pairwise bbox distance used for association. ``iou`` is the reference
+    ``1 - IoU`` cost; ``giou``/``diou``/``ciou`` extend it and stay informative
+    for weakly overlapping or disjoint boxes. Cost limits are calibrated for the
+    ``[0, 1]`` IoU range, so retune thresholds when selecting a wider-range metric."""
 
     lifecycle: LifecycleConfig = Field(default_factory=LifecycleConfig)
     """Track creation, confirmation, and removal parameters."""

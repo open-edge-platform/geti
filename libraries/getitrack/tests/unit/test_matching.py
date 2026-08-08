@@ -5,9 +5,9 @@
 import numpy as np
 import pytest
 
-from getitrack.matching.iou import (
+from getitrack.matching import (
+    IoUDistance,
     fuse_score,
-    iou_distance,
     iou_matrix,
     linear_assignment,
 )
@@ -23,7 +23,7 @@ class TestIoUMatrix:
     def test_iou_distance_is_float32_complement(self):
         a = np.array([[0, 0, 10, 10]], dtype=np.float32)
         b = np.array([[5, 0, 15, 10]], dtype=np.float32)
-        dist = iou_distance(a, b)
+        dist = IoUDistance()(a, b)
         # numpy>=2.0 (NEP 50) keeps ``1.0 - float32`` as float32, no upcast.
         assert dist.dtype == np.float32
         assert dist[0, 0] == pytest.approx(1.0 - 1.0 / 3.0, abs=1e-5)
