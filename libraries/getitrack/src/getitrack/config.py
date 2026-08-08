@@ -86,7 +86,11 @@ class InterpolationConfig(_StrictModel):
     """Maximum consecutive missing frames bridged by interpolation."""
 
     smoothing_window: Annotated[int, Field(ge=1)] = 5
-    """Window size for spline or moving-average smoothing."""
+    """Samples in the centred moving average applied to interpolated boxes. 1 disables smoothing."""
+
+    online: bool = False
+    """Run causally: bridge a gap only once its closing observation is within
+    ``online_buffer`` frames of lookahead. False bridges every gap offline."""
 
     online_buffer: Annotated[int, Field(ge=0)] = 0
     """Frames of lookahead permitted in online mode. 0 is strictly causal (zero latency)."""
