@@ -152,7 +152,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                                 itemsIds={Array.from(selectedKeys) as string[]}
                                 onDeleted={toggleSelectedKeys}
                             />
-                            <SaveDatasetView selectedMediaCount={totalSelectedElements} />
+                            <SaveDatasetView selectedMediaIds={Array.from(selectedMediaItems ?? []) as string[]} />
                         </>
                     )}
                 </Flex>

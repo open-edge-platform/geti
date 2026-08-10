@@ -10,10 +10,10 @@ import { SelectedMediaCount } from '../selected-media-count/selected-media-count
 
 type SaveDatasetViewDialogProps = {
     onClose: () => void;
-    selectedMediaCount: number;
+    selectedMediaIds: string[];
 };
 
-const SaveDatasetViewDialog = ({ onClose, selectedMediaCount }: SaveDatasetViewDialogProps) => {
+const SaveDatasetViewDialog = ({ onClose, selectedMediaIds }: SaveDatasetViewDialogProps) => {
     const [viewName, setViewName] = useState<string>('');
 
     const isSaveDisabled = isEmpty(viewName);
@@ -28,7 +28,7 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaCount }: SaveDatasetViewD
             <Heading>Save view</Heading>
             <Divider size={'S'} />
             <Content>
-                <SelectedMediaCount count={selectedMediaCount} />
+                <SelectedMediaCount count={selectedMediaIds.length} />
                 <Form id={'view-name-form'} onSubmit={saveView} marginTop={'size-200'}>
                     <TextField label={'View name'} value={viewName} onChange={setViewName} />
                 </Form>
@@ -46,10 +46,10 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaCount }: SaveDatasetViewD
 };
 
 type SaveDatasetViewProps = {
-    selectedMediaCount: number;
+    selectedMediaIds: string[];
 };
 
-export const SaveDatasetView = ({ selectedMediaCount }: SaveDatasetViewProps) => {
+export const SaveDatasetView = ({ selectedMediaIds }: SaveDatasetViewProps) => {
     const [isSaveViewDialogOpen, setIsSaveViewDialogOpen] = useState<boolean>(false);
 
     const closeDialog = () => {
@@ -63,7 +63,7 @@ export const SaveDatasetView = ({ selectedMediaCount }: SaveDatasetViewProps) =>
             </Button>
             <DialogContainer onDismiss={closeDialog}>
                 {isSaveViewDialogOpen && (
-                    <SaveDatasetViewDialog onClose={closeDialog} selectedMediaCount={selectedMediaCount} />
+                    <SaveDatasetViewDialog onClose={closeDialog} selectedMediaIds={selectedMediaIds} />
                 )}
             </DialogContainer>
         </>
