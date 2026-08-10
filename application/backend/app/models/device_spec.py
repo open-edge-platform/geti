@@ -68,6 +68,8 @@ class DeviceSpec:
         return self._type == device.type and self._index == (device.index or 0)
 
     def __str__(self) -> str:
+        if self.is_auto() or self.is_cpu():
+            return self._type.value
         return f"{self._type.value}-{self._index}"
 
     def fixed_device(self) -> DeviceInfo | None:

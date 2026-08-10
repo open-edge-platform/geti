@@ -59,7 +59,7 @@ class ActiveModelService:
             pipeline_device = active_model_repo.get_active_pipeline_device()
             if pipeline_device is None:
                 raise RuntimeError("Active pipeline must have a device configured")
-            geti_device = self._system_service.inference_device(pipeline_device)
+            geti_device = self._system_service.inference_device(pipeline_device, fallback_to_cpu=True)
             return ModelActivationState(
                 project_id=UUID(active_model.project_id),
                 active_model_id=UUID(active_model.id),

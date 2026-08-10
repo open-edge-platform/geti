@@ -98,17 +98,25 @@ class OpenVinoInferenceDeviceCatalog:
     """
 
     def __init__(self) -> None:
-        self._core = self._try_create_core()
+        self._core: Any | None = None
+        self._core_init_failed = False
 
-    @staticmethod
-    def _try_create_core() -> Any | None:
+    def _get_core(self) -> Any | None:
+        if self._core is not None:
+            return self._core
+        if self._core_init_failed:
+            return None
         try:
             import openvino as ov
 
-            return ov.Core()
+            self._core = ov.Core()
+        except ImportError:
+            logger.warning("OpenVINO is not installed; falling back to CPU-only inference devices.")
+            self._core_init_failed = True
         except Exception:
             logger.exception("Failed to query OpenVINO inference devices; falling back to CPU only.")
-            return None
+            self._core_init_failed = True
+        return self._core
 
     def devices(self) -> list[DeviceInfo]:
         """
@@ -117,10 +125,15 @@ class OpenVinoInferenceDeviceCatalog:
         Returns:
             list[DeviceInfo]: CPU plus any detected integrated/Intel discrete GPUs.
         """
-        if self._core is None:
+        core = self._get_core()
+        if core is None:
             return [DeviceInfo.cpu()]
 
-        found = [d for name in self._core.available_devices if (d := self._device_info(name)) is not None]
+        found = [
+            d
+            for name in self._core.available_devices  # pyrefly: ignore[missing-attribute]
+            if (d := self._device_info(name)) is not None
+        ]
         if not any(device.type == DeviceType.CPU for device in found):
             found.insert(0, DeviceInfo.cpu())
         return found
@@ -256,26 +269,49 @@ class SystemService:
             raise ValueError(f"Device '{device_str}' is not available for training.")
         return device
 
-    def inference_device(self, device_str: str) -> DeviceInfo:
+    def inference_device(self, device_str: str, fallback_to_cpu: bool = False) -> DeviceInfo:
         """
         Resolve a device string to a `DeviceInfo` for inference.
 
         Args:
             device_str: Device string in format '<target>[-<index>]'
                 (e.g., 'auto', 'cpu', 'xpu', 'xpu-2').
+            fallback_to_cpu: If True, return the CPU device (with a warning logged) instead of
+                raising when `device_str` is malformed, is a CUDA device, or is not currently
+                available for inference.
 
         Returns:
-            DeviceInfo: Information about the specified inference device.
+            DeviceInfo: Information about the specified inference device, or CPU if
+                `fallback_to_cpu` is True and the requested device can't be resolved
 
         Raises:
-            ValueError: If `device_str` is invalid, is a CUDA device, or is not available
-                for inference.
+            ValueError: If `device_str` is invalid, or if it is a CUDA device or not available
+                for inference and `fallback_to_cpu` is False.
         """
-        spec = self._parse(device_str)
+        try:
+            spec = self._parse(device_str)
+        except ValueError:
+            if fallback_to_cpu:
+                logger.warning("Configured inference device '{}' is invalid; falling back to CPU.", device_str)
+                return DeviceInfo.cpu()
+            raise
+
         if spec.is_cuda():
+            if fallback_to_cpu:
+                logger.warning(
+                    "Configured inference device '{}' is a CUDA device, which is not supported for inference; "
+                    "falling back to CPU.",
+                    device_str,
+                )
+                return DeviceInfo.cpu()
             raise ValueError(f"Device '{device_str}' is not valid for inference (CUDA devices are not supported).")
         device = self._inference.find(spec)
         if device is None:
+            if fallback_to_cpu:
+                logger.warning(
+                    "Configured inference device '{}' is not currently available; falling back to CPU.", device_str
+                )
+                return DeviceInfo.cpu()
             raise ValueError(f"Device '{device_str}' is not available for inference.")
         return device
 

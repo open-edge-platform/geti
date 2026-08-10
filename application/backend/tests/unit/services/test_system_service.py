@@ -271,6 +271,12 @@ class TestSystemService:
         with pytest.raises(ValueError):
             _ = fxt_system_service.inference_device("gpu")
 
+    def test_inference_device_fallback_to_cpu(self, fxt_system_service: SystemService) -> None:
+        """Malformed, CUDA, and unavailable inference devices fall back to CPU when fallback_to_cpu=True."""
+        assert fxt_system_service.inference_device("not-a-device!!", fallback_to_cpu=True) == DeviceInfo.cpu()
+        assert fxt_system_service.inference_device("cuda", fallback_to_cpu=True) == DeviceInfo.cpu()
+        assert fxt_system_service.inference_device("xpu-2", fallback_to_cpu=True) == DeviceInfo.cpu()
+
     def test_list_cameras(self, fxt_system_service: SystemService):
         """Test listing camera devices"""
         with patch("app.services.system_service.enumerate_cameras") as mock_enumerate_cameras:

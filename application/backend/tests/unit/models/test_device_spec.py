@@ -28,7 +28,10 @@ class TestDeviceSpec:
         spec = DeviceSpec.parse(device_str)
 
         assert spec.type == expected_type
-        assert str(spec) == f"{expected_type.value}-{expected_index}"
+        if spec.is_auto() or spec.is_cpu():
+            assert str(spec) == f"{expected_type.value}"
+        else:
+            assert str(spec) == f"{expected_type.value}-{expected_index}"
 
     @pytest.mark.parametrize(
         "device_str",
@@ -91,4 +94,5 @@ class TestDeviceSpec:
 
     def test_str(self):
         assert str(DeviceSpec.parse("xpu-2")) == "xpu-2"
-        assert str(DeviceSpec.parse("cpu")) == "cpu-0"
+        assert str(DeviceSpec.parse("cpu")) == "cpu"
+        assert str(DeviceSpec.parse("auto")) == "auto"
