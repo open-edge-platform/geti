@@ -29,11 +29,16 @@ import { useSelectDatasetItem } from '../hooks/use-select-dataset-item.hook';
 import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
 import { DatasetViewSelector } from './dataset-view-selector/dataset-view-selector.component';
+import { SaveDatasetView } from './dataset-view-selector/save-dataset-view/save-dataset-view.component';
 import { MediaFiltering } from './media-filtering/media-filtering.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
 import { toggleMultipleSelection } from './util';
 
+// Copyright (C) 2025-2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (C) 2025-2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
 type ToolbarProps = {
     items: Media[];
     viewMode: ViewModes;
@@ -127,7 +132,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
             <Flex direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
                 <Flex
-                    gap={'size-50'}
+                    gap={'size-100'}
                     height={'size-400'}
                     direction={'row'}
                     alignItems={'center'}
@@ -141,13 +146,14 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     {!hasSelectedElements && <SortMediaByUploadDate />}
 
-                    <Divider orientation={'vertical'} size={'S'} />
-
                     {hasSelectedElements && (
-                        <DeleteMediaItem
-                            itemsIds={Array.from(selectedKeys) as string[]}
-                            onDeleted={toggleSelectedKeys}
-                        />
+                        <>
+                            <DeleteMediaItem
+                                itemsIds={Array.from(selectedKeys) as string[]}
+                                onDeleted={toggleSelectedKeys}
+                            />
+                            <SaveDatasetView selectedMediaCount={totalSelectedElements} />
+                        </>
                     )}
                 </Flex>
 
