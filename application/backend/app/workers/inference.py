@@ -16,7 +16,7 @@ from loguru import logger
 from loguru._logger import Logger as LoguruLogger
 
 from app.models.inference import InferenceWorkerStatus, InferenceWorkerStatusCode
-from app.services import ActiveModelService, MetricsService
+from app.services import ActiveModelService, MetricsService, SystemService
 from app.services.inference.model_loader import LoadedModelHandle
 from app.settings import Settings, get_settings
 from app.stream.stream_data import InferenceData, StreamData
@@ -120,7 +120,8 @@ class InferenceWorker(BaseProcessWorker):
         super().setup()
         self._inference_status_shm = SharedMemory(name=self._inference_status_shm_name, create=False)
         self._metrics_service = MetricsService(self._shm_name, self._shm_lock)
-        self._model_service = ActiveModelService(get_settings().data_dir)
+        system_service = SystemService()
+        self._model_service = ActiveModelService(get_settings().data_dir, system_service)
         self.__prediction_buffer = PredictionReorderBuffer()
 
     @property

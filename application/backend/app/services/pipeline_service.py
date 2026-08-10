@@ -92,7 +92,7 @@ class PipelineService(BaseSessionManagedService):
         if pipeline_db is None:
             return None
 
-        if not self._system_service.validate_device(pipeline_db.device):
+        if not self._system_service.is_valid_inference_device(pipeline_db.device):
             logger.warning(
                 "The configured device '{}' is not available for pipeline '{}'. Falling back to 'cpu'.",
                 pipeline_db.device,
@@ -302,6 +302,6 @@ class PipelineService(BaseSessionManagedService):
         """
         if self._system_service is None:
             raise ValueError("System service is required to validate INT8 support.")
-        device_info = self._system_service.get_device_info(device)
+        device_info = self._system_service.inference_device(device)
         if not self._system_service.supports_int8(device_info):
             raise DeviceInt8NotSupportedError(device)

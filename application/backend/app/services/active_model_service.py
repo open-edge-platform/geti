@@ -24,13 +24,13 @@ class ActiveModelService:
     Used exclusively by the InferenceWorker process.
     """
 
-    def __init__(self, data_dir: Path) -> None:
+    def __init__(self, data_dir: Path, system_service: SystemService) -> None:
         self.projects_dir = data_dir / "projects"
+        self._system_service = system_service
         self._model_activation_state: ModelActivationState = self._load_state()
         self._loaded_model: LoadedModelHandle | None = None
 
-    @staticmethod
-    def _load_state() -> ModelActivationState:
+    def _load_state(self) -> ModelActivationState:
         """Load the state from the DB if it exists, otherwise initialize an empty state"""
         with get_db_session() as db:
             active_model_repo = ActiveModelRepo(db=db)
@@ -59,7 +59,7 @@ class ActiveModelService:
             pipeline_device = active_model_repo.get_active_pipeline_device()
             if pipeline_device is None:
                 raise RuntimeError("Active pipeline must have a device configured")
-            geti_device = SystemService().get_device_info(pipeline_device)
+            geti_device = self._system_service.inference_device(pipeline_device)
             return ModelActivationState(
                 project_id=UUID(active_model.project_id),
                 active_model_id=UUID(active_model.id),
