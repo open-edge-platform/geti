@@ -301,12 +301,20 @@ class OVEngine(Engine):
             task = progress.add_task("Testing", total=num_batches)
             logger.info(
                 "OVEngine.test: test dataloader ready with %d batch(es). Creating dataloader "
-                "iterator (this spawns worker processes and blocks until num_workers>0 workers "
-                "are ready and the first batch is available)...",
+                "iterator (this spawns worker processes but should return quickly; it does NOT "
+                "wait for the first batch)...",
                 num_batches,
             )
+            iter_start_time = time.monotonic()
+            dataloader_iter = iter(dataloader)
+            logger.info(
+                "OVEngine.test: dataloader iterator created in %.2fs (worker processes spawned). "
+                "Fetching first batch (this is where per-item work such as tile expansion in "
+                "__getitem__ and collation happens, and may block for a while)...",
+                time.monotonic() - iter_start_time,
+            )
             start_time = time.monotonic()
-            for batch_idx, data_batch in enumerate(dataloader):
+            for batch_idx, data_batch in enumerate(dataloader_iter):
                 fetch_elapsed = time.monotonic() - start_time
                 logger.info(
                     "OVEngine.test: fetched batch %d/%d from dataloader in %.2fs. Running model.test_step()...",
@@ -414,12 +422,20 @@ class OVEngine(Engine):
                 task = progress.add_task("Predicting", total=num_batches)
                 logger.info(
                     "OVEngine.predict: test dataloader ready with %d batch(es). Creating dataloader "
-                    "iterator (this spawns worker processes and blocks until num_workers>0 workers "
-                    "are ready and the first batch is available)...",
+                    "iterator (this spawns worker processes but should return quickly; it does NOT "
+                    "wait for the first batch)...",
                     num_batches,
                 )
+                iter_start_time = time.monotonic()
+                dataloader_iter = iter(dataloader)
+                logger.info(
+                    "OVEngine.predict: dataloader iterator created in %.2fs (worker processes spawned). "
+                    "Fetching first batch (this is where per-item work such as tile expansion in "
+                    "__getitem__ and collation happens, and may block for a while)...",
+                    time.monotonic() - iter_start_time,
+                )
                 start_time = time.monotonic()
-                for batch_idx, data_batch in enumerate(dataloader):
+                for batch_idx, data_batch in enumerate(dataloader_iter):
                     fetch_elapsed = time.monotonic() - start_time
                     logger.info(
                         "OVEngine.predict: fetched batch %d/%d from dataloader in %.2fs. "
