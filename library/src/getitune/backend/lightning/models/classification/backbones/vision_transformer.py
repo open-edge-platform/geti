@@ -97,8 +97,8 @@ class VisionTransformerBackbone(BaseModule):
                 "embed_dim": 384,
                 "depth": 12,
                 "num_heads": 6,
-                "reg_tokens": 4,
-                "no_embed_class": True,
+                "reg_tokens": 0,
+                "no_embed_class": False,
                 "init_values": 1e-05,
             }
             for key in ["dinov2-small-seg"]
@@ -330,21 +330,14 @@ class VisionTransformerBackbone(BaseModule):
             state_dict.pop("mask_token", None)
             if "register_tokens" in state_dict:
                 state_dict["reg_token"] = state_dict.pop("register_tokens")
-            if self.no_embed_class:
-                state_dict["cls_token"] = state_dict.pop("cls_token")
-            else:
-                state_dict["cls_token"] = state_dict.pop("cls_token") + state_dict["pos_embed"][:, 0]
+            state_dict["cls_token"] = state_dict.pop("cls_token") + state_dict["pos_embed"][:, 0]
 
             img_size = (self.img_size, self.img_size) if isinstance(self.img_size, int) else self.img_size
             patch_size = (self.patch_size, self.patch_size)
 
             if state_dict["pos_embed"].shape != self.pos_embed.shape:
-                pos_embed = state_dict.pop("pos_embed")
-                if not self.no_embed_class:
-                    pos_embed = pos_embed[:, 1:]
-
                 state_dict["pos_embed"] = resize_positional_embeddings(
-                    pos_embed,
+                    state_dict.pop("pos_embed")[:, 1:],
                     (img_size[0] // patch_size[0], img_size[1] // patch_size[1]),
                 )
             self.load_state_dict(state_dict, strict=False)
@@ -403,7 +396,6 @@ class VisionTransformerBackbone(BaseModule):
         if npatch == n and w == h:
             return self.pos_embed
         pos_embed = self.pos_embed.float()
-        patch_pos_embed = pos_embed if self.no_embed_class else pos_embed[:, 1:]
         dim = x.shape[-1]
         w0 = w // self.patch_size
         h0 = h // self.patch_size
@@ -420,16 +412,13 @@ class VisionTransformerBackbone(BaseModule):
         else:
             # Simply specify an output size instead of a scale factor
             kwargs["size"] = (w0, h0)
+        patch_pos_embed = pos_embed[:, 1:]
         patch_pos_embed = nn.functional.interpolate(
             patch_pos_embed.reshape(1, m, m, dim).permute(0, 3, 1, 2),
             mode="bicubic",
             **kwargs,
         )
         patch_pos_embed = patch_pos_embed.permute(0, 2, 3, 1).view(1, -1, dim).to(previous_dtype)
-
-        if self.no_embed_class:
-            return patch_pos_embed
-
         class_pos_embed = pos_embed[:, 0].unsqueeze(0).to(previous_dtype)
         return torch.cat((class_pos_embed, patch_pos_embed), dim=1)
 
@@ -448,7 +437,20 @@ class VisionTransformerBackbone(BaseModule):
         if masks is not None:
             x = torch.where(masks.unsqueeze(-1), self.mask_token.to(x.dtype).unsqueeze(0), x)
 
-        return self._pos_embed(x)
+        x = torch.cat((self.cls_token.expand(x.shape[0], -1, -1), x), dim=1)  # pyrefly: ignore[missing-attribute]
+        x = x + self.interpolate_pos_encoding(x, w, h)
+
+        if self.reg_token is not None:
+            x = torch.cat(
+                (
+                    x[:, :1],
+                    self.reg_token.expand(x.shape[0], -1, -1),
+                    x[:, 1:],
+                ),
+                dim=1,
+            )
+
+        return x
 
     def _get_intermediate_layers_not_chunked(self, x: torch.Tensor, n: int = 1) -> list[torch.Tensor]:
         """Get intermediate layers without chunking.

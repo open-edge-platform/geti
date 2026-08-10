@@ -71,10 +71,8 @@ def get_task_list(task: str) -> list[TaskType]:
         tasks = [TaskType.MULTI_CLASS_CLS]
     elif task == "multi_label_cls":
         tasks = [TaskType.MULTI_LABEL_CLS]
-    elif task == "h_label_cls":
-        tasks = [TaskType.H_LABEL_CLS]
     elif task == "classification":
-        tasks = [TaskType.MULTI_CLASS_CLS, TaskType.MULTI_LABEL_CLS, TaskType.H_LABEL_CLS]
+        tasks = [TaskType.MULTI_CLASS_CLS, TaskType.MULTI_LABEL_CLS]
     elif task == "keypoint_detection":
         tasks = [TaskType.KEYPOINT_DETECTION]
     else:
@@ -104,8 +102,8 @@ def get_model_category_list(task: str) -> list[str]:
         recipes.extend(str(p) for p in CATEGORY_RECIPES_PER_TASK.get(task_key, []))
 
         # Classification category recipes are stored under multi_class_cls;
-        # derive multi_label_cls / h_label_cls variants when requested.
-        if task_key in ("multi_label_cls", "h_label_cls"):
+        # derive multi_label_cls variants when requested.
+        if task_key == "multi_label_cls":
             recipes.extend(
                 str(p).replace("multi_class_cls", task_key)
                 for p in CATEGORY_RECIPES_PER_TASK.get("multi_class_cls", [])
@@ -167,9 +165,7 @@ def fxt_target_dataset_per_task() -> dict:
         "multi_class_cls": "tests/assets/classification_cifar10",
         "multi_class_cls_16bit": "tests/assets/classification_dataset_16bit",
         "multi_label_cls": "tests/assets/multilabel_classification_coco",
-        "h_label_cls": "tests/assets/hierarchical_classification_cifar100",
         "detection": "tests/assets/detection_coco",
-        "rotated_detection": "tests/assets/detection_coco",
         "instance_segmentation": "tests/assets/instance_segmentation_coco",
         "semantic_segmentation": "tests/assets/segmentation_pets",
         "keypoint_detection": "tests/assets/keypoint_detection_coco",

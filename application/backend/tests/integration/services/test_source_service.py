@@ -423,7 +423,7 @@ class TestSourceUpdateServiceIntegration:
         db_source = db_session.get(SourceDB, db_source.id)
         assert db_source.name == "Updated Source"
         assert db_source.config_data["video_path"] == "/new/path"
-        fxt_event_bus.emit_event.assert_called_once_with(EventType.SOURCE_CHANGED)
+        fxt_event_bus.emit_event_after_commit.assert_called_once_with(db_session, EventType.SOURCE_CHANGED)
 
     def test_update_source_video_file_path_changed_deletes_old_video(
         self,

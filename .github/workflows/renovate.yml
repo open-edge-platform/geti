@@ -56,7 +56,7 @@ jobs:
   renovate:
     permissions:
       contents: read
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Harden the runner (audit all outbound calls)

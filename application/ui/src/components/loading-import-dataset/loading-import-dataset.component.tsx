@@ -49,7 +49,7 @@ export const LoadingImportDataset = ({
         },
     });
 
-    const isRunningOrPending = isJobRunning(job) || isJobPending(job);
+    const isRunningOrPending = job !== undefined && (isJobRunning(job) || isJobPending(job));
 
     return (
         <>
@@ -57,8 +57,8 @@ export const LoadingImportDataset = ({
                 <ImportFailedJob
                     fileName={fileName}
                     size={size}
-                    error={job.error ?? ''}
-                    message={job.message ?? ''}
+                    error={job?.error ?? ''}
+                    message={job?.message ?? ''}
                     stagedDatasetId={stagedDatasetId}
                     deleteEntry={deleteEntry}
                 />

@@ -5,7 +5,6 @@
 
 from .dataset import (
     DetectionDataset,
-    HlabelClsDataset,
     InstanceSegDataset,
     KeypointDetectionDataset,
     MulticlassClsDataset,
@@ -18,7 +17,6 @@ from .module import DataModule
 __all__ = [
     "DataModule",
     "DetectionDataset",
-    "HlabelClsDataset",
     "InstanceSegDataset",
     "KeypointDetectionDataset",
     "MulticlassClsDataset",

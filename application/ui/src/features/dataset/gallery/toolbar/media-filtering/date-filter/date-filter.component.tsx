@@ -1,64 +1,56 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { DatePicker, Flex, Text } from '@geti-ui/ui';
-import { getLocalTimeZone, parseAbsoluteToLocal, type DateValue } from '@internationalized/date';
-import dayjs from 'dayjs';
+import { useState } from 'react';
+
+import { DateRangePicker } from '@geti-ui/ui';
+import { getLocalTimeZone, now, parseAbsoluteToLocal, type ZonedDateTime } from '@internationalized/date';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 
 import classes from './date-filter.module.scss';
 
-const MIN_DATE = parseAbsoluteToLocal(dayjs('2020-01-30').startOf('d').toISOString());
-const MAX_DATE = parseAbsoluteToLocal(dayjs('9999-11-30').endOf('d').toISOString());
+type DateRange = { start: ZonedDateTime; end: ZonedDateTime };
+
+const toDateRange = (start: string | null, end: string | null): DateRange | null =>
+    start === null || end === null ? null : { start: parseAbsoluteToLocal(start), end: parseAbsoluteToLocal(end) };
+
+const isDateRangeValid = ({ start, end }: DateRange, maxDate: ZonedDateTime): boolean =>
+    end.compare(start) >= 0 && end.compare(maxDate) <= 0;
 
 export const DateFilter = () => {
-    const { startDate, endDate, setStartDate, setEndDate } = useDatasetFiltersSearchParams();
+    const { startDate, endDate, setDateRange } = useDatasetFiltersSearchParams();
 
-    const handleStartDateChange = (date: DateValue | null) => {
-        if (date === null) {
+    const maxDate = now(getLocalTimeZone());
+
+    // The picker is kept in local state so that an invalid range can be shown to the user
+    // without being applied to the dataset filters
+    const [range, setRange] = useState<DateRange | null>(() => toDateRange(startDate, endDate));
+
+    const handleChange = (value: DateRange | null) => {
+        setRange(value);
+
+        if (value !== null && !isDateRangeValid(value, maxDate)) {
             return;
         }
 
-        setStartDate(date.toDate(getLocalTimeZone()).toISOString());
-    };
-
-    const handleEndDateChange = (date: DateValue | null) => {
-        if (date === null) {
-            return;
-        }
-
-        setEndDate(date.toDate(getLocalTimeZone()).toISOString());
+        setDateRange(
+            value === null ? null : value.start.toDate().toISOString(),
+            value === null ? null : value.end.toDate().toISOString()
+        );
     };
 
     return (
-        <Flex direction='column' gap='size-100'>
-            <Text UNSAFE_className={classes.label}>Filter by upload date</Text>
-
-            <Flex direction='column' gap='size-100'>
-                <DatePicker
-                    granularity={'second'}
-                    width={'100%'}
-                    label='Start date'
-                    labelPosition={'top'}
-                    hourCycle={24}
-                    minValue={MIN_DATE}
-                    maxValue={endDate === null ? MAX_DATE : parseAbsoluteToLocal(endDate)}
-                    value={startDate === null ? null : parseAbsoluteToLocal(startDate)}
-                    onChange={handleStartDateChange}
-                />
-
-                <DatePicker
-                    granularity={'second'}
-                    width={'100%'}
-                    label='End date'
-                    labelPosition={'top'}
-                    hourCycle={24}
-                    minValue={startDate === null ? MIN_DATE : parseAbsoluteToLocal(startDate)}
-                    maxValue={MAX_DATE}
-                    value={endDate === null ? null : parseAbsoluteToLocal(endDate)}
-                    onChange={handleEndDateChange}
-                />
-            </Flex>
-        </Flex>
+        <DateRangePicker
+            label='Filter by upload date'
+            labelPosition='top'
+            width='100%'
+            granularity='minute'
+            hourCycle={24}
+            hideTimeZone
+            maxValue={maxDate}
+            value={range}
+            onChange={handleChange}
+            UNSAFE_className={classes.dateRangePicker}
+        />
     );
 };

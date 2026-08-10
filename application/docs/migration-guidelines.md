@@ -34,6 +34,18 @@
 | File storage      | Local filesystem                               | `data/projects/<project_id>/…` |
 | Migration runner  | `app/db/migration.py` → `MigrationManager`     | Runs on app startup            |
 
+### Runtime upgrade behaviour
+
+`MigrationManager` runs on every startup and makes upgrades **safe and reversible (with manual intervention required)**:
+
+- Before migrating, it takes a **backup of `geti.db`**.
+- If `alembic upgrade head` succeeds, the backup is deleted and the process continues.
+- If `alembic upgrade head` fails, the error is logged so that the use know how to proceed in this situation. 
+- The process then exits with a dedicated fatal exit code (`3`) so it is not
+  restarted in a loop.
+
+See [`upgrade.md`](./upgrade.md) for the end-user upgrade/rollback procedures.
+
 ### File-Storage Layout
 
 ```

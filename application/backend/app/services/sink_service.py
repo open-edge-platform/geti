@@ -120,7 +120,10 @@ class SinkService:
             )
             active_sink_id = self.get_active_sink_id()
             if active_sink_id == UUID(db_sink.id):
-                self._event_bus.emit_event(EventType.SINK_CHANGED)
+                # Emit only after this transaction commits, so consumers reacting to SINK_CHANGED
+                # re-read the new (durable) sink config instead of racing the commit and reading the
+                # previous configuration.
+                self._event_bus.emit_event_after_commit(self._db_session, EventType.SINK_CHANGED)
             return SinkAdapter.validate_python(db_sink, from_attributes=True)
         except UniqueConstraintIntegrityError:
             raise ResourceWithNameAlreadyExistsError(ResourceType.SINK, new_name)  # type: ignore[arg-type]

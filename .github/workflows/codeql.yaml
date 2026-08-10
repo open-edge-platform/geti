@@ -7,6 +7,7 @@ on:
     branches: ["develop", "release/**"]
   pull_request:
     branches: ["develop", "release/**"]
+  workflow_dispatch:
 
 permissions: {}
 
@@ -15,114 +16,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check_paths:
-    name: Check which language should be analyzed by CodeQL
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
-    if: github.event_name == 'pull_request'
-    outputs:
-      run_python: "${{ steps.prepare_outputs.outputs.run_python }}"
-      run_javascript_typescript: "${{ steps.prepare_outputs.outputs.run_javascript_typescript }}"
-      run_actions: "${{ steps.prepare_outputs.outputs.run_actions }}"
-      run_rust: "${{ steps.prepare_outputs.outputs.run_rust }}"
-    steps:
-      - &harden-runner
-        name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
-        with:
-          egress-policy: audit
-
-      - &checkout
-        name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
-        with:
-          persist-credentials: false
-
-      - name: Get all paths that should trigger the workflow
-        id: changed-files-yaml
-        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
-        with:
-          files_yaml: |
-            python:
-              - application/backend/**
-              - library/**
-            rust:
-              - application/ui/**
-            javascript-typescript:
-              - application/ui/**
-            actions:
-              - .github/**
-
-      - name: Prepare outputs
-        id: prepare_outputs
-        env:
-          PYTHON_ANY_CHANGED: ${{ steps.changed-files-yaml.outputs.python_any_changed }}
-          JAVASCRIPT_ANY_CHANGED: ${{ steps.changed-files-yaml.outputs.javascript-typescript_any_changed }}
-          ACTIONS_ANY_CHANGED: ${{ steps.changed-files-yaml.outputs.actions_any_changed }}
-          RUST_ANY_CHANGED: ${{ steps.changed-files-yaml.outputs.rust_any_changed }}
-        run: |
-          echo "PYTHON_ANY_CHANGED=$PYTHON_ANY_CHANGED"
-          if [ "$PYTHON_ANY_CHANGED" = "true" ]; then
-            echo "run_python=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run_python=false" >> "$GITHUB_OUTPUT"
-          fi
-
-          echo "JAVASCRIPT_ANY_CHANGED=$JAVASCRIPT_ANY_CHANGED"
-          if [ "$JAVASCRIPT_ANY_CHANGED" = "true" ]; then
-            echo "run_javascript_typescript=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run_javascript_typescript=false" >> "$GITHUB_OUTPUT"
-          fi
-
-          echo "ACTIONS_ANY_CHANGED=$ACTIONS_ANY_CHANGED"
-          if [ "$ACTIONS_ANY_CHANGED" = "true" ]; then
-            echo "run_actions=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run_actions=false" >> "$GITHUB_OUTPUT"
-          fi
-
-          echo "RUST_ANY_CHANGED=$RUST_ANY_CHANGED"
-          if [ "$RUST_ANY_CHANGED" = "true" ]; then
-            echo "run_rust=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run_rust=false" >> "$GITHUB_OUTPUT"
-          fi
-
   analyze:
     name: Analyze (${{ matrix.language }})
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       security-events: write # required to publish sarif
-    needs: check_paths
+
     strategy:
       fail-fast: false
       matrix:
         include:
           - language: actions
-            run: ${{ needs.check_paths.outputs.run_actions || 'true' }}
+            build-mode: none
           - language: python
-            run: ${{ needs.check_paths.outputs.run_python || 'true' }}
+            build-mode: none
           - language: javascript-typescript
-            run: ${{ needs.check_paths.outputs.run_javascript_typescript || 'true' }}
+            build-mode: none
           - language: rust
-            run: ${{ needs.check_paths.outputs.run_rust || 'true' }}
-
+            build-mode: none
     steps:
-      - *harden-runner
+      - name: Harden the runner
+        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        with:
+          disable-sudo: true
+          disable-telemetry: true
+          egress-policy: audit
 
-      - *checkout
+      - name: Checkout repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
-      # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
-        if: ${{ matrix.run == 'true' }}
         with:
           languages: ${{ matrix.language }}
-          build-mode: none
+          build-mode: ${{ matrix.build-mode }}
           queries: security-extended
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@7188fc363630916deb702c7fdcf4e481b751f97a # v4.37.1
-        if: ${{ matrix.run == 'true' }}
         with:
           category: "/language:${{matrix.language}}"

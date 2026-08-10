@@ -67,13 +67,13 @@ const useDatasetRevisions = () => {
     };
 };
 
-const TRAIN_FROM_SCRATCH = 'train-from-scratch';
+const DEFAULT_PRE_TRAINED_WEIGHTS = 'default-pre-trained-weights';
 const useModelRevisions = () => {
     const { data: models } = useGetSuccessfulModels();
 
     return {
         modelRevisions: [
-            { id: TRAIN_FROM_SCRATCH, name: 'Train from scratch', architecture: '', value: null },
+            { id: DEFAULT_PRE_TRAINED_WEIGHTS, name: 'Default pre-trained weights', architecture: '', value: null },
             ...(models?.map(({ id, name, architecture }) => ({ id, name, architecture, value: String(id) })) ?? []),
         ],
     };
@@ -84,7 +84,7 @@ const getModelRevisionsForArchitecture = (
     architectureId: string | null
 ): ModelRevisionWithValue[] => {
     return modelRevisions.filter((modelRevision) => {
-        if (modelRevision.id === TRAIN_FROM_SCRATCH) {
+        if (modelRevision.id === DEFAULT_PRE_TRAINED_WEIGHTS) {
             return true;
         }
 
@@ -97,7 +97,7 @@ const getDefaultModelRevisionIdForArchitecture = (
     architectureId: string | null
 ): string | null => {
     const revisionsForArchitecture = getModelRevisionsForArchitecture(modelRevisions, architectureId);
-    const firstRevision = revisionsForArchitecture.find(({ id }) => id !== TRAIN_FROM_SCRATCH);
+    const firstRevision = revisionsForArchitecture.find(({ id }) => id !== DEFAULT_PRE_TRAINED_WEIGHTS);
 
     return firstRevision?.id ?? revisionsForArchitecture.at(0)?.id ?? null;
 };

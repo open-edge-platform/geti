@@ -1,7 +1,6 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { API_BASE_URL } from '@/api';
 import type { Model, ModelFormat, ModelVariant } from '@/api/types';
 import {
     ActionButton,
@@ -23,6 +22,7 @@ import { get } from 'lodash-es';
 import { useNumberFormatter } from 'react-aria';
 
 import { downloadFile, formatBytes } from '../../../../shared/util';
+import { getModelVariantBinaryFilename, getModelVariantBinaryUrl } from '../utils/utils';
 import {
     getBaselineVariant,
     getFp32PytorchVariant,
@@ -98,9 +98,12 @@ export const ModelVariantTable = ({ model, format }: ModelVariantTableProps) => 
         ? getVariantPerformanceValue(baselineVariant, fp32PytorchMetric)
         : undefined;
 
-    const handleDownloadModel = (modelVariantId: string) => {
-        const url = `${API_BASE_URL}/api/projects/${projectId}/models/${model.id}/variants/${modelVariantId}/binary`;
-        downloadFile(url, undefined, 'Model download started');
+    const handleDownloadModel = (variant: ModelVariant) => {
+        downloadFile(
+            getModelVariantBinaryUrl(projectId, model.id, variant.id),
+            getModelVariantBinaryFilename(model.id, variant),
+            'Model download started'
+        );
     };
 
     return (
@@ -147,7 +150,7 @@ export const ModelVariantTable = ({ model, format }: ModelVariantTableProps) => 
                                     <ActionButton
                                         isQuiet
                                         aria-label={`Download model ${variant.id}`}
-                                        onPress={() => handleDownloadModel(variant.id)}
+                                        onPress={() => handleDownloadModel(variant)}
                                     >
                                         <DownloadIcon />
                                     </ActionButton>

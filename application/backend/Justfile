@@ -109,9 +109,15 @@ fix-macho-signatures: install-uv
 
 # Build a standalone executable using PyInstaller
 [arg("accelerator", short="a", long="accelerator")]
-pyinstaller accelerator="cpu": install-uv
+[arg("exclude-agpl-models", long="exclude-agpl-models", value="true", help="Exclude AGPL-licensed models from the bundle")]
+pyinstaller accelerator="cpu" exclude-agpl-models="false": install-uv
+    #!/usr/bin/env bash
+    set -euo pipefail
     uv sync --frozen --extra {{accelerator}} --extra mqtt --extra installer
     just fix-macho-signatures
+    if [[ "{{ exclude-agpl-models }}" == "true" ]]; then
+        export EXCLUDE_AGPL_MODELS=1
+    fi
     uv run pyinstaller --noconfirm geti.spec
     just _strip-macos-quarantine
 

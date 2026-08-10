@@ -10,12 +10,13 @@ permissions: {} # No permissions by default
 jobs:
   validate:
     name: Validate RC tag
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     timeout-minutes: 5
     outputs:
       rc_version: "${{ steps.validate.outputs.rc_version }}"
+      rc_number: "${{ steps.validate.outputs.rc_number }}"
     steps:
       - name: Harden the runner (audit all outbound calls)
         uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
@@ -122,11 +123,12 @@ jobs:
           fi
 
           echo "rc_version=$RC_VERSION" >> "$GITHUB_OUTPUT"
+          echo "rc_number=$RC_NUMBER" >> "$GITHUB_OUTPUT"
 
   publish-rc:
     name: Build and push container RC (${{ matrix.device }})
     needs: validate
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read # Checkout code
       packages: write # Push images to GHCR
@@ -203,3 +205,21 @@ jobs:
             --certificate-identity-regexp="^https://github\.com/${GITHUB_REPOSITORY}/\.github/workflows/.+" \
             --certificate-oidc-issuer='https://token.actions.githubusercontent.com'
           EOF
+
+  windows-installer:
+    name: Build Windows MSIX RC (${{ matrix.device }})
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [cpu, xpu, cuda]
+    uses: ./.github/workflows/windows-installer.yml
+    with:
+      device: ${{ matrix.device }}
+      tag: rc${{ needs.validate.outputs.rc_number }} # Suffix only; VERSION file already supplies the base version
+      exclude-agpl-models: true # RC installers must not bundle Ultralytics/AGPL-licensed models
+    secrets:
+      MSIX_SIGN_CERTIFICATE: ${{ secrets.MSIX_SIGN_CERTIFICATE }}
+      MSIX_SIGN_CERTIFICATE_PASSWORD: ${{ secrets.MSIX_SIGN_CERTIFICATE_PASSWORD }}
+    permissions:
+      contents: read
