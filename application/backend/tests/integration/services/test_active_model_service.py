@@ -132,11 +132,19 @@ class TestActiveModelServiceLoadState:
         db_session.add(pipeline)
         db_session.flush()
 
-        with _make_db_session_patcher(db_session):
-            service = ActiveModelService(data_dir=tmp_path, system_service=SystemService())
+        system_service = SystemService()
+
+        with (
+            _make_db_session_patcher(db_session),
+            patch.object(
+                system_service, "inference_device", wraps=system_service.inference_device
+            ) as mock_inference_device,
+        ):
+            service = ActiveModelService(data_dir=tmp_path, system_service=system_service)
+
+        mock_inference_device.assert_called_once_with("cpu", fallback_to_cpu=True)
 
         state = service._model_activation_state
-
         assert len(state.available_models) == 2
         assert set(state.available_models) == {UUID(fxt_successful_model.id), UUID(second_successful.id)}
         assert str(state.active_model_id) == fxt_successful_model.id
