@@ -81,10 +81,9 @@ build-image accelerator="cpu" tag="latest" exclude-agpl-models="false":
 [arg("gpu-slots", long="gpu-slots", help="Number of GPU slots available for model tuning (default: 1)")]
 [arg("certfile", long="certfile", help="Path to TLS certificate file for HTTPs (optional, for secure hosting)")]
 [arg("keyfile", long="keyfile", help="Path to TLS key file for HTTPs (optional, for secure hosting)")]
-[arg("log-level", long="log-level", help="Log level for the application (DEBUG shows debug/traceback lines, default: INFO)")]
 run-image accelerator="cpu" tag="latest" port="7860" container-port="7860" container-name="" detach="false" \
 remove="false" reload="false" shm-size="8g" passthrough-devices="" volumes="" enable_coturn="false" coturn_host="" \
-coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="" log-level="INFO":
+coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
     #!/usr/bin/env bash
     set -euo pipefail
     shopt -s nullglob
@@ -220,8 +219,6 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="" log-level=
         GPU_FLAG="--gpus all"
     fi
 
-    LOG_LEVEL_ENV="--env LOG_LEVEL={{ log-level }}"
-
     echo "Running docker container from image: ${IMAGE_NAME}"
     docker run \
         {{ docker-run-args }} \
@@ -232,7 +229,6 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="" log-level=
         --env PORT={{ container-port }} \
         --env GPU_SLOTS={{ gpu-slots }} \
         --env WEBRTC_ADVERTISE_IP="${HOST_IP}" \
-        $LOG_LEVEL_ENV \
         $COTURN_ENV \
         $STUN_ENV \
         $CERTFILE_ENV \
