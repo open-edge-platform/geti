@@ -34,6 +34,12 @@ def pytest_addoption(parser):
         default="",
         help="directory to store inference result",
     )
+    parser.addoption(
+        "--only-model-type",
+        action="store",
+        default="",
+        help="select model type to run tests on (and all that inherit from it)",
+    )
 
 
 def pytest_configure(config):

@@ -6,6 +6,7 @@ import ast
 import json
 import operator
 from pathlib import Path
+from typing import Type
 
 import cv2
 import numpy as np
@@ -32,6 +33,7 @@ from model_api.models import (
     InstanceSegmentationResult,
     KeypointDetectionModel,
     MaskRCNNModel,
+    Model,
     Prompt,
     SAMDecoder,
     SAMImageEncoder,
@@ -143,6 +145,14 @@ def result(pytestconfig):
 @pytest.fixture(scope="session")
 def model_data_file(pytestconfig):
     return pytestconfig.getoption("model_data")
+
+
+@pytest.fixture(scope="session")
+def only_model_class(pytestconfig) -> Type[Model] | None:
+    model_type = pytestconfig.getoption("only_model_type")
+    if not model_type:
+        return None
+    return Model.get_model_class(model_type)
 
 
 def pytest_generate_tests(metafunc):
@@ -416,13 +426,18 @@ def assert_contours_match(actual: list[dict], expected: list[dict]) -> None:
         )
 
 
-def test_image_models(data, device, dump, result, model_data, results_dir):  # noqa: C901
+def test_image_models(data, device, dump, result, model_data, results_dir, only_model_class):  # noqa: C901
     name = model_data["name"]
+
+    model_type = MODEL_TYPE_MAPPING[model_data["type"]]
+    if only_model_class and not issubclass(model_type, only_model_class):
+        pytest.skip(f"Skipping {name} as it is not a subclass of {only_model_class.__name__}")
+
     if name.endswith((".xml", ".onnx")):
         name = f"{data}/{name}"
 
     for model in create_models(
-        MODEL_TYPE_MAPPING[model_data["type"]],
+        model_type,
         name,
         data,
         model_data.get("force_ort", False),
