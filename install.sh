@@ -691,6 +691,7 @@ upgrade_rollback() {
     # The rollback itself rebuilds the app, so a second entry would restart the whole
     # build and make the installer look like it is looping. Only ever run once.
     if [ -n "${ROLLBACK_IN_PROGRESS:-}" ]; then
+        log "A rollback is already in progress${1:+ (second failure at line $1)}; ignoring this failure."
         return
     fi
     ROLLBACK_IN_PROGRESS=1
