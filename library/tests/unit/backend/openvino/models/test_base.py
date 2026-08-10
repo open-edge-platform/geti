@@ -12,6 +12,7 @@ import numpy as np
 import openvino as ov
 import pytest
 import torch
+from model_api.adapters.inference_adapter import Metadata
 from model_api.models.result import ClassificationResult
 
 from getitune.backend.openvino.models import OVModel
@@ -131,3 +132,46 @@ class TestResolveModelType:
         ov_model._model_adapter = mock_adapter
         result = ov_model.model_type
         assert result == "YOLO11"
+
+
+class TestMapCompiledOutputKeys:
+    """Tests for mapping externally compiled model outputs to ModelAPI output keys."""
+
+    @staticmethod
+    def _wrapper(outputs: dict) -> MagicMock:
+        model = MagicMock()
+        model.outputs = outputs
+        return model
+
+    @staticmethod
+    def _compiled(names: list[set[str]]) -> MagicMock:
+        compiled_model = MagicMock()
+        compiled_model.outputs = []
+        for output_names in names:
+            output = MagicMock()
+            output.get_names.return_value = output_names
+            compiled_model.outputs.append(output)
+        return compiled_model
+
+    def test_maps_named_outputs_by_name(self) -> None:
+        wrapper = self._wrapper(
+            {"boxes": Metadata(names={"boxes"}), "labels": Metadata(names={"labels"})},
+        )
+        # NNCF may return the outputs in a different order than the wrapper.
+        compiled_model = self._compiled([{"labels"}, {"boxes"}])
+
+        assert OVModel._map_compiled_output_keys(wrapper, compiled_model) == ["labels", "boxes"]
+
+    def test_maps_unnamed_outputs_positionally(self) -> None:
+        """Ultralytics YOLO-seg exports have unnamed output tensors, keyed by port object."""
+        det_port, proto_port = object(), object()
+        wrapper = self._wrapper({det_port: Metadata(names=set()), proto_port: Metadata(names=set())})
+        compiled_model = self._compiled([set(), set()])
+
+        assert OVModel._map_compiled_output_keys(wrapper, compiled_model) == [det_port, proto_port]
+
+    def test_maps_unknown_names_positionally(self) -> None:
+        wrapper = self._wrapper({"boxes": Metadata(names={"boxes"}), "labels": Metadata(names={"labels"})})
+        compiled_model = self._compiled([{"renamed_by_nncf"}, {"labels"}])
+
+        assert OVModel._map_compiled_output_keys(wrapper, compiled_model) == ["boxes", "labels"]
