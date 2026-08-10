@@ -8,5 +8,6 @@ Importing this package registers every algorithm into
 """
 
 from getitrack.algorithms.bytetrack import ByteTrackTracker
+from getitrack.algorithms.sort import SortTracker
 
-__all__ = ["ByteTrackTracker"]
+__all__ = ["ByteTrackTracker", "SortTracker"]
