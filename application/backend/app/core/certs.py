@@ -3,8 +3,10 @@
 
 """Self-signed TLS certificate provisioning for the local HTTPS server."""
 
+import contextlib
 import datetime
 import ipaddress
+import os
 from pathlib import Path
 
 from cryptography import x509
@@ -14,6 +16,26 @@ from cryptography.x509.oid import NameOID
 from loguru import logger
 
 _VALIDITY_DAYS = 3650
+_KEY_FILE_MODE = 0o600
+
+
+def _write_private_key(key_path: Path, data: bytes) -> None:
+    """Write an unencrypted private key readable only by its owner.
+
+    The file is created with restrictive permissions rather than relaxed afterwards, so
+    the key is never briefly world-readable. POSIX modes are advisory on Windows, where
+    the key is protected by the ACL of the data directory instead.
+
+    Args:
+        key_path: Destination of the private key.
+        data: PEM-encoded private key bytes.
+    """
+    descriptor = os.open(key_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, _KEY_FILE_MODE)
+    with open(descriptor, "wb") as key_file:
+        # O_CREAT leaves the mode of a pre-existing file untouched, so narrow it explicitly.
+        with contextlib.suppress(OSError):
+            key_path.chmod(_KEY_FILE_MODE)
+        key_file.write(data)
 
 
 def generate_self_signed_cert(cert_path: Path, key_path: Path) -> None:
@@ -49,12 +71,13 @@ def generate_self_signed_cert(cert_path: Path, key_path: Path) -> None:
 
     cert_path.parent.mkdir(parents=True, exist_ok=True)
     key_path.parent.mkdir(parents=True, exist_ok=True)
-    key_path.write_bytes(
+    _write_private_key(
+        key_path,
         key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.TraditionalOpenSSL,
             encryption_algorithm=serialization.NoEncryption(),
-        )
+        ),
     )
     cert_path.write_bytes(cert.public_bytes(serialization.Encoding.PEM))
 
@@ -76,7 +99,7 @@ def ensure_certs_exist(cert_path: Path, key_path: Path) -> bool:
     if cert_path.exists() and key_path.exists():
         return False
 
-    logger.info("No TLS certificate found; generating a self-signed one at {}", cert_path.parent)
+    logger.info("No complete TLS certificate/key pair found; generating a self-signed one at {}", cert_path.parent)
     generate_self_signed_cert(cert_path, key_path)
     logger.info("Self-signed TLS certificate generated. Browsers will warn about it on first connection.")
     return True
