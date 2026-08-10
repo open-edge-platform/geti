@@ -8,8 +8,6 @@ from datumaro.experimental import Dataset
 
 from getitune.config.data import IntensityConfig, SubsetConfig
 from getitune.data.dataset.classification import (
-    HlabelClsDataset,
-    HLabelInfo,
     MulticlassClsDataset,
     MultilabelClsDataset,
 )
@@ -26,9 +24,7 @@ class TestDatasetFactory:
         [
             (TaskType.MULTI_CLASS_CLS, MulticlassClsDataset, "fxt_mock_classification_dm_subset"),
             (TaskType.MULTI_LABEL_CLS, MultilabelClsDataset, "fxt_mock_classification_dm_subset"),
-            (TaskType.H_LABEL_CLS, HlabelClsDataset, "fxt_mock_classification_dm_subset"),
             (TaskType.DETECTION, DetectionDataset, "fxt_mock_detection_dm_subset"),
-            (TaskType.ROTATED_DETECTION, InstanceSegDataset, "fxt_mock_segmentation_dm_subset"),
             (TaskType.INSTANCE_SEGMENTATION, InstanceSegDataset, "fxt_mock_segmentation_dm_subset"),
             (TaskType.SEMANTIC_SEGMENTATION, SegmentationDataset, "fxt_mock_segmentation_dm_subset"),
         ],
@@ -36,7 +32,6 @@ class TestDatasetFactory:
     def test_create(
         self,
         request,
-        fxt_mock_hlabelinfo,
         task_type,
         dataset_cls,
         dm_subset_fxt_name,
@@ -51,7 +46,6 @@ class TestDatasetFactory:
         dm_subset.schema = mock_schema
         cfg_subset = mocker.MagicMock(spec=SubsetConfig)
         cfg_subset.intensity = IntensityConfig()
-        mocker.patch.object(HLabelInfo, "from_dm_label_groups", return_value=fxt_mock_hlabelinfo)
         mocker.patch.object(Dataset, "convert_to_schema", return_value=dm_subset)
 
         assert isinstance(

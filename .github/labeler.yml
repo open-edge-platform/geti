@@ -3,7 +3,12 @@
 Geti Library:
   - changed-files:
       - any-glob-to-any-file:
-        - "library/**/*"
+          - "library/**/*"
+
+Getitrack:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "libraries/getitrack/**/*"
 
 Geti Backend:
   - changed-files:

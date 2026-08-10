@@ -77,6 +77,10 @@ export class ModelsPage {
         return this.page.locator('[data-testid^="model-disclosure-"]');
     }
 
+    async getModelName() {
+        return this.page.getByTestId('model-name').textContent();
+    }
+
     getModelByName(name: string) {
         return this.page.getByTestId('model-name').filter({ hasText: name });
     }
@@ -226,5 +230,26 @@ export class ModelsPage {
 
     getToast(message: string) {
         return this.page.getByLabel('toast').filter({ hasText: message });
+    }
+
+    getRecommendedModelArchitectures() {
+        return this.page.getByLabel('Recommended model architectures');
+    }
+
+    getRunningJob(modelName: string) {
+        return this.page.getByLabel('Current jobs').getByText(modelName).first();
+    }
+
+    getModelVariantRow(modelName: string, propertyName: string) {
+        return this.page
+            .getByRole('group', { name: modelName })
+            .getByLabel(/Model variants for/)
+            .getByRole('row', { name: propertyName });
+    }
+
+    getModelVariantAccuracy(modelName: string, propertyName: string, precision: string) {
+        return this.getModelVariantRow(modelName, propertyName)
+            .getByTestId(`model-variant-value-accuracy-${precision.toLocaleLowerCase()}`)
+            .getAttribute('data-value');
     }
 }

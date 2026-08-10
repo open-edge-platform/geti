@@ -66,7 +66,6 @@ export const CreateLabel = ({ labels, onCreate, taskType }: CreateLabelProps) =>
             maxWidth={'640px'}
             width={'100%'}
             alignItems={'start'}
-            // @ts-expect-error TODO[geti-ui]: Grid wrapper not forwardRef-typed; ref works at runtime
             ref={containerRef}
         >
             <LabelColorPicker
@@ -77,7 +76,6 @@ export const CreateLabel = ({ labels, onCreate, taskType }: CreateLabelProps) =>
             />
             <View>
                 <TextField
-                    // @ts-expect-error TODO[geti-ui]: TextField wrapper not forwardRef-typed; ref works at runtime
                     ref={inputRef}
                     aria-label={'Create label input'}
                     placeholder={'Create label'}

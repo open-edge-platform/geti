@@ -9,7 +9,7 @@ import { ReactComponent as NoTrainedModels } from '../../../assets/no-trained-mo
 import { ExportJobsList } from '../../dataset/import-export/export-jobs-list/export-jobs-list.component';
 import { TrainModel } from '../train-model/train-model.component';
 import { Header } from './components/header.component';
-import { CurrentModelRunning } from './current-model-running/current-model-running.component';
+import { CurrentRunningJobs } from './current-running-jobs/current-running-jobs.component';
 import { ModelListing } from './model-listing.component';
 import { ModelListingProvider, useModelListing } from './provider/model-listing-provider';
 
@@ -29,7 +29,7 @@ const ModelListingContent = () => {
                 justifyContent={'center'}
                 UNSAFE_style={{ padding: dimensionValue('size-300') }}
             >
-                <CurrentModelRunning groupBy={groupBy} datasetRevisions={datasetRevisions} />
+                <CurrentRunningJobs groupBy={groupBy} datasetRevisions={datasetRevisions} />
 
                 <Flex
                     direction={'column'}
@@ -58,7 +58,7 @@ const ModelListingContent = () => {
             <Divider size={'S'} marginY={'size-300'} />
 
             <Flex direction={'column'} flex={1} UNSAFE_style={{ overflowY: 'auto', scrollbarGutter: 'stable' }}>
-                <CurrentModelRunning groupBy={groupBy} datasetRevisions={datasetRevisions} />
+                <CurrentRunningJobs groupBy={groupBy} datasetRevisions={datasetRevisions} />
 
                 <ExportJobsList predicate={({ datasetId }) => isString(datasetId)} />
 

@@ -18,6 +18,7 @@ from torchvision.tv_tensors import BoundingBoxFormat
 from getitune.backend.lightning.exporter.base import ModelExporter
 from getitune.backend.lightning.exporter.native import LightningModelExporter
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
+from getitune.backend.lightning.models.common.target_utils import align_sample_batch_annotations
 from getitune.backend.lightning.models.detection.backbones import PResNet
 from getitune.backend.lightning.models.detection.base import LightningDetectionModel
 from getitune.backend.lightning.models.detection.detectors import DETR
@@ -63,9 +64,9 @@ class RTDETR(LightningDetectionModel):
     """
 
     pretrained_urls: ClassVar[dict[str, str]] = {
-        "rtdetr_18": "https://storage.geti.intel.com/weights/rtdetr_r18vd_5x_coco_objects365_from_paddle.pth",
-        "rtdetr_50": "https://storage.geti.intel.com/weights/rtdetr_r50vd_2x_coco_objects365_from_paddle.pth",
-        "rtdetr_101": "https://storage.geti.intel.com/weights/rtdetr_r101vd_2x_coco_objects365_from_paddle.pth",
+        "rtdetr_18": "https://github.com/lyuwenyu/storage/releases/download/v0.1/rtdetr_r18vd_5x_coco_objects365_from_paddle.pth",
+        "rtdetr_50": "https://github.com/lyuwenyu/storage/releases/download/v0.1/rtdetr_r50vd_2x_coco_objects365_from_paddle.pth",
+        "rtdetr_101": "https://github.com/lyuwenyu/storage/releases/download/v0.1/rtdetr_r101vd_2x_coco_objects365_from_paddle.pth",
     }
 
     input_size_multiplier = 32
@@ -143,6 +144,11 @@ class RTDETR(LightningDetectionModel):
         pad_value: int = 0,
     ) -> dict[str, Any]:
         targets: list[dict[str, Any]] = []
+        # Defensively realign per-image annotation counts so a boxes/labels
+        # divergence (e.g. from tiling or crop augmentations) does not crash the
+        # Hungarian matcher, which concatenates boxes and labels per target.
+        if self.training:
+            align_sample_batch_annotations(entity)
         # prepare bboxes for the model
         if entity.bboxes is not None and entity.labels is not None:
             for bb, ll in zip(entity.bboxes, entity.labels):

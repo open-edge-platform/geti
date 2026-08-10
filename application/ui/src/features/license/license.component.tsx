@@ -14,26 +14,15 @@ const LICENSE_LINKS = {
         // eslint-disable-next-line max-len
         href: 'https://www.intel.com/content/www/us/en/content-details/749362/intel-simplified-software-license-version-october-2022.html',
     },
-    apache2: {
-        label: 'Apache License 2.0',
-        href: 'https://www.apache.org/licenses/LICENSE-2.0',
-    },
+
     dinov2: {
         label: 'DINOv3 License',
         href: 'https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md',
     },
 };
 
-type Platform = 'linux' | 'windows' | 'macos';
-
-type LicenseProps = {
-    platform: Platform;
-};
-
-export const License = ({ platform }: LicenseProps) => {
+export const License = () => {
     const { mutate: acceptLicense, isPending: isAccepting } = useAcceptLicense();
-
-    const appLicense = platform === 'windows' ? LICENSE_LINKS.intelSimplified : LICENSE_LINKS.apache2;
 
     return (
         <View UNSAFE_className={styles.licenseBackground} height={'100vh'}>
@@ -55,8 +44,12 @@ export const License = ({ platform }: LicenseProps) => {
                             <li>Accepted and agreed to the linked license terms.</li>
                         </ul>
                         <Flex direction={'column'} marginTop={'size-200'}>
-                            <Link href={appLicense.href} target={'_blank'} rel={'noopener noreferrer'}>
-                                {appLicense.label}
+                            <Link
+                                href={LICENSE_LINKS.intelSimplified.href}
+                                target={'_blank'}
+                                rel={'noopener noreferrer'}
+                            >
+                                {LICENSE_LINKS.intelSimplified.label}
                             </Link>
                             <Link href={LICENSE_LINKS.dinov2.href} target={'_blank'} rel={'noopener noreferrer'}>
                                 {LICENSE_LINKS.dinov2.label}

@@ -20,7 +20,6 @@ def test_wrap(fxt_label_info, task_type):
     )
 
     multilabel = False
-    hierarchical = False
     output_raw_scores = True
     confidence_threshold = 0.0
     iou_threshold = 0.0
@@ -31,7 +30,6 @@ def test_wrap(fxt_label_info, task_type):
 
     params = params.wrap(
         multilabel=multilabel,
-        hierarchical=hierarchical,
         output_raw_scores=output_raw_scores,
         confidence_threshold=confidence_threshold,
         iou_threshold=iou_threshold,
@@ -44,7 +42,6 @@ def test_wrap(fxt_label_info, task_type):
     metadata = params.to_metadata()
 
     assert metadata[("model_info", "multilabel")] == str(multilabel)
-    assert metadata[("model_info", "hierarchical")] == str(hierarchical)
     assert metadata[("model_info", "confidence_threshold")] == str(confidence_threshold)
     assert metadata[("model_info", "iou_threshold")] == str(iou_threshold)
     assert metadata[("model_info", "return_soft_prediction")] == str(return_soft_prediction)

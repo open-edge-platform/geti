@@ -7,7 +7,6 @@ import torch
 from getitune.backend.lightning.models.base import DataInputParams
 from getitune.backend.lightning.models.classification.classifier import ImageClassifier
 from getitune.backend.lightning.models.classification.heads import LinearClsHead
-from getitune.backend.lightning.models.classification.hlabel_models.torchvision_model import TVModelHLabelCls
 from getitune.backend.lightning.models.classification.multiclass_models.torchvision_model import TVModelMulticlassCls
 from getitune.backend.lightning.models.classification.multilabel_models.torchvision_model import TVModelMultilabelCls
 from getitune.data.entity.base import BatchLoss
@@ -30,8 +29,6 @@ def fxt_tv_model_and_data_entity(
     request,
     fxt_multiclass_cls_batch_data_entity,
     fxt_multilabel_cls_batch_data_entity,
-    fxt_hlabel_cls_batch_data_entity,
-    fxt_hlabel_multilabel_info,
 ):
     if request.param == TaskType.MULTI_CLASS_CLS:
         return TVModelMulticlassCls(
@@ -45,12 +42,6 @@ def fxt_tv_model_and_data_entity(
             label_info=10,
             data_input_params=DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
         ), fxt_multilabel_cls_batch_data_entity
-    if request.param == TaskType.H_LABEL_CLS:
-        return TVModelHLabelCls(
-            model_name="mobilenet_v3_small",
-            label_info=fxt_hlabel_multilabel_info,
-            data_input_params=DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
-        ), fxt_hlabel_cls_batch_data_entity
     return None
 
 
@@ -67,7 +58,7 @@ class TestTVModel:
 
     @pytest.mark.parametrize(
         "fxt_tv_model_and_data_entity",
-        [TaskType.MULTI_CLASS_CLS, TaskType.MULTI_LABEL_CLS, TaskType.H_LABEL_CLS],
+        [TaskType.MULTI_CLASS_CLS, TaskType.MULTI_LABEL_CLS],
         indirect=True,
     )
     def test_customize_inputs(self, fxt_tv_model_and_data_entity):
@@ -79,7 +70,7 @@ class TestTVModel:
 
     @pytest.mark.parametrize(
         "fxt_tv_model_and_data_entity",
-        [TaskType.MULTI_CLASS_CLS, TaskType.MULTI_LABEL_CLS, TaskType.H_LABEL_CLS],
+        [TaskType.MULTI_CLASS_CLS, TaskType.MULTI_LABEL_CLS],
         indirect=True,
     )
     def test_customize_outputs(self, fxt_tv_model_and_data_entity):
@@ -117,9 +108,8 @@ class TestTVModel:
         [
             (TVModelMulticlassCls, 10),
             (TVModelMultilabelCls, 10),
-            (TVModelHLabelCls, "fxt_hlabel_multilabel_info"),
         ],
-        ids=["multiclass", "multilabel", "hlabel"],
+        ids=["multiclass", "multilabel"],
     )
     def test_freeze_backbone(self, model_cls, label_info_param, request):
         data_input_params = DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0))

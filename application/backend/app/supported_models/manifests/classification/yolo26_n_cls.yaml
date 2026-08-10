@@ -1,0 +1,46 @@
+id: image-classification-yolo26-n
+name: YOLO26-N
+license: AGPL-3.0
+
+pretrained_weights:
+  url: https://huggingface.co/Ultralytics/YOLO26/resolve/main/yolo26n-cls.pt
+  mirror_url: https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n-cls.pt
+  sha_sum: "0dd6f8dbc448870ac98a3cbb7156f923f7ce21fed3755d4019169ffffd279e81"
+
+description: "YOLO26-N is the nano Ultralytics YOLO26 classification model. It is optimized for fast fine-tuning and low-latency inference while using the Geti Tune data pipeline for preprocessing and dataset handling."
+stats:
+  gigaflops: 0.5
+  trainable_parameters: 2.8
+  benchmark_metrics:
+    imagenet_top1_accuracy: 71.4
+    imagenet_top5_accuracy: 90.1
+
+hyperparameters:
+  training:
+    learning_rate: 0.000714
+    weight_decay: 0.0005
+    max_epochs: 90
+    early_stopping:
+      enable: false
+    batch_size: 16
+    input_size_width: 224
+    input_size_height: 224
+    scheduler:
+      type: cosine_annealing
+      warmup:
+        enable: true
+        epochs: 3
+    gradient_clip:
+      enable: true
+      max_grad_norm: 10.0
+    gradient_accumulation:
+      enable: false
+  dataset_preparation:
+    augmentation:
+      random_resize_crop:
+        crop_ratio_range:
+          - 0.5
+          - 1.0
+      random_erasing:
+        enable: true
+        probability: 0.4

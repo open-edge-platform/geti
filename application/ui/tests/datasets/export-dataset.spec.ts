@@ -8,6 +8,7 @@ import { getMockedStagedDataset } from 'mocks/mock-staged-dataset';
 import { HttpResponse } from 'msw';
 
 import { expect, http, test } from '../fixtures';
+import { jobStatusStreamHandler } from './utils';
 
 const STAGED_DATASET_ID = 'staged-dataset-456';
 
@@ -78,16 +79,13 @@ test.describe('Export dataset', () => {
     });
 
     test('export dataset with default settings', async ({ network, page }) => {
-        let pollCount = 0;
         let deletedStagedDatasetId: string | undefined;
 
         network.use(
             http.get('/api/jobs/{job_id}', () => {
-                pollCount += 1;
-
-                const job = pollCount <= 2 ? exportingJob : doneJob;
-                return HttpResponse.json(job, { status: 200 });
+                return HttpResponse.json(exportingJob, { status: 200 });
             }),
+            jobStatusStreamHandler({ [exportJob.job_id]: [exportingJob, doneJob] }),
             http.delete('/api/staged_datasets/{staged_dataset_id}', ({ params }) => {
                 deletedStagedDatasetId = params.staged_dataset_id as string;
                 return new HttpResponse(null, { status: 204 });

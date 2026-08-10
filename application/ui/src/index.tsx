@@ -9,6 +9,7 @@ import { setupStorageCleanup } from './platform/storage-cleanup';
 import { Providers } from './providers';
 
 import './index.css';
+import './shared/styles/view-transitions.scss';
 
 setupStorageCleanup();
 

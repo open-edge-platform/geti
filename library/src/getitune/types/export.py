@@ -11,7 +11,7 @@ from enum import Enum
 
 import getitune
 from getitune.config.data import TileConfig
-from getitune.types.label import HLabelInfo, LabelInfo
+from getitune.types.label import LabelInfo
 
 
 class ExportFormat(str, Enum):
@@ -33,8 +33,6 @@ class TaskLevelExportParameters:
             It will be parsed into a format compatible with ModelAPI.
         optimization_config (dict): Configurations for NNCF PTQ model optimization.
         multilabel (bool | None): Whether it is multilabel or not.
-            Only specified for the classification task.
-        hierarchical (bool | None): Whether it is hierarchical or not.
             Only specified for the classification task.
         output_raw_scores (bool | None): Whether to output raw scores.
             Only specified for the classification task.
@@ -64,7 +62,6 @@ class TaskLevelExportParameters:
 
     # (Optional) Classification tasks
     multilabel: bool | None = None
-    hierarchical: bool | None = None
     output_raw_scores: bool | None = None
 
     # (Optional) Classification tasks, detection and instance segmentation task
@@ -132,20 +129,8 @@ class TaskLevelExportParameters:
             ("model_info", "getitune_version"): getitune.__version__,
         }
 
-        if isinstance(self.label_info, HLabelInfo):
-            dict_info = self.label_info.as_dict(normalize_label_names=True)
-            metadata[("model_info", "hierarchical_config")] = json.dumps(
-                {
-                    "cls_heads_info": dict_info,
-                    "label_tree_edges": dict_info["label_tree_edges"],
-                },
-            )
-
         if self.multilabel is not None:
             metadata[("model_info", "multilabel")] = str(self.multilabel)
-
-        if self.hierarchical is not None:
-            metadata[("model_info", "hierarchical")] = str(self.hierarchical)
 
         if self.output_raw_scores is not None:
             metadata[("model_info", "output_raw_scores")] = str(self.output_raw_scores)

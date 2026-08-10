@@ -145,12 +145,12 @@ export const stepTrainModel = async (page: Page, modelsPage: ModelsPage, project
     await firstArchitecture.click();
 
     await selectPickerOption(page, 'Select dataset');
-    await selectPickerOption(page, 'Select model revision');
+    await selectPickerOption(page, 'Select input weights');
 
     await modelsPage.startTraining();
 
     await expect(async () => {
-        const hasRunningHeading = await page.getByRole('heading', { name: 'Currently running' }).isVisible();
+        const hasRunningHeading = await page.getByRole('heading', { name: 'Jobs' }).isVisible();
         const hasTrainingMessage = await page
             .getByText(/Training in progress|running/i)
             .first()

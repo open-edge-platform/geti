@@ -26,10 +26,10 @@ export const isInvalidJob = (error: unknown): boolean => {
     return false;
 };
 
-export const isJobDone = (job?: Job): job is Job => job?.status === 'DONE';
-export const isJobFailed = (job?: Job): job is Job => job?.status === 'FAILED';
-export const isJobRunning = (job?: Job): job is Job => job?.status === 'RUNNING';
-export const isJobPending = (job?: Job): job is Job => job?.status === 'PENDING';
+export const isJobDone = (job?: Job): boolean => job?.status === 'DONE';
+export const isJobFailed = (job?: Job): boolean => job?.status === 'FAILED';
+export const isJobRunning = (job?: Job): boolean => job?.status === 'RUNNING';
+export const isJobPending = (job?: Job): boolean => job?.status === 'PENDING';
 
 export const isTrainJob = (job?: Job): job is TrainJob => job?.job_type === 'train';
 export const isQuantizeJob = (job?: Job): job is QuantizeJob => job?.job_type === 'quantize';

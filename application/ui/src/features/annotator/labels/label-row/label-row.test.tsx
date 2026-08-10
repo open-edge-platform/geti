@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from 'test-utils/render';
 
@@ -108,18 +108,42 @@ describe('LabelRow', () => {
     describe('handleHotkeyChange', () => {
         const label = getMockedLabel({ id: 'label-1', name: 'old name', color: '#ffff00', hotkey: 'a' });
 
-        it('calls onUpdate on Enter when hotkey is valid', async () => {
+        it('calls onUpdate on Enter when hotkey is valid and is changed', async () => {
             const onUpdate = vi.fn();
 
             renderApp({ label, onUpdate });
 
             const hotkeyInput = screen.getByLabelText(/Hotkey input/i);
-            await userEvent.type(hotkeyInput, 'test 1');
             await userEvent.click(hotkeyInput);
-            await userEvent.keyboard('a');
+            await userEvent.keyboard('b');
             await userEvent.keyboard('{Enter}');
 
-            expect(onUpdate).toHaveBeenCalledWith(label.id, expect.objectContaining({ hotkey: 'a' }));
+            expect(onUpdate).toHaveBeenCalledWith(label.id, expect.objectContaining({ hotkey: 'b' }));
+        });
+
+        it('does not call onUpdate on Enter when hotkey is valid but is not changed', async () => {
+            const onUpdate = vi.fn();
+
+            renderApp({ label, onUpdate });
+
+            const hotkeyInput = screen.getByLabelText(/Hotkey input/i);
+            await userEvent.click(hotkeyInput);
+            await userEvent.keyboard('{Enter}');
+
+            expect(onUpdate).not.toHaveBeenCalled();
+        });
+
+        it('calls onUpdate when input is no longer focused', async () => {
+            const onUpdate = vi.fn();
+
+            renderApp({ label, onUpdate });
+
+            const hotkeyInput = screen.getByLabelText(/Hotkey input/i);
+            await userEvent.click(hotkeyInput);
+            await userEvent.keyboard('b');
+            fireEvent.blur(hotkeyInput);
+
+            expect(onUpdate).toHaveBeenCalledWith(label.id, expect.objectContaining({ hotkey: 'b' }));
         });
 
         it('does not call onUpdate when hotkey has validation error', async () => {

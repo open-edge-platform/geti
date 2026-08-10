@@ -98,7 +98,6 @@ class OVEngine(Engine):
             ValueError: If the task type is unsupported or the XML file is invalid.
         """
         task_map = {
-            "classification_hcl": TaskType.H_LABEL_CLS,
             "classification_mlc": TaskType.MULTI_LABEL_CLS,
             "classification_mc": TaskType.MULTI_CLASS_CLS,
             "segmentation": TaskType.SEMANTIC_SEGMENTATION,
@@ -124,12 +123,15 @@ class OVEngine(Engine):
         task_type = task_type.attrib.get("value")
 
         if task_type == "classification":
-            if rt_info.find(".//hierarchical").attrib.get("value") == "True":
-                task_name = task_type + "_hcl"
-            elif rt_info.find(".//multilabel").attrib.get("value") == "True":
-                task_name = task_type + "_mlc"
-            else:
-                task_name = task_type + "_mc"
+            hierarchical = rt_info.find(".//hierarchical")
+            if hierarchical is not None and hierarchical.attrib.get("value") == "True":
+                msg = "Hierarchical classification models are no longer supported."
+                raise ValueError(msg)
+            multilabel = rt_info.find(".//multilabel")
+            if multilabel is None:
+                msg = "No <multilabel> found for the classification model in the IR metadata."
+                raise ValueError(msg)
+            task_name = task_type + ("_mlc" if multilabel.attrib.get("value") == "True" else "_mc")
         else:
             task_name = task_type
 
@@ -152,7 +154,6 @@ class OVEngine(Engine):
             ValueError: If the task type is unsupported or the ONNX metadata is missing.
         """
         task_map = {
-            "classification_hcl": TaskType.H_LABEL_CLS,
             "classification_mlc": TaskType.MULTI_LABEL_CLS,
             "classification_mc": TaskType.MULTI_CLASS_CLS,
             "segmentation": TaskType.SEMANTIC_SEGMENTATION,
@@ -172,11 +173,12 @@ class OVEngine(Engine):
 
         if task_type == "classification":
             if model_info.get("hierarchical") == "True":
-                task_name = task_type + "_hcl"
-            elif model_info.get("multilabel") == "True":
-                task_name = task_type + "_mlc"
-            else:
-                task_name = task_type + "_mc"
+                msg = "Hierarchical classification models are no longer supported."
+                raise ValueError(msg)
+            if "multilabel" not in model_info:
+                msg = "No 'multilabel' found for the classification model in ONNX metadata."
+                raise ValueError(msg)
+            task_name = task_type + ("_mlc" if model_info.get("multilabel") == "True" else "_mc")
         else:
             task_name = task_type
 
@@ -260,6 +262,11 @@ class OVEngine(Engine):
 
         model = self._update_checkpoint(checkpoint)
         metric = metric or model.metric_callable
+
+        # Propagate the datamodule tiling configuration to the model so that tile
+        # predictions can be merged back to the original image during evaluation.
+        if getattr(datamodule, "tile_config", None) is not None:
+            model.tile_config = datamodule.tile_config
 
         datamodule = self._auto_configurator.update_ov_subset_pipeline(
             datamodule=datamodule,
@@ -363,6 +370,10 @@ class OVEngine(Engine):
                         f"datamodule.label_info={self.datamodule.label_info}"
                     )
                     raise ValueError(msg)
+
+                # Propagate the datamodule tiling configuration to the model for predictions.
+                if getattr(datamodule, "tile_config", None) is not None:
+                    model.tile_config = datamodule.tile_config
                 datamodule = self._auto_configurator.update_ov_subset_pipeline(
                     datamodule=datamodule,
                     subset="test",
@@ -402,7 +413,7 @@ class OVEngine(Engine):
         if explain and isinstance(datamodule, DataModule):
             if explain_config is None:
                 explain_config = ExplainConfig()
-            predict_result = process_saliency_maps_in_pred_entity(predict_result, explain_config, datamodule.label_info)
+            predict_result = process_saliency_maps_in_pred_entity(predict_result, explain_config)
 
         return predict_result
 

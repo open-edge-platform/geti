@@ -5,7 +5,8 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+import time
+from typing import TYPE_CHECKING, Any, Callable, ClassVar
 
 import torch
 from torch.utils.data import DataLoader
@@ -16,7 +17,6 @@ from ultralytics.utils.ops import Profile
 from ultralytics.utils.torch_utils import select_device, unwrap_model
 
 from getitune.backend.ultralytics.data.adapter import UltralyticsDatasetAdapter
-from getitune.backend.ultralytics.data.collate import collate_fn
 
 if TYPE_CHECKING:
     from ultralytics.engine.trainer import BaseTrainer
@@ -30,12 +30,32 @@ class GetiTuneValidatorMixin:
     When ``_datamodule`` is set and called without a trainer, runs
     standalone validation bypassing Ultralytics' YAML data parsing.
 
-    Subclasses must set :attr:`_include_masks` to control whether the adapter
-    includes instance masks.
+    Subclasses must set :attr:`_task_kind` to dispatch the adapter to the
+    correct per-task ``_getitem_*`` method (e.g. ``"detect"``, ``"segment"``).
+
+    ``_datamodule`` is bound one of two ways:
+
+    - As a class attribute on a dynamically-created subclass (see
+      ``UltralyticsEngine._make_bound_validator``), for validators that
+      Ultralytics constructs internally (e.g. via ``model.val()``), where we
+      don't control the call site's arguments.
+    - Via :meth:`set_datamodule`, for validators we construct ourselves
+      (e.g. in a trainer's ``get_validator()``).
     """
 
     _datamodule: DataModule | None = None
-    _include_masks: bool = False
+    _task_kind: ClassVar[str] = "detect"
+    _collate_fn: ClassVar[Callable]
+
+    @property
+    def datamodule(self) -> DataModule | None:
+        """Get the bound DataModule instance."""
+        return self._datamodule
+
+    @datamodule.setter
+    def datamodule(self, datamodule: DataModule | None) -> None:
+        """Bind a DataModule instance, overriding any class-level default."""
+        self._datamodule = datamodule
 
     def __call__(self, trainer: BaseTrainer | None = None, model: torch.nn.Module | None = None) -> dict:
         """Dispatch to upstream (training) or standalone DataModule validation."""
@@ -44,7 +64,17 @@ class GetiTuneValidatorMixin:
         return self._run_standalone_eval(model)
 
     def preprocess(self, batch: dict[str, Any]) -> dict[str, Any]:
-        """Move tensors to device."""
+        """Move tensors to device, tracking per-batch wall time for ``iter_time`` metrics."""
+        now = time.perf_counter()
+        batch_times = getattr(self, "_batch_times", None)
+        if batch_times is None:
+            batch_times = []
+            self._batch_times = batch_times
+        batch_start = getattr(self, "_batch_start", None)
+        if batch_start is not None:
+            batch_times.append(now - batch_start)
+        self._batch_start = now
+
         for k, v in batch.items():
             if isinstance(v, torch.Tensor):
                 batch[k] = v.to(self.device, non_blocking=True)  # type: ignore[attr-defined]
@@ -53,6 +83,19 @@ class GetiTuneValidatorMixin:
         if "masks" in batch and isinstance(batch["masks"], torch.Tensor):
             batch["masks"] = batch["masks"].float()
         return batch
+
+    def _average_iter_time(self) -> float:
+        """Trimmed-mean per-batch wall time, excluding the first (warmup) batch.
+
+        Mirrors ``UltralyticsEngine._summarize_iter_times``: the first batch
+        includes one-off warmup costs (CUDA/XPU kernel compilation, first-call
+        overhead) that would otherwise skew the average.
+        """
+        batch_times: list[float] = getattr(self, "_batch_times", None) or []
+        if not batch_times:
+            return 0.0
+        trimmed = batch_times[1:] if len(batch_times) > 1 else batch_times
+        return sum(trimmed) / len(trimmed)
 
     def _run_standalone_eval(self, model: torch.nn.Module | None) -> dict:
         """Run validation using DataModule without YAML data config.
@@ -142,11 +185,11 @@ class GetiTuneValidatorMixin:
         test_key = self._datamodule.test_subset.subset_name
         val_key = self._datamodule.val_subset.subset_name
         subset = self._datamodule.subsets.get(test_key) or self._datamodule.subsets[val_key]
-        adapter = UltralyticsDatasetAdapter(subset, include_masks=self._include_masks)
+        adapter = UltralyticsDatasetAdapter(subset, task_kind=self._task_kind)
         return DataLoader(
             adapter,
             batch_size=self.args.batch,  # type: ignore[attr-defined]
             shuffle=False,
-            collate_fn=collate_fn,
+            collate_fn=self._collate_fn,
             pin_memory=True,
         )

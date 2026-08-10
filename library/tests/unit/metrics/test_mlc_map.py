@@ -25,7 +25,7 @@ class TestMAP:
         metric = MultilabelmAP(label_info=LabelInfo.from_num_classes(3))
         metric.update(fxt_preds, fxt_targets)
         result = metric.compute()
-        assert result["mAP"] > 0
+        assert result["map"] > 0
 
         metric.reset()
         assert metric.preds == []
