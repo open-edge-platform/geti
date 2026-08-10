@@ -188,7 +188,7 @@ def update_pipeline(
 
     if "device" in pipeline_config:
         device_str = pipeline_config["device"]
-        if not system_service.validate_device(device_str):
+        if not system_service.is_valid_inference_device(device_str):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail=f"Device '{device_str}' is not available on this system"
             )

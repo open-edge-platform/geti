@@ -9,7 +9,7 @@ import pytest
 
 from app.db.schema import ModelRevisionDB, ModelVariantDB, PipelineDB, ProjectDB
 from app.models.model_revision import ModelFormat, ModelPrecision, TrainingStatus
-from app.services.active_model_service import ActiveModelService
+from app.services import ActiveModelService, SystemService
 from tests.integration.project_factory import ProjectTestDataFactory
 
 
@@ -88,7 +88,7 @@ class TestActiveModelServiceLoadState:
     def test_load_state_no_active_pipeline_returns_empty_state(self, db_session, tmp_path):
         """When no pipeline is running, load_state returns an empty ModelActivationState."""
         with _make_db_session_patcher(db_session):
-            service = ActiveModelService(data_dir=tmp_path)
+            service = ActiveModelService(data_dir=tmp_path, system_service=SystemService())
 
         state = service._model_activation_state
 
@@ -132,11 +132,19 @@ class TestActiveModelServiceLoadState:
         db_session.add(pipeline)
         db_session.flush()
 
-        with _make_db_session_patcher(db_session):
-            service = ActiveModelService(data_dir=tmp_path)
+        system_service = SystemService()
+
+        with (
+            _make_db_session_patcher(db_session),
+            patch.object(
+                system_service, "inference_device", wraps=system_service.inference_device
+            ) as mock_inference_device,
+        ):
+            service = ActiveModelService(data_dir=tmp_path, system_service=system_service)
+
+        mock_inference_device.assert_called_once_with("cpu", fallback_to_cpu=True)
 
         state = service._model_activation_state
-
         assert len(state.available_models) == 2
         assert set(state.available_models) == {UUID(fxt_successful_model.id), UUID(second_successful.id)}
         assert str(state.active_model_id) == fxt_successful_model.id

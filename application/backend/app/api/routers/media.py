@@ -617,7 +617,7 @@ def media_predict(
         )
 
     try:
-        device = system_service.get_inference_device_info(request.device)
+        device = system_service.inference_device(request.device)
         return media_prediction_service.predict_media(project=project, request=request, device=device)
     except VideoRangeError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
