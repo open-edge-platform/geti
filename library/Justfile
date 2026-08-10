@@ -33,8 +33,8 @@ venv-lock: _ensure_uv
 
 # Patch pyproject.toml to build torch/torchvision against CUDA 12.6 instead of 13.0 for the 'cuda' target,
 # needed for legacy Nvidia GPUs (Volta, Maxwell, Pascal). See https://github.com/open-edge-platform/geti/issues/7163
-patch-for-legacy-gpu-support:
-    sed -i 's/cu130/cu126/g' pyproject.toml
+patch-for-legacy-gpu-support: _ensure_uv
+    uv run python -c "from pathlib import Path; p = Path('pyproject.toml'); p.write_text(p.read_text().replace('cu130', 'cu126'))"
     just venv-lock
 
 # -------------------------------------------------------------------------------------------------
