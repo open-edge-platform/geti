@@ -82,7 +82,7 @@ def generate_self_signed_cert(cert_path: Path, key_path: Path) -> None:
     cert_path.write_bytes(cert.public_bytes(serialization.Encoding.PEM))
 
 
-def ensure_certs_exist(cert_path: Path, key_path: Path) -> bool:
+def ensure_certs_exist(cert_path: Path, key_path: Path) -> None:
     """Generate a self-signed certificate pair unless it is already present.
 
     The server always serves HTTPS, so it cannot start without a certificate. Source
@@ -92,14 +92,10 @@ def ensure_certs_exist(cert_path: Path, key_path: Path) -> bool:
     Args:
         cert_path: Expected location of the PEM-encoded certificate.
         key_path: Expected location of the PEM-encoded private key.
-
-    Returns:
-        True if a new pair was generated, False if an existing one was reused.
     """
     if cert_path.exists() and key_path.exists():
-        return False
+        return
 
     logger.info("No complete TLS certificate/key pair found; generating a self-signed one at {}", cert_path.parent)
     generate_self_signed_cert(cert_path, key_path)
     logger.info("Self-signed TLS certificate generated. Browsers will warn about it on first connection.")
-    return True

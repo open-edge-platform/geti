@@ -25,7 +25,7 @@ def test_ensure_certs_exist_generates_usable_pair(tmp_path: Path) -> None:
     cert_path = tmp_path / "certs" / "localhost.pem"
     key_path = tmp_path / "certs" / "localhost-key.pem"
 
-    assert ensure_certs_exist(cert_path, key_path) is True
+    ensure_certs_exist(cert_path, key_path)
 
     cert = x509.load_pem_x509_certificate(cert_path.read_bytes())
     assert cert.subject.rfc4514_string() == "CN=localhost"
@@ -55,7 +55,8 @@ def test_ensure_certs_exist_reuses_existing_pair(tmp_path: Path) -> None:
     original_cert = cert_path.read_bytes()
     original_key = key_path.read_bytes()
 
-    assert ensure_certs_exist(cert_path, key_path) is False
+    ensure_certs_exist(cert_path, key_path)
+
     assert cert_path.read_bytes() == original_cert
     assert key_path.read_bytes() == original_key
 
@@ -67,7 +68,8 @@ def test_ensure_certs_exist_regenerates_when_key_is_missing(tmp_path: Path) -> N
     original_cert = cert_path.read_bytes()
     key_path.unlink()
 
-    assert ensure_certs_exist(cert_path, key_path) is True
+    ensure_certs_exist(cert_path, key_path)
+
     assert key_path.exists()
     assert cert_path.read_bytes() != original_cert
 
