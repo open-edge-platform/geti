@@ -85,12 +85,12 @@ class Detections:
     def filter_by_score(self, threshold: float) -> Detections:
         """Return rows whose score is at least ``threshold``."""
         keep = self.scores >= threshold
-        return self._index(keep)
+        return self.select(keep)
 
     def split_by_score(self, threshold: float) -> tuple[Detections, Detections]:
         """Return ``(high, low)`` partitions split at ``threshold`` (``high`` is ``>=``)."""
         high = self.scores >= threshold
-        return self._index(high), self._index(~high)
+        return self.select(high), self.select(~high)
 
     def filter_by_class(self, class_ids: Sequence[int]) -> tuple[Detections, np.ndarray]:
         """Return ``(filtered, source_rows)`` for rows whose class is in ``class_ids``.
@@ -101,9 +101,10 @@ class Detections:
         """
         wanted = np.asarray(list(class_ids), dtype=np.int64)
         source_rows = np.flatnonzero(np.isin(self.class_ids, wanted))
-        return self._index(source_rows), source_rows
+        return self.select(source_rows), source_rows
 
-    def _index(self, mask: np.ndarray) -> Detections:
+    def select(self, mask: np.ndarray) -> Detections:
+        """Return the rows selected by ``mask`` (a boolean mask or integer index array)."""
         return Detections(
             bboxes=self.bboxes[mask],
             scores=self.scores[mask],

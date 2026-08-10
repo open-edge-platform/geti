@@ -25,6 +25,7 @@ class AlgorithmType(StrEnum):
     """Identifier resolving to a registered `BaseTracker` subclass."""
 
     BYTETRACK = "bytetrack"
+    SORT = "sort"
     OCSORT = "ocsort"
     BOTSORT = "botsort"
     MEMORY = "memory"
