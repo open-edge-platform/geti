@@ -12,6 +12,7 @@ from .data_collection_policy import (
 from .dataset import AnnotationType, DatasetFormat, StagedDataset
 from .dataset_item import DatasetItem, DatasetItemAnnotation, DatasetItemAnnotationStatus, DatasetItemSubset
 from .dataset_revision import DatasetRevision
+from .device_spec import DeviceSpec
 from .evaluation import EvaluationResult
 from .inference import (
     BatchInferenceInput,
@@ -80,6 +81,7 @@ __all__ = [
     "DatasetItemAnnotationStatus",
     "DatasetItemSubset",
     "DatasetRevision",
+    "DeviceSpec",
     "DisconnectedSinkConfig",
     "DisconnectedSourceConfig",
     "EvaluationResult",
