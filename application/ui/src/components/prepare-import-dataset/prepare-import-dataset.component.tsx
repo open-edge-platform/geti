@@ -26,7 +26,7 @@ export const PrepareImportDataset = ({
 }: PrepareImportDatasetProps) => {
     const { data: job, isError, error } = useImportJobStatus({ jobId, onSuccess });
 
-    const isRunningOrPending = isJobRunning(job) || isJobPending(job);
+    const isRunningOrPending = job !== undefined && (isJobRunning(job) || isJobPending(job));
 
     return (
         <>
@@ -34,8 +34,8 @@ export const PrepareImportDataset = ({
                 <ImportFailedJob
                     size={size}
                     fileName={fileName}
-                    error={job.error ?? ''}
-                    message={job.message ?? ''}
+                    error={job?.error ?? ''}
+                    message={job?.message ?? ''}
                     stagedDatasetId={stagedDatasetId}
                     deleteEntry={deleteEntry}
                 />

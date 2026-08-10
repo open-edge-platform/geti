@@ -156,7 +156,7 @@ describe('ProjectsListPanel', () => {
         });
 
         await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith('/projects');
+            expect(mockNavigate).toHaveBeenCalledWith('/projects', expect.anything());
         });
     });
 });

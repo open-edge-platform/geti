@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from pathlib import Path
+from typing import Callable
 from unittest.mock import MagicMock
 
 import pytest
@@ -86,7 +87,6 @@ class TestDataModule:
         [
             TaskType.MULTI_CLASS_CLS,
             TaskType.MULTI_LABEL_CLS,
-            TaskType.H_LABEL_CLS,
             TaskType.DETECTION,
             TaskType.SEMANTIC_SEGMENTATION,
             TaskType.INSTANCE_SEGMENTATION,
@@ -122,6 +122,42 @@ class TestDataModule:
         assert fxt_config.train_subset.input_size == (240, 240)
         assert fxt_config.val_subset.input_size == (240, 240)
         assert fxt_config.test_subset.input_size == (240, 240)
+
+    def test_eval_loader_kwargs_uses_recipe_settings(self) -> None:
+        """Eval loaders honor the recipe-configured batch size, workers and pinned memory.
+
+        Tiled evaluation memory is bounded by the recipe (the tile recipes set a small
+        ``batch_size`` for the val/test subsets), so the DataModule no longer overrides
+        the loader settings based on the dataset type — the values come straight from
+        the subset config.
+        """
+        from getitune.data.dataset.tile import TileDataset
+
+        class _FakeTiled(TileDataset):
+            def __init__(self):  # bypass heavy TileDataset construction
+                pass
+
+            @property
+            def collate_fn(self) -> Callable:
+                return lambda batch: batch
+
+        dm = DataModule.__new__(DataModule)
+        config = MagicMock(spec=SubsetConfig)
+        config.batch_size = 8
+        config.num_workers = 4
+
+        plain_dataset = MagicMock()
+        plain_dataset.collate_fn = lambda batch: batch
+        plain_kwargs = dm._eval_loader_kwargs(plain_dataset, config)
+        assert plain_kwargs["batch_size"] == 8
+        assert plain_kwargs["num_workers"] == 4
+        assert plain_kwargs["pin_memory"] is True
+
+        # Tiled datasets are treated the same way: the recipe controls the settings.
+        tiled_kwargs = dm._eval_loader_kwargs(_FakeTiled(), config)
+        assert tiled_kwargs["batch_size"] == 8
+        assert tiled_kwargs["num_workers"] == 4
+        assert tiled_kwargs["pin_memory"] is True
 
     def test_init_input_size(
         self,

@@ -3,7 +3,7 @@
 
 import { createContext, ReactNode, useContext } from 'react';
 
-import type { ModelArchitecture as ModelArchitectureType } from '@/api/types';
+import type { ModelArchitecture as ModelArchitectureType, ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { Content, ContextualHelp, Divider, Flex, Heading, Radio, Text } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 
@@ -114,7 +114,7 @@ type ModelArchitectureProps = {
     isSelected: boolean;
     children: ReactNode;
     onSelect: () => void;
-    modelArchitecture: ModelArchitectureType;
+    modelArchitecture: ModelArchitectureWithPerformanceCategory;
 };
 
 export const ModelArchitectureCard = ({
@@ -130,6 +130,12 @@ export const ModelArchitectureCard = ({
                     [classes.modelArchitectureSelected]: isSelected,
                 })}
                 onClick={onSelect}
+                aria-label={
+                    modelArchitecture.performanceCategory === undefined
+                        ? modelArchitecture.name
+                        : `${modelArchitecture.name} - ${modelArchitecture.performanceCategory}`
+                }
+                data-architecture-name={modelArchitecture.name}
             >
                 {children}
             </div>

@@ -46,7 +46,7 @@ export const GroupModelsContainer = ({ group, models }: GroupModelsContainerProp
                         <DisclosureTitle UNSAFE_className={classes.disclosureItem}>
                             <ModelRowContainer model={model} modelArchitecture={modelArchitecture} />
                         </DisclosureTitle>
-                        <DisclosurePanel>
+                        <DisclosurePanel aria-label={`Model details for ${model.name}`}>
                             <ModelDetailsTabs modelId={modelId} />
                         </DisclosurePanel>
                     </Disclosure>

@@ -3,15 +3,11 @@
 
 """Head modules for getitune custom model."""
 
-from .hlabel_cls_head import HierarchicalCBAMClsHead, HierarchicalLinearClsHead, HierarchicalNonLinearClsHead
 from .linear_head import LinearClsHead
 from .multilabel_cls_head import MultiLabelLinearClsHead, MultiLabelNonLinearClsHead
 from .vision_transformer_head import VisionTransformerClsHead
 
 __all__ = [
-    "HierarchicalCBAMClsHead",
-    "HierarchicalLinearClsHead",
-    "HierarchicalNonLinearClsHead",
     "LinearClsHead",
     "MultiLabelLinearClsHead",
     "MultiLabelNonLinearClsHead",

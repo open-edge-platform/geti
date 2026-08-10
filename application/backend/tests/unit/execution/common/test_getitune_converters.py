@@ -85,11 +85,9 @@ class TestGetOtxDatasetClassByTaskType:
         "getitune_task_type",
         [
             GetiTuneTaskType.SEMANTIC_SEGMENTATION,
-            GetiTuneTaskType.H_LABEL_CLS,
-            GetiTuneTaskType.ROTATED_DETECTION,
             GetiTuneTaskType.KEYPOINT_DETECTION,
         ],
-        ids=["semantic_seg", "h_label_cls", "rotated_det", "keypoint_det"],
+        ids=["semantic_seg", "keypoint_det"],
     )
     def test_unsupported_getitune_task_type_raises(self, getitune_task_type: GetiTuneTaskType):
         """A getitune task type without a mapped dataset class must raise ValueError."""
