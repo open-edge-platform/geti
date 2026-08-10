@@ -782,7 +782,7 @@ class TrainingConfigurationView(BaseModel):
                                         "name": "IoU random crop",
                                         "description": (
                                             "Randomly crop images based on Intersection over Union (IoU) criteria. "
-                                            "Note: this augmentation is not supported when Tiling algorithm is enabled."
+                                            "Note: this augmentation is not supported when tiling is enabled."
                                         ),
                                         "parameters": [
                                             {

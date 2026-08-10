@@ -102,24 +102,21 @@ class XPUAwareTrainerMixin:
             super()._setup_train()  # pyrefly: ignore[missing-attribute]
 
     def validate(self) -> tuple[dict | None, float | None]:
-        """Run validation in fp32 on XPU when BF16 training is active and EMA is absent.
+        """Run validation on XPU without handing Ultralytics a bf16 loss tensor.
 
-        When ``ModelEMA`` is active (the common case), Ultralytics passes
-        ``self.ema.ema`` (fp32) to the validator, so no conversion is needed.
-        When EMA is not used and ``self.args.amp`` is ``True`` (BF16 mode),
-        the training model (bf16) would be passed directly — we convert it to
-        fp32 for validation precision, then convert back to bf16 afterward.
-        When ``self.args.amp`` is ``False`` (FP32 mode), the model is already
-        fp32 and no conversion is needed.
+        Ultralytics' trainer validation converts ``self.loss`` to NumPy when it
+        computes fallback fitness. On XPU BF16 runs, that tensor can remain
+        bf16, which NumPy cannot consume. Promoting it once to fp32 before the
+        upstream validation keeps the training path unchanged and avoids any
+        dtype restoration workaround.
         """
-        if getattr(self, "device", None) is not None and self.device.type == "xpu" and getattr(self.args, "amp", True):
-            has_ema = hasattr(self, "ema") and self.ema is not None
-            if not has_ema:
-                self.model.float()
-                try:
-                    return super().validate()  # pyrefly: ignore[missing-attribute]
-                finally:
-                    self.model.bfloat16()
+        if (
+            getattr(self, "device", None) is not None
+            and self.device.type == "xpu"
+            and isinstance(getattr(self, "loss", None), torch.Tensor)
+            and self.loss.dtype != torch.float32
+        ):
+            self.loss = self.loss.float()
         return super().validate()  # pyrefly: ignore[missing-attribute]
 
     def _get_memory(self, fraction: bool = False) -> float:

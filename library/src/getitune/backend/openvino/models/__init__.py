@@ -5,7 +5,6 @@
 
 from .base import OVModel
 from .detection import OVDetectionModel
-from .hlabel_classification import OVHlabelClassificationModel
 from .instance_segmentation import OVInstanceSegmentationModel
 from .keypoint_detection import OVKeypointDetectionModel
 from .multiclass_classification import OVMulticlassClassificationModel
@@ -14,7 +13,6 @@ from .segmentation import OVSegmentationModel
 
 __all__ = [
     "OVDetectionModel",
-    "OVHlabelClassificationModel",
     "OVInstanceSegmentationModel",
     "OVKeypointDetectionModel",
     "OVModel",

@@ -179,6 +179,39 @@ class TestEngine:
         ):
             fxt_engine.predict(checkpoint=checkpoint)
 
+    def test_predict_propagates_tile_config(self, fxt_engine, mocker: MockerFixture) -> None:
+        """predict() must propagate datamodule.tile_config to the model, like test() does.
+
+        Without this, tiled predictions route through OVModel.forward_tiles using the model's
+        default tile_config, diverging from evaluation (test) for tile-merge parameters.
+        """
+        from getitune.config.data import TileConfig
+
+        mocker.patch(
+            "getitune.backend.openvino.engine.AutoConfigurator.update_ov_subset_pipeline",
+            return_value=fxt_engine.datamodule,
+        )
+        mock_model = MagicMock()
+        mock_model.label_info = fxt_engine.datamodule.label_info
+        mocker.patch("getitune.backend.openvino.engine.AutoConfigurator.get_ov_model", return_value=mock_model)
+        fxt_engine._model = mock_model
+
+        # Attach a tiling configuration to the datamodule.
+        tile_config = TileConfig(enable_tiler=True, tile_size=(200, 200))
+        fxt_engine.datamodule.tile_config = tile_config
+
+        # Mock the dataloader to avoid actual data processing.
+        mock_dataloader = MagicMock()
+        mock_batch = MagicMock()
+        mock_dataloader.__iter__ = MagicMock(return_value=iter([mock_batch]))
+        mock_dataloader.__len__ = MagicMock(return_value=1)
+        mocker.patch.object(fxt_engine.datamodule, "test_dataloader", return_value=mock_dataloader)
+
+        fxt_engine.predict()
+
+        # The model's tile_config should now match the datamodule's tile_config.
+        assert mock_model.tile_config == tile_config
+
     def test_predict_with_onnx_checkpoint(self, fxt_engine, mocker, fxt_onnx_model_path) -> None:
         """Test that predict accepts ONNX checkpoints."""
         mocker.patch(

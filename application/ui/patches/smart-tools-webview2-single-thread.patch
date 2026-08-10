@@ -1,0 +1,135 @@
+diff --git a/src/segment-anything/segment-anything.ts b/src/segment-anything/segment-anything.ts
+index d8ec114..b4a2319 100644
+--- a/src/segment-anything/segment-anything.ts
++++ b/src/segment-anything/segment-anything.ts
+@@ -27,10 +27,15 @@ const isWebGpuFailure = (err: unknown): boolean => {
+  * Build a fresh Session pinned to the CPU EP. Used as the last-resort recovery
+  * path whenever an existing Session is too damaged to reset() (e.g.
+  * createOrtSession threw on the new EP, leaving `ortSession === undefined`).
++ *
++ * Single-threaded: reaching here means the threaded CPU retry also failed, which
++ * points at threaded-wasm init itself (no SharedArrayBuffer, blocked pthread
++ * creation) rather than at the GPU. `initWasm()` stays failed for the lifetime of
++ * the page, so the only way back is a pool of one.
+  */
+ const createCpuSession = async (modelPath: string): Promise<Session> => {
+     const session = new Session();
+-    await session.init(modelPath, { executionProviders: ['cpu'] });
++    await session.init(modelPath, { executionProviders: ['cpu'], numThreads: 1 });
+     return session;
+ };
+ 
+diff --git a/src/segment-anything/session.ts b/src/segment-anything/session.ts
+index bf1c33a..2f9f3e7 100644
+--- a/src/segment-anything/session.ts
++++ b/src/segment-anything/session.ts
+@@ -50,6 +50,12 @@ export interface SessionInitOptions {
+      * platforms where WebGPU is unavailable or broken).
+      */
+     executionProviders?: SessionParameters['executionProviders'];
++    /**
++     * Override the wasm thread count (defaults to `sessionParams.numThreads`,
++     * where `0` lets ORT size the pool). Pass `1` as a last-resort retry when
++     * threaded wasm init itself failed, not merely because the EP list is CPU-only.
++     */
++    numThreads?: number;
+     /**
+      * Default timeout (ms) applied to every `run()` call unless overridden per-call.
+      * `0` or `undefined` disables the timeout.
+@@ -73,6 +79,7 @@ export class Session {
+     // re-downloading. Kept until the Session is discarded.
+     private modelData: ArrayBuffer | undefined;
+     private executionProviders: SessionParameters['executionProviders'];
++    private numThreads: number;
+     private runTimeoutMs: number | undefined;
+     private poisoned = false;
+     // Bumped on every reset() and on poisoning. Captured by run() at enqueue
+@@ -84,6 +91,7 @@ export class Session {
+     constructor() {
+         this.params = sessionParams;
+         this.executionProviders = sessionParams.executionProviders;
++        this.numThreads = sessionParams.numThreads;
+     }
+ 
+     /**
+@@ -96,6 +104,7 @@ export class Session {
+ 
+     public async init(modelPath: string, options?: SessionInitOptions): Promise<void> {
+         this.executionProviders = options?.executionProviders ?? this.params.executionProviders;
++        this.numThreads = options?.numThreads ?? this.params.numThreads;
+         // Default to a non-zero timeout so callers that omit `runTimeoutMs`
+         // are still protected from a hung run() blocking the serial queue.
+         // Explicit `0` disables the timeout.
+@@ -128,6 +137,9 @@ export class Session {
+         if (options?.executionProviders) {
+             this.executionProviders = options.executionProviders;
+         }
++        if (options?.numThreads !== undefined) {
++            this.numThreads = options.numThreads;
++        }
+         if (options?.runTimeoutMs !== undefined) {
+             this.runTimeoutMs = options.runTimeoutMs;
+         }
+@@ -156,14 +168,13 @@ export class Session {
+     }
+ 
+     private async createOrtSession(): Promise<void> {
+-        // The threaded JSEP wasm needs SharedArrayBuffer / cross-origin
+-        // isolation. When we're running CPU-only (either by config or after
+-        // a WebGPU/JSEP downgrade) force single-threaded wasm so ORT skips
+-        // pthread_create entirely — once `initWasm()` fails it stays failed
+-        // for the lifetime of the page and even pure-CPU sessions reject
+-        // with "previous call to 'initWasm()' failed".
+-        const cpuOnly = this.executionProviders.length === 1 && this.executionProviders[0] === 'cpu';
+-        env.wasm.numThreads = cpuOnly ? 1 : this.params.numThreads;
++        // Never infer the thread count from the EP list. A CPU-only EP list is also
++        // what a missing WebGPU *adapter* produces (blocklisted driver, no Vulkan ICD,
++        // RDP/VDI session, GPU process crash) while threaded wasm is perfectly
++        // healthy; clamping there drops the SAM encode to one core. `numThreads` is
++        // already 1 when SharedArrayBuffer / cross-origin isolation is missing, and
++        // callers pin it to 1 explicitly when threaded wasm init is the thing that failed.
++        env.wasm.numThreads = this.numThreads;
+         env.wasm.wasmPaths = this.params.wasmRoot;
+         env.wasm.simd = true;
+         // Suppress expected "some nodes not assigned to WebGPU EP" warnings —
+diff --git a/src/utils/wasm-utils.tauri.ts b/src/utils/wasm-utils.tauri.ts
+new file mode 100644
+index 0000000..ec40978
+--- /dev/null
++++ b/src/utils/wasm-utils.tauri.ts
+@@ -0,0 +1,35 @@
++// Copyright (C) 2026 Intel Corporation
++// SPDX-License-Identifier: Apache-2.0
++
++// Tauri build override, resolved via the `.tauri.*` extension list in rsbuild.config.ts.
++//
++// WebView2 honours COEP `credentialless`, so `crossOriginIsolated` is true and the
++// generic module would enable the threaded JSEP wasm. But emscripten spawns its pthread
++// pool as *nested module workers* (`new Worker(new URL(import.meta.url), {type:'module'})`
++// from inside the SAM worker), and those never load in the Tauri webview — ORT logs
++// "worker sent an error! undefined:undefined: undefined" and the runtime then blocks
++// forever on a pool that never comes up, blowing SAM_ENCODER_TIMEOUT_MS.
++//
++// Single-threaded CPU is the only path that completes. This is what macOS/Linux already
++// do implicitly (WKWebView/WebKitGTK report `crossOriginIsolated === false`); Windows
++// needs it stated explicitly. Do not import from `./wasm-utils` here — the `.tauri.*`
++// resolver would resolve that specifier back to this file.
++
++export interface SessionParameters {
++    numThreads: number;
++    executionProviders: string[];
++    wasmRoot: { wasm: string };
++}
++
++const wasmPaths = {
++    wasm: new URL(
++        '../../../../node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.wasm',
++        import.meta.url
++    ).toString(),
++};
++
++export const sessionParams: SessionParameters = {
++    numThreads: 1,
++    executionProviders: ['cpu'],
++    wasmRoot: wasmPaths,
++};

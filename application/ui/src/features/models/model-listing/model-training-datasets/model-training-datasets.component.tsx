@@ -1,13 +1,16 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DatasetRevision, DatasetSubset } from '@/api/types';
+import { useMemo } from 'react';
+
+import type { DatasetRevision, DatasetSubset, Model } from '@/api/types';
 import { Flex, MediaViewModes, Text, ViewModes } from '@geti-ui/ui';
 import { useNumberFormatter } from 'react-aria';
 
 import { useGetDatasetRevisionItems } from '../../../../hooks/use-get-dataset-revision-items.hook';
 import { useViewMode } from '../../../../hooks/use-view-mode.hook';
 import { GALLERY_VIEW_MODES, type GalleryViewMode } from '../../../../shared/gallery-view-modes';
+import { getAllModelsWithOpenVINOVariants, type SelectableModel } from '../../utils';
 import { Box } from '../components/box/box.component';
 import { SubsetGallery } from './subset-gallery.component';
 
@@ -16,9 +19,10 @@ type SubsetBoxProps = {
     subset: DatasetSubset;
     datasetRevisionId: string;
     totalItems: number;
+    selectedModel: SelectableModel | undefined;
 };
 
-const SubsetBox = ({ title, subset, datasetRevisionId, totalItems }: SubsetBoxProps) => {
+const SubsetBox = ({ title, subset, datasetRevisionId, totalItems, selectedModel }: SubsetBoxProps) => {
     const { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, totalCount } = useGetDatasetRevisionItems(
         {
             datasetRevisionId,
@@ -43,15 +47,19 @@ const SubsetBox = ({ title, subset, datasetRevisionId, totalItems }: SubsetBoxPr
                     hasNextPage={hasNextPage}
                     isFetchingNextPage={isFetchingNextPage}
                     isPending={isPending}
+                    selectedModel={selectedModel}
                 />
             }
         />
     );
 };
 
-const ModelTrainingContent = ({ datasetRevision }: { datasetRevision: DatasetRevision }) => {
+const ModelTrainingContent = ({ datasetRevision, model }: { datasetRevision: DatasetRevision; model: Model }) => {
     const totalItems = datasetRevision.item_counts?.total ?? 0;
     const datasetRevisionId = String(datasetRevision.id);
+
+    // Predictions can only be run with an OpenVINO variant of the model being inspected
+    const selectedModel = useMemo(() => getAllModelsWithOpenVINOVariants([model]).at(0), [model]);
 
     return (
         <Flex gap={'size-300'} width={'100%'}>
@@ -60,24 +68,33 @@ const ModelTrainingContent = ({ datasetRevision }: { datasetRevision: DatasetRev
                 subset={'training'}
                 datasetRevisionId={datasetRevisionId}
                 totalItems={totalItems}
+                selectedModel={selectedModel}
             />
             <SubsetBox
                 title={'Validation'}
                 subset={'validation'}
                 datasetRevisionId={datasetRevisionId}
                 totalItems={totalItems}
+                selectedModel={selectedModel}
             />
             <SubsetBox
                 title={'Testing'}
                 subset={'testing'}
                 datasetRevisionId={datasetRevisionId}
                 totalItems={totalItems}
+                selectedModel={selectedModel}
             />
         </Flex>
     );
 };
 
-export const ModelTrainingDatasets = ({ datasetRevision }: { datasetRevision?: DatasetRevision }) => {
+export const ModelTrainingDatasets = ({
+    datasetRevision,
+    model,
+}: {
+    datasetRevision?: DatasetRevision;
+    model: Model;
+}) => {
     if (!datasetRevision || !datasetRevision.id) {
         return (
             <Flex justifyContent={'center'} alignItems={'center'} height={'size-3000'}>
@@ -94,5 +111,5 @@ export const ModelTrainingDatasets = ({ datasetRevision }: { datasetRevision?: D
         );
     }
 
-    return <ModelTrainingContent datasetRevision={datasetRevision} />;
+    return <ModelTrainingContent datasetRevision={datasetRevision} model={model} />;
 };

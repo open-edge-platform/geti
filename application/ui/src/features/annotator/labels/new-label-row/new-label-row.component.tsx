@@ -81,7 +81,6 @@ export const NewLabelRow = ({ onSave, onCancel, validateName, validateHotkey }: 
 
     return (
         <Grid
-            // @ts-expect-error TODO[geti-ui]: Grid wrapper not forwardRef-typed; ref works at runtime
             ref={rowRef}
             columns={['size-350', 'size-400', '1fr', 'size-400', 'size-400']}
             gap={'size-100'}

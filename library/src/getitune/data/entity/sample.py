@@ -107,25 +107,6 @@ class ClassificationMultiLabelSample(BaseSample):
 
 @register_pytree_node
 @register_sample
-class ClassificationHierarchicalSample(BaseSample):
-    """ClassificationHierarchicalSample is a base class for getitune hierarchical classification items."""
-
-    image: tv_tensors.Image | torch.Tensor = image_field(dtype=pl.UInt8(), channels_first=True)
-    label: torch.Tensor = label_field(pl.UInt8(), is_list=True)
-    dm_image_info: DmImageInfo = image_info_field()
-
-    def __post_init__(self) -> None:
-        shape = (self.dm_image_info.height, self.dm_image_info.width)
-
-        self.img_info = ImageInfo(
-            img_idx=0,
-            img_shape=shape,
-            ori_shape=shape,
-        )
-
-
-@register_pytree_node
-@register_sample
 class DetectionSample(BaseSample):
     """DetectionSample is a base class for getitune detection items."""
 

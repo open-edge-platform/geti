@@ -13,7 +13,7 @@ from app.models.media import MediaSortBy, SortDirection
 from .filters import (
     _apply_annotation_status_filter_with_video_support,
     _apply_label_filter_with_video_support,
-    _apply_subset_filter,
+    _apply_subset_filter_with_video_support,
 )
 
 # Maps each sortable field to its underlying DB column. Extend this when a new
@@ -74,7 +74,7 @@ class MediaRepository:
             stmt = stmt.where(MediaDB.type.not_in(exclude_types))
         stmt = self._apply_date_filters(stmt, start_date, end_date)
         stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
-        stmt = _apply_subset_filter(stmt, subsets)
+        stmt = _apply_subset_filter_with_video_support(stmt, subsets)
         stmt = _apply_label_filter_with_video_support(stmt, label_ids)
         return self.db.scalar(stmt) or 0
 
@@ -96,7 +96,7 @@ class MediaRepository:
             stmt = stmt.where(MediaDB.type.not_in(exclude_types))
         stmt = self._apply_date_filters(stmt, start_date, end_date)
         stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
-        stmt = _apply_subset_filter(stmt, subsets)
+        stmt = _apply_subset_filter_with_video_support(stmt, subsets)
         stmt = _apply_label_filter_with_video_support(stmt, label_ids)
         sort_column = _SORT_BY_COLUMN[sort_by]
         order_by_column = sort_column.asc() if sort_direction == SortDirection.ASC else sort_column.desc()

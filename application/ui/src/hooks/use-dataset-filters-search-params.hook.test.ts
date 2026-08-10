@@ -268,59 +268,59 @@ describe('useDatasetFiltersSearchParams', () => {
             expect(result.current.endDate).toBe('2026-12-31T10:00:00.000Z');
         });
 
-        it('sets startDate in the search params', () => {
+        it('sets start date in the search params', () => {
             const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
                 route: '/projects/123',
                 path: '/projects/:projectId',
             });
 
             act(() => {
-                result.current.setStartDate('2026-03-15T22:00:00.000Z');
+                result.current.setDateRange('2026-03-15T22:00:00.000Z', null);
             });
 
             expect(result.current.startDate).toBe('2026-03-15T22:00:00.000Z');
+            expect(result.current.endDate).toBe(null);
         });
 
-        it('sets endDate in the search params', () => {
+        it('sets end date in the search params', () => {
             const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
                 route: '/projects/123',
                 path: '/projects/:projectId',
             });
 
             act(() => {
-                result.current.setEndDate('2026-06-30T10:00:00.000Z');
+                result.current.setDateRange(null, '2026-03-15T22:00:00.000Z');
             });
 
+            expect(result.current.startDate).toBe(null);
+            expect(result.current.endDate).toBe('2026-03-15T22:00:00.000Z');
+        });
+
+        it('sets both dates in the search params', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: '/projects/123',
+                path: '/projects/:projectId',
+            });
+
+            act(() => {
+                result.current.setDateRange('2026-03-15T22:00:00.000Z', '2026-06-30T10:00:00.000Z');
+            });
+
+            expect(result.current.startDate).toBe('2026-03-15T22:00:00.000Z');
             expect(result.current.endDate).toBe('2026-06-30T10:00:00.000Z');
         });
 
-        it('clears startDate when set to null', () => {
+        it('clears both dates when the range is set to null', () => {
             const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
-                route: `/projects/123?${START_DATE_PARAM}=2026-01-01T22:00:00.000Z`,
+                route: `/projects/123?${START_DATE_PARAM}=2026-01-01T22:00:00.000Z&${END_DATE_PARAM}=2026-12-31T10:00:00.000Z`,
                 path: '/projects/:projectId',
             });
 
-            expect(result.current.startDate).toBe('2026-01-01T22:00:00.000Z');
-
             act(() => {
-                result.current.setStartDate(null);
+                result.current.setDateRange(null, null);
             });
 
             expect(result.current.startDate).toBeNull();
-        });
-
-        it('clears endDate when set to null', () => {
-            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
-                route: `/projects/123?${END_DATE_PARAM}=2026-12-31T10:00:00.000Z`,
-                path: '/projects/:projectId',
-            });
-
-            expect(result.current.endDate).toBe('2026-12-31T10:00:00.000Z');
-
-            act(() => {
-                result.current.setEndDate(null);
-            });
-
             expect(result.current.endDate).toBeNull();
         });
 
@@ -341,6 +341,16 @@ describe('useDatasetFiltersSearchParams', () => {
             });
 
             expect(result.current.startDate).toBeNull();
+        });
+
+        it('ignores the whole range when the start date is later than the end date', () => {
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route: `/projects/123?${START_DATE_PARAM}=2026-12-31T10:00:00.000Z&${END_DATE_PARAM}=2026-01-01T22:00:00.000Z`,
+                path: '/projects/:projectId',
+            });
+
+            expect(result.current.startDate).toBeNull();
+            expect(result.current.endDate).toBeNull();
         });
     });
 
