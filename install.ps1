@@ -66,7 +66,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 $GIT_URL = "https://github.com/open-edge-platform/geti.git"
-$GIT_BRANCH = "app/v3.1.0rc2"
+$GIT_BRANCH = "app/v3.1.0rc4"
 
 # Exit code the backend uses for a fatal, non-restartable migration failure
 # (see application/backend/app/lifecycle.py:MIGRATION_FATAL_EXIT_CODE). It lets
@@ -954,11 +954,14 @@ function Start-App {
     # localhost. Honour PORT/HOST overrides if the user set them.
     $port = if ($env:PORT) { $env:PORT } else { "7860" }
     $browserHost = if ($env:HOST -and $env:HOST -ne "0.0.0.0") { $env:HOST } else { "localhost" }
-    $url = "http://${browserHost}:${port}"
+    # The server terminates TLS itself (see app/main.py), so the scheme is https.
+    $url = "https://${browserHost}:${port}"
 
     Write-Host ""
     Write-Host "Geti will be available at: " -NoNewline
     Write-Host $url -ForegroundColor Cyan
+    Write-Host "The server uses a self-signed certificate, so your browser will warn you"
+    Write-Host "about the connection the first time -- accept the warning to continue."
     Write-Host ""
 
     Push-Location $backendDir

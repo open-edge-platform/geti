@@ -20,7 +20,7 @@ trap 'cleanup $LINENO' ERR
 trap 'echo ""; echo "Installation interrupted."; exit 130' INT TERM
 
 GIT_URL="https://github.com/open-edge-platform/geti.git"
-GIT_BRANCH="app/v3.1.0rc2"
+GIT_BRANCH="app/v3.1.0rc4"
 
 # Exit code the backend uses for a fatal, non-restartable migration failure
 # (see application/backend/app/lifecycle.py:MIGRATION_FATAL_EXIT_CODE). It lets
@@ -313,6 +313,18 @@ install_npm() {
     local node_bin installed_npm_version
     node_bin="$(dirname "$NPM_BIN")"
 
+    # npm is a script with a `#!/usr/bin/env node` shebang, so every npm invocation
+    # needs `node` on PATH. `nvm install` cannot provide it: run_cmd_spinner executes
+    # it in a backgrounded subshell, so the PATH nvm exports is discarded when that
+    # subshell exits. Sourcing nvm.sh only helps on later runs, once a default alias
+    # exists -- which is why a first-time install failed with
+    # "env: 'node': No such file or directory" but a re-run succeeded. Put the node
+    # bin directory on PATH here instead of relying on nvm.
+    case ":$PATH:" in
+        *":$node_bin:"*) ;;
+        *) export PATH="$node_bin:$PATH" ;;
+    esac
+
     if [ -x "$node_bin/node" ] && [ -x "$NPM_BIN" ]; then
         installed_npm_version=$("$NPM_BIN" --version)
         if [ "$(printf '%s\n' "$required_npm_version" "$installed_npm_version" | sort -V | head -n1)" = "$required_npm_version" ]; then
@@ -327,6 +339,12 @@ install_npm() {
 
     echo "Required node $required_node_version not found in $NVM_DIR. Installing..."
     run_cmd_spinner "Downloading and installing node $required_node_version" nvm install "$required_node_version"
+
+    if [ ! -x "$node_bin/node" ] || [ ! -x "$NPM_BIN" ]; then
+        echo "Error: node $required_node_version was not installed into $node_bin." >&2
+        echo "See $LOG_FILE for the nvm output." >&2
+        return 1
+    fi
 
     installed_npm_version=$("$NPM_BIN" --version)
     if [ "$(printf '%s\n' "$required_npm_version" "$installed_npm_version" | sort -V | head -n1)" != "$required_npm_version" ]; then
@@ -666,12 +684,23 @@ stop_verification() {
 
 # Restore the previous version (source + data) and rebuild it so the app remains
 # usable after a failed upgrade.
+# $1: line number the upgrade failed on (passed by the ERR trap), if known.
 upgrade_rollback() {
     trap - ERR
     set +e
+    # The rollback itself rebuilds the app, so a second entry would restart the whole
+    # build and make the installer look like it is looping. Only ever run once.
+    if [ -n "${ROLLBACK_IN_PROGRESS:-}" ]; then
+        return
+    fi
+    ROLLBACK_IN_PROGRESS=1
     echo ""
     log "──────────────────────────────────────────────"
-    log "Upgrade failed. Rolling back to the previous version..."
+    if [ -n "${1:-}" ]; then
+        log "Upgrade failed at line $1 of the installer. Rolling back to the previous version..."
+    else
+        log "Upgrade failed. Rolling back to the previous version..."
+    fi
 
     if [ -n "${DATA_BACKED_UP:-}" ] && [ -f "$DATA_BACKUP_FILE" ]; then
         log "Restoring application data from backup..."
@@ -742,7 +771,7 @@ run_upgrade() {
     capture_rollback_point
 
     # From here on, any failure rolls the deployment back to the previous state.
-    trap 'upgrade_rollback' ERR
+    trap 'upgrade_rollback $LINENO' ERR
 
     ensure_source_code
     build_and_deploy
@@ -784,10 +813,13 @@ run_app() {
     if [ "$browser_host" = "0.0.0.0" ]; then
         browser_host="localhost"
     fi
-    local url="http://${browser_host}:${port}"
+    # The server terminates TLS itself (see app/main.py), so the scheme is https.
+    local url="https://${browser_host}:${port}"
 
     echo ""
     echo "Geti will be available at: $url"
+    echo "The server uses a self-signed certificate, so your browser will warn you"
+    echo "about the connection the first time -- accept the warning to continue."
     echo ""
 
     cd "$WORK_DIR/application/backend"
