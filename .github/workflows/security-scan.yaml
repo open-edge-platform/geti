@@ -103,7 +103,7 @@ jobs:
 
   dast-scan:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    timeout-minutes: 90
+    timeout-minutes: 360
     runs-on: ubuntu-latest
     permissions:
       contents: read
