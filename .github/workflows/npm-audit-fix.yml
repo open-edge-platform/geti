@@ -81,6 +81,11 @@ jobs:
         with:
           app-id: ${{ secrets.RENOVATE_APP_ID }}
           private-key: ${{ secrets.RENOVATE_APP_PEM }}
+          repositories: ${{ github.event.repository.name }}
+          owner: ${{ github.repository_owner }}
+          # Repository permissions: only what's needed to push a branch and open a PR
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: Create PR if lockfile changed
         if: steps.check-changes.outputs.changed == 'true'
