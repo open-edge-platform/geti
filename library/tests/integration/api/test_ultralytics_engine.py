@@ -19,9 +19,12 @@ Uses parquet-based datasets under ``tests/assets/``.
 
 from __future__ import annotations
 
+import logging
+from contextlib import contextmanager
 from copy import deepcopy
 from pathlib import Path
-from typing import NamedTuple, cast
+from time import perf_counter
+from typing import Iterator, NamedTuple, cast
 
 import numpy as np
 import pytest
@@ -42,6 +45,7 @@ from getitune.types.task import TaskType
 
 ASSETS_ROOT = Path(__file__).resolve().parents[2] / "assets"
 RECIPE_ROOT = Path(__file__).resolve().parents[3] / "src" / "getitune" / "recipe"
+logger = logging.getLogger(__name__)
 
 
 class _TaskSpec(NamedTuple):
@@ -61,6 +65,21 @@ _TASK_SPECS: list[_TaskSpec] = [
         recipe_name="yolo26_n_seg",
         dataset_dir="instance_segmentation_coco",
     ),
+    _TaskSpec(
+        task=TaskType.MULTI_CLASS_CLS,
+        recipe_name="yolo26_n_cls",
+        dataset_dir="classification_cifar10",
+    ),
+    _TaskSpec(
+        task=TaskType.MULTI_LABEL_CLS,
+        recipe_name="yolo26_n_cls",
+        dataset_dir="multilabel_classification_coco",
+    ),
+    _TaskSpec(
+        task=TaskType.SEMANTIC_SEGMENTATION,
+        recipe_name="yolo26_n_sem",
+        dataset_dir="segmentation_pets",
+    ),
 ]
 
 
@@ -68,6 +87,9 @@ def _resolve_recipe(spec: _TaskSpec) -> Path:
     task_to_subdir = {
         TaskType.DETECTION: "detection",
         TaskType.INSTANCE_SEGMENTATION: "instance_segmentation",
+        TaskType.MULTI_CLASS_CLS: "classification/multi_class_cls",
+        TaskType.MULTI_LABEL_CLS: "classification/multi_label_cls",
+        TaskType.SEMANTIC_SEGMENTATION: "semantic_segmentation",
     }
     subdir = task_to_subdir[spec.task]
     return RECIPE_ROOT / subdir / f"{spec.recipe_name}.yaml"
@@ -88,6 +110,18 @@ def _build_subset_config(data_config: dict, subset_name: str) -> SubsetConfig:
     subset_cfg_data["input_size"] = data_config["input_size"]
     sampler_cfg_data = subset_cfg_data.pop("sampler", {})
     return SubsetConfig(sampler=SamplerConfig(**sampler_cfg_data), **subset_cfg_data)
+
+
+@contextmanager
+def _timed_step(spec: _TaskSpec, step_name: str) -> Iterator[None]:
+    """Log step start/end with execution time for workflow visibility."""
+    start = perf_counter()
+    logger.info("[%s] %s started", spec.task.value, step_name)
+    try:
+        yield
+    finally:
+        elapsed = perf_counter() - start
+        logger.info("[%s] %s finished in %.2fs", spec.task.value, step_name, elapsed)
 
 
 @pytest.mark.parametrize("spec", _FILTERED_TASK_SPECS, ids=_id_fn)
@@ -153,27 +187,35 @@ def test_ultralytics_engine_workflow(
     )
     assert isinstance(engine, UltralyticsEngine)
 
-    train_metrics = engine.train(max_epochs=2)
+    with _timed_step(spec, "train"):
+        train_metrics = engine.train(max_epochs=2)
     assert len(train_metrics) > 0
 
-    test_metrics = engine.test()
+    with _timed_step(spec, "test"):
+        test_metrics = engine.test()
     assert len(test_metrics) > 0
 
-    predictions = engine.predict()
+    with _timed_step(spec, "predict"):
+        predictions = engine.predict()
     assert predictions is not None
     assert len(predictions) > 0
 
-    ov_xml_path = engine.export(
-        export_format=ExportFormat.OPENVINO,
-        export_precision=Precision.FP32,
-    )
+    with _timed_step(spec, "export_openvino_fp32"):
+        ov_xml_path = engine.export(
+            export_format=ExportFormat.OPENVINO,
+            export_precision=Precision.FP32,
+        )
     assert ov_xml_path.exists()
     assert ov_xml_path.suffix == ".xml"
 
-    dummy_input = np.zeros((640, 640, 3), dtype=np.uint8)
-    mapi_model = Model.create_model(str(ov_xml_path))
+    assert datamodule.input_size is not None
+    input_h, input_w = datamodule.input_size
+    dummy_input = np.zeros((input_h, input_w, 3), dtype=np.uint8)
+    with _timed_step(spec, "model_api_fp32_create"):
+        mapi_model = Model.create_model(str(ov_xml_path))
     assert mapi_model is not None
-    fp32_result = mapi_model(dummy_input)
+    with _timed_step(spec, "model_api_fp32_infer"):
+        fp32_result = mapi_model(dummy_input)
     assert fp32_result is not None
 
     ov_engine = create_engine(
@@ -183,17 +225,22 @@ def test_ultralytics_engine_workflow(
     )
     assert isinstance(ov_engine, OVEngine)
 
-    ov_test_metrics = ov_engine.test()
+    with _timed_step(spec, "ov_test"):
+        ov_test_metrics = ov_engine.test()
     assert len(ov_test_metrics) > 0
 
-    ov_predictions = ov_engine.predict()
+    with _timed_step(spec, "ov_predict"):
+        ov_predictions = ov_engine.predict()
     assert ov_predictions is not None
     assert len(ov_predictions) > 0
 
-    optimized_path = ov_engine.optimize()
+    with _timed_step(spec, "ov_optimize"):
+        optimized_path = ov_engine.optimize()
     assert optimized_path.exists()
 
-    mapi_int8_model = Model.create_model(str(optimized_path))
+    with _timed_step(spec, "model_api_int8_create"):
+        mapi_int8_model = Model.create_model(str(optimized_path))
     assert mapi_int8_model is not None
-    int8_result = mapi_int8_model(dummy_input)
+    with _timed_step(spec, "model_api_int8_infer"):
+        int8_result = mapi_int8_model(dummy_input)
     assert int8_result is not None

@@ -164,38 +164,24 @@ Tauri's `externalBin` mechanism requires the executable next to
 `_internal/` resources directory must be reachable from `src-tauri/`.
 
 We use **symlinks** so the side-car always reflects the latest PyInstaller
-run without copying gigabytes around.
-
-cd into `application/ui/src-tauri`, then:
+run without copying gigabytes around. From `application/`:
 
 ```sh
-# macOS — Apple silicon (M1/M2/M3/M4)
-ln -sf ../../backend/dist/geti-backend/geti-backend geti-backend-aarch64-apple-darwin
-ln -sf ../../backend/dist/geti-backend/_internal _internal
-
-# macOS — Intel
-ln -sf ../../backend/dist/geti-backend/geti-backend geti-backend-x86_64-apple-darwin
-ln -sf ../../backend/dist/geti-backend/_internal _internal
-
-# Linux
-ln -sf ../../backend/dist/geti-backend/geti-backend geti-backend-x86_64-unknown-linux-gnu
-ln -sf ../../backend/dist/geti-backend/_internal _internal
-
-# Windows (PowerShell, run as admin or with Developer Mode enabled)
-New-Item -ItemType SymbolicLink -Path .\geti-backend-x86_64-pc-windows-msvc.exe `
-    -Target ..\..\backend\dist\geti-backend\geti-backend.exe
-New-Item -ItemType SymbolicLink -Path .\_internal `
-    -Target ..\..\backend\dist\geti-backend\_internal
+just tauri-link-sidecar
 ```
 
-Find your host triple with `rustc -vV | grep host` if unsure.
+The recipe detects your host triple with `rustc -vV`, then creates
+`src-tauri/geti-backend-<triple>` and `src-tauri/_internal` pointing at
+`backend/dist/geti-backend/`. On **Windows** it needs Developer Mode
+enabled (or an elevated shell) to create symlinks.
 
-The symlinks are gitignored. Tauri stages both `geti-backend` (from
-`externalBin`) and `_internal/` (from `resources`) next to its own
-executable in `target/<profile>/` during `tauri dev`, so PyInstaller's
-frozen layout works in dev with no extra steps. The release `.app` on
-macOS needs the sidecar nested one level deeper — that's done by the
-`just tauri-build` recipe in [`../../Justfile`](../../Justfile); see
+The symlinks are gitignored and only need to be created once — they keep
+pointing at the latest `just pyinstaller` output. Tauri stages both
+`geti-backend` (from `externalBin`) and `_internal/` (from `resources`)
+next to its own executable in `target/<profile>/` during `tauri dev`, so
+PyInstaller's frozen layout works in dev with no extra steps. The release
+`.app` on macOS needs the sidecar nested one level deeper — that's done by
+the `just tauri-build` recipe in [`../../Justfile`](../../Justfile); see
 `spawn_backend()` and `locate_backend()` in [`src/backend.rs`](./src/backend.rs).
 
 ### macOS
@@ -208,7 +194,11 @@ macOS needs the sidecar nested one level deeper — that's done by the
     ```sh
     brew install rustup-init && rustup-init
     ```
-3. From `application/ui`, run the desktop dev shell:
+3. Provide and trust a TLS certificate — see
+   [TLS certificates on macOS](#tls-certificates-on-macos) below. Without
+   this the window loads but every backend request fails with
+   _"The certificate for this server is invalid."_
+4. From `application/ui`, run the desktop dev shell:
 
     ```sh
     npm run start:desktop
@@ -218,7 +208,7 @@ macOS needs the sidecar nested one level deeper — that's done by the
     `BUILD_TARGET=tauri` and starts the Rspack dev server) and launches the
     native window once the dev server is ready.
 
-4. Build a distributable `.app` / `.dmg`:
+5. Build a distributable `.app` / `.dmg`:
     ```sh
     just tauri-build   # from application/
     ```
@@ -228,6 +218,55 @@ macOS needs the sidecar nested one level deeper — that's done by the
     to work around PyInstaller's `.app` bundle detection. Running
     `npx tauri build` directly produces a `.app` whose backend dies on
     launch with `Failed to load Python shared library 'libpython*.dylib'`.
+
+#### TLS certificates on macOS
+
+The backend always serves HTTPS (Hypercorn, HTTP/2) on
+`https://localhost:7860` and refuses to start without a certificate. Only
+the Windows build provisions one automatically — a PyInstaller runtime hook
+([`windows/certs.py`](../../backend/pyinstaller/windows/certs.py)) writes a
+self-signed certificate into `DATA_DIR` on first launch, and WebView2 is
+started with `--ignore-certificate-errors` (see `additionalBrowserArgs` in
+[`tauri.conf.json`](./tauri.conf.json)).
+
+Neither applies on macOS: there is no cert-generation hook, and WKWebView
+has no flag to skip certificate validation. Do both steps manually, once.
+
+Generate the certificate into the desktop `DATA_DIR` (from
+`application/backend`):
+
+```sh
+DATA_DIR="$HOME/Library/Application Support/com.intel.geti" just gen-certs
+```
+
+Then add it to your login keychain as a trusted SSL root:
+
+```sh
+security add-trusted-cert -r trustRoot -p ssl -s localhost \
+    "$HOME/Library/Application Support/com.intel.geti/certs/localhost.pem"
+```
+
+`-r trustRoot` is required because the certificate is self-signed and is
+therefore its own root. Using `-r trustAsRoot` fails with
+_"SecTrustSettingsSetTrustSettings: One or more parameters passed to a
+function were not valid."_ macOS will prompt for your login password.
+
+Verify (exit code `0`) and undo when you're done:
+
+```sh
+security verify-cert -p ssl -n localhost -L -q \
+    -c "$HOME/Library/Application Support/com.intel.geti/certs/localhost.pem"
+security remove-trusted-cert \
+    "$HOME/Library/Application Support/com.intel.geti/certs/localhost.pem"
+```
+
+`add-trusted-cert` records trust settings for the certificate without
+importing it into a keychain, so `security find-certificate` /
+`delete-certificate` will not find it — `remove-trusted-cert` is the undo.
+
+`just gen-certs` skips generation when the files already exist and issues
+certificates valid for 365 days; after regenerating you must re-run
+`add-trusted-cert` for the new certificate.
 
 ### Linux
 
@@ -248,13 +287,21 @@ macOS needs the sidecar nested one level deeper — that's done by the
         librsvg2-dev
     ```
 2. Install Rust via [rustup](https://rustup.rs).
-3. From `application/ui`, run the desktop dev shell:
+3. Provide a TLS certificate. As on macOS (see
+   [TLS certificates on macOS](#tls-certificates-on-macos)) nothing
+   generates one for you, so run
+   `DATA_DIR="$HOME/.local/share/com.intel.geti" just gen-certs` from
+   `application/backend`. WebKitGTK trusts the system CA store, so
+   installing the certificate requires root — e.g. copy it to
+   `/usr/local/share/ca-certificates/geti-localhost.crt` and run
+   `sudo update-ca-certificates`.
+4. From `application/ui`, run the desktop dev shell:
 
     ```sh
     npm run start:desktop
     ```
 
-4. Build a distributable AppImage / `.deb`:
+5. Build a distributable AppImage / `.deb`:
     ```sh
     just tauri-build   # from application/
     ```

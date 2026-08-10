@@ -21,12 +21,14 @@ const DEFAULT_STATE: Partial<TrainModelContextProps> = {
     selectedModelArchitectureId: 'arch-1',
     selectedTrainingDevice: 'cpu',
     selectedDatasetRevisionId: 'use-current-dataset-revision',
-    selectedModelRevisionId: 'train-from-scratch',
+    selectedModelRevisionId: 'default-pre-trained-weights',
     isAdvancedSettingsMode: false,
     trainingConfiguration: mockedTrainingConfiguration,
     defaultTrainingConfiguration: mockedTrainingConfiguration,
     datasetRevisions: [{ id: 'use-current-dataset-revision', name: 'Use current dataset', value: null }],
-    modelRevisions: [{ id: 'train-from-scratch', name: 'Train from scratch', architecture: '', value: null }],
+    modelRevisions: [
+        { id: 'default-pre-trained-weights', name: 'Default pre-trained weights', architecture: '', value: null },
+    ],
 };
 
 const mockTrainModelState = vi.hoisted(() => vi.fn(() => DEFAULT_STATE));
@@ -169,7 +171,12 @@ describe('useTrainModel', () => {
                     { id: 'ds-entry-1', name: 'Rev 1', value: datasetRevisionId },
                 ],
                 modelRevisions: [
-                    { id: 'train-from-scratch', name: 'Train from scratch', architecture: '', value: null },
+                    {
+                        id: 'default-pre-trained-weights',
+                        name: 'Default pre-trained weights',
+                        architecture: '',
+                        value: null,
+                    },
                     { id: 'model-entry-1', name: 'Model Rev 1', architecture: 'arch-1', value: modelRevisionId },
                 ],
             });
@@ -202,7 +209,7 @@ describe('useTrainModel', () => {
             });
         });
 
-        it('uses null for dataset/model revision when the Use current dataset / train from scratch entries are selected', async () => {
+        it('uses null for dataset/model revision when the Use current dataset / default pre-trained weights entries are selected', async () => {
             let capturedBody: unknown;
             server.use(
                 http.post('/api/jobs', async ({ request }) => {

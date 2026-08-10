@@ -291,6 +291,18 @@ class TestDatasetRevisionItemEndpoints:
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
         fxt_dataset_revision_service.list_dataset_revision_items.assert_not_called()
 
+    def test_list_dataset_revision_items_offset_overflow(
+        self, fxt_get_project, fxt_dataset_revision_id, fxt_dataset_revision_service, fxt_client
+    ):
+        """Integers larger than 2^31-1 must be rejected with 422, not cause a SQLite overflow 500."""
+        huge_offset = 2**63  # exceeds the le=2_147_483_647 bound
+        response = fxt_client.get(
+            f"/api/projects/{str(fxt_get_project.id)}/dataset_revisions/{str(fxt_dataset_revision_id)}/items?offset={huge_offset}"
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_dataset_revision_service.list_dataset_revision_items.assert_not_called()
+
     def test_list_dataset_revision_items_invalid_revision_id(
         self, fxt_get_project, fxt_dataset_revision_service, fxt_client
     ):

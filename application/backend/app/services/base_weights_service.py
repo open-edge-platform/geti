@@ -18,9 +18,10 @@ from .model_manifest_service import ModelManifestService
 class BaseWeightsService:
     """Service for downloading and managing pretrained model weights from external archives."""
 
-    REQUEST_TIMEOUT = (10, 600)  # (connect timeout, read timeout) in seconds
-    RETRY_TOTAL = 3  # total number of retries for failed requests
-    RETRY_BACKOFF_FACTOR = 1.0  # exponential backoff factor for retries (e.g., 1s, 2s, 4s)
+    REQUEST_TIMEOUT = (5, 600)  # (connect timeout, read timeout) in seconds
+    RETRY_TOTAL = 2  # total number of retries for failed requests
+    RETRY_CONNECT = 1  # retries specifically for connection failures (fail fast on unreachable hosts)
+    RETRY_BACKOFF_FACTOR = 0.5  # exponential backoff factor for retries (e.g., 0.5s, 1s)
 
     def __init__(self, data_dir: Path) -> None:
         self.pretrained_weights_dir = data_dir / "pretrained_weights"
@@ -61,21 +62,25 @@ class BaseWeightsService:
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
 
-        local_path = self.pretrained_weights_dir / task.name.lower() / Path(manifest.pretrained_weights.url).name
+        local_filename = manifest.pretrained_weights.local_filename
+        local_path = self.pretrained_weights_dir / task.name.lower() / local_filename
         if local_path.exists():
             if self._verify_file_integrity(file_path=local_path, sha_sum=manifest.pretrained_weights.sha_sum):
-                logger.info(f"Using cached weights for {model_manifest_id}: {local_path}")
+                logger.info("Using cached weights for {}: {}", model_manifest_id, local_path)
                 return local_path
 
-            logger.warning(f"Cached weights for {model_manifest_id} failed integrity check, will re-download")
+            logger.warning("Cached weights for {} failed integrity check, will re-download", model_manifest_id)
             local_path.unlink()
 
         if not allow_download:
             raise FileNotFoundError(f"Weights not found locally for model {model_manifest_id} and download is disabled")
 
-        logger.info(f"Downloading pretrained weights for {model_manifest_id} from {manifest.pretrained_weights.url}")
+        logger.info("Downloading pretrained weights for {}", model_manifest_id)
+        urls = [manifest.pretrained_weights.url]
+        if manifest.pretrained_weights.mirror_url is not None:
+            urls.append(manifest.pretrained_weights.mirror_url)
         self._download_weights(
-            remote_url=manifest.pretrained_weights.url,
+            urls=urls,
             local_path=local_path,
             sha_sum=manifest.pretrained_weights.sha_sum,
         )
@@ -94,14 +99,14 @@ class BaseWeightsService:
             bool: True if weights were successfully removed, False if they didn't exist
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
-        local_path = self.pretrained_weights_dir / task.name.lower() / Path(manifest.pretrained_weights.url).name
+        local_path = self.pretrained_weights_dir / task.name.lower() / manifest.pretrained_weights.local_filename
         if local_path.exists():
             try:
                 local_path.unlink()
-                logger.info(f"Removed local weights for {model_manifest_id}: {local_path}")
+                logger.info("Removed local weights for {}: {}", model_manifest_id, local_path)
                 return True
             except OSError as e:
-                logger.error(f"Failed to remove weights file {local_path}: {e}")
+                logger.error("Failed to remove weights file {}: {}", local_path, e)
 
         return False
 
@@ -122,14 +127,14 @@ class BaseWeightsService:
                     try:
                         weights_file.unlink()
                         removed_count += 1
-                        logger.debug(f"Removed weights file: {weights_file}")
+                        logger.debug("Removed weights file: {}", weights_file)
                     except OSError as e:
-                        logger.error(f"Failed to remove weights file {weights_file}: {e}")
+                        logger.error("Failed to remove weights file {}: {}", weights_file, e)
 
-            logger.info(f"Removed {removed_count} cached weight files")
+            logger.info("Removed {} cached weight files", removed_count)
             return removed_count
         except OSError as e:
-            logger.error(f"Failed to remove cached weights: {e}")
+            logger.error("Failed to remove cached weights: {}", e)
             return 0
 
     @staticmethod
@@ -153,7 +158,7 @@ class BaseWeightsService:
             actual_sha_sum = sha256_hash.hexdigest()
             return actual_sha_sum == sha_sum
         except Exception as e:
-            logger.error(f"Failed to verify file integrity for {file_path}: {e}")
+            logger.error("Failed to verify file integrity for {}: {}", file_path, e)
             return False
 
     def _check_disk_space(self, remote_url: str, safety_margin_gb: float = 1.0) -> None:
@@ -180,14 +185,14 @@ class BaseWeightsService:
                     if content_length:
                         file_size = int(content_length)
                     else:
-                        logger.warning(f"Could not determine file size for {remote_url}, assuming 500MB")
+                        logger.warning("Could not determine file size for {}, assuming 500MB", remote_url)
                     break
             except Exception as e:
                 # Log per mode so we can see whether proxy or direct access failed.
                 proxy_mode = "env-proxy" if use_env_proxy else "direct"
-                logger.warning(f"Could not check remote file size for {remote_url} via {proxy_mode}: {e}")
+                logger.warning("Could not check remote file size for {} via {}: {}", remote_url, proxy_mode, e)
         else:
-            logger.warning(f"Could not check remote file size for {remote_url}; assuming 500MB")
+            logger.warning("Could not check remote file size for {}; assuming 500MB", remote_url)
 
         stat = shutil.disk_usage(self.pretrained_weights_dir)
         available_space = stat.free
@@ -199,67 +204,76 @@ class BaseWeightsService:
                 f"Available: {available_space / (1024**3):.2f} GB"
             )
 
-    def _download_weights(self, remote_url: str, local_path: Path, sha_sum: str) -> None:
+    def _download_weights(self, urls: list[str], local_path: Path, sha_sum: str) -> None:
         """
-        Download weights from remote URL to local path and verify integrity.
+        Download weights from the first working URL among the given candidates (e.g. primary then mirror).
         Before download, checks if there is enough space on disk.
 
         Args:
-            remote_url: URL to download from
+            urls: Candidate URLs in priority order.
             local_path: Local path to save the file
             sha_sum: Expected SHA256 checksum for verification
 
         Raises:
-            RuntimeError: If downloaded file fails integrity check, or if download fails
+            RuntimeError: If none of the candidate URLs yield a file that passes integrity verification.
         """
-        self._check_disk_space(remote_url)
-
-        # Create temporary file for download
+        local_path.parent.mkdir(parents=True, exist_ok=True)
         temp_path = local_path.with_suffix(".tmp")
-        try:
-            # Ensure all folders exist for the destination path
-            local_path.parent.mkdir(parents=True, exist_ok=True)
 
-            # Attempt the download with and without proxies, since some environment may have proxy issues
-            last_error: Exception | None = None
-            for use_env_proxy in (True, False):
+        last_error: Exception | None = None
+        try:
+            for url in urls:
+                logger.info("Downloading pretrained weights from {}", url)
                 try:
-                    with (
-                        self._build_retry_session(use_env_proxy=use_env_proxy) as session,
-                        session.get(remote_url, stream=True, timeout=self.REQUEST_TIMEOUT) as response,
-                    ):
-                        response.raise_for_status()
-                        with open(temp_path, "wb") as f:
-                            for data in response.iter_content(chunk_size=4096):
-                                f.write(data)
-                    break
+                    self._check_disk_space(url)
+                    self._download_from_url(url, temp_path)
                 except requests.RequestException as e:
                     last_error = e
-                    proxy_mode = "env-proxy" if use_env_proxy else "direct"
-                    logger.warning(f"Weight download failed via {proxy_mode} for {remote_url}: {e}")
-            else:
-                raise RuntimeError(f"Failed to download weights from {remote_url}: {last_error}")
+                    logger.warning("Failed to download weights from {}: {}", url, e)
+                    continue
 
-            if not self._verify_file_integrity(temp_path, sha_sum):
-                temp_path.unlink()
-                raise RuntimeError(f"Downloaded file failed integrity check for {remote_url}")
+                if self._verify_file_integrity(temp_path, sha_sum):
+                    temp_path.rename(local_path)
+                    logger.info("Successfully downloaded and verified weights: {}", local_path)
+                    return
 
-            # Move temporary file to final location
-            temp_path.rename(local_path)
-            logger.info(f"Successfully downloaded and verified weights: {local_path}")
-        except requests.RequestException as e:
-            logger.error(f"Failed to download weights from {remote_url}: {e}")
-            raise RuntimeError(f"Failed to download weights from {remote_url}: {e}") from e
-        except RuntimeError:
-            # Re-raise runtime errors to preserve the original error type and message and avoid the broad except clause
-            raise
-        except Exception as e:
-            logger.error(f"Unexpected error downloading weights from {remote_url}: {e}")
-            raise RuntimeError(f"Unexpected error downloading weights from {remote_url}: {e}") from e
+                last_error = RuntimeError(f"Integrity check failed for weights downloaded from {url}")
+                logger.warning("Downloaded weights from {} failed integrity check, trying next candidate URL", url)
+                temp_path.unlink(missing_ok=True)
+
+            raise RuntimeError(
+                f"Failed to download weights from any of the candidate URLs {urls}: {last_error}"
+            ) from last_error
+
         finally:
             # Clean up temporary file if it exists
             if temp_path.exists():
                 temp_path.unlink()
+
+    def _download_from_url(self, url: str, temp_path: Path) -> None:
+        """
+        Download a single URL to temp_path, retrying with & without the environment proxy on failure.
+
+        Raises:
+            requests.RequestException: If both the proxied and direct attempts fail.
+        """
+        last_error: Exception | None = None
+        for use_env_proxy in (True, False):
+            try:
+                with (
+                    self._build_retry_session(use_env_proxy=use_env_proxy) as session,
+                    session.get(url, stream=True, timeout=self.REQUEST_TIMEOUT) as response,
+                ):
+                    response.raise_for_status()
+                    with open(temp_path, "wb") as f:
+                        for data in response.iter_content(chunk_size=4096):
+                            f.write(data)
+                return
+            except requests.RequestException as e:
+                last_error = e
+                proxy_mode = "env-proxy" if use_env_proxy else "direct"
+                logger.warning("Weight download failed via {} for {}: {}", proxy_mode, url, e)
+        raise requests.RequestException(f"Failed to download from {url}") from last_error
 
     def _build_retry_session(self, use_env_proxy: bool) -> requests.Session:
         session = requests.Session()
@@ -268,6 +282,8 @@ class BaseWeightsService:
 
         retry = Retry(
             total=self.RETRY_TOTAL,
+            connect=self.RETRY_CONNECT,
+            read=self.RETRY_TOTAL,
             backoff_factor=self.RETRY_BACKOFF_FACTOR,
             status_forcelist=[429, 500, 502, 503, 504],
             allowed_methods=frozenset(["HEAD", "GET"]),

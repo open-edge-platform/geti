@@ -80,8 +80,12 @@ class TileBatchData:
     batch_tile_tile_infos: list[list[TileInfo]]
     imgs_info: list[ImageInfo]
 
-    def unbind(self) -> list[tuple[list[TileInfo], SampleBatch]]:
-        """Unbind batch data entity."""
+    def unbind(self, tile_batch_size: int) -> list[tuple[list[TileInfo], SampleBatch]]:
+        """Unbind batch data entity.
+
+        Args:
+            tile_batch_size: Number of tiles grouped into a single model forward pass.
+        """
         raise NotImplementedError
 
 
@@ -97,21 +101,21 @@ class TileBatchDetDataEntity(TileBatchData):
     bboxes: list[tv_tensors.BoundingBoxes]
     labels: list[LongTensor]
 
-    def unbind(self) -> list[tuple[list[TileInfo], SampleBatch]]:
+    def unbind(self, tile_batch_size: int) -> list[tuple[list[TileInfo], SampleBatch]]:
         """Unbind batch data entity for detection task."""
         tiles = [tile for tiles in self.batch_tiles for tile in tiles]
         tile_img_infos = [tile_info for tile_infos in self.batch_tile_img_infos for tile_info in tile_infos]
         tile_tile_infos = [tile_info for tile_infos in self.batch_tile_tile_infos for tile_info in tile_infos]
 
         batch_data_entities = []
-        for i in range(0, len(tiles), self.batch_size):
+        for i in range(0, len(tiles), tile_batch_size):
             stacked_images, updated_img_info = stack_batch(
-                tiles[i : i + self.batch_size],
-                tile_img_infos[i : i + self.batch_size],
+                tiles[i : i + tile_batch_size],
+                tile_img_infos[i : i + tile_batch_size],
             )
             batch_data_entities.append(
                 (
-                    tile_tile_infos[i : i + self.batch_size],
+                    tile_tile_infos[i : i + tile_batch_size],
                     SampleBatch(
                         images=stacked_images,
                         imgs_info=updated_img_info,
@@ -185,7 +189,7 @@ class TileBatchInstSegDataEntity(TileBatchData):
     labels: list[LongTensor]
     masks: list[tv_tensors.Mask]
 
-    def unbind(self) -> list[tuple[TileAttrDictList, SampleBatch]]:
+    def unbind(self, tile_batch_size: int) -> list[tuple[TileAttrDictList, SampleBatch]]:
         """Unbind batch data entity for instance segmentation task."""
         tiles = [tile for tiles in self.batch_tiles for tile in tiles]
         tile_img_infos = [tile_info for tile_infos in self.batch_tile_img_infos for tile_info in tile_infos]
@@ -193,13 +197,13 @@ class TileBatchInstSegDataEntity(TileBatchData):
 
         batch_data_entities = [
             (
-                tile_tile_infos[i : i + self.batch_size],
+                tile_tile_infos[i : i + tile_batch_size],
                 SampleBatch(
-                    images=tiles[i : i + self.batch_size],
-                    imgs_info=tile_img_infos[i : i + self.batch_size],
+                    images=tiles[i : i + tile_batch_size],
+                    imgs_info=tile_img_infos[i : i + tile_batch_size],
                 ),
             )
-            for i in range(0, len(tiles), self.batch_size)
+            for i in range(0, len(tiles), tile_batch_size)
         ]
         return list(batch_data_entities)
 
@@ -262,7 +266,7 @@ class TileBatchSegDataEntity(TileBatchData):
 
     masks: list[tv_tensors.Mask]
 
-    def unbind(self) -> list[tuple[list[dict[str, int | str]], SampleBatch]]:
+    def unbind(self, tile_batch_size: int) -> list[tuple[list[dict[str, int | str]], SampleBatch]]:
         """Unbind batch data entity for semantic segmentation task."""
         tiles = [tile for tiles in self.batch_tiles for tile in tiles]
         tile_img_infos = [tile_info for tile_infos in self.batch_tile_img_infos for tile_info in tile_infos]
@@ -270,14 +274,17 @@ class TileBatchSegDataEntity(TileBatchData):
 
         batch_data_entities = [
             (
-                tile_tile_infos[i : i + self.batch_size],
+                tile_tile_infos[i : i + tile_batch_size],
                 SampleBatch(
-                    images=tv_tensors.wrap(torch.stack(tiles[i : i + self.batch_size]), like=tiles[0]),
-                    imgs_info=tile_img_infos[i : i + self.batch_size],
-                    masks=[torch.empty((1, 1, 1)) for _ in range(self.batch_size)],
+                    images=tv_tensors.wrap(
+                        torch.stack(tiles[i : i + tile_batch_size]),  # pyrefly: ignore[bad-argument-type]
+                        like=tiles[0],  # pyrefly: ignore[unexpected-keyword]
+                    ),
+                    imgs_info=tile_img_infos[i : i + tile_batch_size],
+                    masks=[torch.empty((1, 1, 1)) for _ in range(len(tiles[i : i + tile_batch_size]))],
                 ),
             )
-            for i in range(0, len(tiles), self.batch_size)
+            for i in range(0, len(tiles), tile_batch_size)
         ]
         return list(batch_data_entities)
 

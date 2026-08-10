@@ -18,6 +18,9 @@ type InferenceDevicesProps = {
     isQuiet?: boolean;
     isDisabled?: boolean;
     ariaLabel?: string;
+    label?: string;
+    maxWidth?: string;
+    width?: string;
 };
 
 export const InferenceDevices = ({
@@ -26,6 +29,9 @@ export const InferenceDevices = ({
     isDisabled = false,
     isQuiet = false,
     ariaLabel,
+    label,
+    maxWidth,
+    width = '100%',
 }: InferenceDevicesProps) => {
     const { data: devices } = $api.useSuspenseQuery('get', '/api/system/devices/inference');
 
@@ -42,12 +48,14 @@ export const InferenceDevices = ({
     return (
         <Picker
             isQuiet={isQuiet}
-            maxWidth='size-3000'
+            maxWidth={maxWidth}
+            width={width}
             items={items}
             onSelectionChange={handleSelectionChange}
             selectedKey={selectedKey}
             isDisabled={isDisabled}
             aria-label={ariaLabel}
+            label={label}
         >
             {(device) => <Item key={device.id}>{device.name}</Item>}
         </Picker>

@@ -65,7 +65,9 @@ export const ValueWithDelta = ({
 
     return (
         <Flex direction={'column'} gap={'size-25'}>
-            <Text data-testid={testId}>{displayValue}</Text>
+            <Text data-testid={testId} data-value={value}>
+                {displayValue}
+            </Text>
             {showDelta && (
                 <ModelVariantDelta currentValue={value} baselineValue={baselineValue} changeType={changeType} />
             )}

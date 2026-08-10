@@ -30,6 +30,7 @@ UNSUPPORTED_MODEL_SUBSTRS = ("dino", "rfdetr")
 )
 def test_forward_explain(
     recipe: str,
+    tmp_path: Path,
     fxt_target_dataset_per_task: dict,
     fxt_accelerator: str,
 ) -> None:
@@ -38,6 +39,7 @@ def test_forward_explain(
 
     Args:
         recipe (str): The recipe to use for predicting. (eg. 'classification/mobilenet_v3_large.yaml')
+        tmp_path (Path): The temporary path for storing the outputs.
         fxt_target_dataset_per_task (dict): A dictionary mapping tasks to target datasets.
         fxt_accelerator (str): The accelerator used for predict.
 
@@ -56,6 +58,7 @@ def test_forward_explain(
         config_path=recipe,
         data=fxt_target_dataset_per_task[task],
         device=fxt_accelerator,
+        work_dir=tmp_path,
     )
 
     predict_result = engine.predict()
@@ -132,13 +135,14 @@ def test_predict_with_explain(
         if "saliency_map" in output.get_names():
             saliency_map_output = output
     assert saliency_map_output is not None
+    saliency_map_output_rank = saliency_map_output.get_partial_shape().rank.get_length()
     if "instance_segmentation" in recipe:
-        assert len(saliency_map_output.get_shape()) == 1
+        assert saliency_map_output_rank == 1
     else:
-        assert len(saliency_map_output.get_shape()) in [3, 4]
+        assert saliency_map_output_rank in [3, 4]
 
     assert feature_vector_output is not None
-    assert len(feature_vector_output.get_shape()) == 2
+    assert feature_vector_output.get_partial_shape().rank.get_length() == 2
 
     # Predict OV model with xai & process maps
     ov_engine = create_engine(model=exported_model_path, data=engine.datamodule, work_dir=engine.work_dir)

@@ -130,7 +130,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                         isSelected={hasSelectedElements && totalSelectedElements === items.length}
                     />
 
-                    <SortMediaByUploadDate />
+                    {!hasSelectedElements && <SortMediaByUploadDate />}
 
                     <Divider orientation={'vertical'} size={'S'} />
 

@@ -9,6 +9,7 @@ import { isFunction } from 'lodash-es';
 import { toast } from '../../../components/toast/toast.component';
 import { isNonEmptyString } from '../../../shared/util';
 import { isInvalidJob, isJobDone, isJobFailed } from '../util';
+import { useStreamJobDetail } from './jobs.hook';
 
 type UseImportJobStatusProps = {
     jobId: string | null | undefined;
@@ -17,15 +18,14 @@ type UseImportJobStatusProps = {
 };
 
 export const useImportJobStatus = ({ jobId, onError, onSuccess }: UseImportJobStatusProps) => {
+    useStreamJobDetail(jobId);
+
     const response = $api.useQuery(
         'get',
         '/api/jobs/{job_id}',
         { params: { path: { job_id: jobId } } },
         {
             enabled: isNonEmptyString(jobId),
-            refetchInterval: ({ state }) => {
-                return isJobDone(state.data) || isJobFailed(state.data) || state.status === 'error' ? false : 1_000;
-            },
         }
     );
 

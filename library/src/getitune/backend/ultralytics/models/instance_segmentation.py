@@ -11,7 +11,6 @@ from getitune.backend.lightning.models.base import DataInputParams
 from getitune.backend.ultralytics.trainers.instance_segmentation import SegmentationTrainer
 from getitune.backend.ultralytics.validators.instance_segmentation import SegmentationValidator
 from getitune.types.export import TaskLevelExportParameters
-from getitune.types.label import LabelInfo
 
 from .base import UltralyticsModel
 
@@ -46,6 +45,17 @@ class UltralyticsInstSegModel(UltralyticsModel):
         "yolo11x-seg": f"{_BASE_URL}/yolo11x-seg.pt",
     }
 
+    metric_keys: ClassVar[dict[str, str]] = {
+        "metrics/mAP50(M)": "val/map_50",
+        "metrics/mAP50-95(M)": "val/map",
+        "metrics/precision(B)": "val/precision",
+        "metrics/recall(B)": "val/recall",
+        "train/box_loss": "train/loss_bbox",
+        "train/cls_loss": "train/loss_cls",
+        "train/dfl_loss": "train/loss_dfl",
+        "train/seg_loss": "train/loss_mask",
+    }
+
     @property
     def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
         """Per-variant preprocessing defaults.
@@ -68,7 +78,6 @@ class UltralyticsInstSegModel(UltralyticsModel):
         (``end2end=False``), we set ``nms_execute=True`` so that ModelAPI
         performs NMS during post-processing.
         """
-        label_info = self.label_info or LabelInfo(label_names=[], label_ids=[], label_groups=[])
         conf = self._export_args.get("confidence_threshold")
         if conf is None:
             conf = self.extra_overrides.get("conf", 0.25)
@@ -79,20 +88,9 @@ class UltralyticsInstSegModel(UltralyticsModel):
             model_type="YOLO-seg",
             model_name=self.model_name,
             task_type="instance_segmentation",
-            label_info=label_info,
+            label_info=self.label_info,
             optimization_config={},
             confidence_threshold=float(conf),
             iou_threshold=float(iou),
             nms_execute=True,
         )
-
-    metric_keys: ClassVar[dict[str, str]] = {
-        "metrics/mAP50(M)": "val/map_50",
-        "metrics/mAP50-95(M)": "val/map",
-        "metrics/precision(B)": "val/precision",
-        "metrics/recall(B)": "val/recall",
-        "train/box_loss": "train/loss_bbox",
-        "train/cls_loss": "train/loss_cls",
-        "train/dfl_loss": "train/loss_dfl",
-        "train/seg_loss": "train/loss_mask",
-    }

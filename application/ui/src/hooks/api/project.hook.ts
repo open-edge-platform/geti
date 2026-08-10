@@ -2,19 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { $api } from '@/api';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 export const useProjects = () => {
     return $api.useSuspenseQuery('get', '/api/projects');
 };
 
+export const getProjectQueryOptions = (projectId: string) => {
+    return $api.queryOptions('get', '/api/projects/{project_id}', {
+        params: { path: { project_id: projectId } },
+    });
+};
+
 export const useProject = () => {
     const projectId = useProjectIdentifier();
 
-    return $api.useSuspenseQuery('get', '/api/projects/{project_id}', {
-        params: { path: { project_id: projectId } },
-    });
+    return useSuspenseQuery(getProjectQueryOptions(projectId));
 };
 
 export const useCreateProject = () => {

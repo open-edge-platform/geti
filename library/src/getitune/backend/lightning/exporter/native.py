@@ -74,6 +74,9 @@ class LightningModelExporter(ModelExporter):
         input_size = self.data_input_params.as_ncwh()
         dummy_tensor = torch.rand(input_size).to(next(model.parameters()).device)
 
+        # Keep spatial dims static, but let the batch dimension be dynamic so any batch size works at inference.
+        dynamic_shape = openvino.PartialShape([-1, *input_size[1:]])
+
         if self.via_onnx:
             with tempfile.TemporaryDirectory() as tmpdirname:
                 tmp_dir = Path(tmpdirname)
@@ -85,19 +88,12 @@ class LightningModelExporter(ModelExporter):
                     Precision.FP32,
                     False,
                 )
-                exported_model = openvino.convert_model(
-                    tmp_dir / (base_model_name + ".onnx"),
-                    input=(openvino.PartialShape(input_size),),
-                )
+                exported_model = openvino.convert_model(tmp_dir / (base_model_name + ".onnx"), input=(dynamic_shape,))
         else:
-            exported_model = openvino.convert_model(
-                model,
-                example_input=dummy_tensor,
-                input=(openvino.PartialShape(input_size),),
-            )
+            exported_model = openvino.convert_model(model, example_input=dummy_tensor, input=(dynamic_shape,))
         exported_model = self._postprocess_openvino_model(exported_model)
 
-        # Validate the converted model before persisting.  OpenVINO's PyTorch
+        # Validate the converted model before persisting. OpenVINO's PyTorch
         # frontend will log a deserialization error on failure and then
         # silently fall back -- leaving us with a zero-op graph that passes
         # through the "Converting to OpenVINO is done." line.  Raise here

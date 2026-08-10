@@ -48,7 +48,6 @@ datasets:
     compatible_tasks:
       - instance_segmentation
       - detection # polygons → bounding boxes
-      - rotated_detection # polygons → oriented bounding boxes
       - semantic_segmentation # polygons → pixel masks
       - classification/multi_label_cls # crop-level or image-level class from category
 

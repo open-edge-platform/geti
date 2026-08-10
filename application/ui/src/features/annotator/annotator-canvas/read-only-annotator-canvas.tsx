@@ -9,10 +9,11 @@ import { MediaCanvas } from './media-canvas';
 type ReadOnlyAnnotatorCanvasProps = {
     mediaItem: Media;
     image: ImageData;
+    isLoadingOverlay?: boolean;
 };
 
-export const ReadOnlyAnnotatorCanvas = ({ mediaItem, image }: ReadOnlyAnnotatorCanvasProps) => (
-    <MediaCanvas mediaItem={mediaItem} image={image}>
+export const ReadOnlyAnnotatorCanvas = ({ mediaItem, image, isLoadingOverlay }: ReadOnlyAnnotatorCanvasProps) => (
+    <MediaCanvas mediaItem={mediaItem} image={image} isLoadingOverlay={isLoadingOverlay}>
         <ReadOnlyAnnotations width={mediaItem.width} height={mediaItem.height} />
     </MediaCanvas>
 );

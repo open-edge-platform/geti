@@ -434,7 +434,7 @@ class CPUAugmentationPipeline(nn.Module):
     def forward(self, *inputs: BaseSample) -> BaseSample | None:
         """Forward with skipping None."""
         needs_unpacking = len(inputs) > 1
-        outputs: BaseSample | None = inputs[0]  # type: ignore[assignment]
+        outputs: BaseSample = inputs[0]  # type: ignore[assignment]
         for transform in self.augmentations:
             if self._is_native_torchvision_transform(transform):
                 # Apply native transforms only to image-related fields
@@ -444,6 +444,10 @@ class CPUAugmentationPipeline(nn.Module):
             if outputs is None:
                 return outputs
             inputs = outputs if needs_unpacking else (outputs,)  # type: ignore[assignment]
+
+        if isinstance(outputs.image, torch.Tensor):
+            outputs.image = outputs.image.clamp(0.0, 1.0)
+
         return outputs
 
     def __repr__(self) -> str:
@@ -560,6 +564,38 @@ class GPUAugmentationPipeline(nn.Module):
     def data_keys(self) -> list[str]:
         """Get data keys used by the pipeline."""
         return self._data_keys
+
+    def apply_image_only(self, images: torch.Tensor) -> torch.Tensor:
+        """Apply only image-level (non-geometric) augmentations to a batch of images.
+
+        Unlike :meth:`forward`, this does not require (or transform) annotations and
+        therefore does not depend on the Kornia ``AugmentationSequential`` data-keys.
+        It is used for tile batches during validation/testing, where the tiles carry
+        no per-tile annotations (predictions are merged back to the original image
+        afterwards) and only intensity transforms such as ``Normalize`` are relevant.
+
+        Design contract for tiling: geometric augmentations are applied in the CPU
+        pipeline (per-sample, with annotations) so that the GPU pipeline used for
+        tiles contains only intensity transforms. As a result ``sanitize_annotations``
+        is a no-op here (see ``_has_geometric_augs`` gating in :meth:`forward`). Any
+        geometric augmentation that still ends up on the GPU pipeline is skipped
+        defensively, since applying it without annotation tracking would desynchronise
+        boxes/masks.
+
+        Args:
+            images: Batched images tensor in BCHW format, values in [0, 1].
+
+        Returns:
+            The transformed images tensor.
+        """
+        if not self._augmentations_list:
+            return images
+        out = images
+        for aug in self._augmentations_list:
+            if isinstance(aug, K.GeometricAugmentationBase2D):
+                continue
+            out = aug(out)
+        return out
 
     @classmethod
     def list_available_transforms(cls) -> list[type]:
