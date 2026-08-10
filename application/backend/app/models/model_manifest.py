@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from enum import Enum
+from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -96,8 +97,22 @@ class PretrainedWeights(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
     url: str = Field(title="Weights URL", description="URL to download the pretrained weights")
-    mirror_url: str = Field(title="Weights mirror URL", description="Alternative URL to download the weights")
+    mirror_url: str | None = Field(
+        default=None, title="Weights mirror URL", description="Alternative URL to download the weights"
+    )
     sha_sum: str = Field(title="Weights SHA256", description="SHA256 checksum of the pretrained weights file")
+    cache_filename: str | None = Field(
+        default=None,
+        title="Cached weights filename",
+        description="Filename used when caching the pretrained weights file. "
+        "If not provided, the filename will be derived from the URL. Set this when 'url' and 'mirror_url' "
+        "resolve to different filenames, so both download sources map to the same local cache entry.",
+    )
+
+    @property
+    def local_filename(self) -> str:
+        """Filename to use when caching the weights locally, regardless of which URL was used to download them."""
+        return self.cache_filename or Path(self.url).name
 
 
 class ModelManifest(BaseModel):

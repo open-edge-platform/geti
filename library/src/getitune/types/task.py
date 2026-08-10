@@ -14,11 +14,9 @@ class TaskType(str, Enum):
     # Classification
     MULTI_CLASS_CLS = "MULTI_CLASS_CLS"
     MULTI_LABEL_CLS = "MULTI_LABEL_CLS"
-    H_LABEL_CLS = "H_LABEL_CLS"
 
     # Detection
     DETECTION = "DETECTION"
-    ROTATED_DETECTION = "ROTATED_DETECTION"
     KEYPOINT_DETECTION = "KEYPOINT_DETECTION"
 
     # Segmentation

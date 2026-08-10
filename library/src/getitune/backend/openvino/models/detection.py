@@ -7,6 +7,7 @@ from __future__ import annotations
 import logging as log
 from typing import TYPE_CHECKING, Any, Sequence, cast
 
+import numpy as np
 import torch
 from model_api.tilers import DetectionTiler
 from torchvision import tv_tensors
@@ -14,6 +15,7 @@ from torchvision import tv_tensors
 from getitune.backend.openvino.models.base import OVModel
 from getitune.backend.openvino.models.utils import rescale_bboxes_to_original
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
+from getitune.data.entity.tile import TileBatchData
 from getitune.metrics import MetricCallable, MetricInput
 from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 from getitune.types.task import TaskType
@@ -202,7 +204,10 @@ class OVDetectionModel(OVModel):
                     dtype=torch.float32,
                 ),
             )
-            scores.append(torch.tensor(output.scores.reshape(-1)))
+            # Cast scores to float32 to match the float32 bboxes. ModelAPI returns numpy
+            # arrays whose default float dtype is float64; a float64/float32 mismatch makes
+            # torchvision NMS fail ("dets should have the same type as scores") during tile merge.
+            scores.append(torch.tensor(output.scores.reshape(-1), dtype=torch.float32))
             labels.append(torch.tensor(output.labels.reshape(-1) - label_shift, dtype=torch.long))
 
         if outputs and outputs[0].saliency_map.size > 1:
@@ -268,9 +273,87 @@ class OVDetectionModel(OVModel):
         compute_kwargs = {"best_confidence_threshold": best_confidence_threshold}
         return super()._compute_metrics(metric, **compute_kwargs)
 
+    def forward_tiles(self, inputs: TileBatchData) -> PredictionBatch:
+        """Run tiled detection inference and merge tile predictions to full-image predictions.
+
+        Delegates tiling to ModelAPI: the datamodule-produced tiles (native-resolution
+        crops) and their absolute coordinates are handed to the ModelAPI
+        :class:`~model_api.tilers.DetectionTiler`, which runs inference on each tile and
+        merges the per-tile detections back to the original image coordinate space
+        (offsetting boxes and applying per-class NMS). The merged ModelAPI
+        :class:`DetectionResult` is then converted to a getitune :class:`PredictionBatch`.
+
+        Args:
+            inputs (TileBatchData): Batch of tiles wrapping the original images.
+
+        Returns:
+            PredictionBatch: Merged full-image detection predictions.
+        """
+        tiler = self._get_tiler()
+        label_shift = 1 if tiler.model.get_label_name(0) == "background" else 0
+        imgs_info = cast("Sequence[ImageInfo]", inputs.imgs_info)
+
+        images: list[torch.Tensor] = []
+        bboxes: list[tv_tensors.BoundingBoxes] = []
+        scores: list[torch.Tensor] = []
+        labels: list[torch.Tensor] = []
+        for img_tiles, tile_infos, ori_info in zip(
+            inputs.batch_tiles,
+            inputs.batch_tile_tile_infos,
+            imgs_info,
+            strict=True,
+        ):
+            ori_h, ori_w = ori_info.ori_shape
+            # ModelAPI expects HWC numpy tiles at their native crop resolution; it resizes
+            # each tile to the model input internally and maps predictions back to crop
+            # (and then original) coordinates using the supplied tile coordinates.
+            np_tiles = [tile.detach().cpu().numpy().transpose(1, 2, 0) for tile in img_tiles]
+            coords = [[t.x, t.y, t.x + t.width, t.y + t.height] for t in tile_infos]
+            merged: DetectionResult = tiler.predict_tiles(np_tiles, coords, (ori_h, ori_w, 3))
+
+            images.append(torch.empty(3, ori_h, ori_w))
+            bboxes.append(
+                tv_tensors.BoundingBoxes(
+                    torch.as_tensor(np.asarray(merged.bboxes), dtype=torch.float32).reshape(-1, 4),
+                    format="XYXY",
+                    canvas_size=(ori_h, ori_w),
+                ),
+            )
+            scores.append(torch.as_tensor(np.asarray(merged.scores), dtype=torch.float32).reshape(-1))
+            labels.append(torch.as_tensor(np.asarray(merged.labels), dtype=torch.long).reshape(-1) - label_shift)
+
+        return PredictionBatch(
+            images=images,
+            imgs_info=inputs.imgs_info,
+            scores=scores,
+            bboxes=bboxes,
+            labels=labels,
+        )
+
+    def _get_tiler(self) -> DetectionTiler:
+        """Return the ModelAPI detection tiler used to merge tile predictions.
+
+        When the IR was exported with tiling metadata, :meth:`_setup_tiler` has already
+        wrapped ``self.model`` in a :class:`~model_api.tilers.DetectionTiler`; that
+        instance (configured from the IR metadata) is reused. Otherwise a tiler is
+        created on demand and cached, configured from the datamodule ``tile_config``.
+        """
+        if isinstance(self.model, DetectionTiler):
+            return self.model
+        if getattr(self, "_fallback_tiler", None) is None:
+            self._fallback_tiler = DetectionTiler(
+                self.model,
+                configuration={
+                    "iou_threshold": self.tile_config.iou_threshold,
+                    "max_pred_number": self.tile_config.max_num_instances,
+                },
+                execution_mode="sync",
+            )
+        return self._fallback_tiler
+
     def predict_step(self, data_batch: SampleBatch) -> PredictionBatch:
         """Run detection inference and filter by confidence threshold."""
-        predictions = self(data_batch)
+        predictions = self.forward_tiles(data_batch) if isinstance(data_batch, TileBatchData) else self(data_batch)
         threshold = self.hparams.get("best_confidence_threshold", None)
         if not threshold:
             return predictions

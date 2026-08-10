@@ -22,6 +22,7 @@ export const ModelListing = ({ groupedModels, hasNoResults }: ModelListingProps)
             ) : (
                 <Flex
                     direction={'column'}
+                    data-testid={'models-listing'}
                     flex={1}
                     UNSAFE_style={{ backgroundColor: 'var(--spectrum-global-color-gray-50)' }}
                 >

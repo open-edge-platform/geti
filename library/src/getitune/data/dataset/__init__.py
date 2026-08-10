@@ -3,7 +3,7 @@
 
 """Module defines VisionDatasets."""
 
-from .classification import HlabelClsDataset, MulticlassClsDataset, MultilabelClsDataset
+from .classification import MulticlassClsDataset, MultilabelClsDataset
 from .detection import DetectionDataset
 from .instance_segmentation import InstanceSegDataset
 from .keypoint_detection import KeypointDetectionDataset
@@ -12,7 +12,6 @@ from .tile import TileDatasetFactory
 
 __all__ = [
     "DetectionDataset",
-    "HlabelClsDataset",
     "InstanceSegDataset",
     "KeypointDetectionDataset",
     "MulticlassClsDataset",

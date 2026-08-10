@@ -26,6 +26,7 @@ from getitune.backend.lightning.models.base import (
     LightningModel,
 )
 from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
+from getitune.backend.lightning.models.common.target_utils import align_sample_batch_annotations
 from getitune.backend.lightning.models.instance_segmentation.segmentors.maskrcnn_tv import MaskRCNN
 from getitune.backend.lightning.models.instance_segmentation.segmentors.two_stage import TwoStageDetector
 from getitune.backend.lightning.models.utils.utils import InstanceData
@@ -112,6 +113,11 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
         self.model.get_results_from_head = self.get_results_from_head
 
     def _customize_inputs(self, entity: SampleBatch) -> dict[str, Any]:
+        # Defensively realign per-image boxes/labels/masks counts so a divergence
+        # (e.g. from tiling or crop augmentations) does not crash mmdet's
+        # InstanceData, which requires all instance-level fields to share length.
+        if self.training:
+            align_sample_batch_annotations(entity)
         if isinstance(entity.images, list):
             entity.images, entity.imgs_info = stack_batch(entity.images, entity.imgs_info, pad_size_divisor=32)  # type: ignore[assignment,arg-type]
         inputs: dict[str, Any] = {}
@@ -214,7 +220,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             self.tile_config,
             self.explain_mode,
         )
-        for batch_tile_infos, batch_tile_input in inputs.unbind():
+        for batch_tile_infos, batch_tile_input in inputs.unbind(self.tile_config.tile_inference_batch_size):
             output = self.forward_explain(batch_tile_input) if self.explain_mode else self.forward(batch_tile_input)
             if isinstance(output, BatchLoss):
                 msg = "Loss output is not supported for tile merging"

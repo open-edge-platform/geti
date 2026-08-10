@@ -53,7 +53,7 @@ class MultilabelmAP(Metric):
             torch.stack(self.targets).cpu().numpy(),
             torch.stack(self.preds).detach().cpu().float().numpy(),
         )
-        return {"mAP": Tensor([metric_value])}
+        return {"map": Tensor([metric_value])}
 
 
 def _map(targs: np.ndarray, preds: np.ndarray) -> float:

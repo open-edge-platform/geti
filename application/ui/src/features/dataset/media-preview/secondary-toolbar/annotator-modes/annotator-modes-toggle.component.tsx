@@ -46,12 +46,12 @@ const ToggleButtonWithCue = ({ showCue, cueLabel, onClick, isActive, children }:
     );
 };
 
-interface AnnotatorModesProps {
+type AnnotatorModesProps = {
     mode: AnnotatorMode;
     onModeChange: (mode: AnnotatorMode) => void;
     hasAnnotations: boolean;
     hasPredictions: boolean;
-}
+};
 
 export const AnnotatorModes = ({ mode, onModeChange, hasAnnotations, hasPredictions }: AnnotatorModesProps) => {
     const [dismissedCues, setDismissedCues] = useState<Set<Extract<AnnotatorMode, 'prediction'>>>(new Set());

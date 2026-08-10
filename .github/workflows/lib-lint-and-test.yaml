@@ -24,7 +24,7 @@ jobs:
   # If PR or merge_group -> run only if files in specified paths changed
   check-paths:
     name: Check if workflow should run
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     outputs:
       run_workflow: ${{ steps.check_paths.outputs.run }}
       run_benchmark_dataset_scripts: ${{ steps.check_benchmark_dataset_scripts.outputs.run }}
@@ -48,8 +48,7 @@ jobs:
           files_yaml: |
             test:
               - library/**
-              - .github/**
-              - '!.github/workflows/getitrack-*.yaml'
+              - .github/workflows/lib-lint-and-test.yaml
 
       # Separate filter so we only run the (slow, network-bound) benchmark
       # dataset preparation tests when those scripts are touched.
@@ -63,7 +62,7 @@ jobs:
               - library/tests/unit/scripts/**
 
   code-quality-checks:
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     needs: check-paths
     if: needs.check-paths.outputs.run_workflow == 'true'
     permissions:
@@ -90,7 +89,7 @@ jobs:
         run: just lint
 
   unit-tests:
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       # The id-token permission is required by Codecov to use OIDC
@@ -155,7 +154,6 @@ jobs:
         task:
           - "multi_class_cls"
           - "multi_label_cls"
-          - "h_label_cls"
           - "keypoint_detection"
           - "detection"
           - "instance_segmentation"
@@ -202,7 +200,7 @@ jobs:
   # tests) are modified, since it actually downloads datasets from the internet.
   benchmark-dataset-scripts:
     name: benchmark-dataset-scripts
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read
     needs:
@@ -248,7 +246,7 @@ jobs:
       - unit-tests
       - integration-tests
       - benchmark-dataset-scripts
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     env:
       CHECKS: ${{ join(needs.*.result, ' ') }}
     if: always() && !cancelled()

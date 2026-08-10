@@ -269,22 +269,27 @@ class PipelineService(BaseSessionManagedService):
                 "Event bus is required to update pipeline. This is because updating pipeline may trigger events that "
                 "require other services to react."
             )
+        # Emit only after this transaction commits: consumers (e.g. the StreamLoader) react by
+        # re-reading the pipeline/source in their own session/process, so notifying before the new
+        # state is durable would let them race the commit and observe the previous configuration.
         if pipeline.status == PipelineStatus.RUNNING and updated.status == PipelineStatus.RUNNING:
             # If the pipeline source_id or sink_id is being updated while running
             if pipeline.source_id != updated.source_id:
-                self._event_bus.emit_event(EventType.SOURCE_CHANGED)
+                self._event_bus.emit_event_after_commit(self.db_session, EventType.SOURCE_CHANGED)
             if pipeline.sink_id != updated.sink_id:
                 # Sink may be None (disconnected): in that case predictions are only routed to WebRTC.
-                self._event_bus.emit_event(EventType.SINK_CHANGED)
+                self._event_bus.emit_event_after_commit(self.db_session, EventType.SINK_CHANGED)
             if pipeline.data_collection != updated.data_collection:
-                self._event_bus.emit_event(EventType.PIPELINE_DATASET_COLLECTION_POLICIES_CHANGED)
+                self._event_bus.emit_event_after_commit(
+                    self.db_session, EventType.PIPELINE_DATASET_COLLECTION_POLICIES_CHANGED
+                )
             if pipeline.device != updated.device:
-                self._event_bus.emit_event(EventType.INFERENCE_DEVICE_CHANGED)
+                self._event_bus.emit_event_after_commit(self.db_session, EventType.INFERENCE_DEVICE_CHANGED)
             if pipeline.model_id != updated.model_id or pipeline.model_variant_id != updated.model_variant_id:
-                self._event_bus.emit_event(EventType.MODEL_CHANGED)
+                self._event_bus.emit_event_after_commit(self.db_session, EventType.MODEL_CHANGED)
         elif pipeline.status != updated.status:
             # If the pipeline is being activated or stopped
-            self._event_bus.emit_event(EventType.PIPELINE_STATUS_CHANGED)
+            self._event_bus.emit_event_after_commit(self.db_session, EventType.PIPELINE_STATUS_CHANGED)
 
     def _validate_int8_support(self, device: str) -> None:
         """Validate that the device supports INT8 inference.
