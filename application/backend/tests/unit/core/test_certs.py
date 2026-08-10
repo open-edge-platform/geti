@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 from cryptography import x509
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric.types import PublicKeyTypes
 
 from app.core.certs import ensure_certs_exist
@@ -33,6 +34,7 @@ def test_ensure_certs_exist_generates_usable_pair(tmp_path: Path) -> None:
     assert "localhost" in san.get_values_for_type(x509.DNSName)
 
     key = serialization.load_pem_private_key(key_path.read_bytes(), password=None)
+    assert isinstance(key, rsa.RSAPrivateKey)
     assert key.key_size == 2048
 
 
