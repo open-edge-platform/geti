@@ -3,7 +3,7 @@
 
 import { createContext, ReactNode, useContext, useState, type Dispatch, type SetStateAction } from 'react';
 
-import { clampBetween } from '@geti/smart-tools/utils';
+import { clampBetween } from '@geti-ui/smart-tools/utils';
 
 import type { ZoomState } from './types';
 import { getZoomState, ZOOM_STEP_DIVISOR } from './util';

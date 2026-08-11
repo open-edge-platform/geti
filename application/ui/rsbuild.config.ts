@@ -47,6 +47,32 @@ const getPublicApiUrl = () => {
 const publicApiUrl = getPublicApiUrl();
 const publicApiUrlJson = JSON.stringify(publicApiUrl);
 
+// Static assets (including the `onnxruntime-web` wasm/mjs artifacts copied
+// below) are served from wherever the backend mounts the built UI — the
+// origin root in dev, but under `ASSET_PREFIX` (e.g. `/html`) in production
+// (see application/docker/Dockerfile, install.sh, and
+// application/backend/app/main.py's `static_dir` mount). Consumers that build
+// absolute asset URLs at runtime (e.g. the SAM worker's `setOrtWasmPaths`)
+// must prefix them with this value, or they 404 behind the `/html` mount.
+//
+// rsbuild's OWN `output.assetPrefix` must never be an empty string: rsbuild
+// treats `''` as "emit relative asset paths" in index.html (e.g.
+// `static/js/index.js` instead of `/static/js/index.js`). Relative paths
+// resolve fine at `/`, but break on any deep client-side route (e.g.
+// `/projects/:id/dataset/:itemId`) because the browser resolves them against
+// the current URL path, 404s, and gets the SPA's index.html fallback back
+// instead of the script — `SyntaxError: Unexpected token '<'` — which blanks
+// the whole app. Fall back to the root-absolute `/` when no explicit prefix
+// is configured.
+const assetPrefix = process.env.ASSET_PREFIX ?? '/';
+
+// Runtime consumers (opencv-source.ts, segment-anything.worker.ts) prepend
+// this value to an already-leading-slash path (`` + `/opencv/opencv.js``), so
+// the trailing slash must be stripped: `'/' + '/opencv/opencv.js'` yields the
+// protocol-relative URL `//opencv/opencv.js`, which the browser resolves to
+// the host `opencv` and the CSP `connect-src 'self'` then blocks.
+const runtimeAssetPrefixJson = JSON.stringify(assetPrefix.replace(/\/+$/, ''));
+
 export default defineConfig({
     plugins: [
         pluginReact(),
@@ -69,7 +95,7 @@ export default defineConfig({
         }),
     ],
     output: {
-        assetPrefix: process.env.ASSET_PREFIX,
+        assetPrefix,
         distPath: { root: isTauriBuild ? 'dist-tauri' : 'dist' },
         minify: isTauriDebugBuild ? false : undefined,
         sourceMap: isTauriDebugBuild
@@ -78,12 +104,17 @@ export default defineConfig({
                   css: false,
               }
             : undefined,
+        copy: [
+            { from: 'node_modules/onnxruntime-web/dist/*.{wasm,mjs}', to: 'ort/[name][ext]' },
+            { from: 'vendor/opencv/4.9.0/opencv.js', to: 'opencv/[name][ext]' },
+        ],
     },
     source: {
         define: {
             ...publicVars,
             'import.meta.env.PUBLIC_API_BASE_URL': publicApiUrlJson,
             'process.env.PUBLIC_API_BASE_URL': publicApiUrlJson,
+            'process.env.ASSET_PREFIX': runtimeAssetPrefixJson,
             // Needed to prevent an issue with spectrum's picker
             // eslint-disable-next-line max-len
             // https://github.com/adobe/react-spectrum/blob/6173beb4dad153aef74fc81575fd97f8afcf6cb3/packages/%40react-spectrum/overlays/src/OpenTransition.tsx#L40

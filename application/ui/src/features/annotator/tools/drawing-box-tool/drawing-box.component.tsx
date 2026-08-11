@@ -4,7 +4,7 @@
 import { PointerEvent, useRef, useState } from 'react';
 
 import type { Label } from '@/api/types';
-import { clampBox, clampPointBetweenImage, pointsToRect } from '@geti/smart-tools/utils';
+import { clampBox, clampPointBetweenImage, pointsToRect } from '@geti-ui/smart-tools/utils';
 import { useEventListener } from 'hooks/event-listener.hook';
 
 import selectionCursor from '../../../../assets/icons/selection.svg?url';
