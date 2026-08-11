@@ -3,13 +3,11 @@
 
 import { useMemo } from 'react';
 
-import { $api, fetchClient } from '@/api';
+import { $api } from '@/api';
 import type { DatasetItemAnnotationStatus, DatasetSubset, Pagination } from '@/api/types';
-import { useQuery } from '@tanstack/react-query';
 import { isEmpty } from 'lodash-es';
 
 import { type SortDirection } from './sort-direction.interface';
-import { useDatasetFiltersSearchParams } from './use-dataset-filters-search-params.hook';
 import { useProjectIdentifier } from './use-project-identifier.hook';
 
 const DATASET_ITEMS_LIMIT = 40;
@@ -76,44 +74,6 @@ const getDatasetItemsQueryParameter = ({
     }
 
     return query;
-};
-
-// if case current media is also not unannotated, we get the next one
-const MAX_INTERESTED_MEDIA_ITEMS_LIMIT = 2;
-
-export const useFetchNextUnannotatedMediaItem = () => {
-    const projectId = useProjectIdentifier();
-
-    const { selectedSubsets, sortDirection, selectedLabelIds, startDate, endDate } = useDatasetFiltersSearchParams();
-    const query = getDatasetItemsQueryParameter({
-        subsets: selectedSubsets,
-        annotationStatus: 'missing_annotations',
-        sortDirection,
-        labelIds: selectedLabelIds,
-        startDate: startDate ?? undefined,
-        endDate: endDate ?? undefined,
-        limit: MAX_INTERESTED_MEDIA_ITEMS_LIMIT,
-    });
-
-    return useQuery({
-        queryKey: ['next-unannotated-media-item', projectId, query],
-        queryFn: async () => {
-            const { data, error } = await fetchClient.GET('/api/projects/{project_id}/dataset/items', {
-                params: {
-                    query,
-                    path: {
-                        project_id: projectId,
-                    },
-                },
-            });
-
-            if (error) {
-                throw error;
-            }
-
-            return data;
-        },
-    });
 };
 
 export const useGetDatasetItems = ({
