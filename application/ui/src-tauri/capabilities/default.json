@@ -13,7 +13,12 @@
         },
         {
             "identifier": "opener:allow-open-url",
-            "allow": [{ "url": "https://www.intel.com/*" }, { "url": "https://github.com/*" }]
+            "allow": [
+                { "url": "https://www.intel.com/*" },
+                { "url": "https://docs.geti.intel.com/*" },
+                { "url": "https://github.com/*" },
+                { "url": "https://www.ultralytics.com/*" }
+            ]
         }
     ]
 }
