@@ -416,6 +416,33 @@ class OVModel:
             keys.append(wrapper_keys[idx] if key is None else key)
         return keys
 
+    @staticmethod
+    def _select_primary_metric(results: dict[str, Any]) -> float:
+        """Select the accuracy indicator that accuracy-aware quantization is driven by.
+
+        The first scalar entry of the computed metrics is used. Non-scalar entries are
+        skipped because some metric collections emit one first, e.g. the multi-label
+        classification metric starts with a list of per-group confusion matrices.
+
+        Args:
+            results (dict[str, Any]): Computed metrics.
+
+        Returns:
+            float: Value of the first scalar metric.
+
+        Raises:
+            RuntimeError: If none of the computed metrics is a scalar.
+        """
+        for value in results.values():
+            if isinstance(value, Tensor):
+                if value.numel() == 1:
+                    return float(value.item())
+            elif isinstance(value, (int, float)) and not isinstance(value, bool):
+                return float(value)
+
+        msg = f"No scalar metric available to measure the accuracy drop against, got keys: {list(results)}"
+        raise RuntimeError(msg)
+
     def _create_validation_fn(
         self, data_module: DataModule
     ) -> Callable[[openvino.CompiledModel, Any], tuple[float, None]]:
@@ -495,12 +522,8 @@ class OVModel:
                     metric.update(**metric_inputs)
 
             results = self.compute_metrics(metric)
-            # Take the first scalar metric value as the accuracy indicator
-            metric_value = next(iter(results.values()))
-            if isinstance(metric_value, torch.Tensor):
-                metric_value = metric_value.item()
 
-            return float(metric_value), None
+            return self._select_primary_metric(results), None
 
         return validation_fn
 
