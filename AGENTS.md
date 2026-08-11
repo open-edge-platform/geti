@@ -83,7 +83,7 @@ User-facing skills (using Geti, not changing it):
 
 - Work from `application/ui/`.
 - Use Node `>=24.2.0` and npm `>=11.14.0`.
-- Install dependencies with `npm ci`. This also fetches the core `@geti` UI packages via a `preinstall` hook.
+- Install dependencies with `npm ci`.
 - Build with `npm run build`.
 - Run formatting checks with `npm run format:check`.
 - Run lint with `npm run lint`.

@@ -3,9 +3,7 @@
 
 import { PointerEvent, RefObject, useRef, useState } from 'react';
 
-import { ANCHOR_SIZE } from '@geti/smart-tools';
-
-import { ResizeAnchor } from '../../../../shared/annotator/resize-anchor.component';
+import { ANCHOR_SIZE, ResizeAnchor } from '../../../../shared/annotator/resize-anchor.component';
 import { isLeftButton } from '../../../../shared/buttons-utils';
 import { Point } from '../../../../shared/types';
 import { getRelativePoint, projectPointOnLine } from '../utils';

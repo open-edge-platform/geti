@@ -11,7 +11,6 @@ application-name := "geti"
 # -------------------------------------------------------------------------------------------------
 # Runtime variables
 # -------------------------------------------------------------------------------------------------
-docker-run-args := "--env http_proxy --env https_proxy --env no_proxy --env HTTP_PROXY --env HTTPS_PROXY --env NO_PROXY"
 webrtc-ports := "50100-50109"
 coturn-port := "443"
 coturn-image := "quay.io/coturn/coturn"
@@ -83,7 +82,7 @@ build-image accelerator="cpu" tag="latest" exclude-agpl-models="false":
 [arg("keyfile", long="keyfile", help="Path to TLS key file for HTTPs (optional, for secure hosting)")]
 run-image accelerator="cpu" tag="latest" port="7860" container-port="7860" container-name="" detach="false" \
 remove="false" reload="false" shm-size="8g" passthrough-devices="" volumes="" enable_coturn="false" coturn_host="" \
-coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
+coturn_port=coturn-port stun_server="" gpu-slots="1" certfile="" keyfile="":
     #!/usr/bin/env bash
     set -euo pipefail
     shopt -s nullglob
@@ -120,58 +119,75 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
         fi
     fi
 
-    DETACH_FLAG=""
+    run_args=(
+        --env http_proxy
+        --env https_proxy
+        --env no_proxy
+        --env HTTP_PROXY
+        --env HTTPS_PROXY
+        --env NO_PROXY
+        --publish "{{ webrtc-ports }}:{{ webrtc-ports }}/udp"
+        --publish "{{ port }}:{{ container-port }}"
+        --env "HOST=0.0.0.0"
+        --env "PORT={{ container-port }}"
+        --env "GPU_SLOTS={{ gpu-slots }}"
+        --sysctl "net.ipv4.ip_local_port_range={{ replace(webrtc-ports, '-', ' ') }}"
+        --volume "{{ data-volume }}:/application/data/"
+        --volume "{{ logs-volume }}:/application/logs/"
+        --name "$CONTAINER_NAME"
+    )
+
     if [[ "{{ detach }}" == "true" ]]; then
-        DETACH_FLAG="--detach"
+        run_args+=(--detach)
     fi
 
-    REMOVE_FLAG=""
     if [[ "{{ remove }}" == "true" ]]; then
-        REMOVE_FLAG="--rm"
+        run_args+=(--rm)
     fi
 
     HOST_IP=$(just resolve-host-ip)
-    COTURN_ENV=""
+
     if [[ "{{ enable_coturn }}" == "true" ]]; then
         if [[ -n "{{ coturn_host }}" ]]; then
             COTURN_HOST="{{ coturn_host }}"
         else
             COTURN_HOST="$HOST_IP"
         fi
-        COTURN_ENV="--env COTURN_HOST=$COTURN_HOST --env COTURN_PORT={{ coturn_port }}"
+        run_args+=(--env "COTURN_HOST=$COTURN_HOST" --env "COTURN_PORT={{ coturn_port }}")
     fi
 
-    STUN_ENV=""
     if [[ -n "{{ stun_server }}" ]]; then
-        STUN_ENV="--env STUN_SERVER={{ stun_server }}"
+        run_args+=(--env "STUN_SERVER={{ stun_server }}")
     fi
 
-    CERTFILE_ENV=""
     if [[ -n "{{ certfile }}" ]]; then
-        CERTFILE_ENV="--env CERTFILE={{ certfile }}"
+        run_args+=(--env "CERTFILE={{ certfile }}")
     fi
 
-    KEYFILE_ENV=""
     if [[ -n "{{ keyfile }}" ]]; then
-        KEYFILE_ENV="--env KEYFILE={{ keyfile }}"
+        run_args+=(--env "KEYFILE={{ keyfile }}")
     fi
+
+    run_args+=(--env "WEBRTC_ADVERTISE_IP=$HOST_IP")
 
     # For XPU acceleration, we need to pass through the appropriate render device and group permissions
-    extra_render_args=()
     if [[ "{{ accelerator }}" == "xpu" ]]; then
-      RENDER_GID=$(getent group render | cut -d: -f3)
-      for node in /dev/dri/renderD*; do
-        vendor=$(cat /sys/class/drm/$(basename "$node")/device/vendor 2>/dev/null)
-        [[ "$vendor" == "0x8086" ]] && extra_render_args+=(--device "$node")
-      done
-      [[ -n "$RENDER_GID" ]] && extra_render_args+=(--group-add "$RENDER_GID")
+        RENDER_GID=$(getent group render | cut -d: -f3)
+        for node in /dev/dri/renderD*; do
+            vendor=$(cat /sys/class/drm/$(basename "$node")/device/vendor 2>/dev/null)
+            if [[ "$vendor" == "0x8086" ]]; then
+                run_args+=(--device "$node")
+            fi
+        done
+        if [[ -n "$RENDER_GID" ]]; then
+            run_args+=(--group-add "$RENDER_GID")
+        fi
     fi
 
-    passthrough_devices_args=()
     has_video_device=false
     for dev in {{ passthrough-devices }}; do
         if [[ -e "$dev" ]]; then
-            passthrough_devices_args+=(--device "$dev":"$dev")
+            run_args+=(--device "$dev:$dev")
             # Track if any video device is being passed through
             if [[ "$dev" == /dev/video* ]]; then
                 has_video_device=true
@@ -187,70 +203,43 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
     if [[ "$has_video_device" == "true" ]]; then
         VIDEO_GID=$(getent group video | cut -d: -f3)
         if [[ -n "$VIDEO_GID" ]]; then
-            passthrough_devices_args+=(--group-add "$VIDEO_GID")
+            run_args+=(--group-add "$VIDEO_GID")
         else
             echo "Warning: could not resolve host 'video' group GID; camera access may fail." >&2
         fi
     fi
 
-    SHM_SIZE_FLAG=""
     if [[ -n "{{ shm-size }}" ]]; then
-        SHM_SIZE_FLAG="--shm-size {{ shm-size }}"
+        run_args+=(--shm-size "{{ shm-size }}")
     fi
 
     # For GPU acceleration on WSL2, it's necessary to pass through the /dev/dxg device and mount the WSL libraries
-    WSL_LIB_FLAG=""
     if [[ "{{ accelerator }}" != "cpu" ]]; then
         if [[ -e "/dev/dxg" ]]; then
-            passthrough_devices_args+=(--device "/dev/dxg":"/dev/dxg")
+            run_args+=(--device "/dev/dxg:/dev/dxg")
         fi
         if [[ -d "/usr/lib/wsl" ]]; then
-            WSL_LIB_FLAG="--volume /usr/lib/wsl:/usr/lib/wsl:ro"
+            run_args+=(--volume "/usr/lib/wsl:/usr/lib/wsl:ro")
         fi
     fi
 
-    volume_args=()
     for vol in {{ volumes }}; do
-        volume_args+=(--volume "$vol")
+        run_args+=(--volume "$vol")
     done
 
-    GPU_FLAG=""
     if [[ "{{ accelerator }}" == "cuda" ]]; then
-        GPU_FLAG="--gpus all"
+        run_args+=(--gpus all)
     fi
 
     echo "Running docker container from image: ${IMAGE_NAME}"
-    docker run \
-        {{ docker-run-args }} \
-        $GPU_FLAG \
-        --publish {{ webrtc-ports }}:{{ webrtc-ports }}/udp \
-        --publish {{ port }}:{{ container-port }} \
-        --env HOST=0.0.0.0 \
-        --env PORT={{ container-port }} \
-        --env GPU_SLOTS={{ gpu-slots }} \
-        --env WEBRTC_ADVERTISE_IP="${HOST_IP}" \
-        $COTURN_ENV \
-        $STUN_ENV \
-        $CERTFILE_ENV \
-        $KEYFILE_ENV \
-        --sysctl net.ipv4.ip_local_port_range="{{ replace(webrtc-ports, '-', ' ') }}" \
-        --volume {{ data-volume }}:/application/data/ \
-        --volume {{ logs-volume }}:/application/logs/ \
-        ${volume_args[@]+"${volume_args[@]}"} \
-        $WSL_LIB_FLAG \
-        ${passthrough_devices_args[@]+"${passthrough_devices_args[@]}"} \
-        ${extra_render_args[@]+"${extra_render_args[@]}"} \
-        $SHM_SIZE_FLAG \
-        --name "${CONTAINER_NAME}" \
-        $DETACH_FLAG \
-        $REMOVE_FLAG \
-        "${IMAGE_NAME}"
+    docker run "${run_args[@]}" "${IMAGE_NAME}"
 
     if [[ "{{ detach }}" == "true" ]]; then
         echo "Container started: ${CONTAINER_NAME}"
     fi
 
 # Remove persisted data and logs volumes
+[confirm("WARNING: This will permanently delete all persisted projects, models, media, and logs. Continue?")]
 clean-volumes:
     docker volume rm {{ data-volume }} {{ logs-volume }} || true
 
@@ -393,3 +382,10 @@ stop-coturn:
     @echo "Stopping coturn server..."
     @docker stop coturn-server || true
 
+# Patch Geti source code to use CUDA 12.6 instead of 13.0 for the 'cuda' target, needed for legacy Nvidia GPUs
+# (Volta, Maxwell, Pascal). See https://github.com/open-edge-platform/geti/issues/7163
+patch-for-legacy-gpu-support:
+    cd {{ justfile_directory() }}/../library && just patch-for-legacy-gpu-support
+    cd {{ justfile_directory() }}/backend && just venv-lock
+    @echo "Patched the code to use CUDA 12.6 for the 'cuda' target (legacy Nvidia GPU support)."
+    @echo "For Docker users: run 'just build-image --accelerator cuda' to rebuild the image with the patched code."

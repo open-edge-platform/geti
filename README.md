@@ -74,7 +74,8 @@ uv pip install "getitune[cuda]" --extra-index-url https://download.pytorch.org/w
 uv pip install getitune # CPU-only by default
 ```
 
-> [!IMPORTANT] > **Ultralytics YOLO Models**: The PyPI package does **not** include Ultralytics YOLO models, which are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license).
+> [!IMPORTANT]  
+> The PyPI package does NOT include **Ultralytics YOLO models**, which are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license).
 >
 > Install `getitune` from source to use them:
 >

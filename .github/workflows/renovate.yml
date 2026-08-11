@@ -60,12 +60,12 @@ jobs:
 
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 
@@ -73,14 +73,29 @@ jobs:
         id: get-github-app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          app-id: ${{ secrets.RENOVATE_APP_ID }}
+          client-id: ${{ secrets.RENOVATE_APP_ID }}
           private-key: ${{ secrets.RENOVATE_APP_PEM }}
+          repositories: ${{ github.event.repository.name }}
+          owner: ${{ github.repository_owner }}
+          # Repository permissions
+          permission-administration: read
+          permission-checks: write
+          permission-statuses: write
+          permission-contents: write
+          permission-vulnerability-alerts: read
+          permission-issues: write
+          permission-metadata: read
+          permission-pull-requests: write
+          permission-workflows: write
+          # Organization permissions
+          permission-organization-administration: read
+          permission-members: read
 
       - name: Self-hosted Renovate
-        uses: renovatebot/github-action@22e0a16091fc706b04affe6ae53d5e3358ac4023 # v46.1.19
+        uses: renovatebot/github-action@316d7cd859606d6039a2182b7d69199e9b036835 # v46.2.1
         with:
           # renovate: datasource=github-releases depName=renovatebot/renovate
-          renovate-version: 43.265.4
+          renovate-version: 44.14.3
           configurationFile: .github/renovate.json5
           token: "${{ steps.get-github-app-token.outputs.token }}"
         env:

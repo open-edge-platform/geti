@@ -38,7 +38,7 @@ async def get_inference_devices(
     system_service: Annotated[SystemService, Depends(get_system_service)],
 ) -> list[DeviceInfoView]:
     """Returns the list of available compute devices (CPU, Intel XPU)."""
-    inference_devices = system_service.get_inference_devices()
+    inference_devices = system_service.inference_devices()
     return [DeviceInfoView.model_validate(device, from_attributes=True) for device in inference_devices]
 
 
@@ -47,7 +47,7 @@ async def get_training_devices(
     system_service: Annotated[SystemService, Depends(get_system_service)],
 ) -> list[DeviceInfoView]:
     """Returns the list of available training devices (CPU, Intel XPU, NVIDIA CUDA)."""
-    training_devices = system_service.get_training_devices()
+    training_devices = system_service.training_devices()
     return [DeviceInfoView.model_validate(device, from_attributes=True) for device in training_devices]
 
 
@@ -56,7 +56,7 @@ async def get_camera_devices(
     system_service: Annotated[SystemService, Depends(get_system_service)],
 ) -> list[CameraInfoView]:
     """Returns the list of available camera devices."""
-    camera_devices = system_service.get_camera_devices()
+    camera_devices = system_service.list_cameras()
     return [CameraInfoView.model_validate(device, from_attributes=True) for device in camera_devices]
 
 

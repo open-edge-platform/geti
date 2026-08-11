@@ -501,8 +501,6 @@ build_backend() {
 build_frontend() {
     cd "$WORK_DIR/application/ui"
     export npm_config_yes=true
-    # --foreground-scripts surfaces lifecycle-script errors (e.g. the
-    # 'preinstall' UI-package clone) in the log instead of a generic exit code.
     run_cmd_spinner "Installing UI dependencies (this may take several minutes)" "$NPM_BIN" ci --foreground-scripts
 
     run_cmd_spinner "Building API client" "$NPM_BIN" run build:api
