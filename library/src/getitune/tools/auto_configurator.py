@@ -385,7 +385,6 @@ class AutoConfigurator:
             # coordinate mapping. Intensity scaling is preserved (the CPU augmentation
             # pipeline prepends its intensity transform independently of Resize).
             self._strip_resize_transforms(subset_config.augmentations_cpu)
-            self._strip_resize_transforms(subset_config.augmentations_gpu)
 
             # IMPORTANT: the OV recipe's batch_size (e.g. 64) is tuned for *non-tiled*
             # evaluation, where one dataset item == one model input. With tiling
@@ -449,17 +448,8 @@ class AutoConfigurator:
             datamodule.train_subset.input_size = actual_input_size
 
             if tiling_enabled:
-                # `from_vision_datasets` reuses each VisionDataset's already-compiled
-                # `.transforms` and ignores `subset_config.augmentations_cpu/gpu` (see
-                # its warning below), so the Resize-stripping above would otherwise be
-                # silently undone here, corrupting the tile-to-image coordinate mapping
-                # and collapsing accuracy. Patch `.transforms` in place instead.
-                new_transforms = TransformLibFactory.generate(subset_config)
                 existing_dataset = datamodule.subsets[subset_config.subset_name]
-                existing_dataset.transforms = new_transforms
-                wrapped_dataset = getattr(existing_dataset, "_dataset", None)
-                if wrapped_dataset is not None:
-                    wrapped_dataset.transforms = new_transforms
+                existing_dataset.transforms = TransformLibFactory.generate(subset_config)
 
             return DataModule.from_vision_datasets(
                 train_dataset=datamodule.subsets[datamodule.train_subset.subset_name],
