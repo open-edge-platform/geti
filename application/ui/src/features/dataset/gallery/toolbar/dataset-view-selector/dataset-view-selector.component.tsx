@@ -91,7 +91,7 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
     const [isDatasetViewSelectorOpen, setIsDatasetViewSelectorOpen] = useState<boolean>(false);
     const datasetViewsWithDefaultView = [ENTIRE_DATASET, ...datasetViews];
 
-    const selectedDatasetViewId = datasetViews[0].id;
+    const selectedDatasetViewId = datasetViewsWithDefaultView[0].id;
     const selectedDatasetView =
         datasetViewsWithDefaultView.find((item) => item.id === selectedDatasetViewId) ?? datasetViews[0];
 
