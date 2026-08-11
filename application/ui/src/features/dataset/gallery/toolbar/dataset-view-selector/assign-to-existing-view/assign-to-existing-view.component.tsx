@@ -1,9 +1,6 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-// Copyright (C) 2025-2026 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
-
 import { FormEvent, useState } from 'react';
 
 import {
@@ -13,14 +10,19 @@ import {
     Dialog,
     DialogContainer,
     Divider,
+    Flex,
     Form,
     Heading,
     Item,
     Picker,
+    Text,
 } from '@geti-ui/ui';
+import { Info } from '@geti-ui/ui/icons';
 import { isEmpty } from 'lodash-es';
 
 import { SelectedMediaCount } from '../selected-media-count/selected-media-count.component';
+
+import classes from './assign-to-existing-view.module.scss';
 
 type DatasetView = {
     id: string;
@@ -58,6 +60,12 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
                         {(item) => <Item key={item.id}>{item.name}</Item>}
                     </Picker>
                 </Form>
+                <Flex gap={'size-50'} marginTop={'size-250'}>
+                    <Info />
+                    <Text UNSAFE_className={classes.note}>
+                        This operation will not affect other media that were already assigned to this view.
+                    </Text>
+                </Flex>
             </Content>
             <ButtonGroup>
                 <Button onPress={onClose} variant={'secondary'}>
