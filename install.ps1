@@ -755,8 +755,22 @@ function Test-AppHealth {
     $url = "https://localhost:${Port}/health"
 
     if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
-        & curl.exe -ksSf --max-time 5 $url *> $null
-        return ($LASTEXITCODE -eq 0)
+        # curl.exe returns a non-zero exit code (e.g. 7 "could not connect")
+        # while the backend is still starting up. Under $ErrorActionPreference =
+        # 'Stop' combined with $PSNativeCommandUseErrorActionPreference (on by
+        # default in PowerShell 7.3+), that non-zero exit is turned into a
+        # terminating error that would abort the whole health-polling loop on the
+        # very first probe -- and be misreported as an "Upgrade error" that
+        # triggers a rollback. Relax the preference locally so a failed probe just
+        # means "not healthy yet" and the loop keeps retrying until the timeout.
+        $prevEAP = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        try {
+            & curl.exe -ksSf --max-time 5 $url *> $null
+            return ($LASTEXITCODE -eq 0)
+        } finally {
+            $ErrorActionPreference = $prevEAP
+        }
     }
 
     try {
