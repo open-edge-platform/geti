@@ -284,4 +284,3 @@ class TestConfigurePreprocessingParams:
         )
         assert result.mean == (0.1, 0.2, 0.3)
         assert result.std == (0.5, 0.5, 0.5)
-
