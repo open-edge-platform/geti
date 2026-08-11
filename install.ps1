@@ -36,6 +36,9 @@
 .PARAMETER HealthTimeout
     Seconds to wait for the upgraded app to become healthy before rolling back (default: 300).
 
+.PARAMETER GitBranch
+    Override the git branch/tag to install (for testing purposes).
+
 .EXAMPLE
     .\install.ps1
     .\install.ps1 -Verbose -Yes
@@ -60,13 +63,23 @@ param(
 
     [string]$BackupDir = "",
 
-    [int]$HealthTimeout = 300
+    [int]$HealthTimeout = 300,
+
+    [string]$GitBranch = ""
 )
 
 $ErrorActionPreference = "Stop"
 
 $GIT_URL = "https://github.com/open-edge-platform/geti.git"
+# GIT_BRANCH can be overridden via the GIT_BRANCH environment variable or the
+# -GitBranch parameter (for testing purposes).
 $GIT_BRANCH = "app/v3.1.0rc4"
+if ($GitBranch) {
+    $GIT_BRANCH = $GitBranch
+}
+elseif ($env:GIT_BRANCH) {
+    $GIT_BRANCH = $env:GIT_BRANCH
+}
 
 # Exit code the backend uses for a fatal, non-restartable migration failure
 # (see application/backend/app/lifecycle.py:MIGRATION_FATAL_EXIT_CODE). It lets

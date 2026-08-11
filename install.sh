@@ -20,7 +20,9 @@ trap 'cleanup $LINENO' ERR
 trap 'echo ""; echo "Installation interrupted."; exit 130' INT TERM
 
 GIT_URL="https://github.com/open-edge-platform/geti.git"
-GIT_BRANCH="app/v3.1.0rc4"
+# GIT_BRANCH can be overridden via the GIT_BRANCH environment variable or the
+# --git-branch flag (for testing purposes).
+GIT_BRANCH="${GIT_BRANCH:-app/v3.1.0rc4}"
 
 # Exit code the backend uses for a fatal, non-restartable migration failure
 # (see application/backend/app/lifecycle.py:MIGRATION_FATAL_EXIT_CODE). It lets
@@ -52,6 +54,7 @@ Options:
                         (default: <work-dir>/.geti-upgrade-backups)
       --health-timeout N  Seconds to wait for the upgraded app to become healthy
                         before rolling back (default: 300)
+      --git-branch REF  Override the git branch/tag to install (for testing)
   -h, --help            Show this help message and exit
 EOF
 }
@@ -110,6 +113,14 @@ parse_args() {
                     exit 1
                 fi
                 HEALTH_TIMEOUT="$2"
+                shift 2
+                ;;
+            --git-branch)
+                if [[ -z "${2:-}" ]]; then
+                    echo "Error: --git-branch requires a ref argument."
+                    exit 1
+                fi
+                GIT_BRANCH="$2"
                 shift 2
                 ;;
             -h|--help)
