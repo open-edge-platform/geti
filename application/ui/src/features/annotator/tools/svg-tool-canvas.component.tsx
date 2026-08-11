@@ -3,7 +3,7 @@
 
 import type { FC, PropsWithChildren, RefObject, SVGProps } from 'react';
 
-import { roiFromImage } from '@geti/smart-tools/utils';
+import { roiFromImage } from '@geti-ui/smart-tools/utils';
 
 import { allowPanning } from '../utils';
 

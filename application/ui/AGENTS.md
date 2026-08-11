@@ -30,12 +30,6 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
 | `test-utils/`            | Testing helpers.                                                                                                                                   |
 | `assets/`                | Static assets.                                                                                                                                     |
 
-## Vendored `@geti` Packages
-
-- `packages/config`, `packages/smart-tools`, and `packages/ui` are cloned by the
-  `preinstall` / `npm run clone-geti-ui-packages` hook.
-- **Do not edit these locally** — they are overwritten on install.
-
 ## Data Fetching & API Types
 
 - Server state goes through **React Query** (`useQuery` / `useMutation`). Never call
@@ -62,7 +56,7 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
   signatures, and mapped/conditional or other computed types. Give a complex or
   reused computed type a named `type` alias so the compiler can cache the result.
 - Function components + hooks only. Co-locate styles as CSS Modules
-  (`*.module.scss`); do not add CSS-in-JS beyond what `@geti/ui` already uses.
+  (`*.module.scss`); do not add CSS-in-JS beyond what `@geti-ui/ui` already uses.
 - Group new code by feature under `src/features/` or share it via `src/components/`,
   `src/hooks/`, or `src/shared/`.
 - New backend endpoints need a corresponding mock handler under `mocks/` — reuse
@@ -100,7 +94,6 @@ full table.
 ## Guardrails
 
 - Do not hand-edit generated API types.
-- Do not edit vendored `packages/*` — they are overwritten.
 - Do not introduce another data-fetching or CSS-in-JS library.
 - See `application/ui/README.md` for detailed architecture, API integration
   examples, and contributing guidelines.

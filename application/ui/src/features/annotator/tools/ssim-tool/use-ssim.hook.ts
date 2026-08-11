@@ -3,7 +3,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
-import type { RunSSIMProps as ToolRunSSIMProps, SSIMMatch as ToolSSIMMatch } from '@geti/smart-tools';
+import type { RunSSIMProps as ToolRunSSIMProps, SSIMMatch as ToolSSIMMatch } from '@geti-ui/smart-tools';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Remote, wrap } from 'comlink';
 

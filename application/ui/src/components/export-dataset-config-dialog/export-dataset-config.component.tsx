@@ -32,9 +32,24 @@ import { getFormatOptions } from '../util';
 
 import classes from './export-dataset-config.module.scss';
 
-const WarningMessages = ({ isVisible }: { isVisible: boolean }) => {
+const EXPORT_VIDEOS_WARNING_MESSAGE =
+    'Exporting videos is not supported by this dataset format. ' +
+    'All annotated frames from videos will be exported as images.';
+const EXPORT_EMPTY_LABEL_WARNING_MESSAGE = (emptyLabelName: string) =>
+    `The selected format does not support empty labels (e.g. "${emptyLabelName}"). ` +
+    `Images and frames containing them will be exported as unannotated.`;
+const EXPORT_UNSUPPORTED_ITEMS_WARNING_MESSAGE = (unsupportedItems: string) =>
+    `To preserve ${unsupportedItems}, please use the Geti export format.`;
+const EXPORT_COCO_WARNING_MESSAGE =
+    "The exported dataset won't include any information about the subset assigned to each media.";
+
+const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: string | null }) => {
+    const isVisible = selectedExportFormat !== 'geti';
+
     const { data: statistics } = useDatasetStatisticsQuery(isVisible);
     const emptyLabel = useProjectLabelsWithEmptyLabel().find(isEmptyLabel);
+
+    const isCocoFormatSelected = selectedExportFormat === 'coco';
 
     const hasVideos = (statistics?.media_counts.videos ?? 0) > 0;
     // Media annotated with the empty label is reported by the API under a `null` label id
@@ -44,13 +59,13 @@ const WarningMessages = ({ isVisible }: { isVisible: boolean }) => {
         ? emptyLabel?.name
         : undefined;
 
-    if (!isVisible || (!hasVideos && emptyLabelName === undefined)) {
-        return null;
-    }
-
     const unsupportedItems = [hasVideos && 'videos', emptyLabelName !== undefined && 'empty labels']
         .filter(Boolean)
         .join(' or ');
+
+    if (!isVisible || (!hasVideos && emptyLabelName === undefined && !isCocoFormatSelected)) {
+        return null;
+    }
 
     return (
         <Flex alignItems={'start'} marginTop={'size-100'} gap={'size-100'}>
@@ -58,19 +73,10 @@ const WarningMessages = ({ isVisible }: { isVisible: boolean }) => {
                 <Alert className={classes.warningMessageIcon} />
             </Flex>
             <Flex direction={'column'} gap={'size-75'}>
-                {hasVideos && (
-                    <Text>
-                        Exporting videos is not supported by this dataset format. All annotated frames from videos will
-                        be exported as images.
-                    </Text>
-                )}
-                {emptyLabelName !== undefined && (
-                    <Text>
-                        {`The selected format does not support empty labels (e.g. "${emptyLabelName}"). ` +
-                            `Images and frames containing them will be exported as unannotated.`}
-                    </Text>
-                )}
-                <Text>{`To preserve ${unsupportedItems}, please use the Geti export format.`}</Text>
+                {hasVideos && <Text>{EXPORT_VIDEOS_WARNING_MESSAGE}</Text>}
+                {emptyLabelName !== undefined && <Text>{EXPORT_EMPTY_LABEL_WARNING_MESSAGE(emptyLabelName)}</Text>}
+                {unsupportedItems && <Text>{EXPORT_UNSUPPORTED_ITEMS_WARNING_MESSAGE(unsupportedItems)}</Text>}
+                {isCocoFormatSelected && <Text>{EXPORT_COCO_WARNING_MESSAGE}</Text>}
             </Flex>
         </Flex>
     );
@@ -106,8 +112,6 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
     const [selectedExportFormat, setSelectedExportFormat] = useState<string | null>(formatOptions.at(0)?.value ?? null);
 
     const labels = selectedProject.task.labels?.map((label) => ({ id: label.name, name: label.name })) ?? [];
-
-    const isNonGetiFormatSelected = selectedExportFormat !== 'geti';
 
     return (
         <Dialog size='L' width={{ base: '70vw' }}>
@@ -149,7 +153,7 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
                         </RadioGroup>
                     </Form>
 
-                    <WarningMessages isVisible={isNonGetiFormatSelected} />
+                    <WarningMessages selectedExportFormat={selectedExportFormat} />
 
                     <Link
                         href={EXPORT_FORMATS_LINK}

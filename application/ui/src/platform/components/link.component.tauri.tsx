@@ -15,7 +15,11 @@ export const Link = ({ href, target, onPress, ...props }: LinkProps) => {
         onPress?.(event);
 
         if (shouldOpenExternally && href) {
-            void openUrl(href);
+            // Rejects when the URL is missing from the `opener:allow-open-url` allowlist in
+            // src-tauri/capabilities/default.json.
+            void openUrl(href).catch((error) => {
+                console.error('[tauri Link] failed to open url', href, error);
+            });
         }
     };
 

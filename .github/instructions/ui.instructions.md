@@ -13,8 +13,8 @@ applyTo: "application/ui/**"
 - **API types are generated** (`src/api/openapi-spec.json` / `.d.ts`) — never
   edit by hand. Regenerate: `npm run update-spec` (backend on `:7860`) or
   `npm run build:api` (if you already have a fresh local `openapi-spec.json`).
-- **Vendored packages** (`packages/config`, `packages/ui`, `packages/smart-tools`)
-  are cloned via `npm run clone-geti-ui-packages`. Do not edit locally.
+- **Shared UI packages** (`@geti-ui/ui`, `@geti-ui/smart-tools`) are consumed as
+  regular published npm dependencies, not clones — do not vendor them locally.
 
 ## Commands
 
@@ -46,8 +46,7 @@ applyTo: "application/ui/**"
 
 - Do not introduce another data-fetching library.
 - Do not hand-edit generated API types.
-- Do not edit vendored `packages` — they will be overwritten.
-- Do not add CSS-in-JS outside what `@geti/ui` already uses.
+- Do not add CSS-in-JS outside what `@geti-ui/ui` already uses.
 
 ## Further reading
 

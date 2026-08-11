@@ -226,6 +226,40 @@ describe('ModelVariantTable', () => {
         expect(screen.getByRole('button', { name: `Download model ${format}-1` })).toBeInTheDocument();
     });
 
+    it.each([
+        ['the model weights were deleted', { modelFilesDeleted: true, variantFilesDeleted: false }],
+        ['the variant weights were deleted', { modelFilesDeleted: false, variantFilesDeleted: true }],
+    ])('shows a dash size and a disabled download button when %s', (_, { modelFilesDeleted, variantFilesDeleted }) => {
+        const model = getMockedModel({
+            files_deleted: modelFilesDeleted,
+            variants: [
+                getMockedVariant({
+                    id: 'ov-1',
+                    format: 'openvino',
+                    precision: 'fp16',
+                    weights_size: 0,
+                    files_deleted: variantFilesDeleted,
+                    evaluations: [
+                        {
+                            dataset_revision_id: 'dataset-1',
+                            subset: 'testing',
+                            metrics: [{ name: 'Accuracy', value: 0.923, primary: true }],
+                        },
+                    ],
+                }),
+            ],
+        });
+
+        render(<ModelVariantTable model={model} format='openvino' />);
+
+        expect(screen.getByTestId('model-variant-value-size-fp16')).toHaveTextContent('-');
+        expect(screen.getByRole('button', { name: 'Download model ov-1' })).toBeDisabled();
+
+        // Precision and score remain visible for the record
+        expect(screen.getByText('FP16')).toBeInTheDocument();
+        expect(screen.getByTestId('model-variant-value-accuracy-fp16')).toHaveTextContent('92%');
+    });
+
     describe('ModelVariantPrecisionRenderer', () => {
         it('renders only uppercased precision text when variant has no quantization_info', () => {
             const model = getMockedModel({

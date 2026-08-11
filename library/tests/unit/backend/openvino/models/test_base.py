@@ -12,6 +12,7 @@ import numpy as np
 import openvino as ov
 import pytest
 import torch
+from model_api.adapters.inference_adapter import Metadata
 from model_api.models.result import ClassificationResult
 
 from getitune.backend.openvino.models import OVModel
@@ -131,3 +132,77 @@ class TestResolveModelType:
         ov_model._model_adapter = mock_adapter
         result = ov_model.model_type
         assert result == "YOLO11"
+
+
+class TestMapCompiledOutputKeys:
+    """Tests for mapping externally compiled model outputs to ModelAPI output keys."""
+
+    @staticmethod
+    def _wrapper(outputs: dict) -> MagicMock:
+        model = MagicMock()
+        model.outputs = outputs
+        return model
+
+    @staticmethod
+    def _compiled(names: list[set[str]]) -> MagicMock:
+        compiled_model = MagicMock()
+        compiled_model.outputs = []
+        for output_names in names:
+            output = MagicMock()
+            output.get_names.return_value = output_names
+            compiled_model.outputs.append(output)
+        return compiled_model
+
+    def test_maps_named_outputs_by_name(self) -> None:
+        wrapper = self._wrapper(
+            {"boxes": Metadata(names={"boxes"}), "labels": Metadata(names={"labels"})},
+        )
+        # NNCF may return the outputs in a different order than the wrapper.
+        compiled_model = self._compiled([{"labels"}, {"boxes"}])
+
+        assert OVModel._map_compiled_output_keys(wrapper, compiled_model) == ["labels", "boxes"]
+
+    def test_maps_unnamed_outputs_positionally(self) -> None:
+        """Ultralytics YOLO-seg exports have unnamed output tensors, keyed by port object."""
+        det_port, proto_port = object(), object()
+        wrapper = self._wrapper({det_port: Metadata(names=set()), proto_port: Metadata(names=set())})
+        compiled_model = self._compiled([set(), set()])
+
+        assert OVModel._map_compiled_output_keys(wrapper, compiled_model) == [det_port, proto_port]
+
+    def test_maps_unknown_names_positionally(self) -> None:
+        wrapper = self._wrapper({"boxes": Metadata(names={"boxes"}), "labels": Metadata(names={"labels"})})
+        compiled_model = self._compiled([{"renamed_by_nncf"}, {"labels"}])
+
+        assert OVModel._map_compiled_output_keys(wrapper, compiled_model) == ["boxes", "labels"]
+
+
+class TestSelectPrimaryMetric:
+    """Tests for choosing the accuracy indicator of accuracy-aware quantization."""
+
+    def test_returns_first_scalar_tensor(self) -> None:
+        results = {"map": torch.tensor(0.75), "map_50": torch.tensor(0.9)}
+
+        assert OVModel._select_primary_metric(results) == pytest.approx(0.75)
+
+    def test_returns_plain_number(self) -> None:
+        assert OVModel._select_primary_metric({"Dice": 0.5}) == pytest.approx(0.5)
+
+    def test_skips_leading_non_scalar_entries(self) -> None:
+        """The multi-label classification metric emits confusion matrices first."""
+        results = {
+            "conf_matrix": [torch.zeros(2, 2), torch.zeros(2, 2)],
+            "accuracy": torch.tensor(0.8),
+            "map": torch.tensor(0.6),
+        }
+
+        assert OVModel._select_primary_metric(results) == pytest.approx(0.8)
+
+    def test_skips_multi_element_tensors(self) -> None:
+        results = {"map_per_class": torch.tensor([0.1, 0.2]), "accuracy": torch.tensor(0.4)}
+
+        assert OVModel._select_primary_metric(results) == pytest.approx(0.4)
+
+    def test_raises_when_no_scalar_metric(self) -> None:
+        with pytest.raises(RuntimeError, match="No scalar metric"):
+            OVModel._select_primary_metric({"conf_matrix": [torch.zeros(2, 2)]})

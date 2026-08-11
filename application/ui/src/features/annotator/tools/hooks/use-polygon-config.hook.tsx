@@ -3,7 +3,7 @@
 
 import { PointerEvent, RefObject, useEffect, useMemo, useRef } from 'react';
 
-import { clampPointBetweenImage, getIntersectionPoint } from '@geti/smart-tools/utils';
+import { clampPointBetweenImage, getIntersectionPoint } from '@geti-ui/smart-tools/utils';
 import { differenceWith, isEmpty, isEqual, isNil } from 'lodash-es';
 
 import { Point, Polygon } from '../../../../shared/types';
