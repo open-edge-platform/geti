@@ -18,7 +18,7 @@ type ModelVariantsTabsProps = {
 };
 
 export const ModelVariantsTabs = ({ model }: ModelVariantsTabsProps) => {
-    if (isEmpty(model.variants) || model.files_deleted) {
+    if (isEmpty(model.variants)) {
         return (
             <Flex justifyContent={'center'} alignItems={'center'} height={'size-3000'}>
                 <Text>No available model variants.</Text>
@@ -42,7 +42,7 @@ export const ModelVariantsTabs = ({ model }: ModelVariantsTabsProps) => {
             <TabPanels width={0} minWidth={'100%'} UNSAFE_className={classes.tabPanels}>
                 <Item key='openvino'>
                     <ModelVariantTable model={model} format='openvino' />
-                    <QuantizationRow model={model} />
+                    <QuantizationRow model={model} isDisabled={model.files_deleted} />
                 </Item>
                 <Item key='pytorch'>
                     <ModelVariantTable model={model} format='pytorch' />

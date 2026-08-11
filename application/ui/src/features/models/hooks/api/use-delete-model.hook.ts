@@ -14,17 +14,26 @@ export const useDeleteModel = () => {
             _,
             {
                 params: {
-                    path: { project_id },
+                    path: { project_id, model_id },
                 },
             }
         ) => {
-            return queryClient.invalidateQueries({
-                queryKey: getQueryKey([
-                    'get',
-                    '/api/projects/{project_id}/models',
-                    { params: { path: { project_id } } },
-                ]),
-            });
+            return Promise.all([
+                queryClient.invalidateQueries({
+                    queryKey: getQueryKey([
+                        'get',
+                        '/api/projects/{project_id}/models',
+                        { params: { path: { project_id } } },
+                    ]),
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: getQueryKey([
+                        'get',
+                        '/api/projects/{project_id}/models/{model_id}',
+                        { params: { path: { project_id, model_id } } },
+                    ]),
+                }),
+            ]);
         },
     });
 };
