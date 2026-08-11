@@ -16,6 +16,7 @@ from jsonargparse import ArgumentParser, Namespace
 
 from getitune.backend.lightning.models.base import DataInputParams, LightningModel
 from getitune.config.data import SamplerConfig, SubsetConfig, TileConfig
+from getitune.data.factory import TransformLibFactory
 from getitune.data.module import DataModule
 from getitune.types import PathLike
 from getitune.types.label import LabelInfoTypes
@@ -446,6 +447,29 @@ class AutoConfigurator:
         # This is useful for the quantization pipeline.
         if not datamodule.data_root and datamodule.subsets:
             datamodule.train_subset.input_size = actual_input_size
+
+            if tiling_enabled:
+                # `from_vision_datasets` reuses each VisionDataset's already-compiled
+                # `.transforms` verbatim and ignores `subset_config.augmentations_cpu/gpu`
+                # (see its own warning below), so the Resize-stripping above would
+                # otherwise silently have no effect here: a tiled OV model would get
+                # Resize-then-tiler-resized crops, and ModelAPI maps each tile's
+                # predictions back to full-image coordinates using the tile's native
+                # size, so that mismatched pre-resize corrupts the mapping and can
+                # collapse accuracy (e.g. mAP -> ~0) even though individual tile
+                # detections still look reasonable. Patch the compiled `.transforms`
+                # in place (on the tile wrapper and the underlying dataset it wraps,
+                # if any) so the stripped pipeline actually takes effect, without
+                # re-importing/re-converting the underlying Datumaro subset. The
+                # non-tiled path is left untouched since its Resize-to-input_size
+                # behavior already matches the reused dataset's own transforms.
+                new_transforms = TransformLibFactory.generate(subset_config)
+                existing_dataset = datamodule.subsets[subset_config.subset_name]
+                existing_dataset.transforms = new_transforms
+                wrapped_dataset = getattr(existing_dataset, "_dataset", None)
+                if wrapped_dataset is not None:
+                    wrapped_dataset.transforms = new_transforms
+
             return DataModule.from_vision_datasets(
                 train_dataset=datamodule.subsets[datamodule.train_subset.subset_name],
                 val_dataset=datamodule.subsets[datamodule.val_subset.subset_name],
