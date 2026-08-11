@@ -450,19 +450,10 @@ class AutoConfigurator:
 
             if tiling_enabled:
                 # `from_vision_datasets` reuses each VisionDataset's already-compiled
-                # `.transforms` verbatim and ignores `subset_config.augmentations_cpu/gpu`
-                # (see its own warning below), so the Resize-stripping above would
-                # otherwise silently have no effect here: a tiled OV model would get
-                # Resize-then-tiler-resized crops, and ModelAPI maps each tile's
-                # predictions back to full-image coordinates using the tile's native
-                # size, so that mismatched pre-resize corrupts the mapping and can
-                # collapse accuracy (e.g. mAP -> ~0) even though individual tile
-                # detections still look reasonable. Patch the compiled `.transforms`
-                # in place (on the tile wrapper and the underlying dataset it wraps,
-                # if any) so the stripped pipeline actually takes effect, without
-                # re-importing/re-converting the underlying Datumaro subset. The
-                # non-tiled path is left untouched since its Resize-to-input_size
-                # behavior already matches the reused dataset's own transforms.
+                # `.transforms` and ignores `subset_config.augmentations_cpu/gpu` (see
+                # its warning below), so the Resize-stripping above would otherwise be
+                # silently undone here, corrupting the tile-to-image coordinate mapping
+                # and collapsing accuracy. Patch `.transforms` in place instead.
                 new_transforms = TransformLibFactory.generate(subset_config)
                 existing_dataset = datamodule.subsets[subset_config.subset_name]
                 existing_dataset.transforms = new_transforms
