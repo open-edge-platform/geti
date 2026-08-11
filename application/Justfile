@@ -124,6 +124,9 @@ coturn_port="443" stun_server="" gpu-slots="1" certfile="" keyfile="":
                 fi
                 sleep 0.5
             done
+            if [[ -n "$(docker ps -aq -f "name=^/${CONTAINER_NAME}$")" ]]; then
+                echo "Warning: container name '${CONTAINER_NAME}' may not be fully released yet." >&2
+            fi
         else
             echo "Error: A container named '${CONTAINER_NAME}' is already running." >&2
             echo "Either pass --reload to stop and replace it, or specify a different --name." >&2
