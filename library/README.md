@@ -9,7 +9,7 @@
 [Key Features](#key-features) •
 [Supported Tasks & Models](#supported-tasks--models) •
 [Installation](#installation) •
-[Quick Start](#quick-start) •
+[Usage](#usage) •
 [Docs](https://docs.geti.intel.com/docs/user-guide/library/get-started/intro) •
 [License](#license)
 
@@ -18,8 +18,8 @@
 <!-- markdownlint-disable MD042 -->
 
 [![python](https://img.shields.io/badge/python-3.11%E2%80%933.14-green)]()
-[![pytorch](https://img.shields.io/badge/pytorch-2.10-orange)]()
-[![openvino](https://img.shields.io/badge/openvino-2026.1-purple)]()
+[![pytorch](https://img.shields.io/badge/pytorch-2.12-orange)]()
+[![openvino](https://img.shields.io/badge/openvino-2026.3-purple)]()
 [![numpy](https://img.shields.io/badge/numpy-%E2%89%A52.0-blue)]()
 
 <!-- markdownlint-enable  MD042 -->
@@ -77,8 +77,6 @@ Each task directory also ships an `openvino_model.yaml` recipe for running and o
 
 ## Installation
 
-## Quick Install
-
 ```bash
 # With uv (recommended)
 # CPU-only by default
@@ -91,7 +89,7 @@ pip install "getitune"
 ```
 
 > [!IMPORTANT]
-> Due to licensing constraints, the PyPI package doesn't include Ultralytics YOLO models.
+> Due to licensing constraints, the PyPI package doesn't include Ultralytics YOLO models.  
 > To use Ultralytics YOLO models, you must [install from source](#advanced-install-from-source).
 
 <details>
@@ -101,9 +99,9 @@ pip install "getitune"
 
 | Extra    | PyTorch wheel                                                          | Use when                             | Setup Guide                                                                      |
 | -------- | ---------------------------------------------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------- |
-| `[cpu]`  | `torch==2.10.0+cpu` (Linux/Windows) or default `torch==2.10.0` (macOS) | No GPU, or running on Apple silicon. | —                                                                                |
-| `[xpu]`  | `torch==2.10.0+xpu` + `triton-xpu`                                     | Intel discrete or integrated GPUs.   | [Intel GPU drivers](https://github.com/intel/compute-runtime/releases)           |
-| `[cuda]` | `torch==2.10.0+cu128`                                                  | NVIDIA GPUs with CUDA 12.8 drivers.  | [NVIDIA CUDA Toolkit](https://developer.nvidia.com/cuda-12-8-0-download-archive) |
+| `[cpu]`  | `torch==2.12.1+cpu` (Linux/Windows) or default `torch==2.12.1` (macOS) | No GPU, or running on Apple silicon. | —                                                                                |
+| `[xpu]`  | `torch==2.12.1+xpu` + `triton-xpu`                                     | Intel discrete or integrated GPUs.   | [Intel GPU drivers](https://github.com/intel/compute-runtime/releases)           |
+| `[cuda]` | `torch==2.12.1+cu130`                                                  | NVIDIA GPUs with CUDA 13.0 drivers.  | [NVIDIA CUDA Toolkit](https://developer.nvidia.com/cuda-13-0-0-download-archive) |
 
 ```bash
 # Intel GPU (XPU)
@@ -117,7 +115,7 @@ uv pip install "getitune[cpu]"
 ```
 
 > [!NOTE]
-> For **macOS** users: PyTorch's `+cpu` wheel is only published for Linux and Windows. The `[cpu]` extra resolves this automatically and installs the default `torch==2.10.0` wheel on macOS.
+> For **macOS** users: PyTorch's `+cpu` wheel is only published for Linux and Windows. The `[cpu]` extra resolves this automatically and installs the default `torch==2.12.1` wheel on macOS.
 
 </details>
 
@@ -182,15 +180,15 @@ pip install -e ".[cuda]" \
   --extra-index-url https://download.pytorch.org/whl/cu126
 ```
 
-> [!NOTE]
-> See [this PyTorch thread](https://github.com/pytorch/pytorch/issues/178665) for more details about what GPUs are
-> supported for each CUDA version.
+> [!TIP]
+> Refer to [this thread](https://github.com/pytorch/pytorch/issues/178665) in the PyTorch project for more details
+> about what GPUs are supported for each CUDA version.
 
 </details>
 
 ---
 
-## Quick Start
+## Usage
 
 ### Discovering Recipes and Models
 
