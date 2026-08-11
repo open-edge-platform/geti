@@ -248,10 +248,12 @@ class AutoConfigurator:
                     "Input size is not specified in the datamodule. Ensure that the datamodule has a valid input size."
                 )
                 raise ValueError(msg)
+            # NOTE: pass mean/std through as-is. None when the CPU augmentation pipeline has no torchvision Normalize to
+            # derive them from, such as when normalization lives in augmentations_gpu instead
             model_config["init_args"]["data_input_params"] = DataInputParams(
                 input_size=datamodule.input_size,
-                mean=datamodule.input_mean if datamodule.input_mean is not None else (0.0, 0.0, 0.0),
-                std=datamodule.input_std if datamodule.input_std is not None else (1.0, 1.0, 1.0),
+                mean=datamodule.input_mean,
+                std=datamodule.input_std,
             ).as_dict()
 
         model_cls = get_model_cls_from_config(Namespace(model_config))
