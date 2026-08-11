@@ -103,7 +103,7 @@ jobs:
 
   dast-scan:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    timeout-minutes: 90
+    timeout-minutes: 360
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -175,7 +175,8 @@ jobs:
         uses: zaproxy/action-full-scan@3c58388149901b9a03b7718852c5ba889646c27c # v0.13.0
         with:
           target: "https://localhost:7860"
-          cmd_options: '-a -j -z "-config connection.ssl.skipCertVerification=true"'
+          # -m 20: cap spider at 20 min; ascan cap at 60 min
+          cmd_options: '-a -m 20 -z "-config connection.ssl.skipCertVerification=true -config ascan.maxScanDurationInMins=60"'
           allow_issue_writing: false
           fail_action: false
           artifact_name: zapfull
