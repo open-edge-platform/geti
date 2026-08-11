@@ -8,8 +8,9 @@ import { QuantizationDialog } from './quantization-dialog/quantization-dialog.co
 
 type QuantizationRowProps = {
     model: Model;
+    isDisabled?: boolean;
 };
-export const QuantizationRow = ({ model }: QuantizationRowProps) => {
+export const QuantizationRow = ({ model, isDisabled = false }: QuantizationRowProps) => {
     return (
         <Flex marginTop={'size-150'} alignItems={'center'} justifyContent={'space-between'}>
             <Flex>
@@ -22,7 +23,9 @@ export const QuantizationRow = ({ model }: QuantizationRowProps) => {
                 </ContextualHelp>
             </Flex>
             <DialogTrigger>
-                <Button variant={'secondary'}>Start quantization</Button>
+                <Button variant={'secondary'} isDisabled={isDisabled}>
+                    Start quantization
+                </Button>
                 {(close) => <QuantizationDialog model={model} onClose={close} />}
             </DialogTrigger>
         </Flex>
