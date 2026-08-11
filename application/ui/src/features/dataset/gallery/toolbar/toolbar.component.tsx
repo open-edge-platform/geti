@@ -12,6 +12,7 @@ import {
     dimensionValue,
     Divider,
     Flex,
+    Heading,
     MediaViewModes,
     ViewModes,
 } from '@geti-ui/ui';
@@ -27,6 +28,7 @@ import { DeleteMediaItem } from '../delete-media-item/delete-media-item.componen
 import { useSelectDatasetItem } from '../hooks/use-select-dataset-item.hook';
 import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
+import { DatasetViewSelector } from './dataset-view-selector/dataset-view-selector.component';
 import { MediaFiltering } from './media-filtering/media-filtering.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
@@ -95,7 +97,14 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
     return (
         <Flex direction={'column'} gridArea={'toolbar'} gap={'size-200'} marginBottom={'size-200'}>
-            <Flex alignItems={'center'} justifyContent={'end'}>
+            <Flex alignItems={'center'} justifyContent={'space-between'}>
+                <Flex alignItems={'center'} gap={'size-200'}>
+                    <Heading margin={0}>Dataset</Heading>
+
+                    <Divider orientation={'vertical'} size={'S'} />
+                    <DatasetViewSelector />
+                </Flex>
+
                 <ButtonGroup UNSAFE_style={{ gap: dimensionValue('size-125') }}>
                     {noMediaSelected && <ImportExport />}
 
