@@ -120,9 +120,9 @@ all read proxy settings from the **environment**. Configuring
 a common cause of connection timeouts on an otherwise working machine.
 
 ```powershell
-[Environment]::SetEnvironmentVariable('http_proxy',  'http://<proxy>:911', 'Machine')
-[Environment]::SetEnvironmentVariable('https_proxy', 'http://<proxy>:912', 'Machine')
-[Environment]::SetEnvironmentVariable('no_proxy',    'localhost,127.0.0.1,::1', 'Machine')
+[Environment]::SetEnvironmentVariable('http_proxy',  'http://<proxy>:911')
+[Environment]::SetEnvironmentVariable('https_proxy', 'http://<proxy>:912')
+[Environment]::SetEnvironmentVariable('no_proxy',    'localhost,127.0.0.1,::1')
 ```
 
 Open a **new** shell afterwards, and verify with `$env:https_proxy` in the
