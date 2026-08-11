@@ -686,7 +686,10 @@ verify_app_start() {
 kill_tree() {
     local pid="$1"
     local child
-    for child in $(pgrep -P "$pid" 2>/dev/null); do
+``    # `pgrep` exits 1 when a process has no children. Under `set -e` + `set -E`
+    # (errtrace) that non-zero status inside the `$(...)` subshell would fire the
+    # inherited ERR trap, so swallow it with `|| true`.
+    for child in $(pgrep -P "$pid" 2>/dev/null || true); do
         kill_tree "$child"
     done
     kill -TERM "$pid" 2>/dev/null || true
@@ -702,6 +705,16 @@ stop_verification() {
 # usable after a failed upgrade.
 # $1: line number the upgrade failed on (passed by the ERR trap), if known.
 upgrade_rollback() {
+    # `set -E` (errtrace) makes this ERR trap fire inside command substitutions
+    # and other subshells too (e.g. a `$(pgrep ...)` that exits non-zero). A
+    # rollback must only ever run in the top-level shell: from a subshell its
+    # `exit 1` and the ROLLBACK_IN_PROGRESS guard would be discarded when the
+    # subshell ends, the parent would keep going with the trap still armed, and
+    # the trap would re-fire — rebuilding the app over and over. Ignore any such
+    # subshell invocation and let the real failure surface in the main shell.
+    if [ "$BASHPID" != "$$" ]; then
+        return
+    fi
     trap - ERR
     set +e
     # The rollback itself rebuilds the app, so a second entry would restart the whole
