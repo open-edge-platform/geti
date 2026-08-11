@@ -98,6 +98,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
     }, [selectedMediaItems, items]);
 
     const noMediaSelected = selectedMediaItems?.size === 0;
+    const selectedMediaItemsIds = Array.from(selectedMediaItems ?? []) as string[];
 
     return (
         <Flex direction={'column'} gridArea={'toolbar'} gap={'size-200'} marginBottom={'size-200'}>
@@ -151,10 +152,10 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                                 itemsIds={Array.from(selectedKeys) as string[]}
                                 onDeleted={toggleSelectedKeys}
                             />
-                            <SaveDatasetView selectedMediaIds={Array.from(selectedMediaItems ?? []) as string[]} />
+                            <SaveDatasetView selectedMediaIds={selectedMediaItemsIds} />
                             <AssignToExistingView
                                 datasetViews={datasetViews}
-                                selectedMediaIds={Array.from(selectedMediaItems ?? []) as string[]}
+                                selectedMediaIds={selectedMediaItemsIds}
                             />
                         </>
                     )}
