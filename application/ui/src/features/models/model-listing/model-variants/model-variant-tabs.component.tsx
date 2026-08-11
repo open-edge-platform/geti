@@ -20,9 +20,9 @@ type ModelVariantsTabsProps = {
 const isQuantizationDisabled = (model: Model) => {
     return Boolean(
         model.files_deleted ||
-        model.variants?.some(
-            (variant) => variant.format === 'openvino' && variant.precision === 'fp16' && variant.files_deleted
-        )
+            model.variants?.some(
+                (variant) => variant.format === 'openvino' && variant.precision === 'fp16' && variant.files_deleted
+            )
     );
 };
 
