@@ -188,7 +188,6 @@ class TestImportDatasetAsNewProject:
     ) -> None:
         dataset = MagicMock(spec=Dataset)
         dataset.schema = Mock()
-        dataset.schema.attributes = attributes
 
         def _attr(tp: object) -> Mock:
             attr = Mock()

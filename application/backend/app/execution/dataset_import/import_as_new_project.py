@@ -143,8 +143,8 @@ class ImportDatasetAsNewProject(BaseDatasetImport[ImportDatasetAsNewProjectJobPa
         """
         Check if the dataset's 'label' or 'labels' attribute is represented as a NumPy array.
 
-        This method inspects the schema definition of the 'label' attribute to check if its type is or contains
-        `np.ndarray` (such as `np.ndarray | None`).
+        This method inspects the schema definition of the 'label' or 'labels' attribute to check if its type is or
+        contains `np.ndarray` (such as `np.ndarray | None`).
 
         The result impacts how the project is created: if the dataset has array labels, the newly created project will
         configure its task with non-exclusive labels (i.e., a multi-label classification project).
