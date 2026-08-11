@@ -116,9 +116,8 @@ uv pip install "getitune[cuda]" --extra-index-url https://download.pytorch.org/w
 uv pip install "getitune[cpu]"
 ```
 
-> [!NOTE] > **macOS**: PyTorch's `+cpu` wheel is only published for Linux and Windows. The `[cpu]` extra resolves this automatically and installs the default `torch==2.10.0` wheel on macOS.
-> **Ultralytics YOLO models**: The PyPI version doesn't include Ultralytics YOLO support.
-> To use YOLO26 models, you must [install from source](#advanced-install-from-source).
+> [!NOTE]
+> For **macOS** users: PyTorch's `+cpu` wheel is only published for Linux and Windows. The `[cpu]` extra resolves this automatically and installs the default `torch==2.10.0` wheel on macOS.
 
 </details>
 
@@ -149,7 +148,8 @@ pip install -e ".[cuda]" \
   --extra-index-url https://download.pytorch.org/whl/cu130
 ```
 
-> [!NOTE] > **Ultralytics YOLO models**: Add `--extra ultralytics` for `uv sync` or `[ultralytics]` for `pip install`:
+> [!NOTE]
+> For **Ultralytics YOLO models**, add `--extra ultralytics` for `uv sync` or `[ultralytics]` for `pip install`:
 >
 > ```bash
 > uv sync --extra xpu --extra ultralytics  # Intel GPU + YOLO
@@ -157,6 +157,34 @@ pip install -e ".[cuda]" \
 > # or with pip
 > pip install -e ".[xpu,ultralytics]" --extra-index-url https://download.pytorch.org/whl/xpu  #Intel GPU + YOLO
 > ```
+
+</details>
+
+<details>
+<summary><a id="legacy-cuda-support"></a><strong> Advanced Installation: Install from Source with Legacy CUDA Support (12.6)</strong></summary>
+
+By default, the `[cuda]` extra builds `torch`/`torchvision` against CUDA 13.0, which doesn't support older NVIDIA GPU
+architectures (Volta, Maxwell, Pascal). If you have one of these GPUs, patch the project to use CUDA 12.6 instead:
+
+```bash
+git clone https://github.com/open-edge-platform/geti.git
+cd geti/library
+
+# Replace CUDA 13.0 with CUDA 12.6 in pyproject.toml and refresh the lockfile
+just patch-for-legacy-gpu-support
+
+# Then install as usual, e.g. with uv
+uv sync --extra cuda         # NVIDIA GPU (CUDA 12.6) — setup: https://developer.nvidia.com/cuda-12-6-0-download-archive
+
+# Or with pip in a virtual environment
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[cuda]" \
+  --extra-index-url https://download.pytorch.org/whl/cu126
+```
+
+> [!NOTE]
+> See [this PyTorch thread](https://github.com/pytorch/pytorch/issues/178665) for more details about what GPUs are
+> supported for each CUDA version.
 
 </details>
 
@@ -375,7 +403,8 @@ engine.train(epochs=50)
 engine.test()
 engine.export()
 
-> ⚠️ **Note**: Ultralytics YOLO models and the `UltralyticsEngine` backend require [installing from source](#advanced-installation-install-from-source) with the `[ultralytics]` extra.
+> [!NOTE]
+> Ultralytics YOLO models and the `UltralyticsEngine` backend require [installing from source](#advanced-installation-install-from-source) with the `[ultralytics]` extra.
 > The PyPI package does **not** include Ultralytics support.
 
 
