@@ -137,7 +137,7 @@ def _entrypoint(
 
     from app.core.jobs.models import Cancelled, Done, Failed, Heartbeat, Progress
 
-    # `report` and `heartbeat` may be called concurrently from different threads within the
+    # `conn.send()` may be called concurrently from different threads within the
     # runnable (e.g. `Execution.heartbeat_during()` ticks on a background thread while the main
     # thread may itself report real progress, such as via a log-derived progress hook during a
     # long blocking call). `Connection.send()` is not guaranteed thread-safe for concurrent
