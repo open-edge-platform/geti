@@ -8,16 +8,18 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, Request, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.api.validators import DatasetRevisionID, ProjectID, SinkID, SourceID
+from app.api.validators import DatasetRevisionID, DatasetViewID, ProjectID, SinkID, SourceID
 from app.core.jobs.control_plane import JobQueue
 from app.db import get_db_session
 from app.models import Project, Sink, Source
 from app.models.dataset_revision import DatasetRevision
+from app.models.dataset_view import DatasetView
 from app.scheduler import Scheduler
 from app.services import (
     BaseWeightsService,
     DatasetRevisionService,
     DatasetService,
+    DatasetViewService,
     LabelService,
     MediaPredictionService,
     MediaService,
@@ -362,3 +364,17 @@ def get_dataset_revision(
 ) -> DatasetRevision:
     """Provides a DatasetService instance."""
     return dataset_revision_service.get_dataset_revision(project_id=project_id, revision_id=dataset_revision_id)
+
+
+def get_dataset_view_service(db: Annotated[Session, Depends(get_db)]) -> DatasetViewService:
+    """Provides a DatasetViewService instance."""
+    return DatasetViewService(db_session=db)
+
+
+def get_dataset_view(
+    project_id: ProjectID,
+    dataset_view_id: DatasetViewID,
+    dataset_view_service: Annotated[DatasetViewService, Depends(get_dataset_view_service)],
+) -> DatasetView:
+    """Provides a DatasetView instance for a request scoped dataset view."""
+    return dataset_view_service.get_dataset_view_by_id(project_id=project_id, dataset_view_id=dataset_view_id)

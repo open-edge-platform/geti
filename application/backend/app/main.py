@@ -38,6 +38,7 @@ from app.api.cache_utils import CachedStaticFiles
 from app.api.routers import (
     dataset_ie,
     dataset_revisions,
+    dataset_views,
     datasets,
     jobs,
     media,
@@ -87,6 +88,7 @@ def create_app() -> FastAPI:
     # Include all API routers from the routers package
     app.include_router(dataset_ie.router)
     app.include_router(dataset_revisions.router)
+    app.include_router(dataset_views.router)
     app.include_router(datasets.router)
     app.include_router(jobs.router)
     app.include_router(license_api.router)
@@ -136,6 +138,14 @@ def create_app() -> FastAPI:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"detail": str(exc)},
+        )
+
+    @app.exception_handler(NotImplementedError)
+    async def not_implemented_exception_handler(request: Request, exc: NotImplementedError) -> JSONResponse:  # noqa: ARG001
+        """Catch not-implemented errors (features under construction) and return a 501 response"""
+        return JSONResponse(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            content={"detail": str(exc) or "This feature is not implemented yet."},
         )
 
     static_dir = settings.static_files_dir

@@ -124,6 +124,28 @@ class DatasetItemDB(Base):
     subset_assigned_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
 
 
+class DatasetViewDB(BaseID):
+    __tablename__ = "dataset_views"
+    __table_args__ = (
+        Index("idx_dataset_views_project", "project_id"),
+        UniqueConstraint("project_id", "name", name="uq_project_dataset_view_name"),
+    )
+
+    project_id: Mapped[str] = mapped_column(Text, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+
+
+class DatasetViewItemDB(Base):
+    __tablename__ = "dataset_view_items"
+
+    dataset_view_id: Mapped[str] = mapped_column(
+        Text, ForeignKey("dataset_views.id", ondelete="CASCADE"), primary_key=True
+    )
+    dataset_item_id: Mapped[str] = mapped_column(
+        Text, ForeignKey("dataset_items.id", ondelete="CASCADE"), primary_key=True
+    )
+
+
 class MediaDB(BaseID):
     __tablename__ = "media"
     __table_args__ = (
