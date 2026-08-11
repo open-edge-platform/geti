@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fireEvent, screen } from '@testing-library/react';
-import dayjs from 'dayjs';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { useProjectLabels } from 'hooks/use-project-labels.hook';
 import { getMockedLabel } from 'mocks/mock-labels';
@@ -22,7 +21,8 @@ const mockLabels = [getMockedLabel({ id: 'label-1', name: 'Cat' }), getMockedLab
 
 const mockSetSelectedLabelIds = vi.fn();
 const mockSetAnnotationStatus = vi.fn();
-const mockSetDateRange = vi.fn();
+const mockSetStartDate = vi.fn();
+const mockSetEndDate = vi.fn();
 const mockSetSelectedSubsets = vi.fn();
 
 const mockUseDatasetFiltersSearchParams = (overrides?: Partial<ReturnType<typeof useDatasetFiltersSearchParams>>) => {
@@ -32,8 +32,9 @@ const mockUseDatasetFiltersSearchParams = (overrides?: Partial<ReturnType<typeof
         annotationStatus: null,
         setAnnotationStatus: mockSetAnnotationStatus,
         startDate: null,
+        setStartDate: mockSetStartDate,
         endDate: null,
-        setDateRange: mockSetDateRange,
+        setEndDate: mockSetEndDate,
         setSortDirection: vi.fn(),
         sortDirection: 'desc',
         selectedSubsets: [],
@@ -84,31 +85,13 @@ describe('ActiveFilters', () => {
         expect(screen.getByText('Media with missing annotations')).toBeVisible();
     });
 
-    it('renders a single chip for the date range filter', () => {
-        mockUseDatasetFiltersSearchParams({
-            startDate: '2026-01-01T09:00:00.000Z',
-            endDate: '2026-01-31T17:30:00.000Z',
-        });
+    it('renders chips for the start and end date filters', () => {
+        mockUseDatasetFiltersSearchParams({ startDate: '2026-01-01', endDate: '2026-01-31' });
 
         render(<ActiveFilters />);
 
-        const start = dayjs('2026-01-01T09:00:00.000Z').format('DD/MM/YYYY HH:mm');
-        const end = dayjs('2026-01-31T17:30:00.000Z').format('DD/MM/YYYY HH:mm');
-
-        expect(screen.getByText(`${start} - ${end}`)).toBeVisible();
-    });
-
-    it('clears both bounds when the date range chip is closed', () => {
-        mockUseDatasetFiltersSearchParams({
-            startDate: '2026-01-01T09:00:00.000Z',
-            endDate: '2026-01-31T17:30:00.000Z',
-        });
-
-        render(<ActiveFilters />);
-
-        fireEvent.click(screen.getByRole('button', { name: /^Remove .* filter$/ }));
-
-        expect(mockSetDateRange).toHaveBeenCalledWith(null, null);
+        expect(screen.getByText('From 01/01/2026')).toBeVisible();
+        expect(screen.getByText('To 31/01/2026')).toBeVisible();
     });
 
     it('renders chips for the selected subsets', () => {
@@ -155,7 +138,8 @@ describe('ActiveFilters', () => {
 
         expect(mockSetSelectedLabelIds).toHaveBeenCalledWith([]);
         expect(mockSetAnnotationStatus).toHaveBeenCalledWith(null);
-        expect(mockSetDateRange).toHaveBeenCalledWith(null, null);
+        expect(mockSetStartDate).toHaveBeenCalledWith(null);
+        expect(mockSetEndDate).toHaveBeenCalledWith(null);
         expect(mockSetSelectedSubsets).toHaveBeenCalledWith([]);
     });
 });
