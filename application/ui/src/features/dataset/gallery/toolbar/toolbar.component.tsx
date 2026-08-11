@@ -35,10 +35,6 @@ import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
 import { toggleMultipleSelection } from './util';
 
-// Copyright (C) 2025-2026 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
-// Copyright (C) 2025-2026 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
 type ToolbarProps = {
     items: Media[];
     viewMode: ViewModes;

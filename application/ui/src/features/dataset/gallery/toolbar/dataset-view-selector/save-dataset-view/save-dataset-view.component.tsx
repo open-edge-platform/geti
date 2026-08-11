@@ -16,7 +16,7 @@ type SaveDatasetViewDialogProps = {
 const SaveDatasetViewDialog = ({ onClose, selectedMediaIds }: SaveDatasetViewDialogProps) => {
     const [viewName, setViewName] = useState<string>('');
 
-    const isSaveDisabled = isEmpty(viewName);
+    const isSaveDisabled = isEmpty(viewName.trim());
 
     const saveView = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
