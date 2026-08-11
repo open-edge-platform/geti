@@ -67,13 +67,17 @@ const decodeLabelsParam = (raw: string): string => {
     }
 };
 
+const setOrDeleteParam = (params: URLSearchParams, key: string, value: string | null) => {
+    if (value === null || value === undefined) {
+        params.delete(key);
+    } else {
+        params.set(key, value);
+    }
+};
+
 const updateSearchParam = (setSearchParams: SetURLSearchParams, key: string, value: string | null) => {
     setSearchParams((prev) => {
-        if (value === null || value === undefined) {
-            prev.delete(key);
-        } else {
-            prev.set(key, value);
-        }
+        setOrDeleteParam(prev, key, value);
 
         return prev;
     });
@@ -121,6 +125,16 @@ export const useDatasetFiltersSearchParams = () => {
         updateSearchParam(setSearchParams, END_DATE_PARAM, date);
     };
 
+    // Updates both bounds at once, so that changing a range does not go through an intermediate state
+    const setDateRange = (start: string | null, end: string | null) => {
+        setSearchParams((prev) => {
+            setOrDeleteParam(prev, START_DATE_PARAM, start);
+            setOrDeleteParam(prev, END_DATE_PARAM, end);
+
+            return prev;
+        });
+    };
+
     const setSortDirection = (direction: SortDirection) => {
         updateSearchParam(setSearchParams, SORT_DIRECTION_PARAM, direction);
     };
@@ -139,6 +153,7 @@ export const useDatasetFiltersSearchParams = () => {
         setStartDate,
         endDate,
         setEndDate,
+        setDateRange,
         sortDirection,
         setSortDirection,
         selectedSubsets,

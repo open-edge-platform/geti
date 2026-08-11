@@ -12,10 +12,12 @@ import classes from './date-filter.module.scss';
 
 const MIN_DATE = parseAbsoluteToLocal(dayjs('2020-01-30').startOf('d').toISOString());
 
+export const INVALID_RANGE_MESSAGE = 'End date must be later than start date';
+
 const parseDate = (date: string | null): ZonedDateTime | null => (date === null ? null : parseAbsoluteToLocal(date));
 
 export const DateFilter = () => {
-    const { startDate, endDate, setStartDate, setEndDate } = useDatasetFiltersSearchParams();
+    const { startDate, endDate, setDateRange } = useDatasetFiltersSearchParams();
 
     // Media cannot be uploaded in the future
     const maxDate = now(getLocalTimeZone());
@@ -38,28 +40,16 @@ export const DateFilter = () => {
         const newStartDate = start === null ? null : start.toDate().toISOString();
         const newEndDate = end === null ? null : end.toDate().toISOString();
 
-        if (newStartDate !== startDate) {
-            setStartDate(newStartDate);
-        }
-
-        if (newEndDate !== endDate) {
-            setEndDate(newEndDate);
+        if (newStartDate !== startDate || newEndDate !== endDate) {
+            setDateRange(newStartDate, newEndDate);
         }
     };
 
     const handleStartDateChange = (date: ZonedDateTime | null) => {
-        if (date === null) {
-            return;
-        }
-
         applyDates(date, endValue);
     };
 
     const handleEndDateChange = (date: ZonedDateTime | null) => {
-        if (date === null) {
-            return;
-        }
-
         applyDates(startValue, date);
     };
 
@@ -90,6 +80,8 @@ export const DateFilter = () => {
                     maxValue={maxDate}
                     value={endValue}
                     onChange={handleEndDateChange}
+                    validationState={invalidRange === null ? undefined : 'invalid'}
+                    errorMessage={INVALID_RANGE_MESSAGE}
                 />
             </Flex>
         </Flex>
