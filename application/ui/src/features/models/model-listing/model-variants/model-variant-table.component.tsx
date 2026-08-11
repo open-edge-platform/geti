@@ -120,6 +120,7 @@ export const ModelVariantTable = ({ model, format }: ModelVariantTableProps) => 
                 {(variant) => {
                     const performanceValue = getVariantPerformanceValue(variant, fp32PytorchMetric);
                     const isBaselineVariant = variant.id === baselineVariant?.id;
+                    const areWeightsDeleted = model.files_deleted || variant.files_deleted;
 
                     return (
                         <Row key={variant.id}>
@@ -131,8 +132,8 @@ export const ModelVariantTable = ({ model, format }: ModelVariantTableProps) => 
                                     value={variant.weights_size}
                                     baselineValue={baselineVariant?.weights_size}
                                     changeType='size'
-                                    displayValue={formatBytes(variant.weights_size)}
-                                    showDelta={!isBaselineVariant}
+                                    displayValue={areWeightsDeleted ? '-' : formatBytes(variant.weights_size)}
+                                    showDelta={!isBaselineVariant && !areWeightsDeleted}
                                     precision={variant.precision}
                                 />
                             </Cell>
@@ -149,6 +150,7 @@ export const ModelVariantTable = ({ model, format }: ModelVariantTableProps) => 
                                 <Flex gap={'size-100'} justifyContent='end' alignItems='center'>
                                     <ActionButton
                                         isQuiet
+                                        isDisabled={areWeightsDeleted}
                                         aria-label={`Download model ${variant.id}`}
                                         onPress={() => handleDownloadModel(variant)}
                                     >
