@@ -175,3 +175,34 @@ class TestMapCompiledOutputKeys:
         compiled_model = self._compiled([{"renamed_by_nncf"}, {"labels"}])
 
         assert OVModel._map_compiled_output_keys(wrapper, compiled_model) == ["boxes", "labels"]
+
+
+class TestSelectPrimaryMetric:
+    """Tests for choosing the accuracy indicator of accuracy-aware quantization."""
+
+    def test_returns_first_scalar_tensor(self) -> None:
+        results = {"map": torch.tensor(0.75), "map_50": torch.tensor(0.9)}
+
+        assert OVModel._select_primary_metric(results) == pytest.approx(0.75)
+
+    def test_returns_plain_number(self) -> None:
+        assert OVModel._select_primary_metric({"Dice": 0.5}) == pytest.approx(0.5)
+
+    def test_skips_leading_non_scalar_entries(self) -> None:
+        """The multi-label classification metric emits confusion matrices first."""
+        results = {
+            "conf_matrix": [torch.zeros(2, 2), torch.zeros(2, 2)],
+            "accuracy": torch.tensor(0.8),
+            "map": torch.tensor(0.6),
+        }
+
+        assert OVModel._select_primary_metric(results) == pytest.approx(0.8)
+
+    def test_skips_multi_element_tensors(self) -> None:
+        results = {"map_per_class": torch.tensor([0.1, 0.2]), "accuracy": torch.tensor(0.4)}
+
+        assert OVModel._select_primary_metric(results) == pytest.approx(0.4)
+
+    def test_raises_when_no_scalar_metric(self) -> None:
+        with pytest.raises(RuntimeError, match="No scalar metric"):
+            OVModel._select_primary_metric({"conf_matrix": [torch.zeros(2, 2)]})
