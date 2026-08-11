@@ -576,6 +576,18 @@ function Build-Frontend {
     try {
         $env:npm_config_yes = "true"
 
+        # Remove build artifacts and cloned workspace packages left over from a
+        # previous build/version. `git checkout --force` does not touch these
+        # untracked paths, and stale contents make `npm ci` fail with
+        # "package.json and package-lock.json are not in sync" (e.g. a missing
+        # @geti/ui workspace package from the old revision).
+        foreach ($stale in @("node_modules", "packages", "dist")) {
+            $stalePath = Join-Path $uiDir $stale
+            if (Test-Path $stalePath) {
+                Remove-Item -Path $stalePath -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
+
         # The 'preinstall' hook clones geti_v2 via `npx tiged`, which contains
         # files with very long paths that exceed the Windows MAX_PATH (260) limit
         # and fail checkout with "Filename too long". Enable git long-path support

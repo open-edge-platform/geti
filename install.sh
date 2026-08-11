@@ -530,6 +530,13 @@ build_backend() {
 build_frontend() {
     cd "$WORK_DIR/application/ui"
     export npm_config_yes=true
+
+    # Remove build artifacts and cloned workspace packages left over from a
+    # previous build/version. `git checkout --force` does not touch these
+    # untracked paths, and stale contents make `npm ci` fail with
+    # "package.json and package-lock.json are not in sync".
+    rm -rf node_modules packages dist
+
     # --foreground-scripts surfaces lifecycle-script errors (e.g. the
     # 'preinstall' UI-package clone) in the log instead of a generic exit code.
     run_cmd_spinner "Installing UI dependencies (this may take several minutes)" "$NPM_BIN" ci --foreground-scripts
