@@ -7,6 +7,7 @@
 }
 
 .datasetViewInListItem {
+    cursor: pointer;
     border: var(--spectrum-alias-border-size-thin) solid transparent;
     background-color: var(--spectrum-global-color-gray-100);
 

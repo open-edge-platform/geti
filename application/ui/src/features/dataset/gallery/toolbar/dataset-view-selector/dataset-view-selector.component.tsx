@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
     AlertDialog,
@@ -16,6 +16,7 @@ import {
 } from '@geti-ui/ui';
 import { ChevronDownSmall } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
+import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { isEmpty } from 'lodash-es';
 
 import { DatasetView, DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
@@ -83,17 +84,18 @@ type DatasetViewSelectorProps = {
 };
 
 const ENTIRE_DATASET = {
-    id: 'entire-dataset-id',
+    id: ENTIRE_DATASET_VIEW_ID,
     name: 'Entire dataset',
 };
 
 export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) => {
     const [isDatasetViewSelectorOpen, setIsDatasetViewSelectorOpen] = useState<boolean>(false);
-    const datasetViewsWithDefaultView = [ENTIRE_DATASET, ...datasetViews];
+    const datasetViewsWithDefaultView = useMemo(() => {
+        return [ENTIRE_DATASET, ...datasetViews];
+    }, [datasetViews]);
 
-    const selectedDatasetViewId = datasetViewsWithDefaultView[0].id;
-    const selectedDatasetView =
-        datasetViewsWithDefaultView.find((item) => item.id === selectedDatasetViewId) ?? datasetViews[0];
+    const [datasetViewId, setDatasetViewId] = useDatasetViewId();
+    const selectedDatasetView = datasetViewsWithDefaultView.find((item) => item.id === datasetViewId) ?? ENTIRE_DATASET;
 
     const [datasetViewToBeDeleted, setDatasetViewToBeDeleted] = useState<DatasetView | null>(null);
     const isDeleteDialogOpen = datasetViewToBeDeleted !== null;
@@ -113,6 +115,19 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
 
     const onlyEntireDatasetView = isEmpty(datasetViews);
 
+    // When the datasetViewId is invalid, i.e. not found in the datasetViews array, set it to the default view id.
+    // TODO: Once backend is ready, check if we can remove `useEffect`.
+    useEffect(() => {
+        if (!datasetViewsWithDefaultView.some(({ id }) => id === datasetViewId)) {
+            setDatasetViewId(ENTIRE_DATASET_VIEW_ID);
+        }
+    }, [datasetViewId, datasetViewsWithDefaultView, setDatasetViewId]);
+
+    const onSelectDatasetView = (id: string) => {
+        setDatasetViewId(id);
+        setIsDatasetViewSelectorOpen(false);
+    };
+
     return (
         <Flex gap={'size-100'} alignItems={'center'}>
             <Text UNSAFE_className={classes.viewsTitle}>Views</Text>
@@ -130,9 +145,9 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
                         <DatasetViewItemsList
                             entireDatasetView={ENTIRE_DATASET}
                             otherDatasetViews={datasetViews}
-                            selectedDatasetViewId={selectedDatasetViewId}
+                            selectedDatasetViewId={datasetViewId}
                             onOpenDeleteConfirmationDialog={openDeleteConfirmationDialog}
-                            onSelectDatasetView={() => {}}
+                            onSelectDatasetView={onSelectDatasetView}
                         />
                     </Content>
                 </Dialog>
