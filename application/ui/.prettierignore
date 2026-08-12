@@ -6,4 +6,4 @@ src-tauri/bin
 src-tauri/target
 src-tauri/gen
 
-vendor/
+/vendor/
