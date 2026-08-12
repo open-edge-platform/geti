@@ -15,27 +15,27 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
 
 ## App Layout (`app/`)
 
-| Module / package      | Responsibility                                                                                                                  |
-| --------------------- |---------------------------------------------------------------------------------------------------------------------------------|
-| `main.py`             | FastAPI app entry point: registers routers, middleware, exception handlers, static files.                                       |
-| `lifecycle.py`        | Lifespan context: startup (DB init, services, workers, scheduler) and shutdown.                                                 |
-| `settings.py`         | `pydantic-settings` config loaded from environment/`.env` (paths, ports, DB URL, limits).                                       |
-| `cli.py`              | Click CLI for DB ops (`init_db`, `migrate`, `check_db`, …) and helpers.                                                         |
-| `create_openapi.py`   | Generates the OpenAPI spec JSON consumed by the UI.                                                                             |
-| `scheduler.py`        | Orchestrates worker processes and multiprocessing queues.                                                                       |
-| `api/`                | HTTP layer: `routers/`, `schemas/` (Pydantic DTOs), `dependencies.py`, `validators.py`.                                         |
-| `services/`           | Business logic; orchestrates repositories and workflows.                                                                        |
-| `repositories/`       | Data access; generic `BaseRepository` + per-resource repos wrapping ORM models.                                                 |
-| `models/`             | Domain/business models (Pydantic), separate from ORM models.                                                                    |
-| `db/`                 | SQLAlchemy ORM (`schema.py`), engine/session (`engine.py`), migration mgmt (`migration.py`).                                    |
-| `alembic/`            | Alembic env and `versions/` migration scripts.                                                                                  |
-| `core/`               | Core infrastructure: `jobs/` (queue/controller/exec), `run/`, `logging/`, core models.                                          |
-| `execution/`          | Long-running job implementations: `training/`, `dataset_export/`, `dataset_import/`, `quantization/` (lazy-imported builders).  |
-| `workers/`            | Multiprocessing workers for real-time tasks (inference, stream loading, dispatch).                                              |
-| `stream/`, `webrtc/`  | Real-time video streaming and WebRTC connection handling.                                                                       |
-| `datumaro_converter/` | Dataset format conversion (Geti internal ↔ COCO/VOC/… via Datumaro).                                                            |
-| `supported_models/`   | Recommended model architectures/manifests by task type.                                                                         |
-| `utils/`              | Shared utilities.                                                                                                               |
+| Module / package      | Responsibility |
+| --------------------- | -------------- |
+| `main.py`             | FastAPI app entry point: registers routers, middleware, exception handlers, static files. |
+| `lifecycle.py`        | Lifespan context: startup (DB init, services, workers, scheduler) and shutdown. |
+| `settings.py`         | `pydantic-settings` config loaded from environment/`.env` (paths, ports, DB URL, limits). |
+| `cli.py`              | Click CLI for DB ops (`init_db`, `migrate`, `check_db`, …) and helpers. |
+| `create_openapi.py`   | Generates the OpenAPI spec JSON consumed by the UI. |
+| `scheduler.py`        | Orchestrates worker processes and multiprocessing queues. |
+| `api/`                | HTTP layer: `routers/`, `schemas/` (Pydantic DTOs), `dependencies.py`, `validators.py`. |
+| `services/`           | Business logic; orchestrates repositories and workflows. |
+| `repositories/`       | Data access; generic `BaseRepository` + per-resource repos wrapping ORM models. |
+| `models/`             | Domain/business models (Pydantic), separate from ORM models. |
+| `db/`                 | SQLAlchemy ORM (`schema.py`), engine/session (`engine.py`), migration mgmt (`migration.py`). |
+| `alembic/`            | Alembic env and `versions/` migration scripts. |
+| `core/`               | Core infrastructure: `jobs/` (queue/controller/exec), `run/`, `logging/`, core models. |
+| `execution/`          | Long-running job implementations: `training/`, `dataset_export/`, `dataset_import/`, `quantization/` (lazy-imported builders). |
+| `workers/`            | Multiprocessing workers for real-time tasks (inference, stream loading, dispatch). |
+| `stream/`, `webrtc/`  | Real-time video streaming and WebRTC connection handling. |
+| `datumaro_converter/` | Dataset format conversion (Geti internal ↔ COCO/VOC/… via Datumaro). |
+| `supported_models/`   | Recommended model architectures/manifests by task type. |
+| `utils/`              | Shared utilities. |
 
 ## Layered Architecture (import-linter)
 
@@ -140,18 +140,18 @@ Follow the layering top-to-bottom:
 Work from `application/backend/`. See `.github/instructions/backend.instructions.md`
 for the full table.
 
-| Task                    | Recipe                                              |
-| ----------------------- | --------------------------------------------------- |
-| Create venv             | `just venv --accelerator cpu\|xpu\|cuda`            |
-| Refresh lockfile        | `just venv-lock`                                    |
-| Lint + type-check       | `just lint`                                         |
-| Auto-fix lint           | `just ruff-fix`                                     |
-| Import-graph check      | `just lint-imports`                                 |
-| Unit tests              | `just test-unit -- <pytest args>`                   |
-| Integration tests       | `just test-integration -- <pytest args>`            |
-| BDD tests               | `just test-bdd -- <behave args>`                    |
+| Task                    | Recipe                                          |
+| ----------------------- | ----------------------------------------------- |
+| Create venv             | `just venv --accelerator cpu\|xpu\|cuda`        |
+| Refresh lockfile        | `just venv-lock`                                |
+| Lint + type-check       | `just lint`                                     |
+| Auto-fix lint           | `just ruff-fix`                                 |
+| Import-graph check      | `just lint-imports`                             |
+| Unit tests              | `just test-unit -- <pytest args>`               |
+| Integration tests       | `just test-integration -- <pytest args>`        |
+| BDD tests               | `just test-bdd -- <behave args>`                |
 | Regenerate OpenAPI spec | `just gen-api-spec --output-path openapi-spec.json` |
-| Start server            | `just run-server`                                   |
+| Start server            | `just run-server`                               |
 
 ## Conventions & Guardrails
 
