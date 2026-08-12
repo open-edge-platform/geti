@@ -73,7 +73,7 @@ $ErrorActionPreference = "Stop"
 $GIT_URL = "https://github.com/open-edge-platform/geti.git"
 # GIT_BRANCH can be overridden via the GIT_BRANCH environment variable or the
 # -GitBranch parameter (for testing purposes).
-$GIT_BRANCH = "app/v3.1.0rc4"
+$GIT_BRANCH = "nightly-2026.06.19"
 if ($GitBranch) {
     $GIT_BRANCH = $GitBranch
 }
