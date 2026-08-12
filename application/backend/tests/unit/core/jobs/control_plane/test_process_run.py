@@ -7,7 +7,8 @@ from unittest.mock import Mock, patch
 import pytest
 
 from app.core.jobs.exec import ProcessRun
-from app.core.jobs.models import Job, Progress
+from app.core.jobs.exec.process_run import _entrypoint
+from app.core.jobs.models import Heartbeat, Job, Progress
 from app.core.jobs.models.events import Done, Failed, Started
 from app.core.run import RunnableFactory
 
@@ -183,3 +184,88 @@ class TestProcessRun:
 
                 # Should log error about unkillable process
                 mock_logger.error.assert_called_with("Process {} doesn't respond to SIGKILL", "test-process")
+
+
+class TestEntrypoint:
+    """Test cases for the child-process ``_entrypoint`` function, in particular the wiring of the
+    ``report`` and ``heartbeat`` callbacks into the ``ExecutionContext`` passed to the runnable.
+    """
+
+    @pytest.fixture
+    def fxt_cancel_event(self):
+        event = Mock()
+        event.is_set.return_value = False
+        return event
+
+    def test_entrypoint_wires_report_and_heartbeat_into_context(self, fxt_cancel_event):
+        """``ctx.report`` and ``ctx.heartbeat`` calls made by the runnable are forwarded to the
+        parent process as ``Progress`` and ``Heartbeat`` events, respectively.
+        """
+        conn = Mock()
+
+        class DummyRunnable:
+            def run(self, ctx):
+                ctx.report("halfway there", 50.0, {"key": "value"})
+                ctx.heartbeat()
+
+        get_runnable = Mock(return_value=DummyRunnable())
+
+        with (
+            patch("app.core.jobs.exec.process_run.logging_ctx"),
+            patch("app.core.jobs.exec.process_run.get_settings"),
+        ):
+            _entrypoint(get_runnable, "train", "log.txt", "{}", conn, fxt_cancel_event)
+
+        sent_events = [call_args.args[0] for call_args in conn.send.call_args_list]
+        assert sent_events == [
+            Started(),
+            Progress(message="halfway there", value=50.0, metadata={"key": "value"}),
+            Heartbeat(),
+            Done(),
+        ]
+
+    def test_entrypoint_heartbeat_ignores_cancellation(self, fxt_cancel_event):
+        """Unlike ``report``, ``heartbeat`` must not raise on cancellation: it's a passive liveness
+        signal that may be called from a background thread, not a cooperative-cancellation point.
+        """
+        conn = Mock()
+        fxt_cancel_event.is_set.return_value = True  # job is being cancelled
+
+        class DummyRunnable:
+            def run(self, ctx):
+                ctx.heartbeat()  # must not raise even though cancellation was requested
+
+        get_runnable = Mock(return_value=DummyRunnable())
+
+        with (
+            patch("app.core.jobs.exec.process_run.logging_ctx"),
+            patch("app.core.jobs.exec.process_run.get_settings"),
+        ):
+            _entrypoint(get_runnable, "train", "log.txt", "{}", conn, fxt_cancel_event)
+
+        sent_events = [call_args.args[0] for call_args in conn.send.call_args_list]
+        assert Heartbeat() in sent_events
+        assert Done() in sent_events  # run() completed normally, no CancelledExc was raised
+
+    def test_entrypoint_heartbeat_swallows_send_errors(self, fxt_cancel_event):
+        """If the pipe is unusable when a heartbeat fires, the error is swallowed silently."""
+        conn = Mock()
+
+        class DummyRunnable:
+            def run(self, ctx):
+                ctx.heartbeat()
+
+        get_runnable = Mock(return_value=DummyRunnable())
+
+        def _send(event):
+            if isinstance(event, Heartbeat):
+                raise OSError("broken pipe")
+
+        conn.send.side_effect = _send
+
+        with (
+            patch("app.core.jobs.exec.process_run.logging_ctx"),
+            patch("app.core.jobs.exec.process_run.get_settings"),
+        ):
+            # Must not raise despite the heartbeat's conn.send() failing.
+            _entrypoint(get_runnable, "train", "log.txt", "{}", conn, fxt_cancel_event)

@@ -9,7 +9,7 @@ import pytest
 
 from app.core.jobs import CancellationResult
 from app.core.jobs.control_plane import JobController, JobQueue
-from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, JobStatus, Progress, Started
+from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, Heartbeat, JobStatus, Progress, Started
 from app.core.run import RunnerFactory
 
 
@@ -261,6 +261,27 @@ class TestJobController:
 
         assert job.status == expected_status
         assert job.progress == expected_progress
+
+    @pytest.mark.asyncio
+    async def test_handle_job_events_heartbeat_keeps_job_alive_without_progress_change(
+        self, fxt_job_controller, fxt_job
+    ):
+        """Heartbeat events must refresh ``updated_at`` without touching message/progress."""
+        job = fxt_job()
+        job.advance(percent=42.0, msg="Working on it")
+        stale_updated_at = job.updated_at
+
+        event_queue = asyncio.Queue()
+        await event_queue.put(Heartbeat())
+        await event_queue.put(None)  # Signal end  # pyrefly: ignore[bad-argument-type]
+
+        with patch("app.core.jobs.models.job.now_utc_ts", return_value=stale_updated_at + 100):
+            await fxt_job_controller._handle_job_events(job, event_queue)
+
+        assert job.status == JobStatus.PENDING  # heartbeat alone doesn't change status
+        assert job.progress == 42.0  # progress is untouched by a heartbeat
+        assert job.message == "Working on it"  # message is untouched by a heartbeat
+        assert job.updated_at == stale_updated_at + 100  # but the liveness timestamp is refreshed
 
     @pytest.mark.asyncio
     async def test_setup_job_execution_creates_thread_and_cancel_task(

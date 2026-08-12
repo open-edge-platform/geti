@@ -570,7 +570,10 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 case _:
                     raise ExecutionErr(f"Unsupported model variant format for evaluation: {variant.format}")
 
-            metrics = engine.test(metric=metric_callable)
+            # Evaluating a variant is a single, non-instrumented blocking call that can take a
+            # while for large test sets; heartbeat so it isn't mistaken for a stale/hung job.
+            with self.heartbeat_during():
+                metrics = engine.test(metric=metric_callable)
             self._save_evaluation_result(
                 metrics=metrics,
                 model_revision_id=model_revision_id,
@@ -605,19 +608,21 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
 
         """Export the trained model to desired OpenVINO and ONNX formats"""
         logger.info("Exporting the model to OpenVINO format (FP16 precision)...")
-        exported_ov_model_path = getitune_engine.export(
-            checkpoint=model_checkpoint_path,
-            export_format=ExportFormat.OPENVINO,
-            export_precision=Precision.FP16,
-        )
+        with self.heartbeat_during():
+            exported_ov_model_path = getitune_engine.export(
+                checkpoint=model_checkpoint_path,
+                export_format=ExportFormat.OPENVINO,
+                export_precision=Precision.FP16,
+            )
         logger.info("Model exported to OpenVINO format: {}", exported_ov_model_path)
 
         logger.info("Exporting the model to ONNX format (FP16 precision)...")
-        exported_onnx_model_path = getitune_engine.export(
-            checkpoint=model_checkpoint_path,
-            export_format=ExportFormat.ONNX,
-            export_precision=Precision.FP16,
-        )
+        with self.heartbeat_during():
+            exported_onnx_model_path = getitune_engine.export(
+                checkpoint=model_checkpoint_path,
+                export_format=ExportFormat.ONNX,
+                export_precision=Precision.FP16,
+            )
         logger.info("Model exported to ONNX format: {}", exported_onnx_model_path)
         return ExportedModels(openvino_model_path=exported_ov_model_path, onnx_model_path=exported_onnx_model_path)
 

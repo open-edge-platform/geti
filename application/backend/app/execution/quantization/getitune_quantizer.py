@@ -2,9 +2,11 @@
 # SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 
+import logging
+import re
 import shutil
-from collections.abc import Callable
-from contextlib import AbstractContextManager
+from collections.abc import Callable, Iterator
+from contextlib import AbstractContextManager, contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -33,6 +35,91 @@ from app.models.jobs.quantization_job import QuantizationJobParams
 from app.models.model_revision import ModelFormat, ModelPrecision, ModelVariant
 from app.models.project import Task
 from app.services import DatasetRevisionService, ModelService, ProjectService, TrainingConfigurationService
+
+# The "Run Quantization" step spans this range of overall job progress (see the neighboring
+# @step(...) completion percentages in this file: "Initialize OV Engine" ends at 25, and this
+# step itself is declared as complete=80). Interior progress derived from NNCF's accuracy-aware
+# restoration loop (see `_AccuracyControlIterationLogHandler` below) is interpolated within these
+# bounds so it fits the same overall-job-progress scale as every other step. Keep these two
+# constants in sync if the neighboring steps' declared completion percentages ever change.
+_QUANTIZATION_STEP_START_PERCENT = 25.0
+_QUANTIZATION_STEP_END_PERCENT = 80.0
+
+# Logged unconditionally, exactly once per iteration of NNCF's accuracy-restoration loop
+# (`for iteration in range(self.max_num_iterations)` in
+# nncf/quantization/algorithms/accuracy_control/algorithm.py), right after a group of quantizers
+# is reverted to floating-point precision and before the loop's termination checks. This makes it
+# a reliable 1:1 marker of loop progress -- see `_AccuracyControlIterationLogHandler`.
+_ACCURACY_CONTROL_ITERATION_LOG_RE = re.compile(r"^Reverted \d+ operations? to the floating-point precision")
+
+
+class _AccuracyControlIterationLogHandler(logging.Handler):
+    """Derives real (non-heartbeat) progress from NNCF's accuracy-aware quantization log output.
+
+    Neither ``nncf.quantize()`` nor ``nncf.quantize_with_accuracy_control()`` accept any
+    progress/callback parameter (verified against their public signatures and the
+    ``AdvancedQuantizationParameters`` / ``AdvancedAccuracyRestorerParameters`` dataclasses -- there
+    is none). However, NNCF's ``nncf_logger`` is a plain ``logging.Logger`` (see
+    ``nncf.common.logging.logger``) that we can attach an extra handler to without touching any
+    private/internal state, and its iterative accuracy-restoration loop logs one INFO message per
+    iteration unconditionally. Since we already know the iteration bound (it's the
+    ``max_num_iterations`` value *we* pass into NNCF), counting these messages yields an accurate,
+    bounded progress percentage for the otherwise un-instrumented, potentially very long blocking
+    call.
+
+    This is deliberately best-effort and defensive: if NNCF ever changes this log message, matching
+    simply stops (silently, see ``emit``), and quantization keeps working exactly as before, backed
+    by the unconditional ``Execution.heartbeat_during()`` liveness signal.
+    """
+
+    def __init__(self, on_iteration: Callable[[int], None]) -> None:
+        super().__init__(level=logging.INFO)
+        self._on_iteration = on_iteration
+        self._iterations_seen = 0
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            if _ACCURACY_CONTROL_ITERATION_LOG_RE.match(record.getMessage()):
+                self._iterations_seen += 1
+                self._on_iteration(self._iterations_seen)
+        except Exception:
+            # This is a best-effort progress hook piggy-backing on a third-party library's log
+            # output; a failure here must never break the actual quantization call.
+            logger.opt(exception=True).debug("Failed to derive progress from an NNCF log record")
+
+
+@contextmanager
+def _track_accuracy_control_progress(
+    report_progress: Callable[[float], None], max_num_iterations: int | None
+) -> Iterator[None]:
+    """Report real interior progress during NNCF's accuracy-aware restoration loop, if bounded.
+
+    Standard PTQ (``max_drop=None``) has no such iterative loop at all -- there's nothing to
+    interpolate, and ``Execution.heartbeat_during()`` remains the only liveness signal for that
+    case. Likewise, if ``max_num_iterations`` is left unbounded, there's no known denominator to
+    compute a percentage against, so this is a no-op in both cases.
+    """
+    if not max_num_iterations:
+        yield
+        return
+
+    known_max_num_iterations: int = max_num_iterations
+
+    def _on_iteration(iteration: int) -> None:
+        fraction = min(iteration / known_max_num_iterations, 1.0)
+        percent = (
+            _QUANTIZATION_STEP_START_PERCENT
+            + (_QUANTIZATION_STEP_END_PERCENT - _QUANTIZATION_STEP_START_PERCENT) * fraction
+        )
+        report_progress(percent)
+
+    handler = _AccuracyControlIterationLogHandler(_on_iteration)
+    nncf_logger = logging.getLogger("nncf")
+    nncf_logger.addHandler(handler)
+    try:
+        yield
+    finally:
+        nncf_logger.removeHandler(handler)
 
 
 @dataclass(frozen=True)
@@ -253,12 +340,31 @@ class GetiTuneQuantizer(Execution[QuantizationJobParams]):
         Returns:
             Path to the quantized model XML file.
         """
-        logger.info("Running quantization with max_calibration_subset_size={}", subset_size)
-        quantized_model_path = ov_engine.optimize(
-            max_data_subset_size=subset_size,
-            max_drop=max_drop,
-            max_num_iterations=max_num_iterations,
+        logger.info(
+            "Running quantization with max_calibration_subset_size={}, max_drop={}, max_num_iterations={}",
+            subset_size,
+            max_drop,
+            max_num_iterations,
         )
+        # NNCF's PTQ / accuracy-aware quantization runs as a single blocking call. Its public API
+        # (nncf.quantize / nncf.quantize_with_accuracy_control) has no progress-callback parameter,
+        # so we combine two complementary signals for the duration of the call:
+        #   1. heartbeat_during(): an unconditional liveness signal (see Execution.heartbeat_during)
+        #      so the job isn't mistakenly killed by the async task stale-job monitor while
+        #      genuinely still working, regardless of whether real progress can be derived below.
+        #   2. _track_accuracy_control_progress(): best-effort *real* progress, derived from NNCF's
+        #      own per-iteration log output during accuracy-aware quantization (the case most
+        #      likely to run long, especially with max_num_iterations unset/large), giving a
+        #      meaningful percentage instead of just "still alive".
+        with (
+            self.heartbeat_during(),
+            _track_accuracy_control_progress(self.update_progress, max_num_iterations),
+        ):
+            quantized_model_path = ov_engine.optimize(
+                max_data_subset_size=subset_size,
+                max_drop=max_drop,
+                max_num_iterations=max_num_iterations,
+            )
         logger.info("Quantization completed. Model saved at {}", quantized_model_path)
         return quantized_model_path
 
@@ -274,7 +380,8 @@ class GetiTuneQuantizer(Execution[QuantizationJobParams]):
     ) -> None:
         """Evaluate the quantized model on the testing subset."""
         logger.info("Evaluating the quantized model on the testing set...")
-        metrics = ov_engine.test(checkpoint=quantized_model_path, metric=get_metric_by_task(task))
+        with self.heartbeat_during():
+            metrics = ov_engine.test(checkpoint=quantized_model_path, metric=get_metric_by_task(task))
         with self._db_session_factory() as db:
             self._model_service.set_db_session(db)
             self._model_service.save_evaluation_result(

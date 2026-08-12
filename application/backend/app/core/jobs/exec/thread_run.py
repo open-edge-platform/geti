@@ -8,7 +8,7 @@ from collections.abc import Iterator
 from queue import Empty, Queue
 from typing import Any
 
-from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, Job, Progress, Started
+from app.core.jobs.models import Cancelled, Done, ExecutionEvent, Failed, Heartbeat, Job, Progress, Started
 from app.core.run import ExecutionContext, RunnableFactory, Runner
 
 from .exceptions import CancelledExc
@@ -102,12 +102,17 @@ class ThreadRun(Runner[Job, ExecutionEvent]):
         class ThreadAwareExecutionContext(ExecutionContext):
             def __init__(self, runner: "ThreadRun"):
                 self.runner = runner
+                self.payload = runner.job.params.model_dump_json()
                 self.report = self._report_impl
+                self.heartbeat = self._heartbeat_impl
 
             def _report_impl(self, message: str, progress: float, metadata: dict[str, Any] | None = None) -> None:
                 if self.runner._cancel_event.is_set():
                     raise CancelledExc("Job cancelled")
                 self.runner._event_queue.put(Progress(message, progress, metadata))
+
+            def _heartbeat_impl(self) -> None:
+                self.runner._event_queue.put(Heartbeat())
 
         return ThreadAwareExecutionContext(self)
 
