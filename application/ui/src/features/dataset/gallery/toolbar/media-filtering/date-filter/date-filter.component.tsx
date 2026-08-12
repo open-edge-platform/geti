@@ -65,7 +65,7 @@ export const DateFilter = () => {
                     labelPosition={'top'}
                     hourCycle={24}
                     minValue={MIN_DATE}
-                    maxValue={maxDate}
+                    maxValue={endValue}
                     value={startValue}
                     onChange={handleStartDateChange}
                 />
@@ -76,7 +76,7 @@ export const DateFilter = () => {
                     label='End date'
                     labelPosition={'top'}
                     hourCycle={24}
-                    minValue={MIN_DATE}
+                    minValue={startValue}
                     maxValue={maxDate}
                     value={endValue}
                     onChange={handleEndDateChange}
