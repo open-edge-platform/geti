@@ -1,5 +1,6 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+from collections.abc import Generator
 from datetime import datetime
 from unittest.mock import MagicMock
 from uuid import uuid4
@@ -13,7 +14,7 @@ from app.services import DatasetViewService
 
 
 @pytest.fixture
-def fxt_dataset_view_service(fxt_app: FastAPI) -> MagicMock:
+def fxt_dataset_view_service(fxt_app: FastAPI) -> Generator[MagicMock]:
     dataset_view_service = MagicMock(spec=DatasetViewService)
     fxt_app.dependency_overrides[get_dataset_view_service] = lambda: dataset_view_service
     yield dataset_view_service
@@ -158,6 +159,21 @@ class TestDatasetViewEndpoints:
         assert response_data["pagination"]["total"] == 0
         fxt_dataset_view_service.count_dataset_view_items.assert_called_once()
         fxt_dataset_view_service.list_dataset_view_items.assert_called_once()
+
+    def test_filter_dataset_view_media_success(
+        self, fxt_get_project, fxt_get_dataset_view, fxt_dataset_view_service, fxt_client
+    ):
+        fxt_dataset_view_service.count_dataset_view_media.return_value = 0
+        fxt_dataset_view_service.list_dataset_view_media.return_value = []
+
+        response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset_views/{fxt_get_dataset_view.id}/media")
+
+        assert response.status_code == status.HTTP_200_OK
+        response_data = response.json()
+        assert response_data["items"] == []
+        assert response_data["pagination"]["total"] == 0
+        fxt_dataset_view_service.count_dataset_view_media.assert_called_once()
+        fxt_dataset_view_service.list_dataset_view_media.assert_called_once()
 
     def test_get_dataset_view_statistics_success(
         self, fxt_get_project, fxt_get_dataset_view, fxt_dataset_view_service, fxt_client

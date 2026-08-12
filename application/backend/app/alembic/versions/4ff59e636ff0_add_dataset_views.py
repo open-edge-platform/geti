@@ -36,12 +36,12 @@ def upgrade() -> None:
     op.create_table(
         "dataset_view_items",
         sa.Column("dataset_view_id", sa.Text(), nullable=False),
-        sa.Column("dataset_item_id", sa.Text(), nullable=False),
+        sa.Column("media_id", sa.Text(), nullable=False),
         sa.Column("created_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
         sa.Column("updated_at", sa.DateTime(), server_default=sa.text("(CURRENT_TIMESTAMP)"), nullable=False),
-        sa.ForeignKeyConstraint(["dataset_item_id"], ["dataset_items.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["media_id"], ["media.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["dataset_view_id"], ["dataset_views.id"], ondelete="CASCADE"),
-        sa.PrimaryKeyConstraint("dataset_view_id", "dataset_item_id"),
+        sa.PrimaryKeyConstraint("dataset_view_id", "media_id"),
     )
     # ### end Alembic commands ###
 
