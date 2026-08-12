@@ -18,6 +18,7 @@ type SelectionStateOptions = {
     selectOnFocus?: boolean;
 };
 
+// TODO: Extends types on @geti-ui/ui
 const ListBox = AriaComponentsListBox as ComponentType<AriaComponentsListBoxProps & SelectionStateOptions>;
 
 interface GridItem {
