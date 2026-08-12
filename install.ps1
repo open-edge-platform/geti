@@ -36,6 +36,9 @@
 .PARAMETER HealthTimeout
     Seconds to wait for the upgraded app to become healthy before rolling back (default: 300).
 
+.PARAMETER GitBranch
+    Override the git branch/tag to install (for testing purposes).
+
 .EXAMPLE
     .\install.ps1
     .\install.ps1 -Verbose -Yes
@@ -60,13 +63,23 @@ param(
 
     [string]$BackupDir = "",
 
-    [int]$HealthTimeout = 300
+    [int]$HealthTimeout = 300,
+
+    [string]$GitBranch = ""
 )
 
 $ErrorActionPreference = "Stop"
 
 $GIT_URL = "https://github.com/open-edge-platform/geti.git"
-$GIT_BRANCH = "app/v3.1.0rc2"
+# GIT_BRANCH can be overridden via the GIT_BRANCH environment variable or the
+# -GitBranch parameter (for testing purposes).
+$GIT_BRANCH = "app/v3.1.0rc4"
+if ($GitBranch) {
+    $GIT_BRANCH = $GitBranch
+}
+elseif ($env:GIT_BRANCH) {
+    $GIT_BRANCH = $env:GIT_BRANCH
+}
 
 # Exit code the backend uses for a fatal, non-restartable migration failure
 # (see application/backend/app/lifecycle.py:MIGRATION_FATAL_EXIT_CODE). It lets
@@ -563,6 +576,18 @@ function Build-Frontend {
     try {
         $env:npm_config_yes = "true"
 
+        # Remove build artifacts and cloned workspace packages left over from a
+        # previous build/version. `git checkout --force` does not touch these
+        # untracked paths, and stale contents make `npm ci` fail with
+        # "package.json and package-lock.json are not in sync" (e.g. a missing
+        # @geti/ui workspace package from the old revision).
+        foreach ($stale in @("node_modules", "packages", "dist")) {
+            $stalePath = Join-Path $uiDir $stale
+            if (Test-Path $stalePath) {
+                Remove-Item -Path $stalePath -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
+
         Invoke-CmdSpinner -Command $script:NPM_BIN `
             -Arguments @("ci", "--foreground-scripts") `
             -Activity "Installing UI dependencies (this may take several minutes)"
@@ -730,8 +755,22 @@ function Test-AppHealth {
     $url = "https://localhost:${Port}/health"
 
     if (Get-Command curl.exe -ErrorAction SilentlyContinue) {
-        & curl.exe -ksSf --max-time 5 $url *> $null
-        return ($LASTEXITCODE -eq 0)
+        # curl.exe returns a non-zero exit code (e.g. 7 "could not connect")
+        # while the backend is still starting up. Under $ErrorActionPreference =
+        # 'Stop' combined with $PSNativeCommandUseErrorActionPreference (on by
+        # default in PowerShell 7.3+), that non-zero exit is turned into a
+        # terminating error that would abort the whole health-polling loop on the
+        # very first probe -- and be misreported as an "Upgrade error" that
+        # triggers a rollback. Relax the preference locally so a failed probe just
+        # means "not healthy yet" and the loop keeps retrying until the timeout.
+        $prevEAP = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        try {
+            & curl.exe -ksSf --max-time 5 $url *> $null
+            return ($LASTEXITCODE -eq 0)
+        } finally {
+            $ErrorActionPreference = $prevEAP
+        }
     }
 
     try {
@@ -941,11 +980,14 @@ function Start-App {
     # localhost. Honour PORT/HOST overrides if the user set them.
     $port = if ($env:PORT) { $env:PORT } else { "7860" }
     $browserHost = if ($env:HOST -and $env:HOST -ne "0.0.0.0") { $env:HOST } else { "localhost" }
-    $url = "http://${browserHost}:${port}"
+    # The server terminates TLS itself (see app/main.py), so the scheme is https.
+    $url = "https://${browserHost}:${port}"
 
     Write-Host ""
     Write-Host "Geti will be available at: " -NoNewline
     Write-Host $url -ForegroundColor Cyan
+    Write-Host "The server uses a self-signed certificate, so your browser will warn you"
+    Write-Host "about the connection the first time -- accept the warning to continue."
     Write-Host ""
 
     Push-Location $backendDir
