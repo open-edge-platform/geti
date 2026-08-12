@@ -1,0 +1,20 @@
+.container {
+    background-color: var(--spectrum-global-color-gray-100);
+    padding: var(--spectrum-global-dimension-size-200);
+    border-radius: var(--spectrum-global-dimension-size-50);
+    gap: var(--spectrum-global-dimension-size-200);
+}
+
+.heading {
+    font-size: var(--spectrum-global-dimension-font-size-300);
+    font-weight: 600;
+}
+
+.infoList {
+    padding-top: var(--spectrum-global-dimension-size-300);
+    padding-right: var(--spectrum-global-dimension-size-300);
+    font-size: var(--spectrum-global-dimension-font-size-75);
+    display: flex;
+    flex-direction: column;
+    list-style-type: disc;
+}
