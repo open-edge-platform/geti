@@ -95,10 +95,12 @@ describe('DatasetViewSelector', () => {
         await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 
-    it('falls back to "Entire dataset" and strips an unknown datasetViewId param', () => {
+    it('falls back to "Entire dataset" and strips an unknown datasetViewId param', async () => {
         renderDatasetViewSelector(`/projects/123?${DATASET_VIEW_ID_PARAM}=unknown-view-id`);
 
         expect(screen.getByRole('button', { name: 'Select dataset view' })).toHaveTextContent('Entire dataset');
-        expect(screen.getByTestId('search-params-spy')).not.toHaveTextContent(DATASET_VIEW_ID_PARAM);
+        await waitFor(() => {
+            expect(screen.getByTestId('search-params-spy')).not.toHaveTextContent(DATASET_VIEW_ID_PARAM);
+        });
     });
 });
