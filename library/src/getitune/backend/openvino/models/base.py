@@ -510,16 +510,6 @@ class OVModel:
                decide which quantizers to revert to floating point during accuracy-aware
                quantization.
 
-            Previously this function ignored ``validation_dataset`` entirely and instead
-            re-created and fully re-iterated ``data_module.val_dataloader()`` on *every* call.
-            Since NNCF invokes this function once per batch during per-item collection, that meant
-            a brand new multi-worker ``DataLoader`` (with its own worker processes and pinned-memory
-            thread) was spun up and torn down, and the *entire* validation set was re-scanned, once
-            per batch of the validation set -- i.e. roughly ``num_batches`` full passes instead of
-            one. This was extremely slow and, in resource-constrained (e.g. containerized)
-            environments, could exhaust shared memory / worker processes and crash with
-            ``RuntimeError: Pin memory thread exited unexpectedly``.
-
             Args:
                 compiled_model: Compiled OpenVINO model provided by NNCF during
                     accuracy-aware quantization.
