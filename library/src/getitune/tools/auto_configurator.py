@@ -16,6 +16,7 @@ from jsonargparse import ArgumentParser, Namespace
 
 from getitune.backend.lightning.models.base import DataInputParams, LightningModel
 from getitune.config.data import SamplerConfig, SubsetConfig, TileConfig
+from getitune.data.factory import TransformLibFactory
 from getitune.data.module import DataModule
 from getitune.types import PathLike
 from getitune.types.label import LabelInfoTypes
@@ -388,7 +389,6 @@ class AutoConfigurator:
             # coordinate mapping. Intensity scaling is preserved (the CPU augmentation
             # pipeline prepends its intensity transform independently of Resize).
             self._strip_resize_transforms(subset_config.augmentations_cpu)
-            self._strip_resize_transforms(subset_config.augmentations_gpu)
 
             # IMPORTANT: the OV recipe's batch_size (e.g. 64) is tuned for *non-tiled*
             # evaluation, where one dataset item == one model input. With tiling
@@ -450,6 +450,11 @@ class AutoConfigurator:
         # This is useful for the quantization pipeline.
         if not datamodule.data_root and datamodule.subsets:
             datamodule.train_subset.input_size = actual_input_size
+
+            if tiling_enabled:
+                existing_dataset = datamodule.subsets[subset_config.subset_name]
+                existing_dataset.transforms = TransformLibFactory.generate(subset_config)
+
             return DataModule.from_vision_datasets(
                 train_dataset=datamodule.subsets[datamodule.train_subset.subset_name],
                 val_dataset=datamodule.subsets[datamodule.val_subset.subset_name],
