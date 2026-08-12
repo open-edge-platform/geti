@@ -18,9 +18,10 @@ from .model_manifest_service import ModelManifestService
 class BaseWeightsService:
     """Service for downloading and managing pretrained model weights from external archives."""
 
-    REQUEST_TIMEOUT = (10, 600)  # (connect timeout, read timeout) in seconds
-    RETRY_TOTAL = 3  # total number of retries for failed requests
-    RETRY_BACKOFF_FACTOR = 1.0  # exponential backoff factor for retries (e.g., 1s, 2s, 4s)
+    REQUEST_TIMEOUT = (5, 600)  # (connect timeout, read timeout) in seconds
+    RETRY_TOTAL = 2  # total number of retries for failed requests
+    RETRY_CONNECT = 1  # retries specifically for connection failures (fail fast on unreachable hosts)
+    RETRY_BACKOFF_FACTOR = 0.5  # exponential backoff factor for retries (e.g., 0.5s, 1s)
 
     def __init__(self, data_dir: Path) -> None:
         self.pretrained_weights_dir = data_dir / "pretrained_weights"
@@ -75,8 +76,11 @@ class BaseWeightsService:
             raise FileNotFoundError(f"Weights not found locally for model {model_manifest_id} and download is disabled")
 
         logger.info("Downloading pretrained weights for {}", model_manifest_id)
+        urls = [manifest.pretrained_weights.url]
+        if manifest.pretrained_weights.mirror_url is not None:
+            urls.append(manifest.pretrained_weights.mirror_url)
         self._download_weights(
-            urls=[manifest.pretrained_weights.url, manifest.pretrained_weights.mirror_url],
+            urls=urls,
             local_path=local_path,
             sha_sum=manifest.pretrained_weights.sha_sum,
         )
@@ -278,6 +282,8 @@ class BaseWeightsService:
 
         retry = Retry(
             total=self.RETRY_TOTAL,
+            connect=self.RETRY_CONNECT,
+            read=self.RETRY_TOTAL,
             backoff_factor=self.RETRY_BACKOFF_FACTOR,
             status_forcelist=[429, 500, 502, 503, 504],
             allowed_methods=frozenset(["HEAD", "GET"]),

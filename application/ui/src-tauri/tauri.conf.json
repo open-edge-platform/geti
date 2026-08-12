@@ -21,7 +21,7 @@
                 "fullscreen": false,
                 "useHttpsScheme": true,
                 "dragDropEnabled": false,
-                "additionalBrowserArgs": "--enable-unsafe-webgpu --enable-features=Vulkan --ignore-certificate-errors --unsafely-treat-insecure-origin-as-secure=https://localhost:7860"
+                "additionalBrowserArgs": "--enable-unsafe-webgpu --disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --ignore-certificate-errors --unsafely-treat-insecure-origin-as-secure=https://localhost:7860"
             }
         ],
         "security": {

@@ -141,10 +141,10 @@ class ImportDatasetAsNewProject(BaseDatasetImport[ImportDatasetAsNewProjectJobPa
     @staticmethod
     def _has_array_label(dataset: Dataset) -> bool:
         """
-        Check if the dataset's 'label' attribute is represented as a NumPy array.
+        Check if the dataset's 'label' or 'labels' attribute is represented as a NumPy array.
 
-        This method inspects the schema definition of the 'label' attribute to check if its type is or contains
-        `np.ndarray` (such as `np.ndarray | None`).
+        This method inspects the schema definition of the 'label' or 'labels' attribute to check if its type is or
+        contains `np.ndarray` (such as `np.ndarray | None`).
 
         The result impacts how the project is created: if the dataset has array labels, the newly created project will
         configure its task with non-exclusive labels (i.e., a multi-label classification project).
@@ -156,10 +156,14 @@ class ImportDatasetAsNewProject(BaseDatasetImport[ImportDatasetAsNewProjectJobPa
             True if the dataset's 'label' attribute schema type contains `np.ndarray`,
             False otherwise.
         """
-        if "label" not in dataset.schema.attributes:
+        attribute_name = next(
+            (name for name in ("label", "labels") if name in dataset.schema.attributes),
+            None,
+        )
+        if attribute_name is None:
             return False
 
-        label_type = dataset.schema.attributes["label"].type
+        label_type = dataset.schema.attributes[attribute_name].type
 
         def _is_numpy_array_type(tp: object) -> bool:
             return tp is np.ndarray or get_origin(tp) is np.ndarray

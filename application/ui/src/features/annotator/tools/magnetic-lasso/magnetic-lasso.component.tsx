@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react';
 
-import { isPointOverPoint, isPolygonValid } from '@geti/smart-tools/utils';
+import { isPointOverPoint, isPolygonValid } from '@geti-ui/smart-tools/utils';
 import { useMutation } from '@tanstack/react-query';
 import { isEmpty, isEqual, throttle } from 'lodash-es';
 

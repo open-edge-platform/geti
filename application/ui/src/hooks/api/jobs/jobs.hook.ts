@@ -23,6 +23,7 @@ export const useStreamJobStatus = (jobId: string | undefined) => {
     const modelIdRef = useRef<string | null>(null);
 
     const { close } = useSSE<Job>(jobId ? `/api/jobs/${jobId}/status` : undefined, {
+        retry: true,
         onMessage: (updatedJob) => {
             if (isQuantizeJob(updatedJob)) {
                 modelIdRef.current = updatedJob.metadata.model.id;
@@ -73,6 +74,39 @@ export const useStreamJobStatus = (jobId: string | undefined) => {
                     ]),
                 });
             modelIdRef.current = null;
+        },
+    });
+};
+
+// Same stream as useStreamJobStatus, but writes to the single-job cache instead of the job-list
+// cache, so consumers that query a job by id (import/export) don't have to poll.
+export const useStreamJobDetail = (jobId: string | undefined | null) => {
+    const queryClient = useQueryClient();
+
+    const { close } = useSSE<Job>(jobId ? `/api/jobs/${jobId}/status` : undefined, {
+        retry: true,
+        onMessage: (updatedJob) => {
+            queryClient.setQueryData<Job>(
+                getQueryKey(['get', '/api/jobs/{job_id}', { params: { path: { job_id: updatedJob.job_id } } }]),
+                updatedJob
+            );
+
+            if (TERMINAL_STATUSES.includes(updatedJob.status)) {
+                close();
+            }
+        },
+        onClose: () => {
+            if (!jobId) {
+                return;
+            }
+
+            const jobKey = getQueryKey(['get', '/api/jobs/{job_id}', { params: { path: { job_id: jobId } } }]);
+            const cachedJob = queryClient.getQueryData<Job>(jobKey);
+
+            // The stream gave up before the job settled, so whatever is cached is stale
+            if (!cachedJob || !TERMINAL_STATUSES.includes(cachedJob.status)) {
+                queryClient.invalidateQueries({ queryKey: jobKey });
+            }
         },
     });
 };

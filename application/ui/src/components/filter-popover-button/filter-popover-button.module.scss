@@ -1,5 +1,5 @@
 .filterContainer {
-    padding: 0 var(--spectrum-global-dimension-size-100) 0 var(--spectrum-global-dimension-size-25);
+    padding: 0 var(--spectrum-global-dimension-size-100) 0 var(--spectrum-global-dimension-size-150);
     overflow: auto;
     border: var(--spectrum-alias-input-border-size) solid var(--spectrum-alias-border-color);
     border-radius: var(--spectrum-global-dimension-size-50);
@@ -17,7 +17,6 @@
 
 .searchPlaceholder {
     color: var(--placeholder-light);
-    margin-left: var(--spectrum-global-dimension-size-125);
     transition: color 200ms ease-in;
 }
 

@@ -112,6 +112,8 @@ export default defineConfig({
                 ignoreHTTPSErrors: GETI_BASE_URL?.startsWith('https://') ?? false,
                 headless: CI,
                 viewport: { width: 1280, height: 720 },
+                trace: 'retain-on-failure-and-retries',
+                video: 'retain-on-failure-and-retries',
             },
         },
     ],
