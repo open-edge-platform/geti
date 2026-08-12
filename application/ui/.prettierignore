@@ -5,3 +5,5 @@ package-lock.json
 src-tauri/bin
 src-tauri/target
 src-tauri/gen
+
+vendor/
