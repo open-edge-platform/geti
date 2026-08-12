@@ -141,14 +141,6 @@ def create_app() -> FastAPI:
             content={"detail": str(exc)},
         )
 
-    @app.exception_handler(NotImplementedError)
-    async def not_implemented_exception_handler(request: Request, exc: NotImplementedError) -> JSONResponse:  # noqa: ARG001
-        """Catch not-implemented errors (features under construction) and return a 501 response"""
-        return JSONResponse(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            content={"detail": str(exc) or "This feature is not implemented yet."},
-        )
-
     static_dir = settings.static_files_dir
     if static_dir is not None and static_dir.is_dir() and any(static_dir.iterdir()):
         asset_prefix = getenv("ASSET_PREFIX", "/html")
