@@ -28,6 +28,8 @@ import { DeleteMediaItem } from '../delete-media-item/delete-media-item.componen
 import { useSelectDatasetItem } from '../hooks/use-select-dataset-item.hook';
 import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
+import { useDatasetViews } from './dataset-view-selector/api/use-dataset-views';
+import { AssignToExistingView } from './dataset-view-selector/assign-to-existing-view/assign-to-existing-view.component';
 import { DatasetViewSelector } from './dataset-view-selector/dataset-view-selector.component';
 import { SaveDatasetView } from './dataset-view-selector/save-dataset-view/save-dataset-view.component';
 import { MediaFiltering } from './media-filtering/media-filtering.component';
@@ -75,6 +77,7 @@ const SortMediaByUploadDate = () => {
 export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
     const { onSelectedMediaItemChange } = useSelectDatasetItem();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys } = useSelectedData();
+    const datasetViews = useDatasetViews();
 
     const selectedMediaItems = selectedKeys instanceof Set ? selectedKeys : null;
 
@@ -95,6 +98,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
     }, [selectedMediaItems, items]);
 
     const noMediaSelected = selectedMediaItems?.size === 0;
+    const selectedMediaItemsIds = Array.from(selectedMediaItems ?? []) as string[];
 
     return (
         <Flex direction={'column'} gridArea={'toolbar'} gap={'size-200'} marginBottom={'size-200'}>
@@ -103,7 +107,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                     <Heading margin={0}>Dataset</Heading>
 
                     <Divider orientation={'vertical'} size={'S'} />
-                    <DatasetViewSelector />
+                    <DatasetViewSelector datasetViews={datasetViews} />
                 </Flex>
 
                 <ButtonGroup UNSAFE_style={{ gap: dimensionValue('size-125') }}>
@@ -148,7 +152,11 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                                 itemsIds={Array.from(selectedKeys) as string[]}
                                 onDeleted={toggleSelectedKeys}
                             />
-                            <SaveDatasetView selectedMediaIds={Array.from(selectedMediaItems ?? []) as string[]} />
+                            <SaveDatasetView selectedMediaIds={selectedMediaItemsIds} />
+                            <AssignToExistingView
+                                datasetViews={datasetViews}
+                                selectedMediaIds={selectedMediaItemsIds}
+                            />
                         </>
                     )}
                 </Flex>

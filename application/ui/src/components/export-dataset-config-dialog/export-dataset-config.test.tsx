@@ -19,6 +19,8 @@ describe('ExportDatasetConfig', () => {
         close: vi.fn(),
         toggle: vi.fn(),
         setOpen: vi.fn(),
+        point: { x: 0, y: 0 },
+        setPoint: vi.fn(),
     };
 
     const VIDEO_WARNING = /Exporting videos is not supported by this dataset format/i;

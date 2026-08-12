@@ -34,7 +34,7 @@ from getitune.types.task import TaskType
 from .utils import get_default_num_async_infer_requests
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable
 
     from model_api.models.result import Result
     from torchmetrics import Metric, MetricCollection
@@ -496,23 +496,32 @@ class OVModel:
 
         def validation_fn(
             compiled_model: openvino.CompiledModel,
-            validation_dataset: nncf.Dataset,  # noqa: ARG001 required by NNCF signature
+            validation_dataset: Iterable[SampleBatch],
         ) -> tuple[float, None]:
-            """Evaluate the compiled OpenVINO model on the validation dataset.
+            """Evaluate the compiled OpenVINO model on the given batches of data.
+
+            NNCF calls this function in two different modes, both of which must be honored:
+
+            1. Once with the *entire* validation dataset, to compute the overall metric of a
+               candidate model (``Evaluator.validate_prepared_model``).
+            2. Once per data item/batch (each call passing only a single-item iterable), to rank
+               how much each item contributes to the accuracy drop
+               (``Evaluator.collect_values_for_each_item_using_prepared_model``). This is used to
+               decide which quantizers to revert to floating point during accuracy-aware
+               quantization.
 
             Args:
                 compiled_model: Compiled OpenVINO model provided by NNCF during
                     accuracy-aware quantization.
-                validation_dataset: Validation NNCF dataset (unused, we iterate
-                    via the dataloader for proper batching and transforms).
+                validation_dataset: The batches of data to evaluate, as selected by NNCF for this
+                    particular call (either the whole validation set or a single batch).
 
             Returns:
                 Tuple of (metric_value, None).
             """
             metric = self.metric_callable(data_module.label_info)
 
-            val_dataloader = data_module.val_dataloader()
-            for data_batch in val_dataloader:
+            for data_batch in validation_dataset:
                 preds = _infer_compiled_model(compiled_model, data_batch)
                 metric_inputs = self.prepare_metric_inputs(preds, data_batch)
                 if isinstance(metric_inputs, list):
