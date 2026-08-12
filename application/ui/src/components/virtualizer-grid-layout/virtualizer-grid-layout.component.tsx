@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ComponentProps, ReactNode, useRef } from 'react';
+import { ComponentProps, ComponentType, ReactNode, useRef } from 'react';
 
 import { AriaComponentsListBox, AriaListBoxItem, GridLayout, Loading, View, Virtualizer } from '@geti-ui/ui';
 import { useLoadMore } from '@react-aria/utils';
@@ -13,15 +13,22 @@ import classes from './virtualizer-grid-layout.module.scss';
 
 type AriaComponentsListBoxProps = ComponentProps<typeof AriaComponentsListBox>;
 
+type SelectionStateOptions = {
+    allowDuplicateSelectionEvents?: boolean;
+    selectOnFocus?: boolean;
+};
+
+const ListBox = AriaComponentsListBox as ComponentType<AriaComponentsListBoxProps & SelectionStateOptions>;
+
 interface GridItem {
     id: string;
     [key: string]: unknown;
 }
 
-interface VirtualizerGridLayoutProps<T extends GridItem> extends Pick<
-    AriaComponentsListBoxProps,
-    'selectedKeys' | 'onSelectionChange'
-> {
+interface VirtualizerGridLayoutProps<T extends GridItem>
+    extends
+        Pick<AriaComponentsListBoxProps, 'selectedKeys' | 'onSelectionChange' | 'selectionBehavior'>,
+        SelectionStateOptions {
     items: T[];
     ariaLabel: string;
     scrollToIndex?: number;
@@ -43,11 +50,14 @@ export const VirtualizerGridLayout = <T extends GridItem>({
     isPending = false,
     isLoadingMore,
     selectionMode,
+    selectionBehavior,
     layoutOptions,
     scrollToIndex,
     onLoadMore,
     contentItem,
     onSelectionChange,
+    allowDuplicateSelectionEvents,
+    selectOnFocus,
     getItemId = (item) => item.id,
 }: VirtualizerGridLayoutProps<T>) => {
     const ref = useRef<HTMLDivElement | null>(null);
@@ -71,14 +81,17 @@ export const VirtualizerGridLayout = <T extends GridItem>({
     return (
         <View UNSAFE_className={classes.mainContainer}>
             <Virtualizer layout={GridLayout} layoutOptions={layoutOptions}>
-                <AriaComponentsListBox
+                <ListBox
                     ref={ref}
                     layout='grid'
                     aria-label={ariaLabel}
                     className={classes.container}
                     selectedKeys={selectedKeys}
                     selectionMode={selectionMode}
+                    selectionBehavior={selectionBehavior}
                     onSelectionChange={onSelectionChange}
+                    allowDuplicateSelectionEvents={allowDuplicateSelectionEvents}
+                    selectOnFocus={selectOnFocus}
                 >
                     {items.map((item, index) => {
                         const itemId = getItemId(item);
@@ -99,7 +112,7 @@ export const VirtualizerGridLayout = <T extends GridItem>({
                             <Loading mode='overlay' />
                         </AriaListBoxItem>
                     )}
-                </AriaComponentsListBox>
+                </ListBox>
             </Virtualizer>
             {isPending && <Loading mode='overlay' />}
         </View>
