@@ -43,10 +43,18 @@ class TestTimmModelMulticlassCls:
         preds = fxt_multi_class_cls_model._customize_outputs(outputs, fxt_multiclass_cls_batch_data_entity)
         assert isinstance(preds, PredictionBatch)
 
-    # TODO(vitalii): explain_mode=True is not supported. base_classifier._forward_explain expects the backbone to return
-    #  a tuple of spatial features from the `forward` method, but timm backbones don't do it.
-    #  This test will fail until we implement a proper forward for explainability in the base classifier.
-    @pytest.mark.parametrize("explain_mode", [False])
+    @pytest.mark.parametrize(
+        "explain_mode",
+        [
+            False,
+            pytest.param(
+                True,
+                marks=pytest.mark.xfail(
+                    reason="Explain mode expects spatial feature maps; timm backbones currently return pooled embeddings."
+                ),
+            ),
+        ],
+    )
     def test_predict_step(self, fxt_multi_class_cls_model, fxt_multiclass_cls_batch_data_entity, explain_mode):
         fxt_multi_class_cls_model.eval()
         fxt_multi_class_cls_model.explain_mode = explain_mode
@@ -112,10 +120,18 @@ class TestTimmModelMultilabelCls:
         preds = fxt_multi_label_cls_model._customize_outputs(outputs, fxt_multilabel_cls_batch_data_entity)
         assert isinstance(preds, PredictionBatch)
 
-    # TODO(vitalii): explain_mode=True is not supported. base_classifier._forward_explain expects the backbone to return
-    #  a tuple of spatial features from the `forward` method, but timm backbones don't do it.
-    #  This test will fail until we implement a proper forward for explainability in the base classifier.
-    @pytest.mark.parametrize("explain_mode", [False])
+    @pytest.mark.parametrize(
+        "explain_mode",
+        [
+            False,
+            pytest.param(
+                True,
+                marks=pytest.mark.xfail(
+                    reason="Explain mode expects spatial feature maps; timm backbones currently return pooled embeddings."
+                ),
+            ),
+        ],
+    )
     def test_predict_step(self, fxt_multi_label_cls_model, fxt_multilabel_cls_batch_data_entity, explain_mode):
         fxt_multi_label_cls_model.eval()
         fxt_multi_label_cls_model.explain_mode = explain_mode

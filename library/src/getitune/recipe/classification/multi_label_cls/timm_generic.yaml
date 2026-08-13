@@ -9,7 +9,7 @@ model:
 engine:
   device: auto
 
-callback_monitor: val/f1-score
+callback_monitor: val/map
 
 data: ../../_base_/data/classification.yaml
 

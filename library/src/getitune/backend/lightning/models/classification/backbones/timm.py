@@ -85,7 +85,7 @@ class TimmBackbone(nn.Module):
         self.num_head_features = self.model.num_features
         self.num_features = self.model.num_features
 
-    def forward(self, x: torch.Tensor, **kwargs) -> tuple[torch.Tensor]:
+    def forward(self, x: torch.Tensor, **kwargs) -> torch.Tensor:
         """Extract the pooled feature embedding using the architecture's own default pooling.
 
         The backbone is created with ``num_classes=0``, so timm sets the classifier head to

@@ -28,7 +28,7 @@ from getitune.types.label import LabelInfoTypes
 
 if TYPE_CHECKING:
     import torch
-    from lightning.pytorch.cli import LRSchedulerCallable
+    from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
     from torch import nn
 
     from getitune.metrics import MetricCallable
@@ -40,11 +40,13 @@ class TimmModelMultilabelCls(TimmWeightsLoader, LightningMultilabelClsModel):
 
     Args:
         label_info (LabelInfoTypes): Information about the labels.
-        learning_rate (float): Learning rate for the optimizer.
+        learning_rate (float, optional): Learning rate for the optimizer. Defaults to None.
+            If None, `optimizer` must be provided.
         data_input_params (DataInputParams | dict | None, optional): The data input parameters
             such as input size and normalization. If None is given,
             default parameters for the specific model will be used.
         model_name (str, optional): Backbone model name for feature extraction. Defaults to "efficientnet_v2_s".
+        optimizer (OptimizerCallable, optional): Optimizer for model training. Defaults to None.
         scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): Learning rate scheduler.
             Defaults to DefaultSchedulerCallable.
         metric (MetricCallable, optional): Metric for model evaluation. Defaults to MultiClassClsMetricCallable.
@@ -57,22 +59,28 @@ class TimmModelMultilabelCls(TimmWeightsLoader, LightningMultilabelClsModel):
     def __init__(
         self,
         label_info: LabelInfoTypes,
-        learning_rate: float,
+        learning_rate: float | None = None,
         data_input_params: DataInputParams | dict | None = None,
         model_name: str = "tf_efficientnetv2_s.in21k",
         freeze_backbone: bool = False,
+        optimizer: OptimizerCallable | None = None,
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiLabelClsMetricCallable,
         torch_compile: bool = False,
         pretrained: bool = True,
         pretrained_weights: PathLike | None = None,
     ) -> None:
+        if optimizer is None:
+            if learning_rate is None:
+                msg = "Either `optimizer` or `learning_rate` must be provided."
+                raise ValueError(msg)
+            optimizer = build_timm_optimizer_fn(model_name=model_name, learning_rate=learning_rate)
         super().__init__(
             label_info=label_info,
             data_input_params=data_input_params,
             model_name=model_name,
             freeze_backbone=freeze_backbone,
-            optimizer=build_timm_optimizer_fn(model_name=model_name, learning_rate=learning_rate),
+            optimizer=optimizer,
             scheduler=scheduler,
             metric=metric,
             torch_compile=torch_compile,
