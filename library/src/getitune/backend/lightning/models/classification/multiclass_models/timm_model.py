@@ -10,21 +10,24 @@ from typing import TYPE_CHECKING
 import torch
 from torch import nn
 
-from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
-from getitune.backend.lightning.models.classification.backbones.timm import TimmBackbone
+from getitune.backend.lightning.models.base import DataInputParams, DefaultSchedulerCallable
+from getitune.backend.lightning.models.classification.backbones.timm import (
+    TimmBackbone,
+    build_timm_optimizer_fn,
+    get_preprocessing_params,
+)
 from getitune.backend.lightning.models.classification.classifier import ImageClassifier
 from getitune.backend.lightning.models.classification.heads import LinearClsHead
 from getitune.backend.lightning.models.classification.multiclass_models.base import (
     LightningMulticlassClsModel,
 )
-from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
 from getitune.backend.lightning.models.classification.utils.pretrained_weights import TimmWeightsLoader
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiClassClsMetricCallable
 from getitune.types.label import LabelInfoTypes
 
 if TYPE_CHECKING:
-    from lightning.pytorch.cli import LRSchedulerCallable, OptimizerCallable
+    from lightning.pytorch.cli import LRSchedulerCallable
 
     from getitune.metrics import MetricCallable
     from getitune.types import PathLike
@@ -35,11 +38,11 @@ class TimmModelMulticlassCls(TimmWeightsLoader, LightningMulticlassClsModel):
 
     Args:
         label_info (LabelInfoTypes): Information about the labels.
+        learning_rate (float): Learning rate for the optimizer.
         data_input_params (DataInputParams | dict | None, optional): The data input parameters
             such as input size and normalization. If None is given,
             default parameters for the specific model will be used.
         model_name (str, optional): Backbone model name for feature extraction. Defaults to "efficientnet_v2_s".
-        optimizer (OptimizerCallable, optional): Optimizer for model training. Defaults to DefaultOptimizerCallable.
         scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): Learning rate scheduler.
             Defaults to DefaultSchedulerCallable.
         metric (MetricCallable, optional): Metric for model evaluation. Defaults to MultiClassClsMetricCallable.
@@ -49,24 +52,20 @@ class TimmModelMulticlassCls(TimmWeightsLoader, LightningMulticlassClsModel):
             the default pretrained weights will be utilized for fine-tuning. Defaults to None.
 
     Example:
-        1. API
-            >>> model = TimmModelForMulticlassCls(
-            ...     model_name="tf_efficientnetv2_s.in21k",
-            ...     label_info=<Number-of-classes>,
-            ... )
-        2. CLI
-            >>> getitune train \
-            ... --model getitune.algo.classification.timm_model.TimmModelForMulticlassCls \
-            ... --model.model_name tf_efficientnetv2_s.in21k
+        >>> model = TimmModelMulticlassCls(
+        ...     model_name="tf_efficientnetv2_s.in21k",
+        ...     label_info=10,  # Number of classes
+        ...     learning_rate=0.0001,
+        ... )
     """
 
     def __init__(
         self,
         label_info: LabelInfoTypes,
+        learning_rate: float,
         data_input_params: DataInputParams | dict | None = None,
         model_name: str = "tf_efficientnetv2_s.in21k",
         freeze_backbone: bool = False,
-        optimizer: OptimizerCallable = DefaultOptimizerCallable,
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
@@ -78,7 +77,7 @@ class TimmModelMulticlassCls(TimmWeightsLoader, LightningMulticlassClsModel):
             data_input_params=data_input_params,
             model_name=model_name,
             freeze_backbone=freeze_backbone,
-            optimizer=optimizer,
+            optimizer=build_timm_optimizer_fn(model_name=model_name, learning_rate=learning_rate),
             scheduler=scheduler,
             metric=metric,
             torch_compile=torch_compile,
@@ -91,7 +90,7 @@ class TimmModelMulticlassCls(TimmWeightsLoader, LightningMulticlassClsModel):
         backbone = TimmBackbone(model_name=self.model_name)
         return ImageClassifier(
             backbone=backbone,
-            neck=GlobalAveragePooling(dim=2),
+            neck=None,
             head=LinearClsHead(
                 num_classes=num_classes,
                 in_channels=backbone.num_features,
@@ -105,3 +104,7 @@ class TimmModelMulticlassCls(TimmWeightsLoader, LightningMulticlassClsModel):
             return self.model(images=image, mode="explain")
 
         return self.model(images=image, mode="tensor")
+
+    @property
+    def _default_preprocessing_params(self) -> DataInputParams | dict[str, DataInputParams]:
+        return get_preprocessing_params(backbone_name=self.model_name)
