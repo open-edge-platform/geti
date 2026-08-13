@@ -63,8 +63,11 @@ export class InferencePage {
     }
 
     /**
-     * Adds a video file source by typing its path. The "Upload" button opens a native file picker,
-     * which cannot be driven by Playwright, so the path field is used instead.
+     * Adds a video file source by uploading the video to the backend.
+     *
+     * The "Upload" button opens a native file picker, but it delegates to a hidden `<input type="file">`
+     * that Playwright can set directly. Uploading rather than typing a path keeps the test independent of
+     * where the backend runs: the bytes travel over HTTP and the backend stores them on its own filesystem.
      */
     async addVideoFileSource({ name, videoPath, loop = true }: { name: string; videoPath: string; loop?: boolean }) {
         await this.getInputTab().click();
@@ -73,7 +76,7 @@ export class InferencePage {
         await this.page.getByRole('button', { name: 'Video file', exact: true }).click();
 
         await this.page.getByRole('textbox', { name: 'Name', exact: true }).fill(name);
-        await this.page.getByRole('textbox', { name: 'Video file path' }).fill(videoPath);
+        await this.page.getByTestId('upload-video-file').setInputFiles(videoPath);
 
         const loopSwitch = this.page.getByRole('switch', { name: 'loop video' });
 
@@ -127,6 +130,10 @@ export class InferencePage {
 
     getPipelineSwitch(state: 'enabled' | 'disabled') {
         return this.page.getByRole('switch', { name: `Pipeline ${state}` });
+    }
+
+    getPipelineHealth() {
+        return this.page.getByRole('status');
     }
 
     async enablePipeline() {

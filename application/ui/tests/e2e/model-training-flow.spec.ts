@@ -1,7 +1,6 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,24 +17,22 @@ const TIMEOUTS = {
     nextMediaItem: 1000 * 30,
     mediaUploaded: 1000 * 60,
     stream: 1000 * 90,
-    sinkOutput: 1000 * 90,
+    pipelineHealth: 1000 * 90,
 };
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-/** The backend reads the video and writes the sink output itself, so it has to share a host with the test. */
+/** Uploaded to the backend by the video file source, so this path is only resolved on the test runner. */
 const VIDEO_PATH = path.resolve(dirname, '../assets/fish_60.mp4');
 
 test.describe('Model training flow E2E', () => {
     const projectName = `E2E Project - ${new Date().toISOString()}`;
     const uniqueSuffix = new Date().toISOString().replace(/[:.]/g, '-');
-    const sinkFolderPath = path.resolve(dirname, `../../test-results/inference-sink-${uniqueSuffix}`);
     const sourceName = `E2E source - ${uniqueSuffix}`;
     const sinkName = `E2E sink - ${uniqueSuffix}`;
 
-    test.beforeEach(() => {
-        fs.mkdirSync(sinkFolderPath, { recursive: true });
-    });
+    // Resolved and created by the backend, which may run on a different host than the test runner.
+    const sinkFolderPath = `/tmp/geti-e2e-sink-${uniqueSuffix}`;
 
     test.afterEach(async ({ projectPage }) => {
         await test.step('Delete project', async () => {
@@ -46,8 +43,6 @@ test.describe('Model training flow E2E', () => {
 
             await expect(projectPage.getProjectCard(projectName)).toBeHidden();
         });
-
-        fs.rmSync(sinkFolderPath, { recursive: true, force: true });
     });
 
     test('Model training flow', async ({
@@ -230,9 +225,12 @@ test.describe('Model training flow E2E', () => {
         });
 
         await test.step('Write predictions to the output sink', async () => {
-            await expect
-                .poll(() => fs.readdirSync(sinkFolderPath).length, { timeout: TIMEOUTS.sinkOutput })
-                .toBeGreaterThan(0);
+            // The sink writes to a folder on the backend's filesystem, which the runner cannot read when the
+            // backend runs on another host. A sink that fails to write turns the pipeline health negative,
+            // so a running pipeline is asserted instead of the folder contents.
+            await expect(inferencePage.getPipelineHealth()).toHaveText('Running', {
+                timeout: TIMEOUTS.pipelineHealth,
+            });
         });
 
         await test.step('Disable the pipeline', async () => {
