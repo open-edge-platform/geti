@@ -6,7 +6,6 @@ import { HttpResponse } from 'msw';
 
 import { getMockedProject } from '../../mocks/mock-project';
 import { expect, http, test } from '../fixtures';
-import { stepCreateProject } from '../workflows/workflow-steps';
 import { ProjectPage } from './project-page';
 
 test.describe('Project', () => {
@@ -58,11 +57,17 @@ test.describe('Project', () => {
             })
         );
 
-        await stepCreateProject(page, {
-            projectName,
+        await projectPage.gotoCreate();
+        await projectPage.fillProjectForm({
+            name: projectName,
             task: 'instance_segmentation',
-            labels: ['Person', 'Animal'],
+            labelNames: ['Person', 'Animal'],
         });
+
+        await projectPage.getCreateProjectButton().scrollIntoViewIfNeeded();
+        await projectPage.getCreateProjectButton().click();
+
+        await expect(page).toHaveURL(/\/projects\/[^/]+\/dataset/);
 
         network.use(
             http.get('/api/projects', () => {
