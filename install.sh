@@ -22,7 +22,7 @@ trap 'echo ""; echo "Installation interrupted."; exit 130' INT TERM
 GIT_URL="https://github.com/open-edge-platform/geti.git"
 # GIT_BRANCH can be overridden via the GIT_BRANCH environment variable or the
 # --git-branch flag (for testing purposes).
-GIT_BRANCH="${GIT_BRANCH:-nightly-2026.06.19}"
+GIT_BRANCH="${GIT_BRANCH:-app/v3.1.0}"
 
 # Exit code the backend uses for a fatal, non-restartable migration failure
 # (see application/backend/app/lifecycle.py:MIGRATION_FATAL_EXIT_CODE). It lets
