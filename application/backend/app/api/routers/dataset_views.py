@@ -16,7 +16,7 @@ from app.models import Project
 from app.models.dataset_view import DatasetView
 from app.services import DatasetViewService
 
-router = APIRouter(prefix="/api/projects/{project_id}/dataset_views", tags=["Dataset Views"])
+router = APIRouter(prefix="/api/projects/{project_id}/dataset/views", tags=["Dataset Views"])
 
 DEFAULT_DATASET_ITEMS_NUMBER_RETURNED = 10
 MAX_DATASET_ITEMS_NUMBER_RETURNED = 100
@@ -127,7 +127,7 @@ def delete_dataset_view(
 
 
 @router.post(
-    "/{dataset_view_id}/media:assign",
+    "/{dataset_view_id}/media",
     status_code=status.HTTP_204_NO_CONTENT,
     responses={
         status.HTTP_204_NO_CONTENT: {"description": "Media successfully assigned to the dataset view"},
@@ -147,8 +147,8 @@ def assign_media_to_dataset_view(
     )
 
 
-@router.post(
-    "/{dataset_view_id}/media:unassign",
+@router.delete(
+    "/{dataset_view_id}/media",
     status_code=status.HTTP_204_NO_CONTENT,
     responses={
         status.HTTP_204_NO_CONTENT: {"description": "Media successfully unassigned from the dataset view"},

@@ -121,7 +121,7 @@ class TestDatasetViewEndpoints:
         media_id = uuid4()
 
         response = fxt_client.post(
-            f"/api/projects/{fxt_get_project.id}/dataset/views/{fxt_get_dataset_view.id}/media:assign",
+            f"/api/projects/{fxt_get_project.id}/dataset/views/{fxt_get_dataset_view.id}/media",
             json={"media_ids": [str(media_id)]},
         )
 
@@ -135,8 +135,11 @@ class TestDatasetViewEndpoints:
     ):
         media_id = uuid4()
 
-        response = fxt_client.post(
-            f"/api/projects/{fxt_get_project.id}/dataset/views/{fxt_get_dataset_view.id}/media:unassign",
+        # httpx's `.delete()` helper doesn't support a request body, so a DELETE with a JSON payload
+        # must be issued via the generic `.request()` method.
+        response = fxt_client.request(
+            "DELETE",
+            f"/api/projects/{fxt_get_project.id}/dataset/views/{fxt_get_dataset_view.id}/media",
             json={"media_ids": [str(media_id)]},
         )
 
