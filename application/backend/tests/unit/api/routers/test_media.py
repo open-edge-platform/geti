@@ -16,6 +16,7 @@ from PIL import Image as PILImage
 
 from app.api.dependencies import (
     get_dataset_service,
+    get_dataset_view_service,
     get_inference_media_limit,
     get_media_prediction_service,
     get_media_service,
@@ -46,7 +47,14 @@ from app.models.media import (
     VideoRange,
 )
 from app.models.system import DeviceInfo, DeviceType
-from app.services import DatasetService, MediaPredictionService, MediaService, ResourceNotFoundError, ResourceType
+from app.services import (
+    DatasetService,
+    DatasetViewService,
+    MediaPredictionService,
+    MediaService,
+    ResourceNotFoundError,
+    ResourceType,
+)
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
 from app.services.inference import InferenceBusyError
 from app.services.media_prediction_service import VideoRangeError
@@ -115,6 +123,13 @@ def fxt_dataset_service(fxt_app) -> MagicMock:
     dataset_service = MagicMock(spec=DatasetService)
     fxt_app.dependency_overrides[get_dataset_service] = lambda: dataset_service
     return dataset_service
+
+
+@pytest.fixture
+def fxt_dataset_view_service(fxt_app) -> MagicMock:
+    dataset_view_service = MagicMock(spec=DatasetViewService)
+    fxt_app.dependency_overrides[get_dataset_view_service] = lambda: dataset_view_service
+    return dataset_view_service
 
 
 @pytest.fixture
@@ -305,6 +320,39 @@ class TestMediaEndpoints:
             ),
             exclude_types=[MediaType.VIDEO_FRAME],
         )
+
+    def test_list_media_with_dataset_view_id(
+        self,
+        fxt_get_project,
+        fxt_image_media,
+        fxt_media_service,
+        fxt_dataset_view_service,
+        fxt_client,
+    ):
+        """When dataset_view_id is provided, the view-scoped service is used instead of the main media service."""
+        dataset_view_id = uuid4()
+        fxt_dataset_view_service.count_dataset_view_media.return_value = 1
+        fxt_dataset_view_service.list_dataset_view_media.return_value = [fxt_image_media]
+
+        response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media?dataset_view_id={dataset_view_id}")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_dataset_view_service.count_dataset_view_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            dataset_view_id=dataset_view_id,
+            filters=MediaFilters(
+                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
+            ),
+        )
+        fxt_dataset_view_service.list_dataset_view_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            dataset_view_id=dataset_view_id,
+            filters=MediaFilters(
+                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
+            ),
+        )
+        fxt_media_service.count_media.assert_not_called()
+        fxt_media_service.list_media.assert_not_called()
 
     def test_list_media_filtering_and_pagination(
         self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client
