@@ -32,18 +32,42 @@ const renderDateFilter = (route: string) =>
         { route, path: '/projects/:projectId' }
     );
 
-const setYear = async (user: ReturnType<typeof userEvent.setup>, fieldName: string, year: string) => {
+const setSegment = async (
+    user: ReturnType<typeof userEvent.setup>,
+    fieldName: string,
+    segmentName: RegExp,
+    value: string
+) => {
     const field = screen.getByRole('group', { name: fieldName });
-    const yearSegment = within(field).getByRole('spinbutton', { name: /year/i });
+    const segment = within(field).getByRole('spinbutton', { name: segmentName });
 
-    await user.click(yearSegment);
-    await user.keyboard(year);
+    await user.click(segment);
+    await user.keyboard(value);
 };
+
+const setYear = (user: ReturnType<typeof userEvent.setup>, fieldName: string, year: string) =>
+    setSegment(user, fieldName, /year/i, year);
+
+// A month is committed with a single keystroke, so it does not go through intermediate (applied) values
+const setMonth = (user: ReturnType<typeof userEvent.setup>, fieldName: string, month: string) =>
+    setSegment(user, fieldName, /month/i, month);
 
 describe('DateFilter', () => {
     const routeWithDates = `/projects/123?${START_DATE_PARAM}=${START_DATE}&${END_DATE_PARAM}=${END_DATE}`;
 
-    it('does not apply the filter when the end date precedes the start date', async () => {
+    it('applies the filter when the picked range is valid', async () => {
+        const user = userEvent.setup();
+
+        renderDateFilter(routeWithDates);
+
+        await setYear(user, 'Start date', '2025');
+
+        expect(screen.getByTestId('applied-start-date')).toHaveTextContent('2025-03-15');
+        expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
+        expect(screen.queryByText(INVALID_RANGE_MESSAGE)).not.toBeInTheDocument();
+    });
+
+    it('keeps the previous filter and shows an error when the end date is moved before the start date', async () => {
         const user = userEvent.setup();
 
         renderDateFilter(routeWithDates);
@@ -55,7 +79,19 @@ describe('DateFilter', () => {
         expect(screen.getByText(INVALID_RANGE_MESSAGE)).toBeVisible();
     });
 
-    it('applies the filter once the range becomes valid again', async () => {
+    it('keeps the previous filter and shows an error when the start date is moved after the end date', async () => {
+        const user = userEvent.setup();
+
+        renderDateFilter(routeWithDates);
+
+        await setMonth(user, 'Start date', '4');
+
+        expect(screen.getByTestId('applied-start-date')).toHaveTextContent(START_DATE);
+        expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
+        expect(screen.getByText(INVALID_RANGE_MESSAGE)).toBeVisible();
+    });
+
+    it('applies the filter once an invalid end date is corrected', async () => {
         const user = userEvent.setup();
 
         renderDateFilter(routeWithDates);
@@ -68,13 +104,16 @@ describe('DateFilter', () => {
         expect(screen.queryByText(INVALID_RANGE_MESSAGE)).not.toBeInTheDocument();
     });
 
-    it('applies the filter when the picked range is valid', async () => {
+    it('applies the filter once an invalid start date is corrected', async () => {
         const user = userEvent.setup();
 
         renderDateFilter(routeWithDates);
 
-        await setYear(user, 'Start date', '2025');
+        await setMonth(user, 'Start date', '4');
+        await setMonth(user, 'Start date', '2');
 
-        expect(screen.getByTestId('applied-start-date')).toHaveTextContent('2025-03-15');
+        expect(screen.getByTestId('applied-start-date')).toHaveTextContent('2026-02-15');
+        expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
+        expect(screen.queryByText(INVALID_RANGE_MESSAGE)).not.toBeInTheDocument();
     });
 });
