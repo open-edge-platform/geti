@@ -1,6 +1,10 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { ANNOTATIONS_TO_DRAW_PER_ASSET } from './assets-annotations';
 import { expectMediaItemToChange } from './expects';
 import { expect, test } from './fixtures';
@@ -13,10 +17,25 @@ const TIMEOUTS = {
     quantization: 1000 * 60 * 5,
     nextMediaItem: 1000 * 30,
     mediaUploaded: 1000 * 60,
+    stream: 1000 * 90,
+    sinkOutput: 1000 * 90,
 };
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/** The backend reads the video and writes the sink output itself, so it has to share a host with the test. */
+const VIDEO_PATH = path.resolve(dirname, '../assets/fish_60.mp4');
 
 test.describe('Model training flow E2E', () => {
     const projectName = `E2E Project - ${new Date().toISOString()}`;
+    const uniqueSuffix = new Date().toISOString().replace(/[:.]/g, '-');
+    const sinkFolderPath = path.resolve(dirname, `../../test-results/inference-sink-${uniqueSuffix}`);
+    const sourceName = `E2E source - ${uniqueSuffix}`;
+    const sinkName = `E2E sink - ${uniqueSuffix}`;
+
+    test.beforeEach(() => {
+        fs.mkdirSync(sinkFolderPath, { recursive: true });
+    });
 
     test.afterEach(async ({ projectPage }) => {
         await test.step('Delete project', async () => {
@@ -27,6 +46,8 @@ test.describe('Model training flow E2E', () => {
 
             await expect(projectPage.getProjectCard(projectName)).toBeHidden();
         });
+
+        fs.rmSync(sinkFolderPath, { recursive: true, force: true });
     });
 
     test('Model training flow', async ({
@@ -35,6 +56,8 @@ test.describe('Model training flow E2E', () => {
         annotatorPage,
         boundingBoxTool,
         modelsPage,
+        inferencePage,
+        streamPage,
         page,
     }) => {
         const filesToUpload = getFilesToUpload('./assets/lego-bricks-dataset');
@@ -138,8 +161,10 @@ test.describe('Model training flow E2E', () => {
             });
         });
 
+        let modelName = '';
+
         await test.step('Quantize model', async () => {
-            const modelName = (await modelsPage.getModelName()) as string;
+            modelName = (await modelsPage.getModelName()) as string;
             await modelsPage.expandModel(modelName);
             await modelsPage.openQuantizationDialog();
             await modelsPage.submitQuantization();
@@ -161,6 +186,59 @@ test.describe('Model training flow E2E', () => {
             expect(Number(await modelsPage.getModelVariantAccuracy(modelName, precision, precision))).toBeGreaterThan(
                 0
             );
+        });
+
+        await test.step('Configure the inference pipeline', async () => {
+            await inferencePage.openInferenceTab();
+            await inferencePage.openPipelineConfiguration();
+
+            await inferencePage.addVideoFileSource({ name: sourceName, videoPath: VIDEO_PATH, loop: true });
+            await expect(inferencePage.getSourceCard(sourceName)).toBeVisible();
+
+            await inferencePage.addFolderSink({
+                name: sinkName,
+                folderPath: sinkFolderPath,
+                outputFormats: ['Predictions', 'Image with Predictions'],
+            });
+            await expect(inferencePage.getSinkCard(sinkName)).toBeVisible();
+        });
+
+        await test.step('Select the trained model', async () => {
+            // The quantized variant shares this label, so the precision keeps the option unambiguous.
+            const openVinoModelName = `${modelName} [FP16]`;
+
+            await inferencePage.selectModel(openVinoModelName);
+
+            await expect(inferencePage.getModelPicker()).toContainText(openVinoModelName);
+        });
+
+        await test.step('Enable the pipeline', async () => {
+            await expect(inferencePage.getPipelineSwitch('disabled')).toBeVisible();
+
+            await inferencePage.enablePipeline();
+
+            await expect(inferencePage.getPipelineSwitch('enabled')).toBeVisible();
+        });
+
+        await test.step('Start the stream', async () => {
+            await expect(streamPage.getStartStreamButton()).toBeVisible();
+
+            await streamPage.startStream();
+
+            await expect(streamPage.getStopStreamButton()).toBeVisible({ timeout: TIMEOUTS.stream });
+            await expect(streamPage.getStreamVideo()).toBeVisible({ timeout: TIMEOUTS.stream });
+        });
+
+        await test.step('Write predictions to the output sink', async () => {
+            await expect
+                .poll(() => fs.readdirSync(sinkFolderPath).length, { timeout: TIMEOUTS.sinkOutput })
+                .toBeGreaterThan(0);
+        });
+
+        await test.step('Disable the pipeline', async () => {
+            await inferencePage.disablePipeline();
+
+            await expect(inferencePage.getPipelineSwitch('disabled')).toBeVisible();
         });
     });
 });
