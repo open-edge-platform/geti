@@ -83,7 +83,11 @@ export class ProjectPage {
         await activeProject.getByLabel('open project options').click();
         await this.page.getByRole('menuitem', { name: 'Disable pipeline' }).click();
 
-        await activeProject.waitFor({ state: 'detached' });
+        await this.page
+            .getByLabel('toast')
+            .filter({ hasText: 'Pipeline disabled successfully' })
+            .waitFor({ timeout: ACTIVE_PIPELINE_TIMEOUT });
+        await activeProject.waitFor({ state: 'hidden', timeout: ACTIVE_PIPELINE_TIMEOUT });
     }
 
     async clickDeleteMenuAction() {
