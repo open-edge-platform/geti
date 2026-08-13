@@ -53,6 +53,7 @@ from app.api.routers import (
     webrtc,
 )
 from app.api.routers import license as license_api
+from app.core.certs import ensure_certs_exist
 from app.core.logging import InterceptHandler, setup_hypercorn_logging
 from app.lifecycle import lifespan
 from app.services.base import ResourceNotFoundError
@@ -201,8 +202,11 @@ async def main_async() -> None:
     setup_hypercorn_logging(settings.log_level)
     config = Config()
     config.bind = [f"{settings.host}:{settings.port}"]
-    config.certfile = str(settings.data_dir / settings.certfile)
-    config.keyfile = str(settings.data_dir / settings.keyfile)
+    certfile = settings.data_dir / settings.certfile
+    keyfile = settings.data_dir / settings.keyfile
+    ensure_certs_exist(certfile, keyfile)
+    config.certfile = str(certfile)
+    config.keyfile = str(keyfile)
     config.accesslog = "-"
     config.errorlog = "-"
     config.loglevel = settings.log_level.upper()
