@@ -9,7 +9,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "getitune"
-version = "0.2.0"
+version = "0.2.1"
 description = "getitune: Train, Evaluate, Optimize, Deploy Computer Vision Models"
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
@@ -152,10 +152,6 @@ exclude-dependencies = [
     "opencv-python",
 ]
 override-dependencies = [
-    # Bypass the unnecessarily strict version requirement of 'opencv-python-headless' set by 'roboflow'
-    "opencv-python-headless~=4.11",
-    # mlflow caps pyarrow<24 but datumaro 2.0.0 requires pyarrow>=24; pyarrow 24.x works fine with mlflow
-    "pyarrow>=24.0,<25",
     # roboflow hard-pins idna==3.7; allow newer versions
     "idna>=3.15",
     # torch==2.12.1 caps setuptools<82 but version lower than 83.0 have vulnerabilities of moderate severity
