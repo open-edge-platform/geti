@@ -16,6 +16,7 @@ const TIMEOUTS = {
     quantization: 1000 * 60 * 5,
     nextMediaItem: 1000 * 30,
     mediaUploaded: 1000 * 60,
+    videoUploaded: 1000 * 60,
     stream: 1000 * 90,
     pipelineHealth: 1000 * 90,
 };
@@ -31,8 +32,9 @@ test.describe('Model training flow E2E', () => {
     const sourceName = `E2E source - ${uniqueSuffix}`;
     const sinkName = `E2E sink - ${uniqueSuffix}`;
 
-    // Resolved and created by the backend, which may run on a different host than the test runner.
-    const sinkFolderPath = `/tmp/geti-e2e-sink-${uniqueSuffix}`;
+    test.beforeEach(async ({ projectPage }) => {
+        await projectPage.disableActivePipeline();
+    });
 
     test.afterEach(async ({ projectPage }) => {
         await test.step('Delete project', async () => {
@@ -187,8 +189,17 @@ test.describe('Model training flow E2E', () => {
             await inferencePage.openInferenceTab();
             await inferencePage.openPipelineConfiguration();
 
-            await inferencePage.addVideoFileSource({ name: sourceName, videoPath: VIDEO_PATH, loop: true });
-            await expect(inferencePage.getSourceCard(sourceName)).toBeVisible();
+            const uploadedVideoPath = await inferencePage.addVideoFileSource({
+                name: sourceName,
+                videoPath: VIDEO_PATH,
+                loop: true,
+            });
+            // The source is only created once the video has finished uploading to the backend.
+            await expect(inferencePage.getSourceCard(sourceName)).toBeVisible({ timeout: TIMEOUTS.videoUploaded });
+
+            // The backend rejects a sink folder that does not already exist on its own filesystem, so the
+            // directory it just stored the uploaded video in is reused as the output folder.
+            const sinkFolderPath = uploadedVideoPath.replace(/[\\/][^\\/]+$/, '');
 
             await inferencePage.addFolderSink({
                 name: sinkName,

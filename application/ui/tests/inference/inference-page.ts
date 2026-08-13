@@ -5,6 +5,8 @@ import { Page } from '@playwright/test';
 
 type OutputFormatLabel = 'Predictions' | 'Image Original' | 'Image with Predictions';
 
+const VIDEO_UPLOAD_TIMEOUT = 1000 * 60;
+
 export class InferencePage {
     constructor(private page: Page) {}
 
@@ -63,13 +65,22 @@ export class InferencePage {
     }
 
     /**
-     * Adds a video file source by uploading the video to the backend.
+     * Adds a video file source by uploading the video to the backend, returning the path the backend
+     * stored it at.
      *
      * The "Upload" button opens a native file picker, but it delegates to a hidden `<input type="file">`
      * that Playwright can set directly. Uploading rather than typing a path keeps the test independent of
      * where the backend runs: the bytes travel over HTTP and the backend stores them on its own filesystem.
      */
-    async addVideoFileSource({ name, videoPath, loop = true }: { name: string; videoPath: string; loop?: boolean }) {
+    async addVideoFileSource({
+        name,
+        videoPath,
+        loop = true,
+    }: {
+        name: string;
+        videoPath: string;
+        loop?: boolean;
+    }): Promise<string> {
         await this.getInputTab().click();
         await this.getAddSourceButton().click();
 
@@ -84,7 +95,16 @@ export class InferencePage {
             await loopSwitch.click();
         }
 
+        const uploadResponse = this.page.waitForResponse(
+            (response) => response.url().includes('/api/sources/media') && response.request().method() === 'POST',
+            { timeout: VIDEO_UPLOAD_TIMEOUT }
+        );
+
         await this.page.getByRole('button', { name: 'Add & Use' }).click();
+
+        const { video_path: uploadedVideoPath } = (await (await uploadResponse).json()) as { video_path: string };
+
+        return uploadedVideoPath;
     }
 
     async addFolderSink({
