@@ -89,7 +89,8 @@ pip install "getitune"
 ```
 
 > [!IMPORTANT]
-> Due to licensing constraints, the PyPI package doesn't include Ultralytics YOLO models.  
+> Due to licensing constraints, the PyPI package doesn't include Ultralytics YOLO models.
+>
 > To use Ultralytics YOLO models, you must [install from source](#advanced-install-from-source).
 
 <details>
@@ -107,7 +108,7 @@ pip install "getitune"
 # Intel GPU (XPU)
 uv pip install "getitune[xpu]" --extra-index-url https://download.pytorch.org/whl/xpu
 
-# NVIDIA GPU (CUDA 12.8)
+# NVIDIA GPU (CUDA 13.0)
 uv pip install "getitune[cuda]" --extra-index-url https://download.pytorch.org/whl/cu128
 
 # CPU-only (no extra index needed)
