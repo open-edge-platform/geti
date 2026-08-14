@@ -161,7 +161,7 @@ class FCNHeadModule(BaseSegmentationHead):
         x = self._transform_inputs(inputs)
         feats = self.convs(x)
         if self.concat_input:
-            feats = self.conv_cat(torch.cat([x, feats], dim=1))
+            feats = self.conv_cat(torch.cat([x, feats], dim=1))  # pyrefly: ignore[no-matching-overload]
         return feats
 
     def forward(self, inputs: Tensor) -> Tensor:
