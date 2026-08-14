@@ -43,6 +43,12 @@ class ModelView(BaseRequiredIDModel):
                     "start_time": "2021-06-29T16:24:30.928000+00:00",
                     "end_time": "2021-06-29T16:24:30.928000+00:00",
                     "dataset_revision_id": "3c6c6d38-1cd8-4458-b759-b9880c048b78",
+                    "device": {
+                        "type": "cuda",
+                        "name": "NVIDIA GeForce RTX 4090",
+                        "memory": 25757220864,
+                        "index": 0,
+                    },
                     "label_schema_revision": {
                         "labels": [
                             {
