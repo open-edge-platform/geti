@@ -21,6 +21,9 @@ export default defineConfig({
             include: '**/*.svg',
         }),
     ],
+    resolve: {
+        tsconfigPaths: true,
+    },
     test: {
         environment: 'jsdom',
 
