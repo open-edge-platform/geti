@@ -164,10 +164,10 @@ def _build_entry(
         "imagenet_top1_accuracy": imagenet_top1.get(model_name),
     }
 
-    if existing is not None and "trainable_parameters" in existing and "gigaflops" in existing:
+    cached_keys = {"trainable_parameters", "gigaflops"}
+    if existing is not None and cached_keys.issubset(existing.keys()):
         logger.debug("Reusing cached stats for %s", model_name)
-        entry["trainable_parameters"] = existing["trainable_parameters"]
-        entry["gigaflops"] = existing["gigaflops"]
+        entry.update({k: existing[k] for k in cached_keys})
     else:
         logger.info("Computing stats for %s", model_name)
         entry.update(_compute_stats(model_name))

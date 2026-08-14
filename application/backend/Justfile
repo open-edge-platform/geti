@@ -110,18 +110,18 @@ gen-timm-catalog: install-uv
     trap 'rm -f "$TMP_CSV"' EXIT
 
     echo "Downloading ImageNet results table..."
-    IMAGENET_ARGS=()
-    if curl -fL --retry 3 --retry-delay 2 "{{ timm-imagenet-results-url }}" -o "$TMP_CSV"; then
-        IMAGENET_ARGS=(--imagenet-results-csv "$TMP_CSV")
-    else
-        echo "Warning: failed to download ImageNet results table; continuing without top1 accuracy." >&2
-    fi
+    IMAGENET_ARGS=()
+    if curl -fL --retry 3 --retry-delay 2 "{{ timm-imagenet-results-url }}" -o "$TMP_CSV"; then
+        IMAGENET_ARGS=(--imagenet-results-csv "$TMP_CSV")
+    else
+        echo "Warning: failed to download ImageNet results table; continuing without top1 accuracy." >&2
+    fi
 
     echo "Generating timm catalog snapshot at ${OUTPUT}..."
     cd ../../library
     uv run python scripts/timm_catalog/generate_snapshot.py \
         --output "$OUTPUT" \
-        "${IMAGENET_ARGS[@]}"
+        "${IMAGENET_ARGS[@]}"
 
     echo "Snapshot written to ${OUTPUT}"
 
