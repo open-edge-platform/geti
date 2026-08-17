@@ -18,7 +18,7 @@ maintainers = [
   {name = "Intel(R) Corporation"},
 ]
 description = "Model API: model wrappers and pipelines for inference with OpenVINO"
-readme = "../README.md"
+readme = "README.md"
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3.11",
