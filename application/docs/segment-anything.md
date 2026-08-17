@@ -230,7 +230,11 @@ _Response:_ HTTP 200 OK and image embedding in binary format (`Content-Type: app
 
 ### Implementation plan
 
-1. SAM 2 support is added to the `model_api` module
+1. SAM 2 support is added to the `model_api` module. 
+   New classes inheriting `ImageModel` class from `model_api` should be added for both encoder and decoder similarly 
+   to SAM 1 support: https://github.com/open-edge-platform/model_api/blob/master/model_api/src/model_api/models/sam_models.py
+   Benefit of adding it to `model_api` is that it can be reused later in other products, plus it already has built-in code and algorithma
+   for data pre- and post-processing.
 2. Encoder model weights are converted to OpenVino IR format
 3. Model loading is added to the application startup sequence, so the encoder is pre-loaded and cached
 4. The new endpoint is introduced to the backend API, which runs the encoder and returns the embedding to the client
