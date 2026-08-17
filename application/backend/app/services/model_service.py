@@ -3,7 +3,6 @@
 
 import json
 import shutil
-import xml.etree.ElementTree as ET
 from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import datetime
@@ -12,6 +11,7 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from defusedxml.ElementTree import parse as parse_xml
 from loguru import logger
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -102,8 +102,9 @@ def _cached_model_size_in_bytes(model_path: Path) -> int:
 def _read_ir_confidence_threshold(model_xml: Path) -> float | None:
     """Read the confidence threshold from the ``rt_info`` section of an OpenVINO IR XML file."""
     # The IR topology is parsed directly rather than through openvino.Core.read_model, which would also
-    # load the (much larger) weights file. The file is application-generated, hence trusted.
-    element = ET.parse(model_xml).getroot().find(CONFIDENCE_THRESHOLD_IR_PATH)  # noqa: S314
+    # load the (much larger) weights file.
+    root = parse_xml(model_xml).getroot()
+    element = root.find(CONFIDENCE_THRESHOLD_IR_PATH) if root is not None else None
     if element is None:
         return None
     value = element.get("value")
