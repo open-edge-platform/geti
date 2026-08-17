@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
 type OutputFormatLabel = 'Predictions' | 'Image Original' | 'Image with Predictions';
 
@@ -42,13 +42,55 @@ export class InferencePage {
         return this.page.getByRole('button', { name: 'Add new sink' });
     }
 
-    // The source and sink lists render their name as plain text, without a role or test id to anchor on.
     getSourceCard(name: string) {
-        return this.page.getByText(name, { exact: true });
+        return this.page.getByTestId(`source-card-${name}`);
+    }
+
+    async deleteSource(name: string) {
+        await this.getInputTab().click();
+
+        await this.removeCard(this.getSourceCard(name), 'source menu', name);
     }
 
     getSinkCard(name: string) {
-        return this.page.getByText(name, { exact: true });
+        return this.page.getByTestId(`sink-card-${name}`);
+    }
+
+    async deleteSink(name: string) {
+        await this.getOutputTab().click();
+
+        await this.removeCard(this.getSinkCard(name), 'sink menu', name);
+    }
+
+    /**
+     * Removes a source or sink card, disconnecting it from the pipeline first because the menu keeps
+     * "Remove" disabled while it is connected.
+     *
+     * Missing cards are ignored so this can run as teardown after a test that failed before creating them.
+     */
+    private async removeCard(card: Locator, menuLabel: string, name: string) {
+        if (!(await card.isVisible())) {
+            return;
+        }
+
+        const menuButton = card.getByRole('button', { name: menuLabel });
+
+        await menuButton.click();
+
+        const disconnect = this.page.getByRole('menuitem', { name: 'Disconnect' });
+
+        if (await disconnect.isVisible()) {
+            await disconnect.click();
+
+            await this.page
+                .getByLabel('toast')
+                .filter({ hasText: `disconnected from "${name}"` })
+                .waitFor();
+
+            await menuButton.click();
+        }
+
+        await this.page.getByRole('menuitem', { name: 'Remove' }).click();
     }
 
     /** Adds a USB camera source, picking the first camera the backend reports. */

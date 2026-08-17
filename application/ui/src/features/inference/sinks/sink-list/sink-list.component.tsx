@@ -43,6 +43,7 @@ const SinkListItem = ({ sink, isConnected, onEditSink }: SinksListItemProps) => 
             key={sink.id}
             gap='size-200'
             direction='column'
+            data-testid={`sink-card-${sink.name}`}
             UNSAFE_className={clsx(classes.card, {
                 [classes.activeCard]: isConnected,
             })}
