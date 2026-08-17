@@ -150,12 +150,12 @@ approach requires no additional development on the client side.
 
 ### SAM 2.1 Models Description
 
-| Model              | Size (M) | Speed (FPS) |
-| ------------------ | -------: | -----------: |
-| sam2.1_hiera_tiny  |     38.9 |         91.2 |
-| sam2.1_hiera_small |      46 |         84.8 |
-| sam2.1_hiera_base_plus |   80.8 |         64.1 |
-| sam2.1_hiera_large |    224.4 |         39.5 |
+| Model                  | Size (M) | Speed (FPS)   |  SA-V test (J&F) | MOSE val (J&F) | LVOS v2 (J&F) |
+|------------------------|---------:|--------------:|-----------------:|---------------:|--------------:|
+| sam2.1_hiera_tiny      |     38.9 |          91.2 |             76.5 |           71.8 |          77.3 |
+| sam2.1_hiera_small     |     46   |          84.8 |             76.6 |           73.5 |          78.3 |
+| sam2.1_hiera_base_plus |     80.8 |          64.1 |             78.2 |           73.7 |          78.2 |
+| sam2.1_hiera_large     |    224.4 |          39.5 |             79.5 |           74.6 |          80.6 |
 
 ### SAM 2.1 models benchmarks
 
@@ -170,8 +170,8 @@ All models were converted to OpenVino IR format and run with OpenVino Runtime. T
 - Enc fps = frames per second for encoder model
 - Pred mean = average time to run decoder model
 - Pred fps = frames per second for decoder model
-- E2E mean = average time to run encoder and decoder models end-to-end
-- E2E fps = frames per second for encoder and decoder models end-to-end
+- E2E mean = average time to run encoder and decoder models end-to-end (excluding model loading)
+- E2E fps = frames per second for encoder and decoder models end-to-end (excluding model loading)
 
 Load/latency in ms; Cold = first compile, Warm = from cache.
 
@@ -181,8 +181,8 @@ Load/latency in ms; Cold = first compile, Warm = from cache.
 | --------- | ------: | ------: | -------: | -------: | -------: | ------: | --------: | -------: | -------: | ------: |
 | tiny      |  4208.7 |   147.8 |    282.8 |     50.8 |    88.66 |   11.28 |     10.93 |    91.53 |    99.59 |   10.04 |
 | small     |  4133.9 |   121.9 |    280.9 |     51.4 |   102.20 |    9.79 |     10.92 |    91.57 |   113.12 |    8.84 |
-| large     |  6826.8 |   413.0 |    290.6 |     55.9 |   364.58 |    2.74 |     11.21 |    89.23 |   375.78 |    2.66 |
 | base_plus |  5195.9 |   221.9 |    297.1 |     53.0 |   164.27 |    6.09 |     10.95 |    91.31 |   175.22 |    5.71 |
+| large     |  6826.8 |   413.0 |    290.6 |     55.9 |   364.58 |    2.74 |     11.21 |    89.23 |   375.78 |    2.66 |
 
 #### CPU (Tiger Lake)
 
@@ -190,8 +190,8 @@ Load/latency in ms; Cold = first compile, Warm = from cache.
 | --------- | ------: | ------: | -------: | -------: | -------: | ------: | --------: | -------: | -------: | ------: |
 | tiny      |  7682.0 |   292.7 |    320.5 |     97.7 |  2002.11 |    0.50 |     97.28 |    10.28 |  2099.39 |    0.48 |
 | small     |  8187.2 |   383.7 |    332.2 |    107.4 |  2555.28 |    0.39 |     74.38 |    13.44 |  2629.65 |    0.38 |
-| large     | 14116.6 |  1472.8 |    386.9 |    104.3 | 10906.51 |    0.09 |     59.97 |    16.67 | 10966.48 |    0.09 |
 | base_plus | 10728.1 |   616.8 |    364.6 |    101.7 |  4210.63 |    0.24 |     65.58 |    15.25 |  4276.21 |    0.23 |
+| large     | 14116.6 |  1472.8 |    386.9 |    104.3 | 10906.51 |    0.09 |     59.97 |    16.67 | 10966.48 |    0.09 |
 
 #### Choosing a model for CPU targets
 
