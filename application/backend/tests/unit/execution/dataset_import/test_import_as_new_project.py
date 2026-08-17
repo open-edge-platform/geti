@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 from uuid import uuid4
 
+import numpy as np
 import polars as pl
 import pytest
 from datumaro.experimental import Dataset
@@ -165,6 +166,40 @@ class TestImportDatasetAsNewProject:
                 include_unannotated=False,
                 start_progress=15.0,
             )
+
+    @pytest.mark.parametrize(
+        "attributes, expected",
+        [
+            ({}, False),  # no label attribute at all
+            ({"label": str}, False),  # plain scalar label
+            ({"label": np.ndarray}, True),  # array label under "label"
+            ({"label": np.ndarray | None}, True),  # optional array label under "label"
+            ({"labels": np.ndarray}, True),  # array label under "labels"
+            ({"labels": np.ndarray | None}, True),  # optional array label under "labels"
+            ({"labels": str}, False),  # plain scalar under "labels"
+            ({"other": np.ndarray}, False),  # unrelated attribute name
+        ],
+    )
+    def test_has_array_label(
+        self,
+        attributes: dict,
+        expected: bool,
+        fxt_import: ImportDatasetAsNewProject,
+    ) -> None:
+        dataset = MagicMock(spec=Dataset)
+        dataset.schema = Mock()
+
+        def _attr(tp: object) -> Mock:
+            attr = Mock()
+            attr.type = tp
+            return attr
+
+        # wrap raw types into mock attribute objects with a `.type`
+        dataset.schema.attributes = {name: _attr(tp) for name, tp in attributes.items()}
+
+        result = fxt_import._has_array_label(dataset=dataset)
+
+        assert result is expected
 
     def test_execute(
         self, fxt_import: ImportDatasetAsNewProject, fxt_import_params: ImportDatasetAsNewProjectJobParams

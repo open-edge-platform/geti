@@ -21,7 +21,7 @@ import { Edit } from '@geti-ui/ui/icons';
 import { useProjects } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { partition } from 'lodash-es';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { EnablePipelineBlockedDialog } from '../../components/enable-pipeline-blocked-dialog/enable-pipeline-blocked-dialog.component';
 import { DeleteProjectDialog } from '../../components/project-dialogs/delete-project-dialog.component';
@@ -74,7 +74,9 @@ const ManageProjects = () => {
     const navigate = useNavigate();
 
     const navigateToProjectsList = () => {
-        navigate(paths.project.index({}));
+        navigate(paths.project.index({}), {
+            viewTransition: true,
+        });
     };
 
     return (
@@ -122,7 +124,9 @@ export const ProjectsListPanel = () => {
 
     const handleDeleted = () => {
         if (selectedProject?.id === projectActionMetadata?.projectId) {
-            navigate(paths.project.index({}));
+            navigate(paths.project.index({}), {
+                viewTransition: true,
+            });
         }
 
         clearProjectActionMetadata();

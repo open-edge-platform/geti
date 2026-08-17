@@ -24,26 +24,12 @@ vi.mock('../../../shared/drop-zone.utils', () => ({
     getFilesFromDropEvent: ({ files }: { files: File[] }) => Promise.resolve(files),
 }));
 
-vi.mock('../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component', () => ({
-    VirtualizerGridLayout: ({
-        items,
-        contentItem,
-    }: {
-        items: Array<{ id: string }>;
-        contentItem: (item: unknown) => ReactNode;
-    }) => (
-        <>
-            {items.map((item) => (
-                <div key={item.id}>{contentItem(item)}</div>
-            ))}
-        </>
-    ),
-}));
-
 vi.mock('@geti-ui/ui', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@geti-ui/ui')>();
     return {
         ...actual,
+        // Virtualized items are laid out from measurements jsdom does not provide, so they never render
+        Virtualizer: ({ children }: { children: ReactNode }) => <>{children}</>,
         AriaDropZone: ({
             children,
             onDrop,
@@ -183,5 +169,117 @@ describe('Gallery item deletion and selection', () => {
         await screen.findByText('1 item deleted successfully');
 
         expect(screen.queryByText(/\d+ selected/)).not.toBeInTheDocument();
+    });
+
+    describe('multi selection', () => {
+        const items = ['item-1', 'item-2', 'item-3', 'item-4'].map((id) => getMockedMediaImage({ id }));
+
+        const getItem = (index: number) => screen.getAllByRole('option')[index];
+
+        const getCheckbox = (id: string) => screen.getByRole('checkbox', { name: `Select media item ${id}` });
+
+        const clickWithModifier = async (
+            user: ReturnType<typeof userEvent.setup>,
+            modifier: 'Shift' | 'Control',
+            index: number
+        ) => {
+            await user.keyboard(`{${modifier}>}`);
+            await user.click(getItem(index));
+            await user.keyboard(`{/${modifier}}`);
+        };
+
+        it('selects an item by clicking anywhere on it', async () => {
+            const user = userEvent.setup();
+            await renderGalleryWithItems(items);
+
+            await user.click(getItem(0));
+
+            expect(screen.getByText('1 selected')).toBeInTheDocument();
+            expect(getCheckbox('item-1')).toBeChecked();
+        });
+
+        it('replaces the selection when clicking another item without a modifier', async () => {
+            const user = userEvent.setup();
+            await renderGalleryWithItems(items);
+
+            await user.click(getItem(0));
+            await user.click(getItem(2));
+
+            expect(screen.getByText('1 selected')).toBeInTheDocument();
+            expect(getCheckbox('item-1')).not.toBeChecked();
+            expect(getCheckbox('item-3')).toBeChecked();
+        });
+
+        it('deselects the item when clicking it again', async () => {
+            const user = userEvent.setup();
+            await renderGalleryWithItems(items);
+
+            await user.click(getItem(0));
+            await user.click(getItem(0));
+
+            expect(screen.queryByText(/\d+ selected/)).not.toBeInTheDocument();
+            expect(getCheckbox('item-1')).not.toBeChecked();
+        });
+
+        it('adds an item to the selection when clicking with the ctrl key', async () => {
+            const user = userEvent.setup();
+            await renderGalleryWithItems(items);
+
+            await user.click(getItem(0));
+            await clickWithModifier(user, 'Control', 2);
+
+            expect(screen.getByText('2 selected')).toBeInTheDocument();
+            expect(getCheckbox('item-1')).toBeChecked();
+            expect(getCheckbox('item-3')).toBeChecked();
+        });
+
+        it('selects every item between the previously selected item and the shift clicked one', async () => {
+            const user = userEvent.setup();
+            await renderGalleryWithItems(items);
+
+            await user.click(getItem(1));
+            await clickWithModifier(user, 'Shift', 3);
+
+            expect(screen.getByText('3 selected')).toBeInTheDocument();
+            expect(getCheckbox('item-1')).not.toBeChecked();
+            expect(getCheckbox('item-2')).toBeChecked();
+            expect(getCheckbox('item-3')).toBeChecked();
+            expect(getCheckbox('item-4')).toBeChecked();
+        });
+
+        it('selects the range when shift clicking an item above the previously selected one', async () => {
+            const user = userEvent.setup();
+            await renderGalleryWithItems(items);
+
+            await user.click(getItem(2));
+            await clickWithModifier(user, 'Shift', 0);
+
+            expect(screen.getByText('3 selected')).toBeInTheDocument();
+            expect(getCheckbox('item-4')).not.toBeChecked();
+        });
+
+        it('toggles a single item through its checkbox', async () => {
+            const user = userEvent.setup();
+            await renderGalleryWithItems(items);
+
+            await user.click(getCheckbox('item-1'));
+            expect(screen.getByText('1 selected')).toBeInTheDocument();
+
+            await user.click(getCheckbox('item-2'));
+            expect(screen.getByText('2 selected')).toBeInTheDocument();
+
+            await user.click(getCheckbox('item-1'));
+            expect(screen.getByText('1 selected')).toBeInTheDocument();
+        });
+
+        it('does not select an item when using its actions menu', async () => {
+            const user = userEvent.setup();
+            await renderGalleryWithItems([item]);
+
+            await user.click(screen.getByRole('button', { name: 'Media actions' }));
+
+            expect(await screen.findByRole('menuitem', { name: 'Delete' })).toBeInTheDocument();
+            expect(screen.queryByText(/\d+ selected/)).not.toBeInTheDocument();
+        });
     });
 });

@@ -40,6 +40,8 @@ export const annotationsQueryOptions = (projectId: string, media: Media) =>
     queryOptions({
         queryKey: getAnnotationsQueryKey(projectId, media),
         queryFn: () => annotationsQueryFn(projectId, media),
+        // Saving annotations invalidates this query, so revisiting a media item can be served from the cache
+        staleTime: 1000 * 60,
     });
 
 const isValidAnnotation = (annotation: AnnotationDTO): boolean => {

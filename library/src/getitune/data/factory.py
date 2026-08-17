@@ -80,17 +80,12 @@ class DatasetFactory:
 
                 return MultilabelClsDataset(**common_kwargs)
 
-            case TaskType.H_LABEL_CLS:
-                from .dataset.classification import HlabelClsDataset
-
-                return HlabelClsDataset(**common_kwargs)
-
             case TaskType.DETECTION:
                 from .dataset.detection import DetectionDataset
 
                 return DetectionDataset(**common_kwargs)
 
-            case TaskType.ROTATED_DETECTION | TaskType.INSTANCE_SEGMENTATION:
+            case TaskType.INSTANCE_SEGMENTATION:
                 from .dataset.instance_segmentation import InstanceSegDataset
 
                 return InstanceSegDataset(task_type=task, **common_kwargs)

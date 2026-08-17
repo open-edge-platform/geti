@@ -7,12 +7,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
 import pycocotools.mask as mask_utils
 import torch
 from torchvision.ops import roi_align
 
 if TYPE_CHECKING:
+    import numpy as np
     from torchvision import tv_tensors
 
 
@@ -106,19 +106,15 @@ def crop_and_resize_masks(
     if len(annos) == 0:
         return torch.empty((0, *out_shape), dtype=torch.float, device=device)
 
-    # convert bboxes to tensor
-    if isinstance(bboxes, np.ndarray):
-        bboxes = torch.from_numpy(bboxes).to(device=device)
-    if isinstance(inds, np.ndarray):
-        inds = torch.from_numpy(inds).to(device=device)
+    bboxes_tensor = torch.from_numpy(bboxes).to(device=device)
+    inds_tensor = torch.from_numpy(inds).to(device=device)
 
-    num_bbox = bboxes.shape[0]
-    # pyrefly: ignore[no-matching-overload]
-    fake_inds = torch.arange(num_bbox, device=device).to(dtype=bboxes.dtype)[:, None]
-    rois = torch.cat([fake_inds, bboxes], dim=1)  # Nx5
+    num_bbox = bboxes_tensor.shape[0]
+    fake_inds = torch.arange(num_bbox, device=device).to(dtype=bboxes_tensor.dtype)[:, None]
+    rois = torch.cat([fake_inds, bboxes_tensor], dim=1)  # Nx5
     rois = rois.to(device=device)
     if num_bbox > 0:
-        gt_masks_th = annos.index_select(0, inds).to(dtype=rois.dtype)
+        gt_masks_th = annos.index_select(0, inds_tensor).to(dtype=rois.dtype)
         targets = roi_align(gt_masks_th[:, None, :, :], rois, out_shape, 1.0, 0, True).squeeze(1)
         resized_masks = targets >= 0.5
     else:

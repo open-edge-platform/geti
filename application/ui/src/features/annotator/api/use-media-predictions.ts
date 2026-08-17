@@ -82,20 +82,38 @@ export const useMediaPredictions = ({
     selectedModel,
     range,
     device,
+    enabled = true,
 }: {
     mediaId: string;
     selectedModel: SelectableModel | undefined;
     range?: PredictionVideoRangePayload | null;
     device: string;
+    enabled?: boolean;
 }) => {
     const projectId = useProjectIdentifier();
+    const options = mediaPredictionsQueryOptions({ projectId, selectedModel, mediaId, range, device });
 
-    return useQuery(mediaPredictionsQueryOptions({ projectId, selectedModel, mediaId, range, device }));
+    return useQuery({ ...options, enabled: options.enabled && enabled });
+};
+
+export const useIsFetchingMediaPredictions = ({
+    mediaId,
+    selectedModel,
+    device,
+    range = null,
+}: {
+    mediaId: string;
+    selectedModel: SelectableModel | undefined;
+    device: string;
+    range?: PredictionVideoRangePayload | null;
+}) => {
+    const projectId = useProjectIdentifier();
+    const { queryKey } = mediaPredictionsQueryOptions({ projectId, selectedModel, mediaId, device, range });
+
+    return useIsFetching({ queryKey, exact: true }) > 0;
 };
 
 export const useIsFetchingCurrentRangeFramesPredictions = (mediaId: string) => {
-    const projectId = useProjectIdentifier();
-
     const { selectedModel, selectedDevice } = usePredictionSetup();
     const videoContext = useVideoPlayerContext();
 
@@ -110,19 +128,15 @@ export const useIsFetchingCurrentRangeFramesPredictions = (mediaId: string) => {
         chunkSize: PREDICTION_CHUNK_SIZE,
     });
 
-    const rangeQueryKey = mediaPredictionsQueryOptions({
-        projectId,
-        selectedModel,
+    return useIsFetchingMediaPredictions({
         mediaId,
+        selectedModel,
         device: selectedDevice,
         range: { stride: PREDICTION_FRAME_SKIP, start_frame: startFrameIndex, end_frame: endFrameIndex },
-    }).queryKey;
-
-    return useIsFetching({ queryKey: rangeQueryKey, exact: true }) > 0;
+    });
 };
 
 const useIsFetchingCurrentFramePredictions = (mediaId: string) => {
-    const projectId = useProjectIdentifier();
     const { selectedModel, selectedDevice } = usePredictionSetup();
     const { mediaItem } = useSelectedMediaItem();
 
@@ -130,15 +144,12 @@ const useIsFetchingCurrentFramePredictions = (mediaId: string) => {
         ? { start_frame: mediaItem.frame_number, end_frame: mediaItem.frame_number, stride: mediaItem.frame_stride }
         : null;
 
-    const singleFrameQueryKey = mediaPredictionsQueryOptions({
-        projectId,
-        selectedModel,
+    return useIsFetchingMediaPredictions({
         mediaId,
+        selectedModel,
         device: selectedDevice,
         range: singleFrameRange,
-    }).queryKey;
-
-    return useIsFetching({ queryKey: singleFrameQueryKey, exact: true }) > 0;
+    });
 };
 
 export const useIsFetchingPredictions = (mediaId: string) => {

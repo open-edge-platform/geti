@@ -3,7 +3,7 @@
 
 import type { Project } from '@/api/types';
 import { Badge, Flex, Text } from '@geti-ui/ui';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { paths } from '../../../constants/paths';
 import { ActiveProjectBadge } from '../../../features/project/list/active-project-badge/active-project-badge.component';
@@ -36,7 +36,9 @@ export const ProjectListItem = ({
     const taskType = getProjectTypeTitle(project.task);
 
     const handleNavigateToProject = () => {
-        navigate(paths.project.dataset.index({ projectId: project.id }));
+        navigate(paths.project.dataset.index({ projectId: project.id }), {
+            viewTransition: true,
+        });
     };
 
     return (

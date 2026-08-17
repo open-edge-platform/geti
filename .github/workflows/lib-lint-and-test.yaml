@@ -31,13 +31,13 @@ jobs:
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - &checkout
         name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 
@@ -48,7 +48,7 @@ jobs:
           files_yaml: |
             test:
               - library/**
-              - .github/**
+              - .github/workflows/lib-lint-and-test.yaml
 
       # Separate filter so we only run the (slow, network-bound) benchmark
       # dataset preparation tests when those scripts are touched.
@@ -106,12 +106,12 @@ jobs:
     steps:
       # YAML anchors not used cause currently zizmor don't support them in matrix strategies
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 
@@ -154,7 +154,6 @@ jobs:
         task:
           - "multi_class_cls"
           - "multi_label_cls"
-          - "h_label_cls"
           - "keypoint_detection"
           - "detection"
           - "instance_segmentation"
@@ -163,12 +162,12 @@ jobs:
     steps:
       # YAML anchors aren't used because Zizmor fails here and support for them is best-effort for now
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 
@@ -219,7 +218,7 @@ jobs:
       - *harden-runner
 
       - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 

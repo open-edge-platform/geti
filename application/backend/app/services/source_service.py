@@ -183,7 +183,11 @@ class SourceUpdateService(SourceService):
             )
             active_source_id = self.get_active_source_id()
             if active_source_id == UUID(db_source.id):
-                self._event_bus.emit_event(EventType.SOURCE_CHANGED)
+                # Emit only after this transaction commits: the StreamLoader reacts to SOURCE_CHANGED
+                # by re-reading the active source in its own session/process, so notifying before the
+                # new config is durable would let it reopen the stream with stale data (e.g. the old
+                # video_path).
+                self._event_bus.emit_event_after_commit(self._db_session, EventType.SOURCE_CHANGED)
         except UniqueConstraintIntegrityError:
             raise ResourceWithNameAlreadyExistsError(ResourceType.SOURCE, new_name)
 

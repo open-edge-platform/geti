@@ -445,10 +445,12 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         logger.info("Instantiating model for training (model_id={})", model_id)
         model_cfg = training_config["model"]
         model_cfg["init_args"]["label_info"] = datamodule.label_info.label_names
+        # NOTE: pass mean/std through as-is. None when the CPU augmentation pipeline has no torchvision Normalize to
+        # derive them from, such as when normalization lives in augmentations_gpu instead
         model_cfg["init_args"]["data_input_params"] = DataInputParams(
             input_size=cast(tuple[int, int], datamodule.input_size),
-            mean=datamodule.input_mean if datamodule.input_mean is not None else (0.0, 0.0, 0.0),
-            std=datamodule.input_std if datamodule.input_std is not None else (1.0, 1.0, 1.0),
+            mean=datamodule.input_mean,
+            std=datamodule.input_std,
             intensity_config=datamodule.input_intensity_config,
         ).as_dict()
         logger.info("Initializing engine for training (model_id={})", model_id)

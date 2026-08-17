@@ -46,9 +46,9 @@ class SegNext(LightningSegmentationModel):
 
     pretrained_weights_target = "backbone"
     pretrained_urls: ClassVar[dict[str, str]] = {
-        "segnext_tiny": "https://storage.geti.intel.com/weights/mscan_t_20230227-119e8c9f.pth",
-        "segnext_small": "https://storage.geti.intel.com/weights/mscan_s_20230227-f33ccdf2.pth",
-        "segnext_base": "https://storage.geti.intel.com/weights/mscan_b_20230227-3ab7d230.pth",
+        "segnext_tiny": "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segnext/mscan_t_20230227-119e8c9f.pth",
+        "segnext_small": "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segnext/mscan_s_20230227-f33ccdf2.pth",
+        "segnext_base": "https://download.openmmlab.com/mmsegmentation/v0.5/pretrain/segnext/mscan_b_20230227-3ab7d230.pth",
     }
 
     def __init__(

@@ -2,8 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DatasetSubset, Media } from '@/api/types';
-import { ActionButton, Button, ButtonGroup, Divider, Flex, Icon, Text } from '@geti-ui/ui';
-import { CloseSemiBold } from '@geti-ui/ui/icons';
+import {
+    ActionButton,
+    Button,
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogTrigger,
+    Divider,
+    Flex,
+    Heading,
+    Icon,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+} from '@geti-ui/ui';
+import { CloseSemiBold, Gear } from '@geti-ui/ui/icons';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -66,6 +80,31 @@ const VideoAnnotationButtons = ({ onSubmit, isDisabled, isSaving }: VideoAnnotat
     );
 };
 
+const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
+    return (
+        <DialogTrigger type={'popover'} placement={'bottom'}>
+            <TooltipTrigger>
+                <Toolbar.Section>
+                    <ActionButton isQuiet aria-label={'Prediction settings'}>
+                        <Gear />
+                    </ActionButton>
+                </Toolbar.Section>
+                <Tooltip>Prediction settings</Tooltip>
+            </TooltipTrigger>
+            <Dialog size='S'>
+                <Heading>Prediction settings</Heading>
+                <Divider />
+                <Content>
+                    <Flex gap={'size-50'} direction={'column'}>
+                        <PredictionModelSelector isDisabled={isDisabled} />
+                        <PredictionInferenceDevices isDisabled={isDisabled} />
+                    </Flex>
+                </Content>
+            </Dialog>
+        </DialogTrigger>
+    );
+};
+
 type SecondaryToolbarProps = {
     items: Media[];
     mediaItem: Media;
@@ -121,6 +160,7 @@ export const SecondaryToolbar = ({
 
     const isPredictionMode = mode === 'prediction';
     const isAnnotationMode = mode === 'annotation';
+    const showPredictionActions = isPredictionMode && !isEmpty(selectableModels);
 
     const isSubmitDisabled = useIsSubmitDisabled({
         mode,
@@ -158,18 +198,7 @@ export const SecondaryToolbar = ({
                         />
                     </Toolbar.Section>
 
-                    {isPredictionMode && (
-                        <Flex gap={'size-50'}>
-                            {!isEmpty(selectableModels) ? (
-                                <Toolbar.Section minWidth={'size-2000'}>
-                                    <PredictionModelSelector isDisabled={isLoadingPredictions || isPlaying} />
-                                </Toolbar.Section>
-                            ) : null}
-                            <Toolbar.Section>
-                                <PredictionInferenceDevices isDisabled={isLoadingPredictions || isPlaying} />
-                            </Toolbar.Section>
-                        </Flex>
-                    )}
+                    {showPredictionActions && <PredictionActions isDisabled={isLoadingPredictions || isPlaying} />}
                 </Flex>
             </Toolbar.Container>
             {isAnnotationMode && (

@@ -1,26 +1,21 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Suspense, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 
 import type { DatasetRevisionItem } from '@/api/types';
-import { Content, Dialog, DialogContainer, Flex, Grid, Loading, Size, Text, View, ViewModes } from '@geti-ui/ui';
+import { DialogContainer, Flex, Loading, Size, Text, View, ViewModes } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { GridLayoutOptions } from 'react-aria-components';
 
 import { MediaItem } from '../../../../components/media-item/media-item.component';
 import { MediaThumbnail } from '../../../../components/media-thumbnail/media-thumbnail.component';
 import { VirtualizerGridLayout } from '../../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
-import {
-    SelectedMediaItemProvider,
-    useSelectedMediaItem,
-} from '../../../../features/annotator/selected-media-item-provider.component';
-import { useAnnotationsQuery } from '../../../../features/dataset/media-preview/api/use-annotations-query';
-import { ReadOnlyAnnotatorProviders } from '../../../../features/dataset/media-preview/read-only-annotator-providers.component';
-import { ReadOnlyAnnotator } from '../../../../features/dataset/media-preview/read-only-annotator.component';
-import { getInitialAnnotations } from '../../../../features/dataset/media-preview/utils';
 import { type GalleryViewMode } from '../../../../shared/gallery-view-modes';
 import { getDatasetRevisionThumbnailUrl } from '../../../../shared/media-url.utils';
+import { usePrefetchMediaItem } from '../../../annotator/hooks/use-prefetch-media-item.hook';
+import { type SelectableModel } from '../../utils';
+import { SubsetMediaDialog } from './subset-media-dialog.component';
 import { datasetRevisionItemToMedia } from './utils';
 
 const VIEW_MODE_SETTINGS: Record<GalleryViewMode, GridLayoutOptions> = {
@@ -28,6 +23,9 @@ const VIEW_MODE_SETTINGS: Record<GalleryViewMode, GridLayoutOptions> = {
     [ViewModes.MEDIUM]: { minItemSize: new Size(120, 120), minSpace: new Size(4, 4), preserveAspectRatio: true },
     [ViewModes.SMALL]: { minItemSize: new Size(80, 80), minSpace: new Size(4, 4), preserveAspectRatio: true },
 };
+
+// How many loaded items must remain ahead of the newly selected one before the next page is requested
+const LOAD_AHEAD_BUFFER = 1;
 
 type SubsetGalleryProps = {
     items: DatasetRevisionItem[];
@@ -37,64 +35,52 @@ type SubsetGalleryProps = {
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
     isPending: boolean;
+    selectedModel: SelectableModel | undefined;
 };
 
-type SubsetMediaDialogProps = {
-    item: DatasetRevisionItem;
-    onClose: () => void;
-};
+const useSubsetNavigation = ({
+    items,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+}: Pick<SubsetGalleryProps, 'items' | 'hasNextPage' | 'isFetchingNextPage' | 'fetchNextPage'>) => {
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
-type SubsetMediaDialogContentProps = {
-    item: DatasetRevisionItem;
-    onClose: () => void;
-};
+    const selectedItemIndex = items.findIndex(({ id }) => id === selectedItemId);
+    const selectedItem = selectedItemIndex === -1 ? null : items[selectedItemIndex];
+    const nextItem = selectedItemIndex === -1 ? undefined : items[selectedItemIndex + 1];
 
-const SubsetMediaDialogContent = ({ item, onClose }: SubsetMediaDialogContentProps) => {
-    const { mediaItem, image } = useSelectedMediaItem();
-    const { data: annotationsData } = useAnnotationsQuery(mediaItem);
-
-    const annotationsDTO = annotationsData?.annotations ?? [];
-    const isUserReviewed = annotationsData?.user_reviewed ?? false;
-
-    return (
-        <ReadOnlyAnnotatorProviders
-            key={mediaItem.id}
-            mediaItem={mediaItem}
-            initialAnnotationsDTO={getInitialAnnotations(isUserReviewed, annotationsDTO)}
-            isUserReviewed={isUserReviewed}
-        >
-            <ReadOnlyAnnotator
-                image={image}
-                mediaItem={mediaItem}
-                onClose={onClose}
-                subset={item.subset}
-                hasAnnotationStatus={false}
-            />
-        </ReadOnlyAnnotatorProviders>
+    const nextMediaItem = useMemo(
+        () => (nextItem === undefined ? undefined : datasetRevisionItemToMedia(nextItem)),
+        [nextItem]
     );
-};
 
-const SubsetMediaDialog = ({ item, onClose }: SubsetMediaDialogProps) => {
-    const mediaItem = datasetRevisionItemToMedia(item);
+    usePrefetchMediaItem(nextMediaItem);
 
-    return (
-        <Dialog>
-            <Content>
-                <Grid
-                    gap='size-125'
-                    width='100%'
-                    height='100%'
-                    rows='auto 1fr auto'
-                    columns={['1fr']}
-                    areas={['header', 'canvas', 'bottom']}
-                >
-                    <SelectedMediaItemProvider mediaItem={mediaItem}>
-                        <SubsetMediaDialogContent item={item} onClose={onClose} />
-                    </SelectedMediaItemProvider>
-                </Grid>
-            </Content>
-        </Dialog>
-    );
+    const selectPreviousItem =
+        selectedItemIndex > 0 ? () => setSelectedItemId(items[selectedItemIndex - 1].id) : undefined;
+
+    const selectNextItem =
+        nextItem === undefined
+            ? undefined
+            : () => {
+                  setSelectedItemId(nextItem.id);
+
+                  const remainingItems = items.length - 1 - (selectedItemIndex + 1);
+
+                  // Keep loading ahead so the user can keep walking through the subset
+                  if (hasNextPage && !isFetchingNextPage && remainingItems < LOAD_AHEAD_BUFFER) {
+                      fetchNextPage();
+                  }
+              };
+
+    return {
+        selectedItem,
+        selectItem: (id: string) => setSelectedItemId(id),
+        clearSelection: () => setSelectedItemId(null),
+        selectPreviousItem,
+        selectNextItem,
+    };
 };
 
 export const SubsetGallery = ({
@@ -105,9 +91,15 @@ export const SubsetGallery = ({
     isFetchingNextPage,
     isPending,
     fetchNextPage,
+    selectedModel,
 }: SubsetGalleryProps) => {
     const projectId = useProjectIdentifier();
-    const [selectedItem, setSelectedItem] = useState<DatasetRevisionItem | null>(null);
+    const { selectedItem, selectItem, clearSelection, selectPreviousItem, selectNextItem } = useSubsetNavigation({
+        items,
+        hasNextPage,
+        isFetchingNextPage,
+        fetchNextPage,
+    });
 
     if (isPending) {
         return (
@@ -143,7 +135,7 @@ export const SubsetGallery = ({
                                     item={{ ...item, type: 'image' }}
                                     alt={`${item.subset} item`}
                                     url={getDatasetRevisionThumbnailUrl(projectId, datasetRevisionId, item.id)}
-                                    onDoubleClick={() => setSelectedItem(item)}
+                                    onDoubleClick={() => selectItem(item.id)}
                                 />
                             )}
                         />
@@ -151,10 +143,16 @@ export const SubsetGallery = ({
                 />
             </View>
 
-            <DialogContainer type={'fullscreen'} onDismiss={() => setSelectedItem(null)}>
+            <DialogContainer type={'fullscreen'} onDismiss={clearSelection}>
                 {selectedItem && (
                     <Suspense fallback={<Loading />}>
-                        <SubsetMediaDialog item={selectedItem} onClose={() => setSelectedItem(null)} />
+                        <SubsetMediaDialog
+                            item={selectedItem}
+                            onClose={clearSelection}
+                            selectedModel={selectedModel}
+                            onSelectPreviousMediaItem={selectPreviousItem}
+                            onSelectNextMediaItem={selectNextItem}
+                        />
                     </Suspense>
                 )}
             </DialogContainer>

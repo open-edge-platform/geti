@@ -3,8 +3,8 @@
 
 import type ClipperShape from '@doodle3d/clipper-js';
 import Clipper from '@doodle3d/clipper-js';
-import type { Shape as SmartToolsShape, Polygon as ToolPolygon, Rect as ToolRect } from '@geti/smart-tools/types';
-import { BoundingBox } from '@geti/smart-tools/utils';
+import type { Shape as SmartToolsShape, Polygon as ToolPolygon, Rect as ToolRect } from '@geti-ui/smart-tools/types';
+import { BoundingBox } from '@geti-ui/smart-tools/utils';
 import { isEmpty } from 'lodash-es';
 
 import type { ClipperPoint, Point, Polygon, Rect, RegionOfInterest, Shape } from '../../../shared/types';

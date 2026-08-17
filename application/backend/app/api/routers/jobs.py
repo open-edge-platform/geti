@@ -68,7 +68,7 @@ async def submit_job(
         job_id = uuid4()
         match job_request.job_type:
             case JobType.TRAIN:
-                device = system_service.get_device_info(job_request.parameters.device)
+                device = system_service.training_device(job_request.parameters.device)
                 project = project_service.get_project_by_id(job_request.project_id)
                 arch_id = job_request.parameters.model_architecture_id
                 arch_name = ModelManifestService.get_model_manifest_by_id(arch_id).name

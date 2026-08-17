@@ -31,6 +31,7 @@ export const useGetDatasetRevisionItems = ({ datasetRevisionId, subsets }: UseGe
         },
         {
             pageParamName: 'offset',
+            initialPageParam: 0,
             getNextPageParam: ({ pagination }: { pagination: Pagination }) => {
                 const total = pagination.offset + pagination.count;
 

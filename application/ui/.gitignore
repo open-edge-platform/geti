@@ -6,6 +6,7 @@
 # Dist
 node_modules
 dist/
+dist-tauri/
 
 # Profile
 .rspack-profile-*/
@@ -15,7 +16,9 @@ dist/
 !.vscode/extensions.json
 .idea
 
-# We clone our geti packages during the npm install phase
+# Legacy artifact: @geti-ui packages used to be cloned into packages/ during
+# npm install. They're now regular published npm dependencies, but keep this
+# ignored in case a stale packages/ directory lingers from an old checkout.
 packages/
 
 # Playwright

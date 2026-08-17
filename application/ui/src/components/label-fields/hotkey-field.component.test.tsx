@@ -76,4 +76,14 @@ describe('HotkeyField', () => {
             expect(mockOnHotkeyChange).not.toHaveBeenCalled();
         });
     });
+
+    describe('removing hotkeys', () => {
+        it('"Backspace" key press should remove existing hotkeys', () => {
+            const input = renderHotkeyField('ctrl+p');
+
+            fireEvent.keyDown(input, { key: 'Backspace' });
+
+            expect(mockOnHotkeyChange).toHaveBeenCalledWith(null);
+        });
+    });
 });

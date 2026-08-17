@@ -9,7 +9,6 @@ from getitune.types.label import LabelInfo
 @pytest.fixture(
     params=[
         "fxt_multiclass_labelinfo",
-        "fxt_hlabel_multilabel_info",
         "fxt_null_label_info",
         "fxt_seg_label_info",
     ],

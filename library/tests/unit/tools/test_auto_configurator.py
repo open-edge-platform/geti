@@ -24,7 +24,6 @@ def fxt_data_root_per_task_type() -> dict:
         TaskType.MULTI_LABEL_CLS: "tests/assets/multilabel_classification_coco",
         TaskType.DETECTION: "tests/assets/detection_coco",
         TaskType.KEYPOINT_DETECTION: "tests/assets/keypoint_detection_coco",
-        TaskType.ROTATED_DETECTION: "tests/assets/detection_coco",
         TaskType.INSTANCE_SEGMENTATION: "tests/assets/instance_segmentation_coco",
         TaskType.SEMANTIC_SEGMENTATION: "tests/assets/segmentation_pets",
     }
@@ -108,9 +107,6 @@ class TestAutoConfigurator:
         assert datamodule.task == task
 
     def test_get_model(self, fxt_task: TaskType, fxt_data_root_per_task_type) -> None:
-        if fxt_task is TaskType.H_LABEL_CLS:
-            pytest.xfail(reason="Not working")
-
         auto_configurator = AutoConfigurator(task=fxt_task, data_root=fxt_data_root_per_task_type[fxt_task])
 
         # With label_info
@@ -152,11 +148,18 @@ class TestAutoConfigurator:
         # The detection base config has augmentations_cpu with Resize
         assert any("Resize" in aug.get("class_path", "") for aug in datamodule.test_subset.augmentations_cpu)
 
+        ov_config_path = DEFAULT_CONFIG_PER_TASK[TaskType.DETECTION].parent / "openvino_model.yaml"
+        ov_recipe_batch_size = auto_configurator._load_default_config(config_path=ov_config_path)["data"][
+            "test_subset"
+        ]["batch_size"]
+
         updated_datamodule = auto_configurator.update_ov_subset_pipeline(datamodule, subset="test")
         # OV recipes now use Resize (preprocessing moved from ModelAPI to getitune)
         assert len(updated_datamodule.test_subset.augmentations_cpu) == 1
         assert "Resize" in updated_datamodule.test_subset.augmentations_cpu[0]["class_path"]
         assert not updated_datamodule.tile_config.enable_tiler
+        # Without tiling, the OV recipe's batch_size is used as-is (no override).
+        assert updated_datamodule.test_subset.batch_size == ov_recipe_batch_size
 
     def test_update_ov_subset_pipeline_tiling_keeps_tiler_and_strips_resize(self) -> None:
         """With tiling enabled, the OV pipeline keeps the tiler on and removes the tile Resize.
@@ -171,7 +174,26 @@ class TestAutoConfigurator:
         datamodule = auto_configurator.get_datamodule()
         datamodule.tile_config.enable_tiler = True
 
+        # Sanity-check the precondition this regression test relies on: the OV recipe's
+        # non-tiled batch_size must be > 1, otherwise the batch_size==1 assertion below
+        # would pass trivially even if the override logic were removed.
+        ov_config_path = DEFAULT_CONFIG_PER_TASK[TaskType.DETECTION].parent / "openvino_model.yaml"
+        ov_recipe_batch_size = auto_configurator._load_default_config(config_path=ov_config_path)["data"][
+            "test_subset"
+        ]["batch_size"]
+        assert ov_recipe_batch_size > 1, (
+            "This test expects the OV recipe's test_subset.batch_size to be > 1 "
+            "(currently 64) so it can verify that tiling forces it down to 1."
+        )
+
         updated_datamodule = auto_configurator.update_ov_subset_pipeline(datamodule, subset="test")
+
+        # Tiling forces the loader batch_size down to 1 regardless of the OV recipe's
+        # configured batch_size: with tiling enabled, a single dataset item expands into
+        # every grid tile of the native-resolution image, so a larger loader batch_size
+        # would collate many images' worth of tiles into one in-memory batch, which can
+        # hang or OOM (see DataModule._eval_loader_kwargs and update_ov_subset_pipeline).
+        assert updated_datamodule.test_subset.batch_size == 1
 
         # Tiling stays enabled: ModelAPI performs tiled inference via forward_tiles.
         assert updated_datamodule.tile_config.enable_tiler

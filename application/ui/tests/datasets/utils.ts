@@ -51,24 +51,34 @@ export const stagedDatasetWithMetadata = getMockedStagedDataset({
     },
 });
 
-export const jobPollHandler = ({
-    jobId,
-    whileRunning,
-    whenDone,
-    afterPolls = 2,
-}: {
-    jobId: string;
-    whileRunning: ReturnType<typeof getMockedJob>;
-    whenDone: ReturnType<typeof getMockedJob>;
-    afterPolls?: number;
-}) => {
-    let pollCount = 0;
+const SSE_HEADERS = { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' };
+const SNAPSHOT_STEP_MS = 1_000;
 
-    return (requestJobId: string) => {
-        if (requestJobId !== jobId) return undefined;
-        pollCount += 1;
-        return pollCount <= afterPolls ? whileRunning : whenDone;
-    };
+// Responses are buffered by @msw/playwright, so a connection can only carry one snapshot. Which
+// snapshot is picked by elapsed time rather than connection count, so a client that reconnects or
+// opens the stream twice still observes every step.
+export const jobStatusStreamHandler = (snapshotsByJobId: Record<string, Job[]>) => {
+    const firstRequestedAt = new Map<string, number>();
+
+    return http.get('/api/jobs/{job_id}/status', ({ params }) => {
+        const jobId = params.job_id as string;
+        const snapshots = snapshotsByJobId[jobId] ?? [];
+
+        if (snapshots.length === 0) {
+            return new HttpResponse(':ok\n\n', { status: 200, headers: SSE_HEADERS });
+        }
+
+        const startedAt = firstRequestedAt.get(jobId) ?? Date.now();
+        firstRequestedAt.set(jobId, startedAt);
+
+        const step = Math.floor((Date.now() - startedAt) / SNAPSHOT_STEP_MS);
+        const snapshot = snapshots[Math.min(step, snapshots.length - 1)];
+
+        return new HttpResponse(`data: ${JSON.stringify(snapshot)}\n\n`, {
+            status: 200,
+            headers: SSE_HEADERS,
+        });
+    });
 };
 
 export const deleteStagedDatasetHandler = () => {

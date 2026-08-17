@@ -19,8 +19,9 @@ export const PredictionModelSelector = ({ isDisabled }: PredictionModelSelectorP
 
     return (
         <Picker
-            isQuiet
             aria-label={'Select prediction model'}
+            label={'Model'}
+            width={'100%'}
             items={selectableModels}
             selectedKey={selectedModelId}
             isDisabled={isDisabled}

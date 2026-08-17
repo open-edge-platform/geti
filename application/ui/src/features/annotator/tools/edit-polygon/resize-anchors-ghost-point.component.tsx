@@ -3,9 +3,7 @@
 
 import { PointerEvent, RefObject, useRef, useState } from 'react';
 
-import { ANCHOR_SIZE } from '@geti/smart-tools';
-
-import { ResizeAnchor } from '../../../../shared/annotator/resize-anchor.component';
+import { ANCHOR_SIZE, ResizeAnchor } from '../../../../shared/annotator/resize-anchor.component';
 import { isLeftButton } from '../../../../shared/buttons-utils';
 import { Point } from '../../../../shared/types';
 import { getRelativePoint, projectPointOnLine } from '../utils';
@@ -16,8 +14,10 @@ interface GhostPoint {
     point: Point;
 }
 
-interface ResizeAnchorsProps
-    extends Pick<EditPointsProps, 'shape' | 'moveAnchorTo' | 'addPoint' | 'onComplete' | 'zoom'> {
+interface ResizeAnchorsProps extends Pick<
+    EditPointsProps,
+    'shape' | 'moveAnchorTo' | 'addPoint' | 'onComplete' | 'zoom'
+> {
     svgRef: RefObject<SVGRectElement | null>;
 }
 

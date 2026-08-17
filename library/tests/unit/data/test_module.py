@@ -87,7 +87,6 @@ class TestDataModule:
         [
             TaskType.MULTI_CLASS_CLS,
             TaskType.MULTI_LABEL_CLS,
-            TaskType.H_LABEL_CLS,
             TaskType.DETECTION,
             TaskType.SEMANTIC_SEGMENTATION,
             TaskType.INSTANCE_SEGMENTATION,
