@@ -8,7 +8,7 @@ import { getJobProgress, isJobRunning } from 'hooks/api/util';
 import capitalize from 'lodash-es/capitalize';
 
 import { CancelJobConfirmation } from '../../../features/dataset/import-export/cancel-job-confirmation/cancel-job-confirmation.component';
-import { BottomProgressBar } from '../../../features/models/model-listing/current-model-running/bottom-progress-bar.component';
+import { BottomProgressBar } from '../../../features/models/model-listing/current-running-jobs/bottom-progress-bar.component';
 import { formatBytes } from '../../../shared/util';
 import { JobStatusCard } from '../../job-status-card/job-status-card.component';
 

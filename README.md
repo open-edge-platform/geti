@@ -3,9 +3,9 @@
 
 <img src="assets/geti-header.png" alt="Geti™ - A framework to rapidly build and deploy computer vision AI models">
 
-[Quick Start](#quick-start) •
+[Quick Start](#quick-start-with-geti) •
 [Geti™ documentation](https://docs.geti.intel.com/) •
-[`getitune` documentation](library/README.md)
+[`getitune` documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/intro)
 
 [![Container build](https://github.com/open-edge-platform/geti/actions/workflows/build.yaml/badge.svg)](https://github.com/open-edge-platform/geti/actions/workflows/build.yaml)
 [![Codecov](https://codecov.io/gh/open-edge-platform/geti/branch/develop/graph/badge.svg?token=9HVFNMPFGD)](https://codecov.io/gh/open-edge-platform/geti)
@@ -39,112 +39,16 @@ Geti™ is an end-to-end Vision AI application that takes you from raw images to
 
 Before you begin, make sure your machine meets the following requirements:
 
-| Component | Requirement                                            |
-| --------- | ------------------------------------------------------ |
-| CPU       | 8 threads                                              |
-| RAM       | 16 GB                                                  |
-| Disk      | 40 GB free                                             |
+| Component | Requirement                                              |
+| --------- | -------------------------------------------------------- |
+| CPU       | 8 threads                                                |
+| RAM       | 16 GB                                                    |
+| Disk      | 40 GB free                                               |
 | GPU       | Optional - Intel® XPU or NVIDIA® GPU for larger models |
 
-Geti can be installed as a **Windows application**, run as a **container**, or built **from source code**. Choose the option that best suits your environment below.
+Geti can be installed as a **Windows application**, run as a **container**, or built **from source code**. Choose the option that best suits your environment.
 
-<details>
-<summary>Windows Application</summary>
-
-Download the latest Geti™ Windows installer suitable for your hardware (Intel® XPU, NVIDIA® CUDA or CPU-only) from the releases repository:
-
-- [CPU-only version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cpu-3.0.0.msix)
-- [Intel® XPU version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-xpu-3.0.0.msix)
-- [NVIDIA® CUDA version installer](https://storage.geti.intel.com/geti/packages/3.0.0/geti-cuda-3.0.0.msix)
-
-Install Geti™ Windows application and launch it from the Start menu.
-
-</details>
-
-<details>
-<summary>Container image</summary>
-
-Pull a pre-built container image for your hardware and launch it using [`just`](https://just.systems), which handles device passthrough, volumes, and WebRTC ports automatically:
-
-```bash
-# 1. Install just
-curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
-
-# 2. Clone the repository
-git clone https://github.com/open-edge-platform/geti.git
-cd geti/application
-
-# 3. Pull the image for your hardware (choose one: cpu|cuda|xpu)
-ACCELERATOR=xpu
-docker pull ghcr.io/open-edge-platform/geti-${ACCELERATOR}
-
-# 4. Retag the pulled image for use with just
-docker tag ghcr.io/open-edge-platform/geti-${ACCELERATOR}:latest geti-${ACCELERATOR}:latest
-
-# 5. Launch the application
-just run-image --accelerator ${ACCELERATOR}
-```
-
-Then get access to Geti™ user interface at `http://localhost:7860`.
-
-</details>
-
-<details>
-<summary>Install from source code</summary>
-
-**Install the Geti™ stable development version from source code.**
-
-**Installing from source gives you access to the latest features not yet available in released builds, including Ultralytics YOLO26 support.**
-
-
-The installer clones the repository, sets up its own
-copy of `uv`, Node.js and npm under `.build/`, detects your accelerator (Intel® XPU, NVIDIA® CUDA, or CPU), builds the
-backend and UI, and starts the app. The first build downloads several GB of packages (PyTorch, OpenVINO, …) and can
-take a while — progress is shown for each step.
-
-
-> [!NOTE]
-> `git` is required on all platforms; `curl` is also required on Linux/WSL. Re-running the installer reuses the cached
-> tools and dependencies, so only the first build is slow.
-
-**Linux / WSL2**:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/open-edge-platform/geti/develop/install.sh | bash
-```
-
-To pass flags — `-v`/`--verbose` (stream full output), `-y`/`--yes` (non-interactive), `-w`/`--work-dir <path>` (custom
-install directory, default `./geti`) — forward them through the pipe with `bash -s --`:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/open-edge-platform/geti/develop/install.sh | bash -s -- --yes --work-dir ~/geti
-```
-
-**Windows (PowerShell)**:
-
-```powershell
-irm https://raw.githubusercontent.com/open-edge-platform/geti/develop/install.ps1 | iex
-```
-
-To pass parameters — `-Verbose` (stream full output), `-Yes`/`-y` (non-interactive), `-WorkDir <path>`/`-w` (custom
-install directory, default `.\geti`) — run the downloaded script as a script block instead:
-
-```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/open-edge-platform/geti/develop/install.ps1))) -Yes -WorkDir C:\geti
-```
-
-If your execution policy blocks remote scripts, download first and run it explicitly (Bypass applies only to this
-process and does not change your machine policy):
-
-```powershell
-curl.exe -L https://raw.githubusercontent.com/open-edge-platform/geti/develop/install.ps1 -o install.ps1
-powershell -ExecutionPolicy Bypass -File .\install.ps1
-```
-
-If a build step fails, re-run with `--verbose` (Linux) or `-Verbose` (Windows), or inspect the log at
-`<work-dir>/.build/.install.log`.
-
-</details>
+For complete, step-by-step instructions - including prerequisites, GPU/accelerator support, container and source builds, the install script, and troubleshooting - see the [Installation guide](application/docs/install.md).
 
 Once Geti is up and running, follow the intuitive UI to train your first model.
 
@@ -170,19 +74,20 @@ uv pip install "getitune[cuda]" --extra-index-url https://download.pytorch.org/w
 uv pip install getitune # CPU-only by default
 ```
 
-> ⚠️ **Ultralytics YOLO Models**: The PyPI package does **not** include Ultralytics YOLO26 models. Install from source to use them:
+> [!IMPORTANT]  
+> The PyPI package does NOT include **Ultralytics YOLO models**, which are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license).
+>
+> Install `getitune` from source to use them:
 >
 > ```bash
-> git clone https://github.com/open-edge-platform/training_extensions.git
-> cd training_extensions/library
+> git clone https://github.com/open-edge-platform/geti.git
+> cd geti/library
 > uv sync --extra xpu --extra ultralytics                              # Intel GPU + YOLO
 > uv sync --extra cuda --extra ultralytics                             # NVIDIA GPU + YOLO
 > uv sync --extra cpu --extra ultralytics                              # CPU + YOLO
 > ```
 >
-> See the [library README](library/README.md#installation) for more details.
->
-> ℹ️ Ultralytics YOLO models are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license).
+> See the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/installation) for more details.
 
 **Discover available models and train a model in just a few lines of code:**
 
@@ -223,8 +128,8 @@ metrics = ov_engine.test()
 predictions = ov_engine.predict()
 ```
 
-See the [library README](library/README.md) for the full list of recipes, advanced configuration, dataset support,
-backend-specific options, and deployment/optimization examples.
+See the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/quick-start) for the full list of recipes,
+advanced configuration, dataset support, backend-specific options, and deployment/optimization examples.
 
 ## Key Features
 
@@ -246,13 +151,17 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
   </thead>
   <tbody>
     <tr>
-      <td rowspan="8"><b>Object Detection</b><br>Locate and classify objects with bounding boxes, e.g. counting items, defect localization, surveillance.</td>
+      <td rowspan="11"><b>Object Detection</b><br>Locate and classify objects with bounding boxes. Common use cases: counting items, defect localization, surveillance.</td>
       <td>D-FINE M / L / X</td>
       <td><a href="https://arxiv.org/abs/2412.04234">DEIM</a> + <a href="https://arxiv.org/abs/2410.13842">D-FINE</a></td>
     </tr>
     <tr>
       <td>DINOv3 DETR S / M / L</td>
       <td><a href="https://arxiv.org/abs/2508.10104">DINOv3</a> + <a href="https://arxiv.org/html/2509.20787v4">DEIMv2</a> + <a href="https://arxiv.org/abs/2005.12872">DETR</a></td>
+    </tr>
+    <tr>
+      <td>ECDet S / M / L / X</td>
+      <td><a href="https://arxiv.org/abs/2603.18739">EdgeCrafter</a></td>
     </tr>
     <tr>
       <td>MobileNet V2 ATSS</td>
@@ -263,7 +172,7 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/1801.04381">MobileNetV2</a> + <a href="https://arxiv.org/abs/1512.02325">SSD</a></td>
     </tr>
     <tr>
-      <td>RF-DETR S / M / L</td>
+      <td>RF-DETR N / S / M / L</td>
       <td><a href="https://arxiv.org/abs/2511.09554">RF-DETR</a></td>
     </tr>
     <tr>
@@ -271,15 +180,23 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2304.08069">RT-DETR</a></td>
     </tr>
     <tr>
-      <td>YOLO26 Nano / Small / Medium</td>
-      <td><a href="https://github.com/ultralytics/ultralytics">Ultralytics YOLO</a></td>
+      <td>YOLO11 N / S / M / L / X</td>
+      <td><a href="https://docs.ultralytics.com/models/yolo11#overview">Ultralytics YOLO11</a></td>
+    </tr>
+    <tr>
+      <td>YOLO12 N / S / M / L / X</td>
+      <td><a href="https://arxiv.org/abs/2502.12524">YOLOv12</a></td>
+    </tr>
+    <tr>
+      <td>YOLO26 Nano / Small / Medium / Large / XLarge</td>
+      <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
     </tr>
     <tr>
       <td>YOLOX Tiny / S / L / X</td>
       <td><a href="https://arxiv.org/abs/2107.08430">YOLOX</a></td>
     </tr>
     <tr>
-      <td rowspan="6"><b>Instance Segmentation</b><br>Detect objects and produce pixel-precise masks per instance, e.g. measuring object area, robotics, medical imaging.</td>
+      <td rowspan="7"><b>Instance Segmentation</b><br>Detect objects and produce pixel-precise masks per instance. Common use cases: medical imaging, robotics, area estimation.</td>
       <td>RTMDet Tiny</td>
       <td><a href="https://arxiv.org/abs/2212.07784">RTMDet</a></td>
     </tr>
@@ -296,15 +213,19 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2103.14030">Swin Transformer</a> + <a href="https://arxiv.org/abs/1703.06870">Mask R-CNN</a></td>
     </tr>
     <tr>
-      <td>RF-DETR S / M / L</td>
+      <td>RF-DETR N / S / M / L / XL / 2XL</td>
       <td><a href="https://arxiv.org/abs/2511.09554">RF-DETR</a></td>
     </tr>
     <tr>
-      <td>YOLO26 Nano / Small / Medium</td>
-      <td><a href="https://github.com/ultralytics/ultralytics">Ultralytics YOLO</a></td>
+      <td>YOLO11 N / S / M / L / X</td>
+      <td><a href="https://docs.ultralytics.com/models/yolo11#overview">Ultralytics YOLO11</a></td>
     </tr>
     <tr>
-      <td rowspan="5"><b>Classification</b> (multi-class, multi-label)<br>Assign one or more labels to an entire image, e.g. quality pass/fail, product categorization, content tagging.</td>
+      <td>YOLO26 Nano / Small / Medium / Large / XLarge</td>
+      <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
+    </tr>
+    <tr>
+      <td rowspan="6"><b>Classification</b> (multi-class, multi-label)<br>Assign one or more labels to an entire image. Common use cases: defect classification, product categorization, content tagging.</td>
       <td>ViT Tiny</td>
       <td><a href="https://arxiv.org/abs/2010.11929">ViT</a></td>
     </tr>
@@ -323,6 +244,10 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
     <tr>
       <td>MobileNet V3 Large</td>
       <td><a href="https://arxiv.org/abs/1905.02244">MobileNetV3</a></td>
+    </tr>
+    <tr>
+      <td>YOLO26 Nano / Small / Medium / Large / XLarge</td>
+      <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
     </tr>
   </tbody>
 </table>
@@ -362,7 +287,7 @@ Geti™ supports [multiple computer vision tasks](https://docs.geti.intel.com/do
 <details>
 <summary>🧠 Smart annotations</summary>
 
-Smart annotations in Geti™ enable users to easily create bounding boxes, rotated bounding boxes, segmentation boundaries, and more. These smart annotation features coupled with the AI-assisted annotations and state-of-the-art AI models such as the Segment Anything Model keep human experts in the loop while massively reducing the total annotation efforts needed by a human.
+Smart annotations in Geti™ enable users to easily create bounding boxes and polygons. These smart annotation features coupled with the AI-assisted annotations and state-of-the-art AI models such as the Segment Anything Model keep human experts in the loop while massively reducing the total annotation efforts needed by a human.
 
 <p align="center">
   <img src="application/docs/assets/annotator.webp" width="600" alt="Smart Annotations">

@@ -16,6 +16,7 @@ from jsonargparse import ArgumentParser, Namespace
 
 from getitune.backend.lightning.models.base import DataInputParams, LightningModel
 from getitune.config.data import SamplerConfig, SubsetConfig, TileConfig
+from getitune.data.factory import TransformLibFactory
 from getitune.data.module import DataModule
 from getitune.types import PathLike
 from getitune.types.label import LabelInfoTypes
@@ -33,9 +34,7 @@ RECIPE_PATH = get_getitune_root_path() / "recipe"
 DEFAULT_CONFIG_PER_TASK = {
     TaskType.MULTI_CLASS_CLS: RECIPE_PATH / "classification" / "multi_class_cls" / "mobilenet_v3_large.yaml",
     TaskType.MULTI_LABEL_CLS: RECIPE_PATH / "classification" / "multi_label_cls" / "mobilenet_v3_large.yaml",
-    TaskType.H_LABEL_CLS: RECIPE_PATH / "classification" / "h_label_cls" / "mobilenet_v3_large.yaml",
     TaskType.DETECTION: RECIPE_PATH / "detection" / "yolox_s.yaml",
-    TaskType.ROTATED_DETECTION: RECIPE_PATH / "rotated_detection" / "maskrcnn_r50.yaml",
     TaskType.SEMANTIC_SEGMENTATION: RECIPE_PATH / "semantic_segmentation" / "litehrnet_18.yaml",
     TaskType.INSTANCE_SEGMENTATION: RECIPE_PATH / "instance_segmentation" / "rfdetr_seg_small.yaml",
     TaskType.KEYPOINT_DETECTION: RECIPE_PATH / "keypoint_detection" / "rtmpose_tiny.yaml",
@@ -45,9 +44,7 @@ DEFAULT_CONFIG_PER_TASK = {
 OVMODEL_PER_TASK = {
     TaskType.MULTI_CLASS_CLS: "getitune.backend.openvino.models.OVMulticlassClassificationModel",
     TaskType.MULTI_LABEL_CLS: "getitune.backend.openvino.models.OVMultilabelClassificationModel",
-    TaskType.H_LABEL_CLS: "getitune.backend.openvino.models.OVHlabelClassificationModel",
     TaskType.DETECTION: "getitune.backend.openvino.models.OVDetectionModel",
-    TaskType.ROTATED_DETECTION: "getitune.backend.openvino.models.OVRotatedDetectionModel",
     TaskType.INSTANCE_SEGMENTATION: "getitune.backend.openvino.models.OVInstanceSegmentationModel",
     TaskType.SEMANTIC_SEGMENTATION: "getitune.backend.openvino.models.OVSegmentationModel",
     TaskType.KEYPOINT_DETECTION: "getitune.backend.openvino.models.OVKeypointDetectionModel",
@@ -252,10 +249,12 @@ class AutoConfigurator:
                     "Input size is not specified in the datamodule. Ensure that the datamodule has a valid input size."
                 )
                 raise ValueError(msg)
+            # NOTE: pass mean/std through as-is. None when the CPU augmentation pipeline has no torchvision Normalize to
+            # derive them from, such as when normalization lives in augmentations_gpu instead
             model_config["init_args"]["data_input_params"] = DataInputParams(
                 input_size=datamodule.input_size,
-                mean=datamodule.input_mean if datamodule.input_mean is not None else (0.0, 0.0, 0.0),
-                std=datamodule.input_std if datamodule.input_std is not None else (1.0, 1.0, 1.0),
+                mean=datamodule.input_mean,
+                std=datamodule.input_std,
             ).as_dict()
 
         model_cls = get_model_cls_from_config(Namespace(model_config))
@@ -354,6 +353,9 @@ class AutoConfigurator:
         subset_config = getattr(datamodule, f"{subset}_subset")
         ov_subset = ov_config.get(f"{subset}_subset", ov_config["test_subset"])
 
+        # Capture the tiling intent before overwriting the subset augmentations below.
+        tiling_enabled = datamodule.tile_config.enable_tiler
+
         if keep_aspect_ratio:
             subset_config.batch_size = ov_subset["batch_size"]
             subset_config.augmentations_cpu = ov_subset["augmentations_cpu"]
@@ -372,7 +374,46 @@ class AutoConfigurator:
             subset_config.batch_size = ov_subset["batch_size"]
             subset_config.augmentations_cpu = ov_subset["augmentations_cpu"]
             subset_config.augmentations_gpu = ov_subset.get("augmentations_gpu", [])
-        datamodule.tile_config.enable_tiler = False
+
+        if tiling_enabled:
+            # ModelAPI's tiler performs tiling, resizing and coordinate/mask mapping
+            # internally on native-resolution crops (see OVModel.forward_tiles ->
+            # Tiler.predict_tiles). Keep DataModule tiling enabled so the loader emits
+            # per-image tile batches, and strip the model-input Resize from the OV
+            # pipeline so tiles reach ModelAPI at their native resolution — resizing
+            # tiles here would both duplicate the resize and corrupt the tile-to-image
+            # coordinate mapping. Intensity scaling is preserved (the CPU augmentation
+            # pipeline prepends its intensity transform independently of Resize).
+            self._strip_resize_transforms(subset_config.augmentations_cpu)
+
+            # IMPORTANT: the OV recipe's batch_size (e.g. 64) is tuned for *non-tiled*
+            # evaluation, where one dataset item == one model input. With tiling
+            # enabled, a single original image expands into *every* grid tile inside
+            # the dataset (see DataModule._eval_loader_kwargs), so a loader batch_size
+            # of N images can balloon into N * num_tiles tiles collated into a single
+            # in-memory batch. With tile_size=400/overlap=0.2 on large images this can
+            # produce a batch so large that building/collating it appears to hang
+            # (severe memory pressure / thrashing) rather than raising an error.
+            # The model still groups tiles into TileConfig.tile_inference_batch_size
+            # chunks for the actual forward passes, so the loader batch_size can (and
+            # must) stay small here regardless of what the OV recipe specifies.
+            if subset_config.batch_size != 1:
+                logger.info(
+                    "update_ov_subset_pipeline: tiling is enabled, overriding OV recipe "
+                    "%s_subset.batch_size (%d) -> 1 to avoid collating %d images' worth of "
+                    "tiles (tile_size=%s, overlap=%s) into a single dataloader batch, which "
+                    "can hang/OOM. Tile-level batching for the model forward pass is still "
+                    "controlled independently via tile_config.tile_inference_batch_size=%d.",
+                    subset,
+                    subset_config.batch_size,
+                    subset_config.batch_size,
+                    datamodule.tile_config.tile_size,
+                    datamodule.tile_config.overlap,
+                    datamodule.tile_config.tile_inference_batch_size,
+                )
+                subset_config.batch_size = 1
+        else:
+            datamodule.tile_config.enable_tiler = False
 
         # Resolve input size: prefer model IR metadata, fall back to
         # the training recipe's default, raise if neither is available.
@@ -392,7 +433,11 @@ class AutoConfigurator:
             f"For OpenVINO IR models, Update the following {subset} \n"
             f"\t augmentations_cpu: {subset_config.augmentations_cpu} \n"
             f"\t batch_size: {subset_config.batch_size} \n"
-            "And the tiler is disabled."
+            + (
+                "And the tiler is kept enabled; ModelAPI performs tiled inference on native crops."
+                if tiling_enabled
+                else "And the tiler is disabled."
+            )
         )
         warn(msg, stacklevel=1)
 
@@ -401,6 +446,11 @@ class AutoConfigurator:
         # This is useful for the quantization pipeline.
         if not datamodule.data_root and datamodule.subsets:
             datamodule.train_subset.input_size = actual_input_size
+
+            if tiling_enabled:
+                existing_dataset = datamodule.subsets[subset_config.subset_name]
+                existing_dataset.transforms = TransformLibFactory.generate(subset_config)
+
             return DataModule.from_vision_datasets(
                 train_dataset=datamodule.subsets[datamodule.train_subset.subset_name],
                 val_dataset=datamodule.subsets[datamodule.val_subset.subset_name],
@@ -425,6 +475,20 @@ class AutoConfigurator:
             auto_num_workers=datamodule.auto_num_workers,
             device=datamodule.device,
         )
+
+    @staticmethod
+    def _strip_resize_transforms(augmentations: list[dict]) -> None:
+        """Remove every Resize step from an augmentation list, in place.
+
+        Used for the OpenVINO tiling path: ModelAPI's tiler resizes each native
+        crop to the model input internally, so a DataModule-side Resize would both
+        duplicate the resize and corrupt the tile-to-image coordinate mapping.
+
+        Args:
+            augmentations: List of augmentation config dicts, each with a
+                ``class_path`` key (and optionally ``init_args``).
+        """
+        augmentations[:] = [aug for aug in augmentations if "Resize" not in aug.get("class_path", "")]
 
     @staticmethod
     def _patch_resize_keep_aspect_ratio(

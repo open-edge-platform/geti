@@ -21,7 +21,6 @@ from app.api.dependencies import (
     get_media_service,
 )
 from app.api.schemas.media import ImageView, MediaViewAdapter, SetMediaAnnotations, VideoFrameView, VideoView
-from app.main import app
 from app.models import (
     BatchInferenceMedia,
     BatchInferencePrediction,
@@ -105,30 +104,30 @@ def fxt_video_frame_media():
 
 
 @pytest.fixture
-def fxt_media_service() -> MagicMock:
+def fxt_media_service(fxt_app) -> MagicMock:
     media_service = MagicMock(spec=MediaService)
-    app.dependency_overrides[get_media_service] = lambda: media_service
+    fxt_app.dependency_overrides[get_media_service] = lambda: media_service
     return media_service
 
 
 @pytest.fixture
-def fxt_dataset_service() -> MagicMock:
+def fxt_dataset_service(fxt_app) -> MagicMock:
     dataset_service = MagicMock(spec=DatasetService)
-    app.dependency_overrides[get_dataset_service] = lambda: dataset_service
+    fxt_app.dependency_overrides[get_dataset_service] = lambda: dataset_service
     return dataset_service
 
 
 @pytest.fixture
-def fxt_media_prediction_service() -> MagicMock:
+def fxt_media_prediction_service(fxt_app) -> MagicMock:
     media_prediction_service = MagicMock(spec=MediaPredictionService)
-    app.dependency_overrides[get_media_prediction_service] = lambda: media_prediction_service
+    fxt_app.dependency_overrides[get_media_prediction_service] = lambda: media_prediction_service
     return media_prediction_service
 
 
 @pytest.fixture
-def fxt_inference_media_limit() -> Callable[[int], None]:
+def fxt_inference_media_limit(fxt_app) -> Callable[[int], None]:
     def set_limit(limit: int) -> None:
-        app.dependency_overrides[get_inference_media_limit] = lambda: limit
+        fxt_app.dependency_overrides[get_inference_media_limit] = lambda: limit
 
     return set_limit
 
@@ -385,6 +384,14 @@ class TestMediaEndpoints:
     @pytest.mark.parametrize("offset", [-20])
     def test_list_media_wrong_offset(self, fxt_get_project, fxt_media_service, fxt_client, offset):
         response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/media?offset=${offset}")
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_media_service.list_media.assert_not_called()
+
+    def test_list_media_offset_overflow(self, fxt_get_project, fxt_media_service, fxt_client):
+        """Integers larger than 2^31-1 must be rejected with 422, not cause a SQLite overflow 500."""
+        huge_offset = 2**63  # exceeds the le=2_147_483_647 bound
+        response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/media?offset={huge_offset}")
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
         fxt_media_service.list_media.assert_not_called()

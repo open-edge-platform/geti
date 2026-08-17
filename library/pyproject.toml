@@ -9,13 +9,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "getitune"
-version = "0.1.0"
+version = "0.2.0"
 description = "getitune: Train, Evaluate, Optimize, Deploy Computer Vision Models"
 readme = "README.md"
 requires-python = ">=3.11,<3.15"
 license = "Apache-2.0"
 authors = [
-    { name = "OpenVINO™ Training Extensions Contributors" },
+    { name = "Intel Corporation" },
 ]
 classifiers = [
     "Programming Language :: Python :: 3.11",
@@ -24,7 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
-    "datumaro[experimental]~=1.13.1",
+    "datumaro[experimental]~=1.13.7",
     "omegaconf==2.3.0",
     "rich==14.0.0",
     "jsonargparse==4.35.0",
@@ -39,8 +39,8 @@ dependencies = [
     "torchmetrics==1.8.2",
     "pytorchcv==0.0.74",
     "timm==1.0.3",
-    "openvino~=2026.2.0",
-    "openvino-model-api~=0.4.5",
+    "openvino~=2026.3.0",
+    "openvino-model-api==0.4.6",
     "onnx==1.22.0",
     "onnxruntime==1.26.0",
     "onnxslim~=0.1.71",
@@ -90,22 +90,22 @@ lint = [
 cpu = [
     # Note: platform-specific wheels are only available for Linux and Windows.
     # For macOS, there is only one version of torch (default) available via PyPI.
-    "torch==2.10.0+cpu ; sys_platform == 'linux' or sys_platform == 'win32'",
-    "torchvision==0.25.0+cpu ; sys_platform == 'linux' or sys_platform == 'win32'",
-    "torch==2.10.0 ; sys_platform != 'linux' and sys_platform != 'win32'",
-    "torchvision==0.25.0 ; sys_platform != 'linux' and sys_platform != 'win32'"
+    "torch==2.12.1+cpu ; sys_platform == 'linux' or sys_platform == 'win32'",
+    "torchvision==0.27.1+cpu ; sys_platform == 'linux' or sys_platform == 'win32'",
+    "torch==2.12.1 ; sys_platform != 'linux' and sys_platform != 'win32'",
+    "torchvision==0.27.1 ; sys_platform != 'linux' and sys_platform != 'win32'"
 ]
 cuda = [
-    "torch==2.10.0+cu128",
-    "torchvision==0.25.0+cu128"
+    "torch==2.12.1+cu130",
+    "torchvision==0.27.1+cu130"
 ]
 xpu = [
-    "torch==2.10.0+xpu",
-    "triton-xpu==3.6.0",
-    "torchvision==0.25.0+xpu"
+    "torch==2.12.1+xpu",
+    "triton-xpu==3.7.1",
+    "torchvision==0.27.1+xpu"
 ]
 ultralytics = [
-    "ultralytics~=8.4.82",
+    "ultralytics==8.4.86",
 ]
 
 docs = [
@@ -136,8 +136,8 @@ getitune = "getitune.cli:main"
 otx = "getitune.cli:main"
 
 [project.urls]
-Documentation = "https://open-edge-platform.github.io/training_extensions/"
-Repository = "https://github.com/open-edge-platform/training_extensions/"
+Documentation = "https://docs.geti.intel.com/docs/user-guide/library/get-started/intro"
+Repository = "https://github.com/open-edge-platform/geti/"
 
 [tool.uv]
 default-groups = ["dev", "lint"]
@@ -161,6 +161,8 @@ override-dependencies = [
     "pyarrow>=24.0,<25",
     # roboflow hard-pins idna==3.7; allow newer versions
     "idna>=3.15",
+    # torch==2.12.1 caps setuptools<82 but version lower than 83.0 have vulnerabilities of moderate severity
+    "setuptools>=83.0",
 ]
 
 [tool.uv.sources]
@@ -187,7 +189,7 @@ explicit = true
 
 [[tool.uv.index]]
 name = "torch-cuda"
-url = "https://download.pytorch.org/whl/cu128"
+url = "https://download.pytorch.org/whl/cu130"
 explicit = true
 
 [[tool.uv.index]]
@@ -361,8 +363,7 @@ exclude = [
     "venv",
     "tests/assets",
 
-    # Ruff complains it but don't know how to fix since it literally showed no useful logs.
-    # https://github.com/openvinotoolkit/training_extensions/actions/runs/7176557723/job/19541622452?pr=2718#step:5:170
+    # Ruff complains about it without providing details about the reason.
     "tests/regression/*.py",
 
     # Mostly borrowed from jsonargparse codebase
@@ -423,7 +424,6 @@ notice-rgx = """
 "src/getitune/**/*.py" = [
     "ERA001",
 ]
-# See https://github.com/openvinotoolkit/training_extensions/actions/runs/7109500350/job/19354528819?pr=2700
 "src/getitune/core/config/**/*.py" = [
     "UP007"
 ]

@@ -1,10 +1,10 @@
 {
     "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
     "productName": "Geti",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "identifier": "com.intel.geti",
     "build": {
-        "frontendDist": "../dist",
+        "frontendDist": "../dist-tauri",
         "devUrl": "http://localhost:3000",
         "beforeDevCommand": "npm run start:tauri",
         "beforeBuildCommand": "npm run build:tauri"
@@ -21,7 +21,7 @@
                 "fullscreen": false,
                 "useHttpsScheme": true,
                 "dragDropEnabled": false,
-                "additionalBrowserArgs": "--enable-unsafe-webgpu --enable-features=Vulkan --ignore-certificate-errors --unsafely-treat-insecure-origin-as-secure=https://localhost:7860"
+                "additionalBrowserArgs": "--enable-unsafe-webgpu --disable-features=msWebOOUI,msPdfOOUI,msSmartScreenProtection --ignore-certificate-errors --unsafely-treat-insecure-origin-as-secure=https://localhost:7860"
             }
         ],
         "security": {

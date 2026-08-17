@@ -10,7 +10,6 @@ from fastapi import status
 
 from app.api.dependencies import get_dataset_service
 from app.api.schemas.dataset_item import DatasetItemSubset, DatasetItemView
-from app.main import app
 from app.models import DatasetItem, DatasetItemAnnotationStatus
 from app.models.dataset import DatasetStatistics
 from app.models.dataset_item import DatasetItemSortBy
@@ -33,9 +32,9 @@ def fxt_dataset_item():
 
 
 @pytest.fixture
-def fxt_dataset_service() -> MagicMock:
+def fxt_dataset_service(fxt_app) -> MagicMock:
     dataset_service = MagicMock(spec=DatasetService)
-    app.dependency_overrides[get_dataset_service] = lambda: dataset_service
+    fxt_app.dependency_overrides[get_dataset_service] = lambda: dataset_service
     return dataset_service
 
 
@@ -145,6 +144,14 @@ class TestDatasetItemEndpoints:
     @pytest.mark.parametrize("offset", [-20])
     def test_list_dataset_items_wrong_offset(self, fxt_get_project, fxt_dataset_service, fxt_client, offset):
         response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/items?offset=${offset}")
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_dataset_service.list_dataset_items.assert_not_called()
+
+    def test_list_dataset_items_offset_overflow(self, fxt_get_project, fxt_dataset_service, fxt_client):
+        """Integers larger than 2^31-1 must be rejected with 422, not cause a SQLite overflow 500."""
+        huge_offset = 2**63  # exceeds the le=2_147_483_647 bound
+        response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/items?offset={huge_offset}")
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
         fxt_dataset_service.list_dataset_items.assert_not_called()

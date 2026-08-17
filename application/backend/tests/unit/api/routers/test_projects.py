@@ -12,7 +12,6 @@ from fastapi import status
 from app.api.dependencies import get_data_collector, get_label_service
 from app.api.schemas import LabelView, PatchLabels, ProjectView, TaskView
 from app.api.schemas.label import LabelCreate, LabelEdit, LabelRemove
-from app.main import app
 from app.models import Label, TaskType
 from app.services import ResourceInUseError, ResourceNotFoundError, ResourceType, ResourceWithIdAlreadyExistsError
 from app.services.data_collect import DataCollector
@@ -38,16 +37,16 @@ def fxt_project() -> ProjectView:
 
 
 @pytest.fixture
-def fxt_data_collector() -> MagicMock:
+def fxt_data_collector(fxt_app) -> MagicMock:
     data_collector = MagicMock(spec=DataCollector)
-    app.dependency_overrides[get_data_collector] = lambda: data_collector
+    fxt_app.dependency_overrides[get_data_collector] = lambda: data_collector
     return data_collector
 
 
 @pytest.fixture
-def fxt_label_service():
+def fxt_label_service(fxt_app):
     label_service = MagicMock(spec=LabelService)
-    app.dependency_overrides[get_label_service] = lambda: label_service
+    fxt_app.dependency_overrides[get_label_service] = lambda: label_service
     return label_service
 
 
@@ -106,6 +105,72 @@ class TestProjectEndpoints:
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
         fxt_project_service.create_project.assert_not_called()
+
+
+class TestCreateProjectInputValidationSecurity:
+    """Regression tests for a null label color must not cause a 500 error."""
+
+    @pytest.mark.parametrize(
+        "label_payload",
+        [
+            {"name": "cat"},  # color omitted, defaults to None in LabelCreate
+            {"name": "cat", "color": None},  # color explicitly null
+        ],
+    )
+    def test_null_label_color_gets_random_default_assigned(
+        self, label_payload, fxt_project_service, fxt_project, fxt_client
+    ):
+        """Label with color=null must return 201 and receive a valid hex color, not cause 500."""
+        import re
+
+        fxt_project_service.create_project.return_value = fxt_project
+        payload = {
+            "name": "Security Test Project",
+            "task": {
+                "task_type": "classification",
+                "exclusive_labels": True,
+                # classification + exclusive_labels requires >= 2 labels (TaskCreate.validate_labels)
+                "labels": [
+                    {"id": str(uuid4()), **label_payload},
+                    {"id": str(uuid4()), "name": "dog", "color": "#001122"},
+                ],
+            },
+        }
+
+        response = fxt_client.post("/api/projects", json=payload)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        fxt_project_service.create_project.assert_called_once()
+
+        # Verify the handler assigned a valid #RRGGBB hex color before calling the service
+        task_arg = fxt_project_service.create_project.call_args[0][2]
+        hex_pattern = re.compile(r"^#[0-9A-Fa-f]{6}$")
+        assert task_arg.labels, "expected at least one label"
+        for label in task_arg.labels:
+            assert label.color is not None, "color must not reach the service as None"
+            assert hex_pattern.match(label.color), f"color must be #RRGGBB, got {label.color!r}"
+
+    def test_provided_color_preserved(self, fxt_project_service, fxt_project, fxt_client):
+        """An explicitly provided color must not be overridden."""
+        fxt_project_service.create_project.return_value = fxt_project
+        payload = {
+            "name": "Color Project",
+            "task": {
+                "task_type": "classification",
+                "exclusive_labels": True,
+                # classification + exclusive_labels requires >= 2 labels
+                "labels": [
+                    {"id": str(uuid4()), "name": "cat", "color": "#AABB11"},
+                    {"id": str(uuid4()), "name": "dog", "color": "#112233"},
+                ],
+            },
+        }
+
+        response = fxt_client.post("/api/projects", json=payload)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        task_arg = fxt_project_service.create_project.call_args[0][2]
+        assert task_arg.labels[0].color == "#AABB11"
 
     def test_delete_project_success(self, fxt_project, fxt_project_service, fxt_client):
         response = fxt_client.delete(f"/api/projects/{str(fxt_project.id)}")

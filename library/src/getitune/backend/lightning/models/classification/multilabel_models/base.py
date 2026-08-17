@@ -47,7 +47,7 @@ class LightningMultilabelClsModel(LightningModel):
         optimizer (OptimizerCallable, optional): Callable for the optimizer. Defaults to DefaultOptimizerCallable.
         scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): Callable for the learning rate scheduler.
         Defaults to DefaultSchedulerCallable.
-        metric (MetricCallable, optional): Callable for the metric. Defaults to HLabelClsMetricCallable.
+        metric (MetricCallable, optional): Callable for the metric. Defaults to MultiLabelClsMetricCallable.
         torch_compile (bool, optional): Flag to indicate whether to use torch.compile. Defaults to False.
         pretrained (bool, optional): Whether to use pretrained weights. Defaults to True.
         pretrained_weights (PathLike | None, optional): Path to the pretrained weights file. When None is passed,
@@ -135,7 +135,6 @@ class LightningMultilabelClsModel(LightningModel):
             model_type="Classification",
             task_type="classification",
             multilabel=True,
-            hierarchical=False,
             confidence_threshold=0.5,
             output_raw_scores=True,
         )

@@ -20,7 +20,6 @@ from getitune.backend.lightning.exporter.native import LightningModelExporter
 from getitune.backend.lightning.models.base import DataInputParams, DefaultOptimizerCallable, DefaultSchedulerCallable
 from getitune.backend.lightning.models.instance_segmentation.base import LightningInstanceSegModel
 from getitune.backend.lightning.models.instance_segmentation.heads import TVRoIHeads
-from getitune.backend.lightning.models.instance_segmentation.rotated_det import RotatedPredictMixin
 from getitune.backend.lightning.models.instance_segmentation.segmentors.maskrcnn_tv import (
     FastRCNNConvFCHead,
     MaskRCNN,
@@ -319,12 +318,3 @@ class MaskRCNNTV(LightningInstanceSegModel):
                 "validate": False,
             },
         }
-
-
-class RotatedMaskRCNNModelV2(RotatedPredictMixin, MaskRCNNTV):
-    """Rotated MaskRCNN for Torchvision MaskRCNN model implementation."""
-
-    def predict_step(self, *args: torch.Any, **kwargs: torch.Any) -> PredictionBatch:
-        """Perform prediction step for rotated detection."""
-        preds = super().predict_step(*args, **kwargs)
-        return self.rotated_predict_step(preds)

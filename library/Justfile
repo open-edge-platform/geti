@@ -4,7 +4,7 @@ default:
     @just --list --unsorted
 
 # -------------------------------------------------------------------------------------------------
-# Virtual environment management
+# Virtual environment and dependency management
 # -------------------------------------------------------------------------------------------------
 
 uv_version := `grep -A 3 '\[tool\.uv\]' pyproject.toml | grep 'required-version' | sed 's/.*= "[~=<>]*\(.*\)"/\1/'`
@@ -30,6 +30,12 @@ venv-benchmark device="cpu": _ensure_uv
 # Generate or update the uv lock file
 venv-lock: _ensure_uv
     uv lock
+
+# Patch pyproject.toml to build torch/torchvision against CUDA 12.6 instead of 13.0 for the 'cuda' target,
+# needed for legacy Nvidia GPUs (Volta, Maxwell, Pascal). See https://github.com/open-edge-platform/geti/issues/7163
+patch-for-legacy-gpu-support: _ensure_uv
+    uv run python -c "from pathlib import Path; p = Path('pyproject.toml'); p.write_text(p.read_text().replace('cu130', 'cu126'))"
+    just venv-lock
 
 # -------------------------------------------------------------------------------------------------
 # Linting and formatting
@@ -60,9 +66,21 @@ pyrefly: _ensure_uv
 test-unit *ARGS: _ensure_uv
     uv run pytest ./tests/unit -v {{ ARGS }}
 
+# Run lightning backend
+test-unit-lightning *ARGS: _ensure_uv
+    uv run pytest ./tests/unit/backend/lightning -v {{ ARGS }}
+
 # Run model-related unit tests with pytest
 test-unit-models *ARGS: _ensure_uv
-    uv run pytest ./tests/unit/backend/native/models -v {{ ARGS }}
+    uv run pytest ./tests/unit/backend/*/models -v {{ ARGS }}
+
+# Run ultralytics backend
+test-unit-ultralytics *ARGS: _ensure_uv
+    uv run pytest ./tests/unit/backend/ultralytics -v {{ ARGS }}
+
+# Run openvino backend
+test-unit-openvino *ARGS: _ensure_uv
+    uv run pytest ./tests/unit/backend/openvino -v {{ ARGS }}
 
 # Run integration tests with pytest
 test-integration *ARGS: _ensure_uv

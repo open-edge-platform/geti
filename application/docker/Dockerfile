@@ -2,10 +2,13 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+# If set to 1, uninstalls ultralytics and its AGPL-licensed dependencies after installation.
+ARG EXCLUDE_AGPL_MODELS=0
+
 ##############
 # Backend base
 ##############
-FROM python:3.13-slim@sha256:6771159cd4fa5d9bba1258caf0b82e6b73458c694d178ad97c5e925c2d0e1a91 AS backend-base
+FROM python:3.13-slim@sha256:9662417aace5ae7b8e2609cce472b72a8958e134ba372808abe9cc1a0c0125e6 AS backend-base
 
 # uv / uvx
 COPY --from=docker.io/astral/uv:0.10.4@sha256:4cac394b6b72846f8a85a7a0e577c6d61d4e17fe2ccee65d9451a8b3c9efb4ac /uv /uvx /bin/
@@ -40,6 +43,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 # CPU Base
 ##########
 FROM backend-base AS cpu-base
+ARG EXCLUDE_AGPL_MODELS
 
 # Step 1: Install all third-party dependencies (cache key = uv.lock + pyproject.toml + version only).
 # --no-install-project skips building/installing the local project and its path deps (getitune),
@@ -64,10 +68,17 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=library,target=/library,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra cpu
 
+# Optionally uninstall ultralytics and its AGPL-licensed dependencies.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
+        uv pip uninstall ultralytics ultralytics-thop nvidia-ml-py; \
+    fi
+
 ###########
 # CUDA Base
 ###########
 FROM backend-base AS cuda-base
+ARG EXCLUDE_AGPL_MODELS
 
 # Step 1: Install all third-party dependencies (cache key = uv.lock + pyproject.toml + version only).
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -87,10 +98,17 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=library,target=/library,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra cuda
 
+# Optionally uninstall ultralytics and its AGPL-licensed dependencies.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
+        uv pip uninstall ultralytics ultralytics-thop nvidia-ml-py; \
+    fi
+
 ##########
 # XPU Base
 ##########
 FROM backend-base AS xpu-base
+ARG EXCLUDE_AGPL_MODELS
 
 # Step 1: Install all third-party dependencies (cache key = uv.lock + pyproject.toml + version only).
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -110,15 +128,11 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=library,target=/library,rw \
     uv sync --frozen --no-dev --no-editable --no-install-package av --extra mqtt --extra xpu
 
-##################
-# Geti UI packages
-##################
-FROM node:24-alpine3.22@sha256:191c9f0080fcbbc6547a85dc0ff7988072214a355aabdc1d2ec55a7dae5eea8a AS geti-ui-packages
-
-WORKDIR /home/application/ui/
-RUN apk add --no-cache git=2.49.1-r0
-COPY --link application/ui/package.json ./
-RUN npm run clone-geti-ui-packages
+# Optionally uninstall ultralytics and its AGPL-licensed dependencies.
+RUN --mount=type=cache,target=/root/.cache/uv \
+    if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
+        uv pip uninstall ultralytics ultralytics-thop nvidia-ml-py; \
+    fi
 
 #############
 # Web UI deps
@@ -129,13 +143,13 @@ WORKDIR /home/application/ui/
 
 COPY --link application/ui/package.json ./
 COPY --link application/ui/package-lock.json ./
-COPY --from=geti-ui-packages /home/application/ui/packages/ /home/application/ui/packages/
-RUN npm ci --audit=false --ignore-scripts
+RUN npm ci --audit=false
 
 COPY --link application/ui/tsconfig.json ./
 COPY --link application/ui/rsbuild.config.ts ./
 COPY --link application/ui/src/ src/
 COPY --link application/ui/public/ public/
+COPY --link application/ui/vendor/ vendor/
 
 ########
 # Web UI
@@ -149,7 +163,7 @@ RUN npm run build
 #===========================================================================
 # pyav + ffmpeg
 # ===========================================================================
-FROM python:3.13-slim@sha256:6771159cd4fa5d9bba1258caf0b82e6b73458c694d178ad97c5e925c2d0e1a91 AS ffmpeg-builder
+FROM python:3.13-slim@sha256:9662417aace5ae7b8e2609cce472b72a8958e134ba372808abe9cc1a0c0125e6 AS ffmpeg-builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -266,7 +280,7 @@ RUN python -m pip wheel --no-binary av "av==${PYAV_VERSION}" -w /dist
 #########################
 # Base for CPU, GPU and XPU runtime images
 #########################
-FROM python:3.13-slim@sha256:6771159cd4fa5d9bba1258caf0b82e6b73458c694d178ad97c5e925c2d0e1a91 AS runtime-base
+FROM python:3.13-slim@sha256:9662417aace5ae7b8e2609cce472b72a8958e134ba372808abe9cc1a0c0125e6 AS runtime-base
 
 LABEL org.opencontainers.image.source="https://github.com/open-edge-platform/training_extensions"
 LABEL org.opencontainers.image.description="Geti – train, optimize and deploy deep-learning models"
@@ -279,6 +293,7 @@ ENV STATIC_FILES_DIR="/application/html"
 ENV DATA_DIR="/application/data"
 ENV LOG_DIR="/application/logs"
 ENV PYTHONPATH=/application/backend
+ENV PYTHONUNBUFFERED=1
 
 # Create secure non-root user, add it to the 'video' group (for /dev/videoN access),
 # and remove unused package managers to reduce image size
@@ -359,15 +374,14 @@ RUN set -eu; \
     # Remove non-redistributable headers and binaries from triton nvidia backend
     find "$CLEANUP_ROOT" -type d -path "*/triton/backends/nvidia/include" -exec rm -rf {} + 2>/dev/null || true && \
     find "$CLEANUP_ROOT" -type d -path "*/triton/backends/nvidia/bin" -exec rm -rf {} + 2>/dev/null || true && \
-    # Remove specific non-redistributable CUPTI components
-    find "$CLEANUP_ROOT" -type f \( \
+    # Remove specific non-redistributable components (regular files and symlinks)
+    find "$CLEANUP_ROOT" \( -type f -o -type l \) \( \
     -name "libcheckpoint.so*" -o \
     -name "libnvperf_host.so*" -o \
     -name "libnvperf_target.so*" -o \
-    -name "libpcsamplingutil.so*" \
-    \) -path "*cupti*" -delete 2>/dev/null || true && \
-    # Remove cuSolver MG libraries (enterprise feature)
-    find "$CLEANUP_ROOT" -name "libcusolverMg.so*" -delete 2>/dev/null || true
+    -name "libpcsamplingutil.so*" -o \
+    -name "libcusolverMg.so*" \
+    \) -delete 2>/dev/null || true
 
 FROM xpu-base AS xpu-clean
 
@@ -383,6 +397,10 @@ RUN set -eu; \
 ######################
 FROM runtime-base AS geti-cpu
 
+ARG EXCLUDE_AGPL_MODELS
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 COPY --from=cpu-base --chown=${UID}:${UID} /application/backend/.venv /application/backend/.venv
 
 # Replace pyav
@@ -390,13 +408,22 @@ RUN uv pip install --no-deps --force-reinstall /dist/av-*.whl && \
     python -c "import av; print('PyAV:', av.__version__, av.library_versions)"
 
 # App code + UI assets last – source-only changes only invalidate this layer
-COPY --link application/backend/app /application/backend/app
-COPY --link --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
+COPY --link --chown=${UID}:${UID} application/backend/app /application/backend/app
+COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
+
+# Optionally strip the model manifests of AGPL-3.0 licensed models
+RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
+        grep -rl '^license: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+    fi
 
 ######################
 # Server (CUDA version)
 ######################
 FROM runtime-base AS geti-cuda
+
+ARG EXCLUDE_AGPL_MODELS
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 COPY --from=cuda-clean --chown=${UID}:${UID} /application/backend/.venv /application/backend/.venv
 
@@ -405,13 +432,20 @@ RUN uv pip install --no-deps --force-reinstall /dist/av-*.whl && \
     python -c "import av; print('PyAV:', av.__version__, av.library_versions)"
 
 # App code + UI assets last – source-only changes only invalidate this layer
-COPY --link application/backend/app /application/backend/app
-COPY --link --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
+COPY --link --chown=${UID}:${UID} application/backend/app /application/backend/app
+COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
+
+# Optionally strip the model manifests of AGPL-3.0 licensed models
+RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
+        grep -rl '^license: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+    fi
 
 #######################
 ## Server (XPU version)
 #######################
 FROM runtime-base AS geti-xpu
+
+ARG EXCLUDE_AGPL_MODELS
 
 USER root
 
@@ -441,6 +475,10 @@ RUN uv pip install --no-deps --force-reinstall /dist/av-*.whl && \
     python -c "import av; print('PyAV:', av.__version__, av.library_versions)"
 
 # App code + UI assets last – source-only changes only invalidate this layer
-COPY --link application/backend/app /application/backend/app
-COPY --link --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
+COPY --link --chown=${UID}:${UID} application/backend/app /application/backend/app
+COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
 
+# Optionally strip the model manifests of AGPL-3.0 licensed models
+RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
+        grep -rl '^license: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+    fi

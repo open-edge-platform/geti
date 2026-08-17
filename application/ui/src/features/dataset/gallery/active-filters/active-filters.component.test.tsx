@@ -35,6 +35,7 @@ const mockUseDatasetFiltersSearchParams = (overrides?: Partial<ReturnType<typeof
         setStartDate: mockSetStartDate,
         endDate: null,
         setEndDate: mockSetEndDate,
+        setDateRange: vi.fn(),
         setSortDirection: vi.fn(),
         sortDirection: 'desc',
         selectedSubsets: [],
@@ -90,8 +91,8 @@ describe('ActiveFilters', () => {
 
         render(<ActiveFilters />);
 
-        expect(screen.getByText('From 01/01/2026')).toBeVisible();
-        expect(screen.getByText('To 31/01/2026')).toBeVisible();
+        expect(screen.getByText('From 01/01/2026 00:00')).toBeVisible();
+        expect(screen.getByText('To 31/01/2026 00:00')).toBeVisible();
     });
 
     it('renders chips for the selected subsets', () => {

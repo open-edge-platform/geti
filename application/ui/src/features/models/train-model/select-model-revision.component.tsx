@@ -12,16 +12,16 @@ export const SelectModelRevision = () => {
         <Picker
             flex={1}
             items={modelRevisions}
-            label={'Select model revision'}
+            label={'Select input weights'}
             selectedKey={selectedModelRevisionId}
             onSelectionChange={(key) => onSelectModelRevisionId(String(key))}
             contextualHelp={
                 <ContextualHelp variant={'info'} placement={'top'}>
-                    <Heading>Selecting a model revision</Heading>
+                    <Heading>Selecting input weights</Heading>
                     <Content>
-                        {`Choose an existing model revision for fine-tuning,
-                        or select "Train from scratch" to start from base weights.
-                        `}
+                        {'Choose an existing model to continue fine-tuning, or select ' +
+                            `"Default pre-trained weights" to fine-tune a new model starting from ` +
+                            'publicly available weights pre-trained on large public datasets.'}
                     </Content>
                 </ContextualHelp>
             }

@@ -95,11 +95,7 @@ export type RosSinkConfig = components['schemas']['RosSinkConfigView'];
 export type SinkOutputFormats = LocalFolderSinkConfig['output_formats'];
 
 export type SinkConfig =
-    | LocalFolderSinkConfig
-    | MqttSinkConfig
-    | WebhookSinkConfig
-    | DisconnectedSinkConfig
-    | RosSinkConfig;
+    LocalFolderSinkConfig | MqttSinkConfig | WebhookSinkConfig | DisconnectedSinkConfig | RosSinkConfig;
 
 export type AnnotationDTO = components['schemas']['DatasetItemAnnotation'];
 export type PredictionDTO = components['schemas']['DatasetItemAnnotation'];

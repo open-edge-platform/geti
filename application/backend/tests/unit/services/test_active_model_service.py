@@ -40,7 +40,7 @@ def fxt_active_model_service(fxt_model_activation_state) -> Iterator[ActiveModel
         tempfile.TemporaryDirectory() as tmpdir,
         patch.object(ActiveModelService, "_load_state", return_value=fxt_model_activation_state),
     ):
-        yield ActiveModelService(data_dir=Path(tmpdir))
+        yield ActiveModelService(data_dir=Path(tmpdir), system_service=Mock())
 
 
 class TestActiveModelServiceUnit:

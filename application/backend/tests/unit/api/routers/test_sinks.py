@@ -12,7 +12,6 @@ from fastapi import status
 
 from app.api.dependencies import get_sink, get_sink_service
 from app.api.schemas.sink import FolderSinkConfigCreate, FolderSinkConfigView, MqttSinkConfigView
-from app.main import app
 from app.models import OutputFormat, SinkType
 from app.models.sink import FolderConfig, MqttConfig, Sink, SinkTestResult
 from app.services import (
@@ -50,10 +49,10 @@ def fxt_folder_sink_view() -> FolderSinkConfigView:
 
 
 @pytest.fixture
-def fxt_get_sink(fxt_folder_sink_view) -> Generator[Sink]:
-    app.dependency_overrides[get_sink] = lambda: fxt_folder_sink_view
+def fxt_get_sink(fxt_app, fxt_folder_sink_view) -> Generator[Sink]:
+    fxt_app.dependency_overrides[get_sink] = lambda: fxt_folder_sink_view
     yield fxt_folder_sink_view
-    del app.dependency_overrides[get_sink]
+    del fxt_app.dependency_overrides[get_sink]
 
 
 @pytest.fixture
@@ -73,9 +72,9 @@ def fxt_mqtt_sink_view() -> MqttSinkConfigView:
 
 
 @pytest.fixture
-def fxt_sink_service() -> MagicMock:
+def fxt_sink_service(fxt_app) -> MagicMock:
     sink_service = MagicMock(spec=SinkService)
-    app.dependency_overrides[get_sink_service] = lambda: sink_service
+    fxt_app.dependency_overrides[get_sink_service] = lambda: sink_service
     return sink_service
 
 

@@ -50,9 +50,12 @@ class LiteHRNet(LightningSegmentationModel):
 
     pretrained_weights_target = "backbone"
     pretrained_urls: ClassVar[dict[str, str]] = {
-        "lite_hrnet_s": "https://storage.geti.intel.com/weights/litehrnetsv2_imagenet1k_rsc.pth",
-        "lite_hrnet_18": "https://storage.geti.intel.com/weights/litehrnet18_imagenet1k_rsc.pth",
-        "lite_hrnet_x": "https://storage.geti.intel.com/weights/litehrnetxv3_imagenet1k_rsc.pth",
+        "lite_hrnet_s": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/"
+        "custom_semantic_segmentation/litehrnetsv2_imagenet1k_rsc.pth",
+        "lite_hrnet_18": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/"
+        "custom_semantic_segmentation/litehrnet18_imagenet1k_rsc.pth",
+        "lite_hrnet_x": "https://storage.openvinotoolkit.org/repositories/openvino_training_extensions/models/"
+        "custom_semantic_segmentation/litehrnetxv3_imagenet1k_rsc.pth",
     }
 
     def __init__(

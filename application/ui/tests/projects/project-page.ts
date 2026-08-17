@@ -23,6 +23,10 @@ export class ProjectPage {
         await this.page.goto(paths.project.new({}));
     }
 
+    getCreateNewProjectButton() {
+        return this.page.getByRole('button', { name: 'Create new project' });
+    }
+
     getCreateProjectButton() {
         return this.page.getByRole('button', { name: /Create project/ });
     }
@@ -57,8 +61,8 @@ export class ProjectPage {
         }
     }
 
-    async openProjectMenu(projectId: string) {
-        await this.page.getByTestId(projectId).click();
+    async openProjectMenu(projectName: string) {
+        await this.getProjectCard(projectName).getByLabel('open project options').click();
     }
 
     async clickDeleteMenuAction() {
@@ -67,5 +71,9 @@ export class ProjectPage {
 
     async confirmDeleteProject() {
         await this.page.getByRole('button', { name: /Delete/ }).click();
+    }
+
+    getProjectCard(projectName: string) {
+        return this.page.getByLabel(`Project: ${projectName}`);
     }
 }

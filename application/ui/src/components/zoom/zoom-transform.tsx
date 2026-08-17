@@ -3,7 +3,7 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { clampBetween } from '@geti/smart-tools/utils';
+import { clampBetween } from '@geti-ui/smart-tools/utils';
 import { createUseGesture, dragAction, pinchAction, wheelAction } from '@use-gesture/react';
 
 import type { Point } from './types';

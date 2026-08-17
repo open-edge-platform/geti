@@ -8,27 +8,21 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from app.api.dependencies import get_system_service
-from app.main import app
 from app.models.system import DeviceInfo, DeviceType
 from app.services import SystemService
 
 
 @pytest.fixture
-def fxt_client():
-    return TestClient(app)
-
-
-@pytest.fixture
-def fxt_system_service() -> Mock:
+def fxt_system_service(fxt_app) -> Mock:
     system_service = Mock(spec=SystemService)
-    app.dependency_overrides[get_system_service] = lambda: system_service
+    fxt_app.dependency_overrides[get_system_service] = lambda: system_service
     return system_service
 
 
 class TestSystemEndpoints:
     def test_get_training_devices_with_all_devices(self, fxt_system_service: Mock, fxt_client: TestClient):
         """Test GET /api/system/devices/training with all device types"""
-        fxt_system_service.get_training_devices.return_value = [
+        fxt_system_service.training_devices.return_value = [
             DeviceInfo(type=DeviceType.CPU, name="CPU", memory=None, index=None),
             DeviceInfo(type=DeviceType.XPU, name="Intel(R) Graphics [0x7d41]", memory=36022263808, index=0),
             DeviceInfo(type=DeviceType.CUDA, name="NVIDIA GeForce RTX 4090", memory=25769803776, index=0),
@@ -51,7 +45,7 @@ class TestSystemEndpoints:
 
     def test_get_inference_devices_with_xpu(self, fxt_system_service: Mock, fxt_client: TestClient):
         """Test GET /api/system/devices/inference with Intel XPU"""
-        fxt_system_service.get_inference_devices.return_value = [
+        fxt_system_service.inference_devices.return_value = [
             DeviceInfo(type=DeviceType.CPU, name="CPU", memory=None, index=None),
             DeviceInfo(type=DeviceType.XPU, name="Intel(R) Graphics [0x7d41]", memory=36022263808, index=0),
         ]
@@ -69,7 +63,7 @@ class TestSystemEndpoints:
 
     def test_get_camera_devices(self, fxt_system_service: Mock, fxt_client: TestClient):
         """Test GET /api/system/devices/camera"""
-        fxt_system_service.get_camera_devices.return_value = [
+        fxt_system_service.list_cameras.return_value = [
             {"index": 0, "name": "Integrated USB Camera"},
             {"index": 1, "name": "USB Camera"},
         ]

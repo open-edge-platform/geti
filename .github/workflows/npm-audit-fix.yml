@@ -14,18 +14,18 @@ permissions: {} # No permissions by default on workflow level
 
 jobs:
   npm-audit-fix:
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       contents: read # to checkout code
 
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 
@@ -81,6 +81,11 @@ jobs:
         with:
           app-id: ${{ secrets.RENOVATE_APP_ID }}
           private-key: ${{ secrets.RENOVATE_APP_PEM }}
+          repositories: ${{ github.event.repository.name }}
+          owner: ${{ github.repository_owner }}
+          # Repository permissions: only what's needed to push a branch and open a PR
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: Create PR if lockfile changed
         if: steps.check-changes.outputs.changed == 'true'

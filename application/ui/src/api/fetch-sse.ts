@@ -43,6 +43,9 @@ export const connectSSE = <T = unknown>(path: string, options: SSEOptions<T>): S
         eventSource.onmessage = (event: MessageEvent) => {
             try {
                 const data = JSON.parse(event.data) as T;
+
+                // A delivered message proves the stream works, so later drops get a fresh retry budget
+                retryCount = 0;
                 options.onMessage(data);
             } catch {
                 // Skip unparseable messages

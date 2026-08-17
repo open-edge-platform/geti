@@ -189,7 +189,7 @@ class TestGetiTuneTrainerPrepareWeights:
         expected_weights_path.touch()
         getitune_trainer = fxt_getitune_trainer()
 
-        getitune_trainer._model_service.get_model_variants.return_value = [
+        getitune_trainer._model_service.get_model_variants.return_value = [  # pyrefly: ignore[missing-attribute]
             ModelVariant(
                 id=parent_model_variant_id,
                 model_revision_id=parent_model_revision_id,
@@ -224,7 +224,7 @@ class TestGetiTuneTrainerPrepareWeights:
         )
         getitune_trainer = fxt_getitune_trainer()
 
-        getitune_trainer._model_service.get_model_variants.return_value = []
+        getitune_trainer._model_service.get_model_variants.return_value = []  # pyrefly: ignore[missing-attribute]
 
         # Act
         msg = (
@@ -265,7 +265,7 @@ class TestGetiTuneTrainerPrepareWeights:
         )
         getitune_trainer = fxt_getitune_trainer()
 
-        getitune_trainer._model_service.get_model_variants.return_value = [
+        getitune_trainer._model_service.get_model_variants.return_value = [  # pyrefly: ignore[missing-attribute]
             ModelVariant(
                 id=parent_model_variant_id,
                 model_revision_id=parent_model_revision_id,
@@ -542,9 +542,13 @@ class TestGetiTuneTrainerCreateTrainingDataset:
             mock_dataset_class = Mock()
             mock_dataset_class.__name__ = "DetectionDataset"
 
-            mock_getitune_training_dataset = Mock()
-            mock_getitune_validation_dataset = Mock()
-            mock_getitune_testing_dataset = Mock()
+            # Datasets need a working __len__ because prepare_training_dataset logs their sizes.
+            mock_getitune_training_dataset = MagicMock()
+            mock_getitune_training_dataset.__len__.return_value = 10
+            mock_getitune_validation_dataset = MagicMock()
+            mock_getitune_validation_dataset.__len__.return_value = 5
+            mock_getitune_testing_dataset = MagicMock()
+            mock_getitune_testing_dataset.__len__.return_value = 3
 
             mock_dataset_class.side_effect = [
                 mock_getitune_training_dataset,

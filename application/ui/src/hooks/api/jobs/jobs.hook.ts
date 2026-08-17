@@ -4,14 +4,15 @@
 import { useRef } from 'react';
 
 import { $api } from '@/api';
-import type { Job } from '@/api/types';
+import type { Job, QuantizeJob, TrainJob } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { toast } from '../../../components/toast/toast.component';
 import { getQueryKey } from '../../../query-client/query-client';
+import { useDismissedJobs } from '../../storage/use-dismissed-jobs.hook';
 import { useSSE } from '../../use-sse.hook';
-import { isQuantizeJob, isTrainJob } from '../util';
+import { isJobFailed, isQuantizeJob, isTrainJob } from '../util';
 
 const TERMINAL_STATUSES: string[] = ['DONE', 'FAILED', 'CANCELLED'];
 const ERROR_MESSAGE = 'Job failed. Please check the logs for details and try again.';
@@ -22,6 +23,7 @@ export const useStreamJobStatus = (jobId: string | undefined) => {
     const modelIdRef = useRef<string | null>(null);
 
     const { close } = useSSE<Job>(jobId ? `/api/jobs/${jobId}/status` : undefined, {
+        retry: true,
         onMessage: (updatedJob) => {
             if (isQuantizeJob(updatedJob)) {
                 modelIdRef.current = updatedJob.metadata.model.id;
@@ -76,6 +78,39 @@ export const useStreamJobStatus = (jobId: string | undefined) => {
     });
 };
 
+// Same stream as useStreamJobStatus, but writes to the single-job cache instead of the job-list
+// cache, so consumers that query a job by id (import/export) don't have to poll.
+export const useStreamJobDetail = (jobId: string | undefined | null) => {
+    const queryClient = useQueryClient();
+
+    const { close } = useSSE<Job>(jobId ? `/api/jobs/${jobId}/status` : undefined, {
+        retry: true,
+        onMessage: (updatedJob) => {
+            queryClient.setQueryData<Job>(
+                getQueryKey(['get', '/api/jobs/{job_id}', { params: { path: { job_id: updatedJob.job_id } } }]),
+                updatedJob
+            );
+
+            if (TERMINAL_STATUSES.includes(updatedJob.status)) {
+                close();
+            }
+        },
+        onClose: () => {
+            if (!jobId) {
+                return;
+            }
+
+            const jobKey = getQueryKey(['get', '/api/jobs/{job_id}', { params: { path: { job_id: jobId } } }]);
+            const cachedJob = queryClient.getQueryData<Job>(jobKey);
+
+            // The stream gave up before the job settled, so whatever is cached is stale
+            if (!cachedJob || !TERMINAL_STATUSES.includes(cachedJob.status)) {
+                queryClient.invalidateQueries({ queryKey: jobKey });
+            }
+        },
+    });
+};
+
 export const useSubmitJob = () => {
     return $api.useMutation('post', '/api/jobs', {
         meta: {
@@ -88,21 +123,26 @@ const useListJobs = () => {
     return $api.useQuery('get', '/api/jobs');
 };
 
-export const useGetCurrentRunningJobs = () => {
+const isTrainOrQuantizeJob = (job: Job): job is TrainJob | QuantizeJob => isTrainJob(job) || isQuantizeJob(job);
+
+export const useGetCurrentRunningJobs = (): (QuantizeJob | TrainJob)[] | undefined => {
     const projectId = useProjectIdentifier();
     const activeJobs = useListJobs();
+    const { isJobDismissed } = useDismissedJobs();
 
-    const activeRunningJobs = activeJobs.data?.filter((job) => {
-        const isActive = job.status === 'RUNNING' || job.status === 'PENDING';
-
-        if (isActive && (isTrainJob(job) || isQuantizeJob(job))) {
-            return job.metadata.project.id === projectId;
+    return activeJobs.data?.filter((job): job is TrainJob | QuantizeJob => {
+        if (!isTrainOrQuantizeJob(job) || job.metadata.project.id !== projectId) {
+            return false;
         }
 
-        return false;
-    });
+        if (job.status === 'RUNNING' || job.status === 'PENDING') {
+            return true;
+        }
 
-    return activeRunningJobs;
+        // A failed train job is already surfaced as a "Failed" model, the other job types are not,
+        // so they stay listed until the user dismisses them
+        return isJobFailed(job) && !isTrainJob(job) && !isJobDismissed(job.job_id);
+    });
 };
 
 export const useCancelJob = () => {

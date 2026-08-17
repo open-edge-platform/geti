@@ -25,19 +25,19 @@ jobs:
   # If PR or merge_group -> run only if files in specified paths changed
   check_paths:
     name: Check if workflow should run
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     outputs:
       run_workflow: ${{ steps.check_paths.outputs.run }}
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - &checkout
         name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 
@@ -53,7 +53,7 @@ jobs:
 
   generate-openapi-spec:
     name: Generate OpenAPI Spec
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     needs: check_paths
     if: needs.check_paths.outputs.run_workflow == 'true'
     permissions:
@@ -85,7 +85,7 @@ jobs:
 
   build:
     name: Build UI
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     needs: check_paths
     if: needs.check_paths.outputs.run_workflow == 'true'
     permissions:
@@ -124,7 +124,7 @@ jobs:
 
   lint:
     name: Eslint checks
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     needs:
       - check_paths
       - generate-openapi-spec
@@ -170,7 +170,7 @@ jobs:
 
   unit-tests:
     name: Unit tests
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     needs:
       - check_paths
       - generate-openapi-spec
@@ -272,7 +272,7 @@ jobs:
     permissions:
       contents: read # to checkout code
     timeout-minutes: 60
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-jammy@sha256:7b86926fff94374389e8e1f4fdc5c76d050d4a06a7886bb537bf412b20e2b71e
     steps:
@@ -293,13 +293,17 @@ jobs:
         working-directory: "application/ui"
         run: tar -xzf dist.tar.gz
 
+      - name: Build UI (Tauri target)
+        working-directory: "application/ui"
+        run: npm run build:tauri
+
       - *download-openapi-spec
 
       - *build-openapi-types
 
       - name: Run Playwright tests
         working-directory: "application/ui"
-        run: npm run test:component -- --project "component"
+        run: npm run test:component
 
       - name: Upload blob report to GitHub Actions Artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -318,7 +322,7 @@ jobs:
       - lint
       - unit-tests
       - playwright-tests
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     env:
       CHECKS: ${{ join(needs.*.result, ' ') }}
     if: always() && !cancelled()

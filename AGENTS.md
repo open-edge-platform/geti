@@ -61,7 +61,9 @@ User-facing skills (using Geti, not changing it):
 - Create or refresh the environment with `just venv --device cpu`, `just venv --device cuda`, or `just venv --device xpu`.
 - Run lint and type checks with `just lint`.
 - Run unit tests with `just test-unit -- <pytest args>`.
-- Run model-focused unit tests with `just test-unit-models -- <pytest args>`.
+- Run backend-focused unit tests with `just test-unit-lightning -- <pytest args>` (Lightning models),
+  `just test-unit-ultralytics -- <pytest args>` (Ultralytics/YOLO models), or
+  `just test-unit-openvino -- <pytest args>` (OpenVINO).
 - Run integration tests with `just test-integration -- <pytest args>`.
 
 ## Commands: Backend
@@ -81,7 +83,7 @@ User-facing skills (using Geti, not changing it):
 
 - Work from `application/ui/`.
 - Use Node `>=24.2.0` and npm `>=11.14.0`.
-- Install dependencies with `npm ci`. This also fetches the core `@geti` UI packages via a `preinstall` hook.
+- Install dependencies with `npm ci`.
 - Build with `npm run build`.
 - Run formatting checks with `npm run format:check`.
 - Run lint with `npm run lint`.

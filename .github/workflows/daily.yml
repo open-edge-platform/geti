@@ -13,6 +13,7 @@ jobs:
     uses: ./.github/workflows/build.yaml
     with:
       use-cache: false # Verify image is buildable from scratch without any cached layers
+      exclude-agpl-models: true # Daily images (pushed to GHCR) must not bundle AGPL-licensed models
     permissions:
       contents: read
       packages: write # to push Docker images to GHCR
@@ -57,7 +58,7 @@ jobs:
 
   check-existing-issue:
     name: Check for existing failure issue
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     needs:
       - build
       - backend-lint-and-test
@@ -72,7 +73,7 @@ jobs:
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
@@ -109,7 +110,7 @@ jobs:
 
   create-issue-on-failure:
     name: Create issue on scheduled workflow failure
-    runs-on: ${{ github.repository_owner == 'open-edge-platform' && 'overflow' || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     needs:
       - build
       - backend-lint-and-test

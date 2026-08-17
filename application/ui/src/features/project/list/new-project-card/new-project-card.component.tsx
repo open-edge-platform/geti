@@ -16,7 +16,9 @@ export const NewProjectCard = () => {
     const { datasetImportDialogState, setCurrentStep, setCurrentStagedId } = useImportDatasetDialog();
 
     const handleCreateProject = () => {
-        navigate(paths.project.new.pattern);
+        navigate(paths.project.new.pattern, {
+            viewTransition: true,
+        });
     };
 
     const handleCreateFromDataset = () => {
