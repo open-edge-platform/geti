@@ -70,6 +70,8 @@ class ModelVariant(BaseEntity):
         evaluations: List of evaluation results for this variant.
         quantization_info: Info about the quantization process (only for quantized variants).
         files_deleted: Flag indicating whether the variant files have been deleted from storage.
+        optimal_confidence_threshold: Confidence threshold determined at export time, embedded in the model
+            file. Only available for deployable formats (OpenVINO, ONNX) and for tasks that use it.
     """
 
     id: UUID
@@ -80,6 +82,7 @@ class ModelVariant(BaseEntity):
     evaluations: list[EvaluationResult] = []
     quantization_info: dict | None = None
     files_deleted: bool = False
+    optimal_confidence_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
 
     @model_validator(mode="before")
     @classmethod
@@ -93,6 +96,7 @@ class ModelVariant(BaseEntity):
                 "weights_size": 0,  # Computed at runtime
                 "quantization_info": data.quantization_info,
                 "files_deleted": data.files_deleted,
+                "optimal_confidence_threshold": None,  # Read from the model file at runtime
                 "evaluations": [
                     EvaluationResult(
                         model_revision_id=UUID(data.model_revision_id),
