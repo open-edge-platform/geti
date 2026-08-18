@@ -117,13 +117,13 @@ coturn_port=coturn-port stun_server="" gpu-slots="1" certfile="" keyfile="":
             # (e.g. for containers auto-removed after `docker stop`), so wait
             # until the name is actually free before proceeding, to avoid a
             # "Conflict. The container name is already in use" race.
-            for _ in {1..20}; do
-                if ! docker container inspect "${CONTAINER_NAME}" > /dev/null 2>&1; then
+            for _ in {1..20}; do
+                if ! docker container inspect "${CONTAINER_NAME}" > /dev/null 2>&1; then
                     break
                 fi
                 sleep 0.5
             done
-            if docker container inspect "${CONTAINER_NAME}" > /dev/null 2>&1; then
+            if docker container inspect "${CONTAINER_NAME}" > /dev/null 2>&1; then
                 echo "Warning: container name '${CONTAINER_NAME}' may not be fully released yet." >&2
             fi
         else
