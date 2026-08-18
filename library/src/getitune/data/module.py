@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import logging
 import multiprocessing
-import types
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -37,40 +36,6 @@ logger = logging.getLogger(__name__)
 
 
 _MP_CONTEXT = multiprocessing.get_context("spawn")
-
-
-def _dataset_needs_single_process_loading(dataset: VisionDataset) -> bool:
-    """Detect datasets whose backing dataframe stores per-row Python closures.
-
-    Some datumaro dataset formats (e.g. lazily-loaded, per-row mask images) store a
-    plain Python closure (e.g. a nested ``def load_image(): ...`` function) in an
-    ``Object``-typed dataframe column. Such closures cannot be pickled, which crashes
-    ``DataLoader`` worker startup under the ``spawn`` multiprocessing context (used
-    unconditionally here for CUDA/XPU safety) with a confusing
-    ``AttributeError: Can't get local object '...'`` deep inside worker startup.
-
-    Detect this case up front so we can fall back to single-process (``num_workers=0``)
-    loading for the affected dataset instead of crashing.
-    """
-    try:
-        dataframe = getattr(getattr(dataset, "dm_subset", None), "df", None)
-        if dataframe is None or len(dataframe) == 0:
-            return False
-        for name, dtype in dataframe.schema.items():
-            if str(dtype) != "Object":
-                continue
-            # Scan the whole column (short-circuiting on the first hit): a closure
-            # may not appear in the first row (e.g. mixed lazy/eager samples), so
-            # only checking `dataframe[name][0]` could miss it and let a crash
-            # slip through on a later batch.
-            if any(isinstance(sample, types.FunctionType) for sample in dataframe[name]):
-                return True
-    except (AttributeError, TypeError):
-        # Defensive: don't let detection itself break dataloader construction for
-        # dataset-like objects (e.g. test doubles) that don't expose a real
-        # datumaro-backed ``dm_subset.df``.
-        return False
-    return False
 
 
 # Mapping from getitune subset config names to Datumaro experimental Subset enums
@@ -476,13 +441,6 @@ class DataModule(LightningDataModule):
         sampler = instantiate_sampler(config.sampler, dataset=dataset, batch_size=config.batch_size)
 
         num_workers = config.num_workers
-        if num_workers > 0 and _dataset_needs_single_process_loading(dataset):
-            logger.warning(
-                "Dataset contains non-picklable per-row closures (e.g. lazily-loaded mask "
-                "images); falling back to num_workers=0 for the train dataloader to avoid "
-                "DataLoader worker startup failures under the 'spawn' multiprocessing context.",
-            )
-            num_workers = 0
 
         # Pre-populate cached augmentation caches (CachedMosaic, CachedMixUp)
         # before workers start, so all workers inherit full, diverse caches.
@@ -550,13 +508,6 @@ class DataModule(LightningDataModule):
         ``TileConfig.tile_inference_batch_size`` for GPU efficiency.
         """
         num_workers = config.num_workers
-        if num_workers > 0 and _dataset_needs_single_process_loading(dataset):
-            logger.warning(
-                "Dataset contains non-picklable per-row closures (e.g. lazily-loaded mask "
-                "images); falling back to num_workers=0 for this dataloader to avoid "
-                "DataLoader worker startup failures under the 'spawn' multiprocessing context.",
-            )
-            num_workers = 0
         return {
             "dataset": dataset,
             "batch_size": config.batch_size,
