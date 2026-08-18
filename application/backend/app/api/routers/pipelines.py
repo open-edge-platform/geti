@@ -21,7 +21,7 @@ from app.api.dependencies import (
 from app.api.schemas import PipelineMetricsView, PipelineView
 from app.api.schemas.pipeline import PipelineHealth
 from app.api.validators import ProjectID
-from app.models import DataCollectionConfig, DataCollectionPolicyAdapter, PipelineStatus
+from app.models import DataCollectionConfig, DataCollectionPolicyAdapter, InferenceConfig, PipelineStatus
 from app.services import PipelineMetricsService, PipelineService, SystemService
 from app.services.inference_status_service import InferenceStatusService
 from app.services.pipeline_service import (
@@ -37,11 +37,16 @@ router = APIRouter(prefix="/api/projects/{project_id}/pipeline", tags=["Pipeline
 
 UPDATE_PIPELINE_BODY_DESCRIPTION = """
 Partial pipeline configuration update. May contain any subset of fields including 'device', 'data_collection', 
-'source_id', 'sink_id', 'model_id', or 'model_variant_id'. Fields not included in the request will remain unchanged.
+'inference', 'source_id', 'sink_id', 'model_id', or 'model_variant_id'. Fields not included in the request will remain 
+unchanged.
 
 When 'model_id' is provided without 'model_variant_id', the default FP16 OpenVINO variant is selected automatically.
 Only OpenVINO model variants can be used for inference. If an INT8 variant is selected, the server validates that the 
 inference device supports INT8.
+
+The confidence threshold in 'inference' is applied to the running model without reloading it. Since it is a
+model-specific parameter, it is reset to the value embedded in the model files whenever the model or model variant
+changes. Passing an explicit null also restores that value.
 """
 UPDATE_PIPELINE_BODY_EXAMPLES = {
     "switch_model": Example(
@@ -92,6 +97,16 @@ UPDATE_PIPELINE_BODY_EXAMPLES = {
         summary="Change inference device",
         description="Change the device used for model inference (e.g., 'cpu', 'xpu', 'xpu-1')",
         value={"device": "xpu"},
+    ),
+    "set_confidence_threshold": Example(
+        summary="Change the confidence threshold",
+        description="Apply a custom confidence threshold to the model currently used for inference",
+        value={"inference": {"confidence_threshold": 0.7}},
+    ),
+    "reset_confidence_threshold": Example(
+        summary="Restore the model confidence threshold",
+        description="Discard the custom threshold and fall back to the default value defined by the model",
+        value={"inference": {"confidence_threshold": None}},
     ),
     "disconnect_sink": Example(
         summary="Disconnect sink",
@@ -170,7 +185,7 @@ def get_pipeline_health(
         },
     },
 )
-def update_pipeline(
+def update_pipeline(  # noqa: C901
     project_id: ProjectID,
     pipeline_config: Annotated[
         dict,
@@ -194,6 +209,7 @@ def update_pipeline(
             )
 
     try:
+        # Replace the nested config sections of the request body with their validated models, in place.
         if "data_collection" in pipeline_config:
             data_collection = pipeline_config["data_collection"]
             if "policies" in data_collection:
@@ -201,6 +217,8 @@ def update_pipeline(
                     DataCollectionPolicyAdapter.validate_python(policy) for policy in data_collection["policies"]
                 ]
             pipeline_config["data_collection"] = DataCollectionConfig.model_validate(data_collection)
+        if "inference" in pipeline_config:
+            pipeline_config["inference"] = InferenceConfig.model_validate(pipeline_config["inference"])
         updated = pipeline_service.update_pipeline(project_id, pipeline_config)
         return PipelineView.model_validate(updated, from_attributes=True)
     except ValidationError as e:

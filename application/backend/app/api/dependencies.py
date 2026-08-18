@@ -196,13 +196,24 @@ def get_system_service() -> SystemService:
     return SystemService()
 
 
+def get_model_service(
+    data_dir: Annotated[Path, Depends(get_data_dir)],
+    db: Annotated[Session, Depends(get_db)],
+) -> ModelService:
+    """Provides a ModelService instance with the model reload event from the scheduler."""
+    return ModelService(data_dir=data_dir, db_session=db)
+
+
 def get_pipeline_service(
     event_bus: Annotated[EventBus, Depends(get_event_bus)],
     db: Annotated[Session, Depends(get_db)],
     system_service: Annotated[SystemService, Depends(get_system_service)],
+    model_service: Annotated[ModelService, Depends(get_model_service)],
 ) -> PipelineService:
     """Provides a PipelineService instance ."""
-    return PipelineService(event_bus=event_bus, db_session=db, system_service=system_service)
+    return PipelineService(
+        event_bus=event_bus, db_session=db, system_service=system_service, model_service=model_service
+    )
 
 
 def get_pipeline_metrics_service(
@@ -214,14 +225,6 @@ def get_pipeline_metrics_service(
         pipeline_service=pipeline_service,
         metrics_service=metrics_service,
     )
-
-
-def get_model_service(
-    data_dir: Annotated[Path, Depends(get_data_dir)],
-    db: Annotated[Session, Depends(get_db)],
-) -> ModelService:
-    """Provides a ModelService instance with the model reload event from the scheduler."""
-    return ModelService(data_dir=data_dir, db_session=db)
 
 
 def get_webrtc_manager(request: Request) -> WebRTCManager:

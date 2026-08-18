@@ -16,7 +16,7 @@ from app.api.dependencies import (
     get_source_status_service,
 )
 from app.api.schemas import PipelineView
-from app.models import DataCollectionConfig, FixedRateDataCollectionPolicy, PipelineStatus
+from app.models import DataCollectionConfig, FixedRateDataCollectionPolicy, InferenceConfig, PipelineStatus
 from app.models.inference import InferenceWorkerStatus, InferenceWorkerStatusCode
 from app.models.metrics import InferenceMetrics, LatencyMetrics, PipelineMetrics, ThroughputMetrics, TimeWindow
 from app.models.sink import SinkStatus, SinkStatusCode
@@ -39,6 +39,7 @@ def fxt_pipeline() -> PipelineView:
         project_id=uuid4(),
         status=PipelineStatus.IDLE,
         data_collection=DataCollectionConfig(policies=[FixedRateDataCollectionPolicy(type="fixed_rate", rate=0.1)]),
+        inference=InferenceConfig(confidence_threshold=0.35),
     )
 
 
@@ -388,6 +389,35 @@ class TestPipelineEndpoints:
                     ],
                 }
             },
+        )
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        fxt_pipeline_service.update_pipeline.assert_not_called()
+
+    @pytest.mark.parametrize("threshold", [0.7, None], ids=["custom", "reset_to_model_value"])
+    def test_update_pipeline_confidence_threshold(self, threshold, fxt_pipeline, fxt_pipeline_service, fxt_client):
+        project_id = fxt_pipeline.project_id
+        fxt_pipeline_service.update_pipeline.return_value = fxt_pipeline
+
+        response = fxt_client.patch(
+            f"/api/projects/{project_id}/pipeline",
+            json={"inference": {"confidence_threshold": threshold}},
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_pipeline_service.update_pipeline.assert_called_once_with(
+            project_id, {"inference": InferenceConfig(confidence_threshold=threshold)}
+        )
+
+    @pytest.mark.parametrize("threshold", [-0.1, 1.5, "high"])
+    def test_update_pipeline_confidence_threshold_invalid(
+        self, threshold, fxt_pipeline, fxt_pipeline_service, fxt_client
+    ):
+        project_id = fxt_pipeline.project_id
+
+        response = fxt_client.patch(
+            f"/api/projects/{project_id}/pipeline",
+            json={"inference": {"confidence_threshold": threshold}},
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST

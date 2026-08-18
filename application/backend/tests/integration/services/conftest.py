@@ -7,7 +7,15 @@ from pathlib import Path
 import pytest
 from sqlalchemy.orm import Session
 
-from app.services import DatasetService, LabelService, MediaService, PipelineService, ProjectService, SystemService
+from app.services import (
+    DatasetService,
+    LabelService,
+    MediaService,
+    ModelService,
+    PipelineService,
+    ProjectService,
+    SystemService,
+)
 from app.services.event.event_bus import EventBus
 from app.services.video import VideoService
 
@@ -28,10 +36,18 @@ def fxt_system_service() -> SystemService:
 
 @pytest.fixture
 def fxt_pipeline_service(
-    fxt_event_bus: EventBus, db_session: Session, fxt_system_service: SystemService
+    fxt_event_bus: EventBus,
+    db_session: Session,
+    fxt_system_service: SystemService,
+    fxt_projects_dir: Path,
 ) -> PipelineService:
     """Fixture to create a PipelineService instance."""
-    return PipelineService(event_bus=fxt_event_bus, db_session=db_session, system_service=fxt_system_service)
+    return PipelineService(
+        event_bus=fxt_event_bus,
+        db_session=db_session,
+        system_service=fxt_system_service,
+        model_service=ModelService(data_dir=fxt_projects_dir.parent, db_session=db_session),
+    )
 
 
 @pytest.fixture
