@@ -6,14 +6,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { defineConfig, devices } from '@playwright/test';
-import dotenv from 'dotenv';
 
 const file = fileURLToPath(import.meta.url);
 const dirname = path.dirname(file);
 
-dotenv.config({
-    path: path.resolve(dirname, '.env.test'),
-});
+const envFile = path.resolve(dirname, '.env.test');
+if (existsSync(envFile)) {
+    process.loadEnvFile(envFile);
+}
 
 const CI = !!process.env.CI;
 

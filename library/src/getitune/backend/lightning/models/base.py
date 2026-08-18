@@ -92,8 +92,8 @@ class DataInputParams:
     """
 
     input_size: tuple[int, int]
-    mean: tuple[float, float, float]
-    std: tuple[float, float, float]
+    mean: tuple[float, float, float] | None
+    std: tuple[float, float, float] | None
     intensity_config: IntensityConfig | None = None
 
     def as_dict(self) -> dict[str, Any]:
@@ -1016,9 +1016,11 @@ class LightningModel(LightningModule):
 
                 intensity_cfg = IntensityConfig(**intensity_cfg)
             data_input_params = DataInputParams(
-                input_size=preprocessing_params.get("input_size") or default.input_size,
-                mean=preprocessing_params.get("mean") or default.mean,
-                std=preprocessing_params.get("std") or default.std,
+                input_size=preprocessing_params.get("input_size")
+                if preprocessing_params.get("input_size") is not None
+                else default.input_size,
+                mean=preprocessing_params.get("mean") if preprocessing_params.get("mean") is not None else default.mean,
+                std=preprocessing_params.get("std") if preprocessing_params.get("std") is not None else default.std,
                 intensity_config=intensity_cfg,
             )
         elif isinstance(preprocessing_params, DataInputParams):

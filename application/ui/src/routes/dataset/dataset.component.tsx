@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { dimensionValue, Grid, View } from '@geti-ui/ui';
-import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useViewMode } from 'hooks/use-view-mode.hook';
 
-import { ActiveFilters } from '../../features/dataset/gallery/active-filters/active-filters.component';
+import {
+    ActiveFilters,
+    useHasActiveFilters,
+} from '../../features/dataset/gallery/active-filters/active-filters.component';
 import { Gallery } from '../../features/dataset/gallery/gallery.component';
 import { Toolbar } from '../../features/dataset/gallery/toolbar/toolbar.component';
 import { ExportJobsList } from '../../features/dataset/import-export/export-jobs-list/export-jobs-list.component';
@@ -16,17 +18,11 @@ import { GalleryViewMode } from '../../shared/gallery-view-modes';
 
 export const Dataset = () => {
     const [viewMode, setViewMode] = useViewMode('dataset-gallery-view-mode');
-    const datasetFilters = useDatasetFiltersSearchParams();
 
     const { items, isPending, isFetchingNextPage, fetchNextPage, isMediaItemReviewedById } =
         useDatasetMediaWithReviewStatus();
 
-    const hasActiveFilter =
-        datasetFilters.annotationStatus !== null ||
-        datasetFilters.selectedLabelIds.length > 0 ||
-        datasetFilters.startDate !== null ||
-        datasetFilters.endDate !== null ||
-        datasetFilters.selectedSubsets.length > 0;
+    const hasActiveFilter = useHasActiveFilters();
 
     return (
         <MediaUploadProvider>

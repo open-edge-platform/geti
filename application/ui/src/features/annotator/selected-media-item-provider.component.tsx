@@ -5,7 +5,7 @@ import { createContext, ReactNode, useCallback, useContext, useRef, useState } f
 
 import type { Media } from '@/api/types';
 import { isEqual } from 'lodash-es';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 import { isVideo, isVideoFrame } from '../../shared/media-item-utils';
 import type { RegionOfInterest } from '../../shared/types';

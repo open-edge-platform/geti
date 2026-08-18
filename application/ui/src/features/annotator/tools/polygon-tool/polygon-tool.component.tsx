@@ -3,7 +3,7 @@
 
 import { PointerEvent, useRef, useState, useTransition } from 'react';
 
-import { isPointOverPoint, isPolygonValid } from '@geti/smart-tools/utils';
+import { isPointOverPoint, isPolygonValid } from '@geti-ui/smart-tools/utils';
 import { isEmpty } from 'lodash-es';
 
 import { useZoom } from '../../../../components/zoom/zoom.provider';

@@ -794,7 +794,8 @@ class DEIMTransformerModule(nn.Module):
 
         if denoising_bbox_unact is not None:
             enc_topk_bbox_unact = torch.concat([denoising_bbox_unact, enc_topk_bbox_unact], dim=1)
-            content = torch.concat([denoising_logits, content], dim=1)
+            if denoising_logits is not None:
+                content = torch.concat([denoising_logits, content], dim=1)
 
         return content, enc_topk_bbox_unact, enc_topk_bboxes_list, enc_topk_logits_list, enc_outputs_logits
 

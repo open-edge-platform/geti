@@ -47,13 +47,13 @@ Expected behavior:
 - Uses Node `>=24.2.0`, runs `npm ci` from `application/ui/`.
 - Runs `npm run test:unit`, and prefers unit tests over Playwright/e2e.
 
-### Scenario 4: Respect generated packages
+### Scenario 4: Respect generated API types
 
 > "Update the UI to use a new API field."
 
 Expected behavior:
 
-- Does not hand-edit generated `@geti` packages fetched by the preinstall hook.
+- Does not hand-edit generated API types (`src/api/openapi-spec.d.ts`); regenerates them instead.
 - Runs `npm run type-check` and `npm run lint` before finishing.
 
 ## `geti-openapi-sync`

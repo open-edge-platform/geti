@@ -1,0 +1,28 @@
+.datasetViewsList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spectrum-global-dimension-size-200);
+    height: 100%;
+    overflow-y: auto;
+}
+
+.datasetViewInListItem {
+    cursor: pointer;
+    border: var(--spectrum-alias-border-size-thin) solid transparent;
+    background-color: var(--spectrum-global-color-gray-100);
+
+    transition: all 0.2s ease-in-out;
+}
+
+.datasetViewListItemSelected {
+    border-color: var(--energy-blue);
+    background-color: var(--selection-dark-blue);
+
+    & .datasetViewInList {
+        color: var(--energy-blue);
+    }
+}
+
+.datasetViewInList {
+    color: var(--spectrum-global-color-gray-900);
+}
