@@ -3,10 +3,13 @@
 
 mod backend;
 
+use std::fs::OpenOptions;
+use std::io::Write as _;
 use std::process::Child;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, OnceLock};
+use std::time::{Instant, SystemTime, UNIX_EPOCH};
 
 use serde::Deserialize;
 use tauri::{AppHandle, Manager, RunEvent, WindowEvent};
@@ -128,6 +131,77 @@ fn read_and_clear_fatal_status(app: &AppHandle) -> Option<FatalStatus> {
     status
 }
 
+// ---------------------------------------------------------------------------
+// TEMPORARY shutdown instrumentation
+//
+// Measures how long each phase of the window-close path takes, so the ~8 s exit
+// delay reported for the packaged Windows build can be attributed to a concrete
+// step instead of guessed at. Every line goes to the normal Tauri log *and* to
+// `<log dir>/shutdown-trace.log`, which is opened/flushed/closed per line so the
+// data survives even if the process is killed or hangs mid-shutdown.
+//
+// Deliberately not gated on `debug_assertions`: the interesting costs (GUI
+// subsystem => a fresh console + conhost for every child process, MSIX package
+// identity) only exist in a real release build, so a debug build would hide
+// them. Remove this block once the root cause is confirmed.
+// ---------------------------------------------------------------------------
+
+/// Instant the shell process started; zero point of every trace line.
+static APP_START: OnceLock<Instant> = OnceLock::new();
+
+/// Resolved trace-file path (`None` when no log directory could be resolved).
+static TRACE_FILE: OnceLock<Option<PathBuf>> = OnceLock::new();
+
+/// Wall-clock milliseconds since the Unix epoch, so trace lines can be lined up
+/// with observations made outside the process (Task Manager, Process Monitor, a
+/// PowerShell watcher polling for the PID to disappear).
+fn epoch_millis() -> u128 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|d| d.as_millis())
+        .unwrap_or(0)
+}
+
+/// Append one instrumentation line, flushing immediately.
+fn trace(msg: &str) {
+    let elapsed = APP_START.get().map(|t| t.elapsed().as_millis()).unwrap_or(0);
+    log::info!("[shutdown-trace +{elapsed} ms] {msg}");
+
+    if let Some(Some(path)) = TRACE_FILE.get() {
+        if let Ok(mut file) = OpenOptions::new().create(true).append(true).open(path) {
+            let _ = writeln!(file, "{}\t+{} ms\t{}", epoch_millis(), elapsed, msg);
+            let _ = file.flush();
+        }
+    }
+}
+
+/// Run `f`, trace how long it took, and hand back its result.
+fn trace_step<T>(label: &str, f: impl FnOnce() -> T) -> T {
+    trace(&format!("-> {label}"));
+    let start = Instant::now();
+    let result = f();
+    trace(&format!("<- {label} took {} ms", start.elapsed().as_millis()));
+    result
+}
+
+/// Set up the trace sink. Must run before anything else in `setup()`.
+fn init_trace(app: &AppHandle) {
+    let _ = APP_START.set(Instant::now());
+
+    let path = resolve_log_dir(app).map(|dir| {
+        let _ = std::fs::create_dir_all(&dir);
+        dir.join("shutdown-trace.log")
+    });
+    let _ = TRACE_FILE.set(path);
+
+    let debug_build = cfg!(debug_assertions);
+    trace(&format!(
+        "=== app start: pid={} debug_assertions={debug_build} trace_file={:?}",
+        std::process::id(),
+        TRACE_FILE.get().and_then(|p| p.as_ref())
+    ));
+}
+
 /// Shared handle used to tear the backend down and to tell the monitor thread
 /// whether an exit was intentional (so it doesn't mistake a clean shutdown for a
 /// crash).
@@ -137,6 +211,9 @@ struct BackendControl {
     pid: Arc<Mutex<Option<u32>>>,
     /// Set before we deliberately kill the backend during app shutdown.
     shutting_down: Arc<AtomicBool>,
+    /// TEMPORARY: instant the kill was issued, so the monitor thread can report
+    /// how long the backend tree actually took to die.
+    kill_started: Arc<Mutex<Option<Instant>>>,
 }
 
 /// Kill a process and all its descendants by PID.
@@ -149,18 +226,49 @@ fn kill_process_tree(pid: u32) {
     #[cfg(windows)]
     {
         use std::process::Command;
-        let _ = Command::new("taskkill")
-            .args(["/F", "/T", "/PID", &pid.to_string()])
-            .output();
+
+        // TEMPORARY control probe. Spawning a trivial console child measures the
+        // fixed cost of `CreateProcess` from *this* process — console + conhost
+        // allocation in a GUI-subsystem build, plus MSIX AppModel overhead —
+        // without doing any process-tree work. Subtracting it from the taskkill
+        // timing below separates "starting any child process is slow here" from
+        // "enumerating the process tree is slow".
+        trace_step("probe: spawn `cmd /c exit`", || {
+            let _ = Command::new("cmd").args(["/c", "exit"]).output();
+        });
+
+        let result = trace_step("taskkill /F /T", || {
+            Command::new("taskkill")
+                .args(["/F", "/T", "/PID", &pid.to_string()])
+                .output()
+        });
+
+        // The stdout of `taskkill /T` lists every PID it terminated, which tells
+        // us for free how large the backend process tree was.
+        match result {
+            Ok(output) => {
+                let stdout = String::from_utf8_lossy(&output.stdout);
+                let stderr = String::from_utf8_lossy(&output.stderr);
+                trace(&format!(
+                    "taskkill exit={:?} stdout={:?} stderr={:?}",
+                    output.status.code(),
+                    stdout.trim(),
+                    stderr.trim()
+                ));
+            }
+            Err(e) => trace(&format!("taskkill could not be started: {e}")),
+        }
     }
 
     #[cfg(unix)]
     {
         use std::process::Command;
         // kill -- -PID sends the signal to the whole process group.
-        let _ = Command::new("kill")
-            .args(["-9", "--", &format!("-{pid}")])
-            .output();
+        trace_step("kill -9 -- -<pid>", || {
+            let _ = Command::new("kill")
+                .args(["-9", "--", &format!("-{pid}")])
+                .output();
+        });
     }
 }
 
@@ -168,9 +276,16 @@ fn kill_process_tree(pid: u32) {
 /// so the monitor thread stays silent instead of showing a crash dialog.
 fn shutdown_backend(control: &BackendControl) {
     control.shutting_down.store(true, Ordering::SeqCst);
-    if let Some(pid) = control.pid.lock().unwrap().take() {
-        kill_process_tree(pid);
-        log::info!("⛔ Backend terminated");
+    let pid = control.pid.lock().unwrap().take();
+    match pid {
+        Some(pid) => {
+            *control.kill_started.lock().unwrap() = Some(Instant::now());
+            trace_step(&format!("shutdown_backend(pid={pid})"), || {
+                kill_process_tree(pid);
+            });
+            log::info!("⛔ Backend terminated");
+        }
+        None => trace("shutdown_backend: no PID recorded, backend already shut down"),
     }
 }
 
@@ -278,6 +393,18 @@ fn monitor_backend(app: AppHandle, mut child: Child, control: BackendControl) {
     // A deliberate shutdown (window closed / app quit) already killed it — the
     // exit is expected, so stay silent.
     if control.shutting_down.load(Ordering::SeqCst) {
+        // TEMPORARY: how long the backend tree really took to disappear after
+        // the kill was issued — `taskkill` returning is not the same as the
+        // processes actually being gone.
+        let waited = control
+            .kill_started
+            .lock()
+            .unwrap()
+            .map(|t| t.elapsed().as_millis());
+        trace(&format!(
+            "backend side-car reaped {waited:?} ms after the kill was issued (exit code {:?})",
+            status.as_ref().ok().and_then(|s| s.code())
+        ));
         return;
     }
 
@@ -312,6 +439,7 @@ fn main() {
         .setup({
             let control = control.clone();
             move |app| {
+                init_trace(app.handle());
                 let child = spawn_backend(app.handle()).expect("Failed to spawn python backend");
                 // Record the PID so shutdown can kill the whole tree, then hand
                 // the child to a monitor thread that watches for crashes and
@@ -330,6 +458,8 @@ fn main() {
             let control = control.clone();
             move |window, event| {
                 if let WindowEvent::CloseRequested { api, .. } = event {
+                    trace("WindowEvent::CloseRequested — shutdown starts here (T0)");
+
                     // Prevent the default close so we can shut down gracefully.
                     // Destroying the window first lets the WebView2 / Chromium
                     // widget tear down cleanly before the process exits,
@@ -343,9 +473,12 @@ fn main() {
                     shutdown_backend(&control);
 
                     let handle = window.app_handle().clone();
-                    if let Err(e) = window.destroy() {
-                        log::warn!("Failed to destroy window during shutdown: {e}");
-                    }
+                    trace_step("window.destroy()", || {
+                        if let Err(e) = window.destroy() {
+                            log::warn!("Failed to destroy window during shutdown: {e}");
+                        }
+                    });
+                    trace("calling AppHandle::exit(0)");
                     handle.exit(0);
                 }
             }
@@ -358,9 +491,16 @@ fn main() {
     // exits without going through the CloseRequested path (e.g. Cmd+Q on
     // macOS, or programmatic shutdown).
     let exit_control = control.clone();
-    app.run(move |_app_handle, event| {
-        if let RunEvent::Exit = event {
+    app.run(move |_app_handle, event| match event {
+        RunEvent::ExitRequested { .. } => trace("RunEvent::ExitRequested"),
+        RunEvent::Exit => {
             shutdown_backend(&exit_control);
+            // Last line we can emit from inside the process: everything after
+            // this (WebView2 host/GPU/renderer teardown, unmapping the backend's
+            // torch/OpenVINO address spaces, AV process-exit callbacks) is only
+            // observable from outside.
+            trace("RunEvent::Exit handled — OS/WebView2 teardown starts now");
         }
+        _ => {}
     });
 }
