@@ -33,9 +33,9 @@ import { isClassificationTask, isMultiLabelClassificationTask } from '../../../p
 import { DeleteMediaItem } from '../../gallery/delete-media-item/delete-media-item.component';
 import { Toolbar } from '../toolbar-container/toolbar-container.component';
 import { AnnotatorModes } from './annotator-modes/annotator-modes-toggle.component';
-import { PredictionInferenceDevices } from './annotator-modes/prediction-inference-devices.component';
-import { PredictionModelSelector } from './annotator-modes/prediction-model-selector.component';
-import { PredictionButtons } from './annotator-modes/predictions-buttons.component';
+import { PredictionInferenceDevices } from './prediction-inference-devices/prediction-inference-devices.component';
+import { PredictionModelSelector } from './prediction-model-selector/prediction-model-selector.component';
+import { PredictionButtons } from './predictions-buttons.component';
 import { useIsSubmitDisabled } from './use-is-submit-disabled.hook';
 import { getNextItem } from './util';
 
