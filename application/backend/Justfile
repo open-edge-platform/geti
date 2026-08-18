@@ -118,8 +118,7 @@ gen-timm-catalog: install-uv
     fi
 
     echo "Generating timm catalog snapshot at ${OUTPUT}..."
-    cd ../../library
-    uv run python scripts/timm_catalog/generate_snapshot.py \
+    uv run python app/gen_timm_catalog.py \
         --output "$OUTPUT" \
         "${IMAGENET_ARGS[@]}"
 

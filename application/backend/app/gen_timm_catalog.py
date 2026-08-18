@@ -15,10 +15,10 @@ build, this script records:
   grouping.
 - preprocessing defaults (``input_size``, ``mean``, ``std``, ``interpolation``)
   from ``pretrained_cfg``.
-- ``default_lr``: aligned with the optimizer family the timm model wrapper
-  will pick at train time (see ``TimmModelMulticlassCls``/§3.2 of the design
-  doc), so the exposed learning rate always matches the optimizer actually
-  constructed.
+- ``default_lr`` / ``default_weight_decay``: aligned with the optimizer family
+  the timm model wrapper will pick at train time (see ``TimmModelMulticlassCls``/§3.2
+  of the design doc), so the exposed learning rate and weight decay always matches
+  the optimizer actually constructed.
 - ``trainable_parameters`` / ``gigaflops``: computed once per model via a
   headless (``num_classes=0``) forward pass and ``measure_flops``.
 
@@ -50,8 +50,14 @@ logger = logging.getLogger(__name__)
 # optimizer selection in TimmModelMulticlassCls / TimmModelMultilabelCls).
 # TODO(https://github.com/open-edge-platform/geti/issues/7097): import constants from library (single source of truth)
 _ADAMW_PREFIXES = ("vit", "deit", "beit", "swin", "cait", "xcit", "maxvit", "coat", "twins", "pvt")
-_ADAMW_DEFAULT_LR = 1e-4
-_SGD_DEFAULT_LR = 7e-3
+_ADAMW_DEFAULTS = {
+    "learning_rate": 1e-4,
+    "weight_decay": 5e-2,
+}
+_SGD_DEFAULTS = {
+    "learning_rate": 7e-3,
+    "weight_decay": 1e-3,
+}
 
 _DEFAULT_OUTPUT = Path(__file__).resolve().parent / "timm_catalog_snapshot.json"
 
@@ -65,11 +71,11 @@ def _family_of(model_name: str) -> str:
     return model_name.removeprefix("tf_").split("_")[0].lower()
 
 
-def _default_lr_for(model_name: str) -> float:
+def _defaults_for(model_name: str) -> dict[str, float]:
     family = _family_of(model_name)
     if family.startswith(_ADAMW_PREFIXES):
-        return _ADAMW_DEFAULT_LR
-    return _SGD_DEFAULT_LR
+        return _ADAMW_DEFAULTS
+    return _SGD_DEFAULTS
 
 
 def _module_family_map() -> dict[str, str]:
@@ -86,7 +92,7 @@ def _module_family_map() -> dict[str, str]:
 def _tags(model_name: str, family: str) -> tuple[str, str]:
     """Best-effort variant & pretrained tags: model name with the leading family token stripped."""
     variant, _, pretrained = model_name.partition(".")
-    variant = variant.removeprefix(f"tf_{family}" if "tf_" in variant else family)
+    variant = variant.removeprefix(f"tf_{family}_" if "tf_" in variant else f"{family}_")
     return variant, pretrained
 
 
@@ -120,10 +126,11 @@ def _compute_stats(model_name: str) -> dict[str, float]:
     """Compute headless parameter count and single-forward-pass GFLOPs for *model_name*."""
     import timm
     import torch
-
     from getitune.utils.utils import measure_flops
 
     cfg = timm.get_pretrained_cfg(model_name)
+    if cfg is None:
+        raise ValueError(f"Pretrained config not found for {model_name}; cannot compute stats.")
     model = timm.create_model(model_name, pretrained=False, num_classes=0)
     model.eval()
 
@@ -148,8 +155,11 @@ def _build_entry(
     import timm
 
     cfg = timm.get_pretrained_cfg(model_name)
+    if cfg is None:
+        raise ValueError(f"Pretrained config not found for {model_name}; cannot build entry.")
     family = family_map.get(model_name, _family_of(model_name))
     version_tag, pretrained_tag = _tags(model_name, family)
+    default_params = _defaults_for(model_name)
 
     entry: dict[str, Any] = {
         "model_name": model_name,
@@ -160,7 +170,8 @@ def _build_entry(
         "mean": list(cfg.mean),
         "std": list(cfg.std),
         "interpolation": cfg.interpolation,
-        "default_lr": _default_lr_for(model_name),
+        "default_lr": default_params["learning_rate"],
+        "default_weight_decay": default_params["weight_decay"],
         "imagenet_top1_accuracy": imagenet_top1.get(model_name),
     }
 
