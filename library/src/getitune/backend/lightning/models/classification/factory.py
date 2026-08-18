@@ -181,12 +181,11 @@ class TimmModel:
     def __new__(
         cls,
         label_info: LabelInfoTypes,
-        learning_rate: float | None = None,
         data_input_params: DataInputParams | dict | None = None,
         task: Literal["multi_class", "multi_label"] = "multi_class",
         model_name: str = "tf_efficientnetv2_s.in21k",
         freeze_backbone: bool = False,
-        optimizer: OptimizerCallable | None = None,
+        optimizer: OptimizerCallable = DefaultOptimizerCallable,
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
@@ -211,8 +210,6 @@ class TimmModel:
 
         Args:
             label_info (LabelInfoTypes): The label information.
-            learning_rate (float, optional): Learning rate for the optimizer. Defaults to None.
-                If None, `optimizer` must be provided.
             data_input_params (DataInputParams | dict | None, optional): The data input parameters that consists
                 of input size, mean and std. Defaults to None.
             freeze_backbone (bool, optional): Whether to freeze the backbone during training.
@@ -221,7 +218,7 @@ class TimmModel:
                 You can find all available models at timm.list_models() or using TimmModel.list_model().
             task (Literal["multi_class", "multi_label"], optional): The task type.
                 Can be "multi_class" or "multi_label". Defaults to "multi_class".
-            optimizer (OptimizerCallable, optional): The optimizer callable. Defaults to None.
+            optimizer (OptimizerCallable): The optimizer callable. Defaults to DefaultOptimizerCallable.
             scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): The learning rate scheduler callable.
                 Defaults to DefaultSchedulerCallable.
             metric (MetricCallable, optional): The metric callable. Defaults to MultiClassClsMetricCallable.
@@ -232,21 +229,21 @@ class TimmModel:
             >>> model = TimmModel(
             ...     task="multi_class",
             ...     label_info=10,
-            ...     learning_rate=0.0001,
             ...     data_input_params={"input_size": (224, 224),
             ...                        "mean": [123.675, 116.28, 103.53],
             ...                        "std": [58.395, 57.12, 57.375]},
             ...     model_name="tf_efficientnetv2_s.in21k",
             ... )
-            >>> # Multi-label classification
+            >>> # Multi-label classification with timm optimizer
+            >>> from getitune.backend.lightning.models.classification.utils.timm import TimmOptimizer
             >>> model = TimmModel(
             ...     task="multi_label",
-            ...     learning_rate=0.0001,
+            ...     optimizer = TimmOptimizer(lr=0.01, weight_decay=0.001),
             ...     model_name="tf_efficientnetv2_s.in21k",
             ...     data_input_params={"input_size": (224, 224),
             ...                        "mean": [123.675, 116.28, 103.53],
             ...                        "std": [58.395, 57.12, 57.375]},
-            ...     label_info=[1, 5, 10]  # Multi-label setup
+            ...     label_info=["1", "5", "10"]  # Multi-label setup
             ... )
         """
         if task == "multi_class":

@@ -4,7 +4,12 @@ model:
   init_args:
     label_info: 1000
     model_name: DYNAMIC
-    learning_rate: DYNAMIC
+
+    optimizer:
+      class_path: getitune.backend.lightning.models.classification.utils.timm.TimmOptimizer
+      init_args:
+        lr: DYNAMIC
+        weight_decay: DYNAMIC
 
 engine:
   device: auto

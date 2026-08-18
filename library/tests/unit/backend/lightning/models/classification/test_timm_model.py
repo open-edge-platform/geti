@@ -16,7 +16,6 @@ from getitune.data.entity.sample import PredictionBatch
 def fxt_multi_class_cls_model():
     return TimmModelMulticlassCls(
         label_info=10,
-        learning_rate=0.0001,
         model_name="tf_efficientnetv2_s.in21k",
         data_input_params=DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
         pretrained=False,
@@ -68,7 +67,6 @@ class TestTimmModelMulticlassCls:
 
         model = TimmModelMulticlassCls(
             label_info=10,
-            learning_rate=0.0001,
             model_name="tf_efficientnetv2_s.in21k",
             data_input_params=data_input_params,
             freeze_backbone=True,
@@ -80,7 +78,6 @@ class TestTimmModelMulticlassCls:
 
         model = TimmModelMulticlassCls(
             label_info=10,
-            learning_rate=0.0001,
             model_name="tf_efficientnetv2_s.in21k",
             data_input_params=data_input_params,
             freeze_backbone=False,
@@ -93,7 +90,6 @@ class TestTimmModelMulticlassCls:
 def fxt_multi_label_cls_model():
     return TimmModelMultilabelCls(
         label_info=10,
-        learning_rate=0.0001,
         model_name="tf_efficientnetv2_s.in21k",
         data_input_params=DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
         pretrained=False,
@@ -145,7 +141,6 @@ class TestTimmModelMultilabelCls:
 
         model = TimmModelMultilabelCls(
             label_info=10,
-            learning_rate=0.0001,
             model_name="tf_efficientnetv2_s.in21k",
             data_input_params=data_input_params,
             freeze_backbone=True,
@@ -157,7 +152,6 @@ class TestTimmModelMultilabelCls:
 
         model = TimmModelMultilabelCls(
             label_info=10,
-            learning_rate=0.0001,
             model_name="tf_efficientnetv2_s.in21k",
             data_input_params=data_input_params,
             freeze_backbone=False,
