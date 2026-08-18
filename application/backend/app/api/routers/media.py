@@ -15,6 +15,7 @@ from app.api.dependencies import (
     get_file_name_and_extension,
     get_inference_media_limit,
     get_media_prediction_service,
+    get_media_segment_service,
     get_media_service,
     get_project,
     get_system_service,
@@ -45,8 +46,10 @@ from app.services import DatasetService, MediaPredictionService, MediaService, S
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
 from app.services.inference import InferenceBusyError
-from app.services.media_prediction_service import BinaryNotFoundError, VideoRangeError
+from app.services.media_numpy_loader import BinaryNotFoundError
+from app.services.media_prediction_service import VideoRangeError
 from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters
+from app.services.sam import MediaSegmentService
 from app.utils.images import needs_display_normalization, normalize_image_to_png_bytes
 
 router = APIRouter(prefix="/api/projects/{project_id}/dataset/media", tags=["Media"])
@@ -624,5 +627,53 @@ def media_predict(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except InferenceBusyError as e:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@router.get(
+    "/{media_id}/embeddings",
+    response_model=None,
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {
+            "description": "Media is segmented, embeddings are calculated",
+            "content": {"application/octet-stream": {}},
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            "description": "Missing frame range, range is specified for non-video media, "
+            "or media inference limit exceeded"
+        },
+        status.HTTP_404_NOT_FOUND: {"description": "Media, dataset item or project not found"},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {
+            "description": "Inference server is busy with another request, try again later"
+        },
+    },
+)
+def media_embeddings(
+    project: Annotated[Project, Depends(get_project)],
+    media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
+    media_segment_service: Annotated[MediaSegmentService, Depends(get_media_segment_service)],
+    system_service: Annotated[SystemService, Depends(get_system_service)],
+    frame_index: Annotated[int | None, Query(description="Video frame index", ge=0)] = None,
+) -> Response:
+    """
+    Segment media and return embeddings as a binary file
+    """
+    if isinstance(media, Video) and not frame_index:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Video frame index is not provided.")
+    try:
+        media_id = f"{media.video.id}_{media.frame_index}" if isinstance(media, NotAnnotatedVideoFrame) else media.id
+        device = system_service.inference_device("cpu")
+        embeddings_bytes = media_segment_service.segment_media(project=project, media=media, device=device)
+        return write_bytes_to_response(
+            content=embeddings_bytes,
+            filename=f"{media_id}_embeddings.safetensors",
+            media_type="application/octet-stream",
+        )
+    except VideoRangeError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except BinaryNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

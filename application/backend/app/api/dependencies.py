@@ -19,7 +19,9 @@ from app.services import (
     DatasetRevisionService,
     DatasetService,
     LabelService,
+    MediaNumpyLoader,
     MediaPredictionService,
+    MediaSegmentService,
     MediaService,
     MetricsService,
     ModelService,
@@ -116,6 +118,16 @@ def get_inference_model_ttl(request: Request) -> int:
 def get_inference_keyframe_stride(request: Request) -> int:
     """Provides the inference frame skip from settings."""
     return request.app.state.settings.inference_keyframe_stride
+
+
+def get_sam_encoder_xml_path(request: Request) -> Path:
+    """Provides the path to the SAM encoder model XML file. This path is defined in the app settings."""
+    return request.app.state.settings.sam_encoder_xml_path
+
+
+def get_sam_ov_cache_path(request: Request) -> Path | None:
+    """Provides the OpenVINO cache directory for the SAM encoder. This path is defined in the app settings."""
+    return request.app.state.settings.sam_ov_cache_path
 
 
 def get_event_bus(request: Request) -> EventBus:
@@ -255,6 +267,13 @@ def get_media_service(
     return MediaService(data_dir=data_dir, video_service=video_service, db_session=db)
 
 
+def get_media_numpy_loader(
+    media_service: Annotated[MediaService, Depends(get_media_service)],
+) -> MediaNumpyLoader:
+    """Provides a MediaNumpyLoader instance."""
+    return MediaNumpyLoader(media_service=media_service)
+
+
 def get_dataset_service(
     label_service: Annotated[LabelService, Depends(get_label_service)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
@@ -270,6 +289,7 @@ def get_media_prediction_service(
     inference_server: Annotated[InferenceServer, Depends(get_inference_server)],
     inference_model_ttl: Annotated[int, Depends(get_inference_model_ttl)],
     inference_keyframe_stride: Annotated[int, Depends(get_inference_keyframe_stride)],
+    media_numpy_loader: Annotated[MediaNumpyLoader, Depends(get_media_numpy_loader)],
     db: Annotated[Session, Depends(get_db)],
 ) -> MediaPredictionService:
     """Provides a MediaPredictionService instance."""
@@ -279,6 +299,24 @@ def get_media_prediction_service(
         inference_server=inference_server,
         inference_model_ttl=inference_model_ttl,
         inference_keyframe_stride=inference_keyframe_stride,
+        media_numpy_loader=media_numpy_loader,
+        db_session=db,
+    )
+
+
+def get_media_segment_service(
+    media_service: Annotated[MediaService, Depends(get_media_service)],
+    media_numpy_loader: Annotated[MediaNumpyLoader, Depends(get_media_numpy_loader)],
+    model_xml_path: Annotated[Path, Depends(get_sam_encoder_xml_path)],
+    ov_cache_path: Annotated[Path | None, Depends(get_sam_ov_cache_path)],
+    db: Annotated[Session, Depends(get_db)],
+) -> MediaSegmentService:
+    """Provides a MediaSegmentService instance."""
+    return MediaSegmentService(
+        media_service=media_service,
+        media_numpy_loader=media_numpy_loader,
+        model_xml_path=model_xml_path,
+        ov_cache_path=ov_cache_path,
         db_session=db,
     )
 

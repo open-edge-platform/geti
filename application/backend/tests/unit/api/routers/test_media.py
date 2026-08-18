@@ -18,6 +18,7 @@ from app.api.dependencies import (
     get_dataset_service,
     get_inference_media_limit,
     get_media_prediction_service,
+    get_media_segment_service,
     get_media_service,
 )
 from app.api.schemas.media import ImageView, MediaViewAdapter, SetMediaAnnotations, VideoFrameView, VideoView
@@ -49,8 +50,10 @@ from app.models.system import DeviceInfo, DeviceType
 from app.services import DatasetService, MediaPredictionService, MediaService, ResourceNotFoundError, ResourceType
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
 from app.services.inference import InferenceBusyError
+from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
 from app.services.media_service import ImageMetadata, MediaFilters
+from app.services.sam import MediaSegmentService
 
 
 @pytest.fixture
@@ -122,6 +125,13 @@ def fxt_media_prediction_service(fxt_app) -> MagicMock:
     media_prediction_service = MagicMock(spec=MediaPredictionService)
     fxt_app.dependency_overrides[get_media_prediction_service] = lambda: media_prediction_service
     return media_prediction_service
+
+
+@pytest.fixture
+def fxt_media_segment_service(fxt_app) -> MagicMock:
+    media_segment_service = MagicMock(spec=MediaSegmentService)
+    fxt_app.dependency_overrides[get_media_segment_service] = lambda: media_segment_service
+    return media_segment_service
 
 
 @pytest.fixture
@@ -2016,3 +2026,99 @@ class TestMediaEndpoints:
             "detail": "Inference request timed out waiting for the model lock. Another inference is in "
             + "progress or model is not loaded yet."
         }
+
+    def test_media_embeddings_image_success(
+        self, fxt_image_media, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        fxt_media_service.get_media_by_id.return_value = fxt_image_media
+        fxt_media_segment_service.segment_media.return_value = b"embeddings-bytes"
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(fxt_image_media.id)}/embeddings")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("content-type") == "application/octet-stream"
+        assert f"{fxt_image_media.id}_embeddings.safetensors" in response.headers.get("content-disposition", "")
+        assert response.content == b"embeddings-bytes"
+
+        fxt_media_service.get_media_by_id.assert_called_once_with(
+            project_id=fxt_get_project.id, media_id=fxt_image_media.id
+        )
+        fxt_media_segment_service.segment_media.assert_called_once_with(
+            project=fxt_get_project, media=fxt_image_media, device=DeviceInfo.cpu()
+        )
+
+    def test_media_embeddings_video_frame_success(
+        self, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        video_id = uuid4()
+        media = MagicMock(spec=Video, id=video_id, format=VideoFormat.MP4, type=MediaType.VIDEO, frame_count=100)
+        fxt_media_service.get_media_by_id.return_value = media
+        # No annotated frame exists, so a NotAnnotatedVideoFrame is segmented on the fly
+        fxt_media_service.get_video_frame_by_video_id_and_index.return_value = None
+        fxt_media_segment_service.segment_media.return_value = b"frame-embeddings"
+
+        response = fxt_client.get(
+            f"/api/projects/{str(uuid4())}/dataset/media/{str(video_id)}/embeddings?frame_index=10"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("content-type") == "application/octet-stream"
+        assert f"{video_id}_10_embeddings.safetensors" in response.headers.get("content-disposition", "")
+        assert response.content == b"frame-embeddings"
+
+        fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=video_id)
+        fxt_media_service.get_video_frame_by_video_id_and_index.assert_called_once_with(
+            project=fxt_get_project, video_id=video_id, frame_index=10
+        )
+        fxt_media_segment_service.segment_media.assert_called_once_with(
+            project=fxt_get_project, media=ANY, device=DeviceInfo.cpu()
+        )
+
+    def test_media_embeddings_video_without_frame_index(
+        self, fxt_video_media, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        fxt_media_service.get_media_by_id.return_value = fxt_video_media
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(fxt_video_media.id)}/embeddings")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {"detail": "Video frame index is not provided."}
+        fxt_media_segment_service.segment_media.assert_not_called()
+
+    def test_media_embeddings_media_not_found(
+        self, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        media_id = uuid4()
+        fxt_media_service.get_media_by_id.side_effect = ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media_id)}/embeddings")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=media_id)
+        fxt_media_segment_service.segment_media.assert_not_called()
+
+    def test_media_embeddings_video_range_error(
+        self, fxt_image_media, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        fxt_media_service.get_media_by_id.return_value = fxt_image_media
+        fxt_media_segment_service.segment_media.side_effect = VideoRangeError(
+            resource_id=str(fxt_image_media.id), message="Frame range can be specified only for videos."
+        )
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(fxt_image_media.id)}/embeddings")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {"detail": "Frame range can be specified only for videos."}
+
+    def test_media_embeddings_binary_not_found(
+        self, fxt_image_media, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        fxt_media_service.get_media_by_id.return_value = fxt_image_media
+        fxt_media_segment_service.segment_media.side_effect = BinaryNotFoundError(
+            f"Media {str(fxt_image_media.id)} binary cannot be found"
+        )
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(fxt_image_media.id)}/embeddings")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.json() == {"detail": f"Media {str(fxt_image_media.id)} binary cannot be found"}

@@ -4,8 +4,6 @@ import bisect
 from dataclasses import dataclass
 from uuid import UUID
 
-import cv2
-import numpy as np
 from loguru import logger
 from sqlalchemy.orm import Session
 
@@ -25,6 +23,7 @@ from app.models.system import DeviceInfo
 from .base import BaseSessionManagedService, ResourceError, ResourceNotFoundError, ResourceType
 from .inference import InferenceServer
 from .label_service import LabelService
+from .media_numpy_loader import MediaNumpyLoader
 from .media_service import MediaService
 
 
@@ -38,11 +37,6 @@ class Frame:
 class VideoRangeError(ResourceError):
     def __init__(self, resource_id: str, message: str):
         super().__init__(ResourceType.MEDIA, resource_id, message)
-
-
-class BinaryNotFoundError(Exception):
-    def __init__(self, message: str):
-        super().__init__(message)
 
 
 @dataclass(frozen=True)
@@ -59,6 +53,7 @@ class MediaPredictionService(BaseSessionManagedService):
         inference_server: InferenceServer,
         inference_model_ttl: int,
         inference_keyframe_stride: int,
+        media_numpy_loader: MediaNumpyLoader,
         db_session: Session | None = None,
     ) -> None:
         super().__init__(db_session)
@@ -67,20 +62,7 @@ class MediaPredictionService(BaseSessionManagedService):
         self._inference_server = inference_server
         self._inference_model_ttl = inference_model_ttl
         self._inference_keyframe_stride = inference_keyframe_stride
-
-    def _load_media_binary(self, project_id: UUID, media: Media) -> np.ndarray:
-        binary_path = self._media_service.get_media_binary_path(project_id=project_id, media=media)
-        # IMREAD_UNCHANGED preserves the original bit depth (e.g. 16-bit PNG/TIFF images).
-        binary_data = cv2.imread(str(binary_path), cv2.IMREAD_UNCHANGED)
-        if binary_data is None:
-            raise BinaryNotFoundError(f"Media {str(media.id)} binary cannot be found")
-        # Add explicit channel dimension for 2D grayscale: (H, W) → (H, W, 1)
-        if binary_data.ndim == 2:
-            binary_data = binary_data[..., np.newaxis]
-        # Convert only 3-channel BGR images to RGB; pass grayscale and other formats through.
-        if binary_data.shape[-1] == 3:
-            binary_data = cv2.cvtColor(binary_data, cv2.COLOR_BGR2RGB)
-        return binary_data
+        self._media_numpy_loader = media_numpy_loader
 
     @staticmethod
     def _is_frame_index_to_infer(index: int, frame_indexes: list[int], inference_keyframe_stride: int) -> bool:
@@ -136,7 +118,7 @@ class MediaPredictionService(BaseSessionManagedService):
 
         # Process single media (images and already-saved video frames)
         for single_media in loaded_media.single_media:
-            data = self._load_media_binary(project_id=project.id, media=single_media)
+            data = self._media_numpy_loader.load_media_binary(project_id=project.id, media=single_media)
             inputs.append(BatchInferenceInput(media_id=single_media.id, data=data))
 
         for video in loaded_media.video_frames:
@@ -145,7 +127,7 @@ class MediaPredictionService(BaseSessionManagedService):
                 frame for frame in frames if frame.annotated_frame is not None and not frame.skip
             ]
             for frame in annotated_frames:
-                binary_data = self._load_media_binary(
+                binary_data = self._media_numpy_loader.load_media_binary(
                     project_id=project.id,
                     media=frame.annotated_frame,  # pyrefly: ignore[bad-argument-type]
                 )
