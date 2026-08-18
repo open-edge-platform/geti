@@ -17,7 +17,6 @@ const TIMEOUTS = {
     nextMediaItem: 1000 * 30,
     mediaUploaded: 1000 * 60,
     videoUploaded: 1000 * 60,
-    stream: 1000 * 90,
     pipelineHealth: 1000 * 90,
 };
 
@@ -65,7 +64,6 @@ test.describe('Model training flow E2E', () => {
         boundingBoxTool,
         modelsPage,
         inferencePage,
-        streamPage,
         page,
     }) => {
         const filesToUpload = getFilesToUpload('./assets/lego-bricks-dataset');
@@ -237,19 +235,11 @@ test.describe('Model training flow E2E', () => {
             await expect(inferencePage.getPipelineSwitch('enabled')).toBeVisible();
         });
 
-        await test.step('Start the stream', async () => {
-            await expect(streamPage.getStartStreamButton()).toBeVisible();
-
-            await streamPage.startStream();
-
-            await expect(streamPage.getStopStreamButton()).toBeVisible({ timeout: TIMEOUTS.stream });
-            await expect(streamPage.getStreamVideo()).toBeVisible({ timeout: TIMEOUTS.stream });
-        });
-
         await test.step('Write predictions to the output sink', async () => {
             // The sink writes to a folder on the backend's filesystem, which the runner cannot read when the
             // backend runs on another host. A sink that fails to write turns the pipeline health negative,
-            // so a running pipeline is asserted instead of the folder contents.
+            // so a running pipeline is asserted instead of the folder contents. The WebRTC preview is not
+            // asserted either: it needs a media path between the runner and the backend, which CI does not have.
             await expect(inferencePage.getPipelineHealth()).toHaveText('Running', {
                 timeout: TIMEOUTS.pipelineHealth,
             });
