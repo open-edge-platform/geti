@@ -35,7 +35,7 @@ def write_bytes_to_response(
     content: bytes | Generator[bytes], filename: str, media_type: str | None = None, cache_control: str | None = None
 ) -> Response:
     """
-    Stream a binary content to FastAPI StreamingResponse.
+    Stream a binary content to FastAPI response.
     Additionally, method sets file name, MIME type and cache control headers if provided,
 
     Args:
@@ -45,7 +45,7 @@ def write_bytes_to_response(
         cache_control: Cache control header, optional.
 
     Returns:
-        FastAPI StreamingResponse.
+        FastAPI Response if content is bytes, StreamingResponse otherwise.
     """
     headers = {"Content-Disposition": f"inline; filename={filename}"}
     if cache_control:
@@ -57,7 +57,7 @@ def write_bytes_to_response(
 
 def write_image_to_response(image: Image, filename: str, cache_control: str | None = None) -> Response:
     """
-    Stream a Pillow image as JPEG to FastAPI StreamingResponse.
+    Return a Pillow image as JPEG in a FastAPI response.
     Additionally, method sets file name and cache control headers if provided.
 
     Args:
@@ -66,7 +66,7 @@ def write_image_to_response(image: Image, filename: str, cache_control: str | No
         cache_control: Cache control header, optional.
 
     Returns:
-        FastAPI StreamingResponse.
+        FastAPI ``Response`` containing the JPEG-encoded image.
     """
     buffer = BytesIO()
     image.save(buffer, format="JPEG")
