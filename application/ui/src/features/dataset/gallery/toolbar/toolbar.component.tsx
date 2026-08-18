@@ -20,6 +20,7 @@ import { SortDown, SortUp } from '@geti-ui/ui/icons';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { isString } from 'lodash-es';
 
+import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { isImage } from '../../../../shared/media-item-utils';
 import { TrainModel } from '../../../models/train-model/train-model.component';
 import { ImportExport } from '../../import-export/import-export.component';
@@ -106,8 +107,12 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                 <Flex alignItems={'center'} gap={'size-200'}>
                     <Heading margin={0}>Dataset</Heading>
 
-                    <Divider orientation={'vertical'} size={'S'} />
-                    <DatasetViewSelector datasetViews={datasetViews} />
+                    {FEATURE_FLAGS.DATASET_VIEWS && (
+                        <>
+                            <Divider orientation={'vertical'} size={'S'} />
+                            <DatasetViewSelector datasetViews={datasetViews} />
+                        </>
+                    )}
                 </Flex>
 
                 <ButtonGroup UNSAFE_style={{ gap: dimensionValue('size-125') }}>

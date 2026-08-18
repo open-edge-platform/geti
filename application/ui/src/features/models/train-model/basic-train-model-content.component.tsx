@@ -3,6 +3,7 @@
 
 import { Divider, Flex, View } from '@geti-ui/ui';
 
+import { FEATURE_FLAGS } from '../../../constants/feature-flags';
 import { ModelArchitecturesList } from './model-architectures-list/model-architectures-list.component';
 import { SelectDatasetRevision } from './select-dataset-revision.component';
 import { SelectModelRevision } from './select-model-revision.component';
@@ -11,7 +12,7 @@ import { TimmModelConfiguration } from './timm-model-configuration/timm-model-co
 
 export const BasicTrainModelContent = () => {
     // TODO: Update this once the backend part is done
-    const isTIMMModelSelected = false;
+    const showTIMMModelConfiguration = false && FEATURE_FLAGS.TIMM_MODEL_CONFIGURATION;
 
     return (
         <View backgroundColor={'gray-50'} height={'100%'}>
@@ -23,7 +24,7 @@ export const BasicTrainModelContent = () => {
                 <Divider size={'S'} width={'100%'} />
 
                 <Flex direction={'column'} gap={'size-300'}>
-                    {isTIMMModelSelected && <TimmModelConfiguration />}
+                    {showTIMMModelConfiguration && <TimmModelConfiguration />}
 
                     <Flex gap={'size-300'} width={'100%'}>
                         <SelectTrainingDevice />
