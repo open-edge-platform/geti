@@ -189,7 +189,7 @@ class TestGetiTuneTrainerPrepareWeights:
         expected_weights_path.touch()
         getitune_trainer = fxt_getitune_trainer()
 
-        getitune_trainer._model_service.get_model_variants.return_value = [
+        getitune_trainer._model_service.get_model_variants.return_value = [  # pyrefly: ignore[missing-attribute]
             ModelVariant(
                 id=parent_model_variant_id,
                 model_revision_id=parent_model_revision_id,
@@ -224,7 +224,7 @@ class TestGetiTuneTrainerPrepareWeights:
         )
         getitune_trainer = fxt_getitune_trainer()
 
-        getitune_trainer._model_service.get_model_variants.return_value = []
+        getitune_trainer._model_service.get_model_variants.return_value = []  # pyrefly: ignore[missing-attribute]
 
         # Act
         msg = (
@@ -265,7 +265,7 @@ class TestGetiTuneTrainerPrepareWeights:
         )
         getitune_trainer = fxt_getitune_trainer()
 
-        getitune_trainer._model_service.get_model_variants.return_value = [
+        getitune_trainer._model_service.get_model_variants.return_value = [  # pyrefly: ignore[missing-attribute]
             ModelVariant(
                 id=parent_model_variant_id,
                 model_revision_id=parent_model_revision_id,

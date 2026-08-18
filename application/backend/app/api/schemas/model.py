@@ -18,6 +18,15 @@ class ModelVariantView(BaseModel):
     evaluations: list[EvaluationView] = Field(description="List of evaluations for this variant", default=[])
     quantization_info: dict | None = Field(None, description="Quantization metadata, if applicable")
     files_deleted: bool = Field(False, description="Indicates if variant files have been deleted")
+    optimal_confidence_threshold: float | None = Field(
+        None,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "Optimal confidence threshold determined when the model was exported. Only available for "
+            "deployable variants ('openvino', 'onnx') whose task uses a confidence threshold; null otherwise."
+        ),
+    )
 
 
 class ModelView(BaseRequiredIDModel):
@@ -63,6 +72,7 @@ class ModelView(BaseRequiredIDModel):
                         "precision": "fp16",
                         "weights_size": 123456,
                         "evaluations": [],
+                        "optimal_confidence_threshold": 0.65,
                     },
                     {
                         "id": "6b7bb928-5d6f-46ea-8fd2-5ce80dd1e12b",
@@ -70,6 +80,7 @@ class ModelView(BaseRequiredIDModel):
                         "precision": "fp16",
                         "weights_size": 123456,
                         "evaluations": [],
+                        "optimal_confidence_threshold": 0.65,
                     },
                     {
                         "id": "d01945ae-1578-41f9-a2b3-11865032981c",
@@ -77,6 +88,7 @@ class ModelView(BaseRequiredIDModel):
                         "precision": "fp32",
                         "weights_size": 123456,
                         "evaluations": [],
+                        "optimal_confidence_threshold": None,
                     },
                 ],
                 "evaluations": [
