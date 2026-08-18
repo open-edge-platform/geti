@@ -22,12 +22,12 @@ const ACTION_TIMEOUT = 30000;
 const GETI_BASE_URL = process.env.GETI_BASE_URL;
 
 const getTestTimeout = () => {
-    if (CI && GETI_BASE_URL) {
-        return 1000 * 60 * 60;
-    }
-
     return CI ? 1000 * 60 * 2 : 1000 * 60;
 };
+
+// E2E tests drive a real backend, where a single step (training, quantization) can outlast the
+// component test timeout on its own.
+const E2E_TEST_TIMEOUT = 1000 * 60 * 60;
 
 // In CI we serve pre-built bundles via `rsbuild preview`, which requires the
 // output directories to already exist. Failing fast here produces a clearer
@@ -106,6 +106,7 @@ export default defineConfig({
         {
             name: 'e2e',
             testDir: './tests/e2e',
+            timeout: E2E_TEST_TIMEOUT,
             use: {
                 ...devices['Desktop Chrome'],
                 baseURL: GETI_BASE_URL || 'http://localhost:3000',

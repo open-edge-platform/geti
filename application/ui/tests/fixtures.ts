@@ -20,6 +20,7 @@ import { VideoPage } from './annotator/video/video-page';
 import { AnnotatorPage } from './datasets/annotator-page';
 import { DatasetPage } from './datasets/dataset-page';
 import { ImportDatasetPage } from './datasets/import-dataset-page';
+import { InferencePage } from './inference/inference-page';
 import { StreamPage } from './inference/stream-page';
 import { JobsPage } from './jobs/jobs-page';
 import { ModelsPage } from './models/models-page';
@@ -47,6 +48,7 @@ const getSampleImageArrayBuffer = (): ArrayBuffer => {
 interface Fixtures {
     network: NetworkFixture;
     streamPage: StreamPage;
+    inferencePage: InferencePage;
     modelsPage: ModelsPage;
     jobsPage: JobsPage;
     polygonTool: PolygonToolPage;
@@ -235,6 +237,11 @@ const test = testBase.extend<Fixtures>({
         const streamPage = new StreamPage(page);
 
         await use(streamPage);
+    },
+    inferencePage: async ({ page }, use) => {
+        const inferencePage = new InferencePage(page);
+
+        await use(inferencePage);
     },
     modelsPage: async ({ page }, use) => {
         const modelsPage = new ModelsPage(page);
