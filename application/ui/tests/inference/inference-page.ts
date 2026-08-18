@@ -7,9 +7,6 @@ type OutputFormatLabel = 'Predictions' | 'Image Original' | 'Image with Predicti
 
 const VIDEO_UPLOAD_TIMEOUT = 1000 * 60;
 
-// How long to wait for the "disconnect also disables the pipeline" dialog before assuming it is not shown.
-const DISCONNECT_CONFIRMATION_TIMEOUT = 1000 * 5;
-
 export class InferencePage {
     constructor(private page: Page) {}
 
@@ -84,16 +81,6 @@ export class InferencePage {
 
         if (await disconnect.isVisible()) {
             await disconnect.click();
-
-            // Disconnecting a source also disables a running pipeline, which has to be confirmed first.
-            const confirmDisconnect = this.page.getByRole('dialog').getByRole('button', { name: 'Disconnect' });
-
-            try {
-                await confirmDisconnect.waitFor({ timeout: DISCONNECT_CONFIRMATION_TIMEOUT });
-                await confirmDisconnect.click();
-            } catch {
-                // The pipeline was not running, so no confirmation was asked for.
-            }
 
             await this.page
                 .getByLabel('toast')
