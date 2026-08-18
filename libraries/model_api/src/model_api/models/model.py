@@ -123,6 +123,29 @@ class Model:
             return self._parameters_cache[name].default_value
         return self.raise_error(f"Parameter '{name}' not found")
 
+    def set_param(self, name: str, value: Any) -> None:
+        """Sets a parameter value, validating it against the parameter definition.
+
+        Args:
+            name (str): parameter name
+            value (Any): parameter value
+        """
+        parameters = self.parameters()
+
+        if name in parameters:
+            errors = parameters[name].validate(value)
+            if errors:
+                self.logger.error(f'Error with "{name}" parameter:')
+                for _error in errors:
+                    self.logger.error(f"\t{_error}")
+                self.raise_error("Incorrect user configuration")
+            value = parameters[name].get_value(value)
+            self.__setattr__(f"_{name}", value)
+        else:
+            self.logger.warning(
+                f'The parameter "{name}" not found in {self.__model__} wrapper, will be omitted',
+            )
+
     def get_cached_parameters(self) -> dict[str, Any]:
         """Get cached parameters, initializing cache if needed.
 
@@ -432,19 +455,7 @@ class Model:
         for name, value in config.items():
             if value is None:
                 continue
-            if name in parameters:
-                errors = parameters[name].validate(value)
-                if errors:
-                    self.logger.error(f'Error with "{name}" parameter:')
-                    for _error in errors:
-                        self.logger.error(f"\t{_error}")
-                    self.raise_error("Incorrect user configuration")
-                value = parameters[name].get_value(value)
-                self.__setattr__(f"_{name}", value)
-            else:
-                self.logger.warning(
-                    f'The parameter "{name}" not found in {self.__model__} wrapper, will be omitted',
-                )
+            self.set_param(name, value)
 
     @classmethod
     def raise_error(cls, message) -> NoReturn:

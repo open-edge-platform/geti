@@ -2,6 +2,27 @@
 
 Model's static method `create_model()` has two overloads. One constructs the model from a string (a path or a model name) and the other takes an already constructed `InferenceAdapter`. The first overload configures a created model with values taken from `configuration` dict function argument and from model's intermediate representation (IR) stored in `.xml` in `model_info` section of `rt_info`. Values provided in `configuration` have priority over values in IR `rt_info`. If no value is specified in `configuration` nor in `rt_info` the default value for a model wrapper is used. For Python configuration values are accessible as model wrapper member fields.
 
+## Runtime parameter modification
+
+Parameters can be read and modified after model creation using `get_param()` and `set_param()`:
+
+```python
+from model_api.models import Model
+
+model = Model.create_model("model.xml")
+
+# Read current value
+current_threshold = model.get_param("confidence_threshold")
+
+# Modify parameter with validation
+model.set_param("confidence_threshold", 0.7)
+
+# Parameters are also accessible via the params descriptor
+print(model.params.confidence_threshold)
+```
+
+`set_param()` validates the value against the parameter definition and raises `WrapperError` if validation fails. Unknown parameter names are logged as warnings and ignored.
+
 ## List of values
 
 The list features only model wrappers which introduce new configuration values in their hierarchy.

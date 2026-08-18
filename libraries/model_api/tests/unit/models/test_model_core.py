@@ -182,6 +182,49 @@ class TestModelGetParam:
             model.get_param("nonexistent_parameter_xyz")
 
 
+class TestModelSetParam:
+    """Tests for set_param."""
+
+    def test_set_param_valid_value(self):
+        """Valid param sets underscore-prefixed attribute."""
+        from model_api.models.image_model import ImageModel
+
+        adapter = _make_adapter()
+        model = ImageModel(adapter, configuration={}, preload=False)
+        model.set_param("resize_type", "fit_to_window")
+        assert model.params.resize_type == "fit_to_window"
+        assert model.get_param("resize_type") == "fit_to_window"
+
+    def test_set_param_invalid_value_raises(self):
+        """Validation failure raises WrapperError."""
+        from model_api.models.image_model import ImageModel
+
+        adapter = _make_adapter()
+        model = ImageModel(adapter, configuration={}, preload=False)
+        with pytest.raises(WrapperError, match="Incorrect user configuration"):
+            model.set_param("resize_type", "INVALID_RESIZE_TYPE")
+
+    def test_set_param_unknown_warns(self, caplog):
+        """Unknown param logs warning and is omitted."""
+        adapter = _make_adapter()
+        model = Model(adapter, configuration={}, preload=False)
+        with caplog.at_level(logging.WARNING):
+            model.set_param("unknown_param_xyz", 42)
+        assert any("unknown_param_xyz" in r.message for r in caplog.records)
+        assert any("not found" in r.message for r in caplog.records)
+        assert not hasattr(model, "_unknown_param_xyz")
+
+    def test_set_param_applies_get_value_transformation(self):
+        """Value is transformed by parameter's get_value method."""
+        from model_api.models.image_model import ImageModel
+
+        adapter = _make_adapter()
+        model = ImageModel(adapter, configuration={}, preload=False)
+        # resize_type is a StringValue which returns value as-is, but validates options
+        model.set_param("resize_type", "standard")
+        assert model.params.resize_type == "standard"
+
+
 class TestModelGetCachedParameters:
     """Tests for get_cached_parameters (lines 124-132)."""
 
