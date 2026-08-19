@@ -1,9 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Flex, Heading, View } from '@geti-ui/ui';
-
-import { IntelBrandedLoading } from '../../../../components/intel-branded-loading/intel-branded-loading.component.tauri';
+import { Flex, Heading, Loading, View } from '@geti-ui/ui';
 
 export const SAMLoading = ({ isLoading }: { isLoading: boolean }) => {
     return (
@@ -25,7 +23,7 @@ export const SAMLoading = ({ isLoading }: { isLoading: boolean }) => {
                         transformOrigin: 'center',
                     }}
                 >
-                    <IntelBrandedLoading height={'auto'} />
+                    <Loading height={'auto'} variant='intel' />
                     <Heading
                         level={3}
                         UNSAFE_style={{
