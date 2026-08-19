@@ -21,6 +21,7 @@ from app.db.schema import (
 )
 from app.models import DatasetItemSubset, EvaluationResult
 from app.models.model_revision import ModelFormat, TrainingStatus
+from app.models.system import DeviceInfo, DeviceType
 from app.services import ModelRevisionMetadata, ModelService, ResourceInUseError, ResourceNotFoundError, ResourceType
 from tests.integration.model_files import write_onnx_model, write_openvino_model
 from tests.integration.project_factory import ProjectTestDataFactory
@@ -649,6 +650,24 @@ class TestModelServiceIntegration:
         assert model_db.training_status == TrainingStatus.SUCCESSFUL
         assert model_db.training_started_at == started_at
         assert model_db.training_finished_at == finished_at
+
+    def test_update_revision_persists_training_device(
+        self, fxt_project_id: UUID, fxt_model_id: UUID, fxt_model_service: ModelService, db_session: Session
+    ):
+        """Test that the hardware used to run the training is persisted on the model revision."""
+        device = DeviceInfo(type=DeviceType.CUDA, name="NVIDIA GeForce RTX 4090", memory=25757220864, index=0)
+
+        fxt_model_service.update_revision_status(
+            project_id=fxt_project_id,
+            model_id=fxt_model_id,
+            training_status=TrainingStatus.IN_PROGRESS,
+            training_device=device,
+        )
+
+        model_db = db_session.get(ModelRevisionDB, str(fxt_model_id))
+        db_session.refresh(model_db)
+        assert model_db is not None
+        assert model_db.training_device == device.model_dump(mode="json")
 
     def test_save_evaluation_result(
         self, fxt_model_id: UUID, fxt_project_id: UUID, fxt_model_service: ModelService, db_session: Session

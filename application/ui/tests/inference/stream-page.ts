@@ -10,6 +10,14 @@ export class StreamPage {
         return this.page.getByRole('button', { name: 'Start stream' });
     }
 
+    getStopStreamButton() {
+        return this.page.getByRole('button', { name: 'Stop stream' });
+    }
+
+    getStreamVideo() {
+        return this.page.locator('video');
+    }
+
     async startStream() {
         await this.getStartStreamButton().click();
     }
@@ -19,6 +27,6 @@ export class StreamPage {
     }
 
     async stopStream() {
-        await this.page.getByLabel('Stop stream').click();
+        await this.getStopStreamButton().click();
     }
 }

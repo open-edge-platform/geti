@@ -10,6 +10,7 @@ from pydantic import Field, model_validator
 from app.db.schema import ModelRevisionDB, ModelVariantDB
 from app.models import DatasetItemSubset, EvaluationResult
 from app.models.base import BaseEntity
+from app.models.system import DeviceInfo
 
 
 class ModelFormat(StrEnum):
@@ -39,6 +40,7 @@ class TrainingInfo(BaseEntity):
     start_time: datetime | None = None
     end_time: datetime | None = None
     dataset_revision_id: UUID | None = None
+    device: DeviceInfo | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -50,6 +52,7 @@ class TrainingInfo(BaseEntity):
                 "start_time": data.training_started_at,
                 "end_time": data.training_finished_at,
                 "dataset_revision_id": data.training_dataset_id,
+                "device": data.training_device,
             }
         return data
 

@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session
 from app.db.schema import EvaluationDB, MetricScoreDB, ModelRevisionDB, ModelVariantDB
 from app.models import EvaluationResult, ModelRevision, ModelVariant, TrainingStatus
 from app.models.model_revision import ModelFormat, ModelPrecision
+from app.models.system import DeviceInfo
 from app.models.training_configuration.configuration import TrainingConfiguration
 from app.repositories import (
     EvaluationRepository,
@@ -454,6 +455,7 @@ class ModelService(BaseSessionManagedService):
         training_status: TrainingStatus,
         training_started_at: datetime | None = None,
         training_finished_at: datetime | None = None,
+        training_device: DeviceInfo | None = None,
     ) -> None:
         """
         Updates the training status of a model revision for the given project.
@@ -464,6 +466,7 @@ class ModelService(BaseSessionManagedService):
             training_status (TrainingStatus): New training status to set for the model revision.
             training_started_at (datetime): Date and time when the training was started
             training_finished_at (datetime): Date and time when the training was finished
+            training_device (DeviceInfo | None): Hardware device used to run the training
         """
         model_revision_repo = ModelRevisionRepository(project_id=str(project_id), db=self.db_session)
         model_revision_repo.update_training_status(
@@ -471,6 +474,7 @@ class ModelService(BaseSessionManagedService):
             training_status=training_status,
             training_started_at=training_started_at,
             training_finished_at=training_finished_at,
+            training_device=training_device.model_dump(mode="json") if training_device is not None else None,
         )
 
     def get_model_binary_files(
