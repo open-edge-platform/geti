@@ -270,6 +270,32 @@ class TestCausalMode:
         off_far = _interp(clip([500.0, 0.0, 510.0, 10.0]), offline)
         assert not np.array_equal(off_near[3].bboxes[_row(off_near[3])], off_far[3].bboxes[_row(off_far[3])])
 
+    def test_spline_fill_respects_causal_horizon(self):
+        # A spline fits the whole trajectory, so online mode must hide observations
+        # past a gap's closing anchor: an already-filled gap frame must not move
+        # when a later observation is added. Smoothing is off to isolate the fill.
+        def clip(far_box: list[float]) -> list[TrackedDetections]:
+            return [
+                _frame(0, [[0.0, 0.0, 10.0, 10.0]], [1]),
+                _frame(1, [[10.0, 0.0, 20.0, 10.0]], [1]),
+                _frame(2, [], []),  # gap
+                _frame(3, [], []),  # gap
+                _frame(4, [[40.0, 0.0, 50.0, 10.0]], [1]),  # closing anchor
+                _frame(5, [far_box], [1]),  # future observation, beyond the anchor
+            ]
+
+        online = InterpolationConfig(
+            max_gap=5, online=True, online_buffer=3, smoothing_window=1, method=InterpolationMethod.SPLINE
+        )
+        near = _interp(clip([50.0, 0.0, 60.0, 10.0]), online)
+        far = _interp(clip([500.0, 0.0, 510.0, 10.0]), online)
+        np.testing.assert_array_equal(near[2].bboxes[_row(near[2])], far[2].bboxes[_row(far[2])])
+        # Offline sees the whole trajectory, so the future box does bend the fill.
+        offline = InterpolationConfig(max_gap=5, smoothing_window=1, method=InterpolationMethod.SPLINE)
+        off_near = _interp(clip([50.0, 0.0, 60.0, 10.0]), offline)
+        off_far = _interp(clip([500.0, 0.0, 510.0, 10.0]), offline)
+        assert not np.array_equal(off_near[2].bboxes[_row(off_near[2])], off_far[2].bboxes[_row(off_far[2])])
+
 
 class TestSparseClip:
     def test_absent_gap_frame_is_skipped(self):

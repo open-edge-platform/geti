@@ -199,7 +199,11 @@ class BaseInterpolator(ABC):
             ]
             if not frame_ids:
                 continue
-            boxes = self.fill(observations, start, end, frame_ids)
+            # Causal horizon: a strategy that fits the whole trajectory (spline)
+            # must not see observations past this gap's closing anchor, or an
+            # already-emitted gap frame would shift when later frames arrive.
+            visible = [obs for obs in observations if not online or obs.frame_id <= end.frame_id]
+            boxes = self.fill(visible, start, end, frame_ids)
             span = float(end.frame_id - start.frame_id)
             for frame_id, box in zip(frame_ids, boxes, strict=True):
                 weight = (frame_id - start.frame_id) / span
