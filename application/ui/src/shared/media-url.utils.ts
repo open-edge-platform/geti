@@ -30,3 +30,9 @@ export const getVideoFrameBinaryUrl = (projectId: string, itemId: string, frameN
 
 export const getVideoFrameThumbnailUrl = (projectId: string, itemId: string, frameNumber: number) =>
     `${getMediaBaseUrl(projectId, itemId)}/thumbnail?frame_index=${frameNumber}`;
+
+export const getMediaEmbeddingsUrl = (projectId: string, itemId: string) =>
+    `${getMediaBaseUrl(projectId, itemId)}/embeddings`;
+
+export const getVideoFrameEmbeddingsUrl = (projectId: string, itemId: string, frameNumber: number) =>
+    `${getMediaEmbeddingsUrl(projectId, itemId)}?frame_index=${frameNumber}`;

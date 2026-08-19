@@ -8,9 +8,9 @@ import { Remote, wrap } from 'comlink';
 import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { isVideoFrame } from '../../../../shared/media-item-utils';
+import { isVideo, isVideoFrame } from '../../../../shared/media-item-utils';
+import { getMediaEmbeddingsUrl, getVideoFrameEmbeddingsUrl } from '../../../../shared/media-url.utils';
 import { isDetectionTask } from '../../../project/task-type-guards';
-import { loadImageQueryOptions } from '../../hooks/use-load-image-query.hook';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
 import type {
     SegmentAnythingWorkerApi,
@@ -18,9 +18,9 @@ import type {
 } from '../../webworkers/segment-anything.worker.interface';
 import { executeWithTimeout } from '../execute-with-timeout';
 import { convertToolShapeToGetiShape } from '../utils';
+import { InvalidEncodingError, parseEncoding } from './encoding-transport';
 import {
     SAM_DECODER_TIMEOUT_MS,
-    SAM_ENCODER_TIMEOUT_MS,
     SAM_ENCODING_GC_TIME_MS,
     SAM_WORKER_BUILD_TIMEOUT_MS,
     SAM_WORKER_INIT_TIMEOUT_MS,
@@ -70,9 +70,9 @@ const segmentAnythingWorkerQueryOptions = (enabled = true) =>
                     SAM_WORKER_BUILD_TIMEOUT_MS
                 );
 
-                // Initialize encoder and decoder sessions in parallel inside the same worker.
+                // Only the decoder runs locally; image embeddings come from the backend.
                 await executeWithTimeout(
-                    Promise.all([instance.init('SEGMENT_ANYTHING_ENCODER'), instance.init('SEGMENT_ANYTHING_DECODER')]),
+                    instance.init('SEGMENT_ANYTHING_DECODER'),
                     'SAM worker init',
                     SAM_WORKER_INIT_TIMEOUT_MS
                 );
@@ -99,23 +99,52 @@ const getSegmentAnythingEncodingQueryKey = (mediaItem: Media) => {
         : ['segment-anything-model', 'encoding', mediaItem.id];
 };
 
-const segmentAnythingEncodingQueryOptions = (
-    mediaItem: Media,
-    model: SegmentAnythingRemoteInstance | undefined,
-    image: ImageData,
-    enabled = true
-) =>
+class EmbeddingRequestError extends Error {
+    constructor(
+        readonly status: number,
+        statusText: string
+    ) {
+        super(`Could not fetch the image embedding (${status}${statusText ? ` ${statusText}` : ''}).`);
+
+        this.name = 'EmbeddingRequestError';
+    }
+}
+
+const segmentAnythingEncodingQueryOptions = (projectId: string, mediaItem: Media, enabled = true) =>
     queryOptions({
         queryKey: getSegmentAnythingEncodingQueryKey(mediaItem),
-        queryFn: async () => {
-            if (model === undefined) {
-                throw new Error('Model not yet initialized');
+        queryFn: async ({ signal }) => {
+            const url = isVideoFrame(mediaItem)
+                ? getVideoFrameEmbeddingsUrl(projectId, mediaItem.id, mediaItem.frame_number)
+                : getMediaEmbeddingsUrl(projectId, mediaItem.id);
+
+            // No `executeWithTimeout` here: the query's abort signal is what cancels the
+            // in-flight download when the user moves to another media item.
+            const response = await fetch(url, { signal });
+
+            if (!response.ok) {
+                throw new EmbeddingRequestError(response.status, response.statusText);
             }
 
-            return executeWithTimeout(model.processEncoder(image), 'SAM encoder', SAM_ENCODER_TIMEOUT_MS);
+            return parseEncoding(await response.arrayBuffer());
         },
         staleTime: Infinity,
         gcTime: SAM_ENCODING_GC_TIME_MS,
+        retry: (failureCount, error) => {
+            // A malformed payload is a contract violation; retrying cannot fix it.
+            if (error instanceof InvalidEncodingError) {
+                return false;
+            }
+
+            // Neither can a client error (unknown media item, missing frame index).
+            // Server errors are transient though: the backend serialises SAM inference
+            // and answers 503 while another request is running.
+            if (error instanceof EmbeddingRequestError && error.status < 500) {
+                return false;
+            }
+
+            return failureCount < 3;
+        },
         enabled,
     });
 
@@ -126,23 +155,15 @@ export const useSegmentAnythingWorker = (enabled = true) => {
     });
 };
 
-const useEncodingQuery = (
-    model: SegmentAnythingRemoteInstance | undefined,
-    mediaItem: Media | undefined,
-    image: ImageData | undefined,
-    isImageReady: boolean
-) => {
-    const isEnabled =
-        model !== undefined &&
-        mediaItem !== undefined &&
-        image !== undefined &&
-        isImageReady &&
-        image.width > 0 &&
-        image.height > 0;
+const useEncodingQuery = (projectId: string, mediaItem: Media | undefined, enabled = true) => {
+    // A whole video has no frame to encode. The selected media item is always converted
+    // to a video frame, but `nextMediaItem` comes straight from the dataset listing and
+    // can still be the video itself; asking for its embedding would 400.
+    const isEncodable = mediaItem !== undefined && !isVideo(mediaItem);
 
     return useQuery(
-        mediaItem !== undefined && image !== undefined
-            ? segmentAnythingEncodingQueryOptions(mediaItem, model, image, isEnabled)
+        isEncodable
+            ? segmentAnythingEncodingQueryOptions(projectId, mediaItem, enabled)
             : {
                   queryKey: ['segment-anything-model', 'encoding', 'disabled'],
                   queryFn: skipToken,
@@ -207,20 +228,16 @@ export const useSegmentAnythingModel = ({ nextMediaItem }: SegmentAnythingModelO
     const isLoadingWorkers = workerQuery.isLoading;
     const projectId = useProjectIdentifier();
 
-    const { mediaItem, image, isImageReady } = useSelectedMediaItem();
-    const nextImageQuery = useQuery({
-        ...loadImageQueryOptions(projectId, nextMediaItem ?? mediaItem),
-        enabled: nextMediaItem !== undefined,
-    });
+    const { mediaItem } = useSelectedMediaItem();
 
     // First we get the encoding for the CURRENT image
-    const encodingQuery = useEncodingQuery(model, mediaItem, image, isImageReady);
+    const encodingQuery = useEncodingQuery(projectId, mediaItem);
 
     // At the same time we start prefetching the encoding for the NEXT image,
     // so when the user moves to the next media item the decoding will be faster.
     // We don't need to get the decoding query result for the next image, we just want to cache the encoding result.
-    const canPrefetch = nextImageQuery.isSuccess && !encodingQuery.isFetching;
-    useEncodingQuery(model, nextMediaItem, nextImageQuery.data, canPrefetch);
+    // The backend serialises SAM inference, so we hold off while the current one is in flight.
+    useEncodingQuery(projectId, nextMediaItem, !encodingQuery.isFetching);
 
     const decodingQueryFn = useDecodingFn(model, encodingQuery.data);
 
