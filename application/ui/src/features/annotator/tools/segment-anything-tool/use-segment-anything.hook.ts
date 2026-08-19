@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Media } from '@/api/types';
-import { EncodingOutput } from '@geti-ui/smart-tools/segment-anything';
+import { EncodingOutput, InvalidEncodingError, parseEncoding } from '@geti-ui/smart-tools/segment-anything';
 import { queryOptions, skipToken, useQuery } from '@tanstack/react-query';
 import { Remote, wrap } from 'comlink';
 import { useProject } from 'hooks/api/project.hook';
@@ -18,7 +18,6 @@ import type {
 } from '../../webworkers/segment-anything.worker.interface';
 import { executeWithTimeout } from '../execute-with-timeout';
 import { convertToolShapeToGetiShape } from '../utils';
-import { InvalidEncodingError, parseEncoding } from './encoding-transport';
 import {
     SAM_DECODER_TIMEOUT_MS,
     SAM_ENCODING_GC_TIME_MS,
@@ -29,10 +28,6 @@ import { InteractiveAnnotationPoint } from './segment-anything.interface';
 
 type SegmentAnythingRemoteInstance = Remote<SegmentAnythingWorkerInstance>;
 
-// A single shared worker hosts BOTH the encoder and decoder ONNX sessions.
-// Spawning two workers used to double the OpenCV + ONNX Runtime WASM footprint
-// for no functional gain (encoder/decoder always run sequentially anyway).
-//
 // `gcTime: Infinity` is critical: the default 5-min gc would evict the worker
 // entry whenever SAM is unmounted (switching tools/projects), causing the
 // next mount to spawn a brand-new worker that re-downloads the ORT wasm +
@@ -242,16 +237,13 @@ export const useSegmentAnythingModel = ({ nextMediaItem }: SegmentAnythingModelO
     const decodingQueryFn = useDecodingFn(model, encodingQuery.data);
 
     const isLoading = !hasWorkerError && (isLoadingWorkers || encodingQuery.isLoading);
-    const isProcessing = encodingQuery.isFetching;
     const isError = hasWorkerError || encodingQuery.isError;
     const error = workerQuery.error ?? encodingQuery.error;
 
     return {
         isLoading,
-        isProcessing,
         isError,
         error,
-        encodingQuery,
         decodingQueryFn,
     };
 };
