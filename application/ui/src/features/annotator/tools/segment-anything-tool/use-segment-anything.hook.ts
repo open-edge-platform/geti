@@ -88,10 +88,10 @@ const segmentAnythingWorkerQueryOptions = (enabled = true) =>
         enabled,
     });
 
-const getSegmentAnythingEncodingQueryKey = (mediaItem: Media) => {
+const getSegmentAnythingEncodingQueryKey = (projectId: string, mediaItem: Media) => {
     return isVideoFrame(mediaItem)
-        ? ['segment-anything-model', 'encoding', mediaItem.id, mediaItem.frame_number]
-        : ['segment-anything-model', 'encoding', mediaItem.id];
+        ? ['segment-anything-model', 'encoding', projectId, mediaItem.id, mediaItem.frame_number]
+        : ['segment-anything-model', 'encoding', projectId, mediaItem.id];
 };
 
 class EmbeddingRequestError extends Error {
@@ -107,7 +107,7 @@ class EmbeddingRequestError extends Error {
 
 const segmentAnythingEncodingQueryOptions = (projectId: string, mediaItem: Media, enabled = true) =>
     queryOptions({
-        queryKey: getSegmentAnythingEncodingQueryKey(mediaItem),
+        queryKey: getSegmentAnythingEncodingQueryKey(projectId, mediaItem),
         queryFn: async ({ signal }) => {
             const url = isVideoFrame(mediaItem)
                 ? getVideoFrameEmbeddingsUrl(projectId, mediaItem.id, mediaItem.frame_number)
