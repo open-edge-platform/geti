@@ -4,7 +4,7 @@
 """add_confidence_threshold_to_pipelines
 
 Revision ID: 6fec06bf05e4
-Revises: 2d2b0c9a5c2c
+Revises: 5ad4c6c3c077
 Create Date: 2026-08-18 14:01:13.960034
 
 """
@@ -16,7 +16,8 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "6fec06bf05e4"
-down_revision: str | Sequence[str] | None = "2d2b0c9a5c2c"
+down_revision: str | Sequence[str] | None = "5ad4c6c3c077"
+
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
