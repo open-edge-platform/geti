@@ -104,7 +104,11 @@ class TimmWeightsLoader:
 
         from timm.models import load_pretrained
 
-        load_pretrained(timm_model, pretrained_cfg=timm_model.pretrained_cfg)  # pyrefly: ignore[bad-argument-type]
+        load_pretrained(
+            timm_model,
+            pretrained_cfg=timm_model.pretrained_cfg,  # pyrefly: ignore[bad-argument-type]
+            num_classes=0,
+        )
         logger.info("Loaded timm pretrained weights for %s", self.model_name)
 
 
