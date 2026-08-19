@@ -35,6 +35,15 @@ class TestSubConfigDefaults:
         assert ic.enabled is True
         assert ic.method == InterpolationMethod.LINEAR
 
+    def test_even_smoothing_window_rejected(self):
+        # A centred average has no defined centre for an even window.
+        with pytest.raises(ValidationError, match="smoothing_window must be odd"):
+            InterpolationConfig(smoothing_window=4)
+
+    def test_odd_smoothing_window_accepted(self):
+        assert InterpolationConfig(smoothing_window=1).smoothing_window == 1
+        assert InterpolationConfig(smoothing_window=7).smoothing_window == 7
+
 
 class TestBaseConfig:
     def test_shared_defaults(self):

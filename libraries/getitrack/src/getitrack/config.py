@@ -87,7 +87,8 @@ class InterpolationConfig(_StrictModel):
     """Maximum consecutive missing frames bridged by interpolation."""
 
     smoothing_window: Annotated[int, Field(ge=1)] = 5
-    """Samples in the centred moving average applied to interpolated boxes. 1 disables smoothing."""
+    """Samples in the centred moving average applied to interpolated boxes. Must
+    be odd so the window has a defined centre; 1 disables smoothing."""
 
     online: bool = False
     """Run causally: bridge a gap only once its closing observation is within
@@ -95,6 +96,14 @@ class InterpolationConfig(_StrictModel):
 
     online_buffer: Annotated[int, Field(ge=0)] = 0
     """Frames of lookahead permitted in online mode. 0 is strictly causal (zero latency)."""
+
+    @model_validator(mode="after")
+    def _smoothing_window_is_odd(self) -> InterpolationConfig:
+        """Reject an even smoothing window: a centred average has no centre and would average one extra sample."""
+        if self.smoothing_window % 2 == 0:
+            msg = f"smoothing_window must be odd for a centred average; got {self.smoothing_window}"
+            raise ValueError(msg)
+        return self
 
 
 class TrackerConfig(_StrictModel):
