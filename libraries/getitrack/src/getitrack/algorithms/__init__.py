@@ -8,7 +8,7 @@ Importing this package registers every algorithm into
 """
 
 from getitrack.algorithms.bytetrack import ByteTrackTracker
-from getitrack.algorithms.sort import SortTracker
 from getitrack.algorithms.ocsort import OCSortTracker
+from getitrack.algorithms.sort import SortTracker
 
 __all__ = ["ByteTrackTracker", "OCSortTracker", "SortTracker"]
