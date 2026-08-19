@@ -408,7 +408,7 @@ class ModelService(BaseSessionManagedService):
             training_status (TrainingStatus): New training status to set for the model revision.
             training_started_at (datetime): Date and time when the training was started
             training_finished_at (datetime): Date and time when the training was finished
-            training_device (DeviceInfo): Hardware device used to run the training
+            training_device (DeviceInfo | None): Hardware device used to run the training
         """
         model_revision_repo = ModelRevisionRepository(project_id=str(project_id), db=self.db_session)
         model_revision_repo.update_training_status(
