@@ -4,4 +4,5 @@
 export const FEATURE_FLAGS = {
     DATASET_VIEWS: false,
     TIMM_MODEL_CONFIGURATION: false,
+    CONFIDENCE_THRESHOLD: false,
 };
