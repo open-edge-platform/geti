@@ -49,6 +49,12 @@ def _row(frame: TrackedDetections, track_id: int = 1) -> int:
     return int(rows[0])
 
 
+def _flags(frame: TrackedDetections) -> np.ndarray:
+    # ``interpolated`` is optional on TrackedDetections; the interpolation stage always sets it.
+    assert frame.interpolated is not None
+    return frame.interpolated
+
+
 class TestGapFill:
     def test_linear_midpoint_with_synth_metadata(self):
         frames = [
@@ -59,8 +65,10 @@ class TestGapFill:
         mid = _interp(frames, _no_smoothing())[1]
         row = _row(mid)
         np.testing.assert_allclose(mid.bboxes[row], [5.0, 5.0, 15.0, 15.0])
-        assert bool(mid.interpolated[row]) is True  # synth rows are flagged
-        assert int(mid.det_indices[row]) == -1  # ... and carry no source detection
+        assert bool(_flags(mid)[row]) is True  # synth rows are flagged
+        det_indices = mid.det_indices
+        assert det_indices is not None
+        assert int(det_indices[row]) == -1  # ... and carry no source detection
 
     def test_score_blends_between_endpoints(self):
         frames = [
@@ -120,8 +128,8 @@ class TestMultiTrack:
         mid = _interp(frames, _no_smoothing())[1]
         assert len(mid) == 2
         np.testing.assert_allclose(mid.bboxes[_row(mid, 1)], [10.0, 0.0, 20.0, 10.0])
-        assert bool(mid.interpolated[_row(mid, 1)]) is True  # synth
-        assert bool(mid.interpolated[_row(mid, 2)]) is False  # observed, untouched
+        assert bool(_flags(mid)[_row(mid, 1)]) is True  # synth
+        assert bool(_flags(mid)[_row(mid, 2)]) is False  # observed, untouched
 
     def test_unsorted_input_is_ordered(self):
         frames = [
@@ -336,4 +344,4 @@ class TestConstruction:
         ]
         result = _interp(frames, InterpolationConfig(max_gap=5))
         assert len(result[1]) == 1  # no duplicate on the pre-existing row
-        assert bool(result[2].interpolated[_row(result[2])]) is True  # anchors are frames 0 and 3
+        assert bool(_flags(result[2])[_row(result[2])]) is True  # anchors are frames 0 and 3
