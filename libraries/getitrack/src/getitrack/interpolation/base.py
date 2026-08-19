@@ -115,20 +115,15 @@ class BaseInterpolator(ABC):
         endpoint-only strategies rely on ``start``/``end``.
         """
 
-    def interpolate(
-        self,
-        frames: Sequence[TrackedDetections],
-        *,
-        online: bool | None = None,
-    ) -> list[TrackedDetections]:
+    def interpolate(self, frames: Sequence[TrackedDetections]) -> list[TrackedDetections]:
         """Return a gap-filled copy of the clip, sorted by ``frame_id``.
 
         Bridges gaps up to ``max_gap`` between two observed frames; frames that
         gain no rows are returned unchanged. Idempotent: a track never gets a
-        second row in a frame and observed boxes are never modified. ``online``
-        overrides `InterpolationConfig.online`; in causal mode a gap frame is
-        filled only once its closing observation is within ``online_buffer``
-        frames. Synthesised rows carry ``interpolated=True`` and ``det_index=-1``.
+        second row in a frame and observed boxes are never modified. When
+        `InterpolationConfig.online` is set, a gap frame is filled only once its
+        closing observation is within ``online_buffer`` frames. Synthesised rows
+        carry ``interpolated=True`` and ``det_index=-1``.
         """
         if not self._config.enabled:
             return list(frames)
@@ -136,7 +131,6 @@ class BaseInterpolator(ABC):
         if not ordered:
             return []
 
-        use_online = self._config.online if online is None else online
         position_by_frame = {frame.frame_id: index for index, frame in enumerate(ordered)}
         observations = self._collect_observations(ordered)
 
@@ -148,7 +142,7 @@ class BaseInterpolator(ABC):
 
         additions: defaultdict[int, list[_SynthRow]] = defaultdict(list)
         for track_id in sorted(observations):
-            for frame_id, bbox, score, class_id in self._interpolate_track(observations[track_id], online=use_online):
+            for frame_id, bbox, score, class_id in self._interpolate_track(observations[track_id]):
                 position = position_by_frame.get(frame_id)
                 if position is None or (position, track_id) in occupied:
                     continue
@@ -179,14 +173,10 @@ class BaseInterpolator(ABC):
                 )
         return dict(observations)
 
-    def _interpolate_track(
-        self,
-        observations: list[Observation],
-        *,
-        online: bool,
-    ) -> list[tuple[int, np.ndarray, float, int]]:
+    def _interpolate_track(self, observations: list[Observation]) -> list[tuple[int, np.ndarray, float, int]]:
         """Synthesise this track's gap rows, delegating each gap to `fill` and then smoothing."""
         cfg = self._config
+        online = cfg.online
         synth: dict[int, tuple[np.ndarray, float, int]] = {}
         for start, end in pairwise(observations):
             gap = end.frame_id - start.frame_id - 1
@@ -211,7 +201,7 @@ class BaseInterpolator(ABC):
                 synth[frame_id] = (box, score, start.class_id)
 
         if synth and cfg.smoothing_window > 1:
-            smoothed = self._smooth_synth_boxes(observations, synth, online=online)
+            smoothed = self._smooth_synth_boxes(observations, synth)
             synth = {
                 frame_id: (smoothed[frame_id], score, class_id) for frame_id, (_, score, class_id) in synth.items()
             }
@@ -222,8 +212,6 @@ class BaseInterpolator(ABC):
         self,
         observations: list[Observation],
         synth: dict[int, tuple[np.ndarray, float, int]],
-        *,
-        online: bool,
     ) -> dict[int, np.ndarray]:
         """Replace each synthesised box with a centred moving average over the track's trajectory.
 
@@ -231,6 +219,7 @@ class BaseInterpolator(ABC):
         the window is trimmed to ``frame + online_buffer`` so smoothing reads no
         further ahead than the fill did.
         """
+        online = self._config.online
         trajectory: dict[int, np.ndarray] = {observation.frame_id: observation.bbox for observation in observations}
         for frame_id, (box, _, _) in synth.items():
             trajectory[frame_id] = box

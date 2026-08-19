@@ -17,11 +17,10 @@ def _interp(
     frames: list[TrackedDetections],
     config: InterpolationConfig | None = None,
     *,
-    online: bool | None = None,
     motion: MotionConfig | None = None,
 ) -> list[TrackedDetections]:
     # The library exposes only the interpolator classes; this wraps the build-and-run for brevity.
-    return BaseInterpolator.from_config(config, motion=motion).interpolate(frames, online=online)
+    return BaseInterpolator.from_config(config, motion=motion).interpolate(frames)
 
 
 def _frame(
@@ -232,20 +231,21 @@ class TestCausalMode:
             _frame(2, [], []),
             _frame(3, [[30.0, 0.0, 40.0, 10.0]], [1]),
         ]
-        result = _interp(frames, InterpolationConfig(max_gap=5, online_buffer=1), online=True)
+        result = _interp(frames, InterpolationConfig(max_gap=5, online=True, online_buffer=1))
         assert len(result[1]) == 0  # closing obs 2 frames ahead, beyond buffer
         assert len(result[2]) == 1  # closing obs 1 frame ahead
 
-    def test_online_resolution(self):
-        # config picks causal (buffer 0 fills nothing); the kwarg overrides it.
+    def test_online_field_selects_causal_fill(self):
+        # InterpolationConfig.online is the single switch: causal vs offline.
         frames = [
             _frame(0, [[0.0, 0.0, 10.0, 10.0]], [1]),
             _frame(1, [], []),
             _frame(2, [[10.0, 10.0, 20.0, 20.0]], [1]),
         ]
         causal = InterpolationConfig(max_gap=5, online=True, online_buffer=0)
-        assert len(_interp(frames, causal)[1]) == 0
-        assert len(_interp(frames, causal, online=False)[1]) == 1
+        offline = InterpolationConfig(max_gap=5, online=False)
+        assert len(_interp(frames, causal)[1]) == 0  # strictly causal (buffer 0) fills nothing
+        assert len(_interp(frames, offline)[1]) == 1  # offline bridges the gap
 
     def test_smoothing_respects_causal_horizon(self):
         # Online mode must not smooth a synth frame against an observation beyond
