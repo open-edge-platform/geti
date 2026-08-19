@@ -79,7 +79,7 @@ export const NumberParameterField = ({
                 step={fieldStep}
                 isFilled
                 flex={1}
-                width={sliderWidth}
+                width={sliderWidth ?? undefined}
                 isDisabled={isDisabled}
             />
             <NumberField
