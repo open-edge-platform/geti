@@ -23,7 +23,7 @@ export const SAMLoading = ({ isLoading }: { isLoading: boolean }) => {
                         transformOrigin: 'center',
                     }}
                 >
-                    <Loading height={'auto'} variant='intel' />
+                    <Loading mode='inline' height={'auto'} variant='intel' />
                     <Heading
                         level={3}
                         UNSAFE_style={{
