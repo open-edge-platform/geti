@@ -3,13 +3,12 @@
 
 import os
 from datetime import datetime
-from io import BytesIO
 from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile, status
 from fastapi.openapi.models import Example
-from starlette.responses import FileResponse, StreamingResponse
+from starlette.responses import Response
 
 from app.api.dependencies import (
     get_dataset_service,
@@ -348,7 +347,7 @@ def get_media_binary(
     media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
     raw: Annotated[bool, Query(description="Return the original file without normalization")] = False,
-) -> StreamingResponse | FileResponse:
+) -> Response:
     """Get media binary content"""
     if isinstance(media, NotAnnotatedVideoFrame):
         frame_binary = media_service.get_frame_binary(
@@ -368,7 +367,7 @@ def get_media_binary(
         and needs_display_normalization(binary_path)
     ):
         png_bytes = normalize_image_to_png_bytes(binary_path)
-        return write_bytes_to_response(bytes=BytesIO(png_bytes), filename=f"{media.name}.png", media_type="image/png")
+        return write_bytes_to_response(content=png_bytes, filename=f"{media.name}.png", media_type="image/png")
 
     filename = f"{media.name}.{media.format.value.lower()}"
 
@@ -388,7 +387,7 @@ def get_media_thumbnail(
     project: Annotated[Project, Depends(get_project)],
     media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
-) -> StreamingResponse | FileResponse:
+) -> Response:
     """Get media thumbnail binary content"""
     if isinstance(media, NotAnnotatedVideoFrame):
         frame_thumbnail = media_service.get_frame_thumbnail(

@@ -68,6 +68,7 @@ def fxt_model_variants() -> list[ModelVariant]:
             format=ModelFormat.OPENVINO,
             precision=ModelPrecision.FP16,
             weights_size=100000,
+            optimal_confidence_threshold=0.35,
         ),
         ModelVariant(
             id=uuid4(),
@@ -75,6 +76,7 @@ def fxt_model_variants() -> list[ModelVariant]:
             format=ModelFormat.ONNX,
             precision=ModelPrecision.FP16,
             weights_size=100100,
+            optimal_confidence_threshold=0.35,
         ),
         ModelVariant(
             id=uuid4(),
@@ -121,6 +123,11 @@ class TestModelEndpoints:
 
         assert response.status_code == status.HTTP_200_OK
         assert len(response.json()) == 2
+        for model_view in response.json():
+            thresholds_by_format = {
+                variant["format"]: variant["optimal_confidence_threshold"] for variant in model_view["variants"]
+            }
+            assert thresholds_by_format == {"openvino": 0.35, "onnx": 0.35, "pytorch": None}
         fxt_model_service.list_models.assert_called_once_with(
             project_id=fxt_get_project.id, dataset_revision_id=dataset_revision_id
         )
@@ -181,6 +188,7 @@ class TestModelEndpoints:
             assert resp_variant["format"] == expected_variant.format
             assert resp_variant["precision"] == expected_variant.precision
             assert resp_variant["weights_size"] == expected_variant.weights_size
+            assert resp_variant["optimal_confidence_threshold"] == expected_variant.optimal_confidence_threshold
         assert response_data["size"] == 300100
 
     @pytest.mark.parametrize(

@@ -6,6 +6,8 @@ import { expect, test as testBase } from '@playwright/test';
 import { BoundingBoxToolPage } from '../annotator/bounding-box-tool-page';
 import { AnnotatorPage } from '../datasets/annotator-page';
 import { DatasetPage } from '../datasets/dataset-page';
+import { InferencePage } from '../inference/inference-page';
+import { StreamPage } from '../inference/stream-page';
 import { ModelsPage } from '../models/models-page';
 import { ProjectPage } from '../projects/project-page';
 
@@ -15,6 +17,8 @@ interface Fixtures {
     annotatorPage: AnnotatorPage;
     boundingBoxTool: BoundingBoxToolPage;
     modelsPage: ModelsPage;
+    inferencePage: InferencePage;
+    streamPage: StreamPage;
 }
 
 const test = testBase.extend<Fixtures>({
@@ -39,6 +43,16 @@ const test = testBase.extend<Fixtures>({
         const modelsPage = new ModelsPage(page);
 
         await use(modelsPage);
+    },
+    inferencePage: async ({ page }, use) => {
+        const inferencePage = new InferencePage(page);
+
+        await use(inferencePage);
+    },
+    streamPage: async ({ page }, use) => {
+        const streamPage = new StreamPage(page);
+
+        await use(streamPage);
     },
 });
 

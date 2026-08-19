@@ -105,7 +105,19 @@ export default defineConfig({
               }
             : undefined,
         copy: [
-            { from: 'node_modules/onnxruntime-web/dist/*.{wasm,mjs}', to: 'ort/[name][ext]' },
+            // Only the `jsep` build is ever fetched at runtime: it is the sole variant
+            // referenced by onnxruntime-web's browser entrypoints, and it serves both
+            // execution providers smart-tools can select (`webgpu` and `cpu`). Copying the
+            // whole `dist/*.{wasm,mjs}` glob shipped ~59 MB of never-requested binaries
+            // (`.jspi`, `.asyncify`, the plain CPU build, and every `ort.*.mjs` entrypoint).
+            //
+            // These binaries must come from the same `onnxruntime-web` copy the bundler
+            // links against, or the JS glue and the wasm disagree at runtime. Keep our pin
+            // equal to `@geti-ui/smart-tools`' own pin so npm hoists a single install.
+            {
+                from: 'node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.jsep.{wasm,mjs}',
+                to: 'ort/[name][ext]',
+            },
             { from: 'vendor/opencv/4.9.0/opencv.js', to: 'opencv/[name][ext]' },
         ],
     },
@@ -156,9 +168,18 @@ export default defineConfig({
             const existing = config.resolve?.extensions ?? [];
             const extensions = Array.from(new Set([...platformExtensions, ...existing, ...styleExtensions]));
 
+            // onnxruntime-web's default browser export inlines its ~26 MB wasm binary as a
+            // bundler asset. We already serve that binary from `ort/` (see `output.copy`) and
+            // point ORT at it via `setOrtWasmPaths`, so the inlined copy is emitted but never
+            // fetched. This export condition selects ORT's external-wasm entry instead.
+            // `'...'` must be kept: it expands to rspack's own defaults (`webpack`,
+            // `production`, `browser`, …), and dropping them breaks every package whose
+            // `exports` map is keyed on `browser`.
+            const conditionNames = ['onnxruntime-web-use-extern-wasm', '...'];
+
             return {
                 ...config,
-                resolve: { ...config.resolve, extensions },
+                resolve: { ...config.resolve, extensions, conditionNames },
                 watchOptions: { ...config.watchOptions, ignored: ['**/src-tauri/**'] },
             };
         },
