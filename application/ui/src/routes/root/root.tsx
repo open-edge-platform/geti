@@ -5,7 +5,7 @@ import { ReactNode, Suspense } from 'react';
 
 import { $api } from '@/api';
 import { Flex, Heading, Loading } from '@geti-ui/ui';
-import { Outlet } from 'react-router';
+import { Outlet } from 'react-router-dom';
 
 import { LicenseCheck } from '../../features/license/license-check.component';
 import { ServerErrorFallback } from './server-error-fallback.component';

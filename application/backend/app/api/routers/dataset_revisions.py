@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 from fastapi.openapi.models import Example
-from starlette.responses import FileResponse, StreamingResponse
+from starlette.responses import FileResponse, Response
 
 from app.api.dependencies import get_dataset_revision, get_dataset_revision_service, get_project
 from app.api.io_utils import write_file_to_response, write_image_to_response
@@ -208,7 +208,7 @@ def get_dataset_revision_item_thumbnail(
     dataset_revision: Annotated[DatasetRevision, Depends(get_dataset_revision)],
     dataset_item_id: DatasetItemID,
     dataset_revision_service: Annotated[DatasetRevisionService, Depends(get_dataset_revision_service)],
-) -> StreamingResponse:
+) -> Response:
     """Get the thumbnail of an item in the dataset revision"""
     thumbnail = dataset_revision_service.get_dataset_revision_item_thumbnail(
         project_id=project.id,

@@ -8,8 +8,7 @@ import { Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/u
 import { usePrefetchQuery } from '@tanstack/react-query';
 import { usePrefetchPipeline } from 'hooks/api/pipeline.hook';
 import { useProject } from 'hooks/api/project.hook';
-import { Outlet, useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import getiLogo from './assets/icons/geti-logo.webp';
 import { ProjectsListPanel } from './components/project-panel/projects-list-panel.component';
