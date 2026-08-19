@@ -160,6 +160,59 @@ class TestInferenceServer:
 
         assert status == InferenceState(status=InferenceStatus.IDLE)
 
+    def _server_with_loaded_model(self, tmp_path, model: Mock) -> InferenceServer:
+        inference_server = InferenceServer(data_dir=Path(tmp_path))
+        inference_server._loaded_model = LoadedModelHandle(
+            model_id=uuid4(),
+            variant_id=uuid4(),
+            model=model,
+            device=DeviceInfo(type=DeviceType.CPU, name="CPU", memory=None, index=None),
+            loaded_at=datetime.now(),
+        )
+        return inference_server
+
+    def test_set_confidence_threshold(self, tmp_path) -> None:
+        """A threshold that differs from the one in use is pushed onto the loaded model."""
+        model = Mock(spec=Model)
+        model.parameters.return_value = {"confidence_threshold": Mock()}
+        model.get_param.return_value = 0.5
+        inference_server = self._server_with_loaded_model(tmp_path, model)
+
+        changed = inference_server.set_confidence_threshold(0.8)
+
+        assert changed
+        model.set_param.assert_called_once_with("confidence_threshold", 0.8)
+
+    def test_set_confidence_threshold_already_applied(self, tmp_path) -> None:
+        """A threshold equal to the one in use leaves the model untouched."""
+        model = Mock(spec=Model)
+        model.parameters.return_value = {"confidence_threshold": Mock()}
+        model.get_param.return_value = 0.5
+        inference_server = self._server_with_loaded_model(tmp_path, model)
+
+        changed = inference_server.set_confidence_threshold(0.5)
+
+        assert not changed
+        model.set_param.assert_not_called()
+
+    def test_set_confidence_threshold_unsupported_by_model(self, tmp_path) -> None:
+        """Models whose task has no confidence threshold ignore the requested value."""
+        model = Mock(spec=Model)
+        model.parameters.return_value = {}
+        inference_server = self._server_with_loaded_model(tmp_path, model)
+
+        changed = inference_server.set_confidence_threshold(0.8)
+
+        assert not changed
+        model.set_param.assert_not_called()
+
+    def test_set_confidence_threshold_no_model_loaded(self, tmp_path) -> None:
+        inference_server = InferenceServer(data_dir=Path(tmp_path))
+        inference_server._loaded_model = None
+
+        with pytest.raises(RuntimeError):
+            inference_server.set_confidence_threshold(0.8)
+
     def test_get_status_active(self, tmp_path) -> None:
         model_id = uuid4()
         device = DeviceInfo(type=DeviceType.CPU, name="CPU", memory=None, index=None)

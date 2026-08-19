@@ -16,6 +16,8 @@ from app.services.data_collect.prediction_converter import convert_prediction
 
 from .model_loader import LoadedModelHandle, ModelLoader
 
+CONFIDENCE_THRESHOLD_PARAM = "confidence_threshold"  # defined in 'model_api/models/parameters.py'
+
 
 class InferenceBusyError(Exception):
     """
@@ -127,6 +129,43 @@ class InferenceServer:
                 return True
         finally:
             self._loading_model = False
+            self._lock.release()
+
+    def set_confidence_threshold(self, confidence_threshold: float) -> bool:
+        """
+        Apply a confidence threshold to the loaded model, unless it already uses that value.
+
+        Args:
+            confidence_threshold: Threshold to apply.
+
+        Returns:
+            True if the threshold was changed, False if the model already used it or does not support one.
+
+        Raises:
+            RuntimeError: If no model is loaded.
+            InferenceBusyError: If another inference is in progress.
+        """
+        if self._loaded_model is None:
+            raise RuntimeError("No model loaded for inference")
+        if not self._lock.acquire(timeout=30):
+            raise InferenceBusyError
+        try:
+            model = self._loaded_model.model
+            if CONFIDENCE_THRESHOLD_PARAM not in model.parameters():
+                logger.warning("Model {} has no confidence threshold to set", self._loaded_model.model_id)
+                return False
+            current_threshold = model.get_param(CONFIDENCE_THRESHOLD_PARAM)
+            if current_threshold == confidence_threshold:
+                return False
+            logger.info(
+                "Changing confidence threshold of model {} from {} to {}",
+                self._loaded_model.model_id,
+                current_threshold,
+                confidence_threshold,
+            )
+            model.set_param(CONFIDENCE_THRESHOLD_PARAM, confidence_threshold)
+            return True
+        finally:
             self._lock.release()
 
     def get_status(self) -> InferenceState:
