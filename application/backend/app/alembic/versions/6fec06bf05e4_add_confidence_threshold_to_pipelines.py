@@ -1,3 +1,6 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
 """add_confidence_threshold_to_pipelines
 
 Revision ID: 6fec06bf05e4
