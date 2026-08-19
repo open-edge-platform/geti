@@ -8,7 +8,7 @@ from typing import Union
 
 from PIL import Image
 
-from model_api.visualizer.defaults import DEFAULT_FONT_SIZE
+from model_api.visualizer.defaults import DEFAULT_FONT_SIZE, DEFAULT_LABEL_BG_COLOR
 from model_api.visualizer.utils import default_font, make_label_image, truetype_font
 
 from .primitive import Primitive
@@ -47,7 +47,7 @@ class Label(Primitive):
         label: str,
         score: Union[float, None] = None,
         fg_color: Union[str, tuple[int, int, int]] = "black",
-        bg_color: Union[str, tuple[int, int, int]] = "yellow",
+        bg_color: Union[str, tuple[int, int, int]] = DEFAULT_LABEL_BG_COLOR,
         font_path: Union[str, BytesIO, None] = None,
         size: int = DEFAULT_FONT_SIZE,
     ) -> None:

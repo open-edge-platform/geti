@@ -9,9 +9,10 @@ import logging
 from typing import TYPE_CHECKING
 
 import cv2
-from PIL import Image, ImageColor, ImageDraw
+from PIL import Image, ImageDraw
 
-from model_api.visualizer.defaults import DEFAULT_OPACITY, DEFAULT_OUTLINE_WIDTH
+from model_api.visualizer.defaults import DEFAULT_OPACITY, DEFAULT_OUTLINE_WIDTH, DEFAULT_SHAPE_COLOR
+from model_api.visualizer.utils import to_rgb
 
 from .primitive import Primitive
 
@@ -42,7 +43,7 @@ class Polygon(Primitive):
         self,
         points: list[tuple[int, int]] | None = None,
         mask: np.ndarray | None = None,
-        color: str | tuple[int, int, int] = "blue",
+        color: str | tuple[int, int, int] = DEFAULT_SHAPE_COLOR,
         opacity: float = DEFAULT_OPACITY,
         outline_width: int = DEFAULT_OUTLINE_WIDTH,
     ) -> None:
@@ -112,6 +113,6 @@ class Polygon(Primitive):
 
         draw = ImageDraw.Draw(image, "RGBA")
         # Draw polygon with darker edge and a semi-transparent fill.
-        ink = ImageColor.getrgb(self.color)
+        ink = to_rgb(self.color)
         draw.polygon(self.points, fill=(*ink, int(255 * self.opacity)), outline=self.color, width=self.outline_width)
         return image

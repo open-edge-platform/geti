@@ -30,11 +30,14 @@ from .scene import (
     Scene,
     SegmentationScene,
 )
+from .utils import validate_label_colors
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
     from pathlib import Path
 
     from .layout import Layout
+    from .utils import Color
 
 
 class Visualizer:
@@ -45,11 +48,30 @@ class Visualizer:
         auto_scale: When True, drawing sizes (line widths, font sizes, etc.) are
             automatically scaled relative to 720p so that annotations remain
             visible on high-resolution images.  Defaults to True.
+        label_colors: Optional mapping of label name to colour, used to render
+            predictions with colours defined by the caller (for example the label
+            colours of a project) instead of the automatically assigned palette.
+            Colours are either a string accepted by PIL (e.g. ``"#RRGGBB"`` or
+            ``"red"``) or an ``(R, G, B)`` tuple of integers in the 0-255 range.
+            Labels absent from the mapping keep their default colour.
+
+    Raises:
+        ValueError: If *label_colors* contains an invalid colour.
+
+    Example:
+        >>> visualizer = Visualizer(label_colors={"car": "#FF0000", "person": (0, 255, 0)})
+        >>> visualizer.show(image, result)
     """
 
-    def __init__(self, layout: Layout | None = None, auto_scale: bool = True) -> None:
+    def __init__(
+        self,
+        layout: Layout | None = None,
+        auto_scale: bool = True,
+        label_colors: Mapping[str, Color] | None = None,
+    ) -> None:
         self.layout = layout
         self.auto_scale = auto_scale
+        self.label_colors = validate_label_colors(label_colors)
 
     @staticmethod
     def compute_scale_factor(image: Image.Image) -> float:
@@ -135,17 +157,17 @@ class Visualizer:
 
         scene: Scene
         if isinstance(result, AnomalyResult):
-            scene = AnomalyScene(image, result, self.layout, scale=scale)
+            scene = AnomalyScene(image, result, self.layout, scale=scale, label_colors=self.label_colors)
         elif isinstance(result, ClassificationResult):
-            scene = ClassificationScene(image, result, self.layout, scale=scale)
+            scene = ClassificationScene(image, result, self.layout, scale=scale, label_colors=self.label_colors)
         elif isinstance(result, InstanceSegmentationResult):
             # Note: This has to be before DetectionScene because InstanceSegmentationResult is a subclass
             # of DetectionResult
-            scene = InstanceSegmentationScene(image, result, self.layout, scale=scale)
+            scene = InstanceSegmentationScene(image, result, self.layout, scale=scale, label_colors=self.label_colors)
         elif isinstance(result, ImageResultWithSoftPrediction):
             scene = SegmentationScene(image, result, self.layout, scale=scale)
         elif isinstance(result, DetectionResult):
-            scene = DetectionScene(image, result, self.layout, scale=scale)
+            scene = DetectionScene(image, result, self.layout, scale=scale, label_colors=self.label_colors)
         elif isinstance(result, DetectedKeypoints):
             scene = KeypointScene(image, result, self.layout, scale=scale)
         else:

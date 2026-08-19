@@ -3,21 +3,35 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 import cv2
 from PIL import Image
 
 from model_api.models.result import ClassificationResult
-from model_api.visualizer.defaults import DEFAULT_FONT_SIZE
+from model_api.visualizer.defaults import DEFAULT_FONT_SIZE, DEFAULT_LABEL_BG_COLOR
 from model_api.visualizer.layout import Flatten, Layout
 from model_api.visualizer.primitive import Label, Overlay
 
 from .scene import Scene
 
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from model_api.visualizer.utils import Color
+
 
 class ClassificationScene(Scene):
-    """Classification Scene."""
+    """Classification Scene.
+
+    Args:
+        image: Base image to draw on.
+        result: Classification result to render.
+        layout: Optional layout to use for rendering.
+        scale: Scale factor applied to drawing sizes.
+        label_colors: Optional mapping of label name to colour used as the label
+            background. Labels absent from the mapping keep the default background.
+    """
 
     def __init__(
         self,
@@ -25,8 +39,10 @@ class ClassificationScene(Scene):
         result: ClassificationResult,
         layout: Union[Layout, None] = None,
         scale: float = 1.0,
+        label_colors: Union["Mapping[str, Color]", None] = None,
     ) -> None:
         self.scale = scale
+        self.label_colors = label_colors or {}
         super().__init__(
             base=image,
             label=self._get_labels(result),
@@ -44,6 +60,7 @@ class ClassificationScene(Scene):
                             label=label.name,
                             score=label.confidence,
                             size=int(DEFAULT_FONT_SIZE * self.scale),
+                            bg_color=self.label_colors.get(label.name, DEFAULT_LABEL_BG_COLOR),
                         ),
                     )
         return labels

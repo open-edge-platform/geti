@@ -23,3 +23,10 @@ DEFAULT_KEYPOINT_SIZE: int = 3
 SCALE_BASELINE: int = 1280
 """Longer-edge pixel count of 720p (landscape). Used as the denominator when
 computing the auto-scale factor."""
+
+# Colors
+DEFAULT_SHAPE_COLOR: str = "blue"
+"""Default color for bounding boxes and polygons."""
+
+DEFAULT_LABEL_BG_COLOR: str = "yellow"
+"""Default background color for label chips."""

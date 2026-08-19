@@ -3,7 +3,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
 import cv2
 from PIL import Image
@@ -16,9 +16,23 @@ from model_api.visualizer.utils import get_label_color_mapping
 
 from .scene import Scene
 
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from model_api.visualizer.utils import Color
+
 
 class DetectionScene(Scene):
-    """Detection Scene."""
+    """Detection Scene.
+
+    Args:
+        image: Base image to draw on.
+        result: Detection result to render.
+        layout: Optional layout to use for rendering.
+        scale: Scale factor applied to drawing sizes.
+        label_colors: Optional mapping of label name to colour. Labels absent from the
+            mapping keep their automatically assigned palette colour.
+    """
 
     def __init__(
         self,
@@ -26,8 +40,9 @@ class DetectionScene(Scene):
         result: DetectionResult,
         layout: Union[Layout, None] = None,
         scale: float = 1.0,
+        label_colors: Union["Mapping[str, Color]", None] = None,
     ) -> None:
-        self.color_per_label = get_label_color_mapping(result.label_names)
+        self.color_per_label = get_label_color_mapping(result.label_names, overrides=label_colors)
         self.scale = scale
         super().__init__(
             base=image,

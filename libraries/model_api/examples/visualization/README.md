@@ -29,3 +29,22 @@ and then run
 ```bash
 uv run python examples/visualization/run.py --image data/cards.png --model data/otx_models/ssd-card-detection.xml --output cards_result.jpg
 ```
+
+## Matching your own label colours
+
+By default the `Visualizer` assigns a colour to each label from a built-in palette. Pass
+`label_colors` to render predictions with colours you control, for example the label
+colours defined in your project:
+
+```python
+from model_api.visualizer import Visualizer
+
+visualizer = Visualizer(label_colors={"car": "#FF0000", "person": (0, 255, 0)})
+visualizer.show(image, result)
+```
+
+Colours are either any string accepted by PIL (`"#RRGGBB"`, `"red"`, ...) or an
+`(R, G, B)` tuple of integers in the 0-255 range. Labels that are not in the mapping keep
+their default colour, and invalid colours raise a `ValueError` when the `Visualizer` is
+created. The mapping is applied to detection, instance segmentation, classification and
+anomaly results.

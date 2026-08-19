@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Union
+from typing import TYPE_CHECKING, Union
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageColor, ImageDraw, ImageFont
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+
+Color = Union[str, tuple[int, int, int]]
 
 COLOR_PALETTE = [
     "#FF6B6B",  # Red
@@ -34,17 +39,90 @@ COLOR_PALETTE = [
 ]
 
 
-def get_label_color_mapping(labels: list[str]) -> dict[str, str]:
+def _is_valid_rgb_tuple(color: tuple) -> bool:
+    """Check that a tuple is a valid ``(R, G, B)`` triplet.
+
+    Args:
+        color: Tuple to check.
+
+    Returns:
+        True when the tuple holds exactly three integers in the 0-255 range.
+    """
+    return len(color) == 3 and all(isinstance(channel, int) and 0 <= channel <= 255 for channel in color)
+
+
+def to_rgb(color: Color) -> tuple[int, int, int]:
+    """Normalize a colour to an ``(R, G, B)`` tuple.
+
+    ``PIL.ImageColor.getrgb`` only accepts strings, so tuples are returned unchanged.
+
+    Args:
+        color: Colour string accepted by PIL (e.g. ``"#RRGGBB"`` or ``"red"``) or an
+            ``(R, G, B)`` tuple of integers in the 0-255 range.
+
+    Returns:
+        The colour as an ``(R, G, B)`` tuple.
+    """
+    if isinstance(color, str):
+        return ImageColor.getrgb(color)
+    return color
+
+
+def validate_label_colors(label_colors: Union[Mapping[str, Color], None]) -> dict[str, Color]:
+    """Validate a mapping of label name to colour.
+
+    Args:
+        label_colors: Mapping of label name to a colour. Colours are either a string
+            accepted by PIL (e.g. ``"#RRGGBB"`` or ``"red"``) or an ``(R, G, B)`` tuple
+            of integers in the 0-255 range. ``None`` is treated as an empty mapping.
+
+    Returns:
+        A copy of the mapping as a plain dictionary. Empty when *label_colors* is None.
+
+    Raises:
+        ValueError: If any colour is not a valid colour string or RGB tuple.
+    """
+    if label_colors is None:
+        return {}
+
+    validated: dict[str, Color] = {}
+    for label, color in label_colors.items():
+        if isinstance(color, str):
+            try:
+                to_rgb(color)
+            except ValueError as error:
+                msg = f"Invalid color {color!r} for label {label!r}."
+                raise ValueError(msg) from error
+        elif not (isinstance(color, tuple) and _is_valid_rgb_tuple(color)):
+            msg = (
+                f"Invalid color {color!r} for label {label!r}. Expected a color string or "
+                "a tuple of three integers in the 0-255 range."
+            )
+            raise ValueError(msg)
+        validated[label] = color
+    return validated
+
+
+def get_label_color_mapping(
+    labels: list[str],
+    overrides: Union[Mapping[str, Color], None] = None,
+) -> dict[str, Color]:
     """Generate a consistent color mapping for a list of labels.
 
     Args:
         labels: List of label names.
+        overrides: Optional mapping of label name to colour. Entries whose label appears
+            in *labels* replace the automatically assigned palette colour; other entries
+            are ignored.
 
     Returns:
-        Dictionary mapping each label to a hex color string.
+        Dictionary mapping each label to a colour.
     """
     unique_labels = sorted(set(labels))
-    return {label: COLOR_PALETTE[i % len(COLOR_PALETTE)] for i, label in enumerate(unique_labels)}
+    mapping: dict[str, Color] = {label: COLOR_PALETTE[i % len(COLOR_PALETTE)] for i, label in enumerate(unique_labels)}
+    if overrides:
+        mapping.update({label: color for label, color in overrides.items() if label in mapping})
+    return mapping
 
 
 @lru_cache(maxsize=5)

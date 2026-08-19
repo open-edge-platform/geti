@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from PIL import Image, ImageDraw
 
-from model_api.visualizer.defaults import DEFAULT_FONT_SIZE, DEFAULT_OUTLINE_WIDTH
+from model_api.visualizer.defaults import DEFAULT_FONT_SIZE, DEFAULT_OUTLINE_WIDTH, DEFAULT_SHAPE_COLOR
 from model_api.visualizer.utils import default_font, make_label_image
 
 from .primitive import Primitive
@@ -38,7 +38,7 @@ class BoundingBox(Primitive):
         x2: int,
         y2: int,
         label: str | None = None,
-        color: str | tuple[int, int, int] = "blue",
+        color: str | tuple[int, int, int] = DEFAULT_SHAPE_COLOR,
         outline_width: int = DEFAULT_OUTLINE_WIDTH,
         font_size: int = DEFAULT_FONT_SIZE,
     ) -> None:
