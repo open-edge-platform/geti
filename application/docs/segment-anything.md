@@ -45,14 +45,23 @@ degrade the user experience:
   inconsistent embeddings. Because the whole pipeline depends on the cached
   encoding, an unstable encoder step makes the tool unreliable and hard to
   reason about when something goes wrong.
-- **Poor in-browser performance.** Executing both the encoder and decoder
-  client-side is computationally heavy. Encoding is slow, consumes significant
-  memory, and competes with the rest of the UI for resources, causing noticeable
-  latency, jank, and occasional freezes — especially on lower-end machines and
-  with large images.
+- **No WebGPU acceleration in the embedded WebView.** The core performance
+  bottleneck is that ONNX Runtime Web's WebGPU/JSEP path requires
+  `SharedArrayBuffer` and cross-origin isolation, which the embedded WebView
+  used by the Tauri app does not provide. As a result, our more recent updates
+  to the SAM logic had to drop WebGPU support under Tauri and fall back
+  immediately to CPU execution, leaving the user waiting noticeably longer for
+  a SAM result.
+- **Sub-optimal performance.** With WebGPU unavailable, the encoder and decoder
+  run on the CPU client-side within the constraints of the Tauri app, so
+  inference is computationally heavy and incurs high latency. Encoding is slow,
+  consumes significant memory, and competes with the rest of the UI for
+  resources, causing noticeable jank and occasional freezes — especially on
+  lower-end machines and with large images.
 - **Bad user experience.** The combination of dated mask quality, an unstable
   encoder, and sluggish in-browser inference leads to slow, inconsistent, and
   sometimes broken interactions.
+
 
 ## Geti 3.2 improvements
 
@@ -83,7 +92,7 @@ license, accuracy, and speed:
 
 With SAM 2 selected, the next decision is how to split the inference pipeline
 between the backend and the client. Two architectural approaches are available taking 
-into account issues runnign both encoder and decoder in browser.
+into account issues running both encoder and decoder in browser.
 
 #### Option 1: Encoder and decoder on the backend
 
@@ -145,8 +154,7 @@ lightweight decoder locally for each prompt.
   client, offering less IP protection than a fully server-side approach.
 
 Weighing these trade-offs, the superior user experience of second option outweighs
-its cons. Moreover, the decoding is already performed on the UI today, so this
-approach requires no additional development on the client side.
+its cons.
 
 ### SAM 2.1 Models Description
 
@@ -193,6 +201,23 @@ Load/latency in ms; Cold = first compile, Warm = from cache.
 | base_plus | 10728.1 |   616.8 |    364.6 |    101.7 |  4210.63 |    0.24 |     65.58 |    15.25 |  4276.21 |    0.23 |
 | large     | 14116.6 |  1472.8 |    386.9 |    104.3 | 10906.51 |    0.09 |     59.97 |    16.67 | 10966.48 |    0.09 |
 
+### MobileSAM 1 encoding benchmarks (baseline)
+
+The same tests were done on the original MobileSAM 1 TinyViT encoder model to provide a baseline for comparison. 
+The results are summarized below.
+
+#### GPU (Panther Lake)
+
+| EncCold | EncWarm | Enc mean | Enc fps |
+| ------: | ------: | -------: | ------: |
+|   520.3 |   171.5 |    51.47 |   19.43 |
+
+#### CPU (Tiger Lake)
+
+| EncCold | EncWarm | Enc mean | Enc fps |
+| ------: | ------: | -------: | ------: |
+|   569.0 |   179.5 |   439.26 |    2.28 |
+
 #### Choosing a model for CPU targets
 
 The Segment Anything tool is intended to run on CPU-only machines as well, not
@@ -230,16 +255,19 @@ _Response:_ HTTP 200 OK and image embedding in binary format (`Content-Type: app
 
 ### Implementation plan
 
-1. SAM 2 support is added to the `model_api` module. 
+Phase 1: Keeping original MobileSAM 1 in the UI, but moving encoding to the backend
+1. The new endpoint is introduced to the backend API, which runs the encoder and returns the embedding to the client
+2. Package `@geti-ui/smart-tools` is adjusted to be able to parse server-side generated embeddings and feed them to the decoder for mask generation
+3. The UI application is switched to new `@geti-ui/smart-tools` and adjusted to obtain embeddings from the backend instead of running the encoder in the browser
+
+Phase 2: Upgrading to SAM 2.1
+4. SAM 2 support is added to the `model_api` module. 
    New classes inheriting `ImageModel` class from `model_api` should be added for both encoder and decoder similarly 
    to SAM 1 support: https://github.com/open-edge-platform/model_api/blob/master/model_api/src/model_api/models/sam_models.py
    Benefit of adding it to `model_api` is that it can be reused later in other products, plus it already has built-in code and algorithma
    for data pre- and post-processing.
-2. Encoder model weights are converted to OpenVino IR format
-3. Model loading is added to the application startup sequence, so the encoder is pre-loaded and cached
-4. The new endpoint is introduced to the backend API, which runs the encoder and returns the embedding to the client
-5. Decoder model weights are downloaded and converted to ONNX format and added to `@geti-ui/smart-tools` for client-side decoding
-6. The client-side Segment Anything tool is updated to use the new backend endpoint for encoding and run the decoder locally for each prompt, using the cached embedding
+5. Encoder model weights are converted to OpenVino IR format and added to the backend replacing old MobileSAM 1 encoder. The backend endpoint is adjusted to use the new encoder model.
+6. Decoder model weights are downloaded and converted to ONNX format and added to `@geti-ui/smart-tools` for client-side decoding.
 
 ### Open points
 
