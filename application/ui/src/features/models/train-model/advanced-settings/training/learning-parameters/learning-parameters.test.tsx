@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { render } from 'test-utils/render';
 import { describe } from 'vitest';
 
-import { getStep } from '../../../../../../components/number-parameter-field/utils';
+import { getStep } from '../../components/number-parameter-field/utils';
 import { isBoolEnableParameterGroup, isNumberParameter } from '../../utils';
 import { LearningParameters } from './learning-parameters.component';
 import { learningParameters } from './mocks';

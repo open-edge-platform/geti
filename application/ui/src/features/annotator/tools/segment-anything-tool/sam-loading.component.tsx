@@ -3,7 +3,7 @@
 
 import { Flex, Heading, View } from '@geti-ui/ui';
 
-import { IntelBrandedLoading } from '../../../../shared/components/intel-branded-loading/intel-branded-loading.component';
+import { IntelBrandedLoading } from '../../../../components/intel-branded-loading/intel-branded-loading.component.tauri';
 
 export const SAMLoading = ({ isLoading }: { isLoading: boolean }) => {
     return (
