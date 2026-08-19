@@ -13,6 +13,7 @@ type NumberGroupParamsProps = {
     onChange: (value: number) => void;
     isDisabled?: boolean;
     step?: number;
+    sliderWidth?: string;
     minValue: number | null;
     maxValue: number | null;
     value: number;
@@ -24,6 +25,7 @@ export const NumberParameterField = ({
     minValue,
     maxValue,
     type,
+    sliderWidth = 'size-2400',
     onChange,
     isDisabled,
     name,
@@ -77,6 +79,7 @@ export const NumberParameterField = ({
                 step={fieldStep}
                 isFilled
                 flex={1}
+                width={sliderWidth}
                 isDisabled={isDisabled}
             />
             <NumberField

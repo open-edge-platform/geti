@@ -25,6 +25,7 @@ import {
 } from '@geti-ui/ui';
 import { isBoolean, isFunction } from 'lodash-es';
 
+import { NumberParameterField } from '../../../../../components/number-parameter-field/number-parameter-field.component';
 import { isParameter } from '../../../model-listing/model-training-parameters/utils';
 import {
     isBoolEnableParameterGroup,
@@ -34,7 +35,6 @@ import {
     ParametersEnableGroupParameters,
 } from '../utils';
 import { BooleanParameterField } from './boolean-parameter-field.component';
-import { NumberParameterField } from './number-parameter-field.component';
 import { RangeParameterField } from './range-parameter-field/range-parameter-field.component';
 import { ResetButton } from './reset-button.component';
 

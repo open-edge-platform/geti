@@ -33,6 +33,7 @@ import { isClassificationTask, isMultiLabelClassificationTask } from '../../../p
 import { DeleteMediaItem } from '../../gallery/delete-media-item/delete-media-item.component';
 import { Toolbar } from '../toolbar-container/toolbar-container.component';
 import { AnnotatorModes } from './annotator-modes/annotator-modes-toggle.component';
+import { ConfidenceThreshold } from './confidence-threshold/confidence-threshold.component';
 import { PredictionInferenceDevices } from './prediction-inference-devices/prediction-inference-devices.component';
 import { PredictionModelSelector } from './prediction-model-selector/prediction-model-selector.component';
 import { PredictionButtons } from './predictions-buttons.component';
@@ -95,9 +96,10 @@ const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
                 <Heading>Prediction settings</Heading>
                 <Divider />
                 <Content>
-                    <Flex gap={'size-50'} direction={'column'}>
+                    <Flex gap={'size-300'} direction={'column'}>
                         <PredictionModelSelector isDisabled={isDisabled} />
                         <PredictionInferenceDevices isDisabled={isDisabled} />
+                        <ConfidenceThreshold isDisabled={isDisabled} />
                     </Flex>
                 </Content>
             </Dialog>
