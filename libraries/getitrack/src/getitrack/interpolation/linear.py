@@ -12,7 +12,7 @@ from getitrack.config import InterpolationMethod
 from getitrack.interpolation.base import BaseInterpolator
 
 if TYPE_CHECKING:
-    from getitrack.interpolation.base import _Observation
+    from getitrack.interpolation.base import Observation
 
 
 class LinearInterpolator(BaseInterpolator):
@@ -22,9 +22,9 @@ class LinearInterpolator(BaseInterpolator):
 
     def fill(
         self,
-        observations: list[_Observation],
-        start: _Observation,
-        end: _Observation,
+        observations: list[Observation],
+        start: Observation,
+        end: Observation,
         frame_ids: list[int],
     ) -> np.ndarray:
         """Interpolate ``xyxy`` corners linearly between ``start`` and ``end``."""

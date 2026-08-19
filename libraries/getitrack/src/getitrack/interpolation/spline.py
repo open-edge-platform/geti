@@ -15,7 +15,7 @@ from getitrack.interpolation.linear import LinearInterpolator
 from getitrack.utils import cxcywh_to_xyxy, xyxy_to_cxcywh
 
 if TYPE_CHECKING:
-    from getitrack.interpolation.base import _Observation
+    from getitrack.interpolation.base import Observation
 
 # Spline sizes are floored to this so an overshoot never yields a degenerate box.
 _MIN_BOX_SIZE = 1e-3
@@ -32,9 +32,9 @@ class SplineInterpolator(BaseInterpolator):
 
     def fill(
         self,
-        observations: list[_Observation],
-        start: _Observation,
-        end: _Observation,
+        observations: list[Observation],
+        start: Observation,
+        end: Observation,
         frame_ids: list[int],
     ) -> np.ndarray:
         """Evaluate the fitted center/size spline at the gap frames and return ``xyxy`` boxes."""
@@ -46,7 +46,7 @@ class SplineInterpolator(BaseInterpolator):
         return cxcywh_to_xyxy(values).astype(np.float32)
 
     @staticmethod
-    def _build_spline(observations: list[_Observation]) -> CubicSpline | None:
+    def _build_spline(observations: list[Observation]) -> CubicSpline | None:
         """Fit a cubic spline over the track's ``cxcywh`` observations, or ``None`` if fewer than two."""
         if len(observations) < 2:
             return None

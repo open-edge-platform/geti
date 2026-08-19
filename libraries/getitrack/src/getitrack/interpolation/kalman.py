@@ -15,7 +15,7 @@ from getitrack.utils import cxcywh_to_xyxy, xyah_to_xyxy, xyxy_to_cxcywh, xyxy_t
 
 if TYPE_CHECKING:
     from getitrack.config import InterpolationConfig, MotionConfig
-    from getitrack.interpolation.base import _Observation
+    from getitrack.interpolation.base import Observation
 
 # Degenerate anchor sizes are floored to this before the xyah conversion, which
 # otherwise rejects zero-area boxes.
@@ -40,9 +40,9 @@ class KalmanInterpolator(BaseInterpolator):
 
     def fill(
         self,
-        observations: list[_Observation],
-        start: _Observation,
-        end: _Observation,
+        observations: list[Observation],
+        start: Observation,
+        end: Observation,
         frame_ids: list[int],
     ) -> np.ndarray:
         """Fill the gap by advancing a seeded constant-velocity state one frame at a time."""

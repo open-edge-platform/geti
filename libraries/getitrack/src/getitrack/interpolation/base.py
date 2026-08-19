@@ -33,7 +33,7 @@ _INTERPOLATOR_REGISTRY: dict[InterpolationMethod, type[BaseInterpolator]] = {}
 
 
 @dataclass(frozen=True)
-class _Observation:
+class Observation:
     """One observed appearance of a track: frame, box, score, and class."""
 
     frame_id: int
@@ -104,9 +104,9 @@ class BaseInterpolator(ABC):
     @abstractmethod
     def fill(
         self,
-        observations: list[_Observation],
-        start: _Observation,
-        end: _Observation,
+        observations: list[Observation],
+        start: Observation,
+        end: Observation,
         frame_ids: list[int],
     ) -> np.ndarray:
         """Return ``(len(frame_ids), 4)`` float32 ``xyxy`` boxes for one gap.
@@ -161,16 +161,16 @@ class BaseInterpolator(ABC):
         ]
 
     @staticmethod
-    def _collect_observations(ordered: list[TrackedDetections]) -> dict[int, list[_Observation]]:
+    def _collect_observations(ordered: list[TrackedDetections]) -> dict[int, list[Observation]]:
         """Group observed (non-interpolated) rows by track id in frame order."""
-        observations: defaultdict[int, list[_Observation]] = defaultdict(list)
+        observations: defaultdict[int, list[Observation]] = defaultdict(list)
         for frame in ordered:
             interpolated = frame.interpolated
             for row in range(len(frame)):
                 if interpolated is not None and bool(interpolated[row]):
                     continue
                 observations[int(frame.track_ids[row])].append(
-                    _Observation(
+                    Observation(
                         frame_id=frame.frame_id,
                         bbox=frame.bboxes[row].astype(np.float32),
                         score=float(frame.scores[row]),
@@ -181,7 +181,7 @@ class BaseInterpolator(ABC):
 
     def _interpolate_track(
         self,
-        observations: list[_Observation],
+        observations: list[Observation],
         *,
         online: bool,
     ) -> list[tuple[int, np.ndarray, float, int]]:
@@ -220,7 +220,7 @@ class BaseInterpolator(ABC):
 
     def _smooth_synth_boxes(
         self,
-        observations: list[_Observation],
+        observations: list[Observation],
         synth: dict[int, tuple[np.ndarray, float, int]],
         *,
         online: bool,

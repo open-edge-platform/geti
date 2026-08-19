@@ -23,7 +23,7 @@ Regimes (`InterpolationConfig.online`):
 
 from __future__ import annotations
 
-from getitrack.interpolation.base import BaseInterpolator
+from getitrack.interpolation.base import BaseInterpolator, Observation
 from getitrack.interpolation.kalman import KalmanInterpolator
 from getitrack.interpolation.linear import LinearInterpolator
 from getitrack.interpolation.spline import SplineInterpolator
@@ -32,5 +32,6 @@ __all__ = [
     "BaseInterpolator",
     "KalmanInterpolator",
     "LinearInterpolator",
+    "Observation",
     "SplineInterpolator",
 ]
