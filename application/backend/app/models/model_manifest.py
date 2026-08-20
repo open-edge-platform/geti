@@ -1,7 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -10,16 +10,12 @@ from .task import TaskType
 from .training_configuration import AlgoLevelParameters
 
 
-class ModelManifestDeprecationStatus(str, Enum):
+class ModelManifestDeprecationStatus(StrEnum):
     """Status of a model architecture with respect to the deprecation process."""
 
     ACTIVE = "active"  # Model architecture is fully supported, models can be trained
     DEPRECATED = "deprecated"  # Model architecture is deprecated, can still view and train but it's discouraged
     OBSOLETE = "obsolete"  # Model architecture is no longer supported, models can be still viewed but not trained
-
-    def __str__(self) -> str:
-        """Returns the name of the model status."""
-        return str(self.name)
 
 
 class BenchmarkMetrics(BaseModel):
@@ -115,6 +111,13 @@ class PretrainedWeights(BaseModel):
         return self.cache_filename or Path(self.url).name
 
 
+class WeightsSource(StrEnum):
+    """Source of pretrained weights for a model architecture."""
+
+    TIMM_MANAGED = "timm_managed"  # Weights are managed by the timm library
+    GETI_HOSTED = "geti_hosted"  # Weights URL and checksum are defined directly in the manifest file
+
+
 class ModelManifest(BaseModel):
     """ModelManifest contains the necessary information for training a specific machine learning model."""
 
@@ -124,8 +127,27 @@ class ModelManifest(BaseModel):
     license: str = Field(
         default="Apache 2.0", title="License", description="License under which the model architecture is released"
     )
-    pretrained_weights: PretrainedWeights = Field(
-        title="Pretrained Weights", description="URL and SHA sum of the pretrained weights"
+    pretrained_weights: PretrainedWeights | None = Field(
+        default=None, title="Pretrained Weights", description="URL and SHA sum of the pretrained weights"
+    )
+    family: str | None = Field(
+        default=None, title="Model family", description="Family or category of the model architecture"
+    )
+    version: str | None = Field(
+        default=None,
+        title="Model Version",
+        description="Identifier for the specific version from the model family, e.g., 'v1', 'v2', or a specific "
+        "variant like 'b0', 'b1', etc.",
+    )
+    pretrained: str | None = Field(
+        default=None,
+        title="Pretrained Tag",
+        description="Pretrained tag of the model (e.g. timm's pretraining tag such as 'in22k_ft_in22k')",
+    )
+    weights_source: WeightsSource = Field(
+        title="Weights Source",
+        description="Source of pretrained weights for the model architecture (timm-managed or geti-hosted)",
+        default=WeightsSource.GETI_HOSTED,
     )
     description: str = Field(title="Description", description="Detailed description of the model capabilities")
     task: TaskType = Field(title="Task Type", description="Type of machine learning task addressed by the model")
@@ -145,7 +167,7 @@ class ModelManifest(BaseModel):
     @model_validator(mode="after")
     def validate_metrics(self) -> "ModelManifest":
         if self.task in {TaskType.CLASSIFICATION}:
-            if self.stats.benchmark_metrics.imagenet_top1_accuracy is None:
+            if self.pretrained_weights is not None and self.stats.benchmark_metrics.imagenet_top1_accuracy is None:
                 raise ValueError("For classification 'imagenet_top1_accuracy' benchmark metric is required")
             if (
                 self.stats.benchmark_metrics.coco_map_50 is not None

@@ -4,9 +4,11 @@
 import hashlib
 import shutil
 from pathlib import Path
+from typing import cast
 
 import requests
 from loguru import logger
+from models.model_manifest import PretrainedWeights
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
@@ -41,7 +43,8 @@ class BaseWeightsService:
             str: The remote URL of the pretrained weights
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
-        return manifest.pretrained_weights.url
+        pretrained_weights = cast(PretrainedWeights, manifest.pretrained_weights)
+        return pretrained_weights.url
 
     def get_local_weights_path(self, task: TaskType, model_manifest_id: str, allow_download: bool = True) -> Path:
         """
@@ -62,10 +65,11 @@ class BaseWeightsService:
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
 
-        local_filename = manifest.pretrained_weights.local_filename
+        pretrained_weights = cast(PretrainedWeights, manifest.pretrained_weights)
+        local_filename = pretrained_weights.local_filename
         local_path = self.pretrained_weights_dir / task.name.lower() / local_filename
         if local_path.exists():
-            if self._verify_file_integrity(file_path=local_path, sha_sum=manifest.pretrained_weights.sha_sum):
+            if self._verify_file_integrity(file_path=local_path, sha_sum=pretrained_weights.sha_sum):
                 logger.info("Using cached weights for {}: {}", model_manifest_id, local_path)
                 return local_path
 
@@ -76,13 +80,13 @@ class BaseWeightsService:
             raise FileNotFoundError(f"Weights not found locally for model {model_manifest_id} and download is disabled")
 
         logger.info("Downloading pretrained weights for {}", model_manifest_id)
-        urls = [manifest.pretrained_weights.url]
-        if manifest.pretrained_weights.mirror_url is not None:
-            urls.append(manifest.pretrained_weights.mirror_url)
+        urls = [pretrained_weights.url]
+        if pretrained_weights.mirror_url is not None:
+            urls.append(pretrained_weights.mirror_url)
         self._download_weights(
             urls=urls,
             local_path=local_path,
-            sha_sum=manifest.pretrained_weights.sha_sum,
+            sha_sum=pretrained_weights.sha_sum,
         )
 
         return local_path
@@ -99,7 +103,8 @@ class BaseWeightsService:
             bool: True if weights were successfully removed, False if they didn't exist
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
-        local_path = self.pretrained_weights_dir / task.name.lower() / manifest.pretrained_weights.local_filename
+        pretrained_weights = cast(PretrainedWeights, manifest.pretrained_weights)
+        local_path = self.pretrained_weights_dir / task.name.lower() / pretrained_weights.local_filename
         if local_path.exists():
             try:
                 local_path.unlink()
@@ -311,4 +316,6 @@ class BaseWeightsService:
         manifest = ModelManifestService.get_model_manifest_by_id(model_manifest_id)
         if manifest.task != task:
             raise ValueError(f"Task mismatch: expected '{task.name.lower()}', got '{manifest.task.lower()}'")
+        if manifest.pretrained_weights is None:
+            raise ValueError(f"Model manifest '{model_manifest_id}' does not have pretrained weights configured")
         return manifest

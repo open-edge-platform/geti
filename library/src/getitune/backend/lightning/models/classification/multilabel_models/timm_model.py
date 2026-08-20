@@ -17,6 +17,7 @@ from getitune.backend.lightning.models.classification.losses.asymmetric_angular_
 from getitune.backend.lightning.models.classification.multilabel_models.base import (
     LightningMultilabelClsModel,
 )
+from getitune.backend.lightning.models.classification.optimizers import TimmOptimizer
 from getitune.backend.lightning.models.classification.utils.pretrained_weights import TimmWeightsLoader
 from getitune.backend.lightning.models.classification.utils.timm import get_preprocessing_params
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
@@ -64,6 +65,8 @@ class TimmModelMultilabelCls(TimmWeightsLoader, LightningMultilabelClsModel):
         pretrained: bool = True,
         pretrained_weights: PathLike | None = None,
     ) -> None:
+        if isinstance(optimizer, TimmOptimizer):
+            optimizer.bind_model_name(model_name)
         super().__init__(
             label_info=label_info,
             data_input_params=data_input_params,
