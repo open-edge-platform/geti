@@ -2,9 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { RefObject } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 import type { Media } from '@/api/types';
+import { useHotkeys } from 'react-hotkeys-hook';
+
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
 
 export type UseKeyboardNavigationProps = {
@@ -31,7 +32,7 @@ export const useKeyboardNavigation = ({
                 }
             }
         },
-        { target: ref },
+
         [items, selectedIndex, onSelectedMediaItem, ref]
     );
 
@@ -46,7 +47,7 @@ export const useKeyboardNavigation = ({
                 }
             }
         },
-        { target: ref },
+
         [items, selectedIndex, onSelectedMediaItem, ref]
     );
 };
