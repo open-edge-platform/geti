@@ -25,6 +25,14 @@ def _query_dataset_items_labels(engine: Engine, metadata: MetaData, project_id: 
     return select(dil).join(di, dil.c.dataset_item_id == di.c.id).where(di.c.project_id == project_id)
 
 
+def _query_dataset_view_items(engine: Engine, metadata: MetaData, project_id: str):
+    """Join through dataset_views to get project-related dataset view item assignments."""
+    dvi = Table("dataset_view_items", metadata, autoload_with=engine)
+    dv = Table("dataset_views", metadata, autoload_with=engine)
+
+    return select(dvi).join(dv, dvi.c.dataset_view_id == dv.c.id).where(dv.c.project_id == project_id)
+
+
 def _query_metric_scores(engine: Engine, metadata: MetaData, project_id: str):
     """Join through evaluations, model_variants, and model_revisions to get project-related metric scores."""
     ms = Table("metric_scores", metadata, autoload_with=engine)
@@ -90,8 +98,10 @@ QUERY_STRATEGY_BY_TABLE = {
     "media": "project_id",
     "labels": "project_id",
     "training_configurations": "project_id",
+    "dataset_views": "project_id",
     # Tables requiring joins
     "dataset_items_labels": _query_dataset_items_labels,
+    "dataset_view_items": _query_dataset_view_items,
     "model_variants": _query_model_variants,
     "evaluations": _query_evaluations,
     "metric_scores": _query_metric_scores,

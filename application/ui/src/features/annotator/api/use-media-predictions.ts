@@ -47,7 +47,6 @@ export const mediaPredictionsQueryOptions = ({
                 body: {
                     ...getModelIdentifierPayload(selectedModel),
                     device,
-                    save_predictions: false,
                     media: [{ media_id: mediaId, range }],
                 },
             });
