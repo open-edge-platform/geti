@@ -3,10 +3,8 @@
 
 import { useRef, useState } from 'react';
 
-import { ActionButton, Flex, NumberField, Slider, Text, View } from '@geti-ui/ui';
+import { ActionButton, Flex, NumberField, Slider, View } from '@geti-ui/ui';
 import { Refresh } from '@geti-ui/ui/icons';
-
-import classes from './confidence-threshold.module.scss';
 
 const THRESHOLD_CONFIG = {
     defaultValue: 0.3,
@@ -37,9 +35,10 @@ const ThresholdField = ({ onChange, value, isDisabled, name }: ThresholdFieldPro
     };
 
     return (
-        <Flex gap={'size-100'}>
+        <Flex gap={'size-100'} alignItems={'end'}>
             <Slider
-                aria-label={`Change ${name} slider`}
+                label={name}
+                showValueLabel={false}
                 value={parameterValue}
                 minValue={THRESHOLD_CONFIG.min}
                 maxValue={THRESHOLD_CONFIG.max}
@@ -65,15 +64,20 @@ const ThresholdField = ({ onChange, value, isDisabled, name }: ThresholdFieldPro
     );
 };
 
-export const ConfidenceThreshold = ({ isDisabled }: { isDisabled: boolean }) => {
+type ConfidenceThresholdProps = {
+    isDisabled?: boolean;
+    maxWidth?: string;
+    width?: string;
+};
+
+export const ConfidenceThreshold = ({ isDisabled = false, maxWidth, width = '100%' }: ConfidenceThresholdProps) => {
     // TODO: Default confidence threshold value will come from the server side
     const defaultValue = THRESHOLD_CONFIG.defaultValue;
     const [threshold, setThreshold] = useState<number>(defaultValue);
 
     return (
-        <View>
-            <Text UNSAFE_className={classes.label}>Confidence threshold</Text>
-            <Flex width={'100%'} gap={'size-175'} alignItems={'center'}>
+        <View maxWidth={maxWidth} width={width}>
+            <Flex width={'100%'} gap={'size-175'} alignItems={'end'}>
                 <ThresholdField
                     onChange={setThreshold}
                     name={'Confidence threshold'}
