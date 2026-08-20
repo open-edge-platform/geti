@@ -62,6 +62,31 @@ test-bdd *ARGS: install-uv
     uv run behave ./tests/bdd -v {{ ARGS }}
 
 # -------------------------------------------------------------------------------------------------
+# Database migrations
+# -------------------------------------------------------------------------------------------------
+
+# Validate the Alembic migrations: revision graph is not broken, models and
+# migrations are in sync, and the upgrade chain applies cleanly to an empty DB
+check-migrations: install-uv
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    echo "Checking that the Alembic revision graph has a single head..."
+    HEADS="$(uv run alembic -c app/alembic.ini heads)"
+    HEAD_COUNT="$(echo "${HEADS}" | grep -c . || true)"
+    if [[ "${HEAD_COUNT}" -ne 1 ]]; then
+        echo "Alembic revision graph has ${HEAD_COUNT} heads (expected 1):" >&2
+        echo "${HEADS}" >&2
+        echo "Please ensure that Alembic revisions are linked in a linear fashion." >&2
+        exit 1
+    fi
+
+    echo "Checking that Alembic migrations are in sync with the database schema..."
+    uv run alembic -c app/alembic.ini check
+
+    echo "✓ All migrations applied successfully to the fresh database"
+
+# -------------------------------------------------------------------------------------------------
 # Documentation
 # -------------------------------------------------------------------------------------------------
 
