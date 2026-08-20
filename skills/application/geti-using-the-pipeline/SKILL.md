@@ -12,9 +12,14 @@ then configure and **enable** a live inference **pipeline** (source → model �
 sink). This skill is about _using_ that API; to change backend code use the
 `geti-backend-dev` skill instead.
 
-Start the server from `application/backend/` with `just run-server` (default
-`https://localhost:7860`). The full endpoint reference is
-`application/docs/api.md`; interactive docs are the generated OpenAPI spec.
+These endpoints are served by a **running Geti instance**; how it was launched
+does not matter (Docker container, Windows MSIX app, install script, or
+`just run-server` from `application/backend/` for development). Ask the user for
+their base URL rather than assuming one — `https://localhost:7860` is only the
+default for a local deployment, the port is configurable and remote instances
+use a different host. See `application/docs/install.md` for the deployment
+modes. The full endpoint reference is `application/docs/api.md`; interactive
+docs are the Scalar instance at `<base-url>/api/docs`.
 
 ## End-to-end pipeline
 

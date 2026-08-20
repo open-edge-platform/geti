@@ -11,11 +11,15 @@ CVAT, Label Studio, or any tool that emits a standard dataset archive, or export
 a project's data for backup or reuse in other frameworks. This skill is about
 _using_ the API, not changing backend code (use `geti-backend-dev` for that).
 
-Start the server from `application/backend/` with `just run-server` (default
-`https://localhost:7860`). The live, authoritative API reference is the Scalar
-instance at `https://localhost:7860/api/docs`; `application/docs/api.md` guides
-development but defer to Scalar if the two diverge. Design background is
-`application/docs/dataset-ie.md`.
+These endpoints are served by a **running Geti instance**; how it was launched
+does not matter (Docker container, Windows MSIX app, install script, or
+`just run-server` from `application/backend/` for development). Ask the user for
+their base URL rather than assuming one — `https://localhost:7860` is only the
+default for a local deployment, the port is configurable and remote instances
+use a different host. See `application/docs/install.md` for the deployment
+modes. The live, authoritative API reference is the Scalar instance at
+`<base-url>/api/docs`; `application/docs/api.md` guides development but defer to
+Scalar if the two diverge. Design background is `application/docs/dataset-ie.md`.
 
 ## When to Use
 
@@ -107,7 +111,7 @@ All operations return a job id from `POST /api/jobs` (HTTP 202). Poll
 ## Notes
 
 - The REST snippets in `application/docs/dataset-ie.md` are design-level; the
-  live Scalar API docs at `https://localhost:7860/api/docs` are the
+  live Scalar API docs at `<base-url>/api/docs` are the
   authoritative contract (`application/docs/api.md` guides development but defer
   to Scalar if they diverge).
 - Importing a *dataset* is supported; importing an externally trained *model*

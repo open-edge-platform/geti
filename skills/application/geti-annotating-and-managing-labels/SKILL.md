@@ -11,11 +11,15 @@ to media items and video frames — all through the Geti REST API. This skill is
 about _using_ the API, not changing backend code (use `geti-backend-dev` for
 that).
 
-Start the server from `application/backend/` with `just run-server` (default
-`https://localhost:7860`). The live, authoritative API reference is the Scalar
-instance at `https://localhost:7860/api/docs`; `application/docs/api.md` guides
-development but defer to Scalar if the two diverge. Task/label background is
-`application/docs/labels.md`.
+These endpoints are served by a **running Geti instance**; how it was launched
+does not matter (Docker container, Windows MSIX app, install script, or
+`just run-server` from `application/backend/` for development). Ask the user for
+their base URL rather than assuming one — `https://localhost:7860` is only the
+default for a local deployment, the port is configurable and remote instances
+use a different host. See `application/docs/install.md` for the deployment
+modes. The live, authoritative API reference is the Scalar instance at
+`<base-url>/api/docs`; `application/docs/api.md` guides development but defer to
+Scalar if the two diverge. Task/label background is `application/docs/labels.md`.
 
 ## When to Use
 
@@ -104,7 +108,7 @@ Match shapes to the project task type:
 
 - To bring in an already-annotated dataset instead of annotating from scratch,
   use `geti-import-export-datasets`.
-- The live Scalar API docs at `https://localhost:7860/api/docs` are the
+- The live Scalar API docs at `<base-url>/api/docs` are the
   authoritative contract for endpoint paths and payloads (`application/docs/api.md`
   guides development but defer to Scalar if they diverge). To add or change
   endpoints, use `geti-backend-dev` and `geti-openapi-sync`.
