@@ -7,8 +7,10 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from getitrack.algorithms import ByteTrackTracker
+from getitrack.algorithms import ByteTrackTracker, OCSortTracker, SortTracker
 from getitrack.algorithms.configs.bytetrack import ByteTrackConfig
+from getitrack.algorithms.configs.ocsort import OCSortConfig
+from getitrack.algorithms.configs.sort import SortConfig
 from getitrack.config import DistanceMetric, TrackerConfig
 from getitrack.matching import (
     BaseDistanceMetric,
@@ -229,3 +231,20 @@ class TestByteTrackWiring:
     def test_selected_metric_is_wired_into_association(self, metric, expected):
         tracker = ByteTrackTracker(ByteTrackConfig(distance_metric=metric))
         assert isinstance(tracker._distance, expected)
+
+
+@pytest.mark.parametrize(
+    ("metric", "expected"),
+    [
+        (DistanceMetric.IOU, IoUDistance),
+        (DistanceMetric.GIOU, GIoUDistance),
+        (DistanceMetric.DIOU, DIoUDistance),
+        (DistanceMetric.CIOU, CIoUDistance),
+    ],
+)
+class TestEveryTrackerWiring:
+    def test_sort_honours_configured_metric(self, metric, expected):
+        assert isinstance(SortTracker(SortConfig(distance_metric=metric))._distance, expected)
+
+    def test_ocsort_honours_configured_metric(self, metric, expected):
+        assert isinstance(OCSortTracker(OCSortConfig(distance_metric=metric))._distance, expected)
