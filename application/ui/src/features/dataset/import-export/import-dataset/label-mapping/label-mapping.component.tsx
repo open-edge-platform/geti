@@ -3,8 +3,8 @@
 
 import { Fragment, useActionState } from 'react';
 
+import { DatasetStatistics } from '@/components/dataset-statistics/dataset-statistics.component';
 import { Checkbox, dimensionValue, Flex, Form, Grid, Heading, Item, Picker, Text, View } from '@geti-ui/ui';
-import { DatasetStatistics } from 'components/dataset-statistics/dataset-statistics.component';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
 import { useStagedDataset } from 'hooks/api/staged-dataset.hook';
 

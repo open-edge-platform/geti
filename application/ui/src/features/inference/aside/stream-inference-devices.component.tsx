@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { InferenceDevices } from 'components/inference-devices/inference-devices.component';
+import { InferenceDevices } from '@/components/inference-devices/inference-devices.component';
 import { usePatchPipeline, usePipeline } from 'hooks/api/pipeline.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 

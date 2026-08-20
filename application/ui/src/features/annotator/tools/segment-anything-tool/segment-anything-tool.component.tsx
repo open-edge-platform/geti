@@ -3,9 +3,9 @@
 
 import { PointerEvent, useEffect, useRef, useState } from 'react';
 
+import { toast } from '@/components/toast/toast.component';
+import { useZoom } from '@/components/zoom/zoom.provider';
 import { clampPointBetweenImage } from '@geti-ui/smart-tools/utils';
-import { toast } from 'components/toast/toast.component';
-import { useZoom } from 'components/zoom/zoom.provider';
 import { useGetDatasetMediaItems } from 'hooks/use-get-dataset-media-items.hook';
 
 import selectionCursor from '../../../../assets/icons/selection.svg?url';

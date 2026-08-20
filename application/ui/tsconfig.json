@@ -23,7 +23,7 @@
             "mocks/*": ["./mocks/*"],
             "@/api": ["./src/api/index.ts"],
             "@/api/types": ["./src/api/shared-types.ts"],
-            "components/*": ["./src/components/*"]
+            "@/components/*": ["./src/components/*"]
         }
     }
 }

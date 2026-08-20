@@ -4,7 +4,7 @@
 import { useEffect } from 'react';
 
 import { $api } from '@/api';
-import { toast } from 'components/toast/toast.component';
+import { toast } from '@/components/toast/toast.component';
 import { isFunction } from 'lodash-es';
 
 import { isNonEmptyString } from '../../../shared/util';

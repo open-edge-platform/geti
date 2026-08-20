@@ -3,7 +3,7 @@
 
 import { ReactNode, RefObject, useRef } from 'react';
 
-import { useZoom } from 'components/zoom/zoom.provider';
+import { useZoom } from '@/components/zoom/zoom.provider';
 import { useEventListener } from 'hooks/event-listener.hook';
 
 import { useAnnotator } from '../../../shared/annotator/annotator-provider.component';

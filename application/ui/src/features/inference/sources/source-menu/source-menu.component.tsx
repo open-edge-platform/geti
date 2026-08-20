@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 import { $api } from '@/api';
+import { toast } from '@/components/toast/toast.component';
 import {
     ActionButton,
     Button,
@@ -20,7 +21,6 @@ import {
     Text,
 } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
-import { toast } from 'components/toast/toast.component';
 import { useDisablePipeline } from 'hooks/api/pipeline.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 

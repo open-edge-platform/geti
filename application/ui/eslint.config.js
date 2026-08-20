@@ -97,17 +97,13 @@ const isTauriRestrictedSyntax = {
         'Do not branch on `isTauri()` at runtime. Add or split a capability module via a `.tauri.{ts,tsx}` twin instead.',
 };
 
-// Containment rule for the shared `src/components/` folder: every file outside
-// it must import through the `components/*` alias. A relative specifier only
-// reaches `src/components` when its `../` count equals the file's depth below
-// `src/`, so the check is generated per depth — feature-local `components/`
-// folders (e.g. `src/features/models/components/`) stay reachable relatively.
-// The bound is the deepest `src/` nesting level plus headroom.
-const MAX_SRC_DEPTH = 12;
-
-const sharedComponentsAliasConfigs = Array.from({ length: MAX_SRC_DEPTH + 1 }, (_, depth) => ({
-    files: [`src/${'*/'.repeat(depth)}*.{ts,tsx}`],
-    ignores: ['src/components/**'],
+// Containment rule for the shared `src/components/` folder: it must be reached
+// through the `@/components/*` alias. A relative `../components/` specifier is
+// ambiguous on its own, so the trees that own a local `components/` folder are
+// exempted rather than resolved.
+const sharedComponentsAliasConfig = {
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/components/**', 'src/platform/**', 'src/features/models/**'],
     rules: {
         'no-restricted-syntax': [
             'error',
@@ -115,12 +111,13 @@ const sharedComponentsAliasConfigs = Array.from({ length: MAX_SRC_DEPTH + 1 }, (
             {
                 selector:
                     ':matches(ImportDeclaration, ImportExpression, ExportNamedDeclaration, ExportAllDeclaration)' +
-                    `[source.value=/^${depth === 0 ? '\\.\\/' : `(\\.\\.\\/){${depth}}`}components\\//]`,
-                message: 'Do not import `src/components/` with a relative path. Use the `components/*` alias instead.',
+                    '[source.value=/^(\\.\\.\\/)+components\\//]',
+                message:
+                    'Do not import `src/components/` with a relative path. Use the `@/components/*` alias instead.',
             },
         ],
     },
-}));
+};
 
 export default [
     {
@@ -150,7 +147,7 @@ export default [
             'no-restricted-syntax': ['error', isTauriRestrictedSyntax],
         },
     },
-    ...sharedComponentsAliasConfigs,
+    sharedComponentsAliasConfig,
     {
         files: ['**/*.test.ts', '**/*.test.tsx', '**/*mock*.ts', '**/*.spec.ts'],
         rules: {

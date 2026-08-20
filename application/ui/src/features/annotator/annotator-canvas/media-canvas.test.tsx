@@ -1,8 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { ZoomProvider } from '@/components/zoom/zoom.provider';
 import { screen } from '@testing-library/react';
-import { ZoomProvider } from 'components/zoom/zoom.provider';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { render } from 'test-utils/render';
 

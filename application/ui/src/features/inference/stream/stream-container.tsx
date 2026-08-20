@@ -3,10 +3,10 @@
 
 import { KeyboardEvent, useState } from 'react';
 
+import { toast } from '@/components/toast/toast.component';
 import { dimensionValue, Flex, Loading, Text, View } from '@geti-ui/ui';
 import { Pause, Play } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
-import { toast } from 'components/toast/toast.component';
 
 import { usePipeline } from '../../../hooks/api/pipeline.hook';
 import { CaptureFrameButton } from './capture-frame-button.component';

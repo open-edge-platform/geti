@@ -4,9 +4,9 @@
 import { Suspense } from 'react';
 
 import { $api } from '@/api';
+import { ProjectsListPanel } from '@/components/project-panel/projects-list-panel.component';
 import { Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/ui';
 import { usePrefetchQuery } from '@tanstack/react-query';
-import { ProjectsListPanel } from 'components/project-panel/projects-list-panel.component';
 import { usePrefetchPipeline } from 'hooks/api/pipeline.hook';
 import { useProject } from 'hooks/api/project.hook';
 import { Link, Outlet, useLocation } from 'react-router-dom';

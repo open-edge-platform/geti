@@ -4,8 +4,8 @@
 import { useRef } from 'react';
 
 import type { Media } from '@/api/types';
+import { VirtualizerGridLayout } from '@/components/virtualizer-grid-layout/virtualizer-grid-layout.component';
 import { Flex, Size, useUnwrapDOMRef, View } from '@geti-ui/ui';
-import { VirtualizerGridLayout } from 'components/virtualizer-grid-layout/virtualizer-grid-layout.component';
 import { isEmpty } from 'lodash-es';
 
 import { SIDEBAR_MEDIA_SIZE } from '../constants';

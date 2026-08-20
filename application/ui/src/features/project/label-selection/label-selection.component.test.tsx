@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Label, TaskType } from '@/api/types';
+import { Toast } from '@/components/toast/toast.component';
 import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Toast } from 'components/toast/toast.component';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { render } from 'test-utils/render';
 

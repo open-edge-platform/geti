@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { $api } from '@/api';
-import { DatasetStatistics } from 'components/dataset-statistics/dataset-statistics.component';
+import { DatasetStatistics } from '@/components/dataset-statistics/dataset-statistics.component';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 type DatasetRevisionStatisticsProps = {

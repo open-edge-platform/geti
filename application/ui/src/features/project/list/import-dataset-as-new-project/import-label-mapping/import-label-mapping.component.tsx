@@ -3,9 +3,9 @@
 
 import { useActionState } from 'react';
 
+import { DatasetStatistics } from '@/components/dataset-statistics/dataset-statistics.component';
+import { MultiSelectList } from '@/components/multi-select-list/multi-select-list.component';
 import { Checkbox, dimensionValue, Divider, Flex, Form, Heading, View } from '@geti-ui/ui';
-import { DatasetStatistics } from 'components/dataset-statistics/dataset-statistics.component';
-import { MultiSelectList } from 'components/multi-select-list/multi-select-list.component';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
 import { useStagedDataset } from 'hooks/api/staged-dataset.hook';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';

@@ -3,6 +3,7 @@
 
 import { Suspense, type ReactNode } from 'react';
 
+import { Toast } from '@/components/toast/toast.component';
 import { IntelBrandedLoading, ThemeProvider } from '@geti-ui/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
@@ -10,7 +11,6 @@ import {
     renderHook as rtlRenderHook,
     RenderOptions as RTLRenderOptions,
 } from '@testing-library/react';
-import { Toast } from 'components/toast/toast.component';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import { paths } from '../constants/paths';

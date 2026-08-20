@@ -4,7 +4,7 @@
 import { useCallback } from 'react';
 
 import type { Label } from '@/api/types';
-import { validateLabelHotkey, validateLabelName } from 'components/label-fields/label-validation';
+import { validateLabelHotkey, validateLabelName } from '@/components/label-fields/label-validation';
 import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';

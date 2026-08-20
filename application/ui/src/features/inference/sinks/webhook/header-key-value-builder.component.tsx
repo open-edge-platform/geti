@@ -3,9 +3,9 @@
 
 import { Fragment, useState } from 'react';
 
+import { RequiredTextField } from '@/components/required-text-field/required-text-field.component';
 import { ActionButton, Content, ContextualHelp, dimensionValue, Flex, Grid, Text } from '@geti-ui/ui';
 import { Add, Delete } from '@geti-ui/ui/icons';
-import { RequiredTextField } from 'components/required-text-field/required-text-field.component';
 import { isEmpty } from 'lodash-es';
 
 import { Fields, getPairsFromObject, Pair } from './utils';

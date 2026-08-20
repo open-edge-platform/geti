@@ -1,8 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import * as toastModule from '@/components/toast/toast.component';
 import { act, waitFor } from '@testing-library/react';
-import * as toastModule from 'components/toast/toast.component';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 import { vi } from 'vitest';

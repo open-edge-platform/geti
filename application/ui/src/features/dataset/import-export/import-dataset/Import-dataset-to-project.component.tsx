@@ -1,9 +1,9 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { FileUploadedResponse, ImportUploadFile } from '@/components/import-upload-file/import-upload-file.component';
+import { getFormatOptions } from '@/components/util';
 import { Content, Dialog, DialogContainer, Divider, Heading } from '@geti-ui/ui';
-import { FileUploadedResponse, ImportUploadFile } from 'components/import-upload-file/import-upload-file.component';
-import { getFormatOptions } from 'components/util';
 import { useProject } from 'hooks/api/project.hook';
 import { useImportDatasetToProject } from 'hooks/storage/use-import-dataset-to-project.hook';
 

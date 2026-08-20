@@ -4,9 +4,9 @@
 import { MouseEvent, PointerEvent, ReactNode, RefObject, useMemo, useRef } from 'react';
 
 import type { Media } from '@/api/types';
+import { ZoomTransform } from '@/components/zoom/zoom-transform';
 import { Loading } from '@geti-ui/ui';
 import { useIsFetching } from '@tanstack/react-query';
-import { ZoomTransform } from 'components/zoom/zoom-transform';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { useSpinDelay } from 'spin-delay';
 

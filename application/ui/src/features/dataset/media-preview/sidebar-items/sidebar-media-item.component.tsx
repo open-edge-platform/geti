@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Media } from '@/api/types';
-import { MediaItem } from 'components/media-item/media-item.component';
-import { MediaThumbnail } from 'components/media-thumbnail/media-thumbnail.component';
+import { MediaItem } from '@/components/media-item/media-item.component';
+import { MediaThumbnail } from '@/components/media-thumbnail/media-thumbnail.component';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { getThumbnailUrl } from '../../../../shared/media-url.utils';
