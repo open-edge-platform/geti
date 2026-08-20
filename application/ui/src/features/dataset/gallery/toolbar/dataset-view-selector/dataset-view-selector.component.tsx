@@ -61,7 +61,7 @@ const DatasetViewsTrigger = ({ selectedDatasetView, isDisabled }: DatasetViewsTr
             >
                 <View
                     paddingX={'size-150'}
-                    paddingY={'size-50'}
+                    paddingY={'size-100'}
                     borderRadius={'regular'}
                     maxWidth={'size-2400'}
                     UNSAFE_className={clsx(classes.datasetViewsTrigger, {
@@ -69,7 +69,7 @@ const DatasetViewsTrigger = ({ selectedDatasetView, isDisabled }: DatasetViewsTr
                     })}
                 >
                     <Flex alignItems={'center'} gap={'size-200'}>
-                        <Text>{selectedDatasetView.name}</Text>
+                        <Text UNSAFE_className={classes.datasetViewName}>{selectedDatasetView.name}</Text>
 
                         <ChevronDownSmall />
                     </Flex>
