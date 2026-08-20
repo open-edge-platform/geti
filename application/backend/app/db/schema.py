@@ -125,6 +125,35 @@ class DatasetItemDB(Base):
     subset_assigned_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
 
 
+class DatasetViewDB(BaseID):
+    __tablename__ = "dataset_views"
+    __table_args__ = (
+        Index("idx_dataset_views_project", "project_id"),
+        UniqueConstraint("project_id", "name", name="uq_project_dataset_view_name"),
+    )
+
+    project_id: Mapped[str] = mapped_column(Text, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+
+
+class DatasetViewItemDB(Base):
+    """
+    Associates a dataset view with the media (images/videos) assigned to it.
+
+    References ``media.id`` (rather than ``dataset_items.id``) so that a video can be assigned to a view as soon
+    as it is uploaded, even before any of its frames have been annotated (and therefore before a dataset item
+    exists for it). Cascading on ``media`` deletion ensures that once a media item is deleted from the project's
+    dataset, it is automatically removed from any view it was assigned to.
+    """
+
+    __tablename__ = "dataset_view_items"
+
+    dataset_view_id: Mapped[str] = mapped_column(
+        Text, ForeignKey("dataset_views.id", ondelete="CASCADE"), primary_key=True
+    )
+    media_id: Mapped[str] = mapped_column(Text, ForeignKey("media.id", ondelete="CASCADE"), primary_key=True)
+
+
 class MediaDB(BaseID):
     __tablename__ = "media"
     __table_args__ = (

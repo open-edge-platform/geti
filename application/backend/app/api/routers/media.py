@@ -12,6 +12,7 @@ from starlette.responses import Response
 
 from app.api.dependencies import (
     get_dataset_service,
+    get_dataset_view_service,
     get_file_name_and_extension,
     get_inference_media_limit,
     get_media_prediction_service,
@@ -41,7 +42,7 @@ from app.models.media import (
     SortDirection,
     VideoFormat,
 )
-from app.services import DatasetService, MediaPredictionService, MediaService, SystemService
+from app.services import DatasetService, DatasetViewService, MediaPredictionService, MediaService, SystemService
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
 from app.services.inference import InferenceBusyError
@@ -222,6 +223,7 @@ def add_media(
 def list_media(  # noqa: PLR0913
     project: Annotated[Project, Depends(get_project)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
+    dataset_view_service: Annotated[DatasetViewService, Depends(get_dataset_view_service)],
     limit: Annotated[int, Query(ge=1, le=MAX_MEDIA_NUMBER_RETURNED)] = DEFAULT_MEDIA_NUMBER_RETURNED,
     offset: Annotated[int, Query(ge=0, le=2_147_483_647)] = 0,
     start_date: Annotated[datetime | None, Query()] = None,
@@ -231,6 +233,10 @@ def list_media(  # noqa: PLR0913
     subsets: Annotated[list[DatasetItemSubset] | None, Query()] = None,
     sort_by: Annotated[MediaSortBy, Query()] = MediaSortBy.UPLOAD_DATE,
     sort_direction: Annotated[SortDirection, Query()] = SortDirection.DESC,
+    dataset_view_id: Annotated[
+        UUID | None,
+        Query(description="If provided, list media assigned to this dataset view instead of the entire dataset"),
+    ] = None,
 ) -> MediaWithPagination:
     """List the available media and their metadata. This endpoint supports pagination."""
     start_date = normalize_datetime_to_utc(start_date)
@@ -241,30 +247,39 @@ def list_media(  # noqa: PLR0913
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Start date must be before end date."
         )
     subset_values = [item.value for item in subsets] if subsets else None
-    total = media_service.count_media(
-        project=project,
+    filters = MediaFilters(
+        limit=limit,
+        offset=offset,
         start_date=start_date,
         end_date=end_date,
         annotation_status=annotation_status,
         label_ids=labels,
         subsets=subset_values,
-        exclude_types=[MediaType.VIDEO_FRAME],
+        sort_by=sort_by,
+        sort_direction=sort_direction,
     )
-    media_list = media_service.list_media(
-        project_id=project.id,
-        filters=MediaFilters(
-            limit=limit,
-            offset=offset,
+    if dataset_view_id is not None:
+        total = dataset_view_service.count_dataset_view_media(
+            project_id=project.id, dataset_view_id=dataset_view_id, filters=filters
+        )
+        media_list = dataset_view_service.list_dataset_view_media(
+            project_id=project.id, dataset_view_id=dataset_view_id, filters=filters
+        )
+    else:
+        total = media_service.count_media(
+            project=project,
             start_date=start_date,
             end_date=end_date,
             annotation_status=annotation_status,
             label_ids=labels,
             subsets=subset_values,
-            sort_by=sort_by,
-            sort_direction=sort_direction,
-        ),
-        exclude_types=[MediaType.VIDEO_FRAME],
-    )
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+        media_list = media_service.list_media(
+            project_id=project.id,
+            filters=filters,
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
     return MediaWithPagination(
         items=[MediaViewAdapter.validate_python(media, from_attributes=True) for media in media_list],
         pagination=Pagination(
