@@ -150,6 +150,8 @@ class InferenceServer:
         if not self._lock.acquire(timeout=30):
             raise InferenceBusyError
         try:
+            if self._loaded_model is None:
+                raise RuntimeError("No model loaded for inference")
             model = self._loaded_model.model
             if CONFIDENCE_THRESHOLD_PARAM not in model.parameters():
                 logger.warning("Model {} has no confidence threshold to set", self._loaded_model.model_id)
