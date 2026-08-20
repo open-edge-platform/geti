@@ -179,47 +179,42 @@ class TestInferenceServer:
         )
         return inference_server
 
-    def test_set_confidence_threshold(self, tmp_path) -> None:
-        """A threshold that differs from the one in use is pushed onto the loaded model."""
+    @staticmethod
+    def _model_with_threshold(current_threshold: float | None) -> Mock:
+        """A mocked model that either exposes the given confidence threshold, or none at all."""
         model = Mock(spec=Model)
-        model.parameters.return_value = {"confidence_threshold": Mock()}
-        model.get_param.return_value = 0.5
+        model.infer_batch.return_value = []
+        model.parameters.return_value = {} if current_threshold is None else {"confidence_threshold": Mock()}
+        model.get_param.return_value = current_threshold
+        return model
+
+    def test_infer_batch_applies_confidence_threshold(self, tmp_path) -> None:
+        """A threshold that differs from the one in use is pushed onto the model before inferring."""
+        model = self._model_with_threshold(0.5)
         inference_server = self._server_with_loaded_model(tmp_path, model)
 
-        changed = inference_server.set_confidence_threshold(0.8)
+        inference_server.infer_batch(labels=[], inputs=[], confidence_threshold=0.8)
 
-        assert changed
         model.set_param.assert_called_once_with("confidence_threshold", 0.8)
+        model.infer_batch.assert_called_once()
 
-    def test_set_confidence_threshold_already_applied(self, tmp_path) -> None:
-        """A threshold equal to the one in use leaves the model untouched."""
-        model = Mock(spec=Model)
-        model.parameters.return_value = {"confidence_threshold": Mock()}
-        model.get_param.return_value = 0.5
+    @pytest.mark.parametrize(
+        "current_threshold, requested_threshold",
+        [
+            pytest.param(0.5, 0.5, id="already_applied"),
+            pytest.param(0.5, None, id="not_requested"),
+            pytest.param(None, 0.8, id="unsupported_by_model"),
+        ],
+    )
+    def test_infer_batch_keeps_confidence_threshold(self, current_threshold, requested_threshold, tmp_path) -> None:
+        """The model is left untouched when the threshold is already in use, not requested, or unsupported."""
+        model = self._model_with_threshold(current_threshold)
         inference_server = self._server_with_loaded_model(tmp_path, model)
 
-        changed = inference_server.set_confidence_threshold(0.5)
+        inference_server.infer_batch(labels=[], inputs=[], confidence_threshold=requested_threshold)
 
-        assert not changed
         model.set_param.assert_not_called()
-
-    def test_set_confidence_threshold_unsupported_by_model(self, tmp_path) -> None:
-        """Models whose task has no confidence threshold ignore the requested value."""
-        model = Mock(spec=Model)
-        model.parameters.return_value = {}
-        inference_server = self._server_with_loaded_model(tmp_path, model)
-
-        changed = inference_server.set_confidence_threshold(0.8)
-
-        assert not changed
-        model.set_param.assert_not_called()
-
-    def test_set_confidence_threshold_no_model_loaded(self, tmp_path) -> None:
-        inference_server = InferenceServer(data_dir=Path(tmp_path))
-        inference_server._loaded_model = None
-
-        with pytest.raises(RuntimeError):
-            inference_server.set_confidence_threshold(0.8)
+        model.infer_batch.assert_called_once()
 
     def test_get_status_active(self, tmp_path) -> None:
         model_id = uuid4()

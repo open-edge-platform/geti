@@ -132,44 +132,35 @@ class InferenceServer:
             self._loading_model = False
             self._lock.release()
 
-    def set_confidence_threshold(self, confidence_threshold: float) -> bool:
+    def _set_confidence_threshold(self, confidence_threshold: float) -> bool:
         """
         Apply a confidence threshold to the loaded model, unless it already uses that value.
+
+        The caller must hold the model lock.
 
         Args:
             confidence_threshold: Threshold to apply.
 
         Returns:
             True if the threshold was changed, False if the model already used it or does not support one.
-
-        Raises:
-            RuntimeError: If no model is loaded.
-            InferenceBusyError: If another inference is in progress.
         """
         if self._loaded_model is None:
             raise RuntimeError("No model loaded for inference")
-        if not self._lock.acquire(timeout=LOCK_ACQUIRE_TIMEOUT):
-            raise InferenceBusyError
-        try:
-            if self._loaded_model is None:
-                raise RuntimeError("No model loaded for inference")
-            model = self._loaded_model.model
-            if CONFIDENCE_THRESHOLD_PARAM not in model.parameters():
-                logger.warning("Model {} has no confidence threshold to set", self._loaded_model.model_id)
-                return False
-            current_threshold = model.get_param(CONFIDENCE_THRESHOLD_PARAM)
-            if current_threshold == confidence_threshold:
-                return False
-            logger.info(
-                "Changing confidence threshold of model {} from {} to {}",
-                self._loaded_model.model_id,
-                current_threshold,
-                confidence_threshold,
-            )
-            model.set_param(CONFIDENCE_THRESHOLD_PARAM, confidence_threshold)
-            return True
-        finally:
-            self._lock.release()
+        model = self._loaded_model.model
+        if CONFIDENCE_THRESHOLD_PARAM not in model.parameters():
+            logger.warning("Model {} has no confidence threshold to set", self._loaded_model.model_id)
+            return False
+        current_threshold = model.get_param(CONFIDENCE_THRESHOLD_PARAM)
+        if current_threshold == confidence_threshold:
+            return False
+        logger.info(
+            "Changing confidence threshold of model {} from {} to {}",
+            self._loaded_model.model_id,
+            current_threshold,
+            confidence_threshold,
+        )
+        model.set_param(CONFIDENCE_THRESHOLD_PARAM, confidence_threshold)
+        return True
 
     def get_status(self) -> InferenceState:
         """
@@ -193,7 +184,10 @@ class InferenceServer:
         )
 
     def infer_batch(
-        self, labels: list[Label], inputs: list[BatchInferenceInput]
+        self,
+        labels: list[Label],
+        inputs: list[BatchInferenceInput],
+        confidence_threshold: float | None = None,
     ) -> dict[tuple[UUID, int | None], list[DatasetItemAnnotation]]:
         """
         Perform batch inference on the provided inputs using the currently loaded model.
@@ -203,6 +197,8 @@ class InferenceServer:
         Args:
             labels: Project labels
             inputs: List of inputs
+            confidence_threshold: Threshold to apply to the model before inferring.
+                When None, the model keeps the threshold it is currently using.
 
         Returns:
             Dictionary mapping (media_id, frame_index) tuples to lists of DatasetItemAnnotation predictions.
@@ -214,6 +210,9 @@ class InferenceServer:
         try:
             if self._loaded_model is None:
                 raise RuntimeError("No model loaded for inference")
+            # Applied under the same lock as the inference, so concurrent requests cannot swap it mid-flight
+            if confidence_threshold is not None:
+                self._set_confidence_threshold(confidence_threshold)
             logger.debug("Running inference on batch of {} inputs", len(inputs))
 
             input_data = [inp.data for inp in inputs]

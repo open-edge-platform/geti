@@ -329,7 +329,9 @@ class TestMediaPredictionServiceUnit:
         fxt_inference_server.set_inference_model.assert_called_once_with(
             project_id=project.id, model_id=model_id, device=device, ttl=10, model_variant_id=None
         )
-        fxt_inference_server.infer_batch.assert_called_once_with(labels=labels, inputs=inputs)
+        fxt_inference_server.infer_batch.assert_called_once_with(
+            labels=labels, inputs=inputs, confidence_threshold=None
+        )
         mock_convert_result.assert_called_once_with(loaded_media=loaded_media, inference_result=infer_batch_result)
         assert result == batch_inference_result
 
@@ -337,7 +339,7 @@ class TestMediaPredictionServiceUnit:
     def test_predict_media_confidence_threshold(
         self, confidence_threshold, fxt_media_prediction_service, fxt_label_service, fxt_inference_server
     ):
-        """The requested threshold is applied to the loaded model, and only when one is requested."""
+        """The requested threshold is forwarded to the inference server together with the batch."""
         project = MagicMock(spec=Project, id=uuid4(), task=MagicMock(spec=Task))
         request = MediaListPredictionRequest(
             model_id=uuid4(), media=[], device="AUTO", confidence_threshold=confidence_threshold
@@ -352,10 +354,7 @@ class TestMediaPredictionServiceUnit:
         ):
             media_prediction_service.predict_media(project=project, request=request, device=device)
 
-        if confidence_threshold is None:
-            fxt_inference_server.set_confidence_threshold.assert_not_called()
-        else:
-            fxt_inference_server.set_confidence_threshold.assert_called_once_with(confidence_threshold)
+        assert fxt_inference_server.infer_batch.call_args.kwargs["confidence_threshold"] == confidence_threshold
 
     @pytest.mark.parametrize(
         "frame_index, keyframe_indexes, expected",
