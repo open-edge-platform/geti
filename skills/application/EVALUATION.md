@@ -108,8 +108,8 @@ Expected behavior:
 
 Expected behavior:
 
-- Updates the correct target (`README.md`, `CHANGELOG.md`, Sphinx source, or
-  docstrings).
+- Updates the correct target (`README.md`, `application/docs/`, `library/README.md`,
+  or docstrings).
 - Keeps the change scoped and consistent with the code, without inventing
   behavior.
 

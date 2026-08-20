@@ -19,7 +19,7 @@ Run commands from the relevant component root (`application/backend/` or
 | `geti-import-export-datasets` | Import and export datasets (COCO/YOLO/VOC/Datumaro) via the staging area and async jobs; label remapping and subset filtering.                                               |
 | `geti-runtime-configuring-inference-pipeline` | Configure and validate the runtime source → model → sink pipeline; tune parameters and diagnose bad predictions or throughput issues.                                  |
 | `geti-runtime-running-live-inference` | Start, monitor, stop, and recover live inference execution; verify production readiness and troubleshoot stalls, dropped outputs, and latency.                                  |
-| `geti-docs-update`        | Update `README.md`, `CHANGELOG.md`, Sphinx docs, or inline docstrings to reflect behavior changes.                                                                                          |
+| `geti-docs-update`        | Update READMEs, `application/docs/`, or inline docstrings to reflect behavior changes.                                                                                                      |
 
 New application skills must pass at least three scenarios in
 [`EVALUATION.md`](EVALUATION.md).

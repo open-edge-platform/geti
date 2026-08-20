@@ -46,7 +46,8 @@ description: Develop and validate changes in `library/` for the `getitune` Pytho
 
 - Use `just lint` for formatting, lint, and type issues.
 - Use `just test-unit -- tests/unit/...` or `just test-unit -- -k <expr>` for normal Python behavior changes.
-- Use `just test-unit-models -- <pytest args>` for model-specific code.
+- Use the backend-scoped recipes for model code: `just test-unit-lightning -- <pytest args>`,
+  `just test-unit-ultralytics -- <pytest args>`, or `just test-unit-openvino -- <pytest args>`.
 - Use `just test-integration -- <pytest args>` only when the change affects end-to-end training, export, or integration behavior.
 
 ## Coordination Notes
