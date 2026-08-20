@@ -101,7 +101,7 @@ class TestMediaSegmentService:
         tensors = safetensors_load(blob)
         np.testing.assert_array_equal(tensors["image_embeddings"], embeddings)
 
-    def test_segment_media_image(self, fxt_media_segment_service, fxt_media_numpy_loader):
+    def test_encode_media_image(self, fxt_media_segment_service, fxt_media_numpy_loader):
         project = MagicMock(spec=Project, id=uuid4())
         image = MagicMock(spec=Image, id=uuid4(), type=MediaType.IMAGE)
         device = DeviceInfo.cpu()
@@ -113,7 +113,7 @@ class TestMediaSegmentService:
         model = MagicMock(return_value=embeddings)
 
         with patch.object(fxt_media_segment_service, "_load_model", return_value=model) as mock_load_model:
-            result = fxt_media_segment_service.segment_media(project=project, media=image, device=device)
+            result = fxt_media_segment_service.encode_media(project=project, media=image, device=device)
 
         fxt_media_numpy_loader.load_media_binary.assert_called_once_with(project_id=project.id, media=image)
         mock_load_model.assert_called_once_with(device="CPU")
@@ -127,7 +127,7 @@ class TestMediaSegmentService:
             "model_version": SAM_EMBEDDING_MODEL_VERSION,
         }
 
-    def test_segment_media_video_frame(self, fxt_media_segment_service, fxt_media_numpy_loader):
+    def test_encode_media_video_frame(self, fxt_media_segment_service, fxt_media_numpy_loader):
         project = MagicMock(spec=Project, id=uuid4())
         video_frame = MagicMock(spec=VideoFrame, id=uuid4(), type=MediaType.VIDEO_FRAME)
         device = DeviceInfo.cpu()
@@ -139,14 +139,14 @@ class TestMediaSegmentService:
         model = MagicMock(return_value=embeddings)
 
         with patch.object(fxt_media_segment_service, "_load_model", return_value=model):
-            result = fxt_media_segment_service.segment_media(project=project, media=video_frame, device=device)
+            result = fxt_media_segment_service.encode_media(project=project, media=video_frame, device=device)
 
         fxt_media_numpy_loader.load_media_binary.assert_called_once_with(project_id=project.id, media=video_frame)
         metadata = _read_safetensors_metadata(result)
         assert metadata["original_height"] == "1024"
         assert metadata["original_width"] == "512"
 
-    def test_segment_media_not_annotated_video_frame(self, fxt_media_segment_service, fxt_media_service):
+    def test_encode_media_not_annotated_video_frame(self, fxt_media_segment_service, fxt_media_service):
         project = MagicMock(spec=Project, id=uuid4())
         video = MagicMock(spec=Video, id=uuid4())
         media = MagicMock(spec=NotAnnotatedVideoFrame, video=video, frame_index=7)
@@ -159,7 +159,7 @@ class TestMediaSegmentService:
         model = MagicMock(return_value=embeddings)
 
         with patch.object(fxt_media_segment_service, "_load_model", return_value=model):
-            result = fxt_media_segment_service.segment_media(project=project, media=media, device=device)
+            result = fxt_media_segment_service.encode_media(project=project, media=media, device=device)
 
         fxt_media_service.get_frame_binaries.assert_called_once_with(project=project, video=video, frame_indexes=[7])
         model.assert_called_once_with(media_binary)
@@ -170,10 +170,10 @@ class TestMediaSegmentService:
         assert metadata["original_height"] == "720"
         assert metadata["original_width"] == "1280"
 
-    def test_segment_media_video_raises(self, fxt_media_segment_service):
+    def test_encode_media_video_raises(self, fxt_media_segment_service):
         project = MagicMock(spec=Project, id=uuid4())
         video = MagicMock(spec=Video, id=uuid4(), type=MediaType.VIDEO)
         device = DeviceInfo(type=DeviceType.CPU, name="CPU", memory=None, index=None)
 
         with pytest.raises(ValueError, match="Video media type is not supported"):
-            fxt_media_segment_service.segment_media(project=project, media=video, device=device)
+            fxt_media_segment_service.encode_media(project=project, media=video, device=device)

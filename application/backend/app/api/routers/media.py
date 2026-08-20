@@ -642,24 +642,32 @@ def media_predict(
         },
         status.HTTP_400_BAD_REQUEST: {"description": "Missing frame index or range is specified for non-video media"},
         status.HTTP_404_NOT_FOUND: {"description": "Media, dataset item or project not found"},
+        status.HTTP_409_CONFLICT: {"description": "Device is not available on this system for inference"},
     },
 )
-def media_embeddings(
+def get_media_embeddings(
     project: Annotated[Project, Depends(get_project)],
     media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
     media_segment_service: Annotated[MediaSegmentService, Depends(get_media_segment_service)],
     system_service: Annotated[SystemService, Depends(get_system_service)],
     frame_index: Annotated[int | None, Query(description="Video frame index", ge=0)] = None,
+    device: Annotated[str | None, Query(description="Device to run inference at")] = None,
 ) -> Response:
     """
-    Segment media and return embeddings as a binary file
+    Encode a media through a segment-anything model and return the embeddings as a binary file
     """
     if isinstance(media, Video) and not frame_index:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Video frame index is not provided.")
+    device = device if device is not None else "cpu"
+    if not system_service.is_valid_inference_device(device):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail=f"Device '{device}' is not available on this system"
+        )
     try:
         media_id = f"{media.video.id}_{media.frame_index}" if isinstance(media, NotAnnotatedVideoFrame) else media.id
-        device = system_service.inference_device("cpu")
-        embeddings_bytes = media_segment_service.segment_media(project=project, media=media, device=device)
+        embeddings_bytes = media_segment_service.encode_media(
+            project=project, media=media, device=system_service.inference_device(device)
+        )
         return write_bytes_to_response(
             content=embeddings_bytes,
             filename=f"{media_id}_embeddings.safetensors",

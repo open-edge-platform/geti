@@ -66,11 +66,11 @@ class MediaSegmentService(BaseSessionManagedService):
         from model_api.models import Model
 
         logger.info("Loading SAM model '{}' on device '{}'", self.model_xml_path, device)
-        ie = create_core()
-        ie.set_property({"PERFORMANCE_HINT": "LATENCY"})
+        core = create_core()
+        core.set_property({"PERFORMANCE_HINT": "LATENCY"})
         if self.ov_cache_path is not None:
-            ie.set_property({"CACHE_DIR": str(self.ov_cache_path)})
-        adapter = OpenvinoAdapter(ie, str(self.model_xml_path), device=device, max_num_requests=1)
+            core.set_property({"CACHE_DIR": str(self.ov_cache_path)})
+        adapter = OpenvinoAdapter(core, str(self.model_xml_path), device=device, max_num_requests=1)
         return Model.create_model(adapter, configuration=SAM_ENCODER_CONFIGURATION)
 
     def _unload(self, model: "Model") -> None:
@@ -121,7 +121,7 @@ class MediaSegmentService(BaseSessionManagedService):
         metadata = {**resize_metadata, "model_version": SAM_EMBEDDING_MODEL_VERSION}
         return safetensors_save({"image_embeddings": embeddings}, metadata=metadata)
 
-    def segment_media(
+    def encode_media(
         self,
         project: Project,
         media: Media | NotAnnotatedVideoFrame,
