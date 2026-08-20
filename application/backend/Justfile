@@ -82,6 +82,7 @@ check-migrations: install-uv
     fi
 
     echo "Checking that Alembic migrations are in sync with the database schema..."
+    uv run app/cli.py init-db
     uv run alembic -c app/alembic.ini check
 
     echo "✓ All migrations applied successfully to the fresh database"
