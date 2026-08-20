@@ -4,7 +4,7 @@
 """add_dataset_views
 
 Revision ID: 4ff59e636ff0
-Revises: 2d2b0c9a5c2c
+Revises: 5ad4c6c3c077
 Create Date: 2026-08-11 12:37:53.876634
 
 """
@@ -16,7 +16,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "4ff59e636ff0"
-down_revision: str | Sequence[str] | None = "2d2b0c9a5c2c"
+down_revision: str | Sequence[str] | None = "5ad4c6c3c077"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
