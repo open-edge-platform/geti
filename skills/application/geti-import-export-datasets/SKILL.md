@@ -17,9 +17,13 @@ does not matter (Docker container, Windows MSIX app, install script, or
 their base URL rather than assuming one — `https://localhost:7860` is only the
 default for a local deployment, the port is configurable and remote instances
 use a different host. See `application/docs/install.md` for the deployment
-modes. The live, authoritative API reference is the Scalar instance at
-`<base-url>/api/docs`; `application/docs/api.md` guides development but defer to
-Scalar if the two diverge. Design background is `application/docs/dataset-ie.md`.
+modes. The authoritative API reference is the spec the instance serves; fetch it
+as JSON from `/api/openapi.json` (the `/api/docs` page is only an HTML viewer
+for humans). Read endpoint paths and payloads from there rather than from any
+checked-in Markdown, which may be out of date. If no instance is running and you
+have the sources, generate the spec with `just gen-api-spec --output-path
+openapi.json` from `application/backend/`.
+Design background is `application/docs/dataset-ie.md`.
 
 ## When to Use
 
@@ -110,10 +114,9 @@ All operations return a job id from `POST /api/jobs` (HTTP 202). Poll
 
 ## Notes
 
-- The REST snippets in `application/docs/dataset-ie.md` are design-level; the
-  live Scalar API docs at `<base-url>/api/docs` are the
-  authoritative contract (`application/docs/api.md` guides development but defer
-  to Scalar if they diverge).
+- The REST snippets in `application/docs/dataset-ie.md` are design-level and may
+  lag behind the implementation; the API spec at `/api/openapi.json` is the only
+  authoritative contract.
 - Importing a *dataset* is supported; importing an externally trained *model*
   (BYOM) is not — pipeline models come only from in-project training/quantization.
 

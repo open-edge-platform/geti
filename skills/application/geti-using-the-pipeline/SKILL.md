@@ -18,8 +18,12 @@ does not matter (Docker container, Windows MSIX app, install script, or
 their base URL rather than assuming one — `https://localhost:7860` is only the
 default for a local deployment, the port is configurable and remote instances
 use a different host. See `application/docs/install.md` for the deployment
-modes. The full endpoint reference is `application/docs/api.md`; interactive
-docs are the Scalar instance at `<base-url>/api/docs`.
+modes. The authoritative API reference is the spec the instance serves; fetch it
+as JSON from `/api/openapi.json` (the `/api/docs` page is only an HTML viewer
+for humans). Read endpoint paths and payloads from there rather than from any
+checked-in Markdown, which may be out of date. If no instance is running and you
+have the sources, generate the spec with `just gen-api-spec --output-path
+openapi.json` from `application/backend/`.
 
 ## End-to-end pipeline
 
@@ -85,9 +89,9 @@ To bring in an existing dataset rather than annotating from scratch:
 - Training and quantization jobs run out-of-process and call into the `getitune`
   library; the underlying capabilities map to the `getitune-training-a-model`
   and `getitune-optimizing-a-model` skills.
-- This skill covers API usage; endpoint paths and payloads are the contract in
-  `application/docs/api.md`. To add or change endpoints, use `geti-backend-dev`
-  and `geti-openapi-sync`.
+- This skill covers API usage; the contract for endpoint paths and payloads is
+  the spec at `/api/openapi.json`. To add or change endpoints, use
+  `geti-backend-dev` and `geti-openapi-sync`.
 
 ## Related skills
 

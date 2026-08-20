@@ -17,9 +17,13 @@ does not matter (Docker container, Windows MSIX app, install script, or
 their base URL rather than assuming one — `https://localhost:7860` is only the
 default for a local deployment, the port is configurable and remote instances
 use a different host. See `application/docs/install.md` for the deployment
-modes. The live, authoritative API reference is the Scalar instance at
-`<base-url>/api/docs`; `application/docs/api.md` guides development but defer to
-Scalar if the two diverge. Task/label background is `application/docs/labels.md`.
+modes. The authoritative API reference is the spec the instance serves; fetch it
+as JSON from `/api/openapi.json` (the `/api/docs` page is only an HTML viewer
+for humans). Read endpoint paths and payloads from there rather than from any
+checked-in Markdown, which may be out of date. If no instance is running and you
+have the sources, generate the spec with `just gen-api-spec --output-path
+openapi.json` from `application/backend/`.
+Task/label background is `application/docs/labels.md`.
 
 ## When to Use
 
@@ -108,10 +112,9 @@ Match shapes to the project task type:
 
 - To bring in an already-annotated dataset instead of annotating from scratch,
   use `geti-import-export-datasets`.
-- The live Scalar API docs at `<base-url>/api/docs` are the
-  authoritative contract for endpoint paths and payloads (`application/docs/api.md`
-  guides development but defer to Scalar if they diverge). To add or change
-  endpoints, use `geti-backend-dev` and `geti-openapi-sync`.
+- The API spec at `/api/openapi.json` is the only authoritative source for
+  endpoint paths and payloads. To add or change endpoints, use
+  `geti-backend-dev` and `geti-openapi-sync`.
 
 ## Related skills
 
