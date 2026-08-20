@@ -137,7 +137,7 @@ def _make_timm_getitune_config(**overrides: Any) -> dict:
                 "model_name": "DYNAMIC",
                 "optimizer": {
                     "class_path": "getitune.backend.lightning.models.classification.utils.timm.TimmOptimizer",
-                    "init_args": {"lr": "DYNAMIC", "weight_decay": "DYNAMIC"},
+                    "init_args": {"lr": float("nan"), "weight_decay": float("nan")},
                 },
             },
         },

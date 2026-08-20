@@ -8,11 +8,11 @@ from typing import cast
 
 import requests
 from loguru import logger
-from models.model_manifest import PretrainedWeights
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
 from app.models import ModelManifest, TaskType
+from app.models.model_manifest import PretrainedWeights
 
 from .model_manifest_service import ModelManifestService
 
