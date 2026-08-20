@@ -1,21 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import {
-    Button,
-    ButtonGroup,
-    Content,
-    Dialog,
-    Divider,
-    Flex,
-    Footer,
-    Heading,
-    InlineAlert,
-    Link,
-    Text,
-} from '@geti-ui/ui';
+import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Footer, Heading, InlineAlert, Text } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-import { useMatch } from 'react-router-dom';
+import { Link, useMatch } from 'react-router-dom';
 
 import { toast } from '../../../components/toast/toast.component';
 import { paths } from '../../../constants/paths';
@@ -62,10 +50,7 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
                         <Flex alignItems={'center'} gap={'size-50'} wrap={'wrap'}>
                             <Text>
                                 Model training started successfully.{' '}
-                                <Link
-                                    href={paths.project.models({ projectId })}
-                                    routerOptions={{ viewTransition: true }}
-                                >
+                                <Link to={paths.project.models({ projectId })} viewTransition>
                                     Open models screen to see progress.
                                 </Link>
                             </Text>
