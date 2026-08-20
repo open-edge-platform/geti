@@ -77,7 +77,7 @@ describe('ModelRow', () => {
 
             expect(screen.getByTestId('model-name')).toHaveTextContent('Test Model');
             expect(
-                screen.getByText(formatTrainingDateTime(defaultModel.training_info.end_time).replace('\n', ' '))
+                screen.getByText(formatTrainingDateTime(defaultModel.training_info.end_time).replace('/\n/g', ' '))
             ).toBeInTheDocument();
 
             const datasetBadge = screen.getByTestId('dataset-count');
@@ -108,7 +108,7 @@ describe('ModelRow', () => {
 
             expect(screen.getByTestId('model-name')).toHaveTextContent('Test Model');
             expect(
-                screen.getByText(formatTrainingDateTime(defaultModel.training_info.end_time).replace('\n', ' '))
+                screen.getByText(formatTrainingDateTime(defaultModel.training_info.end_time).replace('/\n/g', ' '))
             ).toBeInTheDocument();
 
             expect(screen.getByText(`${modelArchitecture.name} (${modelArchitecture.license})`)).toBeInTheDocument();
