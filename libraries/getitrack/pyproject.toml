@@ -28,10 +28,27 @@ dependencies = [
     "scipy~=1.13",
 ]
 
+[project.optional-dependencies]
+# Appearance / ReID extra. The core library stays importable without it: the
+# providers import their backend (openvino / torch / torchreid) lazily, so this
+# stack is only required to actually run ReID embedding or export. torchreid
+# sources the models; torch runs them natively and openvino runs an IR exported
+# from them (or a prebuilt one).
+reid = [
+    "openvino>=2024.0",
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "torchreid>=0.2.5",
+]
+
 [dependency-groups]
 dev = [
     "pytest~=9.0.3",
     "pytest-mock",
+    "openvino>=2024.0",
+    # torch is used only to export a tiny IR in the ReID provider test; the
+    # library itself never imports it, and the test skips when it is absent.
+    "torch>=2.0",
 ]
 
 lint = [

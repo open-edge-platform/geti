@@ -7,8 +7,9 @@ Importing this package registers every algorithm into
 `BaseTracker.from_config` can dispatch by name without explicit wiring.
 """
 
+from getitrack.algorithms.botsort import BotSortTracker
 from getitrack.algorithms.bytetrack import ByteTrackTracker
 from getitrack.algorithms.ocsort import OCSortTracker
 from getitrack.algorithms.sort import SortTracker
 
-__all__ = ["ByteTrackTracker", "OCSortTracker", "SortTracker"]
+__all__ = ["BotSortTracker", "ByteTrackTracker", "OCSortTracker", "SortTracker"]
