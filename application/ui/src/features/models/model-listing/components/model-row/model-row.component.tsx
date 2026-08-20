@@ -56,6 +56,7 @@ export const ModelRow = ({
 }: ModelRowProps) => {
     const trainingEndTime = model.training_info.end_time;
     const totalSize = model.size;
+    const device = model.training_info.device;
     const labelSchemaRevision = model.training_info.label_schema_revision ?? {};
     const labelsCount =
         'labels' in labelSchemaRevision && Array.isArray(labelSchemaRevision.labels)
@@ -94,6 +95,10 @@ export const ModelRow = ({
             ) : (
                 <ArchitectureColumn architecture={modelArchitecture} />
             )}
+
+            <Text UNSAFE_className={classes.smallText} data-testid={'device info'}>
+                {device ? device.name : '-'}
+            </Text>
 
             <Text UNSAFE_className={classes.smallText} data-testid={'model size'}>
                 {totalSize > 0 ? formatBytes(totalSize) : '-'}
