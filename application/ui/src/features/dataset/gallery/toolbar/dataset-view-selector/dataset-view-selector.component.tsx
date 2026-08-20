@@ -20,9 +20,14 @@ import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view
 import { isEmpty } from 'lodash-es';
 
 import { DatasetView, DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
+import { EditDatasetView } from './edit-dataset-view.component';
 
 import classes from './dataset-view-selector.module.scss';
 
+// Copyright (C) 2025-2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (C) 2025-2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
 type DeleteDatasetViewDialogProps = {
     datasetView: DatasetView;
     onDelete: () => void;
@@ -90,6 +95,7 @@ const ENTIRE_DATASET = {
 
 export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) => {
     const [isDatasetViewSelectorOpen, setIsDatasetViewSelectorOpen] = useState<boolean>(false);
+
     const datasetViewsWithDefaultView = useMemo(() => {
         return [ENTIRE_DATASET, ...datasetViews];
     }, [datasetViews]);
@@ -98,19 +104,28 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
     const selectedDatasetView = datasetViewsWithDefaultView.find((item) => item.id === datasetViewId) ?? ENTIRE_DATASET;
 
     const [datasetViewToBeDeleted, setDatasetViewToBeDeleted] = useState<DatasetView | null>(null);
-    const isDeleteDialogOpen = datasetViewToBeDeleted !== null;
+    const [datasetViewToBeEdited, setDatasetViewToBeEdited] = useState<DatasetView | null>(null);
 
     const openDeleteConfirmationDialog = (datasetView: DatasetView) => {
         setIsDatasetViewSelectorOpen(false);
         setDatasetViewToBeDeleted(datasetView);
     };
 
+    const openEditDialog = (datasetView: DatasetView) => {
+        setIsDatasetViewSelectorOpen(false);
+        setDatasetViewToBeEdited(datasetView);
+    };
+
     const handleDelete = () => {
         setDatasetViewToBeDeleted(null);
     };
 
-    const handleClose = () => {
+    const handleCloseDeleteDialog = () => {
         setDatasetViewToBeDeleted(null);
+    };
+
+    const handleCloseEditDialog = () => {
+        setDatasetViewToBeEdited(null);
     };
 
     const onlyEntireDatasetView = isEmpty(datasetViews);
@@ -148,18 +163,24 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
                             selectedDatasetViewId={datasetViewId}
                             onOpenDeleteConfirmationDialog={openDeleteConfirmationDialog}
                             onSelectDatasetView={onSelectDatasetView}
+                            onOpenEditDialog={openEditDialog}
                         />
                     </Content>
                 </Dialog>
             </DialogTrigger>
 
-            <DialogContainer onDismiss={handleClose}>
-                {isDeleteDialogOpen && (
+            <DialogContainer onDismiss={handleCloseDeleteDialog}>
+                {datasetViewToBeDeleted !== null && (
                     <DeleteDatasetViewDialog
                         datasetView={datasetViewToBeDeleted}
                         onDelete={handleDelete}
-                        onClose={handleClose}
+                        onClose={handleCloseDeleteDialog}
                     />
+                )}
+            </DialogContainer>
+            <DialogContainer onDismiss={handleCloseEditDialog}>
+                {datasetViewToBeEdited && (
+                    <EditDatasetView datasetView={datasetViewToBeEdited} onClose={handleCloseEditDialog} />
                 )}
             </DialogContainer>
         </Flex>
