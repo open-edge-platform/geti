@@ -29,10 +29,6 @@ from getitrack.utils import xyah_to_xyxy, xyxy_to_xyah
 if TYPE_CHECKING:
     from getitrack.config import LifecycleConfig
 
-# Plain IoU distance reused for the duplicate-track merge, independent of the
-# configured association metric.
-_IOU = IoUDistance()
-
 
 def _subset(dets: Detections, indices: list[int] | np.ndarray) -> Detections:
     idx = np.asarray(indices, dtype=np.int64)
@@ -272,7 +268,8 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
         lost = [tid for tid, t in self._tracks.items() if t.state == TrackState.LOST]
         if not active or not lost:
             return
-        dist = _IOU(
+        # Plain IoU, independent of the configured association metric.
+        dist = IoUDistance()(
             np.stack([self._tracks[tid].bbox for tid in active], axis=0),
             np.stack([self._tracks[tid].bbox for tid in lost], axis=0),
         )
