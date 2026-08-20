@@ -54,6 +54,10 @@ const mockedModelRevisions = [
             start_time: '2025-01-10T10:00:00.000000+00:00',
             end_time: '2025-01-10T12:30:00.000000+00:00',
             dataset_revision_id: 'dataset-1',
+            device: {
+                type: 'cpu',
+                name: 'CPU',
+            },
         },
     }),
     getMockedModel({
@@ -66,6 +70,10 @@ const mockedModelRevisions = [
             start_time: '2025-01-11T10:00:00.000000+00:00',
             end_time: '2025-01-11T12:30:00.000000+00:00',
             dataset_revision_id: 'dataset-1',
+            device: {
+                type: 'cpu',
+                name: 'CPU',
+            },
         },
     }),
 ];
