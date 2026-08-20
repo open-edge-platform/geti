@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { matchQuery, MutationCache, QueryClient } from '@tanstack/react-query';
+import { toast } from 'components/toast/toast.component';
 
 import { paths } from '../api/openapi-spec';
-import { toast } from '../components/toast/toast.component';
 import { Meta, QueryKey } from './query-client.interface';
 
 declare module '@tanstack/react-query' {

@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Button, ButtonGroup } from '@geti-ui/ui';
+import { ImportJobProcessButtons } from 'components/import-job-process/import-job-process-buttons.component';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';
 
-import { ImportJobProcessButtons } from '../../../../../components/import-job-process/import-job-process-buttons.component';
 import { ImportDatasetAsNewProjectState } from '../../../../dataset/import-export/import-dataset/util';
 import { ImportLabelMappingButtons } from '../import-label-mapping/import-label-mapping-buttons.component';
 import { ImportTaskSelectionButtons } from '../import-task-selection/import-task-selection-buttons.component';

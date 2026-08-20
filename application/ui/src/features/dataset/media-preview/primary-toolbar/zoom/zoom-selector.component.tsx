@@ -3,9 +3,8 @@
 
 import { ActionButton, Flex, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Add, Remove } from '@geti-ui/ui/icons';
-
-import { IconWrapper } from '../../../../../components/icon-wrapper/icon-wrapper.component';
-import { useSetZoom, useZoom } from '../../../../../components/zoom/zoom.provider';
+import { IconWrapper } from 'components/icon-wrapper/icon-wrapper.component';
+import { useSetZoom, useZoom } from 'components/zoom/zoom.provider';
 
 export const ZoomSelector = () => {
     const zoom = useZoom();

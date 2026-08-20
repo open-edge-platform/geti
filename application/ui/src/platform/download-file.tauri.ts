@@ -3,8 +3,7 @@
 
 import { save } from '@tauri-apps/plugin-dialog';
 import { writeFile } from '@tauri-apps/plugin-fs';
-
-import { toast } from '../components/toast/toast.component';
+import { toast } from 'components/toast/toast.component';
 
 export const downloadFile = (url: string, name?: string, startedMessage?: string): void => {
     void saveDownload(url, name, startedMessage);

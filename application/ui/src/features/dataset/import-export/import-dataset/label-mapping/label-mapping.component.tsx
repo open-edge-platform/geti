@@ -4,10 +4,10 @@
 import { Fragment, useActionState } from 'react';
 
 import { Checkbox, dimensionValue, Flex, Form, Grid, Heading, Item, Picker, Text, View } from '@geti-ui/ui';
+import { DatasetStatistics } from 'components/dataset-statistics/dataset-statistics.component';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
 import { useStagedDataset } from 'hooks/api/staged-dataset.hook';
 
-import { DatasetStatistics } from '../../../../../components/dataset-statistics/dataset-statistics.component';
 import { useProject } from '../../../../../hooks/api/project.hook';
 import { useImportDatasetToProject } from '../../../../../hooks/storage/use-import-dataset-to-project.hook';
 import { useImportDatasetDialogState } from '../../../providers/export-import-dataset-dialog-provider.component';

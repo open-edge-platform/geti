@@ -4,9 +4,9 @@
 import { PointerEvent, useRef, useState, useTransition } from 'react';
 
 import { isPointOverPoint, isPolygonValid } from '@geti-ui/smart-tools/utils';
+import { useZoom } from 'components/zoom/zoom.provider';
 import { isEmpty } from 'lodash-es';
 
-import { useZoom } from '../../../../components/zoom/zoom.provider';
 import { Point } from '../../../../shared/types';
 import { useAnnotatorLabels } from '../../annotator-labels-provider.component';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';

@@ -2,14 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Content, Dialog, DialogContainer, Divider, Heading } from '@geti-ui/ui';
+import { FileUploadedResponse, ImportUploadFile } from 'components/import-upload-file/import-upload-file.component';
+import { getFormatOptions } from 'components/util';
 import { useProject } from 'hooks/api/project.hook';
 import { useImportDatasetToProject } from 'hooks/storage/use-import-dataset-to-project.hook';
 
-import {
-    FileUploadedResponse,
-    ImportUploadFile,
-} from '../../../../components/import-upload-file/import-upload-file.component';
-import { getFormatOptions } from '../../../../components/util';
 import { isNonEmptyString } from '../../../../shared/util';
 import { useImportDatasetDialogState } from '../../providers/export-import-dataset-dialog-provider.component';
 import { ImportDatasetButtons } from './import-dataset-buttons/import-dataset-buttons.component';

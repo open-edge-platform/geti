@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Grid } from '@geti-ui/ui';
+import { ZoomProvider } from 'components/zoom/zoom.provider';
 
-import { ZoomProvider } from '../../components/zoom/zoom.provider';
 import { Sidebar } from '../../features/inference/aside/sidebar-tabs.component';
 import { Footer } from '../../features/inference/footer/footer.component';
 import { Header } from '../../features/inference/header/inference-header.component';

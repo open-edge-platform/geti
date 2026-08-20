@@ -3,6 +3,7 @@
 
 import { ThemeProvider } from '@geti-ui/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { Toast } from 'components/toast/toast.component';
 import { RouterProvider } from 'react-router-dom';
 
 import { queryClient } from './query-client/query-client';

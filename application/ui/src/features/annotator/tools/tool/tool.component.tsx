@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ActionButton, Flex, Heading, IllustratedMessage, Text, Tooltip, TooltipTrigger, View } from '@geti-ui/ui';
+import { IconWrapper } from 'components/icon-wrapper/icon-wrapper.component';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { IconWrapper } from '../../../../components/icon-wrapper/icon-wrapper.component';
 import type { ToolConfig, ToolType } from '../interface';
 
 import classes from './tool.module.scss';

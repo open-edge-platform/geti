@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { screen } from '@testing-library/react';
+import { ZoomProvider } from 'components/zoom/zoom.provider';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { render } from 'test-utils/render';
 
-import { ZoomProvider } from '../../../components/zoom/zoom.provider';
 import { MediaCanvas } from './media-canvas';
 
 const mediaItem = getMockedMediaImage({ width: 100, height: 100 });

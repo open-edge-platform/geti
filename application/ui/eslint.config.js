@@ -88,6 +88,40 @@ const apiBarrelRestrictedImportPath = {
     message: 'Do not import the `@/api` barrel from within `src/api/`. Use a direct relative import instead.',
 };
 
+// Forbid `isTauri()` runtime branching. Per-platform behaviour must be selected
+// at build time by the bundler via `*.tauri.{ts,tsx}` file overrides — see
+// src-tauri/README.md.
+const isTauriRestrictedSyntax = {
+    selector: "CallExpression[callee.name='isTauri']",
+    message:
+        'Do not branch on `isTauri()` at runtime. Add or split a capability module via a `.tauri.{ts,tsx}` twin instead.',
+};
+
+// Containment rule for the shared `src/components/` folder: every file outside
+// it must import through the `components/*` alias. A relative specifier only
+// reaches `src/components` when its `../` count equals the file's depth below
+// `src/`, so the check is generated per depth — feature-local `components/`
+// folders (e.g. `src/features/models/components/`) stay reachable relatively.
+// The bound is the deepest `src/` nesting level plus headroom.
+const MAX_SRC_DEPTH = 12;
+
+const sharedComponentsAliasConfigs = Array.from({ length: MAX_SRC_DEPTH + 1 }, (_, depth) => ({
+    files: [`src/${'*/'.repeat(depth)}*.{ts,tsx}`],
+    ignores: ['src/components/**'],
+    rules: {
+        'no-restricted-syntax': [
+            'error',
+            isTauriRestrictedSyntax,
+            {
+                selector:
+                    ':matches(ImportDeclaration, ImportExpression, ExportNamedDeclaration, ExportAllDeclaration)' +
+                    `[source.value=/^${depth === 0 ? '\\.\\/' : `(\\.\\.\\/){${depth}}`}components\\//]`,
+                message: 'Do not import `src/components/` with a relative path. Use the `components/*` alias instead.',
+            },
+        ],
+    },
+}));
+
 export default [
     {
         ignores: [...sharedEslintConfig[0].ignores, 'src/api/openapi-spec.d.ts'],
@@ -113,19 +147,10 @@ export default [
                     ' SPDX-License-Identifier: Apache-2.0',
                 ],
             ],
-            // Forbid `isTauri()` runtime branching. Per-platform behaviour must
-            // be selected at build time by the bundler via `*.tauri.{ts,tsx}`
-            // file overrides — see src-tauri/README.md.
-            'no-restricted-syntax': [
-                'error',
-                {
-                    selector: "CallExpression[callee.name='isTauri']",
-                    message:
-                        'Do not branch on `isTauri()` at runtime. Add or split a capability module via a `.tauri.{ts,tsx}` twin instead.',
-                },
-            ],
+            'no-restricted-syntax': ['error', isTauriRestrictedSyntax],
         },
     },
+    ...sharedComponentsAliasConfigs,
     {
         files: ['**/*.test.ts', '**/*.test.tsx', '**/*mock*.ts', '**/*.spec.ts'],
         rules: {

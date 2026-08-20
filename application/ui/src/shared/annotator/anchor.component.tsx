@@ -4,9 +4,9 @@
 import { ComponentRef, CSSProperties, PointerEvent, ReactNode, useRef, useState } from 'react';
 
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { CursorContextMenu } from 'components/cursor-context-menu/cursor-context-menu.component';
 import { isFunction } from 'lodash-es';
 
-import { CursorContextMenu } from '../../components/cursor-context-menu/cursor-context-menu.component';
 import { isLeftButton } from '../buttons-utils';
 import { Point } from '../types';
 

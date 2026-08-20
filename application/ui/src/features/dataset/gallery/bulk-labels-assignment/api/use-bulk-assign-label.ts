@@ -3,10 +3,10 @@
 
 import { $api } from '@/api';
 import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'components/toast/toast.component';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty, partition } from 'lodash-es';
 
-import { toast } from '../../../../../components/toast/toast.component';
 import { getQueryKey } from '../../../../../query-client/query-client';
 import { filterOutEmptyLabels } from '../../../../../shared/annotator/labels';
 

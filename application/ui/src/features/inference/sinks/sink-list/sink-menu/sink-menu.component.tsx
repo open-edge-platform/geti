@@ -6,9 +6,8 @@ import { Key } from 'react';
 import { $api } from '@/api';
 import { ActionButton, Item, Menu, MenuTrigger } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
+import { toast } from 'components/toast/toast.component';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-
-import { toast } from '../../../../../components/toast/toast.component';
 
 const SINK_MENU_OPTIONS = {
     CONNECT: 'connect',

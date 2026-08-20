@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { act, waitFor } from '@testing-library/react';
+import * as toastModule from 'components/toast/toast.component';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 import { vi } from 'vitest';
 
 import { getMockedJob, getMockedQuantizeJob } from '../../../../mocks/mock-job';
 import { http } from '../../../api/utils';
-import * as toastModule from '../../../components/toast/toast.component';
 import { server } from '../../../msw-node-setup';
 import { MockEventSourceConstructor, resetMockEventSource } from '../../../test-utils/mock-event-source';
 import { useDismissedJobs } from '../../storage/use-dismissed-jobs.hook';

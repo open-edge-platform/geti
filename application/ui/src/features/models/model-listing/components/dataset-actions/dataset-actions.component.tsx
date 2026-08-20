@@ -4,9 +4,9 @@
 import { ActionButton, AlertDialog, DialogContainer, Item, Key, Menu, MenuTrigger } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { ExportDatasetConfig } from 'components/export-dataset-config-dialog/export-dataset-config.component';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { ExportDatasetConfig } from '../../../../../components/export-dataset-config-dialog/export-dataset-config.component';
 import { useDeleteDatasetRevision } from '../../hooks/use-delete-dataset-revision.hook';
 import { useRenameDatasetRevision } from '../../hooks/use-rename-dataset-revision.hook';
 import type { DatasetGroup } from '../../types';

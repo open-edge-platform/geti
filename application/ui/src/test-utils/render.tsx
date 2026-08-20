@@ -10,9 +10,9 @@ import {
     renderHook as rtlRenderHook,
     RenderOptions as RTLRenderOptions,
 } from '@testing-library/react';
+import { Toast } from 'components/toast/toast.component';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
-import { Toast } from '../components/toast/toast.component';
 import { paths } from '../constants/paths';
 import { createQueryClient } from '../query-client/query-client';
 
