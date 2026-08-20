@@ -249,9 +249,9 @@ interaction is fast instead of incurring the one-time cold-load penalty.
 
 ### Image embedding endpoint
 
-_Endpoint:_ `POST /api/projects/{project_id}/dataset/media/{media_id}/sam`
+_Endpoint:_ `GET /api/projects/{project_id}/dataset/media/{media_id}/embeddings`
 
-_Response:_ HTTP 200 OK and image embedding in binary format (`Content-Type: application/octet-stream`) 
+_Response:_ HTTP 200 OK and image embedding in `safetensors` format (`Content-Type: application/octet-stream`) 
 
 ### Implementation plan
 
