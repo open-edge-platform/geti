@@ -45,7 +45,7 @@ class DistanceMetric(StrEnum):
     - ``IOU``: the reference ``1 - IoU`` cost.
     - ``GIOU``: adds an enclosing-box penalty.
     - ``DIOU``: adds a centre-distance term.
-    - ``CIOU``: adds both, plus an aspect-ratio term.
+    - ``CIOU``: extends DIoU with an aspect-ratio term.
     """
 
     IOU = "iou"
