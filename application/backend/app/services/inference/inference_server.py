@@ -16,6 +16,7 @@ from app.services.data_collect.prediction_converter import convert_prediction
 
 from .model_loader import LoadedModelHandle, ModelLoader
 
+LOCK_ACQUIRE_TIMEOUT = 30  # seconds
 CONFIDENCE_THRESHOLD_PARAM = "confidence_threshold"  # defined in 'model_api/models/parameters.py'
 
 
@@ -147,7 +148,7 @@ class InferenceServer:
         """
         if self._loaded_model is None:
             raise RuntimeError("No model loaded for inference")
-        if not self._lock.acquire(timeout=30):
+        if not self._lock.acquire(timeout=LOCK_ACQUIRE_TIMEOUT):
             raise InferenceBusyError
         try:
             if self._loaded_model is None:
@@ -208,7 +209,7 @@ class InferenceServer:
         """
         if self._loaded_model is None:
             raise RuntimeError("No model loaded for inference")
-        if not self._lock.acquire(timeout=30):
+        if not self._lock.acquire(timeout=LOCK_ACQUIRE_TIMEOUT):
             raise InferenceBusyError
         try:
             if self._loaded_model is None:

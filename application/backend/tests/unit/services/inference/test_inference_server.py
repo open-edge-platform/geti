@@ -18,6 +18,14 @@ from app.services.inference.model_loader import LoadedModelHandle
 
 
 class TestInferenceServer:
+    def test_confidence_threshold_param_exists_in_mapi(self) -> None:
+        """Ensure that the confidence threshold parameter is defined in the Model API."""
+        from model_api.models.parameters import ParameterRegistry
+
+        from app.services.inference.inference_server import CONFIDENCE_THRESHOLD_PARAM
+
+        assert CONFIDENCE_THRESHOLD_PARAM in ParameterRegistry.CONFIDENCE_THRESHOLD
+
     def test_set_inference_model(self, tmp_path) -> None:
         project_id = uuid4()
         model_id = uuid4()
