@@ -5,11 +5,9 @@ import {
     getDatasetRevisionThumbnailUrl,
     getMediaBinaryUrl,
     getMediaDownloadUrl,
-    getMediaEmbeddingsUrl,
     getProjectThumbnailUrl,
     getThumbnailUrl,
     getVideoFrameBinaryUrl,
-    getVideoFrameEmbeddingsUrl,
     getVideoFrameThumbnailUrl,
 } from './media-url.utils';
 
@@ -43,10 +41,6 @@ describe.each([
         );
         expect(getVideoFrameThumbnailUrl('p1', 'm1', 7)).toBe(
             `${prefix}/api/projects/p1/dataset/media/m1/thumbnail?frame_index=7`
-        );
-        expect(getMediaEmbeddingsUrl('p1', 'm1')).toBe(`${prefix}/api/projects/p1/dataset/media/m1/embeddings`);
-        expect(getVideoFrameEmbeddingsUrl('p1', 'm1', 7)).toBe(
-            `${prefix}/api/projects/p1/dataset/media/m1/embeddings?frame_index=7`
         );
     });
 });

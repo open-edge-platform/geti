@@ -1,15 +1,16 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { fetchClient } from '@/api';
 import type { Media } from '@/api/types';
 import { EncodingOutput, InvalidEncodingError, parseEncoding } from '@geti-ui/smart-tools/segment-anything';
-import { queryOptions, skipToken, useQuery } from '@tanstack/react-query';
+import { queryOptions, skipToken, useQuery, type QueryKey } from '@tanstack/react-query';
 import { Remote, wrap } from 'comlink';
 import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
+import { getQueryKey } from '../../../../query-client/query-client';
 import { isVideo, isVideoFrame } from '../../../../shared/media-item-utils';
-import { getMediaEmbeddingsUrl, getVideoFrameEmbeddingsUrl } from '../../../../shared/media-url.utils';
 import { isDetectionTask } from '../../../project/task-type-guards';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
 import type {
@@ -88,11 +89,20 @@ const segmentAnythingWorkerQueryOptions = (enabled = true) =>
         enabled,
     });
 
-const getSegmentAnythingEncodingQueryKey = (projectId: string, mediaItem: Media) => {
-    return isVideoFrame(mediaItem)
-        ? ['segment-anything-model', 'encoding', projectId, mediaItem.id, mediaItem.frame_number]
-        : ['segment-anything-model', 'encoding', projectId, mediaItem.id];
-};
+const getEncodingQueryParams = (mediaItem: Media) =>
+    isVideoFrame(mediaItem) ? { frame_index: mediaItem.frame_number } : undefined;
+
+const getSegmentAnythingEncodingQueryKey = (projectId: string, mediaItem: Media): QueryKey =>
+    getQueryKey([
+        'get',
+        '/api/projects/{project_id}/dataset/media/{media_id}/embeddings',
+        {
+            params: {
+                path: { project_id: projectId, media_id: mediaItem.id },
+                query: getEncodingQueryParams(mediaItem),
+            },
+        },
+    ]);
 
 class EmbeddingRequestError extends Error {
     constructor(
@@ -109,19 +119,25 @@ const segmentAnythingEncodingQueryOptions = (projectId: string, mediaItem: Media
     queryOptions({
         queryKey: getSegmentAnythingEncodingQueryKey(projectId, mediaItem),
         queryFn: async ({ signal }) => {
-            const url = isVideoFrame(mediaItem)
-                ? getVideoFrameEmbeddingsUrl(projectId, mediaItem.id, mediaItem.frame_number)
-                : getMediaEmbeddingsUrl(projectId, mediaItem.id);
-
             // No `executeWithTimeout` here: the query's abort signal is what cancels the
             // in-flight download when the user moves to another media item.
-            const response = await fetch(url, { signal });
+            const { data, response } = await fetchClient.GET(
+                '/api/projects/{project_id}/dataset/media/{media_id}/embeddings',
+                {
+                    params: {
+                        path: { project_id: projectId, media_id: mediaItem.id },
+                        query: getEncodingQueryParams(mediaItem),
+                    },
+                    parseAs: 'arrayBuffer',
+                    signal,
+                }
+            );
 
-            if (!response.ok) {
+            if (!response.ok || data === undefined) {
                 throw new EmbeddingRequestError(response.status, response.statusText);
             }
 
-            return parseEncoding(await response.arrayBuffer());
+            return parseEncoding(data);
         },
         staleTime: Infinity,
         gcTime: SAM_ENCODING_GC_TIME_MS,
