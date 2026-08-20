@@ -16,18 +16,22 @@ _INVALID_COST = 1e6
 
 
 def fuse_score(cost_matrix: np.ndarray, det_scores: np.ndarray) -> np.ndarray:
-    """Weight a cost matrix by per-detection confidence: ``1 - (sim * score)`` with ``sim = 1 - cost``.
+    """Discount cost by per-detection confidence where boxes overlap: ``cost + max(sim, 0) * (1 - score)``.
 
-    High-confidence detections become cheaper to match. With an IoU input the
-    output stays in ``[0, 1]``; a wider-range metric (GIoU/DIoU/CIoU) makes
-    ``sim`` negative and can push the fused cost above 1, which is harmless since
-    `linear_assignment` only orders within the ``cost <= thresh`` region.
+    ``sim = 1 - cost`` is the similarity. In the overlap region (``sim >= 0``)
+    this equals the usual ``1 - sim * score``, so a higher-confidence detection is
+    cheaper to match. A wider-range metric (GIoU/DIoU/CIoU) makes ``sim`` negative
+    for disjoint pairs; there is nothing to discount there, so the raw geometric
+    cost is kept. Clamping ``sim`` at 0 keeps the fused cost non-increasing in
+    ``score`` everywhere, so a low-confidence detection is never made cheaper than
+    a high-confidence one in that region.
     """
     if cost_matrix.size == 0:
         return cost_matrix
-    iou_sim = 1.0 - cost_matrix
+    similarity = 1.0 - cost_matrix
     scores = np.asarray(det_scores, dtype=np.float32)[None, :]
-    return (1.0 - iou_sim * scores).astype(np.float32)
+    discount = np.maximum(similarity, 0.0) * (1.0 - scores)
+    return (cost_matrix + discount).astype(np.float32)
 
 
 def linear_assignment(

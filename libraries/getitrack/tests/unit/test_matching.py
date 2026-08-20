@@ -56,6 +56,24 @@ class TestFuseScore:
         fused = fuse_score(cost, scores)
         assert fused[0, 0] < fused[0, 1]
 
+    def test_iou_region_matches_classic_fusion(self):
+        # Where sim >= 0, fusion must equal the classic 1 - sim * score.
+        cost = np.array([[0.2, 0.8]], dtype=np.float32)
+        scores = np.array([0.9, 0.3], dtype=np.float32)
+        fused = fuse_score(cost, scores)
+        classic = 1.0 - (1.0 - cost) * scores[None, :]
+        np.testing.assert_allclose(fused, classic, rtol=1e-6)
+
+    def test_negative_similarity_does_not_reward_low_confidence(self):
+        # cost > 1 (disjoint pair under GIoU/DIoU/CIoU) => sim < 0. A higher-confidence
+        # detection must never be more expensive than a lower-confidence one at equal cost.
+        cost = np.array([[1.5, 1.5]], dtype=np.float32)
+        scores = np.array([1.0, 0.1], dtype=np.float32)  # high, low
+        fused = fuse_score(cost, scores)
+        assert fused[0, 0] <= fused[0, 1]
+        # Raw geometric cost is preserved (no confidence discount off the overlap).
+        np.testing.assert_allclose(fused, cost, rtol=1e-6)
+
 
 class TestLinearAssignment:
     def test_empty_cost_matrix(self):
