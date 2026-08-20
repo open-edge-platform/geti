@@ -230,5 +230,7 @@ class MediaPredictionService(BaseSessionManagedService):
             ttl=self._inference_model_ttl,
             model_variant_id=request.model_variant_id,
         )
-        result = self._inference_server.infer_batch(labels=labels, inputs=inputs)
+        result = self._inference_server.infer_batch(
+            labels=labels, inputs=inputs, confidence_threshold=request.confidence_threshold
+        )
         return self._convert_result(loaded_media=loaded_media, inference_result=result)

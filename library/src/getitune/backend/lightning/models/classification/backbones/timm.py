@@ -36,25 +36,24 @@ class TimmBackbone(nn.Module):
         self.num_head_features = self.model.num_features
         self.num_features = self.model.num_features
 
-    def forward(self, x: torch.Tensor, **kwargs) -> tuple[torch.Tensor]:
-        """Forward."""
-        y = self.extract_features(x)
-        return (y,)
+    def forward(self, x: torch.Tensor, **kwargs) -> torch.Tensor:
+        """Extract the pooled feature embedding using the architecture's own default pooling.
 
-    def extract_features(self, x: torch.Tensor) -> torch.Tensor:
-        """Extract features."""
-        return self.model.forward_features(x)
+        The backbone is created with ``num_classes=0``, so timm sets the classifier head to
+        ``Identity`` and each architecture applies its own default ``global_pool`` before
+        returning. The result is a flat ``(B, num_features)`` embedding, not a spatial
+        ``(B, C, H, W)`` feature map.
 
-    def get_config_optim(self, lrs: list[float] | float) -> list[dict[str, float]]:
-        """Get optimizer configs."""
-        parameters = [
-            {"params": self.model.named_parameters()},
-        ]
-        if isinstance(lrs, list):
-            for lr, param_dict in zip(lrs, parameters):
-                param_dict["lr"] = lr
-        else:
-            for param_dict in parameters:
-                param_dict["lr"] = lrs
+        This is deliberate rather than forced (e.g. via ``global_pool="avg"``): a single
+        pooling mode is not universal across timm's 1400+ architectures (some models reject
+        ``"avg"``, others override ``forward_head`` incompatibly, or return multiple feature
+        branches). Delegating to each model's own default keeps this backbone
+        architecture-agnostic.
 
-        return parameters
+        Args:
+            x: Input image batch, shape ``(B, 3, H, W)``.
+
+        Returns:
+            Pooled feature embedding, shape ``(B, num_features)``.
+        """
+        return self.model(x)

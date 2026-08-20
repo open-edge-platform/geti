@@ -5,7 +5,7 @@ import type { Model } from '@/api/types';
 
 export type GroupByMode = 'dataset' | 'architecture';
 
-export type SortBy = 'name' | 'trained' | 'architecture' | 'dataset' | 'size' | 'score';
+export type SortBy = 'name' | 'trained' | 'architecture' | 'dataset' | 'device' | 'size' | 'score';
 
 export type DatasetGroup = {
     id: string;

@@ -14,6 +14,7 @@ from .base import (
 from .base_weights_service import BaseWeightsService
 from .dataset_revision_service import DatasetRevisionService
 from .dataset_service import DatasetService
+from .dataset_view_service import DatasetViewService
 from .dispatch_service import DispatchService
 from .label_service import LabelService
 from .license_service import LicenseService
@@ -42,6 +43,7 @@ __all__ = [
     "BaseWeightsService",
     "DatasetRevisionService",
     "DatasetService",
+    "DatasetViewService",
     "DispatchService",
     "LabelService",
     "LicenseService",
