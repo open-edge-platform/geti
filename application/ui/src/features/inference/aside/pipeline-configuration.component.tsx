@@ -21,7 +21,7 @@ const ConfigurationItem = ({ children }: { children: ReactNode }) => {
 
 export const PipelineConfiguration = () => {
     return (
-        <Flex direction={'column'} gap={'size-100'} minHeight={0}>
+        <Flex direction={'column'} gap={'size-150'} minHeight={0}>
             <Suspense fallback={<Loading />}>
                 <StreamInferenceDevices />
             </Suspense>
