@@ -110,7 +110,7 @@ export const Graphs = () => {
                 <IllustratedMessage>
                     <Heading>No statistics available</Heading>
                     <Content>
-                        Pipeline metrics will show here once the pipeline starts running and starts processing data.
+                        Pipeline metrics will show here once the pipeline starts running and processing data.
                     </Content>
                 </IllustratedMessage>
             ) : (
