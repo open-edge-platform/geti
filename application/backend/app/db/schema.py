@@ -89,6 +89,7 @@ class ModelRevisionDB(BaseID):
     label_schema_revision: Mapped[dict] = mapped_column(JSON, nullable=False)
     training_started_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
     training_finished_at: Mapped[datetime | None] = mapped_column(UTCDateTime(), nullable=True)
+    training_device: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     files_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
 
     project = relationship("ProjectDB", back_populates="model_revisions")

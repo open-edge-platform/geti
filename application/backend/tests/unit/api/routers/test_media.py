@@ -2064,3 +2064,43 @@ class TestMediaEndpoints:
             "detail": "Inference request timed out waiting for the model lock. Another inference is in "
             + "progress or model is not loaded yet."
         }
+
+    def test_media_predict_with_confidence_threshold(
+        self, fxt_get_project, fxt_media_prediction_service, fxt_inference_media_limit, fxt_client
+    ) -> None:
+        request = MediaListPredictionRequest(
+            model_id=uuid4(),
+            media=[MediaPredictionRequest(media_id=uuid4(), range=None)],
+            device="AUTO",
+            confidence_threshold=0.8,
+        )
+
+        fxt_inference_media_limit(10)
+        fxt_media_prediction_service.predict_media.return_value = BatchInferenceResult(predictions=[])
+
+        response = fxt_client.post(
+            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            json=request.model_dump(mode="json"),
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert fxt_media_prediction_service.predict_media.call_args.kwargs["request"].confidence_threshold == 0.8
+
+    @pytest.mark.parametrize("confidence_threshold", [-0.1, 1.5, "high"])
+    def test_media_predict_invalid_confidence_threshold(
+        self, confidence_threshold, fxt_get_project, fxt_media_prediction_service, fxt_inference_media_limit, fxt_client
+    ) -> None:
+        fxt_inference_media_limit(10)
+
+        response = fxt_client.post(
+            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            json={
+                "model_id": str(uuid4()),
+                "media": [{"media_id": str(uuid4()), "range": None}],
+                "device": "AUTO",
+                "confidence_threshold": confidence_threshold,
+            },
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_media_prediction_service.predict_media.assert_not_called()

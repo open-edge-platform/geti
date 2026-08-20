@@ -1079,6 +1079,12 @@ class TestGetiTuneTrainerExecuteCancellation:
         last_status_call = status_calls[-1]
         assert last_status_call.kwargs.get("training_status") == TrainingStatus.FAILED
 
+        # Assert - the IN_PROGRESS update recorded which hardware was used to run the training
+        in_progress_call = next(
+            call for call in status_calls if call.kwargs.get("training_status") == TrainingStatus.IN_PROGRESS
+        )
+        assert in_progress_call.kwargs.get("training_device") == params.device
+
 
 class TestGetiTuneTrainerEvaluateModel:
     """Tests for the GetiTuneTrainer.evaluate_model method."""
