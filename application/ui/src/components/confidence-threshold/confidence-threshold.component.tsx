@@ -77,7 +77,7 @@ export const ConfidenceThreshold = ({ isDisabled = false, maxWidth, width = '100
 
     return (
         <View maxWidth={maxWidth} width={width}>
-            <Flex width={'100%'} gap={'size-175'} alignItems={'end'}>
+            <Flex width={'100%'} justifyContent={'space-between'} gap={'size-175'} alignItems={'end'}>
                 <ThresholdField
                     onChange={setThreshold}
                     name={'Confidence threshold'}
