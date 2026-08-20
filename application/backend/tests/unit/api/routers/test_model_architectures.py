@@ -40,6 +40,7 @@ class TestModelArchitecturesEndpoint:
         assert "capabilities" in detection_model
         assert detection_model["capabilities"]["xai"] is True
         assert detection_model["capabilities"]["tiling"] is True
+        assert detection_model["capabilities"]["high_bit_depth_images"] is True
 
         # Verify stats structure
         assert "stats" in detection_model
