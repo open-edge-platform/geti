@@ -33,7 +33,7 @@ export const StreamInferenceDevices = () => {
 
     return (
         <InferenceDevices
-            ariaLabel='inference compute'
+            label={'Inference device'}
             selectedKey={selectedKey}
             onSelectionChange={handleChange}
             maxWidth={'size-3000'}

@@ -3,8 +3,10 @@
 
 import { ReactNode, Suspense } from 'react';
 
-import { Flex, Heading, Item, Loading, TabList, TabPanels, Tabs, Text, View } from '@geti-ui/ui';
+import { Flex, Item, Loading, TabList, TabPanels, Tabs, Text, View } from '@geti-ui/ui';
 
+import { ConfidenceThreshold } from '../../../components/confidence-threshold/confidence-threshold.component';
+import { FEATURE_FLAGS } from '../../../constants/feature-flags';
 import { SinkActions } from '../sinks/sink-actions.component';
 import { SourceActions } from '../sources/source-actions.component';
 import { StreamInferenceDevices } from './stream-inference-devices.component';
@@ -20,10 +22,12 @@ const ConfigurationItem = ({ children }: { children: ReactNode }) => {
 export const PipelineConfiguration = () => {
     return (
         <Flex direction={'column'} gap={'size-100'} minHeight={0}>
-            <Heading level={3}>Inference device</Heading>
             <Suspense fallback={<Loading />}>
                 <StreamInferenceDevices />
             </Suspense>
+
+            {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && <ConfidenceThreshold />}
+
             <Tabs
                 aria-label={'Pipeline configuration tabs'}
                 flex={1}
