@@ -640,14 +640,8 @@ def media_predict(
             "description": "Media is segmented, embeddings are calculated",
             "content": {"application/octet-stream": {}},
         },
-        status.HTTP_400_BAD_REQUEST: {
-            "description": "Missing frame range, range is specified for non-video media, "
-            "or media inference limit exceeded"
-        },
+        status.HTTP_400_BAD_REQUEST: {"description": "Missing frame index or range is specified for non-video media"},
         status.HTTP_404_NOT_FOUND: {"description": "Media, dataset item or project not found"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Inference server is busy with another request, try again later"
-        },
     },
 )
 def media_embeddings(
