@@ -4,6 +4,7 @@
 import { FormEvent, useState } from 'react';
 
 import { Button, ButtonGroup, Content, Dialog, Divider, Form, Heading, TextField } from '@geti-ui/ui';
+import { isEmpty } from 'lodash-es';
 
 import { DatasetView } from './dataset-view-items-list/dataset-view-items-list.component';
 
@@ -14,6 +15,7 @@ type EditDatasetViewProps = {
 
 export const EditDatasetView = ({ datasetView, onClose }: EditDatasetViewProps) => {
     const [newName, setNewName] = useState(datasetView.name);
+    const isEditDisabled = newName === datasetView.name || isEmpty(newName.trim());
 
     const edit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -34,7 +36,7 @@ export const EditDatasetView = ({ datasetView, onClose }: EditDatasetViewProps) 
                 <Button variant={'secondary'} onPress={onClose}>
                     Cancel
                 </Button>
-                <Button type={'submit'} form={'edit-dataset-view-name'}>
+                <Button type={'submit'} form={'edit-dataset-view-name'} isDisabled={isEditDisabled}>
                     Edit
                 </Button>
             </ButtonGroup>
