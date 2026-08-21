@@ -3,49 +3,18 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import {
-    AlertDialog,
-    Content,
-    Dialog,
-    DialogContainer,
-    DialogTrigger,
-    Flex,
-    PressableElement,
-    Text,
-    View,
-} from '@geti-ui/ui';
+import { Content, Dialog, DialogContainer, DialogTrigger, Flex, PressableElement, Text, View } from '@geti-ui/ui';
 import { ChevronDownSmall } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { isEmpty } from 'lodash-es';
 
 import { DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
+import { DeleteDatasetViewDialog } from './delete-dataset-view.component';
 import { RenameDatasetView } from './rename-dataset-view.component';
 import { DatasetView } from './type';
 
 import classes from './dataset-view-selector.module.scss';
-
-type DeleteDatasetViewDialogProps = {
-    datasetView: DatasetView;
-    onDelete: () => void;
-    onClose: () => void;
-};
-
-const DeleteDatasetViewDialog = ({ datasetView, onDelete, onClose }: DeleteDatasetViewDialogProps) => {
-    return (
-        <AlertDialog
-            title={`Delete confirmation`}
-            primaryActionLabel={'Delete'}
-            onPrimaryAction={onDelete}
-            onCancel={onClose}
-            secondaryActionLabel={'Close'}
-        >
-            <Content>
-                <Text>Are you sure you want to delete the {`"${datasetView.name}"`} dataset view?</Text>
-            </Content>
-        </AlertDialog>
-    );
-};
 
 type DatasetViewsTriggerProps = {
     selectedDatasetView: DatasetView;
@@ -113,10 +82,6 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
         setDatasetViewToBeRenamed(datasetView);
     };
 
-    const handleDelete = () => {
-        setDatasetViewToBeDeleted(null);
-    };
-
     const handleCloseDeleteDialog = () => {
         setDatasetViewToBeDeleted(null);
     };
@@ -168,11 +133,7 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
 
             <DialogContainer onDismiss={handleCloseDeleteDialog}>
                 {datasetViewToBeDeleted !== null && (
-                    <DeleteDatasetViewDialog
-                        datasetView={datasetViewToBeDeleted}
-                        onDelete={handleDelete}
-                        onClose={handleCloseDeleteDialog}
-                    />
+                    <DeleteDatasetViewDialog datasetView={datasetViewToBeDeleted} onClose={handleCloseDeleteDialog} />
                 )}
             </DialogContainer>
             <DialogContainer onDismiss={handleCloseRenameDialog}>

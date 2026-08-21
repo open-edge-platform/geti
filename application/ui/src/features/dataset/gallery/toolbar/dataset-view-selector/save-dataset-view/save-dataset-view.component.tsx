@@ -68,7 +68,13 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds, datasetViews }: Save
                 <Button variant={'secondary'} onPress={onClose}>
                     Close
                 </Button>
-                <Button variant={'accent'} type={'submit'} form={'view-name-form'} isDisabled={isSaveDisabled}>
+                <Button
+                    variant={'accent'}
+                    type={'submit'}
+                    form={'view-name-form'}
+                    isDisabled={isSaveDisabled}
+                    isPending={createDatasetViewMutation.isPending}
+                >
                     Save
                 </Button>
             </ButtonGroup>

@@ -66,7 +66,12 @@ export const RenameDatasetView = ({ datasetView, onClose, datasetViews }: Rename
                 <Button variant={'secondary'} onPress={onClose}>
                     Cancel
                 </Button>
-                <Button type={'submit'} form={'rename-dataset-view-name'} isDisabled={isSaveDisabled}>
+                <Button
+                    type={'submit'}
+                    form={'rename-dataset-view-name'}
+                    isDisabled={isSaveDisabled}
+                    isPending={renameDatasetViewMutation.isPending}
+                >
                     Save
                 </Button>
             </ButtonGroup>
