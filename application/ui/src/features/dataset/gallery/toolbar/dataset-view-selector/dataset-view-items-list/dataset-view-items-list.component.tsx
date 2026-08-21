@@ -11,6 +11,34 @@ import { isEmpty } from 'lodash-es';
 
 import classes from './dataset-view-items-list.module.scss';
 
+type DatasetViewItemContainerProps = {
+    datasetView: DatasetView;
+    isSelected: boolean;
+    onSelectDatasetView: (datasetViewId: string) => void;
+    children: ReactNode;
+};
+
+const DatasetViewItemContainer = ({
+    datasetView,
+    isSelected,
+    onSelectDatasetView,
+    children,
+}: DatasetViewItemContainerProps) => {
+    return (
+        <li aria-label={datasetView.name} onClick={() => onSelectDatasetView(datasetView.id)}>
+            <View
+                padding={'size-200'}
+                borderRadius={'regular'}
+                UNSAFE_className={clsx(classes.datasetViewInListItem, {
+                    [classes.datasetViewListItemSelected]: isSelected,
+                })}
+            >
+                {children}
+            </View>
+        </li>
+    );
+};
+
 type DatasetViewItemProps = {
     datasetView: DatasetView;
     isSelected: boolean;
