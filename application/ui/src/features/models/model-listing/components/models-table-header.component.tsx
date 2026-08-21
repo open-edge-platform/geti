@@ -42,6 +42,7 @@ export const ModelsTableHeader = () => {
                 label={groupBy === 'architecture' ? 'Dataset' : 'Architecture'}
                 isSorted={sortBy === 'architecture' || sortBy === 'dataset'}
             />
+            <ColumnHeader label='Device' isSorted={sortBy === 'device'} />
             <ColumnHeader label='Total size' isSorted={sortBy === 'size'} />
             <ColumnHeader label={performanceColumnName} isSorted={sortBy === 'score'} />
             <div />

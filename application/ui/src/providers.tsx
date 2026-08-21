@@ -5,7 +5,6 @@ import { ThemeProvider } from '@geti-ui/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
 
-import { Toast } from './components/toast/toast.component';
 import { queryClient } from './query-client/query-client';
 import { router } from './router';
 
@@ -19,9 +18,6 @@ export const Providers = () => {
                         v7_startTransition: true,
                     }}
                 />
-                <div data-react-aria-top-layer='true'>
-                    <Toast />
-                </div>
             </ThemeProvider>
         </QueryClientProvider>
     );

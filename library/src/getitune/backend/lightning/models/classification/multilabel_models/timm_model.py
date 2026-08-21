@@ -17,8 +17,8 @@ from getitune.backend.lightning.models.classification.losses.asymmetric_angular_
 from getitune.backend.lightning.models.classification.multilabel_models.base import (
     LightningMultilabelClsModel,
 )
-from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
 from getitune.backend.lightning.models.classification.utils.pretrained_weights import TimmWeightsLoader
+from getitune.backend.lightning.models.classification.utils.timm import get_preprocessing_params
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiLabelClsMetricCallable
 from getitune.types.label import LabelInfoTypes
@@ -82,7 +82,7 @@ class TimmModelMultilabelCls(TimmWeightsLoader, LightningMultilabelClsModel):
         backbone = TimmBackbone(model_name=self.model_name)
         return ImageClassifier(
             backbone=backbone,
-            neck=GlobalAveragePooling(dim=2),
+            neck=None,
             head=MultiLabelLinearClsHead(
                 num_classes=num_classes,
                 in_channels=backbone.num_features,
@@ -98,3 +98,7 @@ class TimmModelMultilabelCls(TimmWeightsLoader, LightningMultilabelClsModel):
             return self.model(images=image, mode="explain")
 
         return self.model(images=image, mode="tensor")
+
+    @property
+    def _default_preprocessing_params(self) -> DataInputParams | dict[str, DataInputParams]:
+        return get_preprocessing_params(backbone_name=self.model_name)
