@@ -746,6 +746,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 model_id=params.model_id,
                 status=TrainingStatus.IN_PROGRESS,
                 training_started_at=training_start_time,
+                training_device=params.device,
             )
             trained_model_path, getitune_engine = self.train_model(
                 training_config=getitune_training_config,
@@ -942,6 +943,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         status: TrainingStatus,
         training_started_at: datetime | None = None,
         training_finished_at: datetime | None = None,
+        training_device: DeviceInfo | None = None,
     ):
         with self._db_session_factory() as db:
             self._model_service.set_db_session(db)
@@ -951,6 +953,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 training_status=status,
                 training_started_at=training_started_at,
                 training_finished_at=training_finished_at,
+                training_device=training_device,
             )
 
     def __delete_model_revision(self, project_id: UUID, model_id: UUID):

@@ -7,6 +7,8 @@ import { getMockedDatasetRevision } from 'mocks/mock-dataset-revision';
 import { render } from 'test-utils/render';
 
 import { getMockedModel, getMockedModelArchitecture } from '../../../../../../mocks/mock-model';
+import { formatDateTime, formatTrainingDateTime } from '../../../../../shared/date-utils';
+import { formatBytes } from '../../../../../shared/util';
 import { ModelRow } from './model-row.component';
 
 describe('ModelRow', () => {
@@ -18,12 +20,35 @@ describe('ModelRow', () => {
         training_info: {
             status: 'successful',
             label_schema_revision: {
-                labels: [],
+                labels: [
+                    { id: 'label-1', name: 'cat' },
+                    { id: 'label-2', name: 'dog' },
+                ],
             },
             start_time: '2025-01-10T10:00:00.000000+00:00',
             end_time: '2025-01-10T12:30:00.000000+00:00',
             dataset_revision_id: 'dataset-123',
+            device: {
+                type: 'cuda',
+                name: 'NVIDIA RTX 3090',
+            },
         },
+        variants: [
+            {
+                id: 'variant-123',
+                format: 'pytorch',
+                precision: 'fp32',
+                weights_size: 1024,
+                files_deleted: false,
+                evaluations: [
+                    {
+                        dataset_revision_id: 'dataset-123',
+                        subset: 'testing',
+                        metrics: [{ name: 'mAP', value: 0.85, primary: true }],
+                    },
+                ],
+            },
+        ],
     });
 
     const datasetRevision = getMockedDatasetRevision({
@@ -51,18 +76,22 @@ describe('ModelRow', () => {
             );
 
             expect(screen.getByTestId('model-name')).toHaveTextContent('Test Model');
+            expect(
+                screen.getByText(formatTrainingDateTime(defaultModel.training_info.end_time).replace(/\n/g, ' '))
+            ).toBeInTheDocument();
 
             const datasetBadge = screen.getByTestId('dataset-count');
             const labelsBadge = screen.getByTestId('labels-count');
-            const labelSchemaRevision = defaultModel.training_info.label_schema_revision ?? {};
-            const labelsCount =
-                'labels' in labelSchemaRevision && Array.isArray(labelSchemaRevision.labels)
-                    ? labelSchemaRevision.labels.length
-                    : '';
 
             expect(screen.getByText(datasetRevision.name)).toBeInTheDocument();
-            expect(within(datasetBadge).getByText(datasetRevision.item_counts?.total?.toString() ?? ''));
-            expect(within(labelsBadge).getByText(labelsCount));
+            expect(screen.getByText(formatDateTime(datasetRevision.created_at))).toBeInTheDocument();
+            expect(within(datasetBadge).getByText('10')).toBeInTheDocument();
+            expect(within(labelsBadge).getByText('2')).toBeInTheDocument();
+
+            expect(screen.getByTestId('device info')).toHaveTextContent('NVIDIA RTX 3090');
+            expect(screen.getByTestId('model size')).toHaveTextContent(formatBytes(defaultModel.size));
+            expect(screen.getByLabelText('Model accuracy')).toHaveTextContent('85%');
+
             expect(screen.queryByText(new RegExp(modelArchitecture.name))).not.toBeInTheDocument();
             expect(screen.queryByText(modelArchitecture.performanceCategory ?? '')).not.toBeInTheDocument();
         });
@@ -78,9 +107,17 @@ describe('ModelRow', () => {
             );
 
             expect(screen.getByTestId('model-name')).toHaveTextContent('Test Model');
+            expect(
+                screen.getByText(formatTrainingDateTime(defaultModel.training_info.end_time).replace(/\n/g, ' '))
+            ).toBeInTheDocument();
 
-            expect(screen.getByText(new RegExp(modelArchitecture.name))).toBeInTheDocument();
+            expect(screen.getByText(`${modelArchitecture.name} (${modelArchitecture.license})`)).toBeInTheDocument();
             expect(screen.getByText(modelArchitecture.performanceCategory ?? '')).toBeInTheDocument();
+
+            expect(screen.getByTestId('device info')).toHaveTextContent('NVIDIA RTX 3090');
+            expect(screen.getByTestId('model size')).toHaveTextContent(formatBytes(defaultModel.size));
+            expect(screen.getByLabelText('Model accuracy')).toHaveTextContent('85%');
+
             expect(screen.queryByText(datasetRevision.name)).not.toBeInTheDocument();
             expect(screen.queryByTestId('dataset-count')).not.toBeInTheDocument();
             expect(screen.queryByTestId('labels-count')).not.toBeInTheDocument();

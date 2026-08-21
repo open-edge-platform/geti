@@ -34,6 +34,9 @@ class DatasetViewService(BaseSessionManagedService):
         - Uploading media while a specific view is selected is a two-step client-side operation (handled by the
           UI): (1) upload the media via the regular ``/dataset/media`` endpoint, then (2) assign it to the
           selected view via :meth:`assign_media`.
+
+    NOTE: This is a work-in-progress feature. The API surface (routers, schemas, dependencies) is fully wired up,
+    but the business logic is not implemented yet; every method below raises ``NotImplementedError``.
     """
 
     def __init__(self, db_session: Session | None = None) -> None:
