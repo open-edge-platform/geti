@@ -135,8 +135,7 @@ def _compute_stats(model_name: str) -> dict[str, float]:
     params = sum(parameter.numel() for parameter in model.parameters())
     inputs = torch.zeros((1, *cfg.input_size))
 
-    with torch.no_grad():
-        flops = measure_flops(lambda: model(inputs))
+    flops = measure_flops(lambda: model(inputs))
 
     return {
         "trainable_parameters": round(params / 1_000_000, 1),

@@ -109,7 +109,7 @@ def _build_timm_card_entry() -> ModelArchitectureView:
         family="timm",
         version=None,
         pretrained=None,
-        description="Choose any of 1400+ timm backbones.",
+        description="Choose any of 1700+ timm backbones.",
         capabilities=Capabilities(xai=False, tiling=False),
         license="Apache 2.0",
         stats=None,
