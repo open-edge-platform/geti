@@ -11,7 +11,8 @@ from app.models.model_manifest import (
     ModelManifest,
     ModelManifestDeprecationStatus,
     ModelStats,
-    WeightsSource,
+    TimmMetadata,
+    TimmPretrainedWeights,
 )
 from app.models.training_configuration import AlgoLevelParameters, AlgoLevelTrainingParameters
 from app.supported_models.timm.catalog import _snapshot
@@ -35,7 +36,7 @@ def _license_of(model_name: str) -> str:
     try:
         info = huggingface_hub.model_info(f"timm/{model_name}")
     except huggingface_hub.errors.HfHubHTTPError:
-        logger.warning("No model card found on the Hub for %s; defaulting license to {}", model_name, _DEFAULT_LICENSE)
+        logger.warning("No model card found on the Hub for {}; defaulting license to {}", model_name, _DEFAULT_LICENSE)
         return _DEFAULT_LICENSE
 
     if info.card_data is None or not info.card_data.license:
@@ -60,13 +61,14 @@ class TimmManifestProvider:
             id=model_name_to_id(model_name),
             name=f"timm/{model_name}",
             license=_license_of(model_name),
-            family=e["family"],
-            version=e["version"],
-            pretrained=e["pretrained"],
             task=TaskType.CLASSIFICATION,
             description=f"timm backbone '{model_name}'.",
-            pretrained_weights=None,
-            weights_source=WeightsSource.TIMM_MANAGED,
+            timm_metadata=TimmMetadata(
+                family=e["family"],
+                variant=e["version"],
+                pretrained_tag=e["pretrained"],
+            ),
+            pretrained_weights=TimmPretrainedWeights(),
             support_status=ModelManifestDeprecationStatus.ACTIVE,
             capabilities=Capabilities(xai=False, tiling=False),
             stats=ModelStats(

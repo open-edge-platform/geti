@@ -78,7 +78,7 @@ def get_timm_pretrained_tags(family: str, variant: str) -> list[str]:
     },
 )
 def get_timm_manifest(family: str, variant: str, pretrained_tag: str) -> ModelArchitectureView:
-    """Get all available timm pretrained tags for a given family and version."""
+    """Build and return the TIMM manifest view for a specific family, variant, and pretrained tag."""
     model_name = TimmCatalog.get_model_name(family, variant, pretrained_tag)
     if model_name is None:
         raise HTTPException(
@@ -106,12 +106,10 @@ def _build_timm_card_entry() -> ModelArchitectureView:
         id=TIMM_CARD_ID,
         task=TaskType.CLASSIFICATION,
         name="Custom backbone (timm)",
-        family="timm",
-        version=None,
-        pretrained=None,
+        timm_metadata=None,
         description="Choose any of 1700+ timm backbones.",
         capabilities=Capabilities(xai=False, tiling=False),
-        license="Apache 2.0",
+        license=None,
         stats=None,
         support_status=ModelManifestDeprecationStatus.ACTIVE,
     )

@@ -145,9 +145,7 @@ class TestModelArchitecturesEndpoint:
 
         assert timm_card["task"] == "classification"
         assert timm_card["name"] == "Custom backbone (timm)"
-        assert timm_card["family"] == "timm"
-        assert timm_card["version"] is None
-        assert timm_card["pretrained"] is None
+        assert timm_card["timm_metadata"] is None
         assert timm_card["capabilities"]["xai"] is False
         assert timm_card["capabilities"]["tiling"] is False
         assert timm_card["stats"] is None
@@ -175,9 +173,10 @@ class TestModelArchitecturesEndpoint:
         data = response.json()
         assert data["id"].startswith("image-classification-timm-")
         assert data["task"] == "classification"
-        assert data["family"] == family
-        assert data["version"] == variant
-        assert data["pretrained"] == pretrained_tag
+        assert data["timm_metadata"] is not None
+        assert data["timm_metadata"]["family"] == family
+        assert data["timm_metadata"]["variant"] == variant
+        assert data["timm_metadata"]["pretrained_tag"] == pretrained_tag
         assert data["capabilities"]["xai"] is False
         assert data["capabilities"]["tiling"] is False
         assert data["support_status"] == "active"

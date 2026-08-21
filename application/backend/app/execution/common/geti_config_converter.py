@@ -747,7 +747,7 @@ class GetiConfigConverter:
         """Inject the selected timm backbone name and its native preprocessing.
 
         timm_generic.yaml is architecture-agnostic; the concrete backbone and its
-        pretrained_cfg-derived input size/mean/std are only known once the user
+        pretrained_cfg-derived input size is only known once the user
         has selected a specific backbone (encoded in model_manifest_id).
         """
         from app.supported_models.timm import TimmManifestProvider
@@ -777,7 +777,7 @@ class GetiConfigConverter:
 
     @staticmethod
     def _get_params(hyperparameters: dict) -> dict:
-        """Get configuraable parameters from ModelTemplate config hyperparameters field."""
+        """Get configurable parameters from ModelTemplate config hyperparameters field."""
         param_dict = {}
         for param_name, param_info in hyperparameters.items():
             if isinstance(param_info, dict):

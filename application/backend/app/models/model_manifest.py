@@ -3,6 +3,7 @@
 
 from enum import StrEnum
 from pathlib import Path
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -88,10 +89,18 @@ class Capabilities(BaseModel):
     )
 
 
-class PretrainedWeights(BaseModel):
-    """Pretrained weights information."""
+class WeightsSource(StrEnum):
+    """Source of pretrained weights for a model architecture."""
+
+    TIMM = "timm"  # Weights are managed by the timm library
+    DIRECT_LINK = "direct_link"  # Weights URL and checksum are defined directly in the manifest file
+
+
+class DirectLinkPretrainedWeights(BaseModel):
+    """Pretrained weights provided via a direct download link."""
 
     model_config = ConfigDict(extra="forbid")
+    source: Literal[WeightsSource.DIRECT_LINK] = WeightsSource.DIRECT_LINK
     url: str = Field(title="Weights URL", description="URL to download the pretrained weights")
     mirror_url: str | None = Field(
         default=None, title="Weights mirror URL", description="Alternative URL to download the weights"
@@ -111,11 +120,27 @@ class PretrainedWeights(BaseModel):
         return self.cache_filename or Path(self.url).name
 
 
-class WeightsSource(StrEnum):
-    """Source of pretrained weights for a model architecture."""
+class TimmPretrainedWeights(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    source: Literal[WeightsSource.TIMM] = WeightsSource.TIMM
 
-    TIMM_MANAGED = "timm_managed"  # Weights are managed by the timm library
-    GETI_HOSTED = "geti_hosted"  # Weights URL and checksum are defined directly in the manifest file
+
+PretrainedWeights = Annotated[
+    DirectLinkPretrainedWeights | TimmPretrainedWeights,
+    Field(discriminator="source"),
+]
+
+
+class TimmMetadata(BaseModel):
+    """Metadata specific to timm backbones."""
+
+    model_config = ConfigDict(extra="forbid")
+    family: str = Field(title="Model family", description="Family or category of the model architecture")
+    variant: str = Field(title="Model variant", description="Specific variant of the model architecture")
+    pretrained_tag: str = Field(
+        title="Pretrained tag",
+        description="Pretrained tag of the model (e.g. timm's pretraining tag such as 'in22k_ft_in22k')",
+    )
 
 
 class ModelManifest(BaseModel):
@@ -127,27 +152,11 @@ class ModelManifest(BaseModel):
     license: str = Field(
         default="Apache 2.0", title="License", description="License under which the model architecture is released"
     )
-    pretrained_weights: PretrainedWeights | None = Field(
-        default=None, title="Pretrained Weights", description="URL and SHA sum of the pretrained weights"
+    pretrained_weights: PretrainedWeights = Field(
+        title="Pretrained Weights", description="Information about the pretrained weights for the model architecture"
     )
-    family: str | None = Field(
-        default=None, title="Model family", description="Family or category of the model architecture"
-    )
-    version: str | None = Field(
-        default=None,
-        title="Model Version",
-        description="Identifier for the specific version from the model family, e.g., 'v1', 'v2', or a specific "
-        "variant like 'b0', 'b1', etc.",
-    )
-    pretrained: str | None = Field(
-        default=None,
-        title="Pretrained Tag",
-        description="Pretrained tag of the model (e.g. timm's pretraining tag such as 'in22k_ft_in22k')",
-    )
-    weights_source: WeightsSource = Field(
-        title="Weights Source",
-        description="Source of pretrained weights for the model architecture (timm-managed or geti-hosted)",
-        default=WeightsSource.GETI_HOSTED,
+    timm_metadata: TimmMetadata | None = Field(
+        default=None, title="TIMM Metadata", description="Metadata specific to timm backbones"
     )
     description: str = Field(title="Description", description="Detailed description of the model capabilities")
     task: TaskType = Field(title="Task Type", description="Type of machine learning task addressed by the model")
@@ -167,7 +176,10 @@ class ModelManifest(BaseModel):
     @model_validator(mode="after")
     def validate_metrics(self) -> "ModelManifest":
         if self.task in {TaskType.CLASSIFICATION}:
-            if self.pretrained_weights is not None and self.stats.benchmark_metrics.imagenet_top1_accuracy is None:
+            if (
+                isinstance(self.pretrained_weights, DirectLinkPretrainedWeights)
+                and self.stats.benchmark_metrics.imagenet_top1_accuracy is None
+            ):
                 raise ValueError("For classification 'imagenet_top1_accuracy' benchmark metric is required")
             if (
                 self.stats.benchmark_metrics.coco_map_50 is not None

@@ -12,7 +12,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
 from app.models import ModelManifest, TaskType
-from app.models.model_manifest import PretrainedWeights
+from app.models.model_manifest import DirectLinkPretrainedWeights
 
 from .model_manifest_service import ModelManifestService
 
@@ -43,7 +43,7 @@ class BaseWeightsService:
             str: The remote URL of the pretrained weights
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
-        pretrained_weights = cast(PretrainedWeights, manifest.pretrained_weights)
+        pretrained_weights = cast(DirectLinkPretrainedWeights, manifest.pretrained_weights)
         return pretrained_weights.url
 
     def get_local_weights_path(self, task: TaskType, model_manifest_id: str, allow_download: bool = True) -> Path:
@@ -65,7 +65,7 @@ class BaseWeightsService:
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
 
-        pretrained_weights = cast(PretrainedWeights, manifest.pretrained_weights)
+        pretrained_weights = cast(DirectLinkPretrainedWeights, manifest.pretrained_weights)
         local_filename = pretrained_weights.local_filename
         local_path = self.pretrained_weights_dir / task.name.lower() / local_filename
         if local_path.exists():
@@ -103,7 +103,7 @@ class BaseWeightsService:
             bool: True if weights were successfully removed, False if they didn't exist
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
-        pretrained_weights = cast(PretrainedWeights, manifest.pretrained_weights)
+        pretrained_weights = cast(DirectLinkPretrainedWeights, manifest.pretrained_weights)
         local_path = self.pretrained_weights_dir / task.name.lower() / pretrained_weights.local_filename
         if local_path.exists():
             try:
@@ -316,6 +316,4 @@ class BaseWeightsService:
         manifest = ModelManifestService.get_model_manifest_by_id(model_manifest_id)
         if manifest.task != task:
             raise ValueError(f"Task mismatch: expected '{task.name.lower()}', got '{manifest.task.lower()}'")
-        if manifest.pretrained_weights is None:
-            raise ValueError(f"Model manifest '{model_manifest_id}' does not have pretrained weights configured")
         return manifest

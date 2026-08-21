@@ -71,12 +71,12 @@ class TestTimmManifestProvider:
         assert manifest.id == model_name_to_id("resnet18.a1_in1k")
         assert manifest.name == "timm/resnet18.a1_in1k"
         assert manifest.license == "apache-2.0"
-        assert manifest.family == "resnet"
-        assert manifest.version == "resnet18"
-        assert manifest.pretrained == "a1_in1k"
+        assert manifest.timm_metadata is not None
+        assert manifest.timm_metadata.family == "resnet"
+        assert manifest.timm_metadata.variant == "resnet18"
+        assert manifest.timm_metadata.pretrained_tag == "a1_in1k"
         assert manifest.task == TaskType.CLASSIFICATION
-        assert manifest.weights_source == WeightsSource.TIMM_MANAGED
-        assert manifest.pretrained_weights is None
+        assert manifest.pretrained_weights.source == WeightsSource.TIMM
         assert manifest.support_status == ModelManifestDeprecationStatus.ACTIVE
         assert manifest.stats.gigaflops == 1.8
         assert manifest.stats.trainable_parameters == 11.7
