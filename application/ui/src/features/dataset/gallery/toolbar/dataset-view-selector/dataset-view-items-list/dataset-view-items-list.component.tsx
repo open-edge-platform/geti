@@ -3,11 +3,12 @@
 
 import { Key, ReactNode } from 'react';
 
-import { DatasetView } from '@/api/types';
 import { ActionButton, Divider, Flex, Heading, Item, Menu, MenuTrigger, View } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { isEmpty } from 'lodash-es';
+
+import { DatasetView } from '../type';
 
 import classes from './dataset-view-items-list.module.scss';
 

@@ -21,13 +21,9 @@ import { Info } from '@geti-ui/ui/icons';
 import { isEmpty } from 'lodash-es';
 
 import { SelectedMediaCount } from '../selected-media-count/selected-media-count.component';
+import { DatasetView } from '../type';
 
 import classes from './assign-to-existing-view.module.scss';
-
-type DatasetView = {
-    id: string;
-    name: string;
-};
 
 type AssignToExistingViewDialogProps = {
     datasetViews: DatasetView[];

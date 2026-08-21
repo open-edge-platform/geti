@@ -6,7 +6,7 @@ import { FormEvent, useState } from 'react';
 import { Button, ButtonGroup, Content, Dialog, Divider, Form, Heading, TextField } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
 
-import { DatasetView } from './dataset-view-items-list/dataset-view-items-list.component';
+import { DatasetView } from './type';
 
 type RenameDatasetViewProps = {
     datasetView: DatasetView;

@@ -3,13 +3,13 @@
 
 import { FormEvent, useState } from 'react';
 
-import { DatasetView } from '@/api/types';
 import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading, TextField } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
 import { useCreateDatasetViewMutation } from '../api/use-create-dataset-view';
 import { SelectedMediaCount } from '../selected-media-count/selected-media-count.component';
+import { DatasetView } from '../type';
 
 type SaveDatasetViewDialogProps = {
     onClose: () => void;
