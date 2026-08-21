@@ -177,7 +177,11 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
             </DialogContainer>
             <DialogContainer onDismiss={handleCloseRenameDialog}>
                 {datasetViewToBeRenamed && (
-                    <RenameDatasetView datasetView={datasetViewToBeRenamed} onClose={handleCloseRenameDialog} />
+                    <RenameDatasetView
+                        datasetView={datasetViewToBeRenamed}
+                        onClose={handleCloseRenameDialog}
+                        datasetViews={datasetViews.filter((view) => view.id !== datasetViewToBeRenamed.id)}
+                    />
                 )}
             </DialogContainer>
         </Flex>
