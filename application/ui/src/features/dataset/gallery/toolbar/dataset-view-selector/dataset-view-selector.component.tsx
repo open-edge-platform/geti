@@ -24,10 +24,6 @@ import { EditDatasetView } from './edit-dataset-view.component';
 
 import classes from './dataset-view-selector.module.scss';
 
-// Copyright (C) 2025-2026 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
-// Copyright (C) 2025-2026 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
 type DeleteDatasetViewDialogProps = {
     datasetView: DatasetView;
     onDelete: () => void;
