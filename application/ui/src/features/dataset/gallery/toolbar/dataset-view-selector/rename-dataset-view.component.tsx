@@ -4,8 +4,10 @@
 import { FormEvent, useState } from 'react';
 
 import { Button, ButtonGroup, Content, Dialog, Divider, Form, Heading, TextField } from '@geti-ui/ui';
+import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
+import { useRenameDatasetViewMutation } from './api/use-rename-dataset-view-mutation';
 import { DatasetView } from './type';
 
 type RenameDatasetViewProps = {
@@ -15,14 +17,32 @@ type RenameDatasetViewProps = {
 };
 
 export const RenameDatasetView = ({ datasetView, onClose, datasetViews }: RenameDatasetViewProps) => {
+    const projectId = useProjectIdentifier();
     const [newName, setNewName] = useState(datasetView.name);
+    const renameDatasetViewMutation = useRenameDatasetViewMutation();
 
     const isDuplicateName = datasetViews.some((view) => view.name === newName.trim());
     const isSaveDisabled = newName === datasetView.name || isEmpty(newName.trim()) || isDuplicateName;
 
     const rename = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        onClose();
+
+        renameDatasetViewMutation.mutate(
+            {
+                params: {
+                    path: {
+                        project_id: projectId,
+                        dataset_view_id: datasetView.id,
+                    },
+                },
+                body: {
+                    name: newName,
+                },
+            },
+            {
+                onSuccess: onClose,
+            }
+        );
     };
 
     return (
