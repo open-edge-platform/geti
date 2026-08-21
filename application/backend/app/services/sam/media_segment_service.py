@@ -50,11 +50,6 @@ SAM_ENCODER_CONFIGURATION = {
 # reproduces on macOS ARM. Pin f32 explicitly on every platform.
 SAM_ENCODER_PLUGIN_CONFIG = {"INFERENCE_PRECISION_HINT": "f32"}
 
-# OpenVINO's blob cache does NOT key on INFERENCE_PRECISION_HINT, so a cache populated
-# before the hint was pinned would silently keep serving the f16 blob. Compiling into a
-# dedicated sub-directory sidesteps that; bump the name whenever the encoder config changes.
-SAM_ENCODER_CACHE_NAMESPACE = "encoder-f32"
-
 
 class MediaSegmentService(BaseSessionManagedService):
     def __init__(
@@ -80,9 +75,7 @@ class MediaSegmentService(BaseSessionManagedService):
         core = create_core()
         core.set_property({"PERFORMANCE_HINT": "LATENCY"})
         if self.ov_cache_path is not None:
-            cache_dir = self.ov_cache_path / SAM_ENCODER_CACHE_NAMESPACE
-            cache_dir.mkdir(parents=True, exist_ok=True)
-            core.set_property({"CACHE_DIR": str(cache_dir)})
+            core.set_property({"CACHE_DIR": str(self.ov_cache_path)})
         adapter = OpenvinoAdapter(
             core,
             str(self.model_xml_path),
