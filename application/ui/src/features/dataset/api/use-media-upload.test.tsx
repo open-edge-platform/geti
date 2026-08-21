@@ -6,7 +6,6 @@ import { getMockedMediaImage } from 'mocks/mock-media';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 import { v4 as uuid } from 'uuid';
-import { vi } from 'vitest';
 
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
@@ -36,16 +35,6 @@ const uploadMediaAndWaitForCompletion = async (
 };
 
 describe('useMediaUpload', () => {
-    beforeEach(() => {
-        vi.useFakeTimers({ shouldAdvanceTime: true });
-    });
-
-    afterEach(() => {
-        vi.runOnlyPendingTimers();
-        vi.useRealTimers();
-        vi.clearAllMocks();
-    });
-
     it('uploads all selected files', async () => {
         const uploadedFileNames: string[] = [];
 
