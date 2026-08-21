@@ -20,6 +20,7 @@ import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view
 import { isEmpty } from 'lodash-es';
 
 import { DatasetView, DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
+import { RenameDatasetView } from './rename-dataset-view.component';
 
 import classes from './dataset-view-selector.module.scss';
 
@@ -61,7 +62,7 @@ const DatasetViewsTrigger = ({ selectedDatasetView, isDisabled }: DatasetViewsTr
             >
                 <View
                     paddingX={'size-150'}
-                    paddingY={'size-50'}
+                    paddingY={'size-100'}
                     borderRadius={'regular'}
                     maxWidth={'size-2400'}
                     UNSAFE_className={clsx(classes.datasetViewsTrigger, {
@@ -69,7 +70,7 @@ const DatasetViewsTrigger = ({ selectedDatasetView, isDisabled }: DatasetViewsTr
                     })}
                 >
                     <Flex alignItems={'center'} gap={'size-200'}>
-                        <Text>{selectedDatasetView.name}</Text>
+                        <Text UNSAFE_className={classes.datasetViewName}>{selectedDatasetView.name}</Text>
 
                         <ChevronDownSmall />
                     </Flex>
@@ -90,6 +91,7 @@ const ENTIRE_DATASET = {
 
 export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) => {
     const [isDatasetViewSelectorOpen, setIsDatasetViewSelectorOpen] = useState<boolean>(false);
+
     const datasetViewsWithDefaultView = useMemo(() => {
         return [ENTIRE_DATASET, ...datasetViews];
     }, [datasetViews]);
@@ -98,19 +100,28 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
     const selectedDatasetView = datasetViewsWithDefaultView.find((item) => item.id === datasetViewId) ?? ENTIRE_DATASET;
 
     const [datasetViewToBeDeleted, setDatasetViewToBeDeleted] = useState<DatasetView | null>(null);
-    const isDeleteDialogOpen = datasetViewToBeDeleted !== null;
+    const [datasetViewToBeRenamed, setDatasetViewToBeRenamed] = useState<DatasetView | null>(null);
 
     const openDeleteConfirmationDialog = (datasetView: DatasetView) => {
         setIsDatasetViewSelectorOpen(false);
         setDatasetViewToBeDeleted(datasetView);
     };
 
+    const openRenameDialog = (datasetView: DatasetView) => {
+        setIsDatasetViewSelectorOpen(false);
+        setDatasetViewToBeRenamed(datasetView);
+    };
+
     const handleDelete = () => {
         setDatasetViewToBeDeleted(null);
     };
 
-    const handleClose = () => {
+    const handleCloseDeleteDialog = () => {
         setDatasetViewToBeDeleted(null);
+    };
+
+    const handleCloseRenameDialog = () => {
+        setDatasetViewToBeRenamed(null);
     };
 
     const onlyEntireDatasetView = isEmpty(datasetViews);
@@ -148,18 +159,24 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
                             selectedDatasetViewId={datasetViewId}
                             onOpenDeleteConfirmationDialog={openDeleteConfirmationDialog}
                             onSelectDatasetView={onSelectDatasetView}
+                            onOpenRenameDialog={openRenameDialog}
                         />
                     </Content>
                 </Dialog>
             </DialogTrigger>
 
-            <DialogContainer onDismiss={handleClose}>
-                {isDeleteDialogOpen && (
+            <DialogContainer onDismiss={handleCloseDeleteDialog}>
+                {datasetViewToBeDeleted !== null && (
                     <DeleteDatasetViewDialog
                         datasetView={datasetViewToBeDeleted}
                         onDelete={handleDelete}
-                        onClose={handleClose}
+                        onClose={handleCloseDeleteDialog}
                     />
+                )}
+            </DialogContainer>
+            <DialogContainer onDismiss={handleCloseRenameDialog}>
+                {datasetViewToBeRenamed && (
+                    <RenameDatasetView datasetView={datasetViewToBeRenamed} onClose={handleCloseRenameDialog} />
                 )}
             </DialogContainer>
         </Flex>
