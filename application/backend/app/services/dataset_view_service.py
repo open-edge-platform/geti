@@ -53,11 +53,23 @@ class DatasetViewService(BaseSessionManagedService):
         return db_dataset_view
 
     def _validate_media_exist(self, project_id: UUID, media_ids: list[UUID]) -> None:
-        """Raise ResourceNotFoundError if any of the given media ids does not exist in the project."""
+        """
+        Raise ResourceNotFoundError if any of the given media ids does not exist in the project, or if it
+        refers to a video frame.
+
+        Dataset view membership is only tracked at the image/video level (see class docstring); video frames
+        are considered part of a view solely via their parent video. Video frame ids are therefore treated as
+        non-existent in this context, to keep view membership consistent across all of the service's read
+        paths (media listing/counting explicitly exclude frames, and items/statistics derive frame membership
+        from the parent video rather than from any direct frame assignment).
+        """
         media_repo = MediaRepository(project_id=str(project_id), db=self.db_session)
-        found_ids = {db_media.id for db_media in media_repo.get_by_ids([str(media_id) for media_id in media_ids])}
+        found_media = {
+            db_media.id: db_media.type for db_media in media_repo.get_by_ids([str(media_id) for media_id in media_ids])
+        }
         for media_id in media_ids:
-            if str(media_id) not in found_ids:
+            media_type = found_media.get(str(media_id))
+            if media_type is None or media_type == MediaType.VIDEO_FRAME:
                 raise ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
 
     def create_dataset_view(self, project_id: UUID, name: str, media_ids: list[UUID] | None = None) -> DatasetView:
