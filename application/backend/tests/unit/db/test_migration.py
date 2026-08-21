@@ -10,7 +10,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
-from alembic.util.exc import CommandError
+from alembic.script.revision import ResolutionError
 
 from app.db.migration import MigrationManager, RevisionNotFoundError
 
@@ -49,7 +49,7 @@ def _mock_migration_script(current_head: str, known_revisions: set[str]) -> Magi
 
     def _get_revision(rev_id: str) -> MagicMock:
         if rev_id not in known_revisions:
-            raise CommandError(f"Can't locate revision identified by '{rev_id}'")
+            raise ResolutionError("Can't locate revision", rev_id)
         return MagicMock()
 
     script.get_revision.side_effect = _get_revision
