@@ -254,7 +254,6 @@ class PipelineService(BaseSessionManagedService):
         """Get the confidence threshold embedded in the files of the given model variant."""
         if model_id is None or model_variant_id is None or self._model_service is None:
             return None
-        self._model_service.set_db_session(self.db_session)
         try:
             return self._model_service.get_optimal_confidence_threshold(
                 project_id=project_id, model_id=model_id, variant_id=model_variant_id
