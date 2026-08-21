@@ -48,26 +48,26 @@ type DatasetViewItemProps = {
     isSelected: boolean;
     onSelectDatasetView: (datasetViewId: string) => void;
     onOpenDeleteConfirmationDialog: (datasetView: DatasetView) => void;
-    onOpenEditDialog: (datasetView: DatasetView) => void;
+    onOpenRenameDialog: (datasetView: DatasetView) => void;
 };
 
 const DATASET_VIEW_ITEM_OPTIONS = {
     DELETE: 'Delete',
-    EDIT: 'Edit',
+    RENAME: 'Rename',
 };
 
 const DatasetViewItem = ({
     datasetView,
     isSelected,
-    onOpenEditDialog,
+    onOpenRenameDialog,
     onSelectDatasetView,
     onOpenDeleteConfirmationDialog,
 }: DatasetViewItemProps) => {
     const handleAction = (key: Key) => {
         if (key === DATASET_VIEW_ITEM_OPTIONS.DELETE) {
             onOpenDeleteConfirmationDialog(datasetView);
-        } else if (key === DATASET_VIEW_ITEM_OPTIONS.EDIT) {
-            onOpenEditDialog(datasetView);
+        } else if (key === DATASET_VIEW_ITEM_OPTIONS.RENAME) {
+            onOpenRenameDialog(datasetView);
         }
     };
 
@@ -86,9 +86,9 @@ const DatasetViewItem = ({
                         <ActionButton isQuiet aria-label={`Dataset view actions for ${datasetView.name}`}>
                             <MoreMenu />
                         </ActionButton>
-                        <Menu onAction={handleAction} aria-label={'Media actions menu'}>
-                            <Item key={DATASET_VIEW_ITEM_OPTIONS.EDIT}>Edit</Item>
-                            <Item key={DATASET_VIEW_ITEM_OPTIONS.DELETE}>Delete</Item>
+                        <Menu onAction={handleAction} aria-label={'Dataset view actions menu'}>
+                            <Item key={DATASET_VIEW_ITEM_OPTIONS.RENAME}>{DATASET_VIEW_ITEM_OPTIONS.RENAME}</Item>
+                            <Item key={DATASET_VIEW_ITEM_OPTIONS.DELETE}>{DATASET_VIEW_ITEM_OPTIONS.DELETE}</Item>
                         </Menu>
                     </MenuTrigger>
                 </Flex>
@@ -120,7 +120,7 @@ type DatasetViewItemsListProps = {
     onOpenDeleteConfirmationDialog: (datasetView: DatasetView) => void;
     entireDatasetView: DatasetView;
     otherDatasetViews: DatasetView[];
-    onOpenEditDialog: (datasetView: DatasetView) => void;
+    onOpenRenameDialog: (datasetView: DatasetView) => void;
     onSelectDatasetView: (datasetViewId: string) => void;
 };
 
@@ -129,7 +129,7 @@ export const DatasetViewItemsList = ({
     entireDatasetView,
     otherDatasetViews,
     onSelectDatasetView,
-    onOpenEditDialog,
+    onOpenRenameDialog,
     onOpenDeleteConfirmationDialog,
 }: DatasetViewItemsListProps) => {
     return (
@@ -148,7 +148,7 @@ export const DatasetViewItemsList = ({
                     datasetView={datasetView}
                     isSelected={selectedDatasetViewId === datasetView.id}
                     onSelectDatasetView={onSelectDatasetView}
-                    onOpenEditDialog={onOpenEditDialog}
+                    onOpenRenameDialog={onOpenRenameDialog}
                     onOpenDeleteConfirmationDialog={onOpenDeleteConfirmationDialog}
                 />
             ))}

@@ -20,7 +20,7 @@ import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view
 import { isEmpty } from 'lodash-es';
 
 import { DatasetView, DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
-import { EditDatasetView } from './edit-dataset-view.component';
+import { RenameDatasetView } from './rename-dataset-view.component';
 
 import classes from './dataset-view-selector.module.scss';
 
@@ -100,16 +100,16 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
     const selectedDatasetView = datasetViewsWithDefaultView.find((item) => item.id === datasetViewId) ?? ENTIRE_DATASET;
 
     const [datasetViewToBeDeleted, setDatasetViewToBeDeleted] = useState<DatasetView | null>(null);
-    const [datasetViewToBeEdited, setDatasetViewToBeEdited] = useState<DatasetView | null>(null);
+    const [datasetViewToBeRenamed, setDatasetViewToBeRenamed] = useState<DatasetView | null>(null);
 
     const openDeleteConfirmationDialog = (datasetView: DatasetView) => {
         setIsDatasetViewSelectorOpen(false);
         setDatasetViewToBeDeleted(datasetView);
     };
 
-    const openEditDialog = (datasetView: DatasetView) => {
+    const openRenameDialog = (datasetView: DatasetView) => {
         setIsDatasetViewSelectorOpen(false);
-        setDatasetViewToBeEdited(datasetView);
+        setDatasetViewToBeRenamed(datasetView);
     };
 
     const handleDelete = () => {
@@ -120,8 +120,8 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
         setDatasetViewToBeDeleted(null);
     };
 
-    const handleCloseEditDialog = () => {
-        setDatasetViewToBeEdited(null);
+    const handleCloseRenameDialog = () => {
+        setDatasetViewToBeRenamed(null);
     };
 
     const onlyEntireDatasetView = isEmpty(datasetViews);
@@ -159,7 +159,7 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
                             selectedDatasetViewId={datasetViewId}
                             onOpenDeleteConfirmationDialog={openDeleteConfirmationDialog}
                             onSelectDatasetView={onSelectDatasetView}
-                            onOpenEditDialog={openEditDialog}
+                            onOpenRenameDialog={openRenameDialog}
                         />
                     </Content>
                 </Dialog>
@@ -174,9 +174,9 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
                     />
                 )}
             </DialogContainer>
-            <DialogContainer onDismiss={handleCloseEditDialog}>
-                {datasetViewToBeEdited && (
-                    <EditDatasetView datasetView={datasetViewToBeEdited} onClose={handleCloseEditDialog} />
+            <DialogContainer onDismiss={handleCloseRenameDialog}>
+                {datasetViewToBeRenamed && (
+                    <RenameDatasetView datasetView={datasetViewToBeRenamed} onClose={handleCloseRenameDialog} />
                 )}
             </DialogContainer>
         </Flex>

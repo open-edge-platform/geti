@@ -8,12 +8,12 @@ import { isEmpty } from 'lodash-es';
 
 import { DatasetView } from './dataset-view-items-list/dataset-view-items-list.component';
 
-type EditDatasetViewProps = {
+type RenameDatasetViewProps = {
     datasetView: DatasetView;
     onClose: () => void;
 };
 
-export const EditDatasetView = ({ datasetView, onClose }: EditDatasetViewProps) => {
+export const RenameDatasetView = ({ datasetView, onClose }: RenameDatasetViewProps) => {
     const [newName, setNewName] = useState(datasetView.name);
     const isEditDisabled = newName === datasetView.name || isEmpty(newName.trim());
 
