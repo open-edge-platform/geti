@@ -23,6 +23,7 @@ from .inference import (
     InferenceWorkerStatus,
     InferenceWorkerStatusCode,
 )
+from .inference_config import InferenceConfig
 from .jobs import (
     ExportDatasetJob,
     ExportDatasetJobParams,
@@ -95,6 +96,7 @@ __all__ = [
     "IPCameraSourceConfig",
     "Image",
     "ImagesFolderSourceConfig",
+    "InferenceConfig",
     "InferenceWorkerStatus",
     "InferenceWorkerStatusCode",
     "Label",
