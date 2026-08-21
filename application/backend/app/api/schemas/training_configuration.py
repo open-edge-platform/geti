@@ -3,7 +3,7 @@
 
 import types
 from enum import StrEnum
-from typing import Annotated, Any, Literal, Union, cast, get_args, get_origin
+from typing import Annotated, Any, Literal, cast, get_args, get_origin
 
 from pydantic import BaseModel, Discriminator, Field, Tag
 from pydantic.fields import FieldInfo
@@ -124,7 +124,7 @@ class ConfigurableParameterGroupView(BaseModel):
             "If set, this parameter group is only applicable when the specified sibling parameter has the given value."
         ),
     )
-    parameters: list[Union[ConfigurableParameterView, "ConfigurableParameterGroupView"]] = Field(
+    parameters: list[ConfigurableParameterView | "ConfigurableParameterGroupView"] = Field(
         title="List of parameters in the group"
     )
 
