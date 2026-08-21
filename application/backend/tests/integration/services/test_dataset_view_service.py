@@ -204,6 +204,18 @@ class TestDatasetViewServiceCRUD:
         with pytest.raises(ResourceNotFoundError):
             fxt_dataset_view_service.create_dataset_view(project_id=project.id, name="My view", media_ids=[uuid4()])
 
+    def test_create_dataset_view_with_video_frame_media_raises(
+        self, fxt_dataset_view_service: DatasetViewService, fxt_project_with_media
+    ):
+        # Dataset views only track membership at the image/video level; a video frame is considered
+        # part of a view solely via its parent video, so passing a frame id directly must be rejected.
+        project, media = fxt_project_with_media
+
+        with pytest.raises(ResourceNotFoundError):
+            fxt_dataset_view_service.create_dataset_view(
+                project_id=project.id, name="My view", media_ids=[UUID(media["frame_annotated"].id)]
+            )
+
     def test_create_dataset_view_duplicate_name_raises(
         self, fxt_dataset_view_service: DatasetViewService, fxt_project_with_pipeline
     ):
@@ -323,6 +335,19 @@ class TestDatasetViewServiceAssignment:
 
         with pytest.raises(ResourceNotFoundError):
             fxt_dataset_view_service.assign_media(project_id=project.id, dataset_view_id=view.id, media_ids=[uuid4()])
+
+    def test_assign_video_frame_media_raises(
+        self, fxt_dataset_view_service: DatasetViewService, fxt_project_with_media
+    ):
+        # Video frames cannot be assigned directly to a view; only their parent video can be. Frame
+        # membership is derived implicitly once the video itself is assigned (see other tests).
+        project, media = fxt_project_with_media
+        view = fxt_dataset_view_service.create_dataset_view(project_id=project.id, name="My view")
+
+        with pytest.raises(ResourceNotFoundError):
+            fxt_dataset_view_service.assign_media(
+                project_id=project.id, dataset_view_id=view.id, media_ids=[UUID(media["frame_unannotated"].id)]
+            )
 
     def test_assign_media_dataset_view_not_found(
         self, fxt_dataset_view_service: DatasetViewService, fxt_project_with_media
