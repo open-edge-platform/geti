@@ -1350,7 +1350,7 @@ test.describe('Annotator', () => {
                 const predictResponsePromise = page.waitForResponse((res) => res.url().includes('media:predict'));
 
                 await annotatorPage.openPredictionSettings();
-                await page.getByRole('button', { name: 'Inference devices' }).click();
+                await page.getByRole('button', { name: /inference device/i }).click();
                 await page.getByRole('option', { name: /XPU/i }).click();
 
                 await expect(page.getByRole('button', { name: /XPU/i })).toBeVisible();

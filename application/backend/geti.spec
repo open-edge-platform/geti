@@ -49,6 +49,9 @@ datas = [
     ('app/alembic', 'app/alembic'),
     ('app/alembic.ini', 'app'),
     ('app/static/*', 'app/static'),
+    # SAM encoder model shipped inside the app/services/sam module
+    ('app/services/sam/mobile_sam.encoder.xml', 'app/services/sam'),
+    ('app/services/sam/mobile_sam.encoder.bin', 'app/services/sam'),
     *_collect_manifests(EXCLUDE_AGPL_MODELS),
     *copy_metadata("geti"),
     *copy_metadata("optree"),

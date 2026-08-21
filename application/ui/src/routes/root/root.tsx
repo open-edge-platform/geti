@@ -7,6 +7,7 @@ import { $api } from '@/api';
 import { Flex, Heading, Loading } from '@geti-ui/ui';
 import { Outlet } from 'react-router-dom';
 
+import { Toast } from '../../components/toast/toast.component';
 import { LicenseCheck } from '../../features/license/license-check.component';
 import { ServerErrorFallback } from './server-error-fallback.component';
 
@@ -53,6 +54,9 @@ export const RootLayout = () => {
                     <Outlet />
                 </LicenseCheck>
             </HealthCheck>
+            <div data-react-aria-top-layer='true'>
+                <Toast />
+            </div>
         </Suspense>
     );
 };

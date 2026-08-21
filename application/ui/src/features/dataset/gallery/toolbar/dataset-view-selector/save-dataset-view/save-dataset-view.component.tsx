@@ -30,7 +30,8 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds }: SaveDatasetViewDia
             <Content>
                 <SelectedMediaCount count={selectedMediaIds.length} />
                 <Form id={'view-name-form'} onSubmit={saveView} marginTop={'size-200'}>
-                    <TextField label={'View name'} value={viewName} onChange={setViewName} />
+                    {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
+                    <TextField autoFocus label={'View name'} value={viewName} onChange={setViewName} />
                 </Form>
             </Content>
             <ButtonGroup>

@@ -17,8 +17,7 @@ type InferenceDevicesProps = {
     onSelectionChange: (selectedKey: string) => void;
     isQuiet?: boolean;
     isDisabled?: boolean;
-    ariaLabel?: string;
-    label?: string;
+    label: string;
     maxWidth?: string;
     width?: string;
 };
@@ -28,7 +27,6 @@ export const InferenceDevices = ({
     onSelectionChange,
     isDisabled = false,
     isQuiet = false,
-    ariaLabel,
     label,
     maxWidth,
     width = '100%',
@@ -54,7 +52,6 @@ export const InferenceDevices = ({
             onSelectionChange={handleSelectionChange}
             selectedKey={selectedKey}
             isDisabled={isDisabled}
-            aria-label={ariaLabel}
             label={label}
         >
             {(device) => <Item key={device.id}>{device.name}</Item>}
