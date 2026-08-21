@@ -1,0 +1,342 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+"""Base model contract for the Hugging Face backend.
+
+There is one wrapper per task rather than one per model. The ``transformers``
+training contract is stable within a task, so adding a checkpoint is normally
+just a recipe entry.
+
+Requires the optional ``huggingface`` extra.
+"""
+
+from __future__ import annotations
+
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, ClassVar
+
+import torch
+from torch import nn
+
+from getitune.backend.huggingface._deps import ModelOutput, transformers
+from getitune.backend.lightning.models.base import DataInputParams
+from getitune.types.export import ExportFormat, TaskLevelExportParameters
+from getitune.types.label import LabelInfo
+from getitune.types.precision import Precision
+
+if TYPE_CHECKING:
+    from torchmetrics import Metric, MetricCollection
+
+    from getitune.backend.lightning.exporter.base import ModelExporter
+    from getitune.config.data import IntensityConfig
+    from getitune.data.entity.sample import PredictionBatch, SampleBatch
+    from getitune.types import PathLike
+    from getitune.types.label import LabelInfoTypes
+    from getitune.types.task import TaskType
+
+__all__ = ["HFModel", "ModelOutput", "transformers"]
+
+
+class HFModel(ABC, nn.Module):
+    """Wraps a ``transformers`` computer-vision model for one Geti task.
+
+    Subclasses override ``build_targets``, ``postprocess``, ``to_metric_inputs``,
+    ``forward_for_tracing``, and ``build_default_metric``. Everything else,
+    including ``forward``, is shared.
+
+    Class attributes:
+        task: The task this wrapper serves.
+        hf_auto_class: ``Auto*`` class used to build the underlying model,
+            e.g. ``AutoModelForObjectDetection``.
+        export_model_type: ModelAPI ``model_info/model_type`` string written
+            during export, e.g. ``"ssd"`` or ``"DETRInstSeg"``.
+        label_keys: Target keyword names the underlying model expects. Passed
+            to ``TrainingArguments(label_names=...)``.
+    """
+
+    task: ClassVar[TaskType]
+    hf_auto_class: ClassVar[type]
+    export_model_type: ClassVar[str] = "null"
+    label_keys: ClassVar[tuple[str, ...]] = ("labels",)
+
+    def __init__(
+        self,
+        checkpoint: str | transformers.PretrainedConfig,
+        label_info: LabelInfoTypes,
+        *,
+        input_size: tuple[int, int] = (640, 640),
+        mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
+        std: tuple[float, float, float] = (0.229, 0.224, 0.225),
+        pretrained: bool = True,
+        extra_overrides: dict[str, Any] | None = None,
+    ) -> None:
+        """Build the underlying ``transformers`` model.
+
+        Args:
+            checkpoint: A Hub repo id, a local ``save_pretrained()``
+                directory, or an already-built ``PretrainedConfig``. Passing a
+                config builds the model from scratch with random weights and
+                *pretrained* is ignored; this is the offline path used by
+                tests and by recipes that define a model from scratch.
+            label_info: Label metadata, or anything ``_dispatch_label_info``
+                accepts (an int, a list of names, or a ``LabelInfo``).
+            input_size: Model input size, used for export metadata only.
+                Geti's data pipeline does the actual resizing.
+            mean: Per-channel normalization mean, for export metadata.
+            std: Per-channel normalization std, for export metadata.
+            pretrained: Load Hub/local weights if ``True``, otherwise build an
+                untrained model from the resolved config.
+            extra_overrides: Extra keyword arguments forwarded to
+                ``from_pretrained`` / ``from_config``, e.g. ``problem_type`` or
+                ``semantic_loss_ignore_index``.
+        """
+        super().__init__()
+        self.checkpoint = checkpoint if isinstance(checkpoint, str) else type(checkpoint).__name__
+        self.pretrained = pretrained
+        self.extra_overrides = dict(extra_overrides or {})
+        self._label_info = self._dispatch_label_info(label_info)
+        self._data_input_params = DataInputParams(input_size=input_size, mean=mean, std=std)
+        self._intensity_config: IntensityConfig | None = None
+        self._best_checkpoint: Path | None = None
+
+        id2label = dict(enumerate(self._label_info.label_names))
+        label2id = {name: idx for idx, name in id2label.items()}
+
+        if isinstance(checkpoint, transformers.PretrainedConfig):
+            for key, value in {"id2label": id2label, "label2id": label2id, **self.extra_overrides}.items():
+                setattr(checkpoint, key, value)
+            self.hf_model = self.hf_auto_class.from_config(checkpoint)
+        elif pretrained:
+            self.hf_model = self.hf_auto_class.from_pretrained(
+                checkpoint,
+                id2label=id2label,
+                label2id=label2id,
+                ignore_mismatched_sizes=True,
+                **self.extra_overrides,
+            )
+        else:
+            config = transformers.AutoConfig.from_pretrained(
+                checkpoint,
+                id2label=id2label,
+                label2id=label2id,
+                **self.extra_overrides,
+            )
+            self.hf_model = self.hf_auto_class.from_config(config)
+
+    @staticmethod
+    def _dispatch_label_info(label_info: LabelInfoTypes) -> LabelInfo:
+        """Normalize *label_info* to a :class:`LabelInfo`.
+
+        Accepts the same shapes as the Lightning and Ultralytics backends: a
+        dict, a plain int (number of classes), a list of label names, or a
+        ``LabelInfo`` instance (passed through, including subclasses such as
+        ``SegLabelInfo``).
+        """
+        if isinstance(label_info, dict):
+            if "label_ids" not in label_info:
+                label_info["label_ids"] = label_info["label_names"]
+            return LabelInfo(**label_info)
+        if isinstance(label_info, int):
+            return LabelInfo.from_num_classes(num_classes=label_info)
+        if isinstance(label_info, (list, tuple)) and all(isinstance(name, str) for name in label_info):
+            return LabelInfo(
+                label_names=list(label_info),
+                label_groups=[list(label_info)],
+                label_ids=[str(i) for i in range(len(label_info))],
+            )
+        if isinstance(label_info, LabelInfo):
+            return label_info
+        msg = f"Cannot build LabelInfo from {label_info!r}"
+        raise TypeError(msg)
+
+    @abstractmethod
+    def build_targets(self, batch: SampleBatch) -> dict[str, Any]:
+        """Convert a Geti batch into ``transformers`` forward kwargs.
+
+        Args:
+            batch: Collated Geti batch. Every target field is a Python list,
+                not a stacked tensor.
+
+        Returns:
+            Forward kwargs, always including ``pixel_values``.
+        """
+        raise NotImplementedError
+
+    def forward(self, batch: SampleBatch) -> ModelOutput:
+        """Run a training forward pass.
+
+        Shared across tasks: only ``build_targets`` differs per task.
+        """
+        return self.hf_model(**self.build_targets(batch))
+
+    @abstractmethod
+    def postprocess(self, outputs: ModelOutput, batch: SampleBatch) -> PredictionBatch:
+        """Turn raw model outputs into Geti predictions."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def to_metric_inputs(self, outputs: ModelOutput, batch: SampleBatch) -> dict[str, Any]:
+        """Build the keyword arguments the task's Geti metric callable expects.
+
+        Returns:
+            A dict such as ``{"preds": ..., "target": ...}``, passed to the
+            metric as ``metric.update(**result)``. The shapes inside differ
+            per task (lists of per-image dicts for detection and instance
+            segmentation, plain tensors for the rest) because that is what
+            each underlying torchmetrics metric actually expects — this
+            method exists precisely to hide that difference from the caller.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def forward_for_tracing(self, images: torch.Tensor) -> dict[str, torch.Tensor] | torch.Tensor:
+        """Return export-shaped outputs for ModelAPI.
+
+        Args:
+            images: Batched input shaped ``(B, C, H, W)``.
+
+        Returns:
+            Either a plain tensor (classification, semantic segmentation) or
+            an output-name-to-tensor dict (detection, instance segmentation).
+            Dict keys become the ONNX ``output_names`` and must be passed
+            explicitly at export time, otherwise ONNX numbers them and
+            ModelAPI's detection parser cannot match them.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def build_default_metric(self) -> Metric | MetricCollection:
+        """Build this task's default Geti metric, ready for ``.update()``.
+
+        Used by ``HFEngine.test()`` unless the caller supplies its own metric
+        callable. A method rather than a bare class-level callable because
+        semantic segmentation needs the model's resolved ``ignore_index``,
+        which is only known once the model is constructed.
+        """
+        raise NotImplementedError
+
+    def set_intensity_config(self, intensity_config: IntensityConfig | None) -> None:
+        """Attach the DataModule intensity config so export metadata is correct."""
+        self._intensity_config = intensity_config
+
+    def ensure_predict_ready(self) -> None:
+        """Load the image processor if needed and switch to eval mode.
+
+        Subclasses that override this must call ``super()``.
+        """
+        self.eval()
+
+    def load_checkpoint(self, checkpoint: PathLike) -> None:
+        """Reload weights from a ``save_pretrained()`` directory.
+
+        Replaces the wrapped model in place and records the checkpoint so
+        ``best_checkpoint`` reflects it.
+        """
+        self.hf_model = self.hf_auto_class.from_pretrained(str(checkpoint))
+        self._best_checkpoint = Path(checkpoint)
+
+    def record_checkpoint(self, checkpoint: PathLike) -> None:
+        """Record *checkpoint* as the location backing this model's current weights.
+
+        Unlike :meth:`load_checkpoint`, this does not touch ``hf_model``. Used
+        right after training, once the in-memory weights already match what
+        was just written to *checkpoint* by ``Trainer.save_model()``, so
+        reloading them from disk would be pure waste.
+        """
+        self._best_checkpoint = Path(checkpoint)
+
+    @property
+    def label_info(self) -> LabelInfo:
+        """Label metadata backing ``id2label`` and ``label2id``."""
+        return self._label_info
+
+    @property
+    def imgsz(self) -> int:
+        """Square input size, for recipe convenience.
+
+        ``data_input_params.input_size`` is the source of truth.
+        """
+        return self.data_input_params.input_size[0]
+
+    @property
+    def data_input_params(self) -> DataInputParams:
+        """Preprocessing parameters used for export metadata."""
+        return self._data_input_params
+
+    @property
+    def best_checkpoint(self) -> Path | None:
+        """Most recently saved checkpoint directory, if any."""
+        return self._best_checkpoint
+
+    @property
+    def _export_parameters(self) -> TaskLevelExportParameters:
+        """Export parameters shared at the task level.
+
+        Task subclasses override this with ``.wrap(...)``, following the same
+        pattern as ``LightningModel._export_parameters``.
+        """
+        return TaskLevelExportParameters(
+            model_type="null",
+            task_type="null",
+            model_name=self.checkpoint,
+            label_info=self.label_info,
+            optimization_config={},
+        )
+
+    @property
+    def _exporter(self) -> ModelExporter:
+        """Build the ONNX/OpenVINO exporter.
+
+        Overridden per task with an :class:`~getitune.backend.huggingface.exporter.native.HFModelExporter`.
+        """
+        msg = f"{type(self).__name__} does not define an exporter; override the '_exporter' property."
+        raise NotImplementedError(msg)
+
+    def export(
+        self,
+        output_dir: Path,
+        base_name: str,
+        export_format: ExportFormat,
+        precision: Precision = Precision.FP32,
+    ) -> Path:
+        """Export this model to OpenVINO IR or ONNX.
+
+        Traces via ``forward_for_tracing`` rather than the training
+        ``forward``: swaps ``self.forward`` for the tracing duration only,
+        the same pattern ``LightningModel.export`` uses. Weights are moved
+        to CPU/fp32 first — training may leave the model on XPU, and tracing
+        a model whose parameters live on an accelerator not available at
+        export time (or in bf16, which ONNX/OpenVINO conversion tools do not
+        reliably support) is not a risk worth taking for a one-off export
+        call.
+
+        Args:
+            output_dir: Directory to write the exported artifact into.
+            base_name: File stem for the exported artifact.
+            export_format: ``ExportFormat.OPENVINO`` or ``ExportFormat.ONNX``.
+            precision: Precision of the exported weights.
+
+        Returns:
+            Path to the exported model file.
+        """
+        mode = self.training
+        original_device = next(self.hf_model.parameters()).device
+        original_dtype = next(self.hf_model.parameters()).dtype
+
+        self.eval()
+        self.hf_model = self.hf_model.to(device="cpu", dtype=torch.float32)
+        orig_forward = self.forward
+        try:
+            self.forward = self.forward_for_tracing  # type: ignore[method-assign]
+            return self._exporter.export(
+                self,  # pyrefly: ignore[bad-argument-type]
+                output_dir,
+                base_name,
+                export_format,
+                precision,
+            )
+        finally:
+            self.forward = orig_forward  # type: ignore[method-assign]
+            self.hf_model = self.hf_model.to(device=original_device, dtype=original_dtype)
+            self.train(mode)

@@ -1,0 +1,257 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+"""Instance segmentation wrapper."""
+
+from __future__ import annotations
+
+import copy
+from functools import cached_property
+from typing import TYPE_CHECKING, Any, ClassVar
+
+import torch
+import torch.nn.functional as f
+from torchvision import tv_tensors
+from torchvision.ops import masks_to_boxes
+
+from getitune.backend.huggingface._deps import ModelOutput, transformers
+from getitune.backend.huggingface.data.geometry import (
+    reproject_boxes_to_input_space,
+    reproject_masks_to_input_space,
+)
+from getitune.backend.huggingface.exporter.native import HFModelExporter
+from getitune.backend.huggingface.models.base import HFModel
+from getitune.data.entity.sample import PredictionBatch
+from getitune.data.utils.structures.mask.mask_util import encode_rle
+from getitune.metrics.mean_ap import MaskRLEMeanAPCallable
+from getitune.types.export import TaskLevelExportParameters
+from getitune.types.task import TaskType
+
+if TYPE_CHECKING:
+    from torchmetrics import Metric, MetricCollection
+
+    from getitune.backend.lightning.exporter.base import ModelExporter
+    from getitune.data.entity.sample import SampleBatch
+
+__all__ = ["HFInstSegModel"]
+
+
+class HFInstSegModel(HFModel):
+    """Instance segmentation wrapper for the MaskFormer family.
+
+    Covers Mask2Former, MaskFormer, EoMT, and OneFormer, which all take
+    ``mask_labels`` and ``class_labels`` and return
+    ``{class_queries_logits, masks_queries_logits}``. Models that instead
+    return plain ``labels`` (``DetrForSegmentation``, RF-DETR instance
+    segmentation) are out of scope for this wrapper.
+    """
+
+    task: ClassVar[TaskType] = TaskType.INSTANCE_SEGMENTATION
+    hf_auto_class: ClassVar[type] = transformers.AutoModelForUniversalSegmentation
+    export_model_type: ClassVar[str] = "DETRInstSeg"
+    label_keys: ClassVar[tuple[str, ...]] = ("mask_labels", "class_labels")
+
+    @property
+    def _export_parameters(self) -> TaskLevelExportParameters:
+        # ModelAPI's DETRInstSeg wrapper shifts labels by one and expects a
+        # leading placeholder class in the exported label metadata, mirroring
+        # RFDETRInst._export_parameters. This is purely an export-time
+        # convention; the underlying HF model's own id2label is unaffected.
+        #
+        # Built via concatenation, not in-place `.insert()`: `LabelInfo.from_num_classes`
+        # constructs `label_groups=[label_names]` as the *same* list object, so
+        # `.deepcopy()` preserves that aliasing and a naive `.insert()` into both
+        # `label_names` and `label_groups[0]` double-inserts the placeholder.
+        label_info = copy.deepcopy(self.label_info)
+        label_info.label_names = ["getitune_empty_lbl", *label_info.label_names]
+        label_info.label_ids = ["None", *label_info.label_ids]
+        label_info.label_groups = [["getitune_empty_lbl", *label_info.label_groups[0]], *label_info.label_groups[1:]]
+
+        return super()._export_parameters.wrap(
+            model_type=self.export_model_type,
+            task_type="instance_segmentation",
+            confidence_threshold=0.05,
+            iou_threshold=0.5,
+            label_info=label_info,
+        )
+
+    def build_targets(self, batch: SampleBatch) -> dict[str, Any]:
+        """Convert Geti's uint8 instance masks and labels to MaskFormer's targets (G9)."""
+        if batch.masks is None or batch.labels is None:
+            msg = "Instance segmentation batches need masks and labels."
+            raise ValueError(msg)
+        return {
+            "pixel_values": batch.images,
+            "mask_labels": [m.as_subclass(torch.Tensor).float() for m in batch.masks],
+            "class_labels": [c.long() for c in batch.labels],
+        }
+
+    @cached_property
+    def _image_processor(self) -> transformers.Mask2FormerImageProcessor:
+        """Stateless post-processing shared across the whole MaskFormer family.
+
+        It only reads ``outputs.class_queries_logits`` /
+        ``outputs.masks_queries_logits``, which every model in this wrapper's
+        scope provides, so one instance covers all of them.
+        """
+        return transformers.Mask2FormerImageProcessor()
+
+    def postprocess(self, outputs: ModelOutput, batch: SampleBatch) -> PredictionBatch:
+        """Decode raw outputs into boxes, masks, scores, and labels in the model's input space.
+
+        Kept in the shared input canvas rather than each image's own original
+        size, for the same reason as detection: ``to_metric_inputs`` then
+        only has to reproject the (simpler) ground truth once, instead of
+        rescaling every prediction individually.
+        """
+        input_size = (int(batch.images.shape[-2]), int(batch.images.shape[-1]))
+        decoded = self._image_processor.post_process_instance_segmentation(
+            outputs,
+            threshold=0.0,
+            target_sizes=[input_size] * batch.images.shape[0],
+            return_binary_maps=True,
+        )
+
+        bboxes, masks, labels, scores = [], [], [], []
+        for image_result in decoded:
+            binary_maps = image_result["segmentation"].bool()
+            device = binary_maps.device
+            bboxes.append(
+                tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+                    masks_to_boxes(binary_maps), format=tv_tensors.BoundingBoxFormat.XYXY, canvas_size=input_size
+                )
+            )
+            masks.append(tv_tensors.Mask(binary_maps))
+            segments_info = image_result["segments_info"]
+            labels.append(
+                torch.tensor([segment["label_id"] for segment in segments_info], dtype=torch.long, device=device)
+            )
+            scores.append(
+                torch.tensor([segment["score"] for segment in segments_info], dtype=torch.float32, device=device)
+            )
+
+        return PredictionBatch(
+            images=batch.images,
+            imgs_info=batch.imgs_info,
+            bboxes=bboxes,
+            masks=masks,
+            labels=labels,
+            scores=scores,
+        )
+
+    def to_metric_inputs(self, outputs: ModelOutput, batch: SampleBatch) -> dict[str, Any]:
+        """Build the ``preds``/``target`` lists ``MaskRLEMeanAPCallable`` expects.
+
+        Ground truth stays in original image coordinates (``resize_targets:
+        false``), so both boxes and masks are reprojected into the same
+        input-space canvas the predictions from ``postprocess`` already live
+        in (G12), then masks on both sides are RLE-encoded.
+        """
+        if batch.bboxes is None or batch.masks is None or batch.labels is None or batch.imgs_info is None:
+            msg = "Instance segmentation batches need bboxes, masks, labels, and imgs_info to compute metrics."
+            raise ValueError(msg)
+
+        predictions = self.postprocess(outputs, batch)
+        if predictions.bboxes is None or predictions.masks is None or predictions.scores is None:
+            msg = "Instance segmentation postprocess() must always populate bboxes, masks, and scores."
+            raise ValueError(msg)
+
+        input_size = (int(batch.images.shape[-2]), int(batch.images.shape[-1]))
+        preds = [
+            {
+                "boxes": boxes.as_subclass(torch.Tensor),
+                "masks": [encode_rle(mask) for mask in masks.as_subclass(torch.Tensor)],
+                "scores": scores,
+                "labels": labels,
+            }
+            for boxes, masks, scores, labels in zip(
+                predictions.bboxes, predictions.masks, predictions.scores, predictions.labels, strict=True
+            )
+        ]
+        target = [
+            {
+                "boxes": reproject_boxes_to_input_space(boxes.as_subclass(torch.Tensor), img_info),
+                "masks": [
+                    encode_rle(mask)
+                    for mask in reproject_masks_to_input_space(masks.as_subclass(torch.Tensor), img_info, input_size)
+                ],
+                "labels": labels,
+            }
+            for boxes, masks, labels, img_info in zip(
+                batch.bboxes, batch.masks, batch.labels, batch.imgs_info, strict=True
+            )
+        ]
+        return {"preds": preds, "target": target}
+
+    def build_default_metric(self) -> Metric | MetricCollection:
+        """Mean average precision over RLE-encoded masks, the standard instance-seg metric."""
+        return MaskRLEMeanAPCallable(self.label_info)
+
+    @property
+    def _exporter(self) -> ModelExporter:
+        return HFModelExporter(
+            task_level_export_parameters=self._export_parameters,
+            data_input_params=self.data_input_params,
+            resize_mode="standard",
+            swap_rgb=False,
+            onnx_export_configuration={"input_names": ["images"], "output_names": ["boxes", "labels", "masks"]},
+        )
+
+    def forward_for_tracing(self, images: torch.Tensor) -> dict[str, torch.Tensor]:
+        """Return per-query boxes/labels/masks for ONNX/OpenVINO export.
+
+        Mask2Former has no box head (G4), so boxes are derived from the
+        thresholded mask extents via ``masks_to_boxes``, exactly like
+        ``postprocess`` does for metrics — but for every query at once
+        (fixed shape, trace-safe) rather than per decoded segment. The score
+        is the top foreground-class probability per query rather than
+        ``postprocess``'s ``class_score x mask_quality`` product: computing
+        the latter here would need the same per-image segment merging
+        ``post_process_instance_segmentation`` does, which is not trace-safe
+        (variable segment count). ModelAPI's ``DETRInstSeg`` wrapper expects
+        a ``(Q, 5)`` xyxy-plus-score layout per image, hence the label shift
+        in ``_export_parameters`` (G21).
+        """
+        input_size = (int(images.shape[-2]), int(images.shape[-1]))
+        outputs = self.hf_model(pixel_values=images)
+        masks_logits = f.interpolate(outputs.masks_queries_logits, size=input_size, mode="bilinear")
+        masks_probs = masks_logits.sigmoid()
+        class_probs = outputs.class_queries_logits.softmax(dim=-1)[..., :-1]
+        scores, labels = class_probs.max(dim=-1)
+
+        batch_size, num_queries = masks_probs.shape[:2]
+        binary_masks = masks_probs > 0.5
+        boxes = _traceable_masks_to_boxes(binary_masks.reshape(batch_size * num_queries, *input_size))
+        boxes = boxes.reshape(batch_size, num_queries, 4)
+        boxes_with_scores = torch.cat([boxes, scores.unsqueeze(-1)], dim=-1)
+
+        return {"boxes": boxes_with_scores, "labels": labels, "masks": masks_probs}
+
+
+def _traceable_masks_to_boxes(masks: torch.Tensor) -> torch.Tensor:
+    """A ``torchvision.ops.masks_to_boxes`` reimplementation that traces to ONNX.
+
+    ``masks_to_boxes`` itself assigns into an empty-mask boolean index
+    (``bounding_boxes[empty_masks] = 0``), which OpenVINO's ONNX frontend
+    cannot convert (``Select`` op with mismatched, non-broadcastable shapes —
+    a boolean-index assignment traces very differently from a elementwise
+    ``where``). Replacing it with an explicit ``torch.where`` over a
+    broadcastable condition produces the identical result and converts
+    cleanly.
+    """
+    _n, h, w = masks.shape
+    masks_bool = masks.bool()
+    non_zero_rows = torch.any(masks_bool, dim=2)
+    non_zero_cols = torch.any(masks_bool, dim=1)
+    empty = ~torch.any(non_zero_rows, dim=1)
+
+    non_zero_rows_f = non_zero_rows.float()
+    non_zero_cols_f = non_zero_cols.float()
+
+    y1 = non_zero_rows_f.argmax(dim=1)
+    x1 = non_zero_cols_f.argmax(dim=1)
+    y2 = (h - 1) - non_zero_rows_f.flip(dims=[1]).argmax(dim=1)
+    x2 = (w - 1) - non_zero_cols_f.flip(dims=[1]).argmax(dim=1)
+
+    boxes = torch.stack([x1, y1, x2, y2], dim=1).float()
+    return torch.where(empty.unsqueeze(-1), torch.zeros_like(boxes), boxes)

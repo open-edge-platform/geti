@@ -1,0 +1,31 @@
+backend: huggingface
+task: MULTI_LABEL_CLS
+
+model:
+  class_path: getitune.backend.huggingface.models.classification.HFMultilabelClsModel
+  init_args:
+    checkpoint: google/vit-base-patch16-224
+    pretrained: true
+    input_size:
+      - 224
+      - 224
+    mean:
+      - 0.485
+      - 0.456
+      - 0.406
+    std:
+      - 0.229
+      - 0.224
+      - 0.225
+
+engine:
+  device: auto
+
+training:
+  max_epochs: 90
+  batch: 64
+  learning_rate: 0.0001
+  precision: bf16-mixed
+  patience: 10
+
+data: ../../_base_/data/classification.yaml

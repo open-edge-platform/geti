@@ -86,7 +86,7 @@ def _read_backend(recipe_path: Path) -> str:
         recipe_path: Absolute path to the recipe YAML file.
 
     Returns:
-        Backend name string (e.g. ``'lightning'``, ``'ultralytics'``).
+        Backend name string (e.g. ``'lightning'``, ``'ultralytics'``, ``'huggingface'``).
     """
     with recipe_path.open() as fh:
         raw = yaml.safe_load(fh)
@@ -106,8 +106,9 @@ def create_engine(
 
     Accepts three forms for *model*:
 
-    * **Model instance** (``LightningModel``, ``UltralyticsModel``, ``OVModel``)
-      or a **weights path** (``.xml``, ``.onnx``) — for OpenVINO and ONNX models
+    * **Model instance** (``LightningModel``, ``UltralyticsModel``, ``HFModel``,
+      ``OVModel``) or a **weights path** (``.xml``, ``.onnx``) — for OpenVINO
+      and ONNX models
 
     * **Recipe path** — a ``.yaml`` / ``.yml`` file.  The ``backend`` field in
       the recipe selects the engine; defaults to ``lightning`` when absent.
@@ -151,6 +152,13 @@ def create_engine(
         from getitune.backend.ultralytics.engine import UltralyticsEngine
 
         backend_to_engine["ultralytics"] = UltralyticsEngine
+    except ImportError:
+        pass
+
+    try:
+        from getitune.backend.huggingface.engine import HFEngine
+
+        backend_to_engine["huggingface"] = HFEngine
     except ImportError:
         pass
 

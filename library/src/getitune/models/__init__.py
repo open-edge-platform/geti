@@ -52,6 +52,23 @@ except ImportError:
     UltralyticsMultiLabelClsModel = None  # type: ignore[assignment]
     UltralyticsSemanticSegModel = None  # type: ignore[assignment]
 
+try:
+    from getitune.backend.huggingface.models import (
+        HFDetectionModel,
+        HFInstSegModel,
+        HFModel,
+        HFMulticlassClsModel,
+        HFMultilabelClsModel,
+        HFSemanticSegModel,
+    )
+except ImportError:
+    HFDetectionModel = None  # type: ignore[assignment]
+    HFInstSegModel = None  # type: ignore[assignment]
+    HFModel = None  # type: ignore[assignment]
+    HFMulticlassClsModel = None  # type: ignore[assignment]
+    HFMultilabelClsModel = None  # type: ignore[assignment]
+    HFSemanticSegModel = None  # type: ignore[assignment]
+
 __all__ = [
     "ATSS",
     "DEIMV2",
@@ -92,5 +109,17 @@ if UltralyticsDetectionModel is not None:
             "UltralyticsMultiClassClsModel",
             "UltralyticsMultiLabelClsModel",
             "UltralyticsSemanticSegModel",
+        ]
+    )
+
+if HFModel is not None:
+    __all__.extend(
+        [
+            "HFDetectionModel",
+            "HFInstSegModel",
+            "HFModel",
+            "HFMulticlassClsModel",
+            "HFMultilabelClsModel",
+            "HFSemanticSegModel",
         ]
     )
