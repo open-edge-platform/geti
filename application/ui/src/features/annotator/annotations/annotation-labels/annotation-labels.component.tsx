@@ -69,7 +69,7 @@ export const AnnotationLabels = ({
         >
             <div
                 className={useBottomCorners ? classes.labelsContainerPolygon : classes.labelsContainerRect}
-                style={{ height: '100%', alignItems: 'flex-end' }}
+                style={{ height: '100%' }}
             >
                 {displayLabels.map((label, index) => {
                     const isFirst = index === 0;
