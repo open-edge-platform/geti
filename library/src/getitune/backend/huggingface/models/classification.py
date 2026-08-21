@@ -8,8 +8,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import torch
+import transformers
 
-from getitune.backend.huggingface._deps import ModelOutput, transformers
 from getitune.backend.huggingface.exporter.native import HFModelExporter
 from getitune.backend.huggingface.models.base import HFModel
 from getitune.data.entity.sample import PredictionBatch
@@ -20,6 +20,7 @@ from getitune.types.task import TaskType
 
 if TYPE_CHECKING:
     from torchmetrics import Metric, MetricCollection
+    from transformers.utils import ModelOutput
 
     from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.data.entity.sample import SampleBatch

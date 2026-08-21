@@ -143,22 +143,17 @@ def create_engine(
     """
     from getitune.backend.lightning.engine import LightningEngine
     from getitune.backend.openvino.engine import OVEngine
+    from getitune.backend.huggingface.engine import HFEngine
 
     backend_to_engine: dict[str, type[Engine]] = {
         "lightning": LightningEngine,
         "openvino": OVEngine,
+        "huggingface": HFEngine,
     }
     try:
         from getitune.backend.ultralytics.engine import UltralyticsEngine
 
         backend_to_engine["ultralytics"] = UltralyticsEngine
-    except ImportError:
-        pass
-
-    try:
-        from getitune.backend.huggingface.engine import HFEngine
-
-        backend_to_engine["huggingface"] = HFEngine
     except ImportError:
         pass
 

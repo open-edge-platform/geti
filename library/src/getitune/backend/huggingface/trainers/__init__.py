@@ -4,6 +4,6 @@
 """The ``transformers.Trainer`` bridge for the Hugging Face backend."""
 
 from .base import GetiTuneHFTrainer
-from .metrics_csv import remap_log_key, write_metrics_csv
+from .utils import remap_log_key, write_metrics_csv
 
 __all__ = ["GetiTuneHFTrainer", "remap_log_key", "write_metrics_csv"]

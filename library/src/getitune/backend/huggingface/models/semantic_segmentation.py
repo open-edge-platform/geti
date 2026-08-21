@@ -9,9 +9,9 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 import torch
 import torch.nn.functional as f
+import transformers
 from torchvision import tv_tensors
 
-from getitune.backend.huggingface._deps import ModelOutput, transformers
 from getitune.backend.huggingface.exporter.native import HFModelExporter
 from getitune.backend.huggingface.models.base import HFModel
 from getitune.data.entity.sample import PredictionBatch
@@ -22,6 +22,7 @@ from getitune.types.task import TaskType
 
 if TYPE_CHECKING:
     from torchmetrics import Metric, MetricCollection
+    from transformers.utils import ModelOutput
 
     from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.data.entity.sample import SampleBatch
@@ -43,6 +44,8 @@ class HFSemanticSegModel(HFModel):
         label_info: LabelInfoTypes,
         *,
         ignore_index: int | None = None,
+        soft_threshold: float = 0.5,
+        blur_strength: int = -1,
         **kwargs: Any,  # noqa: ANN401
     ) -> None:
         """Build the model, defaulting ``semantic_loss_ignore_index`` from the label info.
@@ -54,6 +57,10 @@ class HFSemanticSegModel(HFModel):
                 given explicitly, its value is used.
             ignore_index: Pixel value to exclude from the loss. Defaults to
                 255, matching ``DataModule.ignore_index``.
+            soft_threshold: Minimum per-pixel class confidence ModelAPI
+                requires, embedded in the exported model's metadata.
+            blur_strength: ModelAPI soft-mask blur strength, embedded in the
+                exported model's metadata; ``-1`` disables blurring.
             **kwargs: Forwarded to :class:`HFModel`.
         """
         dispatched = self._dispatch_label_info(label_info)
@@ -62,6 +69,8 @@ class HFSemanticSegModel(HFModel):
         overrides.setdefault("semantic_loss_ignore_index", resolved_ignore_index)
         super().__init__(checkpoint, label_info, extra_overrides=overrides, **kwargs)
         self._ignore_index = resolved_ignore_index
+        self._soft_threshold = soft_threshold
+        self._blur_strength = blur_strength
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
@@ -69,8 +78,8 @@ class HFSemanticSegModel(HFModel):
             model_type=self.export_model_type,
             task_type="semantic_segmentation",
             return_soft_prediction=True,
-            soft_threshold=0.5,
-            blur_strength=-1,
+            soft_threshold=self._soft_threshold,
+            blur_strength=self._blur_strength,
         )
 
     def build_targets(self, batch: SampleBatch) -> dict[str, Any]:

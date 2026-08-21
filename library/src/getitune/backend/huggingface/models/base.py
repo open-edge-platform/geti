@@ -6,8 +6,6 @@
 There is one wrapper per task rather than one per model. The ``transformers``
 training contract is stable within a task, so adding a checkpoint is normally
 just a recipe entry.
-
-Requires the optional ``huggingface`` extra.
 """
 
 from __future__ import annotations
@@ -17,9 +15,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import torch
+import transformers
 from torch import nn
+from transformers.utils import ModelOutput
 
-from getitune.backend.huggingface._deps import ModelOutput, transformers
 from getitune.backend.lightning.models.base import DataInputParams
 from getitune.types.export import ExportFormat, TaskLevelExportParameters
 from getitune.types.label import LabelInfo

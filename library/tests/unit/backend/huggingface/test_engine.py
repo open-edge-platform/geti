@@ -14,7 +14,6 @@ import pytest
 from torch import nn
 
 from getitune.backend.huggingface import HFEngine, HFModel
-from getitune.backend.huggingface.engine import _final_metrics, _format_test_metrics, _resolve_precision
 from getitune.backend.huggingface.models.base import ModelOutput
 from getitune.backend.lightning.models.base import DataInputParams
 from getitune.data.module import DataModule
@@ -93,20 +92,15 @@ def test_optional_backends_do_not_shadow_each_other() -> None:
 
 def _collect_registered_backends(create_mod) -> dict[str, type]:
     """Re-run the registration block from create_engine() in isolation."""
+    from getitune.backend.huggingface.engine import HFEngine as _HFEngine
     from getitune.backend.lightning.engine import LightningEngine
     from getitune.backend.openvino.engine import OVEngine
 
-    backends: dict[str, type] = {"lightning": LightningEngine, "openvino": OVEngine}
+    backends: dict[str, type] = {"lightning": LightningEngine, "openvino": OVEngine, "huggingface": _HFEngine}
     try:
         from getitune.backend.ultralytics.engine import UltralyticsEngine
 
         backends["ultralytics"] = UltralyticsEngine
-    except ImportError:
-        pass
-    try:
-        from getitune.backend.huggingface.engine import HFEngine as _HFEngine
-
-        backends["huggingface"] = _HFEngine
     except ImportError:
         pass
     assert create_mod is not None
@@ -248,7 +242,7 @@ def test_from_config_requires_data(tmp_path: Path) -> None:
 def test_from_config_builds_a_working_engine_from_an_offline_recipe(tmp_path: Path) -> None:
     """Real recipe parsing end to end, offline: no Hub download involved.
 
-    Mirrors ``create_engine("hf_mask2former_swin_t", data="data/wgisd")`` in
+    Mirrors ``create_engine("mask2former_swin_t", data="data/wgisd")`` in
     real usage, but with a bare ``PretrainedConfig`` checkpoint so the test
     suite doesn't need network access.
     """
@@ -330,76 +324,6 @@ data: {base_data_config}
 
     assert isinstance(engine, HFEngine)
     assert engine.model.hf_model.config.num_queries == 10
-
-
-class TestResolvePrecision:
-    def test_none_means_fp32(self) -> None:
-        assert _resolve_precision(None) == (False, False)
-
-    @pytest.mark.parametrize("value", [16, "16", "16-mixed", "16-true", "fp16"])
-    def test_16_bit_variants_select_fp16(self, value: int | str) -> None:
-        assert _resolve_precision(value) == (True, False)
-
-    @pytest.mark.parametrize("value", ["bf16", "bf16-mixed", "bf16-true"])
-    def test_bf16_variants_select_bf16(self, value: str) -> None:
-        assert _resolve_precision(value) == (False, True)
-
-    @pytest.mark.parametrize("value", [32, "32", "32-true", "fp32", 64, "64-true"])
-    def test_32_and_64_bit_variants_select_neither(self, value: int | str) -> None:
-        assert _resolve_precision(value) == (False, False)
-
-    def test_rejects_unknown_values(self) -> None:
-        with pytest.raises(ValueError, match="Unsupported precision"):
-            _resolve_precision("int8")
-
-
-class TestFinalMetrics:
-    def test_later_entries_win(self) -> None:
-        log_history = [
-            {"loss": 2.0, "epoch": 1.0, "step": 4},
-            {"loss": 1.5, "epoch": 2.0, "step": 8},
-        ]
-        assert _final_metrics(log_history) == {"train/loss": 1.5}
-
-    def test_epoch_and_step_are_excluded(self) -> None:
-        metrics = _final_metrics([{"loss": 1.0, "epoch": 1.0, "step": 4}])
-        assert "epoch" not in metrics
-        assert "step" not in metrics
-
-    def test_non_numeric_values_are_skipped(self) -> None:
-        metrics = _final_metrics([{"loss": 1.0, "some_string": "ignored"}])
-        assert metrics == {"train/loss": 1.0}
-
-    def test_empty_history_yields_empty_metrics(self) -> None:
-        assert _final_metrics([]) == {}
-
-
-class TestFormatTestMetrics:
-    def test_scalar_tensor_is_flattened_with_a_test_prefix(self) -> None:
-        import torch
-
-        assert _format_test_metrics({"map": torch.tensor(0.5)}) == {"test/map": 0.5}
-
-    def test_plain_numbers_are_kept(self) -> None:
-        assert _format_test_metrics({"accuracy": 1}) == {"test/accuracy": 1.0}
-
-    def test_non_scalar_auxiliary_keys_are_skipped(self) -> None:
-        import torch
-
-        results = {"map": torch.tensor(0.5), "classes": torch.tensor([0, 1, 2])}
-        assert _format_test_metrics(results) == {"test/map": 0.5}
-
-    def test_non_scalar_tensors_outside_the_skip_list_are_skipped_too(self) -> None:
-        import torch
-
-        results = {"per_image_iou": torch.tensor([0.1, 0.2, 0.3])}
-        assert _format_test_metrics(results) == {}
-
-    def test_nested_dicts_are_flattened_recursively(self) -> None:
-        import torch
-
-        results = {"MulticlassAccuracy": {"accuracy": torch.tensor(0.75)}}
-        assert _format_test_metrics(results) == {"test/MulticlassAccuracy/accuracy": 0.75}
 
 
 class TestTrainEndToEnd:

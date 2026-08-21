@@ -3,6 +3,14 @@
 
 """Reimport models from differnt backends for user frendly imports."""
 
+from getitune.backend.huggingface.models import (
+    HFDetectionModel,
+    HFInstSegModel,
+    HFModel,
+    HFMulticlassClsModel,
+    HFMultilabelClsModel,
+    HFSemanticSegModel,
+)
 from getitune.backend.lightning.models import (
     ATSS,
     DEIMV2,
@@ -52,23 +60,6 @@ except ImportError:
     UltralyticsMultiLabelClsModel = None  # type: ignore[assignment]
     UltralyticsSemanticSegModel = None  # type: ignore[assignment]
 
-try:
-    from getitune.backend.huggingface.models import (
-        HFDetectionModel,
-        HFInstSegModel,
-        HFModel,
-        HFMulticlassClsModel,
-        HFMultilabelClsModel,
-        HFSemanticSegModel,
-    )
-except ImportError:
-    HFDetectionModel = None  # type: ignore[assignment]
-    HFInstSegModel = None  # type: ignore[assignment]
-    HFModel = None  # type: ignore[assignment]
-    HFMulticlassClsModel = None  # type: ignore[assignment]
-    HFMultilabelClsModel = None  # type: ignore[assignment]
-    HFSemanticSegModel = None  # type: ignore[assignment]
-
 __all__ = [
     "ATSS",
     "DEIMV2",
@@ -81,6 +72,12 @@ __all__ = [
     "DinoV2Seg",
     "EdgeCrafter",
     "EfficientNet",
+    "HFDetectionModel",
+    "HFInstSegModel",
+    "HFModel",
+    "HFMulticlassClsModel",
+    "HFMultilabelClsModel",
+    "HFSemanticSegModel",
     "LiteHRNet",
     "MaskRCNN",
     "MaskRCNNTV",
@@ -109,17 +106,5 @@ if UltralyticsDetectionModel is not None:
             "UltralyticsMultiClassClsModel",
             "UltralyticsMultiLabelClsModel",
             "UltralyticsSemanticSegModel",
-        ]
-    )
-
-if HFModel is not None:
-    __all__.extend(
-        [
-            "HFDetectionModel",
-            "HFInstSegModel",
-            "HFModel",
-            "HFMulticlassClsModel",
-            "HFMultilabelClsModel",
-            "HFSemanticSegModel",
         ]
     )

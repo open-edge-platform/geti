@@ -7,7 +7,7 @@ Uses offline, network-free recipes: ``checkpoint`` is a nested
 ``transformers.PretrainedConfig`` class_path rather than a bare Hub id, the
 same offline-construction path every other HF backend test already relies
 on. The real, network-downloading recipes under ``recipe/`` (used by
-``create_engine("hf_mask2former_swin_t", data=...)`` in real usage) are
+``create_engine("mask2former_swin_t", data=...)`` in real usage) are
 exercised manually against ``data/wgisd``, not in this fast unit suite.
 """
 
@@ -148,7 +148,7 @@ def test_configurator_accepts_an_already_built_model(datamodule: DataModule) -> 
 
 def test_configurator_rejects_bad_data_type() -> None:
     with pytest.raises(TypeError, match="data must be PathLike or DataModule"):
-        Configurator(data=123, model="hf_mask2former_swin_t", task="INSTANCE_SEGMENTATION")  # type: ignore[arg-type]
+        Configurator(data=123, model="mask2former_swin_t", task="INSTANCE_SEGMENTATION")  # type: ignore[arg-type]
 
 
 def test_configurator_rejects_bad_model_type(datamodule: DataModule) -> None:
@@ -158,7 +158,7 @@ def test_configurator_rejects_bad_model_type(datamodule: DataModule) -> None:
 
 def test_configurator_rejects_unsupported_task(datamodule: DataModule) -> None:
     with pytest.raises(ValueError, match="Unsupported task"):
-        Configurator(data=datamodule, model="hf_mask2former_swin_t", task="KEYPOINT_DETECTION")
+        Configurator(data=datamodule, model="mask2former_swin_t", task="KEYPOINT_DETECTION")
 
 
 def test_configurator_resolves_a_bare_recipe_name_without_task_from_recipe(tmp_path: Path) -> None:
@@ -170,12 +170,12 @@ def test_configurator_resolves_a_bare_recipe_name_without_task_from_recipe(tmp_p
 
 def test_bare_model_name_requires_task_to_resolve() -> None:
     with pytest.raises(ValueError, match="Cannot resolve model name"):
-        Configurator(data="tests/assets/instance_segmentation_coco", model="hf_mask2former_swin_t")
+        Configurator(data="tests/assets/instance_segmentation_coco", model="mask2former_swin_t")
 
 
 def test_bare_model_name_resolves_against_the_recipe_tree() -> None:
     configurator = Configurator(
-        data="tests/assets/instance_segmentation_coco", model="hf_mask2former_swin_t", task="INSTANCE_SEGMENTATION"
+        data="tests/assets/instance_segmentation_coco", model="mask2former_swin_t", task="INSTANCE_SEGMENTATION"
     )
     assert configurator.task == "INSTANCE_SEGMENTATION"
 

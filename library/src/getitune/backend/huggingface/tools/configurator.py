@@ -46,7 +46,7 @@ class Configurator:
         data: A data-root path (COCO/YOLO/Datumaro-native, whatever the
             underlying dataset format is) or an already-built
             :class:`~getitune.data.module.DataModule`.
-        model: A recipe filename (``"hf_rtdetrv2_r18"``), a full recipe path,
+        model: A recipe filename (``"rtdetrv2_r18"``), a full recipe path,
             or an already-instantiated :class:`HFModel`.
         task: Task identifier. Required when *model* is a bare name (there is
             no cross-task recipe search the way Ultralytics does).
@@ -125,7 +125,7 @@ class Configurator:
         if not path.exists():
             msg = (
                 f"Recipe not found: {path}\n"
-                f"Model name should match recipe filename (e.g., 'hf_rtdetrv2_r18' for 'hf_rtdetrv2_r18.yaml')"
+                f"Model name should match recipe filename (e.g., 'rtdetrv2_r18' for 'rtdetrv2_r18.yaml')"
             )
             raise FileNotFoundError(msg)
         return path

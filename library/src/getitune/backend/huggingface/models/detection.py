@@ -9,10 +9,10 @@ from functools import cached_property
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import torch
+import transformers
 from torchvision import tv_tensors
 from torchvision.ops import box_convert
 
-from getitune.backend.huggingface._deps import ModelOutput, transformers
 from getitune.backend.huggingface.data.geometry import reproject_boxes_to_input_space
 from getitune.backend.huggingface.exporter.native import HFModelExporter
 from getitune.backend.huggingface.models.base import HFModel
@@ -23,9 +23,11 @@ from getitune.types.task import TaskType
 
 if TYPE_CHECKING:
     from torchmetrics import Metric, MetricCollection
+    from transformers.utils import ModelOutput
 
     from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.data.entity.sample import SampleBatch
+    from getitune.types.label import LabelInfoTypes
 
 __all__ = ["HFDetectionModel"]
 
@@ -43,13 +45,37 @@ class HFDetectionModel(HFModel):
     export_model_type: ClassVar[str] = "ssd"
     label_keys: ClassVar[tuple[str, ...]] = ("labels",)
 
+    def __init__(
+        self,
+        checkpoint: str | transformers.PretrainedConfig,
+        label_info: LabelInfoTypes,
+        *,
+        confidence_threshold: float = 0.25,
+        iou_threshold: float = 0.5,
+        **kwargs: Any,  # noqa: ANN401
+    ) -> None:
+        """Build the model.
+
+        Args:
+            checkpoint: A Hub repo id or a local checkpoint directory.
+            label_info: Label metadata.
+            confidence_threshold: Minimum score ModelAPI keeps a detection
+                at, embedded in the exported model's metadata.
+            iou_threshold: IoU threshold for ModelAPI's NMS post-processing,
+                embedded in the exported model's metadata.
+            **kwargs: Forwarded to :class:`HFModel`.
+        """
+        super().__init__(checkpoint, label_info, **kwargs)
+        self._confidence_threshold = confidence_threshold
+        self._iou_threshold = iou_threshold
+
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
         return super()._export_parameters.wrap(
             model_type=self.export_model_type,
             task_type="detection",
-            confidence_threshold=0.25,
-            iou_threshold=0.5,
+            confidence_threshold=self._confidence_threshold,
+            iou_threshold=self._iou_threshold,
         )
 
     def build_targets(self, batch: SampleBatch) -> dict[str, Any]:

@@ -8,7 +8,7 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
-from getitune.backend.huggingface.trainers.metrics_csv import remap_log_key, write_metrics_csv
+from getitune.backend.huggingface.trainers.utils import remap_log_key, write_metrics_csv
 
 
 class TestRemapLogKey:
