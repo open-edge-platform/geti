@@ -13,7 +13,7 @@ from app.models import DatasetItemSubset
 from app.models.dataset_item import DatasetItemSortBy
 from app.models.media import SortDirection
 
-from .filters import _apply_annotation_status_filter, _apply_subset_filter
+from .filters import _apply_annotation_status_filter, _apply_date_range_filter, _apply_subset_filter
 
 # Maps each sortable field to its underlying DB column. Extend this when a new
 # `DatasetItemSortBy` member is introduced.
@@ -32,17 +32,6 @@ class DatasetItemRepository:
     def _base_select(self) -> Select:
         """Create base select statement filtered by project_id."""
         return select(DatasetItemDB).where(DatasetItemDB.project_id == self.project_id)
-
-    @staticmethod
-    def _apply_date_filters(
-        stmt: Select, start_date: datetime | None = None, end_date: datetime | None = None
-    ) -> Select:
-        """Apply date range filters to a select statement."""
-        if start_date:
-            stmt = stmt.where(DatasetItemDB.created_at >= start_date)
-        if end_date:
-            stmt = stmt.where(DatasetItemDB.created_at < end_date)
-        return stmt
 
     def save(self, dataset_item_db: DatasetItemDB) -> DatasetItemDB:
         dataset_item_db.updated_at = datetime.now(UTC)
@@ -64,7 +53,7 @@ class DatasetItemRepository:
         else:
             select_fn = func.count()
         stmt = select(select_fn).select_from(DatasetItemDB).where(DatasetItemDB.project_id == self.project_id)
-        stmt = self._apply_date_filters(stmt, start_date, end_date)
+        stmt = _apply_date_range_filter(stmt, DatasetItemDB.created_at, start_date, end_date)
         stmt = _apply_annotation_status_filter(stmt, annotation_status)
         stmt = _apply_subset_filter(stmt, subsets)
         if label_ids:
@@ -84,7 +73,7 @@ class DatasetItemRepository:
         sort_direction: SortDirection = SortDirection.DESC,
     ) -> list[DatasetItemDB]:
         stmt = self._base_select()
-        stmt = self._apply_date_filters(stmt, start_date, end_date)
+        stmt = _apply_date_range_filter(stmt, DatasetItemDB.created_at, start_date, end_date)
         stmt = _apply_annotation_status_filter(stmt, annotation_status)
         stmt = _apply_subset_filter(stmt, subsets)
         if label_ids:
@@ -110,7 +99,7 @@ class DatasetItemRepository:
             .join(MediaDB)
             .where(MediaDB.id == DatasetItemDB.id, MediaDB.project_id == DatasetItemDB.project_id)
         )
-        stmt = self._apply_date_filters(stmt, start_date, end_date)
+        stmt = _apply_date_range_filter(stmt, DatasetItemDB.created_at, start_date, end_date)
         stmt = _apply_annotation_status_filter(stmt, annotation_status)
         stmt = _apply_subset_filter(stmt, subsets)
         if label_ids:

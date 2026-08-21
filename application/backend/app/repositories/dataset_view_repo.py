@@ -18,6 +18,7 @@ from .base import BaseRepository
 from .filters import (
     _apply_annotation_status_filter,
     _apply_annotation_status_filter_with_video_support,
+    _apply_date_range_filter,
     _apply_label_filter_with_video_support,
     _apply_subset_filter,
     _apply_subset_filter_with_video_support,
@@ -38,11 +39,6 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
     def get_by_id(self, obj_id: str) -> DatasetViewDB | None:
         """Get a dataset view by its ID, scoped to the repository's project."""
         stmt = select(DatasetViewDB).where(DatasetViewDB.id == obj_id, DatasetViewDB.project_id == self.project_id)
-        return self.db.scalar(stmt)
-
-    def get_by_name(self, name: str) -> DatasetViewDB | None:
-        """Get a dataset view by its (project-unique) name."""
-        stmt = select(DatasetViewDB).where(DatasetViewDB.project_id == self.project_id, DatasetViewDB.name == name)
         return self.db.scalar(stmt)
 
     def list_by_project(self) -> Sequence[DatasetViewDB]:
@@ -104,16 +100,6 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             )
         )
 
-    @staticmethod
-    def _apply_media_date_filters(
-        stmt: Select, start_date: datetime | None = None, end_date: datetime | None = None
-    ) -> Select:
-        if start_date:
-            stmt = stmt.where(MediaDB.created_at >= start_date)
-        if end_date:
-            stmt = stmt.where(MediaDB.created_at < end_date)
-        return stmt
-
     def count_media(
         self,
         dataset_view_id: str,
@@ -135,7 +121,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
                 MediaDB.type != MediaType.VIDEO_FRAME,
             )
         )
-        stmt = self._apply_media_date_filters(stmt, start_date, end_date)
+        stmt = _apply_date_range_filter(stmt, MediaDB.created_at, start_date, end_date)
         stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
         stmt = _apply_subset_filter_with_video_support(stmt, subsets)
         stmt = _apply_label_filter_with_video_support(stmt, label_ids)
@@ -158,7 +144,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         stmt = self._base_media_select(dataset_view_id).join(
             DatasetItemDB, DatasetItemDB.id == MediaDB.id, isouter=True
         )
-        stmt = self._apply_media_date_filters(stmt, start_date, end_date)
+        stmt = _apply_date_range_filter(stmt, MediaDB.created_at, start_date, end_date)
         stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
         stmt = _apply_subset_filter_with_video_support(stmt, subsets)
         stmt = _apply_label_filter_with_video_support(stmt, label_ids)
@@ -183,16 +169,6 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             )
         )
 
-    @staticmethod
-    def _apply_item_date_filters(
-        stmt: Select, start_date: datetime | None = None, end_date: datetime | None = None
-    ) -> Select:
-        if start_date:
-            stmt = stmt.where(DatasetItemDB.created_at >= start_date)
-        if end_date:
-            stmt = stmt.where(DatasetItemDB.created_at < end_date)
-        return stmt
-
     def count_items(
         self,
         dataset_view_id: str,
@@ -213,7 +189,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
                 self._media_in_view_condition(dataset_view_id),
             )
         )
-        stmt = self._apply_item_date_filters(stmt, start_date, end_date)
+        stmt = _apply_date_range_filter(stmt, DatasetItemDB.created_at, start_date, end_date)
         stmt = _apply_annotation_status_filter(stmt, annotation_status)
         stmt = _apply_subset_filter(stmt, subsets)
         if label_ids:
@@ -235,7 +211,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
     ) -> list[DatasetItemDB]:
         """List (filter) the dataset items assigned to a dataset view."""
         stmt = self._base_item_select(dataset_view_id)
-        stmt = self._apply_item_date_filters(stmt, start_date, end_date)
+        stmt = _apply_date_range_filter(stmt, DatasetItemDB.created_at, start_date, end_date)
         stmt = _apply_annotation_status_filter(stmt, annotation_status)
         stmt = _apply_subset_filter(stmt, subsets)
         if label_ids:

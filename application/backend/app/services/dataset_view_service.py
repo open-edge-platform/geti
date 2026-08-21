@@ -75,9 +75,6 @@ class DatasetViewService(BaseSessionManagedService):
     def create_dataset_view(self, project_id: UUID, name: str, media_ids: list[UUID] | None = None) -> DatasetView:
         """Create a new, named dataset view, optionally pre-populated with the given media items."""
         repo = self._get_repo(project_id)
-        if repo.get_by_name(name) is not None:
-            raise ResourceWithNameAlreadyExistsError(ResourceType.DATASET_VIEW, name)
-
         db_dataset_view = DatasetViewDB(project_id=str(project_id), name=name)
         try:
             db_dataset_view = repo.save(db_dataset_view)
@@ -107,10 +104,6 @@ class DatasetViewService(BaseSessionManagedService):
         db_dataset_view = self._get_db_dataset_view(repo, dataset_view_id)
 
         if new_name != db_dataset_view.name:
-            existing = repo.get_by_name(new_name)
-            if existing is not None and existing.id != db_dataset_view.id:
-                raise ResourceWithNameAlreadyExistsError(ResourceType.DATASET_VIEW, new_name)
-
             db_dataset_view.name = new_name
             try:
                 db_dataset_view = repo.save(db_dataset_view)
