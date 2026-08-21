@@ -3,45 +3,13 @@
 
 import { Key, ReactNode } from 'react';
 
+import { DatasetView } from '@/api/types';
 import { ActionButton, Divider, Flex, Heading, Item, Menu, MenuTrigger, View } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { isEmpty } from 'lodash-es';
 
 import classes from './dataset-view-items-list.module.scss';
-
-export type DatasetView = {
-    id: string;
-    name: string;
-};
-
-type DatasetViewItemContainerProps = {
-    datasetView: DatasetView;
-    isSelected: boolean;
-    onSelectDatasetView: (datasetViewId: string) => void;
-    children: ReactNode;
-};
-
-const DatasetViewItemContainer = ({
-    datasetView,
-    isSelected,
-    onSelectDatasetView,
-    children,
-}: DatasetViewItemContainerProps) => {
-    return (
-        <li aria-label={datasetView.name} onClick={() => onSelectDatasetView(datasetView.id)}>
-            <View
-                padding={'size-200'}
-                borderRadius={'regular'}
-                UNSAFE_className={clsx(classes.datasetViewInListItem, {
-                    [classes.datasetViewListItemSelected]: isSelected,
-                })}
-            >
-                {children}
-            </View>
-        </li>
-    );
-};
 
 type DatasetViewItemProps = {
     datasetView: DatasetView;

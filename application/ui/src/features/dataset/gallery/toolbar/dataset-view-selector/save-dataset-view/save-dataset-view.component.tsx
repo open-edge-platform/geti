@@ -3,24 +3,47 @@
 
 import { FormEvent, useState } from 'react';
 
+import { DatasetView } from '@/api/types';
 import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading, TextField } from '@geti-ui/ui';
+import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
+import { useCreateDatasetViewMutation } from '../api/use-create-dataset-view';
 import { SelectedMediaCount } from '../selected-media-count/selected-media-count.component';
 
 type SaveDatasetViewDialogProps = {
     onClose: () => void;
     selectedMediaIds: string[];
+    datasetViews: DatasetView[];
 };
 
-const SaveDatasetViewDialog = ({ onClose, selectedMediaIds }: SaveDatasetViewDialogProps) => {
+const SaveDatasetViewDialog = ({ onClose, selectedMediaIds, datasetViews }: SaveDatasetViewDialogProps) => {
     const [viewName, setViewName] = useState<string>('');
+    const projectId = useProjectIdentifier();
+    const createDatasetViewMutation = useCreateDatasetViewMutation();
+    const isDuplicatedName = datasetViews.some((view) => view.name === viewName.trim());
 
-    const isSaveDisabled = isEmpty(viewName.trim());
+    const isSaveDisabled = isEmpty(viewName.trim()) || isDuplicatedName;
 
     const saveView = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        onClose();
+
+        createDatasetViewMutation.mutate(
+            {
+                params: {
+                    path: {
+                        project_id: projectId,
+                    },
+                },
+                body: {
+                    name: viewName,
+                    media_ids: selectedMediaIds,
+                },
+            },
+            {
+                onSuccess: onClose,
+            }
+        );
     };
 
     return (
@@ -30,8 +53,15 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds }: SaveDatasetViewDia
             <Content>
                 <SelectedMediaCount count={selectedMediaIds.length} />
                 <Form id={'view-name-form'} onSubmit={saveView} marginTop={'size-200'}>
-                    {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
-                    <TextField autoFocus label={'View name'} value={viewName} onChange={setViewName} />
+                    <TextField
+                        // eslint-disable-next-line jsx-a11y/no-autofocus
+                        autoFocus
+                        label={'View name'}
+                        value={viewName}
+                        onChange={setViewName}
+                        validationState={isDuplicatedName ? 'invalid' : undefined}
+                        errorMessage={isDuplicatedName ? 'A view with this name already exists.' : undefined}
+                    />
                 </Form>
             </Content>
             <ButtonGroup>
@@ -48,9 +78,10 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds }: SaveDatasetViewDia
 
 type SaveDatasetViewProps = {
     selectedMediaIds: string[];
+    datasetViews: DatasetView[];
 };
 
-export const SaveDatasetView = ({ selectedMediaIds }: SaveDatasetViewProps) => {
+export const SaveDatasetView = ({ selectedMediaIds, datasetViews }: SaveDatasetViewProps) => {
     const [isSaveViewDialogOpen, setIsSaveViewDialogOpen] = useState<boolean>(false);
 
     const closeDialog = () => {
@@ -64,7 +95,11 @@ export const SaveDatasetView = ({ selectedMediaIds }: SaveDatasetViewProps) => {
             </Button>
             <DialogContainer onDismiss={closeDialog}>
                 {isSaveViewDialogOpen && (
-                    <SaveDatasetViewDialog onClose={closeDialog} selectedMediaIds={selectedMediaIds} />
+                    <SaveDatasetViewDialog
+                        onClose={closeDialog}
+                        selectedMediaIds={selectedMediaIds}
+                        datasetViews={datasetViews}
+                    />
                 )}
             </DialogContainer>
         </>

@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
+import { DatasetView } from '@/api/types';
 import {
     AlertDialog,
     Content,
@@ -19,7 +20,7 @@ import { clsx } from 'clsx';
 import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { isEmpty } from 'lodash-es';
 
-import { DatasetView, DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
+import { DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
 import { RenameDatasetView } from './rename-dataset-view.component';
 
 import classes from './dataset-view-selector.module.scss';
@@ -84,9 +85,11 @@ type DatasetViewSelectorProps = {
     datasetViews: DatasetView[];
 };
 
-const ENTIRE_DATASET = {
+const ENTIRE_DATASET: DatasetView = {
     id: ENTIRE_DATASET_VIEW_ID,
     name: 'Entire dataset',
+    project_id: '',
+    created_at: '',
 };
 
 export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) => {
