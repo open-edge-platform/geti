@@ -119,6 +119,22 @@ class Settings(BaseSettings):
         gt=0,
     )
 
+    # SAM (Segment Anything Model)
+    sam_encoder_xml_path: Path = Field(
+        # The OpenVINO SAM encoder ships inside the ``app/services/sam`` Python module, so the
+        # default is resolved relative to this file rather than the current working directory.
+        # settings.py -> app; the encoder lives at app/services/sam/mobile_sam.encoder.xml
+        default=Path(__file__).resolve().parent / "services" / "sam" / "mobile_sam.encoder.xml",
+        alias="SAM_ENCODER_XML_PATH",
+        description="Path to the OpenVINO SAM image-encoder model XML file",
+    )
+    sam_ov_cache_path: Path | None = Field(
+        default=None,
+        alias="SAM_OV_CACHE_PATH",
+        description="Directory for the OpenVINO model cache used by the SAM encoder. "
+        "Defaults to <data_dir>/.sam_ov_cache.",
+    )
+
     # Video
     video_cache_ttl: float = Field(
         default=30.0,
@@ -192,6 +208,8 @@ class Settings(BaseSettings):
             self.staged_datasets_dir = self.data_dir / "staged_datasets"
         if self.source_media_dir is None:
             self.source_media_dir = self.data_dir / "source_media"
+        if self.sam_ov_cache_path is None:
+            self.sam_ov_cache_path = self.data_dir / ".sam_ov_cache"
 
         return self
 
@@ -204,6 +222,7 @@ class Settings(BaseSettings):
             self.job_dir,
             self.staged_datasets_dir,
             self.source_media_dir,
+            self.sam_ov_cache_path,
         ]:
             if d:
                 d.mkdir(parents=True, exist_ok=True)

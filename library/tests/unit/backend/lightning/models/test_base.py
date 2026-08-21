@@ -212,3 +212,75 @@ class TestDataInputParams:
         params = DataInputParams(input_size=(224, 224), mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
         ncwh = params.as_ncwh(batch_size=4)
         assert ncwh == (4, 3, 224, 224)
+
+
+class TestConfigurePreprocessingParams:
+    """Regression tests for LightningModel._configure_preprocessing_params.
+
+    Guards against reintroducing the 0% mAP bug where callers (e.g.
+    AutoConfigurator, getitune_trainer) substitute a hardcoded (0.0, 0.0, 0.0) /
+    (1.0, 1.0, 1.0) whenever the DataModule cannot derive mean/std from its CPU
+    augmentation pipeline (the common case when normalization instead lives in
+    augmentations_gpu). Such a substitution is a *truthy* tuple that must not
+    permanently shadow a model's own `_default_preprocessing_params` fallback
+    (e.g. YOLOX-S/L/X's std=(1/255, 1/255, 1/255), needed to undo the CPU
+    pipeline's [0, 1] scaling before OV/ONNX export).
+    """
+
+    @pytest.fixture
+    def model_default_std_1_over_255(self, mocker: MockerFixture) -> LightningModel:
+        """A LightningModel whose model-specific default mimics YOLOX-S/L/X."""
+        with mocker.patch.object(LightningModel, "_create_model", return_value=MockNNModule(3)):
+            model = LightningModel(
+                label_info=3,
+                data_input_params=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0)),
+            )
+        mocker.patch.object(
+            LightningModel,
+            "_default_preprocessing_params",
+            new_callable=mocker.PropertyMock,
+            return_value=DataInputParams((640, 640), (0.0, 0.0, 0.0), (1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0)),
+        )
+        return model
+
+    def test_none_mean_std_falls_back_to_model_default(self, model_default_std_1_over_255: LightningModel) -> None:
+        """mean=None/std=None (e.g. datamodule couldn't derive them) must use the model default."""
+        result = model_default_std_1_over_255._configure_preprocessing_params(
+            {"input_size": (640, 640), "mean": None, "std": None},
+        )
+        assert result.mean == (0.0, 0.0, 0.0)
+        assert result.std == (1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0)
+
+    def test_missing_mean_std_keys_fall_back_to_model_default(
+        self,
+        model_default_std_1_over_255: LightningModel,
+    ) -> None:
+        """A partial dict (mean/std keys absent entirely) must also use the model default."""
+        result = model_default_std_1_over_255._configure_preprocessing_params({"input_size": (640, 640)})
+        assert result.std == (1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0)
+
+    def test_hardcoded_identity_fallback_does_not_shadow_model_default(
+        self,
+        model_default_std_1_over_255: LightningModel,
+    ) -> None:
+        """Regression guard: callers must NOT substitute (1.0, 1.0, 1.0) for a missing std.
+
+        A caller that (incorrectly) substitutes the generic identity std=(1.0, 1.0, 1.0)
+        for a missing value defeats the model-specific default, since a non-empty tuple
+        is truthy and therefore looks "provided". This test documents/pins the (bad)
+        outcome of doing that, to make the anti-pattern obvious if it's reintroduced
+        upstream: callers must pass None through, not (1.0, 1.0, 1.0).
+        """
+        result = model_default_std_1_over_255._configure_preprocessing_params(
+            {"input_size": (640, 640), "mean": (0.0, 0.0, 0.0), "std": (1.0, 1.0, 1.0)},
+        )
+        assert result.std == (1.0, 1.0, 1.0)
+        assert result.std != (1.0 / 255.0, 1.0 / 255.0, 1.0 / 255.0)
+
+    def test_explicit_zero_mean_is_respected(self, model_default_std_1_over_255: LightningModel) -> None:
+        """A genuinely-intentional, explicit mean/std must still be honored (not overridden)."""
+        result = model_default_std_1_over_255._configure_preprocessing_params(
+            {"input_size": (640, 640), "mean": (0.1, 0.2, 0.3), "std": (0.5, 0.5, 0.5)},
+        )
+        assert result.mean == (0.1, 0.2, 0.3)
+        assert result.std == (0.5, 0.5, 0.5)

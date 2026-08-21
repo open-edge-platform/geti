@@ -128,6 +128,67 @@ describe('sortModels', () => {
         });
     });
 
+    describe('device', () => {
+        const modelsWithDevice = [
+            getMockedModel({
+                id: 'gpu',
+                training_info: { status: 'successful', device: { type: 'cuda', name: 'NVIDIA RTX 3090' } },
+            }),
+            getMockedModel({
+                id: 'cpu',
+                training_info: { status: 'successful', device: { type: 'cpu', name: 'Intel Core Ultra 9' } },
+            }),
+            getMockedModel({
+                id: 'xpu',
+                training_info: { status: 'successful', device: { type: 'xpu', name: 'Intel Arc A770' } },
+            }),
+        ];
+
+        it('sorts models by device name ascending', () => {
+            const sorted = sortModels(modelsWithDevice, 'device', []);
+
+            expect(sorted[0].id).toBe('xpu');
+            expect(sorted[1].id).toBe('cpu');
+            expect(sorted[2].id).toBe('gpu');
+        });
+
+        it('sorts models by device name case-insensitively', () => {
+            const models = [
+                getMockedModel({
+                    id: 'cuda',
+                    training_info: { status: 'successful', device: { type: 'cuda', name: 'ZOTAC GPU' } },
+                }),
+                getMockedModel({
+                    id: 'cpu',
+                    training_info: { status: 'successful', device: { type: 'cpu', name: 'amd cpu' } },
+                }),
+            ];
+
+            const sorted = sortModels(models, 'device', []);
+
+            expect(sorted[0].id).toBe('cpu');
+            expect(sorted[1].id).toBe('cuda');
+        });
+
+        it('places models with an undefined device last', () => {
+            const models = [
+                getMockedModel({
+                    id: 'undefined-device',
+                    training_info: { status: 'successful', device: undefined },
+                }),
+                getMockedModel({
+                    id: 'has-device',
+                    training_info: { status: 'successful', device: { type: 'cpu', name: 'Intel Core Ultra 9' } },
+                }),
+            ];
+
+            const sorted = sortModels(models, 'device', []);
+
+            expect(sorted[0].id).toBe('has-device');
+            expect(sorted[1].id).toBe('undefined-device');
+        });
+    });
+
     describe('size', () => {
         it('sorts models by size ascending', () => {
             const models = [

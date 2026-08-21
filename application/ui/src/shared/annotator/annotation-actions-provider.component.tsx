@@ -4,14 +4,15 @@
 import { createContext, ReactNode, useContext, useMemo, useRef } from 'react';
 
 import { $api } from '@/api';
-import type { AnnotationDTO, DatasetSubset, Label, Media } from '@/api/types';
-import { useQueryClient } from '@tanstack/react-query';
+import type { AnnotationDTO, DatasetItem, DatasetSubset, Label, Media } from '@/api/types';
+import { InfiniteData, matchQuery, useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEqual } from 'lodash-es';
 import { v4 as uuid } from 'uuid';
 
 import { UndoRedoProvider } from '../../features/dataset/media-preview/primary-toolbar/undo-redo/undo-redo-provider.component';
 import useUndoRedoState from '../../features/dataset/media-preview/primary-toolbar/undo-redo/use-undo-redo-state';
+import { getQueryKey } from '../../query-client/query-client';
 import { isVideoFrame } from '../media-item-utils';
 import type { Annotation, AnnotationLabelRef, Shape } from '../types';
 import { isNonEmptyArray } from '../util';
@@ -19,6 +20,8 @@ import { mapLocalAnnotationsToServer, mapServerAnnotationsToLocal } from './anno
 import type { AnnotatorMode } from './annotator-mode';
 import { EMPTY_LABEL_ID, isNonEmptyLabel, useProjectLabelsWithEmptyLabel } from './labels';
 import { incrementCachedAnnotatedFrameCount } from './util';
+
+type DatasetItemsPage = { items: DatasetItem[] };
 
 type AnnotationsContextValue = {
     annotations: Annotation[];
@@ -74,7 +77,6 @@ export const AnnotationActionsProvider = ({
                     '/api/projects/{project_id}/dataset/media/{media_id}/annotations',
                     { params: { path: { project_id: projectId, media_id: mediaItem.id } } },
                 ],
-                ['get', '/api/projects/{project_id}/dataset/items', { params: { path: { project_id: projectId } } }],
                 [
                     'get',
                     '/api/projects/{project_id}/dataset/items/{dataset_item_id}',
@@ -86,6 +88,38 @@ export const AnnotationActionsProvider = ({
                     { params: { path: { project_id: projectId, media_id: mediaItem.id } } },
                 ],
             ],
+        },
+        onSuccess: (data) => {
+            // The dataset item list backs the sidebar's review-status badges. Instead of
+            // invalidating it over the network (which would refetch every page the user has
+            // already scrolled through - potentially dozens of requests on every single
+            // submit), patch the affected item directly in the already-cached pages.
+            const datasetItemsQueryKey = getQueryKey([
+                'get',
+                '/api/projects/{project_id}/dataset/items',
+                { params: { path: { project_id: projectId } } },
+            ]);
+
+            queryClient.setQueriesData<InfiniteData<DatasetItemsPage>>(
+                { predicate: (query) => matchQuery({ queryKey: datasetItemsQueryKey }, query) },
+                (previousData) => {
+                    if (previousData === undefined) {
+                        return previousData;
+                    }
+
+                    return {
+                        ...previousData,
+                        pages: previousData.pages.map((page) => ({
+                            ...page,
+                            items: page.items.map((item) =>
+                                item.id === data.media_id
+                                    ? { ...item, subset: data.subset, user_reviewed: data.user_reviewed }
+                                    : item
+                            ),
+                        })),
+                    };
+                }
+            );
         },
     });
 

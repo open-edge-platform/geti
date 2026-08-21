@@ -19,11 +19,14 @@ describe('ExportDatasetConfig', () => {
         close: vi.fn(),
         toggle: vi.fn(),
         setOpen: vi.fn(),
+        point: { x: 0, y: 0 },
+        setPoint: vi.fn(),
     };
 
     const VIDEO_WARNING = /Exporting videos is not supported by this dataset format/i;
     const EMPTY_LABEL_WARNING_NO_OBJECT = /does not support empty labels.*"No object"/i;
     const EMPTY_LABEL_WARNING_NO_LABEL = /does not support empty labels.*"No label"/i;
+    const COCO_WARNING = /The exported dataset won't include any information about the subset assigned to each media/i;
 
     const renderApp = (project: Project, { videos = 2, emptyLabelInstances = 3 } = {}) => {
         server.use(
@@ -149,5 +152,12 @@ describe('ExportDatasetConfig', () => {
         expect(screen.getByRole('radio', { name: 'COCO' })).toBeChecked();
 
         await expect(screen.findByText(/please use the Geti export format/i)).rejects.toThrow();
+    });
+
+    it('shows the COCO subset warning', async () => {
+        renderApp(getMockedProject({ task: { exclusive_labels: true, task_type: 'detection' } }), { videos: 0 });
+
+        fireEvent.click(await screen.findByRole('radio', { name: 'COCO' }));
+        expect(await screen.findByText(COCO_WARNING)).toBeVisible();
     });
 });

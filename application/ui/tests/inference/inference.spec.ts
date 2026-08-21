@@ -6,7 +6,6 @@ import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
 import { expect, http, test } from '../fixtures';
-import { stepConfigureInferenceSourceAndSink } from '../workflows/workflow-steps';
 
 test.describe('Inference', () => {
     test.beforeEach(({ network }) => {
@@ -58,7 +57,7 @@ test.describe('Inference', () => {
         );
     });
 
-    test('Inference workflow', async ({ streamPage, page, network }) => {
+    test('Inference workflow', async ({ streamPage, inferencePage, page, network }) => {
         await test.step('starts stream', async () => {
             network.use(
                 http.get('/api/projects/{project_id}/pipeline', ({ response }) => {
@@ -82,7 +81,7 @@ test.describe('Inference', () => {
 
             await page.goto('/projects/id-1/inference');
 
-            await expect(page.getByRole('switch', { name: /Pipeline disabled/i })).toBeEnabled();
+            await expect(inferencePage.getPipelineSwitch('disabled')).toBeEnabled();
 
             network.use(
                 http.post('/api/projects/{project_id}/pipeline:enable', () => {
@@ -93,9 +92,9 @@ test.describe('Inference', () => {
                 })
             );
 
-            await page.getByRole('switch', { name: /Pipeline disabled/i }).click();
+            await inferencePage.enablePipeline();
 
-            await expect(page.getByRole('switch', { name: 'Pipeline enabled' })).toBeEnabled();
+            await expect(inferencePage.getPipelineSwitch('enabled')).toBeEnabled();
             network.use(
                 http.post('/api/projects/{project_id}/pipeline:disable', () => {
                     return HttpResponse.json(null, { status: 204 });
@@ -105,17 +104,17 @@ test.describe('Inference', () => {
                 })
             );
 
-            await page.getByRole('switch', { name: 'Pipeline enabled' }).click();
+            await inferencePage.disablePipeline();
 
-            await expect(page.getByRole('switch', { name: /Pipeline disabled/i })).toBeEnabled();
+            await expect(inferencePage.getPipelineSwitch('disabled')).toBeEnabled();
         });
 
         await test.step('updates data collection policy', async () => {
             await page.goto('/projects/id-1/inference');
 
             // Open both tabs just to make sure everything works
-            await page.getByRole('button', { name: 'Toggle Model statistics tab' }).click();
-            await expect(page.getByText('Model statistics', { exact: true })).toBeVisible();
+            await page.getByRole('button', { name: 'Toggle Pipeline metrics tab' }).click();
+            await expect(page.getByText('Pipeline metrics', { exact: true })).toBeVisible();
 
             await page.getByRole('button', { name: 'Toggle Data collection policy' }).click();
             await expect(page.getByRole('heading', { name: 'Data collection' })).toBeVisible();
@@ -351,21 +350,34 @@ test.describe('Inference', () => {
                 })
             );
 
-            await stepConfigureInferenceSourceAndSink(page);
+            await expect(inferencePage.getAddSourceButton()).toBeVisible();
 
-            await page.getByLabel('Pipeline configuration tabs').getByText('Input').click();
-            await expect(page.getByText(usbCamera)).toBeVisible();
+            await inferencePage.addUsbCameraSource({ name: usbCamera });
+            await inferencePage.addFolderSink({
+                name: 'My Sink',
+                folderPath: 'my-output',
+                outputFormats: ['Predictions'],
+                rateLimitSamples: 5,
+            });
+
+            await inferencePage.getInputTab().click();
+            await expect(inferencePage.getSourceCard(usbCamera)).toBeVisible();
             await expect(page.getByText('Device: FaceTime HD Camera')).toBeVisible();
 
-            await page.getByLabel('Pipeline configuration tabs').getByText('Output').click();
-            await expect(page.getByText('My Sink')).toBeVisible();
+            await inferencePage.getOutputTab().click();
+            await expect(inferencePage.getSinkCard('My Sink')).toBeVisible();
             await expect(page.getByText('Folder path: e2e-output')).toBeVisible();
             await expect(page.getByText('Rate limit: 5 samples every 1 second')).toBeVisible();
             await expect(page.getByText('Output formats: predictions')).toBeVisible();
         });
     });
 
-    test('shows stream only for projects with enabled pipeline', async ({ page, network, streamPage }) => {
+    test('shows stream only for projects with enabled pipeline', async ({
+        page,
+        network,
+        streamPage,
+        inferencePage,
+    }) => {
         const projectWithEnabledPipeline = getMockedProject({
             id: 'enabled-project-id',
             name: 'Enabled project',
@@ -415,7 +427,7 @@ test.describe('Inference', () => {
         await page.keyboard.press('Escape');
         await expect(page.getByRole('dialog')).toBeHidden();
 
-        await page.getByRole('tab', { name: 'Inference' }).click();
+        await inferencePage.openInferenceTab();
 
         await expect(page.getByTitle('Enable pipeline to start stream')).toBeVisible();
         await expect(page.getByRole('switch', { name: /Pipeline disabled/i })).toBeVisible();

@@ -17,14 +17,15 @@ elements, edit annotations and other attributes.
 
 In Geti, a _media_ refers to the actual image or video file that contains visual content. Media files are the raw
 data that the system processes, analyzes, and displays. They can be in various formats such as JPEG, PNG, MP4, etc.
-Images and video frames can be annotated. When a frame is annotated, Geti extracts it 
+Images and video frames can be annotated. When a frame is annotated, Geti extracts it
 from the video, assigns it an ID, and saves it as an image; the extracted frame can also be
 considered a media, supporting all the operations that are normally possible for images.
 A media may have a reference to a source, e.g. the camera from which it was acquired.
 
 A _dataset item_, on the other hand, is the fundamental unit of a machine learning dataset.
-Each dataset item corresponds to an annotated image or video frame, enriched with metadata  that is relevant for ML tasks. 
+Each dataset item corresponds to an annotated image or video frame, enriched with metadata that is relevant for ML tasks.
 Each dataset item typically contains:
+
 - A reference to the media file (image or video frame). Video CANNOT have a dataset item associated with it.
 - Annotations: Labels, bounding boxes, segmentation masks, or other forms of annotations that describe the content of the media.
 - Metadata: Additional information such as timestamps, source information, tags, and other relevant attributes.
@@ -78,6 +79,14 @@ This ensures that storage remains efficient and that any updates to the underlyi
 where those items appear. Removing an item from a view does not delete it from the dataset; conversely, deleting an item
 from the dataset automatically removes it from all views.
 
+Membership in a view is tracked at the _media_ level (images and videos), not at the dataset item level. This allows
+a video to be assigned to a view as soon as it is uploaded, even before any of its frames have been annotated (and
+therefore before a dataset item exists for it).
+
+In the web interface, a dataset view is not a separate page: it is selected via the `datasetViewId` query parameter
+on the project's dataset page, e.g. `/projects/<project_id>/dataset?datasetViewId=<dataset_view_id>`. When the
+parameter is absent, the page shows the entire dataset.
+
 ## Dataset revisions
 
 A dataset revision in Geti is an immutable snapshot of a dataset (or dataset view), capturing its exact state at
@@ -111,7 +120,7 @@ The database saves the relevant information in the following tables:
 
 - `media`: contains all media records, for images, videos & video frames. Each record is identified by a unique id
   and contains metadata about the media (filename, format, size, shape, etc.).
-- `video_frames`: contains one record for each video frame, identified by a media id. Video frame shares the id with corresponding `media` record. 
+- `video_frames`: contains one record for each video frame, identified by a media id. Video frame shares the id with corresponding `media` record.
   Each record contains metadata about the video frame (timestamp).
   Additionally, it has a reference to the source video (video_id) it was extracted from.
 - `dataset_items`: contains one record for each dataset item, identified by a unique id. The record contains
@@ -124,8 +133,9 @@ The database saves the relevant information in the following tables:
   The actual media file is stored in the filesystem with a name that matches the id and the format
   (e.g. `e4531145-540f-4a0b-8e70-02a70aef9637.jpg`); the same applies to the corresponding thumbnail image.
 - `dataset_views`: one record for each view, identified by a unique id and a name.
-- `dataset_view_items`: a many-to-many relationship table that associates dataset items with views. Each record contains
-  the id of the dataset item and the id of the view it belongs to.
+- `dataset_view_items`: a many-to-many relationship table that associates media (images and videos) with views.
+  Each record contains the id of the media item and the id of the view it belongs to. Referencing media (rather
+  than dataset items) allows a video to be assigned to a view before any of its frames have been annotated.
 - `dataset_revisions`: simple metadata about each revision, such as creation time and number of items. The actual data
   is instead stored in a file on the filesystem.
 - `dataset_items_tags`: a many-to-many relationship table that associates tags with dataset items. Each record contains

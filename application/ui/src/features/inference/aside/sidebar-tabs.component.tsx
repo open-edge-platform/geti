@@ -16,7 +16,7 @@ import styles from './sidebar-tabs.module.scss';
 const TABS = [
     { label: 'Pipeline configuration', icon: <PipelineIcon />, content: <PipelineConfiguration /> },
     { label: 'Data collection policy', icon: <Gear />, content: <DataCollection /> },
-    { label: 'Model statistics', icon: <GraphChart />, content: <Graphs /> },
+    { label: 'Pipeline metrics', icon: <GraphChart />, content: <Graphs /> },
 ];
 
 type TabProps = {

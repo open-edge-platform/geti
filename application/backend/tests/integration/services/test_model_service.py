@@ -21,8 +21,42 @@ from app.db.schema import (
 )
 from app.models import DatasetItemSubset, EvaluationResult
 from app.models.model_revision import ModelFormat, TrainingStatus
+from app.models.system import DeviceInfo, DeviceType
 from app.services import ModelRevisionMetadata, ModelService, ResourceInUseError, ResourceNotFoundError, ResourceType
 from tests.integration.project_factory import ProjectTestDataFactory
+
+
+def write_openvino_model(variant_dir: Path, confidence_threshold: float | None) -> None:
+    """Write a minimal OpenVINO IR model, optionally carrying a confidence threshold in its rt_info."""
+    import openvino as ov
+    import openvino.opset14 as ops
+
+    variant_dir.mkdir(parents=True, exist_ok=True)
+    param = ops.parameter([1, 3], ov.Type.f32, name="input")
+    model = ov.Model([ops.relu(param)], [param], name="tiny")  # pyrefly: ignore[no-matching-overload]
+    if confidence_threshold is not None:
+        model.set_rt_info(str(confidence_threshold), ["model_info", "confidence_threshold"])
+    ov.save_model(model, variant_dir / "model.xml", compress_to_fp16=False)
+
+
+def write_onnx_model(variant_dir: Path, confidence_threshold: float | None) -> None:
+    """Write a minimal ONNX model, optionally carrying a confidence threshold in its metadata properties."""
+    import onnx
+    from onnx import TensorProto, helper
+
+    variant_dir.mkdir(parents=True, exist_ok=True)
+    graph = helper.make_graph(
+        [helper.make_node("Relu", ["input"], ["output"])],
+        "tiny",
+        [helper.make_tensor_value_info("input", TensorProto.FLOAT, [1, 3])],
+        [helper.make_tensor_value_info("output", TensorProto.FLOAT, [1, 3])],
+    )
+    model = helper.make_model(graph)
+    if confidence_threshold is not None:
+        model.metadata_props.append(
+            onnx.StringStringEntryProto(key="model_info confidence_threshold", value=str(confidence_threshold))
+        )
+    onnx.save(model, variant_dir / "model.onnx")
 
 
 @pytest.fixture(autouse=True)
@@ -286,6 +320,68 @@ class TestModelServiceIntegration:
             assert variant.format in ["openvino", "onnx", "pytorch"]
             assert variant.precision in ["fp16", "fp32"]
             assert variant.weights_size == 0  # Files are empty, so size is 0
+            assert variant.optimal_confidence_threshold is None  # Files are empty, so nothing can be read
+
+    def test_get_model_variants_optimal_confidence_threshold(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ):
+        """The confidence threshold embedded at export time is reported for deployable variants only."""
+        variant_ids = {fmt: uuid4() for fmt in ("openvino", "onnx", "pytorch")}
+        for fmt, variant_id in variant_ids.items():
+            db_session.add(
+                ModelVariantDB(
+                    id=str(variant_id),
+                    model_revision_id=str(fxt_model_id),
+                    format=fmt,
+                    precision="fp16" if fmt != "pytorch" else "fp32",
+                )
+            )
+        db_session.flush()
+
+        models_dir = tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id) / "variants"
+        write_openvino_model(models_dir / str(variant_ids["openvino"]), confidence_threshold=0.35)
+        write_onnx_model(models_dir / str(variant_ids["onnx"]), confidence_threshold=0.35)
+        pytorch_dir = models_dir / str(variant_ids["pytorch"])
+        pytorch_dir.mkdir(parents=True, exist_ok=True)
+        (pytorch_dir / "model.pt").touch()
+
+        variants = fxt_model_service.get_model_variants(fxt_project_id, fxt_model_id)
+
+        thresholds_by_format = {v.format: v.optimal_confidence_threshold for v in variants}
+        assert thresholds_by_format == {
+            ModelFormat.OPENVINO: pytest.approx(0.35),
+            ModelFormat.ONNX: pytest.approx(0.35),
+            ModelFormat.PYTORCH: None,
+        }
+
+    def test_get_model_variants_without_confidence_threshold_metadata(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ):
+        """Variants whose task does not use a confidence threshold report None instead of failing."""
+        variant_ids = {fmt: uuid4() for fmt in ("openvino", "onnx")}
+        for fmt, variant_id in variant_ids.items():
+            db_session.add(
+                ModelVariantDB(id=str(variant_id), model_revision_id=str(fxt_model_id), format=fmt, precision="fp16")
+            )
+        db_session.flush()
+
+        models_dir = tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id) / "variants"
+        write_openvino_model(models_dir / str(variant_ids["openvino"]), confidence_threshold=None)
+        write_onnx_model(models_dir / str(variant_ids["onnx"]), confidence_threshold=None)
+
+        variants = fxt_model_service.get_model_variants(fxt_project_id, fxt_model_id)
+
+        assert {v.optimal_confidence_threshold for v in variants} == {None}
 
     def test_get_model_size_in_bytes(
         self, tmp_path: Path, fxt_project_id: UUID, fxt_model_id: UUID, fxt_model_service: ModelService
@@ -586,6 +682,24 @@ class TestModelServiceIntegration:
         assert model_db.training_status == TrainingStatus.SUCCESSFUL
         assert model_db.training_started_at == started_at
         assert model_db.training_finished_at == finished_at
+
+    def test_update_revision_persists_training_device(
+        self, fxt_project_id: UUID, fxt_model_id: UUID, fxt_model_service: ModelService, db_session: Session
+    ):
+        """Test that the hardware used to run the training is persisted on the model revision."""
+        device = DeviceInfo(type=DeviceType.CUDA, name="NVIDIA GeForce RTX 4090", memory=25757220864, index=0)
+
+        fxt_model_service.update_revision_status(
+            project_id=fxt_project_id,
+            model_id=fxt_model_id,
+            training_status=TrainingStatus.IN_PROGRESS,
+            training_device=device,
+        )
+
+        model_db = db_session.get(ModelRevisionDB, str(fxt_model_id))
+        db_session.refresh(model_db)
+        assert model_db is not None
+        assert model_db.training_device == device.model_dump(mode="json")
 
     def test_save_evaluation_result(
         self, fxt_model_id: UUID, fxt_project_id: UUID, fxt_model_service: ModelService, db_session: Session
