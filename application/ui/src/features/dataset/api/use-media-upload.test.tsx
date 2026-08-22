@@ -62,7 +62,7 @@ describe('useMediaUpload', () => {
             files,
             () => result.current.upload.uploadProgress.isUploading
         );
-        await vi.runAllTimersAsync();
+
         expect(uploadedFileNames).toEqual(['image-1.jpg', 'image-2.jpg']);
     });
 
@@ -97,7 +97,6 @@ describe('useMediaUpload', () => {
             mockFiles,
             () => result.current.upload.uploadProgress.isUploading
         );
-        await vi.runAllTimersAsync();
 
         expect(maxRunningUploads).toBeLessThanOrEqual(MEDIA_UPLOAD_CONCURRENCY);
         expect(result.current.upload.uploadProgress.completed).toBe(12);
@@ -132,7 +131,6 @@ describe('useMediaUpload', () => {
             files,
             () => result.current.upload.uploadProgress.isUploading
         );
-        await vi.runAllTimersAsync();
 
         expect(result.current.upload.uploadProgress).toEqual({
             total: 2,
@@ -171,7 +169,6 @@ describe('useMediaUpload', () => {
             files,
             () => result.current.upload.uploadProgress.isUploading
         );
-        await vi.runAllTimersAsync();
 
         const items = result.current.state.items;
         expect(items).toHaveLength(2);
