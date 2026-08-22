@@ -16,7 +16,10 @@ interface LanguageOption {
 
 export const SUPPORTED_LANGUAGES: readonly LanguageOption[] = [
     { code: 'en', label: 'English' },
-    { code: 'zh-CN', label: '中文' },
+    { code: 'zh-CN', label: '简体中文' },
+    { code: 'zh-TW', label: '繁體中文（台灣）' },
+    { code: 'zh-HK', label: '繁體中文（香港）' },
+    { code: 'zh-MO', label: '繁體中文（澳門）' },
 ];
 
 /**

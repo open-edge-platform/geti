@@ -490,7 +490,8 @@
         "assignmentUnannotatedPart_one": "{{count}} item that still need annotation before they can be assigned",
         "assignmentUnannotatedPart_other": "{{count}} items that still need annotation before they can be assigned",
         "assignmentThereAre": "there are {{detail}} and {{unannotatedDetail}}",
-        "trainMinAnnotationsReason": "In order to train a model, you need to annotate at least 3 items in your dataset, although we recommend annotating several more for better results."
+        "trainMinAnnotationsReason": "In order to train a model, you need to annotate at least 3 items in your dataset, although we recommend annotating several more for better results.",
+        "variantsTabsAriaLabel": "Model variants"
     },
     "inference": {
         "inferenceDevice": "Inference device",

@@ -30,7 +30,9 @@ const HealthCheck = ({ children }: { children: ReactNode }) => {
         return (
             <Flex direction={'column'} justifyContent={'center'} alignItems={'center'} height={'100vh'}>
                 <Loading variant={'intel'} mode={'inline'} />
-                <Heading bottom={'size-4600'} level={2}>{t('common.loadingPleaseWait')}</Heading>
+                <Heading bottom={'size-4600'} level={2}>
+                    {t('common.loadingPleaseWait')}
+                </Heading>
             </Flex>
         );
     }

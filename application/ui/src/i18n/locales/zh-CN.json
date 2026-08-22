@@ -7,9 +7,9 @@
         "edit": "编辑",
         "close": "关闭",
         "pleaseTryAgain": "请重试",
-        "selectAllItems": "全选条目",
+        "selectAllItems": "全选",
         "emptyList": "空列表",
-        "loadingPleaseWait": "加载中，请稍候……",
+        "loadingPleaseWait": "加载中，请稍候...",
         "serverError": "服务器错误",
         "refresh": "刷新"
     },
@@ -476,7 +476,8 @@
         "assignmentThereAre": "{{detail}}，且{{unannotatedDetail}}",
         "assignmentReviewedOnly_one": "还有 {{count}} 个已审核条目待分配",
         "assignmentUnannotatedOnly_one": "有 {{count}} 个条目仍需标注后才能分配",
-        "trainMinAnnotationsReason": "训练模型前，你需要为数据集中的至少 3 个条目添加标注；为了获得更好的效果，我们建议标注更多条目。"
+        "trainMinAnnotationsReason": "训练模型前，你需要为数据集中的至少 3 个条目添加标注；为了获得更好的效果，我们建议标注更多条目。",
+        "variantsTabsAriaLabel": "模型变体"
     },
     "inference": {
         "inferenceDevice": "推理设备",

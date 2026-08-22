@@ -38,7 +38,7 @@ export const ModelVariantsTabs = ({ model }: ModelVariantsTabsProps) => {
     }
 
     return (
-        <Tabs aria-label={t('models.detailsTabsAriaLabel')} UNSAFE_className={classes.tabs}>
+        <Tabs aria-label={t('models.variantsTabsAriaLabel')} UNSAFE_className={classes.tabs}>
             <TabList>
                 <Item aria-label='openvino tab' key='openvino' textValue='openvino'>
                     <OpenVINO />
