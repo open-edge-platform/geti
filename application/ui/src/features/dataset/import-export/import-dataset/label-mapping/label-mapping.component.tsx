@@ -6,6 +6,7 @@ import { Fragment, useActionState } from 'react';
 import { Checkbox, dimensionValue, Flex, Form, Grid, Heading, Item, Picker, Text, View } from '@geti-ui/ui';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
 import { useStagedDataset } from 'hooks/api/staged-dataset.hook';
+import { useTranslation } from 'react-i18next';
 
 import { DatasetStatistics } from '../../../../../components/dataset-statistics/dataset-statistics.component';
 import { useProject } from '../../../../../hooks/api/project.hook';
@@ -63,6 +64,8 @@ const useFormConfig = ({ datasetLabels, stagedDatasetId, selectedProjectId }: us
 };
 
 export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
+    const { t } = useTranslation();
+
     const { data: selectedProject } = useProject();
     const projectLabels = selectedProject?.task?.labels ?? [];
     const finalLabels = [{ id: '', name: UNMAPPED_LABEL_VALUE, color: '' }, ...projectLabels];
@@ -84,19 +87,19 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
 
     return (
         <Flex direction={'column'} gap={'size-200'} UNSAFE_style={{ padding: dimensionValue('size-275') }}>
-            <Heading>Imported dataset statistics</Heading>
+            <Heading>{t('dataset.importedStatsHeading')}</Heading>
 
             <View padding={'size-200'} borderRadius={'regular'} backgroundColor={'gray-75'}>
                 <Flex justifyContent={'center'} gap={'size-200'}>
                     <DatasetStatistics
-                        label='images'
+                        label={t('dataset.imagesLabel')}
                         totalMediaItems={totalImages}
                         totalAnnotatedItems={totalAnnotatedImages}
                     />
 
                     {totalFrames > 0 && (
                         <DatasetStatistics
-                            label='frames'
+                            label={t('dataset.framesLabel')}
                             totalMediaItems={totalFrames}
                             totalAnnotatedItems={totalAnnotatedFrames}
                         />
@@ -107,7 +110,7 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
             </View>
 
             <Flex direction={'column'}>
-                <Heading marginTop={'size-200'}>Label mapping - optional</Heading>
+                <Heading marginTop={'size-200'}>{t('dataset.labelMappingHeading')}</Heading>
                 <Text UNSAFE_className={classes.emptyLabelsWarning}>
                     Any unmapped items will be imported as unlabeled
                 </Text>
@@ -121,9 +124,9 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                         alignItems={'center'}
                         columns={[`1fr ${dimensionValue('size-400')} 1fr`]}
                     >
-                        <View>Dataset labels</View>
+                        <View>{t('dataset.datasetLabelsColumn')}</View>
                         <View />
-                        <View>Project labels</View>
+                        <View>{t('dataset.projectLabelsColumn')}</View>
 
                         {datasetLabels.map((label, index) => (
                             <Fragment key={`${label}-${index}`}>
@@ -134,7 +137,7 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                                         items={finalLabels}
                                         placeholder={PLACEHOLDER_LABEL}
                                         name={`targetLabel-${index}`}
-                                        aria-label={`Target label for ${label}`}
+                                        aria-label={t('dataset.targetLabelAriaLabel', { label })}
                                         defaultSelectedKey={finalLabels.find(({ name }) => name === label)?.name}
                                     >
                                         {(item) => (
@@ -151,7 +154,7 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                     <Checkbox
                         defaultSelected={formState.include_unannotated}
                         name='include_unannotated'
-                        aria-label='include unannotated'
+                        aria-label={t('dataset.includeUnannotatedAriaLabel')}
                     >
                         Include media without annotations
                     </Checkbox>

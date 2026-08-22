@@ -4,6 +4,7 @@
 import { Content, Dialog, DialogContainer, Divider, Heading } from '@geti-ui/ui';
 import { useProject } from 'hooks/api/project.hook';
 import { useImportDatasetToProject } from 'hooks/storage/use-import-dataset-to-project.hook';
+import { useTranslation } from 'react-i18next';
 
 import {
     FileUploadedResponse,
@@ -17,6 +18,8 @@ import { ImportProcess } from './import-process/import-process.component';
 import { LabelMapping } from './label-mapping/label-mapping.component';
 
 export const ImportDatasetToProject = () => {
+    const { t } = useTranslation();
+
     const { data: selectedProject } = useProject();
 
     const { appendImportEntry } = useImportDatasetToProject();
@@ -36,8 +39,8 @@ export const ImportDatasetToProject = () => {
     return (
         <DialogContainer onDismiss={datasetImportDialogState.close}>
             {datasetImportDialogState.isOpen && (
-                <Dialog aria-label={'Import dataset to project'} width={800}>
-                    <Heading>Import dataset</Heading>
+                <Dialog aria-label={t('dataset.importToProjectAriaLabel')} width={800}>
+                    <Heading>{t('dataset.importDataset')}</Heading>
                     <Divider />
                     <Content
                         minHeight={'size-5000'}

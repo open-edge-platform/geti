@@ -7,6 +7,7 @@ import type { Label, TaskType } from '@/api/types';
 import { ActionButton, DOMRefValue, Grid, TextField, TextFieldRef, useUnwrapDOMRef, View } from '@geti-ui/ui';
 import { Add } from '@geti-ui/ui/icons';
 import { useEventListener } from 'hooks/event-listener.hook';
+import { useTranslation } from 'react-i18next';
 import { v4 as uuid } from 'uuid';
 
 import { HotkeyField } from '../../../../components/label-fields/hotkey-field.component';
@@ -25,6 +26,7 @@ type CreateLabelProps = {
 
 export const CreateLabel = ({ labels, onCreate, taskType }: CreateLabelProps) => {
     const [newLabel, setNewLabel] = useState<Label>(getInitialLabel);
+    const { t } = useTranslation();
     const containerRef = useRef<DOMRefValue<HTMLDivElement>>(null);
     const inputRef = useRef<TextFieldRef<HTMLInputElement>>(null);
     const inputRefUnwrapped = useUnwrapDOMRef(inputRef);
@@ -77,8 +79,8 @@ export const CreateLabel = ({ labels, onCreate, taskType }: CreateLabelProps) =>
             <View>
                 <TextField
                     ref={inputRef}
-                    aria-label={'Create label input'}
-                    placeholder={'Create label'}
+                    aria-label={t('labels.createInputAriaLabel')}
+                    placeholder={t('labels.createPlaceholder')}
                     value={newLabel.name}
                     onChange={(newName) => setNewLabel((prevLabel) => ({ ...prevLabel, name: newName }))}
                     errorMessage={validationResult}
@@ -98,7 +100,7 @@ export const CreateLabel = ({ labels, onCreate, taskType }: CreateLabelProps) =>
                 isQuiet
                 onPress={createLabel}
                 isDisabled={isCreateLabelDisabled}
-                aria-label={`Create label ${newLabel.name}`}
+                aria-label={t('labels.createActionAriaLabel', { name: newLabel.name })}
             >
                 <Add />
             </ActionButton>

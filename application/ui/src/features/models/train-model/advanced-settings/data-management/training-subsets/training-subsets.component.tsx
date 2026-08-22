@@ -7,6 +7,7 @@ import type { ConfigurableParameter, TrainingConfiguration } from '@/api/types';
 import { Content, Flex, Heading, InlineAlert, View } from '@geti-ui/ui';
 import { useGetDatasetItems } from 'hooks/use-get-dataset-items.hook';
 import { isEqual } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { isParameterGroup } from '../../../../model-listing/model-training-parameters/utils';
 import { distributeByLargestRemainder } from '../../../../utils';
@@ -29,9 +30,10 @@ type TrainingSubsetsProps = {
 };
 
 const TrainingSubsetsUnavailable = () => {
+    const { t } = useTranslation();
     return (
         <InlineAlert variant={'notice'} marginTop={'size-200'}>
-            <Heading>Invalid training subsets configuration</Heading>
+            <Heading>{t('models.invalidSubsetsHeading')}</Heading>
             <Content>
                 Training subsets do not contain enough media items to support a configurable split between training,
                 validation, and testing subsets.
@@ -114,6 +116,8 @@ export const TrainingSubsets = ({
     subsetsParameters,
     onTrainingConfigurationChange,
 }: TrainingSubsetsProps) => {
+    const { t } = useTranslation();
+
     const { trainingSubset, validationSubset } = getSubsets(subsetsParameters);
     const {
         validationSubsetSize,
@@ -196,10 +200,16 @@ export const TrainingSubsets = ({
                 </Accordion.Description>
                 <Accordion.Divider marginY={'size-200'} />
                 <View>
-                    <span aria-label={'Total dataset samples'}>Dataset: {totalDatasetItemsSize} samples</span>
+                    <span aria-label={t('models.totalSamplesAriaLabel')}>
+                        {t('models.totalSamplesText', { count: totalDatasetItemsSize })}
+                    </span>
                     <Flex alignItems={'center'} gap={'size-100'}>
-                        <span aria-label={'Total assigned samples'}>Assigned: {assignedDatasetItemsSize}</span>
-                        <span aria-label={'Total unassigned samples'}>Unassigned: {unassignedSubsetSize}</span>
+                        <span aria-label={t('models.assignedAriaLabel')}>
+                            {t('models.assignedText', { count: assignedDatasetItemsSize })}
+                        </span>
+                        <span aria-label={t('models.unassignedAriaLabel')}>
+                            {t('models.unassignedText', { count: unassignedSubsetSize })}
+                        </span>
                     </Flex>
                     <Accordion.Divider marginY={'size-200'} />
                     <SubsetsDistribution

@@ -5,6 +5,7 @@ import { $api } from '@/api';
 import { AlertDialog, Button, DialogTrigger } from '@geti-ui/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { isInvalidJob } from 'hooks/api/util';
+import { useTranslation } from 'react-i18next';
 
 type CancelJobConfirmationProps = {
     jobId: string;
@@ -12,6 +13,8 @@ type CancelJobConfirmationProps = {
 };
 
 export const CancelJobConfirmation = ({ jobId, onRemove }: CancelJobConfirmationProps) => {
+    const { t } = useTranslation();
+
     const dialogState = useOverlayTriggerState({});
     const cancelMutation = $api.useMutation('post', `/api/jobs/{job_id}:cancel`);
 
@@ -35,23 +38,23 @@ export const CancelJobConfirmation = ({ jobId, onRemove }: CancelJobConfirmation
             <Button
                 variant='negative'
                 style='outline'
-                aria-label='cancel job dialog'
+                aria-label={t('dataset.cancelJobAriaLabel')}
                 isDisabled={cancelMutation.isPending}
                 isPending={cancelMutation.isPending}
             >
-                Cancel
+                {t('dataset.cancelJobButton')}
             </Button>
             <AlertDialog
-                title='Cancel Job'
+                title={t('dataset.cancelJobTitle')}
                 variant='destructive'
-                cancelLabel='Cancel'
+                cancelLabel={t('common.cancel')}
                 autoFocusButton='primary'
-                primaryActionLabel='Cancel Job'
+                primaryActionLabel={t('dataset.cancelJobAction')}
                 onPrimaryAction={handleCancel}
                 onSecondaryAction={dialogState.close}
                 isPrimaryActionDisabled={cancelMutation.isPending}
             >
-                {`Are you sure you want to cancel the job "${jobId}"?`}
+                {t('dataset.cancelJobConfirmText', { jobId })}
             </AlertDialog>
         </DialogTrigger>
     );

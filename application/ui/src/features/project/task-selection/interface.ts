@@ -6,9 +6,9 @@ import type { TaskType } from '@/api/types';
 export type TaskOption = {
     id: string;
     imageSrc: string;
-    title: string;
-    description: string;
-    advice: string;
-    verb: string;
+    titleKey: string;
+    descriptionKey: string;
+    adviceKey: string;
+    verbKey: string;
     value: TaskType;
 };

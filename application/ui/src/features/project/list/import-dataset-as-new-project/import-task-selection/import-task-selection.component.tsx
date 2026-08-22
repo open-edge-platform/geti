@@ -9,11 +9,12 @@ import { InfoOutline } from '@geti-ui/ui/icons';
 import { useProjects } from 'hooks/api/project.hook';
 import { useStagedDatasetSuspense } from 'hooks/api/staged-dataset.hook';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';
+import { useTranslation } from 'react-i18next';
 
 import { generateUniqueProjectName } from '../../../create/utils';
 import { useImportDatasetDialog } from '../../../providers/import-dataset-dialog-provider.component';
 import { validateProjectName } from '../../../validator';
-import { MAP_PROJECT_TYPE_TO_TITLE } from '../../util';
+import { getTaskTypeTitle } from '../../util';
 import { getAllowedTaskTypes, getRecommendedTaskType, TASK_SELECTION_FORM_ID } from './util';
 
 type ImportTaskSelectionProps = {
@@ -55,6 +56,7 @@ const useFormConfig = (
 export const ImportTaskSelection = ({ stagedDatasetId }: ImportTaskSelectionProps) => {
     const { data: projects } = useProjects();
     const { data: stagedDataset } = useStagedDatasetSuspense(stagedDatasetId);
+    const { t } = useTranslation();
 
     const annotationType = stagedDataset?.metadata?.annotation_type;
     const isGetiFormat = stagedDataset.format === 'geti';
@@ -73,8 +75,8 @@ export const ImportTaskSelection = ({ stagedDatasetId }: ImportTaskSelectionProp
         key: taskType,
         label:
             defaultTaskType === taskType
-                ? `${MAP_PROJECT_TYPE_TO_TITLE[taskType]} (Recommended)`
-                : MAP_PROJECT_TYPE_TO_TITLE[taskType],
+                ? `${getTaskTypeTitle(taskType)} ${t('projectList.recommendedSuffix')}`
+                : getTaskTypeTitle(taskType),
     }));
 
     return (
@@ -85,8 +87,8 @@ export const ImportTaskSelection = ({ stagedDatasetId }: ImportTaskSelectionProp
                     name={'name'}
                     value={name}
                     onChange={setName}
-                    label={'Project name'}
-                    aria-label={'Project name'}
+                    label={t('projectForm.nameLabel')}
+                    aria-label={t('projectForm.nameLabel')}
                     defaultValue={formState.name}
                     marginBottom={'size-250'}
                     errorMessage={validationErrorMessage}
@@ -97,10 +99,10 @@ export const ImportTaskSelection = ({ stagedDatasetId }: ImportTaskSelectionProp
                     isRequired
                     items={items}
                     name={'task_type'}
-                    label={'Task type'}
-                    aria-label={'Task type'}
+                    label={t('projectForm.taskTypeLabel')}
+                    aria-label={t('projectForm.taskTypeLabel')}
                     marginBottom={'size-150'}
-                    placeholder='Select task'
+                    placeholder={t('projectForm.selectTaskPlaceholder')}
                     defaultSelectedKey={formState.task_type}
                 >
                     {(item) => <Item>{item.label}</Item>}
@@ -113,11 +115,7 @@ export const ImportTaskSelection = ({ stagedDatasetId }: ImportTaskSelectionProp
                                 <InfoOutline />
                             </View>
 
-                            <Text>
-                                The recommended choice is based on the type of the annotations detected in the dataset.
-                                If you choose a different type, the annotations will be automatically transformed during
-                                import to fit the selected type.
-                            </Text>
+                            <Text>{t('projectList.importRecommendationInfo')}</Text>
                         </Flex>
                     )}
                 </View>

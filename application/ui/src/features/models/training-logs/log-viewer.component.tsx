@@ -16,6 +16,7 @@ import {
     View,
 } from '@geti-ui/ui';
 import { ChevronDownLight } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { useScrollAnchor } from './hooks/use-scroll-anchor.hook';
 import { LogEntry } from './log-entry.component';
@@ -42,6 +43,7 @@ const CONNECTION_STATUS_LABEL: Record<ConnectionStatus, string> = {
 };
 
 export const LogViewer = ({ logs, isStreaming = false, connectionStatus }: LogViewerProps) => {
+    const { t } = useTranslation();
     const [minLevel, setMinLevel] = useState<LogLevel>('INFO');
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -53,16 +55,16 @@ export const LogViewer = ({ logs, isStreaming = false, connectionStatus }: LogVi
         <Flex direction={'column'} height={'100%'} UNSAFE_style={{ overflow: 'hidden' }}>
             <Flex alignItems={'center'} gap={'size-200'} UNSAFE_className={classes.toolbar} flexShrink={0}>
                 <Picker
-                    label={'Level'}
+                    label={t('models.levelLabel')}
                     labelPosition={'side'}
                     selectedKey={minLevel}
                     onSelectionChange={(key) => setMinLevel(key as LogLevel)}
                     width={'size-2000'}
-                    aria-label={'Minimum log level'}
+                    aria-label={t('models.minimumLogLevelAriaLabel')}
                     isQuiet
                     contextualHelp={
                         <ContextualHelp variant={'info'}>
-                            <Heading>Minimum log level</Heading>
+                            <Heading>{t('models.minimumLogLevelAriaLabel')}</Heading>
                             <Content>
                                 <Text>
                                     Shows log entries at the selected level and above. For example, selecting WARNING
@@ -81,7 +83,7 @@ export const LogViewer = ({ logs, isStreaming = false, connectionStatus }: LogVi
                     value={searchQuery}
                     onChange={setSearchQuery}
                     placeholder={'Search logs...'}
-                    aria-label={'Search logs'}
+                    aria-label={t('models.searchLogsAriaLabel')}
                     width={'size-3000'}
                     isQuiet
                 />
@@ -121,10 +123,10 @@ export const LogViewer = ({ logs, isStreaming = false, connectionStatus }: LogVi
                     <ActionButton
                         onPress={scrollToBottom}
                         UNSAFE_className={classes.scrollToBottom}
-                        aria-label={'Scroll to bottom'}
+                        aria-label={t('models.scrollToBottom')}
                     >
                         <ChevronDownLight />
-                        <Text>Scroll to bottom</Text>
+                        <Text>{t('models.scrollToBottom')}</Text>
                     </ActionButton>
                 ) : null}
             </div>

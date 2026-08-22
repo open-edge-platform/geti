@@ -6,6 +6,7 @@ import { useDeferredValue, useMemo, useState } from 'react';
 import type { Label } from '@/api/types';
 import { Flex, Item, ListView, Selection, Text, TextField, View } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { EMPTY_LABEL_ID } from '../../../../../shared/annotator/labels';
 
@@ -26,6 +27,7 @@ export const LabelsList = ({
     onSelectedLabelsChange,
     isMultiple,
 }: LabelsListProps) => {
+    const { t } = useTranslation();
     const [searchPhrase, setSearchPhrase] = useState<string>(INITIAL_SEARCH_PHRASE);
     const deferredSearchPhrase = useDeferredValue(searchPhrase, INITIAL_SEARCH_PHRASE);
 
@@ -54,14 +56,14 @@ export const LabelsList = ({
     return (
         <Flex gap='size-200' direction='column' flex={1} minHeight={0}>
             <TextField
-                aria-label={'Search labels'}
+                aria-label={t('dataset.searchLabelsAriaLabel')}
                 value={searchPhrase}
                 onChange={setSearchPhrase}
-                placeholder='Search labels'
+                placeholder={t('dataset.searchLabelsPlaceholder')}
             />
 
             {hasNoSearchResults ? (
-                <Text>No results found. Try searching with different words.</Text>
+                <Text>{t('dataset.noResultsFound')}</Text>
             ) : (
                 <View flex={1} UNSAFE_style={{ overflowY: 'auto' }}>
                     <ListView

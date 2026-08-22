@@ -6,6 +6,7 @@ import { Key, useMemo } from 'react';
 import { ActionButton, Flex, Grid, Item, Menu, MenuTrigger, Picker } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useProjectTask } from 'hooks/use-project-task.hook';
+import { useTranslation } from 'react-i18next';
 
 import { TrainModel } from '../../train-model/train-model.component';
 import { useModelListing } from '../provider/model-listing-provider';
@@ -18,6 +19,7 @@ type MoreOptionsProps = {
     onToggleShowFailedModels: () => void;
 };
 const MoreOptions = ({ showFailedModels, onToggleShowFailedModels }: MoreOptionsProps) => {
+    const { t } = useTranslation();
     const handleOptionsAction = (key: Key) => {
         switch (key) {
             case 'show-failed':
@@ -30,10 +32,10 @@ const MoreOptions = ({ showFailedModels, onToggleShowFailedModels }: MoreOptions
 
     return (
         <MenuTrigger>
-            <ActionButton isQuiet aria-label={'Model listing options'}>
+            <ActionButton isQuiet aria-label={t('models.listingOptionsAriaLabel')}>
                 <MoreMenu />
             </ActionButton>
-            <Menu onAction={handleOptionsAction} aria-label={'Model listing options menu'}>
+            <Menu onAction={handleOptionsAction} aria-label={t('models.listingOptionsMenuAriaLabel')}>
                 <Item key={'show-failed'}>{showFailedModels ? 'Hide failed models' : 'Show failed models'}</Item>
             </Menu>
         </MenuTrigger>
@@ -41,6 +43,7 @@ const MoreOptions = ({ showFailedModels, onToggleShowFailedModels }: MoreOptions
 };
 
 export const Header = () => {
+    const { t } = useTranslation();
     const {
         groupBy,
         sortBy,
@@ -63,31 +66,31 @@ export const Header = () => {
         <Grid columns={['auto auto 1fr auto']} gap={'size-100'} alignItems={'center'}>
             <Flex gap={'size-100'}>
                 <Picker
-                    placeholder={'Group by'}
+                    placeholder={t('models.groupByPlaceholder')}
                     width={'size-2400'}
-                    aria-label={'Group models'}
+                    aria-label={t('models.groupModelsAriaLabel')}
                     selectedKey={groupBy}
                     onSelectionChange={(key) => onGroupByChange(key as GroupByMode)}
                 >
-                    <Item key='dataset'>Group by: Dataset</Item>
-                    <Item key='architecture'>Group by: Architecture</Item>
+                    <Item key='dataset'>{t('models.groupByDataset')}</Item>
+                    <Item key='architecture'>{t('models.groupByArchitecture')}</Item>
                 </Picker>
                 <Picker
-                    placeholder={'Sort by'}
+                    placeholder={t('models.sortByPlaceholder')}
                     width={'size-2000'}
-                    aria-label={'Sort models'}
+                    aria-label={t('models.sortModelsAriaLabel')}
                     selectedKey={sortBy}
                     onSelectionChange={(key) => onSortChange(key as SortBy)}
                 >
-                    <Item key='name'>Sort: Name</Item>
-                    <Item key='trained'>Sort: Trained</Item>
+                    <Item key='name'>{t('models.sortName')}</Item>
+                    <Item key='trained'>{t('models.sortTrained')}</Item>
                     {groupBy === 'dataset' ? (
-                        <Item key='architecture'>Sort: Architecture</Item>
+                        <Item key='architecture'>{t('models.sortArchitecture')}</Item>
                     ) : (
-                        <Item key='dataset'>Sort: Dataset</Item>
+                        <Item key='dataset'>{t('models.sortDataset')}</Item>
                     )}
-                    <Item key='device'>Sort: Device</Item>
-                    <Item key='size'>Sort: Size</Item>
+                    <Item key='device'>{t('models.sortDevice')}</Item>
+                    <Item key='size'>{t('models.sortSize')}</Item>
                     <Item key='score'>{`Sort: ${performanceMetricName}`}</Item>
                 </Picker>
             </Flex>

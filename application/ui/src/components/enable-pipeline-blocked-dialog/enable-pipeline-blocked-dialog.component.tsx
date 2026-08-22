@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AlertDialog, DialogContainer } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 type EnablePipelineBlockedDialogProps = {
     isOpen: boolean;
@@ -9,16 +10,18 @@ type EnablePipelineBlockedDialogProps = {
 };
 
 export const EnablePipelineBlockedDialog = ({ isOpen, onClose }: EnablePipelineBlockedDialogProps) => {
+    const { t } = useTranslation();
+
     return (
         <DialogContainer onDismiss={onClose}>
             {isOpen && (
                 <AlertDialog
-                    title={'Cannot enable pipeline'}
-                    primaryActionLabel={'Close'}
+                    title={t('inference.cannotEnableTitle')}
+                    primaryActionLabel={t('common.close')}
                     variant={'warning'}
                     onPrimaryAction={onClose}
                 >
-                    Make sure you selected a model and source before enabling the pipeline.
+                    {t('inference.cannotEnableText')}
                 </AlertDialog>
             )}
         </DialogContainer>

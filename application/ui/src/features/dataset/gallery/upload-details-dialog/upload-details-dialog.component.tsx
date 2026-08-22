@@ -26,34 +26,42 @@ import {
     TooltipTrigger,
 } from '@geti-ui/ui';
 import { AcceptCircle, CrossCircle, Pending } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
-import { formatBytes, pluralizeItems } from '../../../../shared/util';
+import { formatBytes } from '../../../../shared/util';
 import { useMediaUploadContext } from '../../providers/media-upload-provider.component';
 import { computeSummary, type UploadFileItem, type UploadItemStatus } from '../../providers/media-upload-reducer';
 
 import classes from './upload-details-dialog.module.scss';
 
-const STATUS_LABEL: Record<UploadItemStatus, string> = {
-    queued: 'Queued',
-    uploading: 'Uploading',
-    uploaded: 'Uploaded',
-    failed: 'Failed',
+const STATUS_LABEL_KEYS: Record<UploadItemStatus, string> = {
+    queued: 'dataset.queuedStatus',
+    uploading: 'dataset.statusUploading',
+    uploaded: 'dataset.uploadedStatus',
+    failed: 'dataset.failedStatus',
 };
 
 const StatusIcon = ({ status }: { status: UploadItemStatus }): ReactNode => {
+    const { t } = useTranslation();
+
     switch (status) {
         case 'queued':
-            return <Pending aria-label={'Queued'} size={'S'} />;
+            return <Pending aria-label={t('dataset.queuedStatus')} size={'S'} />;
         case 'uploading':
             return <Loading mode={'inline'} size={'S'} />;
         case 'uploaded':
             return (
-                <AcceptCircle aria-label={'Uploaded'} width={16} height={16} style={{ fill: 'var(--brand-moss)' }} />
+                <AcceptCircle
+                    aria-label={t('dataset.uploadedStatus')}
+                    width={16}
+                    height={16}
+                    style={{ fill: 'var(--brand-moss)' }}
+                />
             );
         case 'failed':
             return (
                 <CrossCircle
-                    aria-label={'Failed'}
+                    aria-label={t('dataset.failedStatus')}
                     width={16}
                     height={16}
                     style={{ fill: 'var(--brand-coral-cobalt)' }}
@@ -63,10 +71,11 @@ const StatusIcon = ({ status }: { status: UploadItemStatus }): ReactNode => {
 };
 
 const StatusCell = ({ item }: { item: UploadFileItem }) => {
+    const { t } = useTranslation();
     const statusContent = (
         <Flex alignItems={'center'} gap={'size-100'}>
             <StatusIcon status={item.status} />
-            <Text>{STATUS_LABEL[item.status]}</Text>
+            <Text>{t(STATUS_LABEL_KEYS[item.status])}</Text>
         </Flex>
     );
 
@@ -75,11 +84,15 @@ const StatusCell = ({ item }: { item: UploadFileItem }) => {
             <Flex alignItems={'center'} gap={'size-100'}>
                 {statusContent}
                 <DialogTrigger type={'popover'}>
-                    <ActionButton isQuiet aria-label={'Error details'} UNSAFE_className={classes.error}>
-                        Error
+                    <ActionButton
+                        isQuiet
+                        aria-label={t('dataset.errorDetailsAriaLabel')}
+                        UNSAFE_className={classes.error}
+                    >
+                        {t('dataset.errorLabel')}
                     </ActionButton>
                     <Dialog>
-                        <Heading>Upload error</Heading>
+                        <Heading>{t('dataset.uploadErrorHeading')}</Heading>
                         <Divider />
                         <Content>
                             <Text>{item.errorMessage}</Text>
@@ -93,45 +106,54 @@ const StatusCell = ({ item }: { item: UploadFileItem }) => {
     return statusContent;
 };
 
-const buildSubheader = (total: number, succeeded: number, failed: number, isUploading: boolean): string => {
-    if (isUploading) {
-        const parts = [`${succeeded} uploaded`, failed > 0 ? `${failed} failed` : null].filter(Boolean).join(', ');
-
-        return `Uploading ${total} ${pluralizeItems(total)} — ${parts}`;
-    }
-
-    if (failed === 0) return `Uploaded ${succeeded} ${pluralizeItems(succeeded)}`;
-    if (succeeded === 0) return `Failed to upload ${failed} ${pluralizeItems(failed)}`;
-
-    return `Uploaded ${succeeded} ${pluralizeItems(succeeded)}, ${failed} failed`;
-};
-
 const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
     const { state } = useMediaUploadContext();
+    const { t } = useTranslation();
     const summary = computeSummary(state.items, state.isUploading);
     const items = state.items;
 
-    const subheader = buildSubheader(summary.total, summary.succeeded, summary.failed, summary.isUploading);
+    const separator = t('dataset.commaSeparator');
+
+    let subheader: string;
+    if (summary.isUploading) {
+        const parts = [
+            t('dataset.partUploaded', { count: summary.succeeded }),
+            summary.failed > 0 ? t('dataset.partFailed', { count: summary.failed }) : null,
+        ]
+            .filter(Boolean)
+            .join(separator);
+
+        subheader = `${t('dataset.summaryUploading', { count: summary.total })} — ${parts}`;
+    } else if (summary.failed === 0) {
+        subheader = t('dataset.summaryUploaded', { count: summary.succeeded });
+    } else if (summary.succeeded === 0) {
+        subheader = t('dataset.summaryFailed', { count: summary.failed });
+    } else {
+        subheader = [
+            t('dataset.summaryUploaded', { count: summary.succeeded }),
+            t('dataset.partFailed', { count: summary.failed }),
+        ].join(separator);
+    }
 
     return (
         <Dialog size={'L'}>
-            <Heading>Upload details</Heading>
+            <Heading>{t('dataset.uploadDetailsHeading')}</Heading>
             <Divider />
             <Content>
                 <Flex direction={'column'} gap={'size-200'}>
                     <Text>{subheader}</Text>
                     <TableView
-                        aria-label={'Upload details'}
+                        aria-label={t('dataset.uploadDetailsAriaLabel')}
                         overflowMode={'truncate'}
                         density={'compact'}
                         maxHeight={'60vh'}
                         isQuiet
                     >
                         <TableHeader>
-                            <Column isRowHeader>FILENAME</Column>
-                            <Column width={160}>STATUS</Column>
+                            <Column isRowHeader>{t('dataset.fileNameColumn')}</Column>
+                            <Column width={160}>{t('dataset.statusColumn')}</Column>
                             <Column width={120} align={'end'}>
-                                SIZE
+                                {t('dataset.sizeColumn')}
                             </Column>
                         </TableHeader>
                         <TableBody items={items}>

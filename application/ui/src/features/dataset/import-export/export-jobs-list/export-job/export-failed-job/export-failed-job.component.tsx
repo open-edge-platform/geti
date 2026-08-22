@@ -3,6 +3,7 @@
 
 import type { ExportDatasetJob } from '@/api/types';
 import { Button, Divider, Flex, Text, View } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { useExportDataset } from '../../../../../../hooks/storage/use-export-dataset.hook';
 import { ExportJobDetails } from '../export-details/export-details.component';
@@ -13,6 +14,8 @@ type ExportFailedJobProps = {
 };
 
 export const ExportFailedJob = ({ job, datasetName }: ExportFailedJobProps) => {
+    const { t } = useTranslation();
+
     const { removeLsExportId } = useExportDataset();
 
     const handleClose = () => {
@@ -28,7 +31,7 @@ export const ExportFailedJob = ({ job, datasetName }: ExportFailedJobProps) => {
                     <Button
                         variant='secondary'
                         style='fill'
-                        aria-label='close export dataset status'
+                        aria-label={t('dataset.closeExportStatusAriaLabel')}
                         onPress={handleClose}
                     >
                         Close

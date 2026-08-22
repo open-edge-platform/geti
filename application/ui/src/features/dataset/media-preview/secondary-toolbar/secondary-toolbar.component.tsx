@@ -21,6 +21,7 @@ import { CloseSemiBold, Gear } from '@geti-ui/ui/icons';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useTranslation } from 'react-i18next';
 
 import { ConfidenceThreshold } from '../../../../components/confidence-threshold/confidence-threshold.component';
 import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
@@ -83,18 +84,20 @@ const VideoAnnotationButtons = ({ onSubmit, isDisabled, isSaving }: VideoAnnotat
 };
 
 const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
+    const { t } = useTranslation();
+
     return (
         <DialogTrigger type={'popover'} placement={'bottom'}>
             <TooltipTrigger>
                 <Toolbar.Section>
-                    <ActionButton isQuiet aria-label={'Prediction settings'}>
+                    <ActionButton isQuiet aria-label={t('annotator.predictionSettings')}>
                         <Gear />
                     </ActionButton>
                 </Toolbar.Section>
-                <Tooltip>Prediction settings</Tooltip>
+                <Tooltip>{t('annotator.predictionSettings')}</Tooltip>
             </TooltipTrigger>
             <Dialog size='S'>
-                <Heading>Prediction settings</Heading>
+                <Heading>{t('annotator.predictionSettings')}</Heading>
                 <Divider />
                 <Content>
                     <Flex gap={'size-300'} direction={'column'}>

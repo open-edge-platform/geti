@@ -5,6 +5,7 @@ import { Fragment } from 'react';
 
 import dayjs from 'dayjs';
 import { useClipboard } from 'hooks/use-clipboard/use-clipboard.hook';
+import { useTranslation } from 'react-i18next';
 
 import { LOG_LEVEL_COLORS, type LogEntry as LogEntryType } from './log-types';
 
@@ -40,6 +41,7 @@ const formatSource = (name: string, func: string, line: number): string => {
 };
 
 const MessageWithPaths = ({ message }: { message: string }) => {
+    const { t } = useTranslation();
     const { copy } = useClipboard();
 
     return message.split(PATH_REGEX).map((part, index) => {
@@ -48,7 +50,7 @@ const MessageWithPaths = ({ message }: { message: string }) => {
                 <span
                     key={index}
                     className={classes.path}
-                    title={'Click to copy path'}
+                    title={t('models.clickToCopyPath')}
                     onClick={() => copy(part)}
                     role={'button'}
                     tabIndex={0}

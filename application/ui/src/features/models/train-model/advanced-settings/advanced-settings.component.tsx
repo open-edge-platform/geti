@@ -4,6 +4,7 @@
 import { ReactNode, RefObject, useRef } from 'react';
 
 import { DOMRefValue, Item, TabList, TabPanels, Tabs, Text, useUnwrapDOMRef, View } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { useTrainModelState } from '../train-model-provider.component';
 import { DataManagement } from './data-management/data-management.component';
@@ -25,13 +26,14 @@ type TabProps = {
 };
 
 export const AdvancedSettings = () => {
+    const { t } = useTranslation();
     const { trainingConfiguration, onTrainingConfigurationChange, defaultTrainingConfiguration } = useTrainModelState();
     const containerRef = useRef<DOMRefValue<HTMLDivElement>>(null);
     const unwrappedContainerRef = useUnwrapDOMRef(containerRef);
 
     // Should never happen, but just in case, to prevent errors in the UI
     if (trainingConfiguration === undefined || defaultTrainingConfiguration === undefined) {
-        return <Text>Training configuration is not available.</Text>;
+        return <Text>{t('models.configNotAvailable')}</Text>;
     }
 
     const TABS: TabProps[] = [

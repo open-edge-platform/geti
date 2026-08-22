@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Content, Heading, IllustratedMessage, View } from '@geti-ui/ui';
 import { usePipelineMetrics } from 'hooks/api/pipeline.hook';
+import { useTranslation } from 'react-i18next';
 import { CartesianGrid, Label, Line, LineChart, ReferenceLine, XAxis, YAxis } from 'recharts';
 
 interface DataPoint {
@@ -100,6 +101,7 @@ const Graph = ({ label, data }: { label: string; data: DataPoint[] }) => {
 };
 
 export const Graphs = () => {
+    const { t } = useTranslation();
     const { latencyData, throughputData, metrics } = useMetricsData();
 
     const hasData = latencyData.length > 0 || throughputData.length > 0;
@@ -108,7 +110,7 @@ export const Graphs = () => {
         <View height={'100%'} UNSAFE_style={{ overflow: 'hidden auto' }}>
             {!hasData && !metrics ? (
                 <IllustratedMessage>
-                    <Heading>No statistics available</Heading>
+                    <Heading>{t('inference.noStatistics')}</Heading>
                     <Content>
                         Pipeline metrics will show here once the pipeline starts running and processing data.
                     </Content>
@@ -119,13 +121,13 @@ export const Graphs = () => {
                         <Heading level={4} marginBottom={'size-300'}>
                             Throughput
                         </Heading>
-                        <Graph label='requests/sec' data={throughputData} />
+                        <Graph label={t('inference.requestsPerSecondLabel')} data={throughputData} />
                     </View>
                     <View>
                         <Heading level={4} marginBottom={'size-300'}>
                             Latency
                         </Heading>
-                        <Graph label='ms' data={latencyData} />
+                        <Graph label={t('inference.latencyMsLabel')} data={latencyData} />
                     </View>
                 </>
             )}

@@ -14,26 +14,29 @@ import {
     TooltipTrigger,
 } from '@geti-ui/ui';
 import { Close, Hotkeys as HotkeysIcon } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { HotkeysList } from './hotkeys-list.component';
 
 import styles from './hotkeys.module.scss';
 
 export const Hotkeys = () => {
+    const { t } = useTranslation();
+
     return (
         <DialogTrigger type={'popover'} hideArrow placement={'top'}>
             <TooltipTrigger>
-                <ActionButton isQuiet aria-label={'Hotkeys'}>
+                <ActionButton isQuiet aria-label={t('annotator.hotkeys')}>
                     <HotkeysIcon />
                 </ActionButton>
-                <Tooltip>Hotkeys</Tooltip>
+                <Tooltip>{t('annotator.hotkeys')}</Tooltip>
             </TooltipTrigger>
             {(close) => (
                 <Dialog UNSAFE_className={styles.hotkeysDialog}>
                     <Heading>
                         <Flex justifyContent={'space-between'} alignItems={'center'}>
-                            <Text>Hotkeys</Text>
-                            <ActionButton isQuiet onPress={close} aria-label={'Close hotkeys'}>
+                            <Text>{t('annotator.hotkeys')}</Text>
+                            <ActionButton isQuiet onPress={close} aria-label={t('annotator.closeHotkeys')}>
                                 <Close />
                             </ActionButton>
                         </Flex>

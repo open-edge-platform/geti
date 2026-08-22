@@ -3,6 +3,7 @@
 
 import type { Media, MediaVideo } from '@/api/types';
 import { Content, ContextualHelp, Divider, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { isVideo } from '../../../../shared/media-item-utils';
 
@@ -13,6 +14,8 @@ type MediaItemContextualHelpProps = {
 };
 
 export const MediaItemContextualHelp = ({ item }: MediaItemContextualHelpProps) => {
+    const { t } = useTranslation();
+
     if (!isVideo(item)) {
         return null;
     }
@@ -22,12 +25,12 @@ export const MediaItemContextualHelp = ({ item }: MediaItemContextualHelpProps) 
             <ContextualHelp
                 variant='info'
                 UNSAFE_className={classes.videoIndicatorDetails}
-                aria-label='Media information'
+                aria-label={t('dataset.mediaInformationAriaLabel')}
             >
                 <Content>
-                    <Text>Number of annotated frames: {item.annotated_frame_count}</Text>
+                    <Text>{t('dataset.annotatedFrames', { count: item.annotated_frame_count })}</Text>
                     <br />
-                    <Text>Total frames: {item.frame_count}</Text>
+                    <Text>{t('dataset.totalFrames', { count: item.frame_count })}</Text>
                 </Content>
             </ContextualHelp>
 

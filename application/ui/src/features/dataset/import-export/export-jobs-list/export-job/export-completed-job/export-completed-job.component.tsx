@@ -6,6 +6,7 @@ import type { ExportDatasetJob } from '@/api/types';
 import { Button, Divider, Flex, Text, View } from '@geti-ui/ui';
 import { useDeleteStagedDataset, useStagedDataset } from 'hooks/api/staged-dataset.hook';
 import { isNil } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { useExportDataset } from '../../../../../../hooks/storage/use-export-dataset.hook';
 import { downloadFile } from '../../../../../../shared/util';
@@ -17,6 +18,8 @@ type ExportCompletedJobProps = {
 };
 
 export const ExportCompletedJob = ({ job, datasetName }: ExportCompletedJobProps) => {
+    const { t } = useTranslation();
+
     const { removeLsExportId } = useExportDataset();
     const stageDatasetResponse = useStagedDataset(job.metadata.dataset_id);
 
@@ -51,7 +54,7 @@ export const ExportCompletedJob = ({ job, datasetName }: ExportCompletedJobProps
                     <Button
                         variant='secondary'
                         style='fill'
-                        aria-label='close export dataset status'
+                        aria-label={t('dataset.closeExportStatusAriaLabel')}
                         onPress={handleClose}
                         isPending={removeStagedDatasetMutation.isPending}
                         isDisabled={removeStagedDatasetMutation.isPending}
@@ -60,7 +63,7 @@ export const ExportCompletedJob = ({ job, datasetName }: ExportCompletedJobProps
                     </Button>
                     <Button
                         variant='secondary'
-                        aria-label='download dataset'
+                        aria-label={t('dataset.downloadDatasetAriaLabel')}
                         onPress={handleDownload}
                         isPending={stageDatasetResponse.isFetching}
                         isDisabled={

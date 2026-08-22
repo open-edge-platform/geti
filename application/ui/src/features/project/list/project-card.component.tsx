@@ -8,6 +8,7 @@ import { Badge, dimensionValue, Flex, Heading, Text, View } from '@geti-ui/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { getProjectQueryOptions } from 'hooks/api/project.hook';
+import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
 import placeholderThumbnailIconUrl from '../../../assets/icons/image-icon.svg?url';
@@ -65,13 +66,14 @@ export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: Pro
     const isActive = item.active_pipeline;
     const taskType = getProjectTypeTitle(item.task);
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
 
     const prefetchProject = () => {
         void queryClient.prefetchQuery(getProjectQueryOptions(item.id));
     };
 
     return (
-        <div style={{ position: 'relative' }} aria-label={`Project: ${item.name}`}>
+        <div style={{ position: 'relative' }} aria-label={t('projectList.projectAriaLabel', { name: item.name })}>
             <NavLink
                 to={paths.project.dataset.index({ projectId: item.id })}
                 viewTransition
@@ -105,10 +107,13 @@ export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: Pro
 
                         <Flex marginTop={'size-200'} gap={'size-100'} direction={'column'}>
                             <Text UNSAFE_className={classes.projectMetadata}>
-                                • Created: {formatCreationDate(item.created_at)}
+                                • {t('projectList.createdLabel', { date: formatCreationDate(item.created_at) })}
                             </Text>
                             <Text UNSAFE_className={clsx(classes.labelList, classes.projectMetadata)}>
-                                • Labels: {(item.task.labels ?? []).map((label) => label.name).join(', ')}
+                                •{' '}
+                                {t('projectList.labelsLabel', {
+                                    labels: (item.task.labels ?? []).map((label) => label.name).join(', '),
+                                })}
                             </Text>
                         </Flex>
                     </View>

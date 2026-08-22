@@ -3,11 +3,10 @@
 
 import { Key } from '@geti-ui/ui';
 import { useIsPipelineConfigured } from 'hooks/use-is-pipeline-configured.hook';
+import { useTranslation } from 'react-i18next';
 
 import { toast } from '../../../../components/toast/toast.component';
 import { useDisablePipeline, useEnablePipeline, useProjectPipeline } from '../../../../hooks/api/pipeline.hook';
-
-const PROJECT_ACTIONS = { rename: 'Rename', delete: 'Delete' };
 
 type ProjectMenuCallbacks = {
     onRename: () => void;
@@ -28,14 +27,16 @@ export const useProjectMenuActions = (
     const enablePipelineMutation = useEnablePipeline();
     const disablePipelineMutation = useDisablePipeline();
     const projectPipelineQuery = useProjectPipeline(projectId);
+    const { t } = useTranslation();
 
     const isPipelineConfigured = useIsPipelineConfigured(projectPipelineQuery.data);
 
     const menuActions: MenuAction[] = [
         ...(isPipelineRunning
-            ? [{ key: 'disable-pipeline', label: 'Disable pipeline' }]
-            : [{ key: 'enable-pipeline', label: 'Enable pipeline' }]),
-        ...Object.entries(PROJECT_ACTIONS).map(([key, label]) => ({ key, label })),
+            ? [{ key: 'disable-pipeline', label: t('projectPanel.disablePipeline') }]
+            : [{ key: 'enable-pipeline', label: t('projectPanel.enablePipeline') }]),
+        { key: 'rename', label: t('projectPanel.rename') },
+        { key: 'delete', label: t('projectPanel.delete') },
     ];
 
     const handleAction = (key: Key) => {
@@ -50,14 +51,14 @@ export const useProjectMenuActions = (
 
                 enablePipelineMutation.mutate(mutationParams, {
                     onSuccess: () => {
-                        toast({ type: 'success', message: 'Pipeline enabled successfully' });
+                        toast({ type: 'success', message: t('projectPanel.pipelineEnabledToast') });
                     },
                 });
                 break;
             case 'disable-pipeline':
                 disablePipelineMutation.mutate(mutationParams, {
                     onSuccess: () => {
-                        toast({ type: 'success', message: 'Pipeline disabled successfully' });
+                        toast({ type: 'success', message: t('projectPanel.pipelineDisabledToast') });
                     },
                 });
                 break;

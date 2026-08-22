@@ -5,6 +5,7 @@ import { ReactNode, useState } from 'react';
 
 import { ActionButton, DialogContainer, dimensionValue, Divider, Flex, Heading } from '@geti-ui/ui';
 import { Collapse, Expand } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 type DatasetCardProps = {
     title: string;
@@ -14,6 +15,8 @@ type DatasetCardProps = {
 };
 
 export const DatasetCard = ({ title, gridArea, children, hasFullSizeContent = false }: DatasetCardProps) => {
+    const { t } = useTranslation();
+
     const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
 
     return (
@@ -45,7 +48,7 @@ export const DatasetCard = ({ title, gridArea, children, hasFullSizeContent = fa
                                         isQuiet
                                         alignSelf={'end'}
                                         onPress={() => setIsFullscreenOpen(false)}
-                                        aria-label='collapse fullscreen'
+                                        aria-label={t('dataset.collapseFullscreenAriaLabel')}
                                     >
                                         <Collapse />
                                     </ActionButton>

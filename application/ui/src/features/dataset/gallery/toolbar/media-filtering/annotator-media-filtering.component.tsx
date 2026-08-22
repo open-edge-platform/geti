@@ -13,6 +13,7 @@ import {
     TooltipTrigger,
 } from '@geti-ui/ui';
 import { Filter } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { DateFilter } from './date-filter/date-filter.component';
 import { FilterByStatus } from './filter-by-status/filter-by-status.component';
@@ -20,16 +21,18 @@ import { FilterBySubset } from './filter-by-subset/filter-by-subset.component';
 import { MediaFilterLabels } from './media-filter-labels/media-filter-labels.component';
 
 export const AnnotatorMediaFiltering = () => {
+    const { t } = useTranslation();
+
     return (
         <DialogTrigger type={'popover'} placement={'bottom'}>
             <TooltipTrigger>
-                <ActionButton isQuiet aria-label={'More filters'}>
+                <ActionButton isQuiet aria-label={t('dataset.moreFilters')}>
                     <Filter />
                 </ActionButton>
-                <Tooltip>More filters</Tooltip>
+                <Tooltip>{t('dataset.moreFilters')}</Tooltip>
             </TooltipTrigger>
             <Dialog size='S'>
-                <Heading>Filters</Heading>
+                <Heading>{t('dataset.filtersHeading')}</Heading>
                 <Divider />
                 <Content>
                     <Flex direction='column' gap='size-300'>

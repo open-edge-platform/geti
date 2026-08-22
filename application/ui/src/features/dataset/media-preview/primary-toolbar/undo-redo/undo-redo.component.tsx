@@ -4,11 +4,14 @@
 import { ActionButton, Flex, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Redo, Undo } from '@geti-ui/ui/icons';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useTranslation } from 'react-i18next';
 
 import { HOTKEYS } from '../../../../../shared/hotkeys-definition';
 import { useUndoRedo } from './undo-redo-provider.component';
 
 export const UndoRedo = ({ isDisabled }: { isDisabled?: boolean }) => {
+    const { t } = useTranslation();
+
     const { undo, canUndo, redo, canRedo } = useUndoRedo();
 
     useHotkeys(HOTKEYS.undo, undo, { enabled: canUndo, preventDefault: true }, [undo, canUndo]);
@@ -26,12 +29,12 @@ export const UndoRedo = ({ isDisabled }: { isDisabled?: boolean }) => {
                     id='undo-button'
                     data-testid='undo-button'
                     onPress={undo}
-                    aria-label='undo'
+                    aria-label={t('annotator.undo')}
                     isDisabled={!canUndo || isDisabled}
                 >
                     <Undo />
                 </ActionButton>
-                <Tooltip>Undo</Tooltip>
+                <Tooltip>{t('annotator.undoTooltip')}</Tooltip>
             </TooltipTrigger>
 
             <TooltipTrigger placement={'end'}>
@@ -39,13 +42,13 @@ export const UndoRedo = ({ isDisabled }: { isDisabled?: boolean }) => {
                     isQuiet
                     id='redo-button'
                     data-testid='redo-button'
-                    aria-label='redo'
+                    aria-label={t('annotator.redo')}
                     onPress={redo}
                     isDisabled={!canRedo || isDisabled}
                 >
                     <Redo />
                 </ActionButton>
-                <Tooltip>Redo</Tooltip>
+                <Tooltip>{t('annotator.redoTooltip')}</Tooltip>
             </TooltipTrigger>
         </Flex>
     );

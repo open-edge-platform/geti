@@ -6,6 +6,7 @@ import { useState, type CSSProperties } from 'react';
 import { ActionButton, Item, Menu, MenuTrigger } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { useTranslation } from 'react-i18next';
 
 import { EnablePipelineBlockedDialog } from '../../../../components/enable-pipeline-blocked-dialog/enable-pipeline-blocked-dialog.component';
 import { DeleteProjectDialog } from '../../../../components/project-dialogs/delete-project-dialog.component';
@@ -44,6 +45,7 @@ export const ProjectActionsMenu = ({
     onDelete,
     onEnableBlocked,
 }: ProjectActionsMenuProps) => {
+    const { t } = useTranslation();
     const metadata = { projectId, projectName, projectNames };
     const { menuActions, handleAction } = useProjectMenuActions(
         projectId,
@@ -63,7 +65,7 @@ export const ProjectActionsMenu = ({
                     fill: 'var(--spectrum-gray-900)',
                     ...actionButtonStyle,
                 }}
-                aria-label={'open project options'}
+                aria-label={t('projectPanel.openOptionsAriaLabel')}
                 data-testid={projectId}
             >
                 <MoreMenu />

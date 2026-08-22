@@ -3,6 +3,7 @@
 
 import { ActionButton, Icon, Text } from '@geti-ui/ui';
 import { Checkmark, Edit } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
@@ -14,12 +15,19 @@ type EditPredictionButtonProps = {
 };
 
 const EditPredictionButton = ({ isDisabled, onEditPrediction }: EditPredictionButtonProps) => {
+    const { t } = useTranslation();
+
     return (
-        <ActionButton isQuiet onPress={onEditPrediction} isDisabled={isDisabled} aria-label={'Edit prediction'}>
+        <ActionButton
+            isQuiet
+            onPress={onEditPrediction}
+            isDisabled={isDisabled}
+            aria-label={t('annotator.editPrediction')}
+        >
             <Icon>
                 <Edit />
             </Icon>
-            <Text>Edit</Text>
+            <Text>{t('common.edit')}</Text>
         </ActionButton>
     );
 };
@@ -31,6 +39,8 @@ type PredictionButtonsProps = {
 };
 
 export const PredictionButtons = ({ onSubmit, onModeChange, isDisabled }: PredictionButtonsProps) => {
+    const { t } = useTranslation();
+
     const { replaceAnnotations, annotations } = useAnnotationActions();
 
     const handleEditPrediction = () => {
@@ -42,7 +52,7 @@ export const PredictionButtons = ({ onSubmit, onModeChange, isDisabled }: Predic
         <>
             <ActionButton isQuiet onPress={onSubmit} isDisabled={isDisabled}>
                 <Checkmark />
-                <Text>Confirm prediction</Text>
+                <Text>{t('annotator.confirmPrediction')}</Text>
             </ActionButton>
 
             <EditPredictionButton onEditPrediction={handleEditPrediction} isDisabled={isDisabled} />

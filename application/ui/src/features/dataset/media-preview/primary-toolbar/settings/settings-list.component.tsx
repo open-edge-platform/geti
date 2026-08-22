@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Divider, Flex, Switch, Text, View } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { AnnotationSetting } from './annotation-setting.component';
 import { CanvasSettingsState } from './canvas-settings-provider.component';
@@ -13,6 +14,8 @@ interface SettingsListProps {
 }
 
 export const SettingsList = ({ canvasSettings, onCanvasSettingsChange }: SettingsListProps) => {
+    const { t } = useTranslation();
+
     const updateCanvasSettings = <T extends keyof CanvasSettingsState>(
         key: T,
         value: CanvasSettingsState[T]['value']
@@ -25,10 +28,10 @@ export const SettingsList = ({ canvasSettings, onCanvasSettingsChange }: Setting
     return (
         <View paddingEnd={'size-50'}>
             <Flex alignItems={'center'} justifyContent={'space-between'}>
-                <Text>Hide labels</Text>
+                <Text>{t('annotator.hideLabels')}</Text>
                 <Flex alignItems={'center'} gap={'size-100'}>
                     <Switch
-                        aria-label={'Hide labels'}
+                        aria-label={t('annotator.hideLabels')}
                         isEmphasized
                         isSelected={canvasSettings.hideLabels.value}
                         onChange={(isSelected) => {
@@ -89,10 +92,10 @@ export const SettingsList = ({ canvasSettings, onCanvasSettingsChange }: Setting
             <Divider size={'S'} marginY={'size-250'} />
 
             <Flex alignItems={'center'} justifyContent={'space-between'}>
-                <Text>Pixel view</Text>
+                <Text>{t('annotator.pixelView')}</Text>
                 <Flex alignItems={'center'} gap={'size-100'}>
                     <Switch
-                        aria-label={'Pixel view'}
+                        aria-label={t('annotator.pixelView')}
                         isEmphasized
                         isSelected={canvasSettings.pixelView.value}
                         onChange={(isSelected) => {

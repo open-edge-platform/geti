@@ -3,15 +3,15 @@
 
 import { Divider, Flex, Text } from '@geti-ui/ui';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useTranslation } from 'react-i18next';
 
 type TotalItemsProps = {
     totalSelectedElements: number;
 };
 
-const pluralRules = new Intl.PluralRules('en');
-
 export const TotalItems = ({ totalSelectedElements }: TotalItemsProps) => {
     const { totalCount } = useDatasetMediaWithReviewStatus();
+    const { t } = useTranslation();
 
     if (totalCount === 0) {
         return null;
@@ -23,12 +23,12 @@ export const TotalItems = ({ totalSelectedElements }: TotalItemsProps) => {
         <Flex gap={'size-100'}>
             {hasSelectedElements && (
                 <>
-                    <Text>{`${totalSelectedElements} selected`}</Text>
+                    <Text>{t('dataset.selectedCount', { count: totalSelectedElements })}</Text>
                     <Divider orientation={'vertical'} size={'S'} />
                 </>
             )}
 
-            <Text>{`${totalCount} media ${pluralRules.select(totalCount) === 'one' ? 'item' : 'items'}`}</Text>
+            <Text>{t('dataset.totalCount', { count: totalCount })}</Text>
         </Flex>
     );
 };

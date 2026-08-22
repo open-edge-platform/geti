@@ -4,6 +4,7 @@
 import type { Model } from '@/api/types';
 import { Flex, Item, TabList, TabPanels, Tabs, Text } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as ONNX } from '../../../../assets/icons/onnx-logo.svg';
 import { ReactComponent as OpenVINO } from '../../../../assets/icons/openvino-logo.svg';
@@ -27,16 +28,17 @@ const isQuantizationDisabled = (model: Model) => {
 };
 
 export const ModelVariantsTabs = ({ model }: ModelVariantsTabsProps) => {
+    const { t } = useTranslation();
     if (isEmpty(model.variants)) {
         return (
             <Flex justifyContent={'center'} alignItems={'center'} height={'size-3000'}>
-                <Text>No available model variants.</Text>
+                <Text>{t('models.noVariantsAvailable')}</Text>
             </Flex>
         );
     }
 
     return (
-        <Tabs aria-label='Model variants' UNSAFE_className={classes.tabs}>
+        <Tabs aria-label={t('models.detailsTabsAriaLabel')} UNSAFE_className={classes.tabs}>
             <TabList>
                 <Item aria-label='openvino tab' key='openvino' textValue='openvino'>
                     <OpenVINO />

@@ -8,8 +8,8 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isFunction } from 'lodash-es';
 
 import { toast } from '../../../components/toast/toast.component';
+import { i18n } from '../../../i18n';
 import { getQueryKey } from '../../../query-client/query-client';
-import { pluralizeItems } from '../../../shared/util';
 
 const toastId = 'deleting-notification';
 
@@ -20,7 +20,7 @@ const useDeleteMediaItemsMutation = () => {
             toast({
                 id: toastId,
                 type: 'error',
-                message: `Failed to delete, ${error?.detail}`,
+                message: i18n.t('dataset.deleteFailedToast', { detail: error?.detail }),
             });
         },
     });
@@ -36,7 +36,7 @@ export const useDeleteMediaItem = () => {
     const handleDeleteItems = async (media_ids: string[], onDeleted?: (ids: string[]) => void) => {
         alertDialogState.close();
 
-        toast({ id: toastId, type: 'info', message: `Deleting items...` });
+        toast({ id: toastId, type: 'info', message: i18n.t('dataset.deletingItemsToast') });
 
         deleteItemsMutation.mutate(
             {
@@ -68,7 +68,7 @@ export const useDeleteMediaItem = () => {
         toast({
             id: toastId,
             type: 'success',
-            message: `${deletedIds.length} ${pluralizeItems(deletedIds.length)} deleted successfully`,
+            message: i18n.t('dataset.deletedCountToast', { count: deletedIds.length }),
             duration: 3000,
         });
     };

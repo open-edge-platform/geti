@@ -5,6 +5,7 @@ import { $api } from '@/api';
 import { Button, Content, DropZone, FileTrigger, Flex, Heading, IllustratedMessage, Text } from '@geti-ui/ui';
 import { LinkOut } from '@geti-ui/ui/icons';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as EmptyDataset } from '../../assets/drop-files.svg';
 import { Link } from '../../platform/components/link.component';
@@ -23,6 +24,8 @@ type ImportUploadFileProps = {
 };
 
 export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUploadFileProps) => {
+    const { t } = useTranslation();
+
     const stagedDatasetMutation = $api.useMutation('post', '/api/staged_datasets');
     const prepareImportJobMutation = useSubmitJob();
 
@@ -31,7 +34,7 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
 
         if (hasMultipleFiles) {
             toast({
-                message: 'Adding folders or multiple files is not allowed. Please load a single file.',
+                message: t('dataset.uploadNotAllowedToast'),
                 type: 'error',
             });
             return;
@@ -39,7 +42,7 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
 
         if (!isSupportedDatasetZip(files[0])) {
             toast({
-                message: 'Unsupported file format. Please upload a valid .zip file.',
+                message: t('dataset.unsupportedFormatToast'),
                 type: 'error',
             });
             return;
@@ -87,13 +90,13 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
                                 Uploading
                                 <ThreeDotsFlashing />
                             </Heading>
-                            <Text>Dataset is being uploaded</Text>
+                            <Text>{t('dataset.uploadingText')}</Text>
                         </Flex>
                     )}
 
                     {!isPending && (
                         <Flex alignItems={'center'} direction={'column'} gap={'size-100'}>
-                            <Text>Drop the dataset .zip file here</Text>
+                            <Text>{t('dataset.dropZipHere')}</Text>
 
                             <FileTrigger
                                 data-testid='upload-zip-file'

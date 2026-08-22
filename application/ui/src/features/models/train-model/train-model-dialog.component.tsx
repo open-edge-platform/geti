@@ -3,6 +3,7 @@
 
 import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Footer, Heading, InlineAlert, Text } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { useTranslation } from 'react-i18next';
 import { Link, useMatch } from 'react-router-dom';
 
 import { toast } from '../../../components/toast/toast.component';
@@ -19,6 +20,7 @@ type TrainModelDialogProps = {
 };
 
 export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
+    const { t } = useTranslation();
     const {
         selectedTrainingDevice,
         selectedModelArchitectureId,
@@ -45,7 +47,7 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
 
                 toast({
                     message: isModelsPage ? (
-                        <Text>Model training started successfully.</Text>
+                        <Text>{t('models.trainingStartedToast')}</Text>
                     ) : (
                         <Flex alignItems={'center'} gap={'size-50'} wrap={'wrap'}>
                             <Text>
@@ -64,7 +66,7 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
 
     return (
         <Dialog width={'clamp(800px, 50vw, 1150px)'} height={isAdvancedSettingsMode ? '80vh' : undefined}>
-            <Heading>Select a model to train</Heading>
+            <Heading>{t('models.selectModelToTrain')}</Heading>
 
             <Divider size={'S'} />
 
@@ -80,7 +82,7 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
                 <Flex alignItems={'center'} marginBottom={'size-200'}>
                     {isTrainingDisabled ? (
                         <InlineAlert variant={'notice'}>
-                            <Heading>Why can I not start training?</Heading>
+                            <Heading>{t('models.whyCannotTrainHeading')}</Heading>
                             <Content>{trainingDisabledReason}</Content>
                         </InlineAlert>
                     ) : null}

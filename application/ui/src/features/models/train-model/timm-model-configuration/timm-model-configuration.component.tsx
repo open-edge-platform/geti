@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Divider, Flex, Heading, Item, Picker, View } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import classes from './timm-model-configuration.module.scss';
 
@@ -29,6 +30,7 @@ const useGetTimmConfiguration = () => {
 };
 
 export const TimmModelConfiguration = () => {
+    const { t } = useTranslation();
     const { architectures, variants, pretrainedWeights, info } = useGetTimmConfiguration();
 
     return (
@@ -43,20 +45,25 @@ export const TimmModelConfiguration = () => {
                         <Picker
                             width={'100%'}
                             items={architectures}
-                            label={'Architecture family'}
-                            placeholder={'Select architecture'}
+                            label={t('models.architectureFamilyLabel')}
+                            placeholder={t('models.selectArchitecturePlaceholder')}
                         >
                             {(item) => <Item key={item.id}>{item.name}</Item>}
                         </Picker>
-                        <Picker width={'100%'} items={variants} label={'Model variant'} placeholder={'Select variant'}>
+                        <Picker
+                            width={'100%'}
+                            items={variants}
+                            label={t('models.modelVariantLabel')}
+                            placeholder={t('models.selectVariantPlaceholder')}
+                        >
                             {(item) => <Item key={item.id}>{item.name}</Item>}
                         </Picker>
                     </Flex>
                     <Picker
                         width={'100%'}
                         items={pretrainedWeights}
-                        label={'Pretrained Weights'}
-                        placeholder={'Select weights'}
+                        label={t('models.pretrainedWeightsLabel')}
+                        placeholder={t('models.selectWeightsPlaceholder')}
                     >
                         {(item) => <Item key={item.id}>{item.name}</Item>}
                     </Picker>

@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 import { Button, ButtonGroup, Content, Dialog, Divider, Form, Heading, TextField } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 interface RenameDatasetRevisionDialogProps {
     currentName: string;
@@ -18,6 +19,7 @@ export const RenameDatasetRevisionDialog = ({
     onClose,
     isPending,
 }: RenameDatasetRevisionDialogProps) => {
+    const { t } = useTranslation();
     const [newName, setNewName] = useState(currentName);
 
     const hasSameName = newName.trim() === currentName;
@@ -30,14 +32,14 @@ export const RenameDatasetRevisionDialog = ({
 
     return (
         <Dialog>
-            <Heading>Rename dataset revision</Heading>
+            <Heading>{t('models.renameDatasetRevisionHeading')}</Heading>
 
             <Divider />
 
             <Content>
                 <Form onSubmit={handleSubmit} validationBehavior={'native'}>
                     <TextField
-                        label={'Dataset revision name'}
+                        label={t('models.datasetRevisionNameLabel')}
                         value={newName}
                         onChange={setNewName}
                         width={'100%'}

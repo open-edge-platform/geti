@@ -18,6 +18,7 @@ import { ChevronDownSmall } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { DatasetView, DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
 import { RenameDatasetView } from './rename-dataset-view.component';
@@ -31,16 +32,18 @@ type DeleteDatasetViewDialogProps = {
 };
 
 const DeleteDatasetViewDialog = ({ datasetView, onDelete, onClose }: DeleteDatasetViewDialogProps) => {
+    const { t } = useTranslation();
+
     return (
         <AlertDialog
-            title={`Delete confirmation`}
-            primaryActionLabel={'Delete'}
+            title={t('dataset.viewDeleteConfirmTitle')}
+            primaryActionLabel={t('common.delete')}
             onPrimaryAction={onDelete}
             onCancel={onClose}
-            secondaryActionLabel={'Close'}
+            secondaryActionLabel={t('dataset.closeButton')}
         >
             <Content>
-                <Text>Are you sure you want to delete the {`"${datasetView.name}"`} dataset view?</Text>
+                <Text>{t('dataset.viewDeleteConfirmText', { name: datasetView.name })}</Text>
             </Content>
         </AlertDialog>
     );
@@ -52,11 +55,13 @@ type DatasetViewsTriggerProps = {
 };
 
 const DatasetViewsTrigger = ({ selectedDatasetView, isDisabled }: DatasetViewsTriggerProps) => {
+    const { t } = useTranslation();
+
     return (
         <PressableElement isDisabled={isDisabled}>
             <div
                 role={'button'}
-                aria-label={'Select dataset view'}
+                aria-label={t('dataset.selectViewAriaLabel')}
                 aria-disabled={isDisabled}
                 tabIndex={isDisabled ? -1 : 0}
             >
@@ -84,20 +89,20 @@ type DatasetViewSelectorProps = {
     datasetViews: DatasetView[];
 };
 
-const ENTIRE_DATASET = {
-    id: ENTIRE_DATASET_VIEW_ID,
-    name: 'Entire dataset',
-};
-
 export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) => {
+    const { t } = useTranslation();
     const [isDatasetViewSelectorOpen, setIsDatasetViewSelectorOpen] = useState<boolean>(false);
 
+    const entireDataset = useMemo(() => {
+        return { id: ENTIRE_DATASET_VIEW_ID, name: t('dataset.entireDataset') };
+    }, [t]);
+
     const datasetViewsWithDefaultView = useMemo(() => {
-        return [ENTIRE_DATASET, ...datasetViews];
-    }, [datasetViews]);
+        return [entireDataset, ...datasetViews];
+    }, [entireDataset, datasetViews]);
 
     const [datasetViewId, setDatasetViewId] = useDatasetViewId();
-    const selectedDatasetView = datasetViewsWithDefaultView.find((item) => item.id === datasetViewId) ?? ENTIRE_DATASET;
+    const selectedDatasetView = datasetViewsWithDefaultView.find((item) => item.id === datasetViewId) ?? entireDataset;
 
     const [datasetViewToBeDeleted, setDatasetViewToBeDeleted] = useState<DatasetView | null>(null);
     const [datasetViewToBeRenamed, setDatasetViewToBeRenamed] = useState<DatasetView | null>(null);
@@ -141,7 +146,7 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
 
     return (
         <Flex gap={'size-100'} alignItems={'center'}>
-            <Text UNSAFE_className={classes.viewsTitle}>Views</Text>
+            <Text UNSAFE_className={classes.viewsTitle}>{t('dataset.viewsTitle')}</Text>
 
             <DialogTrigger
                 hideArrow
@@ -154,7 +159,7 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
                 <Dialog>
                     <Content>
                         <DatasetViewItemsList
-                            entireDatasetView={ENTIRE_DATASET}
+                            entireDatasetView={entireDataset}
                             otherDatasetViews={datasetViews}
                             selectedDatasetViewId={datasetViewId}
                             onOpenDeleteConfirmationDialog={openDeleteConfirmationDialog}

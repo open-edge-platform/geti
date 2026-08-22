@@ -19,6 +19,7 @@ import {
 import { SortDown, SortUp } from '@geti-ui/ui/icons';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { isString } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { isImage } from '../../../../shared/media-item-utils';
@@ -76,6 +77,7 @@ const SortMediaByUploadDate = () => {
 };
 
 export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
+    const { t } = useTranslation();
     const { onSelectedMediaItemChange } = useSelectDatasetItem();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys } = useSelectedData();
     const datasetViews = useDatasetViews();
@@ -105,7 +107,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
         <Flex direction={'column'} gridArea={'toolbar'} gap={'size-200'} marginBottom={'size-200'}>
             <Flex alignItems={'center'} justifyContent={'space-between'}>
                 <Flex alignItems={'center'} gap={'size-200'}>
-                    <Heading margin={0}>Dataset</Heading>
+                    <Heading margin={0}>{t('dataset.toolbarHeading')}</Heading>
 
                     {FEATURE_FLAGS.DATASET_VIEWS && (
                         <>
@@ -144,7 +146,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                     justifyContent={'space-between'}
                 >
                     <Checkbox
-                        aria-label={'select all'}
+                        aria-label={t('dataset.selectAllAriaLabel')}
                         onChange={handleToggleManyItemSelection}
                         isSelected={hasSelectedElements && totalSelectedElements === items.length}
                     />

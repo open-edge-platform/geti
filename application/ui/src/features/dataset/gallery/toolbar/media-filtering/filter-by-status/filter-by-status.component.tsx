@@ -4,11 +4,12 @@
 import type { FilterByStatusKey } from '@/api/types';
 import { DimensionValue, Item, Picker } from '@geti-ui/ui';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
+import { useTranslation } from 'react-i18next';
 
-const FILTER_BY_STATUS_OPTIONS: { name: string; key: FilterByStatusKey }[] = [
-    { name: 'All media', key: 'all' },
-    { name: 'Media with annotations', key: 'with_annotations' },
-    { name: 'Media with missing annotations', key: 'missing_annotations' },
+const FILTER_BY_STATUS_OPTIONS: { nameKey: string; key: FilterByStatusKey }[] = [
+    { nameKey: 'dataset.statusAll', key: 'all' },
+    { nameKey: 'dataset.statusWithAnnotations', key: 'with_annotations' },
+    { nameKey: 'dataset.statusMissingAnnotations', key: 'missing_annotations' },
 ];
 
 type FilterByStatusProps = {
@@ -17,16 +18,17 @@ type FilterByStatusProps = {
 
 export const FilterByStatus = ({ width }: FilterByStatusProps) => {
     const { annotationStatus, setAnnotationStatus } = useDatasetFiltersSearchParams();
+    const { t } = useTranslation();
 
     return (
         <Picker
             width={width}
-            aria-label={'media status'}
+            aria-label={t('dataset.mediaStatusAriaLabel')}
             items={FILTER_BY_STATUS_OPTIONS}
             selectedKey={annotationStatus ?? FILTER_BY_STATUS_OPTIONS[0].key}
             onSelectionChange={(status) => setAnnotationStatus(status as FilterByStatusKey)}
         >
-            {(item) => <Item>{item.name}</Item>}
+            {(item) => <Item>{t(item.nameKey)}</Item>}
         </Picker>
     );
 };

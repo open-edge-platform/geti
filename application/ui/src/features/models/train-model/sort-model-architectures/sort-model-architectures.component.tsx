@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Item, Picker, Section, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { SortingOptions } from './utils';
 
@@ -31,6 +32,7 @@ const SortModelArchitectureItem = ({ item }: SortItemProps) => {
 };
 
 export const SortModelArchitectures = ({ sortBy, onSort, items, ariaLabel }: SortWidgetProps) => {
+    const { t } = useTranslation();
     return (
         <Picker
             isQuiet
@@ -41,7 +43,7 @@ export const SortModelArchitectures = ({ sortBy, onSort, items, ariaLabel }: Sor
             UNSAFE_className={styles.sortModelArchitectures}
             labelAlign={'start'}
             labelPosition={'side'}
-            label={'Sort Models by:'}
+            label={t('models.sortModelsByLabel')}
             menuWidth={'size-3000'}
         >
             {(item) => {

@@ -4,6 +4,7 @@
 import { useImportJobStatus } from 'hooks/api/jobs/use-import-job-status.hook';
 import { useDeleteStagedDataset } from 'hooks/api/staged-dataset.hook';
 import { isInvalidJob, isJobFailed, isJobPending, isJobRunning } from 'hooks/api/util';
+import { useTranslation } from 'react-i18next';
 
 import { formatBytes } from '../../shared/util';
 import { ImportActiveJob } from '../import-card-status/import-active-job/import-active-job.component';
@@ -27,6 +28,7 @@ export const LoadingImportDataset = ({
     onSuccess,
     deleteEntry,
 }: LoadingImportDatasetProps) => {
+    const { t } = useTranslation();
     const deleteStagedFileMutation = useDeleteStagedDataset({ stagedDatasetId });
 
     const { data: job, ...response } = useImportJobStatus({
@@ -37,7 +39,7 @@ export const LoadingImportDataset = ({
             await onSuccess();
 
             toast({
-                message: `Dataset ${fileName} ${formatBytes(size)} imported successfully.`,
+                message: t('dataset.importedSuccessfullyToast', { fileName, size: formatBytes(size) }),
                 type: 'success',
             });
         },

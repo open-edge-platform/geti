@@ -5,6 +5,7 @@ import { Flex } from '@geti-ui/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';
 import { isEmpty, partition } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { StagedImportDataset } from '../../../../components/import-card-status/staged-import-dataset/staged-import-dataset.component';
 import { LoadingImportDataset } from '../../../../components/loading-import-dataset/loading-import-dataset.component';
@@ -15,6 +16,7 @@ import { useImportDatasetDialog } from '../../providers/import-dataset-dialog-pr
 
 export const ImportJobsList = () => {
     const queryClient = useQueryClient();
+    const { t } = useTranslation();
     const { datasetImportDialogState, setCurrentStep, setCurrentStagedId } = useImportDatasetDialog();
     const { getAllImportEntries, deleteImportEntry, updateImportEntryStep } = useImportDatasetAsNewProject();
 
@@ -75,10 +77,10 @@ export const ImportJobsList = () => {
                 <StagedImportDataset
                     key={`task-type-${stagedDatasetId}`}
                     fileName={fileName}
-                    message={'Select task type'}
+                    message={t('projectList.selectTaskTypeMessage')}
                     stagedDatasetId={stagedDatasetId}
                     onOpen={() => handleOpen('taskTypeSelection', stagedDatasetId)}
-                    primaryButtonLabel={'Select task type'}
+                    primaryButtonLabel={t('projectList.selectTaskTypeButton')}
                     deleteEntry={() => deleteImportEntry(stagedDatasetId)}
                 />
             ))}
@@ -87,10 +89,10 @@ export const ImportJobsList = () => {
                 <StagedImportDataset
                     key={`label-mapping-${stagedDatasetId}`}
                     fileName={fileName}
-                    message={'Map labels for the uploaded dataset'}
+                    message={t('projectList.mapLabelsMessage')}
                     stagedDatasetId={stagedDatasetId}
                     onOpen={() => handleOpen('labelMapping', stagedDatasetId)}
-                    primaryButtonLabel={'Map labels'}
+                    primaryButtonLabel={t('projectList.mapLabelsButton')}
                     deleteEntry={() => deleteImportEntry(stagedDatasetId)}
                 />
             ))}

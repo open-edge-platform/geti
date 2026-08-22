@@ -3,6 +3,7 @@
 
 import { ActionButton, Flex, Text, View } from '@geti-ui/ui';
 import { AddCircle } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { paths } from '../../../../constants/paths';
@@ -13,6 +14,7 @@ import classes from './new-project-menu.module.scss';
 
 export const NewProjectCard = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const { datasetImportDialogState, setCurrentStep, setCurrentStagedId } = useImportDatasetDialog();
 
     const handleCreateProject = () => {
@@ -32,21 +34,13 @@ export const NewProjectCard = () => {
             <View UNSAFE_className={classes.card} flex={1}>
                 <ActionButton onPress={handleCreateProject} UNSAFE_className={classes.buttonText}>
                     <AddCircle />
-                    <Text>
-                        Create
-                        <br />
-                        new project
-                    </Text>
+                    <Text>{t('projectList.createNewProject')}</Text>
                 </ActionButton>
             </View>
             <View UNSAFE_className={classes.card} flex={1}>
                 <ActionButton onPress={handleCreateFromDataset} UNSAFE_className={classes.buttonText}>
                     <AddCircle />
-                    <Text>
-                        Create
-                        <br />
-                        project from dataset
-                    </Text>
+                    <Text>{t('projectList.createProjectFromDataset')}</Text>
                 </ActionButton>
             </View>
             <ImportDatasetAsNewProject dialogState={datasetImportDialogState} />

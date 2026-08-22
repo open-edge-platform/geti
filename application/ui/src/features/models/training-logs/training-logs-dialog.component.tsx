@@ -14,6 +14,7 @@ import {
     useDialogContainer,
 } from '@geti-ui/ui';
 import { CloseSemiBold, DownloadIcon } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { useDownloadModelLogs, useModelLogs } from './hooks/use-model-logs.hook';
 import { useStreamJobLogs } from './hooks/use-stream-job-logs.hook';
@@ -57,19 +58,20 @@ const HistoricalModelLogs = ({ modelId }: { modelId: string }) => {
 };
 
 export const TrainingLogsDialog = ({ jobId, modelId }: TrainingLogsDialogProps) => {
+    const { t } = useTranslation();
     const dialogContainer = useDialogContainer();
     const { downloadModelLogs, isDownloading } = useDownloadModelLogs(String(modelId));
 
     return (
-        <Dialog aria-label={'Training logs'} UNSAFE_className={classes.dialog}>
-            <Heading>Training Logs</Heading>
+        <Dialog aria-label={t('models.trainingLogsAriaLabel')} UNSAFE_className={classes.dialog}>
+            <Heading>{t('models.trainingLogsHeading')}</Heading>
             <Header>
                 <Flex alignItems={'center'} gap={'size-100'} marginStart={'auto'}>
                     {modelId && (
                         <ActionButton
                             isQuiet
                             onPress={downloadModelLogs}
-                            aria-label={'Download logs'}
+                            aria-label={t('models.downloadLogsAriaLabel')}
                             isDisabled={isDownloading}
                         >
                             <DownloadIcon />
@@ -78,7 +80,7 @@ export const TrainingLogsDialog = ({ jobId, modelId }: TrainingLogsDialogProps) 
                     <ActionButton
                         isQuiet
                         onPress={dialogContainer.dismiss}
-                        aria-label={'Close dialog'}
+                        aria-label={t('models.closeDialogAriaLabel')}
                         UNSAFE_className={classes.closeButton}
                     >
                         <CloseSemiBold width={14} height={14} />
@@ -91,7 +93,7 @@ export const TrainingLogsDialog = ({ jobId, modelId }: TrainingLogsDialogProps) 
                 {!jobId && modelId && <HistoricalModelLogs modelId={modelId} />}
                 {!jobId && !modelId && (
                     <Flex alignItems={'center'} justifyContent={'center'} height={'100%'}>
-                        <Text UNSAFE_className={classes.errorText}>No job or model specified</Text>
+                        <Text UNSAFE_className={classes.errorText}>{t('models.noJobOrModel')}</Text>
                     </Flex>
                 )}
             </Content>

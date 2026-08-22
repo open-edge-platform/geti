@@ -4,6 +4,7 @@
 import { Content, dimensionValue, Flex, Grid, Meter, Text } from '@geti-ui/ui';
 import { useDatasetStatistics } from 'hooks/api/dataset.hook';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { DatasetCard } from './dataset-card.component';
 import { DatasetLabelsChart } from './dataset-labels-chart.component';
@@ -28,6 +29,7 @@ const getMaxInstancesPerLabel = (instancesPerLabel: { label_id: string | null; i
 
 export const DatasetStatisticsContent = () => {
     const { data: statistics } = useDatasetStatistics();
+    const { t } = useTranslation();
 
     const totalMediaItems = statistics.media_counts.images + statistics.media_counts.videos;
 
@@ -52,21 +54,21 @@ export const DatasetStatisticsContent = () => {
                     background: 'var(--spectrum-global-color-gray-50)',
                 }}
             >
-                <DatasetCard title='Number of media' gridArea='col1'>
+                <DatasetCard title={t('dataset.numberOfMedia')} gridArea='col1'>
                     <Flex justifyContent={'space-evenly'}>
                         <Flex direction={'column'} alignItems={'center'}>
                             <Text UNSAFE_className={classes.mainValue}>{statistics.media_counts.images}</Text>
-                            <Text UNSAFE_className={classes.subTitle}>Images</Text>
+                            <Text UNSAFE_className={classes.subTitle}>{t('dataset.imagesSubtitle')}</Text>
                         </Flex>
 
                         <Flex direction={'column'} alignItems={'center'}>
                             <Text UNSAFE_className={classes.mainValue}>{statistics.media_counts.videos}</Text>
-                            <Text UNSAFE_className={classes.subTitle}>Videos</Text>
+                            <Text UNSAFE_className={classes.subTitle}>{t('dataset.videosSubtitle')}</Text>
                         </Flex>
                     </Flex>
                 </DatasetCard>
 
-                <DatasetCard title='Annotated images' gridArea='col2'>
+                <DatasetCard title={t('dataset.annotatedImages')} gridArea='col2'>
                     <Flex direction={'column'} alignItems={'center'}>
                         <Text UNSAFE_className={classes.mainValue}>
                             {statistics.annotations_counts.annotated_images}
@@ -81,22 +83,22 @@ export const DatasetStatisticsContent = () => {
                         />
                     </Flex>
                 </DatasetCard>
-                <DatasetCard title='Annotated videos / frames' gridArea='col3'>
+                <DatasetCard title={t('dataset.annotatedVideosFrames')} gridArea='col3'>
                     <Flex gap={'size-125'} alignItems={'center'}>
-                        <Text UNSAFE_className={classes.subTitle}>Videos:</Text>
+                        <Text UNSAFE_className={classes.subTitle}>{t('dataset.videosColon')}</Text>
                         <Text UNSAFE_className={classes.secondaryValue}>
                             {statistics.annotations_counts.annotated_videos}
                         </Text>
                     </Flex>
 
                     <Flex gap={'size-125'} alignItems={'center'}>
-                        <Text UNSAFE_className={classes.subTitle}>Frames:</Text>
+                        <Text UNSAFE_className={classes.subTitle}>{t('dataset.framesColon')}</Text>
                         <Text UNSAFE_className={classes.secondaryValue}>
                             {statistics.annotations_counts.annotated_video_frames}
                         </Text>
                     </Flex>
                 </DatasetCard>
-                <DatasetCard title='Number of objects per label' gridArea='full' hasFullSizeContent>
+                <DatasetCard title={t('dataset.objectsPerLabel')} gridArea='full' hasFullSizeContent>
                     <DatasetLabelsChart
                         totalItems={totalItems}
                         instancesPerLabel={statistics.annotations_counts.instances_per_label}

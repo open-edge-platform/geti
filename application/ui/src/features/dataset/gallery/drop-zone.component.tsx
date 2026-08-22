@@ -13,6 +13,7 @@ import {
     View,
     type SpectrumDropZoneProps,
 } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as DropFiles } from '../../../assets/drop-files.svg';
 import { getFilesFromDropEvent } from '../../../shared/drop-zone.utils';
@@ -27,6 +28,7 @@ type DatasetDropZoneProps = {
 type DropEvent = Parameters<NonNullable<SpectrumDropZoneProps['onDrop']>>[0];
 
 export const DatasetDropZone = ({ children, onFilesDropped }: DatasetDropZoneProps) => {
+    const { t } = useTranslation();
     const handleDrop = async (event: DropEvent) => {
         const files = await getFilesFromDropEvent(event);
 
@@ -46,10 +48,8 @@ export const DatasetDropZone = ({ children, onFilesDropped }: DatasetDropZonePro
 
                                 <Content>
                                     <Flex alignItems={'center'} direction={'column'} gap={'size-100'}>
-                                        <Heading level={2}>Drop media files here</Heading>
-                                        <Text UNSAFE_className={classes.dropMessage}>
-                                            Images and videos will be uploaded to this dataset.
-                                        </Text>
+                                        <Heading level={2}>{t('dataset.dropMediaFilesHere')}</Heading>
+                                        <Text UNSAFE_className={classes.dropMessage}>{t('dataset.dropMessage')}</Text>
                                     </Flex>
                                 </Content>
                             </IllustratedMessage>

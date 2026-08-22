@@ -5,6 +5,7 @@ import type { DatasetSubset, Media } from '@/api/types';
 import { ActionButton, Flex, Icon, Text, View } from '@geti-ui/ui';
 import { ChevronLeft, ChevronRight, CloseSemiBold } from '@geti-ui/ui/icons';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { useAnnotationActions } from '../../../shared/annotator/annotation-actions-provider.component';
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
@@ -62,11 +63,13 @@ type NavigationButtonsProps = {
     isLoading?: boolean;
 };
 const NavigationButtons = ({ onSelectPreviousMediaItem, onSelectNextMediaItem, isLoading }: NavigationButtonsProps) => {
+    const { t } = useTranslation();
+
     return (
         <>
             <ActionButton
                 isQuiet
-                aria-label={'Previous media item'}
+                aria-label={t('annotator.previousMediaItem')}
                 isDisabled={onSelectPreviousMediaItem === undefined || isLoading}
                 onPress={onSelectPreviousMediaItem}
             >
@@ -76,7 +79,7 @@ const NavigationButtons = ({ onSelectPreviousMediaItem, onSelectNextMediaItem, i
             </ActionButton>
             <ActionButton
                 isQuiet
-                aria-label={'Next media item'}
+                aria-label={t('annotator.nextMediaItem')}
                 isDisabled={onSelectNextMediaItem === undefined || isLoading}
                 onPress={onSelectNextMediaItem}
             >
@@ -112,6 +115,7 @@ export const ReadOnlyAnnotator = ({
     onSelectNextMediaItem,
     onClose,
 }: ReadOnlyAnnotatorProps) => {
+    const { t } = useTranslation();
     const hasMediaNavigation = onSelectPreviousMediaItem !== undefined || onSelectNextMediaItem !== undefined;
 
     return (
@@ -137,7 +141,7 @@ export const ReadOnlyAnnotator = ({
                                     <Icon height={'size-150'} width={'size-150'}>
                                         <CloseSemiBold />
                                     </Icon>
-                                    <Text>Close</Text>
+                                    <Text>{t('common.close')}</Text>
                                 </ActionButton>
                             </Flex>
                         </Toolbar.Section>

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Flex, Grid, repeat, Text, View } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { distributeByLargestRemainder } from '../../../../utils';
 import { LABEL_COLOR_MAPPING, SubsetTile } from './subset-distribution-stats.component';
@@ -87,6 +88,8 @@ export const ResultingDatasetDistribution = ({
     newValidationSubsetSize,
     newTestingSubsetSize,
 }: ResultingDatasetDistributionProps) => {
+    const { t } = useTranslation();
+
     const [trainingPercentage, validationPercentage, testingPercentage] = distributeByLargestRemainder(
         [
             trainingSubsetSize + newTrainingSubsetSize,
@@ -98,7 +101,7 @@ export const ResultingDatasetDistribution = ({
 
     return (
         <Flex direction={'column'} gap={'size-50'}>
-            <Text>Resulting dataset distribution:</Text>
+            <Text>{t('models.resultingDistributionText')}</Text>
             <View backgroundColor={'static-gray-800'} borderRadius={'small'} padding={'size-100'}>
                 <Grid
                     columns={[repeat(7, 'max-content')]}
@@ -108,7 +111,7 @@ export const ResultingDatasetDistribution = ({
                     UNSAFE_className={classes.resultingDistributionText}
                 >
                     <ResultingDatasetDistributionSubset
-                        label={'Training'}
+                        label={t('models.trainingSubsetTitle')}
                         color={LABEL_COLOR_MAPPING.training}
                         newSize={newTrainingSubsetSize}
                         existingSize={trainingSubsetSize}
@@ -116,7 +119,7 @@ export const ResultingDatasetDistribution = ({
                     />
 
                     <ResultingDatasetDistributionSubset
-                        label={'Validation'}
+                        label={t('models.validationSubsetTitle')}
                         color={LABEL_COLOR_MAPPING.validation}
                         newSize={newValidationSubsetSize}
                         existingSize={validationSubsetSize}
@@ -124,7 +127,7 @@ export const ResultingDatasetDistribution = ({
                     />
 
                     <ResultingDatasetDistributionSubset
-                        label={'Test'}
+                        label={t('models.testingSubsetTitle')}
                         color={LABEL_COLOR_MAPPING.test}
                         newSize={newTestingSubsetSize}
                         existingSize={testingSubsetSize}

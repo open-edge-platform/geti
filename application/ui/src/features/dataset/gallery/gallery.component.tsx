@@ -6,6 +6,7 @@ import { Checkbox, DialogContainer, dimensionValue, Flex, Selection, Size, ViewM
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty, isEqual } from 'lodash-es';
 import { GridLayoutOptions } from 'react-aria-components';
+import { useTranslation } from 'react-i18next';
 
 import { MediaItem } from '../../../components/media-item/media-item.component';
 import { MediaThumbnail } from '../../../components/media-thumbnail/media-thumbnail.component';
@@ -59,6 +60,7 @@ const GalleryList = ({
     isMediaItemReviewedById,
 }: GalleryListProps) => {
     const projectId = useProjectIdentifier();
+    const { t } = useTranslation();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys, isSelected } = useSelectedData();
 
     const handleSelectionChange = (keys: Selection) => {
@@ -108,7 +110,7 @@ const GalleryList = ({
                                 UNSAFE_style={{ margin: dimensionValue('size-150') }}
                             >
                                 <Checkbox
-                                    aria-label={`Select media item ${item.id}`}
+                                    aria-label={t('dataset.selectMediaItemAriaLabel', { id: item.id })}
                                     onChange={() => toggleSelectedKeys([String(item.id)])}
                                     isSelected={selected}
                                 />

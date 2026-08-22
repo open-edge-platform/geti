@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Flex, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { pluralizeItems } from '../../../../../../shared/util';
 
@@ -12,9 +13,11 @@ type SelectedMediaCountProps = {
 };
 
 export const SelectedMediaCount = ({ count }: SelectedMediaCountProps) => {
+    const { t } = useTranslation();
+
     return (
         <Flex direction={'column'} gap={'size-100'}>
-            <Text UNSAFE_className={classes.selectedMedia}>Selected media</Text>
+            <Text UNSAFE_className={classes.selectedMedia}>{t('dataset.selectedMediaLabel')}</Text>
             <Text UNSAFE_className={classes.selectedMediaCount}>{`${count} ${pluralizeItems(count)}`}</Text>
         </Flex>
     );

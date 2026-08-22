@@ -5,6 +5,7 @@ import type { ExportDatasetJob } from '@/api/types';
 import { Divider, Flex, Loading, Text, View } from '@geti-ui/ui';
 import { getJobProgress, isJobRunning } from 'hooks/api/util';
 import { useExportDataset } from 'hooks/storage/use-export-dataset.hook';
+import { useTranslation } from 'react-i18next';
 
 import { BottomProgressBar } from '../../../../models/model-listing/current-running-jobs/bottom-progress-bar.component';
 import { CancelJobConfirmation } from '../../cancel-job-confirmation/cancel-job-confirmation.component';
@@ -16,6 +17,8 @@ type ExportActiveJobProps = {
 };
 
 export const ExportActiveJob = ({ job, datasetName }: ExportActiveJobProps) => {
+    const { t } = useTranslation();
+
     const isRunning = isJobRunning(job);
     const { removeLsExportId } = useExportDataset();
 
@@ -33,7 +36,7 @@ export const ExportActiveJob = ({ job, datasetName }: ExportActiveJobProps) => {
                     <CancelJobConfirmation jobId={job.job_id} onRemove={handleRemove} />
                 </Flex>
 
-                <Text>Processing dataset for export</Text>
+                <Text>{t('dataset.processingForExport')}</Text>
 
                 <Divider size='S' marginY='size-150' />
 

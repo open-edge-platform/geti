@@ -18,6 +18,7 @@ import {
 import { Info } from '@geti-ui/ui/icons';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { useProjectLabelsWithEmptyLabel } from '../../../../shared/annotator/labels';
 import { isImage } from '../../../../shared/media-item-utils';
@@ -44,6 +45,7 @@ const BulkLabelsAssignmentDialogContent = ({
     isMultiLabelClassification,
 }: BulkLabelsAssignmentDialogContentProps) => {
     const projectLabels = useProjectLabelsWithEmptyLabel();
+    const { t } = useTranslation();
 
     const [selectedLabels, setSelectedLabels] = useState<Set<string>>(() => new Set([]));
 
@@ -55,17 +57,14 @@ const BulkLabelsAssignmentDialogContent = ({
 
     return (
         <Dialog height={'65vh'}>
-            <Heading>Label assignment</Heading>
+            <Heading>{t('dataset.labelAssignmentHeading')}</Heading>
             <Divider />
             <Content>
                 <Flex direction={'column'} gap={'size-100'} height={'100%'} minHeight={0}>
-                    <Text>
-                        Choose the label(s) to assign to the uploaded images, then click {"'Continue'"}. If you instead
-                        prefer to annotate the images at a later time, choose {"'Skip'"}.
-                    </Text>
+                    <Text>{t('dataset.chooseLabelsUploadText')}</Text>
                     <Divider size={'S'} marginY={'size-100'} />
                     <LabelsList
-                        ariaLabel={'Labels to assign'}
+                        ariaLabel={t('dataset.labelsToAssignAriaLabel')}
                         labels={projectLabels}
                         selectedLabels={selectedLabels}
                         onSelectedLabelsChange={setSelectedLabels}
@@ -74,18 +73,17 @@ const BulkLabelsAssignmentDialogContent = ({
                     <Flex gap={'size-50'}>
                         <Info />
                         <Text UNSAFE_style={{ lineHeight: dimensionValue('size-225') }}>
-                            The selected labels apply only to images, videos (if any) will be uploaded without
-                            annotations.
+                            {t('dataset.imagesOnlyNote')}
                         </Text>
                     </Flex>
                 </Flex>
             </Content>
             <ButtonGroup>
                 <Button variant={'secondary'} onPress={onClose}>
-                    Cancel upload
+                    {t('dataset.cancelUploadButton')}
                 </Button>
                 <Button variant={'secondary'} onPress={onSkip} isPending={isSkipPending} isDisabled={isSkipPending}>
-                    Skip
+                    {t('dataset.skipButton')}
                 </Button>
                 <Button
                     variant={'accent'}
@@ -93,7 +91,7 @@ const BulkLabelsAssignmentDialogContent = ({
                     isDisabled={isContinueDisabled}
                     isPending={isContinuePending}
                 >
-                    Continue
+                    {t('dataset.continueButton')}
                 </Button>
             </ButtonGroup>
         </Dialog>

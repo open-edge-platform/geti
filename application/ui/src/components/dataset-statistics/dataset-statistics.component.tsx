@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Flex, Text, View } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 import { Pie, PieChart, Sector } from 'recharts';
 
 import classes from './dataset-statistics.module.scss';
@@ -18,6 +19,8 @@ type DatasetStatisticsProps = {
 };
 
 export const DatasetStatistics = ({ label, totalMediaItems, totalAnnotatedItems }: DatasetStatisticsProps) => {
+    const { t } = useTranslation();
+
     const totalUnannotatedItems = totalMediaItems - totalAnnotatedItems;
     const percentageAnnotated = totalMediaItems > 0 ? Math.round((totalAnnotatedItems / totalMediaItems) * 100) : 0;
     const percentageUnannotated = totalMediaItems > 0 ? Math.round((totalUnannotatedItems / totalMediaItems) * 100) : 0;
@@ -31,7 +34,7 @@ export const DatasetStatistics = ({ label, totalMediaItems, totalAnnotatedItems 
                     justifyContent='center'
                     UNSAFE_className={classes.unannotatedStats}
                 >
-                    <Text>Unannotated</Text>
+                    <Text>{t('dataset.unannotatedText')}</Text>
                     <Text>{percentageUnannotated}%</Text>
                     <Text>
                         {totalUnannotatedItems} {label}
@@ -79,7 +82,7 @@ export const DatasetStatistics = ({ label, totalMediaItems, totalAnnotatedItems 
                     justifyContent='center'
                     UNSAFE_className={classes.unannotatedStats}
                 >
-                    <Text>Annotated</Text>
+                    <Text>{t('dataset.annotatedText')}</Text>
                     <Text>{percentageAnnotated}%</Text>
                     <Text>
                         {totalAnnotatedItems} {label}

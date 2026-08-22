@@ -5,10 +5,12 @@ import { useState } from 'react';
 
 import { usePatchPipeline, usePipeline } from 'hooks/api/pipeline.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { useTranslation } from 'react-i18next';
 
 import { InferenceDevices } from '../../../components/inference-devices/inference-devices.component';
 
 export const StreamInferenceDevices = () => {
+    const { t } = useTranslation();
     const { data: pipeline } = usePipeline();
     const projectId = useProjectIdentifier();
     const [selectedKey, setSelectedKey] = useState<string>(pipeline.device);
@@ -31,5 +33,11 @@ export const StreamInferenceDevices = () => {
         );
     };
 
-    return <InferenceDevices label={'Inference device'} selectedKey={selectedKey} onSelectionChange={handleChange} />;
+    return (
+        <InferenceDevices
+            label={t('inference.inferenceDevice')}
+            selectedKey={selectedKey}
+            onSelectionChange={handleChange}
+        />
+    );
 };

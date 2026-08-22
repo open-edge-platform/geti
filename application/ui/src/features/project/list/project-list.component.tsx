@@ -6,9 +6,10 @@ import { Suspense, useMemo, useState } from 'react';
 import { Content, Divider, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
 import { partition } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { version } from '../../../../package.json';
-import { isNonEmptyArray, pluralize } from '../../../shared/util';
+import { isNonEmptyArray } from '../../../shared/util';
 import { EmptyProjectList } from './empty-project-list/empty-project-list.component';
 import { NoMatchingProjects } from './filter-projects/no-matching-projects.component';
 import { ProjectFilters } from './filter-projects/project-filters.component';
@@ -25,6 +26,7 @@ import classes from './project-list.module.scss';
 const ProjectGrid = () => {
     const projectsQuery = useProjects();
     const projects = projectsQuery.data;
+    const { t } = useTranslation();
     const [sortBy, setSortBy] = useState<SortBy>('createdAt-descending');
     const hasProjects = isNonEmptyArray(projects);
 
@@ -45,17 +47,12 @@ const ProjectGrid = () => {
         return <EmptyProjectList />;
     }
 
-    const matchCountLabel = `${sortedProjects.length} of ${projectsWithoutActivePipeline.length} ${pluralize(
-        projectsWithoutActivePipeline.length,
-        'project',
-        'projects'
-    )}`;
+    const matchCountLabel = t('projectList.projectsMatchCount', {
+        count: sortedProjects.length,
+        total: projectsWithoutActivePipeline.length,
+    });
 
-    const totalCountLabel = `${projectsWithoutActivePipeline.length} ${pluralize(
-        projectsWithoutActivePipeline.length,
-        'project',
-        'projects'
-    )}`;
+    const totalCountLabel = t('projectList.projectsTotal', { count: projectsWithoutActivePipeline.length });
 
     const columns = activeProject === undefined ? ['1fr'] : ['1fr', '1fr'];
 
@@ -129,6 +126,8 @@ const AppInfo = () => {
 };
 
 export const ProjectList = () => {
+    const { t } = useTranslation();
+
     return (
         <View UNSAFE_className={backgroundStyles.projectBackground} height={'100%'} position={'relative'}>
             <Content height={'100%'} maxWidth={'1052px'} margin={'0 auto'} UNSAFE_className={classes.content}>
@@ -143,14 +142,13 @@ export const ProjectList = () => {
                             fontSize: 'var(--spectrum-global-dimension-font-size-700)',
                         }}
                     >
-                        Projects
+                        {t('projectList.title')}
                     </Heading>
 
                     <Text UNSAFE_className={classes.description}>
-                        Your computer vision journey starts here.
+                        {t('projectList.descriptionLine1')}
                         <br />
-                        Create projects by selecting a computer vision task, annotate your data, train models, and run
-                        inference.
+                        {t('projectList.descriptionLine2')}
                     </Text>
 
                     <View flex={1} UNSAFE_style={{ overflow: 'auto' }}>

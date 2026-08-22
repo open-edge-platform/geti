@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { AlertDialog, Text } from '@geti-ui/ui';
-
-import { pluralizeItems } from '../../../../shared/util';
+import { useTranslation } from 'react-i18next';
 
 type AlertDialogContentProps = {
     itemsIds: string[];
@@ -11,17 +10,19 @@ type AlertDialogContentProps = {
 };
 
 export const AlertDialogContent = ({ itemsIds, onPrimaryAction }: AlertDialogContentProps) => {
+    const { t } = useTranslation();
+
     return (
         <AlertDialog
             maxHeight={'size-6000'}
-            title='Delete Items'
+            title={t('dataset.deleteItemsTitle')}
             variant='destructive'
-            primaryActionLabel='Confirm'
-            secondaryActionLabel='Cancel'
+            primaryActionLabel={t('dataset.confirmLabel')}
+            secondaryActionLabel={t('common.cancel')}
             onPrimaryAction={onPrimaryAction}
             autoFocusButton='primary'
         >
-            <Text>{`Are you sure you want to delete ${itemsIds.length} ${pluralizeItems(itemsIds.length)}?`}</Text>
+            <Text>{t('dataset.deleteItemsConfirmation', { count: itemsIds.length })}</Text>
         </AlertDialog>
     );
 };

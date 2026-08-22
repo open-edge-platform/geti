@@ -3,6 +3,7 @@
 
 import { ActionButton, DialogContainer, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Delete } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { useDeleteMediaItem } from '../../api/use-delete-media-item';
 import { AlertDialogContent } from './alert-dialog-content.component';
@@ -16,6 +17,7 @@ type DeleteMediaItemProps = {
 
 export const DeleteMediaItem = ({ itemsIds = [], onDeleted }: DeleteMediaItemProps) => {
     const { deleteMedia, openDeleteDialog, closeDeleteDialog, isPending, isDeleteDialogOpen } = useDeleteMediaItem();
+    const { t } = useTranslation();
 
     const handleDelete = async () => {
         await deleteMedia(itemsIds, onDeleted);
@@ -26,14 +28,14 @@ export const DeleteMediaItem = ({ itemsIds = [], onDeleted }: DeleteMediaItemPro
             <TooltipTrigger>
                 <ActionButton
                     isQuiet
-                    aria-label='delete media item'
+                    aria-label={t('dataset.deleteMediaItemAriaLabel')}
                     isDisabled={isPending}
                     UNSAFE_className={classes.deleteButton}
                     onPress={openDeleteDialog}
                 >
                     <Delete />
                 </ActionButton>
-                <Tooltip>Delete media item</Tooltip>
+                <Tooltip>{t('dataset.deleteMediaItemTooltip')}</Tooltip>
             </TooltipTrigger>
 
             <DialogContainer onDismiss={closeDeleteDialog}>

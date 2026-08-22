@@ -2,22 +2,24 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Content, ContextualHelp, Heading, Item, Picker } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { useTrainModelState } from './train-model-provider.component';
 
 export const SelectModelRevision = () => {
+    const { t } = useTranslation();
     const { modelRevisions, selectedModelRevisionId, onSelectModelRevisionId } = useTrainModelState();
 
     return (
         <Picker
             flex={1}
             items={modelRevisions}
-            label={'Select input weights'}
+            label={t('models.selectInputWeightsLabel')}
             selectedKey={selectedModelRevisionId}
             onSelectionChange={(key) => onSelectModelRevisionId(String(key))}
             contextualHelp={
                 <ContextualHelp variant={'info'} placement={'top'}>
-                    <Heading>Selecting input weights</Heading>
+                    <Heading>{t('models.selectingInputWeightsHeading')}</Heading>
                     <Content>
                         {'Choose an existing model to continue fine-tuning, or select ' +
                             `"Default pre-trained weights" to fine-tune a new model starting from ` +

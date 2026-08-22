@@ -17,21 +17,24 @@ import {
     TooltipTrigger,
 } from '@geti-ui/ui';
 import { GraphChart } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { DatasetStatisticsContent } from './dataset-statistics-content.component';
 
 export const DatasetStatistics = () => {
+    const { t } = useTranslation();
+
     return (
         <DialogTrigger>
             <TooltipTrigger>
-                <ActionButton isQuiet aria-label={'dataset statistics'}>
+                <ActionButton isQuiet aria-label={t('dataset.statisticsAriaLabel')}>
                     <GraphChart />
                 </ActionButton>
-                <Tooltip>Dataset statistics</Tooltip>
+                <Tooltip>{t('dataset.statisticsTooltip')}</Tooltip>
             </TooltipTrigger>
             {(close) => (
                 <Dialog width={{ base: '90vw', L: '70vw' }}>
-                    <Heading>Dataset Statistics</Heading>
+                    <Heading>{t('dataset.statisticsHeading')}</Heading>
                     <Divider />
                     <Content>
                         <Suspense fallback={<Loading size='M' />}>
@@ -40,7 +43,7 @@ export const DatasetStatistics = () => {
                     </Content>
                     <ButtonGroup>
                         <Button variant='secondary' onPress={close}>
-                            Close
+                            {t('dataset.closeButton')}
                         </Button>
                     </ButtonGroup>
                 </Dialog>

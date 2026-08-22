@@ -3,6 +3,7 @@
 
 import { Button, Text } from '@geti-ui/ui';
 import { useDeleteStagedDataset } from 'hooks/api/staged-dataset.hook';
+import { useTranslation } from 'react-i18next';
 
 import { formatBytes, isNonEmptyString } from '../../../shared/util';
 import { JobStatusCard } from '../../job-status-card/job-status-card.component';
@@ -18,12 +19,16 @@ type ImportFailedJobProps = {
     deleteEntry: () => void;
 };
 
-const TechnicalDetails = ({ error }: { error: string }) => (
-    <details className={classes.details} aria-label={'Technical details of the job failure'}>
-        <summary className={classes.summary}>Technical details</summary>
-        <pre className={classes.traceback}>{error}</pre>
-    </details>
-);
+const TechnicalDetails = ({ error }: { error: string }) => {
+    const { t } = useTranslation();
+
+    return (
+        <details className={classes.details} aria-label={t('dataset.technicalDetailsAriaLabel')}>
+            <summary className={classes.summary}>{t('dataset.technicalDetails')}</summary>
+            <pre className={classes.traceback}>{error}</pre>
+        </details>
+    );
+};
 
 const BottomMessage = ({ error, message }: { error: string; message: string }) => {
     return (
@@ -42,6 +47,7 @@ export const ImportFailedJob = ({
     stagedDatasetId,
     deleteEntry,
 }: ImportFailedJobProps) => {
+    const { t } = useTranslation();
     const deleteFileMutation = useDeleteStagedDataset({ stagedDatasetId, deleteEntry });
 
     const errorMessage = isNonEmptyString(message) ? message : 'An unknown error occurred';
@@ -54,7 +60,7 @@ export const ImportFailedJob = ({
                 <Button
                     variant='secondary'
                     style='fill'
-                    aria-label='close import dataset status'
+                    aria-label={t('dataset.closeImportStatusAriaLabel')}
                     onPress={deleteFileMutation.mutate}
                     isPending={deleteFileMutation.isPending}
                     isDisabled={deleteFileMutation.isPending}

@@ -7,6 +7,7 @@ import { DatePicker, Flex, Text } from '@geti-ui/ui';
 import { getLocalTimeZone, now, parseAbsoluteToLocal, type ZonedDateTime } from '@internationalized/date';
 import dayjs from 'dayjs';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
+import { useTranslation } from 'react-i18next';
 
 import classes from './date-filter.module.scss';
 
@@ -17,6 +18,8 @@ export const INVALID_RANGE_MESSAGE = 'End date must be later than start date';
 const parseDate = (date: string | null): ZonedDateTime | null => (date === null ? null : parseAbsoluteToLocal(date));
 
 export const DateFilter = () => {
+    const { t } = useTranslation();
+
     const { startDate, endDate, setDateRange } = useDatasetFiltersSearchParams();
 
     // Media cannot be uploaded in the future
@@ -55,13 +58,13 @@ export const DateFilter = () => {
 
     return (
         <Flex direction='column' gap='size-100'>
-            <Text UNSAFE_className={classes.label}>Filter by upload date</Text>
+            <Text UNSAFE_className={classes.label}>{t('dataset.filterByUploadDate')}</Text>
 
             <Flex direction='column' gap='size-100'>
                 <DatePicker
                     granularity={'minute'}
                     width={'100%'}
-                    label='Start date'
+                    label={t('dataset.startDate')}
                     labelPosition={'top'}
                     hourCycle={24}
                     minValue={MIN_DATE}
@@ -73,7 +76,7 @@ export const DateFilter = () => {
                 <DatePicker
                     granularity={'minute'}
                     width={'100%'}
-                    label='End date'
+                    label={t('dataset.endDate')}
                     labelPosition={'top'}
                     hourCycle={24}
                     minValue={startValue}

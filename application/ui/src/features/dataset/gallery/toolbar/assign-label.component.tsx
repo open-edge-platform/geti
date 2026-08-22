@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Button } from '@geti-ui/ui';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { isClassificationTask } from '../../../project/task-type-guards';
 import { BulkSelectedMediaLabelsAssignmentDialog } from '../bulk-labels-assignment/bulk-selected-media-labels-assignment-dialog.component';
@@ -16,6 +17,7 @@ type AssignLabelProps = {
 
 export const AssignLabel = ({ selectedImagesIds }: AssignLabelProps) => {
     const { data: project } = useProject();
+    const { t } = useTranslation();
     const isClassification = isClassificationTask(project.task.task_type);
     const [isVisible, setIsVisible] = useState<boolean>(false);
 
@@ -23,7 +25,7 @@ export const AssignLabel = ({ selectedImagesIds }: AssignLabelProps) => {
         return (
             <>
                 <Button margin={0} variant={'secondary'} onPress={() => setIsVisible(true)}>
-                    Assign label
+                    {t('dataset.assignLabel')}
                 </Button>
                 <BulkSelectedMediaLabelsAssignmentDialog
                     isVisible={isVisible}

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Divider, Flex, Heading, NumberField, Slider, Switch, Text } from '@geti-ui/ui';
 import { usePatchPipeline, usePipeline } from 'hooks/api/pipeline.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { useTranslation } from 'react-i18next';
 
 const DEFAULTS = {
     RATE: 12,
@@ -19,6 +20,7 @@ const MIN_FRAME_SAMPLING_VALUE = 0.1;
 const isPositiveFiniteNumber = (value: number): boolean => Number.isFinite(value) && value > 0;
 
 export const DataCollection = () => {
+    const { t } = useTranslation();
     const projectId = useProjectIdentifier();
     const pipelineQuery = usePipeline();
     const patchPipelineMutation = usePatchPipeline();
@@ -90,10 +92,10 @@ export const DataCollection = () => {
                     Max dataset size
                 </Heading>
 
-                <Text marginY={'size-100'}>Maximum number of items to collect</Text>
+                <Text marginY={'size-100'}>{t('inference.maxItemsToCollect')}</Text>
 
                 <NumberField
-                    label={'Size'}
+                    label={t('inference.sizeLabel')}
                     width={'100%'}
                     minValue={1}
                     step={1}
@@ -110,7 +112,7 @@ export const DataCollection = () => {
                     Capture rate
                 </Heading>
 
-                <Text marginY={'size-100'}>Capture frames while the stream is running</Text>
+                <Text marginY={'size-100'}>{t('inference.captureWhileRunning')}</Text>
 
                 <Switch
                     isEmphasized
@@ -124,7 +126,7 @@ export const DataCollection = () => {
 
                 <Flex direction='row' gap='size-100' alignItems={'end'} marginBottom={'size-200'}>
                     <NumberField
-                        label='Frames'
+                        label={t('inference.framesLabel')}
                         minValue={MIN_FRAME_SAMPLING_VALUE}
                         step={0.1}
                         value={localRateFrames}
@@ -136,7 +138,7 @@ export const DataCollection = () => {
                     />
                     <Text>every</Text>
                     <NumberField
-                        label='Seconds'
+                        label={t('inference.secondsLabel')}
                         minValue={1}
                         step={1}
                         value={localRateSeconds}
@@ -154,7 +156,7 @@ export const DataCollection = () => {
                     Confidence threshold
                 </Heading>
 
-                <Text marginY={'size-100'}>Capture frames when confidence is below threshold</Text>
+                <Text marginY={'size-100'}>{t('inference.captureBelowThreshold')}</Text>
 
                 <Switch
                     isEmphasized
@@ -174,7 +176,7 @@ export const DataCollection = () => {
                     onChange={setLocalConfidenceThreshold}
                     onChangeEnd={(confidenceThreshold) => updatePolicies({ confidenceThreshold })}
                     marginY={'size-200'}
-                    label='Threshold'
+                    label={t('inference.thresholdLabel')}
                     isDisabled={!confidencePolicy?.enabled || isUpdating}
                 />
             </Flex>

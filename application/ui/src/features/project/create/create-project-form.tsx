@@ -6,6 +6,7 @@ import { FormEvent, useState } from 'react';
 import type { Label, Project, TaskType } from '@/api/types';
 import { Button, ButtonGroup, Divider, Flex, Form, Text, TextField } from '@geti-ui/ui';
 import { useCreateProject } from 'hooks/api/project.hook';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuid } from 'uuid';
 
@@ -36,6 +37,7 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
 
     const navigate = useNavigate();
     const createProjectMutation = useCreateProject();
+    const { t } = useTranslation();
 
     const isSubmitting = createProjectMutation.isPending || createProjectMutation.isSuccess;
 
@@ -99,7 +101,7 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
             >
                 <Flex justifyContent={'center'} marginTop={'size-600'}>
                     <TextField
-                        aria-label={'Project name input'}
+                        aria-label={t('createProject.nameInputAriaLabel')}
                         maxLength={PROJECT_NAME_MAX_LENGTH}
                         isRequired
                         value={name}
@@ -116,9 +118,7 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
                     UNSAFE_style={{ overflow: 'auto', margin: '0 auto' }}
                     width={'100%'}
                 >
-                    <Text UNSAFE_className={classes.taskTypeSelectionTitle}>
-                        What type of task would you like the model to perform?
-                    </Text>
+                    <Text UNSAFE_className={classes.taskTypeSelectionTitle}>{t('createProject.taskQuestion')}</Text>
 
                     <TaskSelection selectedTask={selectedTask} setSelectedTask={setSelectedTask} />
 
@@ -133,7 +133,9 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
                         <Flex direction={'column'} alignItems={'center'} gap={'size-350'}>
                             <Flex>
                                 <Text UNSAFE_className={classes.objectsToLearnTitle}>
-                                    {`What objects should the model learn to ${selectedTaskOption?.verb}?`}
+                                    {t('createProject.learnObjectsQuestion', {
+                                        verb: selectedTaskOption ? t(selectedTaskOption.verbKey) : '',
+                                    })}
                                 </Text>
                             </Flex>
                             <LabelSelection labels={labels} setLabels={setLabels} taskType={selectedTask} />
@@ -155,10 +157,10 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
                             isExternalReferrer ? navigate(paths.project.index({})) : navigate(-1);
                         }}
                     >
-                        Go back
+                        {t('createProject.goBackButton')}
                     </Button>
                     <Button type={'submit'} variant='accent' isDisabled={isCreateProjectDisabled}>
-                        Create project
+                        {t('createProject.createProjectButton')}
                     </Button>
                 </ButtonGroup>
             </Flex>

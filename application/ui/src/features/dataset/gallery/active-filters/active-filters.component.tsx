@@ -6,18 +6,20 @@ import { ActionButton, Divider, Flex } from '@geti-ui/ui';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { useProjectLabels } from 'hooks/use-project-labels.hook';
 import { capitalize, isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { formatDateRangeEnd, formatDateRangeStart } from '../../../../shared/date-utils';
 import { isNonEmptyArray } from '../../../../shared/util';
 import { FilterChips } from '../toolbar/media-filtering/filter-chips/filter-chips.component';
 
-const ANNOTATION_STATUS_LABELS: Record<DatasetItemAnnotationStatus, string> = {
-    with_annotations: 'Media with annotations',
-    missing_annotations: 'Media with missing annotations',
+const ANNOTATION_STATUS_LABEL_KEYS: Record<DatasetItemAnnotationStatus, string> = {
+    with_annotations: 'dataset.statusWithAnnotations',
+    missing_annotations: 'dataset.statusMissingAnnotations',
 };
 
 export const ActiveFiltersList = () => {
     const labels = useProjectLabels();
+    const { t } = useTranslation();
     const {
         selectedLabelIds,
         setSelectedLabelIds,
@@ -47,7 +49,7 @@ export const ActiveFiltersList = () => {
 
             {annotationStatus !== null && (
                 <FilterChips
-                    name={ANNOTATION_STATUS_LABELS[annotationStatus]}
+                    name={t(ANNOTATION_STATUS_LABEL_KEYS[annotationStatus])}
                     onClose={() => setAnnotationStatus(null)}
                 />
             )}
@@ -98,6 +100,8 @@ export const useClearAllFilters = () => {
 };
 
 export const ActiveFilters = () => {
+    const { t } = useTranslation();
+
     const hasActiveFilters = useHasActiveFilters();
     const handleClearAll = useClearAllFilters();
 
@@ -106,7 +110,7 @@ export const ActiveFilters = () => {
     }
 
     return (
-        <Flex gap={'size-150'} wrap={'wrap'} alignItems={'center'} aria-label='Active filters'>
+        <Flex gap={'size-150'} wrap={'wrap'} alignItems={'center'} aria-label={t('dataset.activeFiltersAriaLabel')}>
             <ActionButton isQuiet onPress={handleClearAll}>
                 Clear all
             </ActionButton>

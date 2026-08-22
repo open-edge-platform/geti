@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Flex } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 import { Pie, PieChart, Sector } from 'recharts';
 
 import { getColor } from './util';
@@ -11,6 +12,7 @@ interface AccuracyIndicatorProps {
 }
 
 export const AccuracyIndicator = ({ accuracy }: AccuracyIndicatorProps) => {
+    const { t } = useTranslation();
     const graphData = [
         { name: 'accuracy', value: accuracy },
         { name: 'remaining', value: 100 - accuracy },
@@ -42,7 +44,7 @@ export const AccuracyIndicator = ({ accuracy }: AccuracyIndicatorProps) => {
                     dominantBaseline={'middle'}
                     fill={'var(--spectrum-global-color-gray-900)'}
                     fontSize={'var(--spectrum-global-dimension-size-125)'}
-                    aria-label={'Model accuracy'}
+                    aria-label={t('models.modelAccuracyAriaLabel')}
                     aria-valuenow={accuracy}
                 >
                     {`${accuracy}%`}

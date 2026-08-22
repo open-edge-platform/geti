@@ -19,6 +19,7 @@ import {
 } from '@geti-ui/ui';
 import { Info } from '@geti-ui/ui/icons';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { SelectedMediaCount } from '../selected-media-count/selected-media-count.component';
 
@@ -37,6 +38,7 @@ type AssignToExistingViewDialogProps = {
 
 const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }: AssignToExistingViewDialogProps) => {
     const [selectedDatasetViewId, setSelectedDatasetViewId] = useState<string | null>(null);
+    const { t } = useTranslation();
 
     const assignMedia = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -45,15 +47,15 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
 
     return (
         <Dialog>
-            <Heading>Assign to existing view</Heading>
+            <Heading>{t('dataset.assignToExistingViewHeading')}</Heading>
             <Divider size={'S'} />
             <Content>
                 <SelectedMediaCount count={selectedMediaIds.length} />
                 <Form id={'assign-to-existing-view-form'} onSubmit={assignMedia} marginTop={'size-200'}>
                     <Picker
                         items={datasetViews}
-                        label={'Assign to'}
-                        placeholder={'Select a view'}
+                        label={t('dataset.assignToLabel')}
+                        placeholder={t('dataset.selectViewPlaceholder')}
                         selectedKey={selectedDatasetViewId}
                         onSelectionChange={(viewId) => setSelectedDatasetViewId(viewId?.toString() ?? null)}
                     >
@@ -62,17 +64,15 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
                 </Form>
                 <Flex gap={'size-50'} marginTop={'size-250'}>
                     <Info />
-                    <Text UNSAFE_className={classes.note}>
-                        This operation will not affect other media that were already assigned to this view.
-                    </Text>
+                    <Text UNSAFE_className={classes.note}>{t('dataset.assignNote')}</Text>
                 </Flex>
             </Content>
             <ButtonGroup>
                 <Button onPress={onClose} variant={'secondary'}>
-                    Close
+                    {t('dataset.closeButton')}
                 </Button>
                 <Button type={'submit'} form={'assign-to-existing-view-form'} variant={'accent'}>
-                    Assign
+                    {t('dataset.assignButton')}
                 </Button>
             </ButtonGroup>
         </Dialog>

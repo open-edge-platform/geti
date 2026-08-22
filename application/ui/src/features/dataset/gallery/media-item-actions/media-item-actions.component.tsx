@@ -5,6 +5,7 @@ import { Key } from 'react';
 
 import { ActionButton, DialogContainer, Item, Menu, MenuTrigger } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { downloadFile } from '../../../../shared/util';
 import { useDeleteMediaItem } from '../../api/use-delete-media-item';
@@ -26,6 +27,7 @@ type MediaItemActionsProps = {
 
 export const MediaItemActions = ({ id, onDeleted, mediaUrl, mediaFileName, onAnnotate }: MediaItemActionsProps) => {
     const { closeDeleteDialog, openDeleteDialog, isDeleteDialogOpen, deleteMedia, isPending } = useDeleteMediaItem();
+    const { t } = useTranslation();
 
     const handleAction = (key: Key) => {
         if (key === MEDIA_ACTIONS.DOWNLOAD) {
@@ -44,13 +46,13 @@ export const MediaItemActions = ({ id, onDeleted, mediaUrl, mediaFileName, onAnn
     return (
         <>
             <MenuTrigger>
-                <ActionButton isQuiet aria-label={'Media actions'} isDisabled={isPending}>
+                <ActionButton isQuiet aria-label={t('dataset.mediaActionsAriaLabel')} isDisabled={isPending}>
                     <MoreMenu />
                 </ActionButton>
-                <Menu onAction={handleAction} aria-label={'Media actions menu'}>
-                    <Item key={MEDIA_ACTIONS.ANNOTATE}>Annotate</Item>
-                    <Item key={MEDIA_ACTIONS.DOWNLOAD}>Download</Item>
-                    <Item key={MEDIA_ACTIONS.DELETE}>Delete</Item>
+                <Menu onAction={handleAction} aria-label={t('dataset.mediaActionsMenuAriaLabel')}>
+                    <Item key={MEDIA_ACTIONS.ANNOTATE}>{t('dataset.annotate')}</Item>
+                    <Item key={MEDIA_ACTIONS.DOWNLOAD}>{t('dataset.download')}</Item>
+                    <Item key={MEDIA_ACTIONS.DELETE}>{t('common.delete')}</Item>
                 </Menu>
             </MenuTrigger>
             <DialogContainer onDismiss={closeDeleteDialog}>

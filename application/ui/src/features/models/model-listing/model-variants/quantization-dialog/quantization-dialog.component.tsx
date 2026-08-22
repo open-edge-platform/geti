@@ -9,6 +9,7 @@ import { Button, ButtonGroup, Content, Dialog, dimensionValue, Divider, Flex, He
 import { InfoOutline } from '@geti-ui/ui/icons';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { useTranslation } from 'react-i18next';
 
 import { toast } from '../../../../../components/toast/toast.component';
 import {
@@ -40,6 +41,7 @@ type QuantizationDialogProps = {
 };
 
 export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) => {
+    const { t } = useTranslation();
     const [accuracyDrop, setAccuracyDrop] = useState(DEFAULT_QUANTIZATION_PARAMETERS.accuracyDrop);
     const [hasNoMaxAccuracyDrop, setHasNoMaxAccuracyDrop] = useState(
         DEFAULT_QUANTIZATION_PARAMETERS.hasNoMaxAccuracyDrop
@@ -79,7 +81,7 @@ export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) 
                     onClose();
                     toast({
                         type: 'success',
-                        message: 'Quantization job started.',
+                        message: t('models.quantizationToast'),
                     });
                 },
             }
@@ -88,7 +90,7 @@ export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) 
 
     return (
         <Dialog width={'100%'}>
-            <Heading>Quantization</Heading>
+            <Heading>{t('models.quantizationHeading')}</Heading>
 
             <Divider size={'S'} />
 

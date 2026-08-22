@@ -17,6 +17,7 @@ import {
 } from '@geti-ui/ui';
 import { InfoOutline } from '@geti-ui/ui/icons';
 import { usePipelineHealth } from 'hooks/api/pipeline.hook';
+import { useTranslation } from 'react-i18next';
 
 import { getComponentStatusMeta, getOverallStatusMeta, shouldShowPipelineHealthDetails } from './utils';
 
@@ -33,9 +34,11 @@ type PipelineComponentsDetailsInfoProps = {
 };
 
 const PipelineComponentsDetailsInfo = ({ components }: PipelineComponentsDetailsInfoProps) => {
+    const { t } = useTranslation();
+
     return (
         <DialogTrigger type={'popover'} placement={'top'}>
-            <ActionButton isQuiet aria-label={'Pipeline component health'}>
+            <ActionButton isQuiet aria-label={t('inference.componentHealthAriaLabel')}>
                 <InfoOutline />
             </ActionButton>
             <Dialog>

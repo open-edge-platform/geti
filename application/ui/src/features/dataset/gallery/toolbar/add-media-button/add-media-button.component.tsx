@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Button, FileTrigger } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { acceptedExtensions } from '../../utils';
 
@@ -11,6 +12,8 @@ type AddMediaButtonProps = {
 };
 
 export const AddMediaButton = ({ onFileUpload, isDisabled = false }: AddMediaButtonProps) => {
+    const { t } = useTranslation();
+
     const handleFileSelect = async (files: FileList | null) => {
         if (files && files.length > 0) {
             await onFileUpload(Array.from(files));
@@ -25,7 +28,7 @@ export const AddMediaButton = ({ onFileUpload, isDisabled = false }: AddMediaBut
             onSelect={handleFileSelect}
         >
             <Button variant={'secondary'} isDisabled={isDisabled} margin={0}>
-                Upload media
+                {t('dataset.uploadMedia')}
             </Button>
         </FileTrigger>
     );

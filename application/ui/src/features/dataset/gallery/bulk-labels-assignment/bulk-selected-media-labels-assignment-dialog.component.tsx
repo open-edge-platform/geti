@@ -16,6 +16,7 @@ import {
     Text,
 } from '@geti-ui/ui';
 import { useProject } from 'hooks/api/project.hook';
+import { useTranslation } from 'react-i18next';
 
 import { useProjectLabelsWithEmptyLabel } from '../../../../shared/annotator/labels';
 import { isMultiLabelClassificationTask } from '../../../project/task-type-guards';
@@ -35,6 +36,7 @@ const BulkSelectedMediaLabelsAssignment = ({
 }: BulkSelectedMediaLabelsAssignmentProps) => {
     const projectLabels = useProjectLabelsWithEmptyLabel();
     const { data: project } = useProject();
+    const { t } = useTranslation();
     const isMultiLabelClassification = isMultiLabelClassificationTask(project.task);
 
     const [selectedLabels, setSelectedLabels] = useState<Set<string>>(() => new Set([]));
@@ -47,27 +49,27 @@ const BulkSelectedMediaLabelsAssignment = ({
 
     return (
         <Dialog height={'65vh'}>
-            <Heading>Label assignment</Heading>
+            <Heading>{t('dataset.labelAssignmentHeading')}</Heading>
             <Divider />
             <Content>
                 <Flex direction={'column'} gap={'size-100'} height={'100%'} minHeight={0}>
-                    <Text>Choose the label(s) to assign to the selected images, then click {"'Assign'"}.</Text>
+                    <Text>{t('dataset.chooseLabelsSelectedText')}</Text>
                     <Divider size={'S'} marginY={'size-100'} />
                     <LabelsList
-                        ariaLabel={'Labels to assign'}
+                        ariaLabel={t('dataset.labelsToAssignAriaLabel')}
                         labels={projectLabels}
                         selectedLabels={selectedLabels}
                         onSelectedLabelsChange={setSelectedLabels}
                         isMultiple={isMultiLabelClassification}
                     />
                     <Text UNSAFE_style={{ lineHeight: dimensionValue('size-225') }}>
-                        The selected labels apply only to images, videos (if any) remain intact.
+                        {t('dataset.selectedLabelsImagesOnlyNote')}
                     </Text>
                 </Flex>
             </Content>
             <ButtonGroup>
                 <Button variant={'secondary'} onPress={onClose}>
-                    Cancel
+                    {t('common.cancel')}
                 </Button>
                 <Button
                     variant={'accent'}
@@ -75,7 +77,7 @@ const BulkSelectedMediaLabelsAssignment = ({
                     isDisabled={isAssignDisabled}
                     isPending={isAssignPending}
                 >
-                    Assign
+                    {t('dataset.assignButton')}
                 </Button>
             </ButtonGroup>
         </Dialog>

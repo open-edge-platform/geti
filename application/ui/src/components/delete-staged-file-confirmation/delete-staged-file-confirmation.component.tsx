@@ -3,6 +3,7 @@
 
 import { AlertDialog, Button, DialogTrigger } from '@geti-ui/ui';
 import { useDeleteStagedDataset } from 'hooks/api/staged-dataset.hook';
+import { useTranslation } from 'react-i18next';
 
 type DeleteStagedFileConfirmationProps = {
     stagedDatasetId: string;
@@ -10,6 +11,8 @@ type DeleteStagedFileConfirmationProps = {
 };
 
 export const DeleteStagedFileConfirmation = ({ stagedDatasetId, deleteEntry }: DeleteStagedFileConfirmationProps) => {
+    const { t } = useTranslation();
+
     const deleteFileMutation = useDeleteStagedDataset({ stagedDatasetId, deleteEntry });
 
     const handleCancel = () => {
@@ -18,7 +21,7 @@ export const DeleteStagedFileConfirmation = ({ stagedDatasetId, deleteEntry }: D
 
     return (
         <DialogTrigger>
-            <Button variant='secondary' style='fill' aria-label='delete import dataset status'>
+            <Button variant='secondary' style='fill' aria-label={t('dataset.deleteImportStatusAriaLabel')}>
                 Delete
             </Button>
             <AlertDialog

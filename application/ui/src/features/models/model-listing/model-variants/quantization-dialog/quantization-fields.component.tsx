@@ -16,6 +16,7 @@ import {
     View,
 } from '@geti-ui/ui';
 import { Refresh } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 export const DEFAULT_QUANTIZATION_PARAMETERS = {
     accuracyDrop: 1.0,
@@ -29,15 +30,19 @@ type QuantizationFieldLayoutProps = {
     children: ReactNode;
     onReset: () => void;
 };
-const QuantizationFieldLayout = ({ children, onReset }: QuantizationFieldLayoutProps) => (
-    <Grid columns={['1fr', '.1fr', 'size-3400', '1fr', '.2fr']} alignItems={'center'} gap={'size-200'}>
-        {children}
+const QuantizationFieldLayout = ({ children, onReset }: QuantizationFieldLayoutProps) => {
+    const { t } = useTranslation();
 
-        <ActionButton isQuiet aria-label={'Reset to default'} onPress={onReset}>
-            <Refresh />
-        </ActionButton>
-    </Grid>
-);
+    return (
+        <Grid columns={['1fr', '.1fr', 'size-3400', '1fr', '.2fr']} alignItems={'center'} gap={'size-200'}>
+            {children}
+
+            <ActionButton isQuiet aria-label={t('models.resetToDefault')} onPress={onReset}>
+                <Refresh />
+            </ActionButton>
+        </Grid>
+    );
+};
 
 type MaxAccuracyDropFieldProps = {
     value: number;
@@ -54,6 +59,7 @@ export const MaxAccuracyDropField = ({
     onDisabledChange,
     onReset,
 }: MaxAccuracyDropFieldProps) => {
+    const { t } = useTranslation();
     const [draftValue, setDraftValue] = useState<number | null>(null);
     const parameterValue = draftValue ?? value;
 
@@ -64,7 +70,7 @@ export const MaxAccuracyDropField = ({
 
     return (
         <QuantizationFieldLayout onReset={onReset}>
-            <Text>Max accuracy drop (%)</Text>
+            <Text>{t('models.maxAccuracyDrop')}</Text>
             <ContextualHelp>
                 <Content>
                     Maximum allowed drop in validation accuracy.
@@ -79,7 +85,7 @@ export const MaxAccuracyDropField = ({
             </ContextualHelp>
             <Flex gap={'size-100'}>
                 <Slider
-                    aria-label={'Change Max accuracy drop slider'}
+                    aria-label={t('models.changeMaxAccuracyDropSlider')}
                     value={parameterValue}
                     minValue={0.1}
                     maxValue={15}
@@ -98,11 +104,11 @@ export const MaxAccuracyDropField = ({
                     maxValue={15}
                     onChange={handleValueChange}
                     isDisabled={isDisabled}
-                    aria-label={'Change Max accuracy drop'}
+                    aria-label={t('models.changeMaxAccuracyDrop')}
                     formatOptions={{ maximumFractionDigits: 1 }}
                 />
             </Flex>
-            <Checkbox aria-label='No maximum' isSelected={isDisabled} onChange={onDisabledChange}>
+            <Checkbox aria-label={t('models.noMaximumCheckbox')} isSelected={isDisabled} onChange={onDisabledChange}>
                 No maximum
             </Checkbox>
         </QuantizationFieldLayout>
@@ -117,9 +123,10 @@ type MaxNumIterationsFieldProps = {
 };
 
 export const MaxNumIterationsField = ({ value, onChange, isDisabled, onReset }: MaxNumIterationsFieldProps) => {
+    const { t } = useTranslation();
     return (
         <QuantizationFieldLayout onReset={onReset}>
-            <Text>Max number of iterations</Text>
+            <Text>{t('models.maxIterations')}</Text>
             <ContextualHelp>
                 <Content>
                     Maximum number of iterations of accuracy-aware quantization.
@@ -141,7 +148,7 @@ export const MaxNumIterationsField = ({ value, onChange, isDisabled, onReset }: 
                     minValue={1}
                     onChange={onChange}
                     isDisabled={isDisabled}
-                    aria-label={'Change Max number of iterations'}
+                    aria-label={t('models.changeMaxIterations')}
                     formatOptions={{ maximumFractionDigits: 0 }}
                     flex={1}
                 />
@@ -168,6 +175,7 @@ export const CalibrationDatasetSizeField = ({
     onDisabledChange,
     onReset,
 }: CalibrationDatasetSizeFieldProps) => {
+    const { t } = useTranslation();
     const [draftValue, setDraftValue] = useState<number | null>(null);
     const parameterValue = draftValue ?? value;
 
@@ -178,15 +186,15 @@ export const CalibrationDatasetSizeField = ({
 
     return (
         <QuantizationFieldLayout onReset={onReset}>
-            <Text>Max calibration size</Text>
+            <Text>{t('models.maxCalibrationSize')}</Text>
 
             <ContextualHelp>
-                <Content>Calibration samples will be randomly selected within the dataset</Content>
+                <Content>{t('models.calibrationNote')}</Content>
             </ContextualHelp>
 
             <Flex gap={'size-100'}>
                 <Slider
-                    aria-label={'Change Max calibration size slider'}
+                    aria-label={t('models.changeCalibrationSizeSlider')}
                     value={parameterValue}
                     minValue={1}
                     maxValue={maxValue}
@@ -205,10 +213,14 @@ export const CalibrationDatasetSizeField = ({
                     maxValue={maxValue}
                     onChange={handleValueChange}
                     isDisabled={isDisabled}
-                    aria-label={'Change Max calibration size'}
+                    aria-label={t('models.changeCalibrationSize')}
                 />
             </Flex>
-            <Checkbox aria-label='Use full dataset' isSelected={isDisabled} onChange={onDisabledChange}>
+            <Checkbox
+                aria-label={t('models.useFullDatasetCheckbox')}
+                isSelected={isDisabled}
+                onChange={onDisabledChange}
+            >
                 Use full dataset
             </Checkbox>
         </QuantizationFieldLayout>

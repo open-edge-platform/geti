@@ -5,6 +5,8 @@ import { ThemeProvider } from '@geti-ui/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { RouterProvider } from 'react-router-dom';
 
+import './i18n';
+
 import { queryClient } from './query-client/query-client';
 import { router } from './router';
 

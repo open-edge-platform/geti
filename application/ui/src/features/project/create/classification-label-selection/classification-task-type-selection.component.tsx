@@ -3,6 +3,7 @@
 
 import { Flex, Radio, RadioGroup, Text } from '@geti-ui/ui';
 import { InfoOutline } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import classes from './classification-task-type-selection.module.scss';
 
@@ -47,12 +48,14 @@ export const ClassificationTaskSelection = ({
     selectedType,
     onSelectedTypeChange,
 }: ClassificationTaskSelectionProps) => {
+    const { t } = useTranslation();
+
     return (
         <Flex direction={'column'} gap={'size-250'}>
-            <Text UNSAFE_className={classes.title}>What classification type should the model use?</Text>
+            <Text UNSAFE_className={classes.title}>{t('createProject.classificationTypeQuestion')}</Text>
             <RadioGroup
                 isEmphasized
-                aria-label={'Classification type'}
+                aria-label={t('createProject.classificationTypeAriaLabel')}
                 value={selectedType}
                 onChange={(value) => onSelectedTypeChange(value as ClassificationTaskType)}
             >
@@ -60,15 +63,15 @@ export const ClassificationTaskSelection = ({
                     <Flex gap={'size-200'} width={'80%'}>
                         <ClassificationTaskTypeItem
                             type={'single-label'}
-                            label={'Single-label'}
-                            description={'Assign one label from mutually exclusive labels'}
+                            label={t('createProject.singleLabel')}
+                            description={t('createProject.singleLabelDescription')}
                             onSelect={onSelectedTypeChange}
-                            warning={'Requires at least 2 labels'}
+                            warning={t('createProject.singleLabelWarning')}
                         />
                         <ClassificationTaskTypeItem
                             type={'multi-label'}
-                            label={'Multi-label'}
-                            description={'Assign one or more labels from non-mutually exclusive labels'}
+                            label={t('createProject.multiLabel')}
+                            description={t('createProject.multiLabelDescription')}
                             onSelect={onSelectedTypeChange}
                         />
                     </Flex>

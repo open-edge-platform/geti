@@ -3,6 +3,7 @@
 
 import type { DatasetRevision, Model, ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { Badge, Flex, Grid, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { formatTrainingDateTime } from '../../../../../shared/date-utils';
 import { formatBytes } from '../../../../../shared/util';
@@ -30,7 +31,9 @@ type ModelRowProps = {
 };
 
 const FailedModel = () => {
-    return <Badge variant={'negative'}>Failed</Badge>;
+    const { t } = useTranslation();
+
+    return <Badge variant={'negative'}>{t('models.failedStatusBadge')}</Badge>;
 };
 
 const DeletedWeightsModel = () => {

@@ -23,6 +23,7 @@ import { Alert, LinkOut } from '@geti-ui/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { useDatasetStatisticsQuery } from 'hooks/api/dataset.hook';
 import { useProject } from 'hooks/api/project.hook';
+import { useTranslation } from 'react-i18next';
 
 import { useExportDatasetJobAction } from '../../hooks/use-export-dataset-job-action.hook';
 import { Link } from '../../platform/components/link.component';
@@ -101,6 +102,7 @@ type ExportDatasetDialogContentProps = {
 };
 
 const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }: ExportDatasetDialogContentProps) => {
+    const { t } = useTranslation();
     const { data: selectedProject } = useProject();
 
     const [formState, submitAction, isPending] = useExportDatasetJobAction({
@@ -118,10 +120,10 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
             <Heading>Export {name}</Heading>
             <Divider />
             <Content UNSAFE_className={classes.container}>
-                <Heading>Exported dataset statistics</Heading>
+                <Heading>{t('dataset.exportedStatsHeading')}</Heading>
                 {statistics}
 
-                <Heading>Export settings</Heading>
+                <Heading>{t('dataset.exportSettingsHeading')}</Heading>
 
                 <View backgroundColor='gray-75' padding='size-200' borderRadius='regular'>
                     <Form id={FORM_ID} validationBehavior='native' action={submitAction}>
@@ -129,7 +131,7 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
                             name='labels'
                             items={labels}
                             maxHeight='size-2000'
-                            label='Filter annotations by label'
+                            label={t('dataset.filterAnnotationsByLabel')}
                             defaultSelectedKeys={new Set(labels.map(({ id }) => id))}
                         />
 
@@ -141,7 +143,7 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
 
                         <RadioGroup
                             name='export_format'
-                            label='Select dataset export format'
+                            label={t('dataset.selectExportFormat')}
                             defaultValue={formState.export_format}
                             onChange={(value) => setSelectedExportFormat(value)}
                         >

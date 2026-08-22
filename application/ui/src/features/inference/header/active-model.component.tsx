@@ -7,12 +7,14 @@ import { Item, Key, Picker } from '@geti-ui/ui';
 import { usePatchPipeline } from 'hooks/api/pipeline.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { useGetActiveModel } from '../../models/hooks/api/use-get-active-model.hook';
 import { useGetSuccessfulModels } from '../../models/hooks/api/use-get-models.hook';
 import { getAllModelsWithOpenVINOVariants, getModelIdentifierPayload } from '../../models/utils';
 
 export const ActiveModel = () => {
+    const { t } = useTranslation();
     const { data: models } = useGetSuccessfulModels();
     const activeModel = useGetActiveModel();
     const projectId = useProjectIdentifier();
@@ -46,8 +48,8 @@ export const ActiveModel = () => {
     return (
         <>
             <Picker
-                aria-label={'active model'}
-                label={'Model'}
+                aria-label={t('inference.activeModelAriaLabel')}
+                label={t('inference.modelLabel')}
                 labelPosition={'side'}
                 items={allModelsWithOpenVinoQuantizedModels}
                 onSelectionChange={handleChange}

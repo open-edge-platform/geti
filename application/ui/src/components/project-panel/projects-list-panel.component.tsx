@@ -21,6 +21,7 @@ import { Edit } from '@geti-ui/ui/icons';
 import { useProjects } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { partition } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { EnablePipelineBlockedDialog } from '../../components/enable-pipeline-blocked-dialog/enable-pipeline-blocked-dialog.component';
@@ -43,9 +44,11 @@ type SelectedProjectProps = {
 };
 
 const SelectedProjectButton = ({ name, id, isActive }: SelectedProjectProps) => {
+    const { t } = useTranslation();
+
     return (
         <ActionButton
-            aria-label={`Selected project ${name}`}
+            aria-label={t('projectPanel.selectedProjectLabel', { name })}
             isQuiet
             height={'max-content'}
             staticColor={'white'}
@@ -72,6 +75,7 @@ const SelectedProjectButton = ({ name, id, isActive }: SelectedProjectProps) => 
 
 const ManageProjects = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const navigateToProjectsList = () => {
         navigate(paths.project.index({}), {
@@ -87,7 +91,7 @@ const ManageProjects = () => {
             onPress={navigateToProjectsList}
         >
             <Edit />
-            <Text>Manage projects</Text>
+            <Text>{t('projectPanel.manageProjects')}</Text>
         </ActionButton>
     );
 };

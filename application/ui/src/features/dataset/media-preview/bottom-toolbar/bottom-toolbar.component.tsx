@@ -6,6 +6,7 @@ import { Flex, Grid, Item, Key, Picker, Tag, Text } from '@geti-ui/ui';
 import { Accept, Search } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { capitalize } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { Hotkeys } from '../primary-toolbar/hotkeys/hotkeys.component';
 import { Settings } from '../primary-toolbar/settings/settings.component';
@@ -35,6 +36,7 @@ export const BottomToolbar = ({
     isReadOnlySubset,
     hasAnnotationStatus = true,
 }: BottomToolbarProps) => {
+    const { t } = useTranslation();
     const fileName = `${mediaItem.name}.${mediaItem.format} (${mediaItem.width} x ${mediaItem.height} px)`;
 
     return (
@@ -66,14 +68,14 @@ export const BottomToolbar = ({
                             ) : (
                                 <Picker
                                     selectedKey={subset}
-                                    placeholder={'Select subset'}
-                                    aria-label={'Select subset'}
+                                    placeholder={t('annotator.selectSubset')}
+                                    aria-label={t('annotator.selectSubset')}
                                     onSelectionChange={onSubsetChange}
                                 >
-                                    <Item key={'unassigned'}>Unassigned</Item>
-                                    <Item key={'validation'}>Validation</Item>
-                                    <Item key={'testing'}>Testing</Item>
-                                    <Item key={'training'}>Training</Item>
+                                    <Item key={'unassigned'}>{t('annotator.subsetUnassigned')}</Item>
+                                    <Item key={'validation'}>{t('annotator.subsetValidation')}</Item>
+                                    <Item key={'testing'}>{t('annotator.subsetTesting')}</Item>
+                                    <Item key={'training'}>{t('annotator.subsetTraining')}</Item>
                                 </Picker>
                             )}
                         </Flex>

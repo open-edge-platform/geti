@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Content, ContextualHelp, Heading, Item, Picker } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { useTrainModelState } from './train-model-provider.component';
 
 export const SelectDatasetRevision = () => {
+    const { t } = useTranslation();
     const { datasetRevisions, selectedDatasetRevisionId, onSelectDatasetRevisionId } = useTrainModelState();
 
     return (
@@ -13,12 +15,12 @@ export const SelectDatasetRevision = () => {
             <Picker
                 flex={1}
                 items={datasetRevisions}
-                label={'Select dataset'}
+                label={t('models.selectDatasetLabel')}
                 selectedKey={selectedDatasetRevisionId}
                 onSelectionChange={(key) => onSelectDatasetRevisionId(String(key))}
                 contextualHelp={
                     <ContextualHelp variant={'info'} placement={'top'}>
-                        <Heading>Selecting a dataset</Heading>
+                        <Heading>{t('models.selectingDatasetHeading')}</Heading>
                         <Content>
                             {`Choose the version of the dataset to use for training. If you want to train the new model
                             on the exact same data (media and annotations) as another model, please select the

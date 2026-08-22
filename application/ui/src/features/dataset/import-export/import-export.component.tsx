@@ -3,6 +3,7 @@
 
 import { Button, Item, Key, Menu, MenuTrigger } from '@geti-ui/ui';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { useTranslation } from 'react-i18next';
 
 import { ExportDatasetConfig } from '../../../components/export-dataset-config-dialog/export-dataset-config.component';
 import { useImportDatasetDialogState } from '../providers/export-import-dataset-dialog-provider.component';
@@ -10,6 +11,8 @@ import { MainDatasetStatistics } from './export-dataset/dataset-statistics.compo
 import { ImportDatasetToProject } from './import-dataset/Import-dataset-to-project.component';
 
 export const ImportExport = () => {
+    const { t } = useTranslation();
+
     const exportDialogState = useOverlayTriggerState({});
     const { datasetImportDialogState, setCurrentStep } = useImportDatasetDialogState();
 
@@ -29,12 +32,12 @@ export const ImportExport = () => {
     return (
         <>
             <MenuTrigger>
-                <Button variant='secondary' aria-label='import-export dataset'>
+                <Button variant='secondary' aria-label={t('dataset.importExportButtonAriaLabel')}>
                     Export/Import
                 </Button>
                 <Menu onAction={handleMenuAction}>
-                    <Item key='export'>Export dataset</Item>
-                    <Item key='import'>Import dataset</Item>
+                    <Item key='export'>{t('dataset.exportDataset')}</Item>
+                    <Item key='import'>{t('dataset.importDataset')}</Item>
                 </Menu>
             </MenuTrigger>
 

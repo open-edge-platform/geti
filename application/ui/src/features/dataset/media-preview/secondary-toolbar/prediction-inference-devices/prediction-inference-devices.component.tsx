@@ -4,6 +4,7 @@
 import { Suspense } from 'react';
 
 import { Loading } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { InferenceDevices } from '../../../../../components/inference-devices/inference-devices.component';
 import { usePredictionSetup } from '../../../../annotator/predictions-setup-provider.component';
@@ -13,12 +14,14 @@ type PredictionInferenceDevicesProps = {
 };
 
 export const PredictionInferenceDevices = ({ isDisabled }: PredictionInferenceDevicesProps) => {
+    const { t } = useTranslation();
+
     const { selectedDevice, changeSelectedDevice } = usePredictionSetup();
 
     return (
         <Suspense fallback={<Loading mode={'inline'} />}>
             <InferenceDevices
-                label={'Inference device'}
+                label={t('annotator.inferenceDevice')}
                 selectedKey={selectedDevice}
                 onSelectionChange={changeSelectedDevice}
                 isDisabled={isDisabled}
