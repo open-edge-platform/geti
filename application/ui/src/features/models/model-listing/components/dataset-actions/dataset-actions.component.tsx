@@ -5,6 +5,7 @@ import { ActionButton, AlertDialog, DialogContainer, Item, Key, Menu, MenuTrigge
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { useTranslation } from 'react-i18next';
 
 import { ExportDatasetConfig } from '../../../../../components/export-dataset-config-dialog/export-dataset-config.component';
 import { useDeleteDatasetRevision } from '../../hooks/use-delete-dataset-revision.hook';
@@ -18,6 +19,8 @@ type DatasetActionsProps = {
 };
 
 export const DatasetActions = ({ dataset }: DatasetActionsProps) => {
+    const { t } = useTranslation();
+
     const projectId = useProjectIdentifier();
     const renameDatasetRevisionMutation = useRenameDatasetRevision();
     const deleteDatasetRevisionMutation = useDeleteDatasetRevision();
@@ -69,9 +72,9 @@ export const DatasetActions = ({ dataset }: DatasetActionsProps) => {
                     <MoreMenu />
                 </ActionButton>
                 <Menu onAction={handleDatasetMenuAction} aria-label={'Dataset actions menu'}>
-                    <Item key={'rename'}>Rename</Item>
-                    <Item key={'delete'}>Delete</Item>
-                    <Item key={'export'}>Export</Item>
+                    <Item key={'rename'}>{t('models.renameItem')}</Item>
+                    <Item key={'delete'}>{t('common.delete')}</Item>
+                    <Item key={'export'}>{t('models.exportItem')}</Item>
                 </Menu>
             </MenuTrigger>
 
@@ -89,7 +92,7 @@ export const DatasetActions = ({ dataset }: DatasetActionsProps) => {
             <DialogContainer onDismiss={deleteDialog.close}>
                 {deleteDialog.isOpen && (
                     <AlertDialog
-                        title='Delete dataset revision'
+                        title={t('models.deleteDatasetRevisionTitle')}
                         variant='destructive'
                         primaryActionLabel='Delete'
                         onPrimaryAction={handleDelete}

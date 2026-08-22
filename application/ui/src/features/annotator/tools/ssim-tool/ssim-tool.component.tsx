@@ -3,6 +3,8 @@
 
 import { useEffect } from 'react';
 
+import { useTranslation } from 'react-i18next';
+
 import { useZoom } from '../../../../components/zoom/zoom.provider';
 import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
 import { getFormattedPoints } from '../../annotations/utils';
@@ -17,6 +19,8 @@ import { useSSIM } from './use-ssim.hook';
 import classes from './ssim-tool.module.scss';
 
 export const SSIMTool = () => {
+    const { t } = useTranslation();
+
     const { scale: zoom } = useZoom();
     const { roi, image } = useSelectedMediaItem();
     const { annotations } = useAnnotationActions();
@@ -43,7 +47,7 @@ export const SSIMTool = () => {
     return (
         <>
             <svg
-                aria-label='ssim preview'
+                aria-label={t('annotator.ssimPreviewAriaLabel')}
                 data-loading={isLoading}
                 viewBox={`0 0 ${image.width} ${image.height}`}
                 style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible' }}

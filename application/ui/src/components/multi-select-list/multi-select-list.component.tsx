@@ -4,6 +4,7 @@
 import { ComponentProps, useState } from 'react';
 
 import { Checkbox, Flex, Item, ListView, Selection, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { isNonEmptyString } from '../../shared/util';
 
@@ -32,6 +33,8 @@ export const MultiSelectList = <T extends string = string>({
     defaultSelectedKeys,
     ...listProps
 }: MultiSelectListProps<T>) => {
+    const { t } = useTranslation();
+
     const [selectedLabels, setSelectedLabels] = useState<Set<T>>(defaultSelectedKeys);
 
     const allItemSelected = selectedLabels.size === items.length && items.length > 0;
@@ -52,7 +55,11 @@ export const MultiSelectList = <T extends string = string>({
         <Flex gap='size-100' direction='column'>
             {isNonEmptyString(label) && <Text UNSAFE_className={classes.label}>{label}</Text>}
 
-            <Checkbox aria-label='Select all items' onChange={handleSelectAllItems} isSelected={allItemSelected}>
+            <Checkbox
+                aria-label={t('common.selectAllItems')}
+                onChange={handleSelectAllItems}
+                isSelected={allItemSelected}
+            >
                 {selectAllLabel}
             </Checkbox>
 

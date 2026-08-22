@@ -6,6 +6,7 @@ import { KeyboardEvent, useState } from 'react';
 import type { Label } from '@/api/types';
 import { ActionButton, Flex, Grid, TextField, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Delete, Pin, Unpin } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { HotkeyField } from '../../../../components/label-fields/hotkey-field.component';
 import { LabelColorPicker } from '../../../../components/label-fields/label-color-picker.component';
@@ -44,6 +45,8 @@ export const LabelRow = ({
     validateName,
     validateHotkey,
 }: LabelRowProps) => {
+    const { t } = useTranslation();
+
     const [name, setName] = useState(label.name);
     const [color, setColor] = useState(label.color);
     const [hotkey, setHotkey] = useState(label.hotkey ?? '');
@@ -120,14 +123,18 @@ export const LabelRow = ({
 
             <TooltipTrigger>
                 <ActionButton
-                    aria-label={isPinned ? `Unpin ${label.name} label` : `Pin ${label.name} label`}
+                    aria-label={
+                        isPinned
+                            ? t('annotator.unpinLabelAriaLabel', { name: label.name })
+                            : t('annotator.pinLabelAriaLabel', { name: label.name })
+                    }
                     isQuiet
                     UNSAFE_className={isPinned ? classes.pinButtonPinned : classes.pinButton}
                     onPress={() => onTogglePin(label)}
                 >
                     {isPinned ? <Pin /> : <Unpin />}
                 </ActionButton>
-                <Tooltip>{isPinned ? 'Unpin label' : 'Pin label'}</Tooltip>
+                <Tooltip>{isPinned ? t('annotator.unpinLabelTooltip') : t('annotator.pinLabelTooltip')}</Tooltip>
             </TooltipTrigger>
 
             <ActionButton

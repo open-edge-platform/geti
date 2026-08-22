@@ -3,6 +3,7 @@
 
 import type { LocalFolderSinkConfig } from '@/api/types';
 import { Flex, TextField } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { OutputFormats } from '../output-formats/output-formats.component';
 import { RateLimitFields } from '../rate-limit/rate-limit-fields.component';
@@ -12,12 +13,18 @@ type LocalFolderProps = {
 };
 
 export const LocalFolder = ({ defaultState }: LocalFolderProps) => {
+    const { t } = useTranslation();
+
     return (
         <Flex direction='column' gap='size-200'>
             <TextField isHidden label='id' name='id' defaultValue={defaultState.id} />
 
             <Flex gap='size-200'>
-                <TextField label='Name' name='name' defaultValue={defaultState.name || 'Local folder sink'} />
+                <TextField
+                    label={t('inference.nameLabel')}
+                    name='name'
+                    defaultValue={defaultState.name || t('inference.localFolderSinkDefaultName')}
+                />
             </Flex>
 
             <Flex>
@@ -28,7 +35,7 @@ export const LocalFolder = ({ defaultState }: LocalFolderProps) => {
                 <TextField
                     isRequired
                     width={'100%'}
-                    label='Folder Path'
+                    label={t('inference.folderPathLabel')}
                     name='folder_path'
                     defaultValue={defaultState.folder_path}
                 />

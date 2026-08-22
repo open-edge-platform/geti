@@ -7,6 +7,7 @@ import type { DatasetRevisionItem } from '@/api/types';
 import { DialogContainer, Flex, Loading, Size, Text, View, ViewModes } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { GridLayoutOptions } from 'react-aria-components';
+import { useTranslation } from 'react-i18next';
 
 import { MediaItem } from '../../../../components/media-item/media-item.component';
 import { MediaThumbnail } from '../../../../components/media-thumbnail/media-thumbnail.component';
@@ -93,6 +94,8 @@ export const SubsetGallery = ({
     fetchNextPage,
     selectedModel,
 }: SubsetGalleryProps) => {
+    const { t } = useTranslation();
+
     const projectId = useProjectIdentifier();
     const { selectedItem, selectItem, clearSelection, selectPreviousItem, selectNextItem } = useSubsetNavigation({
         items,
@@ -112,7 +115,7 @@ export const SubsetGallery = ({
     if (items.length === 0) {
         return (
             <Flex height={'100%'} alignItems={'center'} justifyContent={'center'}>
-                <Text>No items in this subset</Text>
+                <Text>{t('models.noItemsInSubset')}</Text>
             </Flex>
         );
     }

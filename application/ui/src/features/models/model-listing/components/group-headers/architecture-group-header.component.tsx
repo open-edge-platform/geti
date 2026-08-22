@@ -3,6 +3,7 @@
 
 import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { dimensionValue, Flex, Heading, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { PerformanceCategoryBadge } from '../model-row/performance-category-badge.component';
 
@@ -11,9 +12,11 @@ type ArchitectureGroupHeaderProps = {
 };
 
 export const ArchitectureGroupHeader = ({ architecture }: ArchitectureGroupHeaderProps) => {
+    const { t } = useTranslation();
+
     // Should never happen, but just in case
     if (architecture === undefined) {
-        return <Text>Unknown</Text>;
+        return <Text>{t('models.unknownArchitecture')}</Text>;
     }
 
     return (

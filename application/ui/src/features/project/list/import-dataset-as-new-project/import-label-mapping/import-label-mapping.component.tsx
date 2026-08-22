@@ -8,6 +8,7 @@ import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
 import { useStagedDataset } from 'hooks/api/staged-dataset.hook';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';
 import { isNil, isString } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { DatasetStatistics } from '../../../../../components/dataset-statistics/dataset-statistics.component';
 import { MultiSelectList } from '../../../../../components/multi-select-list/multi-select-list.component';
@@ -64,6 +65,8 @@ const useFormConfig = (stagedDatasetId: string) => {
 };
 
 export const ImportLabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
+    const { t } = useTranslation();
+
     const { data: stagedDataset } = useStagedDataset(stagedDatasetId);
 
     const [formState, submitAction] = useFormConfig(stagedDatasetId);
@@ -78,19 +81,19 @@ export const ImportLabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
 
     return (
         <Flex direction={'column'} gap={'size-200'} UNSAFE_style={{ padding: dimensionValue('size-275') }}>
-            <Heading>Imported dataset statistics</Heading>
+            <Heading>{t('dataset.importedStatsHeading')}</Heading>
 
             <View padding={'size-200'} borderRadius={'regular'} backgroundColor={'gray-75'}>
                 <Flex justifyContent={'center'} gap={'size-200'}>
                     <DatasetStatistics
-                        label='images'
+                        label={t('dataset.imagesLabel')}
                         totalMediaItems={totalImages}
                         totalAnnotatedItems={totalAnnotatedImages}
                     />
 
                     {totalFrames > 0 && (
                         <DatasetStatistics
-                            label='frames'
+                            label={t('dataset.framesLabel')}
                             totalMediaItems={totalFrames}
                             totalAnnotatedItems={totalAnnotatedFrames}
                         />
@@ -98,13 +101,13 @@ export const ImportLabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                 </Flex>
             </View>
 
-            <Heading marginTop={'size-200'}>Label mapping</Heading>
+            <Heading marginTop={'size-200'}>{t('project.list.labelMappingHeading')}</Heading>
 
             <View padding={'size-200'} borderRadius={'regular'} backgroundColor={'gray-75'}>
                 <Form id={LABEL_MAPPING_FORM_ID} validationBehavior='native' action={submitAction}>
                     <MultiSelectList
                         name='labels'
-                        label='Dataset labels'
+                        label={t('project.list.datasetLabelsLabel')}
                         maxHeight='size-2000'
                         defaultSelectedKeys={new Set(datasetLabels.map((label) => label))}
                         items={datasetLabels.map((label) => ({ id: label, name: label }))}
@@ -115,9 +118,9 @@ export const ImportLabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                     <Checkbox
                         defaultSelected={formState.include_unannotated}
                         name='include_unannotated'
-                        aria-label='include unannotated'
+                        aria-label={t('project.list.includeUnannotatedAriaLabel')}
                     >
-                        Include media without annotations
+                        {t('project.list.includeUnannotatedText')}
                     </Checkbox>
                 </Form>
             </View>

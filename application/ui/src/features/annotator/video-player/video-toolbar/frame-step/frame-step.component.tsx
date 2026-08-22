@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 import { ActionButton, Tooltip, TooltipTrigger, View } from '@geti-ui/ui';
 import { Fps } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { FRAME_STEP_TO_DISPLAY_ALL_FRAMES } from './utils';
 
@@ -25,6 +26,8 @@ const FRAME_MODE = {
 } as const;
 
 export const FrameStep = ({ isDisabled, step, onChangeStep, defaultFps }: FrameStepProps) => {
+    const { t } = useTranslation();
+
     const isAllMode = step === FRAME_STEP_TO_DISPLAY_ALL_FRAMES;
 
     const handleFpsToggle = () => {
@@ -53,7 +56,7 @@ export const FrameStep = ({ isDisabled, step, onChangeStep, defaultFps }: FrameS
                     {isAllMode ? FRAME_MODE.ALL_FRAMES : FRAME_MODE.ONE_FRAME}
                 </View>
             </ActionButton>
-            <Tooltip>{isAllMode ? 'Show 1 frame per second' : 'Show all frames'}</Tooltip>
+            <Tooltip>{isAllMode ? t('annotator.showOneFpsTooltip') : t('annotator.showAllFramesTooltip')}</Tooltip>
         </TooltipTrigger>
     );
 };

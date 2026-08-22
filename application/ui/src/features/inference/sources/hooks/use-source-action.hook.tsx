@@ -7,6 +7,7 @@ import type { SourceConfigPayload } from '@/api/types';
 import { isFunction } from 'lodash-es';
 
 import { toast } from '../../../../components/toast/toast.component';
+import { i18n } from '../../../../i18n';
 import { useSourceMutation } from './use-source-mutation.hook';
 
 interface useSourceActionProps<T> {
@@ -35,7 +36,7 @@ export const useSourceAction = <T extends SourceConfigPayload>({
 
             toast({
                 type: 'success',
-                message: `Source configuration ${isNewSource ? 'created' : 'updated'} successfully.`,
+                message: i18n.t(isNewSource ? 'inference.sourceCreatedToast' : 'inference.sourceUpdatedToast'),
             });
 
             isFunction(onSaved) && onSaved(source_id);
@@ -45,7 +46,9 @@ export const useSourceAction = <T extends SourceConfigPayload>({
 
             toast({
                 type: 'error',
-                message: `Failed to save source configuration, ${details ?? 'please try again'}`,
+                message: i18n.t('inference.sourceSaveFailedToast', {
+                    detail: details ?? i18n.t('common.pleaseTryAgain'),
+                }),
             });
         }
 

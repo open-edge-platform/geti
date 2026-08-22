@@ -3,6 +3,7 @@
 
 import { ActionButton, Flex, PressableElement, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Pause, Play, SoundOff, SoundOn, StepBackward, StepForward } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import { useIsFetchingPredictions } from '../../api/use-media-predictions';
@@ -14,6 +15,8 @@ type VideoControlsProps = {
 };
 
 export const VideoControls = ({ mode }: VideoControlsProps) => {
+    const { t } = useTranslation();
+
     const { isMuted, toggleMute, videoControls, videoFrame, videoError } = useVideoPlayer();
     const { isPlaying, play, pause, previousFrame, nextFrame, canSelectPreviousFrame, canSelectNextFrame } =
         videoControls;
@@ -40,7 +43,12 @@ export const VideoControls = ({ mode }: VideoControlsProps) => {
                 ) : (
                     <TooltipTrigger delay={500} isDisabled={videoError === null}>
                         <PressableElement>
-                            <ActionButton isQuiet aria-label={'Play video'} onPress={play} isDisabled={isPlayDisabled}>
+                            <ActionButton
+                                isQuiet
+                                aria-label={t('annotator.playVideoAriaLabel')}
+                                onPress={play}
+                                isDisabled={isPlayDisabled}
+                            >
                                 <Play />
                             </ActionButton>
                         </PressableElement>
@@ -56,7 +64,11 @@ export const VideoControls = ({ mode }: VideoControlsProps) => {
                     <StepForward />
                 </ActionButton>
             </Flex>
-            <ActionButton isQuiet aria-label={isMuted ? 'Unmute audio' : 'Mute audio'} onPress={toggleMute}>
+            <ActionButton
+                isQuiet
+                aria-label={isMuted ? t('annotator.unmuteAudioAriaLabel') : t('annotator.muteAudioAriaLabel')}
+                onPress={toggleMute}
+            >
                 {isMuted ? <SoundOff /> : <SoundOn />}
             </ActionButton>
         </Flex>

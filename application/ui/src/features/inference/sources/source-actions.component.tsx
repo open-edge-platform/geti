@@ -8,6 +8,7 @@ import { ActionButton, Flex, Loading, Text } from '@geti-ui/ui';
 import { Back } from '@geti-ui/ui/icons';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEmpty, orderBy } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { useSourcesQuery } from './api/use-sources';
 import { EditSourceForm } from './edit-source-form.component';
@@ -15,6 +16,8 @@ import { SourcesList } from './source-list/source-list.component';
 import { SourceOptions } from './source-options';
 
 export const SourceActions = () => {
+    const { t } = useTranslation();
+
     const [view, setView] = useState<'list' | 'options' | 'edit'>('list');
     const [currentSource, setCurrentSource] = useState<SourceConfig | null>(null);
     const { data: sources = [], isPending } = useSourcesQuery();
@@ -71,7 +74,7 @@ export const SourceActions = () => {
                     <Back />
                 </ActionButton>
 
-                <Text>Add new input source</Text>
+                <Text>{t('inference.addNewSource')}</Text>
             </Flex>
         </SourceOptions>
     );

@@ -3,6 +3,7 @@
 
 import type { QuantizeJob, TrainJob } from '@/api/types';
 import { Badge, Button } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { JobRow, type JobRowColumnsProps } from './job-row.component';
 
@@ -12,7 +13,9 @@ type FailedJobRowProps = JobRowColumnsProps & {
 };
 
 const FailedStatusBadge = () => {
-    return <Badge variant={'negative'}>Failed</Badge>;
+    const { t } = useTranslation();
+
+    return <Badge variant={'negative'}>{t('models.failedStatusBadge')}</Badge>;
 };
 
 const DismissFailedJob = ({ onDismiss }: { onDismiss: () => void }) => {

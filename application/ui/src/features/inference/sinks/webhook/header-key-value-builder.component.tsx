@@ -6,6 +6,7 @@ import { Fragment, useState } from 'react';
 import { ActionButton, Content, ContextualHelp, dimensionValue, Flex, Grid, Text } from '@geti-ui/ui';
 import { Add, Delete } from '@geti-ui/ui/icons';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { RequiredTextField } from '../../../../components/required-text-field/required-text-field.component';
 import { Fields, getPairsFromObject, Pair } from './utils';
@@ -21,6 +22,7 @@ const updatePairAtIndex = (indexToUpdate: number, field: Fields, value: string) 
     index === indexToUpdate ? { ...pair, [field]: value } : pair;
 
 export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {} }: HeaderKeyValueBuilderProps) => {
+    const { t } = useTranslation();
     const [pairs, setPairs] = useState<Pair[]>(getPairsFromObject(config));
 
     const addPair = () => {
@@ -86,7 +88,7 @@ export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {}
                             isDisabled={isEmpty(pair.key)}
                             onChange={(val) => updatePair(index, Fields.VALUE, val)}
                         />
-                        <ActionButton aria-label='Remove' onPress={() => removePair(index)}>
+                        <ActionButton aria-label={t('inference.removeRowAriaLabel')} onPress={() => removePair(index)}>
                             <Delete />
                         </ActionButton>
                     </Fragment>

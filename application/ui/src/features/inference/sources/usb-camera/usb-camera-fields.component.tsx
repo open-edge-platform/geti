@@ -8,12 +8,15 @@ import type { USBCameraSourceConfig } from '@/api/types';
 import { ActionButton, Flex, Item, Loading, Picker, TextField } from '@geti-ui/ui';
 import { Refresh } from '@geti-ui/ui/icons';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 type UsbCameraProps = {
     defaultState?: USBCameraSourceConfig;
 };
 
 export const UsbCamera = ({ defaultState }: UsbCameraProps) => {
+    const { t } = useTranslation();
+
     const [name, setName] = useState(defaultState?.name);
     const isSystemName = useRef(isEmpty(defaultState?.name));
 
@@ -46,17 +49,23 @@ export const UsbCamera = ({ defaultState }: UsbCameraProps) => {
         <Flex direction='column' gap='size-200'>
             <TextField isHidden label='id' name='id' defaultValue={defaultState?.id} />
             <TextField isHidden label='name' name='name' value={name} />
-            <TextField width='100%' label='Name' name='name_display' value={name} onChange={handleNameChange} />
+            <TextField
+                width='100%'
+                label={t('inference.nameLabel')}
+                name='name_display'
+                value={name}
+                onChange={handleNameChange}
+            />
 
             <Flex alignItems='end' gap='size-200'>
                 <Picker
                     flex='1'
                     isRequired
-                    label='Camera'
+                    label={t('inference.cameraLabel')}
                     name='device_id'
                     items={devices}
                     isLoading={isLoading}
-                    aria-label='Camera list'
+                    aria-label={t('inference.cameraListAriaLabel')}
                     defaultSelectedKey={String(defaultState?.device_id)}
                     onSelectionChange={handleSelectionChange}
                 >
@@ -66,7 +75,7 @@ export const UsbCamera = ({ defaultState }: UsbCameraProps) => {
                 <ActionButton
                     isQuiet
                     onPress={() => refetch()}
-                    aria-label='Refresh Cameras'
+                    aria-label={t('inference.refreshCamerasAriaLabel')}
                     isDisabled={isLoading || isRefetching}
                 >
                     {isRefetching ? <Loading mode={'inline'} size='S' /> : <Refresh />}

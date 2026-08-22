@@ -7,6 +7,7 @@ import type { Job, QuantizeJob, TrainJob } from '@/api/types';
 import { AlertDialog, Badge, Button, DialogContainer, Flex, Loading, Text } from '@geti-ui/ui';
 import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
 import { capitalize } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { JobRow, type JobRowColumnsProps } from './job-row.component';
 
@@ -44,6 +45,7 @@ type CancelRunningJobProps = {
 };
 
 const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
+    const { t } = useTranslation();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
 
     return (
@@ -59,7 +61,7 @@ const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
             <DialogContainer onDismiss={() => setIsDeleteDialogOpen(false)}>
                 {isDeleteDialogOpen && (
                     <AlertDialog
-                        title='Stop job'
+                        title={t('models.stopJobTitle')}
                         variant='destructive'
                         primaryActionLabel='Cancel'
                         onPrimaryAction={onCancel}

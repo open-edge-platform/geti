@@ -37,7 +37,7 @@ export const EmptyProjectList = () => {
             justifyContent={'center'}
             UNSAFE_className={classes.container}
         >
-            <EmptyFolderImage aria-label='empty list' />
+            <EmptyFolderImage aria-label={t('common.emptyList')} />
 
             <Flex alignItems={'center'} gap={'size-100'}>
                 <Button variant='accent' id='create-new-project-button' onPress={handleCreateProject}>

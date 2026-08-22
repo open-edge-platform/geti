@@ -8,6 +8,7 @@ import { ActionButton, Button, ButtonGroup, Divider, Flex, Form, Text, View } fr
 import { Back } from '@geti-ui/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useConnectSourceToPipeline } from 'hooks/api/pipeline.hook';
+import { useTranslation } from 'react-i18next';
 
 import { testSourceQueryOptions } from '../api/use-test-source';
 import { useSourceAction } from '../hooks/use-source-action.hook';
@@ -33,6 +34,8 @@ export const EditSource = <T extends SourceConfigPayload>({
     componentFields,
     isConnected,
 }: EditSourceProps<T>) => {
+    const { t } = useTranslation();
+
     const connectToPipeline = useRef(false);
     const connectToPipelineMutation = useConnectSourceToPipeline();
     const queryClient = useQueryClient();
@@ -57,7 +60,7 @@ export const EditSource = <T extends SourceConfigPayload>({
                     <Back />
                 </ActionButton>
 
-                <Text>Edit input source</Text>
+                <Text>{t('inference.editSource')}</Text>
             </Flex>
 
             <View UNSAFE_className={classes.container}>

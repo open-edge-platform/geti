@@ -4,6 +4,7 @@
 import type { FC, PropsWithChildren, RefObject, SVGProps } from 'react';
 
 import { roiFromImage } from '@geti-ui/smart-tools/utils';
+import { useTranslation } from 'react-i18next';
 
 import { allowPanning } from '../utils';
 
@@ -18,6 +19,7 @@ export const SvgToolCanvas: FC<PropsWithChildren<CanvasProps>> = ({
     onPointerDown,
     ...props
 }) => {
+    const { t } = useTranslation();
     const roi = roiFromImage(image);
 
     return (
@@ -28,7 +30,7 @@ export const SvgToolCanvas: FC<PropsWithChildren<CanvasProps>> = ({
             // eslint-disable-next-line jsx-a11y/aria-role
             role='editor'
             viewBox={`0 0 ${roi.width} ${roi.height}`}
-            aria-label={props['aria-label'] ?? 'tool'}
+            aria-label={props['aria-label'] ?? t('annotator.svgToolFallbackAriaLabel')}
         >
             <rect {...roi} fillOpacity={0} ref={canvasRef} />
             {children}

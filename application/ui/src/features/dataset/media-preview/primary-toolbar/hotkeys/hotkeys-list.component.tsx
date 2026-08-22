@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Divider, Grid, Keyboard, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { formatHotkeyForDisplay, HOTKEYS } from '../../../../../shared/hotkeys-definition';
 import { useAvailableTools } from '../../../../annotator/tools/annotator-tools/use-available-tools';
@@ -21,17 +22,22 @@ const HotkeyItem = ({ hotkeyName, hotkey }: HotkeyItemProps) => {
 };
 
 export const HotkeysList = () => {
+    const { t } = useTranslation();
     const availableTools = useAvailableTools();
 
     return (
         <Grid columns={['2fr', '1fr']} rowGap={'size-100'}>
-            <HotkeyItem hotkeyName={'Submit annotations/predictions'} hotkey={formatHotkeyForDisplay(HOTKEYS.submit)} />
+            <HotkeyItem hotkeyName={t('annotator.submitHotkeyName')} hotkey={formatHotkeyForDisplay(HOTKEYS.submit)} />
             <Divider size='S' gridColumn={'1/-1'} />
             {availableTools.map((tool) => (
-                <HotkeyItem key={tool.label} hotkeyName={tool.label} hotkey={formatHotkeyForDisplay(tool.hotkey)} />
+                <HotkeyItem
+                    key={tool.labelKey}
+                    hotkeyName={t(tool.labelKey)}
+                    hotkey={formatHotkeyForDisplay(tool.hotkey)}
+                />
             ))}
             <Divider size='S' gridColumn={'1/-1'} />
-            <HotkeyItem hotkeyName={'Undo'} hotkey={formatHotkeyForDisplay(HOTKEYS.undo)} />
+            <HotkeyItem hotkeyName={t('annotator.undoHotkeyName')} hotkey={formatHotkeyForDisplay(HOTKEYS.undo)} />
             <HotkeyItem
                 hotkeyName={'Redo'}
                 hotkey={`${formatHotkeyForDisplay(HOTKEYS.redo)} or ${formatHotkeyForDisplay(HOTKEYS.redoAlt)}`}

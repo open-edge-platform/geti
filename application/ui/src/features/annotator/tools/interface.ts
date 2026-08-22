@@ -9,9 +9,9 @@ export interface ToolConfig {
     type: ToolType;
     icon: ComponentType<SVGProps<SVGSVGElement>>;
     hotkey: string;
-    label: string;
+    labelKey: string;
     tooltip?: {
         img: string;
-        description: string;
+        descriptionKey: string;
     };
 }

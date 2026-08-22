@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 
 import type { VideoFileSourceConfig } from '@/api/types';
 import { Button, Flex, Switch, Text, TextField } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { acceptedVideoExtensions } from '../../../dataset/gallery/utils';
 
@@ -17,6 +18,7 @@ type VideoFileProps = {
 const ACCEPTED_VIDEO_EXTENSIONS = [acceptedVideoExtensions, '.flv', '.wmv', '.mpg', '.mpeg'].join(',');
 
 export const VideoFile = ({ defaultState }: VideoFileProps) => {
+    const { t } = useTranslation();
     const [videoPath, setVideoPath] = useState(defaultState?.video_path ?? '');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -43,7 +45,7 @@ export const VideoFile = ({ defaultState }: VideoFileProps) => {
     return (
         <Flex direction='column' gap='size-200'>
             <TextField isHidden label='id' name='id' defaultValue={defaultState?.id} />
-            <TextField width='100%' label='Name' name='name' defaultValue={defaultState?.name} />
+            <TextField width='100%' label={t('inference.nameLabel')} name='name' defaultValue={defaultState?.name} />
 
             <Flex direction='column' gap='size-100'>
                 <Flex gap='size-100' alignItems='end'>
@@ -51,7 +53,7 @@ export const VideoFile = ({ defaultState }: VideoFileProps) => {
                         isRequired={selectedFile === null}
                         flex='1'
                         name='video_path'
-                        label='Video file path'
+                        label={t('inference.videoFilePathLabel')}
                         value={videoPath}
                         onChange={handlePathChange}
                     />
@@ -78,7 +80,7 @@ export const VideoFile = ({ defaultState }: VideoFileProps) => {
             </Flex>
 
             <Switch
-                aria-label='loop video'
+                aria-label={t('inference.loopVideoAriaLabel')}
                 name='loop'
                 defaultSelected={defaultState?.loop}
                 key={defaultState?.loop ? 'true' : 'false'}

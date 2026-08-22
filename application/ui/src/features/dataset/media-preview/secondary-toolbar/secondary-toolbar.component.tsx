@@ -136,6 +136,7 @@ export const SecondaryToolbar = ({
     hasSubsetChanged = false,
     isLoadingPredictions = false,
 }: SecondaryToolbarProps) => {
+    const { t } = useTranslation();
     const { data: selectedProject } = useProject();
     const videoPlayerContext = useVideoPlayerContext();
     const { selectableModels } = usePredictionSetup();
@@ -247,7 +248,7 @@ export const SecondaryToolbar = ({
                             <Icon height={'size-150'} width={'size-150'}>
                                 <CloseSemiBold />
                             </Icon>
-                            <Text>Close</Text>
+                            <Text>{t('common.close')}</Text>
                         </ActionButton>
                     </ButtonGroup>
                 </Toolbar.Section>

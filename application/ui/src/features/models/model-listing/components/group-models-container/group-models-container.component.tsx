@@ -3,6 +3,7 @@
 
 import type { Model } from '@/api/types';
 import { Disclosure, DisclosurePanel, DisclosureTitle, Flex } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { useGetTaskModelArchitectures } from '../../../hooks/api/use-get-model-architectures.hook';
 import { ModelDetailsTabs } from '../../model-details/model-details-tabs.component';
@@ -21,6 +22,7 @@ interface GroupModelsContainerProps {
 }
 
 export const GroupModelsContainer = ({ group, models }: GroupModelsContainerProps) => {
+    const { t } = useTranslation();
     const { expandedModelIds, onExpandModel } = useModelListing();
     const { modelArchitectures } = useGetTaskModelArchitectures();
 
@@ -46,7 +48,7 @@ export const GroupModelsContainer = ({ group, models }: GroupModelsContainerProp
                         <DisclosureTitle UNSAFE_className={classes.disclosureItem}>
                             <ModelRowContainer model={model} modelArchitecture={modelArchitecture} />
                         </DisclosureTitle>
-                        <DisclosurePanel aria-label={`Model details for ${model.name}`}>
+                        <DisclosurePanel aria-label={t('models.detailsForModelAriaLabel', { name: model.name })}>
                             <ModelDetailsTabs modelId={modelId} />
                         </DisclosurePanel>
                     </Disclosure>

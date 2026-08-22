@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 
 import { dimensionValue, Grid } from '@geti-ui/ui';
 import { useProjectTask } from 'hooks/use-project-task.hook';
+import { useTranslation } from 'react-i18next';
 
 import { GRID_COLUMNS } from '../constants';
 import { useModelListing } from '../provider/model-listing-provider';
@@ -15,6 +16,8 @@ import { getPerformanceColumnLabel } from './model-row/utils';
 // We are just rendering the result of the sort, not doing the sort itself on the table.
 // The actual sorting comes from the models screen Header.
 export const ModelsTableHeader = () => {
+    const { t } = useTranslation();
+
     const { groupBy, sortBy, groupedModels } = useModelListing();
     const taskType = useProjectTask();
 
@@ -36,14 +39,14 @@ export const ModelsTableHeader = () => {
                     ${dimensionValue('size-150')} ${dimensionValue('size-1000')}`,
             }}
         >
-            <ColumnHeader label='Model Name' isSorted={sortBy === 'name'} />
-            <ColumnHeader label='Trained' isSorted={sortBy === 'trained'} />
+            <ColumnHeader label={t('models.modelNameColumn')} isSorted={sortBy === 'name'} />
+            <ColumnHeader label={t('models.trainedColumn')} isSorted={sortBy === 'trained'} />
             <ColumnHeader
                 label={groupBy === 'architecture' ? 'Dataset' : 'Architecture'}
                 isSorted={sortBy === 'architecture' || sortBy === 'dataset'}
             />
-            <ColumnHeader label='Device' isSorted={sortBy === 'device'} />
-            <ColumnHeader label='Total size' isSorted={sortBy === 'size'} />
+            <ColumnHeader label={t('models.deviceColumn')} isSorted={sortBy === 'device'} />
+            <ColumnHeader label={t('models.totalSizeColumn')} isSorted={sortBy === 'size'} />
             <ColumnHeader label={performanceColumnName} isSorted={sortBy === 'score'} />
             <div />
         </Grid>

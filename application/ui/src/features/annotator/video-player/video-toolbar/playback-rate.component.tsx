@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { ActionButton, DialogTrigger, Flex, Slider, Text, Tooltip, TooltipTrigger, View } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as PlayRate } from '../../../../assets/icons/play-rate.svg';
 import { useVideoPlayer } from '../video-player-provider.component';
@@ -34,6 +35,8 @@ const MIN_RATE = 1;
 const MAX_RATE = 3;
 
 export const PlaybackSpeedSlider = () => {
+    const { t } = useTranslation();
+
     const { playbackRate, changePlaybackRate } = useVideoPlayer();
 
     const selectedPlaybackRate =
@@ -50,7 +53,7 @@ export const PlaybackSpeedSlider = () => {
                         </Flex>
                     </View>
                 </ActionButton>
-                <Tooltip>Playback speed</Tooltip>
+                <Tooltip>{t('annotator.playbackSpeedTooltip')}</Tooltip>
             </TooltipTrigger>
 
             <View padding={'size-200'}>

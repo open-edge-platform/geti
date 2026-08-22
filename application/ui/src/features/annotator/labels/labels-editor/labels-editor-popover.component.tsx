@@ -7,6 +7,7 @@ import type { Label } from '@/api/types';
 import { ActionButton, AlertDialog, DialogContainer, DialogTrigger, Text, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Add, Edit } from '@geti-ui/ui/icons';
 import { useOverlayTriggerState } from '@react-stately/overlays';
+import { useTranslation } from 'react-i18next';
 
 import { useLabels } from '../use-labels.hook';
 import { LabelsEditor } from './labels-editor.component';
@@ -50,7 +51,8 @@ export const LabelsEditorPopover = ({
         popoverState.open();
     };
 
-    const triggerLabel = hasLabels ? 'Edit labels' : 'Create label';
+    const { t } = useTranslation();
+    const triggerLabel = hasLabels ? t('annotator.editLabelsTrigger') : t('annotator.createLabelTrigger');
 
     return (
         <>
@@ -70,7 +72,7 @@ export const LabelsEditorPopover = ({
                         ) : (
                             <>
                                 <Add />
-                                <Text>Create label</Text>
+                                <Text>{t('annotator.createLabelTrigger')}</Text>
                             </>
                         )}
                     </ActionButton>
@@ -88,16 +90,14 @@ export const LabelsEditorPopover = ({
             <DialogContainer onDismiss={handleCancelDeleteLabel}>
                 {deleteDialogState.isOpen && labelToDelete && (
                     <AlertDialog
-                        title={'Delete label'}
+                        title={t('annotator.deleteLabelTitle')}
                         variant={'destructive'}
-                        primaryActionLabel={'Delete'}
-                        cancelLabel={'Cancel'}
+                        primaryActionLabel={t('common.delete')}
+                        cancelLabel={t('common.cancel')}
                         onPrimaryAction={handleConfirmDeleteLabel}
                         onCancel={handleCancelDeleteLabel}
                     >
-                        If you remove the {labelToDelete.name} label, all annotations in your dataset that have this
-                        label will be deleted. However, this won&apos;t impact any models you&apos;ve trained in the
-                        past.
+                        {t('annotator.deleteLabelWarning', { name: labelToDelete.name })}
                     </AlertDialog>
                 )}
             </DialogContainer>

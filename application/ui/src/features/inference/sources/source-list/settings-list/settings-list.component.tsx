@@ -3,6 +3,7 @@
 
 import { $api } from '@/api';
 import type { SourceConfig } from '@/api/types';
+import { useTranslation } from 'react-i18next';
 
 import classes from './settings-list.module.scss';
 
@@ -11,11 +12,12 @@ interface SettingsListProps {
 }
 
 const CameraDeviceDisplay = ({ deviceId }: { deviceId: number }) => {
+    const { t } = useTranslation();
     const { data: cameraDevices = [], isLoading } = $api.useQuery('get', '/api/system/devices/camera');
     const device = cameraDevices.find(({ index }) => index === deviceId);
 
     if (isLoading) {
-        return <span>Loading...</span>;
+        return <span>{t('inference.loadingText')}</span>;
     }
 
     return (

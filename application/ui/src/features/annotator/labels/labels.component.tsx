@@ -9,6 +9,7 @@ import { clsx } from 'clsx';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useTranslation } from 'react-i18next';
 
 import { EMPTY_LABEL_ID } from '../../../shared/annotator/labels';
 import { formatHotkeyForDisplay } from '../../../shared/hotkeys-definition';
@@ -27,6 +28,8 @@ type LabelBadgeProps = {
 };
 
 const LabelBadge = ({ label, isSelected, onClick }: LabelBadgeProps) => {
+    const { t } = useTranslation();
+
     return (
         <TooltipTrigger isDisabled={isEmpty(label.hotkey)}>
             <Pressable>
@@ -40,7 +43,7 @@ const LabelBadge = ({ label, isSelected, onClick }: LabelBadgeProps) => {
                     <Text UNSAFE_className={classes.badgeText}>{label.name}</Text>
                 </button>
             </Pressable>
-            <Tooltip>Hotkey: {formatHotkeyForDisplay(label.hotkey ?? '')}</Tooltip>
+            <Tooltip>{t('annotator.hotkeyTooltip', { hotkey: formatHotkeyForDisplay(label.hotkey ?? '') })}</Tooltip>
         </TooltipTrigger>
     );
 };

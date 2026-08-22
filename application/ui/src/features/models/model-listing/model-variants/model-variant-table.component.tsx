@@ -20,6 +20,7 @@ import { DownloadIcon } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { get } from 'lodash-es';
 import { useNumberFormatter } from 'react-aria';
+import { useTranslation } from 'react-i18next';
 
 import { downloadFile, formatBytes } from '../../../../shared/util';
 import { getModelVariantBinaryFilename, getModelVariantBinaryUrl } from '../utils/utils';
@@ -42,6 +43,7 @@ type ModelVariantPrecisionRendererProps = {
 };
 
 const ModelVariantPrecisionRenderer = ({ variant }: ModelVariantPrecisionRendererProps) => {
+    const { t } = useTranslation();
     const numberFormatter = useNumberFormatter({
         style: 'percent',
         maximumFractionDigits: 1,
@@ -67,7 +69,7 @@ const ModelVariantPrecisionRenderer = ({ variant }: ModelVariantPrecisionRendere
             <Text>{variant.precision.toUpperCase()}</Text>
             {(calibrationDatasetSize || maxAccuracyDrop) && (
                 <ContextualHelp variant={'info'} placement={'top'}>
-                    <Heading>Quantized with NNCF PTQ</Heading>
+                    <Heading>{t('models.quantizedHeading')}</Heading>
                     <Content>
                         <Flex direction={'column'}>
                             {maxAccuracyDrop !== null && (
@@ -85,6 +87,8 @@ const ModelVariantPrecisionRenderer = ({ variant }: ModelVariantPrecisionRendere
 };
 
 export const ModelVariantTable = ({ model, format }: ModelVariantTableProps) => {
+    const { t } = useTranslation();
+
     const projectId = useProjectIdentifier();
 
     const allVariants = model.variants ?? [];
@@ -109,8 +113,8 @@ export const ModelVariantTable = ({ model, format }: ModelVariantTableProps) => 
     return (
         <TableView aria-label={`Model variants for ${model.id}`} overflowMode={'wrap'} density={'compact'}>
             <TableHeader>
-                <Column isRowHeader>PRECISION</Column>
-                <Column isRowHeader>SIZE</Column>
+                <Column isRowHeader>{t('models.precisionColumn')}</Column>
+                <Column isRowHeader>{t('models.sizeColumnHeader')}</Column>
                 <Column isRowHeader>{performanceColumnName}</Column>
                 <Column align='end'>
                     <></>

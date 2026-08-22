@@ -6,7 +6,7 @@ import { createContext, Dispatch, ReactNode, useContext, useEffect, useMemo, use
 import { Button, Flex, Loading } from '@geti-ui/ui';
 
 import { removeToast, toast } from '../../../components/toast/toast.component';
-import { pluralizeItems } from '../../../shared/util';
+import { i18n } from '../../../i18n';
 import { UploadDetailsDialog } from '../gallery/upload-details-dialog/upload-details-dialog.component';
 import { Action, computeSummary, INITIAL_STATE, MediaUploadState, reducer } from './media-upload-reducer';
 
@@ -21,23 +21,24 @@ type MediaUploadContextValue = {
 const MediaUploadContext = createContext<MediaUploadContextValue | null>(null);
 
 const buildProgressDetail = (succeeded: number, failed: number): string => {
-    const parts = [succeeded > 0 ? `${succeeded} succeeded` : null, failed > 0 ? `${failed} failed` : null].filter(
-        Boolean
-    );
+    const parts = [
+        succeeded > 0 ? i18n.t('dataset.partSucceeded', { count: succeeded }) : null,
+        failed > 0 ? i18n.t('dataset.partFailed', { count: failed }) : null,
+    ].filter(Boolean);
 
     return parts.length === 0 ? '' : `(${parts.join(', ')})`;
 };
 
 const ShowDetailsButton = ({ onPress }: { onPress: () => void }) => (
     <Button variant={'secondary'} style={'fill'} onPress={onPress}>
-        Show details
+        {i18n.t('dataset.showDetailsButton')}
     </Button>
 );
 
 const InProgressMessage = ({ total, detail }: { total: number; detail: string }): ReactNode => (
     <Flex alignItems={'center'} gap={'size-100'} UNSAFE_style={{ fontSize: UPLOAD_TOAST_FONT_SIZE }}>
         <Loading mode={'inline'} size={'S'} />
-        <span>{`Uploading ${total} ${pluralizeItems(total)}... ${detail}`.trim()}</span>
+        <span>{i18n.t('dataset.uploadProgressText', { count: total, detail }).trim()}</span>
     </Flex>
 );
 
@@ -56,11 +57,13 @@ const showFinalToast = (succeeded: number, failed: number, openDialog: () => voi
     let text: string;
 
     if (failed === 0) {
-        text = `Uploaded ${succeeded} ${pluralizeItems(succeeded)}`;
+        text = i18n.t('dataset.uploadedSummary', { count: succeeded });
     } else if (succeeded === 0) {
-        text = `Failed to upload ${failed} ${pluralizeItems(failed)}`;
+        text = i18n.t('dataset.failedSummary', { count: failed });
     } else {
-        text = `Uploaded ${succeeded} ${pluralizeItems(succeeded)}, ${failed} failed`;
+        const uploaded = i18n.t('dataset.uploadedSummary', { count: succeeded });
+        const failedPart = i18n.t('dataset.partFailed', { count: failed });
+        text = `${uploaded}, ${failedPart}`;
     }
 
     toast({

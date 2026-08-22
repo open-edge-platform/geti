@@ -7,6 +7,7 @@ import { $api } from '@/api';
 import { ActionButton, Item, Menu, MenuTrigger } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { useTranslation } from 'react-i18next';
 
 import { toast } from '../../../../../components/toast/toast.component';
 
@@ -27,6 +28,7 @@ export type SinkMenuProps = {
 };
 
 export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProps) => {
+    const { t } = useTranslation();
     const project_id = useProjectIdentifier();
     const removeSink = $api.useMutation('delete', '/api/sinks/{sink_id}', {
         meta: {
@@ -70,7 +72,7 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: `Successfully connected to "${name}"`,
+                        message: t('inference.connectedToast', { name }),
                     });
                 },
             }
@@ -84,7 +86,7 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: `${name} has been removed successfully!`,
+                        message: t('inference.removedToast', { name }),
                     });
                 },
             }
@@ -101,7 +103,7 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: `Successfully disconnected from "${name}"`,
+                        message: t('inference.disconnectedToast', { name }),
                     });
                 },
             }
@@ -110,7 +112,7 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
 
     return (
         <MenuTrigger>
-            <ActionButton isQuiet aria-label='sink menu'>
+            <ActionButton isQuiet aria-label={t('inference.sinkMenuAriaLabel')}>
                 <MoreMenu />
             </ActionButton>
             <Menu
@@ -118,13 +120,13 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
                 disabledKeys={isConnected ? [SINK_MENU_OPTIONS.REMOVE, SINK_MENU_OPTIONS.TEST] : []}
             >
                 {isConnected ? (
-                    <Item key={SINK_MENU_OPTIONS.DISCONNECT}>Disconnect</Item>
+                    <Item key={SINK_MENU_OPTIONS.DISCONNECT}>{t('inference.disconnect')}</Item>
                 ) : (
-                    <Item key={SINK_MENU_OPTIONS.CONNECT}>Connect</Item>
+                    <Item key={SINK_MENU_OPTIONS.CONNECT}>{t('inference.connect')}</Item>
                 )}
-                <Item key={SINK_MENU_OPTIONS.TEST}>Test connection</Item>
-                <Item key={SINK_MENU_OPTIONS.EDIT}>Edit</Item>
-                <Item key={SINK_MENU_OPTIONS.REMOVE}>Remove</Item>
+                <Item key={SINK_MENU_OPTIONS.TEST}>{t('inference.testConnection')}</Item>
+                <Item key={SINK_MENU_OPTIONS.EDIT}>{t('common.edit')}</Item>
+                <Item key={SINK_MENU_OPTIONS.REMOVE}>{t('inference.remove')}</Item>
             </Menu>
         </MenuTrigger>
     );

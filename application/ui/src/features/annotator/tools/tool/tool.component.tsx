@@ -3,6 +3,7 @@
 
 import { ActionButton, Flex, Heading, IllustratedMessage, Text, Tooltip, TooltipTrigger, View } from '@geti-ui/ui';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useTranslation } from 'react-i18next';
 
 import { IconWrapper } from '../../../../components/icon-wrapper/icon-wrapper.component';
 import type { ToolConfig, ToolType } from '../interface';
@@ -26,7 +27,9 @@ type DrawingToolsTooltipProps = {
 };
 
 const DrawingToolsTooltip = ({ tool }: DrawingToolsTooltipProps) => {
-    const { tooltip, hotkey, label } = tool;
+    const { t } = useTranslation();
+    const { tooltip, hotkey, labelKey } = tool;
+    const label = t(labelKey);
 
     return (
         <IllustratedMessage>
@@ -36,7 +39,9 @@ const DrawingToolsTooltip = ({ tool }: DrawingToolsTooltipProps) => {
                     <Heading UNSAFE_className={classes.drawingToolsTooltipsTitle}>{label}</Heading>
                     {hotkey !== undefined && <Hotkey hotkey={hotkey} />}
                 </Flex>
-                <Text UNSAFE_className={classes.drawingToolsTooltipsDescription}>{tooltip?.description}</Text>
+                <Text UNSAFE_className={classes.drawingToolsTooltipsDescription}>
+                    {tooltip === undefined ? '' : t(tooltip.descriptionKey)}
+                </Text>
             </View>
         </IllustratedMessage>
     );
@@ -50,6 +55,7 @@ type ToolProps = {
 };
 
 export const Tool = ({ tool, activeTool, setActiveTool, isDisabled }: ToolProps) => {
+    const { t } = useTranslation();
     useHotkeys(tool.hotkey, () => setActiveTool(tool.type), [setActiveTool, isDisabled], { enabled: !isDisabled });
 
     return (
@@ -58,7 +64,7 @@ export const Tool = ({ tool, activeTool, setActiveTool, isDisabled }: ToolProps)
                 isQuiet
                 width={'size-400'}
                 onPress={() => setActiveTool(tool.type)}
-                aria-label={`${tool.type} tool`}
+                aria-label={t('annotator.toolAriaLabel', { name: t(tool.labelKey) })}
                 isDisabled={isDisabled}
                 aria-pressed={activeTool === tool.type}
             >
@@ -67,7 +73,11 @@ export const Tool = ({ tool, activeTool, setActiveTool, isDisabled }: ToolProps)
                 </IconWrapper>
             </ActionButton>
             <Tooltip UNSAFE_className={tool.tooltip ? classes.drawingToolsTooltips : undefined}>
-                {tool.tooltip === undefined ? `${tool.label} (${tool.hotkey})` : <DrawingToolsTooltip tool={tool} />}
+                {tool.tooltip === undefined ? (
+                    `${t(tool.labelKey)} (${tool.hotkey})`
+                ) : (
+                    <DrawingToolsTooltip tool={tool} />
+                )}
             </Tooltip>
         </TooltipTrigger>
     );

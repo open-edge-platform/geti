@@ -7,6 +7,7 @@ import type { SinkConfig } from '@/api/types';
 import { isFunction } from 'lodash-es';
 
 import { toast } from '../../../../components/toast/toast.component';
+import { i18n } from '../../../../i18n';
 import { useSinkMutation } from './use-sink-mutation.hook';
 
 interface useSinkActionProps<T> {
@@ -32,7 +33,7 @@ export const useSinkAction = <T extends SinkConfig>({
 
             toast({
                 type: 'success',
-                message: `Sink configuration ${isNewSink ? 'created' : 'updated'} successfully.`,
+                message: i18n.t(isNewSink ? 'inference.sinkCreatedToast' : 'inference.sinkUpdatedToast'),
             });
 
             isFunction(onSaved) && onSaved(sink_id);
@@ -43,7 +44,9 @@ export const useSinkAction = <T extends SinkConfig>({
 
             toast({
                 type: 'error',
-                message: `Failed to save sink configuration, ${details ?? 'please try again'}`,
+                message: i18n.t('inference.sinkSaveFailedToast', {
+                    detail: details ?? i18n.t('common.pleaseTryAgain'),
+                }),
             });
         }
 

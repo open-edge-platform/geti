@@ -19,17 +19,17 @@ const SELECTION_TOOL_CONFIG: ToolConfig = {
     type: 'selection',
     icon: Selector,
     hotkey: HOTKEYS.selectionTool,
-    label: 'Selection',
+    labelKey: 'annotator.selectionTool',
 };
 
 const BOUNDING_BOX_TOOL_CONFIG: ToolConfig = {
     type: 'bounding-box',
     icon: BoundingBox,
     hotkey: HOTKEYS.boundingBoxTool,
-    label: 'Bounding box',
+    labelKey: 'annotator.boundingBoxTool',
     tooltip: {
         img: BoundingBoxImg,
-        description: 'Draw a rectangle or square surrounding an object in an image.',
+        descriptionKey: 'annotator.tooltipBoundingBox',
     },
 };
 
@@ -37,11 +37,10 @@ const AUTO_SEGMENTATION_DETECTION_CONFIG: ToolConfig = {
     type: 'sam',
     icon: SegmentAnythingIcon,
     hotkey: HOTKEYS.autoSegmentation,
-    label: 'Auto segmentation',
+    labelKey: 'annotator.autoSegmentationTool',
     tooltip: {
         img: SAMDetectionImg,
-        description:
-            'Move your cursor over an object to preview a suggested rectangle, then click to create the annotation.',
+        descriptionKey: 'annotator.tooltipSamDetection',
     },
 };
 
@@ -49,11 +48,10 @@ const AUTO_SEGMENTATION_CONFIG: ToolConfig = {
     type: 'sam',
     icon: SegmentAnythingIcon,
     hotkey: HOTKEYS.autoSegmentation,
-    label: 'Auto segmentation',
+    labelKey: 'annotator.autoSegmentationTool',
     tooltip: {
         img: SAMSegmentationImg,
-        description:
-            'Move your cursor over an object to preview a suggested polygon, then click to create the annotation.',
+        descriptionKey: 'annotator.tooltipSamSegmentation',
     },
 };
 
@@ -61,12 +59,10 @@ const POLYGON_TOOL_CONFIG: ToolConfig = {
     type: 'polygon',
     icon: Polygon,
     hotkey: HOTKEYS.polygonTool,
-    label: 'Polygon',
+    labelKey: 'annotator.polygonTool',
     tooltip: {
         img: PolygonImg,
-        description:
-            'Click to place points one by one, or hold and drag to draw freehand. Ideal for irregular shapes ' +
-            'requiring pixel-precision.',
+        descriptionKey: 'annotator.tooltipPolygon',
     },
 };
 
@@ -74,10 +70,10 @@ const MAGNETIC_LASSO_TOOL_CONFIG: ToolConfig = {
     type: 'magnetic-lasso',
     icon: MagneticLasso,
     hotkey: HOTKEYS.magneticLassoTool,
-    label: 'Magnetic Lasso',
+    labelKey: 'annotator.magneticLassoTool',
     tooltip: {
         img: MagneticLassoImg,
-        description: "Hover along an object's edge and click periodically to snap the outline to its borders.",
+        descriptionKey: 'annotator.tooltipMagneticLasso',
     },
 };
 

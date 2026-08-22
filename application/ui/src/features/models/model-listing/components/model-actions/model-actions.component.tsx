@@ -7,6 +7,7 @@ import type { Model } from '@/api/types';
 import { ActionButton, AlertDialog, DialogContainer, Item, Key, Menu, MenuTrigger } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { useTranslation } from 'react-i18next';
 
 import { useDeleteModel } from '../../../hooks/api/use-delete-model.hook';
 import { useRenameModel } from '../../../hooks/api/use-rename-model.hook';
@@ -32,6 +33,8 @@ type ModelActionsProps = {
 };
 
 export const ModelActions = ({ model }: ModelActionsProps) => {
+    const { t } = useTranslation();
+
     const projectId = useProjectIdentifier();
     const deleteModelMutation = useDeleteModel();
     const renameModelMutation = useRenameModel();
@@ -94,10 +97,10 @@ export const ModelActions = ({ model }: ModelActionsProps) => {
                     <MoreMenu />
                 </ActionButton>
                 <Menu onAction={handleAction} aria-label={'Model actions menu'} disabledKeys={disabledKeys}>
-                    <Item key={MODEL_ACTIONS.RENAME}>Rename</Item>
-                    <Item key={MODEL_ACTIONS.DELETE_WEIGHTS}>Delete weights</Item>
-                    <Item key={MODEL_ACTIONS.DELETE_MODEL}>Delete model</Item>
-                    <Item key={MODEL_ACTIONS.VIEW_LOGS}>View training logs</Item>
+                    <Item key={MODEL_ACTIONS.RENAME}>{t('models.renameItem')}</Item>
+                    <Item key={MODEL_ACTIONS.DELETE_WEIGHTS}>{t('models.deleteWeightsItem')}</Item>
+                    <Item key={MODEL_ACTIONS.DELETE_MODEL}>{t('models.deleteModelItem')}</Item>
+                    <Item key={MODEL_ACTIONS.VIEW_LOGS}>{t('models.viewLogsItem')}</Item>
                 </Menu>
             </MenuTrigger>
 
@@ -114,28 +117,28 @@ export const ModelActions = ({ model }: ModelActionsProps) => {
             <DialogContainer onDismiss={() => setIsDialogOpen(null)}>
                 {isDialogOpen === DIALOG_TYPES.DELETE_WEIGHTS && (
                     <AlertDialog
-                        title='Delete weights'
+                        title={t('models.deleteWeightsTitle')}
                         variant='destructive'
-                        primaryActionLabel='Delete weights'
+                        primaryActionLabel={t('models.deleteWeightsItem')}
                         onPrimaryAction={() => handleDeleteModel(true)}
                         isPrimaryActionDisabled={deleteModelMutation.isPending}
-                        cancelLabel='Cancel'
+                        cancelLabel={t('common.cancel')}
                     >
-                        {`Are you sure you want to delete the weights for model "${modelName}"?`}
+                        {t('models.deleteWeightsConfirm', { name: modelName })}
                     </AlertDialog>
                 )}
             </DialogContainer>
             <DialogContainer onDismiss={() => setIsDialogOpen(null)}>
                 {isDialogOpen === DIALOG_TYPES.DELETE_MODEL && (
                     <AlertDialog
-                        title='Delete model'
+                        title={t('models.deleteModelTitle')}
                         variant='destructive'
-                        primaryActionLabel='Delete model'
+                        primaryActionLabel={t('models.deleteModelItem')}
                         onPrimaryAction={() => handleDeleteModel(false)}
                         isPrimaryActionDisabled={deleteModelMutation.isPending}
-                        cancelLabel='Cancel'
+                        cancelLabel={t('common.cancel')}
                     >
-                        {`Are you sure you want to delete model "${modelName}"? This action cannot be undone.`}
+                        {t('models.deleteModelConfirm', { name: modelName })}
                     </AlertDialog>
                 )}
             </DialogContainer>

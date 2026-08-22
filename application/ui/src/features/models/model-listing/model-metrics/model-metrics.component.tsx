@@ -3,6 +3,7 @@
 
 import type { Evaluation } from '@/api/types';
 import { Flex, Loading, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { useGetModelTrainingMetrics } from '../../hooks/api/use-get-model-training-metrics.hook';
 import { ModelEvaluations } from './model-evaluations.component';
@@ -15,12 +16,14 @@ type ModelMetricsProps = {
 };
 
 export const ModelMetrics = ({ modelId, evaluations, filesDeleted = false }: ModelMetricsProps) => {
+    const { t } = useTranslation();
+
     const { data: trainingMetrics, isPending, isError } = useGetModelTrainingMetrics(filesDeleted ? null : modelId);
 
     if (filesDeleted) {
         return (
             <Flex alignItems={'center'} justifyContent={'center'} height={'size-3000'}>
-                <Text>No available metrics</Text>
+                <Text>{t('models.noMetrics')}</Text>
             </Flex>
         );
     }
@@ -33,7 +36,7 @@ export const ModelMetrics = ({ modelId, evaluations, filesDeleted = false }: Mod
                 </Flex>
             ) : isError ? (
                 <Flex alignItems={'center'} justifyContent={'center'} height={'size-3000'}>
-                    <Text>Failed to load training metrics</Text>
+                    <Text>{t('models.metricsLoadFailed')}</Text>
                 </Flex>
             ) : (
                 <>

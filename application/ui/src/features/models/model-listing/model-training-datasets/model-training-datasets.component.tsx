@@ -6,6 +6,7 @@ import { useMemo } from 'react';
 import type { DatasetRevision, DatasetSubset, Model } from '@/api/types';
 import { Flex, MediaViewModes, Text, ViewModes } from '@geti-ui/ui';
 import { useNumberFormatter } from 'react-aria';
+import { useTranslation } from 'react-i18next';
 
 import { useGetDatasetRevisionItems } from '../../../../hooks/use-get-dataset-revision-items.hook';
 import { useViewMode } from '../../../../hooks/use-view-mode.hook';
@@ -95,10 +96,12 @@ export const ModelTrainingDatasets = ({
     datasetRevision?: DatasetRevision;
     model: Model;
 }) => {
+    const { t } = useTranslation();
+
     if (!datasetRevision || !datasetRevision.id) {
         return (
             <Flex justifyContent={'center'} alignItems={'center'} height={'size-3000'}>
-                <Text>No dataset revision found for this model</Text>
+                <Text>{t('models.noDatasetRevision')}</Text>
             </Flex>
         );
     }
@@ -106,7 +109,7 @@ export const ModelTrainingDatasets = ({
     if (datasetRevision.files_deleted) {
         return (
             <Flex justifyContent={'center'} alignItems={'center'} height={'size-3000'}>
-                <Text>The files for this dataset revision have been deleted.</Text>
+                <Text>{t('models.datasetFilesDeleted')}</Text>
             </Flex>
         );
     }

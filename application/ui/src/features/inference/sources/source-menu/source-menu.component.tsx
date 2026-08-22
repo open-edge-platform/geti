@@ -22,6 +22,7 @@ import {
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useDisablePipeline } from 'hooks/api/pipeline.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { useTranslation } from 'react-i18next';
 
 import { toast } from '../../../../components/toast/toast.component';
 import { useWebRTCConnection } from '../../stream/web-rtc-connection-provider';
@@ -78,6 +79,7 @@ export type SourceMenuProps = {
 };
 
 export const SourceMenu = ({ id, name, isConnected, onEdit, isPipelineRunning, onTest }: SourceMenuProps) => {
+    const { t } = useTranslation();
     const project_id = useProjectIdentifier();
     const [isDisconnectConfirmationDialogVisible, setIsDisconnectConfirmationDialogVisible] = useState<boolean>(false);
     const disablePipelineMutation = useDisablePipeline();
@@ -132,7 +134,7 @@ export const SourceMenu = ({ id, name, isConnected, onEdit, isPipelineRunning, o
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: `Successfully connected to "${name}".`,
+                        message: t('inference.connectedToast', { name }),
                     });
                 },
             }
@@ -149,7 +151,7 @@ export const SourceMenu = ({ id, name, isConnected, onEdit, isPipelineRunning, o
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: `Successfully disconnected from "${name}".`,
+                        message: t('inference.disconnectedToast', { name }),
                     });
                 },
             }
@@ -176,7 +178,7 @@ export const SourceMenu = ({ id, name, isConnected, onEdit, isPipelineRunning, o
                             onSuccess: () => {
                                 toast({
                                     type: 'success',
-                                    message: `Successfully disabled pipeline and disconnected from "${name}".`,
+                                    message: t('inference.disabledAndDisconnectedToast', { name }),
                                 });
 
                                 setIsDisconnectConfirmationDialogVisible(false);
@@ -198,7 +200,7 @@ export const SourceMenu = ({ id, name, isConnected, onEdit, isPipelineRunning, o
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: `${name} has been removed successfully!`,
+                        message: t('inference.removedToast', { name }),
                     });
                 },
             }
@@ -208,7 +210,7 @@ export const SourceMenu = ({ id, name, isConnected, onEdit, isPipelineRunning, o
     return (
         <>
             <MenuTrigger>
-                <ActionButton isQuiet aria-label='source menu'>
+                <ActionButton isQuiet aria-label={t('inference.sourceMenuAriaLabel')}>
                     <MoreMenu />
                 </ActionButton>
                 <Menu
@@ -216,13 +218,13 @@ export const SourceMenu = ({ id, name, isConnected, onEdit, isPipelineRunning, o
                     disabledKeys={isConnected ? [SOURCE_MENU_OPTIONS.REMOVE, SOURCE_MENU_OPTIONS.TEST] : []}
                 >
                     {isConnected ? (
-                        <Item key={SOURCE_MENU_OPTIONS.DISCONNECT}>Disconnect</Item>
+                        <Item key={SOURCE_MENU_OPTIONS.DISCONNECT}>{t('inference.disconnect')}</Item>
                     ) : (
-                        <Item key={SOURCE_MENU_OPTIONS.CONNECT}>Connect</Item>
+                        <Item key={SOURCE_MENU_OPTIONS.CONNECT}>{t('inference.connect')}</Item>
                     )}
-                    <Item key={SOURCE_MENU_OPTIONS.TEST}>Test connection</Item>
-                    <Item key={SOURCE_MENU_OPTIONS.EDIT}>Edit</Item>
-                    <Item key={SOURCE_MENU_OPTIONS.REMOVE}>Remove</Item>
+                    <Item key={SOURCE_MENU_OPTIONS.TEST}>{t('inference.testConnection')}</Item>
+                    <Item key={SOURCE_MENU_OPTIONS.EDIT}>{t('common.edit')}</Item>
+                    <Item key={SOURCE_MENU_OPTIONS.REMOVE}>{t('inference.remove')}</Item>
                 </Menu>
             </MenuTrigger>
             <DialogContainer onDismiss={() => setIsDisconnectConfirmationDialogVisible(false)}>

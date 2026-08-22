@@ -2,16 +2,26 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useGetDatasetItems } from 'hooks/use-get-dataset-items.hook';
+import { useTranslation } from 'react-i18next';
 
-import { pluralizeItems } from '../../../../shared/util';
+import { i18n } from '../../../../i18n';
 
 const MIN_NUMBER_OF_ANNOTATED_ITEMS = 3;
-const listFormatter = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' });
-const pluralRules = new Intl.PluralRules('en');
 
-const conjugateToBe = (count: number) => (pluralRules.select(count) === 'one' ? 'is' : 'are');
+const SUBSET_TITLE_KEYS = {
+    training: 'models.trainingSubsetTitle',
+    validation: 'models.validationSubsetTitle',
+    testing: 'models.testingSubsetTitle',
+} as const;
+
+const getListFormatter = () =>
+    new Intl.ListFormat(i18n.language.startsWith('zh') ? 'zh' : 'en', {
+        style: 'long',
+        type: 'conjunction',
+    });
 
 export const useTrainModelDisabledReason = () => {
+    const { t } = useTranslation();
     const { totalCount, isPending: isTotalPending } = useGetDatasetItems({ annotationStatus: 'with_annotations' });
     const { totalCount: trainingSubsetSize, isPending: isTrainingPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
@@ -45,11 +55,7 @@ export const useTrainModelDisabledReason = () => {
     }
 
     if (totalCount < MIN_NUMBER_OF_ANNOTATED_ITEMS) {
-        return {
-            reason:
-                'In order to train a model, you need to annotate at least 3 items in your dataset, although we ' +
-                'recommend annotating several more for better results.',
-        };
+        return { reason: t('models.trainMinAnnotationsReason') };
     }
 
     const subsetSizes = [
@@ -64,39 +70,35 @@ export const useTrainModelDisabledReason = () => {
         return { reason: undefined };
     }
 
-    const emptySubsetNames = emptySubsets.map(({ name }) => name);
-    const emptySubsetText =
-        emptySubsetNames.length === 1
-            ? `${emptySubsetNames[0]} subset is`
-            : `${listFormatter.format(emptySubsetNames)} subsets are`;
+    const isZh = i18n.language.startsWith('zh');
+    const emptySubsetNames = emptySubsets.map(({ name }) =>
+        isZh && name in SUBSET_TITLE_KEYS ? t(SUBSET_TITLE_KEYS[name as keyof typeof SUBSET_TITLE_KEYS]) : name
+    );
+    const emptySubsetText = t('models.emptySubsetText', {
+        names: emptySubsetNames.length === 1 ? emptySubsetNames[0] : getListFormatter().format(emptySubsetNames),
+        count: emptySubsetNames.length,
+    });
 
     const unannotatedUnassignedSize = unassignedSubsetSize - reviewedUnassignedSubsetSize;
 
     let assignmentDetail: string;
 
     if (reviewedUnassignedSubsetSize > 0 && unannotatedUnassignedSize > 0) {
-        assignmentDetail =
-            `there are ${reviewedUnassignedSubsetSize} reviewed ${pluralizeItems(reviewedUnassignedSubsetSize)} ready` +
-            ' to assign and ' +
-            `${unannotatedUnassignedSize} ${pluralizeItems(unannotatedUnassignedSize)} that still need annotation ` +
-            'before they can be assigned';
+        const reviewedPart = i18n.t('models.assignmentReviewedPart', { count: reviewedUnassignedSubsetSize });
+        const unannotatedPart = i18n.t('models.assignmentUnannotatedPart', { count: unannotatedUnassignedSize });
+        assignmentDetail = i18n.t('models.assignmentThereAre', {
+            detail: reviewedPart,
+            unannotatedDetail: unannotatedPart,
+        });
     } else if (reviewedUnassignedSubsetSize > 0) {
-        assignmentDetail =
-            `there are ${reviewedUnassignedSubsetSize} reviewed ` +
-            `${pluralizeItems(reviewedUnassignedSubsetSize)} left to assign`;
+        assignmentDetail = i18n.t('models.assignmentReviewedOnly', { count: reviewedUnassignedSubsetSize });
     } else if (unannotatedUnassignedSize > 0) {
-        assignmentDetail =
-            `there ${conjugateToBe(unannotatedUnassignedSize)} ${unannotatedUnassignedSize} ` +
-            `${pluralizeItems(unannotatedUnassignedSize)} that still need annotation before they ` +
-            'can be assigned';
+        assignmentDetail = i18n.t('models.assignmentUnannotatedOnly', { count: unannotatedUnassignedSize });
     } else {
-        assignmentDetail = 'there are no unassigned items available to redistribute';
+        assignmentDetail = i18n.t('models.assignmentNone');
     }
 
     return {
-        reason:
-            'In order to train a model, each subset (training, validation, testing) needs at least one item. ' +
-            `This condition is currently not satisfiable, because the ${emptySubsetText} empty and ` +
-            `${assignmentDetail}.`,
+        reason: t('models.trainDisabledReason', { emptySubsets: emptySubsetText, assignmentDetail }),
     };
 };

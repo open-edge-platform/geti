@@ -7,6 +7,7 @@ import type { SinkConfig } from '@/api/types';
 import { ActionButton, Button, ButtonGroup, Divider, Flex, Form, Text, View } from '@geti-ui/ui';
 import { Back } from '@geti-ui/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { useConnectSinkToPipeline } from '../../../../hooks/api/pipeline.hook';
 import { testSinkQueryOptions } from '../api/use-test-sink';
@@ -31,6 +32,8 @@ export const EditSink = <T extends SinkConfig>({
     componentFields,
     isConnected,
 }: EditSinkProps<T>) => {
+    const { t } = useTranslation();
+
     const connectToPipeline = useRef(false);
     const connectToPipelineMutation = useConnectSinkToPipeline();
     const queryClient = useQueryClient();
@@ -54,7 +57,7 @@ export const EditSink = <T extends SinkConfig>({
                     <Back />
                 </ActionButton>
 
-                <Text>Edit sink</Text>
+                <Text>{t('inference.editSink')}</Text>
             </Flex>
 
             <View UNSAFE_className={classes.container}>

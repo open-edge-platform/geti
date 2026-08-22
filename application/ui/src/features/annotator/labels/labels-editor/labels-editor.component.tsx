@@ -7,6 +7,7 @@ import type { Label } from '@/api/types';
 import { ActionButton, Flex, Loading, View } from '@geti-ui/ui';
 import { Add } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { useTranslation } from 'react-i18next';
 
 import { usePinnedLabels } from '../hooks/use-pinned-labels.hook';
 import { LabelRow } from '../label-row/label-row.component';
@@ -28,6 +29,8 @@ export const LabelsEditor = ({
     onRequestDeleteLabel,
     autoCreateNewLabel = false,
 }: LabelsEditorProps) => {
+    const { t } = useTranslation();
+
     const {
         isUpdating,
         editableLabels,
@@ -89,7 +92,7 @@ export const LabelsEditor = ({
                         validateHotkey={validateHotkey}
                     />
                 ) : (
-                    <ActionButton isQuiet onPress={handleAddNewLabel} aria-label='Add new label'>
+                    <ActionButton isQuiet onPress={handleAddNewLabel} aria-label={t('annotator.addNewLabelAriaLabel')}>
                         {isUpdating ? <Loading mode='inline' size='S' /> : <Add />}
                     </ActionButton>
                 )}

@@ -3,6 +3,7 @@
 
 import type { Model } from '@/api/types';
 import { Button, Content, ContextualHelp, DialogTrigger, Flex, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { QuantizationDialog } from './quantization-dialog/quantization-dialog.component';
 
@@ -11,10 +12,12 @@ type QuantizationRowProps = {
     isDisabled?: boolean;
 };
 export const QuantizationRow = ({ model, isDisabled = false }: QuantizationRowProps) => {
+    const { t } = useTranslation();
+
     return (
         <Flex marginTop={'size-150'} alignItems={'center'} justifyContent={'space-between'}>
             <Flex>
-                <Text>Optimize the FP16 model using OpenVINO NNCF (via INT8 quantization)</Text>
+                <Text>{t('models.optimizeNncfText')}</Text>
                 <ContextualHelp>
                     <Content>
                         OpenVINO NNCF (Neural Network Compression Framework) via INT8 quantization reduces model size

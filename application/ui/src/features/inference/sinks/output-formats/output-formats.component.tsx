@@ -3,6 +3,7 @@
 
 import type { SinkOutputFormats } from '@/api/types';
 import { Checkbox, CheckboxGroup } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { OutputFormat } from '../utils';
 
@@ -13,10 +14,12 @@ type OutputFormatsProps = {
 };
 
 export const OutputFormats = ({ config = [] }: OutputFormatsProps) => {
+    const { t } = useTranslation();
+
     return (
         <CheckboxGroup
             isRequired
-            label='Output Formats'
+            label={t('inference.outputFormatsLabel')}
             name='output_formats'
             defaultValue={config}
             UNSAFE_className={classes.itemList}

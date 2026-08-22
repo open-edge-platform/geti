@@ -5,6 +5,7 @@ import { FocusEvent, KeyboardEvent, useRef, useState } from 'react';
 
 import { ActionButton, DOMRefValue, Flex, Grid, TextField, useUnwrapDOMRef, View } from '@geti-ui/ui';
 import { Add, Close } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { HotkeyField } from '../../../../components/label-fields/hotkey-field.component';
 import { LabelColorPicker } from '../../../../components/label-fields/label-color-picker.component';
@@ -20,6 +21,8 @@ type NewLabelRowProps = {
 };
 
 export const NewLabelRow = ({ onSave, onCancel, validateName, validateHotkey }: NewLabelRowProps) => {
+    const { t } = useTranslation();
+
     const rowRef = useRef<DOMRefValue<HTMLDivElement>>(null);
     const rowRefUnwrapped = useUnwrapDOMRef(rowRef);
     const [name, setName] = useState('');
@@ -126,7 +129,7 @@ export const NewLabelRow = ({ onSave, onCancel, validateName, validateHotkey }: 
             </ActionButton>
 
             <ActionButton
-                aria-label='Cancel new label'
+                aria-label={t('annotator.cancelNewLabelAriaLabel')}
                 isQuiet
                 onPress={onCancel}
                 UNSAFE_className={classes.deleteButton}

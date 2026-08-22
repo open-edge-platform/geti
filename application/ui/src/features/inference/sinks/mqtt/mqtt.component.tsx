@@ -3,6 +3,7 @@
 
 import type { MqttSinkConfig } from '@/api/types';
 import { Flex, NumberField, Switch, TextField } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { OutputFormats } from '../output-formats/output-formats.component';
 import { RateLimitFields } from '../rate-limit/rate-limit-fields.component';
@@ -12,21 +13,28 @@ type MqttProps = {
 };
 
 export const Mqtt = ({ defaultState }: MqttProps) => {
+    const { t } = useTranslation();
+
     return (
         <Flex direction='column' gap='size-200'>
             <TextField isHidden label='id' name='id' defaultValue={defaultState.id} />
-            <TextField width='100%' label='Name' name='name' defaultValue={defaultState.name || 'MQTT sink'} />
+            <TextField
+                width='100%'
+                label={t('inference.nameLabel')}
+                name='name'
+                defaultValue={defaultState.name || t('inference.mqttSinkDefaultName')}
+            />
             <TextField
                 isRequired
                 width='100%'
-                label='Broker Host'
+                label={t('inference.brokerHostLabel')}
                 name='broker_host'
                 defaultValue={defaultState.broker_host}
             />
             <Flex gap='size-200'>
-                <TextField flex='1' label='Topic' name='topic' defaultValue={defaultState.topic} />
+                <TextField flex='1' label={t('inference.topicLabel')} name='topic' defaultValue={defaultState.topic} />
                 <NumberField
-                    label='Broker Port'
+                    label={t('inference.brokerPortLabel')}
                     name='broker_port'
                     minValue={0}
                     step={1}
@@ -41,7 +49,7 @@ export const Mqtt = ({ defaultState }: MqttProps) => {
                 <Switch
                     name='auth_required'
                     alignSelf='end'
-                    aria-label='Require Authentication'
+                    aria-label={t('inference.requireAuthAriaLabel')}
                     defaultSelected={defaultState.auth_required}
                     key={defaultState.auth_required ? 'true' : 'false'}
                 >

@@ -3,6 +3,8 @@
 
 import { ReactNode } from 'react';
 
+import { useTranslation } from 'react-i18next';
+
 import type { Annotation as AnnotationType } from '../../../../shared/types';
 import { useTranslate } from '../../hooks/use-translate.hook';
 import { allowPanning } from '../../utils';
@@ -18,6 +20,8 @@ interface TranslateShapeProps {
 }
 
 export const TranslateShape = ({ zoom, onComplete, translateShape, annotation, children }: TranslateShapeProps) => {
+    const { t } = useTranslation();
+
     const { onPointerDown, onPointerMove, onPointerUp } = useTranslate({
         zoom,
         onTranslate: translateShape,
@@ -29,7 +33,7 @@ export const TranslateShape = ({ zoom, onComplete, translateShape, annotation, c
             id={`translate-annotation-${annotation.id}`}
             stroke='var(--energy-blue)'
             strokeWidth={STROKE_WIDTH / zoom}
-            aria-label='Drag to move shape'
+            aria-label={t('annotator.dragToMoveShapeAriaLabel')}
             onPointerDown={allowPanning(onPointerDown)}
             onPointerMove={onPointerMove}
             onPointerUp={onPointerUp}

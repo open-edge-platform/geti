@@ -4,6 +4,7 @@
 import { useMemo } from 'react';
 
 import { type ColorValue } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 interface CircularProgressProps {
     percentage: number;
@@ -32,6 +33,8 @@ export const CircularProgress = ({
     checkMarkOnComplete = true,
     checkMarkColor = '--energy-blue-shade',
 }: CircularProgressProps) => {
+    const { t } = useTranslation();
+
     const progress = Math.floor(Math.max(0, Math.min(100, percentage)));
 
     const viewBox = useMemo<string>((): string => `0 0 ${size} ${size}`, [size]);
@@ -45,7 +48,7 @@ export const CircularProgress = ({
     );
 
     return (
-        <svg width={size} height={size} viewBox={viewBox} aria-label='progress-circular-loader'>
+        <svg width={size} height={size} viewBox={viewBox} aria-label={t('annotator.progressLoaderAriaLabel')}>
             <circle
                 fill='none'
                 stroke={`var(--spectrum-global-color-${backStrokeColor})`}

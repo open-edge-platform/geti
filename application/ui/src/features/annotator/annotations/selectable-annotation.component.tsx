@@ -4,6 +4,7 @@
 import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useTranslation } from 'react-i18next';
 
 import { useAnnotationActions } from '../../../shared/annotator/annotation-actions-provider.component';
 import { useLabelResolver } from '../../../shared/annotator/labels';
@@ -14,6 +15,7 @@ import { drawingStyles } from '../tools/polygon-tool/utils';
 import { useAnnotation } from './annotation-context';
 
 export const SelectableAnnotation = ({ children }: { children: ReactNode }) => {
+    const { t } = useTranslation();
     const annotation = useAnnotation();
     const { deleteAnnotations } = useAnnotationActions();
     const { setSelectedLabelId } = useAnnotatorLabels();
@@ -102,7 +104,7 @@ export const SelectableAnnotation = ({ children }: { children: ReactNode }) => {
     return (
         <g
             ref={elementRef}
-            aria-label={isSelected ? 'selected annotation' : 'annotation'}
+            aria-label={isSelected ? t('annotator.selectedAnnotationAriaLabel') : t('annotator.annotationAriaLabel')}
             tabIndex={isSelected ? 0 : -1}
             onClick={handleSelectAnnotation}
             style={{

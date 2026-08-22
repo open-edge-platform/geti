@@ -5,6 +5,7 @@ import { PointerEvent, useEffect, useRef, useState } from 'react';
 
 import { clampPointBetweenImage } from '@geti-ui/smart-tools/utils';
 import { useGetDatasetMediaItems } from 'hooks/use-get-dataset-media-items.hook';
+import { useTranslation } from 'react-i18next';
 
 import selectionCursor from '../../../../assets/icons/selection.svg?url';
 import { toast } from '../../../../components/toast/toast.component';
@@ -33,6 +34,7 @@ interface PreviewAnnotationsProps {
 const CURSOR_OFFSET = '7 8';
 
 const PreviewAnnotations = ({ previewAnnotations, image }: PreviewAnnotationsProps) => {
+    const { t } = useTranslation();
     if (previewAnnotations.length === 0) return null;
 
     return (
@@ -40,7 +42,7 @@ const PreviewAnnotations = ({ previewAnnotations, image }: PreviewAnnotationsPro
             {previewAnnotations.map((annotation) => (
                 <g
                     key={annotation.id}
-                    aria-label='Segment anything preview'
+                    aria-label={t('annotator.samPreviewAriaLabel')}
                     stroke={'var(--energy-blue-shade)'}
                     strokeWidth={'calc(3px / var(--zoom-scale))'}
                     fill={'transparent'}
@@ -55,6 +57,8 @@ const PreviewAnnotations = ({ previewAnnotations, image }: PreviewAnnotationsPro
 };
 
 export const SegmentAnythingTool = () => {
+    const { t } = useTranslation();
+
     const [previewShapes, setPreviewShapes] = useState<Shape[]>([]);
     const [isDecoding, setIsDecoding] = useState(false);
     const ref = useRef<SVGSVGElement>(null);
@@ -144,8 +148,9 @@ export const SegmentAnythingTool = () => {
         if (isError && !hasShownErrorToastRef.current) {
             toast({
                 type: 'error',
-                message: `
-                Error in Segment Anything tool: ${error?.message ?? 'Unknown error, please try refreshing the page.'}`,
+                message: t('annotator.samErrorToast', {
+                    detail: error?.message ?? t('annotator.samUnknownError'),
+                }),
             });
 
             hasShownErrorToastRef.current = true;
@@ -154,7 +159,7 @@ export const SegmentAnythingTool = () => {
         if (!isError) {
             hasShownErrorToastRef.current = false;
         }
-    }, [isError, error]);
+    }, [isError, error, t]);
 
     if (isLoading) {
         return <SAMLoading isLoading={isLoading} />;
@@ -165,7 +170,7 @@ export const SegmentAnythingTool = () => {
             ref={ref}
             image={image}
             canvasRef={canvasRef}
-            aria-label='SAM tool canvas'
+            aria-label={t('annotator.samCanvasAriaLabel')}
             onPointerMove={handleMouseMove}
             onPointerUp={handlePointerUp}
             onPointerLeave={handlePointerLeave}
