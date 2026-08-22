@@ -15,7 +15,7 @@
 # UI
 !application/ui/src
 !application/ui/public
-!application/ui/packages
+!application/ui/vendor
 !application/ui/package.json
 !application/ui/package-lock.json
 !application/ui/tsconfig.json

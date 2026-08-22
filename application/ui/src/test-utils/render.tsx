@@ -10,7 +10,7 @@ import {
     renderHook as rtlRenderHook,
     RenderOptions as RTLRenderOptions,
 } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import { Toast } from '../components/toast/toast.component';
 import { paths } from '../constants/paths';

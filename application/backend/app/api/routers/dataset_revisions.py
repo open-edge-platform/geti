@@ -4,7 +4,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, status
 from fastapi.openapi.models import Example
-from starlette.responses import FileResponse, StreamingResponse
+from starlette.responses import FileResponse, Response
 
 from app.api.dependencies import get_dataset_revision, get_dataset_revision_service, get_project
 from app.api.io_utils import write_file_to_response, write_image_to_response
@@ -126,7 +126,7 @@ def list_dataset_revision_items(
     dataset_revision_service: Annotated[DatasetRevisionService, Depends(get_dataset_revision_service)],
     dataset_revision: Annotated[DatasetRevision, Depends(get_dataset_revision)],
     limit: Annotated[int, Query(ge=1, le=MAX_DATASET_ITEMS_NUMBER_RETURNED)] = DEFAULT_DATASET_ITEMS_NUMBER_RETURNED,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    offset: Annotated[int, Query(ge=0, le=2_147_483_647)] = 0,
     subsets: Annotated[list[DatasetItemSubset] | None, Query()] = None,
 ) -> DatasetRevisionItemsWithPagination:
     """List the items in a dataset revision. This endpoint supports pagination."""
@@ -208,7 +208,7 @@ def get_dataset_revision_item_thumbnail(
     dataset_revision: Annotated[DatasetRevision, Depends(get_dataset_revision)],
     dataset_item_id: DatasetItemID,
     dataset_revision_service: Annotated[DatasetRevisionService, Depends(get_dataset_revision_service)],
-) -> StreamingResponse:
+) -> Response:
     """Get the thumbnail of an item in the dataset revision"""
     thumbnail = dataset_revision_service.get_dataset_revision_item_thumbnail(
         project_id=project.id,

@@ -9,7 +9,7 @@
 [Key Features](#key-features) •
 [Supported Tasks & Models](#supported-tasks--models) •
 [Installation](#installation) •
-[Quick Start](#quick-start) •
+[Usage](#usage) •
 [Docs](https://docs.geti.intel.com/docs/user-guide/library/get-started/intro) •
 [License](#license)
 
@@ -18,8 +18,8 @@
 <!-- markdownlint-disable MD042 -->
 
 [![python](https://img.shields.io/badge/python-3.11%E2%80%933.14-green)]()
-[![pytorch](https://img.shields.io/badge/pytorch-2.10-orange)]()
-[![openvino](https://img.shields.io/badge/openvino-2026.1-purple)]()
+[![pytorch](https://img.shields.io/badge/pytorch-2.12-orange)]()
+[![openvino](https://img.shields.io/badge/openvino-2026.3-purple)]()
 [![numpy](https://img.shields.io/badge/numpy-%E2%89%A52.0-blue)]()
 
 <!-- markdownlint-enable  MD042 -->
@@ -60,23 +60,22 @@ Each supported task ships with curated "recipes": YAML files that bundle the mod
 
 All recipes live under `src/getitune/recipe/<task>/`. Pass any of these YAMLs directly to the API as `model=...`. Recipes whose name ends in `_tile` enable the tiling pipeline for large images.
 
-| Task                                                      | Recipe directory                                                                                                                                                                                               | Example recipes                                                                                                                                                              |
-| --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Classification (multi-class / multi-label / hierarchical) | [multi_class_cls](src/getitune/recipe/classification/multi_class_cls/), [multi_label_cls](src/getitune/recipe/classification/multi_label_cls/), [h_label_cls](src/getitune/recipe/classification/h_label_cls/) | `dino_v2`, `vit_tiny`, `efficientnet_b0`, `efficientnet_b3`, `efficientnet_v2`, `mobilenet_v3_large`, `yolo26_{n,s,m,l,x}_cls`                                                                         |
-| Object detection                                          | [detection](src/getitune/recipe/detection/)                                                                                                                                                                    | `atss_mobilenetv2`, `ssd_mobilenetv2`, `yolox_{tiny,s,l,x}`, `rtdetr_50`, `dfine_x`, `deim_dfine_{l,m,x}`, `deimv2_{s,m,l}`, `rfdetr_{nano,small,medium,large}`, `yolo26_{n,s,m}` |
-| Instance segmentation                                     | [instance_segmentation](src/getitune/recipe/instance_segmentation/)                                                                                                                                            | `maskrcnn_{r50,swint,efficientnetb2b}`, `rtmdet_inst_tiny`, `rfdetr_seg_{nano,small,medium,large,xlarge,2xlarge}`, `yolo26_{n,s,m}_seg`                                                   |
-| Semantic segmentation                                     | [semantic_segmentation](src/getitune/recipe/semantic_segmentation/)                                                                                                                                            | `dino_v2`, `litehrnet_{s,18,x}`, `segnext_{t,s,b}` (with `_tile` variants)                                                                                                   |
-| Keypoint detection                                        | [keypoint_detection](src/getitune/recipe/keypoint_detection/)                                                                                                                                                  | `rtmpose_tiny`                                                                                                                                                               |
+| Task                                       | Recipe directory                                                                                                                               | Example recipes                                                                                                                                                                                                                                            |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Classification (multi-class / multi-label) | [multi_class_cls](src/getitune/recipe/classification/multi_class_cls/), [multi_label_cls](src/getitune/recipe/classification/multi_label_cls/) | `dino_v2`, `vit_tiny`, `efficientnet_b0`, `efficientnet_b3`, `efficientnet_v2`, `mobilenet_v3_large`, `yolo26_{n,s,m,l,x}_cls`                                                                                                                             |
+| Object detection                           | [detection](src/getitune/recipe/detection/)                                                                                                    | `atss_mobilenetv2`, `ssd_mobilenetv2`, `yolox_{tiny,s,l,x}`, `rtdetr_50`, `dfine_x`, `deim_dfine_{l,m,x}`, `deimv2_{s,m,l}`, `edgecrafter_{s,m,l,x}`, `rfdetr_{nano,small,medium,large}`, `yolo11_{n,s,m,l,x}`, `yolo12_{n,s,m,l,x}`, `yolo26_{n,s,m,l,x}` |
+| Instance segmentation                      | [instance_segmentation](src/getitune/recipe/instance_segmentation/)                                                                            | `maskrcnn_{r50,swint,efficientnetb2b}`, `rtmdet_inst_tiny`, `rfdetr_seg_{nano,small,medium,large,xlarge,2xlarge}`, `yolo11_{n,s,m,l,x}_seg`, `yolo26_{n,s,m,l,x}_seg`                                                                                      |
+| Semantic segmentation                      | [semantic_segmentation](src/getitune/recipe/semantic_segmentation/)                                                                            | `dino_v2`, `litehrnet_{s,18,x}`, `segnext_{t,s,b}`, `yolo26_{n,s,m,l,x}_sem` (with `_tile` variants)                                                                                                                                                       |
+| Keypoint detection                         | [keypoint_detection](src/getitune/recipe/keypoint_detection/)                                                                                  | `rtmpose_tiny`                                                                                                                                                                                                                                             |
 
 Each task directory also ships an `openvino_model.yaml` recipe for running and optimizing pre-exported OpenVINO IR models via `OVEngine`.
 
-Licensing Information: Ultralytics YOLO models are distributed under the AGPL-3.0 license, an OSI approved license ideal for open-source research, academic, and personal projects. For commercial use, enhanced support, and tailored licensing terms, please explore flexible Ultralytics licensing options at https://www.ultralytics.com/license.
+> [!NOTE]
+> Ultralytics YOLO models are distributed under the AGPL-3.0 license, an OSI approved license ideal for open-source research, academic, and personal projects. For commercial use, enhanced support, and tailored licensing terms, please explore flexible Ultralytics licensing options at https://www.ultralytics.com/license.
 
 ---
 
 ## Installation
-
-## Quick Install
 
 ```bash
 # With uv (recommended)
@@ -89,7 +88,10 @@ pip install "getitune"
 # For hardware-specific PyTorch wheels, see "Advanced Installation: Specify Hardware Backend" below.
 ```
 
-⚠️ **Note**: PyPI version doesn't support Ultralytics YOLO models. To use Ultralytics YOLO models, you must [install from source](#advanced-install-from-source).
+> [!IMPORTANT]
+> Due to licensing constraints, the PyPI package doesn't include Ultralytics YOLO models.
+>
+> To use Ultralytics YOLO models, you must [install from source](#advanced-install-from-source).
 
 <details>
 <summary><strong> Advanced Installation: Specify Hardware Backend</strong></summary>
@@ -98,24 +100,23 @@ pip install "getitune"
 
 | Extra    | PyTorch wheel                                                          | Use when                             | Setup Guide                                                                      |
 | -------- | ---------------------------------------------------------------------- | ------------------------------------ | -------------------------------------------------------------------------------- |
-| `[cpu]`  | `torch==2.10.0+cpu` (Linux/Windows) or default `torch==2.10.0` (macOS) | No GPU, or running on Apple silicon. | —                                                                                |
-| `[xpu]`  | `torch==2.10.0+xpu` + `triton-xpu`                                     | Intel discrete or integrated GPUs.   | [Intel GPU drivers](https://github.com/intel/compute-runtime/releases)           |
-| `[cuda]` | `torch==2.10.0+cu128`                                                  | NVIDIA GPUs with CUDA 12.8 drivers.  | [NVIDIA CUDA Toolkit](https://developer.nvidia.com/cuda-12-8-0-download-archive) |
+| `[cpu]`  | `torch==2.12.1+cpu` (Linux/Windows) or default `torch==2.12.1` (macOS) | No GPU, or running on Apple silicon. | —                                                                                |
+| `[xpu]`  | `torch==2.12.1+xpu` + `triton-xpu`                                     | Intel discrete or integrated GPUs.   | [Intel GPU drivers](https://github.com/intel/compute-runtime/releases)           |
+| `[cuda]` | `torch==2.12.1+cu130`                                                  | NVIDIA GPUs with CUDA 13.0 drivers.  | [NVIDIA CUDA Toolkit](https://developer.nvidia.com/cuda-13-0-0-download-archive) |
 
 ```bash
 # Intel GPU (XPU)
 uv pip install "getitune[xpu]" --extra-index-url https://download.pytorch.org/whl/xpu
 
-# NVIDIA GPU (CUDA 12.8)
+# NVIDIA GPU (CUDA 13.0)
 uv pip install "getitune[cuda]" --extra-index-url https://download.pytorch.org/whl/cu128
 
 # CPU-only (no extra index needed)
 uv pip install "getitune[cpu]"
 ```
 
-> **macOS**: PyTorch's `+cpu` wheel is only published for Linux and Windows. The `[cpu]` extra resolves this automatically and installs the default `torch==2.10.0` wheel on macOS.
-> **Ultralytics YOLO models**: The PyPI version doesn't include Ultralytics YOLO support.
-> To use YOLO26 models, you must [install from source](#advanced-install-from-source).
+> [!NOTE]
+> For **macOS** users: PyTorch's `+cpu` wheel is only published for Linux and Windows. The `[cpu]` extra resolves this automatically and installs the default `torch==2.12.1` wheel on macOS.
 
 </details>
 
@@ -129,7 +130,7 @@ cd geti/library
 # Recommended: use uv to honor the lockfile
 uv sync                      # CPU-only
 uv sync --extra xpu          # Intel GPU (XPU) — setup: https://github.com/intel/compute-runtime/releases
-uv sync --extra cuda         # NVIDIA GPU (CUDA 12.8) — setup: https://developer.nvidia.com/cuda-12-8-0-download-archive
+uv sync --extra cuda         # NVIDIA GPU (CUDA 13.0) — setup: https://developer.nvidia.com/cuda-13-0-0-download-archive
 
 # Or with pip in a virtual environment
 python -m venv .venv && source .venv/bin/activate
@@ -141,12 +142,13 @@ pip install -e ".[cpu]"
 pip install -e ".[xpu]" \
   --extra-index-url https://download.pytorch.org/whl/xpu
 
-# NVIDIA GPU (CUDA 12.8)
+# NVIDIA GPU (CUDA 13.0)
 pip install -e ".[cuda]" \
-  --extra-index-url https://download.pytorch.org/whl/cu128
+  --extra-index-url https://download.pytorch.org/whl/cu130
 ```
 
-> **Ultralytics YOLO models**: Add `--extra ultralytics` for `uv sync` or `[ultralytics]` for `pip install`:
+> [!NOTE]
+> For **Ultralytics YOLO models**, add `--extra ultralytics` for `uv sync` or `[ultralytics]` for `pip install`:
 >
 > ```bash
 > uv sync --extra xpu --extra ultralytics  # Intel GPU + YOLO
@@ -157,9 +159,37 @@ pip install -e ".[cuda]" \
 
 </details>
 
+<details>
+<summary><a id="legacy-cuda-support"></a><strong> Advanced Installation: Install from Source with Legacy CUDA Support (12.6)</strong></summary>
+
+By default, the `[cuda]` extra builds `torch`/`torchvision` against CUDA 13.0, which doesn't support older NVIDIA GPU
+architectures (Volta, Maxwell, Pascal). If you have one of these GPUs, patch the project to use CUDA 12.6 instead:
+
+```bash
+git clone https://github.com/open-edge-platform/geti.git
+cd geti/library
+
+# Replace CUDA 13.0 with CUDA 12.6 in pyproject.toml and refresh the lockfile
+just patch-for-legacy-gpu-support
+
+# Then install as usual, e.g. with uv
+uv sync --extra cuda         # NVIDIA GPU (CUDA 12.6) — setup: https://developer.nvidia.com/cuda-12-6-0-download-archive
+
+# Or with pip in a virtual environment
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[cuda]" \
+  --extra-index-url https://download.pytorch.org/whl/cu126
+```
+
+> [!TIP]
+> Refer to [this thread](https://github.com/pytorch/pytorch/issues/178665) in the PyTorch project for more details
+> about what GPUs are supported for each CUDA version.
+
+</details>
+
 ---
 
-## Quick Start
+## Usage
 
 ### Discovering Recipes and Models
 
@@ -183,7 +213,8 @@ efficient_models = list_models(pattern="*efficient*")
 
 Then pass any model name to `create_engine(model="...", data="...")`.
 
-> **Note on Model Resolution:**
+> [!NOTE]
+> Model resolution depends on the provided input type:
 >
 > - If you pass a **recipe YAML path** (with `.yaml` or `.yml` suffix) that doesn't exist on disk, a `FileNotFoundError` is raised.
 > - If you pass a **model name** that matches recipes under multiple tasks, a `ValueError` is raised listing the matches. Pass `task=` to disambiguate.
@@ -209,7 +240,8 @@ engine.train(max_epochs=50)
 engine.test()
 ```
 
-> **Tip:** Pass `model=` as a recipe YAML path or a model name (e.g., `"efficientnet_b0"`), or a weights path (`.xml`, `.onnx`).
+> [!TIP]
+> Pass `model=` as a recipe YAML path or a model name (e.g., `"efficientnet_b0"`), or a weights path (`.xml`, `.onnx`).
 > If a model name matches recipes under multiple tasks, pass `task=` to disambiguate (e.g., `task="DETECTION"`).
 > If you want to use an Ultralytics YOLO model, you can pass a YAML file in [Ultralytics format](https://docs.ultralytics.com/datasets/) as `data=`.
 
@@ -299,7 +331,8 @@ test_metrics = ov_engine.test() # test on test subset with optimized model
 predictions = ov_engine.predict() # predict on test subset with optimized model
 ```
 
-> **Note:** The recommended calibration set size for optimization is around 300 images. Calibration images are automatically taken from the training subset of your dataset.
+> [!NOTE]
+> The recommended calibration set size for optimization is around 300 images. Calibration images are automatically taken from the training subset of your dataset.
 >
 > After `.optimize()` the model in the Engine is replaced with an INT8 quantized version. To re-validate or run inference with the original FP32/FP16 model, pass the model XML path directly to `.test()` / `.predict()` or create the Engine again from the original `.xml`.
 
@@ -327,7 +360,8 @@ engine = create_engine(
 engine.train()
 ```
 
-> **Note:** If you are working with Ultralytics YOLO models, you can pass a [YOLO Ultralytics](https://docs.ultralytics.com/datasets/) `data.yaml` file directly to the `data=` argument of `create_engine`.
+> [!NOTE]
+> If you are working with Ultralytics YOLO models, you can pass a [YOLO Ultralytics](https://docs.ultralytics.com/datasets/) `data.yaml` file directly to the `data=` argument of `create_engine`.
 
 ---
 
@@ -368,7 +402,8 @@ engine.train(epochs=50)
 engine.test()
 engine.export()
 
-> ⚠️ **Note**: Ultralytics YOLO models and the `UltralyticsEngine` backend require [installing from source](#advanced-installation-install-from-source) with the `[ultralytics]` extra.
+> [!NOTE]
+> Ultralytics YOLO models and the `UltralyticsEngine` backend require [installing from source](#advanced-installation-install-from-source) with the `[ultralytics]` extra.
 > The PyPI package does **not** include Ultralytics support.
 
 
@@ -561,14 +596,15 @@ engine = create_engine(data=datamodule, model=model)
 engine.train()
 ```
 
-> **Note:** GPU augmentations (`augmentations_gpu`) are supported only for the Lightning backend and will be ignored for Ultralytics. For YOLO models, all augmentations should be placed on CPU via `torchvision.transforms.v2`.
+> [!NOTE]
+> GPU augmentations (`augmentations_gpu`) are supported only for the Lightning backend and will be ignored for Ultralytics. For YOLO models, all augmentations should be placed on CPU via `torchvision.transforms.v2`.
 
 Available model classes:
 
-- **Detection:** `ATSS`, `SSD`, `YOLOX`, `RTDETR`, `DFine`, `DEIMDFine`, `DEIMV2`, `RFDETR`, `UltralyticsDetectionModel`
+- **Detection:** `ATSS`, `SSD`, `YOLOX`, `RTDETR`, `DFine`, `DEIMDFine`, `DEIMV2`, `RFDETR`, `EdgeCrafter`, `UltralyticsDetectionModel`
 - **Instance segmentation:** `MaskRCNN`, `MaskRCNNTV`, `RTMDetInst`, `RFDETRSeg`, `UltralyticsInstSegModel`
-- **Semantic segmentation:** `DinoV2Seg`, `LiteHRNet`, `SegNext`
-- **Classification:** `EfficientNet`, `MobileNetV3`, `VisionTransformer`, `TimmModel`, `TVModel`
+- **Semantic segmentation:** `DinoV2Seg`, `LiteHRNet`, `SegNext`, `UltralyticsSemanticSegModel`
+- **Classification:** `EfficientNet`, `MobileNetV3`, `VisionTransformer`, `TimmModel`, `TVModel`, `UltralyticsMultiClassClsModel`
 - **Keypoint:** `RTMPose`
 
 </details>

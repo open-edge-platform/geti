@@ -2,7 +2,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { $api } from '@/api';
+import type { TrainingConfiguration } from '@/api/types';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+
+// openapi-fetch normalizes response types, which widens tuples such as `float_range` values
+// to `number[]`. Restore the spec's shape so consumers keep using the generated schema types.
+const asTrainingConfiguration = (data: unknown) => data as TrainingConfiguration;
 
 export const useGetModelTrainingConfiguration = (modelId: string | null) => {
     const projectId = useProjectIdentifier();
@@ -15,6 +20,7 @@ export const useGetModelTrainingConfiguration = (modelId: string | null) => {
         },
         {
             enabled: modelId !== null,
+            select: asTrainingConfiguration,
         }
     );
 };
@@ -43,6 +49,7 @@ export const useGetModelArchitectureTrainingConfiguration = ({
         },
         {
             enabled: modelArchitectureId !== null && modelRevisionId === null,
+            select: asTrainingConfiguration,
         }
     );
 };

@@ -8,7 +8,7 @@ from uuid import UUID, uuid4
 import pytest
 
 from app.db.schema import ModelVariantDB, PipelineDB, ProjectDB
-from app.models import DataCollectionConfig, PipelineStatus
+from app.models import DataCollectionConfig, InferenceConfig, PipelineStatus
 from app.models.data_collection_policy import FixedRateDataCollectionPolicy
 from app.models.model_revision import ModelFormat, ModelPrecision, TrainingStatus
 from app.models.system import DeviceInfo, DeviceType
@@ -20,6 +20,7 @@ from app.services.pipeline_service import (
     IncompatibleModelVariantError,
     OtherProjectActiveError,
 )
+from tests.integration.model_files import write_openvino_model
 from tests.integration.project_factory import ProjectTestDataFactory
 
 
@@ -175,9 +176,9 @@ class TestPipelineServiceIntegration:
         updated = fxt_pipeline_service.update_pipeline(db_pipeline.project_id, {pipeline_attr: item_id})
 
         if pipeline_attr == PipelineField.SINK_ID:
-            fxt_event_bus.emit_event.assert_called_once_with(EventType.SINK_CHANGED)
+            fxt_event_bus.emit_event_after_commit.assert_called_once_with(db_session, EventType.SINK_CHANGED)
         else:
-            fxt_event_bus.emit_event.assert_called_once_with(EventType.SOURCE_CHANGED)
+            fxt_event_bus.emit_event_after_commit.assert_called_once_with(db_session, EventType.SOURCE_CHANGED)
         db_updated = db_session.get(PipelineDB, db_pipeline.project_id)
         assert str(getattr(updated, pipeline_attr)) == item_id
         assert str(getattr(updated, pipeline_attr)) == getattr(db_updated, pipeline_attr)
@@ -200,7 +201,7 @@ class TestPipelineServiceIntegration:
 
         updated = fxt_pipeline_service.update_pipeline(db_pipeline.project_id, {model_attr: model_id})
 
-        fxt_event_bus.emit_event.assert_called_once_with(EventType.MODEL_CHANGED)
+        fxt_event_bus.emit_event_after_commit.assert_called_once_with(db_session, EventType.MODEL_CHANGED)
         db_updated = db_session.get(PipelineDB, db_pipeline.project_id)
         assert str(updated.model_id) == model_id
         assert str(updated.model_id) == db_updated.model_revision_id
@@ -227,7 +228,7 @@ class TestPipelineServiceIntegration:
             {"model_id": target_model.id, "model_variant_id": target_variant.id},
         )
 
-        fxt_event_bus.emit_event.assert_called_once_with(EventType.MODEL_CHANGED)
+        fxt_event_bus.emit_event_after_commit.assert_called_once_with(db_session, EventType.MODEL_CHANGED)
         db_updated = db_session.get(PipelineDB, db_pipeline.project_id)
         assert str(updated.model_id) == target_model.id
         assert db_updated.model_variant_id == target_variant.id
@@ -486,7 +487,7 @@ class TestPipelineServiceIntegration:
 
         fxt_pipeline_service.update_pipeline(db_pipeline.project_id, {"status": pipeline_status})
 
-        fxt_event_bus.emit_event.assert_called_once_with(EventType.PIPELINE_STATUS_CHANGED)
+        fxt_event_bus.emit_event_after_commit.assert_called_once_with(db_session, EventType.PIPELINE_STATUS_CHANGED)
         db_updated = db_session.get(PipelineDB, db_pipeline.project_id)
         if pipeline_status == PipelineStatus.RUNNING:
             assert db_updated.is_running
@@ -639,3 +640,107 @@ class TestPipelineServiceIntegration:
 
         assert pipeline is not None
         assert pipeline.data_collection == DataCollectionConfig()
+
+
+class TestPipelineConfidenceThreshold:
+    """Integration tests for the inference confidence threshold of a pipeline."""
+
+    @pytest.fixture
+    def fxt_pipeline_with_models(
+        self,
+        fxt_project_with_pipeline,
+        fxt_project_id,
+        fxt_db_models,
+        fxt_db_model_variants,
+        fxt_projects_dir,
+    ):
+        """Set up a pipeline whose models embed the given confidence thresholds, one per model."""
+
+        def _create(thresholds: list[float | None], is_running: bool = True) -> None:
+            fxt_project_with_pipeline(is_running=is_running)
+            for model, variant, threshold in zip(fxt_db_models, fxt_db_model_variants, thresholds):
+                write_openvino_model(
+                    fxt_projects_dir / str(fxt_project_id) / "models" / model.id / "variants" / variant.id,
+                    confidence_threshold=threshold,
+                )
+
+        return _create
+
+    @pytest.mark.parametrize("embedded_threshold", [0.35, None], ids=["with_threshold", "without_threshold"])
+    def test_get_pipeline_reports_model_confidence_threshold(
+        self, embedded_threshold, fxt_pipeline_with_models, fxt_pipeline_service, fxt_project_id
+    ):
+        """A pipeline that never overrode the threshold reports the one embedded in the model, if any."""
+        fxt_pipeline_with_models([embedded_threshold, None], is_running=False)
+
+        pipeline = fxt_pipeline_service.get_pipeline_by_id(fxt_project_id)
+
+        assert pipeline.inference.confidence_threshold == pytest.approx(embedded_threshold)
+
+    def test_get_pipeline_without_model_reports_no_threshold(
+        self, fxt_pipeline_service, fxt_project_id, fxt_db_projects, db_session
+    ):
+        """A pipeline without a model has no confidence threshold to report."""
+        ProjectTestDataFactory(db_session).with_project(fxt_db_projects[0]).with_pipeline().build()
+
+        pipeline = fxt_pipeline_service.get_pipeline_by_id(fxt_project_id)
+
+        assert pipeline.inference.confidence_threshold is None
+
+    def test_set_custom_confidence_threshold(
+        self, fxt_pipeline_with_models, fxt_pipeline_service, fxt_project_id, fxt_event_bus, db_session
+    ):
+        """A custom threshold is persisted and applied to the running model without reloading it."""
+        fxt_pipeline_with_models([0.35, 0.6])
+
+        updated = fxt_pipeline_service.update_pipeline(
+            str(fxt_project_id), {"inference": InferenceConfig(confidence_threshold=0.7)}
+        )
+
+        assert updated.inference.confidence_threshold == pytest.approx(0.7)
+        assert db_session.get(PipelineDB, str(fxt_project_id)).inference == {"confidence_threshold": 0.7}
+        fxt_event_bus.emit_event_after_commit.assert_called_once_with(db_session, EventType.INFERENCE_PARAMS_CHANGED)
+
+    @pytest.mark.parametrize(
+        "follow_up_config, expected_threshold",
+        [
+            pytest.param(lambda models: {"inference": InferenceConfig()}, 0.35, id="explicit_null_restores_model"),
+            pytest.param(lambda models: {"model_id": models[1].id}, 0.6, id="model_switch_resets_to_new_model"),
+            pytest.param(
+                lambda models: {"data_collection": DataCollectionConfig(max_dataset_size=10)},
+                0.7,
+                id="unrelated_update_keeps_custom",
+            ),
+        ],
+    )
+    def test_update_after_custom_confidence_threshold(
+        self,
+        follow_up_config,
+        expected_threshold,
+        fxt_pipeline_with_models,
+        fxt_pipeline_service,
+        fxt_project_id,
+        fxt_db_models,
+    ):
+        """A custom threshold only stays in effect while the pipeline keeps using the same model."""
+        fxt_pipeline_with_models([0.35, 0.6])
+        fxt_pipeline_service.update_pipeline(
+            str(fxt_project_id), {"inference": InferenceConfig(confidence_threshold=0.7)}
+        )
+
+        updated = fxt_pipeline_service.update_pipeline(str(fxt_project_id), follow_up_config(fxt_db_models))
+
+        assert updated.inference.confidence_threshold == pytest.approx(expected_threshold)
+
+    def test_switch_model_with_explicit_threshold(
+        self, fxt_pipeline_with_models, fxt_pipeline_service, fxt_project_id, fxt_db_models
+    ):
+        """A threshold provided together with a new model takes precedence over the model's own value."""
+        fxt_pipeline_with_models([0.35, 0.6])
+
+        updated = fxt_pipeline_service.update_pipeline(
+            str(fxt_project_id),
+            {"model_id": fxt_db_models[1].id, "inference": InferenceConfig(confidence_threshold=0.8)},
+        )
+
+        assert updated.inference.confidence_threshold == pytest.approx(0.8)

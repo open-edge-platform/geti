@@ -6,6 +6,8 @@
 Reference : https://github.com/WongKinYiu/YOLO
 """
 
+from __future__ import annotations
+
 import torch
 from torch import Tensor, nn
 
@@ -24,7 +26,7 @@ class Concat(nn.Module):
         super().__init__()
         self.dim = dim
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: list[Tensor]) -> Tensor:
         """Forward function."""
         return torch.cat(x, self.dim)
 

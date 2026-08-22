@@ -81,7 +81,7 @@ class TileDatasetFactory:
 
         if dataset.task_type == TaskType.DETECTION:
             return TileDetTestDataset(dataset, tile_config, subset)
-        if dataset.task_type in [TaskType.ROTATED_DETECTION, TaskType.INSTANCE_SEGMENTATION]:
+        if dataset.task_type == TaskType.INSTANCE_SEGMENTATION:
             return TileInstSegTestDataset(dataset, tile_config, subset)
         if dataset.task_type == TaskType.SEMANTIC_SEGMENTATION:
             return TileSemanticSegTestDataset(dataset, tile_config, subset)

@@ -11,12 +11,16 @@
 /* Rectangle shape labels: positioned at bottom of foreignObject, scale from bottom-left */
 /* translate offset accounts for stroke width (half of the 3px) and small adjustment to prevent antialiasing issues */
 .labelsContainerRect {
+    align-items: flex-end;
     transform: scale(calc(1 / var(--zoom-scale, 1))) translate(-1.5px, -1.3px);
     transform-origin: bottom left;
 }
 
 /* Polygon labels: center on the centroid, scale from center */
+/* The foreignObject is inflated by 1/zoom, so the chip must be centered in it for the
+   center-origin scale to pivot on the chip rather than on the (much taller) box. */
 .labelsContainerPolygon {
+    align-items: center;
     transform: translate(-50%, -50%) scale(calc(1 / var(--zoom-scale, 1)));
     transform-origin: center center;
 }

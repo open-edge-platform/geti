@@ -3,7 +3,7 @@
 
 import { PointerEvent, useEffect, useRef, useState } from 'react';
 
-import { clampPointBetweenImage } from '@geti/smart-tools/utils';
+import { clampPointBetweenImage } from '@geti-ui/smart-tools/utils';
 import { useGetDatasetMediaItems } from 'hooks/use-get-dataset-media-items.hook';
 
 import selectionCursor from '../../../../assets/icons/selection.svg?url';

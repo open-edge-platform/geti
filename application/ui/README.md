@@ -2,7 +2,7 @@
 
 Modern React application for AI model training and inference, built with Rsbuild and TypeScript.
 
-The Geti™ applications aim to provide a user experience and design language consistent with the main [Geti application](https://github.com/open-edge-platform/geti). To achieve this, we reuse many architectural decisions from Geti™, including the shared `@geti-ui/ui`, `@geti/config`, and `@geti/smart-tools` packages.
+The Geti™ applications aim to provide a user experience and design language consistent with the main [Geti application](https://github.com/open-edge-platform/geti). To achieve this, we reuse many architectural decisions from Geti™, including the shared `@geti-ui/ui` and `@geti-ui/smart-tools` packages.
 
 ## Goals
 
@@ -23,7 +23,15 @@ The Geti™ applications aim to provide a user experience and design language co
 npm install
 ```
 
-The `preinstall` script clones `@geti/config` and `@geti/smart-tools` from the `open-edge-platform/geti_v2` repository at a pinned commit using [`tiged`](https://github.com/tiged/tiged) (the maintained fork of Degit). These are workspace packages installed into `packages/` and are **gitignored** — never commit that directory. The UI library is consumed as the published [`@geti-ui/ui`](https://github.com/MarkRedeman/geti-ui) npm package (a regular dependency), not a clone.
+The UI library and smart tools are consumed as published [`@geti-ui/ui`](https://github.com/MarkRedeman/geti-ui) and `@geti-ui/smart-tools` npm packages (regular dependencies), not clones.
+
+#### OpenCV WASM binary
+
+`@geti-ui/smart-tools` uses a custom-compiled `opencv.js` build for GrabCut, Intelligent Scissors, Watershed, SSIM, RITM, and Segment Anything's mask-to-polygon postprocessing. The package doesn't bundle or serve that binary itself — it must be compiled separately (Docker + Emscripten, see [its README](https://github.com/MarkRedeman/geti-ui/blob/main/packages/smart-tools/README.md)) and vendored here at `vendor/opencv/4.9.0/opencv.js`; `rsbuild.config.ts`'s `output.copy` copies it to `dist/opencv/`.
+
+`src/features/annotator/webworkers/opencv-source.ts` calls `setOpenCVSourceUrl(...)` before any OpenCV-backed tool runs (imported for its side effect by every worker that needs it). Note: `setOpenCVSourceUrl` resolves string paths against the running app's origin (`location.origin`), not the configured asset prefix, so `ASSET_PREFIX` (e.g. `/html` in the Docker/`install.sh` production build) must be prepended manually — same handling as the ORT wasm path in `segment-anything.worker.ts`.
+
+If `@geti-ui/smart-tools` bumps its OpenCV version, update both the vendored binary and the version segment of the `output.copy` path in `rsbuild.config.ts`.
 
 ### Development
 
@@ -52,9 +60,6 @@ npm run preview      # Preview production build
 
 ```
 .
-├── packages/                # Cloned via tiged (gitignored)
-│   ├── config               # Shared ESLint/TS/Jest configs (@geti/config)
-│   └── smart-tools          # AI algorithms — RITM, SAM, OpenCV, ONNX Runtime (@geti/smart-tools)
 ├── src/
 │   ├── api/                 # OpenAPI client (openapi-fetch + openapi-react-query)
 │   ├── assets/              # Images, illustrations, icons
@@ -140,7 +145,7 @@ The application is built on four main pillars:
 - **TypeScript** - Static typing for reliability and maintainability
 - **Rsbuild** - Fast and robust build toolchain for bundling, optimization, and environment targeting
 - **Tauri** - Cross-platform desktop app packaging
-- **ESLint & Prettier** - Enforced via `@geti/config` for code consistency and best practices
+- **ESLint & Prettier** - Enforced for code consistency and best practices
 
 #### Application Architecture
 
@@ -159,7 +164,7 @@ The application is built on four main pillars:
 
 #### Algorithms & AI
 
-- **@geti/smart-tools** - Suite of intelligent tools for advanced functionality and optimization
+- **@geti-ui/smart-tools** - Suite of intelligent tools for advanced functionality and optimization
 - **WebRTC API** - Live video feeds with prediction overlays
 - **WebAssembly** - High-performance, browser-executed code for compute-intensive tasks
 - **OpenCV** - Image processing and computer vision
@@ -236,9 +241,7 @@ const { data } = $api.useQuery('get', '/api/sources');
 // Mutation
 const mutation = $api.useMutation('post', '/api/sources');
 mutation.mutate({
-    body: {
-        /* ... */
-    },
+    body: {/* ... */},
 });
 ```
 
@@ -255,9 +258,7 @@ const createProject = useCreateProject();
 createProject.mutate({
     body: {
         name: 'My Project',
-        task: {
-            /* ... */
-        },
+        task: {/* ... */},
     },
 });
 ```

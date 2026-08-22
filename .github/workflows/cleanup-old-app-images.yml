@@ -45,16 +45,17 @@ jobs:
       packages: write
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - name: Cleanup old container images
-        uses: open-edge-platform/geti-ci/actions/cleanup-images@287abbfdced5c02904ab2f39a0fe944cd402c36f # cleanup-images/v0.1.0
+        uses: open-edge-platform/geti-ci/actions/cleanup-images@164479fa1091ae69e1fa7c2be65eaecdf7f3cf66 # cleanup-images/v0.1.1
         with:
           packages: |
             geti-cpu
             geti-xpu
             geti-cuda
           min-versions-to-keep: ${{ inputs.min_versions_to_keep || 10 }}
-          dry-run: ${{ inputs.dry_run == false && 'false' || 'true' }}
+          # Scheduled runs delete for real; manual dispatch previews by default.
+          dry-run: ${{ github.event_name != 'schedule' && inputs.dry_run && 'true' || 'false' }}

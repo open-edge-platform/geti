@@ -9,9 +9,9 @@ from typing import Union
 
 from typing_extensions import TypeAlias
 
-from getitune.types.label import HLabelInfo, LabelInfo, NullLabelInfo, SegLabelInfo
+from getitune.types.label import LabelInfo, NullLabelInfo, SegLabelInfo
 from getitune.types.task import TaskType
 
-__all__ = ["HLabelInfo", "LabelInfo", "NullLabelInfo", "PathLike", "SegLabelInfo", "TaskType"]
+__all__ = ["LabelInfo", "NullLabelInfo", "PathLike", "SegLabelInfo", "TaskType"]
 
 PathLike: TypeAlias = Union[str, Path, os.PathLike]

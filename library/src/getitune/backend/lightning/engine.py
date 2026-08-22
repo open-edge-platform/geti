@@ -283,7 +283,7 @@ class LightningEngine(Engine):
         if self.model.label_info != self.datamodule.label_info:
             msg = (
                 "Model label_info is not equal to the Datamodule label_info. "
-                f"It will be overriden: {self.model.label_info} => {self.datamodule.label_info}"
+                f"It will be overridden: {self.model.label_info} => {self.datamodule.label_info}"
             )
             logging.warning(msg)
             self.model.label_info = self.datamodule.label_info
@@ -486,7 +486,7 @@ class LightningEngine(Engine):
             if explain_config is None:
                 explain_config = ExplainConfig()
 
-            predict_result = process_saliency_maps_in_pred_entity(predict_result, explain_config, datamodule.label_info)
+            predict_result = process_saliency_maps_in_pred_entity(predict_result, explain_config)
 
         return predict_result
 

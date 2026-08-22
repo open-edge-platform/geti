@@ -4,7 +4,7 @@
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, StrictBool, model_validator
 
 from app.api.schemas.dataset import DatasetFilters
 from app.core.jobs.models import JobType
@@ -37,7 +37,7 @@ class ImportDatasetProjectParams(BaseModel):
         description="Specify how to map the labels found in the dataset to the labels defined in the project. If and "
         "only if the dataset labels exactly match the project labels, this parameter can be left unspecified (null)",
     )
-    include_unannotated: bool = Field(True, description="Whether to include unannotated items from the dataset")
+    include_unannotated: StrictBool = Field(True, description="Whether to include unannotated items from the dataset")
 
     model_config = {
         "json_schema_extra": {

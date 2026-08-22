@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { MouseEvent, PointerEvent, ReactNode, RefObject, useRef } from 'react';
+import { MouseEvent, PointerEvent, ReactNode, RefObject, useMemo, useRef } from 'react';
 
 import type { Media } from '@/api/types';
 import { Loading } from '@geti-ui/ui';
@@ -39,26 +39,35 @@ export const MediaCanvas = ({
     const isFetchingMedia = useIsFetching({ queryKey: loadImageQueryOptions(projectId, mediaItem).queryKey }) > 0;
     const isLoadingMedia = useSpinDelay(isFetchingMedia, { delay: 400, minDuration: 200 });
 
-    const isPlaceholderImage = image.width === 1 && image.height === 1;
-    const size = { width: mediaItem.width, height: mediaItem.height };
-
-    if (isLoadingMedia && isPlaceholderImage) {
-        return <Loading size='M' />;
-    }
+    // A new object would make the zoom refit on every render, discarding the user's pan and zoom
+    const size = useMemo(
+        () => ({ width: mediaItem.width, height: mediaItem.height }),
+        [mediaItem.width, mediaItem.height]
+    );
 
     return (
-        <ZoomTransform target={size}>
-            <div
-                ref={resolvedRef}
-                style={{ position: 'relative', height: '100%', width: '100%' }}
-                onContextMenu={(event: MouseEvent): void => event.preventDefault()}
-                onPointerMove={onPointerMove}
-                className={className}
-            >
-                {(isLoadingMedia || isLoadingOverlay) && <Loading mode={'overlay'} />}
-                <MediaImage image={image} mediaItem={mediaItem} />
-                {children}
-            </div>
-        </ZoomTransform>
+        <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+            <ZoomTransform target={size}>
+                <div
+                    ref={resolvedRef}
+                    style={{ position: 'relative', height: '100%', width: '100%' }}
+                    onContextMenu={(event: MouseEvent): void => event.preventDefault()}
+                    onPointerMove={onPointerMove}
+                    className={className}
+                >
+                    <MediaImage image={image} mediaItem={mediaItem} />
+                    {children}
+                </div>
+            </ZoomTransform>
+
+            {/* Rendered outside the zoom transform so it is not scaled along with the media */}
+            {(isLoadingMedia || isLoadingOverlay) && (
+                <Loading
+                    mode={'overlay'}
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+                    aria-label={'Media canvas loading'}
+                />
+            )}
+        </div>
     );
 };

@@ -9,7 +9,7 @@ import inspect
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 import nncf
 import numpy as np
@@ -34,7 +34,7 @@ from getitune.types.task import TaskType
 from .utils import get_default_num_async_infer_requests
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterable
 
     from model_api.models.result import Result
     from torchmetrics import Metric, MetricCollection
@@ -391,6 +391,58 @@ class OVModel:
 
         return output_model_path
 
+    @staticmethod
+    def _map_compiled_output_keys(model: ImageModel, compiled_model: openvino.CompiledModel) -> list[Any]:
+        """Map the outputs of an externally compiled model onto the ModelAPI wrapper's output keys.
+
+        ModelAPI keys raw results by tensor name, but falls back to the output port object
+        itself when the tensor carries no name (as is the case for Ultralytics YOLO exports).
+        Outputs of a model compiled outside of ModelAPI, e.g. by NNCF during accuracy-aware
+        quantization, are therefore matched by name when possible and positionally otherwise.
+
+        Args:
+            model (ImageModel): ModelAPI wrapper whose ``postprocess`` consumes the raw results.
+            compiled_model (openvino.CompiledModel): Compiled model whose outputs must be mapped.
+
+        Returns:
+            list[Any]: The wrapper output key for each output of ``compiled_model``, in order.
+        """
+        wrapper_outputs = cast("dict[Any, Any]", model.outputs or {})
+        wrapper_keys = list(wrapper_outputs)
+        name_to_key = {name: key for key, metadata in wrapper_outputs.items() for name in metadata.names}
+        keys: list[Any] = []
+        for idx, output in enumerate(compiled_model.outputs):
+            key = next((name_to_key[name] for name in output.get_names() if name in name_to_key), None)
+            keys.append(wrapper_keys[idx] if key is None else key)
+        return keys
+
+    @staticmethod
+    def _select_primary_metric(results: dict[str, Any]) -> float:
+        """Select the accuracy indicator that accuracy-aware quantization is driven by.
+
+        The first scalar entry of the computed metrics is used. Non-scalar entries are
+        skipped because some metric collections emit one first, e.g. the multi-label
+        classification metric starts with a list of per-group confusion matrices.
+
+        Args:
+            results (dict[str, Any]): Computed metrics.
+
+        Returns:
+            float: Value of the first scalar metric.
+
+        Raises:
+            RuntimeError: If none of the computed metrics is a scalar.
+        """
+        for value in results.values():
+            if isinstance(value, Tensor):
+                if value.numel() == 1:
+                    return float(value.item())
+            elif isinstance(value, (int, float)) and not isinstance(value, bool):
+                return float(value)
+
+        msg = f"No scalar metric available to measure the accuracy drop against, got keys: {list(results)}"
+        raise RuntimeError(msg)
+
     def _create_validation_fn(
         self, data_module: DataModule
     ) -> Callable[[openvino.CompiledModel, Any], tuple[float, None]]:
@@ -425,16 +477,18 @@ class OVModel:
                 PredictionBatch with predictions from the compiled model.
             """
             numpy_inputs = self._customize_inputs(inputs)["inputs"]
+            model_ref: ImageModel = self.model.model if isinstance(self.model, Tiler) else self.model  # type: ignore[assignment]
+            output_keys = self._map_compiled_output_keys(model_ref, compiled_model)
             infer_request = compiled_model.create_infer_request()
             outputs: list[Result] = []
             for image in numpy_inputs:
-                model_ref: ImageModel = self.model.model if isinstance(self.model, Tiler) else self.model  # type: ignore[assignment]
                 resized = model_ref.resize(image, (model_ref.w, model_ref.h))
                 resized = model_ref.input_transform(resized)
                 input_tensor = model_ref._change_layout(resized)  # noqa: SLF001
                 infer_request.infer({0: input_tensor})
                 raw_result = {
-                    out.get_any_name(): infer_request.get_tensor(out).data.copy() for out in compiled_model.outputs
+                    key: infer_request.get_tensor(out).data.copy()
+                    for key, out in zip(output_keys, compiled_model.outputs, strict=True)
                 }
                 result = model_ref.postprocess(raw_result, {"original_shape": image.shape})
                 outputs.append(result)
@@ -442,23 +496,32 @@ class OVModel:
 
         def validation_fn(
             compiled_model: openvino.CompiledModel,
-            validation_dataset: nncf.Dataset,  # noqa: ARG001 required by NNCF signature
+            validation_dataset: Iterable[SampleBatch],
         ) -> tuple[float, None]:
-            """Evaluate the compiled OpenVINO model on the validation dataset.
+            """Evaluate the compiled OpenVINO model on the given batches of data.
+
+            NNCF calls this function in two different modes, both of which must be honored:
+
+            1. Once with the *entire* validation dataset, to compute the overall metric of a
+               candidate model (``Evaluator.validate_prepared_model``).
+            2. Once per data item/batch (each call passing only a single-item iterable), to rank
+               how much each item contributes to the accuracy drop
+               (``Evaluator.collect_values_for_each_item_using_prepared_model``). This is used to
+               decide which quantizers to revert to floating point during accuracy-aware
+               quantization.
 
             Args:
                 compiled_model: Compiled OpenVINO model provided by NNCF during
                     accuracy-aware quantization.
-                validation_dataset: Validation NNCF dataset (unused, we iterate
-                    via the dataloader for proper batching and transforms).
+                validation_dataset: The batches of data to evaluate, as selected by NNCF for this
+                    particular call (either the whole validation set or a single batch).
 
             Returns:
                 Tuple of (metric_value, None).
             """
             metric = self.metric_callable(data_module.label_info)
 
-            val_dataloader = data_module.val_dataloader()
-            for data_batch in val_dataloader:
+            for data_batch in validation_dataset:
                 preds = _infer_compiled_model(compiled_model, data_batch)
                 metric_inputs = self.prepare_metric_inputs(preds, data_batch)
                 if isinstance(metric_inputs, list):
@@ -468,12 +531,8 @@ class OVModel:
                     metric.update(**metric_inputs)
 
             results = self.compute_metrics(metric)
-            # Take the first scalar metric value as the accuracy indicator
-            metric_value = next(iter(results.values()))
-            if isinstance(metric_value, torch.Tensor):
-                metric_value = metric_value.item()
 
-            return float(metric_value), None
+            return self._select_primary_metric(results), None
 
         return validation_fn
 

@@ -8,18 +8,22 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, Request, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.api.validators import DatasetRevisionID, ProjectID, SinkID, SourceID
+from app.api.validators import DatasetRevisionID, DatasetViewID, ProjectID, SinkID, SourceID
 from app.core.jobs.control_plane import JobQueue
 from app.db import get_db_session
 from app.models import Project, Sink, Source
 from app.models.dataset_revision import DatasetRevision
+from app.models.dataset_view import DatasetView
 from app.scheduler import Scheduler
 from app.services import (
     BaseWeightsService,
     DatasetRevisionService,
     DatasetService,
+    DatasetViewService,
     LabelService,
+    MediaNumpyLoader,
     MediaPredictionService,
+    MediaSegmentService,
     MediaService,
     MetricsService,
     ModelService,
@@ -118,6 +122,16 @@ def get_inference_keyframe_stride(request: Request) -> int:
     return request.app.state.settings.inference_keyframe_stride
 
 
+def get_sam_encoder_xml_path(request: Request) -> Path:
+    """Provides the path to the SAM encoder model XML file. This path is defined in the app settings."""
+    return request.app.state.settings.sam_encoder_xml_path
+
+
+def get_sam_ov_cache_path(request: Request) -> Path | None:
+    """Provides the OpenVINO cache directory for the SAM encoder. This path is defined in the app settings."""
+    return request.app.state.settings.sam_ov_cache_path
+
+
 def get_event_bus(request: Request) -> EventBus:
     """Provides an EventBus instance."""
     return request.app.state.event_bus
@@ -196,13 +210,24 @@ def get_system_service() -> SystemService:
     return SystemService()
 
 
+def get_model_service(
+    data_dir: Annotated[Path, Depends(get_data_dir)],
+    db: Annotated[Session, Depends(get_db)],
+) -> ModelService:
+    """Provides a ModelService instance with the model reload event from the scheduler."""
+    return ModelService(data_dir=data_dir, db_session=db)
+
+
 def get_pipeline_service(
     event_bus: Annotated[EventBus, Depends(get_event_bus)],
     db: Annotated[Session, Depends(get_db)],
     system_service: Annotated[SystemService, Depends(get_system_service)],
+    model_service: Annotated[ModelService, Depends(get_model_service)],
 ) -> PipelineService:
     """Provides a PipelineService instance ."""
-    return PipelineService(event_bus=event_bus, db_session=db, system_service=system_service)
+    return PipelineService(
+        event_bus=event_bus, db_session=db, system_service=system_service, model_service=model_service
+    )
 
 
 def get_pipeline_metrics_service(
@@ -214,14 +239,6 @@ def get_pipeline_metrics_service(
         pipeline_service=pipeline_service,
         metrics_service=metrics_service,
     )
-
-
-def get_model_service(
-    data_dir: Annotated[Path, Depends(get_data_dir)],
-    db: Annotated[Session, Depends(get_db)],
-) -> ModelService:
-    """Provides a ModelService instance with the model reload event from the scheduler."""
-    return ModelService(data_dir=data_dir, db_session=db)
 
 
 def get_webrtc_manager(request: Request) -> WebRTCManager:
@@ -255,6 +272,13 @@ def get_media_service(
     return MediaService(data_dir=data_dir, video_service=video_service, db_session=db)
 
 
+def get_media_numpy_loader(
+    media_service: Annotated[MediaService, Depends(get_media_service)],
+) -> MediaNumpyLoader:
+    """Provides a MediaNumpyLoader instance."""
+    return MediaNumpyLoader(media_service=media_service)
+
+
 def get_dataset_service(
     label_service: Annotated[LabelService, Depends(get_label_service)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
@@ -270,6 +294,7 @@ def get_media_prediction_service(
     inference_server: Annotated[InferenceServer, Depends(get_inference_server)],
     inference_model_ttl: Annotated[int, Depends(get_inference_model_ttl)],
     inference_keyframe_stride: Annotated[int, Depends(get_inference_keyframe_stride)],
+    media_numpy_loader: Annotated[MediaNumpyLoader, Depends(get_media_numpy_loader)],
     db: Annotated[Session, Depends(get_db)],
 ) -> MediaPredictionService:
     """Provides a MediaPredictionService instance."""
@@ -279,6 +304,24 @@ def get_media_prediction_service(
         inference_server=inference_server,
         inference_model_ttl=inference_model_ttl,
         inference_keyframe_stride=inference_keyframe_stride,
+        media_numpy_loader=media_numpy_loader,
+        db_session=db,
+    )
+
+
+def get_media_segment_service(
+    media_service: Annotated[MediaService, Depends(get_media_service)],
+    media_numpy_loader: Annotated[MediaNumpyLoader, Depends(get_media_numpy_loader)],
+    model_xml_path: Annotated[Path, Depends(get_sam_encoder_xml_path)],
+    ov_cache_path: Annotated[Path | None, Depends(get_sam_ov_cache_path)],
+    db: Annotated[Session, Depends(get_db)],
+) -> MediaSegmentService:
+    """Provides a MediaSegmentService instance."""
+    return MediaSegmentService(
+        media_service=media_service,
+        media_numpy_loader=media_numpy_loader,
+        model_xml_path=model_xml_path,
+        ov_cache_path=ov_cache_path,
         db_session=db,
     )
 
@@ -362,3 +405,17 @@ def get_dataset_revision(
 ) -> DatasetRevision:
     """Provides a DatasetService instance."""
     return dataset_revision_service.get_dataset_revision(project_id=project_id, revision_id=dataset_revision_id)
+
+
+def get_dataset_view_service(db: Annotated[Session, Depends(get_db)]) -> DatasetViewService:
+    """Provides a DatasetViewService instance."""
+    return DatasetViewService(db_session=db)
+
+
+def get_dataset_view(
+    project_id: ProjectID,
+    dataset_view_id: DatasetViewID,
+    dataset_view_service: Annotated[DatasetViewService, Depends(get_dataset_view_service)],
+) -> DatasetView:
+    """Provides a DatasetView instance for a request scoped dataset view."""
+    return dataset_view_service.get_dataset_view_by_id(project_id=project_id, dataset_view_id=dataset_view_id)

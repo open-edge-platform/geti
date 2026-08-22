@@ -12,13 +12,6 @@ from typing import TYPE_CHECKING, Literal, overload
 from getitune.backend.lightning.models.base import DefaultOptimizerCallable, DefaultSchedulerCallable
 from getitune.metrics.accuracy import MultiClassClsMetricCallable
 
-from .hlabel_models import (
-    EfficientNetHLabelCls,
-    MobileNetV3HLabelCls,
-    TimmModelHLabelCls,
-    TVModelHLabelCls,
-    VisionTransformerHLabelCls,
-)
 from .multiclass_models import (
     EfficientNetMulticlassCls,
     MobileNetV3MulticlassCls,
@@ -51,20 +44,20 @@ class MobileNetV3:
         cls,
         label_info: LabelInfoTypes,
         data_input_params: DataInputParams | dict | None = None,
-        task: Literal["multi_class", "multi_label", "h_label"] = "multi_class",
+        task: Literal["multi_class", "multi_label"] = "multi_class",
         freeze_backbone: bool = False,
         model_name: Literal["mobilenetv3_large", "mobilenetv3_small"] = "mobilenetv3_large",
         optimizer: OptimizerCallable = DefaultOptimizerCallable,
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
-    ) -> MobileNetV3MulticlassCls | MobileNetV3MultilabelCls | MobileNetV3HLabelCls: ...
+    ) -> MobileNetV3MulticlassCls | MobileNetV3MultilabelCls: ...
 
     def __new__(
         cls,
-        task: Literal["multi_class", "multi_label", "h_label"] = "multi_class",
+        task: Literal["multi_class", "multi_label"] = "multi_class",
         **kwargs,
-    ) -> MobileNetV3MulticlassCls | MobileNetV3MultilabelCls | MobileNetV3HLabelCls:
+    ) -> MobileNetV3MulticlassCls | MobileNetV3MultilabelCls:
         """Factory method to create MobileNetV3 models based on the task type.
 
         Args:
@@ -74,8 +67,8 @@ class MobileNetV3:
             freeze_backbone (bool, optional): Whether to freeze the backbone during training. Defaults to False.
                 Note: only multiclass classification supports this argument.
             model_name (str, optional): The model name. Defaults to "mobilenetv3_large".
-            task (Literal["multi_class", "multi_label", "h_label"], optional): The task type.
-                Can be "multi_class", "multi_label", or "h_label". Defaults to "multi_class".
+            task (Literal["multi_class", "multi_label"], optional): The task type.
+                Can be "multi_class" or "multi_label". Defaults to "multi_class".
             optimizer (OptimizerCallable, optional): The optimizer callable. Defaults to DefaultOptimizerCallable.
             scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): The learning rate scheduler callable.
                 Defaults to DefaultSchedulerCallable.
@@ -107,8 +100,6 @@ class MobileNetV3:
             return MobileNetV3MulticlassCls(**kwargs)
         if task == "multi_label":
             return MobileNetV3MultilabelCls(**kwargs)
-        if task == "h_label":
-            return MobileNetV3HLabelCls(**kwargs)
         msg = f"Unsupported task type: {task}"
         raise ValueError(msg)
 
@@ -121,7 +112,7 @@ class EfficientNet:
         cls,
         label_info: LabelInfoTypes,
         data_input_params: DataInputParams | dict | None = None,
-        task: Literal["multi_class", "multi_label", "h_label"] = "multi_class",
+        task: Literal["multi_class", "multi_label"] = "multi_class",
         model_name: Literal[
             "efficientnet_b0",
             "efficientnet_b1",
@@ -138,13 +129,13 @@ class EfficientNet:
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
-    ) -> EfficientNetMulticlassCls | EfficientNetMultilabelCls | EfficientNetHLabelCls: ...
+    ) -> EfficientNetMulticlassCls | EfficientNetMultilabelCls: ...
 
     def __new__(
         cls,
-        task: Literal["multi_class", "multi_label", "h_label"] = "multi_class",
+        task: Literal["multi_class", "multi_label"] = "multi_class",
         **kwargs,
-    ) -> EfficientNetMulticlassCls | EfficientNetMultilabelCls | EfficientNetHLabelCls:
+    ) -> EfficientNetMulticlassCls | EfficientNetMultilabelCls:
         """Factory method to create EfficientNet models based on the task type.
 
         Args:
@@ -156,8 +147,8 @@ class EfficientNet:
             model_name (Literal["efficientnet_b0", "efficientnet_b1", "efficientnet_b2", "efficientnet_b3",
                                  "efficientnet_b4", "efficientnet_b5", "efficientnet_b6", "efficientnet_b7",
                                  "efficientnet_b8"], optional): The model name. Defaults to "efficientnet_b0".
-            task (Literal["multi_class", "multi_label", "h_label"], optional): The task type.
-                Can be "multi_class", "multi_label", or "h_label". Defaults to "multi_class".
+            task (Literal["multi_class", "multi_label"], optional): The task type.
+                Can be "multi_class" or "multi_label". Defaults to "multi_class".
             optimizer (OptimizerCallable, optional): The optimizer callable. Defaults to DefaultOptimizerCallable.
             scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): The learning rate scheduler callable.
                 Defaults to DefaultSchedulerCallable.
@@ -179,8 +170,6 @@ class EfficientNet:
             return EfficientNetMulticlassCls(**kwargs)
         if task == "multi_label":
             return EfficientNetMultilabelCls(**kwargs)
-        if task == "h_label":
-            return EfficientNetHLabelCls(**kwargs)
         msg = f"Unsupported task type: {task}"
         raise ValueError(msg)
 
@@ -193,25 +182,25 @@ class TimmModel:
         cls,
         label_info: LabelInfoTypes,
         data_input_params: DataInputParams | dict | None = None,
-        task: Literal["multi_class", "multi_label", "h_label"] = "multi_class",
+        task: Literal["multi_class", "multi_label"] = "multi_class",
         model_name: str = "tf_efficientnetv2_s.in21k",
         freeze_backbone: bool = False,
         optimizer: OptimizerCallable = DefaultOptimizerCallable,
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
-    ) -> TimmModelMulticlassCls | TimmModelMultilabelCls | TimmModelHLabelCls: ...
+    ) -> TimmModelMulticlassCls | TimmModelMultilabelCls: ...
 
     def __new__(
         cls,
-        task: Literal["multi_class", "multi_label", "h_label"] = "multi_class",
+        task: Literal["multi_class", "multi_label"] = "multi_class",
         **kwargs,
-    ) -> TimmModelMulticlassCls | TimmModelMultilabelCls | TimmModelHLabelCls:
+    ) -> TimmModelMulticlassCls | TimmModelMultilabelCls:
         """Factory method to create Timm models based on the task type.
 
-        This class allows users to create models for multi-class, multi-label,
-        or hierarchical label classification by specifying the `task` parameter.
-        Users can select any model available in the Timm library (over 900 models as of 2025)
+        This class allows users to create models for multi-class or multi-label
+        classification by specifying the `task` parameter.
+        Users can select any model available in the Timm library (over 1400+ models as of 2026)
         by providing its name to the `model_name` parameter.
         To explore all available models, use `timm.list_models()` or `TimmModel.list_model()`.
 
@@ -227,9 +216,9 @@ class TimmModel:
                 Note: only multiclass classification supports this argument. Defaults to False.
             model_name (str, optional): The model name. Defaults to "tf_efficientnetv2_s.in21k".
                 You can find all available models at timm.list_models() or using TimmModel.list_model().
-            task (Literal["multi_class", "multi_label", "h_label"], optional): The task type.
-                Can be "multi_class", "multi_label", or "h_label". Defaults to "multi_class".
-            optimizer (OptimizerCallable, optional): The optimizer callable. Defaults to DefaultOptimizerCallable.
+            task (Literal["multi_class", "multi_label"], optional): The task type.
+                Can be "multi_class" or "multi_label". Defaults to "multi_class".
+            optimizer (OptimizerCallable): The optimizer callable. Defaults to DefaultOptimizerCallable.
             scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): The learning rate scheduler callable.
                 Defaults to DefaultSchedulerCallable.
             metric (MetricCallable, optional): The metric callable. Defaults to MultiClassClsMetricCallable.
@@ -245,22 +234,22 @@ class TimmModel:
             ...                        "std": [58.395, 57.12, 57.375]},
             ...     model_name="tf_efficientnetv2_s.in21k",
             ... )
-            >>> # Multi-label classification
+            >>> # Multi-label classification with timm optimizer
+            >>> from getitune.backend.lightning.models.classification.utils.timm import TimmOptimizer
             >>> model = TimmModel(
             ...     task="multi_label",
+            ...     optimizer = TimmOptimizer(lr=0.01, weight_decay=0.001),
             ...     model_name="tf_efficientnetv2_s.in21k",
             ...     data_input_params={"input_size": (224, 224),
             ...                        "mean": [123.675, 116.28, 103.53],
             ...                        "std": [58.395, 57.12, 57.375]},
-            ...     label_info=[1, 5, 10]  # Multi-label setup
+            ...     label_info=["1", "5", "10"]  # Multi-label setup
             ... )
         """
         if task == "multi_class":
             return TimmModelMulticlassCls(**kwargs)
         if task == "multi_label":
             return TimmModelMultilabelCls(**kwargs)
-        if task == "h_label":
-            return TimmModelHLabelCls(**kwargs)
         msg = f"Unsupported task type: {task}"
         raise ValueError(msg)
 
@@ -280,24 +269,24 @@ class TVModel:
         cls,
         label_info: LabelInfoTypes,
         data_input_params: DataInputParams | dict | None = None,
-        task: Literal["multi_class", "multi_label", "h_label"] = "multi_class",
+        task: Literal["multi_class", "multi_label"] = "multi_class",
         model_name: str = "efficientnet_v2_s",
         freeze_backbone: bool = False,
         optimizer: OptimizerCallable = DefaultOptimizerCallable,
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
-    ) -> TVModelMulticlassCls | TVModelMultilabelCls | TVModelHLabelCls: ...
+    ) -> TVModelMulticlassCls | TVModelMultilabelCls: ...
 
     def __new__(
         cls,
-        task: Literal["multi_class", "multi_label", "h_label"] = "multi_class",
+        task: Literal["multi_class", "multi_label"] = "multi_class",
         **kwargs,
-    ) -> TVModelMulticlassCls | TVModelMultilabelCls | TVModelHLabelCls:
+    ) -> TVModelMulticlassCls | TVModelMultilabelCls:
         """Factory to create TV models based on the task type.
 
         This class allows users to create models for multi-class, multi-label,
-        or hierarchical label classification by specifying the `task` parameter.
+        classification by specifying the `task` parameter.
         You can select any model available in the TorchVision library (over 40 models as of 2025)
         by providing its name to the `model_name` parameter.
         To explore all available models, use `torchvision.models.list_models()` or `TVModel.list_models()`.
@@ -309,8 +298,8 @@ class TVModel:
             freeze_backbone (bool, optional): Whether to freeze the backbone during training.
                 Note: only multiclass classification supports this argument. Defaults to False.
             model_name (str, optional): The model name. Defaults to "efficientnet_v2_s".
-            task (Literal["multi_class", "multi_label", "h_label"], optional): The task type.
-                Can be "multi_class", "multi_label", or "h_label". Defaults to "multi_class".
+            task (Literal["multi_class", "multi_label"], optional): The task type.
+                Can be "multi_class" or "multi_label". Defaults to "multi_class".
             optimizer (OptimizerCallable, optional): The optimizer callable. Defaults to DefaultOptimizerCallable.
             scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): The learning rate scheduler callable.
                 Defaults to DefaultSchedulerCallable.
@@ -341,8 +330,6 @@ class TVModel:
             return TVModelMulticlassCls(**kwargs)
         if task == "multi_label":
             return TVModelMultilabelCls(**kwargs)
-        if task == "h_label":
-            return TVModelHLabelCls(**kwargs)
         msg = f"Unsupported task type: {task}"
         raise ValueError(msg)
 
@@ -362,7 +349,7 @@ class VisionTransformer:
         cls,
         label_info: LabelInfoTypes,
         data_input_params: DataInputParams | dict | None = None,
-        task: Literal["multi_class", "multi_label", "h_label"] = "multi_class",
+        task: Literal["multi_class", "multi_label"] = "multi_class",
         model_name: Literal[
             "vit-tiny",
             "vit-small",
@@ -379,16 +366,16 @@ class VisionTransformer:
         scheduler: LRSchedulerCallable | LRSchedulerListCallable = DefaultSchedulerCallable,
         metric: MetricCallable = MultiClassClsMetricCallable,
         torch_compile: bool = False,
-    ) -> VisionTransformerMulticlassCls | VisionTransformerMultilabelCls | VisionTransformerHLabelCls: ...
+    ) -> VisionTransformerMulticlassCls | VisionTransformerMultilabelCls: ...
 
     def __new__(
         cls,
-        task: Literal["multi_class", "multi_label", "h_label"] = "multi_class",
+        task: Literal["multi_class", "multi_label"] = "multi_class",
         **kwargs,
-    ) -> VisionTransformerMulticlassCls | VisionTransformerMultilabelCls | VisionTransformerHLabelCls:
+    ) -> VisionTransformerMulticlassCls | VisionTransformerMultilabelCls:
         """Factory to create VisionTransformer models based on the task type.
 
-        This class supports multi-class, multi-label, and hierarchical label classification tasks.
+        This class supports multi-class and multi-label classification tasks.
         It provides VIT backbones (tiny to large) and DINOv2 backbones (small to giant).
 
         Args:
@@ -400,8 +387,8 @@ class VisionTransformer:
             model_name (Literal["vit-tiny", "vit-small", "vit-base", "vit-large",
                                 "dinov2-small", "dinov2-base", "dinov2-large", "dinov2-giant"], optional):
                 The model name. Defaults to "vit-tiny".
-            task (Literal["multi_class", "multi_label", "h_label"], optional): The task type.
-                Can be "multi_class", "multi_label", or "h_label". Defaults to "multi_class".
+            task (Literal["multi_class", "multi_label"], optional): The task type.
+                Can be "multi_class" or "multi_label". Defaults to "multi_class".
             optimizer (OptimizerCallable, optional): The optimizer callable. Defaults to DefaultOptimizerCallable.
             scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): The learning rate scheduler callable.
                 Defaults to DefaultSchedulerCallable.
@@ -432,7 +419,5 @@ class VisionTransformer:
             return VisionTransformerMulticlassCls(**kwargs)
         if task == "multi_label":
             return VisionTransformerMultilabelCls(**kwargs)
-        if task == "h_label":
-            return VisionTransformerHLabelCls(**kwargs)
         msg = f"Unsupported task type: {task}"
         raise ValueError(msg)

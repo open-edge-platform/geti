@@ -2,8 +2,10 @@ name: Build and upload to PyPI
 
 on:
   workflow_dispatch: # run on request (no need for PR)
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'lib/v[0-9]+\.[0-9]+\.[0-9]+rc[0-9]+' # RC: lib/v0.1.0rc1
+      - 'lib/v[0-9]+\.[0-9]+\.[0-9]+' # Release: lib/v0.1.0, lib/v0.1.2
 
 permissions: {} # No permissions by default
 
@@ -13,21 +15,21 @@ jobs:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
-      contents: write # required by svenstaro/upload-release-action
       id-token: write # required by trusted publisher
+      contents: read
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
 
@@ -56,25 +58,17 @@ jobs:
         uses: actions-ecosystem/action-regex-match@9e6c4fb3d5e898f505be7a1fb6e7b0a278f6665b # v2.0.2
         with:
           text: ${{ github.ref }}
-          regex: '^refs/tags/[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+rc[0-9]+|rc[0-9]+)?$'
-
-      - name: Upload package distributions to GitHub
-        if: ${{ steps.check-tag.outputs.match != '' }}
-        uses: svenstaro/upload-release-action@29e53e917877a24fad85510ded594ab3c9ca12de # v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: library/dist/*
-          tag: ${{ github.ref }}
-          overwrite: true
-          file_glob: true
+          regex: '^refs/tags/lib/v[0-9]+\.[0-9]+\.[0-9]+$'
 
       - name: Publish package distributions to PyPI
         if: ${{ steps.check-tag.outputs.match != '' }}
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: library/dist
 
       - name: Publish package distributions to TestPyPI
         if: ${{ steps.check-tag.outputs.match == '' }}
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b # v1.14.0
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           repository-url: https://test.pypi.org/legacy/
           verbose: true

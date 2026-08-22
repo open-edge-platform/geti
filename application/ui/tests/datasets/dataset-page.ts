@@ -16,6 +16,10 @@ export class DatasetPage {
         return this.page.goto(`projects/${projectId}/dataset`);
     }
 
+    async openAnnotator() {
+        await this.page.getByRole('button', { name: 'Annotate' }).click();
+    }
+
     getMediaGrid() {
         return this.page.getByRole('listbox', { name: 'data-collection-grid' });
     }
@@ -61,7 +65,7 @@ export class DatasetPage {
         return this.page.getByRole('button', { name: 'Upload media' });
     }
 
-    uploadFiles(files: { name: string; mimeType: string; buffer: Buffer }[]) {
+    uploadFiles(files: { name: string; mimeType: string; buffer: Buffer }[] | string[]) {
         return this.getUploadInput().setInputFiles(files);
     }
 

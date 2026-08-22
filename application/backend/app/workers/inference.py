@@ -16,7 +16,7 @@ from loguru import logger
 from loguru._logger import Logger as LoguruLogger
 
 from app.models.inference import InferenceWorkerStatus, InferenceWorkerStatusCode
-from app.services import ActiveModelService, MetricsService
+from app.services import ActiveModelService, MetricsService, SystemService
 from app.services.inference.model_loader import LoadedModelHandle
 from app.settings import Settings, get_settings
 from app.stream.stream_data import InferenceData, StreamData
@@ -35,6 +35,7 @@ class InferenceWorkerConfig:
     pred_queue: mp.Queue
     stop_event: EventClass
     model_reload_event: EventClass | None
+    inference_params_event: EventClass | None = None
     shm_name: str
     shm_lock: Lock
     inference_status_shm_name: str
@@ -99,6 +100,7 @@ class InferenceWorker(BaseProcessWorker):
         self._frame_queue = config.frame_queue
         self._pred_queue = config.pred_queue
         self._model_reload_event = config.model_reload_event
+        self._inference_params_event = config.inference_params_event
         self._shm_name = config.shm_name
         self._shm_lock = config.shm_lock
         self._inference_status_shm_name = config.inference_status_shm_name
@@ -120,7 +122,8 @@ class InferenceWorker(BaseProcessWorker):
         super().setup()
         self._inference_status_shm = SharedMemory(name=self._inference_status_shm_name, create=False)
         self._metrics_service = MetricsService(self._shm_name, self._shm_lock)
-        self._model_service = ActiveModelService(get_settings().data_dir)
+        system_service = SystemService()
+        self._model_service = ActiveModelService(get_settings().data_dir, system_service)
         self.__prediction_buffer = PredictionReorderBuffer()
 
     @property
@@ -228,6 +231,13 @@ class InferenceWorker(BaseProcessWorker):
 
         return loaded_model
 
+    def _apply_inference_params_if_needed(self) -> None:
+        """Apply pending inference parameter changes (e.g. confidence threshold) to the loaded model."""
+        if self._inference_params_event is None or not self._inference_params_event.is_set():
+            return
+        self._inference_params_event.clear()
+        self._model_service.refresh_inference_params()  # type: ignore
+
     def run_loop(self) -> None:
         while not self.should_stop():
             try:
@@ -237,6 +247,7 @@ class InferenceWorker(BaseProcessWorker):
                     self.stop_aware_sleep(1)
                     continue
 
+                self._apply_inference_params_if_needed()
                 model = self._loaded_model.model
                 self._install_callback_if_needed(model)
                 if model.inference_adapter.is_ready():
