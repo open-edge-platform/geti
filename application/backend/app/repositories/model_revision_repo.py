@@ -38,6 +38,8 @@ class ModelRevisionRepository(BaseRepository[ModelRevisionDB]):
             stmt = stmt.where(ModelRevisionDB.training_dataset_id == training_dataset_id)
         if training_status is not None:
             stmt = stmt.where(ModelRevisionDB.training_status == training_status)
+
+        stmt = stmt.order_by(ModelRevisionDB.created_at.desc(), ModelRevisionDB.name.asc())
         return self.db.execute(stmt).scalars().all()
 
     def get_by_id(self, obj_id: str) -> ModelRevisionDB | None:
