@@ -827,7 +827,23 @@
         "upload": "上傳",
         "loopVideo": "循環播放影片",
         "requireAuthentication": "需要驗證",
-        "metricsEmptyDesc": "流水線開始執行並處理數據後，流水線指標將顯示於此。"
+        "metricsEmptyDesc": "流水線開始執行並處理數據後，流水線指標將顯示於此。",
+        "rateLimitLabel": "速率限制",
+        "rateLimitPerSec_other": "每 1 秒 {{count}} 個樣本",
+        "sampleEverySec_other": "每 {{seconds}} 秒 1 個樣本",
+        "webhookUrlLabelDetail": "Webhook URL",
+        "headersLabel": "標頭",
+        "topicLabelDetail": "主題",
+        "authRequiredDetail": "需要身份驗證",
+        "brokerHostDetail": "Broker 主機",
+        "brokerPortDetail": "Broker 連接埠",
+        "deviceLabelDetail": "裝置",
+        "unknownDeviceAria": "未知裝置",
+        "ignoreExistingImagesLabel": "忽略已有圖像",
+        "videoPathLabelDetail": "影片路徑",
+        "yes": "是",
+        "no": "否",
+        "sampleEverySec_one": "每 {{seconds}} 秒 1 個樣本"
     },
     "project": {
         "list": {

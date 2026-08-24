@@ -39,18 +39,23 @@ const WebhookHeaders = ({ sink }: { sink: WebhookSinkConfig }) => {
 export const SettingsList = ({ sink }: SettingsListProps) => {
     const { t } = useTranslation();
 
+    const rateLimitText = formatRateLimit(sink.rate_limit);
+    const outputFormatsLine = (
+        <li>
+            {t('inference.outputFormatsLabel')}: <OutputFormats outputFormats={sink.output_formats} />
+        </li>
+    );
+
     if (sink.sink_type === 'folder') {
         return (
             <ul className={classes.list}>
                 <li>
-                    {t('inference.folderPathDetail')}: {sink.folder_path}
+                    {t('inference.folderPathLabel')}: {sink.folder_path}
                 </li>
                 <li>
-                    {t('inference.samplesLabel')}/{t('inference.secondsLabel')}: {formatRateLimit(sink.rate_limit)}
+                    {t('inference.rateLimitLabel')}: {rateLimitText}
                 </li>
-                <li>
-                    {t('inference.outputFormatsLabel')}: <OutputFormats outputFormats={sink.output_formats} />
-                </li>
+                {outputFormatsLine}
             </ul>
         );
     }
@@ -59,7 +64,7 @@ export const SettingsList = ({ sink }: SettingsListProps) => {
         return (
             <ul className={classes.list}>
                 <li>
-                    {t('inference.samplesLabel')}/{t('inference.secondsLabel')}: {formatRateLimit(sink.rate_limit)}
+                    {t('inference.rateLimitLabel')}: {rateLimitText}
                 </li>
                 <li>
                     {t('inference.httpMethodDetail')}: {sink.http_method}
@@ -68,14 +73,12 @@ export const SettingsList = ({ sink }: SettingsListProps) => {
                     {t('inference.timeoutDetail')}: {sink.timeout}
                 </li>
                 <li>
-                    {t('inference.webhookUrlLabel')}: {sink.webhook_url}
+                    {t('inference.webhookUrlLabelDetail')}: {sink.webhook_url}
                 </li>
                 <li>
-                    {t('inference.headersTitle')} <WebhookHeaders sink={sink} />
+                    {t('inference.headersLabel')} <WebhookHeaders sink={sink} />
                 </li>
-                <li>
-                    {t('inference.outputFormatsLabel')}: <OutputFormats outputFormats={sink.output_formats} />
-                </li>
+                {outputFormatsLine}
             </ul>
         );
     }
@@ -84,23 +87,21 @@ export const SettingsList = ({ sink }: SettingsListProps) => {
         return (
             <ul className={classes.list}>
                 <li>
-                    {t('inference.topicLabel')}: {sink.topic}
+                    {t('inference.topicLabelDetail')}: {sink.topic}
                 </li>
                 <li>
-                    {t('inference.samplesLabel')}/{t('inference.secondsLabel')}: {formatRateLimit(sink.rate_limit)}
+                    {t('inference.rateLimitLabel')}: {rateLimitText}
                 </li>
                 <li>
-                    {t('inference.authRequiredLabel')}: {sink.auth_required ? t('common.yes') : t('common.no')}
+                    {t('inference.authRequiredDetail')}: {sink.auth_required ? t('common.yes') : t('common.no')}
                 </li>
                 <li>
-                    {t('inference.brokerHostLabel')}: {sink.broker_host}
+                    {t('inference.brokerHostDetail')}: {sink.broker_host}
                 </li>
                 <li>
-                    {t('inference.brokerPortLabel')}: {sink.broker_port}
+                    {t('inference.brokerPortDetail')}: {sink.broker_port}
                 </li>
-                <li>
-                    {t('inference.outputFormatsLabel')}: <OutputFormats outputFormats={sink.output_formats} />
-                </li>
+                {outputFormatsLine}
             </ul>
         );
     }
@@ -109,14 +110,12 @@ export const SettingsList = ({ sink }: SettingsListProps) => {
         return (
             <ul className={classes.list}>
                 <li>
-                    {t('inference.topicLabel')}: {sink.topic}
+                    {t('inference.topicLabelDetail')}: {sink.topic}
                 </li>
                 <li>
-                    {t('inference.samplesLabel')}/{t('inference.secondsLabel')}: {formatRateLimit(sink.rate_limit)}
+                    {t('inference.rateLimitLabel')}: {rateLimitText}
                 </li>
-                <li>
-                    {t('inference.outputFormatsLabel')}: <OutputFormats outputFormats={sink.output_formats} />
-                </li>
+                {outputFormatsLine}
             </ul>
         );
     }

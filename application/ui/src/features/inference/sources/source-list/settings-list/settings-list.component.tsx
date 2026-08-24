@@ -23,7 +23,7 @@ const CameraDeviceDisplay = ({ deviceId }: { deviceId: number }) => {
     return (
         <ul className={classes.list}>
             <li>
-                {t('inference.deviceLabel')}: {device ? device.name : t('common.unknownDevice', { id: deviceId })}
+                {t('inference.deviceLabelDetail')}: {device ? device.name : t('common.unknownDeviceAria')}
             </li>
         </ul>
     );
@@ -36,10 +36,10 @@ export const SettingsList = ({ source }: SettingsListProps) => {
         return (
             <ul className={classes.list}>
                 <li>
-                    {t('inference.folderPathDetail')}: {source.images_folder_path}
+                    {t('inference.folderPathLabel')}: {source.images_folder_path}
                 </li>
                 <li>
-                    {t('inference.ignoreExistingLabel')}:{' '}
+                    {t('inference.ignoreExistingImagesLabel')}:{' '}
                     {source.ignore_existing_images ? t('common.yes') : t('common.no')}
                 </li>
             </ul>
@@ -50,10 +50,10 @@ export const SettingsList = ({ source }: SettingsListProps) => {
         return (
             <ul className={classes.list}>
                 <li>
-                    {t('inference.streamUrlLabelDetail')}: {source.stream_url}
+                    {t('inference.streamUrlLabel')}: {source.stream_url}
                 </li>
                 <li>
-                    {t('inference.authRequiredLabel')}: {source.auth_required ? t('common.yes') : t('common.no')}
+                    {t('inference.authRequiredDetail')}: {source.auth_required ? t('common.yes') : t('common.no')}
                 </li>
             </ul>
         );
@@ -63,7 +63,7 @@ export const SettingsList = ({ source }: SettingsListProps) => {
         return (
             <ul className={classes.list}>
                 <li>
-                    {t('inference.videoPathLabel')}: {source.video_path}
+                    {t('inference.videoPathLabelDetail')}: {source.video_path}
                 </li>
             </ul>
         );

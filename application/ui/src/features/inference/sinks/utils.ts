@@ -58,15 +58,12 @@ export const formatRateLimit = (rateLimit?: number | null): string => {
     }
 
     if (normalizedRateLimit < 1) {
-        const seconds = 1 / normalizedRateLimit;
-        const normalizedSeconds = Math.round(seconds);
-        const secondsLabel = normalizedSeconds === 1 ? 'second' : 'seconds';
+        const seconds = Math.round(1 / normalizedRateLimit);
 
-        return `1 sample every ${normalizedSeconds} ${secondsLabel}`;
+        return i18n.t('inference.sampleEverySec_other', { seconds });
     }
 
-    const normalizedSamples = Math.round(normalizedRateLimit);
-    const sampleLabel = normalizedSamples === 1 ? 'sample' : 'samples';
+    const samples = Math.round(normalizedRateLimit);
 
-    return `${normalizedSamples} ${sampleLabel} every 1 second`;
+    return i18n.t('inference.rateLimitPerSec', { count: samples });
 };

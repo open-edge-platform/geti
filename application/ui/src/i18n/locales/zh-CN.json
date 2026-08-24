@@ -827,7 +827,23 @@
         "upload": "上传",
         "loopVideo": "循环播放视频",
         "requireAuthentication": "需要身份验证",
-        "metricsEmptyDesc": "流水线开始运行并处理数据后，流水线指标将在此处显示。"
+        "metricsEmptyDesc": "流水线开始运行并处理数据后，流水线指标将在此处显示。",
+        "rateLimitLabel": "速率限制",
+        "rateLimitPerSec_other": "每 1 秒 {{count}} 个样本",
+        "sampleEverySec_other": "每 {{seconds}} 秒 1 个样本",
+        "webhookUrlLabelDetail": "Webhook URL",
+        "headersLabel": "请求头",
+        "topicLabelDetail": "主题",
+        "authRequiredDetail": "需要身份验证",
+        "brokerHostDetail": "Broker 主机",
+        "brokerPortDetail": "Broker 端口",
+        "deviceLabelDetail": "设备",
+        "unknownDeviceAria": "未知设备",
+        "ignoreExistingImagesLabel": "忽略已有图像",
+        "videoPathLabelDetail": "视频路径",
+        "yes": "是",
+        "no": "否",
+        "sampleEverySec_one": "每 {{seconds}} 秒 1 个样本"
     },
     "project": {
         "list": {
