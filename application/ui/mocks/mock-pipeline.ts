@@ -36,6 +36,9 @@ export const getMockedPipeline = (customPipeline?: Partial<SchemaPipelineView>):
             sink_type: 'folder' as const,
         },
         device: 'cpu',
+        inference: {
+            confidence_threshold: 0.35,
+        },
         ...customPipeline,
     };
 };

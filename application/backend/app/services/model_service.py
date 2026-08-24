@@ -608,6 +608,25 @@ class ModelService(BaseSessionManagedService):
             raise ResourceNotFoundError(ResourceType.MODEL, str(variant_id))
         return ModelVariant.model_validate(variant_db)
 
+    def get_optimal_confidence_threshold(self, project_id: UUID, model_id: UUID, variant_id: UUID) -> float | None:
+        """
+        Get the confidence threshold that was determined for a model variant when it was exported.
+
+        Args:
+            project_id (UUID): The unique identifier of the project.
+            model_id (UUID): The unique identifier of the model.
+            variant_id (UUID): The unique identifier of the model variant.
+
+        Returns:
+            float | None: The optimal confidence threshold, or None if the variant does not embed one
+                (e.g. PyTorch variants, or tasks that do not use a confidence threshold).
+        """
+        variant = self.get_variant(variant_id=variant_id)
+        variant_dir = self._get_variant_dir(project_id, model_id, variant_id)
+        if variant.files_deleted or not variant_dir.exists():
+            return None
+        return _cached_optimal_confidence_threshold(variant_dir, variant.format)
+
     def save_evaluation_result(self, result: EvaluationResult) -> None:
         evaluation_db = EvaluationDB(
             model_revision_id=str(result.model_revision_id),

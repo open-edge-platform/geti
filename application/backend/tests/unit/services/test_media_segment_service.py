@@ -16,7 +16,11 @@ from app.models.media import Image, MediaType, NotAnnotatedVideoFrame, VideoFram
 from app.models.system import DeviceInfo, DeviceType
 from app.services.media_numpy_loader import MediaNumpyLoader
 from app.services.media_service import MediaService
-from app.services.sam.media_segment_service import SAM_EMBEDDING_MODEL_VERSION, MediaSegmentService
+from app.services.sam.media_segment_service import (
+    SAM_EMBEDDING_MODEL_VERSION,
+    SAM_ENCODER_PLUGIN_CONFIG,
+    MediaSegmentService,
+)
 
 
 def _read_safetensors_metadata(blob: bytes) -> dict[str, str]:
@@ -100,6 +104,26 @@ class TestMediaSegmentService:
 
         tensors = safetensors_load(blob)
         np.testing.assert_array_equal(tensors["image_embeddings"], embeddings)
+
+    def test_load_model_pins_f32_precision(self, fxt_media_service, fxt_media_numpy_loader, tmp_path):
+        service = MediaSegmentService(
+            media_service=fxt_media_service,
+            media_numpy_loader=fxt_media_numpy_loader,
+            model_xml_path=Path("/tmp/mobile_sam.encoder.xml"),
+            ov_cache_path=tmp_path,
+            db_session=MagicMock(spec=Session),
+        )
+        core = MagicMock()
+
+        with (
+            patch("model_api.adapters.create_core", return_value=core),
+            patch("model_api.adapters.OpenvinoAdapter") as mock_adapter,
+            patch("model_api.models.Model.create_model"),
+        ):
+            service._load_model(device="CPU")
+
+        core.set_property.assert_any_call({"CACHE_DIR": str(tmp_path)})
+        assert mock_adapter.call_args.kwargs["plugin_config"] == SAM_ENCODER_PLUGIN_CONFIG
 
     def test_encode_media_image(self, fxt_media_segment_service, fxt_media_numpy_loader):
         project = MagicMock(spec=Project, id=uuid4())

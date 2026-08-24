@@ -33,8 +33,8 @@
         "tauri": "tauri"
     },
     "dependencies": {
-        "@geti-ui/ui": "^1.5.4",
-        "@geti-ui/smart-tools": "^1.5.4",
+        "@geti-ui/ui": "^1.6.0",
+        "@geti-ui/smart-tools": "^1.6.0",
         "@react-aria/utils": "^3.34.1",
         "@react-stately/overlays": "^3.7.1",
         "@tanstack/react-query": "~5.101.4",
