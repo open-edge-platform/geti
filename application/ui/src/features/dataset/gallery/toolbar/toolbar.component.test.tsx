@@ -5,6 +5,7 @@ import type { Media } from '@/api/types';
 import { ViewModes } from '@geti-ui/ui';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
+import { getMockedDatasetView } from 'mocks/mock-dataset-view';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
@@ -92,6 +93,9 @@ describe('Toolbar', () => {
                     },
                     items: [],
                 });
+            }),
+            http.get('/api/projects/{project_id}/dataset/views', () => {
+                return HttpResponse.json([getMockedDatasetView()]);
             })
         );
 
