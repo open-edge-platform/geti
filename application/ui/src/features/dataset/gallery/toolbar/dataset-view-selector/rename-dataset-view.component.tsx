@@ -53,8 +53,8 @@ export const RenameDatasetView = ({ datasetView, onClose, datasetViews }: Rename
             <Divider />
             <Content>
                 <Form id={'rename-dataset-view-name'} onSubmit={rename}>
-                    {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
                     <TextField
+                        // eslint-disable-next-line jsx-a11y/no-autofocus
                         autoFocus
                         value={newName}
                         onChange={setNewName}

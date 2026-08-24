@@ -4,11 +4,13 @@
 import type { BenchmarkMetrics, ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { isNil } from 'lodash-es';
 
+import { i18n } from '../../../../i18n';
+
 type AccuracyMetric = { label: string; value: number };
 
 type BenchmarkMetricKey = keyof BenchmarkMetrics;
 
-const ACCURACY_METRIC_LABELS: Partial<Record<BenchmarkMetricKey, string>> = {
+const ACCURACY_METRIC_LABEL_KEYS: Partial<Record<BenchmarkMetricKey, string>> = {
     imagenet_top1_accuracy: 'models.metricTop1Acc',
     coco_map_50_95: 'models.metricMapOnCoco',
     coco_map_50: 'models.metricMap50OnCoco',
@@ -19,11 +21,11 @@ export const getAccuracyMetric = (
 ): AccuracyMetric | undefined => {
     const benchmarkMetrics = modelArchitecture.stats.benchmark_metrics;
 
-    for (const [key, label] of Object.entries(ACCURACY_METRIC_LABELS)) {
+    for (const [key, labelKey] of Object.entries(ACCURACY_METRIC_LABEL_KEYS)) {
         const value = benchmarkMetrics[key as BenchmarkMetricKey];
 
         if (!isNil(value)) {
-            return { label, value };
+            return { label: i18n.t(labelKey), value };
         }
     }
 

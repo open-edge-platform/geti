@@ -74,7 +74,7 @@ const ModelArchitectureDetailedParameters = () => {
             </li>
             {accuracyMetric !== undefined && (
                 <li>
-                    {t(accuracyMetric.label)}: {accuracyMetric.value}%
+                    {accuracyMetric.label}: {accuracyMetric.value}%
                 </li>
             )}
             <License />

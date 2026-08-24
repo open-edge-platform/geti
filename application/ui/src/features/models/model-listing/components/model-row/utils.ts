@@ -3,6 +3,7 @@
 
 import type { Evaluation, Metric, Model, TaskType } from '@/api/types';
 
+import { i18n } from '../../../../../i18n';
 import { isClassificationTask } from '../../../../project/task-type-guards';
 
 export const getModelEvaluations = (model: Model): Evaluation[] => {
@@ -10,7 +11,7 @@ export const getModelEvaluations = (model: Model): Evaluation[] => {
 };
 
 const getDefaultPerformanceMetricName = (taskType: TaskType | null): string => {
-    return isClassificationTask(taskType) ? 'models.metricAccuracy' : 'models.metricMAP';
+    return isClassificationTask(taskType) ? i18n.t('models.metricAccuracy') : i18n.t('models.metricMAP');
 };
 
 const getTestingEvaluation = (evaluations: Evaluation[]): Evaluation | undefined => {

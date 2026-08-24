@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Key, useMemo } from 'react';
+import { Key } from 'react';
 
 import { ActionButton, Flex, Grid, Item, Menu, MenuTrigger, Picker } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
@@ -58,11 +58,10 @@ export const Header = () => {
         groupedModels,
     } = useModelListing();
     const taskType = useProjectTask();
-    const performanceMetricName = useMemo(() => {
-        const models = groupedModels.flatMap((group) => group.models);
-
-        return getPerformanceColumnLabel(models, taskType);
-    }, [groupedModels, taskType]);
+    const performanceMetricName = getPerformanceColumnLabel(
+        groupedModels.flatMap((group) => group.models),
+        taskType
+    );
 
     return (
         <Grid columns={['auto auto 1fr auto']} gap={'size-100'} alignItems={'center'}>
@@ -93,7 +92,7 @@ export const Header = () => {
                     )}
                     <Item key='device'>{t('models.sortDevice')}</Item>
                     <Item key='size'>{t('models.sortSize')}</Item>
-                    <Item key='score'>{t('models.sortByMetricTemplate', { metric: t(performanceMetricName) })}</Item>
+                    <Item key='score'>{t('models.sortByMetricTemplate', { metric: performanceMetricName })}</Item>
                 </Picker>
             </Flex>
 

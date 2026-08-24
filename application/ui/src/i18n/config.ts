@@ -24,12 +24,15 @@ export const LANGUAGE_STORAGE_KEY = 'geti-language';
 /** Maps any detected `zh*` language tag to one of the supported Chinese locales. */
 const normalizeChineseLanguage = (language: string): string => {
     const lower = language.toLowerCase();
-    if (/^zh-(hant|tw|hk|mo)/.test(lower)) {
-        if (lower.startsWith('zh-hk')) return 'zh-HK';
-        if (lower.startsWith('zh-mo')) return 'zh-MO';
-        return 'zh-TW';
+    const isTraditional = lower.includes('hant') || /^zh-(tw|hk|mo)/.test(lower);
+
+    if (!isTraditional) {
+        return 'zh-CN';
     }
-    return 'zh-CN';
+
+    if (lower.includes('-hk')) return 'zh-HK';
+    if (lower.includes('-mo')) return 'zh-MO';
+    return 'zh-TW';
 };
 
 const i18next = createInstance();

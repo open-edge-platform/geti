@@ -23,7 +23,7 @@ const CameraDeviceDisplay = ({ deviceId }: { deviceId: number }) => {
     return (
         <ul className={classes.list}>
             <li>
-                {t('inference.deviceLabelDetail')}: {device ? device.name : t('common.unknownDeviceAria')}
+                {t('inference.deviceLabelDetail')}: {device ? device.name : t('inference.unknownDeviceAria')}
             </li>
         </ul>
     );

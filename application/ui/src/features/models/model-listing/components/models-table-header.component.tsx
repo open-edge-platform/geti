@@ -1,8 +1,6 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
 import { dimensionValue, Grid } from '@geti-ui/ui';
 import { useProjectTask } from 'hooks/use-project-task.hook';
 import { useTranslation } from 'react-i18next';
@@ -21,11 +19,10 @@ export const ModelsTableHeader = () => {
     const { groupBy, sortBy, groupedModels } = useModelListing();
     const taskType = useProjectTask();
 
-    const performanceColumnName = useMemo(() => {
-        const models = groupedModels.flatMap((group) => group.models);
-
-        return getPerformanceColumnLabel(models, taskType);
-    }, [groupedModels, taskType]);
+    const performanceColumnName = getPerformanceColumnLabel(
+        groupedModels.flatMap((group) => group.models),
+        taskType
+    );
 
     return (
         <Grid
@@ -42,7 +39,7 @@ export const ModelsTableHeader = () => {
             <ColumnHeader label={t('models.modelNameColumn')} isSorted={sortBy === 'name'} />
             <ColumnHeader label={t('models.trainedColumn')} isSorted={sortBy === 'trained'} />
             <ColumnHeader
-                label={groupBy === 'architecture' ? 'Dataset' : 'Architecture'}
+                label={groupBy === 'architecture' ? t('models.datasetColumn') : t('models.architectureColumn')}
                 isSorted={sortBy === 'architecture' || sortBy === 'dataset'}
             />
             <ColumnHeader label={t('models.deviceColumn')} isSorted={sortBy === 'device'} />

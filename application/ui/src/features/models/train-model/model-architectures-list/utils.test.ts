@@ -73,7 +73,7 @@ describe('getAccuracyMetric', () => {
 
         const result = getAccuracyMetric(modelArchitecture);
 
-        expect(result).toEqual({ label: 'models.metricTop1Acc', value: 76.2 });
+        expect(result).toEqual({ label: 'Top-1 Acc on ImageNet', value: 76.2 });
     });
 
     it('returns mAP (50-95) for detection tasks', () => {
@@ -93,7 +93,7 @@ describe('getAccuracyMetric', () => {
 
         const result = getAccuracyMetric(modelArchitecture);
 
-        expect(result).toEqual({ label: 'models.metricMapOnCoco', value: 55.3 });
+        expect(result).toEqual({ label: 'mAP on COCO', value: 55.3 });
     });
 
     it('falls back to coco_map_50 when coco_map_50_95 is null', () => {
@@ -113,7 +113,7 @@ describe('getAccuracyMetric', () => {
 
         const result = getAccuracyMetric(modelArchitecture);
 
-        expect(result).toEqual({ label: 'models.metricMap50OnCoco', value: 72.1 });
+        expect(result).toEqual({ label: 'mAP50 on COCO', value: 72.1 });
     });
 
     it('returns undefined when no accuracy metrics are available', () => {
