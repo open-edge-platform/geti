@@ -36,7 +36,7 @@ export const RenameDatasetView = ({ datasetView, onClose, datasetViews }: Rename
                     },
                 },
                 body: {
-                    name: newName,
+                    name: newName.trim(),
                 },
             },
             {

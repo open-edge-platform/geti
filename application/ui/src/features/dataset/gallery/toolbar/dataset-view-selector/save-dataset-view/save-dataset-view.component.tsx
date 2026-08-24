@@ -37,7 +37,7 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds, datasetViews }: Save
                     },
                 },
                 body: {
-                    name: viewName,
+                    name: viewName.trim(),
                     media_ids: selectedMediaIds,
                 },
             },
