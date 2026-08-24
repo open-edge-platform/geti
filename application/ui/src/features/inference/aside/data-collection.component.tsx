@@ -89,7 +89,7 @@ export const DataCollection = () => {
         <Flex direction={'column'} minHeight={0} height={'100%'}>
             <Flex direction={'column'} flex={1} UNSAFE_style={{ overflow: 'hidden auto' }}>
                 <Heading level={3} margin={0}>
-                    Max dataset size
+                    {t('inference.maxDatasetSizeHeading')}
                 </Heading>
 
                 <Text marginY={'size-100'}>{t('inference.maxItemsToCollect')}</Text>
@@ -109,7 +109,7 @@ export const DataCollection = () => {
                 <Divider marginY={'size-400'} size={'S'} />
 
                 <Heading level={3} margin={0}>
-                    Capture rate
+                    {t('inference.captureRateHeading')}
                 </Heading>
 
                 <Text marginY={'size-100'}>{t('inference.captureWhileRunning')}</Text>
@@ -121,7 +121,7 @@ export const DataCollection = () => {
                     marginBottom={'size-200'}
                     isDisabled={isUpdating}
                 >
-                    Toggle auto capturing
+                    {t('inference.toggleAutoCapturing')}
                 </Switch>
 
                 <Flex direction='row' gap='size-100' alignItems={'end'} marginBottom={'size-200'}>
@@ -153,7 +153,7 @@ export const DataCollection = () => {
                 <Divider marginY={'size-400'} size={'S'} />
 
                 <Heading level={3} margin={0}>
-                    Confidence threshold
+                    {t('inference.confidenceThresholdHeading')}
                 </Heading>
 
                 <Text marginY={'size-100'}>{t('inference.captureBelowThreshold')}</Text>
@@ -164,7 +164,7 @@ export const DataCollection = () => {
                     onChange={(enabled) => updatePolicies({ confidenceEnabled: enabled })}
                     isDisabled={isUpdating}
                 >
-                    Confidence threshold
+                    {t('inference.confidenceThresholdSwitch')}
                 </Switch>
 
                 <Slider

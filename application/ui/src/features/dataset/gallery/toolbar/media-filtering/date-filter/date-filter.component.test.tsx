@@ -7,6 +7,7 @@ import { useSearchParams } from 'react-router-dom';
 import { render } from 'test-utils/render';
 
 import { END_DATE_PARAM, START_DATE_PARAM } from '../../../../../../hooks/use-dataset-filters-search-params.hook';
+import { i18n } from '../../../../../../i18n';
 import { DateFilter, INVALID_RANGE_MESSAGE } from './date-filter.component';
 
 const START_DATE = '2026-03-15T10:00:00.000Z';
@@ -64,7 +65,7 @@ describe('DateFilter', () => {
 
         expect(screen.getByTestId('applied-start-date')).toHaveTextContent('2025-03-15');
         expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
-        expect(screen.queryByText(INVALID_RANGE_MESSAGE)).not.toBeInTheDocument();
+        expect(screen.queryByText(i18n.t(INVALID_RANGE_MESSAGE))).not.toBeInTheDocument();
     });
 
     it('keeps the previous filter and shows an error when the end date is moved before the start date', async () => {
@@ -76,7 +77,7 @@ describe('DateFilter', () => {
 
         expect(screen.getByTestId('applied-start-date')).toHaveTextContent(START_DATE);
         expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
-        expect(screen.getByText(INVALID_RANGE_MESSAGE)).toBeVisible();
+        expect(screen.getByText(i18n.t(INVALID_RANGE_MESSAGE))).toBeVisible();
     });
 
     it('keeps the previous filter and shows an error when the start date is moved after the end date', async () => {
@@ -88,7 +89,7 @@ describe('DateFilter', () => {
 
         expect(screen.getByTestId('applied-start-date')).toHaveTextContent(START_DATE);
         expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
-        expect(screen.getByText(INVALID_RANGE_MESSAGE)).toBeVisible();
+        expect(screen.getByText(i18n.t(INVALID_RANGE_MESSAGE))).toBeVisible();
     });
 
     it('applies the filter once an invalid end date is corrected', async () => {
@@ -101,7 +102,7 @@ describe('DateFilter', () => {
 
         expect(screen.getByTestId('applied-start-date')).toHaveTextContent('2020-03-15');
         expect(screen.getByTestId('applied-end-date')).toHaveTextContent('2020-03-20');
-        expect(screen.queryByText(INVALID_RANGE_MESSAGE)).not.toBeInTheDocument();
+        expect(screen.queryByText(i18n.t(INVALID_RANGE_MESSAGE))).not.toBeInTheDocument();
     });
 
     it('applies the filter once an invalid start date is corrected', async () => {
@@ -114,6 +115,6 @@ describe('DateFilter', () => {
 
         expect(screen.getByTestId('applied-start-date')).toHaveTextContent('2026-02-15');
         expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
-        expect(screen.queryByText(INVALID_RANGE_MESSAGE)).not.toBeInTheDocument();
+        expect(screen.queryByText(i18n.t(INVALID_RANGE_MESSAGE))).not.toBeInTheDocument();
     });
 });

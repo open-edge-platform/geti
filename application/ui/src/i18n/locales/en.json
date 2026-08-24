@@ -708,7 +708,12 @@
         "statusUnavailable": "Unavailable",
         "statusError": "Error",
         "toggleTabAria": "Toggle {{label}} tab",
-        "keyEmptyError": "Key cannot be empty"
+        "keyEmptyError": "Key cannot be empty",
+        "maxDatasetSizeHeading": "Max dataset size",
+        "captureRateHeading": "Capture rate",
+        "toggleAutoCapturing": "Toggle auto capturing",
+        "confidenceThresholdHeading": "Confidence threshold",
+        "confidenceThresholdSwitch": "Confidence threshold"
     },
     "project": {
         "list": {

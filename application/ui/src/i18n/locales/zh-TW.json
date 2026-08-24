@@ -694,7 +694,12 @@
         "statusUnavailable": "無法使用",
         "statusError": "錯誤",
         "toggleTabAria": "切換{{label}}頁籤",
-        "keyEmptyError": "鍵不能為空"
+        "keyEmptyError": "鍵不能為空",
+        "maxDatasetSizeHeading": "最大資料集大小",
+        "captureRateHeading": "擷取速率",
+        "toggleAutoCapturing": "切換自動擷取",
+        "confidenceThresholdHeading": "信心度門檻值",
+        "confidenceThresholdSwitch": "信心度門檻值"
     },
     "project": {
         "list": {

@@ -694,7 +694,12 @@
         "statusUnavailable": "不可用",
         "statusError": "错误",
         "toggleTabAria": "切换{{label}}选项卡",
-        "keyEmptyError": "键不能为空"
+        "keyEmptyError": "键不能为空",
+        "maxDatasetSizeHeading": "最大数据集大小",
+        "captureRateHeading": "捕获速率",
+        "toggleAutoCapturing": "切换自动捕获",
+        "confidenceThresholdHeading": "置信度阈值",
+        "confidenceThresholdSwitch": "置信度阈值"
     },
     "project": {
         "list": {

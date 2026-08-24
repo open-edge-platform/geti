@@ -62,7 +62,12 @@ export const DisclosureGroup = ({ items, defaultActiveInput }: DisclosureGroupPr
     return (
         <Flex width={'100%'} direction={'column'} gap={'size-100'}>
             {items.map((item) => (
-                <DisclosureItem item={item} key={item.labelKey} onChange={handleActiveInputChange} value={activeInput} />
+                <DisclosureItem
+                    item={item}
+                    key={item.labelKey}
+                    onChange={handleActiveInputChange}
+                    value={activeInput}
+                />
             ))}
         </Flex>
     );

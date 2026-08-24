@@ -280,25 +280,25 @@ describe('getPerformanceColumnLabel', () => {
     it('returns "Accuracy" for classification task when models have no testing metrics', () => {
         const modelWithoutMetric = getMockedModel({ variants: [] });
 
-        expect(getPerformanceColumnLabel([modelWithoutMetric], 'classification')).toBe('Accuracy');
+        expect(getPerformanceColumnLabel([modelWithoutMetric], 'classification')).toBe('models.metricAccuracy');
     });
 
     it('returns "mAP" for detection task when models have no testing metrics', () => {
         const modelWithoutMetric = getMockedModel({ variants: [] });
 
-        expect(getPerformanceColumnLabel([modelWithoutMetric], 'detection')).toBe('mAP');
+        expect(getPerformanceColumnLabel([modelWithoutMetric], 'detection')).toBe('models.metricMAP');
     });
 
     it('returns "mAP" for instance_segmentation task when models have no testing metrics', () => {
         const modelWithoutMetric = getMockedModel({ variants: [] });
 
-        expect(getPerformanceColumnLabel([modelWithoutMetric], 'instance_segmentation')).toBe('mAP');
+        expect(getPerformanceColumnLabel([modelWithoutMetric], 'instance_segmentation')).toBe('models.metricMAP');
     });
 
     it('returns "mAP" for null task type when models have no testing metrics', () => {
         const modelWithoutMetric = getMockedModel({ variants: [] });
 
-        expect(getPerformanceColumnLabel([modelWithoutMetric], null)).toBe('mAP');
+        expect(getPerformanceColumnLabel([modelWithoutMetric], null)).toBe('models.metricMAP');
     });
 
     it('returns undefined model metric name over default task type metric', () => {
@@ -324,6 +324,6 @@ describe('getPerformanceColumnLabel', () => {
     });
 
     it('handles undefined models array', () => {
-        expect(getPerformanceColumnLabel(undefined, 'classification')).toBe('Accuracy');
+        expect(getPerformanceColumnLabel(undefined, 'classification')).toBe('models.metricAccuracy');
     });
 });
