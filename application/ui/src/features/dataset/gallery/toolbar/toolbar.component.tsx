@@ -120,8 +120,6 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     <MediaUpload />
 
-                    <AssignLabel selectedImagesIds={selectedImagesIds} />
-
                     {noMediaSelected && <TrainModel />}
 
                     {noMediaSelected && (
@@ -153,6 +151,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     {hasSelectedElements && (
                         <>
+                            <AssignLabel selectedImagesIds={selectedImagesIds} />
                             <DeleteMediaItem
                                 itemsIds={Array.from(selectedKeys) as string[]}
                                 onDeleted={toggleSelectedKeys}
