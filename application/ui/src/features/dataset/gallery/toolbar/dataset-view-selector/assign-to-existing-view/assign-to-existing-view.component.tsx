@@ -35,7 +35,7 @@ const useAssignMediaToExistingView = () => {
 
     const assignToExistingViewMutation = useAssignMediaToExistingDatasetView();
 
-    return (selectedDatasetViewId: string, selectedMediaIds: string[], onClose: () => void) => {
+    const assignToExistingView = (selectedDatasetViewId: string, selectedMediaIds: string[], onClose: () => void) => {
         assignToExistingViewMutation.mutate(
             {
                 params: {
@@ -99,6 +99,11 @@ const useAssignMediaToExistingView = () => {
             }
         );
     };
+
+    return {
+        assignToExistingView,
+        isPending: assignToExistingViewMutation.isPending,
+    };
 };
 
 type AssignToExistingViewDialogProps = {
@@ -109,7 +114,7 @@ type AssignToExistingViewDialogProps = {
 
 const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }: AssignToExistingViewDialogProps) => {
     const [selectedDatasetViewId, setSelectedDatasetViewId] = useState<string | null>(null);
-    const assignToExistingView = useAssignMediaToExistingView();
+    const { assignToExistingView, isPending } = useAssignMediaToExistingView();
 
     const assignMedia = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -149,7 +154,7 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
                 <Button onPress={onClose} variant={'secondary'}>
                     Close
                 </Button>
-                <Button type={'submit'} form={'assign-to-existing-view-form'} variant={'accent'}>
+                <Button type={'submit'} form={'assign-to-existing-view-form'} variant={'accent'} isPending={isPending}>
                     Assign
                 </Button>
             </ButtonGroup>
