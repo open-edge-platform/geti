@@ -98,8 +98,8 @@ class HFSemanticSegModel(HFModel):
         upsample, is what keeps class boundaries aligned with the true pixel
         grid instead of a blocky low-resolution one.
         """
-        input_size = batch.images.shape[-2:]
-        upsampled = f.interpolate(outputs.logits, size=input_size, mode="bilinear", align_corners=False)
+        input_size = batch.images[0].shape[-2:]
+        upsampled = f.interpolate(outputs["logits"], size=input_size, mode="bilinear", align_corners=False)
         class_map = upsampled.argmax(dim=1)
         return PredictionBatch(
             images=batch.images,

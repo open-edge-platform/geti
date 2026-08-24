@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 import torch
 import transformers
@@ -131,12 +131,12 @@ class HFDetectionModel(HFModel):
         so this same method can also feed ``to_metric_inputs`` for mAP, which
         needs the full unfiltered score distribution.
         """
-        input_size = batch.images.shape[-2:]
+        input_size = (int(batch.images[0].shape[-2]), int(batch.images[0].shape[-1]))
         use_focal_loss = getattr(self.hf_model.config, "use_focal_loss", False)
         decoded = self._image_processor.post_process_object_detection(
             outputs,
             threshold=0.0,
-            target_sizes=[input_size] * batch.images.shape[0],
+            target_sizes=[input_size] * len(batch.images),
             use_focal_loss=use_focal_loss,
         )
 
@@ -151,8 +151,8 @@ class HFDetectionModel(HFModel):
             images=batch.images,
             imgs_info=batch.imgs_info,
             bboxes=bboxes,
-            labels=[image_result["labels"] for image_result in decoded],
-            scores=[image_result["scores"] for image_result in decoded],
+            labels=[cast("torch.Tensor", image_result["labels"]) for image_result in decoded],
+            scores=[cast("torch.Tensor", image_result["scores"]) for image_result in decoded],
         )
 
     def to_metric_inputs(self, outputs: ModelOutput, batch: SampleBatch) -> dict[str, Any]:
@@ -175,13 +175,17 @@ class HFDetectionModel(HFModel):
             {"boxes": boxes.as_subclass(torch.Tensor), "scores": scores, "labels": labels}
             for boxes, scores, labels in zip(predictions.bboxes, predictions.scores, predictions.labels, strict=True)
         ]
-        target = [
-            {
-                "boxes": reproject_boxes_to_input_space(boxes.as_subclass(torch.Tensor), img_info),
-                "labels": labels,
-            }
-            for boxes, labels, img_info in zip(batch.bboxes, batch.labels, batch.imgs_info, strict=True)
-        ]
+        target = []
+        for boxes, labels, img_info in zip(batch.bboxes, batch.labels, batch.imgs_info, strict=True):
+            if img_info is None:
+                msg = "Detection batches need per-sample img_info to compute metrics."
+                raise ValueError(msg)
+            target.append(
+                {
+                    "boxes": reproject_boxes_to_input_space(boxes.as_subclass(torch.Tensor), img_info),
+                    "labels": labels,
+                }
+            )
         return {"preds": preds, "target": target}
 
     def build_default_metric(self) -> Metric | MetricCollection:

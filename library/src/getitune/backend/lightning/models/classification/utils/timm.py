@@ -98,7 +98,7 @@ def get_preprocessing_params(backbone_name: str) -> DataInputParams | dict[str, 
         msg = f"Backbone {backbone_name} does not have a default preprocessing configuration."
         raise ValueError(msg)
     return DataInputParams(
-        input_size=cast("tuple[int, int]", cfg.input_size[-2:]),
+        input_size=cfg.input_size[-2:],
         mean=cast("tuple[float, float, float]", cfg.mean),
         std=cast("tuple[float, float, float]", cfg.std),
     )

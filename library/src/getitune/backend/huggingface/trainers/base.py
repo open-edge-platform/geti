@@ -94,7 +94,7 @@ class GetiTuneHFTrainer(Trainer):
         """Return a DataLoader over the validation split, via ``HFDatasetAdapter``."""
         return self._build_dataloader(self.datamodule.subsets["val"], self.datamodule.val_subset, shuffle=False)
 
-    def get_test_dataloader(self) -> DataLoader:
+    def get_test_dataloader(self, test_dataset: Any = None) -> DataLoader:  # noqa: ANN401
         """Return a DataLoader over the test split, via ``HFDatasetAdapter``."""
         return self._build_dataloader(self.datamodule.subsets["test"], self.datamodule.test_subset, shuffle=False)
 

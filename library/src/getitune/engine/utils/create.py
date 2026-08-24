@@ -141,9 +141,9 @@ def create_engine(
         ValueError: If a model name is ambiguous, the backend is unknown,
             or no engine supports the given model/data pair.
     """
+    from getitune.backend.huggingface.engine import HFEngine
     from getitune.backend.lightning.engine import LightningEngine
     from getitune.backend.openvino.engine import OVEngine
-    from getitune.backend.huggingface.engine import HFEngine
 
     backend_to_engine: dict[str, type[Engine]] = {
         "lightning": LightningEngine,

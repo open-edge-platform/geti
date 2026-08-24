@@ -130,11 +130,11 @@ class HFInstSegModel(HFModel):
         only has to reproject the (simpler) ground truth once, instead of
         rescaling every prediction individually.
         """
-        input_size = (int(batch.images.shape[-2]), int(batch.images.shape[-1]))
+        input_size = (int(batch.images[0].shape[-2]), int(batch.images[0].shape[-1]))
         decoded = self._image_processor.post_process_instance_segmentation(
             outputs,
             threshold=0.0,
-            target_sizes=[input_size] * batch.images.shape[0],
+            target_sizes=[input_size] * len(batch.images),
             return_binary_maps=True,
         )
 
@@ -178,11 +178,16 @@ class HFInstSegModel(HFModel):
             raise ValueError(msg)
 
         predictions = self.postprocess(outputs, batch)
-        if predictions.bboxes is None or predictions.masks is None or predictions.scores is None:
-            msg = "Instance segmentation postprocess() must always populate bboxes, masks, and scores."
+        if (
+            predictions.bboxes is None
+            or predictions.masks is None
+            or predictions.scores is None
+            or predictions.labels is None
+        ):
+            msg = "Instance segmentation postprocess() must always populate bboxes, masks, scores, and labels."
             raise ValueError(msg)
 
-        input_size = (int(batch.images.shape[-2]), int(batch.images.shape[-1]))
+        input_size = (int(batch.images[0].shape[-2]), int(batch.images[0].shape[-1]))
         preds = [
             {
                 "boxes": boxes.as_subclass(torch.Tensor),
@@ -194,19 +199,25 @@ class HFInstSegModel(HFModel):
                 predictions.bboxes, predictions.masks, predictions.scores, predictions.labels, strict=True
             )
         ]
-        target = [
-            {
-                "boxes": reproject_boxes_to_input_space(boxes.as_subclass(torch.Tensor), img_info),
-                "masks": [
-                    encode_rle(mask)
-                    for mask in reproject_masks_to_input_space(masks.as_subclass(torch.Tensor), img_info, input_size)
-                ],
-                "labels": labels,
-            }
-            for boxes, masks, labels, img_info in zip(
-                batch.bboxes, batch.masks, batch.labels, batch.imgs_info, strict=True
+        target = []
+        for boxes, masks, labels, img_info in zip(
+            batch.bboxes, batch.masks, batch.labels, batch.imgs_info, strict=True
+        ):
+            if img_info is None:
+                msg = "Instance segmentation batches need per-sample img_info to compute metrics."
+                raise ValueError(msg)
+            target.append(
+                {
+                    "boxes": reproject_boxes_to_input_space(boxes.as_subclass(torch.Tensor), img_info),
+                    "masks": [
+                        encode_rle(mask)
+                        for mask in reproject_masks_to_input_space(
+                            masks.as_subclass(torch.Tensor), img_info, input_size
+                        )
+                    ],
+                    "labels": labels,
+                }
             )
-        ]
         return {"preds": preds, "target": target}
 
     def build_default_metric(self) -> Metric | MetricCollection:

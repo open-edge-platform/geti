@@ -55,7 +55,7 @@ class HFMulticlassClsModel(HFModel):
 
     def postprocess(self, outputs: ModelOutput, batch: SampleBatch) -> PredictionBatch:
         """Turn logits into a predicted class index and confidence score per image."""
-        probabilities = outputs.logits.softmax(dim=-1)
+        probabilities = outputs["logits"].softmax(dim=-1)
         scores, labels = probabilities.max(dim=-1)
         return PredictionBatch(
             images=batch.images,
@@ -73,7 +73,7 @@ class HFMulticlassClsModel(HFModel):
         if batch.labels is None:
             msg = "Classification batches need labels to compute metrics."
             raise ValueError(msg)
-        predicted_labels = outputs.logits.argmax(dim=-1)
+        predicted_labels = outputs["logits"].argmax(dim=-1)
         target = torch.stack([label.long() for label in batch.labels])
         return {"preds": predicted_labels, "target": target}
 
@@ -146,7 +146,7 @@ class HFMultilabelClsModel(HFModel):
 
     def postprocess(self, outputs: ModelOutput, batch: SampleBatch) -> PredictionBatch:
         """Turn logits into per-label sigmoid probabilities and a thresholded multi-hot label."""
-        scores = outputs.logits.sigmoid()
+        scores = outputs["logits"].sigmoid()
         return PredictionBatch(
             images=batch.images,
             imgs_info=batch.imgs_info,
@@ -164,7 +164,7 @@ class HFMultilabelClsModel(HFModel):
         if batch.labels is None:
             msg = "Classification batches need labels to compute metrics."
             raise ValueError(msg)
-        preds = outputs.logits.sigmoid()
+        preds = outputs["logits"].sigmoid()
         target = torch.vstack(list(batch.labels))
         return {"preds": preds, "target": target}
 
