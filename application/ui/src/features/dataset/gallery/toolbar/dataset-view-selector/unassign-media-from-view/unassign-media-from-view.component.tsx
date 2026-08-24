@@ -96,15 +96,15 @@ type UnassignMediaFromViewProps = {
 };
 
 export const UnassignMediaFromView = ({ selectedMediaIds }: UnassignMediaFromViewProps) => {
-    const [datasetView] = useDatasetViewId();
+    const [datasetViewId] = useDatasetViewId();
 
     if (isEmpty(selectedMediaIds)) {
         return null;
     }
 
-    if (datasetView === ENTIRE_DATASET_VIEW_ID) {
+    if (datasetViewId === ENTIRE_DATASET_VIEW_ID) {
         return null;
     }
 
-    return <UnassingMediaButton selectedMediaIds={selectedMediaIds} datasetViewId={datasetView} />;
+    return <UnassingMediaButton selectedMediaIds={selectedMediaIds} datasetViewId={datasetViewId} />;
 };

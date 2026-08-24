@@ -4,6 +4,7 @@
 import { FormEvent, useState } from 'react';
 
 import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading, TextField } from '@geti-ui/ui';
+import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
@@ -88,11 +89,17 @@ type SaveDatasetViewProps = {
 };
 
 export const SaveDatasetView = ({ selectedMediaIds, datasetViews }: SaveDatasetViewProps) => {
+    const [datasetViewId] = useDatasetViewId();
+
     const [isSaveViewDialogOpen, setIsSaveViewDialogOpen] = useState<boolean>(false);
 
     const closeDialog = () => {
         setIsSaveViewDialogOpen(false);
     };
+
+    if (datasetViewId !== ENTIRE_DATASET_VIEW_ID) {
+        return null;
+    }
 
     return (
         <>

@@ -19,6 +19,7 @@ import {
 } from '@geti-ui/ui';
 import { Info } from '@geti-ui/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
+import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
@@ -168,12 +169,17 @@ type AssignToExistingViewProps = {
 };
 
 export const AssignToExistingView = ({ datasetViews, selectedMediaIds }: AssignToExistingViewProps) => {
+    const [datasetViewId] = useDatasetViewId();
     const [isAssignToExistingViewOpen, setIsAssignToExistingViewOpen] = useState<boolean>(false);
     const isAssignToExistingViewDisabled = isEmpty(datasetViews);
 
     const closeDialog = () => {
         setIsAssignToExistingViewOpen(false);
     };
+
+    if (datasetViewId !== ENTIRE_DATASET_VIEW_ID) {
+        return null;
+    }
 
     return (
         <>
