@@ -735,7 +735,7 @@
         "remove": "移除",
         "addNewSink": "新建输出端",
         "editSink": "编辑输出端",
-        "addNewSource": "新建输入源",
+        "addNewSource": "新增输入源",
         "editSource": "编辑输入源",
         "sinkMenuAriaLabel": "输出端菜单",
         "sourceMenuAriaLabel": "输入源菜单",

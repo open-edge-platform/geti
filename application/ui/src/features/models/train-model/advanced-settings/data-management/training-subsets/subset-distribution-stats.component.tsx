@@ -58,7 +58,11 @@ export const SubsetDistributionStats = ({
                         color={LABEL_COLOR_MAPPING.validation}
                         size={validationSize}
                     />
-                    <SubsetDistributionStat title={t('models.testingSubsetTitle')} color={LABEL_COLOR_MAPPING.test} size={testSize} />
+                    <SubsetDistributionStat
+                        title={t('models.testingSubsetTitle')}
+                        color={LABEL_COLOR_MAPPING.test}
+                        size={testSize}
+                    />
                 </Flex>
                 <Text>
                     <Text UNSAFE_className={classes.totalStats}>{t('models.totalPrefix')} </Text>

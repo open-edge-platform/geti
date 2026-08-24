@@ -749,7 +749,7 @@
         "remove": "Remove",
         "addNewSink": "Add new sink",
         "editSink": "Edit sink",
-        "addNewSource": "Add new input source",
+        "addNewSource": "Add new source",
         "editSource": "Edit input source",
         "sinkMenuAriaLabel": "sink menu",
         "sourceMenuAriaLabel": "source menu",

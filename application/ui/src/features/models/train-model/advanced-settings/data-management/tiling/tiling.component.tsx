@@ -103,7 +103,8 @@ export const Tiling = ({ tilingParameters, onTrainingConfigurationChange }: Tili
     return (
         <Accordion>
             <Accordion.Title>
-                {t('models.tilingTitle')} <Accordion.Tag ariaLabel={t('models.tilingTagAria')}>{selectedTilingMode}</Accordion.Tag>
+                {t('models.tilingTitle')}{' '}
+                <Accordion.Tag ariaLabel={t('models.tilingTagAria')}>{selectedTilingMode}</Accordion.Tag>
             </Accordion.Title>
             <Accordion.Content>
                 <Accordion.Description>{t('models.tilingDescription')}</Accordion.Description>
