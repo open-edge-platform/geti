@@ -36,12 +36,8 @@ __all__ = ["HFModelExporter"]
 class HFModelExporter(ModelExporter):
     """Exporter that uses native torch and OpenVINO conversion tools.
 
-    Always goes through ONNX first (``via_onnx`` has no toggle here, unlike
-    ``LightningModelExporter``): ``torch.onnx.export(dynamo=True)`` cannot
-    trace the RT-DETR family (G27), so every task is pinned to the legacy
-    ``dynamo=False`` exporter, and going through ONNX keeps that choice in
-    one place rather than duplicating it across a direct
-    ``openvino.convert_model(model, ...)`` path as well.
+    ``to_openvino`` tries a direct torch -> OpenVINO conversion first and only
+    falls back to an intermediate ONNX file when that fails.
     """
 
     def __init__(
@@ -87,14 +83,30 @@ class HFModelExporter(ModelExporter):
         base_model_name: str = "exported_model",
         precision: Precision = Precision.FP32,
     ) -> Path:
-        """Export to OpenVINO IR, via an intermediate ONNX file."""
+        """Export to OpenVINO IR.
+
+        Tries a direct torch -> OpenVINO conversion first, with no intermediate
+        artifact. If that fails for a particular model (some architectures don't
+        trace cleanly through OpenVINO's torch frontend), it falls back to the
+        legacy ONNX route: ``torch.onnx.export``.
+        """
         input_size = self.data_input_params.as_ncwh()
         dynamic_shape = openvino.PartialShape([-1, *input_size[1:]])
+        dummy_input = torch.rand(input_size).to(next(model.parameters()).device)
 
-        with tempfile.TemporaryDirectory() as tmp_dir_name:
-            tmp_dir = Path(tmp_dir_name)
-            self.to_onnx(model, tmp_dir, base_model_name, Precision.FP32, embed_metadata=False)
-            exported_model = openvino.convert_model(tmp_dir / (base_model_name + ".onnx"), input=(dynamic_shape,))
+        try:
+            exported_model = openvino.convert_model(model, example_input=dummy_input, input=(dynamic_shape,))
+            log.info("Direct torch -> OpenVINO conversion succeeded.")
+        except Exception as direct_error:
+            log.warning(
+                "Direct torch -> OpenVINO conversion failed (%s); falling back to ONNX. "
+                "If this is unexpected, report it so the model can be added to an allow-list.",
+                direct_error,
+            )
+            with tempfile.TemporaryDirectory() as tmp_dir_name:
+                tmp_dir = Path(tmp_dir_name)
+                self.to_onnx(model, tmp_dir, base_model_name, Precision.FP32, embed_metadata=False)
+                exported_model = openvino.convert_model(tmp_dir / (base_model_name + ".onnx"), input=(dynamic_shape,))
 
         exported_model = self._postprocess_openvino_model(exported_model)
 
@@ -102,7 +114,7 @@ class HFModelExporter(ModelExporter):
             msg = (
                 "OpenVINO conversion produced an empty model "
                 f"(inputs={len(exported_model.inputs)}, outputs={len(exported_model.outputs)}). "
-                "Check preceding logs for the underlying ONNX export failure."
+                "Check preceding logs for the underlying conversion failure."
             )
             raise RuntimeError(msg)
 

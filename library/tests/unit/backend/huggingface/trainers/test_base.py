@@ -248,3 +248,68 @@ class TestEvaluateWithMetricAndPredictBatches:
             assert batch.bboxes is not None
             assert batch.scores is not None
             assert batch.labels is not None
+
+
+class TestTrainerLoopExercisesOverrides:
+    """The real ``Trainer`` loop must not trip the base ``Mapping``-assumption paths.
+
+    ``_prepare_inputs``, ``_get_num_items_in_batch``, ``floating_point_ops`` and
+    ``prediction_step`` all exist only because ``transformers.Trainer`` assumes a
+    dict-like batch and we feed it ``SampleBatch`` dataclasses instead. This test
+    drives the actual training and evaluation loops with a tiny real model so a
+    regression that drops an override (or makes ``Trainer`` touch a batch as a
+    dict) fails loudly rather than silently.
+    """
+
+    def test_train_and_eval_run_without_dict_assumptions(self) -> None:
+        import transformers as tf
+
+        from getitune.backend.huggingface.models import HFDetectionModel
+
+        dm = DataModule(task=TaskType.DETECTION, data_root="tests/assets/detection_coco")
+        num_labels = dm.subsets["train"].label_info.num_classes
+        model = HFDetectionModel(tf.RTDetrV2Config(num_queries=10, decoder_layers=2), num_labels)
+        dm.train_subset.num_workers = 0
+        dm.val_subset.num_workers = 0
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            args = TrainingArguments(
+                output_dir=tmp_dir,
+                report_to=[],
+                remove_unused_columns=False,
+                label_names=list(model.label_keys),
+                use_cpu=True,
+                per_device_train_batch_size=dm.train_subset.batch_size,
+                per_device_eval_batch_size=dm.val_subset.batch_size,
+                max_steps=2,
+                eval_strategy="steps",
+                eval_steps=1,
+                logging_strategy="steps",
+                logging_steps=1,
+                save_strategy="no",
+            )
+            trainer = GetiTuneHFTrainer(
+                model,
+                dm,
+                model=model.hf_model,
+                args=args,
+                train_dataset=dm.subsets["train"],
+                eval_dataset=dm.subsets["val"],
+            )
+
+            # Exercises _prepare_inputs / _get_num_items_in_batch /
+            # floating_point_ops through Trainer.training_step, and
+            # prediction_step through the eval loop invoked by eval_strategy.
+            trainer.train()
+
+        log_history = trainer.state.log_history
+        train_loss_entries = [e for e in log_history if "loss" in e]
+        eval_loss_entries = [e for e in log_history if "eval_loss" in e]
+
+        # A training loss entry proves the training-step overrides were hit.
+        assert train_loss_entries, "expected training loss entries in the log history"
+        # An eval_loss entry proves prediction_step ran through Trainer.evaluate().
+        assert eval_loss_entries, "expected eval_loss entries; prediction_step was not exercised"
+        for entry in train_loss_entries + eval_loss_entries:
+            value = entry.get("loss", entry.get("eval_loss"))
+            assert torch.isfinite(torch.tensor(value, dtype=torch.float32))

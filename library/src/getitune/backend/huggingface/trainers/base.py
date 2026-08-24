@@ -114,34 +114,45 @@ class GetiTuneHFTrainer(Trainer):
         )
 
     def _get_num_items_in_batch(self, batch_samples: list[Any], device: torch.device) -> int | None:
-        """Skip HF's per-batch item counting for gradient-accumulation loss scaling.
+        """Disable per-batch item counting for gradient-accumulation loss scaling.
 
-        ``Trainer`` peeks at ``"labels" in batch_samples[0]`` to rescale the
-        loss under gradient accumulation, assuming a dict-like batch —
-        ``SampleBatch`` isn't one. It's also unnecessary here: our vision
-        models each return a batch-mean loss already, not a per-token loss
-        that needs rescaling by item count the way causal LM losses do.
+        ``Trainer.training_step`` calls this to learn how many examples are in a
+        batch so it can rescale the loss under gradient accumulation. The base
+        implementation assumes a dict-like batch: it tests ``"labels" in
+        batch_samples[0]`` and then indexes ``batch_samples[0]["labels"]``. A
+        ``SampleBatch`` dataclass is neither subscriptable nor a ``Mapping``, so
+        those operators don't exist on it. Returning ``None`` tells ``Trainer``
+        not to rescale — which is correct here, because each of our vision
+        models already returns a batch-mean loss, not a per-token loss that
+        would need normalizing the way a causal LM's does.
         """
         return None
 
     def _prepare_inputs(self, inputs: SampleBatch) -> SampleBatch:  # pyrefly: ignore[bad-override]
-        """Bypass the base implementation's dict/``Mapping`` assumptions.
+        """Pass ``SampleBatch`` through unchanged.
 
-        The base ``_prepare_inputs`` checks things like ``len(inputs)`` and
-        recurses through ``Mapping``/``list``/``tuple`` to move tensors to
-        device — none of which applies to a ``SampleBatch`` dataclass. The
-        device move (and any GPU augmentation) happens explicitly in
-        ``compute_loss`` instead, so this is a no-op.
+        ``Trainer.training_step`` calls ``self._prepare_inputs(inputs)`` before
+        the forward pass. The base version only knows how to recurse into a
+        ``Mapping``/``list``/``tuple`` and otherwise treats the argument as a
+        single tensor to move to the target device; a ``SampleBatch`` dataclass
+        matches none of those branches, so the base would either no-op or try to
+        move the whole dataclass as a tensor. The real device transfer (and any
+        GPU augmentation) happens explicitly in ``compute_loss``/``_prepare_batch``,
+        so this override is a deliberate identity function.
         """
         return inputs
 
     def floating_point_ops(self, inputs: SampleBatch) -> int:  # pyrefly: ignore[bad-override]
-        """Skip FLOPs accounting.
+        """Skip FLOPs accounting (returns 0).
 
-        The base implementation inspects ``inputs`` like a dict to estimate
-        FLOPs for the ``total_flos`` logging field. Not worth reimplementing
-        for ``SampleBatch`` just to populate an informational metric no Geti
-        consumer reads.
+        ``Trainer.training_step`` adds ``self.floating_point_ops(inputs)`` to the
+        running ``total_flos`` it logs. The base implementation estimates FLOPs
+        by indexing the batch with ``self.main_input_name`` (``"input_ids"`` by
+        default) and reading ``inputs[main_input_name].shape`` — again a
+        dict-style access that doesn't apply to a ``SampleBatch``. We return 0:
+        a meaningful per-call FLOP count for arbitrary Hugging Face vision models
+        would require model-specific analysis, and no Geti consumer reads
+        ``total_flos``, so the effort isn't warranted.
         """
         return 0
 
@@ -152,19 +163,28 @@ class GetiTuneHFTrainer(Trainer):
         prediction_loss_only: bool,
         ignore_keys: list[str] | None = None,
     ) -> tuple[torch.Tensor | None, None, None]:
-        """Compute only the evaluation loss.
+        """Compute the evaluation loss; return ``(loss, None, None)``.
 
-        The base implementation inspects ``inputs`` like a dict (``inputs.get(k)``)
-        to decide whether labels are present, and otherwise builds
-        ``(loss, logits, labels)`` for ``compute_metrics``. Geti's own metric
-        callables are wired in through ``HFEngine.test()``, not through
-        ``Trainer``'s ``compute_metrics``, so eval here only needs the
-        loss — for the training-time metrics CSV and early stopping.
+        ``Trainer.evaluate()`` calls this once per eval batch. The base
+        implementation expects a dict-like batch: it inspects ``inputs`` with
+        ``inputs.get(k)`` to decide whether labels are present, then builds
+        ``(loss, logits, labels)`` for ``Trainer``'s ``compute_metrics``. Two
+        reasons we don't do that here:
+
+        * ``SampleBatch`` is a dataclass, not a ``Mapping``, so the base's
+          dict probing would fail; and
+        * Geti's own metric callables run through ``HFEngine.test()`` /
+          ``evaluate_with_metric``, not through ``Trainer.compute_metrics``.
+
+        Only the loss is needed, and only for that one reason: ``Trainer``
+        writes it to the log history as ``eval_loss``, which feeds the
+        training-time metrics CSV (``val/loss``) and the
+        ``EarlyStoppingCallback``'s ``metric_for_best_model="eval_loss"``
+        checkpoint selection. Logits and labels are ``None`` because nothing
+        downstream consumes them.
         """
         with torch.no_grad():
             loss = self.compute_loss(model, inputs)
-        if prediction_loss_only:
-            return loss, None, None
         return loss, None, None
 
     def compute_loss(  # pyrefly: ignore[bad-override]

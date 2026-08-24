@@ -12,10 +12,9 @@ dimension added and removed around the Kornia call; that stays in
 ``GPUAugmentationPipeline.forward`` since it's a Kornia-shape detail, not a
 task fact.
 
-``backend/lightning/callbacks/gpu_augmentation.py`` still keeps its own copy
-of this table rather than importing it. It has no test coverage today, so
-the plan is to switch it over once one exists, rather than edit tested and
-untested code in the same change.
+This module is the single source of truth for that per-task table; both
+``GPUAugmentationCallback`` and ``GetiTuneHFTrainer`` import ``DATA_KEYS_BY_TASK``
+from here rather than keeping their own copies.
 """
 
 from __future__ import annotations
