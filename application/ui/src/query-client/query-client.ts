@@ -3,9 +3,9 @@
 
 import { matchQuery, MutationCache, QueryClient } from '@tanstack/react-query';
 
-import { i18n } from '../i18n';
 import { paths } from '../api/openapi-spec';
 import { toast } from '../components/toast/toast.component';
+import { i18n } from '../i18n';
 import { Meta, QueryKey } from './query-client.interface';
 
 declare module '@tanstack/react-query' {

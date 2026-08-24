@@ -53,7 +53,10 @@ export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProp
 
                 <Divider orientation='vertical' size='S' />
 
-                <Text>{t('common.mediaColon')}: {metadata.filters.include_unannotated ? t('dataset.allMedia') : t('dataset.onlyWithAnnotations')}</Text>
+                <Text>
+                    {t('common.mediaColon')}:{' '}
+                    {metadata.filters.include_unannotated ? t('dataset.allMedia') : t('dataset.onlyWithAnnotations')}
+                </Text>
 
                 <Divider orientation='vertical' size='S' />
 

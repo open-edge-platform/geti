@@ -12,12 +12,12 @@ import type {
 } from '@/api/types';
 import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
 
+import { i18n } from '../../../i18n';
 import { useGetTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
 import { useGetSuccessfulModels } from '../hooks/api/use-get-models.hook';
 import { useGetTrainingDevices } from './api/use-get-training-devices';
 import { useTrainingConfiguration } from './hooks/use-training-configuration';
 import { getDefaultTrainingDevice } from './select-training-device/utils';
-import { i18n } from '../../../i18n';
 
 type DatasetRevisionWithValue = Pick<DatasetRevision, 'id' | 'name'> & { value: string | null };
 type ModelRevisionWithValue = Pick<Model, 'id' | 'name' | 'architecture'> & { value: string | null };
@@ -74,7 +74,12 @@ const useModelRevisions = () => {
 
     return {
         modelRevisions: [
-            { id: DEFAULT_PRE_TRAINED_WEIGHTS, name: i18n.t('models.defaultPretrainedWeights'), architecture: '', value: null },
+            {
+                id: DEFAULT_PRE_TRAINED_WEIGHTS,
+                name: i18n.t('models.defaultPretrainedWeights'),
+                architecture: '',
+                value: null,
+            },
             ...(models?.map(({ id, name, architecture }) => ({ id, name, architecture, value: String(id) })) ?? []),
         ],
     };

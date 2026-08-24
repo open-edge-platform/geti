@@ -7,13 +7,23 @@ import type { Label, TaskType } from '@/api/types';
 import { useProject } from 'hooks/api/project.hook';
 import { negate } from 'lodash-es';
 
-import { i18n } from '../../i18n';
 import { isClassificationTask } from '../../features/project/task-type-guards';
+import { i18n } from '../../i18n';
 import type { AnnotationLabel, AnnotationLabelRef } from '../types';
 
 export const EMPTY_LABEL_ID = 'empty-label';
-const getNoLabel = (): Label => ({ id: EMPTY_LABEL_ID, name: i18n.t('annotator.noLabel'), color: 'var(--no-label)', hotkey: 'N' });
-const getNoObjectLabel = (): Label => ({ id: EMPTY_LABEL_ID, name: i18n.t('annotator.noObject'), color: 'var(--no-label)', hotkey: 'N' });
+const getNoLabel = (): Label => ({
+    id: EMPTY_LABEL_ID,
+    name: i18n.t('annotator.noLabel'),
+    color: 'var(--no-label)',
+    hotkey: 'N',
+});
+const getNoObjectLabel = (): Label => ({
+    id: EMPTY_LABEL_ID,
+    name: i18n.t('annotator.noObject'),
+    color: 'var(--no-label)',
+    hotkey: 'N',
+});
 
 export const isEmptyLabel = <T extends { id: string }>({ id }: T): boolean => id === EMPTY_LABEL_ID;
 export const isNonEmptyLabel = negate(isEmptyLabel);

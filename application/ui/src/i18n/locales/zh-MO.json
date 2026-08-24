@@ -42,7 +42,8 @@
         "multiSelectListFallback": "多選清單",
         "importDatasetDialogAria": "匯入資料集對話方塊",
         "unexpectedError": "發生未預期的錯誤。請再試一次。",
-        "networkError": "網絡錯誤。請檢查連接後重試。"
+        "networkError": "網絡錯誤。請檢查連接後重試。",
+        "export": "匯出"
     },
     "nav": {
         "dataset": "資料集",
@@ -700,7 +701,8 @@
         "ultralyticsLicense": "遵循 Ultralytics 的授權使用指引",
         "performanceSpeed": "速度",
         "performanceAccuracy": "準確率",
-        "performanceBalance": "均衡"
+        "performanceBalance": "均衡",
+        "totalSizeAriaLabel": "總大小"
     },
     "inference": {
         "inferenceDevice": "推理裝置",

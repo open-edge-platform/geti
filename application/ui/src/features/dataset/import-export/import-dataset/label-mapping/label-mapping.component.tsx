@@ -111,9 +111,7 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
 
             <Flex direction={'column'}>
                 <Heading marginTop={'size-200'}>{t('dataset.labelMappingHeading')}</Heading>
-                <Text UNSAFE_className={classes.emptyLabelsWarning}>
-                    {t('dataset.unmappedWarning')}
-                </Text>
+                <Text UNSAFE_className={classes.emptyLabelsWarning}>{t('dataset.unmappedWarning')}</Text>
             </Flex>
 
             <View backgroundColor={'gray-75'} padding={'size-200'} borderRadius={'regular'}>

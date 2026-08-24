@@ -72,10 +72,18 @@ export const TimmModelConfiguration = () => {
                 <Divider size={'S'} marginX={'size-400'} orientation={'vertical'} />
 
                 <ul className={classes.infoList}>
-                    <li>{t('models.parametersCountLabel')}: {info.parameters}</li>
-                    <li>{t('models.gigaflopsLabel')}: {info.gigaFlops}</li>
-                    <li>{t('models.mapLabel')}: {info.mAP}</li>
-                    <li>{t('models.licenseLabel')}: {info.license}</li>
+                    <li>
+                        {t('models.parametersCountLabel')}: {info.parameters}
+                    </li>
+                    <li>
+                        {t('models.gigaflopsLabel')}: {info.gigaFlops}
+                    </li>
+                    <li>
+                        {t('models.mapLabel')}: {info.mAP}
+                    </li>
+                    <li>
+                        {t('models.licenseLabel')}: {info.license}
+                    </li>
                 </ul>
             </Flex>
         </View>

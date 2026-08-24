@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Text } from '@geti-ui/ui';
-import { useTranslation } from 'react-i18next';
 import { capitalize } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as ThumbsUp } from '../../../../../assets/icons/thumbs-up.svg';
 import { ModelBadge } from './model-badge.component';

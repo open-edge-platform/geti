@@ -58,7 +58,7 @@ const SidebarTabs = ({ tabs, selectedTab }: TabProps) => {
                 {isExpanded && (
                     <>
                         <Flex alignItems='center' gap={'size-100'} marginBottom={'size-300'}>
-                            <Heading level={2}>{t(tab!)}</Heading>
+                            <Heading level={2}>{tab ? t(tab) : ''}</Heading>
                         </Flex>
                         <Flex direction={'column'} flex={1} UNSAFE_style={{ overflow: 'hidden auto' }}>
                             {content}

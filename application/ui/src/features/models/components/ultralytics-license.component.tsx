@@ -1,8 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Link } from '../../../platform/components/link.component';
 import { useTranslation } from 'react-i18next';
+
+import { Link } from '../../../platform/components/link.component';
 
 const ULTRALYTICS_LICENSE_KEY = 'models.ultralyticsLicense';
 

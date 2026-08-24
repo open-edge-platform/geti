@@ -99,7 +99,9 @@ export const JobRow = ({
                         {statusBadges}
                     </Flex>
 
-                    <Text UNSAFE_className={classes.metaText}>{t('models.startedAt', { date: formattedStartedAt })}</Text>
+                    <Text UNSAFE_className={classes.metaText}>
+                        {t('models.startedAt', { date: formattedStartedAt })}
+                    </Text>
                     {device && <Text UNSAFE_className={classes.metaText}>{t('models.deviceAt', { device })}</Text>}
                 </Flex>
 

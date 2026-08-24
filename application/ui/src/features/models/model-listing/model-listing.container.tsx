@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { dimensionValue, Divider, Flex, Heading } from '@geti-ui/ui';
-import { useTranslation } from 'react-i18next';
 import { useGetCurrentRunningJobs } from 'hooks/api/jobs/jobs.hook';
 import { isEmpty, isString } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as NoTrainedModels } from '../../../assets/no-trained-models.svg';
 import { ExportJobsList } from '../../dataset/import-export/export-jobs-list/export-jobs-list.component';

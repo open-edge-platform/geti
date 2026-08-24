@@ -36,7 +36,7 @@ import classes from './export-dataset-config.module.scss';
 const EXPORT_VIDEOS_WARNING_MESSAGE_KEY = 'dataset.exportVideosWarning';
 const EXPORT_EMPTY_LABEL_WARNING_MESSAGE_KEY = 'dataset.exportEmptyLabelWarning';
 const EXPORT_UNSUPPORTED_ITEMS_WARNING_KEY = 'dataset.exportUnsupportedItemsWarning';
-const EXPORT_COCO_WARNING_KEY = "dataset.exportCocoWarning";
+const EXPORT_COCO_WARNING_KEY = 'dataset.exportCocoWarning';
 
 const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: string | null }) => {
     const isVisible = selectedExportFormat !== 'geti';
@@ -70,8 +70,12 @@ const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: strin
             </Flex>
             <Flex direction={'column'} gap={'size-75'}>
                 {hasVideos && <Text>{t(EXPORT_VIDEOS_WARNING_MESSAGE_KEY)}</Text>}
-                {emptyLabelName !== undefined && <Text>{t(EXPORT_EMPTY_LABEL_WARNING_MESSAGE_KEY, { label: emptyLabelName })}</Text>}
-                {unsupportedItems && <Text>{t(EXPORT_UNSUPPORTED_ITEMS_WARNING_KEY, { items: unsupportedItems })}</Text>}
+                {emptyLabelName !== undefined && (
+                    <Text>{t(EXPORT_EMPTY_LABEL_WARNING_MESSAGE_KEY, { label: emptyLabelName })}</Text>
+                )}
+                {unsupportedItems && (
+                    <Text>{t(EXPORT_UNSUPPORTED_ITEMS_WARNING_KEY, { items: unsupportedItems })}</Text>
+                )}
                 {isCocoFormatSelected && <Text>{t(EXPORT_COCO_WARNING_KEY)}</Text>}
             </Flex>
         </Flex>
@@ -169,7 +173,7 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
                     {t('common.cancel')}
                 </Button>
                 <Button type='submit' form={FORM_ID} variant='accent' isPending={isPending} isDisabled={isPending}>
-                    {t('dataset.exportDataset')}
+                    {t('common.export')}
                 </Button>
             </ButtonGroup>
         </Dialog>
@@ -182,7 +186,6 @@ export const ExportDatasetConfig = ({
     statistics,
     dialogState,
 }: ExportDatasetConfigProps) => {
-    const { t } = useTranslation();
     return (
         <DialogContainer onDismiss={dialogState.close}>
             {dialogState.isOpen && (

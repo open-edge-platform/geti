@@ -42,7 +42,8 @@
         "multiSelectListFallback": "Multi-select list",
         "importDatasetDialogAria": "import-dataset-dialog",
         "unexpectedError": "An unexpected error occurred. Please try again.",
-        "networkError": "Network error. Please check your connection and try again."
+        "networkError": "Network error. Please check your connection and try again.",
+        "export": "Export"
     },
     "nav": {
         "dataset": "Dataset",
@@ -640,8 +641,8 @@
         "endRangeAria": "End range",
         "trainingSubsetsDistributionAria": "Training subsets distribution",
         "failedToLoadLogsPrefix": "Failed to load logs:",
-        "tilingOffDescription": "Model processes the entire image as a single unit without dividing it into smaller tiles. This approach is straightforward but may struggle with detecting small objects in high-resolution images, as the model might miss finer details.",
-        "tilingAutoDescription": "The system will automatically set the parameters based on the image resolution and annotation size.",
+        "tilingOffDescription": "Model processes the entire image as a single unit without dividing it into smaller tiles. This approach is straightforward but may struggle with detecting small objects in high-resolution images, as the model might miss finer details",
+        "tilingAutoDescription": "It means that the system will automatically set the parameters based on the image resolution and annotations size.",
         "metricTop1Acc": "Top-1 Acc on ImageNet",
         "modelDownloadStartedToast": "Model download started",
         "searchModelsPlaceholder": "Search models...",
@@ -714,7 +715,8 @@
         "ultralyticsLicense": "Follow Ultralytics guidance on license usage",
         "performanceSpeed": "Speed",
         "performanceAccuracy": "Accuracy",
-        "performanceBalance": "Balance"
+        "performanceBalance": "Balance",
+        "totalSizeAriaLabel": "Total size"
     },
     "inference": {
         "inferenceDevice": "Inference device",

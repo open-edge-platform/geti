@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Flex, Text } from '@geti-ui/ui';
-import { useTranslation } from 'react-i18next';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import classes from './status-tag.module.scss';
 

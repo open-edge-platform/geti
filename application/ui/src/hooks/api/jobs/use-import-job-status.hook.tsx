@@ -6,8 +6,8 @@ import { useEffect } from 'react';
 import { $api } from '@/api';
 import { isFunction } from 'lodash-es';
 
-import { i18n } from '../../../i18n';
 import { toast } from '../../../components/toast/toast.component';
+import { i18n } from '../../../i18n';
 import { isNonEmptyString } from '../../../shared/util';
 import { isInvalidJob, isJobDone, isJobFailed } from '../util';
 import { useStreamJobDetail } from './jobs.hook';
@@ -40,7 +40,10 @@ export const useImportJobStatus = ({ jobId, onError, onSuccess }: UseImportJobSt
     useEffect(() => {
         if (isJobFailed(response.data)) {
             isFunction(onError) && onError();
-            toast({ type: 'error', message: i18n.t('dataset.importErrorMessage', { message: response.data?.message }) });
+            toast({
+                type: 'error',
+                message: i18n.t('dataset.importErrorMessage', { message: response.data?.message }),
+            });
         }
     }, [onError, response.data]);
 

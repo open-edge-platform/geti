@@ -42,7 +42,8 @@
         "multiSelectListFallback": "多选列表",
         "importDatasetDialogAria": "导入数据集对话框",
         "unexpectedError": "发生意外错误。请重试。",
-        "networkError": "网络错误。请检查网络连接后重试。"
+        "networkError": "网络错误。请检查网络连接后重试。",
+        "export": "导出"
     },
     "nav": {
         "dataset": "数据集",
@@ -700,7 +701,8 @@
         "ultralyticsLicense": "遵循 Ultralytics 的许可使用指南",
         "performanceSpeed": "速度",
         "performanceAccuracy": "准确率",
-        "performanceBalance": "均衡"
+        "performanceBalance": "均衡",
+        "totalSizeAriaLabel": "总大小"
     },
     "inference": {
         "inferenceDevice": "推理设备",

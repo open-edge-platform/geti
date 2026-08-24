@@ -80,7 +80,9 @@ export const StreamContainer = () => {
                                 height={dimensionValue('size-400')}
                                 aria-disabled={!isPipelineRunning}
                             />
-                            <Text UNSAFE_style={{ paddingRight: dimensionValue('size-100') }}>{t('inference.startStream')}</Text>
+                            <Text UNSAFE_style={{ paddingRight: dimensionValue('size-100') }}>
+                                {t('inference.startStream')}
+                            </Text>
                         </Flex>
                     </Flex>
                 )}

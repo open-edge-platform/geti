@@ -39,7 +39,8 @@ export const SettingsList = ({ source }: SettingsListProps) => {
                     {t('inference.folderPathDetail')}: {source.images_folder_path}
                 </li>
                 <li>
-                    {t('inference.ignoreExistingLabel')}: {source.ignore_existing_images ? t('common.yes') : t('common.no')}
+                    {t('inference.ignoreExistingLabel')}:{' '}
+                    {source.ignore_existing_images ? t('common.yes') : t('common.no')}
                 </li>
             </ul>
         );

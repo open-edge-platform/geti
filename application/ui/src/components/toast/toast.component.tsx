@@ -188,7 +188,5 @@ export const toast = ({
 };
 
 export const Toast = () => {
-    const { t } = useTranslation();
-
     return <Toaster position='bottom-center' className={classes.toaster} />;
 };
