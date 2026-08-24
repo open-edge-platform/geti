@@ -3,7 +3,8 @@
 
 import { useState } from 'react';
 
-import { Button } from '@geti-ui/ui';
+import { ActionButton } from '@geti-ui/ui';
+import { Tag } from '@geti-ui/ui/icons';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 
@@ -22,9 +23,9 @@ export const AssignLabel = ({ selectedImagesIds }: AssignLabelProps) => {
     if (isClassification && !isEmpty(selectedImagesIds)) {
         return (
             <>
-                <Button margin={0} variant={'secondary'} onPress={() => setIsVisible(true)}>
-                    Assign label
-                </Button>
+                <ActionButton margin={0} isQuiet onPress={() => setIsVisible(true)} aria-label={'Assign label'}>
+                    <Tag />
+                </ActionButton>
                 <BulkSelectedMediaLabelsAssignmentDialog
                     isVisible={isVisible}
                     selectedImagesIds={selectedImagesIds}
