@@ -33,7 +33,7 @@ from app.api.schemas.media import (
     MediaWithPagination,
     SetMediaAnnotations,
 )
-from app.api.validators import MediaID, normalize_datetime_to_utc, ProjectID
+from app.api.validators import MediaID, ProjectID, normalize_datetime_to_utc
 from app.core.models import Pagination
 from app.models import BatchInferenceResult, DatasetItemAnnotationStatus, DatasetItemSubset, Media, Project, Video
 from app.models.media import (
@@ -50,8 +50,8 @@ from app.services import (
     DatasetViewService,
     MediaPredictionService,
     MediaService,
-    SystemService,
     ProjectService,
+    SystemService,
 )
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
@@ -450,8 +450,7 @@ def get_media_thumbnail(
         thumbnail_path = media_service.get_media_thumbnail_path_by_id(project_id=project_id, media_id=video_frame.id)
         if os.path.exists(thumbnail_path):
             return _response(thumbnail_path)
-        else:
-            raise _not_found()
+        raise _not_found()
 
     # If the media is a video frame, generate the thumbnail on the fly
     frame_thumbnail = media_service.get_frame_thumbnail(project=project, video=media, frame_index=frame_index)

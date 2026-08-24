@@ -54,9 +54,9 @@ from app.services import (
     DatasetViewService,
     MediaPredictionService,
     MediaService,
+    ProjectService,
     ResourceNotFoundError,
     ResourceType,
-    ProjectService,
 )
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
 from app.services.inference import InferenceBusyError
