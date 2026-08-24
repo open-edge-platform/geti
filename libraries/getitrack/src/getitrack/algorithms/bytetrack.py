@@ -12,7 +12,6 @@ Every Detection Box" (ECCV 2022).
 
 from __future__ import annotations
 
-from dataclasses import replace
 from typing import TYPE_CHECKING, ClassVar
 
 import numpy as np
@@ -290,15 +289,41 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
     def _compose_output(self, frame_id: int) -> TrackedDetections:
         # Output is ACTIVE tracks only; LOST tracks coast internally.
         active = [t for t in self._tracks.values() if t.state == TrackState.ACTIVE]
-        if not active:
-            empty = TrackedDetections.create_empty(frame_id=frame_id)
-            return replace(empty, det_indices=np.empty((0,), dtype=np.int64))
-        return TrackedDetections(
-            bboxes=np.stack([t.bbox for t in active], axis=0).astype(np.float32),
-            scores=np.array([t.score for t in active], dtype=np.float32),
-            class_ids=np.array([t.class_id for t in active], dtype=np.int64),
-            track_ids=np.array([t.track_id for t in active], dtype=np.int64),
-            track_states=np.array([int(t.state) for t in active], dtype=np.int8),
-            frame_id=frame_id,
-            det_indices=np.array([self._frame_det_index.get(t.track_id, -1) for t in active], dtype=np.int64),
-        )
+        det_indices = [self._frame_det_index.get(t.track_id, -1) for t in active]
+        return self._compose_tracked_detections(active, det_indices, frame_id)
+
+    @property
+    def tracks(self) -> list[Track]:
+        """Return the tracker's current tracks across all lifecycle states.
+
+        Exposes the live `Track` objects (TENTATIVE, ACTIVE, and LOST) held by
+        the tracker, in insertion order. REMOVED tracks are already pruned, so
+        they never appear. This is a cheap view for debugging and tests; the
+        returned list is a fresh copy but the `Track` objects are shared, so
+        mutating them mutates tracker state.
+        """
+        return list(self._tracks.values())
+
+    def tracked_objects(self) -> TrackedDetections:
+        """Return the confirmed-alive tracks for the current frame.
+
+        Unlike `update`, which returns ACTIVE tracks only, this also includes
+        coasted LOST tracks that are still within ``max_age``. LOST tracks
+        carry their Kalman-predicted box for this frame (set during the frame's
+        predict step) with ``det_index`` -1, since they have no detection this
+        frame; their score and class are the last observed values. ACTIVE rows
+        are identical to the `update` output, detection box and all. TENTATIVE
+        tracks (not yet confirmed) and REMOVED tracks are excluded. As in
+        `update`, ``det_indices`` index into the unfiltered detections of the
+        last processed frame even when a ``class_filter`` is set.
+
+        Returns:
+            A `TrackedDetections` for the last processed frame, or an empty one
+            (with an empty int64 ``det_indices``) if no frame has run yet.
+        """
+        frame_id = self._frame_id if self._frame_id is not None else 0
+        alive = [t for t in self._tracks.values() if t.state in {TrackState.ACTIVE, TrackState.LOST}]
+        # _frame_det_index holds filtered-space rows; remap to unfiltered input
+        # rows so det_indices match update()'s contract when a class_filter is set.
+        det_indices = [self._frame_det_index.get(t.track_id, -1) for t in alive]
+        return self._remap_to_input_rows(self._compose_tracked_detections(alive, det_indices, frame_id))
