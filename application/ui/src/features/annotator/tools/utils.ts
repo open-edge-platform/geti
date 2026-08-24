@@ -105,7 +105,7 @@ export const getBoundingBoxResizePoints = ({ boundingBox, gap, onResized }: getB
                 });
             },
             cursor: 'nw-resize',
-            label: 'North west resize anchor',
+            labelKey: 'annotator.anchorNw',
         },
         {
             x: boundingBox.x + boundingBox.width / 2,
@@ -120,7 +120,7 @@ export const getBoundingBoxResizePoints = ({ boundingBox, gap, onResized }: getB
                 });
             },
             cursor: 'n-resize',
-            label: 'North resize anchor',
+            labelKey: 'annotator.anchorN',
         },
         {
             x: boundingBox.x + boundingBox.width,
@@ -136,7 +136,7 @@ export const getBoundingBoxResizePoints = ({ boundingBox, gap, onResized }: getB
                 });
             },
             cursor: 'ne-resize',
-            label: 'North east resize anchor',
+            labelKey: 'annotator.anchorNe',
         },
         {
             x: boundingBox.x + boundingBox.width,
@@ -145,7 +145,7 @@ export const getBoundingBoxResizePoints = ({ boundingBox, gap, onResized }: getB
                 onResized({ ...boundingBox, width: Math.max(gap, x - boundingBox.x) });
             },
             cursor: 'e-resize',
-            label: 'East resize anchor',
+            labelKey: 'annotator.anchorE',
         },
         {
             x: boundingBox.x + boundingBox.width,
@@ -160,7 +160,7 @@ export const getBoundingBoxResizePoints = ({ boundingBox, gap, onResized }: getB
                 });
             },
             cursor: 'se-resize',
-            label: 'South east resize anchor',
+            labelKey: 'annotator.anchorSe',
         },
         {
             x: boundingBox.x + boundingBox.width / 2,
@@ -173,7 +173,7 @@ export const getBoundingBoxResizePoints = ({ boundingBox, gap, onResized }: getB
                 });
             },
             cursor: 's-resize',
-            label: 'South resize anchor',
+            labelKey: 'annotator.anchorS',
         },
         {
             x: boundingBox.x,
@@ -190,7 +190,7 @@ export const getBoundingBoxResizePoints = ({ boundingBox, gap, onResized }: getB
                 });
             },
             cursor: 'sw-resize',
-            label: 'South west resize anchor',
+            labelKey: 'annotator.anchorSw',
         },
         {
             x: boundingBox.x,
@@ -205,7 +205,7 @@ export const getBoundingBoxResizePoints = ({ boundingBox, gap, onResized }: getB
                 });
             },
             cursor: 'w-resize',
-            label: 'West resize anchor',
+            labelKey: 'annotator.anchorW',
         },
     ];
 };

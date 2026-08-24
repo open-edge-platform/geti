@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import { ActionButton, Flex, SearchField, TextFieldRef } from '@geti-ui/ui';
 import { Search } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import classes from './expandable-search.module.scss';
 
@@ -20,6 +21,8 @@ const focusInputRef = (ref: TextFieldRef<HTMLInputElement> | null) => {
 };
 
 export const ExpandableSearch = ({ value, onChange }: ExpandableSearchProps) => {
+    const { t } = useTranslation();
+
     const [isExpanded, setIsExpanded] = useState(false);
 
     const handleToggle = () => {
@@ -44,13 +47,13 @@ export const ExpandableSearch = ({ value, onChange }: ExpandableSearchProps) => 
                     ref={focusInputRef}
                     onChange={onChange}
                     onBlur={handleBlur}
-                    placeholder={'Search models...'}
-                    aria-label={'Search models'}
+                    placeholder={t('models.searchModelsPlaceholder')}
+                    aria-label={t('models.searchModelsAria')}
                     UNSAFE_className={classes.searchField}
                     width={'size-2400'}
                 />
             ) : (
-                <ActionButton isQuiet onPress={handleToggle} aria-label={'Search models'}>
+                <ActionButton isQuiet onPress={handleToggle} aria-label={t('models.searchModelsAria')}>
                     <Search />
                 </ActionButton>
             )}

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Flex, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 import { clsx } from 'clsx';
 
 import classes from './status-tag.module.scss';
@@ -12,11 +13,12 @@ interface StatusTagProps {
 }
 
 export const StatusTag = ({ isConnected = false, isError = false }: StatusTagProps) => {
+    const { t } = useTranslation();
     if (isError) {
         return (
             <Flex gap={'size-75'} alignItems={'center'} UNSAFE_className={classes.container}>
                 <div className={classes.status}></div>
-                <Text>Error</Text>
+                <Text>{t('dataset.errorLabel')}</Text>
             </Flex>
         );
     }

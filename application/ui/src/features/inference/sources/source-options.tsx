@@ -33,7 +33,7 @@ export const SourceOptions = ({ onSaved, hasHeader, children, existingNames = []
                 defaultActiveInput={null}
                 items={[
                     {
-                        label: 'USB Camera',
+                        labelKey: 'inference.sourceUsbCamera',
                         value: 'usb_camera',
                         icon: <WebcamIcon width={'24px'} />,
                         content: (
@@ -46,7 +46,7 @@ export const SourceOptions = ({ onSaved, hasHeader, children, existingNames = []
                         ),
                     },
                     {
-                        label: 'IP Camera',
+                        labelKey: 'inference.sourceIpCamera',
                         value: 'ip_camera',
                         icon: <IpCameraIcon width={'24px'} />,
                         content: (
@@ -76,7 +76,7 @@ export const SourceOptions = ({ onSaved, hasHeader, children, existingNames = []
                     //     ),
                     // },
                     {
-                        label: 'Video file',
+                        labelKey: 'inference.sourceVideoFile',
                         value: 'video_file',
                         icon: <Video width={'24px'} />,
 

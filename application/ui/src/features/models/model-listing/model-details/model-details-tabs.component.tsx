@@ -59,7 +59,7 @@ export const ModelDetailsTabs = ({ modelId }: ModelDetailsTabsProps) => {
             <Tabs
                 flex={1}
                 minHeight={0}
-                aria-label={'Model details'}
+                aria-label={t('models.detailsTabsAriaLabel')}
                 UNSAFE_style={{
                     backgroundColor: 'var(--spectrum-global-color-gray-75)',
                     padding: 'var(--spectrum-global-dimension-size-400)',

@@ -7,6 +7,7 @@ import { ActionButton, Divider, Flex, Heading, Text, View } from '@geti-ui/ui';
 import { AcceptCircle, Alert, CloseSmall, CrossCircle, Info } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 import { toast as soonerToast, Toaster, ToastT } from 'sonner';
 
 import classes from './toast.module.scss';
@@ -43,11 +44,13 @@ const ICON: Record<ToastType, ReactNode> = {
 };
 
 const ToastCloseButton = ({ id }: { id: string }) => {
+    const { t } = useTranslation();
+
     return (
         <ActionButton
             isQuiet
             onPress={() => soonerToast.dismiss(id)}
-            aria-label={'Close toast'}
+            aria-label={t('common.closeToastAria')}
             UNSAFE_className={classes.closeButton}
         >
             <CloseSmall className={classes.icon} />

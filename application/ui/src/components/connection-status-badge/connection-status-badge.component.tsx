@@ -7,6 +7,8 @@ import { Flex, Loading, Text } from '@geti-ui/ui';
 import { Checkmark, CloseSmall } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 
+import { i18n } from '../../i18n';
+
 import classes from './connection-status-badge.module.scss';
 
 type ConnectionStatusBadgeProps = {
@@ -36,7 +38,7 @@ export const ConnectionStatusBadge = ({
         : isInUse
           ? {
                 icon: <Checkmark size='S' UNSAFE_className={classes.inUseIcon} />,
-                label: 'In use',
+                label: i18n.t('common.inUse'),
                 isInUseContainer: true,
             }
           : isUnreachable

@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction } from 'react';
 
 import type { ConfigurableParameterGroup, TrainingConfiguration } from '@/api/types';
 import { Grid, minmax } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { Accordion } from '../../components/accordion/accordion.component';
 import { deepReplaceParameters } from '../../utils';
@@ -32,6 +33,8 @@ const changeFilterParameters = (
 });
 
 export const Filters = ({ filtersParameters, onTrainingConfigurationChange }: FiltersProps) => {
+    const { t } = useTranslation();
+
     const handleFilterChange = (key: string, newParameters: FilterConfigurableParameters) => {
         onTrainingConfigurationChange((config) => {
             if (config === undefined) return;
@@ -47,7 +50,10 @@ export const Filters = ({ filtersParameters, onTrainingConfigurationChange }: Fi
     return (
         <Accordion>
             <Accordion.Title>
-                Filters <Accordion.Tag ariaLabel={'Filters tag'}>{areFiltersEnabled ? 'On' : 'Off'}</Accordion.Tag>
+                Filters{' '}
+                <Accordion.Tag ariaLabel={t('models.filtersTagAria')}>
+                    {areFiltersEnabled ? t('models.filtersOn') : t('models.filtersOff')}
+                </Accordion.Tag>
             </Accordion.Title>
             <Accordion.Content>
                 <Accordion.Description>{filtersParameters.description}</Accordion.Description>

@@ -10,7 +10,7 @@ import styles from './sort-model-architectures.module.scss';
 
 type SortItemType = {
     key: string;
-    name: string;
+    nameKey: string;
 };
 
 type SortWidgetProps = {
@@ -23,12 +23,14 @@ type SortWidgetProps = {
 type SortItemProps = {
     item: {
         key: string;
-        name: string;
+        nameKey: string;
     };
 };
 
 const SortModelArchitectureItem = ({ item }: SortItemProps) => {
-    return <Text>{item.name}</Text>;
+    const { t } = useTranslation();
+
+    return <Text>{t(item.nameKey)}</Text>;
 };
 
 export const SortModelArchitectures = ({ sortBy, onSort, items, ariaLabel }: SortWidgetProps) => {
@@ -50,7 +52,7 @@ export const SortModelArchitectures = ({ sortBy, onSort, items, ariaLabel }: Sor
                 return (
                     <Section key={`${item[0].key}-${item[1].key}`}>
                         {item.map((option) => (
-                            <Item key={option.key} textValue={option.name}>
+                            <Item key={option.key} textValue={t(option.nameKey)}>
                                 <SortModelArchitectureItem item={option} />
                             </Item>
                         ))}

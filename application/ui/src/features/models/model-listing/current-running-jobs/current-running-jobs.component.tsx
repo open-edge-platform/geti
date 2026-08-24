@@ -7,6 +7,7 @@ import { useCancelJob, useGetCurrentRunningJobs } from 'hooks/api/jobs/jobs.hook
 import { isJobFailed } from 'hooks/api/util';
 import { useDismissedJobs } from 'hooks/storage/use-dismissed-jobs.hook';
 import { isEmpty, isNil } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { useGetTaskModelArchitectures } from '../../hooks/api/use-get-model-architectures.hook';
 import { GroupByMode } from '../types';
@@ -20,6 +21,8 @@ type CurrentRunningJobsProps = {
 };
 
 export const CurrentRunningJobs = ({ groupBy, datasetRevisions }: CurrentRunningJobsProps) => {
+    const { t } = useTranslation();
+
     const cancelJobMutation = useCancelJob();
     const activeRunningJobs = useGetCurrentRunningJobs();
     const { modelArchitectures } = useGetTaskModelArchitectures();
@@ -49,7 +52,7 @@ export const CurrentRunningJobs = ({ groupBy, datasetRevisions }: CurrentRunning
             <View backgroundColor={'gray-75'}>
                 <RunningJobTableHeader groupBy={groupBy} />
 
-                <div aria-label={'Current jobs'}>
+                <div aria-label={t('models.currentJobsAria')}>
                     {activeRunningJobs.map((job) =>
                         isJobFailed(job) ? (
                             <FailedJobRow

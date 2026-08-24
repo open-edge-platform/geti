@@ -27,7 +27,7 @@ interface MultiSelectListProps<T extends string = string> extends Omit<
 export const MultiSelectList = <T extends string = string>({
     name,
     label,
-    selectAllLabel = 'Select all',
+    selectAllLabel,
     items,
     onSelectionChange,
     defaultSelectedKeys,

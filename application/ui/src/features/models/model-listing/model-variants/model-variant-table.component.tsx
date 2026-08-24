@@ -106,7 +106,7 @@ export const ModelVariantTable = ({ model, format }: ModelVariantTableProps) => 
         downloadFile(
             getModelVariantBinaryUrl(projectId, model.id, variant.id),
             getModelVariantBinaryFilename(model.id, variant),
-            'Model download started'
+            t('models.modelDownloadStartedToast')
         );
     };
 

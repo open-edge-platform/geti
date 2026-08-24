@@ -36,7 +36,9 @@ const MoreOptions = ({ showFailedModels, onToggleShowFailedModels }: MoreOptions
                 <MoreMenu />
             </ActionButton>
             <Menu onAction={handleOptionsAction} aria-label={t('models.listingOptionsMenuAriaLabel')}>
-                <Item key={'show-failed'}>{showFailedModels ? 'Hide failed models' : 'Show failed models'}</Item>
+                <Item key={'show-failed'}>
+                    {showFailedModels ? t('models.hideFailedModels') : t('models.showFailedModels')}
+                </Item>
             </Menu>
         </MenuTrigger>
     );
@@ -91,7 +93,7 @@ export const Header = () => {
                     )}
                     <Item key='device'>{t('models.sortDevice')}</Item>
                     <Item key='size'>{t('models.sortSize')}</Item>
-                    <Item key='score'>{`Sort: ${performanceMetricName}`}</Item>
+                    <Item key='score'>{t('models.sortByMetricTemplate', { metric: t(performanceMetricName) })}</Item>
                 </Picker>
             </Flex>
 

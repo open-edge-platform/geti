@@ -136,7 +136,7 @@ export const DataCollection = () => {
                         }}
                         isDisabled={!ratePolicy?.enabled || isUpdating}
                     />
-                    <Text>every</Text>
+                    <Text>{t('inference.every')}</Text>
                     <NumberField
                         label={t('inference.secondsLabel')}
                         minValue={1}

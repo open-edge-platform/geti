@@ -5,6 +5,8 @@ import type { PipelineComponentsHealth, PipelineStatus } from '@/api/types';
 import type { StatusLightProps } from '@geti-ui/ui';
 import { capitalize } from 'lodash-es';
 
+import { i18n } from '../../../i18n';
+
 export type StatusVariant = StatusLightProps['variant'];
 
 export type ComponentStatusMeta = {
@@ -21,11 +23,11 @@ export type StatusMeta = {
 export const getOverallStatusMeta = (status: string): StatusMeta => {
     switch (status) {
         case 'running':
-            return { label: 'Running', variant: 'positive' };
+            return { label: i18n.t('inference.statusRunning'), variant: 'positive' };
         case 'idle':
-            return { label: 'Idle', variant: 'neutral' };
+            return { label: i18n.t('inference.statusIdle'), variant: 'neutral' };
         case 'error':
-            return { label: 'Problems detected', variant: 'negative' };
+            return { label: i18n.t('inference.statusProblemsDetected'), variant: 'negative' };
         default:
             return { label: capitalize(status), variant: 'neutral' };
     }
@@ -34,13 +36,13 @@ export const getOverallStatusMeta = (status: string): StatusMeta => {
 export const getComponentStatusMeta = (component: PipelineStatus): ComponentStatusMeta => {
     switch (component.status) {
         case 'ok':
-            return { label: 'Healthy', variant: 'positive', message: component.message };
+            return { label: i18n.t('inference.statusHealthy'), variant: 'positive', message: component.message };
         case 'finished':
-            return { label: 'Finished', variant: 'info', message: component.message };
+            return { label: i18n.t('inference.statusFinished'), variant: 'info', message: component.message };
         case 'unavailable':
-            return { label: 'Unavailable', variant: 'neutral', message: component.message };
+            return { label: i18n.t('inference.statusUnavailable'), variant: 'neutral', message: component.message };
         case 'error':
-            return { label: 'Error', variant: 'negative', message: component.message };
+            return { label: i18n.t('inference.statusError'), variant: 'negative', message: component.message };
         default:
             return { label: capitalize(component.status), variant: 'neutral', message: component.message };
     }

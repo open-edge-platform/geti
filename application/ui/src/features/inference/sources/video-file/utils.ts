@@ -4,11 +4,12 @@
 import { fetchClient } from '@/api';
 import type { VideoFileSourceConfig } from '@/api/types';
 
+import { i18n } from '../../../../i18n';
 import { getUniqueName } from '../utils';
 
 export const getVideoFileInitialConfig = (existingNames: string[] = []): VideoFileSourceConfig => ({
     id: '',
-    name: getUniqueName('Video file source', existingNames),
+    name: getUniqueName(i18n.t('inference.videoFileSourceDefault'), existingNames),
     source_type: 'video_file',
     video_path: '',
     loop: false,
@@ -24,7 +25,7 @@ const uploadVideoFile = async (file: File): Promise<string> => {
     });
 
     if (error !== undefined || data === undefined) {
-        throw error ?? new Error('Video upload failed');
+        throw error ?? new Error(i18n.t('inference.uploadVideoFailed'));
     }
 
     return data.video_path;

@@ -50,7 +50,7 @@ export const ImportFailedJob = ({
     const { t } = useTranslation();
     const deleteFileMutation = useDeleteStagedDataset({ stagedDatasetId, deleteEntry });
 
-    const errorMessage = isNonEmptyString(message) ? message : 'An unknown error occurred';
+    const errorMessage = isNonEmptyString(message) ? message : t('common.unknownError');
     const errorDetails = isNonEmptyString(error) ? error : undefined;
 
     return (

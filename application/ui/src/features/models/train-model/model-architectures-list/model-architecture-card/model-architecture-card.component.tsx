@@ -6,6 +6,7 @@ import { createContext, ReactNode, useContext } from 'react';
 import type { ModelArchitecture as ModelArchitectureType, ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { Content, ContextualHelp, Divider, Flex, Heading, Radio, Text } from '@geti-ui/ui';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import { UltralyticsLicense } from '../../../components/ultralytics-license.component';
 import { isUltralyticsModel } from '../../../utils';
@@ -56,6 +57,7 @@ const ModelArchitectureParameters = () => {
 };
 
 const ModelArchitectureDetailedParameters = () => {
+    const { t } = useTranslation();
     const { modelArchitecture } = useModelArchitecture();
     const accuracyMetric = getAccuracyMetric(modelArchitecture);
 
@@ -65,7 +67,7 @@ const ModelArchitectureDetailedParameters = () => {
             <li>Gigaflops: {modelArchitecture.stats.gigaflops}</li>
             {accuracyMetric !== undefined && (
                 <li>
-                    {accuracyMetric.label}: {accuracyMetric.value}%
+                    {t(accuracyMetric.label)}: {accuracyMetric.value}%
                 </li>
             )}
             <License />

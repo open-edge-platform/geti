@@ -13,7 +13,7 @@ import classes from './date-filter.module.scss';
 
 const MIN_DATE = parseAbsoluteToLocal(dayjs('2020-01-30').startOf('d').toISOString());
 
-export const INVALID_RANGE_MESSAGE = 'End date must be later than start date';
+export const INVALID_RANGE_MESSAGE = 'dataset.invalidRangeMessage';
 
 const parseDate = (date: string | null): ZonedDateTime | null => (date === null ? null : parseAbsoluteToLocal(date));
 
@@ -84,7 +84,7 @@ export const DateFilter = () => {
                     value={endValue}
                     onChange={handleEndDateChange}
                     validationState={invalidRange === null ? undefined : 'invalid'}
-                    errorMessage={INVALID_RANGE_MESSAGE}
+                    errorMessage={t(INVALID_RANGE_MESSAGE)}
                 />
             </Flex>
         </Flex>

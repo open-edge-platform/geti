@@ -74,7 +74,7 @@ export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {}
                             value={pair.key}
                             aria-label={keysName}
                             placeholder='key'
-                            errorMessage='Key cannot be empty'
+                            errorMessage={t('inference.keyEmptyError')}
                             onChange={(val) => updatePair(index, Fields.KEY, val)}
                         />
                         <RequiredTextField
@@ -84,7 +84,7 @@ export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {}
                             value={pair.value}
                             aria-label={valuesName}
                             placeholder='value'
-                            errorMessage='Value cannot be empty'
+                            errorMessage={t('inference.valueEmptyError')}
                             isDisabled={isEmpty(pair.key)}
                             onChange={(val) => updatePair(index, Fields.VALUE, val)}
                         />

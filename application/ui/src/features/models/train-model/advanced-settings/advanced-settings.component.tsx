@@ -38,7 +38,7 @@ export const AdvancedSettings = () => {
 
     const TABS: TabProps[] = [
         {
-            name: 'Data management',
+            name: t('models.dataManagementTab'),
             children: (
                 <DataManagement
                     containerRef={unwrappedContainerRef}

@@ -6,10 +6,11 @@ import { ReactNode, useState } from 'react';
 import { Disclosure, DisclosurePanel, DisclosureTitle, Flex, Text } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 import { isFunction } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import styles from './disclosure-group.module.scss';
 
-type DisclosureItem = { value: string; label: string; icon: ReactNode; content?: ReactNode };
+type DisclosureItem = { value: string; labelKey: string; icon: ReactNode; content?: ReactNode };
 
 type DisclosureItemProps = {
     value: string | null;
@@ -23,6 +24,7 @@ interface DisclosureGroupProps {
 }
 
 const DisclosureItem = ({ item, value, onChange }: DisclosureItemProps) => {
+    const { t } = useTranslation();
     const isExpanded = item.value === value;
 
     const handleExpandedChange = () => {
@@ -32,7 +34,7 @@ const DisclosureItem = ({ item, value, onChange }: DisclosureItemProps) => {
     return (
         <Disclosure
             isQuiet
-            key={item.label}
+            key={item.labelKey}
             isExpanded={isExpanded}
             UNSAFE_className={clsx(styles.disclosure, { [styles.selected]: isExpanded })}
             onExpandedChange={handleExpandedChange}
@@ -41,7 +43,7 @@ const DisclosureItem = ({ item, value, onChange }: DisclosureItemProps) => {
                 <Flex alignItems={'center'} justifyContent={'space-between'} width={'100%'}>
                     <Flex marginStart={'size-50'} alignItems={'center'} gap={'size-100'}>
                         {item.icon}
-                        <Text UNSAFE_className={styles.disclosureTitle}>{item.label}</Text>
+                        <Text UNSAFE_className={styles.disclosureTitle}>{t(item.labelKey)}</Text>
                     </Flex>
                 </Flex>
             </DisclosureTitle>
@@ -60,7 +62,7 @@ export const DisclosureGroup = ({ items, defaultActiveInput }: DisclosureGroupPr
     return (
         <Flex width={'100%'} direction={'column'} gap={'size-100'}>
             {items.map((item) => (
-                <DisclosureItem item={item} key={item.label} onChange={handleActiveInputChange} value={activeInput} />
+                <DisclosureItem item={item} key={item.labelKey} onChange={handleActiveInputChange} value={activeInput} />
             ))}
         </Flex>
     );

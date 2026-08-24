@@ -25,7 +25,7 @@ export const DeleteStagedFileConfirmation = ({ stagedDatasetId, deleteEntry }: D
                 Delete
             </Button>
             <AlertDialog
-                title='Delete Staged File'
+                title={t('dataset.deleteStagedFileTitle')}
                 variant='destructive'
                 cancelLabel='Cancel'
                 autoFocusButton='primary'

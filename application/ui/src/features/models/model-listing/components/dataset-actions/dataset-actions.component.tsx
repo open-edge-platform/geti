@@ -68,10 +68,10 @@ export const DatasetActions = ({ dataset }: DatasetActionsProps) => {
     return (
         <>
             <MenuTrigger>
-                <ActionButton isQuiet aria-label={'Dataset actions'}>
+                <ActionButton isQuiet aria-label={t('models.datasetActionsAria')}>
                     <MoreMenu />
                 </ActionButton>
-                <Menu onAction={handleDatasetMenuAction} aria-label={'Dataset actions menu'}>
+                <Menu onAction={handleDatasetMenuAction} aria-label={t('models.datasetActionsMenuAria')}>
                     <Item key={'rename'}>{t('models.renameItem')}</Item>
                     <Item key={'delete'}>{t('common.delete')}</Item>
                     <Item key={'export'}>{t('models.exportItem')}</Item>

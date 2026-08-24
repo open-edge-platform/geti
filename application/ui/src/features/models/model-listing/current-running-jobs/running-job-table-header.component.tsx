@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { dimensionValue, Grid } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { ColumnHeader } from '../components/column-header.component';
 import { GroupByMode } from '../types';
@@ -13,6 +14,8 @@ type RunningJobTableHeaderProps = {
 };
 
 export const RunningJobTableHeader = ({ groupBy }: RunningJobTableHeaderProps) => {
+    const { t } = useTranslation();
+
     return (
         <Grid
             columns={RUNNING_JOB_GRID_COLUMNS}
@@ -25,7 +28,7 @@ export const RunningJobTableHeader = ({ groupBy }: RunningJobTableHeaderProps) =
                     ${dimensionValue('size-150')} ${dimensionValue('size-1000')}`,
             }}
         >
-            <ColumnHeader label={'Model Name'} />
+            <ColumnHeader label={t('models.runningJobsModelNameColumn')} />
             <ColumnHeader label={groupBy === 'architecture' ? 'Dataset' : 'Architecture'} />
             <div />
         </Grid>

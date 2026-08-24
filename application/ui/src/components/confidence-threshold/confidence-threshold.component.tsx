@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 
 import { ActionButton, Flex, NumberField, Slider, View } from '@geti-ui/ui';
 import { Refresh } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 const THRESHOLD_CONFIG = {
     defaultValue: 0.3,
@@ -71,6 +72,8 @@ type ConfidenceThresholdProps = {
 };
 
 export const ConfidenceThreshold = ({ isDisabled = false, maxWidth, width = '100%' }: ConfidenceThresholdProps) => {
+    const { t } = useTranslation();
+
     // TODO: Default confidence threshold value will come from the server side
     const defaultValue = THRESHOLD_CONFIG.defaultValue;
     const [threshold, setThreshold] = useState<number>(defaultValue);
@@ -80,13 +83,13 @@ export const ConfidenceThreshold = ({ isDisabled = false, maxWidth, width = '100
             <Flex width={'100%'} justifyContent={'space-between'} gap={'size-175'} alignItems={'end'}>
                 <ThresholdField
                     onChange={setThreshold}
-                    name={'Confidence threshold'}
+                    name={t('inference.confidenceThresholdName')}
                     value={threshold}
                     isDisabled={isDisabled}
                 />
                 <ActionButton
                     isQuiet
-                    aria-label={'Reset confidence threshold'}
+                    aria-label={t('inference.resetConfidenceThresholdAria')}
                     onPress={() => setThreshold(defaultValue)}
                     isDisabled={isDisabled}
                 >

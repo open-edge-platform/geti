@@ -30,14 +30,14 @@ export const VideoControls = ({ mode }: VideoControlsProps) => {
             <Flex alignItems={'center'}>
                 <ActionButton
                     isQuiet
-                    aria-label={'Go to previous frame'}
+                    aria-label={t('annotator.goToPreviousFrameAria')}
                     isDisabled={!canSelectPreviousFrame}
                     onPress={previousFrame}
                 >
                     <StepBackward />
                 </ActionButton>
                 {isPlaying ? (
-                    <ActionButton isQuiet aria-label={'Pause video'} onPress={pause}>
+                    <ActionButton isQuiet aria-label={t('annotator.pauseVideoAria')} onPress={pause}>
                         <Pause />
                     </ActionButton>
                 ) : (
@@ -57,7 +57,7 @@ export const VideoControls = ({ mode }: VideoControlsProps) => {
                 )}
                 <ActionButton
                     isQuiet
-                    aria-label={'Go to next frame'}
+                    aria-label={t('annotator.goToNextFrameAria')}
                     isDisabled={!canSelectNextFrame}
                     onPress={nextFrame}
                 >

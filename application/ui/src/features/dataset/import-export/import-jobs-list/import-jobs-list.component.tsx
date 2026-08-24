@@ -6,6 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useImportDatasetToProject } from 'hooks/storage/use-import-dataset-to-project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty, partition } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { StagedImportDataset } from '../../../../components/import-card-status/staged-import-dataset/staged-import-dataset.component';
 import { LoadingImportDataset } from '../../../../components/loading-import-dataset/loading-import-dataset.component';
@@ -14,6 +15,7 @@ import { getQueryKey } from '../../../../query-client/query-client';
 import { useImportDatasetDialogState } from '../../providers/export-import-dataset-dialog-provider.component';
 
 export const ImportJobsList = () => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const projectId = useProjectIdentifier();
     const { datasetImportDialogState, setCurrentStep, setCurrentStagedId } = useImportDatasetDialogState();
@@ -75,7 +77,7 @@ export const ImportJobsList = () => {
                 <StagedImportDataset
                     key={`staged-${stagedDatasetId}`}
                     fileName={fileName}
-                    message={'Map labels for the uploaded dataset'}
+                    message={t('dataset.mapLabelsMessage')}
                     stagedDatasetId={stagedDatasetId}
                     primaryButtonLabel={'Continue'}
                     onOpen={() => handleOpen(stagedDatasetId)}

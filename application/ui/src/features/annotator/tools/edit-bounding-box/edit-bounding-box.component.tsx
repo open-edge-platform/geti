@@ -3,6 +3,8 @@
 
 import { useState } from 'react';
 
+import { useTranslation } from 'react-i18next';
+
 import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
 import { ANCHOR_SIZE, ResizeAnchor } from '../../../../shared/annotator/resize-anchor.component';
 import type { Annotation, Point } from '../../../../shared/types';
@@ -17,6 +19,8 @@ interface EditBoundingBoxProps {
 }
 
 export const EditBoundingBox = ({ annotation, zoom }: EditBoundingBoxProps) => {
+    const { t } = useTranslation();
+
     const [shape, setShape] = useState(annotation.shape);
     const { roi } = useSelectedMediaItem();
     const { updateAnnotations } = useAnnotationActions();
@@ -56,7 +60,15 @@ export const EditBoundingBox = ({ annotation, zoom }: EditBoundingBoxProps) => {
                 id={`edit-bounding-box-points-${annotation.id}`}
             >
                 {anchorPoints.map((anchor) => {
-                    return <ResizeAnchor key={anchor.label} zoom={zoom} onComplete={onComplete} {...anchor} />;
+                    return (
+                        <ResizeAnchor
+                            key={anchor.labelKey}
+                            zoom={zoom}
+                            onComplete={onComplete}
+                            {...anchor}
+                            label={t(anchor.labelKey)}
+                        />
+                    );
                 })}
             </g>
         </>

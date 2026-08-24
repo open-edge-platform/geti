@@ -7,6 +7,7 @@ import type { Media } from '@/api/types';
 import { Loading } from '@geti-ui/ui';
 import { useIsFetching } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { useTranslation } from 'react-i18next';
 import { useSpinDelay } from 'spin-delay';
 
 import { ZoomTransform } from '../../../components/zoom/zoom-transform';
@@ -32,6 +33,8 @@ export const MediaCanvas = ({
     isLoadingOverlay = false,
     children,
 }: MediaCanvasProps) => {
+    const { t } = useTranslation();
+
     const projectId = useProjectIdentifier();
     const localRef = useRef<HTMLDivElement | null>(null);
     const resolvedRef = containerRef ?? localRef;
@@ -65,7 +68,7 @@ export const MediaCanvas = ({
                 <Loading
                     mode={'overlay'}
                     style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-                    aria-label={'Media canvas loading'}
+                    aria-label={t('annotator.mediaCanvasLoadingAria')}
                 />
             )}
         </div>

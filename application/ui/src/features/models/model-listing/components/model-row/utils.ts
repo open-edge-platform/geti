@@ -10,7 +10,7 @@ export const getModelEvaluations = (model: Model): Evaluation[] => {
 };
 
 const getDefaultPerformanceMetricName = (taskType: TaskType | null): string => {
-    return isClassificationTask(taskType) ? 'Accuracy' : 'mAP';
+    return isClassificationTask(taskType) ? 'models.metricAccuracy' : 'models.metricMAP';
 };
 
 const getTestingEvaluation = (evaluations: Evaluation[]): Evaluation | undefined => {

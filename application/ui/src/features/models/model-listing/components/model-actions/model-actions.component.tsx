@@ -93,10 +93,10 @@ export const ModelActions = ({ model }: ModelActionsProps) => {
     return (
         <>
             <MenuTrigger>
-                <ActionButton isQuiet aria-label={'Model actions'}>
+                <ActionButton isQuiet aria-label={t('models.modelActionsAria')}>
                     <MoreMenu />
                 </ActionButton>
-                <Menu onAction={handleAction} aria-label={'Model actions menu'} disabledKeys={disabledKeys}>
+                <Menu onAction={handleAction} aria-label={t('models.modelActionsMenuAria')} disabledKeys={disabledKeys}>
                     <Item key={MODEL_ACTIONS.RENAME}>{t('models.renameItem')}</Item>
                     <Item key={MODEL_ACTIONS.DELETE_WEIGHTS}>{t('models.deleteWeightsItem')}</Item>
                     <Item key={MODEL_ACTIONS.DELETE_MODEL}>{t('models.deleteModelItem')}</Item>

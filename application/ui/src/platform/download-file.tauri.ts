@@ -5,6 +5,7 @@ import { save } from '@tauri-apps/plugin-dialog';
 import { writeFile } from '@tauri-apps/plugin-fs';
 
 import { toast } from '../components/toast/toast.component';
+import { i18n } from '../i18n/config';
 
 export const downloadFile = (url: string, name?: string, startedMessage?: string): void => {
     void saveDownload(url, name, startedMessage);
@@ -35,7 +36,7 @@ const saveDownload = async (url: string, name?: string, startedMessage?: string)
         await writeFile(selectedPath, fileData);
     } catch (error: unknown) {
         console.error('[tauri downloadFile] failed', error);
-        toast({ type: 'error', message: 'Failed to download file' });
+        toast({ type: 'error', message: i18n.t('common.downloadFileFailed') });
     }
 };
 

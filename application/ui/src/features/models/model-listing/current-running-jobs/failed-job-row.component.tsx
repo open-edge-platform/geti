@@ -19,8 +19,10 @@ const FailedStatusBadge = () => {
 };
 
 const DismissFailedJob = ({ onDismiss }: { onDismiss: () => void }) => {
+    const { t } = useTranslation();
+
     return (
-        <Button variant={'negative'} onPress={onDismiss} aria-label={'Dismiss failed job'}>
+        <Button variant={'negative'} onPress={onDismiss} aria-label={t('models.dismissFailedJobAria')}>
             Dismiss
         </Button>
     );

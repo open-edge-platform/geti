@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { ActionButton } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { useEventListener } from '../../../../hooks/event-listener.hook';
 import { ResizeAnchor } from '../../../../shared/annotator/resize-anchor.component';
@@ -13,6 +14,8 @@ import { ResizeAnchorsGhostPoint } from './resize-anchors-ghost-point.component'
 import { EditPointsProps, selectAnchorPointLabel } from './utils';
 
 export const EditPoints = ({ zoom, shape, addPoint, onComplete, moveAnchorTo, removePoints }: EditPointsProps) => {
+    const { t } = useTranslation();
+
     const containerRef = useRef<SVGGElement | null>(null);
     const ref = useRef<SVGRectElement>(null);
 
@@ -84,7 +87,7 @@ export const EditPoints = ({ zoom, shape, addPoint, onComplete, moveAnchorTo, re
                         onClick={(event) => {
                             event.stopPropagation();
                         }}
-                        aria-label={label}
+                        aria-label={t(label)}
                         aria-selected={isSelected}
                         onContextMenu={(event) => {
                             // we don't want event to be caught by annotation context menu

@@ -6,6 +6,7 @@ import { KeyboardEvent, useState } from 'react';
 import { dimensionValue, Flex, Loading, Text, View } from '@geti-ui/ui';
 import { Pause, Play } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 import { toast } from '../../../components/toast/toast.component';
 import { usePipeline } from '../../../hooks/api/pipeline.hook';
@@ -15,6 +16,8 @@ import { useWebRTCConnection } from './web-rtc-connection-provider';
 import classes from './stream.module.scss';
 
 export const StreamContainer = () => {
+    const { t } = useTranslation();
+
     const { start, stop, status, webRTCConnectionRef } = useWebRTCConnection();
     const { data: pipeline } = usePipeline();
 
@@ -37,7 +40,7 @@ export const StreamContainer = () => {
             await start();
 
             if (webRTCConnectionRef.current?.getStatus() === 'failed') {
-                toast({ type: 'error', message: 'Failed to connect to the stream' });
+                toast({ type: 'error', message: t('inference.streamConnectFailed') });
             }
         }
     };
@@ -57,9 +60,9 @@ export const StreamContainer = () => {
                 onKeyDown={isInteractive ? handleKeyDown : undefined}
                 role={isInteractive ? 'button' : undefined}
                 tabIndex={isInteractive ? 0 : -1}
-                aria-label={isConnected ? 'Stop stream' : 'Start stream'}
+                aria-label={isConnected ? t('inference.stopStreamAria') : t('inference.startStreamAria')}
                 aria-disabled={!isPipelineRunning}
-                title={isStopped && !isPipelineRunning ? 'Enable pipeline to start stream' : undefined}
+                title={isStopped && !isPipelineRunning ? t('inference.enablePipelineToStart') : undefined}
                 style={{ cursor: isInteractive ? 'pointer' : 'default' }}
             >
                 {isStopped && (
@@ -101,7 +104,7 @@ export const StreamContainer = () => {
                                     color={'currentColor'}
                                     width={dimensionValue('size-400')}
                                     height={dimensionValue('size-400')}
-                                    aria-label={'Stream stopped'}
+                                    aria-label={t('inference.streamStoppedAria')}
                                 />
                             </Flex>
                         </Flex>

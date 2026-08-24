@@ -31,7 +31,7 @@ export const SinkOptions = ({ hasHeader, onSaved, children }: SinkOptionsProps) 
                 defaultActiveInput={null}
                 items={[
                     {
-                        label: 'Folder',
+                        labelKey: 'inference.sinkFolderOption',
                         value: 'folder',
                         icon: <FolderIcon width={'24px'} />,
                         content: (
@@ -44,7 +44,7 @@ export const SinkOptions = ({ hasHeader, onSaved, children }: SinkOptionsProps) 
                         ),
                     },
                     {
-                        label: 'Webhook',
+                        labelKey: 'inference.sinkWebhookOption',
                         value: 'webhook',
                         icon: <WebhookIcon width={'24px'} />,
                         content: (
@@ -57,7 +57,7 @@ export const SinkOptions = ({ hasHeader, onSaved, children }: SinkOptionsProps) 
                         ),
                     },
                     {
-                        label: 'MQTT',
+                        labelKey: 'inference.sinkMqttOption',
                         value: 'mqtt',
                         icon: <MqttIcon width={'24px'} />,
                         content: (

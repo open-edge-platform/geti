@@ -102,8 +102,8 @@ export const LabelRow = ({
                 <TextField
                     width={'100%'}
                     value={name}
-                    aria-label={'Label name'}
-                    placeholder={'Label name'}
+                    aria-label={t('annotator.labelNameAria')}
+                    placeholder={t('annotator.labelNamePlaceholder')}
                     onChange={setName}
                     onBlur={handleUpdateName}
                     onKeyDown={onEnter(handleUpdateName)}
@@ -116,7 +116,7 @@ export const LabelRow = ({
                     onHotkeyChange={(newHotkey) => setHotkey(newHotkey ?? '')}
                     onEnter={handleHotkeyChange}
                     onBlur={handleHotkeyChange}
-                    aria-label={'Edited hotkey'}
+                    aria-label={t('annotator.editedHotkeyAria')}
                     errorMessage={hotkeyValidationError}
                 />
             </Flex>

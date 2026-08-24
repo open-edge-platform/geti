@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { MediaVideoFrame } from '@/api/types';
+import { useTranslation } from 'react-i18next';
 
 import { formatDurationText } from './time-utils';
 
@@ -10,6 +11,8 @@ type VideoDurationProps = {
 };
 
 export const VideoDuration = ({ videoFrame }: VideoDurationProps) => {
+    const { t } = useTranslation();
+
     const currentTime = videoFrame.frame_number / videoFrame.fps;
     const endTime = videoFrame.duration;
 
@@ -17,7 +20,7 @@ export const VideoDuration = ({ videoFrame }: VideoDurationProps) => {
     const endFormattedTime = formatDurationText(endTime);
 
     return (
-        <span aria-label={'Video duration'}>
+        <span aria-label={t('annotator.videoDurationAria')}>
             {currentFormattedTime} / {endFormattedTime}
         </span>
     );

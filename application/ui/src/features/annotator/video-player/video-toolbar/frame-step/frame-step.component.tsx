@@ -41,7 +41,7 @@ export const FrameStep = ({ isDisabled, step, onChangeStep, defaultFps }: FrameS
                 isDisabled={isDisabled}
                 onPress={handleFpsToggle}
                 position={'relative'}
-                aria-label={'Toggle frame mode'}
+                aria-label={t('annotator.toggleFrameModeAria')}
             >
                 <Fps />
                 <View

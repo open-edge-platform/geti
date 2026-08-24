@@ -99,8 +99,8 @@ export const NewLabelRow = ({ onSave, onCancel, validateName, validateHotkey }: 
                 <TextField
                     // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
-                    aria-label={'New label name'}
-                    placeholder={'Label name'}
+                    aria-label={t('annotator.newLabelNameAria')}
+                    placeholder={t('annotator.labelNamePlaceholder')}
                     value={name}
                     onChange={setName}
                     onKeyDown={handleNameKeyDown}
@@ -114,14 +114,14 @@ export const NewLabelRow = ({ onSave, onCancel, validateName, validateHotkey }: 
                     hotkey={hotkey}
                     onEnter={handleHotkeyUpdate}
                     onHotkeyChange={handleHotkeyChange}
-                    aria-label={'New label hotkey'}
+                    aria-label={t('annotator.newLabelHotkeyAria')}
                     errorMessage={validateHotkey(hotkey)}
                 />
             </Flex>
 
             <ActionButton
                 isQuiet
-                aria-label={'Create new label'}
+                aria-label={t('annotator.createNewLabelAria')}
                 onPress={handleSave}
                 isDisabled={isCreateButtonDisabled}
             >

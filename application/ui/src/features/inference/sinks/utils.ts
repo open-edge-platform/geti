@@ -3,6 +3,8 @@
 
 import { isEmpty } from 'lodash-es';
 
+import { i18n } from '../../../i18n';
+
 export enum OutputFormat {
     IMAGE_ORIGINAL = 'image_original',
     IMAGE_WITH_PREDICTIONS = 'image_with_predictions',
@@ -52,7 +54,7 @@ export const formatRateLimit = (rateLimit?: number | null): string => {
     const normalizedRateLimit = positiveNumberOrUndefined(rateLimit);
 
     if (normalizedRateLimit === undefined) {
-        return 'Not set';
+        return i18n.t('inference.notSet');
     }
 
     if (normalizedRateLimit < 1) {

@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import { Flex, Grid, Heading, ToggleButton, Tooltip, TooltipTrigger, View } from '@geti-ui/ui';
 import { Gear, GraphChart } from '@geti-ui/ui/icons';
+import { useTranslation } from 'react-i18next';
 
 import { ReactComponent as PipelineIcon } from '../../../assets/icons/pipeline.svg';
 import { DataCollection } from './data-collection.component';
@@ -14,9 +15,9 @@ import { PipelineConfiguration } from './pipeline-configuration.component';
 import styles from './sidebar-tabs.module.scss';
 
 const TABS = [
-    { label: 'Pipeline configuration', icon: <PipelineIcon />, content: <PipelineConfiguration /> },
-    { label: 'Data collection policy', icon: <Gear />, content: <DataCollection /> },
-    { label: 'Pipeline metrics', icon: <GraphChart />, content: <Graphs /> },
+    { labelKey: 'inference.pipelineConfigTab', icon: <PipelineIcon />, content: <PipelineConfiguration /> },
+    { labelKey: 'inference.dataCollectionPolicyTab', icon: <Gear />, content: <DataCollection /> },
+    { labelKey: 'inference.pipelineMetricsTab', icon: <GraphChart />, content: <Graphs /> },
 ];
 
 type TabProps = {
@@ -25,12 +26,14 @@ type TabProps = {
 };
 
 const SidebarTabs = ({ tabs, selectedTab }: TabProps) => {
+    const { t } = useTranslation();
+
     const [tab, setTab] = useState<string | null>(selectedTab);
 
     const isExpanded = tab !== null;
     const gridTemplateColumns = isExpanded ? ['clamp(size-4600, 30vw, 40rem)', 'size-600'] : ['0px', 'size-600'];
 
-    const content = tabs.find(({ label }) => label === tab)?.content;
+    const content = tabs.find(({ labelKey }) => labelKey === tab)?.content;
 
     const handleSetTab = (label: string) => {
         setTab((prev) => (prev === label ? null : label));
@@ -65,20 +68,24 @@ const SidebarTabs = ({ tabs, selectedTab }: TabProps) => {
             </View>
             <View gridColumn={'2/3'} backgroundColor={'gray-200'} padding={'size-100'}>
                 <Flex direction={'column'} height={'100%'} alignItems={'center'} gap={'size-100'}>
-                    {tabs.map(({ label, icon }) => (
-                        <TooltipTrigger key={label} placement={'left'}>
-                            <ToggleButton
-                                isQuiet
-                                isSelected={label === tab}
-                                onChange={() => handleSetTab(label)}
-                                UNSAFE_className={styles.toggleButton}
-                                aria-label={`Toggle ${label} tab`}
-                            >
-                                {icon}
-                            </ToggleButton>
-                            <Tooltip>{label}</Tooltip>
-                        </TooltipTrigger>
-                    ))}
+                    {tabs.map(({ labelKey, icon }) => {
+                        const label = t(labelKey);
+
+                        return (
+                            <TooltipTrigger key={labelKey} placement={'left'}>
+                                <ToggleButton
+                                    isQuiet
+                                    isSelected={label === tab}
+                                    onChange={() => handleSetTab(label)}
+                                    UNSAFE_className={styles.toggleButton}
+                                    aria-label={t('inference.toggleTabAria', { label })}
+                                >
+                                    {icon}
+                                </ToggleButton>
+                                <Tooltip>{label}</Tooltip>
+                            </TooltipTrigger>
+                        );
+                    })}
                 </Flex>
             </View>
         </Grid>
@@ -86,5 +93,5 @@ const SidebarTabs = ({ tabs, selectedTab }: TabProps) => {
 };
 
 export const Sidebar = () => {
-    return <SidebarTabs tabs={TABS} selectedTab={TABS[0].label} />;
+    return <SidebarTabs tabs={TABS} selectedTab={TABS[0].labelKey} />;
 };

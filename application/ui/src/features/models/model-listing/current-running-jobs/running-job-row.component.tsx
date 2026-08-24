@@ -54,7 +54,7 @@ const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
                 isDisabled={job.status !== 'RUNNING' && job.status !== 'PENDING'}
                 variant={'negative'}
                 onPress={() => setIsDeleteDialogOpen(true)}
-                aria-label={'Cancel job'}
+                aria-label={t('models.cancelJobAriaLabel')}
             >
                 Cancel
             </Button>

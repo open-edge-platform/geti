@@ -45,7 +45,7 @@ export const PlaybackSpeedSlider = () => {
     return (
         <DialogTrigger type='popover'>
             <TooltipTrigger placement={'bottom'}>
-                <ActionButton isQuiet aria-label={'Change playback speed'}>
+                <ActionButton isQuiet aria-label={t('annotator.changePlaybackSpeedAria')}>
                     <View padding={'size-100'} width={'size-1000'}>
                         <Flex alignItems={'center'} gap={'size-100'}>
                             <PlayRate />
@@ -62,7 +62,7 @@ export const PlaybackSpeedSlider = () => {
                     minValue={MIN_RATE}
                     maxValue={MAX_RATE}
                     step={1}
-                    label={'Playback speed'}
+                    label={t('annotator.playbackSpeedTooltip')}
                     getValueLabel={(value) => AVAILABLE_PLAYBACK_RATES_MAPPING[value].label}
                     aria-label={'Playback'}
                     value={selectedPlaybackRate}

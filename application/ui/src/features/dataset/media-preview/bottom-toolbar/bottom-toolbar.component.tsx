@@ -59,7 +59,7 @@ export const BottomToolbar = ({
                                         [classes.forReview]: !isUserReviewed,
                                     })}
                                     prefix={isUserReviewed ? <Accept /> : <Search />}
-                                    text={isUserReviewed ? 'Reviewed' : 'For Review'}
+                                    text={isUserReviewed ? t('dataset.reviewedBadge') : t('dataset.forReviewBadge')}
                                 />
                             )}
 

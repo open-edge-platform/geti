@@ -6,6 +6,7 @@ import { useState, type ReactNode } from 'react';
 import type { DatasetRevision, ModelArchitectureWithPerformanceCategory, QuantizeJob, TrainJob } from '@/api/types';
 import { Button, DialogContainer, Flex, Grid, Text } from '@geti-ui/ui';
 import { isJobPending, isTrainJob } from 'hooks/api/util';
+import { useTranslation } from 'react-i18next';
 
 import { formatDateTime } from '../../../../shared/date-utils';
 import { useGetModel } from '../../hooks/api/use-get-model.hook';
@@ -32,11 +33,16 @@ type JobRowProps = JobRowColumnsProps & {
 };
 
 const ViewLogsButton = ({ jobId }: { jobId: string }) => {
+    const { t } = useTranslation();
     const [isLogsDialogOpen, setIsLogsDialogOpen] = useState(false);
 
     return (
         <>
-            <Button variant={'secondary'} onPress={() => setIsLogsDialogOpen(true)} aria-label={'View logs'}>
+            <Button
+                variant={'secondary'}
+                onPress={() => setIsLogsDialogOpen(true)}
+                aria-label={t('models.viewLogsButtonAria')}
+            >
                 Logs
             </Button>
             <DialogContainer type={'fullscreen'} onDismiss={() => setIsLogsDialogOpen(false)}>

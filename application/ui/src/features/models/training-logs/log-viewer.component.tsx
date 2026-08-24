@@ -35,11 +35,14 @@ type LogViewerProps = {
     connectionStatus?: ConnectionStatus;
 };
 
-const CONNECTION_STATUS_LABEL: Record<ConnectionStatus, string> = {
-    connecting: 'Connecting...',
-    connected: 'Live',
-    disconnected: 'Disconnected',
-    error: 'Connection error',
+const getConnectionStatusLabel = (status: ConnectionStatus, t: (k: string) => string): string => {
+    const map: Record<ConnectionStatus, string> = {
+        connecting: t('models.connectionConnecting'),
+        connected: t('models.connectionLive'),
+        disconnected: t('models.connectionDisconnected'),
+        error: t('models.connectionError'),
+    };
+    return map[status];
 };
 
 export const LogViewer = ({ logs, isStreaming = false, connectionStatus }: LogViewerProps) => {
@@ -82,7 +85,7 @@ export const LogViewer = ({ logs, isStreaming = false, connectionStatus }: LogVi
                 <SearchField
                     value={searchQuery}
                     onChange={setSearchQuery}
-                    placeholder={'Search logs...'}
+                    placeholder={t('models.searchLogsPlaceholder')}
                     aria-label={t('models.searchLogsAriaLabel')}
                     width={'size-3000'}
                     isQuiet
@@ -95,12 +98,12 @@ export const LogViewer = ({ logs, isStreaming = false, connectionStatus }: LogVi
                                 UNSAFE_className={`${classes.statusDot} ${classes[`statusDot--${connectionStatus}`]}`}
                             />
                             <Text UNSAFE_className={classes.statusText}>
-                                {CONNECTION_STATUS_LABEL[connectionStatus]}
+                                {getConnectionStatusLabel(connectionStatus, t)}
                             </Text>
                         </Flex>
                     ) : null}
                     <Text UNSAFE_className={classes.logCount}>
-                        {filteredLogs.length} / {logs.length} entries
+                        {t('models.logEntriesCount', { filtered: filteredLogs.length, total: logs.length })}
                     </Text>
                 </Flex>
             </Flex>
@@ -112,7 +115,7 @@ export const LogViewer = ({ logs, isStreaming = false, connectionStatus }: LogVi
                     ) : (
                         <Flex alignItems={'center'} justifyContent={'center'} height={'100%'}>
                             <Text UNSAFE_className={classes.emptyState}>
-                                {logs.length === 0 ? 'No log entries' : 'No matching log entries'}
+                                {logs.length === 0 ? t('models.noLogEntries') : t('models.noMatchingLogEntries')}
                             </Text>
                         </Flex>
                     )}

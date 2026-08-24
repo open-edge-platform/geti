@@ -9,9 +9,9 @@ type AccuracyMetric = { label: string; value: number };
 type BenchmarkMetricKey = keyof BenchmarkMetrics;
 
 const ACCURACY_METRIC_LABELS: Partial<Record<BenchmarkMetricKey, string>> = {
-    imagenet_top1_accuracy: 'Top-1 Acc on ImageNet',
-    coco_map_50_95: 'mAP on COCO',
-    coco_map_50: 'mAP50 on COCO',
+    imagenet_top1_accuracy: 'models.metricTop1Acc',
+    coco_map_50_95: 'models.metricMapOnCoco',
+    coco_map_50: 'models.metricMap50OnCoco',
 };
 
 export const getAccuracyMetric = (

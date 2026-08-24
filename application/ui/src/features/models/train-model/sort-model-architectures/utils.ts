@@ -44,31 +44,31 @@ export const SORT_OPTIONS = [
     [
         {
             key: SortingOptions.NAME_ASC,
-            name: 'Name (A to Z)',
+            nameKey: 'models.archSortNameAsc',
         },
         {
             key: SortingOptions.NAME_DESC,
-            name: 'Name (Z to A)',
+            nameKey: 'models.archSortNameDesc',
         },
     ],
     [
         {
             key: SortingOptions.SPEED_ASC,
-            name: 'Speed (fastest first)',
+            nameKey: 'models.archSortSpeedFastest',
         },
         {
             key: SortingOptions.SPEED_DESC,
-            name: 'Speed (slowest first)',
+            nameKey: 'models.archSortSpeedSlowest',
         },
     ],
     [
         {
             key: SortingOptions.ACCURACY_ASC,
-            name: 'Accuracy (lowest first)',
+            nameKey: 'models.archSortAccLowest',
         },
         {
             key: SortingOptions.ACCURACY_DESC,
-            name: 'Accuracy (highest first)',
+            nameKey: 'models.archSortAccHighest',
         },
     ],
 ];
