@@ -22,7 +22,7 @@ from getitrack.core.base import BaseTracker
 from getitrack.core.detection import Detections, TrackedDetections
 from getitrack.core.registry import register_algorithm
 from getitrack.core.track import Track, TrackState
-from getitrack.matching import fuse_score, iou_distance, linear_assignment
+from getitrack.matching import BaseDistanceMetric, IoUDistance, fuse_score, linear_assignment
 from getitrack.motion import KalmanFilter
 from getitrack.utils import xyah_to_xyxy, xyxy_to_xyah
 
@@ -56,7 +56,10 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
 
     algorithm_name: ClassVar[str] = "bytetrack"
 
-    _UNMATCHABLE_COST: ClassVar[np.float32] = np.nextafter(np.float32(1.0), np.float32(2.0))
+    # Stamped on class-mismatched pairs (after score fusion, just before
+    # assignment) so the solver never keeps them. Far above any cost_limit
+    # regardless of the metric's range, matching linear_assignment's own sentinel.
+    _UNMATCHABLE_COST: ClassVar[float] = 1e6
     # Cost limits for the second-stage and tentative association passes.
     _SECOND_STAGE_COST_LIMIT: ClassVar[float] = 0.5
     _TENTATIVE_COST_LIMIT: ClassVar[float] = 0.7
@@ -66,6 +69,8 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
     def __init__(self, config: ByteTrackConfig) -> None:
         super().__init__(config)
         self._kalman = KalmanFilter.from_config(config.motion)
+        # Association distance selected by config; defaults to IoUDistance.
+        self._distance: BaseDistanceMetric = BaseDistanceMetric.from_metric(config.distance_metric)
         self._tracks: dict[int, Track] = {}
         self._kalman_states: dict[int, tuple[np.ndarray, np.ndarray]] = {}
         self._first_frame_id: int | None = None
@@ -198,7 +203,7 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
                 np.arange(len(dets), dtype=np.int64),
             )
         track_boxes = np.stack([self._tracks[tid].bbox for tid in track_ids], axis=0)
-        cost = iou_distance(track_boxes, dets.bboxes)
+        cost = self._distance(track_boxes, dets.bboxes)
         cls_mismatch: np.ndarray | None = None
         if self.config.match_class_only:
             track_classes = np.array([self._tracks[tid].class_id for tid in track_ids])
@@ -263,7 +268,8 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
         lost = [tid for tid, t in self._tracks.items() if t.state == TrackState.LOST]
         if not active or not lost:
             return
-        dist = iou_distance(
+        # Plain IoU, independent of the configured association metric.
+        dist = IoUDistance()(
             np.stack([self._tracks[tid].bbox for tid in active], axis=0),
             np.stack([self._tracks[tid].bbox for tid in lost], axis=0),
         )

@@ -26,7 +26,7 @@ from getitrack.core.base import BaseTracker
 from getitrack.core.detection import Detections, TrackedDetections
 from getitrack.core.registry import register_algorithm
 from getitrack.core.track import Track, TrackState
-from getitrack.matching import iou_distance, linear_assignment
+from getitrack.matching import BaseDistanceMetric, linear_assignment
 from getitrack.motion import KalmanFilter
 from getitrack.utils import xyah_to_xyxy, xyxy_to_xyah
 
@@ -52,6 +52,8 @@ class SortTracker(BaseTracker[SortConfig]):
     def __init__(self, config: SortConfig) -> None:
         super().__init__(config)
         self._kalman = KalmanFilter.from_config(config.motion)
+        # Association distance selected by config; defaults to IoUDistance.
+        self._distance: BaseDistanceMetric = BaseDistanceMetric.from_metric(config.distance_metric)
         self._tracks: dict[int, Track] = {}
         self._kalman_states: dict[int, tuple[np.ndarray, np.ndarray]] = {}
         self._first_frame_id: int | None = None
@@ -119,7 +121,7 @@ class SortTracker(BaseTracker[SortConfig]):
                 np.arange(len(dets), dtype=np.int64),
             )
         track_boxes = np.stack([self._tracks[track_id].bbox for track_id in track_ids], axis=0)
-        cost = iou_distance(track_boxes, dets.bboxes)
+        cost = self._distance(track_boxes, dets.bboxes)
         if self.config.match_class_only:
             track_classes = np.array([self._tracks[track_id].class_id for track_id in track_ids])
             cost[track_classes[:, None] != dets.class_ids[None, :]] = self._UNMATCHABLE_COST

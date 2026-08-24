@@ -33,7 +33,7 @@ from getitrack.core.base import BaseTracker
 from getitrack.core.detection import Detections, TrackedDetections
 from getitrack.core.registry import register_algorithm
 from getitrack.core.track import Track, TrackState
-from getitrack.matching import iou_distance, linear_assignment
+from getitrack.matching import BaseDistanceMetric, linear_assignment
 from getitrack.motion import KalmanFilter
 from getitrack.utils import xyah_to_xyxy, xyxy_to_xyah
 
@@ -143,6 +143,8 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
     def __init__(self, config: OCSortConfig) -> None:
         super().__init__(config)
         self._kalman = KalmanFilter.from_config(config.motion)
+        # Association distance selected by config; defaults to IoUDistance.
+        self._distance: BaseDistanceMetric = BaseDistanceMetric.from_metric(config.distance_metric)
         self._tracks: dict[int, Track] = {}
         # Current Kalman state, kept as its own dict for batched multi_predict.
         self._kalman_states: dict[int, tuple[np.ndarray, np.ndarray]] = {}
@@ -227,11 +229,11 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
             self._tracks[track_id].bbox = xyah_to_xyxy(means[i, :4][None, :])[0].astype(np.float32)
 
     def _associate_first(self, track_ids: list[int], dets: Detections) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """First pass: IoU cost with the OCM momentum momentum_bonus, gated on pure IoU."""
+        """First pass: association cost with the OCM momentum bonus, gated on the configured metric."""
         if not track_ids or len(dets) == 0:
             return self._empty_association(len(track_ids), len(dets))
         track_boxes = np.stack([self._tracks[track_id].bbox for track_id in track_ids], axis=0)
-        iou_cost = iou_distance(track_boxes, dets.bboxes)
+        metric_cost = self._distance(track_boxes, dets.bboxes)
 
         prev_boxes = np.stack([self._previous_observation(track_id) for track_id in track_ids], axis=0)
         velocities = np.stack(
@@ -241,9 +243,9 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
         valid = np.array([self._obs[track_id].velocity is not None for track_id in track_ids])
         momentum_bonus = _direction_cost(dets.bboxes, prev_boxes, velocities, valid, dets.scores, self.config.inertia)
 
-        cost = iou_cost - momentum_bonus
-        # Mask pairs failing the IoU or class gate; the momentum_bonus only reorders the rest.
-        invalid = iou_cost > self.config.match_threshold
+        cost = metric_cost - momentum_bonus
+        # Mask pairs failing the distance or class gate; the momentum_bonus only reorders the rest.
+        invalid = metric_cost > self.config.match_threshold
         class_mismatch = self._class_mismatch(track_ids, dets)
         if class_mismatch is not None:
             invalid = invalid | class_mismatch
@@ -253,11 +255,11 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
     def _associate_byte(
         self, track_ids: list[int], low_dets: Detections, low_score_indices: np.ndarray, lifecycle: LifecycleConfig
     ) -> list[int]:
-        """BYTE pass: unmatched tracks vs low-score detections, IoU only."""
+        """BYTE pass: unmatched tracks vs low-score detections, on the configured metric."""
         if not track_ids or len(low_dets) == 0:
             return track_ids
         track_boxes = np.stack([self._tracks[track_id].bbox for track_id in track_ids], axis=0)
-        cost = iou_distance(track_boxes, low_dets.bboxes)
+        cost = self._distance(track_boxes, low_dets.bboxes)
         class_mismatch = self._class_mismatch(track_ids, low_dets)
         if class_mismatch is not None:
             cost[class_mismatch] = self._INVALID_COST
@@ -281,7 +283,7 @@ class OCSortTracker(BaseTracker[OCSortConfig]):
             return track_ids, unmatched_high_indices
         left_dets = _subset(high_dets, unmatched_high_indices)
         last_boxes = np.stack([self._obs[track_id].last_obs for track_id in track_ids], axis=0)
-        cost = iou_distance(last_boxes, left_dets.bboxes)
+        cost = self._distance(last_boxes, left_dets.bboxes)
         class_mismatch = self._class_mismatch(track_ids, left_dets)
         if class_mismatch is not None:
             cost[class_mismatch] = self._INVALID_COST

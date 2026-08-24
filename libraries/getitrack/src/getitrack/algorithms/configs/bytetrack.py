@@ -21,10 +21,11 @@ class ByteTrackConfig(TrackerConfig):
     algorithm: Literal[AlgorithmType.BYTETRACK] = AlgorithmType.BYTETRACK  # pyrefly: ignore[bad-override]
     """Algorithm identifier; fixed to ``bytetrack``."""
 
-    match_threshold: Annotated[float, Field(ge=0.0, le=1.0)] = 0.8
-    """Maximum assignment cost accepted when matching detections to tracks.
-    The cost is ``1 - IoU``, score-fused to ``1 - IoU * score`` where fusion
-    applies, so larger values accept weaker overlaps."""
+    match_threshold: Annotated[float, Field(ge=0.0, le=2.5)] = 0.8
+    """Maximum assignment cost (``1 - <distance_metric>``, fused to ``1 - metric * score``) accepted when matching.
+
+    IoU stays in ``[0, 1]``; GIoU/DIoU/CIoU reach ~2.31, so the bound allows
+    values above 1.0 for them."""
 
     high_score_threshold: Annotated[float, Field(ge=0.0, le=1.0)] = 0.5
     """High/low detection split for two-stage association (ByteTrack's ``track_thresh``).

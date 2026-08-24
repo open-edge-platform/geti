@@ -5,9 +5,9 @@
 import numpy as np
 import pytest
 
-from getitrack.matching.iou import (
+from getitrack.matching import (
+    IoUDistance,
     fuse_score,
-    iou_distance,
     iou_matrix,
     linear_assignment,
 )
@@ -23,7 +23,7 @@ class TestIoUMatrix:
     def test_iou_distance_is_float32_complement(self):
         a = np.array([[0, 0, 10, 10]], dtype=np.float32)
         b = np.array([[5, 0, 15, 10]], dtype=np.float32)
-        dist = iou_distance(a, b)
+        dist = IoUDistance()(a, b)
         # numpy>=2.0 (NEP 50) keeps ``1.0 - float32`` as float32, no upcast.
         assert dist.dtype == np.float32
         assert dist[0, 0] == pytest.approx(1.0 - 1.0 / 3.0, abs=1e-5)
@@ -55,6 +55,24 @@ class TestFuseScore:
         scores = np.array([1.0, 0.1], dtype=np.float32)
         fused = fuse_score(cost, scores)
         assert fused[0, 0] < fused[0, 1]
+
+    def test_iou_region_matches_classic_fusion(self):
+        # Where sim >= 0, fusion must equal the classic 1 - sim * score.
+        cost = np.array([[0.2, 0.8]], dtype=np.float32)
+        scores = np.array([0.9, 0.3], dtype=np.float32)
+        fused = fuse_score(cost, scores)
+        classic = 1.0 - (1.0 - cost) * scores[None, :]
+        np.testing.assert_allclose(fused, classic, rtol=1e-6)
+
+    def test_negative_similarity_does_not_reward_low_confidence(self):
+        # cost > 1 (disjoint pair under GIoU/DIoU/CIoU) => sim < 0. A higher-confidence
+        # detection must never be more expensive than a lower-confidence one at equal cost.
+        cost = np.array([[1.5, 1.5]], dtype=np.float32)
+        scores = np.array([1.0, 0.1], dtype=np.float32)  # high, low
+        fused = fuse_score(cost, scores)
+        assert fused[0, 0] <= fused[0, 1]
+        # Raw geometric cost is preserved (no confidence discount off the overlap).
+        np.testing.assert_allclose(fused, cost, rtol=1e-6)
 
 
 class TestLinearAssignment:
