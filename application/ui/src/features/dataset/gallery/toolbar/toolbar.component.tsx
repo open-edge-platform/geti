@@ -29,10 +29,11 @@ import { DeleteMediaItem } from '../delete-media-item/delete-media-item.componen
 import { useSelectDatasetItem } from '../hooks/use-select-dataset-item.hook';
 import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
-import { useDatasetViews } from './dataset-view-selector/api/use-dataset-views';
+import { useDatasetViewsQuery } from './dataset-view-selector/api/use-dataset-views';
 import { AssignToExistingView } from './dataset-view-selector/assign-to-existing-view/assign-to-existing-view.component';
 import { DatasetViewSelector } from './dataset-view-selector/dataset-view-selector.component';
 import { SaveDatasetView } from './dataset-view-selector/save-dataset-view/save-dataset-view.component';
+import { UnassignMediaFromView } from './dataset-view-selector/unassign-media-from-view/unassign-media-from-view.component';
 import { MediaFiltering } from './media-filtering/media-filtering.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
@@ -78,7 +79,7 @@ const SortMediaByUploadDate = () => {
 export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
     const { onSelectedMediaItemChange } = useSelectDatasetItem();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys } = useSelectedData();
-    const datasetViews = useDatasetViews();
+    const { data: datasetViews } = useDatasetViewsQuery();
 
     const selectedMediaItems = selectedKeys instanceof Set ? selectedKeys : null;
 
@@ -159,11 +160,15 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                             />
                             {FEATURE_FLAGS.DATASET_VIEWS && (
                                 <>
-                                    <SaveDatasetView selectedMediaIds={selectedMediaItemsIds} />
+                                    <SaveDatasetView
+                                        selectedMediaIds={selectedMediaItemsIds}
+                                        datasetViews={datasetViews}
+                                    />
                                     <AssignToExistingView
                                         datasetViews={datasetViews}
                                         selectedMediaIds={selectedMediaItemsIds}
                                     />
+                                    <UnassignMediaFromView selectedMediaIds={selectedMediaItemsIds} />
                                 </>
                             )}
                         </>
