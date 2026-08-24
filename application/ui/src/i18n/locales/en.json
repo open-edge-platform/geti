@@ -711,7 +711,10 @@
         "licenseLabel": "License",
         "mapLabel": "mAP",
         "parametersCountLabel": "Parameters",
-        "ultralyticsLicense": "Follow Ultralytics guidance on license usage"
+        "ultralyticsLicense": "Follow Ultralytics guidance on license usage",
+        "performanceSpeed": "Speed",
+        "performanceAccuracy": "Accuracy",
+        "performanceBalance": "Balance"
     },
     "inference": {
         "inferenceDevice": "Inference device",

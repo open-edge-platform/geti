@@ -126,6 +126,18 @@ export const ModelArchitectureCard = ({
     onSelect,
     modelArchitecture,
 }: ModelArchitectureProps) => {
+    const { t } = useTranslation();
+
+    const getCategoryLabel = (category: string | undefined) => {
+        if (category === undefined) return undefined;
+        const keyMap: Record<string, string> = {
+            speed: 'models.performanceSpeed',
+            accuracy: 'models.performanceAccuracy',
+            balance: 'models.performanceBalance',
+        };
+        return t(keyMap[category] ?? category, { defaultValue: category });
+    };
+
     return (
         <ModelArchitectureContext value={{ isSelected, modelArchitecture }}>
             <div
@@ -136,7 +148,7 @@ export const ModelArchitectureCard = ({
                 aria-label={
                     modelArchitecture.performanceCategory === undefined
                         ? modelArchitecture.name
-                        : `${modelArchitecture.name} - ${modelArchitecture.performanceCategory}`
+                        : `${modelArchitecture.name} - ${getCategoryLabel(modelArchitecture.performanceCategory)}`
                 }
                 data-architecture-name={modelArchitecture.name}
             >

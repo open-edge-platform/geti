@@ -697,7 +697,10 @@
         "licenseLabel": "许可证",
         "mapLabel": "mAP",
         "parametersCountLabel": "参数量",
-        "ultralyticsLicense": "遵循 Ultralytics 的许可使用指南"
+        "ultralyticsLicense": "遵循 Ultralytics 的许可使用指南",
+        "performanceSpeed": "速度",
+        "performanceAccuracy": "准确率",
+        "performanceBalance": "均衡"
     },
     "inference": {
         "inferenceDevice": "推理设备",

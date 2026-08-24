@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 import { capitalize } from 'lodash-es';
 
 import { ReactComponent as ThumbsUp } from '../../../../../assets/icons/thumbs-up.svg';
@@ -13,11 +14,20 @@ type PerformanceCategoryBadgeProps = {
     color?: string;
 };
 
+const CATEGORY_KEYS: Record<string, string> = {
+    speed: 'models.performanceSpeed',
+    accuracy: 'models.performanceAccuracy',
+    balance: 'models.performanceBalance',
+};
+
 export const PerformanceCategoryBadge = ({ performanceCategory, id, color }: PerformanceCategoryBadgeProps) => {
+    const { t } = useTranslation();
+    const key = CATEGORY_KEYS[performanceCategory] ?? performanceCategory;
+
     return (
         <ModelBadge id={id} color={color}>
             <ThumbsUp />
-            <Text>{capitalize(performanceCategory)}</Text>
+            <Text>{t(key, { defaultValue: capitalize(performanceCategory) })}</Text>
         </ModelBadge>
     );
 };

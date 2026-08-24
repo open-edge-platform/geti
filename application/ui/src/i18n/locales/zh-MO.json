@@ -697,7 +697,10 @@
         "licenseLabel": "授權",
         "mapLabel": "mAP",
         "parametersCountLabel": "參數量",
-        "ultralyticsLicense": "遵循 Ultralytics 的授權使用指引"
+        "ultralyticsLicense": "遵循 Ultralytics 的授權使用指引",
+        "performanceSpeed": "速度",
+        "performanceAccuracy": "準確率",
+        "performanceBalance": "均衡"
     },
     "inference": {
         "inferenceDevice": "推理裝置",
