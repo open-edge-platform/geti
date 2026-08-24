@@ -22,17 +22,25 @@ const CameraDeviceDisplay = ({ deviceId }: { deviceId: number }) => {
 
     return (
         <ul className={classes.list}>
-            <li>Device: {device ? device.name : `Unknown device (id: ${deviceId})`}</li>
+            <li>
+                {t('inference.deviceLabel')}: {device ? device.name : t('common.unknownDevice', { id: deviceId })}
+            </li>
         </ul>
     );
 };
 
 export const SettingsList = ({ source }: SettingsListProps) => {
+    const { t } = useTranslation();
+
     if (source.source_type === 'images_folder') {
         return (
             <ul className={classes.list}>
-                <li>Folder path: {source.images_folder_path}</li>
-                <li>Ignore existing images: {source.ignore_existing_images ? 'Yes' : 'No'}</li>
+                <li>
+                    {t('inference.folderPathDetail')}: {source.images_folder_path}
+                </li>
+                <li>
+                    {t('inference.ignoreExistingLabel')}: {source.ignore_existing_images ? t('common.yes') : t('common.no')}
+                </li>
             </ul>
         );
     }
@@ -40,8 +48,12 @@ export const SettingsList = ({ source }: SettingsListProps) => {
     if (source.source_type === 'ip_camera') {
         return (
             <ul className={classes.list}>
-                <li>Stream url: {source.stream_url}</li>
-                <li>Auth required: {source.auth_required ? 'Yes' : 'No'}</li>
+                <li>
+                    {t('inference.streamUrlLabelDetail')}: {source.stream_url}
+                </li>
+                <li>
+                    {t('inference.authRequiredLabel')}: {source.auth_required ? t('common.yes') : t('common.no')}
+                </li>
             </ul>
         );
     }
@@ -49,7 +61,9 @@ export const SettingsList = ({ source }: SettingsListProps) => {
     if (source.source_type === 'video_file') {
         return (
             <ul className={classes.list}>
-                <li>Video path: {source.video_path}</li>
+                <li>
+                    {t('inference.videoPathLabel')}: {source.video_path}
+                </li>
             </ul>
         );
     }

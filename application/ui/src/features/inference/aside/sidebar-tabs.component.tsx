@@ -58,7 +58,7 @@ const SidebarTabs = ({ tabs, selectedTab }: TabProps) => {
                 {isExpanded && (
                     <>
                         <Flex alignItems='center' gap={'size-100'} marginBottom={'size-300'}>
-                            <Heading level={2}>{tab}</Heading>
+                            <Heading level={2}>{t(tab!)}</Heading>
                         </Flex>
                         <Flex direction={'column'} flex={1} UNSAFE_style={{ overflow: 'hidden auto' }}>
                             {content}
@@ -75,8 +75,8 @@ const SidebarTabs = ({ tabs, selectedTab }: TabProps) => {
                             <TooltipTrigger key={labelKey} placement={'left'}>
                                 <ToggleButton
                                     isQuiet
-                                    isSelected={label === tab}
-                                    onChange={() => handleSetTab(label)}
+                                    isSelected={labelKey === tab}
+                                    onChange={() => handleSetTab(labelKey)}
                                     UNSAFE_className={styles.toggleButton}
                                     aria-label={t('inference.toggleTabAria', { label })}
                                 >

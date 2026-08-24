@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { SinkConfig, SinkOutputFormats, WebhookSinkConfig } from '@/api/types';
+import { useTranslation } from 'react-i18next';
 
 import { removeUnderscore } from '../../../util';
 import { formatRateLimit } from '../../utils';
@@ -36,13 +37,19 @@ const WebhookHeaders = ({ sink }: { sink: WebhookSinkConfig }) => {
 };
 
 export const SettingsList = ({ sink }: SettingsListProps) => {
+    const { t } = useTranslation();
+
     if (sink.sink_type === 'folder') {
         return (
             <ul className={classes.list}>
-                <li>Folder path: {sink.folder_path}</li>
-                <li>Rate limit: {formatRateLimit(sink.rate_limit)}</li>
                 <li>
-                    Output formats: <OutputFormats outputFormats={sink.output_formats} />
+                    {t('inference.folderPathDetail')}: {sink.folder_path}
+                </li>
+                <li>
+                    {t('inference.samplesLabel')}/{t('inference.secondsLabel')}: {formatRateLimit(sink.rate_limit)}
+                </li>
+                <li>
+                    {t('inference.outputFormatsLabel')}: <OutputFormats outputFormats={sink.output_formats} />
                 </li>
             </ul>
         );
@@ -51,15 +58,23 @@ export const SettingsList = ({ sink }: SettingsListProps) => {
     if (sink.sink_type === 'webhook') {
         return (
             <ul className={classes.list}>
-                <li>Rate limit: {formatRateLimit(sink.rate_limit)}</li>
-                <li>HTTP method: {sink.http_method}</li>
-                <li>Timeout: {sink.timeout}</li>
-                <li>Webhook URL: {sink.webhook_url}</li>
                 <li>
-                    Headers <WebhookHeaders sink={sink} />
+                    {t('inference.samplesLabel')}/{t('inference.secondsLabel')}: {formatRateLimit(sink.rate_limit)}
                 </li>
                 <li>
-                    Output formats: <OutputFormats outputFormats={sink.output_formats} />
+                    {t('inference.httpMethodDetail')}: {sink.http_method}
+                </li>
+                <li>
+                    {t('inference.timeoutDetail')}: {sink.timeout}
+                </li>
+                <li>
+                    {t('inference.webhookUrlLabel')}: {sink.webhook_url}
+                </li>
+                <li>
+                    {t('inference.headersTitle')} <WebhookHeaders sink={sink} />
+                </li>
+                <li>
+                    {t('inference.outputFormatsLabel')}: <OutputFormats outputFormats={sink.output_formats} />
                 </li>
             </ul>
         );
@@ -68,13 +83,23 @@ export const SettingsList = ({ sink }: SettingsListProps) => {
     if (sink.sink_type === 'mqtt') {
         return (
             <ul className={classes.list}>
-                <li>Topic: {sink.topic}</li>
-                <li>Rate limit: {formatRateLimit(sink.rate_limit)}</li>
-                <li>Auth required: {sink.auth_required ? 'Yes' : 'No'}</li>
-                <li>Broker host: {sink.broker_host}</li>
-                <li>Broker port: {sink.broker_port}</li>
                 <li>
-                    Output formats: <OutputFormats outputFormats={sink.output_formats} />
+                    {t('inference.topicLabel')}: {sink.topic}
+                </li>
+                <li>
+                    {t('inference.samplesLabel')}/{t('inference.secondsLabel')}: {formatRateLimit(sink.rate_limit)}
+                </li>
+                <li>
+                    {t('inference.authRequiredLabel')}: {sink.auth_required ? t('common.yes') : t('common.no')}
+                </li>
+                <li>
+                    {t('inference.brokerHostLabel')}: {sink.broker_host}
+                </li>
+                <li>
+                    {t('inference.brokerPortLabel')}: {sink.broker_port}
+                </li>
+                <li>
+                    {t('inference.outputFormatsLabel')}: <OutputFormats outputFormats={sink.output_formats} />
                 </li>
             </ul>
         );
@@ -83,10 +108,14 @@ export const SettingsList = ({ sink }: SettingsListProps) => {
     if (sink.sink_type === 'ros') {
         return (
             <ul className={classes.list}>
-                <li>Topic: {sink.topic}</li>
-                <li>Rate limit: {formatRateLimit(sink.rate_limit)}</li>
                 <li>
-                    Output formats: <OutputFormats outputFormats={sink.output_formats} />
+                    {t('inference.topicLabel')}: {sink.topic}
+                </li>
+                <li>
+                    {t('inference.samplesLabel')}/{t('inference.secondsLabel')}: {formatRateLimit(sink.rate_limit)}
+                </li>
+                <li>
+                    {t('inference.outputFormatsLabel')}: <OutputFormats outputFormats={sink.output_formats} />
                 </li>
             </ul>
         );

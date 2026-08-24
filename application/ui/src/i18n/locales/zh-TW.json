@@ -27,7 +27,12 @@
         "noPermission": "您沒有存取此頁面的權限。",
         "notExist": "此頁面不存在！",
         "notAuthorized": "您未獲授權檢視此內容",
-        "serverErrorGeneric": "伺服器發生錯誤，無法完成請求。"
+        "serverErrorGeneric": "伺服器發生錯誤，無法完成請求。",
+        "yes": "是",
+        "no": "否",
+        "unknownDevice": "未知的裝置 (id: {{id}})",
+        "mediaColon": "媒體",
+        "errorPrefix": "錯誤"
     },
     "nav": {
         "dataset": "資料集",
@@ -291,7 +296,14 @@
         "downloadStartedToast": "資料集下載已開始",
         "selectPlaceholderLabel": "選擇標籤",
         "reviewedBadge": "已審核",
-        "forReviewBadge": "待審核"
+        "forReviewBadge": "待審核",
+        "importUploadButton": "上傳",
+        "learnMoreFormats": "了解不同格式的更多資訊",
+        "uploadingHeading": "正在上傳",
+        "deleteStagedFileConfirm": "確定要刪除資料集檔案「{{id}}」嗎？",
+        "exportHeading": "匯出 {{name}}",
+        "allMedia": "全部媒體",
+        "onlyWithAnnotations": "僅已標註的媒體"
     },
     "annotator": {
         "previousMediaItem": "上一個媒體項目",
@@ -593,7 +605,13 @@
         "searchLogsPlaceholder": "搜尋記錄...",
         "noLogEntries": "沒有記錄項目",
         "noMatchingLogEntries": "沒有符合的記錄項目",
-        "logEntriesCount": "{{filtered}} / {{total}} 筆"
+        "logEntriesCount": "{{filtered}} / {{total}} 筆",
+        "stopJobConfirm": "確定要停止此工作嗎？",
+        "deleteDatasetRevisionConfirm": "確定要刪除資料集修訂版「{{name}}」嗎？之後仍可檢視模型統計資料，但無法存取訓練資料集檔案。",
+        "numberOfParams": "參數量",
+        "gigaflops": "十億次浮點運算",
+        "calibrationSizeLabel": "校正集大小",
+        "parametersLabel": "參數"
     },
     "inference": {
         "inferenceDevice": "推論裝置",
@@ -699,7 +717,17 @@
         "captureRateHeading": "擷取速率",
         "toggleAutoCapturing": "切換自動擷取",
         "confidenceThresholdHeading": "信心度門檻值",
-        "confidenceThresholdSwitch": "信心度門檻值"
+        "confidenceThresholdSwitch": "信心度門檻值",
+        "deviceLabel": "裝置",
+        "folderPathDetail": "資料夾路徑",
+        "ignoreExistingLabel": "忽略現有影像",
+        "streamUrlLabelDetail": "串流網址",
+        "authRequiredLabel": "需要驗證",
+        "videoPathLabel": "影片路徑",
+        "httpMethodDetail": "HTTP 方法",
+        "timeoutDetail": "逾時",
+        "disconnectHeading": "中斷連線 {{name}}",
+        "disconnectWarningText": "中斷此輸入來源將同時停用推論管線。是否要繼續？"
     },
     "project": {
         "list": {

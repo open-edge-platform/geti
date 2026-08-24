@@ -46,11 +46,12 @@ const License = () => {
 };
 
 const ModelArchitectureParameters = () => {
+    const { t } = useTranslation();
     const { modelArchitecture } = useModelArchitecture();
 
     return (
         <ul className={classes.modelArchitectureParameters}>
-            <li>Number of parameters: {modelArchitecture.stats.trainable_parameters} million</li>
+            <li>{t("models.numberOfParams")}: {modelArchitecture.stats.trainable_parameters} million</li>
             <License />
         </ul>
     );
@@ -63,8 +64,8 @@ const ModelArchitectureDetailedParameters = () => {
 
     return (
         <ul className={classes.modelArchitectureParameters}>
-            <li>Number of parameters: {modelArchitecture.stats.trainable_parameters} million</li>
-            <li>Gigaflops: {modelArchitecture.stats.gigaflops}</li>
+            <li>{t("models.numberOfParams")}: {modelArchitecture.stats.trainable_parameters} million</li>
+            <li>{t("models.gigaflops")}: {modelArchitecture.stats.gigaflops}</li>
             {accuracyMetric !== undefined && (
                 <li>
                     {t(accuracyMetric.label)}: {accuracyMetric.value}%

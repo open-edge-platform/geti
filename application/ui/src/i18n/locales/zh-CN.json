@@ -27,7 +27,12 @@
         "noPermission": "你没有访问此页面的权限。",
         "notExist": "此页面不存在！",
         "notAuthorized": "你无权查看此内容",
-        "serverErrorGeneric": "服务器遇到错误，无法完成请求。"
+        "serverErrorGeneric": "服务器遇到错误，无法完成请求。",
+        "yes": "是",
+        "no": "否",
+        "unknownDevice": "未知设备 (id: {{id}})",
+        "mediaColon": "媒体",
+        "errorPrefix": "错误"
     },
     "nav": {
         "dataset": "数据集",
@@ -291,7 +296,14 @@
         "downloadStartedToast": "数据集下载已开始",
         "selectPlaceholderLabel": "选择标签",
         "reviewedBadge": "已审核",
-        "forReviewBadge": "待审核"
+        "forReviewBadge": "待审核",
+        "importUploadButton": "上传",
+        "learnMoreFormats": "了解不同格式的更多信息",
+        "uploadingHeading": "正在上传",
+        "deleteStagedFileConfirm": "确定要删除数据集文件“{{id}}”吗？",
+        "exportHeading": "导出 {{name}}",
+        "allMedia": "全部媒体",
+        "onlyWithAnnotations": "仅已标注媒体"
     },
     "annotator": {
         "previousMediaItem": "上一个媒体条目",
@@ -593,7 +605,13 @@
         "searchLogsPlaceholder": "搜索日志...",
         "noLogEntries": "暂无日志条目",
         "noMatchingLogEntries": "没有匹配的日志条目",
-        "logEntriesCount": "{{filtered}} / {{total}} 条"
+        "logEntriesCount": "{{filtered}} / {{total}} 条",
+        "stopJobConfirm": "确定要停止此任务吗？",
+        "deleteDatasetRevisionConfirm": "确定要删除数据集版本“{{name}}”吗？之后仍可查看模型统计信息，但将无法访问训练数据集文件。",
+        "numberOfParams": "参数量",
+        "gigaflops": "十亿浮点运算",
+        "calibrationSizeLabel": "校准集大小",
+        "parametersLabel": "参数"
     },
     "inference": {
         "inferenceDevice": "推理设备",
@@ -699,7 +717,17 @@
         "captureRateHeading": "捕获速率",
         "toggleAutoCapturing": "切换自动捕获",
         "confidenceThresholdHeading": "置信度阈值",
-        "confidenceThresholdSwitch": "置信度阈值"
+        "confidenceThresholdSwitch": "置信度阈值",
+        "deviceLabel": "设备",
+        "folderPathDetail": "文件夹路径",
+        "ignoreExistingLabel": "忽略已有图像",
+        "streamUrlLabelDetail": "视频流地址",
+        "authRequiredLabel": "需要身份验证",
+        "videoPathLabel": "视频路径",
+        "httpMethodDetail": "HTTP 方法",
+        "timeoutDetail": "超时时间",
+        "disconnectHeading": "断开 {{name}}",
+        "disconnectWarningText": "断开此输入源将同时停用推理流水线。是否继续？"
     },
     "project": {
         "list": {

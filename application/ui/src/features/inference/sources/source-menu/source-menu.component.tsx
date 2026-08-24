@@ -40,21 +40,21 @@ const DisconnectSourceWarningDialog = ({
     isPending,
     onDisconnect,
 }: DisconnectSourceWarningDialogProps) => {
+    const { t } = useTranslation();
+
     return (
         <Dialog>
-            <Heading>Disconnect {name}</Heading>
+            <Heading>{t('inference.disconnectHeading', { name })}</Heading>
             <Divider />
             <Content>
-                <Text>
-                    Disconnecting this source will also disable the inference pipeline. Do you want to continue?
-                </Text>
+                <Text>{t('inference.disconnectWarningText')}</Text>
             </Content>
             <ButtonGroup>
                 <Button variant={'secondary'} onPress={onCancel}>
-                    Cancel
+                    {t('common.cancel')}
                 </Button>
                 <Button variant={'accent'} onPress={onDisconnect} isDisabled={isPending}>
-                    Disconnect
+                    {t('inference.disconnect')}
                 </Button>
             </ButtonGroup>
         </Dialog>

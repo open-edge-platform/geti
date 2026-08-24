@@ -27,7 +27,12 @@
         "noPermission": "You do not have permission to access this page.",
         "notExist": "This page doesn't exist!",
         "notAuthorized": "You aren't authorized to see this",
-        "serverErrorGeneric": "The server encountered an error and could not complete your request."
+        "serverErrorGeneric": "The server encountered an error and could not complete your request.",
+        "yes": "Yes",
+        "no": "No",
+        "unknownDevice": "Unknown device (id: {{id}})",
+        "mediaColon": "Media",
+        "errorPrefix": "Error"
     },
     "nav": {
         "dataset": "Dataset",
@@ -305,7 +310,14 @@
         "downloadStartedToast": "Dataset download started",
         "selectPlaceholderLabel": "Select label",
         "reviewedBadge": "Reviewed",
-        "forReviewBadge": "For Review"
+        "forReviewBadge": "For Review",
+        "importUploadButton": "Upload",
+        "learnMoreFormats": "Learn more about the different formats",
+        "uploadingHeading": "Uploading",
+        "deleteStagedFileConfirm": "Are you sure you want to delete the dataset file \"{{id}}\"?",
+        "exportHeading": "Export {{name}}",
+        "allMedia": "All media",
+        "onlyWithAnnotations": "Only media with annotations"
     },
     "annotator": {
         "previousMediaItem": "Previous media item",
@@ -607,7 +619,13 @@
         "searchLogsPlaceholder": "Search logs...",
         "noLogEntries": "No log entries",
         "noMatchingLogEntries": "No matching log entries",
-        "logEntriesCount": "{{filtered}} / {{total}} entries"
+        "logEntriesCount": "{{filtered}} / {{total}} entries",
+        "stopJobConfirm": "Are you sure you want to stop this job?",
+        "deleteDatasetRevisionConfirm": "Are you sure you want to delete dataset revision \"{{name}}\"? You will still be able to see the model statistics but you won't be able to access the training dataset files.",
+        "numberOfParams": "Number of parameters",
+        "gigaflops": "Gigaflops",
+        "calibrationSizeLabel": "Calibration dataset size",
+        "parametersLabel": "Parameters"
     },
     "inference": {
         "inferenceDevice": "Inference device",
@@ -713,7 +731,17 @@
         "captureRateHeading": "Capture rate",
         "toggleAutoCapturing": "Toggle auto capturing",
         "confidenceThresholdHeading": "Confidence threshold",
-        "confidenceThresholdSwitch": "Confidence threshold"
+        "confidenceThresholdSwitch": "Confidence threshold",
+        "deviceLabel": "Device",
+        "folderPathDetail": "Folder path",
+        "ignoreExistingLabel": "Ignore existing images",
+        "streamUrlLabelDetail": "Stream url",
+        "authRequiredLabel": "Auth required",
+        "videoPathLabel": "Video path",
+        "httpMethodDetail": "HTTP method",
+        "timeoutDetail": "Timeout",
+        "disconnectHeading": "Disconnect {{name}}",
+        "disconnectWarningText": "Disconnecting this source will also disable the inference pipeline. Do you want to continue?"
     },
     "project": {
         "list": {

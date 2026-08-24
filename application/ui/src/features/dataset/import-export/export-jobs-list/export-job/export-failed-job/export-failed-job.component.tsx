@@ -41,7 +41,7 @@ export const ExportFailedJob = ({ job, datasetName }: ExportFailedJobProps) => {
 
             <Text>{job.message}</Text>
             <Divider size='S' marginY='size-150' />
-            <Text>Error: {job.error}</Text>
+            <Text>{t('common.errorPrefix')}: {job.error}</Text>
         </View>
     );
 };

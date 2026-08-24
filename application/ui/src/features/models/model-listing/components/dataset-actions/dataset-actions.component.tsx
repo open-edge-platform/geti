@@ -94,13 +94,11 @@ export const DatasetActions = ({ dataset }: DatasetActionsProps) => {
                     <AlertDialog
                         title={t('models.deleteDatasetRevisionTitle')}
                         variant='destructive'
-                        primaryActionLabel='Delete'
+                        primaryActionLabel={t('common.delete')}
                         onPrimaryAction={handleDelete}
-                        cancelLabel='Cancel'
+                        cancelLabel={t('common.cancel')}
                     >
-                        {`Are you sure you want to delete dataset revision "${dataset.name}"? ` +
-                            `You will still be able to see the model statistics but you won't ` +
-                            `be able to access the training dataset files.`}
+                        {t('models.deleteDatasetRevisionConfirm', { name: dataset.name })}
                     </AlertDialog>
                 )}
             </DialogContainer>

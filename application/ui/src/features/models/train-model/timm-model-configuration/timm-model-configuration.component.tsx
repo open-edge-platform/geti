@@ -72,7 +72,7 @@ export const TimmModelConfiguration = () => {
                 <Divider size={'S'} marginX={'size-400'} orientation={'vertical'} />
 
                 <ul className={classes.infoList}>
-                    <li>Parameters: {info.parameters}</li>
+                    <li>{t('models.parametersLabel')}: {info.parameters}</li>
                     <li>GigaFlops: {info.gigaFlops}</li>
                     <li>mAP: {info.mAP}</li>
                     <li>License: {info.license}</li>

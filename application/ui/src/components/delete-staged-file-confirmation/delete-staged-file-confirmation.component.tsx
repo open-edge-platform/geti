@@ -27,13 +27,13 @@ export const DeleteStagedFileConfirmation = ({ stagedDatasetId, deleteEntry }: D
             <AlertDialog
                 title={t('dataset.deleteStagedFileTitle')}
                 variant='destructive'
-                cancelLabel='Cancel'
+                cancelLabel={t('common.cancel')}
                 autoFocusButton='primary'
-                primaryActionLabel='Delete'
+                primaryActionLabel={t('common.delete')}
                 onPrimaryAction={handleCancel}
                 isPrimaryActionDisabled={deleteFileMutation.isPending}
             >
-                {`Are you sure you want to delete the dataset file "${stagedDatasetId}"?`}
+                {t('dataset.deleteStagedFileConfirm', { id: stagedDatasetId })}
             </AlertDialog>
         </DialogTrigger>
     );

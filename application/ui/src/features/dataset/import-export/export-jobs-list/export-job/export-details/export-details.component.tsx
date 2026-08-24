@@ -4,6 +4,7 @@
 import type { ExportDatasetMetadata } from '@/api/types';
 import { dimensionValue, Divider, Flex, Grid, Text } from '@geti-ui/ui';
 import { isEmpty, isNil } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { useProject } from '../../../../../../hooks/api/project.hook';
 
@@ -15,6 +16,8 @@ type ExportJobDetailsProps = {
 const isGetiFormat = (format?: string | null) => format?.toLowerCase() === 'geti';
 
 export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProps) => {
+    const { t } = useTranslation();
+
     const { data: selectedProject } = useProject();
 
     const projectLabels = selectedProject.task.labels ?? [];
@@ -50,7 +53,7 @@ export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProp
 
                 <Divider orientation='vertical' size='S' />
 
-                <Text>Media: {metadata.filters.include_unannotated ? 'All media' : 'Only media with annotations'}</Text>
+                <Text>{t('common.mediaColon')}: {metadata.filters.include_unannotated ? t('dataset.allMedia') : t('dataset.onlyWithAnnotations')}</Text>
 
                 <Divider orientation='vertical' size='S' />
 

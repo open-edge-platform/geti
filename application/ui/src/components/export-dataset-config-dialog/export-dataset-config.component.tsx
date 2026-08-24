@@ -117,7 +117,7 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
 
     return (
         <Dialog size='L' width={{ base: '70vw' }}>
-            <Heading>Export {name}</Heading>
+            <Heading>{t('dataset.exportHeading', { name })}</Heading>
             <Divider />
             <Content UNSAFE_className={classes.container}>
                 <Heading>{t('dataset.exportedStatsHeading')}</Heading>
