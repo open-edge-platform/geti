@@ -3,6 +3,7 @@
 
 import os
 from datetime import datetime
+from pathlib import Path
 from typing import Annotated
 from uuid import UUID
 
@@ -19,6 +20,7 @@ from app.api.dependencies import (
     get_media_segment_service,
     get_media_service,
     get_project,
+    get_project_service,
     get_system_service,
 )
 from app.api.io_utils import write_bytes_to_response, write_file_to_response, write_image_to_response
@@ -31,7 +33,7 @@ from app.api.schemas.media import (
     MediaWithPagination,
     SetMediaAnnotations,
 )
-from app.api.validators import MediaID, normalize_datetime_to_utc
+from app.api.validators import MediaID, normalize_datetime_to_utc, ProjectID
 from app.core.models import Pagination
 from app.models import BatchInferenceResult, DatasetItemAnnotationStatus, DatasetItemSubset, Media, Project, Video
 from app.models.media import (
@@ -43,7 +45,14 @@ from app.models.media import (
     SortDirection,
     VideoFormat,
 )
-from app.services import DatasetService, DatasetViewService, MediaPredictionService, MediaService, SystemService
+from app.services import (
+    DatasetService,
+    DatasetViewService,
+    MediaPredictionService,
+    MediaService,
+    SystemService,
+    ProjectService,
+)
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
 from app.services.inference import InferenceBusyError
@@ -402,25 +411,51 @@ def get_media_binary(
     },
 )
 def get_media_thumbnail(
-    project: Annotated[Project, Depends(get_project)],
-    media: Annotated[Media | NotAnnotatedVideoFrame, Depends(_get_request_media)],
+    project_id: ProjectID,
+    media_id: MediaID,
+    project_service: Annotated[ProjectService, Depends(get_project_service)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
+    frame_index: Annotated[int | None, Query(description="Video frame index", ge=0)] = None,
 ) -> Response:
     """Get media thumbnail binary content"""
-    if isinstance(media, NotAnnotatedVideoFrame):
-        frame_thumbnail = media_service.get_frame_thumbnail(
-            project=project, video=media.video, frame_index=media.frame_index
-        )
-        return write_image_to_response(
-            image=frame_thumbnail, filename=f"{media.video.name}_frame_{media.frame_index}.jpeg"
+
+    def _response(thumbnail_path: Path) -> Response:
+        return write_file_to_response(
+            path=thumbnail_path, filename=f"{media_id}-thumb.jpeg", cache_control="public, max-age=31536000"
         )
 
-    thumbnail_path = media_service.get_media_thumbnail_path(project=project, media=media)
-    if not os.path.exists(thumbnail_path):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Media thumbnail file is not found.")
-    return write_file_to_response(
-        path=thumbnail_path, filename=f"{media.id}-thumb.jpeg", cache_control="public, max-age=31536000"
+    def _not_found() -> HTTPException:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Media thumbnail file is not found.")
+
+    thumbnail_path = media_service.get_media_thumbnail_path_by_id(project_id=project_id, media_id=media_id)
+    if os.path.exists(thumbnail_path):
+        return _response(thumbnail_path)
+
+    project = project_service.get_project_by_id(project_id=project_id)
+    media = media_service.get_media_by_id(project_id=project_id, media_id=media_id)
+    if media.type != MediaType.VIDEO or frame_index is None:
+        raise _not_found()
+
+    # Video frames can be identified by video ID and frame index
+    if frame_index >= media.frame_count:  # pyrefly: ignore[unsupported-operation]
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Video frame index {frame_index} exceeds video frames count {media.frame_count}.",
+        )
+
+    video_frame = media_service.get_video_frame_by_video_id_and_index(
+        project=project, video_id=media_id, frame_index=frame_index
     )
+    if video_frame is not None:
+        thumbnail_path = media_service.get_media_thumbnail_path_by_id(project_id=project_id, media_id=video_frame.id)
+        if os.path.exists(thumbnail_path):
+            return _response(thumbnail_path)
+        else:
+            raise _not_found()
+
+    # If the media is a video frame, generate the thumbnail on the fly
+    frame_thumbnail = media_service.get_frame_thumbnail(project=project, video=media, frame_index=frame_index)
+    return write_image_to_response(image=frame_thumbnail, filename=f"{media.name}_frame_{frame_index}.jpeg")
 
 
 @router.delete(
