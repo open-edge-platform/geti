@@ -43,7 +43,7 @@ const ViewLogsButton = ({ jobId }: { jobId: string }) => {
                 onPress={() => setIsLogsDialogOpen(true)}
                 aria-label={t('models.viewLogsButtonAria')}
             >
-                Logs
+                {t('models.logs')}
             </Button>
             <DialogContainer type={'fullscreen'} onDismiss={() => setIsLogsDialogOpen(false)}>
                 {isLogsDialogOpen && <TrainingLogsDialog jobId={jobId} />}
@@ -78,7 +78,8 @@ export const JobRow = ({
             ? labelSchemaRevision.labels.length
             : undefined;
 
-    const formattedStartedAt = job.started_at ? formatDateTime(job.started_at) : 'Waiting to start...';
+    const { t } = useTranslation();
+    const formattedStartedAt = job.started_at ? formatDateTime(job.started_at) : t('models.waitingToStart');
 
     return (
         <BottomProgressBar progress={progress}>
@@ -98,8 +99,8 @@ export const JobRow = ({
                         {statusBadges}
                     </Flex>
 
-                    <Text UNSAFE_className={classes.metaText}>{`Started: ${formattedStartedAt}`}</Text>
-                    {device && <Text UNSAFE_className={classes.metaText}>{`Device: ${device}`}</Text>}
+                    <Text UNSAFE_className={classes.metaText}>{t('models.startedAt', { date: formattedStartedAt })}</Text>
+                    {device && <Text UNSAFE_className={classes.metaText}>{t('models.deviceAt', { device })}</Text>}
                 </Flex>
 
                 <Flex alignItems={'start'} direction={'column'} gap={'size-100'}>

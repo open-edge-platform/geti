@@ -3,6 +3,7 @@
 
 import type { ConfigurableParameter, NumberEnumConfigurableParameter } from '@/api/types';
 import { Flex } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { NumberEnumParameterField, Parameter, Parameters } from '../../components/parameters.component';
 import { getInputSizeHeightParameter, getInputSizeWidthParameter } from './utils';
@@ -32,6 +33,7 @@ export const InputSizeParameters = ({
     onInputSizeParameterChange,
     isReadOnly = false,
 }: InputSizeParametersProps) => {
+    const { t } = useTranslation();
     const inputSizeWidthParameter = getInputSizeWidthParameter(inputSizeParameters);
     const inputSizeHeightParameter = getInputSizeHeightParameter(inputSizeParameters);
 
@@ -58,7 +60,7 @@ export const InputSizeParameters = ({
 
     return (
         <Parameters.Container>
-            <Parameter.Layout header={'Input size'} description={description} onReset={handleReset}>
+            <Parameter.Layout header={t('models.inputSizeTitle')} description={description} onReset={handleReset}>
                 <Flex alignItems={'center'} gap={'size-50'}>
                     <InputSizeParameter
                         inputSizeParameter={inputSizeWidthParameter}

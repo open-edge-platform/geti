@@ -72,7 +72,7 @@ export const EditSink = <T extends SinkConfig>({
                     UNSAFE_style={{ maxWidth: 'fit-content' }}
                     onPress={() => (connectToPipeline.current = false)}
                 >
-                    Save
+                    {t('common.save')}
                 </Button>
 
                 {!isConnected && (

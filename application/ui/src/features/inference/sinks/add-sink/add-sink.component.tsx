@@ -5,6 +5,7 @@ import { ReactNode } from 'react';
 
 import type { SinkConfig } from '@/api/types';
 import { Button, Form } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { usePatchPipeline } from '../../../../hooks/api/pipeline.hook';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';
@@ -18,6 +19,7 @@ interface AddSinkProps<T> {
 }
 
 export const AddSink = <T extends SinkConfig>({ config, onSaved, bodyFormatter, componentFields }: AddSinkProps<T>) => {
+    const { t } = useTranslation();
     const pipeline = usePatchPipeline();
     const project_id = useProjectIdentifier();
 
@@ -40,7 +42,7 @@ export const AddSink = <T extends SinkConfig>({ config, onSaved, bodyFormatter, 
                 isDisabled={isPending || pipeline.isPending}
                 UNSAFE_style={{ maxWidth: 'fit-content' }}
             >
-                Add & Use
+                {t('common.addAndUse')}
             </Button>
         </Form>
     );

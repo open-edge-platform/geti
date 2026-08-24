@@ -46,7 +46,7 @@ export const CurrentRunningJobs = ({ groupBy, datasetRevisions }: CurrentRunning
             UNSAFE_style={{ padding: 'var(--spectrum-global-dimension-size-300)' }}
         >
             <Heading level={2} UNSAFE_style={{ fontSize: dimensionValue('size-300') }}>
-                Jobs
+                {t('models.jobsHeading')}
             </Heading>
 
             <View backgroundColor={'gray-75'}>

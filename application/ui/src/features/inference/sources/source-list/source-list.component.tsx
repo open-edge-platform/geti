@@ -7,6 +7,7 @@ import { Add as AddIcon } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 import { isEqual } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { ConnectionStatusBadge } from '../../../../components/connection-status-badge/connection-status-badge.component';
 import { getErrorMessage } from '../../../../query-client/query-client';
@@ -83,6 +84,7 @@ const SourceListItem = ({ source, isConnected, onEditSource, isPipelineRunning }
 };
 
 export const SourcesList = ({ sources, onAddSource, onEditSource }: SourcesListProps) => {
+    const { t } = useTranslation();
     const pipeline = usePipeline();
     const currentSourceId = pipeline.data.source?.id;
     const isPipelineRunning = pipeline.data.status === 'running';
@@ -94,7 +96,7 @@ export const SourcesList = ({ sources, onAddSource, onEditSource }: SourcesListP
             UNSAFE_style={{ overflow: 'auto', padding: dimensionValue('size-10') }}
         >
             <Button variant='secondary' height={'size-800'} UNSAFE_className={classes.addSource} onPress={onAddSource}>
-                <AddIcon /> Add new source
+                <AddIcon /> {t('inference.addNewSource')}
             </Button>
 
             {sources.map((source) => (

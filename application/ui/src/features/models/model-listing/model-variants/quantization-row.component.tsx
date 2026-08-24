@@ -27,7 +27,7 @@ export const QuantizationRow = ({ model, isDisabled = false }: QuantizationRowPr
             </Flex>
             <DialogTrigger>
                 <Button variant={'secondary'} isDisabled={isDisabled}>
-                    Start quantization
+                    {t('models.startQuantization')}
                 </Button>
                 {(close) => <QuantizationDialog model={model} onClose={close} />}
             </DialogTrigger>

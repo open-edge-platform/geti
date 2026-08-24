@@ -75,7 +75,7 @@ export const EditSource = <T extends SourceConfigPayload>({
                     UNSAFE_style={{ maxWidth: 'fit-content' }}
                     onPress={() => (connectToPipeline.current = false)}
                 >
-                    Save
+                    {t('common.save')}
                 </Button>
 
                 {!isConnected && (

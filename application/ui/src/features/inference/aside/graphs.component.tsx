@@ -111,21 +111,19 @@ export const Graphs = () => {
             {!hasData && !metrics ? (
                 <IllustratedMessage>
                     <Heading>{t('inference.noStatistics')}</Heading>
-                    <Content>
-                        Pipeline metrics will show here once the pipeline starts running and processing data.
-                    </Content>
+                    <Content>{t('inference.metricsEmptyDesc')}</Content>
                 </IllustratedMessage>
             ) : (
                 <>
                     <View>
                         <Heading level={4} marginBottom={'size-300'}>
-                            Throughput
+                            {t('dataset.throughputHeading')}
                         </Heading>
                         <Graph label={t('inference.requestsPerSecondLabel')} data={throughputData} />
                     </View>
                     <View>
                         <Heading level={4} marginBottom={'size-300'}>
-                            Latency
+                            {t('dataset.latencyHeading')}
                         </Heading>
                         <Graph label={t('inference.latencyMsLabel')} data={latencyData} />
                     </View>

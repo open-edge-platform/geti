@@ -29,7 +29,9 @@ export const RunningJobTableHeader = ({ groupBy }: RunningJobTableHeaderProps) =
             }}
         >
             <ColumnHeader label={t('models.runningJobsModelNameColumn')} />
-            <ColumnHeader label={groupBy === 'architecture' ? 'Dataset' : 'Architecture'} />
+            <ColumnHeader
+                label={groupBy === 'architecture' ? t('models.datasetColumnLabel') : t('models.architectureColumnLabel')}
+            />
             <div />
         </Grid>
     );

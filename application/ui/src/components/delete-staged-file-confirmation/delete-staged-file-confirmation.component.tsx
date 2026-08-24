@@ -22,7 +22,7 @@ export const DeleteStagedFileConfirmation = ({ stagedDatasetId, deleteEntry }: D
     return (
         <DialogTrigger>
             <Button variant='secondary' style='fill' aria-label={t('dataset.deleteImportStatusAriaLabel')}>
-                Delete
+                {t('common.delete')}
             </Button>
             <AlertDialog
                 title={t('dataset.deleteStagedFileTitle')}

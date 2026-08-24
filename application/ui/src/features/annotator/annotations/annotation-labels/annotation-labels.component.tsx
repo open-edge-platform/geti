@@ -3,6 +3,7 @@
 
 import { PointerEvent, useCallback } from 'react';
 
+import { useTranslation } from 'react-i18next';
 import { v4 as uuid } from 'uuid';
 
 import { useZoom } from '../../../../components/zoom/zoom.provider';
@@ -11,8 +12,6 @@ import type { AnnotationLabel, AnnotationLabelRef } from '../../../../shared/typ
 import { isPrediction } from '../utils';
 
 import classes from './annotation-labels.module.scss';
-
-const placeholderLabel = { id: uuid(), name: 'No label', color: 'var(--annotation-fill)', isPrediction: false };
 
 // Screen-space dimensions for the foreignObject hit area
 const LABEL_HEIGHT_PX = 24;
@@ -39,6 +38,13 @@ export const AnnotationLabels = ({
     useBottomCorners = false,
     isRemovable = true,
 }: AnnotationLabelsProps) => {
+    const { t } = useTranslation();
+    const placeholderLabel = {
+        id: uuid(),
+        name: t('annotator.noLabel'),
+        color: 'var(--annotation-fill)',
+        isPrediction: false,
+    };
     const { scale } = useZoom();
     const { resolveAnnotationLabel } = useLabelResolver();
 

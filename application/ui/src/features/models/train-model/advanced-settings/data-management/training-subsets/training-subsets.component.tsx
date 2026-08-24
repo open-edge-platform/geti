@@ -35,10 +35,9 @@ const TrainingSubsetsUnavailable = () => {
         <InlineAlert variant={'notice'} marginTop={'size-200'}>
             <Heading>{t('models.invalidSubsetsHeading')}</Heading>
             <Content>
-                Training subsets do not contain enough media items to support a configurable split between training,
-                validation, and testing subsets.
+                {t('models.trainingSubsetsUnavailableText')}
                 <br />
-                Please add more media items to ensure each subset contains at least one item.
+                {t('models.trainingSubsetsUnavailableHint')}
             </Content>
         </InlineAlert>
     );
@@ -187,17 +186,13 @@ export const TrainingSubsets = ({
     return (
         <Accordion>
             <Accordion.Title>
-                Training subsets
-                <Accordion.Tag ariaLabel={'Training subsets tag'}>
+                {t('models.trainingSubsetsTitle')}
+                <Accordion.Tag ariaLabel={t('models.trainingSubsetsTagAria')}>
                     {trainingSubsetRatio}/{validationSubsetRatio}/{testSubsetRatio}%
                 </Accordion.Tag>
             </Accordion.Title>
             <Accordion.Content>
-                <Accordion.Description>
-                    Specify the distribution of annotated samples that have NOT already been assigned to a subset. Note
-                    that samples used in previous training rounds already have a subset and this will remain unchanged,
-                    to avoid data contamination and evaluation bias.
-                </Accordion.Description>
+                <Accordion.Description>{t('models.trainingSubsetsDescription')}</Accordion.Description>
                 <Accordion.Divider marginY={'size-200'} />
                 <View>
                     <span aria-label={t('models.totalSamplesAriaLabel')}>

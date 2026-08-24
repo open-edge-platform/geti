@@ -21,13 +21,7 @@ export const SelectDatasetRevision = () => {
                 contextualHelp={
                     <ContextualHelp variant={'info'} placement={'top'}>
                         <Heading>{t('models.selectingDatasetHeading')}</Heading>
-                        <Content>
-                            {`Choose the version of the dataset to use for training. If you want to train the new model
-                            on the exact same data (media and annotations) as another model, please select the
-                            corresponding dataset revision. Conversely, if you want to train on the most recent version
-                            of the data (what you see in the "Dataset" page), please select "Use
-                            current dataset".`}
-                        </Content>
+                        <Content>{t('models.selectDatasetRevisionHelp')}</Content>
                     </ContextualHelp>
                 }
             >

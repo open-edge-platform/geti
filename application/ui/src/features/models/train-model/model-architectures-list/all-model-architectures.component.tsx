@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import type { ModelArchitecture as ModelArchitectureType } from '@/api/types';
 import { Flex } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { SortModelArchitectures } from '../sort-model-architectures/sort-model-architectures.component';
 import { SORT_OPTIONS, SORTING_HANDLERS, SortingOptions } from '../sort-model-architectures/utils';
@@ -22,6 +23,7 @@ export const AllModelArchitectures = ({
     onSelectedModelArchitectureIdChange,
     selectedModelArchitectureId,
 }: AllModelArchitecturesProps) => {
+    const { t } = useTranslation();
     const [sortBy, setSortBy] = useState<SortingOptions>(SortingOptions.NAME_ASC);
     const sortedModelArchitectures = SORTING_HANDLERS[sortBy](modelArchitectures);
 
@@ -31,7 +33,7 @@ export const AllModelArchitectures = ({
             <ModelArchitecturesListLayout
                 selectedModelArchitectureId={selectedModelArchitectureId}
                 onSelectedModelArchitectureIdChange={onSelectedModelArchitectureIdChange}
-                ariaLabel={'ALL model architectures'}
+                ariaLabel={t('models.allArchitecturesAria')}
             >
                 {sortedModelArchitectures.map((modelArchitecture) => (
                     <DetailedModelArchitecture

@@ -25,7 +25,7 @@ export const DataAugmentation = ({
     return (
         <Accordion>
             <Accordion.Title>
-                Data Augmentation
+                {t('models.dataAugmentationTitle')}
                 <Accordion.Tag ariaLabel={t('models.dataAugmentationTagAria')}>
                     {isEnabled ? t('models.augmentationYes') : t('models.augmentationNo')}
                 </Accordion.Tag>

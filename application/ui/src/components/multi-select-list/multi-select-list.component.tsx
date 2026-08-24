@@ -66,7 +66,7 @@ export const MultiSelectList = <T extends string = string>({
             <ListView
                 {...listProps}
                 items={items}
-                aria-label={label ?? 'Multi-select list'}
+                aria-label={label ?? t('common.multiSelectListFallback')}
                 selectionMode='multiple'
                 onSelectionChange={handleSelectChange}
                 selectedKeys={selectedLabels}

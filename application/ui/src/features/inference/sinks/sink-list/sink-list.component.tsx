@@ -6,6 +6,7 @@ import { Button, dimensionValue, Flex, Text } from '@geti-ui/ui';
 import { Add as AddIcon } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { isEqual } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 
 import { ConnectionStatusBadge } from '../../../../components/connection-status-badge/connection-status-badge.component';
 import { usePipeline } from '../../../../hooks/api/pipeline.hook';
@@ -83,6 +84,7 @@ const SinkListItem = ({ sink, isConnected, onEditSink }: SinksListItemProps) => 
 };
 
 export const SinkList = ({ sinks, onAddSink, onEditSink }: SinksListProps) => {
+    const { t } = useTranslation();
     const pipeline = usePipeline();
     const currentSinkId = pipeline.data.sink?.id;
 
@@ -93,7 +95,7 @@ export const SinkList = ({ sinks, onAddSink, onEditSink }: SinksListProps) => {
             UNSAFE_style={{ overflow: 'auto', padding: dimensionValue('size-10') }}
         >
             <Button variant='secondary' height={'size-800'} UNSAFE_className={classes.addSink} onPress={onAddSink}>
-                <AddIcon /> Add new sink
+                <AddIcon /> {t('inference.addNewSink')}
             </Button>
 
             {sinks.map((sink) => (

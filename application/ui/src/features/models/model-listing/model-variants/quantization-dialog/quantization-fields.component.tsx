@@ -109,7 +109,7 @@ export const MaxAccuracyDropField = ({
                 />
             </Flex>
             <Checkbox aria-label={t('models.noMaximumCheckbox')} isSelected={isDisabled} onChange={onDisabledChange}>
-                No maximum
+                {t('models.noMaximumCheckbox')}
             </Checkbox>
         </QuantizationFieldLayout>
     );
@@ -221,7 +221,7 @@ export const CalibrationDatasetSizeField = ({
                 isSelected={isDisabled}
                 onChange={onDisabledChange}
             >
-                Use full dataset
+                {t('models.useFullDatasetCheckbox')}
             </Checkbox>
         </QuantizationFieldLayout>
     );

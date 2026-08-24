@@ -49,7 +49,7 @@ export const AdvancedSettings = () => {
             ),
         },
         {
-            name: 'Training',
+            name: t('models.trainingTab'),
             children: (
                 <Training
                     trainingConfiguration={trainingConfiguration}
@@ -61,7 +61,7 @@ export const AdvancedSettings = () => {
     ];
 
     return (
-        <Tabs items={TABS} height={'100%'} UNSAFE_style={{ overflow: 'hidden' }} aria-label={'Advanced settings tabs'}>
+        <Tabs items={TABS} height={'100%'} UNSAFE_style={{ overflow: 'hidden' }} aria-label={t('models.advancedSettingsTabsAria')}>
             <TabList UNSAFE_style={{ '--spectrum-tabs-selection-indicator-color': 'var(--energy-blue)' }}>
                 {(tab: TabProps) => (
                     <Item key={tab.name} textValue={tab.name}>

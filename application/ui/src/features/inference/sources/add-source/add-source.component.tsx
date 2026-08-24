@@ -5,6 +5,7 @@ import { ReactNode } from 'react';
 
 import type { SourceConfigPayload } from '@/api/types';
 import { Button, Flex, Form } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { useConnectSourceToPipeline } from '../../../../hooks/api/pipeline.hook';
 import { useSourceAction } from '../hooks/use-source-action.hook';
@@ -24,6 +25,7 @@ export const AddSource = <T extends SourceConfigPayload>({
     prepareFormData,
     componentFields,
 }: AddSourceProps<T>) => {
+    const { t } = useTranslation();
     const connectToPipelineMutation = useConnectSourceToPipeline();
 
     const [state, submitAction, isPending] = useSourceAction({
@@ -43,7 +45,7 @@ export const AddSource = <T extends SourceConfigPayload>({
                 <>{componentFields(state)}</>
 
                 <Button type='submit' isDisabled={isPending} UNSAFE_style={{ maxWidth: 'fit-content' }}>
-                    Add & Use
+                    {t('common.addAndUse')}
                 </Button>
             </Flex>
         </Form>

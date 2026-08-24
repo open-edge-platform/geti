@@ -37,6 +37,7 @@ const FailedModel = () => {
 };
 
 const DeletedWeightsModel = () => {
+    const { t } = useTranslation();
     return (
         <Badge
             variant={'yellow'}
@@ -44,7 +45,7 @@ const DeletedWeightsModel = () => {
                 '--spectrum-yellow-background-color-default': `var(--brand-daisy)`,
             }}
         >
-            Deleted weights
+            {t('models.deletedWeightsBadge')}
         </Badge>
     );
 };

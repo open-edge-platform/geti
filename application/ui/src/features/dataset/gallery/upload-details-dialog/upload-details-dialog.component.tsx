@@ -177,7 +177,7 @@ const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
             </Content>
             <ButtonGroup>
                 <Button variant={'primary'} onPress={onClose}>
-                    Close
+                    {t('common.close')}
                 </Button>
             </ButtonGroup>
         </Dialog>

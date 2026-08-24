@@ -17,6 +17,7 @@ import { useGetSuccessfulModels } from '../hooks/api/use-get-models.hook';
 import { useGetTrainingDevices } from './api/use-get-training-devices';
 import { useTrainingConfiguration } from './hooks/use-training-configuration';
 import { getDefaultTrainingDevice } from './select-training-device/utils';
+import { i18n } from '../../../i18n';
 
 type DatasetRevisionWithValue = Pick<DatasetRevision, 'id' | 'name'> & { value: string | null };
 type ModelRevisionWithValue = Pick<Model, 'id' | 'name' | 'architecture'> & { value: string | null };
@@ -61,7 +62,7 @@ const useDatasetRevisions = () => {
 
     return {
         datasetRevisions: [
-            { id: 'use-current-dataset-revision', name: 'Use current dataset', value: null },
+            { id: 'use-current-dataset-revision', name: i18n.t('models.useCurrentDataset'), value: null },
             ...(datasetRevisions?.map(({ id, name }) => ({ id, name, value: String(id) })) ?? []),
         ],
     };
@@ -73,7 +74,7 @@ const useModelRevisions = () => {
 
     return {
         modelRevisions: [
-            { id: DEFAULT_PRE_TRAINED_WEIGHTS, name: 'Default pre-trained weights', architecture: '', value: null },
+            { id: DEFAULT_PRE_TRAINED_WEIGHTS, name: i18n.t('models.defaultPretrainedWeights'), architecture: '', value: null },
             ...(models?.map(({ id, name, architecture }) => ({ id, name, architecture, value: String(id) })) ?? []),
         ],
     };

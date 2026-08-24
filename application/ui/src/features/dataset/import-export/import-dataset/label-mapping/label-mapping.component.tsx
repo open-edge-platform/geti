@@ -112,7 +112,7 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
             <Flex direction={'column'}>
                 <Heading marginTop={'size-200'}>{t('dataset.labelMappingHeading')}</Heading>
                 <Text UNSAFE_className={classes.emptyLabelsWarning}>
-                    Any unmapped items will be imported as unlabeled
+                    {t('dataset.unmappedWarning')}
                 </Text>
             </Flex>
 
@@ -156,7 +156,7 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                         name='include_unannotated'
                         aria-label={t('dataset.includeUnannotatedAriaLabel')}
                     >
-                        Include media without annotations
+                        {t('dataset.includeUnannotatedText')}
                     </Checkbox>
                 </Form>
             </View>

@@ -65,7 +65,7 @@ export const ImportFailedJob = ({
                     isPending={deleteFileMutation.isPending}
                     isDisabled={deleteFileMutation.isPending}
                 >
-                    Close
+                    {t('common.close')}
                 </Button>
             }
             bottomLeftMessage={

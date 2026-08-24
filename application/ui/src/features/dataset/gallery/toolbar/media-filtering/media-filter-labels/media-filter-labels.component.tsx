@@ -22,7 +22,7 @@ export const MediaFilterLabels = () => {
 
     return (
         <FilterPopoverButton
-            ariaLabel='Filter by labels'
+            ariaLabel={t('dataset.filterByLabelsAria')}
             placeholder={t('dataset.searchLabelsPlaceholder')}
             summary={summary}
             minWidth='size-3000'
@@ -32,7 +32,7 @@ export const MediaFilterLabels = () => {
                 name='labels'
                 items={labels}
                 maxHeight='size-2000'
-                selectAllLabel='Toggle all'
+                selectAllLabel={t('dataset.toggleAllLabel')}
                 onSelectionChange={setSelectedLabelIds}
                 defaultSelectedKeys={new Set(selectedLabelIds)}
             />

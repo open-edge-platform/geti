@@ -90,14 +90,14 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
 
                 <ButtonGroup marginStart={'auto'}>
                     <Button variant={'secondary'} onPress={onClose}>
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     {isAdvancedSettingsMode ? (
                         <Button
                             variant={'primary'}
                             onPress={() => onToggleAdvancedSettingsMode(!isAdvancedSettingsMode)}
                         >
-                            Back
+                            {t('models.backButton')}
                         </Button>
                     ) : (
                         <Button
@@ -105,7 +105,7 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
                             isDisabled={isAdvancedSettingsModeDisabled}
                             onPress={() => onToggleAdvancedSettingsMode(!isAdvancedSettingsMode)}
                         >
-                            Advanced settings
+                            {t('models.advancedSettingsButton')}
                         </Button>
                     )}
 
@@ -115,7 +115,7 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
                         isDisabled={isStartButtonDisabled}
                         isPending={isPending}
                     >
-                        Start
+                        {t('models.startButton')}
                     </Button>
                 </ButtonGroup>
             </Footer>

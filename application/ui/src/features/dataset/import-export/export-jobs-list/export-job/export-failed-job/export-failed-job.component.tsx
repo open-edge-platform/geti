@@ -34,7 +34,7 @@ export const ExportFailedJob = ({ job, datasetName }: ExportFailedJobProps) => {
                         aria-label={t('dataset.closeExportStatusAriaLabel')}
                         onPress={handleClose}
                     >
-                        Close
+                        {t('common.close')}
                     </Button>
                 </Flex>
             </Flex>

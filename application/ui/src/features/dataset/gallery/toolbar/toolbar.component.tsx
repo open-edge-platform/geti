@@ -51,27 +51,30 @@ type AnnotateButtonProps = {
 };
 
 const AnnotateButton = ({ isDisabled, onClick }: AnnotateButtonProps) => {
+    const { t } = useTranslation();
+
     return (
         <Button margin={0} variant={'primary'} onPress={onClick} isDisabled={isDisabled}>
-            Annotate
+            {t('dataset.annotateButton')}
         </Button>
     );
 };
 
 const SortMediaByUploadDate = () => {
+    const { t } = useTranslation();
     const { sortDirection, setSortDirection } = useDatasetFiltersSearchParams();
 
     if (sortDirection === 'asc') {
         return (
             <ActionButton isQuiet onPress={() => setSortDirection('desc')}>
-                Oldest first <SortUp />
+                {t('dataset.sortOldestFirst')} <SortUp />
             </ActionButton>
         );
     }
 
     return (
         <ActionButton isQuiet onPress={() => setSortDirection('asc')}>
-            Newest first <SortDown />
+            {t('dataset.sortNewestFirst')} <SortDown />
         </ActionButton>
     );
 };

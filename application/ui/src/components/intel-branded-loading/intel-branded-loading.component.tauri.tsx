@@ -7,15 +7,18 @@
 // while the main thread is busy bootstrapping WASM / OpenCV / SAM workers.
 
 import { Flex, Loading } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 type IntelBrandedLoadingProps = {
     height?: string;
 };
 
 export const IntelBrandedLoading = ({ height = '100vh' }: IntelBrandedLoadingProps) => {
+    const { t } = useTranslation();
+
     return (
         <Flex justifyContent='center' alignItems='center' height={height} direction='column' marginBottom={'size-400'}>
-            <Loading mode={'inline'} size={'L'} aria-label={'Loading'} />
+            <Loading mode={'inline'} size={'L'} aria-label={t('common.loadingAria')} />
         </Flex>
     );
 };

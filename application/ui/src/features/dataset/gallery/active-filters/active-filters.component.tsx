@@ -112,7 +112,7 @@ export const ActiveFilters = () => {
     return (
         <Flex gap={'size-150'} wrap={'wrap'} alignItems={'center'} aria-label={t('dataset.activeFiltersAriaLabel')}>
             <ActionButton isQuiet onPress={handleClearAll}>
-                Clear all
+                {t('dataset.clearAllButton')}
             </ActionButton>
 
             <Divider orientation={'vertical'} size={'S'} />

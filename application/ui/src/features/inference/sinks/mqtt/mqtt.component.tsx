@@ -53,7 +53,7 @@ export const Mqtt = ({ defaultState }: MqttProps) => {
                     defaultSelected={defaultState.auth_required}
                     key={defaultState.auth_required ? 'true' : 'false'}
                 >
-                    Auth Required
+                    {t('inference.authRequired')}
                 </Switch>
             </Flex>
 

@@ -36,7 +36,7 @@ export const TimmModelConfiguration = () => {
     return (
         <View UNSAFE_className={classes.container}>
             <Heading UNSAFE_className={classes.heading} level={3} marginBottom={'size-200'}>
-                TIMM model configuration
+                {t('models.timmModelConfiguration')}
             </Heading>
 
             <Flex>
@@ -72,10 +72,10 @@ export const TimmModelConfiguration = () => {
                 <Divider size={'S'} marginX={'size-400'} orientation={'vertical'} />
 
                 <ul className={classes.infoList}>
-                    <li>{t('models.parametersLabel')}: {info.parameters}</li>
-                    <li>GigaFlops: {info.gigaFlops}</li>
-                    <li>mAP: {info.mAP}</li>
-                    <li>License: {info.license}</li>
+                    <li>{t('models.parametersCountLabel')}: {info.parameters}</li>
+                    <li>{t('models.gigaflopsLabel')}: {info.gigaFlops}</li>
+                    <li>{t('models.mapLabel')}: {info.mAP}</li>
+                    <li>{t('models.licenseLabel')}: {info.license}</li>
                 </ul>
             </Flex>
         </View>

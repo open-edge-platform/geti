@@ -5,6 +5,7 @@ import { Dispatch, ReactNode, SetStateAction } from 'react';
 
 import type { ConfigurableParameter, TrainingConfiguration } from '@/api/types';
 import { Grid, minmax, Text, View } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { Accordion } from '../../components/accordion/accordion.component';
 import { Parameters } from '../../components/parameters.component';
@@ -15,9 +16,7 @@ import {
     getCustomTilingParameters,
     getEnableTilingParameter,
     getTilingMode,
-    TILING_AUTOMATIC_DESCRIPTION,
     TILING_MODES,
-    TILING_OFF_DESCRIPTION,
     TilingConfigurableParameterGroup,
     TilingMode,
 } from './utils';
@@ -43,6 +42,7 @@ const changeTilingParameters = (
 };
 
 export const Tiling = ({ tilingParameters, onTrainingConfigurationChange }: TilingProps) => {
+    const { t } = useTranslation();
     const selectedTilingMode = getTilingMode(tilingParameters.parameters);
     const customTilingParameters = getCustomTilingParameters(tilingParameters.parameters);
 
@@ -81,13 +81,13 @@ export const Tiling = ({ tilingParameters, onTrainingConfigurationChange }: Tili
     const TILING_MODE_COMPONENTS: Record<TilingMode, ReactNode> = {
         [TILING_MODES.OFF]: (
             <Text UNSAFE_className={classes.tilingModeDescription} gridColumn={'2/3'}>
-                {TILING_OFF_DESCRIPTION}
+                {t('models.tilingOffDescription')}
             </Text>
         ),
 
         [TILING_MODES.AUTOMATIC]: (
             <Text UNSAFE_className={classes.tilingModeDescription} gridColumn={'2/3'}>
-                {TILING_AUTOMATIC_DESCRIPTION}
+                {t('models.tilingAutoDescription')}
             </Text>
         ),
         [TILING_MODES.CUSTOM]: (
@@ -103,13 +103,10 @@ export const Tiling = ({ tilingParameters, onTrainingConfigurationChange }: Tili
     return (
         <Accordion>
             <Accordion.Title>
-                Tiling <Accordion.Tag ariaLabel={'Tiling tag'}>{selectedTilingMode}</Accordion.Tag>
+                {t('models.tilingTitle')} <Accordion.Tag ariaLabel={t('models.tilingTagAria')}>{selectedTilingMode}</Accordion.Tag>
             </Accordion.Title>
             <Accordion.Content>
-                <Accordion.Description>
-                    Tiling is a technique that divides high-resolution images into smaller tiles and might be useful to
-                    increase accuracy for small object detection tasks.
-                </Accordion.Description>
+                <Accordion.Description>{t('models.tilingDescription')}</Accordion.Description>
                 <Accordion.Divider marginY={'size-250'} />
                 <Grid
                     columns={['size-3000', minmax('size-3400', '1fr'), 'size-400']}

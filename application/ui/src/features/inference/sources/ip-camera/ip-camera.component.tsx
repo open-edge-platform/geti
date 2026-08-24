@@ -29,7 +29,7 @@ export const IpCamera = ({ defaultState }: IpCameraProps) => {
                 defaultSelected={defaultState?.auth_required}
                 key={defaultState?.auth_required ? 'true' : 'false'}
             >
-                Require Authentication
+                {t('inference.requireAuthentication')}
             </Switch>
         </Flex>
     );

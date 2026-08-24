@@ -25,13 +25,13 @@ export const OutputFormats = ({ config = [] }: OutputFormatsProps) => {
             UNSAFE_className={classes.itemList}
         >
             <Checkbox name='output_formats' value={OutputFormat.PREDICTIONS}>
-                Predictions
+                {t('inference.predictions')}
             </Checkbox>
             <Checkbox name='output_formats' value={OutputFormat.IMAGE_ORIGINAL}>
-                Image Original
+                {t('inference.imageOriginal')}
             </Checkbox>
             <Checkbox name='output_formats' value={OutputFormat.IMAGE_WITH_PREDICTIONS}>
-                Image with Predictions
+                {t('inference.imageWithPredictions')}
             </Checkbox>
         </CheckboxGroup>
     );

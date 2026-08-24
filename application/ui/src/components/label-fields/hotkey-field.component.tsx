@@ -4,6 +4,7 @@
 import { KeyboardEvent } from 'react';
 
 import { TextField } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { formatHotkeyForDisplay } from '../../shared/hotkeys-definition';
 
@@ -64,10 +65,12 @@ export const HotkeyField = ({ hotkey, errorMessage, onEnter, onHotkeyChange, onB
 
     const formattedHotkey = hotkey == null ? '' : formatHotkeyForDisplay(hotkey);
 
+    const { t } = useTranslation();
+
     return (
         <TextField
-            aria-label={'Hotkey input'}
-            placeholder={'Hotkey'}
+            aria-label={t('annotator.hotkeyInputAria')}
+            placeholder={t('annotator.hotkeyPlaceholder')}
             value={formattedHotkey}
             onKeyDown={handleKeyDown}
             onBlur={onBlur}

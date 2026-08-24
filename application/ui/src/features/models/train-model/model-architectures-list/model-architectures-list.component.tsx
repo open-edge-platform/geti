@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Button, Flex } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { useTrainModelState } from '../train-model-provider.component';
 import { AllModelArchitectures } from './all-model-architectures.component';
@@ -19,6 +20,7 @@ export const ModelArchitecturesList = () => {
         onToggleShowMoreModelArchitectures,
     } = useTrainModelState();
 
+    const { t } = useTranslation();
     const recommendedArchitectures = getRecommendedArchitectures(modelArchitectures);
     const collapsedArchitectures = recommendedArchitectures.slice(0, SHOW_MORE_THRESHOLD);
     const canToggleArchitecturesList = modelArchitectures.length > SHOW_MORE_THRESHOLD;
@@ -45,7 +47,7 @@ export const ModelArchitecturesList = () => {
                     variant={'primary'}
                     onPress={() => onToggleShowMoreModelArchitectures(!showMoreModelArchitectures)}
                 >
-                    {showMoreModelArchitectures ? 'Show less' : 'Show more'}
+                    {showMoreModelArchitectures ? t('models.showLess') : t('models.showMore')}
                 </Button>
             )}
         </Flex>

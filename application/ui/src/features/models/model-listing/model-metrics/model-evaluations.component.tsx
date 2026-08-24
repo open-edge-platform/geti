@@ -3,6 +3,7 @@
 
 import type { Evaluation } from '@/api/types';
 import { Grid, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import { Box } from '../components/box/box.component';
 import { getTestingMetrics } from '../components/model-row/utils';
@@ -16,15 +17,16 @@ type ModelEvaluationMetrics = {
 };
 
 export const ModelEvaluations = ({ evaluations }: ModelEvaluationMetrics) => {
+    const { t } = useTranslation();
     const testingMetrics = getTestingMetrics(evaluations);
 
     if (testingMetrics.length === 0) {
         return (
             <Box
-                title={'Evaluations'}
+                title={t('models.evaluationsTitle')}
                 content={
                     <Text UNSAFE_style={{ color: 'var(--spectrum-global-color-gray-900)' }}>
-                        Testing evaluation metrics are not available
+                        {t('models.testingMetricsNotAvailable')}
                     </Text>
                 }
             />

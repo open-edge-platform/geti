@@ -85,6 +85,7 @@ type AssignToExistingViewProps = {
 };
 
 export const AssignToExistingView = ({ datasetViews, selectedMediaIds }: AssignToExistingViewProps) => {
+    const { t } = useTranslation();
     const [isAssignToExistingViewOpen, setIsAssignToExistingViewOpen] = useState<boolean>(false);
     const isAssignToExistingViewDisabled = isEmpty(datasetViews);
 
@@ -99,7 +100,7 @@ export const AssignToExistingView = ({ datasetViews, selectedMediaIds }: AssignT
                 onPress={() => setIsAssignToExistingViewOpen(true)}
                 isDisabled={isAssignToExistingViewDisabled}
             >
-                Assign to existing view
+                {t('dataset.assignToExistingViewButton')}
             </Button>
             <DialogContainer onDismiss={closeDialog}>
                 {isAssignToExistingViewOpen && (

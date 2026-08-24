@@ -68,7 +68,7 @@ export const VideoFile = ({ defaultState }: VideoFileProps) => {
                         onChange={(event) => handleFileChange(event.target.files?.[0] ?? null)}
                     />
                     <Button variant='secondary' onPress={() => fileInputRef.current?.click()}>
-                        Upload
+                        {t('inference.upload')}
                     </Button>
                 </Flex>
 
@@ -85,7 +85,7 @@ export const VideoFile = ({ defaultState }: VideoFileProps) => {
                 defaultSelected={defaultState?.loop}
                 key={defaultState?.loop ? 'true' : 'false'}
             >
-                Loop video
+                {t('inference.loopVideo')}
             </Switch>
         </Flex>
     );

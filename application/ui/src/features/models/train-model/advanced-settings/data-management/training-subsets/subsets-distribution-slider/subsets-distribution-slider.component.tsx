@@ -6,6 +6,7 @@ import { RefObject, useRef } from 'react';
 import { Content, ContextualHelp, Flex, Text, View, VisuallyHidden } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 import { mergeProps, useFocusRing, useNumberFormatter, useSlider, useSliderThumb } from 'react-aria';
+import { useTranslation } from 'react-i18next';
 import { SliderState, useSliderState } from 'react-stately';
 
 import classes from './subsets-distribution-slider.module.scss';
@@ -47,14 +48,11 @@ const Thumb = ({ state, trackRef, index, ariaLabel }: ThumbProps) => {
 };
 
 const DistributionTooltip = () => {
+    const { t } = useTranslation();
     return (
         <ContextualHelp variant='info'>
             <Content>
-                <Text>
-                    Specify the distribution of annotated samples that have NOT already been assigned to a subset. Note
-                    that samples used in previous training rounds already have a subset and this will remain unchanged,
-                    to avoid data contamination and evaluation bias.
-                </Text>
+                <Text>{t('models.subsetsDistributionHelp')}</Text>
             </Content>
         </ContextualHelp>
     );
@@ -73,6 +71,7 @@ type SubsetsDistributionSliderProps = {
 };
 
 export const SubsetsDistributionSlider = (props: SubsetsDistributionSliderProps) => {
+    const { t } = useTranslation();
     const trackRef = useRef(null);
 
     const numberFormatter = useNumberFormatter(props.formatOptions);
@@ -106,11 +105,11 @@ export const SubsetsDistributionSlider = (props: SubsetsDistributionSliderProps)
                         left={`${state.getThumbPercent(1) * 100}%`}
                         UNSAFE_className={clsx(classes.track, classes.testTrack)}
                     />
-                    <Thumb index={0} state={state} trackRef={trackRef} ariaLabel={'Start range'} />
-                    <Thumb index={1} state={state} trackRef={trackRef} ariaLabel={'End range'} />
+                    <Thumb index={0} state={state} trackRef={trackRef} ariaLabel={t('models.startRangeAria')} />
+                    <Thumb index={1} state={state} trackRef={trackRef} ariaLabel={t('models.endRangeAria')} />
                 </div>
                 <Text width={'size-1000'}>
-                    <span aria-label={'Training subsets distribution'}>
+                    <span aria-label={t('models.trainingSubsetsDistributionAria')}>
                         {trainingValue}/{validationValue}/{testValue}%
                     </span>
                 </Text>

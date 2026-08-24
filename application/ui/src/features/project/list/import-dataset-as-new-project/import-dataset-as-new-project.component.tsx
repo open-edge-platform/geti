@@ -47,7 +47,7 @@ export const ImportDatasetAsNewProject = ({ dialogState }: ImportDatasetAsNewPro
     return (
         <DialogContainer onDismiss={dialogState.close}>
             {dialogState.isOpen && (
-                <Dialog aria-label={'import-dataset-dialog'} width={860}>
+                <Dialog aria-label={t('common.importDatasetDialogAria')} width={860}>
                     <Heading>{t('project.list.importWizardHeading')}</Heading>
                     <Divider />
                     <Content UNSAFE_className={classes.container}>

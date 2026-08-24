@@ -59,11 +59,13 @@ const ImageAnnotationButtons = ({
     isDisabled,
     isSaving,
 }: ImageAnnotationButtonsProps) => {
+    const { t } = useTranslation();
+
     return (
         <>
             <DeleteMediaItem itemsIds={[mediaId]} onDeleted={onDeleteItem} />
             <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
-                Submit
+                {t('common.submitButton')}
             </Button>
         </>
     );
@@ -76,9 +78,11 @@ type VideoAnnotationButtonsProps = {
 };
 
 const VideoAnnotationButtons = ({ onSubmit, isDisabled, isSaving }: VideoAnnotationButtonsProps) => {
+    const { t } = useTranslation();
+
     return (
         <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
-            Submit
+            {t('common.submitButton')}
         </Button>
     );
 };

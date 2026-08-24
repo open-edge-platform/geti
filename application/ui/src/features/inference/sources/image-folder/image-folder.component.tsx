@@ -33,7 +33,7 @@ export const ImageFolder = ({ defaultState }: ImageFolderProps) => {
                 defaultSelected={defaultState?.ignore_existing_images}
                 key={defaultState?.ignore_existing_images ? 'true' : 'false'}
             >
-                Ignore existing images
+                {t('inference.ignoreExistingLabel')}
             </Switch>
         </Flex>
     );

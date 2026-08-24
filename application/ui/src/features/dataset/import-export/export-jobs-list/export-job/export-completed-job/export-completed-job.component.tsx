@@ -29,7 +29,7 @@ export const ExportCompletedJob = ({ job, datasetName }: ExportCompletedJobProps
     });
 
     const hasInvalidStagedDataset = isNil(job.metadata.dataset_id);
-    const message = hasInvalidStagedDataset ? job.message : 'Dataset is ready for download';
+    const message = hasInvalidStagedDataset ? job.message : t('dataset.exportReadyToast');
 
     const handleClose = () => {
         if (hasInvalidStagedDataset) {
@@ -59,7 +59,7 @@ export const ExportCompletedJob = ({ job, datasetName }: ExportCompletedJobProps
                         isPending={removeStagedDatasetMutation.isPending}
                         isDisabled={removeStagedDatasetMutation.isPending}
                     >
-                        Close
+                        {t('common.close')}
                     </Button>
                     <Button
                         variant='secondary'
@@ -72,7 +72,7 @@ export const ExportCompletedJob = ({ job, datasetName }: ExportCompletedJobProps
                             removeStagedDatasetMutation.isPending
                         }
                     >
-                        Download
+                        {t('dataset.downloadButton')}
                     </Button>
                 </Flex>
             </Flex>

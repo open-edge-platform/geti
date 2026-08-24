@@ -98,7 +98,7 @@ export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) 
                 <View padding={'size-300'} backgroundColor={'gray-50'} height={'100%'}>
                     <View padding={'size-300'} backgroundColor={'gray-75'} height={'100%'}>
                         <Heading UNSAFE_style={{ color: 'var(--spectrum-global-color-gray-700)' }} level={4}>
-                            Quantize model to INT8
+                            {t('models.quantizeModelToInt8')}
                         </Heading>
 
                         <Divider size={'S'} marginY={'size-200'} />
@@ -137,7 +137,7 @@ export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) 
                                     color: 'var(--spectrum-global-color-gray-700)',
                                 }}
                             >
-                                Recommended calibration dataset size: between 200-500 media items
+                                {t('models.recommendedCalibrationSize')}
                             </Text>
                         </Flex>
                     </View>
@@ -150,7 +150,7 @@ export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) 
                     onPress={onClose}
                     UNSAFE_style={{ paddingTop: dimensionValue('size-75') }}
                 >
-                    Cancel
+                    {t('common.cancel')}
                 </Button>
                 <Button
                     variant={'primary'}
@@ -158,7 +158,7 @@ export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) 
                     isPending={submitJob.isPending}
                     isDisabled={isLoadingCount || hasNoDatasetItems || submitJob.isPending}
                 >
-                    Start quantization
+                    {t('models.startQuantization')}
                 </Button>
             </ButtonGroup>
         </Dialog>

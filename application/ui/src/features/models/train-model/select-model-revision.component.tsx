@@ -20,11 +20,7 @@ export const SelectModelRevision = () => {
             contextualHelp={
                 <ContextualHelp variant={'info'} placement={'top'}>
                     <Heading>{t('models.selectingInputWeightsHeading')}</Heading>
-                    <Content>
-                        {'Choose an existing model to continue fine-tuning, or select ' +
-                            `"Default pre-trained weights" to fine-tune a new model starting from ` +
-                            'publicly available weights pre-trained on large public datasets.'}
-                    </Content>
+                    <Content>{t('models.selectModelRevisionHelp')}</Content>
                 </ContextualHelp>
             }
         >

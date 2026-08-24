@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Flex, Text, View } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 
 import classes from './training-subsets.module.scss';
 
@@ -41,25 +42,27 @@ export const SubsetDistributionStats = ({
     testSize,
     totalSize,
 }: SubsetDistributionStatsProps) => {
+    const { t } = useTranslation();
+
     return (
         <View gridArea={'counts'} backgroundColor={'static-gray-800'} borderRadius={'small'} padding={'size-100'}>
             <Flex alignItems={'center'} justifyContent={'space-between'} UNSAFE_className={classes.statsText}>
                 <Flex alignItems={'center'} gap={'size-200'}>
                     <SubsetDistributionStat
-                        title={'Training'}
+                        title={t('models.trainingSubsetTitle')}
                         color={LABEL_COLOR_MAPPING.training}
                         size={trainingSize}
                     />
                     <SubsetDistributionStat
-                        title={'Validation'}
+                        title={t('models.validationSubsetTitle')}
                         color={LABEL_COLOR_MAPPING.validation}
                         size={validationSize}
                     />
-                    <SubsetDistributionStat title={'Test'} color={LABEL_COLOR_MAPPING.test} size={testSize} />
+                    <SubsetDistributionStat title={t('models.testingSubsetTitle')} color={LABEL_COLOR_MAPPING.test} size={testSize} />
                 </Flex>
                 <Text>
-                    <Text UNSAFE_className={classes.totalStats}>Total: </Text>
-                    <span aria-label={'Total size'}>{totalSize}</span> media items
+                    <Text UNSAFE_className={classes.totalStats}>{t('models.totalPrefix')} </Text>
+                    <span aria-label={t('models.totalSizeAriaLabel')}>{totalSize}</span> {t('models.mediaItems')}
                 </Text>
             </Flex>
         </View>

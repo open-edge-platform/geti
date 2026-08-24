@@ -33,7 +33,7 @@ export const ImportExport = () => {
         <>
             <MenuTrigger>
                 <Button variant='secondary' aria-label={t('dataset.importExportButtonAriaLabel')}>
-                    Export/Import
+                    {t('dataset.exportImportText')}
                 </Button>
                 <Menu onAction={handleMenuAction}>
                     <Item key='export'>{t('dataset.exportDataset')}</Item>

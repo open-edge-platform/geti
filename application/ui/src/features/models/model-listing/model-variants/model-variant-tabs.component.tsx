@@ -40,13 +40,13 @@ export const ModelVariantsTabs = ({ model }: ModelVariantsTabsProps) => {
     return (
         <Tabs aria-label={t('models.variantsTabsAriaLabel')} UNSAFE_className={classes.tabs}>
             <TabList>
-                <Item aria-label='openvino tab' key='openvino' textValue='openvino'>
+                <Item aria-label={t('common.openvinoTabAria')} key='openvino' textValue='openvino'>
                     <OpenVINO />
                 </Item>
-                <Item aria-label='pytorch tab' key='pytorch' textValue='pytorch'>
+                <Item aria-label={t('common.pytorchTabAria')} key='pytorch' textValue='pytorch'>
                     <Pytorch />
                 </Item>
-                <Item aria-label='onnx tab' key='onnx' textValue='onnx'>
+                <Item aria-label={t('common.onnxTabAria')} key='onnx' textValue='onnx'>
                     <ONNX />
                 </Item>
             </TabList>

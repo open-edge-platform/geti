@@ -7,12 +7,13 @@ import type { Label, TaskType } from '@/api/types';
 import { useProject } from 'hooks/api/project.hook';
 import { negate } from 'lodash-es';
 
+import { i18n } from '../../i18n';
 import { isClassificationTask } from '../../features/project/task-type-guards';
 import type { AnnotationLabel, AnnotationLabelRef } from '../types';
 
 export const EMPTY_LABEL_ID = 'empty-label';
-const NO_LABEL: Label = { id: EMPTY_LABEL_ID, name: 'No label', color: 'var(--no-label)', hotkey: 'N' };
-const NO_OBJECT_LABEL: Label = { id: EMPTY_LABEL_ID, name: 'No object', color: 'var(--no-label)', hotkey: 'N' };
+const getNoLabel = (): Label => ({ id: EMPTY_LABEL_ID, name: i18n.t('annotator.noLabel'), color: 'var(--no-label)', hotkey: 'N' });
+const getNoObjectLabel = (): Label => ({ id: EMPTY_LABEL_ID, name: i18n.t('annotator.noObject'), color: 'var(--no-label)', hotkey: 'N' });
 
 export const isEmptyLabel = <T extends { id: string }>({ id }: T): boolean => id === EMPTY_LABEL_ID;
 export const isNonEmptyLabel = negate(isEmptyLabel);
@@ -22,13 +23,13 @@ export const getEmptyLabel = (taskType: TaskType, exclusiveLabels: boolean): Lab
         const isMultiLabel = exclusiveLabels === false;
 
         if (isMultiLabel) {
-            return NO_LABEL;
+            return getNoLabel();
         }
 
         return null;
     }
 
-    return NO_OBJECT_LABEL;
+    return getNoObjectLabel();
 };
 
 export const useProjectLabelsWithEmptyLabel = (): Label[] => {

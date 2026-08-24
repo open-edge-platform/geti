@@ -73,7 +73,7 @@ const ModelVariantPrecisionRenderer = ({ variant }: ModelVariantPrecisionRendere
                     <Content>
                         <Flex direction={'column'}>
                             {maxAccuracyDrop !== null && (
-                                <Text>Max accuracy drop: {numberFormatter.format(maxAccuracyDrop)}</Text>
+                                <Text>{t('models.maxAccuracyDropLabel', { value: numberFormatter.format(maxAccuracyDrop) })}</Text>
                             )}
                             {calibrationDatasetSize != null && (
                                 <Text>{t('models.calibrationSizeLabel')}: {calibrationDatasetSize}</Text>

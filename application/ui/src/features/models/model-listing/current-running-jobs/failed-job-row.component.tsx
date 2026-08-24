@@ -23,7 +23,7 @@ const DismissFailedJob = ({ onDismiss }: { onDismiss: () => void }) => {
 
     return (
         <Button variant={'negative'} onPress={onDismiss} aria-label={t('models.dismissFailedJobAria')}>
-            Dismiss
+            {t('models.dismiss')}
         </Button>
     );
 };

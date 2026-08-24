@@ -5,6 +5,7 @@ import type { DatasetRevision } from '@/api/types';
 import { Flex, Text } from '@geti-ui/ui';
 import { Image, Tag } from '@geti-ui/ui/icons';
 import { useNumberFormatter } from 'react-aria';
+import { useTranslation } from 'react-i18next';
 
 import { formatDateTime } from '../../../../../shared/date-utils';
 import { ModelBadge } from './model-badge.component';
@@ -17,6 +18,7 @@ type DatasetColumnProps = {
 };
 
 export const DatasetColumn = ({ datasetRevision, labelsCount }: DatasetColumnProps) => {
+    const { t } = useTranslation();
     const totalCount = datasetRevision?.item_counts?.total;
     const formatter = useNumberFormatter();
 
@@ -24,7 +26,7 @@ export const DatasetColumn = ({ datasetRevision, labelsCount }: DatasetColumnPro
     if (datasetRevision === undefined) {
         return (
             <Flex alignItems={'center'} justifyContent={'center'}>
-                Unknown
+                {t('models.unknown')}
             </Flex>
         );
     }

@@ -59,10 +59,11 @@ const ToastCloseButton = ({ id }: { id: string }) => {
 };
 
 const ToastContainer = ({ children, type }: { children: ReactNode; type: ToastType }) => {
+    const { t } = useTranslation();
     const toastTypeStyles = classes[type];
 
     return (
-        <div aria-label={'toast'} className={clsx(toastTypeStyles, classes.toast)}>
+        <div aria-label={t('common.toastAria')} className={clsx(toastTypeStyles, classes.toast)}>
             {children}
         </div>
     );
@@ -187,5 +188,7 @@ export const toast = ({
 };
 
 export const Toast = () => {
+    const { t } = useTranslation();
+
     return <Toaster position='bottom-center' className={classes.toaster} />;
 };

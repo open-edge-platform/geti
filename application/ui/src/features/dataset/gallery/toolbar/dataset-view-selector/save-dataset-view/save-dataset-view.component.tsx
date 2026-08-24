@@ -53,6 +53,7 @@ type SaveDatasetViewProps = {
 };
 
 export const SaveDatasetView = ({ selectedMediaIds }: SaveDatasetViewProps) => {
+    const { t } = useTranslation();
     const [isSaveViewDialogOpen, setIsSaveViewDialogOpen] = useState<boolean>(false);
 
     const closeDialog = () => {
@@ -62,7 +63,7 @@ export const SaveDatasetView = ({ selectedMediaIds }: SaveDatasetViewProps) => {
     return (
         <>
             <Button variant={'primary'} onPress={() => setIsSaveViewDialogOpen(true)}>
-                Save view
+                {t('dataset.saveViewButton')}
             </Button>
             <DialogContainer onDismiss={closeDialog}>
                 {isSaveViewDialogOpen && (
