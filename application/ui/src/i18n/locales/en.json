@@ -350,7 +350,10 @@
         "exportUnsupportedItemsWarning": "To preserve {{items}}, please use the Geti export format.",
         "exportCocoWarning": "The exported dataset won't include any information about the subset assigned to each media.",
         "importErrorDetail": "An error occurred during import. {{detail}}",
-        "importErrorMessage": "An error occurred during import. {{message}}"
+        "importErrorMessage": "An error occurred during import. {{message}}",
+        "assignLabelAria": "Assign label",
+        "renameDuplicateError": "A dataset view with this name already exists",
+        "saveDuplicateError": "A view with this name already exists."
     },
     "annotator": {
         "previousMediaItem": "Previous media item",

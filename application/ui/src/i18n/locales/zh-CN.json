@@ -336,7 +336,10 @@
         "exportUnsupportedItemsWarning": "要保留{{items}}，请使用 Geti 导出格式。",
         "exportCocoWarning": "导出的数据集将不包含分配给每个媒体的子集信息。",
         "importErrorDetail": "导入时出错。{{detail}}",
-        "importErrorMessage": "导入时出错。{{message}}"
+        "importErrorMessage": "导入时出错。{{message}}",
+        "assignLabelAria": "分配标签",
+        "renameDuplicateError": "已存在同名数据集视图",
+        "saveDuplicateError": "已存在同名视图。"
     },
     "annotator": {
         "previousMediaItem": "上一个媒体条目",

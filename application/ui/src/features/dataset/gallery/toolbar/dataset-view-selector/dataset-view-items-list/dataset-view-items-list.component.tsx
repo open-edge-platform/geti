@@ -9,12 +9,9 @@ import { clsx } from 'clsx';
 import { isEmpty } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
 
-import classes from './dataset-view-items-list.module.scss';
+import { DatasetView } from '../type';
 
-export type DatasetView = {
-    id: string;
-    name: string;
-};
+import classes from './dataset-view-items-list.module.scss';
 
 type DatasetViewItemContainerProps = {
     datasetView: DatasetView;

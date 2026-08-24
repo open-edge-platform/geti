@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { defineNetworkFixture, NetworkFixture } from '@msw/playwright';
 import { expect, test as testBase } from '@playwright/test';
 import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
+import { getMockedDatasetView } from 'mocks/mock-dataset-view';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedModelArchitecture } from 'mocks/mock-model';
 import { HttpResponse } from 'msw';
@@ -223,6 +224,9 @@ const test = testBase.extend<Fixtures>({
                                 model: { status: 'ok', updated_at: '2026-01-01T00:00:00Z', message: null },
                             },
                         });
+                    }),
+                    http.get('/api/projects/{project_id}/dataset/views', () => {
+                        return HttpResponse.json([getMockedDatasetView()]);
                     }),
                 ],
             });

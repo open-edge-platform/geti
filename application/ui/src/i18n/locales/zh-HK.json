@@ -336,7 +336,10 @@
         "exportUnsupportedItemsWarning": "如需保留{{items}}，請使用 Geti 匯出格式。",
         "exportCocoWarning": "匯出的數據集將不包含指派給每個媒體的子集資訊。",
         "importErrorDetail": "匯入時發生錯誤。{{detail}}",
-        "importErrorMessage": "匯入時發生錯誤。{{message}}"
+        "importErrorMessage": "匯入時發生錯誤。{{message}}",
+        "assignLabelAria": "指派標籤",
+        "renameDuplicateError": "已存在同名數據集檢視",
+        "saveDuplicateError": "已存在同名檢視。"
     },
     "annotator": {
         "previousMediaItem": "上一個媒體條目",

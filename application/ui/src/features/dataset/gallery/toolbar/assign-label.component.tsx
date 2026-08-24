@@ -3,7 +3,8 @@
 
 import { useState } from 'react';
 
-import { Button } from '@geti-ui/ui';
+import { ActionButton, Tooltip, TooltipTrigger } from '@geti-ui/ui';
+import { Tag } from '@geti-ui/ui/icons';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
@@ -24,9 +25,17 @@ export const AssignLabel = ({ selectedImagesIds }: AssignLabelProps) => {
     if (isClassification && !isEmpty(selectedImagesIds)) {
         return (
             <>
-                <Button margin={0} variant={'secondary'} onPress={() => setIsVisible(true)}>
-                    {t('dataset.assignLabel')}
-                </Button>
+                <TooltipTrigger>
+                    <ActionButton
+                        margin={0}
+                        isQuiet
+                        onPress={() => setIsVisible(true)}
+                        aria-label={t('dataset.assignLabelAria')}
+                    >
+                        <Tag />
+                    </ActionButton>
+                    <Tooltip>{t('dataset.assignLabel')}</Tooltip>
+                </TooltipTrigger>
                 <BulkSelectedMediaLabelsAssignmentDialog
                     isVisible={isVisible}
                     selectedImagesIds={selectedImagesIds}
