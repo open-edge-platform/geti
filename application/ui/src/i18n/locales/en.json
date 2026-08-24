@@ -322,7 +322,6 @@
         "tooltipSamSegmentation": "Move your cursor over an object to preview a suggested polygon, then click to create the annotation.",
         "tooltipPolygon": "Click to place points one by one, or hold and drag to draw freehand. Ideal for irregular shapes requiring pixel-precision.",
         "tooltipMagneticLasso": "Hover along an object's edge and click periodically to snap the outline to its borders.",
-        "toolAriaLabel": "{{name}} tool",
         "videoNetworkError": "Cannot play video due to a network error, please refresh and try again.",
         "videoDecodeError": "Unable to play video, please try again.",
         "videoFormatError": "Unable to play video, please try a different video format (mp4/webm).",
@@ -356,7 +355,12 @@
         "submitHotkeyName": "Submit annotations/predictions",
         "undoHotkeyName": "Undo",
         "progressLoaderAriaLabel": "progress-circular-loader",
-        "emptyListAriaLabel": "empty list"
+        "emptyListAriaLabel": "empty list",
+        "toolSelectionAria": "selection tool",
+        "toolBoundingBoxAria": "bounding-box tool",
+        "toolSamAria": "sam tool",
+        "toolPolygonAria": "polygon tool",
+        "toolMagneticLassoAria": "magnetic-lasso tool"
     },
     "models": {
         "listingOptionsAriaLabel": "Model listing options",

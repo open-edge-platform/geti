@@ -308,7 +308,6 @@
         "tooltipSamSegmentation": "將游標移到物件上以預覽建議的多邊形，點擊即可建立標註。",
         "tooltipPolygon": "逐一點擊放置頂點，或按住拖曳以自由繪製。適合需要像素級精準度的不規則形狀。",
         "tooltipMagneticLasso": "沿著物件邊緣移動並定期點擊，讓輪廓自動貼齊邊界。",
-        "toolAriaLabel": "{{name}}工具",
         "videoNetworkError": "由於網路錯誤，無法播放影片。請重新整理後再試。",
         "videoDecodeError": "無法播放影片，請再試一次。",
         "videoFormatError": "無法播放影片。請嘗試其他影片格式（mp4/webm）。",
@@ -342,7 +341,12 @@
         "submitHotkeyName": "提交標註/預測",
         "undoHotkeyName": "復原",
         "progressLoaderAriaLabel": "圓形進度載入器",
-        "emptyListAriaLabel": "空清單"
+        "emptyListAriaLabel": "空清單",
+        "toolSelectionAria": "選取工具",
+        "toolBoundingBoxAria": "邊界框工具",
+        "toolSamAria": "自動分割工具",
+        "toolPolygonAria": "多邊形工具",
+        "toolMagneticLassoAria": "磁性套索工具"
     },
     "models": {
         "listingOptionsAriaLabel": "模型清單選項",

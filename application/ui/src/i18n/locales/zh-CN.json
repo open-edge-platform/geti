@@ -308,7 +308,6 @@
         "tooltipSamSegmentation": "将光标移到目标上以预览建议的多边形，点击即可创建标注。",
         "tooltipPolygon": "逐点单击放置顶点，或按住拖动自由绘制。适合需要像素级精度的不规则形状。",
         "tooltipMagneticLasso": "沿目标边缘移动并定期单击，使轮廓自动吸附到边界。",
-        "toolAriaLabel": "{{name}}工具",
         "videoNetworkError": "由于网络错误无法播放视频，请刷新后重试。",
         "videoDecodeError": "无法播放视频，请重试。",
         "videoFormatError": "无法播放视频，请尝试其他视频格式（mp4/webm）。",
@@ -342,7 +341,12 @@
         "submitHotkeyName": "提交标注/预测结果",
         "undoHotkeyName": "撤销",
         "progressLoaderAriaLabel": "圆形进度加载器",
-        "emptyListAriaLabel": "空列表"
+        "emptyListAriaLabel": "空列表",
+        "toolSelectionAria": "选择工具",
+        "toolBoundingBoxAria": "边界框工具",
+        "toolSamAria": "自动分割工具",
+        "toolPolygonAria": "多边形工具",
+        "toolMagneticLassoAria": "磁性套索工具"
     },
     "models": {
         "listingOptionsAriaLabel": "模型列表选项",

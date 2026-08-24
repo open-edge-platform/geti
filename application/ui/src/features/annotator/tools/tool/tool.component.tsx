@@ -64,7 +64,7 @@ export const Tool = ({ tool, activeTool, setActiveTool, isDisabled }: ToolProps)
                 isQuiet
                 width={'size-400'}
                 onPress={() => setActiveTool(tool.type)}
-                aria-label={t('annotator.toolAriaLabel', { name: t(tool.labelKey) })}
+                aria-label={t(tool.ariaLabelKey)}
                 isDisabled={isDisabled}
                 aria-pressed={activeTool === tool.type}
             >

@@ -20,6 +20,7 @@ const SELECTION_TOOL_CONFIG: ToolConfig = {
     icon: Selector,
     hotkey: HOTKEYS.selectionTool,
     labelKey: 'annotator.selectionTool',
+    ariaLabelKey: 'annotator.toolSelectionAria',
 };
 
 const BOUNDING_BOX_TOOL_CONFIG: ToolConfig = {
@@ -27,6 +28,7 @@ const BOUNDING_BOX_TOOL_CONFIG: ToolConfig = {
     icon: BoundingBox,
     hotkey: HOTKEYS.boundingBoxTool,
     labelKey: 'annotator.boundingBoxTool',
+    ariaLabelKey: 'annotator.toolBoundingBoxAria',
     tooltip: {
         img: BoundingBoxImg,
         descriptionKey: 'annotator.tooltipBoundingBox',
@@ -38,6 +40,7 @@ const AUTO_SEGMENTATION_DETECTION_CONFIG: ToolConfig = {
     icon: SegmentAnythingIcon,
     hotkey: HOTKEYS.autoSegmentation,
     labelKey: 'annotator.autoSegmentationTool',
+    ariaLabelKey: 'annotator.toolSamAria',
     tooltip: {
         img: SAMDetectionImg,
         descriptionKey: 'annotator.tooltipSamDetection',
@@ -49,6 +52,7 @@ const AUTO_SEGMENTATION_CONFIG: ToolConfig = {
     icon: SegmentAnythingIcon,
     hotkey: HOTKEYS.autoSegmentation,
     labelKey: 'annotator.autoSegmentationTool',
+    ariaLabelKey: 'annotator.toolSamAria',
     tooltip: {
         img: SAMSegmentationImg,
         descriptionKey: 'annotator.tooltipSamSegmentation',
@@ -60,6 +64,7 @@ const POLYGON_TOOL_CONFIG: ToolConfig = {
     icon: Polygon,
     hotkey: HOTKEYS.polygonTool,
     labelKey: 'annotator.polygonTool',
+    ariaLabelKey: 'annotator.toolPolygonAria',
     tooltip: {
         img: PolygonImg,
         descriptionKey: 'annotator.tooltipPolygon',
@@ -71,6 +76,7 @@ const MAGNETIC_LASSO_TOOL_CONFIG: ToolConfig = {
     icon: MagneticLasso,
     hotkey: HOTKEYS.magneticLassoTool,
     labelKey: 'annotator.magneticLassoTool',
+    ariaLabelKey: 'annotator.toolMagneticLassoAria',
     tooltip: {
         img: MagneticLassoImg,
         descriptionKey: 'annotator.tooltipMagneticLasso',

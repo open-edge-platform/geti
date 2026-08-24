@@ -10,6 +10,7 @@ export interface ToolConfig {
     icon: ComponentType<SVGProps<SVGSVGElement>>;
     hotkey: string;
     labelKey: string;
+    ariaLabelKey: string;
     tooltip?: {
         img: string;
         descriptionKey: string;
