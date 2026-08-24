@@ -33,6 +33,7 @@ import { useDatasetViewsQuery } from './dataset-view-selector/api/use-dataset-vi
 import { AssignToExistingView } from './dataset-view-selector/assign-to-existing-view/assign-to-existing-view.component';
 import { DatasetViewSelector } from './dataset-view-selector/dataset-view-selector.component';
 import { SaveDatasetView } from './dataset-view-selector/save-dataset-view/save-dataset-view.component';
+import { UnassignMediaFromView } from './dataset-view-selector/unassign-media-from-view/unassign-media-from-view.component';
 import { MediaFiltering } from './media-filtering/media-filtering.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
@@ -167,6 +168,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                                         datasetViews={datasetViews}
                                         selectedMediaIds={selectedMediaItemsIds}
                                     />
+                                    <UnassignMediaFromView selectedMediaIds={selectedMediaItemsIds} />
                                 </>
                             )}
                         </>
