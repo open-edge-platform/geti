@@ -1,0 +1,31 @@
+{
+  "skill_name": "getitune-optimizing-a-model",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Quantize my exported getitune OpenVINO model to INT8 and explain how to check the accuracy impact.",
+      "expected_output": "An OpenVINO/NNCF post-training quantization workflow with calibration data and before/after metric comparison.",
+      "should_trigger": true,
+      "files": ["../example-prompts/01-quantize-openvino-int8.md"],
+      "expectations": [
+        "Creates an engine from an exported OpenVINO `.xml` model and a dataset",
+        "Explains that calibration samples come from the training subset and recommends a reasonable calibration size",
+        "Calls `optimize()` to perform NNCF post-training INT8 quantization",
+        "Runs `test()` after optimization and compares the INT8 metric with the original FP32 or FP16 baseline"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Can I pass my ONNX export directly to getitune `engine.optimize()` for INT8 quantization?",
+      "expected_output": "A clear rejection of direct ONNX optimization with instructions to produce or convert to OpenVINO IR first.",
+      "should_trigger": true,
+      "files": ["../example-prompts/02-handle-onnx-optimization.md"],
+      "expectations": [
+        "States that `optimize()` supports OpenVINO IR `.xml` input and not direct ONNX input",
+        "Directs the user to export or convert the model to OpenVINO IR first",
+        "Explains that the operation is NNCF post-training quantization rather than training-time quantization",
+        "Requires a calibration dataset and recommends validating accuracy after quantization"
+      ]
+    }
+  ]
+}

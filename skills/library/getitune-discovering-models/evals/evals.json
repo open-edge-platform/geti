@@ -1,0 +1,31 @@
+{
+  "skill_name": "getitune-discovering-models",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Which object detection models can I train with getitune, and how can I get their recipe paths?",
+      "expected_output": "Python and CLI discovery commands that filter recipes by detection task and return concrete recipe paths without inventing a static model list.",
+      "should_trigger": true,
+      "files": ["../example-prompts/01-list-detection-models.md"],
+      "expectations": [
+        "Uses `list_models` from `getitune.utils` or `getitune find` instead of guessing a fixed list of models",
+        "Filters Python discovery with `task=\"DETECTION\"`",
+        "Uses `return_recipes=True` when showing how to obtain full recipe paths",
+        "Explains that recipes live under task-specific directories and that a returned model name or recipe path can be passed to `create_engine`"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "`getitune train` says my model name matches recipes under multiple tasks. How do I resolve that ambiguity?",
+      "expected_output": "An explanation of cross-task recipe-name ambiguity with task filtering or an unambiguous recipe path as the remedy.",
+      "should_trigger": true,
+      "files": ["../example-prompts/02-resolve-model-ambiguity.md"],
+      "expectations": [
+        "Explains that the same model or recipe name can exist under more than one task",
+        "Shows disambiguation by passing an explicit `task=` value to `create_engine`",
+        "Shows `list_models(task=..., return_recipes=True)` as a way to obtain unambiguous recipe paths",
+        "Distinguishes a model-name ambiguity error from a missing recipe path, which raises `FileNotFoundError`"
+      ]
+    }
+  ]
+}

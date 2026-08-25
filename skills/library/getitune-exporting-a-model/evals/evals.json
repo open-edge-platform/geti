@@ -1,0 +1,31 @@
+{
+  "skill_name": "getitune-exporting-a-model",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Export my trained getitune model to OpenVINO IR at FP16 and show how to validate the exported artifact.",
+      "expected_output": "A Python export flow using the OpenVINO format and FP16 precision, followed by artifact checks and inference parity validation.",
+      "should_trigger": true,
+      "files": ["../example-prompts/01-export-openvino-fp16.md"],
+      "expectations": [
+        "Imports `ExportFormat` and `Precision` from `getitune.types`",
+        "Calls `engine.export` with OpenVINO output and `export_precision=Precision.FP16`, or correctly explains that OpenVINO is the default format",
+        "Checks for both `.xml` and `.bin` OpenVINO IR artifacts under `work_dir`",
+        "Loads the exported model for `test()` and compares its metrics with the trained model while allowing small FP16 drift"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Should I export my getitune model as OpenVINO IR or ONNX, and how do format and precision options differ?",
+      "expected_output": "A deployment-oriented comparison of OpenVINO IR and ONNX with correct ExportFormat and Precision usage and downstream constraints.",
+      "should_trigger": true,
+      "files": ["../example-prompts/02-choose-export-format.md"],
+      "expectations": [
+        "States that OpenVINO IR is the default export format and consists of `.xml` and `.bin` artifacts",
+        "Shows `ExportFormat.ONNX` for ONNX output and `Precision.FP16` for FP16 precision",
+        "Explains that both exported formats can be loaded for inference through the deployed inference path",
+        "Notes that getitune INT8 optimization requires OpenVINO IR and does not claim that ONNX can be passed directly to `optimize()`"
+      ]
+    }
+  ]
+}

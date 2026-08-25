@@ -1,0 +1,31 @@
+{
+  "skill_name": "getitune-training-a-model",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a short getitune Python script that trains a classification model on my dataset as a CPU smoke run, then evaluates it.",
+      "expected_output": "A concise Python example using create_engine, an explicit CPU device, a one-epoch training smoke run, and engine.test for evaluation.",
+      "should_trigger": true,
+      "files": ["../example-prompts/01-python-training-smoke-run.md"],
+      "expectations": [
+        "Imports and calls `create_engine` with both a model and dataset root",
+        "Selects CPU explicitly through the engine device configuration",
+        "Uses `engine.train(max_epochs=1)` or an equivalently bounded smoke run before suggesting longer training",
+        "Calls `engine.test()` after training and explains that checkpoints and logs are written under `work_dir`"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Show me how to warm-start getitune training from an existing checkpoint using both the Python API and CLI.",
+      "expected_output": "Matching Python and CLI examples that supply an existing checkpoint while preserving the model, dataset, and task setup.",
+      "should_trigger": true,
+      "files": ["../example-prompts/02-warm-start-training.md"],
+      "expectations": [
+        "Passes `checkpoint=\"/path/to/weights.pt\"` to `create_engine` in the Python example",
+        "Uses `--checkpoint /path/to/weights.pt` with `getitune train` in the CLI example",
+        "Includes the dataset root and model or recipe in both workflows",
+        "Recommends a short validation run and does not invent a resume-specific flag not documented by the skill"
+      ]
+    }
+  ]
+}

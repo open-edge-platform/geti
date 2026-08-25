@@ -1,0 +1,31 @@
+{
+  "skill_name": "getitune-running-inference",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Run getitune inference and evaluation on my dataset using a trained PyTorch model, and explain the difference between predict and test.",
+      "expected_output": "A PyTorch-backed create_engine example that uses test for dataset metrics and predict for per-item outputs.",
+      "should_trigger": true,
+      "files": ["../example-prompts/01-pytorch-inference.md"],
+      "expectations": [
+        "Creates an engine with a PyTorch model name or checkpoint and the dataset root",
+        "Uses `engine.test()` for aggregate metrics on the test subset",
+        "Uses `engine.predict()` for per-item predictions",
+        "Provides an equivalent `getitune predict` or `getitune test` CLI command with `--data_root` and `--model`"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Run inference with my exported getitune OpenVINO model and explain how I can compare it with the original PyTorch model.",
+      "expected_output": "An exported-model inference example that passes the OpenVINO XML to create_engine and compares test metrics with the PyTorch baseline.",
+      "should_trigger": true,
+      "files": ["../example-prompts/02-openvino-inference.md"],
+      "expectations": [
+        "Passes the exported OpenVINO `.xml` path as `model=` to `create_engine`",
+        "Explains that the exported model is loaded through the OpenVINO backend using ModelAPI",
+        "Runs `test()` for metrics and `predict()` for per-item outputs",
+        "Compares exported-model metrics with the PyTorch baseline and allows small numerical drift"
+      ]
+    }
+  ]
+}

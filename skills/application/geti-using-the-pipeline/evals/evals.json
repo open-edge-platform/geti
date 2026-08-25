@@ -1,0 +1,33 @@
+{
+  "skill_name": "geti-using-the-pipeline",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Using the REST API, create a Geti detection project, upload an image, annotate it, and start training.",
+      "expected_output": "An end-to-end REST workflow that creates and verifies the project, uploads and annotates media, submits an asynchronous training job, tracks it to completion, and verifies the trained model.",
+      "should_trigger": true,
+      "files": ["../example-prompts/01-create-project-and-train.md"],
+      "expectations": [
+        "Asks for the Geti instance base URL and uses `/api/openapi.json` as the authoritative source for request payloads instead of assuming a fixed deployment URL",
+        "Orders the REST workflow as project creation, media upload, annotation, and training job submission",
+        "Submits training through `POST /api/jobs` with job type `train` rather than treating training as a synchronous endpoint",
+        "Tracks the job through `GET /api/jobs/<id>` or the job status/log streams and verifies the resulting model under the project",
+        "Stays at the REST API usage layer and does not propose backend implementation changes"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Configure a source, model, and sink for my Geti project, enable live inference, and tell me how to verify that it is running.",
+      "expected_output": "A REST workflow that creates or identifies source and sink resources, wires them with a model into the project pipeline, enables it, and verifies active inference through pipeline state and metrics.",
+      "should_trigger": true,
+      "files": ["../example-prompts/02-configure-live-inference.md"],
+      "expectations": [
+        "Creates or identifies source and sink resources and selects an existing trained model before enabling the pipeline",
+        "Uses `PATCH /api/projects/<id>/pipeline` to bind the source, model, and sink",
+        "Uses `POST /api/projects/<id>/pipeline:enable` only after the three pipeline components are configured",
+        "Verifies the configured pipeline and checks `/api/projects/<id>/pipeline/metrics` for latency or throughput",
+        "Mentions the disable operation or another concrete recovery action without suggesting backend code changes"
+      ]
+    }
+  ]
+}

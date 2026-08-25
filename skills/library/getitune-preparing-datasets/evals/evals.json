@@ -1,0 +1,31 @@
+{
+  "skill_name": "getitune-preparing-datasets",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I have a COCO object detection dataset. Show me the expected layout and how to pass it to getitune with both the Python API and CLI.",
+      "expected_output": "The required COCO root markers and equivalent Python and CLI examples that point getitune at the dataset root for Datumaro auto-detection.",
+      "should_trigger": true,
+      "files": ["../example-prompts/01-use-coco-dataset.md"],
+      "expectations": [
+        "Identifies an `annotations/` directory with COCO JSON files as the COCO format marker",
+        "Points `data=` at the dataset root in a `create_engine` example",
+        "Uses `--data_root` for the equivalent getitune CLI command",
+        "Checks that detection annotations contain bounding boxes and recommends a short loading or one-epoch smoke test before full training"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "getitune cannot auto-detect my dataset format. What layouts does it recognize, and what should I check?",
+      "expected_output": "A systematic diagnosis based on the marker files for COCO, YOLO, Pascal VOC, and Datumaro-native layouts, including root nesting and task-label compatibility.",
+      "should_trigger": true,
+      "files": ["../example-prompts/02-debug-format-detection.md"],
+      "expectations": [
+        "Checks whether the supplied path is the directory that directly contains the format markers rather than a parent directory",
+        "Names the correct markers for COCO, YOLO, Pascal VOC, and Datumaro-native datasets",
+        "Explains that zip archives are accepted and that YOLO can use its `data.yaml` directly",
+        "Separates format-detection failures from feature or label mismatches caused by a dataset task that disagrees with the selected model"
+      ]
+    }
+  ]
+}
