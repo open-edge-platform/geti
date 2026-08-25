@@ -30,4 +30,4 @@ type: Bug
 - Installation mode: <!--[e.g., MSIX / Docker (app), pypi (library), ...]-->
 - Hardware spec: <!--[CPU, memory, GPU, ...]-->
 - OS: <!--[e.g., Linux Ubuntu 24.04]-->
-- GPU drivers <!--[Intel® Graphics, CUDA, ...]-->
+- GPU drivers: <!--[Intel® Graphics, CUDA, ...]-->
