@@ -163,3 +163,5 @@ export type MediaListPredictionRequest = components['schemas']['MediaListPredict
 export type PipelineHealth = components['schemas']['PipelineHealth'];
 export type PipelineComponentsHealth = components['schemas']['PipelineComponentsHealth'];
 export type PipelineStatus = components['schemas']['Status'];
+
+export type DatasetView = components['schemas']['DatasetViewView'];

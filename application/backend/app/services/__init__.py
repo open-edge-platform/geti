@@ -14,9 +14,11 @@ from .base import (
 from .base_weights_service import BaseWeightsService
 from .dataset_revision_service import DatasetRevisionService
 from .dataset_service import DatasetService
+from .dataset_view_service import DatasetViewService
 from .dispatch_service import DispatchService
 from .label_service import LabelService
 from .license_service import LicenseService
+from .media_numpy_loader import MediaNumpyLoader
 from .media_prediction_service import MediaPredictionService
 from .media_service import MediaService
 from .metrics_service import MetricsService
@@ -25,6 +27,7 @@ from .model_service import ModelRevisionMetadata, ModelService
 from .pipeline_metrics_service import PipelineMetricsService
 from .pipeline_service import PipelineService
 from .project_service import ProjectService
+from .sam import MediaSegmentService
 from .sink_service import SinkService
 from .source_media_service import SourceMediaService
 from .source_service import SourceService, SourceUpdateService
@@ -40,10 +43,13 @@ __all__ = [
     "BaseWeightsService",
     "DatasetRevisionService",
     "DatasetService",
+    "DatasetViewService",
     "DispatchService",
     "LabelService",
     "LicenseService",
+    "MediaNumpyLoader",
     "MediaPredictionService",
+    "MediaSegmentService",
     "MediaService",
     "MetricsService",
     "ModelManifestService",

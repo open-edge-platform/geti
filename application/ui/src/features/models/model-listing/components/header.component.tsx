@@ -86,6 +86,7 @@ export const Header = () => {
                     ) : (
                         <Item key='dataset'>Sort: Dataset</Item>
                     )}
+                    <Item key='device'>Sort: Device</Item>
                     <Item key='size'>Sort: Size</Item>
                     <Item key='score'>{`Sort: ${performanceMetricName}`}</Item>
                 </Picker>

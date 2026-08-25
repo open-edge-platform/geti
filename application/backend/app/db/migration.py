@@ -12,6 +12,8 @@ from alembic import command
 from alembic.config import Config
 from alembic.runtime import migration
 from alembic.script import ScriptDirectory
+from alembic.script.revision import ResolutionError
+from alembic.util.exc import CommandError
 from loguru import logger
 from sqlalchemy import text
 
@@ -157,10 +159,13 @@ class MigrationManager:
                 current_rev = context.get_current_revision()
 
             # Check if current_rev is in Alembic's tracked revisions
-            if current_rev and current_rev not in script.get_heads() + script.get_bases():
-                raise RevisionNotFoundError(
-                    f"Current revision '{current_rev}' not found in Alembic history. Please, recreate the database."
-                )
+            if current_rev:
+                try:
+                    script.get_revision(current_rev)
+                except (CommandError, ResolutionError) as e:
+                    raise RevisionNotFoundError(
+                        f"Current revision '{current_rev}' not found in Alembic history. Please, recreate the database."
+                    ) from e
 
             needs_migration = current_rev != current_head
             status = f"Current: {current_rev or 'None'}, Head: {current_head or 'None'}"

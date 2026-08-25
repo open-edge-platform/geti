@@ -132,7 +132,7 @@ Dataset ||---o{ DatasetView
 DatasetItem ||--o| Annotation : "Every media has an annotation,\n or a model-generated prediction,\n or it is unannotated"
 DatasetItem }o---o| "Source " : "Each media is acquired\n from a source, or\n uploaded by the user"
 DatasetItem ||---o| "Media" : "Dataset item refers \n to a certain media (except video)"
-DatasetView ||---o{ DatasetItem: "A view is a set of media\n filtered by some criteria"
+DatasetView ||---o{ Media: "A view is a set of media\n filtered by some criteria"
 
 ModelRevision ||---o{ ModelRevision : "New revisions are created\n after fine-tuning the weights \n of the parent revision"
 ModelRevision |o---o{ Annotation : "Models generate predictions"
