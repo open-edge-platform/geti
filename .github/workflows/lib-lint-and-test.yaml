@@ -49,6 +49,9 @@ jobs:
             test:
               - library/**
               - .github/workflows/lib-lint-and-test.yaml
+              - .github/actions/**
+              - '!**/*.md'
+              - '!library/docs/**'
 
       # Separate filter so we only run the (slow, network-bound) benchmark
       # dataset preparation tests when those scripts are touched.

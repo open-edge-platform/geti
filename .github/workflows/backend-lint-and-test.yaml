@@ -47,7 +47,10 @@ jobs:
             test:
               - application/backend/**
               - library/**
-              - .github/**
+              - .github/workflows/build.yaml
+              - .github/actions/**
+              - '!**/*.md'
+              - '!library/docs/**'
 
   python-checks:
     strategy:
