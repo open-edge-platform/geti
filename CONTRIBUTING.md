@@ -79,11 +79,9 @@ tox -vv -e pre-commit
    pytest tests/integration
    ```
 
-5. **Update the Changelog:** For significant changes, add a summary to the [CHANGELOG](CHANGELOG.md).
+5. **Check Licensing:** Ensure you own the code or have rights to use it, adhering to appropriate licensing.
 
-6. **Check Licensing:** Ensure you own the code or have rights to use it, adhering to appropriate licensing.
-
-7. **Sign Your Commits:** Use signed commits to certify that you have the right to submit the code under the project's license:
+6. **Sign Your Commits:** Use signed commits to certify that you have the right to submit the code under the project's license:
 
    ```bash
    git commit -S -m "Your detailed commit message"

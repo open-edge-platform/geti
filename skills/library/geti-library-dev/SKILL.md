@@ -1,12 +1,12 @@
 ---
 name: geti-library-dev
-description: Develop and validate changes in `library/` for the `getitune` Python package (the Geti training library). Use when touching `library/src/**`, `library/tests/**`, `library/pyproject.toml`, recipes, model manifests, or any Python API, CLI, model, training, export, or utility logic owned by the library. Helps with `uv` and `just` setup, choosing cpu, cuda, or xpu extras, the multi-backend model architecture, adding models and recipes, and running the smallest relevant lint, unit, model, or integration checks.
+description: Develop and validate changes in `library/` for the `getitune` Python package. Use when changing library source or tests as well as packaging, recipes and model manifests. This includes Python APIs and CLI behavior across training and export. Covers environment setup; accelerator extras; multi-backend architecture; model and recipe additions; focused checks.
 ---
 
 # Geti Library Development
 
 > For the full architecture reference (package layout, multi-backend design, how
-> to add models, recipes, and manifests) read [`library/AGENTS.md`](../../../library/AGENTS.md).
+> to add models, recipes, and manifests) read `library/AGENTS.md`.
 
 ## Quick Start
 
@@ -33,7 +33,7 @@ description: Develop and validate changes in `library/` for the `getitune` Pytho
 - **Adding a model**: implement the model class under
   `src/getitune/backend/lightning/models/<task>/`, inheriting the task base
   class (ultimately `LightningModel`); export it from the task `__init__.py`;
-  add a recipe YAML. See [`library/AGENTS.md`](../../../library/AGENTS.md) for the full walkthrough.
+  add a recipe YAML. See `library/AGENTS.md` for the full walkthrough.
 
 ## Workflow
 
@@ -46,7 +46,8 @@ description: Develop and validate changes in `library/` for the `getitune` Pytho
 
 - Use `just lint` for formatting, lint, and type issues.
 - Use `just test-unit -- tests/unit/...` or `just test-unit -- -k <expr>` for normal Python behavior changes.
-- Use `just test-unit-models -- <pytest args>` for model-specific code.
+- Use the backend-scoped recipes for model code: `just test-unit-lightning -- <pytest args>`,
+  `just test-unit-ultralytics -- <pytest args>`, or `just test-unit-openvino -- <pytest args>`.
 - Use `just test-integration -- <pytest args>` only when the change affects end-to-end training, export, or integration behavior.
 
 ## Coordination Notes
