@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 import numpy as np
@@ -13,10 +12,6 @@ from app.utils.singleton import Singleton
 
 if TYPE_CHECKING:
     from model_api.models.result import ClassificationResult, DetectionResult, InstanceSegmentationResult, Result
-
-# Mapping of label name to the colour used to render it, e.g. {"cat": "#00FF00"}.
-# Colours are hex strings (as stored on the project labels) or (R, G, B) tuples.
-LabelColors = Mapping[str, str | tuple[int, int, int]]
 
 
 def _compute_scale(image: np.ndarray) -> float:
@@ -42,17 +37,8 @@ class VisualizerCreator(ABC):
         self,
         original_image: np.ndarray,
         predictions: "Result",
-        label_colors: LabelColors | None = None,
     ) -> np.ndarray:
-        """Create a visualization of the predictions on the original image.
-
-        Args:
-            original_image: RGB numpy image to draw on.
-            predictions: Model API prediction result.
-            label_colors: Optional mapping of label name to colour, used to render the
-                predictions with the colours defined on the project labels. Labels absent
-                from the mapping keep their automatically assigned palette colour.
-        """
+        """Create a visualization of the predictions on the original image."""
 
 
 class ClassificationVisualizerCreator(VisualizerCreator):
@@ -62,7 +48,6 @@ class ClassificationVisualizerCreator(VisualizerCreator):
         self,
         original_image: np.ndarray,
         predictions: "ClassificationResult",
-        label_colors: LabelColors | None = None,
     ) -> np.ndarray:
         from model_api.visualizer.scene import ClassificationScene
 
@@ -72,7 +57,6 @@ class ClassificationVisualizerCreator(VisualizerCreator):
             image=image_pil,
             result=predictions,
             scale=scale,
-            label_colors=label_colors,
         )
         rendered = classification_scene.render()
         return np.array(rendered)
@@ -85,7 +69,6 @@ class DetectionVisualizerCreator(VisualizerCreator):
         self,
         original_image: np.ndarray,
         predictions: "DetectionResult",
-        label_colors: LabelColors | None = None,
     ) -> np.ndarray:
         from model_api.visualizer import BoundingBox, Flatten, Label
         from model_api.visualizer.scene import DetectionScene
@@ -97,7 +80,6 @@ class DetectionVisualizerCreator(VisualizerCreator):
             result=predictions,
             layout=Flatten(BoundingBox, Label),
             scale=scale,
-            label_colors=label_colors,
         )
         rendered = detection_scene.render()
         return np.array(rendered)
@@ -110,7 +92,6 @@ class InstanceSegmentationVisualizerCreator(VisualizerCreator):
         self,
         original_image: np.ndarray,
         predictions: "InstanceSegmentationResult",
-        label_colors: LabelColors | None = None,
     ) -> np.ndarray:
         from model_api.visualizer import Flatten, Label, Polygon
         from model_api.visualizer.scene import InstanceSegmentationScene
@@ -122,7 +103,6 @@ class InstanceSegmentationVisualizerCreator(VisualizerCreator):
             result=predictions,
             layout=Flatten(Polygon, Label),
             scale=scale,
-            label_colors=label_colors,
         )
         rendered = segmentation_scene.render()
         return np.array(rendered)
@@ -144,14 +124,13 @@ class VisualizationDispatcher(metaclass=Singleton):
         self,
         original_image: np.ndarray,
         predictions: "Result",
-        label_colors: LabelColors | None = None,
     ) -> np.ndarray | None:
         if original_image.size == 0:
             raise ValueError("The image provided through the 'original_image' parameter cannot be empty.")
 
         creator = self._creator_map.get(type(predictions))
         if creator is not None:
-            return creator.create_visualization(original_image, predictions, label_colors)
+            return creator.create_visualization(original_image, predictions)
         logger.error("Visualization for {} is not supported.", type(predictions))
         return None
 
@@ -161,21 +140,15 @@ class Visualizer:
     def overlay_predictions(
         original_image: np.ndarray,
         predictions: "Result",
-        label_colors: LabelColors | None = None,
     ) -> np.ndarray:
         """Overlay predictions on the original image.
 
         Args:
             original_image: BGR/RGB numpy image.
             predictions: Model API prediction result.
-            label_colors: Optional mapping of label name to colour (e.g. the colours of the
-                project labels), so that the rendered predictions match the project's label
-                colours. Labels absent from the mapping keep their default palette colour.
         """
         try:
-            visualization = VisualizationDispatcher().create_visualization(
-                original_image, predictions, label_colors=label_colors
-            )
+            visualization = VisualizationDispatcher().create_visualization(original_image, predictions)
             if visualization is None:
                 return original_image
         except Exception:

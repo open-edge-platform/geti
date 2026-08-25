@@ -2,6 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from app.utils.singleton import Singleton
-from app.utils.visualization import LabelColors, Visualizer
+from app.utils.visualization import Visualizer
 
-__all__ = ["LabelColors", "Singleton", "Visualizer"]
+__all__ = ["Singleton", "Visualizer"]
