@@ -1,36 +1,35 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
-assignees: ''
-
+about: Share an idea to improve this project
+title: ""
+labels: "User request"
+assignees: leoll2
+type: Feature
 ---
 
+<!-- Thank you very much for sharing your ideas to improve Geti -->
+
+**Is your request related to a specific problem or use case? Please describe.**
+
 <!--
-    Thank you very much for contributing to this project by creating an issue!
+A clear and concise description of what the problem is.
+You can also attach images or links that help clarify the context.
+
+For example: I want to count the objects predicted by my detection model [...]
 -->
 
-**Is your feature request related to a problem? Please describe.**
+**What should the feature do?**
 
 <!--
-A clear and concise description of what the problem is. For example: I'm always frustrated when [...]
+A description of what you want to happen. Please be as detailed as possible,
+and mention any hard requirements that must be met.
+
+For example: when showing predictions, the UI should also report the total number
+of objects for each individual class
 -->
 
-**Describe the solution you'd like to propose.**
+**(Optional) Do you have any idea of how the feature should be implemented?**
 
 <!--
-A clear and concise description of what you want to happen.
--->
-
-**Describe alternatives you've considered**
-
-<!--
-A clear and concise description of any alternative solutions or features you've considered.
--->
-
-**Additional context**
-
-<!--
-Add any other context or screenshots about the feature request here.
+If you already have a possible solution in mind, please share it here.
 -->

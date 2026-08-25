@@ -1,11 +1,10 @@
 ---
 name: Bug report
 about: Report an issue
-title: ''
-labels: ''
+title: ""
+labels: ""
 assignees: leoll2
 type: Bug
-
 ---
 
 <!-- Thanks for taking the time to report an issue! Our team will review it carefully and react as soon as possible. -->
@@ -28,7 +27,7 @@ type: Bug
 <!-- Include as many relevant details about the environment in which you experienced the bug as you can. -->
 
 - Geti app / library version: <!--[e.g., v3.0]-->
-- Installation mode: <!--[e.g., MSIX (app), pypi (library), ...]-->
+- Installation mode: <!--[e.g., MSIX / Docker (app), pypi (library), ...]-->
 - Hardware spec: <!--[CPU, memory, GPU, ...]-->
-- OS: <!--[e.g., Linux Ubuntu 16.04]-->
+- OS: <!--[e.g., Linux Ubuntu 24.04]-->
 - GPU drivers <!--[Intel® Graphics, CUDA, ...]-->
