@@ -41,7 +41,7 @@ export const mediaPredictionsQueryOptions = ({
         queryFn: async ({ signal }) => {
             if (selectedModel === undefined) return [];
 
-            const response = await fetchClient.POST('/api/projects/{project_id}/dataset/media/media:predict', {
+            const response = await fetchClient.POST('/api/projects/{project_id}/dataset/media:predict', {
                 signal,
                 params: { path: { project_id: projectId } },
                 body: {

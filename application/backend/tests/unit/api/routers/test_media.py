@@ -1926,8 +1926,18 @@ class TestMediaEndpoints:
             frame_index_to=9,
         )
 
+    @pytest.mark.parametrize(
+        "predict_path_suffix",
+        ["media:predict", "media/media:predict"],
+        ids=["new_path", "deprecated_path"],
+    )
     def test_media_predict(
-        self, fxt_get_project, fxt_media_prediction_service, fxt_inference_media_limit, fxt_client
+        self,
+        predict_path_suffix,
+        fxt_get_project,
+        fxt_media_prediction_service,
+        fxt_inference_media_limit,
+        fxt_client,
     ) -> None:
         label_id = uuid4()
         model_id = uuid4()
@@ -1955,7 +1965,7 @@ class TestMediaEndpoints:
         )
 
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            f"/api/projects/{str(uuid4())}/dataset/{predict_path_suffix}",
             json=request.model_dump(mode="json"),
         )
 
@@ -2010,7 +2020,7 @@ class TestMediaEndpoints:
             resource_id=str(media_id), message="Frame range can be specified only for videos."
         )
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
             json=request.model_dump(mode="json"),
         )
 
@@ -2038,7 +2048,7 @@ class TestMediaEndpoints:
         fxt_inference_media_limit(3)
 
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
             json=request.model_dump(mode="json"),
         )
 
@@ -2065,7 +2075,7 @@ class TestMediaEndpoints:
         fxt_media_prediction_service.predict_media.side_effect = InferenceBusyError()
 
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
             json=request.model_dump(mode="json"),
         )
 
@@ -2089,7 +2099,7 @@ class TestMediaEndpoints:
         fxt_media_prediction_service.predict_media.return_value = BatchInferenceResult(predictions=[])
 
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
             json=request.model_dump(mode="json"),
         )
 
@@ -2103,7 +2113,7 @@ class TestMediaEndpoints:
         fxt_inference_media_limit(10)
 
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
             json={
                 "model_id": str(uuid4()),
                 "media": [{"media_id": str(uuid4()), "range": None}],
