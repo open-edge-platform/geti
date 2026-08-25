@@ -3,7 +3,7 @@
 
 import types
 from enum import StrEnum
-from typing import Annotated, Any, Literal, cast, get_args, get_origin
+from typing import Annotated, Any, Literal, Union, cast, get_args, get_origin
 
 from pydantic import BaseModel, Discriminator, Field, Tag
 from pydantic.fields import FieldInfo
