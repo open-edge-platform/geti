@@ -1086,7 +1086,9 @@ class TestMediaEndpoints:
         )
         fxt_media_service.get_frame_thumbnail.assert_called_once_with(project=project, video=media, frame_index=10)
 
-    def test_get_video_frame_thumbnail_on_the_fly_index_exceeds(self, fxt_media_service, fxt_client):
+    def test_get_video_frame_thumbnail_on_the_fly_index_exceeds(
+        self, fxt_project_service, fxt_media_service, fxt_client
+    ):
         video_id = uuid4()
         project_id = uuid4()
 
