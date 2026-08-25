@@ -428,7 +428,7 @@ def get_media_thumbnail(
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Media thumbnail file is not found.")
 
     thumbnail_path = media_service.get_media_thumbnail_path_by_id(project_id=project_id, media_id=media_id)
-    if os.path.exists(thumbnail_path):
+    if frame_index is None and os.path.exists(thumbnail_path):
         return _response(thumbnail_path)
 
     project = project_service.get_project_by_id(project_id=project_id)
