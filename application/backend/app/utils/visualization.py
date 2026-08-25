@@ -114,7 +114,7 @@ class VisualizationDispatcher(metaclass=Singleton):
     def __init__(self) -> None:
         from model_api.models.result import ClassificationResult, DetectionResult, InstanceSegmentationResult
 
-        self._creator_map: dict[type[object], VisualizerCreator] = {
+        self._creator_map: dict[type["Result"], VisualizerCreator] = {
             DetectionResult: DetectionVisualizerCreator(),
             ClassificationResult: ClassificationVisualizerCreator(),
             InstanceSegmentationResult: InstanceSegmentationVisualizerCreator(),
