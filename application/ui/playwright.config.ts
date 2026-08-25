@@ -6,14 +6,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { defineConfig, devices } from '@playwright/test';
-import dotenv from 'dotenv';
 
 const file = fileURLToPath(import.meta.url);
 const dirname = path.dirname(file);
 
-dotenv.config({
-    path: path.resolve(dirname, '.env.test'),
-});
+const envFile = path.resolve(dirname, '.env.test');
+if (existsSync(envFile)) {
+    process.loadEnvFile(envFile);
+}
 
 const CI = !!process.env.CI;
 
@@ -22,12 +22,12 @@ const ACTION_TIMEOUT = 30000;
 const GETI_BASE_URL = process.env.GETI_BASE_URL;
 
 const getTestTimeout = () => {
-    if (CI && GETI_BASE_URL) {
-        return 1000 * 60 * 60;
-    }
-
     return CI ? 1000 * 60 * 2 : 1000 * 60;
 };
+
+// E2E tests drive a real backend, where a single step (training, quantization) can outlast the
+// component test timeout on its own.
+const E2E_TEST_TIMEOUT = 1000 * 60 * 60;
 
 // In CI we serve pre-built bundles via `rsbuild preview`, which requires the
 // output directories to already exist. Failing fast here produces a clearer
@@ -106,12 +106,15 @@ export default defineConfig({
         {
             name: 'e2e',
             testDir: './tests/e2e',
+            timeout: E2E_TEST_TIMEOUT,
             use: {
                 ...devices['Desktop Chrome'],
                 baseURL: GETI_BASE_URL || 'http://localhost:3000',
                 ignoreHTTPSErrors: GETI_BASE_URL?.startsWith('https://') ?? false,
                 headless: CI,
                 viewport: { width: 1280, height: 720 },
+                trace: 'retain-on-failure-and-retries',
+                video: 'retain-on-failure-and-retries',
             },
         },
     ],

@@ -3,7 +3,7 @@
 
 import type { Project } from '@/api/types';
 import { Badge, Flex, Text } from '@geti-ui/ui';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { paths } from '../../../constants/paths';
 import { ActiveProjectBadge } from '../../../features/project/list/active-project-badge/active-project-badge.component';

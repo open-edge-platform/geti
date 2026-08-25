@@ -67,7 +67,7 @@ const decodeLabelsParam = (raw: string): string => {
     }
 };
 
-const setParam = (params: URLSearchParams, key: string, value: string | null) => {
+const setOrDeleteParam = (params: URLSearchParams, key: string, value: string | null) => {
     if (value === null || value === undefined) {
         params.delete(key);
     } else {
@@ -77,7 +77,7 @@ const setParam = (params: URLSearchParams, key: string, value: string | null) =>
 
 const updateSearchParam = (setSearchParams: SetURLSearchParams, key: string, value: string | null) => {
     setSearchParams((prev) => {
-        setParam(prev, key, value);
+        setOrDeleteParam(prev, key, value);
 
         return prev;
     });
@@ -97,21 +97,14 @@ const parseDateFromURL = (date: string | null) => {
     }
 };
 
-const isReversedRange = (start: string | null, end: string | null): boolean =>
-    start !== null && end !== null && new Date(start) > new Date(end);
-
 export const useDatasetFiltersSearchParams = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const labelsFilterValue = decodeLabelsParam(searchParams.get(LABELS_PARAM) ?? '');
     const selectedLabelIds = isNonEmptyString(labelsFilterValue) ? labelsFilterValue.split(',') : [];
     const annotationStatus = parseAnnotationStatus(searchParams.get(ANNOTATION_STATUS_PARAM));
-    const rawStartDate = parseDateFromURL(searchParams.get(START_DATE_PARAM));
-    const rawEndDate = parseDateFromURL(searchParams.get(END_DATE_PARAM));
-    // A reversed range can only come from a hand edited url, in that case the whole range is ignored
-    const hasValidRange = !isReversedRange(rawStartDate, rawEndDate);
-    const startDate = hasValidRange ? rawStartDate : null;
-    const endDate = hasValidRange ? rawEndDate : null;
+    const startDate = parseDateFromURL(searchParams.get(START_DATE_PARAM));
+    const endDate = parseDateFromURL(searchParams.get(END_DATE_PARAM));
     const sortDirection: SortDirection = searchParams.get(SORT_DIRECTION_PARAM) === 'asc' ? 'asc' : 'desc';
     const selectedSubsets = parseSubsets(searchParams.get(SUBSET_PARAM));
 
@@ -124,10 +117,19 @@ export const useDatasetFiltersSearchParams = () => {
         updateSearchParam(setSearchParams, ANNOTATION_STATUS_PARAM, status);
     };
 
+    const setStartDate = (date: string | null) => {
+        updateSearchParam(setSearchParams, START_DATE_PARAM, date);
+    };
+
+    const setEndDate = (date: string | null) => {
+        updateSearchParam(setSearchParams, END_DATE_PARAM, date);
+    };
+
+    // Updates both bounds at once, so that changing a range does not go through an intermediate state
     const setDateRange = (start: string | null, end: string | null) => {
         setSearchParams((prev) => {
-            setParam(prev, START_DATE_PARAM, start);
-            setParam(prev, END_DATE_PARAM, end);
+            setOrDeleteParam(prev, START_DATE_PARAM, start);
+            setOrDeleteParam(prev, END_DATE_PARAM, end);
 
             return prev;
         });
@@ -148,7 +150,9 @@ export const useDatasetFiltersSearchParams = () => {
         annotationStatus,
         setAnnotationStatus,
         startDate,
+        setStartDate,
         endDate,
+        setEndDate,
         setDateRange,
         sortDirection,
         setSortDirection,

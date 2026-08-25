@@ -3,7 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { isPolygonValid } from '@geti/smart-tools/utils';
+import { isPolygonValid } from '@geti-ui/smart-tools/utils';
 
 import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
 import { Annotation, Polygon } from '../../../../shared/types';

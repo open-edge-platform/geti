@@ -6,7 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from app.api.dependencies import get_dataset_service, get_project
+from app.api.dependencies import get_dataset_service, get_dataset_view_service, get_project
 from app.api.schemas.dataset import DatasetStatisticsView
 from app.api.schemas.dataset_item import DatasetItemsWithPagination, DatasetItemView
 from app.api.validators import DatasetItemID, ProjectID, normalize_datetime_to_utc
@@ -14,7 +14,7 @@ from app.core.models import Pagination
 from app.models import DatasetItemAnnotationStatus, DatasetItemSubset, Project
 from app.models.dataset_item import DatasetItemSortBy
 from app.models.media import SortDirection
-from app.services import DatasetService
+from app.services import DatasetService, DatasetViewService
 from app.services.dataset_service import DatasetItemFilters
 
 router = APIRouter(prefix="/api/projects/{project_id}/dataset", tags=["Datasets"])
@@ -32,8 +32,9 @@ MAX_DATASET_ITEMS_NUMBER_RETURNED = 100
 def list_dataset_items(  # noqa: PLR0913
     project: Annotated[Project, Depends(get_project)],
     dataset_service: Annotated[DatasetService, Depends(get_dataset_service)],
+    dataset_view_service: Annotated[DatasetViewService, Depends(get_dataset_view_service)],
     limit: Annotated[int, Query(ge=1, le=MAX_DATASET_ITEMS_NUMBER_RETURNED)] = DEFAULT_DATASET_ITEMS_NUMBER_RETURNED,
-    offset: Annotated[int, Query(ge=0)] = 0,
+    offset: Annotated[int, Query(ge=0, le=2_147_483_647)] = 0,
     start_date: Annotated[datetime | None, Query()] = None,
     end_date: Annotated[datetime | None, Query()] = None,
     annotation_status: Annotated[DatasetItemAnnotationStatus | None, Query()] = None,
@@ -41,6 +42,10 @@ def list_dataset_items(  # noqa: PLR0913
     subsets: Annotated[list[DatasetItemSubset] | None, Query()] = None,
     sort_by: Annotated[DatasetItemSortBy, Query()] = DatasetItemSortBy.CREATION_DATE,
     sort_direction: Annotated[SortDirection, Query()] = SortDirection.DESC,
+    dataset_view_id: Annotated[
+        UUID | None,
+        Query(description="If provided, list items assigned to this dataset view instead of the entire dataset"),
+    ] = None,
 ) -> DatasetItemsWithPagination:
     """List the available dataset items and their metadata. This endpoint supports pagination."""
     start_date = normalize_datetime_to_utc(start_date)
@@ -51,28 +56,34 @@ def list_dataset_items(  # noqa: PLR0913
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Start date must be before end date."
         )
     subset_values = [item.value for item in subsets] if subsets else None
-    total = dataset_service.count_dataset_items(
-        project=project,
+    filters = DatasetItemFilters(
+        limit=limit,
+        offset=offset,
         start_date=start_date,
         end_date=end_date,
         annotation_status=annotation_status,
         label_ids=labels,
         subsets=subset_values,
+        sort_by=sort_by,
+        sort_direction=sort_direction,
     )
-    dataset_items = dataset_service.list_dataset_items(
-        project_id=project.id,
-        filters=DatasetItemFilters(
-            limit=limit,
-            offset=offset,
+    if dataset_view_id is not None:
+        total = dataset_view_service.count_dataset_view_items(
+            project_id=project.id, dataset_view_id=dataset_view_id, filters=filters
+        )
+        dataset_items = dataset_view_service.list_dataset_view_items(
+            project_id=project.id, dataset_view_id=dataset_view_id, filters=filters
+        )
+    else:
+        total = dataset_service.count_dataset_items(
+            project=project,
             start_date=start_date,
             end_date=end_date,
             annotation_status=annotation_status,
             label_ids=labels,
             subsets=subset_values,
-            sort_by=sort_by,
-            sort_direction=sort_direction,
-        ),
-    )
+        )
+        dataset_items = dataset_service.list_dataset_items(project_id=project.id, filters=filters)
     return DatasetItemsWithPagination(
         items=[DatasetItemView.model_validate(dataset_item, from_attributes=True) for dataset_item in dataset_items],
         pagination=Pagination(
@@ -113,7 +124,17 @@ def get_dataset_item(
 def get_dataset_statistics(
     project_id: ProjectID,
     dataset_service: Annotated[DatasetService, Depends(get_dataset_service)],
+    dataset_view_service: Annotated[DatasetViewService, Depends(get_dataset_view_service)],
+    dataset_view_id: Annotated[
+        UUID | None,
+        Query(description="If provided, get statistics for this dataset view instead of the entire dataset"),
+    ] = None,
 ) -> DatasetStatisticsView:
     """Get statistics about the number of media and annotations in a dataset"""
-    dataset_statistics = dataset_service.get_dataset_statistics(project_id=project_id)
+    if dataset_view_id is not None:
+        dataset_statistics = dataset_view_service.get_dataset_view_statistics(
+            project_id=project_id, dataset_view_id=dataset_view_id
+        )
+    else:
+        dataset_statistics = dataset_service.get_dataset_statistics(project_id=project_id)
     return DatasetStatisticsView.model_validate(dataset_statistics, from_attributes=True)

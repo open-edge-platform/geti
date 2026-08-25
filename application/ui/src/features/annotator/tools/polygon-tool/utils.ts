@@ -4,7 +4,7 @@
 import { PointerEvent, SVGProps } from 'react';
 
 import type { Label } from '@/api/types';
-import { isPolygonValid } from '@geti/smart-tools/utils';
+import { isPolygonValid } from '@geti-ui/smart-tools/utils';
 import { isEmpty, isEqual, isNil, negate } from 'lodash-es';
 
 import eraserToolCursor from '../../../../assets/icons/cursor/eraser-tool.png';

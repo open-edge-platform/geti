@@ -13,7 +13,7 @@ export class JobsPage {
     }
 
     getCurrentRunningSection() {
-        return this.page.getByRole('heading', { name: 'Currently running' });
+        return this.page.getByRole('heading', { name: 'Jobs' });
     }
 
     getRunningBadge() {

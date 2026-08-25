@@ -445,10 +445,12 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         logger.info("Instantiating model for training (model_id={})", model_id)
         model_cfg = training_config["model"]
         model_cfg["init_args"]["label_info"] = datamodule.label_info.label_names
+        # NOTE: pass mean/std through as-is. None when the CPU augmentation pipeline has no torchvision Normalize to
+        # derive them from, such as when normalization lives in augmentations_gpu instead
         model_cfg["init_args"]["data_input_params"] = DataInputParams(
             input_size=cast(tuple[int, int], datamodule.input_size),
-            mean=datamodule.input_mean if datamodule.input_mean is not None else (0.0, 0.0, 0.0),
-            std=datamodule.input_std if datamodule.input_std is not None else (1.0, 1.0, 1.0),
+            mean=datamodule.input_mean,
+            std=datamodule.input_std,
             intensity_config=datamodule.input_intensity_config,
         ).as_dict()
         logger.info("Initializing engine for training (model_id={})", model_id)
@@ -744,6 +746,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 model_id=params.model_id,
                 status=TrainingStatus.IN_PROGRESS,
                 training_started_at=training_start_time,
+                training_device=params.device,
             )
             trained_model_path, getitune_engine = self.train_model(
                 training_config=getitune_training_config,
@@ -940,6 +943,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         status: TrainingStatus,
         training_started_at: datetime | None = None,
         training_finished_at: datetime | None = None,
+        training_device: DeviceInfo | None = None,
     ):
         with self._db_session_factory() as db:
             self._model_service.set_db_session(db)
@@ -949,6 +953,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 training_status=status,
                 training_started_at=training_started_at,
                 training_finished_at=training_finished_at,
+                training_device=training_device,
             )
 
     def __delete_model_revision(self, project_id: UUID, model_id: UUID):

@@ -24,6 +24,16 @@ export const sortModels = (models: Model[], sortBy: SortBy, datasetRevisions: Da
                 },
                 'desc'
             );
+        case 'device':
+            return orderBy(
+                models,
+                [
+                    // Models without a device come last.
+                    (model) => (model.training_info?.device?.name != null ? 0 : 1),
+                    (model) => model.training_info?.device?.name?.toLowerCase() ?? '',
+                ],
+                ['asc', 'asc']
+            );
         case 'size':
             return orderBy(models, (model) => model.size ?? 0, 'asc');
         case 'score':

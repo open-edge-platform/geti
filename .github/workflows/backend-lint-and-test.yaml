@@ -29,13 +29,13 @@ jobs:
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - &checkout
         name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 
@@ -63,7 +63,7 @@ jobs:
     steps:
       - name: Harden the runner (audit all outbound calls)
         if: matrix.os == 'ubuntu'
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
@@ -93,6 +93,11 @@ jobs:
         working-directory: application/backend
         run: just lint
 
+      - name: Validate Alembic migrations
+        if: matrix.os == 'ubuntu'
+        working-directory: application/backend
+        run: just check-migrations
+
       - name: Run unit tests
         working-directory: application/backend
         run: just test-unit
@@ -101,11 +106,48 @@ jobs:
         working-directory: application/backend
         run: just test-integration
 
+  timm-catalog-version-check:
+    name: timm-catalog-version-check
+    runs-on: ubuntu-latest
+    needs: check_paths
+    if: needs.check_paths.outputs.run_workflow == 'true'
+    permissions:
+      contents: read
+    steps:
+      - *harden-runner
+
+      - *checkout
+
+      - name: Verify snapshot timm_version matches the pinned dependency
+        run: |
+          SNAPSHOT="application/backend/app/supported_models/timm_catalog_snapshot.json"
+          if [[ ! -f "$SNAPSHOT" ]]; then
+            echo "::error::${SNAPSHOT} not found. Run 'just gen-timm-catalog' from application/backend/." >&2
+            exit 1
+          fi
+
+          PINNED_VERSION=$(python3 -c "import pathlib,re; m=re.search(r'\"timm==([^\"]+)\"', pathlib.Path('library/pyproject.toml').read_text(encoding='utf-8')); print(m.group(1) if m else '')")
+          if [[ -z "$PINNED_VERSION" ]]; then
+            echo "::error::Could not parse pinned timm version from library/pyproject.toml." >&2
+            exit 1
+          fi
+
+          SNAPSHOT_VERSION=$(python3 -c "import json; print(json.load(open('${SNAPSHOT}'))['timm_version'])")
+
+          echo "Pinned timm version:   ${PINNED_VERSION}"
+          echo "Snapshot timm_version: ${SNAPSHOT_VERSION}"
+
+          if [[ "$PINNED_VERSION" != "$SNAPSHOT_VERSION" ]]; then
+            echo "::error::${SNAPSHOT} was generated with timm==${SNAPSHOT_VERSION}, but library/pyproject.toml pins timm==${PINNED_VERSION}. Regenerate with 'just gen-timm-catalog' from application/backend/." >&2
+            exit 1
+          fi
+
   required_check:
     name: Required Check backend-lint-and-test
     needs:
       - check_paths
       - python-checks
+      - timm-catalog-version-check
     runs-on: ubuntu-latest
     env:
       CHECKS: ${{ join(needs.*.result, ' ') }}

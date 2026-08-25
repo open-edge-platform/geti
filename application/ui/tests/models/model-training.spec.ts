@@ -54,6 +54,10 @@ const mockedModelRevisions = [
             start_time: '2025-01-10T10:00:00.000000+00:00',
             end_time: '2025-01-10T12:30:00.000000+00:00',
             dataset_revision_id: 'dataset-1',
+            device: {
+                type: 'cpu',
+                name: 'CPU',
+            },
         },
     }),
     getMockedModel({
@@ -66,6 +70,10 @@ const mockedModelRevisions = [
             start_time: '2025-01-11T10:00:00.000000+00:00',
             end_time: '2025-01-11T12:30:00.000000+00:00',
             dataset_revision_id: 'dataset-1',
+            device: {
+                type: 'cpu',
+                name: 'CPU',
+            },
         },
     }),
 ];
@@ -192,11 +200,11 @@ test.describe('Model training flow', () => {
         await modelsPage.openTrainModelDialog();
         await modelsPage.selectModelArchitecture('Custom_Object_Detection_Gen3_ATSS');
         await modelsPage.selectPickerOption('Select dataset', 'Dataset Revision 2');
-        await modelsPage.selectPickerOption('Select model revision', 'ATSS Revision 1');
+        await modelsPage.selectPickerOption('Select input weights', 'ATSS Revision 1');
 
         await modelsPage.startTraining();
 
-        await expect(page.getByRole('heading', { name: 'Currently running' })).toBeVisible();
+        await expect(page.getByRole('heading', { name: 'Jobs' })).toBeVisible();
         await expect(page.getByText('ATSS Training Run')).toBeVisible();
 
         expect(state.submittedJobBody).toMatchObject({
@@ -226,8 +234,8 @@ test.describe('Model training flow', () => {
             await modelsPage.selectPickerOption('Select dataset', 'Dataset Revision 2');
         });
 
-        await test.step('Select model revision', async () => {
-            await modelsPage.selectPickerOption('Select model revision', 'ATSS Revision 1');
+        await test.step('Select input weights', async () => {
+            await modelsPage.selectPickerOption('Select input weights', 'ATSS Revision 1');
         });
 
         await test.step('Select advanced settings', async () => {
@@ -292,8 +300,8 @@ test.describe('Model training flow', () => {
             await modelsPage.selectPickerOption('Select dataset', 'Dataset Revision 2');
         });
 
-        await test.step('Select model revision', async () => {
-            await modelsPage.selectPickerOption('Select model revision', 'Train from scratch');
+        await test.step('Select input weights', async () => {
+            await modelsPage.selectPickerOption('Select input weights', 'Default pre-trained weights');
         });
 
         await test.step('Select advanced settings', async () => {

@@ -12,6 +12,8 @@ from .data_collection_policy import (
 from .dataset import AnnotationType, DatasetFormat, StagedDataset
 from .dataset_item import DatasetItem, DatasetItemAnnotation, DatasetItemAnnotationStatus, DatasetItemSubset
 from .dataset_revision import DatasetRevision
+from .dataset_view import DatasetView
+from .device_spec import DeviceSpec
 from .evaluation import EvaluationResult
 from .inference import (
     BatchInferenceInput,
@@ -21,6 +23,7 @@ from .inference import (
     InferenceWorkerStatus,
     InferenceWorkerStatusCode,
 )
+from .inference_config import InferenceConfig
 from .jobs import (
     ExportDatasetJob,
     ExportDatasetJobParams,
@@ -80,6 +83,8 @@ __all__ = [
     "DatasetItemAnnotationStatus",
     "DatasetItemSubset",
     "DatasetRevision",
+    "DatasetView",
+    "DeviceSpec",
     "DisconnectedSinkConfig",
     "DisconnectedSourceConfig",
     "EvaluationResult",
@@ -91,6 +96,7 @@ __all__ = [
     "IPCameraSourceConfig",
     "Image",
     "ImagesFolderSourceConfig",
+    "InferenceConfig",
     "InferenceWorkerStatus",
     "InferenceWorkerStatusCode",
     "Label",

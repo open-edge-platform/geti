@@ -24,13 +24,13 @@ class ActiveModelService:
     Used exclusively by the InferenceWorker process.
     """
 
-    def __init__(self, data_dir: Path) -> None:
+    def __init__(self, data_dir: Path, system_service: SystemService) -> None:
         self.projects_dir = data_dir / "projects"
+        self._system_service = system_service
         self._model_activation_state: ModelActivationState = self._load_state()
         self._loaded_model: LoadedModelHandle | None = None
 
-    @staticmethod
-    def _load_state() -> ModelActivationState:
+    def _load_state(self) -> ModelActivationState:
         """Load the state from the DB if it exists, otherwise initialize an empty state"""
         with get_db_session() as db:
             active_model_repo = ActiveModelRepo(db=db)
@@ -59,13 +59,14 @@ class ActiveModelService:
             pipeline_device = active_model_repo.get_active_pipeline_device()
             if pipeline_device is None:
                 raise RuntimeError("Active pipeline must have a device configured")
-            geti_device = SystemService().get_device_info(pipeline_device)
+            geti_device = self._system_service.inference_device(pipeline_device, fallback_to_cpu=True)
             return ModelActivationState(
                 project_id=UUID(active_model.project_id),
                 active_model_id=UUID(active_model.id),
                 active_model_variant_id=UUID(active_variant_id),
                 available_models=[UUID(m.id) for m in available_models],
                 device=geti_device,
+                confidence_threshold=active_model_repo.get_active_confidence_threshold(),
             )
 
     def _get_model_file_path(self, project_id: UUID, model_id: UUID, variant_id: UUID, extension: str = "xml") -> Path:
@@ -130,8 +131,27 @@ class ActiveModelService:
             except FileNotFoundError:
                 logger.exception("Failed to load model with ID '{}'", active_model_id)
                 return None
+            # The model is created with the threshold embedded in its files; override it if the pipeline says so.
+            self._apply_confidence_threshold()
 
         return self._loaded_model
+
+    def refresh_inference_params(self) -> None:
+        """Re-read the pipeline inference parameters and apply them to the loaded model, without reloading it."""
+        with get_db_session() as db:
+            confidence_threshold = ActiveModelRepo(db=db).get_active_confidence_threshold()
+        self._model_activation_state.confidence_threshold = confidence_threshold
+        self._apply_confidence_threshold()
+
+    def _apply_confidence_threshold(self) -> None:
+        """Push the configured confidence threshold onto the loaded model."""
+        confidence_threshold = self._model_activation_state.confidence_threshold
+        if self._loaded_model is None or confidence_threshold is None:
+            return
+        logger.info(
+            "Setting confidence threshold of model '{}' to {}", self._loaded_model.model_id, confidence_threshold
+        )
+        self._loaded_model.model.set_param("confidence_threshold", confidence_threshold)
 
     def _unload_model(self) -> None:
         """Release the currently loaded model and free its resources."""

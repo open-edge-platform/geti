@@ -6,8 +6,8 @@ import { useImportJobStatus } from 'hooks/api/jobs/use-import-job-status.hook';
 import { getJobProgress, isJobPending } from 'hooks/api/util';
 import { isEmpty } from 'lodash-es';
 
-import { ThreeDotsFlashing } from '../../shared/components/three-dots-flashing/three-dots-flashing.component';
 import { CircularProgress } from '../circular-progress/circular-progress.component';
+import { ThreeDotsFlashing } from '../three-dots-flashing/three-dots-flashing.component';
 
 import classes from './import-job-process.module.scss';
 

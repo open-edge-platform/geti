@@ -6,7 +6,7 @@ import { Divider, Flex, Loading, Text, View } from '@geti-ui/ui';
 import { getJobProgress, isJobRunning } from 'hooks/api/util';
 import { useExportDataset } from 'hooks/storage/use-export-dataset.hook';
 
-import { BottomProgressBar } from '../../../../models/model-listing/current-model-running/bottom-progress-bar.component';
+import { BottomProgressBar } from '../../../../models/model-listing/current-running-jobs/bottom-progress-bar.component';
 import { CancelJobConfirmation } from '../../cancel-job-confirmation/cancel-job-confirmation.component';
 import { ExportJobDetails } from './export-details/export-details.component';
 

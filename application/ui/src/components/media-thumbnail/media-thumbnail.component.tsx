@@ -1,6 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useEffect, useRef } from 'react';
+
 import type { Media, MediaVideo } from '@/api/types';
 import { Flex } from '@geti-ui/ui';
 
@@ -37,9 +39,25 @@ const VideoIndicator = ({ duration }: VideoIndicatorProps) => {
 };
 
 export const MediaThumbnail = ({ onDoubleClick, onClick, url, alt, item }: MediaThumbnailProps) => {
+    const imgRef = useRef<HTMLImageElement>(null);
+
+    useEffect(() => {
+        const ref = imgRef.current;
+
+        if (ref) {
+            ref.src = url;
+        }
+
+        return () => {
+            if (ref) {
+                ref.src = '';
+            }
+        };
+    }, [url]);
+
     return (
         <div onDoubleClick={onDoubleClick} onClick={onClick} className={classes.imgContainer}>
-            <img src={url} alt={alt} className={classes.img} draggable={false} />
+            <img ref={imgRef} src={url} alt={alt} className={classes.img} draggable={false} decoding={'async'} />
             {isVideo(item) && <VideoIndicator duration={item.duration} />}
         </div>
     );

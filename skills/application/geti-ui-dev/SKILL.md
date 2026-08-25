@@ -6,8 +6,7 @@ description: Develop and validate changes in `application/ui/` for the React and
 # Geti UI Development
 
 > For the full architecture reference (feature-folder layout, data fetching,
-> generated API types, and vendored packages) read
-> [`application/ui/AGENTS.md`](../../../application/ui/AGENTS.md).
+> and generated API types) read the `application/ui/AGENTS.md` file.
 
 ## Quick Start
 
@@ -34,10 +33,11 @@ description: Develop and validate changes in `application/ui/` for the React and
 ## API Type Notes
 
 - `npm run build:api` reads `src/api/openapi-spec.json` and regenerates `src/api/openapi-spec.d.ts`.
-- `npm run update-spec` downloads the spec from `http://localhost:7860` and then rebuilds the TypeScript types.
+- `npm run update-spec` downloads the spec from `https://localhost:7860` (self-signed TLS, fetched with `--insecure`) and then rebuilds the TypeScript types.
 - Use `$geti-openapi-sync` when backend API changes are part of the task.
 
 ## Coordination Notes
 
-- The `preinstall` script clones pinned Geti UI workspace packages into `packages/`; do not edit those generated packages.
+- `@geti-ui/ui` and `@geti-ui/smart-tools` are consumed as regular published npm
+  dependencies (`npm install`/`npm ci`) — no clone/preinstall step, do not vendor them locally.
 - Keep generated API artifacts and the consuming UI changes in the same change set when the contract changes.

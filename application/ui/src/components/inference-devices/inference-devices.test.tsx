@@ -22,12 +22,12 @@ describe('InferenceDevices', () => {
 
     it('renders picker items from the devices API', async () => {
         const onSelectionChange = vi.fn();
-        render(<InferenceDevices selectedKey='cpu' onSelectionChange={onSelectionChange} ariaLabel='device picker' />);
+        render(<InferenceDevices selectedKey='cpu' onSelectionChange={onSelectionChange} label='device picker' />);
 
-        const picker = await screen.findByLabelText('device picker');
+        const picker = await screen.findByRole('button', { name: /device picker/i });
         expect(picker).toBeInTheDocument();
 
-        await userEvent.click(screen.getByRole('button', { name: /device picker/i }));
+        await userEvent.click(picker);
 
         expect(await screen.findByRole('option', { name: /CPU/i })).toBeInTheDocument();
         expect(screen.getByRole('option', { name: /XPU/i })).toBeInTheDocument();
@@ -35,10 +35,9 @@ describe('InferenceDevices', () => {
 
     it('calls onSelectionChange with the device key when a different device is selected', async () => {
         const onSelectionChange = vi.fn();
-        render(<InferenceDevices selectedKey='cpu' onSelectionChange={onSelectionChange} ariaLabel='device picker' />);
+        render(<InferenceDevices selectedKey='cpu' onSelectionChange={onSelectionChange} label='device picker' />);
 
-        await screen.findByLabelText('device picker');
-        await userEvent.click(screen.getByRole('button', { name: /device picker/i }));
+        await userEvent.click(await screen.findByRole('button', { name: /device picker/i }));
         await userEvent.click(await screen.findByRole('option', { name: /XPU/i }));
 
         await waitFor(() => {
@@ -48,10 +47,9 @@ describe('InferenceDevices', () => {
 
     it('does not call onSelectionChange when the already-selected key is clicked again', async () => {
         const onSelectionChange = vi.fn();
-        render(<InferenceDevices selectedKey='cpu' onSelectionChange={onSelectionChange} ariaLabel='device picker' />);
+        render(<InferenceDevices selectedKey='cpu' onSelectionChange={onSelectionChange} label='device picker' />);
 
-        await screen.findByLabelText('device picker');
-        await userEvent.click(screen.getByRole('button', { name: /device picker/i }));
+        await userEvent.click(await screen.findByRole('button', { name: /device picker/i }));
         await userEvent.click(await screen.findByRole('option', { name: /CPU/i }));
 
         expect(onSelectionChange).not.toHaveBeenCalled();
@@ -65,10 +63,9 @@ describe('InferenceDevices', () => {
         server.use(http.get('/api/system/devices/inference', () => HttpResponse.json(devicesWithIndex)));
 
         const onSelectionChange = vi.fn();
-        render(<InferenceDevices selectedKey='cpu' onSelectionChange={onSelectionChange} ariaLabel='device picker' />);
+        render(<InferenceDevices selectedKey='cpu' onSelectionChange={onSelectionChange} label='device picker' />);
 
-        await screen.findByLabelText('device picker');
-        await userEvent.click(screen.getByRole('button', { name: /device picker/i }));
+        await userEvent.click(await screen.findByRole('button', { name: /device picker/i }));
         await userEvent.click(await screen.findByRole('option', { name: /XPU/i }));
 
         await waitFor(() => {

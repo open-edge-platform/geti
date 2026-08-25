@@ -17,8 +17,8 @@ from getitune.backend.lightning.models.classification.heads import LinearClsHead
 from getitune.backend.lightning.models.classification.multiclass_models.base import (
     LightningMulticlassClsModel,
 )
-from getitune.backend.lightning.models.classification.necks.gap import GlobalAveragePooling
 from getitune.backend.lightning.models.classification.utils.pretrained_weights import TimmWeightsLoader
+from getitune.backend.lightning.models.classification.utils.timm import get_preprocessing_params
 from getitune.backend.lightning.schedulers import LRSchedulerListCallable
 from getitune.metrics.accuracy import MultiClassClsMetricCallable
 from getitune.types.label import LabelInfoTypes
@@ -49,15 +49,11 @@ class TimmModelMulticlassCls(TimmWeightsLoader, LightningMulticlassClsModel):
             the default pretrained weights will be utilized for fine-tuning. Defaults to None.
 
     Example:
-        1. API
-            >>> model = TimmModelForMulticlassCls(
-            ...     model_name="tf_efficientnetv2_s.in21k",
-            ...     label_info=<Number-of-classes>,
-            ... )
-        2. CLI
-            >>> getitune train \
-            ... --model getitune.algo.classification.timm_model.TimmModelForMulticlassCls \
-            ... --model.model_name tf_efficientnetv2_s.in21k
+        >>> model = TimmModelMulticlassCls(
+        ...     model_name="tf_efficientnetv2_s.in21k",
+        ...     label_info=10,  # Number of classes
+        ...     learning_rate=0.0001,
+        ... )
     """
 
     def __init__(
@@ -91,7 +87,7 @@ class TimmModelMulticlassCls(TimmWeightsLoader, LightningMulticlassClsModel):
         backbone = TimmBackbone(model_name=self.model_name)
         return ImageClassifier(
             backbone=backbone,
-            neck=GlobalAveragePooling(dim=2),
+            neck=None,
             head=LinearClsHead(
                 num_classes=num_classes,
                 in_channels=backbone.num_features,
@@ -105,3 +101,7 @@ class TimmModelMulticlassCls(TimmWeightsLoader, LightningMulticlassClsModel):
             return self.model(images=image, mode="explain")
 
         return self.model(images=image, mode="tensor")
+
+    @property
+    def _default_preprocessing_params(self) -> DataInputParams | dict[str, DataInputParams]:
+        return get_preprocessing_params(backbone_name=self.model_name)

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Button, Flex, Text } from '@geti-ui/ui';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 
 import { ReactComponent as EmptyFolderImage } from '../../../../assets/empty-folder.svg';
 import { paths } from '../../../../constants/paths';

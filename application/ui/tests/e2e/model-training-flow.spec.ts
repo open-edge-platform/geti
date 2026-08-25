@@ -1,22 +1,52 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { ANNOTATIONS_TO_DRAW_PER_ASSET } from './assets-annotations';
 import { expectMediaItemToChange } from './expects';
 import { expect, test } from './fixtures';
 import { getFilesToUpload } from './utils';
 
 const TIMEOUTS = {
-    training: 1000 * 60 * 60,
-    quantization: 1000 * 60 * 20,
+    trainedModelResults: 1000 * 20,
+    quantizationResults: 1000 * 20,
+    training: 1000 * 60 * 10,
+    quantization: 1000 * 60 * 5,
     nextMediaItem: 1000 * 30,
     mediaUploaded: 1000 * 60,
+    videoUploaded: 1000 * 60,
+    pipelineHealth: 1000 * 90,
 };
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/** Uploaded to the backend by the video file source, so this path is only resolved on the test runner. */
+const VIDEO_PATH = path.resolve(dirname, '../assets/fish_60.mp4');
 
 test.describe('Model training flow E2E', () => {
     const projectName = `E2E Project - ${new Date().toISOString()}`;
+    const uniqueSuffix = new Date().toISOString().replace(/[:.]/g, '-');
+    const sourceName = `E2E source - ${uniqueSuffix}`;
+    const sinkName = `E2E sink - ${uniqueSuffix}`;
 
-    test.afterEach(async ({ projectPage }) => {
+    test.beforeEach(async ({ projectPage }) => {
+        await projectPage.disableActivePipeline();
+    });
+
+    test.afterEach(async ({ projectPage, inferencePage }) => {
+        // Sources and sinks are not project scoped, so deleting the project leaves them behind.
+        await test.step('Delete source and sink', async () => {
+            if (await inferencePage.getInputTab().isVisible()) {
+                await inferencePage.deleteSource(sourceName);
+                await inferencePage.deleteSink(sinkName);
+
+                await expect(inferencePage.getSourceCard(sourceName)).toBeHidden();
+                await expect(inferencePage.getSinkCard(sinkName)).toBeHidden();
+            }
+        });
+
         await test.step('Delete project', async () => {
             await projectPage.gotoList();
             await projectPage.openProjectMenu(projectName);
@@ -33,6 +63,7 @@ test.describe('Model training flow E2E', () => {
         annotatorPage,
         boundingBoxTool,
         modelsPage,
+        inferencePage,
         page,
     }) => {
         const filesToUpload = getFilesToUpload('./assets/lego-bricks-dataset');
@@ -67,6 +98,8 @@ test.describe('Model training flow E2E', () => {
             let prevImageName: string | null = null;
 
             for (let i = 0; i < filesToUpload.length; i++) {
+                await expect(annotatorPage.getMediaCanvasLoading()).toBeHidden({ timeout: TIMEOUTS.nextMediaItem });
+
                 await expectMediaItemToChange(annotatorPage, prevImageName, TIMEOUTS.nextMediaItem);
 
                 const imageName = (await annotatorPage.getSelectedMediaItem().getAttribute('alt')) as string;
@@ -109,18 +142,18 @@ test.describe('Model training flow E2E', () => {
             await speedCard.click();
             await modelsPage.startTraining();
 
-            await expect(modelsPage.getRunningModelJob(selectedArchitectureName)).toBeVisible({
+            await expect(modelsPage.getRunningJob(selectedArchitectureName)).toBeVisible({
                 timeout: TIMEOUTS.training,
             });
 
-            await expect(modelsPage.getRunningModelJob(selectedArchitectureName)).toBeHidden({
+            await expect(modelsPage.getRunningJob(selectedArchitectureName)).toBeHidden({
                 timeout: TIMEOUTS.training,
             });
 
             await expect(async () => {
                 const modelNames = await modelsPage.getModelNamesInOrder();
                 expect(modelNames).toHaveLength(1);
-                expect(modelNames).toContain(selectedArchitectureName);
+                expect(modelNames.some((name) => name.includes(selectedArchitectureName))).toBe(true);
 
                 const modelAccuracy = await modelsPage
                     .getModelRows()
@@ -130,30 +163,92 @@ test.describe('Model training flow E2E', () => {
 
                 expect(Number(modelAccuracy)).toBeGreaterThan(0);
             }).toPass({
-                timeout: TIMEOUTS.training,
+                timeout: TIMEOUTS.trainedModelResults,
             });
         });
 
+        let modelName = '';
+
         await test.step('Quantize model', async () => {
-            const modelName = (await modelsPage.getModelName()) as string;
+            modelName = (await modelsPage.getModelName()) as string;
             await modelsPage.expandModel(modelName);
             await modelsPage.openQuantizationDialog();
             await modelsPage.submitQuantization();
 
-            await expect(modelsPage.getRunningModelJob(modelName)).toBeVisible({
+            await expect(modelsPage.getRunningJob(modelName)).toBeVisible({
                 timeout: TIMEOUTS.quantization,
             });
 
-            await expect(modelsPage.getRunningModelJob(modelName)).toBeHidden({
+            await expect(modelsPage.getRunningJob(modelName)).toBeHidden({
                 timeout: TIMEOUTS.quantization,
             });
 
             const precision = 'INT8';
+
             await expect(modelsPage.getModelVariantRow(modelName, precision)).toBeVisible({
-                timeout: TIMEOUTS.quantization,
+                timeout: TIMEOUTS.quantizationResults,
             });
 
-            expect(modelsPage.getModelVariantAccuracy(modelName, precision, precision)).toBeGreaterThan(0);
+            expect(Number(await modelsPage.getModelVariantAccuracy(modelName, precision, precision))).toBeGreaterThan(
+                0
+            );
+        });
+
+        await test.step('Configure the inference pipeline', async () => {
+            await inferencePage.openInferenceTab();
+            await inferencePage.openPipelineConfiguration();
+
+            const uploadedVideoPath = await inferencePage.addVideoFileSource({
+                name: sourceName,
+                videoPath: VIDEO_PATH,
+                loop: true,
+            });
+            // The source is only created once the video has finished uploading to the backend.
+            await expect(inferencePage.getSourceCard(sourceName)).toBeVisible({ timeout: TIMEOUTS.videoUploaded });
+
+            // The backend rejects a sink folder that does not already exist on its own filesystem, so the
+            // directory it just stored the uploaded video in is reused as the output folder.
+            const sinkFolderPath = uploadedVideoPath.replace(/[\\/][^\\/]+$/, '');
+
+            await inferencePage.addFolderSink({
+                name: sinkName,
+                folderPath: sinkFolderPath,
+                outputFormats: ['Predictions', 'Image with Predictions'],
+            });
+            await expect(inferencePage.getSinkCard(sinkName)).toBeVisible();
+        });
+
+        await test.step('Select the trained model', async () => {
+            // The quantized variant shares this label, so the precision keeps the option unambiguous.
+            const openVinoModelName = `${modelName} [FP16]`;
+
+            await inferencePage.selectModel(openVinoModelName);
+
+            await expect(inferencePage.getModelPicker()).toContainText(openVinoModelName);
+        });
+
+        await test.step('Enable the pipeline', async () => {
+            await expect(inferencePage.getPipelineSwitch('disabled')).toBeVisible();
+
+            await inferencePage.enablePipeline();
+
+            await expect(inferencePage.getPipelineSwitch('enabled')).toBeVisible();
+        });
+
+        await test.step('Write predictions to the output sink', async () => {
+            // The sink writes to a folder on the backend's filesystem, which the runner cannot read when the
+            // backend runs on another host. A sink that fails to write turns the pipeline health negative,
+            // so a running pipeline is asserted instead of the folder contents. The WebRTC preview is not
+            // asserted either: it needs a media path between the runner and the backend, which CI does not have.
+            await expect(inferencePage.getPipelineHealth()).toHaveText('Running', {
+                timeout: TIMEOUTS.pipelineHealth,
+            });
+        });
+
+        await test.step('Disable the pipeline', async () => {
+            await inferencePage.disablePipeline();
+
+            await expect(inferencePage.getPipelineSwitch('disabled')).toBeVisible();
         });
     });
 });

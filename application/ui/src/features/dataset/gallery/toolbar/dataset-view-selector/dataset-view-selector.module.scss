@@ -1,0 +1,21 @@
+.viewsTitle {
+    font-size: var(--spectrum-global-dimension-font-size-75);
+    color: var(--spectrum-global-color-gray-800);
+}
+
+.datasetViewsTrigger {
+    cursor: pointer;
+    background-color: var(--spectrum-global-color-gray-50);
+    border: var(--spectrum-alias-border-size-thick) solid var(--spectrum-global-color-gray-500);
+}
+
+.datasetViewsTriggerDisabled {
+    cursor: not-allowed;
+    background-color: var(--background-inverse);
+    border-color: var(--background-inverse);
+    color: color-mix(in srgb, var(--spectrum-global-color-gray-900) 40%, transparent);
+}
+
+.datasetViewName {
+    line-height: 1;
+}

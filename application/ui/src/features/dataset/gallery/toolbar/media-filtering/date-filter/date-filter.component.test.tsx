@@ -1,115 +1,119 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { screen } from '@testing-library/react';
-import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { useSearchParams } from 'react-router-dom';
 import { render } from 'test-utils/render';
 
-import {
-    END_DATE_PARAM,
-    START_DATE_PARAM,
-    useDatasetFiltersSearchParams,
-} from '../../../../../../hooks/use-dataset-filters-search-params.hook';
-import { DateFilter } from './date-filter.component';
+import { END_DATE_PARAM, START_DATE_PARAM } from '../../../../../../hooks/use-dataset-filters-search-params.hook';
+import { DateFilter, INVALID_RANGE_MESSAGE } from './date-filter.component';
 
-const REVERSED_RANGE_MESSAGE = 'Start date must be before end date.';
+const START_DATE = '2026-03-15T10:00:00.000Z';
+const END_DATE = '2026-03-20T10:00:00.000Z';
 
 const AppliedFilters = () => {
-    const { startDate, endDate, setDateRange } = useDatasetFiltersSearchParams();
+    const [searchParams] = useSearchParams();
 
     return (
         <>
-            <div data-testid='applied-filters'>{`${startDate ?? 'none'}|${endDate ?? 'none'}`}</div>
-            <button onClick={() => setDateRange(null, null)}>Clear all</button>
+            <span data-testid='applied-start-date'>{searchParams.get(START_DATE_PARAM) ?? ''}</span>
+            <span data-testid='applied-end-date'>{searchParams.get(END_DATE_PARAM) ?? ''}</span>
         </>
     );
 };
 
-const renderDateFilter = (search = '') => {
-    return render(
+const renderDateFilter = (route: string) =>
+    render(
         <>
             <DateFilter />
             <AppliedFilters />
         </>,
-        { route: `/projects/123${search}`, path: '/projects/:projectId' }
+        { route, path: '/projects/:projectId' }
     );
+
+const setSegment = async (
+    user: ReturnType<typeof userEvent.setup>,
+    fieldName: string,
+    segmentName: RegExp,
+    value: string
+) => {
+    const field = screen.getByRole('group', { name: fieldName });
+    const segment = within(field).getByRole('spinbutton', { name: segmentName });
+
+    await user.click(segment);
+    await user.keyboard(value);
 };
 
-// Both date fields live in a single group, their segments are told apart by the
-// "Start Date" / "End Date" part of their accessible name
-const getSegment = (segmentName: RegExp) => screen.getByRole('spinbutton', { name: segmentName });
+const setYear = (user: ReturnType<typeof userEvent.setup>, fieldName: string, year: string) =>
+    setSegment(user, fieldName, /year/i, year);
 
-// Fills every segment of a date field at once, the digits are expected to follow the
-// en-US segment order: month, day, year, hour, minute
-const typeDate = async (user: UserEvent, fieldName: 'start' | 'end', digits: string) => {
-    await user.click(getSegment(new RegExp(`month, ${fieldName} date`, 'i')));
-    await user.keyboard(digits);
-};
-
-const getAppliedFilters = () => screen.getByTestId('applied-filters').textContent;
-
-const START_DATE = '2024-05-10T10:00:00.000Z';
-const END_DATE = '2024-06-10T10:00:00.000Z';
+// A month is committed with a single keystroke, so it does not go through intermediate (applied) values
+const setMonth = (user: ReturnType<typeof userEvent.setup>, fieldName: string, month: string) =>
+    setSegment(user, fieldName, /month/i, month);
 
 describe('DateFilter', () => {
-    const search = `?${START_DATE_PARAM}=${START_DATE}&${END_DATE_PARAM}=${END_DATE}`;
+    const routeWithDates = `/projects/123?${START_DATE_PARAM}=${START_DATE}&${END_DATE_PARAM}=${END_DATE}`;
 
-    it('applies the filter properly', async () => {
+    it('applies the filter when the picked range is valid', async () => {
         const user = userEvent.setup();
 
-        renderDateFilter();
+        renderDateFilter(routeWithDates);
 
-        await typeDate(user, 'start', '051020241000');
-        await typeDate(user, 'end', '061020241200');
+        await setYear(user, 'Start date', '2025');
 
-        // The picker operates in the local time zone, so the expected values are built the same way
-        const expectedStartDate = new Date(2024, 4, 10, 10, 0).toISOString();
-        const expectedEndDate = new Date(2024, 5, 10, 12, 0).toISOString();
-
-        expect(getAppliedFilters()).toBe(`${expectedStartDate}|${expectedEndDate}`);
+        expect(screen.getByTestId('applied-start-date')).toHaveTextContent('2025-03-15');
+        expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
+        expect(screen.queryByText(INVALID_RANGE_MESSAGE)).not.toBeInTheDocument();
     });
 
-    it('does not allow filtering by a date in the future', async () => {
+    it('keeps the previous filter and shows an error when the end date is moved before the start date', async () => {
         const user = userEvent.setup();
 
-        renderDateFilter(search);
+        renderDateFilter(routeWithDates);
 
-        await user.click(getSegment(/year, end date/i));
-        await user.keyboard(String(new Date().getFullYear() + 1));
+        await setYear(user, 'End date', '2020');
 
-        expect(await screen.findByText(/or earlier\.$/)).toBeVisible();
-        expect(getAppliedFilters()).toBe(`${START_DATE}|${END_DATE}`);
+        expect(screen.getByTestId('applied-start-date')).toHaveTextContent(START_DATE);
+        expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
+        expect(screen.getByText(INVALID_RANGE_MESSAGE)).toBeVisible();
     });
 
-    it('keeps the previously applied filters and shows an error when the end date is earlier than the start date', async () => {
+    it('keeps the previous filter and shows an error when the start date is moved after the end date', async () => {
         const user = userEvent.setup();
 
-        renderDateFilter(search);
+        renderDateFilter(routeWithDates);
 
-        await user.click(getSegment(/year, end date/i));
-        await user.keyboard('2023');
+        await setMonth(user, 'Start date', '4');
 
-        expect(await screen.findByText(REVERSED_RANGE_MESSAGE)).toBeVisible();
-        expect(getAppliedFilters()).toBe(`${START_DATE}|${END_DATE}`);
+        expect(screen.getByTestId('applied-start-date')).toHaveTextContent(START_DATE);
+        expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
+        expect(screen.getByText(INVALID_RANGE_MESSAGE)).toBeVisible();
     });
 
-    it('re-applies the filter once the range becomes valid again', async () => {
+    it('applies the filter once an invalid end date is corrected', async () => {
         const user = userEvent.setup();
 
-        renderDateFilter(search);
+        renderDateFilter(routeWithDates);
 
-        await user.click(getSegment(/year, end date/i));
-        await user.keyboard('2023');
+        await setYear(user, 'End date', '2020');
+        await setYear(user, 'Start date', '2020');
 
-        expect(await screen.findByText(REVERSED_RANGE_MESSAGE)).toBeVisible();
+        expect(screen.getByTestId('applied-start-date')).toHaveTextContent('2020-03-15');
+        expect(screen.getByTestId('applied-end-date')).toHaveTextContent('2020-03-20');
+        expect(screen.queryByText(INVALID_RANGE_MESSAGE)).not.toBeInTheDocument();
+    });
 
-        await user.click(getSegment(/year, end date/i));
-        await user.keyboard('2025');
+    it('applies the filter once an invalid start date is corrected', async () => {
+        const user = userEvent.setup();
 
-        const expectedEndDate = new Date(END_DATE);
-        expectedEndDate.setFullYear(2025);
+        renderDateFilter(routeWithDates);
 
-        expect(screen.queryByText(REVERSED_RANGE_MESSAGE)).not.toBeInTheDocument();
-        expect(getAppliedFilters()).toBe(`${START_DATE}|${expectedEndDate.toISOString()}`);
+        await setMonth(user, 'Start date', '4');
+        await setMonth(user, 'Start date', '2');
+
+        expect(screen.getByTestId('applied-start-date')).toHaveTextContent('2026-02-15');
+        expect(screen.getByTestId('applied-end-date')).toHaveTextContent(END_DATE);
+        expect(screen.queryByText(INVALID_RANGE_MESSAGE)).not.toBeInTheDocument();
     });
 });

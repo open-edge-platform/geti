@@ -5,6 +5,7 @@ import type { Media } from '@/api/types';
 import { ViewModes } from '@geti-ui/ui';
 import { fireEvent, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
+import { getMockedDatasetView } from 'mocks/mock-dataset-view';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
@@ -92,6 +93,9 @@ describe('Toolbar', () => {
                     },
                     items: [],
                 });
+            }),
+            http.get('/api/projects/{project_id}/dataset/views', () => {
+                return HttpResponse.json([getMockedDatasetView()]);
             })
         );
 
@@ -236,6 +240,7 @@ describe('Toolbar', () => {
         expect(screen.getByRole('button', { name: 'More filters' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /media status/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View mode' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Newest first' })).toBeInTheDocument();
     });
 
     it('shows "Newest first" sort button by default', async () => {
@@ -259,5 +264,21 @@ describe('Toolbar', () => {
 
         const newestFirstButton2 = await screen.findByRole('button', { name: 'Newest first' });
         expect(newestFirstButton2).toHaveTextContent('Newest first');
+    });
+
+    it('hides sort button when at least one media item is selected', async () => {
+        const firstItem = getMockedMediaImage({ id: 'first-item' });
+
+        vi.mocked(useSelectedData).mockReturnValue({
+            selectedKeys: new Set([firstItem.id]),
+            setSelectedKeys: vi.fn(),
+            toggleSelectedKeys: vi.fn(),
+            isSelected: vi.fn().mockReturnValue(false),
+        });
+
+        await renderToolbar([firstItem]);
+
+        expect(screen.queryByRole('button', { name: 'Newest first' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Oldest first' })).not.toBeInTheDocument();
     });
 });

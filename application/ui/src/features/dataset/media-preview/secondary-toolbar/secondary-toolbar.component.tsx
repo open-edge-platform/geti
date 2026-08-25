@@ -2,12 +2,28 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DatasetSubset, Media } from '@/api/types';
-import { ActionButton, Button, ButtonGroup, Divider, Flex, Icon, Text } from '@geti-ui/ui';
-import { CloseSemiBold } from '@geti-ui/ui/icons';
+import {
+    ActionButton,
+    Button,
+    ButtonGroup,
+    Content,
+    Dialog,
+    DialogTrigger,
+    Divider,
+    Flex,
+    Heading,
+    Icon,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+} from '@geti-ui/ui';
+import { CloseSemiBold, Gear } from '@geti-ui/ui/icons';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
+import { ConfidenceThreshold } from '../../../../components/confidence-threshold/confidence-threshold.component';
+import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
@@ -19,9 +35,9 @@ import { isClassificationTask, isMultiLabelClassificationTask } from '../../../p
 import { DeleteMediaItem } from '../../gallery/delete-media-item/delete-media-item.component';
 import { Toolbar } from '../toolbar-container/toolbar-container.component';
 import { AnnotatorModes } from './annotator-modes/annotator-modes-toggle.component';
-import { PredictionInferenceDevices } from './annotator-modes/prediction-inference-devices.component';
-import { PredictionModelSelector } from './annotator-modes/prediction-model-selector.component';
-import { PredictionButtons } from './annotator-modes/predictions-buttons.component';
+import { PredictionInferenceDevices } from './prediction-inference-devices/prediction-inference-devices.component';
+import { PredictionModelSelector } from './prediction-model-selector/prediction-model-selector.component';
+import { PredictionButtons } from './predictions-buttons.component';
 import { useIsSubmitDisabled } from './use-is-submit-disabled.hook';
 import { getNextItem } from './util';
 
@@ -63,6 +79,32 @@ const VideoAnnotationButtons = ({ onSubmit, isDisabled, isSaving }: VideoAnnotat
         <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
             Submit
         </Button>
+    );
+};
+
+const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
+    return (
+        <DialogTrigger type={'popover'} placement={'bottom'}>
+            <TooltipTrigger>
+                <Toolbar.Section>
+                    <ActionButton isQuiet aria-label={'Prediction settings'}>
+                        <Gear />
+                    </ActionButton>
+                </Toolbar.Section>
+                <Tooltip>Prediction settings</Tooltip>
+            </TooltipTrigger>
+            <Dialog size='S'>
+                <Heading>Prediction settings</Heading>
+                <Divider />
+                <Content>
+                    <Flex gap={'size-300'} direction={'column'}>
+                        <PredictionModelSelector isDisabled={isDisabled} />
+                        <PredictionInferenceDevices isDisabled={isDisabled} />
+                        {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && <ConfidenceThreshold isDisabled={isDisabled} />}
+                    </Flex>
+                </Content>
+            </Dialog>
+        </DialogTrigger>
     );
 };
 
@@ -121,6 +163,7 @@ export const SecondaryToolbar = ({
 
     const isPredictionMode = mode === 'prediction';
     const isAnnotationMode = mode === 'annotation';
+    const showPredictionActions = isPredictionMode && !isEmpty(selectableModels);
 
     const isSubmitDisabled = useIsSubmitDisabled({
         mode,
@@ -158,18 +201,7 @@ export const SecondaryToolbar = ({
                         />
                     </Toolbar.Section>
 
-                    {isPredictionMode && (
-                        <Flex gap={'size-50'}>
-                            {!isEmpty(selectableModels) ? (
-                                <Toolbar.Section minWidth={'size-2000'}>
-                                    <PredictionModelSelector isDisabled={isLoadingPredictions || isPlaying} />
-                                </Toolbar.Section>
-                            ) : null}
-                            <Toolbar.Section>
-                                <PredictionInferenceDevices isDisabled={isLoadingPredictions || isPlaying} />
-                            </Toolbar.Section>
-                        </Flex>
-                    )}
+                    {showPredictionActions && <PredictionActions isDisabled={isLoadingPredictions || isPlaying} />}
                 </Flex>
             </Toolbar.Container>
             {isAnnotationMode && (

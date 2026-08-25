@@ -126,7 +126,7 @@ describe('ReadOnlyAnnotator', () => {
             isLoading: true,
         });
 
-        expect(await screen.findByRole('progressbar', { name: 'Loading...' })).toBeInTheDocument();
+        expect(await screen.findByRole('progressbar', { name: 'Media canvas loading' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Previous media item' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Next media item' })).toBeDisabled();
     });

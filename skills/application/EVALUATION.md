@@ -47,13 +47,13 @@ Expected behavior:
 - Uses Node `>=24.2.0`, runs `npm ci` from `application/ui/`.
 - Runs `npm run test:unit`, and prefers unit tests over Playwright/e2e.
 
-### Scenario 4: Respect generated packages
+### Scenario 4: Respect generated API types
 
 > "Update the UI to use a new API field."
 
 Expected behavior:
 
-- Does not hand-edit generated `@geti` packages fetched by the preinstall hook.
+- Does not hand-edit generated API types (`src/api/openapi-spec.d.ts`); regenerates them instead.
 - Runs `npm run type-check` and `npm run lint` before finishing.
 
 ## `geti-openapi-sync`
@@ -108,10 +108,59 @@ Expected behavior:
 
 Expected behavior:
 
-- Updates the correct target (`README.md`, `CHANGELOG.md`, Sphinx source, or
-  docstrings).
+- Updates the correct target (`README.md`, `application/docs/`, `library/README.md`,
+  or docstrings).
 - Keeps the change scoped and consistent with the code, without inventing
   behavior.
+
+## `geti-annotating-and-managing-labels`
+
+### Scenario 10: Create a project and annotate media
+
+> "Using the REST API, create a detection project with two labels, upload an
+> image, and add a bounding-box annotation to it."
+
+Expected behavior:
+
+- Uses `POST /api/projects` with a task type and initial labels, then
+  `POST /api/projects/<id>/dataset/media` and
+  `POST /api/projects/<id>/dataset/media/<media_id>/annotations`.
+- Matches the annotation shape (bounding box) to the detection task type.
+- Stays at the REST-usage layer; does not propose backend code changes.
+
+### Scenario 11: Edit labels on an existing project
+
+> "Add a new label and rename an existing one on my project."
+
+Expected behavior:
+
+- Uses `PATCH /api/projects/<id>/labels` with `labels_to_add` / `labels_to_edit`.
+- Does not attempt to change the project task type or reparent labels.
+
+## `geti-import-export-datasets`
+
+### Scenario 12: Import an existing dataset as a new project
+
+> "I have a COCO dataset archive — import it into Geti as a new project."
+
+Expected behavior:
+
+- Uploads the archive to staging (`POST /api/staged_datasets`), runs a
+  `prepare_dataset_for_import` job, reviews detected task/labels, then submits
+  `import_dataset_as_new_project` via `POST /api/jobs`.
+- Tracks each operation with the async job model (`GET /api/jobs/<id>` or the
+  `/status` stream).
+- Does not claim external trained models (BYOM) can be imported.
+
+### Scenario 13: Export a project's dataset with filtering
+
+> "Export my project's dataset in COCO format, only the training subset."
+
+Expected behavior:
+
+- Submits an `export_dataset` job with the format and subset filter, then
+  downloads the archive via `GET /api/staged_datasets/<id>/zip`.
+- Uses the staging area rather than assuming a synchronous download.
 
 ## Running the evaluations
 

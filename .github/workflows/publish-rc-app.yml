@@ -16,14 +16,15 @@ jobs:
     timeout-minutes: 5
     outputs:
       rc_version: "${{ steps.validate.outputs.rc_version }}"
+      rc_number: "${{ steps.validate.outputs.rc_number }}"
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
           fetch-depth: 0 # Fetch all history and branches for validation
@@ -122,6 +123,7 @@ jobs:
           fi
 
           echo "rc_version=$RC_VERSION" >> "$GITHUB_OUTPUT"
+          echo "rc_number=$RC_NUMBER" >> "$GITHUB_OUTPUT"
 
   publish-rc:
     name: Build and push container RC (${{ matrix.device }})
@@ -139,17 +141,17 @@ jobs:
 
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
+        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
         with:
           egress-policy: audit
 
       - name: Checkout repository
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
 
       - name: Log in to Container Registry
-        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -203,3 +205,21 @@ jobs:
             --certificate-identity-regexp="^https://github\.com/${GITHUB_REPOSITORY}/\.github/workflows/.+" \
             --certificate-oidc-issuer='https://token.actions.githubusercontent.com'
           EOF
+
+  windows-installer:
+    name: Build Windows MSIX RC (${{ matrix.device }})
+    needs: validate
+    strategy:
+      fail-fast: false
+      matrix:
+        device: [cpu, xpu, cuda]
+    uses: ./.github/workflows/windows-installer.yml
+    with:
+      device: ${{ matrix.device }}
+      tag: rc${{ needs.validate.outputs.rc_number }} # Suffix only; VERSION file already supplies the base version
+      exclude-agpl-models: true # RC installers must not bundle Ultralytics/AGPL-licensed models
+    secrets:
+      MSIX_SIGN_CERTIFICATE: ${{ secrets.MSIX_SIGN_CERTIFICATE }}
+      MSIX_SIGN_CERTIFICATE_PASSWORD: ${{ secrets.MSIX_SIGN_CERTIFICATE_PASSWORD }}
+    permissions:
+      contents: read

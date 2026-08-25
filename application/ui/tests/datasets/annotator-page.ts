@@ -114,6 +114,14 @@ export class AnnotatorPage {
         await this.getAnnotatorMode('prediction').click();
     }
 
+    getPredictionSettingsButton() {
+        return this.page.getByRole('button', { name: 'Prediction settings' });
+    }
+
+    async openPredictionSettings() {
+        await this.getPredictionSettingsButton().click();
+    }
+
     getPrimaryToolbar() {
         return this.page.getByLabel('primary toolbar');
     }
@@ -165,5 +173,9 @@ export class AnnotatorPage {
 
     async close() {
         await this.page.getByRole('dialog').getByRole('button', { name: 'Close' }).click();
+    }
+
+    getMediaCanvasLoading() {
+        return this.page.getByRole('progressbar', { name: 'Media canvas loading' });
     }
 }

@@ -8,8 +8,8 @@ import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
 
 import { ReactComponent as EmptyDataset } from '../../assets/drop-files.svg';
 import { Link } from '../../platform/components/link.component';
-import { ThreeDotsFlashing } from '../../shared/components/three-dots-flashing/three-dots-flashing.component';
 import { getFilesFromDropEvent } from '../../shared/drop-zone.utils';
+import { ThreeDotsFlashing } from '../three-dots-flashing/three-dots-flashing.component';
 import { toast } from '../toast/toast.component';
 import { formatToFileArray, isSupportedDatasetZip } from './util';
 

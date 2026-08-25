@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Media } from '@/api/types';
-import { Checkbox, DialogContainer, dimensionValue, Flex, Size, ViewModes } from '@geti-ui/ui';
+import { Checkbox, DialogContainer, dimensionValue, Flex, Selection, Size, ViewModes } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-import { isEmpty } from 'lodash-es';
+import { isEmpty, isEqual } from 'lodash-es';
 import { GridLayoutOptions } from 'react-aria-components';
 
 import { MediaItem } from '../../../components/media-item/media-item.component';
@@ -59,14 +59,26 @@ const GalleryList = ({
     isMediaItemReviewedById,
 }: GalleryListProps) => {
     const projectId = useProjectIdentifier();
-    const { selectedKeys, toggleSelectedKeys, isSelected } = useSelectedData();
+    const { selectedKeys, setSelectedKeys, toggleSelectedKeys, isSelected } = useSelectedData();
+
+    const handleSelectionChange = (keys: Selection) => {
+        setSelectedKeys((previousKeys) => {
+            const isSameItem = keys !== 'all' && keys.size === 1 && isEqual(previousKeys, keys);
+
+            return isSameItem ? new Set() : keys;
+        });
+    };
 
     return (
         <VirtualizerGridLayout
             items={items}
             ariaLabel='data-collection-grid'
             selectionMode='multiple'
+            selectionBehavior='replace'
+            allowDuplicateSelectionEvents
+            selectOnFocus={false}
             selectedKeys={selectedKeys}
+            onSelectionChange={handleSelectionChange}
             layoutOptions={VIEW_MODE_SETTINGS[viewMode]}
             isPending={isPending}
             isLoadingMore={isFetchingNextPage}
