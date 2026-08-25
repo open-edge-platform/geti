@@ -47,7 +47,7 @@ jobs:
             test:
               - application/backend/**
               - library/**
-              - .github/workflows/build.yaml
+              - .github/workflows/backend-lint-and-test.yaml
               - .github/actions/**
               - '!**/*.md'
               - '!library/docs/**'
