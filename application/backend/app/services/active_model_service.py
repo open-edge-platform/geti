@@ -66,6 +66,7 @@ class ActiveModelService:
                 active_model_variant_id=UUID(active_variant_id),
                 available_models=[UUID(m.id) for m in available_models],
                 device=geti_device,
+                confidence_threshold=active_model_repo.get_active_confidence_threshold(),
             )
 
     def _get_model_file_path(self, project_id: UUID, model_id: UUID, variant_id: UUID, extension: str = "xml") -> Path:
@@ -130,8 +131,27 @@ class ActiveModelService:
             except FileNotFoundError:
                 logger.exception("Failed to load model with ID '{}'", active_model_id)
                 return None
+            # The model is created with the threshold embedded in its files; override it if the pipeline says so.
+            self._apply_confidence_threshold()
 
         return self._loaded_model
+
+    def refresh_inference_params(self) -> None:
+        """Re-read the pipeline inference parameters and apply them to the loaded model, without reloading it."""
+        with get_db_session() as db:
+            confidence_threshold = ActiveModelRepo(db=db).get_active_confidence_threshold()
+        self._model_activation_state.confidence_threshold = confidence_threshold
+        self._apply_confidence_threshold()
+
+    def _apply_confidence_threshold(self) -> None:
+        """Push the configured confidence threshold onto the loaded model."""
+        confidence_threshold = self._model_activation_state.confidence_threshold
+        if self._loaded_model is None or confidence_threshold is None:
+            return
+        logger.info(
+            "Setting confidence threshold of model '{}' to {}", self._loaded_model.model_id, confidence_threshold
+        )
+        self._loaded_model.model.set_param("confidence_threshold", confidence_threshold)
 
     def _unload_model(self) -> None:
         """Release the currently loaded model and free its resources."""

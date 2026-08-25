@@ -53,6 +53,7 @@ class PipelineDB(Base):
     )
     is_running: Mapped[bool] = mapped_column(Boolean, default=False)
     data_collection: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
+    inference: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
     device: Mapped[str] = mapped_column(String(50), nullable=False, default="cpu")
 
     sink = relationship("SinkDB", uselist=False, lazy="joined")

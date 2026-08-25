@@ -93,6 +93,11 @@ jobs:
         working-directory: application/backend
         run: just lint
 
+      - name: Validate Alembic migrations
+        if: matrix.os == 'ubuntu'
+        working-directory: application/backend
+        run: just check-migrations
+
       - name: Run unit tests
         working-directory: application/backend
         run: just test-unit

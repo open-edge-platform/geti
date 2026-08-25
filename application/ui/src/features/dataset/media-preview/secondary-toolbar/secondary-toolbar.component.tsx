@@ -22,6 +22,7 @@ import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
+import { ConfidenceThreshold } from '../../../../components/confidence-threshold/confidence-threshold.component';
 import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
@@ -34,7 +35,6 @@ import { isClassificationTask, isMultiLabelClassificationTask } from '../../../p
 import { DeleteMediaItem } from '../../gallery/delete-media-item/delete-media-item.component';
 import { Toolbar } from '../toolbar-container/toolbar-container.component';
 import { AnnotatorModes } from './annotator-modes/annotator-modes-toggle.component';
-import { ConfidenceThreshold } from './confidence-threshold/confidence-threshold.component';
 import { PredictionInferenceDevices } from './prediction-inference-devices/prediction-inference-devices.component';
 import { PredictionModelSelector } from './prediction-model-selector/prediction-model-selector.component';
 import { PredictionButtons } from './predictions-buttons.component';
