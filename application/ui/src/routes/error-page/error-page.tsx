@@ -4,7 +4,6 @@
 import { Button, Heading, IllustratedMessage, View } from '@geti-ui/ui';
 import { NotFound } from '@geti-ui/ui/icons';
 import { isObject, isString } from 'lodash-es';
-import { useTranslation } from 'react-i18next';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 
 import { paths } from '../../constants/paths';
@@ -12,31 +11,30 @@ import { redirectTo } from '../utils';
 
 const useErrorMessage = () => {
     const error = useRouteError();
-    const { t } = useTranslation();
 
     if (isRouteErrorResponse(error)) {
         if (error.status === 400) {
-            return t('common.serverCannotProcess');
+            return 'The server cannot or will not process the current request.';
         }
 
         if (error.status === 403) {
-            return t('common.noPermission');
+            return 'You do not have permission to access this page.';
         }
 
         if (error.status === 404) {
-            return t('common.notExist');
+            return "This page doesn't exist!";
         }
 
         if (error.status === 401) {
-            return t('common.notAuthorized');
+            return "You aren't authorized to see this";
         }
 
         if (error.status === 500) {
-            return t('common.serverErrorGeneric');
+            return 'The server encountered an error and could not complete your request.';
         }
 
         if (error.status === 503) {
-            return t('common.apiDown');
+            return 'Looks like our API is down';
         }
     }
 
@@ -48,12 +46,11 @@ const useErrorMessage = () => {
         return error.detail;
     }
 
-    return t('common.unknownErrorGeneric');
+    return 'An unknown error occurred';
 };
 
 export const ErrorPage = () => {
     const message = useErrorMessage();
-    const { t } = useTranslation();
 
     return (
         <View height={'100vh'}>
@@ -68,7 +65,7 @@ export const ErrorPage = () => {
                         redirectTo(paths.root({}));
                     }}
                 >
-                    {t('common.goBackHome')}
+                    Go back to home page
                 </Button>
             </IllustratedMessage>
         </View>

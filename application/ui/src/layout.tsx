@@ -8,7 +8,6 @@ import { Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/u
 import { usePrefetchQuery } from '@tanstack/react-query';
 import { usePrefetchPipeline } from 'hooks/api/pipeline.hook';
 import { useProject } from 'hooks/api/project.hook';
-import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import getiLogo from './assets/icons/geti-logo.webp';
@@ -22,7 +21,6 @@ import classes from './layout.module.scss';
 
 const Header = () => {
     const projectId = useProjectIdentifier();
-    const { t } = useTranslation();
 
     return (
         <View backgroundColor={'gray-200'} gridArea={'header'}>
@@ -46,25 +44,25 @@ const Header = () => {
 
                 <TabList height={'100%'} UNSAFE_className={classes.tabList}>
                     <Item
-                        textValue={t('nav.datasetDescription')}
+                        textValue='Data collection page to visualise your media items'
                         key={'dataset'}
                         href={paths.project.dataset.index({ projectId })}
                     >
-                        {t('nav.dataset')}
+                        Dataset
                     </Item>
                     <Item
-                        textValue={t('nav.modelsDescription')}
+                        textValue='Models page to visualise your models'
                         key={'models'}
                         href={paths.project.models({ projectId })}
                     >
-                        {t('nav.models')}
+                        Models
                     </Item>
                     <Item
-                        textValue={t('nav.inferenceDescription')}
+                        textValue='Inference page showing live inference on your project'
                         key={'inference'}
                         href={paths.project.inference({ projectId })}
                     >
-                        {t('nav.inference')}
+                        Inference
                     </Item>
                 </TabList>
 
@@ -89,7 +87,6 @@ const usePrefetchResources = () => {
 
 export const Layout = () => {
     const { pathname } = useLocation();
-    const { t } = useTranslation();
     // We want to check if the project exists before rendering the layout. If it doesn't, error boundary will catch it.
     useProject();
     usePrefetchResources();

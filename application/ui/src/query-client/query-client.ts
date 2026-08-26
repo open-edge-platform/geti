@@ -5,7 +5,6 @@ import { matchQuery, MutationCache, QueryClient } from '@tanstack/react-query';
 
 import { paths } from '../api/openapi-spec';
 import { toast } from '../components/toast/toast.component';
-import { i18n } from '../i18n';
 import { Meta, QueryKey } from './query-client.interface';
 
 declare module '@tanstack/react-query' {
@@ -19,7 +18,7 @@ const TOAST_DURATION = 5000;
 
 export const getErrorMessage = (error: unknown): string => {
     if (!error || typeof error !== 'object') {
-        return i18n.t('common.unexpectedError');
+        return 'An unexpected error occurred. Please try again.';
     }
 
     if ('detail' in error && typeof error.detail === 'string') {
@@ -30,13 +29,13 @@ export const getErrorMessage = (error: unknown): string => {
         const message = error.message;
 
         if (error instanceof TypeError && message.includes('Failed to fetch')) {
-            return i18n.t('common.networkError');
+            return 'Network error. Please check your connection and try again.';
         }
 
         return message;
     }
 
-    return i18n.t('common.unexpectedError');
+    return 'An unexpected error occurred. Please try again.';
 };
 
 export const createQueryClient = () => {

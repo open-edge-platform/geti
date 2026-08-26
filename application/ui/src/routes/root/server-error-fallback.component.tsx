@@ -3,18 +3,16 @@
 
 import { Button, Heading, IllustratedMessage, View } from '@geti-ui/ui';
 import { CloudErrorIcon } from '@geti-ui/ui/icons';
-import { useTranslation } from 'react-i18next';
 
 import { paths } from '../../constants/paths';
 import { redirectTo } from '../utils';
 
 export const ServerErrorFallback = () => {
-    const { t } = useTranslation();
     return (
         <View height={'100vh'}>
             <IllustratedMessage>
                 <CloudErrorIcon size='XXL' />
-                <Heading>{t('common.serverError')}</Heading>
+                <Heading>Server Error</Heading>
 
                 <Button
                     variant={'accent'}
@@ -23,7 +21,7 @@ export const ServerErrorFallback = () => {
                         redirectTo(paths.root({}));
                     }}
                 >
-                    {t('common.refresh')}
+                    Refresh
                 </Button>
             </IllustratedMessage>
         </View>
