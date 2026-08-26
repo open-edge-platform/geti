@@ -2,15 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 """Appearance (ReID) cost computation and IoU-gated fusion.
 
-Operate on plain numpy feature and cost matrices. Features are assumed
-L2-normalised row vectors; `cosine_distance` renormalises defensively.
-`fuse_appearance_cost` blends an IoU cost with an appearance cost and gates the
-result by an IoU floor.
+Operate on plain numpy feature and cost matrices. `cosine_distance` returns the
+pairwise cosine-distance matrix; `fuse_appearance_cost` blends an IoU cost with an
+appearance cost and gates the result by an IoU floor.
 """
 
 from __future__ import annotations
 
 import numpy as np
+from scipy.spatial.distance import cdist
 
 _EPS = 1e-12
 
@@ -49,10 +49,7 @@ def cosine_distance(features_a: np.ndarray, features_b: np.ndarray) -> np.ndarra
     m, n = features_a.shape[0], features_b.shape[0]
     if m == 0 or n == 0:
         return np.zeros((m, n), dtype=np.float32)
-    a = l2_normalize(features_a)
-    b = l2_normalize(features_b)
-    similarity = a @ b.T
-    return np.clip(1.0 - similarity, 0.0, 2.0).astype(np.float32)
+    return np.clip(cdist(features_a, features_b, metric="cosine"), 0.0, 2.0).astype(np.float32)
 
 
 def fuse_appearance_cost(
