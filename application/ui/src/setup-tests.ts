@@ -10,10 +10,7 @@ import { server } from './msw-node-setup';
 
 import './test-utils/mock-event-source';
 
-import { i18n } from './i18n/config';
-
-beforeAll(async () => {
-    await i18n.changeLanguage('en');
+beforeAll(() => {
     server.listen({ onUnhandledRequest: 'bypass' });
 });
 
