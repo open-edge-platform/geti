@@ -60,7 +60,7 @@ export const formatRateLimit = (rateLimit?: number | null): string => {
     if (normalizedRateLimit < 1) {
         const seconds = Math.round(1 / normalizedRateLimit);
 
-        return i18n.t('inference.sampleEverySec_other', { seconds });
+        return i18n.t('inference.sampleEverySec', { count: seconds, seconds });
     }
 
     const samples = Math.round(normalizedRateLimit);
