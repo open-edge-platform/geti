@@ -20,7 +20,6 @@
         "inference": "推理",
         "datasetDescription": "用于查看媒体条目的数据收集页面",
         "modelsDescription": "用于查看模型的模型页面",
-        "inferenceDescription": "展示项目实时推理结果的推理页面",
-        "headerNavigation": "顶部导航"
+        "inferenceDescription": "展示项目实时推理结果的推理页面"
     }
 }

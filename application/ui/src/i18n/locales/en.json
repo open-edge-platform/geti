@@ -20,7 +20,6 @@
         "inference": "Inference",
         "datasetDescription": "Data collection page to visualise your media items",
         "modelsDescription": "Models page to visualise your models",
-        "inferenceDescription": "Inference page showing live inference on your project",
-        "headerNavigation": "Header navigation"
+        "inferenceDescription": "Inference page showing live inference on your project"
     }
 }

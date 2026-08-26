@@ -95,7 +95,7 @@ export const Layout = () => {
     usePrefetchResources();
 
     return (
-        <Tabs aria-label={t('nav.headerNavigation')} selectedKey={getFirstPathSegment(pathname)}>
+        <Tabs aria-label='Header navigation' selectedKey={getFirstPathSegment(pathname)}>
             <Grid
                 areas={['header', 'content']}
                 rows={['size-800', 'minmax(0, 1fr)']}

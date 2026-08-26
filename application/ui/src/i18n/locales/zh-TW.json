@@ -20,7 +20,6 @@
         "inference": "推論",
         "datasetDescription": "用於檢視媒體項目的資料收集頁面",
         "modelsDescription": "用於檢視模型的模型頁面",
-        "inferenceDescription": "顯示專案即時推論結果的推論頁面",
-        "headerNavigation": "頂部導覽列"
+        "inferenceDescription": "顯示專案即時推論結果的推論頁面"
     }
 }
