@@ -10,8 +10,8 @@ import { renderHook } from 'test-utils/render';
 import { http } from '../api/utils';
 import { server } from '../msw-node-setup';
 import { SORT_DIRECTION_PARAM } from './use-dataset-filters-search-params.hook';
-import { DATASET_VIEW_ID_PARAM } from './use-dataset-view-id.hook';
 import { useDatasetMediaWithReviewStatus } from './use-dataset-media-with-review-status.hook';
+import { DATASET_VIEW_ID_PARAM } from './use-dataset-view-id.hook';
 
 type HandlerOptions = {
     mediaTotal: number;
