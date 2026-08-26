@@ -161,7 +161,7 @@ class ReIDConfig(_StrictModel):
     """Device the model runs on. OpenVINO device string (e.g. ``CPU``, ``GPU``)
     for the OpenVINO backend; mapped to ``cpu``/``cuda`` for the torch backend."""
 
-    input_size: tuple[int, int] = (256, 128)
+    input_size: tuple[Annotated[int, Field(gt=0)], Annotated[int, Field(gt=0)]] = (256, 128)
     """ReID model input ``(height, width)`` in pixels (OSNet default 256x128)."""
 
     cache_dir: Path | None = None
