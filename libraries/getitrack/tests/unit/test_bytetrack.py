@@ -246,6 +246,16 @@ class TestStateAccessors:
         # Mutating the returned list must not disturb tracker state.
         assert len(bt.tracks) == 3
 
+    def test_tracks_are_deep_copies(self):
+        bt, _ = _mixed_state_tracker()
+        returned = bt.tracks[0]
+        returned.state = TrackState.REMOVED
+        returned.bbox[0] = -999.0
+        # Mutating a returned copy must not leak into the tracker's own Track.
+        internal = bt._tracks[returned.track_id]
+        assert internal.state != TrackState.REMOVED
+        assert internal.bbox[0] != -999.0
+
     def test_tracked_objects_includes_coasted_lost_track(self):
         bt, out2 = _mixed_state_tracker()
         to = bt.tracked_objects

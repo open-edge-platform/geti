@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
+from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
@@ -84,32 +85,32 @@ class BaseTracker(ABC, Generic[ConfigT]):
 
     @property
     def tracks(self) -> list[Track]:
-        """Return the tracker's current tracks across all lifecycle states.
+        """Return a snapshot of the tracker's current tracks.
 
-        Returns the live `Track` objects (TENTATIVE, ACTIVE, LOST) in insertion
-        order; REMOVED tracks are already pruned. The returned list is a fresh
-        copy, but the `Track` objects are shared: mutating them mutates tracker
-        state.
+        The snapshot spans every live lifecycle state (TENTATIVE, ACTIVE, and
+        LOST); REMOVED tracks have already been pruned.
+
+        Returns:
+            Deep copies of the current `Track` objects, in insertion order.
+            The copies are independent of tracker state, so mutating them has no
+            effect on the tracker.
         """
-        return list(self._tracks.values())
+        return deepcopy(list(self._tracks.values()))
 
     @property
     def tracked_objects(self) -> TrackedDetections:
         """Return the confirmed-alive tracks for the last processed frame.
 
-        Includes ACTIVE tracks and coasted LOST tracks still within ``max_age``;
-        excludes TENTATIVE and REMOVED tracks. Row contents:
-
-        - ACTIVE rows match the `update` output, detection box included.
-        - LOST rows carry the predicted box for this frame with ``det_index``
-          -1; their score and class are the last observed values.
-
-        ``det_indices`` index into the unfiltered detections of the last
-        processed frame even when a ``class_filter`` is set.
+        Includes ACTIVE tracks and coasted LOST tracks still within ``max_age``,
+        and excludes TENTATIVE and REMOVED tracks. ACTIVE rows mirror the `update`
+        output, including the detection box; LOST rows carry the predicted box for
+        the frame with a ``det_index`` of -1 and the last observed score and class.
+        ``det_indices`` index into the unfiltered detections of the last processed
+        frame even when a ``class_filter`` is set.
 
         Returns:
             A `TrackedDetections` for the last processed frame, or an empty one
-            (with an empty int64 ``det_indices``) if no frame has run yet.
+            (with an empty int64 ``det_indices``) when no frame has been processed.
         """
         frame_id = self._frame_id if self._frame_id is not None else 0
         alive = [t for t in self._tracks.values() if t.state in {TrackState.ACTIVE, TrackState.LOST}]
