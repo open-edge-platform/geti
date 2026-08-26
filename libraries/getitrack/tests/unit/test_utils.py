@@ -39,7 +39,7 @@ class TestConversions:
         np.testing.assert_allclose(got, [[20.0, 40.0, 20.0, 40.0]], atol=1e-6)
 
     def test_cxcywh_tolerates_zero_area(self):
-        # No aspect division, so a zero-size box round-trips without raising.
+        # A zero-size box round-trips without raising.
         np.testing.assert_allclose(
             cxcywh_to_xyxy(xyxy_to_cxcywh(np.array([[5.0, 5.0, 5.0, 5.0]]))), [[5.0, 5.0, 5.0, 5.0]]
         )

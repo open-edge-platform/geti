@@ -88,7 +88,7 @@ class InterpolationConfig(_StrictModel):
 
     smoothing_window: Annotated[int, Field(ge=1)] = 5
     """Samples in the centred moving average applied to interpolated boxes. Must
-    be odd so the window has a defined centre; 1 disables smoothing."""
+    be odd; 1 disables smoothing."""
 
     online: bool = False
     """Run causally: bridge a gap only once its closing observation is within

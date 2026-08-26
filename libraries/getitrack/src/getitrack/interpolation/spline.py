@@ -17,7 +17,7 @@ from getitrack.utils import cxcywh_to_xyxy, xyxy_to_cxcywh
 if TYPE_CHECKING:
     from getitrack.interpolation.base import Observation
 
-# Spline sizes are floored to this so an overshoot never yields a degenerate box.
+# Spline output sizes are floored to this minimum.
 _MIN_BOX_SIZE = 1e-3
 
 

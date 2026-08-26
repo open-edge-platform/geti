@@ -3,9 +3,8 @@
 """Bounding-box interpolation: fills short per-track gaps in a clip.
 
 Consumes a clip's per-frame `TrackedDetections` and synthesises missing boxes
-for gaps up to ``max_gap``, so downstream consumers see continuous trajectories.
-Synthesised rows carry ``interpolated=True`` and ``det_index=-1``; observed rows
-are untouched, which makes the stage idempotent.
+for gaps up to ``max_gap``. Synthesised rows carry ``interpolated=True`` and
+``det_index=-1``; observed rows are untouched and the stage is idempotent.
 
 Strategies (`InterpolationConfig.method`, resolved by `BaseInterpolator.from_config`):
 

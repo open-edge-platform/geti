@@ -19,7 +19,7 @@ def _interp(
     *,
     motion: MotionConfig | None = None,
 ) -> list[TrackedDetections]:
-    # The library exposes only the interpolator classes; this wraps the build-and-run for brevity.
+    # Build the interpolator from config and run it over the clip.
     return BaseInterpolator.from_config(config, motion=motion).interpolate(frames)
 
 
@@ -39,7 +39,7 @@ def _frame(
 
 
 def _no_smoothing(*, max_gap: int = 5, method: InterpolationMethod = InterpolationMethod.LINEAR) -> InterpolationConfig:
-    # The default smoothing_window is 5, so isolate the raw fill geometry.
+    # smoothing_window=1 disables smoothing, leaving the raw fill geometry.
     return InterpolationConfig(smoothing_window=1, max_gap=max_gap, method=method)
 
 

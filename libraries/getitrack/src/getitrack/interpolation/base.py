@@ -2,11 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """Interpolation-strategy base class and shared internal types.
 
-`BaseInterpolator` owns the clip-level pipeline (gap detection, causal
+`BaseInterpolator` runs the clip-level pipeline (gap detection, causal
 lookahead, smoothing, row assembly) as a template method; concrete strategies
 override only `fill`. Strategies self-register via a ``method`` class variable,
-so `from_config` dispatches by `InterpolationMethod` the way
-`BaseTracker.from_config` resolves algorithms.
+and `from_config` dispatches by `InterpolationMethod`.
 """
 
 from __future__ import annotations
@@ -56,8 +55,7 @@ class BaseInterpolator(ABC):
     """Fills short per-track gaps across a clip of `TrackedDetections`.
 
     Subclasses supply only `fill`; the shared clip pipeline lives in
-    `interpolate`. Stateless between calls, so one instance serves any number of
-    clips.
+    `interpolate`. Stateless between calls.
     """
 
     #: The `InterpolationMethod` this strategy fills for; set by each subclass.
@@ -134,8 +132,7 @@ class BaseInterpolator(ABC):
         position_by_frame = {frame.frame_id: index for index, frame in enumerate(ordered)}
         observations = self._collect_observations(ordered)
 
-        # Every (frame, track) pair already present blocks a synthesised row, so
-        # a track never gets two rows in one frame and the pass is idempotent.
+        # Every (frame, track) pair already present blocks a synthesised row.
         occupied: set[tuple[int, int]] = {
             (index, int(track_id)) for index, frame in enumerate(ordered) for track_id in frame.track_ids.tolist()
         }
@@ -189,9 +186,8 @@ class BaseInterpolator(ABC):
             ]
             if not frame_ids:
                 continue
-            # Causal horizon: a strategy that fits the whole trajectory (spline)
-            # must not see observations past this gap's closing anchor, or an
-            # already-emitted gap frame would shift when later frames arrive.
+            # Causal horizon: in online mode, hide observations past this gap's
+            # closing anchor from whole-trajectory strategies (spline).
             visible = [obs for obs in observations if not online or obs.frame_id <= end.frame_id]
             boxes = self.fill(visible, start, end, frame_ids)
             span = float(end.frame_id - start.frame_id)
@@ -215,9 +211,8 @@ class BaseInterpolator(ABC):
     ) -> dict[int, np.ndarray]:
         """Replace each synthesised box with a centred moving average over the track's trajectory.
 
-        Observed boxes are untouched (keeps the pass idempotent). In causal mode
-        the window is trimmed to ``frame + online_buffer`` so smoothing reads no
-        further ahead than the fill did.
+        Observed boxes are untouched. In causal mode the window is trimmed to
+        ``frame + online_buffer``.
         """
         online = self._config.online
         trajectory: dict[int, np.ndarray] = {observation.frame_id: observation.bbox for observation in observations}
