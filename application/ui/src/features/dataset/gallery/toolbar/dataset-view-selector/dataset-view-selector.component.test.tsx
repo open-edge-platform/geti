@@ -23,7 +23,7 @@ const SearchParamsSpy = () => {
 const renderDatasetViewSelector = (route?: string) => {
     return render(
         <>
-            <DatasetViewSelector datasetViews={DATASET_VIEWS} />
+            <DatasetViewSelector datasetViews={DATASET_VIEWS} resetSelectedMediaIds={vi.fn()} />
             <SearchParamsSpy />
         </>,
         {

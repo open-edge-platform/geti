@@ -30,9 +30,6 @@ import { DatasetView } from '../type';
 
 import classes from './assign-to-existing-view.module.scss';
 
-// Copyright (C) 2025-2026 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
-
 const useAssignMediaToExistingView = () => {
     const projectId = useProjectIdentifier();
     const queryClient = useQueryClient();

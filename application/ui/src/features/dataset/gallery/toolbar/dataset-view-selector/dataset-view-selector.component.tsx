@@ -89,7 +89,6 @@ export const DatasetViewSelector = ({ datasetViews, resetSelectedMediaIds }: Dat
     const onlyEntireDatasetView = isEmpty(datasetViews);
 
     // When the datasetViewId is invalid, i.e. not found in the datasetViews array, set it to the default view id.
-    // TODO: Once backend is ready, check if we can remove `useEffect`.
     useEffect(() => {
         if (datasetViewId !== ENTIRE_DATASET_VIEW_ID && !datasetViews.some(({ id }) => id === datasetViewId)) {
             setDatasetViewId(ENTIRE_DATASET_VIEW_ID);
