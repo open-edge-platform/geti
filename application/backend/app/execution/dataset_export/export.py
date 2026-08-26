@@ -10,6 +10,7 @@ from datumaro.experimental.data_formats.base import DataFormat
 from datumaro.experimental.export_import import export_dataset
 from datumaro.experimental.fields import Subset
 from loguru import logger
+from pathvalidate import sanitize_filename
 from sqlalchemy.orm import Session
 
 from app.datumaro_converter import SampleMode
@@ -82,22 +83,26 @@ class ExportDataset(Execution[ExportDatasetJobParams]):
             return uuid4(), dataset
 
     @step("Export dataset", 100)
-    def export_dataset(self, dataset_id: UUID, dataset: Dataset, export_format: DatasetFormat) -> Path | None:
+    def export_dataset(
+        self, dataset_id: UUID, dataset: Dataset, export_format: DatasetFormat, project_name: str
+    ) -> Path | None:
         target_dir = self._staged_datasets_dir / str(dataset_id)
         logger.info("Exporting dataset {} to {} in {} format", dataset_id, target_dir, export_format)
         target_dir.mkdir(parents=True, exist_ok=True)
+        file_prefix = sanitize_filename(project_name)
+        filename = f"{file_prefix}-{export_format}-dataset.zip"
         match export_format:
             case DatasetFormat.COCO | DatasetFormat.YOLO | DatasetFormat.VOC:
                 export_dataset(
                     dataset=dataset,
                     data_format=get_dm_format(export_format),
-                    output_path=str(target_dir / f"dataset-{export_format}.zip"),
+                    output_path=str(target_dir / filename),
                     as_zip=True,
                 )
             case DatasetFormat.GETI:
                 export_dataset(
                     dataset=dataset,
-                    output_path=str(target_dir / f"dataset-{export_format}.zip"),
+                    output_path=str(target_dir / filename),
                     as_zip=True,
                 )
             case _:
@@ -110,4 +115,4 @@ class ExportDataset(Execution[ExportDatasetJobParams]):
             self.pin_message("Dataset is empty after applying filters. Nothing to export.")
             return
         self.update_metadata({"dataset_id": dataset_id})
-        self.export_dataset(dataset_id, dataset, params.export_format)
+        self.export_dataset(dataset_id, dataset, params.export_format, params.project_name)

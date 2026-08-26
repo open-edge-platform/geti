@@ -42,6 +42,7 @@ def fxt_export(
 def fxt_export_params() -> ExportDatasetJobParams:
     return ExportDatasetJobParams(
         project_id=uuid4(),
+        project_name="my_project",
         task=Task(task_type=TaskType.DETECTION),
         export_format=DatasetFormat.COCO,
         labels=["label1", "label2"],
@@ -147,32 +148,34 @@ class TestDatasetExporter:
     ):
         dataset = MagicMock(spec=Dataset)
         dataset_id = uuid4()
+        project_name = "my_project"
 
         with patch("app.execution.dataset_export.export.export_dataset") as mock_export_dataset:
-            target_dir = fxt_export.export_dataset(dataset_id, dataset, export_format)
+            target_dir = fxt_export.export_dataset(dataset_id, dataset, export_format, project_name)
 
             assert target_dir
             assert target_dir == fxt_staged_datasets_dir / str(dataset_id)
             mock_export_dataset.assert_called_once_with(
                 dataset=dataset,
                 data_format=data_format,
-                output_path=str(fxt_staged_datasets_dir / str(dataset_id) / f"dataset-{export_format}.zip"),
+                output_path=str(fxt_staged_datasets_dir / str(dataset_id) / f"my_project-{export_format}-dataset.zip"),
                 as_zip=True,
             )
 
     def test_export_dataset_geti(self, fxt_export: ExportDataset, fxt_staged_datasets_dir: Path):
         dataset = MagicMock(spec=Dataset)
         dataset_id = uuid4()
+        project_name = "my_project"
 
         with (
             patch("app.execution.dataset_export.export.export_dataset") as mock_export_dataset,
         ):
-            target_dir = fxt_export.export_dataset(dataset_id, dataset, DatasetFormat.GETI)
+            target_dir = fxt_export.export_dataset(dataset_id, dataset, DatasetFormat.GETI, project_name)
 
             assert target_dir
             assert target_dir == fxt_staged_datasets_dir / str(dataset_id)
             mock_export_dataset.assert_called_once_with(
-                dataset=dataset, output_path=str(target_dir / f"dataset-{DatasetFormat.GETI}.zip"), as_zip=True
+                dataset=dataset, output_path=str(target_dir / f"my_project-{DatasetFormat.GETI}-dataset.zip"), as_zip=True
             )
 
     def test_execute(self, fxt_export: ExportDataset, fxt_export_params: ExportDatasetJobParams):
@@ -189,7 +192,7 @@ class TestDatasetExporter:
 
             mock_prepare.assert_called_once_with(fxt_export_params)
             mock_update_metadata.assert_called_once_with({"dataset_id": dataset_id})
-            mock_export.assert_called_once_with(dataset_id, dataset, fxt_export_params.export_format)
+            mock_export.assert_called_once_with(dataset_id, dataset, fxt_export_params.export_format, fxt_export_params.project_name)
 
     def test_execute_empty_dataset(self, fxt_export: ExportDataset, fxt_export_params: ExportDatasetJobParams):
         dataset_id = uuid4()

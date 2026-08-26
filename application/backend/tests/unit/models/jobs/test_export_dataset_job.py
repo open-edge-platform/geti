@@ -27,6 +27,7 @@ class TestExportDatasetJobParams:
         try:
             ExportDatasetJobParams(
                 project_id=uuid4(),
+                project_name="my_project",
                 task=Task(task_type=task_type),
                 export_format=export_format,
             )
@@ -50,6 +51,7 @@ class TestExportDatasetJobParams:
         ):
             ExportDatasetJobParams(
                 project_id=uuid4(),
+                project_name="my_project",
                 task=Task(task_type=task_type),
                 export_format=export_format,
             )

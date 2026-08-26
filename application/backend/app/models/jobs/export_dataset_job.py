@@ -19,6 +19,7 @@ VALID_FORMATS_PER_TASK = {
 class ExportDatasetJobParams(JobParams):
     dataset_id: UUID | None = None
     project_id: UUID
+    project_name: str
     task: Task
     export_format: DatasetFormat
     labels: list[str] | None = None
