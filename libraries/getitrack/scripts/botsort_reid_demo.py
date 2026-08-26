@@ -105,6 +105,7 @@ def run(args: argparse.Namespace) -> None:
 
     rows: list[dict[str, object]] = []
     frame_id = 0
+    max_track_id = 0
     started = time.perf_counter()
     while True:
         ok, frame = capture.read()
@@ -116,6 +117,8 @@ def run(args: argparse.Namespace) -> None:
             dets = replace(dets, embeddings=provider.extract(frame, dets.bboxes))
         warp = tracker.apply_camera_motion(frame)
         tracked = tracker.update(dets)
+        if len(tracked.track_ids) > 0:
+            max_track_id = max(max_track_id, int(tracked.track_ids.max()))
         _draw_tracks(frame, tracked)
         writer.write(frame)
         rows.append(
@@ -152,7 +155,8 @@ def run(args: argparse.Namespace) -> None:
         "gmc": not args.no_gmc,
         "frames": frame_id,
         "total_detections": sum(int(r["detections"]) for r in rows),
-        "max_track_id": max((int(r["tracks"]) for r in rows), default=0),
+        "max_track_id": max_track_id,
+        "max_active_tracks": max((int(r["tracks"]) for r in rows), default=0),
         "elapsed_s": round(elapsed, 2),
         "fps": round(frame_id / elapsed, 2) if elapsed > 0 else None,
         "output_video": str(final_path),
