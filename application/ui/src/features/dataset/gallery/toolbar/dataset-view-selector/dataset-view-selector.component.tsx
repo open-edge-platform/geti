@@ -9,7 +9,6 @@ import { clsx } from 'clsx';
 import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { isEmpty } from 'lodash-es';
 
-import { useSelectedData } from '../../../providers/selected-data-provider.component';
 import { DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
 import { DeleteDatasetViewDialog } from './delete-dataset-view.component';
 import { RenameDatasetView } from './rename-dataset-view.component';
@@ -54,15 +53,14 @@ const DatasetViewsTrigger = ({ selectedDatasetViewName, isDisabled }: DatasetVie
 
 type DatasetViewSelectorProps = {
     datasetViews: DatasetView[];
+    resetSelectedMediaIds: () => void;
 };
 
-export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) => {
+export const DatasetViewSelector = ({ datasetViews, resetSelectedMediaIds }: DatasetViewSelectorProps) => {
     const [isDatasetViewSelectorOpen, setIsDatasetViewSelectorOpen] = useState<boolean>(false);
-    const { setSelectedKeys } = useSelectedData();
 
     const [datasetViewId, setDatasetViewId] = useDatasetViewId();
-    const selectedDatasetViewName =
-        datasetViews.find((view) => view.id === datasetViewId)?.name ?? ENTIRE_DATASET_NAME;
+    const selectedDatasetViewName = datasetViews.find((view) => view.id === datasetViewId)?.name ?? ENTIRE_DATASET_NAME;
 
     const [datasetViewToBeDeleted, setDatasetViewToBeDeleted] = useState<DatasetView | null>(null);
     const [datasetViewToBeRenamed, setDatasetViewToBeRenamed] = useState<DatasetView | null>(null);
@@ -103,7 +101,7 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
 
         setDatasetViewId(id);
         setIsDatasetViewSelectorOpen(false);
-        setSelectedKeys(new Set());
+        resetSelectedMediaIds();
     };
 
     return (

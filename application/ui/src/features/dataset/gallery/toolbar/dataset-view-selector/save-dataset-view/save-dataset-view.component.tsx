@@ -13,7 +13,7 @@ import { SelectedMediaCount } from '../selected-media-count/selected-media-count
 import { DatasetView } from '../type';
 
 type SaveDatasetViewDialogProps = {
-    onClose: () => void;
+    onClose: (datasetViewId?: string) => void;
     selectedMediaIds: string[];
     datasetViews: DatasetView[];
 };
@@ -42,7 +42,9 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds, datasetViews }: Save
                 },
             },
             {
-                onSuccess: onClose,
+                onSuccess: ({ id }) => {
+                    onClose(id);
+                },
             }
         );
     };
@@ -66,7 +68,7 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds, datasetViews }: Save
                 </Form>
             </Content>
             <ButtonGroup>
-                <Button variant={'secondary'} onPress={onClose}>
+                <Button variant={'secondary'} onPress={() => onClose()}>
                     Close
                 </Button>
                 <Button
@@ -86,20 +88,25 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds, datasetViews }: Save
 type SaveDatasetViewProps = {
     selectedMediaIds: string[];
     datasetViews: DatasetView[];
+    resetSelectedMediaIds: () => void;
 };
 
-export const SaveDatasetView = ({ selectedMediaIds, datasetViews }: SaveDatasetViewProps) => {
-    const [datasetViewId] = useDatasetViewId();
+export const SaveDatasetView = ({ selectedMediaIds, datasetViews, resetSelectedMediaIds }: SaveDatasetViewProps) => {
+    const [datasetViewId, setDatasetViewId] = useDatasetViewId();
 
     const [isSaveViewDialogOpen, setIsSaveViewDialogOpen] = useState<boolean>(false);
-
-    const closeDialog = () => {
-        setIsSaveViewDialogOpen(false);
-    };
 
     if (datasetViewId !== ENTIRE_DATASET_VIEW_ID) {
         return null;
     }
+
+    const closeDialog = (newDatasetViewId?: string) => {
+        if (newDatasetViewId) {
+            setDatasetViewId(newDatasetViewId);
+            resetSelectedMediaIds();
+        }
+        setIsSaveViewDialogOpen(false);
+    };
 
     return (
         <>

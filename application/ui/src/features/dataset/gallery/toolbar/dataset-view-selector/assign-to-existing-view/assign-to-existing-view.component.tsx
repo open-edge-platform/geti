@@ -30,13 +30,24 @@ import { DatasetView } from '../type';
 
 import classes from './assign-to-existing-view.module.scss';
 
+// Copyright (C) 2025-2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
 const useAssignMediaToExistingView = () => {
     const projectId = useProjectIdentifier();
     const queryClient = useQueryClient();
 
     const assignToExistingViewMutation = useAssignMediaToExistingDatasetView();
 
-    const assignToExistingView = (selectedDatasetViewId: string, selectedMediaIds: string[], onClose: () => void) => {
+    const assignToExistingView = ({
+        selectedDatasetViewId,
+        selectedMediaIds,
+        onClose,
+    }: {
+        selectedDatasetViewId: string;
+        selectedMediaIds: string[];
+        onClose: (selectedDatasetViewId: string) => void;
+    }) => {
         assignToExistingViewMutation.mutate(
             {
                 params: {
@@ -95,7 +106,7 @@ const useAssignMediaToExistingView = () => {
                         }),
                     ]);
 
-                    onClose();
+                    onClose(selectedDatasetViewId);
                 },
             }
         );
@@ -109,7 +120,7 @@ const useAssignMediaToExistingView = () => {
 
 type AssignToExistingViewDialogProps = {
     datasetViews: DatasetView[];
-    onClose: () => void;
+    onClose: (selectedDatasetViewId?: string) => void;
     selectedMediaIds: string[];
 };
 
@@ -125,7 +136,7 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
             return;
         }
 
-        assignToExistingView(selectedDatasetViewId, selectedMediaIds, onClose);
+        assignToExistingView({ selectedDatasetViewId, selectedMediaIds, onClose });
     };
 
     return (
@@ -153,7 +164,7 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
                 </Flex>
             </Content>
             <ButtonGroup>
-                <Button onPress={onClose} variant={'secondary'}>
+                <Button onPress={() => onClose()} variant={'secondary'}>
                     Close
                 </Button>
                 <Button
@@ -173,14 +184,23 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
 type AssignToExistingViewProps = {
     datasetViews: DatasetView[];
     selectedMediaIds: string[];
+    resetSelectedMediaIds: () => void;
 };
 
-export const AssignToExistingView = ({ datasetViews, selectedMediaIds }: AssignToExistingViewProps) => {
-    const [datasetViewId] = useDatasetViewId();
+export const AssignToExistingView = ({
+    datasetViews,
+    selectedMediaIds,
+    resetSelectedMediaIds,
+}: AssignToExistingViewProps) => {
+    const [datasetViewId, setDatasetViewId] = useDatasetViewId();
     const [isAssignToExistingViewOpen, setIsAssignToExistingViewOpen] = useState<boolean>(false);
     const isAssignToExistingViewDisabled = isEmpty(datasetViews);
 
-    const closeDialog = () => {
+    const closeDialog = (selectedDatasetViewId?: string) => {
+        if (selectedDatasetViewId != null) {
+            setDatasetViewId(selectedDatasetViewId);
+            resetSelectedMediaIds();
+        }
         setIsAssignToExistingViewOpen(false);
     };
 
