@@ -1,4 +1,0 @@
-interface:
-  display_name: "Export a Model (getitune)"
-  short_description: "Export a trained getitune model to OpenVINO IR or ONNX"
-  default_prompt: "Use $getitune-exporting-a-model to export a trained model with getitune."

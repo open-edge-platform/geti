@@ -102,12 +102,17 @@ class DataCollector:
         )
 
     def _load_pipeline(self) -> None:
-        from app.services import LabelService, PipelineService, ProjectService, SystemService
+        from app.services import LabelService, ModelService, PipelineService, ProjectService, SystemService
 
         with get_db_session() as db:
             label_service = LabelService(db_session=db)
             system_service = SystemService()
-            pipeline_service = PipelineService(event_bus=self.event_bus, db_session=db, system_service=system_service)
+            pipeline_service = PipelineService(
+                event_bus=self.event_bus,
+                db_session=db,
+                system_service=system_service,
+                model_service=ModelService(data_dir=self.data_dir, db_session=db),
+            )
             pipeline = pipeline_service.get_active_pipeline()
             if pipeline is None:
                 logger.info("No active pipeline found, disabling data collection")
