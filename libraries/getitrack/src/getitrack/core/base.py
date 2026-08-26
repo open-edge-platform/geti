@@ -52,8 +52,8 @@ class BaseTracker(ABC, Generic[ConfigT]):
         self.config = config
         self._next_id: int = 1
         self._frame_id: int | None = None
-        # source_rows of the last processed frame, used to remap filtered-space
-        # det_indices back to input rows for both update() and state accessors.
+        # source_rows of the last processed frame, for remapping filtered-space
+        # det_indices back to input rows.
         self._last_source_rows: np.ndarray | None = None
         if config.verbose:
             enable_logging()
@@ -79,12 +79,9 @@ class BaseTracker(ABC, Generic[ConfigT]):
     def _remap_to_input_rows(self, tracked: TrackedDetections) -> TrackedDetections:
         """Remap ``det_indices`` from the last frame's filtered space to input rows.
 
-        ``det_indices`` produced against the class-filtered detections index into
-        filtered-row space; this maps the matched (``>= 0``) entries back to rows
-        of the unfiltered `Detections` passed to `update`, leaving -1 rows (no
-        source detection) untouched. A no-op when no ``class_filter`` was applied.
-        Shared by `update` and the state accessors so both honour the same
-        "``det_indices`` index the unfiltered detections" contract.
+        Maps matched (``>= 0``) entries back to rows of the unfiltered
+        `Detections` passed to `update`, leaving -1 rows untouched. A no-op when
+        no ``class_filter`` was applied.
         """
         if self._last_source_rows is None or tracked.det_indices is None:
             return tracked
@@ -112,11 +109,7 @@ class BaseTracker(ABC, Generic[ConfigT]):
         """Assemble a `TrackedDetections` from tracks and their det indices.
 
         Reads ``bbox``, ``score``, ``class_id``, ``track_id``, and ``state`` off
-        each `Track` in order, pairing row ``i`` with ``det_indices[i]``. The
-        caller decides which tracks to emit and supplies -1 for rows with no
-        source detection this frame (e.g. coasted tracks). This is the shared
-        output-building step for any track-collection tracker, kept on the base
-        so per-frame output and state accessors stay row-for-row consistent.
+        each `Track` in order, pairing row ``i`` with ``det_indices[i]``.
 
         Args:
             tracks: Tracks to emit, one per output row.

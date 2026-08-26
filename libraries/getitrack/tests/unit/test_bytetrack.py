@@ -301,8 +301,8 @@ class TestStateAccessors:
         assert bt.tracks == []
 
     def test_tracked_objects_only_tentative_hits_empty_branch(self):
-        # A non-empty _tracks whose tracks are all TENTATIVE yields no alive rows,
-        # so the empty-output branch runs even though the tracker holds a track.
+        # An all-TENTATIVE _tracks yields no alive rows: empty output with a
+        # non-empty tracker.
         bt = ByteTrackTracker(ByteTrackConfig())
         box = np.array([0, 0, 40, 40], dtype=np.float32)
         bt._tracks = {1: Track(track_id=1, class_id=0, bbox=box, score=0.9, state=TrackState.TENTATIVE)}

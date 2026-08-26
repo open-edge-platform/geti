@@ -296,26 +296,25 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
     def tracks(self) -> list[Track]:
         """Return the tracker's current tracks across all lifecycle states.
 
-        Exposes the live `Track` objects (TENTATIVE, ACTIVE, and LOST) held by
-        the tracker, in insertion order. REMOVED tracks are already pruned, so
-        they never appear. This is a cheap view for debugging and tests; the
-        returned list is a fresh copy but the `Track` objects are shared, so
-        mutating them mutates tracker state.
+        Returns the live `Track` objects (TENTATIVE, ACTIVE, LOST) in insertion
+        order; REMOVED tracks are already pruned. The returned list is a fresh
+        copy, but the `Track` objects are shared: mutating them mutates tracker
+        state.
         """
         return list(self._tracks.values())
 
     def tracked_objects(self) -> TrackedDetections:
-        """Return the confirmed-alive tracks for the current frame.
+        """Return the confirmed-alive tracks for the last processed frame.
 
-        Unlike `update`, which returns ACTIVE tracks only, this also includes
-        coasted LOST tracks that are still within ``max_age``. LOST tracks
-        carry their Kalman-predicted box for this frame (set during the frame's
-        predict step) with ``det_index`` -1, since they have no detection this
-        frame; their score and class are the last observed values. ACTIVE rows
-        are identical to the `update` output, detection box and all. TENTATIVE
-        tracks (not yet confirmed) and REMOVED tracks are excluded. As in
-        `update`, ``det_indices`` index into the unfiltered detections of the
-        last processed frame even when a ``class_filter`` is set.
+        Includes ACTIVE tracks and coasted LOST tracks still within ``max_age``;
+        excludes TENTATIVE and REMOVED tracks. Row contents:
+
+        - ACTIVE rows match the `update` output, detection box included.
+        - LOST rows carry the Kalman-predicted box for this frame with
+          ``det_index`` -1; their score and class are the last observed values.
+
+        ``det_indices`` index into the unfiltered detections of the last
+        processed frame even when a ``class_filter`` is set.
 
         Returns:
             A `TrackedDetections` for the last processed frame, or an empty one
@@ -323,7 +322,6 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
         """
         frame_id = self._frame_id if self._frame_id is not None else 0
         alive = [t for t in self._tracks.values() if t.state in {TrackState.ACTIVE, TrackState.LOST}]
-        # _frame_det_index holds filtered-space rows; remap to unfiltered input
-        # rows so det_indices match update()'s contract when a class_filter is set.
+        # _frame_det_index holds filtered-space rows; remap to unfiltered input rows.
         det_indices = [self._frame_det_index.get(t.track_id, -1) for t in alive]
         return self._remap_to_input_rows(self._compose_tracked_detections(alive, det_indices, frame_id))
