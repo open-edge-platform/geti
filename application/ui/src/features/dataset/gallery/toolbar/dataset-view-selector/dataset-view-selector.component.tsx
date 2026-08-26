@@ -83,6 +83,9 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
     };
 
     const handleCloseDeleteDialog = () => {
+        if (datasetViewToBeDeleted?.id === datasetViewId) {
+            setDatasetViewId(ENTIRE_DATASET_VIEW_ID);
+        }
         setDatasetViewToBeDeleted(null);
     };
 
