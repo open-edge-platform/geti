@@ -105,8 +105,8 @@ const GalleryList = ({
                                 height={'size-200'}
                                 alignItems={'center'}
                                 justifyContent={'center'}
-                                // Clicks fall through to the grid item so the checkbox area follows the same
-                                // replace/ctrl/shift selection semantics as clicking anywhere else on the item.
+                                // Set pointerEvents to 'none' to allow clicks to pass through
+                                // to the MediaItemActions component
                                 UNSAFE_style={{ margin: dimensionValue('size-150'), pointerEvents: 'none' }}
                             >
                                 <Checkbox
