@@ -419,9 +419,9 @@ def get_media_thumbnail(
 ) -> Response:
     """Get media thumbnail binary content"""
 
-    def _response(thumbnail_path: Path) -> Response:
+    def _response(thumbnail_path: Path, media_id: str | UUID) -> Response:
         return write_file_to_response(
-            path=thumbnail_path, filename=f"{media_id}-thumb.jpeg", cache_control="public, max-age=31536000"
+            path=thumbnail_path, filename=f"{str(media_id)}-thumb.jpeg", cache_control="public, max-age=31536000"
         )
 
     def _not_found() -> HTTPException:
@@ -429,7 +429,7 @@ def get_media_thumbnail(
 
     thumbnail_path = media_service.get_media_thumbnail_path_by_id(project_id=project_id, media_id=media_id)
     if frame_index is None and os.path.exists(thumbnail_path):
-        return _response(thumbnail_path)
+        return _response(thumbnail_path=thumbnail_path, media_id=media_id)
 
     project = project_service.get_project_by_id(project_id=project_id)
     media = media_service.get_media_by_id(project_id=project_id, media_id=media_id)
@@ -449,7 +449,7 @@ def get_media_thumbnail(
     if video_frame is not None:
         thumbnail_path = media_service.get_media_thumbnail_path_by_id(project_id=project_id, media_id=video_frame.id)
         if os.path.exists(thumbnail_path):
-            return _response(thumbnail_path)
+            return _response(thumbnail_path=thumbnail_path, media_id=video_frame.id)
         raise _not_found()
 
     # If the media is a video frame, generate the thumbnail on the fly
