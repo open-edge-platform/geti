@@ -33,7 +33,7 @@ import numpy as np
 from getitrack.algorithms import BotSortTracker
 from getitrack.algorithms.configs.botsort import BotSortConfig
 from getitrack.config import GMCConfig, GMCMethod, LifecycleConfig, ReIDBackend, ReIDConfig
-from getitrack.core.detection import Detections
+from getitrack.core.detection import Detections, TrackedDetections
 
 _RESULTS_ROOT = Path(__file__).resolve().parents[1] / "results" / "botsort_reid_demo"
 
@@ -45,14 +45,27 @@ def _palette(track_id: int) -> tuple[int, int, int]:
     return (b, g, r)
 
 
-def _detect_people(hog: cv2.HOGDescriptor, frame: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """Return ``(xyxy boxes, scores)`` for people detected by HOG in ``frame``."""
+def _detect_people(hog: cv2.HOGDescriptor, frame: np.ndarray, frame_id: int) -> Detections:
+    """Detect people in ``frame`` with HOG and return them as `Detections`."""
     rects, weights = hog.detectMultiScale(frame, winStride=(8, 8), padding=(8, 8), scale=1.05)
     if len(rects) == 0:
-        return np.empty((0, 4), dtype=np.float32), np.empty((0,), dtype=np.float32)
+        return Detections.create_empty(frame_id=frame_id)
     boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in rects], dtype=np.float32)
     scores = 1.0 / (1.0 + np.exp(-np.asarray(weights, dtype=np.float32).reshape(-1)))
-    return boxes, scores
+    return Detections(
+        bboxes=boxes,
+        scores=scores.astype(np.float32),
+        class_ids=np.zeros(len(boxes), dtype=np.int64),
+        frame_id=frame_id,
+    )
+
+
+def _draw_tracks(frame: np.ndarray, tracked: TrackedDetections) -> None:
+    """Draw each track's box and id onto ``frame`` in place."""
+    for box, tid in zip(tracked.bboxes.astype(int), tracked.track_ids.tolist(), strict=True):
+        colour = _palette(tid)
+        cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), colour, 2)
+        cv2.putText(frame, f"id {tid}", (box[0], box[1] - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.6, colour, 2)
 
 
 def _build_tracker(backend: str, model_name: str, *, use_gmc: bool) -> BotSortTracker:
@@ -97,27 +110,18 @@ def run(args: argparse.Namespace) -> None:
         ok, frame = capture.read()
         if not ok or (args.max_frames and frame_id >= args.max_frames):
             break
-        boxes, scores = _detect_people(hog, frame)
-        dets = Detections(
-            bboxes=boxes,
-            scores=scores,
-            class_ids=np.zeros(len(boxes), dtype=np.int64),
-            frame_id=frame_id,
-        )
+        dets = _detect_people(hog, frame, frame_id)
         provider = tracker.reid_provider
-        if provider is not None and len(boxes) > 0:
+        if provider is not None and len(dets.bboxes) > 0:
             dets = replace(dets, embeddings=provider.extract(frame, dets.bboxes))
         warp = tracker.apply_camera_motion(frame)
         tracked = tracker.update(dets)
-        for box, tid in zip(tracked.bboxes.astype(int), tracked.track_ids.tolist(), strict=True):
-            colour = _palette(tid)
-            cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), colour, 2)
-            cv2.putText(frame, f"id {tid}", (box[0], box[1] - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.6, colour, 2)
+        _draw_tracks(frame, tracked)
         writer.write(frame)
         rows.append(
             {
                 "frame": frame_id,
-                "detections": len(boxes),
+                "detections": len(dets.bboxes),
                 "tracks": len(tracked.track_ids),
                 "warp_tx": None if warp is None else round(float(warp[0, 2]), 3),
                 "warp_ty": None if warp is None else round(float(warp[1, 2]), 3),
