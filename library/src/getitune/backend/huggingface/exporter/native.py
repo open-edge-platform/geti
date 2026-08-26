@@ -1,15 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Native torch/OpenVINO exporter for the Hugging Face backend.
-
-Deliberately not a subclass of ``LightningModelExporter``: pulling in the
-Lightning backend just for this would create a dependency in the wrong
-direction (Hugging Face depending on Lightning internals for something that
-isn't Lightning-specific to begin with). The logic itself — trace via
-``torch.onnx.export``, optionally convert to OpenVINO, embed metadata — has
-no Lightning dependency, so it is duplicated here rather than imported.
-"""
+"""Native torch/OpenVINO exporter for the Hugging Face backend."""
 
 from __future__ import annotations
 
