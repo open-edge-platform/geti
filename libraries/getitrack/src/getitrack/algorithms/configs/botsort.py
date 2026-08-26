@@ -30,15 +30,14 @@ class BotSortConfig(ByteTrackConfig):
 
     appearance_iou_floor: Annotated[float, Field(ge=0.0, le=1.0)] = 0.5
     """Minimum IoU a track/detection pair must reach for appearance fusion to
-    apply. Pairs below it are gated out, so appearance cannot rescue
-    non-overlapping boxes."""
+    apply. Pairs below it use the IoU cost alone."""
 
     gallery_size: Annotated[int, Field(ge=1)] = 50
     """Maximum descriptors retained in each track's FIFO appearance gallery."""
 
     appearance_threshold: Annotated[float, Field(ge=0.0, le=2.0)] = 0.25
     """Maximum cosine distance for a descriptor to be admitted into a track's
-    gallery. Larger admits more; guards the gallery against pollution."""
+    gallery. Larger values admit more descriptors."""
 
     use_ema: bool = True
     """Also query appearance against a running EMA descriptor, in addition to the

@@ -136,8 +136,7 @@ class ReIDConfig(_StrictModel):
     prebuilt OpenVINO IR (set ``model_path`` to a ``.xml`` with ``backend`` left
     at ``openvino``). With ``model_name`` set, ``backend`` selects how it runs:
     ``torch`` natively, or ``openvino`` via an IR auto-exported and cached from
-    the torchreid model. Kept in the shared config module so BoT-SORT and future
-    appearance trackers (Deep OC-SORT, StrongSORT) reuse the same section.
+    the torchreid model.
     """
 
     enabled: bool = False
@@ -171,13 +170,7 @@ class ReIDConfig(_StrictModel):
 
     @model_validator(mode="after")
     def _warn_enabled_without_model(self) -> ReIDConfig:
-        """Warn when ReID is enabled but no model source is configured.
-
-        Supplying ``Detections.embeddings`` directly is valid, so this is a
-        warning rather than an error; it catches the common misconfiguration
-        where a user enables ReID yet the tracker silently falls back to IoU-only
-        for want of a model.
-        """
+        """Warn when ReID is enabled but no model source is configured."""
         if self.enabled and self.model_name is None and self.model_path is None:
             warnings.warn(
                 "ReIDConfig.enabled is True but neither model_name nor model_path "
@@ -195,9 +188,7 @@ class GMCConfig(_StrictModel):
 
     When enabled, an appearance-aware tracker estimates the affine camera motion
     between consecutive frames and warps its predicted track states by it before
-    association, so tracks stay aligned under a moving camera (BoT-SORT's GMC).
-    Kept in the shared config module so BoT-SORT and future appearance trackers
-    (Deep OC-SORT, StrongSORT) reuse the same section.
+    association (BoT-SORT's GMC).
     """
 
     enabled: bool = False
@@ -208,8 +199,8 @@ class GMCConfig(_StrictModel):
     """Motion-estimation algorithm (BoT-SORT defaults to sparse optical flow)."""
 
     downscale: Annotated[int, Field(ge=1)] = 2
-    """Integer factor the frame is downscaled by before estimation, trading
-    accuracy for speed. 1 disables downscaling."""
+    """Integer factor the frame is downscaled by before estimation. 1 disables
+    downscaling."""
 
 
 class TrackerConfig(_StrictModel):

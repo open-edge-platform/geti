@@ -44,7 +44,7 @@ class FeatureMatchingEstimator(BaseMotionEstimator):
         """Return the ``(detector, extractor, matcher)`` OpenCV objects for this method."""
 
     def _border_mask(self, gray: np.ndarray) -> np.ndarray:
-        """A mask that excludes a small border, where keypoints are least reliable."""
+        """Return a mask that excludes a small border around each edge."""
         height, width = gray.shape[:2]
         mask = np.zeros_like(gray)
         y0, y1 = int(self._BORDER_FRACTION * height), int((1 - self._BORDER_FRACTION) * height)
@@ -85,9 +85,9 @@ class FeatureMatchingEstimator(BaseMotionEstimator):
         if len(matches) < self._MIN_MATCHES:
             return _IDENTITY.copy()
 
-        # Keep displacements close to the mean (abs distance, unlike the reference
-        # which only filters positive deviations); the epsilon admits a pure,
-        # noise-free translation, where the standard deviation is zero.
+        # Keep displacements within _INLIER_STD standard deviations of the mean
+        # (absolute distance). The epsilon admits a pure translation, where the
+        # standard deviation is zero.
         deltas = np.array(displacements)
         inliers = np.abs(deltas - deltas.mean(axis=0)) < self._INLIER_STD * deltas.std(axis=0) + 1e-6
         prev_pts = np.array(

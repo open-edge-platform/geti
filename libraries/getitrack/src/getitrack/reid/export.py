@@ -2,9 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """Export a torchreid model to an OpenVINO IR for the OpenVINO ReID backend.
 
-This bridges torchreid's model zoo to `OpenVINOReIDProvider`: it builds the
-torchreid ``nn.Module`` (downloading or loading its weights) and converts it to
-an IR once, caching the result so repeated runs skip the conversion.
+Builds the torchreid ``nn.Module`` (downloading or loading its weights) and
+converts it to an IR, caching the result. Repeated runs reuse the cached IR.
 """
 
 from __future__ import annotations
@@ -58,7 +57,7 @@ def export_torchreid_to_openvino(
     if xml_path.exists():
         return xml_path
 
-    # Lazy imports keep torch/torchreid/openvino optional for the wider package.
+    # Import torch/torchreid/openvino lazily.
     import openvino as ov
     import torch
     from torchreid.reid.utils import FeatureExtractor

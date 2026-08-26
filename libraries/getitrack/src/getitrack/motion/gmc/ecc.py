@@ -2,10 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """ECC (Enhanced Correlation Coefficient) camera-motion estimator.
 
-Estimates a Euclidean (rotation + translation) warp by directly maximising the
-image correlation, as used by StrongSORT. Denser and more robust than feature
-matching on low-texture frames, but slower; it can fail to converge, in which
-case the estimate falls back to identity.
+Estimates a Euclidean (rotation + translation) warp by maximising the image
+correlation. Falls back to identity when the optimisation fails to converge.
 """
 
 from __future__ import annotations

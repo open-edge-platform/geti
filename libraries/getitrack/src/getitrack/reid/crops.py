@@ -1,11 +1,6 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-"""Bounding-box crop extraction shared by ReID providers.
-
-Both the OpenVINO and torch providers embed the image region under each box, so
-the clamping rule (keep every crop inside the frame and at least one pixel wide)
-lives here once rather than in each provider.
-"""
+"""Bounding-box crop extraction shared by ReID providers."""
 
 from __future__ import annotations
 

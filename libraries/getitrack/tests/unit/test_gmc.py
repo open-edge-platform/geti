@@ -31,10 +31,10 @@ def _textured(height: int = 200, width: int = 200) -> np.ndarray:
 
 
 def _rich_scene(size: int = 240) -> np.ndarray:
-    """A scene of varied-size, varied-intensity rectangles: distinctive sharp corners.
+    """A scene of varied-size, varied-intensity rectangles with distinct corners.
 
-    Unlike uniform shapes, the distinct grey levels give descriptor-based methods
-    (ORB/SIFT) unambiguous matches that survive the ratio test.
+    The distinct grey levels give descriptor-based methods (ORB/SIFT) unambiguous
+    matches that survive the ratio test.
     """
     rng = np.random.default_rng(3)
     frame = np.full((size, size, 3), 40, dtype=np.uint8)

@@ -27,7 +27,7 @@ if TYPE_CHECKING:
     from collections.abc import Sequence
     from pathlib import Path
 
-# ImageNet normalisation constants (RGB), the standard ReID preprocessing.
+# ImageNet normalisation constants (RGB).
 _IMAGENET_MEAN = (0.485, 0.456, 0.406)
 _IMAGENET_STD = (0.229, 0.224, 0.225)
 
@@ -50,9 +50,7 @@ class CompiledModel(Protocol):
 class OpenVINOReIDProvider(ReIDProvider):
     """ReID feature provider backed by a compiled OpenVINO IR model.
 
-    The OpenVINO runtime is imported lazily inside the constructor, so importing
-    this module (and the wider ``getitrack`` package) does not require
-    ``openvino`` to be installed.
+    The OpenVINO runtime is imported lazily in the constructor.
     """
 
     def __init__(
@@ -90,18 +88,15 @@ class OpenVINOReIDProvider(ReIDProvider):
         if model_path is None:
             msg = "either model_path or compiled_model must be provided"
             raise ValueError(msg)
-        # Lazy import keeps openvino an optional dependency; the module (and the
-        # wider getitrack package) stays importable without it installed.
+        # Import openvino lazily.
         import openvino as ov
 
         core = ov.Core()
         model = core.read_model(model_path)
         height, width = input_size
-        # Force a dynamic batch dimension so a single infer call embeds all boxes,
-        # regardless of the batch size the IR was exported with.
+        # Force a dynamic batch dimension so one infer call embeds all boxes.
         model.reshape([-1, 3, height, width])
-        # The compiled model satisfies the CompiledModel protocol at runtime; the
-        # cast bridges openvino's broader ``__call__`` signature to it.
+        # Cast openvino's broader ``__call__`` signature to the CompiledModel protocol.
         self._compiled = cast("CompiledModel", core.compile_model(model, device))
 
     def extract(self, frame_bgr: np.ndarray, boxes: np.ndarray) -> np.ndarray:

@@ -2,15 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """Appearance (ReID) cost computation and IoU-gated fusion.
 
-These helpers are tracker-agnostic: they operate on plain numpy feature
-matrices and cost matrices so any appearance-aware tracker (BoT-SORT, Deep
-OC-SORT, StrongSORT) can reuse them.
-
-Features are assumed L2-normalised row vectors; `cosine_distance` renormalises
-defensively, so an unnormalised input still yields a valid cosine distance.
+Operate on plain numpy feature and cost matrices. Features are assumed
+L2-normalised row vectors; `cosine_distance` renormalises defensively.
 `fuse_appearance_cost` blends an IoU cost with an appearance cost and gates the
-result by an IoU floor, so appearance can never rescue a pair whose boxes do
-not overlap enough.
+result by an IoU floor.
 """
 
 from __future__ import annotations
@@ -69,21 +64,12 @@ def fuse_appearance_cost(
 ) -> np.ndarray:
     """Blend an IoU cost with an appearance cost, gated by IoU proximity.
 
-    The appearance term is applied only where it is trustworthy: the pair's IoU
-    (``1 - iou_cost``) is at or above ``iou_floor`` **and** the appearance cost
-    is present (not ``NaN``). There the fused cost is the convex combination
-    ``(1 - appearance_weight) * iou_cost + appearance_weight * appearance_cost``,
-    which lowers the cost when appearance agrees and raises it when appearance
-    disagrees, letting appearance disambiguate competing matches.
-
-    Everywhere else, the cell falls back to the **plain** ``iou_cost``. The gate
-    only ever *removes the appearance contribution*; it never writes an
-    unmatchable sentinel. This preserves a key invariant for every appearance
-    tracker built on this layer (BoT-SORT, Deep OC-SORT, StrongSORT): appearance
-    can only help. A pair that IoU alone would match is never made unmatchable by
-    appearance, so an appearance tracker is never stricter on geometry than its
-    IoU-only baseline (e.g. a same-identity track reappearing at moderate overlap
-    below the floor is still recovered on IoU).
+    The appearance term is applied only where the pair's IoU (``1 - iou_cost``)
+    is at or above ``iou_floor`` and the appearance cost is present (not
+    ``NaN``). There the fused cost is the convex combination
+    ``(1 - appearance_weight) * iou_cost + appearance_weight * appearance_cost``.
+    Every other cell falls back to the plain ``iou_cost``; the gate never writes
+    an unmatchable sentinel.
 
     Args:
         iou_cost: ``(T, N)`` IoU cost matrix (``1 - IoU``).

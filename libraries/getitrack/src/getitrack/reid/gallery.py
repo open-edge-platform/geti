@@ -2,19 +2,15 @@
 # SPDX-License-Identifier: Apache-2.0
 """Bounded per-track appearance memory (gallery + EMA).
 
-An `AppearanceGallery` holds the appearance history of a single track. It keeps
-two complementary representations:
+An `AppearanceGallery` holds the appearance history of a single track in two
+representations:
 
 - a fixed-capacity FIFO gallery of recent descriptors, and
-- an exponential-moving-average (EMA) descriptor, optionally confidence-scaled,
-  as used by StrongSORT / BoT-SORT.
+- an exponential-moving-average (EMA) descriptor, optionally confidence-scaled.
 
-A cosine admission gate rejects descriptors that are too dissimilar from the
-track's current representation, guarding the memory against pollution from a
-wrong association or a badly-cropped box.
-
-The class is tracker-agnostic: a tracker keeps one `AppearanceGallery` per track
-id, feeds it the matched detection's descriptor via `update`, and queries the
+A cosine admission gate rejects descriptors too dissimilar from the track's
+current representation. A tracker keeps one `AppearanceGallery` per track id,
+feeds it the matched detection's descriptor via `update`, and queries the
 appearance distance of candidate detections via `distance`.
 """
 
@@ -30,10 +26,10 @@ from getitrack.matching.appearance import cosine_distance, l2_normalize
 class AppearanceGallery:
     """Fixed-capacity appearance memory for one track.
 
-    The FIFO gallery is always maintained and always queried, so ``gallery_size``
-    affects matching in both modes. When ``use_ema`` is set, the running EMA
-    descriptor is added as one extra representative alongside the FIFO entries,
-    and `distance` reports the minimum cosine distance over that combined set.
+    The FIFO gallery is always maintained and queried. When ``use_ema`` is set,
+    the running EMA descriptor is queried as one extra representative alongside
+    the FIFO entries, and `distance` reports the minimum cosine distance over the
+    combined set.
 
     Attributes:
         gallery_size: Maximum number of descriptors retained in the FIFO
@@ -76,8 +72,7 @@ class AppearanceGallery:
 
         Args:
             feature: ``(D,)`` appearance descriptor of the matched detection.
-            confidence: Detection score in ``[0, 1]`` scaling the EMA step, so
-                low-confidence detections perturb the running feature less.
+            confidence: Detection score in ``[0, 1]`` scaling the EMA step.
 
         Returns:
             True if the descriptor was admitted, False if the admission gate
@@ -120,8 +115,7 @@ class AppearanceGallery:
     def _representatives(self) -> np.ndarray | None:
         """Return the descriptor set queried against, or None when empty.
 
-        Always the FIFO gallery entries, plus the EMA descriptor when
-        ``use_ema`` is set, so ``gallery_size`` is never inert.
+        The FIFO gallery entries, plus the EMA descriptor when ``use_ema`` is set.
         """
         reps = list(self._gallery)
         if self.use_ema and self._ema is not None:

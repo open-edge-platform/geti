@@ -15,9 +15,7 @@ from getitrack.motion.gmc.features import FeatureMatchingEstimator
 class ORBEstimator(FeatureMatchingEstimator):
     """Detect FAST corners, describe them with ORB, and match with Hamming distance.
 
-    The fastest of the descriptor-based methods; a lightweight alternative to
-    sparse optical flow that re-detects features each frame rather than tracking
-    them.
+    Re-detects features each frame rather than tracking them.
     """
 
     method: ClassVar[GMCMethod] = GMCMethod.ORB

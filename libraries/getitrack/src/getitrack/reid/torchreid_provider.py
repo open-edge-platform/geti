@@ -4,9 +4,8 @@
 
 `TorchReIDProvider` wraps torchreid's ``FeatureExtractor`` to embed box crops
 with any torchreid model-zoo architecture (e.g. OSNet). torchreid handles the
-resize and ImageNet normalisation internally, so the provider only crops the
-boxes, converts BGR to RGB, and L2-normalises the returned descriptors to honour
-the `ReIDProvider` contract.
+resize and ImageNet normalisation internally; the provider crops the boxes,
+converts BGR to RGB, and L2-normalises the returned descriptors.
 
 No weights are bundled: torchreid downloads ImageNet-pretrained weights for the
 chosen ``model_name`` on first use, or loads a ``.pth.tar`` checkpoint when one
@@ -51,9 +50,7 @@ class FeatureExtractorLike(Protocol):
 class TorchReIDProvider(ReIDProvider):
     """ReID feature provider backed by a native torchreid model.
 
-    torchreid is imported lazily in the constructor, so importing this module
-    (and the wider ``getitrack`` package) does not require torch/torchreid to be
-    installed.
+    torchreid is imported lazily in the constructor.
     """
 
     def __init__(
@@ -80,8 +77,7 @@ class TorchReIDProvider(ReIDProvider):
         if extractor is not None:
             self._extractor: FeatureExtractorLike = extractor
             return
-        # Lazy import keeps torchreid an optional dependency; the module (and the
-        # wider getitrack package) stays importable without it installed.
+        # Import torchreid lazily.
         from torchreid.reid.utils import FeatureExtractor
 
         self._extractor = FeatureExtractor(

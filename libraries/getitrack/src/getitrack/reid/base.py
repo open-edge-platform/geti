@@ -4,11 +4,10 @@
 
 A `ReIDProvider` turns image crops (one per bounding box) into fixed-length
 appearance descriptors. Concrete providers wrap a specific inference backend
-(e.g. OpenVINO IR) but share the contract defined here so trackers stay
-backend-agnostic.
+(e.g. OpenVINO IR) and share the contract defined here.
 
-The provider is deliberately stateless with respect to tracks: it only knows
-how to embed boxes. Per-track appearance memory lives in
+The provider is stateless with respect to tracks; it only embeds boxes.
+Per-track appearance memory lives in
 `getitrack.reid.gallery.AppearanceGallery`.
 """
 

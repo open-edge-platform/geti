@@ -127,9 +127,8 @@ class TestAppearanceRecovery:
 class TestModerateOverlapRecovery:
     """A below-floor same-identity reappearance is still recovered on IoU.
 
-    This is the regression guard for the fusion fix: the old sentinel-gate made
-    BoT-SORT stricter than ByteTrack and dropped this match; the fall-back-to-IoU
-    semantics recover it under the DEFAULT config.
+    Pairs below the appearance floor fall back to the IoU cost, so the id is
+    preserved under the default config.
     """
 
     @staticmethod

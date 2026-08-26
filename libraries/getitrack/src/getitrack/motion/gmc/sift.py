@@ -13,12 +13,7 @@ from getitrack.motion.gmc.features import FeatureMatchingEstimator
 
 
 class SIFTEstimator(FeatureMatchingEstimator):
-    """Detect and describe keypoints with SIFT, matched by L2 distance.
-
-    The most robust of the descriptor-based methods on textured, low-motion
-    footage, at the cost of being the slowest. SIFT is patent-free since 2020 and
-    ships in the main OpenCV module.
-    """
+    """Detect and describe keypoints with SIFT, matched by L2 distance."""
 
     method: ClassVar[GMCMethod] = GMCMethod.SIFT
 

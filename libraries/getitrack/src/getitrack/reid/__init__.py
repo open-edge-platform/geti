@@ -2,15 +2,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """Appearance / ReID layer: feature providers and per-track appearance memory.
 
-This package is tracker-agnostic. `ReIDProvider` (with OpenVINO and torch
-implementations) turns boxes into descriptors; `build_reid_provider` picks one
-from a `ReIDConfig`; `AppearanceGallery` holds a bounded per-track appearance
-memory. Appearance-aware trackers (BoT-SORT and, later, Deep OC-SORT /
-StrongSORT) compose these with the cosine/fusion helpers in
-`getitrack.matching.appearance`.
-
-The provider implementations import their backend (openvino / torch / torchreid)
-lazily, so this package stays importable without those extras installed.
+`ReIDProvider` (with OpenVINO and torch implementations) turns boxes into
+descriptors; `build_reid_provider` picks one from a `ReIDConfig`;
+`AppearanceGallery` holds a bounded per-track appearance memory. Provider
+implementations import their backend (openvino / torch / torchreid) lazily.
 """
 
 from getitrack.reid.base import ReIDProvider

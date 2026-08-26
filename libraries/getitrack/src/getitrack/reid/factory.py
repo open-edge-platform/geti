@@ -2,9 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """Resolve a `ReIDConfig` into a concrete `ReIDProvider`.
 
-Keeps backend selection (torch vs OpenVINO, torchreid model vs prebuilt IR) in
-one place so trackers only depend on the `ReIDProvider` contract. Backend-specific
-imports stay lazy, so choosing one backend never requires the other's stack.
+Selects the backend (torch vs OpenVINO, torchreid model vs prebuilt IR).
+Backend-specific imports stay lazy.
 """
 
 from __future__ import annotations
