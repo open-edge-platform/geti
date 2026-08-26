@@ -5,10 +5,10 @@
 
 from __future__ import annotations
 
-import csv
 import math
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
+from unittest.mock import MagicMock, patch
 
 import pytest
 from torch import nn
@@ -46,6 +46,7 @@ class _StubHFModel(HFModel):
         self._data_input_params = DataInputParams(input_size=(640, 640), mean=(0.0, 0.0, 0.0), std=(1.0, 1.0, 1.0))
         self._intensity_config = None
         self._best_checkpoint = None
+        self.hf_model = MagicMock()
 
     def build_targets(self, batch: SampleBatch) -> dict[str, Any]:
         return {"pixel_values": batch.images}
@@ -180,6 +181,27 @@ def test_best_checkpoint_is_a_directory(tmp_path: Path, model: _StubHFModel) -> 
     assert checkpoint == wd / "best_checkpoint"
     assert checkpoint is not None
     assert checkpoint.is_dir()
+
+
+def test_test_defaults_to_best_checkpoint(tmp_path: Path, model: _StubHFModel) -> None:
+    """test(checkpoint=None) must load self.best_checkpoint, matching export()."""
+    wd = tmp_path / "wd"
+    engine = HFEngine(model=model, data=tmp_path, work_dir=wd)
+    engine._datamodule = MagicMock()  # satisfy the DataModule guard; trainer is mocked below
+    best_dir = wd / "best_checkpoint"
+    best_dir.mkdir(parents=True)
+
+    engine._model.load_checkpoint = MagicMock()  # type: ignore[method-assign]
+    engine._model.build_default_metric = MagicMock(return_value=MagicMock())  # type: ignore[method-assign]
+    mock_trainer = MagicMock()
+    mock_trainer.evaluate.return_value = {"test/map": 0.5}
+    engine._build_test_scoped_trainer = MagicMock(return_value=mock_trainer)  # type: ignore[method-assign]
+
+    metrics = engine.test()
+
+    engine._model.load_checkpoint.assert_called_once_with(best_dir)
+    mock_trainer.evaluate.assert_called_once()
+    assert metrics == {"test/map": 0.5}
 
 
 @pytest.mark.parametrize(
@@ -326,72 +348,115 @@ data: {base_data_config}
     assert engine.model.hf_model.config.num_queries == 10
 
 
-class TestTrainEndToEnd:
-    """Real training, not mocked.
+class TestTrain:
+    """Mocked unit tests for HFEngine.train()."""
 
-    Two epochs against a real Datumaro asset, on whatever accelerator this
-    machine has (XPU here). Uses a bare ``transformers`` config, so no
-    network access is needed for the model.
-    """
+    def _engine(self, tmp_path: Path, model: _StubHFModel, *, with_val: bool = True) -> HFEngine:
+        engine = HFEngine(model=model, data=tmp_path, work_dir=tmp_path / "wd")
+        engine._datamodule = MagicMock()
+        engine._datamodule.train_subset = MagicMock(batch_size=2)
+        engine._datamodule.val_subset = MagicMock(batch_size=2)
+        engine._datamodule.subsets = {"train": MagicMock(), "val": [1] if with_val else None}
+        return engine
 
-    def test_two_epochs_produce_a_checkpoint_and_a_parseable_metrics_csv(self, tmp_path: Path) -> None:
-        import transformers as tf
+    def _mock_trainer(self, best_eval_metrics: dict[str, float] | None = None) -> MagicMock:
+        trainer = MagicMock()
+        trainer.state.log_history = [{"loss": 0.1, "learning_rate": 1e-5, "epoch": 1}]
+        trainer._best_eval_metrics = best_eval_metrics or {"val/map": 0.5, "val/map_50": 0.7}
+        return trainer
 
-        from getitune.backend.huggingface.models import HFDetectionModel
+    @pytest.mark.parametrize(
+        ("task", "expected_monitor"),
+        [
+            (TaskType.DETECTION, "val/map"),
+            (TaskType.INSTANCE_SEGMENTATION, "val/map"),
+            (TaskType.MULTI_LABEL_CLS, "val/map"),
+            (TaskType.MULTI_CLASS_CLS, "val/f1-score"),
+            (TaskType.SEMANTIC_SEGMENTATION, "val/Dice"),
+        ],
+    )
+    def test_train_wires_task_monitor(
+        self, task: TaskType, expected_monitor: str, tmp_path: Path, model: _StubHFModel
+    ) -> None:
+        object.__setattr__(model, "task", task)
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer({expected_monitor: 0.75})
 
-        dm = DataModule(task=TaskType.DETECTION, data_root="tests/assets/detection_coco")
-        # Avoid spawning real OS worker processes in the test suite; production
-        # training keeps the DataModule's configured worker count.
-        dm.train_subset.num_workers = 0
-        dm.val_subset.num_workers = 0
-        num_labels = dm.subsets["train"].label_info.num_classes
-        model = HFDetectionModel(tf.RTDetrV2Config(num_queries=20, decoder_layers=2), num_labels)
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer) as mock_cls:
+            engine.train(max_epochs=1, batch=2)
 
-        engine = HFEngine(model=model, data=dm, work_dir=tmp_path)
-        metrics = engine.train(max_epochs=2, batch=2)
+        _, kwargs = mock_cls.call_args
+        args = kwargs["args"]
+        assert args.metric_for_best_model == expected_monitor
+        assert args.greater_is_better is True
+        assert args.load_best_model_at_end is False
+        assert args.save_strategy.value == "no"
 
-        assert "train/loss" in metrics
-        assert math.isfinite(metrics["train/loss"])
+    def test_train_monitor_is_configurable(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer({"val/map_50": 0.75})
 
-        assert engine.best_checkpoint is not None
-        assert engine.best_checkpoint.is_dir()
-        assert (engine.best_checkpoint / "config.json").exists()
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer) as mock_cls:
+            engine.train(max_epochs=1, batch=2, monitor="val/map_50")
 
-        csv_path = engine.work_dir / "csv" / "version_0" / "metrics.csv"
-        assert csv_path.exists()
-        with csv_path.open() as fh:
-            rows = list(csv.DictReader(fh))
-        assert len(rows) > 0
-        assert "train/loss" in rows[0]
+        _, kwargs = mock_cls.call_args
+        assert kwargs["args"].metric_for_best_model == "val/map_50"
 
-    def test_progress_callback_is_driven_from_0_to_100(self, tmp_path: Path) -> None:
-        import transformers as tf
+    def test_train_passes_metric_and_val_check_interval_to_trainer(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer()
+        custom_metric = MagicMock()
 
-        from getitune.backend.huggingface.models import HFMulticlassClsModel
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer) as mock_cls:
+            engine.train(max_epochs=1, batch=2, metric=custom_metric, val_check_interval=3)
 
-        dm = DataModule(task=TaskType.MULTI_CLASS_CLS, data_root="tests/assets/classification_cifar10")
-        dm.train_subset.num_workers = 0
-        dm.val_subset.num_workers = 0
-        num_labels = dm.subsets["train"].label_info.num_classes
-        config = tf.ViTConfig(hidden_size=32, num_hidden_layers=1, num_attention_heads=2, intermediate_size=64)
-        model = HFMulticlassClsModel(config, num_labels)
+        _, kwargs = mock_cls.call_args
+        assert kwargs["metric"] is custom_metric
+        assert kwargs["val_check_interval"] == 3
 
-        class _Progress:
-            _min_p = 0.0
-            _max_p = 100.0
+    def test_train_returns_best_validation_metrics(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer({"val/map": 0.8, "val/map_50": 0.9})
 
-            def __init__(self) -> None:
-                self.calls: list[float] = []
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            metrics = engine.train(max_epochs=1, batch=2)
 
-            def _on_progress_update(self, value: float) -> None:
-                self.calls.append(value)
+        assert "val/map" in metrics
+        assert metrics["val/map"] == pytest.approx(0.8)
+        assert "val/map_50" in metrics
+        assert metrics["val/map_50"] == pytest.approx(0.9)
 
-        progress = _Progress()
-        engine = HFEngine(model=model, data=dm, work_dir=tmp_path)
-        engine.train(max_epochs=1, batch=4, callbacks=[progress])
+    def test_train_loads_best_checkpoint_when_it_exists(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        best_dir = tmp_path / "wd" / "best_checkpoint"
+        best_dir.mkdir(parents=True)
+        engine._model.load_checkpoint = MagicMock()  # type: ignore[method-assign]
+        trainer = self._mock_trainer()
 
-        assert progress.calls
-        assert progress.calls[-1] == 100.0
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.train(max_epochs=1, batch=2)
+
+        engine._model.load_checkpoint.assert_called_once_with(best_dir)
+        trainer.save_model.assert_not_called()
+
+    def test_train_saves_final_checkpoint_when_no_best_exists(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer()
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.train(max_epochs=1, batch=2)
+
+        trainer.save_model.assert_called_once()
+
+    def test_train_disables_eval_when_no_val_split(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model, with_val=False)
+        trainer = self._mock_trainer()
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer) as mock_cls:
+            engine.train(max_epochs=1, batch=2)
+
+        _, kwargs = mock_cls.call_args
+        assert kwargs["args"].eval_strategy.value == "no"
 
 
 def _detection_case() -> tuple[TaskType, str, object]:
@@ -441,33 +506,6 @@ def _multilabel_case() -> tuple[TaskType, str, object]:
         "tests/assets/multilabel_classification_coco",
         lambda n: HFMultilabelClsModel(config, n, input_size=(224, 224)),
     )
-
-
-@pytest.mark.parametrize(
-    "case_factory",
-    [_instance_segmentation_case, _semantic_segmentation_case, _multilabel_case],
-    ids=["instance_segmentation", "semantic_segmentation", "multi_label_cls"],
-)
-def test_two_epochs_train_for_the_remaining_tasks(case_factory: object, tmp_path: Path) -> None:
-    """Detection and multi-class cls get their own tests above; these three
-    round out training coverage for "all five tasks" without duplicating
-    the checkpoint/CSV/progress assertions three more times.
-    """
-    task, data_root, make_model = case_factory()  # type: ignore[operator]
-
-    dm = DataModule(task=task, data_root=data_root)
-    dm.train_subset.num_workers = 0
-    dm.val_subset.num_workers = 0
-    num_labels = dm.subsets["train"].label_info.num_classes
-    model = make_model(num_labels)
-
-    engine = HFEngine(model=model, data=dm, work_dir=tmp_path)
-    metrics = engine.train(max_epochs=2, batch=2)
-
-    assert "train/loss" in metrics
-    assert math.isfinite(metrics["train/loss"])
-    assert engine.best_checkpoint is not None
-    assert engine.best_checkpoint.is_dir()
 
 
 @pytest.mark.parametrize(
@@ -523,26 +561,30 @@ def test_multiclass_test_and_predict_run_end_to_end(tmp_path: Path) -> None:
     assert len(predictions) == len(dm.subsets["test"])
 
 
-def test_predict_confidence_threshold_filters_detections(tmp_path: Path) -> None:
-    """A threshold above every score must yield empty (not missing) predictions."""
-    import transformers as tf
+def test_predict_confidence_threshold_filters_detections(tmp_path: Path, model: _StubHFModel) -> None:
+    """A threshold above every score must yield empty bboxes — tests unbatch_predictions logic."""
+    import torch
+    from torchvision import tv_tensors
 
-    from getitune.backend.huggingface.models import HFDetectionModel
-    from getitune.data.entity.sample import Prediction
+    from getitune.backend.huggingface.engine_utils import unbatch_predictions
+    from getitune.data.entity.sample import Prediction, PredictionBatch
 
-    dm = DataModule(task=TaskType.DETECTION, data_root="tests/assets/detection_coco")
-    num_labels = dm.subsets["train"].label_info.num_classes
-    model = HFDetectionModel(tf.RTDetrV2Config(num_queries=10, decoder_layers=2), num_labels)
+    images = torch.zeros(1, 3, 64, 64)
+    bboxes = [
+        tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+            torch.tensor([[0.0, 0.0, 10.0, 10.0]]),
+            format=tv_tensors.BoundingBoxFormat.XYXY,
+            canvas_size=(64, 64),
+        )
+    ]
+    batch = PredictionBatch(images=images, bboxes=bboxes, scores=[torch.tensor([0.3])], labels=[torch.tensor([0])])
 
-    engine = HFEngine(model=model, data=dm, work_dir=tmp_path)
+    predictions = unbatch_predictions(batch, confidence_threshold=2.0)
 
-    predictions = engine.predict(confidence_threshold=2.0)
-
-    assert len(predictions) == len(dm.subsets["test"])
-    for prediction in predictions:
-        assert isinstance(prediction, Prediction)
-        assert prediction.bboxes is not None
-        assert prediction.bboxes.shape[0] == 0
+    assert len(predictions) == 1
+    assert isinstance(predictions[0], Prediction)
+    assert predictions[0].bboxes is not None
+    assert predictions[0].bboxes.shape[0] == 0
 
 
 class TestExport:

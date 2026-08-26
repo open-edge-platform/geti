@@ -13,14 +13,14 @@ import torch
 import torch.nn.functional as f
 import transformers
 from torchvision import tv_tensors
-from torchvision.ops import masks_to_boxes
 
-from getitune.backend.huggingface.data.geometry import (
+from getitune.backend.huggingface.exporter.native import HFModelExporter
+from getitune.backend.huggingface.models.base import HFModel
+from getitune.backend.huggingface.models.utils import (
+    _traceable_masks_to_boxes,
     reproject_boxes_to_input_space,
     reproject_masks_to_input_space,
 )
-from getitune.backend.huggingface.exporter.native import HFModelExporter
-from getitune.backend.huggingface.models.base import HFModel
 from getitune.data.entity.sample import PredictionBatch
 from getitune.data.utils.structures.mask.mask_util import encode_rle
 from getitune.metrics.mean_ap import MaskRLEMeanAPCallable
@@ -144,7 +144,9 @@ class HFInstSegModel(HFModel):
             device = binary_maps.device
             bboxes.append(
                 tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
-                    masks_to_boxes(binary_maps), format=tv_tensors.BoundingBoxFormat.XYXY, canvas_size=input_size
+                    _traceable_masks_to_boxes(binary_maps),
+                    format=tv_tensors.BoundingBoxFormat.XYXY,
+                    canvas_size=input_size,
                 )
             )
             masks.append(tv_tensors.Mask(binary_maps))
@@ -237,9 +239,11 @@ class HFInstSegModel(HFModel):
     def forward_for_tracing(self, images: torch.Tensor) -> dict[str, torch.Tensor]:
         """Return per-query boxes/labels/masks for ONNX/OpenVINO export.
 
-        Mask2Former has no box head (G4), so boxes are derived from the
-        thresholded mask extents via ``masks_to_boxes``, exactly like
-        ``postprocess`` does for metrics — but for every query at once
+        The MaskFormer-family models covered by this wrapper (Mask2Former,
+        MaskFormer, EoMT, OneFormer) have no box head (G4), so boxes are
+        derived from the thresholded mask extents via
+        ``_traceable_masks_to_boxes`` — the same trace-safe helper
+        ``postprocess`` uses for metrics, but applied to every query at once
         (fixed shape, trace-safe) rather than per decoded segment. The score
         is the top foreground-class probability per query rather than
         ``postprocess``'s ``class_score x mask_quality`` product: computing
@@ -263,32 +267,3 @@ class HFInstSegModel(HFModel):
         boxes_with_scores = torch.cat([boxes, scores.unsqueeze(-1)], dim=-1)
 
         return {"boxes": boxes_with_scores, "labels": labels, "masks": masks_probs}
-
-
-def _traceable_masks_to_boxes(masks: torch.Tensor) -> torch.Tensor:
-    """A ``torchvision.ops.masks_to_boxes`` reimplementation that traces to ONNX.
-
-    ``masks_to_boxes`` itself assigns into an empty-mask boolean index
-    (``bounding_boxes[empty_masks] = 0``), which OpenVINO's ONNX frontend
-    cannot convert (``Select`` op with mismatched, non-broadcastable shapes —
-    a boolean-index assignment traces very differently from a elementwise
-    ``where``). Replacing it with an explicit ``torch.where`` over a
-    broadcastable condition produces the identical result and converts
-    cleanly.
-    """
-    _n, h, w = masks.shape
-    masks_bool = masks.bool()
-    non_zero_rows = torch.any(masks_bool, dim=2)
-    non_zero_cols = torch.any(masks_bool, dim=1)
-    empty = ~torch.any(non_zero_rows, dim=1)
-
-    non_zero_rows_f = non_zero_rows.float()
-    non_zero_cols_f = non_zero_cols.float()
-
-    y1 = non_zero_rows_f.argmax(dim=1)
-    x1 = non_zero_cols_f.argmax(dim=1)
-    y2 = (h - 1) - non_zero_rows_f.flip(dims=[1]).argmax(dim=1)
-    x2 = (w - 1) - non_zero_cols_f.flip(dims=[1]).argmax(dim=1)
-
-    boxes = torch.stack([x1, y1, x2, y2], dim=1).float()
-    return torch.where(empty.unsqueeze(-1), torch.zeros_like(boxes), boxes)

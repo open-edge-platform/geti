@@ -21,10 +21,11 @@ from getitune.engine.engine import Engine
 from getitune.types.device import DeviceType
 from getitune.types.export import ExportFormat
 from getitune.types.precision import Precision
+from getitune.types.task import TaskType
 from getitune.utils.device import is_xpu_available
 
 from .callbacks.progress import HFProgressCallback, extract_progress_fn
-from .engine_utils import format_test_metrics, resolve_precision, summarize_log_history, unbatch_predictions
+from .engine_utils import resolve_precision, summarize_log_history, unbatch_predictions
 from .models.base import HFModel
 from .plugins.xpu import XPUMemoryCallback
 from .tools.configurator import Configurator
@@ -39,6 +40,15 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 logger.debug("Hugging Face backend: transformers=%s accelerate=%s", transformers.__version__, accelerate.__version__)
+
+# Fallback monitor key used when a recipe/training config does not specify one.
+_DEFAULT_MONITOR: dict[TaskType, str] = {
+    TaskType.DETECTION: "val/map",
+    TaskType.INSTANCE_SEGMENTATION: "val/map",
+    TaskType.MULTI_LABEL_CLS: "val/map",
+    TaskType.MULTI_CLASS_CLS: "val/f1-score",
+    TaskType.SEMANTIC_SEGMENTATION: "val/Dice",
+}
 
 
 class HFEngine(Engine):
@@ -125,16 +135,12 @@ class HFEngine(Engine):
         precision: _PRECISION_INPUT | None = None,
         callbacks: list | None = None,
         checkpoint: PathLike | None = None,
+        metric: MetricCallable | None = None,
+        val_check_interval: int | None = None,
+        monitor: str | None = None,
         **kwargs,
     ) -> METRICS:
         """Train the model.
-
-        The signature intentionally mirrors ``LightningEngine.train()`` (same
-        names for ``max_epochs``, ``precision``, ``callbacks``, ``checkpoint``)
-        so switching a recipe's ``backend:`` field does not also mean
-        relearning the call site. See "Unified engine interface" in
-        ``docs/design/huggingface-backend-integration.md`` for the rationale
-        and the current gaps between backends.
 
         Args:
             max_epochs: Maximum number of epochs. Falls back to the recipe's
@@ -147,9 +153,7 @@ class HFEngine(Engine):
                 ``training.learning_rate``, then to 5e-5.
             patience: Early-stopping patience, in evaluation rounds. Falls
                 back to the recipe's ``training.patience``. Only takes effect
-                when a non-empty validation split is attached; selection is
-                by evaluation loss, since Geti's own metric callables are
-                only computed in :meth:`test`, not during training.
+                when a non-empty validation split is attached.
             precision: Same value space as Lightning's ``_PRECISION_INPUT``
                 (``16``, ``32``, ``"bf16-mixed"``, etc.). Falls back to the
                 recipe's ``training.precision``, then to ``"bf16-mixed"``
@@ -160,11 +164,21 @@ class HFEngine(Engine):
                 ``transformers.TrainerCallback`` instances are passed through
                 to ``Trainer`` unchanged; anything else is dropped.
             checkpoint: Optional checkpoint to resume or warm-start from.
+            metric: Optional metric callable taking ``label_info`` and
+                returning a ``torchmetrics.Metric``/``MetricCollection``. If
+                ``None``, the model's default task metric is used.
+            val_check_interval: Run validation and the best-checkpoint check
+                every N epochs. ``1`` means every epoch (default). Falls back
+                to the recipe's ``training.val_check_interval``.
+            monitor: Metric key used for best checkpointing and early
+                stopping, e.g. ``"val/map"`` or ``"val/Dice"``. Falls back to
+                the recipe's ``training.monitor``, then to a task default.
             **kwargs: Additional ``transformers.TrainingArguments`` overrides.
 
         Returns:
-            The final logged metrics, keyed with the same ``train/`` /
-            ``val/`` convention as the metrics CSV.
+            The best validation metrics merged with the final training
+            summary, keyed with the same ``train/`` / ``val/`` convention as
+            the metrics CSV.
 
         Raises:
             ValueError: If the engine was built from a bare data-root path
@@ -185,6 +199,10 @@ class HFEngine(Engine):
         learning_rate = learning_rate if learning_rate is not None else defaults.get("learning_rate")
         patience = patience if patience is not None else defaults.get("patience")
         precision = precision if precision is not None else defaults.get("precision", "bf16-mixed")
+        val_check_interval = (
+            val_check_interval if val_check_interval is not None else defaults.get("val_check_interval")
+        )
+        monitor = monitor if monitor is not None else defaults.get("monitor")
 
         if checkpoint is not None:
             self._model.load_checkpoint(checkpoint)
@@ -200,6 +218,7 @@ class HFEngine(Engine):
 
         val_subset = self._datamodule.subsets.get("val")
         has_eval = bool(val_subset) and len(val_subset) > 0
+        monitor = monitor if monitor is not None else _DEFAULT_MONITOR.get(self._model.task)
 
         training_args_kwargs: dict[str, Any] = {
             "output_dir": str(self._work_dir / "train"),
@@ -214,28 +233,28 @@ class HFEngine(Engine):
             "label_names": list(self._model.label_keys),
             "use_cpu": self._device.type == "cpu",
             "eval_strategy": "epoch" if has_eval else "no",
-            "save_strategy": "epoch" if has_eval else "no",
+            "save_strategy": "no",
             "logging_strategy": "epoch",
         }
-        if has_eval and patience is not None:
+        if has_eval and monitor is not None:
             training_args_kwargs.update(
-                load_best_model_at_end=True,
-                metric_for_best_model="eval_loss",
-                greater_is_better=False,
+                load_best_model_at_end=False,
+                metric_for_best_model=monitor,
+                greater_is_better=True,
             )
-            trainer_callbacks.append(EarlyStoppingCallback(early_stopping_patience=patience))
+            if patience is not None:
+                trainer_callbacks.append(EarlyStoppingCallback(early_stopping_patience=patience))
         training_args_kwargs.update(kwargs)
 
         args = TrainingArguments(**training_args_kwargs)
+        val_subset = self._datamodule.subsets.get("val")
         trainer = GetiTuneHFTrainer(
             self._model,
             self._datamodule,
+            metric=metric,
+            val_check_interval=val_check_interval,
             model=self._model.hf_model,
             args=args,
-            # get_train_dataloader/get_eval_dataloader build the real loaders
-            # via HFDatasetAdapter; these are only here so Trainer's own
-            # startup validation (which checks for an eval_dataset whenever
-            # eval_strategy != "no") doesn't reject a valid configuration.
             train_dataset=self._datamodule.subsets["train"],
             eval_dataset=val_subset if has_eval else None,
             callbacks=trainer_callbacks,
@@ -243,12 +262,17 @@ class HFEngine(Engine):
         trainer.train()
 
         best_dir = self._work_dir / self._CHECKPOINT_DIR_NAME
-        trainer.save_model(str(best_dir))
+        if best_dir.exists():
+            self._model.load_checkpoint(best_dir)
+        else:
+            trainer.save_model(str(best_dir))
         self._model.record_checkpoint(best_dir)
 
         write_metrics_csv(trainer.state.log_history, self._work_dir)
 
-        return summarize_log_history(trainer.state.log_history)
+        summary = summarize_log_history(trainer.state.log_history)
+        summary.update(trainer._best_eval_metrics)  # noqa: SLF001
+        return summary
 
     def test(
         self,
@@ -260,7 +284,7 @@ class HFEngine(Engine):
         """Evaluate the model on the test split.
 
         Bypasses ``transformers.Trainer.evaluate()``: see
-        ``GetiTuneHFTrainer.evaluate_with_metric`` for why. Results are
+        ``GetiTuneHFTrainer.evaluate(split="test")`` for why. Results are
         computed by the model's own :meth:`HFModel.build_default_metric`
         (or an override), then flattened to ``test/`` scalar keys, matching
         the naming convention ``LightningEngine.test()`` uses.
@@ -271,7 +295,9 @@ class HFEngine(Engine):
                 instead of the model's default metric.
             batch: Batch size override. Defaults to the test subset's
                 configured ``batch_size``.
-            checkpoint: Optional checkpoint to load before evaluating.
+            checkpoint: Optional checkpoint to load before evaluating. If
+                ``None``, ``self.best_checkpoint`` is used, matching
+                :meth:`export` and ``LightningEngine.test()``.
             **kwargs: Additional ``transformers.TrainingArguments`` overrides.
 
         Returns:
@@ -285,6 +311,8 @@ class HFEngine(Engine):
             msg = "HFEngine.test() requires a DataModule to build a dataloader from; got a bare data-root path."
             raise ValueError(msg)
 
+        if checkpoint is None:
+            checkpoint = self.best_checkpoint
         if checkpoint is not None:
             self._model.load_checkpoint(checkpoint)
 
@@ -292,8 +320,7 @@ class HFEngine(Engine):
 
         metric_obj = metric(self._model.label_info) if metric is not None else self._model.build_default_metric()
         metric_obj = metric_obj.to(self._device)
-        results = trainer.evaluate_with_metric(metric_obj)
-        return format_test_metrics(results)
+        return trainer.evaluate(split="test", metric=metric_obj)
 
     def predict(
         self,

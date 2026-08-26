@@ -13,9 +13,9 @@ import transformers
 from torchvision import tv_tensors
 from torchvision.ops import box_convert
 
-from getitune.backend.huggingface.data.geometry import reproject_boxes_to_input_space
 from getitune.backend.huggingface.exporter.native import HFModelExporter
 from getitune.backend.huggingface.models.base import HFModel
+from getitune.backend.huggingface.models.utils import reproject_boxes_to_input_space
 from getitune.data.entity.sample import PredictionBatch
 from getitune.metrics.mean_ap import MeanAPCallable
 from getitune.types.export import TaskLevelExportParameters
@@ -114,8 +114,7 @@ class HFDetectionModel(HFModel):
         selects between the sigmoid/top-k convention RT-DETR and D-FINE use
         and the softmax/background-class convention plain DETR and
         Deformable-DETR use (G3), and it only ever reads ``outputs.logits``
-        and ``outputs.pred_boxes``, which every model here provides. So one
-        processor instance, built once, is enough for the whole family.
+        and ``outputs.pred_boxes``, which every model here provides.
         """
         return transformers.RTDetrImageProcessor()
 

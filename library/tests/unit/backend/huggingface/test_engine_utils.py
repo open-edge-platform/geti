@@ -6,10 +6,8 @@
 from __future__ import annotations
 
 import pytest
-import torch
 
 from getitune.backend.huggingface.engine_utils import (
-    format_test_metrics,
     resolve_precision,
     summarize_log_history,
 )
@@ -55,23 +53,3 @@ class TestSummarizeLogHistory:
 
     def test_empty_history_yields_empty_metrics(self) -> None:
         assert summarize_log_history([]) == {}
-
-
-class TestFormatTestMetrics:
-    def test_scalar_tensor_is_flattened_with_a_test_prefix(self) -> None:
-        assert format_test_metrics({"map": torch.tensor(0.5)}) == {"test/map": 0.5}
-
-    def test_plain_numbers_are_kept(self) -> None:
-        assert format_test_metrics({"accuracy": 1}) == {"test/accuracy": 1.0}
-
-    def test_non_scalar_auxiliary_keys_are_skipped(self) -> None:
-        results = {"map": torch.tensor(0.5), "classes": torch.tensor([0, 1, 2])}
-        assert format_test_metrics(results) == {"test/map": 0.5}
-
-    def test_non_scalar_tensors_outside_the_skip_list_are_skipped_too(self) -> None:
-        results = {"per_image_iou": torch.tensor([0.1, 0.2, 0.3])}
-        assert format_test_metrics(results) == {}
-
-    def test_nested_dicts_are_flattened_recursively(self) -> None:
-        results = {"MulticlassAccuracy": {"accuracy": torch.tensor(0.75)}}
-        assert format_test_metrics(results) == {"test/MulticlassAccuracy/accuracy": 0.75}

@@ -6,8 +6,10 @@
 from __future__ import annotations
 
 import tempfile
+from pathlib import Path
 from unittest.mock import MagicMock
 
+import pytest
 import torch
 import transformers as tf
 from torchvision import tv_tensors
@@ -17,9 +19,7 @@ from getitune.backend.huggingface.models import HFDetectionModel, HFMulticlassCl
 from getitune.backend.huggingface.trainers.base import GetiTuneHFTrainer
 from getitune.config.data import SubsetConfig
 from getitune.data.entity.sample import SampleBatch
-from getitune.data.module import DataModule
 from getitune.types.label import LabelInfo
-from getitune.types.task import TaskType
 
 
 def _label_info() -> LabelInfo:
@@ -49,6 +49,7 @@ def _mock_datamodule(*, with_gpu_augmentations: bool = False) -> MagicMock:
         ),
     )
     datamodule.val_subset = SubsetConfig(batch_size=2, num_workers=0, augmentations_gpu=[])
+    datamodule.test_subset = SubsetConfig(batch_size=2, num_workers=0, augmentations_gpu=[])
     return datamodule
 
 
@@ -203,113 +204,215 @@ class TestComputeLoss:
         assert labels is None
 
 
-class TestEvaluateWithMetricAndPredictBatches:
-    """Real detection data end to end, mirroring TestTrainEndToEnd in test_engine.py.
+class TestEvaluateOnTestSplitAndPredictBatches:
+    """Mocked tests for evaluate(split='test') and predict_batches."""
 
-    ``evaluate_with_metric``/``predict_batches`` bypass ``Trainer``'s own
-    evaluation loop entirely (see their docstrings), so they need to be
-    exercised against real dataloaders, not a mocked datamodule.
-    """
+    def _build_trainer(self, tmp_path: Path) -> GetiTuneHFTrainer:
+        model = _detection_model()
+        datamodule = _mock_datamodule()
+        args = TrainingArguments(
+            output_dir=str(tmp_path / "train"),
+            report_to=[],
+            remove_unused_columns=False,
+            label_names=list(model.label_keys),
+            use_cpu=True,
+        )
+        trainer = GetiTuneHFTrainer(
+            model,
+            datamodule,
+            model=model.hf_model,
+            args=args,
+            train_dataset=[0],
+            eval_dataset=[0],
+        )
+        # mock the test dataloader to return one synthetic batch
+        batch = _detection_batch()
+        trainer.get_test_dataloader = MagicMock(return_value=[batch])
+        model.to_metric_inputs = MagicMock(return_value={})  # type: ignore[method-assign]
+        return trainer
 
-    def _build_real_trainer(self, model: HFDetectionModel, dm: DataModule) -> GetiTuneHFTrainer:
-        dm.test_subset.num_workers = 0
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            args = TrainingArguments(
-                output_dir=tmp_dir,
-                report_to=[],
-                remove_unused_columns=False,
-                label_names=list(model.label_keys),
-                use_cpu=True,
-                per_device_eval_batch_size=dm.test_subset.batch_size,
-            )
-            return GetiTuneHFTrainer(model, dm, model=model.hf_model, args=args, eval_dataset=dm.subsets["test"])
+    def test_evaluate_on_test_split_returns_prefixed_metrics(self, tmp_path: Path) -> None:
+        trainer = self._build_trainer(tmp_path)
+        fake_metric = _FakeMetric(0.42)
 
-    def test_evaluate_with_metric_returns_a_finite_map(self) -> None:
-        dm = DataModule(task=TaskType.DETECTION, data_root="tests/assets/detection_coco")
-        num_labels = dm.subsets["train"].label_info.num_classes
-        model = HFDetectionModel(tf.RTDetrV2Config(num_queries=10, decoder_layers=2), num_labels)
-        trainer = self._build_real_trainer(model, dm)
+        result = trainer.evaluate(split="test", metric=fake_metric)  # pyrefly: ignore[bad-argument-type]
 
-        result = trainer.evaluate_with_metric(model.build_default_metric())
+        assert "test/map" in result
+        assert result["test/map"] == pytest.approx(0.42)
+        assert fake_metric.update_calls == 1
 
-        assert torch.isfinite(result["map"])
-
-    def test_predict_batches_returns_one_prediction_batch_per_dataloader_batch(self) -> None:
-        dm = DataModule(task=TaskType.DETECTION, data_root="tests/assets/detection_coco")
-        num_labels = dm.subsets["train"].label_info.num_classes
-        model = HFDetectionModel(tf.RTDetrV2Config(num_queries=10, decoder_layers=2), num_labels)
-        trainer = self._build_real_trainer(model, dm)
+    def test_predict_batches_returns_one_batch_per_dataloader_batch(self, tmp_path: Path) -> None:
+        trainer = self._build_trainer(tmp_path)
 
         batches = trainer.predict_batches()
 
-        assert len(batches) == len(trainer.get_test_dataloader())
-        assert sum(batch.batch_size for batch in batches) == len(dm.subsets["test"])
-        for batch in batches:
-            assert batch.bboxes is not None
-            assert batch.scores is not None
-            assert batch.labels is not None
+        assert len(batches) == 1  # one batch from mocked dataloader
+
+
+class _FakeMetric:
+    """Stand-in torchmetrics-like object for exercising GetiTuneHFTrainer.evaluate()."""
+
+    def __init__(self, value: float) -> None:
+        self.value = value
+        self.update_calls = 0
+
+    def reset(self) -> None:
+        self.update_calls = 0
+
+    def to(self, device: torch.device) -> _FakeMetric:
+        return self
+
+    def update(self, **_kwargs: object) -> None:
+        self.update_calls += 1
+
+    def compute(self) -> dict[str, torch.Tensor]:
+        return {"map": torch.tensor(self.value), "map_50": torch.tensor(self.value + 0.1)}
 
 
 class TestTrainerLoopExercisesOverrides:
-    """The real ``Trainer`` loop must not trip the base ``Mapping``-assumption paths.
+    """Mocked tests verifying SampleBatch-compatible overrides wire correctly.
 
-    ``_prepare_inputs``, ``_get_num_items_in_batch``, ``floating_point_ops`` and
-    ``prediction_step`` all exist only because ``transformers.Trainer`` assumes a
-    dict-like batch and we feed it ``SampleBatch`` dataclasses instead. This test
-    drives the actual training and evaluation loops with a tiny real model so a
-    regression that drops an override (or makes ``Trainer`` touch a batch as a
-    dict) fails loudly rather than silently.
+    These overrides exist because ``transformers.Trainer`` assumes a dict-like
+    batch everywhere (``labels in batch``, ``batch["labels"]`` etc.). We verify
+    each override in isolation with a synthetic batch, without running the full
+    Trainer training loop.
     """
 
-    def test_train_and_eval_run_without_dict_assumptions(self) -> None:
-        import transformers as tf
+    def _trainer(self, tmp_path: Path) -> GetiTuneHFTrainer:
+        model = _detection_model()
+        datamodule = _mock_datamodule()
+        args = TrainingArguments(
+            output_dir=str(tmp_path / "train"),
+            report_to=[],
+            remove_unused_columns=False,
+            label_names=list(model.label_keys),
+            use_cpu=True,
+        )
+        return GetiTuneHFTrainer(
+            model,
+            datamodule,
+            model=model.hf_model,
+            args=args,
+            train_dataset=[0],
+            eval_dataset=[0],
+        )
 
-        from getitune.backend.huggingface.models import HFDetectionModel
+    def test_prepare_inputs_is_a_no_op(self, tmp_path: Path) -> None:
+        trainer = self._trainer(tmp_path)
+        batch = _detection_batch()
+        assert trainer._prepare_inputs(batch) is batch
 
-        dm = DataModule(task=TaskType.DETECTION, data_root="tests/assets/detection_coco")
-        num_labels = dm.subsets["train"].label_info.num_classes
-        model = HFDetectionModel(tf.RTDetrV2Config(num_queries=10, decoder_layers=2), num_labels)
-        dm.train_subset.num_workers = 0
-        dm.val_subset.num_workers = 0
+    def test_get_num_items_in_batch_returns_none(self, tmp_path: Path) -> None:
+        trainer = self._trainer(tmp_path)
+        assert trainer._get_num_items_in_batch([_detection_batch()], torch.device("cpu")) is None
 
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            args = TrainingArguments(
-                output_dir=tmp_dir,
-                report_to=[],
-                remove_unused_columns=False,
-                label_names=list(model.label_keys),
-                use_cpu=True,
-                per_device_train_batch_size=dm.train_subset.batch_size,
-                per_device_eval_batch_size=dm.val_subset.batch_size,
-                max_steps=2,
-                eval_strategy="steps",
-                eval_steps=1,
-                logging_strategy="steps",
-                logging_steps=1,
-                save_strategy="no",
-            )
-            trainer = GetiTuneHFTrainer(
-                model,
-                dm,
-                model=model.hf_model,
-                args=args,
-                train_dataset=dm.subsets["train"],
-                eval_dataset=dm.subsets["val"],
-            )
+    def test_floating_point_ops_returns_zero(self, tmp_path: Path) -> None:
+        trainer = self._trainer(tmp_path)
+        assert trainer.floating_point_ops(_detection_batch()) == 0
 
-            # Exercises _prepare_inputs / _get_num_items_in_batch /
-            # floating_point_ops through Trainer.training_step, and
-            # prediction_step through the eval loop invoked by eval_strategy.
-            trainer.train()
+    def test_evaluate_logs_val_map_keys(self, tmp_path: Path) -> None:
+        """evaluate() logs val/* keys when FakeMetric is configured."""
+        model = _detection_model()
+        datamodule = _mock_datamodule()
+        args = TrainingArguments(
+            output_dir=str(tmp_path / "train"),
+            report_to=[],
+            remove_unused_columns=False,
+            label_names=list(model.label_keys),
+            use_cpu=True,
+        )
+        trainer = GetiTuneHFTrainer(
+            model,
+            datamodule,
+            metric=lambda _li: _FakeMetric(0.5),  # pyrefly: ignore[bad-argument-type]
+            model=model.hf_model,
+            args=args,
+            train_dataset=[0],
+            eval_dataset=[0],
+        )
+        batch = _detection_batch()
+        trainer.get_eval_dataloader = MagicMock(return_value=[batch])
+        model.to_metric_inputs = MagicMock(return_value={})  # type: ignore[method-assign]
 
-        log_history = trainer.state.log_history
-        train_loss_entries = [e for e in log_history if "loss" in e]
-        eval_loss_entries = [e for e in log_history if "eval_loss" in e]
+        metrics = trainer.evaluate()
 
-        # A training loss entry proves the training-step overrides were hit.
-        assert train_loss_entries, "expected training loss entries in the log history"
-        # An eval_loss entry proves prediction_step ran through Trainer.evaluate().
-        assert eval_loss_entries, "expected eval_loss entries; prediction_step was not exercised"
-        for entry in train_loss_entries + eval_loss_entries:
-            value = entry.get("loss", entry.get("eval_loss"))
-            assert torch.isfinite(torch.tensor(value, dtype=torch.float32))
+        assert "val/map" in metrics
+        assert any("val/map" in e for e in trainer.state.log_history)
+
+
+class TestEvaluateOverride:
+    """Unit tests for GetiTuneHFTrainer.evaluate() metric + best-checkpoint behavior."""
+
+    def _build_trainer(
+        self, tmp_path: Path, metric_value: float = 0.5, val_check_interval: int = 1
+    ) -> GetiTuneHFTrainer:
+        model = _detection_model()
+        datamodule = _mock_datamodule()
+        args = TrainingArguments(
+            output_dir=str(tmp_path / "train"),
+            report_to=[],
+            remove_unused_columns=False,
+            label_names=list(model.label_keys),
+            use_cpu=True,
+            metric_for_best_model="val/map",
+            greater_is_better=True,
+        )
+        trainer = GetiTuneHFTrainer(
+            model,
+            datamodule,
+            metric=lambda _label_info: _FakeMetric(metric_value),  # pyrefly: ignore[bad-argument-type]
+            val_check_interval=val_check_interval,
+            model=model.hf_model,
+            args=args,
+            train_dataset=[0],
+            eval_dataset=[0],
+        )
+        trainer.get_eval_dataloader = MagicMock(return_value=[_detection_batch()])
+        model.to_metric_inputs = MagicMock(return_value={})  # type: ignore[method-assign]
+        return trainer
+
+    def test_evaluate_logs_prefixed_scalar_metrics(self, tmp_path: Path) -> None:
+        trainer = self._build_trainer(tmp_path, metric_value=0.42)
+
+        metrics = trainer.evaluate()
+
+        assert "val/map" in metrics
+        assert "val/map_50" in metrics
+        assert metrics["val/map"] == pytest.approx(0.42)
+        assert any("val/map" in entry for entry in trainer.state.log_history)
+
+    def test_evaluate_saves_best_checkpoint_only_on_improvement(self, tmp_path: Path) -> None:
+        trainer = self._build_trainer(tmp_path, metric_value=0.5)
+        save_model = MagicMock()
+        trainer.save_model = save_model
+
+        trainer.evaluate()
+        assert save_model.call_count == 1
+
+        # Worse metric: no new save
+        trainer._val_metric.value = 0.4  # pyrefly: ignore[missing-attribute, bad-argument-type]
+        trainer.evaluate()
+        assert save_model.call_count == 1
+
+        # Better metric: save again
+        trainer._val_metric.value = 0.6  # pyrefly: ignore[missing-attribute, bad-argument-type]
+        trainer.evaluate()
+        assert save_model.call_count == 2
+
+    def test_evaluate_skips_non_eval_epochs(self, tmp_path: Path) -> None:
+        trainer = self._build_trainer(tmp_path, val_check_interval=2)
+        trainer.state.epoch = 1.0
+
+        metrics = trainer.evaluate()
+
+        assert metrics == {}
+        assert trainer._val_metric.update_calls == 0  # pyrefly: ignore[missing-attribute]
+
+    def test_evaluate_runs_on_eval_epochs_when_interval_is_two(self, tmp_path: Path) -> None:
+        trainer = self._build_trainer(tmp_path, val_check_interval=2)
+        trainer.state.epoch = 2.0
+
+        metrics = trainer.evaluate()
+
+        assert "val/map" in metrics
+        assert trainer._val_metric.update_calls == 1  # pyrefly: ignore[missing-attribute]

@@ -1,24 +1,12 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Reproject ground truth into the model's padded input canvas.
+"""Shared helpers for the Hugging Face model wrappers.
 
-Detection and instance segmentation both validate with ``resize_targets:
-false`` (see ``recipe/_base_/data/{detection,instance_segmentation}.yaml``),
-so ground-truth boxes and masks stay in original image coordinates while the
-image itself is resized (and, for instance segmentation, letterbox-padded)
-to the model's input size. Predictions come out of the model in that input
-canvas, so the two need to be brought into the same coordinate space before a
-metric can compare them.
-
-This reprojects the ground truth using ``ImageInfo.scale_factor`` and
-``ImageInfo.padding`` — the exact values the ``Resize`` augmentation itself
-computed and stored — rather than re-deriving a resize formula independently.
-That matters because the two tasks' base recipes use different resize
-conventions (detection distorts the aspect ratio with no padding; instance
-segmentation preserves it and pads bottom-right only), and reading the actual
-stored metadata is correct for both without having to special-case either
-one, or notice if a future recipe picks a third convention.
+Reproject ground truth (boxes and masks) into the model's padded input canvas
+so predictions and ground truth can be compared in the same coordinate space.
+``_traceable_masks_to_boxes`` is the ONNX/OpenVINO-trace-safe replacement for
+``torchvision.ops.masks_to_boxes``.
 """
 
 from __future__ import annotations
@@ -97,3 +85,32 @@ def reproject_masks_to_input_space(
     padded = f.pad(resized, [pad_left, pad_right, pad_top, pad_bottom])
     height, width = input_size
     return padded[:, :height, :width] > 0.5
+
+
+def _traceable_masks_to_boxes(masks: torch.Tensor) -> torch.Tensor:
+    """A ``torchvision.ops.masks_to_boxes`` reimplementation that traces to ONNX.
+
+    ``masks_to_boxes`` itself assigns into an empty-mask boolean index
+    (``bounding_boxes[empty_masks] = 0``), which OpenVINO's ONNX frontend
+    cannot convert (``Select`` op with mismatched, non-broadcastable shapes —
+    a boolean-index assignment traces very differently from a elementwise
+    ``where``). Replacing it with an explicit ``torch.where`` over a
+    broadcastable condition produces the identical result and converts
+    cleanly.
+    """
+    _n, h, w = masks.shape
+    masks_bool = masks.bool()
+    non_zero_rows = torch.any(masks_bool, dim=2)
+    non_zero_cols = torch.any(masks_bool, dim=1)
+    empty = ~torch.any(non_zero_rows, dim=1)
+
+    non_zero_rows_f = non_zero_rows.float()
+    non_zero_cols_f = non_zero_cols.float()
+
+    y1 = non_zero_rows_f.argmax(dim=1)
+    x1 = non_zero_cols_f.argmax(dim=1)
+    y2 = (h - 1) - non_zero_rows_f.flip(dims=[1]).argmax(dim=1)
+    x2 = (w - 1) - non_zero_cols_f.flip(dims=[1]).argmax(dim=1)
+
+    boxes = torch.stack([x1, y1, x2, y2], dim=1).float()
+    return torch.where(empty.unsqueeze(-1), torch.zeros_like(boxes), boxes)

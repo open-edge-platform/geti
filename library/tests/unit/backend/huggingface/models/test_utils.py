@@ -1,14 +1,16 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Unit tests for reprojecting ground truth into the model's input canvas."""
+"""Unit tests for shared HF model-wrapper helpers."""
 
 from __future__ import annotations
 
 import pytest
 import torch
+from torchvision.ops import masks_to_boxes
 
-from getitune.backend.huggingface.data.geometry import (
+from getitune.backend.huggingface.models.utils import (
+    _traceable_masks_to_boxes,
     reproject_boxes_to_input_space,
     reproject_masks_to_input_space,
 )
@@ -43,7 +45,6 @@ class TestReprojectBoxesToInputSpace:
 
     def test_aspect_preserving_resize_with_bottom_right_padding(self) -> None:
         """Instance segmentation's base recipe: uniform scale, pad_left=pad_top=0."""
-        # A 480x720 image scaled by min(1024/480, 1024/720) = 1.4222 -> (683, 1024), padded to 1024 square.
         scale = 1024 / 720
         info = _img_info(ori_shape=(480, 720), scale_factor=(scale, scale), padding=(0, 0, 0, 341))
         boxes = torch.tensor([[0.0, 0.0, 720.0, 480.0]])
@@ -110,3 +111,26 @@ class TestReprojectMasksToInputSpace:
         info = _img_info(ori_shape=(100, 100), scale_factor=None)
         with pytest.raises(ValueError, match="scale_factor is None"):
             reproject_masks_to_input_space(torch.ones((1, 100, 100), dtype=torch.uint8), info, input_size=(50, 50))
+
+
+class TestTraceableMasksToBoxes:
+    def test_matches_torchvision_masks_to_boxes(self) -> None:
+        masks = torch.tensor(
+            [
+                [[0, 0, 0], [1, 1, 0], [1, 0, 0]],
+                [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+            ],
+            dtype=torch.bool,
+        )
+
+        result = _traceable_masks_to_boxes(masks)
+        expected = masks_to_boxes(masks)
+
+        torch.testing.assert_close(result, expected)
+
+    def test_empty_mask_yields_zero_box(self) -> None:
+        masks = torch.zeros((1, 4, 4), dtype=torch.bool)
+
+        result = _traceable_masks_to_boxes(masks)
+
+        torch.testing.assert_close(result, torch.zeros((1, 4)))

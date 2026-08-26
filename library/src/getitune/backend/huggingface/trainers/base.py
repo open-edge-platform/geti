@@ -5,16 +5,17 @@
 
 from __future__ import annotations
 
-import multiprocessing
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-import torch.utils.data
+import numpy as np
+import torch
 from torchvision import tv_tensors
 from transformers import Trainer
 
-from getitune.backend.huggingface.data.adapter import HFDatasetAdapter
 from getitune.data.augmentation import GPUAugmentationPipeline
 from getitune.data.augmentation.task_keys import DATA_KEYS_BY_TASK
+from getitune.metrics import MetricCallable
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -24,19 +25,10 @@ if TYPE_CHECKING:
 
     from getitune.backend.huggingface.models.base import HFModel
     from getitune.config.data import SubsetConfig
-    from getitune.data.dataset.base import VisionDataset
     from getitune.data.entity.sample import PredictionBatch, SampleBatch
     from getitune.data.module import DataModule
 
 __all__ = ["GetiTuneHFTrainer"]
-
-# Workers must use spawn, not the platform default (fork on Linux). By the
-# time training starts, the process has usually already loaded XPU driver
-# threads, and forking a multi-threaded process is unsafe — it can corrupt
-# state in ways that only surface later, in unrelated code. Every other
-# dataloader in getitune already does this (``DataModule``, Ultralytics'
-# ``InfiniteDataLoader``); this one needs to as well.
-_MP_CONTEXT = multiprocessing.get_context("spawn")
 
 
 class GetiTuneHFTrainer(Trainer):
@@ -53,6 +45,12 @@ class GetiTuneHFTrainer(Trainer):
             ``build_targets`` and the task used to pick the GPU augmentation
             pipeline's ``data_keys``.
         datamodule: The Geti ``DataModule`` supplying the train/eval splits.
+        metric: Optional metric callable that receives the model's
+            ``label_info`` and returns a ``torchmetrics.Metric`` (or
+            ``MetricCollection``). If ``None``, ``model_wrapper``'s default
+            task metric is used.
+        val_check_interval: Evaluate and checkpoint on every N-th epoch.
+            ``1`` means every epoch; ``None`` defaults to ``1``.
         *args: Forwarded to ``transformers.Trainer`` (typically ``model`` and
             ``args``).
         **kwargs: Forwarded to ``transformers.Trainer``.
@@ -62,6 +60,8 @@ class GetiTuneHFTrainer(Trainer):
         self,
         model_wrapper: HFModel,
         datamodule: DataModule,
+        metric: MetricCallable | None = None,
+        val_check_interval: int | None = None,
         *args: Any,  # noqa: ANN401
         **kwargs: Any,  # noqa: ANN401
     ) -> None:
@@ -70,6 +70,12 @@ class GetiTuneHFTrainer(Trainer):
         self._train_gpu_pipeline = self._build_gpu_pipeline(datamodule.train_subset, sanitize=True)
         self._eval_gpu_pipeline = self._build_gpu_pipeline(datamodule.val_subset, sanitize=False)
         self._test_gpu_pipeline = self._build_gpu_pipeline(datamodule.test_subset, sanitize=False)
+        self._val_check_interval = max(1, val_check_interval or 1)
+        self._val_metric: Metric | MetricCollection | None = (
+            metric(model_wrapper.label_info) if metric is not None else model_wrapper.build_default_metric()
+        )
+        self._best_metric_value: float | None = None
+        self._best_eval_metrics: dict[str, float] = {}
         super().__init__(*args, **kwargs)
 
     def _build_gpu_pipeline(
@@ -87,31 +93,16 @@ class GetiTuneHFTrainer(Trainer):
         return GPUAugmentationPipeline.from_config(subset_config, data_keys=data_keys, sanitize_annotations=sanitize)
 
     def get_train_dataloader(self) -> DataLoader:
-        """Return a DataLoader over the training split, via ``HFDatasetAdapter``."""
-        return self._build_dataloader(self.datamodule.subsets["train"], self.datamodule.train_subset, shuffle=True)
+        """Return the DataModule's training dataloader."""
+        return self.datamodule.train_dataloader()
 
     def get_eval_dataloader(self, eval_dataset: Any = None) -> DataLoader:  # noqa: ANN401
-        """Return a DataLoader over the validation split, via ``HFDatasetAdapter``."""
-        return self._build_dataloader(self.datamodule.subsets["val"], self.datamodule.val_subset, shuffle=False)
+        """Return the DataModule's validation dataloader."""
+        return self.datamodule.val_dataloader()
 
     def get_test_dataloader(self, test_dataset: Any = None) -> DataLoader:  # noqa: ANN401
-        """Return a DataLoader over the test split, via ``HFDatasetAdapter``."""
-        return self._build_dataloader(self.datamodule.subsets["test"], self.datamodule.test_subset, shuffle=False)
-
-    def _build_dataloader(
-        self, vision_dataset: VisionDataset, subset_config: SubsetConfig, *, shuffle: bool
-    ) -> DataLoader:
-        adapter = HFDatasetAdapter(vision_dataset, task_kind=self.model_wrapper.task.value.lower())
-        batch_size = self.args.per_device_train_batch_size if shuffle else self.args.per_device_eval_batch_size
-        num_workers = subset_config.num_workers
-        return torch.utils.data.DataLoader(
-            adapter,
-            batch_size=batch_size,
-            shuffle=shuffle,
-            num_workers=num_workers,
-            collate_fn=adapter.collate_fn,
-            multiprocessing_context=_MP_CONTEXT if num_workers > 0 else None,
-        )
+        """Return the DataModule's test dataloader."""
+        return self.datamodule.test_dataloader()
 
     def _get_num_items_in_batch(self, batch_samples: list[Any], device: torch.device) -> int | None:
         """Disable per-batch item counting for gradient-accumulation loss scaling.
@@ -165,23 +156,21 @@ class GetiTuneHFTrainer(Trainer):
     ) -> tuple[torch.Tensor | None, None, None]:
         """Compute the evaluation loss; return ``(loss, None, None)``.
 
-        ``Trainer.evaluate()`` calls this once per eval batch. The base
-        implementation expects a dict-like batch: it inspects ``inputs`` with
-        ``inputs.get(k)`` to decide whether labels are present, then builds
+        ``Trainer.predict()`` calls this once per batch. The base implementation
+        expects a dict-like batch: it inspects ``inputs`` with ``inputs.get(k)``
+        to decide whether labels are present, then builds
         ``(loss, logits, labels)`` for ``Trainer``'s ``compute_metrics``. Two
         reasons we don't do that here:
 
         * ``SampleBatch`` is a dataclass, not a ``Mapping``, so the base's
           dict probing would fail; and
         * Geti's own metric callables run through ``HFEngine.test()`` /
-          ``evaluate_with_metric``, not through ``Trainer.compute_metrics``.
+          ``GetiTuneHFTrainer.evaluate(split="test")``, not through
+          ``Trainer.compute_metrics``.
 
-        Only the loss is needed, and only for that one reason: ``Trainer``
-        writes it to the log history as ``eval_loss``, which feeds the
-        training-time metrics CSV (``val/loss``) and the
-        ``EarlyStoppingCallback``'s ``metric_for_best_model="eval_loss"``
-        checkpoint selection. Logits and labels are ``None`` because nothing
-        downstream consumes them.
+        Only the loss is returned because nothing downstream consumes logits or
+        labels here. ``GetiTuneHFTrainer.evaluate()`` bypasses this method
+        entirely and computes real task metrics on the validation split.
         """
         with torch.no_grad():
             loss = self.compute_loss(model, inputs)
@@ -208,42 +197,158 @@ class GetiTuneHFTrainer(Trainer):
         outputs = model(**targets)
         return (outputs.loss, outputs) if return_outputs else outputs.loss
 
-    def evaluate_with_metric(self, metric: Metric | MetricCollection) -> dict[str, Any]:
-        """Run the test split through the model and accumulate *metric*.
+    def _determine_best_metric(  # pyrefly: ignore[bad-override]
+        self,
+        metrics: dict[str, float],
+        trial: Any,  # noqa: ANN401
+    ) -> bool:
+        """Look up ``metric_for_best_model``.
 
-        Bypasses ``transformers.Trainer``'s own evaluation loop on purpose:
-        that loop is built around a fixed-shape ``EvalPrediction`` /
-        ``compute_metrics`` contract, which does not fit detection's or
-        instance segmentation's variable number of predictions per image.
-        Iterating the test dataloader directly and calling
-        ``HFModel.to_metric_inputs`` per batch sidesteps that mismatch
-        entirely, at the cost of not being able to reuse ``Trainer.evaluate()``.
+        ``Trainer._determine_best_metric`` unconditionally prepends ``eval_``
+        to ``metric_for_best_model`` if it doesn't already start with that
+        prefix. Our ``evaluate()`` logs directly as ``val/map``, ``val/Dice``
+        etc., so we skip that mangling and look up the key as-is.
+        """
+        monitor = self.args.metric_for_best_model
+        if not monitor or monitor not in metrics:
+            return False
+
+        metric_value = metrics[monitor]
+        operator = np.greater if self.args.greater_is_better else np.less
+
+        if self.state.best_metric is None:
+            self.state.best_metric = float("-inf") if self.args.greater_is_better else float("inf")
+
+        if operator(metric_value, self.state.best_metric):
+            self.state.best_metric = metric_value
+            return True
+        return False
+
+    def evaluate(  # pyrefly: ignore[bad-override]
+        self,
+        eval_dataset: Any = None,  # noqa: ANN401
+        ignore_keys: list[str] | None = None,
+        metric_key_prefix: str = "eval",
+        *,
+        split: str = "val",
+        metric: Metric | MetricCollection | None = None,
+    ) -> dict[str, float]:
+        """Run a Geti metric on *split* and return scalar ``val/`` or ``test/`` metrics.
+
+        This replaces ``transformers.Trainer.evaluate()`` during training so
+        that validation reports real task metrics (e.g. ``val/map``,
+        ``val/f1-score``, ``val/Dice``) instead of ``eval_loss``. It is also
+        used for the test split.
 
         Args:
-            metric: A metric or metric collection, already constructed for
-                this model's ``label_info`` (e.g. via
-                ``HFModel.build_default_metric()``).
+            eval_dataset: Ignored; the dataloader is taken from
+                ``self.datamodule``.
+            ignore_keys: Ignored; kept for signature compatibility with the
+                base ``Trainer.evaluate()``.
+            metric_key_prefix: Ignored; kept for signature compatibility.
+            split: Either ``"val"`` or ``"test"``. Determines which dataloader
+                is used and the metric key prefix.
+            metric: Optional metric or metric collection to use. If ``None``,
+                the metric passed to ``__init__`` (the task's default or an
+                override) is used.
 
         Returns:
-            The result of ``metric.compute()`` after seeing every batch in
-            the test split.
+            A dictionary of scalar metrics prefixed with ``val/`` or ``test/``.
         """
-        model = self.model_wrapper.hf_model
+        if split not in ("val", "test"):
+            msg = f"split must be 'val' or 'test', got {split!r}"
+            raise ValueError(msg)
+
+        metric_obj = metric if metric is not None else self._val_metric
+        if metric_obj is None:
+            return super().evaluate(eval_dataset, ignore_keys, metric_key_prefix)
+
+        if split == "val":
+            dataloader = self.get_eval_dataloader(eval_dataset)
+        else:
+            dataloader = self.get_test_dataloader(eval_dataset)
+
+        epoch = int(getattr(self.state, "epoch", 0))
+        if split == "val" and epoch % self._val_check_interval != 0:
+            return {}
+
         self.model_wrapper.ensure_predict_ready()
+        metric_obj.reset()
+        metric_obj.to(self.args.device)
+
+        pipeline = self._eval_gpu_pipeline if split == "val" else self._test_gpu_pipeline
+        model = self.model
+        if model is None:
+            msg = "Trainer model is not set; cannot run evaluation."
+            raise RuntimeError(msg)
         with torch.no_grad():
-            for inputs in self.get_test_dataloader():
-                batch = self._prepare_batch(inputs, self._test_gpu_pipeline)
+            for inputs in dataloader:
+                batch = self._prepare_batch(inputs, pipeline)
                 targets = self.model_wrapper.build_targets(batch)
                 outputs = model(**targets)
-                metric.update(**self.model_wrapper.to_metric_inputs(outputs, batch))
-        return metric.compute()
+                metric_obj.update(**self.model_wrapper.to_metric_inputs(outputs, batch))
+
+        computed = metric_obj.compute()
+        metrics = self._format_metrics(computed, f"{split}/")
+        if not metrics:
+            return {}
+
+        if split == "val":
+            metrics["epoch"] = epoch
+            self.log(metrics)
+            self.control = self.callback_handler.on_evaluate(self.args, self.state, self.control, metrics)
+            self._maybe_save_best_checkpoint(metrics)
+            model.train()
+
+        return metrics
+
+    @staticmethod
+    def _format_metrics(computed: dict[str, Any], prefix: str) -> dict[str, float]:
+        """Flatten a metric result, keep only scalar values, and prefix keys."""
+        metrics: dict[str, float] = {}
+        for key, value in computed.items():
+            if isinstance(value, torch.Tensor):
+                if value.ndim == 0:
+                    metrics[f"{prefix}{key}"] = value.item()
+            elif isinstance(value, (int, float)):
+                metrics[f"{prefix}{key}"] = float(value)
+        return metrics
+
+    def _maybe_save_best_checkpoint(self, metrics: dict[str, float]) -> None:
+        """Save ``best_checkpoint/`` if ``metric_for_best_model`` improved."""
+        monitor = self.args.metric_for_best_model
+        if not monitor:
+            return
+
+        current = metrics.get(monitor)
+        if current is None or not isinstance(current, (int, float)):
+            return
+
+        greater_is_better = self.args.greater_is_better
+        if greater_is_better is None:
+            greater_is_better = True
+
+        best = self._best_metric_value
+        if best is None:
+            improved = True
+        elif greater_is_better:
+            improved = current > best
+        else:
+            improved = current < best
+
+        if improved:
+            self._best_metric_value = float(current)
+            self._best_eval_metrics = metrics.copy()
+            output_dir = self.args.output_dir
+            if output_dir is None:
+                msg = "TrainingArguments.output_dir is not set; cannot save best checkpoint."
+                raise RuntimeError(msg)
+            best_dir = Path(output_dir).parent / "best_checkpoint"
+            best_dir.mkdir(parents=True, exist_ok=True)
+            self.save_model(str(best_dir))
 
     def _prepare_batch(self, batch: SampleBatch, pipeline: GPUAugmentationPipeline | None) -> SampleBatch:
-        """Move a batch to the model's device and apply GPU augmentation, if configured.
-
-        Shared by ``compute_loss`` and ``evaluate_with_metric`` so the two
-        don't drift into subtly different device-handling paths.
-        """
+        """Move a batch to the model's device and apply GPU augmentation, if configured."""
         batch = self._move_batch_to_device(batch, self.args.device)
         if pipeline is not None:
             batch = self._apply_gpu_augmentation(pipeline, batch)
@@ -252,12 +357,12 @@ class GetiTuneHFTrainer(Trainer):
     def predict_batches(self) -> list[PredictionBatch]:
         """Run the test split through the model and postprocess every batch.
 
-        Like ``evaluate_with_metric``, this iterates the test dataloader
-        directly instead of going through ``Trainer.predict()``, whose
-        ``EvalLoopOutput``/``compute_metrics`` contract assumes fixed-shape
-        per-sample outputs. Confidence thresholding is deliberately not
-        applied here — it belongs to whichever caller decides what to do
-        with these predictions (``HFEngine.predict()``).
+        This iterates the test dataloader directly instead of going through
+        ``Trainer.predict()``, whose ``EvalLoopOutput``/``compute_metrics``
+        contract assumes fixed-shape per-sample outputs. Confidence
+        thresholding is deliberately not applied here — it belongs to
+        whichever caller decides what to do with these predictions
+        (``HFEngine.predict()``).
 
         Returns:
             One :class:`~getitune.data.entity.sample.PredictionBatch` per

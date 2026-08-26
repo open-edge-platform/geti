@@ -14,7 +14,6 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, Any
 
-import torch
 from torchvision import tv_tensors
 
 from getitune.data.entity.sample import Prediction
@@ -22,13 +21,14 @@ from getitune.data.entity.sample import Prediction
 from .trainers.utils import remap_log_key
 
 if TYPE_CHECKING:
+    import torch
+
     from getitune.data.entity.sample import PredictionBatch
     from getitune.types.types import METRICS
 
 logger = logging.getLogger(__name__)
 
 __all__ = [
-    "format_test_metrics",
     "resolve_precision",
     "summarize_log_history",
     "unbatch_predictions",
@@ -77,46 +77,6 @@ def summarize_log_history(log_history: list[dict[str, Any]]) -> METRICS:
                 continue
             metrics[remap_log_key(key)] = float(value)
     return metrics
-
-
-_NON_SCALAR_METRIC_KEYS = {"classes", "map_per_class", "mar_100_per_class", "ious"}
-
-
-def format_test_metrics(results: dict[str, Any]) -> METRICS:
-    """Convert a ``torchmetrics`` ``compute()`` output to a flat ``test/``-prefixed dict.
-
-    Mirrors ``LightningModel._log_metrics`` and
-    ``UltralyticsEngine._format_torchmetrics_results``: only scalar values
-    are kept; auxiliary keys (``classes``, ``map_per_class``,
-    ``mar_100_per_class``, ``ious``) are skipped, and nested dicts (as
-    returned by a ``MetricCollection``) are flattened recursively.
-
-    Args:
-        results: Dict returned by ``metric.compute()``.
-
-    Returns:
-        Flat dict, e.g. ``{"test/map": 0.75, "test/map_50": 0.90}``.
-    """
-    formatted: dict[str, float] = {}
-
-    def _add(prefix: str, value: Any) -> None:  # noqa: ANN401
-        if isinstance(value, dict):
-            for key, nested in value.items():
-                _add(prefix if prefix.endswith(f"/{key}") else f"{prefix}/{key}", nested)
-            return
-        if prefix.rsplit("/", 1)[-1] in _NON_SCALAR_METRIC_KEYS:
-            return
-        if isinstance(value, torch.Tensor):
-            if value.numel() == 1:
-                formatted[prefix] = value.item()
-            else:
-                logger.debug("Skipping non-scalar torchmetric '%s' with %d elements", prefix, value.numel())
-        elif isinstance(value, (int, float)):
-            formatted[prefix] = float(value)
-
-    for name, value in results.items():
-        _add(f"test/{name}", value)
-    return formatted
 
 
 def _rewrap(sliced: torch.Tensor, like: tv_tensors.TVTensor) -> torch.Tensor:
