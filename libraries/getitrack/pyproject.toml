@@ -45,10 +45,6 @@ reid = [
 dev = [
     "pytest~=9.0.3",
     "pytest-mock",
-    "openvino>=2024.0",
-    # torch is used only to export a tiny IR in the ReID provider test; the
-    # library itself never imports it, and the test skips when it is absent.
-    "torch>=2.0",
 ]
 
 lint = [
