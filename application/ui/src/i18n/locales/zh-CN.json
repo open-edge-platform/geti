@@ -1,25 +1,3 @@
 {
-    "common": {
-        "loadingPleaseWait": "加载中，请稍候...",
-        "serverError": "服务器错误",
-        "refresh": "刷新",
-        "apiDown": "API 似乎不可用",
-        "unknownErrorGeneric": "发生未知错误",
-        "goBackHome": "返回首页",
-        "serverCannotProcess": "服务器无法处理当前请求。",
-        "noPermission": "您没有访问此页面的权限。",
-        "notExist": "此页面不存在！",
-        "notAuthorized": "您无权查看此内容",
-        "serverErrorGeneric": "服务器遇到错误，无法完成请求。",
-        "unexpectedError": "发生意外错误。请重试。",
-        "networkError": "网络错误。请检查网络连接后重试。"
-    },
-    "nav": {
-        "dataset": "数据集",
-        "models": "模型",
-        "inference": "推理",
-        "datasetDescription": "用于查看媒体条目的数据收集页面",
-        "modelsDescription": "用于查看模型的模型页面",
-        "inferenceDescription": "展示项目实时推理结果的推理页面"
-    }
+
 }

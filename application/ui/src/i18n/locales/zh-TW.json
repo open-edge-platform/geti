@@ -1,25 +1,3 @@
 {
-    "common": {
-        "loadingPleaseWait": "載入中，請稍候...",
-        "serverError": "伺服器錯誤",
-        "refresh": "重新整理",
-        "apiDown": "API 似乎無法使用",
-        "unknownErrorGeneric": "發生未知錯誤",
-        "goBackHome": "返回首頁",
-        "serverCannotProcess": "伺服器無法處理目前的請求。",
-        "noPermission": "您沒有存取此頁面的權限。",
-        "notExist": "此頁面不存在！",
-        "notAuthorized": "您未獲授權檢視此內容",
-        "serverErrorGeneric": "伺服器發生錯誤，無法完成請求。",
-        "unexpectedError": "發生未預期的錯誤。請再試一次。",
-        "networkError": "網路錯誤。請檢查連線後再試一次。"
-    },
-    "nav": {
-        "dataset": "資料集",
-        "models": "模型",
-        "inference": "推論",
-        "datasetDescription": "用於檢視媒體項目的資料收集頁面",
-        "modelsDescription": "用於檢視模型的模型頁面",
-        "inferenceDescription": "顯示專案即時推論結果的推論頁面"
-    }
+
 }
