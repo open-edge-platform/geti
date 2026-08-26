@@ -77,7 +77,6 @@ const useAssignMediaToExistingView = () => {
                                 },
                             ]),
                         }),
-                        // TODO: double-check if we can avoid invalidating these two queries.
                         queryClient.invalidateQueries({
                             queryKey: getQueryKey([
                                 'get',
