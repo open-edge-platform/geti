@@ -57,7 +57,7 @@ from app.api.routers import license as license_api
 from app.core.certs import ensure_certs_exist
 from app.core.logging import InterceptHandler, setup_hypercorn_logging
 from app.lifecycle import lifespan
-from app.services.base import ResourceNotFoundError
+from app.services.base import ResourceNotFoundError, ResourceWithNameAlreadyExistsError
 from app.settings import get_settings
 
 settings = get_settings()
@@ -138,6 +138,17 @@ def create_app() -> FastAPI:
         """Catch resource not found errors and return 404 response"""
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
+            content={"detail": str(exc)},
+        )
+
+    @app.exception_handler(ResourceWithNameAlreadyExistsError)
+    async def resource_with_name_already_exists_exception_handler(
+        request: Request,  # noqa: ARG001
+        exc: ResourceWithNameAlreadyExistsError,
+    ) -> JSONResponse:
+        """Catch resource-name-conflict errors and return 409 response"""
+        return JSONResponse(
+            status_code=status.HTTP_409_CONFLICT,
             content={"detail": str(exc)},
         )
 

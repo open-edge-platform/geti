@@ -172,7 +172,7 @@ export const SecondaryToolbar = ({
     });
 
     useHotkeys(
-        HOTKEYS.submit,
+        [HOTKEYS.submit, HOTKEYS.submitAlternative],
         (event) => {
             event.preventDefault();
 

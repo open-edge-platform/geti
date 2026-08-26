@@ -8,12 +8,9 @@ import { MoreMenu } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { isEmpty } from 'lodash-es';
 
-import classes from './dataset-view-items-list.module.scss';
+import { DatasetView } from '../type';
 
-export type DatasetView = {
-    id: string;
-    name: string;
-};
+import classes from './dataset-view-items-list.module.scss';
 
 type DatasetViewItemContainerProps = {
     datasetView: DatasetView;
