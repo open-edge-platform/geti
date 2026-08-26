@@ -180,7 +180,7 @@ export const MetricGraph = ({ title, data, xAxisLabel, yAxisLabel }: MetricGraph
                             <Tooltip
                                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #ccc' }}
                                 labelStyle={{ color: '#333' }}
-                                formatter={(value: number | string | undefined) => [
+                                formatter={(value: number | string | ReadonlyArray<string | number> | undefined) => [
                                     Number.isInteger(Number(value)) ? Number(value) : Number(value).toFixed(4),
                                     yAxisLabel,
                                 ]}
