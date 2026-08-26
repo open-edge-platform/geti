@@ -245,12 +245,12 @@ class TestNoEmbeddings:
 
 class TestCameraMotion:
     @staticmethod
-    def _seeded_tracker() -> BotSortTracker:
+    def _seeded_tracker(box: list[float] | None = None) -> BotSortTracker:
         from getitrack.config import GMCConfig
 
         cfg = BotSortConfig(gmc=GMCConfig(enabled=True), lifecycle=LifecycleConfig(min_hits=1, tentative_max_age=1))
         tracker = BotSortTracker(cfg)
-        tracker.update(_dets([[50, 50, 90, 90]], [0.9], frame_id=0))
+        tracker.update(_dets([box or [50, 50, 90, 90]], [0.9], frame_id=0))
         return tracker
 
     def test_cmc_is_none_when_gmc_disabled(self):
@@ -271,6 +271,34 @@ class TestCameraMotion:
         tracker._apply_cmc(np.array([[1, 0, 10], [0, 1, 5]], dtype=np.float32))
         after = tracker._tracks[1].bbox
         assert after == pytest.approx(before + np.array([10, 5, 10, 5]), abs=1e-3)
+
+    def test_apply_cmc_scale_preserves_aspect_ratio(self):
+        # A uniform zoom must scale width and height equally, leaving the aspect
+        # ratio unchanged; the old kron(I4, R) transform scaled width by s**2.
+        tracker = self._seeded_tracker([50, 50, 90, 130])  # w=40, h=80, aspect 0.5
+        before = tracker._tracks[1].bbox.copy()
+        w0, h0 = before[2] - before[0], before[3] - before[1]
+        tracker._apply_cmc(np.array([[2, 0, 0], [0, 2, 0]], dtype=np.float32))
+        after = tracker._tracks[1].bbox
+        w1, h1 = after[2] - after[0], after[3] - after[1]
+        assert h1 == pytest.approx(2 * h0, rel=1e-2)
+        assert w1 == pytest.approx(2 * w0, rel=1e-2)
+        assert (w1 / h1) == pytest.approx(w0 / h0, rel=1e-2)
+
+    def test_apply_cmc_rotation_keeps_height_and_aspect(self):
+        # A pure rotation (det == 1) must leave height and aspect ratio intact
+        # and never drive them negative; only position rotates.
+        tracker = self._seeded_tracker([50, 50, 90, 130])
+        before = tracker._tracks[1].bbox.copy()
+        w0, h0 = before[2] - before[0], before[3] - before[1]
+        theta = np.deg2rad(10)
+        cos, sin = np.cos(theta), np.sin(theta)
+        tracker._apply_cmc(np.array([[cos, -sin, 0], [sin, cos, 0]], dtype=np.float32))
+        after = tracker._tracks[1].bbox
+        w1, h1 = after[2] - after[0], after[3] - after[1]
+        assert w1 > 0
+        assert h1 == pytest.approx(h0, rel=1e-3)
+        assert (w1 / h1) == pytest.approx(w0 / h0, rel=1e-3)
 
     def test_predict_all_consumes_pending_warp(self):
         tracker = self._seeded_tracker()

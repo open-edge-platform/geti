@@ -127,21 +127,28 @@ class BotSortTracker(ByteTrackTracker):
     def _apply_cmc(self, warp: np.ndarray) -> None:
         """Transform every Kalman state (mean and covariance) by the affine ``warp``.
 
-        The ``2x2`` linear part is applied blockwise to the 8-D state via
-        ``kron(I4, R)`` and to the covariance; the translation is added to the
-        position. The aspect component is scaled along with the position.
+        The ``xyah`` state is mapped by an aspect-preserving Jacobian: position
+        ``(x, y)`` and velocity ``(vx, vy)`` are transformed by the ``2x2`` linear
+        part, height ``h`` and its velocity ``vh`` are scaled by ``sqrt(|det|)``,
+        and the aspect ratio ``a`` (and ``va``) is left unchanged. The translation
+        is added to the position afterwards.
         """
         if not self._kalman_states:
             return
-        linear = warp[:2, :2]
-        translation = warp[:2, 2]
-        block = np.kron(np.eye(4, dtype=np.float32), linear)
+        linear = np.asarray(warp[:2, :2], dtype=np.float64)
+        translation = np.asarray(warp[:2, 2], dtype=np.float64)
+        scale = float(np.sqrt(abs(np.linalg.det(linear))))
+        jacobian = np.eye(8, dtype=np.float64)
+        jacobian[:2, :2] = linear
+        jacobian[3, 3] = scale
+        jacobian[4:6, 4:6] = linear
+        jacobian[7, 7] = scale
         tids = list(self._kalman_states)
         for tid in tids:
             mean, cov = self._kalman_states[tid]
-            mean = block @ mean
+            mean = jacobian @ mean
             mean[:2] += translation
-            cov = block @ cov @ block.T
+            cov = jacobian @ cov @ jacobian.T
             self._kalman_states[tid] = (mean, cov)
         boxes = xyah_to_xyxy(np.stack([self._kalman_states[tid][0][:4] for tid in tids], axis=0)).astype(np.float32)
         for i, tid in enumerate(tids):
