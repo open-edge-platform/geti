@@ -110,7 +110,7 @@ const GalleryList = ({
                                 UNSAFE_style={{ margin: dimensionValue('size-150'), pointerEvents: 'none' }}
                             >
                                 <Checkbox
-                                    aria-label={`Select media item ${item.id}`}
+                                    aria-label={`Selection state of media item ${item.id}`}
                                     isSelected={selected}
                                     isReadOnly
                                 />

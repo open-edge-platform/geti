@@ -176,7 +176,18 @@ describe('Gallery item deletion and selection', () => {
 
         const getItem = (index: number) => screen.getAllByRole('option')[index];
 
-        const getCheckbox = (id: string) => screen.getByRole('checkbox', { name: `Select media item ${id}` });
+        const getCheckbox = (id: string) =>
+            screen.getByRole('checkbox', { name: `Selection state of media item ${id}` });
+
+        const getCheckboxContainer = (id: string) => {
+            const container = getCheckbox(id).closest('[data-floating-container]');
+
+            if (container === null) {
+                throw new Error(`Could not find the container wrapping the checkbox of ${id}`);
+            }
+
+            return container;
+        };
 
         const clickWithModifier = async (
             user: ReturnType<typeof userEvent.setup>,
@@ -258,15 +269,13 @@ describe('Gallery item deletion and selection', () => {
             expect(getCheckbox('item-4')).not.toBeChecked();
         });
 
-        it('replaces the selection when clicking on the checkbox of another item', async () => {
+        it('replaces the selection when clicking on the checkbox overlay of another item', async () => {
             const user = userEvent.setup();
             await renderGalleryWithItems(items);
 
             // The checkbox itself ignores pointer events, so a click lands on the item behind it
-            const checkboxArea = (id: string) => getCheckbox(id).closest('[data-floating-container]') as HTMLElement;
-
-            await user.click(checkboxArea('item-1'));
-            await user.click(checkboxArea('item-3'));
+            await user.click(getCheckboxContainer('item-1'));
+            await user.click(getCheckboxContainer('item-3'));
 
             expect(screen.getByText('1 selected')).toBeInTheDocument();
             expect(getCheckbox('item-1')).not.toBeChecked();

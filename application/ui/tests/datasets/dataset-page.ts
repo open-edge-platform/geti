@@ -27,7 +27,7 @@ export class DatasetPage {
     async selectMediaItem(mediaId: string) {
         await this.getMediaGrid()
             .getByRole('checkbox', {
-                name: `Select media item ${mediaId}`,
+                name: `Selection state of media item ${mediaId}`,
                 exact: true,
             })
             .click();
