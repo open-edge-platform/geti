@@ -17,14 +17,26 @@ def _default_cache_dir() -> Path:
     return Path.home() / ".cache" / "getitrack" / "reid"
 
 
+def _weights_fingerprint(weights_path: str | Path) -> str:
+    """Return an 8-char digest that changes when the checkpoint changes.
+
+    Combines the resolved path with the file size and modification time so that
+    replacing a checkpoint in place yields a new cache key. Falls back to the
+    path alone when the file cannot be stat-ed (e.g. it does not exist yet).
+    """
+    resolved = Path(weights_path).resolve()
+    try:
+        stat = resolved.stat()
+        fingerprint = f"{resolved}:{stat.st_size}:{stat.st_mtime_ns}"
+    except OSError:
+        fingerprint = str(resolved)
+    return hashlib.sha256(fingerprint.encode()).hexdigest()[:8]
+
+
 def _cache_stem(model_name: str, input_size: tuple[int, int], weights_path: str | Path | None) -> str:
     """Build a cache filename stem unique to the model, input size, and weights."""
     height, width = input_size
-    if weights_path is None:
-        tag = "pretrained"
-    else:
-        digest = hashlib.sha256(str(Path(weights_path).resolve()).encode()).hexdigest()[:8]
-        tag = f"{Path(weights_path).stem}_{digest}"
+    tag = "pretrained" if weights_path is None else f"{Path(weights_path).stem}_{_weights_fingerprint(weights_path)}"
     return f"{model_name}_{height}x{width}_{tag}"
 
 
