@@ -8,7 +8,7 @@ import { useEventListener } from './event-listener.hook';
 const IsScrollingContext = createContext(false);
 
 // `scrollend` is not implemented by every webview (notably WKWebView), so a timeout is used as fallback.
-const SCROLL_END_FALLBACK_MS = 150;
+export const SCROLL_END_FALLBACK_MS = 150;
 
 type IsScrollingProviderProps = {
     scrollRef: RefObject<HTMLElement | null>;
