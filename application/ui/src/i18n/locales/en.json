@@ -1,0 +1,26 @@
+{
+    "common": {
+        "loadingPleaseWait": "Loading...Please wait.",
+        "serverError": "Server Error",
+        "refresh": "Refresh",
+        "apiDown": "Looks like our API is down",
+        "unknownErrorGeneric": "An unknown error occurred",
+        "goBackHome": "Go back to home page",
+        "serverCannotProcess": "The server cannot or will not process the current request.",
+        "noPermission": "You do not have permission to access this page.",
+        "notExist": "This page doesn't exist!",
+        "notAuthorized": "You aren't authorized to see this",
+        "serverErrorGeneric": "The server encountered an error and could not complete your request.",
+        "unexpectedError": "An unexpected error occurred. Please try again.",
+        "networkError": "Network error. Please check your connection and try again."
+    },
+    "nav": {
+        "dataset": "Dataset",
+        "models": "Models",
+        "inference": "Inference",
+        "datasetDescription": "Data collection page to visualise your media items",
+        "modelsDescription": "Models page to visualise your models",
+        "inferenceDescription": "Inference page showing live inference on your project",
+        "headerNavigation": "Header navigation"
+    }
+}
