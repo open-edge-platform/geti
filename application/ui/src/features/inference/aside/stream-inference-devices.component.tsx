@@ -31,12 +31,5 @@ export const StreamInferenceDevices = () => {
         );
     };
 
-    return (
-        <InferenceDevices
-            ariaLabel='inference compute'
-            selectedKey={selectedKey}
-            onSelectionChange={handleChange}
-            maxWidth={'size-3000'}
-        />
-    );
+    return <InferenceDevices label={'Inference device'} selectedKey={selectedKey} onSelectionChange={handleChange} />;
 };

@@ -3,47 +3,18 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
-import {
-    AlertDialog,
-    Content,
-    Dialog,
-    DialogContainer,
-    DialogTrigger,
-    Flex,
-    PressableElement,
-    Text,
-    View,
-} from '@geti-ui/ui';
+import { Content, Dialog, DialogContainer, DialogTrigger, Flex, PressableElement, Text, View } from '@geti-ui/ui';
 import { ChevronDownSmall } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { isEmpty } from 'lodash-es';
 
-import { DatasetView, DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
+import { DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
+import { DeleteDatasetViewDialog } from './delete-dataset-view.component';
+import { RenameDatasetView } from './rename-dataset-view.component';
+import { DatasetView } from './type';
 
 import classes from './dataset-view-selector.module.scss';
-
-type DeleteDatasetViewDialogProps = {
-    datasetView: DatasetView;
-    onDelete: () => void;
-    onClose: () => void;
-};
-
-const DeleteDatasetViewDialog = ({ datasetView, onDelete, onClose }: DeleteDatasetViewDialogProps) => {
-    return (
-        <AlertDialog
-            title={`Delete confirmation`}
-            primaryActionLabel={'Delete'}
-            onPrimaryAction={onDelete}
-            onCancel={onClose}
-            secondaryActionLabel={'Close'}
-        >
-            <Content>
-                <Text>Are you sure you want to delete the {`"${datasetView.name}"`} dataset view?</Text>
-            </Content>
-        </AlertDialog>
-    );
-};
 
 type DatasetViewsTriggerProps = {
     selectedDatasetView: DatasetView;
@@ -61,7 +32,7 @@ const DatasetViewsTrigger = ({ selectedDatasetView, isDisabled }: DatasetViewsTr
             >
                 <View
                     paddingX={'size-150'}
-                    paddingY={'size-50'}
+                    paddingY={'size-100'}
                     borderRadius={'regular'}
                     maxWidth={'size-2400'}
                     UNSAFE_className={clsx(classes.datasetViewsTrigger, {
@@ -69,7 +40,7 @@ const DatasetViewsTrigger = ({ selectedDatasetView, isDisabled }: DatasetViewsTr
                     })}
                 >
                     <Flex alignItems={'center'} gap={'size-200'}>
-                        <Text>{selectedDatasetView.name}</Text>
+                        <Text UNSAFE_className={classes.datasetViewName}>{selectedDatasetView.name}</Text>
 
                         <ChevronDownSmall />
                     </Flex>
@@ -83,13 +54,14 @@ type DatasetViewSelectorProps = {
     datasetViews: DatasetView[];
 };
 
-const ENTIRE_DATASET = {
+const ENTIRE_DATASET: DatasetView = {
     id: ENTIRE_DATASET_VIEW_ID,
     name: 'Entire dataset',
 };
 
 export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) => {
     const [isDatasetViewSelectorOpen, setIsDatasetViewSelectorOpen] = useState<boolean>(false);
+
     const datasetViewsWithDefaultView = useMemo(() => {
         return [ENTIRE_DATASET, ...datasetViews];
     }, [datasetViews]);
@@ -98,19 +70,24 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
     const selectedDatasetView = datasetViewsWithDefaultView.find((item) => item.id === datasetViewId) ?? ENTIRE_DATASET;
 
     const [datasetViewToBeDeleted, setDatasetViewToBeDeleted] = useState<DatasetView | null>(null);
-    const isDeleteDialogOpen = datasetViewToBeDeleted !== null;
+    const [datasetViewToBeRenamed, setDatasetViewToBeRenamed] = useState<DatasetView | null>(null);
 
     const openDeleteConfirmationDialog = (datasetView: DatasetView) => {
         setIsDatasetViewSelectorOpen(false);
         setDatasetViewToBeDeleted(datasetView);
     };
 
-    const handleDelete = () => {
+    const openRenameDialog = (datasetView: DatasetView) => {
+        setIsDatasetViewSelectorOpen(false);
+        setDatasetViewToBeRenamed(datasetView);
+    };
+
+    const handleCloseDeleteDialog = () => {
         setDatasetViewToBeDeleted(null);
     };
 
-    const handleClose = () => {
-        setDatasetViewToBeDeleted(null);
+    const handleCloseRenameDialog = () => {
+        setDatasetViewToBeRenamed(null);
     };
 
     const onlyEntireDatasetView = isEmpty(datasetViews);
@@ -148,17 +125,23 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
                             selectedDatasetViewId={datasetViewId}
                             onOpenDeleteConfirmationDialog={openDeleteConfirmationDialog}
                             onSelectDatasetView={onSelectDatasetView}
+                            onOpenRenameDialog={openRenameDialog}
                         />
                     </Content>
                 </Dialog>
             </DialogTrigger>
 
-            <DialogContainer onDismiss={handleClose}>
-                {isDeleteDialogOpen && (
-                    <DeleteDatasetViewDialog
-                        datasetView={datasetViewToBeDeleted}
-                        onDelete={handleDelete}
-                        onClose={handleClose}
+            <DialogContainer onDismiss={handleCloseDeleteDialog}>
+                {datasetViewToBeDeleted !== null && (
+                    <DeleteDatasetViewDialog datasetView={datasetViewToBeDeleted} onClose={handleCloseDeleteDialog} />
+                )}
+            </DialogContainer>
+            <DialogContainer onDismiss={handleCloseRenameDialog}>
+                {datasetViewToBeRenamed && (
+                    <RenameDatasetView
+                        datasetView={datasetViewToBeRenamed}
+                        onClose={handleCloseRenameDialog}
+                        datasetViews={datasetViews.filter((view) => view.id !== datasetViewToBeRenamed.id)}
                     />
                 )}
             </DialogContainer>

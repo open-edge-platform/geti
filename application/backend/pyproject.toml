@@ -25,6 +25,7 @@ dependencies = [
     "pydantic-settings~=2.14.2",
     "aiortc~=1.14.0",
     "datumaro[experimental]~=1.13.7",
+    "defusedxml~=0.7.1",
     "scikit-learn~=1.7.2",
     "faster-coco-eval~=1.7.0",
     "scikit-multilearn~=0.2.0",
@@ -38,6 +39,8 @@ dependencies = [
     "starlette~=1.3.1",
     "hypercorn[h2]~=0.18.0",
     "pathvalidate>=3.3.1",
+    "hypercorn~=0.18.0",
+    "safetensors~=0.8.0",
 ]
 
 [project.optional-dependencies]
@@ -68,7 +71,7 @@ lint = [
     "types-aiofiles~=25.1.0",  # should match aiofiles version
     "types-requests~=2.32.4",
     "types-pyyaml~=6.0.12",  # should match pyyaml version
-    "pyrefly~=0.51.0",
+    "pyrefly~=1.2.0",
 ]
 
 [tool.uv]

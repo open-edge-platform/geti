@@ -12,6 +12,7 @@ from getitune.types.task import TaskType
 
 from .augmentation.pipeline import CPUAugmentationPipeline
 from .dataset.base import Transforms, VisionDataset
+from .utils.utils import fill_null_annotation_lists
 
 if TYPE_CHECKING:
     from datumaro.experimental import Dataset
@@ -59,6 +60,7 @@ class DatasetFactory:
         ignore_index: int = 255,  # noqa: ARG003
     ) -> VisionDataset:
         """Create VisionDataset."""
+        dm_subset = fill_null_annotation_lists(dm_subset)
         transforms = TransformLibFactory.generate(cfg_subset)
 
         common_kwargs = {

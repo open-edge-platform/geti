@@ -67,10 +67,7 @@ export const AnnotationLabels = ({
             overflow='visible'
             aria-label={`Annotation labels`}
         >
-            <div
-                className={useBottomCorners ? classes.labelsContainerPolygon : classes.labelsContainerRect}
-                style={{ height: '100%', alignItems: 'flex-end' }}
-            >
+            <div className={useBottomCorners ? classes.labelsContainerPolygon : classes.labelsContainerRect}>
                 {displayLabels.map((label, index) => {
                     const isFirst = index === 0;
                     const isLast = index === displayLabels.length - 1;

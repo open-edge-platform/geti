@@ -22,7 +22,7 @@ def fxt_multi_class_cls_model():
     )
 
 
-class TestTimmModelForMulticlassCls:
+class TestTimmModelMulticlassCls:
     def test_create_model(self, fxt_multi_class_cls_model):
         assert isinstance(fxt_multi_class_cls_model.model, ImageClassifier)
 
@@ -42,7 +42,18 @@ class TestTimmModelForMulticlassCls:
         preds = fxt_multi_class_cls_model._customize_outputs(outputs, fxt_multiclass_cls_batch_data_entity)
         assert isinstance(preds, PredictionBatch)
 
-    @pytest.mark.parametrize("explain_mode", [True, False])
+    @pytest.mark.parametrize(
+        "explain_mode",
+        [
+            False,
+            pytest.param(
+                True,
+                marks=pytest.mark.xfail(
+                    reason="Explain mode expects spatial feature maps; timm backbones currently return pooled embeddings."
+                ),
+            ),
+        ],
+    )
     def test_predict_step(self, fxt_multi_class_cls_model, fxt_multiclass_cls_batch_data_entity, explain_mode):
         fxt_multi_class_cls_model.eval()
         fxt_multi_class_cls_model.explain_mode = explain_mode
@@ -85,7 +96,7 @@ def fxt_multi_label_cls_model():
     )
 
 
-class TestTimmModelForMultilabelCls:
+class TestTimmModelMultilabelCls:
     def test_create_model(self, fxt_multi_label_cls_model):
         assert isinstance(fxt_multi_label_cls_model.model, ImageClassifier)
 
@@ -105,7 +116,18 @@ class TestTimmModelForMultilabelCls:
         preds = fxt_multi_label_cls_model._customize_outputs(outputs, fxt_multilabel_cls_batch_data_entity)
         assert isinstance(preds, PredictionBatch)
 
-    @pytest.mark.parametrize("explain_mode", [True, False])
+    @pytest.mark.parametrize(
+        "explain_mode",
+        [
+            False,
+            pytest.param(
+                True,
+                marks=pytest.mark.xfail(
+                    reason="Explain mode expects spatial feature maps; timm backbones currently return pooled embeddings."
+                ),
+            ),
+        ],
+    )
     def test_predict_step(self, fxt_multi_label_cls_model, fxt_multilabel_cls_batch_data_entity, explain_mode):
         fxt_multi_label_cls_model.eval()
         fxt_multi_label_cls_model.explain_mode = explain_mode

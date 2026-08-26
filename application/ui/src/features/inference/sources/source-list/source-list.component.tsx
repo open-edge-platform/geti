@@ -44,6 +44,7 @@ const SourceListItem = ({ source, isConnected, onEditSource, isPipelineRunning }
             key={source.id}
             gap='size-200'
             direction='column'
+            data-testid={`source-card-${source.name}`}
             UNSAFE_className={clsx(classes.card, { [classes.activeCard]: isConnected })}
         >
             {showConnectionStatusBadge && (

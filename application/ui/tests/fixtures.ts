@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import { defineNetworkFixture, NetworkFixture } from '@msw/playwright';
 import { expect, test as testBase } from '@playwright/test';
 import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
+import { getMockedDatasetView } from 'mocks/mock-dataset-view';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedModelArchitecture } from 'mocks/mock-model';
 import { HttpResponse } from 'msw';
@@ -20,6 +21,7 @@ import { VideoPage } from './annotator/video/video-page';
 import { AnnotatorPage } from './datasets/annotator-page';
 import { DatasetPage } from './datasets/dataset-page';
 import { ImportDatasetPage } from './datasets/import-dataset-page';
+import { InferencePage } from './inference/inference-page';
 import { StreamPage } from './inference/stream-page';
 import { JobsPage } from './jobs/jobs-page';
 import { ModelsPage } from './models/models-page';
@@ -47,6 +49,7 @@ const getSampleImageArrayBuffer = (): ArrayBuffer => {
 interface Fixtures {
     network: NetworkFixture;
     streamPage: StreamPage;
+    inferencePage: InferencePage;
     modelsPage: ModelsPage;
     jobsPage: JobsPage;
     polygonTool: PolygonToolPage;
@@ -222,6 +225,9 @@ const test = testBase.extend<Fixtures>({
                             },
                         });
                     }),
+                    http.get('/api/projects/{project_id}/dataset/views', () => {
+                        return HttpResponse.json([getMockedDatasetView()]);
+                    }),
                 ],
             });
 
@@ -235,6 +241,11 @@ const test = testBase.extend<Fixtures>({
         const streamPage = new StreamPage(page);
 
         await use(streamPage);
+    },
+    inferencePage: async ({ page }, use) => {
+        const inferencePage = new InferencePage(page);
+
+        await use(inferencePage);
     },
     modelsPage: async ({ page }, use) => {
         const modelsPage = new ModelsPage(page);

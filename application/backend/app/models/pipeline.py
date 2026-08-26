@@ -9,6 +9,7 @@ from pydantic import AliasChoices, Field, model_validator
 
 from .base import BaseEntity
 from .data_collection_policy import DataCollectionConfig, DataCollectionPolicy
+from .inference_config import InferenceConfig
 from .model_revision import ModelRevision, ModelVariant
 from .sink import Sink
 from .source import Source
@@ -47,6 +48,7 @@ class Pipeline(BaseEntity):
         model_variant_id: UUID reference to the model variant entity.
         status: Current operational status of the pipeline (IDLE or RUNNING).
         data_collection: Configuration for data collection including max dataset size and policies.
+        inference: Configuration applied to the model at inference time, e.g. the confidence threshold.
         device: The device used for model inference (e.g., 'cpu', 'xpu', 'cuda', 'xpu-1', etc.).
 
     Raises:
@@ -66,6 +68,7 @@ class Pipeline(BaseEntity):
     model_variant_id: UUID | None = None
     status: PipelineStatus = PipelineStatus.IDLE
     data_collection: DataCollectionConfig = Field(default_factory=DataCollectionConfig)
+    inference: InferenceConfig = Field(default_factory=InferenceConfig)
     device: str = Field(default="cpu", pattern=r"^(cpu|xpu|cuda)(-\d+)?$")
 
     @property

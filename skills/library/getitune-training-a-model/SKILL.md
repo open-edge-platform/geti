@@ -15,11 +15,12 @@ There are two equal entry points that share the same objects and recipes:
 
 - **Python API** — `from getitune.engine import create_engine`, then
   `engine.train()` / `engine.test()`. Preferred for notebooks, scripts, tests,
-  and library integration. See `library/README.md` ("Quick Start") and
-  `library/docs/source/guide/get_started/api_tutorial.rst`.
+  and library integration. See `library/README.md` ("Quick Start") and the
+  [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/quick-start).
 - **CLI** — `getitune train --data_root <path> --model <name|recipe.yaml>`.
   Preferred for reproducible experiments and shell workflows. See
-  `library/docs/source/guide/get_started/cli_commands.rst`.
+  `getitune train --help` and the
+  [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/intro).
 
 Run everything from `library/`. Install with the extra that matches your
 hardware: `uv sync` (cpu), `uv sync --extra xpu`, or `uv sync --extra cuda`.

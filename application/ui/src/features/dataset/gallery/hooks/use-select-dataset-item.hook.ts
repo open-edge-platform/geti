@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import type { Media } from '@/api/types';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
-import { useLocation, useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import { paths } from '../../../../constants/paths';
 import { useProjectIdentifier } from '../../../../hooks/use-project-identifier.hook';

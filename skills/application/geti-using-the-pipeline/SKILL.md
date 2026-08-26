@@ -12,9 +12,18 @@ then configure and **enable** a live inference **pipeline** (source → model �
 sink). This skill is about _using_ that API; to change backend code use the
 `geti-backend-dev` skill instead.
 
-Start the server from `application/backend/` with `just run-server` (default
-`https://localhost:7860`). The full endpoint reference is
-`application/docs/api.md`; interactive docs are the generated OpenAPI spec.
+These endpoints are served by a **running Geti instance**; how it was launched
+does not matter (Docker container, Windows MSIX app, install script, or
+`just run-server` from `application/backend/` for development). Ask the user for
+their base URL rather than assuming one — `https://localhost:7860` is only the
+default for a local deployment, the port is configurable and remote instances
+use a different host. See `application/docs/install.md` for the deployment
+modes. The authoritative API reference is the spec the instance serves; fetch it
+as JSON from `/api/openapi.json` (the `/api/docs` page is only an HTML viewer
+for humans). Read endpoint paths and payloads from there rather than from any
+checked-in Markdown, which may be out of date. If no instance is running and you
+have the sources, generate the spec with `just gen-api-spec --output-path
+openapi.json` from `application/backend/`.
 
 ## End-to-end pipeline
 
@@ -63,7 +72,7 @@ flowchart LR
 Long-running work runs as **jobs** (`POST /api/jobs`), keeping the API
 responsive. Job types: `train`, `quantize`, `prepare_dataset_for_import`,
 `import_dataset_to_existing_project`, `import_dataset_as_new_project`,
-`export_dataset`, `stage_dataset`. Poll `GET /api/jobs/<id>` or stream
+`export_dataset`. Poll `GET /api/jobs/<id>` or stream
 `/status` and `/logs`; jobs are cancelable.
 
 ## Datasets: import instead of manual annotation
@@ -80,9 +89,9 @@ To bring in an existing dataset rather than annotating from scratch:
 - Training and quantization jobs run out-of-process and call into the `getitune`
   library; the underlying capabilities map to the `getitune-training-a-model`
   and `getitune-optimizing-a-model` skills.
-- This skill covers API usage; endpoint paths and payloads are the contract in
-  `application/docs/api.md`. To add or change endpoints, use `geti-backend-dev`
-  and `geti-openapi-sync`.
+- This skill covers API usage; the contract for endpoint paths and payloads is
+  the spec at `/api/openapi.json`. To add or change endpoints, use
+  `geti-backend-dev` and `geti-openapi-sync`.
 
 ## Related skills
 

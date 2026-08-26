@@ -11,6 +11,7 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from defusedxml.ElementTree import parse as parse_xml
 from loguru import logger
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -18,6 +19,7 @@ from sqlalchemy.orm import Session
 from app.db.schema import EvaluationDB, MetricScoreDB, ModelRevisionDB, ModelVariantDB
 from app.models import EvaluationResult, ModelRevision, ModelVariant, TrainingStatus
 from app.models.model_revision import ModelFormat, ModelPrecision
+from app.models.system import DeviceInfo
 from app.models.training_configuration.configuration import TrainingConfiguration
 from app.repositories import (
     EvaluationRepository,
@@ -28,6 +30,7 @@ from app.repositories import (
 )
 from app.services.dataset_revision_service import DatasetRevisionService
 from app.services.model_manifest_service import ModelManifestService
+from app.utils.onnx_metadata import read_onnx_metadata_attrs
 
 from .base import BaseSessionManagedService, ResourceInUseError, ResourceNotFoundError, ResourceType
 from .parent_process_guard import parent_process_only
@@ -87,10 +90,65 @@ KEY_MAPPING = {
     "validation/iter_time": MetricDisplayInfo(display_name="Validation iteration time", frequency="epoch"),
 }
 
+# Key under which the confidence threshold is stored in the metadata of exported models
+CONFIDENCE_THRESHOLD_IR_PATH = "rt_info/model_info/confidence_threshold"
+CONFIDENCE_THRESHOLD_ONNX_KEY = "model_info confidence_threshold"
+
 
 @lru_cache
 def _cached_model_size_in_bytes(model_path: Path) -> int:
     return sum(f.stat().st_size for f in model_path.glob("**/*") if f.is_file())
+
+
+def _read_ir_confidence_threshold(model_xml: Path) -> float | None:
+    """Read the confidence threshold from the ``rt_info`` section of an OpenVINO IR XML file."""
+    # The IR topology is parsed directly rather than through openvino.Core.read_model, which would also
+    # load the (much larger) weights file.
+    root = parse_xml(model_xml).getroot()
+    element = root.find(CONFIDENCE_THRESHOLD_IR_PATH) if root is not None else None
+    if element is None:
+        return None
+    value = element.get("value")
+    return float(value) if value is not None else None
+
+
+def _read_onnx_confidence_threshold(model_onnx: Path) -> float | None:
+    """Read the confidence threshold from the metadata properties of an ONNX model file."""
+    attrs = read_onnx_metadata_attrs(model_onnx, keys=[CONFIDENCE_THRESHOLD_ONNX_KEY])
+    value = attrs.get(CONFIDENCE_THRESHOLD_ONNX_KEY)
+    return float(value) if value is not None else None
+
+
+@lru_cache
+def _cached_optimal_confidence_threshold(variant_dir: Path, model_format: ModelFormat) -> float | None:
+    """
+    Read the optimal confidence threshold embedded in an exported model file.
+
+    The value is baked into the model at export time and never changes, so it is cached.
+
+    Args:
+        variant_dir (Path): Directory holding the files of the model variant.
+        model_format (ModelFormat): Format of the model variant.
+
+    Returns:
+        float | None: The optimal confidence threshold, or None if the format does not embed one,
+            the model file is missing, or the value could not be read.
+    """
+    match model_format:
+        case ModelFormat.OPENVINO:
+            model_file, reader = variant_dir / "model.xml", _read_ir_confidence_threshold
+        case ModelFormat.ONNX:
+            model_file, reader = variant_dir / "model.onnx", _read_onnx_confidence_threshold
+        case _:
+            return None
+
+    if not model_file.exists():
+        return None
+    try:
+        return reader(model_file)
+    except Exception as exc:
+        logger.warning("Could not read the optimal confidence threshold from '{}': {}", model_file, exc)
+        return None
 
 
 @dataclass(frozen=True)
@@ -186,10 +244,11 @@ class ModelService(BaseSessionManagedService):
         variants = []
         for v_db in variant_dbs:
             variant = ModelVariant.model_validate(v_db)
-            # Compute weights_size from the filesystem
+            # Compute weights_size and read the embedded confidence threshold from the filesystem
             variant_dir = self._get_variant_dir(project_id, model_id, UUID(v_db.id))
             if not v_db.files_deleted and variant_dir.exists():
                 variant.weights_size = sum(f.stat().st_size for f in variant_dir.iterdir() if f.is_file())
+                variant.optimal_confidence_threshold = _cached_optimal_confidence_threshold(variant_dir, variant.format)
             variants.append(variant)
         return variants
 
@@ -396,6 +455,7 @@ class ModelService(BaseSessionManagedService):
         training_status: TrainingStatus,
         training_started_at: datetime | None = None,
         training_finished_at: datetime | None = None,
+        training_device: DeviceInfo | None = None,
     ) -> None:
         """
         Updates the training status of a model revision for the given project.
@@ -406,6 +466,7 @@ class ModelService(BaseSessionManagedService):
             training_status (TrainingStatus): New training status to set for the model revision.
             training_started_at (datetime): Date and time when the training was started
             training_finished_at (datetime): Date and time when the training was finished
+            training_device (DeviceInfo | None): Hardware device used to run the training
         """
         model_revision_repo = ModelRevisionRepository(project_id=str(project_id), db=self.db_session)
         model_revision_repo.update_training_status(
@@ -413,6 +474,7 @@ class ModelService(BaseSessionManagedService):
             training_status=training_status,
             training_started_at=training_started_at,
             training_finished_at=training_finished_at,
+            training_device=training_device.model_dump(mode="json") if training_device is not None else None,
         )
 
     def get_model_binary_files(
@@ -545,6 +607,25 @@ class ModelService(BaseSessionManagedService):
         if not variant_db:
             raise ResourceNotFoundError(ResourceType.MODEL, str(variant_id))
         return ModelVariant.model_validate(variant_db)
+
+    def get_optimal_confidence_threshold(self, project_id: UUID, model_id: UUID, variant_id: UUID) -> float | None:
+        """
+        Get the confidence threshold that was determined for a model variant when it was exported.
+
+        Args:
+            project_id (UUID): The unique identifier of the project.
+            model_id (UUID): The unique identifier of the model.
+            variant_id (UUID): The unique identifier of the model variant.
+
+        Returns:
+            float | None: The optimal confidence threshold, or None if the variant does not embed one
+                (e.g. PyTorch variants, or tasks that do not use a confidence threshold).
+        """
+        variant = self.get_variant(variant_id=variant_id)
+        variant_dir = self._get_variant_dir(project_id, model_id, variant_id)
+        if variant.files_deleted or not variant_dir.exists():
+            return None
+        return _cached_optimal_confidence_threshold(variant_dir, variant.format)
 
     def save_evaluation_result(self, result: EvaluationResult) -> None:
         evaluation_db = EvaluationDB(

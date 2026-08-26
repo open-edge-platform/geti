@@ -189,7 +189,7 @@ class TestGetiTuneTrainerPrepareWeights:
         expected_weights_path.touch()
         getitune_trainer = fxt_getitune_trainer()
 
-        getitune_trainer._model_service.get_model_variants.return_value = [
+        getitune_trainer._model_service.get_model_variants.return_value = [  # pyrefly: ignore[missing-attribute]
             ModelVariant(
                 id=parent_model_variant_id,
                 model_revision_id=parent_model_revision_id,
@@ -224,7 +224,7 @@ class TestGetiTuneTrainerPrepareWeights:
         )
         getitune_trainer = fxt_getitune_trainer()
 
-        getitune_trainer._model_service.get_model_variants.return_value = []
+        getitune_trainer._model_service.get_model_variants.return_value = []  # pyrefly: ignore[missing-attribute]
 
         # Act
         msg = (
@@ -265,7 +265,7 @@ class TestGetiTuneTrainerPrepareWeights:
         )
         getitune_trainer = fxt_getitune_trainer()
 
-        getitune_trainer._model_service.get_model_variants.return_value = [
+        getitune_trainer._model_service.get_model_variants.return_value = [  # pyrefly: ignore[missing-attribute]
             ModelVariant(
                 id=parent_model_variant_id,
                 model_revision_id=parent_model_revision_id,
@@ -1078,6 +1078,12 @@ class TestGetiTuneTrainerExecuteCancellation:
         status_calls = fxt_model_service.update_revision_status.call_args_list
         last_status_call = status_calls[-1]
         assert last_status_call.kwargs.get("training_status") == TrainingStatus.FAILED
+
+        # Assert - the IN_PROGRESS update recorded which hardware was used to run the training
+        in_progress_call = next(
+            call for call in status_calls if call.kwargs.get("training_status") == TrainingStatus.IN_PROGRESS
+        )
+        assert in_progress_call.kwargs.get("training_device") == params.device
 
 
 class TestGetiTuneTrainerEvaluateModel:

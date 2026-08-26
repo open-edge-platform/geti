@@ -20,6 +20,7 @@ import { SortDown, SortUp } from '@geti-ui/ui/icons';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { isString } from 'lodash-es';
 
+import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { isImage } from '../../../../shared/media-item-utils';
 import { TrainModel } from '../../../models/train-model/train-model.component';
 import { ImportExport } from '../../import-export/import-export.component';
@@ -28,10 +29,11 @@ import { DeleteMediaItem } from '../delete-media-item/delete-media-item.componen
 import { useSelectDatasetItem } from '../hooks/use-select-dataset-item.hook';
 import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
-import { useDatasetViews } from './dataset-view-selector/api/use-dataset-views';
+import { useDatasetViewsQuery } from './dataset-view-selector/api/use-dataset-views';
 import { AssignToExistingView } from './dataset-view-selector/assign-to-existing-view/assign-to-existing-view.component';
 import { DatasetViewSelector } from './dataset-view-selector/dataset-view-selector.component';
 import { SaveDatasetView } from './dataset-view-selector/save-dataset-view/save-dataset-view.component';
+import { UnassignMediaFromView } from './dataset-view-selector/unassign-media-from-view/unassign-media-from-view.component';
 import { MediaFiltering } from './media-filtering/media-filtering.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
@@ -77,7 +79,7 @@ const SortMediaByUploadDate = () => {
 export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
     const { onSelectedMediaItemChange } = useSelectDatasetItem();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys } = useSelectedData();
-    const datasetViews = useDatasetViews();
+    const { data: datasetViews } = useDatasetViewsQuery();
 
     const selectedMediaItems = selectedKeys instanceof Set ? selectedKeys : null;
 
@@ -106,16 +108,18 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                 <Flex alignItems={'center'} gap={'size-200'}>
                     <Heading margin={0}>Dataset</Heading>
 
-                    <Divider orientation={'vertical'} size={'S'} />
-                    <DatasetViewSelector datasetViews={datasetViews} />
+                    {FEATURE_FLAGS.DATASET_VIEWS && (
+                        <>
+                            <Divider orientation={'vertical'} size={'S'} />
+                            <DatasetViewSelector datasetViews={datasetViews} />
+                        </>
+                    )}
                 </Flex>
 
                 <ButtonGroup UNSAFE_style={{ gap: dimensionValue('size-125') }}>
                     {noMediaSelected && <ImportExport />}
 
                     <MediaUpload />
-
-                    <AssignLabel selectedImagesIds={selectedImagesIds} />
 
                     {noMediaSelected && <TrainModel />}
 
@@ -148,15 +152,24 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     {hasSelectedElements && (
                         <>
+                            <AssignLabel selectedImagesIds={selectedImagesIds} />
                             <DeleteMediaItem
                                 itemsIds={Array.from(selectedKeys) as string[]}
                                 onDeleted={toggleSelectedKeys}
                             />
-                            <SaveDatasetView selectedMediaIds={selectedMediaItemsIds} />
-                            <AssignToExistingView
-                                datasetViews={datasetViews}
-                                selectedMediaIds={selectedMediaItemsIds}
-                            />
+                            {FEATURE_FLAGS.DATASET_VIEWS && (
+                                <>
+                                    <SaveDatasetView
+                                        selectedMediaIds={selectedMediaItemsIds}
+                                        datasetViews={datasetViews}
+                                    />
+                                    <AssignToExistingView
+                                        datasetViews={datasetViews}
+                                        selectedMediaIds={selectedMediaItemsIds}
+                                    />
+                                    <UnassignMediaFromView selectedMediaIds={selectedMediaItemsIds} />
+                                </>
+                            )}
                         </>
                     )}
                 </Flex>
