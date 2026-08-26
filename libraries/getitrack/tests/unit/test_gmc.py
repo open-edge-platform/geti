@@ -93,6 +93,14 @@ class TestTranslationRecovery:
         # full-resolution pixels, so it should still recover ~8 not ~4.
         assert warp[0, 2] == pytest.approx(8.0, abs=2.5)
 
+    def test_large_downscale_on_small_frame_does_not_crash(self):
+        # A downscale larger than the frame would floor a resize dimension to
+        # zero (and OpenCV would raise) without the clamp; estimate must run.
+        estimator = SparseOptFlowEstimator(downscale=32)
+        assert np.array_equal(estimator.estimate(_textured(height=20, width=20)), _IDENTITY)
+        warp = estimator.estimate(_textured(height=20, width=20))
+        assert warp.shape == (2, 3)
+
 
 class TestECC:
     def test_returns_affine_shape(self):

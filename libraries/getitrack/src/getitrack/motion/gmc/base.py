@@ -72,19 +72,25 @@ class BaseMotionEstimator(ABC):
         there is no previous frame to compare against.
         """
         gray = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2GRAY)
+        scale_x = scale_y = 1.0
         if self._downscale > 1:
             height, width = gray.shape[:2]
-            gray = cv2.resize(gray, (width // self._downscale, height // self._downscale))
+            # Clamp to at least one pixel so a large downscale on a small frame
+            # never produces a zero resize dimension.
+            resized_width = max(1, width // self._downscale)
+            resized_height = max(1, height // self._downscale)
+            scale_x = width / resized_width
+            scale_y = height / resized_height
+            gray = cv2.resize(gray, (resized_width, resized_height))
         if self._prev_gray is None:
             self._prev_gray = gray
             return _IDENTITY.copy()
         warp = self._estimate(self._prev_gray, gray)
         self._prev_gray = gray
-        if self._downscale > 1:
-            # Rotation/scale is downscale-invariant; only translation must be
-            # rescaled back to full-resolution pixels.
-            warp[0, 2] *= self._downscale
-            warp[1, 2] *= self._downscale
+        # Rotation/scale is downscale-invariant; only translation must be rescaled
+        # back to full-resolution pixels, using the actual per-axis resize ratios.
+        warp[0, 2] *= scale_x
+        warp[1, 2] *= scale_y
         return warp
 
     @abstractmethod
