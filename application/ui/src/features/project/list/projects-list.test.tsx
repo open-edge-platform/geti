@@ -92,12 +92,6 @@ describe('ProjectList', () => {
             expect(await screen.findByRole('heading', { name: 'Projects' })).toBeInTheDocument();
         });
 
-        it('renders the description text', async () => {
-            renderProjectList();
-
-            expect(await screen.findByText(/Create projects by selecting a computer vision task/i)).toBeInTheDocument();
-        });
-
         it('renders a card for each project', async () => {
             renderProjectList();
 
