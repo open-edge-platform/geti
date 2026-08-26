@@ -43,7 +43,9 @@
         "importDatasetDialogAria": "匯入資料集對話方塊",
         "unexpectedError": "發生未預期的錯誤。請再試一次。",
         "networkError": "網路錯誤。請檢查連線後再試一次。",
-        "export": "匯出"
+        "export": "匯出",
+        "or": "或",
+        "importPreparationError": "匯入準備過程中發生錯誤。"
     },
     "nav": {
         "dataset": "資料集",
@@ -453,7 +455,13 @@
         "anchorW": "西縮放點",
         "noObject": "無物件",
         "hotkeyPlaceholder": "快速鍵",
-        "magneticLassoFailed": "選取形狀邊界失敗，請再試一次。"
+        "magneticLassoFailed": "選取形狀邊界失敗，請再試一次。",
+        "redoHotkeyName": "重做",
+        "deleteSelectedAnnotationHotkeyName": "刪除選取的標註",
+        "toggleAnnotationsHotkeyName": "顯示或隱藏所有標註",
+        "selectAllAnnotationsHotkeyName": "選取所有標註",
+        "deselectAllAnnotationsHotkeyName": "取消選取所有標註",
+        "resetZoomHotkeyName": "重設縮放"
     },
     "models": {
         "listingOptionsAriaLabel": "模型清單選項",

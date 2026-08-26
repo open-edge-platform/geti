@@ -43,7 +43,9 @@
         "importDatasetDialogAria": "import-dataset-dialog",
         "unexpectedError": "An unexpected error occurred. Please try again.",
         "networkError": "Network error. Please check your connection and try again.",
-        "export": "Export"
+        "export": "Export",
+        "or": "or",
+        "importPreparationError": "An error occurred during import preparation."
     },
     "nav": {
         "dataset": "Dataset",
@@ -467,7 +469,13 @@
         "anchorW": "West resize anchor",
         "noObject": "No object",
         "hotkeyPlaceholder": "Hotkey",
-        "magneticLassoFailed": "Failed to select the shape boundaries, could you please try again?"
+        "magneticLassoFailed": "Failed to select the shape boundaries, could you please try again?",
+        "redoHotkeyName": "Redo",
+        "deleteSelectedAnnotationHotkeyName": "Delete selected annotation",
+        "toggleAnnotationsHotkeyName": "Show or hide all annotations",
+        "selectAllAnnotationsHotkeyName": "Select all annotations",
+        "deselectAllAnnotationsHotkeyName": "Deselect all annotations",
+        "resetZoomHotkeyName": "Reset zoom"
     },
     "models": {
         "listingOptionsAriaLabel": "Model listing options",

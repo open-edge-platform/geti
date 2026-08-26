@@ -39,27 +39,33 @@ export const HotkeysList = () => {
             <Divider size='S' gridColumn={'1/-1'} />
             <HotkeyItem hotkeyName={t('annotator.undoHotkeyName')} hotkey={formatHotkeyForDisplay(HOTKEYS.undo)} />
             <HotkeyItem
-                hotkeyName={'Redo'}
-                hotkey={`${formatHotkeyForDisplay(HOTKEYS.redo)} or ${formatHotkeyForDisplay(HOTKEYS.redoAlt)}`}
+                hotkeyName={t('annotator.redoHotkeyName')}
+                hotkey={
+                    `${formatHotkeyForDisplay(HOTKEYS.redo)} ${t('common.or')} ` +
+                    `${formatHotkeyForDisplay(HOTKEYS.redoAlt)}`
+                }
             />
             <HotkeyItem
-                hotkeyName={'Delete selected annotation'}
+                hotkeyName={t('annotator.deleteSelectedAnnotationHotkeyName')}
                 hotkey={formatHotkeyForDisplay(HOTKEYS.deleteAnnotation)}
             />
             <HotkeyItem
-                hotkeyName={'Show or hide all annotations'}
+                hotkeyName={t('annotator.toggleAnnotationsHotkeyName')}
                 hotkey={formatHotkeyForDisplay(HOTKEYS.toggleAnnotationsVisibility)}
             />
             <HotkeyItem
-                hotkeyName={'Select all annotations'}
+                hotkeyName={t('annotator.selectAllAnnotationsHotkeyName')}
                 hotkey={formatHotkeyForDisplay(HOTKEYS.selectAllAnnotations)}
             />
             <HotkeyItem
-                hotkeyName={'Deselect all annotations'}
+                hotkeyName={t('annotator.deselectAllAnnotationsHotkeyName')}
                 hotkey={formatHotkeyForDisplay(HOTKEYS.deselectAllAnnotations)}
             />
             <Divider size='S' gridColumn={'1/-1'} />
-            <HotkeyItem hotkeyName={'Reset zoom'} hotkey={formatHotkeyForDisplay(HOTKEYS.fitToScreen)} />
+            <HotkeyItem
+                hotkeyName={t('annotator.resetZoomHotkeyName')}
+                hotkey={formatHotkeyForDisplay(HOTKEYS.fitToScreen)}
+            />
         </Grid>
     );
 };

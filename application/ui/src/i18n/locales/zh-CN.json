@@ -43,7 +43,9 @@
         "importDatasetDialogAria": "导入数据集对话框",
         "unexpectedError": "发生意外错误。请重试。",
         "networkError": "网络错误。请检查网络连接后重试。",
-        "export": "导出"
+        "export": "导出",
+        "or": "或",
+        "importPreparationError": "导入准备过程中发生错误。"
     },
     "nav": {
         "dataset": "数据集",
@@ -453,7 +455,13 @@
         "anchorW": "西缩放点",
         "noObject": "无对象",
         "hotkeyPlaceholder": "快捷键",
-        "magneticLassoFailed": "选择形状边界失败，请重试。"
+        "magneticLassoFailed": "选择形状边界失败，请重试。",
+        "redoHotkeyName": "重做",
+        "deleteSelectedAnnotationHotkeyName": "删除选中的标注",
+        "toggleAnnotationsHotkeyName": "显示或隐藏所有标注",
+        "selectAllAnnotationsHotkeyName": "选择所有标注",
+        "deselectAllAnnotationsHotkeyName": "取消选择所有标注",
+        "resetZoomHotkeyName": "重置缩放"
     },
     "models": {
         "listingOptionsAriaLabel": "模型列表选项",

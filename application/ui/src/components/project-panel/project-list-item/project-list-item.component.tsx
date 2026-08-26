@@ -3,6 +3,7 @@
 
 import type { Project } from '@/api/types';
 import { Badge, Flex, Text } from '@geti-ui/ui';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { paths } from '../../../constants/paths';
@@ -32,6 +33,7 @@ export const ProjectListItem = ({
     onEnableBlocked,
 }: ProjectListItemProps) => {
     const navigate = useNavigate();
+    useTranslation();
 
     const taskType = getProjectTypeTitle(project.task);
 

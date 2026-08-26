@@ -49,7 +49,7 @@ export const PrepareImportDataset = ({
                     size={size}
                     fileName={fileName}
                     error={`${error?.detail ?? t('common.unknownError')}`}
-                    message={'An error occurred during import preparation.'}
+                    message={t('common.importPreparationError')}
                     stagedDatasetId={stagedDatasetId}
                     deleteEntry={deleteEntry}
                 />

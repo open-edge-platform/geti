@@ -11,8 +11,8 @@ import type {
     TrainingDevice,
 } from '@/api/types';
 import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
+import { useTranslation } from 'react-i18next';
 
-import { i18n } from '../../../i18n';
 import { useGetTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
 import { useGetSuccessfulModels } from '../hooks/api/use-get-models.hook';
 import { useGetTrainingDevices } from './api/use-get-training-devices';
@@ -58,11 +58,12 @@ type TrainModelProviderProps = {
 };
 
 const useDatasetRevisions = () => {
+    const { t } = useTranslation();
     const { data: datasetRevisions } = useGetDatasetRevisions();
 
     return {
         datasetRevisions: [
-            { id: 'use-current-dataset-revision', name: i18n.t('models.useCurrentDataset'), value: null },
+            { id: 'use-current-dataset-revision', name: t('models.useCurrentDataset'), value: null },
             ...(datasetRevisions?.map(({ id, name }) => ({ id, name, value: String(id) })) ?? []),
         ],
     };
@@ -70,13 +71,14 @@ const useDatasetRevisions = () => {
 
 const DEFAULT_PRE_TRAINED_WEIGHTS = 'default-pre-trained-weights';
 const useModelRevisions = () => {
+    const { t } = useTranslation();
     const { data: models } = useGetSuccessfulModels();
 
     return {
         modelRevisions: [
             {
                 id: DEFAULT_PRE_TRAINED_WEIGHTS,
-                name: i18n.t('models.defaultPretrainedWeights'),
+                name: t('models.defaultPretrainedWeights'),
                 architecture: '',
                 value: null,
             },

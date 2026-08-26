@@ -1,10 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { PointerEvent, useCallback } from 'react';
+import { PointerEvent, useCallback, useMemo } from 'react';
 
 import { useTranslation } from 'react-i18next';
-import { v4 as uuid } from 'uuid';
 
 import { useZoom } from '../../../../components/zoom/zoom.provider';
 import { useLabelResolver } from '../../../../shared/annotator/labels';
@@ -32,6 +31,8 @@ const getLabelText = (label: AnnotationLabel) => {
     return `${label.name} ${isPrediction(label) ? formatPredictionScore(label.probability) : ''}`.trim();
 };
 
+const PLACEHOLDER_LABEL_ID = 'placeholder-no-label';
+
 export const AnnotationLabels = ({
     labels,
     onRemove,
@@ -39,12 +40,15 @@ export const AnnotationLabels = ({
     isRemovable = true,
 }: AnnotationLabelsProps) => {
     const { t } = useTranslation();
-    const placeholderLabel = {
-        id: uuid(),
-        name: t('annotator.noLabel'),
-        color: 'var(--annotation-fill)',
-        isPrediction: false,
-    };
+    const placeholderLabel = useMemo(
+        () => ({
+            id: PLACEHOLDER_LABEL_ID,
+            name: t('annotator.noLabel'),
+            color: 'var(--annotation-fill)',
+            isPrediction: false,
+        }),
+        [t]
+    );
     const { scale } = useZoom();
     const { resolveAnnotationLabel } = useLabelResolver();
 
