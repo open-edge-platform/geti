@@ -18,6 +18,15 @@
     }
 }
 
+.imgHidden {
+    visibility: hidden;
+}
+
+.skeleton {
+    inset: 0;
+    position: absolute;
+}
+
 .videoIndicator {
     color: var(--spectrum-global-color-gray-900);
     padding: var(--spectrum-global-dimension-size-50);
