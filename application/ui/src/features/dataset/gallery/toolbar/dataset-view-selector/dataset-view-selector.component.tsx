@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Content, Dialog, DialogContainer, DialogTrigger, Flex, PressableElement, Text, View } from '@geti-ui/ui';
 import { ChevronDownSmall } from '@geti-ui/ui/icons';
@@ -14,15 +14,16 @@ import { DatasetViewItemsList } from './dataset-view-items-list/dataset-view-ite
 import { DeleteDatasetViewDialog } from './delete-dataset-view.component';
 import { RenameDatasetView } from './rename-dataset-view.component';
 import { DatasetView } from './type';
+import { ENTIRE_DATASET_NAME } from './util';
 
 import classes from './dataset-view-selector.module.scss';
 
 type DatasetViewsTriggerProps = {
-    selectedDatasetView: DatasetView;
+    selectedDatasetViewName: string;
     isDisabled: boolean;
 };
 
-const DatasetViewsTrigger = ({ selectedDatasetView, isDisabled }: DatasetViewsTriggerProps) => {
+const DatasetViewsTrigger = ({ selectedDatasetViewName, isDisabled }: DatasetViewsTriggerProps) => {
     return (
         <PressableElement isDisabled={isDisabled}>
             <div
@@ -41,7 +42,7 @@ const DatasetViewsTrigger = ({ selectedDatasetView, isDisabled }: DatasetViewsTr
                     })}
                 >
                     <Flex alignItems={'center'} gap={'size-200'}>
-                        <Text UNSAFE_className={classes.datasetViewName}>{selectedDatasetView.name}</Text>
+                        <Text UNSAFE_className={classes.datasetViewName}>{selectedDatasetViewName}</Text>
 
                         <ChevronDownSmall />
                     </Flex>
@@ -55,21 +56,13 @@ type DatasetViewSelectorProps = {
     datasetViews: DatasetView[];
 };
 
-const ENTIRE_DATASET: DatasetView = {
-    id: ENTIRE_DATASET_VIEW_ID,
-    name: 'Entire dataset',
-};
-
 export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) => {
     const [isDatasetViewSelectorOpen, setIsDatasetViewSelectorOpen] = useState<boolean>(false);
     const { setSelectedKeys } = useSelectedData();
 
-    const datasetViewsWithDefaultView = useMemo(() => {
-        return [ENTIRE_DATASET, ...datasetViews];
-    }, [datasetViews]);
-
     const [datasetViewId, setDatasetViewId] = useDatasetViewId();
-    const selectedDatasetView = datasetViewsWithDefaultView.find((item) => item.id === datasetViewId) ?? ENTIRE_DATASET;
+    const selectedDatasetViewName =
+        datasetViews.find((view) => view.id === datasetViewId)?.name ?? ENTIRE_DATASET_NAME;
 
     const [datasetViewToBeDeleted, setDatasetViewToBeDeleted] = useState<DatasetView | null>(null);
     const [datasetViewToBeRenamed, setDatasetViewToBeRenamed] = useState<DatasetView | null>(null);
@@ -100,12 +93,12 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
     // When the datasetViewId is invalid, i.e. not found in the datasetViews array, set it to the default view id.
     // TODO: Once backend is ready, check if we can remove `useEffect`.
     useEffect(() => {
-        if (!datasetViewsWithDefaultView.some(({ id }) => id === datasetViewId)) {
+        if (datasetViewId !== ENTIRE_DATASET_VIEW_ID && !datasetViews.some(({ id }) => id === datasetViewId)) {
             setDatasetViewId(ENTIRE_DATASET_VIEW_ID);
         }
-    }, [datasetViewId, datasetViewsWithDefaultView, setDatasetViewId]);
+    }, [datasetViewId, datasetViews, setDatasetViewId]);
 
-    const selectDatasetView = (id: string) => {
+    const selectDatasetView = (id: string | null) => {
         if (id === datasetViewId) return;
 
         setDatasetViewId(id);
@@ -124,11 +117,13 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
                 isOpen={isDatasetViewSelectorOpen}
                 onOpenChange={setIsDatasetViewSelectorOpen}
             >
-                <DatasetViewsTrigger selectedDatasetView={selectedDatasetView} isDisabled={onlyEntireDatasetView} />
+                <DatasetViewsTrigger
+                    selectedDatasetViewName={selectedDatasetViewName}
+                    isDisabled={onlyEntireDatasetView}
+                />
                 <Dialog>
                     <Content>
                         <DatasetViewItemsList
-                            entireDatasetView={ENTIRE_DATASET}
                             otherDatasetViews={datasetViews}
                             selectedDatasetViewId={datasetViewId}
                             onOpenDeleteConfirmationDialog={openDeleteConfirmationDialog}

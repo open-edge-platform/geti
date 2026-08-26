@@ -16,10 +16,6 @@ const useUnassignMediaFromView = () => {
     const unassignFromViewMutation = useUnassignMediaFromViewMutation();
 
     const unassignMediaFromView = (datasetViewId: string, selectedMediaIds: string[]) => {
-        if (datasetViewId === ENTIRE_DATASET_VIEW_ID) {
-            return;
-        }
-
         unassignFromViewMutation.mutate(
             {
                 params: {
@@ -77,10 +73,6 @@ const UnassignMediaButton = ({ selectedMediaIds, datasetViewId }: UnassignMediaB
     const { unassignMediaFromView, isPending } = useUnassignMediaFromView();
 
     const unassignMedia = async () => {
-        if (datasetViewId === ENTIRE_DATASET_VIEW_ID) {
-            return;
-        }
-
         unassignMediaFromView(datasetViewId, selectedMediaIds);
     };
 

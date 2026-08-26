@@ -20,8 +20,8 @@ export const useDatasetMediaWithReviewStatus = () => {
         labelIds: isEmpty(selectedLabelIds) ? undefined : selectedLabelIds,
         startDate: startDate ?? undefined,
         endDate: endDate ?? undefined,
+        datasetViewId: datasetViewId ?? undefined,
         sortDirection,
-        datasetViewId,
         subsets,
     });
 
@@ -30,8 +30,8 @@ export const useDatasetMediaWithReviewStatus = () => {
         labelIds: isEmpty(selectedLabelIds) ? undefined : selectedLabelIds,
         startDate: startDate ?? undefined,
         endDate: endDate ?? undefined,
+        datasetViewId: datasetViewId ?? undefined,
         sortDirection,
-        datasetViewId,
         subsets,
     });
 

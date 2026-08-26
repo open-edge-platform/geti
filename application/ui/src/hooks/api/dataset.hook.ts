@@ -6,7 +6,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-const datasetStatisticsQueryOptions = (projectId: string, datasetViewId?: string) =>
+const datasetStatisticsQueryOptions = (projectId: string, datasetViewId: string | null) =>
     $api.queryOptions('get', '/api/projects/{project_id}/dataset/statistics', {
         params: {
             path: { project_id: projectId },
