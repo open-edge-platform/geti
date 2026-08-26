@@ -1,6 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { match } from '@formatjs/intl-localematcher';
 import { createInstance, type i18n as I18n } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
@@ -11,28 +12,29 @@ import zhHK from './locales/zh-HK.json';
 import zhMO from './locales/zh-MO.json';
 import zhTW from './locales/zh-TW.json';
 
+const SUPPORTED_LANGUAGES = ['en', 'zh-CN', 'zh-TW', 'zh-HK', 'zh-MO'];
+
 export const resources = {
     en: { translation: en },
     'zh-CN': { translation: zhCN },
     'zh-HK': { translation: zhHK },
     'zh-MO': { translation: zhMO },
     'zh-TW': { translation: zhTW },
-} as const;
+};
 
 export const LANGUAGE_STORAGE_KEY = 'geti-language';
 
-/** Maps any detected `zh*` language tag to one of the supported Chinese locales. */
-const normalizeChineseLanguage = (language: string): string => {
-    const lower = language.toLowerCase();
-    const isTraditional = lower.includes('hant') || /^zh-(tw|hk|mo)/.test(lower);
+const resolveLanguage = (language: string): string => {
+    if (!language || typeof language !== 'string') return 'en';
 
-    if (!isTraditional) {
-        return 'zh-CN';
+    const trimmed = language.trim();
+    if (trimmed === '') return 'en';
+
+    try {
+        return match([trimmed], SUPPORTED_LANGUAGES, 'en');
+    } catch {
+        return 'en';
     }
-
-    if (lower.includes('-hk')) return 'zh-HK';
-    if (lower.includes('-mo')) return 'zh-MO';
-    return 'zh-TW';
 };
 
 const i18next = createInstance();
@@ -44,17 +46,16 @@ if (!i18next.isInitialized) {
         .init({
             resources,
             fallbackLng: {
-                'zh-MO': ['zh-HK'],
-                'zh-HK': ['zh-TW'],
+                'zh-MO': ['zh-HK', 'zh-TW', 'en'],
+                'zh-HK': ['zh-TW', 'en'],
                 default: ['en'],
             },
-            supportedLngs: ['en', 'zh-CN', 'zh-TW', 'zh-HK', 'zh-MO'],
+            supportedLngs: [...SUPPORTED_LANGUAGES],
             detection: {
                 order: ['localStorage', 'navigator'],
                 lookupLocalStorage: LANGUAGE_STORAGE_KEY,
                 caches: ['localStorage'],
-                convertDetectedLanguage: (language) =>
-                    language.toLowerCase().startsWith('zh') ? normalizeChineseLanguage(language) : language,
+                convertDetectedLanguage: (language) => resolveLanguage(language),
             },
             interpolation: { escapeValue: false },
             react: { useSuspense: false },
