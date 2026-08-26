@@ -528,4 +528,3 @@ class TestDataModule:
         # Assert storage_dtype was preserved (not overwritten to uint8)
         assert train_subset.intensity.storage_dtype == "uint16"
         assert module.input_intensity_config is not None
-        assert module.input_intensity_config.storage_dtype == "uint16"

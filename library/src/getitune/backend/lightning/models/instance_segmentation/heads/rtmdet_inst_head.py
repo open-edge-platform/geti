@@ -1003,12 +1003,16 @@ class RTMDetInstHead(RTMDetHead):
             1,
         )
 
-        # Convert polygon masks to bitmap masks
+        # Convert polygon masks to bitmap masks.
         if isinstance(batch_gt_instances[0].masks, np.ndarray):
-            for gt_instances, img_meta in zip(batch_gt_instances, batch_img_metas):
-                ndarray_masks = polygon_to_bitmap(gt_instances.masks, *img_meta["img_shape"])
+            batch_shape = (
+                max(img_meta["img_shape"][0] for img_meta in batch_img_metas),
+                max(img_meta["img_shape"][1] for img_meta in batch_img_metas),
+            )
+            for gt_instances in batch_gt_instances:
+                ndarray_masks = polygon_to_bitmap(gt_instances.masks, *batch_shape)
                 if len(ndarray_masks) == 0:
-                    ndarray_masks = np.empty((0, *img_meta["img_shape"]), dtype=np.uint8)
+                    ndarray_masks = np.empty((0, *batch_shape), dtype=np.uint8)
                 gt_instances.masks = torch.tensor(ndarray_masks, dtype=torch.bool, device=device)
 
         num_imgs = len(batch_img_metas)
