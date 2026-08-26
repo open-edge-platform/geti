@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import logging
 import shutil
 import subprocess
 import time
@@ -35,6 +36,7 @@ from getitrack.algorithms.configs.botsort import BotSortConfig
 from getitrack.config import GMCConfig, GMCMethod, LifecycleConfig, ReIDBackend, ReIDConfig
 from getitrack.core.detection import Detections, TrackedDetections
 
+_LOGGER = logging.getLogger(__name__)
 _RESULTS_ROOT = Path(__file__).resolve().parents[1] / "results" / "botsort_reid_demo"
 
 
@@ -141,7 +143,7 @@ def run(args: argparse.Namespace) -> None:
         raw_path.unlink(missing_ok=True)
     else:
         final_path = raw_path
-        print("WARNING: ffmpeg not found or failed; leaving mp4v output (may not play in some viewers).")
+        _LOGGER.warning("ffmpeg not found or failed; leaving mp4v output (may not play in some viewers).")
 
     with (out_dir / "frames.csv").open("w", newline="") as handle:
         fieldnames = ["frame", "detections", "tracks", "warp_tx", "warp_ty"]
