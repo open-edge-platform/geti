@@ -105,12 +105,14 @@ const GalleryList = ({
                                 height={'size-200'}
                                 alignItems={'center'}
                                 justifyContent={'center'}
-                                UNSAFE_style={{ margin: dimensionValue('size-150') }}
+                                // Clicks fall through to the grid item so the checkbox area follows the same
+                                // replace/ctrl/shift selection semantics as clicking anywhere else on the item.
+                                UNSAFE_style={{ margin: dimensionValue('size-150'), pointerEvents: 'none' }}
                             >
                                 <Checkbox
                                     aria-label={`Select media item ${item.id}`}
-                                    onChange={() => toggleSelectedKeys([String(item.id)])}
                                     isSelected={selected}
+                                    isReadOnly
                                 />
                             </Flex>
                         )}
