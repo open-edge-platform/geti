@@ -28,25 +28,17 @@ export const NewProjectCard = () => {
     };
 
     return (
-        <Flex gap={'size-300'}>
-            <View UNSAFE_className={classes.card} flex={1}>
+        <Flex gap={'size-300'} height={'100%'}>
+            <View UNSAFE_className={classes.card}>
                 <ActionButton onPress={handleCreateProject} UNSAFE_className={classes.buttonText}>
                     <AddCircle />
-                    <Text>
-                        Create
-                        <br />
-                        new project
-                    </Text>
+                    <Text>Create new project</Text>
                 </ActionButton>
             </View>
-            <View UNSAFE_className={classes.card} flex={1}>
+            <View UNSAFE_className={classes.card}>
                 <ActionButton onPress={handleCreateFromDataset} UNSAFE_className={classes.buttonText}>
                     <AddCircle />
-                    <Text>
-                        Create
-                        <br />
-                        project from dataset
-                    </Text>
+                    <Text>Create project from dataset</Text>
                 </ActionButton>
             </View>
             <ImportDatasetAsNewProject dialogState={datasetImportDialogState} />

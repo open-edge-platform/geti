@@ -1,19 +1,11 @@
 .card {
     height: 100%;
-    display: flex;
-    border: 1px dashed var(--spectrum-gray-700) !important;
-    border-radius: var(--spectrum-alias-border-radius-regular);
-    gap: var(--spectrum-global-dimension-size-10);
 
     button {
-        flex: 1;
         height: 100%;
-        display: flex;
-        align-items: center;
-        flex-direction: column;
-        justify-content: center;
+        padding: var(--spectrum-global-dimension-size-250);
         background-color: var(--spectrum-global-color-gray-300);
-        gap: var(--spectrum-global-dimension-size-200);
+        gap: var(--spectrum-global-dimension-size-125);
     }
 }
 
