@@ -248,7 +248,7 @@ class TestStateAccessors:
 
     def test_tracked_objects_includes_coasted_lost_track(self):
         bt, out2 = _mixed_state_tracker()
-        to = bt.tracked_objects()
+        to = bt.tracked_objects
         assert to.det_indices is not None
         rows = {int(tid): i for i, tid in enumerate(to.track_ids)}
         # ACTIVE and LOST are both emitted; TENTATIVE (id 3) is not.
@@ -277,11 +277,11 @@ class TestStateAccessors:
             bt.update(_dets([[200, 200, 240, 240]], [0.9], frame_id=f))
         live_ids = {t.track_id for t in bt.tracks}
         assert 1 not in live_ids
-        assert 1 not in bt.tracked_objects().track_ids.tolist()
+        assert 1 not in bt.tracked_objects.track_ids.tolist()
 
     def test_tracked_objects_dtypes_and_shape_match_update(self):
         bt, out2 = _mixed_state_tracker()
-        to = bt.tracked_objects()
+        to = bt.tracked_objects
         assert to.det_indices is not None
         assert to.bboxes.dtype == out2.bboxes.dtype == np.float32
         assert to.scores.dtype == out2.scores.dtype == np.float32
@@ -293,7 +293,7 @@ class TestStateAccessors:
 
     def test_tracked_objects_before_any_frame_is_empty(self):
         bt = ByteTrackTracker(ByteTrackConfig())
-        to = bt.tracked_objects()
+        to = bt.tracked_objects
         assert len(to) == 0
         assert to.det_indices is not None
         assert to.det_indices.dtype == np.int64
@@ -306,7 +306,7 @@ class TestStateAccessors:
         bt = ByteTrackTracker(ByteTrackConfig())
         box = np.array([0, 0, 40, 40], dtype=np.float32)
         bt._tracks = {1: Track(track_id=1, class_id=0, bbox=box, score=0.9, state=TrackState.TENTATIVE)}
-        to = bt.tracked_objects()
+        to = bt.tracked_objects
         assert len(to) == 0
         assert to.det_indices is not None
         assert len(to.det_indices) == 0
@@ -319,7 +319,7 @@ class TestStateAccessors:
         bt = ByteTrackTracker(cfg)
         dets = _dets([[10, 10, 50, 50], [100, 100, 140, 140]], [0.9, 0.9], frame_id=0, class_ids=[0, 5])
         out = bt.update(dets)
-        to = bt.tracked_objects()
+        to = bt.tracked_objects
         assert out.det_indices is not None
         assert to.det_indices is not None
         # The single tracked object came from input row 1 in both views.
@@ -335,7 +335,7 @@ class TestStateAccessors:
         assert bt._tracks[1].state == TrackState.LOST
         bt.update(_dets([[22, 22, 62, 62]], [0.9], frame_id=3))
         assert bt._tracks[1].state == TrackState.ACTIVE
-        to = bt.tracked_objects()
+        to = bt.tracked_objects
         assert to.det_indices is not None
         rows = {int(tid): i for i, tid in enumerate(to.track_ids)}
         recovered_row = rows[1]
@@ -347,7 +347,7 @@ class TestStateAccessors:
         bt, _ = _mixed_state_tracker()
 
         def lost_x1() -> float:
-            to = bt.tracked_objects()
+            to = bt.tracked_objects
             rows = {int(tid): i for i, tid in enumerate(to.track_ids)}
             return float(to.bboxes[rows[1]][0])
 

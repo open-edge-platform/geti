@@ -20,6 +20,7 @@ import numpy as np
 from getitrack.config import TrackerConfig
 from getitrack.core.detection import TrackedDetections
 from getitrack.core.registry import ALGORITHM_REGISTRY, resolve_tracker_config
+from getitrack.core.track import TrackState
 from getitrack.logger import enable_logging
 
 _LOGGER = logging.getLogger(__name__)
@@ -48,6 +49,11 @@ class BaseTracker(ABC, Generic[ConfigT]):
     config_cls: ClassVar[type[TrackerConfig]]
     config: ConfigT
 
+    # Populated by every concrete tracker's ``__init__`` (see subclasses); the
+    # shared accessors below read them, so they are declared on the base.
+    _tracks: dict[int, Track]
+    _frame_det_index: dict[int, int]
+
     def __init__(self, config: ConfigT) -> None:
         self.config = config
         self._next_id: int = 1
@@ -75,6 +81,41 @@ class BaseTracker(ABC, Generic[ConfigT]):
         if self.config.verbose:
             self._log_update(filtered, tracked)
         return tracked
+
+    @property
+    def tracks(self) -> list[Track]:
+        """Return the tracker's current tracks across all lifecycle states.
+
+        Returns the live `Track` objects (TENTATIVE, ACTIVE, LOST) in insertion
+        order; REMOVED tracks are already pruned. The returned list is a fresh
+        copy, but the `Track` objects are shared: mutating them mutates tracker
+        state.
+        """
+        return list(self._tracks.values())
+
+    @property
+    def tracked_objects(self) -> TrackedDetections:
+        """Return the confirmed-alive tracks for the last processed frame.
+
+        Includes ACTIVE tracks and coasted LOST tracks still within ``max_age``;
+        excludes TENTATIVE and REMOVED tracks. Row contents:
+
+        - ACTIVE rows match the `update` output, detection box included.
+        - LOST rows carry the predicted box for this frame with ``det_index``
+          -1; their score and class are the last observed values.
+
+        ``det_indices`` index into the unfiltered detections of the last
+        processed frame even when a ``class_filter`` is set.
+
+        Returns:
+            A `TrackedDetections` for the last processed frame, or an empty one
+            (with an empty int64 ``det_indices``) if no frame has run yet.
+        """
+        frame_id = self._frame_id if self._frame_id is not None else 0
+        alive = [t for t in self._tracks.values() if t.state in {TrackState.ACTIVE, TrackState.LOST}]
+        # _frame_det_index holds filtered-space rows; remap to unfiltered input rows.
+        det_indices = [self._frame_det_index.get(t.track_id, -1) for t in alive]
+        return self._remap_to_input_rows(self._compose_tracked_detections(alive, det_indices, frame_id))
 
     def _remap_to_input_rows(self, tracked: TrackedDetections) -> TrackedDetections:
         """Remap ``det_indices`` from the last frame's filtered space to input rows.

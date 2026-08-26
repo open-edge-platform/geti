@@ -56,6 +56,24 @@ class TestSingleObject:
         assert idx[1] == 1
 
 
+class TestAccessors:
+    def test_tracks_and_tracked_objects_after_update(self, fast_confirm):
+        sort = SortTracker(fast_confirm)
+        for f in range(3):
+            sort.update(_dets([[10, 10, 50, 50]], [0.9], frame_id=f))
+        assert [t.track_id for t in sort.tracks] == [1]
+        to = sort.tracked_objects
+        assert to.track_ids.tolist() == [1]
+        assert to.det_indices is not None
+
+    def test_tracked_objects_before_any_frame_is_empty(self):
+        sort = SortTracker(SortConfig())
+        to = sort.tracked_objects
+        assert len(to) == 0
+        assert to.det_indices is not None
+        assert sort.tracks == []
+
+
 class TestScoreGate:
     def test_detection_at_or_below_score_threshold_is_dropped(self):
         cfg = SortConfig(score_threshold=0.5, lifecycle=LifecycleConfig(min_hits=1))

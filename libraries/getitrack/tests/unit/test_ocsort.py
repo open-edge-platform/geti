@@ -58,6 +58,24 @@ class TestSingleObject:
         assert idx[1] == 1
 
 
+class TestAccessors:
+    def test_tracks_and_tracked_objects_after_update(self, fast_confirm):
+        ocs = OCSortTracker(fast_confirm)
+        for f in range(3):
+            ocs.update(_dets([[10, 10, 50, 50]], [0.9], frame_id=f))
+        assert [t.track_id for t in ocs.tracks] == [1]
+        to = ocs.tracked_objects
+        assert to.track_ids.tolist() == [1]
+        assert to.det_indices is not None
+
+    def test_tracked_objects_before_any_frame_is_empty(self):
+        ocs = OCSortTracker(OCSortConfig())
+        to = ocs.tracked_objects
+        assert len(to) == 0
+        assert to.det_indices is not None
+        assert ocs.tracks == []
+
+
 class TestRecovery:
     def test_first_pass_recovers_track_near_predicted_trajectory(self, fast_confirm):
         # Object seen, gone for 3 frames, reappears on its trajectory: the

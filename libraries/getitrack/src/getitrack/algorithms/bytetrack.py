@@ -291,37 +291,3 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
         active = [t for t in self._tracks.values() if t.state == TrackState.ACTIVE]
         det_indices = [self._frame_det_index.get(t.track_id, -1) for t in active]
         return self._compose_tracked_detections(active, det_indices, frame_id)
-
-    @property
-    def tracks(self) -> list[Track]:
-        """Return the tracker's current tracks across all lifecycle states.
-
-        Returns the live `Track` objects (TENTATIVE, ACTIVE, LOST) in insertion
-        order; REMOVED tracks are already pruned. The returned list is a fresh
-        copy, but the `Track` objects are shared: mutating them mutates tracker
-        state.
-        """
-        return list(self._tracks.values())
-
-    def tracked_objects(self) -> TrackedDetections:
-        """Return the confirmed-alive tracks for the last processed frame.
-
-        Includes ACTIVE tracks and coasted LOST tracks still within ``max_age``;
-        excludes TENTATIVE and REMOVED tracks. Row contents:
-
-        - ACTIVE rows match the `update` output, detection box included.
-        - LOST rows carry the Kalman-predicted box for this frame with
-          ``det_index`` -1; their score and class are the last observed values.
-
-        ``det_indices`` index into the unfiltered detections of the last
-        processed frame even when a ``class_filter`` is set.
-
-        Returns:
-            A `TrackedDetections` for the last processed frame, or an empty one
-            (with an empty int64 ``det_indices``) if no frame has run yet.
-        """
-        frame_id = self._frame_id if self._frame_id is not None else 0
-        alive = [t for t in self._tracks.values() if t.state in {TrackState.ACTIVE, TrackState.LOST}]
-        # _frame_det_index holds filtered-space rows; remap to unfiltered input rows.
-        det_indices = [self._frame_det_index.get(t.track_id, -1) for t in alive]
-        return self._remap_to_input_rows(self._compose_tracked_detections(alive, det_indices, frame_id))
