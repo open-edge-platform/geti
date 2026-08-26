@@ -65,8 +65,10 @@ def fuse_appearance_cost(
     is at or above ``iou_floor`` and the appearance cost is present (not
     ``NaN``). There the fused cost is the convex combination
     ``(1 - appearance_weight) * iou_cost + appearance_weight * appearance_cost``.
-    Every other cell falls back to the plain ``iou_cost``; the gate never writes
-    an unmatchable sentinel.
+    Every other cell falls back to the plain ``iou_cost``, so appearance never
+    rescues a below-floor (low-overlap) pair. Above the floor a disagreeing
+    appearance raises the fused cost and can reject a pair that IoU alone would
+    match; the gate itself never writes an unmatchable sentinel.
 
     Args:
         iou_cost: ``(T, N)`` IoU cost matrix (``1 - IoU``).
