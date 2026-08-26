@@ -81,11 +81,9 @@ const ProjectGrid = () => {
                     </Flex>
                 </Flex>
             )}
-            {sortedProjects.length === 0 ? (
-                isFiltering ? (
-                    <NoMatchingProjects />
-                ) : null
-            ) : (
+            {isFiltering && sortedProjects.length === 0 && <NoMatchingProjects />}
+
+            {(activeProject !== undefined || sortedProjects.length > 0) && (
                 <Grid
                     flex={1}
                     gap={'size-300'}
