@@ -1,8 +1,5 @@
 @use '../../../shared/styles/line-clamp' as lineClamp;
 
-$one-column: 848px;
-$card-min-width: 380px;
-
 .content {
     padding: 0 var(--spectrum-global-dimension-size-500);
 }
@@ -10,15 +7,13 @@ $card-min-width: 380px;
 .newProjectRow {
     height: var(--spectrum-global-dimension-size-900);
 
-    @media (max-width: $one-column) {
+    @media (max-width: 848px) {
         height: var(--spectrum-global-dimension-size-800);
     }
 }
 
 .projectGrid {
     overflow-y: auto;
-    // `min()` prevents overflow when the container is narrower than one card
-    grid-template-columns: repeat(auto-fit, minmax(min($card-min-width, 100%), 1fr));
 }
 
 .card {

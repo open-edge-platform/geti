@@ -50,6 +50,8 @@ const ProjectGrid = () => {
     const countLabel = isFiltering
         ? `${sortedProjects.length} of ${totalCount} ${countUnit}`
         : `${totalCount} ${countUnit}`;
+    const cardMinWidth = 480;
+    const visibleCardsCount = (activeProject === undefined ? 0 : 1) + sortedProjects.length;
 
     return (
         <Flex direction={'column'} gap={'size-300'} height={'100%'}>
@@ -83,12 +85,16 @@ const ProjectGrid = () => {
             )}
             {isFiltering && sortedProjects.length === 0 && <NoMatchingProjects />}
 
-            {(activeProject !== undefined || sortedProjects.length > 0) && (
+            {visibleCardsCount > 0 && (
                 <Grid
                     flex={1}
                     gap={'size-300'}
                     autoRows={'size-2000'}
-                    justifyContent={'center'}
+                    columns={
+                        visibleCardsCount === 1
+                            ? `minmax(min(${cardMinWidth}px, 100%), .5fr)`
+                            : `repeat(auto-fit, minmax(min(${cardMinWidth}px, 100%), 1fr))`
+                    }
                     UNSAFE_className={classes.projectGrid}
                 >
                     {activeProject !== undefined && (
