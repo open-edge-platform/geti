@@ -39,6 +39,11 @@ reid = [
     "torch>=2.0",
     "torchvision>=0.15",
     "torchreid>=0.2.5",
+    # torchreid 0.2.5 imports gdown eagerly at package load and calls it to fetch
+    # pretrained weights, but declares it too loosely to lock. Its other eager
+    # import, torch.utils.tensorboard, is stubbed in _torchreid_compat so the
+    # training-only tensorboard package is not required for inference.
+    "gdown>=4.0",
 ]
 
 [dependency-groups]

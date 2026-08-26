@@ -43,7 +43,7 @@ class Descriptors(Protocol):
 class FeatureExtractorLike(Protocol):
     """Minimal view of torchreid's ``FeatureExtractor``: callable on a crop list."""
 
-    def __call__(self, images: list[np.ndarray]) -> Descriptors:
+    def __call__(self, images: list[np.ndarray], /) -> Descriptors:
         """Embed each ``(H, W, 3)`` RGB crop into a ``(N, D)`` descriptor batch."""
 
 
@@ -77,7 +77,10 @@ class TorchReIDProvider(ReIDProvider):
         if extractor is not None:
             self._extractor: FeatureExtractorLike = extractor
             return
-        # Import torchreid lazily.
+        # Import torchreid lazily, stubbing its training-only tensorboard import.
+        from getitrack.reid._torchreid_compat import ensure_torchreid_importable
+
+        ensure_torchreid_importable()
         from torchreid.reid.utils import FeatureExtractor
 
         self._extractor = FeatureExtractor(

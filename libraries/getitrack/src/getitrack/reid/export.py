@@ -69,9 +69,13 @@ def export_torchreid_to_openvino(
     if xml_path.exists():
         return xml_path
 
-    # Import torch/torchreid/openvino lazily.
+    # Import torch/torchreid/openvino lazily, stubbing torchreid's tensorboard import.
     import openvino as ov
     import torch
+
+    from getitrack.reid._torchreid_compat import ensure_torchreid_importable
+
+    ensure_torchreid_importable()
     from torchreid.reid.utils import FeatureExtractor
 
     height, width = input_size
