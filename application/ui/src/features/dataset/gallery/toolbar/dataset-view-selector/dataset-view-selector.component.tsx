@@ -9,6 +9,7 @@ import { clsx } from 'clsx';
 import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { isEmpty } from 'lodash-es';
 
+import { useSelectedData } from '../../../providers/selected-data-provider.component';
 import { DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
 import { DeleteDatasetViewDialog } from './delete-dataset-view.component';
 import { RenameDatasetView } from './rename-dataset-view.component';
@@ -61,6 +62,7 @@ const ENTIRE_DATASET: DatasetView = {
 
 export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) => {
     const [isDatasetViewSelectorOpen, setIsDatasetViewSelectorOpen] = useState<boolean>(false);
+    const { setSelectedKeys } = useSelectedData();
 
     const datasetViewsWithDefaultView = useMemo(() => {
         return [ENTIRE_DATASET, ...datasetViews];
@@ -103,9 +105,12 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
         }
     }, [datasetViewId, datasetViewsWithDefaultView, setDatasetViewId]);
 
-    const onSelectDatasetView = (id: string) => {
+    const selectDatasetView = (id: string) => {
+        if (id === datasetViewId) return;
+
         setDatasetViewId(id);
         setIsDatasetViewSelectorOpen(false);
+        setSelectedKeys(new Set());
     };
 
     return (
@@ -127,7 +132,7 @@ export const DatasetViewSelector = ({ datasetViews }: DatasetViewSelectorProps) 
                             otherDatasetViews={datasetViews}
                             selectedDatasetViewId={datasetViewId}
                             onOpenDeleteConfirmationDialog={openDeleteConfirmationDialog}
-                            onSelectDatasetView={onSelectDatasetView}
+                            onSelectDatasetView={selectDatasetView}
                             onOpenRenameDialog={openRenameDialog}
                         />
                     </Content>
