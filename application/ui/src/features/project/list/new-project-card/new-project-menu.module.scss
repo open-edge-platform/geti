@@ -1,14 +1,10 @@
-.card {
+.button {
     height: 100%;
+    padding: var(--spectrum-global-dimension-size-250);
+    background-color: var(--spectrum-global-color-gray-300);
+    gap: var(--spectrum-global-dimension-size-125);
 
-    button {
-        height: 100%;
-        padding: var(--spectrum-global-dimension-size-250);
-        background-color: var(--spectrum-global-color-gray-300);
-        gap: var(--spectrum-global-dimension-size-125);
+    span[class*='spectrum-ActionButton-label'] {
+        padding-inline-end: 0;
     }
-}
-
-.buttonText span[class*='spectrum-ActionButton-label'] {
-    padding-inline-end: 0;
 }
