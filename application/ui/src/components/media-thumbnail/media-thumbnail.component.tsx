@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import type { Media, MediaVideo } from '@/api/types';
 import { Flex, Skeleton } from '@geti-ui/ui';
+import { clsx } from 'clsx';
 
 import { useIsScrolling } from '../../hooks/use-is-scrolling.hook';
 import { isVideo } from '../../shared/media-item-utils';
@@ -69,7 +70,9 @@ export const MediaThumbnail = ({ onDoubleClick, onClick, url, alt, item }: Media
             <img
                 ref={imgRef}
                 alt={alt}
-                className={`${classes.img} ${isLoading ? classes.imgHidden : ''}`}
+                className={clsx(classes.img, {
+                    [classes.imgHidden]: isLoading,
+                })}
                 draggable={false}
                 decoding={'async'}
                 onLoad={() => setIsLoading(false)}
