@@ -15,6 +15,9 @@ import { PREDICTION_CHUNK_SIZE, PREDICTION_FRAME_SKIP } from '../video-player/ap
 import { getVideoFrameRangeIndexes } from '../video-player/api/utils';
 import { useVideoPlayerContext } from '../video-player/video-player-provider.component';
 
+// Prefix matching every prediction query of a project, so callers can cancel them all at once.
+export const getMediaPredictionsQueryKeyPrefix = (projectId: string) => [projectId, 'media-predictions'];
+
 export const mediaPredictionsQueryOptions = ({
     projectId,
     selectedModel,
