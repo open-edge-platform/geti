@@ -3,7 +3,7 @@
 
 import os
 from datetime import datetime
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile, status
@@ -591,7 +591,7 @@ def delete_media_annotation(
     dataset_service.delete_dataset_item_annotations(project=project, dataset_item_id=dataset_item_id)
 
 
-MEDIA_PREDICT_RESPONSES = {
+MEDIA_PREDICT_RESPONSES: dict[int | str, dict[str, Any]] = {
     status.HTTP_200_OK: {"description": "Media predictions are calculated"},
     status.HTTP_400_BAD_REQUEST: {
         "description": "Missing frame range, range is specified for non-video media, or media inference limit exceeded"
