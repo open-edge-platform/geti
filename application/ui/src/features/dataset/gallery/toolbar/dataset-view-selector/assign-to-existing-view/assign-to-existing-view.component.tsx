@@ -19,11 +19,14 @@ import {
 } from '@geti-ui/ui';
 import { Info } from '@geti-ui/ui/icons';
 import { useQueryClient } from '@tanstack/react-query';
-import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
+import { DATASET_VIEW_ID_PARAM, ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
+import { createSearchParams, Link, useLocation } from 'react-router-dom';
 
+import { toast } from '../../../../../../components/toast/toast.component';
 import { getQueryKey } from '../../../../../../query-client/query-client';
+import { pluralizeItems } from '../../../../../../shared/util';
 import { useAssignMediaToExistingDatasetView } from '../api/use-assign-media-to-existing-dataset-view';
 import { SelectedMediaCount } from '../selected-media-count/selected-media-count.component';
 import { DatasetView } from '../type';
@@ -174,13 +177,34 @@ export const AssignToExistingView = ({
     selectedMediaIds,
     resetSelectedMediaIds,
 }: AssignToExistingViewProps) => {
-    const [datasetViewId, setDatasetViewId] = useDatasetViewId();
+    const [datasetViewId] = useDatasetViewId();
     const [isAssignToExistingViewOpen, setIsAssignToExistingViewOpen] = useState<boolean>(false);
     const isAssignToExistingViewDisabled = isEmpty(datasetViews);
+    const location = useLocation();
 
     const closeDialog = (selectedDatasetViewId?: string) => {
         if (selectedDatasetViewId != null) {
-            setDatasetViewId(selectedDatasetViewId);
+            const selectedDatasetView = datasetViews.find((view) => view.id === selectedDatasetViewId);
+            const searchParams = createSearchParams(location.search);
+            searchParams.set(DATASET_VIEW_ID_PARAM, selectedDatasetViewId);
+
+            toast({
+                id: 'assign-dataset-view-id',
+                message: (
+                    <Flex alignItems={'center'} wrap={'wrap'}>
+                        <Text>
+                            Media {pluralizeItems(selectedMediaIds.length)} assigned successfully.{' '}
+                            <Link
+                                to={{ pathname: location.pathname, search: searchParams.toString() }}
+                                className={classes.link}
+                            >
+                                Open {selectedDatasetView?.name}
+                            </Link>
+                        </Text>
+                    </Flex>
+                ),
+                type: 'success',
+            });
             resetSelectedMediaIds();
         }
         setIsAssignToExistingViewOpen(false);
