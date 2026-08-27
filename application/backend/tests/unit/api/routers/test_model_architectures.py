@@ -144,8 +144,11 @@ class TestModelArchitecturesEndpoint:
         timm_card = next(arch for arch in data["model_architectures"] if arch["id"] == "image-classification-timm")
 
         assert timm_card["task"] == "classification"
-        assert timm_card["name"] == "Custom backbone (timm)"
+        assert timm_card["name"] == "Pytorch Image Models (timm)"
         assert timm_card["timm_metadata"] is None
+        assert timm_card["license"] is None
+        assert timm_card["description"] == "Choose any of 1713 timm backbones."
+        assert timm_card["capabilities"] is not None
         assert timm_card["capabilities"]["xai"] is False
         assert timm_card["capabilities"]["tiling"] is False
         assert timm_card["stats"] is None

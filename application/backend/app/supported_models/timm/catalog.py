@@ -18,6 +18,11 @@ class TimmCatalog:
     """The single entry point for querying available timm backbones."""
 
     @staticmethod
+    def count_backbones() -> int:
+        """Return the number of timm backbones in the catalog."""
+        return len(_snapshot())
+
+    @staticmethod
     def list_families() -> list[str]:
         """Return every distinct architecture family present in the catalog."""
         return sorted({e["family"] for e in _snapshot().values()})

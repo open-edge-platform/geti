@@ -105,9 +105,9 @@ def _build_timm_card_entry() -> ModelArchitectureView:
     return ModelArchitectureView(
         id=TIMM_CARD_ID,
         task=TaskType.CLASSIFICATION,
-        name="Custom backbone (timm)",
+        name="Pytorch Image Models (timm)",
         timm_metadata=None,
-        description="Choose any of 1700+ timm backbones.",
+        description=f"Choose any of {TimmCatalog.count_backbones()} timm backbones.",
         capabilities=Capabilities(xai=False, tiling=False),
         license=None,
         stats=None,
