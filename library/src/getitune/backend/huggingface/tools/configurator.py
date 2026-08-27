@@ -151,12 +151,15 @@ class Configurator:
         """Training configuration dict (``max_epochs``, ``learning_rate``, ...)."""
         return self._training
 
-    def build_datamodule(self, data_root: PathLike | None = None) -> DataModule:
+    def build_datamodule(
+        self, data_root: PathLike | None = None, input_size: tuple[int, int] | None = None
+    ) -> DataModule:
         """Build a DataModule from the recipe's data config.
 
         Args:
             data_root: Dataset directory. Falls back to the *data* passed to
                 the constructor when omitted.
+            input_size: Optional override for the recipe's model input size.
 
         Returns:
             A fully constructed :class:`DataModule`.
@@ -183,8 +186,8 @@ class Configurator:
         if "input_size" not in data_config:
             msg = "data config is missing 'input_size'"
             raise ValueError(msg)
-        input_size_raw = data_config["input_size"]
-        input_size = (int(input_size_raw[0]), int(input_size_raw[1]))
+        configured_input_size = data_config["input_size"]
+        resolved_input_size = input_size or (int(configured_input_size[0]), int(configured_input_size[1]))
 
         for subset_name in ("train", "val", "test"):
             key = f"{subset_name}_subset"
@@ -195,14 +198,19 @@ class Configurator:
         self._datamodule = DataModule(
             task=TaskType(self._task),
             data_root=str(root),
-            train_subset=build_subset_config(data_config, "train", input_size),
-            val_subset=build_subset_config(data_config, "val", input_size),
-            test_subset=build_subset_config(data_config, "test", input_size),
-            input_size=input_size,
+            train_subset=build_subset_config(data_config, "train", resolved_input_size),
+            val_subset=build_subset_config(data_config, "val", resolved_input_size),
+            test_subset=build_subset_config(data_config, "test", resolved_input_size),
+            input_size=resolved_input_size,
         )
         return self._datamodule
 
-    def create_model(self, label_info: LabelInfo | int, pretrained: bool | None = None) -> HFModel:
+    def create_model(
+        self,
+        label_info: LabelInfo | int,
+        pretrained: bool | None = None,
+        input_size: tuple[int, int] | None = None,
+    ) -> HFModel:
         """Instantiate the configured Hugging Face model via jsonargparse."""
         if self._model is not None:
             return self._model
@@ -225,6 +233,8 @@ class Configurator:
         init_args["label_info"] = label_info_dict
         if pretrained is not None:
             init_args["pretrained"] = pretrained
+        if input_size is not None:
+            init_args["input_size"] = input_size
         if ignore_index is not None:
             init_args.setdefault("ignore_index", ignore_index)
 

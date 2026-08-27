@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import NamedTuple, cast
+from typing import Any, NamedTuple, cast
 
 import numpy as np
 import pytest
@@ -66,12 +66,18 @@ def test_huggingface_engine_workflow(spec: _TaskSpec, tmp_path: Path, fxt_accele
     if not recipe.exists():
         pytest.skip(f"Recipe not found at {recipe}")
 
+    engine_kwargs: dict[str, Any] = {
+        "model": recipe,
+        "data": data_root,
+        "work_dir": tmp_path / spec.task.value,
+        "device": fxt_accelerator,
+        "pretrained": False,
+    }
+    if spec.task == TaskType.INSTANCE_SEGMENTATION:
+        engine_kwargs["input_size"] = (512, 512)
+
     engine = create_engine(
-        model=recipe,
-        data=data_root,
-        work_dir=tmp_path / spec.task.value,
-        device=fxt_accelerator,
-        pretrained=False,
+        **engine_kwargs,
     )
     assert isinstance(engine, HFEngine)
 

@@ -486,6 +486,7 @@ class HFEngine(Engine):
         checkpoint: str | None = None,
         task: str | None = None,
         pretrained: bool | None = None,
+        input_size: tuple[int, int] | None = None,
         **kwargs,
     ) -> HFEngine:
         """Build an engine from a Hugging Face recipe.
@@ -498,6 +499,7 @@ class HFEngine(Engine):
             device: Device to use.
             checkpoint: Optional warm-start checkpoint directory.
             pretrained: Override the recipe's model weight-loading setting.
+            input_size: Override the recipe's model input size.
             task: Task type for disambiguation. Read from the recipe's
                 top-level ``task`` field if not given here.
             **kwargs: Backend-specific keyword arguments forwarded to
@@ -515,9 +517,9 @@ class HFEngine(Engine):
 
         configurator = Configurator(data=data, model=Path(str(config_path)), task=task)
 
-        datamodule = configurator.build_datamodule()
+        datamodule = configurator.build_datamodule(input_size=input_size)
         label_info = datamodule.label_info
-        model = configurator.create_model(label_info, pretrained=pretrained)
+        model = configurator.create_model(label_info, pretrained=pretrained, input_size=input_size)
 
         engine_kwargs: dict[str, Any] = {**kwargs}
         if device is not None:
