@@ -1,1 +1,25 @@
-{}
+{
+    "nav": {
+        "dataset": "Dataset",
+        "models": "Models",
+        "inference": "Inference"
+    },
+    "projectPanel": {
+        "manageProjects": "Manage projects"
+    },
+    "root": {
+        "loading": "Loading...Please wait.",
+        "serverError": "Server Error",
+        "refresh": "Refresh"
+    },
+    "errorPage": {
+        "badRequest": "The server cannot or will not process the current request.",
+        "forbidden": "You do not have permission to access this page.",
+        "notFound": "This page doesn't exist!",
+        "unauthorized": "You aren't authorized to see this",
+        "internalServerError": "The server encountered an error and could not complete your request.",
+        "serviceUnavailable": "Looks like our API is down",
+        "unknown": "An unknown error occurred",
+        "backToHome": "Go back to home page"
+    }
+}
