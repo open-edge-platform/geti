@@ -198,7 +198,7 @@ export const AssignToExistingView = ({
                                 to={{ pathname: location.pathname, search: searchParams.toString() }}
                                 className={classes.link}
                             >
-                                Open {selectedDatasetView?.name}
+                                Open {selectedDatasetView?.name} view
                             </Link>
                         </Text>
                     </Flex>
