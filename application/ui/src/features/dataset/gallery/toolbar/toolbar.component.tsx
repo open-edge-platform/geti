@@ -99,6 +99,10 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
             .filter((itemId) => isString(itemId));
     }, [selectedMediaItems, items]);
 
+    const resetSelectedMediaIds = () => {
+        setSelectedKeys(new Set());
+    };
+
     const noMediaSelected = selectedMediaItems?.size === 0;
     const selectedMediaItemsIds = Array.from(selectedMediaItems ?? []) as string[];
 
@@ -111,7 +115,10 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                     {FEATURE_FLAGS.DATASET_VIEWS && (
                         <>
                             <Divider orientation={'vertical'} size={'S'} />
-                            <DatasetViewSelector datasetViews={datasetViews} />
+                            <DatasetViewSelector
+                                datasetViews={datasetViews}
+                                resetSelectedMediaIds={resetSelectedMediaIds}
+                            />
                         </>
                     )}
                 </Flex>
@@ -162,12 +169,17 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                                     <SaveDatasetView
                                         selectedMediaIds={selectedMediaItemsIds}
                                         datasetViews={datasetViews}
+                                        resetSelectedMediaIds={resetSelectedMediaIds}
                                     />
                                     <AssignToExistingView
                                         datasetViews={datasetViews}
                                         selectedMediaIds={selectedMediaItemsIds}
+                                        resetSelectedMediaIds={resetSelectedMediaIds}
                                     />
-                                    <UnassignMediaFromView selectedMediaIds={selectedMediaItemsIds} />
+                                    <UnassignMediaFromView
+                                        selectedMediaIds={selectedMediaItemsIds}
+                                        resetSelectedMediaIds={resetSelectedMediaIds}
+                                    />
                                 </>
                             )}
                         </>
