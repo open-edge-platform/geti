@@ -1,13 +1,13 @@
 ---
 name: geti-backend-dev
-description: Develop and validate changes in `application/backend/` for the FastAPI `geti` service. Use when touching `application/backend/app/**`, backend tests, backend packaging, backend configuration, API routers, schemas, services, repositories, or database code, or when the UI contract depends on a backend API change. Helps with `uv` and `just` setup, targeted pytest or behave runs, OpenAPI generation, and local server workflows.
+description: Develop and validate changes in `application/backend/` for the FastAPI `geti` service. Use when changing backend source or tests as well as packaging and configuration. This includes API routers and schemas; services and repositories; database code; UI-facing backend contracts. Covers environment setup; targeted tests; OpenAPI generation; local server workflows.
 ---
 
 # Geti Backend Development
 
 > For the full architecture reference (layered design, app/ layout, adding an
 > endpoint end-to-end, library integration and job execution) read
-> [`application/backend/AGENTS.md`](../../../application/backend/AGENTS.md).
+> `application/backend/AGENTS.md`.
 
 ## Quick Start
 

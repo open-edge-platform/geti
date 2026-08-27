@@ -21,6 +21,7 @@ interface UseGetDatasetMediaItemsOptions {
     startDate?: string;
     endDate?: string;
     sortDirection?: SortDirection;
+    datasetViewId?: string;
 }
 
 const getMediaEntities = (items: MediaDTO[]): Media[] => {
@@ -56,6 +57,7 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
         annotation_status?: DatasetItemAnnotationStatus;
         sort_direction?: SortDirection;
         sort_by?: SortBy;
+        dataset_view_id?: string;
     } = {
         offset: 0,
         limit: DATASET_ITEMS_LIMIT,
@@ -84,6 +86,10 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
     if (options?.sortDirection !== undefined) {
         query.sort_direction = options.sortDirection;
         query.sort_by = 'upload_date';
+    }
+
+    if (options?.datasetViewId !== undefined) {
+        query.dataset_view_id = options.datasetViewId;
     }
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = $api.useInfiniteQuery(

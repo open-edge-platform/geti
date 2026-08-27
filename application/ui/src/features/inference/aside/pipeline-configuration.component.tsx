@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactNode, Suspense } from 'react';
+import { ReactNode, Suspense, useState } from 'react';
 
 import { Flex, Item, Loading, TabList, TabPanels, Tabs, Text, View } from '@geti-ui/ui';
 
@@ -19,6 +19,16 @@ const ConfigurationItem = ({ children }: { children: ReactNode }) => {
     );
 };
 
+// TODO: read the value from `inference.confidence_threshold` and persist it through `PATCH /pipeline`
+const PipelineConfidenceThreshold = () => {
+    const FALLBACK_CONFIDENCE_THRESHOLD = 0.3;
+    const [threshold, setThreshold] = useState(FALLBACK_CONFIDENCE_THRESHOLD);
+
+    return (
+        <ConfidenceThreshold value={threshold} defaultValue={FALLBACK_CONFIDENCE_THRESHOLD} onChange={setThreshold} />
+    );
+};
+
 export const PipelineConfiguration = () => {
     return (
         <Flex direction={'column'} gap={'size-150'} minHeight={0}>
@@ -26,7 +36,7 @@ export const PipelineConfiguration = () => {
                 <StreamInferenceDevices />
             </Suspense>
 
-            {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && <ConfidenceThreshold />}
+            {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && <PipelineConfidenceThreshold />}
 
             <Tabs
                 aria-label={'Pipeline configuration tabs'}

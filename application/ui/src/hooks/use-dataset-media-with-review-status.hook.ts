@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { isEmpty } from 'lodash-es';
 
 import { useDatasetFiltersSearchParams } from './use-dataset-filters-search-params.hook';
@@ -10,6 +11,7 @@ import { useGetDatasetMediaItems } from './use-get-dataset-media-items.hook';
 export const useDatasetMediaWithReviewStatus = () => {
     const { selectedLabelIds, annotationStatus, startDate, endDate, sortDirection, selectedSubsets } =
         useDatasetFiltersSearchParams();
+    const [datasetViewId] = useDatasetViewId();
 
     const subsets = isEmpty(selectedSubsets) ? undefined : selectedSubsets;
 
@@ -18,7 +20,8 @@ export const useDatasetMediaWithReviewStatus = () => {
         labelIds: isEmpty(selectedLabelIds) ? undefined : selectedLabelIds,
         startDate: startDate ?? undefined,
         endDate: endDate ?? undefined,
-        sortDirection: sortDirection ?? undefined,
+        datasetViewId: datasetViewId ?? undefined,
+        sortDirection,
         subsets,
     });
 
@@ -27,7 +30,8 @@ export const useDatasetMediaWithReviewStatus = () => {
         labelIds: isEmpty(selectedLabelIds) ? undefined : selectedLabelIds,
         startDate: startDate ?? undefined,
         endDate: endDate ?? undefined,
-        sortDirection: sortDirection ?? undefined,
+        datasetViewId: datasetViewId ?? undefined,
+        sortDirection,
         subsets,
     });
 

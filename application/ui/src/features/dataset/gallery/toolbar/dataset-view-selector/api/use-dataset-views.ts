@@ -2,21 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { $api } from '@/api';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-/*const DATASET_VIEWS: DatasetView[] = [
-    { id: 'collection-one', name: 'Collection One', created_at: '', project_id: '' },
-    { id: 'collection-two', name: 'Collection Two', created_at: '', project_id: '' },
-];*/
-
-export const useDatasetViewsQuery = () => {
-    const projectId = useProjectIdentifier();
-
-    return $api.useSuspenseQuery('get', '/api/projects/{project_id}/dataset/views', {
+export const datasetViewsQueryOptions = (projectId: string) =>
+    $api.queryOptions('get', '/api/projects/{project_id}/dataset/views', {
         params: {
             path: {
                 project_id: projectId,
             },
         },
     });
+
+export const useDatasetViewsQuery = () => {
+    const projectId = useProjectIdentifier();
+    return useSuspenseQuery(datasetViewsQueryOptions(projectId));
 };

@@ -5,7 +5,12 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from 'test-utils/render';
 
+import { useIsScrolling } from '../../hooks/use-is-scrolling.hook';
 import { MediaThumbnail } from './media-thumbnail.component';
+
+vi.mock('../../hooks/use-is-scrolling.hook', () => ({
+    useIsScrolling: vi.fn(() => false),
+}));
 
 describe('MediaThumbnail', () => {
     it('calls onClick when image is clicked', async () => {
@@ -43,5 +48,21 @@ describe('MediaThumbnail', () => {
         );
 
         expect(screen.getByText('01:00')).toBeInTheDocument();
+    });
+
+    it('does not set the image src while scrolling', () => {
+        vi.mocked(useIsScrolling).mockReturnValue(true);
+
+        render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
+
+        expect(screen.getByRole('img', { name: 'Test Image' })).not.toHaveAttribute('src');
+    });
+
+    it('sets the image src when not scrolling', () => {
+        vi.mocked(useIsScrolling).mockReturnValue(false);
+
+        render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
+
+        expect(screen.getByRole('img', { name: 'Test Image' })).toHaveAttribute('src', 'test-image.jpg');
     });
 });
