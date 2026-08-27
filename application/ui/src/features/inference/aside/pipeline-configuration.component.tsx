@@ -1,14 +1,14 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactNode, Suspense, useState } from 'react';
+import { ReactNode, Suspense } from 'react';
 
 import { Flex, Item, Loading, TabList, TabPanels, Tabs, Text, View } from '@geti-ui/ui';
 
-import { ConfidenceThreshold } from '../../../components/confidence-threshold/confidence-threshold.component';
 import { FEATURE_FLAGS } from '../../../constants/feature-flags';
 import { SinkActions } from '../sinks/sink-actions.component';
 import { SourceActions } from '../sources/source-actions.component';
+import { PipelineConfidenceThreshold } from './pipeline-confidence-threshold.component';
 import { StreamInferenceDevices } from './stream-inference-devices.component';
 
 const ConfigurationItem = ({ children }: { children: ReactNode }) => {
@@ -16,16 +16,6 @@ const ConfigurationItem = ({ children }: { children: ReactNode }) => {
         <View position={'relative'} minHeight={'size-800'}>
             <Suspense fallback={<Loading mode={'inline'} size={'M'} />}>{children}</Suspense>
         </View>
-    );
-};
-
-// TODO: read the value from `inference.confidence_threshold` and persist it through `PATCH /pipeline`
-const PipelineConfidenceThreshold = () => {
-    const FALLBACK_CONFIDENCE_THRESHOLD = 0.3;
-    const [threshold, setThreshold] = useState(FALLBACK_CONFIDENCE_THRESHOLD);
-
-    return (
-        <ConfidenceThreshold value={threshold} defaultValue={FALLBACK_CONFIDENCE_THRESHOLD} onChange={setThreshold} />
     );
 };
 

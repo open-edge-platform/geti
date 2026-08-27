@@ -100,9 +100,7 @@ const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
                     <Flex gap={'size-300'} direction={'column'}>
                         <PredictionModelSelector isDisabled={isDisabled} />
                         <PredictionInferenceDevices isDisabled={isDisabled} />
-                        {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && (
-                            <PredictionConfidenceThreshold isDisabled={isDisabled} />
-                        )}
+                        {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && <PredictionConfidenceThreshold />}
                     </Flex>
                 </Content>
             </Dialog>

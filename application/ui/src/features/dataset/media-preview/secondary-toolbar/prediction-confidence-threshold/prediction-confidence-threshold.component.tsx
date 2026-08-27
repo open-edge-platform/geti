@@ -4,11 +4,7 @@
 import { ConfidenceThreshold } from '../../../../../components/confidence-threshold/confidence-threshold.component';
 import { usePredictionSetup } from '../../../../annotator/predictions-setup-provider.component';
 
-type PredictionConfidenceThresholdProps = {
-    isDisabled?: boolean;
-};
-
-export const PredictionConfidenceThreshold = ({ isDisabled }: PredictionConfidenceThresholdProps) => {
+export const PredictionConfidenceThreshold = () => {
     const { selectedModel, confidenceThreshold, changeConfidenceThreshold } = usePredictionSetup();
 
     const defaultValue = selectedModel?.optimalConfidenceThreshold ?? null;
@@ -23,7 +19,6 @@ export const PredictionConfidenceThreshold = ({ isDisabled }: PredictionConfiden
             value={confidenceThreshold}
             defaultValue={defaultValue}
             onChange={changeConfidenceThreshold}
-            isDisabled={isDisabled}
         />
     );
 };
