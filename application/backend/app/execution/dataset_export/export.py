@@ -16,7 +16,7 @@ from sqlalchemy.orm import Session
 from app.datumaro_converter import SampleMode
 from app.execution.base import Execution, step
 from app.models import DatasetFormat, DatasetItemAnnotationStatus, ExportDatasetJobParams
-from app.services import DatasetRevisionService, DatasetService
+from app.services import DatasetRevisionService, DatasetService, ProjectService
 
 
 def get_dm_format(dataset_format: DatasetFormat) -> DataFormat:
@@ -47,12 +47,14 @@ class ExportDataset(Execution[ExportDatasetJobParams]):
         staged_datasets_dir: Path,
         dataset_service: DatasetService,
         dataset_revision_service: DatasetRevisionService,
+        project_service: ProjectService,
         db_session_factory: Callable[[], AbstractContextManager[Session]],
     ):
         super().__init__()
         self._staged_datasets_dir = staged_datasets_dir
         self._dataset_service = dataset_service
         self._dataset_revision_service = dataset_revision_service
+        self._project_service = project_service
         self._db_session_factory = db_session_factory
 
     @step("Prepare dataset for export", 20)
@@ -115,4 +117,8 @@ class ExportDataset(Execution[ExportDatasetJobParams]):
             self.pin_message("Dataset is empty after applying filters. Nothing to export.")
             return
         self.update_metadata({"dataset_id": dataset_id})
-        self.export_dataset(dataset_id, dataset, params.export_format, params.project_name)
+        with self._db_session_factory() as session:
+            self._project_service.set_db_session(session)
+            project = self._project_service.get_project_by_id(params.project_id)
+            project_name = project.name
+        self.export_dataset(dataset_id, dataset, params.export_format, project_name)

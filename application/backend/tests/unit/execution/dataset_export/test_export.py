@@ -24,16 +24,24 @@ from app.models import (
 
 
 @pytest.fixture
+def fxt_project_service() -> Mock:
+    return Mock()
+
+
+@pytest.fixture
 def fxt_export(
     fxt_staged_datasets_dir: Path,
     fxt_dataset_service: Mock,
     fxt_dataset_revision_service: Mock,
+    fxt_project_service: Mock,
     fxt_db_session_factory: Callable,
 ) -> ExportDataset:
+    fxt_project_service.get_project_by_id.return_value.name = "my_project"
     return ExportDataset(
         staged_datasets_dir=fxt_staged_datasets_dir,
         dataset_service=fxt_dataset_service,
         dataset_revision_service=fxt_dataset_revision_service,
+        project_service=fxt_project_service,
         db_session_factory=fxt_db_session_factory,
     )
 
@@ -42,7 +50,6 @@ def fxt_export(
 def fxt_export_params() -> ExportDatasetJobParams:
     return ExportDatasetJobParams(
         project_id=uuid4(),
-        project_name="my_project",
         task=Task(task_type=TaskType.DETECTION),
         export_format=DatasetFormat.COCO,
         labels=["label1", "label2"],
@@ -192,7 +199,7 @@ class TestDatasetExporter:
 
             mock_prepare.assert_called_once_with(fxt_export_params)
             mock_update_metadata.assert_called_once_with({"dataset_id": dataset_id})
-            mock_export.assert_called_once_with(dataset_id, dataset, fxt_export_params.export_format, fxt_export_params.project_name)
+            mock_export.assert_called_once_with(dataset_id, dataset, fxt_export_params.export_format, "my_project")
 
     def test_execute_empty_dataset(self, fxt_export: ExportDataset, fxt_export_params: ExportDatasetJobParams):
         dataset_id = uuid4()

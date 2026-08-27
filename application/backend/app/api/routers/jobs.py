@@ -148,7 +148,6 @@ async def submit_job(
                     params=ExportDatasetJobParams(
                         dataset_id=job_request.dataset_id,
                         project_id=project.id,
-                        project_name=project.name,
                         task=project.task,
                         export_format=DatasetFormat(job_request.parameters.export_format),
                         labels=job_request.parameters.filters.labels,
