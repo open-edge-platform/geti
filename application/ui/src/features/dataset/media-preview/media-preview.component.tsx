@@ -97,9 +97,9 @@ const MediaPreviewPanels = ({
 };
 
 /**
- * Aborts inference and embedding requests the user walked away from.
- * `media:predict` is a synchronous backend endpoint holding a process-wide model lock, so an
- * abandoned request keeps every later request (thumbnails, dataset items) queued behind it.
+ * Aborts inference and embedding requests if the user closes the annotator dialog.
+ *
+ * It won't stop the server side processing but it will prevent the client from waiting for the results.
  */
 const useCancelInferenceOnUnmount = () => {
     const queryClient = useQueryClient();
@@ -179,8 +179,7 @@ const MediaPreviewContent = ({
 export const MediaPreview = ({ close, onSelectedMediaItem }: MediaPreviewProps) => {
     const { items, isFetchingNextPage, fetchNextPage, isMediaItemReviewedById } = useDatasetMediaWithReviewStatus();
 
-    // Read rather than receive the selection: Spectrum keeps this dialog's last child mounted for its
-    // 350ms exit animation, so props are frozen but the cleared selection still reaches us.
+    // Reading the route param unmounts the content on close, without waiting for the dialog's exit animation.
     const { selectedMediaItem } = useSelectDatasetItem();
 
     return (
