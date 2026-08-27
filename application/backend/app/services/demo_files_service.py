@@ -114,7 +114,7 @@ class DemoFilesService:
         try:
             labels = self._label_service.list_all(project_id=project_id)
         except Exception:
-            logger.warning("Could not resolve label colors for project {}; using default colors.", project_id)
+            logger.exception("Could not resolve label colors for project {}; using default colors.", project_id)
             return "{}"
 
         entries = {label.name: label.color for label in labels if label.name and label.color}

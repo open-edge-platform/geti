@@ -323,7 +323,7 @@ class TestDemoFilesServiceIntegration:
     def test_label_colors_are_baked_into_the_demo(
         self,
         fxt_demo_files_service: DemoFilesService,
-        fxt_project_with_image: tuple[Project, MediaDB],
+        fxt_project_with_image: tuple[Project, Media],
     ) -> None:
         """The generated utils.py pins the project label colors so that the demo
         visualizations match the label colors shown in Geti."""
