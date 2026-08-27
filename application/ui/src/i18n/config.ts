@@ -23,7 +23,7 @@ export const resources = {
 
 export const LANGUAGE_STORAGE_KEY = 'geti-language';
 
-const resolveLanguage = (language: string): string => {
+export const resolveLanguage = (language: string): string => {
     if (!language || typeof language !== 'string') return 'en';
 
     const tag = language.trim();
