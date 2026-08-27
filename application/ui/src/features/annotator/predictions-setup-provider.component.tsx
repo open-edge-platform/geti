@@ -47,26 +47,6 @@ const useSelectedModelId = (models: Model[]) => {
     return useLocalStorage<string | null>(`${projectId}-model-variant-id`, defaultSelectedId);
 };
 
-// The threshold is a model specific parameter, so an edited value only applies to the model it was set for.
-const useConfidenceThreshold = (selectedModel: SelectableModel | undefined) => {
-    const [editedThreshold, setEditedThreshold] = useState<{ modelVariantId: string; value: number } | null>(null);
-
-    const confidenceThreshold =
-        editedThreshold !== null && editedThreshold.modelVariantId === selectedModel?.modelVariantId
-            ? editedThreshold.value
-            : (selectedModel?.optimalConfidenceThreshold ?? null);
-
-    const changeConfidenceThreshold = (value: number) => {
-        if (selectedModel === undefined) {
-            return;
-        }
-
-        setEditedThreshold({ modelVariantId: selectedModel.modelVariantId, value });
-    };
-
-    return [confidenceThreshold, changeConfidenceThreshold] as const;
-};
-
 export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) => {
     const { data: models } = useGetSuccessfulModels();
 
@@ -76,7 +56,18 @@ export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) 
 
     const selectedModel = selectableModels.find((model) => model.modelVariantId === selectedModelId);
 
-    const [confidenceThreshold, changeConfidenceThreshold] = useConfidenceThreshold(selectedModel);
+    const [confidenceThreshold, setConfidenceThreshold] = useState<number | null>(
+        selectedModel?.optimalConfidenceThreshold ?? null
+    );
+
+    // The threshold is a model specific parameter, so it always follows the selected model
+    const changeSelectedModelId = (modelId: string | null) => {
+        setSelectedModelId(modelId);
+
+        const newModel = selectableModels.find((model) => model.modelVariantId === modelId);
+
+        setConfidenceThreshold(newModel?.optimalConfidenceThreshold ?? null);
+    };
 
     const { data: pipeline } = usePipeline();
 
@@ -87,12 +78,12 @@ export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) 
             value={{
                 selectedModelId,
                 selectedModel,
-                changeSelectedModelId: setSelectedModelId,
+                changeSelectedModelId,
                 selectableModels,
                 selectedDevice,
                 changeSelectedDevice: setSelectedDevice,
                 confidenceThreshold,
-                changeConfidenceThreshold,
+                changeConfidenceThreshold: setConfidenceThreshold,
             }}
         >
             {children}
