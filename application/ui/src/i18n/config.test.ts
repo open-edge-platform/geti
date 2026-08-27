@@ -19,10 +19,7 @@ describe('resolveLanguage', () => {
         expect(resolveLanguage(input)).toBe(expected);
     });
 
-    it.each(['invalid-tag', 'zh-XYZ', '---', 'zh-', '-en'])(
-        'returns en for invalid BCP47 %s',
-        (input) => {
-            expect(resolveLanguage(input)).toBe('en');
-        }
-    );
+    it.each(['invalid-tag', 'zh-XYZ', '---', 'zh-', '-en'])('returns en for invalid BCP47 %s', (input) => {
+        expect(resolveLanguage(input)).toBe('en');
+    });
 });
