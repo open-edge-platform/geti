@@ -121,7 +121,7 @@ export const DatasetViewSelector = ({ datasetViews, resetSelectedMediaIds }: Dat
                 <Dialog>
                     <Content>
                         <DatasetViewItemsList
-                            otherDatasetViews={datasetViews}
+                            datasetViews={datasetViews}
                             selectedDatasetViewId={datasetViewId}
                             onOpenDeleteConfirmationDialog={openDeleteConfirmationDialog}
                             onSelectDatasetView={selectDatasetView}

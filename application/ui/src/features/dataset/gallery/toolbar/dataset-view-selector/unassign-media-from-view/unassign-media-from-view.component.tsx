@@ -86,7 +86,7 @@ const UnassignMediaButton = ({
 }: UnassignMediaButtonFromViewProps) => {
     const { unassignMediaFromView, isPending } = useUnassignMediaFromView();
 
-    const unassignMedia = async () => {
+    const unassignMedia = () => {
         unassignMediaFromView({
             datasetViewId,
             selectedMediaIds,

@@ -107,14 +107,14 @@ const EntireDatasetViewItem = ({ isSelected, onSelectDatasetView }: EntireDatase
 type DatasetViewItemsListProps = {
     selectedDatasetViewId: string | null;
     onOpenDeleteConfirmationDialog: (datasetView: DatasetView) => void;
-    otherDatasetViews: DatasetView[];
+    datasetViews: DatasetView[];
     onOpenRenameDialog: (datasetView: DatasetView) => void;
     onSelectDatasetView: (datasetViewId: string | null) => void;
 };
 
 export const DatasetViewItemsList = ({
     selectedDatasetViewId,
-    otherDatasetViews,
+    datasetViews,
     onSelectDatasetView,
     onOpenRenameDialog,
     onOpenDeleteConfirmationDialog,
@@ -126,9 +126,9 @@ export const DatasetViewItemsList = ({
                 onSelectDatasetView={onSelectDatasetView}
             />
 
-            {!isEmpty(otherDatasetViews) && <Divider size={'S'} />}
+            {!isEmpty(datasetViews) && <Divider size={'S'} />}
 
-            {otherDatasetViews.map((datasetView) => (
+            {datasetViews.map((datasetView) => (
                 <DatasetViewItem
                     key={datasetView.id}
                     datasetView={datasetView}
