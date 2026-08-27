@@ -12,7 +12,6 @@ import torch.nn.functional as f
 import transformers
 from torchvision import tv_tensors
 
-from getitune.backend.huggingface.exporter.native import HFModelExporter
 from getitune.backend.huggingface.models.base import HFModel
 from getitune.data.entity.sample import PredictionBatch
 from getitune.metrics.dice import SegmCallable
@@ -24,7 +23,6 @@ if TYPE_CHECKING:
     from torchmetrics import Metric, MetricCollection
     from transformers.utils import ModelOutput
 
-    from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.data.entity.sample import SampleBatch
 
 __all__ = ["HFSemanticSegModel"]
@@ -37,6 +35,7 @@ class HFSemanticSegModel(HFModel):
     hf_auto_class: ClassVar[type] = transformers.AutoModelForSemanticSegmentation
     export_model_type: ClassVar[str] = "Segmentation"
     label_keys: ClassVar[tuple[str, ...]] = ("labels",)
+    _onnx_output_names: ClassVar[list[str]] = ["preds"]
 
     def __init__(
         self,
@@ -76,7 +75,7 @@ class HFSemanticSegModel(HFModel):
     def _export_parameters(self) -> TaskLevelExportParameters:
         return super()._export_parameters.wrap(
             model_type=self.export_model_type,
-            task_type="semantic_segmentation",
+            task_type="segmentation",
             return_soft_prediction=True,
             soft_threshold=self._soft_threshold,
             blur_strength=self._blur_strength,
@@ -141,16 +140,6 @@ class HFSemanticSegModel(HFModel):
             )
         )
         return SegmCallable(seg_label_info)
-
-    @property
-    def _exporter(self) -> ModelExporter:
-        return HFModelExporter(
-            task_level_export_parameters=self._export_parameters,
-            data_input_params=self.data_input_params,
-            resize_mode="standard",
-            swap_rgb=False,
-            onnx_export_configuration={"input_names": ["images"], "output_names": ["preds"]},
-        )
 
     def forward_for_tracing(self, images: torch.Tensor) -> torch.Tensor:
         """Return per-pixel class probabilities for ONNX/OpenVINO export.

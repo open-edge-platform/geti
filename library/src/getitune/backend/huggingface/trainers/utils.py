@@ -12,7 +12,19 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-__all__ = ["remap_log_key", "write_metrics_csv"]
+__all__ = ["remap_log_key", "resolve_greater_is_better", "write_metrics_csv"]
+
+
+def resolve_greater_is_better(monitor: str | None) -> bool:
+    """Return ``True`` when a higher ``monitor`` value is better.
+
+    Loss-like keys are lower-is-better; everything else (mAP, Dice, accuracy,
+    F1, IoU, ...) is higher-is-better. A recipe can override this explicitly
+    via ``training.greater_is_better``.
+    """
+    if not monitor:
+        return True
+    return "loss" not in monitor.lower()
 
 
 def remap_log_key(key: str) -> str:

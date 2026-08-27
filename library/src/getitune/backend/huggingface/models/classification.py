@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Any, ClassVar
 import torch
 import transformers
 
-from getitune.backend.huggingface.exporter.native import HFModelExporter
 from getitune.backend.huggingface.models.base import HFModel
 from getitune.data.entity.sample import PredictionBatch
 from getitune.metrics.accuracy import MultiClassClsMetricCallable, MultiLabelClsMetricCallable
@@ -22,7 +21,6 @@ if TYPE_CHECKING:
     from torchmetrics import Metric, MetricCollection
     from transformers.utils import ModelOutput
 
-    from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.data.entity.sample import SampleBatch
 
 __all__ = ["HFMulticlassClsModel", "HFMultilabelClsModel"]
@@ -35,6 +33,7 @@ class HFMulticlassClsModel(HFModel):
     hf_auto_class: ClassVar[type] = transformers.AutoModelForImageClassification
     export_model_type: ClassVar[str] = "Classification"
     label_keys: ClassVar[tuple[str, ...]] = ("labels",)
+    _onnx_output_names: ClassVar[list[str]] = ["logits"]
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
@@ -81,16 +80,6 @@ class HFMulticlassClsModel(HFModel):
         """Accuracy and macro F1, the standard multi-class classification metrics."""
         return MultiClassClsMetricCallable(self.label_info)
 
-    @property
-    def _exporter(self) -> ModelExporter:
-        return HFModelExporter(
-            task_level_export_parameters=self._export_parameters,
-            data_input_params=self.data_input_params,
-            resize_mode="standard",
-            swap_rgb=False,
-            onnx_export_configuration={"input_names": ["images"], "output_names": ["logits"]},
-        )
-
     def forward_for_tracing(self, images: torch.Tensor) -> torch.Tensor:
         """Return raw logits for ONNX/OpenVINO export; ModelAPI applies softmax."""
         return self.hf_model(pixel_values=images).logits
@@ -109,6 +98,7 @@ class HFMultilabelClsModel(HFModel):
     hf_auto_class: ClassVar[type] = transformers.AutoModelForImageClassification
     export_model_type: ClassVar[str] = "Classification"
     label_keys: ClassVar[tuple[str, ...]] = ("labels",)
+    _onnx_output_names: ClassVar[list[str]] = ["logits"]
 
     def __init__(
         self,
@@ -171,16 +161,6 @@ class HFMultilabelClsModel(HFModel):
     def build_default_metric(self) -> Metric | MetricCollection:
         """Accuracy and mAP over labels, the standard multi-label classification metrics."""
         return MultiLabelClsMetricCallable(self.label_info)
-
-    @property
-    def _exporter(self) -> ModelExporter:
-        return HFModelExporter(
-            task_level_export_parameters=self._export_parameters,
-            data_input_params=self.data_input_params,
-            resize_mode="standard",
-            swap_rgb=False,
-            onnx_export_configuration={"input_names": ["images"], "output_names": ["logits"]},
-        )
 
     def forward_for_tracing(self, images: torch.Tensor) -> torch.Tensor:
         """Return raw logits for ONNX/OpenVINO export; ModelAPI applies sigmoid."""

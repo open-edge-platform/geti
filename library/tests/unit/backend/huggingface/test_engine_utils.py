@@ -8,6 +8,7 @@ from __future__ import annotations
 import pytest
 
 from getitune.backend.huggingface.engine_utils import (
+    resolve_greater_is_better,
     resolve_precision,
     summarize_log_history,
 )
@@ -32,6 +33,22 @@ class TestResolvePrecision:
     def test_rejects_unknown_values(self) -> None:
         with pytest.raises(ValueError, match="Unsupported precision"):
             resolve_precision("int8")
+
+
+class TestResolveGreaterIsBetter:
+    @pytest.mark.parametrize("monitor", ["val/loss", "train/loss", "eval_loss", "loss"])
+    def test_loss_is_lower_better(self, monitor: str) -> None:
+        assert resolve_greater_is_better(monitor) is False
+
+    @pytest.mark.parametrize(
+        "monitor", ["val/map", "val/map_50", "val/f1-score", "val/Dice", "test/accuracy", "val/iou"]
+    )
+    def test_known_metrics_are_higher_better(self, monitor: str) -> None:
+        assert resolve_greater_is_better(monitor) is True
+
+    @pytest.mark.parametrize("monitor", [None, "", "val/custom_metric"])
+    def test_unknown_defaults_to_higher_better(self, monitor: str | None) -> None:
+        assert resolve_greater_is_better(monitor) is True
 
 
 class TestSummarizeLogHistory:

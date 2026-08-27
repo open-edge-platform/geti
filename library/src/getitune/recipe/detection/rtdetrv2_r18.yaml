@@ -27,6 +27,11 @@ training:
   learning_rate: 0.0001
   precision: bf16-mixed
   patience: 10
+  optim: adamw_torch
+  weight_decay: 0.0001
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.03
+  max_grad_norm: 0.1
 
 data: ../_base_/data/detection.yaml
 

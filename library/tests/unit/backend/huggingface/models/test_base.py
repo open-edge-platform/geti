@@ -91,6 +91,11 @@ def test_exporter_builds_a_configured_hf_model_exporter() -> None:
     assert exporter.task_level_export_parameters.model_type == "Classification"
 
 
+def test_resize_mode_is_passed_to_exporter() -> None:
+    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info(), resize_mode="fit_to_window")
+    assert model._exporter.resize_mode == "fit_to_window"
+
+
 def test_forward_runs_end_to_end_through_build_targets() -> None:
     """forward() is shared: build_targets is implemented, so this must now work."""
     model = HFMulticlassClsModel(_tiny_vit_config(), _label_info())

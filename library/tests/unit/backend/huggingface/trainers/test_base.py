@@ -18,6 +18,7 @@ from transformers import TrainingArguments
 from getitune.backend.huggingface.models import HFDetectionModel, HFMulticlassClsModel
 from getitune.backend.huggingface.trainers.base import GetiTuneHFTrainer
 from getitune.config.data import SubsetConfig
+from getitune.data.entity.base import ImageInfo
 from getitune.data.entity.sample import SampleBatch
 from getitune.types.label import LabelInfo
 
@@ -67,7 +68,11 @@ def _detection_batch(device: torch.device | None = None) -> SampleBatch:
         ),
     ]
     labels = [torch.tensor([1], device=device), torch.zeros(0, dtype=torch.long, device=device)]
-    return SampleBatch(images=images, bboxes=bboxes, labels=labels)
+    imgs_info = [
+        ImageInfo(img_idx=0, img_shape=(64, 64), ori_shape=(64, 64)),  # pyrefly: ignore[no-matching-overload]
+        ImageInfo(img_idx=1, img_shape=(64, 64), ori_shape=(64, 64)),  # pyrefly: ignore[no-matching-overload]
+    ]
+    return SampleBatch(images=images, bboxes=bboxes, labels=labels, imgs_info=imgs_info)
 
 
 def _build_trainer(model_wrapper, datamodule, **args_kwargs) -> GetiTuneHFTrainer:
@@ -227,8 +232,11 @@ class TestEvaluateOnTestSplitAndPredictBatches:
         )
         # mock the test dataloader to return one synthetic batch
         batch = _detection_batch()
+        from getitune.data.entity.sample import PredictionBatch
+
         trainer.get_test_dataloader = MagicMock(return_value=[batch])
         model.to_metric_inputs = MagicMock(return_value={})  # type: ignore[method-assign]
+        model.postprocess = MagicMock(return_value=PredictionBatch(images=batch.images))  # type: ignore[method-assign]
         return trainer
 
     def test_evaluate_on_test_split_returns_prefixed_metrics(self, tmp_path: Path) -> None:

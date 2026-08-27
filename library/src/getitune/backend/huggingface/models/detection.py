@@ -5,7 +5,6 @@
 
 from __future__ import annotations
 
-from functools import cached_property
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 import torch
@@ -13,9 +12,7 @@ import transformers
 from torchvision import tv_tensors
 from torchvision.ops import box_convert
 
-from getitune.backend.huggingface.exporter.native import HFModelExporter
 from getitune.backend.huggingface.models.base import HFModel
-from getitune.backend.huggingface.models.utils import reproject_boxes_to_input_space
 from getitune.data.entity.sample import PredictionBatch
 from getitune.metrics.mean_ap import MeanAPCallable
 from getitune.types.export import TaskLevelExportParameters
@@ -25,7 +22,6 @@ if TYPE_CHECKING:
     from torchmetrics import Metric, MetricCollection
     from transformers.utils import ModelOutput
 
-    from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.data.entity.sample import SampleBatch
     from getitune.types.label import LabelInfoTypes
 
@@ -44,6 +40,7 @@ class HFDetectionModel(HFModel):
     hf_auto_class: ClassVar[type] = transformers.AutoModelForObjectDetection
     export_model_type: ClassVar[str] = "ssd"
     label_keys: ClassVar[tuple[str, ...]] = ("labels",)
+    _onnx_output_names: ClassVar[list[str]] = ["bboxes", "labels", "scores"]
 
     def __init__(
         self,
@@ -105,46 +102,42 @@ class HFDetectionModel(HFModel):
             labels.append({"class_labels": class_labels.long(), "boxes": cxcywh})
         return {"pixel_values": batch.images, "labels": labels}
 
-    @cached_property
-    def _image_processor(self) -> transformers.RTDetrImageProcessor:
-        """The post-processing math is stateless and shared across the DETR family.
-
-        ``RTDetrImageProcessor`` works correctly for every model in this
-        wrapper's scope, not just RT-DETR: its ``use_focal_loss`` argument
-        selects between the sigmoid/top-k convention RT-DETR and D-FINE use
-        and the softmax/background-class convention plain DETR and
-        Deformable-DETR use (G3), and it only ever reads ``outputs.logits``
-        and ``outputs.pred_boxes``, which every model here provides.
-        """
-        return transformers.RTDetrImageProcessor()
-
     def postprocess(self, outputs: ModelOutput, batch: SampleBatch) -> PredictionBatch:
-        """Decode raw outputs into boxes, scores, and labels in the model's input space.
+        """Decode raw outputs into boxes, scores, and labels in original image space.
 
-        Every image in *batch* was resized to the same input canvas, so
-        keeping predictions in that shared space (rather than rescaling each
-        one back to its own original size) is what lets ``to_metric_inputs``
-        compare them against ground truth with a single reprojection instead
-        of two. Returns every query with no confidence filtering — thresholding
-        for user-facing predictions happens in ``HFEngine.predict()``, not here,
+        Predictions are decoded per image to its own ``ori_shape`` (the
+        Lightning DETR convention): detection data uses ``resize_targets:
+        false``, so ground truth stays in original coordinates and both sides
+        of ``to_metric_inputs`` live in the same space with no reprojection.
+        Returns every query with no confidence filtering — thresholding for
+        user-facing predictions happens in ``HFEngine.predict()``, not here,
         so this same method can also feed ``to_metric_inputs`` for mAP, which
         needs the full unfiltered score distribution.
         """
-        input_size = (int(batch.images[0].shape[-2]), int(batch.images[0].shape[-1]))
+        if batch.imgs_info is None:
+            msg = "Detection batches need imgs_info to decode predictions into original image space."
+            raise ValueError(msg)
+        target_sizes: list[tuple[int, int]] = []
+        for info in batch.imgs_info:
+            if info is None:
+                msg = "Detection batches need per-sample imgs_info to decode predictions."
+                raise ValueError(msg)
+            target_sizes.append((int(info.ori_shape[0]), int(info.ori_shape[1])))
         use_focal_loss = getattr(self.hf_model.config, "use_focal_loss", False)
-        decoded = self._image_processor.post_process_object_detection(
+        decoded = self._image_processor.post_process_object_detection(  # pyrefly: ignore[missing-attribute]
             outputs,
             threshold=0.0,
-            target_sizes=[input_size] * len(batch.images),
+            target_sizes=target_sizes,
             use_focal_loss=use_focal_loss,
         )
 
-        canvas_size = (int(input_size[0]), int(input_size[1]))
         bboxes = [
             tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
-                image_result["boxes"], format=tv_tensors.BoundingBoxFormat.XYXY, canvas_size=canvas_size
+                image_result["boxes"],
+                format=tv_tensors.BoundingBoxFormat.XYXY,
+                canvas_size=target_sizes[i],
             )
-            for image_result in decoded
+            for i, image_result in enumerate(decoded)
         ]
         return PredictionBatch(
             images=batch.images,
@@ -157,12 +150,13 @@ class HFDetectionModel(HFModel):
     def to_metric_inputs(self, outputs: ModelOutput, batch: SampleBatch) -> dict[str, Any]:
         """Build the ``preds``/``target`` lists ``MeanAPCallable`` expects.
 
-        Ground truth stays in original image coordinates (``resize_targets:
-        false``), so it is reprojected into the same input-space canvas the
-        predictions from ``postprocess`` already live in (G12).
+        Both predictions and ground truth are in original image coordinates:
+        predictions are decoded to ``ori_shape`` by ``postprocess``, and
+        detection data is configured with ``resize_targets: false`` so ground
+        truth arrives in original coordinates too. No reprojection is needed.
         """
-        if batch.bboxes is None or batch.labels is None or batch.imgs_info is None:
-            msg = "Detection batches need bboxes, labels, and imgs_info to compute metrics."
+        if batch.bboxes is None or batch.labels is None:
+            msg = "Detection batches need bboxes and labels to compute metrics."
             raise ValueError(msg)
 
         predictions = self.postprocess(outputs, batch)
@@ -174,32 +168,15 @@ class HFDetectionModel(HFModel):
             {"boxes": boxes.as_subclass(torch.Tensor), "scores": scores, "labels": labels}
             for boxes, scores, labels in zip(predictions.bboxes, predictions.scores, predictions.labels, strict=True)
         ]
-        target = []
-        for boxes, labels, img_info in zip(batch.bboxes, batch.labels, batch.imgs_info, strict=True):
-            if img_info is None:
-                msg = "Detection batches need per-sample img_info to compute metrics."
-                raise ValueError(msg)
-            target.append(
-                {
-                    "boxes": reproject_boxes_to_input_space(boxes.as_subclass(torch.Tensor), img_info),
-                    "labels": labels,
-                }
-            )
+        target = [
+            {"boxes": boxes.as_subclass(torch.Tensor), "labels": labels}
+            for boxes, labels in zip(batch.bboxes, batch.labels, strict=True)
+        ]
         return {"preds": preds, "target": target}
 
     def build_default_metric(self) -> Metric | MetricCollection:
         """Mean average precision over boxes, the standard detection metric."""
         return MeanAPCallable(self.label_info)
-
-    @property
-    def _exporter(self) -> ModelExporter:
-        return HFModelExporter(
-            task_level_export_parameters=self._export_parameters,
-            data_input_params=self.data_input_params,
-            resize_mode="standard",
-            swap_rgb=False,
-            onnx_export_configuration={"input_names": ["images"], "output_names": ["bboxes", "labels", "scores"]},
-        )
 
     def forward_for_tracing(self, images: torch.Tensor) -> dict[str, torch.Tensor]:
         """Return per-query boxes/labels/scores for ONNX/OpenVINO export.

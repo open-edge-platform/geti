@@ -25,7 +25,7 @@ from getitune.types.task import TaskType
 from getitune.utils.device import is_xpu_available
 
 from .callbacks.progress import HFProgressCallback, extract_progress_fn
-from .engine_utils import resolve_precision, summarize_log_history, unbatch_predictions
+from .engine_utils import resolve_greater_is_better, resolve_precision, summarize_log_history, unbatch_predictions
 from .models.base import HFModel
 from .plugins.xpu import XPUMemoryCallback
 from .tools.configurator import Configurator
@@ -204,6 +204,19 @@ class HFEngine(Engine):
         )
         monitor = monitor if monitor is not None else defaults.get("monitor")
 
+        # The named keys above are consumed here and excluded to
+        # avoid double-setting them.
+        named_keys = {
+            "max_epochs",
+            "batch",
+            "learning_rate",
+            "patience",
+            "precision",
+            "val_check_interval",
+            "monitor",
+        }
+        extra_training_args = {k: v for k, v in defaults.items() if k not in named_keys}
+
         if checkpoint is not None:
             self._model.load_checkpoint(checkpoint)
 
@@ -237,14 +250,24 @@ class HFEngine(Engine):
             "logging_strategy": "epoch",
         }
         if has_eval and monitor is not None:
+            greater_is_better = resolve_greater_is_better(monitor)
             training_args_kwargs.update(
                 load_best_model_at_end=False,
                 metric_for_best_model=monitor,
-                greater_is_better=True,
+                greater_is_better=greater_is_better,
             )
             if patience is not None:
                 trainer_callbacks.append(EarlyStoppingCallback(early_stopping_patience=patience))
+        training_args_kwargs.update(extra_training_args)
         training_args_kwargs.update(kwargs)
+
+        # Convert`warmup_ratio` to the supported `warmup_steps` using the estimated number of training steps.
+        warmup_ratio = training_args_kwargs.pop("warmup_ratio", None)
+        if warmup_ratio is not None:
+            train_batch = training_args_kwargs["per_device_train_batch_size"]
+            steps_per_epoch = max(1, len(self._datamodule.subsets["train"]) // train_batch)
+            total_steps = max(1, int(steps_per_epoch * training_args_kwargs["num_train_epochs"]))
+            training_args_kwargs["warmup_steps"] = int(warmup_ratio * total_steps)
 
         args = TrainingArguments(**training_args_kwargs)
         val_subset = self._datamodule.subsets.get("val")
@@ -319,7 +342,6 @@ class HFEngine(Engine):
         trainer = self._build_test_scoped_trainer("test", batch, kwargs)
 
         metric_obj = metric(self._model.label_info) if metric is not None else self._model.build_default_metric()
-        metric_obj = metric_obj.to(self._device)
         return trainer.evaluate(split="test", metric=metric_obj)
 
     def predict(
@@ -463,6 +485,7 @@ class HFEngine(Engine):
         device: str | None = None,
         checkpoint: str | None = None,
         task: str | None = None,
+        pretrained: bool | None = None,
         **kwargs,
     ) -> HFEngine:
         """Build an engine from a Hugging Face recipe.
@@ -474,6 +497,7 @@ class HFEngine(Engine):
             work_dir: Working directory for checkpoints and exports.
             device: Device to use.
             checkpoint: Optional warm-start checkpoint directory.
+            pretrained: Override the recipe's model weight-loading setting.
             task: Task type for disambiguation. Read from the recipe's
                 top-level ``task`` field if not given here.
             **kwargs: Backend-specific keyword arguments forwarded to
@@ -493,7 +517,7 @@ class HFEngine(Engine):
 
         datamodule = configurator.build_datamodule()
         label_info = datamodule.label_info
-        model = configurator.create_model(label_info)
+        model = configurator.create_model(label_info, pretrained=pretrained)
 
         engine_kwargs: dict[str, Any] = {**kwargs}
         if device is not None:

@@ -11,14 +11,16 @@ just a recipe entry.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from functools import cached_property
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, Literal
 
 import torch
 import transformers
 from torch import nn
 from transformers.utils import ModelOutput
 
+from getitune.backend.huggingface.exporter.native import HFModelExporter
 from getitune.backend.lightning.models.base import DataInputParams
 from getitune.types.export import ExportFormat, TaskLevelExportParameters
 from getitune.types.label import LabelInfo
@@ -26,6 +28,7 @@ from getitune.types.precision import Precision
 
 if TYPE_CHECKING:
     from torchmetrics import Metric, MetricCollection
+    from transformers.image_processing_utils import BaseImageProcessor
 
     from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.config.data import IntensityConfig
@@ -52,12 +55,15 @@ class HFModel(ABC, nn.Module):
             during export, e.g. ``"ssd"`` or ``"DETRInstSeg"``.
         label_keys: Target keyword names the underlying model expects. Passed
             to ``TrainingArguments(label_names=...)``.
+        _onnx_output_names: Output tensor names baked into the ONNX export;
+            ModelAPI's parsers resolve outputs by name.
     """
 
     task: ClassVar[TaskType]
     hf_auto_class: ClassVar[type]
     export_model_type: ClassVar[str] = "null"
     label_keys: ClassVar[tuple[str, ...]] = ("labels",)
+    _onnx_output_names: ClassVar[list[str]] = []
 
     def __init__(
         self,
@@ -67,6 +73,7 @@ class HFModel(ABC, nn.Module):
         input_size: tuple[int, int] = (640, 640),
         mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
         std: tuple[float, float, float] = (0.229, 0.224, 0.225),
+        resize_mode: Literal["crop", "standard", "fit_to_window", "fit_to_window_letterbox"] = "standard",
         pretrained: bool = True,
         extra_overrides: dict[str, Any] | None = None,
     ) -> None:
@@ -84,6 +91,8 @@ class HFModel(ABC, nn.Module):
                 Geti's data pipeline does the actual resizing.
             mean: Per-channel normalization mean, for export metadata.
             std: Per-channel normalization std, for export metadata.
+            resize_mode: Resize mode used by the data pipeline and recorded in
+                exported model metadata.
             pretrained: Load Hub/local weights if ``True``, otherwise build an
                 untrained model from the resolved config.
             extra_overrides: Extra keyword arguments forwarded to
@@ -96,6 +105,7 @@ class HFModel(ABC, nn.Module):
         self.extra_overrides = dict(extra_overrides or {})
         self._label_info = self._dispatch_label_info(label_info)
         self._data_input_params = DataInputParams(input_size=input_size, mean=mean, std=std)
+        self._resize_mode = resize_mode
         self._intensity_config: IntensityConfig | None = None
         self._best_checkpoint: Path | None = None
 
@@ -168,6 +178,10 @@ class HFModel(ABC, nn.Module):
         Shared across tasks: only ``build_targets`` differs per task.
         """
         return self.hf_model(**self.build_targets(batch))
+
+    def build_eval_inputs(self, batch: SampleBatch) -> dict[str, Any]:
+        """Build the minimal forward kwargs an eval/predict pass needs."""
+        return {"pixel_values": batch.images}
 
     @abstractmethod
     def postprocess(self, outputs: ModelOutput, batch: SampleBatch) -> PredictionBatch:
@@ -264,6 +278,11 @@ class HFModel(ABC, nn.Module):
         return self._data_input_params
 
     @property
+    def resize_mode(self) -> Literal["crop", "standard", "fit_to_window", "fit_to_window_letterbox"]:
+        """Resize mode used by the data pipeline."""
+        return self._resize_mode
+
+    @property
     def best_checkpoint(self) -> Path | None:
         """Most recently saved checkpoint directory, if any."""
         return self._best_checkpoint
@@ -283,14 +302,36 @@ class HFModel(ABC, nn.Module):
             optimization_config={},
         )
 
+    @cached_property
+    def _image_processor(self) -> BaseImageProcessor:
+        """Load the checkpoint's image processor for post-processing."""
+        return transformers.AutoImageProcessor.from_pretrained(
+            self.checkpoint,
+            do_resize=False,
+            do_rescale=False,
+            do_normalize=False,
+            do_pad=False,
+        )
+
     @property
     def _exporter(self) -> ModelExporter:
-        """Build the ONNX/OpenVINO exporter.
+        """Build the ONNX/OpenVINO exporter from the task's output names.
 
-        Overridden per task with an :class:`~getitune.backend.huggingface.exporter.native.HFModelExporter`.
+        Task subclasses set ``_onnx_output_names`` and inherit this builder,
+        keeping the export contract (input names, resize mode, swap RGB,
+        opset, dynamo off) in one place.
         """
-        msg = f"{type(self).__name__} does not define an exporter; override the '_exporter' property."
-        raise NotImplementedError(msg)
+        if not hasattr(self, "_onnx_output_names") or not self._onnx_output_names:
+            msg = "ONNX output names are not set."
+            raise ValueError(msg)
+
+        return HFModelExporter(
+            task_level_export_parameters=self._export_parameters,
+            data_input_params=self.data_input_params,
+            resize_mode=self.resize_mode,
+            swap_rgb=False,
+            onnx_export_configuration={"input_names": ["images"], "output_names": self._onnx_output_names},
+        )
 
     def export(
         self,

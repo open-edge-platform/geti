@@ -10,12 +10,15 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import torch
+from lightning_utilities.core.apply_func import apply_to_collection
 from torchvision import tv_tensors
 from transformers import Trainer
 
 from getitune.data.augmentation import GPUAugmentationPipeline
 from getitune.data.augmentation.task_keys import DATA_KEYS_BY_TASK
 from getitune.metrics import MetricCallable
+
+from .utils import resolve_greater_is_better
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -284,9 +287,13 @@ class GetiTuneHFTrainer(Trainer):
         with torch.no_grad():
             for inputs in dataloader:
                 batch = self._prepare_batch(inputs, pipeline)
-                targets = self.model_wrapper.build_targets(batch)
-                outputs = model(**targets)
-                metric_obj.update(**self.model_wrapper.to_metric_inputs(outputs, batch))
+                outputs = model(**self.model_wrapper.build_eval_inputs(batch))
+                metric_inputs = self.model_wrapper.to_metric_inputs(outputs, batch)
+                # HF postprocess returns CPU tensors while the batch lives on the
+                # accelerator, so move every tensor in the metric inputs to CPU once
+                # here instead of scattering .cpu() through each to_metric_inputs.
+                metric_inputs = apply_to_collection(metric_inputs, torch.Tensor, lambda t: t.cpu())
+                metric_obj.update(**metric_inputs)
 
         computed = metric_obj.compute()
         metrics = self._format_metrics(computed, f"{split}/")
@@ -326,7 +333,7 @@ class GetiTuneHFTrainer(Trainer):
 
         greater_is_better = self.args.greater_is_better
         if greater_is_better is None:
-            greater_is_better = True
+            greater_is_better = resolve_greater_is_better(monitor)
 
         best = self._best_metric_value
         if best is None:
@@ -374,8 +381,7 @@ class GetiTuneHFTrainer(Trainer):
         with torch.no_grad():
             for inputs in self.get_test_dataloader():
                 batch = self._prepare_batch(inputs, self._test_gpu_pipeline)
-                targets = self.model_wrapper.build_targets(batch)
-                outputs = model(**targets)
+                outputs = model(**self.model_wrapper.build_eval_inputs(batch))
                 batches.append(self.model_wrapper.postprocess(outputs, batch))
         return batches
 

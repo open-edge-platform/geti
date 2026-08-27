@@ -18,7 +18,7 @@ from torchvision import tv_tensors
 
 from getitune.data.entity.sample import Prediction
 
-from .trainers.utils import remap_log_key
+from .trainers.utils import remap_log_key, resolve_greater_is_better
 
 if TYPE_CHECKING:
     import torch
@@ -29,6 +29,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 __all__ = [
+    "resolve_greater_is_better",
     "resolve_precision",
     "summarize_log_history",
     "unbatch_predictions",

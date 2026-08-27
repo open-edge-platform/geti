@@ -202,7 +202,7 @@ class Configurator:
         )
         return self._datamodule
 
-    def create_model(self, label_info: LabelInfo | int) -> HFModel:
+    def create_model(self, label_info: LabelInfo | int, pretrained: bool | None = None) -> HFModel:
         """Instantiate the configured Hugging Face model via jsonargparse."""
         if self._model is not None:
             return self._model
@@ -223,6 +223,8 @@ class Configurator:
         ignore_index = label_info_dict.pop("ignore_index", None)
         init_args = model_config.setdefault("init_args", {})
         init_args["label_info"] = label_info_dict
+        if pretrained is not None:
+            init_args["pretrained"] = pretrained
         if ignore_index is not None:
             init_args.setdefault("ignore_index", ignore_index)
 

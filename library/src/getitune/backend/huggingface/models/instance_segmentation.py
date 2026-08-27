@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 import copy
-from functools import cached_property
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import torch
@@ -14,7 +13,6 @@ import torch.nn.functional as f
 import transformers
 from torchvision import tv_tensors
 
-from getitune.backend.huggingface.exporter.native import HFModelExporter
 from getitune.backend.huggingface.models.base import HFModel
 from getitune.backend.huggingface.models.utils import (
     _traceable_masks_to_boxes,
@@ -31,7 +29,6 @@ if TYPE_CHECKING:
     from torchmetrics import Metric, MetricCollection
     from transformers.utils import ModelOutput
 
-    from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.data.entity.sample import SampleBatch
     from getitune.types.label import LabelInfoTypes
 
@@ -52,6 +49,7 @@ class HFInstSegModel(HFModel):
     hf_auto_class: ClassVar[type] = transformers.AutoModelForUniversalSegmentation
     export_model_type: ClassVar[str] = "DETRInstSeg"
     label_keys: ClassVar[tuple[str, ...]] = ("mask_labels", "class_labels")
+    _onnx_output_names: ClassVar[list[str]] = ["boxes", "labels", "masks"]
 
     def __init__(
         self,
@@ -112,16 +110,6 @@ class HFInstSegModel(HFModel):
             "class_labels": [c.long() for c in batch.labels],
         }
 
-    @cached_property
-    def _image_processor(self) -> transformers.Mask2FormerImageProcessor:
-        """Stateless post-processing shared across the whole MaskFormer family.
-
-        It only reads ``outputs.class_queries_logits`` /
-        ``outputs.masks_queries_logits``, which every model in this wrapper's
-        scope provides, so one instance covers all of them.
-        """
-        return transformers.Mask2FormerImageProcessor()
-
     def postprocess(self, outputs: ModelOutput, batch: SampleBatch) -> PredictionBatch:
         """Decode raw outputs into boxes, masks, scores, and labels in the model's input space.
 
@@ -131,7 +119,7 @@ class HFInstSegModel(HFModel):
         rescaling every prediction individually.
         """
         input_size = (int(batch.images[0].shape[-2]), int(batch.images[0].shape[-1]))
-        decoded = self._image_processor.post_process_instance_segmentation(
+        decoded = self._image_processor.post_process_instance_segmentation(  # pyrefly: ignore[missing-attribute]
             outputs,
             threshold=0.0,
             target_sizes=[input_size] * len(batch.images),
@@ -140,7 +128,11 @@ class HFInstSegModel(HFModel):
 
         bboxes, masks, labels, scores = [], [], [], []
         for image_result in decoded:
-            binary_maps = image_result["segmentation"].bool()
+            segmentation = image_result["segmentation"]
+            if segmentation.ndim == 2:
+                binary_maps = torch.empty((0, *input_size), dtype=torch.bool, device=segmentation.device)
+            else:
+                binary_maps = segmentation.bool()
             device = binary_maps.device
             bboxes.append(
                 tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
@@ -170,10 +162,14 @@ class HFInstSegModel(HFModel):
     def to_metric_inputs(self, outputs: ModelOutput, batch: SampleBatch) -> dict[str, Any]:
         """Build the ``preds``/``target`` lists ``MaskRLEMeanAPCallable`` expects.
 
-        Ground truth stays in original image coordinates (``resize_targets:
-        false``), so both boxes and masks are reprojected into the same
-        input-space canvas the predictions from ``postprocess`` already live
-        in (G12), then masks on both sides are RLE-encoded.
+        Unlike detection (which decodes predictions to each image's
+        ``ori_shape`` and compares in original image space), instance
+        segmentation compares in the model's padded input canvas: the data
+        uses ``Resize(keep_aspect_ratio=True)`` (letterbox with padding), and
+        a simple ``target_sizes=ori_shape`` rescale does not invert the
+        letterbox padding for masks. Decoding predictions to the shared canvas
+        and reprojecting ground-truth boxes/masks into that same canvas is the
+        exact, efficient path here (G12).
         """
         if batch.bboxes is None or batch.masks is None or batch.labels is None or batch.imgs_info is None:
             msg = "Instance segmentation batches need bboxes, masks, labels, and imgs_info to compute metrics."
@@ -225,16 +221,6 @@ class HFInstSegModel(HFModel):
     def build_default_metric(self) -> Metric | MetricCollection:
         """Mean average precision over RLE-encoded masks, the standard instance-seg metric."""
         return MaskRLEMeanAPCallable(self.label_info)
-
-    @property
-    def _exporter(self) -> ModelExporter:
-        return HFModelExporter(
-            task_level_export_parameters=self._export_parameters,
-            data_input_params=self.data_input_params,
-            resize_mode="standard",
-            swap_rgb=False,
-            onnx_export_configuration={"input_names": ["images"], "output_names": ["boxes", "labels", "masks"]},
-        )
 
     def forward_for_tracing(self, images: torch.Tensor) -> dict[str, torch.Tensor]:
         """Return per-query boxes/labels/masks for ONNX/OpenVINO export.
