@@ -11,6 +11,7 @@ import { isEmpty } from 'lodash-es';
 import { useCreateDatasetViewMutation } from '../api/use-create-dataset-view';
 import { SelectedMediaCount } from '../selected-media-count/selected-media-count.component';
 import { DatasetView } from '../type';
+import { DUPLICATE_DATASET_VIEW_NAME_ERROR } from '../util';
 
 type SaveDatasetViewDialogProps = {
     onClose: (datasetViewId?: string) => void;
@@ -63,7 +64,7 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds, datasetViews }: Save
                         value={viewName}
                         onChange={setViewName}
                         validationState={isDuplicatedName ? 'invalid' : undefined}
-                        errorMessage={isDuplicatedName ? 'A view with this name already exists.' : undefined}
+                        errorMessage={isDuplicatedName ? DUPLICATE_DATASET_VIEW_NAME_ERROR : undefined}
                     />
                 </Form>
             </Content>
