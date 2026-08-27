@@ -372,6 +372,63 @@ class TestModelServiceIntegration:
 
         assert total_size == 100 + 200 + 300 + 400
 
+    @pytest.mark.parametrize("training_status", [TrainingStatus.NOT_STARTED, TrainingStatus.IN_PROGRESS])
+    def test_get_model_size_in_bytes_recomputes_while_training_not_finished(
+        self,
+        training_status: TrainingStatus,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ):
+        """Size must reflect the current filesystem state while the model folder can still change."""
+        model_rev_db = db_session.get(ModelRevisionDB, str(fxt_model_id))
+        assert model_rev_db
+        model_rev_db.training_status = training_status
+        db_session.add(model_rev_db)
+        db_session.flush()
+
+        model_base_path = tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id)
+        variant_dir = model_base_path / "variants" / str(uuid4())
+        variant_dir.mkdir(parents=True, exist_ok=True)
+        (variant_dir / "model.pt").write_bytes(b"x" * 100)
+
+        assert fxt_model_service.get_model_size_in_bytes(fxt_project_id, fxt_model_id) == 100
+
+        (variant_dir / "extra.ckpt").write_bytes(b"x" * 50)
+
+        assert fxt_model_service.get_model_size_in_bytes(fxt_project_id, fxt_model_id) == 150
+
+    @pytest.mark.parametrize("training_status", [TrainingStatus.SUCCESSFUL, TrainingStatus.FAILED])
+    def test_get_model_size_in_bytes_uses_cache_after_training_finishes(
+        self,
+        training_status: TrainingStatus,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ):
+        """Once training has finished the folder is stable, so the cached value is returned."""
+        model_rev_db = db_session.get(ModelRevisionDB, str(fxt_model_id))
+        assert model_rev_db
+        model_rev_db.training_status = training_status
+        db_session.add(model_rev_db)
+        db_session.flush()
+
+        model_base_path = tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id)
+        variant_dir = model_base_path / "variants" / str(uuid4())
+        variant_dir.mkdir(parents=True, exist_ok=True)
+        (variant_dir / "model.pt").write_bytes(b"x" * 100)
+
+        assert fxt_model_service.get_model_size_in_bytes(fxt_project_id, fxt_model_id) == 100
+
+        (variant_dir / "extra.ckpt").write_bytes(b"x" * 50)
+
+        # Stale cached value is returned, since the model path is assumed immutable after training finishes
+        assert fxt_model_service.get_model_size_in_bytes(fxt_project_id, fxt_model_id) == 100
+
     def test_rename_model(self, fxt_project_id: UUID, fxt_model_id: UUID, fxt_model_service: ModelService):
         """Test updating name of a model by ID."""
         new_model_name = "This is a new model name"
