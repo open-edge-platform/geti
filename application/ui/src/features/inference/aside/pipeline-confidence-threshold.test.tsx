@@ -84,4 +84,20 @@ describe('PipelineConfidenceThreshold', () => {
             expect(pipelinePatchSpy).toHaveBeenCalledWith({ inference: { confidence_threshold: 0.65 } });
         });
     });
+
+    it('restores the pipeline value when it could not be persisted', async () => {
+        renderApp(mockedPipeline);
+
+        server.use(http.patch('/api/projects/{project_id}/pipeline', () => HttpResponse.json(null, { status: 500 })));
+
+        await screen.findByRole('textbox', { name: 'Change Confidence threshold' });
+
+        await userEvent.clear(getInput());
+        await userEvent.type(getInput(), '0.8');
+        await userEvent.tab();
+
+        await waitFor(() => {
+            expect(getInput()).toHaveValue('0.35');
+        });
+    });
 });

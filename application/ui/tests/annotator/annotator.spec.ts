@@ -1278,7 +1278,10 @@ test.describe('Annotator', () => {
                     return HttpResponse.json([olderModel, newerModel]);
                 }),
                 http.post('/api/projects/{project_id}/dataset/media:predict', async ({ request }) => {
-                    const body = (await request.json()) as unknown as Record<string, string & number>;
+                    const body = (await request.json()) as unknown as {
+                        model_variant_id?: string;
+                        confidence_threshold?: number;
+                    };
                     capturedModelVariantId = body.model_variant_id;
                     capturedConfidenceThreshold = body.confidence_threshold;
 
