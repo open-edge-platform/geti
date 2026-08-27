@@ -43,6 +43,7 @@ const selectableModel: SelectableModel = {
     modelId: 'model-1',
     modelVariantId: 'variant-1',
     name: 'Model [FP16]',
+    optimalConfidenceThreshold: 0.65,
 };
 
 const PREDICTION_DELAY_MS = 500;
