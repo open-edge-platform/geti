@@ -24,13 +24,21 @@ export class DatasetPage {
         return this.page.getByRole('listbox', { name: 'data-collection-grid' });
     }
 
+    getMediaItemById(mediaId: string) {
+        return this.getMediaGrid()
+            .getByRole('option')
+            .filter({
+                has: this.page.getByRole('checkbox', {
+                    name: `Selection state of media item ${mediaId}`,
+                    exact: true,
+                }),
+            });
+    }
+
     async selectMediaItem(mediaId: string) {
-        await this.getMediaGrid()
-            .getByRole('checkbox', {
-                name: `Select media item ${mediaId}`,
-                exact: true,
-            })
-            .click();
+        // The checkbox only reflects the state, selection happens on the item itself,
+        // where a plain click replaces the selection and a ctrl click adds to it
+        await this.getMediaItemById(mediaId).click({ modifiers: ['Control'] });
     }
 
     getMediaItemByName(name: string) {

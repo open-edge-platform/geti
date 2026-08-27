@@ -1,4 +1,0 @@
-interface:
-  display_name: "Geti Library Dev"
-  short_description: "Work on the getitune Python library in library/"
-  default_prompt: "Use $geti-library-dev to plan or validate a change under library/."

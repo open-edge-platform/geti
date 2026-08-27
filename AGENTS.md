@@ -21,8 +21,11 @@
 - `library/`: `getitune` Python package (the Geti training library; source in `src/getitune/`), recipes, and tests. See `library/AGENTS.md`.
 - `application/backend/`: FastAPI backend named `geti`; consumes `../../library` as an editable `uv` source. See `application/backend/AGENTS.md`.
 - `application/ui/`: React 19 + TypeScript + RSBuild frontend. See `application/ui/AGENTS.md`.
-- `library/docs/`: Sphinx-based documentation source.
-- `README.md` & `CHANGELOG.md`: root-level project documentation.
+- `application/README.md`: overview and entry point for the application; links to the installation guide.
+- `application/docs/`: Markdown docs for the application (installation, upgrade, API, pipeline, jobs, dataset import/export, models, quantization).
+- `library/README.md`: overview and quick-start for the `getitune` library.
+- `library/docs/design/`: design notes for the library; user-facing library docs live on the external documentation website.
+- `README.md`: root-level project overview.
 - `.github/workflows/`: CI source of truth for path-based checks and required jobs.
 
 ## Data & State
@@ -35,6 +38,42 @@
   - SSL certificates under `certs/`
   - pretrained weights downloaded as per manifest urls under `pretrained_weights/`
 
+## Documentation
+
+Keep documentation close to the code and update it in the same PR as the behavior
+it describes. Use the `geti-docs-update` skill for documentation changes.
+
+Where each kind of documentation lives:
+
+- `README.md` (root): project overview and the shortest possible quick-start. It
+  lists the available install options and documents only the most basic case,
+  then links to `application/docs/install.md` for anything more advanced. Do not
+  duplicate detailed steps here.
+- `application/README.md`: application overview and entry point. It summarises
+  the install options and links to the installation guide; it does not repeat
+  the detailed steps.
+- `application/docs/install.md`: the **single source of truth for installing and
+  running the application**. It covers every scenario (Windows MSIX app, Docker
+  with pre-built or self-built images, install script, and run-from-source for
+  development), plus prerequisites, accelerator support, TLS/TURN, and
+  air-gapped setup. Add or change installation steps here first.
+- `application/docs/upgrade.md`: upgrading an existing installation (Docker or
+  Windows MSIX), data migration, and rollback.
+- `library/README.md`: overview and quick-start for the `getitune` training
+  library. Detailed library guides live on the external documentation website
+  (`https://docs.geti.intel.com/docs/user-guide/library/`), not in this repo.
+- `library/docs/design/`: design notes for the library.
+- `application/docs/`: Markdown docs for the application (API, pipeline, jobs,
+  dataset import/export, models, quantization).
+
+Installation docs follow an **install-guide-first** model:
+`application/docs/install.md` is authoritative and detailed, while the root
+`README.md`, `application/README.md`, and the public docs website
+(`https://docs.geti.intel.com`) show only the basic case and link to it for
+advanced scenarios. When you change how Geti is installed or run, update
+`application/docs/install.md` first, then reconcile the two READMEs so they do
+not drift; the docs website lives outside this repo and may also need updating.
+
 ## Choose the Right Workflow
 
 Contributor/development skills (changing the codebase):
@@ -43,7 +82,7 @@ Contributor/development skills (changing the codebase):
 - Use the `backend` workflow for changes under `application/backend/app`, backend tests, backend packaging, or backend API schemas.
 - Use the `ui` workflow for changes under `application/ui/src`, frontend tests, build config, or generated API client types.
 - Use the OpenAPI sync workflow whenever backend API contracts change and the UI consumes those changes.
-- Use the documentation update workflow to keep `README.md`, `CHANGELOG.md`, or `library/docs/` in sync with code changes.
+- Use the documentation update workflow to keep `README.md`, `application/README.md`, `application/docs/`, or `library/README.md` in sync with code changes.
 
 User-facing skills (using Geti, not changing it):
 
@@ -107,4 +146,5 @@ User-facing skills (using Geti, not changing it):
 - Prefer minimal, area-scoped edits.
 - Follow existing Ruff, import-linter, ESLint, Prettier, and TypeScript configuration instead of introducing parallel style rules.
 - Update tests or docs when behavior changes.
+- When changing how Geti is installed or run, edit `application/docs/install.md` (the source of truth) and reconcile `README.md` and `application/README.md` so they do not drift.
 - Run the narrowest relevant verification before finishing and state exactly what was not run.

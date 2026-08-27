@@ -16,6 +16,7 @@ from app.services import (
     ProjectService,
     SystemService,
 )
+from app.services.dataset_view_service import DatasetViewService
 from app.services.event.event_bus import EventBus
 from app.services.video import VideoService
 
@@ -86,3 +87,11 @@ def fxt_dataset_service(
 ) -> DatasetService:
     """Fixture to create a DatasetService instance."""
     return DatasetService(label_service=fxt_label_service, media_service=fxt_media_service, db_session=db_session)
+
+
+@pytest.fixture
+def fxt_dataset_view_service(
+    db_session: Session,
+) -> DatasetViewService:
+    """Fixture to create a DatasetViewService instance."""
+    return DatasetViewService(db_session=db_session)
