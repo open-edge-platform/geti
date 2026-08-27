@@ -1,7 +1,6 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { match } from '@formatjs/intl-localematcher';
 import { createInstance, type i18n as I18n } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
@@ -27,11 +26,24 @@ export const LANGUAGE_STORAGE_KEY = 'geti-language';
 const resolveLanguage = (language: string): string => {
     if (!language || typeof language !== 'string') return 'en';
 
-    const trimmed = language.trim();
-    if (trimmed === '') return 'en';
+    const tag = language.trim();
+    if (tag === '') return 'en';
 
     try {
-        return match([trimmed], SUPPORTED_LANGUAGES, 'en');
+        const locale = new Intl.Locale(tag);
+
+        if (locale.language === 'en') return 'en';
+        if (locale.language !== 'zh') return 'en';
+
+        const maximized = locale.maximize();
+
+        if (maximized.script === 'Hant') {
+            if (maximized.region === 'HK') return 'zh-HK';
+            if (maximized.region === 'MO') return 'zh-MO';
+            return 'zh-TW';
+        }
+
+        return 'zh-CN';
     } catch {
         return 'en';
     }

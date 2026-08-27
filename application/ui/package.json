@@ -33,7 +33,6 @@
         "tauri": "tauri"
     },
     "dependencies": {
-        "@formatjs/intl-localematcher": "~0.8.13",
         "@geti-ui/smart-tools": "^1.6.0",
         "@geti-ui/ui": "^1.6.0",
         "@react-aria/utils": "^3.34.1",
