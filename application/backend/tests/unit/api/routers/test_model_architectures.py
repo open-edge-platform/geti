@@ -9,6 +9,8 @@ import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
+from app.supported_models.timm import TimmCatalog
+
 
 class TestModelArchitecturesEndpoint:
     """Test cases for the model architectures endpoint."""
@@ -144,10 +146,10 @@ class TestModelArchitecturesEndpoint:
         timm_card = next(arch for arch in data["model_architectures"] if arch["id"] == "image-classification-timm")
 
         assert timm_card["task"] == "classification"
-        assert timm_card["name"] == "Pytorch Image Models (timm)"
+        assert timm_card["name"] == "PyTorch Image Models (timm)"
         assert timm_card["timm_metadata"] is None
-        assert timm_card["license"] is None
-        assert timm_card["description"] == "Choose any of 1713 timm backbones."
+        assert timm_card["license"] == "varies by model"
+        assert f"Geti offers {TimmCatalog.count_backbones()} of these models" in timm_card["description"]
         assert timm_card["capabilities"] is not None
         assert timm_card["capabilities"]["xai"] is False
         assert timm_card["capabilities"]["tiling"] is False

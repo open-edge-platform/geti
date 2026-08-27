@@ -102,14 +102,19 @@ def _build_timm_card_entry() -> ModelArchitectureView:
     via `get_model_manifest_by_id` — selecting a concrete backbone always uses
     a real `image-classification-timm-<name>` id instead.
     """
+    description = (
+        "PyTorch Image Models (TIMM) is a large collection of SOTA image classification models and "
+        f"pretrained weights. Geti offers {TimmCatalog.count_backbones()} of these models across dozens "
+        "of architecture families."
+    )
     return ModelArchitectureView(
         id=TIMM_CARD_ID,
         task=TaskType.CLASSIFICATION,
-        name="Pytorch Image Models (timm)",
+        name="PyTorch Image Models (timm)",
         timm_metadata=None,
-        description=f"Choose any of {TimmCatalog.count_backbones()} timm backbones.",
+        description=description,
         capabilities=Capabilities(xai=False, tiling=False),
-        license=None,
+        license="varies by model",
         stats=None,
         support_status=ModelManifestDeprecationStatus.ACTIVE,
     )
