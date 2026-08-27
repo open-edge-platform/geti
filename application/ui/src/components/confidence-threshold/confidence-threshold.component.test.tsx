@@ -28,6 +28,26 @@ describe('ConfidenceThreshold', () => {
         expect(onChange).toHaveBeenCalledWith(0.8);
     });
 
+    it('does not call onChange while the user is still typing', async () => {
+        const onChange = vi.fn();
+        render(<ConfidenceThreshold value={0.65} defaultValue={0.65} onChange={onChange} />);
+
+        await userEvent.clear(getInput());
+        await userEvent.type(getInput(), '0.8');
+
+        expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('commits the numeric input when Enter is pressed', async () => {
+        const onChange = vi.fn();
+        render(<ConfidenceThreshold value={0.65} defaultValue={0.65} onChange={onChange} />);
+
+        await userEvent.clear(getInput());
+        await userEvent.type(getInput(), '0.8{Enter}');
+
+        expect(onChange).toHaveBeenCalledExactlyOnceWith(0.8);
+    });
+
     it('restores the default value when reset is pressed', async () => {
         const onChange = vi.fn();
         render(<ConfidenceThreshold value={0.8} defaultValue={0.65} onChange={onChange} />);

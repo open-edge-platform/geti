@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useContext, useMemo, useRef, useState } from 'react';
+import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
 
 import type { Model } from '@/api/types';
 import { usePipeline } from 'hooks/api/pipeline.hook';
@@ -47,18 +47,24 @@ const useSelectedModelId = (models: Model[]) => {
     return useLocalStorage<string | null>(`${projectId}-model-variant-id`, defaultSelectedId);
 };
 
-// The threshold is a model specific parameter, so selecting another model always resets to that model's value.
+// The threshold is a model specific parameter, so an edited value only applies to the model it was set for.
 const useConfidenceThreshold = (selectedModel: SelectableModel | undefined) => {
-    const optimalConfidenceThreshold = selectedModel?.optimalConfidenceThreshold ?? null;
-    const [confidenceThreshold, setConfidenceThreshold] = useState<number | null>(optimalConfidenceThreshold);
-    const previousModelVariantIdRef = useRef(selectedModel?.modelVariantId);
+    const [editedThreshold, setEditedThreshold] = useState<{ modelVariantId: string; value: number } | null>(null);
 
-    if (previousModelVariantIdRef.current !== selectedModel?.modelVariantId) {
-        previousModelVariantIdRef.current = selectedModel?.modelVariantId;
-        setConfidenceThreshold(optimalConfidenceThreshold);
-    }
+    const confidenceThreshold =
+        editedThreshold !== null && editedThreshold.modelVariantId === selectedModel?.modelVariantId
+            ? editedThreshold.value
+            : (selectedModel?.optimalConfidenceThreshold ?? null);
 
-    return [confidenceThreshold, setConfidenceThreshold] as const;
+    const changeConfidenceThreshold = (value: number) => {
+        if (selectedModel === undefined) {
+            return;
+        }
+
+        setEditedThreshold({ modelVariantId: selectedModel.modelVariantId, value });
+    };
+
+    return [confidenceThreshold, changeConfidenceThreshold] as const;
 };
 
 export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) => {
@@ -70,7 +76,7 @@ export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) 
 
     const selectedModel = selectableModels.find((model) => model.modelVariantId === selectedModelId);
 
-    const [confidenceThreshold, setConfidenceThreshold] = useConfidenceThreshold(selectedModel);
+    const [confidenceThreshold, changeConfidenceThreshold] = useConfidenceThreshold(selectedModel);
 
     const { data: pipeline } = usePipeline();
 
@@ -86,7 +92,7 @@ export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) 
                 selectedDevice,
                 changeSelectedDevice: setSelectedDevice,
                 confidenceThreshold,
-                changeConfidenceThreshold: setConfidenceThreshold,
+                changeConfidenceThreshold,
             }}
         >
             {children}
