@@ -51,6 +51,14 @@ vi.mock('../../import-export/import-export.component', () => ({
 vi.mock('hooks/use-project-identifier.hook', () => ({
     useProjectIdentifier: () => 'project-123',
 }));
+vi.mock('../../../../constants/feature-flags', () => ({
+    FEATURE_FLAGS: {
+        DATASET_VIEWS: true,
+        TIMM_MODEL_CONFIGURATION: false,
+        CONFIDENCE_THRESHOLD: false,
+    },
+}));
+
 vi.mock('../../providers/selected-data-provider.component', () => ({
     useSelectedData: vi.fn(() => ({
         selectedKeys: new Set(),
