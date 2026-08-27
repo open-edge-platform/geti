@@ -75,7 +75,7 @@ export const DatasetViewSelector = ({ datasetViews, resetSelectedMediaIds }: Dat
         setDatasetViewToBeRenamed(datasetView);
     };
 
-    const handleDeleteSuccess = () => {
+    const handleDelete = () => {
         if (datasetViewToBeDeleted?.id === datasetViewId) {
             setDatasetViewId(ENTIRE_DATASET_VIEW_ID);
         }
@@ -140,7 +140,7 @@ export const DatasetViewSelector = ({ datasetViews, resetSelectedMediaIds }: Dat
                 {datasetViewToBeDeleted !== null && (
                     <DeleteDatasetViewDialog
                         datasetView={datasetViewToBeDeleted}
-                        onSuccess={handleDeleteSuccess}
+                        onSuccess={handleDelete}
                         onCancel={handleCancelDelete}
                     />
                 )}
