@@ -75,10 +75,14 @@ export const DatasetViewSelector = ({ datasetViews, resetSelectedMediaIds }: Dat
         setDatasetViewToBeRenamed(datasetView);
     };
 
-    const handleCloseDeleteDialog = () => {
+    const handleDeleteSuccess = () => {
         if (datasetViewToBeDeleted?.id === datasetViewId) {
             setDatasetViewId(ENTIRE_DATASET_VIEW_ID);
         }
+        setDatasetViewToBeDeleted(null);
+    };
+
+    const handleCancelDelete = () => {
         setDatasetViewToBeDeleted(null);
     };
 
@@ -96,10 +100,11 @@ export const DatasetViewSelector = ({ datasetViews, resetSelectedMediaIds }: Dat
     }, [datasetViewId, datasetViews, setDatasetViewId]);
 
     const selectDatasetView = (id: string | null) => {
+        setIsDatasetViewSelectorOpen(false);
+
         if (id === datasetViewId) return;
 
         setDatasetViewId(id);
-        setIsDatasetViewSelectorOpen(false);
         resetSelectedMediaIds();
     };
 
@@ -131,9 +136,13 @@ export const DatasetViewSelector = ({ datasetViews, resetSelectedMediaIds }: Dat
                 </Dialog>
             </DialogTrigger>
 
-            <DialogContainer onDismiss={handleCloseDeleteDialog}>
+            <DialogContainer onDismiss={handleCancelDelete}>
                 {datasetViewToBeDeleted !== null && (
-                    <DeleteDatasetViewDialog datasetView={datasetViewToBeDeleted} onClose={handleCloseDeleteDialog} />
+                    <DeleteDatasetViewDialog
+                        datasetView={datasetViewToBeDeleted}
+                        onSuccess={handleDeleteSuccess}
+                        onCancel={handleCancelDelete}
+                    />
                 )}
             </DialogContainer>
             <DialogContainer onDismiss={handleCloseRenameDialog}>

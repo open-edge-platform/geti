@@ -11,7 +11,8 @@ import { DatasetView } from './type';
 
 type DeleteDatasetViewDialogProps = {
     datasetView: DatasetView;
-    onClose: () => void;
+    onSuccess: () => void;
+    onCancel: () => void;
 };
 
 const useDeleteDatasetView = () => {
@@ -44,11 +45,11 @@ const useDeleteDatasetView = () => {
     };
 };
 
-export const DeleteDatasetViewDialog = ({ datasetView, onClose }: DeleteDatasetViewDialogProps) => {
+export const DeleteDatasetViewDialog = ({ datasetView, onSuccess, onCancel }: DeleteDatasetViewDialogProps) => {
     const { deleteDatasetView, isPending } = useDeleteDatasetView();
 
     const deleteView = () => {
-        deleteDatasetView({ datasetViewId: datasetView.id, onSuccess: onClose });
+        deleteDatasetView({ datasetViewId: datasetView.id, onSuccess });
     };
 
     return (
@@ -57,7 +58,7 @@ export const DeleteDatasetViewDialog = ({ datasetView, onClose }: DeleteDatasetV
             primaryActionLabel={'Delete'}
             variant={'destructive'}
             onPrimaryAction={deleteView}
-            onCancel={onClose}
+            onCancel={onCancel}
             secondaryActionLabel={'Close'}
             isPrimaryActionDisabled={isPending}
         >
