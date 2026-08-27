@@ -4,7 +4,7 @@
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile, status
@@ -625,20 +625,28 @@ def delete_media_annotation(
     dataset_service.delete_dataset_item_annotations(project=project, dataset_item_id=dataset_item_id)
 
 
+MEDIA_PREDICT_RESPONSES: dict[int | str, dict[str, Any]] = {
+    status.HTTP_200_OK: {"description": "Media predictions are calculated"},
+    status.HTTP_400_BAD_REQUEST: {
+        "description": "Missing frame range, range is specified for non-video media, or media inference limit exceeded"
+    },
+    status.HTTP_404_NOT_FOUND: {"description": "Media, dataset item or project not found"},
+    status.HTTP_503_SERVICE_UNAVAILABLE: {
+        "description": "Inference server is busy with another request, try again later"
+    },
+}
+
+
+@router.post(
+    ":predict",
+    status_code=status.HTTP_200_OK,
+    responses=MEDIA_PREDICT_RESPONSES,
+)
 @router.post(
     "/media:predict",
     status_code=status.HTTP_200_OK,
-    responses={
-        status.HTTP_200_OK: {"description": "Media predictions are calculated"},
-        status.HTTP_400_BAD_REQUEST: {
-            "description": "Missing frame range, range is specified for non-video media, "
-            "or media inference limit exceeded"
-        },
-        status.HTTP_404_NOT_FOUND: {"description": "Media, dataset item or project not found"},
-        status.HTTP_503_SERVICE_UNAVAILABLE: {
-            "description": "Inference server is busy with another request, try again later"
-        },
-    },
+    deprecated=True,
+    responses=MEDIA_PREDICT_RESPONSES,
 )
 def media_predict(
     inference_media_limit: Annotated[int, Depends(get_inference_media_limit)],
@@ -647,7 +655,11 @@ def media_predict(
     media_prediction_service: Annotated[MediaPredictionService, Depends(get_media_prediction_service)],
     system_service: Annotated[SystemService, Depends(get_system_service)],
 ) -> BatchInferenceResult:
-    """Get predictions for media"""
+    """Get predictions for media.
+
+    .. deprecated:: The `/media:predict` path is deprecated due to a duplicated `media` path segment
+       and will be removed in version 3.4. Use `:predict` instead.
+    """
     items_count = sum(
         [
             1
