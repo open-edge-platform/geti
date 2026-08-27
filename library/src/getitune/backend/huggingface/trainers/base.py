@@ -277,7 +277,6 @@ class GetiTuneHFTrainer(Trainer):
 
         self.model_wrapper.ensure_predict_ready()
         metric_obj.reset()
-        metric_obj.to(self.args.device)
 
         pipeline = self._eval_gpu_pipeline if split == "val" else self._test_gpu_pipeline
         model = self.model
