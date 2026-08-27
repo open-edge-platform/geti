@@ -129,6 +129,7 @@ ci_publish = [
 
 benchmark = [
     "kagglehub>=0.4.1",
+    "psutil>=6.0",
 ]
 
 [project.scripts]

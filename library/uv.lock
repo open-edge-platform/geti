@@ -1385,6 +1385,7 @@ dependencies = [
 [package.optional-dependencies]
 benchmark = [
     { name = "kagglehub" },
+    { name = "psutil" },
 ]
 ci-publish = [
     { name = "build" },
@@ -1478,6 +1479,7 @@ requires-dist = [
     { name = "onnxslim", specifier = "~=0.1.71" },
     { name = "openvino", specifier = "~=2026.3.0" },
     { name = "openvino-model-api", git = "https://github.com/open-edge-platform/model_api?subdirectory=model_api&branch=master" },
+    { name = "psutil", marker = "extra == 'benchmark'", specifier = ">=6.0" },
     { name = "pydata-sphinx-theme", marker = "extra == 'docs'", specifier = "==0.12.0" },
     { name = "pytorchcv", specifier = "==0.0.74" },
     { name = "pyyaml", specifier = "==6.0.3" },
