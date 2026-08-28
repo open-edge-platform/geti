@@ -31,7 +31,12 @@ class TimmBackbone(nn.Module):
         super().__init__(**kwargs)
         self.model_name = model_name
 
-        self.model = timm.create_model(self.model_name, num_classes=0)
+        # `exportable=True` is timm's own knob for export-friendliness: some architectures
+        # swap internal ops (e.g. dynamic "same" padding, certain pooling/reshape patterns)
+        # for export-safe equivalents when this flag is set. This is the same flag timm's
+        # own `onnx_export.py` script always passes, precisely to avoid tracing/decomposition
+        # failures like the ones observed with the newer torch.onnx FX-based exporter.
+        self.model = timm.create_model(self.model_name, num_classes=0, exportable=True)
 
         num_features = self.model.num_features
         if not isinstance(num_features, int):
