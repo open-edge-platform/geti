@@ -18,13 +18,13 @@ export type TimmModelSelection = {
     timmPretrainedTags: string[];
 
     selectedTimmFamily: string | null;
-    onSelectTimmFamily: (family: string | null) => void;
+    onSelectTimmFamily: (family: string) => void;
 
     selectedTimmVariant: string | null;
-    onSelectTimmVariant: (variant: string | null) => void;
+    onSelectTimmVariant: (variant: string) => void;
 
     selectedTimmPretrainedTag: string | null;
-    onSelectTimmPretrainedTag: (pretrainedTag: string | null) => void;
+    onSelectTimmPretrainedTag: (pretrainedTag: string) => void;
 
     timmModelArchitecture: ModelArchitecture | undefined;
     isLoadingTimmModelArchitecture: boolean;
@@ -53,13 +53,13 @@ export const useTimmModelSelection = (isEnabled: boolean): TimmModelSelection =>
         selectedTimmPretrainedTag
     );
 
-    const onSelectTimmFamily = (nextFamily: string | null) => {
+    const onSelectTimmFamily = (nextFamily: string) => {
         setFamily(nextFamily);
         setVariant(null);
         setPretrainedTag(null);
     };
 
-    const onSelectTimmVariant = (nextVariant: string | null) => {
+    const onSelectTimmVariant = (nextVariant: string) => {
         setVariant(nextVariant);
         setPretrainedTag(null);
     };
