@@ -35,8 +35,7 @@ export const mediaPredictionsQueryOptions = ({
 }) =>
     queryOptions({
         queryKey: [
-            projectId,
-            'media-predictions',
+            ...getMediaPredictionsQueryKeyPrefix(projectId),
             mediaId,
             device,
             selectedModel?.modelId,
