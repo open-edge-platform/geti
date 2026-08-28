@@ -13,8 +13,10 @@ import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { v4 as uuid } from 'uuid';
 
-import { SchemaProjectView } from '../../src/api/openapi-spec';
+import type { components } from '../../src/api/openapi-spec';
 import { expect, http, test } from '../fixtures';
+
+type SchemaProjectView = components['schemas']['ProjectView'];
 
 const mockedItems = getMultipleMockedMediaImage(40, '1');
 const mockedItems2 = getMultipleMockedMediaImage(20, '2');

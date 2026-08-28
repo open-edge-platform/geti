@@ -1,7 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { SchemaProjectView } from './../src/api/openapi-spec.d';
+import type { components } from './../src/api/openapi-spec';
+
+type SchemaProjectView = components['schemas']['ProjectView'];
 
 export const getMockedProject = (customProject: Partial<SchemaProjectView> = {}): SchemaProjectView => {
     return {
