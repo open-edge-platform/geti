@@ -9,6 +9,7 @@ import { getMockedVariant } from 'mocks/mock-model-variant';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
+import { FEATURE_FLAGS } from '../../src/constants/feature-flags';
 import { Polygon } from '../../src/shared/types';
 import { http, test } from '../fixtures';
 import { blueLabel, candyBinaryHandler, redLabel } from './annotator-fixtures';
@@ -1109,7 +1110,14 @@ test.describe('Annotator', () => {
         const olderModel = getMockedModel({
             id: 'older-model-id',
             name: 'Older_Model (older)',
-            variants: [getMockedVariant({ id: 'older-variant-id', format: 'openvino', precision: 'fp32' })],
+            variants: [
+                getMockedVariant({
+                    id: 'older-variant-id',
+                    format: 'openvino',
+                    precision: 'fp32',
+                    optimal_confidence_threshold: 0.2,
+                }),
+            ],
             training_info: {
                 status: 'successful',
                 label_schema_revision: { labels: [{ id: 'label-1', name: 'cat' }] },
@@ -1122,7 +1130,14 @@ test.describe('Annotator', () => {
         const newerModel = getMockedModel({
             id: 'newer-model-id',
             name: 'Newer_Model (newer)',
-            variants: [getMockedVariant({ id: 'newer-variant-id', format: 'openvino', precision: 'fp16' })],
+            variants: [
+                getMockedVariant({
+                    id: 'newer-variant-id',
+                    format: 'openvino',
+                    precision: 'fp16',
+                    optimal_confidence_threshold: 0.65,
+                }),
+            ],
             training_info: {
                 status: 'successful',
                 label_schema_revision: { labels: [{ id: 'label-1', name: 'cat' }] },
@@ -1256,14 +1271,19 @@ test.describe('Annotator', () => {
             network,
         }) => {
             let capturedModelVariantId: string | undefined;
+            let capturedConfidenceThreshold: number | undefined;
 
             network.use(
                 http.get('/api/projects/{project_id}/models', async () => {
                     return HttpResponse.json([olderModel, newerModel]);
                 }),
                 http.post('/api/projects/{project_id}/dataset/media:predict', async ({ request }) => {
-                    const body = await request.json();
-                    capturedModelVariantId = (body as unknown as Record<string, string>).model_variant_id;
+                    const body = (await request.json()) as unknown as {
+                        model_variant_id?: string;
+                        confidence_threshold?: number;
+                    };
+                    capturedModelVariantId = body.model_variant_id;
+                    capturedConfidenceThreshold = body.confidence_threshold;
 
                     return HttpResponse.json({ predictions: [{ media: { id: 'item-1' }, prediction: [] }] });
                 })
@@ -1296,6 +1316,14 @@ test.describe('Annotator', () => {
             await test.step('predictions are requested with the newly selected model variant', async () => {
                 expect(capturedModelVariantId).toBe(olderModel.variants[0].id);
             });
+
+            // TODO: drop the guard once CONFIDENCE_THRESHOLD is enabled by default
+            if (FEATURE_FLAGS.CONFIDENCE_THRESHOLD) {
+                await test.step('the confidence threshold follows the selected model', async () => {
+                    await expect(page.getByRole('textbox', { name: 'Change Confidence threshold' })).toHaveValue('0.2');
+                    expect(capturedConfidenceThreshold).toBe(0.2);
+                });
+            }
         });
 
         test('changing device selection uses the new device for predictions', async ({
