@@ -339,19 +339,11 @@ def load_image() -> cv2.Mat:
     return image_raw
 
 
-def build_visualizer() -> Visualizer:
-    try:
-        return Visualizer(label_colors=LABEL_COLORS)
-    except TypeError:
-        # Older Model API releases do not support custom label colors.
-        return Visualizer()
-
-
 def visualise_result(image, result) -> None:
     if image.dtype != np.uint8:
         image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
 
-    visualizer = build_visualizer()
+    visualizer = Visualizer(label_colors=LABEL_COLORS)
     visualizer.show(image, result)
 
     display_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
