@@ -16,8 +16,7 @@ from sqlalchemy.orm import Session
 from app.datumaro_converter import SampleMode
 from app.execution.base import Execution, step
 from app.models import DatasetFormat, DatasetItemAnnotationStatus, ExportDatasetJobParams
-from app.repositories.project_repo import ProjectRepository
-from app.services import DatasetRevisionService, DatasetService
+from app.services import DatasetRevisionService, DatasetService, ProjectService
 
 
 def get_dm_format(dataset_format: DatasetFormat) -> DataFormat:
@@ -119,5 +118,7 @@ class ExportDataset(Execution[ExportDatasetJobParams]):
             return
         self.update_metadata({"dataset_id": dataset_id})
         with self._db_session_factory() as session:
-            project_name = ProjectRepository(session).get_by_id(str(params.project_id)).name
+            self._project_service.set_db_session(session)
+            project = self._project_service.get_project_by_id(params.project_id)
+            project_name = project.name
         self.export_dataset(dataset_id, dataset, params.export_format, project_name)

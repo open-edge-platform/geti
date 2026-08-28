@@ -116,7 +116,7 @@ class TestDatasetIEEndpoints:
         fxt_client: TestClient,
     ):
         from urllib.parse import quote
-
+        
         file_path = tmp_path / "dataset-coco.zip"
         file_content = b"zip-binary-content"
         file_path.write_bytes(file_content)
