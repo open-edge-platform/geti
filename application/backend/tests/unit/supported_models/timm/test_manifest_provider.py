@@ -17,6 +17,8 @@ _FAKE_ENTRY = {
     "version": "resnet18",
     "pretrained": "a1_in1k",
     "input_size": [3, 224, 224],
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225],
     "default_lr": 0.01,
     "default_weight_decay": 0.001,
     "imagenet_top1_accuracy": 70.0,
@@ -87,4 +89,6 @@ class TestTimmManifestProvider:
 
         assert preprocessing == {
             "input_size": (224, 224),
+            "mean": (0.485, 0.456, 0.406),
+            "std": (0.229, 0.224, 0.225),
         }

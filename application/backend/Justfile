@@ -57,9 +57,13 @@ test-unit *ARGS: install-uv
 test-integration *ARGS: install-uv
     uv run pytest ./tests/integration -v {{ ARGS }}
 
-# Run BDD tests with behave
+# Main test suite (excludes timm tag)
 test-bdd *ARGS: install-uv
-    uv run behave ./tests/bdd -v {{ ARGS }}
+    uv run behave ./tests/bdd -v --tags=~timm {{ ARGS }}
+
+# Dedicated recipe for the timm training tests
+test-bdd-timm *ARGS: install-uv
+    uv run behave ./tests/bdd -v --tags=timm {{ ARGS }}
 
 # -------------------------------------------------------------------------------------------------
 # Database migrations
@@ -160,6 +164,11 @@ gen-timm-catalog: install-uv
         "${LICENSE_ARGS[@]}"
 
     echo "Snapshot written to ${OUTPUT}"
+
+# Print one lightweight (lowest-gigaflops) model per timm architecture family,
+# useful to (re)generate the Examples table in tests/bdd/features/timm_training.feature
+list-timm-smoke-models *ARGS: install-uv
+    uv run python app/select_timm_smoke_models.py {{ ARGS }}
 
 # -------------------------------------------------------------------------------------------------
 # Packaging

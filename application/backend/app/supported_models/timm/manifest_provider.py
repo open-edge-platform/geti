@@ -79,4 +79,6 @@ class TimmManifestProvider:
         _, height, width = e["input_size"]
         return {
             "input_size": (height, width),
+            "mean": tuple(e["mean"]),
+            "std": tuple(e["std"]),
         }
