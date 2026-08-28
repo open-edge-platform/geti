@@ -65,7 +65,7 @@ const EmptyEntireDataset = () => {
                 Upload your first media item to get started.
             </EmptyMessage>
             <Flex gap={'size-100'}>
-                <MediaUpload />
+                <MediaUpload testId={'upload-media-input-empty-dataset'} />
                 <ImportDatasetButton />
             </Flex>
         </>
