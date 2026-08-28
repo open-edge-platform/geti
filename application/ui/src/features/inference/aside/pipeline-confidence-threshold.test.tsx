@@ -92,6 +92,8 @@ describe('PipelineConfidenceThreshold', () => {
 
         await screen.findByRole('textbox', { name: 'Change Confidence threshold' });
 
+        expect(getInput()).toHaveValue('0.35');
+
         await userEvent.clear(getInput());
         await userEvent.type(getInput(), '0.8');
         await userEvent.tab();
