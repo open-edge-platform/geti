@@ -194,7 +194,12 @@ class TestDatasetExporter:
             patch.object(fxt_export, "prepare_dataset", return_value=(dataset_id, dataset)) as mock_prepare,
             patch.object(fxt_export, "export_dataset") as mock_export,
             patch.object(fxt_export, "update_metadata") as mock_update_metadata,
+            patch("app.execution.dataset_export.export.ProjectRepository") as mock_repo_class,
         ):
+            mock_repo_instance = MagicMock()
+            mock_repo_instance.get_by_id.return_value.name = "my_project"
+            mock_repo_class.return_value = mock_repo_instance
+
             fxt_export.execute(fxt_export_params)
 
             mock_prepare.assert_called_once_with(fxt_export_params)
