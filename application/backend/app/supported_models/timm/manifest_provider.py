@@ -17,7 +17,7 @@ from app.models.model_manifest import (
 from app.models.training_configuration import AlgoLevelParameters, AlgoLevelTrainingParameters
 from app.supported_models.timm.catalog import _snapshot
 
-_DEFAULT_LICENSE = "apache-2.0"
+_UNKNOWN_LICENSE = "unknown"
 _ID_PREFIX = "image-classification-timm-"
 
 
@@ -31,17 +31,18 @@ def id_to_model_name(manifest_id: str) -> str:
     return manifest_id.removeprefix(_ID_PREFIX)
 
 
+# TODO(vitalii): populate catalog with the license information for each timm model and remove this function
 def _license_of(model_name: str) -> str:
     """Return the Hugging Face Hub license for *model_name*, defaulting to Apache-2.0."""
     try:
         info = huggingface_hub.model_info(f"timm/{model_name}")
     except huggingface_hub.errors.HfHubHTTPError:
-        logger.warning("No model card found on the Hub for {}; defaulting license to {}", model_name, _DEFAULT_LICENSE)
-        return _DEFAULT_LICENSE
+        logger.warning("No model card found on the Hub for {}; defaulting license to {}", model_name, _UNKNOWN_LICENSE)
+        return _UNKNOWN_LICENSE
 
     if info.card_data is None or not info.card_data.license:
-        logger.debug("No license in model card for {}; defaulting to {}", model_name, _DEFAULT_LICENSE)
-        return _DEFAULT_LICENSE
+        logger.debug("No license in model card for {}; defaulting to {}", model_name, _UNKNOWN_LICENSE)
+        return _UNKNOWN_LICENSE
 
     return info.card_data.license
 

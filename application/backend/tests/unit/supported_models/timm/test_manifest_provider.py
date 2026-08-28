@@ -11,7 +11,7 @@ from app.models.model_manifest import ModelManifestDeprecationStatus, WeightsSou
 from app.models.task import TaskType
 from app.supported_models.timm import catalog, manifest_provider
 from app.supported_models.timm.manifest_provider import (
-    _DEFAULT_LICENSE,
+    _UNKNOWN_LICENSE,
     TimmManifestProvider,
     _license_of,
     id_to_model_name,
@@ -105,12 +105,12 @@ class TestTimmManifestProvider:
     def test_defaults_when_no_card_data(self) -> None:
         fake_info = Mock(card_data=None)
         with patch.object(huggingface_hub, "model_info", return_value=fake_info):
-            assert _license_of("resnet18.a1_in1k") == _DEFAULT_LICENSE
+            assert _license_of("resnet18.a1_in1k") == _UNKNOWN_LICENSE
 
     def test_defaults_when_license_field_empty(self) -> None:
         fake_info = Mock(card_data=Mock(license=None))
         with patch.object(huggingface_hub, "model_info", return_value=fake_info):
-            assert _license_of("resnet18.a1_in1k") == _DEFAULT_LICENSE
+            assert _license_of("resnet18.a1_in1k") == _UNKNOWN_LICENSE
 
     def test_defaults_when_hub_lookup_fails(self) -> None:
         with patch.object(
@@ -118,4 +118,4 @@ class TestTimmManifestProvider:
             "model_info",
             side_effect=huggingface_hub.errors.HfHubHTTPError("not found", response=Mock(status_code=404)),
         ):
-            assert _license_of("resnet18.a1_in1k") == _DEFAULT_LICENSE
+            assert _license_of("resnet18.a1_in1k") == _UNKNOWN_LICENSE
