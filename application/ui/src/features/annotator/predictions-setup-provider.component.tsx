@@ -21,6 +21,9 @@ type PredictionsSetupContextProps = {
 
     selectedDevice: string;
     changeSelectedDevice: (device: string) => void;
+
+    confidenceThreshold: number | null;
+    changeConfidenceThreshold: (confidenceThreshold: number) => void;
 };
 
 const PredictionSetupContext = createContext<PredictionsSetupContextProps | null>(null);
@@ -53,6 +56,19 @@ export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) 
 
     const selectedModel = selectableModels.find((model) => model.modelVariantId === selectedModelId);
 
+    const [confidenceThreshold, setConfidenceThreshold] = useState<number | null>(
+        selectedModel?.optimalConfidenceThreshold ?? null
+    );
+
+    // The threshold is a model specific parameter, so it always follows the selected model
+    const changeSelectedModelId = (modelId: string | null) => {
+        setSelectedModelId(modelId);
+
+        const newModel = selectableModels.find((model) => model.modelVariantId === modelId);
+
+        setConfidenceThreshold(newModel?.optimalConfidenceThreshold ?? null);
+    };
+
     const { data: pipeline } = usePipeline();
 
     const [selectedDevice, setSelectedDevice] = useState<string>(pipeline.device);
@@ -62,10 +78,12 @@ export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) 
             value={{
                 selectedModelId,
                 selectedModel,
-                changeSelectedModelId: setSelectedModelId,
+                changeSelectedModelId,
                 selectableModels,
                 selectedDevice,
                 changeSelectedDevice: setSelectedDevice,
+                confidenceThreshold,
+                changeConfidenceThreshold: setConfidenceThreshold,
             }}
         >
             {children}

@@ -23,7 +23,7 @@ const SearchParamsSpy = () => {
 const renderDatasetViewSelector = (route?: string) => {
     return render(
         <>
-            <DatasetViewSelector datasetViews={DATASET_VIEWS} />
+            <DatasetViewSelector datasetViews={DATASET_VIEWS} resetSelectedMediaIds={vi.fn()} />
             <SearchParamsSpy />
         </>,
         {
@@ -93,6 +93,32 @@ describe('DatasetViewSelector', () => {
         await user.click(screen.getByRole('listitem', { name: 'Collection One' }));
 
         await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('closes the popover when the user selects the already selected view', async () => {
+        const user = userEvent.setup();
+        renderDatasetViewSelector(`/projects/123?${DATASET_VIEW_ID_PARAM}=collection-one`);
+
+        await openDatasetViewSelector(user);
+        await user.click(screen.getByRole('listitem', { name: 'Collection One' }));
+
+        await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+        expect(screen.getByTestId('search-params-spy')).toHaveTextContent(`${DATASET_VIEW_ID_PARAM}=collection-one`);
+    });
+
+    it('keeps the selected view when the user cancels the delete confirmation', async () => {
+        const user = userEvent.setup();
+        renderDatasetViewSelector(`/projects/123?${DATASET_VIEW_ID_PARAM}=collection-one`);
+
+        await openDatasetViewSelector(user);
+        await user.click(screen.getByRole('button', { name: 'Dataset view actions for Collection One' }));
+        await user.click(screen.getByRole('menuitem', { name: 'Delete' }));
+
+        await user.click(await screen.findByRole('button', { name: 'Close' }));
+
+        await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+        expect(screen.getByTestId('search-params-spy')).toHaveTextContent(`${DATASET_VIEW_ID_PARAM}=collection-one`);
+        expect(screen.getByRole('button', { name: 'Select dataset view' })).toHaveTextContent('Collection One');
     });
 
     it('falls back to "Entire dataset" and strips an unknown datasetViewId param', async () => {

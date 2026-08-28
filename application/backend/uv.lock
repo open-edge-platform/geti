@@ -60,6 +60,15 @@ wheels = [
 ]
 
 [[package]]
+name = "agent-detector"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/0a/51/2d6a4580f8a1ad26eca1f3849207e08d65a0df318188fe1a5b56cd868a1e/agent_detector-1.1.0.tar.gz", hash = "sha256:3428dc45713f93a115bd0b05c9dbbfdc72af70246064c07bd837a9a95cf016bc", size = 53720, upload-time = "2026-08-19T10:24:41.338Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c4/26/43b02c1cf72b12597dd7a3b49023918bded80edd733e00222f5a3ce42d85/agent_detector-1.1.0-py3-none-any.whl", hash = "sha256:c605af97afb894737dd798721b117d9bbc7aa491e02a676cd5916c79dc39a46d", size = 7966, upload-time = "2026-08-19T10:24:40.276Z" },
+]
+
+[[package]]
 name = "aiofiles"
 version = "25.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -537,10 +546,10 @@ wheels = [
 
 [[package]]
 name = "cuda-pathfinder"
-version = "1.7.0"
+version = "1.8.0"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/62/01/a7171c5e2e8755597bd8f1c1eb228a0876f502afdf25f936061f5dbe2880/cuda_pathfinder-1.7.0-py3-none-any.whl", hash = "sha256:e9d67e950f3d5992b854dfd25917c3719d0c21d3057b11abe86ba6feec526138", size = 63091, upload-time = "2026-08-24T04:13:56.054Z" },
+    { url = "https://files.pythonhosted.org/packages/a1/b1/ef21259ec74fe0b265ed201379de1d0ef7c14178313ee03705952f1b7093/cuda_pathfinder-1.8.0-py3-none-any.whl", hash = "sha256:c44e574dc997fae2814721d1ae97d0fd6db76db82decbe9b753bf75de53f515e", size = 62539, upload-time = "2026-08-27T21:33:03.229Z" },
 ]
 
 [[package]]
@@ -608,7 +617,7 @@ wheels = [
 
 [[package]]
 name = "datumaro"
-version = "1.13.8"
+version = "1.13.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -630,13 +639,13 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ae/d2/68ed776ef3f995ea06059c309bf14975fc7ebaaf1f7c7a0782e06e8fd666/datumaro-1.13.8.tar.gz", hash = "sha256:755985ca829e23a6afa3f75d0550b3f187628af7ff521f46d0f42fa202153a9c", size = 628976, upload-time = "2026-08-12T15:01:10.946Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/fb/1a/5362866d340cfe86120c24129c1043e968065b39eedadb4e02f67882fa04/datumaro-1.13.9.tar.gz", hash = "sha256:921cca28bdad293a9aac935ff4e8986a9e581f74daf231ad9d8653be0e465370", size = 632569, upload-time = "2026-08-27T12:11:03.287Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/04/77/6dd4a82bf0158b60d06cc03258525a865354987f822603e0ce3d2aecd940/datumaro-1.13.8-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:fb9d9b1cb880989278c0ca9fe3f206d89861ce7f89c91b8a229f5e4f261c6b0a", size = 1065078, upload-time = "2026-08-12T15:01:03.023Z" },
-    { url = "https://files.pythonhosted.org/packages/70/34/b35849cfcd7a4899a4c2e0a4f8750d86f9610f234008946e408766e86eee/datumaro-1.13.8-cp314-cp314-macosx_11_0_x86_64.whl", hash = "sha256:2ffe33f5542e780526834ef8f20ef8450ce5c4ca4ce0774b233b9823635488af", size = 1077611, upload-time = "2026-08-12T15:01:04.575Z" },
-    { url = "https://files.pythonhosted.org/packages/98/ee/27462d8706ae291afa8af7b1a7ecebdc5a66d0dfd2c16427d580311dbb70/datumaro-1.13.8-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:abec8c05e204ac53c0819e4e8e0b820b31087fad765fa956e570ffc1e4453961", size = 1113368, upload-time = "2026-08-12T15:01:06.384Z" },
-    { url = "https://files.pythonhosted.org/packages/0b/b6/f35f1370312ff62c9245bb47736359f2079f272a80714a2ba53f49108b73/datumaro-1.13.8-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:fa248ddbe0b7cec99780a796f5cf745f285ca21a659c4d977ea1ec89b2d160b7", size = 1187910, upload-time = "2026-08-12T15:01:07.953Z" },
-    { url = "https://files.pythonhosted.org/packages/72/3c/5843e1564ae921b639c1db647759876771f492cf4421caa3e3898ed95a53/datumaro-1.13.8-cp314-cp314-win_amd64.whl", hash = "sha256:6ea86432095fa153b7ac0b720380dbca83fd4870dcb7d098a6ac182701688b99", size = 970584, upload-time = "2026-08-12T15:01:09.493Z" },
+    { url = "https://files.pythonhosted.org/packages/bb/0b/7b96f26759b0e52d4c99930c1d2e01b183798d77a47fb73fcc8e4fd0ce87/datumaro-1.13.9-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:86c6889207e5a46aee1233f678eb6c1386c20ff3d9d3d10f57e79f9e707f7a23", size = 1068639, upload-time = "2026-08-27T12:10:52.728Z" },
+    { url = "https://files.pythonhosted.org/packages/f4/d6/f2e4bed8b339d0beb102ab092c04bdec805be78c8f071e008469dd7e80b7/datumaro-1.13.9-cp314-cp314-macosx_11_0_x86_64.whl", hash = "sha256:8992a45fa0e42d010fe6917857db6392b0026be739e400de2b184d94faf5768e", size = 1080791, upload-time = "2026-08-27T12:10:54.528Z" },
+    { url = "https://files.pythonhosted.org/packages/8d/8c/1da2a69756df3b5aff50e2b20d033693c227eb65c24e223aa202c5f784c8/datumaro-1.13.9-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:0b92277dc7f01a17d0156e01da4ea5aec093dab9a676907615d152819159072f", size = 1120276, upload-time = "2026-08-27T12:10:56.392Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/92/db8171135c0421a61d7647046511d07e0851e389f1abce94ff68239126a1/datumaro-1.13.9-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:6b9254e26fc5df554cf4cfadca0d32b5b5d06d14f788a44fc495434612a8fb3f", size = 1192766, upload-time = "2026-08-27T12:10:58.235Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/cc/67b3691cbda7063ad73fcbbca4e6049d5465809103007107fffdbc09888e/datumaro-1.13.9-cp314-cp314-win_amd64.whl", hash = "sha256:fe1645f99345497d25d0a82df07b8939313ab43219ca520c0d6bf1c35b0bbed7", size = 974213, upload-time = "2026-08-27T12:10:59.904Z" },
 ]
 
 [package.optional-dependencies]
@@ -781,9 +790,10 @@ standard = [
 
 [[package]]
 name = "fastapi-cloud-cli"
-version = "0.23.0"
+version = "0.24.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "agent-detector" },
     { name = "detect-installer" },
     { name = "fastar" },
     { name = "httpx" },
@@ -794,9 +804,9 @@ dependencies = [
     { name = "typer" },
     { name = "uvicorn", extra = ["standard"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/00/dc/63aaf9913f455e39a7027c27140edd887a87d47d65ac43532d77a51718e5/fastapi_cloud_cli-0.23.0.tar.gz", hash = "sha256:840895bb8d14309aeffc905e0dcd1334d18c6f5da54b735413a8f1cb385e581e", size = 95295, upload-time = "2026-07-28T14:03:33.463Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f0/40/ea8e20e690c2cfd14fc9f76a140e0797e4b6ab8203e79032d57364a2557a/fastapi_cloud_cli-0.24.0.tar.gz", hash = "sha256:f48c0fce0749cf819f5e043cd9d5a385e8fc9cd97898efdefd38e2de663fb281", size = 105401, upload-time = "2026-08-27T14:36:45.064Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/86/96/7e9aba6fabce3cb05f320abeef5b81efd5134823ae85d1a517872cb83cbc/fastapi_cloud_cli-0.23.0-py3-none-any.whl", hash = "sha256:1cd2ffa56e92e92c1fc63acc426c214dd928cbeed2a4c7c6a9a5fc85ea73de16", size = 78058, upload-time = "2026-07-28T14:03:34.386Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/fd/cb698b3d2b150bf6d5d1b2691a2cbbfd9fab1930f43d4005467c980c1616/fastapi_cloud_cli-0.24.0-py3-none-any.whl", hash = "sha256:2104ec83b579623426dd9000fb36d47d54cdc2978d9bd856d63fbdab89139a25", size = 89526, upload-time = "2026-08-27T14:36:43.754Z" },
 ]
 
 [[package]]
@@ -1151,7 +1161,7 @@ xpu = [
 requires-dist = [
     { name = "build", marker = "extra == 'ci-publish'", specifier = "==1.2.2.post1" },
     { name = "certifi", specifier = ">=2026" },
-    { name = "datumaro", extras = ["experimental"], specifier = "~=1.13.7" },
+    { name = "datumaro", extras = ["experimental"], specifier = "~=1.13.9" },
     { name = "docstring-parser", specifier = "==0.16" },
     { name = "einops", specifier = "==0.8.1" },
     { name = "ftfy", specifier = "==6.3.1" },
@@ -1173,6 +1183,7 @@ requires-dist = [
     { name = "onnxslim", specifier = "~=0.1.71" },
     { name = "openvino", specifier = "~=2026.3.0" },
     { name = "openvino-model-api", git = "https://github.com/open-edge-platform/model_api?subdirectory=model_api&branch=master" },
+    { name = "psutil", marker = "extra == 'benchmark'", specifier = ">=6.0" },
     { name = "pydata-sphinx-theme", marker = "extra == 'docs'", specifier = "==0.12.0" },
     { name = "pytorchcv", specifier = "==0.0.74" },
     { name = "pyyaml", specifier = "==6.0.3" },
@@ -1435,7 +1446,7 @@ wheels = [
 
 [[package]]
 name = "huggingface-hub"
-version = "1.28.0"
+version = "1.29.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -1448,9 +1459,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/ae/222a91937ebee7f62c0ca8f5ee0afd97577caf24c0abb927d1f5c7e9f6d2/huggingface_hub-1.28.0.tar.gz", hash = "sha256:46a2e950c09234de54093d587d1675382f0d08dbd600d9fb599b5932f5b2c6cb", size = 959609, upload-time = "2026-08-18T12:27:15.101Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/64/35/42316e8f6908b6d21bc8df017cc6efba94fb5edbf99b64e28dd142325e20/huggingface_hub-1.29.0.tar.gz", hash = "sha256:6ebb385a581435325cf6d5c5b233d5d4bc91175834d99fd65dae14379b36e9ad", size = 963121, upload-time = "2026-08-27T12:18:37.432Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/51/0e/eafef18f1a75e125e68395db21131db0cf868a128ecd2fce69b4df6c584b/huggingface_hub-1.28.0-py3-none-any.whl", hash = "sha256:58a8bacb03072edfc38067065e9dc24bbb34805410fcd36a1632de0b329660bb", size = 793202, upload-time = "2026-08-18T12:27:12.719Z" },
+    { url = "https://files.pythonhosted.org/packages/4e/a5/47c2ea9b228ccbcba8467e9a64823146e8ebbad29855e591d8f5eedcc9c7/huggingface_hub-1.29.0-py3-none-any.whl", hash = "sha256:b00f7782afc14db4bc6572763810a635bdfbab8623d957bfb553bd18e03852cd", size = 795768, upload-time = "2026-08-27T12:18:35.431Z" },
 ]
 
 [[package]]

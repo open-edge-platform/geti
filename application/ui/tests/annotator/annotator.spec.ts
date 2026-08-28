@@ -515,7 +515,7 @@ test.describe('Annotator', () => {
                         subset: 'training',
                     });
                 }),
-                http.post('/api/projects/{project_id}/dataset/media/media:predict', async () => {
+                http.post('/api/projects/{project_id}/dataset/media:predict', async () => {
                     return HttpResponse.json({
                         predictions: [
                             {
@@ -613,7 +613,7 @@ test.describe('Annotator', () => {
                         }),
                     ]);
                 }),
-                http.post('/api/projects/{project_id}/dataset/media/media:predict', async () => {
+                http.post('/api/projects/{project_id}/dataset/media:predict', async () => {
                     return HttpResponse.json({
                         predictions: [
                             {
@@ -710,7 +710,7 @@ test.describe('Annotator', () => {
                         { status: 404 }
                     );
                 }),
-                http.post('/api/projects/{project_id}/dataset/media/media:predict', async () => {
+                http.post('/api/projects/{project_id}/dataset/media:predict', async () => {
                     return HttpResponse.json({
                         predictions: [
                             {
@@ -1132,7 +1132,7 @@ test.describe('Annotator', () => {
             },
         });
 
-        const emptyPredictHandler = http.post('/api/projects/{project_id}/dataset/media/media:predict', async () => {
+        const emptyPredictHandler = http.post('/api/projects/{project_id}/dataset/media:predict', async () => {
             return HttpResponse.json({ predictions: [{ media: { id: 'item-1' }, prediction: [] }] });
         });
 
@@ -1261,7 +1261,7 @@ test.describe('Annotator', () => {
                 http.get('/api/projects/{project_id}/models', async () => {
                     return HttpResponse.json([olderModel, newerModel]);
                 }),
-                http.post('/api/projects/{project_id}/dataset/media/media:predict', async ({ request }) => {
+                http.post('/api/projects/{project_id}/dataset/media:predict', async ({ request }) => {
                     const body = await request.json();
                     capturedModelVariantId = (body as unknown as Record<string, string>).model_variant_id;
 
@@ -1324,7 +1324,7 @@ test.describe('Annotator', () => {
                         device: 'cpu',
                     });
                 }),
-                http.post('/api/projects/{project_id}/dataset/media/media:predict', async ({ request }) => {
+                http.post('/api/projects/{project_id}/dataset/media:predict', async ({ request }) => {
                     const body = await request.json();
                     capturedDevice = body.device;
 
