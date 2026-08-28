@@ -49,7 +49,7 @@ const ModelArchitectureParameters = () => {
 
     return (
         <ul className={classes.modelArchitectureParameters}>
-            <li>Number of parameters: {modelArchitecture.stats.trainable_parameters} million</li>
+            <li>Number of parameters: {modelArchitecture.stats?.trainable_parameters} million</li>
             <License />
         </ul>
     );
@@ -61,8 +61,8 @@ const ModelArchitectureDetailedParameters = () => {
 
     return (
         <ul className={classes.modelArchitectureParameters}>
-            <li>Number of parameters: {modelArchitecture.stats.trainable_parameters} million</li>
-            <li>Gigaflops: {modelArchitecture.stats.gigaflops}</li>
+            <li>Number of parameters: {modelArchitecture.stats?.trainable_parameters} million</li>
+            <li>Gigaflops: {modelArchitecture.stats?.gigaflops}</li>
             {accuracyMetric !== undefined && (
                 <li>
                     {accuracyMetric.label}: {accuracyMetric.value}%
