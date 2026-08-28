@@ -141,7 +141,7 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
     const [selectedDatasetRevisionId, setSelectedDatasetRevisionId] = useState<string | null>(
         datasetRevisions?.at(0)?.id ?? null
     );
-    const [selectedModelRevisionId, setSelectedModelRevisionId] = useState<string | null>(() =>
+    const [modelRevisionId, setModelRevisionId] = useState<string | null>(() =>
         getDefaultModelRevisionIdForArchitecture(allModelRevisions, selectedModelArchitectureId)
     );
 
@@ -150,6 +150,11 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
     const modelRevisions = useMemo(() => {
         return getModelRevisionsForArchitecture(allModelRevisions, resolvedModelArchitectureId);
     }, [allModelRevisions, resolvedModelArchitectureId]);
+
+    // The resolved architecture also changes while the timm card stays selected, which can invalidate the selection
+    const selectedModelRevisionId = modelRevisions.some(({ id }) => id === modelRevisionId)
+        ? modelRevisionId
+        : getDefaultModelRevisionIdForArchitecture(allModelRevisions, resolvedModelArchitectureId);
 
     const selectedModelRevision = modelRevisions.find((modelRevision) => modelRevision.id === selectedModelRevisionId);
 
@@ -162,7 +167,7 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
     const onSelectModelArchitectureId = (modelArchitectureId: string | null) => {
         setSelectedModelArchitectureId(modelArchitectureId);
-        setSelectedModelRevisionId(getDefaultModelRevisionIdForArchitecture(allModelRevisions, modelArchitectureId));
+        setModelRevisionId(getDefaultModelRevisionIdForArchitecture(allModelRevisions, modelArchitectureId));
     };
 
     return (
@@ -186,7 +191,7 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
                 modelRevisions,
                 selectedModelRevisionId,
-                onSelectModelRevisionId: setSelectedModelRevisionId,
+                onSelectModelRevisionId: setModelRevisionId,
 
                 isAdvancedSettingsMode,
                 onToggleAdvancedSettingsMode: setIsAdvancedSettingsMode,
