@@ -166,8 +166,8 @@ def import_dataset_as_new_project(
     return wait_for_job_completion(session, base_url, job.job_id)
 
 
-def train(session: requests.Session, base_url: str, project_id: UUID, model_id: str, device: str):
-    """Resolve the first pretrained tag for (family, version) and launch a training job for it."""
+def train(session: requests.Session, base_url: str, project_id: UUID, model_id: str, device: str) -> JobView:
+    """Launch a training job for *model_id* on *device* and wait for completion."""
     job_body = {
         "job_type": JobType.TRAIN,
         "project_id": str(project_id),

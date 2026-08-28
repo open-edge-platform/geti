@@ -73,7 +73,7 @@ jobs:
           TESTCONTAINERS_RYUK_DISABLED: true
         run: |
           export DOCKER_HOST=$(docker context inspect --format '{{.Endpoints.docker.Host}}')
-          just test-bdd -- --tags=@timm
+          just test-bdd-timm
 
       - name: Upload timm training failures report
         if: always()
