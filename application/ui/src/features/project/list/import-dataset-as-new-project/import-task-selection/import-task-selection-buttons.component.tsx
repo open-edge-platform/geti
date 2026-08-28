@@ -3,6 +3,7 @@
 
 import { Button, ButtonGroup } from '@geti-ui/ui';
 import { useDeleteStagedDataset, useStagedDataset } from 'hooks/api/staged-dataset.hook';
+import { useTranslation } from 'react-i18next';
 
 import { TASK_SELECTION_FORM_ID } from './util';
 
@@ -17,6 +18,7 @@ export const ImportTaskSelectionButtons = ({
     onClose,
     deleteEntry,
 }: ImportTaskSelectionButtonsProps) => {
+    const { t } = useTranslation();
     const stagedDatasetQuery = useStagedDataset(stagedDatasetId);
     const deleteFileMutation = useDeleteStagedDataset({ stagedDatasetId, onSuccess: onClose, deleteEntry });
 
@@ -30,15 +32,15 @@ export const ImportTaskSelectionButtons = ({
     return (
         <ButtonGroup>
             <Button variant='negative' isPending={isPending} isDisabled={isDisabled} onPress={handleDeleteJob}>
-                Delete
+                {t('common.delete')}
             </Button>
 
             <Button onPress={onClose} isPending={isPending} isDisabled={isDisabled} variant='secondary'>
-                Hide
+                {t('common.hide')}
             </Button>
 
             <Button type='submit' form={TASK_SELECTION_FORM_ID} variant='primary' isDisabled={isDisabled}>
-                Next
+                {t('common.next')}
             </Button>
         </ButtonGroup>
     );
