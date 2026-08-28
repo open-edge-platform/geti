@@ -175,7 +175,6 @@ export const Gallery = ({
                 <DialogContainer type={'fullscreenTakeover'} onDismiss={() => onSelectedMediaItemChange(null)}>
                     {selectedMediaItem !== null && (
                         <MediaPreview
-                            mediaItem={selectedMediaItem}
                             close={() => onSelectedMediaItemChange(null)}
                             onSelectedMediaItem={onSelectedMediaItemChange}
                         />
