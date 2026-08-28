@@ -6,7 +6,8 @@ import { useIsPipelineConfigured } from 'hooks/use-is-pipeline-configured.hook';
 
 import { toast } from '../../../../components/toast/toast.component';
 import { useDisablePipeline, useEnablePipeline, useProjectPipeline } from '../../../../hooks/api/pipeline.hook';
-import { i18n } from '../../../../i18n';
+
+const PROJECT_ACTIONS = { rename: 'Rename', delete: 'Delete' };
 
 type ProjectMenuCallbacks = {
     onRename: () => void;
@@ -32,10 +33,9 @@ export const useProjectMenuActions = (
 
     const menuActions: MenuAction[] = [
         ...(isPipelineRunning
-            ? [{ key: 'disable-pipeline', label: i18n.t('projectList.menu.disablePipeline') }]
-            : [{ key: 'enable-pipeline', label: i18n.t('projectList.menu.enablePipeline') }]),
-        { key: 'rename', label: i18n.t('projectList.menu.rename') },
-        { key: 'delete', label: i18n.t('common.delete') },
+            ? [{ key: 'disable-pipeline', label: 'Disable pipeline' }]
+            : [{ key: 'enable-pipeline', label: 'Enable pipeline' }]),
+        ...Object.entries(PROJECT_ACTIONS).map(([key, label]) => ({ key, label })),
     ];
 
     const handleAction = (key: Key) => {
@@ -50,14 +50,14 @@ export const useProjectMenuActions = (
 
                 enablePipelineMutation.mutate(mutationParams, {
                     onSuccess: () => {
-                        toast({ type: 'success', message: i18n.t('projectList.toast.pipelineEnabled') });
+                        toast({ type: 'success', message: 'Pipeline enabled successfully' });
                     },
                 });
                 break;
             case 'disable-pipeline':
                 disablePipelineMutation.mutate(mutationParams, {
                     onSuccess: () => {
-                        toast({ type: 'success', message: i18n.t('projectList.toast.pipelineDisabled') });
+                        toast({ type: 'success', message: 'Pipeline disabled successfully' });
                     },
                 });
                 break;

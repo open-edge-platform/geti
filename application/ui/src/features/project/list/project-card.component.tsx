@@ -8,7 +8,6 @@ import { Badge, dimensionValue, Flex, Heading, Text, View } from '@geti-ui/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { getProjectQueryOptions } from 'hooks/api/project.hook';
-import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
 
 import placeholderThumbnailIconUrl from '../../../assets/icons/image-icon.svg?url';
@@ -63,7 +62,6 @@ type ProjectCardProps = {
 };
 
 export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: ProjectCardProps) => {
-    const { t, i18n } = useTranslation();
     const isActive = item.active_pipeline;
     const taskType = getProjectTypeTitle(item.task);
     const queryClient = useQueryClient();
@@ -107,14 +105,10 @@ export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: Pro
 
                         <Flex marginTop={'size-200'} gap={'size-100'} direction={'column'}>
                             <Text UNSAFE_className={classes.projectMetadata}>
-                                {t('projectList.created', { date: formatCreationDate(item.created_at) })}
+                                • Created: {formatCreationDate(item.created_at)}
                             </Text>
                             <Text UNSAFE_className={clsx(classes.labelList, classes.projectMetadata)}>
-                                {t('projectList.labels', {
-                                    labels: new Intl.ListFormat(i18n.language, { type: 'unit' }).format(
-                                        (item.task.labels ?? []).map((label) => label.name)
-                                    ),
-                                })}
+                                • Labels: {(item.task.labels ?? []).map((label) => label.name).join(', ')}
                             </Text>
                         </Flex>
                     </View>

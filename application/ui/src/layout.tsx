@@ -8,7 +8,6 @@ import { Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/u
 import { usePrefetchQuery } from '@tanstack/react-query';
 import { usePrefetchPipeline } from 'hooks/api/pipeline.hook';
 import { useProject } from 'hooks/api/project.hook';
-import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import getiLogo from './assets/icons/geti-logo.webp';
@@ -21,7 +20,6 @@ import { useProjectIdentifier } from './hooks/use-project-identifier.hook';
 import classes from './layout.module.scss';
 
 const Header = () => {
-    const { t } = useTranslation();
     const projectId = useProjectIdentifier();
 
     return (
@@ -50,21 +48,21 @@ const Header = () => {
                         key={'dataset'}
                         href={paths.project.dataset.index({ projectId })}
                     >
-                        {t('nav.dataset')}
+                        Dataset
                     </Item>
                     <Item
                         textValue='Models page to visualise your models'
                         key={'models'}
                         href={paths.project.models({ projectId })}
                     >
-                        {t('nav.models')}
+                        Models
                     </Item>
                     <Item
                         textValue='Inference page showing live inference on your project'
                         key={'inference'}
                         href={paths.project.inference({ projectId })}
                     >
-                        {t('nav.inference')}
+                        Inference
                     </Item>
                 </TabList>
 

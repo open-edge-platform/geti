@@ -6,12 +6,12 @@ import { orderBy } from 'lodash-es';
 
 export const SORT_BY_OPTIONS = [
     [
-        { nameKey: 'nameAZ', key: 'name-ascending' },
-        { nameKey: 'nameZA', key: 'name-descending' },
+        { name: 'Name (A-Z)', key: 'name-ascending' },
+        { name: 'Name (Z-A)', key: 'name-descending' },
     ],
     [
-        { nameKey: 'createdNewest', key: 'createdAt-descending' },
-        { nameKey: 'createdOldest', key: 'createdAt-ascending' },
+        { name: 'Created date (newest)', key: 'createdAt-descending' },
+        { name: 'Created date (oldest)', key: 'createdAt-ascending' },
     ],
 ] as const;
 

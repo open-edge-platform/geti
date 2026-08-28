@@ -6,7 +6,6 @@ import { FormEvent, useState } from 'react';
 import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, Heading, TextField } from '@geti-ui/ui';
 import { usePatchProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
-import { useTranslation } from 'react-i18next';
 
 import { PROJECT_NAME_MAX_LENGTH, validateProjectName } from '../../features/project/validator';
 import { toast } from '../toast/toast.component';
@@ -26,7 +25,6 @@ export const EditProjectNameDialog = ({
     projectName,
     projectNames,
 }: EditProjectNameDialogProps) => {
-    const { t } = useTranslation();
     const patchProjectMutation = usePatchProject();
     const [newProjectName, setNewProjectName] = useState(projectName);
 
@@ -48,7 +46,7 @@ export const EditProjectNameDialog = ({
             {
                 onSuccess: () => {
                     onClose();
-                    toast({ type: 'success', message: t('projectList.toast.projectUpdated') });
+                    toast({ type: 'success', message: 'Project updated successfully' });
                 },
             }
         );
@@ -68,7 +66,7 @@ export const EditProjectNameDialog = ({
         <DialogContainer onDismiss={onClose}>
             {isOpen && (
                 <Dialog>
-                    <Heading>{t('projectList.editDialog.heading')}</Heading>
+                    <Heading>Edit project name</Heading>
                     <Divider />
                     <Content>
                         <Form onSubmit={handleEditProjectName}>
@@ -90,7 +88,7 @@ export const EditProjectNameDialog = ({
                                     onPress={onClose}
                                     isDisabled={patchProjectMutation.isPending}
                                 >
-                                    {t('common.cancel')}
+                                    Cancel
                                 </Button>
                                 <Button
                                     type='submit'
@@ -98,7 +96,7 @@ export const EditProjectNameDialog = ({
                                     isDisabled={isSaveButtonDisabled}
                                     isPending={patchProjectMutation.isPending}
                                 >
-                                    {t('common.save')}
+                                    Save
                                 </Button>
                             </ButtonGroup>
                         </Form>

@@ -3,7 +3,6 @@
 
 import { AlertDialog, DialogContainer } from '@geti-ui/ui';
 import { useDeleteProject } from 'hooks/api/project.hook';
-import { useTranslation } from 'react-i18next';
 
 import { toast } from '../toast/toast.component';
 
@@ -22,7 +21,6 @@ export const DeleteProjectDialog = ({
     onClose,
     onDeleted,
 }: DeleteProjectDialogProps) => {
-    const { t } = useTranslation();
     const deleteMutation = useDeleteProject();
 
     const handleDelete = () => {
@@ -31,7 +29,7 @@ export const DeleteProjectDialog = ({
             {
                 onSuccess: () => {
                     onDeleted?.();
-                    toast({ type: 'success', message: t('projectList.toast.projectDeleted') });
+                    toast({ type: 'success', message: 'Project deleted successfully' });
                 },
             }
         );
@@ -41,16 +39,16 @@ export const DeleteProjectDialog = ({
         <DialogContainer onDismiss={onClose}>
             {isOpen && (
                 <AlertDialog
-                    title={t('common.delete')}
+                    title='Delete'
                     variant='destructive'
-                    cancelLabel={t('common.cancel')}
-                    primaryActionLabel={t('common.delete')}
+                    cancelLabel='Cancel'
+                    primaryActionLabel='Delete'
                     onPrimaryAction={handleDelete}
                     onSecondaryAction={onClose}
                     autoFocusButton='primary'
                     isPrimaryActionDisabled={deleteMutation.isPending}
                 >
-                    {t('projectList.deleteDialog.confirm', { name: projectName })}
+                    {`Are you sure you want to delete project "${projectName}"?`}
                 </AlertDialog>
             )}
         </DialogContainer>

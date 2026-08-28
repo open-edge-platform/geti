@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Item, Picker, Section } from '@geti-ui/ui';
-import { useTranslation } from 'react-i18next';
 
 import { SORT_BY_OPTIONS, SortBy } from './utils';
 
@@ -16,8 +15,6 @@ type SortProjectsProps = {
 export { SORT_BY_HANDLERS } from './utils';
 
 export const SortProjects = ({ sortBy, onSort }: SortProjectsProps) => {
-    const { t } = useTranslation();
-
     return (
         <Picker
             isQuiet
@@ -26,21 +23,17 @@ export const SortProjects = ({ sortBy, onSort }: SortProjectsProps) => {
             onSelectionChange={(key) => onSort(key as SortBy)}
             labelAlign={'start'}
             labelPosition={'side'}
-            label={t('projectList.sort.label')}
+            label={'Sort:'}
             UNSAFE_className={classes.sortProjects}
         >
             {(item) => {
                 return (
                     <Section key={item.map((option) => option.key).join('-')}>
-                        {item.map((option) => {
-                            const label = t(`projectList.sort.${option.nameKey}`);
-
-                            return (
-                                <Item key={option.key} textValue={label}>
-                                    {label}
-                                </Item>
-                            );
-                        })}
+                        {item.map((option) => (
+                            <Item key={option.key} textValue={option.name}>
+                                {option.name}
+                            </Item>
+                        ))}
                     </Section>
                 );
             }}

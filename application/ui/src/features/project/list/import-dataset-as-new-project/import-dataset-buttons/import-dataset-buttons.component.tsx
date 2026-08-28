@@ -3,7 +3,6 @@
 
 import { Button, ButtonGroup } from '@geti-ui/ui';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';
-import { useTranslation } from 'react-i18next';
 
 import { ImportJobProcessButtons } from '../../../../../components/import-job-process/import-job-process-buttons.component';
 import { ImportDatasetAsNewProjectState } from '../../../../dataset/import-export/import-dataset/util';
@@ -17,7 +16,6 @@ type ImportDatasetButtonsProps = {
 };
 
 export const ImportDatasetButtons = ({ currentStep, stagedDatasetId, onClose }: ImportDatasetButtonsProps) => {
-    const { t } = useTranslation();
     const { getImportEntry, deleteImportEntry } = useImportDatasetAsNewProject();
     const { prepareJobId } = getImportEntry(stagedDatasetId ?? '') ?? { prepareJobId: null };
 
@@ -25,7 +23,7 @@ export const ImportDatasetButtons = ({ currentStep, stagedDatasetId, onClose }: 
         return (
             <ButtonGroup>
                 <Button onPress={onClose} variant='secondary'>
-                    {t('common.cancel')}
+                    Cancel
                 </Button>
             </ButtonGroup>
         );
@@ -65,7 +63,7 @@ export const ImportDatasetButtons = ({ currentStep, stagedDatasetId, onClose }: 
     return (
         <ButtonGroup>
             <Button onPress={onClose} variant='secondary'>
-                {t('common.cancel')}
+                Cancel
             </Button>
         </ButtonGroup>
     );

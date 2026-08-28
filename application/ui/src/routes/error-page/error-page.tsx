@@ -4,39 +4,37 @@
 import { Button, Heading, IllustratedMessage, View } from '@geti-ui/ui';
 import { NotFound } from '@geti-ui/ui/icons';
 import { isObject, isString } from 'lodash-es';
-import { useTranslation } from 'react-i18next';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 
 import { paths } from '../../constants/paths';
 import { redirectTo } from '../utils';
 
 const useErrorMessage = () => {
-    const { t } = useTranslation();
     const error = useRouteError();
 
     if (isRouteErrorResponse(error)) {
         if (error.status === 400) {
-            return t('errorPage.badRequest');
+            return 'The server cannot or will not process the current request.';
         }
 
         if (error.status === 403) {
-            return t('errorPage.forbidden');
+            return 'You do not have permission to access this page.';
         }
 
         if (error.status === 404) {
-            return t('errorPage.notFound');
+            return "This page doesn't exist!";
         }
 
         if (error.status === 401) {
-            return t('errorPage.unauthorized');
+            return "You aren't authorized to see this";
         }
 
         if (error.status === 500) {
-            return t('errorPage.internalServerError');
+            return 'The server encountered an error and could not complete your request.';
         }
 
         if (error.status === 503) {
-            return t('errorPage.serviceUnavailable');
+            return 'Looks like our API is down';
         }
     }
 
@@ -48,11 +46,10 @@ const useErrorMessage = () => {
         return error.detail;
     }
 
-    return t('errorPage.unknown');
+    return 'An unknown error occurred';
 };
 
 export const ErrorPage = () => {
-    const { t } = useTranslation();
     const message = useErrorMessage();
 
     return (
@@ -68,7 +65,7 @@ export const ErrorPage = () => {
                         redirectTo(paths.root({}));
                     }}
                 >
-                    {t('errorPage.backToHome')}
+                    Go back to home page
                 </Button>
             </IllustratedMessage>
         </View>

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Button, Flex, Text } from '@geti-ui/ui';
-import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { ReactComponent as EmptyFolderImage } from '../../../../assets/empty-folder.svg';
@@ -13,7 +12,6 @@ import { ImportDatasetAsNewProject } from '../import-dataset-as-new-project/impo
 import classes from './empty-project-list.module.scss';
 
 export const EmptyProjectList = () => {
-    const { t } = useTranslation();
     const navigate = useNavigate();
     const { datasetImportDialogState, setCurrentStep, setCurrentStagedId } = useImportDatasetDialog();
 
@@ -41,10 +39,10 @@ export const EmptyProjectList = () => {
 
             <Flex alignItems={'center'} gap={'size-100'}>
                 <Button variant='accent' id='create-new-project-button' onPress={handleCreateProject}>
-                    <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>{t('projectList.empty.createNewProject')}</Text>
+                    <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>Create new Project</Text>
                 </Button>
                 <Button variant='accent' id='create-new-project-button' onPress={handleCreateFromDataset}>
-                    <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>{t('projectList.empty.createFromDataset')}</Text>
+                    <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>Create from dataset</Text>
                 </Button>
             </Flex>
 
