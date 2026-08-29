@@ -250,7 +250,10 @@ def list_media(  # noqa: PLR0913
         Query(description="If provided, list media assigned to this dataset view instead of the entire dataset"),
     ] = None,
 ) -> MediaWithPagination:
-    """List the available media and their metadata. This endpoint supports pagination."""
+    """
+    List the available media and their metadata. This endpoint supports pagination.
+    Note: Listing media assigned to a dataset view happens through this endpoint by providing a `dataset_view_id`.
+    """
     start_date = normalize_datetime_to_utc(start_date)
     end_date = normalize_datetime_to_utc(end_date)
 
