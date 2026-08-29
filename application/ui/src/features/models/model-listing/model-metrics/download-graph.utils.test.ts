@@ -1,4 +1,5 @@
-// eslint-disable-next-line header/header
+/* eslint-disable header/header */
+
 import { vi } from 'vitest';
 
 import { downloadSvgAsImage } from './download-graph.utils';

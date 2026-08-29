@@ -1,4 +1,4 @@
-// eslint-disable-next-line header/header
+/* eslint-disable header/header */
 const applyInlineStyles = (sourceNode: Element, targetNode: Element) => {
     const computedStyle = window.getComputedStyle(sourceNode);
 
