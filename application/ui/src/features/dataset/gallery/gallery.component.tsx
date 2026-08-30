@@ -2,7 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Media } from '@/api/types';
-import { Checkbox, DialogContainer, dimensionValue, Flex, Selection, Size, ViewModes } from '@geti-ui/ui';
+import {
+    Checkbox,
+    DialogContainer,
+    dimensionValue,
+    Flex,
+    Selection,
+    Size,
+    Tooltip,
+    TooltipTrigger,
+    ViewModes,
+} from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty, isEqual } from 'lodash-es';
 import { GridLayoutOptions } from 'react-aria-components';
@@ -12,6 +22,7 @@ import { MediaThumbnail } from '../../../components/media-thumbnail/media-thumbn
 import { VirtualizerGridLayout } from '../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
 import { type GalleryViewMode } from '../../../shared/gallery-view-modes';
 import { getMediaDownloadUrl, getThumbnailUrl } from '../../../shared/media-url.utils';
+import { formatBytes } from '../../../shared/util';
 import { MediaPreview } from '../media-preview/media-preview.component';
 import { useSelectedData } from '../providers/selected-data-provider.component';
 import { AnnotationStatusIcon } from './annotation-state-icon.component';
@@ -92,12 +103,21 @@ const GalleryList = ({
                 return (
                     <MediaItem
                         contentElement={() => (
-                            <MediaThumbnail
-                                item={item}
-                                alt={item.name}
-                                url={mediaUrl}
-                                onDoubleClick={() => onSelectedMediaItemChange(item)}
-                            />
+                            <TooltipTrigger delay={0}>
+                                <MediaThumbnail
+                                    item={item}
+                                    alt={item.name}
+                                    url={mediaUrl}
+                                    onDoubleClick={() => onSelectedMediaItemChange(item)}
+                                />
+                                <Tooltip>
+                                    {item.name}
+                                    <br />
+                                    {formatBytes(item.size)}
+                                    <br />
+                                    {item.width} x {item.height}
+                                </Tooltip>
+                            </TooltipTrigger>
                         )}
                         topLeftElement={() => (
                             <Flex
