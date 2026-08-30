@@ -136,6 +136,7 @@ class TestTrainingConfiguration:
     def test_apply_updates_intensity_mapping_mode(self) -> None:
         config = make_config()
         config.apply_updates({"dataset_preparation.intensity_mapping.mode": "Windowing"})
+        assert config.task_level_parameters.dataset_preparation.intensity_mapping is not None
         assert config.task_level_parameters.dataset_preparation.intensity_mapping.mode == IntensityMappingMode.WINDOW
 
     def test_apply_updates_intensity_mapping_window_params(self) -> None:
@@ -147,6 +148,7 @@ class TestTrainingConfiguration:
             }
         )
         im = config.task_level_parameters.dataset_preparation.intensity_mapping
+        assert im is not None
         assert im.window_center == pytest.approx(500.0)
         assert im.window_width == pytest.approx(1000.0)
 

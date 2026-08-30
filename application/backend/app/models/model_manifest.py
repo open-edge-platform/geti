@@ -87,6 +87,11 @@ class Capabilities(BaseModel):
         title="Tiling Support",
         description="Whether the model supports image tiling for processing large images",
     )
+    high_bit_depth_images: bool = Field(
+        default=True,
+        title="High Bit Depth Images Support",
+        description="Whether the model supports input images with a bit depth greater than 8 bits per channel",
+    )
 
 
 class WeightsSource(StrEnum):

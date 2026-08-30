@@ -39,6 +39,7 @@ export const getMockedModelArchitecture = (
     capabilities: {
         xai: true,
         tiling: true,
+        high_bit_depth_images: true,
     },
     stats: {
         gigaflops: 91,

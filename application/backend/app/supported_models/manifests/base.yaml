@@ -1,6 +1,7 @@
 capabilities:
   tiling: false
   xai: true # by default, all models support XAI features (unless specified otherwise)
+  high_bit_depth_images: true # by default, all models support high bit depth images (unless specified otherwise)
 
 support_status: active
 

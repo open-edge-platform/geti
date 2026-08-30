@@ -196,6 +196,62 @@ class TestTrainingConfigurationService:
 
         assert result.algo_level_parameters.dataset_preparation.augmentation.tiling is None
 
+    def test_get_default_by_model_architecture_strips_intensity_mapping_when_unsupported(
+        self,
+        fxt_training_configuration_service: TrainingConfigurationService,
+    ):
+        """Intensity mapping should be removed from the default config when the architecture doesn't support
+        high bit depth images."""
+        TrainingConfigurationService.get_default_by_model_architecture.cache_clear()
+
+        # YOLOX-S does not support high bit depth images (capabilities.high_bit_depth_images: false in its manifest)
+        result = TrainingConfigurationService.get_default_by_model_architecture(
+            model_architecture_id="object-detection-yolox-s",
+        )
+
+        assert result.task_level_parameters.dataset_preparation.intensity_mapping is None
+
+        # Sanity check: a model that supports high bit depth images still exposes the intensity mapping parameters
+        TrainingConfigurationService.get_default_by_model_architecture.cache_clear()
+        yolo11_result = TrainingConfigurationService.get_default_by_model_architecture(
+            model_architecture_id="object-detection-yolo11-n",
+        )
+        assert yolo11_result.task_level_parameters.dataset_preparation.intensity_mapping is not None
+
+        TrainingConfigurationService.get_default_by_model_architecture.cache_clear()
+
+    def test_get_by_model_architecture_strips_intensity_mapping_when_unsupported(
+        self,
+        fxt_training_configuration: TrainingConfiguration,
+        fxt_training_configuration_service: TrainingConfigurationService,
+        fxt_project: ProjectDB,
+        db_session: Session,
+    ):
+        """Persisted intensity mapping values should be stripped when the architecture doesn't support high bit
+        depth images."""
+        # Persist a task-level configuration with intensity_mapping populated (simulating an older configuration)
+        task_level_data = fxt_training_configuration.task_level_parameters.model_dump()
+        task_level_data["dataset_preparation"]["intensity_mapping"] = {
+            "mode": "window",
+            "window_center": 500.0,
+            "window_width": 1000.0,
+        }
+        task_level_config = TrainingConfigurationDB(
+            id=str(uuid4()),
+            project_id=fxt_project.id,
+            model_architecture_id=None,
+            configuration_data=task_level_data,
+        )
+        db_session.add(task_level_config)
+        db_session.flush()
+
+        result = fxt_training_configuration_service.get_by_model_architecture(
+            project_id=UUID(fxt_project.id),
+            model_architecture_id="object-detection-yolox-s",
+        )
+
+        assert result.task_level_parameters.dataset_preparation.intensity_mapping is None
+
     def test_get_by_model_architecture_with_existing_config(
         self,
         fxt_training_configuration: TrainingConfiguration,

@@ -78,6 +78,8 @@ class TrainingConfigurationService(BaseSessionManagedService):
         """
         if not model_manifest.capabilities.tiling:
             training_configuration.algo_level_parameters.dataset_preparation.augmentation.tiling = None
+        if not model_manifest.capabilities.high_bit_depth_images:
+            training_configuration.task_level_parameters.dataset_preparation.intensity_mapping = None
 
     def get_by_model_architecture(self, project_id: UUID, model_architecture_id: str) -> TrainingConfiguration:
         """

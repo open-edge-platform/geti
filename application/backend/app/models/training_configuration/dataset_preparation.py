@@ -242,7 +242,7 @@ class TaskLevelDatasetPreparationParameters(BaseModel):
             "improve the model performance by removing noisy annotations."
         ),
     )
-    intensity_mapping: IntensityMapping = Field(
+    intensity_mapping: IntensityMapping | None = Field(
         default_factory=IntensityMapping,
         title="Intensity mapping",
         description=(

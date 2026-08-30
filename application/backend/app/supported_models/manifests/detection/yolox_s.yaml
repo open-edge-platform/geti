@@ -13,6 +13,9 @@ stats:
   benchmark_metrics:
     coco_map_50_95: 40.5
 
+capabilities:
+  high_bit_depth_images: false # YOLOX-S is not compatible with 16-bit images because its pretrained weights were trained on 8-bit RGB images without normalization.
+
 hyperparameters:
   dataset_preparation:
     augmentation:
