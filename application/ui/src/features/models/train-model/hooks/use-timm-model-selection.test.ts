@@ -47,9 +47,9 @@ describe('useTimmModelSelection', () => {
     it('does not fetch the catalog while disabled', async () => {
         const { result } = renderHook(() => useTimmModelSelection(false));
 
-        await waitFor(() => {
-            expect(result.current.timmFamilies).toEqual([]);
-        });
+        // Give the async path a chance to fire — it should not.
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        expect(result.current.timmFamilies).toEqual([]);
 
         expect(result.current.timmModelArchitecture).toBeUndefined();
     });
