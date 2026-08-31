@@ -63,7 +63,7 @@ class TestTimmManifestProvider:
         manifest = TimmManifestProvider.build_manifest("resnet18.a1_in1k")
 
         assert manifest.id == model_name_to_id("resnet18.a1_in1k")
-        assert manifest.name == "timm/resnet18.a1_in1k"
+        assert manifest.name == "resnet18.a1_in1k"
         assert manifest.license == "apache-2.0"
         assert manifest.timm_metadata is not None
         assert manifest.timm_metadata.family == "resnet"

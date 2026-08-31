@@ -34,6 +34,16 @@ def step_project_from_dataset_url(context: Context, project_name: str, url: str)
     session = cast(Session, context.session)
     base_url = str(context.base_url)
 
+    response = session.get(f"{base_url}/api/projects")
+    assert response.status_code == 200, (
+        f"Expected status code 200, got {response.status_code}, response: {response.text}"
+    )
+    existing_projects = [ProjectView.model_validate(proj) for proj in response.json()]
+    existing_project = next((proj for proj in existing_projects if proj.name == project_name), None)
+    if existing_project is not None:
+        context.project = existing_project
+        return
+
     archive_path = download_file(url, _DATASET_CACHE_DIR)
     staged_dataset_id = upload_staged_dataset(session, base_url, archive_path)
 
@@ -97,7 +107,7 @@ def step_train_timm_model(context: Context, model_id: str, device: str) -> None:
             device=device,
         )
     except JobFailedError as exc:
-        context.failures[model_id] = exc.job.error or "<no stacktrace captured>"
+        context.failures.append({"model_id": model_id, "stacktrace": exc.job.error or "<no stacktrace captured>"})
         raise
 
 

@@ -36,12 +36,12 @@ def fastapi_server(context: Context) -> Generator[None]:
 
 def before_all(context: Context) -> None:
     """Set up the server before each scenario."""
-    context.failures = {}
+    context.failures = []
     use_fixture(fastapi_server, context)
 
 
 def after_all(context: Context) -> None:
     """Dump collected model-architecture failures (stacktraces) to a JSON report."""
-    failures = getattr(context, "failures", {})
+    failures = getattr(context, "failures", [])
     if failures:
         _FAILURES_REPORT_PATH.write_text(json.dumps(failures, indent=2, sort_keys=True), encoding="utf-8")
