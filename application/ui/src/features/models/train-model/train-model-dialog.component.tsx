@@ -21,7 +21,7 @@ type TrainModelDialogProps = {
 export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
     const {
         selectedTrainingDevice,
-        selectedModelArchitectureId,
+        resolvedModelArchitectureId,
         isAdvancedSettingsMode,
         onToggleAdvancedSettingsMode,
         trainingConfiguration,
@@ -34,9 +34,9 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
     const { trainModel, isPending } = useTrainModel();
 
     const isStartButtonDisabled =
-        isTrainingDisabled || selectedModelArchitectureId === null || selectedTrainingDevice === null || isPending;
+        isTrainingDisabled || resolvedModelArchitectureId === null || selectedTrainingDevice === null || isPending;
 
-    const isAdvancedSettingsModeDisabled = selectedModelArchitectureId === null || trainingConfiguration === undefined;
+    const isAdvancedSettingsModeDisabled = resolvedModelArchitectureId === null || trainingConfiguration === undefined;
 
     const handleTrainModel = () => {
         trainModel({
