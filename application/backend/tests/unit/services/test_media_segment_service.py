@@ -201,3 +201,42 @@ class TestMediaSegmentService:
 
         with pytest.raises(ValueError, match="Video media type is not supported"):
             fxt_media_segment_service.encode_media(project=project, media=video, device=device)
+
+    @pytest.mark.parametrize(
+        "shape, dtype",
+        [
+            pytest.param((256, 256, 1), np.uint16, id="16bit_grayscale"),
+            pytest.param((256, 256), np.uint16, id="16bit_grayscale_2d"),
+            pytest.param((256, 256, 3), np.uint16, id="16bit_rgb"),
+            pytest.param((256, 256, 1), np.uint8, id="8bit_grayscale"),
+            pytest.param((256, 256, 4), np.uint8, id="8bit_rgba"),
+        ],
+    )
+    def test_encode_media_converts_input_to_uint8_rgb(
+        self, fxt_media_segment_service, fxt_media_numpy_loader, shape, dtype
+    ):
+        """The SAM encoder IR only accepts (1, H, W, 3) uint8, so any decoded media must be converted.
+
+        Regression test: 16-bit / grayscale images used to be forwarded as-is and made
+        OpenVINO raise a shape mismatch (``{1, ?, ?, 3}`` vs ``{1, 256, 256, 1}``).
+        """
+        project = MagicMock(spec=Project, id=uuid4())
+        image = MagicMock(spec=Image, id=uuid4(), type=MediaType.IMAGE)
+        device = DeviceInfo.cpu()
+
+        rng = np.random.default_rng(0)
+        media_binary = (rng.random(shape) * np.iinfo(dtype).max).astype(dtype)
+        fxt_media_numpy_loader.load_media_binary.return_value = media_binary
+
+        model = MagicMock(return_value=np.random.rand(1, 256, 64, 64).astype(np.float32))
+        with patch.object(fxt_media_segment_service, "_load_model", return_value=model):
+            result = fxt_media_segment_service.encode_media(project=project, media=image, device=device)
+
+        model_input = model.call_args.args[0]
+        assert model_input.dtype == np.uint8
+        assert model_input.shape == (256, 256, 3)
+
+        # The resize metadata still reflects the original media dimensions.
+        metadata = _read_safetensors_metadata(result)
+        assert metadata["original_height"] == "256"
+        assert metadata["original_width"] == "256"
