@@ -49,7 +49,7 @@ const useSelectedModelId = (models: Model[]) => {
         defaultSelectedId
     );
 
-    // With a single model there is nothing to choose from, so it is always the selected one
+    // With a single available model variant there is nothing to choose from, so it is always selected
     const selectedModelId = selectableModels.length === 1 ? selectableModels[0].modelVariantId : storedModelId;
 
     return [selectedModelId, setStoredModelId] as const;
