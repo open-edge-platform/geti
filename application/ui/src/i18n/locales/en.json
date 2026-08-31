@@ -1,1 +1,123 @@
-{}
+{
+    "nav": {
+        "dataset": "Dataset",
+        "models": "Models",
+        "inference": "Inference"
+    },
+    "common": {
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "save": "Save",
+        "back": "Back",
+        "next": "Next",
+        "hide": "Hide",
+        "create": "Create"
+    },
+    "taskTypes": {
+        "detection": "Object detection",
+        "classification": "Classification",
+        "instance_segmentation": "Instance segmentation",
+        "multiLabelClassification": "Multi-label classification"
+    },
+    "projectPanel": {
+        "manageProjects": "Manage projects"
+    },
+    "root": {
+        "loading": "Loading...Please wait.",
+        "serverError": "Server Error",
+        "refresh": "Refresh"
+    },
+    "errorPage": {
+        "badRequest": "The server cannot or will not process the current request.",
+        "forbidden": "You do not have permission to access this page.",
+        "notFound": "This page doesn't exist!",
+        "unauthorized": "You aren't authorized to see this",
+        "internalServerError": "The server encountered an error and could not complete your request.",
+        "serviceUnavailable": "Looks like our API is down",
+        "unknown": "An unknown error occurred",
+        "backToHome": "Go back to home page"
+    },
+    "projectList": {
+        "title": "Projects",
+        "active": "Active",
+        "count_one": "{{count}} project",
+        "count_other": "{{count}} projects",
+        "countFiltered_one": "{{filtered}} of {{count}} project",
+        "countFiltered_other": "{{filtered}} of {{count}} projects",
+        "created": "• Created: {{date}}",
+        "labels": "• Labels: {{labels}}",
+        "empty": {
+            "createNewProject": "Create new Project",
+            "createFromDataset": "Create from dataset"
+        },
+        "newCard": {
+            "createProject": "Create new project",
+            "createFromDataset": "Create project from dataset"
+        },
+        "menu": {
+            "rename": "Rename",
+            "enablePipeline": "Enable pipeline",
+            "disablePipeline": "Disable pipeline"
+        },
+        "toast": {
+            "pipelineEnabled": "Pipeline enabled successfully",
+            "pipelineDisabled": "Pipeline disabled successfully",
+            "projectDeleted": "Project deleted successfully",
+            "projectUpdated": "Project updated successfully"
+        },
+        "sort": {
+            "label": "Sort:",
+            "nameAZ": "Name (A-Z)",
+            "nameZA": "Name (Z-A)",
+            "createdNewest": "Created date (newest)",
+            "createdOldest": "Created date (oldest)"
+        },
+        "filters": {
+            "searchPlaceholder": "Search by name...",
+            "byTaskType": "Filter by task type",
+            "typesSelected_one": "{{count}} type selected",
+            "typesSelected_other": "{{count}} types selected"
+        },
+        "noMatching": {
+            "title": "No projects match your filters",
+            "hint": "Try adjusting your search or task type filters to find what you are looking for."
+        },
+        "deleteDialog": {
+            "confirm": "Are you sure you want to delete project \"{{name}}\"?"
+        },
+        "editDialog": {
+            "heading": "Edit project name"
+        },
+        "stepper": {
+            "dataset": "Dataset",
+            "taskType": "Task type",
+            "labels": "Labels"
+        },
+        "importDialog": {
+            "title": "Create project from a dataset - Import"
+        },
+        "import": {
+            "prepareMessage": "Prepare dataset import as new project"
+        },
+        "importJobs": {
+            "selectTaskType": "Select task type",
+            "mapLabelsMessage": "Map labels for the uploaded dataset",
+            "mapLabels": "Map labels"
+        },
+        "importTask": {
+            "projectName": "Project name",
+            "taskType": "Task type",
+            "selectTask": "Select task",
+            "recommended": "{{task}} (Recommended)",
+            "recommendedHint": "The recommended choice is based on the type of the annotations detected in the dataset. If you choose a different type, the annotations will be automatically transformed during import to fit the selected type."
+        },
+        "labelMapping": {
+            "statisticsHeading": "Imported dataset statistics",
+            "images": "images",
+            "frames": "frames",
+            "heading": "Label mapping",
+            "datasetLabels": "Dataset labels",
+            "includeUnannotated": "Include media without annotations"
+        }
+    }
+}

@@ -10,10 +10,12 @@ import {
     renderHook as rtlRenderHook,
     RenderOptions as RTLRenderOptions,
 } from '@testing-library/react';
+import { I18nextProvider } from 'react-i18next';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import { Toast } from '../components/toast/toast.component';
 import { paths } from '../constants/paths';
+import { i18n } from '../i18n';
 import { createQueryClient } from '../query-client/query-client';
 
 type RenderOptions = RTLRenderOptions & {
@@ -24,12 +26,14 @@ type RenderOptions = RTLRenderOptions & {
 
 const TestProviders = ({ children, queryClient }: { children: ReactNode; queryClient: QueryClient }) => {
     return (
-        <QueryClientProvider client={queryClient}>
-            <ThemeProvider>
-                <Suspense fallback={<IntelBrandedLoading />}>{children}</Suspense>
-                <Toast />
-            </ThemeProvider>
-        </QueryClientProvider>
+        <I18nextProvider i18n={i18n}>
+            <QueryClientProvider client={queryClient}>
+                <ThemeProvider>
+                    <Suspense fallback={<IntelBrandedLoading />}>{children}</Suspense>
+                    <Toast />
+                </ThemeProvider>
+            </QueryClientProvider>
+        </I18nextProvider>
     );
 };
 

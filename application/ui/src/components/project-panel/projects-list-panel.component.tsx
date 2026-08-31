@@ -21,6 +21,7 @@ import { Edit } from '@geti-ui/ui/icons';
 import { useProjects } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { partition } from 'lodash-es';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 import { EnablePipelineBlockedDialog } from '../../components/enable-pipeline-blocked-dialog/enable-pipeline-blocked-dialog.component';
@@ -71,6 +72,7 @@ const SelectedProjectButton = ({ name, id, isActive }: SelectedProjectProps) => 
 };
 
 const ManageProjects = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const navigateToProjectsList = () => {
@@ -87,7 +89,7 @@ const ManageProjects = () => {
             onPress={navigateToProjectsList}
         >
             <Edit />
-            <Text>Manage projects</Text>
+            <Text>{t('projectPanel.manageProjects')}</Text>
         </ActionButton>
     );
 };
