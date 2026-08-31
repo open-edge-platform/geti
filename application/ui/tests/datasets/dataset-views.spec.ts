@@ -8,8 +8,6 @@ import { HttpResponse } from 'msw';
 
 import { expect, http, test } from '../fixtures';
 
-// Copyright (C) 2025-2026 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
 const COLLECTION_ONE = getMockedDatasetView({ id: 'collection-one', name: 'Collection One' });
 const COLLECTION_TWO = getMockedDatasetView({ id: 'collection-two', name: 'Collection Two' });
 
