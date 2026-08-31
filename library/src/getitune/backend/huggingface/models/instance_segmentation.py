@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import copy
+import inspect
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import torch
@@ -119,20 +120,36 @@ class HFInstSegModel(HFModel):
         rescaling every prediction individually.
         """
         input_size = (int(batch.images[0].shape[-2]), int(batch.images[0].shape[-1]))
-        decoded = self._image_processor.post_process_instance_segmentation(  # pyrefly: ignore[missing-attribute]
-            outputs,
-            threshold=0.0,
-            target_sizes=[input_size] * len(batch.images),
-            return_binary_maps=True,
-        )
+        postprocess = self._image_processor.post_process_instance_segmentation  # pyrefly: ignore[missing-attribute]
+        if "return_binary_maps" in inspect.signature(postprocess).parameters:
+            decoded = self._image_processor.post_process_instance_segmentation(  # pyrefly: ignore[missing-attribute]
+                outputs,
+                threshold=0.0,
+                target_sizes=[input_size] * len(batch.images),
+                return_binary_maps=True,
+            )
+        else:
+            decoded = self._image_processor.post_process_instance_segmentation(  # pyrefly: ignore[missing-attribute]
+                outputs,
+                threshold=0.0,
+                target_sizes=[input_size] * len(batch.images),
+            )
 
         bboxes, masks, labels, scores = [], [], [], []
         for image_result in decoded:
             segmentation = image_result["segmentation"]
+            segments_info = image_result["segments_info"]
             if segmentation.ndim == 2:
-                binary_maps = torch.empty((0, *input_size), dtype=torch.bool, device=segmentation.device)
-            else:
+                segment_ids = [segment.get("id", index) for index, segment in enumerate(segments_info)]
+                binary_maps = torch.stack(
+                    [segmentation == segment_id for segment_id in segment_ids]  # pyrefly: ignore[bad-argument-type]
+                )
+                if not segment_ids:
+                    binary_maps = torch.empty((0, *input_size), dtype=torch.bool, device=segmentation.device)
+            elif segmentation.ndim == 3:
                 binary_maps = segmentation.bool()
+            else:
+                binary_maps = torch.empty((0, *input_size), dtype=torch.bool, device=segmentation.device)
             device = binary_maps.device
             bboxes.append(
                 tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
@@ -142,7 +159,6 @@ class HFInstSegModel(HFModel):
                 )
             )
             masks.append(tv_tensors.Mask(binary_maps))
-            segments_info = image_result["segments_info"]
             labels.append(
                 torch.tensor([segment["label_id"] for segment in segments_info], dtype=torch.long, device=device)
             )

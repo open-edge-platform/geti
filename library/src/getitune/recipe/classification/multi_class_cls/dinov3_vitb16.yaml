@@ -1,23 +1,23 @@
 backend: huggingface
 task: MULTI_CLASS_CLS
-
-model:
-  class_path: getitune.backend.huggingface.models.classification.HFMulticlassClsModel
-  init_args:
-    checkpoint: google/vit-base-patch16-224
+model: 
+  class_path: getitune.backend.huggingface.models.dinov3_classification.HFDinov3MulticlassClsModel
+  init_args: 
+    checkpoint: timm/vit_base_patch16_dinov3.lvd1689m
     pretrained: true
+    input_size: [256, 256]
 
-engine:
+engine: 
   device: auto
 
-training:
+training: 
   max_epochs: 90
   batch: 64
   learning_rate: 0.0001
   precision: bf16-mixed
   patience: 10
   optim: adamw_torch
-  weight_decay: 0.05
+  weight_decay: 0.0001
   lr_scheduler_type: cosine
   warmup_ratio: 0.1
   max_grad_norm: 1.0

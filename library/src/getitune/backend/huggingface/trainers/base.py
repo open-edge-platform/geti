@@ -300,6 +300,10 @@ class GetiTuneHFTrainer(Trainer):
             return {}
 
         if split == "val":
+            # ``transformers.EarlyStoppingCallback`` looks up ``eval_`` + ``metric_for_best_model``
+            # in the metrics dict, but we log task metrics under the ``val/`` prefix. Mirror them under
+            # the ``eval_`` prefix so early stopping can find the monitored metric.
+            metrics.update({f"eval_{k}": v for k, v in metrics.items()})
             metrics["epoch"] = epoch
             self.log(metrics)
             self.control = self.callback_handler.on_evaluate(self.args, self.state, self.control, metrics)

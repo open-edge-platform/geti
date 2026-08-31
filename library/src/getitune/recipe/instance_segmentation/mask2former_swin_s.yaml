@@ -1,0 +1,24 @@
+backend: huggingface
+task: INSTANCE_SEGMENTATION
+model:
+  class_path: getitune.backend.huggingface.models.instance_segmentation.HFInstSegModel
+  init_args:
+    checkpoint: facebook/mask2former-swin-small-coco-instance
+    pretrained: true
+    input_size: [1024, 1024]
+    resize_mode: fit_to_window
+engine:
+  device: auto
+training:
+  max_epochs: 100
+  batch: 2
+  gradient_accumulation_steps: 2
+  learning_rate: 0.00005
+  precision: bf16-mixed
+  patience: 10
+  optim: adamw_torch
+  weight_decay: 0.05
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.05
+  max_grad_norm: 0.1
+data: ../_base_/data/instance_segmentation.yaml
