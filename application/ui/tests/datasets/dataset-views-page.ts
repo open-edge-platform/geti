@@ -70,9 +70,9 @@ export class DatasetViewsPage {
         await this.getAssignButton().click();
 
         const dialog = this.page.getByRole('dialog');
-        await dialog.getByLabel('Assign to').click();
+        await dialog.getByRole('button', { name: /Assign to/i }).click();
         await this.page.getByRole('option', { name, exact: true }).click();
-        await dialog.getByRole('button', { name: 'Assign' }).click();
+        await dialog.getByRole('button', { name: 'Assign', exact: true }).click();
     }
 
     getUnassignButton() {

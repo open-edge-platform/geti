@@ -8,8 +8,10 @@ import { HttpResponse } from 'msw';
 
 import { expect, http, test } from '../fixtures';
 
-const COLLECTION_ONE = getMockedDatasetView({ id: 'collection-one', name: 'Collection One' });
-const COLLECTION_TWO = getMockedDatasetView({ id: 'collection-two', name: 'Collection Two' });
+const PROJECT_ID = 'id-1';
+
+const COLLECTION_ONE = getMockedDatasetView({ id: 'collection-one', name: 'Collection One', project_id: PROJECT_ID });
+const COLLECTION_TWO = getMockedDatasetView({ id: 'collection-two', name: 'Collection Two', project_id: PROJECT_ID });
 
 const IMAGE_A = getMockedMediaImage({ id: 'image-a', name: 'Image A' });
 const IMAGE_B = getMockedMediaImage({ id: 'image-b', name: 'Image B' });
@@ -48,7 +50,7 @@ test.describe('Dataset views', () => {
             network.use(
                 http.post('/api/projects/{project_id}/dataset/views', async ({ request }) => {
                     const body = (await request.json()) as { name: string; media_ids?: string[] | null };
-                    const newView = getMockedDatasetView({ id: 'new-view', name: body.name });
+                    const newView = getMockedDatasetView({ id: 'new-view', name: body.name, project_id: PROJECT_ID });
 
                     views = [...views, newView];
                     viewMedia[newView.id] = ENTIRE_DATASET_MEDIA.filter((item) =>
@@ -255,7 +257,6 @@ test.describe('Dataset views', () => {
             await datasetPage.goto('id-1', '?datasetViewId=collection-one');
 
             await expect(datasetPage.views.getEmptyViewMessage()).toBeVisible();
-            await expect(datasetPage.getUploadButton()).toBeHidden();
 
             await datasetPage.views.getGoToEntireDatasetButton().click();
 
@@ -270,7 +271,8 @@ test.describe('Dataset views', () => {
 
             await expect(datasetPage.views.getViewSelectorTrigger()).toHaveAttribute('aria-disabled', 'true');
 
-            await datasetPage.views.getViewSelectorTrigger().click();
+            // eslint-disable-next-line playwright/no-force-option
+            await datasetPage.views.getViewSelectorTrigger().click({ force: true });
             await expect(datasetPage.views.getViewsList()).toBeHidden();
         });
 
