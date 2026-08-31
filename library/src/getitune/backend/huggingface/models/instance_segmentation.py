@@ -19,6 +19,7 @@ from getitune.backend.huggingface.models.utils import (
     reproject_boxes_to_input_space,
     reproject_masks_to_input_space,
 )
+from getitune.backend.lightning.models.base import DataInputParams
 from getitune.data.entity.sample import PredictionBatch
 from getitune.data.utils.structures.mask.mask_util import encode_rle
 from getitune.metrics.mean_ap import MaskRLEMeanAPCallable
@@ -74,6 +75,17 @@ class HFInstSegModel(HFModel):
         super().__init__(checkpoint, label_info, **kwargs)
         self._confidence_threshold = confidence_threshold
         self._iou_threshold = iou_threshold
+
+    @property
+    def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
+        """Known-checkpoint preprocessing defaults for instance segmentation recipes."""
+        return {
+            "facebook/mask2former-swin-tiny-coco-instance": DataInputParams(
+                input_size=(1024, 1024),
+                mean=(0.485, 0.456, 0.406),
+                std=(0.229, 0.224, 0.225),
+            ),
+        }
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:

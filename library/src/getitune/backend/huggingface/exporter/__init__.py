@@ -5,6 +5,6 @@
 
 from __future__ import annotations
 
-from getitune.backend.huggingface.exporter.native import HFModelExporter
+from getitune.backend.huggingface.exporter.hf_exporter import HFModelExporter
 
 __all__ = ["HFModelExporter"]

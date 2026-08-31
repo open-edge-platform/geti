@@ -11,6 +11,7 @@ import torch
 import transformers
 
 from getitune.backend.huggingface.models.base import HFModel
+from getitune.backend.lightning.models.base import DataInputParams
 from getitune.data.entity.sample import PredictionBatch
 from getitune.metrics.accuracy import MultiClassClsMetricCallable, MultiLabelClsMetricCallable
 from getitune.types.export import TaskLevelExportParameters
@@ -25,6 +26,14 @@ if TYPE_CHECKING:
 
 __all__ = ["HFMulticlassClsModel", "HFMultilabelClsModel"]
 
+_CLASSIFICATION_DEFAULTS: dict[str, DataInputParams] = {
+    "google/vit-base-patch16-224": DataInputParams(
+        input_size=(224, 224),
+        mean=(0.485, 0.456, 0.406),
+        std=(0.229, 0.224, 0.225),
+    ),
+}
+
 
 class HFMulticlassClsModel(HFModel):
     """Multi-class classification wrapper, e.g. ViT, ConvNeXt, EfficientNet."""
@@ -34,6 +43,11 @@ class HFMulticlassClsModel(HFModel):
     export_model_type: ClassVar[str] = "Classification"
     label_keys: ClassVar[tuple[str, ...]] = ("labels",)
     _onnx_output_names: ClassVar[list[str]] = ["logits"]
+
+    @property
+    def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
+        """Known-checkpoint preprocessing defaults for multi-class recipes."""
+        return _CLASSIFICATION_DEFAULTS
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
@@ -116,6 +130,11 @@ class HFMultilabelClsModel(HFModel):
         overrides = dict(kwargs.pop("extra_overrides", None) or {})
         overrides.setdefault("problem_type", "multi_label_classification")
         super().__init__(checkpoint, label_info, extra_overrides=overrides, **kwargs)
+
+    @property
+    def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
+        """Known-checkpoint preprocessing defaults for multi-label recipes."""
+        return _CLASSIFICATION_DEFAULTS
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:

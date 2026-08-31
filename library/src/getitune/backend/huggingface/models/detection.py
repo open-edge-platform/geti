@@ -13,6 +13,7 @@ from torchvision import tv_tensors
 from torchvision.ops import box_convert
 
 from getitune.backend.huggingface.models.base import HFModel
+from getitune.backend.lightning.models.base import DataInputParams
 from getitune.data.entity.sample import PredictionBatch
 from getitune.metrics.mean_ap import MeanAPCallable
 from getitune.types.export import TaskLevelExportParameters
@@ -29,11 +30,11 @@ __all__ = ["HFDetectionModel"]
 
 
 class HFDetectionModel(HFModel):
-    """Detection wrapper covering the DETR family.
+    """Detection wrapper covering HF's generic object-detection model mapping.
 
-    Covers RT-DETRv2, RT-DETR, D-FINE, Deformable/Conditional/DAB-DETR and
-    similar models that take ``pixel_values`` and return
-    ``{loss, logits, pred_boxes}``.
+    Targets ``transformers.AutoModelForObjectDetection``, which spans DETR-family
+    models (RT-DETRv2, RT-DETR, D-FINE, Deformable/Conditional/DAB-DETR), all of
+    which take ``pixel_values`` and return ``{loss, logits, pred_boxes}``.
     """
 
     task: ClassVar[TaskType] = TaskType.DETECTION
@@ -74,6 +75,17 @@ class HFDetectionModel(HFModel):
             confidence_threshold=self._confidence_threshold,
             iou_threshold=self._iou_threshold,
         )
+
+    @property
+    def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
+        """Known-checkpoint preprocessing defaults for detection recipes."""
+        return {
+            "PekingU/rtdetr_v2_r18vd": DataInputParams(
+                input_size=(640, 640),
+                mean=(0.485, 0.456, 0.406),
+                std=(0.229, 0.224, 0.225),
+            ),
+        }
 
     def build_targets(self, batch: SampleBatch) -> dict[str, Any]:
         """Convert Geti's absolute-xyxy boxes into normalized cxcywh.

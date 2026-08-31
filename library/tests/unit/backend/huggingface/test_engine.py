@@ -292,7 +292,8 @@ model:
         decoder_layers: 2
         encoder_layers: 2
     pretrained: true
-    input_size: [64, 64]
+    data_input_params:
+      input_size: [64, 64]
 
 data: {base_data_config}
 """.strip()
@@ -335,7 +336,8 @@ model:
         decoder_layers: 2
         encoder_layers: 2
     pretrained: true
-    input_size: [64, 64]
+    data_input_params:
+      input_size: [64, 64]
 
 data: {base_data_config}
 """.strip()
