@@ -63,22 +63,6 @@ from app.settings import get_settings
 settings = get_settings()
 logging.basicConfig(handlers=[InterceptHandler()], level=settings.log_level, force=True)
 
-# Descriptions of the OpenAPI tags, shown at the top of each section of the API documentation.
-# Only tags that need extra clarification are listed here.
-OPENAPI_TAGS_METADATA: list[dict[str, str]] = [
-    {
-        "name": "Dataset Views",
-        "description": (
-            "Create, inspect and delete dataset views, and assign or unassign media to them.\n\n"
-            "**Listing the content of a view is not done here**: the media of a view are listed with "
-            "`GET /api/projects/{project_id}/dataset/media?dataset_view_id={dataset_view_id}` (see the *Media* "
-            "section). Likewise, the dataset items and the statistics of a view are available through "
-            "`GET /api/projects/{project_id}/dataset/items` and "
-            "`GET /api/projects/{project_id}/dataset/statistics` with the same `dataset_view_id` query parameter."
-        ),
-    },
-]
-
 
 def create_app() -> FastAPI:
     """Build and configure the FastAPI application instance."""
@@ -86,7 +70,6 @@ def create_app() -> FastAPI:
         title=settings.app_name,
         version=settings.version,
         description=settings.description,
-        openapi_tags=OPENAPI_TAGS_METADATA,
         openapi_url=settings.openapi_url,
         redoc_url=None,
         docs_url=None,

@@ -24,7 +24,6 @@ def create_openapi(target_path: str) -> None:
             summary=app.summary,
             description=app.description,
             openapi_version=app.openapi_version,
-            tags=app.openapi_tags,
             routes=app.routes,
         )
         json.dump(obj=open_api, fp=file, indent=2)
