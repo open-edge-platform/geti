@@ -7,7 +7,10 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import shutil
+import subprocess  # nosec B404 - invokes the configured OpenVINO benchmark application
+import sys
 import threading
 import time
 import traceback as _traceback
@@ -158,12 +161,16 @@ _PHASE_MARKERS: list[tuple[str, str]] = [
     ("test/torch", "test/torch/result.json"),
     ("export", "export/exported_model.xml"),
     ("test/export", "test/export/result.json"),
+    ("benchmark/export/throughput", "benchmark/export/throughput/result.json"),
+    ("benchmark/export/latency", "benchmark/export/latency/result.json"),
     ("optimize", "optimize/optimized_model.xml"),
     ("test/optimize", "test/optimize/result.json"),
+    ("benchmark/optimize/throughput", "benchmark/optimize/throughput/result.json"),
+    ("benchmark/optimize/latency", "benchmark/optimize/latency/result.json"),
 ]
 
 
-def detect_resume_point(seed_dir: Path) -> tuple[bool, str | None]:
+def detect_resume_point(seed_dir: Path, required_phases: set[str] | None = None) -> tuple[bool, str | None]:
     """Determine whether an experiment can be skipped or partially resumed.
 
     Returns:
@@ -184,8 +191,16 @@ def detect_resume_point(seed_dir: Path) -> tuple[bool, str | None]:
         shutil.rmtree(seed_dir)
         return False, None
 
-    # Training is complete. Walk later phases to find the first incomplete one.
+    # Training is complete. Walk only phases requested by this invocation.
+    # Callers that do not provide a phase set use the legacy phase chain. This
+    # keeps direct resume checks compatible with result directories created
+    # before benchmark-app phases existed.
+    phases = required_phases or {
+        phase_name for phase_name, _ in _PHASE_MARKERS if not phase_name.startswith("benchmark/")
+    }
     for phase_name, marker_rel in _PHASE_MARKERS[1:]:  # skip "train"
+        if phase_name not in phases:
+            continue
         marker = seed_dir / marker_rel
         if not marker.exists():
             return False, phase_name
@@ -455,6 +470,66 @@ def _write_phase_metrics_csv(work_dir: Path, metrics: dict[str, Any] | None) -> 
     pd.DataFrame([scalar_metrics]).to_csv(csv_dir / "metrics.csv", index=False)
 
 
+def _parse_benchmark_value(value: object) -> float | None:
+    """Extract a float from benchmark-app's string-valued JSON report."""
+    if isinstance(value, (int, float)):
+        return float(value)
+    if not isinstance(value, str):
+        return None
+    try:
+        return float(value.split()[0])
+    except (IndexError, ValueError):
+        return None
+
+
+def _parse_benchmark_report(report_path: Path, *, prefix: str) -> dict[str, float]:
+    """Parse OpenVINO benchmark-app JSON execution results into flat metrics."""
+    try:
+        raw = json.loads(report_path.read_text(encoding="utf-8"))
+        execution = raw.get("execution_results", {})
+    except (OSError, json.JSONDecodeError, AttributeError):
+        logger.warning("Could not parse benchmark-app report %s", report_path)
+        return {}
+
+    aliases = {
+        "throughput": "fps",
+        "latency (ms)": "latency_ms",
+        "latency (50 percentile) (ms)": "latency_ms",
+        "avg latency": "avg_latency_ms",
+        "total execution time (ms)": "duration_ms",
+        "total number of iterations": "iterations",
+    }
+    metrics: dict[str, float] = {}
+    for key, metric_name in aliases.items():
+        value = _parse_benchmark_value(execution.get(key))
+        if value is not None:
+            metrics[f"{prefix}{metric_name}"] = value
+    return metrics
+
+
+def _default_benchmark_app() -> str:
+    """Return the benchmark-app executable for the current Python environment."""
+    return str(Path(sys.executable).with_name("benchmark_app"))
+
+
+def _benchmark_device(accelerator: str) -> str:
+    """Map a Geti accelerator label to an OpenVINO device label."""
+    return {"cpu": "CPU", "gpu": "GPU", "xpu": "GPU", "mps": "CPU"}.get(accelerator.lower(), accelerator)
+
+
+def _benchmark_data_shape(model: Path) -> str | None:
+    """Return a concrete input shape for benchmark-app dynamic inputs."""
+    try:
+        import openvino as ov
+
+        input_port = ov.Core().read_model(model).inputs[0]
+        dimensions = [str(dim.get_length() if dim.is_static else 1) for dim in input_port.partial_shape]
+    except Exception:
+        logger.warning("Could not determine a concrete input shape for %s", model, exc_info=True)
+        return None
+    return "[" + ",".join(dimensions) + "]"
+
+
 # ---------------------------------------------------------------------------
 # Executor
 # ---------------------------------------------------------------------------
@@ -480,6 +555,8 @@ class ExperimentExecutor:
         seed: int = 0,
         deterministic: bool | str = True,
         max_epochs: int | None = None,
+        benchmark_app: str | None = None,
+        openvino_device: str | None = None,
     ) -> None:
         self.recipe_path = recipe_path
         self.data_path = data_path
@@ -490,6 +567,8 @@ class ExperimentExecutor:
         self.seed = seed
         self.deterministic = deterministic
         self.max_epochs = max_epochs
+        self.benchmark_app = benchmark_app or _default_benchmark_app()
+        self.openvino_device = openvino_device or _benchmark_device(accelerator)
         self._backend, self._task_type = _recipe_backend(recipe_path)
 
     @property
@@ -669,6 +748,14 @@ class ExperimentExecutor:
         del engine
         return PhaseResult(phase="test/export", metrics=csv_metrics, wall_time=wall)
 
+    def benchmark_export_throughput(self) -> PhaseResult:
+        """Measure the exported IR in throughput mode."""
+        return self._benchmark_model(self._find_exported_model(), "export", "throughput")
+
+    def benchmark_export_latency(self) -> PhaseResult:
+        """Measure the exported IR in latency mode."""
+        return self._benchmark_model(self._find_exported_model(), "export", "latency")
+
     def optimize(self) -> PhaseResult:
         """Optimize the exported model with NNCF/POT."""
         from getitune.backend.openvino.engine import OVEngine
@@ -720,6 +807,62 @@ class ExperimentExecutor:
 
         del engine
         return PhaseResult(phase="test/optimize", metrics=csv_metrics, wall_time=wall)
+
+    def benchmark_optimize_throughput(self) -> PhaseResult:
+        """Measure the INT8 IR in throughput mode."""
+        return self._benchmark_model(self._optimized_model(), "optimize", "throughput")
+
+    def benchmark_optimize_latency(self) -> PhaseResult:
+        """Measure the INT8 IR in latency mode."""
+        return self._benchmark_model(self._optimized_model(), "optimize", "latency")
+
+    def _optimized_model(self) -> Path:
+        """Return the optimized INT8 model path."""
+        optimized = self.work_dir / "optimize" / "optimized_model.xml"
+        if not optimized.exists():
+            msg = f"Optimized model not found: {optimized}"
+            raise FileNotFoundError(msg)
+        return optimized
+
+    def _benchmark_model(self, model: Path, model_kind: str, hint: str) -> PhaseResult:
+        """Run one benchmark-app performance measurement for *model*."""
+        batch_size = 1 if hint == "latency" else None
+        phase = f"benchmark/{model_kind}/{hint}"
+        output_dir = self.work_dir / phase
+        output_dir.mkdir(parents=True, exist_ok=True)
+        report_path = output_dir / "benchmark_report.json"
+        data_shape = _benchmark_data_shape(model)
+        command = [
+            self.benchmark_app, "-m", str(model), "-d", self.openvino_device,
+            "-hint", hint, "-report_type", "no_counters", "-report_folder", str(output_dir), "-json_stats",
+        ]
+        if data_shape is not None:
+            command.extend(["-data_shape", data_shape])
+        if batch_size is not None:
+            command.extend(["-b", str(batch_size)])
+
+        start = time.monotonic()
+        try:
+            completed = subprocess.run(  # noqa: S603
+                command, check=True, capture_output=True, text=True, env=os.environ.copy()
+            )
+        except (OSError, subprocess.CalledProcessError) as exc:
+            detail = str(exc)
+            if isinstance(exc, subprocess.CalledProcessError):
+                detail = exc.stderr or exc.stdout or detail
+            (output_dir / "benchmark_app.log").write_text(detail, encoding="utf-8")
+            msg = f"benchmark_app failed for {phase}: {detail}"
+            raise RuntimeError(msg) from exc
+        wall = time.monotonic() - start
+        log = f"$ {' '.join(command)}\n\n{completed.stdout}\n{completed.stderr}"
+        (output_dir / "benchmark_app.log").write_text(log, encoding="utf-8")
+        metrics = _parse_benchmark_report(report_path, prefix=f"{model_kind}:{hint}:")
+        metrics[f"{model_kind}:{hint}:batch_size"] = float(batch_size or 1)
+        if len(metrics) == 1:
+            msg = f"benchmark_app produced no metrics for {phase}: {report_path}"
+            raise RuntimeError(msg)
+        (output_dir / "result.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
+        return PhaseResult(phase=phase, metrics=metrics, wall_time=wall)
 
     # -- helpers -----------------------------------------------------------
 

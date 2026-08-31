@@ -135,6 +135,27 @@ def _build_parser() -> argparse.ArgumentParser:
     run.add_argument("--scenario", type=str, nargs="*", default=None, help="Scenario name filter.")
     run.add_argument("--scenario-tag", type=str, nargs="*", default=None, help="Scenario tag filter.")
     run.add_argument("--accelerator", type=str, default="gpu", help="Device: gpu, xpu, or cpu.")
+    run.add_argument(
+        "--benchmark-app", "--benchmark_app", type=str, default=None,
+        help="Path to the OpenVINO benchmark_app executable.",
+    )
+    run.add_argument(
+        "--openvino-device", "--openvino_device", type=str, default=None,
+        help="OpenVINO target device (default follows accelerator).",
+    )
+    run.add_argument(
+        "--benchmark",
+        dest="enable_openvino_benchmark",
+        action="store_true",
+        help="Run OpenVINO benchmark_app in throughput and latency modes.",
+    )
+    run.add_argument(
+        "--no-validation",
+        dest="enable_validation",
+        action="store_false",
+        default=True,
+        help="Skip Torch and OpenVINO accuracy validation phases.",
+    )
     run.add_argument("--num-seeds", type=int, default=None, help="Override number of seeds.")
     run.add_argument("--max-epochs", type=int, default=None, help="Override max training epochs.")
     run.add_argument("--eval-upto", type=str, choices=["train", "export", "optimize"], default=None)
@@ -307,6 +328,10 @@ def _cmd_run(args: argparse.Namespace) -> int:
         keep_checkpoints=args.keep_checkpoints,
         ad_hoc_overrides=ad_hoc_overrides,
         ad_hoc_train_kwargs=ad_hoc_train_kwargs,
+        benchmark_app=args.benchmark_app,
+        openvino_device=args.openvino_device,
+        enable_openvino_benchmark=args.enable_openvino_benchmark or args.benchmark_app is not None,
+        enable_validation=args.enable_validation,
         rotation_group=args.rotation_group,
         no_rotation=args.no_rotation,
     )

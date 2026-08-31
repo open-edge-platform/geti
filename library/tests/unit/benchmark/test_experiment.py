@@ -20,6 +20,7 @@ from getitune.benchmark.experiment import (
     PhaseResult,
     _find_csv_metrics,
     _get_peak_gpu_memory_mb,
+    _parse_benchmark_report,
     _PeakRamSampler,
     _recipe_backend,
     _reset_peak_gpu_memory,
@@ -374,6 +375,24 @@ class TestScrapeCsvMetrics:
         csv_path.write_text("test/iter_time\n10.0\n2.0\n4.0\n")
         metrics = _scrape_csv_metrics(csv_path, prefix="torch:")
         assert metrics["torch:test/iter_time"] == pytest.approx(3.0)
+
+
+class TestBenchmarkReport:
+    def test_parses_execution_results(self, tmp_path: Path) -> None:
+        report = tmp_path / "benchmark_report.json"
+        report.write_text(json.dumps({"execution_results": {
+            "throughput": "123.45",
+            "latency (ms)": "8.25",
+            "avg latency": "9.50",
+            "total execution time (ms)": "1000.00",
+            "total number of iterations": "100",
+        }}))
+
+        metrics = _parse_benchmark_report(report, prefix="export:throughput:")
+
+        assert metrics["export:throughput:fps"] == pytest.approx(123.45)
+        assert metrics["export:throughput:latency_ms"] == pytest.approx(8.25)
+        assert metrics["export:throughput:iterations"] == pytest.approx(100)
 
 
 # ---------------------------------------------------------------------------
@@ -753,6 +772,35 @@ class TestExecutorBackendDispatch:
         )
         assert executor.is_ultralytics is False
         assert executor._checkpoint_name == "best_checkpoint.pt"
+
+    def test_benchmark_defaults_follow_accelerator(self, tmp_path: Path) -> None:
+        recipe = tmp_path / "atss.yaml"
+        recipe.write_text(_LIGHTNING_RECIPE)
+        executor = ExperimentExecutor(recipe_path=recipe, data_path=tmp_path / "data", work_dir=tmp_path / "work", accelerator="xpu")
+        assert executor.openvino_device == "GPU"
+
+    def test_benchmark_commands_use_batch_one_only_for_latency(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        recipe = tmp_path / "atss.yaml"
+        recipe.write_text(_LIGHTNING_RECIPE)
+        executor = ExperimentExecutor(recipe_path=recipe, data_path=tmp_path / "data", work_dir=tmp_path / "work", benchmark_app="benchmark_app")
+        model = tmp_path / "model.xml"
+        model.write_text("fake")
+        (tmp_path / "work" / "benchmark" / "export" / "throughput").mkdir(parents=True)
+        (tmp_path / "work" / "benchmark" / "export" / "throughput" / "benchmark_report.json").write_text(json.dumps({"execution_results": {"throughput": "1", "latency (ms)": "2"}}))
+        calls: list[list[str]] = []
+
+        def run(command: list[str], **kwargs: object) -> object:
+            calls.append(command)
+            output_dir = Path(command[command.index("-report_folder") + 1])
+            output_dir.mkdir(parents=True, exist_ok=True)
+            (output_dir / "benchmark_report.json").write_text(json.dumps({"execution_results": {"throughput": "1", "latency (ms)": "2"}}))
+            return type("Completed", (), {"stdout": "", "stderr": ""})()
+
+        monkeypatch.setattr("getitune.benchmark.experiment.subprocess.run", run)
+        executor._benchmark_model(model, "export", "throughput")
+        executor._benchmark_model(model, "export", "latency")
+        assert "-b" not in calls[0]
+        assert calls[1][calls[1].index("-b") + 1] == "1"
 
     def test_ultralytics_recipe_properties(self, tmp_path: Path) -> None:
         recipe = tmp_path / "yolo.yaml"

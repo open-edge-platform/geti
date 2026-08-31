@@ -16,6 +16,10 @@ from model_api.adapters.inference_adapter import Metadata
 from model_api.models.result import ClassificationResult
 
 from getitune.backend.openvino.models import OVModel
+from getitune.backend.openvino.models.base import (
+    _remove_invalid_nncf_dispatch_keys,
+    _resolve_concrete_types,
+)
 from getitune.data.entity.sample import SampleBatch
 
 if TYPE_CHECKING:
@@ -55,6 +59,120 @@ class TestOVModel:
         batch_size = 2
         batch = model.get_dummy_input(batch_size)
         assert batch.batch_size == batch_size
+
+
+class TestResolveConcreteTypes:
+    """Tests for the alias-to-class resolution used by the NNCF workaround."""
+
+    def test_plain_class_passthrough(self) -> None:
+        assert _resolve_concrete_types(np.ndarray) == [np.ndarray]
+
+    def test_parameterized_generic_resolves_to_origin(self) -> None:
+        from typing import Any
+
+        from numpy.typing import NDArray
+
+        assert _resolve_concrete_types(NDArray[Any]) == [np.ndarray]
+
+    def test_pep695_type_alias_resolves_via_dunder_value(self) -> None:
+        """Regression test: some numpy releases define ``NDArray`` via the
+        PEP 695 ``type X = ...`` statement. :func:`typing.get_origin` returns
+        ``None`` for such aliases, so resolution must fall back to
+        ``__value__``.
+        """
+        type FakeNDArray = np.ndarray
+
+        assert _resolve_concrete_types(FakeNDArray) == [np.ndarray]
+
+    def test_union_members_are_each_resolved(self) -> None:
+        """Regression test: the real failure. ``typing.get_origin`` on a
+        union returns ``types.UnionType`` itself (a class), which must not be
+        mistaken for a usable dispatch key -- every union member has to be
+        resolved individually instead.
+        """
+        from typing import Any
+
+        from numpy.typing import NDArray
+
+        type FakeUnion = NDArray[Any] | np.generic
+
+        resolved = _resolve_concrete_types(FakeUnion)
+        assert set(resolved) == {np.ndarray, np.generic}
+
+    def test_unresolvable_alias_returns_empty(self) -> None:
+        assert _resolve_concrete_types(object()) == []
+
+
+def test_remove_invalid_nncf_dispatch_keys() -> None:
+    """Typing aliases must not reach NNCF's issubclass-based dispatcher.
+
+    Reproduces the exact real-world failure: some numpy releases define
+    ``numpy.typing.NDArray`` via a PEP 695 ``type X = ...`` statement, whose
+    underlying type ``typing.get_origin`` cannot resolve. Left unregistered,
+    NNCF's statistics collection fails with
+    ``NotImplementedError: Function 'isempty' is not implemented for
+    <class 'numpy.ndarray'>`` as soon as real quantization data is processed.
+
+    Uses a scratch registry (rather than the live one) because on some numpy
+    releases ``numpy.ndarray`` is already correctly registered, which would
+    make the "bug reproduced" sanity check meaningless.
+    """
+    from nncf.tensor import functions
+
+    def handler(_value: object) -> bool:
+        return False
+
+    type BrokenNDArray = np.ndarray
+
+    registry: dict[type, object] = {np.generic: handler, torch.Tensor: handler}
+    registry[BrokenNDArray] = handler
+    valid_keys = {key for key in registry if isinstance(key, type)}
+    assert np.ndarray not in registry  # sanity check: bug reproduced
+
+    saved_registry = functions.isempty.registry
+    functions.isempty.registry = registry
+    try:
+        _remove_invalid_nncf_dispatch_keys()
+    finally:
+        functions.isempty.registry = saved_registry
+
+    assert BrokenNDArray not in registry
+    assert registry.get(np.ndarray) is handler
+    assert valid_keys <= set(registry)
+
+
+def test_remove_invalid_nncf_dispatch_keys_covers_non_reexported_functions() -> None:
+    """Regression test for the second real-world failure.
+
+    ``nncf.tensor.functions.tolist`` is defined in the ``numeric`` submodule
+    but -- unlike ``isempty`` -- is *not* re-exported from
+    ``nncf.tensor.functions.__init__``. A cleanup that only scans
+    ``nncf.tensor.functions`` (the package namespace) silently misses it,
+    which is exactly what caused
+    ``TypeError: issubclass() arg 2 must be a class, a tuple of classes, or a
+    union`` inside NNCF's SmoothQuant algorithm (``Tensor.tolist()``) even
+    after the ``isempty`` dispatch key had already been fixed.
+    """
+    import nncf.tensor.functions.numeric as nncf_numeric
+
+    def handler(_value: object) -> list[int]:
+        return [1, 2, 3]
+
+    type BrokenNDArray = np.ndarray
+
+    registry: dict[type, object] = {np.generic: handler, torch.Tensor: handler}
+    registry[BrokenNDArray] = handler
+    assert np.ndarray not in registry  # sanity check: bug reproduced
+
+    saved_registry = nncf_numeric.tolist.registry
+    nncf_numeric.tolist.registry = registry
+    try:
+        _remove_invalid_nncf_dispatch_keys()
+    finally:
+        nncf_numeric.tolist.registry = saved_registry
+
+    assert BrokenNDArray not in registry
+    assert registry.get(np.ndarray) is handler
 
 
 class TestResolveModelType:

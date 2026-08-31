@@ -4,7 +4,7 @@ This module runs repeatable model benchmarks for GetiTune with a CLI:
 
 - dataset provisioning from `benchmark_catalog.yaml`
 - experiment selection from `benchmark_manifest.yaml`
-- phased execution (`train -> test/torch -> export -> test/export -> optimize -> test/optimize`)
+- phased execution (`train -> test/torch -> export -> test/export -> benchmark FP -> optimize -> test/optimize -> benchmark INT8`)
 - MLflow tracking and baseline comparison
 - report generation (`report.md`, `aggregated.csv`, optional `failed_experiments.json`)
 
@@ -82,6 +82,42 @@ Run only train+torch-test phases:
 ```bash
 python -m getitune.benchmark run --task detection --model yolox_s --dataset wgisd --eval-upto train --num-seeds 1 --no-tracking
 ```
+
+### OpenVINO performance benchmarking
+
+When `--benchmark` is supplied and `eval_upto` is `export` or `optimize`, the
+runner invokes OpenVINO's `benchmark_app` for every successful exported model.
+Each IR is measured twice:
+
+- throughput mode: `benchmark_app -hint throughput` (the model's default batch size)
+- latency mode: `benchmark_app -hint latency -b 1`
+
+The application selects its default warmup and measurement duration/iteration
+count. The same measurements are repeated for the optimized INT8 IR when
+`eval_upto=optimize`. The default executable is `benchmark_app` next to the
+active Python interpreter; override it with `--benchmark-app`. Override the
+OpenVINO target with `--openvino-device CPU`, `GPU`, or another supported
+device string when the Geti accelerator label is not sufficient.
+
+Example:
+
+```bash
+python -m getitune.benchmark run --accelerator xpu --eval-upto optimize \
+  --max-epochs 2 --num-seeds 1 --benchmark --no-validation
+```
+
+Supplying `--benchmark-app` also enables benchmarking implicitly, which is
+useful when the executable is installed outside the active Python environment.
+Use `--no-validation` to skip the Torch/OpenVINO accuracy-test phases when the
+purpose is performance collection; training, export, INT8 optimization, and
+benchmark-app measurements still run.
+
+Select the desired one dataset per task in `benchmark_manifest.yaml` before
+running. Raw reports and command output are retained below each seed directory:
+`benchmark/export/{throughput,latency}/` and
+`benchmark/optimize/{throughput,latency}/`. The aggregated report includes
+FPS, median/average latency, batch size, iteration count, and measurement
+duration for FP and INT8 models.
 
 Run with custom output location:
 

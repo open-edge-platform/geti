@@ -9,7 +9,7 @@ import inspect
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, cast
+from typing import TYPE_CHECKING, Any, Callable, cast, get_args, get_origin
 
 import nncf
 import numpy as np
@@ -19,6 +19,7 @@ from jsonargparse import ArgumentParser
 from model_api.adapters import OpenvinoAdapter, create_core
 from model_api.models import ImageModel, Model
 from model_api.tilers import Tiler
+from nncf.tensor import functions as nncf_tensor_functions
 from torch import Tensor
 
 from getitune.config.data import TileConfig
@@ -44,6 +45,87 @@ if TYPE_CHECKING:
     from getitune.types import PathLike
 
 logger = logging.getLogger()
+
+
+def _resolve_concrete_types(alias: Any) -> list[type]:  # noqa: ANN401
+    """Recursively resolve *alias* to the concrete class(es) it stands for.
+
+    Handles the shapes NNCF (and its dependencies) actually use as dispatch
+    keys:
+
+    - Plain classes (returned as-is).
+    - Parameterized generics such as ``NDArray[Any]``, via
+      :func:`typing.get_origin`.
+    - Unions such as ``NDArray[Any] | np.generic``, via
+      :func:`typing.get_args` (each member is resolved recursively). Must be
+      checked *before* the generic-origin case below, since
+      :func:`typing.get_origin` on a union returns ``types.UnionType``/
+      ``typing.Union`` itself (a class), which is not a usable dispatch key.
+    - PEP 695 ``type X = ...`` aliases (``typing.TypeAliasType`` /
+      ``types.TypeAliasType``), whose underlying type is exposed via
+      ``__value__`` rather than :func:`typing.get_origin` (which returns
+      ``None`` for these on Python 3.12). Some numpy releases define
+      ``numpy.typing.NDArray`` this way.
+    """
+    import types as _types
+    import typing as _typing
+
+    if isinstance(alias, type):
+        return [alias]
+
+    origin = get_origin(alias)
+    is_union = origin is _types.UnionType or origin is _typing.Union
+    args = get_args(alias)
+    if not is_union and isinstance(origin, type):
+        return [origin]
+
+    if args:
+        resolved: list[type] = []
+        for arg in args:
+            resolved.extend(_resolve_concrete_types(arg))
+        return resolved
+
+    value = getattr(alias, "__value__", None)
+    if value is not None:
+        return _resolve_concrete_types(value)
+
+    return []
+
+
+def _remove_invalid_nncf_dispatch_keys() -> None:
+    """Remove typing aliases that older NNCF releases register as dispatch keys.
+
+    NNCF's dispatcher uses ``issubclass`` when looking up tensor functions.
+    ``typing`` aliases such as ``numpy.typing.NDArray`` are not classes and
+    therefore make statistics collection fail before quantization starts. Each
+    invalid alias is remapped to the concrete class(es) it represents (e.g.
+    ``numpy.ndarray``) so the original handler stays reachable.
+
+    Scans ``nncf.tensor.functions.numeric``, ``.io``, and ``.linalg`` -- the
+    actual modules where dispatcher functions (``@tensor_dispatcher``,
+    exposing a ``.registry`` dict) are *defined* -- rather than
+    ``nncf.tensor.functions`` (the package ``__init__``), because several
+    functions (e.g. ``tolist``) are not re-exported there and would otherwise
+    be silently skipped.
+    """
+    import nncf.tensor.functions.io as nncf_io
+    import nncf.tensor.functions.linalg as nncf_linalg
+    import nncf.tensor.functions.numeric as nncf_numeric
+
+    modules = (nncf_tensor_functions, nncf_numeric, nncf_io, nncf_linalg)
+    seen_registries: set[int] = set()
+    for module in modules:
+        for function in vars(module).values():
+            registry = getattr(function, "registry", None)
+            if not isinstance(registry, dict) or id(registry) in seen_registries:
+                continue
+            seen_registries.add(id(registry))
+            for key in list(registry):
+                if isinstance(key, type):
+                    continue
+                handler = registry.pop(key)
+                for resolved in _resolve_concrete_types(key):
+                    registry.setdefault(resolved, handler)
 
 
 class OVModel:
@@ -373,6 +455,7 @@ class OVModel:
                 ptq_config["advanced_accuracy_restorer_parameters"] = nncf.AdvancedAccuracyRestorerParameters(
                     max_num_iterations=max_num_iterations
                 )
+            _remove_invalid_nncf_dispatch_keys()
             compressed_model = nncf.quantize_with_accuracy_control(
                 model=ov_model,
                 calibration_dataset=quantization_dataset,
@@ -381,6 +464,7 @@ class OVModel:
                 **ptq_config,
             )
         else:
+            _remove_invalid_nncf_dispatch_keys()
             compressed_model = nncf.quantize(
                 model=ov_model,
                 calibration_dataset=quantization_dataset,

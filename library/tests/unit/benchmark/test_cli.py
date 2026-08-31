@@ -84,6 +84,21 @@ class TestBuildParser:
         assert args.accelerator == "gpu"
         assert args.deterministic is None
         assert args.dry_run is False
+        assert args.enable_openvino_benchmark is False
+        assert args.benchmark_app is None
+        assert args.enable_validation is True
+
+    def test_run_subcommand_benchmark_options(self) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(["run", "--benchmark", "--benchmark-app", "/opt/benchmark_app", "--openvino-device", "CPU"])
+        assert args.enable_openvino_benchmark is True
+        assert args.benchmark_app == "/opt/benchmark_app"
+        assert args.openvino_device == "CPU"
+
+    def test_run_subcommand_no_validation(self) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(["run", "--no-validation"])
+        assert args.enable_validation is False
 
     def test_run_subcommand_deterministic_flag(self) -> None:
         parser = _build_parser()
