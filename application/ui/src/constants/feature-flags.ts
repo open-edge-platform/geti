@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 export const FEATURE_FLAGS = {
-    DATASET_VIEWS: false,
+    DATASET_VIEWS: true,
     TIMM_MODEL_CONFIGURATION: false,
-    CONFIDENCE_THRESHOLD: false,
+    CONFIDENCE_THRESHOLD: true,
 };
