@@ -1,9 +1,9 @@
 # Third-Party Software Notices
 
-This file contains the list of third-party software included in or with 
+This file contains the list of third-party software included in or with
 the Intel software and their required license, copyright statement, permission
-notice, disclaimers, or other terms. This third-party software is governed by 
-the separate license terms listed in this file.  
+notice, disclaimers, or other terms. This third-party software is governed by
+the separate license terms listed in this file.
 
 ## Third-party software
 
