@@ -1,5 +1,6 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+import platform
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -44,11 +45,14 @@ SAM_ENCODER_CONFIGURATION = {
     "pad_value": 0,
 }
 
-# The mobile_sam encoder IR is numerically unstable in f16: the graph emits the same
-# embedding for every input, so the client decodes an empty mask with no error anywhere.
-# f16 is the CPU plugin default on Apple Silicon (x86 defaults to bf16/f32), so this only
-# reproduces on macOS ARM. Pin f32 explicitly on every platform.
-SAM_ENCODER_PLUGIN_CONFIG = {"INFERENCE_PRECISION_HINT": "f32"}
+
+# The mobile_sam encoder IR is numerically unstable in f16 on Apple Silicon (ARM):
+# the graph emits the same embedding for every input, so the client decodes an empty
+# mask with no error anywhere. As a workaround, we pin the inference precision to f32
+# on arm64 (a.k.a. aarch64), meanwhile other platforms can use the plugin default.
+def _get_encoder_plugin_config() -> dict[str, str]:
+    is_apple_silicon = platform.system() == "Darwin" and platform.machine() in {"arm64", "aarch64"}
+    return {"INFERENCE_PRECISION_HINT": "f32"} if is_apple_silicon else {}
 
 
 class MediaSegmentService(BaseSessionManagedService):
@@ -80,7 +84,7 @@ class MediaSegmentService(BaseSessionManagedService):
             core,
             str(self.model_xml_path),
             device=device,
-            plugin_config=SAM_ENCODER_PLUGIN_CONFIG,
+            plugin_config=_get_encoder_plugin_config(),
             max_num_requests=1,
         )
         return Model.create_model(adapter, configuration=SAM_ENCODER_CONFIGURATION)
