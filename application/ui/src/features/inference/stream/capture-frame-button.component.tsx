@@ -11,11 +11,7 @@ import { useWebRTCConnection } from './web-rtc-connection-provider';
 export const CaptureFrameButton = () => {
     const projectId = useProjectIdentifier();
     const { data: pipeline } = usePipeline();
-    const {
-        data: pipelineHealth,
-        isPending: isPipelineHealthPending,
-        isError: isPipelineHealthError,
-    } = usePipelineHealth();
+    const { data: pipelineHealth } = usePipelineHealth();
     const { status: streamStatus } = useWebRTCConnection();
     const captureFrameMutation = useCapturePipelineFrame();
 
@@ -24,14 +20,10 @@ export const CaptureFrameButton = () => {
     // The backend collects the *next* frame the source produces, so a source that ended
     // (e.g. a non-looping video file) or errored can never fulfil the request.
     const sourceStatus = pipelineHealth?.components?.source.status;
-    const isSourceProducingFrames = isPipelineHealthError || sourceStatus === undefined || sourceStatus === 'ok';
+    const isSourceExhausted = sourceStatus !== undefined && sourceStatus !== 'ok';
 
     const isCaptureDisabled =
-        isPipelineHealthPending ||
-        !isPipelineRunning ||
-        !isStreamConnected ||
-        !isSourceProducingFrames ||
-        captureFrameMutation.isPending;
+        !isPipelineRunning || !isStreamConnected || isSourceExhausted || captureFrameMutation.isPending;
 
     const handleCapture = () => {
         captureFrameMutation.mutate(
