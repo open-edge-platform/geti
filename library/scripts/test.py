@@ -60,7 +60,6 @@ METRIC_REGISTRY: dict[str, dict[str, MetricFactory]] = {
     TaskType.INSTANCE_SEGMENTATION.value: {
         "f1-score": _f_measure_callable,
         "map": _mask_rle_mean_ap_callable,
-        "dice": _segm_callable,
     },
     TaskType.SEMANTIC_SEGMENTATION.value: {
         "dice": _segm_callable,
@@ -176,7 +175,7 @@ def build_parser() -> argparse.ArgumentParser:
             "One or more metrics to evaluate (overrides recipe defaults). "
             "Supported per task: MULTI_CLASS_CLS=accuracy,f1-score; "
             "MULTI_LABEL_CLS=accuracy,f1-score,map; "
-            "DETECTION=f1-score,map; INSTANCE_SEGMENTATION=f1-score,map,dice; "
+            "DETECTION=f1-score,map; INSTANCE_SEGMENTATION=f1-score,map; "
             "SEMANTIC_SEGMENTATION=dice,miou; KEYPOINT_DETECTION=pck,pck-score"
         ),
     )

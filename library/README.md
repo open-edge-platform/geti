@@ -655,7 +655,7 @@ python scripts/test.py \
 #   MULTI_CLASS_CLS:        accuracy, f1-score
 #   MULTI_LABEL_CLS:        accuracy, f1-score, map
 #   DETECTION:              f1-score, map
-#   INSTANCE_SEGMENTATION:  f1-score, map, dice
+#   INSTANCE_SEGMENTATION:  f1-score, map
 #   SEMANTIC_SEGMENTATION:  dice, miou
 #   KEYPOINT_DETECTION:     pck, pck-score
 ```
