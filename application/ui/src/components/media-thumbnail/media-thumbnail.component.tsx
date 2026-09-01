@@ -1,11 +1,13 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { Media, MediaVideo } from '@/api/types';
-import { Flex } from '@geti-ui/ui';
+import { Flex, Skeleton } from '@geti-ui/ui';
+import { clsx } from 'clsx';
 
+import { useIsScrolling } from '../../hooks/use-is-scrolling.hook';
 import { isVideo } from '../../shared/media-item-utils';
 import { formatCompactDuration } from './util';
 
@@ -40,24 +42,47 @@ const VideoIndicator = ({ duration }: VideoIndicatorProps) => {
 
 export const MediaThumbnail = ({ onDoubleClick, onClick, url, alt, item }: MediaThumbnailProps) => {
     const imgRef = useRef<HTMLImageElement>(null);
+    const isScrolling = useIsScrolling();
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Tiles that fly past during a fast scroll would otherwise start a request and immediately
+    // cancel it; enough of those wedge the connection and leave the gallery blank.
+    useEffect(() => {
+        if (isScrolling || imgRef.current === null) {
+            return;
+        }
+
+        imgRef.current.src = url;
+    }, [url, isScrolling]);
 
     useEffect(() => {
         const ref = imgRef.current;
-
-        if (ref) {
-            ref.src = url;
-        }
 
         return () => {
             if (ref) {
                 ref.src = '';
             }
         };
-    }, [url]);
+    }, []);
 
     return (
         <div onDoubleClick={onDoubleClick} onClick={onClick} className={classes.imgContainer}>
-            <img ref={imgRef} src={url} alt={alt} className={classes.img} draggable={false} decoding={'async'} />
+            <img
+                ref={imgRef}
+                alt={alt}
+                className={clsx(classes.img, {
+                    [classes.imgHidden]: isLoading,
+                })}
+                draggable={false}
+                decoding={'async'}
+                onLoad={() => setIsLoading(false)}
+                onError={() => {
+                    if (imgRef.current?.complete === true) {
+                        setIsLoading(false);
+                    }
+                }}
+            />
+            {isLoading && <Skeleton width={'100%'} height={'100%'} className={classes.skeleton} />}
             {isVideo(item) && <VideoIndicator duration={item.duration} />}
         </div>
     );

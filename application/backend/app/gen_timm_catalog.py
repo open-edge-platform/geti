@@ -13,8 +13,7 @@ build, this script records:
 
 - ``family`` / ``version`` / ``pretrained``: derived from timm's own module
   grouping.
-- preprocessing defaults (``input_size``, ``mean``, ``std``, ``interpolation``)
-  from ``pretrained_cfg``.
+- ``input_size`` from ``pretrained_cfg``.
 - ``default_lr`` / ``default_weight_decay``: aligned with the optimizer family
   the timm model wrapper will pick at train time (see ``TimmModelMulticlassCls``/§3.2
   of the design doc), so the exposed learning rate and weight decay always matches
@@ -29,9 +28,8 @@ model name, its ``trainable_parameters``/``gigaflops`` are reused as-is and
 preprocessing, default_lr) are always recomputed, since they cost nothing
 and must never drift from the pinned timm build.
 
-Run only when the pinned `timm` version changes (see `library/Justfile`
-`generate-timm-catalog` recipe, wired to `just generate-timm-catalog` from
-`application/`).
+Run only when the pinned `timm` version changes (see `application/backend/Justfile`
+`gen-timm-catalog` recipe, wired to `just gen-timm-catalog` from `application/backend`).
 """
 
 from __future__ import annotations
@@ -137,8 +135,7 @@ def _compute_stats(model_name: str) -> dict[str, float]:
     params = sum(parameter.numel() for parameter in model.parameters())
     inputs = torch.zeros((1, *cfg.input_size))
 
-    with torch.no_grad():
-        flops = measure_flops(lambda: model(inputs))
+    flops = measure_flops(lambda: model(inputs))
 
     return {
         "trainable_parameters": round(params / 1_000_000, 1),
@@ -167,9 +164,6 @@ def _build_entry(
         "version": version_tag,
         "pretrained": pretrained_tag,
         "input_size": list(cfg.input_size),
-        "mean": list(cfg.mean),
-        "std": list(cfg.std),
-        "interpolation": cfg.interpolation,
         "default_lr": default_params["learning_rate"],
         "default_weight_decay": default_params["weight_decay"],
         "imagenet_top1_accuracy": imagenet_top1.get(model_name),
