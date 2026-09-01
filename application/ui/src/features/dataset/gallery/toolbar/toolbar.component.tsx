@@ -62,7 +62,6 @@ type DatasetViewsProps = {
     resetSelectedMediaIds: () => void;
 };
 
-// Owns the dataset views query so the rest of the toolbar renders without waiting on it
 const DatasetViews = ({ resetSelectedMediaIds }: DatasetViewsProps) => {
     const { data: datasetViews } = useDatasetViewsQuery();
 
