@@ -126,19 +126,15 @@ class TestMediaSegmentService:
         assert mock_adapter.call_args.kwargs["plugin_config"] == _get_encoder_plugin_config()
 
     @pytest.mark.parametrize(
-        "system, machine, expected_config",
+        "machine, expected_config",
         [
-            ("Darwin", "arm64", {"INFERENCE_PRECISION_HINT": "f32"}),
-            ("Darwin", "aarch64", {"INFERENCE_PRECISION_HINT": "f32"}),
-            ("Darwin", "x86_64", {}),
-            ("Linux", "arm64", {}),
-            ("Linux", "x86_64", {}),
-            ("Windows", "x86_64", {}),
+            ("arm64", {"INFERENCE_PRECISION_HINT": "f32"}),
+            ("aarch64", {"INFERENCE_PRECISION_HINT": "f32"}),
+            ("x86_64", {}),
         ],
     )
-    def test_get_encoder_plugin_config(self, system, machine, expected_config):
+    def test_get_encoder_plugin_config(self, machine, expected_config):
         with (
-            patch("app.services.sam.media_segment_service.platform.system", return_value=system),
             patch("app.services.sam.media_segment_service.platform.machine", return_value=machine),
         ):
             assert _get_encoder_plugin_config() == expected_config
