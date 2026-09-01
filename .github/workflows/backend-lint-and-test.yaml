@@ -50,7 +50,7 @@ jobs:
               - .github/workflows/backend-lint-and-test.yaml
               - .github/actions/install-common-deps/**
               - '!**/*.md'
-              - '!library/docs/**'
+              - '!**/docs/**'
 
   python-checks:
     strategy:
