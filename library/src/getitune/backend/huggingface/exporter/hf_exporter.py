@@ -26,11 +26,7 @@ __all__ = ["HFModelExporter"]
 
 
 class HFModelExporter(ModelExporter):
-    """Exporter that uses native torch and OpenVINO conversion tools.
-
-    ``to_openvino`` tries a direct torch -> OpenVINO conversion first and only
-    falls back to an intermediate ONNX file when that fails.
-    """
+    """Export HuggingFace models from PyTorch to ONNX and OpenVINO."""
 
     def __init__(
         self,
@@ -44,7 +40,7 @@ class HFModelExporter(ModelExporter):
         input_names: list[str] | None = None,
     ) -> None:
         self.onnx_export_configuration = dict(onnx_export_configuration or {})
-        self.onnx_export_configuration.setdefault("dynamo", False)
+        self.onnx_export_configuration.setdefault("dynamo", True)
         self.onnx_export_configuration.setdefault("do_constant_folding", True)
         self.onnx_export_configuration.setdefault("opset_version", 17)
 

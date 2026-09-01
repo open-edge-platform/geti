@@ -62,6 +62,7 @@ describe('useMediaUpload', () => {
             files,
             () => result.current.upload.uploadProgress.isUploading
         );
+
         expect(uploadedFileNames).toEqual(['image-1.jpg', 'image-2.jpg']);
     });
 

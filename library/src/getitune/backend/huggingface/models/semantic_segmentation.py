@@ -13,6 +13,7 @@ import transformers
 from torchvision import tv_tensors
 
 from getitune.backend.huggingface.models.base import HFModel
+from getitune.backend.lightning.models.base import DataInputParams
 from getitune.data.entity.sample import PredictionBatch
 from getitune.metrics.dice import SegmCallable
 from getitune.types.export import TaskLevelExportParameters
@@ -70,6 +71,17 @@ class HFSemanticSegModel(HFModel):
         self._ignore_index = resolved_ignore_index
         self._soft_threshold = soft_threshold
         self._blur_strength = blur_strength
+
+    @property
+    def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
+        """Known-checkpoint preprocessing defaults for semantic segmentation recipes."""
+        return {
+            "nvidia/segformer-b0-finetuned-ade-512-512": DataInputParams(
+                input_size=(512, 512),
+                mean=(0.485, 0.456, 0.406),
+                std=(0.229, 0.224, 0.225),
+            ),
+        }
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:

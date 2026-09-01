@@ -1,16 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Shared utility functions for Hugging Face recipe handling.
-
-Deliberately duplicated from ``backend/ultralytics/tools/utils.py`` rather
-than imported: these functions are genuinely backend-agnostic (recipe YAML
-resolution, subset-config construction), but importing them from the
-Ultralytics package would make this optional backend depend on another
-optional backend, which is worse than the duplication. The design doc's
-"no shared code across backends" rule (except task-level facts like
-``DATA_KEYS_BY_TASK``) applies here for the same reason.
-"""
+"""Shared utility functions for Hugging Face recipe handling."""
 
 from __future__ import annotations
 

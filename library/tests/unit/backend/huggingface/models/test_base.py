@@ -49,7 +49,7 @@ def test_hf_model_is_a_registered_submodule() -> None:
 
 
 def test_imgsz_derives_from_data_input_params() -> None:
-    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info(), input_size=(224, 224))
+    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info(), data_input_params={"input_size": (224, 224)})
     assert model.imgsz == 224
     assert model.data_input_params.input_size == (224, 224)
 
@@ -83,7 +83,7 @@ def test_ensure_predict_ready_switches_to_eval() -> None:
 
 
 def test_exporter_builds_a_configured_hf_model_exporter() -> None:
-    from getitune.backend.huggingface.exporter.native import HFModelExporter
+    from getitune.backend.huggingface.exporter.hf_exporter import HFModelExporter
 
     model = HFMulticlassClsModel(_tiny_vit_config(), _label_info())
     exporter = model._exporter
@@ -104,7 +104,7 @@ def test_forward_runs_end_to_end_through_build_targets() -> None:
 
 
 def test_forward_for_tracing_returns_raw_logits() -> None:
-    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info(), input_size=(224, 224))
+    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info(), data_input_params={"input_size": (224, 224)})
     images = torch.rand(2, 3, 224, 224)
     logits = model.forward_for_tracing(images)
     assert logits.shape == (2, 3)
@@ -113,7 +113,7 @@ def test_forward_for_tracing_returns_raw_logits() -> None:
 def test_export_writes_an_onnx_file(tmp_path: Path) -> None:
     from getitune.types.export import ExportFormat
 
-    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info(), input_size=(224, 224))
+    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info(), data_input_params={"input_size": (224, 224)})
     path = model.export(tmp_path, "exported_model", ExportFormat.ONNX)
     assert path == tmp_path / "exported_model.onnx"
     assert path.exists()
@@ -123,7 +123,7 @@ def test_export_restores_training_mode_and_device(tmp_path: Path) -> None:
     """export() must not leave the model in eval mode or move it permanently."""
     from getitune.types.export import ExportFormat
 
-    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info(), input_size=(224, 224))
+    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info(), data_input_params={"input_size": (224, 224)})
     model.train()
     original_forward = model.forward
 

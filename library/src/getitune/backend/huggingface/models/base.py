@@ -20,7 +20,7 @@ import transformers
 from torch import nn
 from transformers.utils import ModelOutput
 
-from getitune.backend.huggingface.exporter.native import HFModelExporter
+from getitune.backend.huggingface.exporter.hf_exporter import HFModelExporter
 from getitune.backend.lightning.models.base import DataInputParams
 from getitune.types.export import ExportFormat, TaskLevelExportParameters
 from getitune.types.label import LabelInfo
@@ -70,12 +70,11 @@ class HFModel(ABC, nn.Module):
         checkpoint: str | transformers.PretrainedConfig,
         label_info: LabelInfoTypes,
         *,
-        input_size: tuple[int, int] = (640, 640),
-        mean: tuple[float, float, float] = (0.485, 0.456, 0.406),
-        std: tuple[float, float, float] = (0.229, 0.224, 0.225),
+        data_input_params: DataInputParams | dict[str, Any] | None = None,
         resize_mode: Literal["crop", "standard", "fit_to_window", "fit_to_window_letterbox"] = "standard",
         pretrained: bool = True,
         extra_overrides: dict[str, Any] | None = None,
+        onnx_dynamo: bool | None = None,
     ) -> None:
         """Build the underlying ``transformers`` model.
 
@@ -84,13 +83,15 @@ class HFModel(ABC, nn.Module):
                 directory, or an already-built ``PretrainedConfig``. Passing a
                 config builds the model from scratch with random weights and
                 *pretrained* is ignored; this is the offline path used by
-                tests and by recipes that define a model from scratch.
+                tests and by recipes that define a model from scratch. Also
+                doubles as the key into ``_default_preprocessing_params``.
             label_info: Label metadata, or anything ``_dispatch_label_info``
                 accepts (an int, a list of names, or a ``LabelInfo``).
-            input_size: Model input size, used for export metadata only.
-                Geti's data pipeline does the actual resizing.
-            mean: Per-channel normalization mean, for export metadata.
-            std: Per-channel normalization std, for export metadata.
+            data_input_params: Input size/mean/std used for export metadata
+                (Geti's data pipeline does the actual resizing). A full or
+                partial dict is merged with this checkpoint's entry in
+                ``_default_preprocessing_params``; ``None`` uses that entry
+                as-is. Matches ``LightningModel``'s ``data_input_params``.
             resize_mode: Resize mode used by the data pipeline and recorded in
                 exported model metadata.
             pretrained: Load Hub/local weights if ``True``, otherwise build an
@@ -98,13 +99,18 @@ class HFModel(ABC, nn.Module):
             extra_overrides: Extra keyword arguments forwarded to
                 ``from_pretrained`` / ``from_config``, e.g. ``problem_type`` or
                 ``semantic_loss_ignore_index``.
+            onnx_dynamo: override for ``torch.onnx.export(...,
+                dynamo=...)``. ``None`` (default) leaves the exporter's own
+                default (``True``) in place; set explicitly per recipe for
+                checkpoints that need the other mode.
         """
         super().__init__()
         self.checkpoint = checkpoint if isinstance(checkpoint, str) else type(checkpoint).__name__
         self.pretrained = pretrained
         self.extra_overrides = dict(extra_overrides or {})
+        self._onnx_dynamo = onnx_dynamo
         self._label_info = self._dispatch_label_info(label_info)
-        self._data_input_params = DataInputParams(input_size=input_size, mean=mean, std=std)
+        self._data_input_params = self._configure_preprocessing_params(data_input_params)
         self._resize_mode = resize_mode
         self._intensity_config: IntensityConfig | None = None
         self._best_checkpoint: Path | None = None
@@ -137,8 +143,7 @@ class HFModel(ABC, nn.Module):
     def _dispatch_label_info(label_info: LabelInfoTypes) -> LabelInfo:
         """Normalize *label_info* to a :class:`LabelInfo`.
 
-        Accepts the same shapes as the Lightning and Ultralytics backends: a
-        dict, a plain int (number of classes), a list of label names, or a
+        Accepts a dict, a plain int (number of classes), a list of label names, or a
         ``LabelInfo`` instance (passed through, including subclasses such as
         ``SegLabelInfo``).
         """
@@ -157,6 +162,42 @@ class HFModel(ABC, nn.Module):
         if isinstance(label_info, LabelInfo):
             return label_info
         msg = f"Cannot build LabelInfo from {label_info!r}"
+        raise TypeError(msg)
+
+    @property
+    def _default_preprocessing_params(self) -> DataInputParams | dict[str, DataInputParams]:
+        """Default preprocessing parameters, by checkpoint if task-specific.
+
+        Task subclasses override this with a dict of known checkpoints fall back
+        to the generic default below.
+        """
+        return DataInputParams(input_size=(640, 640), mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+
+    def _configure_preprocessing_params(
+        self,
+        preprocessing_params: DataInputParams | dict[str, Any] | None,
+    ) -> DataInputParams:
+        """Resolve *preprocessing_params* against this checkpoint's registered defaults."""
+        defaults = self._default_preprocessing_params
+        if isinstance(defaults, dict):
+            default = defaults.get(
+                self.checkpoint,
+                DataInputParams(input_size=(640, 640), mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+            )
+        else:
+            default = defaults
+
+        if isinstance(preprocessing_params, DataInputParams):
+            return preprocessing_params
+        if isinstance(preprocessing_params, dict):
+            return DataInputParams(
+                input_size=preprocessing_params.get("input_size") or default.input_size,
+                mean=preprocessing_params.get("mean") or default.mean,
+                std=preprocessing_params.get("std") or default.std,
+            )
+        if preprocessing_params is None:
+            return default
+        msg = f"data_input_params should be DataInputParams, dict, or None, got {type(preprocessing_params)}."
         raise TypeError(msg)
 
     @abstractmethod
@@ -319,18 +360,26 @@ class HFModel(ABC, nn.Module):
 
         Task subclasses set ``_onnx_output_names`` and inherit this builder,
         keeping the export contract (input names, resize mode, swap RGB,
-        opset, dynamo off) in one place.
+        opset) in one place. ``dynamo`` defaults to the exporter's own
+        default (``False``) unless overridden via ``onnx_dynamo``.
         """
         if not hasattr(self, "_onnx_output_names") or not self._onnx_output_names:
             msg = "ONNX output names are not set."
             raise ValueError(msg)
+
+        onnx_export_configuration: dict[str, Any] = {
+            "input_names": ["images"],
+            "output_names": self._onnx_output_names,
+        }
+        if self._onnx_dynamo is not None:
+            onnx_export_configuration["dynamo"] = self._onnx_dynamo
 
         return HFModelExporter(
             task_level_export_parameters=self._export_parameters,
             data_input_params=self.data_input_params,
             resize_mode=self.resize_mode,
             swap_rgb=False,
-            onnx_export_configuration={"input_names": ["images"], "output_names": self._onnx_output_names},
+            onnx_export_configuration=onnx_export_configuration,
         )
 
     def export(

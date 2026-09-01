@@ -20,10 +20,9 @@ __all__ = ["HFProgressCallback", "extract_progress_fn"]
 def extract_progress_fn(
     callbacks: list[Any] | None,
 ) -> tuple[Callable[[float], None] | None, float, float]:
-    """Find the application's progress-reporting callback, if any (G18).
+    """Find the application's progress-reporting callback, if any.
 
-    Mirrors ``UltralyticsEngine._extract_progress_callback``: scans for an
-    object with ``_on_progress_update``, ``_min_p``, and ``_max_p``
+    Scans for an object with ``_on_progress_update``, ``_min_p``, and ``_max_p``
     attributes, duck-typed so this module doesn't have to import the
     application's ``TrainingProgressCallback``. Everything else in
     *callbacks* — including genuine ``transformers.TrainerCallback``

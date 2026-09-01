@@ -33,8 +33,12 @@ class TimmBackbone(nn.Module):
 
         self.model = timm.create_model(self.model_name, num_classes=0)
 
-        self.num_head_features = self.model.num_features
-        self.num_features = self.model.num_features
+        num_features = self.model.num_features
+        if not isinstance(num_features, int):
+            msg = f"Expected int num_features from timm model {model_name!r}, got {type(num_features)}"
+            raise TypeError(msg)
+        self.num_head_features = num_features
+        self.num_features = num_features
 
     def forward(self, x: torch.Tensor, **kwargs) -> torch.Tensor:
         """Extract the pooled feature embedding using the architecture's own default pooling.
@@ -45,7 +49,7 @@ class TimmBackbone(nn.Module):
         ``(B, C, H, W)`` feature map.
 
         This is deliberate rather than forced (e.g. via ``global_pool="avg"``): a single
-        pooling mode is not universal across timm's 1400+ architectures (some models reject
+        pooling mode is not universal across timm's 1700+ architectures (some models reject
         ``"avg"``, others override ``forward_head`` incompatibly, or return multiple feature
         branches). Delegating to each model's own default keeps this backbone
         architecture-agnostic.
