@@ -76,7 +76,7 @@ describe('CaptureFrameButton', () => {
         await waitFor(() => {
             expect(captureSpy).toHaveBeenCalled();
         });
-        expect(await screen.findByText('Frame captured!')).toBeVisible();
+        expect(await screen.findByText('Frame captured and added to the dataset.')).toBeVisible();
     });
 
     it('is disabled when the stream is off', async () => {

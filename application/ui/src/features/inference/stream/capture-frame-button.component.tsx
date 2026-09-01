@@ -38,7 +38,7 @@ export const CaptureFrameButton = () => {
             { params: { path: { project_id: projectId } } },
             {
                 onSuccess: () => {
-                    toast({ type: 'success', message: 'Frame captured!' });
+                    toast({ type: 'success', message: 'Frame captured and added to the dataset.' });
                 },
             }
         );
