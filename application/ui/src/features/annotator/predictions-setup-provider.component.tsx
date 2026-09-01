@@ -64,17 +64,18 @@ export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) 
 
     const selectedModel = selectableModels.find((model) => model.modelVariantId === selectedModelId);
 
-    const [confidenceThreshold, setConfidenceThreshold] = useState<number | null>(
-        selectedModel?.optimalConfidenceThreshold ?? null
+    const [thresholdOverride, setThresholdOverride] = useState<{ modelVariantId: string | null; value: number } | null>(
+        null
     );
 
-    // The threshold is a model specific parameter, so it always follows the selected model
-    const changeSelectedModelId = (modelId: string | null) => {
-        setSelectedModelId(modelId);
+    // The threshold is a model specific parameter, so it follows the selected model unless the user overrode it
+    const confidenceThreshold =
+        thresholdOverride?.modelVariantId === selectedModelId
+            ? thresholdOverride.value
+            : (selectedModel?.optimalConfidenceThreshold ?? null);
 
-        const newModel = selectableModels.find((model) => model.modelVariantId === modelId);
-
-        setConfidenceThreshold(newModel?.optimalConfidenceThreshold ?? null);
+    const changeConfidenceThreshold = (value: number) => {
+        setThresholdOverride({ modelVariantId: selectedModelId, value });
     };
 
     const { data: pipeline } = usePipeline();
@@ -86,12 +87,12 @@ export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) 
             value={{
                 selectedModelId,
                 selectedModel,
-                changeSelectedModelId,
+                changeSelectedModelId: setSelectedModelId,
                 selectableModels,
                 selectedDevice,
                 changeSelectedDevice: setSelectedDevice,
                 confidenceThreshold,
-                changeConfidenceThreshold: setConfidenceThreshold,
+                changeConfidenceThreshold,
             }}
         >
             {children}
