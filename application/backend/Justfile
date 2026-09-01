@@ -123,6 +123,7 @@ gen-certs:
 # -------------------------------------------------------------------------------------------------
 
 timm-imagenet-results-url := "https://raw.githubusercontent.com/huggingface/pytorch-image-models/main/results/results-imagenet.csv"
+timm-model-licenses-url := "https://raw.githubusercontent.com/itallix/timm_license_extractor/refs/heads/main/timm_model_licenses.csv"
 
 # Regenerate app/supported_models/timm_catalog_snapshot.json from the pinned `timm`
 # version in ../../library. Requires the library venv (`just venv` from library/)
@@ -133,7 +134,8 @@ gen-timm-catalog: install-uv
 
     OUTPUT="$(pwd)/app/supported_models/timm_catalog_snapshot.json"
     TMP_CSV="$(mktemp -t results-imagenet-XXXXXX.csv)"
-    trap 'rm -f "$TMP_CSV"' EXIT
+    TMP_LICENSES_CSV="$(mktemp -t timm-model-licenses-XXXXXX.csv)"
+    trap 'rm -f "$TMP_CSV" "$TMP_LICENSES_CSV"' EXIT
 
     echo "Downloading ImageNet results table..."
     IMAGENET_ARGS=()
@@ -143,10 +145,19 @@ gen-timm-catalog: install-uv
         echo "Warning: failed to download ImageNet results table; continuing without top1 accuracy." >&2
     fi
 
+    echo "Downloading model license table..."
+    LICENSE_ARGS=()
+    if curl -fL --retry 3 --retry-delay 2 "{{ timm-model-licenses-url }}" -o "$TMP_LICENSES_CSV"; then
+        LICENSE_ARGS=(--model-licenses-csv "$TMP_LICENSES_CSV")
+    else
+        echo "Warning: failed to download model license table; continuing without license info/filtering." >&2
+    fi
+
     echo "Generating timm catalog snapshot at ${OUTPUT}..."
     uv run python app/gen_timm_catalog.py \
         --output "$OUTPUT" \
-        "${IMAGENET_ARGS[@]}"
+        "${IMAGENET_ARGS[@]}" \
+        "${LICENSE_ARGS[@]}"
 
     echo "Snapshot written to ${OUTPUT}"
 
