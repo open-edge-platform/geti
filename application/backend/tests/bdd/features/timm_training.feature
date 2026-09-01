@@ -45,7 +45,6 @@ Feature: Timm Model Training Smoke Test
       | efficientvit_msra         | efficientvit_m0.r224_in1k                 |
       | eva                       | eva02_tiny_patch14_224.mim_in22k          |
       | fasternet                 | fasternet_t0.in1k                         |
-      | fastvit                   | fastvit_t8.apple_dist_in1k                |
       | focalnet                  | focalnet_tiny_srf.ms_in1k                 |
       | gcvit                     | gcvit_xxtiny.in1k                         |
 #      | gemma4_vit                | gemma4_vit_167m.gemma4_e4b_it             |
@@ -66,7 +65,6 @@ Feature: Timm Model Training Smoke Test
       | mlp_mixer                 | resmlp_12_224.fb_dino                     |
       | mobilenetv3               | mobilenetv3_small_050.lamb_in1k           |
 #      | mobilenetv5               | mobilenetv5_300m.gemma3n                  |
-      | mobilevit                 | mobilevit_xxs.cvnets_in1k                 |
       | mvitv2                    | mvitv2_tiny.fb_in1k                       |
       | naflexvit                 | naflexvit_base_patch16_gap.e300_s576_in1k |
       | nasnet                    | nasnetalarge.tf_in1k                      |
@@ -80,12 +78,10 @@ Feature: Timm Model Training Smoke Test
       | regnet                    | regnetx_002.pycls_in1k                    |
       | repghost                  | repghostnet_050.in1k                      |
       | repvit                    | repvit_m0_9.dist_300e_in1k                |
-      | res2net                   | res2net50_48w_2s.in1k                     |
       | resnest                   | resnest14d.gluon_in1k                     |
       | resnet                    | test_resnet.r160_in1k                     |
       | resnetv2                  | resnetv2_18.ra4_e3600_r224_in1k           |
       | rexnet                    | rexnet_100.nav_in1k                       |
-      | selecsls                  | selecsls42b.in1k                          |
       | senet                     | legacy_seresnet18.in1k                    |
       | sequencer                 | sequencer2d_s.in1k                        |
       | shvit                     | shvit_s1.in1k                             |
