@@ -54,6 +54,7 @@ jobs:
               - .github/workflows/ui-lint-and-test.yaml
               - .github/actions/install-common-deps/**
               - '!**/*.md'
+              - '!**/docs/**'
 
   generate-openapi-spec:
     name: Generate OpenAPI Spec

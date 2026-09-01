@@ -61,8 +61,7 @@ jobs:
               - .github/actions/docker-build/**
               - .github/actions/install-common-deps/**
               - '!**/*.md'
-              - '!application/docs/**'
-              - '!library/docs/**'
+              - '!**/docs/**'
 
   build:
     name: Build and push docker image (${{ matrix.device }})

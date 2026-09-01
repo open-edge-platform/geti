@@ -37,6 +37,7 @@ jobs:
               - .github/workflows/import-time.yml
               - .github/actions/**
               - '!**/*.md'
+              - '!**/docs/**'
 
   import-time:
     name: Measure Backend Import Time
