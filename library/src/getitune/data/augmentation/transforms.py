@@ -661,6 +661,13 @@ class CachedMosaic(CacheableMixin, tvt_v2.Transform):
                 masks = mask_crop[valid]
         else:
             new_bboxes = bboxes
+            # No boxes to filter, but an empty masks tensor (0 instances) must still be
+            # reshaped to the output canvas size: downstream transforms (e.g.
+            # `CachedMixUp`) concatenate masks across samples and assume every sample's
+            # masks tensor -- even an empty one -- matches (out_h, out_w), not the
+            # pre-crop input size.
+            if masks is not None:
+                masks = torch.zeros((masks.shape[0], out_h, out_w), dtype=masks.dtype, device=masks.device)
 
         return output, new_bboxes, labels, masks
 

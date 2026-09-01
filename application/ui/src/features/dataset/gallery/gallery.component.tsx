@@ -105,12 +105,14 @@ const GalleryList = ({
                                 height={'size-200'}
                                 alignItems={'center'}
                                 justifyContent={'center'}
-                                UNSAFE_style={{ margin: dimensionValue('size-150') }}
+                                // Set pointerEvents to 'none' to allow clicks to pass through
+                                // to the MediaItemActions component
+                                UNSAFE_style={{ margin: dimensionValue('size-150'), pointerEvents: 'none' }}
                             >
                                 <Checkbox
-                                    aria-label={`Select media item ${item.id}`}
-                                    onChange={() => toggleSelectedKeys([String(item.id)])}
+                                    aria-label={`Selection state of media item ${item.id}`}
                                     isSelected={selected}
+                                    isReadOnly
                                 />
                             </Flex>
                         )}
@@ -173,7 +175,6 @@ export const Gallery = ({
                 <DialogContainer type={'fullscreenTakeover'} onDismiss={() => onSelectedMediaItemChange(null)}>
                     {selectedMediaItem !== null && (
                         <MediaPreview
-                            mediaItem={selectedMediaItem}
                             close={() => onSelectedMediaItemChange(null)}
                             onSelectedMediaItem={onSelectedMediaItemChange}
                         />
