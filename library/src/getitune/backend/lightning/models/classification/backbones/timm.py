@@ -1,12 +1,7 @@
 # Copyright (C) 2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Timm Backbone Class for getitune classification.
-
-Original papers:
-- 'EfficientNetV2: Smaller Models and Faster Training,' https://arxiv.org/abs/2104.00298,
-- 'Adversarial Examples Improve Image Recognition,' https://arxiv.org/abs/1911.09665.
-"""
+"""Timm Backbone Class for getitune classification."""
 
 from __future__ import annotations
 
@@ -51,13 +46,36 @@ class TimmBackbone(nn.Module):
         self.num_head_features = num_features
         self.num_features = num_features
 
+    def _forward_features(self, x: torch.Tensor) -> torch.Tensor:
+        """Extract the pre-logits feature embedding, bypassing the model's own classifier.
+
+        Delegates to timm's own ``forward_features``/``forward_head(pre_logits=True)``
+        contract rather than calling the model directly. This is deliberate: some timm
+        architectures (e.g. ``NormMlpClassifierHead`` used by ConvNeXt/InceptionNeXt) keep
+        a final classifier layer even when the model is created with ``num_classes=0``,
+        which can silently return a zero-width tensor from a plain ``self.model(x)`` call.
+        Routing through ``pre_logits=True`` guarantees the true pre-classifier
+        representation is returned regardless of how a given architecture's head behaves.
+
+        Args:
+            x: Input image batch, shape ``(B, 3, H, W)``.
+
+        Returns:
+            Pre-logits feature embedding, shape ``(B, num_features)``.
+        """
+        feats = self.model.forward_features(x)  # pyrefly: ignore[not-callable]
+        return self.model.forward_head(feats, pre_logits=True)  # pyrefly: ignore[not-callable]
+
     def forward(self, x: torch.Tensor, **kwargs) -> torch.Tensor:
         """Extract the pooled feature embedding using the architecture's own default pooling.
 
         The backbone is created with ``num_classes=0``, so timm sets the classifier head to
-        ``Identity`` and each architecture applies its own default ``global_pool`` before
-        returning. The result is a flat ``(B, num_features)`` embedding, not a spatial
-        ``(B, C, H, W)`` feature map.
+        ``Identity`` (or, for some architectures, a zero-width ``Linear``) and each
+        architecture applies its own default ``global_pool`` before returning. This method
+        always routes through :meth:`_forward_features` (``forward_features`` +
+        ``forward_head(pre_logits=True)``) rather than calling the wrapped model directly,
+        so the returned embedding is safe even for architectures whose ``num_classes=0``
+        classifier is not a plain ``Identity``.
 
         This is deliberate rather than forced (e.g. via ``global_pool="avg"``): a single
         pooling mode is not universal across timm's 1700+ architectures (some models reject
@@ -71,4 +89,4 @@ class TimmBackbone(nn.Module):
         Returns:
             Pooled feature embedding, shape ``(B, num_features)``.
         """
-        return self.model(x)
+        return self._forward_features(x)

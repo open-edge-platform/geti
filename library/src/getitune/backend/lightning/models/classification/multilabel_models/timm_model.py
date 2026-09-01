@@ -120,6 +120,8 @@ class TimmModelMultilabelCls(TimmWeightsLoader, LightningMultilabelClsModel):
         torch's current default.
         """
         exporter = super()._exporter
-        assert isinstance(exporter, LightningModelExporter)  # noqa: S101 - internal invariant, not user input
-        exporter.onnx_export_configuration["dynamo"] = False
+        modules = ("naflexvit", "nfnet", "volo")
+        if not any(s in self.model_name for s in modules):
+            assert isinstance(exporter, LightningModelExporter)  # noqa: S101 - internal invariant, not user input
+            exporter.onnx_export_configuration["dynamo"] = False
         return exporter
