@@ -46,6 +46,7 @@ logger = logging.getLogger(__name__)
 
 _ALLOWED_CODE_LICENSES = frozenset({"Apache-2.0", "BSD-3-Clause", "MIT"})
 _REFUSED_WEIGHTS_LICENSES = frozenset({"Not Specified", "unknown"})
+_UNKNOWN_LICENSE = "unknown"
 # Architecture prefixes that should use AdamW at train time (matches the
 # optimizer selection in TimmModelMulticlassCls / TimmModelMultilabelCls).
 # TODO(https://github.com/open-edge-platform/geti/issues/7097): import constants from library (single source of truth)
@@ -159,8 +160,8 @@ def _is_license_allowed(model_name: str, licenses: dict[str, dict[str, str]]) ->
     if code_license not in _ALLOWED_CODE_LICENSES:
         return False
 
-    weights_license = info.get("weights_license", "")
-    return weights_license not in _REFUSED_WEIGHTS_LICENSES
+    weights_license = (info.get("weights_license", "")).strip()
+    return bool(weights_license) and weights_license not in _REFUSED_WEIGHTS_LICENSES
 
 
 def _compute_stats(model_name: str) -> dict[str, float]:
@@ -211,7 +212,7 @@ def _build_entry(
         "default_lr": default_params["learning_rate"],
         "default_weight_decay": default_params["weight_decay"],
         "imagenet_top1_accuracy": imagenet_top1.get(model_name),
-        "license": model_licenses.get(model_name, {}).get("weights_license") or None,
+        "license": model_licenses.get(model_name, {}).get("weights_license", _UNKNOWN_LICENSE),
     }
 
     cached_keys = {"trainable_parameters", "gigaflops"}
@@ -252,7 +253,8 @@ def generate_snapshot(
     model_licenses = _load_model_licenses(model_licenses_csv)
 
     model_names = sorted(timm.list_models(pretrained=True))
-    model_names = [name for name in model_names if _is_license_allowed(name, model_licenses)]
+    if model_licenses:
+        model_names = [name for name in model_names if _is_license_allowed(name, model_licenses)]
     if limit is not None:
         model_names = model_names[:limit]
 
