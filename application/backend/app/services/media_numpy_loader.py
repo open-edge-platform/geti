@@ -24,20 +24,22 @@ class MediaNumpyLoader:
         self._media_service = media_service
 
     def load_media_binary(self, project_id: UUID, media: Media) -> np.ndarray:
-        """Decode a media binary into a numpy array in RGB(A) channel order.
+        """Decode a media binary into a numpy array, preserving bit depth and channel count.
 
-        The original bit depth and channel count are preserved, so the result can be
+        The result is always 3D but otherwise mirrors the source file: it can be
         ``(H, W, 1)`` grayscale, ``(H, W, 3)`` RGB or ``(H, W, 4)`` RGBA, with a dtype
-        of ``uint8``, ``uint16``, … depending on the source file. OpenCV decodes colour
-        images as BGR(A), so both 3- and 4-channel data is converted to RGB(A) here;
-        every consumer can therefore assume RGB(A) ordering.
+        of ``uint8``, ``uint16``, … depending on the source file. Colour data is
+        guaranteed to be in RGB(A) order: OpenCV decodes it as BGR(A), so both 3- and
+        4-channel data is converted here. Grayscale has no channel order to speak of
+        and is passed through unchanged.
 
         Args:
             project_id: ID of the project the media belongs to.
             media: Media whose binary should be decoded.
 
         Returns:
-            A 3D array of shape ``(H, W, C)`` with ``C`` in ``{1, 3, 4}``, in RGB(A) order.
+            A 3D array of shape ``(H, W, C)`` with ``C`` in ``{1, 3, 4}``; colour data
+            (``C`` of 3 or 4) is in RGB(A) order.
 
         Raises:
             BinaryNotFoundError: If the binary is missing or cannot be decoded.
