@@ -20,8 +20,6 @@ export const useSelectNextAnnotation = ({
     useHotkeys(
         HOTKEYS.selectNextAnnotation,
         (event) => {
-            event.preventDefault();
-
             const selectedAnnotationIdx = annotations.findIndex((annotation) =>
                 selectedAnnotationsIds.has(annotation.id)
             );
@@ -29,6 +27,8 @@ export const useSelectNextAnnotation = ({
             if (selectedAnnotationIdx < 0) {
                 return;
             }
+
+            event.preventDefault();
 
             const nextAnnotationIdx = (selectedAnnotationIdx + 1) % annotations.length;
             updateSelectedAnnotationsIds(new Set([annotations[nextAnnotationIdx].id]));
