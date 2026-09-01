@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
 
 import type { Model } from '@/api/types';
 import { usePipeline } from 'hooks/api/pipeline.hook';
@@ -49,7 +49,10 @@ const useSelectedModelId = (models: Model[]) => {
         defaultSelectedId
     );
 
-    return [storedModelId, setStoredModelId] as const;
+    // With a single model there is nothing to choose from, so it is always the selected one
+    const selectedModelId = selectableModels.length === 1 ? selectableModels[0].modelVariantId : storedModelId;
+
+    return [selectedModelId, setStoredModelId] as const;
 };
 
 export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) => {
@@ -66,25 +69,13 @@ export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) 
     );
 
     // The threshold is a model specific parameter, so it always follows the selected model
-    const changeSelectedModelId = useCallback(
-        (modelId: string | null) => {
-            setSelectedModelId(modelId);
+    const changeSelectedModelId = (modelId: string | null) => {
+        setSelectedModelId(modelId);
 
-            const newModel = selectableModels.find((model) => model.modelVariantId === modelId);
+        const newModel = selectableModels.find((model) => model.modelVariantId === modelId);
 
-            setConfidenceThreshold(newModel?.optimalConfidenceThreshold ?? null);
-        },
-        [selectableModels, setSelectedModelId]
-    );
-
-    const singleModelId = selectableModels.length === 1 ? selectableModels[0].modelVariantId : null;
-
-    // The stored id is only read on mount, so a model trained later in the session is not picked up on its own
-    useEffect(() => {
-        if (singleModelId !== null && singleModelId !== selectedModelId) {
-            changeSelectedModelId(singleModelId);
-        }
-    }, [singleModelId, selectedModelId, changeSelectedModelId]);
+        setConfidenceThreshold(newModel?.optimalConfidenceThreshold ?? null);
+    };
 
     const { data: pipeline } = usePipeline();
 
