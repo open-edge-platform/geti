@@ -109,10 +109,14 @@ def to_uint8_rgb(array: np.ndarray) -> np.ndarray:
     * single-channel data is replicated across three channels;
     * a fourth (alpha) channel is dropped, leaving the existing channel order intact.
 
+    Channel order is never changed: colour input must already be in RGB(A) order.
+    OpenCV decodes BGR(A), so callers reading with ``cv2.imread`` have to convert first
+    (:meth:`app.services.media_numpy_loader.MediaNumpyLoader.load_media_binary` does this
+    for both 3- and 4-channel images).
+
     Args:
         array: Decoded image array of shape ``(H, W)``, ``(H, W, 1)``, ``(H, W, 3)``
-            or ``(H, W, 4)``. Three- and four-channel input is assumed to already be
-            in RGB(A) order.
+            or ``(H, W, 4)``, in RGB(A) order for colour input.
 
     Returns:
         A ``(H, W, 3)`` ``uint8`` array.
