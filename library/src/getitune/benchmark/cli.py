@@ -157,6 +157,16 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Skip Torch and OpenVINO accuracy validation phases.",
     )
     run.add_argument("--num-seeds", type=int, default=None, help="Override number of seeds.")
+    run.add_argument(
+        "--max-attempts", type=int, default=3, help="Maximum attempts per experiment (use 1 to disable retries)."
+    )
+    run.add_argument(
+        "--no-benchmark-retries",
+        dest="enable_benchmark_retries",
+        action="store_false",
+        default=True,
+        help="Do not retry benchmark_app with lower inference-request counts.",
+    )
     run.add_argument("--max-epochs", type=int, default=None, help="Override max training epochs.")
     run.add_argument("--eval-upto", type=str, choices=["train", "export", "optimize"], default=None)
     run.add_argument("--deterministic", action="store_const", const=True, default=None)
@@ -317,6 +327,8 @@ def _cmd_run(args: argparse.Namespace) -> int:
         deterministic=deterministic,
         max_epochs=args.max_epochs,
         num_seeds=args.num_seeds,
+        max_attempts=args.max_attempts,
+        enable_benchmark_retries=args.enable_benchmark_retries,
         eval_upto=args.eval_upto,
         filters=filters,
         mlflow_tracking_uri=args.mlflow_uri,

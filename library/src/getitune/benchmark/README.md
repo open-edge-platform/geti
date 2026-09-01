@@ -119,6 +119,15 @@ running. Raw reports and command output are retained below each seed directory:
 FPS, median/average latency, batch size, iteration count, and measurement
 duration for FP and INT8 models.
 
+For dynamic IR inputs, the runner passes both `-shape` and `-data_shape` with
+the concrete batch-1 input shape so Intel GPU compilation can resolve dynamic
+output shapes. If throughput mode reports `CL_OUT_OF_RESOURCES`, it retries
+with four and then one inference request. Latency mode remains batch 1 with
+the default single request.
+
+Use `--max-attempts 1 --no-benchmark-retries` for a strict single-pass run
+without either experiment retries or benchmark-app request-count fallbacks.
+
 Run with custom output location:
 
 ```bash

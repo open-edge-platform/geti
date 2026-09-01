@@ -84,6 +84,8 @@ class TestBuildParser:
         assert args.accelerator == "gpu"
         assert args.deterministic is None
         assert args.dry_run is False
+        assert args.max_attempts == 3
+        assert args.enable_benchmark_retries is True
         assert args.enable_openvino_benchmark is False
         assert args.benchmark_app is None
         assert args.enable_validation is True
@@ -168,6 +170,16 @@ class TestBuildParser:
         parser = _build_parser()
         args = parser.parse_args(["run", "--no-deterministic"])
         assert args.deterministic is False
+
+    def test_run_max_attempts(self) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(["run", "--max-attempts", "1"])
+        assert args.max_attempts == 1
+
+    def test_run_no_benchmark_retries(self) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(["run", "--no-benchmark-retries"])
+        assert args.enable_benchmark_retries is False
 
     def test_log_level_flag(self) -> None:
         parser = _build_parser()

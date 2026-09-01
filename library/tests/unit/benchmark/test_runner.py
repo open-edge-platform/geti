@@ -363,6 +363,8 @@ class TestRunConfig:
         assert cfg.enable_report is True
         assert cfg.trigger == "manual"
         assert cfg.baseline_branch == "develop"
+        assert cfg.max_attempts == 3
+        assert cfg.enable_benchmark_retries is True
 
     def test_custom_fields(self, tmp_path: Path) -> None:
         cfg = RunConfig(
@@ -374,11 +376,13 @@ class TestRunConfig:
             max_epochs=5,
             num_seeds=2,
             eval_upto="export",
+            max_attempts=1,
         )
         assert cfg.accelerator == "xpu"
         assert cfg.max_epochs == 5
         assert cfg.num_seeds == 2
         assert cfg.eval_upto == "export"
+        assert cfg.max_attempts == 1
 
     def test_validation_enabled_by_default(self, tmp_path: Path) -> None:
         cfg = RunConfig(

@@ -244,6 +244,8 @@ class RunConfig:
     # the seed is done.
     isolate_in_subprocess: bool = True
     subprocess_timeout: float | None = None  # seconds; None = no timeout
+    max_attempts: int = _MAX_ATTEMPTS
+    enable_benchmark_retries: bool = True
 
 
 # ---------------------------------------------------------------------------
@@ -616,12 +618,13 @@ class BenchmarkRunner:
 
         run_fn = self._execute_isolated if self.config.isolate_in_subprocess else self._execute
 
-        for attempt in range(1, _MAX_ATTEMPTS + 1):
+        max_attempts = max(1, self.config.max_attempts)
+        for attempt in range(1, max_attempts + 1):
             try:
                 return run_fn(experiment, seed, data_path, allowed_phases, deterministic=deterministic)
             except Exception as exc:  # noqa: PERF203
                 last_exc = exc
-                if attempt < _MAX_ATTEMPTS:
+                if attempt < max_attempts:
                     # If the failure is due to a missing deterministic kernel,
                     # relax the deterministic setting one level for the retry.
                     fallback = self._DETERMINISTIC_FALLBACKS.get(deterministic)
@@ -631,7 +634,7 @@ class BenchmarkRunner:
                             "retrying with deterministic=%r: %s",
                             seed,
                             attempt,
-                            _MAX_ATTEMPTS,
+                            max_attempts,
                             fallback,
                             exc,
                         )
@@ -641,14 +644,14 @@ class BenchmarkRunner:
                             "  seed=%d attempt %d/%d failed, retrying: %s",
                             seed,
                             attempt,
-                            _MAX_ATTEMPTS,
+                            max_attempts,
                             exc,
                         )
                 else:
                     logger.exception(
-                        "  seed=%d failed after %d attempts",
+                        "  seed=%d failed after %d attempt(s)",
                         seed,
-                        _MAX_ATTEMPTS,
+                        max_attempts,
                     )
 
         return ExperimentResult.failure(
@@ -745,7 +748,9 @@ class BenchmarkRunner:
             # Child died before writing a result — almost always OOM-killed
             # (exitcode = -9 / SIGKILL) or segfault. Surface it as a real
             # exception so _run_single's retry can kick in.
-            msg = f"Subprocess for seed={seed} produced no result (exitcode={exitcode}): {exc}"
+            phase_file = self.config.output_root / experiment.run_id / str(seed) / "current_phase"
+            phase = phase_file.read_text(encoding="utf-8").strip() if phase_file.exists() else "unknown"
+            msg = f"Subprocess for seed={seed} produced no result (exitcode={exitcode}, phase={phase}): {exc}"
             raise RuntimeError(msg) from exc
         finally:
             with contextlib.suppress(FileNotFoundError):
@@ -812,6 +817,7 @@ class BenchmarkRunner:
             max_epochs=self.config.max_epochs,
             benchmark_app=self.config.benchmark_app,
             openvino_device=self.config.openvino_device,
+            enable_benchmark_retries=self.config.enable_benchmark_retries,
         )
 
         # Determine which phases to run (respecting resume point)
@@ -827,6 +833,9 @@ class BenchmarkRunner:
             resuming = False  # From here on, execute everything
 
             logger.info("  seed=%d  phase=%s", seed, phase_name)
+            phase_file = seed_dir / "current_phase"
+            phase_file.parent.mkdir(parents=True, exist_ok=True)
+            phase_file.write_text(phase_name, encoding="utf-8")
             method = getattr(executor, method_name)
             try:
                 result = method()
@@ -839,6 +848,7 @@ class BenchmarkRunner:
                 # flush PyTorch's CUDA cache, and collect cycle garbage so
                 # the next phase starts from a clean slate.
                 _cleanup_resources()
+                phase_file.unlink(missing_ok=True)
             phase_results.extend(result if isinstance(result, list) else [result])
 
         # Drop the executor (and the heavy engine/trainer state it holds)

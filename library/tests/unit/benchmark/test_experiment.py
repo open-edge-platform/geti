@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import builtins
 import json
+import subprocess
 import time
 from pathlib import Path
 from types import ModuleType
@@ -794,13 +795,81 @@ class TestExecutorBackendDispatch:
             output_dir = Path(command[command.index("-report_folder") + 1])
             output_dir.mkdir(parents=True, exist_ok=True)
             (output_dir / "benchmark_report.json").write_text(json.dumps({"execution_results": {"throughput": "1", "latency (ms)": "2"}}))
-            return type("Completed", (), {"stdout": "", "stderr": ""})()
+            return type("Completed", (), {"stdout": "", "stderr": "", "returncode": 0})()
 
         monkeypatch.setattr("getitune.benchmark.experiment.subprocess.run", run)
         executor._benchmark_model(model, "export", "throughput")
         executor._benchmark_model(model, "export", "latency")
         assert "-b" not in calls[0]
         assert calls[1][calls[1].index("-b") + 1] == "1"
+
+    def test_benchmark_retries_throughput_after_gpu_resource_error(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        recipe = tmp_path / "atss.yaml"
+        recipe.write_text(_LIGHTNING_RECIPE)
+        executor = ExperimentExecutor(
+            recipe_path=recipe,
+            data_path=tmp_path / "data",
+            work_dir=tmp_path / "work",
+            benchmark_app="benchmark_app",
+        )
+        model = tmp_path / "model.xml"
+        model.write_text("fake")
+        calls: list[list[str]] = []
+
+        def run(command: list[str], **kwargs: object) -> object:
+            calls.append(command)
+            if len(calls) < 3:
+                raise subprocess.CalledProcessError(134, command, stderr="CL_OUT_OF_RESOURCES")
+            output_dir = Path(command[command.index("-report_folder") + 1])
+            output_dir.mkdir(parents=True, exist_ok=True)
+            (output_dir / "benchmark_report.json").write_text(
+                json.dumps({"execution_results": {"throughput": "10", "latency (ms)": "2"}})
+            )
+            return type("Completed", (), {"stdout": "", "stderr": "", "returncode": 0})()
+
+        monkeypatch.setattr("getitune.benchmark.experiment.subprocess.run", run)
+        executor._benchmark_model(model, "export", "throughput")
+
+        assert [command[command.index("-nireq") + 1] for command in calls[1:]] == ["4", "1"]
+
+    def test_benchmark_accepts_complete_report_after_process_crash(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        recipe = tmp_path / "atss.yaml"
+        recipe.write_text(_LIGHTNING_RECIPE)
+        executor = ExperimentExecutor(
+            recipe_path=recipe,
+            data_path=tmp_path / "data",
+            work_dir=tmp_path / "work",
+            benchmark_app="benchmark_app",
+        )
+        model = tmp_path / "model.xml"
+        model.write_text("fake")
+
+        def run(command: list[str], **kwargs: object) -> object:
+            output_dir = Path(command[command.index("-report_folder") + 1])
+            output_dir.mkdir(parents=True, exist_ok=True)
+            (output_dir / "benchmark_report.json").write_text(
+                json.dumps(
+                    {
+                        "execution_results": {
+                            "throughput": "10",
+                            "latency (ms)": "2",
+                            "total number of iterations": "100",
+                        }
+                    }
+                )
+            )
+            return type("Completed", (), {"stdout": "", "stderr": "", "returncode": -11})()
+
+        monkeypatch.setattr("getitune.benchmark.experiment.subprocess.run", run)
+
+        result = executor._benchmark_model(model, "optimize", "latency")
+
+        assert result.metrics["optimize:latency:fps"] == pytest.approx(10)
+        assert result.metrics["optimize:latency:latency_ms"] == pytest.approx(2)
 
     def test_ultralytics_recipe_properties(self, tmp_path: Path) -> None:
         recipe = tmp_path / "yolo.yaml"

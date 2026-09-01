@@ -507,6 +507,16 @@ def _parse_benchmark_report(report_path: Path, *, prefix: str) -> dict[str, floa
     return metrics
 
 
+def _benchmark_report_error(report_path: Path) -> str | None:
+    """Return benchmark-app's reported execution error, if any."""
+    try:
+        raw = json.loads(report_path.read_text(encoding="utf-8"))
+        error = raw.get("execution_results", {}).get("error")
+    except (OSError, json.JSONDecodeError, AttributeError):
+        return None
+    return str(error) if error else None
+
+
 def _default_benchmark_app() -> str:
     """Return the benchmark-app executable for the current Python environment."""
     return str(Path(sys.executable).with_name("benchmark_app"))
@@ -557,6 +567,7 @@ class ExperimentExecutor:
         max_epochs: int | None = None,
         benchmark_app: str | None = None,
         openvino_device: str | None = None,
+        enable_benchmark_retries: bool = True,
     ) -> None:
         self.recipe_path = recipe_path
         self.data_path = data_path
@@ -569,6 +580,7 @@ class ExperimentExecutor:
         self.max_epochs = max_epochs
         self.benchmark_app = benchmark_app or _default_benchmark_app()
         self.openvino_device = openvino_device or _benchmark_device(accelerator)
+        self.enable_benchmark_retries = enable_benchmark_retries
         self._backend, self._task_type = _recipe_backend(recipe_path)
 
     @property
@@ -837,26 +849,63 @@ class ExperimentExecutor:
             "-hint", hint, "-report_type", "no_counters", "-report_folder", str(output_dir), "-json_stats",
         ]
         if data_shape is not None:
+            # ``-data_shape`` supplies generated input data, while ``-shape``
+            # concretizes dynamic model inputs before device compilation.
+            command.extend(["-shape", data_shape])
             command.extend(["-data_shape", data_shape])
         if batch_size is not None:
             command.extend(["-b", str(batch_size)])
 
-        start = time.monotonic()
-        try:
-            completed = subprocess.run(  # noqa: S603
-                command, check=True, capture_output=True, text=True, env=os.environ.copy()
-            )
-        except (OSError, subprocess.CalledProcessError) as exc:
-            detail = str(exc)
-            if isinstance(exc, subprocess.CalledProcessError):
-                detail = exc.stderr or exc.stdout or detail
-            (output_dir / "benchmark_app.log").write_text(detail, encoding="utf-8")
-            msg = f"benchmark_app failed for {phase}: {detail}"
-            raise RuntimeError(msg) from exc
-        wall = time.monotonic() - start
-        log = f"$ {' '.join(command)}\n\n{completed.stdout}\n{completed.stderr}"
-        (output_dir / "benchmark_app.log").write_text(log, encoding="utf-8")
-        metrics = _parse_benchmark_report(report_path, prefix=f"{model_kind}:{hint}:")
+        request_counts = (
+            (None, 4, 1) if self.enable_benchmark_retries and hint == "throughput" else (None,)
+        )
+        logs: list[str] = []
+        wall = 0.0
+        metrics: dict[str, float] = {}
+        for request_count in request_counts:
+            attempt_command = list(command)
+            if request_count is not None:
+                attempt_command.extend(["-nireq", str(request_count)])
+            report_path.unlink(missing_ok=True)
+            start = time.monotonic()
+            try:
+                completed = subprocess.run(  # noqa: S603
+                    attempt_command, check=False, capture_output=True, text=True, env=os.environ.copy()
+                )
+            except (OSError, subprocess.CalledProcessError) as exc:
+                detail = str(exc)
+                if isinstance(exc, subprocess.CalledProcessError):
+                    detail = exc.stderr or exc.stdout or detail
+                logs.append(f"$ {' '.join(attempt_command)}\n\n{detail}")
+                if hint == "throughput" and "OUT_OF_RESOURCES" in detail:
+                    continue
+                (output_dir / "benchmark_app.log").write_text("\n\n".join(logs), encoding="utf-8")
+                msg = f"benchmark_app failed for {phase}: {detail}"
+                raise RuntimeError(msg) from exc
+            wall = time.monotonic() - start
+            logs.append(f"$ {' '.join(attempt_command)}\n\n{completed.stdout}\n{completed.stderr}")
+            report_error = _benchmark_report_error(report_path)
+            metrics = _parse_benchmark_report(report_path, prefix=f"{model_kind}:{hint}:")
+            # benchmark_app may crash during native teardown after it has
+            # already written a complete report. Such a report is usable and
+            # must not turn a valid measurement into a failed experiment.
+            if report_error is None and metrics:
+                if completed.returncode != 0:
+                    logger.warning(
+                        "%s exited with code %d after writing a valid report; accepting the measurement.",
+                        self.benchmark_app,
+                        completed.returncode,
+                    )
+                break
+            if report_error is None:
+                continue
+            if "OUT_OF_RESOURCES" not in report_error:
+                break
+        (output_dir / "benchmark_app.log").write_text("\n\n".join(logs), encoding="utf-8")
+        report_error = _benchmark_report_error(report_path)
+        if report_error is not None:
+            msg = f"benchmark_app failed for {phase}: {report_error}"
+            raise RuntimeError(msg)
         metrics[f"{model_kind}:{hint}:batch_size"] = float(batch_size or 1)
         if len(metrics) == 1:
             msg = f"benchmark_app produced no metrics for {phase}: {report_path}"
