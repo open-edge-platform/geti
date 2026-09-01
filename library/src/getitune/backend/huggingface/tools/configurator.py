@@ -1,16 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Configurator for Hugging Face recipes.
-
-Deliberately much smaller than ``backend/ultralytics/tools/configurator.py``:
-Ultralytics resolves model *names* (``"yolo26s"``) against a per-model-family
-registry baked into the ``ultralytics`` package. Hugging Face has no such
-registry — every model is identified by a bare Hub id or a local
-``save_pretrained()`` directory, both of which are just the ``checkpoint``
-constructor argument. So there is nothing to resolve beyond parsing the
-recipe YAML and instantiating the declared model class.
-"""
+"""Configurator for Hugging Face recipes."""
 
 from __future__ import annotations
 
@@ -48,8 +39,7 @@ class Configurator:
             :class:`~getitune.data.module.DataModule`.
         model: A recipe filename (``"rtdetrv2_r18"``), a full recipe path,
             or an already-instantiated :class:`HFModel`.
-        task: Task identifier. Required when *model* is a bare name (there is
-            no cross-task recipe search the way Ultralytics does).
+        task: Task identifier. Required when *model* is a bare name.
     """
 
     def __init__(

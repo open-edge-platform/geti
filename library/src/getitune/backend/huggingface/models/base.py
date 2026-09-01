@@ -143,8 +143,7 @@ class HFModel(ABC, nn.Module):
     def _dispatch_label_info(label_info: LabelInfoTypes) -> LabelInfo:
         """Normalize *label_info* to a :class:`LabelInfo`.
 
-        Accepts the same shapes as the Lightning and Ultralytics backends: a
-        dict, a plain int (number of classes), a list of label names, or a
+        Accepts a dict, a plain int (number of classes), a list of label names, or a
         ``LabelInfo`` instance (passed through, including subclasses such as
         ``SegLabelInfo``).
         """

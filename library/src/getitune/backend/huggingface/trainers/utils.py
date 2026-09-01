@@ -33,7 +33,7 @@ def remap_log_key(key: str) -> str:
     ``Trainer`` logs ``loss``, ``learning_rate``, and ``grad_norm`` during
     training, ``eval_*`` during evaluation, and a final summary entry with
     ``train_runtime``-style keys. ``epoch`` and ``step`` stay bare, matching
-    Lightning's ``CSVLogger`` and the Ultralytics remapper.
+    Lightning's ``CSVLogger``.
     """
     if key in ("epoch", "step"):
         return key
@@ -54,10 +54,9 @@ def write_metrics_csv(log_history: list[dict[str, float]], work_dir: Path) -> Pa
 
     Args:
         log_history: ``trainer.state.log_history`` after training.
-        work_dir: The engine's work directory. The file lands at the same
-            path Ultralytics uses, ``csv/version_0/metrics.csv``, so
-            downstream consumers have one place to look regardless of
-            backend.
+        work_dir: The engine's work directory. The file lands at the
+            ``csv/version_0/metrics.csv``, so downstream consumers have
+            one place to look regardless of backend.
 
     Returns:
         Path to the written CSV file.

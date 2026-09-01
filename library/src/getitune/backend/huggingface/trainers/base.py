@@ -37,12 +37,6 @@ __all__ = ["GetiTuneHFTrainer"]
 class GetiTuneHFTrainer(Trainer):
     """Binds ``transformers.Trainer`` to a Geti ``DataModule`` and ``HFModel``.
 
-    One trainer class for every task. Ultralytics needs a per-task trainer
-    subclass because it binds to upstream task trainers through MRO; here
-    the only thing that differs per task is what
-    ``model_wrapper.build_targets`` does, and that's already handled one
-    level down, in the model wrapper.
-
     Args:
         model_wrapper: The ``HFModel`` being trained. Supplies
             ``build_targets`` and the task used to pick the GPU augmentation

@@ -448,10 +448,6 @@ class HFEngine(Engine):
     ) -> Path:
         """Export the model to OpenVINO IR or ONNX.
 
-        Mirrors ``UltralyticsEngine.export()``/``LightningModel.export()``:
-        metadata embedding, preprocessing parameters, and FP16 compression
-        are handled by the model's own ``_exporter``, not here.
-
         Args:
             checkpoint: Optional checkpoint to load before exporting. When
                 omitted, the currently loaded weights are used — typically
