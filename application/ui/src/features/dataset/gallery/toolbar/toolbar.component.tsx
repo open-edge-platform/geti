@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Dispatch, SetStateAction, useMemo } from 'react';
+import { Dispatch, SetStateAction, Suspense, useMemo } from 'react';
 
 import type { Media } from '@/api/types';
 import {
@@ -58,6 +58,46 @@ const AnnotateButton = ({ isDisabled, onClick }: AnnotateButtonProps) => {
     );
 };
 
+type DatasetViewsProps = {
+    resetSelectedMediaIds: () => void;
+};
+
+// Owns the dataset views query so the rest of the toolbar renders without waiting on it
+const DatasetViews = ({ resetSelectedMediaIds }: DatasetViewsProps) => {
+    const { data: datasetViews } = useDatasetViewsQuery();
+
+    return (
+        <>
+            <Divider orientation={'vertical'} size={'S'} />
+            <DatasetViewSelector datasetViews={datasetViews} resetSelectedMediaIds={resetSelectedMediaIds} />
+        </>
+    );
+};
+
+type DatasetViewActionsProps = {
+    selectedMediaIds: string[];
+    resetSelectedMediaIds: () => void;
+};
+
+const DatasetViewActions = ({ selectedMediaIds, resetSelectedMediaIds }: DatasetViewActionsProps) => {
+    const { data: datasetViews } = useDatasetViewsQuery();
+
+    return (
+        <>
+            <SaveDatasetView
+                selectedMediaIds={selectedMediaIds}
+                datasetViews={datasetViews}
+                resetSelectedMediaIds={resetSelectedMediaIds}
+            />
+            <AssignToExistingView
+                datasetViews={datasetViews}
+                selectedMediaIds={selectedMediaIds}
+                resetSelectedMediaIds={resetSelectedMediaIds}
+            />
+        </>
+    );
+};
+
 const SortMediaByUploadDate = () => {
     const { sortDirection, setSortDirection } = useDatasetFiltersSearchParams();
 
@@ -79,7 +119,6 @@ const SortMediaByUploadDate = () => {
 export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
     const { onSelectedMediaItemChange } = useSelectDatasetItem();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys } = useSelectedData();
-    const { data: datasetViews } = useDatasetViewsQuery();
 
     const selectedMediaItems = selectedKeys instanceof Set ? selectedKeys : null;
 
@@ -113,13 +152,9 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                     <Heading margin={0}>Dataset</Heading>
 
                     {FEATURE_FLAGS.DATASET_VIEWS && (
-                        <>
-                            <Divider orientation={'vertical'} size={'S'} />
-                            <DatasetViewSelector
-                                datasetViews={datasetViews}
-                                resetSelectedMediaIds={resetSelectedMediaIds}
-                            />
-                        </>
+                        <Suspense fallback={null}>
+                            <DatasetViews resetSelectedMediaIds={resetSelectedMediaIds} />
+                        </Suspense>
                     )}
                 </Flex>
 
@@ -166,16 +201,12 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                             />
                             {FEATURE_FLAGS.DATASET_VIEWS && (
                                 <>
-                                    <SaveDatasetView
-                                        selectedMediaIds={selectedMediaItemsIds}
-                                        datasetViews={datasetViews}
-                                        resetSelectedMediaIds={resetSelectedMediaIds}
-                                    />
-                                    <AssignToExistingView
-                                        datasetViews={datasetViews}
-                                        selectedMediaIds={selectedMediaItemsIds}
-                                        resetSelectedMediaIds={resetSelectedMediaIds}
-                                    />
+                                    <Suspense fallback={null}>
+                                        <DatasetViewActions
+                                            selectedMediaIds={selectedMediaItemsIds}
+                                            resetSelectedMediaIds={resetSelectedMediaIds}
+                                        />
+                                    </Suspense>
                                     <UnassignMediaFromView
                                         selectedMediaIds={selectedMediaItemsIds}
                                         resetSelectedMediaIds={resetSelectedMediaIds}
