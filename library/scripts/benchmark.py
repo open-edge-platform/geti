@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
+import subprocess  # nosec B404
 from pathlib import Path
 
 from getitune.engine import create_engine
@@ -31,6 +31,7 @@ def _input_shape(value: str) -> str:
 
 
 def _benchmark_command(args: argparse.Namespace, model: Path, shape: str | None) -> list[str]:
+    # benchmark_app receives a constructed argv list and does not use shell interpolation.
     command = [args.benchmark_app, "-m", str(model), "-d", args.device]
     if args.batch is not None:
         command.extend(["-b", str(args.batch)])

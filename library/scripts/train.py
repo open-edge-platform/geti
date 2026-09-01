@@ -101,7 +101,7 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the command-line argument parser."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--model", required=True, help="Model name or recipe YAML path")
-    parser.add_argument("--task", type=_task, help="Task type, for example DETECTION or OBJECT DETECTION")
+    parser.add_argument("--task", type=_task, help="Task type, for example DETECTION or INSTANCE_SEGMENTATION")
     parser.add_argument("--data-root", required=True, type=Path, help="Dataset root or supported dataset file")
     parser.add_argument("--work-dir", type=Path, default=Path("./getitune-workspace"))
     parser.add_argument("--checkpoint", type=Path, help="Optional checkpoint for warm-start training")

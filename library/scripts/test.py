@@ -83,18 +83,18 @@ def _resolve_metric(
         message = f"unsupported metric(s) {unknown} for task {task}; supported: {supported}"
         raise ValueError(message)
 
-    metrics: dict[str, Metric] = {}
-    for name in metric_names:
-        result = available[name](label_info)
-        if isinstance(result, MetricCollection):
-            for key, metric in result.items():
-                metrics[f"{name}/{key}"] = metric
-        else:
-            metrics[name] = result
-    collection = MetricCollection(metrics)
+    def _callable(current_label_info: LabelInfo) -> MetricCollection:
+        metrics: dict[str, Metric] = {}
+        for name in metric_names:
+            result = available[name](current_label_info)
+            if isinstance(result, MetricCollection):
+                for key, metric in result.items():
+                    metrics[f"{name}/{key}"] = metric
+            else:
+                metrics[name] = result
+        return MetricCollection(metrics)
 
-    def _callable(_: LabelInfo) -> MetricCollection:
-        return collection
+    _callable(label_info)
 
     return _callable
 

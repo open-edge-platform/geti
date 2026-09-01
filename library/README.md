@@ -670,9 +670,9 @@ python scripts/export.py \
     --model yolox_s --checkpoint /path/to/ckpt.ckpt \
     --data-root /path/to/dataset
 
-# Export to ONNX FP32
+# Export to ONNX FP32 from a recipe/model and checkpoint
 python scripts/export.py \
-    --model /path/to/exported_model.xml \
+    --model yolox_s --checkpoint /path/to/ckpt.ckpt \
     --data-root /path/to/dataset \
     --format onnx --precision fp32
 

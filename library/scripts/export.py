@@ -45,6 +45,13 @@ def _quantize(model: Path, args: argparse.Namespace) -> Path:
 
 def run(args: argparse.Namespace) -> Path:
     """Export a model to the requested format and precision."""
+    if Path(str(args.model)).suffix.lower() in {".xml", ".onnx"}:
+        message = (
+            "--model must be a model name or recipe YAML when using export.py; "
+            "exporting from an already-exported .xml/.onnx model is not supported."
+        )
+        raise ValueError(message)
+
     if args.precision == "int8" and args.format != "openvino":
         message = "INT8 quantization requires --format openvino"
         raise ValueError(message)
@@ -78,8 +85,8 @@ def run(args: argparse.Namespace) -> Path:
 def build_parser() -> argparse.ArgumentParser:
     """Build the command-line argument parser."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", required=True, help="Model name, recipe YAML path, or .xml/.onnx model")
-    parser.add_argument("--task", type=_task, help="Task type, for example DETECTION or OBJECT DETECTION")
+    parser.add_argument("--model", required=True, help="Model name or recipe YAML path")
+    parser.add_argument("--task", type=_task, help="Task type, for example DETECTION or INSTANCE_SEGMENTATION")
     parser.add_argument(
         "--data-root", required=True, type=Path, help="Dataset root, required for recipe export and INT8 quantization"
     )

@@ -8,9 +8,9 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from getitune.engine import create_engine
+from coco_utils import iter_image_files, write_coco
 
-from .coco_utils import iter_image_files, write_coco
+from getitune.engine import create_engine
 
 
 def _task(value: str) -> str:
