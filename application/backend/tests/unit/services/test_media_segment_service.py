@@ -18,8 +18,8 @@ from app.services.media_numpy_loader import MediaNumpyLoader
 from app.services.media_service import MediaService
 from app.services.sam.media_segment_service import (
     SAM_EMBEDDING_MODEL_VERSION,
-    SAM_ENCODER_PLUGIN_CONFIG,
     MediaSegmentService,
+    _get_encoder_plugin_config,
 )
 
 
@@ -105,7 +105,7 @@ class TestMediaSegmentService:
         tensors = safetensors_load(blob)
         np.testing.assert_array_equal(tensors["image_embeddings"], embeddings)
 
-    def test_load_model_pins_f32_precision(self, fxt_media_service, fxt_media_numpy_loader, tmp_path):
+    def test_load_model_pins_precision_per_platform(self, fxt_media_service, fxt_media_numpy_loader, tmp_path):
         service = MediaSegmentService(
             media_service=fxt_media_service,
             media_numpy_loader=fxt_media_numpy_loader,
@@ -123,7 +123,21 @@ class TestMediaSegmentService:
             service._load_model(device="CPU")
 
         core.set_property.assert_any_call({"CACHE_DIR": str(tmp_path)})
-        assert mock_adapter.call_args.kwargs["plugin_config"] == SAM_ENCODER_PLUGIN_CONFIG
+        assert mock_adapter.call_args.kwargs["plugin_config"] == _get_encoder_plugin_config()
+
+    @pytest.mark.parametrize(
+        "machine, expected_config",
+        [
+            ("arm64", {"INFERENCE_PRECISION_HINT": "f32"}),
+            ("aarch64", {"INFERENCE_PRECISION_HINT": "f32"}),
+            ("x86_64", {}),
+        ],
+    )
+    def test_get_encoder_plugin_config(self, machine, expected_config):
+        with (
+            patch("app.services.sam.media_segment_service.platform.machine", return_value=machine),
+        ):
+            assert _get_encoder_plugin_config() == expected_config
 
     def test_encode_media_image(self, fxt_media_segment_service, fxt_media_numpy_loader):
         project = MagicMock(spec=Project, id=uuid4())
