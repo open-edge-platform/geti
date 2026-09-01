@@ -14,6 +14,7 @@ from app.models.system import DeviceInfo
 from app.services.base import BaseSessionManagedService
 from app.services.media_numpy_loader import MediaNumpyLoader
 from app.services.media_service import MediaService
+from app.utils.images import to_uint8_rgb
 
 if TYPE_CHECKING:
     from model_api.models import Model
@@ -149,6 +150,17 @@ class MediaSegmentService(BaseSessionManagedService):
         elif isinstance(media, Video):
             raise ValueError("Video media type is not supported for segmentation")
 
+        # Derive the resize metadata from the decoded binary (H, W, ...) before any channel
+        # conversion; this is correct for every media type (Image, VideoFrame, extracted frame).
+        original_height, original_width = int(media_binary.shape[0]), int(media_binary.shape[1])
+
+        # The SAM encoder IR only accepts (1, H, W, 3) uint8 input, but media is decoded with its
+        # original bit depth and channel count preserved (e.g. a 16-bit grayscale image decodes to
+        # (H, W, 1) uint16), which makes OpenVINO reject the tensor. Normalize to 8-bit RGB using
+        # the same min-max scaling the UI applies when displaying high bit depth images, so the
+        # encoder sees exactly the pixels the user is prompting on.
+        model_input = to_uint8_rgb(media_binary)
+
         model = self._load_model(device=device.as_openvino)
 
         media_id = (
@@ -156,14 +168,11 @@ class MediaSegmentService(BaseSessionManagedService):
         )
         try:
             logger.debug("Performing image '{}' segmentation", media_id)
-            embeddings = model(media_binary)
+            embeddings = model(model_input)
         finally:
             # Release the native OpenVINO resources; this service loads a fresh model per request.
             self._unload(model)
 
-        # Derive the resize metadata from the actual decoded binary (H, W, C), which is
-        # correct for every media type (Image, VideoFrame, extracted video frame).
-        original_height, original_width = int(media_binary.shape[0]), int(media_binary.shape[1])
         resize_metadata = self._compute_resize_metadata(original_height=original_height, original_width=original_width)
         logger.debug("Embedding resize metadata for '{}': {}", media_id, resize_metadata)
 
