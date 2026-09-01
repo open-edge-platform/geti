@@ -44,6 +44,9 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+_ALLOWED_CODE_LICENSES = frozenset({"Apache-2.0", "BSD-3-Clause", "MIT"})
+_REFUSED_WEIGHTS_LICENSES = frozenset({"Not Specified", "unknown"})
+_UNKNOWN_LICENSE = "unknown"
 # Architecture prefixes that should use AdamW at train time (matches the
 # optimizer selection in TimmModelMulticlassCls / TimmModelMultilabelCls).
 # TODO(https://github.com/open-edge-platform/geti/issues/7097): import constants from library (single source of truth)
@@ -120,6 +123,47 @@ def _load_imagenet_top1(csv_path: Path | None) -> dict[str, float]:
     return top1
 
 
+def _load_model_licenses(csv_path: Path | None) -> dict[str, dict[str, str]]:
+    """Optionally load per-model weight/code license info from a local CSV copy.
+
+    Expected source: timm_license_extractor's `timm_model_licenses.csv`
+    (https://github.com/itallix/timm_license_extractor). Pass
+    ``--model-licenses-csv`` with a locally downloaded copy to populate
+    ``weight_license`` and to filter out models whose license isn't allowed.
+    When omitted, no license info is added and no models are filtered on this basis.
+    """
+    if csv_path is None:
+        return {}
+    if not csv_path.exists():
+        logger.warning("Model licenses CSV not found at %s; skipping license info.", csv_path)
+        return {}
+    licenses: dict[str, dict[str, str]] = {}
+    with csv_path.open(newline="", encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            model_id = row.get("model_id")
+            if not model_id:
+                continue
+            licenses[model_id] = {
+                "weights_license": row.get("weights_license", "") or "",
+                "code_license": row.get("code_license", "") or "",
+            }
+    return licenses
+
+
+def _is_license_allowed(model_name: str, licenses: dict[str, dict[str, str]]) -> bool:
+    """Return True if *model_name*'s code license is allowed and its weight license isn't refused."""
+    info = licenses.get(model_name)
+    if info is None:
+        return False
+
+    code_license = info.get("code_license", "")
+    if code_license not in _ALLOWED_CODE_LICENSES:
+        return False
+
+    weights_license = (info.get("weights_license", "")).strip()
+    return bool(weights_license) and weights_license not in _REFUSED_WEIGHTS_LICENSES
+
+
 def _compute_stats(model_name: str) -> dict[str, float]:
     """Compute headless parameter count and single-forward-pass GFLOPs for *model_name*."""
     import timm
@@ -147,6 +191,7 @@ def _build_entry(
     model_name: str,
     family_map: dict[str, str],
     imagenet_top1: dict[str, float],
+    model_licenses: dict[str, dict[str, str]],
     existing: dict[str, Any] | None,
 ) -> dict[str, Any]:
     import timm
@@ -167,6 +212,7 @@ def _build_entry(
         "default_lr": default_params["learning_rate"],
         "default_weight_decay": default_params["weight_decay"],
         "imagenet_top1_accuracy": imagenet_top1.get(model_name),
+        "license": model_licenses.get(model_name, {}).get("weights_license", _UNKNOWN_LICENSE),
     }
 
     cached_keys = {"trainable_parameters", "gigaflops"}
@@ -194,6 +240,7 @@ def _load_existing(output: Path) -> dict[str, dict[str, Any]]:
 def generate_snapshot(
     output: Path,
     imagenet_results_csv: Path | None,
+    model_licenses_csv: Path | None,
     limit: int | None,
 ) -> dict[str, Any]:
     """Build (or incrementally update) the timm catalog snapshot."""
@@ -203,12 +250,18 @@ def generate_snapshot(
     existing_by_name = _load_existing(output)
     family_map = _module_family_map()
     imagenet_top1 = _load_imagenet_top1(imagenet_results_csv)
+    model_licenses = _load_model_licenses(model_licenses_csv)
 
     model_names = sorted(timm.list_models(pretrained=True))
+    if model_licenses:
+        model_names = [name for name in model_names if _is_license_allowed(name, model_licenses)]
     if limit is not None:
         model_names = model_names[:limit]
 
-    backbones = [_build_entry(name, family_map, imagenet_top1, existing_by_name.get(name)) for name in model_names]
+    backbones = [
+        _build_entry(name, family_map, imagenet_top1, model_licenses, existing_by_name.get(name))
+        for name in model_names
+    ]
 
     return {"timm_version": timm_version, "backbones": backbones}
 
@@ -228,6 +281,13 @@ def _parse_args() -> argparse.Namespace:
         help="Optional local copy of timm's results/results-imagenet.csv to populate top1 accuracy.",
     )
     parser.add_argument(
+        "--model-licenses-csv",
+        type=Path,
+        default=None,
+        help="Optional local copy of timm_license_extractor's timm_model_licenses.csv "
+        "to populate weight_license and filter models by allowed code license.",
+    )
+    parser.add_argument(
         "--limit",
         type=int,
         default=None,
@@ -244,6 +304,7 @@ def main() -> None:
     snapshot = generate_snapshot(
         output=args.output,
         imagenet_results_csv=args.imagenet_results_csv,
+        model_licenses_csv=args.model_licenses_csv,
         limit=args.limit,
     )
 
