@@ -11,11 +11,9 @@ import { useModelListing } from '../provider/model-listing-provider';
 import { ColumnHeader } from './column-header.component';
 import { getPerformanceColumnLabel } from './model-row/utils';
 
-// NOTE: We cannot have DisclosureGroup inside TableView when using Spectrum so
-// We are just rendering the result of the sort, not doing the sort itself on the table.
-// The actual sorting comes from the models screen Header.
+// NOTE: We cannot have DisclosureGroup inside TableView when using Spectrum, so this grid mimics a table.
 export const ModelsTableHeader = () => {
-    const { groupBy, sortBy, groupedModels } = useModelListing();
+    const { groupBy, sortBy, onSortChange, groupedModels } = useModelListing();
     const taskType = useProjectTask();
 
     const performanceColumnName = useMemo(() => {
@@ -36,15 +34,17 @@ export const ModelsTableHeader = () => {
                     ${dimensionValue('size-150')} ${dimensionValue('size-1000')}`,
             }}
         >
-            <ColumnHeader label='Model Name' isSorted={sortBy === 'name'} />
-            <ColumnHeader label='Trained' isSorted={sortBy === 'trained'} />
+            <ColumnHeader label={'Model Name'} sortKey={'name'} sortBy={sortBy} onSortChange={onSortChange} />
+            <ColumnHeader label={'Trained'} sortKey={'trained'} sortBy={sortBy} onSortChange={onSortChange} />
             <ColumnHeader
                 label={groupBy === 'architecture' ? 'Dataset' : 'Architecture'}
-                isSorted={sortBy === 'architecture' || sortBy === 'dataset'}
+                sortKey={groupBy === 'architecture' ? 'dataset' : 'architecture'}
+                sortBy={sortBy}
+                onSortChange={onSortChange}
             />
-            <ColumnHeader label='Device' isSorted={sortBy === 'device'} />
-            <ColumnHeader label='Total size' isSorted={sortBy === 'size'} />
-            <ColumnHeader label={performanceColumnName} isSorted={sortBy === 'score'} />
+            <ColumnHeader label={'Device'} sortKey={'device'} sortBy={sortBy} onSortChange={onSortChange} />
+            <ColumnHeader label={'Total size'} sortKey={'size'} sortBy={sortBy} onSortChange={onSortChange} />
+            <ColumnHeader label={performanceColumnName} sortKey={'score'} sortBy={sortBy} onSortChange={onSortChange} />
             <div />
         </Grid>
     );

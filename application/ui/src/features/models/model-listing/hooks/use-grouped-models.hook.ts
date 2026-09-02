@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 
 import type { DatasetRevision, Model } from '@/api/types';
 
-import { GroupByMode, GroupedModels, SortBy } from '../types';
+import { GroupByMode, GroupedModels, SortBy, SortDirection } from '../types';
 import {
     filterBySearch,
     filterOutFailedModels,
@@ -22,6 +22,7 @@ type UseGroupedModelsOptions = {
     searchBy: string;
     datasetRevisions: DatasetRevision[];
     showFailedModels: boolean;
+    sortDirection?: SortDirection;
 };
 
 // Responsible for:
@@ -29,7 +30,7 @@ type UseGroupedModelsOptions = {
 // - Grouping models based on the selected grouping mode
 // - Sorting models within each group based on the selected sorting criteria
 export const useGroupedModels = (models: Model[] | undefined, options: UseGroupedModelsOptions): GroupedModels[] => {
-    const { groupBy, sortBy, searchBy, datasetRevisions, showFailedModels } = options;
+    const { groupBy, sortBy, searchBy, datasetRevisions, showFailedModels, sortDirection } = options;
 
     return useMemo(() => {
         if (!models) return [];
@@ -40,12 +41,12 @@ export const useGroupedModels = (models: Model[] | undefined, options: UseGroupe
             : filterOutFailedModels(filteredByTraining);
         const filteredBySearch = filterBySearch(filteredByFailedModels, searchBy);
         const grouped = groupModels(filteredBySearch, groupBy, datasetRevisions);
-        const sortedModelsInsideGroup = sortGroupedModels(grouped, sortBy, datasetRevisions);
+        const sortedModelsInsideGroup = sortGroupedModels(grouped, sortBy, datasetRevisions, sortDirection);
         const sortedGroupsByDatasetRevisionDate = sortGroupedModelsByDatasetRevisionDate(
             sortedModelsInsideGroup,
             datasetRevisions
         );
 
         return removeEmpty(sortedGroupsByDatasetRevisionDate);
-    }, [models, groupBy, sortBy, searchBy, datasetRevisions, showFailedModels]);
+    }, [models, groupBy, sortBy, sortDirection, searchBy, datasetRevisions, showFailedModels]);
 };
