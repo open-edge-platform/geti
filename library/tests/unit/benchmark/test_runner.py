@@ -24,7 +24,13 @@ from getitune.benchmark.manifest import (
     ManifestFilters,
     load_manifest,
 )
-from getitune.benchmark.runner import BenchmarkRunner, RunConfig
+from getitune.benchmark.runner import (
+    _BENCHMARK_PHASES,
+    _EVAL_UPTO_GATES,
+    _VALIDATION_PHASES,
+    BenchmarkRunner,
+    RunConfig,
+)
 
 # ---------------------------------------------------------------------------
 # Fixtures — minimal catalog + manifest
@@ -357,6 +363,7 @@ class TestRunConfig:
         assert cfg.enable_report is True
         assert cfg.trigger == "manual"
         assert cfg.baseline_branch == "develop"
+        assert cfg.max_attempts == 3
 
     def test_custom_fields(self, tmp_path: Path) -> None:
         cfg = RunConfig(
@@ -368,11 +375,32 @@ class TestRunConfig:
             max_epochs=5,
             num_seeds=2,
             eval_upto="export",
+            max_attempts=1,
         )
         assert cfg.accelerator == "xpu"
         assert cfg.max_epochs == 5
         assert cfg.num_seeds == 2
         assert cfg.eval_upto == "export"
+        assert cfg.max_attempts == 1
+
+    def test_validation_enabled_by_default(self, tmp_path: Path) -> None:
+        cfg = RunConfig(
+            manifest_path=tmp_path / "m.yaml",
+            catalog_path=tmp_path / "c.yaml",
+            data_root=tmp_path / "data",
+            output_root=tmp_path / "out",
+        )
+        assert cfg.enable_validation is True
+
+    def test_validation_can_be_disabled(self, tmp_path: Path) -> None:
+        cfg = RunConfig(
+            manifest_path=tmp_path / "m.yaml",
+            catalog_path=tmp_path / "c.yaml",
+            data_root=tmp_path / "data",
+            output_root=tmp_path / "out",
+            enable_validation=False,
+        )
+        assert cfg.enable_validation is False
 
 
 # ---------------------------------------------------------------------------
@@ -381,6 +409,19 @@ class TestRunConfig:
 
 
 class TestRunnerEvalUpto:
+    def test_no_validation_keeps_performance_phases(self) -> None:
+        allowed = set(_EVAL_UPTO_GATES["optimize"])
+        allowed.update(_BENCHMARK_PHASES["optimize"])
+        allowed.difference_update(_VALIDATION_PHASES)
+
+        assert "test/torch" not in allowed
+        assert "test/export" not in allowed
+        assert "test/optimize" not in allowed
+        assert "export" in allowed
+        assert "optimize" in allowed
+        assert "benchmark/export" in allowed
+        assert "benchmark/optimize" in allowed
+
     @patch("getitune.benchmark.runner.provision_datasets")
     @patch("getitune.benchmark.runner.ExperimentExecutor")
     def test_eval_upto_train_limits_phases(

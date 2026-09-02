@@ -84,6 +84,37 @@ class TestBuildParser:
         assert args.accelerator == "gpu"
         assert args.deterministic is None
         assert args.dry_run is False
+        assert args.max_attempts == 3
+        assert args.enable_openvino_benchmark is False
+        assert args.benchmark_app is None
+        assert args.enable_validation is True
+
+    def test_run_subcommand_benchmark_options(self) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(
+            [
+                "run",
+                "--benchmark",
+                "--benchmark-app",
+                "/opt/benchmark_app",
+                "--openvino-device",
+                "CPU",
+                "--training-device-name",
+                "NVIDIA GeForce RTX 3090",
+                "--openvino-device-name",
+                "Intel Core i9-14900K",
+            ]
+        )
+        assert args.enable_openvino_benchmark is True
+        assert args.benchmark_app == "/opt/benchmark_app"
+        assert args.openvino_device == "CPU"
+        assert args.training_device_name == "NVIDIA GeForce RTX 3090"
+        assert args.openvino_device_name == "Intel Core i9-14900K"
+
+    def test_run_subcommand_no_validation(self) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(["run", "--no-validation"])
+        assert args.enable_validation is False
 
     def test_run_subcommand_deterministic_flag(self) -> None:
         parser = _build_parser()
@@ -153,6 +184,11 @@ class TestBuildParser:
         parser = _build_parser()
         args = parser.parse_args(["run", "--no-deterministic"])
         assert args.deterministic is False
+
+    def test_run_max_attempts(self) -> None:
+        parser = _build_parser()
+        args = parser.parse_args(["run", "--max-attempts", "1"])
+        assert args.max_attempts == 1
 
     def test_log_level_flag(self) -> None:
         parser = _build_parser()

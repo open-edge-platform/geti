@@ -43,16 +43,40 @@ _PHASE_CHAIN: list[tuple[str, str]] = [
     ("test/torch", "test_torch"),
     ("export", "export"),
     ("test/export", "test_export"),
+    ("benchmark/export", "benchmark_export"),
     ("optimize", "optimize"),
     ("test/optimize", "test_optimize"),
+    ("benchmark/optimize", "benchmark_optimize"),
 ]
 
 # Which phases are included for a given ``eval_upto`` value.
 _EVAL_UPTO_GATES: dict[str, set[str]] = {
     "train": {"train", "test/torch"},
-    "export": {"train", "test/torch", "export", "test/export"},
-    "optimize": {"train", "test/torch", "export", "test/export", "optimize", "test/optimize"},
+    "export": {
+        "train",
+        "test/torch",
+        "export",
+        "test/export",
+    },
+    "optimize": {
+        "train",
+        "test/torch",
+        "export",
+        "test/export",
+        "optimize",
+        "test/optimize",
+    },
 }
+
+_BENCHMARK_PHASES: dict[str, set[str]] = {
+    "export": {"benchmark/export"},
+    "optimize": {
+        "benchmark/export",
+        "benchmark/optimize",
+    },
+}
+
+_VALIDATION_PHASES = {"test/torch", "test/export", "test/optimize"}
 
 _MAX_ATTEMPTS = 3
 
@@ -211,6 +235,12 @@ class RunConfig:
     # Ad-hoc overrides (from CLI --override / --train-kwarg flags)
     ad_hoc_overrides: dict[str, str] = field(default_factory=dict)
     ad_hoc_train_kwargs: dict[str, str] = field(default_factory=dict)
+    benchmark_app: str | None = None
+    openvino_device: str | None = None
+    training_device_name: str | None = None
+    openvino_device_name: str | None = None
+    enable_openvino_benchmark: bool = False
+    enable_validation: bool = True
 
     # Rotation logic
     rotation_group: int | None = None  # If set, only run extended models in this group
@@ -221,6 +251,7 @@ class RunConfig:
     # the seed is done.
     isolate_in_subprocess: bool = True
     subprocess_timeout: float | None = None  # seconds; None = no timeout
+    max_attempts: int = _MAX_ATTEMPTS
 
 
 # ---------------------------------------------------------------------------
@@ -263,7 +294,11 @@ class BenchmarkRunner:
             self._setup_tracking()
 
         eval_upto = self.config.eval_upto or manifest.defaults.eval_upto
-        allowed_phases = _EVAL_UPTO_GATES.get(eval_upto, _EVAL_UPTO_GATES["optimize"])
+        allowed_phases = set(_EVAL_UPTO_GATES.get(eval_upto, _EVAL_UPTO_GATES["optimize"]))
+        if self.config.enable_openvino_benchmark:
+            allowed_phases.update(_BENCHMARK_PHASES.get(eval_upto, set()))
+        if not self.config.enable_validation:
+            allowed_phases.difference_update(_VALIDATION_PHASES)
 
         catalog_names = {e.name for e in catalog.all_entries()}
 
@@ -589,12 +624,13 @@ class BenchmarkRunner:
 
         run_fn = self._execute_isolated if self.config.isolate_in_subprocess else self._execute
 
-        for attempt in range(1, _MAX_ATTEMPTS + 1):
+        max_attempts = max(1, self.config.max_attempts)
+        for attempt in range(1, max_attempts + 1):
             try:
                 return run_fn(experiment, seed, data_path, allowed_phases, deterministic=deterministic)
             except Exception as exc:  # noqa: PERF203
                 last_exc = exc
-                if attempt < _MAX_ATTEMPTS:
+                if attempt < max_attempts:
                     # If the failure is due to a missing deterministic kernel,
                     # relax the deterministic setting one level for the retry.
                     fallback = self._DETERMINISTIC_FALLBACKS.get(deterministic)
@@ -604,7 +640,7 @@ class BenchmarkRunner:
                             "retrying with deterministic=%r: %s",
                             seed,
                             attempt,
-                            _MAX_ATTEMPTS,
+                            max_attempts,
                             fallback,
                             exc,
                         )
@@ -614,14 +650,14 @@ class BenchmarkRunner:
                             "  seed=%d attempt %d/%d failed, retrying: %s",
                             seed,
                             attempt,
-                            _MAX_ATTEMPTS,
+                            max_attempts,
                             exc,
                         )
                 else:
                     logger.exception(
-                        "  seed=%d failed after %d attempts",
+                        "  seed=%d failed after %d attempt(s)",
                         seed,
-                        _MAX_ATTEMPTS,
+                        max_attempts,
                     )
 
         return ExperimentResult.failure(
@@ -718,7 +754,9 @@ class BenchmarkRunner:
             # Child died before writing a result — almost always OOM-killed
             # (exitcode = -9 / SIGKILL) or segfault. Surface it as a real
             # exception so _run_single's retry can kick in.
-            msg = f"Subprocess for seed={seed} produced no result (exitcode={exitcode}): {exc}"
+            phase_file = self.config.output_root / experiment.run_id / str(seed) / "current_phase"
+            phase = phase_file.read_text(encoding="utf-8").strip() if phase_file.exists() else "unknown"
+            msg = f"Subprocess for seed={seed} produced no result (exitcode={exitcode}, phase={phase}): {exc}"
             raise RuntimeError(msg) from exc
         finally:
             with contextlib.suppress(FileNotFoundError):
@@ -753,7 +791,7 @@ class BenchmarkRunner:
         seed_dir = self.config.output_root / experiment.run_id / str(seed)
 
         # Resume check
-        skip, resume_from = detect_resume_point(seed_dir)
+        skip, resume_from = detect_resume_point(seed_dir, allowed_phases)
         if skip:
             logger.info("  seed=%d — all phases complete, skipping.", seed)
             return ExperimentResult(
@@ -783,6 +821,15 @@ class BenchmarkRunner:
             seed=seed,
             deterministic=deterministic,
             max_epochs=self.config.max_epochs,
+            benchmark_app=self.config.benchmark_app,
+            openvino_device=self.config.openvino_device,
+            training_device_name=self.config.training_device_name,
+            openvino_device_name=self.config.openvino_device_name,
+            task=experiment.task,
+            model_name=experiment.model.name,
+            dataset_name=experiment.dataset_name,
+            scenario_name=experiment.scenario.name,
+            performance_benchmark=self.config.enable_openvino_benchmark,
         )
 
         # Determine which phases to run (respecting resume point)
@@ -798,6 +845,9 @@ class BenchmarkRunner:
             resuming = False  # From here on, execute everything
 
             logger.info("  seed=%d  phase=%s", seed, phase_name)
+            phase_file = seed_dir / "current_phase"
+            phase_file.parent.mkdir(parents=True, exist_ok=True)
+            phase_file.write_text(phase_name, encoding="utf-8")
             method = getattr(executor, method_name)
             try:
                 result = method()
@@ -810,7 +860,8 @@ class BenchmarkRunner:
                 # flush PyTorch's CUDA cache, and collect cycle garbage so
                 # the next phase starts from a clean slate.
                 _cleanup_resources()
-            phase_results.append(result)
+                phase_file.unlink(missing_ok=True)
+            phase_results.extend(result if isinstance(result, list) else [result])
 
         # Drop the executor (and the heavy engine/trainer state it holds)
         # before returning so the next seed does not inherit its memory.
