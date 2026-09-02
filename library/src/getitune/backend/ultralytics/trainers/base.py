@@ -5,8 +5,11 @@
 
 from __future__ import annotations
 
+import csv
 import logging
 import multiprocessing
+import time
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import numpy as np
@@ -180,6 +183,9 @@ class GetiTuneBaseTrainer:
             self.args.workers = 4  # type: ignore[attr-defined]
         super()._setup_train()  # type: ignore[misc]
 
+        if self._use_getitune_data:
+            self._register_iteration_timer()
+
         if not self._use_getitune_data:
             return
 
@@ -225,6 +231,52 @@ class GetiTuneBaseTrainer:
                 counter["ni"] += 1
 
             self.add_callback("on_train_batch_start", _warmup_callback)  # type: ignore[attr-defined]
+
+    def _register_iteration_timer(self) -> None:
+        """Record per-batch train time and persist epoch means for benchmarking."""
+        times_by_epoch: dict[int, list[float]] = {}
+        state: dict[str, float] = {}
+
+        def on_batch_start(_trainer: Any) -> None:  # noqa: ANN401
+            state["start"] = time.perf_counter()
+
+        def on_batch_end(trainer: Any) -> None:  # noqa: ANN401
+            start = state.pop("start", None)
+            if start is None:
+                return
+            epoch = int(getattr(trainer, "epoch", 0))
+            times_by_epoch.setdefault(epoch, []).append(time.perf_counter() - start)
+
+        def on_train_end(trainer: Any) -> None:  # noqa: ANN401
+            results_csv = Path(getattr(trainer, "save_dir", ".")) / "results.csv"
+            if not results_csv.exists():
+                return
+            try:
+                with results_csv.open(newline="", encoding="utf-8") as stream:
+                    rows = list(csv.reader(stream))
+            except OSError:
+                return
+            if not rows:
+                return
+
+            header = rows[0]
+            if "train/iter_time" in header:
+                return
+            header.append("train/iter_time")
+            epoch_times = {
+                epoch: sum(times) / len(times)
+                for epoch, times in times_by_epoch.items()
+                if times
+            }
+            for row_index, row in enumerate(rows[1:]):
+                row.append(str(epoch_times.get(row_index, "")))
+
+            with results_csv.open("w", newline="", encoding="utf-8") as stream:
+                csv.writer(stream).writerows(rows)
+
+        self.add_callback("on_train_batch_start", on_batch_start)  # type: ignore[attr-defined]
+        self.add_callback("on_train_batch_end", on_batch_end)  # type: ignore[attr-defined]
+        self.add_callback("on_train_end", on_train_end)  # type: ignore[attr-defined]
 
     def _register_progress_callback(self) -> None:
         """Register a progress-reporting callback for the training loop.

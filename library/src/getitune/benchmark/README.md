@@ -128,6 +128,26 @@ the default single request.
 Use `--max-attempts 1 --no-benchmark-retries` for a strict single-pass run
 without either experiment retries or benchmark-app request-count fallbacks.
 
+### Performance-only report generation
+
+`generate_performance_report.py` is a post-processing utility for performance
+comparisons only. It does not run training, export, optimization, validation,
+or inference, and it intentionally does not assess model accuracy. Use it when
+hardware/runtime performance is the goal and accuracy is not important for the
+comparison.
+
+It combines result directories collected on different machines and writes one
+Markdown table. Valid metrics are retained when another metric is missing;
+missing values are shown as `-` and listed in the incomplete-cases section.
+
+```bash
+uv run python -m getitune.benchmark.generate_performance_report \
+  results/performance-cpu \
+  results/performance-xpu \
+  results/performance-cuda \
+  --output results/performance-all/performance_report.md
+```
+
 Run with custom output location:
 
 ```bash
