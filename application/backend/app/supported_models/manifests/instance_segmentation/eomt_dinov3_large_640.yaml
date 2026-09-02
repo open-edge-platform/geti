@@ -1,0 +1,22 @@
+id: instance-segmentation-eomt-dinov3-large-640
+name: EoMT-DINOv3-Large-640
+license: MIT
+pretrained_weights:
+  source: huggingface
+  repo_id: tue-mps/eomt-dinov3-coco-instance-large-640
+  revision: 194260c9bf409f68305422f67bdb59de573d3191
+description: "EoMT-DINOv3-Large uses a DINOv3 ViT-L encoder for efficient instance segmentation without a task-specific decoder."
+stats:
+  gigaflops: 1335.9
+  trainable_parameters: 314.978385
+  benchmark_metrics:
+    coco_map_50_95: 45.9
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.00003
+    weight_decay: 0.05
+    input_size_width: 640
+    input_size_height: 640

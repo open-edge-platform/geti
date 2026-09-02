@@ -1,0 +1,19 @@
+id: image-classification-dinov3-convnext-tiny
+name: DINOv3 ConvNeXt-Tiny
+license: DINOv3 License
+pretrained_weights:
+  source: huggingface
+  repo_id: timm/convnext_tiny.dinov3_lvd1689m
+  revision: 39c7bb32f83c11bbb13cb23058f8852a4dac88ed
+description: "DINOv3 ConvNeXt-Tiny is a compact convolutional feature model distilled on LVD-1689M with the DINOv3 method."
+stats:
+  gigaflops: 8.91
+  trainable_parameters: 28.589128
+  benchmark_metrics: {}
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.0001
+    weight_decay: 0.0001

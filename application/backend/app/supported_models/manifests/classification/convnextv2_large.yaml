@@ -1,0 +1,20 @@
+id: image-classification-convnextv2-large
+name: ConvNeXt V2-Large
+license: CC BY-NC 4.0
+pretrained_weights:
+  source: huggingface
+  repo_id: facebook/convnextv2-large-1k-224
+  revision: 3765ba745dec2bd3e2200c8f4cec29990551d406
+description: "ConvNeXt V2-Large is a large convolutional model pretrained with FCMAE and fine-tuned on ImageNet-1K."
+stats:
+  gigaflops: 68.72
+  trainable_parameters: 197.95684
+  benchmark_metrics:
+    imagenet_top1_accuracy: 85.8
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.00005
+    weight_decay: 0.05

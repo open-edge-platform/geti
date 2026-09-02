@@ -1,0 +1,20 @@
+id: image-classification-convnextv2-atto
+name: ConvNeXt V2-Atto
+license: CC BY-NC 4.0
+pretrained_weights:
+  source: huggingface
+  repo_id: facebook/convnextv2-atto-1k-224
+  revision: c7eab08296c3bca2631738322afc3d05373acc8f
+description: "ConvNeXt V2-Atto is a compact convolutional model pretrained with FCMAE and fine-tuned on ImageNet-1K."
+stats:
+  gigaflops: 1.09
+  trainable_parameters: 3.7084
+  benchmark_metrics:
+    imagenet_top1_accuracy: 76.7
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.0001
+    weight_decay: 0.05

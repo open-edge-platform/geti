@@ -1,0 +1,22 @@
+id: object-detection-rtdetrv2-r50
+name: RT-DETRv2-R50
+pretrained_weights:
+  source: huggingface
+  repo_id: PekingU/rtdetr_v2_r50vd
+  revision: 282494075698cab9faa1096ae26856890030c817
+description: "RT-DETRv2-R50 is a real-time end-to-end detector with selective multi-scale feature extraction and improved training strategies."
+stats:
+  gigaflops: 136
+  trainable_parameters: 42.891372
+  benchmark_metrics:
+    coco_map_50_95: 53.4
+    coco_map_50: 71.6
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.0001
+    weight_decay: 0.0001
+    input_size_width: 640
+    input_size_height: 640

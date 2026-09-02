@@ -1,0 +1,22 @@
+id: object-detection-rtdetrv2-r101
+name: RT-DETRv2-R101
+pretrained_weights:
+  source: huggingface
+  repo_id: PekingU/rtdetr_v2_r101vd
+  revision: 2c5dbbd2d4d8c8814827a3b42737ba1afce3cf2a
+description: "RT-DETRv2-R101 is a high-capacity real-time end-to-end detector with selective multi-scale feature extraction and improved training strategies."
+stats:
+  gigaflops: 259
+  trainable_parameters: 76.556268
+  benchmark_metrics:
+    coco_map_50_95: 54.3
+    coco_map_50: 72.8
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.0001
+    weight_decay: 0.0001
+    input_size_width: 640
+    input_size_height: 640

@@ -1,0 +1,22 @@
+id: object-detection-rtdetrv2-r34
+name: RT-DETRv2-R34
+pretrained_weights:
+  source: huggingface
+  repo_id: PekingU/rtdetr_v2_r34vd
+  revision: 5d60d8fb5eb2a3ee5575bf200ecbce4e2cfa420c
+description: "RT-DETRv2-R34 is a real-time end-to-end detector with selective multi-scale feature extraction and improved training strategies."
+stats:
+  gigaflops: 92
+  trainable_parameters: 31.424388
+  benchmark_metrics:
+    coco_map_50_95: 49.9
+    coco_map_50: 67.5
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.0001
+    weight_decay: 0.0001
+    input_size_width: 640
+    input_size_height: 640

@@ -1,0 +1,21 @@
+id: image-classification-dinov3-vits
+name: DINOv3 ViT-S/16
+license: DINOv3 License
+pretrained_weights:
+  source: huggingface
+  repo_id: timm/vit_small_patch16_dinov3.lvd1689m
+  revision: 3bf4720a82ec2066db88137180ff1f83a675cef0
+description: "DINOv3 ViT-S/16 is a compact self-supervised vision transformer distilled on LVD-1689M for transferable visual representations."
+stats:
+  gigaflops: 12.49
+  trainable_parameters: 21.971944
+  benchmark_metrics: {}
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.0001
+    weight_decay: 0.0001
+    input_size_width: 256
+    input_size_height: 256

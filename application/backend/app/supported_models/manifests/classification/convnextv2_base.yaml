@@ -1,0 +1,20 @@
+id: image-classification-convnextv2-base
+name: ConvNeXt V2-Base
+license: CC BY-NC 4.0
+pretrained_weights:
+  source: huggingface
+  repo_id: facebook/convnextv2-base-1k-224
+  revision: 90fcd1da94cc5ffabf88b0f8aee31b0893b94501
+description: "ConvNeXt V2-Base is a convolutional model pretrained with FCMAE and fine-tuned on ImageNet-1K."
+stats:
+  gigaflops: 30.71
+  trainable_parameters: 88.7178
+  benchmark_metrics:
+    imagenet_top1_accuracy: 84.9
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.00005
+    weight_decay: 0.05

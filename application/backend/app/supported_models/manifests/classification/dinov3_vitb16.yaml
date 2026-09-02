@@ -1,0 +1,21 @@
+id: image-classification-dinov3-vitb16
+name: DINOv3 ViT-B/16
+license: DINOv3 License
+pretrained_weights:
+  source: huggingface
+  repo_id: timm/vit_base_patch16_dinov3.lvd1689m
+  revision: c6a5fb7d12bbd3cf3b0079253141c3332aaed7da
+description: "DINOv3 ViT-B/16 is a self-supervised vision transformer distilled on LVD-1689M for transferable visual representations."
+stats:
+  gigaflops: 47.15
+  trainable_parameters: 86.410216
+  benchmark_metrics: {}
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.0001
+    weight_decay: 0.0001
+    input_size_width: 256
+    input_size_height: 256

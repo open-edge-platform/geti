@@ -1,0 +1,20 @@
+id: instance-segmentation-mask2former-swin-b
+name: Mask2Former-Swin-B
+license: CC BY-NC 4.0
+pretrained_weights:
+  source: huggingface
+  repo_id: facebook/mask2former-swin-base-coco-instance
+  revision: e3169bb2cdc9a0d47c3582a19a757854e3fe82e3
+description: "Mask2Former with a Swin-B backbone predicts instance masks using masked attention and multi-scale features."
+stats:
+  gigaflops: 1022.3
+  trainable_parameters: 106.906249
+  benchmark_metrics:
+    coco_map_50_95: 46.7
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.00005
+    weight_decay: 0.05

@@ -1,0 +1,19 @@
+id: image-classification-dinov3-convnext-large
+name: DINOv3 ConvNeXt-Large
+license: DINOv3 License
+pretrained_weights:
+  source: huggingface
+  repo_id: timm/convnext_large.dinov3_lvd1689m
+  revision: 0f8b496db5dea10c7533e85304400f0eddad55ac
+description: "DINOv3 ConvNeXt-Large is a large convolutional feature model distilled on LVD-1689M with the DINOv3 method."
+stats:
+  gigaflops: 68.72
+  trainable_parameters: 197.767336
+  benchmark_metrics: {}
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.0001
+    weight_decay: 0.0001
