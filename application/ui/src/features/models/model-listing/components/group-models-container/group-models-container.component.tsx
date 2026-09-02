@@ -25,7 +25,11 @@ export const GroupModelsContainer = ({ group, models }: GroupModelsContainerProp
     const { modelArchitectures } = useGetTaskModelArchitectures();
 
     return (
-        <Flex direction={'column'} UNSAFE_className={classes.groupModelsContainer}>
+        <Flex
+            direction={'column'}
+            UNSAFE_className={classes.groupModelsContainer}
+            data-testid={`model-group-${group.id}`}
+        >
             <GroupHeader data={group} modelArchitectures={modelArchitectures} />
             <ModelsTableHeader groupId={group.id} />
 

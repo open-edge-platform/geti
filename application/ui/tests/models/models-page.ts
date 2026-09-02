@@ -16,18 +16,24 @@ export class ModelsPage {
         return this.page.getByRole('button', { name: 'Group models' });
     }
 
-    getSortByPicker() {
-        return this.page.getByRole('button', { name: 'Sort models' });
-    }
-
     async selectGroupBy(option: 'dataset' | 'architecture') {
         await this.getGroupByPicker().click();
         await this.page.getByRole('option', { name: option }).click();
     }
 
-    async selectSortBy(option: 'name' | 'trained' | 'architecture' | 'size' | 'score') {
-        await this.getSortByPicker().click();
-        await this.page.getByRole('option', { name: option }).click();
+    getModelGroup(groupId: string) {
+        return this.page.getByTestId(`model-group-${groupId}`);
+    }
+
+    getColumnHeader(groupId: string, label: string) {
+        // The accessible name changes once a column becomes the one being sorted on.
+        return this.getModelGroup(groupId).getByRole('button', {
+            name: new RegExp(`^(Sort by ${label}$|${label}, sorted )`),
+        });
+    }
+
+    async sortByColumn(groupId: string, label: string) {
+        await this.getColumnHeader(groupId, label).click();
     }
 
     async selectPickerOption(label: string, optionName: string) {
@@ -128,11 +134,13 @@ export class ModelsPage {
         await this.page.getByRole('button', { name: 'Delete', exact: true }).click();
     }
 
-    async getModelNamesInOrder() {
-        const rows = this.getModelRows();
-        const names = await rows.locator('[class*="modelName"]').allTextContents();
+    async getModelNamesInOrder(groupId?: string) {
+        const rows =
+            groupId === undefined
+                ? this.getModelRows()
+                : this.getModelGroup(groupId).locator('[data-testid^="model-disclosure-"]');
 
-        return names;
+        return rows.locator('[class*="modelName"]').allTextContents();
     }
 
     async openDatasetMenu() {
