@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 
 import type { DatasetRevision, Model } from '@/api/types';
 
-import { GroupByMode, GroupedModels, SortBy, SortDirection } from '../types';
+import type { GroupByMode, GroupedModels, SortDescriptor } from '../types';
 import {
     filterBySearch,
     filterOutFailedModels,
@@ -18,11 +18,11 @@ import { sortGroupedModelsByDatasetRevisionDate } from '../utils/sorting';
 
 type UseGroupedModelsOptions = {
     groupBy: GroupByMode;
-    sortBy: SortBy;
+    // Each group sorts independently; groups without an entry use the default sort.
+    sortBy: Record<string, SortDescriptor>;
     searchBy: string;
     datasetRevisions: DatasetRevision[];
     showFailedModels: boolean;
-    sortDirection?: SortDirection;
 };
 
 // Responsible for:
@@ -30,7 +30,7 @@ type UseGroupedModelsOptions = {
 // - Grouping models based on the selected grouping mode
 // - Sorting models within each group based on the selected sorting criteria
 export const useGroupedModels = (models: Model[] | undefined, options: UseGroupedModelsOptions): GroupedModels[] => {
-    const { groupBy, sortBy, searchBy, datasetRevisions, showFailedModels, sortDirection } = options;
+    const { groupBy, sortBy, searchBy, datasetRevisions, showFailedModels } = options;
 
     return useMemo(() => {
         if (!models) return [];
@@ -41,12 +41,12 @@ export const useGroupedModels = (models: Model[] | undefined, options: UseGroupe
             : filterOutFailedModels(filteredByTraining);
         const filteredBySearch = filterBySearch(filteredByFailedModels, searchBy);
         const grouped = groupModels(filteredBySearch, groupBy, datasetRevisions);
-        const sortedModelsInsideGroup = sortGroupedModels(grouped, sortBy, datasetRevisions, sortDirection);
+        const sortedModelsInsideGroup = sortGroupedModels(grouped, sortBy, datasetRevisions);
         const sortedGroupsByDatasetRevisionDate = sortGroupedModelsByDatasetRevisionDate(
             sortedModelsInsideGroup,
             datasetRevisions
         );
 
         return removeEmpty(sortedGroupsByDatasetRevisionDate);
-    }, [models, groupBy, sortBy, sortDirection, searchBy, datasetRevisions, showFailedModels]);
+    }, [models, groupBy, sortBy, searchBy, datasetRevisions, showFailedModels]);
 };

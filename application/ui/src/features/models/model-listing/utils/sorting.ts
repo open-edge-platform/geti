@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import { orderBy } from 'lodash-es';
 
 import { getTestingMetric } from '../components/model-row/utils';
-import type { GroupedModels, SortBy, SortDirection } from '../types';
+import type { GroupedModels, SortBy, SortDescriptor, SortDirection } from '../types';
 
 export const DEFAULT_SORT_DIRECTIONS: Record<SortBy, SortDirection> = {
     name: 'asc',
@@ -17,6 +17,8 @@ export const DEFAULT_SORT_DIRECTIONS: Record<SortBy, SortDirection> = {
     size: 'asc',
     score: 'desc',
 };
+
+export const DEFAULT_SORT: SortDescriptor = { key: 'score', direction: 'desc' };
 
 export const sortModels = (
     models: Model[],
@@ -29,20 +31,23 @@ export const sortModels = (
             return orderBy(models, (model) => model.name.toLowerCase(), direction);
         case 'architecture':
             return orderBy(models, (model) => model.architecture?.toLowerCase() ?? '', direction);
-        case 'trained':
+        case 'trained': {
+            const endTimes = new Map(models.map((model) => [model, dayjs(model.training_info?.end_time)]));
+
             return orderBy(
                 models,
                 [
                     // Models without a valid training date come last in both directions.
-                    (model) => (dayjs(model.training_info?.end_time).isValid() ? 0 : 1),
+                    (model) => (endTimes.get(model)?.isValid() ? 0 : 1),
                     (model) => {
-                        const date = dayjs(model.training_info?.end_time);
+                        const date = endTimes.get(model);
 
-                        return date.isValid() ? date.valueOf() : 0;
+                        return date?.isValid() ? date.valueOf() : 0;
                     },
                 ],
                 ['asc', direction]
             );
+        }
         case 'device':
             return orderBy(
                 models,
@@ -55,39 +60,41 @@ export const sortModels = (
             );
         case 'size':
             return orderBy(models, (model) => model.size ?? 0, direction);
-        case 'score':
+        case 'score': {
+            const metrics = new Map(models.map((model) => [model, getTestingMetric(model)]));
+
             return orderBy(
                 models,
                 [
                     // Models without a score come last.
-                    (model) => (getTestingMetric(model) !== undefined ? 0 : 1),
-                    (model) => getTestingMetric(model)?.value ?? 0,
+                    (model) => (metrics.get(model) !== undefined ? 0 : 1),
+                    (model) => metrics.get(model)?.value ?? 0,
                 ],
                 ['asc', direction]
             );
+        }
         case 'dataset': {
             const datasetRevisionsMap = new Map(
                 datasetRevisions.map((datasetRevision) => [datasetRevision.id, datasetRevision])
             );
 
-            const getDatasetRevision = (model: Model) => {
-                const id = model.training_info?.dataset_revision_id;
-                return id != null ? datasetRevisionsMap.get(id) : undefined;
-            };
+            const revisions = new Map(
+                models.map((model) => {
+                    const id = model.training_info?.dataset_revision_id;
+
+                    return [model, id != null ? datasetRevisionsMap.get(id) : undefined];
+                })
+            );
 
             return orderBy(
                 models,
                 [
                     // First: models without a resolvable dataset revision come last.
-                    (model) => (getDatasetRevision(model) != null ? 0 : 1),
+                    (model) => (revisions.get(model) != null ? 0 : 1),
                     // Second: sort by dataset revision creation date.
-                    (model) => {
-                        const createdAt = getDatasetRevision(model)?.created_at;
-
-                        return createdAt ?? '';
-                    },
+                    (model) => revisions.get(model)?.created_at ?? '',
                     // Third: sort by dataset revision name.
-                    (model) => getDatasetRevision(model)?.name?.toLowerCase() ?? '',
+                    (model) => revisions.get(model)?.name?.toLowerCase() ?? '',
                 ],
                 ['asc', direction, direction]
             );

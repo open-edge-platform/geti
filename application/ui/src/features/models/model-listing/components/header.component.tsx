@@ -43,7 +43,7 @@ export const Header = () => {
         useModelListing();
 
     return (
-        <Grid columns={['auto auto 1fr auto']} gap={'size-100'} alignItems={'center'}>
+        <Grid columns={['auto auto 1fr']} gap={'size-100'} alignItems={'center'}>
             <Picker
                 placeholder={'Group by'}
                 width={'size-2400'}
