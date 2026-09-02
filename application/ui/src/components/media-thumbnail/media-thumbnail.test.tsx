@@ -1,24 +1,36 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { useState } from 'react';
+
+import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from 'test-utils/render';
 
 import { useIsScrolling } from '../../hooks/use-is-scrolling.hook';
 import { MediaThumbnail } from './media-thumbnail.component';
 
+import classes from './media-thumbnail.module.scss';
+
 vi.mock('../../hooks/use-is-scrolling.hook', () => ({
-    useIsScrolling: vi.fn(() => false),
+    useIsScrolling: vi.fn(),
 }));
 
+const getImage = () => screen.getByRole('img', { name: 'Test Image' });
+const getSkeleton = (container: HTMLElement) => container.querySelector(`.${classes.skeleton}`);
+
 describe('MediaThumbnail', () => {
+    beforeEach(() => {
+        vi.mocked(useIsScrolling).mockReturnValue(false);
+    });
+
     it('calls onClick when image is clicked', async () => {
         const mockedClick = vi.fn();
         render(<MediaThumbnail url='test-image.jpg' alt='Test Image' onClick={mockedClick} item={{ type: 'image' }} />);
 
-        await userEvent.click(screen.getByRole('img', { name: 'Test Image' }));
-        await waitFor(() => expect(mockedClick).toHaveBeenCalled());
+        await userEvent.click(getImage());
+
+        expect(mockedClick).toHaveBeenCalled();
     });
 
     it('calls onDoubleClick when image is double-clicked', async () => {
@@ -32,17 +44,16 @@ describe('MediaThumbnail', () => {
             />
         );
 
-        await userEvent.dblClick(screen.getByRole('img', { name: 'Test Image' }));
-        await waitFor(() => expect(mockedDblClick).toHaveBeenCalled());
+        await userEvent.dblClick(getImage());
+
+        expect(mockedDblClick).toHaveBeenCalled();
     });
 
-    it('displays frames count when item is a video', async () => {
-        const mockedClick = vi.fn();
+    it('displays frames count when item is a video', () => {
         render(
             <MediaThumbnail
                 url='test-video.mp4'
                 alt='Test Image'
-                onClick={mockedClick}
                 item={{ type: 'video', frame_count: 3600, annotated_frame_count: 10, duration: 60 }}
             />
         );
@@ -55,26 +66,55 @@ describe('MediaThumbnail', () => {
 
         render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
 
-        expect(screen.getByRole('img', { name: 'Test Image' })).not.toHaveAttribute('src');
+        expect(getImage()).not.toHaveAttribute('src');
     });
 
     it('sets the image src when not scrolling', () => {
-        vi.mocked(useIsScrolling).mockReturnValue(false);
-
         render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
 
-        expect(screen.getByRole('img', { name: 'Test Image' })).toHaveAttribute('src', 'test-image.jpg');
+        expect(getImage()).toHaveAttribute('src', 'test-image.jpg');
     });
 
-    it('keeps the skeleton and hides the image when the thumbnail fails to load', () => {
-        vi.mocked(useIsScrolling).mockReturnValue(false);
+    it('shows the skeleton again when the url changes', async () => {
+        const Thumbnail = () => {
+            const [url, setUrl] = useState('test-image.jpg');
 
-        render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
+            return (
+                <>
+                    <button onClick={() => setUrl('other-image.jpg')}>Next</button>
+                    <MediaThumbnail url={url} alt='Test Image' item={{ type: 'image' }} />
+                </>
+            );
+        };
 
-        fireEvent.error(screen.getByRole('img', { name: 'Test Image' }));
+        const { container } = render(<Thumbnail />);
+        fireEvent.load(getImage());
 
-        // CSS modules are not applied in jsdom, so assert on the class that hides the image.
-        expect(screen.getByRole('img', { name: 'Test Image' }).className).toContain('imgHidden');
-        expect(screen.getByRole('img', { name: 'Loading…' })).toBeVisible();
+        await userEvent.click(screen.getByRole('button'));
+
+        // CSS modules keep the local name, so assert on the class that hides the image.
+        expect(getImage().className).toContain('imgHidden');
+        expect(getSkeleton(container)).toBeInTheDocument();
+    });
+
+    it('stops the skeleton but keeps the image hidden when the thumbnail fails to load', () => {
+        const { container } = render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
+
+        // jsdom never loads the image, so mark it as settled the way a broken image is.
+        Object.defineProperty(getImage(), 'complete', { value: true });
+        fireEvent.error(getImage());
+
+        expect(getImage().className).toContain('imgHidden');
+        expect(getSkeleton(container)).not.toBeInTheDocument();
+    });
+
+    it('ignores the error fired while the image is still loading', () => {
+        const { container } = render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
+
+        expect(getImage()).toHaveProperty('complete', false);
+
+        fireEvent.error(getImage());
+
+        expect(getSkeleton(container)).toBeInTheDocument();
     });
 });
