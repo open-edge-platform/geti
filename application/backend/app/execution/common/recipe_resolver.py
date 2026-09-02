@@ -78,6 +78,56 @@ class RecipeResolver:
             "status": ModelStatus.ACTIVE,
             "default": False,
         },
+        "image-classification-dinov3-vits": {
+            "recipe_path": "classification/multi_class_cls/dinov3_vits.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "image-classification-dinov3-vitb16": {
+            "recipe_path": "classification/multi_class_cls/dinov3_vitb16.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "image-classification-dinov3-vitl16": {
+            "recipe_path": "classification/multi_class_cls/dinov3_vitl16.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "image-classification-dinov3-convnext-tiny": {
+            "recipe_path": "classification/multi_class_cls/dinov3_convnext_tiny.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "image-classification-dinov3-convnext-small": {
+            "recipe_path": "classification/multi_class_cls/dinov3_convnext_small.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "image-classification-dinov3-convnext-base": {
+            "recipe_path": "classification/multi_class_cls/dinov3_convnext_base.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "image-classification-dinov3-convnext-large": {
+            "recipe_path": "classification/multi_class_cls/dinov3_convnext_large.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "image-classification-convnextv2-atto": {
+            "recipe_path": "classification/multi_class_cls/convnextv2_atto.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "image-classification-convnextv2-base": {
+            "recipe_path": "classification/multi_class_cls/convnextv2_base.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "image-classification-convnextv2-large": {
+            "recipe_path": "classification/multi_class_cls/convnextv2_large.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
         # DETECTION
         "object-detection-atss-mobilenet-v2": {
             "recipe_path": "detection/atss_mobilenetv2.yaml",
@@ -111,6 +161,21 @@ class RecipeResolver:
         },
         "object-detection-rt-detr-r50": {
             "recipe_path": "detection/rtdetr_50.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "object-detection-rtdetrv2-r34": {
+            "recipe_path": "detection/rtdetrv2_r34.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "object-detection-rtdetrv2-r50": {
+            "recipe_path": "detection/rtdetrv2_r50.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "object-detection-rtdetrv2-r101": {
+            "recipe_path": "detection/rtdetrv2_r101.yaml",
             "status": ModelStatus.ACTIVE,
             "default": False,
         },
@@ -262,6 +327,31 @@ class RecipeResolver:
         # INSTANCE_SEGMENTATION
         "instance-segmentation-mask-rcnn-swin-t": {
             "recipe_path": "instance_segmentation/maskrcnn_swint.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "instance-segmentation-mask2former-swin-s": {
+            "recipe_path": "instance_segmentation/mask2former_swin_s.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "instance-segmentation-mask2former-swin-b": {
+            "recipe_path": "instance_segmentation/mask2former_swin_b.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "instance-segmentation-mask2former-swin-l": {
+            "recipe_path": "instance_segmentation/mask2former_swin_l.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "instance-segmentation-eomt-large-640": {
+            "recipe_path": "instance_segmentation/eomt_large_640.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
+        "instance-segmentation-eomt-dinov3-large-640": {
+            "recipe_path": "instance_segmentation/eomt_dinov3_large_640.yaml",
             "status": ModelStatus.ACTIVE,
             "default": False,
         },

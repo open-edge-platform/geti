@@ -242,7 +242,7 @@ class ModelService(BaseSessionManagedService):
             # Compute weights_size and read the embedded confidence threshold from the filesystem
             variant_dir = self._get_variant_dir(project_id, model_id, UUID(v_db.id))
             if not v_db.files_deleted and variant_dir.exists():
-                variant.weights_size = sum(f.stat().st_size for f in variant_dir.iterdir() if f.is_file())
+                variant.weights_size = sum(f.stat().st_size for f in variant_dir.rglob("*") if f.is_file())
                 variant.optimal_confidence_threshold = _cached_optimal_confidence_threshold(variant_dir, variant.format)
             variants.append(variant)
         return variants
@@ -525,6 +525,7 @@ class ModelService(BaseSessionManagedService):
         bin_file = variant_dir / "model.bin"
         onnx_file = variant_dir / "model.onnx"
         pt_file = variant_dir / "model.pt"
+        pt_dir = variant_dir / "model"
         metadata_file = variant_dir / "metadata.yaml"
 
         if xml_file.exists() and bin_file.exists():
@@ -537,8 +538,11 @@ class ModelService(BaseSessionManagedService):
             if metadata_file.exists():
                 paths.append(metadata_file)
             return True, tuple(paths)
-        if pt_file.exists():
-            return True, (pt_file,)
+        pytorch_files = ([pt_file] if pt_file.is_file() else []) + (
+            sorted(path for path in pt_dir.rglob("*") if path.is_file()) if pt_dir.is_dir() else []
+        )
+        if pytorch_files:
+            return True, tuple(pytorch_files)
 
         return False, ()
 

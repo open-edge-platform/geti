@@ -416,14 +416,15 @@ class TransformsUpdater:
             logger.info("Tiling parameters are not provided, skipping update.")
             return
 
-        config["data"]["tile_config"]["enable_tiler"] = tiling_dict["enable"]
+        tile_config = config["data"].setdefault("tile_config", {})
+        tile_config["enable_tiler"] = tiling_dict["enable"]
         if tiling_dict["enable"]:
-            config["data"]["tile_config"]["enable_adaptive_tiling"] = tiling_dict["enable_adaptive_tiling"]
-            config["data"]["tile_config"]["tile_size"] = (
+            tile_config["enable_adaptive_tiling"] = tiling_dict["enable_adaptive_tiling"]
+            tile_config["tile_size"] = (
                 tiling_dict["tile_size"],
                 tiling_dict["tile_size"],
             )
-            config["data"]["tile_config"]["overlap"] = tiling_dict["tile_overlap"]
+            tile_config["overlap"] = tiling_dict["tile_overlap"]
 
 
 class HyperparametersUpdater:
@@ -684,17 +685,23 @@ class GetiConfigConverter:
             config["sub_task_type"],
         )
 
-        if GetiConfigConverter._is_ultralytics_recipe(recipe_path):
+        backend = GetiConfigConverter._get_recipe_backend(recipe_path)
+        if backend == "ultralytics":
             return GetiConfigConverter._convert_ultralytics(recipe_path, config, hyper_parameters)
+        if backend == "huggingface":
+            return GetiConfigConverter._convert_huggingface(recipe_path, config, hyper_parameters)
 
         return GetiConfigConverter._convert_lightning(recipe_path, config, hyper_parameters)
 
     @staticmethod
-    def _is_ultralytics_recipe(recipe_path: Path) -> bool:
-        """Return whether a recipe declares the Ultralytics backend."""
+    def _get_recipe_backend(recipe_path: Path) -> str:
+        """Return the backend explicitly declared by a recipe."""
         with recipe_path.open() as f:
             recipe = yaml.safe_load(f)
-        return isinstance(recipe, dict) and recipe.get("backend") == "ultralytics"
+        if not isinstance(recipe, dict):
+            msg = f"Recipe must be a YAML mapping: {recipe_path}"
+            raise TypeError(msg)
+        return str(recipe.get("backend", "lightning"))
 
     @staticmethod
     def _convert_ultralytics(recipe_path: Path, config: dict, hyper_parameters: dict) -> dict:
@@ -707,6 +714,80 @@ class GetiConfigConverter:
         if hyper_parameters:
             GetiConfigConverter._update_data_transforms(config_dict, hyper_parameters)
         GetiConfigConverter._apply_intensity_mapping_from_task_params(config_dict, config)
+        return config_dict
+
+    @staticmethod
+    def _convert_huggingface(  # noqa: C901, PLR0912
+        recipe_path: Path, config: dict, hyper_parameters: dict
+    ) -> dict:
+        """Build the plain in-memory configuration consumed by the HF engine."""
+        from getitune.backend.huggingface.tools.utils import load_recipe
+
+        config_dict = load_recipe(recipe_path)
+        training = config_dict.setdefault("training", {})
+        training_parameters = hyper_parameters.get("training", {})
+
+        direct_mappings = {
+            "batch_size": "batch",
+            "max_epochs": "max_epochs",
+            "learning_rate": "learning_rate",
+            "weight_decay": "weight_decay",
+        }
+        for source_key, target_key in direct_mappings.items():
+            if (value := training_parameters.get(source_key)) is not None:
+                training[target_key] = value
+
+        early_stopping = training_parameters.get("early_stopping")
+        if early_stopping is not None:
+            if early_stopping.get("enable", False):
+                if (patience := early_stopping.get("patience")) is not None:
+                    training["patience"] = patience
+            else:
+                training.pop("patience", None)
+
+        scheduler = training_parameters.get("scheduler")
+        if scheduler is not None:
+            scheduler_types = {
+                "cosine_annealing": "cosine",
+                "reduce_lr_on_plateau": "reduce_lr_on_plateau",
+            }
+            if (scheduler_type := scheduler.get("type")) is not None:
+                training["lr_scheduler_type"] = scheduler_types.get(scheduler_type, scheduler_type)
+            warmup = scheduler.get("warmup")
+            if warmup is not None:
+                warmup_epochs = warmup.get("epochs", 0) if warmup.get("enable", False) else 0
+                max_epochs = training.get("max_epochs", 1)
+                training["warmup_ratio"] = warmup_epochs / max_epochs if max_epochs else 0.0
+
+        gradient_clip = training_parameters.get("gradient_clip")
+        if gradient_clip is not None:
+            training["max_grad_norm"] = (
+                gradient_clip.get("max_grad_norm", 0.0) if gradient_clip.get("enable", False) else 0.0
+            )
+
+        gradient_accumulation = training_parameters.get("gradient_accumulation")
+        if gradient_accumulation is not None:
+            training["gradient_accumulation_steps"] = (
+                gradient_accumulation.get("batches", 1) if gradient_accumulation.get("enable", False) else 1
+            )
+
+        input_size = (
+            training_parameters.get("input_size_height"),
+            training_parameters.get("input_size_width"),
+        )
+        if all(value is not None for value in input_size):
+            config_dict["data"]["input_size"] = input_size
+            config_dict["model"]["init_args"]["data_input_params"] = {"input_size": input_size}
+
+        if (batch := training.get("batch")) is not None:
+            for subset_name in ("train_subset", "val_subset"):
+                config_dict["data"][subset_name]["batch_size"] = batch
+
+        GetiConfigConverter._update_data_transforms(config_dict, hyper_parameters)
+        GetiConfigConverter._apply_intensity_mapping_from_task_params(config_dict, config)
+
+        config_dict["max_epochs"] = training["max_epochs"]
+        config_dict["precision"] = training.get("precision", "bf16-mixed")
         return config_dict
 
     @staticmethod

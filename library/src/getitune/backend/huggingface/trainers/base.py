@@ -89,6 +89,14 @@ class GetiTuneHFTrainer(Trainer):
         data_keys = ["input", *DATA_KEYS_BY_TASK.get(self.model_wrapper.task, ())]
         return GPUAugmentationPipeline.from_config(subset_config, data_keys=data_keys, sanitize_annotations=sanitize)
 
+    def save_model(self, output_dir: str | None = None, _internal_call: bool = False) -> None:
+        """Save through the wrapped HF model so custom wrappers persist their configuration."""
+        target = output_dir or self.args.output_dir
+        if target is None:
+            msg = "TrainingArguments.output_dir is not set; cannot save the model."
+            raise RuntimeError(msg)
+        self.model_wrapper.save_pretrained(target)
+
     def get_train_dataloader(self) -> DataLoader:
         """Return the DataModule's training dataloader."""
         return self.datamodule.train_dataloader()

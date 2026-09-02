@@ -344,6 +344,36 @@ class TestModelEndpoints:
             project_id=fxt_get_project.id, model_id=model_id, model_variant_id=model_variant_id
         )
 
+    def test_download_directory_backed_model_preserves_paths(
+        self, fxt_get_project, fxt_model, fxt_model_service, fxt_client, tmp_path
+    ) -> None:
+        import zipfile
+        from io import BytesIO
+
+        model_variant_id = uuid4()
+        variant_dir = tmp_path / "variants" / str(model_variant_id)
+        checkpoint_dir = variant_dir / "model"
+        (checkpoint_dir / "weights").mkdir(parents=True)
+        config_path = checkpoint_dir / "config.json"
+        weights_path = checkpoint_dir / "weights" / "model.safetensors"
+        config_path.write_text("{}")
+        weights_path.write_bytes(b"weights")
+        fxt_model_service.get_model_binary_files.return_value = True, (config_path, weights_path)
+        fxt_model_service.get_variant.return_value = ModelVariant(
+            id=model_variant_id,
+            model_revision_id=fxt_model.id,
+            format=ModelFormat.PYTORCH,
+            precision=ModelPrecision.FP32,
+        )
+
+        response = fxt_client.get(
+            f"/api/projects/{fxt_get_project.id}/models/{fxt_model.id}/variants/{model_variant_id}/binary"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        with zipfile.ZipFile(BytesIO(response.content)) as zip_file:
+            assert zip_file.namelist() == ["model/config.json", "model/weights/model.safetensors"]
+
     def test_download_model_binary_invalid_id(self, fxt_get_project, fxt_model_service, fxt_client):
         model_id = uuid4()
         response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/models/{model_id}/variants/invalid-id/binary")

@@ -290,6 +290,37 @@ class TestModelServiceIntegration:
             assert variant.weights_size == 0  # Files are empty, so size is 0
             assert variant.optimal_confidence_threshold is None  # Files are empty, so nothing can be read
 
+    def test_get_model_variants_includes_nested_checkpoint_size(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ) -> None:
+        variant_id = uuid4()
+        db_session.add(
+            ModelVariantDB(id=str(variant_id), model_revision_id=str(fxt_model_id), format="pytorch", precision="fp32")
+        )
+        db_session.flush()
+        checkpoint_dir = (
+            tmp_path
+            / "projects"
+            / str(fxt_project_id)
+            / "models"
+            / str(fxt_model_id)
+            / "variants"
+            / str(variant_id)
+            / "model"
+        )
+        checkpoint_dir.mkdir(parents=True)
+        (checkpoint_dir / "config.json").write_bytes(b"123")
+        (checkpoint_dir / "model.safetensors").write_bytes(b"12345")
+
+        variants = fxt_model_service.get_model_variants(fxt_project_id, fxt_model_id)
+
+        assert variants[0].weights_size == 8
+
     def test_get_model_variants_optimal_confidence_threshold(
         self,
         tmp_path: Path,
@@ -581,6 +612,36 @@ class TestModelServiceIntegration:
         assert files_exist is True
         expected_paths = tuple(variant_dir / file for file in expected_files)
         assert paths == expected_paths
+
+    def test_get_directory_backed_pytorch_binary_files(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ) -> None:
+        variant_id = uuid4()
+        db_session.add(
+            ModelVariantDB(id=str(variant_id), model_revision_id=str(fxt_model_id), format="pytorch", precision="fp32")
+        )
+        db_session.flush()
+        variant_dir = (
+            tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id) / "variants" / str(variant_id)
+        )
+        checkpoint_dir = variant_dir / "model"
+        (checkpoint_dir / "weights").mkdir(parents=True)
+        config_path = checkpoint_dir / "config.json"
+        weights_path = checkpoint_dir / "weights" / "model.safetensors"
+        config_path.touch()
+        weights_path.touch()
+
+        files_exist, paths = fxt_model_service.get_model_binary_files(
+            project_id=fxt_project_id, model_id=fxt_model_id, model_variant_id=variant_id
+        )
+
+        assert files_exist is True
+        assert paths == (config_path, weights_path)
 
     def test_create_revision(
         self, fxt_project_id: UUID, fxt_model_id: UUID, fxt_model_service: ModelService, db_session: Session

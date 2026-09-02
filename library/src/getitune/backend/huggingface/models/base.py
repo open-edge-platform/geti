@@ -22,6 +22,7 @@ from transformers.utils import ModelOutput
 
 from getitune.backend.huggingface.exporter.hf_exporter import HFModelExporter
 from getitune.backend.lightning.models.base import DataInputParams
+from getitune.types import PathLike
 from getitune.types.export import ExportFormat, TaskLevelExportParameters
 from getitune.types.label import LabelInfo
 from getitune.types.precision import Precision
@@ -33,7 +34,6 @@ if TYPE_CHECKING:
     from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.config.data import IntensityConfig
     from getitune.data.entity.sample import PredictionBatch, SampleBatch
-    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
     from getitune.types.task import TaskType
 
@@ -71,8 +71,10 @@ class HFModel(ABC, nn.Module):
         label_info: LabelInfoTypes,
         *,
         data_input_params: DataInputParams | dict[str, Any] | None = None,
+        input_size: tuple[int, int] | None = None,
         resize_mode: Literal["crop", "standard", "fit_to_window", "fit_to_window_letterbox"] = "standard",
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
         extra_overrides: dict[str, Any] | None = None,
         onnx_dynamo: bool | None = None,
     ) -> None:
@@ -92,10 +94,15 @@ class HFModel(ABC, nn.Module):
                 partial dict is merged with this checkpoint's entry in
                 ``_default_preprocessing_params``; ``None`` uses that entry
                 as-is. Matches ``LightningModel``'s ``data_input_params``.
+            input_size: Recipe shorthand for overriding only the input size.
             resize_mode: Resize mode used by the data pipeline and recorded in
                 exported model metadata.
             pretrained: Load Hub/local weights if ``True``, otherwise build an
                 untrained model from the resolved config.
+            pretrained_weights: Optional local ``save_pretrained()`` snapshot
+                used instead of *checkpoint* when loading pretrained weights.
+                Ignored when *pretrained* is ``False``. The original
+                *checkpoint* remains the model and preprocessing identity.
             extra_overrides: Extra keyword arguments forwarded to
                 ``from_pretrained`` / ``from_config``, e.g. ``problem_type`` or
                 ``semantic_loss_ignore_index``.
@@ -107,9 +114,18 @@ class HFModel(ABC, nn.Module):
         super().__init__()
         self.checkpoint = checkpoint if isinstance(checkpoint, str) else type(checkpoint).__name__
         self.pretrained = pretrained
+        self.pretrained_weights = Path(pretrained_weights) if pretrained_weights is not None else None
         self.extra_overrides = dict(extra_overrides or {})
         self._onnx_dynamo = onnx_dynamo
         self._label_info = self._dispatch_label_info(label_info)
+        if input_size is not None:
+            params = (
+                data_input_params.as_dict()
+                if isinstance(data_input_params, DataInputParams)
+                else dict(data_input_params or {})
+            )
+            params["input_size"] = input_size
+            data_input_params = params
         self._data_input_params = self._configure_preprocessing_params(data_input_params)
         self._resize_mode = resize_mode
         self._intensity_config: IntensityConfig | None = None
@@ -123,8 +139,9 @@ class HFModel(ABC, nn.Module):
                 setattr(checkpoint, key, value)
             self.hf_model = self.hf_auto_class.from_config(checkpoint)
         elif pretrained:
+            pretrained_source = str(self.pretrained_weights) if self.pretrained_weights is not None else checkpoint
             self.hf_model = self.hf_auto_class.from_pretrained(
-                checkpoint,
+                pretrained_source,
                 id2label=id2label,
                 label2id=label2id,
                 ignore_mismatched_sizes=True,
@@ -300,6 +317,16 @@ class HFModel(ABC, nn.Module):
         """
         self._best_checkpoint = Path(checkpoint)
 
+    def save_pretrained(self, checkpoint: PathLike) -> None:
+        """Save model weights, configuration, and processor for offline reload."""
+        path = Path(checkpoint)
+        self.hf_model.save_pretrained(path)
+        processor = self.__dict__.get("_image_processor")
+        if processor is not None:
+            processor.save_pretrained(path)
+        elif self.pretrained_weights is not None:
+            self._image_processor.save_pretrained(path)
+
     @property
     def label_info(self) -> LabelInfo:
         """Label metadata backing ``id2label`` and ``label2id``."""
@@ -347,7 +374,7 @@ class HFModel(ABC, nn.Module):
     def _image_processor(self) -> BaseImageProcessor:
         """Load the checkpoint's image processor for post-processing."""
         return transformers.AutoImageProcessor.from_pretrained(
-            self.checkpoint,
+            str(self.pretrained_weights) if self.pretrained_weights is not None else self.checkpoint,
             do_resize=False,
             do_rescale=False,
             do_normalize=False,

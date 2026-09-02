@@ -204,6 +204,49 @@ class TestGetiTuneTrainerPrepareWeights:
         # Assert
         assert weights_path == expected_weights_path
 
+    def test_prepare_weights_with_directory_backed_parent_model(
+        self,
+        tmp_path: Path,
+        fxt_getitune_trainer: Callable[[], GetiTuneTrainer],
+    ) -> None:
+        project_id = uuid4()
+        parent_model_revision_id = uuid4()
+        parent_model_variant_id = uuid4()
+        training_params = TrainingJobParams(
+            device=DeviceInfo(type=DeviceType.CPU, name="CPU", memory=0),
+            project_id=project_id,
+            model_architecture_id="classification-hf-model",
+            model_architecture_name="HF Model",
+            task=Task(task_type=TaskType.CLASSIFICATION),
+            parent_model_revision_id=parent_model_revision_id,
+            job_id=uuid4(),
+        )
+        expected_weights_path = (
+            tmp_path
+            / "projects"
+            / str(project_id)
+            / "models"
+            / str(parent_model_revision_id)
+            / "variants"
+            / str(parent_model_variant_id)
+            / "model"
+        )
+        expected_weights_path.mkdir(parents=True)
+        (expected_weights_path / "config.json").touch()
+        getitune_trainer = fxt_getitune_trainer()
+        getitune_trainer._model_service.get_model_variants.return_value = [  # pyrefly: ignore[missing-attribute]
+            ModelVariant(
+                id=parent_model_variant_id,
+                model_revision_id=parent_model_revision_id,
+                format=ModelFormat.PYTORCH,
+                precision=ModelPrecision.FP32,
+            )
+        ]
+
+        weights_path = getitune_trainer.prepare_weights(training_params)
+
+        assert weights_path == expected_weights_path
+
     def test_prepare_weights_with_parent_model_no_variants(
         self,
         tmp_path: Path,
@@ -924,6 +967,92 @@ class TestGetiTuneTrainerTrainModel:
         assert trained_model_path == expected_checkpoint_path
         assert returned_engine == mock_engine
 
+    @pytest.mark.parametrize("has_model_revision", [False, True], ids=["fresh", "resume"])
+    def test_train_huggingface_model_uses_backend_specific_execution(
+        self,
+        fxt_getitune_trainer: Callable[[], GetiTuneTrainer],
+        tmp_path: Path,
+        has_model_revision: bool,
+    ) -> None:
+        getitune_trainer = fxt_getitune_trainer()
+        model_id = uuid4()
+        architecture_checkpoint = "facebook/convnextv2-atto-1k-224"
+        weights_path = tmp_path / ("parent_checkpoint" if has_model_revision else "pretrained_snapshot")
+        weights_path.mkdir()
+        expected_checkpoint_path = tmp_path / "best_checkpoint"
+        expected_checkpoint_path.mkdir()
+        training_config: dict[str, Any] = {
+            "backend": "huggingface",
+            "max_epochs": 3,
+            "model": {
+                "class_path": "getitune.backend.huggingface.models.classification.HFMulticlassClsModel",
+                "init_args": {"checkpoint": architecture_checkpoint, "pretrained": True},
+            },
+            # HF must not attempt to instantiate Lightning callbacks from this section.
+            "callbacks": [{"class_path": "lightning.pytorch.callbacks.ModelCheckpoint"}],
+            "training": {"batch": 2},
+        }
+        dataset_info = Mock()
+        dataset_info.getitune_training_dataset = Mock()
+        dataset_info.getitune_validation_dataset = Mock()
+        dataset_info.getitune_testing_dataset = Mock()
+        dataset_info.getitune_training_subset_config = Mock()
+        dataset_info.getitune_validation_subset_config = Mock()
+        dataset_info.getitune_testing_subset_config = Mock()
+        dataset_info.tile_config = Mock()
+        datamodule = Mock()
+        datamodule.label_info.label_names = ["class_a", "class_b"]
+        datamodule.input_size = (224, 224)
+        datamodule.input_mean = (0.5, 0.5, 0.5)
+        datamodule.input_std = (0.5, 0.5, 0.5)
+        datamodule.input_intensity_config = None
+        model = Mock(spec=[])
+        engine = Mock(best_checkpoint=expected_checkpoint_path, work_dir=tmp_path)
+
+        with (
+            patch("getitune.data.module.DataModule.from_vision_datasets", return_value=datamodule),
+            patch("app.execution.training.getitune_trainer.ArgumentParser") as parser_cls,
+            patch("getitune.engine.create_engine", return_value=engine) as create_engine,
+        ):
+            model_parser = Mock()
+            parser_cls.return_value = model_parser
+            model_parser.instantiate_classes.return_value.get.return_value = model
+
+            trained_model_path, returned_engine = getitune_trainer.train_model(
+                training_config=training_config,
+                dataset_info=dataset_info,
+                weights_path=weights_path,
+                model_id=model_id,
+                device=DeviceInfo(type=DeviceType.XPU, name="Intel Arc", index=0, memory=123),
+                has_model_revision=has_model_revision,
+            )
+
+        from getitune.backend.huggingface.models.base import HFModel
+
+        parser_cls.assert_called_once_with()
+        model_parser.add_argument.assert_called_once_with("--model", type=HFModel)
+        assert training_config["model"]["init_args"]["checkpoint"] == architecture_checkpoint
+        engine_kwargs = create_engine.call_args.kwargs
+        if has_model_revision:
+            assert "checkpoint" not in engine_kwargs
+            assert training_config["model"]["init_args"]["pretrained"] is True
+            assert training_config["model"]["init_args"]["pretrained_weights"] == weights_path
+        else:
+            assert "checkpoint" not in engine_kwargs
+            assert training_config["model"]["init_args"]["pretrained"] is True
+            assert training_config["model"]["init_args"]["pretrained_weights"] == weights_path
+
+        train_kwargs = engine.train.call_args.kwargs
+        assert "devices" not in train_kwargs
+        assert train_kwargs["batch"] == 2
+        assert len(train_kwargs["callbacks"]) == 1
+        progress_callback = train_kwargs["callbacks"][0]
+        assert progress_callback._on_progress_update == getitune_trainer.update_progress
+        assert progress_callback._min_p == 10
+        assert progress_callback._max_p == 80
+        assert trained_model_path == expected_checkpoint_path
+        assert returned_engine == engine
+
 
 class TestGetiTuneTrainerExecuteCancellation:
     """Tests for the GetiTuneTrainer.execute method handling CancelledExc."""
@@ -1419,6 +1548,45 @@ class TestGetiTuneTrainerStoreModelArtifacts:
         # The getitune work directory is no longer cleaned up here; it is removed
         # by ``TrainingJob.on_complete`` after the job finishes.
         assert getitune_work_dir.exists()
+
+    def test_store_directory_backed_pytorch_checkpoint(
+        self,
+        fxt_getitune_trainer: Callable[[], GetiTuneTrainer],
+        tmp_path: Path,
+    ) -> None:
+        getitune_trainer = fxt_getitune_trainer()
+        model_dir = tmp_path / "stored-model"
+        checkpoint_dir = tmp_path / "checkpoint"
+        (checkpoint_dir / "weights").mkdir(parents=True)
+        (checkpoint_dir / "config.json").write_text("{}")
+        (checkpoint_dir / "weights" / "model.safetensors").write_bytes(b"weights")
+        exported_dir = tmp_path / "exported"
+        exported_dir.mkdir()
+        exported_path = exported_dir / "model"
+        exported_path.with_suffix(".xml").touch()
+        exported_path.with_suffix(".bin").touch()
+        exported_path.with_suffix(".onnx").touch()
+        pytorch_variant_id = uuid4()
+
+        getitune_trainer.store_model_artifacts(
+            model_dir=model_dir,
+            getitune_work_dir=tmp_path / "work",
+            trained_model_path=checkpoint_dir,
+            exported_model_paths=ExportedModels(
+                openvino_model_path=exported_path,
+                onnx_model_path=exported_path,
+            ),
+            created_variants={
+                ModelFormat.PYTORCH: pytorch_variant_id,
+                ModelFormat.OPENVINO: uuid4(),
+                ModelFormat.ONNX: uuid4(),
+            },
+        )
+
+        stored_checkpoint = model_dir / "variants" / str(pytorch_variant_id) / "model"
+        assert (stored_checkpoint / "config.json").read_text() == "{}"
+        assert (stored_checkpoint / "weights" / "model.safetensors").read_bytes() == b"weights"
+        assert not (stored_checkpoint.parent / "model.pt").exists()
 
 
 # ---------------------------------------------------------------------------

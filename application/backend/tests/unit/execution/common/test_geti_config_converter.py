@@ -6,12 +6,14 @@
 from __future__ import annotations
 
 import copy
+from pathlib import Path
 from typing import Any
 from unittest.mock import patch
 
 import pytest
 
 from app.execution.common.geti_config_converter import GetiConfigConverter, HyperparametersUpdater, TransformsUpdater
+from app.execution.common.recipe_resolver import RecipeResolver
 
 EARLY_STOPPING_CLASS_PATH = "getitune.backend.lightning.callbacks.adaptive_early_stopping.EarlyStoppingWithWarmup"
 
@@ -181,6 +183,115 @@ class TestGetiConfigConverterConvert:
             result = GetiConfigConverter.convert(geti_cfg)
 
         assert result["model"]["init_args"]["optimizer"]["init_args"]["lr"] == 0.01
+
+    def test_convert_huggingface_recipe_to_plain_execution_config(self) -> None:
+        """HF conversion resolves recipe data and maps Geti parameters without Lightning objects."""
+        from getitune.utils import get_getitune_root_path
+
+        recipe_path = get_getitune_root_path() / "recipe" / "detection" / "rtdetrv2_r18.yaml"
+        geti_cfg = _make_geti_config(
+            hyper_parameters={
+                "dataset_preparation": {
+                    "augmentation": {"random_horizontal_flip": {"enable": True, "probability": 0.8}}
+                },
+                "training": {
+                    "batch_size": 3,
+                    "max_epochs": 20,
+                    "learning_rate": 0.002,
+                    "weight_decay": 0.03,
+                    "early_stopping": {"enable": True, "patience": 4},
+                    "scheduler": {
+                        "type": "cosine_annealing",
+                        "warmup": {"enable": True, "epochs": 2},
+                    },
+                    "gradient_clip": {"enable": True, "max_grad_norm": 0.5},
+                    "gradient_accumulation": {"enable": True, "batches": 5},
+                    "input_size_height": 512,
+                    "input_size_width": 640,
+                },
+            },
+            task_level_parameters={
+                "dataset_preparation": {"intensity_mapping": {"mode": "scale_to_unit", "max_intensity_value": 65535.0}}
+            },
+        )
+        source_config = copy.deepcopy(geti_cfg)
+
+        with patch.object(RecipeResolver, "resolve", return_value=Path(recipe_path)):
+            result = GetiConfigConverter.convert(geti_cfg)
+
+        assert result["backend"] == "huggingface"
+        assert result["model"]["class_path"] == "getitune.backend.huggingface.models.detection.HFDetectionModel"
+        assert result["model"]["init_args"]["data_input_params"]["input_size"] == (512, 640)
+        assert result["data"]["input_size"] == (512, 640)
+        assert result["data"]["train_subset"]["batch_size"] == 3
+        assert result["data"]["val_subset"]["batch_size"] == 3
+        assert result["data"]["train_subset"]["intensity"]["max_value"] == 65535.0
+        assert result["data"]["train_subset"]["augmentations_gpu"][0]["init_args"]["p"] == 0.8
+        assert result["training"] == {
+            "max_epochs": 20,
+            "batch": 3,
+            "learning_rate": 0.002,
+            "precision": "bf16-mixed",
+            "patience": 4,
+            "optim": "adamw_torch",
+            "weight_decay": 0.03,
+            "lr_scheduler_type": "cosine",
+            "warmup_ratio": 0.1,
+            "max_grad_norm": 0.5,
+            "gradient_accumulation_steps": 5,
+        }
+        assert result["max_epochs"] == 20
+        assert result["precision"] == "bf16-mixed"
+        assert "callbacks" not in result
+        assert "optimizer" not in result["model"]["init_args"]
+        assert geti_cfg == source_config
+
+    def test_convert_huggingface_disables_optional_training_features(self) -> None:
+        from getitune.utils import get_getitune_root_path
+
+        recipe_path = get_getitune_root_path() / "recipe" / "detection" / "rtdetrv2_r18.yaml"
+        geti_cfg = _make_geti_config(
+            hyper_parameters={
+                "training": {
+                    "early_stopping": {"enable": False, "patience": 4},
+                    "scheduler": {"warmup": {"enable": False, "epochs": 2}},
+                    "gradient_clip": {"enable": False, "max_grad_norm": 0.5},
+                    "gradient_accumulation": {"enable": False, "batches": 5},
+                }
+            }
+        )
+
+        with patch.object(RecipeResolver, "resolve", return_value=Path(recipe_path)):
+            result = GetiConfigConverter.convert(geti_cfg)
+
+        assert "patience" not in result["training"]
+        assert result["training"]["warmup_ratio"] == 0.0
+        assert result["training"]["max_grad_norm"] == 0.0
+        assert result["training"]["gradient_accumulation_steps"] == 1
+
+    def test_convert_huggingface_adds_missing_tile_config(self) -> None:
+        from getitune.utils import get_getitune_root_path
+
+        recipe_path = get_getitune_root_path() / "recipe" / "detection" / "rtdetrv2_r18.yaml"
+        geti_cfg = _make_geti_config(
+            hyper_parameters={
+                "dataset_preparation": {
+                    "augmentation": {
+                        "tiling": {
+                            "enable": False,
+                            "enable_adaptive_tiling": False,
+                            "tile_size": 512,
+                            "tile_overlap": 0.2,
+                        }
+                    }
+                }
+            }
+        )
+
+        with patch.object(RecipeResolver, "resolve", return_value=Path(recipe_path)):
+            result = GetiConfigConverter.convert(geti_cfg)
+
+        assert result["data"]["tile_config"]["enable_tiler"] is False
 
     def test_convert_ultralytics_recipe_produces_backend_tagged_config(self) -> None:
         """Ultralytics recipes are converted via the library-side UltralyticsConfigurator."""

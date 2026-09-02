@@ -16,12 +16,19 @@ from __future__ import annotations
 
 import math
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 import torch
 import transformers as tf
 
-from getitune.backend.huggingface.models import HFModel, HFMulticlassClsModel
+from getitune.backend.huggingface.models import (
+    HFDetectionModel,
+    HFInstSegModel,
+    HFModel,
+    HFMulticlassClsModel,
+    HFSemanticSegModel,
+)
 from getitune.data.entity.sample import SampleBatch
 from getitune.types.label import LabelInfo, SegLabelInfo
 
@@ -56,6 +63,49 @@ def test_imgsz_derives_from_data_input_params() -> None:
 
 def test_best_checkpoint_starts_as_none() -> None:
     assert HFMulticlassClsModel(_tiny_vit_config(), _label_info()).best_checkpoint is None
+
+
+@pytest.mark.parametrize(
+    "model_class",
+    [HFMulticlassClsModel, HFDetectionModel, HFInstSegModel, HFSemanticSegModel],
+)
+def test_pretrained_weights_loads_local_snapshot_without_changing_identity(
+    model_class: type[HFModel], tmp_path: Path
+) -> None:
+    auto_class = MagicMock()
+    auto_class.from_pretrained.return_value = torch.nn.Linear(1, 1)
+
+    with patch.object(model_class, "hf_auto_class", auto_class):
+        model = model_class("hub/architecture", _label_info(), pretrained_weights=tmp_path)
+
+    assert model.checkpoint == "hub/architecture"
+    assert model.pretrained_weights == tmp_path
+    auto_class.from_pretrained.assert_called_once()
+    assert auto_class.from_pretrained.call_args.args == (str(tmp_path),)
+
+
+def test_pretrained_false_ignores_pretrained_weights(tmp_path: Path) -> None:
+    auto_class = MagicMock()
+    auto_class.from_config.return_value = torch.nn.Linear(1, 1)
+    config = _tiny_vit_config()
+
+    with (
+        patch.object(HFMulticlassClsModel, "hf_auto_class", auto_class),
+        patch.object(tf.AutoConfig, "from_pretrained", return_value=config) as from_pretrained,
+    ):
+        HFMulticlassClsModel(
+            "hub/architecture",
+            _label_info(),
+            pretrained=False,
+            pretrained_weights=tmp_path,
+        )
+
+    from_pretrained.assert_called_once_with(
+        "hub/architecture",
+        id2label={0: "cat", 1: "dog", 2: "bird"},
+        label2id={"cat": 0, "dog": 1, "bird": 2},
+    )
+    auto_class.from_pretrained.assert_not_called()
 
 
 def test_checkpoint_round_trip(tmp_path: Path) -> None:

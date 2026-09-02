@@ -27,6 +27,9 @@ if TYPE_CHECKING:
 
 __all__ = ["HFDinov3MulticlassClsModel", "HFDinov3MultilabelClsModel"]
 
+_GETITUNE_MODEL_TYPE_KEY = "getitune_model_type"
+_GETITUNE_MODEL_TYPE = "dinov3_image_classifier"
+
 
 class _DinoV3ImageClassifier(nn.Module):
     """A DINOv3 backbone with a Geti classification head."""
@@ -36,7 +39,7 @@ class _DinoV3ImageClassifier(nn.Module):
         backbone: nn.Module,
         config: transformers.PretrainedConfig,
         multilabel: bool,
-        freeze_backbone: bool = True,
+        freeze_backbone: bool = False,
     ) -> None:
         super().__init__()
         self.backbone = backbone
@@ -52,6 +55,7 @@ class _DinoV3ImageClassifier(nn.Module):
             raise ValueError(msg)
         self.classifier = nn.Linear(hidden_size, num_labels)
         self.multilabel = multilabel
+        self.freeze_backbone = freeze_backbone
         if freeze_backbone:
             for param in self.backbone.parameters():
                 param.requires_grad_(False)
@@ -74,6 +78,9 @@ class _DinoV3ImageClassifier(nn.Module):
     def save_pretrained(self, save_directory: str | Path) -> None:
         path = Path(save_directory)
         path.mkdir(parents=True, exist_ok=True)
+        setattr(self.config, _GETITUNE_MODEL_TYPE_KEY, _GETITUNE_MODEL_TYPE)
+        self.config.multilabel = self.multilabel
+        self.config.freeze_backbone = self.freeze_backbone
         self.config.save_pretrained(path)
         torch.save(self.state_dict(), path / "pytorch_model.bin")
 
@@ -88,22 +95,28 @@ class _DinoV3Factory:
             backbone,
             config,
             bool(getattr(config, "multilabel", False)),
-            bool(getattr(config, "freeze_backbone", True)),
+            bool(getattr(config, "freeze_backbone", False)),
         )
 
     @classmethod
     def from_pretrained(cls, checkpoint: str, **kwargs: Any) -> nn.Module:  # noqa: ANN401
-        freeze_backbone = bool(kwargs.pop("freeze_backbone", True))
-        path = Path(checkpoint)
-        if path.is_dir():
-            config = transformers.PretrainedConfig.from_pretrained(path)
-            model = cls.from_config(config)
-            model.load_state_dict(torch.load(path / "pytorch_model.bin", map_location="cpu", weights_only=True))
-            return model
-
+        freeze_backbone = bool(kwargs.pop("freeze_backbone", False))
         id2label = kwargs.pop("id2label", {})
         label2id = kwargs.pop("label2id", {label: index for index, label in id2label.items()})
+        path = Path(checkpoint)
         config = transformers.AutoConfig.from_pretrained(checkpoint)
+        if path.is_dir() and getattr(config, _GETITUNE_MODEL_TYPE_KEY, None) == _GETITUNE_MODEL_TYPE:
+            model = cls.from_config(config)
+            model.load_state_dict(torch.load(path / "pytorch_model.bin", map_location="cpu", weights_only=True))
+            if id2label and len(id2label) != config.num_labels:
+                classifier = cast("nn.Linear", model.classifier)
+                model.classifier = nn.Linear(classifier.in_features, len(id2label))
+            if id2label:
+                config.id2label = id2label
+                config.label2id = label2id
+                config.num_labels = len(id2label)
+            return model
+
         config.id2label = id2label
         config.label2id = label2id
         config.num_labels = len(id2label)

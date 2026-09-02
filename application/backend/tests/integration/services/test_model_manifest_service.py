@@ -7,12 +7,15 @@ from importlib import resources
 from unittest.mock import mock_open, patch
 
 import pytest
+import yaml
 
+from app.execution.common.recipe_resolver import RecipeResolver
 from app.models import TaskType
 from app.models.model_manifest import (
     BenchmarkMetrics,
     Capabilities,
     DirectLinkPretrainedWeights,
+    HuggingFacePretrainedWeights,
     ModelManifest,
     ModelManifestDeprecationStatus,
     ModelStats,
@@ -27,6 +30,26 @@ from app.services.model_manifest_service import ModelManifestService
 from app.supported_models import manifests
 
 BASE_MANIFEST_PATH = str(resources.files(manifests).joinpath("base.yaml"))
+GETITUNE_RECIPE_ROOT = pathlib.Path(__file__).parents[5] / "library" / "src" / "getitune" / "recipe"
+HF_MANIFEST_IDS = {
+    "image-classification-dinov3-vits",
+    "image-classification-dinov3-vitb16",
+    "image-classification-dinov3-vitl16",
+    "image-classification-dinov3-convnext-tiny",
+    "image-classification-dinov3-convnext-small",
+    "image-classification-dinov3-convnext-base",
+    "image-classification-dinov3-convnext-large",
+    "image-classification-convnextv2-atto",
+    "image-classification-convnextv2-base",
+    "image-classification-convnextv2-large",
+    "object-detection-rtdetrv2-r34",
+    "object-detection-rtdetrv2-r50",
+    "object-detection-rtdetrv2-r101",
+    "instance-segmentation-mask2former-swin-s",
+    "instance-segmentation-mask2former-swin-b",
+    "instance-segmentation-mask2former-swin-l",
+    "instance-segmentation-eomt-large-640",
+}
 TEST_PATH = pathlib.Path(os.path.dirname(__file__))
 DUMMY_BASE_MANIFEST_PATH = os.path.join(TEST_PATH, "dummy_base_model_manifest.yaml")
 DUMMY_MANIFEST_PATH = os.path.join(TEST_PATH, "dummy_model_manifest.yaml")
@@ -160,6 +183,20 @@ class TestModelManifestService:
         model_manifests = ModelManifestService.get_model_manifests()
 
         assert len(model_manifests) > 0
+
+    def test_huggingface_manifests_match_recipe_checkpoints(self) -> None:
+        model_manifests = ModelManifestService.get_model_manifests()
+        resolver = RecipeResolver(GETITUNE_RECIPE_ROOT)
+
+        assert model_manifests.keys() >= HF_MANIFEST_IDS
+        for manifest_id in HF_MANIFEST_IDS:
+            manifest = model_manifests[manifest_id]
+            sub_task = "MULTI_CLASS_CLS" if manifest.task == "classification" else None
+            recipe = yaml.safe_load(resolver.resolve(manifest_id, sub_task).read_text())
+
+            assert isinstance(manifest.pretrained_weights, HuggingFacePretrainedWeights)
+            assert manifest.pretrained_weights.repo_id == recipe["model"]["init_args"]["checkpoint"]
+            assert manifest.capabilities.tiling is False
 
     @pytest.mark.parametrize(
         "model_manifest_id, expected_task",

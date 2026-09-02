@@ -2,17 +2,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import hashlib
+import json
 import shutil
 from pathlib import Path
-from typing import cast
+from uuid import uuid4
 
+import huggingface_hub
 import requests
 from loguru import logger
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
 from app.models import ModelManifest, TaskType
-from app.models.model_manifest import DirectLinkPretrainedWeights
+from app.models.model_manifest import DirectLinkPretrainedWeights, HuggingFacePretrainedWeights
 
 from .model_manifest_service import ModelManifestService
 
@@ -24,6 +26,7 @@ class BaseWeightsService:
     RETRY_TOTAL = 2  # total number of retries for failed requests
     RETRY_CONNECT = 1  # retries specifically for connection failures (fail fast on unreachable hosts)
     RETRY_BACKOFF_FACTOR = 0.5  # exponential backoff factor for retries (e.g., 0.5s, 1s)
+    HF_CACHE_METADATA_FILENAME = ".geti-huggingface-snapshot.json"
 
     def __init__(self, data_dir: Path) -> None:
         self.pretrained_weights_dir = data_dir / "pretrained_weights"
@@ -43,12 +46,16 @@ class BaseWeightsService:
             str: The remote URL of the pretrained weights
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
-        pretrained_weights = cast(DirectLinkPretrainedWeights, manifest.pretrained_weights)
-        return pretrained_weights.url
+        pretrained_weights = manifest.pretrained_weights
+        if isinstance(pretrained_weights, DirectLinkPretrainedWeights):
+            return pretrained_weights.url
+        if isinstance(pretrained_weights, HuggingFacePretrainedWeights):
+            return pretrained_weights.repo_id
+        raise ValueError(f"Model {model_manifest_id} does not have application-managed pretrained weights")
 
     def get_local_weights_path(self, task: TaskType, model_manifest_id: str, allow_download: bool = True) -> Path:
         """
-        Return the location of the weights (.pt file).
+        Return the location of the weights file or snapshot directory.
 
         If not already present and allow_download is enabled, downloads the weights from remote.
 
@@ -58,14 +65,24 @@ class BaseWeightsService:
             allow_download: Whether to download weights if not present locally
 
         Returns:
-            Path: Path to the local weights file
+            Path: Path to the local weights file or snapshot directory
 
         Raises:
             FileNotFoundError: If weights are not found locally and allow_download is False
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
 
-        pretrained_weights = cast(DirectLinkPretrainedWeights, manifest.pretrained_weights)
+        pretrained_weights = manifest.pretrained_weights
+        if isinstance(pretrained_weights, HuggingFacePretrainedWeights):
+            return self._get_huggingface_snapshot(
+                task=task,
+                model_manifest_id=model_manifest_id,
+                pretrained_weights=pretrained_weights,
+                allow_download=allow_download,
+            )
+        if not isinstance(pretrained_weights, DirectLinkPretrainedWeights):
+            raise ValueError(f"Model {model_manifest_id} does not have application-managed pretrained weights")
+
         local_filename = pretrained_weights.local_filename
         local_path = self.pretrained_weights_dir / task.name.lower() / local_filename
         if local_path.exists():
@@ -103,11 +120,18 @@ class BaseWeightsService:
             bool: True if weights were successfully removed, False if they didn't exist
         """
         manifest = self._get_and_validate_model_manifest(task, model_manifest_id)
-        pretrained_weights = cast(DirectLinkPretrainedWeights, manifest.pretrained_weights)
-        local_path = self.pretrained_weights_dir / task.name.lower() / pretrained_weights.local_filename
-        if local_path.exists():
+        pretrained_weights = manifest.pretrained_weights
+        task_dir = self.pretrained_weights_dir / task.name.lower()
+        if isinstance(pretrained_weights, DirectLinkPretrainedWeights):
+            local_path = task_dir / pretrained_weights.local_filename
+        elif isinstance(pretrained_weights, HuggingFacePretrainedWeights):
+            local_path = task_dir / model_manifest_id
+        else:
+            raise ValueError(f"Model {model_manifest_id} does not have application-managed pretrained weights")
+
+        if local_path.exists() or local_path.is_symlink():
             try:
-                local_path.unlink()
+                self._remove_path(local_path)
                 logger.info("Removed local weights for {}: {}", model_manifest_id, local_path)
                 return True
             except OSError as e:
@@ -120,27 +144,115 @@ class BaseWeightsService:
         Remove all locally cached pretrained weights to free space on disk.
 
         Returns:
-            int: Number of weight files that were removed
+            int: Number of cached weight artifacts that were removed
         """
         removed_count = 0
         if not self.pretrained_weights_dir.exists():
             return 0
 
         try:
-            for weights_file in self.pretrained_weights_dir.rglob("*"):
-                if weights_file.is_file() and not weights_file.name.startswith("."):
+            for task_dir in self.pretrained_weights_dir.iterdir():
+                if not task_dir.is_dir() or task_dir.is_symlink():
+                    continue
+                for weights_path in task_dir.iterdir():
                     try:
-                        weights_file.unlink()
-                        removed_count += 1
-                        logger.debug("Removed weights file: {}", weights_file)
+                        self._remove_path(weights_path)
+                        if not weights_path.name.startswith("."):
+                            removed_count += 1
+                        logger.debug("Removed cached weights: {}", weights_path)
                     except OSError as e:
-                        logger.error("Failed to remove weights file {}: {}", weights_file, e)
+                        logger.error("Failed to remove cached weights {}: {}", weights_path, e)
 
             logger.info("Removed {} cached weight files", removed_count)
             return removed_count
         except OSError as e:
             logger.error("Failed to remove cached weights: {}", e)
             return 0
+
+    def _get_huggingface_snapshot(
+        self,
+        task: TaskType,
+        model_manifest_id: str,
+        pretrained_weights: HuggingFacePretrainedWeights,
+        allow_download: bool,
+    ) -> Path:
+        local_path = self.pretrained_weights_dir / task.name.lower() / model_manifest_id
+        if self._is_matching_huggingface_snapshot(local_path, pretrained_weights):
+            logger.info("Using cached weights for {}: {}", model_manifest_id, local_path)
+            return local_path
+        if local_path.exists() or local_path.is_symlink():
+            self._remove_path(local_path)
+
+        if not allow_download:
+            raise FileNotFoundError(f"Weights not found locally for model {model_manifest_id} and download is disabled")
+
+        self._check_huggingface_disk_space(pretrained_weights)
+        temp_path = local_path.with_name(f".{local_path.name}.{uuid4().hex}.tmp")
+        logger.info("Downloading Hugging Face snapshot for {}", model_manifest_id)
+        try:
+            huggingface_hub.snapshot_download(
+                repo_id=pretrained_weights.repo_id,
+                revision=pretrained_weights.revision,
+                local_dir=temp_path,
+            )
+            (temp_path / self.HF_CACHE_METADATA_FILENAME).write_text(
+                json.dumps({"repo_id": pretrained_weights.repo_id, "revision": pretrained_weights.revision})
+            )
+            try:
+                temp_path.rename(local_path)
+            except FileExistsError:
+                if not self._is_matching_huggingface_snapshot(local_path, pretrained_weights):
+                    raise
+        finally:
+            if temp_path.exists() or temp_path.is_symlink():
+                self._remove_path(temp_path)
+
+        logger.info("Successfully downloaded Hugging Face snapshot: {}", local_path)
+        return local_path
+
+    def _is_matching_huggingface_snapshot(self, path: Path, pretrained_weights: HuggingFacePretrainedWeights) -> bool:
+        if not path.is_dir() or path.is_symlink():
+            return False
+        try:
+            metadata = json.loads((path / self.HF_CACHE_METADATA_FILENAME).read_text())
+        except (OSError, ValueError):
+            return False
+        return metadata == {"repo_id": pretrained_weights.repo_id, "revision": pretrained_weights.revision}
+
+    def _check_huggingface_disk_space(
+        self, pretrained_weights: HuggingFacePretrainedWeights, safety_margin_gb: float = 1.0
+    ) -> None:
+        repository_size = 500 * 1024 * 1024
+        try:
+            info = huggingface_hub.model_info(
+                pretrained_weights.repo_id,
+                revision=pretrained_weights.revision,
+                files_metadata=True,
+            )
+            sizes = [sibling.size for sibling in (info.siblings or []) if sibling.size is not None]
+            if sizes:
+                repository_size = sum(sizes)
+            else:
+                logger.warning("Could not determine repository size for {}, assuming 500MB", pretrained_weights.repo_id)
+        except Exception as e:
+            logger.warning(
+                "Could not determine repository size for {}, assuming 500MB: {}", pretrained_weights.repo_id, e
+            )
+
+        available_space = shutil.disk_usage(self.pretrained_weights_dir).free
+        required_space = repository_size + (safety_margin_gb * 1024 * 1024 * 1024)
+        if available_space < required_space:
+            raise OSError(
+                f"Insufficient disk space. Required: {required_space / (1024**3):.2f} GB, "
+                f"Available: {available_space / (1024**3):.2f} GB"
+            )
+
+    @staticmethod
+    def _remove_path(path: Path) -> None:
+        if path.is_symlink() or path.is_file():
+            path.unlink()
+        elif path.is_dir():
+            shutil.rmtree(path)
 
     @staticmethod
     def _verify_file_integrity(file_path: Path, sha_sum: str) -> bool:
