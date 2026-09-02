@@ -761,11 +761,12 @@ class GetiConfigConverter:
         for subset_key in ("train_subset", "val_subset", "test_subset"):
             subset = config["data"].get(subset_key)
             if subset is None:
-                continue
+                raise ValueError(f"Missing '{subset_key}' in recipe config")
             for stage in ("augmentations_gpu", "augmentations_cpu"):
                 for aug in subset.get(stage, []):
                     if "Normalize" in aug.get("class_path", ""):
                         aug.setdefault("init_args", {}).update(mean=mean, std=std)
+                        break
 
     @staticmethod
     def _assert_no_dynamic_placeholders(config: dict) -> None:

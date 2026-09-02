@@ -16,7 +16,7 @@ Feature: Timm Model Training Smoke Test
 
     # The following examples table contains a representative model architecture for each unique timm architecture flavor.
     # The list of model architectures was generated with `just list-timm-smoke-models --format gherkin`.
-    # gemma4_vit and mobilenetv5 are commented out because they have 167.4 and 294.1 million parameters respectively,
+    # gemma4_vit and mobilenetv5 removed from the scope because they have 167.4 and 294.1 million parameters respectively,
       # which is too large for smoke testing.
     Examples: Timm architecture flavors
       | family                    | model_architecture_id                     |
@@ -47,7 +47,6 @@ Feature: Timm Model Training Smoke Test
       | fasternet                 | fasternet_t0.in1k                         |
       | focalnet                  | focalnet_tiny_srf.ms_in1k                 |
       | gcvit                     | gcvit_xxtiny.in1k                         |
-#      | gemma4_vit                | gemma4_vit_167m.gemma4_e4b_it             |
       | ghostnet                  | ghostnet_100.in1k                         |
       | hardcorenas               | hardcorenas_a.miil_green_in1k             |
       | hgnet                     | hgnetv2_b0.ssld_stage1_in22k_in1k         |
@@ -64,7 +63,6 @@ Feature: Timm Model Training Smoke Test
       | metaformer                | poolformer_s12.sail_in1k                  |
       | mlp_mixer                 | resmlp_12_224.fb_dino                     |
       | mobilenetv3               | mobilenetv3_small_050.lamb_in1k           |
-#      | mobilenetv5               | mobilenetv5_300m.gemma3n                  |
       | mvitv2                    | mvitv2_tiny.fb_in1k                       |
       | naflexvit                 | naflexvit_base_patch16_gap.e300_s576_in1k |
       | nasnet                    | nasnetalarge.tf_in1k                      |
