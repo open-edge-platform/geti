@@ -35,7 +35,7 @@ jobs:
       contents: read
     steps:
       - name: Harden the runner
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         with:
           disable-sudo: true
           disable-telemetry: true
@@ -67,7 +67,7 @@ jobs:
       contents: read
     steps:
       - name: Harden the runner
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         with:
           disable-sudo: true
           disable-telemetry: true
@@ -90,7 +90,7 @@ jobs:
       contents: read
     steps:
       - name: Harden the runner
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         with:
           disable-sudo: true
           disable-telemetry: true
@@ -103,7 +103,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run SkillSpector scan
-        uses: open-edge-platform/geti-ci/actions/skill-scan@fd69b9f71343db7a4a88d8d7b984a281dd475a98 # skill-scan/v0.1.2
+        uses: open-edge-platform/geti-ci/actions/skill-scan@d4d1e54759aac44307b38001996e486a6b7c0569 # skill-scan/v0.2.0
         with:
           severity-level: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'HIGH' || github.event.inputs.severity || 'LOW' }}
           fail-on-findings: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'true' || 'false' }}
@@ -118,7 +118,7 @@ jobs:
       contents: read
     steps:
       - name: Harden the runner
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         with:
           disable-sudo: true
           disable-telemetry: true
@@ -131,7 +131,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run skill-validator
-        uses: open-edge-platform/geti-ci/actions/skill-validator@c64543e05e9f84c7c4ef212666c3ea5fc869e55a # skill-validator/v0.2.0
+        uses: open-edge-platform/geti-ci/actions/skill-validator@3fd1ebf48e46ec6584850e20616763e73ddf94e9 # skill-validator/v0.2.2
         with:
           skills-path: skills
           strict: ${{ (github.event_name == 'pull_request' || github.event_name == 'merge_group') && 'true' || 'false' }}
@@ -150,7 +150,7 @@ jobs:
     if: always() && !cancelled()
     steps:
       - name: Harden the runner
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
         with:
           disable-sudo: true
           disable-telemetry: true
