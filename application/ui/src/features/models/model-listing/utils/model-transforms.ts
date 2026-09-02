@@ -3,7 +3,7 @@
 
 import type { DatasetRevision, Model } from '@/api/types';
 
-import type { GroupByMode, GroupedModels, SortBy } from '../types';
+import type { GroupByMode, GroupedModels, SortBy, SortDirection } from '../types';
 import { groupModelsByArchitecture, groupModelsByDataset } from './grouping';
 import { sortModels } from './sorting';
 import { isFailedModel, isTrainingModel } from './utils';
@@ -29,8 +29,13 @@ export const groupModels = (
 export const sortGroupedModels = (
     groups: GroupedModels[],
     sortBy: SortBy,
-    datasetRevisions: DatasetRevision[]
-): GroupedModels[] => groups.map((group) => ({ ...group, models: sortModels(group.models, sortBy, datasetRevisions) }));
+    datasetRevisions: DatasetRevision[],
+    direction?: SortDirection
+): GroupedModels[] =>
+    groups.map((group) => ({
+        ...group,
+        models: sortModels(group.models, sortBy, datasetRevisions, direction),
+    }));
 
 export const removeEmpty = (groups: GroupedModels[]): GroupedModels[] =>
     groups.filter((group) => group.models.length > 0);
