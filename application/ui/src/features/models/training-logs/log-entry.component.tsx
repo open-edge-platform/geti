@@ -50,6 +50,12 @@ const MessageWithPaths = ({ message }: { message: string }) => {
                     className={classes.path}
                     title={'Click to copy path'}
                     onClick={() => copy(part)}
+                    onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault();
+                            copy(part);
+                        }
+                    }}
                     role={'button'}
                     tabIndex={0}
                 >
