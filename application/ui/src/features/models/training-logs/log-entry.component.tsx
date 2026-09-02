@@ -51,6 +51,10 @@ const MessageWithPaths = ({ message }: { message: string }) => {
                     title={'Click to copy path'}
                     onClick={() => copy(part)}
                     onKeyDown={(event) => {
+                        if (event.repeat) {
+                            return;
+                        }
+
                         if (event.key === 'Enter' || event.key === ' ') {
                             event.preventDefault();
                             copy(part);
