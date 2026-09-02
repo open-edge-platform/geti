@@ -2,9 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from unittest.mock import Mock, patch
-
-import huggingface_hub
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
@@ -167,12 +164,10 @@ class TestModelArchitecturesEndpoint:
         ).json()
         pretrained_tag = tags[0]
 
-        fake_info = Mock(card_data=Mock(license="apache-2.0"))
-        with patch.object(huggingface_hub, "model_info", return_value=fake_info):
-            response = fxt_client.get(
-                "/api/model_architectures/timm/manifest",
-                params={"family": family, "variant": variant, "pretrained_tag": pretrained_tag},
-            )
+        response = fxt_client.get(
+            "/api/model_architectures/timm/manifest",
+            params={"family": family, "variant": variant, "pretrained_tag": pretrained_tag},
+        )
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
