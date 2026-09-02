@@ -79,8 +79,10 @@ export class ModelsPage {
         await this.getSearchInput().fill(query);
     }
 
-    getModelRows() {
-        return this.page.locator('[data-testid^="model-disclosure-"]');
+    getModelRows(groupId?: string) {
+        const root = groupId === undefined ? this.page : this.getModelGroup(groupId);
+
+        return root.getByTestId(/^model-disclosure-/);
     }
 
     async getModelName() {
@@ -135,12 +137,7 @@ export class ModelsPage {
     }
 
     async getModelNamesInOrder(groupId?: string) {
-        const rows =
-            groupId === undefined
-                ? this.getModelRows()
-                : this.getModelGroup(groupId).locator('[data-testid^="model-disclosure-"]');
-
-        return rows.locator('[class*="modelName"]').allTextContents();
+        return this.getModelRows(groupId).getByTestId('model-name').allTextContents();
     }
 
     async openDatasetMenu() {
