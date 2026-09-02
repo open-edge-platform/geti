@@ -8,12 +8,13 @@ import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
 
 import { useGetModels } from '../../hooks/api/use-get-models.hook';
 import { useGroupedModels } from '../hooks/use-grouped-models.hook';
-import type { GroupByMode, GroupedModels, SortBy } from '../types';
+import type { GroupByMode, GroupedModels, SortBy, SortDescriptor } from '../types';
+import { DEFAULT_SORT_DIRECTIONS } from '../utils/sorting';
 
 interface ModelListingContextValue {
     // State
     groupBy: GroupByMode;
-    sortBy: SortBy;
+    sortBy: SortDescriptor;
     expandedModelIds: Set<string>;
     groupedModels: GroupedModels[];
     searchBy: string;
@@ -36,7 +37,7 @@ interface ModelListingProviderProps {
 
 export const ModelListingProvider = ({ children }: ModelListingProviderProps) => {
     const [groupBy, setGroupBy] = useState<GroupByMode>('dataset');
-    const [sortBy, setSortBy] = useState<SortBy>('score');
+    const [sortBy, setSortBy] = useState<SortDescriptor>({ key: 'score', direction: 'desc' });
     const [showFailedModels, setShowFailedModels] = useState<boolean>(true);
     const [expandedModelIds, setExpandedModelIds] = useState<Set<string>>(new Set());
     const [searchBy, setSearchBy] = useState<string>('');
@@ -45,23 +46,30 @@ export const ModelListingProvider = ({ children }: ModelListingProviderProps) =>
     const { data: datasetRevisions = [] } = useGetDatasetRevisions();
     const groupedModels = useGroupedModels(models, {
         groupBy,
-        sortBy,
+        sortBy: sortBy.key,
+        sortDirection: sortBy.direction,
         searchBy,
         datasetRevisions,
         showFailedModels,
     });
 
     const onGroupByChange = (mode: GroupByMode) => {
-        if (mode === 'dataset' && sortBy === 'dataset') {
-            setSortBy('architecture');
-        } else if (mode === 'architecture' && sortBy === 'architecture') {
-            setSortBy('dataset');
+        // The dataset and architecture columns swap places depending on the grouping,
+        // so a sort on the column that is about to disappear moves to its replacement.
+        if (mode === 'dataset' && sortBy.key === 'dataset') {
+            setSortBy({ ...sortBy, key: 'architecture' });
+        } else if (mode === 'architecture' && sortBy.key === 'architecture') {
+            setSortBy({ ...sortBy, key: 'dataset' });
         }
         setGroupBy(mode);
     };
 
     const onSortChange = (key: SortBy) => {
-        setSortBy(key);
+        setSortBy((previous) =>
+            previous.key === key
+                ? { key, direction: previous.direction === 'asc' ? 'desc' : 'asc' }
+                : { key, direction: DEFAULT_SORT_DIRECTIONS[key] }
+        );
     };
 
     const toggleShowFailedModels = () => {
