@@ -12,7 +12,6 @@ Every Detection Box" (ECCV 2022).
 
 from __future__ import annotations
 
-from dataclasses import replace
 from typing import TYPE_CHECKING, ClassVar
 
 import numpy as np
@@ -290,15 +289,5 @@ class ByteTrackTracker(BaseTracker[ByteTrackConfig]):
     def _compose_output(self, frame_id: int) -> TrackedDetections:
         # Output is ACTIVE tracks only; LOST tracks coast internally.
         active = [t for t in self._tracks.values() if t.state == TrackState.ACTIVE]
-        if not active:
-            empty = TrackedDetections.create_empty(frame_id=frame_id)
-            return replace(empty, det_indices=np.empty((0,), dtype=np.int64))
-        return TrackedDetections(
-            bboxes=np.stack([t.bbox for t in active], axis=0).astype(np.float32),
-            scores=np.array([t.score for t in active], dtype=np.float32),
-            class_ids=np.array([t.class_id for t in active], dtype=np.int64),
-            track_ids=np.array([t.track_id for t in active], dtype=np.int64),
-            track_states=np.array([int(t.state) for t in active], dtype=np.int8),
-            frame_id=frame_id,
-            det_indices=np.array([self._frame_det_index.get(t.track_id, -1) for t in active], dtype=np.int64),
-        )
+        det_indices = [self._frame_det_index.get(t.track_id, -1) for t in active]
+        return self._compose_tracked_detections(active, det_indices, frame_id)

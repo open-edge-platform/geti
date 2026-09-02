@@ -16,7 +16,7 @@ from getitrack.algorithms.bytetrack import _subset
 from getitrack.algorithms.configs.bytetrack import ByteTrackConfig
 from getitrack.config import LifecycleConfig, TrackerConfig
 from getitrack.core.base import BaseTracker
-from getitrack.core.detection import Detections
+from getitrack.core.detection import Detections, TrackedDetections
 from getitrack.core.track import Track, TrackState
 
 
@@ -211,6 +211,166 @@ class TestDetIndices:
         out = bt.update(_dets([], [], frame_id=0))
         assert out.det_indices is not None
         assert len(out.det_indices) == 0
+
+
+def _mixed_state_tracker() -> tuple[ByteTrackTracker, TrackedDetections]:
+    """Drive a tracker to a frame holding one ACTIVE, one LOST, one TENTATIVE track.
+
+    Returns the tracker and the frame-2 ``update`` output (ACTIVE only). After
+    frame 2: track 1 (A) coasts as LOST, track 2 (B) stays ACTIVE, and track 3
+    (C) is freshly spawned TENTATIVE.
+    """
+    cfg = ByteTrackConfig(lifecycle=LifecycleConfig(min_hits=2, tentative_max_age=3, max_age=3))
+    bt = ByteTrackTracker(cfg)
+    # Frame 0: both born ACTIVE (first frame bypasses TENTATIVE). A=id1, B=id2.
+    bt.update(_dets([[10, 10, 50, 50], [200, 200, 240, 240]], [0.9, 0.9], frame_id=0))
+    # Frame 1: A drifts +10 (still matches), B is stationary.
+    bt.update(_dets([[20, 20, 60, 60], [200, 200, 240, 240]], [0.9, 0.9], frame_id=1))
+    # Frame 2: A absent -> LOST; B (row 0) matched; C (row 1) new -> TENTATIVE id3.
+    out2 = bt.update(_dets([[200, 200, 240, 240], [400, 400, 440, 440]], [0.9, 0.9], frame_id=2))
+    return bt, out2
+
+
+class TestStateAccessors:
+    def test_tracks_exposes_all_lifecycle_states(self):
+        bt, _ = _mixed_state_tracker()
+        tracks = bt.tracks
+        assert all(isinstance(t, Track) for t in tracks)
+        by_id = {t.track_id: t.state for t in tracks}
+        assert by_id == {1: TrackState.LOST, 2: TrackState.ACTIVE, 3: TrackState.TENTATIVE}
+
+    def test_tracks_returns_a_fresh_list(self):
+        bt, _ = _mixed_state_tracker()
+        tracks = bt.tracks
+        tracks.clear()
+        # Mutating the returned list must not disturb tracker state.
+        assert len(bt.tracks) == 3
+
+    def test_tracks_are_deep_copies(self):
+        bt, _ = _mixed_state_tracker()
+        returned = bt.tracks[0]
+        returned.state = TrackState.REMOVED
+        returned.bbox[0] = -999.0
+        # Mutating a returned copy must not leak into the tracker's own Track.
+        internal = bt._tracks[returned.track_id]
+        assert internal.state != TrackState.REMOVED
+        assert internal.bbox[0] != -999.0
+
+    def test_tracked_objects_includes_coasted_lost_track(self):
+        bt, out2 = _mixed_state_tracker()
+        to = bt.tracked_objects
+        assert to.det_indices is not None
+        rows = {int(tid): i for i, tid in enumerate(to.track_ids)}
+        # ACTIVE and LOST are both emitted; TENTATIVE (id 3) is not.
+        assert set(rows) == {1, 2}
+        # The LOST track coasts: no source detection this frame -> det_index -1.
+        lost_row = rows[1]
+        assert to.track_states[lost_row] == TrackState.LOST
+        assert int(to.det_indices[lost_row]) == -1
+        # A drifted in +x/+y, so the coasted Kalman prediction advances past the
+        # last observed box [20, 20, 60, 60] rather than reusing it.
+        lost_box = to.bboxes[lost_row]
+        assert lost_box[0] > 20.0
+        assert lost_box[1] > 20.0
+        # The ACTIVE track keeps its real detection index (B is input row 0).
+        active_row = rows[2]
+        assert to.track_states[active_row] == TrackState.ACTIVE
+        assert int(to.det_indices[active_row]) == 0
+        # update() stays ACTIVE-only, so tracked_objects() is strictly larger here.
+        assert out2.track_ids.tolist() == [2]
+        assert len(to) == 2
+
+    def test_tracked_objects_excludes_removed_track(self):
+        bt, _ = _mixed_state_tracker()
+        # Keep feeding only B; A (id1) coasts until it ages past max_age -> REMOVED.
+        for f in range(3, 8):
+            bt.update(_dets([[200, 200, 240, 240]], [0.9], frame_id=f))
+        live_ids = {t.track_id for t in bt.tracks}
+        assert 1 not in live_ids
+        assert 1 not in bt.tracked_objects.track_ids.tolist()
+
+    def test_tracked_objects_dtypes_and_shape_match_update(self):
+        bt, out2 = _mixed_state_tracker()
+        to = bt.tracked_objects
+        assert to.det_indices is not None
+        assert to.bboxes.dtype == out2.bboxes.dtype == np.float32
+        assert to.scores.dtype == out2.scores.dtype == np.float32
+        assert to.class_ids.dtype == out2.class_ids.dtype == np.int64
+        assert to.track_ids.dtype == out2.track_ids.dtype == np.int64
+        assert to.track_states.dtype == out2.track_states.dtype == np.int8
+        assert to.det_indices.dtype == np.int64
+        assert to.bboxes.shape[1] == 4
+
+    def test_tracked_objects_before_any_frame_is_empty(self):
+        bt = ByteTrackTracker(ByteTrackConfig())
+        to = bt.tracked_objects
+        assert len(to) == 0
+        assert to.det_indices is not None
+        assert to.det_indices.dtype == np.int64
+        assert len(to.det_indices) == 0
+        assert bt.tracks == []
+
+    def test_tracked_objects_only_tentative_hits_empty_branch(self):
+        # An all-TENTATIVE _tracks yields no alive rows: empty output with a
+        # non-empty tracker.
+        bt = ByteTrackTracker(ByteTrackConfig())
+        box = np.array([0, 0, 40, 40], dtype=np.float32)
+        bt._tracks = {1: Track(track_id=1, class_id=0, bbox=box, score=0.9, state=TrackState.TENTATIVE)}
+        to = bt.tracked_objects
+        assert len(to) == 0
+        assert to.det_indices is not None
+        assert len(to.det_indices) == 0
+        assert len(bt.tracks) == 1
+
+    def test_tracked_objects_det_indices_index_unfiltered_rows_under_class_filter(self):
+        # Row 0 (class 0) is filtered out; row 1 (class 5) is tracked. det_indices
+        # must point at input row 1, matching update(), not the filtered-space 0.
+        cfg = ByteTrackConfig(class_filter=[5], lifecycle=LifecycleConfig(min_hits=1, tentative_max_age=1))
+        bt = ByteTrackTracker(cfg)
+        dets = _dets([[10, 10, 50, 50], [100, 100, 140, 140]], [0.9, 0.9], frame_id=0, class_ids=[0, 5])
+        out = bt.update(dets)
+        to = bt.tracked_objects
+        assert out.det_indices is not None
+        assert to.det_indices is not None
+        # The single tracked object came from input row 1 in both views.
+        assert out.track_ids.tolist() == [1]
+        assert out.det_indices.tolist() == [1]
+        assert to.track_ids.tolist() == [1]
+        assert to.det_indices.tolist() == [1]
+
+    def test_tracked_objects_det_index_becomes_valid_after_lost_recovery(self):
+        bt, _ = _mixed_state_tracker()
+        # Track 1 is LOST after frame 2 (det_index -1); its predicted box sits
+        # near [21, 21, 61, 61]. A detection there re-matches and reactivates it.
+        assert bt._tracks[1].state == TrackState.LOST
+        bt.update(_dets([[22, 22, 62, 62]], [0.9], frame_id=3))
+        assert bt._tracks[1].state == TrackState.ACTIVE
+        to = bt.tracked_objects
+        assert to.det_indices is not None
+        rows = {int(tid): i for i, tid in enumerate(to.track_ids)}
+        recovered_row = rows[1]
+        assert to.track_states[recovered_row] == TrackState.ACTIVE
+        # The recovered track now carries a real detection index again (input row 0).
+        assert int(to.det_indices[recovered_row]) == 0
+
+    def test_tracked_objects_lost_box_advances_over_multiple_coasted_frames(self):
+        bt, _ = _mixed_state_tracker()
+
+        def lost_x1() -> float:
+            to = bt.tracked_objects
+            rows = {int(tid): i for i, tid in enumerate(to.track_ids)}
+            return float(to.bboxes[rows[1]][0])
+
+        # Frame 2: track 1 just went LOST. Keep feeding only B so track 1 keeps
+        # coasting; its predicted x should advance each frame while still LOST.
+        x2 = lost_x1()
+        bt.update(_dets([[200, 200, 240, 240]], [0.9], frame_id=3))
+        x3 = lost_x1()
+        bt.update(_dets([[200, 200, 240, 240]], [0.9], frame_id=4))
+        x4 = lost_x1()
+        assert bt._tracks[1].state == TrackState.LOST
+        assert x3 > x2
+        assert x4 > x3
 
 
 class TestSubset:

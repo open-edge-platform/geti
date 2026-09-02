@@ -11,20 +11,26 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
+from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, TypeVar
 
+import numpy as np
+
 from getitrack.config import TrackerConfig
+from getitrack.core.detection import TrackedDetections
 from getitrack.core.registry import ALGORITHM_REGISTRY, resolve_tracker_config
+from getitrack.core.track import TrackState
 from getitrack.logger import enable_logging
 
 _LOGGER = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    import numpy as np
+    from collections.abc import Sequence
 
-    from getitrack.core.detection import Detections, TrackedDetections
+    from getitrack.core.detection import Detections
+    from getitrack.core.track import Track
 
 ConfigT = TypeVar("ConfigT", bound=TrackerConfig)
 
@@ -44,10 +50,18 @@ class BaseTracker(ABC, Generic[ConfigT]):
     config_cls: ClassVar[type[TrackerConfig]]
     config: ConfigT
 
+    # Populated by every concrete tracker's ``__init__`` (see subclasses); the
+    # shared accessors below read them, so they are declared on the base.
+    _tracks: dict[int, Track]
+    _frame_det_index: dict[int, int]
+
     def __init__(self, config: ConfigT) -> None:
         self.config = config
         self._next_id: int = 1
         self._frame_id: int | None = None
+        # source_rows of the last processed frame, for remapping filtered-space
+        # det_indices back to input rows.
+        self._last_source_rows: np.ndarray | None = None
         if config.verbose:
             enable_logging()
 
@@ -63,13 +77,58 @@ class BaseTracker(ABC, Generic[ConfigT]):
             filtered, source_rows = detections, None
         else:
             filtered, source_rows = detections.filter_by_class(class_filter)
-        tracked = self._update_impl(filtered)
-        if source_rows is not None and tracked.det_indices is not None:
-            remapped = self._remap_det_indices(source_rows, tracked.det_indices)
-            tracked = replace(tracked, det_indices=remapped)
+        self._last_source_rows = source_rows
+        tracked = self._remap_to_input_rows(self._update_impl(filtered))
         if self.config.verbose:
             self._log_update(filtered, tracked)
         return tracked
+
+    @property
+    def tracks(self) -> list[Track]:
+        """Return a snapshot of the tracker's current tracks.
+
+        The snapshot spans every live lifecycle state (TENTATIVE, ACTIVE, and
+        LOST); REMOVED tracks have already been pruned.
+
+        Returns:
+            Deep copies of the current `Track` objects, in insertion order.
+            The copies are independent of tracker state, so mutating them has no
+            effect on the tracker.
+        """
+        return deepcopy(list(self._tracks.values()))
+
+    @property
+    def tracked_objects(self) -> TrackedDetections:
+        """Return the confirmed-alive tracks for the last processed frame.
+
+        Includes ACTIVE tracks and coasted LOST tracks still within ``max_age``,
+        and excludes TENTATIVE and REMOVED tracks. ACTIVE rows mirror the `update`
+        output, including the detection box; LOST rows carry the predicted box for
+        the frame with a ``det_index`` of -1 and the last observed score and class.
+        ``det_indices`` index into the unfiltered detections of the last processed
+        frame even when a ``class_filter`` is set.
+
+        Returns:
+            A `TrackedDetections` for the last processed frame, or an empty one
+            (with an empty int64 ``det_indices``) when no frame has been processed.
+        """
+        frame_id = self._frame_id if self._frame_id is not None else 0
+        alive = [t for t in self._tracks.values() if t.state in {TrackState.ACTIVE, TrackState.LOST}]
+        # _frame_det_index holds filtered-space rows; remap to unfiltered input rows.
+        det_indices = [self._frame_det_index.get(t.track_id, -1) for t in alive]
+        return self._remap_to_input_rows(self._compose_tracked_detections(alive, det_indices, frame_id))
+
+    def _remap_to_input_rows(self, tracked: TrackedDetections) -> TrackedDetections:
+        """Remap ``det_indices`` from the last frame's filtered space to input rows.
+
+        Maps matched (``>= 0``) entries back to rows of the unfiltered
+        `Detections` passed to `update`, leaving -1 rows untouched. A no-op when
+        no ``class_filter`` was applied.
+        """
+        if self._last_source_rows is None or tracked.det_indices is None:
+            return tracked
+        remapped = self._remap_det_indices(self._last_source_rows, tracked.det_indices)
+        return replace(tracked, det_indices=remapped)
 
     @staticmethod
     def _remap_det_indices(source_rows: np.ndarray, det_indices: np.ndarray) -> np.ndarray:
@@ -82,6 +141,40 @@ class BaseTracker(ABC, Generic[ConfigT]):
     @abstractmethod
     def _update_impl(self, detections: Detections) -> TrackedDetections:
         """Algorithm-specific tracking step for one frame."""
+
+    @staticmethod
+    def _compose_tracked_detections(
+        tracks: Sequence[Track],
+        det_indices: Sequence[int],
+        frame_id: int,
+    ) -> TrackedDetections:
+        """Assemble a `TrackedDetections` from tracks and their det indices.
+
+        Reads ``bbox``, ``score``, ``class_id``, ``track_id``, and ``state`` off
+        each `Track` in order, pairing row ``i`` with ``det_indices[i]``.
+
+        Args:
+            tracks: Tracks to emit, one per output row.
+            det_indices: Row indices into the frame's input `Detections`,
+                aligned with ``tracks``; -1 marks a row with no source detection.
+            frame_id: Frame the output belongs to.
+
+        Returns:
+            A `TrackedDetections` with one row per track. When ``tracks`` is
+            empty the result still carries an empty int64 ``det_indices`` array.
+        """
+        if not tracks:
+            empty = TrackedDetections.create_empty(frame_id=frame_id)
+            return replace(empty, det_indices=np.empty((0,), dtype=np.int64))
+        return TrackedDetections(
+            bboxes=np.stack([t.bbox for t in tracks], axis=0).astype(np.float32),
+            scores=np.array([t.score for t in tracks], dtype=np.float32),
+            class_ids=np.array([t.class_id for t in tracks], dtype=np.int64),
+            track_ids=np.array([t.track_id for t in tracks], dtype=np.int64),
+            track_states=np.array([int(t.state) for t in tracks], dtype=np.int8),
+            frame_id=frame_id,
+            det_indices=np.asarray(det_indices, dtype=np.int64),
+        )
 
     def _log_update(self, detections: Detections, tracked: TrackedDetections) -> None:
         """Emit a one-line per-frame summary on the ``getitrack`` logger."""
@@ -106,6 +199,7 @@ class BaseTracker(ABC, Generic[ConfigT]):
         """Clear internal state between videos or sequences."""
         self._next_id = 1
         self._frame_id = None
+        self._last_source_rows = None
 
     def _allocate_id(self) -> int:
         """Return a fresh monotonic id for a new track."""
