@@ -1,207 +1,172 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Generate a performance-only report from benchmark artifacts.
-
-This utility intentionally does not evaluate accuracy. It is for hardware and
-runtime performance comparisons where accuracy is not part of the report:
-training iteration time, OpenVINO throughput, and OpenVINO latency.
-"""
+"""Generate a performance-only Markdown report from structured benchmark results."""
 
 from __future__ import annotations
 
 import argparse
-import csv
 import json
+import statistics
 from collections import defaultdict
-from contextlib import suppress
 from pathlib import Path
+from typing import Any
+
+_REQUIRED_FIELDS = {
+    "schema_version",
+    "task",
+    "model",
+    "dataset",
+    "scenario",
+    "seed",
+    "training_device",
+    "training_batch_size",
+    "openvino_device",
+    "git_sha",
+    "software",
+    "fp16",
+    "int8",
+}
 
 
-def _read_json(path: Path) -> dict[str, object]:
+def _load_result(path: Path) -> dict[str, Any]:
+    """Load and validate one canonical performance result."""
     try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    return value if isinstance(value, dict) else {}
+        result = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        msg = f"Could not read performance result: {path}"
+        raise ValueError(msg) from exc
+    if not isinstance(result, dict):
+        msg = f"Performance result must be a JSON object: {path}"
+        raise TypeError(msg)
+    missing = _REQUIRED_FIELDS - result.keys()
+    if missing:
+        msg = f"Performance result {path} is missing required fields: {sorted(missing)}"
+        raise ValueError(msg)
+    for precision, expected in (("fp16", "FP16"), ("int8", "INT8")):
+        section = result[precision]
+        required = {"precision", "inference_batch_size", "throughput_fps", "latency_ms"}
+        if not isinstance(section, dict) or not required <= section.keys():
+            msg = f"Performance result {path} has an incomplete {precision} section."
+            raise ValueError(msg)
+        if section["precision"] != expected:
+            msg = f"Performance result {path} expected {expected}, got {section['precision']}."
+            raise ValueError(msg)
+        numeric = (section["inference_batch_size"], section["throughput_fps"], section["latency_ms"])
+        if not all(isinstance(value, (int, float)) and value > 0 for value in numeric):
+            msg = f"Performance result {path} has nonpositive {precision} measurements."
+            raise ValueError(msg)
+    device_names = (str(result["training_device"]).strip(), str(result["openvino_device"]).strip())
+    logical_names = {"", "unknown", "auto", "cpu", "gpu", "xpu", "cuda", "mps"}
+    if any(name.lower() in logical_names for name in device_names):
+        msg = f"Performance result {path} has a missing physical device name."
+        raise ValueError(msg)
+    if not isinstance(result["training_batch_size"], int) or result["training_batch_size"] < 1:
+        msg = f"Performance result {path} has an invalid training batch size."
+        raise ValueError(msg)
+    software = result["software"]
+    required_software = {"python", "getitune", "torch", "openvino", "nncf"}
+    if not isinstance(software, dict) or not required_software <= software.keys():
+        msg = f"Performance result {path} has incomplete software metadata."
+        raise ValueError(msg)
+    return result
 
 
-def _read_training_config(path: Path) -> dict[str, object]:
-    """Read training device and batch size from the benchmark hparams YAML."""
-    try:
-        import yaml
+def _training_iter_ms(seed_dir: Path) -> float:
+    """Return post-warmup training iteration time in milliseconds."""
+    import csv
 
-        data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except (OSError, yaml.YAMLError):
-        return {}
-    return data if isinstance(data, dict) else {}
-
-
-def _training_metadata(seed_dir: Path) -> tuple[str, object]:
-    """Return real training device and configured training batch size."""
-    hparams = next(iter(sorted((seed_dir / "train").glob("csv/version_*/hparams.yaml"))), None)
-    if hparams is None:
-        return "unknown", "-"
-    config = _read_training_config(hparams)
-    train_subset = config.get("train_subset", {})
-    batch_size = train_subset.get("batch_size", "-") if isinstance(train_subset, dict) else "-"
-    return str(config.get("device", "unknown")), batch_size
-
-
-def _read_training_iter_time(path: Path) -> float | None:
-    """Read post-warmup train iteration time from the latest metrics CSV."""
-    candidates = sorted(path.glob("csv/version_*/metrics.csv"))
-    if not candidates:
-        return None
-    try:
-        with candidates[-1].open(newline="", encoding="utf-8") as stream:
-            rows = list(csv.DictReader(stream))
-    except OSError:
-        return None
-    values = []
-    for row in rows:
-        value = row.get("train/iter_time")
-        if value:
-            try:
-                values.append(float(value))
-            except ValueError:
-                continue
+    metrics_files = sorted((seed_dir / "train").glob("csv/version_*/metrics.csv"))
+    if not metrics_files:
+        msg = f"Training metrics not found for performance result: {seed_dir}"
+        raise ValueError(msg)
+    with metrics_files[-1].open(newline="", encoding="utf-8") as stream:
+        values = [float(row["train/iter_time"]) for row in csv.DictReader(stream) if row.get("train/iter_time")]
     if not values:
-        return None
-    return sum(values[1:] or values) / len(values[1:] or values)
-
-
-def _benchmark_metrics(seed_dir: Path, relative: str) -> dict[str, object]:
-    """Read normalized metrics, falling back to benchmark-app's raw report."""
-    result = _read_json(seed_dir / relative)
-    if result:
-        return result
-
-    report = _read_json(seed_dir / relative.replace("result.json", "benchmark_report.json"))
-    execution = report.get("execution_results", {})
-    if not isinstance(execution, dict) or execution.get("error"):
-        return {}
-
-    prefix = "export" if "export" in relative else "optimize"
-    mode = "throughput" if "throughput" in relative else "latency"
-    values: dict[str, object] = {}
-    for source, target in (
-        ("throughput", "fps"),
-        ("latency (ms)", "latency_ms"),
-        ("avg latency", "avg_latency_ms"),
-        ("total execution time (ms)", "duration_ms"),
-        ("total number of iterations", "iterations"),
-    ):
-        value = execution.get(source)
-        if isinstance(value, (int, float)):
-            values[f"{prefix}:{mode}:{target}"] = float(value)
-        elif isinstance(value, str):
-            with suppress(IndexError, ValueError):
-                values[f"{prefix}:{mode}:{target}"] = float(value.split()[0])
-    return values
-
-
-def _collect(result_root: Path) -> tuple[list[dict[str, object]], list[dict[str, object]]]:
-    rows: list[dict[str, object]] = []
-    incomplete: list[dict[str, object]] = []
-    required = {
-        "FP throughput": "benchmark/export/throughput/result.json",
-        "FP latency": "benchmark/export/latency/result.json",
-        "INT8 throughput": "benchmark/optimize/throughput/result.json",
-        "INT8 latency": "benchmark/optimize/latency/result.json",
-    }
-    for train_csv in result_root.glob("**/0/train/csv/version_*/metrics.csv"):
-        seed_dir = train_csv.parents[3]
-        parts = seed_dir.relative_to(result_root).parts
-        if len(parts) < 4:
-            continue
-        task = "/".join(parts[:-3])
-        model, dataset, _seed = parts[-3:]
-        device, batch_size = _training_metadata(seed_dir)
-        row: dict[str, object] = {"task": task, "model": model, "dataset": dataset, "hardware": device}
-        row["training_batch_size"] = batch_size
-        row["training:train/iter_time"] = _read_training_iter_time(seed_dir / "train")
-        missing: list[str] = []
-        # Result files contain flat metrics; use their keys directly.
-        for label, relative in required.items():
-            data = _benchmark_metrics(seed_dir, relative)
-            prefix = "export" if "export" in relative else "optimize"
-            mode = "throughput" if "throughput" in relative else "latency"
-            found = False
-            for metric in ("fps", "latency_ms"):
-                value = data.get(f"{prefix}:{mode}:{metric}")
-                if isinstance(value, (int, float)):
-                    row[f"{prefix}:{mode}:{metric}"] = value
-                    found = True
-            if not found:
-                missing.append(label)
-        rows.append(row)
-        if missing:
-            incomplete.append({**row, "missing": ", ".join(missing)})
-    return rows, incomplete
-
-
-def _fmt(value: object, digits: int = 2) -> str:
-    return "-" if value is None else f"{float(value):.{digits}f}"
+        msg = f"train/iter_time is missing from {metrics_files[-1]}"
+        raise ValueError(msg)
+    measured = values[1:] or values
+    return 1000 * sum(measured) / len(measured)
 
 
 def generate_performance_report(result_roots: list[Path], output: Path) -> None:
-    """Write a performance-only report combining all supplied result roots."""
-    rows: list[dict[str, object]] = []
-    incomplete: list[dict[str, object]] = []
+    """Combine canonical seed results into a strict performance-only report."""
+    rows: list[dict[str, Any]] = []
     for root in result_roots:
-        complete, missing = _collect(root)
-        rows.extend(complete)
-        incomplete.extend(missing)
+        files = sorted(root.glob("**/performance_result.json"))
+        if not files:
+            msg = f"No performance_result.json files found under {root}"
+            raise ValueError(msg)
+        for path in files:
+            result = _load_result(path)
+            result["training_iter_ms"] = _training_iter_ms(path.parent)
+            rows.append(result)
 
-    by_task: dict[str, list[dict[str, object]]] = defaultdict(list)
+    model_groups: dict[tuple[object, ...], list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
-        by_task[str(row["task"])].append(row)
+        key = (
+            row["task"],
+            row["model"],
+            row["dataset"],
+            row["scenario"],
+            row["training_device"],
+            row["openvino_device"],
+            row["training_batch_size"],
+            row["fp16"]["inference_batch_size"],
+        )
+        model_groups[key].append(row)
+
+    grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for model_rows in model_groups.values():
+        representative = dict(model_rows[0])
+        fp16 = dict(representative["fp16"])
+        int8 = dict(representative["int8"])
+        representative["training_iter_ms"] = statistics.mean(row["training_iter_ms"] for row in model_rows)
+        fp16["throughput_fps"] = statistics.mean(row["fp16"]["throughput_fps"] for row in model_rows)
+        fp16["latency_ms"] = statistics.mean(row["fp16"]["latency_ms"] for row in model_rows)
+        int8["throughput_fps"] = statistics.mean(row["int8"]["throughput_fps"] for row in model_rows)
+        int8["latency_ms"] = statistics.mean(row["int8"]["latency_ms"] for row in model_rows)
+        representative["fp16"] = fp16
+        representative["int8"] = int8
+        grouped[str(representative["task"])].append(representative)
+
+    for task_rows in grouped.values():
+        visible_keys: set[tuple[object, ...]] = set()
+        for row in task_rows:
+            key = (row["model"], row["training_device"], row["openvino_device"])
+            if key in visible_keys:
+                msg = (
+                    f"Performance report has duplicate visible rows for {row['model']}; "
+                    "use one dataset/scenario per model and hardware combination."
+                )
+                raise ValueError(msg)
+            visible_keys.add(key)
 
     lines = [
         "# GetiTune Performance Report",
         "",
         "> Performance-only report. Accuracy metrics are intentionally excluded.",
-        "> Use this report for hardware/runtime comparisons when accuracy is not important.",
-        "",
-        f"Complete results: **{len(rows)}**",
-        f"Incomplete results: **{len(incomplete)}**",
         "",
     ]
-    for task, task_rows in sorted(by_task.items()):
-        lines.extend(
-            [
-                f"## {task}",
-                "",
-                "| Model | Hardware | Train batch | Train iter (s) | FP FPS | FP latency (ms) | "
-                "INT8 FPS | INT8 latency (ms) |",
-                "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: |",
-            ]
-        )
-        lines.extend(
-            f"| {row['model']} | {row['hardware']} | {row['training_batch_size']} | "
-            f"{_fmt(row.get('training:train/iter_time'))} | "
-            f"{_fmt(row.get('export:throughput:fps'))} | "
-            f"{_fmt(row.get('export:latency:latency_ms'))} | "
-            f"{_fmt(row.get('optimize:throughput:fps'))} | "
-            f"{_fmt(row.get('optimize:latency:latency_ms'))} |"
-            for row in sorted(task_rows, key=lambda item: (str(item["model"]), str(item["hardware"])))
-        )
-        lines.append("")
-
-    if incomplete:
-        lines.extend(
-            [
-                "## Incomplete Cases",
-                "",
-                "| Model | Hardware | Missing |",
-                "| --- | --- | --- |",
-            ]
-        )
-        lines.extend(
-            f"| {row['model']} | {row['hardware']} | {row['missing']} |"
-            for row in sorted(incomplete, key=lambda item: (str(item["task"]), str(item["model"])))
-        )
+    header = (
+        "| Model | Training Device | OpenVINO Device | Train Batch | OV Inference Batch | "
+        "Train Iteration (ms) | FP16 FPS | FP Latency (ms) | INT8 FPS | INT8 Latency (ms) |"
+    )
+    separator = "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+    for task, task_rows in sorted(grouped.items()):
+        lines.extend([f"## {task}", "", header, separator])
+        for row in sorted(task_rows, key=lambda item: (str(item["model"]), str(item["training_device"]))):
+            fp16 = row["fp16"]
+            int8 = row["int8"]
+            if fp16["inference_batch_size"] != int8["inference_batch_size"]:
+                msg = f"FP16 and INT8 inference batches differ for {row['model']}."
+                raise ValueError(msg)
+            lines.append(
+                f"| {row['model']} | {row['training_device']} | {row['openvino_device']} | "
+                f"{row['training_batch_size']} | {fp16['inference_batch_size']} | "
+                f"{row['training_iter_ms']:.2f} | {fp16['throughput_fps']:.2f} | "
+                f"{fp16['latency_ms']:.2f} | {int8['throughput_fps']:.2f} | {int8['latency_ms']:.2f} |"
+            )
         lines.append("")
 
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -209,14 +174,10 @@ def generate_performance_report(result_roots: list[Path], output: Path) -> None:
 
 
 def main() -> None:
-    """Parse command-line arguments and generate a performance-only report."""
-    parser = argparse.ArgumentParser(
-        description="Generate a performance-only report; accuracy is intentionally not evaluated."
-    )
-    parser.add_argument("result_roots", type=Path, nargs="+", help="Benchmark result directories to scan.")
-    parser.add_argument(
-        "--output", type=Path, default=Path("performance_report.md"), help="Output Markdown path."
-    )
+    """Run the performance report generator CLI."""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("result_roots", type=Path, nargs="+", help="Benchmark result directories.")
+    parser.add_argument("--output", type=Path, default=Path("performance_report.md"))
     args = parser.parse_args()
     generate_performance_report(args.result_roots, args.output)
 

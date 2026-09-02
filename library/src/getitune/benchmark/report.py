@@ -623,14 +623,13 @@ def _detect_metric_columns(
     if rewrite_metric_key("torch:test/latency") in all_keys:
         columns.append(("Test Latency ↓", rewrite_metric_key("torch:test/latency"), _fmt_latency))
 
-    for phase, label in (("export", "FP"), ("optimize", "INT8")):
-        for mode, mode_label in (("throughput", "Throughput"), ("latency", "Latency")):
-            fps_key = rewrite_metric_key(f"{phase}:{mode}:fps")
-            latency_key = rewrite_metric_key(f"{phase}:{mode}:latency_ms")
-            if fps_key in all_keys:
-                columns.append((f"{label} {mode_label} FPS ↑", fps_key, _fmt_metric))
-            if latency_key in all_keys:
-                columns.append((f"{label} {mode_label} Latency ↓", latency_key, lambda v: _fmt_metric(v, 2)))
+    for phase, label in (("export", "FP16"), ("optimize", "INT8")):
+        fps_key = rewrite_metric_key(f"{phase}:throughput:fps")
+        latency_key = rewrite_metric_key(f"{phase}:latency:latency_ms")
+        if fps_key in all_keys:
+            columns.append((f"{label} FPS ↑", fps_key, _fmt_metric))
+        if latency_key in all_keys:
+            columns.append((f"{label} Latency ↓", latency_key, lambda v: _fmt_metric(v, 2)))
 
     return columns
 

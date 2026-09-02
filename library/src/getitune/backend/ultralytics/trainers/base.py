@@ -237,15 +237,20 @@ class GetiTuneBaseTrainer:
         times_by_epoch: dict[int, list[float]] = {}
         state: dict[str, float] = {}
 
+        def on_epoch_start(_trainer: Any) -> None:  # noqa: ANN401
+            state.clear()
+
         def on_batch_start(_trainer: Any) -> None:  # noqa: ANN401
-            state["start"] = time.perf_counter()
+            state.setdefault("end", time.perf_counter())
 
         def on_batch_end(trainer: Any) -> None:  # noqa: ANN401
-            start = state.pop("start", None)
-            if start is None:
+            previous_end = state.get("end")
+            if previous_end is None:
                 return
+            current_end = time.perf_counter()
             epoch = int(getattr(trainer, "epoch", 0))
-            times_by_epoch.setdefault(epoch, []).append(time.perf_counter() - start)
+            times_by_epoch.setdefault(epoch, []).append(current_end - previous_end)
+            state["end"] = current_end
 
         def on_train_end(trainer: Any) -> None:  # noqa: ANN401
             results_csv = Path(getattr(trainer, "save_dir", ".")) / "results.csv"
@@ -263,17 +268,14 @@ class GetiTuneBaseTrainer:
             if "train/iter_time" in header:
                 return
             header.append("train/iter_time")
-            epoch_times = {
-                epoch: sum(times) / len(times)
-                for epoch, times in times_by_epoch.items()
-                if times
-            }
+            epoch_times = {epoch: sum(times) / len(times) for epoch, times in times_by_epoch.items() if times}
             for row_index, row in enumerate(rows[1:]):
                 row.append(str(epoch_times.get(row_index, "")))
 
             with results_csv.open("w", newline="", encoding="utf-8") as stream:
                 csv.writer(stream).writerows(rows)
 
+        self.add_callback("on_train_epoch_start", on_epoch_start)  # type: ignore[attr-defined]
         self.add_callback("on_train_batch_start", on_batch_start)  # type: ignore[attr-defined]
         self.add_callback("on_train_batch_end", on_batch_end)  # type: ignore[attr-defined]
         self.add_callback("on_train_end", on_train_end)  # type: ignore[attr-defined]

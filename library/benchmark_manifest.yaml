@@ -38,10 +38,10 @@ experiments:
         priority: extended
     datasets:
       - paddy_disease
-      # - chest_ct
-      # - aircraft
-      # - flowers102
-      # - food41
+      - chest_ct
+      - aircraft
+      - flowers102
+      - food41
     criteria:
       accuracy_metric: f1-score
       thresholds:
@@ -96,20 +96,20 @@ experiments:
     models:
       - name: yolox_tiny
         priority: extended
-      # - name: yolox_tiny_tile
-      #   priority: core # one tiling model to always check Tiling
+      - name: yolox_tiny_tile
+        priority: core # one tiling model to always check Tiling
       - name: yolox_s
         priority: core
-      # - name: yolox_s_tile
-      #   priority: deferred
+      - name: yolox_s_tile
+        priority: deferred
       - name: yolox_l
         priority: deferred
-      # - name: yolox_l_tile
-      #   priority: deferred
+      - name: yolox_l_tile
+        priority: deferred
       - name: yolox_x
         priority: extended
-      # - name: yolox_x_tile
-      #   priority: deferred
+      - name: yolox_x_tile
+        priority: deferred
       - name: yolo11_n
         priority: extended
       - name: yolo11_s
@@ -142,16 +142,16 @@ experiments:
         priority: extended
       - name: atss_mobilenetv2
         priority: extended
-      # - name: atss_mobilenetv2_tile
-      #   priority: deferred
+      - name: atss_mobilenetv2_tile
+        priority: deferred
       - name: ssd_mobilenetv2
         priority: deferred
-      # - name: ssd_mobilenetv2_tile
-      #   priority: deferred
+      - name: ssd_mobilenetv2_tile
+        priority: deferred
       - name: rtdetr_50
         priority: extended
-      # - name: rtdetr_50_tile
-      #   priority: deferred
+      - name: rtdetr_50_tile
+        priority: deferred
       - name: yolo12_n
         priority: extended
       - name: yolo12_s
@@ -182,16 +182,16 @@ experiments:
         priority: extended
 
     datasets:
-      # - pothole
-      # - wgisd
+      - pothole
+      - wgisd
       - bccd
-      # - pcb_defect
-      # - axial_mri
-      # - cable_damage
-      # - brain_tumor
-      # - oxford_pets
-      # - vehicles
-      # - cardd
+      - pcb_defect
+      - axial_mri
+      - cable_damage
+      - brain_tumor
+      - oxford_pets
+      - vehicles
+      - cardd
     criteria:
       accuracy_metric: map
       thresholds:
@@ -224,24 +224,24 @@ experiments:
         priority: deferred
       - name: litehrnet_x
         priority: extended
-      # - name: dino_v2_tile
-      #   priority: deferred
-      # - name: litehrnet_18_tile
-      #   priority: deferred
-      # - name: litehrnet_s_tile
-      #   priority: deferred
-      # - name: litehrnet_x_tile
-      #   priority: deferred
+      - name: dino_v2_tile
+        priority: deferred
+      - name: litehrnet_18_tile
+        priority: deferred
+      - name: litehrnet_s_tile
+        priority: deferred
+      - name: litehrnet_x_tile
+        priority: deferred
     datasets:
-      # - pcb_defect
+      - pcb_defect
       - corrosion
-      # - crack_semantic
-      # - wgisd
-      # - oxford_pets
-      # - pothole
-      # - satellite_building
-      # - brain_tumor
-      # - cardd
+      - crack_semantic
+      - wgisd
+      - oxford_pets
+      - pothole
+      - satellite_building
+      - brain_tumor
+      - cardd
     criteria:
       accuracy_metric: Dice
       thresholds:
@@ -296,22 +296,22 @@ experiments:
         priority: deferred
       - name: yolo26_x_seg
         priority: extended
-      # - name: maskrcnn_efficientnetb2b_tile
-      #   priority: deferred
-      # - name: maskrcnn_r50_tile
-      #   priority: deferred
-      # - name: maskrcnn_swint_tile
-      #   priority: deferred
-      # - name: rtmdet_inst_tiny_tile
-      #   priority: deferred
+      - name: maskrcnn_efficientnetb2b_tile
+        priority: deferred
+      - name: maskrcnn_r50_tile
+        priority: deferred
+      - name: maskrcnn_swint_tile
+        priority: deferred
+      - name: rtmdet_inst_tiny_tile
+        priority: deferred
     datasets:
-      # - pothole
+      - pothole
       - pcb_defect
-      # - wgisd
-      # - oxford_pets
-      # - brain_tumor
-      # - cardd
-      # - satellite_building
+      - wgisd
+      - oxford_pets
+      - brain_tumor
+      - cardd
+      - satellite_building
 
     criteria:
       accuracy_metric: map

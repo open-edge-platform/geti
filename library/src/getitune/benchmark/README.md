@@ -4,7 +4,7 @@ This module runs repeatable model benchmarks for GetiTune with a CLI:
 
 - dataset provisioning from `benchmark_catalog.yaml`
 - experiment selection from `benchmark_manifest.yaml`
-- phased execution (`train -> test/torch -> export -> test/export -> benchmark FP -> optimize -> test/optimize -> benchmark INT8`)
+- phased execution (`train -> test/torch -> FP16 export/benchmark -> INT8 optimize/benchmark`)
 - MLflow tracking and baseline comparison
 - report generation (`report.md`, `aggregated.csv`, optional `failed_experiments.json`)
 
@@ -98,6 +98,10 @@ count. The same measurements are repeated for the optimized INT8 IR when
 active Python interpreter; override it with `--benchmark-app`. Override the
 OpenVINO target with `--openvino-device CPU`, `GPU`, or another supported
 device string when the Geti accelerator label is not sufficient.
+Physical names are detected with PyTorch and OpenVINO `FULL_DEVICE_NAME` and
+stored per seed. If a driver exposes only a PCI identifier instead of a market
+name, pass `--training-device-name` and/or `--openvino-device-name` explicitly
+(for example, `--openvino-device-name "Intel Arc B70"`).
 
 Example:
 
@@ -115,18 +119,15 @@ benchmark-app measurements still run.
 Select the desired one dataset per task in `benchmark_manifest.yaml` before
 running. Raw reports and command output are retained below each seed directory:
 `benchmark/export/{throughput,latency}/` and
-`benchmark/optimize/{throughput,latency}/`. The aggregated report includes
+`benchmark/optimize/{throughput,latency}/`. The performance report includes
 FPS, median/average latency, batch size, iteration count, and measurement
-duration for FP and INT8 models.
+duration for FP16 and INT8 models.
 
 For dynamic IR inputs, the runner passes both `-shape` and `-data_shape` with
 the concrete batch-1 input shape so Intel GPU compilation can resolve dynamic
-output shapes. If throughput mode reports `CL_OUT_OF_RESOURCES`, it retries
-with four and then one inference request. Latency mode remains batch 1 with
-the default single request.
-
-Use `--max-attempts 1 --no-benchmark-retries` for a strict single-pass run
-without either experiment retries or benchmark-app request-count fallbacks.
+output shapes. Latency mode is fixed to batch 1 and one inference request.
+Throughput mode uses OpenVINO's automatically selected performance settings;
+failures are reported rather than silently changing the benchmark methodology.
 
 ### Performance-only report generation
 
@@ -137,8 +138,12 @@ hardware/runtime performance is the goal and accuracy is not important for the
 comparison.
 
 It combines result directories collected on different machines and writes one
-Markdown table. Valid metrics are retained when another metric is missing;
-missing values are shown as `-` and listed in the incomplete-cases section.
+Markdown table. Each benchmark seed writes a canonical
+`performance_result.json` containing physical training/OpenVINO device names,
+effective batch sizes, verified model precision, software versions, and
+measurements. The report generator fails on incomplete metadata instead of
+printing ambiguous values. Multiple seeds are averaged into one row per model
+and hardware combination.
 
 ```bash
 uv run python -m getitune.benchmark.generate_performance_report \

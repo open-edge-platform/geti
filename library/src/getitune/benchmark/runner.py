@@ -43,31 +43,36 @@ _PHASE_CHAIN: list[tuple[str, str]] = [
     ("test/torch", "test_torch"),
     ("export", "export"),
     ("test/export", "test_export"),
-    ("benchmark/export/throughput", "benchmark_export_throughput"),
-    ("benchmark/export/latency", "benchmark_export_latency"),
+    ("benchmark/export", "benchmark_export"),
     ("optimize", "optimize"),
     ("test/optimize", "test_optimize"),
-    ("benchmark/optimize/throughput", "benchmark_optimize_throughput"),
-    ("benchmark/optimize/latency", "benchmark_optimize_latency"),
+    ("benchmark/optimize", "benchmark_optimize"),
 ]
 
 # Which phases are included for a given ``eval_upto`` value.
 _EVAL_UPTO_GATES: dict[str, set[str]] = {
     "train": {"train", "test/torch"},
     "export": {
-        "train", "test/torch", "export", "test/export",
+        "train",
+        "test/torch",
+        "export",
+        "test/export",
     },
     "optimize": {
-        "train", "test/torch", "export", "test/export",
-        "optimize", "test/optimize",
+        "train",
+        "test/torch",
+        "export",
+        "test/export",
+        "optimize",
+        "test/optimize",
     },
 }
 
 _BENCHMARK_PHASES: dict[str, set[str]] = {
-    "export": {"benchmark/export/throughput", "benchmark/export/latency"},
+    "export": {"benchmark/export"},
     "optimize": {
-        "benchmark/export/throughput", "benchmark/export/latency",
-        "benchmark/optimize/throughput", "benchmark/optimize/latency",
+        "benchmark/export",
+        "benchmark/optimize",
     },
 }
 
@@ -232,6 +237,8 @@ class RunConfig:
     ad_hoc_train_kwargs: dict[str, str] = field(default_factory=dict)
     benchmark_app: str | None = None
     openvino_device: str | None = None
+    training_device_name: str | None = None
+    openvino_device_name: str | None = None
     enable_openvino_benchmark: bool = False
     enable_validation: bool = True
 
@@ -245,7 +252,6 @@ class RunConfig:
     isolate_in_subprocess: bool = True
     subprocess_timeout: float | None = None  # seconds; None = no timeout
     max_attempts: int = _MAX_ATTEMPTS
-    enable_benchmark_retries: bool = True
 
 
 # ---------------------------------------------------------------------------
@@ -817,7 +823,13 @@ class BenchmarkRunner:
             max_epochs=self.config.max_epochs,
             benchmark_app=self.config.benchmark_app,
             openvino_device=self.config.openvino_device,
-            enable_benchmark_retries=self.config.enable_benchmark_retries,
+            training_device_name=self.config.training_device_name,
+            openvino_device_name=self.config.openvino_device_name,
+            task=experiment.task,
+            model_name=experiment.model.name,
+            dataset_name=experiment.dataset_name,
+            scenario_name=experiment.scenario.name,
+            performance_benchmark=self.config.enable_openvino_benchmark,
         )
 
         # Determine which phases to run (respecting resume point)

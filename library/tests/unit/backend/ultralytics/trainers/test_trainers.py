@@ -91,25 +91,28 @@ def test_iteration_timer_appends_epoch_means_to_results_csv(tmp_path: Path) -> N
     callbacks: dict[str, list[Callable[..., Any]]] = {}
     trainer.add_callback = lambda event, callback: callbacks.setdefault(event, []).append(callback)  # type: ignore[attr-defined]
 
-    timer_values = iter([1.0, 2.0, 3.0, 5.0, 6.0, 8.0])
+    timer_values = iter([1.0, 2.0, 5.0, 6.0, 8.0, 10.0])
     with patch("getitune.backend.ultralytics.trainers.base.time.perf_counter", side_effect=timer_values):
         trainer._register_iteration_timer()
         start = callbacks["on_train_batch_start"][0]
         end = callbacks["on_train_batch_end"][0]
+        epoch_start = callbacks["on_train_epoch_start"][0]
         finish = callbacks["on_train_end"][0]
         state = SimpleNamespace(epoch=0, save_dir=tmp_path)
+        epoch_start(state)
         start(state)
         end(state)
         start(state)
         end(state)
         state.epoch = 1
+        epoch_start(state)
         start(state)
         end(state)
         finish(state)
 
     with results_csv.open(newline="", encoding="utf-8") as stream:
         rows = list(csv.DictReader(stream))
-    assert rows[0]["train/iter_time"] == "1.5"
+    assert rows[0]["train/iter_time"] == "2.5"
     assert rows[1]["train/iter_time"] == "2.0"
 
 

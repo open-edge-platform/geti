@@ -364,7 +364,6 @@ class TestRunConfig:
         assert cfg.trigger == "manual"
         assert cfg.baseline_branch == "develop"
         assert cfg.max_attempts == 3
-        assert cfg.enable_benchmark_retries is True
 
     def test_custom_fields(self, tmp_path: Path) -> None:
         cfg = RunConfig(
@@ -420,8 +419,8 @@ class TestRunnerEvalUpto:
         assert "test/optimize" not in allowed
         assert "export" in allowed
         assert "optimize" in allowed
-        assert "benchmark/export/throughput" in allowed
-        assert "benchmark/optimize/latency" in allowed
+        assert "benchmark/export" in allowed
+        assert "benchmark/optimize" in allowed
 
     @patch("getitune.benchmark.runner.provision_datasets")
     @patch("getitune.benchmark.runner.ExperimentExecutor")
