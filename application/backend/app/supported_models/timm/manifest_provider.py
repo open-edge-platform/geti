@@ -40,7 +40,7 @@ class TimmManifestProvider:
         _, h, w = e["input_size"]
         return ModelManifest(
             id=model_name_to_id(model_name),
-            name=f"timm/{model_name}",
+            name=model_name,
             license=e["license"],
             task=TaskType.CLASSIFICATION,
             description=f"timm backbone '{model_name}'.",
@@ -79,4 +79,6 @@ class TimmManifestProvider:
         _, height, width = e["input_size"]
         return {
             "input_size": (height, width),
+            "mean": tuple(e["mean"]),
+            "std": tuple(e["std"]),
         }

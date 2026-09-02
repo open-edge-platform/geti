@@ -13,7 +13,7 @@ build, this script records:
 
 - ``family`` / ``version`` / ``pretrained``: derived from timm's own module
   grouping.
-- ``input_size`` from ``pretrained_cfg``.
+- preprocessing defaults (``input_size``, ``mean``, ``std``) from ``pretrained_cfg``.
 - ``default_lr`` / ``default_weight_decay``: aligned with the optimizer family
   the timm model wrapper will pick at train time (see ``TimmModelMulticlassCls``/§3.2
   of the design doc), so the exposed learning rate and weight decay always matches
@@ -209,6 +209,8 @@ def _build_entry(
         "version": version_tag,
         "pretrained": pretrained_tag,
         "input_size": list(cfg.input_size),
+        "mean": list(cfg.mean),
+        "std": list(cfg.std),
         "default_lr": default_params["learning_rate"],
         "default_weight_decay": default_params["weight_decay"],
         "imagenet_top1_accuracy": imagenet_top1.get(model_name),
