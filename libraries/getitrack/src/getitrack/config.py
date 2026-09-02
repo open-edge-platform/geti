@@ -13,6 +13,7 @@ docstrings become schema ``description`` strings via ``use_attribute_docstrings`
 
 from __future__ import annotations
 
+import warnings
 from enum import StrEnum
 from pathlib import Path
 from typing import Annotated, Any
@@ -52,6 +53,26 @@ class DistanceMetric(StrEnum):
     GIOU = "giou"
     DIOU = "diou"
     CIOU = "ciou"
+
+
+class ReIDBackend(StrEnum):
+    """Inference backend used to run the appearance (ReID) model.
+
+    ``torch`` runs the torchreid model natively; ``openvino`` runs an OpenVINO IR,
+    either supplied directly or auto-exported from the torchreid model and cached.
+    """
+
+    OPENVINO = "openvino"
+    TORCH = "torch"
+
+
+class GMCMethod(StrEnum):
+    """Algorithm used to estimate frame-to-frame camera motion (GMC)."""
+
+    SPARSE_OPT_FLOW = "sparse_opt_flow"
+    ECC = "ecc"
+    ORB = "orb"
+    SIFT = "sift"
 
 
 class _StrictModel(BaseModel):
@@ -119,6 +140,80 @@ class InterpolationConfig(_StrictModel):
             msg = f"smoothing_window must be odd for a centred average; got {self.smoothing_window}"
             raise ValueError(msg)
         return self
+
+
+class ReIDConfig(_StrictModel):
+    """Appearance-model (ReID) parameters shared by appearance-aware trackers.
+
+    A ReID model is sourced either from torchreid (set ``model_name``) or as a
+    prebuilt OpenVINO IR (set ``model_path`` to a ``.xml`` with ``backend`` left
+    at ``openvino``). With ``model_name`` set, ``backend`` selects how it runs:
+    ``torch`` natively, or ``openvino`` via an IR auto-exported and cached from
+    the torchreid model.
+    """
+
+    enabled: bool = False
+    """Enable appearance embedding via a ReID model. When false, callers may
+    still supply ``Detections.embeddings`` directly."""
+
+    backend: ReIDBackend = ReIDBackend.OPENVINO
+    """Inference backend for the ReID model (``openvino`` or ``torch``)."""
+
+    model_name: str | None = None
+    """torchreid architecture name (e.g. ``osnet_x1_0``). When set, the model is
+    built with torchreid; the ``torch`` backend runs it natively and the
+    ``openvino`` backend auto-exports it to a cached IR."""
+
+    model_path: Path | None = None
+    """Model weights location. With ``model_name`` set, an optional torchreid
+    ``.pth.tar`` checkpoint (torchreid downloads ImageNet-pretrained weights when
+    omitted). Without ``model_name``, a prebuilt OpenVINO IR ``.xml`` to run
+    directly."""
+
+    device: str = "CPU"
+    """Device the model runs on. OpenVINO device string (e.g. ``CPU``, ``GPU``)
+    for the OpenVINO backend; mapped to ``cpu``/``cuda`` for the torch backend."""
+
+    input_size: tuple[Annotated[int, Field(gt=0)], Annotated[int, Field(gt=0)]] = (256, 128)
+    """ReID model input ``(height, width)`` in pixels (OSNet default 256x128)."""
+
+    cache_dir: Path | None = None
+    """Directory for IRs auto-exported from a torchreid model on the openvino
+    backend. Defaults to ``~/.cache/getitrack/reid`` when omitted."""
+
+    @model_validator(mode="after")
+    def _warn_enabled_without_model(self) -> ReIDConfig:
+        """Warn when ReID is enabled but no model source is configured."""
+        if self.enabled and self.model_name is None and self.model_path is None:
+            warnings.warn(
+                "ReIDConfig.enabled is True but neither model_name nor model_path "
+                "is set; no ReID model will be built. Supply Detections.embeddings "
+                "directly, or set model_name (torchreid) or model_path (IR) to "
+                "embed detections automatically.",
+                UserWarning,
+                stacklevel=2,
+            )
+        return self
+
+
+class GMCConfig(_StrictModel):
+    """Global motion compensation (camera-motion) parameters.
+
+    When enabled, an appearance-aware tracker estimates the affine camera motion
+    between consecutive frames and warps its predicted track states by it before
+    association (BoT-SORT's GMC).
+    """
+
+    enabled: bool = False
+    """Enable camera-motion compensation. The caller must feed frames to the
+    tracker's estimator (e.g. ``tracker.apply_camera_motion(frame)``) each frame."""
+
+    method: GMCMethod = GMCMethod.SPARSE_OPT_FLOW
+    """Motion-estimation algorithm (BoT-SORT defaults to sparse optical flow)."""
+
+    downscale: Annotated[int, Field(ge=1)] = 2
+    """Integer factor the frame is downscaled by before estimation. 1 disables
+    downscaling."""
 
 
 class TrackerConfig(_StrictModel):

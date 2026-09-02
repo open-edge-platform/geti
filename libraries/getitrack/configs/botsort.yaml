@@ -1,0 +1,42 @@
+# BoT-SORT sample configuration: ByteTrack association + appearance (ReID) + GMC.
+algorithm: botsort
+verbose: false
+# Detection filtering, applied before tracking.
+score_threshold: 0.1
+class_filter: null
+# Detection-to-track matching.
+match_threshold: 0.8
+high_score_threshold: 0.5
+match_class_only: true
+lifecycle:
+  max_age: 30
+  min_hits: 2
+  tentative_max_age: 0
+motion:
+  process_noise: 1.0
+  measurement_noise: 1.0
+  velocity_decay: 1.0
+# Appearance fusion: cosine appearance cost blended with IoU under a proximity gate.
+appearance_weight: 0.25
+appearance_iou_floor: 0.5
+gallery_size: 50
+appearance_threshold: 0.25
+use_ema: true
+ema_alpha: 0.9
+# ReID model. backend: torch runs the torchreid model natively; openvino runs an
+# IR auto-exported from it (or a prebuilt .xml when model_name is null).
+reid:
+  enabled: true
+  backend: torch
+  model_name: osnet_x1_0
+  model_path: null
+  device: CPU
+  input_size: [256, 128]
+  cache_dir: null
+# Camera-motion (global motion) compensation. Feed frames via
+# tracker.apply_camera_motion(frame) before each update.
+# method: sparse_opt_flow (default), ecc, orb, or sift.
+gmc:
+  enabled: true
+  method: sparse_opt_flow
+  downscale: 2

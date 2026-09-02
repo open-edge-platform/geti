@@ -12,6 +12,7 @@ from getitrack.config import (
     InterpolationMethod,
     LifecycleConfig,
     MotionConfig,
+    ReIDConfig,
     TrackerConfig,
 )
 
@@ -68,6 +69,16 @@ class TestBaseConfig:
         # A subclass pins ``algorithm``; a different value must be rejected.
         with pytest.raises(ValidationError, match="pins algorithm"):
             _DemoConfig(algorithm=AlgorithmType.OCSORT)
+
+
+class TestReIDConfig:
+    def test_accepts_positive_input_size(self):
+        assert ReIDConfig(input_size=(128, 64)).input_size == (128, 64)
+
+    @pytest.mark.parametrize("bad", [(0, 128), (256, 0), (-1, 128), (256, -1)])
+    def test_rejects_non_positive_input_size(self, bad):
+        with pytest.raises(ValidationError, match="input_size"):
+            ReIDConfig(input_size=bad)
 
 
 class TestYAML:

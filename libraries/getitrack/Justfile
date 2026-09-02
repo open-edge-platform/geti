@@ -17,7 +17,7 @@ _ensure_uv:
 # Create a virtual environment and install dependencies
 venv: _ensure_uv
     uv lock --check
-    uv sync --frozen
+    uv sync --frozen --all-extras
 
 # Generate or update the uv lock file
 venv-lock: _ensure_uv
