@@ -148,6 +148,31 @@ def generate_performance_report(result_roots: list[Path], output: Path) -> None:
         "> Performance-only report. Accuracy metrics are intentionally excluded.",
         "",
     ]
+    environments: dict[tuple[str, str], dict[str, object]] = {}
+    for row in rows:
+        key = (str(row["training_device"]), str(row["openvino_device"]))
+        software = row["software"]
+        existing = environments.get(key)
+        if existing is not None and existing != software:
+            msg = f"Conflicting software versions for training/OpenVINO devices {key}."
+            raise ValueError(msg)
+        environments[key] = software
+
+    lines.extend(
+        [
+            "## Software Environment",
+            "",
+            "| Training Device | OpenVINO Device | Python | PyTorch | OpenVINO |",
+            "| --- | --- | --- | --- | --- |",
+        ]
+    )
+    for (training_device, openvino_device), software in sorted(environments.items()):
+        lines.append(
+            f"| {training_device} | {openvino_device} | {software['python']} | "
+            f"{software['torch']} | {software['openvino']} |"
+        )
+    lines.append("")
+
     header = (
         "| Model | Training Device | OpenVINO Device | Train Batch | OV Inference Batch | "
         "Train Iteration (ms) | FP16 FPS | FP Latency (ms) | INT8 FPS | INT8 Latency (ms) |"

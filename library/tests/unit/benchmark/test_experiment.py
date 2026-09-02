@@ -10,6 +10,7 @@ import json
 import time
 from pathlib import Path
 from types import ModuleType
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -274,6 +275,49 @@ class TestDetectResumePoint:
         skip, resume_from = detect_resume_point(seed_dir)
         assert skip is False
         assert resume_from == "test/torch"
+
+    def test_real_csv_layout_is_recognized_as_trained(self, tmp_path: Path) -> None:
+        """Lightning/Ultralytics write ``train/csv/version_*/metrics.csv``, never a
+        direct ``train/metrics.csv``. The benchmark worker must recognize this
+        layout instead of treating the seed as untrained and wiping it.
+        """
+        seed_dir = tmp_path / "seed"
+        (seed_dir / "train" / "csv" / "version_0").mkdir(parents=True)
+        (seed_dir / "train" / "csv" / "version_0" / "metrics.csv").write_text("train/iter_time\n0.1\n")
+        (seed_dir / "train" / "best_checkpoint.pt").write_text("fake")
+
+        skip, resume_from = detect_resume_point(seed_dir, {"benchmark/export", "benchmark/optimize"})
+
+        assert skip is False
+        assert resume_from == "benchmark/export"
+        assert seed_dir.exists()
+
+    def test_measured_artifacts_survive_incomplete_training_check(self, tmp_path: Path) -> None:
+        """A benchmark-stage worker must never wipe preparation artifacts when
+        the training marker cannot be found (regression for the staged-worker
+        ``FileNotFoundError: Exported model not found`` failure).
+        """
+        seed_dir = tmp_path / "seed"
+        (seed_dir / "export").mkdir(parents=True)
+        (seed_dir / "export" / "exported_model.xml").write_text("fake")
+        (seed_dir / "performance_result.json").write_text("{}")
+
+        skip, resume_from = detect_resume_point(seed_dir, {"benchmark/export"})
+
+        assert skip is False
+        assert resume_from is None
+        assert seed_dir.exists()
+        assert (seed_dir / "export" / "exported_model.xml").exists()
+
+    def test_benchmark_dir_survives_incomplete_training_check(self, tmp_path: Path) -> None:
+        seed_dir = tmp_path / "seed"
+        (seed_dir / "benchmark" / "export" / "throughput").mkdir(parents=True)
+        (seed_dir / "benchmark" / "export" / "throughput" / "benchmark_report.json").write_text("{}")
+
+        detect_resume_point(seed_dir, {"benchmark/export"})
+
+        assert seed_dir.exists()
+        assert (seed_dir / "benchmark" / "export" / "throughput" / "benchmark_report.json").exists()
 
     def test_training_and_test_done_resumes_from_export(self, tmp_path: Path) -> None:
         seed_dir = tmp_path / "seed"
@@ -802,6 +846,42 @@ class TestExecutorBackendDispatch:
             recipe_path=recipe, data_path=tmp_path / "data", work_dir=tmp_path / "work", accelerator="xpu"
         )
         assert executor.openvino_device == "GPU"
+
+    def test_ultralytics_training_batch_falls_back_to_engine_config(self, tmp_path: Path) -> None:
+        recipe = tmp_path / "yolo.yaml"
+        recipe.write_text(_ULTRALYTICS_RECIPE)
+        executor = ExperimentExecutor(recipe_path=recipe, data_path=tmp_path / "data", work_dir=tmp_path / "work")
+        engine = MagicMock()
+        engine.datamodule.train_subset.batch_size = None
+        engine._train_args = {"batch": 16}
+        engine.model.yolo.trainer = None
+        assert executor._effective_training_batch_size(engine) == 16
+
+    def test_training_metadata_is_written_to_canonical_result(self, tmp_path: Path, monkeypatch) -> None:
+        recipe = tmp_path / "recipe.yaml"
+        recipe.write_text(_LIGHTNING_RECIPE)
+        executor = ExperimentExecutor(
+            recipe_path=recipe,
+            data_path=tmp_path / "data",
+            work_dir=tmp_path / "work",
+            accelerator="cpu",
+            task="detection",
+            model_name="model_a",
+            dataset_name="dataset_a",
+        )
+        monkeypatch.setattr("getitune.benchmark.experiment._package_version", lambda _name: "test")
+        monkeypatch.setattr(executor, "_git_sha", lambda: "abc")
+        executor._write_performance_result(
+            {
+                "schema_version": 1,
+                "training_device": "CPU",
+                "training_batch_size": 4,
+                "software": executor._software_versions(),
+            }
+        )
+        result = json.loads((tmp_path / "work" / "performance_result.json").read_text())
+        assert result["training_batch_size"] == 4
+        assert not (tmp_path / "work" / "training_performance_metadata.json").exists()
 
     def test_benchmark_commands_use_batch_one_only_for_latency(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch

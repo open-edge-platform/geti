@@ -172,6 +172,26 @@ _PHASE_MARKERS: list[tuple[str, str]] = [
 ]
 
 
+def _training_artifacts_complete(seed_dir: Path) -> bool:
+    """Return whether training metrics and the best checkpoint both exist.
+
+    Lightning and Ultralytics both write per-run CSVs under
+    ``train/csv/version_*/metrics.csv``; the direct ``train/metrics.csv`` path
+    is kept as a legacy fallback for hand-crafted result directories.
+    """
+    metric_candidates = [
+        *sorted(seed_dir.glob("train/csv/version_*/metrics.csv")),
+        seed_dir / "train" / "metrics.csv",
+    ]
+    has_metrics = any(path.exists() and path.stat().st_size > 0 for path in metric_candidates)
+    return has_metrics and (seed_dir / "train" / "best_checkpoint.pt").exists()
+
+
+def _has_measured_artifacts(seed_dir: Path) -> bool:
+    """Return whether the seed dir holds performance measurements worth keeping."""
+    return (seed_dir / "performance_result.json").exists() or (seed_dir / "benchmark").is_dir()
+
+
 def detect_resume_point(seed_dir: Path, required_phases: set[str] | None = None) -> tuple[bool, str | None]:
     """Determine whether an experiment can be skipped or partially resumed.
 
@@ -180,10 +200,12 @@ def detect_resume_point(seed_dir: Path, required_phases: set[str] | None = None)
         ``(False, None)`` - start from scratch.
         ``(False, <phase_name>)`` - training done, resume from this phase.
     """
-    train_marker = seed_dir / "train" / "metrics.csv"
-    if not train_marker.exists() or train_marker.stat().st_size == 0:
-        # Training not done or corrupt -> start over
-        if seed_dir.exists():
+    if not _training_artifacts_complete(seed_dir):
+        # Training not done or corrupt -> start over. Never destroy a seed
+        # directory that still holds performance measurements: a later worker
+        # (e.g. the isolated benchmark stage) must not wipe artifacts produced
+        # by the preparation stage.
+        if seed_dir.exists() and not _has_measured_artifacts(seed_dir):
             shutil.rmtree(seed_dir)
         return False, None
 
@@ -552,6 +574,15 @@ def _benchmark_data_shape(model: Path) -> str | None:
     return "[" + ",".join(dimensions) + "]"
 
 
+def _as_positive_int(value: object) -> int | None:
+    """Convert a batch-size value to a positive integer when possible."""
+    try:
+        converted = int(value)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return converted if converted > 0 else None
+
+
 def _validate_fp16_model(model: Path) -> None:
     """Verify that an exported IR contains FP16 constants."""
     import openvino as ov
@@ -722,28 +753,43 @@ class ExperimentExecutor:
 
         from getitune.benchmark.hardware import get_training_device_name
 
-        datamodule = engine.datamodule
-        train_subset = getattr(datamodule, "train_subset", None)
-        train_batch_size = getattr(train_subset, "batch_size", None)
-        if self.is_ultralytics:
-            ultralytics_engine: Any = engine
-            trainer = getattr(ultralytics_engine.model.yolo, "trainer", None)
-            train_batch_size = getattr(trainer, "batch_size", None)
-            if train_batch_size is None:
-                train_batch_size = getattr(getattr(trainer, "args", None), "batch", None)
-        if not isinstance(train_batch_size, int) or train_batch_size < 1:
+        train_batch_size = self._effective_training_batch_size(engine)
+        if train_batch_size is None:
             msg = f"Could not determine effective training batch size for {self.model_name}."
             raise RuntimeError(msg)
         metadata = {
+            "schema_version": 1,
+            "task": self.task,
+            "model": self.model_name,
+            "dataset": self.dataset_name,
+            "scenario": self.scenario_name,
+            "seed": self.seed,
             "training_device": self.training_device_name or get_training_device_name(self.accelerator),
             "training_batch_size": train_batch_size,
+            "git_sha": self._git_sha(),
+            "software": self._software_versions(),
         }
-        (self.work_dir / "training_performance_metadata.json").write_text(
-            json.dumps(metadata, indent=2), encoding="utf-8"
-        )
+        self._write_performance_result(metadata)
 
         del engine
         return PhaseResult(phase="train", metrics=csv_metrics, wall_time=wall)
+
+    def _effective_training_batch_size(self, engine: Engine) -> int | None:
+        """Return the actual or configured training batch size."""
+        datamodule = engine.datamodule
+        train_subset = getattr(datamodule, "train_subset", None)
+        train_batch_size = _as_positive_int(getattr(train_subset, "batch_size", None))
+        if self.is_ultralytics:
+            ultralytics_engine: Any = engine
+            trainer = getattr(ultralytics_engine.model.yolo, "trainer", None)
+            train_batch_size = _as_positive_int(getattr(trainer, "batch_size", None))
+            if train_batch_size is None:
+                train_batch_size = _as_positive_int(getattr(getattr(trainer, "args", None), "batch", None))
+            if train_batch_size is None:
+                train_batch_size = _as_positive_int(getattr(ultralytics_engine, "_train_args", {}).get("batch"))
+            if train_batch_size is None:
+                train_batch_size = _as_positive_int(getattr(train_subset, "batch_size", None))
+        return train_batch_size
 
     def test_torch(self) -> PhaseResult:
         """Test the PyTorch checkpoint and return metrics."""
@@ -984,35 +1030,16 @@ class ExperimentExecutor:
     def _update_performance_result(self, precision: str, phase: PhaseResult) -> None:
         """Update the canonical per-seed performance result."""
         from getitune.benchmark.hardware import get_openvino_device_name
-        from getitune.benchmark.tracking import get_git_sha
-
-        metadata_path = self.work_dir / "training_performance_metadata.json"
-        try:
-            training = json.loads(metadata_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError) as exc:
-            msg = f"Missing training performance metadata: {metadata_path}"
-            raise RuntimeError(msg) from exc
         output = self.work_dir / "performance_result.json"
-        current = json.loads(output.read_text(encoding="utf-8")) if output.exists() else {}
+        try:
+            current = json.loads(output.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            msg = f"Missing canonical performance result: {output}"
+            raise RuntimeError(msg) from exc
         current.update(
             {
-                "schema_version": 1,
-                "task": self.task,
-                "model": self.model_name,
-                "dataset": self.dataset_name,
-                "scenario": self.scenario_name,
-                "seed": self.seed,
-                **training,
                 "openvino_device": self.openvino_device_name or get_openvino_device_name(self.openvino_device),
                 "openvino_target": self.openvino_device,
-                "git_sha": get_git_sha(),
-                "software": {
-                    "python": platform.python_version(),
-                    "getitune": _package_version("getitune"),
-                    "torch": _package_version("torch"),
-                    "openvino": _package_version("openvino"),
-                    "nncf": _package_version("nncf"),
-                },
             }
         )
         prefix = "export" if precision == "fp16" else "optimize"
@@ -1022,9 +1049,33 @@ class ExperimentExecutor:
             "throughput_fps": phase.metrics[f"{prefix}:throughput:fps"],
             "latency_ms": phase.metrics[f"{prefix}:latency:latency_ms"],
         }
+        self._write_performance_result(current)
+
+    def _write_performance_result(self, result: dict[str, Any]) -> None:
+        """Atomically write the canonical performance result."""
+        output = self.work_dir / "performance_result.json"
+        output.parent.mkdir(parents=True, exist_ok=True)
         temporary = output.with_suffix(".tmp")
-        temporary.write_text(json.dumps(current, indent=2), encoding="utf-8")
+        temporary.write_text(json.dumps(result, indent=2), encoding="utf-8")
         temporary.replace(output)
+
+    @staticmethod
+    def _git_sha() -> str:
+        """Return the current Git revision for result provenance."""
+        from getitune.benchmark.tracking import get_git_sha
+
+        return get_git_sha()
+
+    @staticmethod
+    def _software_versions() -> dict[str, str]:
+        """Return the software versions needed to reproduce measurements."""
+        return {
+            "python": platform.python_version(),
+            "getitune": _package_version("getitune"),
+            "torch": _package_version("torch"),
+            "openvino": _package_version("openvino"),
+            "nncf": _package_version("nncf"),
+        }
 
     # -- helpers -----------------------------------------------------------
 

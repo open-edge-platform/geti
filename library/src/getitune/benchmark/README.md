@@ -24,7 +24,7 @@ Run commands from `library/`.
 1. Sync dependencies (if needed):
 
    ```bash
-   just venv --device <cpu|cuda|xpu>
+   just venv-benchmark --device <cpu|cuda|xpu>
    ```
 
 2. See all benchmark commands:
@@ -143,7 +143,8 @@ Markdown table. Each benchmark seed writes a canonical
 effective batch sizes, verified model precision, software versions, and
 measurements. The report generator fails on incomplete metadata instead of
 printing ambiguous values. Multiple seeds are averaged into one row per model
-and hardware combination.
+and hardware combination. A software-environment table records the Python,
+PyTorch, and OpenVINO versions used for each physical device pair.
 
 ```bash
 uv run python -m getitune.benchmark.generate_performance_report \
@@ -186,6 +187,11 @@ By default (`--output-root results`), the benchmark writes:
 - `results/report.md` - markdown summary with pass/regression/failure sections
 - `results/aggregated.csv` - flattened metrics table
 - `results/failed_experiments.json` - structured failure details (only when failures exist)
+
+When OpenVINO performance benchmarking is enabled, model/checkpoint files are
+removed only for seeds with complete FP16 and INT8 performance results. Failed
+or partially completed performance runs retain their artifacts so they can be
+resumed without retraining.
 
 Per-seed work directories are created under:
 

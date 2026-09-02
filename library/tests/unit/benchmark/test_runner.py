@@ -403,6 +403,23 @@ class TestRunConfig:
         assert cfg.enable_validation is False
 
 
+class TestPerformanceCleanup:
+    def test_incomplete_performance_result_is_preserved(self, tmp_path: Path) -> None:
+        seed_dir = tmp_path / "detection" / "model" / "data" / "0"
+        seed_dir.mkdir(parents=True)
+        (seed_dir / "exported_model.xml").write_text("model")
+        (seed_dir / "performance_result.json").write_text(json.dumps({"fp16": {}}))
+
+        assert BenchmarkRunner._performance_result_complete(seed_dir / "exported_model.xml") is False
+
+    def test_complete_performance_result_can_be_cleaned(self, tmp_path: Path) -> None:
+        seed_dir = tmp_path / "detection" / "model" / "data" / "0"
+        seed_dir.mkdir(parents=True)
+        (seed_dir / "performance_result.json").write_text(json.dumps({"fp16": {}, "int8": {}}))
+
+        assert BenchmarkRunner._performance_result_complete(seed_dir / "model.xml") is True
+
+
 # ---------------------------------------------------------------------------
 # Runner — eval_upto gating
 # ---------------------------------------------------------------------------
@@ -421,6 +438,40 @@ class TestRunnerEvalUpto:
         assert "optimize" in allowed
         assert "benchmark/export" in allowed
         assert "benchmark/optimize" in allowed
+
+
+class TestRunnerBenchmarkIsolation:
+    def test_benchmark_phases_run_in_fresh_stage(self, tmp_path: Path) -> None:
+        config = RunConfig(
+            manifest_path=tmp_path / "manifest.yaml",
+            catalog_path=tmp_path / "catalog.yaml",
+            data_root=tmp_path / "data",
+            output_root=tmp_path / "results",
+            enable_tracking=False,
+            enable_report=False,
+            isolate_in_subprocess=True,
+        )
+        runner = BenchmarkRunner(config)
+        prepared = ExperimentResult(
+            task="detection", model="model_a", dataset="ds_a", scenario="default", seed=0, success=True
+        )
+        measured = ExperimentResult(
+            task="detection",
+            model="model_a",
+            dataset="ds_a",
+            scenario="default",
+            seed=0,
+            success=True,
+            phases=[PhaseResult(phase="benchmark/export", metrics={"fps": 1.0})],
+        )
+        with patch.object(runner, "_run_single_stage", side_effect=[prepared, measured]) as run_stage:
+            result = runner._run_single(
+                experiment=MagicMock(), seed=0, data_path=tmp_path / "data", allowed_phases={"train", "benchmark/export"}
+            )
+        assert result.success
+        assert [phase.phase for phase in result.phases] == ["benchmark/export"]
+        assert run_stage.call_args_list[0].args[3] == {"train"}
+        assert run_stage.call_args_list[1].args[3] == {"benchmark/export"}
 
     @patch("getitune.benchmark.runner.provision_datasets")
     @patch("getitune.benchmark.runner.ExperimentExecutor")

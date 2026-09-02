@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import gc
 import hashlib
+import json
 import logging
 import multiprocessing as mp
 import os
@@ -77,6 +78,7 @@ _BENCHMARK_PHASES: dict[str, set[str]] = {
 }
 
 _VALIDATION_PHASES = {"test/torch", "test/export", "test/optimize"}
+_BENCHMARK_PHASE_NAMES = {"benchmark/export", "benchmark/optimize"}
 
 _MAX_ATTEMPTS = 3
 
@@ -472,6 +474,8 @@ class BenchmarkRunner:
         removed = 0
         freed_bytes = 0
         for path in output_root.rglob("*"):
+            if self.config.enable_openvino_benchmark and not self._performance_result_complete(path):
+                continue
             if path.is_file() and path.suffix in extensions:
                 freed_bytes += path.stat().st_size
                 path.unlink()
@@ -480,6 +484,21 @@ class BenchmarkRunner:
         if removed:
             freed_mb = freed_bytes / (1024 * 1024)
             logger.info("Cleanup: removed %d checkpoint/model files (%.1f MB freed).", removed, freed_mb)
+
+    @staticmethod
+    def _performance_result_complete(path: Path) -> bool:
+        """Return whether *path* belongs to a complete performance result."""
+        seed_dir = path
+        while seed_dir != seed_dir.parent and seed_dir.name != "0":
+            seed_dir = seed_dir.parent
+        result_path = seed_dir / "performance_result.json"
+        if not result_path.exists():
+            return False
+        try:
+            result = json.loads(result_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return False
+        return isinstance(result, dict) and {"fp16", "int8"} <= result.keys()
 
     # -- single experiment -------------------------------------------------
 
@@ -618,7 +637,38 @@ class BenchmarkRunner:
         data_path: Path,
         allowed_phases: set[str],
     ) -> ExperimentResult:
-        """Run one ``(experiment, seed)`` with retry logic."""
+        """Run one ``(experiment, seed)`` with retry and process isolation."""
+        benchmark_phases = allowed_phases & _BENCHMARK_PHASE_NAMES
+        if benchmark_phases and self.config.isolate_in_subprocess:
+            # Do not keep Torch/XPU/NNCF state alive while benchmark_app runs.
+            # The benchmark stage gets a fresh Python worker and only reads
+            # the exported/optimized model files produced by preparation.
+            preparation_phases = allowed_phases - _BENCHMARK_PHASE_NAMES
+            prepared = self._run_single_stage(experiment, seed, data_path, preparation_phases)
+            if not prepared.success:
+                return prepared
+            measured = self._run_single_stage(experiment, seed, data_path, benchmark_phases)
+            if not measured.success:
+                return measured
+            return ExperimentResult(
+                task=experiment.task,
+                model=experiment.model.name,
+                dataset=experiment.dataset_name,
+                scenario=experiment.scenario.name,
+                seed=seed,
+                success=True,
+                phases=[*prepared.phases, *measured.phases],
+            )
+        return self._run_single_stage(experiment, seed, data_path, allowed_phases)
+
+    def _run_single_stage(
+        self,
+        experiment: Experiment,
+        seed: int,
+        data_path: Path,
+        allowed_phases: set[str],
+    ) -> ExperimentResult:
+        """Run one phase group with retry logic."""
         last_exc: BaseException | None = None
         deterministic: bool | str = self.config.deterministic
 

@@ -100,9 +100,9 @@ cuda = [
     "torchvision==0.27.1+cu130"
 ]
 xpu = [
-    "torch==2.12.1+xpu",
-    "triton-xpu==3.7.1",
-    "torchvision==0.27.1+xpu"
+    "torch==2.14.0+xpu",
+    "triton-xpu==3.8.0",
+    "torchvision==0.29.0+xpu"
 ]
 ultralytics = [
     "ultralytics==8.4.86",
@@ -169,6 +169,7 @@ override-dependencies = [
 [tool.uv.sources]
 # TODO (#7346) revert to official Pypi package after MAPI 0.4.7 or higher is released.
 openvino-model-api = { git = "https://github.com/open-edge-platform/model_api", branch = "master", subdirectory = "model_api" }
+nncf = { git = "https://github.com/openvinotoolkit/nncf.git", rev = "ae0908fe75e9cbe31051545b6ef818d084cb2797" }
 torch = [
     # Note: Pytorch indexes only provide pre-built wheels for Linux and Windows.
     # For other platforms (e.g., macOS), Pytorch has to be installed from the default PyPI index.

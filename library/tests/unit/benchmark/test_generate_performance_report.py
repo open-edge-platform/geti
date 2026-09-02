@@ -61,6 +61,9 @@ def test_generates_exact_performance_schema(tmp_path: Path) -> None:
     assert "Train Iteration (ms) | FP16 FPS | FP Latency (ms) | INT8 FPS | INT8 Latency (ms) |" in report
     assert "NVIDIA GeForce RTX 3090" in report
     assert "Intel(R) Core(TM) i9-14900K" in report
+    assert "## Software Environment" in report
+    assert "| Python | PyTorch | OpenVINO |" in report
+    assert "| 3.12 | 2 | 3 |" in report
     assert "| 16 | 1 | 150.00 | 100.00 | 2.00 | 200.00 | 1.00 |" in report
     assert "Dataset" not in report
 
@@ -99,4 +102,17 @@ def test_logical_device_name_fails(tmp_path: Path) -> None:
     result_path.write_text(json.dumps(result), encoding="utf-8")
 
     with pytest.raises(ValueError, match="physical device"):
+        generate_performance_report([root], tmp_path / "report.md")
+
+
+def test_conflicting_software_versions_fail(tmp_path: Path) -> None:
+    root = tmp_path / "results"
+    _write_result(root, seed=0)
+    _write_result(root, seed=1)
+    result_path = sorted(root.glob("**/performance_result.json"))[1]
+    result = json.loads(result_path.read_text(encoding="utf-8"))
+    result["software"]["torch"] = "different"
+    result_path.write_text(json.dumps(result), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Conflicting software versions"):
         generate_performance_report([root], tmp_path / "report.md")
