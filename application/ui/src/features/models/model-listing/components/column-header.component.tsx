@@ -27,8 +27,7 @@ export const ColumnHeader = ({ label, sortKey, sortBy, onSortChange }: ColumnHea
 
     return (
         <button
-            type={'button'}
-            className={clsx(classes.columnHeader, isSorted && classes.isSorted)}
+            className={clsx(classes.columnHeader, { [classes.isSorted]: isSorted })}
             onClick={() => onSortChange(sortKey)}
             aria-label={isSorted ? `${label}, sorted ${DIRECTION_LABELS[direction]}` : `Sort by ${label}`}
         >
