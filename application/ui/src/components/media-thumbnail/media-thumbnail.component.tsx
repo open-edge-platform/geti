@@ -52,6 +52,12 @@ export const MediaThumbnail = ({ onDoubleClick, onClick, url, alt, item }: Media
             return;
         }
 
+        // Re-assigning the same value restarts the fetch, so every scroll stop would abort and
+        // re-request the thumbnails that are already loading.
+        if (imgRef.current.getAttribute('src') === url) {
+            return;
+        }
+
         imgRef.current.src = url;
     }, [url, isScrolling]);
 
@@ -76,11 +82,6 @@ export const MediaThumbnail = ({ onDoubleClick, onClick, url, alt, item }: Media
                 draggable={false}
                 decoding={'async'}
                 onLoad={() => setIsLoading(false)}
-                onError={() => {
-                    if (imgRef.current?.complete === true) {
-                        setIsLoading(false);
-                    }
-                }}
             />
             {isLoading && <Skeleton width={'100%'} height={'100%'} className={classes.skeleton} />}
             {isVideo(item) && <VideoIndicator duration={item.duration} />}

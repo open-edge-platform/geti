@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from 'test-utils/render';
 
@@ -64,5 +64,17 @@ describe('MediaThumbnail', () => {
         render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
 
         expect(screen.getByRole('img', { name: 'Test Image' })).toHaveAttribute('src', 'test-image.jpg');
+    });
+
+    it('keeps the skeleton and hides the image when the thumbnail fails to load', () => {
+        vi.mocked(useIsScrolling).mockReturnValue(false);
+
+        render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
+
+        fireEvent.error(screen.getByRole('img', { name: 'Test Image' }));
+
+        // CSS modules are not applied in jsdom, so assert on the class that hides the image.
+        expect(screen.getByRole('img', { name: 'Test Image' }).className).toContain('imgHidden');
+        expect(screen.getByRole('img', { name: 'Loading…' })).toBeVisible();
     });
 });
