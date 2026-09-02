@@ -113,6 +113,7 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
         gradient_checkpointing: bool = False,
         pretrained: bool = True,
         pretrained_weights: PathLike | None = None,
+        export_nms: bool = False,
     ) -> None:
         self.multi_scale = multi_scale
         self.max_total_objects_per_batch = max_total_objects_per_batch
@@ -128,6 +129,7 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
             tile_config=tile_config,
             pretrained=pretrained,
             pretrained_weights=pretrained_weights,
+            export_nms=export_nms,
         )
 
     def _create_model(self, num_classes: int | None = None) -> RFDETRDetector:  # pyrefly: ignore[bad-override]

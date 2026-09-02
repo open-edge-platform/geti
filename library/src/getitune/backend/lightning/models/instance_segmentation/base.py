@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import copy
+import inspect
 import logging as log
 import types
 from contextlib import contextmanager
@@ -94,6 +95,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
         tile_config: TileConfig = TileConfig(enable_tiler=False),
         pretrained: bool = True,
         pretrained_weights: PathLike | None = None,
+        export_nms: bool = False,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -111,6 +113,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
         self.model.feature_vector_fn = feature_vector_fn
         self.model.explain_fn = self.get_explain_fn()
         self.model.get_results_from_head = self.get_results_from_head
+        self.export_nms = export_nms
 
     def _customize_inputs(self, entity: SampleBatch) -> dict[str, Any]:
         # Defensively realign per-image boxes/labels/masks counts so a divergence
@@ -253,7 +256,16 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             "scale_factor": (1.0, 1.0),
         }
         meta_info_list = [meta_info] * len(inputs)
-        return self.model.export(inputs, meta_info_list, explain_mode=self.explain_mode)
+        export_sig = inspect.signature(self.model.export).parameters
+        export_kwargs: dict[str, Any] = {}
+        if "explain_mode" in export_sig:
+            export_kwargs["explain_mode"] = self.explain_mode
+        if "with_nms" in export_sig:
+            export_kwargs["with_nms"] = self.export_nms
+        elif self.export_nms:
+            msg = f"{self.__class__.__name__} does not support embedded NMS export."
+            raise ValueError(msg)
+        return self.model.export(inputs, meta_info_list, **export_kwargs)
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:
@@ -269,7 +281,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             task_type="instance_segmentation",
             confidence_threshold=self.hparams.get("best_confidence_threshold", 0.05),
             iou_threshold=0.5,
-            nms_execute=True,
+            nms_execute=True if not self.export_nms else None,
             tile_config=self.tile_config if self.tile_config.enable_tiler else None,
             label_info=modified_label_info,
         )

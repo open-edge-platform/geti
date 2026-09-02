@@ -74,6 +74,19 @@ class TestLightningInstanceSegModel:
         assert isinstance(parameters, TaskLevelExportParameters)
         assert parameters.task_type == "instance_segmentation"
 
+    def test_export_nms_defaults_to_false(self, model):
+        assert model.export_nms is False
+
+    def test_export_nms_can_be_enabled(self):
+        model = MaskRCNNTV(
+            label_info=1,
+            model_name="maskrcnn_resnet_50",
+            data_input_params=DataInputParams((224, 224), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            pretrained=False,
+            export_nms=True,
+        )
+        assert model.export_nms is True
+
     def test_dummy_input(self, model):
         batch_size = 2
         batch = model.get_dummy_input(batch_size)

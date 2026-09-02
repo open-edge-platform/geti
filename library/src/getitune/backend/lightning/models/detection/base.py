@@ -92,6 +92,7 @@ class LightningDetectionModel(PretrainedWeightsMixin, LightningModel):
         explain_mode: bool = False,
         pretrained: bool = True,
         pretrained_weights: PathLike | None = None,
+        export_nms: bool = False,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -107,7 +108,7 @@ class LightningDetectionModel(PretrainedWeightsMixin, LightningModel):
         )
 
         self.explain_mode = explain_mode
-        self.export_nms = False  # Whether to include NMS in the exported model graph
+        self.export_nms = export_nms
         self.model.feature_vector_fn = feature_vector_fn
         self.model.explain_fn = self.get_explain_fn()
 

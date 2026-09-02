@@ -75,6 +75,7 @@ class RTMDetInst(LightningInstanceSegModel):
         tile_config: TileConfig = TileConfig(enable_tiler=False),
         pretrained: bool = True,
         pretrained_weights: PathLike | None = None,
+        export_nms: bool = False,
     ) -> None:
         super().__init__(
             label_info=label_info,
@@ -87,6 +88,7 @@ class RTMDetInst(LightningInstanceSegModel):
             tile_config=tile_config,
             pretrained=pretrained,
             pretrained_weights=pretrained_weights,
+            export_nms=export_nms,
         )
 
     def _create_model(self, num_classes: int | None = None) -> RTMDetInst:

@@ -84,6 +84,7 @@ class UltralyticsModelExporter(ModelExporter):
         swap_rgb: bool = False,
         output_names: list[str] | None = None,
         input_names: list[str] | None = None,
+        export_nms: bool = False,
     ) -> None:
         super().__init__(
             task_level_export_parameters=task_level_export_parameters,
@@ -94,6 +95,14 @@ class UltralyticsModelExporter(ModelExporter):
             output_names=output_names,
             input_names=input_names,
         )
+        self.export_nms = export_nms
+
+    @property
+    def _end2end(self) -> bool:
+        return self.export_nms and self.task_level_export_parameters.task_type in {
+            "detection",
+            "instance_segmentation",
+        }
 
     def to_openvino(  # pyrefly: ignore[bad-override]
         self,
@@ -126,7 +135,7 @@ class UltralyticsModelExporter(ModelExporter):
             format="openvino",
             imgsz=imgsz,
             half=False,
-            end2end=False,
+            end2end=self._end2end,
             project=str(output_dir),
             name="raw_export",
             exist_ok=True,
@@ -182,7 +191,7 @@ class UltralyticsModelExporter(ModelExporter):
             format="onnx",
             imgsz=imgsz,
             half=False,
-            end2end=False,
+            end2end=self._end2end,
             project=str(output_dir),
             name="raw_export",
             exist_ok=True,
@@ -259,7 +268,7 @@ class UltralyticsModelExporter(ModelExporter):
             "imgsz": imgsz,
             "names": names,
             "channels": 3,
-            "end2end": False,
+            "end2end": self._end2end,
             "args": {
                 "data": None,
                 "batch": 1,
@@ -267,7 +276,7 @@ class UltralyticsModelExporter(ModelExporter):
                 "half": precision == Precision.FP16,
                 "int8": False,
                 "dynamic": False,
-                "nms": False,
+                "nms": self._end2end,
             },
         }
 

@@ -146,6 +146,18 @@ class TestLightningDetectionModel:
         assert ("model_info", "agnostic_nms") not in metadata
         assert ("model_info", "nms_max_predictions") not in metadata
 
+    def test_export_nms_defaults_to_false(self, model):
+        assert model.export_nms is False
+
+    def test_export_nms_can_be_enabled(self):
+        model = ATSS(
+            model_name="atss_mobilenetv2",
+            label_info=1,
+            data_input_params=DataInputParams((320, 320), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
+            export_nms=True,
+        )
+        assert model.export_nms is True
+
     def test_export_parameters_with_nms(self, model):
         model.export_nms = True
         parameters = model._export_parameters
