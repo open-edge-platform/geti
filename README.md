@@ -249,6 +249,10 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td>YOLO26 Nano / Small / Medium / Large / XLarge</td>
       <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
     </tr>
+    <tr>
+      <td>Any timm backbone (generic)</td>
+      <td><a href="https://github.com/huggingface/pytorch-image-models">timm</a></td>
+    </tr>
   </tbody>
 </table>
 
