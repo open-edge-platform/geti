@@ -58,6 +58,18 @@ lint = [
     "pyrefly~=0.51.0",
 ]
 
+docs = [
+    "sphinx==7.2.6",
+    "sphinx-autoapi",
+    # sphinx-autoapi 3.5 calls astroid's AstroidBuilder() with no args, which
+    # astroid 4 rejected; pin astroid <4 so the API reference actually generates.
+    "astroid<4",
+    "myst-parser>=2.0.0",
+    "furo",
+    "sphinx-copybutton",
+    "sphinx-design",
+]
+
 [tool.uv]
 default-groups = ["dev", "lint"]
 required-version = "~=0.10.4"
