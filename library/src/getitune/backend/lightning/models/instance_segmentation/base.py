@@ -281,7 +281,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             task_type="instance_segmentation",
             confidence_threshold=self.hparams.get("best_confidence_threshold", 0.05),
             iou_threshold=0.5,
-            nms_execute=True if not self.export_nms else None,
+            nms_execute=not self.export_nms,
             tile_config=self.tile_config if self.tile_config.enable_tiler else None,
             label_info=modified_label_info,
         )

@@ -195,7 +195,7 @@ class TestEngine:
         fxt_engine.export(export_nms=export_nms)
 
         assert observed_export_nms == [export_nms]
-        assert fxt_engine.model.export_nms is False
+        assert not fxt_engine.model.export_nms
 
     def test_export_defaults_to_nms_disabled(self, fxt_engine, mocker) -> None:
         fxt_engine.checkpoint = "path/to/checkpoint.ckpt"

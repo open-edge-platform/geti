@@ -113,7 +113,7 @@ class UltralyticsModelExporter(ModelExporter):
     ) -> Path:
         """Export a YOLO model to OpenVINO IR format.
 
-        1. Export FP32 via ``model.export(format="openvino", half=False, end2end=False)``.
+        1. Export FP32 via ``model.export(format="openvino", half=False, end2end=self._end2end)``.
         2. Load the resulting OV model and apply inherited metadata embedding
            (preprocessing params from ``DataInputParams`` + ``TaskLevelExportParameters``).
         3. Save with ``compress_to_fp16=True`` when *precision* is FP16 —
@@ -170,7 +170,7 @@ class UltralyticsModelExporter(ModelExporter):
     ) -> Path:
         """Export a YOLO model to ONNX format.
 
-        1. Export FP32 via ``model.export(format="onnx", half=False, end2end=False)``.
+        1. Export FP32 via ``model.export(format="onnx", half=False, end2end=self._end2end)``.
         2. Load ONNX, apply inherited metadata embedding + FP16 conversion
            (via ``onnxconverter_common``, same as Lightning).
         3. Save to target location.

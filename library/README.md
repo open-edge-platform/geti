@@ -273,7 +273,7 @@ onnx_path = engine.export(export_format=ExportFormat.ONNX)
 onnx_path = engine.export(export_format=ExportFormat.ONNX, precision=ExportPrecision.FP16)
 ```
 
-Models are exported without NMS in the graph by default; ModelAPI applies NMS using the embedded metadata. To embed NMS in the exported graph, pass `export_nms=True` explicitly:
+NMS-based detection and instance-segmentation models are exported without NMS in the graph by default; ModelAPI applies NMS using the embedded metadata. To embed NMS in the exported graph when supported, pass `export_nms=True` explicitly:
 
 ```python
 onnx_path = engine.export(export_format=ExportFormat.ONNX, export_nms=True)

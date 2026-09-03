@@ -3,6 +3,8 @@
 #
 """Unit tests for instance segmentation model entity."""
 
+from __future__ import annotations
+
 import pytest
 import torch
 
@@ -73,6 +75,36 @@ class TestLightningInstanceSegModel:
         parameters = model._export_parameters
         assert isinstance(parameters, TaskLevelExportParameters)
         assert parameters.task_type == "instance_segmentation"
+        assert parameters.nms_execute is True
+
+    def test_export_parameters_with_nms(self, model):
+        model.export_nms = True
+
+        parameters = model._export_parameters
+
+        assert parameters.nms_execute is None
+
+    def test_forward_for_tracing_forwards_nms_option(self, model, mocker):
+        observed_with_nms = []
+
+        def export_model(_inputs, _meta_info_list, with_nms=False) -> tuple[()]:
+            observed_with_nms.append(with_nms)
+            return ()
+
+        mocker.patch.object(model.model, "export", export_model)
+        LightningInstanceSegModel.forward_for_tracing(model, torch.randn(1, 3, 224, 224))
+
+        assert observed_with_nms == [False]
+
+    def test_forward_for_tracing_rejects_unsupported_nms(self, model, mocker):
+        def export_model(_inputs, _meta_info_list) -> tuple[()]:
+            return ()
+
+        mocker.patch.object(model.model, "export", export_model)
+        model.export_nms = True
+
+        with pytest.raises(ValueError, match="does not support embedded NMS export"):
+            LightningInstanceSegModel.forward_for_tracing(model, torch.randn(1, 3, 224, 224))
 
     def test_export_nms_defaults_to_false(self, model):
         assert model.export_nms is False

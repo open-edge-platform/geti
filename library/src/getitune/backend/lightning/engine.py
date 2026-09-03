@@ -568,6 +568,7 @@ class LightningEngine(Engine):
 
         self.model.explain_mode = explain
 
+        # Models without export_nms do not support configurable graph NMS.
         previous_export_nms = getattr(self.model, "export_nms", None)
         if previous_export_nms is None:
             return self.model.export(
@@ -577,7 +578,8 @@ class LightningEngine(Engine):
                 precision=export_precision,
             )
 
-        self.model.export_nms = export_nms
+        # This is a per-call override; keep the model's configured value intact.
+        self.model.export_nms = export_nms  # pyrefly: ignore[bad-argument-type]
         try:
             return self.model.export(
                 output_dir=Path(self.work_dir),

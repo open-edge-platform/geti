@@ -305,7 +305,7 @@ class UltralyticsModel:
             optimization_config={},
             confidence_threshold=float(conf) if conf is not None else None,
             iou_threshold=float(iou),
-            nms_execute=True if not self.export_nms else None,
+            nms_execute=not self.export_nms,
         )
 
     def __repr__(self) -> str:
