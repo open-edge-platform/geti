@@ -141,18 +141,26 @@ class KalmanFilter:
         new_covariances = np.einsum("nij,kj->nik", left, self._motion_mat) + motion_covs
         return new_means, new_covariances
 
-    def project(self, mean: np.ndarray, covariance: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    def project(
+        self,
+        mean: np.ndarray,
+        covariance: np.ndarray,
+        *,
+        measurement_noise_scale: float = 1.0,
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Project the state distribution into measurement space.
 
         Args:
             mean: ``(8,)`` state mean.
             covariance: ``(8, 8)`` state covariance.
+            measurement_noise_scale: Multiplier on the measurement-noise
+                covariance (R). The default ``1.0`` leaves R unchanged.
 
         Returns:
             ``(measurement_mean, measurement_covariance)`` of shapes
             ``(4,)`` and ``(4, 4)``.
         """
-        innovation_cov = self._measurement_noise_cov(mean[3])
+        innovation_cov = self._measurement_noise_cov(mean[3]) * measurement_noise_scale
         m = self._update_mat @ mean
         c = self._update_mat @ covariance @ self._update_mat.T
         return m, c + innovation_cov
@@ -162,6 +170,8 @@ class KalmanFilter:
         mean: np.ndarray,
         covariance: np.ndarray,
         measurement: np.ndarray,
+        *,
+        measurement_noise_scale: float = 1.0,
     ) -> tuple[np.ndarray, np.ndarray]:
         """Apply the Kalman correction step with a new ``xyah`` measurement.
 
@@ -169,11 +179,14 @@ class KalmanFilter:
             mean: ``(8,)`` predicted state mean.
             covariance: ``(8, 8)`` predicted state covariance.
             measurement: ``(4,)`` observed ``[x, y, a, h]``.
+            measurement_noise_scale: Multiplier on the measurement-noise
+                covariance (R) for this correction. The default ``1.0`` leaves R
+                unchanged.
 
         Returns:
             ``(mean, covariance)`` of the corrected posterior.
         """
-        projected_mean, projected_cov = self.project(mean, covariance)
+        projected_mean, projected_cov = self.project(mean, covariance, measurement_noise_scale=measurement_noise_scale)
         chol_factor, lower = scipy.linalg.cho_factor(projected_cov, lower=True, check_finite=False)
         kalman_gain_t = np.asarray(
             scipy.linalg.cho_solve(

@@ -144,7 +144,21 @@ class SortTracker(BaseTracker[SortConfig]):
         self._frame_det_index[track_id] = src_index
         measurement = xyxy_to_xyah(bbox[None, :])[0]
         mean, covariance = self._kalman_states[track_id]
-        self._kalman_states[track_id] = self._kalman.update(mean, covariance, measurement)
+        self._kalman_states[track_id] = self._kalman.update(
+            mean,
+            covariance,
+            measurement,
+            measurement_noise_scale=self._measurement_noise_scale(score),
+        )
+
+    def _measurement_noise_scale(self, score: float) -> float:
+        """Return the Kalman measurement-noise multiplier for a hit.
+
+        Plain SORT always returns ``1.0``. Subclasses override this hook to
+        implement confidence-aware measurement noise (e.g. StrongSORT's
+        NSA-Kalman).
+        """
+        return 1.0
 
     def _spawn_track(self, dets: Detections, det_idx: int, *, src_index: int) -> None:
         """Create a new track from an unmatched detection."""
