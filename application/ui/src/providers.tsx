@@ -11,7 +11,8 @@ import { router } from './router';
 export const Providers = () => {
     return (
         <QueryClientProvider client={queryClient}>
-            <ThemeProvider router={router}>
+            {/* ThemeProvider defaults to en-US; follow the user's system locale for date and number formatting */}
+            <ThemeProvider router={router} locale={navigator.language}>
                 <RouterProvider
                     router={router}
                     future={{
