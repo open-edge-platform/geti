@@ -3,7 +3,6 @@
 
 import { PointerEvent, useCallback } from 'react';
 
-import { useZoom } from '@/components/zoom/zoom.provider';
 import { v4 as uuid } from 'uuid';
 
 import { useLabelResolver } from '../../../../shared/annotator/labels';
