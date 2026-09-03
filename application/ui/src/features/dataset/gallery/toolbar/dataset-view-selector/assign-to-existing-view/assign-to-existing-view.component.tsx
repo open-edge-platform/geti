@@ -3,6 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
+import { toast } from '@/components/toast/toast.component';
 import {
     Button,
     ButtonGroup,
@@ -24,7 +25,6 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 import { createSearchParams, Link, useLocation } from 'react-router-dom';
 
-import { toast } from '../../../../../../components/toast/toast.component';
 import { getQueryKey } from '../../../../../../query-client/query-client';
 import { pluralizeItems } from '../../../../../../shared/util';
 import { useAssignMediaToExistingDatasetView } from '../api/use-assign-media-to-existing-dataset-view';

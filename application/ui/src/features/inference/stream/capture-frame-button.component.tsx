@@ -1,11 +1,11 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { toast } from '@/components/toast/toast.component';
 import { Button } from '@geti-ui/ui';
 import { useCapturePipelineFrame, usePipeline, usePipelineHealth } from 'hooks/api/pipeline.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { toast } from '../../../components/toast/toast.component';
 import { useWebRTCConnection } from './web-rtc-connection-provider';
 
 export const CaptureFrameButton = () => {

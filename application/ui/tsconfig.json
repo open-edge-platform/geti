@@ -22,7 +22,8 @@
             "hooks/*": ["./src/hooks/*"],
             "mocks/*": ["./mocks/*"],
             "@/api": ["./src/api/index.ts"],
-            "@/api/types": ["./src/api/shared-types.ts"]
+            "@/api/types": ["./src/api/shared-types.ts"],
+            "@/components/*": ["./src/components/*"]
         }
     }
 }
