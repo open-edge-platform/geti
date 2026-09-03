@@ -766,6 +766,8 @@ class ExperimentExecutor:
             "seed": self.seed,
             "training_device": self.training_device_name or get_training_device_name(self.accelerator),
             "training_batch_size": train_batch_size,
+            "gpu_memory_mb": csv_metrics.get("training:gpu_mem", 0.0),
+            "ram_memory_mb": csv_metrics.get("training:ram_mem", 0.0),
             "git_sha": self._git_sha(),
             "software": self._software_versions(),
         }

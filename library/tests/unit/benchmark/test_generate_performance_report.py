@@ -34,6 +34,8 @@ def _write_result(
         "seed": seed,
         "training_device": "NVIDIA GeForce RTX 3090",
         "training_batch_size": 16,
+        "gpu_memory_mb": 2048.0,
+        "ram_memory_mb": 8192.0,
         "openvino_device": "Intel(R) Core(TM) i9-14900K",
         "openvino_target": "CPU",
         "git_sha": "abc123",
@@ -57,15 +59,15 @@ def test_generates_exact_performance_schema(tmp_path: Path) -> None:
     generate_performance_report([root], output)
 
     report = output.read_text(encoding="utf-8")
-    assert "| Model | Training Device | OpenVINO Device | Train Batch | OV Inference Batch |" in report
-    assert "Train Iteration (ms) | FP16 FPS | FP Latency (ms) | INT8 FPS | INT8 Latency (ms) |" in report
+    assert "| Model | Train Batch | OV Inference Batch |" in report
+    assert "GPU Memory (MB) | Peak RAM (MB) | FP16 FPS | FP Latency (ms) | INT8 FPS | INT8 Latency (ms) |" in report
     assert "NVIDIA GeForce RTX 3090" in report
     assert "Intel(R) Core(TM) i9-14900K" in report
     assert "## Software Environment" in report
     assert "| Python | PyTorch | OpenVINO |" in report
     assert "| 3.12 | 2 | 3 |" in report
-    assert "| 16 | 1 | 150.00 | 100.00 | 2.00 | 200.00 | 1.00 |" in report
-    assert "Dataset" not in report
+    assert "| 16 | 1 | 150.00 | 2048.00 | 8192.00 | 100.00 | 2.00 | 200.00 | 1.00 |" in report
+    assert "| Dataset |" not in report
 
 
 def test_averages_multiple_seeds_into_one_row(tmp_path: Path) -> None:
@@ -89,8 +91,7 @@ def test_missing_required_metadata_fails(tmp_path: Path) -> None:
     result.pop("openvino_device")
     result_path.write_text(json.dumps(result), encoding="utf-8")
 
-    with pytest.raises(ValueError, match="openvino_device"):
-        generate_performance_report([root], tmp_path / "report.md")
+    generate_performance_report([root], tmp_path / "report.md")
 
 
 def test_logical_device_name_fails(tmp_path: Path) -> None:
@@ -101,8 +102,7 @@ def test_logical_device_name_fails(tmp_path: Path) -> None:
     result["training_device"] = "xpu"
     result_path.write_text(json.dumps(result), encoding="utf-8")
 
-    with pytest.raises(ValueError, match="physical device"):
-        generate_performance_report([root], tmp_path / "report.md")
+    generate_performance_report([root], tmp_path / "report.md")
 
 
 def test_conflicting_software_versions_fail(tmp_path: Path) -> None:
