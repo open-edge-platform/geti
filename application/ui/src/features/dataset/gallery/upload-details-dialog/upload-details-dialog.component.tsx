@@ -28,7 +28,7 @@ import {
 import { AcceptCircle, CrossCircle, Pending } from '@geti-ui/ui/icons';
 
 import { formatBytes, pluralizeItems } from '../../../../shared/util';
-import { useMediaUploadContext } from '../../providers/media-upload-provider.component';
+import { useMediaUploadDispatch, useMediaUploadState } from '../../providers/media-upload-provider.component';
 import { computeSummary, type UploadFileItem, type UploadItemStatus } from '../../providers/media-upload-reducer';
 
 import classes from './upload-details-dialog.module.scss';
@@ -107,7 +107,7 @@ const buildSubheader = (total: number, succeeded: number, failed: number, isUplo
 };
 
 const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
-    const { state } = useMediaUploadContext();
+    const state = useMediaUploadState();
     const summary = computeSummary(state.items, state.isUploading);
     const items = state.items;
 
@@ -163,7 +163,8 @@ const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
 };
 
 export const UploadDetailsDialog = () => {
-    const { state, dispatch } = useMediaUploadContext();
+    const state = useMediaUploadState();
+    const dispatch = useMediaUploadDispatch();
     const close = () => dispatch({ type: 'CLOSE_DIALOG' });
 
     return (

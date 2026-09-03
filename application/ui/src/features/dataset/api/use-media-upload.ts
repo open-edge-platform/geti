@@ -8,9 +8,13 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isFunction } from 'lodash-es';
 
 import { getErrorMessage, getQueryKey } from '../../../query-client/query-client';
-import { useUploadProgress } from '../hooks/use-display-upload-progress';
+import { useUploadActions } from '../hooks/use-upload-actions';
 
 export const MEDIA_UPLOAD_CONCURRENCY = 10;
+
+// Invalidating the media list refetches every page loaded so far, so doing it after each batch
+// would starve the uploads themselves once a few hundred files are queued.
+export const MEDIA_REFRESH_INTERVAL_MS = 2000;
 
 type UploadTask<T> = () => Promise<T>;
 
@@ -45,14 +49,8 @@ const getFulfilledValues = <T>(results: PromiseSettledResult<T>[]): T[] =>
 export const useMediaUpload = () => {
     const projectId = useProjectIdentifier();
     const queryClient = useQueryClient();
-    const {
-        uploadProgress,
-        startUploadProgress,
-        setItemUploading,
-        setItemUploaded,
-        setItemFailed,
-        finishUploadProgress,
-    } = useUploadProgress();
+    const { startUploadProgress, setItemUploading, setItemUploaded, setItemFailed, finishUploadProgress } =
+        useUploadActions();
 
     const addItemMutation = $api.useMutation('post', '/api/projects/{project_id}/dataset/media', {
         meta: { error: { notify: () => false } },
@@ -102,16 +100,23 @@ export const useMediaUpload = () => {
         ]);
     };
 
-    // Processes files with batched concurrency, returning all successfully uploaded media items
-    const processUploadBatch = async (files: File[]): Promise<MediaDTO[]> => {
+    // Uploads files with batched concurrency, returning all successfully uploaded media items
+    const uploadMedia = async (files: File[]): Promise<MediaDTO[]> => {
         if (files.length === 0) {
             return [];
         }
 
         const itemIds = startUploadProgress(files);
+        let lastInvalidation = Date.now();
 
         try {
             const onBatchCompleted = async () => {
+                if (Date.now() - lastInvalidation < MEDIA_REFRESH_INTERVAL_MS) {
+                    return;
+                }
+
+                lastInvalidation = Date.now();
+
                 await invalidateMediaQuery();
             };
 
@@ -120,6 +125,8 @@ export const useMediaUpload = () => {
 
             finishUploadProgress();
 
+            await invalidateMediaQuery();
+
             return getFulfilledValues(allResults);
         } catch (_error) {
             finishUploadProgress();
@@ -127,17 +134,7 @@ export const useMediaUpload = () => {
         }
     };
 
-    // Starts the upload process directly, returning all successfully uploaded media items
-    const uploadMedia = async (files: File[]): Promise<MediaDTO[]> => {
-        if (files.length === 0) {
-            return [];
-        }
-
-        return processUploadBatch(files);
-    };
-
     return {
         uploadMedia,
-        uploadProgress,
     };
 };
