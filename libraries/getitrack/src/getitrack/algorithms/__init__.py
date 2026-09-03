@@ -11,5 +11,6 @@ from getitrack.algorithms.botsort import BotSortTracker
 from getitrack.algorithms.bytetrack import ByteTrackTracker
 from getitrack.algorithms.ocsort import OCSortTracker
 from getitrack.algorithms.sort import SortTracker
+from getitrack.algorithms.strongsort import StrongSortTracker
 
-__all__ = ["BotSortTracker", "ByteTrackTracker", "OCSortTracker", "SortTracker"]
+__all__ = ["BotSortTracker", "ByteTrackTracker", "OCSortTracker", "SortTracker", "StrongSortTracker"]

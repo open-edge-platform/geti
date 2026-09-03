@@ -29,6 +29,7 @@ class AlgorithmType(StrEnum):
     SORT = "sort"
     OCSORT = "ocsort"
     BOTSORT = "botsort"
+    STRONGSORT = "strongsort"
     MEMORY = "memory"
 
 
