@@ -10,14 +10,13 @@ import { render } from 'test-utils/render';
 import { useIsScrolling } from '../../hooks/use-is-scrolling.hook';
 import { MediaThumbnail } from './media-thumbnail.component';
 
-import classes from './media-thumbnail.module.scss';
-
 vi.mock('../../hooks/use-is-scrolling.hook', () => ({
     useIsScrolling: vi.fn(),
 }));
 
 const getImage = () => screen.getByRole('img', { name: 'Test Image' });
-const getSkeleton = (container: HTMLElement) => container.querySelector(`.${classes.skeleton}`);
+const getSkeleton = () => screen.getByRole('img', { name: 'Loading…' });
+const querySkeleton = () => screen.queryByRole('img', { name: 'Loading…' });
 
 describe('MediaThumbnail', () => {
     beforeEach(() => {
@@ -87,34 +86,34 @@ describe('MediaThumbnail', () => {
             );
         };
 
-        const { container } = render(<Thumbnail />);
+        render(<Thumbnail />);
         fireEvent.load(getImage());
 
         await userEvent.click(screen.getByRole('button'));
 
         // CSS modules keep the local name, so assert on the class that hides the image.
         expect(getImage().className).toContain('imgHidden');
-        expect(getSkeleton(container)).toBeInTheDocument();
+        expect(getSkeleton()).toBeInTheDocument();
     });
 
     it('stops the skeleton but keeps the image hidden when the thumbnail fails to load', () => {
-        const { container } = render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
+        render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
 
         // jsdom never loads the image, so mark it as settled the way a broken image is.
         Object.defineProperty(getImage(), 'complete', { value: true });
         fireEvent.error(getImage());
 
         expect(getImage().className).toContain('imgHidden');
-        expect(getSkeleton(container)).not.toBeInTheDocument();
+        expect(querySkeleton()).not.toBeInTheDocument();
     });
 
     it('ignores the error fired while the image is still loading', () => {
-        const { container } = render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
+        render(<MediaThumbnail url='test-image.jpg' alt='Test Image' item={{ type: 'image' }} />);
 
         expect(getImage()).toHaveProperty('complete', false);
 
         fireEvent.error(getImage());
 
-        expect(getSkeleton(container)).toBeInTheDocument();
+        expect(getSkeleton()).toBeInTheDocument();
     });
 });
