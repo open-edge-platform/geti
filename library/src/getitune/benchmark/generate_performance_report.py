@@ -89,14 +89,12 @@ def _training_iter_ms(seed_dir: Path) -> float | str:
 
     metrics_files = sorted((seed_dir / "train").glob("csv/version_*/metrics.csv"))
     if not metrics_files:
-        msg = f"Training metrics not found for performance result: {seed_dir}"
-        logger.warning(msg)
+        logger.debug("Training metrics not found for performance result: %s", seed_dir)
         return "None"
     with metrics_files[-1].open(newline="", encoding="utf-8") as stream:
         values = [float(row["train/iter_time"]) for row in csv.DictReader(stream) if row.get("train/iter_time")]
     if not values:
-        msg = f"train/iter_time is missing from {metrics_files[-1]}"
-        logger.warning(msg)
+        logger.debug("train/iter_time is missing from %s", metrics_files[-1])
         return "None"
     measured = values[1:] or values
     return 1000 * sum(measured) / len(measured)
@@ -124,6 +122,36 @@ def _training_memory(seed_dir: Path) -> tuple[float | str, float | str]:
         return max(values) if values else "None"
 
     return maximum("gpu_mem_allocated_gib"), maximum("ram_mem_gib")
+
+
+def _load_aggregated_metrics(root: Path) -> dict[tuple[str, str, str], dict[str, float]]:
+    """Index ``aggregated.csv`` peak-resource metrics by task/model/dataset."""
+    import csv
+
+    aggregated = root / "aggregated.csv"
+    if not aggregated.exists():
+        return {}
+    indexed: dict[tuple[str, str, str], dict[str, float]] = {}
+    with aggregated.open(newline="", encoding="utf-8") as stream:
+        for row in csv.DictReader(stream):
+            numeric: dict[str, float] = {}
+            for column in ("current:training:gpu_mem", "current:training:ram_mem", "current:time/train/iter"):
+                value = row.get(column)
+                if value:
+                    try:
+                        numeric[column] = float(value)
+                    except ValueError:
+                        continue
+            indexed[(row.get("task", ""), row.get("model", ""), row.get("dataset", ""))] = numeric
+    return indexed
+
+
+def _first_number(*candidates: object) -> float | str:
+    """Return the first strictly positive numeric candidate."""
+    for candidate in candidates:
+        if isinstance(candidate, (int, float)) and not isinstance(candidate, bool) and candidate > 0:
+            return float(candidate)
+    return "None"
 
 
 def _input_shape(result: dict[str, Any]) -> str:
@@ -154,20 +182,33 @@ def generate_performance_report(result_roots: list[Path], output: Path) -> None:
         if not files:
             msg = f"No performance_result.json files found under {root}"
             raise ValueError(msg)
+        aggregated = _load_aggregated_metrics(root)
         for path in files:
             result = _load_result(path)
-            result["training_iter_ms"] = _training_iter_ms(path.parent)
-            gpu_memory, ram_memory = _training_memory(path.parent)
-            if "gpu_memory_gib" not in result:
-                logger.warning("GPU memory is missing from legacy result %s.", path)
-            if "ram_memory_gib" not in result:
-                logger.warning("Peak RAM is missing from legacy result %s.", path)
-            result.setdefault(
-                "gpu_memory_mb", gpu_memory * 1024 if isinstance(gpu_memory, (int, float)) else gpu_memory
+            key = (str(result.get("task")), str(result.get("model")), str(result.get("dataset")))
+            fallback = aggregated.get(key, {})
+            gpu_memory_gib, ram_memory_gib = _training_memory(path.parent)
+            iteration_seconds = fallback.get("current:time/train/iter")
+            result["training_iter_ms"] = _first_number(
+                _training_iter_ms(path.parent),
+                iteration_seconds * 1000 if iteration_seconds is not None else None,
             )
-            result.setdefault(
-                "ram_memory_mb", ram_memory * 1024 if isinstance(ram_memory, (int, float)) else ram_memory
+            result["gpu_memory_mb"] = _first_number(
+                result.get("gpu_memory_mb"),
+                fallback.get("current:training:gpu_mem"),
+                gpu_memory_gib * 1024 if isinstance(gpu_memory_gib, (int, float)) else None,
             )
+            result["ram_memory_mb"] = _first_number(
+                result.get("ram_memory_mb"),
+                fallback.get("current:training:ram_mem"),
+                ram_memory_gib * 1024 if isinstance(ram_memory_gib, (int, float)) else None,
+            )
+            if result["gpu_memory_mb"] == "None":
+                logger.warning("GPU memory could not be resolved for %s.", path)
+            if result["ram_memory_mb"] == "None":
+                logger.warning("Peak RAM could not be resolved for %s.", path)
+            if result["training_iter_ms"] == "None":
+                logger.warning("Training iteration time could not be resolved for %s.", path)
             rows.append(result)
 
     model_groups: dict[tuple[object, ...], list[dict[str, Any]]] = defaultdict(list)
@@ -243,7 +284,7 @@ def generate_performance_report(result_roots: list[Path], output: Path) -> None:
         "Train Iteration (ms) | GPU Memory (MB) | Peak RAM (MB) | FP16 FPS | FP Latency (ms) | "
         "INT8 FPS | INT8 Latency (ms) |"
     )
-    separator = "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+    separator = "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
     for task, task_rows in sorted(grouped.items()):
         lines.extend([f"## {task}", "", header, separator])
         for row in sorted(task_rows, key=lambda item: (str(item["model"]), str(item["training_device"]))):
