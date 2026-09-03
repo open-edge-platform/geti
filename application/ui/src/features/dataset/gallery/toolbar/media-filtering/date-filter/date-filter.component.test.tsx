@@ -75,6 +75,23 @@ const pickFromCalendar = async (user: ReturnType<typeof userEvent.setup>, index:
 describe('DateFilter', () => {
     const routeWithDates = `/projects/123?${START_DATE_PARAM}=${START_DATE}&${END_DATE_PARAM}=${END_DATE}`;
 
+    // Without a `placeholderValue` an empty picker emits a date with no timezone, which would be
+    // read as UTC and shift the applied filter away from what the user typed
+    it('applies a date typed into an empty picker in the local timezone', async () => {
+        const user = userEvent.setup();
+
+        renderDateFilter('/projects/123');
+
+        await setSegment(user, 'Start date', /month/i, '3');
+        await setSegment(user, 'Start date', /day/i, '15');
+        await setSegment(user, 'Start date', /year/i, '2026');
+        await setSegment(user, 'Start date', /hour/i, '10');
+        await setSegment(user, 'Start date', /minute/i, '30');
+
+        expect(screen.getByTestId('applied-start-date')).toHaveTextContent(new Date(2026, 2, 15, 10, 30).toISOString());
+        expect(screen.getByTestId('applied-end-date')).toBeEmptyDOMElement();
+    });
+
     it('applies the filter when the picked range is valid', async () => {
         const user = userEvent.setup();
 

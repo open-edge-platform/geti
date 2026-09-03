@@ -4,14 +4,7 @@
 import { useMemo, useState } from 'react';
 
 import { ActionButton, DatePicker, Flex, Text } from '@geti-ui/ui';
-import {
-    getLocalTimeZone,
-    now,
-    parseAbsoluteToLocal,
-    toZoned,
-    type DateValue,
-    type ZonedDateTime,
-} from '@internationalized/date';
+import { getLocalTimeZone, now, parseAbsoluteToLocal, type ZonedDateTime } from '@internationalized/date';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 
 import classes from './date-filter.module.scss';
@@ -22,18 +15,20 @@ export const INVALID_RANGE_MESSAGE = 'End date must be later than start date';
 
 const parseDate = (date: string | null): ZonedDateTime | null => (date === null ? null : parseAbsoluteToLocal(date));
 
-// An empty picker hands back a date without a timezone, so it has to be anchored to the local one
-const toZonedDateTime = (date: DateValue | null): ZonedDateTime | null =>
-    date === null ? null : toZoned(date, getLocalTimeZone());
-
 const toISOString = (date: ZonedDateTime | null): string | null => (date === null ? null : date.toDate().toISOString());
 
 export const DateFilter = () => {
     const { startDate, endDate, setDateRange } = useDatasetFiltersSearchParams();
 
-    // Media cannot be uploaded in the future.
-    const [maxDate] = useState(() =>
-        now(getLocalTimeZone()).set({ hour: 23, minute: 59, second: 59, millisecond: 999 })
+    // An empty picker emits a date in the timezone of its placeholder, so this keeps the two pickers
+    // and the applied filter on the local timezone instead of a timezone-less date
+    const [placeholderValue] = useState(() => now(getLocalTimeZone()).set({ second: 0, millisecond: 0 }));
+
+    // Media cannot be uploaded in the future. The whole current day is allowed so that the bound does
+    // not go stale while the filter stays mounted, which would reject the current time.
+    const maxDate = useMemo(
+        () => placeholderValue.set({ hour: 23, minute: 59, second: 59, millisecond: 999 }),
+        [placeholderValue]
     );
 
     // Range picked by the user whose end date precedes its start date, and thus was not applied as a filter
@@ -63,12 +58,12 @@ export const DateFilter = () => {
         }
     };
 
-    const handleStartDateChange = (date: DateValue | null) => {
-        applyDates(toZonedDateTime(date), endValue);
+    const handleStartDateChange = (date: ZonedDateTime | null) => {
+        applyDates(date, endValue);
     };
 
-    const handleEndDateChange = (date: DateValue | null) => {
-        applyDates(startValue, toZonedDateTime(date));
+    const handleEndDateChange = (date: ZonedDateTime | null) => {
+        applyDates(startValue, date);
     };
 
     const handleClear = () => {
@@ -97,11 +92,13 @@ export const DateFilter = () => {
             <DatePicker
                 granularity='minute'
                 hourCycle={24}
+                hideTimeZone
                 width='100%'
                 label='Start date'
                 labelPosition='top'
                 minValue={MIN_DATE}
                 maxValue={maxDate}
+                placeholderValue={placeholderValue}
                 value={startValue}
                 onChange={handleStartDateChange}
             />
@@ -109,11 +106,13 @@ export const DateFilter = () => {
             <DatePicker
                 granularity='minute'
                 hourCycle={24}
+                hideTimeZone
                 width='100%'
                 label='End date'
                 labelPosition='top'
                 minValue={MIN_DATE}
                 maxValue={maxDate}
+                placeholderValue={placeholderValue}
                 value={endValue}
                 onChange={handleEndDateChange}
                 validationState={invalidRange === null ? undefined : 'invalid'}
