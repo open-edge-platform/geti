@@ -22,11 +22,13 @@
 .icon {
     display: flex;
     opacity: 0;
+    visibility: hidden;
     color: var(--spectrum-global-color-gray-700);
     transition: opacity 0.3s ease-in-out;
 }
 
 .isSorted .icon {
     opacity: 1;
+    visibility: visible;
     color: var(--spectrum-global-color-gray-900);
 }
