@@ -15,6 +15,7 @@
     &:hover .icon,
     &:focus-visible .icon {
         opacity: 1;
+        visibility: visible;
     }
 }
 

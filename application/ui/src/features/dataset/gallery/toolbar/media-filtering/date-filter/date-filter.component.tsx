@@ -16,7 +16,7 @@ import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-
 
 import classes from './date-filter.module.scss';
 
-const MIN_DATE = parseAbsoluteToLocal('2020-01-30T00:00:00.000Z');
+const MIN_DATE = parseAbsoluteToLocal(new Date(2020, 0, 30, 0, 0, 0, 0).toISOString());
 
 export const INVALID_RANGE_MESSAGE = 'End date must be later than start date';
 
