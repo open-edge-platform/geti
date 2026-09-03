@@ -91,5 +91,5 @@ class UltralyticsInstSegModel(UltralyticsModel):
             optimization_config={},
             confidence_threshold=float(conf),
             iou_threshold=float(iou),
-            nms_execute=True if not self.export_nms else None,
+            nms_execute=not self.export_nms,
         )
