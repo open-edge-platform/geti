@@ -13,8 +13,8 @@ export const ToggleAnnotationsVisibility = () => {
 
     useHotkeys(HOTKEYS.toggleAnnotationsVisibility, toggleVisibility, [toggleVisibility]);
 
-    const label = `
-    ${isVisible ? 'Hide' : 'Show'} annotations (${formatHotkeyForDisplay(HOTKEYS.toggleAnnotationsVisibility)})`;
+    const hotkey = formatHotkeyForDisplay(HOTKEYS.toggleAnnotationsVisibility);
+    const label = `${isVisible ? 'Hide' : 'Show'} annotations (${hotkey})`;
 
     return (
         <TooltipTrigger placement={'right'}>

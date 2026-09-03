@@ -19,7 +19,7 @@ export const UndoRedo = ({ isDisabled }: { isDisabled?: boolean }) => {
     ]);
 
     const undoLabel = `Undo (${formatHotkeyForDisplay(HOTKEYS.undo)})`;
-    const redoLabel = `Redo (${formatHotkeyForDisplay(HOTKEYS.redo)})`;
+    const redoLabel = `Redo (${formatHotkeyForDisplay(HOTKEYS.redo)} or ${formatHotkeyForDisplay(HOTKEYS.redoAlt)})`;
 
     return (
         <Flex alignItems='center' direction={'column'} justifyContent={'center'} data-testid='undo-redo-tools'>
