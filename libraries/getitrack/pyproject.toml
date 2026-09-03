@@ -26,6 +26,7 @@ dependencies = [
     "pydantic~=2.7",
     "pyyaml==6.0.3",
     "scipy~=1.13",
+    "typer~=0.27",
 ]
 
 [project.optional-dependencies]
@@ -45,6 +46,12 @@ reid = [
     # training-only tensorboard package is not required for inference.
     "gdown>=4.0",
 ]
+
+# Evaluation extra: MOT metrics via motmetrics.
+eval = ["motmetrics~=1.4", "pandas>=2.2"]
+
+[project.scripts]
+getitrack = "getitrack.cli:app"
 
 [dependency-groups]
 dev = [
