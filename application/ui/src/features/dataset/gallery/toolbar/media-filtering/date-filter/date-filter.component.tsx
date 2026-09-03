@@ -97,7 +97,7 @@ export const DateFilter = () => {
                 label='Start date'
                 labelPosition='top'
                 minValue={MIN_DATE}
-                maxValue={maxDate}
+                maxValue={appliedEnd ?? maxDate}
                 placeholderValue={placeholderValue}
                 value={startValue}
                 onChange={handleStartDateChange}
@@ -110,7 +110,7 @@ export const DateFilter = () => {
                 width='100%'
                 label='End date'
                 labelPosition='top'
-                minValue={MIN_DATE}
+                minValue={appliedStart ?? MIN_DATE}
                 maxValue={maxDate}
                 placeholderValue={placeholderValue}
                 value={endValue}
