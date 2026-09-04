@@ -29,7 +29,9 @@ export const WorkflowSteps = () => {
             </ol>
 
             <View UNSAFE_className={classes.loop}>
-                <Text UNSAFE_className={classes.loopText}>Iterate to boost accuracy</Text>
+                <Text UNSAFE_className={classes.loopText}>
+                    Monitor predictions and collect more data to iteratively fine-tune your model
+                </Text>
             </View>
         </View>
     );
