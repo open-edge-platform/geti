@@ -178,6 +178,24 @@ class TestLightningDetectionModel:
         assert labels.ndim == 2
         assert labels.shape == dets.shape[:2]
 
+    def test_forward_for_tracing_with_nms(self, model):
+        model.eval()
+        model.export_nms = True
+
+        dets, labels = model.forward_for_tracing(torch.randn(1, 3, 64, 64))
+
+        assert dets.ndim == 3
+        assert dets.shape[0] == 1
+        assert dets.shape[2] == 5
+        assert labels.ndim == 2
+        assert labels.shape == dets.shape[:2]
+        assert dets.shape[1] <= model.model.test_cfg["max_per_img"]
+
+        scores = dets[..., 4]
+        assert torch.all((scores >= 0) & (scores <= 1))
+        assert torch.all(scores[:, :-1] >= scores[:, 1:])
+        assert torch.all((labels >= 0) & (labels < model.num_classes))
+
     def test_dummy_input(self, model: ATSS):
         batch_size = 2
         batch = model.get_dummy_input(batch_size)

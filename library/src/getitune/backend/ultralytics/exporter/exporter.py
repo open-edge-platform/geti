@@ -48,7 +48,7 @@ class _YOLOExportable(Protocol):
 
     @property
     def model(self) -> Any:  # noqa: ANN401
-        """The underlying model with stride attribute."""
+        """The underlying model with stride and end2end attributes."""
         ...
 
 
@@ -71,6 +71,7 @@ class UltralyticsModelExporter(ModelExporter):
             ``False`` (default) because the Geti backend already sends RGB.
         output_names: Optional output tensor names to embed.
         input_names: Optional input tensor names to embed.
+        export_nms: Whether to embed NMS in the exported graph.
     """
 
     def __init__(
@@ -97,13 +98,6 @@ class UltralyticsModelExporter(ModelExporter):
         )
         self.export_nms = export_nms
 
-    @property
-    def _end2end(self) -> bool:
-        return self.export_nms and self.task_level_export_parameters.task_type in {
-            "detection",
-            "instance_segmentation",
-        }
-
     def to_openvino(  # pyrefly: ignore[bad-override]
         self,
         model: _YOLOExportable,
@@ -113,7 +107,7 @@ class UltralyticsModelExporter(ModelExporter):
     ) -> Path:
         """Export a YOLO model to OpenVINO IR format.
 
-        1. Export FP32 via ``model.export(format="openvino", half=False, end2end=self._end2end)``.
+        1. Export FP32 via ``model.export(format="openvino", half=False, nms=self.export_nms)``.
         2. Load the resulting OV model and apply inherited metadata embedding
            (preprocessing params from ``DataInputParams`` + ``TaskLevelExportParameters``).
         3. Save with ``compress_to_fp16=True`` when *precision* is FP16 —
@@ -135,7 +129,7 @@ class UltralyticsModelExporter(ModelExporter):
             format="openvino",
             imgsz=imgsz,
             half=False,
-            end2end=self._end2end,
+            nms=self.export_nms,
             project=str(output_dir),
             name="raw_export",
             exist_ok=True,
@@ -170,7 +164,7 @@ class UltralyticsModelExporter(ModelExporter):
     ) -> Path:
         """Export a YOLO model to ONNX format.
 
-        1. Export FP32 via ``model.export(format="onnx", half=False, end2end=self._end2end)``.
+        1. Export FP32 via ``model.export(format="onnx", half=False, nms=self.export_nms)``.
         2. Load ONNX, apply inherited metadata embedding + FP16 conversion
            (via ``onnxconverter_common``, same as Lightning).
         3. Save to target location.
@@ -191,7 +185,7 @@ class UltralyticsModelExporter(ModelExporter):
             format="onnx",
             imgsz=imgsz,
             half=False,
-            end2end=self._end2end,
+            nms=self.export_nms,
             project=str(output_dir),
             name="raw_export",
             exist_ok=True,
@@ -268,7 +262,6 @@ class UltralyticsModelExporter(ModelExporter):
             "imgsz": imgsz,
             "names": names,
             "channels": 3,
-            "end2end": self._end2end,
             "args": {
                 "data": None,
                 "batch": 1,
@@ -276,7 +269,7 @@ class UltralyticsModelExporter(ModelExporter):
                 "half": precision == Precision.FP16,
                 "int8": False,
                 "dynamic": False,
-                "nms": self._end2end,
+                "nms": self.export_nms,
             },
         }
 

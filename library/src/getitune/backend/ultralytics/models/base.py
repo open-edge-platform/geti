@@ -38,6 +38,7 @@ class UltralyticsModel:
         pretrained: Whether to load pretrained weights.
         imgsz: Image size for training / inference.
         extra_overrides: Extra Ultralytics config forwarded to train/val/export.
+        export_nms: Whether to embed NMS in the exported graph.
     """
 
     task: ClassVar[str] = ""
