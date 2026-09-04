@@ -43,6 +43,11 @@ class TrainingJob(ProjectJob[TrainingJobParams]):
     data_dir: Path
     params: TrainingJobParams
 
+    # TODO (see github.com/open-edge-platform/geti/pull/7494#discussion_r3935273273)
+    # Consider refactoring to avoid placing this logic in the model layer: one possible
+    # approach is to rely on domain events (the model publishes events, a decoupled
+    # listener handles them); another approach is to let the controller handle the
+    # completion logic based on the job type.
     def on_complete(self) -> None:
         """Copy the training log and clean up the getitune workspace upon job completion."""
         log_path = self.log_dir / self.log_file

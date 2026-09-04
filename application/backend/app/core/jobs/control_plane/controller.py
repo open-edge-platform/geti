@@ -130,7 +130,7 @@ class JobController:
                 case JobStatus.DONE:
                     logger.success("Job completed successfully, job_id: {}", job.id)
                 case JobStatus.FAILED:
-                    logger.error("Job failed, job_id: {}, error: {}", job.id, job.error)
+                    logger.warning("Job failed, job_id: {}", job.id)
                 case JobStatus.CANCELLED:
                     logger.info("Job cancelled, job_id: {}", job.id)
                 case _:
