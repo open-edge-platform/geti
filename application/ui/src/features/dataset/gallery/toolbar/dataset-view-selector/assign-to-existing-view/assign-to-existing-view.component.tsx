@@ -58,7 +58,7 @@ const useAssignMediaToExistingView = () => {
                 },
             },
             {
-                onSuccess: async () => {
+                onSuccess: () => {
                     onClose(selectedDatasetViewId);
                 },
             }
