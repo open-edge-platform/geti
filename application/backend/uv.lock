@@ -1079,6 +1079,7 @@ xpu = [
 
 [package.metadata]
 requires-dist = [
+    { name = "accelerate", specifier = ">=1.1.0,<2" },
     { name = "build", marker = "extra == 'ci-publish'", specifier = "==1.2.2.post1" },
     { name = "certifi", specifier = ">=2026" },
     { name = "datumaro", extras = ["experimental"], specifier = "~=1.13.10" },
@@ -1131,6 +1132,7 @@ requires-dist = [
     { name = "torchvision", marker = "sys_platform != 'linux' and sys_platform != 'win32' and extra == 'cpu'", specifier = "==0.27.1" },
     { name = "torchvision", marker = "extra == 'cuda'", specifier = "==0.27.1+cu130", index = "https://download.pytorch.org/whl/cu130", conflict = { package = "getitune", extra = "cuda" } },
     { name = "torchvision", marker = "extra == 'xpu'", specifier = "==0.27.1+xpu", index = "https://download.pytorch.org/whl/xpu", conflict = { package = "getitune", extra = "xpu" } },
+    { name = "transformers", specifier = ">=5.14,<6" },
     { name = "triton-xpu", marker = "extra == 'xpu'", specifier = "==3.7.1", index = "https://download.pytorch.org/whl/xpu", conflict = { package = "getitune", extra = "xpu" } },
     { name = "typeguard", specifier = ">=4.3,<4.5" },
     { name = "ultralytics", marker = "extra == 'ultralytics'", specifier = "==8.4.86" },

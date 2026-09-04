@@ -64,6 +64,27 @@ wheels = [
 ]
 
 [[package]]
+name = "accelerate"
+version = "1.14.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "huggingface-hub" },
+    { name = "numpy" },
+    { name = "packaging" },
+    { name = "psutil" },
+    { name = "pyyaml" },
+    { name = "safetensors" },
+    { name = "torch", version = "2.12.1", source = { registry = "https://pypi.org/simple" }, marker = "(sys_platform != 'linux' and sys_platform != 'win32' and extra == 'extra-8-getitune-cpu') or (sys_platform == 'linux' and extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (sys_platform == 'linux' and extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (sys_platform == 'win32' and extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (sys_platform == 'win32' and extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (extra != 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu') or (extra != 'extra-8-getitune-cpu' and extra != 'extra-8-getitune-cuda' and extra != 'extra-8-getitune-xpu')" },
+    { name = "torch", version = "2.12.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'linux' and extra == 'extra-8-getitune-cpu') or (sys_platform == 'win32' and extra == 'extra-8-getitune-cpu') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu')" },
+    { name = "torch", version = "2.12.1+cu130", source = { registry = "https://download.pytorch.org/whl/cu130" }, marker = "extra == 'extra-8-getitune-cuda' or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu')" },
+    { name = "torch", version = "2.12.1+xpu", source = { registry = "https://download.pytorch.org/whl/xpu" }, marker = "(extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (extra != 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu') or (extra != 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu')" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/8d/75/94cd5d389649578aca399e5aa822637eec18319a1dadc400ffe2f9a7493f/accelerate-1.14.0.tar.gz", hash = "sha256:41b9c4377a54e0b460a959b0defa1b736e4ca0a2373252d9a539964c2afe3c8d", size = 412167, upload-time = "2026-06-11T13:45:52.326Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a8/db/253133d7e7cb40d3af384bb2f5c0b4a2b7fdcffbc95c688cc67a20a3c103/accelerate-1.14.0-py3-none-any.whl", hash = "sha256:e94390c2863b873be18f623f9df48a0d8fe5eff13ea7f1a00092b0a7904888c6", size = 389246, upload-time = "2026-06-11T13:45:50.477Z" },
+]
+
+[[package]]
 name = "accessible-pygments"
 version = "0.0.5"
 source = { registry = "https://pypi.org/simple" }
@@ -1347,6 +1368,7 @@ name = "getitune"
 version = "0.3.0"
 source = { editable = "." }
 dependencies = [
+    { name = "accelerate" },
     { name = "certifi" },
     { name = "datumaro", extra = ["experimental"] },
     { name = "docstring-parser" },
@@ -1376,6 +1398,7 @@ dependencies = [
     { name = "tensorboardx" },
     { name = "timm" },
     { name = "torchmetrics" },
+    { name = "transformers" },
     { name = "typeguard" },
 ]
 
@@ -1452,6 +1475,7 @@ lint = [
 
 [package.metadata]
 requires-dist = [
+    { name = "accelerate", specifier = ">=1.1.0,<2" },
     { name = "build", marker = "extra == 'ci-publish'", specifier = "==1.2.2.post1" },
     { name = "certifi", specifier = ">=2026" },
     { name = "datumaro", extras = ["experimental"], specifier = "~=1.13.10" },
@@ -1504,6 +1528,7 @@ requires-dist = [
     { name = "torchvision", marker = "sys_platform != 'linux' and sys_platform != 'win32' and extra == 'cpu'", specifier = "==0.27.1" },
     { name = "torchvision", marker = "extra == 'cuda'", specifier = "==0.27.1+cu130", index = "https://download.pytorch.org/whl/cu130", conflict = { package = "getitune", extra = "cuda" } },
     { name = "torchvision", marker = "extra == 'xpu'", specifier = "==0.27.1+xpu", index = "https://download.pytorch.org/whl/xpu", conflict = { package = "getitune", extra = "xpu" } },
+    { name = "transformers", specifier = ">=5.14,<6" },
     { name = "triton-xpu", marker = "extra == 'xpu'", specifier = "==3.7.1", index = "https://download.pytorch.org/whl/xpu", conflict = { package = "getitune", extra = "xpu" } },
     { name = "typeguard", specifier = ">=4.3,<4.5" },
     { name = "ultralytics", marker = "extra == 'ultralytics'", specifier = "==8.4.86" },
