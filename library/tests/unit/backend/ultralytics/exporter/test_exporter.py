@@ -187,6 +187,7 @@ class TestToOpenvino:
             format="openvino",
             imgsz=640,
             half=False,
+            end2end=False,
             nms=export_nms,
             project=str(tmp_path / "output"),
             name="raw_export",
@@ -327,6 +328,7 @@ class TestToOnnx:
             format="onnx",
             imgsz=640,
             half=False,
+            end2end=False,
             nms=export_nms,
             project=str(tmp_path / "output"),
             name="raw_export",
@@ -526,6 +528,7 @@ class TestMetadataYaml:
         assert metadata["stride"] == 32
         assert metadata["imgsz"] == [640, 640]
         assert metadata["names"] == {0: "cat", 1: "dog"}
+        assert metadata["end2end"] is False
         assert metadata["channels"] == 3
         assert metadata["batch"] == 1
         assert metadata["author"] == "Ultralytics"
