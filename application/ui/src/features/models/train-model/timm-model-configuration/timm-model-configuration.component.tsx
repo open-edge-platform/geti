@@ -15,7 +15,26 @@ const LicenseMapping: Record<string, string | undefined> = {
     'bsd-3-clause': 'https://choosealicense.com/licenses/bsd-3-clause',
     'dinov3-license': 'https://ai.meta.com/resources/models-and-libraries/dinov3-license',
     'fair-noncommercial-research-license': 'https://ai.meta.com/resources/models-and-libraries/cwm-license',
+    'cc-by-nc-4.0': 'https://spdx.org/licenses/CC-BY-NC-4.0',
     mit: 'https://choosealicense.com/licenses/mit',
+};
+
+const LicenseLink = ({ license }: { license: string | null | undefined }) => {
+    if (!license) {
+        return '-';
+    }
+
+    const licenseUrl = LicenseMapping[license];
+
+    if (licenseUrl === undefined) {
+        return license;
+    }
+
+    return (
+        <Link href={licenseUrl} target={'_blank'} rel={'noopener noreferrer'}>
+            {license}
+        </Link>
+    );
 };
 
 export const TimmModelConfiguration = () => {
@@ -34,8 +53,6 @@ export const TimmModelConfiguration = () => {
     } = useTrainModelState();
 
     const accuracyMetric = timmModelArchitecture === undefined ? undefined : getAccuracyMetric(timmModelArchitecture);
-    const license = timmModelArchitecture?.license;
-    const licenseUrl = license === undefined || license === null ? undefined : LicenseMapping[license];
 
     return (
         <View UNSAFE_className={classes.container}>
@@ -96,18 +113,7 @@ export const TimmModelConfiguration = () => {
                             {accuracyMetric?.label ?? 'Top-1 Acc on ImageNet'}: {accuracyMetric?.value ?? '-'}%
                         </li>
                         <li>
-                            License:{' '}
-                            {license ? (
-                                licenseUrl ? (
-                                    <Link href={licenseUrl} target={'_blank'} rel={'noopener noreferrer'}>
-                                        {license}
-                                    </Link>
-                                ) : (
-                                    license
-                                )
-                            ) : (
-                                '-'
-                            )}
+                            License: <LicenseLink license={timmModelArchitecture?.license} />
                         </li>
                     </ul>
                 )}
