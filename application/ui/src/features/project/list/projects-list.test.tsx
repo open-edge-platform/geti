@@ -442,14 +442,14 @@ describe('ProjectList', () => {
             renderProjectList();
 
             expect(await screen.findByLabelText('empty list')).toBeInTheDocument();
-            expect(screen.getByText(/end-to-end Vision AI application/)).toBeInTheDocument();
+            expect(screen.getByText(/a vision AI platform that guides you through/)).toBeInTheDocument();
 
             const workflow = screen.getByRole('list', { name: 'Geti workflow' });
             expect(
                 within(workflow)
                     .getAllByRole('listitem')
                     .map((item) => item.textContent)
-            ).toEqual(['Add data', 'Annotate', 'Train', 'Evaluate', 'Deploy']);
+            ).toEqual(['Add data', 'Annotate', 'Train', 'Optimize', 'Deploy']);
             expect(screen.getByText('Inference collects new data — retrain and improve')).toBeInTheDocument();
         });
     });

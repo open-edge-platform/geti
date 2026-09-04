@@ -5,19 +5,11 @@
 }
 
 .intro {
-    display: block;
-    margin-bottom: var(--spectrum-global-dimension-size-600);
-    font-size: var(--spectrum-global-dimension-font-size-500);
-    line-height: 1.5;
-    color: var(--spectrum-global-color-gray-700);
+    max-width: 60vw;
     text-align: center;
-}
-
-.introLogo {
-    width: var(--spectrum-global-dimension-size-400);
-    height: var(--spectrum-global-dimension-size-400);
-    margin-right: var(--spectrum-global-dimension-size-150);
-    vertical-align: middle;
+    margin: 0 auto var(--spectrum-global-dimension-size-600);
+    font-size: var(--spectrum-global-dimension-font-size-500);
+    color: var(--spectrum-global-color-gray-700);
 }
 
 .introName {

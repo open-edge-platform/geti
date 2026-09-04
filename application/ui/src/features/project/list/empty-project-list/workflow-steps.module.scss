@@ -1,38 +1,43 @@
-// Copyright (C) 2026 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
-
-// Space reserved under the steps for the return loop and its caption.
-$loop-gap: 8px;
-$loop-height: 40px;
-
 .workflow {
-    position: relative;
-    margin-top: auto; // pins the chain to the bottom of the empty state
-    padding-top: var(--spectrum-global-dimension-size-600);
-    padding-bottom: $loop-gap + $loop-height + 12px;
+    --circle-size: var(--spectrum-global-dimension-size-900);
+    --line-color: var(--spectrum-global-color-gray-500);
+
+    width: max-content;
+    margin: auto auto 0; // pins the chain to the bottom of the empty state
+    padding-block: var(--spectrum-global-dimension-size-600);
 }
 
 .steps {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: var(--spectrum-global-dimension-size-300);
+    margin: 0 0 var(--spectrum-global-dimension-size-200);
+    padding: 0;
+    list-style: none;
+    font-size: var(--spectrum-global-dimension-font-size-300);
+    color: var(--spectrum-global-color-gray-800);
 }
 
 .step {
     display: flex;
     align-items: center;
     gap: var(--spectrum-global-dimension-size-200);
+    white-space: nowrap;
+
+    &:not(:last-child)::after {
+        content: '';
+        width: var(--spectrum-global-dimension-size-600);
+        border-top: 1px solid var(--line-color);
+    }
 }
 
 .circle {
-    --size: var(--spectrum-global-dimension-size-900);
-
     display: flex;
     align-items: center;
     justify-content: center;
-    width: var(--size);
-    height: var(--size);
-    border: 1.5px solid var(--spectrum-global-color-gray-500);
+    width: var(--circle-size);
+    height: var(--circle-size);
+    border: 1px solid var(--line-color);
     border-radius: 50%;
     background: var(--spectrum-global-color-gray-200);
     color: var(--energy-blue);
@@ -40,65 +45,30 @@ $loop-height: 40px;
     svg {
         width: var(--spectrum-global-dimension-size-350);
         height: var(--spectrum-global-dimension-size-350);
+
+        // Adjustments and Deployments hardcode fill="#E3E3E5", so force every shape to follow `color`.
+        path {
+            fill: currentColor;
+        }
     }
 }
 
-.label {
-    font-size: var(--spectrum-global-dimension-font-size-300);
-    font-weight: 500;
-    color: var(--spectrum-global-color-gray-800);
-    white-space: nowrap;
-}
-
-.link {
-    position: relative;
-    width: var(--spectrum-global-dimension-size-1000);
-    height: 1.5px;
-    margin: 0 var(--spectrum-global-dimension-size-250);
-    background: var(--spectrum-global-color-gray-500);
-
-    &::after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        right: -5px;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        transform: translateY(-50%);
-        background: var(--energy-blue);
-    }
-}
-
-// Dashed U-shape from the last circle back under the row to the first circle.
+// Dashed U-shape running from the centre of the last circle back to the first one.
 .loop {
-    position: absolute;
-    top: calc(100% - #{$loop-height + 12px});
-    height: $loop-height;
-    border: 1.5px dashed var(--spectrum-global-color-gray-500);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: var(--spectrum-global-dimension-size-400);
+    margin-inline: calc(var(--circle-size) / 2);
+    border: 1px dashed var(--line-color);
     border-top: none;
     border-radius: 0 0 var(--spectrum-global-dimension-size-150) var(--spectrum-global-dimension-size-150);
-
-    // arrow head pointing back up into the first step
-    &::before {
-        content: '';
-        position: absolute;
-        top: -6px;
-        left: -5.75px;
-        border-right: 5px solid transparent;
-        border-bottom: 8px solid var(--spectrum-global-color-gray-500);
-        border-left: 5px solid transparent;
-    }
 }
 
 .loopText {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    padding: 0 var(--spectrum-global-dimension-size-150);
-    transform: translate(-50%, 50%);
+    padding: var(--spectrum-global-dimension-size-100);
+    transform: translateY(50%);
     background: var(--spectrum-global-color-gray-100);
     font-size: var(--spectrum-global-dimension-font-size-75);
     color: var(--spectrum-global-color-gray-600);
-    white-space: nowrap;
 }

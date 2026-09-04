@@ -5,7 +5,6 @@ import { Button, Flex, Text } from '@geti-ui/ui';
 import { useNavigate } from 'react-router-dom';
 
 import { ReactComponent as EmptyFolderImage } from '../../../../assets/empty-folder.svg';
-import getiLogo from '../../../../assets/icons/geti-logo.webp';
 import { paths } from '../../../../constants/paths';
 import { useImportDatasetDialog } from '../../providers/import-dataset-dialog-provider.component';
 import { ImportDatasetAsNewProject } from '../import-dataset-as-new-project/import-dataset-as-new-project.component';
@@ -31,13 +30,11 @@ export const EmptyProjectList = () => {
 
     return (
         <div className={classes.emptyState}>
-            <Text UNSAFE_className={classes.intro}>
-                <img src={getiLogo} alt='' className={classes.introLogo} />
-                <span className={classes.introName}>Geti</span> is an end-to-end Vision AI application that takes you
-                <br />
-                from <span className={classes.introHighlight}>raw images</span> to a{' '}
-                <span className={classes.introHighlight}>deployed computer vision model</span>.
-            </Text>
+            <p className={classes.intro}>
+                Welcome to <span className={classes.introName}>Geti</span>, a vision AI platform that guides you through
+                the <span className={classes.introHighlight}>complete model lifecycle</span>, from dataset preparation
+                to training, optimization and deployment.
+            </p>
 
             <Flex
                 gap={'size-100'}
@@ -52,7 +49,7 @@ export const EmptyProjectList = () => {
                     <Button variant='accent' id='create-new-project-button' onPress={handleCreateProject}>
                         <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>Create new Project</Text>
                     </Button>
-                    <Button variant='accent' id='create-new-project-button' onPress={handleCreateFromDataset}>
+                    <Button variant='accent' id='create-from-dataset-button' onPress={handleCreateFromDataset}>
                         <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>Create from dataset</Text>
                     </Button>
                 </Flex>
