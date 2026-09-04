@@ -25,9 +25,17 @@ class TestRemapLogKey:
         assert remap_log_key("train_loss") == "train/loss"
 
     def test_unprefixed_training_keys_default_to_train(self) -> None:
-        assert remap_log_key("loss") == "train/loss"
+        assert remap_log_key("loss") == "train/total_loss"
         assert remap_log_key("grad_norm") == "train/grad_norm"
-        assert remap_log_key("learning_rate") == "train/learning_rate"
+        assert remap_log_key("learning_rate") == "lr"
+
+    def test_canonical_keys_are_preserved(self) -> None:
+        assert remap_log_key("val/map") == "val/map"
+        assert remap_log_key("validation/iter_time") == "validation/iter_time"
+        assert remap_log_key("train/data_time") == "train/data_time"
+
+    def test_early_stopping_alias_becomes_validation_key(self) -> None:
+        assert remap_log_key("eval_val/map") == "val/map"
 
 
 class TestWriteMetricsCsv:
@@ -43,10 +51,11 @@ class TestWriteMetricsCsv:
         with csv_path.open() as fh:
             rows = list(csv.DictReader(fh))
         assert len(rows) == 2
-        assert rows[0]["train/loss"] == "2.0"
+        assert rows[0]["train/total_loss"] == "2.0"
+        assert rows[0]["lr"] == "5e-05"
         assert rows[0]["val/loss"] == ""
         assert rows[1]["val/loss"] == "1.5"
-        assert rows[1]["train/loss"] == ""
+        assert rows[1]["train/total_loss"] == ""
 
     def test_columns_are_the_union_across_all_entries(self, tmp_path: Path) -> None:
         log_history = [
@@ -61,12 +70,13 @@ class TestWriteMetricsCsv:
             fieldnames = csv.DictReader(fh).fieldnames
         assert fieldnames is not None
         assert set(fieldnames) == {
-            "train/loss",
+            "train/total_loss",
             "epoch",
             "step",
             "val/loss",
             "val/runtime",
             "train/runtime",
+            "train/loss",
         }
 
     def test_empty_log_history_writes_an_empty_csv(self, tmp_path: Path) -> None:

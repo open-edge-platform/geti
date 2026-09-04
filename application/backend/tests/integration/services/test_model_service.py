@@ -844,6 +844,42 @@ class TestModelServiceIntegration:
             elif metric["header"] == "Validation F1 score":
                 assert metric["value"]["x_axis_label"] == "Epoch"
 
+    def test_get_huggingface_training_metrics(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+    ):
+        metrics_dir = (
+            tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id) / "metrics" / "version_0"
+        )
+        metrics_dir.mkdir(parents=True)
+        csv_content = (
+            "epoch,step,train/total_loss,lr,train/grad_norm,train/data_time,train/iter_time,"
+            "val/Dice,val/mIoU,validation/data_time,validation/iter_time\n"
+            "1,1,0.8,0.0001,2.5,0.01,0.12,,,,\n"
+            "1,1,,,,,,0.7,0.6,0.02,0.3\n"
+        )
+        (metrics_dir / "metrics.csv").write_text(csv_content)
+
+        metrics = fxt_model_service.get_model_training_metrics(project_id=fxt_project_id, model_id=fxt_model_id)
+
+        metrics_by_name = {metric["header"]: metric for metric in metrics}
+        assert set(metrics_by_name) == {
+            "Training total loss",
+            "Learning rate",
+            "Training gradient norm",
+            "Training data time",
+            "Training iteration time",
+            "Validation Dice score",
+            "Validation mean IoU",
+            "Validation data time",
+            "Validation iteration time",
+        }
+        assert metrics_by_name["Training total loss"]["value"]["x_axis_label"] == "Step"
+        assert metrics_by_name["Validation Dice score"]["value"]["x_axis_label"] == "Epoch"
+
     def test_get_training_metrics_file_not_found(
         self,
         tmp_path: Path,

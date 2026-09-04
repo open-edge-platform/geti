@@ -5,6 +5,7 @@ model:
   init_args:
     checkpoint: PekingU/rtdetr_v2_r50vd
     pretrained: true
+    onnx_dynamo: false
     input_size: [640, 640]
 engine:
   device: auto

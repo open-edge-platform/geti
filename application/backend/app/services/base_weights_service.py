@@ -4,9 +4,11 @@
 import hashlib
 import json
 import shutil
+import time
 from pathlib import Path
 from uuid import uuid4
 
+import httpx
 import huggingface_hub
 import requests
 from loguru import logger
@@ -26,6 +28,7 @@ class BaseWeightsService:
     RETRY_TOTAL = 2  # total number of retries for failed requests
     RETRY_CONNECT = 1  # retries specifically for connection failures (fail fast on unreachable hosts)
     RETRY_BACKOFF_FACTOR = 0.5  # exponential backoff factor for retries (e.g., 0.5s, 1s)
+    HF_MAX_WORKERS = 1  # concurrent proxy tunnels are unreliable in some enterprise environments
     HF_CACHE_METADATA_FILENAME = ".geti-huggingface-snapshot.json"
 
     def __init__(self, data_dir: Path) -> None:
@@ -190,11 +193,25 @@ class BaseWeightsService:
         temp_path = local_path.with_name(f".{local_path.name}.{uuid4().hex}.tmp")
         logger.info("Downloading Hugging Face snapshot for {}", model_manifest_id)
         try:
-            huggingface_hub.snapshot_download(
-                repo_id=pretrained_weights.repo_id,
-                revision=pretrained_weights.revision,
-                local_dir=temp_path,
-            )
+            for attempt in range(self.RETRY_TOTAL + 1):
+                try:
+                    huggingface_hub.snapshot_download(
+                        repo_id=pretrained_weights.repo_id,
+                        revision=pretrained_weights.revision,
+                        local_dir=temp_path,
+                        max_workers=self.HF_MAX_WORKERS,
+                    )
+                    break
+                except (httpx.TransportError, huggingface_hub.errors.LocalEntryNotFoundError) as error:
+                    if not self._is_huggingface_transport_error(error) or attempt == self.RETRY_TOTAL:
+                        raise
+                    delay = self.RETRY_BACKOFF_FACTOR * (2**attempt)
+                    logger.warning(
+                        "Hugging Face snapshot download for {} failed; retrying in {} seconds",
+                        model_manifest_id,
+                        delay,
+                    )
+                    time.sleep(delay)
             (temp_path / self.HF_CACHE_METADATA_FILENAME).write_text(
                 json.dumps({"repo_id": pretrained_weights.repo_id, "revision": pretrained_weights.revision})
             )
@@ -209,6 +226,18 @@ class BaseWeightsService:
 
         logger.info("Successfully downloaded Hugging Face snapshot: {}", local_path)
         return local_path
+
+    @staticmethod
+    def _is_huggingface_transport_error(error: BaseException) -> bool:
+        """Return whether a Hub error was caused by a transient HTTP transport failure."""
+        seen: set[int] = set()
+        current: BaseException | None = error
+        while current is not None and id(current) not in seen:
+            if isinstance(current, httpx.TransportError):
+                return True
+            seen.add(id(current))
+            current = current.__cause__ or current.__context__
+        return False
 
     def _is_matching_huggingface_snapshot(self, path: Path, pretrained_weights: HuggingFacePretrainedWeights) -> bool:
         if not path.is_dir() or path.is_symlink():

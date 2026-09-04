@@ -387,8 +387,9 @@ class HFModel(ABC, nn.Module):
 
         Task subclasses set ``_onnx_output_names`` and inherit this builder,
         keeping the export contract (input names, resize mode, swap RGB,
-        opset) in one place. ``dynamo`` defaults to the exporter's own
-        default (``False``) unless overridden via ``onnx_dynamo``.
+        opset) in one place. ``dynamo`` defaults to ``True`` in the exporter
+        and can be overridden via ``onnx_dynamo`` for checkpoint-specific
+        compatibility.
         """
         if not hasattr(self, "_onnx_output_names") or not self._onnx_output_names:
             msg = "ONNX output names are not set."

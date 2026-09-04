@@ -318,6 +318,17 @@ class TestTrainerLoopExercisesOverrides:
         trainer = self._trainer(tmp_path)
         assert trainer.floating_point_ops(_detection_batch()) == 0
 
+    def test_training_log_includes_timing(self, tmp_path: Path) -> None:
+        trainer = self._trainer(tmp_path)
+        trainer._train_data_time = 0.1
+        trainer._train_iter_time = 0.4
+
+        trainer.log({"loss": 0.5})
+
+        entry = trainer.state.log_history[-1]
+        assert entry["train/data_time"] == pytest.approx(0.1)
+        assert entry["train/iter_time"] == pytest.approx(0.4)
+
     def test_evaluate_logs_val_map_keys(self, tmp_path: Path) -> None:
         """evaluate() logs val/* keys when FakeMetric is configured."""
         model = _detection_model()
@@ -345,6 +356,8 @@ class TestTrainerLoopExercisesOverrides:
         metrics = trainer.evaluate()
 
         assert "val/map" in metrics
+        assert "validation/data_time" in metrics
+        assert "validation/iter_time" in metrics
         assert any("val/map" in e for e in trainer.state.log_history)
 
 

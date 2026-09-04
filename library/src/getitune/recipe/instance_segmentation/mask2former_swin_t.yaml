@@ -6,6 +6,7 @@ model:
   init_args:
     checkpoint: facebook/mask2former-swin-tiny-coco-instance
     pretrained: true
+    onnx_dynamo: false
     resize_mode: fit_to_window
 
 engine:

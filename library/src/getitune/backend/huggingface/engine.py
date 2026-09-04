@@ -247,7 +247,8 @@ class HFEngine(Engine):
             "use_cpu": self._device.type == "cpu",
             "eval_strategy": "epoch" if has_eval else "no",
             "save_strategy": "no",
-            "logging_strategy": "epoch",
+            "logging_strategy": "steps",
+            "logging_steps": 1,
         }
         if has_eval and monitor is not None:
             greater_is_better = resolve_greater_is_better(monitor)

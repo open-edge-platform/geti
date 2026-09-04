@@ -392,6 +392,8 @@ class TestTrain:
         assert args.greater_is_better is True
         assert args.load_best_model_at_end is False
         assert args.save_strategy.value == "no"
+        assert args.logging_strategy.value == "steps"
+        assert args.logging_steps == 1
 
     def test_train_monitor_is_configurable(self, tmp_path: Path, model: _StubHFModel) -> None:
         engine = self._engine(tmp_path, model)

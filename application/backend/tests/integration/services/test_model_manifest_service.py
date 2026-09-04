@@ -48,7 +48,7 @@ HF_MANIFEST_IDS = {
     "instance-segmentation-mask2former-swin-s",
     "instance-segmentation-mask2former-swin-b",
     "instance-segmentation-mask2former-swin-l",
-    "instance-segmentation-eomt-large-640",
+    "instance-segmentation-eomt-dinov3-large-640",
 }
 TEST_PATH = pathlib.Path(os.path.dirname(__file__))
 DUMMY_BASE_MANIFEST_PATH = os.path.join(TEST_PATH, "dummy_base_model_manifest.yaml")

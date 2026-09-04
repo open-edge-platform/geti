@@ -4,6 +4,8 @@
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import httpx
+import huggingface_hub
 import pytest
 
 from app.models import TaskType
@@ -44,7 +46,94 @@ def test_downloads_snapshot_to_application_cache(fxt_service: BaseWeightsService
     assert download.call_args.kwargs["repo_id"] == "org/model"
     assert download.call_args.kwargs["revision"] == "0123456789abcdef"
     assert download.call_args.kwargs["local_dir"].parent == result.parent
+    assert download.call_args.kwargs["max_workers"] == 1
     assert not download.call_args.kwargs["local_dir"].exists()
+
+
+def test_retries_snapshot_after_transport_error(fxt_service: BaseWeightsService, fxt_weights) -> None:
+    manifest = MagicMock(pretrained_weights=fxt_weights)
+    attempts = 0
+
+    def download_snapshot(**kwargs) -> str:
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            raise httpx.ReadError("proxy connection reset")
+        local_dir = Path(kwargs["local_dir"])
+        local_dir.mkdir(parents=True, exist_ok=True)
+        (local_dir / "model.safetensors").write_bytes(b"weights")
+        return str(local_dir)
+
+    with (
+        patch.object(fxt_service, "_get_and_validate_model_manifest", return_value=manifest),
+        patch.object(fxt_service, "_check_huggingface_disk_space"),
+        patch(
+            "app.services.base_weights_service.huggingface_hub.snapshot_download",
+            side_effect=download_snapshot,
+        ) as download,
+        patch("app.services.base_weights_service.time.sleep") as sleep,
+    ):
+        result = fxt_service.get_local_weights_path(TaskType.DETECTION, "hf-model")
+
+    assert download.call_count == 2
+    assert download.call_args_list[0].kwargs["local_dir"] == download.call_args_list[1].kwargs["local_dir"]
+    sleep.assert_called_once_with(fxt_service.RETRY_BACKOFF_FACTOR)
+    assert (result / "model.safetensors").read_bytes() == b"weights"
+
+
+def test_retries_snapshot_after_wrapped_transport_error(fxt_service: BaseWeightsService, fxt_weights) -> None:
+    manifest = MagicMock(pretrained_weights=fxt_weights)
+
+    def wrapped_transport_error() -> huggingface_hub.errors.LocalEntryNotFoundError:
+        try:
+            raise httpx.ConnectError("Cannot assign requested address")
+        except httpx.ConnectError as cause:
+            error = huggingface_hub.errors.LocalEntryNotFoundError("snapshot is not cached")
+            error.__cause__ = cause
+            return error
+
+    def download_snapshot(**kwargs) -> str:
+        local_dir = Path(kwargs["local_dir"])
+        local_dir.mkdir(parents=True, exist_ok=True)
+        if download.call_count == 1:
+            (local_dir / "partial.safetensors").write_bytes(b"partial")
+            raise wrapped_transport_error()
+        (local_dir / "model.safetensors").write_bytes(b"weights")
+        return str(local_dir)
+
+    with (
+        patch.object(fxt_service, "_get_and_validate_model_manifest", return_value=manifest),
+        patch.object(fxt_service, "_check_huggingface_disk_space"),
+        patch(
+            "app.services.base_weights_service.huggingface_hub.snapshot_download",
+            side_effect=download_snapshot,
+        ) as download,
+        patch("app.services.base_weights_service.time.sleep") as sleep,
+    ):
+        result = fxt_service.get_local_weights_path(TaskType.DETECTION, "hf-model")
+
+    assert download.call_count == 2
+    assert download.call_args_list[0].kwargs["local_dir"] == download.call_args_list[1].kwargs["local_dir"]
+    sleep.assert_called_once_with(fxt_service.RETRY_BACKOFF_FACTOR)
+    assert (result / "partial.safetensors").read_bytes() == b"partial"
+    assert (result / "model.safetensors").read_bytes() == b"weights"
+
+
+def test_does_not_retry_local_entry_error_without_transport_cause(fxt_service: BaseWeightsService, fxt_weights) -> None:
+    manifest = MagicMock(pretrained_weights=fxt_weights)
+    error = huggingface_hub.errors.LocalEntryNotFoundError("snapshot is not cached")
+
+    with (
+        patch.object(fxt_service, "_get_and_validate_model_manifest", return_value=manifest),
+        patch.object(fxt_service, "_check_huggingface_disk_space"),
+        patch("app.services.base_weights_service.huggingface_hub.snapshot_download", side_effect=error) as download,
+        patch("app.services.base_weights_service.time.sleep") as sleep,
+        pytest.raises(huggingface_hub.errors.LocalEntryNotFoundError),
+    ):
+        fxt_service.get_local_weights_path(TaskType.DETECTION, "hf-model")
+
+    download.assert_called_once()
+    sleep.assert_not_called()
 
 
 def test_reuses_snapshot_offline(fxt_service: BaseWeightsService, fxt_weights) -> None:

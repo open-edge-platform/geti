@@ -58,6 +58,7 @@ KEY_MAPPING = {
     # Step based training metric
     "train/data_time": MetricDisplayInfo(display_name="Training data time", frequency="step"),
     "train/iter_time": MetricDisplayInfo(display_name="Training iteration time", frequency="step"),
+    "train/grad_norm": MetricDisplayInfo(display_name="Training gradient norm", frequency="step"),
     # "train/loss": MetricDisplayInfo(display_name="Training loss", frequency="step"),  # see issue #6350
     "train/loss_bbox": MetricDisplayInfo(display_name="Training loss bbox", frequency="step"),
     "train/loss_dfl": MetricDisplayInfo(display_name="Training loss DFL", frequency="epoch"),
@@ -86,6 +87,8 @@ KEY_MAPPING = {
     "val/mar_small": MetricDisplayInfo(display_name="Validation mAR small", frequency="epoch"),
     "val/precision": MetricDisplayInfo(display_name="Validation precision", frequency="epoch"),
     "val/recall": MetricDisplayInfo(display_name="Validation recall", frequency="epoch"),
+    "val/Dice": MetricDisplayInfo(display_name="Validation Dice score", frequency="epoch"),
+    "val/mIoU": MetricDisplayInfo(display_name="Validation mean IoU", frequency="epoch"),
     "validation/data_time": MetricDisplayInfo(display_name="Validation data time", frequency="epoch"),
     "validation/iter_time": MetricDisplayInfo(display_name="Validation iteration time", frequency="epoch"),
 }

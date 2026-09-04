@@ -32,11 +32,19 @@ def remap_log_key(key: str) -> str:
 
     ``Trainer`` logs ``loss``, ``learning_rate``, and ``grad_norm`` during
     training, ``eval_*`` during evaluation, and a final summary entry with
-    ``train_runtime``-style keys. ``epoch`` and ``step`` stay bare, matching
-    Lightning's ``CSVLogger``.
+    ``train_runtime``-style keys. Map step metrics to the names consumed by
+    the application while preserving canonical ``train/`` and ``val/`` keys.
     """
     if key in ("epoch", "step"):
         return key
+    if key in ("loss", "train/total_loss"):
+        return "train/total_loss"
+    if key in ("learning_rate", "lr"):
+        return "lr"
+    if key.startswith(("train/", "val/", "validation/")):
+        return key
+    if key.startswith("eval_val/"):
+        return key[len("eval_") :]
     if key.startswith("eval_"):
         return f"val/{key[len('eval_') :]}"
     if key.startswith("train_"):

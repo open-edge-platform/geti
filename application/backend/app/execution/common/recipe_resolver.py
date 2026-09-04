@@ -345,11 +345,6 @@ class RecipeResolver:
             "status": ModelStatus.ACTIVE,
             "default": False,
         },
-        "instance-segmentation-eomt-large-640": {
-            "recipe_path": "instance_segmentation/eomt_large_640.yaml",
-            "status": ModelStatus.ACTIVE,
-            "default": False,
-        },
         "instance-segmentation-eomt-dinov3-large-640": {
             "recipe_path": "instance_segmentation/eomt_dinov3_large_640.yaml",
             "status": ModelStatus.ACTIVE,

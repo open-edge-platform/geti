@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from time import perf_counter
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -21,7 +22,7 @@ from getitune.metrics import MetricCallable
 from .utils import resolve_greater_is_better
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Iterator, Sequence
 
     from torch.utils.data import DataLoader
     from torchmetrics import Metric, MetricCollection
@@ -73,7 +74,19 @@ class GetiTuneHFTrainer(Trainer):
         )
         self._best_metric_value: float | None = None
         self._best_eval_metrics: dict[str, float] = {}
+        self._train_data_time = 0.0
+        self._train_iter_time = 0.0
         super().__init__(*args, **kwargs)
+
+    def get_batch_samples(
+        self, epoch_iterator: Iterator[Any], num_batches: int, device: torch.device
+    ) -> tuple[list[Any], torch.Tensor | int | None]:
+        """Collect an optimizer step's microbatches and measure data loading time."""
+        start = perf_counter()
+        result = super().get_batch_samples(epoch_iterator, num_batches, device)
+        self._train_data_time = perf_counter() - start
+        self._train_iter_time = self._train_data_time
+        return result
 
     def _build_gpu_pipeline(
         self, subset_config: SubsetConfig | None, *, sanitize: bool
@@ -202,6 +215,25 @@ class GetiTuneHFTrainer(Trainer):
         outputs = model(**targets)
         return (outputs.loss, outputs) if return_outputs else outputs.loss
 
+    def training_step(
+        self,
+        model: torch.nn.Module,
+        inputs: SampleBatch,
+        num_items_in_batch: torch.Tensor | int | None = None,
+    ) -> torch.Tensor:
+        """Run one microbatch and accumulate its processing time."""
+        start = perf_counter()
+        loss = super().training_step(model, inputs, num_items_in_batch)
+        self._train_iter_time += perf_counter() - start
+        return loss
+
+    def log(self, logs: dict[str, float], start_time: float | None = None) -> None:
+        """Attach timing to optimizer-step logs before storing them."""
+        if "loss" in logs:
+            logs["train/data_time"] = self._train_data_time
+            logs["train/iter_time"] = self._train_iter_time
+        super().log(logs, start_time)
+
     def _determine_best_metric(  # pyrefly: ignore[bad-override]
         self,
         metrics: dict[str, float],
@@ -285,8 +317,18 @@ class GetiTuneHFTrainer(Trainer):
         if model is None:
             msg = "Trainer model is not set; cannot run evaluation."
             raise RuntimeError(msg)
+        data_time = 0.0
+        iter_time = 0.0
+        num_batches = 0
+        iterator = iter(dataloader)
         with torch.no_grad():
-            for inputs in dataloader:
+            while True:
+                start = perf_counter()
+                try:
+                    inputs = next(iterator)
+                except StopIteration:
+                    break
+                data_time += perf_counter() - start
                 batch = self._prepare_batch(inputs, pipeline)
                 outputs = model(**self.model_wrapper.build_eval_inputs(batch))
                 metric_inputs = self.model_wrapper.to_metric_inputs(outputs, batch)
@@ -295,6 +337,8 @@ class GetiTuneHFTrainer(Trainer):
                 # here instead of scattering .cpu() through each to_metric_inputs.
                 metric_inputs = apply_to_collection(metric_inputs, torch.Tensor, lambda t: t.cpu())
                 metric_obj.update(**metric_inputs)
+                iter_time += perf_counter() - start
+                num_batches += 1
 
         computed = metric_obj.compute()
         metrics = self._format_metrics(computed, f"{split}/")
@@ -302,6 +346,9 @@ class GetiTuneHFTrainer(Trainer):
             return {}
 
         if split == "val":
+            if num_batches:
+                metrics["validation/data_time"] = data_time / num_batches
+                metrics["validation/iter_time"] = iter_time / num_batches
             # ``transformers.EarlyStoppingCallback`` looks up ``eval_`` + ``metric_for_best_model``
             # in the metrics dict, but we log task metrics under the ``val/`` prefix. Mirror them under
             # the ``eval_`` prefix so early stopping can find the monitored metric.
