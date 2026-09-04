@@ -3,13 +3,13 @@
 
 import { useEffect, useState } from 'react';
 
-import { toast } from '../../../../../components/toast/toast.component';
 import { Content, Dialog, DialogContainer, DialogTrigger, Flex, PressableElement, Text, View } from '@geti-ui/ui';
 import { ChevronDownSmall } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { isEmpty } from 'lodash-es';
 
+import { toast } from '../../../../../components/toast/toast.component';
 import { DatasetViewItemsList } from './dataset-view-items-list/dataset-view-items-list.component';
 import { DeleteDatasetViewDialog } from './delete-dataset-view.component';
 import { RenameDatasetView } from './rename-dataset-view.component';
