@@ -309,7 +309,12 @@ class MaskRCNNTV(LightningInstanceSegModel):
             "image_shape": shape,
         }
         meta_info_list = [meta_info] * len(inputs)
-        return self.model.export(inputs, meta_info_list, explain_mode=self.explain_mode)
+        return self.model.export(
+            inputs,
+            meta_info_list,
+            explain_mode=self.explain_mode,
+            with_nms=self.export_nms,
+        )
 
     @property
     def _optimization_config(self) -> dict[str, Any]:

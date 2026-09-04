@@ -161,7 +161,7 @@ class TestLightningDetectionModel:
     def test_export_parameters_with_nms(self, model):
         model.export_nms = True
         parameters = model._export_parameters
-        assert parameters.nms_execute is None
+        assert parameters.nms_execute is False
         assert parameters.agnostic_nms is None
         assert parameters.nms_max_predictions is None
 

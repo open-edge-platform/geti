@@ -176,7 +176,11 @@ class RFDETRInst(RFDETRMixin, LightningInstanceSegModel):  # pyrefly: ignore[inc
 
     def forward_for_tracing(self, inputs: torch.Tensor) -> dict[str, torch.Tensor]:
         """Forward pass used for export (returns dict for reliable OV output naming)."""
-        boxes_with_scores, labels, masks = self.model.export(inputs, merge_scores=True)  # pyrefly: ignore[not-callable]
+        boxes_with_scores, labels, masks = self.model.export(  # pyrefly: ignore[not-callable]
+            inputs,
+            merge_scores=True,
+            with_nms=self.export_nms,
+        )
         # Scale boxes from normalized [0,1] to pixel coordinates (ModelAPI MaskRCNN expects this)
         h, w = inputs.shape[2], inputs.shape[3]
         scale = torch.tensor([w, h, w, h, 1.0], device=inputs.device)

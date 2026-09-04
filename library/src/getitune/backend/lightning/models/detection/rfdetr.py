@@ -177,7 +177,7 @@ class RFDETR(RFDETRMixin, LightningDetectionModel):  # pyrefly: ignore[inconsist
 
     def forward_for_tracing(self, inputs: torch.Tensor) -> dict[str, Any]:
         """Forward pass used for export (returns dict for reliable OV output naming)."""
-        boxes, labels, scores = self.model.export(inputs)  # pyrefly: ignore[not-callable]
+        boxes, labels, scores = self.model.export(inputs, with_nms=self.export_nms)  # pyrefly: ignore[not-callable]
         return {"bboxes": boxes, "labels": labels, "scores": scores}
 
     @property

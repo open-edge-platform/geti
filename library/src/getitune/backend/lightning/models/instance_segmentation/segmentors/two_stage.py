@@ -231,6 +231,7 @@ class TwoStageDetector(nn.Module):
         batch_inputs: Tensor,
         batch_img_metas: list[dict],
         explain_mode: bool = False,
+        with_nms: bool = False,
     ) -> tuple[Tensor, Tensor, Tensor] | dict[str, Tensor]:
         """Export the model for ONNX/OpenVINO.
 
@@ -252,6 +253,9 @@ class TwoStageDetector(nn.Module):
                 - labels (Tensor): labels.
                 - masks (Tensor): masks.
         """
+        if with_nms:
+            msg = "TwoStageDetector does not support embedded NMS export."
+            raise ValueError(msg)
         x = self.extract_feat(batch_inputs)
         rpn_results_list = self.rpn_head.export(
             x,

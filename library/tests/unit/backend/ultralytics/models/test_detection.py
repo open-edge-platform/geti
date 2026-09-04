@@ -48,7 +48,7 @@ class TestDetectionModel:
         assert params.label_info == _label_info()
         assert params.iou_threshold == 0.5
 
-    @pytest.mark.parametrize(("export_nms", "expected_nms_execute"), [(False, True), (True, None)])
+    @pytest.mark.parametrize(("export_nms", "expected_nms_execute"), [(False, True), (True, False)])
     def test_export_nms_controls_deferred_nms_metadata(
         self, export_nms: bool, expected_nms_execute: bool | None
     ) -> None:

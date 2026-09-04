@@ -82,22 +82,25 @@ class TestLightningInstanceSegModel:
 
         parameters = model._export_parameters
 
-        assert parameters.nms_execute is None
+        assert parameters.nms_execute is False
 
-    def test_forward_for_tracing_forwards_nms_option(self, model, mocker):
-        observed_with_nms = []
+    def test_forward_for_tracing_forwards_explain_mode(self, model, mocker):
+        observed_explain_mode = []
 
-        def export_model(_inputs, _meta_info_list, with_nms=False) -> tuple[()]:
-            observed_with_nms.append(with_nms)
+        def export_model(_inputs, _meta_info_list, explain_mode=False, with_nms=False) -> tuple[()]:
+            observed_explain_mode.append(explain_mode)
             return ()
 
         mocker.patch.object(model.model, "export", export_model)
         LightningInstanceSegModel.forward_for_tracing(model, torch.randn(1, 3, 224, 224))
 
-        assert observed_with_nms == [False]
+        assert observed_explain_mode == [False]
 
     def test_forward_for_tracing_rejects_unsupported_nms(self, model, mocker):
-        def export_model(_inputs, _meta_info_list) -> tuple[()]:
+        def export_model(_inputs, _meta_info_list, explain_mode=False, with_nms=False) -> tuple[()]:
+            if with_nms:
+                msg = "MaskRCNN does not support embedded NMS export."
+                raise ValueError(msg)
             return ()
 
         mocker.patch.object(model.model, "export", export_model)

@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 import copy
-import inspect
 import logging as log
 import types
 from contextlib import contextmanager
@@ -256,16 +255,12 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             "scale_factor": (1.0, 1.0),
         }
         meta_info_list = [meta_info] * len(inputs)
-        export_sig = inspect.signature(self.model.export).parameters
-        export_kwargs: dict[str, Any] = {}
-        if "explain_mode" in export_sig:
-            export_kwargs["explain_mode"] = self.explain_mode
-        if "with_nms" in export_sig:
-            export_kwargs["with_nms"] = self.export_nms
-        elif self.export_nms:
-            msg = f"{self.__class__.__name__} does not support embedded NMS export."
-            raise ValueError(msg)
-        return self.model.export(inputs, meta_info_list, **export_kwargs)
+        return self.model.export(
+            inputs,
+            meta_info_list,
+            explain_mode=self.explain_mode,
+            with_nms=self.export_nms,
+        )
 
     @property
     def _export_parameters(self) -> TaskLevelExportParameters:

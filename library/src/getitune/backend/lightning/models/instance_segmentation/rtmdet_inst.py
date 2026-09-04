@@ -195,7 +195,12 @@ class RTMDetInst(LightningInstanceSegModel):
             "scale_factor": (1.0, 1.0),
         }
         meta_info_list = [meta_info] * len(inputs)
-        return self.model.export(inputs, meta_info_list, explain_mode=self.explain_mode)
+        return self.model.export(
+            inputs,
+            meta_info_list,
+            explain_mode=self.explain_mode,
+            with_nms=self.export_nms,
+        )
 
     @property
     def _default_preprocessing_params(self) -> DataInputParams | dict[str, DataInputParams]:

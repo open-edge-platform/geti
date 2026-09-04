@@ -181,7 +181,7 @@ class EdgeCrafterInst(EdgeCrafterMixin, LightningInstanceSegModel):  # pyrefly: 
             Dict with ``boxes``, ``labels``, ``masks``.
         """
         meta_info_list = self._default_is_meta(inputs)
-        result = self.model.export(inputs, meta_info_list)  # type: ignore[attr-defined]  # pyrefly: ignore[not-callable]
+        result = self.model.export(inputs, meta_info_list, with_nms=self.export_nms)  # type: ignore[attr-defined]  # pyrefly: ignore[not-callable]
         return self._make_is_export_prediction(inputs, result)
 
     @property

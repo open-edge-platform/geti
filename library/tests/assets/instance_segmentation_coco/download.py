@@ -58,7 +58,7 @@ def _download_annotations(download_dir: Path) -> Path:
     if not zip_path.exists():
         print(f"  Downloading annotations from {COCO_ANNOTATIONS_URL} ...")
         download_dir.mkdir(parents=True, exist_ok=True)
-        urllib.request.urlretrieve(COCO_ANNOTATIONS_URL, zip_path)  # noqa: S310
+        urllib.request.urlretrieve(COCO_ANNOTATIONS_URL, zip_path)  # noqa: S310  # nosec B310 - fixed HTTPS URL
 
     print("  Extracting annotations ...")
     with zipfile.ZipFile(zip_path) as zf:

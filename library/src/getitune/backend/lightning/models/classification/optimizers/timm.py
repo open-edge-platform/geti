@@ -18,7 +18,7 @@ _TRANSFORMER_PREFIXES = ("vit", "deit", "beit", "swin", "cait", "xcit", "maxvit"
 
 def _is_transformer_family(model_name: str) -> bool:
     """Check whether a timm model name belongs to a transformer-like family."""
-    family = model_name.split("_")[0].split(".")[0].lower()
+    family = model_name.split("_", maxsplit=1)[0].split(".", maxsplit=1)[0].lower()
     return family.startswith(_TRANSFORMER_PREFIXES)
 
 

@@ -54,7 +54,7 @@ class TestInstanceSegmentationModel:
     def test_export_parameters_omit_nms_metadata_when_embedded(self) -> None:
         model = UltralyticsInstSegModel(model_name="yolo26n-seg", label_info=_label_info(), export_nms=True)
 
-        assert model._export_parameters.nms_execute is None
+        assert model._export_parameters.nms_execute is False
 
     def test_export_parameters_use_export_args_override(self) -> None:
         model = UltralyticsInstSegModel(model_name="yolo26n-seg", label_info=_label_info())
