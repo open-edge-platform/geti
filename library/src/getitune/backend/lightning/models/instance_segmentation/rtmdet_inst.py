@@ -58,6 +58,7 @@ class RTMDetInst(LightningInstanceSegModel):
             the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
+    _nms_always_embedded: ClassVar[bool] = True
     pretrained_urls: ClassVar[dict[str, str]] = {
         "rtmdet_inst_tiny": "https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet-ins_tiny_8xb32-300e_coco/"
         "rtmdet-ins_tiny_8xb32-300e_coco_20221130_151727-ec670f7e.pth"
@@ -199,7 +200,7 @@ class RTMDetInst(LightningInstanceSegModel):
             inputs,
             meta_info_list,
             explain_mode=self.explain_mode,
-            with_nms=self.export_nms,
+            with_nms=True,
         )
 
     @property

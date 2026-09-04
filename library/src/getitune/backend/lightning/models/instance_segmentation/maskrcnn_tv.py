@@ -63,6 +63,7 @@ class MaskRCNNTV(LightningInstanceSegModel):
             the default pretrained weights will be utilized for fine-tuning. Defaults to None.
     """
 
+    _nms_always_embedded: ClassVar[bool] = True
     pretrained_urls: ClassVar[dict[str, str]] = {
         "maskrcnn_resnet_50": MaskRCNN_ResNet50_FPN_V2_Weights.verify("DEFAULT").url,
     }
@@ -313,7 +314,7 @@ class MaskRCNNTV(LightningInstanceSegModel):
             inputs,
             meta_info_list,
             explain_mode=self.explain_mode,
-            with_nms=self.export_nms,
+            with_nms=True,
         )
 
     @property

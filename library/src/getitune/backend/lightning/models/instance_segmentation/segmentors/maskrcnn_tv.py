@@ -115,7 +115,7 @@ class MaskRCNN(_MaskRCNN):
         batch_inputs: Tensor,
         batch_img_metas: list[dict],
         explain_mode: bool = False,
-        with_nms: bool = False,
+        with_nms: bool = True,
     ) -> (
         tuple[list[Tensor], list[Tensor], list[Tensor]]
         | tuple[list[Tensor], list[Tensor], list[Tensor], Tensor, Tensor]
@@ -135,8 +135,8 @@ class MaskRCNN(_MaskRCNN):
                 feature_vector (Tensor, optional): feature vector.
                 saliency_map (Tensor, optional): saliency map.
         """
-        if with_nms:
-            msg = "MaskRCNN does not support embedded NMS export."
+        if not with_nms:
+            msg = "MaskRCNN requires embedded NMS for export."
             raise ValueError(msg)
         img_shapes = [img_meta["image_shape"] for img_meta in batch_img_metas]
         image_list = ImageList(batch_inputs, img_shapes)

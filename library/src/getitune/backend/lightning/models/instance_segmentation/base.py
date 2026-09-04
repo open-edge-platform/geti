@@ -81,6 +81,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
     """
 
     pretrained_urls: ClassVar[dict[str, str]]
+    _nms_always_embedded: ClassVar[bool] = False
 
     def __init__(
         self,
@@ -259,7 +260,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             inputs,
             meta_info_list,
             explain_mode=self.explain_mode,
-            with_nms=self.export_nms,
+            with_nms=self._nms_always_embedded or self.export_nms,
         )
 
     @property
@@ -276,7 +277,7 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
             task_type="instance_segmentation",
             confidence_threshold=self.hparams.get("best_confidence_threshold", 0.05),
             iou_threshold=0.5,
-            nms_execute=not self.export_nms,
+            nms_execute=not (self._nms_always_embedded or self.export_nms),
             tile_config=self.tile_config if self.tile_config.enable_tiler else None,
             label_info=modified_label_info,
         )

@@ -75,7 +75,7 @@ class TestLightningInstanceSegModel:
         parameters = model._export_parameters
         assert isinstance(parameters, TaskLevelExportParameters)
         assert parameters.task_type == "instance_segmentation"
-        assert parameters.nms_execute is True
+        assert parameters.nms_execute is False
 
     def test_export_parameters_with_nms(self, model):
         model.export_nms = True
@@ -85,29 +85,31 @@ class TestLightningInstanceSegModel:
         assert parameters.nms_execute is False
 
     def test_forward_for_tracing_forwards_explain_mode(self, model, mocker):
-        observed_explain_mode = []
+        observed_arguments = []
 
         def export_model(_inputs, _meta_info_list, explain_mode=False, with_nms=False) -> tuple[()]:
-            observed_explain_mode.append(explain_mode)
+            observed_arguments.append((explain_mode, with_nms))
             return ()
 
         mocker.patch.object(model.model, "export", export_model)
         LightningInstanceSegModel.forward_for_tracing(model, torch.randn(1, 3, 224, 224))
 
-        assert observed_explain_mode == [False]
+        assert observed_arguments == [(False, True)]
 
-    def test_forward_for_tracing_rejects_unsupported_nms(self, model, mocker):
+    @pytest.mark.parametrize("export_nms", [False, True])
+    def test_forward_for_tracing_always_forwards_nms(self, model, mocker, export_nms):
+        observed_with_nms = []
+
         def export_model(_inputs, _meta_info_list, explain_mode=False, with_nms=False) -> tuple[()]:
-            if with_nms:
-                msg = "MaskRCNN does not support embedded NMS export."
-                raise ValueError(msg)
+            observed_with_nms.append(with_nms)
             return ()
 
         mocker.patch.object(model.model, "export", export_model)
-        model.export_nms = True
+        model.export_nms = export_nms
 
-        with pytest.raises(ValueError, match="does not support embedded NMS export"):
-            LightningInstanceSegModel.forward_for_tracing(model, torch.randn(1, 3, 224, 224))
+        LightningInstanceSegModel.forward_for_tracing(model, torch.randn(1, 3, 224, 224))
+
+        assert observed_with_nms == [True]
 
     def test_export_nms_defaults_to_false(self, model):
         assert model.export_nms is False
