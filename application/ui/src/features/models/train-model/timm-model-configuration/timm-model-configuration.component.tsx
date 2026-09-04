@@ -3,10 +3,20 @@
 
 import { Divider, Flex, Grid, Heading, Item, Loading, Picker, View } from '@geti-ui/ui';
 
+import { Link } from '../../../../platform/components/link.component';
 import { getAccuracyMetric } from '../model-architectures-list/utils';
 import { useTrainModelState } from '../train-model-provider.component';
 
 import classes from './timm-model-configuration.module.scss';
+
+const LicenseMapping: Record<string, string | undefined> = {
+    'apache-2.0': 'https://choosealicense.com/licenses/apache-2.0',
+    'apple-ascl': 'https://developer.apple.com/support/downloads/terms/apple-sample-code/Apple-Sample-Code-License.pdf',
+    'bsd-3-clause': 'https://choosealicense.com/licenses/bsd-3-clause',
+    'dinov3-license': 'https://ai.meta.com/resources/models-and-libraries/dinov3-license',
+    'fair-noncommercial-research-license': 'https://ai.meta.com/resources/models-and-libraries/cwm-license',
+    mit: 'https://choosealicense.com/licenses/mit',
+};
 
 export const TimmModelConfiguration = () => {
     const {
@@ -24,6 +34,8 @@ export const TimmModelConfiguration = () => {
     } = useTrainModelState();
 
     const accuracyMetric = timmModelArchitecture === undefined ? undefined : getAccuracyMetric(timmModelArchitecture);
+    const license = timmModelArchitecture?.license;
+    const licenseUrl = license === undefined || license === null ? undefined : LicenseMapping[license];
 
     return (
         <View UNSAFE_className={classes.container}>
@@ -83,7 +95,20 @@ export const TimmModelConfiguration = () => {
                         <li>
                             {accuracyMetric?.label ?? 'Top-1 Acc on ImageNet'}: {accuracyMetric?.value ?? '-'}%
                         </li>
-                        <li>License: {timmModelArchitecture?.license ?? '-'}</li>
+                        <li>
+                            License:{' '}
+                            {license ? (
+                                licenseUrl ? (
+                                    <Link href={licenseUrl} target={'_blank'} rel={'noopener noreferrer'}>
+                                        {license}
+                                    </Link>
+                                ) : (
+                                    license
+                                )
+                            ) : (
+                                '-'
+                            )}
+                        </li>
                     </ul>
                 )}
             </Grid>
