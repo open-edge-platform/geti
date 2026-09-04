@@ -449,8 +449,10 @@ describe('ProjectList', () => {
                 within(workflow)
                     .getAllByRole('listitem')
                     .map((item) => item.textContent)
-            ).toEqual(['Add data', 'Annotate', 'Train', 'Optimize', 'Deploy']);
-            expect(screen.getByText('Inference collects new data — retrain and improve')).toBeInTheDocument();
+            ).toEqual(['Add data', 'Annotate', 'Train', 'Optimize', 'Run inference']);
+            expect(
+                screen.getByText('Monitor predictions and collect more data to iteratively fine-tune your model')
+            ).toBeInTheDocument();
         });
     });
 
