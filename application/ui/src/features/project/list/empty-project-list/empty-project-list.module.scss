@@ -1,3 +1,31 @@
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.intro {
+    max-width: 60vw;
+    text-align: center;
+    margin: 0 auto var(--spectrum-global-dimension-size-600);
+    font-size: var(--spectrum-global-dimension-font-size-500);
+    color: var(--spectrum-global-color-gray-700);
+}
+
+.introName {
+    font-size: var(--spectrum-global-dimension-font-size-700);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(92deg, var(--energy-blue), var(--energy-blue-light));
+    background-clip: text;
+    color: transparent;
+}
+
+.introHighlight {
+    font-weight: 500;
+    color: var(--spectrum-global-color-gray-900);
+}
+
 .container {
     border: 1px dashed var(--spectrum-global-color-gray-700);
     padding: var(--spectrum-global-dimension-size-500) var(--spectrum-global-dimension-size-200);
