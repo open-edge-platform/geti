@@ -1,6 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 import shutil
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 from uuid import UUID, uuid4
@@ -70,3 +71,37 @@ class TrainingJob(ProjectJob[TrainingJobParams]):
             pass
         except Exception as cleanup_exc:
             logger.error(f"Failed to clean up getitune workspace directory at {workspace_dir}: {cleanup_exc}")
+
+        try:
+            self._reconcile_stuck_training_status()
+        except Exception as reconcile_exc:
+            logger.error(f"Failed to verify the training status for model {self.params.model_id}: {reconcile_exc}")
+
+    def _reconcile_stuck_training_status(self) -> None:
+        """Force training_status to FAILED if the trainer process died without updating it (e.g. a crash/kill)."""
+        # Imported locally: the "models" layer normally must not depend on the "services" layer;
+        # this is a deliberate, narrow exception to provide a safety net at job completion time.
+        from app.db.engine import get_db_session
+        from app.models import TrainingStatus
+        from app.services import ModelService, ResourceNotFoundError
+
+        with get_db_session() as db:
+            model_service = ModelService(data_dir=self.data_dir, db_session=db)
+            try:
+                model = model_service.get_model(project_id=self.project_id, model_id=self.params.model_id)
+            except ResourceNotFoundError:
+                return  # revision was never created (or was already deleted), nothing to reconcile
+
+            if model.training_info is not None:
+                found_status = model.training_info.status
+                if found_status not in (TrainingStatus.SUCCESSFUL, TrainingStatus.FAILED):
+                    model_service.update_revision_status(
+                        project_id=self.project_id,
+                        model_id=self.params.model_id,
+                        training_status=TrainingStatus.FAILED,
+                        training_finished_at=datetime.now(UTC),
+                    )
+                    logger.warning(
+                        f"Model {self.params.model_id} was left at {found_status} after job completion; "
+                        "forced to FAILED"
+                    )
