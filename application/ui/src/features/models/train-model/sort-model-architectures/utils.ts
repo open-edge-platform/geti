@@ -4,6 +4,8 @@
 import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { orderBy } from 'lodash-es';
 
+import { TIMM_MODEL_ARCHITECTURE_ID } from '../timm-model-configuration/utils';
+
 export const SortingOptions = {
     NAME_ASC: 'name-asc',
     NAME_DESC: 'name-desc',
@@ -27,19 +29,33 @@ const getAccuracyMetricBasedOnTask = ({ stats }: ModelArchitectureWithPerformanc
     );
 };
 
+// Pins the synthetic TIMM card to the last position regardless of the chosen sort.
+const pinTimmCardLast = (handler: SortingHandler): SortingHandler => (modelArchitectures) => {
+    const timmCard = modelArchitectures.filter(({ id }) => id === TIMM_MODEL_ARCHITECTURE_ID);
+    const rest = modelArchitectures.filter(({ id }) => id !== TIMM_MODEL_ARCHITECTURE_ID);
+
+    return [...handler(rest), ...timmCard];
+};
+
 export const SORTING_HANDLERS: Record<SortingOptions, SortingHandler> = {
-    [SortingOptions.ACCURACY_ASC]: (modelArchitectures) =>
-        orderBy(modelArchitectures, getAccuracyMetricBasedOnTask, 'asc'),
-    [SortingOptions.ACCURACY_DESC]: (modelArchitectures) =>
-        orderBy(modelArchitectures, getAccuracyMetricBasedOnTask, 'desc'),
-    [SortingOptions.NAME_ASC]: (modelArchitectures) =>
-        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.name, 'asc'),
-    [SortingOptions.NAME_DESC]: (modelArchitectures) =>
-        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.name, 'desc'),
-    [SortingOptions.SPEED_ASC]: (modelArchitectures) =>
-        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.stats?.gigaflops, 'asc'),
-    [SortingOptions.SPEED_DESC]: (modelArchitectures) =>
-        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.stats?.gigaflops, 'desc'),
+    [SortingOptions.ACCURACY_ASC]: pinTimmCardLast((modelArchitectures) =>
+        orderBy(modelArchitectures, getAccuracyMetricBasedOnTask, 'asc')
+    ),
+    [SortingOptions.ACCURACY_DESC]: pinTimmCardLast((modelArchitectures) =>
+        orderBy(modelArchitectures, getAccuracyMetricBasedOnTask, 'desc')
+    ),
+    [SortingOptions.NAME_ASC]: pinTimmCardLast((modelArchitectures) =>
+        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.name, 'asc')
+    ),
+    [SortingOptions.NAME_DESC]: pinTimmCardLast((modelArchitectures) =>
+        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.name, 'desc')
+    ),
+    [SortingOptions.SPEED_ASC]: pinTimmCardLast((modelArchitectures) =>
+        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.stats?.gigaflops, 'asc')
+    ),
+    [SortingOptions.SPEED_DESC]: pinTimmCardLast((modelArchitectures) =>
+        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.stats?.gigaflops, 'desc')
+    ),
 };
 
 export const SORT_OPTIONS = [
