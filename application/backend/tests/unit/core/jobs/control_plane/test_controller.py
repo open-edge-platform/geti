@@ -134,8 +134,8 @@ class TestJobController:
             (
                 [Started(), Progress("progress", 50.0), Failed("boom")],
                 JobStatus.FAILED,
-                "error",
-                ("Job failed, job_id: {}, error: {}", "job_id", "error"),
+                "warning",
+                ("Job failed, job_id: {}", "job_id"),
             ),
             (
                 [Started(), Progress("progress", 50.0), Cancelled()],
@@ -168,9 +168,7 @@ class TestJobController:
             await fxt_job_controller.stop()
 
         assert job.status == expected_status
-        expected_call_args = tuple(
-            job.id if arg == "job_id" else job.error if arg == "error" else arg for arg in expected_log_args
-        )
+        expected_call_args = tuple(job.id if arg == "job_id" else arg for arg in expected_log_args)
         getattr(mock_logger, expected_log_method).assert_any_call(*expected_call_args)
 
     @pytest.mark.asyncio
