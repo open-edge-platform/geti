@@ -88,10 +88,11 @@ class Model:
             "MaskRCNN",
             "SSD",
             "Segmentation",
+            "YOLODETR",
         }:
             self.raise_error(
                 "ONNXRuntimeAdapter is only supported for Classification, DETRInstSeg, MaskRCNN, SSD,"
-                " and Segmentation wrappers",
+                " Segmentation, and YOLODETR wrappers",
             )
 
         self.inputs = self.inference_adapter.get_input_layers()

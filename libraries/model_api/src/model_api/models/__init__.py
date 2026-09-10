@@ -35,6 +35,7 @@ from .utils import (
 )
 from .visual_prompting import Prompt, SAMLearnableVisualPrompter, SAMVisualPrompter
 from .yolo import YOLO, YOLO11, YOLOF, YOLOX, YoloV3ONNX, YoloV4, YOLOv5, YOLOv8
+from .yolo_detr import YOLODETR
 from .yolo_seg import YOLOSeg
 
 classification_models = [
@@ -96,6 +97,7 @@ __all__ = [
     "VisualPromptingResult",
     "YOLO",
     "YOLO11",
+    "YOLODETR",
     "YOLOSeg",
     "YOLOF",
     "YOLOv3ONNX",

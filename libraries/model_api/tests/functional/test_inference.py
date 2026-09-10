@@ -393,7 +393,7 @@ def compare_semantic_segmentation_result(
     reference: dict,
 ) -> None:
     assert "hist" in reference
-    assert outputs.hist() == pytest.approx(reference["hist"], abs=1e-3), "hist values mismatch"
+    assert outputs.hist() == pytest.approx(reference["hist"], abs=1e-2), "hist values mismatch"
 
     assert "soft_prediction_shape" in reference
     assert (

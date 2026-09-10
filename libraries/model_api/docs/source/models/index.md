@@ -106,6 +106,13 @@
 [todo]
 :::
 
+:::{grid-item-card} YOLO-DETR
+:link: ./yolo_detr
+:link-type: doc
+
+Decoded query-based detection wrapper.
+:::
+
 ::::
 
 ```{toctree}
@@ -127,4 +134,5 @@
 ./types
 ./sam_models
 ./yolo
+./yolo_detr
 ```
