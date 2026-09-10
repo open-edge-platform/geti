@@ -172,9 +172,15 @@
             "warnings": {
                 "videos": "Exporting videos is not supported by this dataset format. All annotated frames from videos will be exported as images.",
                 "emptyLabel": "The selected format does not support empty labels (e.g. \"{{emptyLabelName}}\"). Images and frames containing them will be exported as unannotated.",
+<<<<<<< HEAD
                 "unsupportedItemsVideos": "videos",
                 "unsupportedItemsEmptyLabels": "empty labels",
                 "unsupportedItems": "To preserve {{items}}, please use the Geti export format.",
+=======
+                "unsupportedItems": "To preserve {{items}}, please use the Geti export format.",
+                "unsupportedItemsVideos": "videos",
+                "unsupportedItemsEmptyLabels": "empty labels",
+>>>>>>> 90adcbae0 (feat: Language translation [Part 5])
                 "subsetNotIncluded": "The exported dataset won't include any information about the subset assigned to each media."
             }
         }
@@ -192,9 +198,12 @@
         },
         "confidenceThreshold": {
             "label": "Confidence threshold"
+<<<<<<< HEAD
         },
         "sources": {
             "uploadError": "Failed to upload video file."
+=======
+>>>>>>> 90adcbae0 (feat: Language translation [Part 5])
         }
     },
     "project": {
