@@ -1,6 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { createI18nInstance } from '@/i18n';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useClipboard } from 'hooks/use-clipboard/use-clipboard.hook';
 import { getMockedLogEntry } from 'mocks/mock-log-entry';
@@ -82,6 +83,8 @@ describe('LogEntry', () => {
         });
 
         it('copies the path to clipboard when the span is clicked', () => {
+            const { t } = createI18nInstance({ lng: 'en' });
+
             renderLogEntry({ message: 'Saved to /tmp/output/result.json', name: '', function: '' });
 
             fireEvent.click(screen.getByTitle('Click to copy path'));
