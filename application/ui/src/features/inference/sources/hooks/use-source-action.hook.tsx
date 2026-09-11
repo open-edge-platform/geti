@@ -5,6 +5,7 @@ import { useActionState } from 'react';
 
 import type { SourceConfigPayload } from '@/api/types';
 import { toast } from '@/components/toast/toast.component';
+import { useTranslation } from '@/i18n';
 import { isFunction } from 'lodash-es';
 
 import { getErrorMessage } from '../../../../query-client/query-client';
@@ -25,6 +26,7 @@ export const useSourceAction = <T extends SourceConfigPayload>({
     bodyFormatter,
     prepareFormData,
 }: useSourceActionProps<T>) => {
+    const { t } = useTranslation();
     const addOrUpdateSource = useSourceMutation(isNewSource);
 
     return useActionState<T, FormData>(async (prevState: T, formData: FormData) => {
@@ -36,15 +38,21 @@ export const useSourceAction = <T extends SourceConfigPayload>({
 
             toast({
                 type: 'success',
-                message: `Source configuration ${isNewSource ? 'created' : 'updated'} successfully.`,
+                message: isNewSource
+                    ? t('inference.sources.form.createSuccess')
+                    : t('inference.sources.form.updateSuccess'),
             });
 
             isFunction(onSaved) && onSaved(source_id);
             return { ...body, id: source_id };
         } catch (error: unknown) {
+            const details = getErrorMessage(error);
+
             toast({
                 type: 'error',
-                message: `Failed to save source configuration, ${getErrorMessage(error)}`,
+                message: t('inference.sources.form.saveError', {
+                    details: details ?? t('inference.sources.form.saveErrorFallback'),
+                }),
             });
         }
 
