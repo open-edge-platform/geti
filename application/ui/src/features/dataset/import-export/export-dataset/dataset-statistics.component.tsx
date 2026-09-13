@@ -5,9 +5,12 @@ import { DatasetStatistics } from '@/components/dataset-statistics/dataset-stati
 
 import { useGetDatasetItems } from '../../../../hooks/use-get-dataset-items.hook';
 
-export const MainDatasetStatistics = () => {
-    const { totalCount: totalMediaItems } = useGetDatasetItems();
-    const { totalCount: totalAnnotatedItems } = useGetDatasetItems({ annotationStatus: 'with_annotations' });
+export const MainDatasetStatistics = ({ datasetViewId }: { datasetViewId?: string }) => {
+    const { totalCount: totalMediaItems } = useGetDatasetItems({ datasetViewId });
+    const { totalCount: totalAnnotatedItems } = useGetDatasetItems({
+        annotationStatus: 'with_annotations',
+        datasetViewId,
+    });
 
     return (
         <DatasetStatistics label='items' totalMediaItems={totalMediaItems} totalAnnotatedItems={totalAnnotatedItems} />

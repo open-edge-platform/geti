@@ -88,6 +88,8 @@ const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: strin
 type ExportDatasetConfigProps = {
     name?: string;
     datasetId: string | null;
+    datasetViewId?: string;
+    datasetViewName?: string;
     statistics: ReactNode;
     dialogState: OverlayTriggerState;
 };
@@ -99,16 +101,26 @@ const EXPORT_FORMATS_LINK =
 type ExportDatasetDialogContentProps = {
     name: string;
     datasetId: string | null;
+    datasetViewId?: string;
+    datasetViewName?: string;
     statistics: ReactNode;
     dialogState: OverlayTriggerState;
 };
 
-const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }: ExportDatasetDialogContentProps) => {
+const ExportDatasetDialogContent = ({
+    name,
+    datasetId,
+    datasetViewId,
+    datasetViewName,
+    statistics,
+    dialogState,
+}: ExportDatasetDialogContentProps) => {
     const { t } = useTranslation();
     const { data: selectedProject } = useProject();
 
     const [formState, submitAction, isPending] = useExportDatasetJobAction({
         datasetId,
+        datasetViewId,
         onSuccess: dialogState.close,
     });
 
@@ -123,6 +135,13 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
             <Divider />
             <Content UNSAFE_className={classes.container}>
                 <Heading>{t('dataset.export.statisticsHeading')}</Heading>
+                {datasetViewName && (
+                    <Text
+                        UNSAFE_style={{ display: 'block', marginBottom: 'var(--spectrum-global-dimension-size-100)' }}
+                    >
+                        View: {datasetViewName}
+                    </Text>
+                )}
                 {statistics}
 
                 <Heading>{t('dataset.export.settingsHeading')}</Heading>
@@ -187,6 +206,8 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
 export const ExportDatasetConfig = ({
     name = 'dataset',
     datasetId,
+    datasetViewId,
+    datasetViewName,
     statistics,
     dialogState,
 }: ExportDatasetConfigProps) => {
@@ -196,6 +217,8 @@ export const ExportDatasetConfig = ({
                 <ExportDatasetDialogContent
                     name={name}
                     datasetId={datasetId}
+                    datasetViewId={datasetViewId}
+                    datasetViewName={datasetViewName}
                     statistics={statistics}
                     dialogState={dialogState}
                 />
