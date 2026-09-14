@@ -29,7 +29,8 @@ const ICON: Record<ToastType, ReactNode> = {
     neutral: null,
 };
 
-type CustomToastProps = Pick<ToastProps, 'type' | 'message' | 'actionButtons'> & { id: string };
+// sonner generates a numeric id when none is provided, so it must not be stringified
+type CustomToastProps = Pick<ToastProps, 'type' | 'message' | 'actionButtons'> & { id: string | number };
 
 const CustomToast = ({ message, id, actionButtons, type }: CustomToastProps) => {
     const icon = ICON[type];
@@ -79,9 +80,9 @@ const CustomToast = ({ message, id, actionButtons, type }: CustomToastProps) => 
 
 const DEFAULT_TOAST_DURATION = 8000;
 
-export const removeToast = (id: string) => {
+export const removeToast = (id: string | number) => {
     // sonner dismisses every toast when the id is empty
-    if (id.length === 0) return;
+    if (!id) return;
 
     sonnerToast.dismiss(id);
 };
@@ -95,11 +96,11 @@ export const toast = ({ id, message, actionButtons, type, duration = DEFAULT_TOA
     const toastId = id ?? (typeof message === 'string' ? `id-${parseId(message)}` : undefined);
 
     return sonnerToast.custom(
-        (currentId) => (
-            <CustomToast id={String(currentId)} type={type} message={message} actionButtons={actionButtons} />
-        ),
+        (currentId) => <CustomToast id={currentId} type={type} message={message} actionButtons={actionButtons} />,
         {
-            id: toastId,
+            // An explicit `id: undefined` makes sonner register the toast under a different id
+            // than the one handed to the renderer above, which breaks dismissing it
+            ...(toastId !== undefined && { id: toastId }),
             // We don't want error notifications to dismiss automatically.
             // For all the others, we dismiss them after {duration}
             duration: type === 'error' ? Infinity : duration,
