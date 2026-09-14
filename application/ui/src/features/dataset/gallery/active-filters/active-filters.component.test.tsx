@@ -24,6 +24,7 @@ const mockSetAnnotationStatus = vi.fn();
 const mockSetStartDate = vi.fn();
 const mockSetEndDate = vi.fn();
 const mockSetSelectedSubsets = vi.fn();
+const mockClearAllFilters = vi.fn();
 
 const mockUseDatasetFiltersSearchParams = (overrides?: Partial<ReturnType<typeof useDatasetFiltersSearchParams>>) => {
     vi.mocked(useDatasetFiltersSearchParams).mockReturnValue({
@@ -40,6 +41,7 @@ const mockUseDatasetFiltersSearchParams = (overrides?: Partial<ReturnType<typeof
         sortDirection: 'desc',
         selectedSubsets: [],
         setSelectedSubsets: mockSetSelectedSubsets,
+        clearAllFilters: mockClearAllFilters,
         ...overrides,
     });
 };
@@ -138,10 +140,6 @@ describe('ActiveFilters', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Clear all' }));
 
-        expect(mockSetSelectedLabelIds).toHaveBeenCalledWith([]);
-        expect(mockSetAnnotationStatus).toHaveBeenCalledWith(null);
-        expect(mockSetStartDate).toHaveBeenCalledWith(null);
-        expect(mockSetEndDate).toHaveBeenCalledWith(null);
-        expect(mockSetSelectedSubsets).toHaveBeenCalledWith([]);
+        expect(mockClearAllFilters).toHaveBeenCalled();
     });
 });

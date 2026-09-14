@@ -17,6 +17,8 @@ export const END_DATE_PARAM = 'endDateFilter';
 export const SORT_DIRECTION_PARAM = 'sortDirection';
 export const SUBSET_PARAM = 'subsetFilter';
 
+const FILTER_PARAMS = [LABELS_PARAM, ANNOTATION_STATUS_PARAM, START_DATE_PARAM, END_DATE_PARAM, SUBSET_PARAM];
+
 const VALID_ANNOTATION_STATUSES = new Set<DatasetItemAnnotationStatus>(['with_annotations', 'missing_annotations']);
 const VALID_SUBSETS = new Set<DatasetSubset>(['unassigned', 'training', 'validation', 'testing']);
 
@@ -144,6 +146,14 @@ export const useDatasetFiltersSearchParams = () => {
         updateSearchParam(setSearchParams, SUBSET_PARAM, newValue);
     };
 
+    const clearAllFilters = () => {
+        setSearchParams((prev) => {
+            FILTER_PARAMS.forEach((param) => prev.delete(param));
+
+            return prev;
+        });
+    };
+
     return {
         selectedLabelIds,
         setSelectedLabelIds,
@@ -158,5 +168,6 @@ export const useDatasetFiltersSearchParams = () => {
         setSortDirection,
         selectedSubsets,
         setSelectedSubsets,
+        clearAllFilters,
     } as const;
 };
