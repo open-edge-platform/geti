@@ -4,7 +4,7 @@
 import type { DatasetItemAnnotationStatus, DatasetSubset, FilterByStatusKey } from '@/api/types';
 import { parseAbsoluteToLocal } from '@internationalized/date';
 import { isEmpty } from 'lodash-es';
-import { useSearchParams, type SetURLSearchParams } from 'react-router-dom';
+import { useSearchParams, type SetURLSearchParams } from 'react-router';
 import { parse, stringify } from 'zipson/lib';
 
 import { isNonEmptyString } from '../shared/util';

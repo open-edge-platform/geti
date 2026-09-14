@@ -7,7 +7,7 @@ import type { Label, Project, TaskType } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { Button, ButtonGroup, Divider, Flex, Form, Text, TextField } from '@geti-ui/ui';
 import { useCreateProject } from 'hooks/api/project.hook';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { v4 as uuid } from 'uuid';
 
 import { paths } from '../../../constants/paths';

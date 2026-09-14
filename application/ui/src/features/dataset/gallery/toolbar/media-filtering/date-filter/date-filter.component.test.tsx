@@ -3,7 +3,7 @@
 
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import { render } from 'test-utils/render';
 
 import { END_DATE_PARAM, START_DATE_PARAM } from '../../../../../../hooks/use-dataset-filters-search-params.hook';
