@@ -3,24 +3,28 @@
 
 import { useRef, useState } from 'react';
 
+import { useTranslation } from '@/i18n';
 import { ActionButton, Flex, NumberField, Slider, View } from '@geti-ui/ui';
 import { Refresh } from '@geti-ui/ui/icons';
 
 const THRESHOLD_CONFIG = {
-    defaultValue: 0.3,
     step: 0.001,
     min: 0,
     max: 1,
 };
 
+// Fixed-English aria-label text; kept independent of the translated visible label.
+const CONFIDENCE_THRESHOLD_ARIA_LABEL = 'Confidence threshold';
+
 type ThresholdFieldProps = {
-    name: string;
+    label: string;
+    ariaLabel: string;
     onChange: (value: number) => void;
     isDisabled?: boolean;
     value: number;
 };
 
-const ThresholdField = ({ onChange, value, isDisabled, name }: ThresholdFieldProps) => {
+const ThresholdField = ({ onChange, value, isDisabled, label, ariaLabel }: ThresholdFieldProps) => {
     const [parameterValue, setParameterValue] = useState<number>(value);
     const previousValueRef = useRef<number>(value);
 
@@ -37,7 +41,7 @@ const ThresholdField = ({ onChange, value, isDisabled, name }: ThresholdFieldPro
     return (
         <Flex gap={'size-100'} alignItems={'end'}>
             <Slider
-                label={name}
+                label={label}
                 showValueLabel={false}
                 value={parameterValue}
                 minValue={THRESHOLD_CONFIG.min}
@@ -57,7 +61,7 @@ const ThresholdField = ({ onChange, value, isDisabled, name }: ThresholdFieldPro
                 maxValue={THRESHOLD_CONFIG.max}
                 onChange={handleValueChange}
                 isDisabled={isDisabled}
-                aria-label={`Change ${name}`}
+                aria-label={`Change ${ariaLabel}`}
                 step={THRESHOLD_CONFIG.step}
             />
         </Flex>
@@ -65,30 +69,39 @@ const ThresholdField = ({ onChange, value, isDisabled, name }: ThresholdFieldPro
 };
 
 type ConfidenceThresholdProps = {
+    value: number;
+    defaultValue: number;
+    onChange: (value: number) => void;
     isDisabled?: boolean;
     maxWidth?: string;
     width?: string;
 };
 
-export const ConfidenceThreshold = ({ isDisabled = false, maxWidth, width = '100%' }: ConfidenceThresholdProps) => {
-    // TODO: Default confidence threshold value will come from the server side
-    const defaultValue = THRESHOLD_CONFIG.defaultValue;
-    const [threshold, setThreshold] = useState<number>(defaultValue);
+export const ConfidenceThreshold = ({
+    value,
+    defaultValue,
+    onChange,
+    isDisabled = false,
+    maxWidth,
+    width = '100%',
+}: ConfidenceThresholdProps) => {
+    const { t } = useTranslation();
 
     return (
         <View maxWidth={maxWidth} width={width}>
             <Flex width={'100%'} justifyContent={'space-between'} gap={'size-175'} alignItems={'end'}>
                 <ThresholdField
-                    onChange={setThreshold}
-                    name={'Confidence threshold'}
-                    value={threshold}
+                    onChange={onChange}
+                    label={t('inference.confidenceThreshold.label')}
+                    ariaLabel={CONFIDENCE_THRESHOLD_ARIA_LABEL}
+                    value={value}
                     isDisabled={isDisabled}
                 />
                 <ActionButton
                     isQuiet
                     aria-label={'Reset confidence threshold'}
-                    onPress={() => setThreshold(defaultValue)}
-                    isDisabled={isDisabled}
+                    onPress={() => onChange(defaultValue)}
+                    isDisabled={isDisabled || value === defaultValue}
                 >
                     <Refresh />
                 </ActionButton>

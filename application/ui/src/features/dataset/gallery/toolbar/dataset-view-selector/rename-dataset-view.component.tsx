@@ -3,6 +3,7 @@
 
 import { FormEvent, useState } from 'react';
 
+import { useTranslation } from '@/i18n';
 import { Button, ButtonGroup, Content, Dialog, Divider, Form, Heading, TextField } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
@@ -17,6 +18,7 @@ type RenameDatasetViewProps = {
 };
 
 export const RenameDatasetView = ({ datasetView, onClose, datasetViews }: RenameDatasetViewProps) => {
+    const { t } = useTranslation();
     const projectId = useProjectIdentifier();
     const [newName, setNewName] = useState(datasetView.name);
     const renameDatasetViewMutation = useRenameDatasetViewMutation();
@@ -58,7 +60,7 @@ export const RenameDatasetView = ({ datasetView, onClose, datasetViews }: Rename
                         onChange={setNewName}
                         label={'View name'}
                         validationState={isDuplicateName ? 'invalid' : undefined}
-                        errorMessage={isDuplicateName ? 'A dataset view with this name already exists' : undefined}
+                        errorMessage={isDuplicateName ? t('dataset.validation.datasetViewNameExists') : undefined}
                     />
                 </Form>
             </Content>
