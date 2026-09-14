@@ -101,7 +101,7 @@ describe('UploadDetailsDialog', () => {
 
         act(() => {
             result.current.upload.startUploadProgress([makeFile('one.jpg')]);
-            result.current.ctx.dispatch({ type: 'OPEN_DIALOG' });
+            result.current.dispatch({ type: 'OPEN_DIALOG' });
         });
 
         expect(screen.getByText('Uploading 1 item - 0 uploaded')).toBeVisible();
@@ -116,7 +116,7 @@ describe('UploadDetailsDialog', () => {
                 makeFile('two.jpg'),
                 makeFile('three.jpg'),
             ]);
-            result.current.ctx.dispatch({ type: 'OPEN_DIALOG' });
+            result.current.dispatch({ type: 'OPEN_DIALOG' });
         });
 
         expect(screen.getByText('Uploading 3 items - 0 uploaded')).toBeVisible();
@@ -132,7 +132,7 @@ describe('UploadDetailsDialog', () => {
                 makeFile('two.jpg'),
                 makeFile('three.jpg'),
             ]);
-            result.current.ctx.dispatch({ type: 'OPEN_DIALOG' });
+            result.current.dispatch({ type: 'OPEN_DIALOG' });
         });
 
         act(() => {
@@ -149,7 +149,7 @@ describe('UploadDetailsDialog', () => {
         let ids: string[] = [];
         act(() => {
             ids = result.current.upload.startUploadProgress([makeFile('one.jpg'), makeFile('two.jpg')]);
-            result.current.ctx.dispatch({ type: 'OPEN_DIALOG' });
+            result.current.dispatch({ type: 'OPEN_DIALOG' });
         });
 
         act(() => {
