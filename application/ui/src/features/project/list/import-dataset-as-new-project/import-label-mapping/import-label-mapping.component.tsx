@@ -106,11 +106,7 @@ export const ImportLabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                 <Form id={LABEL_MAPPING_FORM_ID} validationBehavior='native' action={submitAction}>
                     <MultiSelectList
                         name='labels'
-<<<<<<< HEAD
                         label={t('project.import.labelMapping.datasetLabels')}
-=======
-                        label='Dataset labels'
->>>>>>> 90adcbae0 (feat: Language translation [Part 5])
                         ariaLabel='Dataset labels'
                         maxHeight='size-2000'
                         defaultSelectedKeys={new Set(datasetLabels.map((label) => label))}
