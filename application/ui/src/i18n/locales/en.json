@@ -67,7 +67,8 @@
             "failedSummary_one": "Failed to upload {{count}} item",
             "failedSummary_other": "Failed to upload {{count}} items",
             "mixedSummary_one": "Uploaded {{uploaded}} item, {{failed}} failed",
-            "mixedSummary_other": "Uploaded {{uploaded}} items, {{failed}} failed"
+            "mixedSummary_other": "Uploaded {{uploaded}} items, {{failed}} failed",
+            "genericError": "Failed to upload media."
         },
         "empty": {
             "noMatches": "No media items match your filter.",
@@ -88,7 +89,9 @@
             "annotatedImages": "Annotated images",
             "annotatedVideosFrames": "Annotated videos / frames",
             "numberOfObjectsPerLabel": "Number of objects per label",
-            "close": "Close"
+            "close": "Close",
+            "unannotated": "Unannotated",
+            "annotated": "Annotated"
         },
         "delete": {
             "title": "Delete Items",
@@ -116,12 +119,82 @@
             "annotate": "Annotate",
             "download": "Download",
             "downloadStarted": "{{fileName}} download has started"
+        },
+        "multiSelect": {
+            "selectAll": "Select all"
+        },
+        "jobs": {
+            "status": {
+                "error": "Error",
+                "connected": "Connected",
+                "disconnected": "Disconnected"
+            }
+        },
+        "import": {
+            "jobTitle": "Import dataset - {{fileName}} - {{size}}",
+            "processingMessage": "{{fileName}} file is being processed for import",
+            "unknownError": "An unknown error occurred",
+            "unknownErrorDetail": "Unknown error",
+            "technicalDetails": "Technical details",
+            "close": "Close",
+            "cancel": "Cancel",
+            "hide": "Hide",
+            "preparingJob": "Preparing",
+            "progressUnavailable": "N/A",
+            "stagedFileReadError": "An error occurred during staged file reading",
+            "prepareError": "An error occurred during import preparation.",
+            "genericError": "An error occurred during import.",
+            "importedSuccess": "Dataset {{fileName}} {{size}} imported successfully.",
+            "multipleFilesError": "Adding folders or multiple files is not allowed. Please load a single file.",
+            "unsupportedFormatError": "Unsupported file format. Please upload a valid .zip file.",
+            "uploading": "Uploading",
+            "datasetBeingUploaded": "Dataset is being uploaded",
+            "dropZipHere": "Drop the dataset .zip file here",
+            "upload": "Upload",
+            "learnMoreFormats": "Learn more about the different formats",
+            "deleteStagedFile": {
+                "title": "Delete Staged File",
+                "confirmation": "Are you sure you want to delete the dataset file \"{{stagedDatasetId}}\"?",
+                "cancel": "Cancel",
+                "delete": "Delete"
+            }
+        },
+        "export": {
+            "heading": "Export {{name}}",
+            "statisticsHeading": "Exported dataset statistics",
+            "settingsHeading": "Export settings",
+            "filterByLabel": "Filter annotations by label",
+            "includeUnannotated": "Include media without annotations",
+            "selectFormat": "Select dataset export format",
+            "learnMoreFormats": "Learn more about export formats",
+            "cancel": "Cancel",
+            "submit": "Export",
+            "warnings": {
+                "videos": "Exporting videos is not supported by this dataset format. All annotated frames from videos will be exported as images.",
+                "emptyLabel": "The selected format does not support empty labels (e.g. \"{{emptyLabelName}}\"). Images and frames containing them will be exported as unannotated.",
+                "unsupportedItemsVideos": "videos",
+                "unsupportedItemsEmptyLabels": "empty labels",
+                "unsupportedItems": "To preserve {{items}}, please use the Geti export format.",
+                "subsetNotIncluded": "The exported dataset won't include any information about the subset assigned to each media."
+            }
         }
     },
     "inference": {
         "validation": {
             "keyEmpty": "Key cannot be empty",
             "valueEmpty": "Value cannot be empty"
+        },
+        "connection": {
+            "testing": "Testing connection...",
+            "inUse": "In use",
+            "unreachable": "Unreachable",
+            "ready": "Ready"
+        },
+        "confidenceThreshold": {
+            "label": "Confidence threshold"
+        },
+        "sources": {
+            "uploadError": "Failed to upload video file."
         }
     },
     "project": {
@@ -139,6 +212,17 @@
             "nameExists": "That project name already exists",
             "labelNameExists": "That label name already exists",
             "hotkeyExists": "That hotkey is already in use"
+        },
+        "labels": {
+            "hotkeyPlaceholder": "Hotkey"
+        },
+        "panel": {
+            "manageProjects": "Manage projects",
+            "enablePipelineBlocked": {
+                "title": "Cannot enable pipeline",
+                "close": "Close",
+                "message": "Make sure you selected a model and source before enabling the pipeline."
+            }
         },
         "taskTypes": {
             "detection": "Object detection",
@@ -236,7 +320,95 @@
             "labels": {
                 "atLeastOneRequired": "At least one object is required",
                 "inputPlaceholder": "Create label"
+            },
+            "defaultName": "Project #{{number}}"
+        },
+        "import": {
+            "title": "Create project from a dataset - Import",
+            "actions": {
+                "cancel": "Cancel",
+                "delete": "Delete",
+                "hide": "Hide",
+                "back": "Back",
+                "create": "Create",
+                "next": "Next"
+            },
+            "statistics": {
+                "title": "Imported dataset statistics",
+                "images": "images",
+                "frames": "frames"
+            },
+            "labelMapping": {
+                "title": "Label mapping",
+                "datasetLabels": "Dataset labels",
+                "includeUnannotated": "Include media without annotations"
+            },
+            "preparingMessage": "Prepare dataset import as new project",
+            "taskSelection": {
+                "projectName": "Project name",
+                "taskType": "Task type",
+                "selectTaskPlaceholder": "Select task",
+                "recommendationHint": "The recommended choice is based on the type of the annotations detected in the dataset. If you choose a different type, the annotations will be automatically transformed during import to fit the selected type."
+            },
+            "progress": {
+                "dataset": "Dataset",
+                "taskType": "Task type",
+                "labels": "Labels"
+            },
+            "jobsList": {
+                "selectTaskType": "Select task type",
+                "mapLabelsMessage": "Map labels for the uploaded dataset",
+                "mapLabelsButton": "Map labels"
             }
+        }
+    },
+    "annotator": {
+        "labels": {
+            "noLabel": "No label",
+            "noObject": "No object"
+        }
+    },
+    "models": {
+        "jobs": {
+            "error": "Job failed. Please check the logs for details and try again."
+        },
+        "training": {
+            "logs": {
+                "copySuccess": "Copied Successfully",
+                "copyError": "Copy failed"
+            }
+        }
+    },
+    "application": {
+        "startup": {
+            "loading": "Loading...Please wait."
+        },
+        "serverError": {
+            "heading": "Server Error",
+            "refresh": "Refresh"
+        },
+        "errorPage": {
+            "badRequest": "The server cannot or will not process the current request.",
+            "forbidden": "You do not have permission to access this page.",
+            "notFound": "This page doesn't exist!",
+            "unauthorized": "You aren't authorized to see this",
+            "serverError": "The server encountered an error and could not complete your request.",
+            "serviceUnavailable": "Looks like our API is down",
+            "unknownError": "An unknown error occurred",
+            "goHome": "Go back to home page"
+        },
+        "notifications": {
+            "unexpectedError": "An unexpected error occurred. Please try again.",
+            "networkError": "Network error. Please check your connection and try again."
+        }
+    },
+    "downloads": {
+        "failure": {
+            "genericError": "Failed to download file"
+        },
+        "saveDialog": {
+            "allFiles": "All Files",
+            "fileTypeFilter": "{{extension}} File"
         }
     }
 }
