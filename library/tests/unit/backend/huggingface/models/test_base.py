@@ -142,7 +142,7 @@ def test_exporter_builds_a_configured_hf_model_exporter() -> None:
 
 
 def test_export_metadata_scales_uint8_runtime_inputs() -> None:
-    """Geti feeds feet value [0,1] arrays while the runtime feeds uint8; the metadata must bridge them."""
+    """Without a DataModule intensity config, plain 8-bit RGB gets the scale-to-unit fallback."""
     model = HFMulticlassClsModel(_tiny_vit_config(), _label_info())
     metadata = model._exporter._extend_model_metadata(model._exporter.metadata)
 
@@ -152,6 +152,44 @@ def test_export_metadata_scales_uint8_runtime_inputs() -> None:
     # mean/std stay in the [0, 1] domain so scaled uint8 inputs match training statistics.
     assert metadata[("model_info", "mean_values")] == "0.485 0.456 0.406"
     assert metadata[("model_info", "scale_values")] == "0.229 0.224 0.225"
+
+
+def test_export_metadata_from_datamodule_intensity_config() -> None:
+    """DataModule intensity config (e.g. 16-bit datasets) drives the runtime metadata."""
+    from getitune.config.data import IntensityConfig
+
+    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info())
+    model.set_intensity_config(IntensityConfig(mode="scale_to_unit", storage_dtype="uint16", max_value=65535.0))
+
+    metadata = model._exporter._extend_model_metadata(model._exporter.metadata)
+
+    assert metadata[("model_info", "input_dtype")] == "u16"
+    assert metadata[("model_info", "intensity_mode")] == "scale_to_unit"
+    assert metadata[("model_info", "intensity_max_value")] == "65535.0"
+
+
+def test_best_confidence_threshold_persisted_in_checkpoint(tmp_path: Path) -> None:
+    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info())
+    assert model.best_confidence_threshold is None
+
+    model._best_confidence_threshold = 0.2
+    model.save_pretrained(tmp_path)
+
+    reloaded = HFMulticlassClsModel(_tiny_vit_config(), _label_info())
+    reloaded.load_checkpoint(tmp_path)
+    assert reloaded.best_confidence_threshold == pytest.approx(0.2)
+
+
+def test_detection_default_metric_includes_fmeasure() -> None:
+    from getitune.backend.huggingface.models import HFDetectionModel
+    from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasure
+
+    model = HFDetectionModel(
+        tf.RTDetrV2Config(num_queries=10, decoder_layers=2),
+        _label_info(),
+        data_input_params={"input_size": (32, 32)},
+    )
+    assert isinstance(model.build_default_metric(), MeanAveragePrecisionFMeasure)
 
 
 def test_resize_mode_is_passed_to_exporter() -> None:

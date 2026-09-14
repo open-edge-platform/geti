@@ -284,6 +284,7 @@ class HFEngine(Engine):
             callbacks=trainer_callbacks,
         )
         trainer.train()
+        self._extract_best_confidence_threshold(trainer)
 
         best_dir = self._work_dir / self._CHECKPOINT_DIR_NAME
         if best_dir.exists():
@@ -343,11 +344,37 @@ class HFEngine(Engine):
         trainer = self._build_test_scoped_trainer("test", batch, kwargs)
 
         metric_obj = metric(self._model.label_info) if metric is not None else self._model.build_default_metric()
-        return trainer.evaluate(split="test", metric=metric_obj)
+        compute_kwargs = (
+            {"best_confidence_threshold": self._model.best_confidence_threshold}
+            if metric is None and self._model.best_confidence_threshold is not None
+            else None
+        )
+        return trainer.evaluate(split="test", metric=metric_obj, compute_kwargs=compute_kwargs)
+
+    def _extract_best_confidence_threshold(self, trainer: GetiTuneHFTrainer) -> None:
+        """Store the validation F1-optimal confidence threshold on the model.
+
+        The detection / instance-segmentation default metric collection contains
+        an ``FMeasure`` submetric whose threshold sweep computes the best
+        confidence threshold on the validation set each epoch. After training
+        it is persisted on the model so export and ``predict()`` pick it up.
+        """
+        from getitune.metrics.fmeasure import FMeasure
+
+        metric_obj = trainer._val_metric  # noqa: SLF001
+        if metric_obj is None:
+            return
+        fmeasure = getattr(metric_obj, "FMeasure", None)
+        if fmeasure is None and isinstance(metric_obj, FMeasure):
+            fmeasure = metric_obj
+        if fmeasure is not None and getattr(fmeasure, "best_confidence_threshold", None) is not None:
+            threshold = float(fmeasure.best_confidence_threshold)
+            self._model.best_confidence_threshold = threshold
+            logger.info("Best confidence threshold from validation F-measure: %s", threshold)
 
     def predict(
         self,
-        confidence_threshold: float = 0.5,
+        confidence_threshold: float | None = None,
         batch: int | None = None,
         checkpoint: PathLike | None = None,
         **kwargs,
@@ -363,10 +390,12 @@ class HFEngine(Engine):
 
         Args:
             confidence_threshold: Minimum score for a detection / instance
-                segmentation prediction to be kept. Not applied to
-                classification (whose scores are per-class probabilities,
-                not a filtering signal) or semantic segmentation (which has
-                no per-prediction score at all).
+                segmentation prediction to be kept. Defaults to the best
+                confidence threshold computed by validation F-measure (or
+                ``0.5`` when not available). Not applied to classification
+                (whose scores are per-class probabilities, not a filtering
+                signal) or semantic segmentation (which has no per-prediction
+                score at all).
             batch: Batch size override. Defaults to the test subset's
                 configured ``batch_size``.
             checkpoint: Optional checkpoint to load before predicting.
@@ -385,6 +414,11 @@ class HFEngine(Engine):
 
         if checkpoint is not None:
             self._model.load_checkpoint(checkpoint)
+
+        if confidence_threshold is None:
+            confidence_threshold = (
+                self._model.best_confidence_threshold if self._model.best_confidence_threshold is not None else 0.25
+            )
 
         trainer = self._build_test_scoped_trainer("predict", batch, kwargs)
 

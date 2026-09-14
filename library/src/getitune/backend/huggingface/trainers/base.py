@@ -269,6 +269,7 @@ class GetiTuneHFTrainer(Trainer):
         *,
         split: str = "val",
         metric: Metric | MetricCollection | None = None,
+        compute_kwargs: dict[str, Any] | None = None,
     ) -> dict[str, float]:
         """Run a Geti metric on *split* and return scalar ``val/`` or ``test/`` metrics.
 
@@ -288,6 +289,9 @@ class GetiTuneHFTrainer(Trainer):
             metric: Optional metric or metric collection to use. If ``None``,
                 the metric passed to ``__init__`` (the task's default or an
                 override) is used.
+            compute_kwargs: Extra keyword arguments forwarded to
+                ``metric.compute()``, e.g.
+                ``{"best_confidence_threshold": 0.3}``.
 
         Returns:
             A dictionary of scalar metrics prefixed with ``val/`` or ``test/``.
@@ -340,7 +344,7 @@ class GetiTuneHFTrainer(Trainer):
                 iter_time += perf_counter() - start
                 num_batches += 1
 
-        computed = metric_obj.compute()
+        computed = metric_obj.compute(**(compute_kwargs or {}))
         metrics = self._format_metrics(computed, f"{split}/")
         if not metrics:
             return {}

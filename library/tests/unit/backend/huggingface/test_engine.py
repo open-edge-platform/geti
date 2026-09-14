@@ -45,6 +45,7 @@ class _StubHFModel(HFModel):
         self._data_input_params = DataInputParams(input_size=(640, 640), mean=(0.0, 0.0, 0.0), std=(1.0, 1.0, 1.0))
         self._intensity_config = None
         self._best_checkpoint = None
+        self._best_confidence_threshold = None
         self.hf_model = MagicMock()
 
     def build_targets(self, batch: SampleBatch) -> dict[str, Any]:
@@ -450,6 +451,69 @@ class TestTrain:
             engine.train(max_epochs=1, batch=2)
 
         trainer.save_model.assert_called_once()
+
+    def test_train_extracts_best_confidence_threshold_from_fmeasure(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer()
+        fmeasure = MagicMock()
+        fmeasure.best_confidence_threshold = 0.145
+        trainer._val_metric = MagicMock()
+        trainer._val_metric.FMeasure = fmeasure
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.train(max_epochs=1, batch=2)
+
+        assert model.best_confidence_threshold == pytest.approx(0.145)
+
+    def test_train_keeps_threshold_none_without_fmeasure(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer()
+        trainer._val_metric = MagicMock()
+        trainer._val_metric.FMeasure = None
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.train(max_epochs=1, batch=2)
+
+        assert model.best_confidence_threshold is None
+
+    def test_predict_uses_model_best_confidence_threshold_by_default(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        engine._datamodule.subsets["test"] = MagicMock()  # pyrefly: ignore[missing-attribute]
+        model._best_confidence_threshold = 0.11
+        trainer = MagicMock()
+        trainer.predict_batches.return_value = []
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.predict(batch=2)
+
+        assert trainer.predict_batches.called
+
+    def test_predict_explicit_threshold_overrides_model_value(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        engine._datamodule.subsets["test"] = MagicMock()  # pyrefly: ignore[missing-attribute]
+        trainer = MagicMock()
+        trainer.predict_batches.return_value = []
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.predict(confidence_threshold=0.9, batch=2)
+
+        trainer.predict_batches.assert_called_once()
+
+    def test_test_passes_best_threshold_as_compute_kwargs(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        engine._datamodule.subsets["test"] = MagicMock()  # pyrefly: ignore[missing-attribute]
+        model._best_confidence_threshold = 0.33
+        default_metric = MagicMock()
+        model.build_default_metric = MagicMock(return_value=default_metric)  # type: ignore[method-assign]
+        trainer = MagicMock()
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.test(batch=2)
+
+        trainer.evaluate.assert_called_once_with(
+            split="test",
+            metric=default_metric,
+            compute_kwargs={"best_confidence_threshold": 0.33},
+        )
 
     def test_train_disables_eval_when_no_val_split(self, tmp_path: Path, model: _StubHFModel) -> None:
         engine = self._engine(tmp_path, model, with_val=False)

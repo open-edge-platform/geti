@@ -68,14 +68,15 @@ class HFModelExporter(ModelExporter):
     def metadata(self) -> dict[tuple[str, str], str]:
         """Model metadata to embed: base export params plus ModelAPI runtime preprocessing.
 
-        Geti's data pipeline feeds float ``[0, 1]`` images during evaluation, while the
-        application runtime and the exported demo feed ``uint8`` ``[0, 255]`` arrays to
-        ModelAPI. The intensity metadata tells ModelAPI to scale those inputs to
-        ``[0, 1]`` before applying ``mean_values``/``scale_values`` (which stay in the
-        same ``[0, 1]`` domain as ``data_input_params``).
+        Intensity metadata follows the Lightning export contract derived from the
+        DataModule's ``IntensityConfig`` (handled by the base exporter, including
+        high-bit-depth inputs such as uint16). When no intensity config is
+        attached — bare CLI usage on plain 8-bit RGB data — the standard
+        ``scale_to_unit`` (÷255) pipeline convention is written so the runtime
+        path normalizes ``uint8`` inputs the same way the training pipeline does.
         """
         metadata = super().metadata
-        if metadata.get(("model_info", "intensity_mode"), "") == "":
+        if self.data_input_params.intensity_config is None:
             metadata.update(
                 {
                     ("model_info", "input_dtype"): "u8",

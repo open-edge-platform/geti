@@ -130,6 +130,7 @@ class HFModel(ABC, nn.Module):
         self._resize_mode = resize_mode
         self._intensity_config: IntensityConfig | None = None
         self._best_checkpoint: Path | None = None
+        self._best_confidence_threshold: float | None = None
 
         id2label = dict(enumerate(self._label_info.label_names))
         label2id = {name: idx for idx, name in id2label.items()}
@@ -302,9 +303,12 @@ class HFModel(ABC, nn.Module):
         """Reload weights from a ``save_pretrained()`` directory.
 
         Replaces the wrapped model in place and records the checkpoint so
-        ``best_checkpoint`` reflects it.
+        ``best_checkpoint`` reflects it. A persisted best confidence
+        threshold is restored as well.
         """
         self.hf_model = self.hf_auto_class.from_pretrained(str(checkpoint))
+        threshold = getattr(self.hf_model.config, "getitune_best_confidence_threshold", None)
+        self._best_confidence_threshold = float(threshold) if threshold is not None else None
         self._best_checkpoint = Path(checkpoint)
 
     def record_checkpoint(self, checkpoint: PathLike) -> None:
@@ -320,12 +324,28 @@ class HFModel(ABC, nn.Module):
     def save_pretrained(self, checkpoint: PathLike) -> None:
         """Save model weights, configuration, and processor for offline reload."""
         path = Path(checkpoint)
+        if self._best_confidence_threshold is not None:
+            self.hf_model.config.getitune_best_confidence_threshold = self._best_confidence_threshold
         self.hf_model.save_pretrained(path)
         processor = self.__dict__.get("_image_processor")
         if processor is not None:
             processor.save_pretrained(path)
         elif self.pretrained_weights is not None:
             self._image_processor.save_pretrained(path)
+
+    @property
+    def best_confidence_threshold(self) -> float | None:
+        """Auto-computed optimal confidence threshold (max F1 on validation), if known.
+
+        Populated for detection / instance segmentation after training via the
+        validation ``FMeasure``; embedded into exported model metadata and used
+        as ``predict()``'s default threshold.
+        """
+        return self._best_confidence_threshold
+
+    @best_confidence_threshold.setter
+    def best_confidence_threshold(self, value: float | None) -> None:
+        self._best_confidence_threshold = value
 
     @property
     def label_info(self) -> LabelInfo:
@@ -404,7 +424,12 @@ class HFModel(ABC, nn.Module):
 
         return HFModelExporter(
             task_level_export_parameters=self._export_parameters,
-            data_input_params=self.data_input_params,
+            data_input_params=DataInputParams(
+                input_size=self.data_input_params.input_size,
+                mean=self.data_input_params.mean,
+                std=self.data_input_params.std,
+                intensity_config=self._intensity_config,
+            ),
             resize_mode=self.resize_mode,
             swap_rgb=False,
             onnx_export_configuration=onnx_export_configuration,

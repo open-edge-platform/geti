@@ -15,7 +15,7 @@ from torchvision.ops import box_convert
 from getitune.backend.huggingface.models.base import HFModel
 from getitune.backend.lightning.models.base import DataInputParams
 from getitune.data.entity.sample import PredictionBatch
-from getitune.metrics.mean_ap import MeanAPCallable
+from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasureCallable
 from getitune.types.export import TaskLevelExportParameters
 from getitune.types.task import TaskType
 
@@ -72,7 +72,11 @@ class HFDetectionModel(HFModel):
         return super()._export_parameters.wrap(
             model_type=self.export_model_type,
             task_type="detection",
-            confidence_threshold=self._confidence_threshold,
+            confidence_threshold=(
+                self.best_confidence_threshold
+                if self.best_confidence_threshold is not None
+                else self._confidence_threshold
+            ),
             iou_threshold=self._iou_threshold,
         )
 
@@ -187,8 +191,8 @@ class HFDetectionModel(HFModel):
         return {"preds": preds, "target": target}
 
     def build_default_metric(self) -> Metric | MetricCollection:
-        """Mean average precision over boxes, the standard detection metric."""
-        return MeanAPCallable(self.label_info)
+        """MAP with F-measure: F1 sweep also yields the optimal confidence threshold."""
+        return MeanAveragePrecisionFMeasureCallable(self.label_info)
 
     def forward_for_tracing(self, images: torch.Tensor) -> dict[str, torch.Tensor]:
         """Return per-query boxes/labels/scores for ONNX/OpenVINO export.

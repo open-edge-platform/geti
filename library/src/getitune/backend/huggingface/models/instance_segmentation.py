@@ -23,7 +23,7 @@ from getitune.backend.huggingface.models.utils import (
 from getitune.backend.lightning.models.base import DataInputParams
 from getitune.data.entity.sample import PredictionBatch
 from getitune.data.utils.structures.mask.mask_util import encode_rle
-from getitune.metrics.mean_ap import MaskRLEMeanAPCallable
+from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
 from getitune.types.export import TaskLevelExportParameters
 from getitune.types.task import TaskType
 
@@ -107,7 +107,11 @@ class HFInstSegModel(HFModel):
         return super()._export_parameters.wrap(
             model_type=self.export_model_type,
             task_type="instance_segmentation",
-            confidence_threshold=self._confidence_threshold,
+            confidence_threshold=(
+                self.best_confidence_threshold
+                if self.best_confidence_threshold is not None
+                else self._confidence_threshold
+            ),
             iou_threshold=self._iou_threshold,
             label_info=label_info,
         )
@@ -247,8 +251,8 @@ class HFInstSegModel(HFModel):
         return {"preds": preds, "target": target}
 
     def build_default_metric(self) -> Metric | MetricCollection:
-        """Mean average precision over RLE-encoded masks, the standard instance-seg metric."""
-        return MaskRLEMeanAPCallable(self.label_info)
+        """Mask RLE MAP with F-measure: F1 sweep also yields the optimal confidence threshold."""
+        return MaskRLEMeanAPFMeasureCallable(self.label_info)
 
     def forward_for_tracing(self, images: torch.Tensor) -> dict[str, torch.Tensor]:
         """Return per-query boxes/labels/masks for ONNX/OpenVINO export.
