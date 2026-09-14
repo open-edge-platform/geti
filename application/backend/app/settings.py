@@ -118,6 +118,31 @@ class Settings(BaseSettings):
         ),
         gt=0,
     )
+    inference_max_models: int = Field(
+        default=2,
+        alias="INFERENCE_MAX_MODELS",
+        description="Maximum number of models the inference server keeps loaded in memory at the same time",
+        ge=1,
+    )
+    inference_max_memory: int | None = Field(
+        default=None,
+        alias="INFERENCE_MAX_MEMORY",
+        description=(
+            "Approximate upper bound, in bytes, on the memory used by the models loaded in the inference server. "
+            "Unset means unlimited. The limit is best-effort and never prevents loading a model when it would be "
+            "the only one loaded."
+        ),
+        gt=0,
+    )
+    inference_memory_overhead_factor: float = Field(
+        default=1.5,
+        alias="INFERENCE_MEMORY_OVERHEAD_FACTOR",
+        description=(
+            "Multiplier applied to a model's on-disk size to estimate its in-memory footprint, which accounts "
+            "for runtime overhead such as activations and inference request buffers."
+        ),
+        gt=0,
+    )
 
     # SAM (Segment Anything Model)
     sam_encoder_xml_path: Path = Field(
