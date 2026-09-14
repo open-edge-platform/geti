@@ -151,12 +151,19 @@ class GetiTuneBaseTrainer:
             num_workers=nw,
             prefetch_factor=4 if nw > 0 else None,
             collate_fn=self._collate_fn,
-            pin_memory=True,
+            pin_memory=self._pin_memory,
             drop_last=False,
             multiprocessing_context=_MP_CONTEXT if nw > 0 else None,
             persistent_workers=nw > 0,
             worker_init_fn=seed_worker,
         )
+
+    @property
+    def _pin_memory(self) -> bool:
+        """Return True if the device is not CPU (for DataLoader pin_memory)."""
+        device = getattr(self, "device", None)
+        device_type = getattr(device, "type", None)
+        return device_type != "cpu"
 
     def _setup_train(self) -> None:
         """Restore workers, run parent setup, then fix warmup for small datasets.

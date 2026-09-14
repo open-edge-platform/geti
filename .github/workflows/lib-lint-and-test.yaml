@@ -196,7 +196,8 @@ jobs:
           --junitxml=${{ matrix.task }}_Python-${{ matrix.python-version }}.xml \
           --task ${{ matrix.task }} \
           --open-subprocess \
-          --run-category-only
+          --run-category-only \
+          --memray
 
   # Real-network test for the benchmark-dataset preparation scripts. Only runs
   # when files under ``library/scripts/benchmark_datasets/**`` (or the matching

@@ -98,7 +98,7 @@ class SemanticSegmentationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _Ul
             num_workers=nw,
             prefetch_factor=4 if nw > 0 else None,
             collate_fn=semantic_collate_fn,
-            pin_memory=True,
+            pin_memory=self._pin_memory,
             drop_last=False,
             multiprocessing_context=_MP_CONTEXT if nw > 0 else None,
             persistent_workers=nw > 0,
