@@ -5,8 +5,8 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
 import csv
+from collections import defaultdict
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Callable
@@ -125,8 +125,8 @@ def test_yolo_detr_trainer_uses_dfine_loss_names() -> None:
     assert validator is validator_cls.return_value
     assert trainer.loss_names == ("giou_loss", "cls_loss", "l1_loss", "fgl_loss", "ddf_loss")
     assert validator.datamodule is trainer._datamodule
-    
-    
+
+
 def test_iteration_timer_appends_epoch_means_to_results_csv(tmp_path: Path) -> None:
     """Training iteration means are persisted in the existing results CSV."""
     results_csv = tmp_path / "results.csv"
