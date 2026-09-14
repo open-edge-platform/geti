@@ -73,7 +73,8 @@ class PytorchcvWeightsLoader:
         weights_path = Path(weights) if weights is not None else None
         if weights_path is not None and weights_path.suffix == ".zip" and weights_path.is_file():
             final_path = weights_path.with_suffix("")
-            if not final_path.exists():
+            needs_extract = not final_path.exists() or weights_path.stat().st_mtime > final_path.stat().st_mtime
+            if needs_extract:
                 with tempfile.TemporaryDirectory(dir=weights_path.parent) as tmp_dir:
                     with zipfile.ZipFile(weights_path) as zf:
                         zf.extractall(tmp_dir)
