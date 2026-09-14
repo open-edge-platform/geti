@@ -7,6 +7,7 @@ import type { SourceConfigPayload } from '@/api/types';
 import { toast } from '@/components/toast/toast.component';
 import { isFunction } from 'lodash-es';
 
+import { getErrorMessage } from '../../../../query-client/query-client';
 import { useSourceMutation } from './use-source-mutation.hook';
 
 interface useSourceActionProps<T> {
@@ -41,11 +42,9 @@ export const useSourceAction = <T extends SourceConfigPayload>({
             isFunction(onSaved) && onSaved(source_id);
             return { ...body, id: source_id };
         } catch (error: unknown) {
-            const details = (error as { detail?: string })?.detail;
-
             toast({
                 type: 'error',
-                message: `Failed to save source configuration, ${details ?? 'please try again'}`,
+                message: `Failed to save source configuration, ${getErrorMessage(error)}`,
             });
         }
 

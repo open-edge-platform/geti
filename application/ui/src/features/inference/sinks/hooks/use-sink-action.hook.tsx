@@ -7,6 +7,7 @@ import type { SinkConfig } from '@/api/types';
 import { toast } from '@/components/toast/toast.component';
 import { isFunction } from 'lodash-es';
 
+import { getErrorMessage } from '../../../../query-client/query-client';
 import { useSinkMutation } from './use-sink-mutation.hook';
 
 interface useSinkActionProps<T> {
@@ -39,11 +40,9 @@ export const useSinkAction = <T extends SinkConfig>({
 
             return { ...body, id: sink_id };
         } catch (error: unknown) {
-            const details = (error as { detail?: string })?.detail;
-
             toast({
                 type: 'error',
-                message: `Failed to save sink configuration, ${details ?? 'please try again'}`,
+                message: `Failed to save sink configuration, ${getErrorMessage(error)}`,
             });
         }
 
