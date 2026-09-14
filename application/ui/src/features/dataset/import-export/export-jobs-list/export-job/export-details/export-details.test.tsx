@@ -15,6 +15,18 @@ import { ExportJobDetails } from './export-details.component';
 describe('ExportJobDetails', () => {
     const renderApp = (metadata: ExportDatasetMetadata) => {
         server.use(
+            http.get('/api/projects/{project_id}/dataset/views', () => {
+                return HttpResponse.json({
+                    views: [
+                        {
+                            id: 'view-1',
+                            name: 'My View',
+                            project_id: 'project-123',
+                            created_at: '2023-01-01T00:00:00Z',
+                        },
+                    ],
+                } as any);
+            }),
             http.get('/api/projects/{project_id}', () => {
                 return HttpResponse.json(
                     getMockedProject({
@@ -111,5 +123,33 @@ describe('ExportJobDetails', () => {
         await screen.findByText('COCO');
 
         expect(await screen.findByText(/All media/)).toBeVisible();
+    });
+
+    it('displays the dataset view name when dataset_view_id is provided', async () => {
+        const metadata: ExportDatasetMetadata = {
+            dataset_id: 'dataset-123',
+            project_id: 'project-123',
+            dataset_view_id: 'view-1',
+            export_format: 'COCO',
+            filters: { include_unannotated: true },
+        };
+
+        renderApp(metadata);
+
+        expect(await screen.findByText(/View: My View/)).toBeVisible();
+    });
+
+    it('displays "Deleted view" when dataset_view_id is provided but not found in the views query', async () => {
+        const metadata: ExportDatasetMetadata = {
+            dataset_id: 'dataset-123',
+            project_id: 'project-123',
+            dataset_view_id: 'view-404',
+            export_format: 'COCO',
+            filters: { include_unannotated: true },
+        };
+
+        renderApp(metadata);
+
+        expect(await screen.findByText(/View: Deleted view/)).toBeVisible();
     });
 });

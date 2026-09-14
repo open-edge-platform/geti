@@ -5,6 +5,7 @@ import type { ExportDatasetMetadata } from '@/api/types';
 import { dimensionValue, Divider, Flex, Grid, Text } from '@geti-ui/ui';
 import { isEmpty, isNil } from 'lodash-es';
 
+import { useDatasetViewsQuery } from '../../../../../../features/dataset/gallery/toolbar/dataset-view-selector/api/use-dataset-views';
 import { useProject } from '../../../../../../hooks/api/project.hook';
 
 type ExportJobDetailsProps = {
@@ -16,6 +17,7 @@ const isGetiFormat = (format?: string | null) => format?.toLowerCase() === 'geti
 
 export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProps) => {
     const { data: selectedProject } = useProject();
+    const { data: viewsData } = useDatasetViewsQuery();
 
     const projectLabels = selectedProject.task.labels ?? [];
     const exportLabelsNames = metadata.filters.labels ?? [];
@@ -24,6 +26,11 @@ export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProp
     const selectedLabels = exportLabelsNames.filter((name) => projectLabelsNames.includes(name));
 
     const labelsList = isEmpty(selectedLabels) ? projectLabelsNames : selectedLabels;
+
+    const viewName = metadata.dataset_view_id
+        ? (viewsData?.find((v: { id: string; name: string }) => v.id === metadata.dataset_view_id)?.name ??
+          'Deleted view')
+        : undefined;
 
     return (
         <Flex direction={'column'}>
@@ -35,8 +42,14 @@ export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProp
                 marginTop={'size-200'}
                 alignItems={'center'}
                 gap='size-125'
-                columns={['auto', '1px', 'auto', '1px', '1fr']}
+                columns={[...'auto,1px'.repeat(viewName ? 3 : 2).split(','), '1fr']}
             >
+                {viewName && (
+                    <>
+                        <Text>View: {viewName}</Text>
+                        <Divider orientation='vertical' size='S' />
+                    </>
+                )}
                 <Text>
                     Format:{' '}
                     <Text

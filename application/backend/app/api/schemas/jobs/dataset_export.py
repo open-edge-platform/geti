@@ -23,6 +23,9 @@ class ExportDatasetRequest(BaseJobRequest):
     dataset_id: UUID | None = Field(
         None, description="The ID of the dataset used for export. If None, the project's main dataset is used."
     )
+    dataset_view_id: UUID | None = Field(
+        None, description="The ID of the dataset view used for export."
+    )
 
     parameters: ExportDatasetParams = Field(..., description="The configuration for exporting dataset")
 
@@ -44,6 +47,7 @@ class StageDatasetRequest(BaseJobRequest):
 
 class ExportDatasetMetadata(BaseModel):
     dataset_id: UUID | None = Field(None, description="Dataset ID")
+    dataset_view_id: UUID | None = Field(None, description="Dataset view ID")
     project_id: UUID = Field(..., description="Project ID")
     filters: DatasetFilters = Field(..., description="Filters to apply to the dataset during export/staging")
     export_format: str | None = Field(None, description="The format of the dataset to export (e.g. coco)")
@@ -54,6 +58,7 @@ class ExportDatasetMetadata(BaseModel):
         if isinstance(data, ExportDatasetJob):
             return {
                 "dataset_id": data.params.dataset_id,
+                "dataset_view_id": getattr(data.params, "dataset_view_id", None),
                 "project_id": data.project_id,
                 "filters": DatasetFilters(
                     labels=data.params.labels,

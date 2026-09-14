@@ -25,10 +25,11 @@ const initialState: FormValues = {
 
 type useExportDatasetJobActionProps = {
     datasetId: string | null;
+    datasetViewId?: string;
     onSuccess: () => void;
 };
 
-export const useExportDatasetJobAction = ({ datasetId, onSuccess }: useExportDatasetJobActionProps) => {
+export const useExportDatasetJobAction = ({ datasetId, datasetViewId, onSuccess }: useExportDatasetJobActionProps) => {
     const projectId = useProjectIdentifier();
     const exportJobMutation = useSubmitJob();
     const { addLsExportId } = useExportDataset();
@@ -45,6 +46,7 @@ export const useExportDatasetJobAction = ({ datasetId, onSuccess }: useExportDat
             body: {
                 project_id: projectId,
                 dataset_id: options.dataset_id,
+                dataset_view_id: datasetViewId,
                 job_type: 'export_dataset',
                 parameters: {
                     export_format: options.export_format,
