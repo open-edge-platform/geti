@@ -70,6 +70,8 @@ class UltralyticsEngine(Engine):
 
     _EXPORTED_MODEL_BASE_NAME: ClassVar[str] = "exported_model"
     _LAST_TRAIN_CHECKPOINT_FILE: ClassVar[str] = ".last_train_checkpoint"
+    backend_name: ClassVar[str] = "ultralytics"
+    model_base_class: ClassVar[type] = UltralyticsModel
 
     def __init__(
         self,

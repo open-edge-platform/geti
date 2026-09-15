@@ -60,6 +60,8 @@ class HFEngine(Engine):
 
     _EXPORTED_MODEL_BASE_NAME: ClassVar[str] = "exported_model"
     _CHECKPOINT_DIR_NAME: ClassVar[str] = "best_checkpoint"
+    backend_name: ClassVar[str] = "huggingface"
+    model_base_class: ClassVar[type] = HFModel
 
     def __init__(
         self,
@@ -247,7 +249,8 @@ class HFEngine(Engine):
             "use_cpu": self._device.type == "cpu",
             "eval_strategy": "epoch" if has_eval else "no",
             "save_strategy": "no",
-            "logging_strategy": "epoch",
+            "logging_strategy": "steps",
+            "logging_steps": 1,
         }
         if has_eval and monitor is not None:
             greater_is_better = resolve_greater_is_better(monitor)
@@ -260,6 +263,17 @@ class HFEngine(Engine):
                 trainer_callbacks.append(EarlyStoppingCallback(early_stopping_patience=patience))
         training_args_kwargs.update(extra_training_args)
         training_args_kwargs.update(kwargs)
+
+        # ReduceLROnPlateau steps the metric from ``metric_for_best_model``, but torch's
+        # default mode is "min" (watched metric must decrease). Our targets (mAP, F1, Dice,
+        # accuracy) are maximized, so inject the mode matching ``greater_is_better`` unless
+        # the caller already set it explicitly.
+        scheduler_kwargs = training_args_kwargs.get("lr_scheduler_kwargs")
+        if isinstance(scheduler_kwargs, dict) and "mode" not in scheduler_kwargs:
+            greater = training_args_kwargs.get(
+                "greater_is_better", resolve_greater_is_better(training_args_kwargs.get("metric_for_best_model"))
+            )
+            training_args_kwargs["lr_scheduler_kwargs"] = {**scheduler_kwargs, "mode": "max" if greater else "min"}
 
         # Convert`warmup_ratio` to the supported `warmup_steps` using the estimated number of training steps.
         warmup_ratio = training_args_kwargs.pop("warmup_ratio", None)
@@ -290,6 +304,13 @@ class HFEngine(Engine):
         else:
             trainer.save_model(str(best_dir))
         self._model.record_checkpoint(best_dir)
+        # Extract only when the selected checkpoint carries no threshold: the
+        # best-checkpoint save persists its *same-epoch* validation threshold
+        # (see ``_maybe_save_best_checkpoint``), so a restore above already
+        # has the authoritative value. Extraction here is the fallback for
+        # runs without such a save (e.g. no monitored metric).
+        if self._model.best_confidence_threshold is None:
+            self._extract_best_confidence_threshold(trainer)
 
         write_metrics_csv(trainer.state.log_history, self._work_dir)
 
@@ -342,11 +363,44 @@ class HFEngine(Engine):
         trainer = self._build_test_scoped_trainer("test", batch, kwargs)
 
         metric_obj = metric(self._model.label_info) if metric is not None else self._model.build_default_metric()
-        return trainer.evaluate(split="test", metric=metric_obj)
+        compute_kwargs = (
+            {"best_confidence_threshold": self._model.best_confidence_threshold}
+            if metric is None and self._model.best_confidence_threshold is not None
+            else None
+        )
+        return trainer.evaluate(split="test", metric=metric_obj, compute_kwargs=compute_kwargs)
+
+    def _extract_best_confidence_threshold(self, trainer: GetiTuneHFTrainer) -> None:
+        """Store the validation F1-optimal confidence threshold on the model.
+
+        The detection / instance-segmentation default metric collection contains
+        an ``FMeasure`` submetric whose threshold sweep computes the best
+        confidence threshold on the validation set each epoch. After training
+        it is persisted on the model so export and ``predict()`` pick it up.
+        """
+        from getitune.metrics.fmeasure import FMeasure
+
+        metric_obj = trainer._val_metric  # noqa: SLF001
+        if metric_obj is None:
+            return
+        fmeasure = getattr(metric_obj, "FMeasure", None)
+        if fmeasure is None and isinstance(metric_obj, FMeasure):
+            fmeasure = metric_obj
+        if fmeasure is None:
+            return
+        # Read the backing attribute directly: the ``best_confidence_threshold``
+        # property raises ``RuntimeError`` instead of returning ``None`` while
+        # the metric has never computed (e.g. training without a validation
+        # metric), which would abort an otherwise completed run.
+        threshold = fmeasure._current_confidence_threshold  # noqa: SLF001
+        if threshold is None:
+            return
+        self._model.best_confidence_threshold = float(threshold)
+        logger.info("Best confidence threshold from validation F-measure: %s", float(threshold))
 
     def predict(
         self,
-        confidence_threshold: float = 0.5,
+        confidence_threshold: float | None = None,
         batch: int | None = None,
         checkpoint: PathLike | None = None,
         **kwargs,
@@ -362,10 +416,12 @@ class HFEngine(Engine):
 
         Args:
             confidence_threshold: Minimum score for a detection / instance
-                segmentation prediction to be kept. Not applied to
-                classification (whose scores are per-class probabilities,
-                not a filtering signal) or semantic segmentation (which has
-                no per-prediction score at all).
+                segmentation prediction to be kept. Defaults to the best
+                confidence threshold computed by validation F-measure (or the
+                model's configured default when not available). Not applied to classification
+                (whose scores are per-class probabilities, not a filtering
+                signal) or semantic segmentation (which has no per-prediction
+                score at all).
             batch: Batch size override. Defaults to the test subset's
                 configured ``batch_size``.
             checkpoint: Optional checkpoint to load before predicting.
@@ -384,6 +440,13 @@ class HFEngine(Engine):
 
         if checkpoint is not None:
             self._model.load_checkpoint(checkpoint)
+
+        if confidence_threshold is None:
+            confidence_threshold = (
+                self._model.best_confidence_threshold
+                if self._model.best_confidence_threshold is not None
+                else self._model.default_confidence_threshold
+            )
 
         trainer = self._build_test_scoped_trainer("predict", batch, kwargs)
 

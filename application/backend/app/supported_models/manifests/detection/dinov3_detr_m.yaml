@@ -1,5 +1,6 @@
 id: object-detection-dinov3-detr-m
 name: DINOv3-DETR-M
+license: DINOv3 License
 
 pretrained_weights:
   source: direct_link

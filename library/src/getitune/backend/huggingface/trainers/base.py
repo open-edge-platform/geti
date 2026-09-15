@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from time import perf_counter
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -18,10 +19,10 @@ from getitune.data.augmentation import GPUAugmentationPipeline
 from getitune.data.augmentation.task_keys import DATA_KEYS_BY_TASK
 from getitune.metrics import MetricCallable
 
-from .utils import resolve_greater_is_better
+from .utils import plateau_warmup_lr, resolve_greater_is_better
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Iterator, Sequence
 
     from torch.utils.data import DataLoader
     from torchmetrics import Metric, MetricCollection
@@ -73,7 +74,21 @@ class GetiTuneHFTrainer(Trainer):
         )
         self._best_metric_value: float | None = None
         self._best_eval_metrics: dict[str, float] = {}
+        self._train_data_time = 0.0
+        self._train_iter_time = 0.0
+        self._plateau_warmup_steps = 0
+        self._plateau_warmup_base_lr = 0.0
         super().__init__(*args, **kwargs)
+
+    def get_batch_samples(
+        self, epoch_iterator: Iterator[Any], num_batches: int, device: torch.device
+    ) -> tuple[list[Any], torch.Tensor | int | None]:
+        """Collect an optimizer step's microbatches and measure data loading time."""
+        start = perf_counter()
+        result = super().get_batch_samples(epoch_iterator, num_batches, device)
+        self._train_data_time = perf_counter() - start
+        self._train_iter_time = self._train_data_time
+        return result
 
     def _build_gpu_pipeline(
         self, subset_config: SubsetConfig | None, *, sanitize: bool
@@ -88,6 +103,14 @@ class GetiTuneHFTrainer(Trainer):
             return None
         data_keys = ["input", *DATA_KEYS_BY_TASK.get(self.model_wrapper.task, ())]
         return GPUAugmentationPipeline.from_config(subset_config, data_keys=data_keys, sanitize_annotations=sanitize)
+
+    def save_model(self, output_dir: str | None = None, _internal_call: bool = False) -> None:
+        """Save through the wrapped HF model so custom wrappers persist their configuration."""
+        target = output_dir or self.args.output_dir
+        if target is None:
+            msg = "TrainingArguments.output_dir is not set; cannot save the model."
+            raise RuntimeError(msg)
+        self.model_wrapper.save_pretrained(target)
 
     def get_train_dataloader(self) -> DataLoader:
         """Return the DataModule's training dataloader."""
@@ -194,6 +217,56 @@ class GetiTuneHFTrainer(Trainer):
         outputs = model(**targets)
         return (outputs.loss, outputs) if return_outputs else outputs.loss
 
+    def training_step(  # pyrefly: ignore[bad-override]
+        self,
+        model: torch.nn.Module,
+        inputs: SampleBatch,
+        num_items_in_batch: torch.Tensor | int | None = None,
+    ) -> torch.Tensor:
+        """Run one microbatch and accumulate its processing time."""
+        start = perf_counter()
+        loss = super().training_step(model, inputs, num_items_in_batch)  # pyrefly: ignore[bad-argument-type]
+        self._train_iter_time += perf_counter() - start
+        self._apply_plateau_warmup()
+        return loss
+
+    def create_optimizer(self, model: torch.nn.Module | None = None) -> torch.optim.Optimizer:
+        """Create the optimizer and arm manual LR warmup for plateau schedules.
+
+        ``transformers.get_scheduler()`` ignores ``num_warmup_steps`` for
+        ``reduce_lr_on_plateau``, so the ramp is applied manually for the first
+        ``warmup_steps`` optimizer steps (see :meth:`_apply_plateau_warmup`).
+        """
+        optimizer = super().create_optimizer()  # pyrefly: ignore[bad-override]
+        scheduler_type = getattr(self.args.lr_scheduler_type, "value", self.args.lr_scheduler_type)
+        if scheduler_type == "reduce_lr_on_plateau" and self.args.warmup_steps > 0:
+            self._plateau_warmup_steps = int(self.args.warmup_steps)
+            self._plateau_warmup_base_lr = float(self.args.learning_rate)
+        return optimizer
+
+    def _apply_plateau_warmup(self) -> None:
+        """Ramp the LR during plateau warmup, then hand the LR back to the scheduler."""
+        if self._plateau_warmup_steps <= 0 or self.optimizer is None:
+            return
+        step = self.state.global_step
+        if step > self._plateau_warmup_steps:
+            self._plateau_warmup_steps = 0
+            self._set_learning_rate(self._plateau_warmup_base_lr)
+            return
+        self._set_learning_rate(plateau_warmup_lr(self._plateau_warmup_base_lr, step, self._plateau_warmup_steps))
+
+    def _set_learning_rate(self, lr: float) -> None:
+        assert self.optimizer is not None  # noqa: S101 - only called from the training loop
+        for group in self.optimizer.param_groups:
+            group["lr"] = lr
+
+    def log(self, logs: dict[str, float], start_time: float | None = None) -> None:
+        """Attach timing to optimizer-step logs before storing them."""
+        if "loss" in logs:
+            logs["train/data_time"] = self._train_data_time
+            logs["train/iter_time"] = self._train_iter_time
+        super().log(logs, start_time)
+
     def _determine_best_metric(  # pyrefly: ignore[bad-override]
         self,
         metrics: dict[str, float],
@@ -229,6 +302,7 @@ class GetiTuneHFTrainer(Trainer):
         *,
         split: str = "val",
         metric: Metric | MetricCollection | None = None,
+        compute_kwargs: dict[str, Any] | None = None,
     ) -> dict[str, float]:
         """Run a Geti metric on *split* and return scalar ``val/`` or ``test/`` metrics.
 
@@ -248,6 +322,9 @@ class GetiTuneHFTrainer(Trainer):
             metric: Optional metric or metric collection to use. If ``None``,
                 the metric passed to ``__init__`` (the task's default or an
                 override) is used.
+            compute_kwargs: Extra keyword arguments forwarded to
+                ``metric.compute()``, e.g.
+                ``{"best_confidence_threshold": 0.3}``.
 
         Returns:
             A dictionary of scalar metrics prefixed with ``val/`` or ``test/``.
@@ -277,8 +354,18 @@ class GetiTuneHFTrainer(Trainer):
         if model is None:
             msg = "Trainer model is not set; cannot run evaluation."
             raise RuntimeError(msg)
+        data_time = 0.0
+        iter_time = 0.0
+        num_batches = 0
+        iterator = iter(dataloader)
         with torch.no_grad():
-            for inputs in dataloader:
+            while True:
+                start = perf_counter()
+                try:
+                    inputs = next(iterator)
+                except StopIteration:
+                    break
+                data_time += perf_counter() - start
                 batch = self._prepare_batch(inputs, pipeline)
                 outputs = model(**self.model_wrapper.build_eval_inputs(batch))
                 metric_inputs = self.model_wrapper.to_metric_inputs(outputs, batch)
@@ -287,13 +374,22 @@ class GetiTuneHFTrainer(Trainer):
                 # here instead of scattering .cpu() through each to_metric_inputs.
                 metric_inputs = apply_to_collection(metric_inputs, torch.Tensor, lambda t: t.cpu())
                 metric_obj.update(**metric_inputs)
+                iter_time += perf_counter() - start
+                num_batches += 1
 
-        computed = metric_obj.compute()
+        computed = metric_obj.compute(**(compute_kwargs or {}))
         metrics = self._format_metrics(computed, f"{split}/")
         if not metrics:
             return {}
 
         if split == "val":
+            if num_batches:
+                metrics["validation/data_time"] = data_time / num_batches
+                metrics["validation/iter_time"] = iter_time / num_batches
+            # ``transformers.EarlyStoppingCallback`` looks up ``eval_`` + ``metric_for_best_model``
+            # in the metrics dict, but we log task metrics under the ``val/`` prefix. Mirror them under
+            # the ``eval_`` prefix so early stopping can find the monitored metric.
+            metrics.update({f"eval_{k}": v for k, v in metrics.items()})
             metrics["epoch"] = epoch
             self.log(metrics)
             self.control = self.callback_handler.on_evaluate(self.args, self.state, self.control, metrics)
@@ -339,6 +435,12 @@ class GetiTuneHFTrainer(Trainer):
         if improved:
             self._best_metric_value = float(current)
             self._best_eval_metrics = metrics.copy()
+            # Persist the validation F1-optimal confidence threshold computed
+            # by *this same epoch's* metrics together with the weights, so
+            # best_checkpoints never pair weights and a threshold from
+            # different validation states. ``save_model`` writes it into the
+            # checkpoint config (``getitune_best_confidence_threshold``).
+            self._sync_val_confidence_threshold()
             output_dir = self.args.output_dir
             if output_dir is None:
                 msg = "TrainingArguments.output_dir is not set; cannot save best checkpoint."
@@ -346,6 +448,26 @@ class GetiTuneHFTrainer(Trainer):
             best_dir = Path(output_dir).parent / "best_checkpoint"
             best_dir.mkdir(parents=True, exist_ok=True)
             self.save_model(str(best_dir))
+
+    def _sync_val_confidence_threshold(self) -> None:
+        """Copy the current validation ``FMeasure`` threshold onto the model.
+
+        Read from the backing attribute: ``FMeasure.best_confidence_threshold``
+        raises instead of returning ``None`` while the sweep never ran.
+        """
+        from getitune.metrics.fmeasure import FMeasure
+
+        metric_obj = self._val_metric
+        if metric_obj is None:
+            return
+        fmeasure = getattr(metric_obj, "FMeasure", None)
+        if fmeasure is None and isinstance(metric_obj, FMeasure):
+            fmeasure = metric_obj
+        if fmeasure is None:
+            return
+        threshold = fmeasure._current_confidence_threshold  # noqa: SLF001
+        if threshold is not None:
+            self.model_wrapper.best_confidence_threshold = float(threshold)
 
     def _prepare_batch(self, batch: SampleBatch, pipeline: GPUAugmentationPipeline | None) -> SampleBatch:
         """Move a batch to the model's device and apply GPU augmentation, if configured."""
