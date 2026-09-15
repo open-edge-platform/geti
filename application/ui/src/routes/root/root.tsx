@@ -7,7 +7,7 @@ import { $api } from '@/api';
 import { Toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
 import { Flex, Heading, Loading } from '@geti-ui/ui';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 
 import { LicenseCheck } from '../../features/license/license-check.component';
 import { ServerErrorFallback } from './server-error-fallback.component';

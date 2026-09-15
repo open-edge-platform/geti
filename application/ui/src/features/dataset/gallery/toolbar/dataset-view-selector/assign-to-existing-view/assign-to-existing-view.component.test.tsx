@@ -5,7 +5,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedDatasetView } from 'mocks/mock-dataset-view';
 import { HttpResponse } from 'msw';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../../../../api/utils';

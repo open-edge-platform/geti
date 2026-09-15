@@ -23,7 +23,7 @@ import { Info } from '@geti-ui/ui/icons';
 import { DATASET_VIEW_ID_PARAM, ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
-import { createSearchParams, Link, useLocation } from 'react-router-dom';
+import { createSearchParams, Link, useLocation } from 'react-router';
 
 import { useAssignMediaToExistingDatasetView } from '../api/use-assign-media-to-existing-dataset-view';
 import { SelectedMediaCount } from '../selected-media-count/selected-media-count.component';

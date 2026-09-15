@@ -62,7 +62,7 @@
         "react-error-boundary": "~3.1.4",
         "react-hotkeys-hook": "^5.3.3",
         "react-i18next": "~17.0.11",
-        "react-router-dom": "~6.30.4",
+        "react-router": "~7.18.3",
         "react-stately": "^3.47.0",
         "recharts": "~3.10.1",
         "sonner": "^2.0.7",

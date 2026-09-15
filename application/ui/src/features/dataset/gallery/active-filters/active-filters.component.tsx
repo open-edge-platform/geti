@@ -84,18 +84,9 @@ export const useHasActiveFilters = () => {
 };
 
 export const useClearAllFilters = () => {
-    const { setSelectedLabelIds, setAnnotationStatus, setStartDate, setEndDate, setSelectedSubsets } =
-        useDatasetFiltersSearchParams();
+    const { clearAllFilters } = useDatasetFiltersSearchParams();
 
-    const handleClearAll = () => {
-        setSelectedLabelIds([]);
-        setAnnotationStatus(null);
-        setStartDate(null);
-        setEndDate(null);
-        setSelectedSubsets([]);
-    };
-
-    return handleClearAll;
+    return clearAllFilters;
 };
 
 export const ActiveFilters = () => {

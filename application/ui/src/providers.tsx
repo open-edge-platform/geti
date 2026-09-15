@@ -3,7 +3,7 @@
 
 import { ThemeProvider } from '@geti-ui/ui';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { RouterProvider } from 'react-router-dom';
+import { RouterProvider } from 'react-router/dom';
 
 import { useDocumentLanguage } from './i18n/use-document-language.hook';
 import { queryClient } from './query-client/query-client';
@@ -15,12 +15,7 @@ export const Providers = () => {
     return (
         <QueryClientProvider client={queryClient}>
             <ThemeProvider router={router} locale={locale}>
-                <RouterProvider
-                    router={router}
-                    future={{
-                        v7_startTransition: true,
-                    }}
-                />
+                <RouterProvider router={router} />
             </ThemeProvider>
         </QueryClientProvider>
     );

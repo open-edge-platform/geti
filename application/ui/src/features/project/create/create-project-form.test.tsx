@@ -15,7 +15,7 @@ import { CreateProjectForm } from './create-project-form';
 
 const mockNavigate = vi.hoisted(() => vi.fn());
 
-vi.mock('react-router-dom', async (importOriginal) => ({
+vi.mock('react-router', async (importOriginal) => ({
     ...(await importOriginal()),
     useNavigate: () => mockNavigate,
 }));
