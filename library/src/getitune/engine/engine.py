@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -17,6 +17,9 @@ if TYPE_CHECKING:
 
 class Engine(ABC):
     """Engine base class."""
+
+    backend_name: ClassVar[str] = "base"
+    model_base_class: ClassVar[type]
 
     @abstractmethod
     def train(self, **kwargs) -> METRICS:
