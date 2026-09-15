@@ -1180,6 +1180,7 @@ dev = [
     { name = "pytest-cov", specifier = ">=4.0.0" },
     { name = "pytest-forked" },
     { name = "pytest-html" },
+    { name = "pytest-memray", marker = "sys_platform != 'win32'", specifier = ">=1.10.0" },
     { name = "pytest-mock" },
     { name = "pytest-stress" },
     { name = "pytest-timeout" },
