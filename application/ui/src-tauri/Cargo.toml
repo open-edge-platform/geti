@@ -23,6 +23,23 @@ tauri-plugin-fs = "=2.5.1"
 tauri-plugin-log = "2.8.0"
 tauri-plugin-opener = "2.5.3"
 
+# "Annotate with ChatGPT" assistant (src/assistant). The OpenAI request is made
+# here rather than in the webview so the API key never reaches renderer JS:
+# `keyring` keeps it in the OS credential store, `reqwest` streams the SSE
+# response, and `tokio`'s process support drives the optional `codex
+# app-server` subprocess used by the ChatGPT-account mode.
+#
+# `rustls-tls` (rather than reqwest's default native-tls) keeps the desktop
+# shell free of an OpenSSL build dependency on Linux.
+keyring = { version = "3", default-features = false }
+reqwest = { version = "0.12", default-features = false, features = [
+    "json",
+    "stream",
+    "rustls-tls",
+] }
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+tokio = { version = "1", features = ["io-util", "macros", "process", "sync", "time"] }
+
 # Desktop-only: guarantees a single running instance so no two
 # backends are spawned competing for the same TCP port and SQLite database.
 [target.'cfg(any(target_os = "windows", target_os = "linux", target_os = "macos"))'.dependencies]
@@ -45,4 +62,10 @@ windows = { version = "0.61", features = [
     "Win32_System_JobObjects",
 ] }
 webview2-com = "0.38"
+# Windows Credential Manager backing store for the assistant's OpenAI API key.
+keyring = { version = "3", default-features = false, features = ["windows-native"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+# Keychain backing store for the assistant's OpenAI API key.
+keyring = { version = "3", default-features = false, features = ["apple-native"] }
 

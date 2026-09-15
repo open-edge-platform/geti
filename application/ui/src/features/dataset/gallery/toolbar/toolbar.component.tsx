@@ -6,7 +6,6 @@ import { Dispatch, SetStateAction, Suspense, useMemo } from 'react';
 import type { Media } from '@/api/types';
 import {
     ActionButton,
-    Button,
     ButtonGroup,
     Checkbox,
     dimensionValue,
@@ -27,6 +26,7 @@ import { ImportExport } from '../../import-export/import-export.component';
 import { useSelectedData } from '../../providers/selected-data-provider.component';
 import { DeleteMediaItem } from '../delete-media-item/delete-media-item.component';
 import { useSelectDatasetItem } from '../hooks/use-select-dataset-item.hook';
+import { AnnotateButton } from './annotate-button.component';
 import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
 import { useDatasetViewsQuery } from './dataset-view-selector/api/use-dataset-views';
@@ -43,19 +43,6 @@ type ToolbarProps = {
     items: Media[];
     viewMode: ViewModes;
     setViewMode: Dispatch<SetStateAction<ViewModes>>;
-};
-
-type AnnotateButtonProps = {
-    isDisabled?: boolean;
-    onClick?: () => void;
-};
-
-const AnnotateButton = ({ isDisabled, onClick }: AnnotateButtonProps) => {
-    return (
-        <Button margin={0} variant={'primary'} onPress={onClick} isDisabled={isDisabled}>
-            Annotate
-        </Button>
-    );
 };
 
 type DatasetViewsProps = {
@@ -166,7 +153,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     {noMediaSelected && (
                         <AnnotateButton
-                            isDisabled={items.at(0) === undefined}
+                            items={items}
                             onClick={items.at(0) === undefined ? undefined : () => onSelectedMediaItemChange(items[0])}
                         />
                     )}

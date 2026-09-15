@@ -1,0 +1,17 @@
+.splitButton {
+    display: flex;
+    align-items: stretch;
+
+    // Visually fuses the menu trigger onto the primary action.
+    > :first-child {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    > :last-child {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-left: 1px solid var(--spectrum-global-color-gray-50);
+        min-width: var(--spectrum-global-dimension-size-400);
+    }
+}

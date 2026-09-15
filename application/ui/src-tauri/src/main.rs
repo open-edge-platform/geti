@@ -1,6 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod assistant;
 mod backend;
 #[cfg(windows)]
 mod job;
@@ -18,6 +19,7 @@ use tauri::{AppHandle, Manager, RunEvent, WindowEvent};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use tauri_plugin_opener::OpenerExt;
 
+use crate::assistant::{CodexState, OpenAiState};
 use crate::backend::spawn_backend;
 
 /// How often the monitor thread checks whether the backend is still alive.
@@ -439,6 +441,10 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_log::Builder::default().build())
+        // Cancellation registries for the "Annotate with ChatGPT" assistant.
+        // Both are empty until the user opens the assistant for the first time.
+        .manage(OpenAiState::default())
+        .manage(CodexState::default())
         .setup({
             let control = control.clone();
             move |app| {
@@ -503,7 +509,15 @@ fn main() {
                 }
             }
         })
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![
+            assistant::openai::openai_key_set,
+            assistant::openai::openai_key_delete,
+            assistant::openai::openai_key_status,
+            assistant::openai::openai_responses_stream,
+            assistant::openai::openai_cancel,
+            assistant::codex::codex_operation,
+            assistant::codex::codex_cancel,
+        ])
         .build(tauri::generate_context!())
         .expect("error building Tauri");
 
