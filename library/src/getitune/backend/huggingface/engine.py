@@ -60,6 +60,8 @@ class HFEngine(Engine):
 
     _EXPORTED_MODEL_BASE_NAME: ClassVar[str] = "exported_model"
     _CHECKPOINT_DIR_NAME: ClassVar[str] = "best_checkpoint"
+    backend_name: ClassVar[str] = "huggingface"
+    model_base_class: ClassVar[type] = HFModel
 
     def __init__(
         self,

@@ -423,9 +423,10 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         in the config; backends that do not support them simply ignore the
         parameter.
         """
-        from getitune.backend.lightning.models.base import DataInputParams, LightningModel
+        from getitune.backend.lightning.models.base import DataInputParams
         from getitune.data.module import DataModule
         from getitune.engine import create_engine
+        from getitune.engine.utils.create import engine_class_for_backend
         from getitune.types.device import DeviceType as GetiTuneDeviceType
 
         from .progress import TrainingProgressCallback
@@ -458,8 +459,9 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             GetiTuneDeviceType.gpu if device.type is DeviceType.CUDA else GetiTuneDeviceType(device.type)
         )
         class_path = model_cfg.get("class_path", "")
-        is_ultralytics = "ultralytics" in class_path
-        is_huggingface = training_config.get("backend") == "huggingface"
+        engine_cls = engine_class_for_backend(training_config.get("backend"), class_path)
+        is_huggingface = engine_cls.backend_name == "huggingface"
+        is_ultralytics = engine_cls.backend_name == "ultralytics"
         engine_kwargs: dict[str, Any] = {
             "work_dir": self._data_dir / f"getitune-workspace-{model_id}",
             "device": getitune_device_type,
@@ -484,18 +486,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 model_cfg["init_args"]["pretrained_weights"] = weights_path
 
         model_parser = ArgumentParser()
-        if is_huggingface:
-            from getitune.backend.huggingface.models.base import HFModel
-
-            model_type = HFModel
-        elif is_ultralytics:
-            # Lazy import because the Ultralytics backend is optional and may not be installed in all environments.
-            from getitune.backend.ultralytics.models.base import UltralyticsModel
-
-            model_type = UltralyticsModel
-        else:
-            model_type = LightningModel
-        model_parser.add_argument("--model", type=model_type)
+        model_parser.add_argument("--model", type=engine_cls.model_base_class)
         getitune_model = model_parser.instantiate_classes(Namespace(model=model_cfg)).get("model")
 
         if hasattr(getitune_model, "tile_config"):

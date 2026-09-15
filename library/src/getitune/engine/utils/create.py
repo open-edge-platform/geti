@@ -24,6 +24,73 @@ _RECIPE_SUFFIXES: frozenset[str] = frozenset({".yaml", ".yml"})
 _WEIGHT_SUFFIXES: frozenset[str] = frozenset({".xml", ".onnx"})
 
 
+def backend_engines() -> dict[str, type[Engine]]:
+    """Return the backend name → engine class registry for the installed environment.
+
+    Ultralytics is an optional backend, so its engine is only registered when
+    the package is importable. The lite dict is rebuilt once per process.
+    """
+    from getitune.backend.huggingface.engine import HFEngine
+    from getitune.backend.lightning.engine import LightningEngine
+    from getitune.backend.openvino.engine import OVEngine
+
+    engines: dict[str, type[Engine]] = {
+        "lightning": LightningEngine,
+        "openvino": OVEngine,
+        "huggingface": HFEngine,
+    }
+    try:
+        from getitune.backend.ultralytics.engine import UltralyticsEngine
+
+        engines["ultralytics"] = UltralyticsEngine
+    except ImportError:
+        pass
+    return engines
+
+
+def resolve_backend(backend: str | None = None, class_path: str = "") -> str:
+    """Resolve the effective backend of a converted training config / recipe.
+
+    Args:
+        backend: ``backend`` field value, when the recipe declares one
+            (``'huggingface'``/``'ultralytics'``). ``None`` for Lightning
+            recipes, which omit the field by convention.
+        class_path: Model ``class_path`` used only as a fallback when *backend*
+            is unset and the torch training code paths may route to
+            Ultralytics despite the missing ``backend`` field.
+
+    Returns:
+        One of ``'lightning'`` | ``'ultralytics'`` | ``'huggingface'``.
+    """
+    if backend:
+        return backend
+    return "ultralytics" if "ultralytics" in class_path else "lightning"
+
+
+def engine_class_for_backend(backend: str | None, class_path: str = "") -> type[Engine]:
+    """Look up the engine class bound to a training config's backend.
+
+    Args:
+        backend: ``backend`` value from the (converted) training config, or
+            ``None`` when absent (Lightning recipes).
+        class_path: Optional model class path used as a backend sniff
+            fallback for recipes that predate the ``backend`` field.
+
+    Returns:
+        The engine class matching the resolved backend.
+
+    Raises:
+        ValueError: If the backend is unknown in the phrase dictionary.
+    """
+    engines = backend_engines()
+    name = resolve_backend(backend, class_path)
+    engine_cls = engines.get(name)
+    if engine_cls is None:
+        msg = f"Unknown backend '{name}'. Known backends: {sorted(engines)}"
+        raise ValueError(msg)
+    return engine_cls
+
+
 def _resolve_recipe(model: MODEL, task: TaskType | str | None) -> Path:
     """Resolve a model name or YAML path to an absolute recipe path.
 
