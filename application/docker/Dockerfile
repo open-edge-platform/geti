@@ -8,7 +8,7 @@ ARG EXCLUDE_AGPL_MODELS=0
 ##############
 # Backend base
 ##############
-FROM python:3.14-slim@sha256:cae66f2ef0ec51a9891263eeee7f987dacf0a9879e8aa9353d5606e0530619a5 AS backend-base
+FROM python:3.14-slim@sha256:cad9a2c871761c413caa6fdd6441c783451e740a48aaeba60ae62a8b53525ef6 AS backend-base
 
 # uv / uvx
 COPY --from=docker.io/astral/uv:0.10.4@sha256:4cac394b6b72846f8a85a7a0e577c6d61d4e17fe2ccee65d9451a8b3c9efb4ac /uv /uvx /bin/
@@ -163,18 +163,33 @@ RUN npm run build
 #===========================================================================
 # pyav + ffmpeg
 # ===========================================================================
-FROM python:3.14-slim@sha256:cae66f2ef0ec51a9891263eeee7f987dacf0a9879e8aa9353d5606e0530619a5 AS ffmpeg-builder
+FROM python:3.14-slim@sha256:cad9a2c871761c413caa6fdd6441c783451e740a48aaeba60ae62a8b53525ef6 AS ffmpeg-builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Pin refs/versions if you want reproducible builds.
-ARG LIBVPL_REF=778a66d6c6537f08eabb91955dbbf1bce3812894
-ARG FFMPEG_REF=9dd0fe0225c2c3406ca49430a74c8660b1713889
-ARG PYAV_VERSION=16.1.0
-ARG OPENH264_REF=e3f5b10438e2bacc155cf54578222bd4236c9f06
-ARG SVTAV1_REF=349f4eb9c369f68d463029d1cd37551c90b7de51
+# Pinned refs/versions for reproducible builds.
+# Full commit SHAs are used instead of tag names so a retag upstream cannot
+# silently change these builds. Each SHA was resolved from its release tag via:
+#   git ls-remote <repo-url> refs/tags/<tag>
+#
+# LIBVPL_REF:  tag v2.17.0
+#   git ls-remote https://github.com/intel/libvpl.git refs/tags/v2.17.0
+ARG LIBVPL_REF=d77f9195cf495b937631607333288fd917ae8939
+# FFMPEG_REF: PyAV 17.1.0's smoke-test matrix validates against FFmpeg 8.1
+# (see https://github.com/PyAV-Org/PyAV/blob/v17.1.0/.github/workflows/smoke.yml); n8.1.2 is a same-branch patch
+# release of 8.1, so it stays within the tested/compatible range.
+#   git ls-remote https://github.com/FFmpeg/FFmpeg.git refs/tags/n8.1.2
+ARG FFMPEG_REF=1c2c67c0b9f7f66ab32c19dcf7f227bcd290aa4c
+ARG PYAV_VERSION=17.1.0
+# OPENH264_REF: OpenH264 has slow release cycles (latest tag as of writing is
+# from 2025), so this is pinned directly to a commit on the default branch
+# rather than resolved from a release tag.
+ARG OPENH264_REF=0bab7fe805b6aa56a7886deb7de357e514268688
+# SVTAV1_REF: tag v4.2.0
+#   git ls-remote https://gitlab.com/AOMediaCodec/SVT-AV1.git refs/tags/v4.2.0
+ARG SVTAV1_REF=9292ec8e32bce26f781f277ec8739b53426c4300
 
 # Install build and runtime dependencies.
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -199,10 +214,10 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 # Python packaging tools for building wheels.
 RUN python -m pip install --no-cache-dir \
-    "pip==25.*" \
-    "setuptools==75.*" \
-    "wheel==0.45.*" \
-    "Cython==3.0.*"
+    "pip==26.*" \
+    "setuptools==84.*" \
+    "wheel==0.48.*" \
+    "Cython==3.1.*"
 
 # Build/install oneVPL dispatcher + headers.
 ENV VPL_INSTALL_DIR=/opt/vpl
@@ -275,12 +290,12 @@ RUN ffmpeg -version && \
 
 # Build PyAV wheel from source against the FFmpeg we just built.
 WORKDIR /build
-RUN python -m pip wheel --no-binary av "av==${PYAV_VERSION}" -w /dist
+RUN python -m pip wheel --no-binary av --no-build-isolation "av==${PYAV_VERSION}" -w /dist
 
 #########################
 # Base for CPU, GPU and XPU runtime images
 #########################
-FROM python:3.14-slim@sha256:cae66f2ef0ec51a9891263eeee7f987dacf0a9879e8aa9353d5606e0530619a5 AS runtime-base
+FROM python:3.14-slim@sha256:cad9a2c871761c413caa6fdd6441c783451e740a48aaeba60ae62a8b53525ef6 AS runtime-base
 
 LABEL org.opencontainers.image.source="https://github.com/open-edge-platform/training_extensions"
 LABEL org.opencontainers.image.description="Geti – train, optimize and deploy deep-learning models"
@@ -315,7 +330,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && apt-get install -y --no-install-recommends \
         git=1:2.47.3-0* \
         libgl1=1.7.0-1+b2 \
-        libglib2.0-0t64=2.84.4-3~deb13u3 \
+        libglib2.0-0t64=2.84.4-3* \
         libglx-mesa0=25.0.* \
         libv4l-0t64=1.30.1-1 \
         libva2=2.22.* \
