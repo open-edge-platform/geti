@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class Engine(ABC):
     """Engine base class."""
 
-    backend_name: ClassVar[str] = "base"
+    backend_name: ClassVar[str]
     model_base_class: ClassVar[type]
 
     @abstractmethod

@@ -206,8 +206,7 @@ class BaseWeightsService:
             # metadata endpoint is unavailable due to DNS, proxy, auth, or a
             # transient service failure.
             logger.warning(
-                "Could not retrieve Hugging Face metadata for {}: {}. "
-                "Using conservative disk-space estimate.",
+                "Could not retrieve Hugging Face metadata for {}: {}. Using conservative disk-space estimate.",
                 pretrained_weights.repo_id,
                 error,
             )
