@@ -75,6 +75,7 @@ dev = [
     "tifffile",
     "py-cpuinfo",
     "mlflow>=3.11.1",
+    "pytest-memray>=1.10.0; sys_platform != 'win32'",
 ]
 
 lint = [
