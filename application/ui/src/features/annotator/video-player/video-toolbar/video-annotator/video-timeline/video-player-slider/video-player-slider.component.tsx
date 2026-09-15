@@ -92,6 +92,9 @@ const blurActiveInput = (isFocused: boolean): void => {
     }
 };
 
+// TODO: Update highlighted frames and buffers
+const NO_HIGHLIGHTED_FRAMES: number[] = [];
+
 export const VideoPlayerSlider = ({
     ref,
     videoFrame,
@@ -121,10 +124,6 @@ export const VideoPlayerSlider = ({
     const lastFrame = isDisplayingAllFrames ? maxValue : framesCount - step;
     const isLastFrame = sliderValue >= lastFrame;
     const containerScrollLeft = getContainerScroll(ref);
-
-    // TODO: Update highlighted frames and buffers
-    const highlightedFrames: number[] = [];
-    const buffers = undefined;
 
     const handlePointerMove = (event: PointerEvent<HTMLDivElement>): void => {
         const rect = event.currentTarget.getBoundingClientRect();
@@ -163,8 +162,7 @@ export const VideoPlayerSlider = ({
                     blurActiveInput(true);
                 }}
                 step={step}
-                buffers={buffers}
-                highlightedFrames={highlightedFrames}
+                highlightedFrames={NO_HIGHLIGHTED_FRAMES}
                 isLastFrame={isLastFrame}
                 sizePerSquare={sizePerSquare}
                 leftOffset={frameOffset}
