@@ -153,13 +153,6 @@
         "multiSelect": {
             "selectAll": "Select all"
         },
-        "jobs": {
-            "status": {
-                "error": "Error",
-                "connected": "Connected",
-                "disconnected": "Disconnected"
-            }
-        },
         "import": {
             "jobTitle": "Import dataset - {{fileName}} - {{size}}",
             "processingMessage": "{{fileName}} file is being processed for import",
@@ -169,7 +162,6 @@
             "cancel": "Cancel",
             "hide": "Hide",
             "preparingJob": "Preparing",
-            "progressUnavailable": "N/A",
             "stagedFileReadError": "An error occurred during staged file reading",
             "prepareError": "An error occurred during import preparation.",
             "genericError": "An error occurred during import.",
