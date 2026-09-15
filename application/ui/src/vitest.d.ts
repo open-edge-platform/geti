@@ -6,9 +6,12 @@
 
 import type { TestingLibraryMatchers } from '@testing-library/jest-dom/matchers';
 
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type */
 declare module 'vitest' {
+    // The type parameters must match Vitest's own `Matchers` declaration exactly for the merge to apply.
     interface Matchers<
         R extends void | Promise<void> = void | Promise<void>,
         T = unknown,
     > extends TestingLibraryMatchers<unknown, R> {}
 }
+/* eslint-enable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-object-type */
