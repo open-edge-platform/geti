@@ -8,7 +8,13 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
-from getitune.backend.huggingface.trainers.utils import remap_log_key, write_metrics_csv
+import pytest
+
+from getitune.backend.huggingface.trainers.utils import (
+    plateau_warmup_lr,
+    remap_log_key,
+    write_metrics_csv,
+)
 
 
 class TestRemapLogKey:
@@ -84,3 +90,19 @@ class TestWriteMetricsCsv:
         assert csv_path.exists()
         with csv_path.open() as fh:
             assert list(csv.DictReader(fh)) == []
+
+
+class TestPlateauWarmupLr:
+    """Manual warmup for plateau schedules (transformers ignores warmup_steps there)."""
+
+    def test_ramps_linearly_over_warmup_steps(self) -> None:
+        assert plateau_warmup_lr(1e-4, optimizer_step=0, warmup_steps=4) == 1e-4 / 4
+        assert plateau_warmup_lr(1e-4, optimizer_step=1, warmup_steps=4) == pytest.approx(2e-4 / 4)
+        assert plateau_warmup_lr(1e-4, optimizer_step=3, warmup_steps=4) == pytest.approx(1e-4)
+
+    def test_returns_base_lr_after_warmup(self) -> None:
+        assert plateau_warmup_lr(1e-4, optimizer_step=4, warmup_steps=4) == 1e-4
+        assert plateau_warmup_lr(1e-4, optimizer_step=500, warmup_steps=4) == 1e-4
+
+    def test_zero_warmup_is_a_noop(self) -> None:
+        assert plateau_warmup_lr(5e-5, optimizer_step=0, warmup_steps=0) == 5e-5

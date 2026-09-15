@@ -27,6 +27,27 @@ def resolve_greater_is_better(monitor: str | None) -> bool:
     return "loss" not in monitor.lower()
 
 
+def plateau_warmup_lr(base_lr: float, optimizer_step: int, warmup_steps: int) -> float:
+    """Linear warmup learning rate for plateau schedulers.
+
+    ``transformers.get_scheduler()`` ignores ``num_warmup_steps`` for
+    ``reduce_lr_on_plateau``, so the trainer ramps the LR itself for the first
+    ``warmup_steps`` optimizer steps and hands control back to the plateau
+    afterwards.
+
+    Args:
+        base_lr: LR configured for training.
+        optimizer_step: Number of completed optimizer steps (0-based).
+        warmup_steps: Ramp length in optimizer steps; ``0`` disables warmup.
+
+    Returns:
+        The learning rate to apply for this step.
+    """
+    if warmup_steps <= 0 or optimizer_step >= warmup_steps:
+        return base_lr
+    return base_lr * (optimizer_step + 1) / warmup_steps
+
+
 def remap_log_key(key: str) -> str:
     """Rename a ``Trainer`` log key to the ``train/`` / ``val/`` convention.
 

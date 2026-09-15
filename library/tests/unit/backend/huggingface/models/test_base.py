@@ -180,6 +180,17 @@ def test_best_confidence_threshold_persisted_in_checkpoint(tmp_path: Path) -> No
     assert reloaded.best_confidence_threshold == pytest.approx(0.2)
 
 
+def test_load_checkpoint_preserves_threshold_when_checkpoint_has_none(tmp_path: Path) -> None:
+    """Checkpoints saved before the F1 sweep must not reset the in-memory threshold."""
+    model = HFMulticlassClsModel(_tiny_vit_config(), _label_info())
+    model.save_pretrained(tmp_path)  # written before any threshold is known
+
+    model._best_confidence_threshold = 0.14
+    model.load_checkpoint(tmp_path)
+
+    assert model.best_confidence_threshold == pytest.approx(0.14)
+
+
 def test_detection_default_metric_includes_fmeasure() -> None:
     from getitune.backend.huggingface.models import HFDetectionModel
     from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasure

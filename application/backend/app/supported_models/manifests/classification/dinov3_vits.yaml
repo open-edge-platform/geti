@@ -19,3 +19,12 @@ hyperparameters:
     weight_decay: 0.0001
     input_size_width: 256
     input_size_height: 256
+    max_epochs: 90
+    batch_size: 64
+    early_stopping:
+      patience: 10
+    scheduler:
+      type: cosine_annealing
+      warmup:
+        enable: true
+        epochs: 10

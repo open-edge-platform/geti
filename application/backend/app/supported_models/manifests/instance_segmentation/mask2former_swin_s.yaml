@@ -18,3 +18,22 @@ hyperparameters:
   training:
     learning_rate: 0.00005
     weight_decay: 0.05
+    input_size_width: 1024
+    input_size_height: 1024
+    max_epochs: 100
+    batch_size: 2
+    early_stopping:
+      patience: 10
+    scheduler:
+      type: reduce_lr_on_plateau
+      factor: 0.1
+      patience: 7
+      warmup:
+        enable: true
+        epochs: 5
+    gradient_clip:
+      enable: true
+      max_grad_norm: 0.1
+    gradient_accumulation:
+      enable: true
+      batches: 2

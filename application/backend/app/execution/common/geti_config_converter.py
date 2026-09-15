@@ -753,6 +753,16 @@ class GetiConfigConverter:
             }
             if (scheduler_type := scheduler.get("type")) is not None:
                 training["lr_scheduler_type"] = scheduler_types.get(scheduler_type, scheduler_type)
+                if scheduler_type == "reduce_lr_on_plateau":
+                    plateau_kwargs = {
+                        key: scheduler[key] for key in ("factor", "patience") if scheduler.get(key) is not None
+                    }
+                    if plateau_kwargs:
+                        training["lr_scheduler_kwargs"] = plateau_kwargs
+                else:
+                    # kwargs left over from a recipe's declared scheduler (e.g. plateau
+                    # mode/factor under a cosine manifest mapping) must not leak.
+                    training.pop("lr_scheduler_kwargs", None)
             warmup = scheduler.get("warmup")
             if warmup is not None:
                 warmup_epochs = warmup.get("epochs", 0) if warmup.get("enable", False) else 0

@@ -17,6 +17,6 @@ training:
   optim: adamw_torch
   weight_decay: 0.05
   lr_scheduler_type: cosine
-  warmup_ratio: 0.1
+  warmup_ratio: 0.11
   max_grad_norm: 1.0
 data: ../../_base_/data/classification.yaml

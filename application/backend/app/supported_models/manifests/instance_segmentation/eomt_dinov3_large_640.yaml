@@ -16,7 +16,22 @@ capabilities:
   tiling: false
 hyperparameters:
   training:
-    learning_rate: 0.00003
+    learning_rate: 0.00005
     weight_decay: 0.05
     input_size_width: 640
     input_size_height: 640
+    max_epochs: 30
+    batch_size: 2
+    early_stopping:
+      patience: 10
+    scheduler:
+      type: cosine_annealing
+      warmup:
+        enable: true
+        epochs: 3
+    gradient_clip:
+      enable: true
+      max_grad_norm: 1.0
+    gradient_accumulation:
+      enable: true
+      batches: 4

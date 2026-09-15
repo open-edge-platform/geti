@@ -459,10 +459,15 @@ class TestTrain:
         fmeasure.best_confidence_threshold = 0.145
         trainer._val_metric = MagicMock()
         trainer._val_metric.FMeasure = fmeasure
+        best_dir = tmp_path / "wd" / "best_checkpoint"
+        best_dir.mkdir(parents=True)  # exercised load_checkpoint path
+        engine._model.load_checkpoint = MagicMock()  # type: ignore[method-assign]
 
         with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
             engine.train(max_epochs=1, batch=2)
 
+        # Extraction runs after load_checkpoint; the pre-sweep checkpoint config
+        # has no persisted threshold, so the in-memory value must survive.
         assert model.best_confidence_threshold == pytest.approx(0.145)
 
     def test_train_keeps_threshold_none_without_fmeasure(self, tmp_path: Path, model: _StubHFModel) -> None:
@@ -514,6 +519,59 @@ class TestTrain:
             metric=default_metric,
             compute_kwargs={"best_confidence_threshold": 0.33},
         )
+
+    def test_train_forwards_hf_recipe_training_args_to_training_arguments(
+        self, tmp_path: Path, model: _StubHFModel
+    ) -> None:
+        """App-level training block (converted recipe hyperparameters) reaches TrainingArguments."""
+        engine = self._engine(tmp_path, model)
+        engine._datamodule.subsets["train"] = MagicMock()  # pyrefly: ignore[missing-attribute]
+        engine._datamodule.subsets["train"].__len__.return_value = 800  # pyrefly: ignore[missing-attribute]
+        kwargs = {
+            "optim": "adamw_torch",
+            "weight_decay": 0.0001,
+            "lr_scheduler_type": "cosine",
+            "max_grad_norm": 0.1,
+            "gradient_accumulation_steps": 4,
+            "warmup_ratio": 0.05,
+        }
+
+        with (
+            patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=self._mock_trainer()),
+            patch("getitune.backend.huggingface.engine.TrainingArguments") as args_cls,
+        ):
+            engine.train(max_epochs=3, batch=1, **kwargs)
+
+        _, call_kwargs = args_cls.call_args
+        assert call_kwargs["optim"] == "adamw_torch"
+        assert call_kwargs["weight_decay"] == pytest.approx(0.0001)
+        assert call_kwargs["lr_scheduler_type"] == "cosine"
+        assert call_kwargs["max_grad_norm"] == pytest.approx(0.1)
+        assert call_kwargs["gradient_accumulation_steps"] == 4
+        # warmup_ratio -> steps: estimated 800 steps/epoch x 3 epochs x 0.05 = 120
+        assert call_kwargs["warmup_steps"] == int(0.05 * (800 // 1) * 3)
+
+    def test_train_injects_plateau_mode_max_for_higher_better_metrics(
+        self, tmp_path: Path, model: _StubHFModel
+    ) -> None:
+        """ReduceLROnPlateau defaults to mode=min; maximized val metrics must get mode=max."""
+        engine = self._engine(tmp_path, model)
+
+        with (
+            patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=self._mock_trainer()),
+            patch("getitune.backend.huggingface.engine.TrainingArguments") as args_cls,
+        ):
+            engine.train(
+                max_epochs=1,
+                batch=2,
+                lr_scheduler_type="reduce_lr_on_plateau",
+                lr_scheduler_kwargs={"factor": 0.1, "patience": 7},
+            )
+
+        call_kwargs = args_cls.call_args.kwargs
+        assert call_kwargs["metric_for_best_model"] == "val/map"
+        scheduler_kwargs = call_kwargs["lr_scheduler_kwargs"]
+        assert scheduler_kwargs == {"factor": 0.1, "patience": 7, "mode": "max"}
 
     def test_train_disables_eval_when_no_val_split(self, tmp_path: Path, model: _StubHFModel) -> None:
         engine = self._engine(tmp_path, model, with_val=False)

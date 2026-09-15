@@ -19,7 +19,7 @@ from getitune.data.augmentation import GPUAugmentationPipeline
 from getitune.data.augmentation.task_keys import DATA_KEYS_BY_TASK
 from getitune.metrics import MetricCallable
 
-from .utils import resolve_greater_is_better
+from .utils import plateau_warmup_lr, resolve_greater_is_better
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
@@ -76,6 +76,8 @@ class GetiTuneHFTrainer(Trainer):
         self._best_eval_metrics: dict[str, float] = {}
         self._train_data_time = 0.0
         self._train_iter_time = 0.0
+        self._plateau_warmup_steps = 0
+        self._plateau_warmup_base_lr = 0.0
         super().__init__(*args, **kwargs)
 
     def get_batch_samples(
@@ -225,7 +227,38 @@ class GetiTuneHFTrainer(Trainer):
         start = perf_counter()
         loss = super().training_step(model, inputs, num_items_in_batch)  # pyrefly: ignore[bad-argument-type]
         self._train_iter_time += perf_counter() - start
+        self._apply_plateau_warmup()
         return loss
+
+    def create_optimizer(self, model: torch.nn.Module | None = None) -> torch.optim.Optimizer:
+        """Create the optimizer and arm manual LR warmup for plateau schedules.
+
+        ``transformers.get_scheduler()`` ignores ``num_warmup_steps`` for
+        ``reduce_lr_on_plateau``, so the ramp is applied manually for the first
+        ``warmup_steps`` optimizer steps (see :meth:`_apply_plateau_warmup`).
+        """
+        optimizer = super().create_optimizer()  # pyrefly: ignore[bad-override]
+        scheduler_type = getattr(self.args.lr_scheduler_type, "value", self.args.lr_scheduler_type)
+        if scheduler_type == "reduce_lr_on_plateau" and self.args.warmup_steps > 0:
+            self._plateau_warmup_steps = int(self.args.warmup_steps)
+            self._plateau_warmup_base_lr = float(self.args.learning_rate)
+        return optimizer
+
+    def _apply_plateau_warmup(self) -> None:
+        """Ramp the LR during plateau warmup, then hand the LR back to the scheduler."""
+        if self._plateau_warmup_steps <= 0 or self.optimizer is None:
+            return
+        step = self.state.global_step
+        if step > self._plateau_warmup_steps:
+            self._plateau_warmup_steps = 0
+            self._set_learning_rate(self._plateau_warmup_base_lr)
+            return
+        self._set_learning_rate(plateau_warmup_lr(self._plateau_warmup_base_lr, step, self._plateau_warmup_steps))
+
+    def _set_learning_rate(self, lr: float) -> None:
+        assert self.optimizer is not None  # noqa: S101 - only called from the training loop
+        for group in self.optimizer.param_groups:
+            group["lr"] = lr
 
     def log(self, logs: dict[str, float], start_time: float | None = None) -> None:
         """Attach timing to optimizer-step logs before storing them."""

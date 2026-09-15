@@ -303,12 +303,14 @@ class HFModel(ABC, nn.Module):
         """Reload weights from a ``save_pretrained()`` directory.
 
         Replaces the wrapped model in place and records the checkpoint so
-        ``best_checkpoint`` reflects it. A persisted best confidence
-        threshold is restored as well.
+        ``best_checkpoint`` reflects it. A persisted best confidence threshold
+        is restored; checkpoints saved before the threshold was computed keep
+        the in-memory value rather than resetting it.
         """
         self.hf_model = self.hf_auto_class.from_pretrained(str(checkpoint))
         threshold = getattr(self.hf_model.config, "getitune_best_confidence_threshold", None)
-        self._best_confidence_threshold = float(threshold) if threshold is not None else None
+        if threshold is not None:
+            self._best_confidence_threshold = float(threshold)
         self._best_checkpoint = Path(checkpoint)
 
     def record_checkpoint(self, checkpoint: PathLike) -> None:

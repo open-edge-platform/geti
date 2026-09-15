@@ -262,6 +262,17 @@ class HFEngine(Engine):
         training_args_kwargs.update(extra_training_args)
         training_args_kwargs.update(kwargs)
 
+        # ReduceLROnPlateau steps the metric from ``metric_for_best_model``, but torch's
+        # default mode is "min" (watched metric must decrease). Our targets (mAP, F1, Dice,
+        # accuracy) are maximized, so inject the mode matching ``greater_is_better`` unless
+        # the caller already set it explicitly.
+        scheduler_kwargs = training_args_kwargs.get("lr_scheduler_kwargs")
+        if isinstance(scheduler_kwargs, dict) and "mode" not in scheduler_kwargs:
+            greater = training_args_kwargs.get(
+                "greater_is_better", resolve_greater_is_better(training_args_kwargs.get("metric_for_best_model"))
+            )
+            training_args_kwargs["lr_scheduler_kwargs"] = {**scheduler_kwargs, "mode": "max" if greater else "min"}
+
         # Convert`warmup_ratio` to the supported `warmup_steps` using the estimated number of training steps.
         warmup_ratio = training_args_kwargs.pop("warmup_ratio", None)
         if warmup_ratio is not None:
@@ -284,7 +295,6 @@ class HFEngine(Engine):
             callbacks=trainer_callbacks,
         )
         trainer.train()
-        self._extract_best_confidence_threshold(trainer)
 
         best_dir = self._work_dir / self._CHECKPOINT_DIR_NAME
         if best_dir.exists():
@@ -292,6 +302,10 @@ class HFEngine(Engine):
         else:
             trainer.save_model(str(best_dir))
         self._model.record_checkpoint(best_dir)
+        # Extract after the checkpoint handling: ``load_checkpoint`` above restores
+        # the F1 threshold from the saved config (mid-training saves predate the
+        # post-training threshold sweep, so extraction must not run before this).
+        self._extract_best_confidence_threshold(trainer)
 
         write_metrics_csv(trainer.state.log_history, self._work_dir)
 

@@ -164,6 +164,11 @@ class RecipeResolver:
             "status": ModelStatus.ACTIVE,
             "default": False,
         },
+        "object-detection-rtdetrv2-r18": {
+            "recipe_path": "detection/rtdetrv2_r18.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
         "object-detection-rtdetrv2-r34": {
             "recipe_path": "detection/rtdetrv2_r34.yaml",
             "status": ModelStatus.ACTIVE,

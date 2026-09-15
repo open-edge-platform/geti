@@ -19,7 +19,11 @@ training:
   patience: 10
   optim: adamw_torch
   weight_decay: 0.05
-  lr_scheduler_type: cosine
+  lr_scheduler_type: reduce_lr_on_plateau
+  lr_scheduler_kwargs:
+    mode: max
+    factor: 0.1
+    patience: 7
   warmup_ratio: 0.05
   max_grad_norm: 0.1
 data: ../_base_/data/instance_segmentation.yaml

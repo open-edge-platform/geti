@@ -289,6 +289,44 @@ class TestGetiConfigConverterConvert:
         assert result["training"]["max_grad_norm"] == 0.0
         assert result["training"]["gradient_accumulation_steps"] == 1
 
+    def test_convert_huggingface_plumbers_plateau_scheduler_kwargs(self) -> None:
+        from getitune.utils import get_getitune_root_path
+
+        recipe_path = get_getitune_root_path() / "recipe" / "detection" / "rtdetrv2_r18.yaml"
+        geti_cfg = _make_geti_config(
+            hyper_parameters={
+                "training": {
+                    "scheduler": {"type": "reduce_lr_on_plateau", "factor": 0.5, "patience": 3},
+                }
+            }
+        )
+
+        with patch.object(RecipeResolver, "resolve", return_value=Path(recipe_path)):
+            result = GetiConfigConverter.convert(geti_cfg)
+
+        assert result["training"]["lr_scheduler_type"] == "reduce_lr_on_plateau"
+        assert result["training"]["lr_scheduler_kwargs"] == {"factor": 0.5, "patience": 3}
+
+    def test_convert_huggingface_maps_cosine_without_plateau_kwargs(self) -> None:
+        from getitune.utils import get_getitune_root_path
+
+        recipe_path = get_getitune_root_path() / "recipe" / "detection" / "rtdetrv2_r18.yaml"
+        geti_cfg = _make_geti_config(
+            hyper_parameters={
+                "training": {
+                    "scheduler": {"type": "cosine_annealing", "factor": 0.5, "patience": 3},
+                }
+            }
+        )
+
+        with patch.object(RecipeResolver, "resolve", return_value=Path(recipe_path)):
+            result = GetiConfigConverter.convert(geti_cfg)
+
+        assert result["training"]["lr_scheduler_type"] == "cosine"
+        assert "lr_scheduler_kwargs" not in result["training"]
+        # recipe-level warmup ratio is preserved untouched by the cosine mapping
+        assert result["training"]["warmup_ratio"] == 0.03
+
     def test_convert_huggingface_adds_missing_tile_config(self) -> None:
         from getitune.utils import get_getitune_root_path
 

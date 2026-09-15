@@ -26,6 +26,7 @@ HF_CLASSIFICATION_RECIPES = {
 }
 
 HF_TASK_RECIPES = {
+    "object-detection-rtdetrv2-r18": "detection/rtdetrv2_r18.yaml",
     "object-detection-rtdetrv2-r34": "detection/rtdetrv2_r34.yaml",
     "object-detection-rtdetrv2-r50": "detection/rtdetrv2_r50.yaml",
     "object-detection-rtdetrv2-r101": "detection/rtdetrv2_r101.yaml",

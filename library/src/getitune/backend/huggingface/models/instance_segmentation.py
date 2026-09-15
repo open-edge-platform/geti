@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 import copy
-import inspect
 from typing import TYPE_CHECKING, Any, ClassVar
 
 import torch
@@ -134,61 +133,65 @@ class HFInstSegModel(HFModel):
         size, for the same reason as detection: ``to_metric_inputs`` then
         only has to reproject the (simpler) ground truth once, instead of
         rescaling every prediction individually.
+
+        Decoded **per query**, identical to the exported runtime path
+        (``forward_for_tracing`` + ModelAPI's ``DETRInstSeg`` decode): one
+        prediction per query with ``mask > 0.5``, label = argmax class
+        (background excluded), and score = top foreground-class probability.
+        The HF ``post_process_instance_segmentation`` merge is intentionally
+        *not* used here: it merges overlapping queries per pixel, which is a
+        semantic that diverges from the per-query ModelAPI decode.
         """
         input_size = (int(batch.images[0].shape[-2]), int(batch.images[0].shape[-1]))
-        postprocess = self._image_processor.post_process_instance_segmentation  # pyrefly: ignore[missing-attribute]
-        if "return_binary_maps" in inspect.signature(postprocess).parameters:
-            decoded = self._image_processor.post_process_instance_segmentation(  # pyrefly: ignore[missing-attribute]
-                outputs,
-                threshold=0.0,
-                target_sizes=[input_size] * len(batch.images),
-                return_binary_maps=True,
-            )
-        else:
-            decoded = self._image_processor.post_process_instance_segmentation(  # pyrefly: ignore[missing-attribute]
-                outputs,
-                threshold=0.0,
-                target_sizes=[input_size] * len(batch.images),
-            )
+        masks_logits = f.interpolate(
+            outputs.masks_queries_logits,  # pyrefly: ignore[missing-attribute]
+            size=input_size,
+            mode="bilinear",
+        )
+        masks_probs = masks_logits.sigmoid()
+        class_probs = outputs.class_queries_logits.softmax(dim=-1)[..., :-1]  # pyrefly: ignore[missing-attribute]
+        scores, labels = class_probs.max(dim=-1)
 
-        bboxes, masks, labels, scores = [], [], [], []
-        for image_result in decoded:
-            segmentation = image_result["segmentation"]
-            segments_info = image_result["segments_info"]
-            if segmentation.ndim == 2:
-                segment_ids = [segment.get("id", index) for index, segment in enumerate(segments_info)]
-                binary_maps = torch.stack(
-                    [segmentation == segment_id for segment_id in segment_ids]  # pyrefly: ignore[bad-argument-type]
+        bboxes, masks, batch_labels, batch_scores = [], [], [], []
+        for image_idx, image_masks in enumerate(masks_probs):
+            per_query_masks, per_query_labels, per_query_scores, per_query_boxes = [], [], [], []
+            for query_idx in range(image_masks.shape[0]):
+                if scores[image_idx, query_idx] <= self._confidence_threshold:
+                    # background query: not a prediction (matches the runtime decode)
+                    continue
+                binary = (image_masks[query_idx] > 0.5).bool()
+                box = _traceable_masks_to_boxes(binary.unsqueeze(0))[0]
+
+                per_query_masks.append(binary.unsqueeze(0))
+                per_query_labels.append(labels[image_idx, query_idx].reshape(1))
+                per_query_scores.append(scores[image_idx, query_idx].reshape(1))
+                per_query_boxes.append(box.reshape(1, 4))
+            if per_query_boxes:
+                bboxes.append(
+                    tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+                        torch.cat(per_query_boxes), format=tv_tensors.BoundingBoxFormat.XYXY, canvas_size=input_size
+                    )
                 )
-                if not segment_ids:
-                    binary_maps = torch.empty((0, *input_size), dtype=torch.bool, device=segmentation.device)
-            elif segmentation.ndim == 3:
-                binary_maps = segmentation.bool()
+                masks.append(tv_tensors.Mask(torch.cat(per_query_masks)))
+                batch_labels.append(torch.cat(per_query_labels).cpu())
+                batch_scores.append(torch.cat(per_query_scores).cpu())
             else:
-                binary_maps = torch.empty((0, *input_size), dtype=torch.bool, device=segmentation.device)
-            device = binary_maps.device
-            bboxes.append(
-                tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
-                    _traceable_masks_to_boxes(binary_maps),
-                    format=tv_tensors.BoundingBoxFormat.XYXY,
-                    canvas_size=input_size,
+                bboxes.append(
+                    tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+                        torch.zeros((0, 4)), format=tv_tensors.BoundingBoxFormat.XYXY, canvas_size=input_size
+                    )
                 )
-            )
-            masks.append(tv_tensors.Mask(binary_maps))
-            labels.append(
-                torch.tensor([segment["label_id"] for segment in segments_info], dtype=torch.long, device=device)
-            )
-            scores.append(
-                torch.tensor([segment["score"] for segment in segments_info], dtype=torch.float32, device=device)
-            )
+                masks.append(tv_tensors.Mask(torch.zeros((0, *input_size), dtype=torch.bool)))
+                batch_labels.append(torch.zeros(0, dtype=torch.long))
+                batch_scores.append(torch.zeros(0, dtype=torch.float32))
 
         return PredictionBatch(
             images=batch.images,
             imgs_info=batch.imgs_info,
             bboxes=bboxes,
             masks=masks,
-            labels=labels,
-            scores=scores,
+            labels=batch_labels,
+            scores=batch_scores,
         )
 
     def to_metric_inputs(self, outputs: ModelOutput, batch: SampleBatch) -> dict[str, Any]:
@@ -275,7 +278,7 @@ class HFInstSegModel(HFModel):
         outputs = self.hf_model(pixel_values=images)
         masks_logits = f.interpolate(outputs.masks_queries_logits, size=input_size, mode="bilinear")
         masks_probs = masks_logits.sigmoid()
-        class_probs = outputs.class_queries_logits.softmax(dim=-1)[..., :-1]
+        class_probs = outputs.class_queries_logits.softmax(dim=-1)[..., :-1]  # pyrefly: ignore[missing-attribute]
         scores, labels = class_probs.max(dim=-1)
 
         batch_size, num_queries = masks_probs.shape[:2]
