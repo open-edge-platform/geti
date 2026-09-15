@@ -3,17 +3,18 @@
 
 import type { TranslateFn } from '@/i18n';
 
+// Generates the first default name that is not taken, comparing rendered names instead of
+// parsing them, so it stays correct in any locale.
 export const generateUniqueProjectName = (existingNames: string[], t: TranslateFn): string => {
-    const usedNumbers: number[] = [];
+    const takenNames = new Set(existingNames);
 
-    existingNames.forEach((name) => {
-        const match = name.match(/^Project #(\d+)$/);
-        if (match) {
-            usedNumbers.push(Number(match[1]));
-        }
-    });
+    let number = 1;
+    let candidate = t('project.create.defaultName', { number });
 
-    const nextNumber = usedNumbers.length === 0 ? 1 : Math.max(...usedNumbers) + 1;
+    while (takenNames.has(candidate)) {
+        number += 1;
+        candidate = t('project.create.defaultName', { number });
+    }
 
-    return t('project.create.defaultName', { number: nextNumber });
+    return candidate;
 };
