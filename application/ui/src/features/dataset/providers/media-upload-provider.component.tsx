@@ -50,7 +50,6 @@ const showInProgressToast = (total: number, succeeded: number, failed: number, o
         type: 'neutral',
         message: <InProgressMessage total={total} detail={buildProgressDetail(succeeded, failed)} />,
         actionButtons: [<ShowDetailsButton key={'show-details'} onPress={openDialog} />],
-        hasCloseButton: true,
         duration: Infinity,
     });
 };
@@ -71,7 +70,6 @@ const showFinalToast = (succeeded: number, failed: number, openDialog: () => voi
         type: 'neutral',
         message: <span style={{ fontSize: UPLOAD_TOAST_FONT_SIZE }}>{text}</span>,
         actionButtons: [<ShowDetailsButton key={'show-details'} onPress={openDialog} />],
-        hasCloseButton: true,
         duration: 5000,
     });
 };
