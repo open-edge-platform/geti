@@ -9,6 +9,8 @@ import { clsx } from 'clsx';
 import { isEmpty } from 'lodash-es';
 import { toast as sonnerToast, Toaster } from 'sonner';
 
+import { isNonEmptyString } from '../../shared/util';
+
 import classes from './toast.module.scss';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info' | 'neutral';
@@ -93,7 +95,7 @@ const parseId = (text: string) => {
 
 export const toast = ({ id, message, actionButtons, type, duration = DEFAULT_TOAST_DURATION }: ToastProps) => {
     // Identical text messages share an id so they replace each other instead of stacking up
-    const toastId = id ?? (typeof message === 'string' ? `id-${parseId(message)}` : undefined);
+    const toastId = id ?? (isNonEmptyString(message) ? `id-${parseId(message)}` : undefined);
 
     return sonnerToast.custom(
         (currentId) => <CustomToast id={currentId} type={type} message={message} actionButtons={actionButtons} />,

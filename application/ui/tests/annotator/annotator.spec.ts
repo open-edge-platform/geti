@@ -9,7 +9,6 @@ import { getMockedVariant } from 'mocks/mock-model-variant';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
-import { FEATURE_FLAGS } from '../../src/constants/feature-flags';
 import { Polygon } from '../../src/shared/types';
 import { http, test } from '../fixtures';
 import { blueLabel, candyBinaryHandler, redLabel } from './annotator-fixtures';
@@ -1317,13 +1316,10 @@ test.describe('Annotator', () => {
                 expect(capturedModelVariantId).toBe(olderModel.variants[0].id);
             });
 
-            // TODO: drop the guard once CONFIDENCE_THRESHOLD is enabled by default
-            if (FEATURE_FLAGS.CONFIDENCE_THRESHOLD) {
-                await test.step('the confidence threshold follows the selected model', async () => {
-                    await expect(page.getByRole('textbox', { name: 'Change Confidence threshold' })).toHaveValue('0.2');
-                    expect(capturedConfidenceThreshold).toBe(0.2);
-                });
-            }
+            await test.step('the confidence threshold follows the selected model', async () => {
+                await expect(page.getByRole('textbox', { name: 'Change Confidence threshold' })).toHaveValue('0.2');
+                expect(capturedConfidenceThreshold).toBe(0.2);
+            });
         });
 
         test('changing device selection uses the new device for predictions', async ({
