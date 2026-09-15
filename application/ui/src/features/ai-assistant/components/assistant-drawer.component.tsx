@@ -7,6 +7,7 @@ import { ActionButton, Content, Flex, Heading, InlineAlert, Text, Tooltip, Toolt
 import { Close, Delete, Gear } from '@geti-ui/ui/icons';
 
 import { MAX_ATTACHMENTS } from '../config';
+import { useAiConnection } from '../connection';
 import { useAssistantContext } from '../context/use-assistant-context';
 import { useConnectionStatus } from '../hooks/use-connection-status';
 import { loadMediaAttachment, type MediaAttachmentSource } from '../media-attachment';
@@ -30,6 +31,7 @@ interface AssistantDrawerProps {
 export const AssistantDrawer = ({ projectId, attachmentSources, onClose }: AssistantDrawerProps) => {
     const context = useAssistantContext(projectId);
     const status = useConnectionStatus();
+    const { provider, model } = useAiConnection();
     const {
         messages,
         status: chatStatus,
@@ -45,10 +47,11 @@ export const AssistantDrawer = ({ projectId, attachmentSources, onClose }: Assis
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     // An unusable connection is the one thing the user must fix first, so the
-    // settings open themselves instead of hiding behind the gear.
+    // settings open themselves instead of hiding behind the gear -- and fold
+    // away again the moment the connection starts working.
     useEffect(() => {
-        if (!status.isLoading && !status.isReady) {
-            setIsSettingsOpen(true);
+        if (!status.isLoading) {
+            setIsSettingsOpen(!status.isReady);
         }
     }, [status.isLoading, status.isReady]);
 
@@ -85,15 +88,32 @@ export const AssistantDrawer = ({ projectId, attachmentSources, onClose }: Assis
         setAttachments([]);
     };
 
+    const providerLabel = provider === 'api' ? 'OpenAI API key' : 'ChatGPT app';
+    const connectionLabel = status.isLoading
+        ? 'Checking connection…'
+        : status.isReady
+          ? `${providerLabel} · ${model === '' ? 'account default' : model}`
+          : 'Not connected';
+
     return (
         <>
             <div className={classes.overlay} onClick={onClose} aria-hidden />
 
             <aside className={classes.drawer} aria-label={'Annotate with ChatGPT'}>
                 <Flex UNSAFE_className={classes.header} alignItems={'center'} justifyContent={'space-between'}>
-                    <Heading level={3} margin={0}>
-                        Annotate with ChatGPT
-                    </Heading>
+                    <Flex direction={'column'} gap={'size-25'}>
+                        <Heading level={3} margin={0}>
+                            Annotate with ChatGPT
+                        </Heading>
+
+                        <span
+                            className={[classes.providerState, status.isReady ? classes.providerStateConnected : '']
+                                .join(' ')
+                                .trim()}
+                        >
+                            {connectionLabel}
+                        </span>
+                    </Flex>
 
                     <Flex alignItems={'center'} gap={'size-50'}>
                         <TooltipTrigger placement={'bottom'}>

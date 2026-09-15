@@ -75,41 +75,165 @@ fn output_schema() -> Value {
     })
 }
 
-/// GUI launches do not inherit the terminal's `PATH`, so look in the places the
-/// official installers use before falling back to a bare command name. The
-/// explicit executable setting stays available for portable installs.
-fn default_binary() -> PathBuf {
+/// Every place an official installer may leave the Codex CLI, in the order they
+/// are tried. GUI launches do not reliably inherit the terminal's `PATH`, so
+/// the well-known locations are probed before falling back to a bare command
+/// name; the explicit executable setting always wins over all of them.
+fn candidate_binaries() -> Vec<PathBuf> {
+    let mut candidates: Vec<PathBuf> = Vec::new();
+
     #[cfg(windows)]
-    if let Some(local) = std::env::var_os("LOCALAPPDATA") {
-        let directory = PathBuf::from(local).join("OpenAI").join("Codex").join("bin");
-        if let Ok(entries) = std::fs::read_dir(directory) {
-            let mut binaries: Vec<PathBuf> = entries
-                .flatten()
-                .map(|entry| entry.path().join("codex.exe"))
-                .filter(|path| path.is_file())
-                .collect();
-            binaries.sort_by_key(|path| path.metadata().and_then(|info| info.modified()).ok());
-            if let Some(binary) = binaries.pop() {
-                return binary;
+    {
+        // `%LOCALAPPDATA%\OpenAI\Codex\bin\<version>\codex.exe` - the ChatGPT
+        // app installer keeps one directory per version, so take the newest.
+        if let Some(local) = std::env::var_os("LOCALAPPDATA") {
+            let local = PathBuf::from(local);
+            let versioned = local.join("OpenAI").join("Codex").join("bin");
+
+            if let Ok(entries) = std::fs::read_dir(&versioned) {
+                let mut binaries: Vec<PathBuf> = entries
+                    .flatten()
+                    .map(|entry| entry.path().join("codex.exe"))
+                    .filter(|path| path.is_file())
+                    .collect();
+
+                binaries.sort_by_key(|path| path.metadata().and_then(|info| info.modified()).ok());
+                candidates.extend(binaries.into_iter().rev());
             }
+
+            candidates.push(versioned.join("codex.exe"));
+            candidates.push(local.join("OpenAI").join("Codex").join("codex.exe"));
+            candidates.push(local.join("Programs").join("ChatGPT").join("codex.exe"));
+            candidates.push(
+                local
+                    .join("Programs")
+                    .join("ChatGPT")
+                    .join("resources")
+                    .join("codex.exe"),
+            );
+            candidates.push(local.join("Programs").join("Codex").join("codex.exe"));
+            // winget and Microsoft Store packages expose a shim here.
+            candidates.push(
+                local
+                    .join("Microsoft")
+                    .join("WinGet")
+                    .join("Links")
+                    .join("codex.exe"),
+            );
+        }
+
+        // `npm i -g @openai/codex` only writes shims; the `.cmd` one is what a
+        // shell resolves, and it needs `cmd.exe` to run.
+        if let Some(appdata) = std::env::var_os("APPDATA") {
+            let npm = PathBuf::from(appdata).join("npm");
+            candidates.push(npm.join("codex.exe"));
+            candidates.push(npm.join("codex.cmd"));
+        }
+
+        if let Some(files) = std::env::var_os("ProgramFiles") {
+            let files = PathBuf::from(files);
+            candidates.push(files.join("ChatGPT").join("codex.exe"));
+            candidates.push(files.join("Codex").join("codex.exe"));
+            candidates.push(files.join("nodejs").join("codex.cmd"));
+        }
+
+        if let Some(home) = home_dir() {
+            candidates.push(home.join(".codex").join("bin").join("codex.exe"));
+            candidates.push(home.join(".cargo").join("bin").join("codex.exe"));
+            candidates.push(home.join("scoop").join("shims").join("codex.exe"));
+            candidates.push(home.join("scoop").join("shims").join("codex.cmd"));
+            candidates.push(home.join(".bun").join("bin").join("codex.exe"));
         }
     }
 
     #[cfg(target_os = "macos")]
-    for location in [
-        "/Applications/Codex.app/Contents/Resources/codex",
-        "/Applications/ChatGPT.app/Contents/Resources/codex",
-        "/opt/homebrew/bin/codex",
-        "/usr/local/bin/codex",
-    ] {
-        let binary = PathBuf::from(location);
-        if binary.is_file() {
-            return binary;
-        }
+    {
+        candidates.push(PathBuf::from(
+            "/Applications/ChatGPT.app/Contents/Resources/codex",
+        ));
+        candidates.push(PathBuf::from(
+            "/Applications/Codex.app/Contents/Resources/codex",
+        ));
+        candidates.push(PathBuf::from("/opt/homebrew/bin/codex"));
+        candidates.push(PathBuf::from("/usr/local/bin/codex"));
     }
 
-    PathBuf::from(if cfg!(windows) { "codex.exe" } else { "codex" })
+    #[cfg(unix)]
+    if let Some(home) = home_dir() {
+        candidates.push(home.join(".codex").join("bin").join("codex"));
+        candidates.push(home.join(".cargo").join("bin").join("codex"));
+        candidates.push(home.join(".local").join("bin").join("codex"));
+        candidates.push(home.join(".bun").join("bin").join("codex"));
+        candidates.push(home.join(".npm-global").join("bin").join("codex"));
+    }
+
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        candidates.push(PathBuf::from("/usr/local/bin/codex"));
+        candidates.push(PathBuf::from("/usr/bin/codex"));
+        candidates.push(PathBuf::from("/snap/bin/codex"));
+    }
+
+    candidates
 }
+
+fn home_dir() -> Option<PathBuf> {
+    std::env::var_os(if cfg!(windows) { "USERPROFILE" } else { "HOME" }).map(PathBuf::from)
+}
+
+/// Picks the first existing candidate, or `None` when only a bare `PATH`
+/// lookup is left to try.
+fn discover_binary() -> Option<PathBuf> {
+    candidate_binaries().into_iter().find(|path| path.is_file())
+}
+
+fn default_binary() -> PathBuf {
+    discover_binary().unwrap_or_else(|| PathBuf::from(if cfg!(windows) { "codex.exe" } else { "codex" }))
+}
+
+fn is_batch_shim(binary: &std::path::Path) -> bool {
+    binary
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .is_some_and(|extension| extension.eq_ignore_ascii_case("cmd") || extension.eq_ignore_ascii_case("bat"))
+}
+
+/// Names a couple of the places that were checked, so the user can tell an
+/// unusual install location apart from a missing install.
+fn not_found_message() -> String {
+    let searched: Vec<String> = candidate_binaries()
+        .iter()
+        .filter_map(|path| path.parent().map(|parent| parent.to_string_lossy().into_owned()))
+        .take(4)
+        .collect();
+
+    format!(
+        "Codex was not found. Install the ChatGPT/Codex app or run `npm i -g @openai/codex`, \
+         or set the executable path in the settings. Looked in: {}.",
+        searched.join(", ")
+    )
+}
+
+/// Reports where Codex was found, and everywhere that was looked at, so the
+/// settings can tell the user exactly what to fix.
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CodexLocation {
+    path: Option<String>,
+    searched: Vec<String>,
+}
+
+#[tauri::command]
+pub fn codex_locate() -> CodexLocation {
+    CodexLocation {
+        path: discover_binary().map(|path| path.to_string_lossy().into_owned()),
+        searched: candidate_binaries()
+            .iter()
+            .map(|path| path.to_string_lossy().into_owned())
+            .collect(),
+    }
+}
+
 
 async fn send(stdin: &mut ChildStdin, value: Value) -> Result<(), String> {
     stdin
@@ -229,7 +353,16 @@ async fn run(
         None => default_binary(),
     };
 
-    let mut command = Command::new(binary);
+    let mut command = if is_batch_shim(&binary) {
+        // `CreateProcess` cannot execute a `.cmd`, which is all that
+        // `npm i -g @openai/codex` installs on Windows.
+        let mut command = Command::new("cmd.exe");
+        command.arg("/C").arg(&binary);
+        command
+    } else {
+        Command::new(&binary)
+    };
+
     command
         .args([
             "app-server",
@@ -266,13 +399,11 @@ async fn run(
     command.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
 
     let mut child = command.spawn().map_err(|error| match error.kind() {
-        std::io::ErrorKind::NotFound => {
-            "Codex was not found. Install the ChatGPT/Codex app, or enter the path to its executable."
-        }
+        std::io::ErrorKind::NotFound => not_found_message(),
         std::io::ErrorKind::PermissionDenied => {
-            "Permission to run Codex was denied. Check the executable permissions."
+            "Permission to run Codex was denied. Check the executable permissions.".to_string()
         }
-        _ => "Codex could not start. Check that the executable is compatible with this system.",
+        _ => "Codex could not start. Check that the executable is compatible with this system.".to_string(),
     })?;
 
     let mut stdin = child.stdin.take().ok_or("ChatGPT input unavailable.")?;

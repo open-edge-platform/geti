@@ -11,8 +11,6 @@ import {
     InlineAlert,
     Item,
     Picker,
-    Radio,
-    RadioGroup,
     Text,
     TextField,
 } from '@geti-ui/ui';
@@ -205,20 +203,62 @@ const ChatGptSettings = ({ status }: { status: ConnectionStatus }) => {
     );
 };
 
+interface ProviderCardProps {
+    title: string;
+    hint: string;
+    isSelected: boolean;
+    isConnected: boolean;
+    onSelect: () => void;
+}
+
+const ProviderCard = ({ title, hint, isSelected, isConnected, onSelect }: ProviderCardProps) => (
+    <button
+        type={'button'}
+        aria-pressed={isSelected}
+        className={[classes.providerCard, isSelected ? classes.providerCardSelected : ''].join(' ').trim()}
+        onClick={onSelect}
+    >
+        <span className={classes.providerTitle}>{title}</span>
+        <span className={classes.providerHint}>{hint}</span>
+        <span
+            className={[
+                classes.providerState,
+                classes.providerStateCard,
+                isConnected ? classes.providerStateConnected : '',
+            ]
+                .join(' ')
+                .trim()}
+        >
+            {isConnected ? 'Connected' : 'Not connected'}
+        </span>
+    </button>
+);
+
 export const ConnectionSettings = ({ status }: { status: ConnectionStatus }) => {
     const { provider } = useAiConnection();
 
     return (
         <Flex direction={'column'} gap={'size-200'} UNSAFE_className={classes.settings}>
-            <RadioGroup
-                label={'Connect through'}
-                orientation={'horizontal'}
-                value={provider}
-                onChange={(value: string) => setAiProvider(value === 'chatgpt' ? 'chatgpt' : 'api')}
-            >
-                <Radio value={'api'}>OpenAI API key</Radio>
-                <Radio value={'chatgpt'}>ChatGPT app</Radio>
-            </RadioGroup>
+            <Flex direction={'column'} gap={'size-100'}>
+                <Text UNSAFE_className={classes.settingsLabel}>Connect through</Text>
+
+                <div className={classes.providerChoice}>
+                    <ProviderCard
+                        title={'OpenAI API key'}
+                        hint={'Billed per request'}
+                        isSelected={provider === 'api'}
+                        isConnected={status.hasKey}
+                        onSelect={() => setAiProvider('api')}
+                    />
+                    <ProviderCard
+                        title={'ChatGPT app'}
+                        hint={'Uses your subscription'}
+                        isSelected={provider === 'chatgpt'}
+                        isConnected={status.account !== null}
+                        onSelect={() => setAiProvider('chatgpt')}
+                    />
+                </div>
+            </Flex>
 
             {provider === 'api' ? <ApiKeySettings status={status} /> : <ChatGptSettings status={status} />}
 

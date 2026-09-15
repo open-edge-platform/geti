@@ -517,6 +517,7 @@ fn main() {
             assistant::openai::openai_cancel,
             assistant::codex::codex_operation,
             assistant::codex::codex_cancel,
+            assistant::codex::codex_locate,
         ])
         .build(tauri::generate_context!())
         .expect("error building Tauri");

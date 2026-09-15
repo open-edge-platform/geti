@@ -52,6 +52,83 @@
     background-color: var(--spectrum-global-color-gray-100);
 }
 
+.settingsLabel {
+    color: var(--spectrum-global-color-gray-700);
+    font-size: var(--spectrum-global-dimension-font-size-75);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.providerChoice {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spectrum-global-dimension-size-100);
+}
+
+.providerCard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spectrum-global-dimension-size-50);
+    padding: var(--spectrum-global-dimension-size-150);
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    color: var(--spectrum-global-color-gray-800);
+    background-color: var(--spectrum-global-color-gray-75);
+    border: 1px solid var(--spectrum-global-color-gray-400);
+    border-radius: var(--spectrum-alias-border-radius-regular);
+
+    &:hover {
+        background-color: var(--spectrum-global-color-gray-200);
+        border-color: var(--spectrum-global-color-gray-500);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--spectrum-global-color-blue-600);
+        outline-offset: 1px;
+    }
+}
+
+.providerCardSelected {
+    background-color: var(--spectrum-global-color-gray-200);
+    border-color: var(--spectrum-global-color-blue-600);
+    box-shadow: inset 0 0 0 1px var(--spectrum-global-color-blue-600);
+}
+
+.providerTitle {
+    font-weight: 700;
+}
+
+.providerHint {
+    color: var(--spectrum-global-color-gray-700);
+    font-size: var(--spectrum-global-dimension-font-size-75);
+}
+
+.providerState {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spectrum-global-dimension-size-75);
+    font-size: var(--spectrum-global-dimension-font-size-75);
+    color: var(--spectrum-global-color-gray-700);
+
+    &::before {
+        content: '';
+        flex: 0 0 auto;
+        width: var(--spectrum-global-dimension-size-100);
+        height: var(--spectrum-global-dimension-size-100);
+        border-radius: 50%;
+        background-color: var(--spectrum-global-color-gray-500);
+    }
+}
+
+.providerStateConnected::before {
+    background-color: var(--spectrum-global-color-green-600);
+}
+
+.providerStateCard {
+    margin-top: var(--spectrum-global-dimension-size-50);
+}
+
 .userMessage {
     align-self: flex-end;
     max-width: 85%;

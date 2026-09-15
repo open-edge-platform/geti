@@ -18,9 +18,13 @@ export interface ConnectionStatus {
     refresh: () => void;
 }
 
+const describe = (reason: unknown): string =>
+    reason instanceof Error ? reason.message : 'Could not check the connection.';
+
 /**
  * Resolves whether the selected provider is usable: an API key present in the
- * credential store, or a signed-in ChatGPT account.
+ * credential store, or a signed-in ChatGPT account. Both providers are probed
+ * so the settings can show, at a glance, which one is already connected.
  */
 export const useConnectionStatus = (): ConnectionStatus => {
     const { provider } = useAiConnection();
@@ -39,35 +43,21 @@ export const useConnectionStatus = (): ConnectionStatus => {
         setIsLoading(true);
         setError(null);
 
-        const resolve = async () => {
-            if (provider === 'api') {
-                const stored = await hasStoredKey();
-
-                if (isCurrent) {
-                    setHasKey(stored);
-                }
-
+        void Promise.allSettled([hasStoredKey(), codexStatus()]).then(([key, codex]) => {
+            if (!isCurrent) {
                 return;
             }
 
-            const signedIn = await codexStatus();
+            setHasKey(key.status === 'fulfilled' && key.value);
+            setAccount(codex.status === 'fulfilled' ? codex.value : null);
 
-            if (isCurrent) {
-                setAccount(signedIn);
-            }
-        };
+            // Only the provider in use may raise an error; a failed probe of the
+            // other one simply reads as "not connected".
+            const selected = provider === 'api' ? key : codex;
 
-        void resolve()
-            .catch((reason: unknown) => {
-                if (isCurrent) {
-                    setError(reason instanceof Error ? reason.message : 'Could not check the connection.');
-                }
-            })
-            .finally(() => {
-                if (isCurrent) {
-                    setIsLoading(false);
-                }
-            });
+            setError(selected.status === 'rejected' ? describe(selected.reason) : null);
+            setIsLoading(false);
+        });
 
         return () => {
             isCurrent = false;
