@@ -3,7 +3,7 @@
 
 import { Trans, useTranslation } from '@/i18n';
 import { Button, Flex, Text } from '@geti-ui/ui';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { ReactComponent as EmptyFolderImage } from '../../../../assets/empty-folder.svg';
 import { paths } from '../../../../constants/paths';

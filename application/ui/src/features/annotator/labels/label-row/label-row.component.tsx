@@ -9,8 +9,8 @@ import { LabelColorPicker } from '@/components/label-fields/label-color-picker.c
 import { SilentCheckbox } from '@/components/label-fields/silent-checkbox.component';
 import { ActionButton, Flex, Grid, TextField, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Delete, Pin, Unpin } from '@geti-ui/ui/icons';
+import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 
-import { useDebounce } from '../../../../hooks/use-debounce.hook';
 import { isNonEmptyString } from '../../../../shared/util';
 
 import classes from './label-row.module.scss';
@@ -70,13 +70,12 @@ export const LabelRow = ({
         onUpdate(label.id, { name: name.trim(), color, hotkey: trimmedHotkey });
     };
 
-    const debouncedUpdate = useDebounce(
-        (newColor: string, currentName: string) => {
-            onUpdate(label.id, { name: currentName, color: newColor, hotkey: trimmedHotkey });
-        },
-        COLOR_DEBOUNCE_MS,
-        [onUpdate, label.id, hotkey]
-    );
+    // useEventCallback keeps the identity stable so the debounce survives the re-render each colour change triggers
+    const updateColor = useEventCallback((newColor: string, currentName: string) => {
+        onUpdate(label.id, { name: currentName, color: newColor, hotkey: trimmedHotkey });
+    });
+
+    const debouncedUpdate = useDebounceCallback(updateColor, COLOR_DEBOUNCE_MS);
 
     const handleColorChange = (newColor: string) => {
         setColor(newColor);

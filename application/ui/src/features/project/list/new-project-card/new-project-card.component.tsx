@@ -4,7 +4,7 @@
 import { useTranslation } from '@/i18n';
 import { ActionButton, Flex, Text } from '@geti-ui/ui';
 import { AddCircle } from '@geti-ui/ui/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { paths } from '../../../../constants/paths';
 import { useImportDatasetDialog } from '../../providers/import-dataset-dialog-provider.component';

@@ -54,6 +54,7 @@ try:
         UltralyticsMultiClassClsModel,
         UltralyticsMultiLabelClsModel,
         UltralyticsSemanticSegModel,
+        UltralyticsYoloDetrModel,
     )
 except ImportError:
     UltralyticsDetectionModel = None  # type: ignore[assignment]
@@ -61,6 +62,7 @@ except ImportError:
     UltralyticsMultiClassClsModel = None  # type: ignore[assignment]
     UltralyticsMultiLabelClsModel = None  # type: ignore[assignment]
     UltralyticsSemanticSegModel = None  # type: ignore[assignment]
+    UltralyticsYoloDetrModel = None  # type: ignore[assignment]
 
 __all__ = [
     "ATSS",
@@ -110,5 +112,6 @@ if UltralyticsDetectionModel is not None:
             "UltralyticsMultiClassClsModel",
             "UltralyticsMultiLabelClsModel",
             "UltralyticsSemanticSegModel",
+            "UltralyticsYoloDetrModel",
         ]
     )
