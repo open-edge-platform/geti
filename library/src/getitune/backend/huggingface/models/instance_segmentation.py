@@ -115,6 +115,11 @@ class HFInstSegModel(HFModel):
             label_info=label_info,
         )
 
+    @property
+    def default_confidence_threshold(self) -> float:
+        """Threshold used when validation did not compute an F1 optimum."""
+        return self._confidence_threshold
+
     def build_targets(self, batch: SampleBatch) -> dict[str, Any]:
         """Convert Geti's uint8 instance masks and labels to MaskFormer's targets (G9)."""
         if batch.masks is None or batch.labels is None:

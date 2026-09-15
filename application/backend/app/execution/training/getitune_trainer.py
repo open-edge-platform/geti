@@ -458,8 +458,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         getitune_device_type = (
             GetiTuneDeviceType.gpu if device.type is DeviceType.CUDA else GetiTuneDeviceType(device.type)
         )
-        class_path = model_cfg.get("class_path", "")
-        engine_cls = engine_class_for_backend(training_config.get("backend"), class_path)
+        engine_cls = engine_class_for_backend(training_config.get("backend"))
         is_huggingface = engine_cls.backend_name == "huggingface"
         is_ultralytics = engine_cls.backend_name == "ultralytics"
         engine_kwargs: dict[str, Any] = {

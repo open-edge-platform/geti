@@ -194,11 +194,24 @@ class BaseWeightsService:
             return local_path
 
         self._configure_huggingface_environment()
-        info = huggingface_hub.model_info(
-            pretrained_weights.repo_id,
-            revision=pretrained_weights.revision,
-            files_metadata=True,
-        )
+        try:
+            info = huggingface_hub.model_info(
+                pretrained_weights.repo_id,
+                revision=pretrained_weights.revision,
+                files_metadata=True,
+            )
+        except Exception as error:
+            # Metadata is only used for a disk-space estimate. Do not prevent
+            # snapshot_download from handling a valid request when the Hub
+            # metadata endpoint is unavailable due to DNS, proxy, auth, or a
+            # transient service failure.
+            logger.warning(
+                "Could not retrieve Hugging Face metadata for {}: {}. "
+                "Using conservative disk-space estimate.",
+                pretrained_weights.repo_id,
+                error,
+            )
+            info = None
         self._check_huggingface_disk_space(info)
         logger.info("Downloading Hugging Face snapshot for {}", model_manifest_id)
 

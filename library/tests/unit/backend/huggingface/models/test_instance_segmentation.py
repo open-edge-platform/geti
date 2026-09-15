@@ -8,6 +8,7 @@ from __future__ import annotations
 import math
 from pathlib import Path
 
+import pytest
 import torch
 import transformers as tf
 from torchvision import tv_tensors
@@ -54,6 +55,12 @@ def test_export_parameters_shift_labels() -> None:
     assert params.label_info.label_names[1:] == _LABEL_NAMES
     # the shift must not leak back into the model's own label_info
     assert model.label_info.label_names == _LABEL_NAMES
+
+
+def test_default_confidence_threshold_matches_export_default() -> None:
+    model = HFInstSegModel(_tiny_config(), _label_info())
+
+    assert model.default_confidence_threshold == pytest.approx(0.05)
 
 
 class TestBuildTargets:

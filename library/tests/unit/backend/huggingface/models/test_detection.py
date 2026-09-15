@@ -71,6 +71,12 @@ def test_export_parameters_embed_computed_best_confidence_threshold() -> None:
     assert model._export_parameters.confidence_threshold == pytest.approx(0.25)
 
 
+def test_default_confidence_threshold_matches_export_default() -> None:
+    model = HFDetectionModel(_tiny_config(), _label_info())
+
+    assert model.default_confidence_threshold == pytest.approx(0.25)
+
+
 def test_default_metric_includes_fmeasure() -> None:
     from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasure
 

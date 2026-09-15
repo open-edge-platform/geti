@@ -465,7 +465,7 @@ class GetiTuneHFTrainer(Trainer):
             fmeasure = metric_obj
         if fmeasure is None:
             return
-        threshold = fmeasure._best_confidence_threshold  # noqa: SLF001
+        threshold = fmeasure._current_confidence_threshold  # noqa: SLF001
         if threshold is not None:
             self.model_wrapper.best_confidence_threshold = float(threshold)
 

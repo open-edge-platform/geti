@@ -458,7 +458,7 @@ class TestTrain:
         fmeasure = MagicMock()
         # The engine reads the backing attribute (the property raises while
         # the sweep has not computed) — set the same field here.
-        fmeasure._best_confidence_threshold = 0.145
+        fmeasure._current_confidence_threshold = 0.145
         trainer._val_metric = MagicMock()
         trainer._val_metric.FMeasure = fmeasure
         best_dir = tmp_path / "wd" / "best_checkpoint"
@@ -488,7 +488,7 @@ class TestTrain:
         engine = self._engine(tmp_path, model)
         trainer = self._mock_trainer()
         fmeasure = MagicMock()
-        fmeasure._best_confidence_threshold = None
+        fmeasure._current_confidence_threshold = None
         trainer._val_metric = MagicMock()
         trainer._val_metric.FMeasure = fmeasure
         # Without a saved best checkpoint (no load path) the extraction is the

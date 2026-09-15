@@ -392,7 +392,7 @@ class HFEngine(Engine):
         # property raises ``RuntimeError`` instead of returning ``None`` while
         # the metric has never computed (e.g. training without a validation
         # metric), which would abort an otherwise completed run.
-        threshold = fmeasure._best_confidence_threshold  # noqa: SLF001
+        threshold = fmeasure._current_confidence_threshold  # noqa: SLF001
         if threshold is None:
             return
         self._model.best_confidence_threshold = float(threshold)
@@ -417,8 +417,8 @@ class HFEngine(Engine):
         Args:
             confidence_threshold: Minimum score for a detection / instance
                 segmentation prediction to be kept. Defaults to the best
-                confidence threshold computed by validation F-measure (or
-                ``0.25`` when not available). Not applied to classification
+                confidence threshold computed by validation F-measure (or the
+                model's configured default when not available). Not applied to classification
                 (whose scores are per-class probabilities, not a filtering
                 signal) or semantic segmentation (which has no per-prediction
                 score at all).
@@ -443,7 +443,9 @@ class HFEngine(Engine):
 
         if confidence_threshold is None:
             confidence_threshold = (
-                self._model.best_confidence_threshold if self._model.best_confidence_threshold is not None else 0.25
+                self._model.best_confidence_threshold
+                if self._model.best_confidence_threshold is not None
+                else self._model.default_confidence_threshold
             )
 
         trainer = self._build_test_scoped_trainer("predict", batch, kwargs)

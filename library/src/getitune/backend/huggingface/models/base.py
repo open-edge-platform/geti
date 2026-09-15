@@ -345,6 +345,11 @@ class HFModel(ABC, nn.Module):
         """
         return self._best_confidence_threshold
 
+    @property
+    def default_confidence_threshold(self) -> float:
+        """Default threshold used when validation did not compute one."""
+        return 0.25
+
     @best_confidence_threshold.setter
     def best_confidence_threshold(self, value: float | None) -> None:
         self._best_confidence_threshold = value

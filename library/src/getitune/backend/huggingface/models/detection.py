@@ -81,6 +81,11 @@ class HFDetectionModel(HFModel):
         )
 
     @property
+    def default_confidence_threshold(self) -> float:
+        """Threshold used when validation did not compute an F1 optimum."""
+        return self._confidence_threshold
+
+    @property
     def _default_preprocessing_params(self) -> dict[str, DataInputParams]:
         """Known-checkpoint preprocessing defaults for detection recipes."""
         return {

@@ -48,45 +48,22 @@ def backend_engines() -> dict[str, type[Engine]]:
     return engines
 
 
-def resolve_backend(backend: str | None = None, class_path: str = "") -> str:
-    """Resolve the effective backend of a converted training config / recipe.
-
-    Args:
-        backend: ``backend`` field value, when the recipe declares one
-            (``'huggingface'``/``'ultralytics'``). ``None`` for Lightning
-            recipes, which omit the field by convention.
-        class_path: Model ``class_path`` used only as a fallback when *backend*
-            is unset and the torch training code paths may route to
-            Ultralytics despite the missing ``backend`` field.
-
-    Returns:
-        One of ``'lightning'`` | ``'ultralytics'`` | ``'huggingface'``.
-    """
-    if backend:
-        return backend
-    return "ultralytics" if "ultralytics" in class_path else "lightning"
-
-
-def engine_class_for_backend(backend: str | None, class_path: str = "") -> type[Engine]:
-    """Look up the engine class bound to a training config's backend.
+def engine_class_for_backend(backend: str | None) -> type[Engine]:
+    """Look up the engine class for a training config's ``backend`` field.
 
     Args:
         backend: ``backend`` value from the (converted) training config, or
-            ``None`` when absent (Lightning recipes).
-        class_path: Optional model class path used as a backend sniff
-            fallback for recipes that predate the ``backend`` field.
+            ``None`` when absent (Lightning recipes omit the field).
 
     Returns:
-        The engine class matching the resolved backend.
+        The engine class matching the backend.
 
     Raises:
-        ValueError: If the backend is unknown in the phrase dictionary.
+        ValueError: If the backend is unknown or has no installed engine.
     """
-    engines = backend_engines()
-    name = resolve_backend(backend, class_path)
-    engine_cls = engines.get(name)
+    engine_cls = backend_engines().get(backend or "lightning")
     if engine_cls is None:
-        msg = f"Unknown backend '{name}'. Known backends: {sorted(engines)}"
+        msg = f"Unknown backend '{backend}'. Known backends: {sorted(backend_engines())}"
         raise ValueError(msg)
     return engine_cls
 
@@ -208,21 +185,7 @@ def create_engine(
         ValueError: If a model name is ambiguous, the backend is unknown,
             or no engine supports the given model/data pair.
     """
-    from getitune.backend.huggingface.engine import HFEngine
-    from getitune.backend.lightning.engine import LightningEngine
-    from getitune.backend.openvino.engine import OVEngine
-
-    backend_to_engine: dict[str, type[Engine]] = {
-        "lightning": LightningEngine,
-        "openvino": OVEngine,
-        "huggingface": HFEngine,
-    }
-    try:
-        from getitune.backend.ultralytics.engine import UltralyticsEngine
-
-        backend_to_engine["ultralytics"] = UltralyticsEngine
-    except ImportError:
-        pass
+    backend_to_engine = backend_engines()
 
     # All known engine classes for the instance/path dispatch path,
     # including any dynamically registered custom subclasses.
