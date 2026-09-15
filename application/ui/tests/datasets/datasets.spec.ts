@@ -11,7 +11,6 @@ import { getMockedLabel } from 'mocks/mock-labels';
 import { getMockedMediaImage, getMockedVideo, getMultipleMockedMediaImage } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
-import { v4 as uuid } from 'uuid';
 
 import { expect, http, test } from '../fixtures';
 
@@ -120,7 +119,7 @@ test.describe('Dataset', () => {
                 // Small delay to test the "in progress" toast or else we would only see start and finish toasts
                 await new Promise((resolve) => setTimeout(resolve, isLastUploadRequest ? 250 : 30));
 
-                return HttpResponse.json(getMockedMediaImage({ id: uuid() }), {
+                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), {
                     status: 201,
                 });
             })
@@ -151,7 +150,9 @@ test.describe('Dataset', () => {
 
         network.use(
             http.post('/api/projects/{project_id}/dataset/media', async () => {
-                return HttpResponse.json(getMockedMediaImage({ id: uuid() }), { status: 201 });
+                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), {
+                    status: 201,
+                });
             })
         );
 
@@ -178,8 +179,11 @@ test.describe('Dataset', () => {
     });
 
     test.describe('Bulk labelling while uploading media items', () => {
-        const mockedImages = [getMockedMediaImage({ id: uuid() }), getMockedMediaImage({ id: uuid() })];
-        const mockedVideo = getMockedVideo({ id: uuid() });
+        const mockedImages = [
+            getMockedMediaImage({ id: crypto.randomUUID() }),
+            getMockedMediaImage({ id: crypto.randomUUID() }),
+        ];
+        const mockedVideo = getMockedVideo({ id: crypto.randomUUID() });
         const mockedMedia = [...mockedImages, mockedVideo];
         const mockedLabels = [
             getMockedLabel({
@@ -418,10 +422,10 @@ test.describe('Dataset', () => {
 
     test.describe('Bulk labelling for selected images', () => {
         const mockedImages = [
-            getMockedMediaImage({ id: uuid(), name: 'media-1' }),
-            getMockedMediaImage({ id: uuid(), name: 'media-2' }),
+            getMockedMediaImage({ id: crypto.randomUUID(), name: 'media-1' }),
+            getMockedMediaImage({ id: crypto.randomUUID(), name: 'media-2' }),
         ];
-        const mockedVideo = getMockedVideo({ id: uuid(), name: 'media-3' });
+        const mockedVideo = getMockedVideo({ id: crypto.randomUUID(), name: 'media-3' });
         const mockedMedia = [...mockedImages, mockedVideo];
         const mockedLabels = [
             getMockedLabel({
