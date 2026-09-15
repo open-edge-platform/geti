@@ -4,9 +4,9 @@
 import { PointerEvent, RefObject, useEffect, useRef, useState } from 'react';
 
 import type { MediaVideoFrame } from '@/api/types';
-import { useDebouncedCallback } from 'hooks/use-debounced-callback/use-debounced-callback.hook';
 import { defer } from 'lodash-es';
 import { useHover } from 'react-aria';
+import { useDebounceCallback } from 'usehooks-ts';
 
 import { FRAME_STEP_TO_DISPLAY_ALL_FRAMES } from '../../../frame-step/utils';
 import { ThumbnailPreview } from './thumbnail-preview.component';
@@ -32,7 +32,7 @@ const useShowThumbnail = () => {
     const [thumbnailVideoFrame, setThumbnailVideoFrame] = useState<null | number>(null);
     const [showThumbnail, setShowThumbnail] = useState(false);
     const [thumbnailPosition, setThumbnailPosition] = useState<null | number>(null);
-    const setThumbnailVideoFrameDebounced = useDebouncedCallback(setThumbnailVideoFrame, 200);
+    const setThumbnailVideoFrameDebounced = useDebounceCallback(setThumbnailVideoFrame, 200);
 
     const { hoverProps } = useHover({
         onHoverStart: () => {
