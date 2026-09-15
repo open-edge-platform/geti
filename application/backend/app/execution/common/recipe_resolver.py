@@ -355,6 +355,11 @@ class RecipeResolver:
             "status": ModelStatus.ACTIVE,
             "default": False,
         },
+        "instance-segmentation-eomt-large-640": {
+            "recipe_path": "instance_segmentation/eomt_large_640.yaml",
+            "status": ModelStatus.ACTIVE,
+            "default": False,
+        },
         "instance-segmentation-mask-rcnn-efficientnet-b2": {
             "recipe_path": "instance_segmentation/maskrcnn_efficientnetb2b.yaml",
             "status": ModelStatus.ACTIVE,

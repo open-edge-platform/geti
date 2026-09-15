@@ -9,7 +9,8 @@ description: "DINOv3 ViT-L/16 is a large self-supervised vision transformer dist
 stats:
   gigaflops: 164.74
   trainable_parameters: 304.104424
-  benchmark_metrics: {}
+  benchmark_metrics:
+    imagenet_top1_accuracy: 87.4
 capabilities:
   xai: false
   tiling: false

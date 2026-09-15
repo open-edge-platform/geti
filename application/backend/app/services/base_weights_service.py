@@ -2,15 +2,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import hashlib
-import json
 import os
 import shutil
-import time
 from pathlib import Path
 
 import huggingface_hub
 import huggingface_hub.constants as huggingface_hub_constants
 import requests
+from huggingface_hub.errors import LocalEntryNotFoundError
 from loguru import logger
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
@@ -28,13 +27,7 @@ class BaseWeightsService:
     RETRY_TOTAL = 2  # total number of retries for failed requests
     RETRY_CONNECT = 1  # retries specifically for connection failures (fail fast on unreachable hosts)
     RETRY_BACKOFF_FACTOR = 0.5  # exponential backoff factor for retries (e.g., 0.5s, 1s)
-    # Enterprise proxies intermittently reject tunnels with "[Errno 99] Cannot assign
-    # requested address"; a single retry is not enough for a large multi-shard repo.
-    HF_RETRY_ATTEMPTS = 4  # total HF snapshot download attempts (1 initial + 3 retries)
-    HF_RETRY_BACKOFF_FACTOR = 1.0  # seconds; doubled per attempt
-    HF_RETRY_MAX_DELAY = 30.0  # cap for the exponential backoff
     HF_DOWNLOAD_TIMEOUT = 60  # seconds; Hub default is 10s, too short behind slow proxies
-    HF_CACHE_METADATA_FILENAME = ".geti-huggingface-snapshot.json"
 
     def __init__(self, data_dir: Path) -> None:
         self.pretrained_weights_dir = data_dir / "pretrained_weights"
@@ -184,141 +177,40 @@ class BaseWeightsService:
         pretrained_weights: HuggingFacePretrainedWeights,
         allow_download: bool,
     ) -> Path:
-        """Download a complete repository snapshot, file by file, with resumable transfers.
-
-        ``huggingface_hub.snapshot_download`` discards partial ``.incomplete``
-        files on failure, so a proxy that resets long-lived transfers forces the
-        download to restart from zero on every attempt and it can never finish.
-        Downloading each repository file explicitly with Range-resume accumulates
-        progress across attempts (and across job retries) instead.
-        """
+        """Download a complete repository snapshot into the application cache."""
         local_path = self.pretrained_weights_dir / task.name.lower() / model_manifest_id
-        if self._is_matching_huggingface_snapshot(local_path, pretrained_weights):
-            logger.info("Using cached weights for {}: {}", model_manifest_id, local_path)
-            return local_path
-        if local_path.exists() or local_path.is_symlink():
-            self._remove_path(local_path)
-
         if not allow_download:
-            raise FileNotFoundError(f"Weights not found locally for model {model_manifest_id} and download is disabled")
+            try:
+                huggingface_hub.snapshot_download(
+                    repo_id=pretrained_weights.repo_id,
+                    revision=pretrained_weights.revision,
+                    local_dir=local_path,
+                    local_files_only=True,
+                )
+            except LocalEntryNotFoundError as error:
+                raise FileNotFoundError(
+                    f"Weights not found locally for model {model_manifest_id} and download is disabled"
+                ) from error
+            return local_path
 
-        # Stable partial directory: kept across attempts and job retries so that
-        # per-file resume can accumulate progress instead of restarting from zero.
-        temp_path = local_path.with_name(f".{local_path.name}.partial")
         self._configure_huggingface_environment()
-        logger.info("Downloading Hugging Face snapshot for {}", model_manifest_id)
-
         info = huggingface_hub.model_info(
             pretrained_weights.repo_id,
             revision=pretrained_weights.revision,
             files_metadata=True,
         )
         self._check_huggingface_disk_space(info)
-        siblings = [(sibling.rfilename, sibling.size) for sibling in info.siblings or []]
+        logger.info("Downloading Hugging Face snapshot for {}", model_manifest_id)
 
-        try:
-            for filename, expected_size in siblings:
-                destination = temp_path / filename
-                if destination.is_file() and (expected_size is None or destination.stat().st_size == expected_size):
-                    continue
-                destination.parent.mkdir(parents=True, exist_ok=True)
-                self._download_huggingface_file(
-                    url=f"{huggingface_hub.constants.ENDPOINT}/{pretrained_weights.repo_id}/resolve/{pretrained_weights.revision}/{filename}",
-                    destination=destination,
-                    expected_size=expected_size,
-                )
-            (temp_path / self.HF_CACHE_METADATA_FILENAME).write_text(
-                json.dumps({"repo_id": pretrained_weights.repo_id, "revision": pretrained_weights.revision})
-            )
-            try:
-                temp_path.rename(local_path)
-            except FileExistsError:
-                if not self._is_matching_huggingface_snapshot(local_path, pretrained_weights):
-                    raise
-                self._remove_path(temp_path)
-        except Exception as error:
-            # Keep the partial directory for a later resume; log where it lives.
-            logger.error(
-                "Hugging Face snapshot download for {} failed: {}. "
-                "Partial download kept at {} and resumes on the next attempt.",
-                model_manifest_id,
-                error,
-                temp_path,
-            )
-            raise
+        huggingface_hub.snapshot_download(
+            repo_id=pretrained_weights.repo_id,
+            revision=pretrained_weights.revision,
+            local_dir=local_path,
+            max_workers=1,
+        )
 
         logger.info("Successfully downloaded Hugging Face snapshot: {}", local_path)
         return local_path
-
-    def _download_huggingface_file(self, url: str, destination: Path, expected_size: int | None) -> None:
-        """Download one repository file, resuming from the local ``.part`` file on retries.
-
-        The ``Range`` header restarts from the bytes already fetched, so a proxy
-        that kills long transfers still makes forward progress attempt after
-        attempt. Both the proxied and the direct route are tried, as for
-        direct-link weights.
-        """
-        part_path = destination.with_name(destination.name + ".part")
-
-        def already_complete(resume_from: int) -> bool:
-            return expected_size is not None and resume_from >= expected_size
-
-        last_error: Exception | None = None
-        for attempt in range(self.HF_RETRY_ATTEMPTS):
-            resume_from = part_path.stat().st_size if part_path.is_file() else 0
-            if already_complete(resume_from):
-                break
-            headers = {"Accept-Encoding": "identity"}
-            if resume_from:
-                headers["Range"] = f"bytes={resume_from}-"
-            try:
-                with (
-                    self._build_retry_session(use_env_proxy=True) as session,
-                    session.get(
-                        url, headers=headers, stream=True, timeout=self.REQUEST_TIMEOUT, allow_redirects=True
-                    ) as response,
-                ):
-                    response.raise_for_status()
-                    # A 200 to a Range request means the server ignored the resume;
-                    # restart from zero in that case.
-                    mode = "ab" if response.status_code == 206 and resume_from else "wb"
-                    with part_path.open(mode) as f:
-                        for chunk in response.iter_content(chunk_size=1024 * 1024):
-                            f.write(chunk)
-                if expected_size is None:
-                    # Nothing to validate against: a completed stream is the final
-                    # word (e.g. plain text files without a Content-Length).
-                    part_path.rename(destination)
-                    return
-                if not already_complete(part_path.stat().st_size):
-                    last_error = requests.RequestException(
-                        f"File {destination.name} is shorter than expected "
-                        f"({part_path.stat().st_size} of {expected_size} bytes)"
-                    )
-                    logger.warning(
-                        "Hugging Face file download incomplete after {} bytes; retrying (attempt {}/{})",
-                        part_path.stat().st_size,
-                        attempt + 1,
-                        self.HF_RETRY_ATTEMPTS,
-                    )
-                    time.sleep(min(self.HF_RETRY_BACKOFF_FACTOR * (2**attempt), self.HF_RETRY_MAX_DELAY))
-                    continue
-                part_path.rename(destination)
-                return
-            except requests.RequestException as error:
-                last_error = error
-                logger.warning(
-                    "Hugging Face file download failed for {} ({}); retrying (attempt {}/{})",
-                    url,
-                    error,
-                    attempt + 1,
-                    self.HF_RETRY_ATTEMPTS,
-                )
-                time.sleep(min(self.HF_RETRY_BACKOFF_FACTOR * (2**attempt), self.HF_RETRY_MAX_DELAY))
-
-        raise requests.RequestException(
-            f"Failed to download {url} after {self.HF_RETRY_ATTEMPTS} attempts"
-        ) from last_error
 
     @staticmethod
     def _configure_huggingface_environment() -> None:
@@ -343,15 +235,6 @@ class BaseWeightsService:
         if os.environ.get("HF_HUB_DOWNLOAD_TIMEOUT") is None:
             os.environ["HF_HUB_DOWNLOAD_TIMEOUT"] = str(BaseWeightsService.HF_DOWNLOAD_TIMEOUT)
             huggingface_hub_constants.HF_HUB_DOWNLOAD_TIMEOUT = BaseWeightsService.HF_DOWNLOAD_TIMEOUT
-
-    def _is_matching_huggingface_snapshot(self, path: Path, pretrained_weights: HuggingFacePretrainedWeights) -> bool:
-        if not path.is_dir() or path.is_symlink():
-            return False
-        try:
-            metadata = json.loads((path / self.HF_CACHE_METADATA_FILENAME).read_text())
-        except (OSError, ValueError):
-            return False
-        return metadata == {"repo_id": pretrained_weights.repo_id, "revision": pretrained_weights.revision}
 
     def _check_huggingface_disk_space(
         self,

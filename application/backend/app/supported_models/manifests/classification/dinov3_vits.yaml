@@ -9,7 +9,8 @@ description: "DINOv3 ViT-S/16 is a compact self-supervised vision transformer di
 stats:
   gigaflops: 12.49
   trainable_parameters: 21.971944
-  benchmark_metrics: {}
+  benchmark_metrics:
+    imagenet_top1_accuracy: 81.4
 capabilities:
   xai: false
   tiling: false

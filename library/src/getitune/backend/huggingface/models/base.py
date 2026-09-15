@@ -389,7 +389,11 @@ class HFModel(ABC, nn.Module):
             task_type="null",
             model_name=self.checkpoint,
             label_info=self.label_info,
-            optimization_config={},
+            # All HF backend architectures are transformer-based; NNCF needs the
+            # transformer preset (SmoothQuant + per-channel weights) to preserve
+            # accuracy under PTQ INT8 — default per-tensor activation quantization
+            # collapses DETR-family attention outputs to constant scores.
+            optimization_config={"model_type": "transformer"},
         )
 
     @cached_property
