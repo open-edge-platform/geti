@@ -2,15 +2,19 @@
 # SPDX-License-Identifier: Apache-2.0
 from collections.abc import Callable
 from datetime import datetime
+from pathlib import Path
 from uuid import UUID, uuid4
 
+import cv2
+import numpy as np
 import pytest
 from sqlalchemy.orm import Session
 
+from app.datumaro_converter import SampleMode
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, DatasetViewItemDB, MediaDB, PipelineDB
 from app.models import DatasetItemAnnotationStatus, DatasetItemSubset, Pipeline, Project, Video
 from app.services.base import ResourceNotFoundError, ResourceWithNameAlreadyExistsError
-from app.services.dataset_service import DatasetItemFilters
+from app.services.dataset_service import DatasetItemFilters, DatasetService
 from app.services.dataset_view_service import DatasetViewService
 from app.services.media_service import MediaFilters
 
@@ -175,6 +179,32 @@ def fxt_project_with_media(
         "frame_annotated": frame_annotated,
         "frame_unannotated": frame_unannotated,
     }
+
+
+@pytest.fixture
+def fxt_project_with_media_on_disk(
+    fxt_projects_dir: Path, fxt_project_with_media: tuple[Project, dict[str, MediaDB]]
+) -> tuple[Project, dict[str, MediaDB]]:
+    """Same media set as ``fxt_project_with_media``, with real files on disk so it can be converted for export."""
+    project, media = fxt_project_with_media
+    dataset_dir = fxt_projects_dir / str(project.id) / "dataset"
+    dataset_dir.mkdir(parents=True, exist_ok=True)
+
+    for key in ("image1", "image2"):
+        image = media[key]
+        (dataset_dir / f"{image.id}.{image.format}").write_bytes(b"\x00")
+
+    video = media["video1"]
+    assert video.fps is not None
+    video_path = dataset_dir / f"{video.id}.{video.format}"
+    fourcc = cv2.VideoWriter.fourcc(*"MJPG")
+    writer = cv2.VideoWriter(str(video_path), fourcc, video.fps, (video.width, video.height))
+    # Only frames up to the highest referenced frame_index (20) need to actually exist.
+    for _ in range(21):
+        writer.write(np.zeros((video.height, video.width, 3), dtype=np.uint8))
+    writer.release()
+
+    return project, media
 
 
 class TestDatasetViewServiceCRUD:
@@ -551,6 +581,83 @@ class TestDatasetViewServiceItems:
             fxt_dataset_view_service.list_dataset_view_items(project_id=project.id, dataset_view_id=uuid4())
         with pytest.raises(ResourceNotFoundError):
             fxt_dataset_view_service.count_dataset_view_items(project_id=project.id, dataset_view_id=uuid4())
+
+
+class TestDatasetServiceViewScopedDataset:
+    """Integration tests for DatasetService.get_dm_dataset(dataset_view_id=...), used by view-scoped export."""
+
+    def test_get_dm_dataset_includes_frames_of_assigned_video(
+        self,
+        fxt_dataset_service: DatasetService,
+        fxt_dataset_view_service: DatasetViewService,
+        fxt_project_with_media_on_disk,
+    ):
+        project, media = fxt_project_with_media_on_disk
+        view = fxt_dataset_view_service.create_dataset_view(
+            project_id=project.id, name="My view", media_ids=[UUID(media["video1"].id)]
+        )
+
+        dataset = fxt_dataset_service.get_dm_dataset(
+            project_id=project.id,
+            task=project.task,
+            annotation_status=None,
+            sample_mode=SampleMode.IMPORT_EXPORT,
+            dataset_view_id=view.id,
+        )
+
+        # Only the annotated frame has a dataset item; it must be included even though the frame itself
+        # was never directly assigned to the view (only its parent video was).
+        assert {sample.id for sample in dataset} == {media["frame_annotated"].id}
+
+    def test_get_dm_dataset_applies_annotation_filter(
+        self,
+        fxt_dataset_service: DatasetService,
+        fxt_dataset_view_service: DatasetViewService,
+        fxt_project_with_media_on_disk,
+    ):
+        project, media = fxt_project_with_media_on_disk
+        view = fxt_dataset_view_service.create_dataset_view(
+            project_id=project.id,
+            name="My view",
+            media_ids=[UUID(media["image1"].id), UUID(media["image2"].id), UUID(media["video1"].id)],
+        )
+
+        unfiltered = fxt_dataset_service.get_dm_dataset(
+            project_id=project.id,
+            task=project.task,
+            annotation_status=None,
+            sample_mode=SampleMode.IMPORT_EXPORT,
+            dataset_view_id=view.id,
+        )
+        annotated_only = fxt_dataset_service.get_dm_dataset(
+            project_id=project.id,
+            task=project.task,
+            annotation_status=DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
+            sample_mode=SampleMode.IMPORT_EXPORT,
+            dataset_view_id=view.id,
+        )
+
+        # image1 has no annotation; image2 and the annotated frame of video1 do.
+        assert {sample.id for sample in unfiltered} == {
+            media["image1"].id,
+            media["image2"].id,
+            media["frame_annotated"].id,
+        }
+        assert {sample.id for sample in annotated_only} == {media["image2"].id, media["frame_annotated"].id}
+
+    def test_get_dm_dataset_unknown_dataset_view_raises(
+        self, fxt_dataset_service: DatasetService, fxt_project_with_media
+    ):
+        project, _ = fxt_project_with_media
+
+        with pytest.raises(ResourceNotFoundError):
+            fxt_dataset_service.get_dm_dataset(
+                project_id=project.id,
+                task=project.task,
+                annotation_status=None,
+                sample_mode=SampleMode.IMPORT_EXPORT,
+                dataset_view_id=uuid4(),
+            )
 
 
 class TestDatasetViewServiceStatistics:
