@@ -66,6 +66,12 @@ export interface CodexModel {
     label: string;
 }
 
+/** Where the desktop shell found the ChatGPT (Codex) executable, and where it looked. */
+export interface CodexLocation {
+    path: string | null;
+    searched: string[];
+}
+
 export type ToolCallStatus = 'running' | 'done' | 'error';
 
 export interface ChatToolCall {

@@ -277,7 +277,9 @@ export const GETI_TOOL_DEFINITIONS: ToolDefinition[] = [
                 },
                 max_calibration_subset_size: {
                     type: ['integer', 'null'],
-                    description: `Calibration samples to use. Use null for the default of ${DEFAULT_CALIBRATION_SUBSET_SIZE}.`,
+                    description:
+                        'Calibration samples to use. Use null for the default of ' +
+                        `${DEFAULT_CALIBRATION_SUBSET_SIZE}.`,
                 },
                 max_drop: {
                     type: ['number', 'null'],
@@ -356,7 +358,10 @@ export const describeToolCall = (name: string, rawArguments: string): string => 
 
     switch (name) {
         case 'start_training':
-            return `Train ${asString(args.model_architecture_id, 'a model')} on ${asString(args.device, 'the first available device')}.`;
+            return (
+                `Train ${asString(args.model_architecture_id, 'a model')} ` +
+                `on ${asString(args.device, 'the first available device')}.`
+            );
         case 'start_quantization':
             return `Quantize model ${asString(args.model_id, '')} to INT8.`;
         case 'cancel_job':
@@ -420,7 +425,7 @@ export const createGetiTools = (currentProjectId: string): Record<string, ToolEx
         get_dataset_statistics: async (args) =>
             unwrap(
                 await fetchClient.GET('/api/projects/{project_id}/dataset/statistics', {
-                    params: { path: { project_id: projectOf(args) }, query: { dataset_view_id: null } },
+                    params: { path: { project_id: projectOf(args) } },
                 })
             ),
 

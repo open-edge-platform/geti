@@ -3,25 +3,22 @@
 
 import { useEffect, useState } from 'react';
 
-import {
-    Button,
-    ComboBox,
-    Content,
-    Flex,
-    InlineAlert,
-    Item,
-    Picker,
-    Text,
-    TextField,
-} from '@geti-ui/ui';
+import { Button, ComboBox, Content, Flex, InlineAlert, Item, Picker, Text, TextArea, TextField } from '@geti-ui/ui';
 
 import { Link } from '../../../platform/components/link.component';
 import { OPENAI_API_KEYS_URL, SUGGESTED_API_MODELS } from '../config';
 import { setAiConnection, setAiProvider, useAiConnection } from '../connection';
 import type { ConnectionStatus } from '../hooks/use-connection-status';
-import { codexLogin, codexLogout, codexModels } from '../transport/codex-transport';
+import {
+    codexDiagnostics,
+    codexLocate,
+    codexLogin,
+    codexLogout,
+    codexModels,
+    pickCodexBinary,
+} from '../transport/codex-transport';
 import { deleteKey, saveKey } from '../transport/key-service';
-import type { CodexModel } from '../types';
+import type { CodexLocation, CodexModel } from '../types';
 
 import classes from './assistant.module.scss';
 
@@ -111,10 +108,29 @@ const ChatGptSettings = ({ status }: { status: ConnectionStatus }) => {
     const { model, executable } = useAiConnection();
 
     const [models, setModels] = useState<CodexModel[]>([]);
+    const [location, setLocation] = useState<CodexLocation | null>(null);
+    const [report, setReport] = useState<string | null>(null);
     const [isBusy, setIsBusy] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const isSignedIn = status.account !== null;
+
+    useEffect(() => {
+        let isCurrent = true;
+
+        void codexLocate()
+            .then((found) => {
+                if (isCurrent) {
+                    setLocation(found);
+                }
+            })
+            // Only used to explain where the app was looked for; a failure is not worth reporting.
+            .catch(() => undefined);
+
+        return () => {
+            isCurrent = false;
+        };
+    }, [status.account, executable]);
 
     useEffect(() => {
         if (!isSignedIn) {
@@ -149,6 +165,37 @@ const ChatGptSettings = ({ status }: { status: ConnectionStatus }) => {
                 setError(reason instanceof Error ? reason.message : 'The ChatGPT app could not be reached.');
             })
             .finally(() => setIsBusy(false));
+    };
+
+    const browse = () => {
+        void pickCodexBinary()
+            .then((selected) => {
+                if (selected !== null) {
+                    setAiConnection({ executable: selected });
+                    status.refresh();
+                }
+            })
+            .catch((reason: unknown) => {
+                setError(reason instanceof Error ? reason.message : 'The file picker could not be opened.');
+            });
+    };
+
+    const diagnose = () => {
+        if (report !== null) {
+            setReport(null);
+
+            return;
+        }
+
+        void codexDiagnostics()
+            .then((text) => {
+                setReport(text);
+                // A clipboard copy is the fastest way to share the report; the box below is the fallback.
+                void navigator.clipboard?.writeText(text).catch(() => undefined);
+            })
+            .catch((reason: unknown) => {
+                setError(reason instanceof Error ? reason.message : 'The diagnostics report could not be collected.');
+            });
     };
 
     return (
@@ -186,13 +233,51 @@ const ChatGptSettings = ({ status }: { status: ConnectionStatus }) => {
                 </Picker>
             )}
 
-            <TextField
-                width={'100%'}
-                label={'ChatGPT app location'}
-                description={'Leave empty unless the ChatGPT app is installed in a non-standard folder.'}
-                value={executable}
-                onChange={(value: string) => setAiConnection({ executable: value })}
-            />
+            <Flex direction={'column'} gap={'size-75'}>
+                <Flex alignItems={'end'} gap={'size-100'}>
+                    <TextField
+                        flex={1}
+                        label={'ChatGPT app location'}
+                        placeholder={location?.path ?? 'Detected automatically'}
+                        value={executable}
+                        onChange={(value: string) => setAiConnection({ executable: value })}
+                    />
+                    <Button variant={'secondary'} onPress={browse}>
+                        Browse…
+                    </Button>
+                </Flex>
+
+                {executable === '' && location !== null && (
+                    <Text UNSAFE_className={classes.providerHint}>
+                        {location.path === null
+                            ? `Not found in ${location.searched.length} standard locations, including ` +
+                              `${location.searched.slice(0, 2).join(' and ')}. Pick it with Browse instead.`
+                            : `Detected at ${location.path}.`}
+                    </Text>
+                )}
+            </Flex>
+
+            <Flex direction={'column'} gap={'size-75'}>
+                <Flex alignItems={'center'} justifyContent={'space-between'} gap={'size-100'}>
+                    <Text UNSAFE_className={classes.providerHint}>
+                        Sign-in trouble? The report shows where Codex was found and what it answered.
+                    </Text>
+                    <Button variant={'secondary'} onPress={diagnose}>
+                        {report === null ? 'Diagnostics' : 'Hide'}
+                    </Button>
+                </Flex>
+
+                {report !== null && (
+                    <TextArea
+                        width={'100%'}
+                        height={'size-2400'}
+                        isReadOnly
+                        aria-label={'ChatGPT diagnostics report'}
+                        description={'Copied to the clipboard. Attach it when reporting a sign-in problem.'}
+                        value={report}
+                    />
+                )}
+            </Flex>
 
             {error !== null && (
                 <InlineAlert variant={'negative'} width={'100%'}>

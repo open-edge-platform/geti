@@ -26,7 +26,7 @@ export const ActionApproval = ({ approval, onResolve }: ActionApprovalProps) => 
                         <Button variant={'secondary'} onPress={() => onResolve(false)}>
                             Decline
                         </Button>
-                        <Button variant={'accent'} onPress={() => onResolve(true)} autoFocus>
+                        <Button variant={'accent'} onPress={() => onResolve(true)}>
                             Run it
                         </Button>
                     </ButtonGroup>

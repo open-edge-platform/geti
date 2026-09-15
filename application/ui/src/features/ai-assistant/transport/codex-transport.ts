@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { CodexAccount, CodexModel, StreamRequest, StreamResult } from '../types';
+import type { CodexAccount, CodexLocation, CodexModel, StreamRequest, StreamResult } from '../types';
 import { DESKTOP_ONLY_MESSAGE } from './parse-response';
 
 /**
@@ -11,6 +11,12 @@ import { DESKTOP_ONLY_MESSAGE } from './parse-response';
 export const codexStatus = (): Promise<CodexAccount | null> => Promise.resolve(null);
 
 export const codexModels = (): Promise<CodexModel[]> => Promise.resolve([]);
+
+export const codexLocate = (): Promise<CodexLocation> => Promise.resolve({ path: null, searched: [] });
+
+export const codexDiagnostics = (): Promise<string> => Promise.resolve(DESKTOP_ONLY_MESSAGE);
+
+export const pickCodexBinary = (): Promise<string | null> => Promise.resolve(null);
 
 export const codexLogin = (_onUrl: (url: string) => void): Promise<void> =>
     Promise.reject(new Error(DESKTOP_ONLY_MESSAGE));

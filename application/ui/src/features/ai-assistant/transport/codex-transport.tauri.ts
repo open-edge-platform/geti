@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Channel, invoke } from '@tauri-apps/api/core';
+import { open } from '@tauri-apps/plugin-dialog';
 import { openUrl } from '@tauri-apps/plugin-opener';
 
 import { getAiConnection } from '../connection';
-import type { CodexAccount, CodexModel, StreamRequest, StreamResult } from '../types';
+import type { CodexAccount, CodexLocation, CodexModel, StreamRequest, StreamResult } from '../types';
 import { parseCodexResult } from './parse-response';
 
 type CodexEvent = { type: 'login'; url: string };
@@ -38,6 +39,25 @@ export const codexStatus = async (): Promise<CodexAccount | null> => {
     }
 
     return { email, plan };
+};
+
+/** The executable the shell auto-detects, plus every folder it looked in. */
+export const codexLocate = (): Promise<CodexLocation> => invoke<CodexLocation>('codex_locate');
+
+/** Plain-text report about the Codex install and the last operation's protocol traffic. */
+export const codexDiagnostics = (): Promise<string> =>
+    invoke<string>('codex_diagnostics', { executable: getAiConnection().executable || null });
+
+/** Resolves to `null` when the user dismisses the file picker. */
+export const pickCodexBinary = async (): Promise<string | null> => {
+    const selected = await open({
+        multiple: false,
+        directory: false,
+        title: 'Select the ChatGPT (Codex) executable',
+        filters: [{ name: 'Executable', extensions: ['exe', 'cmd', 'bat'] }],
+    });
+
+    return typeof selected === 'string' ? selected : null;
 };
 
 export const codexLogin = async (onUrl: (url: string) => void): Promise<void> => {

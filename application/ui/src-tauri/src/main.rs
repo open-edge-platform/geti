@@ -518,6 +518,7 @@ fn main() {
             assistant::codex::codex_operation,
             assistant::codex::codex_cancel,
             assistant::codex::codex_locate,
+            assistant::codex::codex_diagnostics,
         ])
         .build(tauri::generate_context!())
         .expect("error building Tauri");

@@ -16,7 +16,7 @@ export const useAssistantContext = (projectId: string): string => {
     });
 
     const { data: statistics } = $api.useQuery('get', '/api/projects/{project_id}/dataset/statistics', {
-        params: { path: { project_id: projectId }, query: { dataset_view_id: null } },
+        params: { path: { project_id: projectId } },
     });
 
     return useMemo(() => {
@@ -28,7 +28,7 @@ export const useAssistantContext = (projectId: string): string => {
             return lines.join('\n');
         }
 
-        const labels = project.task.labels.map((label) => label.name);
+        const labels = (project.task.labels ?? []).map((label) => label.name);
 
         lines.push(
             `Open project: "${project.name}" (id: ${project.id}), task: ${project.task.task_type}.`,

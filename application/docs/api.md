@@ -178,3 +178,32 @@ Job types:
 - `import_dataset_as_new_project`
 - `export_dataset`
 - `stage_dataset`
+
+## MCP server
+
+`application/mcp/server.py` exposes a read-only view of the API above — plus
+`start_training`, `start_quantization` and `cancel_job` — to any
+[Model Context Protocol](https://modelcontextprotocol.io) client, so an AI
+assistant such as GitHub Copilot in VS Code can inspect and drive a local Geti
+instance.
+
+The server is a single file with PEP 723 inline metadata, so it needs no
+installation:
+
+```shell
+uv run application/mcp/server.py
+```
+
+VS Code picks it up from the checked-in `.vscode/mcp.json`; other clients need
+the same `uv run` command as a stdio server.
+
+Configuration is environment based:
+
+| Variable            | Default                                   | Description                                                      |
+| ------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
+| `GETI_URL`          | `https://localhost:7860`                  | Base URL of the Geti server                                      |
+| `GETI_CERT`         | `<data dir>/certs/localhost.pem`          | Certificate used to verify the self-signed server                |
+| `GETI_TLS_INSECURE` | unset                                     | Set to `1` to skip certificate verification                      |
+
+Geti serves a self-signed certificate and does not authenticate `/api`
+requests, so point the MCP server at a local instance only.
