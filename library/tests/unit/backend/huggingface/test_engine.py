@@ -456,7 +456,9 @@ class TestTrain:
         engine = self._engine(tmp_path, model)
         trainer = self._mock_trainer()
         fmeasure = MagicMock()
-        fmeasure.best_confidence_threshold = 0.145
+        # The engine reads the backing attribute (the property raises while
+        # the sweep has not computed) — set the same field here.
+        fmeasure._best_confidence_threshold = 0.145
         trainer._val_metric = MagicMock()
         trainer._val_metric.FMeasure = fmeasure
         best_dir = tmp_path / "wd" / "best_checkpoint"
@@ -475,6 +477,23 @@ class TestTrain:
         trainer = self._mock_trainer()
         trainer._val_metric = MagicMock()
         trainer._val_metric.FMeasure = None
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.train(max_epochs=1, batch=2)
+
+        assert model.best_confidence_threshold is None
+
+    def test_train_does_not_fail_when_threshold_sweep_never_computed(self, tmp_path: Path, model: _StubHFModel) -> None:
+        """A never-computed FMeasure must be treated as "no threshold", not raise."""
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer()
+        fmeasure = MagicMock()
+        fmeasure._best_confidence_threshold = None
+        trainer._val_metric = MagicMock()
+        trainer._val_metric.FMeasure = fmeasure
+        # Without a saved best checkpoint (no load path) the extraction is the
+        # only threshold source; the property would raise RuntimeError here.
+        engine._model.load_checkpoint = MagicMock()  # type: ignore[method-assign]
 
         with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
             engine.train(max_epochs=1, batch=2)

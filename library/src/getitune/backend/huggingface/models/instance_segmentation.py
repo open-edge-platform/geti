@@ -156,9 +156,11 @@ class HFInstSegModel(HFModel):
         for image_idx, image_masks in enumerate(masks_probs):
             per_query_masks, per_query_labels, per_query_scores, per_query_boxes = [], [], [], []
             for query_idx in range(image_masks.shape[0]):
-                if scores[image_idx, query_idx] <= self._confidence_threshold:
-                    # background query: not a prediction (matches the runtime decode)
-                    continue
+                # NOTE: no score filtering here. ``postprocess`` returns every
+                # query so callers can threshold at any level (metric sweeps,
+                # ``HFEngine.predict()``); user-facing filtering lives at the
+                # engine boundary (``unbatch_predictions``). Dropping
+                # sub-threshold queries here would make results non-recoverable.
                 binary = (image_masks[query_idx] > 0.5).bool()
                 box = _traceable_masks_to_boxes(binary.unsqueeze(0))[0]
 

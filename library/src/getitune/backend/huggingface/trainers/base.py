@@ -435,6 +435,12 @@ class GetiTuneHFTrainer(Trainer):
         if improved:
             self._best_metric_value = float(current)
             self._best_eval_metrics = metrics.copy()
+            # Persist the validation F1-optimal confidence threshold computed
+            # by *this same epoch's* metrics together with the weights, so
+            # best_checkpoints never pair weights and a threshold from
+            # different validation states. ``save_model`` writes it into the
+            # checkpoint config (``getitune_best_confidence_threshold``).
+            self._sync_val_confidence_threshold()
             output_dir = self.args.output_dir
             if output_dir is None:
                 msg = "TrainingArguments.output_dir is not set; cannot save best checkpoint."
@@ -442,6 +448,26 @@ class GetiTuneHFTrainer(Trainer):
             best_dir = Path(output_dir).parent / "best_checkpoint"
             best_dir.mkdir(parents=True, exist_ok=True)
             self.save_model(str(best_dir))
+
+    def _sync_val_confidence_threshold(self) -> None:
+        """Copy the current validation ``FMeasure`` threshold onto the model.
+
+        Read from the backing attribute: ``FMeasure.best_confidence_threshold``
+        raises instead of returning ``None`` while the sweep never ran.
+        """
+        from getitune.metrics.fmeasure import FMeasure
+
+        metric_obj = self._val_metric  # noqa: SLF001
+        if metric_obj is None:
+            return
+        fmeasure = getattr(metric_obj, "FMeasure", None)
+        if fmeasure is None and isinstance(metric_obj, FMeasure):
+            fmeasure = metric_obj
+        if fmeasure is None:
+            return
+        threshold = fmeasure._best_confidence_threshold  # noqa: SLF001
+        if threshold is not None:
+            self.model_wrapper.best_confidence_threshold = float(threshold)
 
     def _prepare_batch(self, batch: SampleBatch, pipeline: GPUAugmentationPipeline | None) -> SampleBatch:
         """Move a batch to the model's device and apply GPU augmentation, if configured."""

@@ -302,10 +302,13 @@ class HFEngine(Engine):
         else:
             trainer.save_model(str(best_dir))
         self._model.record_checkpoint(best_dir)
-        # Extract after the checkpoint handling: ``load_checkpoint`` above restores
-        # the F1 threshold from the saved config (mid-training saves predate the
-        # post-training threshold sweep, so extraction must not run before this).
-        self._extract_best_confidence_threshold(trainer)
+        # Extract only when the selected checkpoint carries no threshold: the
+        # best-checkpoint save persists its *same-epoch* validation threshold
+        # (see ``_maybe_save_best_checkpoint``), so a restore above already
+        # has the authoritative value. Extraction here is the fallback for
+        # runs without such a save (e.g. no monitored metric).
+        if self._model.best_confidence_threshold is None:
+            self._extract_best_confidence_threshold(trainer)
 
         write_metrics_csv(trainer.state.log_history, self._work_dir)
 
@@ -381,10 +384,17 @@ class HFEngine(Engine):
         fmeasure = getattr(metric_obj, "FMeasure", None)
         if fmeasure is None and isinstance(metric_obj, FMeasure):
             fmeasure = metric_obj
-        if fmeasure is not None and getattr(fmeasure, "best_confidence_threshold", None) is not None:
-            threshold = float(fmeasure.best_confidence_threshold)
-            self._model.best_confidence_threshold = threshold
-            logger.info("Best confidence threshold from validation F-measure: %s", threshold)
+        if fmeasure is None:
+            return
+        # Read the backing attribute directly: the ``best_confidence_threshold``
+        # property raises ``RuntimeError`` instead of returning ``None`` while
+        # the metric has never computed (e.g. training without a validation
+        # metric), which would abort an otherwise completed run.
+        threshold = fmeasure._best_confidence_threshold  # noqa: SLF001
+        if threshold is None:
+            return
+        self._model.best_confidence_threshold = float(threshold)
+        logger.info("Best confidence threshold from validation F-measure: %s", float(threshold))
 
     def predict(
         self,
@@ -406,7 +416,7 @@ class HFEngine(Engine):
             confidence_threshold: Minimum score for a detection / instance
                 segmentation prediction to be kept. Defaults to the best
                 confidence threshold computed by validation F-measure (or
-                ``0.5`` when not available). Not applied to classification
+                ``0.25`` when not available). Not applied to classification
                 (whose scores are per-class probabilities, not a filtering
                 signal) or semantic segmentation (which has no per-prediction
                 score at all).
