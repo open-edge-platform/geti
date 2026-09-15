@@ -457,7 +457,7 @@ class GetiTuneHFTrainer(Trainer):
         """
         from getitune.metrics.fmeasure import FMeasure
 
-        metric_obj = self._val_metric  # noqa: SLF001
+        metric_obj = self._val_metric
         if metric_obj is None:
             return
         fmeasure = getattr(metric_obj, "FMeasure", None)

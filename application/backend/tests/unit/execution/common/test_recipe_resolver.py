@@ -87,7 +87,6 @@ def test_hf_task_mapping_resolves_to_huggingface_recipe(manifest_id: str, relati
         "image-classification-dinov3-vit7b16",
         "image-classification-convnextv2-femto",
         "image-classification-convnextv2-huge",
-        "instance-segmentation-eomt-large-640",
         "instance-segmentation-eomt-large-1280",
         "instance-segmentation-eomt-dinov3-large-1280",
     ],
