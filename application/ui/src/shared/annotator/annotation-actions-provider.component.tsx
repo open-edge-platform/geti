@@ -8,7 +8,6 @@ import type { AnnotationDTO, DatasetItem, DatasetSubset, Label, Media } from '@/
 import { InfiniteData, matchQuery, useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEqual } from 'lodash-es';
-import { v4 as uuid } from 'uuid';
 
 import { UndoRedoProvider } from '../../features/dataset/media-preview/primary-toolbar/undo-redo/undo-redo-provider.component';
 import useUndoRedoState from '../../features/dataset/media-preview/primary-toolbar/undo-redo/use-undo-redo-state';
@@ -168,7 +167,7 @@ export const AnnotationActionsProvider = ({
     const addAnnotations = (shapes: Shape[], labels: AnnotationLabelRef[]): string[] => {
         const newAnnotations = shapes.map((shape) => ({
             shape,
-            id: uuid(),
+            id: crypto.randomUUID(),
             labels,
         }));
 

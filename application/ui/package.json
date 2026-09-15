@@ -70,7 +70,6 @@
         "static-path": "~0.0.4",
         "usehooks-ts": "^3.1.1",
         "utif": "^3.1.0",
-        "uuid": "~14.0.1",
         "zipson": "^0.2.12"
     },
     "devDependencies": {

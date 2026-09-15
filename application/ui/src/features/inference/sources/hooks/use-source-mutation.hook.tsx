@@ -5,7 +5,6 @@ import { $api } from '@/api';
 import type { SourceConfigPayload } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { omit } from 'lodash-es';
-import { v4 as uuid } from 'uuid';
 
 import { getQueryKey } from '../../../../query-client/query-client';
 import { testSourceQueryOptions } from '../api/use-test-source';
@@ -55,7 +54,7 @@ export const useSourceMutation = (isNewSource: boolean) => {
         if (isNewSource) {
             const sourcePayload = {
                 ...body,
-                id: uuid(),
+                id: crypto.randomUUID(),
             };
 
             const response = await addSource.mutateAsync({ body: sourcePayload });

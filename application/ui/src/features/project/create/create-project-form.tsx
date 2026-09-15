@@ -8,7 +8,6 @@ import { useTranslation } from '@/i18n';
 import { Button, ButtonGroup, Divider, Flex, Form, Text, TextField } from '@geti-ui/ui';
 import { useCreateProject } from 'hooks/api/project.hook';
 import { useNavigate } from 'react-router';
-import { v4 as uuid } from 'uuid';
 
 import { paths } from '../../../constants/paths';
 import { LabelSelection } from '../label-selection/label-selection.component';
@@ -71,7 +70,7 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
             return;
         }
 
-        const projectId = uuid();
+        const projectId = crypto.randomUUID();
 
         createProjectMutation.mutate(
             {
