@@ -3,7 +3,7 @@
 
 import { $api } from '@/api';
 import { toast } from '@/components/toast/toast.component';
-import { useTranslation, type TranslateFn } from '@/i18n';
+import { useTranslation } from '@/i18n';
 import { useOverlayTriggerState } from '@react-stately/overlays';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
@@ -13,7 +13,9 @@ import { getQueryKey } from '../../../query-client/query-client';
 
 const toastId = 'deleting-notification';
 
-const useDeleteMediaItemsMutation = (t: TranslateFn) => {
+const useDeleteMediaItemsMutation = () => {
+    const { t } = useTranslation();
+
     return $api.useMutation('delete', `/api/projects/{project_id}/dataset/media`, {
         meta: { error: { notify: () => false } },
         onError: (error) => {
@@ -30,7 +32,7 @@ export const useDeleteMediaItem = () => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const projectId = useProjectIdentifier();
-    const deleteItemsMutation = useDeleteMediaItemsMutation(t);
+    const deleteItemsMutation = useDeleteMediaItemsMutation();
 
     const alertDialogState = useOverlayTriggerState({});
 

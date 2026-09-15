@@ -2,6 +2,7 @@
     "common": {
         "actions": {
             "cancel": "Cancel",
+            "close": "Close",
             "delete": "Delete",
             "goBack": "Go back",
             "rename": "Rename",
@@ -74,8 +75,7 @@
             "inProgressToast_one": "Uploading {{count}} item...",
             "inProgressToast_other": "Uploading {{count}} items...",
             "inProgressSucceededPart": "{{count}} succeeded",
-            "inProgressFailedPart": "{{count}} failed",
-            "close": "Close"
+            "inProgressFailedPart": "{{count}} failed"
         },
         "empty": {
             "noMatches": "No media items match your filter.",
@@ -96,7 +96,6 @@
             "annotatedImages": "Annotated images",
             "annotatedVideosFrames": "Annotated videos / frames",
             "numberOfObjectsPerLabel": "Number of objects per label",
-            "close": "Close",
             "unannotated": "Unannotated",
             "annotated": "Annotated"
         },
@@ -167,7 +166,6 @@
             "unknownError": "An unknown error occurred",
             "unknownErrorDetail": "Unknown error",
             "technicalDetails": "Technical details",
-            "close": "Close",
             "cancel": "Cancel",
             "hide": "Hide",
             "preparingJob": "Preparing",
@@ -251,7 +249,6 @@
             "manageProjects": "Manage projects",
             "enablePipelineBlocked": {
                 "title": "Cannot enable pipeline",
-                "close": "Close",
                 "message": "Make sure you selected a model and source before enabling the pipeline."
             }
         },

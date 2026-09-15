@@ -65,7 +65,7 @@ export const ImportFailedJob = ({
                     isPending={deleteFileMutation.isPending}
                     isDisabled={deleteFileMutation.isPending}
                 >
-                    {t('dataset.import.close')}
+                    {t('common.actions.close')}
                 </Button>
             }
             bottomLeftMessage={

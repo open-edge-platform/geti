@@ -173,7 +173,7 @@ const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
             </Content>
             <ButtonGroup>
                 <Button variant={'primary'} onPress={onClose}>
-                    {t('dataset.upload.close')}
+                    {t('common.actions.close')}
                 </Button>
             </ButtonGroup>
         </Dialog>

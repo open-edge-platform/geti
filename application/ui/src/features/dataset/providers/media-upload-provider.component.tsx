@@ -5,7 +5,7 @@ import { createContext, Dispatch, ReactNode, useContext, useEffect, useReducer, 
 
 import { removeToast, toast } from '@/components/toast/toast.component';
 import { useTranslation, type TranslateFn } from '@/i18n';
-import { Button, Flex, Loading } from '@geti-ui/ui';
+import { Button, Flex, Loading, Text } from '@geti-ui/ui';
 
 import { UploadDetailsDialog } from '../gallery/upload-details-dialog/upload-details-dialog.component';
 import { Action, computeSummary, INITIAL_STATE, MediaUploadState, reducer } from './media-upload-reducer';
@@ -57,7 +57,7 @@ const InProgressMessage = ({
     return (
         <Flex alignItems={'center'} gap={'size-100'} UNSAFE_style={{ fontSize: UPLOAD_TOAST_FONT_SIZE }}>
             <Loading mode={'inline'} size={'S'} />
-            <span>{`${t('dataset.upload.inProgressToast', { count: total })} ${detail}`.trim()}</span>
+            <Text>{`${t('dataset.upload.inProgressToast', { count: total })} ${detail}`.trim()}</Text>
         </Flex>
     );
 };
