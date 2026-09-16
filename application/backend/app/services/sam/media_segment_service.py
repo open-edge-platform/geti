@@ -47,8 +47,8 @@ SAM_ENCODER_CONFIGURATION = {
 
 # The mobile_sam encoder IR is numerically unstable in f16: the graph emits the same
 # embedding for every input, so the client decodes an empty mask with no error anywhere.
-# f16 is the CPU plugin default on Apple Silicon (x86 defaults to bf16/f32), so this only
-# reproduces on macOS ARM. Pin f32 explicitly on every platform.
+# f16 is the CPU plugin default on Apple Silicon, but it is also unstable on older
+# x86_64 Intel processors. Pin f32 explicitly on every platform.
 SAM_ENCODER_PLUGIN_CONFIG = {"INFERENCE_PRECISION_HINT": "f32"}
 
 
