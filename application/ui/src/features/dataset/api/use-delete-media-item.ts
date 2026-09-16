@@ -10,6 +10,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isFunction } from 'lodash-es';
 
 import { getQueryKey } from '../../../query-client/query-client';
+import { chunkArray } from '../../../shared/chunk-array';
 
 const toastId = 'deleting-notification';
 
@@ -41,13 +42,18 @@ export const useDeleteMediaItem = () => {
 
         toast({ id: toastId, type: 'info', message: t('dataset.delete.deletingItems') });
 
-        deleteItemsMutation.mutate(
-            {
-                body: { media_ids },
-                params: { path: { project_id: projectId } },
-            },
-            { onSuccess: () => handleSuccess(media_ids, onDeleted) }
-        );
+        try {
+            const chunks = chunkArray(media_ids, 100);
+            for (const chunk of chunks) {
+                await deleteItemsMutation.mutateAsync({
+                    body: { media_ids: chunk },
+                    params: { path: { project_id: projectId } },
+                });
+            }
+            handleSuccess(media_ids, onDeleted);
+        } catch (_error) {
+            // Error is handled by onError in mutation
+        }
     };
 
     const handleSuccess = (deletedIds: string[], onDeleted?: (ids: string[]) => void) => {

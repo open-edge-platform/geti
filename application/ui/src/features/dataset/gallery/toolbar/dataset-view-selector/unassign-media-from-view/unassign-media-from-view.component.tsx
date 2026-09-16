@@ -9,13 +9,14 @@ import { isEmpty } from 'lodash-es';
 
 import { getQueryKey } from '../../../../../../query-client/query-client';
 import { useUnassignMediaFromViewMutation } from '../api/use-unassign-media-from-view';
+import { chunkArray } from '../../../../../../shared/chunk-array';
 
 const useUnassignMediaFromView = () => {
     const projectId = useProjectIdentifier();
     const queryClient = useQueryClient();
     const unassignFromViewMutation = useUnassignMediaFromViewMutation();
 
-    const unassignMediaFromView = ({
+    const unassignMediaFromView = async ({
         datasetViewId,
         selectedMediaIds,
         onSuccess,
@@ -24,40 +25,42 @@ const useUnassignMediaFromView = () => {
         selectedMediaIds: string[];
         onSuccess: () => void;
     }) => {
-        unassignFromViewMutation.mutate(
-            {
-                params: {
-                    path: {
-                        project_id: projectId,
-                        dataset_view_id: datasetViewId,
+        try {
+            const chunks = chunkArray(selectedMediaIds, 100);
+            for (const chunk of chunks) {
+                await unassignFromViewMutation.mutateAsync({
+                    params: {
+                        path: {
+                            project_id: projectId,
+                            dataset_view_id: datasetViewId,
+                        },
                     },
-                },
-                body: {
-                    media_ids: selectedMediaIds,
-                },
-            },
-            {
-                onSuccess: async () => {
-                    await Promise.all([
-                        queryClient.invalidateQueries({
-                            queryKey: getQueryKey([
-                                'get',
-                                '/api/projects/{project_id}/dataset/media',
-                                { params: { path: { project_id: projectId } } },
-                            ]),
-                        }),
-                        queryClient.invalidateQueries({
-                            queryKey: getQueryKey([
-                                'get',
-                                '/api/projects/{project_id}/dataset/items',
-                                { params: { path: { project_id: projectId } } },
-                            ]),
-                        }),
-                    ]);
-                    onSuccess();
-                },
+                    body: {
+                        media_ids: chunk,
+                    },
+                });
             }
-        );
+
+            await Promise.all([
+                queryClient.invalidateQueries({
+                    queryKey: getQueryKey([
+                        'get',
+                        '/api/projects/{project_id}/dataset/media',
+                        { params: { path: { project_id: projectId } } },
+                    ]),
+                }),
+                queryClient.invalidateQueries({
+                    queryKey: getQueryKey([
+                        'get',
+                        '/api/projects/{project_id}/dataset/items',
+                        { params: { path: { project_id: projectId } } },
+                    ]),
+                }),
+            ]);
+            onSuccess();
+        } catch (_error) {
+            // error is handled
+        }
     };
 
     return {

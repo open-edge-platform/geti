@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Dispatch, SetStateAction, Suspense, useMemo } from 'react';
+import { Dispatch, SetStateAction, Suspense, useMemo, useState } from 'react';
 
 import type { Media } from '@/api/types';
 import { useTranslation } from '@/i18n';
@@ -21,6 +21,10 @@ import { SortDown, SortUp } from '@geti-ui/ui/icons';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { isString } from 'lodash-es';
 
+import { useDatasetMediaFilterOptions } from 'hooks/use-dataset-media-filter-options.hook';
+import { useGetDatasetMediaIds } from 'hooks/use-get-dataset-media-ids.hook';
+import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+
 import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { isImage } from '../../../../shared/media-item-utils';
 import { TrainModel } from '../../../models/train-model/train-model.component';
@@ -38,7 +42,7 @@ import { UnassignMediaFromView } from './dataset-view-selector/unassign-media-fr
 import { MediaFiltering } from './media-filtering/media-filtering.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
-import { toggleMultipleSelection } from './util';
+
 
 type ToolbarProps = {
     items: Media[];
@@ -123,15 +127,28 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
     const { t } = useTranslation();
     const { selectedMediaItem, onSelectedMediaItemChange } = useSelectDatasetItem();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys } = useSelectedData();
+    const fetchDatasetMediaIds = useGetDatasetMediaIds();
+    const filterOptions = useDatasetMediaFilterOptions();
+    const { totalCount } = useDatasetMediaWithReviewStatus();
+    const [isSelectAllLoading, setIsSelectAllLoading] = useState(false);
 
     const selectedMediaItems = selectedKeys instanceof Set ? selectedKeys : null;
 
     const totalSelectedElements = selectedMediaItems?.size ?? 0;
     const hasSelectedElements = totalSelectedElements > 0;
 
-    const handleToggleManyItemSelection = () => {
-        const images = items.map((item) => String(item.id));
-        setSelectedKeys(toggleMultipleSelection(images));
+    const handleToggleManyItemSelection = async () => {
+        if (hasSelectedElements && totalSelectedElements === totalCount) {
+            setSelectedKeys(new Set());
+        } else {
+            setIsSelectAllLoading(true);
+            try {
+                const allIds = await fetchDatasetMediaIds(filterOptions);
+                setSelectedKeys(new Set(allIds));
+            } finally {
+                setIsSelectAllLoading(false);
+            }
+        }
     };
 
     const selectedImagesIds = useMemo(() => {
@@ -191,7 +208,8 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                     <Checkbox
                         aria-label={'select all'}
                         onChange={handleToggleManyItemSelection}
-                        isSelected={hasSelectedElements && totalSelectedElements === items.length}
+                        isSelected={hasSelectedElements && totalSelectedElements === totalCount}
+                        isIndeterminate={isSelectAllLoading}
                     />
 
                     {!hasSelectedElements && <SortMediaByUploadDate />}

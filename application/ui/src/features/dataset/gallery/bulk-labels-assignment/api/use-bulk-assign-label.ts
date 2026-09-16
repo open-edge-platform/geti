@@ -10,6 +10,7 @@ import { isEmpty, partition } from 'lodash-es';
 
 import { getQueryKey } from '../../../../../query-client/query-client';
 import { filterOutEmptyLabels } from '../../../../../shared/annotator/labels';
+import { chunkArray } from '../../../../../shared/chunk-array';
 
 export const useBulkAssignLabel = () => {
     const { t } = useTranslation();
@@ -57,7 +58,13 @@ export const useBulkAssignLabel = () => {
     };
 
     const bulkAssignLabel = async (mediaIds: string[], labelIds: string[]) => {
-        const result = await Promise.allSettled(mediaIds.map((mediaId) => assignLabel(mediaId, labelIds)));
+        const chunks = chunkArray(mediaIds, 100);
+        const result: PromiseSettledResult<unknown>[] = [];
+
+        for (const chunk of chunks) {
+            const chunkResult = await Promise.allSettled(chunk.map((mediaId) => assignLabel(mediaId, labelIds)));
+            result.push(...chunkResult);
+        }
 
         const [successfulMediaItems, failedMediaItems] = partition(result, ({ status }) => status === 'fulfilled');
 

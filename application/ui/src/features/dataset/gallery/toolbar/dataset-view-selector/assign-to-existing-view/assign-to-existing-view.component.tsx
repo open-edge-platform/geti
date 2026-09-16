@@ -26,6 +26,7 @@ import { isEmpty } from 'lodash-es';
 import { createSearchParams, Link, useLocation } from 'react-router';
 
 import { useAssignMediaToExistingDatasetView } from '../api/use-assign-media-to-existing-dataset-view';
+import { chunkArray } from '../../../../../../shared/chunk-array';
 import { SelectedMediaCount } from '../selected-media-count/selected-media-count.component';
 import { DatasetView } from '../type';
 
@@ -36,7 +37,7 @@ const useAssignMediaToExistingView = () => {
 
     const assignToExistingViewMutation = useAssignMediaToExistingDatasetView();
 
-    const assignToExistingView = ({
+    const assignToExistingView = async ({
         selectedDatasetViewId,
         selectedMediaIds,
         onClose,
@@ -45,24 +46,25 @@ const useAssignMediaToExistingView = () => {
         selectedMediaIds: string[];
         onClose: (selectedDatasetViewId: string) => void;
     }) => {
-        assignToExistingViewMutation.mutate(
-            {
-                params: {
-                    path: {
-                        project_id: projectId,
-                        dataset_view_id: selectedDatasetViewId,
+        try {
+            const chunks = chunkArray(selectedMediaIds, 100);
+            for (const chunk of chunks) {
+                await assignToExistingViewMutation.mutateAsync({
+                    params: {
+                        path: {
+                            project_id: projectId,
+                            dataset_view_id: selectedDatasetViewId,
+                        },
                     },
-                },
-                body: {
-                    media_ids: selectedMediaIds,
-                },
-            },
-            {
-                onSuccess: () => {
-                    onClose(selectedDatasetViewId);
-                },
+                    body: {
+                        media_ids: chunk,
+                    },
+                });
             }
-        );
+            onClose(selectedDatasetViewId);
+        } catch (_error) {
+            // error is handled by the api client typically or via toast
+        }
     };
 
     return {

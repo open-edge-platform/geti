@@ -46,6 +46,10 @@ vi.mock('hooks/use-project-identifier.hook', () => ({
     useProjectIdentifier: () => 'project-123',
 }));
 
+vi.mock('hooks/use-dataset-media-with-review-status.hook', () => ({
+    useDatasetMediaWithReviewStatus: vi.fn(() => ({ totalCount: 10 })),
+}));
+
 vi.mock('../../providers/selected-data-provider.component', () => ({
     useSelectedData: vi.fn(() => ({
         selectedKeys: new Set(),
