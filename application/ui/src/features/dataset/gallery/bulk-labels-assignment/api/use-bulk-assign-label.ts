@@ -6,10 +6,13 @@ import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-import { isEmpty, partition } from 'lodash-es';
+import { chunk, isEmpty, partition } from 'lodash-es';
 
 import { getQueryKey } from '../../../../../query-client/query-client';
 import { filterOutEmptyLabels } from '../../../../../shared/annotator/labels';
+
+// Annotations can only be set one media at a time, so cap how many requests are in flight at once.
+const ASSIGN_LABEL_BATCH_SIZE = 20;
 
 export const useBulkAssignLabel = () => {
     const { t } = useTranslation();
@@ -57,7 +60,11 @@ export const useBulkAssignLabel = () => {
     };
 
     const bulkAssignLabel = async (mediaIds: string[], labelIds: string[]) => {
-        const result = await Promise.allSettled(mediaIds.map((mediaId) => assignLabel(mediaId, labelIds)));
+        const result: PromiseSettledResult<Awaited<ReturnType<typeof assignLabel>>>[] = [];
+
+        for (const batch of chunk(mediaIds, ASSIGN_LABEL_BATCH_SIZE)) {
+            result.push(...(await Promise.allSettled(batch.map((mediaId) => assignLabel(mediaId, labelIds)))));
+        }
 
         const [successfulMediaItems, failedMediaItems] = partition(result, ({ status }) => status === 'fulfilled');
 

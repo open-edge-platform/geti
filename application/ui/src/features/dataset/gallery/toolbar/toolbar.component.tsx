@@ -144,7 +144,11 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
         }
 
         selectAllMedia.mutate(undefined, {
-            onSuccess: ({ mediaIds, imageIds }) => {
+            onSuccess: ({ mediaIds, imageIds, isStale }) => {
+                if (isStale) {
+                    return;
+                }
+
                 setSelectAllImageIds(imageIds);
                 setSelectedKeys(new Set(mediaIds));
             },
