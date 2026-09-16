@@ -103,7 +103,7 @@ describe('ImportExport', () => {
         await waitFor(() => expect(datasetItemsViewIds.length).toBeGreaterThan(0));
         expect(datasetItemsViewIds.every((id) => id === 'view-1')).toBe(true);
 
-        fireEvent.click(screen.getByRole('button', { name: /export/i, hidden: false }));
+        fireEvent.click(screen.getByRole('button', { name: 'Export' }));
 
         await waitFor(() => expect(exportRequestBody).toBeDefined());
         expect(exportRequestBody).toEqual(expect.objectContaining({ dataset_id: null, dataset_view_id: 'view-1' }));

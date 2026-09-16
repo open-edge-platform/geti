@@ -44,7 +44,9 @@ export const ImportExport = () => {
                     {t('dataset.importExport.trigger')}
                 </Button>
                 <Menu onAction={handleMenuAction}>
-                    <Item key='export'>{t('dataset.importExport.exportItem')}</Item>
+                    <Item key='export'>
+                        {isDatasetView ? t('dataset.export.headingDatasetView') : t('dataset.importExport.exportItem')}
+                    </Item>
                     <Item key='import'>{t('dataset.importExport.importItem')}</Item>
                 </Menu>
             </MenuTrigger>
