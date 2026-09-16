@@ -18,8 +18,12 @@ export const ImportExport = () => {
     const { datasetImportDialogState, setCurrentStep } = useImportDatasetDialogState();
 
     const [datasetViewId] = useDatasetViewId();
-    const { data: datasetViews } = useOptionalDatasetViewsQuery(datasetViewId !== ENTIRE_DATASET_VIEW_ID);
-    const datasetViewName = datasetViews?.find(({ id }) => id === datasetViewId)?.name;
+    const isDatasetView = datasetViewId !== ENTIRE_DATASET_VIEW_ID;
+    const { data: datasetViews } = useOptionalDatasetViewsQuery(isDatasetView);
+    const datasetViewName =
+        !isDatasetView || datasetViews === undefined
+            ? undefined
+            : (datasetViews.find(({ id }) => id === datasetViewId)?.name ?? 'Deleted view');
 
     const handleMenuAction = (option: Key) => {
         switch (option) {
@@ -49,9 +53,9 @@ export const ImportExport = () => {
             <ImportDatasetToProject />
 
             <ExportDatasetConfig
-                name={datasetViewName}
                 datasetId={null}
                 datasetViewId={datasetViewId}
+                datasetViewName={datasetViewName}
                 dialogState={exportDialogState}
                 statistics={<MainDatasetStatistics />}
             />

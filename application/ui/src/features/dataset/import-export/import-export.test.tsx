@@ -3,6 +3,7 @@
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
+import { getMockedJob } from 'mocks/mock-job';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
@@ -56,15 +57,25 @@ describe('ImportExport', () => {
 
     it('exports the selected dataset view', async () => {
         let exportRequestBody: Record<string, unknown> | undefined;
+        const datasetItemsViewIds: (string | null)[] = [];
 
         server.use(
             http.get('/api/projects/{project_id}', () => {
                 return HttpResponse.json(getMockedProject({ id: '123' }));
             }),
             http.get('/api/projects/{project_id}/dataset/views', () => {
-                return HttpResponse.json([{ id: 'view-1', project_id: '123', name: 'Canada signs' }]);
+                return HttpResponse.json([
+                    {
+                        id: 'view-1',
+                        project_id: '123',
+                        name: 'Canada signs',
+                        created_at: '2026-01-19T08:15:00.000000+00:00',
+                    },
+                ]);
             }),
-            http.get('/api/projects/{project_id}/dataset/items', () => {
+            http.get('/api/projects/{project_id}/dataset/items', ({ request }) => {
+                datasetItemsViewIds.push(new URL(request.url).searchParams.get('dataset_view_id'));
+
                 return HttpResponse.json({
                     pagination: { total: 10, offset: 0, limit: 0, count: 0 },
                     items: [],
@@ -73,7 +84,7 @@ describe('ImportExport', () => {
             http.post('/api/jobs', async ({ request }) => {
                 exportRequestBody = (await request.json()) as Record<string, unknown>;
 
-                return HttpResponse.json({ job_id: 'job-1' });
+                return HttpResponse.json(getMockedJob({ job_id: 'job-1' }));
             })
         );
 
@@ -85,9 +96,12 @@ describe('ImportExport', () => {
         );
 
         fireEvent.click(await screen.findByRole('button', { name: /import export dataset/i }));
-        fireEvent.click(await screen.findByRole('menuitem', { name: /Export dataset/i }));
+        fireEvent.click(await screen.findByRole('menuitem', { name: 'Export dataset view' }));
 
-        expect(await screen.findByRole('heading', { name: /Canada signs/i })).toBeVisible();
+        expect(await screen.findByRole('heading', { name: 'Export dataset view' })).toBeVisible();
+
+        await waitFor(() => expect(datasetItemsViewIds.length).toBeGreaterThan(0));
+        expect(datasetItemsViewIds.every((id) => id === 'view-1')).toBe(true);
 
         fireEvent.click(screen.getByRole('button', { name: /export/i, hidden: false }));
 

@@ -89,6 +89,7 @@ type ExportDatasetConfigProps = {
     name?: string;
     datasetId: string | null;
     datasetViewId?: string | null;
+    datasetViewName?: string;
     statistics: ReactNode;
     dialogState: OverlayTriggerState;
 };
@@ -101,6 +102,7 @@ type ExportDatasetDialogContentProps = {
     name: string;
     datasetId: string | null;
     datasetViewId: string | null;
+    datasetViewName: string | undefined;
     statistics: ReactNode;
     dialogState: OverlayTriggerState;
 };
@@ -109,6 +111,7 @@ const ExportDatasetDialogContent = ({
     name,
     datasetId,
     datasetViewId,
+    datasetViewName,
     statistics,
     dialogState,
 }: ExportDatasetDialogContentProps) => {
@@ -128,9 +131,17 @@ const ExportDatasetDialogContent = ({
 
     return (
         <Dialog size='L' width={{ base: '70vw' }}>
-            <Heading>{t('dataset.export.heading', { name })}</Heading>
+            <Heading>
+                {datasetViewName === undefined
+                    ? t('dataset.export.heading', { name })
+                    : t('dataset.export.headingDatasetView')}
+            </Heading>
             <Divider />
             <Content UNSAFE_className={classes.container}>
+                {datasetViewName !== undefined && (
+                    <Text>{t('dataset.export.datasetView', { name: datasetViewName })}</Text>
+                )}
+
                 <Heading>{t('dataset.export.statisticsHeading')}</Heading>
                 {statistics}
 
@@ -197,6 +208,7 @@ export const ExportDatasetConfig = ({
     name = 'dataset',
     datasetId,
     datasetViewId = null,
+    datasetViewName,
     statistics,
     dialogState,
 }: ExportDatasetConfigProps) => {
@@ -207,6 +219,7 @@ export const ExportDatasetConfig = ({
                     name={name}
                     datasetId={datasetId}
                     datasetViewId={datasetViewId}
+                    datasetViewName={datasetViewName}
                     statistics={statistics}
                     dialogState={dialogState}
                 />

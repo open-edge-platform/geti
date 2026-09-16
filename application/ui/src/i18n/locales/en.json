@@ -218,6 +218,8 @@
         },
         "export": {
             "heading": "Export {{name}}",
+            "headingDatasetView": "Export dataset view",
+            "datasetView": "View: {{name}}",
             "statisticsHeading": "Exported dataset statistics",
             "settingsHeading": "Export settings",
             "filterByLabel": "Filter annotations by label",
