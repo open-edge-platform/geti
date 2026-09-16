@@ -9,14 +9,6 @@ import { useDatasetMediaFilterOptions } from './use-dataset-media-filter-options
 import { buildDatasetMediaQueryFilters } from './use-get-dataset-media-items.hook';
 import { useProjectIdentifier } from './use-project-identifier.hook';
 
-/**
- * Resolves the ids of *every* media item matching the currently applied dataset filters,
- * not just the pages the gallery has loaded so far.
- *
- * The gallery's bulk actions (delete, dataset view assignment, label assignment) all take an
- * explicit list of media ids, so "select all" is materialised into concrete ids rather than
- * being expressed as a filter.
- */
 export const useSelectAllDatasetMedia = () => {
     const projectId = useProjectIdentifier();
     const filterOptions = useDatasetMediaFilterOptions();

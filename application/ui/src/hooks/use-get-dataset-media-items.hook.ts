@@ -35,7 +35,7 @@ export interface DatasetMediaQueryFilters {
     dataset_view_id?: string;
 }
 
-const buildDatasetMediaQueryFilters = (options?: UseGetDatasetMediaItemsOptions): DatasetMediaQueryFilters => {
+export const buildDatasetMediaQueryFilters = (options?: UseGetDatasetMediaItemsOptions): DatasetMediaQueryFilters => {
     const query: DatasetMediaQueryFilters = {};
 
     if (options !== undefined && !isEmpty(options?.subsets)) {
