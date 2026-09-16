@@ -18,7 +18,7 @@ type ExportJobDetailsProps = {
 const isGetiFormat = (format?: string | null) => format?.toLowerCase() === 'geti';
 
 const useDatasetViewName = (datasetViewId: string | null | undefined) => {
-    const { data: datasetViews } = useOptionalDatasetViewsQuery(!isNonEmptyString(datasetViewId));
+    const { data: datasetViews } = useOptionalDatasetViewsQuery(isNonEmptyString(datasetViewId));
 
     if (!isNonEmptyString(datasetViewId)) {
         return undefined;
@@ -40,9 +40,7 @@ export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProp
 
     const labelsList = isEmpty(selectedLabels) ? projectLabelsNames : selectedLabels;
 
-    const title = isNil(metadata.dataset_view_id)
-        ? `Export ${isNil(datasetName) ? 'dataset' : datasetName}`
-        : 'Export dataset view';
+    const title = isNil(metadata.dataset_view_id) ? (datasetName ?? 'dataset') : 'dataset view';
 
     return (
         <Flex direction={'column'}>
