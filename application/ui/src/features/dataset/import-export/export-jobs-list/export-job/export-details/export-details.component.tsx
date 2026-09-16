@@ -7,6 +7,7 @@ import { dimensionValue, Divider, Flex, Grid, Text } from '@geti-ui/ui';
 import { isEmpty, isNil } from 'lodash-es';
 
 import { useProject } from '../../../../../../hooks/api/project.hook';
+import { isNonEmptyString } from '../../../../../../shared/util';
 import { useOptionalDatasetViewsQuery } from '../../../../gallery/toolbar/dataset-view-selector/api/use-dataset-views';
 
 type ExportJobDetailsProps = {
@@ -17,9 +18,9 @@ type ExportJobDetailsProps = {
 const isGetiFormat = (format?: string | null) => format?.toLowerCase() === 'geti';
 
 const useDatasetViewName = (datasetViewId: string | null | undefined) => {
-    const { data: datasetViews } = useOptionalDatasetViewsQuery(!isNil(datasetViewId));
+    const { data: datasetViews } = useOptionalDatasetViewsQuery(!isNonEmptyString(datasetViewId));
 
-    if (isNil(datasetViewId)) {
+    if (!isNonEmptyString(datasetViewId)) {
         return undefined;
     }
 
@@ -59,7 +60,7 @@ export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProp
                         : ['auto', '1px', 'auto', '1px', 'auto', '1px', '1fr']
                 }
             >
-                {datasetViewName !== undefined && (
+                {isNonEmptyString(datasetViewName) && (
                     <>
                         <Text>View: {datasetViewName}</Text>
 
