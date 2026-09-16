@@ -165,6 +165,17 @@ populates it with the samples from the database.
 During the conversion, a subset is assigned to any item that doesn't already have one; the assignment is based on
 stratified sampling, and each item's subset remains unchanged in subsequent training rounds to avoid subset leakage.
 
+The data used for training can be scoped in three ways:
+
+- the entire dataset, in its most recent state (the default);
+- a [dataset view](dataset.md#dataset-views), by passing `dataset_view_id` in the job parameters, so that only the
+  media assigned to that view is used, and subsets are assigned within the view;
+- an existing [dataset revision](dataset.md#dataset-revisions), by passing `dataset_revision_id`, to train on the
+  exact same data as another model.
+
+The last two parameters are mutually exclusive. In the first two cases, the job creates a new dataset revision unless
+an up-to-date one already exists for the same scope.
+
 The actual training loop is controlled by the OTX `Engine`, configured with an `OTXDataModule` that is initialized
 from the previously created `Dataset`. Just before the loop starts, the hyperparameters are serialized to a YAML file
 in OTX-compatible format, and any necessary base weights are downloaded if not already cached locally.

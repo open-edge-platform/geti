@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -25,6 +26,10 @@ class DatasetRevisionView(BaseIDModel):
     files_deleted: bool = Field(..., description="Indicates if the dataset revision files have been deleted")
     size: int = Field(..., description="Size in bytes of all files from this dataset revision on disk")
     item_counts: ItemCount = Field(..., description="Number of items in the dataset")
+    dataset_view_id: UUID | None = Field(
+        None,
+        description="Dataset view the revision was created from, null if it covers the entire dataset",
+    )
 
     model_config = {
         "json_schema_extra": {
@@ -35,6 +40,7 @@ class DatasetRevisionView(BaseIDModel):
                 "files_deleted": False,
                 "size": 456123,
                 "item_counts": {"total": 100, "training": 70, "validation": 20, "testing": 10},
+                "dataset_view_id": None,
             }
         }
     }

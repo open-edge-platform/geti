@@ -3,14 +3,15 @@
 
 from collections import Counter
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, cast
 
-from sqlalchemy import ColumnElement, CursorResult, Select, delete, exists, func, select
+from sqlalchemy import ColumnElement, CursorResult, Select, delete, exists, func, select, update
 from sqlalchemy.dialects.sqlite import insert
 from sqlalchemy.orm import Session
 
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, DatasetViewDB, DatasetViewItemDB, MediaDB
+from app.models import DatasetItemSubset
 from app.models.dataset_item import DatasetItemSortBy
 from app.models.media import MediaSortBy, MediaType, SortDirection
 
@@ -59,6 +60,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         values = [{"dataset_view_id": dataset_view_id, "media_id": media_id} for media_id in media_ids]
         stmt = insert(DatasetViewItemDB).values(values).on_conflict_do_nothing()
         self.db.execute(stmt)
+        self._touch(dataset_view_id)
 
     def unassign_media(self, dataset_view_id: str, media_ids: list[str]) -> None:
         """Unassign one or more media items from a dataset view. Non-assigned items are silently ignored."""
@@ -67,6 +69,16 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         stmt = delete(DatasetViewItemDB).where(
             DatasetViewItemDB.dataset_view_id == dataset_view_id,
             DatasetViewItemDB.media_id.in_(media_ids),
+        )
+        self.db.execute(stmt)
+        self._touch(dataset_view_id)
+
+    def _touch(self, dataset_view_id: str) -> None:
+        """Bump the view's ``updated_at``, so that membership changes (including removals) stay detectable."""
+        stmt = (
+            update(DatasetViewDB)
+            .where(DatasetViewDB.id == dataset_view_id, DatasetViewDB.project_id == self.project_id)
+            .values(updated_at=datetime.now(UTC))
         )
         self.db.execute(stmt)
 
@@ -279,6 +291,34 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             stmt = stmt.join(DatasetItemLabelDB).where(DatasetItemLabelDB.label_id.in_(label_ids)).distinct()
         stmt = stmt.order_by(DatasetItemDB.created_at.desc()).offset(offset).limit(limit)
         return [(dataset_item, media) for (dataset_item, media) in self.db.execute(stmt).all()]
+
+    def list_unassigned_items(self, dataset_view_id: str) -> list[DatasetItemLabelDB]:
+        """List the label rows of the dataset items of a view that have no subset assigned yet."""
+        stmt = (
+            select(DatasetItemLabelDB)
+            .join(DatasetItemDB, DatasetItemDB.id == DatasetItemLabelDB.dataset_item_id)
+            .join(MediaDB, MediaDB.id == DatasetItemDB.id)
+            .where(
+                DatasetItemDB.project_id == self.project_id,
+                DatasetItemDB.subset == DatasetItemSubset.UNASSIGNED,
+                self._media_in_view_condition(dataset_view_id),
+            )
+        )
+        return list(self.db.scalars(stmt).all())
+
+    def has_all_subsets_assigned(self, dataset_view_id: str) -> bool:
+        """Return True if the view has at least one item in each of TRAINING, VALIDATION and TESTING subsets."""
+        stmt = (
+            select(func.distinct(DatasetItemDB.subset))
+            .join(MediaDB, MediaDB.id == DatasetItemDB.id)
+            .where(
+                DatasetItemDB.project_id == self.project_id,
+                self._media_in_view_condition(dataset_view_id),
+            )
+        )
+        present_subsets = set(self.db.scalars(stmt).all())
+        required_subsets = {DatasetItemSubset.TRAINING, DatasetItemSubset.VALIDATION, DatasetItemSubset.TESTING}
+        return required_subsets.issubset(present_subsets)
 
     def get_statistics(self, dataset_view_id: str) -> dict[str, Any]:
         """Get statistics (media & annotation counts) about the media assigned to a dataset view."""

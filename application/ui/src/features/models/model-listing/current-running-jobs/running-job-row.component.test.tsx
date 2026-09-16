@@ -164,6 +164,39 @@ describe('RunningJobRow', () => {
         expect(within(labelsBadge).getByText(labelsCount));
     });
 
+    it('shows the dataset view a training job was started on, before its revision exists', async () => {
+        const job = getMockedTrainJob({
+            metadata: {
+                project: { id: '123' },
+                model: {
+                    id: mockModel.id,
+                    name: mockModel.name,
+                    architecture: modelArchitecture.id,
+                    parent_revision_id: null,
+                    dataset_revision_id: null,
+                    dataset_view_id: 'collection-one',
+                    dataset_view_name: 'Collection One',
+                },
+                device: {
+                    type: 'cpu',
+                    name: 'CPU',
+                },
+            },
+            status: 'RUNNING',
+        });
+
+        render(
+            <RunningJobRow
+                job={job}
+                groupBy={'architecture'}
+                datasetRevisions={[]}
+                modelArchitectures={[modelArchitecture]}
+            />
+        );
+
+        expect(await screen.findByText('Collection One')).toBeVisible();
+    });
+
     it('renders Cancel button when onCancel is provided and job is running', async () => {
         const mockCancel = vi.fn();
         const job = getMockedTrainJob({

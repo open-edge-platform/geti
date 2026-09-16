@@ -14,17 +14,18 @@ import styles from './model-row.module.scss';
 type DatasetColumnProps = {
     datasetRevision: DatasetRevision | undefined;
     labelsCount: number | undefined;
+    /** Shown while no revision exists yet, e.g. a training job that was started on a dataset view. */
+    pendingDatasetName?: string;
 };
 
-export const DatasetColumn = ({ datasetRevision, labelsCount }: DatasetColumnProps) => {
+export const DatasetColumn = ({ datasetRevision, labelsCount, pendingDatasetName }: DatasetColumnProps) => {
     const totalCount = datasetRevision?.item_counts?.total;
     const formatter = useNumberFormatter();
 
-    // Should never happen, but just in case
     if (datasetRevision === undefined) {
         return (
-            <Flex alignItems={'center'} justifyContent={'center'}>
-                Unknown
+            <Flex alignItems={'center'} justifyContent={pendingDatasetName === undefined ? 'center' : 'start'}>
+                {pendingDatasetName ?? 'Unknown'}
             </Flex>
         );
     }

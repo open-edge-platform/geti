@@ -66,6 +66,7 @@ export const JobRow = ({
     const modelArchitecture = modelArchitectures.find(({ id }) => id === modelArchitectureId);
 
     const datasetRevision = datasetRevisions.find(({ id }) => id === trainingModel?.training_info.dataset_revision_id);
+    const datasetViewName = isTrainJob(job) ? (job.metadata.model.dataset_view_name ?? undefined) : undefined;
     const labelSchemaRevision = trainingModel?.training_info.label_schema_revision ?? {};
     const labelsCount =
         'labels' in labelSchemaRevision && Array.isArray(labelSchemaRevision.labels)
@@ -98,7 +99,11 @@ export const JobRow = ({
 
                 <Flex alignItems={'start'} direction={'column'} gap={'size-100'}>
                     {groupBy === 'architecture' ? (
-                        <DatasetColumn datasetRevision={datasetRevision} labelsCount={labelsCount} />
+                        <DatasetColumn
+                            datasetRevision={datasetRevision}
+                            labelsCount={labelsCount}
+                            pendingDatasetName={datasetViewName}
+                        />
                     ) : (
                         <ArchitectureColumn architectureId={modelArchitectureId} architecture={modelArchitecture} />
                     )}

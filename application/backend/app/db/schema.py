@@ -103,6 +103,10 @@ class DatasetRevisionDB(BaseID):
 
     project_id: Mapped[str] = mapped_column(Text, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    # Dataset view the revision was created from; NULL means the revision covers the entire dataset.
+    dataset_view_id: Mapped[str | None] = mapped_column(
+        Text, ForeignKey("dataset_views.id", ondelete="SET NULL"), nullable=True
+    )
     files_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
     training_count: Mapped[int] = mapped_column(Integer, default=0)
     validation_count: Mapped[int] = mapped_column(Integer, default=0)

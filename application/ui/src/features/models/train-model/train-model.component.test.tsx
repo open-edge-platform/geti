@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { DATASET_VIEW_ID_PARAM } from 'hooks/use-dataset-view-id.hook';
 import { getMockedDatasetItem } from 'mocks/mock-dataset-item';
+import { getMockedDatasetView } from 'mocks/mock-dataset-view';
 import { getMockedPipeline } from 'mocks/mock-pipeline';
 import { getMockedProject } from 'mocks/mock-project';
 import { getMockedTrainingConfiguration } from 'mocks/mock-training-configuration';
@@ -10,6 +12,7 @@ import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../api/utils';
+import { paths } from '../../../constants/paths';
 import { server } from '../../../msw-node-setup';
 import { TrainModel } from './train-model.component';
 
@@ -23,6 +26,9 @@ describe('TrainModel', () => {
                 return HttpResponse.json(getMockedPipeline({}));
             }),
             http.get('/api/projects/{project_id}/dataset_revisions', () => {
+                return HttpResponse.json([]);
+            }),
+            http.get('/api/projects/{project_id}/dataset/views', () => {
                 return HttpResponse.json([]);
             }),
             http.get('/api/projects/{project_id}/models', () => {
@@ -119,6 +125,49 @@ describe('TrainModel', () => {
             expect(
                 screen.queryByText(/In order to train a model, you need to annotate at least 3 items/)
             ).not.toBeInTheDocument();
+        });
+    });
+
+    describe('dataset selection', () => {
+        beforeEach(() => {
+            server.use(
+                http.get('/api/projects/{project_id}/dataset/views', () => {
+                    return HttpResponse.json([
+                        getMockedDatasetView({ id: 'collection-one', name: 'Collection One' }),
+                        getMockedDatasetView({ id: 'collection-two', name: 'Collection Two' }),
+                    ]);
+                }),
+                http.get('/api/projects/{project_id}/dataset/items', () => {
+                    return HttpResponse.json({
+                        items: [],
+                        pagination: { total: 0, count: 0, limit: 10, offset: 0 },
+                    });
+                })
+            );
+        });
+
+        it('defaults to the current dataset and lists the available dataset views', async () => {
+            render(<TrainModel />);
+
+            fireEvent.click(await screen.findByRole('button', { name: 'Train model' }));
+
+            const picker = await screen.findByTestId('select-dataset');
+            expect(picker).toHaveTextContent('Use current dataset');
+
+            fireEvent.click(picker);
+
+            expect(await screen.findByRole('option', { name: 'Collection One' })).toBeVisible();
+            expect(screen.getByRole('option', { name: 'Collection Two' })).toBeVisible();
+        });
+
+        it('preselects the dataset view that is open on the Dataset screen', async () => {
+            render(<TrainModel />, {
+                route: `${paths.project.details({ projectId: '123' })}?${DATASET_VIEW_ID_PARAM}=collection-two`,
+            });
+
+            fireEvent.click(await screen.findByRole('button', { name: 'Train model' }));
+
+            expect(await screen.findByTestId('select-dataset')).toHaveTextContent('Collection Two');
         });
     });
 });
