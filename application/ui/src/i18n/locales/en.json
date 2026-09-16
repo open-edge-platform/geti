@@ -173,11 +173,31 @@
             "dropZipHere": "Drop the dataset .zip file here",
             "upload": "Upload",
             "learnMoreFormats": "Learn more about the different formats",
+            "dialogHeading": "Import dataset",
+            "scanningMessage": "Scanning and analyzing the dataset archive to import...",
+            "mapLabelsMessage": "Map labels for the uploaded dataset",
+            "continue": "Continue",
             "deleteStagedFile": {
                 "title": "Delete Staged File",
                 "confirmation": "Are you sure you want to delete the dataset file \"{{stagedDatasetId}}\"?",
                 "cancel": "Cancel",
                 "delete": "Delete"
+            },
+            "formatWarning": {
+                "boundingBoxToPolygon": "Imported dataset uses bounding box annotations, but your project’s dataset uses polygons. Annotations will be automatically converted to polygons to keep everything compatible.",
+                "polygonToBoundingBox": "Imported dataset uses polygon annotations, but your project’s dataset uses bounding boxes. Annotations will be automatically converted to bounding boxes to keep everything compatible."
+            },
+            "labelMapping": {
+                "statisticsHeading": "Imported dataset statistics",
+                "imagesLabel": "images",
+                "framesLabel": "frames",
+                "heading": "Label mapping - optional",
+                "unmappedNote": "Any unmapped items will be imported as unlabeled",
+                "datasetLabelsColumn": "Dataset labels",
+                "projectLabelsColumn": "Project labels",
+                "selectLabelPlaceholder": "Select label",
+                "includeUnannotated": "Include media without annotations",
+                "submit": "Submit"
             }
         },
         "export": {
@@ -190,6 +210,21 @@
             "learnMoreFormats": "Learn more about export formats",
             "cancel": "Cancel",
             "submit": "Export",
+            "processing": "Processing dataset for export",
+            "readyForDownload": "Dataset is ready for download",
+            "download": "Download",
+            "downloadStarted": "Dataset download started",
+            "error": "Error: {{error}}",
+            "itemsLabel": "items",
+            "details": {
+                "heading": "Export {{name}}",
+                "defaultName": "dataset",
+                "format": "Format:",
+                "media": "Media:",
+                "allMedia": "All media",
+                "onlyAnnotated": "Only media with annotations",
+                "labels": "Labels:"
+            },
             "warnings": {
                 "videos": "Exporting videos is not supported by this dataset format. All annotated frames from videos will be exported as images.",
                 "emptyLabel": "The selected format does not support empty labels (e.g. \"{{emptyLabelName}}\"). Images and frames containing them will be exported as unannotated.",
@@ -197,6 +232,20 @@
                 "unsupportedItemsEmptyLabels": "empty labels",
                 "unsupportedItems": "To preserve {{items}}, please use the Geti export format.",
                 "subsetNotIncluded": "The exported dataset won't include any information about the subset assigned to each media."
+            }
+        },
+        "importExport": {
+            "trigger": "Import/export dataset",
+            "exportItem": "Export dataset",
+            "importItem": "Import dataset"
+        },
+        "jobs": {
+            "cancel": {
+                "trigger": "Cancel job",
+                "title": "Cancel job",
+                "dismiss": "Dismiss",
+                "confirm": "Cancel job",
+                "confirmation": "Are you sure you want to cancel job {{jobId}}?"
             }
         }
     },
