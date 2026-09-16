@@ -234,7 +234,7 @@ class DataModule(LightningDataModule):
         auto_num_workers: bool = False,
         device: DeviceType = DeviceType.auto,
     ) -> DataModule:
-        """Create an DataModule from pre-constructed VisionDataset instances.
+        """Create a DataModule from pre-constructed VisionDataset instances.
 
         This is a factory method that provides a clean way to create DataModule instances
         when you already have constructed datasets, without needing to provide data_root
