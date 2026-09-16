@@ -1221,7 +1221,7 @@ requires-dist = [
     { name = "jsonargparse", specifier = "==4.35.0" },
     { name = "kagglehub", marker = "extra == 'benchmark'", specifier = ">=0.4.1" },
     { name = "kornia", specifier = "~=0.8.2" },
-    { name = "lightning", specifier = "==2.6.0" },
+    { name = "lightning", specifier = "~=2.6.6" },
     { name = "linkify-it-py", marker = "extra == 'docs'" },
     { name = "myst-parser", marker = "extra == 'docs'", specifier = ">=2.0.0" },
     { name = "nbsphinx", marker = "extra == 'docs'" },
@@ -1832,7 +1832,7 @@ wheels = [
 
 [[package]]
 name = "lightning"
-version = "2.6.0"
+version = "2.6.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fsspec", extra = ["http"], marker = "(extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-cuda') or (extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cpu' and extra == 'extra-8-getitune-cpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-4-geti-xpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu')" },
@@ -1848,9 +1848,9 @@ dependencies = [
     { name = "tqdm", marker = "(extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-cuda') or (extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cpu' and extra == 'extra-8-getitune-cpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-4-geti-xpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu')" },
     { name = "typing-extensions", marker = "(extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-cuda') or (extra == 'extra-4-geti-cpu' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cpu' and extra == 'extra-8-getitune-cpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-4-geti-xpu') or (extra == 'extra-4-geti-cuda' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-4-geti-xpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1a/d5/892ea38816925b3511493e87b0b32494122bf8a20e66f4f2cd2667f95625/lightning-2.6.0.tar.gz", hash = "sha256:881841716b59c1837ae0c562c2e64fea9bcf49ef9de3867bd1f868557ec23d04", size = 656539, upload-time = "2025-11-28T09:34:25.069Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/39/b8/fbf1469d917c3ed3b22e00ab3a852fb9a5f85b9dc7f7060eedc3449098e7/lightning-2.6.6.tar.gz", hash = "sha256:1c6329e241f8a85f29fedead89c1ee138b36caa08de60c260c6a7eaee81c8295", size = 659902, upload-time = "2026-09-10T09:41:03.009Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d6/e9/36b340c7ec01dad6f034481e98fc9fc0133307beb05c714c0542af98bbde/lightning-2.6.0-py3-none-any.whl", hash = "sha256:f1a13a48909960a3454518486f113fae4fadb2db0e28e9c50d8d38d46c9dc3d6", size = 845956, upload-time = "2025-11-28T09:34:23.273Z" },
+    { url = "https://files.pythonhosted.org/packages/12/43/7da7fe42f254ce57777d1a86eece3f86d1b3329fc568d48e2bc16c8b7ebc/lightning-2.6.6-py3-none-any.whl", hash = "sha256:2bcbd6ee840071cd076c7dc9953d7ac1040df92f1c5fa76583aae644f037ab85", size = 849265, upload-time = "2026-09-10T09:41:00.882Z" },
 ]
 
 [[package]]
