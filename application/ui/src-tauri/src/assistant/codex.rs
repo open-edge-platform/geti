@@ -406,11 +406,11 @@ async fn codex_version(binary: &Path) -> String {
 
 fn auth_state(home: &Path) -> &'static str {
     if home.join("auth.json").is_file() {
-        "signed in (auth.json present)"
+        "auth.json present"
     } else if home.is_dir() {
-        "signed out (no auth.json)"
+        "no auth.json (recent Codex versions keep credentials in the OS keyring)"
     } else {
-        "never used (directory missing)"
+        "directory missing"
     }
 }
 

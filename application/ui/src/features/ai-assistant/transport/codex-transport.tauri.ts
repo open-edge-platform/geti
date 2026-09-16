@@ -29,16 +29,17 @@ const run = (operation: string, body: unknown, onEvent: Channel<CodexEvent>): Pr
 /** Resolves to `null` when no ChatGPT account is signed in. */
 export const codexStatus = async (): Promise<CodexAccount | null> => {
     const result = asRecord(await run('status', null, new Channel<CodexEvent>()));
-    const account = asRecord(result.account ?? result);
+    // `account/read` answers with a null account when signed out; `email` itself may be null when signed in.
+    const account = asRecord(result.account);
 
-    const email = typeof account.email === 'string' ? account.email : null;
-    const plan = typeof account.planType === 'string' ? account.planType : null;
-
-    if (email === null && account.authenticated !== true && result.authenticated !== true) {
+    if (account.type !== 'chatgpt') {
         return null;
     }
 
-    return { email, plan };
+    return {
+        email: typeof account.email === 'string' ? account.email : null,
+        plan: typeof account.planType === 'string' ? account.planType : null,
+    };
 };
 
 /** The executable the shell auto-detects, plus every folder it looked in. */
