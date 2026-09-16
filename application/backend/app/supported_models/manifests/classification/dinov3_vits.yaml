@@ -1,6 +1,6 @@
 id: image-classification-dinov3-vits
 name: DINOv3 ViT-S/16
-license: DINOv3 License
+license: https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md
 pretrained_weights:
   source: huggingface
   repo_id: timm/vit_small_patch16_dinov3.lvd1689m
