@@ -88,6 +88,7 @@ const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: strin
 type ExportDatasetConfigProps = {
     name?: string;
     datasetId: string | null;
+    datasetViewId?: string | null;
     statistics: ReactNode;
     dialogState: OverlayTriggerState;
 };
@@ -99,16 +100,24 @@ const EXPORT_FORMATS_LINK =
 type ExportDatasetDialogContentProps = {
     name: string;
     datasetId: string | null;
+    datasetViewId: string | null;
     statistics: ReactNode;
     dialogState: OverlayTriggerState;
 };
 
-const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }: ExportDatasetDialogContentProps) => {
+const ExportDatasetDialogContent = ({
+    name,
+    datasetId,
+    datasetViewId,
+    statistics,
+    dialogState,
+}: ExportDatasetDialogContentProps) => {
     const { t } = useTranslation();
     const { data: selectedProject } = useProject();
 
     const [formState, submitAction, isPending] = useExportDatasetJobAction({
         datasetId,
+        datasetViewId,
         onSuccess: dialogState.close,
     });
 
@@ -187,6 +196,7 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
 export const ExportDatasetConfig = ({
     name = 'dataset',
     datasetId,
+    datasetViewId = null,
     statistics,
     dialogState,
 }: ExportDatasetConfigProps) => {
@@ -196,6 +206,7 @@ export const ExportDatasetConfig = ({
                 <ExportDatasetDialogContent
                     name={name}
                     datasetId={datasetId}
+                    datasetViewId={datasetViewId}
                     statistics={statistics}
                     dialogState={dialogState}
                 />
