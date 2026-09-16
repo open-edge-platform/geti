@@ -485,9 +485,11 @@ class TestPlateauWarmup:
         trainer._apply_plateau_warmup()
         assert trainer.optimizer.param_groups[0]["lr"] == pytest.approx(1e-4)  # pyrefly: ignore[missing-attribute]
 
-        # First step past warmup hands the LR back and disarms the manual ramp.
+        # First step past warmup disarms the manual ramp without re-writing LR:
+        # ReduceLROnPlateau may already have reduced the LR during the first
+        # post-warmup evaluation; rewriting base_lr would undo that drop.
         trainer.state.global_step = 5
         trainer.optimizer.param_groups[0]["lr"] = 1e-6  # pyrefly: ignore[missing-attribute]
         trainer._apply_plateau_warmup()
         assert trainer._plateau_warmup_steps == 0
-        assert trainer.optimizer.param_groups[0]["lr"] == pytest.approx(1e-4)  # pyrefly: ignore[missing-attribute]
+        assert trainer.optimizer.param_groups[0]["lr"] == pytest.approx(1e-6)  # pyrefly: ignore[missing-attribute]

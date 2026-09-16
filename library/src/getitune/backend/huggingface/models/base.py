@@ -309,8 +309,7 @@ class HFModel(ABC, nn.Module):
         """
         self.hf_model = self.hf_auto_class.from_pretrained(str(checkpoint))
         threshold = getattr(self.hf_model.config, "getitune_best_confidence_threshold", None)
-        if threshold is not None:
-            self._best_confidence_threshold = float(threshold)
+        self._best_confidence_threshold = float(threshold) if threshold is not None else None
         self._best_checkpoint = Path(checkpoint)
 
     def record_checkpoint(self, checkpoint: PathLike) -> None:

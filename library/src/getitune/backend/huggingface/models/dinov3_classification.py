@@ -65,9 +65,28 @@ class _DinoV3ImageClassifier(nn.Module):
 
     def forward(self, pixel_values: torch.Tensor, labels: torch.Tensor | None = None) -> ImageClassifierOutput:
         outputs = self.backbone(pixel_values=pixel_values)
-        pooled = getattr(outputs, "pooler_output", None)
-        if pooled is None:
-            pooled = outputs.last_hidden_state[:, 0]
+        pooler_output = getattr(outputs, "pooler_output", None)
+        if pooler_output is not None:
+            pooled = pooler_output
+        else:
+            # Fall back through the shapes every backbone family can emit:
+            # token sequences [B, tokens, C] take the CLS token, convolutional
+            # backbones (e.g. timm ConvNeXt wrappers) give spatial [B, C, H, W]
+            # tensors that need average pooling, and some wrappers hand back an
+            # already-pooled [B, C] tensor directly.
+            hidden_state = outputs.last_hidden_state  # pyrefly: ignore[missing-attribute]
+            if hidden_state.ndim == 3:
+                pooled = hidden_state[:, 0]
+            elif hidden_state.ndim == 4:
+                pooled = hidden_state.mean(dim=(2, 3))
+            elif hidden_state.ndim == 2:
+                pooled = hidden_state
+            else:
+                msg = (
+                    f"Unsupported DINOv3 backbone pooling output shape {tuple(hidden_state.shape)} "
+                    f"({hidden_state.ndim} dims); cannot derive a per-image feature vector."
+                )
+                raise ValueError(msg)
         logits = self.classifier(pooled)
         loss = None
         if labels is not None:

@@ -28,23 +28,36 @@ def fxt_repo_info() -> MagicMock:
 
 def test_downloads_snapshot_to_application_cache(fxt_service: BaseWeightsService, fxt_weights) -> None:
     manifest = MagicMock(pretrained_weights=fxt_weights)
-    snapshot_download = MagicMock()
+    calls: list[dict] = []
+
+    def snapshot_download(**kwargs):
+        calls.append(kwargs)
+        if kwargs.get("local_files_only"):
+            raise LocalEntryNotFoundError("not cached")
 
     with (
         patch.object(fxt_service, "_get_and_validate_model_manifest", return_value=manifest),
         patch("app.services.base_weights_service.huggingface_hub.model_info", return_value=fxt_repo_info()),
-        patch("app.services.base_weights_service.huggingface_hub.snapshot_download", snapshot_download),
+        patch("app.services.base_weights_service.huggingface_hub.snapshot_download", side_effect=snapshot_download),
     ):
         result = fxt_service.get_local_weights_path(TaskType.DETECTION, "hf-model")
 
     local_path = fxt_service.pretrained_weights_dir / "detection" / "hf-model"
     assert result == local_path
-    snapshot_download.assert_called_once_with(
-        repo_id="org/model",
-        revision="0123456789abcdef",
-        local_dir=local_path,
-        max_workers=1,
-    )
+    # Cache-first: a local resolution attempt always precedes the network pull.
+    assert len(calls) == 2
+    assert calls[0] == {
+        "repo_id": "org/model",
+        "revision": "0123456789abcdef",
+        "local_dir": local_path,
+        "local_files_only": True,
+    }
+    snapshot_network = calls[1]
+    assert snapshot_network["repo_id"] == "org/model"
+    assert snapshot_network["revision"] == "0123456789abcdef"
+    assert snapshot_network["local_dir"] == local_path
+    assert snapshot_network.get("local_files_only") is None
+    assert snapshot_network.get("max_workers") == 1
 
 
 def test_offline_lookup_uses_hub_cache(fxt_service: BaseWeightsService, fxt_weights) -> None:

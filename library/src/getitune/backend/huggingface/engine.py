@@ -270,11 +270,16 @@ class HFEngine(Engine):
         # accuracy) are maximized, so inject the mode matching ``greater_is_better`` unless
         # the caller already set it explicitly.
         scheduler_kwargs = training_args_kwargs.get("lr_scheduler_kwargs")
-        if isinstance(scheduler_kwargs, dict) and "mode" not in scheduler_kwargs:
-            greater = training_args_kwargs.get(
-                "greater_is_better", resolve_greater_is_better(training_args_kwargs.get("metric_for_best_model"))
-            )
-            training_args_kwargs["lr_scheduler_kwargs"] = {**scheduler_kwargs, "mode": "max" if greater else "min"}
+        scheduler_type = training_args_kwargs.get("lr_scheduler_type", "linear")
+        scheduler_type = getattr(scheduler_type, "value", scheduler_type)
+        if scheduler_type == "reduce_lr_on_plateau":
+            scheduler_kwargs = dict(scheduler_kwargs) if isinstance(scheduler_kwargs, dict) else {}
+            if "mode" not in scheduler_kwargs:
+                greater = training_args_kwargs.get(
+                    "greater_is_better", resolve_greater_is_better(training_args_kwargs.get("metric_for_best_model"))
+                )
+                scheduler_kwargs["mode"] = "max" if greater else "min"
+            training_args_kwargs["lr_scheduler_kwargs"] = scheduler_kwargs
 
         # Convert`warmup_ratio` to the supported `warmup_steps` using the estimated number of training steps.
         # Warmup steps count optimizer updates, so the loader batch count must be divided by

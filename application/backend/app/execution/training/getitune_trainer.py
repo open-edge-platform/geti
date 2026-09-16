@@ -406,7 +406,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             )
 
     @step("Train Model", 80)
-    def train_model(  # noqa: PLR0912, PLR0915, C901 - training orchestration is intentionally centralized here
+    def train_model(  # noqa: PLR0915, C901 - training orchestration is intentionally centralized here
         self,
         training_config: dict,
         dataset_info: DatasetInfo,

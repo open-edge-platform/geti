@@ -251,7 +251,6 @@ class GetiTuneHFTrainer(Trainer):
         step = self.state.global_step
         if step > self._plateau_warmup_steps:
             self._plateau_warmup_steps = 0
-            self._set_learning_rate(self._plateau_warmup_base_lr)
             return
         self._set_learning_rate(plateau_warmup_lr(self._plateau_warmup_base_lr, step, self._plateau_warmup_steps))
 
