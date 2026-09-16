@@ -1,6 +1,6 @@
 id: instance-segmentation-eomt-dinov3-large-640
 name: EoMT-DINOv3-Large-640
-license: https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md
+license: DINOv3 License
 pretrained_weights:
   source: huggingface
   repo_id: tue-mps/eomt-dinov3-coco-instance-large-640

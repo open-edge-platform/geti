@@ -1,6 +1,5 @@
 id: object-detection-rtdetrv2-r34
 name: RT-DETRv2-R34
-license: Apache 2.0
 pretrained_weights:
   source: huggingface
   repo_id: PekingU/rtdetr_v2_r34vd

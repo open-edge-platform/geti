@@ -1,6 +1,6 @@
 id: image-classification-dinov3-convnext-tiny
 name: DINOv3 ConvNeXt-Tiny
-license: https://github.com/facebookresearch/dinov3/blob/main/LICENSE.md
+license: DINOv3 License
 pretrained_weights:
   source: huggingface
   repo_id: timm/convnext_tiny.dinov3_lvd1689m
