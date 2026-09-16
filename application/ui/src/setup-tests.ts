@@ -56,6 +56,11 @@ class ResizeObserverMock {
 
 global.ResizeObserver = ResizeObserverMock;
 
+// Pointer capture is not implemented in jsdom, and sonner's swipe-to-dismiss handler relies on it
+Object.defineProperty(Element.prototype, 'setPointerCapture', { writable: true, value: vi.fn() });
+Object.defineProperty(Element.prototype, 'releasePointerCapture', { writable: true, value: vi.fn() });
+Object.defineProperty(Element.prototype, 'hasPointerCapture', { writable: true, value: vi.fn(() => false) });
+
 class IntersectionObserverMock {
     constructor(_callback: IntersectionObserverCallback, _options?: IntersectionObserverInit) {}
 

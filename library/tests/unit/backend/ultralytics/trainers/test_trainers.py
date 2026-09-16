@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import csv
+from collections import defaultdict
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any, Callable
@@ -14,8 +15,14 @@ from unittest.mock import MagicMock, patch
 import pytest
 import torch
 
+from getitune.backend.ultralytics.trainers.classification import (
+    ClassificationTrainer,
+    MultiLabelClassificationTrainer,
+)
 from getitune.backend.ultralytics.trainers.detection import DetectionTrainer
 from getitune.backend.ultralytics.trainers.instance_segmentation import SegmentationTrainer
+from getitune.backend.ultralytics.trainers.semantic_segmentation import SemanticSegmentationTrainer
+from getitune.backend.ultralytics.trainers.yolo_detr import YoloDetrTrainer
 
 
 def test_detection_trainer_fallback_uses_upstream_preprocess() -> None:
@@ -80,6 +87,49 @@ def test_segmentation_trainer_datamodule_path_skips_divide_by_255() -> None:
     result = trainer.preprocess_batch(batch)
 
     assert torch.allclose(result["img"], imgs)
+
+
+def test_yolo_detr_trainer_datamodule_path_skips_native_epoch_callback() -> None:
+    trainer = object.__new__(YoloDetrTrainer)
+    trainer._use_getitune_data = True
+    trainer.args = SimpleNamespace(close_mosaic=10)
+
+    with patch("getitune.backend.ultralytics.trainers.yolo_detr._RTDETRTrainer.train", return_value="trained") as train:
+        result = trainer.train()
+
+    train.assert_called_once_with(trainer)
+    assert result == "trained"
+    assert trainer.args.close_mosaic == 0
+
+
+def test_yolo_detr_trainer_datamodule_path_skips_divide_by_255() -> None:
+    trainer = object.__new__(YoloDetrTrainer)
+    trainer._datamodule = MagicMock()
+    trainer._use_getitune_data = True
+    trainer.device = torch.device("cpu")
+
+    imgs = torch.rand(2, 3, 8, 8, dtype=torch.float32)
+    result = trainer.preprocess_batch({"img": imgs.clone()})
+
+    assert torch.allclose(result["img"], imgs)
+
+
+def test_yolo_detr_trainer_uses_dfine_loss_names() -> None:
+    trainer = object.__new__(YoloDetrTrainer)
+    trainer._use_getitune_data = True
+    trainer.model = SimpleNamespace(model=[type("DeimDecoder", (), {})()])
+    trainer.test_loader = MagicMock()
+    trainer.save_dir = Path("save")
+    trainer.args = SimpleNamespace()
+    trainer.callbacks = defaultdict(list)
+    trainer._datamodule = MagicMock()
+
+    with patch("getitune.backend.ultralytics.trainers.yolo_detr.YoloDetrValidator") as validator_cls:
+        validator = trainer.get_validator()
+
+    assert validator is validator_cls.return_value
+    assert trainer.loss_names == ("giou_loss", "cls_loss", "l1_loss", "fgl_loss", "ddf_loss")
+    assert validator.datamodule is trainer._datamodule
 
 
 def test_iteration_timer_appends_epoch_means_to_results_csv(tmp_path: Path) -> None:
@@ -300,3 +350,59 @@ class TestDisableExternalLoggerCallbacks:
         trainer._use_getitune_data = True
         # No ``callbacks`` attribute set.
         trainer._disable_external_logger_callbacks()  # should be a no-op
+
+
+_TRAINER_CASES = [
+    pytest.param(DetectionTrainer, "getitune.backend.ultralytics.trainers.base.InfiniteDataLoader", id="detection"),
+    pytest.param(
+        SegmentationTrainer,
+        "getitune.backend.ultralytics.trainers.base.InfiniteDataLoader",
+        id="instance_segmentation",
+    ),
+    pytest.param(YoloDetrTrainer, "getitune.backend.ultralytics.trainers.base.InfiniteDataLoader", id="yolo_detr"),
+    pytest.param(
+        ClassificationTrainer,
+        "getitune.backend.ultralytics.trainers.classification.InfiniteDataLoader",
+        id="classification",
+    ),
+    pytest.param(
+        MultiLabelClassificationTrainer,
+        "getitune.backend.ultralytics.trainers.classification.InfiniteDataLoader",
+        id="multilabel_classification",
+    ),
+    pytest.param(
+        SemanticSegmentationTrainer,
+        "getitune.backend.ultralytics.trainers.semantic_segmentation.InfiniteDataLoader",
+        id="semantic_segmentation",
+    ),
+]
+
+
+class TestPinMemoryPolicy:
+    """DataLoader pin_memory must follow device, never be hardcoded True."""
+
+    @pytest.mark.parametrize(("trainer_cls", "loader_patch_target"), _TRAINER_CASES)
+    @pytest.mark.parametrize(
+        ("device_type", "expected_pin_memory"),
+        [
+            ("cpu", False),
+            ("cuda:0", True),
+            ("xpu:0", True),
+        ],
+    )
+    def test_get_dataloader_respects_device(
+        self, device_type: str, expected_pin_memory: bool, trainer_cls: type, loader_patch_target: str
+    ) -> None:
+        trainer = object.__new__(trainer_cls)
+        trainer._use_getitune_data = True
+        trainer.device = torch.device(device_type)
+        trainer.args = SimpleNamespace(workers=0)
+
+        with (
+            patch.object(trainer_cls, "build_dataset", return_value=MagicMock()),
+            patch(loader_patch_target) as mock_loader_cls,
+        ):
+            trainer.get_dataloader("unused", batch_size=4, mode="train")
+
+        _, kwargs = mock_loader_cls.call_args
+        assert kwargs["pin_memory"] is expected_pin_memory

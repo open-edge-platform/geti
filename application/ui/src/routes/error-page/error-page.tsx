@@ -5,7 +5,7 @@ import { useTranslation } from '@/i18n';
 import { Button, Heading, IllustratedMessage, View } from '@geti-ui/ui';
 import { NotFound } from '@geti-ui/ui/icons';
 import { isObject, isString } from 'lodash-es';
-import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
+import { isRouteErrorResponse, useRouteError } from 'react-router';
 
 import { paths } from '../../constants/paths';
 import { redirectTo } from '../utils';

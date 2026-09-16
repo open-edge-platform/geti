@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 export const useProjectIdentifier = () => {
     const { projectId } = useParams<{ projectId: string }>();

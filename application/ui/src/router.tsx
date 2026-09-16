@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router';
 
 import { paths } from './constants/paths';
 import { useTerminateAnnotatorWorkersOnUnmount } from './features/annotator/tools/terminate-annotator-workers-on-unmount.hook';

@@ -9,7 +9,7 @@ import { Badge, dimensionValue, Flex, Heading, Text, View } from '@geti-ui/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { clsx } from 'clsx';
 import { getProjectQueryOptions } from 'hooks/api/project.hook';
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router';
 
 import placeholderThumbnailIconUrl from '../../../assets/icons/image-icon.svg?url';
 import { paths } from '../../../constants/paths';

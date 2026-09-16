@@ -4,7 +4,7 @@
 import { toast } from '@/components/toast/toast.component';
 import { Button, ButtonGroup, Content, Dialog, Divider, Flex, Footer, Heading, InlineAlert, Text } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-import { Link, useMatch } from 'react-router-dom';
+import { Link, useMatch } from 'react-router';
 
 import { paths } from '../../../constants/paths';
 import { AdvancedSettings } from './advanced-settings/advanced-settings.component';

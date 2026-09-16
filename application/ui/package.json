@@ -59,10 +59,10 @@
         "react-aria-components": "^1.11.0",
         "react-cool-virtual": "^0.7.0",
         "react-dom": "~19.1.1",
-        "react-error-boundary": "~3.1.4",
+        "react-error-boundary": "~6.1.5",
         "react-hotkeys-hook": "^5.3.3",
         "react-i18next": "~17.0.11",
-        "react-router-dom": "~6.30.4",
+        "react-router": "~7.18.3",
         "react-stately": "^3.47.0",
         "recharts": "~3.10.1",
         "sonner": "^2.0.7",
@@ -70,7 +70,6 @@
         "static-path": "~0.0.4",
         "usehooks-ts": "^3.1.1",
         "utif": "^3.1.0",
-        "uuid": "~14.0.1",
         "zipson": "^0.2.12"
     },
     "devDependencies": {
@@ -98,7 +97,7 @@
         "@typescript-eslint/eslint-plugin": "~8.65.0",
         "@typescript-eslint/parser": "~8.65.0",
         "@vitejs/plugin-react": "~6.0.5",
-        "@vitest/coverage-v8": "~4.1.10",
+        "@vitest/coverage-v8": "~5.0.0",
         "@wessberg/pointer-events": "^1.0.9",
         "babel-plugin-react-compiler": "1.0.0",
         "cross-env": "~10.1.0",
@@ -120,6 +119,9 @@
         "typescript": "~5.9.3",
         "typescript-eslint": "~8.65.0",
         "vite-plugin-svgr": "~5.2.0",
-        "vitest": "~4.1.10"
+        "vitest": "~5.0.0"
+    },
+    "overrides": {
+        "@faker-js/faker": "~10.6.0"
     }
 }

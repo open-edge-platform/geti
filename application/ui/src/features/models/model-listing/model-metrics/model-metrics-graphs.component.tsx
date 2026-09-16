@@ -1,11 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useState } from 'react';
-
 import type { LineMetric } from '@/api/types';
 import { Flex, Grid, Loading, minmax, repeat } from '@geti-ui/ui';
-import { useIsVisible } from 'hooks/use-is-visible.hook';
+import { useIntersectionObserver } from 'usehooks-ts';
 
 import { Box } from '../components/box/box.component';
 import { MetricGraph, type MetricGraphPoint } from './metric-graph.component';
@@ -43,13 +41,11 @@ const GraphPlaceholder = ({ title }: { title: string }) => (
 );
 
 const LazyMetricGraph = ({ graph }: { graph: GraphData }) => {
-    const [container, setContainer] = useState<HTMLDivElement | null>(null);
-
-    const isVisible = useIsVisible({ element: container });
+    const { ref, isIntersecting } = useIntersectionObserver({ freezeOnceVisible: true });
 
     return (
-        <div ref={setContainer} className={classes.graphContainer}>
-            {isVisible ? (
+        <div ref={ref} className={classes.graphContainer}>
+            {isIntersecting ? (
                 <MetricGraph
                     title={graph.title}
                     data={graph.data}

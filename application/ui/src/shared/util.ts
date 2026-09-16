@@ -17,7 +17,7 @@ export const isNonEmptyString = (value: unknown): value is string => isString(va
 
 export const formatBytes = (bytes: number): string => prettyBytes(bytes);
 
-export const pluralize = (count: number, singular: string, plural: string): string =>
+const pluralize = (count: number, singular: string, plural: string): string =>
     pluralRules.select(count) === 'one' ? singular : plural;
 
 export const pluralizeItems = (count: number): string => pluralize(count, 'item', 'items');
