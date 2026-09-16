@@ -20,10 +20,9 @@ export const ImportExport = () => {
     const [datasetViewId] = useDatasetViewId();
     const isDatasetView = datasetViewId !== ENTIRE_DATASET_VIEW_ID;
     const { data: datasetViews } = useOptionalDatasetViewsQuery(isDatasetView);
-    const datasetViewName =
-        !isDatasetView || datasetViews === undefined
-            ? undefined
-            : (datasetViews.find(({ id }) => id === datasetViewId)?.name ?? 'Deleted view');
+    const datasetViewName = isDatasetView
+        ? (datasetViews?.find(({ id }) => id === datasetViewId)?.name ?? 'Deleted view')
+        : undefined;
 
     const handleMenuAction = (option: Key) => {
         switch (option) {
