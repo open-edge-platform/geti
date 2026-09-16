@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import logging
+import math
 import os
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
@@ -276,10 +277,13 @@ class HFEngine(Engine):
             training_args_kwargs["lr_scheduler_kwargs"] = {**scheduler_kwargs, "mode": "max" if greater else "min"}
 
         # Convert`warmup_ratio` to the supported `warmup_steps` using the estimated number of training steps.
+        # Warmup steps count optimizer updates, so the loader batch count must be divided by
+        # gradient_accumulation_steps (math.ceil matches transformers' own optimizer-step estimation).
         warmup_ratio = training_args_kwargs.pop("warmup_ratio", None)
         if warmup_ratio is not None:
             train_batch = training_args_kwargs["per_device_train_batch_size"]
-            steps_per_epoch = max(1, len(self._datamodule.subsets["train"]) // train_batch)
+            accumulation_steps = training_args_kwargs.get("gradient_accumulation_steps", 1) or 1
+            steps_per_epoch = math.ceil(len(self._datamodule.subsets["train"]) / (train_batch * accumulation_steps))
             total_steps = max(1, int(steps_per_epoch * training_args_kwargs["num_train_epochs"]))
             training_args_kwargs["warmup_steps"] = int(warmup_ratio * total_steps)
 

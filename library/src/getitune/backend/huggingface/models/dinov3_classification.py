@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
@@ -19,6 +20,8 @@ from getitune.metrics.accuracy import MultiClassClsMetricCallable, MultiLabelCls
 from getitune.types.export import TaskLevelExportParameters
 from getitune.types.label import LabelInfoTypes
 from getitune.types.task import TaskType
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from transformers.utils import ModelOutput
@@ -106,11 +109,27 @@ class _DinoV3Factory:
         path = Path(checkpoint)
         config = transformers.AutoConfig.from_pretrained(checkpoint)
         if path.is_dir() and getattr(config, _GETITUNE_MODEL_TYPE_KEY, None) == _GETITUNE_MODEL_TYPE:
+            state_dict = torch.load(path / "pytorch_model.bin", map_location="cpu", weights_only=True)
             model = cls.from_config(config)
-            model.load_state_dict(torch.load(path / "pytorch_model.bin", map_location="cpu", weights_only=True))
-            if id2label and len(id2label) != config.num_labels:
+            # The classifier head must be swapped BEFORE loading the saved state:
+            # a label-count change reshapes ``classifier`` so the stored head has
+            # a different shape and a strict load would raise a size mismatch.
+            head_replaced = bool(id2label) and len(id2label) != config.num_labels
+            if head_replaced:
                 classifier = cast("nn.Linear", model.classifier)
                 model.classifier = nn.Linear(classifier.in_features, len(id2label))
+                msg = (
+                    f"DINOv3 checkpoint '{checkpoint}' has {config.num_labels} labels "
+                    f"but the project defines {len(id2label)}; the classifier head was "
+                    f"re-initialized and trained from scratch."
+                )
+                logger.warning(msg)
+                head_keys = {key for key in state_dict if key.startswith("classifier.")}
+                for key in head_keys:
+                    del state_dict[key]
+                model.load_state_dict(state_dict, strict=False)
+            else:
+                model.load_state_dict(state_dict)
             if id2label:
                 config.id2label = id2label
                 config.label2id = label2id

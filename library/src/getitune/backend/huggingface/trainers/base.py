@@ -256,7 +256,9 @@ class GetiTuneHFTrainer(Trainer):
         self._set_learning_rate(plateau_warmup_lr(self._plateau_warmup_base_lr, step, self._plateau_warmup_steps))
 
     def _set_learning_rate(self, lr: float) -> None:
-        assert self.optimizer is not None  # noqa: S101 - only called from the training loop
+        if self.optimizer is None:
+            msg = "Optimizer is not initialized."
+            raise RuntimeError(msg)
         for group in self.optimizer.param_groups:
             group["lr"] = lr
 
@@ -404,7 +406,10 @@ class GetiTuneHFTrainer(Trainer):
         metrics: dict[str, float] = {}
         for key, value in computed.items():
             if isinstance(value, torch.Tensor):
-                if value.ndim == 0:
+                # torchmetrics sometimes wraps scalars in a 1-element tensor
+                # (e.g. ``FMeasure.compute`` returns ``{"f1-score": Tensor([v])}``);
+                # both 0-dim and 1-element tensors carry a single value.
+                if value.ndim == 0 or value.numel() == 1:
                     metrics[f"{prefix}{key}"] = value.item()
             elif isinstance(value, (int, float)):
                 metrics[f"{prefix}{key}"] = float(value)

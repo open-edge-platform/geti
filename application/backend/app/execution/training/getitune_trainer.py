@@ -469,13 +469,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         if weights_path is not None:
             # Route weight loading through checkpoint for Ultralytics and for resume flows.
             load_from_checkpoint = is_ultralytics or has_model_revision
-            if is_huggingface:
-                # HF base snapshots and trained revisions are both complete local
-                # ``from_pretrained`` directories. Load them directly so model
-                # construction never falls back to the remote architecture ID.
-                model_cfg["init_args"]["pretrained"] = True
-                model_cfg["init_args"]["pretrained_weights"] = weights_path
-            elif load_from_checkpoint:
+            if load_from_checkpoint and not is_huggingface:
                 engine_kwargs["checkpoint"] = weights_path
                 # Disable default pretrained loading when checkpoint controls initialization.
                 model_cfg["init_args"]["pretrained"] = False

@@ -567,8 +567,9 @@ class TestTrain:
         assert call_kwargs["lr_scheduler_type"] == "cosine"
         assert call_kwargs["max_grad_norm"] == pytest.approx(0.1)
         assert call_kwargs["gradient_accumulation_steps"] == 4
-        # warmup_ratio -> steps: estimated 800 steps/epoch x 3 epochs x 0.05 = 120
-        assert call_kwargs["warmup_steps"] == int(0.05 * (800 // 1) * 3)
+        # warmup_ratio -> optimizer steps: 800 samples / (batch 1 x accum 4) =
+        # 200 optimizer steps/epoch x 3 epochs x 0.05 ratio = 30.
+        assert call_kwargs["warmup_steps"] == int(0.05 * 200 * 3)
 
     def test_train_injects_plateau_mode_max_for_higher_better_metrics(
         self, tmp_path: Path, model: _StubHFModel

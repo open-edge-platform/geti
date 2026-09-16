@@ -736,6 +736,11 @@ class GetiConfigConverter:
         for source_key, target_key in direct_mappings.items():
             if (value := training_parameters.get(source_key)) is not None:
                 training[target_key] = value
+                if source_key == "batch_size":
+                    for subset_name in ("train_subset", "val_subset", "test_subset"):
+                        config_dict["data"][subset_name]["batch_size"] = value
+            else:
+                raise ValueError(f"Missing required training parameter: {source_key}")
 
         early_stopping = training_parameters.get("early_stopping")
         if early_stopping is not None:
@@ -789,14 +794,9 @@ class GetiConfigConverter:
             config_dict["data"]["input_size"] = input_size
             config_dict["model"]["init_args"]["data_input_params"] = {"input_size": input_size}
 
-        if (batch := training.get("batch")) is not None:
-            for subset_name in ("train_subset", "val_subset"):
-                config_dict["data"][subset_name]["batch_size"] = batch
-
         GetiConfigConverter._update_data_transforms(config_dict, hyper_parameters)
         GetiConfigConverter._apply_intensity_mapping_from_task_params(config_dict, config)
 
-        config_dict["max_epochs"] = training["max_epochs"]
         config_dict["precision"] = training.get("precision", "bf16-mixed")
         return config_dict
 
