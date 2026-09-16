@@ -86,10 +86,11 @@ class MlvlPointGenerator(BasePriorGenerator):
             (coord_x, coord_y, stride_w, stride_h).
         """
         if self.num_levels != len(featmap_sizes):
-            raise ValueError(
+            msg = (
                 f"Number of feature levels must match the number of anchor strides: "
                 f"model has {self.num_levels} levels, but {len(featmap_sizes)} feature map sizes were provided."
             )
+            raise ValueError(msg)
         multi_level_priors = []
         for i in range(self.num_levels):
             priors = self.single_level_grid_priors(
@@ -177,10 +178,11 @@ class MlvlPointGenerator(BasePriorGenerator):
             list(torch.Tensor): Valid flags of points of multiple levels.
         """
         if self.num_levels != len(featmap_sizes):
-            raise ValueError(
+            msg = (
                 f"Number of feature levels must match the number of anchor strides: "
                 f"model has {self.num_levels} levels, but {len(featmap_sizes)} feature map sizes were provided."
             )
+            raise ValueError(msg)
         multi_level_flags = []
         for i in range(self.num_levels):
             point_stride = self.strides[i]
@@ -215,10 +217,11 @@ class MlvlPointGenerator(BasePriorGenerator):
         feat_h, feat_w = featmap_size
         valid_h, valid_w = valid_size
         if valid_h > feat_h or valid_w > feat_w:
-            raise ValueError(
+            msg = (
                 f"Valid feature size must not exceed feature map size: got valid size "
                 f"({valid_h}, {valid_w}) for a feature map of ({feat_h}, {feat_w})."
             )
+            raise ValueError(msg)
         valid_x = torch.zeros(feat_w, dtype=torch.bool, device=device)
         valid_y = torch.zeros(feat_h, dtype=torch.bool, device=device)
         valid_x[:valid_w] = 1

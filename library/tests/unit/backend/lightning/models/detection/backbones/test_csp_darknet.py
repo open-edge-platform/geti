@@ -53,7 +53,7 @@ class TestCSPDarknetModule:
 
     def test_init_with_large_out_indices(self) -> None:
         """Test __init__ with large out_indices."""
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError, match="out_indices"):
             CSPDarknetModule(out_indices=[6])
 
     def test_freeze_stages(self) -> None:

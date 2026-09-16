@@ -64,7 +64,9 @@ class AdaptivePadding(nn.Module):
         padding: str = "corner",
     ):
         super().__init__()
-        assert padding in ("same", "corner")  # noqa: S101
+        if padding not in ("same", "corner"):
+            msg = f"padding must be 'same' or 'corner', got {padding!r}."
+            raise ValueError(msg)
 
         kernel_size = kernel_size if isinstance(kernel_size, tuple) else (kernel_size, kernel_size)
         stride = stride if isinstance(stride, tuple) else (stride, stride)
