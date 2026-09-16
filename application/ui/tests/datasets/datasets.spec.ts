@@ -46,6 +46,11 @@ test.describe('Dataset', () => {
                         total: totalElements,
                     },
                 });
+            }),
+            http.get('/api/projects/{project_id}/dataset/media/ids', () => {
+                return HttpResponse.json({
+                    items: [...mockedItems, ...mockedItems2].map(({ id, type }) => ({ id, type })),
+                });
             })
         );
     });
