@@ -58,7 +58,7 @@ export const ExportCompletedJob = ({ job, datasetName }: ExportCompletedJobProps
                         isPending={removeStagedDatasetMutation.isPending}
                         isDisabled={removeStagedDatasetMutation.isPending}
                     >
-                        {t('dataset.export.close')}
+                        {t('common.actions.close')}
                     </Button>
                     <Button
                         variant='secondary'
