@@ -1,6 +1,6 @@
 id: object-detection-dinov3-detr-l
 name: DINOv3-DETR-L
-license: https://github.com/Intellindust-AI-Lab/DEIMv2?tab=License-1-ov-file
+license: DEIMv2 License
 
 pretrained_weights:
   source: direct_link
