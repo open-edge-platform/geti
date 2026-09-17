@@ -39,10 +39,13 @@ class TimmManifestProvider:
     def build_manifest(cls, model_name: str) -> ModelManifest:
         e = _snapshot()[model_name]
         _, h, w = e["input_size"]
+        license_id, license_url = e.get("license"), e.get("license_url")
+        if not license_id or not license_url:
+            raise ValueError(f"Missing license information for model '{model_name}'")
         return ModelManifest(
             id=model_name_to_id(model_name),
             name=model_name,
-            license=License(name=e["license"], url=e["license_url"]),
+            license=License(name=license_id, url=license_url),
             task=TaskType.CLASSIFICATION,
             description=f"timm backbone '{model_name}'.",
             timm_metadata=TimmMetadata(

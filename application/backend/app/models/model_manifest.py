@@ -172,7 +172,7 @@ class ModelManifest(BaseModel):
     id: str = Field(title="Model architecture ID", description="Unique identifier for the model architecture")
     name: str = Field(title="Model architecture name", description="Friendly name of the model architecture")
     license: License = Field(
-        default=License(name="Apache-2.0", url="https://www.apache.org/licenses/LICENSE-2.0.txt"),
+        default=License(name="Apache 2.0", url="https://www.apache.org/licenses/LICENSE-2.0.txt"),
         title="License",
         description="License under which the model architecture is released",
     )

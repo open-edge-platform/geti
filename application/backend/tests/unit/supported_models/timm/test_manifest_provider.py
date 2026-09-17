@@ -95,6 +95,22 @@ class TestTimmManifestProvider:
         with pytest.raises(KeyError):
             TimmManifestProvider.build_manifest("unknown-model")
 
+    def test_build_manifest_missing_license_raises_value_error(self) -> None:
+        entry = {**_FAKE_ENTRY, "license": None}
+        with (
+            patch.object(manifest_provider, "_snapshot", return_value={entry["model_name"]: entry}),
+            pytest.raises(ValueError, match="Missing license information"),
+        ):
+            TimmManifestProvider.build_manifest("resnet18.a1_in1k")
+
+    def test_build_manifest_missing_license_url_raises_value_error(self) -> None:
+        entry = {**_FAKE_ENTRY, "license_url": None}
+        with (
+            patch.object(manifest_provider, "_snapshot", return_value={entry["model_name"]: entry}),
+            pytest.raises(ValueError, match="Missing license information"),
+        ):
+            TimmManifestProvider.build_manifest("resnet18.a1_in1k")
+
     def test_get_preprocessing_maps_snapshot_fields(self) -> None:
         preprocessing = TimmManifestProvider.get_preprocessing("resnet18.a1_in1k")
 

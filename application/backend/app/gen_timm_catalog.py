@@ -222,6 +222,9 @@ def _build_entry(
         imagenet_top1_accuracy = imagenet_top1.get(model_name)
 
     license_name = model_licenses.get(model_name, {}).get("weights_license", _UNKNOWN_LICENSE).lower()
+    license_url = _LICENSE2URL.get(license_name)
+    if not license_url:
+        raise ValueError(f"The url for license '{license_name}' is not defined. Update _LICENSE2URL mapping.")
 
     entry: dict[str, Any] = {
         "model_name": model_name,
@@ -235,7 +238,7 @@ def _build_entry(
         "default_weight_decay": default_params["weight_decay"],
         "imagenet_top1_accuracy": imagenet_top1_accuracy,
         "license": license_name,
-        "license_url": _LICENSE2URL.get(license_name),
+        "license_url": license_url,
     }
 
     cached_keys = ("gigaflops", "trainable_parameters")
