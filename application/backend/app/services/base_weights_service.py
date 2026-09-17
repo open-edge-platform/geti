@@ -179,26 +179,9 @@ class BaseWeightsService:
     ) -> Path:
         """Download a complete repository snapshot into the application cache."""
         local_path = self.pretrained_weights_dir / task.name.lower() / model_manifest_id
-        if not allow_download:
-            try:
-                huggingface_hub.snapshot_download(
-                    repo_id=pretrained_weights.repo_id,
-                    revision=pretrained_weights.revision,
-                    local_dir=local_path,
-                    local_files_only=True,
-                )
-            except LocalEntryNotFoundError as error:
-                raise FileNotFoundError(
-                    f"Weights not found locally for model {model_manifest_id} and download is disabled"
-                ) from error
-            return local_path
 
         self._configure_huggingface_environment()
-        # The pinned revision may already be complete locally (the common case on
-        # shared hosts training the same model repeatedly, or offline machines).
-        # Resolving locally first avoids both a redundant full-snapshot remote
-        # check and — importantly — a disk-space preflight that would otherwise
-        # reserve room for a second full copy of the snapshot.
+        # Cache-first: the revision may already be complete locally.
         try:
             huggingface_hub.snapshot_download(
                 repo_id=pretrained_weights.repo_id,
@@ -206,9 +189,12 @@ class BaseWeightsService:
                 local_dir=local_path,
                 local_files_only=True,
             )
-            logger.info("Using cached Hugging Face snapshot for {}", model_manifest_id)
             return local_path
-        except LocalEntryNotFoundError:
+        except LocalEntryNotFoundError as error:
+            if not allow_download:
+                raise FileNotFoundError(
+                    f"Weights not found locally for model {model_manifest_id} and download is disabled"
+                ) from error
             logger.info("No complete local snapshot for {}; downloading.", model_manifest_id)
 
         try:

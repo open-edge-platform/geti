@@ -61,6 +61,7 @@ def test_downloads_snapshot_to_application_cache(fxt_service: BaseWeightsService
 
 
 def test_offline_lookup_uses_hub_cache(fxt_service: BaseWeightsService, fxt_weights) -> None:
+    """Offline lookup resolves the cache with a single local_files_only call."""
     manifest = MagicMock(pretrained_weights=fxt_weights)
     snapshot_download = MagicMock()
 
