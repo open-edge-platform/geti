@@ -27,7 +27,7 @@ already be running; the server will not start it.
 ## Quick start: Windows desktop app
 
 The desktop app serves the same REST API as any other Geti install, on `https://localhost:7860`.
-Everything stays on your machine — no tunnel, no network exposure.
+The Geti connection stays on your machine — no tunnel or network exposure is needed for the local desktop app.
 
 **1. Start Geti.** If the app is not running, every tool reports `backend_unavailable`.
 
@@ -138,7 +138,7 @@ from mcp.client.stdio import stdio_client
 
 PARAMS = StdioServerParameters(
     command=".venv/bin/geti-mcp",
-    args=["--base-url", "https://localhost:7860", "--all-projects"],
+    args=["--base-url", "https://localhost:7860", "--all-projects", "--ca-bundle", "/path/to/localhost.pem"],
 )
 
 async def main():
@@ -202,8 +202,7 @@ per install:
 The packaged Windows backend pins `DATA_DIR` to `%LOCALAPPDATA%\Intel\Geti` regardless of the
 bundle identifier, so it does not follow the `com.intel.geti` convention the other platforms use.
 
-The bundle is added to the system trust store rather than replacing it, so a Geti behind a
-properly issued certificate needs no flag at all. An unreadable or malformed bundle fails at
+The bundle is added to this process's trust context rather than replacing the system trust store, so a Geti behind a properly issued certificate needs no flag at all. An unreadable or malformed bundle fails at
 startup with an `invalid_input` error rather than silently falling back to an unverified
 connection.
 
@@ -432,14 +431,16 @@ cd - && GETI_MCP_OPENAPI_SPEC=/tmp/geti-openapi.json just test-integration
 Logs go to **stderr only**, so read them in your host's server output pane. Raise the level
 with `"env": { "GETI_MCP_LOG_LEVEL": "DEBUG" }`.
 
-| Symptom                                         | Cause                                                                                                                          |
-| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | --- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | --- | ------------------- | ------------------------------------------------------------------------ |
-| Server exits immediately with code 2            | Neither `--projects` nor `--all-projects` was given, or `--base-url` is malformed. Run the command by hand to see the message. |
-| Host reports the server failed to start         | `command` is not an absolute path, or points at an interpreter that lacks the package.                                         |
-| `backend_unavailable` mentioning TLS            | Wrong or missing `--ca-bundle`, or you are connecting to a remote host by name instead of through a tunnel.                    |
-| `backend_unavailable` with a connection refusal | Geti is not running, or is on a different port.                                                                                |     | `backend_unavailable` against a local Geti on a corporate network | `HTTPS_PROXY` is set and `NO_PROXY` does not list `localhost,127.0.0.1`, so the request goes to the proxy. |     | `permission_denied` | The project is outside `--projects`, or the matching opt-in flag is off. |
-| `incompatible_backend` on `start_training`      | Geti's API version is outside the tested range. Read-only tools still work.                                                    |
-| Tool is missing from the host's tool list       | Its opt-in flag is not set. Check `get_connection_info`, which reports the enabled permissions.                                |
+ | Symptom | Cause |
+ | ------- | ----- |
+ | Server exits immediately with code 2 | Neither `--projects` nor `--all-projects` was given, or `--base-url` is malformed. Run the command by hand to see the message. |
+ | Host reports the server failed to start | `command` is not an absolute path, or points at an interpreter that lacks the package. |
+ | `backend_unavailable` mentioning TLS | Wrong or missing `--ca-bundle`, or you are connecting to a remote host by name instead of through a tunnel. |
+ | `backend_unavailable` with a connection refusal | Geti is not running, or is on a different port. |
+ | `backend_unavailable` against a local Geti on a corporate network | `HTTPS_PROXY` is set and `NO_PROXY` does not list `localhost,127.0.0.1`, so the request goes to the proxy. |
+ | `permission_denied` | The project is outside `--projects`, or the matching opt-in flag is off. |
+ | `incompatible_backend` on `start_training` | Geti's API version is outside the tested range. Read-only tools still work. |
+ | Tool is missing from the host's tool list | Its opt-in flag is not set. Check `get_connection_info`, which reports the enabled permissions. |                             |
 
 ## Development
 

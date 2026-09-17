@@ -1,6 +1,6 @@
 ## Repository layout
 
-Monorepo with three components — different languages, toolchains, and conventions.
+Monorepo with four components — different languages, toolchains, and conventions.
 
 | Path                   | What it is                                                 | Primary stack                                                    |
 | ---------------------- |------------------------------------------------------------| ---------------------------------------------------------------- |
