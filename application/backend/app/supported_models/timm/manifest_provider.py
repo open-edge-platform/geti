@@ -5,6 +5,7 @@ from app.models import TaskType
 from app.models.model_manifest import (
     BenchmarkMetrics,
     Capabilities,
+    License,
     ModelManifest,
     ModelManifestDeprecationStatus,
     ModelStats,
@@ -41,7 +42,7 @@ class TimmManifestProvider:
         return ModelManifest(
             id=model_name_to_id(model_name),
             name=model_name,
-            license=e["license"],
+            license=License(name=e["license"], url=e["license_url"]),
             task=TaskType.CLASSIFICATION,
             description=f"timm backbone '{model_name}'.",
             timm_metadata=TimmMetadata(

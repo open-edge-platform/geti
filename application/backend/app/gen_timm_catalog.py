@@ -61,6 +61,20 @@ _SGD_DEFAULTS = {
 }
 
 _DEFAULT_OUTPUT = Path(__file__).resolve().parent / "timm_catalog_snapshot.json"
+_LICENSE2URL = {
+    "apache-2.0": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+    "apple-amlr": "https://huggingface.co/apple/deeplabv3-mobilevit-small/blob/main/LICENSE",
+    "apple-ascl": "https://developer.apple.com/support/downloads/terms/apple-sample-code/Apple-Sample-Code-License.pdf",
+    "apple-sample-code-license": "https://developer.apple.com/support/downloads/terms/apple-sample-code/Apple-Sample-Code-License.pdf",
+    "bsd-3-clause": "https://choosealicense.com/licenses/bsd-3-clause",
+    "cc-by-nc-4.0": "https://spdx.org/licenses/CC-BY-NC-4.0",
+    "cc-by-nc-sa-4.0": "https://spdx.org/licenses/CC-BY-NC-SA-4.0",
+    "dinov3-license": "https://ai.meta.com/resources/models-and-libraries/dinov3-license",
+    "fair-noncommercial-research-license": "https://ai.meta.com/resources/models-and-libraries/cwm-license",
+    "gemma": "https://ai.google.dev/gemma/terms",
+    "licenseref-apple-mlmobileone": "https://github.com/apple/ml-mobileone/blob/b7f4e6d48884593c7eb46eedc53c3a097c09e957/LICENSE",
+    "mit": "https://choosealicense.com/licenses/mit",
+}
 
 
 def _family_of(model_name: str) -> str:
@@ -207,6 +221,8 @@ def _build_entry(
     else:
         imagenet_top1_accuracy = imagenet_top1.get(model_name)
 
+    license_name = model_licenses.get(model_name, {}).get("weights_license", _UNKNOWN_LICENSE).lower()
+
     entry: dict[str, Any] = {
         "model_name": model_name,
         "family": family,
@@ -218,7 +234,8 @@ def _build_entry(
         "default_lr": default_params["learning_rate"],
         "default_weight_decay": default_params["weight_decay"],
         "imagenet_top1_accuracy": imagenet_top1_accuracy,
-        "license": model_licenses.get(model_name, {}).get("weights_license", _UNKNOWN_LICENSE),
+        "license": license_name,
+        "license_url": _LICENSE2URL.get(license_name),
     }
 
     cached_keys = ("gigaflops", "trainable_parameters")

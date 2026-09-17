@@ -1,6 +1,9 @@
 id: object-detection-yolo12-m
 name: YOLO12-M
-license: AGPL-3.0
+
+license:
+  name: AGPL-3.0
+  url: https://www.gnu.org/licenses/agpl-3.0.html
 
 pretrained_weights:
   source: direct_link

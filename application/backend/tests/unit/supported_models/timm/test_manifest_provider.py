@@ -24,6 +24,7 @@ _FAKE_ENTRY = {
     "imagenet_top1_accuracy": 70.0,
     "trainable_parameters": 11.7,
     "license": "apache-2.0",
+    "license_url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
     "gigaflops": 1.8,
 }
 _FAKE_SNAPSHOT = MappingProxyType({_FAKE_ENTRY["model_name"]: _FAKE_ENTRY})
@@ -64,7 +65,8 @@ class TestTimmManifestProvider:
 
         assert manifest.id == model_name_to_id("resnet18.a1_in1k")
         assert manifest.name == "resnet18.a1_in1k"
-        assert manifest.license == "apache-2.0"
+        assert manifest.license.name == "apache-2.0"
+        assert manifest.license.url == "https://www.apache.org/licenses/LICENSE-2.0.txt"
         assert manifest.timm_metadata is not None
         assert manifest.timm_metadata.family == "resnet"
         assert manifest.timm_metadata.variant == "resnet18"
