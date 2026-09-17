@@ -14,7 +14,7 @@ describe('SelectedDataProvider', () => {
 
             return (
                 <div>
-                    <p>{selectedKeys === 'all' ? 'all' : [...selectedKeys.values()].join(', ')}</p>
+                    <p>{[...selectedKeys.values()].join(', ')}</p>
                     <button onClick={() => toggleSelectedKeys([testKey])}>toggle key</button>
                 </div>
             );

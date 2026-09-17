@@ -21,7 +21,6 @@ import { SortDown, SortUp } from '@geti-ui/ui/icons';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useSelectAllDatasetMedia } from 'hooks/use-select-all-dataset-media.hook';
-import { isString } from 'lodash-es';
 
 import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { isImage } from '../../../../shared/media-item-utils';
@@ -130,9 +129,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
     // Which of the ids resolved by "select all" are images, for the classification label actions.
     const [selectAllImageIds, setSelectAllImageIds] = useState<string[]>([]);
 
-    const selectedMediaItems = selectedKeys instanceof Set ? selectedKeys : null;
-
-    const totalSelectedElements = selectedMediaItems?.size ?? 0;
+    const totalSelectedElements = selectedKeys.size;
     const hasSelectedElements = totalSelectedElements > 0;
     const allElementsSelected = totalCount > 0 && totalSelectedElements === totalCount;
 
@@ -144,36 +141,32 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
         }
 
         selectAllMedia.mutate(undefined, {
-            onSuccess: ({ mediaIds, imageIds, isStale }) => {
-                if (isStale) {
+            onSuccess: (result) => {
+                if (result === null) {
                     return;
                 }
 
-                setSelectAllImageIds(imageIds);
-                setSelectedKeys(new Set(mediaIds));
+                setSelectAllImageIds(result.imageIds);
+                setSelectedKeys(new Set(result.mediaIds));
             },
         });
     };
 
     const selectedImagesIds = useMemo(() => {
-        if (selectedMediaItems === null) return [];
-
         // The gallery only holds the pages it has loaded, so ids resolved by "select all" are the
         // only way to tell whether an unloaded selected item is an image.
         const imageIds = new Set(selectAllImageIds);
         items.filter(isImage).forEach((item) => imageIds.add(String(item.id)));
 
-        return Array.from(selectedMediaItems)
-            .filter(isString)
-            .filter((itemId) => imageIds.has(itemId));
-    }, [selectedMediaItems, items, selectAllImageIds]);
+        return Array.from(selectedKeys).filter((itemId) => imageIds.has(itemId));
+    }, [selectedKeys, items, selectAllImageIds]);
 
     const resetSelectedMediaIds = () => {
         setSelectedKeys(new Set());
     };
 
-    const noMediaSelected = selectedMediaItems?.size === 0;
-    const selectedMediaItemsIds = Array.from(selectedMediaItems ?? []) as string[];
+    const noMediaSelected = selectedKeys.size === 0;
+    const selectedMediaItemsIds = Array.from(selectedKeys);
 
     return (
         <Flex direction={'column'} gridArea={'toolbar'} gap={'size-200'} marginBottom={'size-200'}>
@@ -228,7 +221,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                         <>
                             <AssignLabel selectedImagesIds={selectedImagesIds} />
                             <DeleteMediaItem
-                                itemsIds={Array.from(selectedKeys) as string[]}
+                                itemsIds={selectedMediaItemsIds}
                                 onDeleted={toggleSelectedKeys}
                                 isHotkeyEnabled={selectedMediaItem === null}
                             />

@@ -35,15 +35,15 @@ export const useSelectAllDatasetMedia = () => {
                 throw new Error(`Failed to select all media: ${response.status} ${response.statusText}`);
             }
 
-            // These ids no longer describe what the gallery is showing, so they must not be selected.
+            // The filters changed mid-request, so these ids no longer describe what the gallery
+            // shows. `null` tells the caller to discard them instead of selecting hidden media.
             if (!isEqual(requestedQuery, latestQuery.current)) {
-                return { mediaIds: [], imageIds: [], isStale: true };
+                return null;
             }
 
             return {
                 mediaIds: data.items.map(({ id }) => id),
                 imageIds: data.items.filter(({ type }) => type === 'image').map(({ id }) => id),
-                isStale: false,
             };
         },
     });

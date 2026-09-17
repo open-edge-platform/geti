@@ -8,11 +8,16 @@ import { renderHook } from 'test-utils/render';
 import { http } from '../api/utils';
 import { server } from '../msw-node-setup';
 import { SUBSET_PARAM } from './use-dataset-filters-search-params.hook';
+import * as datasetMediaFilterOptionsHook from './use-dataset-media-filter-options.hook';
 import { useSelectAllDatasetMedia } from './use-select-all-dataset-media.hook';
 
 const getQueryFromRequest = (request: Request) => new URL(request.url).searchParams;
 
 describe('useSelectAllDatasetMedia', () => {
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     it('resolves the whole dataset in a single request, and reports which ids are images', async () => {
         let requestCount = 0;
 
@@ -89,5 +94,30 @@ describe('useSelectAllDatasetMedia', () => {
         });
 
         expect(result.current.data).toBeUndefined();
+    });
+
+    it('discards the response when the filters change during the request', async () => {
+        const filterOptions = vi
+            .spyOn(datasetMediaFilterOptionsHook, 'useDatasetMediaFilterOptions')
+            .mockReturnValue({ subsets: ['training'] });
+
+        const { result, rerender } = renderHook(() => useSelectAllDatasetMedia());
+
+        server.use(
+            http.get('/api/projects/{project_id}/dataset/media/ids', () => {
+                // Reached only once the request is in flight, so the hook has already captured
+                // the filters it asked for. Switching subsets now makes the response outdated.
+                filterOptions.mockReturnValue({ subsets: ['validation'] });
+                rerender();
+
+                return HttpResponse.json({ items: [{ id: 'image-1', type: 'image' }] });
+            })
+        );
+
+        act(() => result.current.mutate());
+
+        await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+        expect(result.current.data).toBeNull();
     });
 });
