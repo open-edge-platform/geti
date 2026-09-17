@@ -94,6 +94,7 @@ class WeightsSource(StrEnum):
 
     TIMM = "timm"  # Weights are managed by the timm library
     DIRECT_LINK = "direct_link"  # Weights URL and checksum are defined directly in the manifest file
+    HUGGINGFACE = "huggingface"  # Weights are stored as a Hugging Face Hub repository snapshot
 
 
 class DirectLinkPretrainedWeights(BaseModel):
@@ -125,8 +126,21 @@ class TimmPretrainedWeights(BaseModel):
     source: Literal[WeightsSource.TIMM] = WeightsSource.TIMM
 
 
+class HuggingFacePretrainedWeights(BaseModel):
+    """Pretrained weights provided as a Hugging Face Hub repository snapshot."""
+
+    model_config = ConfigDict(extra="forbid")
+    source: Literal[WeightsSource.HUGGINGFACE] = WeightsSource.HUGGINGFACE
+    repo_id: str = Field(title="Repository ID", description="Hugging Face Hub repository identifier")
+    revision: str | None = Field(
+        default=None,
+        title="Repository revision",
+        description="Hugging Face Hub branch, tag, or commit hash to download",
+    )
+
+
 PretrainedWeights = Annotated[
-    DirectLinkPretrainedWeights | TimmPretrainedWeights,
+    DirectLinkPretrainedWeights | TimmPretrainedWeights | HuggingFacePretrainedWeights,
     Field(discriminator="source"),
 ]
 

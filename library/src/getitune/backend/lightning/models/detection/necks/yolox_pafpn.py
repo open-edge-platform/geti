@@ -145,7 +145,12 @@ class YOLOXPAFPNModule(BaseModule):
         Returns:
             tuple[Tensor]: YOLOXPAFPN features.
         """
-        assert len(inputs) == len(self.in_channels)  # noqa: S101
+        if len(inputs) != len(self.in_channels):
+            msg = (
+                f"Number of input feature maps must match the number of input channels: "
+                f"expected {len(self.in_channels)}, got {len(inputs)}."
+            )
+            raise ValueError(msg)
 
         # top-down path
         inner_outs = [inputs[-1]]

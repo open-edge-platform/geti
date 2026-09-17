@@ -38,6 +38,7 @@ dependencies = [
     "av~=17.1.0",
     "starlette~=1.3.1",
     "hypercorn~=0.18.0",
+    "huggingface-hub~=1.29.0",
     "safetensors~=0.8.0",
 ]
 
@@ -46,9 +47,9 @@ dependencies = [
 # - cpu: only CPU training (no GPU support)
 # - xpu: support training on compatible Intel GPUs
 # - cuda: support training on compatible NVIDIA GPUs
-cpu = ["getitune[cpu,ultralytics]"]
-xpu = ["getitune[xpu,ultralytics]"]
-cuda = ["getitune[cuda,ultralytics]"]
+cpu = ["accelerate>=1.1.0,<2", "getitune[cpu,ultralytics]"]
+xpu = ["accelerate>=1.1.0,<2", "getitune[xpu,ultralytics]"]
+cuda = ["accelerate>=1.1.0,<2", "getitune[cuda,ultralytics]"]
 
 mqtt = [
     "paho-mqtt~=2.1.0",
