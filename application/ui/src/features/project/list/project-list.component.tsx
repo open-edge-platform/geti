@@ -4,11 +4,12 @@
 import { Suspense, useMemo, useState } from 'react';
 
 import { useTranslation } from '@/i18n';
-import { Content, Divider, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
+import { ActionButton, Content, Divider, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
 import { partition } from 'lodash-es';
 
 import { version } from '../../../../package.json';
+import { downloadFile } from '../../../platform/download-file';
 import { isNonEmptyArray } from '../../../shared/util';
 import { EmptyProjectList } from './empty-project-list/empty-project-list.component';
 import { NoMatchingProjects } from './filter-projects/no-matching-projects.component';
@@ -120,7 +121,23 @@ const ProjectGrid = () => {
 };
 
 const AppInfo = () => {
-    return <Text UNSAFE_className={classes.version}>v{version}</Text>;
+    const { t } = useTranslation();
+
+    const handleDownloadLogs = () => {
+        downloadFile('/api/system/logs', 'geti_logs.zip');
+    };
+
+    return (
+        <Flex gap='size-200' alignItems='center'>
+            <Text UNSAFE_className={classes.version}>v{version}</Text>
+            <View UNSAFE_className={classes.version}>|</View>
+            <ActionButton isQuiet UNSAFE_className={classes.version} onPress={handleDownloadLogs}>
+                <Text UNSAFE_style={{ textDecoration: 'underline' }}>
+                    {t('project.list.downloadLogs', { defaultValue: 'Download logs' })}
+                </Text>
+            </ActionButton>
+        </Flex>
+    );
 };
 
 export const ProjectList = () => {
