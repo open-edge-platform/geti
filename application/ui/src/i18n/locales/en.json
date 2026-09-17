@@ -34,7 +34,7 @@
             "assignmentNote": "This operation will not affect other media that were already assigned to this view.",
             "mediaAssigned_one": "Media {{count}} item assigned successfully.",
             "mediaAssigned_other": "Media {{count}} items assigned successfully.",
-            "openView": "Open {{viewName}} view",
+            "openView": "Open {{viewName}}",
             "saveView": "Save view",
             "viewNameLabel": "View name",
             "renameTitle": "Rename dataset view",
@@ -234,6 +234,8 @@
         },
         "export": {
             "heading": "Export {{name}}",
+            "headingDatasetView": "Export dataset view",
+            "datasetView": "View: {{name}}",
             "statisticsHeading": "Exported dataset statistics",
             "settingsHeading": "Export settings",
             "filterByLabel": "Filter annotations by label",

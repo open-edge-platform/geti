@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { $api } from '@/api';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 export const datasetViewsQueryOptions = (projectId: string) =>
@@ -22,4 +22,10 @@ export const datasetViewsQueryOptions = (projectId: string) =>
 export const useDatasetViewsQuery = () => {
     const projectId = useProjectIdentifier();
     return useSuspenseQuery(datasetViewsQueryOptions(projectId));
+};
+
+// Non suspending variant, for places where the views are optional and should not block rendering
+export const useOptionalDatasetViewsQuery = (enabled = true) => {
+    const projectId = useProjectIdentifier();
+    return useQuery({ ...datasetViewsQueryOptions(projectId), enabled });
 };

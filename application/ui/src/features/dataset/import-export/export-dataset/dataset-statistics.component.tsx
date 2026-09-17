@@ -3,13 +3,20 @@
 
 import { DatasetStatistics } from '@/components/dataset-statistics/dataset-statistics.component';
 import { useTranslation } from '@/i18n';
+import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 
 import { useGetDatasetItems } from '../../../../hooks/use-get-dataset-items.hook';
 
 export const MainDatasetStatistics = () => {
     const { t } = useTranslation();
-    const { totalCount: totalMediaItems } = useGetDatasetItems();
-    const { totalCount: totalAnnotatedItems } = useGetDatasetItems({ annotationStatus: 'with_annotations' });
+    const [selectedDatasetViewId] = useDatasetViewId();
+    const datasetViewId = selectedDatasetViewId === ENTIRE_DATASET_VIEW_ID ? undefined : selectedDatasetViewId;
+
+    const { totalCount: totalMediaItems } = useGetDatasetItems({ datasetViewId });
+    const { totalCount: totalAnnotatedItems } = useGetDatasetItems({
+        datasetViewId,
+        annotationStatus: 'with_annotations',
+    });
 
     return (
         <DatasetStatistics
