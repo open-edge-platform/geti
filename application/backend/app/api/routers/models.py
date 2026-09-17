@@ -15,6 +15,7 @@ from starlette.responses import FileResponse
 
 from app.api.dependencies import (
     get_demo_files_service,
+    get_inference_server,
     get_model_service,
     get_project,
     get_training_configuration_service,
@@ -29,6 +30,7 @@ from app.services import (
     TrainingConfigurationService,
 )
 from app.services.demo_files_service import DemoFilesService
+from app.services.inference import InferenceServer
 
 router = APIRouter(prefix="/api/projects/{project_id}/models", tags=["Models"])
 
@@ -200,6 +202,7 @@ def delete_model(
     project: Annotated[ProjectView, Depends(get_project)],
     model_id: ModelID,
     model_service: Annotated[ModelService, Depends(get_model_service)],
+    inference_server: Annotated[InferenceServer, Depends(get_inference_server)],
     files_only: Annotated[bool, Query()] = False,
 ) -> None:
     """
@@ -216,6 +219,7 @@ def delete_model(
             model_service.delete_model_files(project_id=project.id, model_id=model_id)
         else:
             model_service.delete_model(project_id=project.id, model_id=model_id)
+        inference_server.invalidate_model(project_id=project.id, model_id=model_id)
     except ResourceInUseError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 

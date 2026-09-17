@@ -85,14 +85,15 @@ class InferenceServer:
         self._memory_overhead_factor = memory_overhead_factor
         self._model_ttl = model_ttl
         self._entries: list[ModelCacheEntry] = []  # MRU-ordered
+        self._pending_unloads: list[ModelCacheEntry] = []
         self._registry_lock = threading.Lock()
 
     # --- registry primitives, called with `self._registry_lock` held ---
 
-    def _find(self, model_id: UUID, variant_id: UUID | None) -> ModelCacheEntry | None:
-        """Return the cached entry for the given model, or None. Without a variant, the MRU match wins."""
+    def _find(self, model_id: UUID, variant_id: UUID) -> ModelCacheEntry | None:
+        """Return the cached entry for the given model variant, or None."""
         for entry in self._entries:
-            if entry.model_id == model_id and (variant_id is None or entry.variant_id == variant_id):
+            if entry.model_id == model_id and entry.variant_id == variant_id:
                 return entry
         return None
 
@@ -130,17 +131,46 @@ class InferenceServer:
 
     def _release(self, entry: ModelCacheEntry) -> None:
         """Release a lease previously taken by `_acquire`."""
+        unload_later = False
         with self._registry_lock:
             entry.refcount -= 1
-            entry.last_used = time.monotonic()
+            if entry in self._entries:
+                self._touch(entry)
+            else:
+                entry.last_used = time.monotonic()
+            unload_later = entry.refcount == 0 and entry.state is EntryState.EVICTED and entry.handle is not None
+        if unload_later:
+            with self._registry_lock:
+                if entry not in self._pending_unloads:
+                    self._pending_unloads.append(entry)
 
     def _unload(self, entry: ModelCacheEntry) -> None:
         """Unload the model held by an entry that has already been dropped from the cache."""
-        handle, entry.handle = entry.handle, None
+        handle = entry.handle
         if handle is None:
             return
         logger.info("Unloading model {} (variant {}) from device {}", entry.model_id, entry.variant_id, entry.device)
-        ModelLoader.unload(handle)
+        try:
+            ModelLoader.unload(handle)
+        except Exception:
+            with self._registry_lock:
+                if entry not in self._pending_unloads:
+                    self._pending_unloads.append(entry)
+            raise
+        entry.handle = None
+
+    def invalidate_model(self, project_id: UUID, model_id: UUID) -> None:
+        """Invalidate every cached variant of a deleted model revision."""
+        to_unload: list[ModelCacheEntry] = []
+        with self._registry_lock:
+            for entry in list(self._entries):
+                if entry.project_id != project_id or entry.model_id != model_id:
+                    continue
+                self._drop(entry)
+                if entry.handle is not None and entry.refcount == 0:
+                    to_unload.append(entry)
+        for entry in to_unload:
+            self._unload(entry)
 
     def _wait_ready(self, entry: ModelCacheEntry, deadline: float) -> ModelCacheEntry | None:
         """
@@ -288,10 +318,6 @@ class InferenceServer:
                 model_xml_path=entry.xml_path,
                 device=entry.device,
             )
-            with self._registry_lock:
-                entry.handle = handle
-                entry.state = EntryState.READY
-                entry.last_used = time.monotonic()
         except BaseException as exc:
             with self._registry_lock:
                 self._drop(entry)
@@ -299,6 +325,26 @@ class InferenceServer:
             entry.error = exc
             entry.ready.set()  # release waiters so they retry
             raise
+
+        evicted_during_load = False
+        with self._registry_lock:
+            if entry.state is EntryState.LOADING:
+                entry.handle = handle
+                entry.state = EntryState.READY
+                entry.last_used = time.monotonic()
+            else:
+                # The entry was evicted while ModelLoader.load() was running (e.g. stop()).
+                # Do not publish it back to READY; unload and abort instead.
+                entry.handle = handle
+                entry.error = InferenceBusyError()
+                entry.refcount -= 1
+                evicted_during_load = True
+
+        if evicted_during_load:
+            entry.ready.set()  # wake waiters so they can observe eviction and retry
+            self._unload(entry)
+            raise InferenceBusyError
+
         entry.ready.set()
         return entry
 
@@ -307,7 +353,7 @@ class InferenceServer:
         project_id: UUID,
         model_id: UUID,
         device: DeviceInfo,
-        variant_id: UUID | None,
+        variant_id: UUID,
         resolved: _ResolvedVariant | None,
     ) -> tuple[ModelCacheEntry | None, ModelCacheEntry | None, ModelCacheEntry | None]:
         """
@@ -317,7 +363,7 @@ class InferenceServer:
             project_id: Project identifier.
             model_id: Model identifier.
             device: Device to use for inference.
-            variant_id: Optional variant identifier; None matches the MRU entry of that model.
+            variant_id: Exact variant identifier to look up in the cache.
             resolved: The resolved variant, once the database has been queried, else None.
 
         Returns:
@@ -355,8 +401,8 @@ class InferenceServer:
             project_id: Project identifier.
             model_id: Model identifier.
             device: Device to use for inference.
-            variant_id: Optional variant identifier. When None, the MRU entry of that model is reused,
-                or the default OpenVINO FP16 variant is resolved from the database.
+            variant_id: Optional variant identifier. When None, the default OpenVINO FP16 variant is resolved
+                from the database before the cache lookup.
 
         Returns:
             A leased entry whose model is ready for inference.
@@ -366,8 +412,12 @@ class InferenceServer:
         """
         deadline = time.monotonic() + LOCK_ACQUIRE_TIMEOUT
         resolved: _ResolvedVariant | None = None
+        exact_variant_id = variant_id
+        if exact_variant_id is None:
+            resolved = self._resolve_variant(project_id, model_id, exact_variant_id)
+            exact_variant_id = resolved.variant_id
         while True:
-            hit, mine, stale = self._try_lease(project_id, model_id, device, variant_id, resolved)
+            hit, mine, stale = self._try_lease(project_id, model_id, device, exact_variant_id, resolved)
             if stale is not None:
                 self._unload(stale)  # outside the lock
             if hit is not None:
@@ -378,8 +428,8 @@ class InferenceServer:
                 return self._load(mine, deadline)  # loads outside the lock, sets `ready`
             elif stale is None and resolved is None:
                 # No entry to wait for and nothing to unload: resolve the variant before inserting one
-                resolved = self._resolve_variant(project_id, model_id, variant_id)
-                variant_id = resolved.variant_id  # exact match from now on
+                resolved = self._resolve_variant(project_id, model_id, exact_variant_id)
+                exact_variant_id = resolved.variant_id
                 continue
             elif stale is not None:
                 continue  # the stale entry is gone, retry immediately with a free slot
@@ -498,6 +548,7 @@ class InferenceServer:
         """Unload every cached model that has been idle for longer than the configured TTL."""
         now = time.monotonic()
         with self._registry_lock:
+            pending_unloads, self._pending_unloads = self._pending_unloads, []
             expired = [
                 entry
                 for entry in self._entries
@@ -505,7 +556,7 @@ class InferenceServer:
             ]
             for entry in expired:
                 self._drop(entry)
-        for entry in expired:
+        for entry in [*pending_unloads, *expired]:
             self._unload(entry)  # outside the lock
 
     def stop(self) -> None:
@@ -514,9 +565,10 @@ class InferenceServer:
         """
         with self._registry_lock:
             entries, self._entries = self._entries, []
+            pending_unloads, self._pending_unloads = self._pending_unloads, []
             for entry in entries:
                 entry.state = EntryState.EVICTED
-        for entry in entries:
+        for entry in [*pending_unloads, *entries]:
             # Take the inference lock first so teardown never races an in-flight inference
             acquired = entry.infer_lock.acquire(timeout=LOCK_ACQUIRE_TIMEOUT)
             try:

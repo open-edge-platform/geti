@@ -73,12 +73,10 @@ def _patched_model_service(
     tmp_path, weights_size: int = 0, variant_id: UUID | None = None
 ) -> Iterator[dict[UUID, UUID]]:
     """Patch the database lookups performed while resolving a model variant.
-
     Args:
         tmp_path: Directory holding the fake model files.
         weights_size: On-disk size reported for the resolved variant weights.
         variant_id: Variant id resolved for every model; a fresh one per model when omitted.
-
     Yields a mapping of model id to the variant id resolved for it.
     """
     variant_ids: dict[UUID, UUID] = {}
@@ -109,7 +107,6 @@ def _patched_model_service(
 @contextmanager
 def _patched_loader() -> Iterator[tuple[Mock, Mock, list[LoadedModelHandle]]]:
     """Patch the model loader, handing out a fresh handle per load.
-
     Yields the load and unload mocks, together with the handles returned by each load, in order.
     """
     handles: list[LoadedModelHandle] = []
@@ -135,14 +132,11 @@ class TestInferenceServer:
 
         assert CONFIDENCE_THRESHOLD_PARAM in ParameterRegistry.CONFIDENCE_THRESHOLD
 
-    # --- cache behaviour ---
-
     def test_cache_hit_does_not_reload(self, tmp_path) -> None:
         """A second request for an already cached model on the same device does not load it again."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
         entry = _seed_entry(server)
-
-        with _patched_loader() as (mock_load, mock_unload, handles):
+        with _patched_loader() as (mock_load, mock_unload, _handles):
             for _ in range(2):
                 server.infer_batch(
                     project_id=entry.project_id,
@@ -152,20 +146,75 @@ class TestInferenceServer:
                     labels=[],
                     inputs=[],
                 )
-
         mock_load.assert_not_called()
         mock_unload.assert_not_called()
         assert server._entries == [entry]
+
+    def test_release_promotes_entry_to_mru_front(self, tmp_path) -> None:
+        """Releasing a cached entry makes the access order match the last use time."""
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
+        newer = _seed_entry(server)
+        older = _seed_entry(server)
+
+        assert server._entries == [older, newer]
+
+        server._release(newer)
+
+        assert server._entries == [newer, older]
+
+    def test_omitted_variant_id_resolves_default_instead_of_reusing_mru_non_default(self, tmp_path) -> None:
+        """Omitting the variant id resolves the default FP16 variant even when another cached variant is MRU."""
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
+        project_id = uuid4()
+        model_id = uuid4()
+        int8_variant_id = uuid4()
+        fp16_variant_id = uuid4()
+        int8_entry = _seed_entry(server, model_id=model_id, variant_id=int8_variant_id)
+        model_variants = [
+            Mock(
+                spec=ModelVariant,
+                id=int8_variant_id,
+                format=ModelFormat.OPENVINO,
+                precision=ModelPrecision.INT8,
+                weights_size=10,
+            ),
+            Mock(
+                spec=ModelVariant,
+                id=fp16_variant_id,
+                format=ModelFormat.OPENVINO,
+                precision=ModelPrecision.FP16,
+                weights_size=20,
+            ),
+        ]
+
+        def _get_model_binary_files(*, project_id: UUID, model_id: UUID, model_variant_id: UUID):
+            return True, (tmp_path / f"{model_variant_id}.xml", tmp_path / f"{model_variant_id}.bin")
+
+        with (
+            patch.object(ModelService, "get_model_variants", return_value=model_variants) as mock_get_model_variants,
+            patch.object(ModelService, "get_model_binary_files", side_effect=_get_model_binary_files),
+            _patched_loader() as (mock_load, mock_unload, _handles),
+        ):
+            server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
+        mock_get_model_variants.assert_called_once_with(project_id=project_id, model_id=model_id)
+        mock_load.assert_called_once_with(
+            model_id=model_id,
+            variant_id=fp16_variant_id,
+            model_xml_path=tmp_path / f"{fp16_variant_id}.xml",
+            device=CPU,
+        )
+        mock_unload.assert_not_called()
+        assert [entry.variant_id for entry in server._entries] == [fp16_variant_id, int8_variant_id]
+        assert int8_entry.handle is not None
 
     def test_device_switch_unloads_then_reloads(self, tmp_path) -> None:
         """Requesting a cached model on another device unloads it and loads it again on the new device."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
         entry = _seed_entry(server, device=CPU)
         old_handle = entry.handle
-
         with (
             _patched_model_service(tmp_path, variant_id=entry.variant_id),
-            _patched_loader() as (mock_load, mock_unload, handles),
+            _patched_loader() as (mock_load, mock_unload, _handles),
         ):
             server.infer_batch(
                 project_id=entry.project_id,
@@ -175,10 +224,12 @@ class TestInferenceServer:
                 labels=[],
                 inputs=[],
             )
-
         mock_unload.assert_called_once_with(old_handle)
         mock_load.assert_called_once_with(
-            model_id=entry.model_id, variant_id=entry.variant_id, model_xml_path=tmp_path / "model.xml", device=XPU
+            model_id=entry.model_id,
+            variant_id=entry.variant_id,
+            model_xml_path=tmp_path / "model.xml",
+            device=XPU,
         )
         assert [e.device for e in server._entries] == [XPU]
 
@@ -187,28 +238,23 @@ class TestInferenceServer:
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
         project_id = uuid4()
         model_a, model_b, model_c = uuid4(), uuid4(), uuid4()
-
         with _patched_model_service(tmp_path), _patched_loader() as (mock_load, mock_unload, handles):
             for model_id in (model_a, model_b, model_c):
                 server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
             evicted_handle = handles[0]
-
         assert mock_load.call_count == 3
         mock_unload.assert_called_once_with(evicted_handle)
         assert {e.model_id for e in server._entries} == {model_b, model_c}
 
     def test_memory_budget_evicts_lru(self, tmp_path) -> None:
         """Loading a model that pushes the estimated memory over the budget evicts the LRU one."""
-        # Two models of 40 bytes on disk, with the default 1.5 overhead factor, need 120 bytes.
         server = InferenceServer(data_dir=Path(tmp_path), max_models=5, max_memory=100)
         project_id = uuid4()
         model_a, model_b = uuid4(), uuid4()
-
         with _patched_model_service(tmp_path, weights_size=40), _patched_loader() as (mock_load, mock_unload, handles):
             for model_id in (model_a, model_b):
                 server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
             evicted_handle = handles[0]
-
         mock_unload.assert_called_once_with(evicted_handle)
         assert [e.model_id for e in server._entries] == [model_b]
         assert [e.size_bytes for e in server._entries] == [60]
@@ -217,13 +263,11 @@ class TestInferenceServer:
         """A single model larger than the memory budget is still loaded: the budget is best-effort."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2, max_memory=10)
         model_id = uuid4()
-
         with (
             _patched_model_service(tmp_path, weights_size=1000),
-            _patched_loader() as (mock_load, mock_unload, handles),
+            _patched_loader() as (mock_load, mock_unload, _handles),
         ):
             server.infer_batch(project_id=uuid4(), model_id=model_id, device=CPU, labels=[], inputs=[])
-
         mock_load.assert_called_once()
         mock_unload.assert_not_called()
         assert [e.model_id for e in server._entries] == [model_id]
@@ -232,15 +276,11 @@ class TestInferenceServer:
         """An entry that is leased is skipped both when making room and when evicting expired models."""
         monkeypatch.setattr("app.services.inference.inference_server.LOCK_ACQUIRE_TIMEOUT", 0.2)
         server = InferenceServer(data_dir=Path(tmp_path), max_models=1, model_ttl=60)
-        in_use = _seed_entry(server, refcount=1, last_used=0.0)  # leased and long expired
-
-        with _patched_model_service(tmp_path), _patched_loader() as (mock_load, mock_unload, handles):
-            # The only slot is taken by a leased entry, so no room can be made for another model.
+        in_use = _seed_entry(server, refcount=1, last_used=0.0)
+        with _patched_model_service(tmp_path), _patched_loader() as (mock_load, mock_unload, _handles):
             with pytest.raises(InferenceBusyError):
                 server.infer_batch(project_id=uuid4(), model_id=uuid4(), device=CPU, labels=[], inputs=[])
-
             server.evict_expired()
-
         mock_load.assert_not_called()
         mock_unload.assert_not_called()
         assert server._entries == [in_use]
@@ -269,14 +309,12 @@ class TestInferenceServer:
         ):
             first = threading.Thread(target=_acquire_and_release)
             first.start()
-            assert load_started.wait(timeout=5)  # the first thread owns the load and is inside it
-
+            assert load_started.wait(timeout=5)
             second = threading.Thread(target=_acquire_and_release)
             second.start()
             finish_load.set()
             first.join(timeout=5)
             second.join(timeout=5)
-
         assert mock_load.call_count == 1
         assert len(handles) == 2
         assert handles[0] is handles[1] is not None
@@ -287,7 +325,6 @@ class TestInferenceServer:
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
         project_id, model_id = uuid4(), uuid4()
         handle = _handle(model_id, uuid4(), CPU)
-
         with (
             _patched_model_service(tmp_path),
             patch(
@@ -297,46 +334,108 @@ class TestInferenceServer:
         ):
             with pytest.raises(RuntimeError, match="load failed"):
                 server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
-
             assert server._entries == []
-
             server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
-
         assert mock_load.call_count == 2
         assert [e.handle for e in server._entries] == [handle]
 
-    # --- eviction and teardown ---
+    def test_stop_during_load_aborts_publish_and_unloads_handle(self, tmp_path) -> None:
+        """A load finishing after stop() must not publish READY or proceed with inference."""
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
+        project_id, model_id = uuid4(), uuid4()
+        load_started = threading.Event()
+        allow_finish = threading.Event()
+        loaded_handles: list[LoadedModelHandle] = []
+        errors: list[BaseException] = []
 
+        def _blocking_load(*, model_id: UUID, variant_id: UUID, model_xml_path: Path, device: DeviceInfo):
+            handle = _handle(model_id, variant_id, device)
+            loaded_handles.append(handle)
+            load_started.set()
+            allow_finish.wait(timeout=5)
+            return handle
+
+        def _infer() -> None:
+            try:
+                server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
+            except BaseException as exc:
+                errors.append(exc)
+
+        with (
+            _patched_model_service(tmp_path),
+            patch("app.services.inference.model_loader.ModelLoader.load", side_effect=_blocking_load),
+            patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload,
+        ):
+            worker = threading.Thread(target=_infer)
+            worker.start()
+            assert load_started.wait(timeout=5)
+            server.stop()
+            allow_finish.set()
+            worker.join(timeout=5)
+        assert len(errors) == 1
+        assert isinstance(errors[0], InferenceBusyError)
+        assert len(loaded_handles) == 1
+        mock_unload.assert_called_once_with(loaded_handles[0])
+        assert server._entries == []
+
+    # --- eviction and teardown ---
     def test_evict_expired_unloads_only_expired_entries(self, tmp_path) -> None:
         """Only the models idle for longer than the TTL are unloaded."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2, model_ttl=60)
         expired = _seed_entry(server, last_used=0.0)
         fresh = _seed_entry(server)
         expired_handle = expired.handle
-
         with patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload:
             server.evict_expired()
-
         mock_unload.assert_called_once_with(expired_handle)
         assert server._entries == [fresh]
         assert expired.state is EntryState.EVICTED
+
+    def test_invalidate_model_unloads_and_removes_cached_entries(self, tmp_path) -> None:
+        """Deleting a model invalidates matching cache entries immediately."""
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
+        target = _seed_entry(server)
+        other = _seed_entry(server)
+        target_handle = target.handle
+        with patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload:
+            server.invalidate_model(project_id=target.project_id, model_id=target.model_id)
+        mock_unload.assert_called_once_with(target_handle)
+        assert server._entries == [other]
+        assert target.state is EntryState.EVICTED
+
+    def test_evict_expired_retries_failed_unloads_from_pending_queue(self, tmp_path) -> None:
+        """A dropped entry whose unload fails is preserved and retried on the next eviction pass."""
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2, model_ttl=60)
+        expired = _seed_entry(server, last_used=0.0)
+        expired_handle = expired.handle
+        with patch(
+            "app.services.inference.model_loader.ModelLoader.unload",
+            side_effect=[RuntimeError("unload failed"), None],
+        ) as mock_unload:
+            with pytest.raises(RuntimeError, match="unload failed"):
+                server.evict_expired()
+            assert server._entries == []
+            assert server._pending_unloads == [expired]
+            assert expired.handle is expired_handle
+            server.evict_expired()
+        assert mock_unload.call_count == 2
+        assert [call.args[0] for call in mock_unload.call_args_list] == [expired_handle, expired_handle]
+        assert server._pending_unloads == []
+        assert expired.handle is None
 
     def test_stop_unloads_all_models(self, tmp_path) -> None:
         """Stopping the server drains the cache and unloads every model."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
         first = _seed_entry(server)
         second = _seed_entry(server)
-        unloaded_handles = [entry.handle for entry in server._entries]  # MRU order: second, then first
+        unloaded_handles = [entry.handle for entry in server._entries]
         assert unloaded_handles == [second.handle, first.handle]
-
         with patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload:
             server.stop()
-
         assert [call.args[0] for call in mock_unload.call_args_list] == unloaded_handles
         assert server._entries == []
 
     # --- status ---
-
     @pytest.mark.parametrize(
         "states, expected_status, expected_models",
         [
@@ -349,9 +448,7 @@ class TestInferenceServer:
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
         for state in states:
             _seed_entry(server, state=state)
-
         status = server.get_status()
-
         assert status.status == expected_status
         assert len(status.models) == expected_models
         ready = [entry for entry in server._entries if entry.state is EntryState.READY]
@@ -362,14 +459,12 @@ class TestInferenceServer:
     def test_get_status_reports_loaded_model(self, tmp_path) -> None:
         server = InferenceServer(data_dir=Path(tmp_path))
         entry = _seed_entry(server)
-
         assert server.get_status() == InferenceState(
             status=InferenceStatus.ACTIVE,
             models=(InferenceModel(model_id=entry.model_id, device=CPU, load_timestamp=ANY),),
         )
 
     # --- inference ---
-
     @staticmethod
     def _model_with_threshold(current_threshold: float | None) -> Mock:
         """A mocked model that either exposes the given confidence threshold, or none at all."""
@@ -396,9 +491,7 @@ class TestInferenceServer:
         server = InferenceServer(data_dir=Path(tmp_path))
         model = self._model_with_threshold(0.5)
         entry = _seed_entry(server, model=model)
-
         self._infer(server, entry, confidence_threshold=0.8)
-
         model.set_param.assert_called_once_with("confidence_threshold", 0.8)
         model.infer_batch.assert_called_once()
 
@@ -415,9 +508,7 @@ class TestInferenceServer:
         server = InferenceServer(data_dir=Path(tmp_path))
         model = self._model_with_threshold(current_threshold)
         entry = _seed_entry(server, model=model)
-
         self._infer(server, entry, confidence_threshold=requested_threshold)
-
         model.set_param.assert_not_called()
         model.infer_batch.assert_called_once()
 
@@ -426,24 +517,19 @@ class TestInferenceServer:
         model = Mock(spec=Model)
         inference_result = Mock()
         model.infer_batch.return_value = [inference_result]
-
         label = Mock(spec=Label)
         raw_uint8 = np.full((20, 20, 3), 128, dtype=np.uint8)
         input = BatchInferenceInput(media_id=media_id, frame_index=15, data=raw_uint8)
         annotation = Mock(spec=DatasetItemAnnotation)
-
         server = InferenceServer(data_dir=Path(tmp_path))
         entry = _seed_entry(server, model=model)
-
         with patch("app.services.inference.inference_server.convert_prediction") as mock_convert_prediction:
             mock_convert_prediction.return_value = [annotation]
             result = self._infer(server, entry, labels=[label], inputs=[input])
-
         (passed_batch,) = model.infer_batch.call_args.args
         assert len(passed_batch) == 1
         np.testing.assert_array_equal(passed_batch[0], raw_uint8)
         assert passed_batch[0].dtype == np.uint8
-
         assert result == {(media_id, 15): [annotation]}
 
     def test_infer_batch_not_loaded(self, tmp_path) -> None:
@@ -451,10 +537,8 @@ class TestInferenceServer:
         server = InferenceServer(data_dir=Path(tmp_path))
         project_id, model_id = uuid4(), uuid4()
         label = Mock(spec=Label)
-
         with _patched_model_service(tmp_path) as variant_ids, _patched_loader() as (mock_load, _, _handles):
             server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[label], inputs=[])
-
         mock_load.assert_called_once_with(
             model_id=model_id,
             variant_id=variant_ids[model_id],
@@ -468,12 +552,10 @@ class TestInferenceServer:
         monkeypatch.setattr("app.services.inference.inference_server.LOCK_ACQUIRE_TIMEOUT", 0.1)
         server = InferenceServer(data_dir=Path(tmp_path))
         entry = _seed_entry(server)
-
         entry.infer_lock.acquire()
         try:
             with pytest.raises(InferenceBusyError):
                 self._infer(server, entry)
         finally:
             entry.infer_lock.release()
-
-        assert entry.refcount == 0  # the lease is released even when the inference lock times out
+        assert entry.refcount == 0
