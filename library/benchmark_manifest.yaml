@@ -259,13 +259,10 @@ experiments:
         priority: extended
       - name: segnext_t
         priority: extended
-        recipe: semantic_segmentation/segnext_t.yaml
       - name: segnext_s
         priority: extended
-        recipe: semantic_segmentation/segnext_s.yaml
       - name: segnext_b
         priority: extended
-        recipe: semantic_segmentation/segnext_b.yaml
       - name: litehrnet_s
         priority: deferred
       - name: litehrnet_x
