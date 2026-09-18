@@ -15,7 +15,7 @@ from model_api.models import Model
 from app.models import BatchInferenceInput, DatasetItemAnnotation, Label
 from app.models.model_revision import ModelFormat, ModelPrecision, ModelVariant
 from app.models.system import DeviceInfo, DeviceType
-from app.services import ModelService
+from app.services import ModelService, ResourceNotFoundError
 from app.services.inference import InferenceModel, InferenceServer, InferenceState, InferenceStatus
 from app.services.inference.inference_server import InferenceBusyError
 from app.services.inference.model_loader import LoadedModelHandle
@@ -339,6 +339,85 @@ class TestInferenceServer:
         assert mock_load.call_count == 2
         assert [e.handle for e in server._entries] == [handle]
 
+    def test_invalidate_model_during_variant_resolution_blocks_insert(self, tmp_path) -> None:
+        """A model deleted while its variant is still being resolved must never enter the cache."""
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
+        project_id, model_id = uuid4(), uuid4()
+        resolve_started = threading.Event()
+        allow_resolve = threading.Event()
+        errors: list[BaseException] = []
+        original_resolve = server._resolve_variant
+
+        def _blocking_resolve(project_id: UUID, model_id: UUID, variant_id: UUID | None):
+            resolve_started.set()
+            allow_resolve.wait(timeout=5)
+            return original_resolve(project_id, model_id, variant_id)
+
+        def _infer() -> None:
+            try:
+                server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
+            except BaseException as exc:
+                errors.append(exc)
+
+        with (
+            _patched_model_service(tmp_path),
+            patch.object(server, "_resolve_variant", side_effect=_blocking_resolve),
+            patch("app.services.inference.model_loader.ModelLoader.load") as mock_load,
+        ):
+            worker = threading.Thread(target=_infer)
+            worker.start()
+            assert resolve_started.wait(timeout=5)
+
+            server.invalidate_model(project_id=project_id, model_id=model_id)
+            allow_resolve.set()
+            worker.join(timeout=5)
+
+        assert len(errors) == 1
+        assert isinstance(errors[0], ResourceNotFoundError)
+        mock_load.assert_not_called()
+        assert server._entries == []
+
+    def test_invalidate_model_during_load_aborts_publish_and_unloads_handle(self, tmp_path) -> None:
+        """A model deleted while loading must not be published back into the cache."""
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
+        project_id, model_id = uuid4(), uuid4()
+        load_started = threading.Event()
+        allow_finish = threading.Event()
+        loaded_handles: list[LoadedModelHandle] = []
+        errors: list[BaseException] = []
+
+        def _blocking_load(*, model_id: UUID, variant_id: UUID, model_xml_path: Path, device: DeviceInfo):
+            handle = _handle(model_id, variant_id, device)
+            loaded_handles.append(handle)
+            load_started.set()
+            allow_finish.wait(timeout=5)
+            return handle
+
+        def _infer() -> None:
+            try:
+                server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
+            except BaseException as exc:
+                errors.append(exc)
+
+        with (
+            _patched_model_service(tmp_path),
+            patch("app.services.inference.model_loader.ModelLoader.load", side_effect=_blocking_load),
+            patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload,
+        ):
+            worker = threading.Thread(target=_infer)
+            worker.start()
+            assert load_started.wait(timeout=5)
+
+            server.invalidate_model(project_id=project_id, model_id=model_id)
+            allow_finish.set()
+            worker.join(timeout=5)
+
+        assert len(errors) == 1
+        assert isinstance(errors[0], ResourceNotFoundError)
+        assert len(loaded_handles) == 1
+        mock_unload.assert_called_once_with(loaded_handles[0])
+        assert server._entries == []
+
     def test_stop_during_load_aborts_publish_and_unloads_handle(self, tmp_path) -> None:
         """A load finishing after stop() must not publish READY or proceed with inference."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
@@ -403,6 +482,35 @@ class TestInferenceServer:
         assert server._entries == [other]
         assert target.state is EntryState.EVICTED
 
+    def test_invalidate_model_attempts_all_matching_variants_before_raising(self, tmp_path) -> None:
+        """A failed unload while invalidating one variant does not skip the later cached variants."""
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=3)
+        project_id = uuid4()
+        model_id = uuid4()
+        first = _seed_entry(server, model_id=model_id)
+        second = _seed_entry(server, model_id=model_id)
+        other = _seed_entry(server)
+        first.project_id = project_id
+        second.project_id = project_id
+        matching_entries = [
+            entry for entry in server._entries if entry.project_id == project_id and entry.model_id == model_id
+        ]
+        expected_handles = [entry.handle for entry in matching_entries]
+
+        with (
+            patch(
+                "app.services.inference.model_loader.ModelLoader.unload",
+                side_effect=[RuntimeError("unload failed"), None],
+            ) as mock_unload,
+            pytest.raises(RuntimeError, match="unload failed"),
+        ):
+            server.invalidate_model(project_id=project_id, model_id=model_id)
+
+        assert [call.args[0] for call in mock_unload.call_args_list] == expected_handles
+        assert server._pending_unloads == [matching_entries[0]]
+        assert server._entries == [other]
+        assert matching_entries[1].handle is None
+
     def test_evict_expired_retries_failed_unloads_from_pending_queue(self, tmp_path) -> None:
         """A dropped entry whose unload fails is preserved and retried on the next eviction pass."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2, model_ttl=60)
@@ -423,6 +531,28 @@ class TestInferenceServer:
         assert server._pending_unloads == []
         assert expired.handle is None
 
+    def test_evict_expired_attempts_all_expired_entries_before_raising(self, tmp_path) -> None:
+        """A failed unload of one expired entry does not stop the remaining expired entries from unloading."""
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2, model_ttl=60)
+        _seed_entry(server, last_used=0.0)
+        _seed_entry(server, last_used=0.0)
+        expired_entries = list(server._entries)
+        expected_handles = [entry.handle for entry in expired_entries]
+
+        with (
+            patch(
+                "app.services.inference.model_loader.ModelLoader.unload",
+                side_effect=[RuntimeError("unload failed"), None],
+            ) as mock_unload,
+            pytest.raises(RuntimeError, match="unload failed"),
+        ):
+            server.evict_expired()
+
+        assert [call.args[0] for call in mock_unload.call_args_list] == expected_handles
+        assert server._pending_unloads == [expired_entries[0]]
+        assert server._entries == []
+        assert expired_entries[1].handle is None
+
     def test_stop_unloads_all_models(self, tmp_path) -> None:
         """Stopping the server drains the cache and unloads every model."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
@@ -434,6 +564,58 @@ class TestInferenceServer:
             server.stop()
         assert [call.args[0] for call in mock_unload.call_args_list] == unloaded_handles
         assert server._entries == []
+
+    def test_stop_attempts_all_entries_before_raising_unload_error(self, tmp_path) -> None:
+        """A failed unload during stop does not prevent later entries from being unloaded."""
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
+        _seed_entry(server)
+        _seed_entry(server)
+        stopped_entries = list(server._entries)
+        expected_handles = [entry.handle for entry in stopped_entries]
+
+        with (
+            patch(
+                "app.services.inference.model_loader.ModelLoader.unload",
+                side_effect=[RuntimeError("unload failed"), None],
+            ) as mock_unload,
+            pytest.raises(RuntimeError, match="unload failed"),
+        ):
+            server.stop()
+
+        assert [call.args[0] for call in mock_unload.call_args_list] == expected_handles
+        assert server._pending_unloads == [stopped_entries[0]]
+        assert server._entries == []
+        assert stopped_entries[1].handle is None
+
+    def test_stop_defers_unload_until_inference_lock_is_acquired(self, tmp_path, monkeypatch) -> None:
+        """Shutdown must not unload a model while another thread still holds its inference lock."""
+        monkeypatch.setattr("app.services.inference.inference_server.LOCK_ACQUIRE_TIMEOUT", 0.1)
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
+        first = _seed_entry(server)
+        second = _seed_entry(server)
+        first_handle = first.handle
+        second_handle = second.handle
+        assert first.infer_lock.acquire()
+        try:
+            with patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload:
+                server.stop()
+
+                assert [call.args[0] for call in mock_unload.call_args_list] == [second_handle]
+                assert server._pending_unloads == [first]
+                assert server._entries == []
+                assert first.handle is not None
+                assert second.handle is None
+
+                first.infer_lock.release()
+                server.stop()
+
+            assert [call.args[0] for call in mock_unload.call_args_list] == [second_handle, first_handle]
+            assert server._pending_unloads == []
+            assert server._entries == []
+            assert first.handle is None
+        finally:
+            if first.infer_lock.locked():
+                first.infer_lock.release()
 
     # --- status ---
     @pytest.mark.parametrize(

@@ -85,6 +85,7 @@ class InferenceServer:
         self._memory_overhead_factor = memory_overhead_factor
         self._model_ttl = model_ttl
         self._entries: list[ModelCacheEntry] = []  # MRU-ordered
+        self._deleted_models: set[tuple[UUID, UUID]] = set()
         self._pending_unloads: list[ModelCacheEntry] = []
         self._registry_lock = threading.Lock()
 
@@ -103,6 +104,11 @@ class InferenceServer:
         if entry in self._entries:
             self._entries.remove(entry)
             self._entries.insert(0, entry)
+
+    @staticmethod
+    def _deleted_model_error(model_id: UUID) -> ResourceNotFoundError:
+        """Build the not-found error raised when a deleted model is requested or finishes loading late."""
+        return ResourceNotFoundError(ResourceType.MODEL, str(model_id))
 
     def _drop(self, entry: ModelCacheEntry) -> None:
         """Remove an entry from the cache and mark it evicted. The caller must unload it outside the lock."""
@@ -163,14 +169,22 @@ class InferenceServer:
         """Invalidate every cached variant of a deleted model revision."""
         to_unload: list[ModelCacheEntry] = []
         with self._registry_lock:
+            self._deleted_models.add((project_id, model_id))
             for entry in list(self._entries):
                 if entry.project_id != project_id or entry.model_id != model_id:
                     continue
                 self._drop(entry)
                 if entry.handle is not None and entry.refcount == 0:
                     to_unload.append(entry)
+        first_error: BaseException | None = None
         for entry in to_unload:
-            self._unload(entry)
+            try:
+                self._unload(entry)
+            except BaseException as exc:
+                if first_error is None:
+                    first_error = exc
+        if first_error is not None:
+            raise first_error
 
     def _wait_ready(self, entry: ModelCacheEntry, deadline: float) -> ModelCacheEntry | None:
         """
@@ -326,7 +340,7 @@ class InferenceServer:
             entry.ready.set()  # release waiters so they retry
             raise
 
-        evicted_during_load = False
+        aborted_error: BaseException | None = None
         with self._registry_lock:
             if entry.state is EntryState.LOADING:
                 entry.handle = handle
@@ -336,14 +350,17 @@ class InferenceServer:
                 # The entry was evicted while ModelLoader.load() was running (e.g. stop()).
                 # Do not publish it back to READY; unload and abort instead.
                 entry.handle = handle
-                entry.error = InferenceBusyError()
+                if (entry.project_id, entry.model_id) in self._deleted_models:
+                    entry.error = self._deleted_model_error(entry.model_id)
+                else:
+                    entry.error = InferenceBusyError()
                 entry.refcount -= 1
-                evicted_during_load = True
+                aborted_error = entry.error
 
-        if evicted_during_load:
+        if aborted_error is not None:
             entry.ready.set()  # wake waiters so they can observe eviction and retry
             self._unload(entry)
-            raise InferenceBusyError
+            raise aborted_error
 
         entry.ready.set()
         return entry
@@ -370,8 +387,12 @@ class InferenceServer:
             A `(hit, mine, stale)` triple, of which at most one element is set: an existing leased entry to wait
             for, a new LOADING entry owned by the caller, or an entry dropped for a device switch that the caller
             must unload outside the lock. An all-None result means the caller should retry.
+        Raises:
+            ResourceNotFoundError: if the model was invalidated by deletion.
         """
         with self._registry_lock:
+            if (project_id, model_id) in self._deleted_models:
+                raise self._deleted_model_error(model_id)
             entry = self._find(model_id, variant_id)
             if entry is not None and entry.device == device:
                 entry.refcount += 1
@@ -409,6 +430,7 @@ class InferenceServer:
 
         Raises:
             InferenceBusyError: if no entry could be leased before the timeout expires.
+            ResourceNotFoundError: if the model was deleted while resolving or loading.
         """
         deadline = time.monotonic() + LOCK_ACQUIRE_TIMEOUT
         resolved: _ResolvedVariant | None = None
@@ -556,8 +578,15 @@ class InferenceServer:
             ]
             for entry in expired:
                 self._drop(entry)
+        first_error: BaseException | None = None
         for entry in [*pending_unloads, *expired]:
-            self._unload(entry)  # outside the lock
+            try:
+                self._unload(entry)  # outside the lock
+            except BaseException as exc:
+                if first_error is None:
+                    first_error = exc
+        if first_error is not None:
+            raise first_error
 
     def stop(self) -> None:
         """
@@ -568,11 +597,27 @@ class InferenceServer:
             pending_unloads, self._pending_unloads = self._pending_unloads, []
             for entry in entries:
                 entry.state = EntryState.EVICTED
+        first_error: BaseException | None = None
         for entry in [*pending_unloads, *entries]:
             # Take the inference lock first so teardown never races an in-flight inference
             acquired = entry.infer_lock.acquire(timeout=LOCK_ACQUIRE_TIMEOUT)
+            if not acquired:
+                logger.warning(
+                    "Timed out waiting to unload model {} (variant {}) during shutdown; deferring retry.",
+                    entry.model_id,
+                    entry.variant_id,
+                )
+                with self._registry_lock:
+                    if entry.handle is not None and entry not in self._pending_unloads:
+                        self._pending_unloads.append(entry)
+                continue
             try:
                 self._unload(entry)
+            except BaseException as exc:
+                if first_error is None:
+                    first_error = exc
             finally:
                 if acquired:
                     entry.infer_lock.release()
+        if first_error is not None:
+            raise first_error

@@ -116,7 +116,7 @@ def fxt_training_configuration_service(fxt_app) -> MagicMock:
     return training_configuration_service
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def fxt_inference_server(fxt_app) -> MagicMock:
     inference_server = MagicMock(spec=InferenceServer)
     fxt_app.dependency_overrides[get_inference_server] = lambda: inference_server

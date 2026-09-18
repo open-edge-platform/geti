@@ -341,4 +341,5 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
     video_service.close()
     await webrtc_manager.cleanup()
     app_scheduler.shutdown()
+    inference_server.stop()
     logger.info("Application shutdown completed")
