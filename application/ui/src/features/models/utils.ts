@@ -52,11 +52,3 @@ export const getAllModelsWithOpenVINOVariants = (models: Model[]): SelectableMod
             }))
     );
 };
-
-export const isUltralyticsModel = (identifier: string): boolean => {
-    return /yolo\d+-/.test(identifier.toLocaleLowerCase());
-};
-
-export const isEdgeCrafterModel = (identifier: string): boolean => {
-    return /edgecrafter-/.test(identifier.toLocaleLowerCase());
-};
