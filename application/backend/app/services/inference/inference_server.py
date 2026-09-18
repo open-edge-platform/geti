@@ -66,7 +66,7 @@ class InferenceServer:
     def __init__(
         self,
         data_dir: Path,
-        max_models: int = 1,
+        max_models: int = 2,
         max_memory: int | None = None,
         memory_overhead_factor: float = 1.5,
         model_ttl: int = 60,
@@ -92,10 +92,6 @@ class InferenceServer:
         self._registry_lock = threading.Lock()
 
     # --- registry primitives, called with `self._registry_lock` held ---
-
-    def _find(self, model_id: UUID, variant_id: UUID) -> ModelCacheEntry | None:
-        """Return the cached entry for the given model variant, or None."""
-        return self._entries.get((model_id, variant_id))
 
     def _is_cached(self, entry: ModelCacheEntry) -> bool:
         """Return whether this exact entry is still the one registered under its key."""
@@ -149,9 +145,7 @@ class InferenceServer:
                 entry.last_used = time.monotonic()
             unload_later = entry.refcount == 0 and entry.state is EntryState.EVICTED and entry.handle is not None
         if unload_later:
-            with self._registry_lock:
-                if entry not in self._pending_unloads:
-                    self._pending_unloads.append(entry)
+            self._defer_unload(entry)
 
     def _unload(self, entry: ModelCacheEntry) -> None:
         """Unload the model held by an entry that has already been dropped from the cache."""
@@ -162,11 +156,39 @@ class InferenceServer:
         try:
             ModelLoader.unload(handle)
         except Exception:
-            with self._registry_lock:
-                if entry not in self._pending_unloads:
-                    self._pending_unloads.append(entry)
+            self._defer_unload(entry)
             raise
         entry.handle = None
+
+    def _defer_unload(self, entry: ModelCacheEntry) -> None:
+        """Queue an entry for a later unload attempt if it still has a live handle."""
+        with self._registry_lock:
+            if entry.handle is not None and entry not in self._pending_unloads:
+                self._pending_unloads.append(entry)
+
+    def _drain_unloads(self, entries: list[ModelCacheEntry], *, operation: str) -> None:
+        """Unload entries after acquiring their inference locks, deferring busy ones for a later retry."""
+        first_error: BaseException | None = None
+        for entry in entries:
+            acquired = entry.infer_lock.acquire(timeout=LOCK_ACQUIRE_TIMEOUT)
+            if not acquired:
+                logger.warning(
+                    "Timed out waiting to unload model {} (variant {}) during {}; deferring retry.",
+                    entry.model_id,
+                    entry.variant_id,
+                    operation,
+                )
+                self._defer_unload(entry)
+                continue
+            try:
+                self._unload(entry)
+            except BaseException as exc:
+                if first_error is None:
+                    first_error = exc
+            finally:
+                entry.infer_lock.release()
+        if first_error is not None:
+            raise first_error
 
     def invalidate_model(self, project_id: UUID, model_id: UUID) -> None:
         """Mark a model revision as deleted so future inference requests are rejected."""
@@ -381,7 +403,7 @@ class InferenceServer:
         with self._registry_lock:
             if (project_id, model_id) in self._deleted_models:
                 raise self._deleted_model_error(model_id)
-            entry = self._find(model_id, variant_id)
+            entry = self._entries.get((model_id, variant_id))
             if entry is not None and entry.device == device:
                 entry.refcount += 1
                 self._touch(entry)  # move to MRU front
@@ -566,15 +588,7 @@ class InferenceServer:
             ]
             for entry in expired:
                 self._drop(entry)
-        first_error: BaseException | None = None
-        for entry in [*pending_unloads, *expired]:
-            try:
-                self._unload(entry)  # outside the lock
-            except BaseException as exc:
-                if first_error is None:
-                    first_error = exc
-        if first_error is not None:
-            raise first_error
+        self._drain_unloads([*pending_unloads, *expired], operation="eviction")
 
     def stop(self) -> None:
         """
@@ -586,27 +600,4 @@ class InferenceServer:
             pending_unloads, self._pending_unloads = self._pending_unloads, []
             for entry in entries:
                 entry.state = EntryState.EVICTED
-        first_error: BaseException | None = None
-        for entry in [*pending_unloads, *entries]:
-            # Take the inference lock first so teardown never races an in-flight inference
-            acquired = entry.infer_lock.acquire(timeout=LOCK_ACQUIRE_TIMEOUT)
-            if not acquired:
-                logger.warning(
-                    "Timed out waiting to unload model {} (variant {}) during shutdown; deferring retry.",
-                    entry.model_id,
-                    entry.variant_id,
-                )
-                with self._registry_lock:
-                    if entry.handle is not None and entry not in self._pending_unloads:
-                        self._pending_unloads.append(entry)
-                continue
-            try:
-                self._unload(entry)
-            except BaseException as exc:
-                if first_error is None:
-                    first_error = exc
-            finally:
-                if acquired:
-                    entry.infer_lock.release()
-        if first_error is not None:
-            raise first_error
+        self._drain_unloads([*pending_unloads, *entries], operation="shutdown")

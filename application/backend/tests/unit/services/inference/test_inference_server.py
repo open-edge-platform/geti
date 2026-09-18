@@ -648,6 +648,41 @@ class TestInferenceServer:
             if first.infer_lock.locked():
                 first.infer_lock.release()
 
+    def test_evict_expired_keeps_stop_deferred_entries_pending_until_inference_lock_is_acquired(
+        self, tmp_path, monkeypatch
+    ) -> None:
+        """Eviction must not unload a stop-deferred model while another thread still holds its inference lock."""
+        monkeypatch.setattr("app.services.inference.inference_server.LOCK_ACQUIRE_TIMEOUT", 0.1)
+        server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
+        first = _seed_entry(server)
+        second = _seed_entry(server)
+        first_handle = first.handle
+        second_handle = second.handle
+        assert first.infer_lock.acquire()
+        try:
+            with patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload:
+                server.stop()
+
+                assert [call.args[0] for call in mock_unload.call_args_list] == [second_handle]
+                assert server._pending_unloads == [first]
+                assert first.handle is first_handle
+
+                server.evict_expired()
+
+                assert [call.args[0] for call in mock_unload.call_args_list] == [second_handle]
+                assert server._pending_unloads == [first]
+                assert first.handle is first_handle
+
+                first.infer_lock.release()
+                server.evict_expired()
+
+            assert [call.args[0] for call in mock_unload.call_args_list] == [second_handle, first_handle]
+            assert server._pending_unloads == []
+            assert first.handle is None
+        finally:
+            if first.infer_lock.locked():
+                first.infer_lock.release()
+
     # --- status ---
     @pytest.mark.parametrize(
         "states, expected_status, expected_models",
