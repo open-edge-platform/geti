@@ -343,17 +343,18 @@
             "recommended": "{{taskType}} (Recommended)"
         },
         "list": {
-            "heading": "Projects",
             "count_one": "{{count}} project",
             "count_other": "{{count}} projects",
             "countFiltered_one": "{{filtered}} of {{count}} project",
             "countFiltered_other": "{{filtered}} of {{count}} projects",
             "createNewProject": "Create new project",
-            "createProjectFromDataset": "Create project from dataset",
+            "createProjectFromDataset": "Create from dataset",
             "activeBadge": "Active",
             "card": {
-                "created": "• Created: {{date}}",
-                "labels": "• Labels: {{labels}}"
+                "created": "Created: {{date}}",
+                "labelsDialog": {
+                    "title": "Labels"
+                }
             },
             "menu": {
                 "enablePipeline": "Enable pipeline",
@@ -362,17 +363,15 @@
                 "pipelineDisabled": "Pipeline disabled successfully"
             },
             "sort": {
-                "label": "Sort:",
+                "label": "Sort Projects by:",
                 "nameAscending": "Name (A-Z)",
                 "nameDescending": "Name (Z-A)",
                 "createdAtDescending": "Created date (newest)",
                 "createdAtAscending": "Created date (oldest)"
             },
             "filters": {
-                "searchPlaceholder": "Search by name...",
-                "taskType": "Filter by task type",
-                "typesSelected_one": "{{count}} type selected",
-                "typesSelected_other": "{{count}} types selected"
+                "searchPlaceholder": "Search projects",
+                "taskType": "Filter by task type"
             },
             "noMatches": {
                 "title": "No projects match your filters",
