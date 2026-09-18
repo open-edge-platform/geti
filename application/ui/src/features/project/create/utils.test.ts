@@ -23,18 +23,32 @@ describe('generateUniqueProjectName', () => {
         expect(result).toBe('Project #1');
     });
 
-    it('handles mixed names and picks max + 1', () => {
+    it('picks the first number that is not taken', () => {
         const result = generateUniqueProjectName(['Project #1', 'Alpha', 'Project #3'], t);
-        expect(result).toBe('Project #4');
+        expect(result).toBe('Project #2');
     });
 
     it('handles duplicate numbers correctly', () => {
-        const result = generateUniqueProjectName(['Project #2', 'Project #2'], t);
+        const result = generateUniqueProjectName(['Project #1', 'Project #2', 'Project #2'], t);
         expect(result).toBe('Project #3');
     });
 
     it('handles large numbers', () => {
-        const result = generateUniqueProjectName(['Project #999'], t);
+        const existingNames = Array.from({ length: 999 }, (_, index) => `Project #${index + 1}`);
+        const result = generateUniqueProjectName(existingNames, t);
         expect(result).toBe('Project #1000');
+    });
+
+    it('stays unique when the default name is localized', () => {
+        const { t: localizedT } = createI18nInstance({
+            lng: 'zh-TW',
+            supportedLngs: ['zh-TW'],
+            resources: {
+                'zh-TW': { translation: { project: { create: { defaultName: '專案 #{{number}}' } } } },
+            },
+        });
+
+        const result = generateUniqueProjectName(['專案 #1', '專案 #2'], localizedT);
+        expect(result).toBe('專案 #3');
     });
 });

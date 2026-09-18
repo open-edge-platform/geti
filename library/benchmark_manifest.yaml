@@ -36,6 +36,26 @@ experiments:
         priority: deferred
       - name: yolo26_x_cls
         priority: extended
+      - name: convnextv2_atto
+        priority: core
+      - name: convnextv2_base
+        priority: deferred
+      - name: convnextv2_large
+        priority: extended
+      - name: dinov3_convnext_tiny
+        priority: core
+      - name: dinov3_convnext_small
+        priority: deferred
+      - name: dinov3_convnext_base
+        priority: deferred
+      - name: dinov3_convnext_large
+        priority: extended
+      - name: dinov3_vits
+        priority: core
+      - name: dinov3_vitb16
+        priority: deferred
+      - name: dinov3_vitl16
+        priority: extended
     datasets:
       - paddy_disease
       - chest_ct
@@ -77,6 +97,26 @@ experiments:
       - name: yolo26_l_cls
         priority: deferred
       - name: yolo26_x_cls
+        priority: extended
+      - name: convnextv2_atto
+        priority: core
+      - name: convnextv2_base
+        priority: deferred
+      - name: convnextv2_large
+        priority: extended
+      - name: dinov3_convnext_tiny
+        priority: core
+      - name: dinov3_convnext_small
+        priority: deferred
+      - name: dinov3_convnext_base
+        priority: deferred
+      - name: dinov3_convnext_large
+        priority: extended
+      - name: dinov3_vits
+        priority: core
+      - name: dinov3_vitb16
+        priority: deferred
+      - name: dinov3_vitl16
         priority: extended
     datasets:
       - aid_multilabel
@@ -180,7 +220,14 @@ experiments:
         priority: deferred
       - name: edgecrafter_x
         priority: extended
-
+      - name: rtdetrv2_r18
+        priority: core
+      - name: rtdetrv2_r34
+        priority: deferred
+      - name: rtdetrv2_r50
+        priority: deferred
+      - name: rtdetrv2_r101
+        priority: extended
     datasets:
       - pothole
       - wgisd
@@ -304,6 +351,18 @@ experiments:
         priority: deferred
       - name: rtmdet_inst_tiny_tile
         priority: deferred
+      - name: eomt_dinov3_large_640
+        priority: extended
+      - name: eomt_large_640
+        priority: extended
+      - name: mask2former_swin_t
+        priority: core
+      - name: mask2former_swin_s
+        priority: deferred
+      - name: mask2former_swin_b
+        priority: deferred
+      - name: mask2former_swin_l
+        priority: extended
     datasets:
       - pothole
       - pcb_defect

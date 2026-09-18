@@ -2,16 +2,21 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
+import warnings
+from dataclasses import asdict
+
 import pytest
 import torch
 from lightning import Trainer
 from lightning.pytorch.utilities.types import LRSchedulerConfig
 from pytest_mock import MockerFixture
 
+from getitune.backend.lightning.models import ATSS
 from getitune.backend.lightning.models.base import DataInputParams, LightningModel
 from getitune.backend.lightning.models.classification.multiclass_models.base import LightningMulticlassClsModel
 from getitune.backend.lightning.models.segmentation.base import LightningSegmentationModel
 from getitune.backend.lightning.schedulers.warmup_schedulers import LinearWarmupScheduler
+from getitune.config.data import TileConfig
 from getitune.types.label import LabelInfo, SegLabelInfo
 
 
@@ -196,6 +201,27 @@ class TestLightningModel:
 
         # Regardless of the activation status, LinearWarmupScheduler can be called
         assert mock_linear_warmup_scheduler.step.call_count == 2
+
+    def test_on_load_checkpoint_restores_tile_config_without_warning(self) -> None:
+        model = ATSS(
+            label_info=1,
+            pretrained=False,
+        )
+        original = model.tile_config
+        restored = TileConfig(enable_tiler=not original.enable_tiler)
+
+        checkpoint = {
+            "hyper_parameters": {
+                "tile_config": asdict(restored),
+            },
+        }
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            model.on_load_checkpoint(checkpoint)
+
+        assert model.tile_config == restored
+        assert not caught
 
 
 class TestDataInputParams:

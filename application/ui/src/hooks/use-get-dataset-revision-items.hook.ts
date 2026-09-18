@@ -44,9 +44,7 @@ export const useGetDatasetRevisionItems = ({ datasetRevisionId, subsets }: UseGe
         }
     );
 
-    // TODO: OpenAPI spec incorrectly types this as DatasetItem[], but the API actually returns DatasetRevisionItem[]
-    // Update this once https://github.com/open-edge-platform/training_extensions/pull/5455 is merged
-    const items: DatasetRevisionItem[] = (data?.pages.flatMap((page) => page.items) ?? []) as DatasetRevisionItem[];
+    const items: DatasetRevisionItem[] = data?.pages.flatMap((page) => page.items) ?? [];
     const totalCount = data?.pages[0]?.pagination?.total ?? 0;
 
     return { items, fetchNextPage, hasNextPage, isFetchingNextPage, isPending, totalCount };

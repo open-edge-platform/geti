@@ -1,0 +1,37 @@
+id: instance-segmentation-eomt-large-640
+name: EoMT-Large-640
+license: MIT
+pretrained_weights:
+  source: huggingface
+  repo_id: tue-mps/coco_instance_eomt_large_640
+  revision: a43666870d47a7010bfea2c4554f7ca829714558
+description: "EoMT-Large is an encoder-only mask transformer on a plain ViT-L backbone for efficient instance segmentation without a task-specific decoder."
+stats:
+  gigaflops: 1071.51269888
+  trainable_parameters: 316.641361
+  benchmark_metrics:
+    coco_map_50_95: 45.9
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.00005
+    weight_decay: 0.05
+    input_size_width: 640
+    input_size_height: 640
+    max_epochs: 30
+    batch_size: 2
+    early_stopping:
+      patience: 10
+    scheduler:
+      type: cosine_annealing
+      warmup:
+        enable: true
+        epochs: 3
+    gradient_clip:
+      enable: true
+      max_grad_norm: 1.0
+    gradient_accumulation:
+      enable: true
+      batches: 4

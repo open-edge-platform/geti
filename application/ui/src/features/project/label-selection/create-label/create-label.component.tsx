@@ -11,12 +11,16 @@ import { useTranslation } from '@/i18n';
 import { ActionButton, DOMRefValue, Grid, TextField, TextFieldRef, useUnwrapDOMRef, View } from '@geti-ui/ui';
 import { Add } from '@geti-ui/ui/icons';
 import { useEventListener } from 'hooks/event-listener.hook';
-import { v4 as uuid } from 'uuid';
 
 import { TASK_HOTKEYS } from '../../../../shared/hotkeys-definition';
 import { getRandomDistinctColor } from '../../../annotator/label-utils';
 
-const getInitialLabel = (): Label => ({ id: uuid(), color: getRandomDistinctColor(), name: '', hotkey: null });
+const getInitialLabel = (): Label => ({
+    id: crypto.randomUUID(),
+    color: getRandomDistinctColor(),
+    name: '',
+    hotkey: null,
+});
 
 type CreateLabelProps = {
     onCreate: (label: Label) => void;

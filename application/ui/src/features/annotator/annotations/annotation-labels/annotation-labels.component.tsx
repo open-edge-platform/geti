@@ -3,26 +3,29 @@
 
 import { PointerEvent, useCallback } from 'react';
 
-import { v4 as uuid } from 'uuid';
-
 import { useLabelResolver } from '../../../../shared/annotator/labels';
 import type { AnnotationLabel, AnnotationLabelRef } from '../../../../shared/types';
 import { isPrediction } from '../utils';
 
 import classes from './annotation-labels.module.scss';
 
-const placeholderLabel = { id: uuid(), name: 'No label', color: 'var(--annotation-fill)', isPrediction: false };
+const placeholderLabel = {
+    id: crypto.randomUUID(),
+    name: 'No label',
+    color: 'var(--annotation-fill)',
+    isPrediction: false,
+};
 
 // Screen-space dimensions for the foreignObject hit area
 const LABEL_HEIGHT_PX = 24;
 const LABEL_MAX_WIDTH_PX = 1000;
 
-interface AnnotationLabelsProps {
+type AnnotationLabelsProps = {
     labels: AnnotationLabelRef[];
     onRemove: (labelId: string) => void;
     useBottomCorners?: boolean;
     isRemovable?: boolean;
-}
+};
 
 const formatPredictionScore = (score: number) => {
     return new Intl.NumberFormat('en-US', { style: 'percent' }).format(score);

@@ -35,7 +35,7 @@ dependencies = [
     "rich_argparse==1.7.0", # CLI help-formatter
     "einops==0.8.1",
     "typeguard>=4.3,<4.5",
-    "lightning==2.6.0",
+    "lightning~=2.6.6",
     "torchmetrics==1.8.2",
     "pytorchcv==0.0.74",
     "timm==1.0.29",
@@ -75,6 +75,7 @@ dev = [
     "tifffile",
     "py-cpuinfo",
     "mlflow>=3.11.1",
+    "pytest-memray>=1.10.0; sys_platform != 'win32'",
 ]
 
 lint = [
@@ -110,7 +111,7 @@ xpu = [
     "torchvision==0.29.0+xpu"
 ]
 ultralytics = [
-    "ultralytics==8.4.86",
+    "ultralytics",
 ]
 
 docs = [
@@ -187,6 +188,8 @@ torchvision = [
     { index = "torch-xpu", extra = "xpu"},
     { index = "torch-cuda", extra = "cuda"},
 ]
+ultralytics = { git = "https://github.com/ultralytics/ultralytics.git", rev = "3d2cc01ee02206e0f7adc2c1e9c559b0b73e66a8" }
+openvino-model-api = { git = "https://github.com/open-edge-platform/model_api.git", branch = "master", subdirectory = "model_api" }
 
 [[tool.uv.index]]
 name = "torch-cpu"

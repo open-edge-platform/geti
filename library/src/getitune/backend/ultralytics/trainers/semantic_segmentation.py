@@ -98,7 +98,7 @@ class SemanticSegmentationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _Ul
             num_workers=nw,
             prefetch_factor=4 if nw > 0 else None,
             collate_fn=semantic_collate_fn,
-            pin_memory=True,
+            pin_memory=self._pin_memory,
             drop_last=False,
             multiprocessing_context=_MP_CONTEXT if nw > 0 else None,
             persistent_workers=nw > 0,
@@ -116,7 +116,7 @@ class SemanticSegmentationTrainer(GetiTuneBaseTrainer, XPUAwareTrainerMixin, _Ul
         if not self._use_getitune_data:
             return super().get_validator()  # type: ignore[return-value]
 
-        self.loss_names = ["ce_loss", "dice_loss", "aux_loss"]
+        self.loss_names = ["ce_loss", "dice_loss", "aux_loss"]  # pyrefly: ignore[bad-assignment]
         validator = SemanticSegmentationValidator(
             self.test_loader,
             save_dir=self.save_dir,

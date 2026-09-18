@@ -168,7 +168,9 @@ class CSPDarknetModule(BaseModule):
         arch_setting = self.arch_settings[arch]
         if arch_ovewrite:
             arch_setting = arch_ovewrite
-        assert set(out_indices).issubset(i for i in range(len(arch_setting) + 1))  # noqa: S101
+        if not set(out_indices).issubset(i for i in range(len(arch_setting) + 1)):
+            msg = f"out_indices must be a subset of range(0, len(arch_setting[{arch}]) + 1). But received {out_indices}"
+            raise ValueError(msg)
         if frozen_stages not in range(-1, len(arch_setting) + 1):
             msg = f"frozen_stages must be in range(-1, len(arch_setting) + 1). But received {frozen_stages}"
             raise ValueError(msg)

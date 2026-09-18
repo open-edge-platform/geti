@@ -258,7 +258,18 @@ class YOLOXHeadModule(BaseDenseHead):
             - bboxes (Tensor): Has a shape (num_instances, 4),
               the last dimension 4 arrange as (x1, y1, x2, y2).
         """
-        assert len(cls_scores) == len(bbox_preds) == len(objectnesses)  # type: ignore[arg-type] # noqa: S101
+        if objectnesses is None:
+            msg = "objectnesses must not be None."
+            raise ValueError(msg)
+        if cls_scores is None or bbox_preds is None:
+            msg = "cls_scores and bbox_preds must not be None."
+            raise ValueError(msg)
+        if not (len(cls_scores) == len(bbox_preds) == len(objectnesses)):
+            msg = (
+                f"cls_scores, bbox_preds, and objectnesses must have the same number of feature levels: "
+                f"got {len(cls_scores)}, {len(bbox_preds)}, and {len(objectnesses)}."
+            )
+            raise ValueError(msg)
         cfg = cfg or self.test_cfg
 
         num_imgs = len(batch_img_metas)  # type: ignore[arg-type]
@@ -437,7 +448,9 @@ class YOLOXHeadModule(BaseDenseHead):
               the last dimension 4 arrange as (x1, y1, x2, y2).
         """
         if rescale:
-            assert img_meta.get("scale_factor") is not None  # type: ignore[union-attr] # noqa: S101
+            if img_meta.get("scale_factor") is None:  # type: ignore[union-attr]
+                msg = "img_meta['scale_factor'] is required to rescale bboxes when rescale=True."
+                raise ValueError(msg)
             results.bboxes /= results.bboxes.new_tensor(img_meta["scale_factor"][::-1]).repeat((1, 2))  # type: ignore[attr-defined, index]
 
         if with_nms and results.bboxes.numel() > 0:  # type: ignore[attr-defined]

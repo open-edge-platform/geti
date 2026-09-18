@@ -58,6 +58,7 @@ KEY_MAPPING = {
     # Step based training metric
     "train/data_time": MetricDisplayInfo(display_name="Training data time", frequency="step"),
     "train/iter_time": MetricDisplayInfo(display_name="Training iteration time", frequency="step"),
+    "train/grad_norm": MetricDisplayInfo(display_name="Training gradient norm", frequency="step"),
     # "train/loss": MetricDisplayInfo(display_name="Training loss", frequency="step"),  # see issue #6350
     "train/loss_bbox": MetricDisplayInfo(display_name="Training loss bbox", frequency="step"),
     "train/loss_dfl": MetricDisplayInfo(display_name="Training loss DFL", frequency="epoch"),
@@ -86,6 +87,8 @@ KEY_MAPPING = {
     "val/mar_small": MetricDisplayInfo(display_name="Validation mAR small", frequency="epoch"),
     "val/precision": MetricDisplayInfo(display_name="Validation precision", frequency="epoch"),
     "val/recall": MetricDisplayInfo(display_name="Validation recall", frequency="epoch"),
+    "val/Dice": MetricDisplayInfo(display_name="Validation Dice score", frequency="epoch"),
+    "val/mIoU": MetricDisplayInfo(display_name="Validation mean IoU", frequency="epoch"),
     "validation/data_time": MetricDisplayInfo(display_name="Validation data time", frequency="epoch"),
     "validation/iter_time": MetricDisplayInfo(display_name="Validation iteration time", frequency="epoch"),
 }
@@ -242,7 +245,7 @@ class ModelService(BaseSessionManagedService):
             # Compute weights_size and read the embedded confidence threshold from the filesystem
             variant_dir = self._get_variant_dir(project_id, model_id, UUID(v_db.id))
             if not v_db.files_deleted and variant_dir.exists():
-                variant.weights_size = sum(f.stat().st_size for f in variant_dir.iterdir() if f.is_file())
+                variant.weights_size = sum(f.stat().st_size for f in variant_dir.rglob("*") if f.is_file())
                 variant.optimal_confidence_threshold = _cached_optimal_confidence_threshold(variant_dir, variant.format)
             variants.append(variant)
         return variants
@@ -525,6 +528,7 @@ class ModelService(BaseSessionManagedService):
         bin_file = variant_dir / "model.bin"
         onnx_file = variant_dir / "model.onnx"
         pt_file = variant_dir / "model.pt"
+        pt_dir = variant_dir / "model"
         metadata_file = variant_dir / "metadata.yaml"
 
         if xml_file.exists() and bin_file.exists():
@@ -537,8 +541,11 @@ class ModelService(BaseSessionManagedService):
             if metadata_file.exists():
                 paths.append(metadata_file)
             return True, tuple(paths)
-        if pt_file.exists():
-            return True, (pt_file,)
+        pytorch_files = ([pt_file] if pt_file.is_file() else []) + (
+            sorted(path for path in pt_dir.rglob("*") if path.is_file()) if pt_dir.is_dir() else []
+        )
+        if pytorch_files:
+            return True, tuple(pytorch_files)
 
         return False, ()
 

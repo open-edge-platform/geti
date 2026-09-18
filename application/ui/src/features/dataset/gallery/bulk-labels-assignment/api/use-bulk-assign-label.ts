@@ -3,14 +3,19 @@
 
 import { $api } from '@/api';
 import { toast } from '@/components/toast/toast.component';
+import { useTranslation } from '@/i18n';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-import { isEmpty, partition } from 'lodash-es';
+import { chunk, isEmpty, partition } from 'lodash-es';
 
 import { getQueryKey } from '../../../../../query-client/query-client';
 import { filterOutEmptyLabels } from '../../../../../shared/annotator/labels';
 
+// Annotations can only be set one media at a time, so cap how many requests are in flight at once.
+const ASSIGN_LABEL_BATCH_SIZE = 20;
+
 export const useBulkAssignLabel = () => {
+    const { t } = useTranslation();
     const projectId = useProjectIdentifier();
     const queryClient = useQueryClient();
     const mutation = $api.useMutation('post', '/api/projects/{project_id}/dataset/media/{media_id}/annotations');
@@ -55,26 +60,32 @@ export const useBulkAssignLabel = () => {
     };
 
     const bulkAssignLabel = async (mediaIds: string[], labelIds: string[]) => {
-        const result = await Promise.allSettled(mediaIds.map((mediaId) => assignLabel(mediaId, labelIds)));
+        const result: PromiseSettledResult<Awaited<ReturnType<typeof assignLabel>>>[] = [];
+
+        for (const batch of chunk(mediaIds, ASSIGN_LABEL_BATCH_SIZE)) {
+            result.push(...(await Promise.allSettled(batch.map((mediaId) => assignLabel(mediaId, labelIds)))));
+        }
 
         const [successfulMediaItems, failedMediaItems] = partition(result, ({ status }) => status === 'fulfilled');
 
         if (failedMediaItems.length === 0) {
             toast({
                 type: 'success',
-                message: `Successfully assigned label(s) to all ${successfulMediaItems.length} image(s)`,
+                message: t('dataset.bulkLabels.assignAllSuccess', { count: successfulMediaItems.length }),
             });
         } else if (successfulMediaItems.length === 0) {
             toast({
                 type: 'error',
-                message: `Failed to assign label(s) to all ${failedMediaItems.length} image(s)`,
+                message: t('dataset.bulkLabels.assignAllFailure', { count: failedMediaItems.length }),
             });
         } else {
             toast({
                 type: 'info',
-                message:
-                    `Assigned label(s) to ${successfulMediaItems.length} of ${mediaIds.length} image(s) ` +
-                    `(${failedMediaItems.length} failed)`,
+                message: t('dataset.bulkLabels.assignPartialSuccess', {
+                    succeeded: successfulMediaItems.length,
+                    total: mediaIds.length,
+                    failed: failedMediaItems.length,
+                }),
             });
         }
 

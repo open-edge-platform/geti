@@ -5,6 +5,8 @@
 
 from getitune.backend.huggingface.models import (
     HFDetectionModel,
+    HFDinov3MulticlassClsModel,
+    HFDinov3MultilabelClsModel,
     HFInstSegModel,
     HFModel,
     HFMulticlassClsModel,
@@ -52,6 +54,7 @@ try:
         UltralyticsMultiClassClsModel,
         UltralyticsMultiLabelClsModel,
         UltralyticsSemanticSegModel,
+        UltralyticsYoloDetrModel,
     )
 except ImportError:
     UltralyticsDetectionModel = None  # type: ignore[assignment]
@@ -59,6 +62,7 @@ except ImportError:
     UltralyticsMultiClassClsModel = None  # type: ignore[assignment]
     UltralyticsMultiLabelClsModel = None  # type: ignore[assignment]
     UltralyticsSemanticSegModel = None  # type: ignore[assignment]
+    UltralyticsYoloDetrModel = None  # type: ignore[assignment]
 
 __all__ = [
     "ATSS",
@@ -73,6 +77,8 @@ __all__ = [
     "EdgeCrafter",
     "EfficientNet",
     "HFDetectionModel",
+    "HFDinov3MulticlassClsModel",
+    "HFDinov3MultilabelClsModel",
     "HFInstSegModel",
     "HFModel",
     "HFMulticlassClsModel",
@@ -106,5 +112,6 @@ if UltralyticsDetectionModel is not None:
             "UltralyticsMultiClassClsModel",
             "UltralyticsMultiLabelClsModel",
             "UltralyticsSemanticSegModel",
+            "UltralyticsYoloDetrModel",
         ]
     )

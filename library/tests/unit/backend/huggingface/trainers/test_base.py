@@ -318,6 +318,17 @@ class TestTrainerLoopExercisesOverrides:
         trainer = self._trainer(tmp_path)
         assert trainer.floating_point_ops(_detection_batch()) == 0
 
+    def test_training_log_includes_timing(self, tmp_path: Path) -> None:
+        trainer = self._trainer(tmp_path)
+        trainer._train_data_time = 0.1
+        trainer._train_iter_time = 0.4
+
+        trainer.log({"loss": 0.5})
+
+        entry = trainer.state.log_history[-1]
+        assert entry["train/data_time"] == pytest.approx(0.1)
+        assert entry["train/iter_time"] == pytest.approx(0.4)
+
     def test_evaluate_logs_val_map_keys(self, tmp_path: Path) -> None:
         """evaluate() logs val/* keys when FakeMetric is configured."""
         model = _detection_model()
@@ -345,6 +356,8 @@ class TestTrainerLoopExercisesOverrides:
         metrics = trainer.evaluate()
 
         assert "val/map" in metrics
+        assert "validation/data_time" in metrics
+        assert "validation/iter_time" in metrics
         assert any("val/map" in e for e in trainer.state.log_history)
 
 
@@ -424,3 +437,59 @@ class TestEvaluateOverride:
 
         assert "val/map" in metrics
         assert trainer._val_metric.update_calls == 1  # pyrefly: ignore[missing-attribute]
+
+
+class TestPlateauWarmup:
+    """The trainer ramps LR itself for plateau schedules (transformers ignores warmup_steps)."""
+
+    def _trainer(self, tmp_path: Path, scheduler_type: str, warmup_steps: int) -> GetiTuneHFTrainer:
+        model = _detection_model()
+        args = TrainingArguments(
+            output_dir=str(tmp_path / "train"),
+            report_to=[],
+            remove_unused_columns=False,
+            label_names=list(model.label_keys),
+            use_cpu=True,
+            learning_rate=1e-4,
+            lr_scheduler_type=scheduler_type,
+            warmup_steps=warmup_steps,
+            eval_strategy="epoch" if scheduler_type == "reduce_lr_on_plateau" else "no",
+            metric_for_best_model="val/map" if scheduler_type == "reduce_lr_on_plateau" else None,
+        )
+        return GetiTuneHFTrainer(
+            model, _mock_datamodule(), model=model.hf_model, args=args, train_dataset=[0], eval_dataset=[0]
+        )
+
+    def test_create_optimizer_arms_warmup_only_for_plateau(self, tmp_path: Path) -> None:
+        trainer = self._trainer(tmp_path, "reduce_lr_on_plateau", warmup_steps=4)
+        optimizer = trainer.create_optimizer()
+        assert trainer._plateau_warmup_steps == 4
+        assert trainer._plateau_warmup_base_lr == pytest.approx(1e-4)
+
+        cosine = self._trainer(tmp_path, "cosine", warmup_steps=4)
+        cosine.create_optimizer()
+        assert cosine._plateau_warmup_steps == 0
+        assert optimizer is not None
+
+    def test_apply_plateau_warmup_ramps_then_releases(self, tmp_path: Path) -> None:
+        trainer = self._trainer(tmp_path, "reduce_lr_on_plateau", warmup_steps=4)
+        trainer.create_optimizer()
+        for group in trainer.optimizer.param_groups:  # pyrefly: ignore[missing-attribute]
+            group["lr"] = 1e-4
+
+        trainer.state.global_step = 0
+        trainer._apply_plateau_warmup()
+        assert trainer.optimizer.param_groups[0]["lr"] == pytest.approx(1e-4 / 4)  # pyrefly: ignore[missing-attribute]
+
+        trainer.state.global_step = 3
+        trainer._apply_plateau_warmup()
+        assert trainer.optimizer.param_groups[0]["lr"] == pytest.approx(1e-4)  # pyrefly: ignore[missing-attribute]
+
+        # First step past warmup disarms the manual ramp without re-writing LR:
+        # ReduceLROnPlateau may already have reduced the LR during the first
+        # post-warmup evaluation; rewriting base_lr would undo that drop.
+        trainer.state.global_step = 5
+        trainer.optimizer.param_groups[0]["lr"] = 1e-6  # pyrefly: ignore[missing-attribute]
+        trainer._apply_plateau_warmup()
+        assert trainer._plateau_warmup_steps == 0
+        assert trainer.optimizer.param_groups[0]["lr"] == pytest.approx(1e-6)  # pyrefly: ignore[missing-attribute]
