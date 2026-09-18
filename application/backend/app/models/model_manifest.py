@@ -161,7 +161,7 @@ class License(BaseModel):
     """License information for a model architecture."""
 
     model_config = ConfigDict(extra="forbid")
-    name: str = Field(title="License Identifier", description="SPDX license identifier")
+    name: str = Field(title="License Name", description="Display name of the license")
     url: str = Field(title="License URL", description="URL to LICENSE file source")
 
 
