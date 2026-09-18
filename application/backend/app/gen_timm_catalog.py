@@ -234,11 +234,19 @@ def _build_entry(
     else:
         imagenet_top1_accuracy = imagenet_top1.get(model_name)
 
-    license_id = model_licenses.get(model_name, {}).get("weights_license", _UNKNOWN_LICENSE).lower()
+    raw_license_id = model_licenses.get(model_name, {}).get("weights_license", _UNKNOWN_LICENSE)
+    license_id = raw_license_id.lower()
     license_info = _LICENSES.get(license_id)
     if license_info is None:
-        raise ValueError(f"License info for '{license_id}' is not defined. Update _LICENSES mapping.")
-    license_name, license_url = license_info
+        logger.warning(
+            "Unmapped TIMM weights_license '%s' for model '%s'; using fallback license '%s'.",
+            raw_license_id,
+            model_name,
+            _UNKNOWN_LICENSE,
+        )
+        license_name, license_url = _UNKNOWN_LICENSE, ""
+    else:
+        license_name, license_url = license_info
 
     entry: dict[str, Any] = {
         "model_name": model_name,
