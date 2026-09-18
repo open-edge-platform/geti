@@ -25,6 +25,11 @@ CPU = DeviceInfo(type=DeviceType.CPU, name="CPU", memory=None, index=None)
 XPU = DeviceInfo(type=DeviceType.XPU, name="XPU", memory=1024, index=0)
 
 
+def _cached(server: InferenceServer) -> list[ModelCacheEntry]:
+    """The cached entries of the server, most-recently-used first."""
+    return list(server._entries.values())
+
+
 def _handle(model_id: UUID, variant_id: UUID, device: DeviceInfo, model: Mock | None = None) -> LoadedModelHandle:
     """A loaded model handle wrapping a mocked Model API model."""
     return LoadedModelHandle(
@@ -64,7 +69,8 @@ def _seed_entry(
         entry.ready.set()
     if last_used is not None:
         entry.last_used = last_used
-    server._entries.insert(0, entry)
+    server._entries[entry.key] = entry
+    server._entries.move_to_end(entry.key, last=False)
     return entry
 
 
@@ -148,7 +154,7 @@ class TestInferenceServer:
                 )
         mock_load.assert_not_called()
         mock_unload.assert_not_called()
-        assert server._entries == [entry]
+        assert _cached(server) == [entry]
 
     def test_release_promotes_entry_to_mru_front(self, tmp_path) -> None:
         """Releasing a cached entry makes the access order match the last use time."""
@@ -156,11 +162,11 @@ class TestInferenceServer:
         newer = _seed_entry(server)
         older = _seed_entry(server)
 
-        assert server._entries == [older, newer]
+        assert _cached(server) == [older, newer]
 
         server._release(newer)
 
-        assert server._entries == [newer, older]
+        assert _cached(server) == [newer, older]
 
     def test_omitted_variant_id_resolves_default_instead_of_reusing_mru_non_default(self, tmp_path) -> None:
         """Omitting the variant id resolves the default FP16 variant even when another cached variant is MRU."""
@@ -204,7 +210,7 @@ class TestInferenceServer:
             device=CPU,
         )
         mock_unload.assert_not_called()
-        assert [entry.variant_id for entry in server._entries] == [fp16_variant_id, int8_variant_id]
+        assert [entry.variant_id for entry in _cached(server)] == [fp16_variant_id, int8_variant_id]
         assert int8_entry.handle is not None
 
     def test_device_switch_unloads_then_reloads(self, tmp_path) -> None:
@@ -231,7 +237,7 @@ class TestInferenceServer:
             model_xml_path=tmp_path / "model.xml",
             device=XPU,
         )
-        assert [e.device for e in server._entries] == [XPU]
+        assert [e.device for e in _cached(server)] == [XPU]
 
     def test_evicts_lru_when_max_models_reached(self, tmp_path) -> None:
         """With a full cache, loading another model evicts the least recently used one."""
@@ -244,7 +250,7 @@ class TestInferenceServer:
             evicted_handle = handles[0]
         assert mock_load.call_count == 3
         mock_unload.assert_called_once_with(evicted_handle)
-        assert {e.model_id for e in server._entries} == {model_b, model_c}
+        assert {e.model_id for e in _cached(server)} == {model_b, model_c}
 
     def test_memory_budget_evicts_lru(self, tmp_path) -> None:
         """Loading a model that pushes the estimated memory over the budget evicts the LRU one."""
@@ -256,8 +262,8 @@ class TestInferenceServer:
                 server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
             evicted_handle = handles[0]
         mock_unload.assert_called_once_with(evicted_handle)
-        assert [e.model_id for e in server._entries] == [model_b]
-        assert [e.size_bytes for e in server._entries] == [60]
+        assert [e.model_id for e in _cached(server)] == [model_b]
+        assert [e.size_bytes for e in _cached(server)] == [60]
 
     def test_memory_budget_never_evicts_the_only_model(self, tmp_path) -> None:
         """A single model larger than the memory budget is still loaded: the budget is best-effort."""
@@ -270,7 +276,7 @@ class TestInferenceServer:
             server.infer_batch(project_id=uuid4(), model_id=model_id, device=CPU, labels=[], inputs=[])
         mock_load.assert_called_once()
         mock_unload.assert_not_called()
-        assert [e.model_id for e in server._entries] == [model_id]
+        assert [e.model_id for e in _cached(server)] == [model_id]
 
     def test_in_use_model_is_not_evicted(self, tmp_path, monkeypatch) -> None:
         """An entry that is leased is skipped both when making room and when evicting expired models."""
@@ -283,7 +289,7 @@ class TestInferenceServer:
             server.evict_expired()
         mock_load.assert_not_called()
         mock_unload.assert_not_called()
-        assert server._entries == [in_use]
+        assert _cached(server) == [in_use]
 
     def test_concurrent_requests_for_same_model_load_once(self, tmp_path) -> None:
         """Two threads asking for the same model share a single load and the resulting handle."""
@@ -318,7 +324,7 @@ class TestInferenceServer:
         assert mock_load.call_count == 1
         assert len(handles) == 2
         assert handles[0] is handles[1] is not None
-        assert len(server._entries) == 1
+        assert len(_cached(server)) == 1
 
     def test_load_failure_removes_entry_and_propagates(self, tmp_path) -> None:
         """A failed load leaves no entry behind, propagates the error, and does not poison later requests."""
@@ -334,10 +340,10 @@ class TestInferenceServer:
         ):
             with pytest.raises(RuntimeError, match="load failed"):
                 server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
-            assert server._entries == []
+            assert _cached(server) == []
             server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
         assert mock_load.call_count == 2
-        assert [e.handle for e in server._entries] == [handle]
+        assert [e.handle for e in _cached(server)] == [handle]
 
     def test_invalidate_model_during_variant_resolution_blocks_insert(self, tmp_path) -> None:
         """A model deleted while its variant is still being resolved must never enter the cache."""
@@ -375,10 +381,12 @@ class TestInferenceServer:
         assert len(errors) == 1
         assert isinstance(errors[0], ResourceNotFoundError)
         mock_load.assert_not_called()
-        assert server._entries == []
+        assert _cached(server) == []
 
-    def test_invalidate_model_during_load_aborts_publish_and_unloads_handle(self, tmp_path) -> None:
-        """A model deleted while loading must not be published back into the cache."""
+    def test_invalidate_model_during_load_allows_current_load_to_finish_but_blocks_future_requests(
+        self, tmp_path
+    ) -> None:
+        """A model deleted while loading may finish the in-flight request, but remains tombstoned afterward."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
         project_id, model_id = uuid4(), uuid4()
         load_started = threading.Event()
@@ -412,11 +420,23 @@ class TestInferenceServer:
             allow_finish.set()
             worker.join(timeout=5)
 
-        assert len(errors) == 1
-        assert isinstance(errors[0], ResourceNotFoundError)
+        assert errors == []
         assert len(loaded_handles) == 1
-        mock_unload.assert_called_once_with(loaded_handles[0])
-        assert server._entries == []
+        mock_unload.assert_not_called()
+        assert _cached(server) == [_cached(server)[0]]
+        assert _cached(server)[0].handle is loaded_handles[0]
+        assert _cached(server)[0].state is EntryState.READY
+        assert (project_id, model_id) in server._deleted_models
+
+        with pytest.raises(ResourceNotFoundError):
+            server.infer_batch(
+                project_id=project_id,
+                model_id=model_id,
+                model_variant_id=_cached(server)[0].variant_id,
+                device=CPU,
+                labels=[],
+                inputs=[],
+            )
 
     def test_stop_during_load_aborts_publish_and_unloads_handle(self, tmp_path) -> None:
         """A load finishing after stop() must not publish READY or proceed with inference."""
@@ -455,7 +475,7 @@ class TestInferenceServer:
         assert isinstance(errors[0], InferenceBusyError)
         assert len(loaded_handles) == 1
         mock_unload.assert_called_once_with(loaded_handles[0])
-        assert server._entries == []
+        assert _cached(server) == []
 
     # --- eviction and teardown ---
     def test_evict_expired_unloads_only_expired_entries(self, tmp_path) -> None:
@@ -467,23 +487,32 @@ class TestInferenceServer:
         with patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload:
             server.evict_expired()
         mock_unload.assert_called_once_with(expired_handle)
-        assert server._entries == [fresh]
+        assert _cached(server) == [fresh]
         assert expired.state is EntryState.EVICTED
 
-    def test_invalidate_model_unloads_and_removes_cached_entries(self, tmp_path) -> None:
-        """Deleting a model invalidates matching cache entries immediately."""
+    def test_invalidate_model_marks_deleted_without_unloading_cached_entries(self, tmp_path) -> None:
+        """Deleting a model marks it as deleted while keeping cached entries resident."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
         target = _seed_entry(server)
         other = _seed_entry(server)
-        target_handle = target.handle
         with patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload:
             server.invalidate_model(project_id=target.project_id, model_id=target.model_id)
-        mock_unload.assert_called_once_with(target_handle)
-        assert server._entries == [other]
-        assert target.state is EntryState.EVICTED
+        mock_unload.assert_not_called()
+        assert _cached(server) == [other, target]
+        assert (target.project_id, target.model_id) in server._deleted_models
 
-    def test_invalidate_model_attempts_all_matching_variants_before_raising(self, tmp_path) -> None:
-        """A failed unload while invalidating one variant does not skip the later cached variants."""
+        with pytest.raises(ResourceNotFoundError):
+            server.infer_batch(
+                project_id=target.project_id,
+                model_id=target.model_id,
+                model_variant_id=target.variant_id,
+                device=target.device,
+                labels=[],
+                inputs=[],
+            )
+
+    def test_invalidate_model_marks_all_matching_variants_deleted_without_unloading(self, tmp_path) -> None:
+        """All cached variants of a deleted model remain loaded but cannot be used for new inference."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=3)
         project_id = uuid4()
         model_id = uuid4()
@@ -493,23 +522,25 @@ class TestInferenceServer:
         first.project_id = project_id
         second.project_id = project_id
         matching_entries = [
-            entry for entry in server._entries if entry.project_id == project_id and entry.model_id == model_id
+            entry for entry in _cached(server) if entry.project_id == project_id and entry.model_id == model_id
         ]
-        expected_handles = [entry.handle for entry in matching_entries]
-
-        with (
-            patch(
-                "app.services.inference.model_loader.ModelLoader.unload",
-                side_effect=[RuntimeError("unload failed"), None],
-            ) as mock_unload,
-            pytest.raises(RuntimeError, match="unload failed"),
-        ):
+        with patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload:
             server.invalidate_model(project_id=project_id, model_id=model_id)
 
-        assert [call.args[0] for call in mock_unload.call_args_list] == expected_handles
-        assert server._pending_unloads == [matching_entries[0]]
-        assert server._entries == [other]
-        assert matching_entries[1].handle is None
+        mock_unload.assert_not_called()
+        assert _cached(server) == [other, second, first]
+        assert (project_id, model_id) in server._deleted_models
+        assert server._pending_unloads == []
+        for entry in matching_entries:
+            with pytest.raises(ResourceNotFoundError):
+                server.infer_batch(
+                    project_id=project_id,
+                    model_id=model_id,
+                    model_variant_id=entry.variant_id,
+                    device=entry.device,
+                    labels=[],
+                    inputs=[],
+                )
 
     def test_evict_expired_retries_failed_unloads_from_pending_queue(self, tmp_path) -> None:
         """A dropped entry whose unload fails is preserved and retried on the next eviction pass."""
@@ -522,7 +553,7 @@ class TestInferenceServer:
         ) as mock_unload:
             with pytest.raises(RuntimeError, match="unload failed"):
                 server.evict_expired()
-            assert server._entries == []
+            assert _cached(server) == []
             assert server._pending_unloads == [expired]
             assert expired.handle is expired_handle
             server.evict_expired()
@@ -536,7 +567,7 @@ class TestInferenceServer:
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2, model_ttl=60)
         _seed_entry(server, last_used=0.0)
         _seed_entry(server, last_used=0.0)
-        expired_entries = list(server._entries)
+        expired_entries = list(_cached(server))
         expected_handles = [entry.handle for entry in expired_entries]
 
         with (
@@ -550,7 +581,7 @@ class TestInferenceServer:
 
         assert [call.args[0] for call in mock_unload.call_args_list] == expected_handles
         assert server._pending_unloads == [expired_entries[0]]
-        assert server._entries == []
+        assert _cached(server) == []
         assert expired_entries[1].handle is None
 
     def test_stop_unloads_all_models(self, tmp_path) -> None:
@@ -558,19 +589,19 @@ class TestInferenceServer:
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
         first = _seed_entry(server)
         second = _seed_entry(server)
-        unloaded_handles = [entry.handle for entry in server._entries]
+        unloaded_handles = [entry.handle for entry in _cached(server)]
         assert unloaded_handles == [second.handle, first.handle]
         with patch("app.services.inference.model_loader.ModelLoader.unload") as mock_unload:
             server.stop()
         assert [call.args[0] for call in mock_unload.call_args_list] == unloaded_handles
-        assert server._entries == []
+        assert _cached(server) == []
 
     def test_stop_attempts_all_entries_before_raising_unload_error(self, tmp_path) -> None:
         """A failed unload during stop does not prevent later entries from being unloaded."""
         server = InferenceServer(data_dir=Path(tmp_path), max_models=2)
         _seed_entry(server)
         _seed_entry(server)
-        stopped_entries = list(server._entries)
+        stopped_entries = list(_cached(server))
         expected_handles = [entry.handle for entry in stopped_entries]
 
         with (
@@ -584,7 +615,7 @@ class TestInferenceServer:
 
         assert [call.args[0] for call in mock_unload.call_args_list] == expected_handles
         assert server._pending_unloads == [stopped_entries[0]]
-        assert server._entries == []
+        assert _cached(server) == []
         assert stopped_entries[1].handle is None
 
     def test_stop_defers_unload_until_inference_lock_is_acquired(self, tmp_path, monkeypatch) -> None:
@@ -602,7 +633,7 @@ class TestInferenceServer:
 
                 assert [call.args[0] for call in mock_unload.call_args_list] == [second_handle]
                 assert server._pending_unloads == [first]
-                assert server._entries == []
+                assert _cached(server) == []
                 assert first.handle is not None
                 assert second.handle is None
 
@@ -611,7 +642,7 @@ class TestInferenceServer:
 
             assert [call.args[0] for call in mock_unload.call_args_list] == [second_handle, first_handle]
             assert server._pending_unloads == []
-            assert server._entries == []
+            assert _cached(server) == []
             assert first.handle is None
         finally:
             if first.infer_lock.locked():
@@ -633,7 +664,7 @@ class TestInferenceServer:
         status = server.get_status()
         assert status.status == expected_status
         assert len(status.models) == expected_models
-        ready = [entry for entry in server._entries if entry.state is EntryState.READY]
+        ready = [entry for entry in _cached(server) if entry.state is EntryState.READY]
         assert list(status.models) == [
             InferenceModel(model_id=entry.model_id, device=entry.device, load_timestamp=ANY) for entry in ready
         ]
@@ -727,7 +758,7 @@ class TestInferenceServer:
             model_xml_path=tmp_path / "model.xml",
             device=CPU,
         )
-        assert [e.model_id for e in server._entries] == [model_id]
+        assert [e.model_id for e in _cached(server)] == [model_id]
 
     def test_infer_batch_busy_raises(self, tmp_path, monkeypatch) -> None:
         """A model already busy with another inference makes the request time out."""

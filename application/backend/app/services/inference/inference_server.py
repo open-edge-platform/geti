@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import threading
 import time
+from collections import OrderedDict
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -84,7 +85,8 @@ class InferenceServer:
         self._max_memory = max_memory
         self._memory_overhead_factor = memory_overhead_factor
         self._model_ttl = model_ttl
-        self._entries: list[ModelCacheEntry] = []  # MRU-ordered
+        # Keyed by `(model_id, variant_id)`, ordered most-recently-used first.
+        self._entries: OrderedDict[tuple[UUID, UUID], ModelCacheEntry] = OrderedDict()
         self._deleted_models: set[tuple[UUID, UUID]] = set()
         self._pending_unloads: list[ModelCacheEntry] = []
         self._registry_lock = threading.Lock()
@@ -93,17 +95,17 @@ class InferenceServer:
 
     def _find(self, model_id: UUID, variant_id: UUID) -> ModelCacheEntry | None:
         """Return the cached entry for the given model variant, or None."""
-        for entry in self._entries:
-            if entry.model_id == model_id and entry.variant_id == variant_id:
-                return entry
-        return None
+        return self._entries.get((model_id, variant_id))
+
+    def _is_cached(self, entry: ModelCacheEntry) -> bool:
+        """Return whether this exact entry is still the one registered under its key."""
+        return self._entries.get(entry.key) is entry
 
     def _touch(self, entry: ModelCacheEntry) -> None:
         """Move an entry to the MRU front of the cache and refresh its idle timer."""
         entry.last_used = time.monotonic()
-        if entry in self._entries:
-            self._entries.remove(entry)
-            self._entries.insert(0, entry)
+        if self._is_cached(entry):
+            self._entries.move_to_end(entry.key, last=False)
 
     @staticmethod
     def _deleted_model_error(model_id: UUID) -> ResourceNotFoundError:
@@ -112,8 +114,8 @@ class InferenceServer:
 
     def _drop(self, entry: ModelCacheEntry) -> None:
         """Remove an entry from the cache and mark it evicted. The caller must unload it outside the lock."""
-        if entry in self._entries:
-            self._entries.remove(entry)
+        if self._is_cached(entry):
+            del self._entries[entry.key]
         entry.state = EntryState.EVICTED
 
     def _insert(
@@ -130,7 +132,8 @@ class InferenceServer:
             state=EntryState.LOADING,
             refcount=1,
         )
-        self._entries.insert(0, entry)
+        self._entries[entry.key] = entry
+        self._entries.move_to_end(entry.key, last=False)
         return entry
 
     # --- lease and unload helpers, taking the lock internally ---
@@ -140,7 +143,7 @@ class InferenceServer:
         unload_later = False
         with self._registry_lock:
             entry.refcount -= 1
-            if entry in self._entries:
+            if self._is_cached(entry):
                 self._touch(entry)
             else:
                 entry.last_used = time.monotonic()
@@ -166,25 +169,9 @@ class InferenceServer:
         entry.handle = None
 
     def invalidate_model(self, project_id: UUID, model_id: UUID) -> None:
-        """Invalidate every cached variant of a deleted model revision."""
-        to_unload: list[ModelCacheEntry] = []
+        """Mark a model revision as deleted so future inference requests are rejected."""
         with self._registry_lock:
             self._deleted_models.add((project_id, model_id))
-            for entry in list(self._entries):
-                if entry.project_id != project_id or entry.model_id != model_id:
-                    continue
-                self._drop(entry)
-                if entry.handle is not None and entry.refcount == 0:
-                    to_unload.append(entry)
-        first_error: BaseException | None = None
-        for entry in to_unload:
-            try:
-                self._unload(entry)
-            except BaseException as exc:
-                if first_error is None:
-                    first_error = exc
-        if first_error is not None:
-            raise first_error
 
     def _wait_ready(self, entry: ModelCacheEntry, deadline: float) -> ModelCacheEntry | None:
         """
@@ -284,11 +271,12 @@ class InferenceServer:
         while True:
             victim: ModelCacheEntry | None = None
             with self._registry_lock:
-                others = [e for e in self._entries if e is not entry]
-                over_count = len(self._entries) > self._max_models
+                cached = list(self._entries.values())  # MRU-first
+                others = [e for e in cached if e is not entry]
+                over_count = len(cached) > self._max_models
                 over_memory = (
                     self._max_memory is not None
-                    and sum(e.size_bytes for e in self._entries) > self._max_memory
+                    and sum(e.size_bytes for e in cached) > self._max_memory
                     and len(others) >= 1  # never enforced down to zero models
                 )
                 if not over_count and not over_memory:
@@ -296,7 +284,7 @@ class InferenceServer:
                 victim = next(
                     (
                         e
-                        for e in reversed(self._entries)  # LRU end first
+                        for e in reversed(cached)  # LRU end first
                         if e is not entry and e.refcount == 0 and e.state is EntryState.READY
                     ),
                     None,
@@ -492,7 +480,7 @@ class InferenceServer:
             The server status, together with every model currently loaded.
         """
         with self._registry_lock:
-            snapshot = [(entry.state, entry.model_id, entry.device, entry.handle) for entry in self._entries]
+            snapshot = [(entry.state, entry.model_id, entry.device, entry.handle) for entry in self._entries.values()]
 
         models = tuple(
             InferenceModel(model_id=model_id, device=device, load_timestamp=handle.loaded_at)
@@ -573,7 +561,7 @@ class InferenceServer:
             pending_unloads, self._pending_unloads = self._pending_unloads, []
             expired = [
                 entry
-                for entry in self._entries
+                for entry in self._entries.values()
                 if entry.state is EntryState.READY and entry.refcount == 0 and now - entry.last_used >= self._model_ttl
             ]
             for entry in expired:
@@ -593,7 +581,8 @@ class InferenceServer:
         Stop the inference server and unload every model.
         """
         with self._registry_lock:
-            entries, self._entries = self._entries, []
+            entries = list(self._entries.values())
+            self._entries = OrderedDict()
             pending_unloads, self._pending_unloads = self._pending_unloads, []
             for entry in entries:
                 entry.state = EntryState.EVICTED

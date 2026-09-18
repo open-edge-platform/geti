@@ -50,3 +50,8 @@ class ModelCacheEntry:
     last_used: float = field(default_factory=time.monotonic)
     ready: threading.Event = field(default_factory=threading.Event)
     infer_lock: threading.Lock = field(default_factory=threading.Lock)
+
+    @property
+    def key(self) -> tuple[UUID, UUID]:
+        """Cache key of this entry: the `(model_id, variant_id)` pair it is registered under."""
+        return self.model_id, self.variant_id
