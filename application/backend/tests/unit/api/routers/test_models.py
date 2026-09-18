@@ -251,7 +251,6 @@ class TestModelEndpoints:
             project_id=fxt_get_project.id, model_id=fxt_model.id
         )
 
-
     def test_delete_model_not_found(self, fxt_get_project, fxt_model_service, fxt_client):
         model_id = uuid4()
         fxt_model_service.delete_model.side_effect = ResourceNotFoundError(ResourceType.MODEL, str(model_id))
