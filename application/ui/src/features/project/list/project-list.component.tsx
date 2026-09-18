@@ -162,7 +162,7 @@ const AppInfo = () => {
 export const ProjectList = () => {
     return (
         <View height={'100%'} position={'relative'}>
-            <Content height={'100%'} maxWidth={'1560px'} margin={'0 auto'}>
+            <Content height={'100%'} margin={'0'}>
                 <Flex direction={'column'} height={'100%'}>
                     <ImportJobsList />
 
