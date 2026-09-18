@@ -469,6 +469,60 @@
         "labels": {
             "noLabel": "无标签",
             "noObject": "无目标"
+        },
+        "canvas": {
+            "settingsTitle": "设置",
+            "hideLabels": "隐藏标签",
+            "pixelView": "像素视图",
+            "annotationFillOpacity": "标注填充不透明度",
+            "annotationBorderOpacity": "标注边框不透明度",
+            "imageBrightness": "图像亮度",
+            "imageContrast": "图像对比度",
+            "imageSaturation": "图像饱和度"
+        },
+        "actions": {
+            "zoomIn": "放大",
+            "zoomOut": "缩小",
+            "fitToScreen": "适应屏幕（{{hotkey}}）",
+            "undo": "撤销（{{hotkey}}）",
+            "redo": "重做（{{hotkeys}}）",
+            "toggleFocus": "切换焦点",
+            "showAnnotations": "显示标注（{{hotkey}}）",
+            "hideAnnotations": "隐藏标注（{{hotkey}}）"
+        },
+        "hotkeys": {
+            "title": "快捷键",
+            "submitAnnotationsPredictions": "提交标注/预测",
+            "previousMedia": "上一个媒体",
+            "nextMedia": "下一个媒体",
+            "undo": "撤销",
+            "redo": "重做",
+            "deleteSelectedAnnotation": "删除所选标注",
+            "toggleAnnotationsVisibility": "显示或隐藏所有标注",
+            "selectAllAnnotations": "选择所有标注",
+            "deselectAllAnnotations": "取消选择所有标注",
+            "selectNextAnnotation": "选择下一个标注",
+            "resetZoom": "重置缩放"
+        },
+        "tools": {
+            "selection": { "label": "选择" },
+            "boundingBox": {
+                "label": "边界框",
+                "description": "在图像中圈选出包围目标的矩形或正方形。"
+            },
+            "autoSegmentation": {
+                "label": "自动分割",
+                "detectionDescription": "将光标移到目标上方预览建议的矩形，然后点击以创建标注。",
+                "segmentationDescription": "将光标移到目标上方预览建议的多边形，然后点击以创建标注。"
+            },
+            "polygon": {
+                "label": "多边形",
+                "description": "逐个点击以放置顶点，或按住拖拽以徒手绘制。适合需要像素级精度的不规则形状。"
+            },
+            "magneticLasso": {
+                "label": "磁性套索",
+                "description": "沿着目标边缘移动并定时点击，将轮廓吸附到其边界。"
+            }
         }
     },
     "models": {
