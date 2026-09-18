@@ -32,7 +32,6 @@ def set_sqlite_pragma(dbapi_connection: Connection, _: Any) -> None:
     cursor = dbapi_connection.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.execute("PRAGMA journal_mode=WAL")  # Enable Write-Ahead Logging (WAL) mode for better concurrency
-    cursor.execute("PRAGMA busy_timeout=5000")  # Set busy timeout to 5000 milliseconds (5 sec) to handle database locks
     cursor.close()
 
 
