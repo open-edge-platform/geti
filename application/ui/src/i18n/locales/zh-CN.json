@@ -468,7 +468,7 @@
     "annotator": {
         "labels": {
             "noLabel": "无标签",
-            "noObject": "无目标"
+            "noObject": "无对象"
         },
         "canvas": {
             "settingsTitle": "设置",
@@ -520,7 +520,7 @@
                 "description": "逐个点击以放置顶点，或按住拖拽以徒手绘制。适合需要像素级精度的不规则形状。"
             },
             "magneticLasso": {
-                "label": "磁性套索",
+                "label": "智能勾边",
                 "description": "沿着目标边缘移动并定时点击，将轮廓吸附到其边界。"
             }
         }
