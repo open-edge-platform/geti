@@ -61,19 +61,32 @@ _SGD_DEFAULTS = {
 }
 
 _DEFAULT_OUTPUT = Path(__file__).resolve().parent / "timm_catalog_snapshot.json"
-_LICENSE2URL = {
-    "apache-2.0": "https://www.apache.org/licenses/LICENSE-2.0.txt",
-    "apple-amlr": "https://huggingface.co/apple/deeplabv3-mobilevit-small/blob/main/LICENSE",
-    "apple-ascl": "https://developer.apple.com/support/downloads/terms/apple-sample-code/Apple-Sample-Code-License.pdf",
-    "apple-sample-code-license": "https://developer.apple.com/support/downloads/terms/apple-sample-code/Apple-Sample-Code-License.pdf",
-    "bsd-3-clause": "https://choosealicense.com/licenses/bsd-3-clause",
-    "cc-by-nc-4.0": "https://spdx.org/licenses/CC-BY-NC-4.0",
-    "cc-by-nc-sa-4.0": "https://spdx.org/licenses/CC-BY-NC-SA-4.0",
-    "dinov3-license": "https://ai.meta.com/resources/models-and-libraries/dinov3-license",
-    "fair-noncommercial-research-license": "https://ai.meta.com/resources/models-and-libraries/cwm-license",
-    "gemma": "https://ai.google.dev/gemma/terms",
-    "licenseref-apple-mlmobileone": "https://github.com/apple/ml-mobileone/blob/b7f4e6d48884593c7eb46eedc53c3a097c09e957/LICENSE",
-    "mit": "https://choosealicense.com/licenses/mit",
+_LICENSES: dict[str, tuple[str, str]] = {
+    # license_id: (display_name, url)
+    "apache-2.0": ("Apache 2.0", "https://www.apache.org/licenses/LICENSE-2.0.txt"),
+    "apple-amlr": ("Apple-AMLR", "https://huggingface.co/apple/deeplabv3-mobilevit-small/blob/main/LICENSE"),
+    "apple-ascl": (
+        "Apple-ASCL",
+        "https://developer.apple.com/support/downloads/terms/apple-sample-code/Apple-Sample-Code-License.pdf",
+    ),
+    "apple-sample-code-license": (
+        "Apple-ASCL",
+        "https://developer.apple.com/support/downloads/terms/apple-sample-code/Apple-Sample-Code-License.pdf",
+    ),
+    "bsd-3-clause": ("BSD-3-Clause", "https://choosealicense.com/licenses/bsd-3-clause"),
+    "cc-by-nc-4.0": ("CC BY-NC 4.0", "https://spdx.org/licenses/CC-BY-NC-4.0"),
+    "cc-by-nc-sa-4.0": ("CC BY-NC-SA 4.0", "https://spdx.org/licenses/CC-BY-NC-SA-4.0"),
+    "dinov3-license": ("DINOv3 License", "https://ai.meta.com/resources/models-and-libraries/dinov3-license"),
+    "fair-noncommercial-research-license": (
+        "Fair Noncommercial Research License",
+        "https://ai.meta.com/resources/models-and-libraries/cwm-license",
+    ),
+    "gemma": ("GEMMA", "https://ai.google.dev/gemma/terms"),
+    "licenseref-apple-mlmobileone": (
+        "Apple ML MobileOne License",
+        "https://github.com/apple/ml-mobileone/blob/b7f4e6d48884593c7eb46eedc53c3a097c09e957/LICENSE",
+    ),
+    "mit": ("MIT", "https://choosealicense.com/licenses/mit"),
 }
 
 
@@ -221,10 +234,11 @@ def _build_entry(
     else:
         imagenet_top1_accuracy = imagenet_top1.get(model_name)
 
-    license_name = model_licenses.get(model_name, {}).get("weights_license", _UNKNOWN_LICENSE).lower()
-    license_url = _LICENSE2URL.get(license_name)
-    if not license_url:
-        raise ValueError(f"The url for license '{license_name}' is not defined. Update _LICENSE2URL mapping.")
+    license_id = model_licenses.get(model_name, {}).get("weights_license", _UNKNOWN_LICENSE).lower()
+    license_info = _LICENSES.get(license_id)
+    if license_info is None:
+        raise ValueError(f"License info for '{license_id}' is not defined. Update _LICENSES mapping.")
+    license_name, license_url = license_info
 
     entry: dict[str, Any] = {
         "model_name": model_name,
