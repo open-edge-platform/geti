@@ -20,7 +20,7 @@
     },
     "dataset": {
         "validation": {
-            "datasetViewNameExists": "该名称的视图已存在。",
+            "datasetViewNameExists": "使用该名称的视图已存在。",
             "invalidDateRange": "结束日期必须晚于开始日期"
         },
         "views": {
@@ -143,7 +143,7 @@
             "deletedSuccess_other": "已成功删除 {{count}} 个文件"
         },
         "bulkLabels": {
-            "title": "批量添加标签",
+            "title": "批量分配标签",
             "uploadInstructions": "请选择要分配给已上传图片的标签，然后点击“继续”；如果想稍后再标注，请选择“跳过”。",
             "selectedInstructions": "请选择要分配给所选图片的标签，然后点击“分配”。",
             "imageOnlyNote": "所选标签只会分配给图片，其中的视频（如有）将不带标注上传。",
@@ -155,7 +155,7 @@
             "assign": "分配",
             "assignLabelTooltip": "分配标签",
             "assignAllSuccess": "已成功为全部 {{count}} 张图片分配标签",
-            "assignAllFailure": "为全部 {{count}} 张图片分配标签失败",
+            "assignAllFailure": "为 {{count}} 张图片分配标签时全部失败",
             "assignPartialSuccess": "{{total}} 张图片中，已有 {{succeeded}} 张分配成功（{{failed}} 张失败）"
         },
         "filtersActive": {
@@ -206,7 +206,7 @@
             "upload": "上传",
             "learnMoreFormats": "了解支持的数据格式",
             "dialogHeading": "导入数据集",
-            "scanningMessage": "正在扫描解析待导入的数据集压缩包…",
+            "scanningMessage": "正在扫描解析待导入的数据集压缩包……",
             "mapLabelsMessage": "为已上传的数据集映射标签",
             "continue": "继续",
             "deleteStagedFile": {
@@ -361,7 +361,7 @@
                 "createdAtAscending": "按创建时间（最早优先）"
             },
             "filters": {
-                "searchPlaceholder": "按名称搜索…",
+                "searchPlaceholder": "按名称搜索……",
                 "taskType": "按任务类型筛选",
                 "typesSelected_one": "已选 {{count}} 种类型",
                 "typesSelected_other": "已选 {{count}} 种类型"
@@ -371,7 +371,7 @@
                 "description": "请调整搜索关键词或任务类型筛选，再重新查找。"
             },
             "empty": {
-                "intro": "欢迎使用 <name>Geti</name>，这是一个视觉 AI 平台，将引导您走完<highlight>完整的模型生命周期</highlight>，从数据集准备、训练、优化，一直到部署。",
+                "intro": "欢迎使用 <name>Geti</name>，这是一个视觉 AI 平台，将引导您完成<highlight>完整的模型生命周期</highlight>，从数据集准备、训练、优化，直到部署。",
                 "createNewProject": "新建项目",
                 "createFromDataset": "从数据集创建"
             },
