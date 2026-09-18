@@ -89,8 +89,13 @@ $card-content-height: 68px;
         background-color: hsl(from var(--selection-dark-blue) h s calc(l + 5));
     }
 
-    h2 {
+    h3 {
         color: var(--energy-blue);
+    }
+
+    // The active card always has a dark background, so metadata needs a light color here.
+    .projectMetadata {
+        color: rgba(255, 255, 255, 0.6);
     }
 }
 
@@ -107,7 +112,7 @@ $card-content-height: 68px;
 .projectMetadata {
     line-height: var(--spectrum-global-dimension-font-size-200);
     font-size: var(--spectrum-global-dimension-font-size-50);
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--spectrum-global-color-gray-700);
 }
 
 .version {
