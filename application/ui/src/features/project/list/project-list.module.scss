@@ -1,18 +1,31 @@
 @use '../../../shared/styles/line-clamp' as lineClamp;
 
-.content {
-    padding: 0 var(--spectrum-global-dimension-size-500);
+$thumbnail-height: 160px;
+$card-content-height: 68px;
+
+.sidebar {
+    width: var(--spectrum-global-dimension-size-3600);
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: var(--spectrum-global-dimension-size-300);
 }
 
-.newProjectRow {
-    height: var(--spectrum-global-dimension-size-900);
+.gridPanel {
+    padding: var(--spectrum-global-dimension-size-600);
+    background-color: var(--spectrum-global-color-gray-50);
+}
 
-    @media (max-width: 848px) {
-        height: var(--spectrum-global-dimension-size-800);
-    }
+.logo {
+    width: var(--spectrum-global-dimension-size-300);
+    height: var(--spectrum-global-dimension-size-300);
+}
+
+.logoText {
+    font-size: var(--spectrum-global-dimension-font-size-200);
 }
 
 .projectGrid {
+    align-content: start;
     overflow-y: auto;
 }
 
@@ -23,6 +36,7 @@
     border-radius: var(--spectrum-global-dimension-size-50);
     background-color: var(--spectrum-global-color-gray-50);
     height: 100%;
+    overflow: hidden;
     transition:
         background-color,
         border 0.2s ease-in-out;
@@ -31,6 +45,28 @@
         background-color: var(--spectrum-global-color-gray-100);
         border-color: var(--energy-blue);
     }
+}
+
+.cardWrapper {
+    position: relative;
+    height: calc($thumbnail-height + $card-content-height);
+}
+
+.thumbnailContainer {
+    height: $thumbnail-height;
+    background-color: var(--spectrum-global-color-gray-100);
+}
+
+.cardBadges {
+    position: absolute;
+    left: var(--spectrum-global-dimension-size-100);
+    bottom: var(--spectrum-global-dimension-size-100);
+}
+
+.cardActions {
+    position: absolute;
+    top: calc($thumbnail-height + var(--spectrum-global-dimension-size-125));
+    right: var(--spectrum-global-dimension-size-125);
 }
 
 .thumbnail {
@@ -63,22 +99,15 @@
     color: var(--spectrum-global-color-gray-900);
 }
 
-.heading {
-    font-size: var(--spectrum-global-dimension-font-size-700);
-}
-
 .projectCardName {
     @include lineClamp.clamp(1);
     @include lineClamp.breakableText;
 }
 
-.labelList {
-    @include lineClamp.clamp(2);
-}
-
 .projectMetadata {
     line-height: var(--spectrum-global-dimension-font-size-200);
     font-size: var(--spectrum-global-dimension-font-size-50);
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .version {
