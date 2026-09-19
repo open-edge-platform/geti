@@ -209,16 +209,19 @@ class DatasetItemRepository:
         )
         self.db.execute(stmt)
 
-    def list_unassigned_items(self) -> list[DatasetItemLabelDB]:
+    def list_unassigned_items(self) -> list[tuple[DatasetItemLabelDB, str | None]]:
+        """List label rows of unassigned dataset items, each paired with the parent
+        video id of the underlying media (None for images and standalone media)."""
         stmt = (
-            select(DatasetItemLabelDB)
-            .join(DatasetItemDB)
+            select(DatasetItemLabelDB, MediaDB.video_id)
+            .join(DatasetItemDB, DatasetItemLabelDB.dataset_item_id == DatasetItemDB.id)
+            .join(MediaDB, MediaDB.id == DatasetItemDB.id)
             .where(
                 DatasetItemDB.project_id == self.project_id,
                 DatasetItemDB.subset == DatasetItemSubset.UNASSIGNED,
             )
         )
-        return list(self.db.scalars(stmt).all())
+        return [(row[0], row[1]) for row in self.db.execute(stmt).all()]
 
     def has_all_subsets_assigned(self) -> bool:
         """Return True if there is at least one dataset item for each of TRAINING, VALIDATION, and TESTING subsets."""

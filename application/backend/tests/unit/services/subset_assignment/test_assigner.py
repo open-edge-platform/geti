@@ -157,3 +157,97 @@ class TestSubsetAssigner:
         result_item_ids = {a.item_id for a in result}
         input_item_ids = {item.item_id for item in items}
         assert result_item_ids == input_item_ids
+
+
+class TestSubsetAssignerMediaGroups:
+    """Group-aware assignment: items sharing a media group (e.g. frames of the same
+    video) must not be split across subsets, and impossible cases must not crash."""
+
+    @pytest.fixture
+    def fxt_assigner(self):
+        return SubsetAssigner()
+
+    @pytest.fixture
+    def fxt_default_ratios(self):
+        return SplitRatios(train=0.7, val=0.2, test=0.1)
+
+    def test_grouped_items_stay_in_same_subset(self, fxt_assigner, fxt_default_ratios):
+        """Frames of the same video must all land in one subset."""
+        label = uuid4()
+        groups = [uuid4() for _ in range(10)]
+        items = [
+            DatasetItemWithLabels(item_id=uuid4(), labels={label}, group_id=group)
+            for group in groups
+            for _ in range(12)
+        ]
+
+        result = fxt_assigner.assign(items, fxt_default_ratios, has_all_subsets_assigned=False)
+
+        assert len(result) == len(items)
+        group_of_item = {item.item_id: item.group_id for item in items}
+        subsets_per_group = {}
+        for assignment in result:
+            subsets_per_group.setdefault(group_of_item[assignment.item_id], set()).add(assignment.subset)
+        for group, subsets in subsets_per_group.items():
+            assert len(subsets) == 1, f"group {group} was split across subsets {subsets}"
+        # every subset must be populated
+        assert {a.subset for a in result} == {
+            DatasetItemSubset.TRAINING,
+            DatasetItemSubset.VALIDATION,
+            DatasetItemSubset.TESTING,
+        }
+
+    def test_single_group_falls_back_and_warns(self, fxt_assigner, fxt_default_ratios, monkeypatch):
+        """With all frames from one video, grouping is impossible: assignment must
+        still succeed (frame-level split) and a warning must be emitted."""
+        from app.services.subset_assignment import assigner as assigner_module
+
+        warnings = []
+        monkeypatch.setattr(assigner_module.logger, "warning", lambda msg, *args, **kwargs: warnings.append(msg))
+
+        video = uuid4()
+        label = uuid4()
+        items = [DatasetItemWithLabels(item_id=uuid4(), labels={label}, group_id=video) for _ in range(30)]
+
+        result = fxt_assigner.assign(items, fxt_default_ratios, has_all_subsets_assigned=False)
+
+        assert len(result) == len(items)
+        assert {a.subset for a in result} == {
+            DatasetItemSubset.TRAINING,
+            DatasetItemSubset.VALIDATION,
+            DatasetItemSubset.TESTING,
+        }
+        assert warnings, "expected a leakage warning when all items share one media group"
+
+    def test_items_without_group_behave_as_before(self, fxt_assigner, fxt_default_ratios):
+        """Images (group_id=None) keep the original per-item stratification."""
+        label = uuid4()
+        items = [DatasetItemWithLabels(item_id=uuid4(), labels={label}) for _ in range(50)]
+
+        result = fxt_assigner.assign(items, fxt_default_ratios, has_all_subsets_assigned=False)
+
+        assert len(result) == len(items)
+        assert {a.subset for a in result} == {
+            DatasetItemSubset.TRAINING,
+            DatasetItemSubset.VALIDATION,
+            DatasetItemSubset.TESTING,
+        }
+
+    def test_mixed_groups_and_images(self, fxt_assigner, fxt_default_ratios):
+        """Videos and standalone images can be mixed; groups stay atomic."""
+        label = uuid4()
+        video_a, video_b, video_c = uuid4(), uuid4(), uuid4()
+        items = (
+            [DatasetItemWithLabels(item_id=uuid4(), labels={label}, group_id=video_a) for _ in range(10)]
+            + [DatasetItemWithLabels(item_id=uuid4(), labels={label}, group_id=video_b) for _ in range(10)]
+            + [DatasetItemWithLabels(item_id=uuid4(), labels={label}, group_id=video_c) for _ in range(10)]
+            + [DatasetItemWithLabels(item_id=uuid4(), labels={label}) for _ in range(15)]
+        )
+
+        result = fxt_assigner.assign(items, fxt_default_ratios, has_all_subsets_assigned=False)
+
+        assert len(result) == len(items)
+        group_of_item = {item.item_id: item.group_id for item in items}
+        for video in (video_a, video_b, video_c):
+            subsets = {a.subset for a in result if group_of_item[a.item_id] == video}
+            assert len(subsets) == 1, f"video group split across {subsets}"
