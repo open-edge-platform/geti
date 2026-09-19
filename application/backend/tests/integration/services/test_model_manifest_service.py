@@ -114,8 +114,8 @@ class TestModelManifestService:
 
         assert model_manifest == fxt_dummy_model_manifest
 
-    @pytest.mark.parametrize("license_yaml", [None, "MIT"])
-    def test_parse_manifest_with_relative_path(self, license_yaml):
+    @pytest.mark.parametrize("license_yaml", [None, ("MIT", "https://opensource.org/licenses/MIT")])
+    def test_parse_manifest_with_relative_path(self, license_yaml: tuple[str, str] | None):
         sources = ("base.yaml", "dummy_base_model_manifest.yaml", "dummy_model_manifest.yaml")
         expected_paths = [str(resources.files(manifests).joinpath(path)) for path in sources]
 
@@ -160,7 +160,10 @@ class TestModelManifestService:
             },
         }
         if license_yaml:
-            mock_yaml_result["license"] = license_yaml
+            mock_yaml_result["license"] = {
+                "name": license_yaml[0],
+                "url": license_yaml[1],
+            }
 
         with (
             patch("app.services.model_manifest_service.open", mock_open(), create=True) as mock_file,
@@ -176,7 +179,7 @@ class TestModelManifestService:
             assert opened_paths == expected_paths
             assert model_manifest == ModelManifest(**mock_yaml_result)  # pyrefly: ignore[bad-argument-type]
             if not license_yaml:
-                assert model_manifest.license == "Apache 2.0"
+                assert model_manifest.license.name == "Apache 2.0"
 
     def test_get_model_manifests(self) -> None:
         # test that the model manifests can be retrieved without errors

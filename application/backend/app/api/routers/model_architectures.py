@@ -7,7 +7,7 @@ from fastapi import APIRouter, HTTPException, status
 
 from app.api.schemas.model_architecture import ModelArchitectures, ModelArchitectureView, TopPicks
 from app.models import TaskType
-from app.models.model_manifest import Capabilities, ModelManifestDeprecationStatus
+from app.models.model_manifest import Capabilities, License, ModelManifestDeprecationStatus
 from app.services import ModelManifestService
 from app.supported_models import RECOMMENDED_MODEL_ARCHITECTURES
 from app.supported_models.timm import TimmCatalog, TimmManifestProvider
@@ -114,7 +114,7 @@ def _build_timm_card_entry() -> ModelArchitectureView:
         timm_metadata=None,
         description=description,
         capabilities=Capabilities(xai=False, tiling=False),
-        license="varies by model",
+        license=License(name="varies by model", url=""),
         stats=None,
         support_status=ModelManifestDeprecationStatus.ACTIVE,
     )
