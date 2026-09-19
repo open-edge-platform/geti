@@ -20,7 +20,7 @@
     },
     "dataset": {
         "validation": {
-            "datasetViewNameExists": "该名称的视图已存在。",
+            "datasetViewNameExists": "使用该名称的视图已存在。",
             "invalidDateRange": "结束日期必须晚于开始日期"
         },
         "views": {
@@ -143,7 +143,7 @@
             "deletedSuccess_other": "已成功删除 {{count}} 个文件"
         },
         "bulkLabels": {
-            "title": "批量添加标签",
+            "title": "批量分配标签",
             "uploadInstructions": "请选择要分配给已上传图片的标签，然后点击“继续”；如果想稍后再标注，请选择“跳过”。",
             "selectedInstructions": "请选择要分配给所选图片的标签，然后点击“分配”。",
             "imageOnlyNote": "所选标签只会分配给图片，其中的视频（如有）将不带标注上传。",
@@ -155,7 +155,7 @@
             "assign": "分配",
             "assignLabelTooltip": "分配标签",
             "assignAllSuccess": "已成功为全部 {{count}} 张图片分配标签",
-            "assignAllFailure": "为全部 {{count}} 张图片分配标签失败",
+            "assignAllFailure": "为 {{count}} 张图片分配标签时全部失败",
             "assignPartialSuccess": "{{total}} 张图片中，已有 {{succeeded}} 张分配成功（{{failed}} 张失败）"
         },
         "filtersActive": {
@@ -206,7 +206,7 @@
             "upload": "上传",
             "learnMoreFormats": "了解支持的数据格式",
             "dialogHeading": "导入数据集",
-            "scanningMessage": "正在扫描解析待导入的数据集压缩包…",
+            "scanningMessage": "正在扫描解析待导入的数据集压缩包……",
             "mapLabelsMessage": "为已上传的数据集映射标签",
             "continue": "继续",
             "deleteStagedFile": {
@@ -361,7 +361,7 @@
                 "createdAtAscending": "按创建时间（最早优先）"
             },
             "filters": {
-                "searchPlaceholder": "按名称搜索…",
+                "searchPlaceholder": "按名称搜索……",
                 "taskType": "按任务类型筛选",
                 "typesSelected_one": "已选 {{count}} 种类型",
                 "typesSelected_other": "已选 {{count}} 种类型"
@@ -371,7 +371,7 @@
                 "description": "请调整搜索关键词或任务类型筛选，再重新查找。"
             },
             "empty": {
-                "intro": "欢迎使用 <name>Geti</name>，这是一个视觉 AI 平台，将引导您走完<highlight>完整的模型生命周期</highlight>，从数据集准备、训练、优化，一直到部署。",
+                "intro": "欢迎使用 <name>Geti</name>，这是一个视觉 AI 平台，将引导您完成<highlight>完整的模型生命周期</highlight>，从数据集准备、训练、优化，直到部署。",
                 "createNewProject": "新建项目",
                 "createFromDataset": "从数据集创建"
             },
@@ -468,7 +468,61 @@
     "annotator": {
         "labels": {
             "noLabel": "无标签",
-            "noObject": "无目标"
+            "noObject": "无对象"
+        },
+        "canvas": {
+            "settingsTitle": "设置",
+            "hideLabels": "隐藏标签",
+            "pixelView": "像素视图",
+            "annotationFillOpacity": "标注填充不透明度",
+            "annotationBorderOpacity": "标注边框不透明度",
+            "imageBrightness": "图像亮度",
+            "imageContrast": "图像对比度",
+            "imageSaturation": "图像饱和度"
+        },
+        "actions": {
+            "zoomIn": "放大",
+            "zoomOut": "缩小",
+            "fitToScreen": "适应屏幕（{{hotkey}}）",
+            "undo": "撤销（{{hotkey}}）",
+            "redo": "重做（{{hotkeys}}）",
+            "toggleFocus": "切换焦点",
+            "showAnnotations": "显示标注（{{hotkey}}）",
+            "hideAnnotations": "隐藏标注（{{hotkey}}）"
+        },
+        "hotkeys": {
+            "title": "快捷键",
+            "submitAnnotationsPredictions": "提交标注/预测",
+            "previousMedia": "上一个媒体",
+            "nextMedia": "下一个媒体",
+            "undo": "撤销",
+            "redo": "重做",
+            "deleteSelectedAnnotation": "删除所选标注",
+            "toggleAnnotationsVisibility": "显示或隐藏所有标注",
+            "selectAllAnnotations": "选择所有标注",
+            "deselectAllAnnotations": "取消选择所有标注",
+            "selectNextAnnotation": "选择下一个标注",
+            "resetZoom": "重置缩放"
+        },
+        "tools": {
+            "selection": { "label": "选择" },
+            "boundingBox": {
+                "label": "边界框",
+                "description": "在图像中圈选出包围目标的矩形或正方形。"
+            },
+            "autoSegmentation": {
+                "label": "自动分割",
+                "detectionDescription": "将光标移到目标上方预览建议的矩形，然后点击以创建标注。",
+                "segmentationDescription": "将光标移到目标上方预览建议的多边形，然后点击以创建标注。"
+            },
+            "polygon": {
+                "label": "多边形",
+                "description": "逐个点击以放置顶点，或按住拖拽以徒手绘制。适合需要像素级精度的不规则形状。"
+            },
+            "magneticLasso": {
+                "label": "智能勾边",
+                "description": "沿着目标边缘移动并定时点击，将轮廓吸附到其边界。"
+            }
         }
     },
     "models": {
