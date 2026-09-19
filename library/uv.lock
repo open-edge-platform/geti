@@ -1674,7 +1674,7 @@ requires-dist = [
     { name = "transformers", specifier = ">=5.14,<6" },
     { name = "triton-xpu", marker = "extra == 'xpu'", specifier = "==3.8.0", index = "https://download.pytorch.org/whl/xpu", conflict = { package = "getitune", extra = "xpu" } },
     { name = "typeguard", specifier = ">=4.3,<4.5" },
-    { name = "ultralytics", marker = "extra == 'ultralytics'", git = "https://github.com/ultralytics/ultralytics.git?rev=3d2cc01ee02206e0f7adc2c1e9c559b0b73e66a8" },
+    { name = "ultralytics", marker = "extra == 'ultralytics'", git = "https://github.com/ultralytics/ultralytics.git?rev=b454f423600f99d41730bd75a7a26b491187de36" },
 ]
 provides-extras = ["cpu", "cuda", "xpu", "ultralytics", "docs", "ci-publish", "benchmark"]
 
@@ -6989,8 +6989,8 @@ wheels = [
 
 [[package]]
 name = "ultralytics"
-version = "8.4.144"
-source = { git = "https://github.com/ultralytics/ultralytics.git?rev=3d2cc01ee02206e0f7adc2c1e9c559b0b73e66a8#3d2cc01ee02206e0f7adc2c1e9c559b0b73e66a8" }
+version = "8.4.155"
+source = { git = "https://github.com/ultralytics/ultralytics.git?rev=b454f423600f99d41730bd75a7a26b491187de36#b454f423600f99d41730bd75a7a26b491187de36" }
 dependencies = [
     { name = "cloudpickle" },
     { name = "filelock" },
@@ -7016,14 +7016,14 @@ dependencies = [
 
 [[package]]
 name = "ultralytics-platform"
-version = "0.1.34"
+version = "0.1.48"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e5/da/b4a6d92817f519fae4d0915f2a8ef0273d0ffaf8c1dc71dbda72b759d0ec/ultralytics_platform-0.1.34.tar.gz", hash = "sha256:c815d8609a62c90488a1bb382e4286c079b52cd1c3925b714c3fe3c34e665801", size = 63811, upload-time = "2026-09-09T12:14:51.194Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d3/28/7cff22ee0096f2b155a22d89041db0cffcefc4b35ebd4030849c63378b34/ultralytics_platform-0.1.48.tar.gz", hash = "sha256:0229cb8228c64ac506e8c5b79ef75406d2ccf22ad26651ea7cc99e8c00338bca", size = 66607, upload-time = "2026-09-18T00:39:01.365Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0f/88/eec5e3f1a78e043b5fc41acdc9534f204a6fc58c81a866941e1b10b1518c/ultralytics_platform-0.1.34-py3-none-any.whl", hash = "sha256:1c93163bb135c3a7c4a9bfd656fbd704d42d41d2751691a168249cdee58c6773", size = 75371, upload-time = "2026-09-09T12:14:49.712Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/d9/99046194cc90670ba748e2566357f79049a2467c2c47ec110cf62d68b50a/ultralytics_platform-0.1.48-py3-none-any.whl", hash = "sha256:ad609e160ad2e53e35f6ccc4f4e59232a3b5b9cfa4de1872547474a98be01e78", size = 78391, upload-time = "2026-09-18T00:39:00.115Z" },
 ]
 
 [[package]]
