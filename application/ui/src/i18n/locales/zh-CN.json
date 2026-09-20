@@ -117,6 +117,11 @@
             "uploadToStart": "上传第一个媒体文件即可开始。",
             "importDataset": "导入数据集"
         },
+        "review": {
+            "reviewed": "已审核",
+            "forReview": "待审核",
+            "selectSubsetPlaceholder": "选择子集"
+        },
         "statistics": {
             "label": "数据集统计",
             "title": "数据集统计",
@@ -297,8 +302,87 @@
         "confidenceThreshold": {
             "label": "置信度阈值"
         },
+        "devices": {
+            "label": "推理设备"
+        },
         "sources": {
-            "uploadError": "视频文件上传失败。"
+            "uploadError": "视频文件上传失败。",
+            "list": {
+                "addSource": "新增输入源"
+            },
+            "types": {
+                "usbCamera": "USB 摄像头",
+                "ipCamera": "IP 摄像头",
+                "videoFile": "视频文件",
+                "imagesFolder": "图片文件夹",
+                "disconnected": "未连接"
+            },
+            "options": {
+                "usbCamera": "USB 摄像头",
+                "ipCamera": "IP 摄像头",
+                "videoFile": "视频文件"
+            },
+            "add": {
+                "title": "新增输入源",
+                "submit": "添加并使用"
+            },
+            "edit": {
+                "title": "编辑输入源",
+                "save": "保存",
+                "saveAndConnect": "保存并连接"
+            },
+            "form": {
+                "createSuccess": "输入源配置创建成功。",
+                "updateSuccess": "输入源配置更新成功。",
+                "saveError": "输入源配置保存失败，{{details}}",
+                "saveErrorFallback": "请重试"
+            },
+            "menu": {
+                "connect": "连接",
+                "disconnect": "断开连接",
+                "testConnection": "测试连接",
+                "edit": "编辑",
+                "remove": "移除",
+                "connectSuccess": "已成功连接到“{{name}}”。",
+                "disconnectSuccess": "已成功断开与“{{name}}”的连接。",
+                "disablePipelineAndDisconnectSuccess": "已成功停用流水线并断开与“{{name}}”的连接。",
+                "removeSuccess": "“{{name}}”已成功移除！",
+                "disconnectDialog": {
+                    "title": "断开 {{name}}",
+                    "message": "断开该输入源还会停用推理流水线。是否继续？",
+                    "cancel": "取消",
+                    "confirm": "断开连接"
+                }
+            },
+            "settings": {
+                "loading": "加载中……",
+                "device": "设备：{{name}}",
+                "unknownDevice": "未知设备（id：{{deviceId}}）",
+                "folderPath": "文件夹路径：{{path}}",
+                "ignoreExistingImages": "忽略已有图片：{{value}}",
+                "streamUrl": "视频流地址：{{url}}",
+                "authRequired": "需要身份验证：{{value}}",
+                "videoPath": "视频路径：{{path}}",
+                "yes": "是",
+                "no": "否"
+            },
+            "fields": {
+                "name": "名称",
+                "imagesFolderPath": "图片文件夹路径",
+                "ignoreExistingImages": "忽略已有图片",
+                "streamUrl": "视频流地址：",
+                "requireAuthentication": "需要身份验证",
+                "camera": "摄像头",
+                "videoFilePath": "视频文件路径",
+                "upload": "上传",
+                "selectedFile": "已选择：{{fileName}}",
+                "loopVideo": "循环播放视频"
+            },
+            "defaultNames": {
+                "usbCamera": "USB 摄像头输入源",
+                "ipCamera": "IP 摄像头输入源",
+                "videoFile": "视频文件输入源"
+            }
         }
     },
     "project": {
@@ -335,7 +419,6 @@
             "recommended": "{{taskType}}（推荐）"
         },
         "list": {
-            "heading": "项目",
             "count_one": "共 {{count}} 个项目",
             "count_other": "共 {{count}} 个项目",
             "countFiltered_one": "共 {{count}} 个项目，筛选出 {{filtered}} 个",
@@ -344,8 +427,10 @@
             "createProjectFromDataset": "从数据集新建项目",
             "activeBadge": "当前项目",
             "card": {
-                "created": "• 创建于 {{date}}",
-                "labels": "• 标签：{{labels}}"
+                "created": "创建于：{{date}}",
+                "labelsDialog": {
+                    "title": "标签"
+                }
             },
             "menu": {
                 "enablePipeline": "启用流水线",
@@ -361,10 +446,8 @@
                 "createdAtAscending": "按创建时间（最早优先）"
             },
             "filters": {
-                "searchPlaceholder": "按名称搜索……",
-                "taskType": "按任务类型筛选",
-                "typesSelected_one": "已选 {{count}} 种类型",
-                "typesSelected_other": "已选 {{count}} 种类型"
+                "searchPlaceholder": "按名称搜索",
+                "taskType": "按任务类型筛选"
             },
             "noMatches": {
                 "title": "没有符合条件的项目",
@@ -488,7 +571,19 @@
             "redo": "重做（{{hotkeys}}）",
             "toggleFocus": "切换焦点",
             "showAnnotations": "显示标注（{{hotkey}}）",
-            "hideAnnotations": "隐藏标注（{{hotkey}}）"
+            "hideAnnotations": "隐藏标注（{{hotkey}}）",
+            "submit": "提交",
+            "close": "关闭"
+        },
+        "modes": {
+            "annotation": "标注",
+            "prediction": "预测"
+        },
+        "predictions": {
+            "settingsTitle": "预测设置",
+            "modelLabel": "模型",
+            "confirm": "确认预测",
+            "edit": "编辑"
         },
         "hotkeys": {
             "title": "快捷键",
