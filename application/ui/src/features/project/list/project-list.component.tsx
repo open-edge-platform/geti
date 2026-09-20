@@ -3,10 +3,12 @@
 
 import { Suspense, useMemo, useState } from 'react';
 
+import type { TaskType } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { ActionButton, Content, Divider, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
 import { partition } from 'lodash-es';
+import { Link } from 'react-router';
 
 import { version } from '../../../../package.json';
 import { downloadFile } from '../../../platform/download-file';
@@ -21,8 +23,53 @@ import { ProjectCard } from './project-card.component';
 import { SORT_BY_HANDLERS, SortProjects } from './sort-projects/sort-projects.component';
 import { SortBy } from './sort-projects/utils';
 
-import backgroundStyles from '../project-background.module.scss';
 import classes from './project-list.module.scss';
+
+const CARD_WIDTH = 280;
+
+const ProjectSidebar = ({
+    shouldShowFilters,
+    searchName,
+    setSearchName,
+    selectedTaskTypes,
+    setSelectedTaskTypes,
+}: {
+    shouldShowFilters: boolean;
+    searchName: string;
+    setSearchName: (value: string) => void;
+    selectedTaskTypes: TaskType[];
+    setSelectedTaskTypes: (taskTypes: TaskType[]) => void;
+}) => {
+    const { t } = useTranslation();
+
+    return (
+        <Flex direction={'column'} gap={'size-300'} UNSAFE_className={classes.sidebar}>
+            <Link to={paths.project.index({})} viewTransition>
+                <Flex alignItems={'center'} gap={'size-50'}>
+                    <img src={getiLogo} alt={t('navigation.logoAlt')} className={classes.logo} />
+                    <Text UNSAFE_className={classes.logoText}>Geti™</Text>
+                </Flex>
+            </Link>
+
+            <Divider size={'S'} />
+
+            <NewProjectCard />
+
+            {shouldShowFilters && (
+                <>
+                    <Divider size={'S'} />
+
+                    <ProjectFilters
+                        searchName={searchName}
+                        onSearchChange={setSearchName}
+                        selectedTaskTypes={selectedTaskTypes}
+                        onSelectedTaskTypesChange={setSelectedTaskTypes}
+                    />
+                </>
+            )}
+        </Flex>
+    );
+};
 
 const ProjectGrid = () => {
     const { t } = useTranslation();
@@ -52,70 +99,57 @@ const ProjectGrid = () => {
     const countLabel = isFiltering
         ? t('project.list.countFiltered', { count: totalCount, filtered: sortedProjects.length })
         : t('project.list.count', { count: totalCount });
-    const cardMinWidth = 480;
     const visibleCardsCount = (activeProject === undefined ? 0 : 1) + sortedProjects.length;
 
     return (
-        <Flex direction={'column'} gap={'size-300'} height={'100%'}>
-            <View UNSAFE_className={classes.newProjectRow}>
-                <NewProjectCard />
-            </View>
+        <Flex height={'100%'} gap={'size-300'}>
+            <ProjectSidebar
+                shouldShowFilters={shouldShowFilters}
+                searchName={searchName}
+                setSearchName={setSearchName}
+                selectedTaskTypes={selectedTaskTypes}
+                setSelectedTaskTypes={setSelectedTaskTypes}
+            />
 
-            <Divider size={'S'} />
+            <Flex direction={'column'} gap={'size-300'} flex={1} minWidth={0} UNSAFE_className={classes.gridPanel}>
+                <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'} gap={'size-300'}>
+                    {shouldShowFilters && <SortProjects sortBy={sortBy} onSort={setSortBy} />}
 
-            <Heading width={'100%'} level={1} UNSAFE_className={classes.heading}>
-                {t('project.list.heading')}
-            </Heading>
-
-            {shouldShowFilters && (
-                <Flex width={'100%'} gap={'size-200'}>
-                    <SortProjects sortBy={sortBy} onSort={setSortBy} />
-
-                    <Divider size={'S'} orientation={'vertical'} />
-
-                    <Flex flex={1} alignItems={'center'} gap={'size-200'}>
-                        <Text UNSAFE_className={classes.projectMetadata}>{countLabel}</Text>
-
-                        <ProjectFilters
-                            searchName={searchName}
-                            onSearchChange={setSearchName}
-                            selectedTaskTypes={selectedTaskTypes}
-                            onSelectedTaskTypesChange={setSelectedTaskTypes}
-                        />
-                    </Flex>
-                </Flex>
-            )}
-            {isFiltering && sortedProjects.length === 0 && <NoMatchingProjects />}
-
-            {visibleCardsCount > 0 && (
-                <Grid
-                    flex={1}
-                    gap={'size-300'}
-                    autoRows={'size-2000'}
-                    columns={
-                        visibleCardsCount === 1
-                            ? `minmax(min(${cardMinWidth}px, 100%), .5fr)`
-                            : `repeat(auto-fit, minmax(min(${cardMinWidth}px, 100%), 1fr))`
-                    }
-                    UNSAFE_className={classes.projectGrid}
-                >
-                    {activeProject !== undefined && (
-                        <ProjectCard
-                            item={activeProject}
-                            prioritizeImage
-                            projectNames={projectNames.filter((projectName) => projectName !== activeProject.name)}
-                        />
+                    {shouldShowFilters && (
+                        <Text marginStart={'auto'} UNSAFE_className={classes.projectMetadata}>
+                            {countLabel}
+                        </Text>
                     )}
-                    {sortedProjects.map((item, index) => (
-                        <ProjectCard
-                            key={item.id}
-                            item={item}
-                            prioritizeImage={index === 0}
-                            projectNames={projectNames.filter((projectName) => projectName !== item.name)}
-                        />
-                    ))}
-                </Grid>
-            )}
+                </Flex>
+
+                {isFiltering && sortedProjects.length === 0 && <NoMatchingProjects />}
+
+                {visibleCardsCount > 0 && (
+                    <Grid
+                        flex={1}
+                        gap={'size-200'}
+                        autoRows={'min-content'}
+                        columns={`repeat(auto-fill, minmax(${CARD_WIDTH}px, 1fr))`}
+                        UNSAFE_className={classes.projectGrid}
+                    >
+                        {activeProject !== undefined && (
+                            <ProjectCard
+                                item={activeProject}
+                                prioritizeImage
+                                projectNames={projectNames.filter((projectName) => projectName !== activeProject.name)}
+                            />
+                        )}
+                        {sortedProjects.map((item, index) => (
+                            <ProjectCard
+                                key={item.id}
+                                item={item}
+                                prioritizeImage={index === 0}
+                                projectNames={projectNames.filter((projectName) => projectName !== item.name)}
+                            />
+                        ))}
+                    </Grid>
+                )}
+            </Flex>
         </Flex>
     );
 };
@@ -142,8 +176,8 @@ const AppInfo = () => {
 
 export const ProjectList = () => {
     return (
-        <View UNSAFE_className={backgroundStyles.projectBackground} height={'100%'} position={'relative'}>
-            <Content height={'100%'} maxWidth={'1560px'} margin={'0 auto'} UNSAFE_className={classes.content}>
+        <View height={'100%'} position={'relative'}>
+            <Content height={'100%'} margin={'0'}>
                 <Flex direction={'column'} height={'100%'}>
                     <ImportJobsList />
 

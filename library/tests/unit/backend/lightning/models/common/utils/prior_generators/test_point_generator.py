@@ -16,7 +16,7 @@ class TestMlvlPointGenerator:
         assert mlvl_points.num_levels == 2
 
         # assert self.num_levels == len(featmap_sizes)  # noqa: ERA001
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError, match="Number of feature levels"):
             mlvl_points.grid_priors(featmap_sizes=[(2, 2)], device="cpu")
         priors = mlvl_points.grid_priors(featmap_sizes=[(2, 2), (4, 8)], device="cpu")
         priors_with_stride = mlvl_points.grid_priors(featmap_sizes=[(2, 2), (4, 8)], with_stride=True, device="cpu")
@@ -51,7 +51,7 @@ class TestMlvlPointGenerator:
             assert mlvl_points.num_levels == 2
 
             # assert self.num_levels == len(featmap_sizes)  # noqa: ERA001
-            with pytest.raises(AssertionError):
+            with pytest.raises(ValueError, match="Number of feature levels"):
                 mlvl_points.grid_priors(featmap_sizes=[(2, 2)], device="cuda")
             priors = mlvl_points.grid_priors(featmap_sizes=[(2, 2), (4, 8)], device="cuda")
             priors_with_stride = mlvl_points.grid_priors(

@@ -1,0 +1,30 @@
+id: image-classification-dinov3-convnext-base
+name: DINOv3 ConvNeXt-Base
+license: DINOv3 License
+pretrained_weights:
+  source: huggingface
+  repo_id: timm/convnext_base.dinov3_lvd1689m
+  revision: 8e953102486d832f58e073cb4080f04001bb71ca
+description: "DINOv3 ConvNeXt-Base is a convolutional feature model distilled on LVD-1689M with the DINOv3 method."
+stats:
+  gigaflops: 30.71
+  trainable_parameters: 88.591464
+  benchmark_metrics: {}
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.00005
+    weight_decay: 0.0001
+    input_size_width: 224
+    input_size_height: 224
+    max_epochs: 90
+    batch_size: 16
+    early_stopping:
+      patience: 10
+    scheduler:
+      type: cosine_annealing
+      warmup:
+        enable: true
+        epochs: 10

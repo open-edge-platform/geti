@@ -88,6 +88,9 @@ class LightningEngine(Engine):
     This class defines the Engine for getitune, which governs each step of the getitune workflow.
     """
 
+    backend_name: ClassVar[str] = "lightning"
+    model_base_class: ClassVar[type] = LightningModel
+
     _EXPORTED_MODEL_BASE_NAME: ClassVar[str] = "exported_model"
 
     def __init__(

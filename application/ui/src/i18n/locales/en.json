@@ -24,15 +24,31 @@
             "invalidDateRange": "End date must be later than start date"
         },
         "views": {
+            "title": "Views",
+            "entireDataset": "Entire dataset",
             "assignTitle": "Assign to existing view",
+            "assignToExistingView": "Assign to existing view",
             "assignTo": "Assign to",
+            "assign": "Assign",
             "selectView": "Select a view",
             "assignmentNote": "This operation will not affect other media that were already assigned to this view.",
             "mediaAssigned_one": "Media {{count}} item assigned successfully.",
             "mediaAssigned_other": "Media {{count}} items assigned successfully.",
-            "openView": "Open {{viewName}} view",
+            "openView": "Open {{viewName}}",
+            "saveView": "Save view",
+            "viewNameLabel": "View name",
+            "renameTitle": "Rename dataset view",
+            "rename": "Rename",
+            "save": "Save",
+            "cancel": "Cancel",
+            "close": "Close",
             "deleteTitle": "Delete confirmation",
-            "deleteConfirmation": "Are you sure you want to delete the \"{{viewName}}\" dataset view?"
+            "deleteConfirmation": "Are you sure you want to delete the \"{{viewName}}\" dataset view?",
+            "delete": "Delete",
+            "deleteSuccess": "Dataset view \"{{viewName}}\" has been deleted successfully.",
+            "unassignFromView": "Unassign from this view",
+            "selectedMediaCount_one": "Selected {{count}} media item",
+            "selectedMediaCount_other": "Selected {{count}} media items"
         },
         "filters": {
             "allMedia": "All media",
@@ -46,7 +62,21 @@
             "toggleAll": "Toggle all",
             "more": "More filters",
             "moreTitle": "More filters",
-            "title": "Filters"
+            "title": "Filters",
+            "subsetOptions": {
+                "training": "Training",
+                "validation": "Validation",
+                "testing": "Testing",
+                "unassigned": "Unassigned"
+            },
+            "dateRange": {
+                "heading": "Filter by upload date",
+                "clear": "Clear",
+                "startDateLabel": "Start date",
+                "endDateLabel": "End date",
+                "from": "From {{date}}",
+                "to": "To {{date}}"
+            }
         },
         "upload": {
             "queued": "Queued",
@@ -87,6 +117,11 @@
             "uploadToStart": "Upload your first media item to get started.",
             "importDataset": "Import dataset"
         },
+        "review": {
+            "reviewed": "Reviewed",
+            "forReview": "For Review",
+            "selectSubsetPlaceholder": "Select subset"
+        },
         "statistics": {
             "label": "Dataset statistics",
             "title": "Dataset Statistics",
@@ -97,7 +132,9 @@
             "annotatedVideosFrames": "Annotated videos / frames",
             "numberOfObjectsPerLabel": "Number of objects per label",
             "unannotated": "Unannotated",
-            "annotated": "Annotated"
+            "annotated": "Annotated",
+            "frames": "Frames",
+            "annotationsChartTooltip": "Annotations"
         },
         "delete": {
             "title": "Delete Items",
@@ -153,13 +190,6 @@
         "multiSelect": {
             "selectAll": "Select all"
         },
-        "jobs": {
-            "status": {
-                "error": "Error",
-                "connected": "Connected",
-                "disconnected": "Disconnected"
-            }
-        },
         "import": {
             "jobTitle": "Import dataset - {{fileName}} - {{size}}",
             "processingMessage": "{{fileName}} file is being processed for import",
@@ -169,7 +199,6 @@
             "cancel": "Cancel",
             "hide": "Hide",
             "preparingJob": "Preparing",
-            "progressUnavailable": "N/A",
             "stagedFileReadError": "An error occurred during staged file reading",
             "prepareError": "An error occurred during import preparation.",
             "genericError": "An error occurred during import.",
@@ -181,15 +210,37 @@
             "dropZipHere": "Drop the dataset .zip file here",
             "upload": "Upload",
             "learnMoreFormats": "Learn more about the different formats",
+            "dialogHeading": "Import dataset",
+            "scanningMessage": "Scanning and analyzing the dataset archive to import...",
+            "mapLabelsMessage": "Map labels for the uploaded dataset",
+            "continue": "Continue",
             "deleteStagedFile": {
                 "title": "Delete Staged File",
                 "confirmation": "Are you sure you want to delete the dataset file \"{{stagedDatasetId}}\"?",
                 "cancel": "Cancel",
                 "delete": "Delete"
+            },
+            "formatWarning": {
+                "boundingBoxToPolygon": "Imported dataset uses bounding box annotations, but your project’s dataset uses polygons. Annotations will be automatically converted to polygons to keep everything compatible.",
+                "polygonToBoundingBox": "Imported dataset uses polygon annotations, but your project’s dataset uses bounding boxes. Annotations will be automatically converted to bounding boxes to keep everything compatible."
+            },
+            "labelMapping": {
+                "statisticsHeading": "Imported dataset statistics",
+                "imagesLabel": "images",
+                "framesLabel": "frames",
+                "heading": "Label mapping - optional",
+                "unmappedNote": "Any unmapped items will be imported as unlabeled",
+                "datasetLabelsColumn": "Dataset labels",
+                "projectLabelsColumn": "Project labels",
+                "selectLabelPlaceholder": "Select label",
+                "includeUnannotated": "Include media without annotations",
+                "submit": "Submit"
             }
         },
         "export": {
             "heading": "Export {{name}}",
+            "headingDatasetView": "Export dataset view",
+            "datasetView": "View: {{name}}",
             "statisticsHeading": "Exported dataset statistics",
             "settingsHeading": "Export settings",
             "filterByLabel": "Filter annotations by label",
@@ -198,6 +249,21 @@
             "learnMoreFormats": "Learn more about export formats",
             "cancel": "Cancel",
             "submit": "Export",
+            "processing": "Processing dataset for export",
+            "readyForDownload": "Dataset is ready for download",
+            "download": "Download",
+            "downloadStarted": "Dataset download started",
+            "error": "Error: {{error}}",
+            "itemsLabel": "items",
+            "details": {
+                "heading": "Export {{name}}",
+                "defaultName": "dataset",
+                "format": "Format:",
+                "media": "Media:",
+                "allMedia": "All media",
+                "onlyAnnotated": "Only media with annotations",
+                "labels": "Labels:"
+            },
             "warnings": {
                 "videos": "Exporting videos is not supported by this dataset format. All annotated frames from videos will be exported as images.",
                 "emptyLabel": "The selected format does not support empty labels (e.g. \"{{emptyLabelName}}\"). Images and frames containing them will be exported as unannotated.",
@@ -205,6 +271,20 @@
                 "unsupportedItemsEmptyLabels": "empty labels",
                 "unsupportedItems": "To preserve {{items}}, please use the Geti export format.",
                 "subsetNotIncluded": "The exported dataset won't include any information about the subset assigned to each media."
+            }
+        },
+        "importExport": {
+            "trigger": "Import/export dataset",
+            "exportItem": "Export dataset",
+            "importItem": "Import dataset"
+        },
+        "jobs": {
+            "cancel": {
+                "trigger": "Cancel job",
+                "title": "Cancel job",
+                "dismiss": "Dismiss",
+                "confirm": "Cancel job",
+                "confirmation": "Are you sure you want to cancel job {{jobId}}?"
             }
         }
     },
@@ -222,8 +302,87 @@
         "confidenceThreshold": {
             "label": "Confidence threshold"
         },
+        "devices": {
+            "label": "Inference device"
+        },
         "sources": {
-            "uploadError": "Failed to upload video file."
+            "uploadError": "Failed to upload video file.",
+            "list": {
+                "addSource": "Add new source"
+            },
+            "types": {
+                "usbCamera": "usb camera",
+                "ipCamera": "ip camera",
+                "videoFile": "video file",
+                "imagesFolder": "images folder",
+                "disconnected": "disconnected"
+            },
+            "options": {
+                "usbCamera": "USB Camera",
+                "ipCamera": "IP Camera",
+                "videoFile": "Video file"
+            },
+            "add": {
+                "title": "Add new input source",
+                "submit": "Add & Use"
+            },
+            "edit": {
+                "title": "Edit input source",
+                "save": "Save",
+                "saveAndConnect": "Save & Connect"
+            },
+            "form": {
+                "createSuccess": "Source configuration created successfully.",
+                "updateSuccess": "Source configuration updated successfully.",
+                "saveError": "Failed to save source configuration, {{details}}",
+                "saveErrorFallback": "please try again"
+            },
+            "menu": {
+                "connect": "Connect",
+                "disconnect": "Disconnect",
+                "testConnection": "Test connection",
+                "edit": "Edit",
+                "remove": "Remove",
+                "connectSuccess": "Successfully connected to \"{{name}}\".",
+                "disconnectSuccess": "Successfully disconnected from \"{{name}}\".",
+                "disablePipelineAndDisconnectSuccess": "Successfully disabled pipeline and disconnected from \"{{name}}\".",
+                "removeSuccess": "{{name}} has been removed successfully!",
+                "disconnectDialog": {
+                    "title": "Disconnect {{name}}",
+                    "message": "Disconnecting this source will also disable the inference pipeline. Do you want to continue?",
+                    "cancel": "Cancel",
+                    "confirm": "Disconnect"
+                }
+            },
+            "settings": {
+                "loading": "Loading...",
+                "device": "Device: {{name}}",
+                "unknownDevice": "Unknown device (id: {{deviceId}})",
+                "folderPath": "Folder path: {{path}}",
+                "ignoreExistingImages": "Ignore existing images: {{value}}",
+                "streamUrl": "Stream url: {{url}}",
+                "authRequired": "Auth required: {{value}}",
+                "videoPath": "Video path: {{path}}",
+                "yes": "Yes",
+                "no": "No"
+            },
+            "fields": {
+                "name": "Name",
+                "imagesFolderPath": "Images folder path",
+                "ignoreExistingImages": "Ignore existing images",
+                "streamUrl": "Stream Url:",
+                "requireAuthentication": "Require Authentication",
+                "camera": "Camera",
+                "videoFilePath": "Video file path",
+                "upload": "Upload",
+                "selectedFile": "Selected: {{fileName}}",
+                "loopVideo": "Loop video"
+            },
+            "defaultNames": {
+                "usbCamera": "USB camera source",
+                "ipCamera": "IP camera source",
+                "videoFile": "Video file source"
+            }
         }
     },
     "project": {
@@ -260,17 +419,18 @@
             "recommended": "{{taskType}} (Recommended)"
         },
         "list": {
-            "heading": "Projects",
             "count_one": "{{count}} project",
             "count_other": "{{count}} projects",
             "countFiltered_one": "{{filtered}} of {{count}} project",
             "countFiltered_other": "{{filtered}} of {{count}} projects",
             "createNewProject": "Create new project",
-            "createProjectFromDataset": "Create project from dataset",
+            "createProjectFromDataset": "Create from dataset",
             "activeBadge": "Active",
             "card": {
-                "created": "• Created: {{date}}",
-                "labels": "• Labels: {{labels}}"
+                "created": "Created: {{date}}",
+                "labelsDialog": {
+                    "title": "Labels"
+                }
             },
             "menu": {
                 "enablePipeline": "Enable pipeline",
@@ -279,17 +439,15 @@
                 "pipelineDisabled": "Pipeline disabled successfully"
             },
             "sort": {
-                "label": "Sort:",
+                "label": "Sort Projects by:",
                 "nameAscending": "Name (A-Z)",
                 "nameDescending": "Name (Z-A)",
                 "createdAtDescending": "Created date (newest)",
                 "createdAtAscending": "Created date (oldest)"
             },
             "filters": {
-                "searchPlaceholder": "Search by name...",
-                "taskType": "Filter by task type",
-                "typesSelected_one": "{{count}} type selected",
-                "typesSelected_other": "{{count}} types selected"
+                "searchPlaceholder": "Search projects",
+                "taskType": "Filter by task type"
             },
             "noMatches": {
                 "title": "No projects match your filters",
@@ -394,6 +552,72 @@
         "labels": {
             "noLabel": "No label",
             "noObject": "No object"
+        },
+        "canvas": {
+            "settingsTitle": "Settings",
+            "hideLabels": "Hide labels",
+            "pixelView": "Pixel view",
+            "annotationFillOpacity": "Annotation fill opacity",
+            "annotationBorderOpacity": "Annotation border opacity",
+            "imageBrightness": "Image brightness",
+            "imageContrast": "Image contrast",
+            "imageSaturation": "Image saturation"
+        },
+        "actions": {
+            "zoomIn": "Zoom In",
+            "zoomOut": "Zoom Out",
+            "fitToScreen": "Fit to screen ({{hotkey}})",
+            "undo": "Undo ({{hotkey}})",
+            "redo": "Redo ({{hotkeys}})",
+            "toggleFocus": "Toggle focus",
+            "showAnnotations": "Show annotations ({{hotkey}})",
+            "hideAnnotations": "Hide annotations ({{hotkey}})",
+            "submit": "Submit",
+            "close": "Close"
+        },
+        "modes": {
+            "annotation": "Annotation",
+            "prediction": "Prediction"
+        },
+        "predictions": {
+            "settingsTitle": "Prediction settings",
+            "modelLabel": "Model",
+            "confirm": "Confirm prediction",
+            "edit": "Edit"
+        },
+        "hotkeys": {
+            "title": "Hotkeys",
+            "submitAnnotationsPredictions": "Submit annotations/predictions",
+            "previousMedia": "Previous media",
+            "nextMedia": "Next media",
+            "undo": "Undo",
+            "redo": "Redo",
+            "deleteSelectedAnnotation": "Delete selected annotation",
+            "toggleAnnotationsVisibility": "Show or hide all annotations",
+            "selectAllAnnotations": "Select all annotations",
+            "deselectAllAnnotations": "Deselect all annotations",
+            "selectNextAnnotation": "Select next annotation",
+            "resetZoom": "Reset zoom"
+        },
+        "tools": {
+            "selection": { "label": "Selection" },
+            "boundingBox": {
+                "label": "Bounding box",
+                "description": "Draw a rectangle or square surrounding an object in an image."
+            },
+            "autoSegmentation": {
+                "label": "Auto segmentation",
+                "detectionDescription": "Move your cursor over an object to preview a suggested rectangle, then click to create the annotation.",
+                "segmentationDescription": "Move your cursor over an object to preview a suggested polygon, then click to create the annotation."
+            },
+            "polygon": {
+                "label": "Polygon",
+                "description": "Click to place points one by one, or hold and drag to draw freehand. Ideal for irregular shapes requiring pixel-precision."
+            },
+            "magneticLasso": {
+                "label": "Magnetic Lasso",
+                "description": "Hover along an object's edge and click periodically to snap the outline to its borders."
+            }
         }
     },
     "models": {

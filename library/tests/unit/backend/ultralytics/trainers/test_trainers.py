@@ -15,8 +15,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 import torch
 
+from getitune.backend.ultralytics.trainers.classification import (
+    ClassificationTrainer,
+    MultiLabelClassificationTrainer,
+)
 from getitune.backend.ultralytics.trainers.detection import DetectionTrainer
 from getitune.backend.ultralytics.trainers.instance_segmentation import SegmentationTrainer
+from getitune.backend.ultralytics.trainers.semantic_segmentation import SemanticSegmentationTrainer
 from getitune.backend.ultralytics.trainers.yolo_detr import YoloDetrTrainer
 
 
@@ -345,3 +350,59 @@ class TestDisableExternalLoggerCallbacks:
         trainer._use_getitune_data = True
         # No ``callbacks`` attribute set.
         trainer._disable_external_logger_callbacks()  # should be a no-op
+
+
+_TRAINER_CASES = [
+    pytest.param(DetectionTrainer, "getitune.backend.ultralytics.trainers.base.InfiniteDataLoader", id="detection"),
+    pytest.param(
+        SegmentationTrainer,
+        "getitune.backend.ultralytics.trainers.base.InfiniteDataLoader",
+        id="instance_segmentation",
+    ),
+    pytest.param(YoloDetrTrainer, "getitune.backend.ultralytics.trainers.base.InfiniteDataLoader", id="yolo_detr"),
+    pytest.param(
+        ClassificationTrainer,
+        "getitune.backend.ultralytics.trainers.classification.InfiniteDataLoader",
+        id="classification",
+    ),
+    pytest.param(
+        MultiLabelClassificationTrainer,
+        "getitune.backend.ultralytics.trainers.classification.InfiniteDataLoader",
+        id="multilabel_classification",
+    ),
+    pytest.param(
+        SemanticSegmentationTrainer,
+        "getitune.backend.ultralytics.trainers.semantic_segmentation.InfiniteDataLoader",
+        id="semantic_segmentation",
+    ),
+]
+
+
+class TestPinMemoryPolicy:
+    """DataLoader pin_memory must follow device, never be hardcoded True."""
+
+    @pytest.mark.parametrize(("trainer_cls", "loader_patch_target"), _TRAINER_CASES)
+    @pytest.mark.parametrize(
+        ("device_type", "expected_pin_memory"),
+        [
+            ("cpu", False),
+            ("cuda:0", True),
+            ("xpu:0", True),
+        ],
+    )
+    def test_get_dataloader_respects_device(
+        self, device_type: str, expected_pin_memory: bool, trainer_cls: type, loader_patch_target: str
+    ) -> None:
+        trainer = object.__new__(trainer_cls)
+        trainer._use_getitune_data = True
+        trainer.device = torch.device(device_type)
+        trainer.args = SimpleNamespace(workers=0)
+
+        with (
+            patch.object(trainer_cls, "build_dataset", return_value=MagicMock()),
+            patch(loader_patch_target) as mock_loader_cls,
+        ):
+            trainer.get_dataloader("unused", batch_size=4, mode="train")
+
+        _, kwargs = mock_loader_cls.call_args
+        assert kwargs["pin_memory"] is expected_pin_memory

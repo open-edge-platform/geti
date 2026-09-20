@@ -70,7 +70,6 @@
         "static-path": "~0.0.4",
         "usehooks-ts": "^3.1.1",
         "utif": "^3.1.0",
-        "uuid": "~14.0.1",
         "zipson": "^0.2.12"
     },
     "devDependencies": {
@@ -121,5 +120,8 @@
         "typescript-eslint": "~8.65.0",
         "vite-plugin-svgr": "~5.2.0",
         "vitest": "~5.0.0"
+    },
+    "overrides": {
+        "@faker-js/faker": "~10.6.0"
     }
 }

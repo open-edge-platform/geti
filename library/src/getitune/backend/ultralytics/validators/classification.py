@@ -60,7 +60,7 @@ class ClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClassification
             batch_size=self.args.batch,  # type: ignore[attr-defined]
             shuffle=False,
             collate_fn=classification_collate_fn,
-            pin_memory=True,
+            pin_memory=self.device.type != "cpu",
         )
 
 
@@ -172,5 +172,5 @@ class MultiLabelClassificationValidator(GetiTuneValidatorMixin, _UltralyticsClas
             batch_size=self.args.batch,  # type: ignore[attr-defined]
             shuffle=False,
             collate_fn=multilabel_collate_fn,
-            pin_memory=True,
+            pin_memory=self.device.type != "cpu",
         )

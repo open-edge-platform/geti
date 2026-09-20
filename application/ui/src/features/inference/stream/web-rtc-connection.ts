@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fetchClient } from '@/api';
-import { v4 as uuid } from 'uuid';
 
 export type WebRTCConnectionStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'failed';
 
@@ -38,7 +37,7 @@ export class WebRTCConnection {
     private timeoutId?: ReturnType<typeof setTimeout>;
 
     constructor() {
-        this.webrtcId = uuid();
+        this.webrtcId = crypto.randomUUID();
     }
 
     public getStatus(): WebRTCConnectionStatus {

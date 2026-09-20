@@ -3,8 +3,6 @@
 
 import { useMemo } from 'react';
 
-import { v4 as uuid } from 'uuid';
-
 import { useMediaUploadDispatch } from '../providers/media-upload-provider.component';
 import { UploadFileItem } from '../providers/media-upload-reducer';
 
@@ -25,7 +23,7 @@ export const useUploadActions = (): UploadActions => {
         () => ({
             startUploadProgress: (files: File[]): string[] => {
                 const newItems: UploadFileItem[] = files.map((file) => ({
-                    id: uuid(),
+                    id: crypto.randomUUID(),
                     name: file.name,
                     size: file.size,
                     status: 'queued',

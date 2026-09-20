@@ -6,7 +6,7 @@ import { ViewModes } from '@geti-ui/ui';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
 import { getMockedDatasetView } from 'mocks/mock-dataset-view';
-import { getMockedMediaImage } from 'mocks/mock-media';
+import { getMockedMediaImage, getMultipleMockedMediaImage } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
@@ -56,7 +56,7 @@ vi.mock('../../providers/selected-data-provider.component', () => ({
 }));
 
 describe('Toolbar', () => {
-    const renderToolbar = async (items: Media[] = [], route: string = '/projects/123') => {
+    const renderToolbar = async (items: Media[] = [], route: string = '/projects/123', allMedia: Media[] = items) => {
         server.use(
             http.get('/api/projects/{project_id}', () => {
                 return HttpResponse.json(getMockedProject({ id: 'project-123' }));
@@ -75,8 +75,11 @@ describe('Toolbar', () => {
             http.get('/api/projects/{project_id}/dataset/media', () => {
                 return HttpResponse.json({
                     items: [getMockedMediaImage({})],
-                    pagination: { offset: 0, limit: 1, count: items.length, total: items.length },
+                    pagination: { offset: 0, limit: 1, count: 1, total: allMedia.length },
                 });
+            }),
+            http.get('/api/projects/{project_id}/dataset/media/ids', () => {
+                return HttpResponse.json({ items: allMedia.map(({ id, type }) => ({ id, type })) });
             }),
             http.get('/api/projects/{project_id}/dataset/items', () => {
                 return HttpResponse.json({
@@ -346,5 +349,60 @@ describe('Toolbar', () => {
 
         await renderToolbar([firstItem]);
         expect(screen.getByRole('button', { name: 'Select dataset view' })).toBeInTheDocument();
+    });
+
+    describe('select all', () => {
+        it('selects every media item matching the filters, not just the loaded pages', async () => {
+            const setSelectedKeys = vi.fn();
+            const allMedia = getMultipleMockedMediaImage(120);
+            const loadedItems = allMedia.slice(0, 40);
+
+            vi.mocked(useSelectedData).mockReturnValue({
+                selectedKeys: new Set(),
+                setSelectedKeys,
+                toggleSelectedKeys: vi.fn(),
+                isSelected: vi.fn().mockReturnValue(false),
+            });
+
+            await renderToolbar(loadedItems, '/projects/123', allMedia);
+
+            const selectAll = screen.getByLabelText('select all');
+
+            await waitFor(() => {
+                expect(selectAll).toBeEnabled();
+            });
+
+            fireEvent.click(selectAll);
+
+            await waitFor(() => {
+                expect(setSelectedKeys).toHaveBeenCalledWith(new Set(allMedia.map(({ id }) => id)));
+            });
+        });
+
+        it('clears the selection when everything is already selected', async () => {
+            const setSelectedKeys = vi.fn();
+            const allMedia = getMultipleMockedMediaImage(3);
+
+            vi.mocked(useSelectedData).mockReturnValue({
+                selectedKeys: new Set(allMedia.map(({ id }) => id)),
+                setSelectedKeys,
+                toggleSelectedKeys: vi.fn(),
+                isSelected: vi.fn().mockReturnValue(true),
+            });
+
+            await renderToolbar(allMedia);
+
+            const selectAll = screen.getByLabelText('select all');
+
+            await waitFor(() => {
+                expect(selectAll).toBeChecked();
+            });
+
+            fireEvent.click(selectAll);
+
+            await waitFor(() => {
+                expect(setSelectedKeys).toHaveBeenCalledWith(new Set());
+            });
+        });
     });
 });

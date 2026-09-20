@@ -406,7 +406,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             )
 
     @step("Train Model", 80)
-    def train_model(  # noqa: PLR0912, PLR0915, C901 - training orchestration is intentionally centralized here
+    def train_model(  # noqa: PLR0915, C901 - training orchestration is intentionally centralized here
         self,
         training_config: dict,
         dataset_info: DatasetInfo,
@@ -423,11 +423,11 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         in the config; backends that do not support them simply ignore the
         parameter.
         """
-        from getitune.backend.lightning.models.base import DataInputParams, LightningModel
+        from getitune.backend.lightning.models.base import DataInputParams
         from getitune.data.module import DataModule
         from getitune.engine import create_engine
+        from getitune.engine.utils.create import engine_class_for_backend
         from getitune.types.device import DeviceType as GetiTuneDeviceType
-        from lightning import Callback
 
         from .progress import TrainingProgressCallback
 
@@ -458,8 +458,9 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         getitune_device_type = (
             GetiTuneDeviceType.gpu if device.type is DeviceType.CUDA else GetiTuneDeviceType(device.type)
         )
-        class_path = model_cfg.get("class_path", "")
-        is_ultralytics = "ultralytics" in class_path
+        engine_cls = engine_class_for_backend(training_config.get("backend"))
+        is_huggingface = engine_cls.backend_name == "huggingface"
+        is_ultralytics = engine_cls.backend_name == "ultralytics"
         engine_kwargs: dict[str, Any] = {
             "work_dir": self._data_dir / f"getitune-workspace-{model_id}",
             "device": getitune_device_type,
@@ -468,24 +469,17 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         if weights_path is not None:
             # Route weight loading through checkpoint for Ultralytics and for resume flows.
             load_from_checkpoint = is_ultralytics or has_model_revision
-            if load_from_checkpoint:
+            if load_from_checkpoint and not is_huggingface:
                 engine_kwargs["checkpoint"] = weights_path
                 # Disable default pretrained loading when checkpoint controls initialization.
                 model_cfg["init_args"]["pretrained"] = False
             else:
-                # Fresh Lightning training loads base weights via model init args.
+                # Fresh Lightning/HF training loads base weights via model init args.
                 model_cfg["init_args"]["pretrained"] = True
                 model_cfg["init_args"]["pretrained_weights"] = weights_path
 
         model_parser = ArgumentParser()
-        if is_ultralytics:
-            # Lazy import because the Ultralytics backend is optional and may not be installed in all environments.
-            from getitune.backend.ultralytics.models.base import UltralyticsModel
-
-            model_type = UltralyticsModel
-        else:
-            model_type = LightningModel
-        model_parser.add_argument("--model", type=model_type)
+        model_parser.add_argument("--model", type=engine_cls.model_base_class)
         getitune_model = model_parser.instantiate_classes(Namespace(model=model_cfg)).get("model")
 
         if hasattr(getitune_model, "tile_config"):
@@ -493,22 +487,25 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
 
         getitune_engine = create_engine(model=getitune_model, data=datamodule, **engine_kwargs)
 
-        callbacks_cfg = training_config.get("callbacks", [])
-        for cb_cfg in callbacks_cfg:
-            if "init_args" in cb_cfg and "dirpath" in cb_cfg["init_args"]:
-                cb_cfg["init_args"]["dirpath"] = getitune_engine.work_dir
-        parser = ArgumentParser()
-        parser.add_argument("--callbacks", type=list[Callback])
-        parsed_callbacks_cfg = parser.parse_object({"callbacks": callbacks_cfg})
-        callbacks_list = parser.instantiate_classes(parsed_callbacks_cfg).get("callbacks", [])
-        callbacks_list.append(TrainingProgressCallback(self.update_progress, min_p=10, max_p=80))
+        callbacks_list = [TrainingProgressCallback(self.update_progress, min_p=10, max_p=80)]
+        if not is_huggingface:
+            from lightning import Callback
+
+            callbacks_cfg = training_config.get("callbacks", [])
+            for cb_cfg in callbacks_cfg:
+                if "init_args" in cb_cfg and "dirpath" in cb_cfg["init_args"]:
+                    cb_cfg["init_args"]["dirpath"] = getitune_engine.work_dir
+            parser = ArgumentParser()
+            parser.add_argument("--callbacks", type=list[Callback])
+            parsed_callbacks_cfg = parser.parse_object({"callbacks": callbacks_cfg})
+            callbacks_list[:0] = parser.instantiate_classes(parsed_callbacks_cfg).get("callbacks", [])
 
         logger.info("Starting training loop (model_id={})", model_id)
         train_kwargs: dict[str, Any] = {
             "max_epochs": training_config["max_epochs"],
             "callbacks": callbacks_list,
         }
-        if device.type is not DeviceType.CPU and device.index is not None:
+        if not is_huggingface and device.type is not DeviceType.CPU and device.index is not None:
             train_kwargs["devices"] = [device.index]
         if "precision" in training_config:
             train_kwargs["precision"] = training_config["precision"]
@@ -657,6 +654,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         """Copy training artifacts into variant directories.
 
         Each variant's files are stored under model_dir/variants/<variant_id>/model.*
+        or, for directory-backed PyTorch checkpoints, in the ``model`` directory.
 
         The getitune workspace itself is removed by ``TrainingJob.on_complete`` after
         the job terminates, so this step does not clean it up.
@@ -673,7 +671,10 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
 
         pytorch_variant_dir = variants_dir / str(created_variants[ModelFormat.PYTORCH])
         pytorch_variant_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(trained_model_path, pytorch_variant_dir / "model.pt")
+        if trained_model_path.is_dir():
+            shutil.copytree(trained_model_path, pytorch_variant_dir / "model")
+        else:
+            shutil.copyfile(trained_model_path, pytorch_variant_dir / "model.pt")
         logger.info("Stored PyTorch variant at {}", pytorch_variant_dir)
 
         # Copy OpenVINO IR files
@@ -956,7 +957,8 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         """Get the path to the stored PyTorch checkpoint."""
         model_dir = cls.__base_model_path(data_dir, project_id, model_id)
         variant_dir = model_dir / "variants" / str(model_variant)
-        return variant_dir / "model.pt"
+        checkpoint_dir = variant_dir / "model"
+        return checkpoint_dir if checkpoint_dir.is_dir() else variant_dir / "model.pt"
 
     @classmethod
     def __build_model_config_path(cls, data_dir: Path, project_id: UUID, model_id: UUID) -> Path:
