@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from collections import defaultdict
+from uuid import UUID
 
 import numpy as np
 from loguru import logger
@@ -43,7 +44,11 @@ class SubsetAssigner:
         self._mlb = MultiLabelBinarizer()
 
     def assign(
-        self, items: list[DatasetItemWithLabels], target_ratios: SplitRatios, has_all_subsets_assigned: bool
+        self,
+        items: list[DatasetItemWithLabels],
+        target_ratios: SplitRatios,
+        has_all_subsets_assigned: bool,
+        pinned_group_subsets: dict[UUID, DatasetItemSubset] | None = None,
     ) -> list[SubsetAssignment]:
         """
         Assigns dataset items to subsets based on target ratios.
@@ -57,13 +62,19 @@ class SubsetAssigner:
                   because there are not enough items to populate every subset.  After stratification,
                   ``_ensure_all_subsets_nonempty`` is called to guarantee no subset is left empty.
                 - If ``True``, the minimum-item guard is bypassed (the caller guarantees that each
-                  subset is already covered).  When fewer than 3 items are provided they are
-                  assigned sequentially (TRAINING first, then VALIDATION, then TESTING).
+                  subset is already covered).  When fewer than 3 items are provided, their media
+                  groups are assigned sequentially (TRAINING first, then VALIDATION, then TESTING).
                   ``_ensure_all_subsets_nonempty`` is *not* called, so stratification may produce
                   empty folds without raising.
+            pinned_group_subsets (dict[UUID, DatasetItemSubset] | None): Media groups that already
+                have assigned items in the project, mapped to their established subset. Items of
+                these groups always join the pinned subset, so incremental annotation of a video
+                cannot spread its frames across subsets.
         Returns:
             list[SubsetAssignment]: List of subset assignments for each item.
         """
+        pinned_assignments, items = self._apply_pins(items, pinned_group_subsets or {})
+
         if len(items) < 3:
             if not has_all_subsets_assigned:
                 raise ValueError(
@@ -71,11 +82,13 @@ class SubsetAssigner:
                     "of subsets: Training, Validation and Testing. Each subset requires at least 1 item before "
                     "training can start."
                 )
-            # If less items are available than subsets, we cannot use stratification, so assign in order to subsets.
-            assignments = []
+            # Fewer items than subsets: stratification is impossible, so assign media groups
+            # (not individual items) to subsets in order, keeping each group in one subset.
+            assignments = list(pinned_assignments)
             subsets = [DatasetItemSubset.TRAINING, DatasetItemSubset.VALIDATION, DatasetItemSubset.TESTING]
-            for idx in range(len(items)):
-                assignments.append(SubsetAssignment(item_id=items[idx].item_id, subset=subsets[idx]))
+            for pos, indices in enumerate(self._group_items(items).values()):
+                for idx in indices:
+                    assignments.append(SubsetAssignment(item_id=items[idx].item_id, subset=subsets[pos]))
             return assignments
 
         items_by_group = self._group_items(items)
@@ -96,12 +109,31 @@ class SubsetAssigner:
             self._ensure_all_subsets_nonempty(indices_by_subset)
 
         if use_groups:
-            return self._group_assignments(items, indices_by_subset, items_by_group, group_keys)
-        return [
+            return pinned_assignments + self._group_assignments(items, indices_by_subset, items_by_group, group_keys)
+        return pinned_assignments + [
             SubsetAssignment(item_id=items[idx].item_id, subset=subset)
             for subset, indices in indices_by_subset.items()
             for idx in indices
         ]
+
+    @staticmethod
+    def _apply_pins(
+        items: list[DatasetItemWithLabels], pins: dict[UUID, DatasetItemSubset]
+    ) -> tuple[list[SubsetAssignment], list[DatasetItemWithLabels]]:
+        """Assign items of already-established media groups to their pinned subset.
+
+        Returns the resulting assignments and the remaining (free) items."""
+        if not pins:
+            return [], items
+        pinned_assignments: list[SubsetAssignment] = []
+        free_items: list[DatasetItemWithLabels] = []
+        for item in items:
+            subset = pins.get(item.group_id) if item.group_id else None
+            if subset is None:
+                free_items.append(item)
+            else:
+                pinned_assignments.append(SubsetAssignment(item_id=item.item_id, subset=subset))
+        return pinned_assignments, free_items
 
     def _stratify(self, labels_per_unit: list, target_ratios: SplitRatios) -> dict[DatasetItemSubset, list[int]]:
         """Run iterative stratification over the given units (items or media groups)."""

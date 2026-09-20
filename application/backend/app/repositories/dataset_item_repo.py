@@ -223,6 +223,23 @@ class DatasetItemRepository:
         )
         return [(row[0], row[1]) for row in self.db.execute(stmt).all()]
 
+    def list_assigned_group_subsets(self) -> list[tuple[str, str, int]]:
+        """List (video_id, subset, item_count) for already-assigned video frames of the project.
+
+        Used to keep newly annotated frames of a video in the same subset as the
+        video's previously assigned frames."""
+        stmt = (
+            select(MediaDB.video_id, DatasetItemDB.subset, func.count(DatasetItemDB.id))
+            .join(DatasetItemDB, DatasetItemDB.id == MediaDB.id)
+            .where(
+                DatasetItemDB.project_id == self.project_id,
+                DatasetItemDB.subset != DatasetItemSubset.UNASSIGNED,
+                MediaDB.video_id.is_not(None),
+            )
+            .group_by(MediaDB.video_id, DatasetItemDB.subset)
+        )
+        return [(row[0], row[1], row[2]) for row in self.db.execute(stmt).all()]
+
     def has_all_subsets_assigned(self) -> bool:
         """Return True if there is at least one dataset item for each of TRAINING, VALIDATION, and TESTING subsets."""
         stmt = select(func.distinct(DatasetItemDB.subset)).where(

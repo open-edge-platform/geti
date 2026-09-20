@@ -5,6 +5,7 @@ from uuid import UUID
 
 from loguru import logger
 
+from app.models import DatasetItemSubset
 from app.repositories import DatasetItemRepository
 from app.services import BaseSessionManagedService
 
@@ -32,6 +33,25 @@ class SubsetService(BaseSessionManagedService):
             DatasetItemWithLabels(item_id=UUID(item_id), labels=labels, group_id=group_by_item[item_id])
             for item_id, labels in items_dict.items()
         ]
+
+    def get_pinned_group_subsets(self, project_id: UUID) -> dict[UUID, DatasetItemSubset]:
+        """Map each video that already has assigned frames to its established subset.
+
+        Newly annotated frames of such a video must join that subset, otherwise
+        incremental training runs would split near-duplicate frames across subsets.
+        If a video's frames are (historically) spread over several subsets, the subset
+        holding most of its frames wins; ties break deterministically by subset order.
+        """
+        repo = DatasetItemRepository(project_id=str(project_id), db=self.db_session)
+        counts: dict[UUID, dict[DatasetItemSubset, int]] = defaultdict(dict)
+        for video_id, subset, count in repo.list_assigned_group_subsets():
+            counts[UUID(video_id)][DatasetItemSubset(subset)] = count
+
+        subset_order = list(DatasetItemSubset)
+        return {
+            video_id: max(by_subset, key=lambda s: (by_subset[s], -subset_order.index(s)))
+            for video_id, by_subset in counts.items()
+        }
 
     def has_all_subsets_assigned(self, project_id: UUID) -> bool:
         """Return True if there is at least one dataset item for each of TRAINING, VALIDATION, and TESTING subsets."""

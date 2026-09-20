@@ -251,3 +251,76 @@ class TestSubsetAssignerMediaGroups:
         for video in (video_a, video_b, video_c):
             subsets = {a.subset for a in result if group_of_item[a.item_id] == video}
             assert len(subsets) == 1, f"video group split across {subsets}"
+
+
+class TestSubsetAssignerPinnedGroups:
+    """Incremental annotation: frames of a video that already has assigned frames
+    must join that video's established subset instead of being re-stratified."""
+
+    @pytest.fixture
+    def fxt_assigner(self):
+        return SubsetAssigner()
+
+    @pytest.fixture
+    def fxt_default_ratios(self):
+        return SplitRatios(train=0.7, val=0.2, test=0.1)
+
+    def test_pinned_group_items_join_established_subset(self, fxt_assigner, fxt_default_ratios):
+        label = uuid4()
+        pinned_video = uuid4()
+        free_videos = [uuid4() for _ in range(5)]
+        pinned_items = [DatasetItemWithLabels(item_id=uuid4(), labels={label}, group_id=pinned_video) for _ in range(7)]
+        free_items = [
+            DatasetItemWithLabels(item_id=uuid4(), labels={label}, group_id=video)
+            for video in free_videos
+            for _ in range(10)
+        ]
+
+        result = fxt_assigner.assign(
+            pinned_items + free_items,
+            fxt_default_ratios,
+            has_all_subsets_assigned=True,
+            pinned_group_subsets={pinned_video: DatasetItemSubset.TESTING},
+        )
+
+        assert len(result) == len(pinned_items) + len(free_items)
+        pinned_ids = {item.item_id for item in pinned_items}
+        for assignment in result:
+            if assignment.item_id in pinned_ids:
+                assert assignment.subset == DatasetItemSubset.TESTING
+
+    def test_small_incremental_batch_keeps_video_frames_together(self, fxt_assigner, fxt_default_ratios):
+        """Two new frames of the same video (fewer items than subsets) must land in ONE subset."""
+        label = uuid4()
+        video = uuid4()
+        items = [DatasetItemWithLabels(item_id=uuid4(), labels={label}, group_id=video) for _ in range(2)]
+
+        result = fxt_assigner.assign(items, fxt_default_ratios, has_all_subsets_assigned=True)
+
+        assert len(result) == 2
+        assert len({a.subset for a in result}) == 1, "frames of one video were split across subsets"
+
+    def test_small_batch_of_independent_items_keeps_sequential_behavior(self, fxt_assigner, fxt_default_ratios):
+        """Two unrelated items (fewer than subsets) keep the original sequential assignment."""
+        label = uuid4()
+        items = [DatasetItemWithLabels(item_id=uuid4(), labels={label}) for _ in range(2)]
+
+        result = fxt_assigner.assign(items, fxt_default_ratios, has_all_subsets_assigned=True)
+
+        assert [a.subset for a in result] == [DatasetItemSubset.TRAINING, DatasetItemSubset.VALIDATION]
+
+    def test_small_incremental_batch_respects_pins(self, fxt_assigner, fxt_default_ratios):
+        """New frames of an established video are pinned even below the size guard."""
+        label = uuid4()
+        video = uuid4()
+        items = [DatasetItemWithLabels(item_id=uuid4(), labels={label}, group_id=video) for _ in range(2)]
+
+        result = fxt_assigner.assign(
+            items,
+            fxt_default_ratios,
+            has_all_subsets_assigned=True,
+            pinned_group_subsets={video: DatasetItemSubset.VALIDATION},
+        )
+
+        assert len(result) == 2
+        assert all(a.subset == DatasetItemSubset.VALIDATION for a in result)

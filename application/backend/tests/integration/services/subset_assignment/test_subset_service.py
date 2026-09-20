@@ -196,3 +196,99 @@ class TestSubsetServiceIntegration:
         empty_project_id = UUID(empty_project.id)
         service = SubsetService(db_session)
         assert service.has_all_subsets_assigned(empty_project_id) is False
+
+
+class TestSubsetServiceVideoGroups:
+    """Video frames expose their parent video as group, and previously assigned
+    videos yield subset pins for incremental annotation."""
+
+    @staticmethod
+    def _add_video_with_frames(
+        db_session: Session,
+        project_id: str,
+        label: LabelDB,
+        frame_subsets: list[DatasetItemSubset],
+    ) -> str:
+        from datetime import datetime
+
+        from app.db.schema import DatasetItemLabelDB, MediaDB
+
+        created = datetime.fromisoformat("2025-02-01T00:00:00Z")
+        video = MediaDB(
+            id=str(uuid4()),
+            type="video",
+            name="test_video",
+            format="mp4",
+            size=4096,
+            width=1920,
+            height=1080,
+            fps=30.0,
+            frame_count=len(frame_subsets),
+            project_id=project_id,
+            created_at=created,
+        )
+        db_session.add(video)
+        db_session.flush()
+        for frame_index, subset in enumerate(frame_subsets):
+            frame = MediaDB(
+                id=str(uuid4()),
+                type="video_frame",
+                name=f"frame_{frame_index}",
+                format="mp4",
+                size=1024,
+                width=1920,
+                height=1080,
+                project_id=project_id,
+                video_id=video.id,
+                frame_index=frame_index,
+                created_at=created,
+            )
+            db_session.add(frame)
+            db_session.flush()
+            db_session.add(DatasetItemDB(id=frame.id, subset=str(subset), project_id=project_id, created_at=created))
+            db_session.add(DatasetItemLabelDB(dataset_item_id=frame.id, label_id=label.id))
+        db_session.flush()
+        return video.id
+
+    def test_unassigned_video_frames_carry_group_id(
+        self,
+        fxt_project_id: UUID,
+        fxt_subset_service: SubsetService,
+        fxt_db_labels: list[LabelDB],
+        db_session: Session,
+    ) -> None:
+        video_id = self._add_video_with_frames(
+            db_session,
+            str(fxt_project_id),
+            fxt_db_labels[0],
+            [DatasetItemSubset.UNASSIGNED] * 3,
+        )
+
+        items = fxt_subset_service.get_unassigned_items_with_labels(fxt_project_id)
+
+        frame_groups = [item.group_id for item in items if item.group_id is not None]
+        assert len(frame_groups) == 3
+        assert all(group == UUID(video_id) for group in frame_groups)
+
+    def test_pinned_group_subsets_prefers_majority_subset(
+        self,
+        fxt_project_id: UUID,
+        fxt_subset_service: SubsetService,
+        fxt_db_labels: list[LabelDB],
+        db_session: Session,
+    ) -> None:
+        video_id = self._add_video_with_frames(
+            db_session,
+            str(fxt_project_id),
+            fxt_db_labels[0],
+            [
+                DatasetItemSubset.TRAINING,
+                DatasetItemSubset.TRAINING,
+                DatasetItemSubset.VALIDATION,
+                DatasetItemSubset.UNASSIGNED,
+            ],
+        )
+
+        pins = fxt_subset_service.get_pinned_group_subsets(fxt_project_id)
+
+        assert pins.get(UUID(video_id)) == DatasetItemSubset.TRAINING
