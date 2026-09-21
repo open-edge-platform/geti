@@ -253,25 +253,25 @@ experiments:
         "torch:test/latency": { compare: "<=", margin: 0.15 }
   semantic_segmentation:
     models:
-      - name: litehrnet_18
-        priority: extended
       - name: dino_v2
         priority: extended
       - name: segnext_t
-        priority: extended
+        priority: core
       - name: segnext_s
-        priority: extended
+        priority: deferred
       - name: segnext_b
         priority: extended
       - name: litehrnet_s
+        priority: core
+      - name: litehrnet_18
         priority: deferred
       - name: litehrnet_x
         priority: extended
       - name: dino_v2_tile
         priority: deferred
-      - name: litehrnet_18_tile
-        priority: deferred
       - name: litehrnet_s_tile
+        priority: core
+      - name: litehrnet_18_tile
         priority: deferred
       - name: litehrnet_x_tile
         priority: deferred
