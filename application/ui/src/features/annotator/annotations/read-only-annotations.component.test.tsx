@@ -126,6 +126,22 @@ describe('ReadOnlyAnnotations', () => {
 
         render(<ReadOnlyAnnotations width={800} height={600} />);
 
+        expect(screen.getAllByLabelText('annotation rect')).toHaveLength(1);
+    });
+
+    it('renders each annotation twice while the focus mask is active', () => {
+        setupMocks({
+            isFocussed: true,
+            annotations: [
+                getMockedAnnotation({
+                    id: 'ann-1',
+                    shape: { type: 'rectangle', x: 10, y: 20, width: 100, height: 50 },
+                }),
+            ],
+        });
+
+        render(<ReadOnlyAnnotations width={800} height={600} />);
+
         expect(screen.getAllByLabelText('annotation rect')).toHaveLength(2); // 1 in mask, 1 visible
     });
 
@@ -148,15 +164,14 @@ describe('ReadOnlyAnnotations', () => {
         expect(maskOverlay?.style.fillOpacity).toBe('0.3');
     });
 
-    it('deactivates the focus mask when isFocussed is false', () => {
+    it('omits the focus mask entirely when isFocussed is false', () => {
         setupMocks({ isFocussed: false });
 
         const { container } = render(<ReadOnlyAnnotations width={800} height={600} />);
 
         const maskOverlay = container.querySelector('rect[mask]') as SVGRectElement | null;
 
-        expect(maskOverlay).toBeInTheDocument();
-        expect(maskOverlay?.style.fillOpacity).toBe('0');
+        expect(maskOverlay).not.toBeInTheDocument();
     });
 
     it('renders annotation labels when hideLabels is false', () => {
@@ -167,11 +182,14 @@ describe('ReadOnlyAnnotations', () => {
         expect(screen.getByText('label-1')).toBeInTheDocument();
     });
 
-    it('omits annotation labels when hideLabels is true', () => {
+    // Visual hiding of labels is applied via the `--annotation-labels-display` CSS variable set by
+    // AnnotatorCanvasSettings (an ancestor outside this component), not by conditionally mounting
+    // them here — see annotator-canvas-settings.component.test.tsx. Labels stay in the DOM either way.
+    it('keeps annotation labels mounted when hideLabels is true (hidden via CSS, not unmounted)', () => {
         setupMocks({ hideLabels: true });
 
         render(<ReadOnlyAnnotations width={800} height={600} />);
 
-        expect(screen.queryByText('label-1')).not.toBeInTheDocument();
+        expect(screen.getByText('label-1')).toBeInTheDocument();
     });
 });
