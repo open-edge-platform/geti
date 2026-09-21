@@ -1,6 +1,8 @@
 id: instance-segmentation-mask2former-swin-b
 name: Mask2Former-Swin-B
-license: CC BY-NC 4.0
+license:
+  name: CC BY-NC 4.0
+  url: https://spdx.org/licenses/CC-BY-NC-4.0
 pretrained_weights:
   source: huggingface
   repo_id: facebook/mask2former-swin-base-coco-instance

@@ -24,6 +24,7 @@ _FAKE_ENTRY = {
     "imagenet_top1_accuracy": 70.0,
     "trainable_parameters": 11.7,
     "license": "apache-2.0",
+    "license_url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
     "gigaflops": 1.8,
 }
 _FAKE_SNAPSHOT = MappingProxyType({_FAKE_ENTRY["model_name"]: _FAKE_ENTRY})
@@ -64,7 +65,8 @@ class TestTimmManifestProvider:
 
         assert manifest.id == model_name_to_id("resnet18.a1_in1k")
         assert manifest.name == "resnet18.a1_in1k"
-        assert manifest.license == "apache-2.0"
+        assert manifest.license.name == "apache-2.0"
+        assert manifest.license.url == "https://www.apache.org/licenses/LICENSE-2.0.txt"
         assert manifest.timm_metadata is not None
         assert manifest.timm_metadata.family == "resnet"
         assert manifest.timm_metadata.variant == "resnet18"
@@ -92,6 +94,22 @@ class TestTimmManifestProvider:
     def test_build_manifest_missing_model_raises_key_error(self) -> None:
         with pytest.raises(KeyError):
             TimmManifestProvider.build_manifest("unknown-model")
+
+    def test_build_manifest_missing_license_raises_value_error(self) -> None:
+        entry = {**_FAKE_ENTRY, "license": None}
+        with (
+            patch.object(manifest_provider, "_snapshot", return_value={entry["model_name"]: entry}),
+            pytest.raises(ValueError, match="Missing license information"),
+        ):
+            TimmManifestProvider.build_manifest("resnet18.a1_in1k")
+
+    def test_build_manifest_missing_license_url_raises_value_error(self) -> None:
+        entry = {**_FAKE_ENTRY, "license_url": None}
+        with (
+            patch.object(manifest_provider, "_snapshot", return_value={entry["model_name"]: entry}),
+            pytest.raises(ValueError, match="Missing license information"),
+        ):
+            TimmManifestProvider.build_manifest("resnet18.a1_in1k")
 
     def test_get_preprocessing_maps_snapshot_fields(self) -> None:
         preprocessing = TimmManifestProvider.get_preprocessing("resnet18.a1_in1k")
