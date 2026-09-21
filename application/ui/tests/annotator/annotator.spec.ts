@@ -54,7 +54,7 @@ test.describe('Annotator', () => {
 
         await test.step('Change annotation label by clicking label badge', async () => {
             await page.getByRole('button', { name: 'Selection' }).click();
-            await page.getByLabel('annotation rect').nth(1).click();
+            await page.getByLabel('annotation rect').first().click();
 
             await expect(page.getByRole('button', { name: `Label ${redLabel.name}` })).toHaveAttribute(
                 'aria-pressed',
@@ -79,7 +79,7 @@ test.describe('Annotator', () => {
 
         await test.step('Change second annotation to red label', async () => {
             await page.getByRole('button', { name: 'Selection' }).click();
-            await page.getByLabel('annotation rect').nth(3).click();
+            await page.getByLabel('annotation rect').nth(0).click();
             await page.getByRole('button', { name: `Label ${redLabel.name}` }).click();
 
             await expect(page.getByLabel(`label ${redLabel.name} background`)).toHaveCount(1);
@@ -121,9 +121,11 @@ test.describe('Annotator', () => {
         await test.step('Change selected annotations label using label badge', async () => {
             const container = page.getByLabel('annotation rect');
 
-            await container.nth(5).click();
-            await container.nth(4).click({ modifiers: ['Shift'] });
-            await container.nth(3).click({ modifiers: ['Shift'] });
+            // Selecting moves an annotation to the back of the DOM (selected shapes render on top),
+            // so the next still-unselected annotation is always at index 0.
+            await container.nth(0).click();
+            await container.nth(0).click({ modifiers: ['Shift'] });
+            await container.nth(0).click({ modifiers: ['Shift'] });
 
             await page.getByRole('button', { name: `Label ${blueLabel.name}` }).click();
 
@@ -395,7 +397,7 @@ test.describe('Annotator', () => {
 
         await test.step('Select annotation on media 1', async () => {
             await page.getByRole('button', { name: 'Selection' }).click();
-            await page.getByLabel('annotation rect').nth(1).click();
+            await page.getByLabel('annotation rect').first().click();
 
             const selectedAnnotations = annotatorPage.getAnnotationsList().getByLabel('selected annotation');
             await expect(selectedAnnotations).toHaveCount(1);
@@ -931,7 +933,7 @@ test.describe('Annotator', () => {
 
                 await test.step('Enter edit mode via selection tool', async () => {
                     await page.getByRole('button', { name: 'Selection' }).click();
-                    await page.getByLabel('annotation rect').nth(1).click();
+                    await page.getByLabel('annotation rect').first().click();
 
                     await expect(page.getByLabel(/^Edit bounding box points/)).toHaveCount(1);
                     await expect(annotatorPage.getAnnotationsList().getByLabel('selected annotation')).toHaveCount(1);
@@ -1004,7 +1006,7 @@ test.describe('Annotator', () => {
 
                 await test.step('Enter edit mode via selection tool', async () => {
                     await page.getByRole('button', { name: 'Selection' }).click();
-                    await page.getByLabel('annotation polygon').nth(1).click();
+                    await page.getByLabel('annotation polygon').first().click();
 
                     await expect(page.locator('[id^="edit-polygon-points-"]')).toHaveCount(1);
                     await expect(annotatorPage.getAnnotationsList().getByLabel('selected annotation')).toHaveCount(1);
