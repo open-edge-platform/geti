@@ -15,14 +15,19 @@ import { AnnotationShape } from './annotation-shape/annotation-shape.component';
 
 type AnnotationShapeProps = {
     annotation: Annotation;
+    hideLabels?: boolean;
 };
 
-export const AnnotationShapeWithLabels = ({ annotation }: AnnotationShapeProps) => {
-    const { isVisible } = useAnnotationVisibility();
+type ShapeLabelsProps = {
+    annotation: Annotation;
+    useBottomCorners?: boolean;
+};
+
+// Owns the label-editing hooks so they're only subscribed to when labels are actually shown -
+// tools that render shapes with hideLabels (e.g. edit-polygon) don't provide those contexts.
+const ShapeLabels = ({ annotation, useBottomCorners = false }: ShapeLabelsProps) => {
     const { updateAnnotations, isReadOnlyMode } = useAnnotationActions();
     const { selectedLabelId, setSelectedLabelId } = useAnnotatorLabels();
-
-    const { shape, labels } = annotation;
 
     const removeLabels = (labelId: Key | null) => {
         if (isReadOnlyMode) {
@@ -38,11 +43,25 @@ export const AnnotationShapeWithLabels = ({ annotation }: AnnotationShapeProps) 
         updateAnnotations([{ ...annotation, labels: updatedLabels }]);
     };
 
+    return (
+        <AnnotationLabels
+            labels={annotation.labels}
+            onRemove={removeLabels}
+            useBottomCorners={useBottomCorners}
+            isRemovable={!isReadOnlyMode}
+        />
+    );
+};
+
+export const AnnotationShapeWithLabels = ({ annotation, hideLabels = false }: AnnotationShapeProps) => {
+    const { isVisible } = useAnnotationVisibility();
+    const { shape } = annotation;
+
     if (shape.type === 'full_image') {
         return (
             <g display={isVisible ? 'block' : 'none'}>
                 <AnnotationShape annotation={annotation} />
-                <AnnotationLabels labels={labels} onRemove={removeLabels} isRemovable={!isReadOnlyMode} />
+                {!hideLabels && <ShapeLabels annotation={annotation} />}
             </g>
         );
     }
@@ -51,9 +70,13 @@ export const AnnotationShapeWithLabels = ({ annotation }: AnnotationShapeProps) 
         return (
             <g transform={`translate(${shape.x}, ${shape.y})`} display={isVisible ? 'block' : 'none'}>
                 <AnnotationShape annotation={{ ...annotation, shape: { ...shape, x: 0, y: 0 } }} />
-                <AnnotationLabels labels={labels} onRemove={removeLabels} isRemovable={!isReadOnlyMode} />
+                {!hideLabels && <ShapeLabels annotation={annotation} />}
             </g>
         );
+    }
+
+    if (hideLabels) {
+        return <AnnotationShape annotation={annotation} />;
     }
 
     const polygonCoords = [shape.points.map((point) => [point.x, point.y])];
@@ -64,7 +87,7 @@ export const AnnotationShapeWithLabels = ({ annotation }: AnnotationShapeProps) 
             <g transform={`translate(${-labelX}, ${-labelY})`}>
                 <AnnotationShape annotation={annotation} />
             </g>
-            <AnnotationLabels labels={labels} onRemove={removeLabels} useBottomCorners isRemovable={!isReadOnlyMode} />
+            <ShapeLabels annotation={annotation} useBottomCorners />
         </g>
     );
 };

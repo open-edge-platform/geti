@@ -16,24 +16,18 @@ type MaskAnnotationsProps = {
 
 export const MaskAnnotations = ({ annotations, children, width, height, isEnabled }: MaskAnnotationsProps) => {
     const id = useId();
-    const maskOpacity = isEnabled ? 0.3 : 0.0;
+
+    // Avoid building/compositing a full-image SVG mask (and duplicating every annotation) when unused.
+    if (!isEnabled) {
+        return <>{children}</>;
+    }
 
     return (
         <>
             <mask id={`mask-${id}`}>
                 <rect x='0' y='0' width={width} height={height} style={{ fill: 'white', fillOpacity: 1.0 }} />
-                {annotations.map((annotation, idx) => (
-                    <g
-                        key={idx}
-                        style={{
-                            fill: 'black',
-                            fillOpacity: isEnabled ? 1.0 : 0.0,
-                            transitionProperty: 'fill-opacity',
-                            transitionTimingFunction: 'ease-in-out',
-                            transitionDuration: isEnabled ? '0.2s' : '0.1s',
-                            transitionDelay: isEnabled ? '0s' : '.25s',
-                        }}
-                    >
+                {annotations.map((annotation) => (
+                    <g key={annotation.id} style={{ fill: 'black', fillOpacity: 1.0 }}>
                         <AnnotationShapeWithoutLabels annotation={annotation} />
                     </g>
                 ))}
@@ -45,14 +39,7 @@ export const MaskAnnotations = ({ annotations, children, width, height, isEnable
                 height={height}
                 mask={`url(#mask-${id})`}
                 pointerEvents={'none'}
-                style={{
-                    fillOpacity: maskOpacity,
-                    fill: 'black',
-                    strokeWidth: 0,
-                    transition: 'fill-opacity 0.1s ease-in-out',
-                    transitionDelay: isEnabled ? '0s' : '.25s',
-                    transitionDuration: isEnabled ? '0.2s' : '0.1s',
-                }}
+                style={{ fillOpacity: 0.3, fill: 'black', strokeWidth: 0 }}
             />
             {children}
         </>

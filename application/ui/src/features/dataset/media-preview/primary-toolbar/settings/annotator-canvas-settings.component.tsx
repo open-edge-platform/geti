@@ -27,6 +27,7 @@ export const AnnotatorCanvasSettings = ({ children }: AnnotatorCanvasSettingsPro
                     '--image-saturation': offsetToPercentage(canvasSettings.imageSaturation.value),
                     '--image-contrast': offsetToPercentage(canvasSettings.imageContrast.value),
                     '--pixel-view': canvasSettings.pixelView.value ? 'pixelated' : 'auto',
+                    '--annotation-labels-display': canvasSettings.hideLabels.value ? 'none' : 'flex',
                 } as CSSProperties
             }
         >
