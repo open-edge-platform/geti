@@ -273,6 +273,20 @@
                 "subsetNotIncluded": "The exported dataset won't include any information about the subset assigned to each media."
             }
         },
+        "importExport": {
+            "trigger": "Import/export dataset",
+            "exportItem": "Export dataset",
+            "importItem": "Import dataset"
+        },
+        "jobs": {
+            "cancel": {
+                "trigger": "Cancel job",
+                "title": "Cancel job",
+                "dismiss": "Dismiss",
+                "confirm": "Cancel job",
+                "confirmation": "Are you sure you want to cancel job {{jobId}}?"
+            }
+        },
         "revisions": {
             "createdOn": "Created {{date}}",
             "unnamedName": "Dataset #{{id}}",
