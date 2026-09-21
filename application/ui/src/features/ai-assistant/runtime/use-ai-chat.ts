@@ -1,10 +1,16 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { v4 as uuid } from 'uuid';
 
+import {
+    annotationInstructions,
+    annotationTool,
+    parseAnnotationProposal,
+    type AnnotationTarget,
+} from '../annotation/annotation-tools';
 import { buildInstructions, MAX_HISTORY_ITEMS, MAX_TOOL_TURNS } from '../config';
 import { useAiConnection } from '../connection';
 import {
@@ -61,7 +67,11 @@ const trimHistory = (history: ResponsesItem[]): ResponsesItem[] => {
     return history.slice(start);
 };
 
-export const useAiChat = (projectId: string, context: string): AiChat => {
+export interface ChatAnnotationOptions {
+    target: AnnotationTarget;
+}
+
+export const useAiChat = (projectId: string, context: string, annotation?: ChatAnnotationOptions): AiChat => {
     const connection = useAiConnection();
 
     const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -70,7 +80,7 @@ export const useAiChat = (projectId: string, context: string): AiChat => {
 
     const history = useRef<ResponsesItem[]>([]);
     const requestId = useRef<string | null>(null);
-    const stopped = useRef(false);
+    const activeRun = useRef<{ cancelled: boolean } | null>(null);
     const approval = useRef<((isApproved: boolean) => void) | null>(null);
 
     const tools = useMemo(() => createGetiTools(projectId), [projectId]);
@@ -86,7 +96,7 @@ export const useAiChat = (projectId: string, context: string): AiChat => {
     }, []);
 
     const stop = useCallback(() => {
-        stopped.current = true;
+        if (activeRun.current) activeRun.current.cancelled = true;
         resolveApproval(false);
 
         const id = requestId.current;
@@ -102,6 +112,8 @@ export const useAiChat = (projectId: string, context: string): AiChat => {
         }
     }, [connection.provider, resolveApproval]);
 
+    useEffect(() => stop, [stop]);
+
     const clear = useCallback(() => {
         stop();
         history.current = [];
@@ -111,15 +123,43 @@ export const useAiChat = (projectId: string, context: string): AiChat => {
 
     const send = useCallback(
         (text: string, attachments: ChatAttachment[]) => {
-            if (status === 'busy' || text.trim() === '') {
+            if (status === 'busy' || (text.trim() === '' && attachments.length === 0)) {
                 return;
             }
+
+            const token = { cancelled: false };
+            activeRun.current = token;
+            const isCurrent = () => activeRun.current === token && !token.cancelled;
+            const currentAnnotation =
+                annotation && attachments.some(({ id }) => id === annotation.target.source.id) ? annotation : undefined;
+            const requestTools = currentAnnotation
+                ? {
+                      ...tools,
+                      propose_annotations: async (args: Record<string, unknown>) => {
+                          if (!isCurrent()) throw new Error(CANCELLED_BY_USER);
+                          const proposals = parseAnnotationProposal(args, currentAnnotation.target);
+                          if (proposals.length > 0) currentAnnotation.target.apply(proposals);
+                          return {
+                              status: proposals.length > 0 ? 'applied_to_editor' : 'no_matching_objects',
+                              count: proposals.length,
+                              saved: false,
+                          };
+                      },
+                  }
+                : tools;
 
             const content: ResponsesContentPart[] = [{ type: 'input_text', text }];
             attachments.forEach((attachment) => {
                 content.push({ type: 'input_image', image_url: attachment.dataUrl, detail: 'high' });
             });
 
+            if (currentAnnotation) {
+                history.current = history.current.map((item) =>
+                    item.type === 'message'
+                        ? { ...item, content: item.content.filter((part) => part.type !== 'input_image') }
+                        : item
+                );
+            }
             history.current = [...history.current, { type: 'message', role: 'user', content }];
 
             const answerId = uuid();
@@ -129,7 +169,6 @@ export const useAiChat = (projectId: string, context: string): AiChat => {
                 { id: answerId, role: 'assistant', content: '' },
             ]);
             setStatus('busy');
-            stopped.current = false;
 
             const respond = connection.provider === 'api' ? streamResponse : codexRespond;
 
@@ -144,7 +183,7 @@ export const useAiChat = (projectId: string, context: string): AiChat => {
                     return { output: DECLINED_OUTPUT, failed: true };
                 }
 
-                return executeToolCall(tools, name, args);
+                return executeToolCall(requestTools, name, args);
             };
 
             const run = async () => {
@@ -155,13 +194,20 @@ export const useAiChat = (projectId: string, context: string): AiChat => {
                     const result = await respond({
                         requestId: id,
                         model: connection.model,
-                        instructions: buildInstructions(context),
+                        instructions:
+                            buildInstructions(context) +
+                            (currentAnnotation ? `\n${annotationInstructions(currentAnnotation.target)}` : ''),
                         input: trimHistory(history.current),
-                        tools: GETI_TOOL_DEFINITIONS,
+                        tools: currentAnnotation
+                            ? [...GETI_TOOL_DEFINITIONS, annotationTool(currentAnnotation.target)]
+                            : GETI_TOOL_DEFINITIONS,
                         onDelta: (delta) => {
+                            if (!isCurrent()) return;
                             updateMessage(answerId, (message) => ({ ...message, content: message.content + delta }));
                         },
                     });
+
+                    if (!isCurrent()) throw new Error(CANCELLED_BY_USER);
 
                     if (result.text !== '') {
                         history.current = [
@@ -193,10 +239,12 @@ export const useAiChat = (projectId: string, context: string): AiChat => {
                     }));
 
                     for (const call of result.functionCalls) {
+                        if (!isCurrent()) throw new Error(CANCELLED_BY_USER);
                         const { output, failed } = ACTION_TOOLS.has(call.name)
                             ? await runApprovedCall(call.callId, call.name, call.arguments)
-                            : await executeToolCall(tools, call.name, call.arguments);
+                            : await executeToolCall(requestTools, call.name, call.arguments);
 
+                        if (!isCurrent()) throw new Error(CANCELLED_BY_USER);
                         history.current = [
                             ...history.current,
                             {
@@ -224,7 +272,7 @@ export const useAiChat = (projectId: string, context: string): AiChat => {
 
             void run()
                 .catch((error: unknown) => {
-                    const message = stopped.current
+                    const message = token.cancelled
                         ? CANCELLED_BY_USER
                         : error instanceof Error
                           ? error.message
@@ -233,12 +281,14 @@ export const useAiChat = (projectId: string, context: string): AiChat => {
                     updateMessage(answerId, (chatMessage) => ({ ...chatMessage, error: message }));
                 })
                 .finally(() => {
+                    if (activeRun.current !== token) return;
+                    activeRun.current = null;
                     requestId.current = null;
                     resolveApproval(false);
                     setStatus('idle');
                 });
         },
-        [connection.model, connection.provider, context, resolveApproval, status, tools, updateMessage]
+        [annotation, connection.model, connection.provider, context, resolveApproval, status, tools, updateMessage]
     );
 
     return { messages, status, pendingApproval, resolveApproval, send, stop, clear };

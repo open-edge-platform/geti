@@ -15,6 +15,26 @@ from app.supported_models.timm import TimmCatalog, TimmManifestProvider
 router = APIRouter(prefix="/api/model_architectures", tags=["Model Architectures"])
 
 
+def _pretrained_auto_label_dataset(model_id: str, task: TaskType) -> str | None:
+    """Return the semantic ontology retained by checkpoints verified for zero-shot pre-labeling."""
+    is_ultralytics_checkpoint = any(f"-{family}-" in model_id for family in ("yolo11", "yolo12", "yolo26"))
+    if not is_ultralytics_checkpoint:
+        return None
+    if task in {TaskType.DETECTION, TaskType.INSTANCE_SEGMENTATION}:
+        return "COCO-80"
+    if task is TaskType.CLASSIFICATION and "yolo26" in model_id:
+        return "ImageNet-1K"
+    return None
+
+
+def _to_architecture_view(manifest: object) -> ModelArchitectureView:
+    view = ModelArchitectureView.model_validate(manifest, from_attributes=True)
+    pretrained_dataset = _pretrained_auto_label_dataset(view.id, view.task)
+    return view.model_copy(
+        update={"pretrained_auto_label": pretrained_dataset is not None, "pretrained_dataset": pretrained_dataset}
+    )
+
+
 @router.get(
     "",
     response_model=ModelArchitectures,
@@ -38,7 +58,7 @@ def get_model_architectures(task: TaskType) -> ModelArchitectures:
     top_picks = RECOMMENDED_MODEL_ARCHITECTURES.get(task, None)
 
     architectures = [
-        ModelArchitectureView.model_validate(manifest, from_attributes=True)
+        _to_architecture_view(manifest)
         for manifest in model_manifests.values()
         if manifest.task == task
     ]

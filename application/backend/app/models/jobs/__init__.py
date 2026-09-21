@@ -5,6 +5,7 @@ from .export_dataset_job import ExportDatasetJob, ExportDatasetJobParams
 from .import_dataset_as_new_project_job import ImportDatasetAsNewProjectJob, ImportDatasetAsNewProjectJobParams
 from .import_dataset_to_project_job import ImportDatasetToProjectJob, ImportDatasetToProjectJobParams
 from .prepare_dataset_for_import_job import PrepareDatasetForImportJob, PrepareDatasetForImportJobParams
+from .pretrained_auto_label_job import PretrainedAutoLabelJob, PretrainedAutoLabelJobParams
 from .quantization_job import QuantizationJob, QuantizationJobParams
 from .training_job import TrainingJob, TrainingJobParams
 
@@ -17,6 +18,8 @@ __all__ = [
     "ImportDatasetToProjectJobParams",
     "PrepareDatasetForImportJob",
     "PrepareDatasetForImportJobParams",
+    "PretrainedAutoLabelJob",
+    "PretrainedAutoLabelJobParams",
     "QuantizationJob",
     "QuantizationJobParams",
     "TrainingJob",

@@ -530,14 +530,21 @@ export const createGetiTools = (currentProjectId: string): Record<string, ToolEx
                 })
             ),
 
-        start_quantization: async (args) =>
-            unwrap(
+        start_quantization: async (args) => {
+            const model = unwrap(
+                await fetchClient.GET('/api/projects/{project_id}/models/{model_id}', {
+                    params: { path: modelPath(args) },
+                })
+            );
+            return unwrap(
                 await fetchClient.POST('/api/jobs', {
                     body: {
                         job_type: 'quantize',
                         project_id: projectOf(args),
                         parameters: {
-                            model_id: requireString(args.model_id, 'model_id'),
+                            model_id: model.id,
+                            model_architecture_id: model.architecture,
+                            max_num_iterations: typeof args.max_drop === 'number' ? 10 : null,
                             max_calibration_subset_size:
                                 typeof args.max_calibration_subset_size === 'number'
                                     ? args.max_calibration_subset_size
@@ -546,7 +553,8 @@ export const createGetiTools = (currentProjectId: string): Record<string, ToolEx
                         },
                     },
                 })
-            ),
+            );
+        },
 
         cancel_job: async (args) =>
             unwrap(

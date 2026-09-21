@@ -13,8 +13,10 @@ In Geti, every _project_ addresses a specific _task_. The currently supported ta
 - **Detection**: Identify and localize objects in images using bounding boxes.
 - **Instance Segmentation**: Identify and segment objects in images using polygons.
 
-After creating a project, the task type is fixed and cannot be changed. On the other hand, the user can
-customize the label structure of the task by adding, removing or editing labels.
+After creating a project, the task type is fixed and cannot be changed. Labels are optional during project
+creation. The user can add, remove, or edit them later from the **Labels** page, and Auto-Label can create labels
+from pretrained model or ChatGPT predictions. Training remains unavailable until the project has at least one label;
+multiclass classification requires at least two.
 
 Labels are uniquely identified by a UUID, which is immutable. They also have a name and other frontend-related
 attributes (color, hotkey, etc.) that can be modified by the user.
@@ -34,7 +36,7 @@ attributes (color, hotkey, etc.) that can be modified by the user.
 `-----------------------------------'
                   | 1
                   |
-                  | 1..*
+                  | 0..*
  ,---------------------------------.
  |labels                           |
  |---------------------------------|
@@ -104,7 +106,9 @@ annotations and model input/outputs.
 
 ### Task - labels association
 
-The task defines one or more labels - the minimum number actually depends on the task type.
+The task can temporarily have no labels while a project is being prepared. Training requirements depend on the task
+type: detection, instance segmentation, and multilabel classification require at least one label, while multiclass
+classification requires at least two.
 Labels strictly belong to the task (project): they can't be reparented to a different project, but they can be modified
 or deleted. Labels can't exist independently of the project because the type of task affects certain semantic
 propositions about the labels themselves.

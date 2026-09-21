@@ -11,11 +11,16 @@ from app.core.jobs.models import Job, JobStatus, JobType
 
 from .dataset_export import ExportDatasetMetadata
 from .dataset_import import ImportDatasetMetadata
+from .pretrained_auto_label import PretrainedAutoLabelMetadata
 from .quantization import QuantizationMetadata
 from .training import TrainingMetadata
 
 JobMetadata = Annotated[
-    TrainingMetadata | QuantizationMetadata | ImportDatasetMetadata | ExportDatasetMetadata,
+    TrainingMetadata
+    | QuantizationMetadata
+    | ImportDatasetMetadata
+    | ExportDatasetMetadata
+    | PretrainedAutoLabelMetadata,
     Field(..., description="Metadata associated with the job"),
 ]
 
@@ -72,6 +77,8 @@ class JobView(BaseModel):
                 metadata = ImportDatasetMetadata.model_validate(job)
             case JobType.EXPORT_DATASET | JobType.STAGE_DATASET:
                 metadata = ExportDatasetMetadata.model_validate(job)
+            case JobType.PRETRAINED_AUTO_LABEL:
+                metadata = PretrainedAutoLabelMetadata.model_validate(job)
             case _:
                 raise ValueError("Metadata is not defined for this job type")
 

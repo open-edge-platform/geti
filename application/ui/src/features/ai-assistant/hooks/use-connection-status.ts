@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useAiConnection } from '../connection';
 import { codexStatus } from '../transport/codex-transport';
@@ -27,7 +27,8 @@ const describe = (reason: unknown): string =>
  * so the settings can show, at a glance, which one is already connected.
  */
 export const useConnectionStatus = (): ConnectionStatus => {
-    const { provider } = useAiConnection();
+    const { provider, executable } = useAiConnection();
+    const previousExecutable = useRef(executable);
 
     const [isLoading, setIsLoading] = useState(true);
     const [hasKey, setHasKey] = useState(false);
@@ -42,14 +43,20 @@ export const useConnectionStatus = (): ConnectionStatus => {
 
         setIsLoading(true);
         setError(null);
+        if (previousExecutable.current !== executable) {
+            previousExecutable.current = executable;
+            setAccount(null);
+        }
 
-        void Promise.allSettled([hasStoredKey(), codexStatus()]).then(([key, codex]) => {
+        void Promise.allSettled([hasStoredKey(), codexStatus(revision > 0)]).then(([key, codex]) => {
             if (!isCurrent) {
                 return;
             }
 
-            setHasKey(key.status === 'fulfilled' && key.value);
-            setAccount(codex.status === 'fulfilled' ? codex.value : null);
+            if (key.status === 'fulfilled') setHasKey(key.value);
+            // A failed probe says nothing about whether the user signed out.
+            // Only a successful account/read returning null may clear an account.
+            if (codex.status === 'fulfilled') setAccount(codex.value);
 
             // Only the provider in use may raise an error; a failed probe of the
             // other one simply reads as "not connected".
@@ -62,7 +69,7 @@ export const useConnectionStatus = (): ConnectionStatus => {
         return () => {
             isCurrent = false;
         };
-    }, [provider, revision]);
+    }, [provider, executable, revision]);
 
     return {
         isLoading,

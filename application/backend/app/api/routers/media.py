@@ -605,8 +605,7 @@ def set_media_annotations(
             project=project,
             dataset_item_id=dataset_item_id,
             annotations=media_annotations.annotations,
-            # Annotations submitted via API are considered user-reviewed, unlike auto-generated predictions
-            user_reviewed=True,
+            user_reviewed=media_annotations.user_reviewed,
             prediction_model_id=None,
         )
     except AnnotationValidationError as e:

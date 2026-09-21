@@ -3,22 +3,15 @@
 
 import { useEffect, useState } from 'react';
 
-import { Button, ComboBox, Content, Flex, InlineAlert, Item, Picker, Text, TextArea, TextField } from '@geti-ui/ui';
+import { Button, ComboBox, Content, Flex, InlineAlert, Item, Text, TextArea, TextField } from '@geti-ui/ui';
 
 import { Link } from '../../../platform/components/link.component';
 import { OPENAI_API_KEYS_URL, SUGGESTED_API_MODELS } from '../config';
 import { setAiConnection, setAiProvider, useAiConnection } from '../connection';
 import type { ConnectionStatus } from '../hooks/use-connection-status';
-import {
-    codexDiagnostics,
-    codexLocate,
-    codexLogin,
-    codexLogout,
-    codexModels,
-    pickCodexBinary,
-} from '../transport/codex-transport';
+import { codexDiagnostics, codexLocate, codexLogin, codexLogout, pickCodexBinary } from '../transport/codex-transport';
 import { deleteKey, saveKey } from '../transport/key-service';
-import type { CodexLocation, CodexModel } from '../types';
+import type { CodexLocation } from '../types';
 
 import classes from './assistant.module.scss';
 
@@ -105,9 +98,8 @@ const ApiKeySettings = ({ status }: { status: ConnectionStatus }) => {
 };
 
 const ChatGptSettings = ({ status }: { status: ConnectionStatus }) => {
-    const { model, executable } = useAiConnection();
+    const { executable } = useAiConnection();
 
-    const [models, setModels] = useState<CodexModel[]>([]);
     const [location, setLocation] = useState<CodexLocation | null>(null);
     const [report, setReport] = useState<string | null>(null);
     const [isBusy, setIsBusy] = useState(false);
@@ -131,29 +123,6 @@ const ChatGptSettings = ({ status }: { status: ConnectionStatus }) => {
             isCurrent = false;
         };
     }, [status.account, executable]);
-
-    useEffect(() => {
-        if (!isSignedIn) {
-            setModels([]);
-
-            return;
-        }
-
-        let isCurrent = true;
-
-        void codexModels()
-            .then((available) => {
-                if (isCurrent) {
-                    setModels(available);
-                }
-            })
-            // A failed lookup only costs the dropdown; the account default still works.
-            .catch(() => undefined);
-
-        return () => {
-            isCurrent = false;
-        };
-    }, [isSignedIn]);
 
     const run = (action: () => Promise<void>) => {
         setIsBusy(true);
@@ -213,25 +182,12 @@ const ChatGptSettings = ({ status }: { status: ConnectionStatus }) => {
                 <Button
                     variant={isSignedIn ? 'secondary' : 'accent'}
                     isPending={isBusy}
+                    isDisabled={isBusy || status.isLoading}
                     onPress={() => run(isSignedIn ? codexLogout : () => codexLogin(() => setError(null)))}
                 >
                     {isSignedIn ? 'Sign out' : 'Sign in'}
                 </Button>
             </Flex>
-
-            {isSignedIn && models.length > 0 && (
-                <Picker
-                    width={'100%'}
-                    label={'Model'}
-                    selectedKey={model === '' ? null : model}
-                    placeholder={'Account default'}
-                    onSelectionChange={(key) => setAiConnection({ model: String(key) })}
-                >
-                    {models.map((available) => (
-                        <Item key={available.id}>{available.label}</Item>
-                    ))}
-                </Picker>
-            )}
 
             <Flex direction={'column'} gap={'size-75'}>
                 <Flex alignItems={'end'} gap={'size-100'}>

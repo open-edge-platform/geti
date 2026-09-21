@@ -27,6 +27,7 @@ import { useAnnotationActions } from '../../../../shared/annotator/annotation-ac
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
 import { isImage, isVideoFrame } from '../../../../shared/media-item-utils';
+import { ChatGptAnnotationButton } from '../../../ai-assistant/annotation/annotation-entry.component';
 import { Labels } from '../../../annotator/labels/labels.component';
 import { usePredictionSetup } from '../../../annotator/predictions-setup-provider.component';
 import { useVideoPlayerContext } from '../../../annotator/video-player/video-player-provider.component';
@@ -214,6 +215,7 @@ export const SecondaryToolbar = ({
             <Toolbar.Container>
                 <Toolbar.Section>
                     <ButtonGroup UNSAFE_className={classes.buttonsGroup}>
+                        {isAnnotationMode && <ChatGptAnnotationButton />}
                         {isPredictionMode && (
                             <PredictionButtons
                                 onModeChange={onModeChange}

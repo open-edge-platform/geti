@@ -7,7 +7,7 @@ import type { Label } from '@/api/types';
 import { HotkeyField } from '@/components/label-fields/hotkey-field.component';
 import { LabelColorPicker } from '@/components/label-fields/label-color-picker.component';
 import { SilentCheckbox } from '@/components/label-fields/silent-checkbox.component';
-import { ActionButton, Flex, Grid, TextField, Tooltip, TooltipTrigger } from '@geti-ui/ui';
+import { ActionButton, Flex, Grid, TextField, Tooltip, TooltipTrigger, View } from '@geti-ui/ui';
 import { Delete, Pin, Unpin } from '@geti-ui/ui/icons';
 
 import { useDebounce } from '../../../../hooks/use-debounce.hook';
@@ -27,6 +27,8 @@ export type LabelRowProps = {
     onUpdate: (labelId: string, updates: { name: string; color: string; hotkey: string | null | undefined }) => void;
     validateName: (name: string, excludeId?: string) => string | undefined;
     validateHotkey: (newHotkey: string, excludeId?: string) => string | undefined;
+    showSelection?: boolean;
+    showPin?: boolean;
 };
 
 const onEnter = (handler: () => void) => (event: KeyboardEvent) => {
@@ -43,6 +45,8 @@ export const LabelRow = ({
     onUpdate,
     validateName,
     validateHotkey,
+    showSelection = true,
+    showPin = true,
 }: LabelRowProps) => {
     const [name, setName] = useState(label.name);
     const [color, setColor] = useState(label.color);
@@ -91,7 +95,11 @@ export const LabelRow = ({
             UNSAFE_className={classes.labelRow}
             UNSAFE_style={{ '--label-color': color }}
         >
-            <SilentCheckbox isSelected={isSelected} onChange={onSelect} aria-label={`Select ${label.name} label`} />
+            {showSelection ? (
+                <SilentCheckbox isSelected={isSelected} onChange={onSelect} aria-label={`Select ${label.name} label`} />
+            ) : (
+                <View />
+            )}
 
             <LabelColorPicker color={color} onChange={handleColorChange} />
 
@@ -118,17 +126,21 @@ export const LabelRow = ({
                 />
             </Flex>
 
-            <TooltipTrigger>
-                <ActionButton
-                    aria-label={isPinned ? `Unpin ${label.name} label` : `Pin ${label.name} label`}
-                    isQuiet
-                    UNSAFE_className={isPinned ? classes.pinButtonPinned : classes.pinButton}
-                    onPress={() => onTogglePin(label)}
-                >
-                    {isPinned ? <Pin /> : <Unpin />}
-                </ActionButton>
-                <Tooltip>{isPinned ? 'Unpin label' : 'Pin label'}</Tooltip>
-            </TooltipTrigger>
+            {showPin ? (
+                <TooltipTrigger>
+                    <ActionButton
+                        aria-label={isPinned ? `Unpin ${label.name} label` : `Pin ${label.name} label`}
+                        isQuiet
+                        UNSAFE_className={isPinned ? classes.pinButtonPinned : classes.pinButton}
+                        onPress={() => onTogglePin(label)}
+                    >
+                        {isPinned ? <Pin /> : <Unpin />}
+                    </ActionButton>
+                    <Tooltip>{isPinned ? 'Unpin label' : 'Pin label'}</Tooltip>
+                </TooltipTrigger>
+            ) : (
+                <View />
+            )}
 
             <ActionButton
                 aria-label={`Delete ${label.name} label`}

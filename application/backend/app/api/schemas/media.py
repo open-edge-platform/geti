@@ -148,6 +148,10 @@ class SetMediaAnnotations(BaseModel):
             "Returns a conflict error if a different subset is already assigned."
         ),
     )
+    user_reviewed: bool = Field(
+        True,
+        description="Whether a user reviewed these annotations. Auto-label clients set this to false.",
+    )
 
     model_config = {
         "json_schema_extra": {

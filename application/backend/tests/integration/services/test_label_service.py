@@ -287,24 +287,25 @@ class TestLabelServiceIntegration:
         assert exc_info.value.resource_type == ResourceType.LABEL
         assert exc_info.value.resource_id == str(nonexistent_id)
 
-    def test_update_labels_remove_all_raises_value_error(
+    def test_update_labels_remove_all(
         self,
         fxt_stored_project_with_labels: tuple[ProjectDB, list[LabelDB]],
         fxt_label_service: LabelService,
     ) -> None:
         """
-        Test removing all labels raises ValueError (project requires at least one label).
+        Test removing all labels leaves an empty label list.
         """
         db_project, db_labels = fxt_stored_project_with_labels
         project = _db_project_to_project(db_project)
 
-        with pytest.raises(ValueError, match="A project requires at least one label"):
-            fxt_label_service.update_labels(
-                project=project,
-                labels_to_add=[],
-                labels_to_remove=[LabelReference(id=UUID(lbl.id)) for lbl in db_labels],
-                labels_to_edit=[],
-            )
+        result = fxt_label_service.update_labels(
+            project=project,
+            labels_to_add=[],
+            labels_to_remove=[LabelReference(id=UUID(lbl.id)) for lbl in db_labels],
+            labels_to_edit=[],
+        )
+
+        assert result == []
 
     def test_update_labels_empty(
         self,

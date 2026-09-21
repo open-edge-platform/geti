@@ -26,6 +26,16 @@ class ModelArchitectureView(BaseModel):
     support_status: ModelManifestDeprecationStatus = Field(
         title="Support Status", description="Current support level (active, deprecated, or obsolete)"
     )
+    pretrained_auto_label: bool = Field(
+        default=False,
+        title="Pretrained auto-label support",
+        description="Whether the original pretrained checkpoint can produce semantic labels before fine-tuning",
+    )
+    pretrained_dataset: str | None = Field(
+        default=None,
+        title="Pretrained dataset",
+        description="Ontology carried by the original pretrained checkpoint, such as COCO-80 or ImageNet-1K",
+    )
 
 
 class TopPicks(BaseModel):

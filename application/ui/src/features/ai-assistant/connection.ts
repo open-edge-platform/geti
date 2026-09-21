@@ -60,6 +60,7 @@ export const setAiConnection = (update: Partial<AiConnection>): void => {
 };
 
 export const setAiProvider = (provider: AiProvider): void => {
+    if (connection.provider === provider) return;
     // The two providers do not share a model namespace, so switching also
     // resets the model to that provider's default.
     setAiConnection({

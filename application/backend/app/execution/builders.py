@@ -33,6 +33,13 @@ def build_quantizer(**deps: Any) -> Runnable:
     return GetiTuneQuantizer(quantization_deps=QuantizationDependencies(**deps))
 
 
+def build_pretrained_auto_label(**deps: Any) -> Runnable:
+    """Lazily import and build pretrained auto-label inference in the worker process."""
+    from app.execution.pretrained_auto_label import PretrainedAutoLabel, PretrainedAutoLabelDependencies
+
+    return PretrainedAutoLabel(PretrainedAutoLabelDependencies(**deps))
+
+
 def build_export_dataset(**kwargs: Any) -> Runnable:
     """Lazily import and build a dataset-export runnable in the worker process."""
     from app.execution import ExportDataset

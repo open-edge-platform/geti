@@ -12,6 +12,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
 import { ToolProvider } from '../../../shared/annotator/tool-provider.component';
 import { isVideoFrame } from '../../../shared/media-item-utils';
+import { useAnnotationReview } from '../../ai-assistant/annotation/annotation-review-provider.component';
 import { getMediaPredictionsQueryKeyPrefix, useMediaPredictions } from '../../annotator/api/use-media-predictions';
 import { PredictionsSetupProvider, usePredictionSetup } from '../../annotator/predictions-setup-provider.component';
 import {
@@ -27,6 +28,8 @@ import { SIDEBAR_WIDTH } from './constants';
 import { SidebarItems } from './sidebar-items/sidebar-items.component';
 import { useAnnotatorMediaTransition } from './use-annotator-media-transition.hook';
 import { getInitialAnnotations, useAnnotatorMode } from './utils';
+
+import classes from './media-preview.module.scss';
 
 type MediaPreviewProps = {
     close: () => void;
@@ -69,6 +72,7 @@ const MediaPreviewPanels = ({
 }: MediaPreviewPanelsProps) => {
     const { mediaItem } = useSelectedMediaItem();
     const handleMediaTransition = useAnnotatorMediaTransition({ onSelectedMediaItem });
+    const review = useAnnotationReview();
 
     return (
         <>
@@ -82,15 +86,18 @@ const MediaPreviewPanels = ({
                 onSelectedMediaItem={handleMediaTransition}
             />
 
-            <View gridArea={'aside'}>
-                <SidebarItems
-                    items={items}
-                    mediaItem={mediaItem}
-                    isFetchingNextPage={isFetchingNextPage}
-                    fetchNextPage={fetchNextPage}
-                    isUserReviewed={isMediaItemReviewedById}
-                    onSelectedMediaItem={handleMediaTransition}
-                />
+            <View gridArea={'aside'} UNSAFE_className={classes.aside}>
+                <div className={classes.mediaList}>
+                    <SidebarItems
+                        items={items}
+                        mediaItem={mediaItem}
+                        isFetchingNextPage={isFetchingNextPage}
+                        fetchNextPage={fetchNextPage}
+                        isUserReviewed={isMediaItemReviewedById}
+                        onSelectedMediaItem={handleMediaTransition}
+                    />
+                </div>
+                <div ref={review?.setPanelHost} className={classes.assistantHost} />
             </View>
         </>
     );
@@ -192,6 +199,7 @@ export const MediaPreview = ({ close, onSelectedMediaItem }: MediaPreviewProps) 
         >
             <Content>
                 <Grid
+                    UNSAFE_className={classes.grid}
                     gap='size-125'
                     width='100%'
                     height='100%'

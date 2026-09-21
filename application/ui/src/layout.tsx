@@ -53,6 +53,13 @@ const Header = () => {
                         {t('navigation.dataset')}
                     </Item>
                     <Item
+                        textValue={t('navigation.labelsDescription')}
+                        key={'labels'}
+                        href={paths.project.labels({ projectId })}
+                    >
+                        {t('navigation.labels')}
+                    </Item>
+                    <Item
                         textValue={t('navigation.modelsDescription')}
                         key={'models'}
                         href={paths.project.models({ projectId })}

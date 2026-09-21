@@ -4,8 +4,6 @@
 import { Dispatch, SetStateAction } from 'react';
 
 import type { Label, TaskType } from '@/api/types';
-import { toast } from '@/components/toast/toast.component';
-import { useTranslation } from '@/i18n';
 import { Flex } from '@geti-ui/ui';
 
 import { CreateLabel } from './create-label/create-label.component';
@@ -18,15 +16,8 @@ type LabelSelectionProps = {
 };
 
 export const LabelSelection = ({ labels, setLabels, taskType }: LabelSelectionProps) => {
-    const { t } = useTranslation();
-
     const handleDeleteItem = (id: string) => {
-        const newLabels = labels.filter((label) => label.id !== id);
-        setLabels(newLabels);
-
-        if (newLabels.length === 0) {
-            toast({ type: 'info', message: t('project.create.labels.atLeastOneRequired') });
-        }
+        setLabels(labels.filter((label) => label.id !== id));
     };
 
     const handleAddItem = (label: Label) => {

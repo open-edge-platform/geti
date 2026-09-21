@@ -55,14 +55,7 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
           );
 
     const isSingleLabelClassification = isClassificationTask(selectedTask) && classificationTaskType === 'single-label';
-    const needsMinimumNumberOfLabels = isSingleLabelClassification && labels.length < 2;
-
-    const isCreateProjectDisabled =
-        isSubmitting ||
-        selectedTask === null ||
-        validationErrorMessage !== undefined ||
-        labels.length === 0 ||
-        needsMinimumNumberOfLabels;
+    const isCreateProjectDisabled = isSubmitting || selectedTask === null || validationErrorMessage !== undefined;
 
     const createProject = (e: FormEvent) => {
         e.preventDefault();
@@ -142,6 +135,7 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
                                     {t('project.create.labelsQuestion', { verb: taskVerb })}
                                 </Text>
                             </Flex>
+                            <Text>{t('project.create.labelsOptional')}</Text>
                             <LabelSelection labels={labels} setLabels={setLabels} taskType={selectedTask} />
                         </Flex>
                     )}

@@ -11,6 +11,7 @@ from .dataset_import import (
     ImportDatasetToProjectRequest,
     PrepareDatasetForImportRequest,
 )
+from .pretrained_auto_label import PretrainedAutoLabelRequest
 from .quantization import QuantizationRequest
 from .training import TrainingRequest
 
@@ -21,7 +22,8 @@ JobRequest = Annotated[
     | PrepareDatasetForImportRequest
     | ImportDatasetAsNewProjectRequest
     | ExportDatasetRequest
-    | StageDatasetRequest,
+    | StageDatasetRequest
+    | PretrainedAutoLabelRequest,
     Field(discriminator="job_type"),
 ]
 

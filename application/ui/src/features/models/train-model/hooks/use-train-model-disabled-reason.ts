@@ -1,6 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useProject } from 'hooks/api/project.hook';
 import { useGetDatasetItems } from 'hooks/use-get-dataset-items.hook';
 
 import { pluralizeItems } from '../../../../shared/util';
@@ -12,6 +13,7 @@ const pluralRules = new Intl.PluralRules('en');
 const conjugateToBe = (count: number) => (pluralRules.select(count) === 'one' ? 'is' : 'are');
 
 export const useTrainModelDisabledReason = () => {
+    const { data: project } = useProject();
     const { totalCount, isPending: isTotalPending } = useGetDatasetItems({ annotationStatus: 'with_annotations' });
     const { totalCount: trainingSubsetSize, isPending: isTrainingPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
@@ -42,6 +44,14 @@ export const useTrainModelDisabledReason = () => {
         isUnassignedPending
     ) {
         return { reason: undefined };
+    }
+
+    const labels = project.task.labels ?? [];
+    if (labels.length === 0) {
+        return { reason: 'Create labels manually or run Auto-Label before training a model.' };
+    }
+    if (project.task.exclusive_labels && labels.length < 2) {
+        return { reason: 'Single-label classification needs at least two labels before training.' };
     }
 
     if (totalCount < MIN_NUMBER_OF_ANNOTATED_ITEMS) {

@@ -39,13 +39,27 @@ export const loadMediaAttachment = async (source: MediaAttachmentSource): Promis
         throw new Error(`Could not load "${source.name}".`);
     }
 
-    const original = await readAsDataUrl(await response.blob());
+    return prepareAttachment(await response.blob(), source.id, source.name);
+};
+
+export const loadFileAttachment = (file: File): Promise<ChatAttachment> => {
+    if (!['image/png', 'image/jpeg', 'image/webp', 'image/gif'].includes(file.type)) {
+        return Promise.reject(new Error('Choose a PNG, JPEG, WebP or GIF image.'));
+    }
+    if (file.size > 20 * 1024 * 1024) {
+        return Promise.reject(new Error('Choose an image smaller than 20 MB.'));
+    }
+    return prepareAttachment(file, crypto.randomUUID(), file.name);
+};
+
+const prepareAttachment = async (blob: Blob, id: string, name: string): Promise<ChatAttachment> => {
+    const original = await readAsDataUrl(blob);
     const image = await loadImage(original);
 
     const longestEdge = Math.max(image.naturalWidth, image.naturalHeight);
 
     if (longestEdge <= ATTACHMENT_MAX_EDGE) {
-        return { id: source.id, name: source.name, dataUrl: original };
+        return { id, name, dataUrl: original };
     }
 
     const scale = ATTACHMENT_MAX_EDGE / longestEdge;
@@ -56,10 +70,10 @@ export const loadMediaAttachment = async (source: MediaAttachmentSource): Promis
     const context = canvas.getContext('2d');
 
     if (context === null) {
-        return { id: source.id, name: source.name, dataUrl: original };
+        throw new Error('Could not resize the image. Try a smaller image.');
     }
 
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
 
-    return { id: source.id, name: source.name, dataUrl: canvas.toDataURL('image/jpeg', 0.85) };
+    return { id, name, dataUrl: canvas.toDataURL('image/jpeg', 0.85) };
 };

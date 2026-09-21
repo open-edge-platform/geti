@@ -10,6 +10,7 @@ import type { ChatMessage, ChatStatus, ChatToolCall } from '../types';
 import classes from './assistant.module.scss';
 
 const TOOL_LABELS: Record<string, string> = {
+    propose_annotations: 'Adding annotations to the image',
     list_projects: 'Reading your projects',
     get_project: 'Reading the project setup',
     get_dataset_statistics: 'Reading dataset statistics',

@@ -77,6 +77,7 @@ class TestJobEndpoints:
         project.task = Mock(spec=Task)
         project.task.task_type = TaskType.CLASSIFICATION
         project.task.exclusive_labels = True
+        project.task.labels = [Mock(), Mock()]
         fxt_project_service.get_project_by_id.return_value = project
 
         mock_manifest = Mock()
@@ -153,6 +154,38 @@ class TestJobEndpoints:
         assert submitted_job.params.max_drop == 0.01
         assert submitted_job.params.max_num_iterations == 5
         assert submitted_job.project_id == project.id
+
+    def test_submit_pretrained_auto_label_job(
+        self, fxt_app, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service
+    ):
+        fxt_app.dependency_overrides[get_job_dir] = lambda: tmp_path / "logs" / "jobs"
+        project = Mock(spec=Project)
+        project.id = uuid4()
+        project.task = Task(task_type=TaskType.DETECTION)
+        fxt_project_service.get_project_by_id.return_value = project
+        manifest = Mock(
+            id="object-detection-yolo11-n",
+            task=TaskType.DETECTION,
+        )
+        request = JobRequestAdapter.validate_python(
+            {
+                "project_id": project.id,
+                "job_type": JobType.PRETRAINED_AUTO_LABEL,
+                "parameters": {
+                    "model_architecture_id": manifest.id,
+                    "confidence_threshold": 0.4,
+                },
+            }
+        )
+
+        with patch("app.api.routers.jobs.ModelManifestService.get_model_manifest_by_id", return_value=manifest):
+            response = fxt_client.post("/api/jobs", json=request.model_dump(mode="json"))
+
+        assert response.status_code == status.HTTP_202_ACCEPTED
+        assert response.json()["job_type"] == JobType.PRETRAINED_AUTO_LABEL
+        submitted_job = fxt_jobs_queue.submit.call_args.args[0]
+        assert submitted_job.params.model_architecture_id == manifest.id
+        assert submitted_job.params.confidence_threshold == 0.4
 
     def test_submit_quantize_job_defaults(self, fxt_app, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service):
         """Quantize request without max_drop uses defaults (None for max_drop, 100 for subset size)."""

@@ -406,12 +406,31 @@ async fn codex_version(binary: &Path) -> String {
 
 fn auth_state(home: &Path) -> &'static str {
     if home.join("auth.json").is_file() {
-        "auth.json present"
+        "auth.json present (account status not checked)"
     } else if home.is_dir() {
-        "no auth.json (recent Codex versions keep credentials in the OS keyring)"
+        "no auth.json (credentials may be in the OS keyring)"
     } else {
-        "directory missing"
+        "never used (directory missing)"
     }
+}
+
+/// Resolve the physical directory before handing it to an external process.
+/// MSIX can redirect Geti's AppData writes into its package's LocalCache while
+/// Codex sees the unvirtualized filesystem. On Windows, canonicalize resolves
+/// the created directory through its handle (GetFinalPathNameByHandle).
+fn prepare_codex_home(app_data: &Path) -> Result<PathBuf, String> {
+    let home = app_data.join("assistant-codex");
+    std::fs::create_dir_all(home.join("workspace"))
+        .map_err(|error| format!("Could not prepare ChatGPT storage: {error}"))?;
+    std::fs::canonicalize(&home).map_err(|error| format!("Could not resolve the ChatGPT storage path: {error}"))
+}
+
+fn codex_home(app: &AppHandle) -> Result<PathBuf, String> {
+    let app_data = app
+        .path()
+        .app_data_dir()
+        .map_err(|_| "Application storage unavailable.".to_string())?;
+    prepare_codex_home(&app_data)
 }
 
 /// Plain-text report the user can copy out of the settings when sign-in fails.
@@ -439,12 +458,11 @@ pub async fn codex_diagnostics(app: AppHandle, executable: Option<String>) -> Re
         Err(error) => report.push(format!("resolved executable: {error}")),
     }
 
-    match app.path().app_data_dir() {
-        Ok(dir) => {
-            let home = dir.join("assistant-codex");
+    match codex_home(&app) {
+        Ok(home) => {
             report.push(format!("CODEX_HOME used by Geti: {} - {}", home.display(), auth_state(&home)));
         }
-        Err(_) => report.push("CODEX_HOME used by Geti: unavailable".to_string()),
+        Err(error) => report.push(format!("CODEX_HOME used by Geti: {error}")),
     }
 
     if let Some(home) = home_dir() {
@@ -576,18 +594,13 @@ async fn run(
     body: Value,
     events: Channel<Value>,
 ) -> Result<Value, String> {
-    let home = app
-        .path()
-        .app_data_dir()
-        .map_err(|_| "Application storage unavailable.".to_string())?
-        .join("assistant-codex");
+    trace_reset();
+    trace(format!("operation: {operation}"));
+    let home = codex_home(app).inspect_err(|error| trace(format!("failed: {error}")))?;
     let workspace = home.join("workspace");
-    std::fs::create_dir_all(&workspace).map_err(|_| "Could not prepare ChatGPT storage.".to_string())?;
 
     let binary = resolve_binary(executable)?;
 
-    trace_reset();
-    trace(format!("operation: {operation}"));
     trace(format!(
         "executable: {} (batch shim: {})",
         binary.display(),
@@ -918,4 +931,59 @@ fn build_turn_input(body: &Value) -> Vec<Value> {
     }));
 
     input
+}
+
+#[cfg(test)]
+mod tests {
+    use super::prepare_codex_home;
+    use std::path::PathBuf;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    struct TestDirectory(PathBuf);
+
+    impl TestDirectory {
+        fn new() -> Self {
+            static NEXT: AtomicUsize = AtomicUsize::new(0);
+            let path = std::env::temp_dir().join(format!(
+                "geti-codex-storage-{}-{}-{}",
+                std::process::id(),
+                std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .unwrap()
+                    .as_nanos(),
+                NEXT.fetch_add(1, Ordering::Relaxed),
+            ));
+            std::fs::create_dir(&path).unwrap();
+            Self(path)
+        }
+    }
+
+    impl Drop for TestDirectory {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+
+    #[test]
+    fn prepares_storage_before_resolving_and_preserves_existing_files() {
+        let directory = TestDirectory::new();
+        let app_data = directory.0.join("app-data");
+        let home = prepare_codex_home(&app_data).unwrap();
+        assert!(home.is_absolute());
+        assert!(home.join("workspace").is_dir());
+        assert_eq!(home, std::fs::canonicalize(app_data.join("assistant-codex")).unwrap());
+
+        let marker = home.join("existing-profile.txt");
+        std::fs::write(&marker, "keep existing profile").unwrap();
+        assert_eq!(prepare_codex_home(&app_data).unwrap(), home);
+        assert_eq!(std::fs::read_to_string(marker).unwrap(), "keep existing profile");
+    }
+
+    #[test]
+    fn reports_storage_failure_instead_of_returning_an_unusable_path() {
+        let directory = TestDirectory::new();
+        std::fs::write(directory.0.join("assistant-codex"), "not a directory").unwrap();
+        let error = prepare_codex_home(&directory.0).unwrap_err();
+        assert!(error.starts_with("Could not prepare ChatGPT storage:"));
+    }
 }

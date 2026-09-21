@@ -6,14 +6,16 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActionButton, Content, Flex, Heading, InlineAlert, Text, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Close, Delete, Gear } from '@geti-ui/ui/icons';
 
+import type { AnnotationTarget } from '../annotation/annotation-tools';
 import { MAX_ATTACHMENTS } from '../config';
 import { useAiConnection } from '../connection';
 import { useAssistantContext } from '../context/use-assistant-context';
 import { useConnectionStatus } from '../hooks/use-connection-status';
-import { loadMediaAttachment, type MediaAttachmentSource } from '../media-attachment';
+import { loadFileAttachment, loadMediaAttachment, type MediaAttachmentSource } from '../media-attachment';
 import { useAiChat } from '../runtime/use-ai-chat';
 import type { ChatAttachment } from '../types';
 import { ActionApproval } from './action-approval.component';
+import { ChatGptModelPicker } from './chatgpt-model-picker.component';
 import { Composer } from './composer.component';
 import { ConnectionSettings } from './connection-settings.component';
 import { MessageList } from './message-list.component';
@@ -25,13 +27,17 @@ interface AssistantDrawerProps {
     projectId: string;
     /** Dataset images the user may attach to a question. */
     attachmentSources: MediaAttachmentSource[];
+    annotationTarget?: AnnotationTarget;
     onClose: () => void;
 }
 
-export const AssistantDrawer = ({ projectId, attachmentSources, onClose }: AssistantDrawerProps) => {
+export const AssistantDrawer = ({ projectId, attachmentSources, annotationTarget, onClose }: AssistantDrawerProps) => {
     const context = useAssistantContext(projectId);
     const status = useConnectionStatus();
     const { provider, model } = useAiConnection();
+    const [attachments, setAttachments] = useState<ChatAttachment[]>([]);
+    const [attachmentError, setAttachmentError] = useState<string | null>(null);
+    const [isAttaching, setIsAttaching] = useState(false);
     const {
         messages,
         status: chatStatus,
@@ -40,11 +46,33 @@ export const AssistantDrawer = ({ projectId, attachmentSources, onClose }: Assis
         send,
         stop,
         clear,
-    } = useAiChat(projectId, context);
+    } = useAiChat(projectId, context, annotationTarget ? { target: annotationTarget } : undefined);
 
-    const [attachments, setAttachments] = useState<ChatAttachment[]>([]);
-    const [attachmentError, setAttachmentError] = useState<string | null>(null);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+    const sourceId = annotationTarget?.source.id;
+    const sourceUrl = annotationTarget?.source.url;
+    const sourceName = annotationTarget?.source.name;
+    useEffect(() => {
+        if (!sourceId || !sourceUrl || !sourceName) return;
+        let active = true;
+        setIsAttaching(true);
+        setAttachmentError(null);
+        void loadMediaAttachment({ id: sourceId, url: sourceUrl, name: sourceName })
+            .then((attachment) => {
+                if (active) setAttachments([attachment]);
+            })
+            .catch((error: unknown) => {
+                if (active)
+                    setAttachmentError(error instanceof Error ? error.message : 'Could not load the current image.');
+            })
+            .finally(() => {
+                if (active) setIsAttaching(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, [sourceId, sourceUrl, sourceName]);
 
     // An unusable connection is the one thing the user must fix first, so the
     // settings open themselves instead of hiding behind the gear -- and fold
@@ -58,17 +86,19 @@ export const AssistantDrawer = ({ projectId, attachmentSources, onClose }: Assis
     useEffect(() => {
         const close = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
+                event.stopImmediatePropagation();
                 onClose();
             }
         };
 
-        window.addEventListener('keydown', close);
+        window.addEventListener('keydown', close, true);
 
-        return () => window.removeEventListener('keydown', close);
+        return () => window.removeEventListener('keydown', close, true);
     }, [onClose]);
 
     const attach = useCallback((source: MediaAttachmentSource) => {
         setAttachmentError(null);
+        setIsAttaching(true);
 
         void loadMediaAttachment(source)
             .then((attachment) => {
@@ -80,12 +110,33 @@ export const AssistantDrawer = ({ projectId, attachmentSources, onClose }: Assis
             })
             .catch((reason: unknown) => {
                 setAttachmentError(reason instanceof Error ? reason.message : 'The image could not be attached.');
-            });
+            })
+            .finally(() => setIsAttaching(false));
     }, []);
 
+    const attachFiles = (files: File[]) => {
+        if (isAttaching || chatStatus === 'busy') return;
+        setIsAttaching(true);
+        setAttachmentError(null);
+        void Promise.all(files.slice(0, MAX_ATTACHMENTS - attachments.length).map(loadFileAttachment))
+            .then((loaded) => setAttachments((current) => [...current, ...loaded].slice(0, MAX_ATTACHMENTS)))
+            .catch((error: unknown) =>
+                setAttachmentError(error instanceof Error ? error.message : 'Could not attach images.')
+            )
+            .finally(() => setIsAttaching(false));
+    };
+
     const submit = (text: string) => {
-        send(text, attachments);
-        setAttachments([]);
+        if (isAttaching || !status.isReady || chatStatus === 'busy') return;
+        if (annotationTarget && !attachments.some(({ id }) => id === annotationTarget.source.id)) {
+            setAttachmentError('Attach the current image before generating annotations.');
+            return;
+        }
+        send(
+            text || (annotationTarget ? 'Annotate this image using the project labels.' : 'Describe this image.'),
+            attachments
+        );
+        if (!annotationTarget) setAttachments([]);
     };
 
     const providerLabel = provider === 'api' ? 'OpenAI API key' : 'ChatGPT app';
@@ -97,9 +148,13 @@ export const AssistantDrawer = ({ projectId, attachmentSources, onClose }: Assis
 
     return (
         <>
-            <div className={classes.overlay} onClick={onClose} aria-hidden />
+            {!annotationTarget && <div className={classes.overlay} onClick={onClose} aria-hidden />}
 
-            <aside className={classes.drawer} aria-label={'Annotate with ChatGPT'}>
+            <aside
+                className={[classes.drawer, annotationTarget ? classes.dockedDrawer : ''].join(' ')}
+                data-annotation-assistant={annotationTarget ? true : undefined}
+                aria-label={'Annotate with ChatGPT'}
+            >
                 <Flex UNSAFE_className={classes.header} alignItems={'center'} justifyContent={'space-between'}>
                     <Flex direction={'column'} gap={'size-25'}>
                         <Heading level={3} margin={0}>
@@ -149,11 +204,25 @@ export const AssistantDrawer = ({ projectId, attachmentSources, onClose }: Assis
                     </Flex>
                 </Flex>
 
+                {provider === 'chatgpt' && (
+                    <div className={classes.modelSelector}>
+                        <ChatGptModelPicker status={status} isBusy={chatStatus === 'busy'} />
+                    </div>
+                )}
                 {isSettingsOpen && <ConnectionSettings status={status} />}
 
                 <div className={classes.body}>
+                    {annotationTarget && (
+                        <Text>
+                            Current image: {annotationTarget.source.name}. It will be included when you send a message.
+                        </Text>
+                    )}
                     {messages.length === 0 ? (
-                        <WelcomeScreen onPick={status.isReady ? submit : () => setIsSettingsOpen(true)} />
+                        annotationTarget ? (
+                            <Text>Describe what to annotate, or press Send to use the project labels.</Text>
+                        ) : (
+                            <WelcomeScreen onPick={status.isReady ? submit : () => setIsSettingsOpen(true)} />
+                        )
                     ) : (
                         <MessageList messages={messages} status={chatStatus} />
                     )}
@@ -178,11 +247,13 @@ export const AssistantDrawer = ({ projectId, attachmentSources, onClose }: Assis
                         )}
 
                         <Composer
+                            placeholder={annotationTarget ? 'Describe what to annotate…' : undefined}
                             status={chatStatus}
-                            isDisabled={!status.isReady}
+                            isDisabled={!status.isReady || isAttaching}
                             attachments={attachments}
                             attachmentSources={attachmentSources}
                             onAttach={attach}
+                            onAttachFiles={annotationTarget ? undefined : attachFiles}
                             onRemoveAttachment={(id) =>
                                 setAttachments((previous) => previous.filter((attachment) => attachment.id !== id))
                             }

@@ -3,6 +3,7 @@
 
 from .job_request import JobRequest, JobRequestAdapter
 from .job_view import JobView
+from .pretrained_auto_label import PretrainedAutoLabelRequestParams
 from .quantization import QuantizationRequestParams
 from .training import JobType, TrainingRequestParams
 
@@ -11,6 +12,7 @@ __all__ = [
     "JobRequestAdapter",
     "JobType",
     "JobView",
+    "PretrainedAutoLabelRequestParams",
     "QuantizationRequestParams",
     "TrainingRequestParams",
 ]

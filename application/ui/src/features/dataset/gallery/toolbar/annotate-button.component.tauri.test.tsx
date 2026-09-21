@@ -11,6 +11,16 @@ import { AnnotateButton } from './annotate-button.component.tauri';
 
 const isAssistantAvailable = vi.fn(() => true);
 
+vi.mock('@geti-ui/ui/icons', () => ({
+    ChevronDownSmall: () => null,
+    AcceptCircle: () => null,
+    CrossCircle: () => null,
+    Alert: () => null,
+    Info: () => null,
+    CloseSmall: () => null,
+}));
+vi.mock('../../media-preview/utils', () => ({ useAnnotatorMode: () => ['annotation', vi.fn()] }));
+
 vi.mock('../../../ai-assistant/platform', () => ({
     isAssistantAvailable: () => isAssistantAvailable(),
 }));
@@ -31,13 +41,13 @@ vi.mock('hooks/use-project-identifier.hook', () => ({
 describe('AnnotateButton (desktop)', () => {
     const items = [getMockedMediaImage({ id: 'image-1' })] as Media[];
 
-    it('opens the assistant from the split button menu', async () => {
+    it('opens project chat from the split button menu', async () => {
         const onClick = vi.fn();
 
         render(<AnnotateButton items={items} onClick={onClick} />);
 
         await userEvent.click(screen.getByRole('button', { name: 'More annotate options' }));
-        await userEvent.click(await screen.findByRole('menuitem', { name: 'Annotate with ChatGPT' }));
+        await userEvent.click(await screen.findByRole('menuitem', { name: 'Ask ChatGPT about this project' }));
 
         expect(await screen.findByText('ChatGPT assistant')).toBeVisible();
         expect(onClick).not.toHaveBeenCalled();

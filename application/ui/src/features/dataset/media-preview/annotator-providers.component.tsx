@@ -11,6 +11,7 @@ import { AnnotationVisibilityProvider } from '../../../shared/annotator/annotati
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
 import { AnnotatorProvider } from '../../../shared/annotator/annotator-provider.component';
 import { SelectAnnotationProvider } from '../../../shared/annotator/select-annotation-provider.component';
+import { AnnotationReviewProvider } from '../../ai-assistant/annotation/annotation-review-provider.component';
 import { AnnotatorLabelsProvider } from '../../annotator/annotator-labels-provider.component';
 import { CanvasSettingsProvider } from './primary-toolbar/settings/canvas-settings-provider.component';
 
@@ -47,7 +48,9 @@ export const AnnotatorProviders = ({
                                 mode={mode}
                                 isReadOnly={isReadOnly}
                             >
-                                <SelectAnnotationProvider>{children}</SelectAnnotationProvider>
+                                <AnnotationReviewProvider>
+                                    <SelectAnnotationProvider>{children}</SelectAnnotationProvider>
+                                </AnnotationReviewProvider>
                             </AnnotationActionsProvider>
                         </AnnotatorLabelsProvider>
                     </CanvasSettingsProvider>

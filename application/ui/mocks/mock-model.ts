@@ -51,5 +51,7 @@ export const getMockedModelArchitecture = (
         },
     },
     support_status: 'active',
+    pretrained_auto_label: false,
+    pretrained_dataset: null,
     ...overrides,
 });

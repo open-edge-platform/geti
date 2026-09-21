@@ -47,6 +47,7 @@ export const useBulkAssignLabel = () => {
                 },
             },
             body: {
+                user_reviewed: true,
                 annotations: isEmpty(labelsWithoutEmptyLabel)
                     ? []
                     : [{ shape: { type: 'full_image' }, labels: labelsWithoutEmptyLabel }],

@@ -26,6 +26,7 @@ from app.execution.builders import (
     build_import_as_new_project,
     build_import_to_project,
     build_prepare_dataset,
+    build_pretrained_auto_label,
     build_quantizer,
     build_trainer,
 )
@@ -161,6 +162,18 @@ def setup_job_controller(
             dataset_revision_service=dataset_revision_service,
             project_service=project_service,
             training_configuration_service=TrainingConfigurationService(),
+            db_session_factory=get_db_session,
+        ),
+    )
+    job_runnable_factory.register(
+        JobType.PRETRAINED_AUTO_LABEL,
+        partial(
+            build_pretrained_auto_label,
+            base_weights_service=BaseWeightsService(data_dir=data_dir),
+            dataset_service=dataset_service,
+            label_service=label_service,
+            media_service=MediaService(data_dir=data_dir),
+            project_service=project_service,
             db_session_factory=get_db_session,
         ),
     )

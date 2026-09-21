@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useState, type KeyboardEvent } from 'react';
+import { useRef, useState, type KeyboardEvent } from 'react';
 
 import {
     ActionButton,
@@ -29,6 +29,8 @@ interface ComposerProps {
     attachments: ChatAttachment[];
     attachmentSources: MediaAttachmentSource[];
     onAttach: (source: MediaAttachmentSource) => void;
+    onAttachFiles?: (files: File[]) => void;
+    placeholder?: string;
     onRemoveAttachment: (id: string) => void;
     onSend: (text: string) => void;
     onStop: () => void;
@@ -40,14 +42,17 @@ export const Composer = ({
     attachments,
     attachmentSources,
     onAttach,
+    onAttachFiles,
+    placeholder = 'Ask about labels, models, training…',
     onRemoveAttachment,
     onSend,
     onStop,
 }: ComposerProps) => {
     const [text, setText] = useState('');
+    const fileInput = useRef<HTMLInputElement>(null);
 
     const isBusy = status === 'busy';
-    const canSend = !isBusy && !isDisabled && text.trim() !== '';
+    const canSend = !isBusy && !isDisabled && (text.trim() !== '' || attachments.length > 0);
 
     const submit = () => {
         if (!canSend) {
@@ -96,22 +101,52 @@ export const Composer = ({
                 width={'100%'}
                 height={'size-1000'}
                 aria-label={'Message'}
-                placeholder={'Ask about labels, models, training…'}
+                placeholder={placeholder}
                 value={text}
                 onChange={setText}
                 onKeyDown={handleKeyDown}
+                onPaste={(event) => {
+                    const files = Array.from(event.clipboardData.files);
+                    if (onAttachFiles && !isDisabled && !isBusy && files.length > 0) {
+                        event.preventDefault();
+                        onAttachFiles(files);
+                    }
+                }}
                 maxLength={MAX_INPUT_CHARS}
                 isDisabled={isDisabled}
             />
 
             <Flex alignItems={'center'} justifyContent={'space-between'} gap={'size-100'}>
                 <Flex alignItems={'center'} gap={'size-100'}>
+                    {onAttachFiles && (
+                        <>
+                            <input
+                                ref={fileInput}
+                                type={'file'}
+                                hidden
+                                multiple
+                                accept={'image/png,image/jpeg,image/webp,image/gif'}
+                                onChange={(event) => {
+                                    onAttachFiles(Array.from(event.target.files ?? []));
+                                    event.target.value = '';
+                                }}
+                            />
+                            <ActionButton
+                                isQuiet
+                                aria-label={'Attach images from computer'}
+                                isDisabled={isDisabled || isBusy || attachments.length >= MAX_ATTACHMENTS}
+                                onPress={() => fileInput.current?.click()}
+                            >
+                                <Image />
+                            </ActionButton>
+                        </>
+                    )}
                     {attachmentSources.length > 0 && (
                         <MenuTrigger>
                             <ActionButton
                                 isQuiet
                                 aria-label={'Attach an image'}
-                                isDisabled={isDisabled || attachments.length >= MAX_ATTACHMENTS}
+                                isDisabled={isDisabled || isBusy || attachments.length >= MAX_ATTACHMENTS}
                             >
                                 <Image />
                             </ActionButton>

@@ -20,6 +20,9 @@ class TestModelArchitecturesEndpoint:
         data = response.json()
         assert "model_architectures" in data
         assert len(data["model_architectures"]) == 36
+        yolo = next(arch for arch in data["model_architectures"] if arch["id"] == "object-detection-yolo11-n")
+        assert yolo["pretrained_auto_label"] is True
+        assert yolo["pretrained_dataset"] == "COCO-80"
 
         # Verify structure of first detection model
         detection_model = next(
@@ -37,6 +40,8 @@ class TestModelArchitecturesEndpoint:
             " and enhances detection performance, especially for objects of varying sizes and aspect ratios."
         )
         assert detection_model["support_status"] == "active"
+        assert detection_model["pretrained_auto_label"] is False
+        assert detection_model["pretrained_dataset"] is None
 
         # Verify capabilities structure
         assert "capabilities" in detection_model

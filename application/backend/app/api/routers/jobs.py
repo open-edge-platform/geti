@@ -23,6 +23,7 @@ from app.models import (
     ExportDatasetJobParams,
     QuantizationJob,
     QuantizationJobParams,
+    TaskType,
     TrainingJob,
     TrainingJobParams,
 )
@@ -33,6 +34,8 @@ from app.models.jobs import (
     ImportDatasetToProjectJobParams,
     PrepareDatasetForImportJob,
     PrepareDatasetForImportJobParams,
+    PretrainedAutoLabelJob,
+    PretrainedAutoLabelJobParams,
 )
 from app.services import ProjectService, SystemService
 from app.services.model_manifest_service import ModelManifestService
@@ -54,7 +57,7 @@ router = APIRouter(prefix="/api/jobs", tags=["Jobs"])
         },
     },
 )
-async def submit_job(
+async def submit_job(  # noqa: C901, PLR0912
     job_request: Annotated[JobRequest, Body()],
     job_queue: Annotated[JobQueue, Depends(get_job_queue)],
     job_dir: Annotated[Path, Depends(get_job_dir)],
@@ -70,6 +73,10 @@ async def submit_job(
             case JobType.TRAIN:
                 device = system_service.training_device(job_request.parameters.device)
                 project = project_service.get_project_by_id(job_request.project_id)
+                if not project.task.labels:
+                    raise ValueError("Create at least one label before training.")
+                if project.task.is_multiclass and len(project.task.labels) < 2:
+                    raise ValueError("Multi-class classification requires at least two labels before training.")
                 arch_id = job_request.parameters.model_architecture_id
                 arch_name = ModelManifestService.get_model_manifest_by_id(arch_id).name
                 job = TrainingJob(
@@ -157,6 +164,28 @@ async def submit_job(
                 )
             case JobType.STAGE_DATASET:
                 raise NotImplementedError
+            case JobType.PRETRAINED_AUTO_LABEL:
+                project = project_service.get_project_by_id(job_request.project_id)
+                manifest = ModelManifestService.get_model_manifest_by_id(job_request.parameters.model_architecture_id)
+                if manifest.task is not project.task.task_type:
+                    raise ValueError("The selected pretrained model is not compatible with the project task.")
+                supported_family = any(
+                    f"-{family}-" in manifest.id for family in ("yolo11", "yolo12", "yolo26")
+                )
+                if not supported_family or (
+                    manifest.task is TaskType.CLASSIFICATION and "yolo26" not in manifest.id
+                ):
+                    raise ValueError("This architecture does not retain a supported semantic pretrained head.")
+                job = PretrainedAutoLabelJob(
+                    id=job_id,
+                    project_id=project.id,
+                    log_dir=job_dir,
+                    params=PretrainedAutoLabelJobParams(
+                        project_id=project.id,
+                        model_architecture_id=manifest.id,
+                        confidence_threshold=job_request.parameters.confidence_threshold,
+                    ),
+                )
             case _:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unknown job type")
         await job_queue.submit(job)

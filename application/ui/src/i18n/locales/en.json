@@ -12,6 +12,8 @@
         "logoAlt": "Geti logo",
         "dataset": "Dataset",
         "datasetDescription": "Data collection page to visualise your media items",
+        "labels": "Labels",
+        "labelsDescription": "Create and edit the labels used by this project",
         "models": "Models",
         "modelsDescription": "Models page to visualise your models",
         "inference": "Inference",
@@ -284,6 +286,7 @@
         "create": {
             "taskQuestion": "What type of task would you like the model to perform?",
             "labelsQuestion": "What objects should the model learn to {{verb}}?",
+            "labelsOptional": "Labels are optional. You can create them later or let Auto-Label create them from predictions.",
             "submit": "Create project",
             "tasks": {
                 "detection": {

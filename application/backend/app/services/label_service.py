@@ -9,7 +9,7 @@ from app.db.schema import LabelDB
 from app.models import Label
 from app.models.label import LabelReference, LabelUpdateInfo
 from app.models.project import Project
-from app.models.task import Task, TaskType
+from app.models.task import Task
 from app.repositories import DatasetItemRepository, LabelRepository
 from app.repositories.base import PrimaryKeyIntegrityError, UniqueConstraintIntegrityError
 from app.utils.color import random_color
@@ -69,10 +69,7 @@ class LabelService(BaseSessionManagedService):
         """
         Update labels for a given project by adding, removing, and editing labels.
 
-        Validates that the resulting number of labels satisfies project task constraints
-        (e.g., multi-class classification requires at least two labels, and every project
-        requires at least one label). Also validates that labels to remove or edit exist
-        in the project before applying changes.
+        Validates that labels to remove or edit exist in the project before applying changes.
 
         Args:
             project (Project): The project whose labels to update.
@@ -84,29 +81,12 @@ class LabelService(BaseSessionManagedService):
             list[Label]: The full list of labels for the project after all updates have been applied.
 
         Raises:
-            ValueError: If the resulting number of labels violates project task constraints.
             ResourceNotFoundError: If any labels to remove or edit do not exist in the project.
             DuplicateLabelsError: If any label names or hotkeys conflict with existing labels.
             ResourceWithIdAlreadyExistsError: If a label to add has an ID that already exists.
         """
 
-        # Validate minimal number of labels satisfies project task constraints
         existing_ids = self.list_ids(project_id=project.id)
-        new_number_of_labels = len(existing_ids) - len(labels_to_remove) + len(labels_to_add)
-        if (
-            project.task.task_type is TaskType.CLASSIFICATION
-            and project.task.exclusive_labels
-            and new_number_of_labels < 2
-        ):
-            raise ValueError(
-                f"Multi-class classification requires at least two labels, but after this label update the total "
-                f"number of labels is {new_number_of_labels}."
-            )
-        if new_number_of_labels < 1:
-            raise ValueError(
-                f"A project requires at least one label, but after this label update the total number of labels is "
-                f"{new_number_of_labels}."
-            )
 
         # Validate labels to remove or edit exist in project
         if missing_ids_to_remove := [label.id for label in labels_to_remove if label.id not in existing_ids]:

@@ -8,7 +8,7 @@ import { DESKTOP_ONLY_MESSAGE } from './parse-response';
  * Web build stub. The `.tauri.ts` twin drives the locally installed
  * ChatGPT/Codex app through the Rust shell.
  */
-export const codexStatus = (): Promise<CodexAccount | null> => Promise.resolve(null);
+export const codexStatus = (_forceRefresh = false): Promise<CodexAccount | null> => Promise.resolve(null);
 
 export const codexModels = (): Promise<CodexModel[]> => Promise.resolve([]);
 

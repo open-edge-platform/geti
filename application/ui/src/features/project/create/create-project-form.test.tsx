@@ -55,21 +55,21 @@ describe('CreateProjectForm', () => {
     });
 
     describe('single-label classification', () => {
-        it('disables create button with zero labels', () => {
+        it('enables create button with zero labels', () => {
             renderCreateProjectForm();
 
             selectTask('Image Classification');
 
-            expect(getCreateButton()).toBeDisabled();
+            expect(getCreateButton()).toBeEnabled();
         });
 
-        it('disables create button with exactly one label', async () => {
+        it('enables create button with exactly one label', async () => {
             renderCreateProjectForm();
 
             selectTask('Image Classification');
             await addLabel('Cat');
 
-            expect(getCreateButton()).toBeDisabled();
+            expect(getCreateButton()).toBeEnabled();
         });
 
         it('enables create button with two labels', async () => {
@@ -95,13 +95,13 @@ describe('CreateProjectForm', () => {
     });
 
     describe('multi-label classification', () => {
-        it('disables create button with zero labels', () => {
+        it('enables create button with zero labels', () => {
             renderCreateProjectForm();
 
             selectTask('Image Classification');
             selectClassificationType('Multi-label');
 
-            expect(getCreateButton()).toBeDisabled();
+            expect(getCreateButton()).toBeEnabled();
         });
 
         it('enables create button with one label', async () => {
@@ -130,12 +130,12 @@ describe('CreateProjectForm', () => {
         it.each([
             { taskLabel: 'Object Detection', labelName: 'Car' },
             { taskLabel: 'Instance Segmentation', labelName: 'Tree' },
-        ])('disables create button with zero labels for $taskLabel', ({ taskLabel }) => {
+        ])('enables create button with zero labels for $taskLabel', ({ taskLabel }) => {
             renderCreateProjectForm();
 
             selectTask(taskLabel);
 
-            expect(getCreateButton()).toBeDisabled();
+            expect(getCreateButton()).toBeEnabled();
         });
 
         it.each([

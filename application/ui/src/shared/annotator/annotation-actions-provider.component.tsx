@@ -34,7 +34,7 @@ type AnnotationsContextValue = {
     submitAnnotations: (subset: DatasetSubset) => Promise<void>;
     submitPredictions: (subset: DatasetSubset) => Promise<void>;
     resetAnnotations: () => void;
-    replaceAnnotations: (annotations: Annotation[]) => void;
+    replaceAnnotations: (annotations: Annotation[] | ((current: Annotation[]) => Annotation[])) => void;
     isUserReviewed: boolean;
     isSaving: boolean;
     isReadOnlyMode: boolean;
@@ -192,8 +192,8 @@ export const AnnotationActionsProvider = ({
         );
     };
 
-    const replaceAnnotations = (newAnnotations: Annotation[]) => {
-        setAnnotations(() => newAnnotations);
+    const replaceAnnotations = (newAnnotations: Annotation[] | ((current: Annotation[]) => Annotation[])) => {
+        setAnnotations((current) => (typeof newAnnotations === 'function' ? newAnnotations(current) : newAnnotations));
     };
 
     const saveAnnotations = async (annotationsDTO: AnnotationDTO[], subset?: DatasetSubset) => {
@@ -202,7 +202,7 @@ export const AnnotationActionsProvider = ({
         await saveMutation
             .mutateAsync({
                 params: { path: { media_id: mediaItem.id, project_id: projectId }, query },
-                body: { annotations: annotationsDTO, subset: subset ?? undefined },
+                body: { annotations: annotationsDTO, subset: subset ?? undefined, user_reviewed: true },
             })
             .then(() => {
                 if (isVideoFrame(mediaItem)) {

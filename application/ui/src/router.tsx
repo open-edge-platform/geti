@@ -15,6 +15,7 @@ import { Layout } from './layout';
 import { Dataset } from './routes/dataset/dataset.component';
 import { ErrorPage } from './routes/error-page/error-page';
 import { Inference } from './routes/inference/inference';
+import { Labels } from './routes/labels/labels';
 import { Models } from './routes/models/models';
 import { CreateProject } from './routes/project/create-project';
 import { RootLayout } from './routes/root/root';
@@ -114,6 +115,10 @@ export const router = createBrowserRouter([
                                 element: <Dataset />,
                             },
                         ],
+                    },
+                    {
+                        path: paths.project.labels.pattern,
+                        element: <Labels />,
                     },
                     {
                         path: paths.project.models.pattern,

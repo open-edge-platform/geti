@@ -46,6 +46,8 @@ air-gapped setup, and troubleshooting - see the [Installation guide](./docs/inst
 Please check the [documentation website](https://docs.geti.intel.com/) for detailed guides, API reference,
 and other resources to help you get the most out of Geti.
 
+For the Windows desktop assistant, see [Annotate with ChatGPT](./docs/chatgpt-annotation.md).
+
 > **Upgrading an existing installation?** See the [Upgrade guide](./docs/upgrade.md) for how to move to a newer
 > version (Docker or Windows MSIX) while preserving your projects, datasets and models, with automatic rollback
 > if a migration fails.

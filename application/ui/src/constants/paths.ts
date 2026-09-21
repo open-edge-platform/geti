@@ -11,6 +11,7 @@ const dataset = projects.path('/:projectId/dataset');
 const datasetItem = dataset.path('/:datasetItemId');
 const videoFrame = datasetItem.path('/:frameNumber');
 const models = projects.path('/:projectId/models');
+const labels = projects.path('/:projectId/labels');
 
 export const paths = {
     root,
@@ -27,5 +28,6 @@ export const paths = {
             },
         },
         models,
+        labels,
     },
 };

@@ -30,6 +30,7 @@ class JobType(StrEnum):
     IMPORT_DATASET_TO_PROJECT = "import_dataset_to_project"
     EXPORT_DATASET = "export_dataset"
     STAGE_DATASET = "stage_dataset"
+    PRETRAINED_AUTO_LABEL = "pretrained_auto_label"
 
 
 def now_utc_ts() -> float:
