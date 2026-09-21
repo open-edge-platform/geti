@@ -3,7 +3,7 @@ name: YOLO26-S
 
 license:
   name: AGPL-3.0
-  url: https://www.gnu.org/licenses/agpl-3.0.html
+  url: https://www.ultralytics.com/legal/agpl-3-0-software-license
 
 pretrained_weights:
   source: direct_link
