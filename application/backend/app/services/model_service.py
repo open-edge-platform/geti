@@ -224,7 +224,7 @@ class ModelService(BaseSessionManagedService):
         """
         architecture = self.get_model_revision_architecture(project_id, model_id)
         manifest = ModelManifestService.get_model_manifest_by_id(architecture)
-        return manifest.license
+        return manifest.license.name
 
     def get_model_variants(self, project_id: UUID, model_id: UUID) -> list[ModelVariant]:
         """

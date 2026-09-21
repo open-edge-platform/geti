@@ -286,6 +286,30 @@
                 "confirm": "Cancel job",
                 "confirmation": "Are you sure you want to cancel job {{jobId}}?"
             }
+        },
+        "revisions": {
+            "createdOn": "Created {{date}}",
+            "unnamedName": "Dataset #{{id}}",
+            "unknown": "Unknown",
+            "trainingSubsets": {
+                "training": "Training",
+                "validation": "Validation",
+                "test": "Test"
+            },
+            "actions": {
+                "rename": "Rename",
+                "delete": "Delete",
+                "export": "Export",
+                "cancel": "Cancel"
+            },
+            "rename": {
+                "title": "Rename dataset revision",
+                "nameLabel": "Dataset revision name"
+            },
+            "delete": {
+                "title": "Delete dataset revision",
+                "description": "Are you sure you want to delete dataset revision \"{{name}}\"? You will still be able to see the model statistics but you won't be able to access the training dataset files."
+            }
         }
     },
     "inference": {
@@ -480,6 +504,85 @@
                 "webhook": "Webhook sink",
                 "mqtt": "MQTT sink"
             }
+        },
+        "pipeline": {
+            "activeModel": {
+                "label": "Model",
+                "loading": "Model: ..."
+            },
+            "toggle": {
+                "enabledLabel": "Pipeline enabled",
+                "disabledLabel": "Pipeline disabled",
+                "enabledSuccess": "Pipeline enabled successfully",
+                "disabledSuccess": "Pipeline disabled successfully"
+            },
+            "configuration": {
+                "sidebarLabel": "Pipeline configuration",
+                "sourcesTab": "Input",
+                "sinksTab": "Output"
+            }
+        },
+        "collection": {
+            "sidebarLabel": "Data collection policy",
+            "maxDatasetSize": {
+                "title": "Max dataset size",
+                "description": "Maximum number of items to collect",
+                "sizeLabel": "Size"
+            },
+            "captureRate": {
+                "title": "Capture rate",
+                "description": "Capture frames while the stream is running",
+                "toggleLabel": "Toggle auto capturing",
+                "framesLabel": "Frames",
+                "secondsLabel": "Seconds",
+                "every": "every"
+            },
+            "confidenceThreshold": {
+                "title": "Confidence threshold",
+                "description": "Capture frames when confidence is below threshold",
+                "toggleLabel": "Confidence threshold",
+                "sliderLabel": "Threshold"
+            }
+        },
+        "metrics": {
+            "sidebarLabel": "Pipeline metrics",
+            "empty": {
+                "title": "No statistics available",
+                "description": "Pipeline metrics will show here once the pipeline starts running and processing data."
+            },
+            "throughput": {
+                "title": "Throughput",
+                "axisLabel": "requests/sec"
+            },
+            "latency": {
+                "title": "Latency",
+                "axisLabel": "ms"
+            }
+        },
+        "health": {
+            "overall": {
+                "running": "Running",
+                "idle": "Idle",
+                "problemsDetected": "Problems detected"
+            },
+            "component": {
+                "healthy": "Healthy",
+                "finished": "Finished",
+                "unavailable": "Unavailable",
+                "error": "Error"
+            },
+            "componentLabels": {
+                "source": "Source",
+                "sink": "Sink",
+                "model": "Model"
+            }
+        },
+        "stream": {
+            "start": "Start stream",
+            "enablePipelineToStart": "Enable pipeline to start stream",
+            "connectError": "Failed to connect to the stream",
+            "captureFrame": "Capture frame",
+            "captureSuccess": "Frame captured and added to the dataset."
         }
     },
     "project": {
@@ -726,6 +829,66 @@
                 "copySuccess": "Copied Successfully",
                 "copyError": "Copy failed"
             }
+        },
+        "list": {
+            "groupByPlaceholder": "Group by",
+            "groupByDataset": "Group by: Dataset",
+            "groupByArchitecture": "Group by: Architecture",
+            "hideFailedModels": "Hide failed models",
+            "showFailedModels": "Show failed models",
+            "searchPlaceholder": "Search models...",
+            "noModelsFound": "No models found",
+            "empty": {
+                "title": "No models yet.",
+                "description": "Train your first model to get started."
+            },
+            "unknownArchitecture": "Unknown",
+            "failedBadge": "Failed",
+            "deletedWeightsBadge": "Deleted weights",
+            "fineTunedFrom": "Fine-tuned from",
+            "columns": {
+                "modelName": "Model Name",
+                "trained": "Trained",
+                "dataset": "Dataset",
+                "architecture": "Architecture",
+                "device": "Device",
+                "totalSize": "Total size"
+            }
+        },
+        "performance": {
+            "accuracy": "Accuracy",
+            "categories": {
+                "balance": "Balance",
+                "speed": "Speed",
+                "accuracy": "Accuracy"
+            }
+        },
+        "actions": {
+            "rename": "Rename",
+            "deleteWeights": "Delete weights",
+            "deleteModel": "Delete model",
+            "viewLogs": "View training logs",
+            "cancel": "Cancel",
+            "deleteWeightsDescription": "Are you sure you want to delete the weights for model \"{{modelName}}\"?",
+            "deleteModelDescription": "Are you sure you want to delete model \"{{modelName}}\"? This action cannot be undone.",
+            "renameDialog": {
+                "title": "Rename model",
+                "nameLabel": "Model name"
+            }
+        }
+    },
+    "license": {
+        "agreement": {
+            "title": "License Agreement",
+            "intro": "By installing, using, or distributing this application, you acknowledge that:",
+            "termsRead": "You have read and understood the license terms at the links below;",
+            "termsGovern": "Confirmed the linked terms govern the contents you seek to access and use; and",
+            "termsAccepted": "Accepted and agreed to the linked license terms.",
+            "accept": "Accept and continue"
+        },
+        "links": {
+            "intelSimplified": "Intel Simplified Software License",
+            "dinov2": "DINOv3 License"
         }
     },
     "application": {

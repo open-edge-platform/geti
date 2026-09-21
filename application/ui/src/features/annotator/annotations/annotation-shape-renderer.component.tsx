@@ -2,21 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Annotation } from '../../../shared/types';
-import { useCanvasSettings } from '../../dataset/media-preview/primary-toolbar/settings/canvas-settings-provider.component';
 import { AnnotationShapeWithLabels } from './annotation-shape-with-labels.component';
-import { AnnotationShapeWithoutLabels } from './annotation-shape-without-labels.component';
 
 interface AnnotationShapeRendererProps {
     annotation: Annotation;
     hideLabels?: boolean;
 }
 
+// `hideLabels` here is only for callers without a label-editing context (e.g. edit-polygon/
+// edit-bounding-box tool previews) that must skip mounting labels entirely. The user-facing
+// "hide labels" canvas setting is applied via CSS (--annotation-labels-display, see
+// annotator-canvas-settings.component.tsx) so toggling it doesn't mount/unmount every annotation.
 export const AnnotationShapeRenderer = ({ annotation, hideLabels = false }: AnnotationShapeRendererProps) => {
-    const { canvasSettings } = useCanvasSettings();
-
-    if (hideLabels || canvasSettings.hideLabels.value) {
-        return <AnnotationShapeWithoutLabels annotation={annotation} />;
-    }
-
-    return <AnnotationShapeWithLabels annotation={annotation} />;
+    return <AnnotationShapeWithLabels annotation={annotation} hideLabels={hideLabels} />;
 };
