@@ -31,10 +31,6 @@ def set_sqlite_pragma(dbapi_connection: Connection, _: Any) -> None:
     # https://docs.sqlalchemy.org/en/20/dialects/sqlite.html#foreign-key-support
     cursor = dbapi_connection.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.execute("PRAGMA journal_mode=WAL")  # Enable Write-Ahead Logging (WAL) mode for better concurrency
-    # WAL's non-blocking reads can surface stale mmap'd pages of the main db file on some
-    # bind-mount/virtualized filesystems; disable mmap I/O to force fresh reads instead.
-    cursor.execute("PRAGMA mmap_size=0")
     cursor.close()
 
 
