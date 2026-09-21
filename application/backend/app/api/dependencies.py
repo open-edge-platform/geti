@@ -246,9 +246,12 @@ def get_webrtc_manager(request: Request) -> WebRTCManager:
     return request.app.state.webrtc_manager
 
 
-def get_label_service(db: Annotated[Session, Depends(get_db)]) -> LabelService:
+def get_label_service(
+    db: Annotated[Session, Depends(get_db)],
+    event_bus: Annotated[EventBus, Depends(get_event_bus)],
+) -> LabelService:
     """Provides a LabelService instance for managing labels."""
-    return LabelService(db_session=db)
+    return LabelService(db_session=db, event_bus=event_bus)
 
 
 def get_project_service(
