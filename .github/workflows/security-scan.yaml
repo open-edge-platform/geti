@@ -249,9 +249,7 @@ jobs:
           fi
 
   trivy-scan-diff:
-    # TODO: drop the pull_request condition once diff-scan testing is done
-    # TODO: add renovate config to support base-image upgrade
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
