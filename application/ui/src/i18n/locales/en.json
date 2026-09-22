@@ -291,6 +291,9 @@
             "createdOn": "Created {{date}}",
             "unnamedName": "Dataset #{{id}}",
             "unknown": "Unknown",
+            "notFoundForModel": "No dataset revision found for this model",
+            "filesDeleted": "The files for this dataset revision have been deleted.",
+            "noItemsInSubset": "No items in this subset",
             "trainingSubsets": {
                 "training": "Training",
                 "validation": "Validation",
@@ -822,12 +825,216 @@
     },
     "models": {
         "jobs": {
-            "error": "Job failed. Please check the logs for details and try again."
+            "error": "Job failed. Please check the logs for details and try again.",
+            "heading": "Jobs",
+            "columns": {
+                "modelName": "Model Name",
+                "dataset": "Dataset",
+                "architecture": "Architecture"
+            },
+            "pending": "Pending...",
+            "running": "Running...",
+            "cancel": "Cancel",
+            "stopDialog": {
+                "title": "Stop job",
+                "confirmation": "Are you sure you want to stop this job?",
+                "close": "Close"
+            },
+            "failed": "Failed",
+            "dismiss": "Dismiss",
+            "logs": "Logs",
+            "startedAt": "Started: {{time}}",
+            "waitingToStart": "Waiting to start...",
+            "device": "Device: {{device}}"
+        },
+        "detail": {
+            "loadError": "Failed to load model details",
+            "tabs": {
+                "variants": "Model variants",
+                "metrics": "Model metrics",
+                "parameters": "Training parameters",
+                "datasets": "Training datasets"
+            }
+        },
+        "metrics": {
+            "noMetrics": "No available metrics",
+            "loadError": "Failed to load training metrics",
+            "evaluationsTitle": "Evaluations",
+            "noEvaluations": "Testing evaluation metrics are not available"
         },
         "training": {
             "logs": {
                 "copySuccess": "Copied Successfully",
-                "copyError": "Copy failed"
+                "copyError": "Copy failed",
+                "copyPathTooltip": "Click to copy path",
+                "showTraceback": "Show traceback",
+                "levelLabel": "Level",
+                "levelHelpTitle": "Minimum log level",
+                "levelHelpDescription": "Shows log entries at the selected level and above. For example, selecting WARNING shows WARNING, ERROR, and CRITICAL entries, hiding DEBUG and INFO.",
+                "searchPlaceholder": "Search logs...",
+                "connectionStatus": {
+                    "connecting": "Connecting...",
+                    "connected": "Live",
+                    "disconnected": "Disconnected",
+                    "error": "Connection error"
+                },
+                "entriesCount": "{{filtered}} / {{total}} entries",
+                "noEntries": "No log entries",
+                "noMatchingEntries": "No matching log entries",
+                "scrollToBottom": "Scroll to bottom",
+                "dialogTitle": "Training Logs",
+                "loadError": "Failed to load logs: {{message}}",
+                "unknownError": "Unknown error",
+                "noJobOrModel": "No job or model specified",
+                "fetchError": "Failed to fetch model logs: {{status}} {{statusText}}",
+                "downloadStarted": "Training logs download started"
+            },
+            "parameters": {
+                "noParameters": "No parameters.",
+                "learningParameters": "LEARNING PARAMETERS",
+                "filters": "FILTERS",
+                "augmentations": "AUGMENTATIONS",
+                "intensityMapping": "INTENSITY MAPPING",
+                "on": "On",
+                "off": "Off"
+            },
+            "architectures": {
+                "metrics": {
+                    "top1AccOnImageNet": "Top-1 Acc on ImageNet",
+                    "mapOnCoco": "mAP on COCO",
+                    "map50OnCoco": "mAP50 on COCO"
+                },
+                "card": {
+                    "numberOfParameters": "Number of parameters: {{count}} million",
+                    "gigaflops": "Gigaflops: {{value}}",
+                    "license": "License: {{license}}"
+                },
+                "list": {
+                    "showMore": "Show more",
+                    "showLess": "Show less"
+                },
+                "sort": {
+                    "label": "Sort Models by:",
+                    "nameAsc": "Name (A to Z)",
+                    "nameDesc": "Name (Z to A)",
+                    "speedAsc": "Speed (fastest first)",
+                    "speedDesc": "Speed (slowest first)",
+                    "accuracyAsc": "Accuracy (lowest first)",
+                    "accuracyDesc": "Accuracy (highest first)"
+                },
+                "timm": {
+                    "heading": "TIMM model configuration",
+                    "architectureFamilyLabel": "Architecture family",
+                    "selectArchitecturePlaceholder": "Select architecture",
+                    "modelVariantLabel": "Model variant",
+                    "selectVariantPlaceholder": "Select variant",
+                    "pretrainedWeightsLabel": "Pretrained Weights",
+                    "selectWeightsPlaceholder": "Select weights",
+                    "parameters": "Parameters: {{count}} million",
+                    "gigaflops": "GigaFlops: {{value}}",
+                    "licenseLabel": "License: "
+                }
+            },
+            "devices": {
+                "selectLabel": "Select training device"
+            },
+            "setup": {
+                "trigger": "Train model",
+                "dialog": {
+                    "title": "Select a model to train",
+                    "disabledReasonTitle": "Why can I not start training?",
+                    "cancel": "Cancel",
+                    "back": "Back",
+                    "advancedSettings": "Advanced settings",
+                    "start": "Start"
+                },
+                "toast": {
+                    "trainingStarted": "Model training started successfully.",
+                    "trainingStartedWithLink": "Model training started successfully. <link>Open models screen to see progress.</link>"
+                },
+                "selectDataset": {
+                    "label": "Select dataset",
+                    "useCurrentDataset": "Use current dataset",
+                    "helpTitle": "Selecting a dataset",
+                    "helpDescription": "Choose the version of the dataset to use for training. If you want to train the new model\n                            on the exact same data (media and annotations) as another model, please select the\n                            corresponding dataset revision. Conversely, if you want to train on the most recent version\n                            of the data (what you see in the \"Dataset\" page), please select \"Use\n                            current dataset\"."
+                },
+                "selectModel": {
+                    "label": "Select input weights",
+                    "defaultPretrainedWeights": "Default pre-trained weights",
+                    "helpTitle": "Selecting input weights",
+                    "helpDescription": "Choose an existing model to continue fine-tuning, or select \"Default pre-trained weights\" to fine-tune a new model starting from publicly available weights pre-trained on large public datasets."
+                }
+            },
+            "validation": {
+                "notEnoughAnnotations": "In order to train a model, you need to annotate at least 3 items in your dataset, although we recommend annotating several more for better results.",
+                "emptySubsetsReason": "In order to train a model, each subset (training, validation, testing) needs at least one item. This condition is currently not satisfiable, because the {{subsetClause}} empty and {{assignmentDetail}}.",
+                "emptySubsetClause_one": "{{list}} subset is",
+                "emptySubsetClause_other": "{{list}} subsets are",
+                "reviewedOnly_one": "there is {{count}} reviewed item left to assign",
+                "reviewedOnly_other": "there are {{count}} reviewed items left to assign",
+                "unannotatedOnly_one": "there is {{count}} item that still needs annotation before it can be assigned",
+                "unannotatedOnly_other": "there are {{count}} items that still need annotation before they can be assigned",
+                "mixedReviewedClause_one": "there is {{count}} reviewed item ready to assign",
+                "mixedReviewedClause_other": "there are {{count}} reviewed items ready to assign",
+                "mixedUnannotatedClause_one": "{{count}} item that still needs annotation before it can be assigned",
+                "mixedUnannotatedClause_other": "{{count}} items that still need annotation before they can be assigned",
+                "mixedAssignmentDetail": "{{reviewedClause}} and {{unannotatedClause}}",
+                "noUnassignedItems": "there are no unassigned items available to redistribute"
+            },
+            "advanced": {
+                "tabs": {
+                    "dataManagement": "Data management",
+                    "training": "Training"
+                },
+                "notAvailable": "Training configuration is not available."
+            },
+            "learning": {
+                "title": "Learning parameters",
+                "tagDefault": "Default",
+                "tagModified": "Modified",
+                "inputSize": "Input size"
+            },
+            "dataManagement": {
+                "trainingSubsets": {
+                    "title": "Training subsets",
+                    "description": "Specify the distribution of annotated samples that have NOT already been assigned to a subset. Note that samples used in previous training rounds already have a subset and this will remain unchanged, to avoid data contamination and evaluation bias.",
+                    "unavailableTitle": "Invalid training subsets configuration",
+                    "unavailableDescription": "Training subsets do not contain enough media items to support a configurable split between training, validation, and testing subsets.",
+                    "unavailableHint": "Please add more media items to ensure each subset contains at least one item.",
+                    "datasetSamples": "Dataset: {{count}} samples",
+                    "assignedSamples": "Assigned: {{count}}",
+                    "unassignedSamples": "Unassigned: {{count}}",
+                    "distributionLabel": "Distribution for new samples",
+                    "resultingDistribution": "Resulting dataset distribution:",
+                    "totalLabel": "Total:",
+                    "mediaItemsLabel": "media items"
+                },
+                "filters": {
+                    "title": "Filters",
+                    "noMinimum": "No minimum",
+                    "noMaximum": "No maximum",
+                    "unlimited": "Unlimited"
+                },
+                "augmentation": {
+                    "title": "Data Augmentation",
+                    "enabledYes": "Yes",
+                    "enabledNo": "No"
+                },
+                "intensityMapping": {
+                    "title": "Intensity Mapping"
+                },
+                "tiling": {
+                    "title": "Tiling",
+                    "description": "Tiling is a technique that divides high-resolution images into smaller tiles and might be useful to increase accuracy for small object detection tasks.",
+                    "modeLabel": "Tiling mode",
+                    "modes": {
+                        "off": "Off",
+                        "automatic": "Automatic",
+                        "custom": "Custom"
+                    },
+                    "offDescription": "Model processes the entire image as a single unit without dividing it into smaller tiles. This approach is straightforward but may struggle with detecting small objects in high-resolution images, as the model might miss finer details",
+                    "automaticDescription": "It means that the system will automatically set the parameters based on the image resolution and annotations size."
+                }
             }
         },
         "list": {
@@ -863,6 +1070,55 @@
                 "accuracy": "Accuracy"
             }
         },
+        "variants": {
+            "empty": "No available model variants.",
+            "columns": {
+                "precision": "PRECISION",
+                "size": "SIZE"
+            },
+            "quantizedInfo": {
+                "title": "Quantized with NNCF PTQ",
+                "maxAccuracyDrop": "Max accuracy drop: {{value}}",
+                "calibrationDatasetSize": "Calibration dataset size: {{size}}"
+            }
+        },
+        "export": {
+            "downloadStarted": "Model download started"
+        },
+        "optimize": {
+            "description": "Optimize the FP16 model using OpenVINO NNCF (via INT8 quantization)",
+            "contextualHelp": "OpenVINO NNCF (Neural Network Compression Framework) via INT8 quantization reduces model size and speeds up inference with minimal impact on accuracy",
+            "start": "Start quantization",
+            "cancel": "Cancel",
+            "dialogTitle": "Quantization",
+            "subheading": "Quantize model to INT8",
+            "jobStarted": "Quantization job started.",
+            "recommendedCalibrationSize": "Recommended calibration dataset size: between 200-500 media items",
+            "fields": {
+                "maxAccuracyDrop": {
+                    "label": "Max accuracy drop (%)",
+                    "help": {
+                        "paragraph1": "Maximum allowed drop in validation accuracy.",
+                        "paragraph2": "Beware that accuracy-aware quantization may take a long time when the max allowed drop is small.",
+                        "paragraph3": "Also note that the final testing accuracy may be lower than the specified validation accuracy threshold, especially for relatively small datasets."
+                    },
+                    "noMaximum": "No maximum"
+                },
+                "maxIterations": {
+                    "label": "Max number of iterations",
+                    "help": {
+                        "paragraph1": "Maximum number of iterations of accuracy-aware quantization.",
+                        "paragraph2": "Accuracy-aware quantization iteratively removes model layers from the quantization scope until the max accuracy drop criteria is met. Limiting the number of iterations can significantly reduce the time it takes to quantize models with many layers.",
+                        "paragraph3": "This parameter is only used when a max accuracy drop is set."
+                    }
+                },
+                "calibrationSize": {
+                    "label": "Max calibration size",
+                    "help": "Calibration samples will be randomly selected within the dataset",
+                    "useFullDataset": "Use full dataset"
+                }
+            }
+        },
         "actions": {
             "rename": "Rename",
             "deleteWeights": "Delete weights",
@@ -889,6 +1145,13 @@
         "links": {
             "intelSimplified": "Intel Simplified Software License",
             "dinov2": "DINOv3 License"
+        },
+        "edgecrafter": {
+            "prefix": "License: ",
+            "linkText": "EdgeCrafter"
+        },
+        "ultralytics": {
+            "linkText": "Follow Ultralytics guidance on license usage"
         }
     },
     "application": {
