@@ -46,7 +46,7 @@ export const LocalFolder = ({ defaultState }: LocalFolderProps) => {
 
             <Flex gap='size-200'>
                 <TextField
-                    label={t('inference.sinks.fields.name')}
+                    label={t('common.labels.name')}
                     name='name'
                     defaultValue={defaultState.name || t('inference.sinks.defaultNames.localFolder')}
                 />

@@ -111,7 +111,7 @@ export const EditPoints = ({ zoom, shape, addPoint, onComplete, moveAnchorTo, re
                                     }}
                                     aria-label={`delete point`}
                                 >
-                                    {t('annotator.tools.polygon.deletePoint')}
+                                    {t('common.actions.delete')}
                                 </ActionButton>
                             )}
                         />

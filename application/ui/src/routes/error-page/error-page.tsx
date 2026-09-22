@@ -48,7 +48,7 @@ const useErrorMessage = () => {
         return error.detail;
     }
 
-    return t('application.errorPage.unknownError');
+    return t('common.errors.unknown');
 };
 
 export const ErrorPage = () => {

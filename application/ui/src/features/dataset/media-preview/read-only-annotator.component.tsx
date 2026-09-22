@@ -139,7 +139,7 @@ export const ReadOnlyAnnotator = ({
                                     <Icon height={'size-150'} width={'size-150'}>
                                         <CloseSemiBold />
                                     </Icon>
-                                    <Text>{t('annotator.actions.close')}</Text>
+                                    <Text>{t('common.actions.close')}</Text>
                                 </ActionButton>
                             </Flex>
                         </Toolbar.Section>

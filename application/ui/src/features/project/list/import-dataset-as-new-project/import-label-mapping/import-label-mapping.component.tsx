@@ -80,19 +80,19 @@ export const ImportLabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
 
     return (
         <Flex direction={'column'} gap={'size-200'} UNSAFE_style={{ padding: dimensionValue('size-275') }}>
-            <Heading>{t('project.import.statistics.title')}</Heading>
+            <Heading>{t('dataset.import.labelMapping.statisticsHeading')}</Heading>
 
             <View padding={'size-200'} borderRadius={'regular'} backgroundColor={'gray-75'}>
                 <Flex justifyContent={'center'} gap={'size-200'}>
                     <DatasetStatistics
-                        label={t('project.import.statistics.images')}
+                        label={t('dataset.import.labelMapping.imagesLabel')}
                         totalMediaItems={totalImages}
                         totalAnnotatedItems={totalAnnotatedImages}
                     />
 
                     {totalFrames > 0 && (
                         <DatasetStatistics
-                            label={t('project.import.statistics.frames')}
+                            label={t('dataset.import.labelMapping.framesLabel')}
                             totalMediaItems={totalFrames}
                             totalAnnotatedItems={totalAnnotatedFrames}
                         />
@@ -106,7 +106,7 @@ export const ImportLabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                 <Form id={LABEL_MAPPING_FORM_ID} validationBehavior='native' action={submitAction}>
                     <MultiSelectList
                         name='labels'
-                        label={t('project.import.labelMapping.datasetLabels')}
+                        label={t('dataset.import.labelMapping.datasetLabelsColumn')}
                         ariaLabel='Dataset labels'
                         maxHeight='size-2000'
                         defaultSelectedKeys={new Set(datasetLabels.map((label) => label))}
@@ -120,7 +120,7 @@ export const ImportLabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                         name='include_unannotated'
                         aria-label='include unannotated'
                     >
-                        {t('project.import.labelMapping.includeUnannotated')}
+                        {t('dataset.includeUnannotated')}
                     </Checkbox>
                 </Form>
             </View>

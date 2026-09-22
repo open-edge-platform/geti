@@ -45,7 +45,7 @@ export const getComponentStatusMeta = (component: PipelineStatus, t: TranslateFn
                 message: component.message,
             };
         case 'error':
-            return { label: t('inference.health.component.error'), variant: 'negative', message: component.message };
+            return { label: t('common.status.error'), variant: 'negative', message: component.message };
         default:
             return { label: capitalize(component.status), variant: 'neutral', message: component.message };
     }

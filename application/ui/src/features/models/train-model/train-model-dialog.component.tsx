@@ -92,14 +92,14 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
 
                 <ButtonGroup marginStart={'auto'}>
                     <Button variant={'secondary'} onPress={onClose}>
-                        {t('models.training.setup.dialog.cancel')}
+                        {t('common.actions.cancel')}
                     </Button>
                     {isAdvancedSettingsMode ? (
                         <Button
                             variant={'primary'}
                             onPress={() => onToggleAdvancedSettingsMode(!isAdvancedSettingsMode)}
                         >
-                            {t('models.training.setup.dialog.back')}
+                            {t('common.actions.back')}
                         </Button>
                     ) : (
                         <Button
@@ -117,7 +117,7 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
                         isDisabled={isStartButtonDisabled}
                         isPending={isPending}
                     >
-                        {t('models.training.setup.dialog.start')}
+                        {t('common.actions.start')}
                     </Button>
                 </ButtonGroup>
             </Footer>

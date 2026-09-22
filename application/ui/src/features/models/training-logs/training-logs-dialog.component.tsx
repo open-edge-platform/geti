@@ -50,7 +50,7 @@ const HistoricalModelLogs = ({ modelId }: { modelId: string }) => {
             <Flex alignItems={'center'} justifyContent={'center'} height={'100%'}>
                 <Text UNSAFE_className={classes.errorText}>
                     {t('models.training.logs.loadError', {
-                        message: error?.message ?? t('models.training.logs.unknownError'),
+                        message: error?.message ?? t('common.errors.unknownDetail'),
                     })}
                 </Text>
             </Flex>

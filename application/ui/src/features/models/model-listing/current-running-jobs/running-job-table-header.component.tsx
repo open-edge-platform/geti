@@ -27,10 +27,8 @@ export const RunningJobTableHeader = ({ groupBy }: RunningJobTableHeaderProps) =
                     ${dimensionValue('size-150')} ${dimensionValue('size-1000')}`,
             }}
         >
-            <Text>{t('models.jobs.columns.modelName')}</Text>
-            <Text>
-                {groupBy === 'architecture' ? t('models.jobs.columns.dataset') : t('models.jobs.columns.architecture')}
-            </Text>
+            <Text>{t('models.columns.modelName')}</Text>
+            <Text>{groupBy === 'architecture' ? t('common.labels.dataset') : t('models.columns.architecture')}</Text>
             <div />
         </Grid>
     );

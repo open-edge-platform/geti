@@ -33,7 +33,7 @@ const PipelineComponentsDetailsInfo = ({ components }: PipelineComponentsDetails
     const componentLabels: Record<(typeof COMPONENT_ORDER)[number], string> = {
         source: t('inference.health.componentLabels.source'),
         sink: t('inference.health.componentLabels.sink'),
-        model: t('inference.health.componentLabels.model'),
+        model: t('common.labels.model'),
     };
 
     return (

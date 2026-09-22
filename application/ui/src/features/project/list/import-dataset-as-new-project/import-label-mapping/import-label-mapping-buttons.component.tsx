@@ -36,15 +36,15 @@ export const ImportLabelMappingButtons = ({
     return (
         <ButtonGroup>
             <Button variant='negative' isPending={isPending} isDisabled={isPending} onPress={handleDeleteJob}>
-                {t('project.import.actions.delete')}
+                {t('common.actions.delete')}
             </Button>
 
             <Button onPress={onClose} isPending={isPending} isDisabled={isPending} variant='secondary'>
-                {t('project.import.actions.hide')}
+                {t('common.actions.hide')}
             </Button>
 
             <Button onPress={handleBack} isPending={isPending} isDisabled={isPending} variant='secondary'>
-                {t('project.import.actions.back')}
+                {t('common.actions.back')}
             </Button>
 
             <Button type='submit' variant='accent' form={LABEL_MAPPING_FORM_ID}>

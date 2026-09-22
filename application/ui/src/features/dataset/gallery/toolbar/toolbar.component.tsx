@@ -56,7 +56,7 @@ const AnnotateButton = ({ isDisabled, onClick }: AnnotateButtonProps) => {
 
     return (
         <Button margin={0} variant={'primary'} onPress={onClick} isDisabled={isDisabled}>
-            {t('dataset.mediaActions.annotate')}
+            {t('common.actions.annotate')}
         </Button>
     );
 };
@@ -170,7 +170,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
         <Flex direction={'column'} gridArea={'toolbar'} gap={'size-200'} marginBottom={'size-200'}>
             <Flex alignItems={'center'} justifyContent={'space-between'}>
                 <Flex alignItems={'center'} gap={'size-200'}>
-                    <Heading margin={0}>{t('dataset.gallery.heading')}</Heading>
+                    <Heading margin={0}>{t('common.labels.dataset')}</Heading>
 
                     {FEATURE_FLAGS.DATASET_VIEWS && (
                         <Suspense fallback={null}>

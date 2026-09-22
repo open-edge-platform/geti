@@ -33,7 +33,7 @@ type ModelRowProps = {
 const FailedModel = () => {
     const { t } = useTranslation();
 
-    return <Badge variant={'negative'}>{t('models.list.failedBadge')}</Badge>;
+    return <Badge variant={'negative'}>{t('common.status.failed')}</Badge>;
 };
 
 const DeletedWeightsModel = () => {

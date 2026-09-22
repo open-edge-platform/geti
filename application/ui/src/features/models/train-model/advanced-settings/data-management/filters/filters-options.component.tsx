@@ -50,7 +50,7 @@ const FilterOption = ({ filterParameter, onFilterChange }: FilterOptionProps) =>
     const toggleName = key.toLocaleLowerCase().includes('min')
         ? t('models.training.dataManagement.filters.noMinimum')
         : key.toLocaleLowerCase().includes('max')
-          ? t('models.training.dataManagement.filters.noMaximum')
+          ? t('common.labels.noMaximum')
           : t('models.training.dataManagement.filters.unlimited');
 
     return (

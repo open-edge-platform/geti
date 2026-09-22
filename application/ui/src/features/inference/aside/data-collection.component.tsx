@@ -126,7 +126,7 @@ export const DataCollection = () => {
 
                 <Flex direction='row' gap='size-100' alignItems={'end'} marginBottom={'size-200'}>
                     <NumberField
-                        label={t('inference.collection.captureRate.framesLabel')}
+                        label={t('common.labels.frames')}
                         minValue={MIN_FRAME_SAMPLING_VALUE}
                         step={0.1}
                         value={localRateFrames}
@@ -136,9 +136,9 @@ export const DataCollection = () => {
                         }}
                         isDisabled={!ratePolicy?.enabled || isUpdating}
                     />
-                    <Text>{t('inference.collection.captureRate.every')}</Text>
+                    <Text>{t('common.labels.every')}</Text>
                     <NumberField
-                        label={t('inference.collection.captureRate.secondsLabel')}
+                        label={t('common.labels.seconds')}
                         minValue={1}
                         step={1}
                         value={localRateSeconds}
@@ -153,7 +153,7 @@ export const DataCollection = () => {
                 <Divider marginY={'size-400'} size={'S'} />
 
                 <Heading level={3} margin={0}>
-                    {t('inference.collection.confidenceThreshold.title')}
+                    {t('inference.confidenceThreshold.label')}
                 </Heading>
 
                 <Text marginY={'size-100'}>{t('inference.collection.confidenceThreshold.description')}</Text>
@@ -164,7 +164,7 @@ export const DataCollection = () => {
                     onChange={(enabled) => updatePolicies({ confidenceEnabled: enabled })}
                     isDisabled={isUpdating}
                 >
-                    {t('inference.collection.confidenceThreshold.toggleLabel')}
+                    {t('inference.confidenceThreshold.label')}
                 </Switch>
 
                 <Slider

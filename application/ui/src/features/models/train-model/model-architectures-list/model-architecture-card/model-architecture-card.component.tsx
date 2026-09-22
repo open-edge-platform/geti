@@ -31,11 +31,12 @@ const ModelArchitectureDivider = () => {
 };
 
 const License = () => {
+    const { t } = useTranslation();
     const { modelArchitecture } = useModelArchitecture();
 
     return (
         <li>
-            {'License: '}
+            {t('license.label')}
             <ModelLicenseLink license={modelArchitecture.license} />
         </li>
     );

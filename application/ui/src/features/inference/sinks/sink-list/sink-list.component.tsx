@@ -102,7 +102,7 @@ export const SinkList = ({ sinks, onAddSink, onEditSink }: SinksListProps) => {
             UNSAFE_style={{ overflow: 'auto', padding: dimensionValue('size-10') }}
         >
             <Button variant='secondary' height={'size-800'} UNSAFE_className={classes.addSink} onPress={onAddSink}>
-                <AddIcon /> {t('inference.sinks.list.addSink')}
+                <AddIcon /> {t('inference.sinks.add.title')}
             </Button>
 
             {sinks.map((sink) => (

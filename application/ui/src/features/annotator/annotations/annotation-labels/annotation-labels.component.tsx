@@ -42,11 +42,11 @@ export const AnnotationLabels = ({
     const placeholderLabel = useMemo(
         () => ({
             id: crypto.randomUUID(),
-            name: t('labels.empty.noLabel'),
+            name: 'No label',
             color: 'var(--annotation-fill)',
             isPrediction: false,
         }),
-        [t]
+        []
     );
 
     const onDeleteLabel = (labelId: string) => (event: PointerEvent) => {
@@ -89,7 +89,9 @@ export const AnnotationLabels = ({
                             }}
                             aria-label={`label ${label.name} background`}
                         >
-                            <span aria-label={`label ${label.name}`}>{getLabelText(label)}</span>
+                            <span aria-label={`label ${label.name}`}>
+                                {isPlaceholder ? t('labels.empty.noLabel') : getLabelText(label)}
+                            </span>
                             {!isPlaceholder && isRemovable && (
                                 <button
                                     className={classes.removeButton}

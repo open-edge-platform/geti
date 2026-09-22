@@ -47,7 +47,7 @@ export const ActiveModel = () => {
         <>
             <Picker
                 aria-label={'active model'}
-                label={t('inference.pipeline.activeModel.label')}
+                label={t('common.labels.model')}
                 labelPosition={'side'}
                 items={allModelsWithOpenVinoQuantizedModels}
                 onSelectionChange={handleChange}

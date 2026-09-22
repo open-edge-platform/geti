@@ -70,7 +70,7 @@ export const LoadingImportDataset = ({
                 <ImportFailedJob
                     size={size}
                     fileName={fileName}
-                    error={`${response.error?.detail ?? t('dataset.import.unknownErrorDetail')}`}
+                    error={`${response.error?.detail ?? t('common.errors.unknownDetail')}`}
                     message={t('dataset.import.genericError')}
                     stagedDatasetId={stagedDatasetId}
                     deleteEntry={deleteEntry}

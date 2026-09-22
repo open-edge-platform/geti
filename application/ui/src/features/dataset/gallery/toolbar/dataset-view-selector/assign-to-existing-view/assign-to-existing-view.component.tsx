@@ -95,7 +95,7 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
 
     return (
         <Dialog>
-            <Heading>{t('dataset.views.assignTitle')}</Heading>
+            <Heading>{t('dataset.views.assignToExistingView')}</Heading>
             <Divider size={'S'} />
             <Content>
                 <SelectedMediaCount count={selectedMediaIds.length} />
@@ -117,7 +117,7 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
             </Content>
             <ButtonGroup>
                 <Button onPress={() => onClose()} variant={'secondary'}>
-                    {t('dataset.views.close')}
+                    {t('common.actions.close')}
                 </Button>
                 <Button
                     type={'submit'}
@@ -126,7 +126,7 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
                     isPending={isPending}
                     isDisabled={isAssignDisabled}
                 >
-                    {t('dataset.views.assign')}
+                    {t('common.actions.assign')}
                 </Button>
             </ButtonGroup>
         </Dialog>

@@ -89,7 +89,7 @@ export const ImportJobsList = () => {
                 <StagedImportDataset
                     key={`label-mapping-${stagedDatasetId}`}
                     fileName={fileName}
-                    message={t('project.import.jobsList.mapLabelsMessage')}
+                    message={t('dataset.import.mapLabelsMessage')}
                     stagedDatasetId={stagedDatasetId}
                     onOpen={() => handleOpen('labelMapping', stagedDatasetId)}
                     primaryButtonLabel={t('project.import.jobsList.mapLabelsButton')}

@@ -56,16 +56,16 @@ const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
                 onPress={() => setIsDeleteDialogOpen(true)}
                 aria-label={'Cancel job'}
             >
-                {t('models.jobs.cancel')}
+                {t('common.actions.cancel')}
             </Button>
             <DialogContainer onDismiss={() => setIsDeleteDialogOpen(false)}>
                 {isDeleteDialogOpen && (
                     <AlertDialog
                         title={t('models.jobs.stopDialog.title')}
                         variant='destructive'
-                        primaryActionLabel={t('models.jobs.cancel')}
+                        primaryActionLabel={t('common.actions.cancel')}
                         onPrimaryAction={onCancel}
-                        cancelLabel={t('models.jobs.stopDialog.close')}
+                        cancelLabel={t('common.actions.close')}
                     >
                         {t('models.jobs.stopDialog.confirmation')}
                     </AlertDialog>

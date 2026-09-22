@@ -26,7 +26,7 @@ export const DatasetColumn = ({ datasetRevision, labelsCount }: DatasetColumnPro
     if (datasetRevision === undefined) {
         return (
             <Flex alignItems={'center'} justifyContent={'center'}>
-                {t('dataset.revisions.unknown')}
+                {t('common.labels.unknown')}
             </Flex>
         );
     }

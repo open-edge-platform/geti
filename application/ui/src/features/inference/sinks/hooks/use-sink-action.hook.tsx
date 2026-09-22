@@ -47,7 +47,7 @@ export const useSinkAction = <T extends SinkConfig>({
             toast({
                 type: 'error',
                 message: t('inference.sinks.form.saveError', {
-                    details: details ?? t('inference.sinks.form.saveErrorFallback'),
+                    details: details ?? t('inference.connection.saveErrorFallback'),
                 }),
             });
         }

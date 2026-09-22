@@ -15,7 +15,7 @@ type FailedJobRowProps = JobRowColumnsProps & {
 const FailedStatusBadge = () => {
     const { t } = useTranslation();
 
-    return <Badge variant={'negative'}>{t('models.jobs.failed')}</Badge>;
+    return <Badge variant={'negative'}>{t('common.status.failed')}</Badge>;
 };
 
 const DismissFailedJob = ({ onDismiss }: { onDismiss: () => void }) => {
@@ -23,7 +23,7 @@ const DismissFailedJob = ({ onDismiss }: { onDismiss: () => void }) => {
 
     return (
         <Button variant={'negative'} onPress={onDismiss} aria-label={'Dismiss failed job'}>
-            {t('models.jobs.dismiss')}
+            {t('common.actions.dismiss')}
         </Button>
     );
 };

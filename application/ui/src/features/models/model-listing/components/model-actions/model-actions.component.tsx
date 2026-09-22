@@ -96,7 +96,7 @@ export const ModelActions = ({ model }: ModelActionsProps) => {
                     <MoreMenu />
                 </ActionButton>
                 <Menu onAction={handleAction} aria-label={'Model actions menu'} disabledKeys={disabledKeys}>
-                    <Item key={MODEL_ACTIONS.RENAME}>{t('models.actions.rename')}</Item>
+                    <Item key={MODEL_ACTIONS.RENAME}>{t('common.actions.rename')}</Item>
                     <Item key={MODEL_ACTIONS.DELETE_WEIGHTS}>{t('models.actions.deleteWeights')}</Item>
                     <Item key={MODEL_ACTIONS.DELETE_MODEL}>{t('models.actions.deleteModel')}</Item>
                     <Item key={MODEL_ACTIONS.VIEW_LOGS}>{t('models.actions.viewLogs')}</Item>
@@ -121,7 +121,7 @@ export const ModelActions = ({ model }: ModelActionsProps) => {
                         primaryActionLabel={t('models.actions.deleteWeights')}
                         onPrimaryAction={() => handleDeleteModel(true)}
                         isPrimaryActionDisabled={deleteModelMutation.isPending}
-                        cancelLabel={t('models.actions.cancel')}
+                        cancelLabel={t('common.actions.cancel')}
                     >
                         {t('models.actions.deleteWeightsDescription', { modelName })}
                     </AlertDialog>
@@ -135,7 +135,7 @@ export const ModelActions = ({ model }: ModelActionsProps) => {
                         primaryActionLabel={t('models.actions.deleteModel')}
                         onPrimaryAction={() => handleDeleteModel(false)}
                         isPrimaryActionDisabled={deleteModelMutation.isPending}
-                        cancelLabel={t('models.actions.cancel')}
+                        cancelLabel={t('common.actions.cancel')}
                     >
                         {t('models.actions.deleteModelDescription', { modelName })}
                     </AlertDialog>

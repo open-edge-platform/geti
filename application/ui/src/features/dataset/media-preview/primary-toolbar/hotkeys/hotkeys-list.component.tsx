@@ -47,9 +47,9 @@ export const HotkeysList = () => {
                 <HotkeyItem key={tool.type} hotkeyName={tool.label} hotkey={formatHotkeyForDisplay(tool.hotkey)} />
             ))}
             <Divider size='S' gridColumn={'1/-1'} />
-            <HotkeyItem hotkeyName={t('annotator.hotkeys.undo')} hotkey={formatHotkeyForDisplay(HOTKEYS.undo)} />
+            <HotkeyItem hotkeyName={t('common.actions.undo')} hotkey={formatHotkeyForDisplay(HOTKEYS.undo)} />
             <HotkeyItem
-                hotkeyName={t('annotator.hotkeys.redo')}
+                hotkeyName={t('common.actions.redo')}
                 hotkey={`${formatHotkeyForDisplay(HOTKEYS.redo)} or ${formatHotkeyForDisplay(HOTKEYS.redoAlt)}`}
             />
             <HotkeyItem
