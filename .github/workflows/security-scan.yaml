@@ -270,6 +270,7 @@ jobs:
         uses: open-edge-platform/geti-ci/actions/trivy-scan-diff@7cb99ede8752d628eb220fc36c86b4eb043ac525 # trivy-scan-diff/v0.1.0
         with:
           image: "ghcr.io/open-edge-platform/geti-${{ matrix.ai-device }}:develop"
+          # renovate: datasource=docker depName=python
           base-image: "python:3.14-slim@sha256:ef30e8ee3a7f227b0b5b39669b2e656f35b56b918c6631820357c2a55ff5a428"
           artifact-name: "trivy-scan-diff-${{ matrix.ai-device }}"
           ignore_unfixed: true
