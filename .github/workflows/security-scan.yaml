@@ -248,12 +248,16 @@ jobs:
             docker stop "${CONTAINER_NAME}" || true
           fi
 
-  trivy-image-scan:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+  trivy-scan-diff:
+    # TODO: drop the pull_request condition once diff-scan testing is done
+    # TODO: add renovate config to support base-image upgrade
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
     strategy:
+      fail-fast: false
       matrix:
         ai-device: [cpu, cuda, xpu]
     steps:
@@ -262,15 +266,10 @@ jobs:
         with:
           egress-policy: audit
 
-      - name: Run container image scan (${{ matrix.ai-device }})
-        uses: open-edge-platform/geti-ci/actions/trivy@7e686c1248b3939f8ee8e04e2612da727e379d91
+      - name: Run Trivy scan diff (${{ matrix.ai-device }})
+        uses: open-edge-platform/geti-ci/actions/trivy-scan-diff@7cb99ede8752d628eb220fc36c86b4eb043ac525 # trivy-scan-diff/v0.1.0
         with:
-          artifact-name: "trivy-scan-container-${{ matrix.ai-device }}"
-          scan_type: "image"
-          scan_target: "ghcr.io/open-edge-platform/geti-${{ matrix.ai-device }}:develop"
-          scan-scope: all
-          severity: "LOW"
-          scanners: "vuln,secret,config"
-          format: "table"
-          timeout: "15m"
-          ignore_unfixed: "true"
+          image: "ghcr.io/open-edge-platform/geti-${{ matrix.ai-device }}:develop"
+          base-image: "python:3.14-slim@sha256:ef30e8ee3a7f227b0b5b39669b2e656f35b56b918c6631820357c2a55ff5a428"
+          artifact-name: "trivy-scan-diff-${{ matrix.ai-device }}"
+          ignore_unfixed: true
