@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { PointerEvent, useCallback, useMemo } from 'react';
+import { PointerEvent, useMemo } from 'react';
 
 import { useTranslation } from '@/i18n';
 
@@ -49,14 +49,11 @@ export const AnnotationLabels = ({
         [t]
     );
 
-    const onDeleteLabel = useCallback(
-        (labelId: string) => (event: PointerEvent) => {
-            event.preventDefault();
-            event.stopPropagation();
-            onRemove(labelId);
-        },
-        [onRemove]
-    );
+    const onDeleteLabel = (labelId: string) => (event: PointerEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onRemove(labelId);
+    };
 
     const resolvedLabels = labels.map(resolveAnnotationLabel).filter((label) => label !== undefined);
     const displayLabels = resolvedLabels.length ? resolvedLabels : [placeholderLabel];

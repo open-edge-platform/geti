@@ -70,9 +70,10 @@ const SubsetMediaDialogContent = ({
     const annotationsDTO = annotationsData?.annotations ?? [];
     const isUserReviewed = annotationsData?.user_reviewed ?? false;
 
-    const initialPredictionsDTO = useMemo(() => {
-        return predictionsData?.flatMap((predictionData) => predictionData.prediction) ?? [];
-    }, [predictionsData]);
+    const initialPredictionsDTO = useMemo(
+        () => predictionsData?.flatMap((predictionData) => predictionData.prediction) ?? [],
+        [predictionsData]
+    );
 
     return (
         <ReadOnlyAnnotatorProviders

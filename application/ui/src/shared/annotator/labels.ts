@@ -1,8 +1,6 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
 import type { Label, TaskType } from '@/api/types';
 import { useTranslation, type TranslateFn } from '@/i18n';
 import { useProject } from 'hooks/api/project.hook';
@@ -35,14 +33,9 @@ export const useProjectLabelsWithEmptyLabel = (): Label[] => {
     const { data: project } = useProject();
     const { labels = [], exclusive_labels, task_type } = project.task;
 
-    return useMemo(() => {
-        const label = getEmptyLabel(task_type, exclusive_labels, t);
-        if (label) {
-            return [...labels, label];
-        }
+    const label = getEmptyLabel(task_type, exclusive_labels, t);
 
-        return labels;
-    }, [exclusive_labels, labels, task_type, t]);
+    return label ? [...labels, label] : labels;
 };
 
 export const filterOutEmptyLabels = <T extends Pick<Label, 'id'>>(labels: T[]): T[] =>
@@ -51,7 +44,7 @@ export const filterOutEmptyLabels = <T extends Pick<Label, 'id'>>(labels: T[]): 
 export const useLabelResolver = () => {
     const labels = useProjectLabelsWithEmptyLabel();
 
-    const labelMap = useMemo(() => new Map(labels.map((label) => [label.id, label])), [labels]);
+    const labelMap = new Map(labels.map((label) => [label.id, label]));
 
     const getLabel = (id: string): Label | undefined => labelMap.get(id);
 

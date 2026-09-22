@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 
 import type { Model } from '@/api/types';
 import { usePipeline } from 'hooks/api/pipeline.hook';
@@ -38,7 +38,7 @@ const useSelectedModelId = (models: Model[]) => {
     const projectId = useProjectIdentifier();
     const activeModel = useGetActiveModel();
 
-    const selectableModels = useMemo(() => getAllModelsWithOpenVINOVariants(models), [models]);
+    const selectableModels = getAllModelsWithOpenVINOVariants(models);
 
     const defaultSelectedId =
         selectableModels.find((model) => model.modelVariantId === activeModel?.model_variant_id)?.modelVariantId ??
@@ -58,7 +58,7 @@ const useSelectedModelId = (models: Model[]) => {
 export const PredictionsSetupProvider = ({ children }: { children: ReactNode }) => {
     const { data: models } = useGetSuccessfulModels();
 
-    const selectableModels = useMemo(() => getAllModelsWithOpenVINOVariants(models), [models]);
+    const selectableModels = getAllModelsWithOpenVINOVariants(models);
 
     const [selectedModelId, setSelectedModelId] = useSelectedModelId(models);
 

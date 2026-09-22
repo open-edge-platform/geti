@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useRef } from 'react';
 
 import { ActionButton, DOMRefValue, Flex, useUnwrapDOMRef, View } from '@geti-ui/ui';
 import { DownloadIcon } from '@geti-ui/ui/icons';
@@ -29,23 +29,18 @@ export const MetricGraph = ({ title, data, xAxisLabel, yAxisLabel }: MetricGraph
     const graphRef = useRef<DOMRefValue<HTMLDivElement>>(null);
     const unwrappedGraphRef = useUnwrapDOMRef(graphRef);
 
-    const chartData = useMemo(() => {
-        if (!data || data.length === 0) return [];
-        // Ensure the line starts from zero epoch (x=0)
-        if (data[0].x > 0) {
-            return [{ x: 0, y: 0 }, ...data];
-        }
-        return data;
-    }, [data]);
+    // Ensure the line starts from zero epoch (x=0)
+    const needsZeroEpoch = data !== undefined && data.length > 0 && data[0].x > 0;
+    const chartData = needsZeroEpoch ? [{ x: 0, y: 0 }, ...data] : (data ?? []);
 
-    const handleDownload = useCallback(() => {
+    const handleDownload = () => {
         if (!unwrappedGraphRef.current) return;
 
         const svgElement = unwrappedGraphRef.current.querySelector('svg');
         if (!svgElement) return;
 
         void downloadSvgAsImage(svgElement, title);
-    }, [title, unwrappedGraphRef]);
+    };
 
     return (
         <Flex flex={1} direction={'column'} minWidth={'size-5000'}>

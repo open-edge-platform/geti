@@ -140,13 +140,15 @@ const MediaPreviewContent = ({
     const isCurrentMediaReviewed = annotationsData?.user_reviewed ?? false;
     const subset: DatasetSubset = annotationsData?.subset ?? 'unassigned';
 
-    const initialAnnotations = useMemo(() => {
-        return getInitialAnnotations(isCurrentMediaReviewed, annotationsData?.annotations ?? []);
-    }, [isCurrentMediaReviewed, annotationsData?.annotations]);
+    const initialAnnotations = useMemo(
+        () => getInitialAnnotations(isCurrentMediaReviewed, annotationsData?.annotations ?? []),
+        [isCurrentMediaReviewed, annotationsData?.annotations]
+    );
 
-    const initialPredictions = useMemo(() => {
-        return predictionsData?.flatMap((predictionData) => predictionData.prediction) ?? [];
-    }, [predictionsData]);
+    const initialPredictions = useMemo(
+        () => predictionsData?.flatMap((predictionData) => predictionData.prediction) ?? [],
+        [predictionsData]
+    );
 
     const [mode, setMode] = useAnnotatorMode();
 

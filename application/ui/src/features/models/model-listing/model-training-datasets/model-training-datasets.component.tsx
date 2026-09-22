@@ -1,8 +1,6 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
 import type { DatasetRevision, DatasetSubset, Model } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { Flex, MediaViewModes, Text, ViewModes } from '@geti-ui/ui';
@@ -61,7 +59,7 @@ const ModelTrainingContent = ({ datasetRevision, model }: { datasetRevision: Dat
     const datasetRevisionId = String(datasetRevision.id);
 
     // Predictions can only be run with an OpenVINO variant of the model being inspected
-    const selectedModel = useMemo(() => getAllModelsWithOpenVINOVariants([model]).at(0), [model]);
+    const selectedModel = getAllModelsWithOpenVINOVariants([model]).at(0);
 
     return (
         <Flex gap={'size-300'} width={'100%'}>

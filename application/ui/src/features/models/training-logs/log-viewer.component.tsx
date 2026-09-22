@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { useTranslation } from '@/i18n';
 import {
@@ -40,7 +40,7 @@ export const LogViewer = ({ logs, isStreaming = false, connectionStatus }: LogVi
     const [minLevel, setMinLevel] = useState<LogLevel>('INFO');
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredLogs = useMemo(() => filterLogs(logs, minLevel, searchQuery), [logs, minLevel, searchQuery]);
+    const filteredLogs = filterLogs(logs, minLevel, searchQuery);
 
     const { anchorRef, isAtBottom, scrollToBottom } = useScrollAnchor();
 

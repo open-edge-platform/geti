@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Dispatch, SetStateAction, Suspense, useMemo, useState } from 'react';
+import { Dispatch, SetStateAction, Suspense, useState } from 'react';
 
 import type { Media } from '@/api/types';
 import { useTranslation } from '@/i18n';
@@ -152,14 +152,12 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
         });
     };
 
-    const selectedImagesIds = useMemo(() => {
-        // The gallery only holds the pages it has loaded, so ids resolved by "select all" are the
-        // only way to tell whether an unloaded selected item is an image.
-        const imageIds = new Set(selectAllImageIds);
-        items.filter(isImage).forEach((item) => imageIds.add(String(item.id)));
+    // The gallery only holds the pages it has loaded, so ids resolved by "select all" are the
+    // only way to tell whether an unloaded selected item is an image.
+    const imageIds = new Set(selectAllImageIds);
+    items.filter(isImage).forEach((item) => imageIds.add(String(item.id)));
 
-        return Array.from(selectedKeys).filter((itemId) => imageIds.has(itemId));
-    }, [selectedKeys, items, selectAllImageIds]);
+    const selectedImagesIds = Array.from(selectedKeys).filter((itemId) => imageIds.has(itemId));
 
     const resetSelectedMediaIds = () => {
         setSelectedKeys(new Set());
