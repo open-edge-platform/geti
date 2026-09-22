@@ -17,9 +17,10 @@ export const executeWithTimeout = async <T>(
             promise,
             new Promise<T>((_, reject) => {
                 timeoutId = setTimeout(() => {
-                    reject(
-                        new Error(i18n.t('annotator.tools.autoSegmentation.timeoutError', { operation, timeoutMs }))
-                    );
+                    const message = i18n.isInitialized
+                        ? i18n.t('annotator.tools.autoSegmentation.timeoutError', { operation, timeoutMs })
+                        : `${operation} timed out after ${timeoutMs}ms. Please try refreshing the page.`;
+                    reject(new Error(message));
                 }, timeoutMs);
             }),
         ]);
