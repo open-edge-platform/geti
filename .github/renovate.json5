@@ -181,6 +181,7 @@
       matchManagers: ["custom.regex"],
       matchDatasources: ["docker"],
       matchDepNames: ["python"],
+      matchUpdateTypes: ["digest"],
       groupName: "Pin images",
       groupSlug: "pin-images",
       schedule: ["* * * * 6"], // weekly on Saturday
