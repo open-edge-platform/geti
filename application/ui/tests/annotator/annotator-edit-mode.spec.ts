@@ -130,7 +130,7 @@ test.describe('Annotator - edit mode', () => {
                 await polygonTool.drawPolygon(smallPolygon);
 
                 await expect(polygonTool.getTool()).toHaveAttribute('aria-pressed', 'true');
-                await expect(page.locator('[id^="edit-polygon-points-"]')).toHaveCount(1);
+                await expect(page.getByTestId(/^edit-polygon-points-/)).toHaveCount(1);
             });
 
             const polygonAnnotation = page.getByLabel('selected annotation').getByLabel('annotation polygon').first();
@@ -159,7 +159,7 @@ test.describe('Annotator - edit mode', () => {
                 await expect
                     .poll(async () => (await polygonAnnotation.getAttribute('points')) ?? '')
                     .not.toBe(initialPoints);
-                await expect(page.locator('[id^="edit-polygon-points-"]')).toHaveCount(1);
+                await expect(page.getByTestId(/^edit-polygon-points-/)).toHaveCount(1);
             });
 
             await test.step('Can draw another polygon without switching to selection tool', async () => {
@@ -247,7 +247,7 @@ test.describe('Annotator - edit mode', () => {
                     await polygonTool.selectPolygonTool();
                     await polygonTool.drawPolygon(smallPolygon);
 
-                    await expect(page.locator('[id^="edit-polygon-points-"]')).toHaveCount(1);
+                    await expect(page.getByTestId(/^edit-polygon-points-/)).toHaveCount(1);
                     await expect(annotatorPage.getAnnotationsList().getByLabel('selected annotation')).toHaveCount(1);
                 });
 
@@ -257,7 +257,7 @@ test.describe('Annotator - edit mode', () => {
                 });
 
                 await test.step('Only the newly created annotation remains in edit mode', async () => {
-                    await expect(page.locator('[id^="edit-polygon-points-"]')).toHaveCount(1);
+                    await expect(page.getByTestId(/^edit-polygon-points-/)).toHaveCount(1);
                     await expect(annotatorPage.getAnnotationsList().getByLabel('selected annotation')).toHaveCount(1);
                     expect(await annotatorPage.getAnnotationsListItems('annotation polygon')).toHaveLength(2);
                 });
@@ -286,7 +286,7 @@ test.describe('Annotator - edit mode', () => {
                     await page.getByRole('button', { name: 'Selection' }).click();
                     await page.getByLabel('annotation polygon').first().click();
 
-                    await expect(page.locator('[id^="edit-polygon-points-"]')).toHaveCount(1);
+                    await expect(page.getByTestId(/^edit-polygon-points-/)).toHaveCount(1);
                     await expect(annotatorPage.getAnnotationsList().getByLabel('selected annotation')).toHaveCount(1);
                 });
 
@@ -296,7 +296,7 @@ test.describe('Annotator - edit mode', () => {
                 });
 
                 await test.step('Previously selected annotation is deselected and new one is in edit mode', async () => {
-                    await expect(page.locator('[id^="edit-polygon-points-"]')).toHaveCount(1);
+                    await expect(page.getByTestId(/^edit-polygon-points-/)).toHaveCount(1);
                     await expect(annotatorPage.getAnnotationsList().getByLabel('selected annotation')).toHaveCount(1);
                     expect(await annotatorPage.getAnnotationsListItems('annotation polygon')).toHaveLength(2);
                 });
