@@ -82,7 +82,9 @@ export const RunningJobRow = ({ job, onCancel, datasetRevisions, groupBy, modelA
     const statusMessage =
         job.message || (job.status === 'PENDING' ? t('models.jobs.pending') : t('models.jobs.running'));
     const showStatusTagMessage =
-        job.status.toLocaleLowerCase() !== statusMessage.replace('...', '').toLocaleLowerCase();
+        typeof job.message === 'string' &&
+        job.message.length > 0 &&
+        job.status.toLocaleLowerCase() !== job.message.replace('...', '').toLocaleLowerCase();
 
     return (
         <JobRow
