@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import type { SourceConfig } from '@/api/types';
 import { useTranslation } from '@/i18n';
@@ -21,7 +21,7 @@ export const SourceActions = () => {
     const [currentSource, setCurrentSource] = useState<SourceConfig | null>(null);
     const { data: sources = [], isPending } = useSourcesQuery();
     const filteredSources = sources.filter((source) => source.source_type !== 'disconnected');
-    const existingNames = useMemo(() => filteredSources.map((source) => source.name), [filteredSources]);
+    const existingNames = filteredSources.map((source) => source.name);
 
     const pipeline = usePipeline();
     const connectedSourceId = pipeline.data.source?.id;

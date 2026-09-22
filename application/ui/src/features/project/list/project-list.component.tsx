@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useState } from 'react';
 
 import type { TaskType } from '@/api/types';
 import { useTranslation } from '@/i18n';
@@ -86,9 +86,7 @@ const ProjectGrid = () => {
     const { searchName, setSearchName, selectedTaskTypes, setSelectedTaskTypes, filteredProjects, isFiltering } =
         useProjectFilters(projectsWithoutActivePipeline);
 
-    const sortedProjects = useMemo(() => {
-        return SORT_BY_HANDLERS[sortBy](filteredProjects);
-    }, [filteredProjects, sortBy]);
+    const sortedProjects = SORT_BY_HANDLERS[sortBy](filteredProjects);
 
     const projectNames = projects.map((project) => project.name);
 

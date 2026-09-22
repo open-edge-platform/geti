@@ -1,8 +1,6 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
 import { useTranslation } from '@/i18n';
 import { dimensionValue, Grid } from '@geti-ui/ui';
 import { useProjectTask } from 'hooks/use-project-task.hook';
@@ -23,17 +21,9 @@ export const ModelsTableHeader = ({ groupId }: { groupId: string }) => {
     const groupSortBy = sortBy[groupId] ?? DEFAULT_SORT;
     const handleSortChange = (key: SortBy) => onSortChange(groupId, key);
 
-    const performanceColumnLabel = useMemo(() => {
-        const models = groupedModels.flatMap((group) => group.models);
-
-        return getPerformanceColumnLabel(models, taskType, t);
-    }, [groupedModels, taskType, t]);
-
-    const performanceColumnAriaLabel = useMemo(() => {
-        const models = groupedModels.flatMap((group) => group.models);
-
-        return getPerformanceColumnAriaLabel(models, taskType);
-    }, [groupedModels, taskType]);
+    const models = groupedModels.flatMap((group) => group.models);
+    const performanceColumnLabel = getPerformanceColumnLabel(models, taskType, t);
+    const performanceColumnAriaLabel = getPerformanceColumnAriaLabel(models, taskType);
 
     return (
         <Grid

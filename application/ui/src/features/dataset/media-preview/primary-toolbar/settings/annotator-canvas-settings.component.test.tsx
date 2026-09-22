@@ -28,6 +28,7 @@ describe('AnnotatorCanvasSettings', () => {
 
         // Same DOM node (not remounted), only the CSS variable changed.
         expect(screen.getByTestId('canvas-content')).toBe(content);
+        expect(screen.getByTestId('canvas-content')).toBeInTheDocument();
         expect(wrapper.style.getPropertyValue('--annotation-labels-display')).toBe('none');
     });
 });

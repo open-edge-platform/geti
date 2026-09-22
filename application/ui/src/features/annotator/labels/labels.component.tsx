@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { CSSProperties, Fragment, useMemo } from 'react';
+import { CSSProperties, Fragment } from 'react';
 
 import type { Label } from '@/api/types';
 import { useTranslation } from '@/i18n';
@@ -78,21 +78,13 @@ export const Labels = ({ isClassification = false, isMultiLabel = false }: Label
     const projectId = useProjectIdentifier();
     const { isPinned, hasPinnedLabels } = usePinnedLabels(projectId);
 
-    const visibleLabels = useMemo(() => {
-        if (hasPinnedLabels) {
-            return labels.filter((label) => isPinned(label.id) || label.id === EMPTY_LABEL_ID);
-        }
+    const emptyLabel = labels.find((label) => label.id === EMPTY_LABEL_ID);
+    const visibleLabels = hasPinnedLabels
+        ? labels.filter((label) => isPinned(label.id) || label.id === EMPTY_LABEL_ID)
+        : [...editableLabels.slice(0, MAX_VISIBLE_LABELS), ...(emptyLabel ? [emptyLabel] : [])];
 
-        const emptyLabel = labels.find((label) => label.id === EMPTY_LABEL_ID);
-        const visible = editableLabels.slice(0, MAX_VISIBLE_LABELS);
-
-        return emptyLabel ? [...visible, emptyLabel] : visible;
-    }, [labels, editableLabels, hasPinnedLabels, isPinned]);
-
-    const hiddenLabelsCount = useMemo(() => {
-        const visibleNonEmptyCount = visibleLabels.filter((label) => label.id !== EMPTY_LABEL_ID).length;
-        return editableLabels.length - visibleNonEmptyCount;
-    }, [editableLabels, visibleLabels]);
+    const visibleNonEmptyCount = visibleLabels.filter((label) => label.id !== EMPTY_LABEL_ID).length;
+    const hiddenLabelsCount = editableLabels.length - visibleNonEmptyCount;
 
     return (
         <Flex alignItems='start' gap='size-100' minWidth={0} flex='1'>

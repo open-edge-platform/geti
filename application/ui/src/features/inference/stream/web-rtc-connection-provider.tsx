@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useCallback, useContext, useEffect, useRef, useState, type RefObject } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useRef, useState, type RefObject } from 'react';
 
 import { WebRTCConnection, WebRTCConnectionStatus } from './web-rtc-connection';
 
@@ -48,7 +48,7 @@ const useWebRTCConnectionState = () => {
         };
     }, []);
 
-    const start = useCallback(async () => {
+    const start = async () => {
         if (!webRTCConnectionRef.current) {
             return;
         }
@@ -59,15 +59,15 @@ const useWebRTCConnectionState = () => {
             console.error('Failed to start WebRTC connection:', error);
             setStatus('failed');
         }
-    }, []);
+    };
 
-    const stop = useCallback(async () => {
+    const stop = async () => {
         if (!webRTCConnectionRef.current) {
             return;
         }
 
         await webRTCConnectionRef.current.stop();
-    }, []);
+    };
 
     return {
         start,

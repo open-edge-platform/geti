@@ -4,12 +4,9 @@
 import { mapServerAnnotationsToLocal } from '../../../shared/annotator/annotation-mappers';
 import { Annotation } from '../../../shared/types';
 import { DEFAULT_ANNOTATION_STYLES } from '../utils';
+import { PREDICTION_CHUNK_SIZE, PREDICTION_FRAME_SKIP } from '../video-player/api/prediction-constants';
 import { useVideoFramesAnnotations } from '../video-player/api/use-video-frames-annotations';
-import {
-    PREDICTION_CHUNK_SIZE,
-    PREDICTION_FRAME_SKIP,
-    useVideoFramesPredictions,
-} from '../video-player/api/use-video-frames-predictions';
+import { useVideoFramesPredictions } from '../video-player/api/use-video-frames-predictions';
 import { useVideoPlayer } from '../video-player/video-player-provider.component';
 import { AnnotationShapeRenderer } from './annotation-shape-renderer.component';
 

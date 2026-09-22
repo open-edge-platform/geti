@@ -10,9 +10,6 @@ import { usePredictionSetup } from '../../predictions-setup-provider.component';
 import { useVideoPlayer } from '../video-player-provider.component';
 import { getVideoFrameRangeIndexes } from './utils';
 
-export const PREDICTION_CHUNK_SIZE = 15;
-export const PREDICTION_FRAME_SKIP = 1;
-
 const useVideoFramesPredictionsQueryOptions = ({
     frameNumber,
     frameSkip,

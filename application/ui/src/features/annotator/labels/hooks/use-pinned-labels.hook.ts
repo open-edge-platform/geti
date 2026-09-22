@@ -1,8 +1,6 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback } from 'react';
-
 import { useLocalStorage } from 'usehooks-ts';
 
 const PINNED_LABELS_KEY = 'pinned-labels';
@@ -21,12 +19,7 @@ type UsePinnedLabelsReturn = {
 export const usePinnedLabels = (projectId: string): UsePinnedLabelsReturn => {
     const [pinnedLabelIds, setPinnedLabelIds] = useLocalStorage<string[]>(getPinnedLabelsKey(projectId), []);
 
-    const isPinned = useCallback(
-        (labelId: string) => {
-            return pinnedLabelIds.includes(labelId);
-        },
-        [pinnedLabelIds]
-    );
+    const isPinned = (labelId: string) => pinnedLabelIds.includes(labelId);
 
     const togglePin = (labelId: string) => {
         setPinnedLabelIds((prev) => {

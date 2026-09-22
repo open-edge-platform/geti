@@ -123,11 +123,7 @@ export const useGetDatasetMediaItems = (options?: UseGetDatasetMediaItemsOptions
         }
     );
 
-    const items = useMemo(() => {
-        const mediaItems = data?.pages?.flatMap((page) => page.items) ?? [];
-
-        return getMediaEntities(mediaItems);
-    }, [data?.pages]);
+    const items = useMemo(() => getMediaEntities(data?.pages?.flatMap((page) => page.items) ?? []), [data?.pages]);
 
     const totalCount = data?.pages[0]?.pagination?.total ?? 0;
 
