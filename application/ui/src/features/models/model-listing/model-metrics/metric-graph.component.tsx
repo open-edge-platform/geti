@@ -7,6 +7,7 @@ import { ActionButton, DOMRefValue, Flex, useUnwrapDOMRef, View } from '@geti-ui
 import { DownloadIcon } from '@geti-ui/ui/icons';
 import { CartesianGrid, Line, LineChart, Tooltip, XAxis, YAxis } from 'recharts';
 
+import { isNonEmptyArray } from '../../../../shared/util';
 import { Box } from '../components/box/box.component';
 import { downloadSvgAsImage } from './download-graph.utils';
 
@@ -30,7 +31,7 @@ export const MetricGraph = ({ title, data, xAxisLabel, yAxisLabel }: MetricGraph
     const unwrappedGraphRef = useUnwrapDOMRef(graphRef);
 
     // Ensure the line starts from zero epoch (x=0)
-    const needsZeroEpoch = data !== undefined && data.length > 0 && data[0].x > 0;
+    const needsZeroEpoch = isNonEmptyArray(data) && data[0].x > 0;
     const chartData = needsZeroEpoch ? [{ x: 0, y: 0 }, ...data] : (data ?? []);
 
     const handleDownload = () => {
