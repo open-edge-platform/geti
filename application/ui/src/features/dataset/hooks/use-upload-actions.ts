@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 
-import { useMediaUploadDispatch } from '../providers/media-upload-provider.component';
+import { useMediaUploadDispatch } from '../providers/media-upload-context';
 import { UploadFileItem } from '../providers/media-upload-reducer';
 
 type UploadActions = {

@@ -34,9 +34,12 @@ describe('Crosshair', () => {
             </svg>
         );
 
-        const rects2 = container2.querySelectorAll('rect');
-        expect(Array.from(rects2).find((rect) => rect.getAttribute('x') === '50')).toBeTruthy();
-        expect(Array.from(rects2).find((rect) => rect.getAttribute('y') === '75')).toBeTruthy();
+        const [horizontal, vertical] = Array.from(container2.querySelectorAll('rect'));
+
+        expect(horizontal).toHaveAttribute('y', '75');
+        expect(horizontal).toHaveAttribute('width', '100%');
+        expect(vertical).toHaveAttribute('x', '50');
+        expect(vertical).toHaveAttribute('height', '100%');
     });
 
     it('handles zoom levels correctly', () => {
@@ -77,9 +80,10 @@ describe('Crosshair', () => {
             </svg>
         );
 
-        const rects = container.querySelectorAll('rect');
-        expect(Array.from(rects).find((rect) => rect.getAttribute('x') === '150')).toBeTruthy();
-        expect(Array.from(rects).find((rect) => rect.getAttribute('y') === '250')).toBeTruthy();
+        const [horizontal, vertical] = Array.from(container.querySelectorAll('rect'));
+
+        expect(horizontal).toHaveAttribute('y', '250');
+        expect(vertical).toHaveAttribute('x', '150');
 
         rerender(
             <svg>

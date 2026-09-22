@@ -10,7 +10,8 @@ import { clsx } from 'clsx';
 
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import { Toolbar } from '../../../dataset/media-preview/toolbar-container/toolbar-container.component';
-import { PREDICTION_CHUNK_SIZE, usePrefetchVideoFramesPredictions } from '../api/use-video-frames-predictions';
+import { PREDICTION_CHUNK_SIZE } from '../api/prediction-constants';
+import { usePrefetchVideoFramesPredictions } from '../api/use-video-frames-predictions';
 import { useVideoPlayer } from '../video-player-provider.component';
 import { FrameStep } from './frame-step/frame-step.component';
 import { PlaybackSpeedSlider } from './playback-rate.component';
