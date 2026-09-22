@@ -147,6 +147,7 @@ def setup_job_controller(
             subset_assigner=SubsetAssigner(),
             dataset_service=dataset_service,
             dataset_revision_service=dataset_revision_service,
+            label_service=label_service,
             model_service=ModelService(data_dir=data_dir),
             training_configuration_service=TrainingConfigurationService(),
             data_dir=data_dir,

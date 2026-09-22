@@ -1,6 +1,7 @@
 # Copyright (C) 2025 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from collections.abc import Sequence
 from enum import StrEnum
 
 from pydantic import Field
@@ -47,3 +48,24 @@ class Task(BaseEntity):
     @property
     def is_multiclass(self) -> bool:
         return self.task_type is TaskType.CLASSIFICATION and self.exclusive_labels
+
+    def validate_trainable(self, labels: Sequence[Label] | None = None) -> None:
+        """
+        Check that the task has enough labels to be trained on.
+
+        A project may be created and annotated without labels, so this invariant is enforced only where training
+        actually starts.
+
+        Args:
+            labels: Labels to validate instead of the ones held by this task. Callers that resumed after a delay
+                (e.g. a queued training job) should pass the labels currently stored for the project, since this
+                task may be a stale snapshot.
+
+        Raises:
+            ValueError: If the task has no labels, or fewer than two for multi-class classification.
+        """
+        effective_labels = self.labels if labels is None else labels
+        if not effective_labels:
+            raise ValueError("Create at least one label before training.")
+        if self.is_multiclass and len(effective_labels) < 2:
+            raise ValueError("Multi-class classification requires at least two labels before training.")

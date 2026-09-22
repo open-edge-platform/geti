@@ -51,6 +51,7 @@ from app.services import (
     BaseWeightsService,
     DatasetRevisionService,
     DatasetService,
+    LabelService,
     ModelRevisionMetadata,
     ModelService,
     SplitRatios,
@@ -75,6 +76,7 @@ class TrainingDependencies:
     subset_service: SubsetService
     dataset_service: DatasetService
     dataset_revision_service: DatasetRevisionService
+    label_service: LabelService
     model_service: ModelService
     training_configuration_service: TrainingConfigurationService
     subset_assigner: SubsetAssigner
@@ -129,6 +131,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         self._subset_service = training_deps.subset_service
         self._dataset_service = training_deps.dataset_service
         self._dataset_revision_service = training_deps.dataset_revision_service
+        self._label_service = training_deps.label_service
         self._model_service = training_deps.model_service
         self._training_configuration_service = training_deps.training_configuration_service
         self._subset_assigner = training_deps.subset_assigner
@@ -743,6 +746,10 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         training_start_time = datetime.now(UTC)
         project_id = params.project_id
         task = params.task
+        # `task` is a snapshot from submission time; labels may have been deleted while the job queued for capacity.
+        with self._db_session_factory() as db:
+            self._label_service.set_db_session(db)
+            task.validate_trainable(self._label_service.list_all(project_id))
         model_dir = self.__base_model_path(
             data_dir=self._data_dir,
             project_id=project_id,

@@ -57,7 +57,7 @@ router = APIRouter(prefix="/api/jobs", tags=["Jobs"])
         },
     },
 )
-async def submit_job(  # noqa: C901, PLR0912
+async def submit_job(  # noqa: C901
     job_request: Annotated[JobRequest, Body()],
     job_queue: Annotated[JobQueue, Depends(get_job_queue)],
     job_dir: Annotated[Path, Depends(get_job_dir)],
@@ -73,10 +73,7 @@ async def submit_job(  # noqa: C901, PLR0912
             case JobType.TRAIN:
                 device = system_service.training_device(job_request.parameters.device)
                 project = project_service.get_project_by_id(job_request.project_id)
-                if not project.task.labels:
-                    raise ValueError("Create at least one label before training.")
-                if project.task.is_multiclass and len(project.task.labels) < 2:
-                    raise ValueError("Multi-class classification requires at least two labels before training.")
+                project.task.validate_trainable()
                 arch_id = job_request.parameters.model_architecture_id
                 arch_name = ModelManifestService.get_model_manifest_by_id(arch_id).name
                 job = TrainingJob(

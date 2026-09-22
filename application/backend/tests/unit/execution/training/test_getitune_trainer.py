@@ -42,6 +42,7 @@ from app.execution.training.getitune_trainer import (
 from app.models import (
     DatasetItemAnnotationStatus,
     DatasetItemSubset,
+    Label,
     ModelVariant,
     Task,
     TaskType,
@@ -53,6 +54,7 @@ from app.models.system import DeviceInfo, DeviceType
 from app.models.training_configuration import AlgoLevelParameters, TaskLevelParameters, TrainingConfiguration
 from app.services import ModelRevisionMetadata, ModelService, TrainingConfigurationService
 from app.services.base_weights_service import BaseWeightsService
+from app.services.label_service import LabelService
 from app.services.subset_assignment import DatasetItemWithLabels, SubsetAssigner, SubsetAssignment, SubsetService
 
 
@@ -81,6 +83,14 @@ def fxt_model_service() -> Mock:
 
 
 @pytest.fixture
+def fxt_label_service() -> Mock:
+    """Mock LabelService returning enough labels to train by default."""
+    label_service = Mock(spec=LabelService)
+    label_service.list_all.return_value = [Mock(), Mock()]
+    return label_service
+
+
+@pytest.fixture
 def fxt_training_configuration_service() -> Mock:
     """Mock TrainingConfigurationService for testing."""
     return Mock(spec=TrainingConfigurationService)
@@ -94,6 +104,7 @@ def fxt_getitune_trainer(
     fxt_assigner: Mock,
     fxt_dataset_service: Mock,
     fxt_dataset_revision_service: Mock,
+    fxt_label_service: Mock,
     fxt_model_service: Mock,
     fxt_training_configuration_service: Mock,
     fxt_db_session_factory: Callable,
@@ -109,6 +120,7 @@ def fxt_getitune_trainer(
                 subset_assigner=fxt_assigner,
                 dataset_service=fxt_dataset_service,
                 dataset_revision_service=fxt_dataset_revision_service,
+                label_service=fxt_label_service,
                 model_service=fxt_model_service,
                 training_configuration_service=fxt_training_configuration_service,
                 db_session_factory=fxt_db_session_factory,
@@ -121,6 +133,50 @@ def fxt_getitune_trainer(
         return getitune_trainer
 
     return create_getitune_trainer
+
+
+class TestGetiTuneTrainerExecute:
+    """Tests for the label guard at the start of GetiTuneTrainer.execute."""
+
+    @staticmethod
+    def _params(task: Task) -> TrainingJobParams:
+        return TrainingJobParams(
+            device=DeviceInfo(type=DeviceType.CPU, name="CPU", memory=None, index=None),
+            model_architecture_id="object-detection-yolox-s",
+            model_architecture_name="Test Model",
+            task=task,
+            project_id=uuid4(),
+            job_id=uuid4(),
+        )
+
+    def test_execute_rejects_labels_deleted_while_queued(
+        self,
+        fxt_label_service: Mock,
+        fxt_weights_service: Mock,
+        fxt_getitune_trainer: Callable[[], GetiTuneTrainer],
+    ):
+        fxt_label_service.list_all.return_value = []
+        stale_label = Label(id=uuid4(), project_id=uuid4(), name="cat", color="#ff0000")
+        params = self._params(Task(task_type=TaskType.DETECTION, labels=[stale_label]))
+
+        with pytest.raises(ValueError, match="Create at least one label before training."):
+            fxt_getitune_trainer().execute(params)
+
+        fxt_weights_service.get_local_weights_path.assert_not_called()
+
+    def test_execute_rejects_multiclass_left_with_one_label(
+        self,
+        fxt_label_service: Mock,
+        fxt_weights_service: Mock,
+        fxt_getitune_trainer: Callable[[], GetiTuneTrainer],
+    ):
+        fxt_label_service.list_all.return_value = [Mock()]
+        params = self._params(Task(task_type=TaskType.CLASSIFICATION, exclusive_labels=True))
+
+        with pytest.raises(ValueError, match="Multi-class classification requires at least two labels"):
+            fxt_getitune_trainer().execute(params)
+
+        fxt_weights_service.get_local_weights_path.assert_not_called()
 
 
 class TestGetiTuneTrainerPrepareWeights:

@@ -19,7 +19,7 @@ from app.api.schemas.jobs.training import TrainingRequest
 from app.core.jobs import JobQueue
 from app.core.jobs.control_plane import CancellationResult
 from app.core.jobs.models import Job, JobStatus, JobType
-from app.models import Project, Task, TaskType, TrainingJob, TrainingJobParams
+from app.models import Label, Project, Task, TaskType, TrainingJob, TrainingJobParams
 from app.models.system import DeviceInfo, DeviceType
 
 
@@ -109,6 +109,58 @@ class TestJobEndpoints:
             fxt_jobs_queue.submit.assert_called_once()
             assert fxt_jobs_queue.submit.call_args[0][0].params.model_architecture_id == "image-classification-vit-tiny"
             assert fxt_jobs_queue.submit.call_args[0][0].params.task.task_type == TaskType.CLASSIFICATION
+
+    def test_submit_train_job_without_labels_is_rejected(
+        self, fxt_app, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service
+    ):
+        fxt_app.dependency_overrides[get_job_dir] = lambda: tmp_path / "logs" / "jobs"
+        fxt_app.dependency_overrides[get_data_dir] = lambda: tmp_path / "data"
+        project = Mock(spec=Project)
+        project.id = uuid4()
+        project.task = Task(task_type=TaskType.DETECTION)
+        fxt_project_service.get_project_by_id.return_value = project
+
+        job_request = JobRequestAdapter.validate_python(
+            {
+                "project_id": project.id,
+                "job_type": JobType.TRAIN,
+                "parameters": {"device": "cpu", "model_architecture_id": "object-detection-yolox-s"},
+            }
+        )
+
+        response = fxt_client.post("/api/jobs", json=job_request.model_dump(mode="json"))
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json()["detail"] == "Create at least one label before training."
+        fxt_jobs_queue.submit.assert_not_called()
+
+    def test_submit_train_job_multiclass_with_single_label_is_rejected(
+        self, fxt_app, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service
+    ):
+        fxt_app.dependency_overrides[get_job_dir] = lambda: tmp_path / "logs" / "jobs"
+        fxt_app.dependency_overrides[get_data_dir] = lambda: tmp_path / "data"
+        project = Mock(spec=Project)
+        project.id = uuid4()
+        project.task = Task(
+            task_type=TaskType.CLASSIFICATION,
+            exclusive_labels=True,
+            labels=[Label(id=uuid4(), name="cat", color="#ff0000")],
+        )
+        fxt_project_service.get_project_by_id.return_value = project
+
+        job_request = JobRequestAdapter.validate_python(
+            {
+                "project_id": project.id,
+                "job_type": JobType.TRAIN,
+                "parameters": {"device": "cpu", "model_architecture_id": "image-classification-vit-tiny"},
+            }
+        )
+
+        response = fxt_client.post("/api/jobs", json=job_request.model_dump(mode="json"))
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json()["detail"] == "Multi-class classification requires at least two labels before training."
+        fxt_jobs_queue.submit.assert_not_called()
 
     def test_submit_quantize_job(self, fxt_app, tmp_path, fxt_client, fxt_jobs_queue, fxt_project_service):
         fxt_app.dependency_overrides[get_job_dir] = lambda: tmp_path / "logs" / "jobs"
