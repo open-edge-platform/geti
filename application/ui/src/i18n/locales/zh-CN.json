@@ -102,8 +102,8 @@
             "genericError": "媒体文件上传失败。",
             "uploadMedia": "上传媒体文件",
             "showDetails": "查看详情",
-            "inProgressToast_one": "正在上传 {{count}} 个文件…",
-            "inProgressToast_other": "正在上传 {{count}} 个文件…",
+            "inProgressToast_one": "正在上传 {{count}} 个文件……",
+            "inProgressToast_other": "正在上传 {{count}} 个文件……",
             "inProgressSucceededPart": "成功 {{count}} 个",
             "inProgressFailedPart": "失败 {{count}} 个"
         },
@@ -142,7 +142,7 @@
             "mediaItem": "删除媒体文件",
             "confirmation_one": "确定要删除 {{count}} 个文件吗？",
             "confirmation_other": "确定要删除 {{count}} 个文件吗？",
-            "deletingItems": "正在删除…",
+            "deletingItems": "正在删除……",
             "deleteError": "删除失败，{{detail}}",
             "deletedSuccess_one": "已成功删除 {{count}} 个文件",
             "deletedSuccess_other": "已成功删除 {{count}} 个文件"
@@ -511,7 +511,7 @@
         "pipeline": {
             "activeModel": {
                 "label": "模型",
-                "loading": "模型：…"
+                "loading": "模型：……"
             },
             "toggle": {
                 "enabledLabel": "流水线已启用",
@@ -622,7 +622,7 @@
             "countFiltered_one": "共 {{count}} 个项目，筛选出 {{filtered}} 个",
             "countFiltered_other": "共 {{count}} 个项目，筛选出 {{filtered}} 个",
             "createNewProject": "新建项目",
-            "createProjectFromDataset": "从数据集新建项目",
+            "createProjectFromDataset": "从数据集创建",
             "activeBadge": "当前项目",
             "card": {
                 "created": "创建于：{{date}}",
@@ -644,7 +644,7 @@
                 "createdAtAscending": "按创建时间（最早优先）"
             },
             "filters": {
-                "searchPlaceholder": "按名称搜索",
+                "searchPlaceholder": "搜索项目",
                 "taskType": "按任务类型筛选"
             },
             "noMatches": {
@@ -766,7 +766,7 @@
         },
         "toolbar": {
             "hotkeyTooltip": "快捷键：{{hotkey}}",
-            "overflowCount": "+{{count}} 个"
+            "overflowCount": "+ {{count}} 个"
         },
         "empty": {
             "noLabel": "无标签",
@@ -913,7 +913,7 @@
             "noMetrics": "暂无可用指标",
             "loadError": "训练指标加载失败",
             "evaluationsTitle": "评测",
-            "noEvaluations": "暂无测试评测指标"
+            "noEvaluations": "测试集评测指标暂不可用"
         },
         "training": {
             "logs": {
@@ -1096,7 +1096,7 @@
             "groupByArchitecture": "按架构分组",
             "hideFailedModels": "隐藏失败的模型",
             "showFailedModels": "显示失败的模型",
-            "searchPlaceholder": "搜索模型…",
+            "searchPlaceholder": "搜索模型……",
             "noModelsFound": "未找到模型",
             "empty": {
                 "title": "暂无模型。",
