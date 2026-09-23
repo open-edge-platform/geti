@@ -47,7 +47,7 @@ export const PrepareImportDataset = ({
                 <ImportFailedJob
                     size={size}
                     fileName={fileName}
-                    error={`${error?.detail ?? t('dataset.import.unknownErrorDetail')}`}
+                    error={`${error?.detail ?? t('common.errors.unknownDetail')}`}
                     message={t('dataset.import.prepareError')}
                     stagedDatasetId={stagedDatasetId}
                     deleteEntry={deleteEntry}

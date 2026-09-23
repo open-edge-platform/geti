@@ -79,7 +79,7 @@ export const getTilingMode = (tilingParameters: ConfigurableParameter[]): Tiling
 export const getTilingModeLabel = (mode: TilingMode, t: TranslateFn): string => {
     switch (mode) {
         case TILING_MODES.OFF:
-            return t('models.training.dataManagement.tiling.modes.off');
+            return t('common.labels.off');
         case TILING_MODES.AUTOMATIC:
             return t('models.training.dataManagement.tiling.modes.automatic');
         case TILING_MODES.CUSTOM:

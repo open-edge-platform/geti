@@ -49,7 +49,7 @@ export const SettingsList = ({ sink }: SettingsListProps) => {
     if (sink.sink_type === 'folder') {
         return (
             <ul className={classes.list}>
-                <li>{t('inference.sinks.settings.folderPath', { path: sink.folder_path })}</li>
+                <li>{t('inference.settings.folderPath', { path: sink.folder_path })}</li>
                 <li>{t('inference.sinks.settings.rateLimit', { value: formatRateLimit(sink.rate_limit, t) })}</li>
                 <li>
                     {t('inference.sinks.settings.outputFormats')}
@@ -78,15 +78,13 @@ export const SettingsList = ({ sink }: SettingsListProps) => {
     }
 
     if (sink.sink_type === 'mqtt') {
-        const authRequiredValue = sink.auth_required
-            ? t('inference.sinks.settings.yes')
-            : t('inference.sinks.settings.no');
+        const authRequiredValue = sink.auth_required ? t('common.labels.yes') : t('common.labels.no');
 
         return (
             <ul className={classes.list}>
                 <li>{t('inference.sinks.settings.topic', { value: sink.topic })}</li>
                 <li>{t('inference.sinks.settings.rateLimit', { value: formatRateLimit(sink.rate_limit, t) })}</li>
-                <li>{t('inference.sinks.settings.authRequired', { value: authRequiredValue })}</li>
+                <li>{t('inference.settings.authRequired', { value: authRequiredValue })}</li>
                 <li>{t('inference.sinks.settings.brokerHost', { value: sink.broker_host })}</li>
                 <li>{t('inference.sinks.settings.brokerPort', { value: sink.broker_port })}</li>
                 <li>

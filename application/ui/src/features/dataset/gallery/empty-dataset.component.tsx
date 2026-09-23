@@ -17,7 +17,7 @@ const ImportDatasetButton = () => {
 
     return (
         <Button variant={'secondary'} onPress={() => datasetImportDialogState.open()}>
-            {t('dataset.empty.importDataset')}
+            {t('dataset.import.dialogHeading')}
         </Button>
     );
 };

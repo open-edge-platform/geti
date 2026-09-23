@@ -24,7 +24,7 @@ export const ImportDatasetButtons = ({ currentStep, stagedDatasetId, onClose }: 
         return (
             <ButtonGroup>
                 <Button onPress={onClose} variant='secondary'>
-                    {t('dataset.import.cancel')}
+                    {t('common.actions.cancel')}
                 </Button>
             </ButtonGroup>
         );
@@ -48,7 +48,7 @@ export const ImportDatasetButtons = ({ currentStep, stagedDatasetId, onClose }: 
     return (
         <ButtonGroup>
             <Button onPress={onClose} variant='secondary'>
-                {t('dataset.import.cancel')}
+                {t('common.actions.cancel')}
             </Button>
         </ButtonGroup>
     );

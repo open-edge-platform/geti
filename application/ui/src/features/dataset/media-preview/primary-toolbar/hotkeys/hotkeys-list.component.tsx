@@ -31,7 +31,10 @@ export const HotkeysList = () => {
         <Grid columns={['2fr', '1fr']} rowGap={'size-100'}>
             <HotkeyItem
                 hotkeyName={t('annotator.hotkeys.submitAnnotationsPredictions')}
-                hotkey={`${submitHotkey} or ${submitAlternativeHotkey}`}
+                hotkey={t('annotator.hotkeys.alternatives', {
+                    primary: submitHotkey,
+                    alternative: submitAlternativeHotkey,
+                })}
             />
             <Divider size='S' gridColumn={'1/-1'} />
             <HotkeyItem
@@ -47,10 +50,13 @@ export const HotkeysList = () => {
                 <HotkeyItem key={tool.type} hotkeyName={tool.label} hotkey={formatHotkeyForDisplay(tool.hotkey)} />
             ))}
             <Divider size='S' gridColumn={'1/-1'} />
-            <HotkeyItem hotkeyName={t('annotator.hotkeys.undo')} hotkey={formatHotkeyForDisplay(HOTKEYS.undo)} />
+            <HotkeyItem hotkeyName={t('common.actions.undo')} hotkey={formatHotkeyForDisplay(HOTKEYS.undo)} />
             <HotkeyItem
-                hotkeyName={t('annotator.hotkeys.redo')}
-                hotkey={`${formatHotkeyForDisplay(HOTKEYS.redo)} or ${formatHotkeyForDisplay(HOTKEYS.redoAlt)}`}
+                hotkeyName={t('common.actions.redo')}
+                hotkey={t('annotator.hotkeys.alternatives', {
+                    primary: formatHotkeyForDisplay(HOTKEYS.redo),
+                    alternative: formatHotkeyForDisplay(HOTKEYS.redoAlt),
+                })}
             />
             <HotkeyItem
                 hotkeyName={t('annotator.hotkeys.deleteSelectedAnnotation')}

@@ -93,8 +93,8 @@ export const LabelsEditorPopover = ({
                     <AlertDialog
                         title={t('labels.editor.delete.title')}
                         variant={'destructive'}
-                        primaryActionLabel={t('labels.editor.delete.confirm')}
-                        cancelLabel={t('labels.editor.delete.cancel')}
+                        primaryActionLabel={t('common.actions.delete')}
+                        cancelLabel={t('common.actions.cancel')}
                         onPrimaryAction={handleConfirmDeleteLabel}
                         onCancel={handleCancelDeleteLabel}
                     >

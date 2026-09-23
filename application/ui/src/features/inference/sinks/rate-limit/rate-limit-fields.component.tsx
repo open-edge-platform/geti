@@ -24,9 +24,9 @@ export const RateLimitFields = ({ rateLimit }: RateLimitFieldsProps) => {
                 step={0.1}
                 defaultValue={samples}
             />
-            <Text>{t('inference.sinks.fields.every')}</Text>
+            <Text>{t('common.labels.every')}</Text>
             <NumberField
-                label={t('inference.sinks.fields.seconds')}
+                label={t('common.labels.seconds')}
                 name='rate_limit_seconds'
                 minValue={0.1}
                 step={0.1}

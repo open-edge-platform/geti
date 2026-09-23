@@ -9,6 +9,7 @@ import { useProjectLabels } from 'hooks/use-project-labels.hook';
 import { capitalize, isEmpty } from 'lodash-es';
 
 import { formatDateRangeEnd, formatDateRangeStart, formatFilterDate } from '../../../../shared/date-utils';
+import { SUBSET_LABEL_KEYS } from '../../../../shared/subsets';
 import { isNonEmptyArray } from '../../../../shared/util';
 import { FilterChips } from '../toolbar/media-filtering/filter-chips/filter-chips.component';
 
@@ -83,7 +84,7 @@ export const ActiveFiltersList = () => {
                 selectedSubsets.map((subset) => (
                     <FilterChips
                         key={subset}
-                        name={t(`dataset.filters.subsetOptions.${subset}`)}
+                        name={t(SUBSET_LABEL_KEYS[subset])}
                         ariaLabel={`Remove ${capitalize(subset)} filter`}
                         onClose={() => setSelectedSubsets(selectedSubsets.filter((sub) => sub !== subset))}
                     />
@@ -122,7 +123,7 @@ export const ActiveFilters = () => {
     return (
         <Flex gap={'size-150'} wrap={'wrap'} alignItems={'center'} aria-label={'Active filters'}>
             <ActionButton isQuiet onPress={handleClearAll}>
-                {t('dataset.filtersActive.clearAll')}
+                {t('common.actions.clearAll')}
             </ActionButton>
 
             <Divider orientation={'vertical'} size={'S'} />

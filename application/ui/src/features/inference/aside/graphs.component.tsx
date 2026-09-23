@@ -57,6 +57,7 @@ type GraphProps = {
 };
 
 const Graph = ({ label, data, fractionDigits }: GraphProps) => {
+    const { t } = useTranslation();
     const end = data.at(-1)?.timestamp ?? Date.now();
 
     return (
@@ -78,7 +79,12 @@ const Graph = ({ label, data, fractionDigits }: GraphProps) => {
                 tickLine={false}
                 tickMargin={8}
             >
-                <Label value='time' position='insideBottom' offset={-14} style={AXIS_LABEL_STYLE} />
+                <Label
+                    value={t('inference.metrics.time')}
+                    position='insideBottom'
+                    offset={-14}
+                    style={AXIS_LABEL_STYLE}
+                />
             </XAxis>
             <YAxis
                 tickLine={false}
@@ -129,13 +135,17 @@ export const Graphs = () => {
                         <Heading level={4} marginBottom={'size-300'}>
                             {t('inference.metrics.throughput.title')}
                         </Heading>
-                        <Graph label='requests/sec' data={throughputData} fractionDigits={2} />
+                        <Graph
+                            label={t('inference.metrics.throughput.axisLabel')}
+                            data={throughputData}
+                            fractionDigits={2}
+                        />
                     </View>
                     <View>
                         <Heading level={4} marginBottom={'size-300'}>
                             {t('inference.metrics.latency.title')}
                         </Heading>
-                        <Graph label='ms' data={latencyData} fractionDigits={1} />
+                        <Graph label={t('inference.metrics.latency.axisLabel')} data={latencyData} fractionDigits={1} />
                     </View>
                 </>
             )}

@@ -29,13 +29,13 @@ export const Settings = () => {
                 <ActionButton isQuiet aria-label={'Settings'}>
                     <Adjustments />
                 </ActionButton>
-                <Tooltip>{t('annotator.canvas.settingsTitle')}</Tooltip>
+                <Tooltip>{t('common.labels.settings')}</Tooltip>
             </TooltipTrigger>
             {(close) => (
                 <Dialog UNSAFE_className={styles.settingsDialog}>
                     <Heading>
                         <Flex justifyContent={'space-between'} alignItems={'center'}>
-                            <Text>{t('annotator.canvas.settingsTitle')}</Text>
+                            <Text>{t('common.labels.settings')}</Text>
                             <ActionButton isQuiet onPress={close} aria-label={'Close settings'}>
                                 <Close />
                             </ActionButton>

@@ -6,12 +6,92 @@
             "delete": "Delete",
             "goBack": "Go back",
             "rename": "Rename",
-            "save": "Save"
+            "save": "Save",
+            "assign": "Assign",
+            "back": "Back",
+            "clear": "Clear",
+            "clearAll": "Clear all",
+            "confirm": "Confirm",
+            "connect": "Connect",
+            "continue": "Continue",
+            "create": "Create",
+            "disconnect": "Disconnect",
+            "dismiss": "Dismiss",
+            "download": "Download",
+            "edit": "Edit",
+            "export": "Export",
+            "hide": "Hide",
+            "next": "Next",
+            "refresh": "Refresh",
+            "remove": "Remove",
+            "selectAll": "Select all",
+            "showLess": "Show less",
+            "showMore": "Show more",
+            "skip": "Skip",
+            "start": "Start",
+            "submit": "Submit",
+            "train": "Train",
+            "upload": "Upload",
+            "undo": "Undo",
+            "redo": "Redo",
+            "annotate": "Annotate",
+            "addAndUse": "Add & Use",
+            "saveAndConnect": "Save & Connect",
+            "testConnection": "Test connection"
+        },
+        "labels": {
+            "allUppercase": "ALL",
+            "yes": "Yes",
+            "no": "No",
+            "unknown": "Unknown",
+            "name": "Name",
+            "on": "On",
+            "off": "Off",
+            "noMaximum": "No maximum",
+            "active": "Active",
+            "dataset": "Dataset",
+            "filters": "Filters",
+            "images": "Images",
+            "videos": "Videos",
+            "size": "Size",
+            "sizeUppercase": "SIZE",
+            "statusUppercase": "STATUS",
+            "settings": "Settings",
+            "training": "Training",
+            "validation": "Validation",
+            "testing": "Testing",
+            "unassigned": "Unassigned",
+            "trainingLowercase": "training",
+            "validationLowercase": "validation",
+            "testingLowercase": "testing",
+            "frames": "Frames",
+            "seconds": "Seconds",
+            "every": "every",
+            "model": "Model",
+            "labels": "Labels"
+        },
+        "viewModes": {
+            "large": "Large thumbnails",
+            "medium": "Medium thumbnails",
+            "small": "Small thumbnails"
+        },
+        "status": {
+            "pending": "Pending",
+            "running": "Running",
+            "done": "Done",
+            "cancelled": "Cancelled",
+            "uploading": "Uploading",
+            "failed": "Failed",
+            "error": "Error",
+            "disconnected": "Disconnected"
+        },
+        "errors": {
+            "unknown": "An unknown error occurred",
+            "unknownDetail": "Unknown error"
         }
     },
     "navigation": {
         "logoAlt": "Geti logo",
-        "dataset": "Dataset",
         "datasetDescription": "Data collection page to visualise your media items",
         "models": "Models",
         "modelsDescription": "Models page to visualise your models",
@@ -24,12 +104,11 @@
             "invalidDateRange": "End date must be later than start date"
         },
         "views": {
+            "deleted": "Deleted view",
             "title": "Views",
             "entireDataset": "Entire dataset",
-            "assignTitle": "Assign to existing view",
             "assignToExistingView": "Assign to existing view",
             "assignTo": "Assign to",
-            "assign": "Assign",
             "selectView": "Select a view",
             "assignmentNote": "This operation will not affect other media that were already assigned to this view.",
             "mediaAssigned_one": "Media {{count}} item assigned successfully.",
@@ -38,13 +117,8 @@
             "saveView": "Save view",
             "viewNameLabel": "View name",
             "renameTitle": "Rename dataset view",
-            "rename": "Rename",
-            "save": "Save",
-            "cancel": "Cancel",
-            "close": "Close",
             "deleteTitle": "Delete confirmation",
             "deleteConfirmation": "Are you sure you want to delete the \"{{viewName}}\" dataset view?",
-            "delete": "Delete",
             "deleteSuccess": "Dataset view \"{{viewName}}\" has been deleted successfully.",
             "unassignFromView": "Unassign from this view",
             "selectedMediaCount_one": "Selected {{count}} media item",
@@ -55,23 +129,13 @@
             "withAnnotations": "Media with annotations",
             "missingAnnotations": "Media with missing annotations",
             "subset": "Filter by subset",
-            "labels": "Filter by labels",
             "searchLabels": "Search labels",
             "labelsSelected_one": "{{count}} label selected",
             "labelsSelected_other": "{{count}} labels selected",
             "toggleAll": "Toggle all",
             "more": "More filters",
-            "moreTitle": "More filters",
-            "title": "Filters",
-            "subsetOptions": {
-                "training": "Training",
-                "validation": "Validation",
-                "testing": "Testing",
-                "unassigned": "Unassigned"
-            },
             "dateRange": {
                 "heading": "Filter by upload date",
-                "clear": "Clear",
                 "startDateLabel": "Start date",
                 "endDateLabel": "End date",
                 "from": "From {{date}}",
@@ -80,15 +144,10 @@
         },
         "upload": {
             "queued": "Queued",
-            "uploading": "Uploading",
             "uploaded": "Uploaded",
-            "failed": "Failed",
-            "error": "Error",
             "errorTitle": "Upload error",
             "details": "Upload details",
             "filename": "FILENAME",
-            "status": "STATUS",
-            "size": "SIZE",
             "uploadingSummary_one": "Uploading {{total}} item - {{uploaded}} uploaded",
             "uploadingSummary_other": "Uploading {{total}} items - {{uploaded}} uploaded",
             "uploadingFailedSummary_one": "Uploading {{total}} item - {{uploaded}} uploaded, {{failed}} failed",
@@ -114,8 +173,7 @@
             "assignOrBack": "Assign media items to it, or go back to the entire dataset.",
             "goToEntireDataset": "Go to {{datasetName}}",
             "datasetEmpty": "Your dataset is empty.",
-            "uploadToStart": "Upload your first media item to get started.",
-            "importDataset": "Import dataset"
+            "uploadToStart": "Upload your first media item to get started."
         },
         "review": {
             "reviewed": "Reviewed",
@@ -126,19 +184,15 @@
             "label": "Dataset statistics",
             "title": "Dataset Statistics",
             "numberOfMedia": "Number of media",
-            "images": "Images",
-            "videos": "Videos",
             "annotatedImages": "Annotated images",
             "annotatedVideosFrames": "Annotated videos / frames",
             "numberOfObjectsPerLabel": "Number of objects per label",
             "unannotated": "Unannotated",
             "annotated": "Annotated",
-            "frames": "Frames",
             "annotationsChartTooltip": "Annotations"
         },
         "delete": {
             "title": "Delete Items",
-            "confirm": "Confirm",
             "mediaItem": "Delete media item",
             "confirmation_one": "Are you sure you want to delete {{count}} item?",
             "confirmation_other": "Are you sure you want to delete {{count}} items?",
@@ -155,24 +209,15 @@
             "selectedImagesNote": "The selected labels apply only to images, videos (if any) remain intact.",
             "noResults": "No results found. Try searching with different words.",
             "cancelUpload": "Cancel upload",
-            "skip": "Skip",
-            "continue": "Continue",
-            "assign": "Assign",
             "assignLabelTooltip": "Assign label",
             "assignAllSuccess": "Successfully assigned label(s) to all {{count}} image(s)",
             "assignAllFailure": "Failed to assign label(s) to all {{count}} image(s)",
             "assignPartialSuccess": "Assigned label(s) to {{succeeded}} of {{total}} image(s) ({{failed}} failed)"
         },
-        "filtersActive": {
-            "clearAll": "Clear all"
-        },
         "mediaActions": {
-            "annotate": "Annotate",
-            "download": "Download",
             "downloadStarted": "{{fileName}} download has started"
         },
         "gallery": {
-            "heading": "Dataset",
             "sortOldestFirst": "Oldest first",
             "sortNewestFirst": "Newest first",
             "selectedCount": "{{count}} selected",
@@ -187,17 +232,10 @@
                 "totalFrames": "Total frames: {{count}}"
             }
         },
-        "multiSelect": {
-            "selectAll": "Select all"
-        },
         "import": {
             "jobTitle": "Import dataset - {{fileName}} - {{size}}",
             "processingMessage": "{{fileName}} file is being processed for import",
-            "unknownError": "An unknown error occurred",
-            "unknownErrorDetail": "Unknown error",
             "technicalDetails": "Technical details",
-            "cancel": "Cancel",
-            "hide": "Hide",
             "preparingJob": "Preparing",
             "stagedFileReadError": "An error occurred during staged file reading",
             "prepareError": "An error occurred during import preparation.",
@@ -205,20 +243,15 @@
             "importedSuccess": "Dataset {{fileName}} {{size}} imported successfully.",
             "multipleFilesError": "Adding folders or multiple files is not allowed. Please load a single file.",
             "unsupportedFormatError": "Unsupported file format. Please upload a valid .zip file.",
-            "uploading": "Uploading",
             "datasetBeingUploaded": "Dataset is being uploaded",
             "dropZipHere": "Drop the dataset .zip file here",
-            "upload": "Upload",
             "learnMoreFormats": "Learn more about the different formats",
             "dialogHeading": "Import dataset",
             "scanningMessage": "Scanning and analyzing the dataset archive to import...",
             "mapLabelsMessage": "Map labels for the uploaded dataset",
-            "continue": "Continue",
             "deleteStagedFile": {
                 "title": "Delete Staged File",
-                "confirmation": "Are you sure you want to delete the dataset file \"{{stagedDatasetId}}\"?",
-                "cancel": "Cancel",
-                "delete": "Delete"
+                "confirmation": "Are you sure you want to delete the dataset file \"{{stagedDatasetId}}\"?"
             },
             "formatWarning": {
                 "boundingBoxToPolygon": "Imported dataset uses bounding box annotations, but your project’s dataset uses polygons. Annotations will be automatically converted to polygons to keep everything compatible.",
@@ -226,15 +259,13 @@
             },
             "labelMapping": {
                 "statisticsHeading": "Imported dataset statistics",
-                "imagesLabel": "images",
-                "framesLabel": "frames",
                 "heading": "Label mapping - optional",
                 "unmappedNote": "Any unmapped items will be imported as unlabeled",
                 "datasetLabelsColumn": "Dataset labels",
                 "projectLabelsColumn": "Project labels",
                 "selectLabelPlaceholder": "Select label",
-                "includeUnannotated": "Include media without annotations",
-                "submit": "Submit"
+                "imagesLabel": "images",
+                "framesLabel": "frames"
             }
         },
         "export": {
@@ -244,66 +275,48 @@
             "statisticsHeading": "Exported dataset statistics",
             "settingsHeading": "Export settings",
             "filterByLabel": "Filter annotations by label",
-            "includeUnannotated": "Include media without annotations",
             "selectFormat": "Select dataset export format",
             "learnMoreFormats": "Learn more about export formats",
-            "cancel": "Cancel",
-            "submit": "Export",
             "processing": "Processing dataset for export",
             "readyForDownload": "Dataset is ready for download",
-            "download": "Download",
             "downloadStarted": "Dataset download started",
             "error": "Error: {{error}}",
             "itemsLabel": "items",
             "details": {
-                "heading": "Export {{name}}",
                 "defaultName": "dataset",
                 "format": "Format:",
                 "media": "Media:",
-                "allMedia": "All media",
                 "onlyAnnotated": "Only media with annotations",
                 "labels": "Labels:"
             },
             "warnings": {
                 "videos": "Exporting videos is not supported by this dataset format. All annotated frames from videos will be exported as images.",
                 "emptyLabel": "The selected format does not support empty labels (e.g. \"{{emptyLabelName}}\"). Images and frames containing them will be exported as unannotated.",
-                "unsupportedItemsVideos": "videos",
                 "unsupportedItemsEmptyLabels": "empty labels",
+                "unsupportedItemsVideos": "videos",
                 "unsupportedItems": "To preserve {{items}}, please use the Geti export format.",
                 "subsetNotIncluded": "The exported dataset won't include any information about the subset assigned to each media."
             }
         },
         "importExport": {
             "trigger": "Import/export dataset",
-            "exportItem": "Export dataset",
-            "importItem": "Import dataset"
+            "exportItem": "Export dataset"
         },
         "jobs": {
             "cancel": {
-                "trigger": "Cancel job",
                 "title": "Cancel job",
-                "dismiss": "Dismiss",
-                "confirm": "Cancel job",
                 "confirmation": "Are you sure you want to cancel job {{jobId}}?"
             }
         },
         "revisions": {
             "createdOn": "Created {{date}}",
             "unnamedName": "Dataset #{{id}}",
-            "unknown": "Unknown",
             "notFoundForModel": "No dataset revision found for this model",
             "filesDeleted": "The files for this dataset revision have been deleted.",
             "noItemsInSubset": "No items in this subset",
+            "itemAlt": "{{subset}} item",
             "trainingSubsets": {
-                "training": "Training",
-                "validation": "Validation",
                 "test": "Test"
-            },
-            "actions": {
-                "rename": "Rename",
-                "delete": "Delete",
-                "export": "Export",
-                "cancel": "Cancel"
             },
             "rename": {
                 "title": "Rename dataset revision",
@@ -313,7 +326,8 @@
                 "title": "Delete dataset revision",
                 "description": "Are you sure you want to delete dataset revision \"{{name}}\"? You will still be able to see the model statistics but you won't be able to access the training dataset files."
             }
-        }
+        },
+        "includeUnannotated": "Include media without annotations"
     },
     "inference": {
         "validation": {
@@ -324,7 +338,9 @@
             "testing": "Testing connection...",
             "inUse": "In use",
             "unreachable": "Unreachable",
-            "ready": "Ready"
+            "ready": "Ready",
+            "saveErrorFallback": "please try again",
+            "removeSuccess": "{{name}} has been removed successfully!"
         },
         "confidenceThreshold": {
             "label": "Confidence threshold"
@@ -350,58 +366,40 @@
                 "videoFile": "Video file"
             },
             "add": {
-                "title": "Add new input source",
-                "submit": "Add & Use"
+                "title": "Add new input source"
             },
             "edit": {
-                "title": "Edit input source",
-                "save": "Save",
-                "saveAndConnect": "Save & Connect"
+                "title": "Edit input source"
             },
             "form": {
                 "createSuccess": "Source configuration created successfully.",
                 "updateSuccess": "Source configuration updated successfully.",
-                "saveError": "Failed to save source configuration, {{details}}",
-                "saveErrorFallback": "please try again"
+                "saveError": "Failed to save source configuration, {{details}}"
             },
             "menu": {
-                "connect": "Connect",
-                "disconnect": "Disconnect",
-                "testConnection": "Test connection",
-                "edit": "Edit",
-                "remove": "Remove",
                 "connectSuccess": "Successfully connected to \"{{name}}\".",
                 "disconnectSuccess": "Successfully disconnected from \"{{name}}\".",
                 "disablePipelineAndDisconnectSuccess": "Successfully disabled pipeline and disconnected from \"{{name}}\".",
-                "removeSuccess": "{{name}} has been removed successfully!",
                 "disconnectDialog": {
                     "title": "Disconnect {{name}}",
-                    "message": "Disconnecting this source will also disable the inference pipeline. Do you want to continue?",
-                    "cancel": "Cancel",
-                    "confirm": "Disconnect"
+                    "message": "Disconnecting this source will also disable the inference pipeline. Do you want to continue?"
                 }
             },
             "settings": {
                 "loading": "Loading...",
                 "device": "Device: {{name}}",
                 "unknownDevice": "Unknown device (id: {{deviceId}})",
-                "folderPath": "Folder path: {{path}}",
                 "ignoreExistingImages": "Ignore existing images: {{value}}",
                 "streamUrl": "Stream url: {{url}}",
-                "authRequired": "Auth required: {{value}}",
-                "videoPath": "Video path: {{path}}",
-                "yes": "Yes",
-                "no": "No"
+                "videoPath": "Video path: {{path}}"
             },
             "fields": {
-                "name": "Name",
                 "imagesFolderPath": "Images folder path",
                 "ignoreExistingImages": "Ignore existing images",
                 "streamUrl": "Stream Url:",
                 "requireAuthentication": "Require Authentication",
                 "camera": "Camera",
                 "videoFilePath": "Video file path",
-                "upload": "Upload",
                 "selectedFile": "Selected: {{fileName}}",
                 "loopVideo": "Loop video"
             },
@@ -412,15 +410,11 @@
             }
         },
         "sinks": {
-            "list": {
-                "addSink": "Add new sink"
-            },
             "types": {
                 "folder": "folder",
                 "mqtt": "mqtt",
                 "webhook": "webhook",
-                "ros": "ros",
-                "disconnected": "disconnected"
+                "ros": "ros"
             },
             "options": {
                 "folder": "Folder",
@@ -428,43 +422,29 @@
                 "mqtt": "MQTT"
             },
             "add": {
-                "title": "Add new sink",
-                "submit": "Add & Use"
+                "title": "Add new sink"
             },
             "edit": {
-                "title": "Edit sink",
-                "save": "Save",
-                "saveAndConnect": "Save & Connect"
+                "title": "Edit sink"
             },
             "form": {
                 "createSuccess": "Sink configuration created successfully.",
                 "updateSuccess": "Sink configuration updated successfully.",
-                "saveError": "Failed to save sink configuration, {{details}}",
-                "saveErrorFallback": "please try again"
+                "saveError": "Failed to save sink configuration, {{details}}"
             },
             "menu": {
-                "connect": "Connect",
-                "disconnect": "Disconnect",
-                "testConnection": "Test connection",
-                "edit": "Edit",
-                "remove": "Remove",
                 "connectSuccess": "Successfully connected to \"{{name}}\"",
-                "disconnectSuccess": "Successfully disconnected from \"{{name}}\"",
-                "removeSuccess": "{{name}} has been removed successfully!"
+                "disconnectSuccess": "Successfully disconnected from \"{{name}}\""
             },
             "settings": {
-                "folderPath": "Folder path: {{path}}",
                 "rateLimit": "Rate limit: {{value}}",
                 "httpMethod": "HTTP method: {{value}}",
                 "timeout": "Timeout: {{value}}",
                 "webhookUrl": "Webhook URL: {{value}}",
                 "topic": "Topic: {{value}}",
-                "authRequired": "Auth required: {{value}}",
                 "brokerHost": "Broker host: {{value}}",
                 "brokerPort": "Broker port: {{value}}",
                 "outputFormats": "Output formats: ",
-                "yes": "Yes",
-                "no": "No",
                 "outputFormatTypes": {
                     "imageOriginal": "image original",
                     "imageWithPredictions": "image with predictions",
@@ -480,13 +460,10 @@
             },
             "fields": {
                 "samples": "Samples",
-                "seconds": "Seconds",
-                "every": "every",
                 "outputFormatsLabel": "Output Formats",
                 "outputFormatPredictions": "Predictions",
                 "outputFormatImageOriginal": "Image Original",
                 "outputFormatImageWithPredictions": "Image with Predictions",
-                "name": "Name",
                 "folderPath": "Folder Path",
                 "httpMethod": "HTTP Method",
                 "timeout": "Timeout",
@@ -510,7 +487,6 @@
         },
         "pipeline": {
             "activeModel": {
-                "label": "Model",
                 "loading": "Model: ..."
             },
             "toggle": {
@@ -529,25 +505,20 @@
             "sidebarLabel": "Data collection policy",
             "maxDatasetSize": {
                 "title": "Max dataset size",
-                "description": "Maximum number of items to collect",
-                "sizeLabel": "Size"
+                "description": "Maximum number of items to collect"
             },
             "captureRate": {
                 "title": "Capture rate",
                 "description": "Capture frames while the stream is running",
-                "toggleLabel": "Toggle auto capturing",
-                "framesLabel": "Frames",
-                "secondsLabel": "Seconds",
-                "every": "every"
+                "toggleLabel": "Toggle auto capturing"
             },
             "confidenceThreshold": {
-                "title": "Confidence threshold",
                 "description": "Capture frames when confidence is below threshold",
-                "toggleLabel": "Confidence threshold",
                 "sliderLabel": "Threshold"
             }
         },
         "metrics": {
+            "time": "time",
             "sidebarLabel": "Pipeline metrics",
             "empty": {
                 "title": "No statistics available",
@@ -564,20 +535,17 @@
         },
         "health": {
             "overall": {
-                "running": "Running",
                 "idle": "Idle",
                 "problemsDetected": "Problems detected"
             },
             "component": {
                 "healthy": "Healthy",
                 "finished": "Finished",
-                "unavailable": "Unavailable",
-                "error": "Error"
+                "unavailable": "Unavailable"
             },
             "componentLabels": {
                 "source": "Source",
-                "sink": "Sink",
-                "model": "Model"
+                "sink": "Sink"
             }
         },
         "stream": {
@@ -586,11 +554,14 @@
             "connectError": "Failed to connect to the stream",
             "captureFrame": "Capture frame",
             "captureSuccess": "Frame captured and added to the dataset."
+        },
+        "settings": {
+            "folderPath": "Folder path: {{path}}",
+            "authRequired": "Auth required: {{value}}"
         }
     },
     "project": {
         "delete": {
-            "title": "Delete",
             "confirmation": "Are you sure you want to delete project \"{{projectName}}\"?",
             "success": "Project deleted successfully"
         },
@@ -623,18 +594,12 @@
             "countFiltered_other": "{{filtered}} of {{count}} projects",
             "createNewProject": "Create new project",
             "createProjectFromDataset": "Create from dataset",
-            "activeBadge": "Active",
             "card": {
-                "created": "Created: {{date}}",
-                "labelsDialog": {
-                    "title": "Labels"
-                }
+                "created": "Created: {{date}}"
             },
             "menu": {
                 "enablePipeline": "Enable pipeline",
-                "disablePipeline": "Disable pipeline",
-                "pipelineEnabled": "Pipeline enabled successfully",
-                "pipelineDisabled": "Pipeline disabled successfully"
+                "disablePipeline": "Disable pipeline"
             },
             "sort": {
                 "label": "Sort Projects by:",
@@ -652,14 +617,10 @@
                 "description": "Try adjusting your search or task type filters to find what you are looking for."
             },
             "empty": {
-                "intro": "Welcome to <name>Geti</name>, a vision AI platform that guides you through the <highlight>complete model lifecycle</highlight>, from dataset preparation to training, optimization and deployment.",
-                "createNewProject": "Create new project",
-                "createFromDataset": "Create from dataset"
+                "intro": "Welcome to <name>Geti</name>, a vision AI platform that guides you through the <highlight>complete model lifecycle</highlight>, from dataset preparation to training, optimization and deployment."
             },
             "workflow": {
                 "addData": "Add data",
-                "annotate": "Annotate",
-                "train": "Train",
                 "optimize": "Optimize",
                 "runInference": "Run inference",
                 "loop": "Monitor predictions and collect more data to iteratively fine-tune your model"
@@ -708,42 +669,21 @@
         },
         "import": {
             "title": "Create project from a dataset - Import",
-            "actions": {
-                "cancel": "Cancel",
-                "delete": "Delete",
-                "hide": "Hide",
-                "back": "Back",
-                "create": "Create",
-                "next": "Next"
-            },
-            "statistics": {
-                "title": "Imported dataset statistics",
-                "images": "images",
-                "frames": "frames"
-            },
             "labelMapping": {
-                "title": "Label mapping",
-                "datasetLabels": "Dataset labels",
-                "includeUnannotated": "Include media without annotations"
+                "title": "Label mapping"
             },
             "preparingMessage": "Prepare dataset import as new project",
             "taskSelection": {
                 "projectName": "Project name",
-                "taskType": "Task type",
                 "selectTaskPlaceholder": "Select task",
                 "recommendationHint": "The recommended choice is based on the type of the annotations detected in the dataset. If you choose a different type, the annotations will be automatically transformed during import to fit the selected type."
             },
-            "progress": {
-                "dataset": "Dataset",
-                "taskType": "Task type",
-                "labels": "Labels"
-            },
             "jobsList": {
                 "selectTaskType": "Select task type",
-                "mapLabelsMessage": "Map labels for the uploaded dataset",
                 "mapLabelsButton": "Map labels"
             }
-        }
+        },
+        "taskType": "Task type"
     },
     "labels": {
         "fields": {
@@ -759,8 +699,6 @@
             "createTrigger": "Create label",
             "delete": {
                 "title": "Delete label",
-                "confirm": "Delete",
-                "cancel": "Cancel",
                 "message": "If you remove the {{labelName}} label, all annotations in your dataset that have this label will be deleted. However, this won't impact any models you've trained in the past."
             }
         },
@@ -771,14 +709,10 @@
         "empty": {
             "noLabel": "No label",
             "noObject": "No object"
-        },
-        "creation": {
-            "namePlaceholder": "Create label"
         }
     },
     "annotator": {
         "canvas": {
-            "settingsTitle": "Settings",
             "hideLabels": "Hide labels",
             "pixelView": "Pixel view",
             "annotationFillOpacity": "Annotation fill opacity",
@@ -795,9 +729,7 @@
             "redo": "Redo ({{hotkeys}})",
             "toggleFocus": "Toggle focus",
             "showAnnotations": "Show annotations ({{hotkey}})",
-            "hideAnnotations": "Hide annotations ({{hotkey}})",
-            "submit": "Submit",
-            "close": "Close"
+            "hideAnnotations": "Hide annotations ({{hotkey}})"
         },
         "modes": {
             "annotation": "Annotation",
@@ -805,17 +737,14 @@
         },
         "predictions": {
             "settingsTitle": "Prediction settings",
-            "modelLabel": "Model",
-            "confirm": "Confirm prediction",
-            "edit": "Edit"
+            "confirm": "Confirm prediction"
         },
         "hotkeys": {
+            "alternatives": "{{primary}} or {{alternative}}",
             "title": "Hotkeys",
             "submitAnnotationsPredictions": "Submit annotations/predictions",
             "previousMedia": "Previous media",
             "nextMedia": "Next media",
-            "undo": "Undo",
-            "redo": "Redo",
             "deleteSelectedAnnotation": "Delete selected annotation",
             "toggleAnnotationsVisibility": "Show or hide all annotations",
             "selectAllAnnotations": "Select all annotations",
@@ -824,7 +753,9 @@
             "resetZoom": "Reset zoom"
         },
         "tools": {
-            "selection": { "label": "Selection" },
+            "selection": {
+                "label": "Selection"
+            },
             "boundingBox": {
                 "label": "Bounding box",
                 "description": "Draw a rectangle or square surrounding an object in an image."
@@ -846,8 +777,7 @@
             },
             "polygon": {
                 "label": "Polygon",
-                "description": "Click to place points one by one, or hold and drag to draw freehand. Ideal for irregular shapes requiring pixel-precision.",
-                "deletePoint": "Delete"
+                "description": "Click to place points one by one, or hold and drag to draw freehand. Ideal for irregular shapes requiring pixel-precision."
             },
             "magneticLasso": {
                 "label": "Magnetic Lasso",
@@ -865,7 +795,6 @@
                 "showOneFramePerSecond": "Show 1 frame per second"
             },
             "frames": {
-                "label": "Frames",
                 "currentTotal": "Current frame: {{currentFrame}} / Total frames: {{totalFrames}}",
                 "thumbnailAlt": "Thumbnail for frame {{frameNumber}}"
             },
@@ -880,21 +809,12 @@
         "jobs": {
             "error": "Job failed. Please check the logs for details and try again.",
             "heading": "Jobs",
-            "columns": {
-                "modelName": "Model Name",
-                "dataset": "Dataset",
-                "architecture": "Architecture"
-            },
             "pending": "Pending...",
             "running": "Running...",
-            "cancel": "Cancel",
             "stopDialog": {
                 "title": "Stop job",
-                "confirmation": "Are you sure you want to stop this job?",
-                "close": "Close"
+                "confirmation": "Are you sure you want to stop this job?"
             },
-            "failed": "Failed",
-            "dismiss": "Dismiss",
             "logs": "Logs",
             "startedAt": "Started: {{time}}",
             "waitingToStart": "Waiting to start...",
@@ -928,7 +848,6 @@
                 "connectionStatus": {
                     "connecting": "Connecting...",
                     "connected": "Live",
-                    "disconnected": "Disconnected",
                     "error": "Connection error"
                 },
                 "entriesCount": "{{filtered}} / {{total}} entries",
@@ -937,7 +856,6 @@
                 "scrollToBottom": "Scroll to bottom",
                 "dialogTitle": "Training Logs",
                 "loadError": "Failed to load logs: {{message}}",
-                "unknownError": "Unknown error",
                 "noJobOrModel": "No job or model specified",
                 "fetchError": "Failed to fetch model logs: {{status}} {{statusText}}",
                 "downloadStarted": "Training logs download started"
@@ -947,9 +865,7 @@
                 "learningParameters": "LEARNING PARAMETERS",
                 "filters": "FILTERS",
                 "augmentations": "AUGMENTATIONS",
-                "intensityMapping": "INTENSITY MAPPING",
-                "on": "On",
-                "off": "Off"
+                "intensityMapping": "INTENSITY MAPPING"
             },
             "architectures": {
                 "metrics": {
@@ -959,12 +875,7 @@
                 },
                 "card": {
                     "numberOfParameters": "Number of parameters: {{count}} million",
-                    "gigaflops": "Gigaflops: {{value}}",
-                    "license": "License: {{license}}"
-                },
-                "list": {
-                    "showMore": "Show more",
-                    "showLess": "Show less"
+                    "gigaflops": "Gigaflops: {{value}}"
                 },
                 "sort": {
                     "label": "Sort Models by:",
@@ -984,8 +895,7 @@
                     "pretrainedWeightsLabel": "Pretrained Weights",
                     "selectWeightsPlaceholder": "Select weights",
                     "parameters": "Parameters: {{count}} million",
-                    "gigaflops": "GigaFlops: {{value}}",
-                    "licenseLabel": "License: "
+                    "gigaflops": "GigaFlops: {{value}}"
                 }
             },
             "devices": {
@@ -996,10 +906,7 @@
                 "dialog": {
                     "title": "Select a model to train",
                     "disabledReasonTitle": "Why can I not start training?",
-                    "cancel": "Cancel",
-                    "back": "Back",
-                    "advancedSettings": "Advanced settings",
-                    "start": "Start"
+                    "advancedSettings": "Advanced settings"
                 },
                 "toast": {
                     "trainingStarted": "Model training started successfully.",
@@ -1036,8 +943,7 @@
             },
             "advanced": {
                 "tabs": {
-                    "dataManagement": "Data management",
-                    "training": "Training"
+                    "dataManagement": "Data management"
                 },
                 "notAvailable": "Training configuration is not available."
             },
@@ -1063,30 +969,25 @@
                     "mediaItemsLabel": "media items"
                 },
                 "filters": {
-                    "title": "Filters",
                     "noMinimum": "No minimum",
-                    "noMaximum": "No maximum",
                     "unlimited": "Unlimited"
                 },
                 "augmentation": {
-                    "title": "Data Augmentation",
-                    "enabledYes": "Yes",
-                    "enabledNo": "No"
-                },
-                "intensityMapping": {
-                    "title": "Intensity Mapping"
+                    "title": "Data Augmentation"
                 },
                 "tiling": {
                     "title": "Tiling",
                     "description": "Tiling is a technique that divides high-resolution images into smaller tiles and might be useful to increase accuracy for small object detection tasks.",
                     "modeLabel": "Tiling mode",
                     "modes": {
-                        "off": "Off",
                         "automatic": "Automatic",
                         "custom": "Custom"
                     },
                     "offDescription": "Model processes the entire image as a single unit without dividing it into smaller tiles. This approach is straightforward but may struggle with detecting small objects in high-resolution images, as the model might miss finer details",
                     "automaticDescription": "It means that the system will automatically set the parameters based on the image resolution and annotations size."
+                },
+                "intensityMapping": {
+                    "title": "Intensity Mapping"
                 }
             }
         },
@@ -1102,21 +1003,21 @@
                 "title": "No models yet.",
                 "description": "Train your first model to get started."
             },
-            "unknownArchitecture": "Unknown",
-            "failedBadge": "Failed",
             "deletedWeightsBadge": "Deleted weights",
             "fineTunedFrom": "Fine-tuned from",
             "columns": {
-                "modelName": "Model Name",
                 "trained": "Trained",
-                "dataset": "Dataset",
-                "architecture": "Architecture",
                 "device": "Device",
                 "totalSize": "Total size"
             }
         },
         "performance": {
-            "accuracy": "Accuracy",
+            "metrics": {
+                "accuracy": "Accuracy",
+                "precision": "Precision",
+                "recall": "Recall",
+                "fMeasure": "F-measure"
+            },
             "categories": {
                 "balance": "Balance",
                 "speed": "Speed",
@@ -1126,8 +1027,7 @@
         "variants": {
             "empty": "No available model variants.",
             "columns": {
-                "precision": "PRECISION",
-                "size": "SIZE"
+                "precision": "PRECISION"
             },
             "quantizedInfo": {
                 "title": "Quantized with NNCF PTQ",
@@ -1142,7 +1042,6 @@
             "description": "Optimize the FP16 model using OpenVINO NNCF (via INT8 quantization)",
             "contextualHelp": "OpenVINO NNCF (Neural Network Compression Framework) via INT8 quantization reduces model size and speeds up inference with minimal impact on accuracy",
             "start": "Start quantization",
-            "cancel": "Cancel",
             "dialogTitle": "Quantization",
             "subheading": "Quantize model to INT8",
             "jobStarted": "Quantization job started.",
@@ -1154,8 +1053,7 @@
                         "paragraph1": "Maximum allowed drop in validation accuracy.",
                         "paragraph2": "Beware that accuracy-aware quantization may take a long time when the max allowed drop is small.",
                         "paragraph3": "Also note that the final testing accuracy may be lower than the specified validation accuracy threshold, especially for relatively small datasets."
-                    },
-                    "noMaximum": "No maximum"
+                    }
                 },
                 "maxIterations": {
                     "label": "Max number of iterations",
@@ -1173,20 +1071,23 @@
             }
         },
         "actions": {
-            "rename": "Rename",
             "deleteWeights": "Delete weights",
             "deleteModel": "Delete model",
             "viewLogs": "View training logs",
-            "cancel": "Cancel",
             "deleteWeightsDescription": "Are you sure you want to delete the weights for model \"{{modelName}}\"?",
             "deleteModelDescription": "Are you sure you want to delete model \"{{modelName}}\"? This action cannot be undone.",
             "renameDialog": {
                 "title": "Rename model",
                 "nameLabel": "Model name"
             }
+        },
+        "columns": {
+            "modelName": "Model Name",
+            "architecture": "Architecture"
         }
     },
     "license": {
+        "label": "License: ",
         "agreement": {
             "title": "License Agreement",
             "intro": "By installing, using, or distributing this application, you acknowledge that:",
@@ -1198,13 +1099,6 @@
         "links": {
             "intelSimplified": "Intel Simplified Software License",
             "dinov2": "DINOv3 License"
-        },
-        "edgecrafter": {
-            "prefix": "License: ",
-            "linkText": "EdgeCrafter"
-        },
-        "ultralytics": {
-            "linkText": "Follow Ultralytics guidance on license usage"
         }
     },
     "application": {
@@ -1212,8 +1106,7 @@
             "loading": "Loading...Please wait."
         },
         "serverError": {
-            "heading": "Server Error",
-            "refresh": "Refresh"
+            "heading": "Server Error"
         },
         "errorPage": {
             "badRequest": "The server cannot or will not process the current request.",
@@ -1222,7 +1115,6 @@
             "unauthorized": "You aren't authorized to see this",
             "serverError": "The server encountered an error and could not complete your request.",
             "serviceUnavailable": "Looks like our API is down",
-            "unknownError": "An unknown error occurred",
             "goHome": "Go back to home page"
         },
         "notifications": {

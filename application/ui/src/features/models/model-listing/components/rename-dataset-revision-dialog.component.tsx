@@ -47,10 +47,10 @@ export const RenameDatasetRevisionDialog = ({
                     />
                     <ButtonGroup align={'end'} marginTop={'size-300'}>
                         <Button variant={'secondary'} onPress={onClose}>
-                            {t('dataset.revisions.actions.cancel')}
+                            {t('common.actions.cancel')}
                         </Button>
                         <Button variant={'accent'} type={'submit'} isPending={isPending} isDisabled={hasSameName}>
-                            {t('dataset.revisions.actions.rename')}
+                            {t('common.actions.rename')}
                         </Button>
                     </ButtonGroup>
                 </Form>

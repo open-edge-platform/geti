@@ -3,7 +3,7 @@
 
 import { PointerEvent, useMemo } from 'react';
 
-import { useTranslation } from '@/i18n';
+import { i18n, useTranslation } from '@/i18n';
 
 import { useLabelResolver } from '../../../../shared/annotator/labels';
 import type { AnnotationLabel, AnnotationLabelRef } from '../../../../shared/types';
@@ -23,7 +23,7 @@ type AnnotationLabelsProps = {
 };
 
 const formatPredictionScore = (score: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'percent' }).format(score);
+    return new Intl.NumberFormat(i18n.resolvedLanguage ?? i18n.language, { style: 'percent' }).format(score);
 };
 
 const getLabelText = (label: AnnotationLabel) => {
@@ -42,11 +42,11 @@ export const AnnotationLabels = ({
     const placeholderLabel = useMemo(
         () => ({
             id: crypto.randomUUID(),
-            name: t('labels.empty.noLabel'),
+            name: 'No label',
             color: 'var(--annotation-fill)',
             isPrediction: false,
         }),
-        [t]
+        []
     );
 
     const onDeleteLabel = (labelId: string) => (event: PointerEvent) => {
@@ -89,7 +89,9 @@ export const AnnotationLabels = ({
                             }}
                             aria-label={`label ${label.name} background`}
                         >
-                            <span aria-label={`label ${label.name}`}>{getLabelText(label)}</span>
+                            <span aria-label={`label ${label.name}`}>
+                                {isPlaceholder ? t('labels.empty.noLabel') : getLabelText(label)}
+                            </span>
                             {!isPlaceholder && isRemovable && (
                                 <button
                                     className={classes.removeButton}

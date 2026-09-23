@@ -50,9 +50,9 @@ export const Filters = ({ filtersParameters, onTrainingConfigurationChange }: Fi
     return (
         <Accordion>
             <Accordion.Title>
-                {t('models.training.dataManagement.filters.title')}{' '}
+                {t('common.labels.filters')}{' '}
                 <Accordion.Tag ariaLabel={'Filters tag'}>
-                    {areFiltersEnabled ? t('models.training.parameters.on') : t('models.training.parameters.off')}
+                    {areFiltersEnabled ? t('common.labels.on') : t('common.labels.off')}
                 </Accordion.Tag>
             </Accordion.Title>
             <Accordion.Content>

@@ -97,7 +97,7 @@ export const TimmModelConfiguration = () => {
                             {accuracyLabel}: {accuracyMetric?.value ?? '-'}%
                         </li>
                         <li>
-                            {t('models.training.architectures.timm.licenseLabel')}
+                            {t('license.label')}
                             <ModelLicenseLink license={timmModelArchitecture?.license || { url: '', name: '' }} />
                         </li>
                     </ul>

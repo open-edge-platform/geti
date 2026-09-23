@@ -4,7 +4,7 @@
 import type { ModelVariant } from '@/api/types';
 import type { TranslateFn } from '@/i18n';
 
-import { getTestingMetrics } from '../components/model-row/utils';
+import { getMetricLabel, getTestingMetrics } from '../components/model-row/utils';
 
 type PrimaryTestingMetricValue = {
     name: string;
@@ -43,10 +43,11 @@ export const getPerformanceColumnName = (
     fp32PytorchMetric: PrimaryTestingMetricValue | undefined,
     t: TranslateFn
 ): string => {
-    return (
+    return getMetricLabel(
         variants.map((variant) => getPrimaryTestingMetricValue(variant)).find((metric) => metric !== undefined)?.name ??
-        fp32PytorchMetric?.name ??
-        t('models.performance.accuracy')
+            fp32PytorchMetric?.name ??
+            'Accuracy',
+        t
     );
 };
 

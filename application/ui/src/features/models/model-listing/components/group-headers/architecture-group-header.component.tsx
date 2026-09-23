@@ -16,7 +16,7 @@ export const ArchitectureGroupHeader = ({ architecture }: ArchitectureGroupHeade
 
     // Should never happen, but just in case
     if (architecture === undefined) {
-        return <Text>{t('models.list.unknownArchitecture')}</Text>;
+        return <Text>{t('common.labels.unknown')}</Text>;
     }
 
     return (

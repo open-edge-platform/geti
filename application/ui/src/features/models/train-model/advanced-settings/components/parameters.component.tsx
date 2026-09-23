@@ -171,11 +171,7 @@ const ParameterReadOnlyValue = ({ value, name }: ParameterReadOnlyValueProps) =>
     const { t } = useTranslation();
 
     if (isBoolean(value)) {
-        return (
-            <span aria-label={name}>
-                {value ? t('models.training.parameters.on') : t('models.training.parameters.off')}
-            </span>
-        );
+        return <span aria-label={name}>{value ? t('common.labels.on') : t('common.labels.off')}</span>;
     }
 
     if (Array.isArray(value) && value.length === 2) {

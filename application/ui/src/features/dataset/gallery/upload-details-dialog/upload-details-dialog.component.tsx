@@ -78,7 +78,7 @@ const StatusCell = ({
                 {statusContent}
                 <DialogTrigger type={'popover'}>
                     <ActionButton isQuiet aria-label={'Error details'} UNSAFE_className={classes.error}>
-                        {t('dataset.upload.error')}
+                        {t('common.status.error')}
                     </ActionButton>
                     <Dialog>
                         <Heading>{t('dataset.upload.errorTitle')}</Heading>
@@ -121,9 +121,9 @@ const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
     const { t } = useTranslation();
     const labels: Record<UploadItemStatus, string> = {
         queued: t('dataset.upload.queued'),
-        uploading: t('dataset.upload.uploading'),
+        uploading: t('common.status.uploading'),
         uploaded: t('dataset.upload.uploaded'),
-        failed: t('dataset.upload.failed'),
+        failed: t('common.status.failed'),
     };
     const state = useMediaUploadState();
     const summary = computeSummary(state.items);
@@ -147,9 +147,9 @@ const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
                     >
                         <TableHeader>
                             <Column isRowHeader>{t('dataset.upload.filename')}</Column>
-                            <Column width={160}>{t('dataset.upload.status')}</Column>
+                            <Column width={160}>{t('common.labels.statusUppercase')}</Column>
                             <Column width={120} align={'end'}>
-                                {t('dataset.upload.size')}
+                                {t('common.labels.sizeUppercase')}
                             </Column>
                         </TableHeader>
                         <TableBody items={items}>

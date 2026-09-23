@@ -85,7 +85,7 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: t('inference.sinks.menu.removeSuccess', { name }),
+                        message: t('inference.connection.removeSuccess', { name }),
                     });
                 },
             }
@@ -119,13 +119,13 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
                 disabledKeys={isConnected ? [SINK_MENU_OPTIONS.REMOVE, SINK_MENU_OPTIONS.TEST] : []}
             >
                 {isConnected ? (
-                    <Item key={SINK_MENU_OPTIONS.DISCONNECT}>{t('inference.sinks.menu.disconnect')}</Item>
+                    <Item key={SINK_MENU_OPTIONS.DISCONNECT}>{t('common.actions.disconnect')}</Item>
                 ) : (
-                    <Item key={SINK_MENU_OPTIONS.CONNECT}>{t('inference.sinks.menu.connect')}</Item>
+                    <Item key={SINK_MENU_OPTIONS.CONNECT}>{t('common.actions.connect')}</Item>
                 )}
-                <Item key={SINK_MENU_OPTIONS.TEST}>{t('inference.sinks.menu.testConnection')}</Item>
-                <Item key={SINK_MENU_OPTIONS.EDIT}>{t('inference.sinks.menu.edit')}</Item>
-                <Item key={SINK_MENU_OPTIONS.REMOVE}>{t('inference.sinks.menu.remove')}</Item>
+                <Item key={SINK_MENU_OPTIONS.TEST}>{t('common.actions.testConnection')}</Item>
+                <Item key={SINK_MENU_OPTIONS.EDIT}>{t('common.actions.edit')}</Item>
+                <Item key={SINK_MENU_OPTIONS.REMOVE}>{t('common.actions.remove')}</Item>
             </Menu>
         </MenuTrigger>
     );

@@ -20,7 +20,7 @@ export const Mqtt = ({ defaultState }: MqttProps) => {
             <TextField isHidden label='id' name='id' defaultValue={defaultState.id} />
             <TextField
                 width='100%'
-                label={t('inference.sinks.fields.name')}
+                label={t('common.labels.name')}
                 name='name'
                 defaultValue={defaultState.name || t('inference.sinks.defaultNames.mqtt')}
             />

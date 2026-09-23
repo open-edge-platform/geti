@@ -50,7 +50,7 @@ export const UsbCamera = ({ defaultState }: UsbCameraProps) => {
             <TextField isHidden label='name' name='name' value={name} />
             <TextField
                 width='100%'
-                label={t('inference.sources.fields.name')}
+                label={t('common.labels.name')}
                 name='name_display'
                 value={name}
                 onChange={handleNameChange}

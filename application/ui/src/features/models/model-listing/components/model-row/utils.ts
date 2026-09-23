@@ -14,6 +14,20 @@ const getDefaultPerformanceMetricName = (taskType: TaskType | null): string => {
     return isClassificationTask(taskType) ? 'Accuracy' : 'mAP';
 };
 
+// Acronyms such as mAP and mAR are shown as the API returns them.
+const METRIC_LABEL_KEYS = {
+    Accuracy: 'models.performance.metrics.accuracy',
+    Precision: 'models.performance.metrics.precision',
+    Recall: 'models.performance.metrics.recall',
+    'F-measure': 'models.performance.metrics.fMeasure',
+} as const satisfies Partial<Record<Metric['name'], string>>;
+
+const isTranslatableMetric = (name: string): name is keyof typeof METRIC_LABEL_KEYS =>
+    Object.hasOwn(METRIC_LABEL_KEYS, name);
+
+export const getMetricLabel = (name: string, t: TranslateFn): string =>
+    isTranslatableMetric(name) ? t(METRIC_LABEL_KEYS[name]) : name;
+
 const getTestingEvaluation = (evaluations: Evaluation[]): Evaluation | undefined => {
     return evaluations.find(({ subset }) => subset === 'testing');
 };
@@ -60,8 +74,5 @@ export const getPerformanceColumnLabel = (
     taskType: TaskType | null,
     t: TranslateFn
 ): string => {
-    return (
-        getFirstAvailableTestingMetric(models)?.name ??
-        (isClassificationTask(taskType) ? t('models.performance.accuracy') : 'mAP')
-    );
+    return getMetricLabel(getPerformanceColumnAriaLabel(models, taskType), t);
 };
