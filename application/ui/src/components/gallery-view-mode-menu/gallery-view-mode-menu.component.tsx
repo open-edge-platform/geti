@@ -19,7 +19,7 @@ export const GalleryViewModeMenu = ({ viewMode, setViewMode }: GalleryViewModeMe
     return (
         <MenuTrigger>
             <ActionButton isQuiet aria-label={'View mode'}>
-                <Icon fill={'#fff'} />
+                <Icon />
             </ActionButton>
             <Menu
                 selectionMode={'single'}

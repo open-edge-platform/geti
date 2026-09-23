@@ -1012,7 +1012,12 @@
             }
         },
         "performance": {
-            "accuracy": "Accuracy",
+            "metrics": {
+                "accuracy": "Accuracy",
+                "precision": "Precision",
+                "recall": "Recall",
+                "fMeasure": "F-measure"
+            },
             "categories": {
                 "balance": "Balance",
                 "speed": "Speed",

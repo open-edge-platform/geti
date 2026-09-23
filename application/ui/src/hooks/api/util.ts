@@ -26,11 +26,11 @@ const JOB_STATUS_KEYS = {
     CANCELLED: 'common.status.cancelled',
 } as const satisfies Record<Job['status'], string>;
 
-export const getJobStatusLabel = (status: Job['status'], t: TranslateFn): string => {
-    const key = Object.entries(JOB_STATUS_KEYS).find(([value]) => value === status)?.[1];
+const isKnownJobStatus = (status: string): status is keyof typeof JOB_STATUS_KEYS =>
+    Object.hasOwn(JOB_STATUS_KEYS, status);
 
-    return t(key ?? 'common.labels.unknown');
-};
+export const getJobStatusLabel = (status: Job['status'], t: TranslateFn): string =>
+    t(isKnownJobStatus(status) ? JOB_STATUS_KEYS[status] : 'common.labels.unknown');
 
 export const isInvalidJob = (error: unknown): boolean => {
     if (isObject(error) && 'detail' in error) {

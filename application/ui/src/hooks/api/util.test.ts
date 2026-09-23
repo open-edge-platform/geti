@@ -33,6 +33,10 @@ describe('getJobStatusLabel', () => {
     it('uses a translated fallback for unrecognized API states', () => {
         expect(getJobStatusLabel('NEW_STATE', instance.t)).toBe('Localized unknown');
     });
+
+    it('does not treat inherited object properties as known states', () => {
+        expect(getJobStatusLabel('toString', instance.t)).toBe('Localized unknown');
+    });
 });
 
 describe('isInvalidStagedFile', () => {

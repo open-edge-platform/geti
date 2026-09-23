@@ -6,7 +6,9 @@ import { dimensionValue, Grid, Text } from '@geti-ui/ui';
 
 import { GroupByMode } from '../types';
 
-export const RUNNING_JOB_GRID_COLUMNS = ['2fr 2fr minmax(auto, var(--spectrum-global-dimension-size-1000))'];
+export const RUNNING_JOB_GRID_COLUMNS = [
+    'minmax(0, 2fr) minmax(0, 2fr) minmax(auto, var(--spectrum-global-dimension-size-1000))',
+];
 
 type RunningJobTableHeaderProps = {
     groupBy: GroupByMode;
