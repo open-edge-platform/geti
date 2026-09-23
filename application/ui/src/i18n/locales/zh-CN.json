@@ -924,7 +924,7 @@
                 "levelLabel": "级别",
                 "levelHelpTitle": "最低日志级别",
                 "levelHelpDescription": "显示所选级别及以上的日志条目。例如，选择 WARNING 将显示 WARNING、ERROR 和 CRITICAL 条目，隐藏 DEBUG 和 INFO。",
-                "searchPlaceholder": "搜索日志…",
+                "searchPlaceholder": "搜索日志……",
                 "connectionStatus": {
                     "connecting": "连接中……",
                     "connected": "实时",
@@ -953,7 +953,7 @@
             },
             "architectures": {
                 "metrics": {
-                    "top1AccOnImageNet": "ImageNet Top-1 精度",
+                    "top1AccOnImageNet": "ImageNet Top-1 准确率",
                     "mapOnCoco": "COCO mAP",
                     "map50OnCoco": "COCO mAP50"
                 },
@@ -972,8 +972,8 @@
                     "nameDesc": "名称（Z 到 A）",
                     "speedAsc": "速度（最快优先）",
                     "speedDesc": "速度（最慢优先）",
-                    "accuracyAsc": "精度（最低优先）",
-                    "accuracyDesc": "精度（最高优先）"
+                    "accuracyAsc": "准确率（最低优先）",
+                    "accuracyDesc": "准确率（最高优先）"
                 },
                 "timm": {
                     "heading": "TIMM 模型配置",
@@ -1078,7 +1078,7 @@
                 },
                 "tiling": {
                     "title": "切片",
-                    "description": "切片是一种将高分辨率图像划分为更小图块的技术，可能有助于提高小目标检测任务的精度。",
+                    "description": "切片是一种将高分辨率图像划分为更小图块的技术，可能有助于提高小目标检测任务的准确率。",
                     "modeLabel": "切片模式",
                     "modes": {
                         "off": "关闭",
@@ -1116,11 +1116,11 @@
             }
         },
         "performance": {
-            "accuracy": "精度",
+            "accuracy": "准确率",
             "categories": {
                 "balance": "均衡",
                 "speed": "速度",
-                "accuracy": "精度"
+                "accuracy": "准确率"
             }
         },
         "variants": {
@@ -1131,7 +1131,7 @@
             },
             "quantizedInfo": {
                 "title": "经 NNCF PTQ 量化",
-                "maxAccuracyDrop": "最大精度下降：{{value}}",
+                "maxAccuracyDrop": "最大准确率下降：{{value}}",
                 "calibrationDatasetSize": "校准数据集大小：{{size}}"
             }
         },
@@ -1140,7 +1140,7 @@
         },
         "optimize": {
             "description": "使用 OpenVINO NNCF（INT8 量化）优化 FP16 模型",
-            "contextualHelp": "通过 INT8 量化，OpenVINO NNCF（神经网络压缩框架）可减小模型体积、加快推理速度，同时对精度影响很小",
+            "contextualHelp": "通过 INT8 量化，OpenVINO NNCF（神经网络压缩框架）可减小模型体积、加快推理速度，同时对准确率影响很小",
             "start": "开始量化",
             "cancel": "取消",
             "dialogTitle": "量化",
@@ -1149,11 +1149,11 @@
             "recommendedCalibrationSize": "建议校准数据集大小为 200–500 个媒体项",
             "fields": {
                 "maxAccuracyDrop": {
-                    "label": "最大精度下降（%）",
+                    "label": "最大准确率下降（%）",
                     "help": {
-                        "paragraph1": "验证精度允许的最大下降幅度。",
-                        "paragraph2": "请注意，当允许的最大下降幅度较小时，精度感知量化可能需要很长时间。",
-                        "paragraph3": "另请注意，最终测试精度可能低于指定的验证精度阈值，尤其是数据集较小时。"
+                        "paragraph1": "验证准确率允许的最大下降幅度。",
+                        "paragraph2": "请注意，当允许的最大准确率下降幅度较小时，精度感知量化可能需要很长时间。",
+                        "paragraph3": "另请注意，最终测试准确率可能低于指定的验证准确率阈值，尤其是数据集较小时。"
                     },
                     "noMaximum": "无上限"
                 },
@@ -1161,8 +1161,8 @@
                     "label": "最大迭代次数",
                     "help": {
                         "paragraph1": "精度感知量化的最大迭代次数。",
-                        "paragraph2": "精度感知量化会逐轮将模型层移出量化范围，直到满足最大精度下降标准。限制迭代次数可显著缩短具有多层模型的量化时间。",
-                        "paragraph3": "仅在设置了最大精度下降时使用此参数。"
+                        "paragraph2": "精度感知量化会逐轮将模型层移出量化范围，直到满足最大准确率下降标准。限制迭代次数可显著缩短具有多层模型的量化时间。",
+                        "paragraph3": "仅在设置了最大准确率下降时使用此参数。"
                     }
                 },
                 "calibrationSize": {
