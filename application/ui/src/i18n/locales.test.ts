@@ -41,9 +41,9 @@ describe('locale registry', () => {
         });
     });
 
-    it('ships English as the default and only supported language', () => {
+    it('ships English as the default language', () => {
         expect(DEFAULT_LANGUAGE).toBe('en');
-        expect(SUPPORTED_LANGUAGES).toEqual(['en']);
+        expect(SUPPORTED_LANGUAGES).toEqual(['en', 'pt']);
         expect(resources.en.translation).toHaveProperty('common.labels.dataset', 'Dataset');
     });
 });
