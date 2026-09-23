@@ -286,6 +286,33 @@
                 "confirm": "确认取消",
                 "confirmation": "确定要取消任务 {{jobId}} 吗？"
             }
+        },
+        "revisions": {
+            "createdOn": "创建于 {{date}}",
+            "unnamedName": "数据集 #{{id}}",
+            "unknown": "未知",
+            "notFoundForModel": "该模型没有关联的数据集版本",
+            "filesDeleted": "该数据集版本的文件已被删除。",
+            "noItemsInSubset": "该子集中没有条目",
+            "trainingSubsets": {
+                "training": "训练集",
+                "validation": "验证集",
+                "test": "测试集"
+            },
+            "actions": {
+                "rename": "重命名",
+                "delete": "删除",
+                "export": "导出",
+                "cancel": "取消"
+            },
+            "rename": {
+                "title": "重命名数据集版本",
+                "nameLabel": "数据集版本名称"
+            },
+            "delete": {
+                "title": "删除数据集版本",
+                "description": "确定要删除数据集版本“{{name}}”吗？之后仍可查看模型统计信息，但将无法访问训练数据集文件。"
+            }
         }
     },
     "inference": {
@@ -294,7 +321,7 @@
             "valueEmpty": "值不能为空"
         },
         "connection": {
-            "testing": "正在测试连接…",
+            "testing": "正在测试连接……",
             "inUse": "使用中",
             "unreachable": "无法连接",
             "ready": "就绪"
@@ -383,6 +410,182 @@
                 "ipCamera": "IP 摄像头输入源",
                 "videoFile": "视频文件输入源"
             }
+        },
+        "sinks": {
+            "list": {
+                "addSink": "新增输出端"
+            },
+            "types": {
+                "folder": "文件夹",
+                "mqtt": "MQTT",
+                "webhook": "Webhook",
+                "ros": "ROS",
+                "disconnected": "未连接"
+            },
+            "options": {
+                "folder": "文件夹",
+                "webhook": "Webhook",
+                "mqtt": "MQTT"
+            },
+            "add": {
+                "title": "新增输出端",
+                "submit": "添加并使用"
+            },
+            "edit": {
+                "title": "编辑输出端",
+                "save": "保存",
+                "saveAndConnect": "保存并连接"
+            },
+            "form": {
+                "createSuccess": "输出端配置创建成功。",
+                "updateSuccess": "输出端配置更新成功。",
+                "saveError": "输出端配置保存失败，{{details}}",
+                "saveErrorFallback": "请重试"
+            },
+            "menu": {
+                "connect": "连接",
+                "disconnect": "断开连接",
+                "testConnection": "测试连接",
+                "edit": "编辑",
+                "remove": "移除",
+                "connectSuccess": "已成功连接到“{{name}}”",
+                "disconnectSuccess": "已成功断开与“{{name}}”的连接",
+                "removeSuccess": "“{{name}}”已成功移除！"
+            },
+            "settings": {
+                "folderPath": "文件夹路径：{{path}}",
+                "rateLimit": "频率限制：{{value}}",
+                "httpMethod": "HTTP 方法：{{value}}",
+                "timeout": "超时：{{value}}",
+                "webhookUrl": "Webhook 地址：{{value}}",
+                "topic": "主题：{{value}}",
+                "authRequired": "需要身份验证：{{value}}",
+                "brokerHost": "Broker 主机：{{value}}",
+                "brokerPort": "Broker 端口：{{value}}",
+                "outputFormats": "输出格式：",
+                "yes": "是",
+                "no": "否",
+                "outputFormatTypes": {
+                    "imageOriginal": "原始图片",
+                    "imageWithPredictions": "含预测的图片",
+                    "predictions": "预测结果"
+                }
+            },
+            "rateLimit": {
+                "notSet": "未设置",
+                "samplesPerSecond_one": "每秒采集 {{count}} 个样本",
+                "samplesPerSecond_other": "每秒采集 {{count}} 个样本",
+                "oneSamplePerSeconds_one": "每 {{count}} 秒采集 1 个样本",
+                "oneSamplePerSeconds_other": "每 {{count}} 秒采集 1 个样本"
+            },
+            "fields": {
+                "samples": "样本数",
+                "seconds": "秒",
+                "every": "每",
+                "outputFormatsLabel": "输出格式",
+                "outputFormatPredictions": "预测结果",
+                "outputFormatImageOriginal": "原始图片",
+                "outputFormatImageWithPredictions": "含预测的图片",
+                "name": "名称",
+                "folderPath": "文件夹路径",
+                "httpMethod": "HTTP 方法",
+                "timeout": "超时",
+                "webhookUrl": "Webhook 地址",
+                "headers": "请求头",
+                "topic": "主题",
+                "brokerHost": "Broker 主机",
+                "brokerPort": "Broker 端口",
+                "authRequired": "需要身份验证"
+            },
+            "webhook": {
+                "headersHelp": "按需添加任意多个键值对，每对都将包含在“{{title}}”对象中。",
+                "keyPlaceholder": "键",
+                "valuePlaceholder": "值"
+            },
+            "defaultNames": {
+                "localFolder": "本地文件夹输出端",
+                "webhook": "Webhook 输出端",
+                "mqtt": "MQTT 输出端"
+            }
+        },
+        "pipeline": {
+            "activeModel": {
+                "label": "模型",
+                "loading": "模型：…"
+            },
+            "toggle": {
+                "enabledLabel": "流水线已启用",
+                "disabledLabel": "流水线已停用",
+                "enabledSuccess": "流水线启用成功",
+                "disabledSuccess": "流水线停用成功"
+            },
+            "configuration": {
+                "sidebarLabel": "流水线配置",
+                "sourcesTab": "输入",
+                "sinksTab": "输出"
+            }
+        },
+        "collection": {
+            "sidebarLabel": "数据采集策略",
+            "maxDatasetSize": {
+                "title": "最大数据集大小",
+                "description": "最多采集的条目数",
+                "sizeLabel": "数量"
+            },
+            "captureRate": {
+                "title": "采集频率",
+                "description": "推流过程中采集帧",
+                "toggleLabel": "自动采集",
+                "framesLabel": "帧",
+                "secondsLabel": "秒",
+                "every": "每"
+            },
+            "confidenceThreshold": {
+                "title": "置信度阈值",
+                "description": "置信度低于阈值时采集帧",
+                "toggleLabel": "置信度阈值",
+                "sliderLabel": "阈值"
+            }
+        },
+        "metrics": {
+            "sidebarLabel": "流水线指标",
+            "empty": {
+                "title": "暂无可用统计",
+                "description": "流水线开始运行并处理数据后，指标将在此处显示。"
+            },
+            "throughput": {
+                "title": "吞吐量",
+                "axisLabel": "请求/秒"
+            },
+            "latency": {
+                "title": "延迟",
+                "axisLabel": "ms"
+            }
+        },
+        "health": {
+            "overall": {
+                "running": "运行中",
+                "idle": "空闲",
+                "problemsDetected": "检测到问题"
+            },
+            "component": {
+                "healthy": "健康",
+                "finished": "已完成",
+                "unavailable": "不可用",
+                "error": "错误"
+            },
+            "componentLabels": {
+                "source": "输入源",
+                "sink": "输出端",
+                "model": "模型"
+            }
+        },
+        "stream": {
+            "start": "开始推流",
+            "enablePipelineToStart": "启用流水线以开始推流",
+            "connectError": "视频流连接失败",
+            "captureFrame": "采集帧",
+            "captureSuccess": "帧已采集并加入数据集。"
         }
     },
     "project": {
@@ -397,12 +600,7 @@
         },
         "validation": {
             "nameEmpty": "项目名称不能为空",
-            "nameExists": "该项目名称已被占用",
-            "labelNameExists": "该标签名称已被占用",
-            "hotkeyExists": "该快捷键已被占用"
-        },
-        "labels": {
-            "hotkeyPlaceholder": "快捷键"
+            "nameExists": "该项目名称已被占用"
         },
         "panel": {
             "manageProjects": "管理项目",
@@ -504,8 +702,7 @@
                 }
             },
             "labels": {
-                "atLeastOneRequired": "请至少添加一个对象",
-                "inputPlaceholder": "新建标签"
+                "atLeastOneRequired": "请至少添加一个对象"
             },
             "defaultName": "项目 #{{number}}"
         },
@@ -548,11 +745,38 @@
             }
         }
     },
-    "annotator": {
-        "labels": {
+    "labels": {
+        "fields": {
+            "hotkeyPlaceholder": "快捷键",
+            "nameExists": "该标签名称已被占用",
+            "hotkeyExists": "该快捷键已被占用"
+        },
+        "editor": {
+            "namePlaceholder": "标签名称",
+            "pin": "固定标签",
+            "unpin": "取消固定",
+            "editTrigger": "编辑标签",
+            "createTrigger": "新建标签",
+            "delete": {
+                "title": "删除标签",
+                "confirm": "删除",
+                "cancel": "取消",
+                "message": "如果删除 {{labelName}} 标签，数据集中带有该标签的所有标注都将被删除，但不会影响之前训练出的模型。"
+            }
+        },
+        "toolbar": {
+            "hotkeyTooltip": "快捷键：{{hotkey}}",
+            "overflowCount": "+{{count}} 个"
+        },
+        "empty": {
             "noLabel": "无标签",
             "noObject": "无对象"
         },
+        "creation": {
+            "namePlaceholder": "新建标签"
+        }
+    },
+    "annotator": {
         "canvas": {
             "settingsTitle": "设置",
             "hideLabels": "隐藏标签",
@@ -608,27 +832,379 @@
             "autoSegmentation": {
                 "label": "自动分割",
                 "detectionDescription": "将光标移到目标上方预览建议的矩形，然后点击以创建标注。",
-                "segmentationDescription": "将光标移到目标上方预览建议的多边形，然后点击以创建标注。"
+                "segmentationDescription": "将光标移到目标上方预览建议的多边形，然后点击以创建标注。",
+                "loading": "正在处理图像，请稍候……",
+                "error": "Segment Anything 工具出错：{{message}}",
+                "unknownError": "发生未知错误，请刷新页面重试。",
+                "timeoutError": "{{operation}} 在 {{timeoutMs}}ms 后超时，请尝试刷新页面。",
+                "embeddingError": "无法获取图像嵌入（{{status}}{{statusText}}）。",
+                "operations": {
+                    "workerBuild": "SAM 工作进程构建",
+                    "workerInit": "SAM 工作进程初始化",
+                    "decoder": "SAM 解码器"
+                }
             },
             "polygon": {
                 "label": "多边形",
-                "description": "逐个点击以放置顶点，或按住拖拽以徒手绘制。适合需要像素级精度的不规则形状。"
+                "description": "逐个点击以放置顶点，或按住拖拽以徒手绘制。适合需要像素级精度的不规则形状。",
+                "deletePoint": "删除"
             },
             "magneticLasso": {
                 "label": "智能勾边",
-                "description": "沿着目标边缘移动并定时点击，将轮廓吸附到其边界。"
+                "description": "沿着目标边缘移动并定时点击，将轮廓吸附到其边界。",
+                "error": "形状边界选取失败，请再试一次。"
+            }
+        },
+        "video": {
+            "playback": {
+                "slower": "更慢",
+                "slow": "慢速",
+                "normal": "正常",
+                "speed": "播放速度",
+                "showAllFrames": "显示所有帧",
+                "showOneFramePerSecond": "每秒显示 1 帧"
+            },
+            "frames": {
+                "label": "帧",
+                "currentTotal": "当前帧：{{currentFrame}} / 总帧数：{{totalFrames}}",
+                "thumbnailAlt": "第 {{frameNumber}} 帧缩略图"
+            },
+            "errors": {
+                "network": "由于网络错误无法播放视频，请刷新后重试。",
+                "unableToPlay": "无法播放视频，请重试。",
+                "unsupportedFormat": "无法播放视频，请换用其他视频格式（mp4/webm）。"
             }
         }
     },
     "models": {
         "jobs": {
-            "error": "任务失败，请查看日志了解详情，然后重试。"
+            "error": "任务失败，请查看日志了解详情，然后重试。",
+            "heading": "任务",
+            "columns": {
+                "modelName": "模型名称",
+                "dataset": "数据集",
+                "architecture": "架构"
+            },
+            "pending": "等待中……",
+            "running": "运行中……",
+            "cancel": "取消",
+            "stopDialog": {
+                "title": "停止任务",
+                "confirmation": "确定要停止该任务吗？",
+                "close": "关闭"
+            },
+            "failed": "失败",
+            "dismiss": "关闭",
+            "logs": "日志",
+            "startedAt": "开始时间：{{time}}",
+            "waitingToStart": "等待开始……",
+            "device": "设备：{{device}}"
+        },
+        "detail": {
+            "loadError": "模型详情加载失败",
+            "tabs": {
+                "variants": "模型变体",
+                "metrics": "模型指标",
+                "parameters": "训练参数",
+                "datasets": "训练数据集"
+            }
+        },
+        "metrics": {
+            "noMetrics": "暂无可用指标",
+            "loadError": "训练指标加载失败",
+            "evaluationsTitle": "评测",
+            "noEvaluations": "暂无测试评测指标"
         },
         "training": {
             "logs": {
                 "copySuccess": "复制成功",
-                "copyError": "复制失败"
+                "copyError": "复制失败",
+                "copyPathTooltip": "点击复制路径",
+                "showTraceback": "显示堆栈跟踪",
+                "levelLabel": "级别",
+                "levelHelpTitle": "最低日志级别",
+                "levelHelpDescription": "显示所选级别及以上的日志条目。例如，选择 WARNING 将显示 WARNING、ERROR 和 CRITICAL 条目，隐藏 DEBUG 和 INFO。",
+                "searchPlaceholder": "搜索日志…",
+                "connectionStatus": {
+                    "connecting": "连接中……",
+                    "connected": "实时",
+                    "disconnected": "已断开",
+                    "error": "连接错误"
+                },
+                "entriesCount": "{{filtered}} / {{total}} 条",
+                "noEntries": "暂无日志条目",
+                "noMatchingEntries": "没有匹配的日志条目",
+                "scrollToBottom": "滚动到底部",
+                "dialogTitle": "训练日志",
+                "loadError": "日志加载失败：{{message}}",
+                "unknownError": "未知错误",
+                "noJobOrModel": "未指定任务或模型",
+                "fetchError": "模型日志获取失败：{{status}} {{statusText}}",
+                "downloadStarted": "训练日志下载已开始"
+            },
+            "parameters": {
+                "noParameters": "暂无参数。",
+                "learningParameters": "学习参数",
+                "filters": "筛选条件",
+                "augmentations": "数据增强",
+                "intensityMapping": "强度映射",
+                "on": "开",
+                "off": "关"
+            },
+            "architectures": {
+                "metrics": {
+                    "top1AccOnImageNet": "ImageNet Top-1 精度",
+                    "mapOnCoco": "COCO mAP",
+                    "map50OnCoco": "COCO mAP50"
+                },
+                "card": {
+                    "numberOfParameters": "参数量：{{count}} 百万",
+                    "gigaflops": "Gigaflops：{{value}}",
+                    "license": "许可：{{license}}"
+                },
+                "list": {
+                    "showMore": "显示更多",
+                    "showLess": "收起"
+                },
+                "sort": {
+                    "label": "模型排序：",
+                    "nameAsc": "名称（A 到 Z）",
+                    "nameDesc": "名称（Z 到 A）",
+                    "speedAsc": "速度（最快优先）",
+                    "speedDesc": "速度（最慢优先）",
+                    "accuracyAsc": "精度（最低优先）",
+                    "accuracyDesc": "精度（最高优先）"
+                },
+                "timm": {
+                    "heading": "TIMM 模型配置",
+                    "architectureFamilyLabel": "架构系列",
+                    "selectArchitecturePlaceholder": "选择架构",
+                    "modelVariantLabel": "模型变体",
+                    "selectVariantPlaceholder": "选择变体",
+                    "pretrainedWeightsLabel": "预训练权重",
+                    "selectWeightsPlaceholder": "选择权重",
+                    "parameters": "参数量：{{count}} 百万",
+                    "gigaflops": "GigaFlops：{{value}}",
+                    "licenseLabel": "许可："
+                }
+            },
+            "devices": {
+                "selectLabel": "选择训练设备"
+            },
+            "setup": {
+                "trigger": "训练模型",
+                "dialog": {
+                    "title": "选择要训练的模型",
+                    "disabledReasonTitle": "为什么无法开始训练？",
+                    "cancel": "取消",
+                    "back": "返回",
+                    "advancedSettings": "高级设置",
+                    "start": "开始"
+                },
+                "toast": {
+                    "trainingStarted": "模型训练启动成功。",
+                    "trainingStartedWithLink": "模型训练已成功启动。<link>打开模型页面查看进度。</link>"
+                },
+                "selectDataset": {
+                    "label": "选择数据集",
+                    "useCurrentDataset": "使用当前数据集",
+                    "helpTitle": "选择数据集",
+                    "helpDescription": "选择用于训练的数据集版本。如果希望新模型使用与其他模型完全相同的数据（媒体和标注）进行训练，请选择对应的数据集版本。反之，如果希望使用最新版本的数据（即“数据集”页面中所见）进行训练，请选择“使用当前数据集”。"
+                },
+                "selectModel": {
+                    "label": "选择输入权重",
+                    "defaultPretrainedWeights": "默认预训练权重",
+                    "helpTitle": "选择输入权重",
+                    "helpDescription": "选择已有模型继续微调，或选择“默认预训练权重”，基于在大型公开数据集上预训练的公开权重微调出新模型。"
+                }
+            },
+            "validation": {
+                "notEnoughAnnotations": "要训练模型，数据集中至少需要标注 3 项，不过为获得更好的效果，建议多标注一些。",
+                "emptySubsetsReason": "要训练模型，每个子集（训练集、验证集、测试集）至少需要包含一项。目前不满足该条件，因为{{subsetClause}}，且{{assignmentDetail}}。",
+                "emptySubsetClause_one": "{{list}} 子集为空",
+                "emptySubsetClause_other": "{{list}} 子集均为空",
+                "reviewedOnly_one": "还有 {{count}} 个已审核项待分配",
+                "reviewedOnly_other": "还有 {{count}} 个已审核项待分配",
+                "unannotatedOnly_one": "还有 {{count}} 项需先完成标注才能分配",
+                "unannotatedOnly_other": "还有 {{count}} 项需先完成标注才能分配",
+                "mixedReviewedClause_one": "有 {{count}} 个已审核项可分配",
+                "mixedReviewedClause_other": "有 {{count}} 个已审核项可分配",
+                "mixedUnannotatedClause_one": "{{count}} 项需先完成标注才能分配",
+                "mixedUnannotatedClause_other": "{{count}} 项需先完成标注才能分配",
+                "mixedAssignmentDetail": "{{reviewedClause}}，{{unannotatedClause}}",
+                "noUnassignedItems": "没有可重新分配的未分配项"
+            },
+            "advanced": {
+                "tabs": {
+                    "dataManagement": "数据管理",
+                    "training": "训练"
+                },
+                "notAvailable": "训练配置不可用。"
+            },
+            "learning": {
+                "title": "学习参数",
+                "tagDefault": "默认",
+                "tagModified": "已修改",
+                "inputSize": "输入尺寸"
+            },
+            "dataManagement": {
+                "trainingSubsets": {
+                    "title": "训练子集",
+                    "description": "指定尚未分配到子集的已标注样本的分布。请注意，之前训练轮次中使用的样本已有子集归属且将保持不变，以避免数据污染和评估偏差。",
+                    "unavailableTitle": "训练子集配置无效",
+                    "unavailableDescription": "训练子集中的媒体项不足，无法支持训练集、验证集和测试集的可配置划分。",
+                    "unavailableHint": "请添加更多媒体项，确保每个子集至少包含一项。",
+                    "datasetSamples": "数据集：{{count}} 个样本",
+                    "assignedSamples": "已分配：{{count}}",
+                    "unassignedSamples": "未分配：{{count}}",
+                    "distributionLabel": "新样本分布",
+                    "resultingDistribution": "最终数据集分布：",
+                    "totalLabel": "总计：",
+                    "mediaItemsLabel": "个媒体项"
+                },
+                "filters": {
+                    "title": "筛选条件",
+                    "noMinimum": "无下限",
+                    "noMaximum": "无上限",
+                    "unlimited": "不限"
+                },
+                "augmentation": {
+                    "title": "数据增强",
+                    "enabledYes": "是",
+                    "enabledNo": "否"
+                },
+                "intensityMapping": {
+                    "title": "强度映射"
+                },
+                "tiling": {
+                    "title": "切片",
+                    "description": "切片是一种将高分辨率图像划分为更小图块的技术，可能有助于提高小目标检测任务的精度。",
+                    "modeLabel": "切片模式",
+                    "modes": {
+                        "off": "关闭",
+                        "automatic": "自动",
+                        "custom": "自定义"
+                    },
+                    "offDescription": "模型将整张图像作为一个整体处理，不划分为更小的图块。这种方式简单直接，但在高分辨率图像中检测小目标时可能力不从心，因为模型可能遗漏精细细节",
+                    "automaticDescription": "这意味着系统将根据图像分辨率和标注尺寸自动设置参数。"
+                }
             }
+        },
+        "list": {
+            "groupByPlaceholder": "分组依据",
+            "groupByDataset": "按数据集分组",
+            "groupByArchitecture": "按架构分组",
+            "hideFailedModels": "隐藏失败的模型",
+            "showFailedModels": "显示失败的模型",
+            "searchPlaceholder": "搜索模型…",
+            "noModelsFound": "未找到模型",
+            "empty": {
+                "title": "暂无模型。",
+                "description": "训练第一个模型即可开始。"
+            },
+            "unknownArchitecture": "未知",
+            "failedBadge": "失败",
+            "deletedWeightsBadge": "权重已删除",
+            "fineTunedFrom": "微调自",
+            "columns": {
+                "modelName": "模型名称",
+                "trained": "训练时间",
+                "dataset": "数据集",
+                "architecture": "架构",
+                "device": "设备",
+                "totalSize": "总大小"
+            }
+        },
+        "performance": {
+            "accuracy": "精度",
+            "categories": {
+                "balance": "均衡",
+                "speed": "速度",
+                "accuracy": "精度"
+            }
+        },
+        "variants": {
+            "empty": "暂无可用的模型变体。",
+            "columns": {
+                "precision": "精度",
+                "size": "大小"
+            },
+            "quantizedInfo": {
+                "title": "经 NNCF PTQ 量化",
+                "maxAccuracyDrop": "最大精度下降：{{value}}",
+                "calibrationDatasetSize": "校准数据集大小：{{size}}"
+            }
+        },
+        "export": {
+            "downloadStarted": "模型下载已开始"
+        },
+        "optimize": {
+            "description": "使用 OpenVINO NNCF（INT8 量化）优化 FP16 模型",
+            "contextualHelp": "通过 INT8 量化，OpenVINO NNCF（神经网络压缩框架）可减小模型体积、加快推理速度，同时对精度影响很小",
+            "start": "开始量化",
+            "cancel": "取消",
+            "dialogTitle": "量化",
+            "subheading": "将模型量化为 INT8",
+            "jobStarted": "量化任务已启动。",
+            "recommendedCalibrationSize": "建议校准数据集大小为 200–500 个媒体项",
+            "fields": {
+                "maxAccuracyDrop": {
+                    "label": "最大精度下降（%）",
+                    "help": {
+                        "paragraph1": "验证精度允许的最大下降幅度。",
+                        "paragraph2": "请注意，当允许的最大下降幅度较小时，精度感知量化可能需要很长时间。",
+                        "paragraph3": "另请注意，最终测试精度可能低于指定的验证精度阈值，尤其是数据集较小时。"
+                    },
+                    "noMaximum": "无上限"
+                },
+                "maxIterations": {
+                    "label": "最大迭代次数",
+                    "help": {
+                        "paragraph1": "精度感知量化的最大迭代次数。",
+                        "paragraph2": "精度感知量化会逐轮将模型层移出量化范围，直到满足最大精度下降标准。限制迭代次数可显著缩短具有多层模型的量化时间。",
+                        "paragraph3": "仅在设置了最大精度下降时使用此参数。"
+                    }
+                },
+                "calibrationSize": {
+                    "label": "最大校准集大小",
+                    "help": "校准样本将在数据集中随机选取",
+                    "useFullDataset": "使用完整数据集"
+                }
+            }
+        },
+        "actions": {
+            "rename": "重命名",
+            "deleteWeights": "删除权重",
+            "deleteModel": "删除模型",
+            "viewLogs": "查看训练日志",
+            "cancel": "取消",
+            "deleteWeightsDescription": "确定要删除模型“{{modelName}}”的权重吗？",
+            "deleteModelDescription": "确定要删除模型“{{modelName}}”吗？此操作无法撤销。",
+            "renameDialog": {
+                "title": "重命名模型",
+                "nameLabel": "模型名称"
+            }
+        }
+    },
+    "license": {
+        "agreement": {
+            "title": "许可协议",
+            "intro": "安装、使用或分发本应用，即表示您确认：",
+            "termsRead": "您已阅读并理解下方链接中的许可条款；",
+            "termsGovern": "确认所访问和使用内容的适用条款为链接中的条款；且",
+            "termsAccepted": "已接受并同意链接中的许可条款。",
+            "accept": "接受并继续"
+        },
+        "links": {
+            "intelSimplified": "Intel Simplified Software License",
+            "dinov2": "DINOv3 License"
+        },
+        "edgecrafter": {
+            "prefix": "许可：",
+            "linkText": "EdgeCrafter"
+        },
+        "ultralytics": {
+            "linkText": "遵循 Ultralytics 的许可使用指引"
         }
     },
     "application": {
