@@ -74,7 +74,7 @@ export const EditSource = <T extends SourceConfigPayload>({
                     UNSAFE_style={{ maxWidth: 'fit-content' }}
                     onPress={() => (connectToPipeline.current = false)}
                 >
-                    {t('inference.sources.edit.save')}
+                    {t('common.actions.save')}
                 </Button>
 
                 {!isConnected && (
@@ -84,7 +84,7 @@ export const EditSource = <T extends SourceConfigPayload>({
                         UNSAFE_style={{ maxWidth: 'fit-content' }}
                         onPress={() => (connectToPipeline.current = true)}
                     >
-                        {t('inference.sources.edit.saveAndConnect')}
+                        {t('common.actions.saveAndConnect')}
                     </Button>
                 )}
             </ButtonGroup>

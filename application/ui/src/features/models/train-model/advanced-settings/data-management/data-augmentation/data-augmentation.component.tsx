@@ -27,9 +27,7 @@ export const DataAugmentation = ({
             <Accordion.Title>
                 {t('models.training.dataManagement.augmentation.title')}
                 <Accordion.Tag ariaLabel={'Data augmentation tag'}>
-                    {isEnabled
-                        ? t('models.training.dataManagement.augmentation.enabledYes')
-                        : t('models.training.dataManagement.augmentation.enabledNo')}
+                    {isEnabled ? t('common.labels.yes') : t('common.labels.no')}
                 </Accordion.Tag>
             </Accordion.Title>
             <Accordion.Content>

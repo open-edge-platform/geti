@@ -47,7 +47,7 @@ export const LogViewer = ({ logs, isStreaming = false, connectionStatus }: LogVi
     const connectionStatusLabel: Record<ConnectionStatus, string> = {
         connecting: t('models.training.logs.connectionStatus.connecting'),
         connected: t('models.training.logs.connectionStatus.connected'),
-        disconnected: t('models.training.logs.connectionStatus.disconnected'),
+        disconnected: t('common.status.disconnected'),
         error: t('models.training.logs.connectionStatus.error'),
     };
 

@@ -45,12 +45,7 @@ export const VideoFile = ({ defaultState }: VideoFileProps) => {
     return (
         <Flex direction='column' gap='size-200'>
             <TextField isHidden label='id' name='id' defaultValue={defaultState?.id} />
-            <TextField
-                width='100%'
-                label={t('inference.sources.fields.name')}
-                name='name'
-                defaultValue={defaultState?.name}
-            />
+            <TextField width='100%' label={t('common.labels.name')} name='name' defaultValue={defaultState?.name} />
 
             <Flex direction='column' gap='size-100'>
                 <Flex gap='size-100' alignItems='end'>
@@ -73,7 +68,7 @@ export const VideoFile = ({ defaultState }: VideoFileProps) => {
                         onChange={(event) => handleFileChange(event.target.files?.[0] ?? null)}
                     />
                     <Button variant='secondary' onPress={() => fileInputRef.current?.click()}>
-                        {t('inference.sources.fields.upload')}
+                        {t('common.actions.upload')}
                     </Button>
                 </Flex>
 

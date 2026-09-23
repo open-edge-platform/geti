@@ -104,7 +104,7 @@ export const ImportTaskSelection = ({ stagedDatasetId }: ImportTaskSelectionProp
                     isRequired
                     items={items}
                     name={'task_type'}
-                    label={t('project.import.taskSelection.taskType')}
+                    label={t('project.taskType')}
                     aria-label={'Task type'}
                     marginBottom={'size-150'}
                     placeholder={t('project.import.taskSelection.selectTaskPlaceholder')}

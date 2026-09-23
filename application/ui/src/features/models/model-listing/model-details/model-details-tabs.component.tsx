@@ -56,7 +56,7 @@ export const ModelDetailsTabs = ({ modelId }: ModelDetailsTabsProps) => {
             {modelArchitecture !== undefined && (
                 <Flex gap={'size-50'} alignItems={'center'}>
                     <Info />
-                    <Text>License: </Text>
+                    <Text>{t('license.label')}</Text>
                     <ModelLicenseLink license={modelArchitecture.license} />
                 </Flex>
             )}

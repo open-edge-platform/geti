@@ -42,10 +42,10 @@ export const RenameModelDialog = ({ currentName, onRename, onClose, isPending }:
                     />
                     <ButtonGroup align={'end'} marginTop={'size-300'}>
                         <Button variant='secondary' onPress={onClose}>
-                            {t('models.actions.cancel')}
+                            {t('common.actions.cancel')}
                         </Button>
                         <Button variant='accent' type='submit' isPending={isPending} isDisabled={hasSameName}>
-                            {t('models.actions.rename')}
+                            {t('common.actions.rename')}
                         </Button>
                     </ButtonGroup>
                 </Form>

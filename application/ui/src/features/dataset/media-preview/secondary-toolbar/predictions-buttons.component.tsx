@@ -22,7 +22,7 @@ const EditPredictionButton = ({ isDisabled, onEditPrediction }: EditPredictionBu
             <Icon>
                 <Edit />
             </Icon>
-            <Text>{t('annotator.predictions.edit')}</Text>
+            <Text>{t('common.actions.edit')}</Text>
         </ActionButton>
     );
 };

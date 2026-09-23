@@ -31,7 +31,7 @@ const formatParameterValue = (value: ConfigurableParameter['value'], t: Translat
     }
 
     if (typeof value === 'boolean') {
-        return value ? t('models.training.parameters.on') : t('models.training.parameters.off');
+        return value ? t('common.labels.on') : t('common.labels.off');
     }
 
     if (value === null) {

@@ -83,7 +83,7 @@ const BulkLabelsAssignmentDialogContent = ({
                     {t('dataset.bulkLabels.cancelUpload')}
                 </Button>
                 <Button variant={'secondary'} onPress={onSkip} isPending={isSkipPending} isDisabled={isSkipPending}>
-                    {t('dataset.bulkLabels.skip')}
+                    {t('common.actions.skip')}
                 </Button>
                 <Button
                     variant={'accent'}
@@ -91,7 +91,7 @@ const BulkLabelsAssignmentDialogContent = ({
                     isDisabled={isContinueDisabled}
                     isPending={isContinuePending}
                 >
-                    {t('dataset.bulkLabels.continue')}
+                    {t('common.actions.continue')}
                 </Button>
             </ButtonGroup>
         </Dialog>

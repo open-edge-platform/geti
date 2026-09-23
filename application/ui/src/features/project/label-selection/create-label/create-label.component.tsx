@@ -84,7 +84,7 @@ export const CreateLabel = ({ labels, onCreate, taskType }: CreateLabelProps) =>
                 <TextField
                     ref={inputRef}
                     aria-label={'Create label input'}
-                    placeholder={t('labels.creation.namePlaceholder')}
+                    placeholder={t('labels.editor.createTrigger')}
                     value={newLabel.name}
                     onChange={(newName) => setNewLabel((prevLabel) => ({ ...prevLabel, name: newName }))}
                     errorMessage={validationResult}

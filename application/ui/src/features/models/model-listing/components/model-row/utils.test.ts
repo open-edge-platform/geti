@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
     getFirstAvailableTestingMetric,
+    getMetricLabel,
     getModelEvaluations,
     getPerformanceColumnLabel,
     getTestingMetric,
@@ -328,5 +329,31 @@ describe('getPerformanceColumnLabel', () => {
 
     it('handles undefined models array', () => {
         expect(getPerformanceColumnLabel(undefined, 'classification', t)).toBe('Accuracy');
+    });
+});
+
+describe('getMetricLabel', () => {
+    const { t } = createI18nInstance({
+        lng: 'en',
+        resources: {
+            en: {
+                translation: {
+                    models: {
+                        performance: { metrics: { accuracy: 'Localized accuracy', recall: 'Localized recall' } },
+                    },
+                },
+            },
+        },
+    });
+
+    it.each([
+        ['Accuracy', 'Localized accuracy'],
+        ['Recall', 'Localized recall'],
+    ])('translates %s', (name, expected) => {
+        expect(getMetricLabel(name, t)).toBe(expected);
+    });
+
+    it.each(['mAP', 'mAP@0.5', 'mAR@100'])('keeps the %s acronym as returned by the API', (name) => {
+        expect(getMetricLabel(name, t)).toBe(name);
     });
 });

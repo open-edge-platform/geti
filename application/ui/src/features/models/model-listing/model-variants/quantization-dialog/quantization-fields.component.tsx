@@ -104,7 +104,7 @@ export const MaxAccuracyDropField = ({
                 />
             </Flex>
             <Checkbox aria-label='No maximum' isSelected={isDisabled} onChange={onDisabledChange}>
-                {t('models.optimize.fields.maxAccuracyDrop.noMaximum')}
+                {t('common.labels.noMaximum')}
             </Checkbox>
         </QuantizationFieldLayout>
     );

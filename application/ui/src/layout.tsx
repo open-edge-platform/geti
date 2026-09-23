@@ -50,7 +50,7 @@ const Header = () => {
                         key={'dataset'}
                         href={paths.project.dataset.index({ projectId })}
                     >
-                        {t('navigation.dataset')}
+                        {t('common.labels.dataset')}
                     </Item>
                     <Item
                         textValue={t('navigation.modelsDescription')}

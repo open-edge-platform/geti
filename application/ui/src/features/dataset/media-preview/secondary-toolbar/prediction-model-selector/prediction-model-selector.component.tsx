@@ -22,7 +22,7 @@ export const PredictionModelSelector = ({ isDisabled }: PredictionModelSelectorP
     return (
         <Picker
             aria-label={'Select prediction model'}
-            label={t('annotator.predictions.modelLabel')}
+            label={t('common.labels.model')}
             width={'100%'}
             items={selectableModels}
             selectedKey={selectedModelId}

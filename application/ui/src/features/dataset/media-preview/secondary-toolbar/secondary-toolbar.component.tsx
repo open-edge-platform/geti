@@ -65,7 +65,7 @@ const ImageAnnotationButtons = ({
         <>
             <DeleteMediaItem itemsIds={[mediaId]} onDeleted={onDeleteItem} />
             <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
-                {t('annotator.actions.submit')}
+                {t('common.actions.submit')}
             </Button>
         </>
     );
@@ -82,7 +82,7 @@ const VideoAnnotationButtons = ({ onSubmit, isDisabled, isSaving }: VideoAnnotat
 
     return (
         <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
-            {t('annotator.actions.submit')}
+            {t('common.actions.submit')}
         </Button>
     );
 };
@@ -252,7 +252,7 @@ export const SecondaryToolbar = ({
                             <Icon height={'size-150'} width={'size-150'}>
                                 <CloseSemiBold />
                             </Icon>
-                            <Text>{t('annotator.actions.close')}</Text>
+                            <Text>{t('common.actions.close')}</Text>
                         </ActionButton>
                     </ButtonGroup>
                 </Toolbar.Section>

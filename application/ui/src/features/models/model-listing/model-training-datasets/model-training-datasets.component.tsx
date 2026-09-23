@@ -2,13 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DatasetRevision, DatasetSubset, Model } from '@/api/types';
+import { GalleryViewModeMenu } from '@/components/gallery-view-mode-menu/gallery-view-mode-menu.component';
 import { useTranslation } from '@/i18n';
-import { Flex, MediaViewModes, Text, ViewModes } from '@geti-ui/ui';
+import { Flex, Text, ViewModes } from '@geti-ui/ui';
 import { useNumberFormatter } from 'react-aria';
 
 import { useGetDatasetRevisionItems } from '../../../../hooks/use-get-dataset-revision-items.hook';
 import { useViewMode } from '../../../../hooks/use-view-mode.hook';
-import { GALLERY_VIEW_MODES, type GalleryViewMode } from '../../../../shared/gallery-view-modes';
+import { type GalleryViewMode } from '../../../../shared/gallery-view-modes';
 import { getAllModelsWithOpenVINOVariants, type SelectableModel } from '../../utils';
 import { Box } from '../components/box/box.component';
 import { SubsetGallery } from './subset-gallery.component';
@@ -36,7 +37,7 @@ const SubsetBox = ({ title, subset, datasetRevisionId, totalItems, selectedModel
     return (
         <Box
             title={`${title} ${formatter.format(subsetPercentage)} (${totalCount})`}
-            actions={<MediaViewModes viewMode={viewMode} setViewMode={setViewMode} items={GALLERY_VIEW_MODES} />}
+            actions={<GalleryViewModeMenu viewMode={viewMode} setViewMode={setViewMode} />}
             content={
                 <SubsetGallery
                     items={items}
@@ -64,21 +65,21 @@ const ModelTrainingContent = ({ datasetRevision, model }: { datasetRevision: Dat
     return (
         <Flex gap={'size-300'} width={'100%'}>
             <SubsetBox
-                title={t('dataset.filters.subsetOptions.training')}
+                title={t('common.labels.training')}
                 subset={'training'}
                 datasetRevisionId={datasetRevisionId}
                 totalItems={totalItems}
                 selectedModel={selectedModel}
             />
             <SubsetBox
-                title={t('dataset.filters.subsetOptions.validation')}
+                title={t('common.labels.validation')}
                 subset={'validation'}
                 datasetRevisionId={datasetRevisionId}
                 totalItems={totalItems}
                 selectedModel={selectedModel}
             />
             <SubsetBox
-                title={t('dataset.filters.subsetOptions.testing')}
+                title={t('common.labels.testing')}
                 subset={'testing'}
                 datasetRevisionId={datasetRevisionId}
                 totalItems={totalItems}

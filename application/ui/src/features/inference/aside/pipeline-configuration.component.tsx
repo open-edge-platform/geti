@@ -40,10 +40,10 @@ export const PipelineConfiguration = () => {
                 }}
             >
                 <TabList marginBottom={'size-200'}>
-                    <Item key='sources' textValue='Sources'>
+                    <Item key='sources' textValue={t('inference.pipeline.configuration.sourcesTab')}>
                         <Text>{t('inference.pipeline.configuration.sourcesTab')}</Text>
                     </Item>
-                    <Item key='sinks' textValue='Sinks'>
+                    <Item key='sinks' textValue={t('inference.pipeline.configuration.sinksTab')}>
                         <Text>{t('inference.pipeline.configuration.sinksTab')}</Text>
                     </Item>
                 </TabList>

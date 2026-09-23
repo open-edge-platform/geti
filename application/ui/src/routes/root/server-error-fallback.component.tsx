@@ -24,7 +24,7 @@ export const ServerErrorFallback = () => {
                         redirectTo(paths.root({}));
                     }}
                 >
-                    {t('application.serverError.refresh')}
+                    {t('common.actions.refresh')}
                 </Button>
             </IllustratedMessage>
         </View>

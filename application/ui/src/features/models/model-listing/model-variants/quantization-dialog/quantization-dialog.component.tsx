@@ -150,7 +150,7 @@ export const QuantizationDialog = ({ model, onClose }: QuantizationDialogProps) 
                     onPress={onClose}
                     UNSAFE_style={{ paddingTop: dimensionValue('size-75') }}
                 >
-                    {t('models.optimize.cancel')}
+                    {t('common.actions.cancel')}
                 </Button>
                 <Button
                     variant={'primary'}

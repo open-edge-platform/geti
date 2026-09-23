@@ -22,7 +22,7 @@ export const BooleanParameterField = ({ value, header, onChange, isDisabled }: B
             onChange={onChange}
             isDisabled={isDisabled}
         >
-            {value ? t('models.training.parameters.on') : t('models.training.parameters.off')}
+            {value ? t('common.labels.on') : t('common.labels.off')}
         </Switch>
     );
 };

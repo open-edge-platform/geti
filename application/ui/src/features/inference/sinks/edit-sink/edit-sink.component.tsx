@@ -71,7 +71,7 @@ export const EditSink = <T extends SinkConfig>({
                     UNSAFE_style={{ maxWidth: 'fit-content' }}
                     onPress={() => (connectToPipeline.current = false)}
                 >
-                    {t('inference.sinks.edit.save')}
+                    {t('common.actions.save')}
                 </Button>
 
                 {!isConnected && (
@@ -81,7 +81,7 @@ export const EditSink = <T extends SinkConfig>({
                         UNSAFE_style={{ maxWidth: 'fit-content' }}
                         onPress={() => (connectToPipeline.current = true)}
                     >
-                        {t('inference.sinks.edit.saveAndConnect')}
+                        {t('common.actions.saveAndConnect')}
                     </Button>
                 )}
             </ButtonGroup>

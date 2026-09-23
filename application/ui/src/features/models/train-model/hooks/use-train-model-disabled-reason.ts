@@ -5,10 +5,13 @@ import { useTranslation } from '@/i18n';
 import { useGetDatasetItems } from 'hooks/use-get-dataset-items.hook';
 
 const MIN_NUMBER_OF_ANNOTATED_ITEMS = 3;
-const listFormatter = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' });
 
 export const useTrainModelDisabledReason = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const listFormatter = new Intl.ListFormat(i18n.resolvedLanguage ?? i18n.language, {
+        style: 'long',
+        type: 'conjunction',
+    });
 
     const { totalCount, isPending: isTotalPending } = useGetDatasetItems({ annotationStatus: 'with_annotations' });
     const { totalCount: trainingSubsetSize, isPending: isTrainingPending } = useGetDatasetItems({
@@ -49,9 +52,9 @@ export const useTrainModelDisabledReason = () => {
     }
 
     const subsetSizes = [
-        { name: 'training', value: trainingSubsetSize },
-        { name: 'validation', value: validationSubsetSize },
-        { name: 'testing', value: testingSubsetSize },
+        { label: t('common.labels.trainingLowercase'), value: trainingSubsetSize },
+        { label: t('common.labels.validationLowercase'), value: validationSubsetSize },
+        { label: t('common.labels.testingLowercase'), value: testingSubsetSize },
     ];
 
     const emptySubsets = subsetSizes.filter(({ value }) => value === 0);
@@ -60,7 +63,7 @@ export const useTrainModelDisabledReason = () => {
         return { reason: undefined };
     }
 
-    const emptySubsetNames = emptySubsets.map(({ name }) => name);
+    const emptySubsetNames = emptySubsets.map(({ label }) => label);
     const subsetClause = t('models.training.validation.emptySubsetClause', {
         count: emptySubsetNames.length,
         list: listFormatter.format(emptySubsetNames),

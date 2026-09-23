@@ -71,9 +71,9 @@ export const DatasetActions = ({ dataset }: DatasetActionsProps) => {
                     <MoreMenu />
                 </ActionButton>
                 <Menu onAction={handleDatasetMenuAction} aria-label={'Dataset actions menu'}>
-                    <Item key={'rename'}>{t('dataset.revisions.actions.rename')}</Item>
-                    <Item key={'delete'}>{t('dataset.revisions.actions.delete')}</Item>
-                    <Item key={'export'}>{t('dataset.revisions.actions.export')}</Item>
+                    <Item key={'rename'}>{t('common.actions.rename')}</Item>
+                    <Item key={'delete'}>{t('common.actions.delete')}</Item>
+                    <Item key={'export'}>{t('common.actions.export')}</Item>
                 </Menu>
             </MenuTrigger>
 
@@ -93,9 +93,9 @@ export const DatasetActions = ({ dataset }: DatasetActionsProps) => {
                     <AlertDialog
                         title={t('dataset.revisions.delete.title')}
                         variant='destructive'
-                        primaryActionLabel={t('dataset.revisions.actions.delete')}
+                        primaryActionLabel={t('common.actions.delete')}
                         onPrimaryAction={handleDelete}
-                        cancelLabel={t('dataset.revisions.actions.cancel')}
+                        cancelLabel={t('common.actions.cancel')}
                     >
                         {t('dataset.revisions.delete.description', { name: dataset.name })}
                     </AlertDialog>

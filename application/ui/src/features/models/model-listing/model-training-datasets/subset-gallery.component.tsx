@@ -14,6 +14,7 @@ import { GridLayoutOptions } from 'react-aria-components';
 
 import { type GalleryViewMode } from '../../../../shared/gallery-view-modes';
 import { getDatasetRevisionThumbnailUrl } from '../../../../shared/media-url.utils';
+import { SUBSET_LABEL_KEYS } from '../../../../shared/subsets';
 import { usePrefetchMediaItem } from '../../../annotator/hooks/use-prefetch-media-item.hook';
 import { type SelectableModel } from '../../utils';
 import { SubsetMediaDialog } from './subset-media-dialog.component';
@@ -134,7 +135,9 @@ export const SubsetGallery = ({
                             contentElement={() => (
                                 <MediaThumbnail
                                     item={{ type: 'image' }}
-                                    alt={`${item.subset} item`}
+                                    alt={t('dataset.revisions.itemAlt', {
+                                        subset: t(SUBSET_LABEL_KEYS[item.subset]),
+                                    })}
                                     url={getDatasetRevisionThumbnailUrl(projectId, datasetRevisionId, item.id)}
                                     onDoubleClick={() => selectItem(item.id)}
                                 />

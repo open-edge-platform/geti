@@ -23,7 +23,7 @@ export const Webhook = ({ defaultState }: WebhookProps) => {
                 <TextField isHidden label='id' name='id' defaultValue={defaultState.id} />
                 <TextField
                     flex='1'
-                    label={t('inference.sinks.fields.name')}
+                    label={t('common.labels.name')}
                     name='name'
                     defaultValue={defaultState.name || t('inference.sinks.defaultNames.webhook')}
                 />

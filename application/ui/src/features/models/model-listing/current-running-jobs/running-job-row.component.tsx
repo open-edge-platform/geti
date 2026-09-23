@@ -7,7 +7,7 @@ import type { Job, QuantizeJob, TrainJob } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { AlertDialog, Badge, Button, DialogContainer, Flex, Loading, Text } from '@geti-ui/ui';
 import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
-import { capitalize } from 'lodash-es';
+import { getJobStatusLabel } from 'hooks/api/util';
 
 import { JobRow, type JobRowColumnsProps } from './job-row.component';
 
@@ -56,16 +56,16 @@ const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
                 onPress={() => setIsDeleteDialogOpen(true)}
                 aria-label={'Cancel job'}
             >
-                {t('models.jobs.cancel')}
+                {t('common.actions.cancel')}
             </Button>
             <DialogContainer onDismiss={() => setIsDeleteDialogOpen(false)}>
                 {isDeleteDialogOpen && (
                     <AlertDialog
                         title={t('models.jobs.stopDialog.title')}
                         variant='destructive'
-                        primaryActionLabel={t('models.jobs.cancel')}
+                        primaryActionLabel={t('common.actions.cancel')}
                         onPrimaryAction={onCancel}
-                        cancelLabel={t('models.jobs.stopDialog.close')}
+                        cancelLabel={t('common.actions.close')}
                     >
                         {t('models.jobs.stopDialog.confirmation')}
                     </AlertDialog>
@@ -92,7 +92,7 @@ export const RunningJobRow = ({ job, onCancel, datasetRevisions, groupBy, modelA
             progress={job.progress}
             statusBadges={
                 <>
-                    <StatusBadge status={capitalize(job.status)} />
+                    <StatusBadge status={getJobStatusLabel(job.status, t)} />
                     {showStatusTagMessage && <StatusBadgeMessage status={statusMessage} />}
                 </>
             }

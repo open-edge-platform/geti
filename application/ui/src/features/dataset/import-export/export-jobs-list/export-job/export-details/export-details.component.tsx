@@ -18,13 +18,14 @@ type ExportJobDetailsProps = {
 const isGetiFormat = (format?: string | null) => format?.toLowerCase() === 'geti';
 
 const useDatasetViewName = (datasetViewId: string | null | undefined) => {
+    const { t } = useTranslation();
     const { data: datasetViews } = useOptionalDatasetViewsQuery(isNonEmptyString(datasetViewId));
 
     if (!isNonEmptyString(datasetViewId)) {
         return undefined;
     }
 
-    return datasetViews?.find(({ id }) => id === datasetViewId)?.name ?? 'Deleted view';
+    return datasetViews?.find(({ id }) => id === datasetViewId)?.name ?? t('dataset.views.deleted');
 };
 
 export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProps) => {
@@ -40,13 +41,13 @@ export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProp
 
     const labelsList = isEmpty(selectedLabels) ? projectLabelsNames : selectedLabels;
 
-    const title = isNil(metadata.dataset_view_id) ? (datasetName ?? 'dataset') : 'dataset view';
+    const title = isNil(metadata.dataset_view_id)
+        ? t('dataset.export.heading', { name: datasetName ?? t('dataset.export.details.defaultName') })
+        : t('dataset.export.headingDatasetView');
 
     return (
         <Flex direction={'column'}>
-            <Text UNSAFE_style={{ fontWeight: 500, fontSize: dimensionValue('size-225') }}>
-                {t('dataset.export.details.heading', { name: title })}
-            </Text>
+            <Text UNSAFE_style={{ fontWeight: 500, fontSize: dimensionValue('size-225') }}>{title}</Text>
 
             <Grid
                 marginTop={'size-200'}
@@ -60,7 +61,7 @@ export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProp
             >
                 {isNonEmptyString(datasetViewName) && (
                     <>
-                        <Text>View: {datasetViewName}</Text>
+                        <Text>{t('dataset.export.datasetView', { name: datasetViewName })}</Text>
 
                         <Divider orientation='vertical' size='S' />
                     </>
@@ -82,7 +83,7 @@ export const ExportJobDetails = ({ datasetName, metadata }: ExportJobDetailsProp
                 <Text>
                     {t('dataset.export.details.media')}{' '}
                     {metadata.filters.include_unannotated
-                        ? t('dataset.export.details.allMedia')
+                        ? t('dataset.filters.allMedia')
                         : t('dataset.export.details.onlyAnnotated')}
                 </Text>
 

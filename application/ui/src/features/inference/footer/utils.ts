@@ -22,7 +22,7 @@ type StatusMeta = {
 export const getOverallStatusMeta = (status: string, t: TranslateFn): StatusMeta => {
     switch (status) {
         case 'running':
-            return { label: t('inference.health.overall.running'), variant: 'positive' };
+            return { label: t('common.status.running'), variant: 'positive' };
         case 'idle':
             return { label: t('inference.health.overall.idle'), variant: 'neutral' };
         case 'error':
@@ -45,7 +45,7 @@ export const getComponentStatusMeta = (component: PipelineStatus, t: TranslateFn
                 message: component.message,
             };
         case 'error':
-            return { label: t('inference.health.component.error'), variant: 'negative', message: component.message };
+            return { label: t('common.status.error'), variant: 'negative', message: component.message };
         default:
             return { label: capitalize(component.status), variant: 'neutral', message: component.message };
     }

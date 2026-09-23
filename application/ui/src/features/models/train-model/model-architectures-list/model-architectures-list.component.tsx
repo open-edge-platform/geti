@@ -47,9 +47,7 @@ export const ModelArchitecturesList = () => {
                     variant={'primary'}
                     onPress={() => onToggleShowMoreModelArchitectures(!showMoreModelArchitectures)}
                 >
-                    {showMoreModelArchitectures
-                        ? t('models.training.architectures.list.showLess')
-                        : t('models.training.architectures.list.showMore')}
+                    {showMoreModelArchitectures ? t('common.actions.showLess') : t('common.actions.showMore')}
                 </Button>
             )}
         </Flex>

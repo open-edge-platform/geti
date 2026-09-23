@@ -122,7 +122,7 @@ export const ModelVariantTable = ({ model, format }: ModelVariantTableProps) => 
         <TableView aria-label={`Model variants for ${model.id}`} overflowMode={'wrap'} density={'compact'}>
             <TableHeader>
                 <Column isRowHeader>{t('models.variants.columns.precision')}</Column>
-                <Column isRowHeader>{t('models.variants.columns.size')}</Column>
+                <Column isRowHeader>{t('common.labels.sizeUppercase')}</Column>
                 <Column isRowHeader>{performanceColumnName}</Column>
                 <Column align='end'>
                     <></>

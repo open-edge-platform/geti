@@ -42,7 +42,7 @@ export const AddSink = <T extends SinkConfig>({ config, onSaved, bodyFormatter, 
                 isDisabled={isPending || pipeline.isPending}
                 UNSAFE_style={{ maxWidth: 'fit-content' }}
             >
-                {t('inference.sinks.add.submit')}
+                {t('common.actions.addAndUse')}
             </Button>
         </Form>
     );

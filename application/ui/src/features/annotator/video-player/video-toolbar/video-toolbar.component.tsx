@@ -44,7 +44,7 @@ export const VideoToolbar = ({ mode }: VideoToolbarProps) => {
                 <View paddingX={'size-100'}>
                     <Flex alignItems={'center'} justifyContent={'space-between'} gap={'size-200'}>
                         <Flex alignItems={'center'} gap={'size-200'}>
-                            {isExpanded && <Text>{t('annotator.video.frames.label')}</Text>}
+                            {isExpanded && <Text>{t('common.labels.frames')}</Text>}
 
                             <VideoControls mode={mode} />
                             <VideoDuration videoFrame={videoFrame} />
