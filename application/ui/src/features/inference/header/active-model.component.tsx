@@ -1,8 +1,6 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
 import { useTranslation } from '@/i18n';
 import { Item, Key, Picker } from '@geti-ui/ui';
 import { usePatchPipeline } from 'hooks/api/pipeline.hook';
@@ -20,7 +18,7 @@ export const ActiveModel = () => {
     const projectId = useProjectIdentifier();
     const updatePipeline = usePatchPipeline();
 
-    const allModelsWithOpenVinoQuantizedModels = useMemo(() => getAllModelsWithOpenVINOVariants(models), [models]);
+    const allModelsWithOpenVinoQuantizedModels = getAllModelsWithOpenVINOVariants(models);
 
     const handleChange = (key: Key | null) => {
         if (key === null) {

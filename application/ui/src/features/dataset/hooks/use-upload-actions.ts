@@ -1,9 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
-import { useMediaUploadDispatch } from '../providers/media-upload-provider.component';
+import { useMediaUploadDispatch } from '../providers/media-upload-context';
 import { UploadFileItem } from '../providers/media-upload-reducer';
 
 type UploadActions = {
@@ -19,33 +17,30 @@ type UploadActions = {
 export const useUploadActions = (): UploadActions => {
     const dispatch = useMediaUploadDispatch();
 
-    return useMemo(
-        () => ({
-            startUploadProgress: (files: File[]): string[] => {
-                const newItems: UploadFileItem[] = files.map((file) => ({
-                    id: crypto.randomUUID(),
-                    name: file.name,
-                    size: file.size,
-                    status: 'queued',
-                }));
+    return {
+        startUploadProgress: (files: File[]): string[] => {
+            const newItems: UploadFileItem[] = files.map((file) => ({
+                id: crypto.randomUUID(),
+                name: file.name,
+                size: file.size,
+                status: 'queued',
+            }));
 
-                dispatch({ type: 'START_UPLOAD', payload: newItems });
+            dispatch({ type: 'START_UPLOAD', payload: newItems });
 
-                return newItems.map((item) => item.id);
-            },
-            setItemUploading: (itemId: string): void => {
-                dispatch({ type: 'SET_UPLOADING', payload: { itemId } });
-            },
-            setItemUploaded: (itemId: string): void => {
-                dispatch({ type: 'SET_UPLOADED', payload: { itemId } });
-            },
-            setItemFailed: (itemId: string, errorMessage?: string): void => {
-                dispatch({ type: 'SET_FAILED', payload: { itemId, errorMessage } });
-            },
-            finishUploadProgress: (): void => {
-                dispatch({ type: 'FINISH_UPLOAD' });
-            },
-        }),
-        [dispatch]
-    );
+            return newItems.map((item) => item.id);
+        },
+        setItemUploading: (itemId: string): void => {
+            dispatch({ type: 'SET_UPLOADING', payload: { itemId } });
+        },
+        setItemUploaded: (itemId: string): void => {
+            dispatch({ type: 'SET_UPLOADED', payload: { itemId } });
+        },
+        setItemFailed: (itemId: string, errorMessage?: string): void => {
+            dispatch({ type: 'SET_FAILED', payload: { itemId, errorMessage } });
+        },
+        finishUploadProgress: (): void => {
+            dispatch({ type: 'FINISH_UPLOAD' });
+        },
+    };
 };

@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { LocalFolderSinkConfig } from '@/api/types';
 import { useTranslation } from '@/i18n';
@@ -24,7 +24,7 @@ export const LocalFolder = ({ defaultState }: LocalFolderProps) => {
         setFolderPath(defaultState.folder_path);
     }, [defaultState.folder_path]);
 
-    const handleOpenFolderDialog = useCallback(() => {
+    const handleOpenFolderDialog = () => {
         void open({
             directory: true,
             multiple: false,
@@ -38,7 +38,7 @@ export const LocalFolder = ({ defaultState }: LocalFolderProps) => {
                 }
             })
             .catch(console.error);
-    }, [folderPath]);
+    };
 
     return (
         <Flex direction='column' gap='size-200'>

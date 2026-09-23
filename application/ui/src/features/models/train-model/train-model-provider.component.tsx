@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, Dispatch, ReactNode, SetStateAction, use, useMemo, useState } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, use, useState } from 'react';
 
 import type {
     DatasetRevision,
@@ -159,9 +159,7 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
     const [isAdvancedSettingsMode, setIsAdvancedSettingsMode] = useState<boolean>(false);
 
-    const modelRevisions = useMemo(() => {
-        return getModelRevisionsForArchitecture(allModelRevisions, resolvedModelArchitectureId);
-    }, [allModelRevisions, resolvedModelArchitectureId]);
+    const modelRevisions = getModelRevisionsForArchitecture(allModelRevisions, resolvedModelArchitectureId);
 
     // The resolved architecture also changes while the timm card stays selected, which can invalidate the selection
     const selectedModelRevisionId = modelRevisions.some(({ id }) => id === modelRevisionId)

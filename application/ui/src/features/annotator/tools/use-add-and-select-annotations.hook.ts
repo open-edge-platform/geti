@@ -32,7 +32,7 @@ export const useAddAndSelectAnnotations = () => {
 
             return newIds;
         },
-        [addAnnotations, setSelectedAnnotations, annotations, deleteAnnotations]
+        [addAnnotations, annotations, deleteAnnotations, setSelectedAnnotations]
     );
 
     return { addAndSelectAnnotations };

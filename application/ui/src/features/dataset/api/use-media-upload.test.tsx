@@ -8,7 +8,8 @@ import { renderHook } from 'test-utils/render';
 
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
-import { MediaUploadProvider, useMediaUploadState } from '../providers/media-upload-provider.component';
+import { useMediaUploadState } from '../providers/media-upload-context';
+import { MediaUploadProvider } from '../providers/media-upload-provider.component';
 import { computeSummary } from '../providers/media-upload-reducer';
 import { MEDIA_UPLOAD_CONCURRENCY, useMediaUpload } from './use-media-upload';
 

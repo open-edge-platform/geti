@@ -29,7 +29,7 @@ import {
 import { AcceptCircle, CrossCircle, Pending } from '@geti-ui/ui/icons';
 
 import { formatBytes } from '../../../../shared/util';
-import { useMediaUploadDispatch, useMediaUploadState } from '../../providers/media-upload-provider.component';
+import { useMediaUploadDispatch, useMediaUploadState } from '../../providers/media-upload-context';
 import { computeSummary, type UploadFileItem, type UploadItemStatus } from '../../providers/media-upload-reducer';
 
 import classes from './upload-details-dialog.module.scss';

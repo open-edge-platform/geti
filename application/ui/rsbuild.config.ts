@@ -77,9 +77,10 @@ export default defineConfig({
     plugins: [
         pluginReact(),
 
-        // React Compiler
+        // React Compiler. `.ts` is included as well as `.tsx`: most custom hooks
+        // live in hook-only `.ts` files and would otherwise never be optimised.
         pluginBabel({
-            include: /\.(?:tsx)$/,
+            include: /\.tsx?$/,
             babelLoaderOptions(opts) {
                 opts.plugins?.unshift('babel-plugin-react-compiler');
             },
