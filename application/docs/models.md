@@ -242,11 +242,11 @@ model from being loaded when it would be the only one in the cache**, however la
 the memory limit reduces the number of models kept around, and never makes inference impossible.
 
 | Environment variable               | Default     | Description                                                              |
-| ---------------------------------- | ----------- | ------------------------------------------------------------------------ |
+| ---------------------------------- |-------------| ------------------------------------------------------------------------ |
 | `INFERENCE_MAX_MODELS`             | `2`         | Maximum number of models kept loaded at the same time.                   |
 | `INFERENCE_MAX_MEMORY`             | _unlimited_ | Approximate upper bound, in bytes, on the memory used by loaded models.  |
 | `INFERENCE_MEMORY_OVERHEAD_FACTOR` | `1.5`       | Multiplier applied to the on-disk size to estimate the memory footprint. |
-| `INFERENCE_MODEL_TTL`              | `60`        | Seconds a model may stay idle in the cache before it is unloaded.        |
+| `INFERENCE_MODEL_TTL`              | `120`       | Seconds a model may stay idle in the cache before it is unloaded.        |
 
 Inference on different models runs in parallel, while concurrent requests for the same model are serialized, since
 the underlying ModelAPI objects are not safe for concurrent use. Concurrent requests for a model that is not cached

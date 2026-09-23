@@ -103,7 +103,7 @@ class Settings(BaseSettings):
         description="Maximum number for images or video frames passed for inference",
     )
     inference_model_ttl: int = Field(
-        default=60,
+        default=120,
         alias="INFERENCE_MODEL_TTL",
         description="Time to live for a model loaded for inference, before unloading",
     )
