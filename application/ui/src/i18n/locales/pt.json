@@ -4,7 +4,7 @@
             "cancel": "Cancelar",
             "close": "Fechar",
             "delete": "Eliminar",
-            "goBack": "Voltar atrás",
+            "goBack": "Voltar",
             "rename": "Renomear",
             "save": "Guardar",
             "assign": "Atribuir",
@@ -602,7 +602,7 @@
                 "disablePipeline": "Desativar pipeline"
             },
             "sort": {
-                "label": "Ordenar Projetos por:",
+                "label": "Ordenar por:",
                 "nameAscending": "Nome (A-Z)",
                 "nameDescending": "Nome (Z-A)",
                 "createdAtDescending": "Data de criação (mais recentes)",
@@ -878,7 +878,7 @@
                     "gigaflops": "Gigaflops: {{value}}"
                 },
                 "sort": {
-                    "label": "Ordenar Modelos por:",
+                    "label": "Ordenar por:",
                     "nameAsc": "Nome (A a Z)",
                     "nameDesc": "Nome (Z a A)",
                     "speedAsc": "Velocidade (mais rápido primeiro)",
@@ -927,9 +927,9 @@
             },
             "validation": {
                 "notEnoughAnnotations": "Para treinar um modelo, precisa de anotar pelo menos 3 itens no seu dataset, embora recomendemos anotar vários mais para obter melhores resultados.",
-                "emptySubsetsReason": "Para treinar um modelo, cada subconjunto (treino, validação, teste) necessita de pelo menos um item. Esta condição não pode ser satisfeita de momento porque {{subsetClause}} vazios e {{assignmentDetail}}.",
-                "emptySubsetClause_one": "o subconjunto {{list}} está",
-                "emptySubsetClause_other": "os subconjuntos {{list}} estão",
+                "emptySubsetsReason": "Para treinar um modelo, cada subconjunto (treino, validação, teste) necessita de pelo menos um item. Esta condição não pode ser satisfeita de momento porque {{subsetClause}} e {{assignmentDetail}}.",
+                "emptySubsetClause_one": "o subconjunto {{list}} está vazio",
+                "emptySubsetClause_other": "os subconjuntos {{list}} estão vazios",
                 "reviewedOnly_one": "resta {{count}} item revisto por atribuir",
                 "reviewedOnly_other": "restam {{count}} itens revistos por atribuir",
                 "unannotatedOnly_one": "há {{count}} item que ainda precisa de anotação antes de poder ser atribuído",
