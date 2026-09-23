@@ -58,12 +58,12 @@ export const DatasetStatisticsContent = () => {
                     <Flex justifyContent={'space-evenly'}>
                         <Flex direction={'column'} alignItems={'center'}>
                             <Text UNSAFE_className={classes.mainValue}>{statistics.media_counts.images}</Text>
-                            <Text UNSAFE_className={classes.subTitle}>{t('dataset.statistics.images')}</Text>
+                            <Text UNSAFE_className={classes.subTitle}>{t('common.labels.images')}</Text>
                         </Flex>
 
                         <Flex direction={'column'} alignItems={'center'}>
                             <Text UNSAFE_className={classes.mainValue}>{statistics.media_counts.videos}</Text>
-                            <Text UNSAFE_className={classes.subTitle}>{t('dataset.statistics.videos')}</Text>
+                            <Text UNSAFE_className={classes.subTitle}>{t('common.labels.videos')}</Text>
                         </Flex>
                     </Flex>
                 </DatasetCard>
@@ -85,7 +85,7 @@ export const DatasetStatisticsContent = () => {
                 </DatasetCard>
                 <DatasetCard title={t('dataset.statistics.annotatedVideosFrames')} gridArea='col3'>
                     <Flex gap={'size-125'} alignItems={'center'}>
-                        <Text UNSAFE_className={classes.subTitle}>{t('dataset.statistics.videos')}:</Text>
+                        <Text UNSAFE_className={classes.subTitle}>{t('common.labels.videos')}:</Text>
                         <Text UNSAFE_className={classes.secondaryValue}>
                             {statistics.annotations_counts.annotated_videos}
                         </Text>

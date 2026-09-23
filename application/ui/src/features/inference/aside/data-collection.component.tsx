@@ -95,7 +95,7 @@ export const DataCollection = () => {
                 <Text marginY={'size-100'}>{t('inference.collection.maxDatasetSize.description')}</Text>
 
                 <NumberField
-                    label={t('inference.collection.maxDatasetSize.sizeLabel')}
+                    label={t('common.labels.size')}
                     width={'100%'}
                     minValue={1}
                     step={1}

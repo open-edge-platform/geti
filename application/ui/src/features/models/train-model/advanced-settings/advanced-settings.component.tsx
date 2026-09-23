@@ -52,7 +52,7 @@ export const AdvancedSettings = () => {
         },
         {
             name: 'Training',
-            label: t('models.training.advanced.tabs.training'),
+            label: t('common.labels.training'),
             children: (
                 <Training
                     trainingConfiguration={trainingConfiguration}
@@ -67,14 +67,14 @@ export const AdvancedSettings = () => {
         <Tabs items={TABS} height={'100%'} UNSAFE_style={{ overflow: 'hidden' }} aria-label={'Advanced settings tabs'}>
             <TabList UNSAFE_style={{ '--spectrum-tabs-selection-indicator-color': 'var(--energy-blue)' }}>
                 {(tab: TabProps) => (
-                    <Item key={tab.name} textValue={tab.name}>
+                    <Item key={tab.name} textValue={tab.label}>
                         <Text>{tab.label}</Text>
                     </Item>
                 )}
             </TabList>
             <TabPanels marginTop={'size-250'} UNSAFE_style={{ overflow: 'hidden' }}>
                 {(tab: TabProps) => (
-                    <Item key={tab.name} textValue={tab.name}>
+                    <Item key={tab.name} textValue={tab.label}>
                         <ContentWrapper ref={containerRef}>{tab.children}</ContentWrapper>
                     </Item>
                 )}

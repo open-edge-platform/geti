@@ -40,7 +40,7 @@ export const ImportTaskSelectionButtons = ({
             </Button>
 
             <Button type='submit' form={TASK_SELECTION_FORM_ID} variant='primary' isDisabled={isDisabled}>
-                {t('project.import.actions.next')}
+                {t('common.actions.next')}
             </Button>
         </ButtonGroup>
     );

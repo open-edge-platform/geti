@@ -59,6 +59,7 @@ export const ModelRow = ({
     datasetRevision,
     modelArchitecture,
 }: ModelRowProps) => {
+    const { i18n } = useTranslation();
     const trainingEndTime = model.training_info.end_time;
     const totalSize = model.size;
     const device = model.training_info.device;
@@ -93,7 +94,9 @@ export const ModelRow = ({
                 </Text>
             </Flex>
 
-            <Text UNSAFE_className={classes.dateText}>{formatTrainingDateTime(trainingEndTime)}</Text>
+            <Text UNSAFE_className={classes.dateText}>
+                {formatTrainingDateTime(trainingEndTime, i18n.resolvedLanguage ?? i18n.language)}
+            </Text>
 
             {groupBy === 'architecture' ? (
                 <DatasetColumn datasetRevision={datasetRevision} labelsCount={labelsCount} />

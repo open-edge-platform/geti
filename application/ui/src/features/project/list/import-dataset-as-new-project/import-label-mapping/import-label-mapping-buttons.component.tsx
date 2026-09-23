@@ -48,7 +48,7 @@ export const ImportLabelMappingButtons = ({
             </Button>
 
             <Button type='submit' variant='accent' form={LABEL_MAPPING_FORM_ID}>
-                {t('project.import.actions.create')}
+                {t('common.actions.create')}
             </Button>
         </ButtonGroup>
     );

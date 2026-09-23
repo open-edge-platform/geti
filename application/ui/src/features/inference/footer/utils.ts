@@ -22,7 +22,7 @@ type StatusMeta = {
 export const getOverallStatusMeta = (status: string, t: TranslateFn): StatusMeta => {
     switch (status) {
         case 'running':
-            return { label: t('inference.health.overall.running'), variant: 'positive' };
+            return { label: t('common.status.running'), variant: 'positive' };
         case 'idle':
             return { label: t('inference.health.overall.idle'), variant: 'neutral' };
         case 'error':

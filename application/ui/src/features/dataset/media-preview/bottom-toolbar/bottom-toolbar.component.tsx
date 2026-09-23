@@ -7,6 +7,7 @@ import { Flex, Grid, Item, Key, Picker, Tag, Text } from '@geti-ui/ui';
 import { Accept, Search } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 
+import { SUBSET_LABEL_KEYS } from '../../../../shared/subsets';
 import { Hotkeys } from '../primary-toolbar/hotkeys/hotkeys.component';
 import { Settings } from '../primary-toolbar/settings/settings.component';
 import { ToggleFocus } from '../primary-toolbar/toggle-focus.component';
@@ -63,11 +64,7 @@ export const BottomToolbar = ({
                             )}
 
                             {isReadOnlySubset ? (
-                                <Tag
-                                    withDot={false}
-                                    text={t(`dataset.filters.subsetOptions.${subset}`)}
-                                    id={'selected-subset-badge'}
-                                />
+                                <Tag withDot={false} text={t(SUBSET_LABEL_KEYS[subset])} id={'selected-subset-badge'} />
                             ) : (
                                 <Picker
                                     selectedKey={subset}
@@ -75,10 +72,10 @@ export const BottomToolbar = ({
                                     aria-label={'Select subset'}
                                     onSelectionChange={onSubsetChange}
                                 >
-                                    <Item key={'unassigned'}>{t('dataset.filters.subsetOptions.unassigned')}</Item>
-                                    <Item key={'validation'}>{t('dataset.filters.subsetOptions.validation')}</Item>
-                                    <Item key={'testing'}>{t('dataset.filters.subsetOptions.testing')}</Item>
-                                    <Item key={'training'}>{t('dataset.filters.subsetOptions.training')}</Item>
+                                    <Item key={'unassigned'}>{t('common.labels.unassigned')}</Item>
+                                    <Item key={'validation'}>{t('common.labels.validation')}</Item>
+                                    <Item key={'testing'}>{t('common.labels.testing')}</Item>
+                                    <Item key={'training'}>{t('common.labels.training')}</Item>
                                 </Picker>
                             )}
                         </Flex>

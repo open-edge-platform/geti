@@ -4,6 +4,7 @@
 import { Dispatch, SetStateAction, Suspense, useState } from 'react';
 
 import type { Media } from '@/api/types';
+import { GalleryViewModeMenu } from '@/components/gallery-view-mode-menu/gallery-view-mode-menu.component';
 import { useTranslation } from '@/i18n';
 import {
     ActionButton,
@@ -14,7 +15,6 @@ import {
     Divider,
     Flex,
     Heading,
-    MediaViewModes,
     ViewModes,
 } from '@geti-ui/ui';
 import { SortDown, SortUp } from '@geti-ui/ui/icons';
@@ -250,11 +250,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                             <DatasetStatistics />
 
-                            <MediaViewModes
-                                viewMode={viewMode}
-                                setViewMode={setViewMode}
-                                items={[ViewModes.LARGE, ViewModes.MEDIUM, ViewModes.SMALL]}
-                            />
+                            <GalleryViewModeMenu viewMode={viewMode} setViewMode={setViewMode} />
                         </>
                     )}
                 </Flex>

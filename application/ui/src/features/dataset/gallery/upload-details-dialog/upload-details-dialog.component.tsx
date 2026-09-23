@@ -147,7 +147,7 @@ const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
                     >
                         <TableHeader>
                             <Column isRowHeader>{t('dataset.upload.filename')}</Column>
-                            <Column width={160}>{t('dataset.upload.status')}</Column>
+                            <Column width={160}>{t('common.labels.statusUppercase')}</Column>
                             <Column width={120} align={'end'}>
                                 {t('common.labels.sizeUppercase')}
                             </Column>

@@ -1,7 +1,39 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { isInvalidStagedFile } from './util';
+import { createI18nInstance } from '@/i18n';
+
+import { getJobStatusLabel, isInvalidStagedFile } from './util';
+
+describe('getJobStatusLabel', () => {
+    const instance = createI18nInstance({
+        lng: 'en',
+        resources: {
+            en: {
+                translation: {
+                    common: {
+                        status: {
+                            pending: 'Localized pending',
+                            running: 'Localized running',
+                            done: 'Localized done',
+                            failed: 'Localized failed',
+                            cancelled: 'Localized cancelled',
+                        },
+                        labels: { unknown: 'Localized unknown' },
+                    },
+                },
+            },
+        },
+    });
+
+    it.each(['PENDING', 'RUNNING', 'DONE', 'FAILED', 'CANCELLED'])('translates %s at call time', (status) => {
+        expect(getJobStatusLabel(status, instance.t)).toBe(`Localized ${status.toLowerCase()}`);
+    });
+
+    it('uses a translated fallback for unrecognized API states', () => {
+        expect(getJobStatusLabel('NEW_STATE', instance.t)).toBe('Localized unknown');
+    });
+});
 
 describe('isInvalidStagedFile', () => {
     it('returns true when detail starts with "Staged dataset" and ends with "not found"', () => {

@@ -7,7 +7,7 @@ import type { Job, QuantizeJob, TrainJob } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { AlertDialog, Badge, Button, DialogContainer, Flex, Loading, Text } from '@geti-ui/ui';
 import { useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
-import { capitalize } from 'lodash-es';
+import { getJobStatusLabel } from 'hooks/api/util';
 
 import { JobRow, type JobRowColumnsProps } from './job-row.component';
 
@@ -92,7 +92,7 @@ export const RunningJobRow = ({ job, onCancel, datasetRevisions, groupBy, modelA
             progress={job.progress}
             statusBadges={
                 <>
-                    <StatusBadge status={capitalize(job.status)} />
+                    <StatusBadge status={getJobStatusLabel(job.status, t)} />
                     {showStatusTagMessage && <StatusBadgeMessage status={statusMessage} />}
                 </>
             }

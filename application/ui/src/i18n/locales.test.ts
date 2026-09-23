@@ -82,6 +82,18 @@ describe('translation coverage', () => {
         );
     });
 
+    it('has no duplicated English values outside of deliberately context-specific keys', () => {
+        // Keys whose English wording collides by accident but may diverge in other locales.
+        const contextualDuplicates = new Set(['models.performance.categories.accuracy']);
+        const keysByValue = new Map<string, string[]>();
+
+        translations
+            .filter(([key]) => !contextualDuplicates.has(key))
+            .forEach(([key, value]) => keysByValue.set(value, [...(keysByValue.get(value) ?? []), key]));
+
+        expect([...keysByValue].filter(([, keys]) => keys.length > 1)).toEqual([]);
+    });
+
     it('does not silently overwrite duplicate JSON properties', () => {
         const source = ts.parseJsonText('en.json', readFileSync(join(sourceRoot, 'i18n/locales/en.json'), 'utf8'));
         const duplicates: string[] = [];
@@ -103,52 +115,127 @@ describe('translation coverage', () => {
 
     it('keeps explicit ARIA labels out of translation calls', () => {
         const translatedLabels: string[] = [];
+        const containsTranslationCall = (source: ts.SourceFile, node: ts.Node): boolean => {
+            let found = false;
+
+            visitNodes(node, (child) => {
+                if (ts.isCallExpression(child) && /^(t|i18n\.t)$/.test(child.expression.getText(source))) found = true;
+            });
+
+            return found;
+        };
 
         sourceFiles.forEach((source) => {
             visitNodes(source, (node) => {
-                if (!ts.isJsxAttribute(node) || !/aria.*label|cueLabel/i.test(node.name.getText(source))) return;
+                if (ts.isJsxAttribute(node) && /aria.*label|cueLabel/i.test(node.name.getText(source))) {
+                    if (containsTranslationCall(source, node)) translatedLabels.push(location(source, node));
+                }
 
-                visitNodes(node, (child) => {
-                    if (ts.isCallExpression(child) && /^(t|i18n\.t)$/.test(child.expression.getText(source))) {
-                        translatedLabels.push(location(source, node));
-                    }
-                });
+                // ARIA labels forwarded through object literals or variables, e.g. `{ 'aria-label': t(...) }`
+                if (
+                    ts.isPropertyAssignment(node) &&
+                    /aria-?label/i.test(node.name.getText(source)) &&
+                    containsTranslationCall(source, node.initializer)
+                ) {
+                    translatedLabels.push(location(source, node));
+                }
             });
         });
 
         expect(translatedLabels).toEqual([]);
     });
 
-    it('translates visible JSX text and text props', () => {
-        const technicalText = new Set(['Geti™', ').zip', 'v', 'x', 'f', '&nbsp;']);
-        const textProps =
-            /^(label|title|placeholder|description|tooltip|errorMessage|alt|primaryActionLabel|secondaryActionLabel|cancelLabel)$/;
-        const untranslated: string[] = [];
+    it('formats dates, numbers and lists with the active language instead of a hardcoded locale', () => {
+        const hardcoded: string[] = [];
 
         sourceFiles.forEach((source) => {
             visitNodes(source, (node) => {
-                let text: string | undefined;
+                if (!ts.isCallExpression(node) && !ts.isNewExpression(node)) return;
+                if (
+                    !/^(Intl\.(DateTimeFormat|NumberFormat|ListFormat|RelativeTimeFormat)|.*\.toLocale(Date|Time)?String)$/.test(
+                        node.expression.getText(source)
+                    )
+                ) {
+                    return;
+                }
 
-                if (ts.isJsxText(node)) text = node.text.trim();
-                if (ts.isJsxExpression(node) && node.expression && ts.isStringLiteralLike(node.expression)) {
-                    if (ts.isJsxElement(node.parent) || ts.isJsxFragment(node.parent)) text = node.expression.text;
+                const [localeArgument] = node.arguments ?? [];
+                if (localeArgument && ts.isStringLiteralLike(localeArgument)) {
+                    hardcoded.push(`${location(source, node)} ${localeArgument.text}`);
+                }
+            });
+        });
+
+        expect(hardcoded).toEqual([]);
+    });
+
+    it('translates visible JSX text and text props', () => {
+        const technicalText = new Set(['Geti™', ').zip', 'v', 'x', 'f', '&nbsp;']);
+        const textProps =
+            /^(label|title|placeholder|description|tooltip|errorMessage|alt|primaryActionLabel|secondaryActionLabel|cancelLabel|hotkey|message|bottomIconMessage|summary|emptyMessage)$/;
+        const untranslated: string[] = [];
+
+        sourceFiles.forEach((source) => {
+            const inspectExpression = (expression: ts.Expression): string[] => {
+                if (ts.isStringLiteralLike(expression)) return [expression.text];
+                if (ts.isTemplateExpression(expression)) {
+                    return [expression.head.text + expression.templateSpans.map((span) => span.literal.text).join('')];
+                }
+                if (ts.isConditionalExpression(expression)) {
+                    return [...inspectExpression(expression.whenTrue), ...inspectExpression(expression.whenFalse)];
+                }
+                if (ts.isBinaryExpression(expression)) {
+                    if (expression.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
+                        return inspectExpression(expression.right);
+                    }
+                    if (
+                        [
+                            ts.SyntaxKind.PlusToken,
+                            ts.SyntaxKind.QuestionQuestionToken,
+                            ts.SyntaxKind.BarBarToken,
+                        ].includes(expression.operatorToken.kind)
+                    ) {
+                        return [...inspectExpression(expression.left), ...inspectExpression(expression.right)];
+                    }
+                }
+                return [];
+            };
+
+            visitNodes(source, (node) => {
+                let texts: string[] = [];
+
+                if (ts.isJsxText(node)) texts = [node.text.trim()];
+                if (ts.isJsxExpression(node) && node.expression) {
+                    if (ts.isJsxElement(node.parent) || ts.isJsxFragment(node.parent)) {
+                        texts = inspectExpression(node.expression);
+                    }
                 }
                 if (ts.isJsxAttribute(node) && textProps.test(node.name.getText(source))) {
+                    const element = node.parent.parent;
+                    if (
+                        node.name.getText(source) === 'label' &&
+                        (ts.isJsxOpeningElement(element) || ts.isJsxSelfClosingElement(element)) &&
+                        ['ResizeAnchor', 'Anchor'].includes(element.tagName.getText(source))
+                    ) {
+                        return;
+                    }
                     const isHidden = node.parent.properties.some(
                         (attribute) => ts.isJsxAttribute(attribute) && attribute.name.getText(source) === 'isHidden'
                     );
                     if (isHidden) return;
 
-                    if (node.initializer && ts.isStringLiteral(node.initializer)) text = node.initializer.text;
+                    if (node.initializer && ts.isStringLiteral(node.initializer)) texts = [node.initializer.text];
                     if (node.initializer && ts.isJsxExpression(node.initializer)) {
                         const expression = node.initializer.expression;
-                        if (expression && ts.isStringLiteralLike(expression)) text = expression.text;
+                        if (expression) texts = inspectExpression(expression);
                     }
                 }
 
-                if (text && /[a-z]/i.test(text) && !technicalText.has(text)) {
-                    untranslated.push(`${location(source, node)} ${text}`);
-                }
+                texts.forEach((text) => {
+                    if (/[a-z]/i.test(text) && !technicalText.has(text)) {
+                        untranslated.push(`${location(source, node)} ${text}`);
+                    }
+                });
             });
         });
 

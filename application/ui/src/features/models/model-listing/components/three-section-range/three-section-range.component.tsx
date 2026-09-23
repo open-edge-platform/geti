@@ -26,12 +26,12 @@ export const ThreeSectionRange = ({ id, trainingValue, validationValue, testingV
 
     const labelledPercentages = [
         {
-            label: t('dataset.filters.subsetOptions.training'),
+            label: t('common.labels.training'),
             percentage: trainingPercentage,
             color: 'var(--training-subset)',
         },
         {
-            label: t('dataset.filters.subsetOptions.validation'),
+            label: t('common.labels.validation'),
             percentage: validationPercentage,
             color: 'var(--validation-subset)',
         },

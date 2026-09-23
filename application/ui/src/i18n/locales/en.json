@@ -14,12 +14,14 @@
             "confirm": "Confirm",
             "connect": "Connect",
             "continue": "Continue",
+            "create": "Create",
             "disconnect": "Disconnect",
             "dismiss": "Dismiss",
             "download": "Download",
             "edit": "Edit",
             "export": "Export",
             "hide": "Hide",
+            "next": "Next",
             "refresh": "Refresh",
             "remove": "Remove",
             "selectAll": "Select all",
@@ -28,6 +30,7 @@
             "skip": "Skip",
             "start": "Start",
             "submit": "Submit",
+            "train": "Train",
             "upload": "Upload",
             "undo": "Undo",
             "redo": "Redo",
@@ -37,6 +40,7 @@
             "testConnection": "Test connection"
         },
         "labels": {
+            "allUppercase": "ALL",
             "yes": "Yes",
             "no": "No",
             "unknown": "Unknown",
@@ -44,19 +48,42 @@
             "on": "On",
             "off": "Off",
             "noMaximum": "No maximum",
+            "active": "Active",
             "dataset": "Dataset",
             "filters": "Filters",
+            "images": "Images",
+            "videos": "Videos",
+            "size": "Size",
             "sizeUppercase": "SIZE",
+            "statusUppercase": "STATUS",
+            "settings": "Settings",
+            "training": "Training",
+            "validation": "Validation",
+            "testing": "Testing",
+            "unassigned": "Unassigned",
+            "trainingLowercase": "training",
+            "validationLowercase": "validation",
+            "testingLowercase": "testing",
             "frames": "Frames",
             "seconds": "Seconds",
             "every": "every",
             "model": "Model",
             "labels": "Labels"
         },
+        "viewModes": {
+            "large": "Large thumbnails",
+            "medium": "Medium thumbnails",
+            "small": "Small thumbnails"
+        },
         "status": {
+            "pending": "Pending",
+            "running": "Running",
+            "done": "Done",
+            "cancelled": "Cancelled",
             "uploading": "Uploading",
             "failed": "Failed",
-            "error": "Error"
+            "error": "Error",
+            "disconnected": "Disconnected"
         },
         "errors": {
             "unknown": "An unknown error occurred",
@@ -107,12 +134,6 @@
             "labelsSelected_other": "{{count}} labels selected",
             "toggleAll": "Toggle all",
             "more": "More filters",
-            "subsetOptions": {
-                "training": "Training",
-                "validation": "Validation",
-                "testing": "Testing",
-                "unassigned": "Unassigned"
-            },
             "dateRange": {
                 "heading": "Filter by upload date",
                 "startDateLabel": "Start date",
@@ -127,7 +148,6 @@
             "errorTitle": "Upload error",
             "details": "Upload details",
             "filename": "FILENAME",
-            "status": "STATUS",
             "uploadingSummary_one": "Uploading {{total}} item - {{uploaded}} uploaded",
             "uploadingSummary_other": "Uploading {{total}} items - {{uploaded}} uploaded",
             "uploadingFailedSummary_one": "Uploading {{total}} item - {{uploaded}} uploaded, {{failed}} failed",
@@ -164,8 +184,6 @@
             "label": "Dataset statistics",
             "title": "Dataset Statistics",
             "numberOfMedia": "Number of media",
-            "images": "Images",
-            "videos": "Videos",
             "annotatedImages": "Annotated images",
             "annotatedVideosFrames": "Annotated videos / frames",
             "numberOfObjectsPerLabel": "Number of objects per label",
@@ -241,13 +259,13 @@
             },
             "labelMapping": {
                 "statisticsHeading": "Imported dataset statistics",
-                "imagesLabel": "images",
-                "framesLabel": "frames",
                 "heading": "Label mapping - optional",
                 "unmappedNote": "Any unmapped items will be imported as unlabeled",
                 "datasetLabelsColumn": "Dataset labels",
                 "projectLabelsColumn": "Project labels",
-                "selectLabelPlaceholder": "Select label"
+                "selectLabelPlaceholder": "Select label",
+                "imagesLabel": "images",
+                "framesLabel": "frames"
             }
         },
         "export": {
@@ -274,8 +292,8 @@
             "warnings": {
                 "videos": "Exporting videos is not supported by this dataset format. All annotated frames from videos will be exported as images.",
                 "emptyLabel": "The selected format does not support empty labels (e.g. \"{{emptyLabelName}}\"). Images and frames containing them will be exported as unannotated.",
-                "unsupportedItemsVideos": "videos",
                 "unsupportedItemsEmptyLabels": "empty labels",
+                "unsupportedItemsVideos": "videos",
                 "unsupportedItems": "To preserve {{items}}, please use the Geti export format.",
                 "subsetNotIncluded": "The exported dataset won't include any information about the subset assigned to each media."
             }
@@ -296,6 +314,7 @@
             "notFoundForModel": "No dataset revision found for this model",
             "filesDeleted": "The files for this dataset revision have been deleted.",
             "noItemsInSubset": "No items in this subset",
+            "itemAlt": "{{subset}} item",
             "trainingSubsets": {
                 "test": "Test"
             },
@@ -486,8 +505,7 @@
             "sidebarLabel": "Data collection policy",
             "maxDatasetSize": {
                 "title": "Max dataset size",
-                "description": "Maximum number of items to collect",
-                "sizeLabel": "Size"
+                "description": "Maximum number of items to collect"
             },
             "captureRate": {
                 "title": "Capture rate",
@@ -517,7 +535,6 @@
         },
         "health": {
             "overall": {
-                "running": "Running",
                 "idle": "Idle",
                 "problemsDetected": "Problems detected"
             },
@@ -577,7 +594,6 @@
             "countFiltered_other": "{{filtered}} of {{count}} projects",
             "createNewProject": "Create new project",
             "createProjectFromDataset": "Create from dataset",
-            "activeBadge": "Active",
             "card": {
                 "created": "Created: {{date}}"
             },
@@ -605,7 +621,6 @@
             },
             "workflow": {
                 "addData": "Add data",
-                "train": "Train",
                 "optimize": "Optimize",
                 "runInference": "Run inference",
                 "loop": "Monitor predictions and collect more data to iteratively fine-tune your model"
@@ -654,10 +669,6 @@
         },
         "import": {
             "title": "Create project from a dataset - Import",
-            "actions": {
-                "create": "Create",
-                "next": "Next"
-            },
             "labelMapping": {
                 "title": "Label mapping"
             },
@@ -702,7 +713,6 @@
     },
     "annotator": {
         "canvas": {
-            "settingsTitle": "Settings",
             "hideLabels": "Hide labels",
             "pixelView": "Pixel view",
             "annotationFillOpacity": "Annotation fill opacity",
@@ -730,6 +740,7 @@
             "confirm": "Confirm prediction"
         },
         "hotkeys": {
+            "alternatives": "{{primary}} or {{alternative}}",
             "title": "Hotkeys",
             "submitAnnotationsPredictions": "Submit annotations/predictions",
             "previousMedia": "Previous media",
@@ -837,7 +848,6 @@
                 "connectionStatus": {
                     "connecting": "Connecting...",
                     "connected": "Live",
-                    "disconnected": "Disconnected",
                     "error": "Connection error"
                 },
                 "entriesCount": "{{filtered}} / {{total}} entries",
@@ -933,8 +943,7 @@
             },
             "advanced": {
                 "tabs": {
-                    "dataManagement": "Data management",
-                    "training": "Training"
+                    "dataManagement": "Data management"
                 },
                 "notAvailable": "Training configuration is not available."
             },
@@ -966,9 +975,6 @@
                 "augmentation": {
                     "title": "Data Augmentation"
                 },
-                "intensityMapping": {
-                    "title": "Intensity Mapping"
-                },
                 "tiling": {
                     "title": "Tiling",
                     "description": "Tiling is a technique that divides high-resolution images into smaller tiles and might be useful to increase accuracy for small object detection tasks.",
@@ -979,6 +985,9 @@
                     },
                     "offDescription": "Model processes the entire image as a single unit without dividing it into smaller tiles. This approach is straightforward but may struggle with detecting small objects in high-resolution images, as the model might miss finer details",
                     "automaticDescription": "It means that the system will automatically set the parameters based on the image resolution and annotations size."
+                },
+                "intensityMapping": {
+                    "title": "Intensity Mapping"
                 }
             }
         },

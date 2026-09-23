@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Job, QuantizeJob, TrainJob } from '@/api/types';
+import type { TranslateFn } from '@/i18n';
 import isObject from 'lodash-es/isObject';
 
 const INVALID_STAGED_FILE_REGEX = /^Staged dataset.*not found\.?$/i;
@@ -16,6 +17,20 @@ export const isInvalidStagedFile = (error: unknown): boolean => {
 };
 
 export const getJobProgress = (progress?: number) => Math.round(Math.max(0, Math.min(100, progress ?? 0)));
+
+const JOB_STATUS_KEYS = {
+    PENDING: 'common.status.pending',
+    RUNNING: 'common.status.running',
+    DONE: 'common.status.done',
+    FAILED: 'common.status.failed',
+    CANCELLED: 'common.status.cancelled',
+} as const satisfies Record<Job['status'], string>;
+
+export const getJobStatusLabel = (status: Job['status'], t: TranslateFn): string => {
+    const key = Object.entries(JOB_STATUS_KEYS).find(([value]) => value === status)?.[1];
+
+    return t(key ?? 'common.labels.unknown');
+};
 
 export const isInvalidJob = (error: unknown): boolean => {
     if (isObject(error) && 'detail' in error) {

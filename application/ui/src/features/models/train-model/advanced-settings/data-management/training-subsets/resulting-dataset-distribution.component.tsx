@@ -112,7 +112,7 @@ export const ResultingDatasetDistribution = ({
                     UNSAFE_className={classes.resultingDistributionText}
                 >
                     <ResultingDatasetDistributionSubset
-                        label={t('dataset.filters.subsetOptions.training')}
+                        label={t('common.labels.training')}
                         ariaLabel={'Training'}
                         color={LABEL_COLOR_MAPPING.training}
                         newSize={newTrainingSubsetSize}
@@ -121,7 +121,7 @@ export const ResultingDatasetDistribution = ({
                     />
 
                     <ResultingDatasetDistributionSubset
-                        label={t('dataset.filters.subsetOptions.validation')}
+                        label={t('common.labels.validation')}
                         ariaLabel={'Validation'}
                         color={LABEL_COLOR_MAPPING.validation}
                         newSize={newValidationSubsetSize}

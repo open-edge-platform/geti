@@ -3,7 +3,7 @@
 
 import { PointerEvent, useMemo } from 'react';
 
-import { useTranslation } from '@/i18n';
+import { i18n, useTranslation } from '@/i18n';
 
 import { useLabelResolver } from '../../../../shared/annotator/labels';
 import type { AnnotationLabel, AnnotationLabelRef } from '../../../../shared/types';
@@ -23,7 +23,7 @@ type AnnotationLabelsProps = {
 };
 
 const formatPredictionScore = (score: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'percent' }).format(score);
+    return new Intl.NumberFormat(i18n.resolvedLanguage ?? i18n.language, { style: 'percent' }).format(score);
 };
 
 const getLabelText = (label: AnnotationLabel) => {

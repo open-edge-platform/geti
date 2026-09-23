@@ -4,6 +4,7 @@
 import { useRef } from 'react';
 
 import { fetchClient } from '@/api';
+import { i18n } from '@/i18n';
 import { useMutation } from '@tanstack/react-query';
 import { isEqual, omit } from 'lodash-es';
 
@@ -27,12 +28,12 @@ export const useSelectAllDatasetMedia = () => {
         mutationFn: async () => {
             const requestedQuery = latestQuery.current;
 
-            const { data, error, response } = await fetchClient.GET('/api/projects/{project_id}/dataset/media/ids', {
+            const { data, error } = await fetchClient.GET('/api/projects/{project_id}/dataset/media/ids', {
                 params: { path: { project_id: projectId }, query: requestedQuery },
             });
 
             if (error !== undefined || data === undefined) {
-                throw new Error(`Failed to select all media: ${response.status} ${response.statusText}`);
+                throw error ?? new Error(i18n.t('application.notifications.unexpectedError'));
             }
 
             // The filters changed mid-request, so these ids no longer describe what the gallery
