@@ -11,7 +11,7 @@ import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-a
 import { isEmpty, partition } from 'lodash-es';
 
 import { getQueryKey } from '../../../../query-client/query-client';
-import { ImportDatasetAsNewProjectState } from '../../../dataset/import-export/import-dataset/util';
+import { ImportDatasetAsNewProjectState } from '../../../../shared/import-dataset-state';
 import { useImportDatasetDialog } from '../../providers/import-dataset-dialog-provider.component';
 
 export const ImportJobsList = () => {
@@ -89,7 +89,7 @@ export const ImportJobsList = () => {
                 <StagedImportDataset
                     key={`label-mapping-${stagedDatasetId}`}
                     fileName={fileName}
-                    message={t('project.import.jobsList.mapLabelsMessage')}
+                    message={t('dataset.import.mapLabelsMessage')}
                     stagedDatasetId={stagedDatasetId}
                     onOpen={() => handleOpen('labelMapping', stagedDatasetId)}
                     primaryButtonLabel={t('project.import.jobsList.mapLabelsButton')}

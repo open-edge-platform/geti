@@ -4,7 +4,7 @@
 import { useTranslation } from '@/i18n';
 import { dimensionValue, Divider, Grid, Text } from '@geti-ui/ui';
 
-import { ImportDatasetAsNewProjectState } from '../../../../dataset/import-export/import-dataset/util';
+import { ImportDatasetAsNewProjectState } from '../../../../../shared/import-dataset-state';
 
 import classes from './progress-stepper.module.scss';
 
@@ -55,11 +55,11 @@ export const ProgressStepper = ({ currentStep }: ProgressStepperProps) => {
                 style={{ gridArea: 'step3' }}
             />
 
-            <Text gridArea={'label1'}>{t('project.import.progress.dataset')}</Text>
+            <Text gridArea={'label1'}>{t('common.labels.dataset')}</Text>
             <Text gridArea={'label2'} UNSAFE_style={{ width: dimensionValue('size-900'), textAlign: 'center' }}>
-                {t('project.import.progress.taskType')}
+                {t('project.taskType')}
             </Text>
-            <Text gridArea={'label3'}>{t('project.import.progress.labels')}</Text>
+            <Text gridArea={'label3'}>{t('common.labels.labels')}</Text>
         </Grid>
     );
 };

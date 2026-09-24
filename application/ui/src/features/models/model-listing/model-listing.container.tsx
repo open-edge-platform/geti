@@ -1,19 +1,28 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactNode } from 'react';
+
+import { useTranslation } from '@/i18n';
 import { dimensionValue, Divider, Flex, Heading } from '@geti-ui/ui';
 import { useGetCurrentRunningJobs } from 'hooks/api/jobs/jobs.hook';
-import { isEmpty, isString } from 'lodash-es';
+import { usePrefetchModels } from 'hooks/api/use-get-models.hook';
+import { isEmpty } from 'lodash-es';
 
 import { ReactComponent as NoTrainedModels } from '../../../assets/no-trained-models.svg';
-import { ExportJobsList } from '../../dataset/import-export/export-jobs-list/export-jobs-list.component';
+import { usePrefetchTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
 import { TrainModel } from '../train-model/train-model.component';
 import { Header } from './components/header.component';
 import { CurrentRunningJobs } from './current-running-jobs/current-running-jobs.component';
 import { ModelListing } from './model-listing.component';
 import { ModelListingProvider, useModelListing } from './provider/model-listing-provider';
 
-const ModelListingContent = () => {
+type ModelListingContainerProps = {
+    exportJobs?: ReactNode;
+};
+
+const ModelListingContent = ({ exportJobs }: ModelListingContainerProps) => {
+    const { t } = useTranslation();
     const runningJobs = useGetCurrentRunningJobs();
     const { groupedModels, searchBy, datasetRevisions, groupBy, showFailedModels } = useModelListing();
 
@@ -41,9 +50,9 @@ const ModelListingContent = () => {
                 >
                     <NoTrainedModels />
                     <Heading level={2} UNSAFE_style={{ textAlign: 'center' }}>
-                        No models yet.
+                        {t('models.list.empty.title')}
                         <br />
-                        Train your first model to get started.
+                        {t('models.list.empty.description')}
                     </Heading>
                     <TrainModel />
                 </Flex>
@@ -60,7 +69,7 @@ const ModelListingContent = () => {
             <Flex direction={'column'} flex={1} UNSAFE_style={{ overflowY: 'auto', scrollbarGutter: 'stable' }}>
                 <CurrentRunningJobs groupBy={groupBy} datasetRevisions={datasetRevisions} />
 
-                <ExportJobsList predicate={({ datasetId }) => isString(datasetId)} />
+                {exportJobs}
 
                 <ModelListing hasNoResults={hasNoResults} groupedModels={groupedModels} />
             </Flex>
@@ -68,10 +77,14 @@ const ModelListingContent = () => {
     );
 };
 
-export const ModelListingContainer = () => {
+export const ModelListingContainer = ({ exportJobs }: ModelListingContainerProps) => {
+    // Start both requests in parallel; otherwise architectures only load after the provider's models query resolves
+    usePrefetchModels();
+    usePrefetchTaskModelArchitectures();
+
     return (
         <ModelListingProvider>
-            <ModelListingContent />
+            <ModelListingContent exportJobs={exportJobs} />
         </ModelListingProvider>
     );
 };

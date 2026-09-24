@@ -4,13 +4,13 @@
 import { ReactNode, Suspense } from 'react';
 
 import { $api } from '@/api';
+import { ServerErrorFallback } from '@/components/server-error-fallback/server-error-fallback.component';
 import { Toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
 import { Flex, Heading, Loading } from '@geti-ui/ui';
 import { Outlet } from 'react-router';
 
 import { LicenseCheck } from '../../features/license/license-check.component';
-import { ServerErrorFallback } from './server-error-fallback.component';
 
 const REFETCH_INTERVAL = 5000;
 const MAX_RETRIES = 30;

@@ -11,13 +11,14 @@ import { render } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
-import { type SelectableModel } from '../../utils';
+import { type SelectableModel } from '../../../../shared/selectable-model';
 import { SubsetMediaDialog } from './subset-media-dialog.component';
 
 const MEDIA_SIZE = 100;
 
-vi.mock('../../../annotator/hooks/use-load-image-query.hook', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('../../../annotator/hooks/use-load-image-query.hook')>();
+vi.mock('../../../../modules/annotator/hooks/use-load-image-query.hook', async (importOriginal) => {
+    const actual =
+        await importOriginal<typeof import('../../../../modules/annotator/hooks/use-load-image-query.hook')>();
 
     return {
         ...actual,

@@ -1,14 +1,14 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useDeferredValue, useMemo, useState } from 'react';
+import { useDeferredValue, useState } from 'react';
 
 import type { Label } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { Flex, Item, ListView, Selection, Text, TextField, View } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
 
-import { EMPTY_LABEL_ID } from '../../../../../shared/annotator/labels';
+import { EMPTY_LABEL_ID } from '../../../../../shared/labels';
 
 type LabelsListProps = {
     ariaLabel: string;
@@ -31,9 +31,9 @@ export const LabelsList = ({
     const [searchPhrase, setSearchPhrase] = useState<string>(INITIAL_SEARCH_PHRASE);
     const deferredSearchPhrase = useDeferredValue(searchPhrase, INITIAL_SEARCH_PHRASE);
 
-    const filteredLabels = useMemo(() => {
-        return labels.filter((label) => label.name.toLowerCase().includes(deferredSearchPhrase.toLowerCase()));
-    }, [deferredSearchPhrase, labels]);
+    const filteredLabels = labels.filter((label) =>
+        label.name.toLowerCase().includes(deferredSearchPhrase.toLowerCase())
+    );
 
     const hasNoSearchResults = !isEmpty(deferredSearchPhrase) && isEmpty(filteredLabels);
 

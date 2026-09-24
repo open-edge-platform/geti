@@ -50,7 +50,7 @@ export const SidebarMediaFilter = ({ hasMediaItems }: SidebarMediaFilterProps) =
                 <AnnotatorMediaFiltering />
                 {hasActiveFilters && (
                     <ActionButton isQuiet onPress={handleClearAll}>
-                        {t('dataset.filtersActive.clearAll')}
+                        {t('common.actions.clearAll')}
                     </ActionButton>
                 )}
             </Flex>

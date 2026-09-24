@@ -94,8 +94,8 @@ describe('ActiveFilters', () => {
 
         render(<ActiveFilters />);
 
-        expect(screen.getByText('From 01/01/2026 09:30')).toBeVisible();
-        expect(screen.getByText('To 31/01/2026 17:45')).toBeVisible();
+        expect(screen.getByText('From Jan 01, 2026, 09:30 AM')).toBeVisible();
+        expect(screen.getByText('To Jan 31, 2026, 05:45 PM')).toBeVisible();
     });
 
     it('renders chips for the selected subsets', () => {

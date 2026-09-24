@@ -1,6 +1,9 @@
 id: object-detection-edgecrafter-s
 name: ECDet-S
-license: EdgeCrafter
+
+license:
+  name: EdgeCrafter
+  url: https://github.com/Intellindust-AI-Lab/EdgeCrafter/blob/main/LICENSE.md
 
 pretrained_weights:
   source: direct_link

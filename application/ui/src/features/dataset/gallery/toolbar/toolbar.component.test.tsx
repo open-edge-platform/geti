@@ -34,10 +34,6 @@ vi.mock('../hooks/use-select-dataset-item.hook', () => ({
     }),
 }));
 
-vi.mock('../../../models/train-model/train-model.component', () => ({
-    TrainModel: () => <button>Train model</button>,
-}));
-
 vi.mock('../../import-export/import-export.component', () => ({
     ImportExport: () => <button>Export/Import</button>,
 }));
@@ -99,7 +95,12 @@ describe('Toolbar', () => {
 
         const result = render(
             <MediaUploadProvider>
-                <Toolbar items={items} viewMode={ViewModes.LARGE} setViewMode={vi.fn()} />
+                <Toolbar
+                    items={items}
+                    viewMode={ViewModes.LARGE}
+                    setViewMode={vi.fn()}
+                    trainModel={<button>Train model</button>}
+                />
             </MediaUploadProvider>,
             {
                 route,

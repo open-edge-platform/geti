@@ -1,24 +1,24 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
+import { useTranslation } from '@/i18n';
 import { Item, Key, Picker } from '@geti-ui/ui';
 import { usePatchPipeline } from 'hooks/api/pipeline.hook';
+import { useGetActiveModel } from 'hooks/api/use-get-active-model.hook';
+import { useGetSuccessfulModels } from 'hooks/api/use-get-models.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
-import { useGetActiveModel } from '../../models/hooks/api/use-get-active-model.hook';
-import { useGetSuccessfulModels } from '../../models/hooks/api/use-get-models.hook';
-import { getAllModelsWithOpenVINOVariants, getModelIdentifierPayload } from '../../models/utils';
+import { getAllModelsWithOpenVINOVariants, getModelIdentifierPayload } from '../../../shared/selectable-model';
 
 export const ActiveModel = () => {
+    const { t } = useTranslation();
     const { data: models } = useGetSuccessfulModels();
     const activeModel = useGetActiveModel();
     const projectId = useProjectIdentifier();
     const updatePipeline = usePatchPipeline();
 
-    const allModelsWithOpenVinoQuantizedModels = useMemo(() => getAllModelsWithOpenVINOVariants(models), [models]);
+    const allModelsWithOpenVinoQuantizedModels = getAllModelsWithOpenVINOVariants(models);
 
     const handleChange = (key: Key | null) => {
         if (key === null) {
@@ -47,7 +47,7 @@ export const ActiveModel = () => {
         <>
             <Picker
                 aria-label={'active model'}
-                label={'Model'}
+                label={t('common.labels.model')}
                 labelPosition={'side'}
                 items={allModelsWithOpenVinoQuantizedModels}
                 onSelectionChange={handleChange}

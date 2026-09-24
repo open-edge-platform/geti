@@ -2,14 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DatasetRevision, Model, ModelArchitectureWithPerformanceCategory } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { Badge, Flex, Grid, Text } from '@geti-ui/ui';
 
 import { formatTrainingDateTime } from '../../../../../shared/date-utils';
+import { isFailedModel } from '../../../../../shared/model-status';
 import { formatBytes } from '../../../../../shared/util';
 import { GRID_COLUMNS } from '../../constants';
 import { AccuracyIndicator } from '../../model-variants/accuracy-indicator/accuracy-indicator.component';
 import { type GroupByMode } from '../../types';
-import { hasDeletedWeights, isFailedModel } from '../../utils/utils';
+import { hasDeletedWeights } from '../../utils/utils';
 import { ParentRevisionModel } from '../parent-revision-model.component';
 import { ArchitectureColumn } from './architecture-column.component';
 import { DatasetColumn } from './dataset-revision-column.component';
@@ -30,10 +32,14 @@ type ModelRowProps = {
 };
 
 const FailedModel = () => {
-    return <Badge variant={'negative'}>Failed</Badge>;
+    const { t } = useTranslation();
+
+    return <Badge variant={'negative'}>{t('common.status.failed')}</Badge>;
 };
 
 const DeletedWeightsModel = () => {
+    const { t } = useTranslation();
+
     return (
         <Badge
             variant={'yellow'}
@@ -41,7 +47,7 @@ const DeletedWeightsModel = () => {
                 '--spectrum-yellow-background-color-default': `var(--brand-daisy)`,
             }}
         >
-            Deleted weights
+            {t('models.list.deletedWeightsBadge')}
         </Badge>
     );
 };
@@ -54,6 +60,7 @@ export const ModelRow = ({
     datasetRevision,
     modelArchitecture,
 }: ModelRowProps) => {
+    const { i18n } = useTranslation();
     const trainingEndTime = model.training_info.end_time;
     const totalSize = model.size;
     const device = model.training_info.device;
@@ -88,7 +95,9 @@ export const ModelRow = ({
                 </Text>
             </Flex>
 
-            <Text UNSAFE_className={classes.dateText}>{formatTrainingDateTime(trainingEndTime)}</Text>
+            <Text UNSAFE_className={classes.dateText}>
+                {formatTrainingDateTime(trainingEndTime, i18n.resolvedLanguage ?? i18n.language)}
+            </Text>
 
             {groupBy === 'architecture' ? (
                 <DatasetColumn datasetRevision={datasetRevision} labelsCount={labelsCount} />

@@ -10,10 +10,10 @@ import { useCreateProject } from 'hooks/api/project.hook';
 import { useNavigate } from 'react-router';
 
 import { paths } from '../../../constants/paths';
+import { PROJECT_NAME_MAX_LENGTH, validateProjectName } from '../../../shared/project-name-validator';
+import { isClassificationTask } from '../../../shared/task-type-guards';
 import { LabelSelection } from '../label-selection/label-selection.component';
 import { MAP_TASK_TYPE_TO_VERB_KEY, TaskSelection } from '../task-selection/task-selection.component';
-import { isClassificationTask } from '../task-type-guards';
-import { PROJECT_NAME_MAX_LENGTH, validateProjectName } from '../validator';
 import {
     ClassificationTaskSelection,
     ClassificationTaskType,
