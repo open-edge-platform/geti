@@ -16,6 +16,8 @@ import getiLogo from './assets/icons/geti-logo.webp';
 import { paths } from './constants/paths';
 import { usePrefetchSinksQuery } from './features/inference/sinks/api/use-sinks-query';
 import { usePrefetchSourcesQuery } from './features/inference/sources/api/use-sources';
+import { usePrefetchTaskModelArchitectures } from './features/models/hooks/api/use-get-model-architectures.hook';
+import { usePrefetchModels } from './features/models/hooks/api/use-get-models.hook';
 import { useProjectIdentifier } from './hooks/use-project-identifier.hook';
 
 import classes from './layout.module.scss';
@@ -85,6 +87,8 @@ const usePrefetchResources = () => {
     usePrefetchPipeline();
     usePrefetchSourcesQuery();
     usePrefetchSinksQuery();
+    usePrefetchModels();
+    usePrefetchTaskModelArchitectures();
 };
 
 export const Layout = () => {
