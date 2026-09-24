@@ -68,6 +68,12 @@ export const streamResponseInBrowser = async (request: StreamRequest): Promise<S
         return parseCompletedResponse(completed);
     } catch (error) {
         if (controller.signal.aborted) throw new Error('Stopped.');
+        if (error instanceof TypeError) {
+            throw new Error(
+                'The browser could not complete the OpenAI request. ' +
+                    'Verify the API key and API billing, or use the Anthropic API or Windows app.'
+            );
+        }
         throw error;
     } finally {
         controllers.delete(request.requestId);
