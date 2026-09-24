@@ -78,6 +78,72 @@ const finite = (value: unknown): number => {
     return value;
 };
 
+const clamp = (value: number, maximum: number): number => Math.min(maximum, Math.max(0, value));
+
+interface ProposalPoint {
+    x: number;
+    y: number;
+}
+
+const clipPolygonEdge = (
+    points: ProposalPoint[],
+    isInside: (point: ProposalPoint) => boolean,
+    intersection: (start: ProposalPoint, end: ProposalPoint) => ProposalPoint
+): ProposalPoint[] => {
+    if (points.length === 0) return [];
+    const output: ProposalPoint[] = [];
+    let start = points.at(-1) as ProposalPoint;
+
+    points.forEach((end) => {
+        const startInside = isInside(start);
+        const endInside = isInside(end);
+        if (endInside) {
+            if (!startInside) output.push(intersection(start, end));
+            output.push(end);
+        } else if (startInside) {
+            output.push(intersection(start, end));
+        }
+        start = end;
+    });
+
+    return output;
+};
+
+const atX =
+    (x: number) =>
+    (start: ProposalPoint, end: ProposalPoint): ProposalPoint => ({
+        x,
+        y: start.y + ((end.y - start.y) * (x - start.x)) / (end.x - start.x),
+    });
+
+const atY =
+    (y: number) =>
+    (start: ProposalPoint, end: ProposalPoint): ProposalPoint => ({
+        x: start.x + ((end.x - start.x) * (y - start.y)) / (end.y - start.y),
+        y,
+    });
+
+const clipPolygon = (points: ProposalPoint[], width: number, height: number): ProposalPoint[] => {
+    const clipped = [
+        [(point: ProposalPoint) => point.x >= 0, atX(0)],
+        [(point: ProposalPoint) => point.x <= width, atX(width)],
+        [(point: ProposalPoint) => point.y >= 0, atY(0)],
+        [(point: ProposalPoint) => point.y <= height, atY(height)],
+    ].reduce(
+        (result, [isInside, intersection]) =>
+            clipPolygonEdge(
+                result,
+                isInside as (point: ProposalPoint) => boolean,
+                intersection as (start: ProposalPoint, end: ProposalPoint) => ProposalPoint
+            ),
+        points
+    );
+
+    return clipped
+        .map(({ x, y }) => ({ x: clamp(x, width), y: clamp(y, height) }))
+        .filter((point, index, all) => index === 0 || point.x !== all[index - 1].x || point.y !== all[index - 1].y);
+};
+
 /** Validate the whole proposal before exposing any part of it to the editor. */
 export const parseAnnotationProposal = (args: Record<string, unknown>, target: AnnotationTarget): Annotation[] => {
     if (args.media_key !== target.key)
@@ -105,20 +171,28 @@ export const parseAnnotationProposal = (args: Record<string, unknown>, target: A
                 y = finite(item.y),
                 width = finite(item.width),
                 height = finite(item.height);
-            if (x < 0 || y < 0 || width <= 0 || height <= 0 || x + width > target.width || y + height > target.height)
-                throw new Error('A box is outside the original image or has zero area.');
-            return { id, labels, shape: { type: 'rectangle', x, y, width, height } };
+            if (width <= 0 || height <= 0) throw new Error('A box has zero area.');
+            const left = clamp(x, target.width);
+            const top = clamp(y, target.height);
+            const right = clamp(x + width, target.width);
+            const bottom = clamp(y + height, target.height);
+            if (right <= left || bottom <= top) throw new Error('A box is outside the original image.');
+            return {
+                id,
+                labels,
+                shape: { type: 'rectangle', x: left, y: top, width: right - left, height: bottom - top },
+            };
         }
         if (!Array.isArray(item.points) || item.points.length < 3 || item.points.length > 500)
             throw new Error('Polygons need 3–500 points.');
-        const points = item.points.map((pointValue) => {
+        const proposalPoints = item.points.map((pointValue) => {
             const point = record(pointValue);
             const x = finite(point.x),
                 y = finite(point.y);
-            if (x < 0 || y < 0 || x > target.width || y > target.height)
-                throw new Error('A polygon point is outside the original image.');
             return { x, y };
         });
+        const points = clipPolygon(proposalPoints, target.width, target.height);
+        if (points.length < 3) throw new Error('A polygon is outside the original image.');
         const twiceArea = points.reduce((area, point, index) => {
             const next = points[(index + 1) % points.length];
             return area + point.x * next.y - next.x * point.y;
@@ -132,6 +206,7 @@ export const annotationInstructions = (target: AnnotationTarget) =>
     [
         'The user is annotating the attached image. When asked to annotate, call propose_annotations.',
         'Use original pixel coordinates even if the attached preview is resized. Use existing label IDs.',
+        'Keep geometry inside the supplied image bounds; the host clips small boundary overshoots.',
         'Trace outlines for segmentation; use tight boxes for detection and image-level labels for classification.',
         'Validated annotations are immediately editable on the open image. They are not saved yet.',
         'In chat, summarize counts and labels added. The user can edit, delete or Undo, then Submit to save.',

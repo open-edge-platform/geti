@@ -3,9 +3,10 @@
 
 import { useEffect, useState } from 'react';
 
-import { Button, ComboBox, Content, Flex, InlineAlert, Item, Text, TextField } from '@geti-ui/ui';
+import { Button, ComboBox, Content, Flex, InlineAlert, Item, Section, Text, TextField } from '@geti-ui/ui';
 
 import { availableAgentsForVendor, getAiAgent } from '../agents';
+import { groupModelIds, type AiModelGroup } from '../config';
 import { setAiAgent, setAiConnection, useAiConnection } from '../connection';
 import type { ConnectionStatus } from '../hooks/use-connection-status';
 import { claudeLogin, claudeLogout, pickClaudeBinary } from '../transport/claude-transport';
@@ -80,8 +81,12 @@ const ApiSettings = ({ status }: { status: ConnectionStatus }) => {
                 inputValue={connection.model}
                 onInputChange={(model: string) => setAiConnection({ model })}
             >
-                {agent.models.map((model) => (
-                    <Item key={model}>{model}</Item>
+                {agent.modelGroups.map((group: AiModelGroup) => (
+                    <Section key={group.label} title={group.label}>
+                        {group.models.map((model) => (
+                            <Item key={model}>{model}</Item>
+                        ))}
+                    </Section>
                 ))}
             </ComboBox>
             {error !== null && (
@@ -99,6 +104,7 @@ const AppSettings = ({ status }: { status: ConnectionStatus }) => {
     const [isBusy, setIsBusy] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [models, setModels] = useState<string[]>([]);
+    const modelGroups = groupModelIds(models);
 
     useEffect(() => {
         if (agent.id !== 'openai-app' || !status.isReady) return;
@@ -166,8 +172,12 @@ const AppSettings = ({ status }: { status: ConnectionStatus }) => {
                 inputValue={connection.model}
                 onInputChange={(model: string) => setAiConnection({ model })}
             >
-                {models.map((model) => (
-                    <Item key={model}>{model}</Item>
+                {modelGroups.map((group: AiModelGroup) => (
+                    <Section key={group.label} title={group.label}>
+                        {group.models.map((model) => (
+                            <Item key={model}>{model}</Item>
+                        ))}
+                    </Section>
                 ))}
             </ComboBox>
             {error !== null && (

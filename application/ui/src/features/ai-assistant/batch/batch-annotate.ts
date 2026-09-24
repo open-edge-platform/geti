@@ -16,7 +16,7 @@ import { AI_SYSTEM_INSTRUCTION } from '../config';
 import { getAiConnection } from '../connection';
 import { loadMediaAttachment, type MediaAttachmentSource } from '../media-attachment';
 import { assistantRespond, cancelAssistantResponse } from '../transport/assistant-transport';
-import type { ResponsesItem } from '../types';
+import { AssistantConnectionError, type ResponsesItem } from '../types';
 
 interface BatchWorkItem {
     key: string;
@@ -26,6 +26,11 @@ interface BatchWorkItem {
     width: number;
     height: number;
     source: MediaAttachmentSource;
+}
+
+interface ExistingAnnotationState {
+    annotations: AnnotationDTO[];
+    isAnnotated: boolean;
 }
 
 export interface BatchAnnotationFailure {
@@ -40,6 +45,7 @@ export interface BatchAnnotationProgress {
     total: number;
     succeeded: number;
     failed: number;
+    skipped: number;
     annotationsAdded: number;
     current: string;
 }
@@ -49,6 +55,7 @@ export interface BatchAnnotationResult {
     completed: number;
     succeeded: number;
     failed: number;
+    skipped: number;
     annotationsAdded: number;
     failures: BatchAnnotationFailure[];
 }
@@ -58,8 +65,12 @@ interface BatchAnnotationOptions {
     project: Project;
     mediaIds: string[];
     signal: AbortSignal;
+    onlyUnannotated: boolean;
+    videoFramesPerSecond: VideoFramesPerSecond;
     onProgress: (progress: BatchAnnotationProgress) => void;
 }
+
+export type VideoFramesPerSecond = 1 | 2 | 5 | 10;
 
 const abortError = () => new DOMException('The annotation run was cancelled.', 'AbortError');
 
@@ -77,18 +88,34 @@ const errorMessage = (error: unknown): string => {
     return 'The item could not be annotated.';
 };
 
-export const sampleVideoFrameIndexes = (frameCount: number, fps: number): number[] => {
-    const stride = Math.max(1, Math.round(fps));
+export const sampleVideoFrameIndexes = (
+    frameCount: number,
+    fps: number,
+    framesPerSecond: VideoFramesPerSecond = 1
+): number[] => {
+    const sourceFps = Math.max(1, fps);
+    const effectiveRate = Math.min(framesPerSecond, sourceFps);
     const indexes: number[] = [];
 
     // The existing annotations endpoint treats frame_index=0 as a missing
     // query parameter, so frame one is the first frame it can persist.
-    for (let index = 1; index < frameCount; index += stride) indexes.push(index);
+    for (let sample = 0; ; sample += 1) {
+        const index = 1 + Math.round((sample * sourceFps) / effectiveRate);
+        if (index >= frameCount) break;
+        if (indexes.at(-1) !== index) indexes.push(index);
+    }
 
     return indexes;
 };
 
-const workItemsForMedia = (projectId: string, media: Media): BatchWorkItem[] => {
+export const shouldSkipAlreadyAnnotated = (onlyUnannotated: boolean, isAnnotated: boolean): boolean =>
+    onlyUnannotated && isAnnotated;
+
+const workItemsForMedia = (
+    projectId: string,
+    media: Media,
+    videoFramesPerSecond: VideoFramesPerSecond
+): BatchWorkItem[] => {
     if (media.type !== 'video') {
         return [
             {
@@ -107,7 +134,7 @@ const workItemsForMedia = (projectId: string, media: Media): BatchWorkItem[] => 
         ];
     }
 
-    const indexes = sampleVideoFrameIndexes(media.frame_count, media.fps);
+    const indexes = sampleVideoFrameIndexes(media.frame_count, media.fps, videoFramesPerSecond);
     if (indexes.length === 0) {
         throw new Error('The video has no frame that the annotations API can save.');
     }
@@ -142,19 +169,48 @@ const getMedia = async (projectId: string, mediaId: string): Promise<Media> => {
     return data as Media;
 };
 
-const getExistingAnnotations = async (projectId: string, item: BatchWorkItem): Promise<AnnotationDTO[]> => {
-    const query = item.frameIndex === null ? undefined : { frame_index: item.frameIndex };
+const getExistingAnnotations = async (projectId: string, item: BatchWorkItem): Promise<ExistingAnnotationState> => {
+    if (item.frameIndex !== null) {
+        const { data, error } = await fetchClient.GET('/api/projects/{project_id}/dataset/media/{media_id}/frames', {
+            params: {
+                path: { project_id: projectId, media_id: item.mediaId },
+                query: { frame_index_from: item.frameIndex, frame_index_to: item.frameIndex },
+            },
+        });
+
+        if (error !== undefined || data === undefined) {
+            throw error ?? new Error('Existing frame annotations could not be read.');
+        }
+
+        const frame = data.find(({ frame_index }) => frame_index === item.frameIndex);
+        return {
+            annotations: frame?.annotation_data.annotations ?? [],
+            isAnnotated: frame !== undefined,
+        };
+    }
+
+    const { data: datasetItem, error: datasetItemError } = await fetchClient.GET(
+        '/api/projects/{project_id}/dataset/items/{dataset_item_id}',
+        {
+            params: { path: { project_id: projectId, dataset_item_id: item.mediaId } },
+        }
+    );
+    if (datasetItemError !== undefined || datasetItem === undefined) {
+        throw datasetItemError ?? new Error('The dataset item could not be read.');
+    }
+    if (!datasetItem.user_reviewed) return { annotations: [], isAnnotated: false };
+
     const { data, error, response } = await fetchClient.GET(
         '/api/projects/{project_id}/dataset/media/{media_id}/annotations',
         {
-            params: { path: { project_id: projectId, media_id: item.mediaId }, query },
+            params: { path: { project_id: projectId, media_id: item.mediaId } },
         }
     );
 
-    if (response.status === 404) return [];
+    if (response.status === 404) return { annotations: [], isAnnotated: false };
     if (error !== undefined || data === undefined) throw error ?? new Error('Existing annotations could not be read.');
 
-    return data.annotations;
+    return { annotations: data.annotations, isAnnotated: true };
 };
 
 const saveAnnotations = async (projectId: string, item: BatchWorkItem, annotations: AnnotationDTO[]): Promise<void> => {
@@ -232,6 +288,7 @@ const emptyResult = (cancelled: boolean, failures: BatchAnnotationFailure[]): Ba
     completed: failures.length,
     succeeded: 0,
     failed: failures.length,
+    skipped: 0,
     annotationsAdded: 0,
     failures,
 });
@@ -241,6 +298,8 @@ export const runBatchAnnotation = async ({
     project,
     mediaIds,
     signal,
+    onlyUnannotated,
+    videoFramesPerSecond,
     onProgress,
 }: BatchAnnotationOptions): Promise<BatchAnnotationResult> => {
     const workItems: BatchWorkItem[] = [];
@@ -254,11 +313,12 @@ export const runBatchAnnotation = async ({
             total: mediaIds.length,
             succeeded: 0,
             failed: failures.length,
+            skipped: 0,
             annotationsAdded: 0,
             current: mediaId,
         });
         try {
-            workItems.push(...workItemsForMedia(projectId, await getMedia(projectId, mediaId)));
+            workItems.push(...workItemsForMedia(projectId, await getMedia(projectId, mediaId), videoFramesPerSecond));
         } catch (error) {
             failures.push({ key: mediaId, name: mediaId, message: errorMessage(error) });
         }
@@ -266,12 +326,21 @@ export const runBatchAnnotation = async ({
 
     let completed = failures.length;
     let succeeded = 0;
+    let skipped = 0;
     let annotationsAdded = 0;
     const total = workItems.length + failures.length;
 
     for (const item of workItems) {
         if (signal.aborted) {
-            return { cancelled: true, completed, succeeded, failed: failures.length, annotationsAdded, failures };
+            return {
+                cancelled: true,
+                completed,
+                succeeded,
+                failed: failures.length,
+                skipped,
+                annotationsAdded,
+                failures,
+            };
         }
         onProgress({
             phase: 'annotating',
@@ -279,20 +348,46 @@ export const runBatchAnnotation = async ({
             total,
             succeeded,
             failed: failures.length,
+            skipped,
             annotationsAdded,
             current: item.name,
         });
         try {
             const existing = await getExistingAnnotations(projectId, item);
+            if (shouldSkipAlreadyAnnotated(onlyUnannotated, existing.isAnnotated)) {
+                skipped += 1;
+                completed += 1;
+                continue;
+            }
             const proposals = await requestProposals(project, item, signal);
-            if (proposals.length > 0) await saveAnnotations(projectId, item, [...existing, ...proposals]);
+            if (proposals.length > 0) await saveAnnotations(projectId, item, [...existing.annotations, ...proposals]);
             succeeded += 1;
             annotationsAdded += proposals.length;
         } catch (error) {
             if (isAbortError(error) || signal.aborted) {
-                return { cancelled: true, completed, succeeded, failed: failures.length, annotationsAdded, failures };
+                return {
+                    cancelled: true,
+                    completed,
+                    succeeded,
+                    failed: failures.length,
+                    skipped,
+                    annotationsAdded,
+                    failures,
+                };
             }
             failures.push({ key: item.key, name: item.name, message: errorMessage(error) });
+            if (error instanceof AssistantConnectionError) {
+                completed += 1;
+                return {
+                    cancelled: false,
+                    completed,
+                    succeeded,
+                    failed: failures.length,
+                    skipped,
+                    annotationsAdded,
+                    failures,
+                };
+            }
         }
         completed += 1;
     }
@@ -303,6 +398,7 @@ export const runBatchAnnotation = async ({
         total,
         succeeded,
         failed: failures.length,
+        skipped,
         annotationsAdded,
         current: '',
     });
@@ -312,6 +408,7 @@ export const runBatchAnnotation = async ({
         completed,
         succeeded,
         failed: failures.length,
+        skipped,
         annotationsAdded,
         failures,
     };

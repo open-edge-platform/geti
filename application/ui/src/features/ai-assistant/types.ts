@@ -56,6 +56,8 @@ export interface StreamRequest {
     onDelta: (text: string) => void;
 }
 
+export class AssistantConnectionError extends Error {}
+
 export interface CodexAccount {
     email: string | null;
     plan: string | null;

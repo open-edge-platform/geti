@@ -1,12 +1,55 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+.activityLine {
+    display: flex;
+    gap: var(--spectrum-global-dimension-size-100);
+    align-items: center;
+}
+
+.samplingHint {
+    max-width: 260px;
+    padding-bottom: 6px;
+    color: var(--spectrum-global-color-gray-700);
+    font-size: var(--spectrum-global-dimension-font-size-75);
+    line-height: 1.4;
+}
+
+.activityDot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    background: var(--energy-blue);
+    border-radius: 50%;
+    animation: activity-pulse 1.2s ease-in-out infinite;
+}
+
 .currentItem {
+    flex: 1 1 auto;
     min-height: 20px;
     overflow: hidden;
     color: var(--spectrum-global-color-gray-700);
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+@keyframes activity-pulse {
+    0%,
+    100% {
+        opacity: 0.35;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .activityDot {
+        animation: none;
+    }
 }
 
 .failures {

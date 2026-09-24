@@ -21,3 +21,14 @@ it('consumes CRLF-delimited events split across chunks', async () => {
 
     expect(payloads).toEqual(['first', 'second']);
 });
+
+it('handles a rejected reader cleanup after the stream is aborted', async () => {
+    const body = {
+        getReader: () => ({
+            read: vi.fn().mockResolvedValue({ done: true, value: undefined }),
+            cancel: vi.fn().mockRejectedValue(new DOMException('BodyStreamBuffer was aborted', 'AbortError')),
+        }),
+    } as unknown as ReadableStream<Uint8Array>;
+
+    await expect(consumeSse(body, vi.fn())).resolves.toBeUndefined();
+});
