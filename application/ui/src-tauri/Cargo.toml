@@ -45,4 +45,12 @@ windows = { version = "0.61", features = [
     "Win32_System_JobObjects",
 ] }
 webview2-com = "0.38"
+keyring = { version = "3", default-features = false, features = ["windows-native"] }
+reqwest = { version = "0.12", default-features = false, features = [
+    "json",
+    "stream",
+    "rustls-tls",
+] }
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+tokio = { version = "1", features = ["io-util", "macros", "process", "sync", "time"] }
 

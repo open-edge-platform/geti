@@ -27,6 +27,7 @@ type AnnotationsContextValue = {
     canSubmit: boolean;
     hasInvalidAnnotation: boolean;
     addAnnotations: (shapes: Shape[], labels: AnnotationLabelRef[]) => string[];
+    appendAnnotations: (annotations: Annotation[]) => void;
     addAnnotationWithEmptyLabel: (label: Label) => void;
     deleteAnnotations: (annotationIds: string[]) => void;
     updateAnnotations: (updatedAnnotations: Annotation[], labels?: AnnotationLabelRef[]) => void;
@@ -176,6 +177,10 @@ export const AnnotationActionsProvider = ({
         return newAnnotations.map((annotation) => annotation.id);
     };
 
+    const appendAnnotations = (newAnnotations: Annotation[]) => {
+        setAnnotations((prevAnnotations) => [...prevAnnotations, ...newAnnotations]);
+    };
+
     const deleteAllAnnotations = () => {
         setAnnotations([]);
     };
@@ -262,6 +267,7 @@ export const AnnotationActionsProvider = ({
 
                 // Local
                 addAnnotations,
+                appendAnnotations,
                 updateAnnotations,
                 deleteAnnotations,
                 addAnnotationWithEmptyLabel,

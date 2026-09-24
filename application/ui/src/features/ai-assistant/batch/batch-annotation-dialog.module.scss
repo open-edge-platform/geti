@@ -1,0 +1,29 @@
+// Copyright (C) 2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+.currentItem {
+    min-height: 20px;
+    overflow: hidden;
+    color: var(--spectrum-global-color-gray-700);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.failures {
+    max-height: 160px;
+    overflow-y: auto;
+    border-top: 1px solid var(--spectrum-global-color-gray-300);
+
+    > div {
+        display: grid;
+        grid-template-columns: minmax(120px, 1fr) minmax(0, 2fr);
+        gap: 12px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--spectrum-global-color-gray-300);
+    }
+
+    strong,
+    span {
+        overflow-wrap: anywhere;
+    }
+}

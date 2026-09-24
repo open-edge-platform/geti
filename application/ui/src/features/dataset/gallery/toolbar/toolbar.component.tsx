@@ -6,17 +6,7 @@ import { Dispatch, SetStateAction, Suspense, useState } from 'react';
 import type { Media } from '@/api/types';
 import { GalleryViewModeMenu } from '@/components/gallery-view-mode-menu/gallery-view-mode-menu.component';
 import { useTranslation } from '@/i18n';
-import {
-    ActionButton,
-    Button,
-    ButtonGroup,
-    Checkbox,
-    dimensionValue,
-    Divider,
-    Flex,
-    Heading,
-    ViewModes,
-} from '@geti-ui/ui';
+import { ActionButton, ButtonGroup, Checkbox, dimensionValue, Divider, Flex, Heading, ViewModes } from '@geti-ui/ui';
 import { SortDown, SortUp } from '@geti-ui/ui/icons';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
@@ -29,6 +19,7 @@ import { ImportExport } from '../../import-export/import-export.component';
 import { useSelectedData } from '../../providers/selected-data-provider.component';
 import { DeleteMediaItem } from '../delete-media-item/delete-media-item.component';
 import { useSelectDatasetItem } from '../hooks/use-select-dataset-item.hook';
+import { AnnotateButton } from './annotate-button.component';
 import { AssignLabel } from './assign-label.component';
 import { DatasetStatistics } from './dataset-statistics/dataset-statistics.component';
 import { useDatasetViewsQuery } from './dataset-view-selector/api/use-dataset-views';
@@ -44,21 +35,6 @@ type ToolbarProps = {
     items: Media[];
     viewMode: ViewModes;
     setViewMode: Dispatch<SetStateAction<ViewModes>>;
-};
-
-type AnnotateButtonProps = {
-    isDisabled?: boolean;
-    onClick?: () => void;
-};
-
-const AnnotateButton = ({ isDisabled, onClick }: AnnotateButtonProps) => {
-    const { t } = useTranslation();
-
-    return (
-        <Button margin={0} variant={'primary'} onPress={onClick} isDisabled={isDisabled}>
-            {t('common.actions.annotate')}
-        </Button>
-    );
 };
 
 type DatasetViewsProps = {
@@ -165,6 +141,13 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
     const noMediaSelected = selectedKeys.size === 0;
     const selectedMediaItemsIds = Array.from(selectedKeys);
+    const firstSelectedItem = items.find(({ id }) => selectedKeys.has(id));
+    const firstAnnotatableItem = firstSelectedItem ?? items.at(0);
+    const resolveBatchMediaIds = async (): Promise<string[] | null> => {
+        if (selectedMediaItemsIds.length > 0) return selectedMediaItemsIds;
+
+        return (await selectAllMedia.mutateAsync())?.mediaIds ?? null;
+    };
 
     return (
         <Flex direction={'column'} gridArea={'toolbar'} gap={'size-200'} marginBottom={'size-200'}>
@@ -186,12 +169,14 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     {noMediaSelected && <TrainModel />}
 
-                    {noMediaSelected && (
-                        <AnnotateButton
-                            isDisabled={items.at(0) === undefined}
-                            onClick={items.at(0) === undefined ? undefined : () => onSelectedMediaItemChange(items[0])}
-                        />
-                    )}
+                    <AnnotateButton
+                        isDisabled={firstAnnotatableItem === undefined || selectAllMedia.isPending}
+                        onAnnotate={() => {
+                            if (firstAnnotatableItem !== undefined) onSelectedMediaItemChange(firstAnnotatableItem);
+                        }}
+                        selectedMediaIds={selectedMediaItemsIds}
+                        resolveAllMediaIds={resolveBatchMediaIds}
+                    />
                 </ButtonGroup>
             </Flex>
 

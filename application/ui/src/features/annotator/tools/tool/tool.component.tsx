@@ -50,10 +50,13 @@ type ToolProps = {
 };
 
 export const Tool = ({ tool, activeTool, setActiveTool, isDisabled }: ToolProps) => {
-    useHotkeys(tool.hotkey, () => setActiveTool(tool.type), [setActiveTool, isDisabled], { enabled: !isDisabled });
+    useHotkeys(tool.hotkey ?? '', () => setActiveTool(tool.type), [setActiveTool, isDisabled], {
+        enabled: tool.hotkey !== undefined && !isDisabled,
+    });
 
-    const label = `${tool.label} (${tool.hotkey})`;
-    const ariaLabel = `${tool.ariaLabel} (${tool.hotkey})`;
+    const hotkeySuffix = tool.hotkey === undefined ? '' : ` (${tool.hotkey})`;
+    const label = `${tool.label}${hotkeySuffix}`;
+    const ariaLabel = `${tool.ariaLabel}${hotkeySuffix}`;
 
     return (
         <TooltipTrigger placement={'right'}>

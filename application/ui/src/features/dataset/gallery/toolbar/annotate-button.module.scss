@@ -1,0 +1,14 @@
+// Copyright (C) 2026 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+.splitButton {
+    display: inline-flex;
+    gap: 1px;
+    align-items: stretch;
+}
+
+.menuButton {
+    min-width: 32px !important;
+    padding-right: 7px !important;
+    padding-left: 7px !important;
+}

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useTool } from '../../../shared/annotator/tool-provider.component';
+import { AiTool } from './ai-tool/ai-tool.component';
 import { BoundingBoxTool } from './bounding-box-tool/bounding-box-tool.component';
 import { MagneticLasso } from './magnetic-lasso/magnetic-lasso.component';
 import { PolygonTool } from './polygon-tool/polygon-tool.component';
@@ -15,6 +16,10 @@ export const ToolManager = () => {
     // to use as soon as the user selects them. Not a huge performance gain but
     // it helps a bit.
     usePreloadWebworkers();
+
+    if (activeTool === 'ai') {
+        return <AiTool />;
+    }
 
     if (activeTool === 'bounding-box') {
         return <BoundingBoxTool />;
