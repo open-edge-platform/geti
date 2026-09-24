@@ -18,7 +18,7 @@ import useUndoRedoState from '../../shared/undo-redo/use-undo-redo-state';
 import { isNonEmptyArray } from '../../shared/util';
 import { mapLocalAnnotationsToServer, mapServerAnnotationsToLocal } from './annotation-mappers';
 import type { AnnotatorMode } from './annotator-mode';
-import { incrementCachedAnnotatedFrameCount } from './util';
+import { incrementCachedAnnotatedFrameCount } from './utils';
 
 type DatasetItemsPage = { items: DatasetItem[] };
 

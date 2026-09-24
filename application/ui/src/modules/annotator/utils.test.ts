@@ -5,7 +5,7 @@ import type { MediaWithPagination, Pagination } from '@/api/types';
 import { InfiniteData, QueryClient } from '@tanstack/react-query';
 
 import { getMockedMediaImage, getMockedVideo } from '../../../mocks/mock-media';
-import { incrementCachedAnnotatedFrameCount } from './util';
+import { incrementCachedAnnotatedFrameCount } from './utils';
 
 const createQueryClient = () => new QueryClient();
 
