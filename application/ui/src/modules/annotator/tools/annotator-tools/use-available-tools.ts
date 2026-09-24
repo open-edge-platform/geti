@@ -12,6 +12,9 @@ import SAMDetectionImg from '../../../../assets/tools/sam-detection.webp';
 import SAMSegmentationImg from '../../../../assets/tools/sam-segmentation.webp';
 import { useProjectTask } from '../../../../hooks/use-project-task.hook';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
+import { getAiAgent } from '../../../ai-assistant/agents';
+import { markForVendor } from '../../../ai-assistant/components/assistant-mark.component';
+import { useAiConnection } from '../../../ai-assistant/connection';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
 import { ToolConfig } from '../interface';
 import { canRasteriseAtFullSize } from '../utils';
@@ -20,6 +23,9 @@ export const useAvailableTools = (): ToolConfig[] => {
     const { t } = useTranslation();
     const taskType = useProjectTask();
     const { mediaItem } = useSelectedMediaItem();
+    const connection = useAiConnection();
+    const assistantVendor = getAiAgent(connection.agentId).vendor;
+    const assistantName = assistantVendor === 'openai' ? 'ChatGPT' : 'Claude';
 
     const selectionToolConfig: ToolConfig = {
         type: 'selection',
@@ -89,14 +95,22 @@ export const useAvailableTools = (): ToolConfig[] => {
         },
     };
 
+    const aiToolConfig: ToolConfig = {
+        type: 'ai',
+        icon: markForVendor(assistantVendor),
+        label: `Annotate with ${assistantName}`,
+        ariaLabel: `Annotate with ${assistantName}`,
+    };
+
     const taskToolConfig: Record<string, ToolConfig[]> = {
         classification: [],
-        detection: [selectionToolConfig, boundingBoxToolConfig, autoSegmentationDetectionConfig],
+        detection: [selectionToolConfig, boundingBoxToolConfig, autoSegmentationDetectionConfig, aiToolConfig],
         instance_segmentation: [
             selectionToolConfig,
             polygonToolConfig,
             magneticLassoToolConfig,
             autoSegmentationConfig,
+            aiToolConfig,
         ],
     };
 

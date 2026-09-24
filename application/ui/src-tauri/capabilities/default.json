@@ -17,7 +17,9 @@
                 { "url": "https://www.intel.com/*" },
                 { "url": "https://docs.geti.intel.com/*" },
                 { "url": "https://github.com/*" },
-                { "url": "https://www.ultralytics.com/*" }
+                { "url": "https://www.ultralytics.com/*" },
+                { "url": "https://auth.openai.com/*" },
+                { "url": "https://chatgpt.com/*" }
             ]
         }
     ]

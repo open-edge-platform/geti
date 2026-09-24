@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+#[cfg(windows)]
+mod assistant;
 mod backend;
 #[cfg(windows)]
 mod job;
@@ -18,6 +20,8 @@ use tauri::{AppHandle, Manager, RunEvent, WindowEvent};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
 use tauri_plugin_opener::OpenerExt;
 
+#[cfg(windows)]
+use crate::assistant::{ApiState, ClaudeState, CodexState};
 use crate::backend::spawn_backend;
 
 /// How often the monitor thread checks whether the backend is still alive.
@@ -421,7 +425,7 @@ fn monitor_backend(app: AppHandle, control: BackendControl) {
 fn main() {
     let control = BackendControl::default();
 
-    let app = tauri::Builder::default()
+    let builder = tauri::Builder::default()
         // Must be the first plugin registered: a second launch has to bail out
         // *before* `setup` spawns another backend. Two side-cars would fight
         // over the same TCP port and the same SQLite database in
@@ -438,7 +442,15 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_log::Builder::default().build())
+        .plugin(tauri_plugin_log::Builder::default().build());
+
+    #[cfg(windows)]
+    let builder = builder
+        .manage(ApiState::default())
+        .manage(CodexState::default())
+        .manage(ClaudeState::default());
+
+    let builder = builder
         .setup({
             let control = control.clone();
             move |app| {
@@ -502,8 +514,29 @@ fn main() {
                     handle.exit(0);
                 }
             }
-        })
-        .invoke_handler(tauri::generate_handler![])
+        });
+
+    #[cfg(windows)]
+    let builder = builder.invoke_handler(tauri::generate_handler![
+        assistant::api::assistant_key_set,
+        assistant::api::assistant_key_delete,
+        assistant::api::assistant_key_status,
+        assistant::api::openai_responses_stream,
+        assistant::api::openai_cancel,
+        assistant::api::anthropic_messages_stream,
+        assistant::api::anthropic_cancel,
+        assistant::codex::codex_operation,
+        assistant::codex::codex_cancel,
+        assistant::codex::codex_locate,
+        assistant::codex::codex_diagnostics,
+        assistant::claude::claude_operation,
+        assistant::claude::claude_cancel,
+        assistant::claude::claude_locate,
+    ]);
+    #[cfg(not(windows))]
+    let builder = builder.invoke_handler(tauri::generate_handler![]);
+
+    let app = builder
         .build(tauri::generate_context!())
         .expect("error building Tauri");
 

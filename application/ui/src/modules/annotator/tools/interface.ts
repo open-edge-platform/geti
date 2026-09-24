@@ -8,7 +8,7 @@ import type { ToolType } from '../tool-type';
 export interface ToolConfig {
     type: ToolType;
     icon: ComponentType<SVGProps<SVGSVGElement>>;
-    hotkey: string;
+    hotkey?: string;
     label: string;
     ariaLabel: string;
     tooltip?: {
