@@ -1,13 +1,15 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { StreamRequest, StreamResult } from '../types';
+import { AssistantConnectionError, type StreamRequest, type StreamResult } from '../types';
 import { readStoredKey } from './key-service';
 import { parseCompletedResponse } from './parse-response';
 import { consumeSse } from './sse';
 
 const OPENAI_RESPONSES_URL = 'https://api.openai.com/v1/responses';
+const OPENAI_MODELS_URL = 'https://api.openai.com/v1/models';
 const controllers = new Map<string, AbortController>();
+let validatedKey: string | null = null;
 
 const asRecord = (value: unknown): Record<string, unknown> =>
     typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {};
@@ -19,9 +21,24 @@ const errorMessage = async (response: Response): Promise<string> => {
     return message.replace(/sk-[A-Za-z0-9_-]+/g, '***');
 };
 
+const validateKey = async (key: string): Promise<void> => {
+    if (validatedKey === key) return;
+
+    const response = await fetch(OPENAI_MODELS_URL, {
+        headers: { authorization: `Bearer ${key}` },
+    });
+    if (!response.ok) throw new AssistantConnectionError(await errorMessage(response));
+    validatedKey = key;
+};
+
 export const streamResponseInBrowser = async (request: StreamRequest): Promise<StreamResult> => {
     const key = readStoredKey('openai-api-key');
-    if (key === null || key.trim() === '') throw new Error('Add an OpenAI API key to continue.');
+    if (key === null || key.trim() === '') {
+        throw new AssistantConnectionError('Add an OpenAI API key to continue.');
+    }
+    const normalizedKey = key.trim();
+
+    await validateKey(normalizedKey);
 
     const controller = new AbortController();
     controllers.set(request.requestId, controller);
@@ -33,7 +50,7 @@ export const streamResponseInBrowser = async (request: StreamRequest): Promise<S
             method: 'POST',
             signal: controller.signal,
             headers: {
-                authorization: `Bearer ${key.trim()}`,
+                authorization: `Bearer ${normalizedKey}`,
                 'content-type': 'application/json',
                 accept: 'text/event-stream',
             },
@@ -69,7 +86,7 @@ export const streamResponseInBrowser = async (request: StreamRequest): Promise<S
     } catch (error) {
         if (controller.signal.aborted) throw new Error('Stopped.');
         if (error instanceof TypeError) {
-            throw new Error(
+            throw new AssistantConnectionError(
                 'The browser could not complete the OpenAI request. ' +
                     'Verify the API key and API billing, or use the Anthropic API or Windows app.'
             );

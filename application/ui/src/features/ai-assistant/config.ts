@@ -1,8 +1,46 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-export const OPENAI_MODELS = ['gpt-4.1', 'gpt-4o', 'gpt-4o-mini'] as const;
-export const ANTHROPIC_MODELS = ['claude-sonnet-4-5', 'claude-opus-4-1', 'claude-haiku-4-5'] as const;
+export interface AiModelGroup {
+    label: string;
+    models: readonly string[];
+}
+
+export const OPENAI_DEFAULT_MODEL = 'gpt-6-sol';
+export const OPENAI_MODEL_GROUPS: readonly AiModelGroup[] = [
+    { label: 'GPT-6', models: ['gpt-6-astra', 'gpt-6-sol', 'gpt-6-luna'] },
+    { label: 'GPT-5.6', models: ['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna'] },
+    { label: 'GPT-5.5', models: ['gpt-5.5'] },
+    { label: 'GPT-5', models: ['gpt-5.4', 'gpt-5.4-mini', 'gpt-5.4-nano', 'gpt-5.2', 'gpt-5.1'] },
+    { label: 'Legacy API models', models: ['gpt-4.1', 'gpt-4.1-mini', 'gpt-4o', 'gpt-4o-mini'] },
+];
+export const OPENAI_MODELS = OPENAI_MODEL_GROUPS.flatMap(({ models }) => models);
+
+export const ANTHROPIC_DEFAULT_MODEL = 'claude-sonnet-5';
+export const ANTHROPIC_MODEL_GROUPS: readonly AiModelGroup[] = [
+    { label: 'Claude 5', models: ['claude-fable-5-1', 'claude-opus-5-5', 'claude-sonnet-5'] },
+    { label: 'Claude 4', models: ['claude-haiku-4-5', 'claude-sonnet-4-6', 'claude-opus-4-6'] },
+    { label: 'Legacy API models', models: ['claude-sonnet-4-5', 'claude-opus-4-5', 'claude-opus-4-1'] },
+];
+export const ANTHROPIC_MODELS = ANTHROPIC_MODEL_GROUPS.flatMap(({ models }) => models);
+
+const claudeFamilyLabel = (family: RegExpExecArray): string => {
+    const name = `${family[1][0].toUpperCase()}${family[1].slice(1)}`;
+    return `Claude ${name} ${family[2].replace('-', '.')}`;
+};
+
+export const groupModelIds = (models: readonly string[]): AiModelGroup[] => {
+    const groups = new Map<string, string[]>();
+
+    models.forEach((model) => {
+        const gptFamily = /^gpt-(\d+(?:\.\d+)?)/i.exec(model)?.[1];
+        const claudeFamily = /^claude-(fable|opus|sonnet|haiku)-(\d+(?:-\d+)?)/i.exec(model);
+        const label = gptFamily ? `GPT-${gptFamily}` : claudeFamily ? claudeFamilyLabel(claudeFamily) : 'Other models';
+        groups.set(label, [...(groups.get(label) ?? []), model]);
+    });
+
+    return Array.from(groups, ([label, groupedModels]) => ({ label, models: groupedModels }));
+};
 
 export const MAX_INPUT_CHARS = 8000;
 

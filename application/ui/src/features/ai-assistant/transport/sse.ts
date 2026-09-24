@@ -28,6 +28,6 @@ export const consumeSse = async (
             if (done) break;
         }
     } finally {
-        void reader.cancel();
+        void reader.cancel().catch(() => undefined);
     }
 };

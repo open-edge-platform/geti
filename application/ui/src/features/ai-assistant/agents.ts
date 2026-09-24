@@ -1,7 +1,15 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ANTHROPIC_MODELS, OPENAI_MODELS } from './config';
+import {
+    ANTHROPIC_DEFAULT_MODEL,
+    ANTHROPIC_MODEL_GROUPS,
+    ANTHROPIC_MODELS,
+    OPENAI_DEFAULT_MODEL,
+    OPENAI_MODEL_GROUPS,
+    OPENAI_MODELS,
+    type AiModelGroup,
+} from './config';
 import { hasNativeAssistantApps } from './platform';
 import type { AiAgentId, AiConnectionMethod, AiVendor } from './types';
 
@@ -12,6 +20,7 @@ export interface AiAgent {
     method: AiConnectionMethod;
     defaultModel: string;
     models: readonly string[];
+    modelGroups: readonly AiModelGroup[];
     credentialAccount?: 'openai-api-key' | 'anthropic-api-key';
 }
 
@@ -21,8 +30,9 @@ export const AI_AGENTS: readonly AiAgent[] = [
         vendor: 'openai',
         name: 'OpenAI API',
         method: 'api',
-        defaultModel: OPENAI_MODELS[0],
+        defaultModel: OPENAI_DEFAULT_MODEL,
         models: OPENAI_MODELS,
+        modelGroups: OPENAI_MODEL_GROUPS,
         credentialAccount: 'openai-api-key',
     },
     {
@@ -32,14 +42,16 @@ export const AI_AGENTS: readonly AiAgent[] = [
         method: 'app',
         defaultModel: '',
         models: [],
+        modelGroups: [],
     },
     {
         id: 'anthropic-api',
         vendor: 'anthropic',
         name: 'Anthropic API',
         method: 'api',
-        defaultModel: ANTHROPIC_MODELS[0],
+        defaultModel: ANTHROPIC_DEFAULT_MODEL,
         models: ANTHROPIC_MODELS,
+        modelGroups: ANTHROPIC_MODEL_GROUPS,
         credentialAccount: 'anthropic-api-key',
     },
     {
@@ -49,6 +61,7 @@ export const AI_AGENTS: readonly AiAgent[] = [
         method: 'app',
         defaultModel: 'sonnet',
         models: [],
+        modelGroups: [],
     },
 ];
 

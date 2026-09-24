@@ -215,7 +215,7 @@ export default defineConfig({
                 "default-src 'self'; " +
                 "script-src 'self' 'unsafe-eval' blob:; " +
                 "worker-src 'self' blob:; " +
-                `connect-src 'self' ${publicApiUrl} data:; ` +
+                `connect-src 'self' ${publicApiUrl} https://api.openai.com https://api.anthropic.com data:; ` +
                 `img-src 'self' ${publicApiUrl} data: blob:; ` +
                 `media-src 'self' ${publicApiUrl} blob: data:; ` +
                 "style-src 'self' 'unsafe-inline';",
