@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Job } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { Loading } from '@geti-ui/ui';
 import { useDeleteStagedDataset } from 'hooks/api/staged-dataset.hook';
-import { getJobProgress, isJobRunning } from 'hooks/api/util';
-import capitalize from 'lodash-es/capitalize';
+import { getJobProgress, getJobStatusLabel, isJobRunning } from 'hooks/api/util';
 
 import { CancelJobConfirmation } from '../../../features/dataset/import-export/cancel-job-confirmation/cancel-job-confirmation.component';
 import { BottomProgressBar } from '../../../features/models/model-listing/current-running-jobs/bottom-progress-bar.component';
@@ -21,6 +21,7 @@ type ImportActiveJobProps = {
 };
 
 export const ImportActiveJob = ({ job, size, fileName, stagedDatasetId, deleteEntry }: ImportActiveJobProps) => {
+    const { t } = useTranslation();
     const deleteFileMutation = useDeleteStagedDataset({ stagedDatasetId, deleteEntry });
 
     const isRunning = isJobRunning(job);
@@ -33,11 +34,11 @@ export const ImportActiveJob = ({ job, size, fileName, stagedDatasetId, deleteEn
     return (
         <BottomProgressBar progress={progress}>
             <JobStatusCard
-                title={`Import dataset - ${fileName} - ${formatBytes(size)}`}
+                title={t('dataset.import.jobTitle', { fileName, size: formatBytes(size) })}
                 actionButtons={<CancelJobConfirmation jobId={job.job_id} onRemove={handleRemove} />}
-                message={`${fileName} file is being processed for import`}
+                message={t('dataset.import.processingMessage', { fileName })}
                 bottomIcon={<Loading mode='inline' size='S' />}
-                bottomIconMessage={job?.message ?? capitalize(job.status.toLocaleLowerCase())}
+                bottomIconMessage={job.message ?? getJobStatusLabel(job.status, t)}
                 bottomRightMessage={isRunning ? `${progress}%` : undefined}
             />
         </BottomProgressBar>

@@ -1,19 +1,21 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { StagedImportDataset } from '@/components/import-card-status/staged-import-dataset/staged-import-dataset.component';
+import { LoadingImportDataset } from '@/components/loading-import-dataset/loading-import-dataset.component';
+import { PrepareImportDataset } from '@/components/prepare-import-dataset/prepare-import-dataset.component';
+import { useTranslation } from '@/i18n';
 import { Flex } from '@geti-ui/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';
 import { isEmpty, partition } from 'lodash-es';
 
-import { StagedImportDataset } from '../../../../components/import-card-status/staged-import-dataset/staged-import-dataset.component';
-import { LoadingImportDataset } from '../../../../components/loading-import-dataset/loading-import-dataset.component';
-import { PrepareImportDataset } from '../../../../components/prepare-import-dataset/prepare-import-dataset.component';
 import { getQueryKey } from '../../../../query-client/query-client';
 import { ImportDatasetAsNewProjectState } from '../../../dataset/import-export/import-dataset/util';
 import { useImportDatasetDialog } from '../../providers/import-dataset-dialog-provider.component';
 
 export const ImportJobsList = () => {
+    const { t } = useTranslation();
     const queryClient = useQueryClient();
     const { datasetImportDialogState, setCurrentStep, setCurrentStagedId } = useImportDatasetDialog();
     const { getAllImportEntries, deleteImportEntry, updateImportEntryStep } = useImportDatasetAsNewProject();
@@ -75,10 +77,10 @@ export const ImportJobsList = () => {
                 <StagedImportDataset
                     key={`task-type-${stagedDatasetId}`}
                     fileName={fileName}
-                    message={'Select task type'}
+                    message={t('project.import.jobsList.selectTaskType')}
                     stagedDatasetId={stagedDatasetId}
                     onOpen={() => handleOpen('taskTypeSelection', stagedDatasetId)}
-                    primaryButtonLabel={'Select task type'}
+                    primaryButtonLabel={t('project.import.jobsList.selectTaskType')}
                     deleteEntry={() => deleteImportEntry(stagedDatasetId)}
                 />
             ))}
@@ -87,10 +89,10 @@ export const ImportJobsList = () => {
                 <StagedImportDataset
                     key={`label-mapping-${stagedDatasetId}`}
                     fileName={fileName}
-                    message={'Map labels for the uploaded dataset'}
+                    message={t('dataset.import.mapLabelsMessage')}
                     stagedDatasetId={stagedDatasetId}
                     onOpen={() => handleOpen('labelMapping', stagedDatasetId)}
-                    primaryButtonLabel={'Map labels'}
+                    primaryButtonLabel={t('project.import.jobsList.mapLabelsButton')}
                     deleteEntry={() => deleteImportEntry(stagedDatasetId)}
                 />
             ))}

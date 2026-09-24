@@ -12,6 +12,9 @@ type ProjectFormOptions = {
     labelNames: string[];
 };
 
+// How long to wait for a project card marked as "Active" before concluding no pipeline is running.
+const ACTIVE_PIPELINE_TIMEOUT = 1000 * 10;
+
 export class ProjectPage {
     constructor(private page: Page) {}
 
@@ -65,6 +68,28 @@ export class ProjectPage {
         await this.getProjectCard(projectName).getByLabel('open project options').click();
     }
 
+    /** The backend allows a single running pipeline, so one left running elsewhere blocks enabling another. */
+    async disableActivePipeline() {
+        await this.gotoList();
+
+        const activeProject = this.getProjectCards().filter({ hasText: 'Active' }).first();
+
+        try {
+            await activeProject.waitFor({ timeout: ACTIVE_PIPELINE_TIMEOUT });
+        } catch {
+            return;
+        }
+
+        await activeProject.getByLabel('open project options').click();
+        await this.page.getByRole('menuitem', { name: 'Disable pipeline' }).click();
+
+        await this.page
+            .getByLabel('toast')
+            .filter({ hasText: 'Pipeline disabled successfully' })
+            .waitFor({ timeout: ACTIVE_PIPELINE_TIMEOUT });
+        await activeProject.waitFor({ state: 'hidden', timeout: ACTIVE_PIPELINE_TIMEOUT });
+    }
+
     async clickDeleteMenuAction() {
         await this.page.getByText(/Delete/).click();
     }
@@ -75,5 +100,9 @@ export class ProjectPage {
 
     getProjectCard(projectName: string) {
         return this.page.getByLabel(`Project: ${projectName}`);
+    }
+
+    getProjectCards() {
+        return this.page.getByLabel(/^Project: /);
     }
 }

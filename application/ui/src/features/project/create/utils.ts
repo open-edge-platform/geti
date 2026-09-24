@@ -1,20 +1,20 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-export const generateUniqueProjectName = (existingNames: string[]): string => {
-    const usedNumbers: number[] = [];
+import type { TranslateFn } from '@/i18n';
 
-    existingNames.forEach((name) => {
-        const match = name.match(/^Project #(\d+)$/);
-        if (match) {
-            usedNumbers.push(Number(match[1]));
-        }
-    });
+// Generates the first default name that is not taken, comparing rendered names instead of
+// parsing them, so it stays correct in any locale.
+export const generateUniqueProjectName = (existingNames: string[], t: TranslateFn): string => {
+    const takenNames = new Set(existingNames);
 
-    if (usedNumbers.length === 0) {
-        return 'Project #1';
+    let number = 1;
+    let candidate = t('project.create.defaultName', { number });
+
+    while (takenNames.has(candidate)) {
+        number += 1;
+        candidate = t('project.create.defaultName', { number });
     }
 
-    const maxNumber = Math.max(...usedNumbers);
-    return `Project #${maxNumber + 1}`;
+    return candidate;
 };

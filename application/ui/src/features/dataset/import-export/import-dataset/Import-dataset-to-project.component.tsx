@@ -1,15 +1,13 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { FileUploadedResponse, ImportUploadFile } from '@/components/import-upload-file/import-upload-file.component';
+import { getFormatOptions } from '@/components/util';
+import { useTranslation } from '@/i18n';
 import { Content, Dialog, DialogContainer, Divider, Heading } from '@geti-ui/ui';
 import { useProject } from 'hooks/api/project.hook';
 import { useImportDatasetToProject } from 'hooks/storage/use-import-dataset-to-project.hook';
 
-import {
-    FileUploadedResponse,
-    ImportUploadFile,
-} from '../../../../components/import-upload-file/import-upload-file.component';
-import { getFormatOptions } from '../../../../components/util';
 import { isNonEmptyString } from '../../../../shared/util';
 import { useImportDatasetDialogState } from '../../providers/export-import-dataset-dialog-provider.component';
 import { ImportDatasetButtons } from './import-dataset-buttons/import-dataset-buttons.component';
@@ -17,6 +15,7 @@ import { ImportProcess } from './import-process/import-process.component';
 import { LabelMapping } from './label-mapping/label-mapping.component';
 
 export const ImportDatasetToProject = () => {
+    const { t } = useTranslation();
     const { data: selectedProject } = useProject();
 
     const { appendImportEntry } = useImportDatasetToProject();
@@ -37,7 +36,7 @@ export const ImportDatasetToProject = () => {
         <DialogContainer onDismiss={datasetImportDialogState.close}>
             {datasetImportDialogState.isOpen && (
                 <Dialog aria-label={'Import dataset to project'} width={800}>
-                    <Heading>Import dataset</Heading>
+                    <Heading>{t('dataset.import.dialogHeading')}</Heading>
                     <Divider />
                     <Content
                         minHeight={'size-5000'}

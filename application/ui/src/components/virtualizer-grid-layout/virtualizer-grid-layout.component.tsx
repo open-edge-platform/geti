@@ -7,6 +7,7 @@ import { AriaComponentsListBox, AriaListBoxItem, GridLayout, Loading, View, Virt
 import { useLoadMore } from '@react-aria/utils';
 import { GridLayoutOptions } from 'react-aria-components';
 
+import { IsScrollingProvider } from '../../hooks/use-is-scrolling.hook';
 import { useGetTargetPosition } from './use-get-target-position.hook';
 
 import classes from './virtualizer-grid-layout.module.scss';
@@ -15,6 +16,7 @@ type AriaComponentsListBoxProps = ComponentProps<typeof AriaComponentsListBox>;
 
 type SelectionStateOptions = {
     allowDuplicateSelectionEvents?: boolean;
+    disallowSelectAll?: boolean;
     selectOnFocus?: boolean;
 };
 
@@ -52,6 +54,7 @@ export const VirtualizerGridLayout = <T extends GridItem>({
     isLoadingMore,
     selectionMode,
     selectionBehavior,
+    disallowSelectAll,
     layoutOptions,
     scrollToIndex,
     onLoadMore,
@@ -81,40 +84,43 @@ export const VirtualizerGridLayout = <T extends GridItem>({
 
     return (
         <View UNSAFE_className={classes.mainContainer}>
-            <Virtualizer layout={GridLayout} layoutOptions={layoutOptions}>
-                <ListBox
-                    ref={ref}
-                    layout='grid'
-                    aria-label={ariaLabel}
-                    className={classes.container}
-                    selectedKeys={selectedKeys}
-                    selectionMode={selectionMode}
-                    selectionBehavior={selectionBehavior}
-                    onSelectionChange={onSelectionChange}
-                    allowDuplicateSelectionEvents={allowDuplicateSelectionEvents}
-                    selectOnFocus={selectOnFocus}
-                >
-                    {items.map((item, index) => {
-                        const itemId = getItemId(item);
+            <IsScrollingProvider scrollRef={ref}>
+                <Virtualizer layout={GridLayout} layoutOptions={layoutOptions}>
+                    <ListBox
+                        ref={ref}
+                        layout='grid'
+                        aria-label={ariaLabel}
+                        className={classes.container}
+                        selectedKeys={selectedKeys}
+                        selectionMode={selectionMode}
+                        selectionBehavior={selectionBehavior}
+                        disallowSelectAll={disallowSelectAll}
+                        onSelectionChange={onSelectionChange}
+                        allowDuplicateSelectionEvents={allowDuplicateSelectionEvents}
+                        selectOnFocus={selectOnFocus}
+                    >
+                        {items.map((item) => {
+                            const itemId = getItemId(item);
 
-                        return (
-                            <AriaListBoxItem
-                                id={itemId}
-                                key={`${ariaLabel}-${itemId}-${index}`}
-                                textValue={String(itemId)}
-                                className={classes.mediaItem}
-                            >
-                                {contentItem(item)}
+                            return (
+                                <AriaListBoxItem
+                                    id={itemId}
+                                    key={`${ariaLabel}-${itemId}`}
+                                    textValue={String(itemId)}
+                                    className={classes.mediaItem}
+                                >
+                                    {contentItem(item)}
+                                </AriaListBoxItem>
+                            );
+                        })}
+                        {isLoadingMore && !isPending && (
+                            <AriaListBoxItem id={'loader'} textValue={'loading'}>
+                                <Loading mode='overlay' />
                             </AriaListBoxItem>
-                        );
-                    })}
-                    {isLoadingMore && !isPending && (
-                        <AriaListBoxItem id={'loader'} textValue={'loading'}>
-                            <Loading mode='overlay' />
-                        </AriaListBoxItem>
-                    )}
-                </ListBox>
-            </Virtualizer>
+                        )}
+                    </ListBox>
+                </Virtualizer>
+            </IsScrollingProvider>
             {isPending && <Loading mode='overlay' />}
         </View>
     );

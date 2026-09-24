@@ -6,9 +6,10 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { getMockedLabel } from 'mocks/mock-labels';
+import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
-import { http } from '../fixtures';
+import { http, test } from '../fixtures';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -23,3 +24,34 @@ export const candyBinaryHandler = http.get('/api/projects/{project_id}/dataset/m
         headers: { 'Content-Type': 'image/png' },
     });
 });
+
+export const mockedDetectionProject = getMockedProject({
+    id: '123e4567-e89b-12d3-a456-426614174000',
+    task: {
+        exclusive_labels: true,
+        task_type: 'detection',
+        labels: [redLabel, blueLabel],
+    },
+});
+
+// Shared network setup for the `mockedDetectionProject` used across the annotator.*.spec.ts files.
+export const useDetectionProjectFixtures = () => {
+    test.beforeEach(async ({ network }) => {
+        network.use(
+            http.get('/api/projects/{project_id}', () => {
+                return HttpResponse.json(mockedDetectionProject);
+            }),
+            http.get('/api/projects', () => {
+                return HttpResponse.json([mockedDetectionProject]);
+            }),
+            candyBinaryHandler,
+            http.get('/api/projects/{project_id}/dataset/media/{media_id}/annotations', async () => {
+                return HttpResponse.json({
+                    annotations: [],
+                    user_reviewed: true,
+                    subset: 'training',
+                });
+            })
+        );
+    });
+};

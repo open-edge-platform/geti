@@ -33,7 +33,7 @@ description: Develop and validate changes in `application/ui/` for the React and
 ## API Type Notes
 
 - `npm run build:api` reads `src/api/openapi-spec.json` and regenerates `src/api/openapi-spec.d.ts`.
-- `npm run update-spec` downloads the spec from `http://localhost:7860` and then rebuilds the TypeScript types.
+- `npm run update-spec` downloads the spec from `https://localhost:7860` (self-signed TLS, fetched with `--insecure`) and then rebuilds the TypeScript types.
 - Use `$geti-openapi-sync` when backend API changes are part of the task.
 
 ## Coordination Notes

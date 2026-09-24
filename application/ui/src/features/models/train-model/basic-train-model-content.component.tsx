@@ -3,15 +3,19 @@
 
 import { Divider, Flex, View } from '@geti-ui/ui';
 
+import { FEATURE_FLAGS } from '../../../constants/feature-flags';
 import { ModelArchitecturesList } from './model-architectures-list/model-architectures-list.component';
 import { SelectDatasetRevision } from './select-dataset-revision.component';
 import { SelectModelRevision } from './select-model-revision.component';
 import { SelectTrainingDevice } from './select-training-device/select-training-device.component';
 import { TimmModelConfiguration } from './timm-model-configuration/timm-model-configuration.component';
+import { isTimmModelArchitecture } from './timm-model-configuration/utils';
+import { useTrainModelState } from './train-model-provider.component';
 
 export const BasicTrainModelContent = () => {
-    // TODO: Update this once the backend part is done
-    const isTIMMModelSelected = false;
+    const { selectedModelArchitectureId } = useTrainModelState();
+    const showTIMMModelConfiguration =
+        FEATURE_FLAGS.TIMM_MODEL_CONFIGURATION && isTimmModelArchitecture(selectedModelArchitectureId);
 
     return (
         <View backgroundColor={'gray-50'} height={'100%'}>
@@ -23,7 +27,7 @@ export const BasicTrainModelContent = () => {
                 <Divider size={'S'} width={'100%'} />
 
                 <Flex direction={'column'} gap={'size-300'}>
-                    {isTIMMModelSelected && <TimmModelConfiguration />}
+                    {showTIMMModelConfiguration && <TimmModelConfiguration />}
 
                     <Flex gap={'size-300'} width={'100%'}>
                         <SelectTrainingDevice />

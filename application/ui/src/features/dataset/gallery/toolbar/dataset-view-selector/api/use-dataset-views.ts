@@ -1,11 +1,31 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-const DATASET_VIEWS = [
-    { id: 'collection-one', name: 'Collection One' },
-    { id: 'collection-two', name: 'Collection Two' },
-];
+import { $api } from '@/api';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-export const useDatasetViews = () => {
-    return DATASET_VIEWS;
+export const datasetViewsQueryOptions = (projectId: string) =>
+    $api.queryOptions(
+        'get',
+        '/api/projects/{project_id}/dataset/views',
+        {
+            params: {
+                path: {
+                    project_id: projectId,
+                },
+            },
+        },
+        { staleTime: 1000 * 60 }
+    );
+
+export const useDatasetViewsQuery = () => {
+    const projectId = useProjectIdentifier();
+    return useSuspenseQuery(datasetViewsQueryOptions(projectId));
+};
+
+// Non suspending variant, for places where the views are optional and should not block rendering
+export const useOptionalDatasetViewsQuery = (enabled = true) => {
+    const projectId = useProjectIdentifier();
+    return useQuery({ ...datasetViewsQueryOptions(projectId), enabled });
 };

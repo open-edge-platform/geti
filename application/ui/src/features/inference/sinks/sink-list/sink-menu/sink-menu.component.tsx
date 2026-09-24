@@ -4,11 +4,11 @@
 import { Key } from 'react';
 
 import { $api } from '@/api';
+import { toast } from '@/components/toast/toast.component';
+import { useTranslation } from '@/i18n';
 import { ActionButton, Item, Menu, MenuTrigger } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-
-import { toast } from '../../../../../components/toast/toast.component';
 
 const SINK_MENU_OPTIONS = {
     CONNECT: 'connect',
@@ -27,6 +27,7 @@ export type SinkMenuProps = {
 };
 
 export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProps) => {
+    const { t } = useTranslation();
     const project_id = useProjectIdentifier();
     const removeSink = $api.useMutation('delete', '/api/sinks/{sink_id}', {
         meta: {
@@ -70,7 +71,7 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: `Successfully connected to "${name}"`,
+                        message: t('inference.sinks.menu.connectSuccess', { name }),
                     });
                 },
             }
@@ -84,7 +85,7 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: `${name} has been removed successfully!`,
+                        message: t('inference.connection.removeSuccess', { name }),
                     });
                 },
             }
@@ -101,7 +102,7 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: `Successfully disconnected from "${name}"`,
+                        message: t('inference.sinks.menu.disconnectSuccess', { name }),
                     });
                 },
             }
@@ -118,13 +119,13 @@ export const SinkMenu = ({ id, name, isConnected, onEdit, onTest }: SinkMenuProp
                 disabledKeys={isConnected ? [SINK_MENU_OPTIONS.REMOVE, SINK_MENU_OPTIONS.TEST] : []}
             >
                 {isConnected ? (
-                    <Item key={SINK_MENU_OPTIONS.DISCONNECT}>Disconnect</Item>
+                    <Item key={SINK_MENU_OPTIONS.DISCONNECT}>{t('common.actions.disconnect')}</Item>
                 ) : (
-                    <Item key={SINK_MENU_OPTIONS.CONNECT}>Connect</Item>
+                    <Item key={SINK_MENU_OPTIONS.CONNECT}>{t('common.actions.connect')}</Item>
                 )}
-                <Item key={SINK_MENU_OPTIONS.TEST}>Test connection</Item>
-                <Item key={SINK_MENU_OPTIONS.EDIT}>Edit</Item>
-                <Item key={SINK_MENU_OPTIONS.REMOVE}>Remove</Item>
+                <Item key={SINK_MENU_OPTIONS.TEST}>{t('common.actions.testConnection')}</Item>
+                <Item key={SINK_MENU_OPTIONS.EDIT}>{t('common.actions.edit')}</Item>
+                <Item key={SINK_MENU_OPTIONS.REMOVE}>{t('common.actions.remove')}</Item>
             </Menu>
         </MenuTrigger>
     );

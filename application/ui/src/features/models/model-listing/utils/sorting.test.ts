@@ -128,6 +128,67 @@ describe('sortModels', () => {
         });
     });
 
+    describe('device', () => {
+        const modelsWithDevice = [
+            getMockedModel({
+                id: 'gpu',
+                training_info: { status: 'successful', device: { type: 'cuda', name: 'NVIDIA RTX 3090' } },
+            }),
+            getMockedModel({
+                id: 'cpu',
+                training_info: { status: 'successful', device: { type: 'cpu', name: 'Intel Core Ultra 9' } },
+            }),
+            getMockedModel({
+                id: 'xpu',
+                training_info: { status: 'successful', device: { type: 'xpu', name: 'Intel Arc A770' } },
+            }),
+        ];
+
+        it('sorts models by device name ascending', () => {
+            const sorted = sortModels(modelsWithDevice, 'device', []);
+
+            expect(sorted[0].id).toBe('xpu');
+            expect(sorted[1].id).toBe('cpu');
+            expect(sorted[2].id).toBe('gpu');
+        });
+
+        it('sorts models by device name case-insensitively', () => {
+            const models = [
+                getMockedModel({
+                    id: 'cuda',
+                    training_info: { status: 'successful', device: { type: 'cuda', name: 'ZOTAC GPU' } },
+                }),
+                getMockedModel({
+                    id: 'cpu',
+                    training_info: { status: 'successful', device: { type: 'cpu', name: 'amd cpu' } },
+                }),
+            ];
+
+            const sorted = sortModels(models, 'device', []);
+
+            expect(sorted[0].id).toBe('cpu');
+            expect(sorted[1].id).toBe('cuda');
+        });
+
+        it('places models with an undefined device last', () => {
+            const models = [
+                getMockedModel({
+                    id: 'undefined-device',
+                    training_info: { status: 'successful', device: undefined },
+                }),
+                getMockedModel({
+                    id: 'has-device',
+                    training_info: { status: 'successful', device: { type: 'cpu', name: 'Intel Core Ultra 9' } },
+                }),
+            ];
+
+            const sorted = sortModels(models, 'device', []);
+
+            expect(sorted[0].id).toBe('has-device');
+            expect(sorted[1].id).toBe('undefined-device');
+        });
+    });
+
     describe('size', () => {
         it('sorts models by size ascending', () => {
             const models = [
@@ -304,6 +365,110 @@ describe('sortModels', () => {
             expect(errorSpy).toHaveBeenCalledWith('Unknown sort option: unknown');
 
             errorSpy.mockRestore();
+        });
+    });
+
+    describe('explicit direction', () => {
+        it('reverses the name order', () => {
+            const models = [
+                getMockedModel({ id: 'alpha', name: 'Alpha' }),
+                getMockedModel({ id: 'zulu', name: 'Zulu' }),
+            ];
+
+            expect(sortModels(models, 'name', [], 'desc').map(({ id }) => id)).toEqual(['zulu', 'alpha']);
+        });
+
+        it('reverses the size order', () => {
+            const models = [getMockedModel({ id: 'small', size: 1 }), getMockedModel({ id: 'large', size: 2 })];
+
+            expect(sortModels(models, 'size', [], 'desc').map(({ id }) => id)).toEqual(['large', 'small']);
+        });
+
+        it('reverses the training date order', () => {
+            const models = [
+                getMockedModel({
+                    id: 'newest',
+                    training_info: { status: 'successful', end_time: '2025-03-01T00:00:00Z' },
+                }),
+                getMockedModel({
+                    id: 'oldest',
+                    training_info: { status: 'successful', end_time: '2025-01-01T00:00:00Z' },
+                }),
+            ];
+
+            expect(sortModels(models, 'trained', [], 'asc').map(({ id }) => id)).toEqual(['oldest', 'newest']);
+        });
+
+        it('keeps models without a training date last in both directions', () => {
+            const models = [
+                getMockedModel({ id: 'no-date', training_info: { status: 'not_started', end_time: null } }),
+                getMockedModel({
+                    id: 'has-date',
+                    training_info: { status: 'successful', end_time: '2025-01-01T00:00:00Z' },
+                }),
+            ];
+
+            expect(sortModels(models, 'trained', [], 'asc').map(({ id }) => id)).toEqual(['has-date', 'no-date']);
+            expect(sortModels(models, 'trained', [], 'desc').map(({ id }) => id)).toEqual(['has-date', 'no-date']);
+        });
+
+        it('keeps models without a device last in both directions', () => {
+            const models = [
+                getMockedModel({ id: 'no-device', training_info: { status: 'successful', device: undefined } }),
+                getMockedModel({
+                    id: 'has-device',
+                    training_info: { status: 'successful', device: { type: 'cpu', name: 'Intel Core Ultra 9' } },
+                }),
+            ];
+
+            expect(sortModels(models, 'device', [], 'asc').map(({ id }) => id)).toEqual(['has-device', 'no-device']);
+            expect(sortModels(models, 'device', [], 'desc').map(({ id }) => id)).toEqual(['has-device', 'no-device']);
+        });
+
+        it('keeps models without a score last in both directions', () => {
+            const models = [
+                getMockedModel({ id: 'no-metric', variants: [] }),
+                getMockedModel({
+                    id: 'has-metric',
+                    variants: [
+                        getMockedVariant({
+                            evaluations: [
+                                {
+                                    dataset_revision_id: 'rev-1',
+                                    subset: 'testing',
+                                    metrics: [{ name: 'Accuracy', value: 0.8, primary: true }],
+                                },
+                            ],
+                        }),
+                    ],
+                }),
+            ];
+
+            expect(sortModels(models, 'score', [], 'asc').map(({ id }) => id)).toEqual(['has-metric', 'no-metric']);
+            expect(sortModels(models, 'score', [], 'desc').map(({ id }) => id)).toEqual(['has-metric', 'no-metric']);
+        });
+
+        it('keeps models without a dataset revision last in both directions', () => {
+            const revisions = [getMockedDatasetRevision({ id: 'rev-1', name: 'Zebra Dataset' })];
+            const models = [
+                getMockedModel({
+                    id: 'no-dataset',
+                    training_info: { status: 'not_started', dataset_revision_id: null },
+                }),
+                getMockedModel({
+                    id: 'has-dataset',
+                    training_info: { status: 'successful', dataset_revision_id: 'rev-1' },
+                }),
+            ];
+
+            expect(sortModels(models, 'dataset', revisions, 'asc').map(({ id }) => id)).toEqual([
+                'has-dataset',
+                'no-dataset',
+            ]);
+            expect(sortModels(models, 'dataset', revisions, 'desc').map(({ id }) => id)).toEqual([
+                'has-dataset',
+                'no-dataset',
+            ]);
         });
     });
 });

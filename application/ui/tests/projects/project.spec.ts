@@ -6,7 +6,6 @@ import { HttpResponse } from 'msw';
 
 import { getMockedProject } from '../../mocks/mock-project';
 import { expect, http, test } from '../fixtures';
-import { stepCreateProject } from '../workflows/workflow-steps';
 import { ProjectPage } from './project-page';
 
 test.describe('Project', () => {
@@ -30,6 +29,24 @@ test.describe('Project', () => {
         await expect(page.getByText('Project 1')).toBeVisible();
         await expect(page.getByText('Project 2')).toBeVisible();
         await expect(page.getByText('Project 3')).toBeVisible();
+    });
+
+    test('switches the UI language and persists it across reloads', async ({ page }) => {
+        const projectPage = new ProjectPage(page);
+
+        await projectPage.gotoList();
+
+        await expect(page.getByText('3 projects')).toBeVisible();
+
+        await page.getByRole('button', { name: /Change language/ }).click();
+        await page.getByRole('option', { name: /português/i }).click();
+
+        await expect(page.getByText('3 projetos')).toBeVisible();
+        await expect(page.locator('html')).toHaveAttribute('lang', 'pt');
+
+        await page.reload();
+
+        await expect(page.getByText('3 projetos')).toBeVisible();
     });
 
     test('creates a project', async ({ page, network }) => {
@@ -58,11 +75,17 @@ test.describe('Project', () => {
             })
         );
 
-        await stepCreateProject(page, {
-            projectName,
+        await projectPage.gotoCreate();
+        await projectPage.fillProjectForm({
+            name: projectName,
             task: 'instance_segmentation',
-            labels: ['Person', 'Animal'],
+            labelNames: ['Person', 'Animal'],
         });
+
+        await projectPage.getCreateProjectButton().scrollIntoViewIfNeeded();
+        await projectPage.getCreateProjectButton().click();
+
+        await expect(page).toHaveURL(/\/projects\/[^/]+\/dataset/);
 
         network.use(
             http.get('/api/projects', () => {

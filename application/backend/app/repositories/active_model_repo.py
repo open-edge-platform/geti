@@ -46,3 +46,15 @@ class ActiveModelRepo:
         """
         stmt = select(PipelineDB.model_variant_id).where(PipelineDB.is_running)
         return self.db.execute(stmt).scalar_one_or_none()
+
+    def get_active_confidence_threshold(self) -> float | None:
+        """
+        Get the confidence threshold configured for the active pipeline.
+
+        Returns:
+            The confidence threshold, or None if no pipeline is running or the pipeline does not
+            override the threshold embedded in the model.
+        """
+        stmt = select(PipelineDB.inference).where(PipelineDB.is_running)
+        inference = self.db.execute(stmt).scalar_one_or_none()
+        return (inference or {}).get("confidence_threshold")

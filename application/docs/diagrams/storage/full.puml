@@ -114,9 +114,9 @@ table(dataset_views) {
   name : TEXT NOT NULL
 }
 
-table(dataset_views_items) {
+table(dataset_view_items) {
   fk(dataset_view_id) : UUID NOT NULL
-  fk(dataset_item_id) : UUID NOT NULL
+  fk(media_id) : UUID NOT NULL
 }
 
 table(dataset_revisions) {
@@ -210,8 +210,8 @@ pipelines }o---|| sinks
 pipelines |o---|| model_revisions
 
 dataset_items ||---o{ dataset_items_tags
-dataset_views ||---o{ dataset_views_items
-dataset_views_items }o---|| dataset_items
+dataset_views ||---o{ dataset_view_items
+dataset_view_items }o---|| media
 
 model_revisions |o---|| dataset_revisions
 model_revisions ||---o{ evaluations

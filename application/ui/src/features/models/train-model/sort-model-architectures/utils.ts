@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
+import type { TranslateFn } from '@/i18n';
 import { orderBy } from 'lodash-es';
 
 export const SortingOptions = {
@@ -19,10 +20,12 @@ type SortingHandler = (
     modelArchitectures: ModelArchitectureWithPerformanceCategory[]
 ) => ModelArchitectureWithPerformanceCategory[];
 
-const getAccuracyMetricBasedOnTask = ({
-    stats: { benchmark_metrics: benchmarkMetrics },
-}: ModelArchitectureWithPerformanceCategory) => {
-    return benchmarkMetrics.imagenet_top1_accuracy ?? benchmarkMetrics.coco_map_50_95 ?? benchmarkMetrics.coco_map_50;
+const getAccuracyMetricBasedOnTask = ({ stats }: ModelArchitectureWithPerformanceCategory) => {
+    const benchmarkMetrics = stats?.benchmark_metrics;
+
+    return (
+        benchmarkMetrics?.imagenet_top1_accuracy ?? benchmarkMetrics?.coco_map_50_95 ?? benchmarkMetrics?.coco_map_50
+    );
 };
 
 export const SORTING_HANDLERS: Record<SortingOptions, SortingHandler> = {
@@ -35,40 +38,40 @@ export const SORTING_HANDLERS: Record<SortingOptions, SortingHandler> = {
     [SortingOptions.NAME_DESC]: (modelArchitectures) =>
         orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.name, 'desc'),
     [SortingOptions.SPEED_ASC]: (modelArchitectures) =>
-        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.stats.gigaflops, 'asc'),
+        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.stats?.gigaflops, 'asc'),
     [SortingOptions.SPEED_DESC]: (modelArchitectures) =>
-        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.stats.gigaflops, 'desc'),
+        orderBy(modelArchitectures, (modelArchitecture) => modelArchitecture.stats?.gigaflops, 'desc'),
 };
 
-export const SORT_OPTIONS = [
+export const getSortOptions = (t: TranslateFn) => [
     [
         {
             key: SortingOptions.NAME_ASC,
-            name: 'Name (A to Z)',
+            name: t('models.training.architectures.sort.nameAsc'),
         },
         {
             key: SortingOptions.NAME_DESC,
-            name: 'Name (Z to A)',
+            name: t('models.training.architectures.sort.nameDesc'),
         },
     ],
     [
         {
             key: SortingOptions.SPEED_ASC,
-            name: 'Speed (fastest first)',
+            name: t('models.training.architectures.sort.speedAsc'),
         },
         {
             key: SortingOptions.SPEED_DESC,
-            name: 'Speed (slowest first)',
+            name: t('models.training.architectures.sort.speedDesc'),
         },
     ],
     [
         {
             key: SortingOptions.ACCURACY_ASC,
-            name: 'Accuracy (lowest first)',
+            name: t('models.training.architectures.sort.accuracyAsc'),
         },
         {
             key: SortingOptions.ACCURACY_DESC,
-            name: 'Accuracy (highest first)',
+            name: t('models.training.architectures.sort.accuracyDesc'),
         },
     ],
 ];

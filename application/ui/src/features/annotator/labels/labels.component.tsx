@@ -1,9 +1,10 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { CSSProperties, Fragment, useMemo } from 'react';
+import { CSSProperties, Fragment } from 'react';
 
 import type { Label } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { Divider, Flex, Pressable, Text, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
@@ -27,6 +28,8 @@ type LabelBadgeProps = {
 };
 
 const LabelBadge = ({ label, isSelected, onClick }: LabelBadgeProps) => {
+    const { t } = useTranslation();
+
     return (
         <TooltipTrigger isDisabled={isEmpty(label.hotkey)}>
             <Pressable>
@@ -40,7 +43,9 @@ const LabelBadge = ({ label, isSelected, onClick }: LabelBadgeProps) => {
                     <Text UNSAFE_className={classes.badgeText}>{label.name}</Text>
                 </button>
             </Pressable>
-            <Tooltip>Hotkey: {formatHotkeyForDisplay(label.hotkey ?? '')}</Tooltip>
+            <Tooltip>
+                {t('labels.toolbar.hotkeyTooltip', { hotkey: formatHotkeyForDisplay(label.hotkey ?? '') })}
+            </Tooltip>
         </TooltipTrigger>
     );
 };
@@ -64,6 +69,7 @@ const LabelHotkeyBinding = ({ label, onTrigger }: LabelHotkeyBindingProps) => {
 };
 
 export const Labels = ({ isClassification = false, isMultiLabel = false }: LabelsProps) => {
+    const { t } = useTranslation();
     const { labels, hasLabels, toggleLabelOnAnnotations, isLabelActive, editableLabels } = useLabels({
         isClassification,
         isMultiLabel,
@@ -72,21 +78,13 @@ export const Labels = ({ isClassification = false, isMultiLabel = false }: Label
     const projectId = useProjectIdentifier();
     const { isPinned, hasPinnedLabels } = usePinnedLabels(projectId);
 
-    const visibleLabels = useMemo(() => {
-        if (hasPinnedLabels) {
-            return labels.filter((label) => isPinned(label.id) || label.id === EMPTY_LABEL_ID);
-        }
+    const emptyLabel = labels.find((label) => label.id === EMPTY_LABEL_ID);
+    const visibleLabels = hasPinnedLabels
+        ? labels.filter((label) => isPinned(label.id) || label.id === EMPTY_LABEL_ID)
+        : [...editableLabels.slice(0, MAX_VISIBLE_LABELS), ...(emptyLabel ? [emptyLabel] : [])];
 
-        const emptyLabel = labels.find((label) => label.id === EMPTY_LABEL_ID);
-        const visible = editableLabels.slice(0, MAX_VISIBLE_LABELS);
-
-        return emptyLabel ? [...visible, emptyLabel] : visible;
-    }, [labels, editableLabels, hasPinnedLabels, isPinned]);
-
-    const hiddenLabelsCount = useMemo(() => {
-        const visibleNonEmptyCount = visibleLabels.filter((label) => label.id !== EMPTY_LABEL_ID).length;
-        return editableLabels.length - visibleNonEmptyCount;
-    }, [editableLabels, visibleLabels]);
+    const visibleNonEmptyCount = visibleLabels.filter((label) => label.id !== EMPTY_LABEL_ID).length;
+    const hiddenLabelsCount = editableLabels.length - visibleNonEmptyCount;
 
     return (
         <Flex alignItems='start' gap='size-100' minWidth={0} flex='1'>
@@ -109,7 +107,9 @@ export const Labels = ({ isClassification = false, isMultiLabel = false }: Label
                         </Fragment>
                     ))}
                     {hiddenLabelsCount > 0 && (
-                        <Text UNSAFE_className={classes.overflowCount}>+ {hiddenLabelsCount} more</Text>
+                        <Text UNSAFE_className={classes.overflowCount}>
+                            {t('labels.toolbar.overflowCount', { count: hiddenLabelsCount })}
+                        </Text>
                     )}
                 </div>
             )}

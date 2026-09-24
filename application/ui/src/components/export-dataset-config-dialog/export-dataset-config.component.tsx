@@ -3,6 +3,7 @@
 
 import { ReactNode, useState } from 'react';
 
+import { useTranslation } from '@/i18n';
 import {
     Button,
     ButtonGroup,
@@ -23,27 +24,21 @@ import { Alert, LinkOut } from '@geti-ui/ui/icons';
 import { OverlayTriggerState } from '@react-stately/overlays';
 import { useDatasetStatisticsQuery } from 'hooks/api/dataset.hook';
 import { useProject } from 'hooks/api/project.hook';
+import { isEmpty } from 'lodash-es';
 
 import { useExportDatasetJobAction } from '../../hooks/use-export-dataset-job-action.hook';
 import { Link } from '../../platform/components/link.component';
 import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../shared/annotator/labels';
+import { isNonEmptyString } from '../../shared/util';
 import { MultiSelectList } from '../multi-select-list/multi-select-list.component';
 import { getFormatOptions } from '../util';
 
 import classes from './export-dataset-config.module.scss';
 
-const EXPORT_VIDEOS_WARNING_MESSAGE =
-    'Exporting videos is not supported by this dataset format. ' +
-    'All annotated frames from videos will be exported as images.';
-const EXPORT_EMPTY_LABEL_WARNING_MESSAGE = (emptyLabelName: string) =>
-    `The selected format does not support empty labels (e.g. "${emptyLabelName}"). ` +
-    `Images and frames containing them will be exported as unannotated.`;
-const EXPORT_UNSUPPORTED_ITEMS_WARNING_MESSAGE = (unsupportedItems: string) =>
-    `To preserve ${unsupportedItems}, please use the Geti export format.`;
-const EXPORT_COCO_WARNING_MESSAGE =
-    "The exported dataset won't include any information about the subset assigned to each media.";
-
 const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: string | null }) => {
+    const { t, i18n } = useTranslation();
+    const language = i18n.resolvedLanguage ?? i18n.language;
+    const warningFormatter = new Intl.ListFormat(language, { type: 'disjunction' });
     const isVisible = selectedExportFormat !== 'geti';
 
     const { data: statistics } = useDatasetStatisticsQuery(isVisible);
@@ -59,9 +54,16 @@ const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: strin
         ? emptyLabel?.name
         : undefined;
 
-    const unsupportedItems = [hasVideos && 'videos', emptyLabelName !== undefined && 'empty labels']
-        .filter(Boolean)
-        .join(' or ');
+    const unsupportedItemNames = [
+        hasVideos && t('dataset.export.warnings.unsupportedItemsVideos'),
+        emptyLabelName !== undefined && t('dataset.export.warnings.unsupportedItemsEmptyLabels'),
+    ].filter((name): name is string => Boolean(name));
+
+    const unsupportedItemsMessage = isEmpty(unsupportedItemNames)
+        ? undefined
+        : t('dataset.export.warnings.unsupportedItems', {
+              items: warningFormatter.format(unsupportedItemNames),
+          });
 
     if (!isVisible || (!hasVideos && emptyLabelName === undefined && !isCocoFormatSelected)) {
         return null;
@@ -73,10 +75,12 @@ const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: strin
                 <Alert className={classes.warningMessageIcon} />
             </Flex>
             <Flex direction={'column'} gap={'size-75'}>
-                {hasVideos && <Text>{EXPORT_VIDEOS_WARNING_MESSAGE}</Text>}
-                {emptyLabelName !== undefined && <Text>{EXPORT_EMPTY_LABEL_WARNING_MESSAGE(emptyLabelName)}</Text>}
-                {unsupportedItems && <Text>{EXPORT_UNSUPPORTED_ITEMS_WARNING_MESSAGE(unsupportedItems)}</Text>}
-                {isCocoFormatSelected && <Text>{EXPORT_COCO_WARNING_MESSAGE}</Text>}
+                {hasVideos && <Text>{t('dataset.export.warnings.videos')}</Text>}
+                {emptyLabelName !== undefined && (
+                    <Text>{t('dataset.export.warnings.emptyLabel', { emptyLabelName })}</Text>
+                )}
+                {unsupportedItemsMessage && <Text>{unsupportedItemsMessage}</Text>}
+                {isCocoFormatSelected && <Text>{t('dataset.export.warnings.subsetNotIncluded')}</Text>}
             </Flex>
         </Flex>
     );
@@ -85,6 +89,8 @@ const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: strin
 type ExportDatasetConfigProps = {
     name?: string;
     datasetId: string | null;
+    datasetViewId?: string | null;
+    datasetViewName?: string;
     statistics: ReactNode;
     dialogState: OverlayTriggerState;
 };
@@ -96,15 +102,26 @@ const EXPORT_FORMATS_LINK =
 type ExportDatasetDialogContentProps = {
     name: string;
     datasetId: string | null;
+    datasetViewId: string | null;
+    datasetViewName: string | undefined;
     statistics: ReactNode;
     dialogState: OverlayTriggerState;
 };
 
-const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }: ExportDatasetDialogContentProps) => {
+const ExportDatasetDialogContent = ({
+    name,
+    datasetId,
+    datasetViewId,
+    datasetViewName,
+    statistics,
+    dialogState,
+}: ExportDatasetDialogContentProps) => {
+    const { t } = useTranslation();
     const { data: selectedProject } = useProject();
 
     const [formState, submitAction, isPending] = useExportDatasetJobAction({
         datasetId,
+        datasetViewId,
         onSuccess: dialogState.close,
     });
 
@@ -115,13 +132,21 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
 
     return (
         <Dialog size='L' width={{ base: '70vw' }}>
-            <Heading>Export {name}</Heading>
+            <Heading>
+                {datasetViewName === undefined
+                    ? t('dataset.export.heading', { name })
+                    : t('dataset.export.headingDatasetView')}
+            </Heading>
             <Divider />
             <Content UNSAFE_className={classes.container}>
-                <Heading>Exported dataset statistics</Heading>
+                {isNonEmptyString(datasetViewName) && (
+                    <Text>{t('dataset.export.datasetView', { name: datasetViewName })}</Text>
+                )}
+
+                <Heading>{t('dataset.export.statisticsHeading')}</Heading>
                 {statistics}
 
-                <Heading>Export settings</Heading>
+                <Heading>{t('dataset.export.settingsHeading')}</Heading>
 
                 <View backgroundColor='gray-75' padding='size-200' borderRadius='regular'>
                     <Form id={FORM_ID} validationBehavior='native' action={submitAction}>
@@ -129,19 +154,20 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
                             name='labels'
                             items={labels}
                             maxHeight='size-2000'
-                            label='Filter annotations by label'
+                            label={t('dataset.export.filterByLabel')}
+                            ariaLabel='Filter annotations by label'
                             defaultSelectedKeys={new Set(labels.map(({ id }) => id))}
                         />
 
                         <Checkbox name='include_unannotated' defaultSelected={formState.include_unannotated}>
-                            Include media without annotations
+                            {t('dataset.includeUnannotated')}
                         </Checkbox>
 
                         <Divider size='S' />
 
                         <RadioGroup
                             name='export_format'
-                            label='Select dataset export format'
+                            label={t('dataset.export.selectFormat')}
                             defaultValue={formState.export_format}
                             onChange={(value) => setSelectedExportFormat(value)}
                         >
@@ -161,7 +187,7 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
                         rel='noopener noreferrer'
                         UNSAFE_className={classes.link}
                     >
-                        Learn more about export formats
+                        {t('dataset.export.learnMoreFormats')}
                         <LinkOut size='XS' />
                     </Link>
                 </View>
@@ -169,10 +195,10 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
 
             <ButtonGroup>
                 <Button onPress={dialogState.close} variant='secondary'>
-                    Cancel
+                    {t('common.actions.cancel')}
                 </Button>
                 <Button type='submit' form={FORM_ID} variant='accent' isPending={isPending} isDisabled={isPending}>
-                    Export
+                    {t('common.actions.export')}
                 </Button>
             </ButtonGroup>
         </Dialog>
@@ -182,6 +208,8 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
 export const ExportDatasetConfig = ({
     name = 'dataset',
     datasetId,
+    datasetViewId = null,
+    datasetViewName,
     statistics,
     dialogState,
 }: ExportDatasetConfigProps) => {
@@ -191,6 +219,8 @@ export const ExportDatasetConfig = ({
                 <ExportDatasetDialogContent
                     name={name}
                     datasetId={datasetId}
+                    datasetViewId={datasetViewId}
+                    datasetViewName={datasetViewName}
                     statistics={statistics}
                     dialogState={dialogState}
                 />

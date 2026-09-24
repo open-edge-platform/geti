@@ -1,32 +1,32 @@
 @use '../../../shared/styles/line-clamp' as lineClamp;
 
-.dialog {
-    background-color: var(--spectrum-gray-100);
-    background-image: url('./../../../assets/background.webp');
-    background-blend-mode: luminosity;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+$thumbnail-height: 160px;
+$card-content-height: 68px;
+
+.sidebar {
+    width: var(--spectrum-global-dimension-size-3600);
+    flex-shrink: 0;
+    overflow-y: auto;
+    padding: var(--spectrum-global-dimension-size-300);
 }
 
-.button {
-    path {
-        fill: currentColor;
-    }
+.gridPanel {
+    padding: var(--spectrum-global-dimension-size-600);
+    background-color: var(--spectrum-global-color-gray-50);
 }
 
-.description {
-    display: block;
-    text-align: center;
-    margin: auto;
-    max-width: 50rem;
+.logo {
+    width: var(--spectrum-global-dimension-size-300);
+    height: var(--spectrum-global-dimension-size-300);
+}
+
+.logoText {
     font-size: var(--spectrum-global-dimension-font-size-200);
-    line-height: var(--spectrum-global-dimension-font-size-500);
-    margin-bottom: var(--spectrum-global-dimension-font-size-1000);
 }
 
-.content {
-    padding: var(--spectrum-global-dimension-size-500);
+.projectGrid {
+    align-content: start;
+    overflow-y: auto;
 }
 
 .card {
@@ -36,6 +36,7 @@
     border-radius: var(--spectrum-global-dimension-size-50);
     background-color: var(--spectrum-global-color-gray-50);
     height: 100%;
+    overflow: hidden;
     transition:
         background-color,
         border 0.2s ease-in-out;
@@ -44,6 +45,28 @@
         background-color: var(--spectrum-global-color-gray-100);
         border-color: var(--energy-blue);
     }
+}
+
+.cardWrapper {
+    position: relative;
+    height: calc($thumbnail-height + $card-content-height);
+}
+
+.thumbnailContainer {
+    height: $thumbnail-height;
+    background-color: var(--spectrum-global-color-gray-100);
+}
+
+.cardBadges {
+    position: absolute;
+    left: var(--spectrum-global-dimension-size-100);
+    bottom: var(--spectrum-global-dimension-size-100);
+}
+
+.cardActions {
+    position: absolute;
+    top: calc($thumbnail-height + var(--spectrum-global-dimension-size-125));
+    right: var(--spectrum-global-dimension-size-125);
 }
 
 .thumbnail {
@@ -66,8 +89,13 @@
         background-color: hsl(from var(--selection-dark-blue) h s calc(l + 5));
     }
 
-    h2 {
+    h3 {
         color: var(--energy-blue);
+    }
+
+    // The active card always has a dark background, so metadata needs a light color here.
+    .projectMetadata {
+        color: rgba(255, 255, 255, 0.6);
     }
 }
 
@@ -81,17 +109,10 @@
     @include lineClamp.breakableText;
 }
 
-.labelList {
-    @include lineClamp.clamp(2);
-}
-
-.projectCreationDate {
-    font-size: var(--spectrum-global-dimension-font-size-75);
-}
-
 .projectMetadata {
     line-height: var(--spectrum-global-dimension-font-size-200);
     font-size: var(--spectrum-global-dimension-font-size-50);
+    color: var(--spectrum-global-color-gray-700);
 }
 
 .version {

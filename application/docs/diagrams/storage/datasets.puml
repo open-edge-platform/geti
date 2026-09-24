@@ -47,14 +47,14 @@ class dataset_views << (T,#FFAAAA) >> {
   name : TEXT
 }
 
-class dataset_views_items << (T,#FFAAAA) >> {
+class dataset_view_items << (T,#FFAAAA) >> {
   dataset_view_id : UUID
-  dataset_item_id : UUID
+  media_id : UUID
 }
 
-dataset_views ||---o{ dataset_views_items
+dataset_views ||---o{ dataset_view_items
 
-dataset_views_items }o---|| dataset_items
+dataset_view_items }o---|| media
 
 class dataset_revisions << (T,#FFAAAA) >> {
   project_id : UUID

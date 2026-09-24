@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { i18n } from '@/i18n';
 import { fireEvent, screen } from '@testing-library/react';
 import { getMockedAnnotationLabel, getMockedAnnotationLabelRef } from 'mocks/mock-labels';
 import { render } from 'test-utils/render';
@@ -37,6 +38,25 @@ describe('AnnotationLabels', () => {
         );
 
         expect(screen.getByText('No label')).toBeInTheDocument();
+    });
+
+    it('keeps placeholder ARIA labels in English when its visible text is translated', () => {
+        const original = i18n.t('labels.empty.noLabel');
+        i18n.addResource('en', 'translation', 'labels.empty.noLabel', 'Translated placeholder');
+
+        try {
+            render(
+                <svg>
+                    <AnnotationLabels labels={[]} onRemove={mockOnRemove} />
+                </svg>
+            );
+
+            expect(screen.getByLabelText('label No label')).toHaveTextContent('Translated placeholder');
+            expect(screen.getByLabelText('label No label background')).toBeInTheDocument();
+            expect(screen.queryByLabelText('label Translated placeholder')).not.toBeInTheDocument();
+        } finally {
+            i18n.addResource('en', 'translation', 'labels.empty.noLabel', original);
+        }
     });
 
     it('renders single label with name and color resolved from catalog', () => {
@@ -108,7 +128,8 @@ describe('AnnotationLabels', () => {
         );
 
         const foreignObject = document.querySelector('foreignObject');
-        expect(foreignObject).toHaveAttribute('height', '25');
+        expect(foreignObject).toHaveAttribute('height', '24');
+        expect(foreignObject).toHaveAttribute('y', '-24');
     });
 
     it('prevents event propagation on close button click', () => {

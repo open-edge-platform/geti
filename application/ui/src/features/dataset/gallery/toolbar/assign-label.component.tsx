@@ -3,7 +3,9 @@
 
 import { useState } from 'react';
 
-import { Button } from '@geti-ui/ui';
+import { useTranslation } from '@/i18n';
+import { ActionButton, Tooltip, TooltipTrigger } from '@geti-ui/ui';
+import { Tag } from '@geti-ui/ui/icons';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 
@@ -15,6 +17,7 @@ type AssignLabelProps = {
 };
 
 export const AssignLabel = ({ selectedImagesIds }: AssignLabelProps) => {
+    const { t } = useTranslation();
     const { data: project } = useProject();
     const isClassification = isClassificationTask(project.task.task_type);
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -22,9 +25,12 @@ export const AssignLabel = ({ selectedImagesIds }: AssignLabelProps) => {
     if (isClassification && !isEmpty(selectedImagesIds)) {
         return (
             <>
-                <Button margin={0} variant={'secondary'} onPress={() => setIsVisible(true)}>
-                    Assign label
-                </Button>
+                <TooltipTrigger>
+                    <ActionButton margin={0} isQuiet onPress={() => setIsVisible(true)} aria-label={'Assign label'}>
+                        <Tag />
+                    </ActionButton>
+                    <Tooltip>{t('dataset.bulkLabels.assignLabelTooltip')}</Tooltip>
+                </TooltipTrigger>
                 <BulkSelectedMediaLabelsAssignmentDialog
                     isVisible={isVisible}
                     selectedImagesIds={selectedImagesIds}

@@ -61,6 +61,7 @@ class ModelRevisionRepository(BaseRepository[ModelRevisionDB]):
         training_status: str,
         training_started_at: datetime | None = None,
         training_finished_at: datetime | None = None,
+        training_device: dict | None = None,
     ) -> None:
         """
         Update the training status and training start and finish time of a model revision.
@@ -70,12 +71,15 @@ class ModelRevisionRepository(BaseRepository[ModelRevisionDB]):
             training_status (str): New training status value to set.
             training_started_at (datetime): Date and time when the training was started
             training_finished_at (datetime): Date and time when the training was finished
+            training_device (dict): Serialized `DeviceInfo` describing the hardware used for training
         """
         values: dict[str, Any] = {"training_status": training_status}
         if training_started_at is not None:
             values["training_started_at"] = training_started_at
         if training_finished_at is not None:
             values["training_finished_at"] = training_finished_at
+        if training_device is not None:
+            values["training_device"] = training_device
 
         stmt = (
             update(ModelRevisionDB)

@@ -27,6 +27,7 @@ from app.models.media import (
 from app.models.system import DeviceInfo, DeviceType
 from app.services import DatasetService, LabelService, MediaPredictionService, MediaService, ResourceNotFoundError
 from app.services.inference import InferenceServer
+from app.services.media_numpy_loader import MediaNumpyLoader
 from app.services.media_prediction_service import Frame, LoadedMedia
 
 
@@ -42,6 +43,10 @@ class TestMediaPredictionServiceUnit:
         return MagicMock(spec=MediaService)
 
     @pytest.fixture
+    def fxt_media_numpy_loader(self):
+        return MagicMock(spec=MediaNumpyLoader)
+
+    @pytest.fixture
     def fxt_dataset_service(self):
         return MagicMock(spec=DatasetService)
 
@@ -50,7 +55,9 @@ class TestMediaPredictionServiceUnit:
         return MagicMock(spec=InferenceServer)
 
     @pytest.fixture
-    def fxt_media_prediction_service(self, fxt_label_service, fxt_media_service, fxt_inference_server):
+    def fxt_media_prediction_service(
+        self, fxt_label_service, fxt_media_service, fxt_inference_server, fxt_media_numpy_loader
+    ):
         def _create_media_prediction_service(inference_keyframe_stride: int = 1):
             db_session = MagicMock(spec=Session)
             return MediaPredictionService(
@@ -59,6 +66,7 @@ class TestMediaPredictionServiceUnit:
                 inference_server=fxt_inference_server,
                 inference_model_ttl=10,
                 inference_keyframe_stride=inference_keyframe_stride,
+                media_numpy_loader=fxt_media_numpy_loader,
                 db_session=db_session,
             )
 
@@ -200,7 +208,7 @@ class TestMediaPredictionServiceUnit:
 
         fxt_media_service.get_media_by_ids.assert_called_once_with(project_id=project.id, media_ids=[media_id])
 
-    def test_convert_to_inference_input(self, fxt_media_prediction_service, fxt_media_service):
+    def test_convert_to_inference_input(self, fxt_media_prediction_service, fxt_media_service, fxt_media_numpy_loader):
         image_id = uuid4()
         video_id = uuid4()
         project = MagicMock(spec=Project, id=uuid4())
@@ -228,14 +236,16 @@ class TestMediaPredictionServiceUnit:
         }
 
         media_prediction_service = fxt_media_prediction_service()
-        with patch.object(media_prediction_service, "_load_media_binary") as mock_load_media_binary:
-            mock_load_media_binary.side_effect = [np.random.rand(100, 100, 3), np.random.rand(100, 100, 3)]
-            result_inputs = media_prediction_service._convert_to_inference_input(
-                project=project,
-                loaded_media=loaded_media,
-            )
+        fxt_media_numpy_loader.load_media_binary.side_effect = [
+            np.random.rand(100, 100, 3),
+            np.random.rand(100, 100, 3),
+        ]
+        result_inputs = media_prediction_service._convert_to_inference_input(
+            project=project,
+            loaded_media=loaded_media,
+        )
 
-        mock_load_media_binary.assert_has_calls(
+        fxt_media_numpy_loader.load_media_binary.assert_has_calls(
             [
                 call(project_id=project.id, media=image),
                 call(project_id=project.id, media=video_frame),
@@ -329,9 +339,32 @@ class TestMediaPredictionServiceUnit:
         fxt_inference_server.set_inference_model.assert_called_once_with(
             project_id=project.id, model_id=model_id, device=device, ttl=10, model_variant_id=None
         )
-        fxt_inference_server.infer_batch.assert_called_once_with(labels=labels, inputs=inputs)
+        fxt_inference_server.infer_batch.assert_called_once_with(
+            labels=labels, inputs=inputs, confidence_threshold=None
+        )
         mock_convert_result.assert_called_once_with(loaded_media=loaded_media, inference_result=infer_batch_result)
         assert result == batch_inference_result
+
+    @pytest.mark.parametrize("confidence_threshold", [0.8, None], ids=["with_threshold", "without_threshold"])
+    def test_predict_media_confidence_threshold(
+        self, confidence_threshold, fxt_media_prediction_service, fxt_label_service, fxt_inference_server
+    ):
+        """The requested threshold is forwarded to the inference server together with the batch."""
+        project = MagicMock(spec=Project, id=uuid4(), task=MagicMock(spec=Task))
+        request = MediaListPredictionRequest(
+            model_id=uuid4(), media=[], device="AUTO", confidence_threshold=confidence_threshold
+        )
+        device = DeviceInfo(type=DeviceType.CPU, name="CPU", memory=None, index=None)
+
+        media_prediction_service = fxt_media_prediction_service()
+        with (
+            patch.object(media_prediction_service, "_load_media", return_value=LoadedMedia([], {})),
+            patch.object(media_prediction_service, "_convert_to_inference_input", return_value=[]),
+            patch.object(media_prediction_service, "_convert_result"),
+        ):
+            media_prediction_service.predict_media(project=project, request=request, device=device)
+
+        assert fxt_inference_server.infer_batch.call_args.kwargs["confidence_threshold"] == confidence_threshold
 
     @pytest.mark.parametrize(
         "frame_index, keyframe_indexes, expected",

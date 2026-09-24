@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, Dispatch, ReactNode, SetStateAction, use, useMemo, useState } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, use, useState } from 'react';
 
 import type {
     DatasetRevision,
@@ -10,22 +10,32 @@ import type {
     TrainingConfiguration,
     TrainingDevice,
 } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
 
 import { useGetTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
 import { useGetSuccessfulModels } from '../hooks/api/use-get-models.hook';
 import { useGetTrainingDevices } from './api/use-get-training-devices';
+import { useTimmModelSelection, type TimmModelSelection } from './hooks/use-timm-model-selection';
 import { useTrainingConfiguration } from './hooks/use-training-configuration';
 import { getDefaultTrainingDevice } from './select-training-device/utils';
+import { isTimmModelArchitecture } from './timm-model-configuration/utils';
 
 type DatasetRevisionWithValue = Pick<DatasetRevision, 'id' | 'name'> & { value: string | null };
 type ModelRevisionWithValue = Pick<Model, 'id' | 'name' | 'architecture'> & { value: string | null };
 
-export type TrainModelContextProps = {
+export type TrainModelContextProps = TimmModelSelection & {
     modelArchitectures: ModelArchitectureWithPerformanceCategory[];
 
     selectedModelArchitectureId: string | null;
     onSelectModelArchitectureId: (id: string | null) => void;
+
+    /**
+     * Architecture id that training is actually started with. Equal to the selected
+     * architecture id, except for the synthetic timm card, where it resolves to the
+     * concrete timm backbone id (or `null` while no backbone is resolved yet).
+     */
+    resolvedModelArchitectureId: string | null;
 
     trainingDevices: TrainingDevice[];
     selectedTrainingDevice: string | null;
@@ -57,11 +67,16 @@ type TrainModelProviderProps = {
 };
 
 const useDatasetRevisions = () => {
+    const { t } = useTranslation();
     const { data: datasetRevisions } = useGetDatasetRevisions();
 
     return {
         datasetRevisions: [
-            { id: 'use-current-dataset-revision', name: 'Use current dataset', value: null },
+            {
+                id: 'use-current-dataset-revision',
+                name: t('models.training.setup.selectDataset.useCurrentDataset'),
+                value: null,
+            },
             ...(datasetRevisions?.map(({ id, name }) => ({ id, name, value: String(id) })) ?? []),
         ],
     };
@@ -69,11 +84,17 @@ const useDatasetRevisions = () => {
 
 const DEFAULT_PRE_TRAINED_WEIGHTS = 'default-pre-trained-weights';
 const useModelRevisions = () => {
+    const { t } = useTranslation();
     const { data: models } = useGetSuccessfulModels();
 
     return {
         modelRevisions: [
-            { id: DEFAULT_PRE_TRAINED_WEIGHTS, name: 'Default pre-trained weights', architecture: '', value: null },
+            {
+                id: DEFAULT_PRE_TRAINED_WEIGHTS,
+                name: t('models.training.setup.selectModel.defaultPretrainedWeights'),
+                architecture: '',
+                value: null,
+            },
             ...(models?.map(({ id, name, architecture }) => ({ id, name, architecture, value: String(id) })) ?? []),
         ],
     };
@@ -118,6 +139,13 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
     const [selectedModelArchitectureId, setSelectedModelArchitectureId] = useState<string | null>(null);
 
+    const isTimmArchitectureSelected = isTimmModelArchitecture(selectedModelArchitectureId);
+    const timmModelSelection = useTimmModelSelection(isTimmArchitectureSelected);
+
+    const resolvedModelArchitectureId = isTimmArchitectureSelected
+        ? (timmModelSelection.timmModelArchitecture?.id ?? null)
+        : selectedModelArchitectureId;
+
     const [selectedTrainingDevice, setSelectedTrainingDevice] = useState<string | null>(() => {
         const defaultDevice = getDefaultTrainingDevice(trainingDevices);
         return defaultDevice ? createTrainingDeviceKey(defaultDevice) : null;
@@ -125,20 +153,23 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
     const [selectedDatasetRevisionId, setSelectedDatasetRevisionId] = useState<string | null>(
         datasetRevisions?.at(0)?.id ?? null
     );
-    const [selectedModelRevisionId, setSelectedModelRevisionId] = useState<string | null>(() =>
+    const [modelRevisionId, setModelRevisionId] = useState<string | null>(() =>
         getDefaultModelRevisionIdForArchitecture(allModelRevisions, selectedModelArchitectureId)
     );
 
     const [isAdvancedSettingsMode, setIsAdvancedSettingsMode] = useState<boolean>(false);
 
-    const modelRevisions = useMemo(() => {
-        return getModelRevisionsForArchitecture(allModelRevisions, selectedModelArchitectureId);
-    }, [allModelRevisions, selectedModelArchitectureId]);
+    const modelRevisions = getModelRevisionsForArchitecture(allModelRevisions, resolvedModelArchitectureId);
+
+    // The resolved architecture also changes while the timm card stays selected, which can invalidate the selection
+    const selectedModelRevisionId = modelRevisions.some(({ id }) => id === modelRevisionId)
+        ? modelRevisionId
+        : getDefaultModelRevisionIdForArchitecture(allModelRevisions, resolvedModelArchitectureId);
 
     const selectedModelRevision = modelRevisions.find((modelRevision) => modelRevision.id === selectedModelRevisionId);
 
     const [trainingConfiguration, setTrainingConfiguration, defaultTrainingConfiguration] = useTrainingConfiguration({
-        modelArchitectureId: selectedModelArchitectureId,
+        modelArchitectureId: resolvedModelArchitectureId,
         modelRevisionId: selectedModelRevision?.value ?? null,
     });
 
@@ -146,16 +177,19 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
     const onSelectModelArchitectureId = (modelArchitectureId: string | null) => {
         setSelectedModelArchitectureId(modelArchitectureId);
-        setSelectedModelRevisionId(getDefaultModelRevisionIdForArchitecture(allModelRevisions, modelArchitectureId));
+        setModelRevisionId(getDefaultModelRevisionIdForArchitecture(allModelRevisions, modelArchitectureId));
     };
 
     return (
         <TrainModelContext
             value={{
+                ...timmModelSelection,
+
                 modelArchitectures,
 
                 selectedModelArchitectureId,
                 onSelectModelArchitectureId,
+                resolvedModelArchitectureId,
 
                 trainingDevices,
                 selectedTrainingDevice,
@@ -167,7 +201,7 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
                 modelRevisions,
                 selectedModelRevisionId,
-                onSelectModelRevisionId: setSelectedModelRevisionId,
+                onSelectModelRevisionId: setModelRevisionId,
 
                 isAdvancedSettingsMode,
                 onToggleAdvancedSettingsMode: setIsAdvancedSettingsMode,

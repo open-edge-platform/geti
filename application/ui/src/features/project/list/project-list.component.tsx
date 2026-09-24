@@ -1,14 +1,20 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useState } from 'react';
 
-import { Content, Divider, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
+import type { TaskType } from '@/api/types';
+import { LanguagePicker } from '@/components/language-picker/language-picker.component';
+import { useTranslation } from '@/i18n';
+import { Content, Divider, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
 import { partition } from 'lodash-es';
+import { Link } from 'react-router';
 
 import { version } from '../../../../package.json';
-import { isNonEmptyArray, pluralize } from '../../../shared/util';
+import getiLogo from '../../../assets/icons/geti-logo.webp';
+import { paths } from '../../../constants/paths';
+import { isNonEmptyArray } from '../../../shared/util';
 import { EmptyProjectList } from './empty-project-list/empty-project-list.component';
 import { NoMatchingProjects } from './filter-projects/no-matching-projects.component';
 import { ProjectFilters } from './filter-projects/project-filters.component';
@@ -19,10 +25,56 @@ import { ProjectCard } from './project-card.component';
 import { SORT_BY_HANDLERS, SortProjects } from './sort-projects/sort-projects.component';
 import { SortBy } from './sort-projects/utils';
 
-import backgroundStyles from '../project-background.module.scss';
 import classes from './project-list.module.scss';
 
+const CARD_WIDTH = 280;
+
+const ProjectSidebar = ({
+    shouldShowFilters,
+    searchName,
+    setSearchName,
+    selectedTaskTypes,
+    setSelectedTaskTypes,
+}: {
+    shouldShowFilters: boolean;
+    searchName: string;
+    setSearchName: (value: string) => void;
+    selectedTaskTypes: TaskType[];
+    setSelectedTaskTypes: (taskTypes: TaskType[]) => void;
+}) => {
+    const { t } = useTranslation();
+
+    return (
+        <Flex direction={'column'} gap={'size-300'} UNSAFE_className={classes.sidebar}>
+            <Link to={paths.project.index({})} viewTransition>
+                <Flex alignItems={'center'} gap={'size-50'}>
+                    <img src={getiLogo} alt={t('navigation.logoAlt')} className={classes.logo} />
+                    <Text UNSAFE_className={classes.logoText}>Geti™</Text>
+                </Flex>
+            </Link>
+
+            <Divider size={'S'} />
+
+            <NewProjectCard />
+
+            {shouldShowFilters && (
+                <>
+                    <Divider size={'S'} />
+
+                    <ProjectFilters
+                        searchName={searchName}
+                        onSearchChange={setSearchName}
+                        selectedTaskTypes={selectedTaskTypes}
+                        onSelectedTaskTypesChange={setSelectedTaskTypes}
+                    />
+                </>
+            )}
+        </Flex>
+    );
+};
+
 const ProjectGrid = () => {
+    const { t } = useTranslation();
     const projectsQuery = useProjects();
     const projects = projectsQuery.data;
     const [sortBy, setSortBy] = useState<SortBy>('createdAt-descending');
@@ -35,123 +87,88 @@ const ProjectGrid = () => {
     const { searchName, setSearchName, selectedTaskTypes, setSelectedTaskTypes, filteredProjects, isFiltering } =
         useProjectFilters(projectsWithoutActivePipeline);
 
-    const sortedProjects = useMemo(() => {
-        return SORT_BY_HANDLERS[sortBy](filteredProjects);
-    }, [filteredProjects, sortBy]);
+    const sortedProjects = SORT_BY_HANDLERS[sortBy](filteredProjects);
 
-    const projectNames = projectsQuery.data.map((project) => project.name);
+    const projectNames = projects.map((project) => project.name);
 
     if (!hasProjects) {
         return <EmptyProjectList />;
     }
 
-    const matchCountLabel = `${sortedProjects.length} of ${projectsWithoutActivePipeline.length} ${pluralize(
-        projectsWithoutActivePipeline.length,
-        'project',
-        'projects'
-    )}`;
-
-    const totalCountLabel = `${projectsWithoutActivePipeline.length} ${pluralize(
-        projectsWithoutActivePipeline.length,
-        'project',
-        'projects'
-    )}`;
-
-    const columns = activeProject === undefined ? ['1fr'] : ['1fr', '1fr'];
+    const totalCount = projectsWithoutActivePipeline.length;
+    const countLabel = isFiltering
+        ? t('project.list.countFiltered', { count: totalCount, filtered: sortedProjects.length })
+        : t('project.list.count', { count: totalCount });
+    const visibleCardsCount = (activeProject === undefined ? 0 : 1) + sortedProjects.length;
 
     return (
-        <Flex direction={'column'} gap={'size-300'} height={'100%'}>
-            <Divider size={'S'} />
-            <Grid columns={columns} gap={'size-300'} rows={['size-2000']}>
-                <NewProjectCard />
+        <Flex height={'100%'} gap={'size-300'}>
+            <ProjectSidebar
+                shouldShowFilters={shouldShowFilters}
+                searchName={searchName}
+                setSearchName={setSearchName}
+                selectedTaskTypes={selectedTaskTypes}
+                setSelectedTaskTypes={setSelectedTaskTypes}
+            />
 
-                {activeProject !== undefined && (
-                    <ProjectCard
-                        item={activeProject}
-                        prioritizeImage
-                        projectNames={projectNames.filter((projectName) => projectName !== activeProject.name)}
-                    />
-                )}
-            </Grid>
-            {shouldShowFilters && (
-                <>
-                    <Divider size={'S'} />
+            <Flex direction={'column'} gap={'size-300'} flex={1} minWidth={0} UNSAFE_className={classes.gridPanel}>
+                <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'} gap={'size-300'}>
+                    {shouldShowFilters && <SortProjects sortBy={sortBy} onSort={setSortBy} />}
 
-                    <Flex width={'100%'} gap={'size-200'}>
-                        <SortProjects sortBy={sortBy} onSort={setSortBy} />
+                    {shouldShowFilters && (
+                        <Text marginStart={'auto'} UNSAFE_className={classes.projectMetadata}>
+                            {countLabel}
+                        </Text>
+                    )}
+                </Flex>
 
-                        <Divider size={'S'} orientation={'vertical'} />
+                {isFiltering && sortedProjects.length === 0 && <NoMatchingProjects />}
 
-                        <Flex flex={1} alignItems={'center'} gap={'size-200'}>
-                            <Text UNSAFE_className={classes.projectMetadata}>
-                                {isFiltering ? matchCountLabel : totalCountLabel}
-                            </Text>
-
-                            <ProjectFilters
-                                searchName={searchName}
-                                onSearchChange={setSearchName}
-                                selectedTaskTypes={selectedTaskTypes}
-                                onSelectedTaskTypesChange={setSelectedTaskTypes}
+                {visibleCardsCount > 0 && (
+                    <Grid
+                        flex={1}
+                        gap={'size-200'}
+                        autoRows={'min-content'}
+                        columns={`repeat(auto-fill, minmax(${CARD_WIDTH}px, 1fr))`}
+                        UNSAFE_className={classes.projectGrid}
+                    >
+                        {activeProject !== undefined && (
+                            <ProjectCard
+                                item={activeProject}
+                                prioritizeImage
+                                projectNames={projectNames.filter((projectName) => projectName !== activeProject.name)}
                             />
-                        </Flex>
-                    </Flex>
-                </>
-            )}
-            {sortedProjects.length === 0 ? (
-                isFiltering ? (
-                    <NoMatchingProjects />
-                ) : null
-            ) : (
-                <Grid
-                    flex={1}
-                    gap={'size-300'}
-                    autoRows={'size-2000'}
-                    justifyContent={'center'}
-                    UNSAFE_style={{ overflowY: 'auto' }}
-                    columns={['1fr', '1fr']}
-                >
-                    {sortedProjects.map((item, index) => (
-                        <ProjectCard
-                            key={item.id}
-                            item={item}
-                            prioritizeImage={index === 0}
-                            projectNames={projectNames.filter((projectName) => projectName !== item.name)}
-                        />
-                    ))}
-                </Grid>
-            )}
+                        )}
+                        {sortedProjects.map((item, index) => (
+                            <ProjectCard
+                                key={item.id}
+                                item={item}
+                                prioritizeImage={index === 0}
+                                projectNames={projectNames.filter((projectName) => projectName !== item.name)}
+                            />
+                        ))}
+                    </Grid>
+                )}
+            </Flex>
         </Flex>
     );
 };
 
 const AppInfo = () => {
-    return <Text UNSAFE_className={classes.version}>v{version}</Text>;
+    return (
+        <Flex alignItems={'center'} gap={'size-200'}>
+            <Text UNSAFE_className={classes.version}>v{version}</Text>
+            <LanguagePicker />
+        </Flex>
+    );
 };
 
 export const ProjectList = () => {
     return (
-        <View UNSAFE_className={backgroundStyles.projectBackground} height={'100%'} position={'relative'}>
-            <Content height={'100%'} maxWidth={'1052px'} margin={'0 auto'} UNSAFE_className={classes.content}>
+        <View height={'100%'} position={'relative'}>
+            <Content height={'100%'} margin={'0'}>
                 <Flex direction={'column'} height={'100%'}>
                     <ImportJobsList />
-
-                    <Heading
-                        level={1}
-                        marginBottom={'size-250'}
-                        UNSAFE_style={{
-                            textAlign: 'center',
-                            fontSize: 'var(--spectrum-global-dimension-font-size-700)',
-                        }}
-                    >
-                        Projects
-                    </Heading>
-
-                    <Text UNSAFE_className={classes.description}>
-                        Your computer vision journey starts here.
-                        <br />
-                        Create projects by selecting a computer vision task, annotate your data, train models, and run
-                        inference.
-                    </Text>
 
                     <View flex={1} UNSAFE_style={{ overflow: 'auto' }}>
                         <Suspense fallback={<Loading size='M' mode='inline' />}>
@@ -160,7 +177,7 @@ export const ProjectList = () => {
                     </View>
                 </Flex>
 
-                <View bottom={'size-150'} left={'size-150'} position={'absolute'}>
+                <View bottom={'size-200'} left={'size-300'} position={'absolute'}>
                     <AppInfo />
                 </View>
             </Content>

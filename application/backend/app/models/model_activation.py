@@ -16,6 +16,14 @@ class ModelActivationState(BaseModel):
     )
     available_models: list[UUID] = Field(..., description="List of all available model IDs that can be activated")
     device: DeviceInfo = Field(..., description="Device information for inference")
+    confidence_threshold: float | None = Field(
+        default=None, description="Confidence threshold to apply to the model, or None to keep the model's own value"
+    )
+    label_colors: dict[str, str] = Field(
+        default_factory=dict,
+        description="Mapping of project label name to its hex colour, used to render predictions "
+        "with the colours defined in the project",
+    )
 
     @field_validator("active_model_id")
     @classmethod

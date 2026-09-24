@@ -44,6 +44,7 @@ if TYPE_CHECKING:
     from torch.utils.data import DataLoader
     from torchmetrics import Metric, MetricCollection
     from ultralytics import YOLO
+    from ultralytics.engine.results import Results
 
     from getitune.types import PathLike
     from getitune.types.label import LabelInfo
@@ -69,6 +70,8 @@ class UltralyticsEngine(Engine):
 
     _EXPORTED_MODEL_BASE_NAME: ClassVar[str] = "exported_model"
     _LAST_TRAIN_CHECKPOINT_FILE: ClassVar[str] = ".last_train_checkpoint"
+    backend_name: ClassVar[str] = "ultralytics"
+    model_base_class: ClassVar[type] = UltralyticsModel
 
     def __init__(
         self,
@@ -332,7 +335,7 @@ class UltralyticsEngine(Engine):
 
         self._model.ensure_predict_ready()
 
-        raw_results = yolo.predict(**predict_args)  # pyrefly: ignore[bad-argument-type]
+        raw_results = self._run_predict(yolo, **predict_args)
 
         return self._convert_predictions(raw_results)  # pyrefly: ignore[bad-return]
 
@@ -341,6 +344,7 @@ class UltralyticsEngine(Engine):
         checkpoint: PathLike | None = None,
         export_format: ExportFormat = ExportFormat.OPENVINO,
         export_precision: Precision = Precision.FP32,
+        export_nms: bool = False,
         **kwargs,
     ) -> Path:
         """Export the model to OpenVINO IR or ONNX.
@@ -354,6 +358,8 @@ class UltralyticsEngine(Engine):
                 weights from this file before exporting.
             export_format: Target format.
             export_precision: Precision (FP32 or FP16).
+            export_nms: Whether to include NMS in the exported model graph.
+                Defaults to False.
             **kwargs: Extra arguments (reserved for future use).
 
         Returns:
@@ -375,13 +381,18 @@ class UltralyticsEngine(Engine):
             f"checkpoint={checkpoint or self._last_train_checkpoint or 'current weights'}"
         )
 
-        return self._model.export(
-            output_dir=self._work_dir,
-            base_name=self._EXPORTED_MODEL_BASE_NAME,
-            export_format=export_format,
-            precision=export_precision,
-            export_args=self._export_args,
-        )
+        previous_export_nms = self._model.export_nms
+        self._model.export_nms = export_nms
+        try:
+            return self._model.export(
+                output_dir=self._work_dir,
+                base_name=self._EXPORTED_MODEL_BASE_NAME,
+                export_format=export_format,
+                precision=export_precision,
+                export_args=self._export_args,
+            )
+        finally:
+            self._model.export_nms = previous_export_nms
 
     @staticmethod
     def is_supported(model: MODEL, data: DATA) -> bool:
@@ -575,7 +586,8 @@ class UltralyticsEngine(Engine):
                 raise TypeError(msg)
 
             imgs = batch.images.to(device) if isinstance(batch.images, torch.Tensor) else batch.images
-            raw_results = yolo.predict(
+            raw_results = self._run_predict(
+                yolo,
                 source=imgs,
                 device=device,
                 imgsz=imgsz,
@@ -674,7 +686,8 @@ class UltralyticsEngine(Engine):
                 raise TypeError(msg)
 
             imgs = batch.images.to(device) if isinstance(batch.images, torch.Tensor) else batch.images
-            raw_results = yolo.predict(
+            raw_results = self._run_predict(
+                yolo,
                 source=imgs,
                 device=device,
                 imgsz=imgsz,
@@ -785,7 +798,8 @@ class UltralyticsEngine(Engine):
 
         for batch in dataloader:
             imgs = batch.images.to(device) if isinstance(batch.images, torch.Tensor) else batch.images
-            raw_results = yolo.predict(
+            raw_results = self._run_predict(
+                yolo,
                 source=imgs,
                 device=device,
                 imgsz=imgsz,
@@ -849,7 +863,8 @@ class UltralyticsEngine(Engine):
                 raise TypeError(msg)
 
             imgs = batch.images.to(device)
-            raw_results = yolo.predict(
+            raw_results = self._run_predict(
+                yolo,
                 source=imgs,
                 device=device,
                 imgsz=self._model.imgsz,
@@ -1158,6 +1173,17 @@ class UltralyticsEngine(Engine):
         for name, value in results.items():
             _add(f"test/{name}", value)
         return formatted
+
+    def _run_predict(self, yolo: YOLO, **predict_args: Any) -> list[Results]:  # noqa: ANN401
+        """Run ``YOLO.predict`` and normalize upstream's union return to a plain list.
+
+        Upstream declares ``Iterator[Results | Tensor] | list[Results] | list[Tensor]``:
+        the iterator variant requires ``stream=True`` and the tensor variant only
+        occurs with ``embed=True``. getitune uses neither, so filtering tensors
+        leaves exactly the ``Results`` items.
+        """
+        raw_results = yolo.predict(**predict_args)  # pyrefly: ignore[bad-argument-type]
+        return [result for result in raw_results if not isinstance(result, torch.Tensor)]
 
     def _convert_predictions(
         self,

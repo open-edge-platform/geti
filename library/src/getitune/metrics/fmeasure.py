@@ -663,6 +663,7 @@ class FMeasure(Metric):
         self._f_measure_per_confidence: dict | None = None
         self._f_measure_per_nms: dict | None = None
         self._best_confidence_threshold: float | None = None
+        self._current_confidence_threshold: float | None = None
         self._best_nms_threshold: float | None = None
         self._f_measure = float("-inf")
 
@@ -676,6 +677,7 @@ class FMeasure(Metric):
         super().reset()
         self.preds: list[list[tuple]] = []
         self.targets: list[list[tuple]] = []
+        self._current_confidence_threshold = None
 
     def update(self, preds: list[dict[str, Tensor]], target: list[dict[str, Tensor]]) -> None:
         """Update total predictions and targets from given batch predicitons and targets."""
@@ -738,6 +740,13 @@ class FMeasure(Metric):
             computed_f_measure = result.best_f_measure
             best_confidence_threshold = result.per_confidence.best_threshold
 
+        # Keep threshold selected for this validation pass separate from the
+        # historical threshold that produced the best F1 across passes. A
+        # checkpoint may be selected by mAP while F1 peaked in another epoch;
+        # saving the current value keeps checkpoint weights and threshold
+        # aligned.
+        self._current_confidence_threshold = float(best_confidence_threshold)
+
         # TODO(jaegukhyun): There was no reset() function in this metric
         # There are some variables dependent on the best F1 metric, e.g., best_confidence_threshold
         # Now we added reset() function and revise some mechanism about it. However,
@@ -768,7 +777,7 @@ class FMeasure(Metric):
         return self._f_measure_per_label
 
     @property
-    def f_measure_per_confidence(self) -> None | dict:
+    def f_measure_per_confidence(self) -> dict | None:
         """Returns the curve for f-measure per confidence as dictionary if exists."""
         return self._f_measure_per_confidence
 
@@ -788,12 +797,20 @@ class FMeasure(Metric):
         return self._best_confidence_threshold
 
     @property
-    def f_measure_per_nms(self) -> None | dict:
+    def current_confidence_threshold(self) -> float:
+        """Return threshold selected during most recent ``compute`` call."""
+        if self._current_confidence_threshold is None:
+            msg = "Cannot obtain current_confidence_threshold before metric computation."
+            raise RuntimeError(msg)
+        return self._current_confidence_threshold
+
+    @property
+    def f_measure_per_nms(self) -> dict | None:
         """Returns the curve for f-measure per nms threshold as CurveMetric if exists."""
         return self._f_measure_per_nms
 
     @property
-    def best_nms_threshold(self) -> None | float:
+    def best_nms_threshold(self) -> float | None:
         """Returns the best NMS threshold as ScoreMetric if exists."""
         return self._best_nms_threshold
 

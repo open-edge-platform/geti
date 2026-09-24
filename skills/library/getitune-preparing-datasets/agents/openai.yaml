@@ -1,4 +1,0 @@
-interface:
-  display_name: "Prepare Datasets (getitune)"
-  short_description: "Lay out and point datasets at getitune (COCO/YOLO/VOC/native)"
-  default_prompt: "Use $getitune-preparing-datasets to prepare or debug a dataset for getitune."

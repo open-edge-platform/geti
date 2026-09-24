@@ -15,3 +15,7 @@
     border-color: var(--background-inverse);
     color: color-mix(in srgb, var(--spectrum-global-color-gray-900) 40%, transparent);
 }
+
+.datasetViewName {
+    line-height: 1;
+}

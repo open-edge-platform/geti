@@ -4,13 +4,14 @@
 import { KeyboardEvent, useState } from 'react';
 
 import type { Label } from '@/api/types';
+import { HotkeyField } from '@/components/label-fields/hotkey-field.component';
+import { LabelColorPicker } from '@/components/label-fields/label-color-picker.component';
+import { SilentCheckbox } from '@/components/label-fields/silent-checkbox.component';
+import { useTranslation } from '@/i18n';
 import { ActionButton, Flex, Grid, TextField, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Delete, Pin, Unpin } from '@geti-ui/ui/icons';
+import { useDebounceCallback, useEventCallback } from 'usehooks-ts';
 
-import { HotkeyField } from '../../../../components/label-fields/hotkey-field.component';
-import { LabelColorPicker } from '../../../../components/label-fields/label-color-picker.component';
-import { SilentCheckbox } from '../../../../components/label-fields/silent-checkbox.component';
-import { useDebounce } from '../../../../hooks/use-debounce.hook';
 import { isNonEmptyString } from '../../../../shared/util';
 
 import classes from './label-row.module.scss';
@@ -44,6 +45,7 @@ export const LabelRow = ({
     validateName,
     validateHotkey,
 }: LabelRowProps) => {
+    const { t } = useTranslation();
     const [name, setName] = useState(label.name);
     const [color, setColor] = useState(label.color);
     const [hotkey, setHotkey] = useState(label.hotkey ?? '');
@@ -70,13 +72,12 @@ export const LabelRow = ({
         onUpdate(label.id, { name: name.trim(), color, hotkey: trimmedHotkey });
     };
 
-    const debouncedUpdate = useDebounce(
-        (newColor: string, currentName: string) => {
-            onUpdate(label.id, { name: currentName, color: newColor, hotkey: trimmedHotkey });
-        },
-        COLOR_DEBOUNCE_MS,
-        [onUpdate, label.id, hotkey]
-    );
+    // useEventCallback keeps the identity stable so the debounce survives the re-render each colour change triggers
+    const updateColor = useEventCallback((newColor: string, currentName: string) => {
+        onUpdate(label.id, { name: currentName, color: newColor, hotkey: trimmedHotkey });
+    });
+
+    const debouncedUpdate = useDebounceCallback(updateColor, COLOR_DEBOUNCE_MS);
 
     const handleColorChange = (newColor: string) => {
         setColor(newColor);
@@ -100,7 +101,7 @@ export const LabelRow = ({
                     width={'100%'}
                     value={name}
                     aria-label={'Label name'}
-                    placeholder={'Label name'}
+                    placeholder={t('labels.editor.namePlaceholder')}
                     onChange={setName}
                     onBlur={handleUpdateName}
                     onKeyDown={onEnter(handleUpdateName)}
@@ -127,7 +128,7 @@ export const LabelRow = ({
                 >
                     {isPinned ? <Pin /> : <Unpin />}
                 </ActionButton>
-                <Tooltip>{isPinned ? 'Unpin label' : 'Pin label'}</Tooltip>
+                <Tooltip>{isPinned ? t('labels.editor.unpin') : t('labels.editor.pin')}</Tooltip>
             </TooltipTrigger>
 
             <ActionButton

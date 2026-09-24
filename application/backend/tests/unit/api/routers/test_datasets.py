@@ -8,13 +8,13 @@ from zoneinfo import ZoneInfo
 import pytest
 from fastapi import status
 
-from app.api.dependencies import get_dataset_service
+from app.api.dependencies import get_dataset_service, get_dataset_view_service
 from app.api.schemas.dataset_item import DatasetItemSubset, DatasetItemView
 from app.models import DatasetItem, DatasetItemAnnotationStatus
 from app.models.dataset import DatasetStatistics
 from app.models.dataset_item import DatasetItemSortBy
 from app.models.media import SortDirection
-from app.services import DatasetService, ResourceNotFoundError, ResourceType
+from app.services import DatasetService, DatasetViewService, ResourceNotFoundError, ResourceType
 from app.services.dataset_service import DatasetItemFilters
 
 
@@ -36,6 +36,13 @@ def fxt_dataset_service(fxt_app) -> MagicMock:
     dataset_service = MagicMock(spec=DatasetService)
     fxt_app.dependency_overrides[get_dataset_service] = lambda: dataset_service
     return dataset_service
+
+
+@pytest.fixture
+def fxt_dataset_view_service(fxt_app) -> MagicMock:
+    dataset_view_service = MagicMock(spec=DatasetViewService)
+    fxt_app.dependency_overrides[get_dataset_view_service] = lambda: dataset_view_service
+    return dataset_view_service
 
 
 def test_convert_dataset_item_to_view(fxt_dataset_item) -> None:
@@ -429,3 +436,73 @@ class TestDatasetItemEndpoints:
             },
         }
         fxt_dataset_service.get_dataset_statistics.assert_called_once_with(project_id=fxt_get_project.id)
+
+    def test_list_dataset_items_with_dataset_view_id(
+        self, fxt_get_project, fxt_dataset_item, fxt_dataset_service, fxt_dataset_view_service, fxt_client
+    ):
+        """When dataset_view_id is provided, the view-scoped service is used instead of the main dataset service."""
+        dataset_view_id = uuid4()
+        fxt_dataset_view_service.count_dataset_view_items.return_value = 1
+        fxt_dataset_view_service.list_dataset_view_items.return_value = [fxt_dataset_item]
+
+        response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/items?dataset_view_id={dataset_view_id}")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_dataset_view_service.count_dataset_view_items.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            dataset_view_id=dataset_view_id,
+            filters=DatasetItemFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=None,
+            ),
+        )
+        fxt_dataset_view_service.list_dataset_view_items.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            dataset_view_id=dataset_view_id,
+            filters=DatasetItemFilters(
+                limit=10,
+                offset=0,
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=None,
+            ),
+        )
+        fxt_dataset_service.count_dataset_items.assert_not_called()
+        fxt_dataset_service.list_dataset_items.assert_not_called()
+
+    def test_get_dataset_statistics_with_dataset_view_id(
+        self, fxt_get_project, fxt_dataset_service, fxt_dataset_view_service, fxt_client
+    ):
+        """When dataset_view_id is provided, statistics are fetched from the view-scoped service."""
+        dataset_view_id = uuid4()
+        statistics_dict = {
+            "images": 1,
+            "videos": 0,
+            "video_frames": 0,
+            "annotated_images": 0,
+            "annotated_videos": 0,
+            "annotated_video_frames": 0,
+            "instances": 0,
+            "instances_per_label": [],
+        }
+        fxt_dataset_view_service.get_dataset_view_statistics.return_value = DatasetStatistics.model_validate(
+            statistics_dict
+        )
+
+        response = fxt_client.get(
+            f"/api/projects/{fxt_get_project.id}/dataset/statistics?dataset_view_id={dataset_view_id}"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()["media_counts"]["images"] == 1
+        fxt_dataset_view_service.get_dataset_view_statistics.assert_called_once_with(
+            project_id=fxt_get_project.id, dataset_view_id=dataset_view_id
+        )
+        fxt_dataset_service.get_dataset_statistics.assert_not_called()

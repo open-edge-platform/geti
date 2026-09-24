@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AnnotationDTO } from '@/api/types';
-import { v4 as uuid } from 'uuid';
 
 import type { Annotation, AnnotationLabelRef } from '../types';
 
@@ -20,7 +19,7 @@ export const mapServerAnnotationsToLocal = (serverAnnotations: AnnotationDTO[]):
 
         return {
             shape: annotation.shape,
-            id: uuid(),
+            id: crypto.randomUUID(),
             labels,
         };
     });

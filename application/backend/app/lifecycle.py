@@ -279,8 +279,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
     source_changed_condition: Condition = mp_ctx.Condition()
     # Event to signal that the model has to be reloaded
     model_reload_event = mp_ctx.Event()
+    # Event to signal that the inference parameters of the loaded model changed (no reload needed)
+    inference_params_event = mp_ctx.Event()
 
-    event_bus = EventBus(source_changed_condition=source_changed_condition, model_reload_event=model_reload_event)
+    event_bus = EventBus(
+        source_changed_condition=source_changed_condition,
+        model_reload_event=model_reload_event,
+        inference_params_event=inference_params_event,
+    )
     app.state.event_bus = event_bus
 
     cache_config = CacheConfig(

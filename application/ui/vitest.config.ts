@@ -3,7 +3,6 @@
 
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
-import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vitest/config';
 
 const CI = !!process.env.CI;
@@ -11,7 +10,6 @@ const CI = !!process.env.CI;
 export default defineConfig({
     envPrefix: ['PUBLIC_'],
     plugins: [
-        tsconfigPaths(),
         react(),
         svgr({
             svgrOptions: {
@@ -21,6 +19,9 @@ export default defineConfig({
             include: '**/*.svg',
         }),
     ],
+    resolve: {
+        tsconfigPaths: true,
+    },
     test: {
         environment: 'jsdom',
 

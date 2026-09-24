@@ -94,8 +94,8 @@ test.describe('Export dataset', () => {
 
         await page.goto(`projects/${mockedProject.id}/dataset`);
 
-        await page.getByRole('button', { name: 'import-export dataset' }).click();
-        await page.getByText('Export dataset').click();
+        await page.getByRole('button', { name: 'import export dataset' }).click();
+        await page.getByRole('menuitem', { name: 'Export dataset', exact: true }).click();
 
         const dialog = page.getByRole('dialog');
         const projectLabels = mockedProject.task.labels ?? [];
@@ -162,8 +162,8 @@ test.describe('Export dataset', () => {
 
         await page.goto(`projects/${mockedProject.id}/dataset`);
 
-        await page.getByRole('button', { name: 'import-export dataset' }).click();
-        await page.getByText('Export dataset').click();
+        await page.getByRole('button', { name: 'import export dataset' }).click();
+        await page.getByRole('menuitem', { name: 'Export dataset', exact: true }).click();
 
         const dialog = page.getByRole('dialog');
 

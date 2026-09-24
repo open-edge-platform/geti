@@ -2,45 +2,50 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { PipelineComponentsHealth, PipelineStatus } from '@/api/types';
+import type { TranslateFn } from '@/i18n';
 import type { StatusLightProps } from '@geti-ui/ui';
 import { capitalize } from 'lodash-es';
 
-export type StatusVariant = StatusLightProps['variant'];
+type StatusVariant = StatusLightProps['variant'];
 
-export type ComponentStatusMeta = {
+type ComponentStatusMeta = {
     label: string;
     variant: StatusVariant;
     message: string | null | undefined;
 };
 
-export type StatusMeta = {
+type StatusMeta = {
     label: string;
     variant: StatusVariant;
 };
 
-export const getOverallStatusMeta = (status: string): StatusMeta => {
+export const getOverallStatusMeta = (status: string, t: TranslateFn): StatusMeta => {
     switch (status) {
         case 'running':
-            return { label: 'Running', variant: 'positive' };
+            return { label: t('common.status.running'), variant: 'positive' };
         case 'idle':
-            return { label: 'Idle', variant: 'neutral' };
+            return { label: t('inference.health.overall.idle'), variant: 'neutral' };
         case 'error':
-            return { label: 'Problems detected', variant: 'negative' };
+            return { label: t('inference.health.overall.problemsDetected'), variant: 'negative' };
         default:
             return { label: capitalize(status), variant: 'neutral' };
     }
 };
 
-export const getComponentStatusMeta = (component: PipelineStatus): ComponentStatusMeta => {
+export const getComponentStatusMeta = (component: PipelineStatus, t: TranslateFn): ComponentStatusMeta => {
     switch (component.status) {
         case 'ok':
-            return { label: 'Healthy', variant: 'positive', message: component.message };
+            return { label: t('inference.health.component.healthy'), variant: 'positive', message: component.message };
         case 'finished':
-            return { label: 'Finished', variant: 'info', message: component.message };
+            return { label: t('inference.health.component.finished'), variant: 'info', message: component.message };
         case 'unavailable':
-            return { label: 'Unavailable', variant: 'neutral', message: component.message };
+            return {
+                label: t('inference.health.component.unavailable'),
+                variant: 'neutral',
+                message: component.message,
+            };
         case 'error':
-            return { label: 'Error', variant: 'negative', message: component.message };
+            return { label: t('common.status.error'), variant: 'negative', message: component.message };
         default:
             return { label: capitalize(component.status), variant: 'neutral', message: component.message };
     }

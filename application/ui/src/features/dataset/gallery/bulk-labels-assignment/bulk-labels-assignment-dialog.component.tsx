@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 
+import { useTranslation } from '@/i18n';
 import {
     Button,
     ButtonGroup,
@@ -43,6 +44,7 @@ const BulkLabelsAssignmentDialogContent = ({
     isContinuePending,
     isMultiLabelClassification,
 }: BulkLabelsAssignmentDialogContentProps) => {
+    const { t } = useTranslation();
     const projectLabels = useProjectLabelsWithEmptyLabel();
 
     const [selectedLabels, setSelectedLabels] = useState<Set<string>>(() => new Set([]));
@@ -55,14 +57,11 @@ const BulkLabelsAssignmentDialogContent = ({
 
     return (
         <Dialog height={'65vh'}>
-            <Heading>Label assignment</Heading>
+            <Heading>{t('dataset.bulkLabels.title')}</Heading>
             <Divider />
             <Content>
                 <Flex direction={'column'} gap={'size-100'} height={'100%'} minHeight={0}>
-                    <Text>
-                        Choose the label(s) to assign to the uploaded images, then click {"'Continue'"}. If you instead
-                        prefer to annotate the images at a later time, choose {"'Skip'"}.
-                    </Text>
+                    <Text>{t('dataset.bulkLabels.uploadInstructions')}</Text>
                     <Divider size={'S'} marginY={'size-100'} />
                     <LabelsList
                         ariaLabel={'Labels to assign'}
@@ -74,18 +73,17 @@ const BulkLabelsAssignmentDialogContent = ({
                     <Flex gap={'size-50'}>
                         <Info />
                         <Text UNSAFE_style={{ lineHeight: dimensionValue('size-225') }}>
-                            The selected labels apply only to images, videos (if any) will be uploaded without
-                            annotations.
+                            {t('dataset.bulkLabels.imageOnlyNote')}
                         </Text>
                     </Flex>
                 </Flex>
             </Content>
             <ButtonGroup>
                 <Button variant={'secondary'} onPress={onClose}>
-                    Cancel upload
+                    {t('dataset.bulkLabels.cancelUpload')}
                 </Button>
                 <Button variant={'secondary'} onPress={onSkip} isPending={isSkipPending} isDisabled={isSkipPending}>
-                    Skip
+                    {t('common.actions.skip')}
                 </Button>
                 <Button
                     variant={'accent'}
@@ -93,7 +91,7 @@ const BulkLabelsAssignmentDialogContent = ({
                     isDisabled={isContinueDisabled}
                     isPending={isContinuePending}
                 >
-                    Continue
+                    {t('common.actions.continue')}
                 </Button>
             </ButtonGroup>
         </Dialog>
@@ -109,9 +107,13 @@ export const BulkLabelsAssignmentDialog = ({ files, onClose }: BulkLabelsAssignm
     const isVisible = !isEmpty(files);
     const { data: project } = useProject();
     const isMultiLabelClassification = isMultiLabelClassificationTask(project.task);
-    const { uploadMedia, uploadProgress } = useMediaUpload();
+    const { uploadMedia } = useMediaUpload();
 
     const bulkAssignLabel = useBulkAssignLabel();
+
+    // Uploading and assigning are separate async steps, so a flag spanning both is needed to keep
+    // the buttons from briefly re-enabling in between them.
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSkip = async () => {
         void uploadMedia(files);
@@ -119,15 +121,21 @@ export const BulkLabelsAssignmentDialog = ({ files, onClose }: BulkLabelsAssignm
     };
 
     const handleAccept = async (labelIds: string[]) => {
-        const mediaItems = await uploadMedia(files);
-        const mediaItemImages = mediaItems.filter(isImage);
+        setIsSubmitting(true);
 
-        await bulkAssignLabel.mutate(
-            mediaItemImages.map(({ id }) => id),
-            labelIds
-        );
+        try {
+            const mediaItems = await uploadMedia(files);
+            const mediaItemImages = mediaItems.filter(isImage);
 
-        onClose();
+            await bulkAssignLabel.mutate(
+                mediaItemImages.map(({ id }) => id),
+                labelIds
+            );
+
+            onClose();
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -137,8 +145,8 @@ export const BulkLabelsAssignmentDialog = ({ files, onClose }: BulkLabelsAssignm
                     onClose={onClose}
                     onSkip={handleSkip}
                     onContinue={handleAccept}
-                    isContinuePending={uploadProgress.isUploading || bulkAssignLabel.isPending}
-                    isSkipPending={uploadProgress.isUploading}
+                    isContinuePending={isSubmitting}
+                    isSkipPending={isSubmitting}
                     isMultiLabelClassification={isMultiLabelClassification}
                 />
             )}

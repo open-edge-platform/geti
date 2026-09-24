@@ -17,16 +17,16 @@ import { Annotations } from '../annotations/annotations.component';
 import { VideoAnnotations, VideoPredictions } from '../annotations/video-annotations.component';
 import { useIsAnnotatorSceneBusy } from '../hooks/use-is-annotator-scene-busy';
 import { ToolManager } from '../tools/tool-manager.component';
+import { PREDICTION_CHUNK_SIZE, PREDICTION_FRAME_SKIP } from '../video-player/api/prediction-constants';
 import { usePrefetchVideoFramesAnnotations } from '../video-player/api/use-video-frames-annotations';
 import {
-    PREDICTION_CHUNK_SIZE,
-    PREDICTION_FRAME_SKIP,
     useKeepVideoFramesPredictionsSubscribed,
     usePrefetchVideoFramesPredictions,
 } from '../video-player/api/use-video-frames-predictions';
 import { getVideoFrameRangeIndexes } from '../video-player/api/utils';
 import { useVideoPlayer, useVideoPlayerContext } from '../video-player/video-player-provider.component';
 import { MediaCanvas } from './media-canvas';
+import { useSelectNextAnnotation } from './use-select-next-annotation.hook';
 
 import classes from './annotator-canvas.module.scss';
 
@@ -37,7 +37,13 @@ type ImageAnnotationsProps = {
 const ImageAnnotations = ({ mediaItem }: ImageAnnotationsProps) => {
     const { isFocussed } = useAnnotationVisibility();
     const { annotations } = useAnnotationActions();
-    const { selectedAnnotations } = useSelectedAnnotations();
+    const { selectedAnnotations, setSelectedAnnotations } = useSelectedAnnotations();
+
+    useSelectNextAnnotation({
+        annotations,
+        selectedAnnotationsIds: selectedAnnotations,
+        updateSelectedAnnotationsIds: setSelectedAnnotations,
+    });
 
     // Order annotations by selection. Selected annotation should always be on top.
     const orderedAnnotations = [
@@ -233,9 +239,9 @@ const useToolLayerPointerPassthrough = ({
     }, []);
 
     // When tools are disabled (prediction/read-only mode, or scene busy) we keep `ToolManager` mounted so
-    // worker-backed tools (notably Segment Anything) don't unmount and discard their in-flight encoder
-    // promises — coming back used to stack new encoder RPCs behind the still-running ones and trip the
-    // SAM encoder timeout. Pointer-events: none routes clicks/hover straight through to the annotations
+    // worker-backed tools (notably Segment Anything) don't unmount and discard their in-flight decoder
+    // promises — coming back used to stack new decoder RPCs behind the still-running ones and trip the
+    // SAM decoder timeout. Pointer-events: none routes clicks/hover straight through to the annotations
     // layer below, matching the previous behavior of unmounting the tool layer entirely.
     const toolLayerPointerEvents =
         areToolsDisabled || isSelectionToolActive || (canEditSelectedAnnotation && isToolLayerPointerPassthrough)

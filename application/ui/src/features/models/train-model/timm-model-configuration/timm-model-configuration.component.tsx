@@ -1,76 +1,108 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Divider, Flex, Heading, Item, Picker, View } from '@geti-ui/ui';
+import { useTranslation } from '@/i18n';
+import { Divider, Flex, Grid, Heading, Item, Loading, Picker, View } from '@geti-ui/ui';
+
+import { ModelLicenseLink } from '../../components/model-license-link.component';
+import { getAccuracyMetric } from '../model-architectures-list/utils';
+import { useTrainModelState } from '../train-model-provider.component';
 
 import classes from './timm-model-configuration.module.scss';
 
-const useGetTimmConfiguration = () => {
-    return {
-        architectures: [
-            { id: '1', name: 'Architecture 1' },
-            { id: '2', name: 'Architecture 2' },
-        ],
-        variants: [
-            { id: '1', name: 'Variant 1' },
-            { id: '2', name: 'Variant 2' },
-        ],
-        pretrainedWeights: [
-            { id: '1', name: 'Pretrained Weights 1' },
-            { id: '2', name: 'Pretrained Weights 2' },
-        ],
-        info: {
-            parameters: '2 Millions',
-            gigaFlops: '68.48',
-            mAP: '31.2%',
-            license: 'Apache-2.0',
-        },
-    };
-};
-
 export const TimmModelConfiguration = () => {
-    const { architectures, variants, pretrainedWeights, info } = useGetTimmConfiguration();
+    const { t } = useTranslation();
+    const {
+        timmFamilies,
+        timmVariants,
+        timmPretrainedTags,
+        selectedTimmFamily,
+        onSelectTimmFamily,
+        selectedTimmVariant,
+        onSelectTimmVariant,
+        selectedTimmPretrainedTag,
+        onSelectTimmPretrainedTag,
+        timmModelArchitecture,
+        isLoadingTimmModelArchitecture,
+    } = useTrainModelState();
+
+    const accuracyMetric =
+        timmModelArchitecture === undefined ? undefined : getAccuracyMetric(timmModelArchitecture, t);
+    const accuracyLabel = accuracyMetric?.label ?? t('models.training.architectures.metrics.top1AccOnImageNet');
 
     return (
         <View UNSAFE_className={classes.container}>
             <Heading UNSAFE_className={classes.heading} level={3} marginBottom={'size-200'}>
-                TIMM model configuration
+                {t('models.training.architectures.timm.heading')}
             </Heading>
 
-            <Flex>
+            <Grid columns={'1fr auto .6fr'}>
                 <Flex direction={'column'} gap={'size-200'} flex={2}>
                     <Flex gap={'size-300'}>
                         <Picker
                             width={'100%'}
-                            items={architectures}
-                            label={'Architecture family'}
-                            placeholder={'Select architecture'}
+                            label={t('models.training.architectures.timm.architectureFamilyLabel')}
+                            placeholder={t('models.training.architectures.timm.selectArchitecturePlaceholder')}
+                            selectedKey={selectedTimmFamily}
+                            onSelectionChange={(key) => key !== null && onSelectTimmFamily(String(key))}
                         >
-                            {(item) => <Item key={item.id}>{item.name}</Item>}
+                            {timmFamilies.map((family) => (
+                                <Item key={family}>{family}</Item>
+                            ))}
                         </Picker>
-                        <Picker width={'100%'} items={variants} label={'Model variant'} placeholder={'Select variant'}>
-                            {(item) => <Item key={item.id}>{item.name}</Item>}
+                        <Picker
+                            width={'100%'}
+                            label={t('models.training.architectures.timm.modelVariantLabel')}
+                            placeholder={t('models.training.architectures.timm.selectVariantPlaceholder')}
+                            isDisabled={selectedTimmFamily === null}
+                            selectedKey={selectedTimmVariant}
+                            onSelectionChange={(key) => key !== null && onSelectTimmVariant(String(key))}
+                        >
+                            {timmVariants.map((variant) => (
+                                <Item key={variant}>{variant}</Item>
+                            ))}
                         </Picker>
                     </Flex>
                     <Picker
                         width={'100%'}
-                        items={pretrainedWeights}
-                        label={'Pretrained Weights'}
-                        placeholder={'Select weights'}
+                        label={t('models.training.architectures.timm.pretrainedWeightsLabel')}
+                        placeholder={t('models.training.architectures.timm.selectWeightsPlaceholder')}
+                        isDisabled={selectedTimmVariant === null}
+                        selectedKey={selectedTimmPretrainedTag}
+                        onSelectionChange={(key) => key !== null && onSelectTimmPretrainedTag(String(key))}
                     >
-                        {(item) => <Item key={item.id}>{item.name}</Item>}
+                        {timmPretrainedTags.map((pretrainedTag) => (
+                            <Item key={pretrainedTag}>{pretrainedTag}</Item>
+                        ))}
                     </Picker>
                 </Flex>
 
                 <Divider size={'S'} marginX={'size-400'} orientation={'vertical'} />
 
-                <ul className={classes.infoList}>
-                    <li>Parameters: {info.parameters}</li>
-                    <li>GigaFlops: {info.gigaFlops}</li>
-                    <li>mAP: {info.mAP}</li>
-                    <li>License: {info.license}</li>
-                </ul>
-            </Flex>
+                {isLoadingTimmModelArchitecture ? (
+                    <Loading mode={'inline'} size={'M'} aria-label={'Loading model statistics'} />
+                ) : (
+                    <ul className={classes.infoList}>
+                        <li>
+                            {t('models.training.architectures.timm.parameters', {
+                                count: timmModelArchitecture?.stats?.trainable_parameters ?? '-',
+                            })}
+                        </li>
+                        <li>
+                            {t('models.training.architectures.timm.gigaflops', {
+                                value: timmModelArchitecture?.stats?.gigaflops ?? '-',
+                            })}
+                        </li>
+                        <li>
+                            {accuracyLabel}: {accuracyMetric?.value ?? '-'}%
+                        </li>
+                        <li>
+                            {t('license.label')}
+                            <ModelLicenseLink license={timmModelArchitecture?.license || { url: '', name: '' }} />
+                        </li>
+                    </ul>
+                )}
+            </Grid>
         </View>
     );
 };

@@ -21,14 +21,12 @@ skills/
 │   ├── README.md
 │   ├── EVALUATION.md
 │   └── <skill-name>/
-│       ├── SKILL.md
-│       └── agents/openai.yaml
+│       └── SKILL.md
 └── application/
     ├── README.md
     ├── EVALUATION.md
     └── <skill-name>/
-        ├── SKILL.md
-        └── agents/openai.yaml
+        └── SKILL.md
 ```
 
 Client adapters are **committed symlinks** so a fresh clone works for agents
@@ -61,9 +59,6 @@ to the **portable core** so a skill works across every agent, not just one.
   optionally `license`). These are understood everywhere.
 - **Do not rely on vendor-only fields for behavior.** Default to model-invoked
   skills.
-- Geti adds a per-skill `agents/openai.yaml` interface file (`display_name`,
-  `short_description`, `default_prompt`). It is optional metadata for the OpenAI
-  client and must not change portable behavior.
 - Use forward-slash paths; no Windows backslashes.
 
 ### `name`

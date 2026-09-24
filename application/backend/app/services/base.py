@@ -20,6 +20,7 @@ class ResourceType(StrEnum):
     PROJECT = "Project"
     DATASET_ITEM = "DatasetItem"
     DATASET_REVISION = "DatasetRevision"
+    DATASET_VIEW = "DatasetView"
     LABEL = "Label"
 
 

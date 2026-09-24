@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { fetchClient } from '@/api';
-import { v4 as uuid } from 'uuid';
 
 export type WebRTCConnectionStatus = 'idle' | 'connecting' | 'connected' | 'disconnected' | 'failed';
 
@@ -38,7 +37,7 @@ export class WebRTCConnection {
     private timeoutId?: ReturnType<typeof setTimeout>;
 
     constructor() {
-        this.webrtcId = uuid();
+        this.webrtcId = crypto.randomUUID();
     }
 
     public getStatus(): WebRTCConnectionStatus {
@@ -77,7 +76,13 @@ export class WebRTCConnection {
 
             const data = await this.sendOffer();
 
-            if (!this.handleOfferResponse(data)) return;
+            if (!(await this.handleOfferResponse(data))) {
+                clearTimeout(this.timeoutId);
+                this.updateStatus('failed');
+                await this.stop();
+
+                return;
+            }
 
             await this.updateConfThreshold(0.5); // Initial confidence threshold
             this.setupConnectionStateListener();
@@ -208,6 +213,8 @@ export class WebRTCConnection {
     }
 
     public async stop(): Promise<void> {
+        clearTimeout(this.timeoutId);
+
         if (!this.peerConnection) {
             return;
         }

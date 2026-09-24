@@ -52,23 +52,22 @@ describe('StreamInferenceDevices', () => {
     it('displays current device selection', async () => {
         renderApp(200, mockDevices, { ...mockPipeline, device: 'xpu' });
 
-        expect(await screen.findByLabelText('inference compute')).toHaveTextContent('GPU');
+        expect(await screen.findByRole('button', { name: /inference device/i })).toHaveTextContent('GPU');
     });
 
     it('updates device on selection change', async () => {
         const pipelinePatchSpy = renderApp();
 
-        const picker = await screen.findByLabelText('inference compute');
+        const picker = await screen.findByRole('button', { name: /inference device/i });
         expect(picker).toHaveTextContent('CPU');
 
-        const button = screen.getByRole('button', { name: /inference compute/i });
-        await userEvent.click(button);
+        await userEvent.click(picker);
 
         const option = await screen.findByRole('option', { name: /GPU/i });
         await userEvent.click(option);
 
         await waitFor(() => {
-            expect(screen.getByLabelText('inference compute')).toHaveTextContent('GPU');
+            expect(picker).toHaveTextContent('GPU');
             expect(pipelinePatchSpy).toHaveBeenCalled();
         });
     });
@@ -76,9 +75,7 @@ describe('StreamInferenceDevices', () => {
     it('shows error toast on update failure', async () => {
         renderApp(500);
 
-        await screen.findByLabelText('inference compute');
-
-        await userEvent.click(screen.getByRole('button', { name: /inference compute/i }));
+        await userEvent.click(await screen.findByRole('button', { name: /inference device/i }));
         await userEvent.click(screen.getByRole('option', { name: /GPU/i }));
 
         expect(await screen.findByLabelText('toast')).toBeVisible();
@@ -87,14 +84,15 @@ describe('StreamInferenceDevices', () => {
     it('reverts selection on error', async () => {
         renderApp(500, mockDevices, { ...mockPipeline, device: 'cpu' });
 
-        expect(await screen.findByLabelText('inference compute')).toHaveTextContent('CPU');
+        const picker = await screen.findByRole('button', { name: /inference device/i });
+        expect(picker).toHaveTextContent('CPU');
 
-        await userEvent.click(screen.getByRole('button', { name: /inference compute/i }));
+        await userEvent.click(picker);
         await userEvent.click(screen.getByRole('option', { name: /GPU/i }));
 
         await screen.findByLabelText('toast');
 
-        expect(await screen.findByLabelText('inference compute')).toHaveTextContent('CPU');
+        expect(picker).toHaveTextContent('CPU');
     });
 
     it('renders devices with same type and name correctly', async () => {
@@ -105,8 +103,7 @@ describe('StreamInferenceDevices', () => {
         ];
         const pipelinePatchSpy = renderApp(200, devicesResponse, { ...mockPipeline, device: 'cpu' });
 
-        await screen.findByLabelText('inference compute');
-        await userEvent.click(screen.getByRole('button', { name: /inference compute/i }));
+        await userEvent.click(await screen.findByRole('button', { name: /inference device/i }));
 
         const options = await screen.findAllByRole('option');
         expect(options).toHaveLength(3);

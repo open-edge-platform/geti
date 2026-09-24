@@ -1,9 +1,10 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { ImportJobProcess } from '@/components/import-job-process/import-job-process.component';
+import { useTranslation } from '@/i18n';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';
 
-import { ImportJobProcess } from '../../../../../components/import-job-process/import-job-process.component';
 import { useImportDatasetDialog } from '../../../providers/import-dataset-dialog-provider.component';
 
 type ImportProcessProps = {
@@ -12,6 +13,7 @@ type ImportProcessProps = {
 };
 
 export const ImportProcess = ({ stagedDatasetId, onFilePrepared }: ImportProcessProps) => {
+    const { t } = useTranslation();
     const { datasetImportDialogState } = useImportDatasetDialog();
     const { getImportEntry, updateImportEntryStep } = useImportDatasetAsNewProject();
 
@@ -26,7 +28,7 @@ export const ImportProcess = ({ stagedDatasetId, onFilePrepared }: ImportProcess
                 onFilePrepared();
                 updateImportEntryStep(stagedDatasetId, 'taskTypeSelection');
             }}
-            message='Prepare dataset import as new project'
+            message={t('project.import.preparingMessage')}
         />
     );
 };

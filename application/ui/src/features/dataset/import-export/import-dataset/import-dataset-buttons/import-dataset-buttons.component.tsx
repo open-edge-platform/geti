@@ -1,9 +1,10 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { ImportJobProcessButtons } from '@/components/import-job-process/import-job-process-buttons.component';
+import { useTranslation } from '@/i18n';
 import { Button, ButtonGroup } from '@geti-ui/ui';
 
-import { ImportJobProcessButtons } from '../../../../../components/import-job-process/import-job-process-buttons.component';
 import { useImportDatasetToProject } from '../../../../../hooks/storage/use-import-dataset-to-project.hook';
 import { LabelMappingButtons } from '../label-mapping/label-mapping-buttons.component';
 import { ImportDatasetToProjectState } from '../util';
@@ -15,6 +16,7 @@ type ImportDatasetButtonsProps = {
 };
 
 export const ImportDatasetButtons = ({ currentStep, stagedDatasetId, onClose }: ImportDatasetButtonsProps) => {
+    const { t } = useTranslation();
     const { getImportEntry, deleteImportEntry } = useImportDatasetToProject();
     const { prepareJobId } = getImportEntry(stagedDatasetId ?? '') ?? { prepareJobId: null };
 
@@ -22,7 +24,7 @@ export const ImportDatasetButtons = ({ currentStep, stagedDatasetId, onClose }: 
         return (
             <ButtonGroup>
                 <Button onPress={onClose} variant='secondary'>
-                    Cancel
+                    {t('common.actions.cancel')}
                 </Button>
             </ButtonGroup>
         );
@@ -46,7 +48,7 @@ export const ImportDatasetButtons = ({ currentStep, stagedDatasetId, onClose }: 
     return (
         <ButtonGroup>
             <Button onPress={onClose} variant='secondary'>
-                Cancel
+                {t('common.actions.cancel')}
             </Button>
         </ButtonGroup>
     );

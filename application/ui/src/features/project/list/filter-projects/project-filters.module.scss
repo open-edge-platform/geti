@@ -1,0 +1,7 @@
+.taskTypeFilter {
+    & label[class*='spectrum-FieldLabel'] {
+        font-weight: 700;
+        color: var(--spectrum-global-color-gray-900);
+        padding-bottom: var(--spectrum-global-dimension-size-100);
+    }
+}

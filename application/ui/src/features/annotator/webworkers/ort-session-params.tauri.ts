@@ -5,6 +5,6 @@ import { sessionParams } from '@geti-ui/smart-tools/utils';
 
 // WebView2 honours COEP credentialless so crossOriginIsolated is true, but
 // emscripten's nested module workers never load in the Tauri webview — threaded
-// ORT then blocks forever and blows SAM_ENCODER_TIMEOUT_MS.
+// ORT then blocks forever and blows SAM_DECODER_TIMEOUT_MS.
 sessionParams.numThreads = 1;
 sessionParams.executionProviders = ['cpu'];

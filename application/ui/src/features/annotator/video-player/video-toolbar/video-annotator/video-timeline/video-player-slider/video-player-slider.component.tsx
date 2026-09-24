@@ -4,9 +4,9 @@
 import { PointerEvent, RefObject, useEffect, useRef, useState } from 'react';
 
 import type { MediaVideoFrame } from '@/api/types';
-import { useDebouncedCallback } from 'hooks/use-debounced-callback/use-debounced-callback.hook';
 import { defer } from 'lodash-es';
 import { useHover } from 'react-aria';
+import { useDebounceCallback } from 'usehooks-ts';
 
 import { FRAME_STEP_TO_DISPLAY_ALL_FRAMES } from '../../../frame-step/utils';
 import { ThumbnailPreview } from './thumbnail-preview.component';
@@ -32,7 +32,7 @@ const useShowThumbnail = () => {
     const [thumbnailVideoFrame, setThumbnailVideoFrame] = useState<null | number>(null);
     const [showThumbnail, setShowThumbnail] = useState(false);
     const [thumbnailPosition, setThumbnailPosition] = useState<null | number>(null);
-    const setThumbnailVideoFrameDebounced = useDebouncedCallback(setThumbnailVideoFrame, 200);
+    const setThumbnailVideoFrameDebounced = useDebounceCallback(setThumbnailVideoFrame, 200);
 
     const { hoverProps } = useHover({
         onHoverStart: () => {
@@ -92,6 +92,9 @@ const blurActiveInput = (isFocused: boolean): void => {
     }
 };
 
+// TODO: Update highlighted frames and buffers
+const NO_HIGHLIGHTED_FRAMES: number[] = [];
+
 export const VideoPlayerSlider = ({
     ref,
     videoFrame,
@@ -121,10 +124,6 @@ export const VideoPlayerSlider = ({
     const lastFrame = isDisplayingAllFrames ? maxValue : framesCount - step;
     const isLastFrame = sliderValue >= lastFrame;
     const containerScrollLeft = getContainerScroll(ref);
-
-    // TODO: Update highlighted frames and buffers
-    const highlightedFrames: number[] = [];
-    const buffers = undefined;
 
     const handlePointerMove = (event: PointerEvent<HTMLDivElement>): void => {
         const rect = event.currentTarget.getBoundingClientRect();
@@ -163,8 +162,7 @@ export const VideoPlayerSlider = ({
                     blurActiveInput(true);
                 }}
                 step={step}
-                buffers={buffers}
-                highlightedFrames={highlightedFrames}
+                highlightedFrames={NO_HIGHLIGHTED_FRAMES}
                 isLastFrame={isLastFrame}
                 sizePerSquare={sizePerSquare}
                 leftOffset={frameOffset}

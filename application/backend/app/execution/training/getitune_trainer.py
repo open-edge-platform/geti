@@ -58,6 +58,7 @@ from app.services import (
     SubsetService,
     TrainingConfigurationService,
 )
+from app.supported_models.timm import TimmManifestProvider
 
 MODEL_WEIGHTS_PATH = "model_weights_path"
 
@@ -409,7 +410,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         self,
         training_config: dict,
         dataset_info: DatasetInfo,
-        weights_path: Path,
+        weights_path: Path | None,
         model_id: UUID,
         device: DeviceInfo,
         has_model_revision: bool,
@@ -422,11 +423,11 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         in the config; backends that do not support them simply ignore the
         parameter.
         """
-        from getitune.backend.lightning.models.base import DataInputParams, LightningModel
+        from getitune.backend.lightning.models.base import DataInputParams
         from getitune.data.module import DataModule
         from getitune.engine import create_engine
+        from getitune.engine.utils.create import engine_class_for_backend
         from getitune.types.device import DeviceType as GetiTuneDeviceType
-        from lightning import Callback
 
         from .progress import TrainingProgressCallback
 
@@ -457,32 +458,28 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         getitune_device_type = (
             GetiTuneDeviceType.gpu if device.type is DeviceType.CUDA else GetiTuneDeviceType(device.type)
         )
-        class_path = model_cfg.get("class_path", "")
-        is_ultralytics = "ultralytics" in class_path
+        engine_cls = engine_class_for_backend(training_config.get("backend"))
+        is_huggingface = engine_cls.backend_name == "huggingface"
+        is_ultralytics = engine_cls.backend_name == "ultralytics"
         engine_kwargs: dict[str, Any] = {
             "work_dir": self._data_dir / f"getitune-workspace-{model_id}",
             "device": getitune_device_type,
         }
-        # Route weight loading through checkpoint for Ultralytics and for resume flows.
-        load_from_checkpoint = is_ultralytics or has_model_revision
-        if load_from_checkpoint:
-            engine_kwargs["checkpoint"] = weights_path
-            # Disable default pretrained loading when checkpoint controls initialization.
-            model_cfg["init_args"]["pretrained"] = False
-        else:
-            # Fresh Lightning training loads base weights via model init args.
-            model_cfg["init_args"]["pretrained"] = True
-            model_cfg["init_args"]["pretrained_weights"] = weights_path
+        # timm weights (`weights_path=None`) are loaded in the library
+        if weights_path is not None:
+            # Route weight loading through checkpoint for Ultralytics and for resume flows.
+            load_from_checkpoint = is_ultralytics or has_model_revision
+            if load_from_checkpoint and not is_huggingface:
+                engine_kwargs["checkpoint"] = weights_path
+                # Disable default pretrained loading when checkpoint controls initialization.
+                model_cfg["init_args"]["pretrained"] = False
+            else:
+                # Fresh Lightning/HF training loads base weights via model init args.
+                model_cfg["init_args"]["pretrained"] = True
+                model_cfg["init_args"]["pretrained_weights"] = weights_path
 
         model_parser = ArgumentParser()
-        if is_ultralytics:
-            # Lazy import because the Ultralytics backend is optional and may not be installed in all environments.
-            from getitune.backend.ultralytics.models.base import UltralyticsModel
-
-            model_type = UltralyticsModel
-        else:
-            model_type = LightningModel
-        model_parser.add_argument("--model", type=model_type)
+        model_parser.add_argument("--model", type=engine_cls.model_base_class)
         getitune_model = model_parser.instantiate_classes(Namespace(model=model_cfg)).get("model")
 
         if hasattr(getitune_model, "tile_config"):
@@ -490,22 +487,25 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
 
         getitune_engine = create_engine(model=getitune_model, data=datamodule, **engine_kwargs)
 
-        callbacks_cfg = training_config.get("callbacks", [])
-        for cb_cfg in callbacks_cfg:
-            if "init_args" in cb_cfg and "dirpath" in cb_cfg["init_args"]:
-                cb_cfg["init_args"]["dirpath"] = getitune_engine.work_dir
-        parser = ArgumentParser()
-        parser.add_argument("--callbacks", type=list[Callback])
-        parsed_callbacks_cfg = parser.parse_object({"callbacks": callbacks_cfg})
-        callbacks_list = parser.instantiate_classes(parsed_callbacks_cfg).get("callbacks", [])
-        callbacks_list.append(TrainingProgressCallback(self.update_progress, min_p=10, max_p=80))
+        callbacks_list = [TrainingProgressCallback(self.update_progress, min_p=10, max_p=80)]
+        if not is_huggingface:
+            from lightning import Callback
+
+            callbacks_cfg = training_config.get("callbacks", [])
+            for cb_cfg in callbacks_cfg:
+                if "init_args" in cb_cfg and "dirpath" in cb_cfg["init_args"]:
+                    cb_cfg["init_args"]["dirpath"] = getitune_engine.work_dir
+            parser = ArgumentParser()
+            parser.add_argument("--callbacks", type=list[Callback])
+            parsed_callbacks_cfg = parser.parse_object({"callbacks": callbacks_cfg})
+            callbacks_list[:0] = parser.instantiate_classes(parsed_callbacks_cfg).get("callbacks", [])
 
         logger.info("Starting training loop (model_id={})", model_id)
         train_kwargs: dict[str, Any] = {
             "max_epochs": training_config["max_epochs"],
             "callbacks": callbacks_list,
         }
-        if device.type is not DeviceType.CPU and device.index is not None:
+        if not is_huggingface and device.type is not DeviceType.CPU and device.index is not None:
             train_kwargs["devices"] = [device.index]
         if "precision" in training_config:
             train_kwargs["precision"] = training_config["precision"]
@@ -543,6 +543,10 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         - PyTorch (.ckpt) variants are evaluated with the LightningEngine used for training.
         - OpenVINO (.xml) and ONNX (.onnx) variants are evaluated with OVEngine, which
           natively supports both checkpoint types.
+
+        If evaluation of the OpenVINO or ONNX variant fails (e.g. an export/runtime quirk),
+        the job is not failed: the PyTorch variant's results are reused instead, so training
+        can still complete successfully with a valid (if not fully independent) evaluation record.
         """
         from getitune.backend.openvino.engine import OVEngine
 
@@ -550,27 +554,44 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         ov_work_dir_base = Path(getitune_engine.work_dir)
         datamodule = getitune_engine.datamodule
 
+        pytorch_metrics: dict | None = None
         for variant in model_variants:
             logger.info("Evaluating the {} model...", variant.format.value)
-            match variant.format:
-                case ModelFormat.PYTORCH:
-                    engine = getitune_engine
-                case ModelFormat.OPENVINO:
-                    engine = OVEngine(
-                        model=variant.path,
-                        data=datamodule,
-                        work_dir=ov_work_dir_base / "ov_eval",
-                    )
-                case ModelFormat.ONNX:
-                    engine = OVEngine(
-                        model=variant.path,
-                        data=datamodule,
-                        work_dir=ov_work_dir_base / "onnx_eval",
-                    )
-                case _:
-                    raise ExecutionErr(f"Unsupported model variant format for evaluation: {variant.format}")
+            try:
+                match variant.format:
+                    case ModelFormat.PYTORCH:
+                        engine = getitune_engine
+                    case ModelFormat.OPENVINO:
+                        engine = OVEngine(
+                            model=variant.path,
+                            data=datamodule,
+                            work_dir=ov_work_dir_base / "ov_eval",
+                        )
+                    case ModelFormat.ONNX:
+                        engine = OVEngine(
+                            model=variant.path,
+                            data=datamodule,
+                            work_dir=ov_work_dir_base / "onnx_eval",
+                        )
+                    case _:
+                        raise ExecutionErr(f"Unsupported model variant format for evaluation: {variant.format}")
 
-            metrics = engine.test(metric=metric_callable)
+                metrics = engine.test(metric=metric_callable)
+            except Exception as eval_exc:
+                # PyTorch is the source of truth for fallback metrics; if it's the one failing, or no
+                # fallback is available yet, there is nothing to reuse, so let the job fail as usual.
+                if variant.format == ModelFormat.PYTORCH or pytorch_metrics is None:
+                    raise
+                logger.warning(
+                    "Evaluation of the {} model failed ({}); reusing the PyTorch evaluation results instead",
+                    variant.format.value,
+                    eval_exc,
+                )
+                metrics = pytorch_metrics
+            else:
+                if variant.format == ModelFormat.PYTORCH:
+                    pytorch_metrics = metrics
+
             self._save_evaluation_result(
                 metrics=metrics,
                 model_revision_id=model_revision_id,
@@ -633,6 +654,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         """Copy training artifacts into variant directories.
 
         Each variant's files are stored under model_dir/variants/<variant_id>/model.*
+        or, for directory-backed PyTorch checkpoints, in the ``model`` directory.
 
         The getitune workspace itself is removed by ``TrainingJob.on_complete`` after
         the job terminates, so this step does not clean it up.
@@ -649,7 +671,10 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
 
         pytorch_variant_dir = variants_dir / str(created_variants[ModelFormat.PYTORCH])
         pytorch_variant_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(trained_model_path, pytorch_variant_dir / "model.pt")
+        if trained_model_path.is_dir():
+            shutil.copytree(trained_model_path, pytorch_variant_dir / "model")
+        else:
+            shutil.copyfile(trained_model_path, pytorch_variant_dir / "model.pt")
         logger.info("Stored PyTorch variant at {}", pytorch_variant_dir)
 
         # Copy OpenVINO IR files
@@ -725,7 +750,9 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
             model_id=params.model_id,
         )
 
-        weights_path = self.prepare_weights(training_params=params)
+        weights_path = None
+        if not TimmManifestProvider.is_timm_id(params.model_architecture_id):
+            weights_path = self.prepare_weights(training_params=params)
         training_config, getitune_training_config = self.prepare_training_configuration(
             training_params=params, task=task
         )
@@ -746,6 +773,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 model_id=params.model_id,
                 status=TrainingStatus.IN_PROGRESS,
                 training_started_at=training_start_time,
+                training_device=params.device,
             )
             trained_model_path, getitune_engine = self.train_model(
                 training_config=getitune_training_config,
@@ -929,7 +957,8 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         """Get the path to the stored PyTorch checkpoint."""
         model_dir = cls.__base_model_path(data_dir, project_id, model_id)
         variant_dir = model_dir / "variants" / str(model_variant)
-        return variant_dir / "model.pt"
+        checkpoint_dir = variant_dir / "model"
+        return checkpoint_dir if checkpoint_dir.is_dir() else variant_dir / "model.pt"
 
     @classmethod
     def __build_model_config_path(cls, data_dir: Path, project_id: UUID, model_id: UUID) -> Path:
@@ -942,6 +971,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
         status: TrainingStatus,
         training_started_at: datetime | None = None,
         training_finished_at: datetime | None = None,
+        training_device: DeviceInfo | None = None,
     ):
         with self._db_session_factory() as db:
             self._model_service.set_db_session(db)
@@ -951,6 +981,7 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
                 training_status=status,
                 training_started_at=training_started_at,
                 training_finished_at=training_finished_at,
+                training_device=training_device,
             )
 
     def __delete_model_revision(self, project_id: UUID, model_id: UUID):

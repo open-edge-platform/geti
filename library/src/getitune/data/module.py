@@ -37,6 +37,7 @@ logger = logging.getLogger(__name__)
 
 _MP_CONTEXT = multiprocessing.get_context("spawn")
 
+
 # Mapping from getitune subset config names to Datumaro experimental Subset enums
 _SUBSET_NAME_TO_ENUM: dict[str, Subset] = {
     "train": Subset.TRAINING,
@@ -233,7 +234,7 @@ class DataModule(LightningDataModule):
         auto_num_workers: bool = False,
         device: DeviceType = DeviceType.auto,
     ) -> DataModule:
-        """Create an DataModule from pre-constructed VisionDataset instances.
+        """Create a DataModule from pre-constructed VisionDataset instances.
 
         This is a factory method that provides a clean way to create DataModule instances
         when you already have constructed datasets, without needing to provide data_root
@@ -439,22 +440,24 @@ class DataModule(LightningDataModule):
         dataset = self._get_dataset(config.subset_name)
         sampler = instantiate_sampler(config.sampler, dataset=dataset, batch_size=config.batch_size)
 
+        num_workers = config.num_workers
+
         # Pre-populate cached augmentation caches (CachedMosaic, CachedMixUp)
         # before workers start, so all workers inherit full, diverse caches.
-        if config.num_workers > 0 and hasattr(dataset.transforms, "prepare"):
+        if num_workers > 0 and hasattr(dataset.transforms, "prepare"):
             dataset.transforms.prepare(dataset)
 
         common_args = {
             "dataset": dataset,
             "batch_size": config.batch_size,
-            "num_workers": config.num_workers,
-            "pin_memory": True,
+            "num_workers": num_workers,
+            "pin_memory": self._pin_memory,
             "collate_fn": dataset.collate_fn,
-            "persistent_workers": config.num_workers > 0,
+            "persistent_workers": num_workers > 0,
             "sampler": sampler,
             "shuffle": sampler is None,
-            "prefetch_factor": 2 if config.num_workers > 0 else None,
-            "multiprocessing_context": _MP_CONTEXT if config.num_workers > 0 else None,
+            "prefetch_factor": 2 if num_workers > 0 else None,
+            "multiprocessing_context": _MP_CONTEXT if num_workers > 0 else None,
         }
 
         tile_config = self.tile_config
@@ -510,11 +513,20 @@ class DataModule(LightningDataModule):
             "batch_size": config.batch_size,
             "shuffle": False,
             "num_workers": num_workers,
-            "pin_memory": True,
+            "pin_memory": self._pin_memory,
             "collate_fn": dataset.collate_fn,
             "persistent_workers": num_workers > 0,
             "multiprocessing_context": _MP_CONTEXT if num_workers > 0 else None,
         }
+
+    @property
+    def _pin_memory(self) -> bool:
+        """Whether batches should be staged in page-locked ("pinned") host memory.
+
+        For CPU-only consumers it never is (eg OV evaluation), the copy is redundant and the
+        locked pages just reduce the memory available to the rest of the process.
+        """
+        return self.device != DeviceType.cpu
 
     def setup(self, stage: str) -> None:
         """Setup for each stage."""

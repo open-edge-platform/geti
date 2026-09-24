@@ -27,7 +27,7 @@ In addition to annotations, which are used when training and evaluating models, 
 custom _tags_ to each dataset item. A tag is a simple label that has no effect on model training or evaluation, but can be
 used to organize and filter the dataset items. Filtered data, based on tags and/or other properties (e.g. timestamp),
 can be used to create a _view_ in the dataset (`DatasetView`). A dataset view basically represents a subset of the
-dataset items; the user fully controls which items belong to a view.
+dataset media; the user fully controls which media items belong to a view.
 
 When the user decides to train a new model - optionally fine-tuning a previous model - Geti creates a snapshot
 of the dataset, namely a _dataset revision_ (`DatasetRevision`), that captures the exact state of the dataset when

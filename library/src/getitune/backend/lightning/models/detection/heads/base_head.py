@@ -315,6 +315,8 @@ class BaseDenseHead(BaseModule):
         results.scores = torch.cat(mlvl_scores)
         results.labels = torch.cat(mlvl_labels)
         if with_score_factors:
+            # pyrefly: ignore[no-matching-overload]
+            # If with_score_factors is True, mlvl_score_factors is always a list of Tensor
             results.score_factors = torch.cat(mlvl_score_factors)
 
         return self._bbox_post_process(results=results, cfg=cfg, rescale=rescale, with_nms=with_nms, img_meta=img_meta)
@@ -544,11 +546,13 @@ class BaseDenseHead(BaseModule):
 
         batch_mlvl_bboxes_pred = torch.cat(mlvl_valid_bboxes, dim=1)
         batch_scores = torch.cat(mlvl_valid_scores, dim=1)
-        batch_priors = torch.cat(mlvl_valid_priors, dim=1)
+        batch_priors = torch.cat(mlvl_valid_priors, dim=1)  # pyrefly: ignore[no-matching-overload]
 
         batch_bboxes = self.bbox_coder.decode_export(batch_priors, batch_mlvl_bboxes_pred, max_shape=img_shape)
 
         if with_score_factors:
+            # pyrefly: ignore[no-matching-overload]
+            # If with_score_factors is True, mlvl_score_factors is always a list of Tensor
             batch_score_factors = torch.cat(mlvl_score_factors, dim=1)
 
         if not self.use_sigmoid_cls:

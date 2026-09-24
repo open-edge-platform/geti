@@ -86,18 +86,6 @@ describe('ProjectList', () => {
             );
         });
 
-        it('renders the "Projects" heading', async () => {
-            renderProjectList();
-
-            expect(await screen.findByRole('heading', { name: 'Projects' })).toBeInTheDocument();
-        });
-
-        it('renders the description text', async () => {
-            renderProjectList();
-
-            expect(await screen.findByText(/Create projects by selecting a computer vision task/i)).toBeInTheDocument();
-        });
-
         it('renders a card for each project', async () => {
             renderProjectList();
 
@@ -227,16 +215,11 @@ describe('ProjectList', () => {
 
             expect(await screen.findByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
 
-            await user.click(screen.getByRole('button', { name: 'Filter by task type' }));
-
             const classificationCheckbox = await screen.findByRole('checkbox', { name: 'Classification' });
             await user.click(classificationCheckbox);
 
             expect(classificationCheckbox).toBeChecked();
 
-            await user.keyboard('{Escape}');
-
-            expect(await screen.findByText('1 type selected')).toBeInTheDocument();
             expect(await screen.findByText('2 of 8 projects')).toBeInTheDocument();
             expect(screen.getByRole('heading', { name: 'Beta Project' })).toBeInTheDocument();
             expect(screen.getByRole('heading', { name: 'Gamma Project' })).toBeInTheDocument();
@@ -250,10 +233,7 @@ describe('ProjectList', () => {
 
             expect(await screen.findByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
 
-            await user.click(screen.getByRole('button', { name: 'Filter by task type' }));
             await user.click(await screen.findByRole('checkbox', { name: 'Object detection' }));
-            await user.keyboard('{Escape}');
-
             await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'alpha');
 
             expect(await screen.findByText('1 of 8 projects')).toBeInTheDocument();
@@ -268,10 +248,7 @@ describe('ProjectList', () => {
 
             expect(await screen.findByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
 
-            await user.click(screen.getByRole('button', { name: 'Filter by task type' }));
             await user.click(await screen.findByRole('checkbox', { name: 'Object detection' }));
-            await user.keyboard('{Escape}');
-
             await user.type(screen.getByRole('searchbox', { name: /search projects by name/i }), 'beta');
 
             expect(await screen.findByText('No projects match your filters')).toBeInTheDocument();
@@ -311,7 +288,8 @@ describe('ProjectList', () => {
             expect(await screen.findByRole('heading', { name: 'Alpha Project' })).toBeInTheDocument();
 
             expect(screen.getByRole('button', { name: /sort/i })).toBeInTheDocument();
-            expect(screen.getByRole('button', { name: 'Filter by task type' })).toBeInTheDocument();
+            expect(screen.getByText('Filter by task type')).toBeInTheDocument();
+            expect(screen.getByRole('checkbox', { name: 'Object detection' })).toBeInTheDocument();
             expect(screen.getByRole('searchbox', { name: /search projects by name/i })).toBeInTheDocument();
             expect(screen.getByText('1 project')).toBeInTheDocument();
         });
@@ -356,7 +334,8 @@ describe('ProjectList', () => {
 
             expect(await screen.findByRole('heading', { name: 'Running Project' })).toBeInTheDocument();
 
-            expect(screen.queryByRole('button', { name: 'Filter by task type' })).not.toBeInTheDocument();
+            expect(screen.queryByText('Filter by task type')).not.toBeInTheDocument();
+            expect(screen.queryByRole('checkbox', { name: 'Object detection' })).not.toBeInTheDocument();
         });
 
         it('hides the search box', async () => {
@@ -443,6 +422,23 @@ describe('ProjectList', () => {
 
             expect(screen.queryByRole('button', { name: /sort/i })).not.toBeInTheDocument();
         });
+
+        it('shows the Geti intro and the workflow steps', async () => {
+            renderProjectList();
+
+            expect(await screen.findByLabelText('empty list')).toBeInTheDocument();
+            expect(screen.getByText(/a vision AI platform that guides you through/)).toBeInTheDocument();
+
+            const workflow = screen.getByRole('list', { name: 'Geti workflow' });
+            expect(
+                within(workflow)
+                    .getAllByRole('listitem')
+                    .map((item) => item.textContent)
+            ).toEqual(['Add data', 'Annotate', 'Train', 'Optimize', 'Run inference']);
+            expect(
+                screen.getByText('Monitor predictions and collect more data to iteratively fine-tune your model')
+            ).toBeInTheDocument();
+        });
     });
 
     describe('create project card', () => {
@@ -454,7 +450,7 @@ describe('ProjectList', () => {
             const createButton = await screen.findByRole('button', { name: /create new project/i });
             expect(createButton).toBeVisible();
 
-            const createFromDatasetButton = await screen.findByRole('button', { name: /Create project from dataset/i });
+            const createFromDatasetButton = await screen.findByRole('button', { name: /create from dataset/i });
             expect(createFromDatasetButton).toBeVisible();
         });
     });

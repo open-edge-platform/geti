@@ -24,6 +24,50 @@ _RECIPE_SUFFIXES: frozenset[str] = frozenset({".yaml", ".yml"})
 _WEIGHT_SUFFIXES: frozenset[str] = frozenset({".xml", ".onnx"})
 
 
+def backend_engines() -> dict[str, type[Engine]]:
+    """Return the backend name → engine class registry for the installed environment.
+
+    Ultralytics is an optional backend, so its engine is only registered when
+    the package is importable. The lite dict is rebuilt once per process.
+    """
+    from getitune.backend.huggingface.engine import HFEngine
+    from getitune.backend.lightning.engine import LightningEngine
+    from getitune.backend.openvino.engine import OVEngine
+
+    engines: dict[str, type[Engine]] = {
+        "lightning": LightningEngine,
+        "openvino": OVEngine,
+        "huggingface": HFEngine,
+    }
+    try:
+        from getitune.backend.ultralytics.engine import UltralyticsEngine
+
+        engines["ultralytics"] = UltralyticsEngine
+    except ImportError:
+        pass
+    return engines
+
+
+def engine_class_for_backend(backend: str | None) -> type[Engine]:
+    """Look up the engine class for a training config's ``backend`` field.
+
+    Args:
+        backend: ``backend`` value from the (converted) training config, or
+            ``None`` when absent (Lightning recipes omit the field).
+
+    Returns:
+        The engine class matching the backend.
+
+    Raises:
+        ValueError: If the backend is unknown or has no installed engine.
+    """
+    engine_cls = backend_engines().get(backend or "lightning")
+    if engine_cls is None:
+        msg = f"Unknown backend '{backend}'. Known backends: {sorted(backend_engines())}"
+        raise ValueError(msg)
+    return engine_cls
+
+
 def _resolve_recipe(model: MODEL, task: TaskType | str | None) -> Path:
     """Resolve a model name or YAML path to an absolute recipe path.
 
@@ -86,7 +130,7 @@ def _read_backend(recipe_path: Path) -> str:
         recipe_path: Absolute path to the recipe YAML file.
 
     Returns:
-        Backend name string (e.g. ``'lightning'``, ``'ultralytics'``).
+        Backend name string (e.g. ``'lightning'``, ``'ultralytics'``, ``'huggingface'``).
     """
     with recipe_path.open() as fh:
         raw = yaml.safe_load(fh)
@@ -106,8 +150,9 @@ def create_engine(
 
     Accepts three forms for *model*:
 
-    * **Model instance** (``LightningModel``, ``UltralyticsModel``, ``OVModel``)
-      or a **weights path** (``.xml``, ``.onnx``) — for OpenVINO and ONNX models
+    * **Model instance** (``LightningModel``, ``UltralyticsModel``, ``HFModel``,
+      ``OVModel``) or a **weights path** (``.xml``, ``.onnx``) — for OpenVINO
+      and ONNX models
 
     * **Recipe path** — a ``.yaml`` / ``.yml`` file.  The ``backend`` field in
       the recipe selects the engine; defaults to ``lightning`` when absent.
@@ -140,19 +185,7 @@ def create_engine(
         ValueError: If a model name is ambiguous, the backend is unknown,
             or no engine supports the given model/data pair.
     """
-    from getitune.backend.lightning.engine import LightningEngine
-    from getitune.backend.openvino.engine import OVEngine
-
-    backend_to_engine: dict[str, type[Engine]] = {
-        "lightning": LightningEngine,
-        "openvino": OVEngine,
-    }
-    try:
-        from getitune.backend.ultralytics.engine import UltralyticsEngine
-
-        backend_to_engine["ultralytics"] = UltralyticsEngine
-    except ImportError:
-        pass
+    backend_to_engine = backend_engines()
 
     # All known engine classes for the instance/path dispatch path,
     # including any dynamically registered custom subclasses.

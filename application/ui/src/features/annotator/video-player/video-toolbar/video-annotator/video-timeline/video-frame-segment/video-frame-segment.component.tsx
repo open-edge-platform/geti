@@ -10,8 +10,9 @@ import { useNumberFormatter } from 'react-aria';
 
 import type { AnnotatorMode } from '../../../../../../../shared/annotator/annotator-mode';
 import { EMPTY_LABEL_ID } from '../../../../../../../shared/annotator/labels';
+import { PREDICTION_CHUNK_SIZE } from '../../../../api/prediction-constants';
 import { useVideoFramesAnnotations } from '../../../../api/use-video-frames-annotations';
-import { PREDICTION_CHUNK_SIZE, useVideoFramesPredictions } from '../../../../api/use-video-frames-predictions';
+import { useVideoFramesPredictions } from '../../../../api/use-video-frames-predictions';
 import { useVideoPlayer } from '../../../../video-player-provider.component';
 
 import classes from './video-frame-segment.module.scss';
@@ -200,7 +201,7 @@ const AnnotationsLabelsSegments = ({ labels, colIndex, frameNumber }: Annotation
     );
 };
 
-export type VideoFrameSegmentProps = {
+type VideoFrameSegmentProps = {
     isFirstFrame: boolean;
     isLastFrame: boolean;
     isSelectedFrame: boolean;

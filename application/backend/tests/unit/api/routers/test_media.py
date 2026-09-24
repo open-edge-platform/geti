@@ -16,9 +16,12 @@ from PIL import Image as PILImage
 
 from app.api.dependencies import (
     get_dataset_service,
+    get_dataset_view_service,
     get_inference_media_limit,
     get_media_prediction_service,
+    get_media_segment_service,
     get_media_service,
+    get_project_service,
 )
 from app.api.schemas.media import ImageView, MediaViewAdapter, SetMediaAnnotations, VideoFrameView, VideoView
 from app.models import (
@@ -46,11 +49,21 @@ from app.models.media import (
     VideoRange,
 )
 from app.models.system import DeviceInfo, DeviceType
-from app.services import DatasetService, MediaPredictionService, MediaService, ResourceNotFoundError, ResourceType
+from app.services import (
+    DatasetService,
+    DatasetViewService,
+    MediaPredictionService,
+    MediaService,
+    ProjectService,
+    ResourceNotFoundError,
+    ResourceType,
+)
 from app.services.dataset_service import AnnotationValidationError, SubsetAlreadyAssignedError
 from app.services.inference import InferenceBusyError
+from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
 from app.services.media_service import ImageMetadata, MediaFilters
+from app.services.sam import MediaSegmentService
 
 
 @pytest.fixture
@@ -104,6 +117,13 @@ def fxt_video_frame_media():
 
 
 @pytest.fixture
+def fxt_project_service(fxt_app) -> MagicMock:
+    project_service = MagicMock(spec=ProjectService)
+    fxt_app.dependency_overrides[get_project_service] = lambda: project_service
+    return project_service
+
+
+@pytest.fixture
 def fxt_media_service(fxt_app) -> MagicMock:
     media_service = MagicMock(spec=MediaService)
     fxt_app.dependency_overrides[get_media_service] = lambda: media_service
@@ -118,10 +138,24 @@ def fxt_dataset_service(fxt_app) -> MagicMock:
 
 
 @pytest.fixture
+def fxt_dataset_view_service(fxt_app) -> MagicMock:
+    dataset_view_service = MagicMock(spec=DatasetViewService)
+    fxt_app.dependency_overrides[get_dataset_view_service] = lambda: dataset_view_service
+    return dataset_view_service
+
+
+@pytest.fixture
 def fxt_media_prediction_service(fxt_app) -> MagicMock:
     media_prediction_service = MagicMock(spec=MediaPredictionService)
     fxt_app.dependency_overrides[get_media_prediction_service] = lambda: media_prediction_service
     return media_prediction_service
+
+
+@pytest.fixture
+def fxt_media_segment_service(fxt_app) -> MagicMock:
+    media_segment_service = MagicMock(spec=MediaSegmentService)
+    fxt_app.dependency_overrides[get_media_segment_service] = lambda: media_segment_service
+    return media_segment_service
 
 
 @pytest.fixture
@@ -306,6 +340,39 @@ class TestMediaEndpoints:
             exclude_types=[MediaType.VIDEO_FRAME],
         )
 
+    def test_list_media_with_dataset_view_id(
+        self,
+        fxt_get_project,
+        fxt_image_media,
+        fxt_media_service,
+        fxt_dataset_view_service,
+        fxt_client,
+    ):
+        """When dataset_view_id is provided, the view-scoped service is used instead of the main media service."""
+        dataset_view_id = uuid4()
+        fxt_dataset_view_service.count_dataset_view_media.return_value = 1
+        fxt_dataset_view_service.list_dataset_view_media.return_value = [fxt_image_media]
+
+        response = fxt_client.get(f"/api/projects/{fxt_get_project.id}/dataset/media?dataset_view_id={dataset_view_id}")
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_dataset_view_service.count_dataset_view_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            dataset_view_id=dataset_view_id,
+            filters=MediaFilters(
+                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
+            ),
+        )
+        fxt_dataset_view_service.list_dataset_view_media.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            dataset_view_id=dataset_view_id,
+            filters=MediaFilters(
+                limit=10, offset=0, start_date=None, end_date=None, annotation_status=None, label_ids=None, subsets=None
+            ),
+        )
+        fxt_media_service.count_media.assert_not_called()
+        fxt_media_service.list_media.assert_not_called()
+
     def test_list_media_filtering_and_pagination(
         self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client
     ):
@@ -404,6 +471,98 @@ class TestMediaEndpoints:
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
         fxt_media_service.list_media.assert_not_called()
+
+    def test_list_media_ids(self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client):
+        """The whole filtered set is returned in one response, as ids only."""
+        fxt_media_service.list_media_ids.return_value = (
+            (fxt_image_media.id, fxt_image_media.type),
+            (fxt_video_media.id, fxt_video_media.type),
+        )
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/ids")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {
+            "items": [
+                {"id": str(fxt_image_media.id), "type": fxt_image_media.type.value},
+                {"id": str(fxt_video_media.id), "type": fxt_video_media.type.value},
+            ]
+        }
+        fxt_media_service.list_media_ids.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=None,
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+        # No pagination means there is nothing to count.
+        fxt_media_service.count_media.assert_not_called()
+
+    def test_list_media_ids_applies_the_same_filters_as_list_media(
+        self, fxt_get_project, fxt_image_media, fxt_media_service, fxt_client
+    ):
+        fxt_media_service.list_media_ids.return_value = ((fxt_image_media.id, fxt_image_media.type),)
+        label_id = uuid4()
+
+        response = fxt_client.get(
+            f"/api/projects/{str(uuid4())}/dataset/media/ids"
+            f"?start_date=2025-01-09T00:00:00Z&end_date=2025-12-31T23:59:59Z"
+            f"&annotation_status={DatasetItemAnnotationStatus.WITH_ANNOTATIONS.value}"
+            f"&labels={label_id}&subsets={DatasetItemSubset.TRAINING.value}"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        fxt_media_service.list_media_ids.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            filters=MediaFilters(
+                start_date=datetime(2025, 1, 9, 0, 0, 0, tzinfo=ZoneInfo("UTC")),
+                end_date=datetime(2025, 12, 31, 23, 59, 59, tzinfo=ZoneInfo("UTC")),
+                annotation_status=DatasetItemAnnotationStatus.WITH_ANNOTATIONS,
+                label_ids=[label_id],
+                subsets=[DatasetItemSubset.TRAINING.value],
+            ),
+            exclude_types=[MediaType.VIDEO_FRAME],
+        )
+
+    def test_list_media_ids_with_dataset_view_id(
+        self, fxt_get_project, fxt_image_media, fxt_media_service, fxt_dataset_view_service, fxt_client
+    ):
+        dataset_view_id = uuid4()
+        fxt_dataset_view_service.list_dataset_view_media_ids.return_value = (
+            (fxt_image_media.id, fxt_image_media.type),
+        )
+
+        response = fxt_client.get(
+            f"/api/projects/{fxt_get_project.id}/dataset/media/ids?dataset_view_id={dataset_view_id}"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json() == {"items": [{"id": str(fxt_image_media.id), "type": fxt_image_media.type.value}]}
+        fxt_dataset_view_service.list_dataset_view_media_ids.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            dataset_view_id=dataset_view_id,
+            filters=MediaFilters(
+                start_date=None,
+                end_date=None,
+                annotation_status=None,
+                label_ids=None,
+                subsets=None,
+            ),
+        )
+        fxt_media_service.list_media_ids.assert_not_called()
+
+    def test_list_media_ids_wrong_dates(self, fxt_get_project, fxt_media_service, fxt_client):
+        response = fxt_client.get(
+            f"/api/projects/{str(uuid4())}/dataset/media/ids"
+            f"?start_date=2025-12-31T23:59:59Z&end_date=2025-01-09T00:00:00Z"
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_media_service.list_media_ids.assert_not_called()
 
     @pytest.mark.parametrize(
         "annotation_status",
@@ -899,47 +1058,54 @@ class TestMediaEndpoints:
         fxt_media_service.get_frame_binary.assert_not_called()
         fxt_media_service.get_media_binary_path_by_id.assert_not_called()
 
-    def test_get_media_thumbnail_not_found(self, fxt_get_project, fxt_media_service, fxt_client):
-        media_id = uuid4()
-        fxt_media_service.get_media_by_id.side_effect = ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
-
-        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media_id)}/thumbnail")
-
-        assert response.status_code == status.HTTP_404_NOT_FOUND
-        fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=media_id)
-
     @pytest.mark.parametrize(
-        "media, suffix",
+        "media",
         [
-            (MagicMock(spec=Image, id=uuid4(), format=ImageFormat.JPG, type=MediaType.IMAGE), ".jpg"),
-            (MagicMock(spec=Video, id=uuid4(), format=VideoFormat.MP4, type=MediaType.VIDEO), ".mp4"),
-            (MagicMock(spec=VideoFrame, id=uuid4(), format=ImageFormat.JPG, type=MediaType.VIDEO_FRAME), ".jpg"),
+            (MagicMock(spec=Image, id=uuid4(), format=ImageFormat.JPG, type=MediaType.IMAGE)),
+            (MagicMock(spec=Video, id=uuid4(), format=VideoFormat.MP4, type=MediaType.VIDEO)),
+            (MagicMock(spec=VideoFrame, id=uuid4(), format=ImageFormat.JPG, type=MediaType.VIDEO_FRAME)),
         ],
     )
-    def test_get_media_thumbnail_success(self, fxt_get_project, fxt_media_service, fxt_client, media, suffix):
+    def test_get_media_thumbnail_not_found(self, fxt_project_service, fxt_media_service, fxt_client, media):
+        project_id = uuid4()
+        media_id = uuid4()
+        fxt_media_service.get_media_thumbnail_path_by_id.return_value = Path("non_existent")
+        fxt_media_service.get_media_by_id.return_value = media
+
+        response = fxt_client.get(f"/api/projects/{str(project_id)}/dataset/media/{str(media_id)}/thumbnail")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        fxt_media_service.get_media_thumbnail_path_by_id.assert_called_once_with(
+            project_id=project_id, media_id=media_id
+        )
+        fxt_media_service.get_media_by_id.assert_called_once_with(project_id=project_id, media_id=media_id)
+
+    def test_get_pregenerated_thumbnail_success(self, fxt_media_service, fxt_client):
         # Create a temporary JPEG file to act as the thumbnail
-        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp_file:
+        project_id = uuid4()
+        media_id = uuid4()
+        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp_file:
             thumbnail_path = Path(tmp_file.name)
             img = PILImage.new("RGB", (64, 64), color="red")
             img.save(tmp_file, format="JPEG")
 
         try:
-            fxt_media_service.get_media_by_id.return_value = media
-            fxt_media_service.get_media_thumbnail_path.return_value = thumbnail_path
+            fxt_media_service.get_media_thumbnail_path_by_id.return_value = thumbnail_path
 
-            response = fxt_client.get(f"/api/projects/{uuid4()}/dataset/media/{str(media.id)}/thumbnail")
+            response = fxt_client.get(f"/api/projects/{project_id}/dataset/media/{media_id}/thumbnail")
 
             assert response.status_code == status.HTTP_200_OK
             assert response.headers["content-type"] == "image/jpeg"
             with open(thumbnail_path, "rb") as f:
                 assert response.content == f.read()
-            fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=media.id)
-            fxt_media_service.get_media_thumbnail_path.assert_called_once_with(project=fxt_get_project, media=media)
+            fxt_media_service.get_media_thumbnail_path_by_id.assert_called_once_with(
+                project_id=project_id, media_id=media_id
+            )
         finally:
             if thumbnail_path.exists():
                 os.unlink(thumbnail_path)
 
-    def test_get_video_frame_thumbnail_on_the_fly_annotated(self, fxt_get_project, fxt_media_service, fxt_client):
+    def test_get_video_frame_thumbnail_on_the_fly_annotated(self, fxt_project_service, fxt_media_service, fxt_client):
         # Create a temporary JPEG file to act as the thumbnail
         with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp_file:
             thumbnail_path = Path(tmp_file.name)
@@ -947,71 +1113,89 @@ class TestMediaEndpoints:
             img.save(tmp_file, format="JPEG")
 
         try:
+            project_id = uuid4()
             video_id = uuid4()
             video_frame_id = uuid4()
+
+            project = MagicMock()
 
             media = MagicMock(spec=Video, id=video_id, format=VideoFormat.MP4, type=MediaType.VIDEO, frame_count=100)
             fxt_media_service.get_media_by_id.return_value = media
 
-            fxt_media_service.get_media_thumbnail_path.return_value = thumbnail_path
+            fxt_media_service.get_media_thumbnail_path_by_id.side_effect = (Path("non_existent"), thumbnail_path)
 
             video_frame = MagicMock(spec=VideoFrame, id=video_frame_id, format=ImageFormat.JPG)
             type(video_frame).name = PropertyMock(return_value="test_10")
+            fxt_project_service.get_project_by_id.return_value = project
             fxt_media_service.get_video_frame_by_video_id_and_index.return_value = video_frame
 
             response = fxt_client.get(
-                f"/api/projects/{str(uuid4())}/dataset/media/{str(video_id)}/thumbnail?frame_index=10"
+                f"/api/projects/{project_id}/dataset/media/{str(video_id)}/thumbnail?frame_index=10"
             )
             assert response.status_code == status.HTTP_200_OK
 
-            fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=video_id)
+            fxt_media_service.get_media_by_id.assert_called_once_with(project_id=project_id, media_id=video_id)
             fxt_media_service.get_video_frame_by_video_id_and_index.assert_called_once_with(
-                project=fxt_get_project, video_id=video_id, frame_index=10
+                project=project, video_id=video_id, frame_index=10
             )
-            fxt_media_service.get_media_thumbnail_path.assert_called_once_with(
-                project=fxt_get_project, media=video_frame
+            fxt_media_service.get_media_thumbnail_path_by_id.assert_has_calls(
+                [
+                    call(project_id=project_id, media_id=video_id),
+                    call(project_id=project_id, media_id=video_frame_id),
+                ]
             )
         finally:
             if thumbnail_path.exists():
                 os.unlink(thumbnail_path)
 
-    def test_get_video_frame_thumbnail_on_the_fly_not_annotated(self, fxt_get_project, fxt_media_service, fxt_client):
+    def test_get_video_frame_thumbnail_on_the_fly_not_annotated(
+        self, fxt_project_service, fxt_media_service, fxt_client
+    ):
         video_id = uuid4()
+        project_id = uuid4()
+
+        project = MagicMock()
+
+        fxt_media_service.get_media_thumbnail_path_by_id.return_value = Path("non_existent")
 
         media = MagicMock(spec=Video, id=video_id, format=VideoFormat.MP4, type=MediaType.VIDEO, frame_count=100)
         type(media).name = PropertyMock(return_value="test")
         fxt_media_service.get_media_by_id.return_value = media
+        fxt_project_service.get_project_by_id.return_value = project
 
         fxt_media_service.get_video_frame_by_video_id_and_index.return_value = None
         test_image = PILImage.new("RGB", (64, 64), color="blue")
         fxt_media_service.get_frame_thumbnail.return_value = test_image
 
         response = fxt_client.get(
-            f"/api/projects/{str(uuid4())}/dataset/media/{str(video_id)}/thumbnail?frame_index=10"
+            f"/api/projects/{str(project_id)}/dataset/media/{str(video_id)}/thumbnail?frame_index=10"
         )
         assert response.status_code == status.HTTP_200_OK
 
-        fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=video_id)
+        fxt_media_service.get_media_by_id.assert_called_once_with(project_id=project_id, media_id=video_id)
         fxt_media_service.get_video_frame_by_video_id_and_index.assert_called_once_with(
-            project=fxt_get_project, video_id=video_id, frame_index=10
+            project=project, video_id=video_id, frame_index=10
         )
-        fxt_media_service.get_frame_thumbnail.assert_called_once_with(
-            project=fxt_get_project, video=media, frame_index=10
-        )
+        fxt_media_service.get_frame_thumbnail.assert_called_once_with(project=project, video=media, frame_index=10)
 
-    def test_get_video_frame_thumbnail_on_the_fly_index_exceeds(self, fxt_get_project, fxt_media_service, fxt_client):
+    def test_get_video_frame_thumbnail_on_the_fly_index_exceeds(
+        self, fxt_project_service, fxt_media_service, fxt_client
+    ):
         video_id = uuid4()
+        project_id = uuid4()
+
+        fxt_media_service.get_media_thumbnail_path_by_id.return_value = Path("non_existent")
 
         media = MagicMock(spec=Video, id=video_id, format=VideoFormat.MP4, type=MediaType.VIDEO, frame_count=10)
         type(media).name = PropertyMock(return_value="test")
         fxt_media_service.get_media_by_id.return_value = media
 
         response = fxt_client.get(
-            f"/api/projects/{str(uuid4())}/dataset/media/{str(video_id)}/thumbnail?frame_index=100"
+            f"/api/projects/{str(project_id)}/dataset/media/{str(video_id)}/thumbnail?frame_index=100"
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-        fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=video_id)
+        fxt_media_service.get_media_by_id.assert_called_once_with(project_id=project_id, media_id=video_id)
         fxt_media_service.get_video_frame_by_video_id_and_index.assert_not_called()
         fxt_media_service.get_frame_thumbnail.assert_not_called()
 
@@ -1868,8 +2052,18 @@ class TestMediaEndpoints:
             frame_index_to=9,
         )
 
+    @pytest.mark.parametrize(
+        "predict_path_suffix",
+        ["media:predict", "media/media:predict"],
+        ids=["new_path", "deprecated_path"],
+    )
     def test_media_predict(
-        self, fxt_get_project, fxt_media_prediction_service, fxt_inference_media_limit, fxt_client
+        self,
+        predict_path_suffix,
+        fxt_get_project,
+        fxt_media_prediction_service,
+        fxt_inference_media_limit,
+        fxt_client,
     ) -> None:
         label_id = uuid4()
         model_id = uuid4()
@@ -1897,7 +2091,7 @@ class TestMediaEndpoints:
         )
 
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            f"/api/projects/{str(uuid4())}/dataset/{predict_path_suffix}",
             json=request.model_dump(mode="json"),
         )
 
@@ -1952,7 +2146,7 @@ class TestMediaEndpoints:
             resource_id=str(media_id), message="Frame range can be specified only for videos."
         )
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
             json=request.model_dump(mode="json"),
         )
 
@@ -1980,7 +2174,7 @@ class TestMediaEndpoints:
         fxt_inference_media_limit(3)
 
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
             json=request.model_dump(mode="json"),
         )
 
@@ -2007,7 +2201,7 @@ class TestMediaEndpoints:
         fxt_media_prediction_service.predict_media.side_effect = InferenceBusyError()
 
         response = fxt_client.post(
-            f"/api/projects/{str(uuid4())}/dataset/media/media:predict",
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
             json=request.model_dump(mode="json"),
         )
 
@@ -2016,3 +2210,139 @@ class TestMediaEndpoints:
             "detail": "Inference request timed out waiting for the model lock. Another inference is in "
             + "progress or model is not loaded yet."
         }
+
+    def test_media_predict_with_confidence_threshold(
+        self, fxt_get_project, fxt_media_prediction_service, fxt_inference_media_limit, fxt_client
+    ) -> None:
+        request = MediaListPredictionRequest(
+            model_id=uuid4(),
+            media=[MediaPredictionRequest(media_id=uuid4(), range=None)],
+            device="AUTO",
+            confidence_threshold=0.8,
+        )
+
+        fxt_inference_media_limit(10)
+        fxt_media_prediction_service.predict_media.return_value = BatchInferenceResult(predictions=[])
+
+        response = fxt_client.post(
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
+            json=request.model_dump(mode="json"),
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert fxt_media_prediction_service.predict_media.call_args.kwargs["request"].confidence_threshold == 0.8
+
+    @pytest.mark.parametrize("confidence_threshold", [-0.1, 1.5, "high"])
+    def test_media_predict_invalid_confidence_threshold(
+        self, confidence_threshold, fxt_get_project, fxt_media_prediction_service, fxt_inference_media_limit, fxt_client
+    ) -> None:
+        fxt_inference_media_limit(10)
+
+        response = fxt_client.post(
+            f"/api/projects/{str(uuid4())}/dataset/media:predict",
+            json={
+                "model_id": str(uuid4()),
+                "media": [{"media_id": str(uuid4()), "range": None}],
+                "device": "AUTO",
+                "confidence_threshold": confidence_threshold,
+            },
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_media_prediction_service.predict_media.assert_not_called()
+
+    def test_media_embeddings_image_success(
+        self, fxt_image_media, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        fxt_media_service.get_media_by_id.return_value = fxt_image_media
+        fxt_media_segment_service.encode_media.return_value = b"embeddings-bytes"
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(fxt_image_media.id)}/embeddings")
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("content-type") == "application/octet-stream"
+        assert f"{fxt_image_media.id}_embeddings.safetensors" in response.headers.get("content-disposition", "")
+        assert response.content == b"embeddings-bytes"
+
+        fxt_media_service.get_media_by_id.assert_called_once_with(
+            project_id=fxt_get_project.id, media_id=fxt_image_media.id
+        )
+        fxt_media_segment_service.encode_media.assert_called_once_with(
+            project=fxt_get_project, media=fxt_image_media, device=DeviceInfo.cpu()
+        )
+
+    def test_media_embeddings_video_frame_success(
+        self, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        video_id = uuid4()
+        media = MagicMock(spec=Video, id=video_id, format=VideoFormat.MP4, type=MediaType.VIDEO, frame_count=100)
+        fxt_media_service.get_media_by_id.return_value = media
+        # No annotated frame exists, so a NotAnnotatedVideoFrame is segmented on the fly
+        fxt_media_service.get_video_frame_by_video_id_and_index.return_value = None
+        fxt_media_segment_service.encode_media.return_value = b"frame-embeddings"
+
+        response = fxt_client.get(
+            f"/api/projects/{str(uuid4())}/dataset/media/{str(video_id)}/embeddings?frame_index=10"
+        )
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.headers.get("content-type") == "application/octet-stream"
+        assert f"{video_id}_10_embeddings.safetensors" in response.headers.get("content-disposition", "")
+        assert response.content == b"frame-embeddings"
+
+        fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=video_id)
+        fxt_media_service.get_video_frame_by_video_id_and_index.assert_called_once_with(
+            project=fxt_get_project, video_id=video_id, frame_index=10
+        )
+        fxt_media_segment_service.encode_media.assert_called_once_with(
+            project=fxt_get_project, media=ANY, device=DeviceInfo.cpu()
+        )
+
+    def test_media_embeddings_video_without_frame_index(
+        self, fxt_video_media, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        fxt_media_service.get_media_by_id.return_value = fxt_video_media
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(fxt_video_media.id)}/embeddings")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {"detail": "Video frame index is not provided."}
+        fxt_media_segment_service.encode_media.assert_not_called()
+
+    def test_media_embeddings_media_not_found(
+        self, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        media_id = uuid4()
+        fxt_media_service.get_media_by_id.side_effect = ResourceNotFoundError(ResourceType.MEDIA, str(media_id))
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(media_id)}/embeddings")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        fxt_media_service.get_media_by_id.assert_called_once_with(project_id=fxt_get_project.id, media_id=media_id)
+        fxt_media_segment_service.encode_media.assert_not_called()
+
+    def test_media_embeddings_video_range_error(
+        self, fxt_image_media, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        fxt_media_service.get_media_by_id.return_value = fxt_image_media
+        fxt_media_segment_service.encode_media.side_effect = VideoRangeError(
+            resource_id=str(fxt_image_media.id), message="Frame range can be specified only for videos."
+        )
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(fxt_image_media.id)}/embeddings")
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.json() == {"detail": "Frame range can be specified only for videos."}
+
+    def test_media_embeddings_binary_not_found(
+        self, fxt_image_media, fxt_get_project, fxt_media_service, fxt_media_segment_service, fxt_client
+    ) -> None:
+        fxt_media_service.get_media_by_id.return_value = fxt_image_media
+        fxt_media_segment_service.encode_media.side_effect = BinaryNotFoundError(
+            f"Media {str(fxt_image_media.id)} binary cannot be found"
+        )
+
+        response = fxt_client.get(f"/api/projects/{str(uuid4())}/dataset/media/{str(fxt_image_media.id)}/embeddings")
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert response.json() == {"detail": f"Media {str(fxt_image_media.id)} binary cannot be found"}

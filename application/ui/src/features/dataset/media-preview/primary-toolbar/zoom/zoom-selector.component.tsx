@@ -1,13 +1,14 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { IconWrapper } from '@/components/icon-wrapper/icon-wrapper.component';
+import { useSetZoom, useZoom } from '@/components/zoom/zoom.provider';
+import { useTranslation } from '@/i18n';
 import { ActionButton, Flex, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Add, Remove } from '@geti-ui/ui/icons';
 
-import { IconWrapper } from '../../../../../components/icon-wrapper/icon-wrapper.component';
-import { useSetZoom, useZoom } from '../../../../../components/zoom/zoom.provider';
-
 export const ZoomSelector = () => {
+    const { t } = useTranslation();
     const zoom = useZoom();
     const { onZoomChange } = useSetZoom();
 
@@ -24,7 +25,7 @@ export const ZoomSelector = () => {
                         <Add />
                     </IconWrapper>
                 </ActionButton>
-                <Tooltip>Zoom In</Tooltip>
+                <Tooltip>{t('annotator.actions.zoomIn')}</Tooltip>
             </TooltipTrigger>
 
             <Flex justifyContent={'end'} width={'size-350'}>
@@ -48,7 +49,7 @@ export const ZoomSelector = () => {
                         <Remove />
                     </IconWrapper>
                 </ActionButton>
-                <Tooltip>Zoom Out</Tooltip>
+                <Tooltip>{t('annotator.actions.zoomOut')}</Tooltip>
             </TooltipTrigger>
         </>
     );

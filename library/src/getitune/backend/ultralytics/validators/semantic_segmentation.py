@@ -50,5 +50,5 @@ class SemanticSegmentationValidator(GetiTuneValidatorMixin, _UltralyticsSemantic
             batch_size=self.args.batch,  # type: ignore[attr-defined]
             shuffle=False,
             collate_fn=semantic_collate_fn,
-            pin_memory=True,
+            pin_memory=self.device.type != "cpu",
         )

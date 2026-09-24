@@ -8,7 +8,6 @@ import {
     distributeByLargestRemainder,
     getAllModelsWithOpenVINOVariants,
     getModelIdentifierPayload,
-    isUltralyticsModel,
     SelectableModel,
 } from './utils';
 
@@ -84,7 +83,7 @@ describe('getAllModelsWithOpenVINOVariants', () => {
         });
 
         expect(getAllModelsWithOpenVINOVariants([model])).toEqual([
-            { modelVariantId: 'v-ov', name: 'My Model [FP16]', modelId: 'model-1' },
+            { modelVariantId: 'v-ov', name: 'My Model [FP16]', modelId: 'model-1', optimalConfidenceThreshold: 0.65 },
         ]);
     });
 
@@ -100,9 +99,9 @@ describe('getAllModelsWithOpenVINOVariants', () => {
         });
 
         expect(getAllModelsWithOpenVINOVariants([model])).toEqual([
-            { modelVariantId: 'v-fp16', name: 'My Model [FP16]', modelId: 'model-1' },
-            { modelVariantId: 'v-fp32', name: 'My Model [FP32]', modelId: 'model-1' },
-            { modelVariantId: 'v-int8', name: 'My Model [INT8]', modelId: 'model-1' },
+            { modelVariantId: 'v-fp16', name: 'My Model [FP16]', modelId: 'model-1', optimalConfidenceThreshold: 0.65 },
+            { modelVariantId: 'v-fp32', name: 'My Model [FP32]', modelId: 'model-1', optimalConfidenceThreshold: 0.65 },
+            { modelVariantId: 'v-int8', name: 'My Model [INT8]', modelId: 'model-1', optimalConfidenceThreshold: 0.65 },
         ]);
     });
 
@@ -117,7 +116,7 @@ describe('getAllModelsWithOpenVINOVariants', () => {
         });
 
         expect(getAllModelsWithOpenVINOVariants([model])).toEqual([
-            { modelVariantId: 'v-ov', name: 'My Model [FP16]', modelId: 'model-1' },
+            { modelVariantId: 'v-ov', name: 'My Model [FP16]', modelId: 'model-1', optimalConfidenceThreshold: 0.65 },
         ]);
     });
 
@@ -138,41 +137,32 @@ describe('getAllModelsWithOpenVINOVariants', () => {
         });
 
         expect(getAllModelsWithOpenVINOVariants([modelA, modelB, modelC])).toEqual([
-            { modelVariantId: 'v-a-ov', name: 'Model A [FP16]', modelId: 'model-a' },
-            { modelVariantId: 'v-c-fp32', name: 'Model C [FP32]', modelId: 'model-c' },
-            { modelVariantId: 'v-c-int8', name: 'Model C [INT8]', modelId: 'model-c' },
+            { modelVariantId: 'v-a-ov', name: 'Model A [FP16]', modelId: 'model-a', optimalConfidenceThreshold: 0.65 },
+            {
+                modelVariantId: 'v-c-fp32',
+                name: 'Model C [FP32]',
+                modelId: 'model-c',
+                optimalConfidenceThreshold: 0.65,
+            },
+            {
+                modelVariantId: 'v-c-int8',
+                name: 'Model C [INT8]',
+                modelId: 'model-c',
+                optimalConfidenceThreshold: 0.65,
+            },
         ]);
     });
 });
 
 describe('getModelIdentifierPayload', () => {
     it('returns both model_id (parent) and model_variant_id', () => {
-        const model: SelectableModel = { modelVariantId: 'v-ov', name: 'My Model [FP16]', modelId: 'model-1' };
+        const model: SelectableModel = {
+            modelVariantId: 'v-ov',
+            name: 'My Model [FP16]',
+            modelId: 'model-1',
+            optimalConfidenceThreshold: 0.65,
+        };
 
         expect(getModelIdentifierPayload(model)).toEqual({ model_id: 'model-1', model_variant_id: 'v-ov' });
-    });
-});
-
-describe('isUltralyticsModel', () => {
-    it('returns true for ultralytics model identifier', () => {
-        const models = [
-            'object-detection-yolo26-m',
-            'OBJECT-DETECTION-YOLO26-M',
-            'object-detection-yolo11-n',
-            'OBJECT-DETECTION-YOLO11-N',
-            'object-detection-yolo12-s',
-            'OBJECT-DETECTION-YOLO12-S',
-            'instance-segmentation-yolo11-l',
-            'instance-segmentation-yolo12-x',
-        ];
-
-        models.forEach((model) => {
-            expect(isUltralyticsModel(model)).toBe(true);
-        });
-    });
-
-    it('returns false for non ultralytics model identifier', () => {
-        expect(isUltralyticsModel('object-detection-yolox-l')).toBe(false);
-        expect(isUltralyticsModel('OBJECT-DETECTION-YOLOX-L')).toBe(false);
     });
 });

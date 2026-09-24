@@ -91,6 +91,7 @@ class Scheduler:
             pred_queue=self.pred_queue,
             stop_event=self.mp_stop_event,
             model_reload_event=self._event_bus.model_reload_event,
+            inference_params_event=self._event_bus.inference_params_event,
             shm_name=self.shm_metrics.name,
             shm_lock=self.shm_metrics_lock,
             inference_status_shm_name=self.inference_status_shm.name,

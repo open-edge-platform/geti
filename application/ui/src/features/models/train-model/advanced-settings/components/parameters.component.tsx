@@ -10,6 +10,7 @@ import type {
     StringEnumConfigurableParameter,
     TrainingConfigurationParameter,
 } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import {
     Content,
     ContextualHelp,
@@ -34,7 +35,7 @@ import {
     ParametersEnableGroupParameters,
 } from '../utils';
 import { BooleanParameterField } from './boolean-parameter-field.component';
-import { NumberParameterField } from './number-parameter-field.component';
+import { NumberParameterField } from './number-parameter-field/number-parameter-field.component';
 import { RangeParameterField } from './range-parameter-field/range-parameter-field.component';
 import { ResetButton } from './reset-button.component';
 
@@ -101,6 +102,7 @@ type ParameterLayoutProps = {
     children: ReactNode;
     marginStart?: DimensionValue;
     isGroupHeader?: boolean;
+    ariaLabel?: string;
 };
 
 type ParameterNameProps = {
@@ -139,7 +141,10 @@ const ParameterLayout = ({
     onReset,
     marginStart,
     isGroupHeader,
+    ariaLabel,
 }: ParameterLayoutProps) => {
+    const resetAriaLabel = ariaLabel ?? header;
+
     return (
         <>
             <ParameterName
@@ -150,7 +155,7 @@ const ParameterLayout = ({
                 isGroupHeader={isGroupHeader}
             />
             <View gridColumn={'2/3'}>{children}</View>
-            {isFunction(onReset) && <ResetButton onPress={onReset} aria-label={`Reset ${header}`} />}
+            {isFunction(onReset) && <ResetButton onPress={onReset} aria-label={`Reset ${resetAriaLabel}`} />}
         </>
     );
 };
@@ -163,8 +168,10 @@ type ParameterReadOnlyProps = {
 type ParameterReadOnlyValueProps = Pick<ConfigurableParameter, 'value' | 'name'>;
 
 const ParameterReadOnlyValue = ({ value, name }: ParameterReadOnlyValueProps) => {
+    const { t } = useTranslation();
+
     if (isBoolean(value)) {
-        return <span aria-label={name}>{value ? 'On' : 'Off'}</span>;
+        return <span aria-label={name}>{value ? t('common.labels.on') : t('common.labels.off')}</span>;
     }
 
     if (Array.isArray(value) && value.length === 2) {

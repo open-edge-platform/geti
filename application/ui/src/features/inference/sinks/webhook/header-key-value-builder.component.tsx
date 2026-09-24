@@ -3,11 +3,12 @@
 
 import { Fragment, useState } from 'react';
 
+import { RequiredTextField } from '@/components/required-text-field/required-text-field.component';
+import { useTranslation } from '@/i18n';
 import { ActionButton, Content, ContextualHelp, dimensionValue, Flex, Grid, Text } from '@geti-ui/ui';
 import { Add, Delete } from '@geti-ui/ui/icons';
 import { isEmpty } from 'lodash-es';
 
-import { RequiredTextField } from '../../../../components/required-text-field/required-text-field.component';
 import { Fields, getPairsFromObject, Pair } from './utils';
 
 type HeaderKeyValueBuilderProps = {
@@ -21,6 +22,7 @@ const updatePairAtIndex = (indexToUpdate: number, field: Fields, value: string) 
     index === indexToUpdate ? { ...pair, [field]: value } : pair;
 
 export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {} }: HeaderKeyValueBuilderProps) => {
+    const { t } = useTranslation();
     const [pairs, setPairs] = useState<Pair[]>(getPairsFromObject(config));
 
     const addPair = () => {
@@ -50,10 +52,7 @@ export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {}
 
                     <ContextualHelp variant='info'>
                         <Content>
-                            <Text>
-                                Add as many key-value pairs as needed. Each pair will be included in the &apos;{title}
-                                &apos; object.
-                            </Text>
+                            <Text>{t('inference.sinks.webhook.headersHelp', { title })}</Text>
                         </Content>
                     </ContextualHelp>
                 </Flex>
@@ -71,8 +70,8 @@ export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {}
                             name={keysName}
                             value={pair.key}
                             aria-label={keysName}
-                            placeholder='key'
-                            errorMessage='Key cannot be empty'
+                            placeholder={t('inference.sinks.webhook.keyPlaceholder')}
+                            errorMessage={t('inference.validation.keyEmpty')}
                             onChange={(val) => updatePair(index, Fields.KEY, val)}
                         />
                         <RequiredTextField
@@ -81,8 +80,8 @@ export const HeaderKeyValueBuilder = ({ title, keysName, valuesName, config = {}
                             name={valuesName}
                             value={pair.value}
                             aria-label={valuesName}
-                            placeholder='value'
-                            errorMessage='Value cannot be empty'
+                            placeholder={t('inference.sinks.webhook.valuePlaceholder')}
+                            errorMessage={t('inference.validation.valueEmpty')}
                             isDisabled={isEmpty(pair.key)}
                             onChange={(val) => updatePair(index, Fields.VALUE, val)}
                         />

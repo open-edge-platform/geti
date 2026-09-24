@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { DatasetSubset, Media } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import {
     ActionButton,
     Button,
@@ -22,6 +23,7 @@ import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 import { useHotkeys } from 'react-hotkeys-hook';
 
+import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
@@ -33,9 +35,10 @@ import { isClassificationTask, isMultiLabelClassificationTask } from '../../../p
 import { DeleteMediaItem } from '../../gallery/delete-media-item/delete-media-item.component';
 import { Toolbar } from '../toolbar-container/toolbar-container.component';
 import { AnnotatorModes } from './annotator-modes/annotator-modes-toggle.component';
-import { PredictionInferenceDevices } from './annotator-modes/prediction-inference-devices.component';
-import { PredictionModelSelector } from './annotator-modes/prediction-model-selector.component';
-import { PredictionButtons } from './annotator-modes/predictions-buttons.component';
+import { PredictionConfidenceThreshold } from './prediction-confidence-threshold/prediction-confidence-threshold.component';
+import { PredictionInferenceDevices } from './prediction-inference-devices/prediction-inference-devices.component';
+import { PredictionModelSelector } from './prediction-model-selector/prediction-model-selector.component';
+import { PredictionButtons } from './predictions-buttons.component';
 import { useIsSubmitDisabled } from './use-is-submit-disabled.hook';
 import { getNextItem } from './util';
 
@@ -56,11 +59,13 @@ const ImageAnnotationButtons = ({
     isDisabled,
     isSaving,
 }: ImageAnnotationButtonsProps) => {
+    const { t } = useTranslation();
+
     return (
         <>
             <DeleteMediaItem itemsIds={[mediaId]} onDeleted={onDeleteItem} />
             <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
-                Submit
+                {t('common.actions.submit')}
             </Button>
         </>
     );
@@ -73,14 +78,18 @@ type VideoAnnotationButtonsProps = {
 };
 
 const VideoAnnotationButtons = ({ onSubmit, isDisabled, isSaving }: VideoAnnotationButtonsProps) => {
+    const { t } = useTranslation();
+
     return (
         <Button variant='accent' onPress={onSubmit} isPending={isSaving} isDisabled={isDisabled}>
-            Submit
+            {t('common.actions.submit')}
         </Button>
     );
 };
 
 const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
+    const { t } = useTranslation();
+
     return (
         <DialogTrigger type={'popover'} placement={'bottom'}>
             <TooltipTrigger>
@@ -89,15 +98,16 @@ const PredictionActions = ({ isDisabled }: { isDisabled: boolean }) => {
                         <Gear />
                     </ActionButton>
                 </Toolbar.Section>
-                <Tooltip>Prediction settings</Tooltip>
+                <Tooltip>{t('annotator.predictions.settingsTitle')}</Tooltip>
             </TooltipTrigger>
             <Dialog size='S'>
-                <Heading>Prediction settings</Heading>
+                <Heading>{t('annotator.predictions.settingsTitle')}</Heading>
                 <Divider />
                 <Content>
-                    <Flex gap={'size-50'} direction={'column'}>
+                    <Flex gap={'size-300'} direction={'column'}>
                         <PredictionModelSelector isDisabled={isDisabled} />
                         <PredictionInferenceDevices isDisabled={isDisabled} />
+                        {FEATURE_FLAGS.CONFIDENCE_THRESHOLD && <PredictionConfidenceThreshold />}
                     </Flex>
                 </Content>
             </Dialog>
@@ -130,6 +140,7 @@ export const SecondaryToolbar = ({
     hasSubsetChanged = false,
     isLoadingPredictions = false,
 }: SecondaryToolbarProps) => {
+    const { t } = useTranslation();
     const { data: selectedProject } = useProject();
     const videoPlayerContext = useVideoPlayerContext();
     const { selectableModels } = usePredictionSetup();
@@ -169,7 +180,7 @@ export const SecondaryToolbar = ({
     });
 
     useHotkeys(
-        HOTKEYS.submit,
+        [HOTKEYS.submit, HOTKEYS.submitAlternative],
         (event) => {
             event.preventDefault();
 
@@ -241,7 +252,7 @@ export const SecondaryToolbar = ({
                             <Icon height={'size-150'} width={'size-150'}>
                                 <CloseSemiBold />
                             </Icon>
-                            <Text>Close</Text>
+                            <Text>{t('common.actions.close')}</Text>
                         </ActionButton>
                     </ButtonGroup>
                 </Toolbar.Section>

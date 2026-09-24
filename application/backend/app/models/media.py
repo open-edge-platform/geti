@@ -163,3 +163,16 @@ class MediaListPredictionRequest(BaseModel):
     model_variant_id: UUID | None = None
     media: list[MediaPredictionRequest]
     device: str
+    confidence_threshold: Annotated[
+        float | None,
+        Field(
+            default=None,
+            ge=0.0,
+            le=1.0,
+            description=(
+                "Confidence threshold to apply to the model before inference. "
+                "When omitted, the model keeps the threshold it is currently using. "
+                "If never set, the model uses the optimal threshold determined at export time, if any."
+            ),
+        ),
+    ]

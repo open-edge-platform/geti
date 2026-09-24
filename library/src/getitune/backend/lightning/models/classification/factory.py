@@ -200,7 +200,7 @@ class TimmModel:
 
         This class allows users to create models for multi-class or multi-label
         classification by specifying the `task` parameter.
-        Users can select any model available in the Timm library (over 900 models as of 2025)
+        Users can select any model available in the Timm library (over 1400+ models as of 2026)
         by providing its name to the `model_name` parameter.
         To explore all available models, use `timm.list_models()` or `TimmModel.list_model()`.
 
@@ -218,7 +218,7 @@ class TimmModel:
                 You can find all available models at timm.list_models() or using TimmModel.list_model().
             task (Literal["multi_class", "multi_label"], optional): The task type.
                 Can be "multi_class" or "multi_label". Defaults to "multi_class".
-            optimizer (OptimizerCallable, optional): The optimizer callable. Defaults to DefaultOptimizerCallable.
+            optimizer (OptimizerCallable): The optimizer callable. Defaults to DefaultOptimizerCallable.
             scheduler (LRSchedulerCallable | LRSchedulerListCallable, optional): The learning rate scheduler callable.
                 Defaults to DefaultSchedulerCallable.
             metric (MetricCallable, optional): The metric callable. Defaults to MultiClassClsMetricCallable.
@@ -234,14 +234,16 @@ class TimmModel:
             ...                        "std": [58.395, 57.12, 57.375]},
             ...     model_name="tf_efficientnetv2_s.in21k",
             ... )
-            >>> # Multi-label classification
+            >>> # Multi-label classification with timm optimizer
+            >>> from getitune.backend.lightning.models.classification.utils.timm import TimmOptimizer
             >>> model = TimmModel(
             ...     task="multi_label",
+            ...     optimizer = TimmOptimizer(lr=0.01, weight_decay=0.001),
             ...     model_name="tf_efficientnetv2_s.in21k",
             ...     data_input_params={"input_size": (224, 224),
             ...                        "mean": [123.675, 116.28, 103.53],
             ...                        "std": [58.395, 57.12, 57.375]},
-            ...     label_info=[1, 5, 10]  # Multi-label setup
+            ...     label_info=["1", "5", "10"]  # Multi-label setup
             ... )
         """
         if task == "multi_class":

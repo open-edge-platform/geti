@@ -13,7 +13,7 @@ description: Regenerate and validate the OpenAPI contract between `application/b
 ## Preferred Workflow
 
 1. If the backend is not already running, generate the spec from `application/backend/` with `just gen-api-spec --output-path ../ui/src/api/openapi-spec.json` on Unix-like shells, or `just gen-api-spec --output-path ..\\ui\\src\\api\\openapi-spec.json` on Windows.
-2. If the backend is already running on `http://localhost:7860`, work from `application/ui/` and run `npm run update-spec`.
+2. If the backend is already running on `https://localhost:7860`, work from `application/ui/` and run `npm run update-spec` (it fetches over TLS with `--insecure`, since the backend serves a self-signed certificate).
 3. If only the JSON spec changed locally, run `npm run build:api` from `application/ui/` to regenerate `src/api/openapi-spec.d.ts`.
 4. Run `npm run format:check` and `npm run type-check` in `application/ui/`, then the narrowest backend or UI tests affected by the contract change.
 

@@ -10,6 +10,7 @@ from pydantic import BaseModel, Field
 
 from app.models import (
     DataCollectionConfig,
+    InferenceConfig,
     InferenceWorkerStatus,
     ModelRevision,
     PipelineStatus,
@@ -83,6 +84,14 @@ class PipelineView(BaseModel):
     model_variant: ModelVariant | None = Field(default=None)
     status: PipelineStatus = PipelineStatus.IDLE
     data_collection: DataCollectionConfig = Field(default_factory=DataCollectionConfig)
+    inference: InferenceConfig = Field(
+        default_factory=InferenceConfig,
+        description=(
+            "Parameters applied to the model at inference time. The confidence threshold reflects the value "
+            "currently in use by the model; it is null when no model is configured or when the model does not "
+            "use a confidence threshold."
+        ),
+    )
     device: str = Field(default="cpu", description="Inference device (e.g., 'cpu', 'xpu', 'cuda', 'xpu-2', 'cuda-1')")
 
     model_config = {
@@ -119,6 +128,9 @@ class PipelineView(BaseModel):
                 },
                 "status": "running",
                 "device": "cpu",
+                "inference": {
+                    "confidence_threshold": 0.35,
+                },
                 "data_collection": {
                     "max_dataset_size": 500,
                     "policies": [

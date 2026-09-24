@@ -4,11 +4,11 @@
 import { createContext, ReactNode, useContext } from 'react';
 
 import type { ModelArchitecture as ModelArchitectureType, ModelArchitectureWithPerformanceCategory } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { Content, ContextualHelp, Divider, Flex, Heading, Radio, Text } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 
-import { UltralyticsLicense } from '../../../components/ultralytics-license.component';
-import { isUltralyticsModel } from '../../../utils';
+import { ModelLicenseLink } from '../../../components/model-license-link.component';
 import { getAccuracyMetric } from '../utils';
 
 import classes from './model-architecture-card.module.scss';
@@ -31,25 +31,30 @@ const ModelArchitectureDivider = () => {
 };
 
 const License = () => {
+    const { t } = useTranslation();
     const { modelArchitecture } = useModelArchitecture();
 
     return (
         <li>
-            {isUltralyticsModel(modelArchitecture.id) ? (
-                <UltralyticsLicense />
-            ) : (
-                `License: ${modelArchitecture.license}`
-            )}
+            {t('license.label')}
+            <ModelLicenseLink license={modelArchitecture.license} />
         </li>
     );
 };
 
 const ModelArchitectureParameters = () => {
     const { modelArchitecture } = useModelArchitecture();
+    const { t } = useTranslation();
 
     return (
         <ul className={classes.modelArchitectureParameters}>
-            <li>Number of parameters: {modelArchitecture.stats.trainable_parameters} million</li>
+            {modelArchitecture.stats !== null && (
+                <li>
+                    {t('models.training.architectures.card.numberOfParameters', {
+                        count: modelArchitecture.stats.trainable_parameters,
+                    })}
+                </li>
+            )}
             <License />
         </ul>
     );
@@ -57,12 +62,25 @@ const ModelArchitectureParameters = () => {
 
 const ModelArchitectureDetailedParameters = () => {
     const { modelArchitecture } = useModelArchitecture();
-    const accuracyMetric = getAccuracyMetric(modelArchitecture);
+    const { t } = useTranslation();
+    const accuracyMetric = getAccuracyMetric(modelArchitecture, t);
 
     return (
         <ul className={classes.modelArchitectureParameters}>
-            <li>Number of parameters: {modelArchitecture.stats.trainable_parameters} million</li>
-            <li>Gigaflops: {modelArchitecture.stats.gigaflops}</li>
+            {modelArchitecture.stats !== null && (
+                <>
+                    <li>
+                        {t('models.training.architectures.card.numberOfParameters', {
+                            count: modelArchitecture.stats.trainable_parameters,
+                        })}
+                    </li>
+                    <li>
+                        {t('models.training.architectures.card.gigaflops', {
+                            value: modelArchitecture.stats.gigaflops,
+                        })}
+                    </li>
+                </>
+            )}
             {accuracyMetric !== undefined && (
                 <li>
                     {accuracyMetric.label}: {accuracyMetric.value}%

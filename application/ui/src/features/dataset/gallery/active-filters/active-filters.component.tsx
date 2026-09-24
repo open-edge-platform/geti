@@ -1,22 +1,20 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DatasetItemAnnotationStatus, Label } from '@/api/types';
+import type { Label } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { ActionButton, Divider, Flex } from '@geti-ui/ui';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 import { useProjectLabels } from 'hooks/use-project-labels.hook';
 import { capitalize, isEmpty } from 'lodash-es';
 
-import { formatDateRangeEnd, formatDateRangeStart } from '../../../../shared/date-utils';
+import { formatDateRangeEnd, formatDateRangeStart, formatFilterDate } from '../../../../shared/date-utils';
+import { SUBSET_LABEL_KEYS } from '../../../../shared/subsets';
 import { isNonEmptyArray } from '../../../../shared/util';
 import { FilterChips } from '../toolbar/media-filtering/filter-chips/filter-chips.component';
 
-const ANNOTATION_STATUS_LABELS: Record<DatasetItemAnnotationStatus, string> = {
-    with_annotations: 'Media with annotations',
-    missing_annotations: 'Media with missing annotations',
-};
-
 export const ActiveFiltersList = () => {
+    const { t } = useTranslation();
     const labels = useProjectLabels();
     const {
         selectedLabelIds,
@@ -42,27 +40,52 @@ export const ActiveFiltersList = () => {
     return (
         <>
             {selectedLabels.map((label) => (
-                <FilterChips key={label.id} name={label.name} onClose={() => handleRemoveLabel(label.id)} />
+                <FilterChips
+                    key={label.id}
+                    name={label.name}
+                    ariaLabel={`Remove ${label.name} filter`}
+                    onClose={() => handleRemoveLabel(label.id)}
+                />
             ))}
 
             {annotationStatus !== null && (
                 <FilterChips
-                    name={ANNOTATION_STATUS_LABELS[annotationStatus]}
+                    name={
+                        annotationStatus === 'with_annotations'
+                            ? t('dataset.filters.withAnnotations')
+                            : t('dataset.filters.missingAnnotations')
+                    }
+                    ariaLabel={`Remove ${
+                        annotationStatus === 'with_annotations'
+                            ? 'Media with annotations'
+                            : 'Media with missing annotations'
+                    } filter`}
                     onClose={() => setAnnotationStatus(null)}
                 />
             )}
 
             {startDate !== null && (
-                <FilterChips name={formatDateRangeStart(startDate)} onClose={() => setStartDate(null)} />
+                <FilterChips
+                    name={formatDateRangeStart(startDate, t)}
+                    ariaLabel={`Remove From ${formatFilterDate(startDate)} filter`}
+                    onClose={() => setStartDate(null)}
+                />
             )}
 
-            {endDate !== null && <FilterChips name={formatDateRangeEnd(endDate)} onClose={() => setEndDate(null)} />}
+            {endDate !== null && (
+                <FilterChips
+                    name={formatDateRangeEnd(endDate, t)}
+                    ariaLabel={`Remove To ${formatFilterDate(endDate)} filter`}
+                    onClose={() => setEndDate(null)}
+                />
+            )}
 
             {isNonEmptyArray(selectedSubsets) &&
                 selectedSubsets.map((subset) => (
                     <FilterChips
                         key={subset}
-                        name={capitalize(subset)}
+                        name={t(SUBSET_LABEL_KEYS[subset])}
+                        ariaLabel={`Remove ${capitalize(subset)} filter`}
                         onClose={() => setSelectedSubsets(selectedSubsets.filter((sub) => sub !== subset))}
                     />
                 ))}
@@ -83,21 +106,13 @@ export const useHasActiveFilters = () => {
 };
 
 export const useClearAllFilters = () => {
-    const { setSelectedLabelIds, setAnnotationStatus, setStartDate, setEndDate, setSelectedSubsets } =
-        useDatasetFiltersSearchParams();
+    const { clearAllFilters } = useDatasetFiltersSearchParams();
 
-    const handleClearAll = () => {
-        setSelectedLabelIds([]);
-        setAnnotationStatus(null);
-        setStartDate(null);
-        setEndDate(null);
-        setSelectedSubsets([]);
-    };
-
-    return handleClearAll;
+    return clearAllFilters;
 };
 
 export const ActiveFilters = () => {
+    const { t } = useTranslation();
     const hasActiveFilters = useHasActiveFilters();
     const handleClearAll = useClearAllFilters();
 
@@ -106,9 +121,9 @@ export const ActiveFilters = () => {
     }
 
     return (
-        <Flex gap={'size-150'} wrap={'wrap'} alignItems={'center'} aria-label='Active filters'>
+        <Flex gap={'size-150'} wrap={'wrap'} alignItems={'center'} aria-label={'Active filters'}>
             <ActionButton isQuiet onPress={handleClearAll}>
-                Clear all
+                {t('common.actions.clearAll')}
             </ActionButton>
 
             <Divider orientation={'vertical'} size={'S'} />

@@ -13,6 +13,7 @@ import { render } from 'test-utils/render';
 
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
+import { MediaUploadProvider } from '../providers/media-upload-provider.component';
 import { SelectedDataProvider, useSelectedData } from '../providers/selected-data-provider.component';
 import { Gallery } from './gallery.component';
 
@@ -46,7 +47,6 @@ vi.mock('@geti-ui/ui', async (importOriginal) => {
 vi.mock('../api/use-media-upload', () => ({
     useMediaUpload: () => ({
         uploadMedia: uploadMediaMock,
-        uploadProgress: { total: 0, completed: 0, succeeded: 0, failed: 0, isUploading: false },
     }),
 }));
 
@@ -70,17 +70,19 @@ describe('Gallery drag-and-drop upload', () => {
         );
 
         render(
-            <SelectedDataProvider>
-                <Gallery
-                    items={[]}
-                    viewMode={ViewModes.LARGE}
-                    isPending={false}
-                    hasActiveFilter={false}
-                    isFetchingNextPage={false}
-                    fetchNextPage={vi.fn()}
-                    isMediaItemReviewedById={() => false}
-                />
-            </SelectedDataProvider>
+            <MediaUploadProvider>
+                <SelectedDataProvider>
+                    <Gallery
+                        items={[]}
+                        viewMode={ViewModes.LARGE}
+                        isPending={false}
+                        hasActiveFilter={false}
+                        isFetchingNextPage={false}
+                        fetchNextPage={vi.fn()}
+                        isMediaItemReviewedById={() => false}
+                    />
+                </SelectedDataProvider>
+            </MediaUploadProvider>
         );
 
         await waitForElementToBeRemoved(() => screen.queryByRole('progressbar'));
@@ -134,9 +136,11 @@ describe('Gallery item deletion and selection', () => {
         );
 
         render(
-            <SelectedDataProvider>
-                <GalleryWithSelectionCount items={items} />
-            </SelectedDataProvider>
+            <MediaUploadProvider>
+                <SelectedDataProvider>
+                    <GalleryWithSelectionCount items={items} />
+                </SelectedDataProvider>
+            </MediaUploadProvider>
         );
 
         await waitForElementToBeRemoved(() => screen.queryByRole('progressbar'));
@@ -160,7 +164,7 @@ describe('Gallery item deletion and selection', () => {
         const user = userEvent.setup();
         await renderGalleryWithItems([item]);
 
-        await user.click(screen.getByRole('checkbox', { name: `Select media item ${item.id}` }));
+        await user.click(screen.getAllByRole('option')[0]);
         expect(screen.getByText('1 selected')).toBeInTheDocument();
 
         await user.click(screen.getByRole('button', { name: 'Media actions' }));
@@ -176,7 +180,18 @@ describe('Gallery item deletion and selection', () => {
 
         const getItem = (index: number) => screen.getAllByRole('option')[index];
 
-        const getCheckbox = (id: string) => screen.getByRole('checkbox', { name: `Select media item ${id}` });
+        const getCheckbox = (id: string) =>
+            screen.getByRole('checkbox', { name: `Selection state of media item ${id}` });
+
+        const getCheckboxContainer = (id: string) => {
+            const container = getCheckbox(id).closest('[data-floating-container]');
+
+            if (container === null) {
+                throw new Error(`Could not find the container wrapping the checkbox of ${id}`);
+            }
+
+            return container;
+        };
 
         const clickWithModifier = async (
             user: ReturnType<typeof userEvent.setup>,
@@ -258,18 +273,17 @@ describe('Gallery item deletion and selection', () => {
             expect(getCheckbox('item-4')).not.toBeChecked();
         });
 
-        it('toggles a single item through its checkbox', async () => {
+        it('replaces the selection when clicking on the checkbox overlay of another item', async () => {
             const user = userEvent.setup();
             await renderGalleryWithItems(items);
 
-            await user.click(getCheckbox('item-1'));
-            expect(screen.getByText('1 selected')).toBeInTheDocument();
+            // The checkbox itself ignores pointer events, so a click lands on the item behind it
+            await user.click(getCheckboxContainer('item-1'));
+            await user.click(getCheckboxContainer('item-3'));
 
-            await user.click(getCheckbox('item-2'));
-            expect(screen.getByText('2 selected')).toBeInTheDocument();
-
-            await user.click(getCheckbox('item-1'));
             expect(screen.getByText('1 selected')).toBeInTheDocument();
+            expect(getCheckbox('item-1')).not.toBeChecked();
+            expect(getCheckbox('item-3')).toBeChecked();
         });
 
         it('does not select an item when using its actions menu', async () => {

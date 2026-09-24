@@ -10,9 +10,6 @@ import { usePredictionSetup } from '../../predictions-setup-provider.component';
 import { useVideoPlayer } from '../video-player-provider.component';
 import { getVideoFrameRangeIndexes } from './utils';
 
-export const PREDICTION_CHUNK_SIZE = 15;
-export const PREDICTION_FRAME_SKIP = 1;
-
 const useVideoFramesPredictionsQueryOptions = ({
     frameNumber,
     frameSkip,
@@ -26,7 +23,7 @@ const useVideoFramesPredictionsQueryOptions = ({
 }) => {
     const projectId = useProjectIdentifier();
     const { videoFrame } = useVideoPlayer();
-    const { selectedModel, selectedDevice } = usePredictionSetup();
+    const { selectedModel, selectedDevice, confidenceThreshold } = usePredictionSetup();
 
     const { startFrameIndex, endFrameIndex } = getVideoFrameRangeIndexes({
         frames: videoFrame.frame_count - 1,
@@ -39,6 +36,7 @@ const useVideoFramesPredictionsQueryOptions = ({
         projectId,
         selectedModel,
         device: selectedDevice,
+        confidenceThreshold,
         mediaId: videoFrame.id,
         range: { stride: rangeStride ?? frameSkip, start_frame: startFrameIndex, end_frame: endFrameIndex },
     });

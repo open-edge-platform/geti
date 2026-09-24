@@ -10,6 +10,7 @@ from pydantic import Field, model_validator
 from app.db.schema import ModelRevisionDB, ModelVariantDB
 from app.models import DatasetItemSubset, EvaluationResult
 from app.models.base import BaseEntity
+from app.models.system import DeviceInfo
 
 
 class ModelFormat(StrEnum):
@@ -39,6 +40,7 @@ class TrainingInfo(BaseEntity):
     start_time: datetime | None = None
     end_time: datetime | None = None
     dataset_revision_id: UUID | None = None
+    device: DeviceInfo | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -50,6 +52,7 @@ class TrainingInfo(BaseEntity):
                 "start_time": data.training_started_at,
                 "end_time": data.training_finished_at,
                 "dataset_revision_id": data.training_dataset_id,
+                "device": data.training_device,
             }
         return data
 
@@ -70,6 +73,8 @@ class ModelVariant(BaseEntity):
         evaluations: List of evaluation results for this variant.
         quantization_info: Info about the quantization process (only for quantized variants).
         files_deleted: Flag indicating whether the variant files have been deleted from storage.
+        optimal_confidence_threshold: Confidence threshold determined at export time, embedded in the model
+            file. Only available for deployable formats (OpenVINO, ONNX) and for tasks that use it.
     """
 
     id: UUID
@@ -80,6 +85,7 @@ class ModelVariant(BaseEntity):
     evaluations: list[EvaluationResult] = []
     quantization_info: dict | None = None
     files_deleted: bool = False
+    optimal_confidence_threshold: float | None = Field(default=None, ge=0.0, le=1.0)
 
     @model_validator(mode="before")
     @classmethod
@@ -93,6 +99,7 @@ class ModelVariant(BaseEntity):
                 "weights_size": 0,  # Computed at runtime
                 "quantization_info": data.quantization_info,
                 "files_deleted": data.files_deleted,
+                "optimal_confidence_threshold": None,  # Read from the model file at runtime
                 "evaluations": [
                     EvaluationResult(
                         model_revision_id=UUID(data.model_revision_id),

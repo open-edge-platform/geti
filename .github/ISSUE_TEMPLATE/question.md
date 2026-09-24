@@ -2,12 +2,13 @@
 name: Question
 about: Ask any question about this repository
 title: ""
-labels: question
-assignees: ""
+labels: "Question"
+assignees: leoll2
 ---
 
 <!--
-    Thank you very much for contributing to this project by creating an issue!
+    Thank you very much for your interest in this project!
 
-    Try to describe your issue clearly and concisely and include the context.
+    Please state your question clearly and provide the necessary context.
+    This will help us understand your issue and help you in the best way.
 -->

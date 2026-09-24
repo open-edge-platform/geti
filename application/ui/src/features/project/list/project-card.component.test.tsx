@@ -2,7 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { API_BASE_URL } from '@/api';
+import { i18n } from '@/i18n';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { getMockedPipeline } from 'mocks/mock-pipeline';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
@@ -50,7 +52,7 @@ describe('ProjectCard', () => {
             screen.getByText(new RegExp(`Created: ${formatCreationDate(mockProject.created_at)}`))
         ).toBeInTheDocument();
         expect(screen.getByText('Object detection')).toBeInTheDocument();
-        expect(screen.getByText('• Labels: Cat, Dog')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /view project labels/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /open project options/i })).toBeInTheDocument();
     });
 
@@ -73,39 +75,19 @@ describe('ProjectCard', () => {
         expect(cardLink).toHaveAttribute('href', '/projects/test-project-id/dataset');
     });
 
-    it('displays single label correctly', async () => {
-        const singleLabelProject = getMockedProject({
-            task: {
-                task_type: 'classification',
-                exclusive_labels: true,
-                labels: [{ id: 'label-1', name: 'Person', color: '#FF0000', hotkey: 'P' }],
-            },
-        });
+    it('shows all labels in a dialog when the labels button is clicked', async () => {
+        const user = userEvent.setup();
 
-        render(<ProjectCard item={singleLabelProject} projectNames={[]} />);
+        render(<ProjectCard item={mockProject} projectNames={[]} />);
 
-        expect(await screen.findByText('• Labels: Person')).toBeInTheDocument();
+        await user.click(await screen.findByRole('button', { name: /view project labels/i }));
+
+        expect(await screen.findByRole('heading', { name: 'Labels' })).toBeInTheDocument();
+        expect(screen.getByText('Cat')).toBeInTheDocument();
+        expect(screen.getByText('Dog')).toBeInTheDocument();
     });
 
-    it('displays multiple labels separated by commas', async () => {
-        const multiLabelProject = getMockedProject({
-            task: {
-                task_type: 'detection',
-                exclusive_labels: false,
-                labels: [
-                    { id: 'label-1', name: 'Car', color: '#FF0000', hotkey: 'C' },
-                    { id: 'label-2', name: 'Truck', color: '#00FF00', hotkey: 'T' },
-                    { id: 'label-3', name: 'Bus', color: '#0000FF', hotkey: 'B' },
-                ],
-            },
-        });
-
-        render(<ProjectCard item={multiLabelProject} projectNames={[]} />);
-
-        expect(await screen.findByText('• Labels: Car, Truck, Bus')).toBeInTheDocument();
-    });
-
-    it('should handle empty labels array', async () => {
+    it('should not render the labels button when there are no labels', async () => {
         const noLabelsProject = getMockedProject({
             task: {
                 task_type: 'instance_segmentation',
@@ -116,7 +98,8 @@ describe('ProjectCard', () => {
 
         render(<ProjectCard item={noLabelsProject} projectNames={[]} />);
 
-        expect(await screen.findByText('• Labels:')).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: noLabelsProject.name })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /view project labels/i })).not.toBeInTheDocument();
     });
 
     it('displays classification task type', async () => {
@@ -142,16 +125,19 @@ describe('ProjectCard', () => {
 
 describe('getProjectTypeTitle', () => {
     it('returns undefined when task is missing', () => {
-        expect(getProjectTypeTitle()).toBeUndefined();
+        expect(getProjectTypeTitle(undefined, i18n.t)).toBeUndefined();
     });
 
     it('returns multi-label classification for non-exclusive classification tasks', () => {
         expect(
-            getProjectTypeTitle({
-                task_type: 'classification',
-                exclusive_labels: false,
-                labels: [],
-            })
+            getProjectTypeTitle(
+                {
+                    task_type: 'classification',
+                    exclusive_labels: false,
+                    labels: [],
+                },
+                i18n.t
+            )
         ).toBe('Multi-label classification');
     });
 });

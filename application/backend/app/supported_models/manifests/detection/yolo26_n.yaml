@@ -1,8 +1,12 @@
 id: object-detection-yolo26-n
 name: YOLO26-N
-license: AGPL-3.0
+
+license:
+  name: AGPL-3.0
+  url: https://www.ultralytics.com/legal/agpl-3-0-software-license
 
 pretrained_weights:
+  source: direct_link
   url: https://huggingface.co/Ultralytics/YOLO26/resolve/main/yolo26n.pt
   mirror_url: https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo26n.pt
   sha_sum: 9b09cc8bf347f0fc8a5f7657480587f25db09b34bf33b0652110fb03a8ad4fef

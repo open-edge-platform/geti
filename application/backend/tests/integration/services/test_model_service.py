@@ -21,7 +21,9 @@ from app.db.schema import (
 )
 from app.models import DatasetItemSubset, EvaluationResult
 from app.models.model_revision import ModelFormat, TrainingStatus
+from app.models.system import DeviceInfo, DeviceType
 from app.services import ModelRevisionMetadata, ModelService, ResourceInUseError, ResourceNotFoundError, ResourceType
+from tests.integration.model_files import write_onnx_model, write_openvino_model
 from tests.integration.project_factory import ProjectTestDataFactory
 
 
@@ -286,6 +288,99 @@ class TestModelServiceIntegration:
             assert variant.format in ["openvino", "onnx", "pytorch"]
             assert variant.precision in ["fp16", "fp32"]
             assert variant.weights_size == 0  # Files are empty, so size is 0
+            assert variant.optimal_confidence_threshold is None  # Files are empty, so nothing can be read
+
+    def test_get_model_variants_includes_nested_checkpoint_size(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ) -> None:
+        variant_id = uuid4()
+        db_session.add(
+            ModelVariantDB(id=str(variant_id), model_revision_id=str(fxt_model_id), format="pytorch", precision="fp32")
+        )
+        db_session.flush()
+        checkpoint_dir = (
+            tmp_path
+            / "projects"
+            / str(fxt_project_id)
+            / "models"
+            / str(fxt_model_id)
+            / "variants"
+            / str(variant_id)
+            / "model"
+        )
+        checkpoint_dir.mkdir(parents=True)
+        (checkpoint_dir / "config.json").write_bytes(b"123")
+        (checkpoint_dir / "model.safetensors").write_bytes(b"12345")
+
+        variants = fxt_model_service.get_model_variants(fxt_project_id, fxt_model_id)
+
+        assert variants[0].weights_size == 8
+
+    def test_get_model_variants_optimal_confidence_threshold(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ):
+        """The confidence threshold embedded at export time is reported for deployable variants only."""
+        variant_ids = {fmt: uuid4() for fmt in ("openvino", "onnx", "pytorch")}
+        for fmt, variant_id in variant_ids.items():
+            db_session.add(
+                ModelVariantDB(
+                    id=str(variant_id),
+                    model_revision_id=str(fxt_model_id),
+                    format=fmt,
+                    precision="fp16" if fmt != "pytorch" else "fp32",
+                )
+            )
+        db_session.flush()
+
+        models_dir = tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id) / "variants"
+        write_openvino_model(models_dir / str(variant_ids["openvino"]), confidence_threshold=0.35)
+        write_onnx_model(models_dir / str(variant_ids["onnx"]), confidence_threshold=0.35)
+        pytorch_dir = models_dir / str(variant_ids["pytorch"])
+        pytorch_dir.mkdir(parents=True, exist_ok=True)
+        (pytorch_dir / "model.pt").touch()
+
+        variants = fxt_model_service.get_model_variants(fxt_project_id, fxt_model_id)
+
+        thresholds_by_format = {v.format: v.optimal_confidence_threshold for v in variants}
+        assert thresholds_by_format == {
+            ModelFormat.OPENVINO: pytest.approx(0.35),
+            ModelFormat.ONNX: pytest.approx(0.35),
+            ModelFormat.PYTORCH: None,
+        }
+
+    def test_get_model_variants_without_confidence_threshold_metadata(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ):
+        """Variants whose task does not use a confidence threshold report None instead of failing."""
+        variant_ids = {fmt: uuid4() for fmt in ("openvino", "onnx")}
+        for fmt, variant_id in variant_ids.items():
+            db_session.add(
+                ModelVariantDB(id=str(variant_id), model_revision_id=str(fxt_model_id), format=fmt, precision="fp16")
+            )
+        db_session.flush()
+
+        models_dir = tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id) / "variants"
+        write_openvino_model(models_dir / str(variant_ids["openvino"]), confidence_threshold=None)
+        write_onnx_model(models_dir / str(variant_ids["onnx"]), confidence_threshold=None)
+
+        variants = fxt_model_service.get_model_variants(fxt_project_id, fxt_model_id)
+
+        assert {v.optimal_confidence_threshold for v in variants} == {None}
 
     def test_get_model_size_in_bytes(
         self, tmp_path: Path, fxt_project_id: UUID, fxt_model_id: UUID, fxt_model_service: ModelService
@@ -518,6 +613,36 @@ class TestModelServiceIntegration:
         expected_paths = tuple(variant_dir / file for file in expected_files)
         assert paths == expected_paths
 
+    def test_get_directory_backed_pytorch_binary_files(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ) -> None:
+        variant_id = uuid4()
+        db_session.add(
+            ModelVariantDB(id=str(variant_id), model_revision_id=str(fxt_model_id), format="pytorch", precision="fp32")
+        )
+        db_session.flush()
+        variant_dir = (
+            tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id) / "variants" / str(variant_id)
+        )
+        checkpoint_dir = variant_dir / "model"
+        (checkpoint_dir / "weights").mkdir(parents=True)
+        config_path = checkpoint_dir / "config.json"
+        weights_path = checkpoint_dir / "weights" / "model.safetensors"
+        config_path.touch()
+        weights_path.touch()
+
+        files_exist, paths = fxt_model_service.get_model_binary_files(
+            project_id=fxt_project_id, model_id=fxt_model_id, model_variant_id=variant_id
+        )
+
+        assert files_exist is True
+        assert paths == (config_path, weights_path)
+
     def test_create_revision(
         self, fxt_project_id: UUID, fxt_model_id: UUID, fxt_model_service: ModelService, db_session: Session
     ):
@@ -586,6 +711,24 @@ class TestModelServiceIntegration:
         assert model_db.training_status == TrainingStatus.SUCCESSFUL
         assert model_db.training_started_at == started_at
         assert model_db.training_finished_at == finished_at
+
+    def test_update_revision_persists_training_device(
+        self, fxt_project_id: UUID, fxt_model_id: UUID, fxt_model_service: ModelService, db_session: Session
+    ):
+        """Test that the hardware used to run the training is persisted on the model revision."""
+        device = DeviceInfo(type=DeviceType.CUDA, name="NVIDIA GeForce RTX 4090", memory=25757220864, index=0)
+
+        fxt_model_service.update_revision_status(
+            project_id=fxt_project_id,
+            model_id=fxt_model_id,
+            training_status=TrainingStatus.IN_PROGRESS,
+            training_device=device,
+        )
+
+        model_db = db_session.get(ModelRevisionDB, str(fxt_model_id))
+        db_session.refresh(model_db)
+        assert model_db is not None
+        assert model_db.training_device == device.model_dump(mode="json")
 
     def test_save_evaluation_result(
         self, fxt_model_id: UUID, fxt_project_id: UUID, fxt_model_service: ModelService, db_session: Session
@@ -700,6 +843,42 @@ class TestModelServiceIntegration:
                 assert metric["value"]["x_axis_label"] == "Step"
             elif metric["header"] == "Validation F1 score":
                 assert metric["value"]["x_axis_label"] == "Epoch"
+
+    def test_get_huggingface_training_metrics(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+    ):
+        metrics_dir = (
+            tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id) / "metrics" / "version_0"
+        )
+        metrics_dir.mkdir(parents=True)
+        csv_content = (
+            "epoch,step,train/total_loss,lr,train/grad_norm,train/data_time,train/iter_time,"
+            "val/Dice,val/mIoU,validation/data_time,validation/iter_time\n"
+            "1,1,0.8,0.0001,2.5,0.01,0.12,,,,\n"
+            "1,1,,,,,,0.7,0.6,0.02,0.3\n"
+        )
+        (metrics_dir / "metrics.csv").write_text(csv_content)
+
+        metrics = fxt_model_service.get_model_training_metrics(project_id=fxt_project_id, model_id=fxt_model_id)
+
+        metrics_by_name = {metric["header"]: metric for metric in metrics}
+        assert set(metrics_by_name) == {
+            "Training total loss",
+            "Learning rate",
+            "Training gradient norm",
+            "Training data time",
+            "Training iteration time",
+            "Validation Dice score",
+            "Validation mean IoU",
+            "Validation data time",
+            "Validation iteration time",
+        }
+        assert metrics_by_name["Training total loss"]["value"]["x_axis_label"] == "Step"
+        assert metrics_by_name["Validation Dice score"]["value"]["x_axis_label"] == "Epoch"
 
     def test_get_training_metrics_file_not_found(
         self,

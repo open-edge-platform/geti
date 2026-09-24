@@ -2,15 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { $api } from '@/api';
+import { DatasetStatistics } from '@/components/dataset-statistics/dataset-statistics.component';
+import { useTranslation } from '@/i18n';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
-
-import { DatasetStatistics } from '../../../../../../components/dataset-statistics/dataset-statistics.component';
 
 type DatasetRevisionStatisticsProps = {
     datasetRevisionId: string;
 };
 
 export const DatasetRevisionStatistics = ({ datasetRevisionId }: DatasetRevisionStatisticsProps) => {
+    const { t } = useTranslation();
     const projectId = useProjectIdentifier();
 
     const { data: annotatedItems } = $api.useQuery(
@@ -36,6 +37,10 @@ export const DatasetRevisionStatistics = ({ datasetRevisionId }: DatasetRevision
     const totalAnnotatedItems = annotatedItems?.pagination.total ?? 0;
 
     return (
-        <DatasetStatistics label='items' totalMediaItems={totalMediaItems} totalAnnotatedItems={totalAnnotatedItems} />
+        <DatasetStatistics
+            label={t('dataset.export.itemsLabel')}
+            totalMediaItems={totalMediaItems}
+            totalAnnotatedItems={totalAnnotatedItems}
+        />
     );
 };

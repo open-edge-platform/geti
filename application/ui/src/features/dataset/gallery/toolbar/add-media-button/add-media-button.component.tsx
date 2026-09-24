@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useTranslation } from '@/i18n';
 import { Button, FileTrigger } from '@geti-ui/ui';
 
 import { acceptedExtensions } from '../../utils';
@@ -8,9 +9,16 @@ import { acceptedExtensions } from '../../utils';
 type AddMediaButtonProps = {
     onFileUpload: (files: File[]) => Promise<void>;
     isDisabled?: boolean;
+    testId?: string;
 };
 
-export const AddMediaButton = ({ onFileUpload, isDisabled = false }: AddMediaButtonProps) => {
+export const AddMediaButton = ({
+    onFileUpload,
+    isDisabled = false,
+    testId = 'upload-media-input',
+}: AddMediaButtonProps) => {
+    const { t } = useTranslation();
+
     const handleFileSelect = async (files: FileList | null) => {
         if (files && files.length > 0) {
             await onFileUpload(Array.from(files));
@@ -19,13 +27,13 @@ export const AddMediaButton = ({ onFileUpload, isDisabled = false }: AddMediaBut
 
     return (
         <FileTrigger
-            data-testid='upload-media-input'
+            data-testid={testId}
             acceptedFileTypes={[acceptedExtensions]}
             allowsMultiple
             onSelect={handleFileSelect}
         >
             <Button variant={'secondary'} isDisabled={isDisabled} margin={0}>
-                Upload media
+                {t('dataset.upload.uploadMedia')}
             </Button>
         </FileTrigger>
     );

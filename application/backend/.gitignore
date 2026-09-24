@@ -19,3 +19,6 @@ data/
 .idea
 .DS_Store
 logs/
+
+!app/services/sam/mobile_sam.encoder.xml
+!app/services/sam/mobile_sam.encoder.bin

@@ -1,14 +1,13 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback } from 'react';
-
 import type { Label } from '@/api/types';
+import { validateLabelHotkey, validateLabelName } from '@/components/label-fields/label-validation';
+import { useTranslation } from '@/i18n';
 import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
-import { validateLabelHotkey, validateLabelName } from '../../../components/label-fields/label-validation';
 import { useAnnotationActions } from '../../../shared/annotator/annotation-actions-provider.component';
 import { EMPTY_LABEL_ID, filterOutEmptyLabels } from '../../../shared/annotator/labels';
 import { useSelectedAnnotations } from '../../../shared/annotator/select-annotation-provider.component';
@@ -32,6 +31,7 @@ export const useLabels = ({ isClassification = false, isMultiLabel = false }: Us
     const project = useProject();
     const projectId = useProjectIdentifier();
     const updateLabelMutation = useUpdateLabel();
+    const { t } = useTranslation();
 
     const editableLabels = labels.filter((label) => label.id !== EMPTY_LABEL_ID);
     const hasLabels = editableLabels.length > 0;
@@ -142,23 +142,23 @@ export const useLabels = ({ isClassification = false, isMultiLabel = false }: Us
         });
     };
 
-    const updateLabel = useCallback(
-        (labelId: string, updates: { name: string; color: string; hotkey: string | null | undefined }) => {
-            updateLabelMutation.mutate({
-                body: {
-                    labels_to_edit: [
-                        { id: labelId, new_name: updates.name, new_color: updates.color, new_hotkey: updates.hotkey },
-                    ],
+    const updateLabel = (
+        labelId: string,
+        updates: { name: string; color: string; hotkey: string | null | undefined }
+    ) => {
+        updateLabelMutation.mutate({
+            body: {
+                labels_to_edit: [
+                    { id: labelId, new_name: updates.name, new_color: updates.color, new_hotkey: updates.hotkey },
+                ],
+            },
+            params: {
+                path: {
+                    project_id: projectId,
                 },
-                params: {
-                    path: {
-                        project_id: projectId,
-                    },
-                },
-            });
-        },
-        [updateLabelMutation, projectId]
-    );
+            },
+        });
+    };
 
     const deleteLabel = (labelId: string) => {
         updateLabelMutation.mutate({
@@ -174,7 +174,7 @@ export const useLabels = ({ isClassification = false, isMultiLabel = false }: Us
     };
 
     const validateName = (name: string, excludeId?: string): string | undefined => {
-        return validateLabelName(name, editableLabels, excludeId);
+        return validateLabelName(name, editableLabels, t, excludeId);
     };
 
     const validateHotkey = (newHotkey: string, excludeId?: string) => {
@@ -187,7 +187,7 @@ export const useLabels = ({ isClassification = false, isMultiLabel = false }: Us
         const appHotkeys = Object.values(TASK_HOTKEYS[taskType]);
         const allHotkeys = [...labelsHotkeys, ...appHotkeys];
 
-        return newHotkey ? validateLabelHotkey(newHotkey, allHotkeys) : undefined;
+        return newHotkey ? validateLabelHotkey(newHotkey, allHotkeys, t) : undefined;
     };
 
     return {

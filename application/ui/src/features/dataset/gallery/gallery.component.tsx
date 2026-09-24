@@ -2,14 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Media } from '@/api/types';
+import { MediaItem } from '@/components/media-item/media-item.component';
+import { MediaThumbnail } from '@/components/media-thumbnail/media-thumbnail.component';
+import { VirtualizerGridLayout } from '@/components/virtualizer-grid-layout/virtualizer-grid-layout.component';
 import { Checkbox, DialogContainer, dimensionValue, Flex, Selection, Size, ViewModes } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty, isEqual } from 'lodash-es';
 import { GridLayoutOptions } from 'react-aria-components';
 
-import { MediaItem } from '../../../components/media-item/media-item.component';
-import { MediaThumbnail } from '../../../components/media-thumbnail/media-thumbnail.component';
-import { VirtualizerGridLayout } from '../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
 import { type GalleryViewMode } from '../../../shared/gallery-view-modes';
 import { getMediaDownloadUrl, getThumbnailUrl } from '../../../shared/media-url.utils';
 import { MediaPreview } from '../media-preview/media-preview.component';
@@ -62,10 +62,16 @@ const GalleryList = ({
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys, isSelected } = useSelectedData();
 
     const handleSelectionChange = (keys: Selection) => {
-        setSelectedKeys((previousKeys) => {
-            const isSameItem = keys !== 'all' && keys.size === 1 && isEqual(previousKeys, keys);
+        if (keys === 'all') return;
 
-            return isSameItem ? new Set() : keys;
+        // Keep react-aria's own Selection instance: copying it into a plain Set drops the
+        // anchor key it uses to resolve shift-click ranges. Our media keys are always strings.
+        const mediaIds = keys as Set<string>;
+
+        setSelectedKeys((previousKeys) => {
+            const isSameItem = mediaIds.size === 1 && isEqual(previousKeys, mediaIds);
+
+            return isSameItem ? new Set() : mediaIds;
         });
     };
 
@@ -75,6 +81,7 @@ const GalleryList = ({
             ariaLabel='data-collection-grid'
             selectionMode='multiple'
             selectionBehavior='replace'
+            disallowSelectAll
             allowDuplicateSelectionEvents
             selectOnFocus={false}
             selectedKeys={selectedKeys}
@@ -105,12 +112,14 @@ const GalleryList = ({
                                 height={'size-200'}
                                 alignItems={'center'}
                                 justifyContent={'center'}
-                                UNSAFE_style={{ margin: dimensionValue('size-150') }}
+                                // Set pointerEvents to 'none' to allow clicks to pass through
+                                // to the MediaItemActions component
+                                UNSAFE_style={{ margin: dimensionValue('size-150'), pointerEvents: 'none' }}
                             >
                                 <Checkbox
-                                    aria-label={`Select media item ${item.id}`}
-                                    onChange={() => toggleSelectedKeys([String(item.id)])}
+                                    aria-label={`Selection state of media item ${item.id}`}
                                     isSelected={selected}
+                                    isReadOnly
                                 />
                             </Flex>
                         )}
@@ -173,7 +182,6 @@ export const Gallery = ({
                 <DialogContainer type={'fullscreenTakeover'} onDismiss={() => onSelectedMediaItemChange(null)}>
                     {selectedMediaItem !== null && (
                         <MediaPreview
-                            mediaItem={selectedMediaItem}
                             close={() => onSelectedMediaItemChange(null)}
                             onSelectedMediaItem={onSelectedMediaItemChange}
                         />

@@ -5,7 +5,7 @@ from io import BytesIO
 from pathlib import Path
 
 from PIL.Image import Image
-from starlette.responses import FileResponse, StreamingResponse
+from starlette.responses import FileResponse, Response, StreamingResponse
 
 
 def file_iterator(filepath: Path, chunk_size: int = 1024 * 1024) -> Generator[bytes]:
@@ -32,30 +32,32 @@ def file_iterator(filepath: Path, chunk_size: int = 1024 * 1024) -> Generator[by
 
 
 def write_bytes_to_response(
-    bytes: BytesIO | Generator[bytes], filename: str, media_type: str | None = None, cache_control: str | None = None
-) -> StreamingResponse:
+    content: bytes | Generator[bytes], filename: str, media_type: str | None = None, cache_control: str | None = None
+) -> Response:
     """
-    Stream a binary content to FastAPI StreamingResponse.
+    Stream a binary content to FastAPI response.
     Additionally, method sets file name, MIME type and cache control headers if provided,
 
     Args:
-        bytes: Binary content.
+        content: Binary content.
         filename: File name.
         media_type: Content MIME type, optional.
         cache_control: Cache control header, optional.
 
     Returns:
-        FastAPI StreamingResponse.
+        FastAPI Response if content is bytes, StreamingResponse otherwise.
     """
     headers = {"Content-Disposition": f"inline; filename={filename}"}
     if cache_control:
         headers["Cache-Control"] = cache_control
-    return StreamingResponse(bytes, media_type=media_type, headers=headers)
+    if isinstance(content, bytes):
+        return Response(content=content, media_type=media_type, headers=headers)
+    return StreamingResponse(content, media_type=media_type, headers=headers)
 
 
-def write_image_to_response(image: Image, filename: str, cache_control: str | None = None) -> StreamingResponse:
+def write_image_to_response(image: Image, filename: str, cache_control: str | None = None) -> Response:
     """
-    Stream a Pillow image as JPEG to FastAPI StreamingResponse.
+    Return a Pillow image as JPEG in a FastAPI response.
     Additionally, method sets file name and cache control headers if provided.
 
     Args:
@@ -64,13 +66,12 @@ def write_image_to_response(image: Image, filename: str, cache_control: str | No
         cache_control: Cache control header, optional.
 
     Returns:
-        FastAPI StreamingResponse.
+        FastAPI ``Response`` containing the JPEG-encoded image.
     """
     buffer = BytesIO()
     image.save(buffer, format="JPEG")
-    buffer.seek(0)
     return write_bytes_to_response(
-        bytes=buffer, filename=filename, media_type="image/jpeg", cache_control=cache_control
+        content=buffer.getvalue(), filename=filename, media_type="image/jpeg", cache_control=cache_control
     )
 
 

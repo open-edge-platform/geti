@@ -1,23 +1,24 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Key, useMemo } from 'react';
+import { Key } from 'react';
 
+import { useTranslation } from '@/i18n';
 import { ActionButton, Flex, Grid, Item, Menu, MenuTrigger, Picker } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
-import { useProjectTask } from 'hooks/use-project-task.hook';
 
 import { TrainModel } from '../../train-model/train-model.component';
 import { useModelListing } from '../provider/model-listing-provider';
-import type { GroupByMode, SortBy } from '../types';
+import type { GroupByMode } from '../types';
 import { ExpandableSearch } from './expandable-search/expandable-search.component';
-import { getPerformanceColumnLabel } from './model-row/utils';
 
 type MoreOptionsProps = {
     showFailedModels: boolean;
     onToggleShowFailedModels: () => void;
 };
 const MoreOptions = ({ showFailedModels, onToggleShowFailedModels }: MoreOptionsProps) => {
+    const { t } = useTranslation();
+
     const handleOptionsAction = (key: Key) => {
         switch (key) {
             case 'show-failed':
@@ -34,62 +35,31 @@ const MoreOptions = ({ showFailedModels, onToggleShowFailedModels }: MoreOptions
                 <MoreMenu />
             </ActionButton>
             <Menu onAction={handleOptionsAction} aria-label={'Model listing options menu'}>
-                <Item key={'show-failed'}>{showFailedModels ? 'Hide failed models' : 'Show failed models'}</Item>
+                <Item key={'show-failed'}>
+                    {showFailedModels ? t('models.list.hideFailedModels') : t('models.list.showFailedModels')}
+                </Item>
             </Menu>
         </MenuTrigger>
     );
 };
 
 export const Header = () => {
-    const {
-        groupBy,
-        sortBy,
-        onGroupByChange,
-        onSortChange,
-        searchBy,
-        onSearchChange,
-        showFailedModels,
-        onToggleShowFailedModels,
-        groupedModels,
-    } = useModelListing();
-    const taskType = useProjectTask();
-    const performanceMetricName = useMemo(() => {
-        const models = groupedModels.flatMap((group) => group.models);
-
-        return getPerformanceColumnLabel(models, taskType);
-    }, [groupedModels, taskType]);
+    const { t } = useTranslation();
+    const { groupBy, onGroupByChange, searchBy, onSearchChange, showFailedModels, onToggleShowFailedModels } =
+        useModelListing();
 
     return (
-        <Grid columns={['auto auto 1fr auto']} gap={'size-100'} alignItems={'center'}>
-            <Flex gap={'size-100'}>
-                <Picker
-                    placeholder={'Group by'}
-                    width={'size-2400'}
-                    aria-label={'Group models'}
-                    selectedKey={groupBy}
-                    onSelectionChange={(key) => onGroupByChange(key as GroupByMode)}
-                >
-                    <Item key='dataset'>Group by: Dataset</Item>
-                    <Item key='architecture'>Group by: Architecture</Item>
-                </Picker>
-                <Picker
-                    placeholder={'Sort by'}
-                    width={'size-2000'}
-                    aria-label={'Sort models'}
-                    selectedKey={sortBy}
-                    onSelectionChange={(key) => onSortChange(key as SortBy)}
-                >
-                    <Item key='name'>Sort: Name</Item>
-                    <Item key='trained'>Sort: Trained</Item>
-                    {groupBy === 'dataset' ? (
-                        <Item key='architecture'>Sort: Architecture</Item>
-                    ) : (
-                        <Item key='dataset'>Sort: Dataset</Item>
-                    )}
-                    <Item key='size'>Sort: Size</Item>
-                    <Item key='score'>{`Sort: ${performanceMetricName}`}</Item>
-                </Picker>
-            </Flex>
+        <Grid columns={['auto auto 1fr']} gap={'size-100'} alignItems={'center'}>
+            <Picker
+                placeholder={t('models.list.groupByPlaceholder')}
+                width={'size-2400'}
+                aria-label={'Group models'}
+                selectedKey={groupBy}
+                onSelectionChange={(key) => onGroupByChange(key as GroupByMode)}
+            >
+                <Item key='dataset'>{t('models.list.groupByDataset')}</Item>
+                <Item key='architecture'>{t('models.list.groupByArchitecture')}</Item>
+            </Picker>
 
             <MoreOptions showFailedModels={showFailedModels} onToggleShowFailedModels={onToggleShowFailedModels} />
 

@@ -3,7 +3,8 @@
 
 import { Suspense, type ReactNode } from 'react';
 
-import { IntelBrandedLoading, ThemeProvider } from '@geti-ui/ui';
+import { Toast } from '@/components/toast/toast.component';
+import { Loading, ThemeProvider } from '@geti-ui/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
     render as rtlRender,
@@ -12,7 +13,6 @@ import {
 } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 
-import { Toast } from '../components/toast/toast.component';
 import { paths } from '../constants/paths';
 import { createQueryClient } from '../query-client/query-client';
 
@@ -26,7 +26,7 @@ const TestProviders = ({ children, queryClient }: { children: ReactNode; queryCl
     return (
         <QueryClientProvider client={queryClient}>
             <ThemeProvider>
-                <Suspense fallback={<IntelBrandedLoading />}>{children}</Suspense>
+                <Suspense fallback={<Loading variant='intel' />}>{children}</Suspense>
                 <Toast />
             </ThemeProvider>
         </QueryClientProvider>
@@ -55,14 +55,7 @@ export const render = (ui: ReactNode, options: RenderOptions = {}) => {
     const testQueryClient = options.queryClient ?? createQueryClient();
     const router = createTestRouter(ui, options, testQueryClient);
 
-    return rtlRender(
-        <RouterProvider
-            router={router}
-            future={{
-                v7_startTransition: true,
-            }}
-        />
-    );
+    return rtlRender(<RouterProvider router={router} />);
 };
 
 export const renderHook = <TProps, TResult>(callback: (props: TProps) => TResult, options: RenderOptions = {}) => {
@@ -72,14 +65,7 @@ export const renderHook = <TProps, TResult>(callback: (props: TProps) => TResult
         const wrappedChildren = options.wrapper ? <options.wrapper>{children}</options.wrapper> : children;
         const router = createTestRouter(wrappedChildren, options, testQueryClient);
 
-        return (
-            <RouterProvider
-                router={router}
-                future={{
-                    v7_startTransition: true,
-                }}
-            />
-        );
+        return <RouterProvider router={router} />;
     };
 
     return rtlRenderHook(callback, { wrapper: Wrapper });

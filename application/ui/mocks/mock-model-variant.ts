@@ -10,5 +10,6 @@ export const getMockedVariant = (overrides: Partial<ModelVariant> = {}): ModelVa
     weights_size: 1024,
     evaluations: [],
     files_deleted: false,
+    optimal_confidence_threshold: 0.65,
     ...overrides,
 });

@@ -99,7 +99,7 @@ export const EditPolygon = ({ annotation, zoom }: EditPolygonProps) => {
                 </TranslateShape>
             </svg>
 
-            <svg id={`edit-polygon-points-${annotation.id}`}>
+            <svg data-testid={`edit-polygon-points-${annotation.id}`} id={`edit-polygon-points-${annotation.id}`}>
                 <EditPoints
                     shape={shape}
                     zoom={zoom}

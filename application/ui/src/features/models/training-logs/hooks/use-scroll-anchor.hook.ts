@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export const useScrollAnchor = () => {
     const anchorRef = useRef<HTMLDivElement>(null);
@@ -24,9 +24,9 @@ export const useScrollAnchor = () => {
         return () => observer.disconnect();
     }, []);
 
-    const scrollToBottom = useCallback(() => {
+    const scrollToBottom = () => {
         anchorRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, []);
+    };
 
     return { anchorRef, isAtBottom, scrollToBottom };
 };

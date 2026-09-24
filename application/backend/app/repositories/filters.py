@@ -1,11 +1,37 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
+from datetime import datetime
+
 from sqlalchemy import Select, exists, func, select
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import InstrumentedAttribute, aliased
 
 from app.db.schema import DatasetItemDB, DatasetItemLabelDB, MediaDB
 from app.models import DatasetItemAnnotationStatus, MediaType
+
+
+def _apply_date_range_filter(
+    stmt: Select,
+    date_column: InstrumentedAttribute[datetime],
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+) -> Select:
+    """Apply an (optional) date range filter to a select statement, on the given date column.
+
+    Args:
+        stmt: The base SQLAlchemy select statement.
+        date_column: The column to filter on (e.g. ``MediaDB.created_at`` or ``DatasetItemDB.created_at``).
+        start_date: If given, only rows with ``date_column >= start_date`` are kept.
+        end_date: If given, only rows with ``date_column < end_date`` are kept.
+
+    Returns:
+        The select statement with the date range condition(s) applied.
+    """
+    if start_date:
+        stmt = stmt.where(date_column >= start_date)
+    if end_date:
+        stmt = stmt.where(date_column < end_date)
+    return stmt
 
 
 def _apply_annotation_status_filter(stmt: Select, annotation_status: str | None = None) -> Select:

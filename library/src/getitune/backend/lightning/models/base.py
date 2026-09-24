@@ -219,7 +219,15 @@ class LightningModel(LightningModule):
 
         self.save_hyperparameters(
             logger=False,
-            ignore=["optimizer", "scheduler", "metric", "label_info", "tile_config", "data_input_params"],
+            ignore=[
+                "optimizer",
+                "scheduler",
+                "metric",
+                "label_info",
+                "tile_config",
+                "data_input_params",
+                "pretrained_weights",
+            ],
         )
 
     def training_step(self, batch: SampleBatch, batch_idx: int) -> Tensor:
@@ -513,7 +521,7 @@ class LightningModel(LightningModule):
             if ckpt_tile_config := hyper_parameters.get("tile_config"):
                 if isinstance(ckpt_tile_config, dict):
                     ckpt_tile_config = TileConfig(**ckpt_tile_config)
-                self.tile_config = ckpt_tile_config
+                self._tile_config = ckpt_tile_config
 
     def load_state_dict_incrementally(self, ckpt: dict[str, Any], *args, **kwargs) -> None:
         """Load state dict incrementally."""

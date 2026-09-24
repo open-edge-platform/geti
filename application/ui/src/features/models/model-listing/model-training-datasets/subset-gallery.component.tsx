@@ -4,15 +4,17 @@
 import { Suspense, useMemo, useState } from 'react';
 
 import type { DatasetRevisionItem } from '@/api/types';
+import { MediaItem } from '@/components/media-item/media-item.component';
+import { MediaThumbnail } from '@/components/media-thumbnail/media-thumbnail.component';
+import { VirtualizerGridLayout } from '@/components/virtualizer-grid-layout/virtualizer-grid-layout.component';
+import { useTranslation } from '@/i18n';
 import { DialogContainer, Flex, Loading, Size, Text, View, ViewModes } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { GridLayoutOptions } from 'react-aria-components';
 
-import { MediaItem } from '../../../../components/media-item/media-item.component';
-import { MediaThumbnail } from '../../../../components/media-thumbnail/media-thumbnail.component';
-import { VirtualizerGridLayout } from '../../../../components/virtualizer-grid-layout/virtualizer-grid-layout.component';
 import { type GalleryViewMode } from '../../../../shared/gallery-view-modes';
 import { getDatasetRevisionThumbnailUrl } from '../../../../shared/media-url.utils';
+import { SUBSET_LABEL_KEYS } from '../../../../shared/subsets';
 import { usePrefetchMediaItem } from '../../../annotator/hooks/use-prefetch-media-item.hook';
 import { type SelectableModel } from '../../utils';
 import { SubsetMediaDialog } from './subset-media-dialog.component';
@@ -93,6 +95,7 @@ export const SubsetGallery = ({
     fetchNextPage,
     selectedModel,
 }: SubsetGalleryProps) => {
+    const { t } = useTranslation();
     const projectId = useProjectIdentifier();
     const { selectedItem, selectItem, clearSelection, selectPreviousItem, selectNextItem } = useSubsetNavigation({
         items,
@@ -112,7 +115,7 @@ export const SubsetGallery = ({
     if (items.length === 0) {
         return (
             <Flex height={'100%'} alignItems={'center'} justifyContent={'center'}>
-                <Text>No items in this subset</Text>
+                <Text>{t('dataset.revisions.noItemsInSubset')}</Text>
             </Flex>
         );
     }
@@ -131,9 +134,10 @@ export const SubsetGallery = ({
                         <MediaItem
                             contentElement={() => (
                                 <MediaThumbnail
-                                    // TODO: Revisit this once API supports required props in DatasetRevisionItem
-                                    item={{ ...item, type: 'image' }}
-                                    alt={`${item.subset} item`}
+                                    item={{ type: 'image' }}
+                                    alt={t('dataset.revisions.itemAlt', {
+                                        subset: t(SUBSET_LABEL_KEYS[item.subset]),
+                                    })}
                                     url={getDatasetRevisionThumbnailUrl(projectId, datasetRevisionId, item.id)}
                                     onDoubleClick={() => selectItem(item.id)}
                                 />

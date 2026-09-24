@@ -4,7 +4,7 @@ This module runs repeatable model benchmarks for GetiTune with a CLI:
 
 - dataset provisioning from `benchmark_catalog.yaml`
 - experiment selection from `benchmark_manifest.yaml`
-- phased execution (`train -> test/torch -> export -> test/export -> optimize -> test/optimize`)
+- phased execution (`train -> test/torch -> FP16 export/benchmark -> INT8 optimize/benchmark`)
 - MLflow tracking and baseline comparison
 - report generation (`report.md`, `aggregated.csv`, optional `failed_experiments.json`)
 
@@ -24,7 +24,7 @@ Run commands from `library/`.
 1. Sync dependencies (if needed):
 
    ```bash
-   just venv --device <cpu|cuda|xpu>
+   just venv-benchmark --device <cpu|cuda|xpu>
    ```
 
 2. See all benchmark commands:
@@ -49,10 +49,10 @@ Run commands from `library/`.
 
 The `Model Benchmark` GitHub workflow runs in two modes: a weekly scheduled run and a manual run.
 
-| Trigger             | Timeline                  | Source ref                   | Model groups / categories                                            | Dataset size tiers          | Dataset data group          | Scenario                   | Eval phase                                    | Seeds                       | Accelerators                   |
-| ------------------- | ------------------------- | ---------------------------- | -------------------------------------------------------------------- | --------------------------- | ---------------------------- | --------------------------- | --------------------------------------------- | --------------------------- | ------------------------------ |
-| `schedule`          | Every Friday, `19:00 UTC` | `develop`                    | `core,extended`                                                      | `tiny,small,medium,large`   | `weekly`                    | `default`                  | `optimize`                                    | `2`                         | `gpu` and `xpu`                |
-| `workflow_dispatch` | On demand                 | User-selected (`source_ref`) | User-selected (`core`, `core,extended`, `core,extended,deferred`)    | User-selected (`size_tier`) | User-selected (`data_group`) | User-selected (`scenario`) | User-selected (`train`, `export`, `optimize`) | User-selected (`num_seeds`) | User-selected (`gpu` or `xpu`) |
+| Trigger             | Timeline                  | Source ref                   | Model groups / categories                                         | Dataset size tiers          | Dataset data group           | Scenario                   | Eval phase                                    | Seeds                       | Accelerators                   |
+| ------------------- | ------------------------- | ---------------------------- | ----------------------------------------------------------------- | --------------------------- | ---------------------------- | -------------------------- | --------------------------------------------- | --------------------------- | ------------------------------ |
+| `schedule`          | Every Friday, `19:00 UTC` | `develop`                    | `core,extended`                                                   | `tiny,small,medium,large`   | `weekly`                     | `default`                  | `optimize`                                    | `2`                         | `gpu` and `xpu`                |
+| `workflow_dispatch` | On demand                 | User-selected (`source_ref`) | User-selected (`core`, `core,extended`, `core,extended,deferred`) | User-selected (`size_tier`) | User-selected (`data_group`) | User-selected (`scenario`) | User-selected (`train`, `export`, `optimize`) | User-selected (`num_seeds`) | User-selected (`gpu` or `xpu`) |
 
 ### Rotation and timeline details
 
@@ -81,6 +81,75 @@ Run only train+torch-test phases:
 
 ```bash
 python -m getitune.benchmark run --task detection --model yolox_s --dataset wgisd --eval-upto train --num-seeds 1 --no-tracking
+```
+
+### OpenVINO performance benchmarking
+
+When `--benchmark` is supplied and `eval_upto` is `export` or `optimize`, the
+runner invokes OpenVINO's `benchmark_app` for every successful exported model.
+Each IR is measured twice:
+
+- throughput mode: `benchmark_app -hint throughput` (the model's default batch size)
+- latency mode: `benchmark_app -hint latency -b 1`
+
+The application selects its default warmup and measurement duration/iteration
+count. The same measurements are repeated for the optimized INT8 IR when
+`eval_upto=optimize`. The executable is `benchmark_app` next to the active
+Python interpreter. Override the OpenVINO target with `--openvino-device CPU`,
+`GPU`, `GPU.1`, or another supported device string when the Geti accelerator
+label is not sufficient. Physical names are detected with PyTorch and OpenVINO
+`FULL_DEVICE_NAME` and stored per seed. If a driver exposes only a PCI
+identifier instead of a market name, pass `--training-device-name` and/or
+`--openvino-full-device-name` explicitly (for example,
+`--openvino-full-device-name "Intel Arc B70"`).
+
+Example:
+
+```bash
+python -m getitune.benchmark run --accelerator xpu --eval-upto optimize \
+  --max-epochs 2 --num-seeds 1 --benchmark --skip-test
+```
+
+Use `--skip-test` to skip the Torch/OpenVINO accuracy-test phases when the
+purpose is performance collection; training, export, INT8 optimization, and
+benchmark-app measurements still run.
+
+Select the desired one dataset per task in `benchmark_manifest.yaml` before
+running. Raw reports and command output are retained below each seed directory:
+`benchmark/export/{throughput,latency}/` and
+`benchmark/optimize/{throughput,latency}/`. The performance report includes
+FPS, median/average latency, batch size, iteration count, and measurement
+duration for FP16 and INT8 models.
+
+For dynamic IR inputs, the runner passes both `-shape` and `-data_shape` with
+the concrete batch-1 input shape so Intel GPU compilation can resolve dynamic
+output shapes. Latency mode is fixed to batch 1 and one inference request.
+Throughput mode uses OpenVINO's automatically selected performance settings;
+failures are reported rather than silently changing the benchmark methodology.
+
+### Performance-only report generation
+
+`generate_performance_report.py` is a post-processing utility for performance
+comparisons only. It does not run training, export, optimization, validation,
+or inference, and it intentionally does not assess model accuracy. Use it when
+hardware/runtime performance is the goal and accuracy is not important for the
+comparison.
+
+It combines result directories collected on different machines and writes one
+Markdown table. Each benchmark seed writes a canonical
+`performance_result.json` containing physical training/OpenVINO device names,
+effective batch sizes, verified model precision, software versions, and
+measurements. The report generator fails on incomplete metadata instead of
+printing ambiguous values. Multiple seeds are averaged into one row per model
+and hardware combination. A software-environment table records the Python,
+PyTorch, and OpenVINO versions used for each physical device pair.
+
+```bash
+uv run python -m getitune.benchmark.generate_performance_report \
+  results/performance-cpu \
+  results/performance-xpu \
+  results/performance-cuda \
+  --output results/performance-all/performance_report.md
 ```
 
 Run with custom output location:
@@ -117,6 +186,11 @@ By default (`--output-root results`), the benchmark writes:
 - `results/aggregated.csv` - flattened metrics table
 - `results/failed_experiments.json` - structured failure details (only when failures exist)
 
+When OpenVINO performance benchmarking is enabled, model/checkpoint files are
+removed only for seeds with complete FP16 and INT8 performance results. Failed
+or partially completed performance runs retain their artifacts so they can be
+resumed without retraining.
+
 Per-seed work directories are created under:
 
 - `results/<task>/<model>/<dataset>/<seed>/` (default scenario)
@@ -127,6 +201,27 @@ Dataset provisioning writes readiness markers at:
 - `data/<dataset>/.ready` (script-provisioned datasets only — `local_path` datasets are
   externally managed and never get a `.ready` marker; see "Datasets requiring
   credentials or manual placement" below)
+
+## Memory profiling
+
+The `train` and `test/torch` phases record peak accelerator and host memory
+alongside their accuracy/timing metrics:
+
+- `training:gpu_mem`, `torch:test/gpu_mem` - peak CUDA/XPU memory allocated by
+  PyTorch during that phase (MB).
+- `training:ram_mem`, `torch:test/ram_mem` - peak host RSS during that phase (MB),
+  summed across the process and any DataLoader worker subprocesses.
+
+These metrics flow through the same MLflow logging, CSV export, and
+baseline-comparison paths as every other metric, so they support the usual
+regression thresholds in `benchmark_manifest.yaml` (10% margin by default) and
+appear in `aggregated.csv`; the Markdown report additionally surfaces the
+train-phase values as "GPU Mem" and "Peak RAM" columns.
+
+RAM sampling requires `psutil`, which is only installed via the `benchmark`
+extra (`just venv-benchmark`, or `uv sync --extra benchmark`); without it,
+`*_ram_mem` values are best-effort and read as `0.0`. `export`/`optimize`
+(OpenVINO) phases are not currently instrumented.
 
 ## Add a new dataset or model
 
@@ -226,12 +321,12 @@ datasets:
 ```
 
 - `raw_dir` is only valid together with `script`, and is forwarded to it as `--raw-dir
-  <resolved-path>`.
+<resolved-path>`.
 - It's a **best-effort accelerant, not a requirement**: if the variable is unset or the
   path doesn't exist, provisioning logs a warning and falls back to the script's normal
   (e.g. network/credentialed) download path instead of failing.
 - In the script, use `getitune.benchmark.dataset_helpers.resolve_raw_source(args,
-  download_fn)` — it returns `args.raw_dir` directly (extracting it first if it's a
+download_fn)` — it returns `args.raw_dir` directly (extracting it first if it's a
   single archive file) when set, or calls `download_fn` otherwise. See
   `scripts/benchmark_datasets/prepare_brain_tumor.py` for a full example.
 
@@ -275,7 +370,6 @@ A single dataset failing to provision (missing credentials, transient network er
 aborting the whole invocation.
 
 ### Add a new model
-
 
 1. Ensure the model recipe exists under `src/getitune/recipe/<task>/<name>.yaml` — the recipe path is
    always derived from the model's `name` and its task, there's no separate path to configure.

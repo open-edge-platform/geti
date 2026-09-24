@@ -233,10 +233,13 @@ class OVInstanceSegmentationModel(OVModel):
         ]
 
         for idx in range(len(inputs.labels)):  # type: ignore[arg-type]
-            if inputs.masks is None or len(inputs.masks[idx]) == 0:
+            if inputs.masks is None:
                 msg = "Masks are required for metric computation"
                 raise ValueError(msg)
-            rles = [encode_rle(mask) for mask in inputs.masks[idx].data]
+            # An empty (0, H, W) mask tensor is a valid ground truth for images with no
+            # instances (e.g. background-only samples); encode it as an empty RLE list
+            # instead of treating it as missing masks.
+            rles = [encode_rle(mask) for mask in inputs.masks[idx].data] if len(inputs.masks[idx]) else []
             target_info.append(
                 {
                     "boxes": inputs.bboxes[idx].data if inputs.bboxes is not None else torch.empty((0, 4)),

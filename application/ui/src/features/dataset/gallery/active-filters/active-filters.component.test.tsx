@@ -24,6 +24,7 @@ const mockSetAnnotationStatus = vi.fn();
 const mockSetStartDate = vi.fn();
 const mockSetEndDate = vi.fn();
 const mockSetSelectedSubsets = vi.fn();
+const mockClearAllFilters = vi.fn();
 
 const mockUseDatasetFiltersSearchParams = (overrides?: Partial<ReturnType<typeof useDatasetFiltersSearchParams>>) => {
     vi.mocked(useDatasetFiltersSearchParams).mockReturnValue({
@@ -40,6 +41,7 @@ const mockUseDatasetFiltersSearchParams = (overrides?: Partial<ReturnType<typeof
         sortDirection: 'desc',
         selectedSubsets: [],
         setSelectedSubsets: mockSetSelectedSubsets,
+        clearAllFilters: mockClearAllFilters,
         ...overrides,
     });
 };
@@ -87,12 +89,13 @@ describe('ActiveFilters', () => {
     });
 
     it('renders chips for the start and end date filters', () => {
-        mockUseDatasetFiltersSearchParams({ startDate: '2026-01-01', endDate: '2026-01-31' });
+        // Without a timezone the dates are parsed as local time, matching what the pickers display
+        mockUseDatasetFiltersSearchParams({ startDate: '2026-01-01T09:30:00', endDate: '2026-01-31T17:45:00' });
 
         render(<ActiveFilters />);
 
-        expect(screen.getByText('From 01/01/2026 00:00')).toBeVisible();
-        expect(screen.getByText('To 31/01/2026 00:00')).toBeVisible();
+        expect(screen.getByText('From Jan 01, 2026, 09:30 AM')).toBeVisible();
+        expect(screen.getByText('To Jan 31, 2026, 05:45 PM')).toBeVisible();
     });
 
     it('renders chips for the selected subsets', () => {
@@ -137,10 +140,6 @@ describe('ActiveFilters', () => {
 
         fireEvent.click(screen.getByRole('button', { name: 'Clear all' }));
 
-        expect(mockSetSelectedLabelIds).toHaveBeenCalledWith([]);
-        expect(mockSetAnnotationStatus).toHaveBeenCalledWith(null);
-        expect(mockSetStartDate).toHaveBeenCalledWith(null);
-        expect(mockSetEndDate).toHaveBeenCalledWith(null);
-        expect(mockSetSelectedSubsets).toHaveBeenCalledWith([]);
+        expect(mockClearAllFilters).toHaveBeenCalled();
     });
 });

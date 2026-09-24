@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ConfigurableParameter, NumberEnumConfigurableParameter } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { Flex } from '@geti-ui/ui';
 
 import { NumberEnumParameterField, Parameter, Parameters } from '../../components/parameters.component';
@@ -14,7 +15,7 @@ type InputSizeParameterProps = {
 };
 
 const InputSizeParameter = ({ inputSizeParameter, onChange, isReadOnly }: InputSizeParameterProps) => {
-    if (isReadOnly) {
+    if (isReadOnly || inputSizeParameter.allowed_values.length <= 1) {
         return <span aria-label={inputSizeParameter.name}>{inputSizeParameter.value}</span>;
     }
 
@@ -32,6 +33,7 @@ export const InputSizeParameters = ({
     onInputSizeParameterChange,
     isReadOnly = false,
 }: InputSizeParametersProps) => {
+    const { t } = useTranslation();
     const inputSizeWidthParameter = getInputSizeWidthParameter(inputSizeParameters);
     const inputSizeHeightParameter = getInputSizeHeightParameter(inputSizeParameters);
 
@@ -58,7 +60,12 @@ export const InputSizeParameters = ({
 
     return (
         <Parameters.Container>
-            <Parameter.Layout header={'Input size'} description={description} onReset={handleReset}>
+            <Parameter.Layout
+                header={t('models.training.learning.inputSize')}
+                ariaLabel={'Input size'}
+                description={description}
+                onReset={handleReset}
+            >
                 <Flex alignItems={'center'} gap={'size-50'}>
                     <InputSizeParameter
                         inputSizeParameter={inputSizeWidthParameter}

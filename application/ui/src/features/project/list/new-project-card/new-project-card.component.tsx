@@ -1,17 +1,17 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ActionButton, Flex, Text, View } from '@geti-ui/ui';
-import { AddCircle } from '@geti-ui/ui/icons';
-import { useNavigate } from 'react-router-dom';
+import { useTranslation } from '@/i18n';
+import { Button, Flex, Text } from '@geti-ui/ui';
+import { Add } from '@geti-ui/ui/icons';
+import { useNavigate } from 'react-router';
 
 import { paths } from '../../../../constants/paths';
 import { useImportDatasetDialog } from '../../providers/import-dataset-dialog-provider.component';
 import { ImportDatasetAsNewProject } from '../import-dataset-as-new-project/import-dataset-as-new-project.component';
 
-import classes from './new-project-menu.module.scss';
-
 export const NewProjectCard = () => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { datasetImportDialogState, setCurrentStep, setCurrentStagedId } = useImportDatasetDialog();
 
@@ -28,27 +28,15 @@ export const NewProjectCard = () => {
     };
 
     return (
-        <Flex gap={'size-300'}>
-            <View UNSAFE_className={classes.card} flex={1}>
-                <ActionButton onPress={handleCreateProject} UNSAFE_className={classes.buttonText}>
-                    <AddCircle />
-                    <Text>
-                        Create
-                        <br />
-                        new project
-                    </Text>
-                </ActionButton>
-            </View>
-            <View UNSAFE_className={classes.card} flex={1}>
-                <ActionButton onPress={handleCreateFromDataset} UNSAFE_className={classes.buttonText}>
-                    <AddCircle />
-                    <Text>
-                        Create
-                        <br />
-                        project from dataset
-                    </Text>
-                </ActionButton>
-            </View>
+        <Flex direction={'column'} alignItems={'start'} gap={'size-150'}>
+            <Button variant={'accent'} onPress={handleCreateProject}>
+                <Add />
+                <Text>{t('project.list.createNewProject')}</Text>
+            </Button>
+            <Button variant={'primary'} onPress={handleCreateFromDataset}>
+                <Add />
+                <Text>{t('project.list.createProjectFromDataset')}</Text>
+            </Button>
             <ImportDatasetAsNewProject dialogState={datasetImportDialogState} />
         </Flex>
     );

@@ -434,7 +434,7 @@ class RPNHeadModule(AnchorHead):
         # loop over features, decode boxes
         mlvl_valid_bboxes = []
         mlvl_scores = []
-        mlvl_valid_anchors = []
+        mlvl_valid_anchors: list[Tensor] = []
         for cls_score, bbox_pred, anchors in zip(
             mlvl_cls_scores,
             mlvl_bbox_preds,

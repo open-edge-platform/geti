@@ -4,10 +4,13 @@
 import { useState } from 'react';
 
 import type { ModelArchitecture as ModelArchitectureType } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { Flex } from '@geti-ui/ui';
+import { partition } from 'lodash-es';
 
 import { SortModelArchitectures } from '../sort-model-architectures/sort-model-architectures.component';
-import { SORT_OPTIONS, SORTING_HANDLERS, SortingOptions } from '../sort-model-architectures/utils';
+import { getSortOptions, SORTING_HANDLERS, SortingOptions } from '../sort-model-architectures/utils';
+import { TIMM_MODEL_ARCHITECTURE_ID } from '../timm-model-configuration/utils';
 import { DetailedModelArchitecture } from './model-architecture.component';
 import { ModelArchitecturesListLayout } from './model-architectures-list-layout/model-architectures-list-layout.component';
 
@@ -22,18 +25,26 @@ export const AllModelArchitectures = ({
     onSelectedModelArchitectureIdChange,
     selectedModelArchitectureId,
 }: AllModelArchitecturesProps) => {
+    const { t } = useTranslation();
     const [sortBy, setSortBy] = useState<SortingOptions>(SortingOptions.NAME_ASC);
-    const sortedModelArchitectures = SORTING_HANDLERS[sortBy](modelArchitectures);
+    const [[timmCard], sortableModelArchitectures] = partition(
+        modelArchitectures,
+        (modelArchitecture) => modelArchitecture.id === TIMM_MODEL_ARCHITECTURE_ID
+    );
+    const sortedModelArchitectures = SORTING_HANDLERS[sortBy](sortableModelArchitectures);
+    // The TIMM card always stays last, regardless of the active sort.
+    const modelArchitecturesToRender =
+        timmCard === undefined ? sortedModelArchitectures : [...sortedModelArchitectures, timmCard];
 
     return (
         <Flex direction={'column'} gap={'size-200'}>
-            <SortModelArchitectures sortBy={sortBy} onSort={setSortBy} items={SORT_OPTIONS} />
+            <SortModelArchitectures sortBy={sortBy} onSort={setSortBy} items={getSortOptions(t)} />
             <ModelArchitecturesListLayout
                 selectedModelArchitectureId={selectedModelArchitectureId}
                 onSelectedModelArchitectureIdChange={onSelectedModelArchitectureIdChange}
                 ariaLabel={'ALL model architectures'}
             >
-                {sortedModelArchitectures.map((modelArchitecture) => (
+                {modelArchitecturesToRender.map((modelArchitecture) => (
                     <DetailedModelArchitecture
                         key={modelArchitecture.id}
                         modelArchitecture={modelArchitecture}

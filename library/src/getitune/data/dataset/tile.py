@@ -8,11 +8,14 @@ from __future__ import annotations
 import logging as log
 from typing import TYPE_CHECKING, Callable
 
+import torch
 from datumaro.experimental.fields import Subset
+from datumaro.experimental.fields.datasets import TileInfo
 from datumaro.experimental.filtering.filter_registry import create_filtering_transform
 from datumaro.experimental.tiling.tiler_registry import TilingConfig, create_tiling_transform
+from torchvision import tv_tensors
 
-from getitune.data.entity.sample import BaseSample
+from getitune.data.entity.sample import BaseSample, DetectionSample, InstanceSegmentationSample
 from getitune.data.entity.tile import (
     TileBatchDetDataEntity,
     TileBatchInstSegDataEntity,
@@ -21,6 +24,7 @@ from getitune.data.entity.tile import (
     TileInstSegDataEntity,
     TileSegDataEntity,
 )
+from getitune.data.utils.utils import fill_null_annotation_lists as _fill_null_annotation_lists
 from getitune.types.task import TaskType
 
 from .base import VisionDataset, _ensure_chw_format
@@ -104,6 +108,11 @@ class TileDataset(VisionDataset):
             dataset.transforms,
             dataset.max_refetch,
         )
+        # Sanitize once up front: `self.dm_subset` is fixed for the lifetime of this
+        # dataset, and `.slice(...)` on an already-null-filled dataframe never
+        # reintroduces nulls, so there is no need to re-sanitize on every
+        # `get_tiles()` call (which runs once per image, per epoch, during eval).
+        self.dm_subset = _fill_null_annotation_lists(self.dm_subset)
         self.tile_config = tile_config
         self._dataset = dataset
         self._subset = subset
@@ -162,9 +171,48 @@ class TileDataset(VisionDataset):
             # NOTE: filter validation tiles with annotations only to avoid evaluation on empty tiles.
             tile_ds = tile_ds.transform(self._filtering_transform, dtype=parent_slice_ds.dtype)  # type: ignore[attr-defined]
 
-            # if tile dataset is empty it means objects are too big to fit in any tile, in this case include full image
-            if len(tile_ds) == 0:
-                tile_ds = parent_slice_ds
+            # if tile dataset is empty (or the filtering transform returned None because the
+            # source image has no annotations at all) it means objects are too big to fit in
+            # any tile, or there are no objects to fit; in this case include the full image.
+            if tile_ds is None or len(tile_ds) == 0:
+                # No tiles produced (image too small, or filtering removed all tiles
+                # from a background image with no annotations). Create a single
+                # synthetic "tile" that covers the full image so the downstream tile
+                # merger / unbind logic still sees one tile per source image (keeps
+                # ``img_infos`` and ``img_ids`` lengths consistent).
+                tile_entities: list[BaseSample] = []
+                for raw_item in parent_slice_ds:
+                    raw_item.image = _ensure_chw_format(raw_item.image)
+                    img = raw_item.img_info
+                    tile_info = TileInfo(
+                        source_sample_idx=parent_idx,
+                        x=0,
+                        y=0,
+                        width=img.img_shape[1],
+                        height=img.img_shape[0],
+                    )
+                    object.__setattr__(raw_item, "tile", tile_info)
+                    transformed = self._apply_transforms(raw_item)
+                    if transformed is None:
+                        continue
+                    # Undo transform corruption of empty tensors (e.g. `Resize`
+                    # turns ``(0,4)`` into ``(1,0)``). Only detection / instance
+                    # segmentation samples carry `bboxes`/`label` fields.
+                    if (
+                        isinstance(transformed, (DetectionSample, InstanceSegmentationSample))
+                        and transformed.label is not None
+                        and len(transformed.label) == 0
+                    ):
+                        shape = transformed.img_info.img_shape
+                        transformed.bboxes = tv_tensors.BoundingBoxes(
+                            torch.zeros((0, 4), dtype=torch.float32),
+                            format=tv_tensors.BoundingBoxFormat.XYXY,
+                            canvas_size=shape,
+                            dtype=torch.float32,
+                        )
+                        transformed.label = torch.zeros(0, dtype=torch.long)
+                    tile_entities.append(transformed)
+                return tile_entities
 
         tile_entities: list[BaseSample] = []
         for tile in tile_ds:

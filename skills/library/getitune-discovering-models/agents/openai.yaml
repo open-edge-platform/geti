@@ -1,4 +1,0 @@
-interface:
-  display_name: "Discover Models (getitune)"
-  short_description: "List getitune models, recipes, and tasks before training"
-  default_prompt: "Use $getitune-discovering-models to find available models and recipes in getitune."

@@ -1,8 +1,12 @@
 id: instance-segmentation-yolo11-s
 name: YOLO11-S-Seg
-license: AGPL-3.0
+
+license:
+  name: AGPL-3.0
+  url: https://www.ultralytics.com/legal/agpl-3-0-software-license
 
 pretrained_weights:
+  source: direct_link
   url: https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo11s-seg.pt
   mirror_url: https://github.com/ultralytics/assets/releases/download/v8.4.0/yolo11s-seg.pt
   sha_sum: "1caa81c0195412efa411b632bcfb8c184939dddb6ae41f6a80c41b211ff257c3"

@@ -5,15 +5,13 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import type { AnnotationDTO } from '@/api/types';
+import type { AnnotationDTO, Project } from '@/api/types';
 import { NetworkFixture } from '@msw/playwright';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { getMockedMediaImage, getMockedVideo, getMultipleMockedMediaImage } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
-import { v4 as uuid } from 'uuid';
 
-import { SchemaProjectView } from '../../src/api/openapi-spec';
 import { expect, http, test } from '../fixtures';
 
 const mockedItems = getMultipleMockedMediaImage(40, '1');
@@ -47,6 +45,11 @@ test.describe('Dataset', () => {
                         count: items.length,
                         total: totalElements,
                     },
+                });
+            }),
+            http.get('/api/projects/{project_id}/dataset/media/ids', () => {
+                return HttpResponse.json({
+                    items: [...mockedItems, ...mockedItems2].map(({ id, type }) => ({ id, type })),
                 });
             })
         );
@@ -121,7 +124,7 @@ test.describe('Dataset', () => {
                 // Small delay to test the "in progress" toast or else we would only see start and finish toasts
                 await new Promise((resolve) => setTimeout(resolve, isLastUploadRequest ? 250 : 30));
 
-                return HttpResponse.json(getMockedMediaImage({ id: uuid() }), {
+                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), {
                     status: 201,
                 });
             })
@@ -152,7 +155,9 @@ test.describe('Dataset', () => {
 
         network.use(
             http.post('/api/projects/{project_id}/dataset/media', async () => {
-                return HttpResponse.json(getMockedMediaImage({ id: uuid() }), { status: 201 });
+                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), {
+                    status: 201,
+                });
             })
         );
 
@@ -179,8 +184,11 @@ test.describe('Dataset', () => {
     });
 
     test.describe('Bulk labelling while uploading media items', () => {
-        const mockedImages = [getMockedMediaImage({ id: uuid() }), getMockedMediaImage({ id: uuid() })];
-        const mockedVideo = getMockedVideo({ id: uuid() });
+        const mockedImages = [
+            getMockedMediaImage({ id: crypto.randomUUID() }),
+            getMockedMediaImage({ id: crypto.randomUUID() }),
+        ];
+        const mockedVideo = getMockedVideo({ id: crypto.randomUUID() });
         const mockedMedia = [...mockedImages, mockedVideo];
         const mockedLabels = [
             getMockedLabel({
@@ -205,7 +213,7 @@ test.describe('Dataset', () => {
 
         const mockNetwork = (
             network: NetworkFixture,
-            project: SchemaProjectView,
+            project: Project,
             options?: { onUpload?: () => Promise<void> }
         ) => {
             const createAnnotationPayloads: [string, AnnotationDTO[]][] = [];
@@ -415,14 +423,62 @@ test.describe('Dataset', () => {
 
             expect(createAnnotationPayloads).toEqual([]);
         });
+
+        test('Continue stays disabled between the upload finishing and the labels being assigned', async ({
+            network,
+            datasetPage,
+        }) => {
+            mockNetwork(
+                network,
+                getMockedProject({
+                    task: {
+                        task_type: 'classification',
+                        exclusive_labels: true,
+                        labels: mockedLabels,
+                    },
+                })
+            );
+
+            // The upload awaits this refresh before assigning, so a slow one keeps the dialog parked in
+            // the window where Continue used to briefly re-enable.
+            network.use(
+                http.get('/api/projects/{project_id}/dataset/media', async () => {
+                    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+                    return HttpResponse.json({
+                        items: mockedImages,
+                        pagination: { offset: 0, limit: 20, count: mockedImages.length, total: mockedImages.length },
+                    });
+                })
+            );
+
+            await datasetPage.goto();
+
+            await datasetPage.uploadFiles(filesToUpload);
+
+            await expect(datasetPage.getLabelAssignmentHeading()).toBeVisible();
+
+            await datasetPage.selectLabel(mockedLabels[0].name);
+
+            await datasetPage.clickContinue();
+
+            await expect(datasetPage.getUploadFinishedText(filesToUpload.length)).toBeVisible();
+
+            // Checked at this instant rather than with a retrying assertion, which would mask the bug by
+            // waiting until the assignment starts and disables the button again.
+            // eslint-disable-next-line playwright/prefer-web-first-assertions
+            expect(await datasetPage.getContinueButton().isDisabled()).toBe(true);
+
+            await expect(datasetPage.getLabelAssignmentHeading()).toBeHidden();
+        });
     });
 
     test.describe('Bulk labelling for selected images', () => {
         const mockedImages = [
-            getMockedMediaImage({ id: uuid(), name: 'media-1' }),
-            getMockedMediaImage({ id: uuid(), name: 'media-2' }),
+            getMockedMediaImage({ id: crypto.randomUUID(), name: 'media-1' }),
+            getMockedMediaImage({ id: crypto.randomUUID(), name: 'media-2' }),
         ];
-        const mockedVideo = getMockedVideo({ id: uuid(), name: 'media-3' });
+        const mockedVideo = getMockedVideo({ id: crypto.randomUUID(), name: 'media-3' });
         const mockedMedia = [...mockedImages, mockedVideo];
         const mockedLabels = [
             getMockedLabel({
@@ -435,7 +491,7 @@ test.describe('Dataset', () => {
             }),
         ];
 
-        const mockNetwork = (network: NetworkFixture, project: SchemaProjectView) => {
+        const mockNetwork = (network: NetworkFixture, project: Project) => {
             const createAnnotationPayloads: [string, AnnotationDTO[]][] = [];
 
             network.use(

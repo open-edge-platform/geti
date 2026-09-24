@@ -5,18 +5,19 @@ import { act, waitFor } from '@testing-library/react';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
-import { v4 as uuid } from 'uuid';
 
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
-import { MediaUploadProvider, useMediaUploadContext } from '../providers/media-upload-provider.component';
+import { useMediaUploadState } from '../providers/media-upload-context';
+import { MediaUploadProvider } from '../providers/media-upload-provider.component';
+import { computeSummary } from '../providers/media-upload-reducer';
 import { MEDIA_UPLOAD_CONCURRENCY, useMediaUpload } from './use-media-upload';
 
 const useMediaUploadProgress = () => {
     const upload = useMediaUpload();
-    const { state } = useMediaUploadContext();
+    const state = useMediaUploadState();
 
-    return { upload, state };
+    return { upload, state, uploadProgress: computeSummary(state.items) };
 };
 
 const renderUpload = () => renderHook(() => useMediaUploadProgress(), { wrapper: MediaUploadProvider });
@@ -46,7 +47,9 @@ describe('useMediaUpload', () => {
                 uploadedFileNames.push((file as File).name);
                 expect(params.project_id).toBe('123');
 
-                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), { status: 201 });
+                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), {
+                    status: 201,
+                });
             })
         );
 
@@ -60,8 +63,9 @@ describe('useMediaUpload', () => {
         await uploadMediaAndWaitForCompletion(
             result.current.upload.uploadMedia,
             files,
-            () => result.current.upload.uploadProgress.isUploading
+            () => result.current.state.isUploading
         );
+
         expect(uploadedFileNames).toEqual(['image-1.jpg', 'image-2.jpg']);
     });
 
@@ -80,7 +84,7 @@ describe('useMediaUpload', () => {
 
                 runningUploads -= 1;
 
-                return HttpResponse.json(getMockedMediaImage({ id: uuid() }), { status: 201 });
+                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), { status: 201 });
             })
         );
 
@@ -94,11 +98,11 @@ describe('useMediaUpload', () => {
         await uploadMediaAndWaitForCompletion(
             result.current.upload.uploadMedia,
             mockFiles,
-            () => result.current.upload.uploadProgress.isUploading
+            () => result.current.state.isUploading
         );
 
         expect(maxRunningUploads).toBeLessThanOrEqual(MEDIA_UPLOAD_CONCURRENCY);
-        expect(result.current.upload.uploadProgress.completed).toBe(12);
+        expect(result.current.uploadProgress.succeeded).toBe(12);
     });
 
     it('tracks upload progress counters', async () => {
@@ -114,7 +118,7 @@ describe('useMediaUpload', () => {
                     return HttpResponse.json({ detail: 'Upload failed' }, { status: 400 });
                 }
 
-                return HttpResponse.json(getMockedMediaImage({ id: uuid() }), { status: 201 });
+                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), { status: 201 });
             })
         );
 
@@ -128,15 +132,13 @@ describe('useMediaUpload', () => {
         await uploadMediaAndWaitForCompletion(
             result.current.upload.uploadMedia,
             files,
-            () => result.current.upload.uploadProgress.isUploading
+            () => result.current.state.isUploading
         );
 
-        expect(result.current.upload.uploadProgress).toEqual({
+        expect(result.current.uploadProgress).toEqual({
             total: 2,
-            completed: 2,
             succeeded: 1,
             failed: 1,
-            isUploading: false,
         });
     });
 
@@ -152,7 +154,7 @@ describe('useMediaUpload', () => {
                     return HttpResponse.json({ detail: 'Upload failed' }, { status: 400 });
                 }
 
-                return HttpResponse.json(getMockedMediaImage({ id: uuid() }), { status: 201 });
+                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), { status: 201 });
             })
         );
 
@@ -166,7 +168,7 @@ describe('useMediaUpload', () => {
         await uploadMediaAndWaitForCompletion(
             result.current.upload.uploadMedia,
             files,
-            () => result.current.upload.uploadProgress.isUploading
+            () => result.current.state.isUploading
         );
 
         const items = result.current.state.items;

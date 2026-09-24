@@ -1,7 +1,9 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { SchemaPipelineView } from './../src/api/openapi-spec.d';
+import type { components } from './../src/api/openapi-spec';
+
+type SchemaPipelineView = components['schemas']['PipelineView'];
 
 export const getMockedPipeline = (customPipeline?: Partial<SchemaPipelineView>): SchemaPipelineView => {
     return {
@@ -36,6 +38,9 @@ export const getMockedPipeline = (customPipeline?: Partial<SchemaPipelineView>):
             sink_type: 'folder' as const,
         },
         device: 'cpu',
+        inference: {
+            confidence_threshold: 0.35,
+        },
         ...customPipeline,
     };
 };

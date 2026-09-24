@@ -3,13 +3,11 @@
 
 import { Suspense } from 'react';
 
+import { FileUploadedResponse, ImportUploadFile } from '@/components/import-upload-file/import-upload-file.component';
+import { useTranslation } from '@/i18n';
 import { Content, Dialog, DialogContainer, Divider, Heading, View } from '@geti-ui/ui';
 import { OverlayTriggerState } from '@react-stately/overlays';
 
-import {
-    FileUploadedResponse,
-    ImportUploadFile,
-} from '../../../../components/import-upload-file/import-upload-file.component';
 import { useImportDatasetAsNewProject } from '../../../../hooks/storage/use-import-dataset-as-new-project.hook';
 import { isNonEmptyString } from '../../../../shared/util';
 import { useImportDatasetDialog } from '../../providers/import-dataset-dialog-provider.component';
@@ -28,6 +26,7 @@ type ImportDatasetAsNewProjectProps = {
 };
 
 export const ImportDatasetAsNewProject = ({ dialogState }: ImportDatasetAsNewProjectProps) => {
+    const { t } = useTranslation();
     const { appendImportEntry } = useImportDatasetAsNewProject();
     const { currentStagedId, setCurrentStagedId, currentStep, setCurrentStep } = useImportDatasetDialog();
 
@@ -45,7 +44,7 @@ export const ImportDatasetAsNewProject = ({ dialogState }: ImportDatasetAsNewPro
         <DialogContainer onDismiss={dialogState.close}>
             {dialogState.isOpen && (
                 <Dialog aria-label={'import-dataset-dialog'} width={860}>
-                    <Heading>Create project from a dataset - Import</Heading>
+                    <Heading>{t('project.import.title')}</Heading>
                     <Divider />
                     <Content UNSAFE_className={classes.container}>
                         <ProgressStepper currentStep={currentStep} />
