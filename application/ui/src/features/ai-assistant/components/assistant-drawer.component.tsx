@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import { ActionButton, Content, Heading, InlineAlert, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Close, Delete, Gear } from '@geti-ui/ui/icons';
+import { createPortal } from 'react-dom';
 
 import type { AnnotationTarget } from '../annotation/annotation-tools';
 import { useConnectionStatus } from '../hooks/use-connection-status';
@@ -58,10 +59,10 @@ export const AssistantDrawer = ({ target, onClose }: { target: AnnotationTarget;
         chat.send(text || defaultPrompt, attachment);
     };
 
-    return (
+    return createPortal(
         <>
             <div className={classes.backdrop} aria-hidden='true' />
-            <aside className={classes.drawer} aria-label='Annotate with AI'>
+            <aside className={classes.drawer} role='dialog' aria-modal={false} aria-label='Annotate with AI'>
                 <header className={classes.header}>
                     <div>
                         <Heading level={3} margin={0}>
@@ -116,6 +117,7 @@ export const AssistantDrawer = ({ target, onClose }: { target: AnnotationTarget;
                     )}
                 </footer>
             </aside>
-        </>
+        </>,
+        document.body
     );
 };

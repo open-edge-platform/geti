@@ -33,8 +33,14 @@ export const AnnotateButton = ({
 
     return (
         <>
-            <div className={classes.splitButton}>
-                <Button margin={0} variant='primary' onPress={onAnnotate} isDisabled={isDisabled}>
+            <div className={classes.splitButton} role='group' aria-label={t('common.actions.annotate')}>
+                <Button
+                    margin={0}
+                    variant='primary'
+                    onPress={onAnnotate}
+                    isDisabled={isDisabled}
+                    UNSAFE_className={classes.primaryButton}
+                >
                     {t('common.actions.annotate')}
                 </Button>
                 <MenuTrigger>
