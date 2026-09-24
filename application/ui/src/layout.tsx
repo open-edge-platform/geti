@@ -4,7 +4,6 @@
 import { Suspense } from 'react';
 
 import { $api } from '@/api';
-import { ProjectsListPanel } from '@/components/project-panel/projects-list-panel.component';
 import { useTranslation } from '@/i18n';
 import { Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/ui';
 import { usePrefetchQuery } from '@tanstack/react-query';
@@ -16,6 +15,7 @@ import getiLogo from './assets/icons/geti-logo.webp';
 import { paths } from './constants/paths';
 import { usePrefetchSinksQuery } from './features/inference/sinks/api/use-sinks-query';
 import { usePrefetchSourcesQuery } from './features/inference/sources/api/use-sources';
+import { ProjectsListPanel } from './features/project/panel/projects-list-panel.component';
 import { useProjectIdentifier } from './hooks/use-project-identifier.hook';
 
 import classes from './layout.module.scss';

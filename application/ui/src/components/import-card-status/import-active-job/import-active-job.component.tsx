@@ -7,9 +7,9 @@ import { Loading } from '@geti-ui/ui';
 import { useDeleteStagedDataset } from 'hooks/api/staged-dataset.hook';
 import { getJobProgress, getJobStatusLabel, isJobRunning } from 'hooks/api/util';
 
-import { CancelJobConfirmation } from '../../../features/dataset/import-export/cancel-job-confirmation/cancel-job-confirmation.component';
-import { BottomProgressBar } from '../../../features/models/model-listing/current-running-jobs/bottom-progress-bar.component';
 import { formatBytes } from '../../../shared/util';
+import { BottomProgressBar } from '../../bottom-progress-bar/bottom-progress-bar.component';
+import { CancelJobConfirmation } from '../../cancel-job-confirmation/cancel-job-confirmation.component';
 import { JobStatusCard } from '../../job-status-card/job-status-card.component';
 
 type ImportActiveJobProps = {

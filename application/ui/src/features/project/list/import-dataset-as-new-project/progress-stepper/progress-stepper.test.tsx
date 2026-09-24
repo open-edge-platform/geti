@@ -4,7 +4,7 @@
 import { screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import { ImportDatasetAsNewProjectState } from '../../../../dataset/import-export/import-dataset/util';
+import { ImportDatasetAsNewProjectState } from '../../../../../shared/import-dataset-state';
 import { ProgressStepper } from './progress-stepper.component';
 
 describe('ProgressStepper', () => {

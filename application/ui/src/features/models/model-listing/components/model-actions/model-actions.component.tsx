@@ -9,10 +9,11 @@ import { ActionButton, AlertDialog, DialogContainer, Item, Key, Menu, MenuTrigge
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
+import { isFailedModel, isTrainingModel } from '../../../../../shared/model-status';
 import { useDeleteModel } from '../../../hooks/api/use-delete-model.hook';
 import { useRenameModel } from '../../../hooks/api/use-rename-model.hook';
 import { TrainingLogsDialog } from '../../../training-logs/training-logs-dialog.component';
-import { hasDeletedWeights, isFailedModel, isTrainingModel } from '../../utils/utils';
+import { hasDeletedWeights } from '../../utils/utils';
 import { RenameModelDialog } from '../model-row/rename-model-dialog.component';
 
 const MODEL_ACTIONS = {

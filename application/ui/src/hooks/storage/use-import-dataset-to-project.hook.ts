@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ImportDatasetToProjectState } from '../../features/dataset/import-export/import-dataset/util';
+import { ImportDatasetToProjectState } from '../../shared/import-dataset-state';
 import { useProjectIdentifier } from '../use-project-identifier.hook';
 import { useDatasetImportStorage } from './use-dataset-import-storage.hook';
 import { DatasetImportState } from './utils';

@@ -6,11 +6,12 @@ import { useTranslation } from '@/i18n';
 import { Badge, Flex, Grid, Text } from '@geti-ui/ui';
 
 import { formatTrainingDateTime } from '../../../../../shared/date-utils';
+import { isFailedModel } from '../../../../../shared/model-status';
 import { formatBytes } from '../../../../../shared/util';
 import { GRID_COLUMNS } from '../../constants';
 import { AccuracyIndicator } from '../../model-variants/accuracy-indicator/accuracy-indicator.component';
 import { type GroupByMode } from '../../types';
-import { hasDeletedWeights, isFailedModel } from '../../utils/utils';
+import { hasDeletedWeights } from '../../utils/utils';
 import { ParentRevisionModel } from '../parent-revision-model.component';
 import { ArchitectureColumn } from './architecture-column.component';
 import { DatasetColumn } from './dataset-revision-column.component';

@@ -4,7 +4,6 @@
 import { createBrowserRouter, Navigate, Outlet } from 'react-router';
 
 import { paths } from './constants/paths';
-import { useTerminateAnnotatorWorkersOnUnmount } from './features/annotator/tools/terminate-annotator-workers-on-unmount.hook';
 import { ImportDatasetDialogStateProvider } from './features/dataset/providers/export-import-dataset-dialog-provider.component';
 import { SelectedDataProvider } from './features/dataset/providers/selected-data-provider.component';
 import { WebRTCConnectionProvider } from './features/inference/stream/web-rtc-connection-provider';
@@ -18,6 +17,7 @@ import { Inference } from './routes/inference/inference';
 import { Models } from './routes/models/models';
 import { CreateProject } from './routes/project/create-project';
 import { RootLayout } from './routes/root/root';
+import { useTerminateAnnotatorWorkersOnUnmount } from './shared/annotator/tools/terminate-annotator-workers-on-unmount.hook';
 
 const Redirect = () => {
     let path = paths.project.index({});

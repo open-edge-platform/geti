@@ -12,11 +12,11 @@ import { DialogContainer, Flex, Loading, Size, Text, View, ViewModes } from '@ge
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { GridLayoutOptions } from 'react-aria-components';
 
+import { usePrefetchMediaItem } from '../../../../shared/annotator/hooks/use-prefetch-media-item.hook';
 import { type GalleryViewMode } from '../../../../shared/gallery-view-modes';
 import { getDatasetRevisionThumbnailUrl } from '../../../../shared/media-url.utils';
+import { type SelectableModel } from '../../../../shared/selectable-model';
 import { SUBSET_LABEL_KEYS } from '../../../../shared/subsets';
-import { usePrefetchMediaItem } from '../../../annotator/hooks/use-prefetch-media-item.hook';
-import { type SelectableModel } from '../../utils';
 import { SubsetMediaDialog } from './subset-media-dialog.component';
 import { datasetRevisionItemToMedia } from './utils';
 

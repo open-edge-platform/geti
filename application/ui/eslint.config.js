@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -127,8 +128,36 @@ const sharedComponentsAliasConfig = {
     },
 };
 
-// Layering rule: `src/shared/` is the foundation that features build on, so it
-// must never depend on feature or route code.
+// Layering rule: the foundation folders that features build on must never depend
+// on feature or route code.
+const foundationLayers = [
+    './src/api',
+    './src/components',
+    './src/constants',
+    './src/hooks',
+    './src/i18n',
+    './src/platform',
+    './src/query-client',
+    './src/shared',
+    './src/test-utils',
+];
+
+// Features are isolated: a feature never imports another feature or a route. Code needed by
+// more than one feature moves to a foundation folder; routes compose features together.
+const featureNames = fs
+    .readdirSync(path.join(dirname, 'src/features'), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
+
+const featureBoundaryZones = featureNames.map((feature) => ({
+    target: `./src/features/${feature}`,
+    from: [
+        ...featureNames.filter((other) => other !== feature).map((other) => `./src/features/${other}`),
+        './src/routes',
+    ],
+    message: 'Features cannot import other features. Move shared code to a foundation folder or compose in a route.',
+}));
+
 const layerBoundariesConfig = {
     files: ['src/**/*.{ts,tsx}'],
     rules: {
@@ -138,10 +167,12 @@ const layerBoundariesConfig = {
                 basePath: dirname,
                 zones: [
                     {
-                        target: './src/shared',
+                        target: foundationLayers,
                         from: ['./src/features', './src/routes'],
-                        message: 'Move the dependency into `src/shared/` or invert it (pass it in from the feature).',
+                        message:
+                            'Move the dependency into a foundation folder or invert it (pass it in from the feature).',
                     },
+                    ...featureBoundaryZones,
                 ],
             },
         ],

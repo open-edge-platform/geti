@@ -7,23 +7,23 @@ import type { DatasetSubset, Media } from '@/api/types';
 import { Key, View } from '@geti-ui/ui';
 import { useSpinDelay } from 'spin-delay';
 
+import { AnnotatorCanvas } from '../../../shared/annotator/annotator-canvas/annotator-canvas';
 import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
-import { isVideo, isVideoFrame } from '../../../shared/media-item-utils';
-import { AnnotatorCanvas } from '../../annotator/annotator-canvas/annotator-canvas';
 import {
     useIsFetchingCurrentRangeFramesPredictions,
     useIsFetchingPredictions,
-} from '../../annotator/api/use-media-predictions';
-import { useSelectedMediaItem } from '../../annotator/selected-media-item-provider.component';
-import { ToolManagerProvider } from '../../annotator/tools/tool-manager-provider.component';
-import { VideoPlayerProvider } from '../../annotator/video-player/video-player-provider.component';
-import { VideoToolbar } from '../../annotator/video-player/video-toolbar/video-toolbar.component';
-import { BottomToolbar } from './bottom-toolbar/bottom-toolbar.component';
-import { PrimaryToolbar } from './primary-toolbar/primary-toolbar.component';
-import { AnnotatorCanvasSettings } from './primary-toolbar/settings/annotator-canvas-settings.component';
+} from '../../../shared/annotator/api/use-media-predictions';
+import { useSelectedMediaItem } from '../../../shared/annotator/selected-media-item-provider.component';
+import { BottomToolbar } from '../../../shared/annotator/shell/bottom-toolbar/bottom-toolbar.component';
+import { PrimaryToolbar } from '../../../shared/annotator/shell/primary-toolbar/primary-toolbar.component';
+import { AnnotatorCanvasSettings } from '../../../shared/annotator/shell/primary-toolbar/settings/annotator-canvas-settings.component';
+import { useNextMediaPrefetch, usePlayPauseVideoBySystem } from '../../../shared/annotator/shell/utils';
+import { ToolManagerProvider } from '../../../shared/annotator/tools/tool-manager-provider.component';
+import { VideoPlayerProvider } from '../../../shared/annotator/video-player/video-player-provider.component';
+import { VideoToolbar } from '../../../shared/annotator/video-player/video-toolbar/video-toolbar.component';
+import { isVideo, isVideoFrame } from '../../../shared/media-item-utils';
 import { SecondaryToolbar } from './secondary-toolbar/secondary-toolbar.component';
 import { useNextPredictionPrefetch } from './use-next-prediction-prefetch.hook';
-import { useNextMediaPrefetch, usePlayPauseVideoBySystem } from './utils';
 
 const DATASET_SUBSETS: DatasetSubset[] = ['unassigned', 'training', 'validation', 'testing'];
 

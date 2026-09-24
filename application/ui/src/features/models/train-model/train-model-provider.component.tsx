@@ -11,10 +11,10 @@ import type {
     TrainingDevice,
 } from '@/api/types';
 import { useTranslation } from '@/i18n';
+import { useGetSuccessfulModels } from 'hooks/api/use-get-models.hook';
 import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
 
 import { useGetTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
-import { useGetSuccessfulModels } from '../hooks/api/use-get-models.hook';
 import { useGetTrainingDevices } from './api/use-get-training-devices';
 import { useTimmModelSelection, type TimmModelSelection } from './hooks/use-timm-model-selection';
 import { useTrainingConfiguration } from './hooks/use-training-configuration';

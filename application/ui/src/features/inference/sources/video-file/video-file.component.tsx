@@ -7,7 +7,7 @@ import type { VideoFileSourceConfig } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { Button, Flex, Switch, Text, TextField } from '@geti-ui/ui';
 
-import { acceptedVideoExtensions } from '../../../dataset/gallery/utils';
+import { acceptedVideoExtensions } from '../../../../shared/media-file-utils';
 
 import classes from './video-file.module.scss';
 

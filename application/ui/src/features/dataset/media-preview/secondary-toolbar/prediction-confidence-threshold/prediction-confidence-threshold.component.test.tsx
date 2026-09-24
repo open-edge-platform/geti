@@ -12,7 +12,7 @@ import { render } from 'test-utils/render';
 
 import { http } from '../../../../../api/utils';
 import { server } from '../../../../../msw-node-setup';
-import { PredictionsSetupProvider } from '../../../../annotator/predictions-setup-provider.component';
+import { PredictionsSetupProvider } from '../../../../../shared/annotator/predictions-setup-provider.component';
 import { PredictionModelSelector } from '../prediction-model-selector/prediction-model-selector.component';
 import { PredictionConfidenceThreshold } from './prediction-confidence-threshold.component';
 

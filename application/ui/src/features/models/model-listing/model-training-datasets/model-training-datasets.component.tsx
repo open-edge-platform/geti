@@ -10,7 +10,7 @@ import { useNumberFormatter } from 'react-aria';
 import { useGetDatasetRevisionItems } from '../../../../hooks/use-get-dataset-revision-items.hook';
 import { useViewMode } from '../../../../hooks/use-view-mode.hook';
 import { type GalleryViewMode } from '../../../../shared/gallery-view-modes';
-import { getAllModelsWithOpenVINOVariants, type SelectableModel } from '../../utils';
+import { getAllModelsWithOpenVINOVariants, type SelectableModel } from '../../../../shared/selectable-model';
 import { Box } from '../components/box/box.component';
 import { SubsetGallery } from './subset-gallery.component';
 

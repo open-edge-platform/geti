@@ -4,7 +4,7 @@
 import { useTranslation } from '@/i18n';
 import { dimensionValue, Divider, Grid, Text } from '@geti-ui/ui';
 
-import { ImportDatasetAsNewProjectState } from '../../../../dataset/import-export/import-dataset/util';
+import { ImportDatasetAsNewProjectState } from '../../../../../shared/import-dataset-state';
 
 import classes from './progress-stepper.module.scss';
 

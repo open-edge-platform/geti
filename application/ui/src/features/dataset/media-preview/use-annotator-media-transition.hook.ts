@@ -5,7 +5,7 @@ import type { Media } from '@/api/types';
 
 import { useAnnotationActions } from '../../../shared/annotator/annotation-actions-provider.component';
 import { useSelectedAnnotations } from '../../../shared/annotator/select-annotation-provider.component';
-import { useSelectedMediaItem } from '../../annotator/selected-media-item-provider.component';
+import { useSelectedMediaItem } from '../../../shared/annotator/selected-media-item-provider.component';
 
 type UseAnnotatorMediaTransitionProps = {
     onSelectedMediaItem: (item: Media) => void;

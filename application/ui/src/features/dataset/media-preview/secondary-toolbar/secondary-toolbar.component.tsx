@@ -26,21 +26,21 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
+import { Labels } from '../../../../shared/annotator/labels/labels.component';
+import { usePredictionSetup } from '../../../../shared/annotator/predictions-setup-provider.component';
+import { AnnotatorModes } from '../../../../shared/annotator/shell/secondary-toolbar/annotator-modes/annotator-modes-toggle.component';
+import { getNextItem } from '../../../../shared/annotator/shell/secondary-toolbar/util';
+import { Toolbar } from '../../../../shared/annotator/shell/toolbar-container/toolbar-container.component';
+import { useVideoPlayerContext } from '../../../../shared/annotator/video-player/video-player-provider.component';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
 import { isImage, isVideoFrame } from '../../../../shared/media-item-utils';
 import { isClassificationTask, isMultiLabelClassificationTask } from '../../../../shared/task-type-guards';
-import { Labels } from '../../../annotator/labels/labels.component';
-import { usePredictionSetup } from '../../../annotator/predictions-setup-provider.component';
-import { useVideoPlayerContext } from '../../../annotator/video-player/video-player-provider.component';
 import { DeleteMediaItem } from '../../gallery/delete-media-item/delete-media-item.component';
-import { Toolbar } from '../toolbar-container/toolbar-container.component';
-import { AnnotatorModes } from './annotator-modes/annotator-modes-toggle.component';
 import { PredictionConfidenceThreshold } from './prediction-confidence-threshold/prediction-confidence-threshold.component';
 import { PredictionInferenceDevices } from './prediction-inference-devices/prediction-inference-devices.component';
 import { PredictionModelSelector } from './prediction-model-selector/prediction-model-selector.component';
 import { PredictionButtons } from './predictions-buttons.component';
 import { useIsSubmitDisabled } from './use-is-submit-disabled.hook';
-import { getNextItem } from './util';
 
 import classes from './secondary-toolbar.module.scss';
 
