@@ -9,7 +9,7 @@ import { Tag } from '@geti-ui/ui/icons';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 
-import { isClassificationTask } from '../../../project/task-type-guards';
+import { isClassificationTask } from '../../../../shared/task-type-guards';
 import { BulkSelectedMediaLabelsAssignmentDialog } from '../bulk-labels-assignment/bulk-selected-media-labels-assignment-dialog.component';
 
 type AssignLabelProps = {

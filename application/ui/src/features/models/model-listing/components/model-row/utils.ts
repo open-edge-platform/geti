@@ -4,7 +4,7 @@
 import type { Evaluation, Metric, Model, TaskType } from '@/api/types';
 import type { TranslateFn } from '@/i18n';
 
-import { isClassificationTask } from '../../../../project/task-type-guards';
+import { isClassificationTask } from '../../../../../shared/task-type-guards';
 
 export const getModelEvaluations = (model: Model): Evaluation[] => {
     return model.variants.flatMap((variant) => variant.evaluations);

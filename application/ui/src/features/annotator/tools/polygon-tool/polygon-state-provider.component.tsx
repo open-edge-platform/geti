@@ -15,11 +15,9 @@ import {
 
 import { useTool } from '../../../../shared/annotator/tool-provider.component';
 import { Point } from '../../../../shared/types';
-import { UndoRedoActions } from '../../../dataset/media-preview/primary-toolbar/undo-redo/undo-redo-actions.interface';
-import { UndoRedoProvider } from '../../../dataset/media-preview/primary-toolbar/undo-redo/undo-redo-provider.component';
-import useUndoRedoState, {
-    SetStateWrapper,
-} from '../../../dataset/media-preview/primary-toolbar/undo-redo/use-undo-redo-state';
+import { UndoRedoActions } from '../../../../shared/undo-redo/undo-redo-actions.interface';
+import { UndoRedoProvider } from '../../../../shared/undo-redo/undo-redo-provider.component';
+import useUndoRedoState, { SetStateWrapper } from '../../../../shared/undo-redo/use-undo-redo-state';
 
 type PolygonState = {
     segments: Point[][];

@@ -22,7 +22,7 @@ import { isEmpty } from 'lodash-es';
 
 import { useProjectLabelsWithEmptyLabel } from '../../../../shared/annotator/labels';
 import { isImage } from '../../../../shared/media-item-utils';
-import { isMultiLabelClassificationTask } from '../../../project/task-type-guards';
+import { isMultiLabelClassificationTask } from '../../../../shared/task-type-guards';
 import { useMediaUpload } from '../../api/use-media-upload';
 import { useBulkAssignLabel } from './api/use-bulk-assign-label';
 import { LabelsList } from './labels-list/labels-list.component';

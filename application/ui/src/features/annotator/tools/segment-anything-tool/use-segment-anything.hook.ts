@@ -12,7 +12,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { getQueryKey } from '../../../../query-client/query-client';
 import { isVideo, isVideoFrame } from '../../../../shared/media-item-utils';
-import { isDetectionTask } from '../../../project/task-type-guards';
+import { isDetectionTask } from '../../../../shared/task-type-guards';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
 import type {
     SegmentAnythingWorkerApi,

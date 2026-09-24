@@ -9,11 +9,11 @@ import { InfiniteData, matchQuery, useQueryClient } from '@tanstack/react-query'
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEqual } from 'lodash-es';
 
-import { UndoRedoProvider } from '../../features/dataset/media-preview/primary-toolbar/undo-redo/undo-redo-provider.component';
-import useUndoRedoState from '../../features/dataset/media-preview/primary-toolbar/undo-redo/use-undo-redo-state';
 import { getQueryKey } from '../../query-client/query-client';
 import { isVideoFrame } from '../media-item-utils';
 import type { Annotation, AnnotationLabelRef, Shape } from '../types';
+import { UndoRedoProvider } from '../undo-redo/undo-redo-provider.component';
+import useUndoRedoState from '../undo-redo/use-undo-redo-state';
 import { isNonEmptyArray } from '../util';
 import { mapLocalAnnotationsToServer, mapServerAnnotationsToLocal } from './annotation-mappers';
 import type { AnnotatorMode } from './annotator-mode';

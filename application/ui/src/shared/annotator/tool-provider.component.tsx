@@ -14,8 +14,8 @@ import {
 import type { TaskType } from '@/api/types';
 import { useProject } from 'hooks/api/project.hook';
 
-import type { ToolType } from '../../features/annotator/tools/interface';
-import { isClassificationTask, isSegmentationTask } from '../../features/project/task-type-guards';
+import { isClassificationTask, isSegmentationTask } from '../task-type-guards';
+import type { ToolType } from './tool-type';
 
 type ToolContextValue = {
     activeTool: ToolType | null;

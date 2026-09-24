@@ -4,8 +4,8 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import { useUndoRedo } from '../../../dataset/media-preview/primary-toolbar/undo-redo/undo-redo-provider.component';
-import type { ToolType } from '../interface';
+import type { ToolType } from '../../../../shared/annotator/tool-type';
+import { useUndoRedo } from '../../../../shared/undo-redo/undo-redo-provider.component';
 import { PolygonStateProvider, usePolygonState } from './polygon-state-provider.component';
 
 const mockSetActiveTool = vi.fn();

@@ -127,11 +127,33 @@ const sharedComponentsAliasConfig = {
     },
 };
 
+// Layering rule: `src/shared/` is the foundation that features build on, so it
+// must never depend on feature or route code.
+const layerBoundariesConfig = {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+        'import/no-restricted-paths': [
+            'error',
+            {
+                basePath: dirname,
+                zones: [
+                    {
+                        target: './src/shared',
+                        from: ['./src/features', './src/routes'],
+                        message: 'Move the dependency into `src/shared/` or invert it (pass it in from the feature).',
+                    },
+                ],
+            },
+        ],
+    },
+};
+
 export default [
     {
         ignores: [...sharedEslintConfig[0].ignores, 'src/api/openapi-spec.d.ts'],
     },
     ...sharedEslintConfig,
+    layerBoundariesConfig,
     {
         rules: {
             'no-restricted-imports': [

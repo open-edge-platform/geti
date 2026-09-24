@@ -7,7 +7,7 @@ import { Redo, Undo } from '@geti-ui/ui/icons';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { formatHotkeyForDisplay, HOTKEYS } from '../../../../../shared/hotkeys-definition';
-import { useUndoRedo } from './undo-redo-provider.component';
+import { useUndoRedo } from '../../../../../shared/undo-redo/undo-redo-provider.component';
 
 export const UndoRedo = ({ isDisabled }: { isDisabled?: boolean }) => {
     const { t } = useTranslation();

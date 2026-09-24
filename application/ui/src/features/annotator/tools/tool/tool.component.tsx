@@ -5,7 +5,8 @@ import { IconWrapper } from '@/components/icon-wrapper/icon-wrapper.component';
 import { ActionButton, Flex, Heading, IllustratedMessage, Text, Tooltip, TooltipTrigger, View } from '@geti-ui/ui';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import type { ToolConfig, ToolType } from '../interface';
+import type { ToolType } from '../../../../shared/annotator/tool-type';
+import type { ToolConfig } from '../interface';
 
 import classes from './tool.module.scss';
 

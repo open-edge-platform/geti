@@ -6,7 +6,7 @@ import { useTranslation, type TranslateFn } from '@/i18n';
 import { useProject } from 'hooks/api/project.hook';
 import { negate } from 'lodash-es';
 
-import { isClassificationTask } from '../../features/project/task-type-guards';
+import { isClassificationTask } from '../task-type-guards';
 import type { AnnotationLabel, AnnotationLabelRef } from '../types';
 
 export const EMPTY_LABEL_ID = 'empty-label';

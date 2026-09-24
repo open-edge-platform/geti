@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 import { useProject } from 'hooks/api/project.hook';
 
-import { isClassificationTask } from '../../project/task-type-guards';
+import { isClassificationTask } from '../../../shared/task-type-guards';
 import { useMediaUpload } from '../api/use-media-upload';
 import { useIsUploading } from '../providers/media-upload-context';
 import { isVideoFile } from './utils';

@@ -7,7 +7,7 @@ import type { Label } from '@/api/types';
 import { useProject } from 'hooks/api/project.hook';
 
 import { useProjectLabelsWithEmptyLabel } from '../../shared/annotator/labels';
-import { isClassificationTask } from '../project/task-type-guards';
+import { isClassificationTask } from '../../shared/task-type-guards';
 
 type AnnotatorLabelsContextProps = {
     labels: Label[];

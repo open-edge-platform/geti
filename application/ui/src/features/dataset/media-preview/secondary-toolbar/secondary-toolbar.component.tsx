@@ -28,10 +28,10 @@ import { useAnnotationActions } from '../../../../shared/annotator/annotation-ac
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
 import { isImage, isVideoFrame } from '../../../../shared/media-item-utils';
+import { isClassificationTask, isMultiLabelClassificationTask } from '../../../../shared/task-type-guards';
 import { Labels } from '../../../annotator/labels/labels.component';
 import { usePredictionSetup } from '../../../annotator/predictions-setup-provider.component';
 import { useVideoPlayerContext } from '../../../annotator/video-player/video-player-provider.component';
-import { isClassificationTask, isMultiLabelClassificationTask } from '../../../project/task-type-guards';
 import { DeleteMediaItem } from '../../gallery/delete-media-item/delete-media-item.component';
 import { Toolbar } from '../toolbar-container/toolbar-container.component';
 import { AnnotatorModes } from './annotator-modes/annotator-modes-toggle.component';

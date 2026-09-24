@@ -3,7 +3,8 @@
 
 import { Fragment } from 'react';
 
-import type { ToolConfig, ToolType } from './interface';
+import type { ToolType } from '../../../shared/annotator/tool-type';
+import type { ToolConfig } from './interface';
 import { Tool } from './tool/tool.component';
 
 type ToolsProps = {
