@@ -38,9 +38,13 @@ const getModelArchitectures = (
 };
 
 const getTaskModelArchitecturesQueryOptions = (taskType: TaskType) => {
-    return $api.queryOptions('get', '/api/model_architectures', {
-        params: { query: { task: taskType } },
-    });
+    return $api.queryOptions(
+        'get',
+        '/api/model_architectures',
+        { params: { query: { task: taskType } } },
+        // Static catalog served from the backend's model manifests
+        { staleTime: Infinity }
+    );
 };
 
 export const usePrefetchTaskModelArchitectures = () => {

@@ -8,6 +8,8 @@ import { isEmpty, isString } from 'lodash-es';
 
 import { ReactComponent as NoTrainedModels } from '../../../assets/no-trained-models.svg';
 import { ExportJobsList } from '../../dataset/import-export/export-jobs-list/export-jobs-list.component';
+import { usePrefetchTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
+import { usePrefetchModels } from '../hooks/api/use-get-models.hook';
 import { TrainModel } from '../train-model/train-model.component';
 import { Header } from './components/header.component';
 import { CurrentRunningJobs } from './current-running-jobs/current-running-jobs.component';
@@ -71,6 +73,10 @@ const ModelListingContent = () => {
 };
 
 export const ModelListingContainer = () => {
+    // Start both requests in parallel; otherwise architectures only load after the provider's models query resolves
+    usePrefetchModels();
+    usePrefetchTaskModelArchitectures();
+
     return (
         <ModelListingProvider>
             <ModelListingContent />

@@ -36,13 +36,14 @@ export const GroupModelsContainer = ({ group, models }: GroupModelsContainerProp
             {models.map((model) => {
                 const modelId = model.id;
                 const modelArchitecture = modelArchitectures.find(({ id }) => id === model.architecture);
+                const isExpanded = expandedModelIds.has(modelId);
 
                 return (
                     <Disclosure
                         key={modelId}
                         isQuiet
                         UNSAFE_className={classes.disclosure}
-                        isExpanded={expandedModelIds.has(modelId)}
+                        isExpanded={isExpanded}
                         isDisabled={isFailedModel(model)}
                         onExpandedChange={() => onExpandModel(modelId)}
                         data-testid={`model-disclosure-${modelId}`}
@@ -51,7 +52,8 @@ export const GroupModelsContainer = ({ group, models }: GroupModelsContainerProp
                             <ModelRowContainer model={model} modelArchitecture={modelArchitecture} />
                         </DisclosureTitle>
                         <DisclosurePanel aria-label={`Model details for ${model.name}`}>
-                            <ModelDetailsTabs modelId={modelId} />
+                            {/* The panel stays mounted while collapsed, so fetch/render details on demand */}
+                            {isExpanded && <ModelDetailsTabs modelId={modelId} />}
                         </DisclosurePanel>
                     </Disclosure>
                 );
