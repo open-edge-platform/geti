@@ -4,6 +4,7 @@
 import { SUPPORTED_LANGUAGES, useTranslation } from '@/i18n';
 import { Item, Key, Picker, Text } from '@geti-ui/ui';
 
+import cnFlag from '../../assets/flags/cn.svg?url';
 import gbFlag from '../../assets/flags/gb.svg?url';
 import ptFlag from '../../assets/flags/pt.svg?url';
 
@@ -13,6 +14,7 @@ import classes from './language-picker.module.scss';
 const LANGUAGE_FLAGS: Partial<Record<string, string>> = {
     en: gbFlag,
     pt: ptFlag,
+    'zh-CN': cnFlag,
 };
 
 const getLanguageName = (language: string): string =>
