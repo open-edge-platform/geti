@@ -3,12 +3,20 @@
 
 .splitButton {
     display: inline-flex;
-    gap: 1px;
+    gap: 0;
     align-items: stretch;
+}
+
+.primaryButton {
+    border-top-right-radius: 0 !important;
+    border-right: 0 !important;
+    border-bottom-right-radius: 0 !important;
 }
 
 .menuButton {
     min-width: 32px !important;
     padding-right: 7px !important;
     padding-left: 7px !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
 }
