@@ -55,6 +55,11 @@ const read = (): ConnectionState => {
 };
 
 let state = read();
+const connectionFromState = (): AiConnection => {
+    const current = state.settings[state.agentId] ?? defaultSettings(state.agentId);
+    return { agentId: state.agentId, ...current };
+};
+let connectionSnapshot = connectionFromState();
 const listeners = new Set<() => void>();
 
 const subscribe = (listener: () => void) => {
@@ -66,6 +71,7 @@ const subscribe = (listener: () => void) => {
 };
 
 const persist = (): void => {
+    connectionSnapshot = connectionFromState();
     try {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch {
@@ -74,10 +80,7 @@ const persist = (): void => {
     listeners.forEach((listener) => listener());
 };
 
-export const getAiConnection = (): AiConnection => {
-    const current = state.settings[state.agentId] ?? defaultSettings(state.agentId);
-    return { agentId: state.agentId, ...current };
-};
+export const getAiConnection = (): AiConnection => connectionSnapshot;
 
 export const setAiConnection = (update: Partial<Omit<AiConnection, 'agentId'>>): void => {
     state = {
