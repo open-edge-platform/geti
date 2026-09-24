@@ -88,7 +88,7 @@ export class DatasetViewsPage {
     }
 
     getOpenViewToastLink(name: string) {
-        return this.page.getByLabel('toast').getByRole('link', { name: `Open ${name} view` });
+        return this.page.getByLabel('toast').getByRole('link', { name: `Open ${name}` });
     }
 
     getDeletedSuccessToast(name: string) {

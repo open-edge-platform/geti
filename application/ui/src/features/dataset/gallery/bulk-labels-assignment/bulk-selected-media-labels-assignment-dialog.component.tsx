@@ -77,7 +77,7 @@ const BulkSelectedMediaLabelsAssignment = ({
                     isDisabled={isAssignDisabled}
                     isPending={isAssignPending}
                 >
-                    {t('dataset.bulkLabels.assign')}
+                    {t('common.actions.assign')}
                 </Button>
             </ButtonGroup>
         </Dialog>

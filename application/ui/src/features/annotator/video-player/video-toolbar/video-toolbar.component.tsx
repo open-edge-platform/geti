@@ -3,13 +3,15 @@
 
 import { useState } from 'react';
 
+import { useTranslation } from '@/i18n';
 import { ActionButton, Divider, Flex, Text, View } from '@geti-ui/ui';
 import { ChevronDownLight } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 
 import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import { Toolbar } from '../../../dataset/media-preview/toolbar-container/toolbar-container.component';
-import { PREDICTION_CHUNK_SIZE, usePrefetchVideoFramesPredictions } from '../api/use-video-frames-predictions';
+import { PREDICTION_CHUNK_SIZE } from '../api/prediction-constants';
+import { usePrefetchVideoFramesPredictions } from '../api/use-video-frames-predictions';
 import { useVideoPlayer } from '../video-player-provider.component';
 import { FrameStep } from './frame-step/frame-step.component';
 import { PlaybackSpeedSlider } from './playback-rate.component';
@@ -25,6 +27,7 @@ type VideoToolbarProps = {
 };
 
 export const VideoToolbar = ({ mode }: VideoToolbarProps) => {
+    const { t } = useTranslation();
     const { videoFrame, step, changeStep, videoControls } = useVideoPlayer();
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -41,7 +44,7 @@ export const VideoToolbar = ({ mode }: VideoToolbarProps) => {
                 <View paddingX={'size-100'}>
                     <Flex alignItems={'center'} justifyContent={'space-between'} gap={'size-200'}>
                         <Flex alignItems={'center'} gap={'size-200'}>
-                            {isExpanded && <Text>Frames</Text>}
+                            {isExpanded && <Text>{t('common.labels.frames')}</Text>}
 
                             <VideoControls mode={mode} />
                             <VideoDuration videoFrame={videoFrame} />
@@ -67,8 +70,10 @@ export const VideoToolbar = ({ mode }: VideoToolbarProps) => {
                         <Flex alignItems={'center'} gap={'size-100'} flex={isExpanded ? undefined : 1}>
                             {isExpanded ? (
                                 <Text>
-                                    Current frame: {videoFrame.frame_number} / Total frames:{' '}
-                                    {videoFrame.frame_count - 1}
+                                    {t('annotator.video.frames.currentTotal', {
+                                        currentFrame: videoFrame.frame_number,
+                                        totalFrames: videoFrame.frame_count - 1,
+                                    })}
                                 </Text>
                             ) : (
                                 <View flex={1}>

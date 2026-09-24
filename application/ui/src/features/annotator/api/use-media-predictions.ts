@@ -11,7 +11,7 @@ import { isVideoFrame } from '../../../shared/media-item-utils';
 import { getModelIdentifierPayload, SelectableModel } from '../../models/utils';
 import { usePredictionSetup } from '../predictions-setup-provider.component';
 import { useSelectedMediaItem } from '../selected-media-item-provider.component';
-import { PREDICTION_CHUNK_SIZE, PREDICTION_FRAME_SKIP } from '../video-player/api/use-video-frames-predictions';
+import { PREDICTION_CHUNK_SIZE, PREDICTION_FRAME_SKIP } from '../video-player/api/prediction-constants';
 import { getVideoFrameRangeIndexes } from '../video-player/api/utils';
 import { useVideoPlayerContext } from '../video-player/video-player-provider.component';
 

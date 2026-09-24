@@ -19,7 +19,7 @@ class TestModelArchitecturesEndpoint:
 
         data = response.json()
         assert "model_architectures" in data
-        assert len(data["model_architectures"]) == 36
+        assert len(data["model_architectures"]) == 40
 
         # Verify structure of first detection model
         detection_model = next(
@@ -59,9 +59,9 @@ class TestModelArchitecturesEndpoint:
     @pytest.mark.parametrize(
         "task_filter, total_models",
         [
-            ("detection", 36),
-            ("instance_segmentation", 20),
-            ("classification", 12),
+            ("detection", 40),
+            ("instance_segmentation", 25),
+            ("classification", 22),
         ],
     )
     def test_get_model_architectures_various_tasks(self, fxt_client: TestClient, task_filter, total_models):
@@ -145,7 +145,7 @@ class TestModelArchitecturesEndpoint:
         assert timm_card["task"] == "classification"
         assert timm_card["name"] == "Other models (TIMM)"
         assert timm_card["timm_metadata"] is None
-        assert timm_card["license"] == "varies by model"
+        assert timm_card["license"]["name"] == "varies by model"
         assert f"Geti offers {TimmCatalog.count_backbones()} of these models" in timm_card["description"]
         assert timm_card["capabilities"] is not None
         assert timm_card["capabilities"]["xai"] is False

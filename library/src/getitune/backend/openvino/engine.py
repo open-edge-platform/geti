@@ -42,6 +42,8 @@ class OVEngine(Engine):
     """
 
     _SUPPORTED_MODEL_SUFFIXES: ClassVar[list[str]] = [".xml", ".onnx"]
+    backend_name: ClassVar[str] = "openvino"
+    model_base_class: ClassVar[type] = OVModel
 
     def __init__(
         self,

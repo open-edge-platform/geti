@@ -1,9 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import type { SourceConfig } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { ActionButton, Flex, Loading, Text } from '@geti-ui/ui';
 import { Back } from '@geti-ui/ui/icons';
 import { usePipeline } from 'hooks/api/pipeline.hook';
@@ -15,11 +16,12 @@ import { SourcesList } from './source-list/source-list.component';
 import { SourceOptions } from './source-options';
 
 export const SourceActions = () => {
+    const { t } = useTranslation();
     const [view, setView] = useState<'list' | 'options' | 'edit'>('list');
     const [currentSource, setCurrentSource] = useState<SourceConfig | null>(null);
     const { data: sources = [], isPending } = useSourcesQuery();
     const filteredSources = sources.filter((source) => source.source_type !== 'disconnected');
-    const existingNames = useMemo(() => filteredSources.map((source) => source.name), [filteredSources]);
+    const existingNames = filteredSources.map((source) => source.name);
 
     const pipeline = usePipeline();
     const connectedSourceId = pipeline.data.source?.id;
@@ -71,7 +73,7 @@ export const SourceActions = () => {
                     <Back />
                 </ActionButton>
 
-                <Text>Add new input source</Text>
+                <Text>{t('inference.sources.add.title')}</Text>
             </Flex>
         </SourceOptions>
     );

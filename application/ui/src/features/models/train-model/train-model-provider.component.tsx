@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, Dispatch, ReactNode, SetStateAction, use, useMemo, useState } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, use, useState } from 'react';
 
 import type {
     DatasetRevision,
@@ -10,6 +10,7 @@ import type {
     TrainingConfiguration,
     TrainingDevice,
 } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
 
 import { useGetTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
@@ -66,11 +67,16 @@ type TrainModelProviderProps = {
 };
 
 const useDatasetRevisions = () => {
+    const { t } = useTranslation();
     const { data: datasetRevisions } = useGetDatasetRevisions();
 
     return {
         datasetRevisions: [
-            { id: 'use-current-dataset-revision', name: 'Use current dataset', value: null },
+            {
+                id: 'use-current-dataset-revision',
+                name: t('models.training.setup.selectDataset.useCurrentDataset'),
+                value: null,
+            },
             ...(datasetRevisions?.map(({ id, name }) => ({ id, name, value: String(id) })) ?? []),
         ],
     };
@@ -78,11 +84,17 @@ const useDatasetRevisions = () => {
 
 const DEFAULT_PRE_TRAINED_WEIGHTS = 'default-pre-trained-weights';
 const useModelRevisions = () => {
+    const { t } = useTranslation();
     const { data: models } = useGetSuccessfulModels();
 
     return {
         modelRevisions: [
-            { id: DEFAULT_PRE_TRAINED_WEIGHTS, name: 'Default pre-trained weights', architecture: '', value: null },
+            {
+                id: DEFAULT_PRE_TRAINED_WEIGHTS,
+                name: t('models.training.setup.selectModel.defaultPretrainedWeights'),
+                architecture: '',
+                value: null,
+            },
             ...(models?.map(({ id, name, architecture }) => ({ id, name, architecture, value: String(id) })) ?? []),
         ],
     };
@@ -147,9 +159,7 @@ export const TrainModelProvider = ({ children }: TrainModelProviderProps) => {
 
     const [isAdvancedSettingsMode, setIsAdvancedSettingsMode] = useState<boolean>(false);
 
-    const modelRevisions = useMemo(() => {
-        return getModelRevisionsForArchitecture(allModelRevisions, resolvedModelArchitectureId);
-    }, [allModelRevisions, resolvedModelArchitectureId]);
+    const modelRevisions = getModelRevisionsForArchitecture(allModelRevisions, resolvedModelArchitectureId);
 
     // The resolved architecture also changes while the timm card stays selected, which can invalidate the selection
     const selectedModelRevisionId = modelRevisions.some(({ id }) => id === modelRevisionId)

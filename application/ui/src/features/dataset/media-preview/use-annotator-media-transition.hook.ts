@@ -1,8 +1,6 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useCallback } from 'react';
-
 import type { Media } from '@/api/types';
 
 import { useAnnotationActions } from '../../../shared/annotator/annotation-actions-provider.component';
@@ -17,13 +15,10 @@ export const useAnnotatorMediaTransition = ({ onSelectedMediaItem }: UseAnnotato
     const { setSelectedAnnotations } = useSelectedAnnotations();
     const { resetAnnotations } = useAnnotationActions();
 
-    return useCallback(
-        (item: Media) => {
-            setSelectedAnnotations(new Set());
-            resetAnnotations();
-            setMediaItem(item);
-            onSelectedMediaItem(item);
-        },
-        [onSelectedMediaItem, resetAnnotations, setMediaItem, setSelectedAnnotations]
-    );
+    return (item: Media) => {
+        setSelectedAnnotations(new Set());
+        resetAnnotations();
+        setMediaItem(item);
+        onSelectedMediaItem(item);
+    };
 };

@@ -6,12 +6,92 @@
             "delete": "Delete",
             "goBack": "Go back",
             "rename": "Rename",
-            "save": "Save"
+            "save": "Save",
+            "assign": "Assign",
+            "back": "Back",
+            "clear": "Clear",
+            "clearAll": "Clear all",
+            "confirm": "Confirm",
+            "connect": "Connect",
+            "continue": "Continue",
+            "create": "Create",
+            "disconnect": "Disconnect",
+            "dismiss": "Dismiss",
+            "download": "Download",
+            "edit": "Edit",
+            "export": "Export",
+            "hide": "Hide",
+            "next": "Next",
+            "refresh": "Refresh",
+            "remove": "Remove",
+            "selectAll": "Select all",
+            "showLess": "Show less",
+            "showMore": "Show more",
+            "skip": "Skip",
+            "start": "Start",
+            "submit": "Submit",
+            "train": "Train",
+            "upload": "Upload",
+            "undo": "Undo",
+            "redo": "Redo",
+            "annotate": "Annotate",
+            "addAndUse": "Add & Use",
+            "saveAndConnect": "Save & Connect",
+            "testConnection": "Test connection"
+        },
+        "labels": {
+            "allUppercase": "ALL",
+            "yes": "Yes",
+            "no": "No",
+            "unknown": "Unknown",
+            "name": "Name",
+            "on": "On",
+            "off": "Off",
+            "noMaximum": "No maximum",
+            "active": "Active",
+            "dataset": "Dataset",
+            "filters": "Filters",
+            "images": "Images",
+            "videos": "Videos",
+            "size": "Size",
+            "sizeUppercase": "SIZE",
+            "statusUppercase": "STATUS",
+            "settings": "Settings",
+            "training": "Training",
+            "validation": "Validation",
+            "testing": "Testing",
+            "unassigned": "Unassigned",
+            "trainingLowercase": "training",
+            "validationLowercase": "validation",
+            "testingLowercase": "testing",
+            "frames": "Frames",
+            "seconds": "Seconds",
+            "every": "every",
+            "model": "Model",
+            "labels": "Labels"
+        },
+        "viewModes": {
+            "large": "Large thumbnails",
+            "medium": "Medium thumbnails",
+            "small": "Small thumbnails"
+        },
+        "status": {
+            "pending": "Pending",
+            "running": "Running",
+            "done": "Done",
+            "cancelled": "Cancelled",
+            "uploading": "Uploading",
+            "failed": "Failed",
+            "error": "Error",
+            "disconnected": "Disconnected"
+        },
+        "errors": {
+            "unknown": "An unknown error occurred",
+            "unknownDetail": "Unknown error"
         }
     },
     "navigation": {
         "logoAlt": "Geti logo",
-        "dataset": "Dataset",
         "datasetDescription": "Data collection page to visualise your media items",
         "models": "Models",
         "modelsDescription": "Models page to visualise your models",
@@ -24,27 +104,21 @@
             "invalidDateRange": "End date must be later than start date"
         },
         "views": {
+            "deleted": "Deleted view",
             "title": "Views",
             "entireDataset": "Entire dataset",
-            "assignTitle": "Assign to existing view",
             "assignToExistingView": "Assign to existing view",
             "assignTo": "Assign to",
-            "assign": "Assign",
             "selectView": "Select a view",
             "assignmentNote": "This operation will not affect other media that were already assigned to this view.",
             "mediaAssigned_one": "Media {{count}} item assigned successfully.",
             "mediaAssigned_other": "Media {{count}} items assigned successfully.",
-            "openView": "Open {{viewName}} view",
+            "openView": "Open {{viewName}}",
             "saveView": "Save view",
             "viewNameLabel": "View name",
             "renameTitle": "Rename dataset view",
-            "rename": "Rename",
-            "save": "Save",
-            "cancel": "Cancel",
-            "close": "Close",
             "deleteTitle": "Delete confirmation",
             "deleteConfirmation": "Are you sure you want to delete the \"{{viewName}}\" dataset view?",
-            "delete": "Delete",
             "deleteSuccess": "Dataset view \"{{viewName}}\" has been deleted successfully.",
             "unassignFromView": "Unassign from this view",
             "selectedMediaCount_one": "Selected {{count}} media item",
@@ -55,26 +129,25 @@
             "withAnnotations": "Media with annotations",
             "missingAnnotations": "Media with missing annotations",
             "subset": "Filter by subset",
-            "labels": "Filter by labels",
             "searchLabels": "Search labels",
             "labelsSelected_one": "{{count}} label selected",
             "labelsSelected_other": "{{count}} labels selected",
             "toggleAll": "Toggle all",
             "more": "More filters",
-            "moreTitle": "More filters",
-            "title": "Filters"
+            "dateRange": {
+                "heading": "Filter by upload date",
+                "startDateLabel": "Start date",
+                "endDateLabel": "End date",
+                "from": "From {{date}}",
+                "to": "To {{date}}"
+            }
         },
         "upload": {
             "queued": "Queued",
-            "uploading": "Uploading",
             "uploaded": "Uploaded",
-            "failed": "Failed",
-            "error": "Error",
             "errorTitle": "Upload error",
             "details": "Upload details",
             "filename": "FILENAME",
-            "status": "STATUS",
-            "size": "SIZE",
             "uploadingSummary_one": "Uploading {{total}} item - {{uploaded}} uploaded",
             "uploadingSummary_other": "Uploading {{total}} items - {{uploaded}} uploaded",
             "uploadingFailedSummary_one": "Uploading {{total}} item - {{uploaded}} uploaded, {{failed}} failed",
@@ -100,24 +173,26 @@
             "assignOrBack": "Assign media items to it, or go back to the entire dataset.",
             "goToEntireDataset": "Go to {{datasetName}}",
             "datasetEmpty": "Your dataset is empty.",
-            "uploadToStart": "Upload your first media item to get started.",
-            "importDataset": "Import dataset"
+            "uploadToStart": "Upload your first media item to get started."
+        },
+        "review": {
+            "reviewed": "Reviewed",
+            "forReview": "For Review",
+            "selectSubsetPlaceholder": "Select subset"
         },
         "statistics": {
             "label": "Dataset statistics",
             "title": "Dataset Statistics",
             "numberOfMedia": "Number of media",
-            "images": "Images",
-            "videos": "Videos",
             "annotatedImages": "Annotated images",
             "annotatedVideosFrames": "Annotated videos / frames",
             "numberOfObjectsPerLabel": "Number of objects per label",
             "unannotated": "Unannotated",
-            "annotated": "Annotated"
+            "annotated": "Annotated",
+            "annotationsChartTooltip": "Annotations"
         },
         "delete": {
             "title": "Delete Items",
-            "confirm": "Confirm",
             "mediaItem": "Delete media item",
             "confirmation_one": "Are you sure you want to delete {{count}} item?",
             "confirmation_other": "Are you sure you want to delete {{count}} items?",
@@ -134,24 +209,15 @@
             "selectedImagesNote": "The selected labels apply only to images, videos (if any) remain intact.",
             "noResults": "No results found. Try searching with different words.",
             "cancelUpload": "Cancel upload",
-            "skip": "Skip",
-            "continue": "Continue",
-            "assign": "Assign",
             "assignLabelTooltip": "Assign label",
             "assignAllSuccess": "Successfully assigned label(s) to all {{count}} image(s)",
             "assignAllFailure": "Failed to assign label(s) to all {{count}} image(s)",
             "assignPartialSuccess": "Assigned label(s) to {{succeeded}} of {{total}} image(s) ({{failed}} failed)"
         },
-        "filtersActive": {
-            "clearAll": "Clear all"
-        },
         "mediaActions": {
-            "annotate": "Annotate",
-            "download": "Download",
             "downloadStarted": "{{fileName}} download has started"
         },
         "gallery": {
-            "heading": "Dataset",
             "sortOldestFirst": "Oldest first",
             "sortNewestFirst": "Newest first",
             "selectedCount": "{{count}} selected",
@@ -166,17 +232,10 @@
                 "totalFrames": "Total frames: {{count}}"
             }
         },
-        "multiSelect": {
-            "selectAll": "Select all"
-        },
         "import": {
             "jobTitle": "Import dataset - {{fileName}} - {{size}}",
             "processingMessage": "{{fileName}} file is being processed for import",
-            "unknownError": "An unknown error occurred",
-            "unknownErrorDetail": "Unknown error",
             "technicalDetails": "Technical details",
-            "cancel": "Cancel",
-            "hide": "Hide",
             "preparingJob": "Preparing",
             "stagedFileReadError": "An error occurred during staged file reading",
             "prepareError": "An error occurred during import preparation.",
@@ -184,20 +243,15 @@
             "importedSuccess": "Dataset {{fileName}} {{size}} imported successfully.",
             "multipleFilesError": "Adding folders or multiple files is not allowed. Please load a single file.",
             "unsupportedFormatError": "Unsupported file format. Please upload a valid .zip file.",
-            "uploading": "Uploading",
             "datasetBeingUploaded": "Dataset is being uploaded",
             "dropZipHere": "Drop the dataset .zip file here",
-            "upload": "Upload",
             "learnMoreFormats": "Learn more about the different formats",
             "dialogHeading": "Import dataset",
             "scanningMessage": "Scanning and analyzing the dataset archive to import...",
             "mapLabelsMessage": "Map labels for the uploaded dataset",
-            "continue": "Continue",
             "deleteStagedFile": {
                 "title": "Delete Staged File",
-                "confirmation": "Are you sure you want to delete the dataset file \"{{stagedDatasetId}}\"?",
-                "cancel": "Cancel",
-                "delete": "Delete"
+                "confirmation": "Are you sure you want to delete the dataset file \"{{stagedDatasetId}}\"?"
             },
             "formatWarning": {
                 "boundingBoxToPolygon": "Imported dataset uses bounding box annotations, but your project’s dataset uses polygons. Annotations will be automatically converted to polygons to keep everything compatible.",
@@ -205,65 +259,75 @@
             },
             "labelMapping": {
                 "statisticsHeading": "Imported dataset statistics",
-                "imagesLabel": "images",
-                "framesLabel": "frames",
                 "heading": "Label mapping - optional",
                 "unmappedNote": "Any unmapped items will be imported as unlabeled",
                 "datasetLabelsColumn": "Dataset labels",
                 "projectLabelsColumn": "Project labels",
                 "selectLabelPlaceholder": "Select label",
-                "includeUnannotated": "Include media without annotations",
-                "submit": "Submit"
+                "imagesLabel": "images",
+                "framesLabel": "frames"
             }
         },
         "export": {
             "heading": "Export {{name}}",
+            "headingDatasetView": "Export dataset view",
+            "datasetView": "View: {{name}}",
             "statisticsHeading": "Exported dataset statistics",
             "settingsHeading": "Export settings",
             "filterByLabel": "Filter annotations by label",
-            "includeUnannotated": "Include media without annotations",
             "selectFormat": "Select dataset export format",
             "learnMoreFormats": "Learn more about export formats",
-            "cancel": "Cancel",
-            "submit": "Export",
             "processing": "Processing dataset for export",
             "readyForDownload": "Dataset is ready for download",
-            "download": "Download",
             "downloadStarted": "Dataset download started",
             "error": "Error: {{error}}",
             "itemsLabel": "items",
             "details": {
-                "heading": "Export {{name}}",
                 "defaultName": "dataset",
                 "format": "Format:",
                 "media": "Media:",
-                "allMedia": "All media",
                 "onlyAnnotated": "Only media with annotations",
                 "labels": "Labels:"
             },
             "warnings": {
                 "videos": "Exporting videos is not supported by this dataset format. All annotated frames from videos will be exported as images.",
                 "emptyLabel": "The selected format does not support empty labels (e.g. \"{{emptyLabelName}}\"). Images and frames containing them will be exported as unannotated.",
-                "unsupportedItemsVideos": "videos",
                 "unsupportedItemsEmptyLabels": "empty labels",
+                "unsupportedItemsVideos": "videos",
                 "unsupportedItems": "To preserve {{items}}, please use the Geti export format.",
                 "subsetNotIncluded": "The exported dataset won't include any information about the subset assigned to each media."
             }
         },
         "importExport": {
             "trigger": "Import/export dataset",
-            "exportItem": "Export dataset",
-            "importItem": "Import dataset"
+            "exportItem": "Export dataset"
         },
         "jobs": {
             "cancel": {
-                "trigger": "Cancel job",
                 "title": "Cancel job",
-                "dismiss": "Dismiss",
-                "confirm": "Cancel job",
                 "confirmation": "Are you sure you want to cancel job {{jobId}}?"
             }
-        }
+        },
+        "revisions": {
+            "createdOn": "Created {{date}}",
+            "unnamedName": "Dataset #{{id}}",
+            "notFoundForModel": "No dataset revision found for this model",
+            "filesDeleted": "The files for this dataset revision have been deleted.",
+            "noItemsInSubset": "No items in this subset",
+            "itemAlt": "{{subset}} item",
+            "trainingSubsets": {
+                "test": "Test"
+            },
+            "rename": {
+                "title": "Rename dataset revision",
+                "nameLabel": "Dataset revision name"
+            },
+            "delete": {
+                "title": "Delete dataset revision",
+                "description": "Are you sure you want to delete dataset revision \"{{name}}\"? You will still be able to see the model statistics but you won't be able to access the training dataset files."
+            }
+        },
+        "includeUnannotated": "Include media without annotations"
     },
     "inference": {
         "validation": {
@@ -274,18 +338,230 @@
             "testing": "Testing connection...",
             "inUse": "In use",
             "unreachable": "Unreachable",
-            "ready": "Ready"
+            "ready": "Ready",
+            "saveErrorFallback": "please try again",
+            "removeSuccess": "{{name}} has been removed successfully!"
         },
         "confidenceThreshold": {
             "label": "Confidence threshold"
         },
+        "devices": {
+            "label": "Inference device"
+        },
         "sources": {
-            "uploadError": "Failed to upload video file."
+            "uploadError": "Failed to upload video file.",
+            "list": {
+                "addSource": "Add new source"
+            },
+            "types": {
+                "usbCamera": "usb camera",
+                "ipCamera": "ip camera",
+                "videoFile": "video file",
+                "imagesFolder": "images folder",
+                "disconnected": "disconnected"
+            },
+            "options": {
+                "usbCamera": "USB Camera",
+                "ipCamera": "IP Camera",
+                "videoFile": "Video file"
+            },
+            "add": {
+                "title": "Add new input source"
+            },
+            "edit": {
+                "title": "Edit input source"
+            },
+            "form": {
+                "createSuccess": "Source configuration created successfully.",
+                "updateSuccess": "Source configuration updated successfully.",
+                "saveError": "Failed to save source configuration, {{details}}"
+            },
+            "menu": {
+                "connectSuccess": "Successfully connected to \"{{name}}\".",
+                "disconnectSuccess": "Successfully disconnected from \"{{name}}\".",
+                "disablePipelineAndDisconnectSuccess": "Successfully disabled pipeline and disconnected from \"{{name}}\".",
+                "disconnectDialog": {
+                    "title": "Disconnect {{name}}",
+                    "message": "Disconnecting this source will also disable the inference pipeline. Do you want to continue?"
+                }
+            },
+            "settings": {
+                "loading": "Loading...",
+                "device": "Device: {{name}}",
+                "unknownDevice": "Unknown device (id: {{deviceId}})",
+                "ignoreExistingImages": "Ignore existing images: {{value}}",
+                "streamUrl": "Stream url: {{url}}",
+                "videoPath": "Video path: {{path}}"
+            },
+            "fields": {
+                "imagesFolderPath": "Images folder path",
+                "ignoreExistingImages": "Ignore existing images",
+                "streamUrl": "Stream Url:",
+                "requireAuthentication": "Require Authentication",
+                "camera": "Camera",
+                "videoFilePath": "Video file path",
+                "selectedFile": "Selected: {{fileName}}",
+                "loopVideo": "Loop video"
+            },
+            "defaultNames": {
+                "usbCamera": "USB camera source",
+                "ipCamera": "IP camera source",
+                "videoFile": "Video file source"
+            }
+        },
+        "sinks": {
+            "types": {
+                "folder": "folder",
+                "mqtt": "mqtt",
+                "webhook": "webhook",
+                "ros": "ros"
+            },
+            "options": {
+                "folder": "Folder",
+                "webhook": "Webhook",
+                "mqtt": "MQTT"
+            },
+            "add": {
+                "title": "Add new sink"
+            },
+            "edit": {
+                "title": "Edit sink"
+            },
+            "form": {
+                "createSuccess": "Sink configuration created successfully.",
+                "updateSuccess": "Sink configuration updated successfully.",
+                "saveError": "Failed to save sink configuration, {{details}}"
+            },
+            "menu": {
+                "connectSuccess": "Successfully connected to \"{{name}}\"",
+                "disconnectSuccess": "Successfully disconnected from \"{{name}}\""
+            },
+            "settings": {
+                "rateLimit": "Rate limit: {{value}}",
+                "httpMethod": "HTTP method: {{value}}",
+                "timeout": "Timeout: {{value}}",
+                "webhookUrl": "Webhook URL: {{value}}",
+                "topic": "Topic: {{value}}",
+                "brokerHost": "Broker host: {{value}}",
+                "brokerPort": "Broker port: {{value}}",
+                "outputFormats": "Output formats: ",
+                "outputFormatTypes": {
+                    "imageOriginal": "image original",
+                    "imageWithPredictions": "image with predictions",
+                    "predictions": "predictions"
+                }
+            },
+            "rateLimit": {
+                "notSet": "Not set",
+                "samplesPerSecond_one": "{{count}} sample every 1 second",
+                "samplesPerSecond_other": "{{count}} samples every 1 second",
+                "oneSamplePerSeconds_one": "1 sample every {{count}} second",
+                "oneSamplePerSeconds_other": "1 sample every {{count}} seconds"
+            },
+            "fields": {
+                "samples": "Samples",
+                "outputFormatsLabel": "Output Formats",
+                "outputFormatPredictions": "Predictions",
+                "outputFormatImageOriginal": "Image Original",
+                "outputFormatImageWithPredictions": "Image with Predictions",
+                "folderPath": "Folder Path",
+                "httpMethod": "HTTP Method",
+                "timeout": "Timeout",
+                "webhookUrl": "Webhook URL",
+                "headers": "Headers",
+                "topic": "Topic",
+                "brokerHost": "Broker Host",
+                "brokerPort": "Broker Port",
+                "authRequired": "Auth Required"
+            },
+            "webhook": {
+                "headersHelp": "Add as many key-value pairs as needed. Each pair will be included in the '{{title}}' object.",
+                "keyPlaceholder": "key",
+                "valuePlaceholder": "value"
+            },
+            "defaultNames": {
+                "localFolder": "Local folder sink",
+                "webhook": "Webhook sink",
+                "mqtt": "MQTT sink"
+            }
+        },
+        "pipeline": {
+            "activeModel": {
+                "loading": "Model: ..."
+            },
+            "toggle": {
+                "enabledLabel": "Pipeline enabled",
+                "disabledLabel": "Pipeline disabled",
+                "enabledSuccess": "Pipeline enabled successfully",
+                "disabledSuccess": "Pipeline disabled successfully"
+            },
+            "configuration": {
+                "sidebarLabel": "Pipeline configuration",
+                "sourcesTab": "Input",
+                "sinksTab": "Output"
+            }
+        },
+        "collection": {
+            "sidebarLabel": "Data collection policy",
+            "maxDatasetSize": {
+                "title": "Max dataset size",
+                "description": "Maximum number of items to collect"
+            },
+            "captureRate": {
+                "title": "Capture rate",
+                "description": "Capture frames while the stream is running",
+                "toggleLabel": "Toggle auto capturing"
+            },
+            "confidenceThreshold": {
+                "description": "Capture frames when confidence is below threshold",
+                "sliderLabel": "Threshold"
+            }
+        },
+        "metrics": {
+            "time": "time",
+            "sidebarLabel": "Pipeline metrics",
+            "empty": {
+                "title": "No statistics available",
+                "description": "Pipeline metrics will show here once the pipeline starts running and processing data."
+            },
+            "throughput": {
+                "title": "Throughput",
+                "axisLabel": "requests/sec"
+            },
+            "latency": {
+                "title": "Latency",
+                "axisLabel": "ms"
+            }
+        },
+        "health": {
+            "overall": {
+                "idle": "Idle",
+                "problemsDetected": "Problems detected"
+            },
+            "component": {
+                "healthy": "Healthy",
+                "finished": "Finished",
+                "unavailable": "Unavailable"
+            },
+            "componentLabels": {
+                "source": "Source",
+                "sink": "Sink"
+            }
+        },
+        "stream": {
+            "start": "Start stream",
+            "enablePipelineToStart": "Enable pipeline to start stream",
+            "connectError": "Failed to connect to the stream",
+            "captureFrame": "Capture frame",
+            "captureSuccess": "Frame captured and added to the dataset."
+        },
+        "settings": {
+            "folderPath": "Folder path: {{path}}",
+            "authRequired": "Auth required: {{value}}"
         }
     },
     "project": {
         "delete": {
-            "title": "Delete",
             "confirmation": "Are you sure you want to delete project \"{{projectName}}\"?",
             "success": "Project deleted successfully"
         },
@@ -295,12 +571,7 @@
         },
         "validation": {
             "nameEmpty": "Project name cannot be empty",
-            "nameExists": "That project name already exists",
-            "labelNameExists": "That label name already exists",
-            "hotkeyExists": "That hotkey is already in use"
-        },
-        "labels": {
-            "hotkeyPlaceholder": "Hotkey"
+            "nameExists": "That project name already exists"
         },
         "panel": {
             "manageProjects": "Manage projects",
@@ -317,50 +588,39 @@
             "recommended": "{{taskType}} (Recommended)"
         },
         "list": {
-            "heading": "Projects",
             "count_one": "{{count}} project",
             "count_other": "{{count}} projects",
             "countFiltered_one": "{{filtered}} of {{count}} project",
             "countFiltered_other": "{{filtered}} of {{count}} projects",
             "createNewProject": "Create new project",
-            "createProjectFromDataset": "Create project from dataset",
-            "activeBadge": "Active",
+            "createProjectFromDataset": "Create from dataset",
             "card": {
-                "created": "• Created: {{date}}",
-                "labels": "• Labels: {{labels}}"
+                "created": "Created: {{date}}"
             },
             "menu": {
                 "enablePipeline": "Enable pipeline",
-                "disablePipeline": "Disable pipeline",
-                "pipelineEnabled": "Pipeline enabled successfully",
-                "pipelineDisabled": "Pipeline disabled successfully"
+                "disablePipeline": "Disable pipeline"
             },
             "sort": {
-                "label": "Sort:",
+                "label": "Sort Projects by:",
                 "nameAscending": "Name (A-Z)",
                 "nameDescending": "Name (Z-A)",
                 "createdAtDescending": "Created date (newest)",
                 "createdAtAscending": "Created date (oldest)"
             },
             "filters": {
-                "searchPlaceholder": "Search by name...",
-                "taskType": "Filter by task type",
-                "typesSelected_one": "{{count}} type selected",
-                "typesSelected_other": "{{count}} types selected"
+                "searchPlaceholder": "Search projects",
+                "taskType": "Filter by task type"
             },
             "noMatches": {
                 "title": "No projects match your filters",
                 "description": "Try adjusting your search or task type filters to find what you are looking for."
             },
             "empty": {
-                "intro": "Welcome to <name>Geti</name>, a vision AI platform that guides you through the <highlight>complete model lifecycle</highlight>, from dataset preparation to training, optimization and deployment.",
-                "createNewProject": "Create new project",
-                "createFromDataset": "Create from dataset"
+                "intro": "Welcome to <name>Geti</name>, a vision AI platform that guides you through the <highlight>complete model lifecycle</highlight>, from dataset preparation to training, optimization and deployment."
             },
             "workflow": {
                 "addData": "Add data",
-                "annotate": "Annotate",
-                "train": "Train",
                 "optimize": "Optimize",
                 "runInference": "Run inference",
                 "loop": "Monitor predictions and collect more data to iteratively fine-tune your model"
@@ -403,65 +663,442 @@
                 }
             },
             "labels": {
-                "atLeastOneRequired": "At least one object is required",
-                "inputPlaceholder": "Create label"
+                "atLeastOneRequired": "At least one object is required"
             },
             "defaultName": "Project #{{number}}"
         },
         "import": {
             "title": "Create project from a dataset - Import",
-            "actions": {
-                "cancel": "Cancel",
-                "delete": "Delete",
-                "hide": "Hide",
-                "back": "Back",
-                "create": "Create",
-                "next": "Next"
-            },
-            "statistics": {
-                "title": "Imported dataset statistics",
-                "images": "images",
-                "frames": "frames"
-            },
             "labelMapping": {
-                "title": "Label mapping",
-                "datasetLabels": "Dataset labels",
-                "includeUnannotated": "Include media without annotations"
+                "title": "Label mapping"
             },
             "preparingMessage": "Prepare dataset import as new project",
             "taskSelection": {
                 "projectName": "Project name",
-                "taskType": "Task type",
                 "selectTaskPlaceholder": "Select task",
                 "recommendationHint": "The recommended choice is based on the type of the annotations detected in the dataset. If you choose a different type, the annotations will be automatically transformed during import to fit the selected type."
             },
-            "progress": {
-                "dataset": "Dataset",
-                "taskType": "Task type",
-                "labels": "Labels"
-            },
             "jobsList": {
                 "selectTaskType": "Select task type",
-                "mapLabelsMessage": "Map labels for the uploaded dataset",
                 "mapLabelsButton": "Map labels"
             }
-        }
+        },
+        "taskType": "Task type"
     },
-    "annotator": {
-        "labels": {
+    "labels": {
+        "fields": {
+            "hotkeyPlaceholder": "Hotkey",
+            "nameExists": "That label name already exists",
+            "hotkeyExists": "That hotkey is already in use"
+        },
+        "editor": {
+            "namePlaceholder": "Label name",
+            "pin": "Pin label",
+            "unpin": "Unpin label",
+            "editTrigger": "Edit labels",
+            "createTrigger": "Create label",
+            "delete": {
+                "title": "Delete label",
+                "message": "If you remove the {{labelName}} label, all annotations in your dataset that have this label will be deleted. However, this won't impact any models you've trained in the past."
+            }
+        },
+        "toolbar": {
+            "hotkeyTooltip": "Hotkey: {{hotkey}}",
+            "overflowCount": "+ {{count}} more"
+        },
+        "empty": {
             "noLabel": "No label",
             "noObject": "No object"
         }
     },
+    "annotator": {
+        "canvas": {
+            "hideLabels": "Hide labels",
+            "pixelView": "Pixel view",
+            "annotationFillOpacity": "Annotation fill opacity",
+            "annotationBorderOpacity": "Annotation border opacity",
+            "imageBrightness": "Image brightness",
+            "imageContrast": "Image contrast",
+            "imageSaturation": "Image saturation"
+        },
+        "actions": {
+            "zoomIn": "Zoom In",
+            "zoomOut": "Zoom Out",
+            "fitToScreen": "Fit to screen ({{hotkey}})",
+            "undo": "Undo ({{hotkey}})",
+            "redo": "Redo ({{hotkeys}})",
+            "toggleFocus": "Toggle focus",
+            "showAnnotations": "Show annotations ({{hotkey}})",
+            "hideAnnotations": "Hide annotations ({{hotkey}})"
+        },
+        "modes": {
+            "annotation": "Annotation",
+            "prediction": "Prediction"
+        },
+        "predictions": {
+            "settingsTitle": "Prediction settings",
+            "confirm": "Confirm prediction"
+        },
+        "hotkeys": {
+            "alternatives": "{{primary}} or {{alternative}}",
+            "title": "Hotkeys",
+            "submitAnnotationsPredictions": "Submit annotations/predictions",
+            "previousMedia": "Previous media",
+            "nextMedia": "Next media",
+            "deleteSelectedAnnotation": "Delete selected annotation",
+            "toggleAnnotationsVisibility": "Show or hide all annotations",
+            "selectAllAnnotations": "Select all annotations",
+            "deselectAllAnnotations": "Deselect all annotations",
+            "selectNextAnnotation": "Select next annotation",
+            "resetZoom": "Reset zoom"
+        },
+        "tools": {
+            "selection": {
+                "label": "Selection"
+            },
+            "boundingBox": {
+                "label": "Bounding box",
+                "description": "Draw a rectangle or square surrounding an object in an image."
+            },
+            "autoSegmentation": {
+                "label": "Auto segmentation",
+                "detectionDescription": "Move your cursor over an object to preview a suggested rectangle, then click to create the annotation.",
+                "segmentationDescription": "Move your cursor over an object to preview a suggested polygon, then click to create the annotation.",
+                "loading": "Processing image, please wait...",
+                "error": "Error in Segment Anything tool: {{message}}",
+                "unknownError": "Unknown error, please try refreshing the page.",
+                "timeoutError": "{{operation}} timed out after {{timeoutMs}}ms. Please try refreshing the page.",
+                "embeddingError": "Could not fetch the image embedding ({{status}}{{statusText}}).",
+                "operations": {
+                    "workerBuild": "SAM worker build",
+                    "workerInit": "SAM worker init",
+                    "decoder": "SAM decoder"
+                }
+            },
+            "polygon": {
+                "label": "Polygon",
+                "description": "Click to place points one by one, or hold and drag to draw freehand. Ideal for irregular shapes requiring pixel-precision."
+            },
+            "magneticLasso": {
+                "label": "Magnetic Lasso",
+                "description": "Hover along an object's edge and click periodically to snap the outline to its borders.",
+                "error": "Failed to select the shape boundaries, could you please try again?"
+            }
+        },
+        "video": {
+            "playback": {
+                "slower": "Slower",
+                "slow": "Slow",
+                "normal": "Normal",
+                "speed": "Playback speed",
+                "showAllFrames": "Show all frames",
+                "showOneFramePerSecond": "Show 1 frame per second"
+            },
+            "frames": {
+                "currentTotal": "Current frame: {{currentFrame}} / Total frames: {{totalFrames}}",
+                "thumbnailAlt": "Thumbnail for frame {{frameNumber}}"
+            },
+            "errors": {
+                "network": "Cannot play video due to a network error, please refresh and try again.",
+                "unableToPlay": "Unable to play video, please try again.",
+                "unsupportedFormat": "Unable to play video, please try a different video format (mp4/webm)."
+            }
+        }
+    },
     "models": {
         "jobs": {
-            "error": "Job failed. Please check the logs for details and try again."
+            "error": "Job failed. Please check the logs for details and try again.",
+            "heading": "Jobs",
+            "pending": "Pending...",
+            "running": "Running...",
+            "stopDialog": {
+                "title": "Stop job",
+                "confirmation": "Are you sure you want to stop this job?"
+            },
+            "logs": "Logs",
+            "startedAt": "Started: {{time}}",
+            "waitingToStart": "Waiting to start...",
+            "device": "Device: {{device}}"
+        },
+        "detail": {
+            "loadError": "Failed to load model details",
+            "tabs": {
+                "variants": "Model variants",
+                "metrics": "Model metrics",
+                "parameters": "Training parameters",
+                "datasets": "Training datasets"
+            }
+        },
+        "metrics": {
+            "noMetrics": "No available metrics",
+            "loadError": "Failed to load training metrics",
+            "evaluationsTitle": "Evaluations",
+            "noEvaluations": "Testing evaluation metrics are not available"
         },
         "training": {
             "logs": {
                 "copySuccess": "Copied Successfully",
-                "copyError": "Copy failed"
+                "copyError": "Copy failed",
+                "copyPathTooltip": "Click to copy path",
+                "showTraceback": "Show traceback",
+                "levelLabel": "Level",
+                "levelHelpTitle": "Minimum log level",
+                "levelHelpDescription": "Shows log entries at the selected level and above. For example, selecting WARNING shows WARNING, ERROR, and CRITICAL entries, hiding DEBUG and INFO.",
+                "searchPlaceholder": "Search logs...",
+                "connectionStatus": {
+                    "connecting": "Connecting...",
+                    "connected": "Live",
+                    "error": "Connection error"
+                },
+                "entriesCount": "{{filtered}} / {{total}} entries",
+                "noEntries": "No log entries",
+                "noMatchingEntries": "No matching log entries",
+                "scrollToBottom": "Scroll to bottom",
+                "dialogTitle": "Training Logs",
+                "loadError": "Failed to load logs: {{message}}",
+                "noJobOrModel": "No job or model specified",
+                "fetchError": "Failed to fetch model logs: {{status}} {{statusText}}",
+                "downloadStarted": "Training logs download started"
+            },
+            "parameters": {
+                "noParameters": "No parameters.",
+                "learningParameters": "LEARNING PARAMETERS",
+                "filters": "FILTERS",
+                "augmentations": "AUGMENTATIONS",
+                "intensityMapping": "INTENSITY MAPPING"
+            },
+            "architectures": {
+                "metrics": {
+                    "top1AccOnImageNet": "Top-1 Acc on ImageNet",
+                    "mapOnCoco": "mAP on COCO",
+                    "map50OnCoco": "mAP50 on COCO"
+                },
+                "card": {
+                    "numberOfParameters": "Number of parameters: {{count}} million",
+                    "gigaflops": "Gigaflops: {{value}}"
+                },
+                "sort": {
+                    "label": "Sort Models by:",
+                    "nameAsc": "Name (A to Z)",
+                    "nameDesc": "Name (Z to A)",
+                    "speedAsc": "Speed (fastest first)",
+                    "speedDesc": "Speed (slowest first)",
+                    "accuracyAsc": "Accuracy (lowest first)",
+                    "accuracyDesc": "Accuracy (highest first)"
+                },
+                "timm": {
+                    "heading": "TIMM model configuration",
+                    "architectureFamilyLabel": "Architecture family",
+                    "selectArchitecturePlaceholder": "Select architecture",
+                    "modelVariantLabel": "Model variant",
+                    "selectVariantPlaceholder": "Select variant",
+                    "pretrainedWeightsLabel": "Pretrained Weights",
+                    "selectWeightsPlaceholder": "Select weights",
+                    "parameters": "Parameters: {{count}} million",
+                    "gigaflops": "GigaFlops: {{value}}"
+                }
+            },
+            "devices": {
+                "selectLabel": "Select training device"
+            },
+            "setup": {
+                "trigger": "Train model",
+                "dialog": {
+                    "title": "Select a model to train",
+                    "disabledReasonTitle": "Why can I not start training?",
+                    "advancedSettings": "Advanced settings"
+                },
+                "toast": {
+                    "trainingStarted": "Model training started successfully.",
+                    "trainingStartedWithLink": "Model training started successfully. <link>Open models screen to see progress.</link>"
+                },
+                "selectDataset": {
+                    "label": "Select dataset",
+                    "useCurrentDataset": "Use current dataset",
+                    "helpTitle": "Selecting a dataset",
+                    "helpDescription": "Choose the version of the dataset to use for training. If you want to train the new model\n                            on the exact same data (media and annotations) as another model, please select the\n                            corresponding dataset revision. Conversely, if you want to train on the most recent version\n                            of the data (what you see in the \"Dataset\" page), please select \"Use\n                            current dataset\"."
+                },
+                "selectModel": {
+                    "label": "Select input weights",
+                    "defaultPretrainedWeights": "Default pre-trained weights",
+                    "helpTitle": "Selecting input weights",
+                    "helpDescription": "Choose an existing model to continue fine-tuning, or select \"Default pre-trained weights\" to fine-tune a new model starting from publicly available weights pre-trained on large public datasets."
+                }
+            },
+            "validation": {
+                "notEnoughAnnotations": "In order to train a model, you need to annotate at least 3 items in your dataset, although we recommend annotating several more for better results.",
+                "emptySubsetsReason": "In order to train a model, each subset (training, validation, testing) needs at least one item. This condition is currently not satisfiable, because the {{subsetClause}} empty and {{assignmentDetail}}.",
+                "emptySubsetClause_one": "{{list}} subset is",
+                "emptySubsetClause_other": "{{list}} subsets are",
+                "reviewedOnly_one": "there is {{count}} reviewed item left to assign",
+                "reviewedOnly_other": "there are {{count}} reviewed items left to assign",
+                "unannotatedOnly_one": "there is {{count}} item that still needs annotation before it can be assigned",
+                "unannotatedOnly_other": "there are {{count}} items that still need annotation before they can be assigned",
+                "mixedReviewedClause_one": "there is {{count}} reviewed item ready to assign",
+                "mixedReviewedClause_other": "there are {{count}} reviewed items ready to assign",
+                "mixedUnannotatedClause_one": "{{count}} item that still needs annotation before it can be assigned",
+                "mixedUnannotatedClause_other": "{{count}} items that still need annotation before they can be assigned",
+                "mixedAssignmentDetail": "{{reviewedClause}} and {{unannotatedClause}}",
+                "noUnassignedItems": "there are no unassigned items available to redistribute"
+            },
+            "advanced": {
+                "tabs": {
+                    "dataManagement": "Data management"
+                },
+                "notAvailable": "Training configuration is not available."
+            },
+            "learning": {
+                "title": "Learning parameters",
+                "tagDefault": "Default",
+                "tagModified": "Modified",
+                "inputSize": "Input size"
+            },
+            "dataManagement": {
+                "trainingSubsets": {
+                    "title": "Training subsets",
+                    "description": "Specify the distribution of annotated samples that have NOT already been assigned to a subset. Note that samples used in previous training rounds already have a subset and this will remain unchanged, to avoid data contamination and evaluation bias.",
+                    "unavailableTitle": "Invalid training subsets configuration",
+                    "unavailableDescription": "Training subsets do not contain enough media items to support a configurable split between training, validation, and testing subsets.",
+                    "unavailableHint": "Please add more media items to ensure each subset contains at least one item.",
+                    "datasetSamples": "Dataset: {{count}} samples",
+                    "assignedSamples": "Assigned: {{count}}",
+                    "unassignedSamples": "Unassigned: {{count}}",
+                    "distributionLabel": "Distribution for new samples",
+                    "resultingDistribution": "Resulting dataset distribution:",
+                    "totalLabel": "Total:",
+                    "mediaItemsLabel": "media items"
+                },
+                "filters": {
+                    "noMinimum": "No minimum",
+                    "unlimited": "Unlimited"
+                },
+                "augmentation": {
+                    "title": "Data Augmentation"
+                },
+                "tiling": {
+                    "title": "Tiling",
+                    "description": "Tiling is a technique that divides high-resolution images into smaller tiles and might be useful to increase accuracy for small object detection tasks.",
+                    "modeLabel": "Tiling mode",
+                    "modes": {
+                        "automatic": "Automatic",
+                        "custom": "Custom"
+                    },
+                    "offDescription": "Model processes the entire image as a single unit without dividing it into smaller tiles. This approach is straightforward but may struggle with detecting small objects in high-resolution images, as the model might miss finer details",
+                    "automaticDescription": "It means that the system will automatically set the parameters based on the image resolution and annotations size."
+                },
+                "intensityMapping": {
+                    "title": "Intensity Mapping"
+                }
             }
+        },
+        "list": {
+            "groupByPlaceholder": "Group by",
+            "groupByDataset": "Group by: Dataset",
+            "groupByArchitecture": "Group by: Architecture",
+            "hideFailedModels": "Hide failed models",
+            "showFailedModels": "Show failed models",
+            "searchPlaceholder": "Search models...",
+            "noModelsFound": "No models found",
+            "empty": {
+                "title": "No models yet.",
+                "description": "Train your first model to get started."
+            },
+            "deletedWeightsBadge": "Deleted weights",
+            "fineTunedFrom": "Fine-tuned from",
+            "columns": {
+                "trained": "Trained",
+                "device": "Device",
+                "totalSize": "Total size"
+            }
+        },
+        "performance": {
+            "metrics": {
+                "accuracy": "Accuracy",
+                "precision": "Precision",
+                "recall": "Recall",
+                "fMeasure": "F-measure"
+            },
+            "categories": {
+                "balance": "Balance",
+                "speed": "Speed",
+                "accuracy": "Accuracy"
+            }
+        },
+        "variants": {
+            "empty": "No available model variants.",
+            "columns": {
+                "precision": "PRECISION"
+            },
+            "quantizedInfo": {
+                "title": "Quantized with NNCF PTQ",
+                "maxAccuracyDrop": "Max accuracy drop: {{value}}",
+                "calibrationDatasetSize": "Calibration dataset size: {{size}}"
+            }
+        },
+        "export": {
+            "downloadStarted": "Model download started"
+        },
+        "optimize": {
+            "description": "Optimize the FP16 model using OpenVINO NNCF (via INT8 quantization)",
+            "contextualHelp": "OpenVINO NNCF (Neural Network Compression Framework) via INT8 quantization reduces model size and speeds up inference with minimal impact on accuracy",
+            "start": "Start quantization",
+            "dialogTitle": "Quantization",
+            "subheading": "Quantize model to INT8",
+            "jobStarted": "Quantization job started.",
+            "recommendedCalibrationSize": "Recommended calibration dataset size: between 200-500 media items",
+            "fields": {
+                "maxAccuracyDrop": {
+                    "label": "Max accuracy drop (%)",
+                    "help": {
+                        "paragraph1": "Maximum allowed drop in validation accuracy.",
+                        "paragraph2": "Beware that accuracy-aware quantization may take a long time when the max allowed drop is small.",
+                        "paragraph3": "Also note that the final testing accuracy may be lower than the specified validation accuracy threshold, especially for relatively small datasets."
+                    }
+                },
+                "maxIterations": {
+                    "label": "Max number of iterations",
+                    "help": {
+                        "paragraph1": "Maximum number of iterations of accuracy-aware quantization.",
+                        "paragraph2": "Accuracy-aware quantization iteratively removes model layers from the quantization scope until the max accuracy drop criteria is met. Limiting the number of iterations can significantly reduce the time it takes to quantize models with many layers.",
+                        "paragraph3": "This parameter is only used when a max accuracy drop is set."
+                    }
+                },
+                "calibrationSize": {
+                    "label": "Max calibration size",
+                    "help": "Calibration samples will be randomly selected within the dataset",
+                    "useFullDataset": "Use full dataset"
+                }
+            }
+        },
+        "actions": {
+            "deleteWeights": "Delete weights",
+            "deleteModel": "Delete model",
+            "viewLogs": "View training logs",
+            "deleteWeightsDescription": "Are you sure you want to delete the weights for model \"{{modelName}}\"?",
+            "deleteModelDescription": "Are you sure you want to delete model \"{{modelName}}\"? This action cannot be undone.",
+            "renameDialog": {
+                "title": "Rename model",
+                "nameLabel": "Model name"
+            }
+        },
+        "columns": {
+            "modelName": "Model Name",
+            "architecture": "Architecture"
+        }
+    },
+    "license": {
+        "label": "License: ",
+        "agreement": {
+            "title": "License Agreement",
+            "intro": "By installing, using, or distributing this application, you acknowledge that:",
+            "termsRead": "You have read and understood the license terms at the links below;",
+            "termsGovern": "Confirmed the linked terms govern the contents you seek to access and use; and",
+            "termsAccepted": "Accepted and agreed to the linked license terms.",
+            "accept": "Accept and continue"
+        },
+        "links": {
+            "intelSimplified": "Intel Simplified Software License",
+            "dinov2": "DINOv3 License"
         }
     },
     "application": {
@@ -469,8 +1106,7 @@
             "loading": "Loading...Please wait."
         },
         "serverError": {
-            "heading": "Server Error",
-            "refresh": "Refresh"
+            "heading": "Server Error"
         },
         "errorPage": {
             "badRequest": "The server cannot or will not process the current request.",
@@ -479,7 +1115,6 @@
             "unauthorized": "You aren't authorized to see this",
             "serverError": "The server encountered an error and could not complete your request.",
             "serviceUnavailable": "Looks like our API is down",
-            "unknownError": "An unknown error occurred",
             "goHome": "Go back to home page"
         },
         "notifications": {

@@ -24,7 +24,6 @@ import { useProjectLabelsWithEmptyLabel } from '../../../../shared/annotator/lab
 import { isImage } from '../../../../shared/media-item-utils';
 import { isMultiLabelClassificationTask } from '../../../project/task-type-guards';
 import { useMediaUpload } from '../../api/use-media-upload';
-import { useIsUploading } from '../../providers/media-upload-provider.component';
 import { useBulkAssignLabel } from './api/use-bulk-assign-label';
 import { LabelsList } from './labels-list/labels-list.component';
 
@@ -84,7 +83,7 @@ const BulkLabelsAssignmentDialogContent = ({
                     {t('dataset.bulkLabels.cancelUpload')}
                 </Button>
                 <Button variant={'secondary'} onPress={onSkip} isPending={isSkipPending} isDisabled={isSkipPending}>
-                    {t('dataset.bulkLabels.skip')}
+                    {t('common.actions.skip')}
                 </Button>
                 <Button
                     variant={'accent'}
@@ -92,7 +91,7 @@ const BulkLabelsAssignmentDialogContent = ({
                     isDisabled={isContinueDisabled}
                     isPending={isContinuePending}
                 >
-                    {t('dataset.bulkLabels.continue')}
+                    {t('common.actions.continue')}
                 </Button>
             </ButtonGroup>
         </Dialog>
@@ -109,9 +108,12 @@ export const BulkLabelsAssignmentDialog = ({ files, onClose }: BulkLabelsAssignm
     const { data: project } = useProject();
     const isMultiLabelClassification = isMultiLabelClassificationTask(project.task);
     const { uploadMedia } = useMediaUpload();
-    const isUploading = useIsUploading();
 
     const bulkAssignLabel = useBulkAssignLabel();
+
+    // Uploading and assigning are separate async steps, so a flag spanning both is needed to keep
+    // the buttons from briefly re-enabling in between them.
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSkip = async () => {
         void uploadMedia(files);
@@ -119,15 +121,21 @@ export const BulkLabelsAssignmentDialog = ({ files, onClose }: BulkLabelsAssignm
     };
 
     const handleAccept = async (labelIds: string[]) => {
-        const mediaItems = await uploadMedia(files);
-        const mediaItemImages = mediaItems.filter(isImage);
+        setIsSubmitting(true);
 
-        await bulkAssignLabel.mutate(
-            mediaItemImages.map(({ id }) => id),
-            labelIds
-        );
+        try {
+            const mediaItems = await uploadMedia(files);
+            const mediaItemImages = mediaItems.filter(isImage);
 
-        onClose();
+            await bulkAssignLabel.mutate(
+                mediaItemImages.map(({ id }) => id),
+                labelIds
+            );
+
+            onClose();
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -137,8 +145,8 @@ export const BulkLabelsAssignmentDialog = ({ files, onClose }: BulkLabelsAssignm
                     onClose={onClose}
                     onSkip={handleSkip}
                     onContinue={handleAccept}
-                    isContinuePending={isUploading || bulkAssignLabel.isPending}
-                    isSkipPending={isUploading}
+                    isContinuePending={isSubmitting}
+                    isSkipPending={isSubmitting}
                     isMultiLabelClassification={isMultiLabelClassification}
                 />
             )}

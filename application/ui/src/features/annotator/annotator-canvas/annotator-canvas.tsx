@@ -17,10 +17,9 @@ import { Annotations } from '../annotations/annotations.component';
 import { VideoAnnotations, VideoPredictions } from '../annotations/video-annotations.component';
 import { useIsAnnotatorSceneBusy } from '../hooks/use-is-annotator-scene-busy';
 import { ToolManager } from '../tools/tool-manager.component';
+import { PREDICTION_CHUNK_SIZE, PREDICTION_FRAME_SKIP } from '../video-player/api/prediction-constants';
 import { usePrefetchVideoFramesAnnotations } from '../video-player/api/use-video-frames-annotations';
 import {
-    PREDICTION_CHUNK_SIZE,
-    PREDICTION_FRAME_SKIP,
     useKeepVideoFramesPredictionsSubscribed,
     usePrefetchVideoFramesPredictions,
 } from '../video-player/api/use-video-frames-predictions';

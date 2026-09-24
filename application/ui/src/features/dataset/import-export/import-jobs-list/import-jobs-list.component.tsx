@@ -79,7 +79,7 @@ export const ImportJobsList = () => {
                     fileName={fileName}
                     message={t('dataset.import.mapLabelsMessage')}
                     stagedDatasetId={stagedDatasetId}
-                    primaryButtonLabel={t('dataset.import.continue')}
+                    primaryButtonLabel={t('common.actions.continue')}
                     onOpen={() => handleOpen(stagedDatasetId)}
                     deleteEntry={() => deleteImportEntry(stagedDatasetId)}
                 />

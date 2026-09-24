@@ -290,6 +290,37 @@ class TestModelServiceIntegration:
             assert variant.weights_size == 0  # Files are empty, so size is 0
             assert variant.optimal_confidence_threshold is None  # Files are empty, so nothing can be read
 
+    def test_get_model_variants_includes_nested_checkpoint_size(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ) -> None:
+        variant_id = uuid4()
+        db_session.add(
+            ModelVariantDB(id=str(variant_id), model_revision_id=str(fxt_model_id), format="pytorch", precision="fp32")
+        )
+        db_session.flush()
+        checkpoint_dir = (
+            tmp_path
+            / "projects"
+            / str(fxt_project_id)
+            / "models"
+            / str(fxt_model_id)
+            / "variants"
+            / str(variant_id)
+            / "model"
+        )
+        checkpoint_dir.mkdir(parents=True)
+        (checkpoint_dir / "config.json").write_bytes(b"123")
+        (checkpoint_dir / "model.safetensors").write_bytes(b"12345")
+
+        variants = fxt_model_service.get_model_variants(fxt_project_id, fxt_model_id)
+
+        assert variants[0].weights_size == 8
+
     def test_get_model_variants_optimal_confidence_threshold(
         self,
         tmp_path: Path,
@@ -582,6 +613,36 @@ class TestModelServiceIntegration:
         expected_paths = tuple(variant_dir / file for file in expected_files)
         assert paths == expected_paths
 
+    def test_get_directory_backed_pytorch_binary_files(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+        db_session: Session,
+    ) -> None:
+        variant_id = uuid4()
+        db_session.add(
+            ModelVariantDB(id=str(variant_id), model_revision_id=str(fxt_model_id), format="pytorch", precision="fp32")
+        )
+        db_session.flush()
+        variant_dir = (
+            tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id) / "variants" / str(variant_id)
+        )
+        checkpoint_dir = variant_dir / "model"
+        (checkpoint_dir / "weights").mkdir(parents=True)
+        config_path = checkpoint_dir / "config.json"
+        weights_path = checkpoint_dir / "weights" / "model.safetensors"
+        config_path.touch()
+        weights_path.touch()
+
+        files_exist, paths = fxt_model_service.get_model_binary_files(
+            project_id=fxt_project_id, model_id=fxt_model_id, model_variant_id=variant_id
+        )
+
+        assert files_exist is True
+        assert paths == (config_path, weights_path)
+
     def test_create_revision(
         self, fxt_project_id: UUID, fxt_model_id: UUID, fxt_model_service: ModelService, db_session: Session
     ):
@@ -782,6 +843,42 @@ class TestModelServiceIntegration:
                 assert metric["value"]["x_axis_label"] == "Step"
             elif metric["header"] == "Validation F1 score":
                 assert metric["value"]["x_axis_label"] == "Epoch"
+
+    def test_get_huggingface_training_metrics(
+        self,
+        tmp_path: Path,
+        fxt_project_id: UUID,
+        fxt_model_id: UUID,
+        fxt_model_service: ModelService,
+    ):
+        metrics_dir = (
+            tmp_path / "projects" / str(fxt_project_id) / "models" / str(fxt_model_id) / "metrics" / "version_0"
+        )
+        metrics_dir.mkdir(parents=True)
+        csv_content = (
+            "epoch,step,train/total_loss,lr,train/grad_norm,train/data_time,train/iter_time,"
+            "val/Dice,val/mIoU,validation/data_time,validation/iter_time\n"
+            "1,1,0.8,0.0001,2.5,0.01,0.12,,,,\n"
+            "1,1,,,,,,0.7,0.6,0.02,0.3\n"
+        )
+        (metrics_dir / "metrics.csv").write_text(csv_content)
+
+        metrics = fxt_model_service.get_model_training_metrics(project_id=fxt_project_id, model_id=fxt_model_id)
+
+        metrics_by_name = {metric["header"]: metric for metric in metrics}
+        assert set(metrics_by_name) == {
+            "Training total loss",
+            "Learning rate",
+            "Training gradient norm",
+            "Training data time",
+            "Training iteration time",
+            "Validation Dice score",
+            "Validation mean IoU",
+            "Validation data time",
+            "Validation iteration time",
+        }
+        assert metrics_by_name["Training total loss"]["value"]["x_axis_label"] == "Step"
+        assert metrics_by_name["Validation Dice score"]["value"]["x_axis_label"] == "Epoch"
 
     def test_get_training_metrics_file_not_found(
         self,

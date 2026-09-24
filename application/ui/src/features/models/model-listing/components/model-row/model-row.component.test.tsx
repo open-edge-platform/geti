@@ -111,7 +111,9 @@ describe('ModelRow', () => {
                 screen.getByText(formatTrainingDateTime(defaultModel.training_info.end_time).replace(/\n/g, ' '))
             ).toBeInTheDocument();
 
-            expect(screen.getByText(`${modelArchitecture.name} (${modelArchitecture.license})`)).toBeInTheDocument();
+            expect(
+                screen.getByText(`${modelArchitecture.name} (${modelArchitecture.license.name})`)
+            ).toBeInTheDocument();
             expect(screen.getByText(modelArchitecture.performanceCategory ?? '')).toBeInTheDocument();
 
             expect(screen.getByTestId('device info')).toHaveTextContent('NVIDIA RTX 3090');

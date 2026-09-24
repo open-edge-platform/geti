@@ -1,20 +1,15 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { PointerEvent, useCallback } from 'react';
+import { PointerEvent, useMemo } from 'react';
+
+import { i18n, useTranslation } from '@/i18n';
 
 import { useLabelResolver } from '../../../../shared/annotator/labels';
 import type { AnnotationLabel, AnnotationLabelRef } from '../../../../shared/types';
 import { isPrediction } from '../utils';
 
 import classes from './annotation-labels.module.scss';
-
-const placeholderLabel = {
-    id: crypto.randomUUID(),
-    name: 'No label',
-    color: 'var(--annotation-fill)',
-    isPrediction: false,
-};
 
 // Screen-space dimensions for the foreignObject hit area
 const LABEL_HEIGHT_PX = 24;
@@ -28,7 +23,7 @@ type AnnotationLabelsProps = {
 };
 
 const formatPredictionScore = (score: number) => {
-    return new Intl.NumberFormat('en-US', { style: 'percent' }).format(score);
+    return new Intl.NumberFormat(i18n.resolvedLanguage ?? i18n.language, { style: 'percent' }).format(score);
 };
 
 const getLabelText = (label: AnnotationLabel) => {
@@ -42,15 +37,23 @@ export const AnnotationLabels = ({
     isRemovable = true,
 }: AnnotationLabelsProps) => {
     const { resolveAnnotationLabel } = useLabelResolver();
+    const { t } = useTranslation();
 
-    const onDeleteLabel = useCallback(
-        (labelId: string) => (event: PointerEvent) => {
-            event.preventDefault();
-            event.stopPropagation();
-            onRemove(labelId);
-        },
-        [onRemove]
+    const placeholderLabel = useMemo(
+        () => ({
+            id: crypto.randomUUID(),
+            name: 'No label',
+            color: 'var(--annotation-fill)',
+            isPrediction: false,
+        }),
+        []
     );
+
+    const onDeleteLabel = (labelId: string) => (event: PointerEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onRemove(labelId);
+    };
 
     const resolvedLabels = labels.map(resolveAnnotationLabel).filter((label) => label !== undefined);
     const displayLabels = resolvedLabels.length ? resolvedLabels : [placeholderLabel];
@@ -86,7 +89,9 @@ export const AnnotationLabels = ({
                             }}
                             aria-label={`label ${label.name} background`}
                         >
-                            <span aria-label={`label ${label.name}`}>{getLabelText(label)}</span>
+                            <span aria-label={`label ${label.name}`}>
+                                {isPlaceholder ? t('labels.empty.noLabel') : getLabelText(label)}
+                            </span>
                             {!isPlaceholder && isRemovable && (
                                 <button
                                     className={classes.removeButton}

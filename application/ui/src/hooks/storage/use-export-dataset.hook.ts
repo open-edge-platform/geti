@@ -18,14 +18,12 @@ type ExportDatasetData = {
 export const useExportDataset = () => {
     const projectId = useProjectIdentifier();
 
-    const [_lsExportProject, setLsExportId] = useLocalStorage<ExportDatasetData[]>(
+    // Exposed as state rather than a getter: reading localStorage during render is impure,
+    // so memoisation can cache an outdated list indefinitely.
+    const [lsExportIds, setLsExportId] = useLocalStorage<ExportDatasetData[]>(
         EXPORT_DATASET_KEY(projectId),
         () => getParsedLocalStorage(EXPORT_DATASET_KEY(projectId)) ?? []
     );
-
-    const getLsExportIds = (): ExportDatasetData[] => {
-        return getParsedLocalStorage<ExportDatasetData[]>(EXPORT_DATASET_KEY(projectId)) ?? [];
-    };
 
     const addLsExportId = (jobId: string, datasetId: string | null) => {
         return setLsExportId((prevState) => [...(prevState ?? []), { jobId, datasetId }]);
@@ -36,7 +34,7 @@ export const useExportDataset = () => {
     };
 
     return {
-        getLsExportIds,
+        lsExportIds,
         addLsExportId,
         removeLsExportId,
     };

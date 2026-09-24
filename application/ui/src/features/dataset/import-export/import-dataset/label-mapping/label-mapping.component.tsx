@@ -157,7 +157,7 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                         name='include_unannotated'
                         aria-label='include unannotated'
                     >
-                        {t('dataset.import.labelMapping.includeUnannotated')}
+                        {t('dataset.includeUnannotated')}
                     </Checkbox>
                 </Form>
             </View>

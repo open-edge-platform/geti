@@ -8,8 +8,6 @@ import {
     distributeByLargestRemainder,
     getAllModelsWithOpenVINOVariants,
     getModelIdentifierPayload,
-    isEdgeCrafterModel,
-    isUltralyticsModel,
     SelectableModel,
 } from './utils';
 
@@ -166,50 +164,5 @@ describe('getModelIdentifierPayload', () => {
         };
 
         expect(getModelIdentifierPayload(model)).toEqual({ model_id: 'model-1', model_variant_id: 'v-ov' });
-    });
-});
-
-describe('isUltralyticsModel', () => {
-    it('returns true for ultralytics model identifier', () => {
-        const models = [
-            'object-detection-yolo26-m',
-            'OBJECT-DETECTION-YOLO26-M',
-            'object-detection-yolo11-n',
-            'OBJECT-DETECTION-YOLO11-N',
-            'object-detection-yolo12-s',
-            'OBJECT-DETECTION-YOLO12-S',
-            'instance-segmentation-yolo11-l',
-            'instance-segmentation-yolo12-x',
-        ];
-
-        models.forEach((model) => {
-            expect(isUltralyticsModel(model)).toBe(true);
-        });
-    });
-
-    it('returns false for non ultralytics model identifier', () => {
-        expect(isUltralyticsModel('object-detection-yolox-l')).toBe(false);
-        expect(isUltralyticsModel('OBJECT-DETECTION-YOLOX-L')).toBe(false);
-    });
-});
-
-describe('isEdgeCrafterModel', () => {
-    it('returns true for edgecrafter model identifier', () => {
-        const models = [
-            'object-detection-edgecrafter-l',
-            'OBJECT-DETECTION-EDGECRAFTER-L',
-            'object-detection-edgecrafter-m',
-            'object-detection-edgecrafter-s',
-            'object-detection-edgecrafter-x',
-        ];
-
-        models.forEach((model) => {
-            expect(isEdgeCrafterModel(model)).toBe(true);
-        });
-    });
-
-    it('returns false for non edgecrafter model identifier', () => {
-        expect(isEdgeCrafterModel('object-detection-yolox-l')).toBe(false);
-        expect(isEdgeCrafterModel('OBJECT-DETECTION-YOLOX-L')).toBe(false);
     });
 });

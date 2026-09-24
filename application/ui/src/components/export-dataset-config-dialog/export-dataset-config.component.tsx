@@ -29,6 +29,7 @@ import { isEmpty } from 'lodash-es';
 import { useExportDatasetJobAction } from '../../hooks/use-export-dataset-job-action.hook';
 import { Link } from '../../platform/components/link.component';
 import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../shared/annotator/labels';
+import { isNonEmptyString } from '../../shared/util';
 import { MultiSelectList } from '../multi-select-list/multi-select-list.component';
 import { getFormatOptions } from '../util';
 
@@ -88,6 +89,8 @@ const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: strin
 type ExportDatasetConfigProps = {
     name?: string;
     datasetId: string | null;
+    datasetViewId?: string | null;
+    datasetViewName?: string;
     statistics: ReactNode;
     dialogState: OverlayTriggerState;
 };
@@ -99,16 +102,26 @@ const EXPORT_FORMATS_LINK =
 type ExportDatasetDialogContentProps = {
     name: string;
     datasetId: string | null;
+    datasetViewId: string | null;
+    datasetViewName: string | undefined;
     statistics: ReactNode;
     dialogState: OverlayTriggerState;
 };
 
-const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }: ExportDatasetDialogContentProps) => {
+const ExportDatasetDialogContent = ({
+    name,
+    datasetId,
+    datasetViewId,
+    datasetViewName,
+    statistics,
+    dialogState,
+}: ExportDatasetDialogContentProps) => {
     const { t } = useTranslation();
     const { data: selectedProject } = useProject();
 
     const [formState, submitAction, isPending] = useExportDatasetJobAction({
         datasetId,
+        datasetViewId,
         onSuccess: dialogState.close,
     });
 
@@ -119,9 +132,17 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
 
     return (
         <Dialog size='L' width={{ base: '70vw' }}>
-            <Heading>{t('dataset.export.heading', { name })}</Heading>
+            <Heading>
+                {datasetViewName === undefined
+                    ? t('dataset.export.heading', { name })
+                    : t('dataset.export.headingDatasetView')}
+            </Heading>
             <Divider />
             <Content UNSAFE_className={classes.container}>
+                {isNonEmptyString(datasetViewName) && (
+                    <Text>{t('dataset.export.datasetView', { name: datasetViewName })}</Text>
+                )}
+
                 <Heading>{t('dataset.export.statisticsHeading')}</Heading>
                 {statistics}
 
@@ -139,7 +160,7 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
                         />
 
                         <Checkbox name='include_unannotated' defaultSelected={formState.include_unannotated}>
-                            {t('dataset.export.includeUnannotated')}
+                            {t('dataset.includeUnannotated')}
                         </Checkbox>
 
                         <Divider size='S' />
@@ -174,10 +195,10 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
 
             <ButtonGroup>
                 <Button onPress={dialogState.close} variant='secondary'>
-                    {t('dataset.export.cancel')}
+                    {t('common.actions.cancel')}
                 </Button>
                 <Button type='submit' form={FORM_ID} variant='accent' isPending={isPending} isDisabled={isPending}>
-                    {t('dataset.export.submit')}
+                    {t('common.actions.export')}
                 </Button>
             </ButtonGroup>
         </Dialog>
@@ -187,6 +208,8 @@ const ExportDatasetDialogContent = ({ name, datasetId, statistics, dialogState }
 export const ExportDatasetConfig = ({
     name = 'dataset',
     datasetId,
+    datasetViewId = null,
+    datasetViewName,
     statistics,
     dialogState,
 }: ExportDatasetConfigProps) => {
@@ -196,6 +219,8 @@ export const ExportDatasetConfig = ({
                 <ExportDatasetDialogContent
                     name={name}
                     datasetId={datasetId}
+                    datasetViewId={datasetViewId}
+                    datasetViewName={datasetViewName}
                     statistics={statistics}
                     dialogState={dialogState}
                 />

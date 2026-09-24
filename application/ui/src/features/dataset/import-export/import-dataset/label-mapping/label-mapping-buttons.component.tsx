@@ -34,15 +34,15 @@ export const LabelMappingButtons = ({ stagedDatasetId, onClose }: LabelMappingBu
                 isPending={deleteFileMutation.isPending}
                 isDisabled={deleteFileMutation.isPending}
             >
-                {t('dataset.import.deleteStagedFile.delete')}
+                {t('common.actions.delete')}
             </Button>
 
             <Button onPress={onClose} variant='secondary'>
-                {t('dataset.import.hide')}
+                {t('common.actions.hide')}
             </Button>
 
             <Button type='submit' form={IMPORT_DATASET_FORM_ID} variant='accent'>
-                {t('dataset.import.labelMapping.submit')}
+                {t('common.actions.submit')}
             </Button>
         </ButtonGroup>
     );

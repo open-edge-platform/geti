@@ -21,7 +21,7 @@ describe('createI18nInstance', () => {
         const instance = createI18nInstance({ lng: 'en' });
 
         expect(instance.isInitialized).toBe(true);
-        expect(instance.t('navigation.dataset')).toBe('Dataset');
+        expect(instance.t('common.labels.dataset')).toBe('Dataset');
     });
 
     it('does not touch language storage when a language is pinned', () => {
@@ -47,7 +47,7 @@ describe('createI18nInstance', () => {
 
         expect(instance.language).toBe('en');
         expect(instance.resolvedLanguage).toBe('en');
-        expect(instance.t('navigation.dataset')).toBe('Dataset');
+        expect(instance.t('common.labels.dataset')).toBe('Dataset');
         expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('en');
     });
 
@@ -58,7 +58,7 @@ describe('createI18nInstance', () => {
             const instance = createI18nInstance();
 
             expect(instance.resolvedLanguage).toBe('en');
-            expect(instance.t('navigation.dataset')).toBe('Dataset');
+            expect(instance.t('common.labels.dataset')).toBe('Dataset');
         }
     );
 
@@ -69,7 +69,7 @@ describe('createI18nInstance', () => {
             const instance = createI18nInstance();
 
             expect(instance.resolvedLanguage).toBe('en');
-            expect(instance.t('navigation.dataset')).toBe('Dataset');
+            expect(instance.t('common.labels.dataset')).toBe('Dataset');
         }
     );
 
@@ -77,7 +77,7 @@ describe('createI18nInstance', () => {
         const instance = createI18nInstance({ lng: 'zh-CN' });
 
         expect(instance.resolvedLanguage).toBe('en');
-        expect(instance.t('navigation.dataset')).toBe('Dataset');
+        expect(instance.t('common.labels.dataset')).toBe('Dataset');
     });
 });
 
@@ -88,11 +88,11 @@ describe('English fallback', () => {
             supportedLngs: ['en', 'zh-TW'],
             resources: {
                 en: resources.en,
-                'zh-TW': { translation: { navigation: { dataset: 'TW dataset' } } },
+                'zh-TW': { translation: { common: { labels: { dataset: 'TW dataset' } } } },
             },
         });
 
-        expect(instance.t('navigation.dataset')).toBe('TW dataset');
+        expect(instance.t('common.labels.dataset')).toBe('TW dataset');
         expect(instance.t('navigation.models')).toBe('Models');
     });
 });

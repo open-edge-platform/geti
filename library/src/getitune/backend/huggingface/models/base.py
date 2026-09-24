@@ -22,6 +22,7 @@ from transformers.utils import ModelOutput
 
 from getitune.backend.huggingface.exporter.hf_exporter import HFModelExporter
 from getitune.backend.lightning.models.base import DataInputParams
+from getitune.types import PathLike
 from getitune.types.export import ExportFormat, TaskLevelExportParameters
 from getitune.types.label import LabelInfo
 from getitune.types.precision import Precision
@@ -33,7 +34,6 @@ if TYPE_CHECKING:
     from getitune.backend.lightning.exporter.base import ModelExporter
     from getitune.config.data import IntensityConfig
     from getitune.data.entity.sample import PredictionBatch, SampleBatch
-    from getitune.types import PathLike
     from getitune.types.label import LabelInfoTypes
     from getitune.types.task import TaskType
 
@@ -71,8 +71,10 @@ class HFModel(ABC, nn.Module):
         label_info: LabelInfoTypes,
         *,
         data_input_params: DataInputParams | dict[str, Any] | None = None,
+        input_size: tuple[int, int] | None = None,
         resize_mode: Literal["crop", "standard", "fit_to_window", "fit_to_window_letterbox"] = "standard",
         pretrained: bool = True,
+        pretrained_weights: PathLike | None = None,
         extra_overrides: dict[str, Any] | None = None,
         onnx_dynamo: bool | None = None,
     ) -> None:
@@ -92,10 +94,15 @@ class HFModel(ABC, nn.Module):
                 partial dict is merged with this checkpoint's entry in
                 ``_default_preprocessing_params``; ``None`` uses that entry
                 as-is. Matches ``LightningModel``'s ``data_input_params``.
+            input_size: Recipe shorthand for overriding only the input size.
             resize_mode: Resize mode used by the data pipeline and recorded in
                 exported model metadata.
             pretrained: Load Hub/local weights if ``True``, otherwise build an
                 untrained model from the resolved config.
+            pretrained_weights: Optional local ``save_pretrained()`` snapshot
+                used instead of *checkpoint* when loading pretrained weights.
+                Ignored when *pretrained* is ``False``. The original
+                *checkpoint* remains the model and preprocessing identity.
             extra_overrides: Extra keyword arguments forwarded to
                 ``from_pretrained`` / ``from_config``, e.g. ``problem_type`` or
                 ``semantic_loss_ignore_index``.
@@ -107,13 +114,23 @@ class HFModel(ABC, nn.Module):
         super().__init__()
         self.checkpoint = checkpoint if isinstance(checkpoint, str) else type(checkpoint).__name__
         self.pretrained = pretrained
+        self.pretrained_weights = Path(pretrained_weights) if pretrained_weights is not None else None
         self.extra_overrides = dict(extra_overrides or {})
         self._onnx_dynamo = onnx_dynamo
         self._label_info = self._dispatch_label_info(label_info)
+        if input_size is not None:
+            params = (
+                data_input_params.as_dict()
+                if isinstance(data_input_params, DataInputParams)
+                else dict(data_input_params or {})
+            )
+            params["input_size"] = input_size
+            data_input_params = params
         self._data_input_params = self._configure_preprocessing_params(data_input_params)
         self._resize_mode = resize_mode
         self._intensity_config: IntensityConfig | None = None
         self._best_checkpoint: Path | None = None
+        self._best_confidence_threshold: float | None = None
 
         id2label = dict(enumerate(self._label_info.label_names))
         label2id = {name: idx for idx, name in id2label.items()}
@@ -123,8 +140,9 @@ class HFModel(ABC, nn.Module):
                 setattr(checkpoint, key, value)
             self.hf_model = self.hf_auto_class.from_config(checkpoint)
         elif pretrained:
+            pretrained_source = str(self.pretrained_weights) if self.pretrained_weights is not None else checkpoint
             self.hf_model = self.hf_auto_class.from_pretrained(
-                checkpoint,
+                pretrained_source,
                 id2label=id2label,
                 label2id=label2id,
                 ignore_mismatched_sizes=True,
@@ -285,9 +303,13 @@ class HFModel(ABC, nn.Module):
         """Reload weights from a ``save_pretrained()`` directory.
 
         Replaces the wrapped model in place and records the checkpoint so
-        ``best_checkpoint`` reflects it.
+        ``best_checkpoint`` reflects it. A persisted best confidence threshold
+        is restored; checkpoints saved before the threshold was computed keep
+        the in-memory value rather than resetting it.
         """
         self.hf_model = self.hf_auto_class.from_pretrained(str(checkpoint))
+        threshold = getattr(self.hf_model.config, "getitune_best_confidence_threshold", None)
+        self._best_confidence_threshold = float(threshold) if threshold is not None else None
         self._best_checkpoint = Path(checkpoint)
 
     def record_checkpoint(self, checkpoint: PathLike) -> None:
@@ -299,6 +321,37 @@ class HFModel(ABC, nn.Module):
         reloading them from disk would be pure waste.
         """
         self._best_checkpoint = Path(checkpoint)
+
+    def save_pretrained(self, checkpoint: PathLike) -> None:
+        """Save model weights, configuration, and processor for offline reload."""
+        path = Path(checkpoint)
+        if self._best_confidence_threshold is not None:
+            self.hf_model.config.getitune_best_confidence_threshold = self._best_confidence_threshold
+        self.hf_model.save_pretrained(path)
+        processor = self.__dict__.get("_image_processor")
+        if processor is not None:
+            processor.save_pretrained(path)
+        elif self.pretrained_weights is not None:
+            self._image_processor.save_pretrained(path)
+
+    @property
+    def best_confidence_threshold(self) -> float | None:
+        """Auto-computed optimal confidence threshold (max F1 on validation), if known.
+
+        Populated for detection / instance segmentation after training via the
+        validation ``FMeasure``; embedded into exported model metadata and used
+        as ``predict()``'s default threshold.
+        """
+        return self._best_confidence_threshold
+
+    @property
+    def default_confidence_threshold(self) -> float:
+        """Default threshold used when validation did not compute one."""
+        return 0.25
+
+    @best_confidence_threshold.setter
+    def best_confidence_threshold(self, value: float | None) -> None:
+        self._best_confidence_threshold = value
 
     @property
     def label_info(self) -> LabelInfo:
@@ -340,14 +393,18 @@ class HFModel(ABC, nn.Module):
             task_type="null",
             model_name=self.checkpoint,
             label_info=self.label_info,
-            optimization_config={},
+            # All HF backend architectures are transformer-based; NNCF needs the
+            # transformer preset (SmoothQuant + per-channel weights) to preserve
+            # accuracy under PTQ INT8 — default per-tensor activation quantization
+            # collapses DETR-family attention outputs to constant scores.
+            optimization_config={"model_type": "transformer"},
         )
 
     @cached_property
     def _image_processor(self) -> BaseImageProcessor:
         """Load the checkpoint's image processor for post-processing."""
         return transformers.AutoImageProcessor.from_pretrained(
-            self.checkpoint,
+            str(self.pretrained_weights) if self.pretrained_weights is not None else self.checkpoint,
             do_resize=False,
             do_rescale=False,
             do_normalize=False,
@@ -360,8 +417,9 @@ class HFModel(ABC, nn.Module):
 
         Task subclasses set ``_onnx_output_names`` and inherit this builder,
         keeping the export contract (input names, resize mode, swap RGB,
-        opset) in one place. ``dynamo`` defaults to the exporter's own
-        default (``False``) unless overridden via ``onnx_dynamo``.
+        opset) in one place. ``dynamo`` defaults to ``True`` in the exporter
+        and can be overridden via ``onnx_dynamo`` for checkpoint-specific
+        compatibility.
         """
         if not hasattr(self, "_onnx_output_names") or not self._onnx_output_names:
             msg = "ONNX output names are not set."
@@ -376,7 +434,12 @@ class HFModel(ABC, nn.Module):
 
         return HFModelExporter(
             task_level_export_parameters=self._export_parameters,
-            data_input_params=self.data_input_params,
+            data_input_params=DataInputParams(
+                input_size=self.data_input_params.input_size,
+                mean=self.data_input_params.mean,
+                std=self.data_input_params.std,
+                intensity_config=self._intensity_config,
+            ),
             resize_mode=self.resize_mode,
             swap_rgb=False,
             onnx_export_configuration=onnx_export_configuration,

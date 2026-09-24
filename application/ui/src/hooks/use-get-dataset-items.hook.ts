@@ -128,9 +128,7 @@ export const useGetDatasetItems = ({
         }
     );
 
-    const items = useMemo(() => {
-        return data?.pages?.flatMap((page) => page.items) ?? [];
-    }, [data?.pages]);
+    const items = useMemo(() => data?.pages?.flatMap((page) => page.items) ?? [], [data?.pages]);
 
     const totalCount = data?.pages[0]?.pagination?.total ?? 0;
 

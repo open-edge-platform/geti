@@ -3,6 +3,7 @@
 
 import { Dispatch, SetStateAction } from 'react';
 
+import { useTranslation } from '@/i18n';
 import { ActionButton, Tooltip, TooltipTrigger, View } from '@geti-ui/ui';
 import { Fps } from '@geti-ui/ui/icons';
 
@@ -17,14 +18,8 @@ type FrameStepProps = {
     defaultFps: number;
 };
 
-const FRAME_MODE = {
-    // Note: All mode means we display all the frames, so the frame skip is equal to 1
-    // One frame means we display one frame per second, so the frame skip is equals the video's FPS (defaultFps)
-    ALL_FRAMES: 'ALL',
-    ONE_FRAME: '1/1',
-} as const;
-
 export const FrameStep = ({ isDisabled, step, onChangeStep, defaultFps }: FrameStepProps) => {
+    const { t } = useTranslation();
     const isAllMode = step === FRAME_STEP_TO_DISPLAY_ALL_FRAMES;
 
     const handleFpsToggle = () => {
@@ -50,10 +45,14 @@ export const FrameStep = ({ isDisabled, step, onChangeStep, defaultFps }: FrameS
                     UNSAFE_className={classes.frameStepBadge}
                     data-testid={'frame-mode-indicator-id'}
                 >
-                    {isAllMode ? FRAME_MODE.ALL_FRAMES : FRAME_MODE.ONE_FRAME}
+                    {isAllMode ? t('common.labels.allUppercase') : '1/1'}
                 </View>
             </ActionButton>
-            <Tooltip>{isAllMode ? 'Show 1 frame per second' : 'Show all frames'}</Tooltip>
+            <Tooltip>
+                {isAllMode
+                    ? t('annotator.video.playback.showOneFramePerSecond')
+                    : t('annotator.video.playback.showAllFrames')}
+            </Tooltip>
         </TooltipTrigger>
     );
 };

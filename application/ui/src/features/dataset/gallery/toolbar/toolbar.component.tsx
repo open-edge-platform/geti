@@ -1,9 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Dispatch, SetStateAction, Suspense, useMemo } from 'react';
+import { Dispatch, SetStateAction, Suspense, useState } from 'react';
 
 import type { Media } from '@/api/types';
+import { GalleryViewModeMenu } from '@/components/gallery-view-mode-menu/gallery-view-mode-menu.component';
 import { useTranslation } from '@/i18n';
 import {
     ActionButton,
@@ -14,12 +15,12 @@ import {
     Divider,
     Flex,
     Heading,
-    MediaViewModes,
     ViewModes,
 } from '@geti-ui/ui';
 import { SortDown, SortUp } from '@geti-ui/ui/icons';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
-import { isString } from 'lodash-es';
+import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
+import { useSelectAllDatasetMedia } from 'hooks/use-select-all-dataset-media.hook';
 
 import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { isImage } from '../../../../shared/media-item-utils';
@@ -38,7 +39,6 @@ import { UnassignMediaFromView } from './dataset-view-selector/unassign-media-fr
 import { MediaFiltering } from './media-filtering/media-filtering.component';
 import { MediaUpload } from './media-upload.component';
 import { TotalItems } from './total-items.component';
-import { toggleMultipleSelection } from './util';
 
 type ToolbarProps = {
     items: Media[];
@@ -56,7 +56,7 @@ const AnnotateButton = ({ isDisabled, onClick }: AnnotateButtonProps) => {
 
     return (
         <Button margin={0} variant={'primary'} onPress={onClick} isDisabled={isDisabled}>
-            {t('dataset.mediaActions.annotate')}
+            {t('common.actions.annotate')}
         </Button>
     );
 };
@@ -123,37 +123,54 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
     const { t } = useTranslation();
     const { selectedMediaItem, onSelectedMediaItemChange } = useSelectDatasetItem();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys } = useSelectedData();
+    const { totalCount } = useDatasetMediaWithReviewStatus();
+    const selectAllMedia = useSelectAllDatasetMedia();
 
-    const selectedMediaItems = selectedKeys instanceof Set ? selectedKeys : null;
+    // Which of the ids resolved by "select all" are images, for the classification label actions.
+    const [selectAllImageIds, setSelectAllImageIds] = useState<string[]>([]);
 
-    const totalSelectedElements = selectedMediaItems?.size ?? 0;
+    const totalSelectedElements = selectedKeys.size;
     const hasSelectedElements = totalSelectedElements > 0;
+    const allElementsSelected = totalCount > 0 && totalSelectedElements === totalCount;
 
     const handleToggleManyItemSelection = () => {
-        const images = items.map((item) => String(item.id));
-        setSelectedKeys(toggleMultipleSelection(images));
+        if (allElementsSelected) {
+            setSelectedKeys(new Set());
+
+            return;
+        }
+
+        selectAllMedia.mutate(undefined, {
+            onSuccess: (result) => {
+                if (result === null) {
+                    return;
+                }
+
+                setSelectAllImageIds(result.imageIds);
+                setSelectedKeys(new Set(result.mediaIds));
+            },
+        });
     };
 
-    const selectedImagesIds = useMemo(() => {
-        if (selectedMediaItems === null) return [];
+    // The gallery only holds the pages it has loaded, so ids resolved by "select all" are the
+    // only way to tell whether an unloaded selected item is an image.
+    const imageIds = new Set(selectAllImageIds);
+    items.filter(isImage).forEach((item) => imageIds.add(String(item.id)));
 
-        return Array.from(selectedMediaItems)
-            .filter((itemId) => items.some((item) => itemId === item.id && isImage(item)))
-            .filter((itemId) => isString(itemId));
-    }, [selectedMediaItems, items]);
+    const selectedImagesIds = Array.from(selectedKeys).filter((itemId) => imageIds.has(itemId));
 
     const resetSelectedMediaIds = () => {
         setSelectedKeys(new Set());
     };
 
-    const noMediaSelected = selectedMediaItems?.size === 0;
-    const selectedMediaItemsIds = Array.from(selectedMediaItems ?? []) as string[];
+    const noMediaSelected = selectedKeys.size === 0;
+    const selectedMediaItemsIds = Array.from(selectedKeys);
 
     return (
         <Flex direction={'column'} gridArea={'toolbar'} gap={'size-200'} marginBottom={'size-200'}>
             <Flex alignItems={'center'} justifyContent={'space-between'}>
                 <Flex alignItems={'center'} gap={'size-200'}>
-                    <Heading margin={0}>{t('dataset.gallery.heading')}</Heading>
+                    <Heading margin={0}>{t('common.labels.dataset')}</Heading>
 
                     {FEATURE_FLAGS.DATASET_VIEWS && (
                         <Suspense fallback={null}>
@@ -191,7 +208,9 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                     <Checkbox
                         aria-label={'select all'}
                         onChange={handleToggleManyItemSelection}
-                        isSelected={hasSelectedElements && totalSelectedElements === items.length}
+                        isSelected={allElementsSelected}
+                        isIndeterminate={hasSelectedElements && !allElementsSelected}
+                        isDisabled={totalCount === 0 || selectAllMedia.isPending}
                     />
 
                     {!hasSelectedElements && <SortMediaByUploadDate />}
@@ -200,7 +219,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
                         <>
                             <AssignLabel selectedImagesIds={selectedImagesIds} />
                             <DeleteMediaItem
-                                itemsIds={Array.from(selectedKeys) as string[]}
+                                itemsIds={selectedMediaItemsIds}
                                 onDeleted={toggleSelectedKeys}
                                 isHotkeyEnabled={selectedMediaItem === null}
                             />
@@ -231,11 +250,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                             <DatasetStatistics />
 
-                            <MediaViewModes
-                                viewMode={viewMode}
-                                setViewMode={setViewMode}
-                                items={[ViewModes.LARGE, ViewModes.MEDIUM, ViewModes.SMALL]}
-                            />
+                            <GalleryViewModeMenu viewMode={viewMode} setViewMode={setViewMode} />
                         </>
                     )}
                 </Flex>
