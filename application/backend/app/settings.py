@@ -103,7 +103,7 @@ class Settings(BaseSettings):
         description="Maximum number for images or video frames passed for inference",
     )
     inference_model_ttl: int = Field(
-        default=60,
+        default=120,
         alias="INFERENCE_MODEL_TTL",
         description="Time to live for a model loaded for inference, before unloading",
     )
@@ -115,6 +115,31 @@ class Settings(BaseSettings):
             "sent to the model for inference, while predictions for other frames are interpolated based "
             "on key frames. Key frames satisfy the condition frame_index % stride == 0. "
             "Additionally, the first and last frames are also considered key frames."
+        ),
+        gt=0,
+    )
+    inference_max_models: int = Field(
+        default=2,
+        alias="INFERENCE_MAX_MODELS",
+        description="Maximum number of models the inference server keeps loaded in memory at the same time",
+        ge=1,
+    )
+    inference_max_memory: int | None = Field(
+        default=None,
+        alias="INFERENCE_MAX_MEMORY",
+        description=(
+            "Approximate upper bound, in bytes, on the memory used by the models loaded in the inference server. "
+            "Unset means unlimited. The limit is best-effort and never prevents loading a model when it would be "
+            "the only one loaded."
+        ),
+        gt=0,
+    )
+    inference_memory_overhead_factor: float = Field(
+        default=1.5,
+        alias="INFERENCE_MEMORY_OVERHEAD_FACTOR",
+        description=(
+            "Multiplier applied to a model's on-disk size to estimate its in-memory footprint, which accounts "
+            "for runtime overhead such as activations and inference request buffers."
         ),
         gt=0,
     )

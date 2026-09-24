@@ -299,7 +299,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
     data_collector = DataCollector(data_dir=settings.data_dir, event_bus=event_bus)
     app.state.data_collector = data_collector
 
-    inference_server = InferenceServer(data_dir=settings.data_dir)
+    inference_server = InferenceServer(
+        data_dir=settings.data_dir,
+        max_models=settings.inference_max_models,
+        max_memory=settings.inference_max_memory,
+        memory_overhead_factor=settings.inference_memory_overhead_factor,
+        model_ttl=settings.inference_model_ttl,
+    )
     app.state.inference_server = inference_server
 
     # Initialize Scheduler
@@ -335,4 +341,5 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
     video_service.close()
     await webrtc_manager.cleanup()
     app_scheduler.shutdown()
+    inference_server.stop()
     logger.info("Application shutdown completed")
