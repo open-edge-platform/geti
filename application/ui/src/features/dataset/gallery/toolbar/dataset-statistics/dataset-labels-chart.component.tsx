@@ -16,7 +16,7 @@ import {
     YAxis,
 } from 'recharts';
 
-import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../../../../shared/annotator/labels';
+import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../../../../shared/labels';
 
 type DatasetLabelsChartProps = {
     totalItems: number;

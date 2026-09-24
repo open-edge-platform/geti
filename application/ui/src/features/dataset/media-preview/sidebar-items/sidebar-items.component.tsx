@@ -8,7 +8,7 @@ import { VirtualizerGridLayout } from '@/components/virtualizer-grid-layout/virt
 import { Flex, Size, useUnwrapDOMRef, View } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
 
-import { Toolbar } from '../../../../shared/annotator/shell/toolbar-container/toolbar-container.component';
+import { Toolbar } from '../../../../modules/annotator/shell/toolbar-container/toolbar-container.component';
 import { SIDEBAR_MEDIA_SIZE } from '../constants';
 import { SidebarMediaFilter } from './sidebar-media-filtering.component';
 import { SidebarMediaItem } from './sidebar-media-item.component';

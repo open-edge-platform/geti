@@ -1,8 +1,8 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
-import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
+import { useAnnotationActions } from '../../../../modules/annotator/annotation-actions-provider.component';
+import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode';
 
 type UseIsSubmitDisabledParams = {
     mode: AnnotatorMode;

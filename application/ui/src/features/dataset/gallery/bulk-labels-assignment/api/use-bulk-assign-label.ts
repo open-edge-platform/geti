@@ -11,7 +11,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { chunk, isEmpty, partition } from 'lodash-es';
 
 import { getQueryKey } from '../../../../../query-client/query-client';
-import { filterOutEmptyLabels } from '../../../../../shared/annotator/labels';
+import { filterOutEmptyLabels } from '../../../../../shared/labels';
 
 // Annotations can only be set one media at a time, so cap how many requests are in flight at once.
 const ASSIGN_LABEL_BATCH_SIZE = 10;

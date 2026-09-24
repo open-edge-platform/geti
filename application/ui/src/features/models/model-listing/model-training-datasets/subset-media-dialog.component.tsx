@@ -7,19 +7,19 @@ import type { DatasetRevisionItem } from '@/api/types';
 import { Content, Dialog, Grid } from '@geti-ui/ui';
 import { usePipeline } from 'hooks/api/pipeline.hook';
 
-import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
+import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode';
 import {
     useIsFetchingMediaPredictions,
     useMediaPredictions,
-} from '../../../../shared/annotator/api/use-media-predictions';
+} from '../../../../modules/annotator/api/use-media-predictions';
 import {
     SelectedMediaItemProvider,
     useSelectedMediaItem,
-} from '../../../../shared/annotator/selected-media-item-provider.component';
-import { useAnnotationsQuery } from '../../../../shared/annotator/shell/api/use-annotations-query';
-import { ReadOnlyAnnotatorProviders } from '../../../../shared/annotator/shell/read-only-annotator-providers.component';
-import { ReadOnlyAnnotator } from '../../../../shared/annotator/shell/read-only-annotator.component';
-import { getInitialAnnotations } from '../../../../shared/annotator/shell/utils';
+} from '../../../../modules/annotator/selected-media-item-provider.component';
+import { useAnnotationsQuery } from '../../../../modules/annotator/shell/api/use-annotations-query';
+import { ReadOnlyAnnotatorProviders } from '../../../../modules/annotator/shell/read-only-annotator-providers.component';
+import { ReadOnlyAnnotator } from '../../../../modules/annotator/shell/read-only-annotator.component';
+import { getInitialAnnotations } from '../../../../modules/annotator/shell/utils';
 import { type SelectableModel } from '../../../../shared/selectable-model';
 import { datasetRevisionItemToMedia } from './utils';
 

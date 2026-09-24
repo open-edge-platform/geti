@@ -8,7 +8,7 @@ import { useTranslation } from '@/i18n';
 import { Flex, Item, ListView, Selection, Text, TextField, View } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
 
-import { EMPTY_LABEL_ID } from '../../../../../shared/annotator/labels';
+import { EMPTY_LABEL_ID } from '../../../../../shared/labels';
 
 type LabelsListProps = {
     ariaLabel: string;

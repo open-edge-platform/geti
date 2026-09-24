@@ -16,9 +16,9 @@ import { SubsetMediaDialog } from './subset-media-dialog.component';
 
 const MEDIA_SIZE = 100;
 
-vi.mock('../../../../shared/annotator/hooks/use-load-image-query.hook', async (importOriginal) => {
+vi.mock('../../../../modules/annotator/hooks/use-load-image-query.hook', async (importOriginal) => {
     const actual =
-        await importOriginal<typeof import('../../../../shared/annotator/hooks/use-load-image-query.hook')>();
+        await importOriginal<typeof import('../../../../modules/annotator/hooks/use-load-image-query.hook')>();
 
     return {
         ...actual,

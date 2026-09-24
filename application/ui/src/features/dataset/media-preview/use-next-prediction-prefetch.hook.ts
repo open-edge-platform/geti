@@ -5,8 +5,8 @@ import type { Media } from '@/api/types';
 import { usePrefetchQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { mediaPredictionsQueryOptions } from '../../../shared/annotator/api/use-media-predictions';
-import { usePredictionSetup } from '../../../shared/annotator/predictions-setup-provider.component';
+import { mediaPredictionsQueryOptions } from '../../../modules/annotator/api/use-media-predictions';
+import { usePredictionSetup } from '../../../modules/annotator/predictions-setup-provider.component';
 import { isVideoFrame } from '../../../shared/media-item-utils';
 
 export const useNextPredictionPrefetch = (nextMediaItem: Media) => {

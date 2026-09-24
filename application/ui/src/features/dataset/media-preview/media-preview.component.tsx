@@ -9,24 +9,24 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
+import type { AnnotatorMode } from '../../../modules/annotator/annotator-mode';
 import {
     getMediaPredictionsQueryKeyPrefix,
     useMediaPredictions,
-} from '../../../shared/annotator/api/use-media-predictions';
+} from '../../../modules/annotator/api/use-media-predictions';
 import {
     PredictionsSetupProvider,
     usePredictionSetup,
-} from '../../../shared/annotator/predictions-setup-provider.component';
+} from '../../../modules/annotator/predictions-setup-provider.component';
 import {
     SelectedMediaItemProvider,
     useSelectedMediaItem,
-} from '../../../shared/annotator/selected-media-item-provider.component';
-import { AnnotatorProviders } from '../../../shared/annotator/shell/annotator-providers.component';
-import { useAnnotationsQuery } from '../../../shared/annotator/shell/api/use-annotations-query';
-import { getInitialAnnotations, useAnnotatorMode } from '../../../shared/annotator/shell/utils';
-import { ToolProvider } from '../../../shared/annotator/tool-provider.component';
-import { SEGMENT_ANYTHING_ENCODING_QUERY_KEY_PREFIX } from '../../../shared/annotator/tools/segment-anything-tool/use-segment-anything.hook';
+} from '../../../modules/annotator/selected-media-item-provider.component';
+import { AnnotatorProviders } from '../../../modules/annotator/shell/annotator-providers.component';
+import { useAnnotationsQuery } from '../../../modules/annotator/shell/api/use-annotations-query';
+import { getInitialAnnotations, useAnnotatorMode } from '../../../modules/annotator/shell/utils';
+import { ToolProvider } from '../../../modules/annotator/tool-provider.component';
+import { SEGMENT_ANYTHING_ENCODING_QUERY_KEY_PREFIX } from '../../../modules/annotator/tools/segment-anything-tool/use-segment-anything.hook';
 import { isVideoFrame } from '../../../shared/media-item-utils';
 import { useSelectDatasetItem } from '../gallery/hooks/use-select-dataset-item.hook';
 import { AnnotatorContainer } from './annotator.component';

@@ -20,7 +20,7 @@ import { Info } from '@geti-ui/ui/icons';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 
-import { useProjectLabelsWithEmptyLabel } from '../../../../shared/annotator/labels';
+import { useProjectLabelsWithEmptyLabel } from '../../../../shared/labels';
 import { isImage } from '../../../../shared/media-item-utils';
 import { isMultiLabelClassificationTask } from '../../../../shared/task-type-guards';
 import { useMediaUpload } from '../../api/use-media-upload';

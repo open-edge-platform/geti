@@ -12,9 +12,9 @@ import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
 import { http } from '../../../../api/utils';
+import { AnnotationActionsProvider } from '../../../../modules/annotator/annotation-actions-provider.component';
+import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode';
 import { server } from '../../../../msw-node-setup';
-import { AnnotationActionsProvider } from '../../../../shared/annotator/annotation-actions-provider.component';
-import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
 import { renderHook } from '../../../../test-utils/render';
 import { useIsSubmitDisabled } from './use-is-submit-disabled.hook';
 

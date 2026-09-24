@@ -3,7 +3,7 @@
 
 import { ConfidenceThreshold } from '@/components/confidence-threshold/confidence-threshold.component';
 
-import { usePredictionSetup } from '../../../../../shared/annotator/predictions-setup-provider.component';
+import { usePredictionSetup } from '../../../../../modules/annotator/predictions-setup-provider.component';
 
 export const PredictionConfidenceThreshold = () => {
     const { selectedModel, confidenceThreshold, changeConfidenceThreshold } = usePredictionSetup();

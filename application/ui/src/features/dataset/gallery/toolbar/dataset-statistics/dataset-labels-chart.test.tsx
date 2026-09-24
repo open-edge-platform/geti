@@ -8,7 +8,7 @@ import { getMockedLabel } from 'mocks/mock-labels';
 import { render } from 'test-utils/render';
 import { vi } from 'vitest';
 
-import { useProjectLabelsWithEmptyLabel } from '../../../../../shared/annotator/labels';
+import { useProjectLabelsWithEmptyLabel } from '../../../../../shared/labels';
 import { DatasetLabelsChart } from './dataset-labels-chart.component';
 
 vi.mock('recharts', async () => {
@@ -33,8 +33,8 @@ const mockLabels = [
     getMockedLabel({ id: 'label-10', name: 'Fish-10' }),
 ];
 
-vi.mock('../../../../../shared/annotator/labels', async () => {
-    const actual = await vi.importActual('../../../../../shared/annotator/labels');
+vi.mock('../../../../../shared/labels', async () => {
+    const actual = await vi.importActual('../../../../../shared/labels');
     return {
         ...actual,
         useProjectLabelsWithEmptyLabel: vi.fn(),

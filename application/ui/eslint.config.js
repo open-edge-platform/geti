@@ -128,8 +128,9 @@ const sharedComponentsAliasConfig = {
     },
 };
 
-// Layering rule: the foundation folders that features build on must never depend
-// on feature or route code.
+// Layers, lowest first: foundation -> modules -> features -> routes. A layer only imports layers
+// below it. Modules (large reusable capabilities, e.g. the annotator) and features are isolated
+// from their siblings; code needed by several of them moves down a layer, routes compose them.
 const foundationLayers = [
     './src/api',
     './src/components',
@@ -142,21 +143,21 @@ const foundationLayers = [
     './src/test-utils',
 ];
 
-// Features are isolated: a feature never imports another feature or a route. Code needed by
-// more than one feature moves to a foundation folder; routes compose features together.
-const featureNames = fs
-    .readdirSync(path.join(dirname, 'src/features'), { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name);
+const listDirectories = (relativePath) =>
+    fs
+        .readdirSync(path.join(dirname, relativePath), { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => `./${relativePath}/${entry.name}`);
 
-const featureBoundaryZones = featureNames.map((feature) => ({
-    target: `./src/features/${feature}`,
-    from: [
-        ...featureNames.filter((other) => other !== feature).map((other) => `./src/features/${other}`),
-        './src/routes',
-    ],
-    message: 'Features cannot import other features. Move shared code to a foundation folder or compose in a route.',
-}));
+const moduleDirs = listDirectories('src/modules');
+const featureDirs = listDirectories('src/features');
+
+const siblingZones = (dirs, from, message) =>
+    dirs.map((dir) => ({
+        target: dir,
+        from: [...dirs.filter((other) => other !== dir), ...from],
+        message,
+    }));
 
 const layerBoundariesConfig = {
     files: ['src/**/*.{ts,tsx}'],
@@ -168,11 +169,19 @@ const layerBoundariesConfig = {
                 zones: [
                     {
                         target: foundationLayers,
-                        from: ['./src/features', './src/routes'],
-                        message:
-                            'Move the dependency into a foundation folder or invert it (pass it in from the feature).',
+                        from: ['./src/modules', './src/features', './src/routes'],
+                        message: 'Foundation code cannot depend on modules, features or routes. Invert the dependency.',
                     },
-                    ...featureBoundaryZones,
+                    ...siblingZones(
+                        moduleDirs,
+                        ['./src/features', './src/routes'],
+                        'Modules can only import foundation code.'
+                    ),
+                    ...siblingZones(
+                        featureDirs,
+                        ['./src/routes'],
+                        'Features cannot import other features. Move shared code down a layer or compose in a route.'
+                    ),
                 ],
             },
         ],

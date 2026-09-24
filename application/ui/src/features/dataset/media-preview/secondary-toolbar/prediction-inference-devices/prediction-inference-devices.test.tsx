@@ -18,7 +18,7 @@ const mockDevices = [
 const mockChangeSelectedDevice = vi.fn();
 const mockSelectedDevice = 'cpu';
 
-vi.mock('../../../../../shared/annotator/predictions-setup-provider.component', () => ({
+vi.mock('../../../../../modules/annotator/predictions-setup-provider.component', () => ({
     usePredictionSetup: () => ({
         selectedDevice: mockSelectedDevice,
         changeSelectedDevice: mockChangeSelectedDevice,
