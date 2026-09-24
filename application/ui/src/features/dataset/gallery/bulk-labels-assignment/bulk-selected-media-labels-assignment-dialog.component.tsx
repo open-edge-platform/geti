@@ -18,8 +18,8 @@ import {
 } from '@geti-ui/ui';
 import { useProject } from 'hooks/api/project.hook';
 
-import { useProjectLabelsWithEmptyLabel } from '../../../../shared/annotator/labels';
-import { isMultiLabelClassificationTask } from '../../../project/task-type-guards';
+import { useProjectLabelsWithEmptyLabel } from '../../../../shared/labels';
+import { isMultiLabelClassificationTask } from '../../../../shared/task-type-guards';
 import { useBulkAssignLabel } from './api/use-bulk-assign-label';
 import { LabelsList } from './labels-list/labels-list.component';
 

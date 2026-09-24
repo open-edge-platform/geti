@@ -5,9 +5,9 @@ import { useTranslation } from '@/i18n';
 import { ActionButton, Icon, Text } from '@geti-ui/ui';
 import { Checkmark, Edit } from '@geti-ui/ui/icons';
 
-import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
-import type { AnnotatorMode } from '../../../../shared/annotator/annotator-mode';
-import { convertPredictionToAnnotation } from '../../../annotator/annotations/utils';
+import { useAnnotationActions } from '../../../../modules/annotator/annotation-actions-provider.component';
+import { convertPredictionToAnnotation } from '../../../../modules/annotator/annotations/utils';
+import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode';
 
 type EditPredictionButtonProps = {
     isDisabled: boolean;

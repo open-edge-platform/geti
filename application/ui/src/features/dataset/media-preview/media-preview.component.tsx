@@ -9,24 +9,30 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useDatasetMediaWithReviewStatus } from 'hooks/use-dataset-media-with-review-status.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import type { AnnotatorMode } from '../../../shared/annotator/annotator-mode';
-import { ToolProvider } from '../../../shared/annotator/tool-provider.component';
-import { isVideoFrame } from '../../../shared/media-item-utils';
-import { getMediaPredictionsQueryKeyPrefix, useMediaPredictions } from '../../annotator/api/use-media-predictions';
-import { PredictionsSetupProvider, usePredictionSetup } from '../../annotator/predictions-setup-provider.component';
+import type { AnnotatorMode } from '../../../modules/annotator/annotator-mode';
+import {
+    getMediaPredictionsQueryKeyPrefix,
+    useMediaPredictions,
+} from '../../../modules/annotator/api/use-media-predictions';
+import {
+    PredictionsSetupProvider,
+    usePredictionSetup,
+} from '../../../modules/annotator/predictions-setup-provider.component';
 import {
     SelectedMediaItemProvider,
     useSelectedMediaItem,
-} from '../../annotator/selected-media-item-provider.component';
-import { SEGMENT_ANYTHING_ENCODING_QUERY_KEY_PREFIX } from '../../annotator/tools/segment-anything-tool/use-segment-anything.hook';
+} from '../../../modules/annotator/selected-media-item-provider.component';
+import { AnnotatorProviders } from '../../../modules/annotator/shell/annotator-providers.component';
+import { useAnnotationsQuery } from '../../../modules/annotator/shell/api/use-annotations-query';
+import { getInitialAnnotations, useAnnotatorMode } from '../../../modules/annotator/shell/utils';
+import { ToolProvider } from '../../../modules/annotator/tool-provider.component';
+import { SEGMENT_ANYTHING_ENCODING_QUERY_KEY_PREFIX } from '../../../modules/annotator/tools/segment-anything-tool/use-segment-anything.hook';
+import { isVideoFrame } from '../../../shared/media-item-utils';
 import { useSelectDatasetItem } from '../gallery/hooks/use-select-dataset-item.hook';
-import { AnnotatorProviders } from './annotator-providers.component';
 import { AnnotatorContainer } from './annotator.component';
-import { useAnnotationsQuery } from './api/use-annotations-query';
 import { SIDEBAR_WIDTH } from './constants';
 import { SidebarItems } from './sidebar-items/sidebar-items.component';
 import { useAnnotatorMediaTransition } from './use-annotator-media-transition.hook';
-import { getInitialAnnotations, useAnnotatorMode } from './utils';
 
 type MediaPreviewProps = {
     close: () => void;

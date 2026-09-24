@@ -28,7 +28,7 @@ import { isEmpty } from 'lodash-es';
 
 import { useExportDatasetJobAction } from '../../hooks/use-export-dataset-job-action.hook';
 import { Link } from '../../platform/components/link.component';
-import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../shared/annotator/labels';
+import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../shared/labels';
 import { isNonEmptyString } from '../../shared/util';
 import { MultiSelectList } from '../multi-select-list/multi-select-list.component';
 import { getFormatOptions } from '../util';

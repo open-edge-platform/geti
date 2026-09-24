@@ -13,7 +13,7 @@ import { Add } from '@geti-ui/ui/icons';
 import { useEventListener } from 'hooks/event-listener.hook';
 
 import { TASK_HOTKEYS } from '../../../../shared/hotkeys-definition';
-import { getRandomDistinctColor } from '../../../annotator/label-utils';
+import { getRandomDistinctColor } from '../../../../shared/label-utils';
 
 const getInitialLabel = (): Label => ({
     id: crypto.randomUUID(),

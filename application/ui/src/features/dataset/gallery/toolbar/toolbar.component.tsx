@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Dispatch, SetStateAction, Suspense, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, Suspense, useState } from 'react';
 
 import type { Media } from '@/api/types';
 import { GalleryViewModeMenu } from '@/components/gallery-view-mode-menu/gallery-view-mode-menu.component';
@@ -24,7 +24,6 @@ import { useSelectAllDatasetMedia } from 'hooks/use-select-all-dataset-media.hoo
 
 import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { isImage } from '../../../../shared/media-item-utils';
-import { TrainModel } from '../../../models/train-model/train-model.component';
 import { ImportExport } from '../../import-export/import-export.component';
 import { useSelectedData } from '../../providers/selected-data-provider.component';
 import { DeleteMediaItem } from '../delete-media-item/delete-media-item.component';
@@ -44,6 +43,7 @@ type ToolbarProps = {
     items: Media[];
     viewMode: ViewModes;
     setViewMode: Dispatch<SetStateAction<ViewModes>>;
+    trainModel: ReactNode;
 };
 
 type AnnotateButtonProps = {
@@ -119,7 +119,7 @@ const SortMediaByUploadDate = () => {
     );
 };
 
-export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
+export const Toolbar = ({ items, viewMode, setViewMode, trainModel }: ToolbarProps) => {
     const { t } = useTranslation();
     const { selectedMediaItem, onSelectedMediaItemChange } = useSelectDatasetItem();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys } = useSelectedData();
@@ -184,7 +184,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     <MediaUpload />
 
-                    {noMediaSelected && <TrainModel />}
+                    {noMediaSelected && trainModel}
 
                     {noMediaSelected && (
                         <AnnotateButton

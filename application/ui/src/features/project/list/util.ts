@@ -4,7 +4,7 @@
 import type { Task, TaskType } from '@/api/types';
 import { i18n, type TranslateFn } from '@/i18n';
 
-import { isMultiLabelClassificationTask } from '../task-type-guards';
+import { isMultiLabelClassificationTask } from '../../../shared/task-type-guards';
 
 export const formatCreationDate = (creationDate: string, locale = i18n.resolvedLanguage ?? i18n.language): string => {
     return new Intl.DateTimeFormat(locale, {

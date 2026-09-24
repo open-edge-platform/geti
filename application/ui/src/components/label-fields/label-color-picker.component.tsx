@@ -3,7 +3,7 @@
 
 import { ColorEditor, ColorSwatch, ColorSwatchPicker, Flex, ColorPicker as SpectrumColorPicker } from '@geti-ui/ui';
 
-import { DISTINCT_COLORS } from '../../features/annotator/label-utils';
+import { DISTINCT_COLORS } from '../../shared/label-utils';
 
 type LabelColorPickerProps = {
     color: string;

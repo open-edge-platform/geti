@@ -14,6 +14,7 @@ import { Toolbar } from '../../features/dataset/gallery/toolbar/toolbar.componen
 import { ExportJobsList } from '../../features/dataset/import-export/export-jobs-list/export-jobs-list.component';
 import { ImportJobsList } from '../../features/dataset/import-export/import-jobs-list/import-jobs-list.component';
 import { MediaUploadProvider } from '../../features/dataset/providers/media-upload-provider.component';
+import { TrainModel } from '../../features/models/train-model/train-model.component';
 import { GalleryViewMode } from '../../shared/gallery-view-modes';
 
 export const Dataset = () => {
@@ -38,7 +39,7 @@ export const Dataset = () => {
                 </View>
 
                 <View gridRow='2 / 3'>
-                    <Toolbar items={items} viewMode={viewMode} setViewMode={setViewMode} />
+                    <Toolbar items={items} viewMode={viewMode} setViewMode={setViewMode} trainModel={<TrainModel />} />
                 </View>
 
                 <View gridRow='3 / 4' marginBottom={hasActiveFilter ? 'size-200' : undefined}>

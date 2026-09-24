@@ -4,10 +4,10 @@
 import type { DatasetRevision, Model } from '@/api/types';
 import type { TranslateFn } from '@/i18n';
 
+import { isFailedModel, isTrainingModel } from '../../../../shared/model-status';
 import type { GroupByMode, GroupedModels, SortDescriptor } from '../types';
 import { groupModelsByArchitecture, groupModelsByDataset } from './grouping';
 import { DEFAULT_SORT, sortModels } from './sorting';
-import { isFailedModel, isTrainingModel } from './utils';
 
 export const filterBySearch = (models: Model[], query: string): Model[] =>
     query ? models.filter((model) => model.name.toLowerCase().includes(query.toLowerCase())) : models;

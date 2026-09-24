@@ -4,7 +4,6 @@
 import { createBrowserRouter, Navigate, Outlet } from 'react-router';
 
 import { paths } from './constants/paths';
-import { useTerminateAnnotatorWorkersOnUnmount } from './features/annotator/tools/terminate-annotator-workers-on-unmount.hook';
 import { ImportDatasetDialogStateProvider } from './features/dataset/providers/export-import-dataset-dialog-provider.component';
 import { SelectedDataProvider } from './features/dataset/providers/selected-data-provider.component';
 import { WebRTCConnectionProvider } from './features/inference/stream/web-rtc-connection-provider';
@@ -12,6 +11,7 @@ import { ProjectList } from './features/project/list/project-list.component';
 import { ImportDatasetDialogProvider } from './features/project/providers/import-dataset-dialog-provider.component';
 import { useProjects } from './hooks/api/project.hook';
 import { Layout } from './layout';
+import { useTerminateAnnotatorWorkersOnUnmount } from './modules/annotator/tools/terminate-annotator-workers-on-unmount.hook';
 import { Dataset } from './routes/dataset/dataset.component';
 import { ErrorPage } from './routes/error-page/error-page';
 import { Inference } from './routes/inference/inference';

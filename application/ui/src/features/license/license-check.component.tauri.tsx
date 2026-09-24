@@ -4,9 +4,9 @@
 import { ReactNode } from 'react';
 
 import { $api } from '@/api';
+import { ServerErrorFallback } from '@/components/server-error-fallback/server-error-fallback.component';
 import { Loading } from '@geti-ui/ui';
 
-import { ServerErrorFallback } from '../../routes/root/server-error-fallback.component';
 import { License } from './license.component';
 
 const REFETCH_INTERVAL = 5000;

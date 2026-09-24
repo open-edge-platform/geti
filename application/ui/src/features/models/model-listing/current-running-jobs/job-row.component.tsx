@@ -4,6 +4,7 @@
 import { useState, type ReactNode } from 'react';
 
 import type { DatasetRevision, ModelArchitectureWithPerformanceCategory, QuantizeJob, TrainJob } from '@/api/types';
+import { BottomProgressBar } from '@/components/bottom-progress-bar/bottom-progress-bar.component';
 import { useTranslation } from '@/i18n';
 import { Button, DialogContainer, Flex, Grid, Text } from '@geti-ui/ui';
 import { isJobPending, isTrainJob } from 'hooks/api/util';
@@ -14,7 +15,6 @@ import { TrainingLogsDialog } from '../../training-logs/training-logs-dialog.com
 import { ArchitectureColumn } from '../components/model-row/architecture-column.component';
 import { DatasetColumn } from '../components/model-row/dataset-revision-column.component';
 import { GroupByMode } from '../types';
-import { BottomProgressBar } from './bottom-progress-bar.component';
 import { RUNNING_JOB_GRID_COLUMNS } from './running-job-table-header.component';
 
 import classes from './current-running-jobs.module.scss';

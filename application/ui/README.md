@@ -29,7 +29,7 @@ The UI library and smart tools are consumed as published [`@geti-ui/ui`](https:/
 
 `@geti-ui/smart-tools` uses a custom-compiled `opencv.js` build for GrabCut, Intelligent Scissors, Watershed, SSIM, RITM, and Segment Anything's mask-to-polygon postprocessing. The package doesn't bundle or serve that binary itself — it must be compiled separately (Docker + Emscripten, see [its README](https://github.com/MarkRedeman/geti-ui/blob/main/packages/smart-tools/README.md)) and vendored here at `vendor/opencv/4.9.0/opencv.js`; `rsbuild.config.ts`'s `output.copy` copies it to `dist/opencv/`.
 
-`src/features/annotator/webworkers/opencv-source.ts` calls `setOpenCVSourceUrl(...)` before any OpenCV-backed tool runs (imported for its side effect by every worker that needs it). Note: `setOpenCVSourceUrl` resolves string paths against the running app's origin (`location.origin`), not the configured asset prefix, so `ASSET_PREFIX` (e.g. `/html` in the Docker/`install.sh` production build) must be prepended manually — same handling as the ORT wasm path in `segment-anything.worker.ts`.
+`src/modules/annotator/webworkers/opencv-source.ts` calls `setOpenCVSourceUrl(...)` before any OpenCV-backed tool runs (imported for its side effect by every worker that needs it). Note: `setOpenCVSourceUrl` resolves string paths against the running app's origin (`location.origin`), not the configured asset prefix, so `ASSET_PREFIX` (e.g. `/html` in the Docker/`install.sh` production build) must be prepended manually — same handling as the ORT wasm path in `segment-anything.worker.ts`.
 
 If `@geti-ui/smart-tools` bumps its OpenCV version, update both the vendored binary and the version segment of the `output.copy` path in `rsbuild.config.ts`.
 
@@ -65,16 +65,19 @@ npm run preview      # Preview production build
 │   ├── assets/              # Images, illustrations, icons
 │   ├── components/          # Reusable UI components
 │   ├── constants/           # Route paths (static-path), shared domain types
-│   ├── features/            # Domain modules (see below)
-│   │   ├── annotator/       # Annotation tools, canvas, providers
+│   ├── features/            # Domain features (see below)
 │   │   ├── dataset/         # Data collection, gallery, media preview
 │   │   ├── inference/       # Live inference, WebRTC streaming
+│   │   ├── license/         # License checks
+│   │   ├── models/          # Model listing and training
 │   │   └── project/         # Project creation, configuration
 │   ├── hooks/               # Cross-feature hooks, including hooks/api/
+│   ├── modules/             # Large reusable capabilities used by several features
+│   │   └── annotator/       # Annotation tools, canvas, providers, toolbars, read-only viewer
 │   ├── platform/            # Cross-platform abstractions (web vs Tauri via *.tauri.ts)
 │   ├── query-client/        # QueryClient config and typed query-key system
 │   ├── routes/              # Route-level components and loaders
-│   ├── shared/              # Cross-feature types, providers, annotation utilities
+│   ├── shared/              # Cross-feature, domain-agnostic types and utilities
 │   ├── test-utils/          # Custom render/renderHook wrapped with providers
 │   ├── index.tsx            # Application entrypoint
 │   ├── layout.tsx           # Top-level layout
@@ -89,7 +92,8 @@ npm run preview      # Preview production build
 
 - **`api/`** — Type-safe API client. `$api` provides `useQuery`, `useSuspenseQuery`, `useMutation`, etc., all typed from `src/api/openapi-spec.d.ts` (auto-generated, gitignored — never edit).
 - **`components/`** — Locally reusable UI primitives (use `*.component.tsx` suffix); promote mature components upstream to `@geti-ui/ui`.
-- **`features/`** — Domain-driven modules. Each owns its own components, hooks, providers, and API hooks.
+- **`features/`** — Domain-driven features. Each owns its own components, hooks, providers, and API hooks.
+- **`modules/`** — Large reusable capabilities (currently the annotator) consumed by several features.
 - **`hooks/api/`** — Custom reusable API hooks composed on top of `$api`.
 - **`platform/`** — Web/Tauri-specific implementations. Files ending in `.tauri.ts` are swapped in for the desktop build.
 - **`query-client/`** — TanStack Query configuration. Query keys are typed tuples `[method, path, params?]`. Global mutation handlers auto-show error toasts and auto-invalidate via `meta.invalidateQueries`.
@@ -174,6 +178,14 @@ The application is built on four main pillars:
 - **WebAssembly** - High-performance, browser-executed code for compute-intensive tasks
 - **OpenCV** - Image processing and computer vision
 - **ONNXRuntime** - In-browser machine learning model execution for predictive analytics
+
+### Layering
+
+Folders form layers, lowest first: **foundation** (`api`, `components`, `constants`, `hooks`, `i18n`,
+`platform`, `query-client`, `shared`, `test-utils`) → **`modules/`** → **`features/`** → **`routes/`**.
+A layer only imports from layers below it, and modules/features never import their siblings. Code needed
+by two features moves down a layer; routes compose features (e.g. by passing one feature's component as a
+prop to another). ESLint (`import/no-restricted-paths`) enforces this.
 
 ### Feature Structure
 

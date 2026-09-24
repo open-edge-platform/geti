@@ -5,7 +5,7 @@ import { useTranslation } from '@/i18n';
 import { Item, Picker } from '@geti-ui/ui';
 import { isEmpty } from 'lodash-es';
 
-import { usePredictionSetup } from '../../../../annotator/predictions-setup-provider.component';
+import { usePredictionSetup } from '../../../../../modules/annotator/predictions-setup-provider.component';
 
 type PredictionModelSelectorProps = {
     isDisabled: boolean;

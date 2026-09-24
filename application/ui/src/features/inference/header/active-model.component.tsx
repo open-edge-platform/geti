@@ -4,12 +4,12 @@
 import { useTranslation } from '@/i18n';
 import { Item, Key, Picker } from '@geti-ui/ui';
 import { usePatchPipeline } from 'hooks/api/pipeline.hook';
+import { useGetActiveModel } from 'hooks/api/use-get-active-model.hook';
+import { useGetSuccessfulModels } from 'hooks/api/use-get-models.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
-import { useGetActiveModel } from '../../models/hooks/api/use-get-active-model.hook';
-import { useGetSuccessfulModels } from '../../models/hooks/api/use-get-models.hook';
-import { getAllModelsWithOpenVINOVariants, getModelIdentifierPayload } from '../../models/utils';
+import { getAllModelsWithOpenVINOVariants, getModelIdentifierPayload } from '../../../shared/selectable-model';
 
 export const ActiveModel = () => {
     const { t } = useTranslation();
