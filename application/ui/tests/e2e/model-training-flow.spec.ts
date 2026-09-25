@@ -1,13 +1,12 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ANNOTATIONS_TO_DRAW_PER_ASSET } from './assets-annotations';
-import { expectMediaItemToChange } from './expects';
 import { expect, test } from './fixtures';
-import { getFilesToUpload } from './utils';
+import { annotateMediaItems, getFilesToUpload, isZipFile } from './utils';
 
 const TIMEOUTS = {
     trainedModelResults: 1000 * 20,
@@ -18,6 +17,8 @@ const TIMEOUTS = {
     mediaUploaded: 1000 * 60,
     videoUploaded: 1000 * 60,
     pipelineHealth: 1000 * 90,
+    modelDownload: 1000 * 60,
+    predictions: 1000 * 60,
 };
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -65,7 +66,7 @@ test.describe('Model training flow E2E', () => {
         modelsPage,
         inferencePage,
         page,
-    }) => {
+    }, testInfo) => {
         const filesToUpload = getFilesToUpload('./assets/lego-bricks-dataset');
 
         await test.step('Navigate to projects list', async () => {
@@ -95,35 +96,13 @@ test.describe('Model training flow E2E', () => {
         await test.step('Annotate media', async () => {
             await datasetPage.openAnnotator();
 
-            let prevImageName: string | null = null;
-
-            for (let i = 0; i < filesToUpload.length; i++) {
-                await expect(annotatorPage.getMediaCanvasLoading()).toBeHidden({ timeout: TIMEOUTS.nextMediaItem });
-
-                await expectMediaItemToChange(annotatorPage, prevImageName, TIMEOUTS.nextMediaItem);
-
-                const imageName = (await annotatorPage.getSelectedMediaItem().getAttribute('alt')) as string;
-
-                prevImageName = imageName;
-
-                const annotations = ANNOTATIONS_TO_DRAW_PER_ASSET[imageName];
-
-                for (const annotation of annotations) {
-                    await boundingBoxTool.selectTool();
-
-                    await boundingBoxTool.drawBoundingBox(annotation.shape);
-
-                    const label = page.getByLabel('Labels').getByRole('button', { name: `Label ${annotation.label}` });
-                    const isLabelAlreadySelected = (await label.getAttribute('aria-pressed')) === 'true';
-
-                    if (!isLabelAlreadySelected) {
-                        await label.click();
-                    }
-                }
-
-                const saveResponse = await annotatorPage.submitAndWaitForSave();
-                expect(saveResponse.ok()).toBeTruthy();
-            }
+            await annotateMediaItems({
+                page,
+                annotatorPage,
+                boundingBoxTool,
+                count: filesToUpload.length,
+                timeout: TIMEOUTS.nextMediaItem,
+            });
 
             await annotatorPage.close();
         });
@@ -168,6 +147,7 @@ test.describe('Model training flow E2E', () => {
         });
 
         let modelName = '';
+        const quantizedPrecision = 'INT8';
 
         await test.step('Quantize model', async () => {
             modelName = (await modelsPage.getModelName()) as string;
@@ -183,15 +163,52 @@ test.describe('Model training flow E2E', () => {
                 timeout: TIMEOUTS.quantization,
             });
 
-            const precision = 'INT8';
-
-            await expect(modelsPage.getModelVariantRow(modelName, precision)).toBeVisible({
+            await expect(modelsPage.getModelVariantRow(modelName, quantizedPrecision)).toBeVisible({
                 timeout: TIMEOUTS.quantizationResults,
             });
 
-            expect(Number(await modelsPage.getModelVariantAccuracy(modelName, precision, precision))).toBeGreaterThan(
-                0
+            expect(
+                Number(await modelsPage.getModelVariantAccuracy(modelName, quantizedPrecision, quantizedPrecision))
+            ).toBeGreaterThan(0);
+        });
+
+        await test.step('Download the quantized model', async () => {
+            const downloadPromise = page.waitForEvent('download', { timeout: TIMEOUTS.modelDownload });
+
+            await modelsPage
+                .getModelVariantRow(modelName, quantizedPrecision)
+                .getByRole('button', { name: /Download model/ })
+                .click();
+
+            const download = await downloadPromise;
+            const downloadPath = testInfo.outputPath(download.suggestedFilename());
+
+            await download.saveAs(downloadPath);
+
+            expect(download.suggestedFilename()).toMatch(/-openvino-int8\.zip$/i);
+            expect((await stat(downloadPath)).size).toBeGreaterThan(0);
+            expect(await isZipFile(downloadPath)).toBe(true);
+        });
+
+        await test.step('Review predictions in the annotator', async () => {
+            // Registered before opening the annotator because predictions can be requested as soon as it opens.
+            const predictResponse = page.waitForResponse(
+                (response) =>
+                    response.request().method() === 'POST' &&
+                    new URL(response.url()).pathname.endsWith('/dataset/media:predict'),
+                { timeout: TIMEOUTS.predictions }
             );
+
+            await page.getByRole('tab', { name: 'Dataset' }).click();
+            await datasetPage.openAnnotator();
+            await annotatorPage.openPredictionMode();
+
+            expect((await predictResponse).ok()).toBe(true);
+
+            // A model trained on a handful of images may find nothing, which is shown as "No object".
+            await expect(page.getByLabel(/^label (minifig|motorbike|car|No object) background$/).first()).toBeVisible();
+
+            await annotatorPage.close();
         });
 
         await test.step('Configure the inference pipeline', async () => {
