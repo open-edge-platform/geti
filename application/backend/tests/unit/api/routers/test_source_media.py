@@ -4,6 +4,7 @@ import io
 from collections.abc import Generator
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
+from uuid import UUID
 
 import pytest
 from fastapi import status
@@ -70,42 +71,38 @@ class TestSourceMediaEndpoints:
         fxt_source_media_service.upload.assert_called_once()
 
     def test_delete_source_media_success(self, fxt_source_service, fxt_client):
-        deleted_paths = ["/data/source_media/712750b2-5a82-47ee-8fba-f3dc96cb615d/sample.mp4"]
-        fxt_source_service.delete_unreferenced_media.return_value = deleted_paths
+        source_media_id = "712750b2-5a82-47ee-8fba-f3dc96cb615d"
+        deleted_path = f"/data/source_media/{source_media_id}/sample.mp4"
+        fxt_source_service.delete_unreferenced_media.return_value = deleted_path
 
-        response = fxt_client.delete("/api/sources/media/sample.mp4")
+        response = fxt_client.delete(f"/api/sources/media/{source_media_id}")
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json() == {"deleted_video_paths": deleted_paths}
-        fxt_source_service.delete_unreferenced_media.assert_called_once_with("sample.mp4")
+        assert response.json() == {"deleted_video_path": deleted_path}
+        fxt_source_service.delete_unreferenced_media.assert_called_once_with(UUID(source_media_id))
 
     def test_delete_source_media_not_found(self, fxt_source_service, fxt_client):
         fxt_source_service.delete_unreferenced_media.side_effect = ResourceNotFoundError(
-            ResourceType.MEDIA, "sample.mp4"
+            ResourceType.MEDIA, "712750b2-5a82-47ee-8fba-f3dc96cb615d"
         )
 
-        response = fxt_client.delete("/api/sources/media/sample.mp4")
+        response = fxt_client.delete("/api/sources/media/712750b2-5a82-47ee-8fba-f3dc96cb615d")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_delete_source_media_in_use(self, fxt_source_service, fxt_client):
         fxt_source_service.delete_unreferenced_media.side_effect = ResourceInUseError(
-            ResourceType.MEDIA, "sample.mp4", "in use by a video_file source"
+            ResourceType.MEDIA, "712750b2-5a82-47ee-8fba-f3dc96cb615d", "in use by a video_file source"
         )
 
-        response = fxt_client.delete("/api/sources/media/sample.mp4")
+        response = fxt_client.delete("/api/sources/media/712750b2-5a82-47ee-8fba-f3dc96cb615d")
 
         assert response.status_code == status.HTTP_409_CONFLICT
 
-    @pytest.mark.parametrize("filename", ["..\\sample.mp4", "a/b.mp4"])
-    def test_delete_source_media_invalid_filename(self, fxt_source_service, fxt_client, filename):
-        # The route uses a path converter, so separator-containing names reach the
-        # handler and map the service's ValueError to the documented 400 instead of
-        # 404-ing at the routing layer. ("../x" input is normalized away by HTTP
-        # clients before it ever reaches the server; the service-level tests cover
-        # its rejection regardless.)
-        fxt_source_service.delete_unreferenced_media.side_effect = ValueError(f"Invalid filename: {filename!r}")
+    def test_delete_source_media_rejects_malformed_uuid(self, fxt_source_service, fxt_client):
+        # Request validation rejects anything that is not a UUID before the
+        # service is ever called.
+        response = fxt_client.delete("/api/sources/media/not-a-uuid")
 
-        response = fxt_client.delete(f"/api/sources/media/{filename}")
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_source_service.delete_unreferenced_media.assert_not_called()

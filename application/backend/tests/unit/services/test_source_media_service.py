@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from io import BytesIO
 from pathlib import Path
+from uuid import UUID, uuid4
 
 import pytest
 
@@ -146,49 +147,29 @@ class TestSourceMediaService:
             fxt_source_media_service.delete_video(str(video_path))
 
     @pytest.mark.asyncio
-    async def test_find_uploads_by_filename_returns_all_matching_uploads(
+    async def test_find_upload_by_id_returns_stored_file(self, fxt_source_media_service: SourceMediaService):
+        video_path = await fxt_source_media_service.upload(filename="sample.mp4", file_obj=BytesIO(b"data"))
+        source_media_id = UUID(video_path.parent.name)
+
+        found = fxt_source_media_service.find_upload_by_id(source_media_id)
+
+        assert found == video_path
+
+    def test_find_upload_by_id_returns_none_for_unknown_uuid(self, fxt_source_media_service: SourceMediaService):
+        assert fxt_source_media_service.find_upload_by_id(uuid4()) is None
+
+    def test_find_upload_by_id_returns_none_for_empty_or_ambiguous_subdirectory(
         self, tmp_path: Path, fxt_source_media_service: SourceMediaService
     ):
-        first_path = await fxt_source_media_service.upload(filename="sample.mp4", file_obj=BytesIO(b"first"))
-        second_path = await fxt_source_media_service.upload(filename="sample.mp4", file_obj=BytesIO(b"second"))
-        await fxt_source_media_service.upload(filename="other.mp4", file_obj=BytesIO(b"unrelated"))
+        empty_dir = tmp_path / str(uuid4())
+        empty_dir.mkdir()
+        ambiguous_dir = tmp_path / str(uuid4())
+        ambiguous_dir.mkdir()
+        (ambiguous_dir / "first.mp4").write_bytes(b"one")
+        (ambiguous_dir / "second.mp4").write_bytes(b"two")
 
-        matches = fxt_source_media_service.find_uploads_by_filename("sample.mp4")
-
-        assert sorted(str(path) for path in matches) == sorted([str(first_path), str(second_path)])
-
-    def test_find_uploads_by_filename_empty_when_no_match(self, tmp_path: Path, fxt_source_media_service):
-        assert fxt_source_media_service.find_uploads_by_filename("sample.mp4") == []
-
-    def test_find_uploads_by_filename_empty_when_media_dir_missing(
-        self, tmp_path: Path, fxt_source_media_service: SourceMediaService
-    ):
-        fxt_source_media_service = SourceMediaService(source_media_dir=tmp_path / "nonexistent")
-
-        assert fxt_source_media_service.find_uploads_by_filename("sample.mp4") == []
-
-    @pytest.mark.parametrize(
-        "invalid_filename",
-        [
-            "",
-            ".",
-            "..",
-            "../",
-            "a/../",
-            "../sample.mp4",
-            "../../etc/passwd.mp4",
-            "a/b.mp4",
-            "/etc/passwd.mp4",
-            "sample.mp4/../sample.mp4",
-            "a\\b.mp4",
-            "..\\sample.mp4",
-        ],
-    )
-    def test_find_uploads_by_filename_rejects_non_bare_names(
-        self, fxt_source_media_service: SourceMediaService, invalid_filename: str
-    ):
-        with pytest.raises(ValueError, match="Invalid filename"):
-            fxt_source_media_service.find_uploads_by_filename(invalid_filename)
+        assert fxt_source_media_service.find_upload_by_id(UUID(empty_dir.name)) is None
+        assert fxt_source_media_service.find_upload_by_id(UUID(ambiguous_dir.name)) is None
 
     @pytest.mark.asyncio
     async def test_quarantine_upload_moves_upload_aside_and_restore_reverts(

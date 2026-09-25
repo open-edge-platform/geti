@@ -4,7 +4,7 @@
 import shutil
 from pathlib import Path
 from typing import BinaryIO
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from anyio import to_thread
 
@@ -110,45 +110,30 @@ class SourceMediaService:
 
         shutil.rmtree(upload_dir)
 
-    def find_uploads_by_filename(self, filename: str) -> list[Path]:
+    def find_upload_by_id(self, source_media_id: UUID) -> Path | None:
         """
-        Find stored uploads whose file name matches the given filename.
+        Find the video file stored under the given upload's UUID subdirectory.
 
-        Uploads are addressed by their file name only, so anything other than a bare
-        name (path separators, traversal segments) is rejected.
+        Each `upload` creates its own UUID subdirectory containing exactly one video
+        file, so the upload's UUID (the subdirectory name) uniquely addresses it.
 
         Args:
-            filename: Bare file name (basename) to look for. Several uploads may share
-                the same file name, since each upload lives in its own subdirectory.
+            source_media_id: UUID of the upload to look up.
 
         Returns:
-            Resolved paths of all matching stored files, in unspecified order.
-
-        Raises:
-            ValueError: If the filename is not a bare, usable file name.
+            The resolved path of the stored video file, or None if no upload with
+            this UUID exists (or its subdirectory does not hold exactly one file).
         """
-        safe_name = Path(filename).name
-        if (
-            not filename
-            or safe_name in {".", ".."}
-            or safe_name != filename
-            or "/" in filename
-            or "\\" in filename
-            or ".." in Path(filename).parts
-        ):
-            raise ValueError(f"Invalid filename: {filename!r}")
+        upload_dir = self._source_media_dir / str(source_media_id)
 
-        if not self._source_media_dir.is_dir():
-            return []
+        if not upload_dir.is_dir():
+            return None
 
-        matches: list[Path] = []
-        for upload_dir in self._source_media_dir.iterdir():
-            if not upload_dir.is_dir():
-                continue
-            candidate = upload_dir / safe_name
-            if candidate.is_file():
-                matches.append(candidate.resolve())
-        return matches
+        stored_files = [path for path in upload_dir.iterdir() if path.is_file()]
+        if len(stored_files) != 1:
+            return None
+
+        return stored_files[0].resolve()
 
     def quarantine_upload(self, video_path: str | Path) -> Path:
         """

@@ -4,6 +4,7 @@
 """Endpoints for managing video files uploaded for use as 'video_file' pipeline sources."""
 
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
@@ -57,35 +58,31 @@ async def upload_source_media(
 
 
 @router.delete(
-    "/{filename:path}",
+    "/{source_media_id}",
     response_model=SourceMediaDeletionView,
     status_code=status.HTTP_200_OK,
     responses={
-        status.HTTP_200_OK: {"description": "Unreferenced video(s) deleted successfully"},
-        status.HTTP_400_BAD_REQUEST: {"description": "Invalid filename"},
-        status.HTTP_404_NOT_FOUND: {"description": "No uploaded video with this filename was found"},
+        status.HTTP_200_OK: {"description": "Unreferenced video deleted successfully"},
+        status.HTTP_404_NOT_FOUND: {"description": "No uploaded video with this UUID was found"},
         status.HTTP_409_CONFLICT: {"description": "A source is using the media"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Malformed source media UUID"},
     },
 )
 def delete_source_media(
-    filename: str,
+    source_media_id: UUID,
     source_service: Annotated[SourceService, Depends(get_source_service)],
 ) -> SourceMediaDeletionView:
-    """Delete uploaded video files with the given filename that are not referenced by any source.
+    """Delete an uploaded video file that is not referenced by any source.
 
-    Uploads are addressed by their file name (the basename of the path returned on upload).
-    The path converter keeps separator-containing names (including encoded traversal input)
-    from 404-ing at the routing layer, so the service-level bare-name validation consistently
-    answers them with 400. All stored copies that no source references are removed together
-    with their upload subdirectory; if any source still uses a matching file, nothing is
-    deleted.
+    Uploads are addressed by their UUID (the subdirectory created on upload). Malformed
+    UUIDs are rejected with 422 by request validation; a well-formed UUID that does not
+    match a stored upload yields 404, and a source still using the media yields 409 with
+    nothing deleted.
     """
     try:
-        deleted_video_paths = source_service.delete_unreferenced_media(filename)
-    except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+        deleted_video_path = source_service.delete_unreferenced_media(source_media_id)
     except ResourceNotFoundError as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
     except ResourceInUseError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
-    return SourceMediaDeletionView(deleted_video_paths=deleted_video_paths)
+    return SourceMediaDeletionView(deleted_video_path=deleted_video_path)
