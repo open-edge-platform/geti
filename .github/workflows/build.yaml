@@ -36,7 +36,7 @@ jobs:
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
@@ -114,7 +114,7 @@ jobs:
 
       - name: Build Docker image
         id: docker_build
-        uses: ./.github/actions/docker-build
+        uses: $/.github/actions/docker-build
         with:
           device: ${{ matrix.device }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -142,7 +142,7 @@ jobs:
 
       - name: Sign container image
         if: github.event_name != 'pull_request'
-        uses: open-edge-platform/geti-ci/actions/sign-image@7e686c1248b3939f8ee8e04e2612da727e379d91
+        uses: open-edge-platform/geti-ci/actions/sign-image@3690cbcc173cf90e0e0999b4822c3f8ebab9c137 # sign-image/v0.1.2
         with:
           image-uri: ${{ steps.primary-tag.outputs.tag }}
 
@@ -207,7 +207,7 @@ jobs:
 
       - name: Install Python, uv and Just
         if: matrix.device == 'cpu'
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           uv-version-file: application/backend/pyproject.toml # Install the uv version specified in pyproject.toml
 

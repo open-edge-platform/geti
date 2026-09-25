@@ -10,7 +10,7 @@ permissions: {} # No permissions by default on workflow level
 jobs:
   build:
     name: Daily build
-    uses: ./.github/workflows/build.yaml
+    uses: $/.github/workflows/build.yaml
     with:
       use-cache: false # Verify image is buildable from scratch without any cached layers
       exclude-agpl-models: true # Daily images (pushed to GHCR) must not bundle AGPL-licensed models
@@ -22,20 +22,20 @@ jobs:
 
   backend-lint-and-test:
     name: Daily backend lint and test
-    uses: ./.github/workflows/backend-lint-and-test.yaml
+    uses: $/.github/workflows/backend-lint-and-test.yaml
     permissions:
       contents: read
 
   lib-lint-and-test:
     name: Daily library lint and test
-    uses: ./.github/workflows/lib-lint-and-test.yaml
+    uses: $/.github/workflows/lib-lint-and-test.yaml
     permissions:
       contents: read
       id-token: write # The id-token permission is required by Codecov to use OIDC
 
   ui-lint-and-test:
     name: Daily UI lint and test
-    uses: ./.github/workflows/ui-lint-and-test.yaml
+    uses: $/.github/workflows/ui-lint-and-test.yaml
     permissions:
       contents: read
       pull-requests: write # required by nested job
@@ -46,7 +46,7 @@ jobs:
       fail-fast: false
       matrix:
         device: [cpu, xpu, cuda]
-    uses: ./.github/workflows/windows-installer.yml
+    uses: $/.github/workflows/windows-installer.yml
     with:
       device: ${{ matrix.device }}
       tag: "daily"
@@ -73,7 +73,7 @@ jobs:
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 

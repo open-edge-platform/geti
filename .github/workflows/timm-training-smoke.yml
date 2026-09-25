@@ -20,7 +20,7 @@ jobs:
       packages: read # to pull the buildcache layer from GHCR
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
@@ -46,7 +46,7 @@ jobs:
 
       - name: Build Docker image (cpu)
         id: docker_build
-        uses: ./.github/actions/docker-build
+        uses: $/.github/actions/docker-build
         with:
           device: cpu
           tags: ${{ steps.meta.outputs.tags }}
@@ -55,7 +55,7 @@ jobs:
           use-cache: "true"
 
       - name: Install Python, uv and Just
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           uv-version-file: application/backend/pyproject.toml
 
@@ -77,7 +77,7 @@ jobs:
 
       - name: Upload timm training failures report
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: timm-training-failures
           path: application/backend/tests/bdd/timm_training_failures.json
@@ -95,7 +95,7 @@ jobs:
       issue_exists: ${{ steps.check.outputs.issue_exists }}
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
@@ -121,7 +121,7 @@ jobs:
       issues: write
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
