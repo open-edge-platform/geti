@@ -4,9 +4,11 @@
 import { Suspense, useState } from 'react';
 
 import type { TaskType } from '@/api/types';
+import { paths } from "../../../constants/paths";
+
 import { LanguagePicker } from '@/components/language-picker/language-picker.component';
 import { useTranslation } from '@/i18n';
-import { ActionButton, Content, Divider, Flex, Grid, Heading, Loading, Text, View } from '@geti-ui/ui';
+import { ActionButton, Content, Divider, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
 import { partition } from 'lodash-es';
 import { Link } from 'react-router';
@@ -47,7 +49,7 @@ const ProjectSidebar = ({
         <Flex direction={'column'} gap={'size-300'} UNSAFE_className={classes.sidebar}>
             <Link to={paths.project.index({})} viewTransition>
                 <Flex alignItems={'center'} gap={'size-50'}>
-                    <img src={getiLogo} alt={t('navigation.logoAlt')} className={classes.logo} />
+                    
                     <Text UNSAFE_className={classes.logoText}>Geti™</Text>
                 </Flex>
             </Link>
