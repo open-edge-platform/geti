@@ -6,7 +6,7 @@ import { MouseEvent, PointerEvent, ReactNode, RefObject, useMemo, useRef } from 
 import type { Media } from '@/api/types';
 import { ZoomTransform } from '@/components/zoom/zoom-transform';
 import { Loading } from '@geti-ui/ui';
-import { useIsFetching } from '@tanstack/react-query';
+import { useIsFetching, useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { useSpinDelay } from 'spin-delay';
 
@@ -33,11 +33,15 @@ export const MediaCanvas = ({
     children,
 }: MediaCanvasProps) => {
     const projectId = useProjectIdentifier();
+    const queryClient = useQueryClient();
     const localRef = useRef<HTMLDivElement | null>(null);
     const resolvedRef = containerRef ?? localRef;
 
-    const isFetchingMedia = useIsFetching({ queryKey: loadImageQueryOptions(projectId, mediaItem).queryKey }) > 0;
+    const imageQueryKey = loadImageQueryOptions(projectId, mediaItem).queryKey;
+    const isFetchingMedia = useIsFetching({ queryKey: imageQueryKey }) > 0;
     const isLoadingMedia = useSpinDelay(isFetchingMedia, { delay: 400, minDuration: 200 });
+    // The fetch starts in an effect, so "not fetching" alone does not mean the image has loaded
+    const isMediaReady = !isFetchingMedia && queryClient.getQueryData(imageQueryKey) !== undefined;
 
     // A new object would make the zoom refit on every render, discarding the user's pan and zoom
     const size = useMemo(
@@ -46,7 +50,11 @@ export const MediaCanvas = ({
     );
 
     return (
-        <div style={{ position: 'relative', height: '100%', width: '100%' }}>
+        <div
+            style={{ position: 'relative', height: '100%', width: '100%' }}
+            data-testid={'media-canvas'}
+            aria-busy={!isMediaReady}
+        >
             <ZoomTransform target={size}>
                 <div
                     ref={resolvedRef}
