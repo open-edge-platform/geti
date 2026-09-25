@@ -11,12 +11,12 @@ import {
     useAnnotationCommands,
     useAnnotations,
     useIsAnnotatorReadOnly,
-} from '../annotation-actions-provider.component';
+} from '../annotation-document-provider.component';
 import { useAnnotationVisibility } from '../annotation-visibility-provider.component';
 import { useCanvasSettings } from '../shell/primary-toolbar/settings/canvas-settings-provider.component';
 import { ReadOnlyAnnotations } from './read-only-annotations.component';
 
-vi.mock('../annotation-actions-provider.component', () => ({
+vi.mock('../annotation-document-provider.component', () => ({
     useAnnotations: vi.fn(),
     useAnnotationCommands: vi.fn(),
     useIsAnnotatorReadOnly: vi.fn(),

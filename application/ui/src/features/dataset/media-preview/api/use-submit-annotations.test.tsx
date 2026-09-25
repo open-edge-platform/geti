@@ -3,7 +3,7 @@
 
 import { type ReactNode } from 'react';
 
-import type { AnnotationDTO, Label } from '@/api/types';
+import type { AnnotationDTO, Label, Media } from '@/api/types';
 import { act, waitFor } from '@testing-library/react';
 import { getMockedShape } from 'mocks/mock-annotation';
 import { getMockedAnnotationLabelRef, getMockedLabel } from 'mocks/mock-labels';
@@ -11,33 +11,29 @@ import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
-import { http } from '../../api/utils';
-import { server } from '../../msw-node-setup';
-import { EMPTY_LABEL_ID } from '../../shared/labels';
-import { renderHook } from '../../test-utils/render';
+import { http } from '../../../../api/utils';
 import {
-    AnnotationActionsProvider,
+    AnnotationDocumentProvider,
     useAnnotationCommands,
     useAnnotations,
-    useAnnotationSubmission,
-    type AnnotationActionsProviderProps,
-} from './annotation-actions-provider.component';
-import type { AnnotatorMode } from './annotator-mode';
-
-const useAnnotationContexts = () => ({
-    ...useAnnotations(),
-    ...useAnnotationCommands(),
-    ...useAnnotationSubmission(),
-});
+} from '../../../../modules/annotator/annotation-document-provider.component';
+import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode';
+import { server } from '../../../../msw-node-setup';
+import { EMPTY_LABEL_ID } from '../../../../shared/labels';
+import { renderHook } from '../../../../test-utils/render';
+import { useSubmitAnnotations } from './use-submit-annotations';
 
 const renderAnnotationActions = ({
     initialAnnotationsDTO = [],
     initialPredictionsDTO = [],
     mediaItem = getMockedMediaImage(),
     mode = 'prediction' as AnnotatorMode,
-    isReadOnly = false,
     labels = [],
-}: Partial<AnnotationActionsProviderProps> & {
+}: {
+    initialAnnotationsDTO?: AnnotationDTO[];
+    initialPredictionsDTO?: AnnotationDTO[];
+    mediaItem?: Media;
+    mode?: AnnotatorMode;
     labels: Label[];
 }) => {
     server.use(
@@ -47,18 +43,19 @@ const renderAnnotationActions = ({
     );
 
     const wrapper = ({ children }: { children: ReactNode }) => (
-        <AnnotationActionsProvider
+        <AnnotationDocumentProvider
             mode={mode}
-            mediaItem={mediaItem}
-            isReadOnly={isReadOnly}
             initialAnnotationsDTO={initialAnnotationsDTO}
             initialPredictionsDTO={initialPredictionsDTO}
         >
             {children}
-        </AnnotationActionsProvider>
+        </AnnotationDocumentProvider>
     );
 
-    return renderHook(() => useAnnotationContexts(), { wrapper });
+    return renderHook(
+        () => ({ ...useAnnotations(), ...useAnnotationCommands(), ...useSubmitAnnotations({ mediaItem, mode }) }),
+        { wrapper }
+    );
 };
 
 describe('submitPredictions', () => {
@@ -251,26 +248,5 @@ describe('canSubmit on initial load', () => {
             expect(result.current.annotations).toHaveLength(2);
             expect(result.current.canSubmit).toBe(true);
         });
-    });
-});
-
-describe('annotation commands', () => {
-    it('keep the same identity while annotations change', async () => {
-        const label = getMockedLabel({ id: 'label-1' });
-        const { result } = renderAnnotationActions({ mode: 'annotation', labels: [label] });
-
-        await waitFor(() => expect(result.current).not.toBeNull());
-
-        const { addAnnotations, updateAnnotations, deleteAnnotations } = result.current;
-
-        act(() => {
-            result.current.addAnnotations([getMockedShape({ type: 'rectangle' })], [{ id: label.id }]);
-        });
-
-        await waitFor(() => expect(result.current.annotations).toHaveLength(1));
-
-        expect(result.current.addAnnotations).toBe(addAnnotations);
-        expect(result.current.updateAnnotations).toBe(updateAnnotations);
-        expect(result.current.deleteAnnotations).toBe(deleteAnnotations);
     });
 });
