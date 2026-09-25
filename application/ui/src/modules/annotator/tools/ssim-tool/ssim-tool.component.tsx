@@ -6,10 +6,10 @@ import { useEffect } from 'react';
 import { toast } from '@/components/toast/toast.component';
 import { useZoom } from '@/components/zoom/zoom.provider';
 import { useTranslation } from '@/i18n';
+import { useProjectTask } from 'hooks/use-project-task.hook';
 
-import { useProjectTask } from '../../../../hooks/use-project-task.hook';
 import { isDetectionTask } from '../../../../shared/task-type-guards';
-import { useAnnotationActions } from '../../annotation-actions-provider.component';
+import { useAnnotations } from '../../annotation-actions-provider.component';
 import { getFormattedPoints } from '../../annotations/utils';
 import { useAnnotatorLabels } from '../../annotator-labels-provider.component';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
@@ -26,7 +26,7 @@ export const SSIMTool = () => {
     const { t } = useTranslation();
     const { scale: zoom } = useZoom();
     const { roi, image } = useSelectedMediaItem();
-    const { annotations } = useAnnotationActions();
+    const { annotations } = useAnnotations();
     const { selectedLabel } = useAnnotatorLabels();
     const { addAndSelectAnnotations } = useAddAndSelectAnnotations();
     const { runSSIM, reset, toolState, isProcessing, isLoading, isError, error } = useSSIM();
