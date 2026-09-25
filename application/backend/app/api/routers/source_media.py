@@ -57,7 +57,7 @@ async def upload_source_media(
 
 
 @router.delete(
-    "/{filename}",
+    "/{filename:path}",
     response_model=SourceMediaDeletionView,
     status_code=status.HTTP_200_OK,
     responses={
@@ -74,8 +74,11 @@ def delete_source_media(
     """Delete uploaded video files with the given filename that are not referenced by any source.
 
     Uploads are addressed by their file name (the basename of the path returned on upload).
-    All stored copies that no source references are removed together with their upload
-    subdirectory. If any source still uses a matching file, nothing is deleted.
+    The path converter keeps separator-containing names (including encoded traversal input)
+    from 404-ing at the routing layer, so the service-level bare-name validation consistently
+    answers them with 400. All stored copies that no source references are removed together
+    with their upload subdirectory; if any source still uses a matching file, nothing is
+    deleted.
     """
     try:
         deleted_video_paths = source_service.delete_unreferenced_media(filename)
