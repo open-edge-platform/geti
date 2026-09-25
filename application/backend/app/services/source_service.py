@@ -116,6 +116,51 @@ class SourceService:
         except OSError as e:
             logger.warning("Failed to delete video file '{}': {}", video_path, e)
 
+    def delete_unreferenced_media(self, filename: str) -> list[str]:
+        """
+        Delete stored source-media uploads with the given filename that no source references.
+
+        All stored copies of `filename` that are not in use as a video_file source's
+        'video_path' are removed together with their upload subdirectory. If any source
+        still references one of the copies, nothing is deleted.
+
+        Args:
+            filename: Bare file name (basename) of the uploaded video(s) to delete.
+
+        Returns:
+            The paths of the deleted files.
+
+        Raises:
+            ValueError: If the filename is not a bare, usable file name.
+            ResourceNotFoundError: If no stored upload matches the filename.
+            ResourceInUseError: If a source still references a matching upload.
+        """
+        if self._source_media_service is None:
+            raise ResourceNotFoundError(ResourceType.MEDIA, filename)
+
+        matches = self._source_media_service.find_uploads_by_filename(filename)
+
+        if not matches:
+            raise ResourceNotFoundError(ResourceType.MEDIA, filename)
+
+        referenced_paths = {
+            source.config_data.video_path
+            for source in self.list_all()
+            if source.source_type == SourceType.VIDEO_FILE and isinstance(source.config_data, VideoFileConfig)
+        }
+        if any(str(path) in referenced_paths for path in matches):
+            raise ResourceInUseError(
+                ResourceType.MEDIA,
+                filename,
+                f"Source media '{filename}' cannot be deleted because it is in use by a video_file source.",
+            )
+
+        deleted_paths: list[str] = []
+        for path in matches:
+            self._source_media_service.delete_video(str(path))
+            deleted_paths.append(str(path))
+        return deleted_paths
+
 
 class SourceUpdateService(SourceService):
     def __init__(

@@ -227,3 +227,17 @@ class SourceMediaUploadView(BaseModel):
             }
         }
     }
+
+
+class SourceMediaDeletionView(BaseModel):
+    """Response returned after deleting unreferenced uploaded video files by file name."""
+
+    deleted_video_paths: list[str]
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "deleted_video_paths": ["/data/source_media/712750b2-5a82-47ee-8fba-f3dc96cb615d/sample.mp4"],
+            }
+        }
+    }

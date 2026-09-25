@@ -1,15 +1,16 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Endpoint for uploading video files for use as 'video_file' pipeline sources."""
+"""Endpoints for managing video files uploaded for use as 'video_file' pipeline sources."""
 
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
-from app.api.dependencies import get_file_name_and_extension, get_source_media_service
-from app.api.schemas import SourceMediaUploadView
-from app.services import SourceMediaService
+from app.api.dependencies import get_file_name_and_extension, get_source_media_service, get_source_service
+from app.api.schemas import SourceMediaDeletionView, SourceMediaUploadView
+from app.services import SourceMediaService, SourceService
+from app.services.base import ResourceInUseError, ResourceNotFoundError
 
 router = APIRouter(prefix="/api/sources/media", tags=["Sources"])
 
@@ -53,3 +54,35 @@ async def upload_source_media(
         return SourceMediaUploadView(video_path=str(video_path))
     finally:
         await file.close()
+
+
+@router.delete(
+    "/{filename}",
+    response_model=SourceMediaDeletionView,
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {"description": "Unreferenced video(s) deleted successfully"},
+        status.HTTP_400_BAD_REQUEST: {"description": "Invalid filename"},
+        status.HTTP_404_NOT_FOUND: {"description": "No uploaded video with this filename was found"},
+        status.HTTP_409_CONFLICT: {"description": "A source is using the media"},
+    },
+)
+def delete_source_media(
+    filename: str,
+    source_service: Annotated[SourceService, Depends(get_source_service)],
+) -> SourceMediaDeletionView:
+    """Delete uploaded video files with the given filename that are not referenced by any source.
+
+    Uploads are addressed by their file name (the basename of the path returned on upload).
+    All stored copies that no source references are removed together with their upload
+    subdirectory. If any source still uses a matching file, nothing is deleted.
+    """
+    try:
+        deleted_video_paths = source_service.delete_unreferenced_media(filename)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+    except ResourceNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    except ResourceInUseError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+    return SourceMediaDeletionView(deleted_video_paths=deleted_video_paths)

@@ -106,3 +106,43 @@ class SourceMediaService:
             return
 
         shutil.rmtree(upload_dir)
+
+    def find_uploads_by_filename(self, filename: str) -> list[Path]:
+        """
+        Find stored uploads whose file name matches the given filename.
+
+        Uploads are addressed by their file name only, so anything other than a bare
+        name (path separators, traversal segments) is rejected.
+
+        Args:
+            filename: Bare file name (basename) to look for. Several uploads may share
+                the same file name, since each upload lives in its own subdirectory.
+
+        Returns:
+            Resolved paths of all matching stored files, in unspecified order.
+
+        Raises:
+            ValueError: If the filename is not a bare, usable file name.
+        """
+        safe_name = Path(filename).name
+        if (
+            not filename
+            or safe_name in {".", ".."}
+            or safe_name != filename
+            or "/" in filename
+            or "\\" in filename
+            or ".." in Path(filename).parts
+        ):
+            raise ValueError(f"Invalid filename: {filename!r}")
+
+        if not self._source_media_dir.is_dir():
+            return []
+
+        matches: list[Path] = []
+        for upload_dir in self._source_media_dir.iterdir():
+            if not upload_dir.is_dir():
+                continue
+            candidate = upload_dir / safe_name
+            if candidate.is_file():
+                matches.append(candidate.resolve())
+        return matches
