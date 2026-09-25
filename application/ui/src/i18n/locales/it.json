@@ -522,7 +522,7 @@
             "sidebarLabel": "Metriche pipeline",
             "empty": {
                 "title": "Nessuna statistica disponibile",
-                "description": "Le metriche della pipeline verranno visualizzate qui una volta che la pipeline inizia a eseguire e elaborare i dati."
+                "description": "Le metriche della pipeline verranno visualizzate qui una volta che la pipeline inizia a eseguire ed elaborare i dati."
             },
             "throughput": {
                 "title": "Throughput",
