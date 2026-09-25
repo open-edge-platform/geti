@@ -1,7 +1,7 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 from pathlib import Path
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 
@@ -30,6 +30,10 @@ def _store_upload(source_media_dir: Path, filename: str) -> Path:
     return upload_path.resolve()
 
 
+def _source_media_id(video_path: Path) -> UUID:
+    return UUID(video_path.parent.name)
+
+
 def _video_file_source(video_path: str):
     return SourceAdapter.validate_python(
         {
@@ -42,65 +46,66 @@ def _video_file_source(video_path: str):
 
 
 class TestDeleteUnreferencedMedia:
-    def test_deletes_all_unreferenced_copies(
-        self, tmp_path: Path, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch
-    ):
-        first_path = _store_upload(tmp_path, "sample.mp4")
-        second_path = _store_upload(tmp_path, "sample.mp4")
-        referenced_path = _store_upload(tmp_path, "other.mp4")
+    def test_deletes_unreferenced_upload(self, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch):
+        source_media_dir = fxt_source_service._source_media_service._source_media_dir
+        upload_path = _store_upload(source_media_dir, "sample.mp4")
+        other_path = _store_upload(source_media_dir, "other.mp4")
+        referenced_path = _store_upload(source_media_dir, "referenced.mp4")
         monkeypatch.setattr(fxt_source_service, "list_all", lambda: [_video_file_source(str(referenced_path))])
 
-        deleted_paths = fxt_source_service.delete_unreferenced_media("sample.mp4")
+        deleted_path = fxt_source_service.delete_unreferenced_media(_source_media_id(upload_path))
 
-        assert sorted(deleted_paths) == sorted([str(first_path), str(second_path)])
-        assert not first_path.parent.exists()
-        assert not second_path.parent.exists()
+        assert deleted_path == str(upload_path)
+        assert not upload_path.parent.exists()
+        assert other_path.is_file()
         assert referenced_path.is_file()
 
-    def test_raises_in_use_and_keeps_files_when_referenced(
-        self, tmp_path: Path, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch
+    def test_raises_in_use_and_keeps_file_when_referenced(
+        self, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch
     ):
-        referenced_path = _store_upload(tmp_path, "sample.mp4")
-        unreferenced_path = _store_upload(tmp_path, "sample.mp4")
-        monkeypatch.setattr(fxt_source_service, "list_all", lambda: [_video_file_source(str(referenced_path))])
+        source_media_dir = fxt_source_service._source_media_service._source_media_dir
+        upload_path = _store_upload(source_media_dir, "sample.mp4")
+        monkeypatch.setattr(fxt_source_service, "list_all", lambda: [_video_file_source(str(upload_path))])
 
         with pytest.raises(ResourceInUseError, match="in use by a video_file source"):
-            fxt_source_service.delete_unreferenced_media("sample.mp4")
+            fxt_source_service.delete_unreferenced_media(_source_media_id(upload_path))
 
-        assert referenced_path.is_file()
-        assert unreferenced_path.is_file()
+        assert upload_path.is_file()
 
     def test_detects_equivalent_path_spellings(
         self, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch
     ):
-        referenced_path = _store_upload(fxt_source_service._source_media_service._source_media_dir, "sample.mp4")
+        source_media_dir = fxt_source_service._source_media_service._source_media_dir
+        upload_path = _store_upload(source_media_dir, "sample.mp4")
         # Same location, but spelled with a '..' segment: a raw-string comparison would
         # miss it, a resolved-path comparison must not.
-        equivalent_spelling = f"{referenced_path.parent}/../{referenced_path.parent.name}/{referenced_path.name}"
+        equivalent_spelling = f"{upload_path.parent}/../{upload_path.parent.name}/{upload_path.name}"
         monkeypatch.setattr(fxt_source_service, "list_all", lambda: [_video_file_source(equivalent_spelling)])
 
         with pytest.raises(ResourceInUseError, match="in use by a video_file source"):
-            fxt_source_service.delete_unreferenced_media("sample.mp4")
+            fxt_source_service.delete_unreferenced_media(_source_media_id(upload_path))
 
-        assert referenced_path.is_file()
+        assert upload_path.is_file()
 
-    def test_restores_uploads_when_reference_appears_concurrently(
+    def test_restores_upload_when_reference_appears_concurrently(
         self, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch
     ):
         # First reference check passes; a source committing between the check and the
-        # deletion must make the endpoint refuse and restore the quarantined uploads.
+        # deletion must make the endpoint refuse and restore the quarantined upload.
         source_media_dir = fxt_source_service._source_media_service._source_media_dir
-        sample_path = _store_upload(source_media_dir, "sample.mp4")
-        other_path = _store_upload(source_media_dir, "sample.mp4")
-        list_all_results = iter([[], [_video_file_source(str(sample_path))]])
+        upload_path = _store_upload(source_media_dir, "sample.mp4")
+        list_all_results = iter([[], [_video_file_source(str(upload_path))]])
         monkeypatch.setattr(fxt_source_service, "list_all", lambda: next(list_all_results))
 
         with pytest.raises(ResourceInUseError, match="in use by a video_file source"):
-            fxt_source_service.delete_unreferenced_media("sample.mp4")
+            fxt_source_service.delete_unreferenced_media(_source_media_id(upload_path))
 
-        assert sample_path.is_file()
-        assert other_path.is_file()
-        assert set(source_media_dir.iterdir()) == {sample_path.parent, other_path.parent}
+        assert upload_path.is_file()
+        assert set(source_media_dir.iterdir()) == {upload_path.parent}
+
+    def test_raises_not_found_for_unknown_uuid(self, fxt_source_service: SourceService):
+        with pytest.raises(ResourceNotFoundError):
+            fxt_source_service.delete_unreferenced_media(uuid4())
 
     def test_raises_not_found_when_upload_disappears(
         self,
@@ -108,31 +113,15 @@ class TestDeleteUnreferencedMedia:
         fxt_source_service: SourceService,
         monkeypatch: pytest.MonkeyPatch,
     ):
-        vanished_path = fxt_source_media_service._source_media_dir / "missing-uuid" / "sample.mp4"
-        monkeypatch.setattr(fxt_source_media_service, "find_uploads_by_filename", lambda _filename: [vanished_path])
+        vanished_path = fxt_source_media_service._source_media_dir / str(uuid4()) / "sample.mp4"
+        monkeypatch.setattr(fxt_source_media_service, "find_upload_by_id", lambda _id: vanished_path)
         monkeypatch.setattr(fxt_source_service, "list_all", list)
 
-        with pytest.raises(ResourceNotFoundError, match="sample.mp4"):
-            fxt_source_service.delete_unreferenced_media("sample.mp4")
+        with pytest.raises(ResourceNotFoundError):
+            fxt_source_service.delete_unreferenced_media(uuid4())
 
-    def test_raises_not_found_when_no_upload_matches(
-        self, tmp_path: Path, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch
-    ):
-        monkeypatch.setattr(fxt_source_service, "list_all", list)
-
-        with pytest.raises(ResourceNotFoundError, match="sample.mp4"):
-            fxt_source_service.delete_unreferenced_media("sample.mp4")
-
-    def test_propagates_value_error_for_invalid_filename(
-        self, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch
-    ):
-        monkeypatch.setattr(fxt_source_service, "list_all", list)
-
-        with pytest.raises(ValueError, match="Invalid filename"):
-            fxt_source_service.delete_unreferenced_media("../sample.mp4")
-
-    def test_raises_not_found_without_media_service(self, tmp_path: Path):
+    def test_raises_not_found_without_media_service(self):
         source_service = SourceService(db_session=None, source_media_service=None)
 
-        with pytest.raises(ResourceNotFoundError, match="sample.mp4"):
-            source_service.delete_unreferenced_media("sample.mp4")
+        with pytest.raises(ResourceNotFoundError):
+            source_service.delete_unreferenced_media(uuid4())

@@ -117,64 +117,54 @@ class SourceService:
         except OSError as e:
             logger.warning("Failed to delete video file '{}': {}", video_path, e)
 
-    def delete_unreferenced_media(self, filename: str) -> list[str]:
+    def delete_unreferenced_media(self, source_media_id: UUID) -> str:
         """
-        Delete stored source-media uploads with the given filename that no source references.
+        Delete the source-media upload with the given UUID that no source references.
 
-        All stored copies of `filename` that are not in use as a video_file source's
-        'video_path' are removed together with their upload subdirectory. Before deleting,
-        the matching uploads are quarantined (moved aside atomically) and the reference
-        check is repeated, so a source that starts referencing the media concurrently
-        leaves the endpoint refusing (409) instead of deleting a file a source points at.
-        If any source references one of the copies, nothing is deleted.
+        The upload is removed together with its upload subdirectory. Before deleting,
+        it is quarantined (moved aside atomically) and the reference check is repeated,
+        so a source that starts referencing the media concurrently leaves the endpoint
+        refusing (409) instead of deleting a file a source points at. If any source
+        references the upload, nothing is deleted.
 
         Args:
-            filename: Bare file name (basename) of the uploaded video(s) to delete.
+            source_media_id: UUID of the upload to delete (the subdirectory name
+                created on upload).
 
         Returns:
-            The paths of the deleted files.
+            The path of the deleted video file.
 
         Raises:
-            ValueError: If the filename is not a bare, usable file name.
-            ResourceNotFoundError: If no stored upload matches the filename, or an upload
+            ResourceNotFoundError: If no stored upload matches the UUID, or the upload
                 disappears between the lookup and the deletion.
-            ResourceInUseError: If a source references a matching upload.
+            ResourceInUseError: If a source references the upload.
         """
         if self._source_media_service is None:
-            raise ResourceNotFoundError(ResourceType.MEDIA, filename)
+            raise ResourceNotFoundError(ResourceType.MEDIA, str(source_media_id))
 
-        matches = self._source_media_service.find_uploads_by_filename(filename)
+        upload = self._source_media_service.find_upload_by_id(source_media_id)
 
-        if not matches:
-            raise ResourceNotFoundError(ResourceType.MEDIA, filename)
+        if upload is None:
+            raise ResourceNotFoundError(ResourceType.MEDIA, str(source_media_id))
 
-        if self._referenced_video_paths().intersection(matches):
-            raise self._media_in_use_error(filename)
+        if upload in self._referenced_video_paths():
+            raise self._media_in_use_error(str(source_media_id))
 
-        # Claim the uploads by moving their subdirectories aside, then revalidate: a
-        # source committed between the first check and this point now points at the
+        # Claim the upload by moving its subdirectory aside, then revalidate: a source
+        # committed between the first check and this point now points at the
         # quarantined (moved) location, so the second check catches it and the
-        # quarantined uploads are restored instead of deleted.
-        quarantined: list[Path] = []
+        # quarantined upload is restored instead of deleted.
         try:
-            for path in matches:
-                quarantined.append(self._source_media_service.quarantine_upload(path))
+            quarantined = self._source_media_service.quarantine_upload(upload)
         except FileNotFoundError:
-            self._restore_quarantined(quarantined)
-            raise ResourceNotFoundError(ResourceType.MEDIA, filename) from None
-        except Exception:
-            self._restore_quarantined(quarantined)
-            raise
+            raise ResourceNotFoundError(ResourceType.MEDIA, str(source_media_id)) from None
 
-        if self._referenced_video_paths().intersection(matches):
-            self._restore_quarantined(quarantined)
-            raise self._media_in_use_error(filename)
+        if upload in self._referenced_video_paths():
+            self._restore_quarantined([quarantined])
+            raise self._media_in_use_error(str(source_media_id))
 
-        deleted_paths: list[str] = []
-        for path, quarantined_path in zip(matches, quarantined):
-            self._source_media_service.delete_quarantined_upload(quarantined_path)
-            deleted_paths.append(str(path))
-        return deleted_paths
+        self._source_media_service.delete_quarantined_upload(quarantined)
+        return str(upload)
 
     def _referenced_video_paths(self) -> set[Path]:
         """Resolved paths of the videos referenced by video_file sources.
@@ -199,11 +189,11 @@ class SourceService:
             return Path(video_path)
 
     @staticmethod
-    def _media_in_use_error(filename: str) -> ResourceInUseError:
+    def _media_in_use_error(source_media_id: str) -> ResourceInUseError:
         return ResourceInUseError(
             ResourceType.MEDIA,
-            filename,
-            f"Source media '{filename}' cannot be deleted because it is in use by a video_file source.",
+            source_media_id,
+            f"Source media '{source_media_id}' cannot be deleted because it is in use by a video_file source.",
         )
 
     def _restore_quarantined(self, quarantined: list[Path]) -> None:
