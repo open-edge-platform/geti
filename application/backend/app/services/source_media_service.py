@@ -4,9 +4,12 @@
 import shutil
 from pathlib import Path
 from typing import BinaryIO
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from anyio import to_thread
+
+# Suffix marking a subdirectory that was moved aside by `quarantine_upload`.
+_QUARANTINE_MARKER = ".quarantined-"
 
 
 class SourceMediaService:
@@ -106,3 +109,85 @@ class SourceMediaService:
             return
 
         shutil.rmtree(upload_dir)
+
+    def find_upload_by_id(self, source_media_id: UUID) -> Path | None:
+        """
+        Find the video file stored under the given upload's UUID subdirectory.
+
+        Each `upload` creates its own UUID subdirectory containing exactly one video
+        file, so the upload's UUID (the subdirectory name) uniquely addresses it.
+
+        Args:
+            source_media_id: UUID of the upload to look up.
+
+        Returns:
+            The resolved path of the stored video file, or None if no upload with
+            this UUID exists (or its subdirectory does not hold exactly one file).
+        """
+        upload_dir = self._source_media_dir / str(source_media_id)
+
+        if not upload_dir.is_dir():
+            return None
+
+        stored_files = [path for path in upload_dir.iterdir() if path.is_file()]
+        if len(stored_files) != 1:
+            return None
+
+        return stored_files[0].resolve()
+
+    def quarantine_upload(self, video_path: str | Path) -> Path:
+        """
+        Atomically move an upload's subdirectory aside so it can be revalidated before deletion.
+
+        The subdirectory created by `upload` (base/<uuid>/<filename>) is renamed to a
+        sibling directory with a marker suffix, so the original location immediately
+        stops serving the file while the caller rechecks whether any source references
+        it. Callers either delete the quarantined upload (`delete_quarantined_upload`)
+        or put it back (`restore_quarantined_upload`).
+
+        Args:
+            video_path: Path of the stored video, as returned by `find_uploads_by_filename`.
+
+        Returns:
+            The path of the video file inside the quarantined directory.
+
+        Raises:
+            FileNotFoundError: If the path does not address a stored upload
+                (base/<uuid>/<file>).
+        """
+        resolved = Path(video_path).resolve()
+        base = self._source_media_dir.resolve()
+        upload_dir = resolved.parent
+
+        if not resolved.is_relative_to(base) or upload_dir.parent != base or not resolved.is_file():
+            raise FileNotFoundError(video_path)
+
+        quarantined_dir = base / f"{upload_dir.name}{_QUARANTINE_MARKER}{uuid4()}"
+        upload_dir.rename(quarantined_dir)
+        return quarantined_dir / resolved.name
+
+    def restore_quarantined_upload(self, quarantined_video_path: str | Path) -> None:
+        """
+        Move a quarantined upload back to its original subdirectory.
+
+        Args:
+            quarantined_video_path: Path returned by `quarantine_upload`.
+
+        Raises:
+            OSError: If moving the directory back fails.
+        """
+        quarantined_dir = Path(quarantined_video_path).parent
+        original_dir = quarantined_dir.with_name(quarantined_dir.name.split(_QUARANTINE_MARKER)[0])
+        quarantined_dir.rename(original_dir)
+
+    def delete_quarantined_upload(self, quarantined_video_path: str | Path) -> None:
+        """
+        Remove a quarantined upload together with its subdirectory.
+
+        Args:
+            quarantined_video_path: Path returned by `quarantine_upload`.
+
+        Raises:
+            OSError: If removing the directory fails.
+        """
+        shutil.rmtree(Path(quarantined_video_path).parent)

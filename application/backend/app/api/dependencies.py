@@ -32,6 +32,7 @@ from app.services import (
     ProjectService,
     SinkService,
     SourceMediaService,
+    SourceService,
     SourceUpdateService,
     StagedDatasetService,
     SystemService,
@@ -169,6 +170,14 @@ def get_source_media_service(
 ) -> SourceMediaService:
     """Provides a SourceMediaService instance for storing uploaded source videos."""
     return SourceMediaService(source_media_dir)
+
+
+def get_source_service(
+    db: Annotated[Session, Depends(get_db)],
+    source_media_service: Annotated[SourceMediaService, Depends(get_source_media_service)],
+) -> SourceService:
+    """Provides a SourceService instance."""
+    return SourceService(db_session=db, source_media_service=source_media_service)
 
 
 def get_source_update_service(

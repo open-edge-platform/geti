@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from io import BytesIO
 from pathlib import Path
+from uuid import UUID, uuid4
 
 import pytest
 
@@ -144,3 +145,77 @@ class TestSourceMediaService:
 
         with pytest.raises(OSError, match="permission denied"):
             fxt_source_media_service.delete_video(str(video_path))
+
+    @pytest.mark.asyncio
+    async def test_find_upload_by_id_returns_stored_file(self, fxt_source_media_service: SourceMediaService):
+        video_path = await fxt_source_media_service.upload(filename="sample.mp4", file_obj=BytesIO(b"data"))
+        source_media_id = UUID(video_path.parent.name)
+
+        found = fxt_source_media_service.find_upload_by_id(source_media_id)
+
+        assert found == video_path
+
+    def test_find_upload_by_id_returns_none_for_unknown_uuid(self, fxt_source_media_service: SourceMediaService):
+        assert fxt_source_media_service.find_upload_by_id(uuid4()) is None
+
+    def test_find_upload_by_id_returns_none_for_empty_or_ambiguous_subdirectory(
+        self, tmp_path: Path, fxt_source_media_service: SourceMediaService
+    ):
+        empty_dir = tmp_path / str(uuid4())
+        empty_dir.mkdir()
+        ambiguous_dir = tmp_path / str(uuid4())
+        ambiguous_dir.mkdir()
+        (ambiguous_dir / "first.mp4").write_bytes(b"one")
+        (ambiguous_dir / "second.mp4").write_bytes(b"two")
+
+        assert fxt_source_media_service.find_upload_by_id(UUID(empty_dir.name)) is None
+        assert fxt_source_media_service.find_upload_by_id(UUID(ambiguous_dir.name)) is None
+
+    @pytest.mark.asyncio
+    async def test_quarantine_upload_moves_upload_aside_and_restore_reverts(
+        self, tmp_path: Path, fxt_source_media_service: SourceMediaService
+    ):
+        video_path = await fxt_source_media_service.upload(filename="sample.mp4", file_obj=BytesIO(b"data"))
+        upload_dir = video_path.parent
+
+        quarantined_path = fxt_source_media_service.quarantine_upload(video_path)
+
+        assert not upload_dir.exists()
+        assert quarantined_path.is_file()
+        assert quarantined_path.name == video_path.name
+        assert quarantined_path.parent.parent == tmp_path
+
+        fxt_source_media_service.restore_quarantined_upload(quarantined_path)
+
+        assert video_path.is_file()
+        assert set(tmp_path.iterdir()) == {upload_dir}
+
+    @pytest.mark.asyncio
+    async def test_delete_quarantined_upload_removes_directory(
+        self, tmp_path: Path, fxt_source_media_service: SourceMediaService
+    ):
+        video_path = await fxt_source_media_service.upload(filename="sample.mp4", file_obj=BytesIO(b"data"))
+
+        quarantined_path = fxt_source_media_service.quarantine_upload(video_path)
+        fxt_source_media_service.delete_quarantined_upload(quarantined_path)
+
+        assert list(tmp_path.iterdir()) == []
+
+    def test_quarantine_upload_rejects_paths_outside_upload_layout(
+        self, tmp_path: Path, fxt_source_media_service: SourceMediaService
+    ):
+        root_level_file = tmp_path / "video.mp4"
+        root_level_file.write_bytes(b"data")
+        outside_file = tmp_path.parent / f"outside-{tmp_path.name}" / "video.mp4"
+        outside_file.parent.mkdir()
+        outside_file.write_bytes(b"data")
+
+        with pytest.raises(FileNotFoundError):
+            fxt_source_media_service.quarantine_upload(str(root_level_file))
+        with pytest.raises(FileNotFoundError):
+            fxt_source_media_service.quarantine_upload(str(outside_file))
+        with pytest.raises(FileNotFoundError):
+            fxt_source_media_service.quarantine_upload(str(tmp_path / "missing-uuid" / "video.mp4"))
+
+        assert root_level_file.is_file()
+        assert outside_file.is_file()
