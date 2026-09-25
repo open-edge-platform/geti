@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { StagedDataset } from '@/api/types';
+import type { DatasetStatisticsView } from '@/api/types';
 
 import { ANNOTATIONS_TO_DRAW_PER_ASSET } from './assets-annotations';
 import { expect, test } from './fixtures';
@@ -18,7 +18,7 @@ const TIMEOUTS = {
 // Keeps the export and import jobs short while still covering items with several annotations.
 const MEDIA_COUNT = 3;
 
-const isStagedDatasetPath = (url: string) => /\/api\/staged_datasets\/[^/]+$/.test(new URL(url).pathname);
+const sortNumbers = (values: number[]) => values.toSorted((a, b) => a - b);
 
 test.describe('Dataset export and import E2E', () => {
     const uniqueSuffix = new Date().toISOString().replace(/[:.]/g, '-');
@@ -55,6 +55,9 @@ test.describe('Dataset export and import E2E', () => {
         const filesToUpload = getFilesToUpload('./assets/lego-bricks-dataset').slice(0, MEDIA_COUNT);
         const drawnAnnotations = filesToUpload.flatMap((file) => ANNOTATIONS_TO_DRAW_PER_ASSET[getAssetName(file)]);
         const usedLabelNames = [...new Set(drawnAnnotations.map(({ label }) => label))];
+        const drawnBoxesPerLabel = usedLabelNames.map(
+            (labelName) => drawnAnnotations.filter(({ label }) => label === labelName).length
+        );
 
         let exportedDatasetPath = '';
 
@@ -108,30 +111,7 @@ test.describe('Dataset export and import E2E', () => {
         await test.step('Import the exported dataset as a new project', async () => {
             await projectPage.gotoList();
             await page.getByRole('button', { name: 'Create from dataset' }).click();
-
-            const preparedStagedDataset = page.waitForResponse(
-                async (response) => {
-                    if (response.request().method() !== 'GET' || !isStagedDatasetPath(response.url())) {
-                        return false;
-                    }
-
-                    const stagedDataset = (await response.json()) as StagedDataset;
-
-                    return stagedDataset.ready_for_import;
-                },
-                { timeout: TIMEOUTS.importPreparation }
-            );
-
             await importDatasetPage.uploadZipFile(exportedDatasetPath);
-
-            const { metadata } = (await (await preparedStagedDataset).json()) as StagedDataset;
-
-            expect(metadata).toMatchObject({
-                num_images: MEDIA_COUNT,
-                num_annotated_images: MEDIA_COUNT,
-                num_annotations: drawnAnnotations.length,
-            });
-            expect(metadata?.labels).toEqual(expect.arrayContaining(usedLabelNames));
 
             const dialog = importDatasetPage.getDialog();
             const projectNameInput = dialog.getByRole('textbox', { name: 'Project name' });
@@ -153,22 +133,29 @@ test.describe('Dataset export and import E2E', () => {
         });
 
         await test.step('Imported project keeps media and annotations', async () => {
+            const statisticsResponse = page.waitForResponse(
+                (response) =>
+                    response.request().method() === 'GET' &&
+                    new URL(response.url()).pathname.endsWith('/dataset/statistics')
+            );
+
             await projectPage.gotoList();
             await projectPage.openProject(importedProjectName);
             await expect(page).toHaveURL(/dataset/);
 
             await expect(datasetPage.getImagesCountText(MEDIA_COUNT)).toBeVisible();
 
-            await datasetPage.openAnnotator();
-            await expect(annotatorPage.getMediaCanvasLoading()).toBeHidden({ timeout: TIMEOUTS.nextMediaItem });
+            await page.getByRole('button', { name: 'dataset statistics' }).click();
 
-            const imageName = (await annotatorPage.getSelectedMediaItem().getAttribute('alt')) as string;
+            // Label ids differ between projects and media is renamed on import, so only the counts are compared.
+            const { annotations_counts } = (await (await statisticsResponse).json()) as DatasetStatisticsView;
+            const importedBoxesPerLabel = annotations_counts.instances_per_label
+                .map(({ instances }) => instances)
+                .filter((instances) => instances > 0);
 
-            await expect
-                .poll(async () => (await annotatorPage.getAnnotationsListItems('annotation rect')).length)
-                .toBe(ANNOTATIONS_TO_DRAW_PER_ASSET[imageName]?.length);
-
-            await annotatorPage.close();
+            expect(annotations_counts.annotated_images).toBe(MEDIA_COUNT);
+            expect(annotations_counts.instances).toBe(drawnAnnotations.length);
+            expect(sortNumbers(importedBoxesPerLabel)).toEqual(sortNumbers(drawnBoxesPerLabel));
         });
     });
 });

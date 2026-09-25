@@ -52,9 +52,11 @@ export const annotateMediaItems = async ({
     let prevImageName: string | null = null;
 
     for (let i = 0; i < count; i++) {
-        await expect(annotatorPage.getMediaCanvasLoading()).toBeHidden({ timeout });
-
         await expectMediaItemToChange(annotatorPage, prevImageName, timeout);
+
+        await annotatorPage.waitForMediaLoaded(timeout);
+        // The spinner can linger briefly after loading and would swallow the drawing.
+        await expect(annotatorPage.getMediaCanvasLoading()).toBeHidden();
 
         const imageName = (await annotatorPage.getSelectedMediaItem().getAttribute('alt')) as string;
 
@@ -64,7 +66,6 @@ export const annotateMediaItems = async ({
 
         for (const annotation of annotations) {
             await boundingBoxTool.selectTool();
-
             await boundingBoxTool.drawBoundingBox(annotation.shape);
 
             const label = page.getByLabel('Labels').getByRole('button', { name: `Label ${annotation.label}` });
