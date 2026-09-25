@@ -198,7 +198,10 @@ class GetiTuneTrainer(Execution[TrainingJobParams]):
 
             self.update_message("Computing optimal subset assignments")
             has_all_subsets_assigned = self._subset_service.has_all_subsets_assigned(project_id)
-            assignments = self._subset_assigner.assign(unassigned_items, target_ratios, has_all_subsets_assigned)
+            pinned_group_subsets = self._subset_service.get_pinned_group_subsets(project_id)
+            assignments = self._subset_assigner.assign(
+                unassigned_items, target_ratios, has_all_subsets_assigned, pinned_group_subsets
+            )
 
             # Persist assignments
             self.update_message("Persisting subset assignments")
