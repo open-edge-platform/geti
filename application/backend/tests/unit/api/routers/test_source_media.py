@@ -97,12 +97,15 @@ class TestSourceMediaEndpoints:
 
         assert response.status_code == status.HTTP_409_CONFLICT
 
-    def test_delete_source_media_invalid_filename(self, fxt_source_service, fxt_client):
-        # Backslash traversal stays a single path segment, so it reaches the route handler
-        # and exercises the ValueError -> 400 mapping. Separator-based traversal
-        # ("../x", "a/b") is covered by the service-level rejection tests.
-        fxt_source_service.delete_unreferenced_media.side_effect = ValueError("Invalid filename: '..\\sample.mp4'")
+    @pytest.mark.parametrize("filename", ["..\\sample.mp4", "a/b.mp4"])
+    def test_delete_source_media_invalid_filename(self, fxt_source_service, fxt_client, filename):
+        # The route uses a path converter, so separator-containing names reach the
+        # handler and map the service's ValueError to the documented 400 instead of
+        # 404-ing at the routing layer. ("../x" input is normalized away by HTTP
+        # clients before it ever reaches the server; the service-level tests cover
+        # its rejection regardless.)
+        fxt_source_service.delete_unreferenced_media.side_effect = ValueError(f"Invalid filename: {filename!r}")
 
-        response = fxt_client.delete("/api/sources/media/..\\sample.mp4")
+        response = fxt_client.delete(f"/api/sources/media/{filename}")
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
