@@ -28,7 +28,7 @@ test.describe('Dataset export and import E2E', () => {
     test.afterEach(async ({ projectPage }) => {
         await test.step('Delete projects', async () => {
             await projectPage.gotoList();
-            await projectPage.getProjectCards().first().waitFor();
+            await projectPage.waitForProjectList();
 
             for (const projectName of [sourceProjectName, importedProjectName]) {
                 if (!(await projectPage.getProjectCard(projectName).isVisible())) {

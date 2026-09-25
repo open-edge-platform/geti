@@ -109,4 +109,8 @@ export class ProjectPage {
     getProjectCards() {
         return this.page.getByLabel(/^Project: /);
     }
+
+    async waitForProjectList() {
+        await this.getProjectCards().or(this.page.getByLabel('empty list')).first().waitFor();
+    }
 }

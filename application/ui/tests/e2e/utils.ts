@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import fs from 'fs';
-import { readFile } from 'fs/promises';
+import { open } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -30,9 +30,15 @@ export const getFilesToUpload = (relativePathToAssetDirectory: string) => {
 export const getAssetName = (filePath: string) => path.parse(filePath).name;
 
 export const isZipFile = async (filePath: string) => {
-    const content = await readFile(filePath);
+    const file = await open(filePath);
 
-    return content.subarray(0, 2).toString('latin1') === 'PK';
+    try {
+        const { buffer, bytesRead } = await file.read(Buffer.alloc(2), 0, 2, 0);
+
+        return bytesRead === 2 && buffer.toString('latin1') === 'PK';
+    } finally {
+        await file.close();
+    }
 };
 
 /** Draws the boxes listed in `ANNOTATIONS_TO_DRAW_PER_ASSET` on every media item, starting from the open one. */
