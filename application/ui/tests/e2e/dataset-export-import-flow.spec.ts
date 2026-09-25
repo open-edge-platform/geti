@@ -1,8 +1,6 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { DatasetStatisticsView } from '@/api/types';
-
 import { ANNOTATIONS_TO_DRAW_PER_ASSET } from './assets-annotations';
 import { expect, test } from './fixtures';
 import { annotateMediaItems, getAssetName, getFilesToUpload, isZipFile } from './utils';
@@ -17,8 +15,6 @@ const TIMEOUTS = {
 
 // Keeps the export and import jobs short while still covering items with several annotations.
 const MEDIA_COUNT = 3;
-
-const sortNumbers = (values: number[]) => values.toSorted((a, b) => a - b);
 
 test.describe('Dataset export and import E2E', () => {
     const uniqueSuffix = new Date().toISOString().replace(/[:.]/g, '-');
@@ -55,9 +51,10 @@ test.describe('Dataset export and import E2E', () => {
         const filesToUpload = getFilesToUpload('./assets/lego-bricks-dataset').slice(0, MEDIA_COUNT);
         const drawnAnnotations = filesToUpload.flatMap((file) => ANNOTATIONS_TO_DRAW_PER_ASSET[getAssetName(file)]);
         const usedLabelNames = [...new Set(drawnAnnotations.map(({ label }) => label))];
-        const drawnBoxesPerLabel = usedLabelNames.map(
-            (labelName) => drawnAnnotations.filter(({ label }) => label === labelName).length
-        );
+        const drawnBoxesPerLabel = usedLabelNames.map((labelName) => ({
+            labelName,
+            count: drawnAnnotations.filter(({ label }) => label === labelName).length,
+        }));
 
         let exportedDatasetPath = '';
 
@@ -133,12 +130,6 @@ test.describe('Dataset export and import E2E', () => {
         });
 
         await test.step('Imported project keeps media and annotations', async () => {
-            const statisticsResponse = page.waitForResponse(
-                (response) =>
-                    response.request().method() === 'GET' &&
-                    new URL(response.url()).pathname.endsWith('/dataset/statistics')
-            );
-
             await projectPage.gotoList();
             await projectPage.openProject(importedProjectName);
             await expect(page).toHaveURL(/dataset/);
@@ -146,16 +137,18 @@ test.describe('Dataset export and import E2E', () => {
             await expect(datasetPage.getImagesCountText(MEDIA_COUNT)).toBeVisible();
 
             await page.getByRole('button', { name: 'dataset statistics' }).click();
+            const statisticsDialog = page.getByRole('dialog', { name: 'Dataset Statistics' });
 
-            // Label ids differ between projects and media is renamed on import, so only the counts are compared.
-            const { annotations_counts } = (await (await statisticsResponse).json()) as DatasetStatisticsView;
-            const importedBoxesPerLabel = annotations_counts.instances_per_label
-                .map(({ instances }) => instances)
-                .filter((instances) => instances > 0);
+            await expect(
+                statisticsDialog
+                    .getByRole('group', { name: 'Annotated images' })
+                    .getByText(String(MEDIA_COUNT), { exact: true })
+            ).toBeVisible();
 
-            expect(annotations_counts.annotated_images).toBe(MEDIA_COUNT);
-            expect(annotations_counts.instances).toBe(drawnAnnotations.length);
-            expect(sortNumbers(importedBoxesPerLabel)).toEqual(sortNumbers(drawnBoxesPerLabel));
+            const objectsPerLabel = statisticsDialog.getByRole('group', { name: 'Number of objects per label' });
+            for (const { labelName, count } of drawnBoxesPerLabel) {
+                await expect(objectsPerLabel.getByRole('img', { name: `${labelName}: ${count}` })).toBeVisible();
+            }
         });
     });
 });
