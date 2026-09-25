@@ -278,7 +278,7 @@ export const AnnotationActionsProvider = ({
                 isReadOnlyMode,
             }}
         >
-            <UndoRedoProvider state={undoRedoActions}>{children}</UndoRedoProvider>
+            <UndoRedoProvider baseHistory={undoRedoActions}>{children}</UndoRedoProvider>
         </AnnotationsContext.Provider>
     );
 };

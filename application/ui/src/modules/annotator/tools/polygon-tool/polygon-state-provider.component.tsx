@@ -15,7 +15,7 @@ import {
 
 import { Point } from '../../../../shared/types';
 import { UndoRedoActions } from '../../../../shared/undo-redo/undo-redo-actions.interface';
-import { UndoRedoProvider } from '../../../../shared/undo-redo/undo-redo-provider.component';
+import { useRegisterToolHistory } from '../../../../shared/undo-redo/undo-redo-provider.component';
 import useUndoRedoState, { SetStateWrapper } from '../../../../shared/undo-redo/use-undo-redo-state';
 import { useTool } from '../../tool-provider.component';
 
@@ -71,16 +71,14 @@ export const PolygonStateProvider = ({ children }: PropsWithChildren) => {
         [canUndo, canRedo, enhancedUndo, enhancedRedo, reset]
     );
 
+    useRegisterToolHistory(wrappedUndoRedoActions);
+
     const value = useMemo<PolygonState>(
         () => ({ segments, setSegments, pointerLine, setPointerLine, lassoSegment, setLassoSegment, undoRedoActions }),
         [segments, setSegments, pointerLine, lassoSegment, undoRedoActions]
     );
 
-    return (
-        <PolygonStateContext.Provider value={value}>
-            <UndoRedoProvider state={wrappedUndoRedoActions}>{children}</UndoRedoProvider>
-        </PolygonStateContext.Provider>
-    );
+    return <PolygonStateContext.Provider value={value}>{children}</PolygonStateContext.Provider>;
 };
 
 export const usePolygonState = (): PolygonState => {
