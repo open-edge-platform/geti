@@ -6,8 +6,7 @@ import { useEffect } from 'react';
 import { fireEvent, screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import { UndoRedoProvider } from './undo-redo-provider.component';
-import useUndoRedoState, { SetStateWrapper } from './use-undo-redo-state';
+import useUndoRedoState from './use-undo-redo-state';
 
 describe('useUndoRedoState', (): void => {
     const App = ({ forced = false }) => {
@@ -265,90 +264,5 @@ describe('useUndoRedoState', (): void => {
         const redoButton = screen.getByRole('button', { name: 'redo' });
         fireEvent.click(redoButton);
         expect(screen.getByText('1')).toBeInTheDocument();
-    });
-
-    describe('Undo redo from a parent undo redo state', () => {
-        const MockApp = ({
-            parentValue,
-            setParentValue,
-        }: {
-            parentValue: number;
-            setParentValue: SetStateWrapper<number>;
-        }) => {
-            const [value, setValue, undoRedo] = useUndoRedoState(0);
-            const increase = () => setValue((oldValue) => oldValue + 1);
-            const increaseParent = () => setParentValue((oldValue) => oldValue + 1);
-
-            return (
-                <div>
-                    <span aria-label='Child value'>{value}</span>
-                    <span aria-label='Parent value'>{parentValue}</span>
-                    <button onClick={increase}>Increase</button>
-                    <button onClick={increaseParent}>Increase parent</button>
-                    <button onClick={undoRedo.undo} disabled={!undoRedo.canUndo}>
-                        Undo
-                    </button>
-                    <button onClick={undoRedo.redo} disabled={!undoRedo.canRedo}>
-                        Redo
-                    </button>
-                </div>
-            );
-        };
-
-        const ParentApp = () => {
-            const [value, setValue, undoRedo] = useUndoRedoState(0);
-
-            return (
-                <UndoRedoProvider state={undoRedo}>
-                    <MockApp parentValue={value} setParentValue={setValue} />
-                </UndoRedoProvider>
-            );
-        };
-
-        it("Undoes a parent's undo redo changes", () => {
-            render(<ParentApp />);
-
-            const increaseButton = screen.getByRole('button', { name: 'Increase' });
-            const increaseParentButton = screen.getByRole('button', { name: 'Increase parent' });
-
-            fireEvent.click(increaseParentButton);
-
-            const undoButton = screen.getByRole('button', { name: 'Undo' });
-            const redoButton = screen.getByRole('button', { name: 'Redo' });
-            expect(undoButton).not.toBeDisabled();
-
-            fireEvent.click(increaseParentButton);
-            fireEvent.click(increaseButton);
-
-            expect(screen.getByLabelText('Child value')).toHaveTextContent('1');
-            expect(screen.getByLabelText('Parent value')).toHaveTextContent('2');
-
-            fireEvent.click(undoButton);
-            expect(screen.getByLabelText('Child value')).toHaveTextContent('0');
-            expect(screen.getByLabelText('Parent value')).toHaveTextContent('2');
-
-            fireEvent.click(redoButton);
-            expect(screen.getByLabelText('Child value')).toHaveTextContent('1');
-            expect(screen.getByLabelText('Parent value')).toHaveTextContent('2');
-
-            fireEvent.click(undoButton);
-            expect(screen.getByLabelText('Child value')).toHaveTextContent('0');
-            expect(screen.getByLabelText('Parent value')).toHaveTextContent('2');
-
-            fireEvent.click(undoButton);
-            expect(screen.getByLabelText('Child value')).toHaveTextContent('0');
-            expect(screen.getByLabelText('Parent value')).toHaveTextContent('1');
-
-            // Parent should be redoed
-            fireEvent.click(redoButton);
-            expect(screen.getByLabelText('Child value')).toHaveTextContent('0');
-            expect(screen.getByLabelText('Parent value')).toHaveTextContent('2');
-
-            // Next the child should be reoded
-            fireEvent.click(redoButton);
-            expect(screen.getByLabelText('Child value')).toHaveTextContent('1');
-            expect(screen.getByLabelText('Parent value')).toHaveTextContent('2');
-            expect(redoButton).toBeDisabled();
-        });
     });
 });

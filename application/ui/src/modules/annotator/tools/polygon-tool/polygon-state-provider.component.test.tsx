@@ -1,10 +1,13 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { ReactNode } from 'react';
+
 import { fireEvent, screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import { useUndoRedo } from '../../../../shared/undo-redo/undo-redo-provider.component';
+import { UndoRedoProvider, useUndoRedo } from '../../../../shared/undo-redo/undo-redo-provider.component';
+import useUndoRedoState from '../../../../shared/undo-redo/use-undo-redo-state';
 import type { ToolType } from '../../tool-type';
 import { PolygonStateProvider, usePolygonState } from './polygon-state-provider.component';
 
@@ -39,10 +42,6 @@ const PolygonStateConsumer = () => {
     );
 };
 
-/**
- * A component that reads the UndoRedo context (resolves to the innermost
- * UndoRedoProvider) so tests can assert toolbar-level undo/redo behaviour.
- */
 const ToolbarUndoRedoConsumer = () => {
     const { undo, redo, canUndo, canRedo } = useUndoRedo();
 
@@ -58,6 +57,12 @@ const ToolbarUndoRedoConsumer = () => {
     );
 };
 
+const Session = ({ children }: { children: ReactNode }) => {
+    const [, , history] = useUndoRedoState(0);
+
+    return <UndoRedoProvider baseHistory={history}>{children}</UndoRedoProvider>;
+};
+
 describe('PolygonStateProvider', () => {
     beforeEach(() => {
         mockActiveTool = 'polygon';
@@ -65,10 +70,12 @@ describe('PolygonStateProvider', () => {
 
     const renderProvider = () =>
         render(
-            <PolygonStateProvider>
-                <PolygonStateConsumer />
-                <ToolbarUndoRedoConsumer />
-            </PolygonStateProvider>
+            <Session>
+                <PolygonStateProvider>
+                    <PolygonStateConsumer />
+                    <ToolbarUndoRedoConsumer />
+                </PolygonStateProvider>
+            </Session>
         );
 
     it('toolbar undo removes the last segment', () => {
@@ -116,10 +123,12 @@ describe('PolygonStateProvider', () => {
 
     it('resets all drawing state when activeTool changes', () => {
         const tree = (
-            <PolygonStateProvider>
-                <PolygonStateConsumer />
-                <ToolbarUndoRedoConsumer />
-            </PolygonStateProvider>
+            <Session>
+                <PolygonStateProvider>
+                    <PolygonStateConsumer />
+                    <ToolbarUndoRedoConsumer />
+                </PolygonStateProvider>
+            </Session>
         );
         const { rerender } = render(tree);
 
