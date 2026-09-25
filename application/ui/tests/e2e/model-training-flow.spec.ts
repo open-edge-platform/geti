@@ -199,7 +199,7 @@ test.describe('Model training flow E2E', () => {
                 { timeout: TIMEOUTS.predictions }
             );
 
-            await page.getByRole('tab', { name: 'Dataset' }).click();
+            await page.getByRole('tab', { name: 'Dataset', exact: true }).click();
             await datasetPage.openAnnotator();
             await annotatorPage.openPredictionMode();
 
