@@ -1,0 +1,1134 @@
+{
+    "common": {
+        "actions": {
+            "cancel": "Cancelar",
+            "close": "Cerrar",
+            "delete": "Eliminar",
+            "goBack": "Volver",
+            "rename": "Renombrar",
+            "save": "Guardar",
+            "assign": "Asignar",
+            "back": "Atrás",
+            "clear": "Borrar",
+            "clearAll": "Borrar todo",
+            "confirm": "Confirmar",
+            "connect": "Conectar",
+            "continue": "Continuar",
+            "create": "Crear",
+            "disconnect": "Desconectar",
+            "dismiss": "Descartar",
+            "download": "Descargar",
+            "edit": "Editar",
+            "export": "Exportar",
+            "hide": "Ocultar",
+            "next": "Siguiente",
+            "refresh": "Actualizar",
+            "remove": "Quitar",
+            "selectAll": "Seleccionar todo",
+            "showLess": "Mostrar menos",
+            "showMore": "Mostrar más",
+            "skip": "Omitir",
+            "start": "Iniciar",
+            "submit": "Enviar",
+            "train": "Entrenar",
+            "upload": "Cargar",
+            "undo": "Deshacer",
+            "redo": "Rehacer",
+            "annotate": "Anotar",
+            "addAndUse": "Añadir y usar",
+            "saveAndConnect": "Guardar y conectar",
+            "testConnection": "Probar conexión"
+        },
+        "labels": {
+            "allUppercase": "TODOS",
+            "yes": "Sí",
+            "no": "No",
+            "unknown": "Desconocido",
+            "name": "Nombre",
+            "on": "Activado",
+            "off": "Desactivado",
+            "noMaximum": "Sin máximo",
+            "active": "Activo",
+            "dataset": "Dataset",
+            "filters": "Filtros",
+            "images": "Imágenes",
+            "videos": "Vídeos",
+            "size": "Tamaño",
+            "sizeUppercase": "TAMAÑO",
+            "statusUppercase": "ESTADO",
+            "settings": "Configuración",
+            "training": "Entrenamiento",
+            "validation": "Validación",
+            "testing": "Prueba",
+            "unassigned": "Sin asignar",
+            "trainingLowercase": "entrenamiento",
+            "validationLowercase": "validación",
+            "testingLowercase": "prueba",
+            "frames": "Fotogramas",
+            "seconds": "Segundos",
+            "every": "cada",
+            "model": "Modelo",
+            "labels": "Etiquetas"
+        },
+        "viewModes": {
+            "large": "Miniaturas grandes",
+            "medium": "Miniaturas medianas",
+            "small": "Miniaturas pequeñas"
+        },
+        "status": {
+            "pending": "Pendiente",
+            "running": "En ejecución",
+            "done": "Completado",
+            "cancelled": "Cancelado",
+            "uploading": "Cargando",
+            "failed": "Fallido",
+            "error": "Error",
+            "disconnected": "Desconectado"
+        },
+        "errors": {
+            "unknown": "Se ha producido un error desconocido",
+            "unknownDetail": "Error desconocido"
+        }
+    },
+    "navigation": {
+        "logoAlt": "Logotipo de Geti",
+        "datasetDescription": "Página de recogida de datos para visualizar tus elementos multimedia",
+        "models": "Modelos",
+        "modelsDescription": "Página de modelos para visualizar tus modelos",
+        "inference": "Inferencia",
+        "inferenceDescription": "Página de inferencia que muestra la inferencia en vivo en tu proyecto"
+    },
+    "dataset": {
+        "validation": {
+            "datasetViewNameExists": "Ya existe una vista con este nombre.",
+            "invalidDateRange": "La fecha final debe ser posterior a la fecha inicial"
+        },
+        "views": {
+            "deleted": "Vista eliminada",
+            "title": "Vistas",
+            "entireDataset": "Dataset completo",
+            "assignToExistingView": "Asignar a una vista existente",
+            "assignTo": "Asignar a",
+            "selectView": "Seleccionar una vista",
+            "assignmentNote": "Esta operación no afectará a otros elementos multimedia ya asignados a esta vista.",
+            "mediaAssigned_one": "Elemento multimedia {{count}} asignado correctamente.",
+            "mediaAssigned_other": "{{count}} elementos multimedia asignados correctamente.",
+            "openView": "Abrir {{viewName}}",
+            "saveView": "Guardar vista",
+            "viewNameLabel": "Nombre de la vista",
+            "renameTitle": "Renombrar vista del dataset",
+            "deleteTitle": "Confirmación de eliminación",
+            "deleteConfirmation": "¿Seguro que quieres eliminar la vista \"{{viewName}}\" del dataset?",
+            "deleteSuccess": "La vista \"{{viewName}}\" del dataset se ha eliminado correctamente.",
+            "unassignFromView": "Desasignar de esta vista",
+            "selectedMediaCount_one": "{{count}} elemento multimedia seleccionado",
+            "selectedMediaCount_other": "{{count}} elementos multimedia seleccionados"
+        },
+        "filters": {
+            "allMedia": "Todos los elementos multimedia",
+            "withAnnotations": "Multimedia con anotaciones",
+            "missingAnnotations": "Multimedia con anotaciones faltantes",
+            "subset": "Filtrar por subconjunto",
+            "searchLabels": "Buscar etiquetas",
+            "labelsSelected_one": "{{count}} etiqueta seleccionada",
+            "labelsSelected_other": "{{count}} etiquetas seleccionadas",
+            "toggleAll": "Alternar todos",
+            "more": "Más filtros",
+            "dateRange": {
+                "heading": "Filtrar por fecha de carga",
+                "startDateLabel": "Fecha de inicio",
+                "endDateLabel": "Fecha de fin",
+                "from": "Desde {{date}}",
+                "to": "Hasta {{date}}"
+            }
+        },
+        "upload": {
+            "queued": "En cola",
+            "uploaded": "Cargado",
+            "errorTitle": "Error de carga",
+            "details": "Detalles de la carga",
+            "filename": "NOMBRE DEL ARCHIVO",
+            "uploadingSummary_one": "Cargando {{total}} elemento - {{uploaded}} cargado",
+            "uploadingSummary_other": "Cargando {{total}} elementos - {{uploaded}} cargados",
+            "uploadingFailedSummary_one": "Cargando {{total}} elemento - {{uploaded}} cargado, {{failed}} fallido",
+            "uploadingFailedSummary_other": "Cargando {{total}} elementos - {{uploaded}} cargados, {{failed}} fallidos",
+            "uploadedSummary_one": "{{count}} elemento cargado",
+            "uploadedSummary_other": "{{count}} elementos cargados",
+            "failedSummary_one": "No se pudo cargar {{count}} elemento",
+            "failedSummary_other": "No se pudieron cargar {{count}} elementos",
+            "mixedSummary_one": "{{uploaded}} elemento cargado, {{failed}} fallido",
+            "mixedSummary_other": "{{uploaded}} elementos cargados, {{failed}} fallidos",
+            "genericError": "No se pudieron cargar los elementos multimedia.",
+            "uploadMedia": "Cargar multimedia",
+            "showDetails": "Mostrar detalles",
+            "inProgressToast_one": "Cargando {{count}} elemento...",
+            "inProgressToast_other": "Cargando {{count}} elementos...",
+            "inProgressSucceededPart": "{{count}} correctos",
+            "inProgressFailedPart": "{{count}} fallidos"
+        },
+        "empty": {
+            "noMatches": "Ningún elemento multimedia coincide con tu filtro.",
+            "changeFilter": "Elimina o selecciona un filtro nuevo.",
+            "viewEmpty": "Esta vista no tiene elementos multimedia.",
+            "assignOrBack": "Asigna elementos multimedia a ella o vuelve al dataset completo.",
+            "goToEntireDataset": "Ir a {{datasetName}}",
+            "datasetEmpty": "Tu dataset está vacío.",
+            "uploadToStart": "Carga tu primer elemento multimedia para empezar."
+        },
+        "review": {
+            "reviewed": "Revisado",
+            "forReview": "Para revisar",
+            "selectSubsetPlaceholder": "Seleccionar subconjunto"
+        },
+        "statistics": {
+            "label": "Estadísticas del dataset",
+            "title": "Estadísticas del dataset",
+            "numberOfMedia": "Número de elementos multimedia",
+            "annotatedImages": "Imágenes anotadas",
+            "annotatedVideosFrames": "Vídeos / fotogramas anotados",
+            "numberOfObjectsPerLabel": "Número de objetos por etiqueta",
+            "unannotated": "Sin anotar",
+            "annotated": "Anotado",
+            "annotationsChartTooltip": "Anotaciones"
+        },
+        "delete": {
+            "title": "Eliminar elementos",
+            "mediaItem": "Eliminar elemento multimedia",
+            "confirmation_one": "¿Seguro que quieres eliminar {{count}} elemento?",
+            "confirmation_other": "¿Seguro que quieres eliminar {{count}} elementos?",
+            "deletingItems": "Eliminando elementos...",
+            "deleteError": "No se pudo eliminar, {{detail}}",
+            "deletedSuccess_one": "{{count}} elemento eliminado correctamente",
+            "deletedSuccess_other": "{{count}} elementos eliminados correctamente"
+        },
+        "bulkLabels": {
+            "title": "Asignación de etiquetas",
+            "uploadInstructions": "Elige la(s) etiqueta(s) que quieres asignar a las imágenes cargadas y haz clic en 'Continuar'. Si prefieres anotar las imágenes más tarde, elige 'Omitir'.",
+            "selectedInstructions": "Elige la(s) etiqueta(s) que quieres asignar a las imágenes seleccionadas y haz clic en 'Asignar'.",
+            "imageOnlyNote": "Las etiquetas seleccionadas se aplican solo a imágenes; los vídeos (si los hay) se cargarán sin anotaciones.",
+            "selectedImagesNote": "Las etiquetas seleccionadas se aplican solo a imágenes; los vídeos (si los hay) permanecen intactos.",
+            "noResults": "No se han encontrado resultados. Prueba a buscar con otras palabras.",
+            "cancelUpload": "Cancelar carga",
+            "assignLabelTooltip": "Asignar etiqueta",
+            "assignAllSuccess": "Etiqueta(s) asignada(s) correctamente a las {{count}} imagen(es)",
+            "assignAllFailure": "No se pudieron asignar etiqueta(s) a las {{count}} imagen(es)",
+            "assignPartialSuccess": "Etiqueta(s) asignada(s) a {{succeeded}} de {{total}} imagen(es) ({{failed}} fallidas)"
+        },
+        "mediaActions": {
+            "downloadStarted": "Se ha iniciado la descarga de {{fileName}}"
+        },
+        "gallery": {
+            "sortOldestFirst": "Más antiguos primero",
+            "sortNewestFirst": "Más recientes primero",
+            "selectedCount": "{{count}} seleccionados",
+            "totalMediaCount_one": "{{count}} elemento multimedia",
+            "totalMediaCount_other": "{{count}} elementos multimedia",
+            "dropZone": {
+                "title": "Arrastra aquí los archivos multimedia",
+                "description": "Las imágenes y vídeos se cargarán en este dataset."
+            },
+            "mediaInfo": {
+                "annotatedFrames": "Número de fotogramas anotados: {{count}}",
+                "totalFrames": "Fotogramas totales: {{count}}"
+            }
+        },
+        "import": {
+            "jobTitle": "Importar dataset - {{fileName}} - {{size}}",
+            "processingMessage": "El archivo {{fileName}} se está procesando para su importación",
+            "technicalDetails": "Detalles técnicos",
+            "preparingJob": "Preparando",
+            "stagedFileReadError": "Se ha producido un error al leer el archivo preparado",
+            "prepareError": "Se ha producido un error durante la preparación de la importación.",
+            "genericError": "Se ha producido un error durante la importación.",
+            "importedSuccess": "Dataset {{fileName}} {{size}} importado correctamente.",
+            "multipleFilesError": "No se permite añadir carpetas ni varios archivos. Carga un único archivo.",
+            "unsupportedFormatError": "Formato de archivo no compatible. Carga un archivo .zip válido.",
+            "datasetBeingUploaded": "El dataset se está cargando",
+            "dropZipHere": "Suelta aquí el archivo .zip del dataset",
+            "learnMoreFormats": "Más información sobre los distintos formatos",
+            "dialogHeading": "Importar dataset",
+            "scanningMessage": "Analizando el archivo del dataset para importarlo...",
+            "mapLabelsMessage": "Mapear etiquetas para el dataset cargado",
+            "deleteStagedFile": {
+                "title": "Eliminar archivo preparado",
+                "confirmation": "¿Seguro que quieres eliminar el archivo del dataset \"{{stagedDatasetId}}\"?"
+            },
+            "formatWarning": {
+                "boundingBoxToPolygon": "El dataset importado utiliza anotaciones con cuadros delimitadores, pero el dataset de tu proyecto usa polígonos. Las anotaciones se convertirán automáticamente en polígonos para mantener la compatibilidad.",
+                "polygonToBoundingBox": "El dataset importado utiliza anotaciones de polígono, pero el dataset de tu proyecto usa cuadros delimitadores. Las anotaciones se convertirán automáticamente en cuadros delimitadores para mantener la compatibilidad."
+            },
+            "labelMapping": {
+                "statisticsHeading": "Estadísticas del dataset importado",
+                "heading": "Mapeo de etiquetas - opcional",
+                "unmappedNote": "Los elementos sin mapear se importarán sin etiqueta",
+                "datasetLabelsColumn": "Etiquetas del dataset",
+                "projectLabelsColumn": "Etiquetas del proyecto",
+                "selectLabelPlaceholder": "Seleccionar etiqueta",
+                "imagesLabel": "imágenes",
+                "framesLabel": "fotogramas"
+            }
+        },
+        "export": {
+            "heading": "Exportar {{name}}",
+            "headingDatasetView": "Exportar vista del dataset",
+            "datasetView": "Vista: {{name}}",
+            "statisticsHeading": "Estadísticas del dataset exportado",
+            "settingsHeading": "Ajustes de exportación",
+            "filterByLabel": "Filtrar anotaciones por etiqueta",
+            "selectFormat": "Seleccionar el formato de exportación del dataset",
+            "learnMoreFormats": "Más información sobre los formatos de exportación",
+            "processing": "Procesando el dataset para su exportación",
+            "readyForDownload": "El dataset está listo para descargar",
+            "downloadStarted": "Descarga del dataset iniciada",
+            "error": "Error: {{error}}",
+            "itemsLabel": "elementos",
+            "details": {
+                "defaultName": "conjunto-de-datos",
+                "format": "Formato:",
+                "media": "Multimedia:",
+                "onlyAnnotated": "Solo multimedia con anotaciones",
+                "labels": "Etiquetas:"
+            },
+            "warnings": {
+                "videos": "Este formato de dataset no admite la exportación de vídeos. Todos los fotogramas anotados de los vídeos se exportarán como imágenes.",
+                "emptyLabel": "El formato seleccionado no admite etiquetas vacías (por ejemplo, \"{{emptyLabelName}}\"). Las imágenes y fotogramas que las contengan se exportarán como no anotados.",
+                "unsupportedItemsEmptyLabels": "etiquetas vacías",
+                "unsupportedItemsVideos": "vídeos",
+                "unsupportedItems": "Para conservar {{items}}, utiliza el formato de exportación de Geti.",
+                "subsetNotIncluded": "El dataset exportado no incluirá información sobre el subconjunto asignado a cada elemento multimedia."
+            }
+        },
+        "importExport": {
+            "trigger": "Importar/exportar dataset",
+            "exportItem": "Exportar dataset"
+        },
+        "jobs": {
+            "cancel": {
+                "title": "Cancelar tarea",
+                "confirmation": "¿Seguro que quieres cancelar la tarea {{jobId}}?"
+            }
+        },
+        "revisions": {
+            "createdOn": "Creado el {{date}}",
+            "unnamedName": "Dataset n.º {{id}}",
+            "notFoundForModel": "No se ha encontrado ninguna revisión del dataset para este modelo",
+            "filesDeleted": "Los archivos de esta revisión del dataset se han eliminado.",
+            "noItemsInSubset": "No hay elementos en este subconjunto",
+            "itemAlt": "Elemento de {{subset}}",
+            "trainingSubsets": {
+                "test": "Prueba"
+            },
+            "rename": {
+                "title": "Renombrar revisión del dataset",
+                "nameLabel": "Nombre de la revisión del dataset"
+            },
+            "delete": {
+                "title": "Eliminar revisión del dataset",
+                "description": "¿Seguro que quieres eliminar la revisión del dataset \"{{name}}\"? Podrás seguir viendo las estadísticas del modelo, pero no podrás acceder a los archivos del dataset de entrenamiento."
+            }
+        },
+        "includeUnannotated": "Incluir multimedia sin anotaciones"
+    },
+    "inference": {
+        "validation": {
+            "keyEmpty": "La clave no puede estar vacía",
+            "valueEmpty": "El valor no puede estar vacío"
+        },
+        "connection": {
+            "testing": "Probando conexión...",
+            "inUse": "En uso",
+            "unreachable": "Inaccesible",
+            "ready": "Listo",
+            "saveErrorFallback": "inténtalo de nuevo",
+            "removeSuccess": "{{name}} se ha eliminado correctamente."
+        },
+        "confidenceThreshold": {
+            "label": "Umbral de confianza"
+        },
+        "devices": {
+            "label": "Dispositivo de inferencia"
+        },
+        "sources": {
+            "uploadError": "No se pudo cargar el archivo de vídeo.",
+            "list": {
+                "addSource": "Añadir nueva fuente"
+            },
+            "types": {
+                "usbCamera": "cámara usb",
+                "ipCamera": "cámara ip",
+                "videoFile": "archivo de vídeo",
+                "imagesFolder": "carpeta de imágenes",
+                "disconnected": "desconectado"
+            },
+            "options": {
+                "usbCamera": "Cámara USB",
+                "ipCamera": "Cámara IP",
+                "videoFile": "Archivo de vídeo"
+            },
+            "add": {
+                "title": "Añadir nueva fuente de entrada"
+            },
+            "edit": {
+                "title": "Editar fuente de entrada"
+            },
+            "form": {
+                "createSuccess": "Configuración de la fuente creada correctamente.",
+                "updateSuccess": "Configuración de la fuente actualizada correctamente.",
+                "saveError": "No se pudo guardar la configuración de la fuente, {{details}}"
+            },
+            "menu": {
+                "connectSuccess": "Conectado correctamente a \"{{name}}\".",
+                "disconnectSuccess": "Desconectado correctamente de \"{{name}}\".",
+                "disablePipelineAndDisconnectSuccess": "Pipeline desactivado y desconectado de \"{{name}}\" correctamente.",
+                "disconnectDialog": {
+                    "title": "Desconectar {{name}}",
+                    "message": "Al desconectar esta fuente también se desactivará el pipeline de inferencia. ¿Quieres continuar?"
+                }
+            },
+            "settings": {
+                "loading": "Cargando...",
+                "device": "Dispositivo: {{name}}",
+                "unknownDevice": "Dispositivo desconocido (id: {{deviceId}})",
+                "ignoreExistingImages": "Ignorar imágenes existentes: {{value}}",
+                "streamUrl": "URL del flujo: {{url}}",
+                "videoPath": "Ruta del vídeo: {{path}}"
+            },
+            "fields": {
+                "imagesFolderPath": "Ruta de la carpeta de imágenes",
+                "ignoreExistingImages": "Ignorar imágenes existentes",
+                "streamUrl": "URL del flujo:",
+                "requireAuthentication": "Requerir autenticación",
+                "camera": "Cámara",
+                "videoFilePath": "Ruta del archivo de vídeo",
+                "selectedFile": "Seleccionado: {{fileName}}",
+                "loopVideo": "Reproducir vídeo en bucle"
+            },
+            "defaultNames": {
+                "usbCamera": "Fuente de cámara USB",
+                "ipCamera": "Fuente de cámara IP",
+                "videoFile": "Fuente de archivo de vídeo"
+            }
+        },
+        "sinks": {
+            "types": {
+                "folder": "carpeta",
+                "mqtt": "mqtt",
+                "webhook": "webhook",
+                "ros": "ros"
+            },
+            "options": {
+                "folder": "Carpeta",
+                "webhook": "Webhook",
+                "mqtt": "MQTT"
+            },
+            "add": {
+                "title": "Añadir nuevo destino"
+            },
+            "edit": {
+                "title": "Editar destino"
+            },
+            "form": {
+                "createSuccess": "Configuración del destino creada correctamente.",
+                "updateSuccess": "Configuración del destino actualizada correctamente.",
+                "saveError": "No se pudo guardar la configuración del destino, {{details}}"
+            },
+            "menu": {
+                "connectSuccess": "Conectado correctamente a \"{{name}}\"",
+                "disconnectSuccess": "Desconectado correctamente de \"{{name}}\""
+            },
+            "settings": {
+                "rateLimit": "Límite de tasa: {{value}}",
+                "httpMethod": "Método HTTP: {{value}}",
+                "timeout": "Tiempo de espera: {{value}}",
+                "webhookUrl": "URL del Webhook: {{value}}",
+                "topic": "Tema: {{value}}",
+                "brokerHost": "Host del bróker: {{value}}",
+                "brokerPort": "Puerto del bróker: {{value}}",
+                "outputFormats": "Formatos de salida: ",
+                "outputFormatTypes": {
+                    "imageOriginal": "imagen original",
+                    "imageWithPredictions": "imagen con predicciones",
+                    "predictions": "predicciones"
+                }
+            },
+            "rateLimit": {
+                "notSet": "Sin definir",
+                "samplesPerSecond_one": "{{count}} muestra cada 1 segundo",
+                "samplesPerSecond_other": "{{count}} muestras cada 1 segundo",
+                "oneSamplePerSeconds_one": "1 muestra cada {{count}} segundo",
+                "oneSamplePerSeconds_other": "1 muestra cada {{count}} segundos"
+            },
+            "fields": {
+                "samples": "Muestras",
+                "outputFormatsLabel": "Formatos de salida",
+                "outputFormatPredictions": "Predicciones",
+                "outputFormatImageOriginal": "Imagen original",
+                "outputFormatImageWithPredictions": "Imagen con predicciones",
+                "folderPath": "Ruta de la carpeta",
+                "httpMethod": "Método HTTP",
+                "timeout": "Tiempo de espera",
+                "webhookUrl": "URL del Webhook",
+                "headers": "Cabeceras",
+                "topic": "Tema",
+                "brokerHost": "Host del bróker",
+                "brokerPort": "Puerto del bróker",
+                "authRequired": "Autenticación requerida"
+            },
+            "webhook": {
+                "headersHelp": "Añade tantos pares clave-valor como necesites. Cada par se incluirá en el objeto '{{title}}'.",
+                "keyPlaceholder": "clave",
+                "valuePlaceholder": "valor"
+            },
+            "defaultNames": {
+                "localFolder": "Destino de carpeta local",
+                "webhook": "Destino de webhook",
+                "mqtt": "Destino MQTT"
+            }
+        },
+        "pipeline": {
+            "activeModel": {
+                "loading": "Modelo: ..."
+            },
+            "toggle": {
+                "enabledLabel": "Pipeline activado",
+                "disabledLabel": "Pipeline desactivado",
+                "enabledSuccess": "Pipeline activado correctamente",
+                "disabledSuccess": "Pipeline desactivado correctamente"
+            },
+            "configuration": {
+                "sidebarLabel": "Configuración del pipeline",
+                "sourcesTab": "Entrada",
+                "sinksTab": "Salida"
+            }
+        },
+        "collection": {
+            "sidebarLabel": "Política de recogida de datos",
+            "maxDatasetSize": {
+                "title": "Tamaño máximo del dataset",
+                "description": "Número máximo de elementos a recopilar"
+            },
+            "captureRate": {
+                "title": "Tasa de captura",
+                "description": "Capturar fotogramas mientras el flujo está en ejecución",
+                "toggleLabel": "Alternar captura automática"
+            },
+            "confidenceThreshold": {
+                "description": "Capturar fotogramas cuando la confianza esté por debajo del umbral",
+                "sliderLabel": "Umbral"
+            }
+        },
+        "metrics": {
+            "time": "tiempo",
+            "sidebarLabel": "Métricas del pipeline",
+            "empty": {
+                "title": "No hay estadísticas disponibles",
+                "description": "Las métricas del pipeline se mostrarán aquí cuando el pipeline empiece a ejecutarse y procesar datos."
+            },
+            "throughput": {
+                "title": "Rendimiento",
+                "axisLabel": "solicitudes/s"
+            },
+            "latency": {
+                "title": "Latencia",
+                "axisLabel": "ms"
+            }
+        },
+        "health": {
+            "overall": {
+                "idle": "Inactivo",
+                "problemsDetected": "Problemas detectados"
+            },
+            "component": {
+                "healthy": "Correcto",
+                "finished": "Finalizado",
+                "unavailable": "No disponible"
+            },
+            "componentLabels": {
+                "source": "Fuente",
+                "sink": "Destino"
+            }
+        },
+        "stream": {
+            "start": "Iniciar flujo",
+            "enablePipelineToStart": "Activa el pipeline para iniciar el flujo",
+            "connectError": "No se pudo conectar al flujo",
+            "captureFrame": "Capturar fotograma",
+            "captureSuccess": "Fotograma capturado y añadido al dataset."
+        },
+        "settings": {
+            "folderPath": "Ruta de la carpeta: {{path}}",
+            "authRequired": "Autenticación requerida: {{value}}"
+        }
+    },
+    "project": {
+        "delete": {
+            "confirmation": "¿Seguro que quieres eliminar el proyecto \"{{projectName}}\"?",
+            "success": "Proyecto eliminado correctamente"
+        },
+        "rename": {
+            "title": "Editar nombre del proyecto",
+            "success": "Proyecto actualizado correctamente"
+        },
+        "validation": {
+            "nameEmpty": "El nombre del proyecto no puede estar vacío",
+            "nameExists": "Ya existe un proyecto con ese nombre"
+        },
+        "panel": {
+            "manageProjects": "Gestionar proyectos",
+            "enablePipelineBlocked": {
+                "title": "No se puede activar el pipeline",
+                "message": "Asegúrate de haber seleccionado un modelo y una fuente antes de activar el pipeline."
+            }
+        },
+        "taskTypes": {
+            "detection": "Detección de objetos",
+            "classification": "Clasificación",
+            "instanceSegmentation": "Segmentación de instancias",
+            "multiLabelClassification": "Clasificación multietiqueta",
+            "recommended": "{{taskType}} (Recomendado)"
+        },
+        "list": {
+            "count_one": "{{count}} proyecto",
+            "count_other": "{{count}} proyectos",
+            "countFiltered_one": "{{filtered}} de {{count}} proyecto",
+            "countFiltered_other": "{{filtered}} de {{count}} proyectos",
+            "createNewProject": "Crear nuevo proyecto",
+            "createProjectFromDataset": "Crear a partir de dataset",
+            "card": {
+                "created": "Creado: {{date}}"
+            },
+            "menu": {
+                "enablePipeline": "Activar pipeline",
+                "disablePipeline": "Desactivar pipeline"
+            },
+            "sort": {
+                "label": "Ordenar proyectos por:",
+                "nameAscending": "Nombre (A-Z)",
+                "nameDescending": "Nombre (Z-A)",
+                "createdAtDescending": "Fecha de creación (más recientes)",
+                "createdAtAscending": "Fecha de creación (más antiguos)"
+            },
+            "filters": {
+                "searchPlaceholder": "Buscar proyectos",
+                "taskType": "Filtrar por tipo de tarea"
+            },
+            "noMatches": {
+                "title": "Ningún proyecto coincide con tus filtros",
+                "description": "Prueba a ajustar la búsqueda o los filtros de tipo de tarea para encontrar lo que buscas."
+            },
+            "empty": {
+                "intro": "Te damos la bienvenida a <name>Geti</name>, una plataforma de IA de visión que te guía a lo largo del <highlight>ciclo de vida completo del modelo</highlight>, desde la preparación del dataset hasta el entrenamiento, la optimización y la implementación."
+            },
+            "workflow": {
+                "addData": "Añadir datos",
+                "optimize": "Optimizar",
+                "runInference": "Ejecutar inferencia",
+                "loop": "Supervisa las predicciones y recopila más datos para afinar tu modelo de forma iterativa"
+            }
+        },
+        "create": {
+            "taskQuestion": "¿Qué tipo de tarea quieres que realice el modelo?",
+            "labelsQuestion": "¿Qué objetos debe aprender a {{verb}} el modelo?",
+            "submit": "Crear proyecto",
+            "tasks": {
+                "detection": {
+                    "title": "Detección de objetos",
+                    "description": "Identifica y localiza objetos en tus imágenes",
+                    "advice": "Ideal para: recuento, seguimiento",
+                    "verb": "detectar"
+                },
+                "instanceSegmentation": {
+                    "title": "Segmentación de instancias",
+                    "description": "Detecta y traza el contorno de regiones o formas específicas",
+                    "advice": "Ideal para: medición, formas irregulares",
+                    "verb": "segmentar"
+                },
+                "classification": {
+                    "title": "Clasificación de imágenes",
+                    "description": "Categoriza imágenes completas en función de su contenido",
+                    "advice": "Ideal para: filtrado, moderación de contenido",
+                    "verb": "clasificar"
+                }
+            },
+            "classificationType": {
+                "title": "¿Qué tipo de clasificación debe utilizar el modelo?",
+                "singleLabel": {
+                    "label": "Etiqueta única",
+                    "description": "Asigna una etiqueta entre etiquetas mutuamente excluyentes",
+                    "warning": "Requiere al menos 2 etiquetas"
+                },
+                "multiLabel": {
+                    "label": "Multietiqueta",
+                    "description": "Asigna una o más etiquetas entre etiquetas no mutuamente excluyentes"
+                }
+            },
+            "labels": {
+                "atLeastOneRequired": "Se requiere al menos un objeto"
+            },
+            "defaultName": "Proyecto n.º {{number}}"
+        },
+        "import": {
+            "title": "Crear proyecto a partir de un dataset - Importar",
+            "labelMapping": {
+                "title": "Mapeo de etiquetas"
+            },
+            "preparingMessage": "Preparando la importación del dataset como nuevo proyecto",
+            "taskSelection": {
+                "projectName": "Nombre del proyecto",
+                "selectTaskPlaceholder": "Seleccionar tarea",
+                "recommendationHint": "La opción recomendada se basa en el tipo de anotaciones detectadas en el dataset. Si eliges un tipo distinto, las anotaciones se transformarán automáticamente durante la importación para adaptarse al tipo seleccionado."
+            },
+            "jobsList": {
+                "selectTaskType": "Seleccionar tipo de tarea",
+                "mapLabelsButton": "Mapear etiquetas"
+            }
+        },
+        "taskType": "Tipo de tarea"
+    },
+    "labels": {
+        "fields": {
+            "hotkeyPlaceholder": "Tecla de acceso rápido",
+            "nameExists": "Ya existe una etiqueta con ese nombre",
+            "hotkeyExists": "Esa tecla de acceso rápido ya está en uso"
+        },
+        "editor": {
+            "namePlaceholder": "Nombre de la etiqueta",
+            "pin": "Fijar etiqueta",
+            "unpin": "Desfijar etiqueta",
+            "editTrigger": "Editar etiquetas",
+            "createTrigger": "Crear etiqueta",
+            "delete": {
+                "title": "Eliminar etiqueta",
+                "message": "Si eliminas la etiqueta {{labelName}}, se eliminarán todas las anotaciones de tu dataset que tengan esta etiqueta. Sin embargo, esto no afectará a los modelos que hayas entrenado anteriormente."
+            }
+        },
+        "toolbar": {
+            "hotkeyTooltip": "Tecla de acceso rápido: {{hotkey}}",
+            "overflowCount": "+ {{count}} más"
+        },
+        "empty": {
+            "noLabel": "Sin etiqueta",
+            "noObject": "Sin objeto"
+        }
+    },
+    "annotator": {
+        "canvas": {
+            "hideLabels": "Ocultar etiquetas",
+            "pixelView": "Vista de píxeles",
+            "annotationFillOpacity": "Opacidad de relleno de la anotación",
+            "annotationBorderOpacity": "Opacidad del borde de la anotación",
+            "imageBrightness": "Brillo de la imagen",
+            "imageContrast": "Contraste de la imagen",
+            "imageSaturation": "Saturación de la imagen"
+        },
+        "actions": {
+            "zoomIn": "Acercar",
+            "zoomOut": "Alejar",
+            "fitToScreen": "Ajustar a la pantalla ({{hotkey}})",
+            "undo": "Deshacer ({{hotkey}})",
+            "redo": "Rehacer ({{hotkeys}})",
+            "toggleFocus": "Alternar foco",
+            "showAnnotations": "Mostrar anotaciones ({{hotkey}})",
+            "hideAnnotations": "Ocultar anotaciones ({{hotkey}})"
+        },
+        "modes": {
+            "annotation": "Anotación",
+            "prediction": "Predicción"
+        },
+        "predictions": {
+            "settingsTitle": "Ajustes de predicción",
+            "confirm": "Confirmar predicción"
+        },
+        "hotkeys": {
+            "alternatives": "{{primary}} o {{alternative}}",
+            "title": "Teclas de acceso rápido",
+            "submitAnnotationsPredictions": "Enviar anotaciones/predicciones",
+            "previousMedia": "Multimedia anterior",
+            "nextMedia": "Multimedia siguiente",
+            "deleteSelectedAnnotation": "Eliminar la anotación seleccionada",
+            "toggleAnnotationsVisibility": "Mostrar u ocultar todas las anotaciones",
+            "selectAllAnnotations": "Seleccionar todas las anotaciones",
+            "deselectAllAnnotations": "Deseleccionar todas las anotaciones",
+            "selectNextAnnotation": "Seleccionar la siguiente anotación",
+            "resetZoom": "Restablecer el zoom"
+        },
+        "tools": {
+            "selection": {
+                "label": "Selección"
+            },
+            "boundingBox": {
+                "label": "Cuadro delimitador",
+                "description": "Dibuja un rectángulo o un cuadrado alrededor de un objeto en una imagen."
+            },
+            "autoSegmentation": {
+                "label": "Segmentación automática",
+                "detectionDescription": "Mueve el cursor sobre un objeto para ver la vista previa de un rectángulo sugerido y haz clic para crear la anotación.",
+                "segmentationDescription": "Mueve el cursor sobre un objeto para ver la vista previa de un polígono sugerido y haz clic para crear la anotación.",
+                "loading": "Procesando imagen, espera...",
+                "error": "Error en la herramienta Segment Anything: {{message}}",
+                "unknownError": "Error desconocido; prueba a actualizar la página.",
+                "timeoutError": "{{operation}} superó el tiempo de espera de {{timeoutMs}}ms. Prueba a actualizar la página.",
+                "embeddingError": "No se pudo obtener el embedding de la imagen ({{status}}{{statusText}}).",
+                "operations": {
+                    "workerBuild": "Compilación del worker de SAM",
+                    "workerInit": "Inicialización del worker de SAM",
+                    "decoder": "Decodificador de SAM"
+                }
+            },
+            "polygon": {
+                "label": "Polígono",
+                "description": "Haz clic para colocar los puntos uno a uno, o mantén presionado y arrastra para dibujar a mano alzada. Ideal para formas irregulares que requieren precisión al píxel."
+            },
+            "magneticLasso": {
+                "label": "Lazo magnético",
+                "description": "Pasa el cursor por el borde de un objeto y haz clic periódicamente para ajustar el contorno a sus bordes.",
+                "error": "No se pudieron seleccionar los límites de la forma. ¿Puedes intentarlo de nuevo?"
+            }
+        },
+        "video": {
+            "playback": {
+                "slower": "Más lento",
+                "slow": "Lento",
+                "normal": "Normal",
+                "speed": "Velocidad de reproducción",
+                "showAllFrames": "Mostrar todos los fotogramas",
+                "showOneFramePerSecond": "Mostrar 1 fotograma por segundo"
+            },
+            "frames": {
+                "currentTotal": "Fotograma actual: {{currentFrame}} / Fotogramas totales: {{totalFrames}}",
+                "thumbnailAlt": "Miniatura del fotograma {{frameNumber}}"
+            },
+            "errors": {
+                "network": "No se puede reproducir el vídeo debido a un error de red. Actualiza la página e inténtalo de nuevo.",
+                "unableToPlay": "No se pudo reproducir el vídeo. Inténtalo de nuevo.",
+                "unsupportedFormat": "No se pudo reproducir el vídeo. Prueba con otro formato (mp4/webm)."
+            }
+        }
+    },
+    "models": {
+        "jobs": {
+            "error": "La tarea ha fallado. Consulta los registros para ver los detalles e inténtalo de nuevo.",
+            "heading": "Tareas",
+            "pending": "Pendiente...",
+            "running": "En ejecución...",
+            "stopDialog": {
+                "title": "Detener tarea",
+                "confirmation": "¿Seguro que quieres detener esta tarea?"
+            },
+            "logs": "Registros",
+            "startedAt": "Iniciado: {{time}}",
+            "waitingToStart": "Esperando para iniciar...",
+            "device": "Dispositivo: {{device}}"
+        },
+        "detail": {
+            "loadError": "No se pudieron cargar los detalles del modelo",
+            "tabs": {
+                "variants": "Variantes del modelo",
+                "metrics": "Métricas del modelo",
+                "parameters": "Parámetros de entrenamiento",
+                "datasets": "Conjuntos de datos de entrenamiento"
+            }
+        },
+        "metrics": {
+            "noMetrics": "No hay métricas disponibles",
+            "loadError": "No se pudieron cargar las métricas de entrenamiento",
+            "evaluationsTitle": "Evaluaciones",
+            "noEvaluations": "Las métricas de evaluación de las pruebas no están disponibles"
+        },
+        "training": {
+            "logs": {
+                "copySuccess": "Copiado correctamente",
+                "copyError": "No se pudo copiar",
+                "copyPathTooltip": "Haz clic para copiar la ruta",
+                "showTraceback": "Mostrar traceback",
+                "levelLabel": "Nivel",
+                "levelHelpTitle": "Nivel mínimo de registro",
+                "levelHelpDescription": "Muestra las entradas de registro del nivel seleccionado y superiores. Por ejemplo, al seleccionar WARNING se muestran las entradas WARNING, ERROR y CRITICAL, y se ocultan las entradas DEBUG e INFO.",
+                "searchPlaceholder": "Buscar en los registros...",
+                "connectionStatus": {
+                    "connecting": "Conectando...",
+                    "connected": "En directo",
+                    "error": "Error de conexión"
+                },
+                "entriesCount": "{{filtered}} / {{total}} entradas",
+                "noEntries": "No hay entradas de registro",
+                "noMatchingEntries": "No hay entradas de registro coincidentes",
+                "scrollToBottom": "Desplazarse hasta abajo",
+                "dialogTitle": "Registros de entrenamiento",
+                "loadError": "No se pudieron cargar los registros: {{message}}",
+                "noJobOrModel": "No se ha especificado ninguna tarea o modelo",
+                "fetchError": "No se pudieron obtener los registros del modelo: {{status}} {{statusText}}",
+                "downloadStarted": "Descarga de los registros de entrenamiento iniciada"
+            },
+            "parameters": {
+                "noParameters": "Sin parámetros.",
+                "learningParameters": "PARÁMETROS DE APRENDIZAJE",
+                "filters": "FILTROS",
+                "augmentations": "AUMENTOS",
+                "intensityMapping": "MAPEO DE INTENSIDAD"
+            },
+            "architectures": {
+                "metrics": {
+                    "top1AccOnImageNet": "Precisión Top-1 en ImageNet",
+                    "mapOnCoco": "mAP en COCO",
+                    "map50OnCoco": "mAP50 en COCO"
+                },
+                "card": {
+                    "numberOfParameters": "Número de parámetros: {{count}} millones",
+                    "gigaflops": "Gigaflops: {{value}}"
+                },
+                "sort": {
+                    "label": "Ordenar modelos por:",
+                    "nameAsc": "Nombre (A a Z)",
+                    "nameDesc": "Nombre (Z a A)",
+                    "speedAsc": "Velocidad (más rápido primero)",
+                    "speedDesc": "Velocidad (más lento primero)",
+                    "accuracyAsc": "Exactitud (más baja primero)",
+                    "accuracyDesc": "Exactitud (más alta primero)"
+                },
+                "timm": {
+                    "heading": "Configuración del modelo TIMM",
+                    "architectureFamilyLabel": "Familia de arquitectura",
+                    "selectArchitecturePlaceholder": "Seleccionar arquitectura",
+                    "modelVariantLabel": "Variante del modelo",
+                    "selectVariantPlaceholder": "Seleccionar variante",
+                    "pretrainedWeightsLabel": "Pesos preentrenados",
+                    "selectWeightsPlaceholder": "Seleccionar pesos",
+                    "parameters": "Parámetros: {{count}} millones",
+                    "gigaflops": "GigaFlops: {{value}}"
+                }
+            },
+            "devices": {
+                "selectLabel": "Seleccionar dispositivo de entrenamiento"
+            },
+            "setup": {
+                "trigger": "Entrenar modelo",
+                "dialog": {
+                    "title": "Selecciona un modelo para entrenar",
+                    "disabledReasonTitle": "¿Por qué no puedo iniciar el entrenamiento?",
+                    "advancedSettings": "Ajustes avanzados"
+                },
+                "toast": {
+                    "trainingStarted": "El entrenamiento del modelo se ha iniciado correctamente.",
+                    "trainingStartedWithLink": "El entrenamiento del modelo se ha iniciado correctamente. <link>Abre la pantalla de modelos para ver el progreso.</link>"
+                },
+                "selectDataset": {
+                    "label": "Seleccionar dataset",
+                    "useCurrentDataset": "Usar el dataset actual",
+                    "helpTitle": "Selección de un dataset",
+                    "helpDescription": "Elige la versión del dataset que quieres usar para el entrenamiento. Si quieres entrenar el nuevo modelo\n                            con exactamente los mismos datos (multimedia y anotaciones) que otro modelo, selecciona la\n                            revisión del dataset correspondiente. En cambio, si quieres entrenar con la versión más reciente\n                            de los datos (lo que ves en la página \"Dataset\"), selecciona \"Usar\n                            el dataset actual\"."
+                },
+                "selectModel": {
+                    "label": "Seleccionar pesos de entrada",
+                    "defaultPretrainedWeights": "Pesos preentrenados predeterminados",
+                    "helpTitle": "Selección de los pesos de entrada",
+                    "helpDescription": "Elige un modelo existente para continuar con el ajuste fino, o selecciona \"Pesos preentrenados predeterminados\" para afinar un nuevo modelo a partir de pesos disponibles públicamente y preentrenados con grandes conjuntos de datos públicos."
+                }
+            },
+            "validation": {
+                "notEnoughAnnotations": "Para entrenar un modelo, necesitas anotar al menos 3 elementos de tu dataset, aunque recomendamos anotar varios más para obtener mejores resultados.",
+                "emptySubsetsReason": "Para entrenar un modelo, cada subconjunto (entrenamiento, validación, prueba) necesita al menos un elemento. Esta condición no se puede cumplir actualmente porque {{subsetClause}} vacío y {{assignmentDetail}}.",
+                "emptySubsetClause_one": "el subconjunto {{list}} está",
+                "emptySubsetClause_other": "los subconjuntos {{list}} están",
+                "reviewedOnly_one": "queda {{count}} elemento revisado por asignar",
+                "reviewedOnly_other": "quedan {{count}} elementos revisados por asignar",
+                "unannotatedOnly_one": "hay {{count}} elemento que aún necesita anotación antes de poder asignarse",
+                "unannotatedOnly_other": "hay {{count}} elementos que aún necesitan anotación antes de poder asignarse",
+                "mixedReviewedClause_one": "hay {{count}} elemento revisado listo para asignar",
+                "mixedReviewedClause_other": "hay {{count}} elementos revisados listos para asignar",
+                "mixedUnannotatedClause_one": "{{count}} elemento que aún necesita anotación antes de poder asignarse",
+                "mixedUnannotatedClause_other": "{{count}} elementos que aún necesitan anotación antes de poder asignarse",
+                "mixedAssignmentDetail": "{{reviewedClause}} y {{unannotatedClause}}",
+                "noUnassignedItems": "no hay elementos sin asignar disponibles para redistribuir"
+            },
+            "advanced": {
+                "tabs": {
+                    "dataManagement": "Gestión de datos"
+                },
+                "notAvailable": "La configuración del entrenamiento no está disponible."
+            },
+            "learning": {
+                "title": "Parámetros de aprendizaje",
+                "tagDefault": "Predeterminado",
+                "tagModified": "Modificado",
+                "inputSize": "Tamaño de entrada"
+            },
+            "dataManagement": {
+                "trainingSubsets": {
+                    "title": "Subconjuntos de entrenamiento",
+                    "description": "Especifica la distribución de las muestras anotadas que AÚN NO se hayan asignado a un subconjunto. Ten en cuenta que las muestras utilizadas en rondas de entrenamiento anteriores ya tienen un subconjunto asignado y este permanecerá sin cambios para evitar la contaminación de datos y el sesgo de evaluación.",
+                    "unavailableTitle": "Configuración de subconjuntos de entrenamiento no válida",
+                    "unavailableDescription": "Los subconjuntos de entrenamiento no contienen suficientes elementos multimedia para admitir una división configurable entre los subconjuntos de entrenamiento, validación y prueba.",
+                    "unavailableHint": "Añade más elementos multimedia para asegurarte de que cada subconjunto contenga al menos un elemento.",
+                    "datasetSamples": "Dataset: {{count}} muestras",
+                    "assignedSamples": "Asignados: {{count}}",
+                    "unassignedSamples": "Sin asignar: {{count}}",
+                    "distributionLabel": "Distribución para nuevas muestras",
+                    "resultingDistribution": "Distribución resultante del dataset:",
+                    "totalLabel": "Total:",
+                    "mediaItemsLabel": "elementos multimedia"
+                },
+                "filters": {
+                    "noMinimum": "Sin mínimo",
+                    "unlimited": "Ilimitado"
+                },
+                "augmentation": {
+                    "title": "Aumento de datos"
+                },
+                "tiling": {
+                    "title": "Mosaico (tiling)",
+                    "description": "El mosaico es una técnica que divide imágenes de alta resolución en teselas más pequeñas y puede ser útil para aumentar la precisión en tareas de detección de objetos pequeños.",
+                    "modeLabel": "Modo de mosaico",
+                    "modes": {
+                        "automatic": "Automático",
+                        "custom": "Personalizado"
+                    },
+                    "offDescription": "El modelo procesa toda la imagen como una única unidad sin dividirla en teselas más pequeñas. Este enfoque es sencillo, pero puede tener dificultades para detectar objetos pequeños en imágenes de alta resolución, ya que el modelo podría perder detalles más finos",
+                    "automaticDescription": "Significa que el sistema establecerá automáticamente los parámetros en función de la resolución de la imagen y del tamaño de las anotaciones."
+                },
+                "intensityMapping": {
+                    "title": "Mapeo de intensidad"
+                }
+            }
+        },
+        "list": {
+            "groupByPlaceholder": "Agrupar por",
+            "groupByDataset": "Agrupar por: dataset",
+            "groupByArchitecture": "Agrupar por: arquitectura",
+            "hideFailedModels": "Ocultar modelos fallidos",
+            "showFailedModels": "Mostrar modelos fallidos",
+            "searchPlaceholder": "Buscar modelos...",
+            "noModelsFound": "No se ha encontrado ningún modelo",
+            "empty": {
+                "title": "Aún no hay modelos.",
+                "description": "Entrena tu primer modelo para empezar."
+            },
+            "deletedWeightsBadge": "Pesos eliminados",
+            "fineTunedFrom": "Afinado a partir de",
+            "columns": {
+                "trained": "Entrenado",
+                "device": "Dispositivo",
+                "totalSize": "Tamaño total"
+            }
+        },
+        "performance": {
+            "metrics": {
+                "accuracy": "Exactitud",
+                "precision": "Precisión",
+                "recall": "Sensibilidad",
+                "fMeasure": "Medida F"
+            },
+            "categories": {
+                "balance": "Equilibrio",
+                "speed": "Velocidad",
+                "accuracy": "Precisión"
+            }
+        },
+        "variants": {
+            "empty": "No hay variantes de modelo disponibles.",
+            "columns": {
+                "precision": "PRECISIÓN"
+            },
+            "quantizedInfo": {
+                "title": "Cuantizado con NNCF PTQ",
+                "maxAccuracyDrop": "Caída máx. de exactitud: {{value}}",
+                "calibrationDatasetSize": "Tamaño del dataset de calibración: {{size}}"
+            }
+        },
+        "export": {
+            "downloadStarted": "Descarga del modelo iniciada"
+        },
+        "optimize": {
+            "description": "Optimiza el modelo FP16 utilizando OpenVINO NNCF (mediante cuantización INT8)",
+            "contextualHelp": "OpenVINO NNCF (Neural Network Compression Framework) mediante cuantización INT8 reduce el tamaño del modelo y acelera la inferencia con un impacto mínimo en la exactitud",
+            "start": "Iniciar cuantización",
+            "dialogTitle": "Cuantización",
+            "subheading": "Cuantizar modelo a INT8",
+            "jobStarted": "Tarea de cuantización iniciada.",
+            "recommendedCalibrationSize": "Tamaño recomendado del dataset de calibración: entre 200 y 500 elementos multimedia",
+            "fields": {
+                "maxAccuracyDrop": {
+                    "label": "Caída máxima de exactitud (%)",
+                    "help": {
+                        "paragraph1": "Caída máxima permitida en la exactitud de validación.",
+                        "paragraph2": "Ten en cuenta que la cuantización con sensibilidad a la exactitud puede tardar bastante tiempo cuando la caída máxima permitida es pequeña.",
+                        "paragraph3": "Ten en cuenta también que la exactitud final de la prueba puede ser inferior al umbral de exactitud de validación especificado, especialmente en conjuntos de datos relativamente pequeños."
+                    }
+                },
+                "maxIterations": {
+                    "label": "Número máximo de iteraciones",
+                    "help": {
+                        "paragraph1": "Número máximo de iteraciones de la cuantización con sensibilidad a la exactitud.",
+                        "paragraph2": "La cuantización con sensibilidad a la exactitud elimina iterativamente capas del modelo del ámbito de cuantización hasta que se cumple el criterio de caída máxima de exactitud. Limitar el número de iteraciones puede reducir considerablemente el tiempo necesario para cuantizar modelos con muchas capas.",
+                        "paragraph3": "Este parámetro solo se utiliza cuando se establece una caída máxima de exactitud."
+                    }
+                },
+                "calibrationSize": {
+                    "label": "Tamaño máximo de calibración",
+                    "help": "Las muestras de calibración se seleccionarán aleatoriamente dentro del dataset",
+                    "useFullDataset": "Usar dataset completo"
+                }
+            }
+        },
+        "actions": {
+            "deleteWeights": "Eliminar pesos",
+            "deleteModel": "Eliminar modelo",
+            "viewLogs": "Ver registros de entrenamiento",
+            "deleteWeightsDescription": "¿Seguro que quieres eliminar los pesos del modelo \"{{modelName}}\"?",
+            "deleteModelDescription": "¿Seguro que quieres eliminar el modelo \"{{modelName}}\"? Esta acción no se puede deshacer.",
+            "renameDialog": {
+                "title": "Renombrar modelo",
+                "nameLabel": "Nombre del modelo"
+            }
+        },
+        "columns": {
+            "modelName": "Nombre del modelo",
+            "architecture": "Arquitectura"
+        }
+    },
+    "license": {
+        "label": "Licencia: ",
+        "agreement": {
+            "title": "Contrato de licencia",
+            "intro": "Al instalar, usar o distribuir esta aplicación, reconoces que:",
+            "termsRead": "Has leído y comprendido los términos de la licencia disponibles en los siguientes enlaces;",
+            "termsGovern": "Has confirmado que los términos indicados rigen los contenidos a los que quieres acceder y utilizar; y",
+            "termsAccepted": "Has aceptado y estás de acuerdo con los términos de la licencia indicados.",
+            "accept": "Aceptar y continuar"
+        },
+        "links": {
+            "intelSimplified": "Licencia de software simplificada de Intel",
+            "dinov2": "Licencia de DINOv3"
+        }
+    },
+    "application": {
+        "startup": {
+            "loading": "Cargando... Espera un momento."
+        },
+        "serverError": {
+            "heading": "Error del servidor"
+        },
+        "errorPage": {
+            "badRequest": "El servidor no puede o no quiere procesar la solicitud actual.",
+            "forbidden": "No tienes permiso para acceder a esta página.",
+            "notFound": "Esta página no existe.",
+            "unauthorized": "No tienes autorización para ver esto",
+            "serverError": "El servidor ha encontrado un error y no ha podido completar tu solicitud.",
+            "serviceUnavailable": "Parece que nuestra API está caída",
+            "goHome": "Volver a la página de inicio"
+        },
+        "notifications": {
+            "unexpectedError": "Se ha producido un error inesperado. Inténtalo de nuevo.",
+            "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo."
+        }
+    },
+    "downloads": {
+        "failure": {
+            "genericError": "No se pudo descargar el archivo"
+        },
+        "saveDialog": {
+            "allFiles": "Todos los archivos",
+            "fileTypeFilter": "Archivo {{extension}}"
+        }
+    }
+}
