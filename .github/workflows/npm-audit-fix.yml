@@ -37,9 +37,11 @@ jobs:
       # `npm audit fix` resolves new versions, so it must honor the
       # `min-release-age` setting in application/ui/.npmrc, which requires
       # npm >= 11.14.0. The npm shipped with the pinned Node version may be
-      # older, so install a compatible npm globally first.
+      # older, so install a compatible npm globally first. There is no
+      # lockfile-based way to pin npm itself (it must exist before any
+      # lockfile-aware install can run), so the version is hardcoded instead.
       - name: Ensure npm supports min-release-age
-        run: npm i -g npm@11.14.0
+        run: npm i -g npm@11.14.0 # zizmor: ignore[adhoc-packages]
 
       - name: Install dependencies
         working-directory: application/ui

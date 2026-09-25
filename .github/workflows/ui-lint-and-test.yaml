@@ -69,7 +69,7 @@ jobs:
       - *checkout
 
       - name: Install Python, uv and Just
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           uv-version-file: application/backend/pyproject.toml # Install the uv version specified in pyproject.toml
 

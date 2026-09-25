@@ -114,7 +114,7 @@ jobs:
 
       - name: Build Docker image
         id: docker_build
-        uses: ./.github/actions/docker-build
+        uses: $/.github/actions/docker-build
         with:
           device: ${{ matrix.device }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -142,7 +142,7 @@ jobs:
 
       - name: Sign container image
         if: github.event_name != 'pull_request'
-        uses: open-edge-platform/geti-ci/actions/sign-image@7e686c1248b3939f8ee8e04e2612da727e379d91
+        uses: open-edge-platform/geti-ci/actions/sign-image@3690cbcc173cf90e0e0999b4822c3f8ebab9c137 # sign-image/v0.1.2
         with:
           image-uri: ${{ steps.primary-tag.outputs.tag }}
 
@@ -207,7 +207,7 @@ jobs:
 
       - name: Install Python, uv and Just
         if: matrix.device == 'cpu'
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           uv-version-file: application/backend/pyproject.toml # Install the uv version specified in pyproject.toml
 

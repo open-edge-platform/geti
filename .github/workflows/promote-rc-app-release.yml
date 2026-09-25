@@ -260,7 +260,7 @@ jobs:
           docker push "${TARGET_IMAGE}"
 
       - name: Sign Docker image
-        uses: open-edge-platform/geti-ci/actions/sign-image@7e686c1248b3939f8ee8e04e2612da727e379d91
+        uses: open-edge-platform/geti-ci/actions/sign-image@3690cbcc173cf90e0e0999b4822c3f8ebab9c137 # sign-image/v0.1.2
         with:
           image-uri: ghcr.io/open-edge-platform/geti-${{ matrix.device }}:${{ needs.validate.outputs.docker_patch_tag }}
 
@@ -285,7 +285,7 @@ jobs:
       fail-fast: false
       matrix:
         device: [cpu, xpu, cuda]
-    uses: ./.github/workflows/windows-installer.yml
+    uses: $/.github/workflows/windows-installer.yml
     with:
       device: ${{ matrix.device }}
       checkout_sha: ${{ needs.validate.outputs.rc_sha }} # Build from the exact promoted RC commit

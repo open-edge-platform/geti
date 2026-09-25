@@ -76,7 +76,7 @@ jobs:
       - *checkout
 
       - name: Install Python, uv and Just
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           uv-version-file: library/pyproject.toml # Install the uv version specified in pyproject.toml
           python-version: "3.11" # Use the lowest supported Python version for linting/type-checking
@@ -119,7 +119,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Python, uv and Just
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           uv-version-file: library/pyproject.toml # Install the uv version specified in pyproject.toml
           python-version: ${{ matrix.python-version }}
@@ -175,7 +175,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Python, uv and Just
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           uv-version-file: library/pyproject.toml # Install the uv version specified in pyproject.toml
           python-version: ${{ matrix.python-version }}
@@ -227,7 +227,7 @@ jobs:
           persist-credentials: false
 
       - name: Install Python, uv and Just
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           uv-version-file: library/pyproject.toml
           python-version: "3.11"

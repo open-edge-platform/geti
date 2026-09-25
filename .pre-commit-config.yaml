@@ -18,7 +18,7 @@ repos:
       - id: ruff-format
 
   # Prettier - Code formatter for UI files
-  - repo: https://github.com/pre-commit/mirrors-prettier
+  - repo: https://github.com/pre-commit/mirrors-prettier # zizmor: ignore[archived-uses] archived but read-only/frozen; local-only formatting hook, not used in CI
     rev: v3.0.3
     hooks:
       - id: prettier

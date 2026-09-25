@@ -61,7 +61,7 @@ jobs:
       - *checkout
 
       - name: Install common dependencies
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           install-just: "false"
           uv-version-file: application/backend/pyproject.toml # Install the uv version specified in pyproject.toml

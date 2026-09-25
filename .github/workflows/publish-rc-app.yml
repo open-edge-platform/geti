@@ -166,7 +166,7 @@ jobs:
             type=raw,value=${{ needs.validate.outputs.rc_version }}
 
       - name: Build and push Docker image
-        uses: ./.github/actions/docker-build
+        uses: $/.github/actions/docker-build
         with:
           device: ${{ matrix.device }}
           push: "true"
@@ -176,7 +176,7 @@ jobs:
           exclude-agpl-models: "true" # RC images must not bundle Ultralytics/AGPL-licensed models
 
       - name: Sign Docker image
-        uses: open-edge-platform/geti-ci/actions/sign-image@7e686c1248b3939f8ee8e04e2612da727e379d91
+        uses: open-edge-platform/geti-ci/actions/sign-image@3690cbcc173cf90e0e0999b4822c3f8ebab9c137 # sign-image/v0.1.2
         with:
           image-uri: ${{ steps.meta.outputs.tags }}
 
@@ -213,7 +213,7 @@ jobs:
       fail-fast: false
       matrix:
         device: [cpu, xpu, cuda]
-    uses: ./.github/workflows/windows-installer.yml
+    uses: $/.github/workflows/windows-installer.yml
     with:
       device: ${{ matrix.device }}
       tag: rc${{ needs.validate.outputs.rc_number }} # Suffix only; VERSION file already supplies the base version

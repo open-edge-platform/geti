@@ -46,7 +46,7 @@ jobs:
 
       - name: Build Docker image (cpu)
         id: docker_build
-        uses: ./.github/actions/docker-build
+        uses: $/.github/actions/docker-build
         with:
           device: cpu
           tags: ${{ steps.meta.outputs.tags }}
@@ -55,7 +55,7 @@ jobs:
           use-cache: "true"
 
       - name: Install Python, uv and Just
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           uv-version-file: application/backend/pyproject.toml
 
