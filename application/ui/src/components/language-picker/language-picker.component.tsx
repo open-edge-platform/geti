@@ -5,6 +5,7 @@ import { SUPPORTED_LANGUAGES, useTranslation } from '@/i18n';
 import { Item, Key, Picker, Text } from '@geti-ui/ui';
 
 import cnFlag from '../../assets/flags/cn.svg?url';
+import itFlag from '../../assets/flags/it.svg?url';
 import ptFlag from '../../assets/flags/pt.svg?url';
 import usFlag from '../../assets/flags/us.svg?url';
 
@@ -13,6 +14,7 @@ import classes from './language-picker.module.scss';
 // Image files, not emoji: Windows/WebView2 renders regional-indicator flag emojis as letters.
 const LANGUAGE_FLAGS: Partial<Record<string, string>> = {
     en: usFlag,
+    it: itFlag,
     pt: ptFlag,
     'zh-CN': cnFlag,
 };
