@@ -6,6 +6,7 @@ import { Item, Key, Picker, Text } from '@geti-ui/ui';
 
 import cnFlag from '../../assets/flags/cn.svg?url';
 import esFlag from '../../assets/flags/es.svg?url';
+import itFlag from '../../assets/flags/it.svg?url';
 import ptFlag from '../../assets/flags/pt.svg?url';
 import usFlag from '../../assets/flags/us.svg?url';
 
@@ -15,6 +16,7 @@ import classes from './language-picker.module.scss';
 const LANGUAGE_FLAGS: Partial<Record<string, string>> = {
     en: usFlag,
     es: esFlag,
+    it: itFlag,
     pt: ptFlag,
     'zh-CN': cnFlag,
 };
