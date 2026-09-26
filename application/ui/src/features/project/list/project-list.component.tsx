@@ -4,9 +4,6 @@
 import { Suspense, useState } from 'react';
 
 import type { TaskType } from '@/api/types';
-import { paths } from "../../../constants/paths";
-
-import { LanguagePicker } from '@/components/language-picker/language-picker.component';
 import { useTranslation } from '@/i18n';
 import { ActionButton, Content, Divider, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
@@ -14,6 +11,7 @@ import { partition } from 'lodash-es';
 import { Link } from 'react-router';
 
 import { version } from '../../../../package.json';
+import { paths } from '../../../constants/paths';
 import { downloadFile } from '../../../platform/download-file';
 import { isNonEmptyArray } from '../../../shared/util';
 import { EmptyProjectList } from './empty-project-list/empty-project-list.component';
@@ -43,13 +41,10 @@ const ProjectSidebar = ({
     selectedTaskTypes: TaskType[];
     setSelectedTaskTypes: (taskTypes: TaskType[]) => void;
 }) => {
-    const { t } = useTranslation();
-
     return (
         <Flex direction={'column'} gap={'size-300'} UNSAFE_className={classes.sidebar}>
             <Link to={paths.project.index({})} viewTransition>
                 <Flex alignItems={'center'} gap={'size-50'}>
-                    
                     <Text UNSAFE_className={classes.logoText}>Geti™</Text>
                 </Flex>
             </Link>
