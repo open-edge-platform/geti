@@ -6,6 +6,8 @@ import { screen } from '@testing-library/react';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { render } from 'test-utils/render';
 
+import { createQueryClient } from '../../../query-client/query-client';
+import { loadImageQueryOptions } from '../hooks/use-load-image-query.hook';
 import { MediaCanvas } from './media-canvas';
 
 const mediaItem = getMockedMediaImage({ width: 100, height: 100 });
@@ -33,5 +35,25 @@ describe('MediaCanvas', () => {
 
         expect(overlay).toBeInTheDocument();
         expect(screen.getByTestId('zoom-transform')).not.toContainElement(overlay);
+    });
+
+    it('is busy until the media image has loaded', () => {
+        renderApp({ isLoadingOverlay: false });
+
+        expect(screen.getByTestId('media-canvas')).toHaveAttribute('aria-busy', 'true');
+    });
+
+    it('is not busy once the media image is loaded', () => {
+        const queryClient = createQueryClient();
+        queryClient.setQueryData(loadImageQueryOptions('123', mediaItem).queryKey, image);
+
+        render(
+            <ZoomProvider>
+                <MediaCanvas mediaItem={mediaItem} image={image} />
+            </ZoomProvider>,
+            { queryClient }
+        );
+
+        expect(screen.getByTestId('media-canvas')).toHaveAttribute('aria-busy', 'false');
     });
 });

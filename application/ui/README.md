@@ -122,6 +122,26 @@ npm run test:e2e           # E2E tests (Playwright against real backend)
 Run a single unit test: `npm run test:unit -- src/path/to/file.test.tsx`
 Run a single Playwright spec: `npm run test:component -- tests/path/to/file.spec.ts`
 
+### Running E2E tests
+
+E2E tests in `tests/e2e/` drive a real backend, and train and quantize a model, so a full run takes several minutes.
+The target is selected with the `GETI_BASE_URL` environment variable:
+
+- **Remote or staging backend**: set `GETI_BASE_URL` to the URL where the backend serves the UI. No local dev server is
+  started, and self-signed certificates are accepted for `https://` URLs.
+
+    ```bash
+    GETI_BASE_URL=https://<host>:<port> npm run test:e2e
+    GETI_BASE_URL=https://<host>:<port> npm run test:e2e -- tests/e2e/your-test.spec.ts
+    ```
+
+- **Local backend**: leave `GETI_BASE_URL` unset. Start the backend first (`just run-server` from
+  `application/backend/`); Playwright then starts `npm run start` on port 3000, which calls the API at
+  `https://localhost:7860`.
+
+Outside CI the browser runs headed. Traces and videos are kept for failed or retried tests under `test-results/`; open
+the report with `npx playwright show-report`.
+
 ### Internationalization
 
 The UI uses i18next and react-i18next for internationalization. English is the
