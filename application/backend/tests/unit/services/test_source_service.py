@@ -1,9 +1,11 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 from pathlib import Path
+from unittest.mock import MagicMock
 from uuid import UUID, uuid4
 
 import pytest
+from sqlalchemy.orm import Session
 
 from app.models import SourceType
 from app.models.source import SourceAdapter, VideoFileConfig
@@ -19,7 +21,7 @@ def fxt_source_media_service(tmp_path: Path) -> SourceMediaService:
 
 @pytest.fixture
 def fxt_source_service(fxt_source_media_service: SourceMediaService) -> SourceService:
-    return SourceService(db_session=None, source_media_service=fxt_source_media_service)
+    return SourceService(db_session=MagicMock(spec=Session), source_media_service=fxt_source_media_service)
 
 
 def _store_upload(source_media_dir: Path, filename: str) -> Path:
@@ -46,8 +48,13 @@ def _video_file_source(video_path: str):
 
 
 class TestDeleteUnreferencedMedia:
-    def test_deletes_unreferenced_upload(self, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch):
-        source_media_dir = fxt_source_service._source_media_service._source_media_dir
+    def test_deletes_unreferenced_upload(
+        self,
+        fxt_source_media_service: SourceMediaService,
+        fxt_source_service: SourceService,
+        monkeypatch: pytest.MonkeyPatch,
+    ):
+        source_media_dir = fxt_source_media_service._source_media_dir
         upload_path = _store_upload(source_media_dir, "sample.mp4")
         other_path = _store_upload(source_media_dir, "other.mp4")
         referenced_path = _store_upload(source_media_dir, "referenced.mp4")
@@ -61,9 +68,12 @@ class TestDeleteUnreferencedMedia:
         assert referenced_path.is_file()
 
     def test_raises_in_use_and_keeps_file_when_referenced(
-        self, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch
+        self,
+        fxt_source_media_service: SourceMediaService,
+        fxt_source_service: SourceService,
+        monkeypatch: pytest.MonkeyPatch,
     ):
-        source_media_dir = fxt_source_service._source_media_service._source_media_dir
+        source_media_dir = fxt_source_media_service._source_media_dir
         upload_path = _store_upload(source_media_dir, "sample.mp4")
         monkeypatch.setattr(fxt_source_service, "list_all", lambda: [_video_file_source(str(upload_path))])
 
@@ -73,9 +83,12 @@ class TestDeleteUnreferencedMedia:
         assert upload_path.is_file()
 
     def test_detects_equivalent_path_spellings(
-        self, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch
+        self,
+        fxt_source_media_service: SourceMediaService,
+        fxt_source_service: SourceService,
+        monkeypatch: pytest.MonkeyPatch,
     ):
-        source_media_dir = fxt_source_service._source_media_service._source_media_dir
+        source_media_dir = fxt_source_media_service._source_media_dir
         upload_path = _store_upload(source_media_dir, "sample.mp4")
         # Same location, but spelled with a '..' segment: a raw-string comparison would
         # miss it, a resolved-path comparison must not.
@@ -88,11 +101,14 @@ class TestDeleteUnreferencedMedia:
         assert upload_path.is_file()
 
     def test_restores_upload_when_reference_appears_concurrently(
-        self, fxt_source_service: SourceService, monkeypatch: pytest.MonkeyPatch
+        self,
+        fxt_source_media_service: SourceMediaService,
+        fxt_source_service: SourceService,
+        monkeypatch: pytest.MonkeyPatch,
     ):
         # First reference check passes; a source committing between the check and the
         # deletion must make the endpoint refuse and restore the quarantined upload.
-        source_media_dir = fxt_source_service._source_media_service._source_media_dir
+        source_media_dir = fxt_source_media_service._source_media_dir
         upload_path = _store_upload(source_media_dir, "sample.mp4")
         list_all_results = iter([[], [_video_file_source(str(upload_path))]])
         monkeypatch.setattr(fxt_source_service, "list_all", lambda: next(list_all_results))
@@ -121,7 +137,7 @@ class TestDeleteUnreferencedMedia:
             fxt_source_service.delete_unreferenced_media(uuid4())
 
     def test_raises_not_found_without_media_service(self):
-        source_service = SourceService(db_session=None, source_media_service=None)
+        source_service = SourceService(db_session=MagicMock(spec=Session), source_media_service=None)
 
         with pytest.raises(ResourceNotFoundError):
             source_service.delete_unreferenced_media(uuid4())
