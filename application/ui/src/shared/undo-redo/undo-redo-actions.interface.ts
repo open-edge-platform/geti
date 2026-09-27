@@ -9,3 +9,5 @@ export interface UndoRedoActions<State = unknown> {
     redo(): void;
     reset(state?: State): void;
 }
+
+export type UndoRedoControls = Pick<UndoRedoActions, 'canUndo' | 'canRedo' | 'undo' | 'redo'>;

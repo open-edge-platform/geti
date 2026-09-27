@@ -6,10 +6,12 @@ import { dimensionValue } from '@geti-ui/ui';
 import {
     Bar,
     BarChart,
+    BarShapeProps,
     CartesianGrid,
     Label,
     LabelList,
     LabelProps,
+    Rectangle,
     ResponsiveContainer,
     Tooltip,
     XAxis,
@@ -113,7 +115,17 @@ export const DatasetLabelsChart = ({ totalItems, instancesPerLabel }: DatasetLab
                     tickLine={false}
                 />
 
-                <Bar dataKey='score' radius={[4, 4, 4, 4]} fill={'color'} barSize={BAR_SIZE}>
+                <Bar
+                    dataKey='score'
+                    radius={[4, 4, 4, 4]}
+                    fill={'color'}
+                    barSize={BAR_SIZE}
+                    shape={(props: BarShapeProps) => (
+                        <g role='img' aria-label={`${props.payload.label}: ${props.payload.score}`}>
+                            <Rectangle {...props} />
+                        </g>
+                    )}
+                >
                     <LabelList
                         dataKey='score'
                         position='insideRight'

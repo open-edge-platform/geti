@@ -102,7 +102,15 @@ export class ProjectPage {
         return this.page.getByLabel(`Project: ${projectName}`);
     }
 
+    async openProject(projectName: string) {
+        await this.getProjectCard(projectName).getByRole('link').click();
+    }
+
     getProjectCards() {
         return this.page.getByLabel(/^Project: /);
+    }
+
+    async waitForProjectList() {
+        await this.getProjectCards().or(this.page.getByLabel('empty list')).first().waitFor();
     }
 }

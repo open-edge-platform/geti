@@ -142,6 +142,13 @@
       matchDatasources: ["pypi", "node-version", "crate"],
     },
 
+    // Git-pinned deps in tool.uv.sources are updated manually
+    {
+      enabled: false,
+      matchManagers: ["pep621"],
+      matchDepTypes: ["tool.uv.sources"],
+    },
+
     // Disable non-security and lock file upgrades for npm
     // Lock is updated manually
     {

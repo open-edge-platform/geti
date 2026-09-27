@@ -178,4 +178,9 @@ export class AnnotatorPage {
     getMediaCanvasLoading() {
         return this.page.getByRole('progressbar', { name: 'Media canvas loading' });
     }
+
+    // The loading spinner only shows after a delay, so it can be hidden while the image is still loading.
+    async waitForMediaLoaded(timeout?: number) {
+        await expect(this.page.getByTestId('media-canvas')).toHaveAttribute('aria-busy', 'false', { timeout });
+    }
 }

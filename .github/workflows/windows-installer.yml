@@ -88,7 +88,7 @@ jobs:
 
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
@@ -140,7 +140,7 @@ jobs:
       # Install and setup build tools
 
       - name: Install Python, uv and Just
-        uses: ./.github/actions/install-common-deps
+        uses: $/.github/actions/install-common-deps
         with:
           uv-version-file: application/backend/pyproject.toml
 
@@ -454,12 +454,14 @@ jobs:
       - name: Build PyAV wheel from source
         if: steps.pyav_cache.outputs.cache-hit != 'true'
         working-directory: application/backend
+        env:
+          PYAV_VERSION: ${{ steps.pyav_cache_key.outputs.pyav-version }}
         run: |
           $wheelDir = ".pyav-wheel"
           New-Item -ItemType Directory -Force -Path $wheelDir | Out-Null
 
           # Build PyAV from source against our custom FFmpeg
-          $pyavVersion = "${{ steps.pyav_cache_key.outputs.pyav-version }}"
+          $pyavVersion = $env:PYAV_VERSION
           # Pin Cython explicitly (matching the Linux Docker build) rather than
           # letting av's own build-system constraint (cython>=3.1.0,<4) resolve
           # to whatever the latest satisfying release is at build time.
