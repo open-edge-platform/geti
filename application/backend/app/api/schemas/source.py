@@ -227,3 +227,17 @@ class SourceMediaUploadView(BaseModel):
             }
         }
     }
+
+
+class SourceMediaDeletionView(BaseModel):
+    """Response returned after deleting an unreferenced uploaded video file by its UUID."""
+
+    deleted_video_path: str
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "deleted_video_path": "/data/source_media/712750b2-5a82-47ee-8fba-f3dc96cb615d/sample.mp4",
+            }
+        }
+    }
