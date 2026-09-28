@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useTranslation } from '@/i18n';
+
 import {
     annotationInstructions,
     annotationTool,
@@ -12,13 +14,14 @@ import {
 import { AI_SYSTEM_INSTRUCTION, MAX_HISTORY_ITEMS, MAX_TOOL_TURNS } from '../config';
 import { useAiConnection } from '../connection';
 import { assistantRespond, cancelAssistantResponse } from '../transport/assistant-transport';
-import type {
-    ChatAttachment,
-    ChatMessage,
-    ChatStatus,
-    ChatToolCall,
-    ResponsesContentPart,
-    ResponsesItem,
+import {
+    AssistantStoppedError,
+    type ChatAttachment,
+    type ChatMessage,
+    type ChatStatus,
+    type ChatToolCall,
+    type ResponsesContentPart,
+    type ResponsesItem,
 } from '../types';
 
 export interface AiChat {
@@ -37,6 +40,7 @@ const trimHistory = (history: ResponsesItem[]): ResponsesItem[] => {
 };
 
 export const useAiChat = (target: AnnotationTarget): AiChat => {
+    const { t } = useTranslation();
     const connection = useAiConnection();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [status, setStatus] = useState<ChatStatus>('idle');
@@ -73,7 +77,9 @@ export const useAiChat = (target: AnnotationTarget): AiChat => {
             const isCurrent = () => runToken.current === token && !token.cancelled;
             const content: ResponsesContentPart[] = [
                 { type: 'input_text', text },
-                { type: 'input_image', image_url: attachment.dataUrl, detail: 'high' },
+                // Images are already downscaled before attachment, so `auto` keeps
+                // the token bill without sacrificing usable detail.
+                { type: 'input_image', image_url: attachment.dataUrl, detail: 'auto' },
             ];
             history.current = [
                 ...history.current.map((item): ResponsesItem =>
@@ -94,6 +100,7 @@ export const useAiChat = (target: AnnotationTarget): AiChat => {
 
             const run = async () => {
                 for (let turn = 0; turn < MAX_TOOL_TURNS; turn++) {
+                    if (!isCurrent()) throw new AssistantStoppedError();
                     const id = crypto.randomUUID();
                     requestId.current = id;
                     const result = await assistantRespond({
@@ -111,7 +118,7 @@ export const useAiChat = (target: AnnotationTarget): AiChat => {
                             }
                         },
                     });
-                    if (!isCurrent()) throw new Error('Stopped.');
+                    if (!isCurrent()) throw new AssistantStoppedError();
                     if (result.text !== '') {
                         history.current.push({
                             type: 'message',
@@ -134,13 +141,16 @@ export const useAiChat = (target: AnnotationTarget): AiChat => {
                     }));
 
                     for (const call of result.functionCalls) {
+                        // A Stop pressed while one call is still being processed
+                        // must not queue the remaining proposals for application.
+                        if (!isCurrent()) throw new AssistantStoppedError();
                         let output: string;
                         let failed = false;
                         try {
-                            if (call.name !== 'propose_annotations') throw new Error('Unsupported assistant action.');
+                            if (call.name !== 'propose_annotations') throw new Error(t('assistant.unsupportedAction'));
                             const args: unknown = JSON.parse(call.arguments);
                             if (typeof args !== 'object' || args === null || Array.isArray(args)) {
-                                throw new Error('Invalid annotation proposal.');
+                                throw new Error(t('assistant.invalidProposal'));
                             }
                             const proposals = parseAnnotationProposal(args as Record<string, unknown>, target);
                             if (proposals.length > 0) target.apply(proposals);
@@ -148,7 +158,7 @@ export const useAiChat = (target: AnnotationTarget): AiChat => {
                         } catch (error) {
                             failed = true;
                             output = JSON.stringify({
-                                error: error instanceof Error ? error.message : 'Invalid annotation proposal.',
+                                error: error instanceof Error ? error.message : t('assistant.invalidProposal'),
                             });
                         }
                         history.current.push(
@@ -170,14 +180,18 @@ export const useAiChat = (target: AnnotationTarget): AiChat => {
                         }));
                     }
                 }
-                throw new Error('The assistant did not finish the annotation request.');
+                throw new Error(t('assistant.didNotFinish'));
             };
 
             void run()
                 .catch((error: unknown) => {
+                    if (error instanceof AssistantStoppedError) {
+                        updateMessage(answerId, (message) => ({ ...message, stopped: true }));
+                        return;
+                    }
                     updateMessage(answerId, (message) => ({
                         ...message,
-                        error: error instanceof Error ? error.message : 'The assistant request failed.',
+                        error: error instanceof Error ? error.message : t('assistant.requestFailedGeneric'),
                     }));
                 })
                 .finally(() => {
@@ -187,7 +201,7 @@ export const useAiChat = (target: AnnotationTarget): AiChat => {
                     setStatus('idle');
                 });
         },
-        [connection.model, status, target, updateMessage]
+        [connection.model, status, target, t, updateMessage]
     );
 
     return { messages, status, send, stop, clear };

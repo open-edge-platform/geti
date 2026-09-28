@@ -1,8 +1,19 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { FunctionCall, ResponsesContentPart, ResponsesItem, StreamRequest, StreamResult } from '../types';
+import { i18n } from '@/i18n';
+
+import {
+    AssistantConnectionError,
+    AssistantStoppedError,
+    type FunctionCall,
+    type ResponsesContentPart,
+    type ResponsesItem,
+    type StreamRequest,
+    type StreamResult,
+} from '../types';
 import { readStoredKey } from './key-service';
+import { redactSecrets } from './redact';
 import { consumeSse } from './sse';
 
 const ANTHROPIC_MESSAGES_URL = 'https://api.anthropic.com/v1/messages';
@@ -79,7 +90,13 @@ export class AnthropicAssembler {
     constructor(private readonly onDelta: (text: string) => void) {}
 
     accept(payload: string): void {
-        const event = asRecord(JSON.parse(payload));
+        let event: Record<string, unknown>;
+        try {
+            event = asRecord(JSON.parse(payload));
+        } catch {
+            // One malformed event must not discard the whole response.
+            return;
+        }
         if (event.type === 'content_block_start') {
             const index = typeof event.index === 'number' ? event.index : -1;
             const block = asRecord(event.content_block);
@@ -106,7 +123,7 @@ export class AnthropicAssembler {
         } else if (event.type === 'error') {
             const error = asRecord(event.error);
             this.error =
-                typeof error.message === 'string' ? error.message : 'Anthropic could not complete the response.';
+                typeof error.message === 'string' ? error.message : i18n.t('assistant.anthropicCouldNotComplete');
             this.done = true;
         }
     }
@@ -134,12 +151,12 @@ const errorMessage = async (response: Response): Promise<string> => {
     const error = asRecord(asRecord(body).error);
     const message =
         typeof error.message === 'string' ? error.message : `Anthropic request failed (${response.status}).`;
-    return message.replace(/sk-ant-[A-Za-z0-9_-]+/g, '***');
+    return redactSecrets(message);
 };
 
 export const streamAnthropicInBrowser = async (request: StreamRequest): Promise<StreamResult> => {
     const key = readStoredKey('anthropic-api-key');
-    if (key === null || key.trim() === '') throw new Error('Add an Anthropic API key to continue.');
+    if (key === null || key.trim() === '') throw new AssistantConnectionError(i18n.t('assistant.addAnthropicKey'));
     const controller = new AbortController();
     controllers.set(request.requestId, controller);
 
@@ -157,14 +174,14 @@ export const streamAnthropicInBrowser = async (request: StreamRequest): Promise<
             body: JSON.stringify(buildAnthropicBody(request)),
         });
         if (!response.ok) throw new Error(await errorMessage(response));
-        if (response.body === null) throw new Error('Anthropic ended the response unexpectedly.');
+        if (response.body === null) throw new Error(i18n.t('assistant.anthropicEnded'));
         const assembler = new AnthropicAssembler(request.onDelta);
         await consumeSse(response.body, (payload) => assembler.accept(payload));
-        if (assembler.error !== null) throw new Error(assembler.error);
-        if (!assembler.done) throw new Error('Anthropic did not return a completed response.');
+        if (assembler.error !== null) throw new Error(redactSecrets(assembler.error));
+        if (!assembler.done) throw new Error(i18n.t('assistant.anthropicIncomplete'));
         return assembler.result();
     } catch (error) {
-        if (controller.signal.aborted) throw new Error('Stopped.');
+        if (controller.signal.aborted) throw new AssistantStoppedError();
         throw error;
     } finally {
         controllers.delete(request.requestId);

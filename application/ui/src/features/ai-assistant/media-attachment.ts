@@ -1,6 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { i18n } from '@/i18n';
+
 import { ATTACHMENT_MAX_EDGE } from './config';
 import type { ChatAttachment } from './types';
 
@@ -14,7 +16,7 @@ const readAsDataUrl = (blob: Blob): Promise<string> =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();
 
-        reader.onerror = () => reject(new Error('Could not read the image.'));
+        reader.onerror = () => reject(new Error(i18n.t('assistant.mediaReadFailed')));
         reader.onload = () => resolve(String(reader.result));
         reader.readAsDataURL(blob);
     });
@@ -23,7 +25,7 @@ const loadImage = (dataUrl: string): Promise<HTMLImageElement> =>
     new Promise((resolve, reject) => {
         const image = new Image();
 
-        image.onerror = () => reject(new Error('Could not decode the image.'));
+        image.onerror = () => reject(new Error(i18n.t('assistant.mediaDecodeFailed')));
         image.onload = () => resolve(image);
         image.src = dataUrl;
     });
@@ -39,7 +41,7 @@ export const loadMediaAttachment = async (
     const response = await fetch(source.url, { credentials: 'include', signal });
 
     if (!response.ok) {
-        throw new Error(`Could not load "${source.name}".`);
+        throw new Error(i18n.t('assistant.mediaLoadFailed'));
     }
 
     return prepareAttachment(await response.blob(), source.id, source.name);
@@ -73,7 +75,7 @@ const prepareAttachment = async (blob: Blob, id: string, name: string): Promise<
     const context = canvas.getContext('2d');
 
     if (context === null) {
-        throw new Error('Could not resize the image. Try a smaller image.');
+        throw new Error(i18n.t('assistant.imageResizeFailed'));
     }
 
     context.drawImage(image, 0, 0, canvas.width, canvas.height);

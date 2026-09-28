@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { AssistantSwitcher } from '@/features/ai-assistant/components/assistant-switcher.component';
 import { ConnectionSettings } from '@/features/ai-assistant/components/connection-settings.component';
+import { useTranslation } from '@/i18n';
 import {
     ActionButton,
     Button,
@@ -56,11 +57,17 @@ const initialProgress: BatchAnnotationProgress = {
     current: '',
 };
 
-const VIDEO_SAMPLING_OPTIONS: { key: string; rate: VideoFramesPerSecond; label: string }[] = [
-    { key: '1', rate: 1, label: '1 frame/s (recommended)' },
-    { key: '2', rate: 2, label: '2 frames/s' },
-    { key: '5', rate: 5, label: '5 frames/s (dense)' },
-    { key: '10', rate: 10, label: '10 frames/s (high cost)' },
+type VideoSamplingLabelKey =
+    | 'assistant.videoSamplingOption1'
+    | 'assistant.videoSamplingOption2'
+    | 'assistant.videoSamplingOption5'
+    | 'assistant.videoSamplingOption10';
+
+const VIDEO_SAMPLING_OPTIONS: { key: string; rate: VideoFramesPerSecond; labelKey: VideoSamplingLabelKey }[] = [
+    { key: '1', rate: 1, labelKey: 'assistant.videoSamplingOption1' },
+    { key: '2', rate: 2, labelKey: 'assistant.videoSamplingOption2' },
+    { key: '5', rate: 5, labelKey: 'assistant.videoSamplingOption5' },
+    { key: '10', rate: 10, labelKey: 'assistant.videoSamplingOption10' },
 ];
 
 export const BatchAnnotationDialog = ({
@@ -68,6 +75,7 @@ export const BatchAnnotationDialog = ({
     resolveAllMediaIds,
     onClose,
 }: BatchAnnotationDialogProps) => {
+    const { t } = useTranslation();
     const projectId = useProjectIdentifier();
     const { data: project } = useProject();
     const queryClient = useQueryClient();
@@ -117,8 +125,8 @@ export const BatchAnnotationDialog = ({
 
         try {
             const resolvedIds = isSelection ? selectedMediaIds : await resolveAllMediaIds();
-            if (resolvedIds === null) throw new Error('Dataset filters changed. Start the annotation run again.');
-            if (resolvedIds.length === 0) throw new Error('There is no media to annotate.');
+            if (resolvedIds === null) throw new Error(t('assistant.filtersChanged'));
+            if (resolvedIds.length === 0) throw new Error(t('assistant.noMedia'));
             const batchResult = await runBatchAnnotation({
                 projectId,
                 project,
@@ -131,7 +139,7 @@ export const BatchAnnotationDialog = ({
             setResult(batchResult);
             if (batchResult.completed > 0) await invalidateDatasetQueries();
         } catch (reason) {
-            setError(reason instanceof Error ? reason.message : 'The annotation run could not be started.');
+            setError(reason instanceof Error ? reason.message : t('assistant.startFailed'));
         } finally {
             controller.current = null;
             setIsRunning(false);
@@ -145,16 +153,17 @@ export const BatchAnnotationDialog = ({
 
     const total = Math.max(progress.total, 1);
     const isWaitingForFirstResult = progress.phase === 'annotating' && progress.completed === 0;
-    const runningSummary = [
-        `${progress.succeeded} completed`,
-        `${progress.failed} failed`,
-        `${progress.skipped} skipped`,
-        `${progress.annotationsAdded} annotations added`,
-    ].join(', ');
+    const runSummary = (value: { succeeded: number; failed: number; skipped: number; annotationsAdded: number }) =>
+        t('assistant.runSummary', {
+            succeeded: value.succeeded,
+            failed: value.failed,
+            skipped: value.skipped,
+            annotationsAdded: value.annotationsAdded,
+        });
 
     return (
         <Dialog width={640} minHeight={400}>
-            <Heading>Annotate with AI</Heading>
+            <Heading>{t('assistant.title')}</Heading>
             <Divider />
             <Content>
                 <Flex direction='column' gap='size-200'>
@@ -163,8 +172,8 @@ export const BatchAnnotationDialog = ({
                             <Flex alignItems='center' justifyContent='space-between' gap='size-200'>
                                 <Text>
                                     {isSelection
-                                        ? `${selectedMediaIds.length} selected media`
-                                        : 'Current filtered dataset'}
+                                        ? t('assistant.selectedMediaCount', { count: selectedMediaIds.length })
+                                        : t('assistant.currentFilteredDataset')}
                                 </Text>
                                 <Flex alignItems='center' gap='size-100'>
                                     <AssistantSwitcher />
@@ -177,17 +186,17 @@ export const BatchAnnotationDialog = ({
                                         >
                                             <Gear />
                                         </ActionButton>
-                                        <Tooltip>Connection settings</Tooltip>
+                                        <Tooltip>{t('assistant.connectionSettings')}</Tooltip>
                                     </TooltipTrigger>
                                 </Flex>
                             </Flex>
                             <Checkbox isSelected={onlyUnannotated} onChange={setOnlyUnannotated}>
-                                Only media without annotations
+                                {t('assistant.onlyUnannotated')}
                             </Checkbox>
                             <Flex alignItems='end' gap='size-150'>
                                 <Picker
                                     flex={1}
-                                    label='Video sampling'
+                                    label={t('assistant.videoSampling')}
                                     selectedKey={String(videoFramesPerSecond)}
                                     onSelectionChange={(key: Key | null) => {
                                         if (key !== null) {
@@ -196,13 +205,11 @@ export const BatchAnnotationDialog = ({
                                         }
                                     }}
                                 >
-                                    {VIDEO_SAMPLING_OPTIONS.map(({ key, label }) => (
-                                        <Item key={key}>{label}</Item>
+                                    {VIDEO_SAMPLING_OPTIONS.map(({ key, labelKey }) => (
+                                        <Item key={key}>{t(labelKey)}</Item>
                                     ))}
                                 </Picker>
-                                <Text UNSAFE_className={classes.samplingHint}>
-                                    Applies to every video in this run. Higher rates use more API calls.
-                                </Text>
+                                <Text UNSAFE_className={classes.samplingHint}>{t('assistant.videoSamplingHint')}</Text>
                             </Flex>
                             {settingsOpen && <ConnectionSettings status={connectionStatus} />}
                         </>
@@ -211,7 +218,11 @@ export const BatchAnnotationDialog = ({
                     {isRunning && (
                         <>
                             <ProgressBar
-                                label={progress.phase === 'preparing' ? 'Preparing media' : 'Annotating media'}
+                                label={
+                                    progress.phase === 'preparing'
+                                        ? t('assistant.preparingMedia')
+                                        : t('assistant.annotatingMedia')
+                                }
                                 value={progress.completed}
                                 maxValue={total}
                                 isIndeterminate={isWaitingForFirstResult}
@@ -221,18 +232,29 @@ export const BatchAnnotationDialog = ({
                                 <span className={classes.activityDot} aria-hidden='true' />
                                 <Text UNSAFE_className={classes.currentItem}>{progress.current}</Text>
                             </div>
-                            <Text>{runningSummary}</Text>
+                            <Text>
+                                {runSummary({
+                                    succeeded: progress.succeeded,
+                                    failed: progress.failed,
+                                    skipped: progress.skipped,
+                                    annotationsAdded: progress.annotationsAdded,
+                                })}
+                            </Text>
                         </>
                     )}
 
                     {result !== null && (
                         <>
                             <Heading level={4} margin={0}>
-                                {result.cancelled ? 'Annotation stopped' : 'Annotation complete'}
+                                {result.cancelled ? t('assistant.runStopped') : t('assistant.runComplete')}
                             </Heading>
                             <Text>
-                                {result.succeeded} completed, {result.skipped} skipped, {result.failed} failed,{' '}
-                                {result.annotationsAdded} annotations added
+                                {runSummary({
+                                    succeeded: result.succeeded,
+                                    failed: result.failed,
+                                    skipped: result.skipped,
+                                    annotationsAdded: result.annotationsAdded,
+                                })}
                             </Text>
                             {result.failures.length > 0 && (
                                 <div className={classes.failures}>
@@ -242,6 +264,11 @@ export const BatchAnnotationDialog = ({
                                             <span>{failure.message}</span>
                                         </div>
                                     ))}
+                                    {result.failures.length > 5 && (
+                                        <div className={classes.failureMore}>
+                                            {t('assistant.moreFailures', { count: result.failures.length - 5 })}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </>
@@ -249,7 +276,7 @@ export const BatchAnnotationDialog = ({
 
                     {error !== null && (
                         <InlineAlert variant='negative' width='100%'>
-                            <Heading>Annotation failed</Heading>
+                            <Heading>{t('assistant.runFailed')}</Heading>
                             <Content>{error}</Content>
                         </InlineAlert>
                     )}
@@ -258,23 +285,36 @@ export const BatchAnnotationDialog = ({
             <ButtonGroup>
                 {isRunning ? (
                     <Button variant='secondary' onPress={() => controller.current?.abort()}>
-                        Cancel
+                        {t('common.actions.cancel')}
                     </Button>
                 ) : result !== null ? (
-                    <Button variant='accent' onPress={close}>
-                        Close
-                    </Button>
-                ) : (
                     <>
                         <Button variant='secondary' onPress={close}>
-                            Cancel
+                            {t('common.actions.close')}
                         </Button>
                         <Button
                             variant='accent'
                             onPress={start}
-                            isDisabled={!connectionStatus.isReady || connectionStatus.isLoading}
+                            isDisabled={
+                                !connectionStatus.isReady || connectionStatus.isLoading || project === undefined
+                            }
                         >
-                            Start annotation
+                            {t('assistant.runAgain')}
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button variant='secondary' onPress={close}>
+                            {t('common.actions.cancel')}
+                        </Button>
+                        <Button
+                            variant='accent'
+                            onPress={start}
+                            isDisabled={
+                                !connectionStatus.isReady || connectionStatus.isLoading || project === undefined
+                            }
+                        >
+                            {t('assistant.startAnnotation')}
                         </Button>
                     </>
                 )}

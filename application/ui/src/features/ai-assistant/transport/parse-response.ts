@@ -1,10 +1,12 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { i18n } from '@/i18n';
+
 import type { FunctionCall, StreamResult } from '../types';
 
 /** Message shown when a desktop-only transport is reached from the web build. */
-export const DESKTOP_ONLY_MESSAGE = 'The Geti assistant is only available in the desktop application.';
+export const desktopOnlyMessage = (): string => i18n.t('assistant.desktopOnly');
 
 const asRecord = (value: unknown): Record<string, unknown> =>
     typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {};

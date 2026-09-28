@@ -33,7 +33,7 @@ export const AnnotateButton = ({
 
     return (
         <>
-            <div className={classes.splitButton} role='group' aria-label={t('common.actions.annotate')}>
+            <div className={classes.splitButton} role='group' aria-label='Annotate'>
                 <Button
                     margin={0}
                     variant='primary'
@@ -54,7 +54,7 @@ export const AnnotateButton = ({
                         <ChevronDownSmall />
                     </Button>
                     <Menu onAction={handleMenuAction} aria-label='Annotate options menu'>
-                        <Item key='ai'>Annotate with AI</Item>
+                        <Item key='ai'>{t('assistant.title')}</Item>
                     </Menu>
                 </MenuTrigger>
             </div>

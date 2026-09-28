@@ -1,21 +1,62 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type KeyboardEvent } from 'react';
 
-import { Button, ComboBox, Content, Flex, InlineAlert, Item, Section, Text, TextField } from '@geti-ui/ui';
+import { useTranslation } from '@/i18n';
+import { Button, ComboBox, Content, Flex, InlineAlert, Item, Section, Text, TextField, type Key } from '@geti-ui/ui';
 
 import { availableAgentsForVendor, getAiAgent } from '../agents';
 import { groupModelIds, type AiModelGroup } from '../config';
 import { setAiAgent, setAiConnection, useAiConnection } from '../connection';
 import type { ConnectionStatus } from '../hooks/use-connection-status';
+import { hasSecureAiBackend } from '../platform';
 import { claudeLogin, claudeLogout, pickClaudeBinary } from '../transport/claude-transport';
 import { codexLogin, codexLogout, codexModels, pickCodexBinary } from '../transport/codex-transport';
 import { deleteKey, saveKey } from '../transport/key-service';
 
 import classes from './assistant.module.scss';
 
+const ModelSelector = ({ groups }: { groups: readonly AiModelGroup[] }) => {
+    const { t } = useTranslation();
+    const connection = useAiConnection();
+    const [draftModel, setDraftModel] = useState(connection.model);
+
+    // The combobox edits a draft; the connection (and localStorage) is only
+    // touched when a model is chosen or the dropdown closes with new text.
+    useEffect(() => {
+        setDraftModel(connection.model);
+    }, [connection.model]);
+
+    return (
+        <ComboBox
+            width='100%'
+            allowsCustomValue
+            label={t('common.labels.model')}
+            inputValue={draftModel}
+            onInputChange={(model: string) => setDraftModel(model)}
+            onSelectionChange={(model: Key | null) => {
+                if (model !== null) setAiConnection({ model: String(model) });
+            }}
+            onOpenChange={(isOpen: boolean) => {
+                if (!isOpen && draftModel !== connection.model) {
+                    setAiConnection({ model: draftModel });
+                }
+            }}
+        >
+            {groups.map((group) => (
+                <Section key={group.label} title={group.label}>
+                    {group.models.map((model) => (
+                        <Item key={model}>{model}</Item>
+                    ))}
+                </Section>
+            ))}
+        </ComboBox>
+    );
+};
+
 const ApiSettings = ({ status }: { status: ConnectionStatus }) => {
+    const { t } = useTranslation();
     const connection = useAiConnection();
     const agent = getAiAgent(connection.agentId);
     const [key, setKey] = useState('');
@@ -32,7 +73,7 @@ const ApiSettings = ({ status }: { status: ConnectionStatus }) => {
                 status.refresh();
             })
             .catch((reason: unknown) => {
-                setError(reason instanceof Error ? reason.message : 'The API key could not be stored.');
+                setError(reason instanceof Error ? reason.message : t('assistant.keyStoreFailed'));
             })
             .finally(() => setIsSaving(false));
     };
@@ -41,17 +82,18 @@ const ApiSettings = ({ status }: { status: ConnectionStatus }) => {
         void deleteKey(account)
             .then(status.refresh)
             .catch((reason: unknown) => {
-                setError(reason instanceof Error ? reason.message : 'The API key could not be removed.');
+                setError(reason instanceof Error ? reason.message : t('assistant.keyRemoveFailed'));
             });
     };
 
     return (
         <Flex direction='column' gap='size-150'>
+            {!hasSecureAiBackend() && <Text>{t('assistant.webKeyWarning')}</Text>}
             {status.isReady ? (
                 <Flex alignItems='center' justifyContent='space-between' gap='size-100'>
-                    <Text>API key connected</Text>
+                    <Text>{t('assistant.apiKeyConnected')}</Text>
                     <Button variant='secondary' onPress={remove}>
-                        Remove
+                        {t('common.actions.remove')}
                     </Button>
                 </Flex>
             ) : (
@@ -59,7 +101,9 @@ const ApiSettings = ({ status }: { status: ConnectionStatus }) => {
                     <TextField
                         width='100%'
                         type='password'
-                        label={`${agent.vendor === 'openai' ? 'OpenAI' : 'Anthropic'} API key`}
+                        label={t('assistant.apiKeyLabel', {
+                            vendor: agent.vendor === 'openai' ? 'OpenAI' : 'Anthropic',
+                        })}
                         value={key}
                         onChange={setKey}
                     />
@@ -70,25 +114,11 @@ const ApiSettings = ({ status }: { status: ConnectionStatus }) => {
                         isPending={isSaving}
                         isDisabled={key.trim() === ''}
                     >
-                        Save key
+                        {t('assistant.saveKey')}
                     </Button>
                 </Flex>
             )}
-            <ComboBox
-                width='100%'
-                allowsCustomValue
-                label='Model'
-                inputValue={connection.model}
-                onInputChange={(model: string) => setAiConnection({ model })}
-            >
-                {agent.modelGroups.map((group: AiModelGroup) => (
-                    <Section key={group.label} title={group.label}>
-                        {group.models.map((model) => (
-                            <Item key={model}>{model}</Item>
-                        ))}
-                    </Section>
-                ))}
-            </ComboBox>
+            <ModelSelector groups={agent.modelGroups} />
             {error !== null && (
                 <InlineAlert variant='negative' width='100%'>
                     <Content>{error}</Content>
@@ -99,19 +129,35 @@ const ApiSettings = ({ status }: { status: ConnectionStatus }) => {
 };
 
 const AppSettings = ({ status }: { status: ConnectionStatus }) => {
+    const { t } = useTranslation();
     const connection = useAiConnection();
     const agent = getAiAgent(connection.agentId);
     const [isBusy, setIsBusy] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [models, setModels] = useState<string[]>([]);
+    const [executable, setExecutable] = useState(connection.executable);
     const modelGroups = groupModelIds(models);
+
+    useEffect(() => {
+        setExecutable(connection.executable);
+    }, [connection.executable]);
+
+    const commitExecutable = () => {
+        if (executable !== connection.executable) {
+            setAiConnection({ executable });
+        }
+    };
 
     useEffect(() => {
         if (agent.id !== 'openai-app' || !status.isReady) return;
         let active = true;
-        void codexModels().then((items) => {
-            if (active) setModels(items.map(({ id }) => id));
-        });
+        void codexModels()
+            .then((items) => {
+                if (active) setModels(items.map(({ id }) => id));
+            })
+            .catch((reason: unknown) => {
+                console.error('[assistant] the ChatGPT model lookup failed', reason);
+            });
         return () => {
             active = false;
         };
@@ -123,7 +169,11 @@ const AppSettings = ({ status }: { status: ConnectionStatus }) => {
         void action()
             .then(status.refresh)
             .catch((reason: unknown) => {
-                setError(reason instanceof Error ? reason.message : `${agent.name} could not be reached.`);
+                setError(
+                    reason instanceof Error
+                        ? reason.message
+                        : t('assistant.agentUnreachable', { assistant: agent.name })
+                );
             })
             .finally(() => setIsBusy(false));
     };
@@ -132,9 +182,14 @@ const AppSettings = ({ status }: { status: ConnectionStatus }) => {
     const logout = () => (agent.id === 'openai-app' ? codexLogout() : claudeLogout());
     const browse = () => {
         const pick = agent.id === 'openai-app' ? pickCodexBinary : pickClaudeBinary;
-        void pick().then((path) => {
-            if (path !== null) setAiConnection({ executable: path });
-        });
+        // The dialog rejects when the user dismisses it, which is not an error.
+        void pick()
+            .then((path) => {
+                if (path !== null) setAiConnection({ executable: path });
+            })
+            .catch((reason: unknown) => {
+                console.error('[assistant] the executable picker failed', reason);
+            });
     };
 
     return (
@@ -142,44 +197,33 @@ const AppSettings = ({ status }: { status: ConnectionStatus }) => {
             <Flex alignItems='center' justifyContent='space-between' gap='size-100'>
                 <Text>
                     {status.isReady
-                        ? `Connected${status.account?.email ? ` as ${status.account.email}` : ''}`
-                        : 'Not connected'}
+                        ? status.account?.email
+                            ? t('assistant.connectedAs', { email: status.account.email })
+                            : t('assistant.connected')
+                        : t('assistant.notConnected')}
                 </Text>
                 <Button
                     variant={status.isReady ? 'secondary' : 'accent'}
                     isPending={isBusy || status.isLoading}
                     onPress={() => run(status.isReady ? logout : login)}
                 >
-                    {status.isReady ? 'Sign out' : 'Sign in'}
+                    {status.isReady ? t('assistant.signOut') : t('assistant.signIn')}
                 </Button>
             </Flex>
             <Flex alignItems='end' gap='size-100'>
                 <TextField
                     flex={1}
-                    label={`${agent.name} location`}
-                    placeholder='Detected automatically'
-                    value={connection.executable}
-                    onChange={(executable: string) => setAiConnection({ executable })}
+                    label={t('assistant.executableLabel', { assistant: agent.name })}
+                    placeholder={t('assistant.executablePlaceholder')}
+                    value={executable}
+                    onChange={(value: string) => setExecutable(value)}
+                    onBlur={commitExecutable}
                 />
                 <Button variant='secondary' onPress={browse}>
-                    Browse
+                    {t('assistant.browse')}
                 </Button>
             </Flex>
-            <ComboBox
-                width='100%'
-                allowsCustomValue
-                label='Model'
-                inputValue={connection.model}
-                onInputChange={(model: string) => setAiConnection({ model })}
-            >
-                {modelGroups.map((group: AiModelGroup) => (
-                    <Section key={group.label} title={group.label}>
-                        {group.models.map((model) => (
-                            <Item key={model}>{model}</Item>
-                        ))}
-                    </Section>
-                ))}
-            </ComboBox>
+            <ModelSelector groups={modelGroups} />
             {error !== null && (
                 <InlineAlert variant='negative' width='100%'>
                     <Content>{error}</Content>
@@ -190,25 +234,46 @@ const AppSettings = ({ status }: { status: ConnectionStatus }) => {
 };
 
 export const ConnectionSettings = ({ status }: { status: ConnectionStatus }) => {
+    const { t } = useTranslation();
     const connection = useAiConnection();
     const agent = getAiAgent(connection.agentId);
     const methods = availableAgentsForVendor(agent.vendor);
 
+    const handleMethodsKeyDown = (event: KeyboardEvent) => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        const group = event.currentTarget as HTMLDivElement;
+        const buttons = Array.from(group.querySelectorAll<HTMLButtonElement>('button[role="radio"]'));
+        const index = buttons.findIndex((button) => button.getAttribute('aria-checked') === 'true');
+        if (index === -1) return;
+        const nextMethod = methods[(index + 1) % methods.length];
+        const nextButton = buttons[(index + 1) % buttons.length];
+        setAiAgent(nextMethod.id);
+        nextButton.focus();
+    };
+
     return (
         <div className={classes.connectionPanel}>
             {methods.length > 1 && (
-                <div className={classes.connectionMethods} role='radiogroup' aria-label='Connection method'>
+                <div
+                    className={classes.connectionMethods}
+                    role='radiogroup'
+                    aria-label='Connection method'
+                    tabIndex={-1}
+                    onKeyDown={handleMethodsKeyDown}
+                >
                     {methods.map((method) => (
                         <button
                             key={method.id}
                             type='button'
                             role='radio'
                             aria-checked={method.id === agent.id}
+                            tabIndex={method.id === agent.id ? 0 : -1}
                             className={classes.connectionMethod}
                             onClick={() => setAiAgent(method.id)}
                         >
                             <strong>{method.name}</strong>
-                            <span>{method.method === 'api' ? 'API key' : 'Desktop app'}</span>
+                            <span>{method.method === 'api' ? t('assistant.methodApi') : t('assistant.methodApp')}</span>
                         </button>
                     ))}
                 </div>

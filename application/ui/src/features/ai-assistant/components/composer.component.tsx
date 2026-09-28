@@ -3,6 +3,7 @@
 
 import { useState, type KeyboardEvent } from 'react';
 
+import { useTranslation } from '@/i18n';
 import { Button, Flex, TextArea } from '@geti-ui/ui';
 
 import { MAX_INPUT_CHARS } from '../config';
@@ -19,6 +20,7 @@ interface ComposerProps {
 }
 
 export const Composer = ({ attachment, status, isDisabled, onSend, onStop }: ComposerProps) => {
+    const { t } = useTranslation();
     const [text, setText] = useState('');
     const isBusy = status === 'busy';
 
@@ -45,7 +47,7 @@ export const Composer = ({ attachment, status, isDisabled, onSend, onStop }: Com
                 width='100%'
                 height='size-1000'
                 aria-label='Annotation request'
-                placeholder='Describe what to annotate...'
+                placeholder={t('assistant.composerPlaceholder')}
                 value={text}
                 onChange={setText}
                 onKeyDown={handleKeyDown}
@@ -53,7 +55,7 @@ export const Composer = ({ attachment, status, isDisabled, onSend, onStop }: Com
                 isDisabled={isDisabled}
             />
             <Button alignSelf='end' variant={isBusy ? 'secondary' : 'accent'} onPress={isBusy ? onStop : submit}>
-                {isBusy ? 'Stop' : 'Send'}
+                {isBusy ? t('assistant.stop') : t('assistant.send')}
             </Button>
         </Flex>
     );

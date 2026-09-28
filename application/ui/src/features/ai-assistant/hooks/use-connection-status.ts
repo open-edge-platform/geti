@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
+import { useTranslation } from '@/i18n';
+
 import { getAiAgent } from '../agents';
 import { useAiConnection } from '../connection';
 import { claudeStatus } from '../transport/claude-transport';
@@ -19,6 +21,7 @@ export interface ConnectionStatus {
 }
 
 export const useConnectionStatus = (): ConnectionStatus => {
+    const { t } = useTranslation();
     const connection = useAiConnection();
     const [revision, setRevision] = useState(0);
     const [status, setStatus] = useState<Omit<ConnectionStatus, 'refresh'>>({
@@ -59,8 +62,7 @@ export const useConnectionStatus = (): ConnectionStatus => {
                         isLoading: false,
                         isReady: false,
                         account: null,
-                        error:
-                            error instanceof Error ? error.message : 'The assistant connection could not be checked.',
+                        error: error instanceof Error ? error.message : t('assistant.connectionCheckFailed'),
                     });
                 }
             });
@@ -68,7 +70,7 @@ export const useConnectionStatus = (): ConnectionStatus => {
         return () => {
             active = false;
         };
-    }, [connection.agentId, connection.executable, revision]);
+    }, [connection.agentId, connection.executable, revision, t]);
 
     return { ...status, refresh };
 };

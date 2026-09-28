@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { AssistantAccount, CodexLocation, StreamRequest, StreamResult } from '../types';
-import { DESKTOP_ONLY_MESSAGE } from './parse-response';
+import { desktopOnlyMessage } from './parse-response';
 
 export const claudeStatus = (): Promise<AssistantAccount | null> => Promise.resolve(null);
 export const claudeLocate = (): Promise<CodexLocation> => Promise.resolve({ path: null, searched: [] });
-export const claudeLogin = (): Promise<void> => Promise.reject(new Error(DESKTOP_ONLY_MESSAGE));
+export const claudeLogin = (): Promise<void> => Promise.reject(new Error(desktopOnlyMessage()));
 export const claudeLogout = (): Promise<void> => Promise.resolve();
 export const pickClaudeBinary = (): Promise<string | null> => Promise.resolve(null);
 
 export const claudeRespond = (_request: StreamRequest): Promise<StreamResult> =>
-    Promise.reject(new Error(DESKTOP_ONLY_MESSAGE));
+    Promise.reject(new Error(desktopOnlyMessage()));
 
 export const claudeCancel = (_requestId: string): void => undefined;

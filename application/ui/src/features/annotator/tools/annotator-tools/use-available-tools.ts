@@ -98,8 +98,12 @@ export const useAvailableTools = (): ToolConfig[] => {
     const aiToolConfig: ToolConfig = {
         type: 'ai',
         icon: markForVendor(assistantVendor),
-        label: `Annotate with ${assistantName}`,
+        label: t('annotator.tools.ai.label', { assistant: assistantName }),
+        // ARIA labels stay out of translation, like the other tools'.
         ariaLabel: `Annotate with ${assistantName}`,
+        tooltip: {
+            description: t('annotator.tools.ai.description'),
+        },
     };
 
     const taskToolConfig: Record<string, ToolConfig[]> = {

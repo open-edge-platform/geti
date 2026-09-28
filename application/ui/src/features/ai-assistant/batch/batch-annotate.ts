@@ -3,6 +3,7 @@
 
 import { fetchClient } from '@/api';
 import type { AnnotationDTO, Media, Project } from '@/api/types';
+import { i18n } from '@/i18n';
 
 import { mapLocalAnnotationsToServer } from '../../../shared/annotator/annotation-mappers';
 import { getMediaBinaryUrl, getVideoFrameBinaryUrl } from '../../../shared/media-url.utils';
@@ -16,7 +17,7 @@ import { AI_SYSTEM_INSTRUCTION } from '../config';
 import { getAiConnection } from '../connection';
 import { loadMediaAttachment, type MediaAttachmentSource } from '../media-attachment';
 import { assistantRespond, cancelAssistantResponse } from '../transport/assistant-transport';
-import { AssistantConnectionError, type ResponsesItem } from '../types';
+import { AssistantConnectionError, AssistantStoppedError, type ResponsesItem } from '../types';
 
 interface BatchWorkItem {
     key: string;
@@ -79,13 +80,12 @@ const throwIfAborted = (signal: AbortSignal): void => {
 };
 
 const isAbortError = (error: unknown): boolean =>
-    (error instanceof DOMException && error.name === 'AbortError') ||
-    (error instanceof Error && error.message === 'Stopped.');
+    (error instanceof DOMException && error.name === 'AbortError') || error instanceof AssistantStoppedError;
 
 const errorMessage = (error: unknown): string => {
     if (error instanceof Error) return error.message;
     if (typeof error === 'object' && error !== null && 'detail' in error) return String(error.detail);
-    return 'The item could not be annotated.';
+    return i18n.t('assistant.itemAnnotateFailed');
 };
 
 export const sampleVideoFrameIndexes = (
@@ -136,7 +136,7 @@ const workItemsForMedia = (
 
     const indexes = sampleVideoFrameIndexes(media.frame_count, media.fps, videoFramesPerSecond);
     if (indexes.length === 0) {
-        throw new Error('The video has no frame that the annotations API can save.');
+        throw new Error(i18n.t('assistant.noSavableFrame'));
     }
 
     return indexes.map((frameIndex) => {
@@ -164,7 +164,7 @@ const getMedia = async (projectId: string, mediaId: string): Promise<Media> => {
         params: { path: { project_id: projectId, media_id: mediaId } },
     });
 
-    if (error !== undefined || data === undefined) throw error ?? new Error('The media item was not found.');
+    if (error !== undefined || data === undefined) throw error ?? new Error(i18n.t('assistant.noMediaFound'));
 
     return data as Media;
 };
@@ -179,7 +179,7 @@ const getExistingAnnotations = async (projectId: string, item: BatchWorkItem): P
         });
 
         if (error !== undefined || data === undefined) {
-            throw error ?? new Error('Existing frame annotations could not be read.');
+            throw error ?? new Error(i18n.t('assistant.frameAnnotationsReadFailed'));
         }
 
         const frame = data.find(({ frame_index }) => frame_index === item.frameIndex);
@@ -196,7 +196,7 @@ const getExistingAnnotations = async (projectId: string, item: BatchWorkItem): P
         }
     );
     if (datasetItemError !== undefined || datasetItem === undefined) {
-        throw datasetItemError ?? new Error('The dataset item could not be read.');
+        throw datasetItemError ?? new Error(i18n.t('assistant.datasetItemReadFailed'));
     }
     if (!datasetItem.user_reviewed) return { annotations: [], isAnnotated: false };
 
@@ -208,7 +208,7 @@ const getExistingAnnotations = async (projectId: string, item: BatchWorkItem): P
     );
 
     if (response.status === 404) return { annotations: [], isAnnotated: false };
-    if (error !== undefined || data === undefined) throw error ?? new Error('Existing annotations could not be read.');
+    if (error !== undefined || data === undefined) throw error ?? new Error(i18n.t('assistant.annotationsReadFailed'));
 
     return { annotations: data.annotations, isAnnotated: true };
 };
@@ -247,7 +247,7 @@ const requestProposals = async (
             role: 'user',
             content: [
                 { type: 'input_text', text: prompt },
-                { type: 'input_image', image_url: attachment.dataUrl, detail: 'high' },
+                { type: 'input_image', image_url: attachment.dataUrl, detail: 'auto' },
             ],
         },
     ];
@@ -266,13 +266,13 @@ const requestProposals = async (
         });
         throwIfAborted(signal);
         if (response.functionCalls.length === 0) {
-            throw new Error('The assistant did not return an annotation proposal.');
+            throw new Error(i18n.t('assistant.noProposal'));
         }
         const proposals = response.functionCalls.flatMap((call) => {
-            if (call.name !== 'propose_annotations') throw new Error('The assistant returned an unsupported action.');
+            if (call.name !== 'propose_annotations') throw new Error(i18n.t('assistant.unsupportedAction'));
             const args: unknown = JSON.parse(call.arguments);
             if (typeof args !== 'object' || args === null || Array.isArray(args)) {
-                throw new Error('The assistant returned an invalid annotation proposal.');
+                throw new Error(i18n.t('assistant.invalidProposal'));
             }
             return parseAnnotationProposal(args as Record<string, unknown>, target);
         });
@@ -317,10 +317,14 @@ export const runBatchAnnotation = async ({
             annotationsAdded: 0,
             current: mediaId,
         });
+        let media: Media | null = null;
         try {
-            workItems.push(...workItemsForMedia(projectId, await getMedia(projectId, mediaId), videoFramesPerSecond));
+            media = await getMedia(projectId, mediaId);
+            workItems.push(...workItemsForMedia(projectId, media, videoFramesPerSecond));
         } catch (error) {
-            failures.push({ key: mediaId, name: mediaId, message: errorMessage(error) });
+            // The failures table shows media names, so fall back to the id only
+            // when the metadata request itself failed.
+            failures.push({ key: mediaId, name: media?.name ?? mediaId, message: errorMessage(error) });
         }
     }
 
