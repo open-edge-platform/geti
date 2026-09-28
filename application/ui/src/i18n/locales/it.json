@@ -918,7 +918,6 @@
                     "helpTitle": "Selezione di un dataset",
                     "helpDescription": "Scegli i dati da usare per l'addestramento. Seleziona \"Usa dataset attuale\" per addestrare sulla versione più recente di tutti i dati (quello che vedi nella pagina \"Dataset\"). Seleziona una vista del dataset per addestrare solo sui media assegnati a quella vista. Seleziona una revisione del dataset per addestrare esattamente sugli stessi dati (media e annotazioni) di un altro modello.",
                     "sections": {
-                        "current": "Dataset attuale",
                         "views": "Viste del dataset",
                         "revisions": "Revisioni del dataset"
                     }

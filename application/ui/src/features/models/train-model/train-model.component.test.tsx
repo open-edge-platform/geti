@@ -160,6 +160,17 @@ describe('TrainModel', () => {
             expect(screen.getByRole('option', { name: 'Collection Two' })).toBeVisible();
         });
 
+        it('groups views and revisions under a heading, but not the current dataset entry', async () => {
+            render(<TrainModel />);
+
+            fireEvent.click(await screen.findByRole('button', { name: 'Train model' }));
+            fireEvent.click(await screen.findByTestId('select-dataset'));
+
+            expect(await screen.findByRole('group', { name: 'Dataset views' })).toBeVisible();
+            expect(screen.getByRole('option', { name: 'Use current dataset' })).toBeVisible();
+            expect(screen.queryByRole('group', { name: 'Current dataset' })).not.toBeInTheDocument();
+        });
+
         it('preselects the dataset view that is open on the Dataset screen', async () => {
             render(<TrainModel />, {
                 route: `${paths.project.details({ projectId: '123' })}?${DATASET_VIEW_ID_PARAM}=collection-two`,

@@ -75,7 +75,7 @@ const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
     );
 };
 
-export const RunningJobRow = ({ job, onCancel, datasetRevisions, groupBy, modelArchitectures }: RunningJobRowProps) => {
+export const RunningJobRow = ({ job, onCancel, datasetRevisions, modelArchitectures }: RunningJobRowProps) => {
     const { t } = useTranslation();
     useStreamJobStatus(job.job_id);
 
@@ -97,7 +97,6 @@ export const RunningJobRow = ({ job, onCancel, datasetRevisions, groupBy, modelA
                 </>
             }
             actions={onCancel && <CancelRunningJob onCancel={onCancel} job={job} />}
-            groupBy={groupBy}
             datasetRevisions={datasetRevisions}
             modelArchitectures={modelArchitectures}
         />

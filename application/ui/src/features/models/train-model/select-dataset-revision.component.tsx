@@ -8,11 +8,12 @@ import { Content, ContextualHelp, Heading, Item, Picker, Section } from '@geti-u
 
 import { DatasetSource, useTrainModelState } from './train-model-provider.component';
 
+// The current dataset is a single self-describing entry, so it is grouped without a heading.
 const SECTION_TITLE_KEYS = {
-    current: 'models.training.setup.selectDataset.sections.current',
+    current: undefined,
     view: 'models.training.setup.selectDataset.sections.views',
     revision: 'models.training.setup.selectDataset.sections.revisions',
-} as const satisfies Record<DatasetSource['kind'], string>;
+} as const satisfies Record<DatasetSource['kind'], string | undefined>;
 
 export const SelectDatasetRevision = () => {
     const { t } = useTranslation();
@@ -21,11 +22,15 @@ export const SelectDatasetRevision = () => {
     const sections = useMemo(
         () =>
             (['current', 'view', 'revision'] as const)
-                .map((kind) => ({
-                    id: kind,
-                    name: t(SECTION_TITLE_KEYS[kind]),
-                    children: datasetSources.filter((source) => source.kind === kind),
-                }))
+                .map((kind) => {
+                    const titleKey = SECTION_TITLE_KEYS[kind];
+
+                    return {
+                        id: kind,
+                        name: titleKey === undefined ? undefined : t(titleKey),
+                        children: datasetSources.filter((source) => source.kind === kind),
+                    };
+                })
                 .filter(({ children }) => children.length > 0),
         [t, datasetSources]
     );

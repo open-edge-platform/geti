@@ -918,7 +918,6 @@
                     "helpTitle": "Selecionar um dataset",
                     "helpDescription": "Escolha os dados a utilizar para o treino. Selecione \"Utilizar dataset atual\" para treinar com a versão mais recente de todos os dados (o que vê na página \"Dataset\"). Selecione uma vista do dataset para treinar apenas com a multimédia atribuída a essa vista. Selecione uma revisão do dataset para treinar exatamente com os mesmos dados (multimédia e anotações) de outro modelo.",
                     "sections": {
-                        "current": "Dataset atual",
                         "views": "Vistas do dataset",
                         "revisions": "Revisões do dataset"
                     }

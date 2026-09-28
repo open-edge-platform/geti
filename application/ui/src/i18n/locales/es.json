@@ -918,7 +918,6 @@
                     "helpTitle": "Selección de un dataset",
                     "helpDescription": "Elige los datos que quieres usar para el entrenamiento. Selecciona \"Usar el dataset actual\" para entrenar con la versión más reciente de todos los datos (lo que ves en la página \"Dataset\"). Selecciona una vista del dataset para entrenar solo con los archivos multimedia asignados a esa vista. Selecciona una revisión del dataset para entrenar con exactamente los mismos datos (multimedia y anotaciones) que otro modelo.",
                     "sections": {
-                        "current": "Dataset actual",
                         "views": "Vistas del dataset",
                         "revisions": "Revisiones del dataset"
                     }
