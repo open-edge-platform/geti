@@ -18,12 +18,28 @@
 
 </div>
 
-**_Geti™_** is an end-to-end platform for building AI computer vision models.
+**_Geti™_** provides access to one of the largest open-source collections of computer vision models, with an end-to-end workflow for training, optimization, and deployment on Intel® hardware.
 
 Available as a Docker container or native Windows application, Geti™ guides you through the entire model lifecycle—from dataset preparation and training to optimization and deployment.
-Geti™ is optimized for fine-tuning and fast inference across the full Intel® XPU portfolio.
+Fine-tune models on Intel® CPUs and GPUs, then deploy supported models through OpenVINO™ for inference on **Intel® CPUs, GPUs, and NPUs**, including **Intel® Core™ Ultra platforms (Panther Lake)** and **Intel® Arc™ B-series GPUs**. Model and device compatibility follows [OpenVINO™ device support](https://docs.openvino.ai/2026/documentation/compatibility-and-support/supported-devices.html).
 
 The Geti™ application is powered by **_getitune_**, an open-source engine for model training and optimization, which is also available standalone as a Python library. Geti™ and _getitune_ are both developed in this repository, in the [`application`](application/) and [`library`](library/) folders, respectively.
+
+### Explore the model catalog
+
+**Detect objects and segment individual instances with RF-DETR, DINOv3 DETR, EdgeCrafter (ECDet), YOLO, and Mask R-CNN.** Geti™ brings these model families into a workflow for dataset preparation, training, optimization, and deployment.
+
+| Task | Model highlights |
+| --- | --- |
+| **Object detection** — locate objects with bounding boxes | **RF-DETR · DINOv3 DETR · EdgeCrafter (ECDet)**<br>D-FINE · RT-DETR · YOLO11 / YOLO12 / YOLO26 · YOLOX · ATSS · SSD |
+| **Instance segmentation** — outline each object with a pixel mask | **RF-DETR Seg · Mask R-CNN · YOLO11 / YOLO26 Seg**<br>RTMDet Instance |
+| **Image classification** — assign labels to images | DINOv2 · ViT · EfficientNet · MobileNetV3 · YOLO26 Cls<br>Additional backbones through the library's [timm](https://github.com/huggingface/pytorch-image-models) integration |
+
+The Geti™ application supports all three task types above. The standalone `getitune` library also provides **semantic segmentation** (DINOv2, Lite-HRNet, SegNeXt, YOLO26 Sem) and **keypoint detection** (RTMPose), with curated recipes and a unified engine API.
+
+Browse the [detailed model catalog](#key-features) or the library's [supported tasks and model recipes](library/README.md#supported-tasks--models). Model availability depends on the interface and installed dependencies; Ultralytics YOLO models require the optional integration described below.
+
+**[Use the application](#quick-start-with-geti) · [Use the Python library](#quick-start-with-geti-library-getitune)**
 
 <p align="center">
  <img src="assets/model-lifecycle-infinity-light.png" width="600" alt="Geti™ - Learning Cycle"/>
@@ -118,6 +134,7 @@ advanced configuration, dataset support, backend-specific options, and deploymen
 <summary>🏆 State-of-the-art model catalog</summary>
 
 Train and fine-tune modern architectures such as RF-DETR, DINOv3 DETR, YOLO26, YOLOX, D-FINE, and Mask R-CNN.
+The table below covers the three application task types, including classification backbones available through the library's timm integration. For additional library tasks and recipe names, see [Supported Tasks & Models](library/README.md#supported-tasks--models).
 Would you like to see a specific model added? Let us know by opening a [GitHub issue](https://github.com/open-edge-platform/geti/issues)!
 
 <!-- markdownlint-disable MD060 -->
@@ -141,7 +158,7 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2508.10104">DINOv3</a> + <a href="https://arxiv.org/html/2509.20787v4">DEIMv2</a> + <a href="https://arxiv.org/abs/2005.12872">DETR</a></td>
     </tr>
     <tr>
-      <td>ECDet S / M / L / X</td>
+      <td>EdgeCrafter (ECDet) S / M / L / X</td>
       <td><a href="https://arxiv.org/abs/2603.18739">EdgeCrafter</a></td>
     </tr>
     <tr>
@@ -231,7 +248,7 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
     </tr>
     <tr>
-      <td>Other models from <i>timm</i> (1600+ backbones)</td>
+      <td>Additional classification backbones through the library's <i>timm</i> integration</td>
       <td><a href="https://github.com/huggingface/pytorch-image-models">timm</a></td>
     </tr>
   </tbody>
