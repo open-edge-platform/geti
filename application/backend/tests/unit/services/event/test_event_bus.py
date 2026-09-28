@@ -128,19 +128,15 @@ class TestEventBus:
         handler.assert_called_once_with()
         assert model_reload_event.is_set()
 
-    @pytest.mark.parametrize(
-        "event_type",
-        [EventType.INFERENCE_PARAMS_CHANGED, EventType.LABELS_CHANGED],
-    )
-    def test_inference_params_refresh_without_model_reload(self, event_type: EventType) -> None:
-        """Inference param and label changes refresh the worker state without reloading the model."""
+    def test_inference_params_refresh_without_model_reload(self) -> None:
+        """Inference params (including label colors) refresh the worker without reloading the model."""
         handler = MagicMock(spec=Callable)
         model_reload_event = mp.Event()
         inference_params_event = mp.Event()
         event_bus = EventBus(model_reload_event=model_reload_event, inference_params_event=inference_params_event)
-        event_bus.subscribe(event_types=[event_type], handler=handler)
+        event_bus.subscribe(event_types=[EventType.INFERENCE_PARAMS_CHANGED], handler=handler)
 
-        event_bus.emit_event(event_type)
+        event_bus.emit_event(EventType.INFERENCE_PARAMS_CHANGED)
 
         handler.assert_called_once_with()
         assert inference_params_event.is_set()

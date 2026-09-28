@@ -214,7 +214,7 @@ class TestLabelServiceIntegration:
             ],
         )
 
-        fxt_event_bus.emit_event_after_commit.assert_called_once_with(db_session, EventType.LABELS_CHANGED)
+        fxt_event_bus.emit_event_after_commit.assert_called_once_with(db_session, EventType.INFERENCE_PARAMS_CHANGED)
 
     def test_update_labels_without_color_change_does_not_notify_inference(
         self,

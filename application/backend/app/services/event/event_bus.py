@@ -19,7 +19,6 @@ class EventType(StrEnum):
     PIPELINE_STATUS_CHANGED = "PIPELINE_STATUS_CHANGED"
     INFERENCE_DEVICE_CHANGED = "INFERENCE_DEVICE_CHANGED"
     INFERENCE_PARAMS_CHANGED = "INFERENCE_PARAMS_CHANGED"
-    LABELS_CHANGED = "LABELS_CHANGED"
 
 
 class EventBus(BaseEventBus[EventType]):
@@ -77,7 +76,7 @@ class EventBus(BaseEventBus[EventType]):
 
     @staticmethod
     def _should_notify_inference_params(event_type: EventType) -> bool:
-        return event_type in (EventType.INFERENCE_PARAMS_CHANGED, EventType.LABELS_CHANGED)
+        return event_type == EventType.INFERENCE_PARAMS_CHANGED
 
     def emit_event(self, event_type: EventType) -> None:
         super().emit_event(event_type)

@@ -77,7 +77,7 @@ class LabelService(BaseSessionManagedService):
         requires at least one label). Also validates that labels to remove or edit exist
         in the project before applying changes.
 
-        If any label colour is effectively changed, a ``LABELS_CHANGED`` event is emitted once the
+        If any label colour is effectively changed, an ``INFERENCE_PARAMS_CHANGED`` event is emitted once the
         transaction commits, so that a running inference pipeline refreshes the colours it uses to
         render predictions without having to reload the model.
 
@@ -167,7 +167,7 @@ class LabelService(BaseSessionManagedService):
         if self._event_bus is None:
             return
         logger.debug("Label colors changed for project '{}'; notifying inference pipeline", project_id)
-        self._event_bus.emit_event_after_commit(self.db_session, EventType.LABELS_CHANGED)
+        self._event_bus.emit_event_after_commit(self.db_session, EventType.INFERENCE_PARAMS_CHANGED)
 
     def _update_label(
         self, project_id: UUID, label_id: UUID, new_name: str | None, new_color: str | None, new_hotkey: str | None
