@@ -90,6 +90,8 @@ def _api_fallback_response(app: FastAPI, request: Request) -> JSONResponse:
     allowed_methods = set().union(
         *(methods for specificity, methods in matching_paths if specificity == most_specific_path)
     )
+    if "GET" in allowed_methods:
+        allowed_methods.add("HEAD")
     if not allowed_methods:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Not Found"})
     return JSONResponse(

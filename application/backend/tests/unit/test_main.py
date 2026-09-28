@@ -12,12 +12,15 @@ def test_spa_fallback_does_not_handle_api_paths(tmp_path, monkeypatch):
     client = TestClient(main.create_app())
 
     unsupported_method = client.get("/api/license/accept")
+    get_only_method = client.post("/api/system/info")
     action_method = client.options("/api/sinks/not-a-uuid:test")
     unknown_api_path = client.get("/api/not-a-route")
     frontend_route = client.get("/projects")
 
     assert unsupported_method.status_code == 405
     assert unsupported_method.headers["allow"] == "POST"
+    assert get_only_method.status_code == 405
+    assert get_only_method.headers["allow"] == "GET, HEAD"
     assert action_method.status_code == 405
     assert action_method.headers["allow"] == "POST"
     assert unknown_api_path.status_code == 404
