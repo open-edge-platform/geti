@@ -27,7 +27,6 @@ class ModelCacheEntry:
         variant_id: Identifier of the cached model variant.
         device: Device the model is (being) loaded on.
         xml_path: Path to the OpenVINO IR `.xml` file used to load this entry.
-        size_bytes: Estimated in-memory footprint of the model, in bytes.
         state: Lifecycle state of the entry.
         handle: Loaded model handle, available once the state is READY.
         error: Exception raised by the load, if it failed.
@@ -42,7 +41,6 @@ class ModelCacheEntry:
     variant_id: UUID
     device: DeviceInfo
     xml_path: Path
-    size_bytes: int
     state: EntryState = EntryState.LOADING
     handle: LoadedModelHandle | None = None
     error: BaseException | None = None

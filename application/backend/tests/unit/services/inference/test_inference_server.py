@@ -48,7 +48,6 @@ def _seed_entry(
     variant_id: UUID | None = None,
     device: DeviceInfo = CPU,
     model: Mock | None = None,
-    size_bytes: int = 0,
     state: EntryState = EntryState.READY,
     refcount: int = 0,
     last_used: float | None = None,
@@ -60,7 +59,6 @@ def _seed_entry(
         variant_id=variant_id if variant_id is not None else uuid4(),
         device=device,
         xml_path=Path("model.xml"),
-        size_bytes=size_bytes,
         state=state,
         refcount=refcount,
     )
@@ -251,32 +249,6 @@ class TestInferenceServer:
         assert mock_load.call_count == 3
         mock_unload.assert_called_once_with(evicted_handle)
         assert {e.model_id for e in _cached(server)} == {model_b, model_c}
-
-    def test_memory_budget_evicts_lru(self, tmp_path) -> None:
-        """Loading a model that pushes the estimated memory over the budget evicts the LRU one."""
-        server = InferenceServer(data_dir=Path(tmp_path), max_models=5, max_memory=100)
-        project_id = uuid4()
-        model_a, model_b = uuid4(), uuid4()
-        with _patched_model_service(tmp_path, weights_size=40), _patched_loader() as (mock_load, mock_unload, handles):
-            for model_id in (model_a, model_b):
-                server.infer_batch(project_id=project_id, model_id=model_id, device=CPU, labels=[], inputs=[])
-            evicted_handle = handles[0]
-        mock_unload.assert_called_once_with(evicted_handle)
-        assert [e.model_id for e in _cached(server)] == [model_b]
-        assert [e.size_bytes for e in _cached(server)] == [60]
-
-    def test_memory_budget_never_evicts_the_only_model(self, tmp_path) -> None:
-        """A single model larger than the memory budget is still loaded: the budget is best-effort."""
-        server = InferenceServer(data_dir=Path(tmp_path), max_models=2, max_memory=10)
-        model_id = uuid4()
-        with (
-            _patched_model_service(tmp_path, weights_size=1000),
-            _patched_loader() as (mock_load, mock_unload, _handles),
-        ):
-            server.infer_batch(project_id=uuid4(), model_id=model_id, device=CPU, labels=[], inputs=[])
-        mock_load.assert_called_once()
-        mock_unload.assert_not_called()
-        assert [e.model_id for e in _cached(server)] == [model_id]
 
     def test_in_use_model_is_not_evicted(self, tmp_path, monkeypatch) -> None:
         """An entry that is leased is skipped both when making room and when evicting expired models."""

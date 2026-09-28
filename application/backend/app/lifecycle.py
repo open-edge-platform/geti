@@ -302,8 +302,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
     inference_server = InferenceServer(
         data_dir=settings.data_dir,
         max_models=settings.inference_max_models,
-        max_memory=settings.inference_max_memory,
-        memory_overhead_factor=settings.inference_memory_overhead_factor,
         model_ttl=settings.inference_model_ttl,
     )
     app.state.inference_server = inference_server

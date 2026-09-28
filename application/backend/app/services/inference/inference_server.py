@@ -47,15 +47,14 @@ class _ResolvedVariant:
 
     variant_id: UUID
     xml_path: Path
-    size_bytes: int
 
 
 class InferenceServer:
     """
     Inference Server manages the lifecycle of the models used for inference.
 
-    It keeps a small LRU cache of loaded models (at most `max_models`, and, best-effort, within `max_memory`
-    bytes of estimated memory), loads them on demand, and evicts them once they are no longer needed: either
+    It keeps a small LRU cache of loaded models (at most `max_models`), loads them on demand, and evicts them once
+    they are no longer needed: either
     because the cache is full or because they have been idle for longer than `model_ttl` seconds.
 
     Cache entries are keyed by `(model_id, variant_id)`; requesting an already cached model on a different
@@ -67,23 +66,16 @@ class InferenceServer:
         self,
         data_dir: Path,
         max_models: int = 2,
-        max_memory: int | None = None,
-        memory_overhead_factor: float = 1.5,
         model_ttl: int = 60,
     ) -> None:
         """
         Args:
             data_dir: Root directory holding the model files.
             max_models: Maximum number of models kept loaded at the same time.
-            max_memory: Approximate upper bound, in bytes, on the memory used by the loaded models.
-                None means unlimited. The limit never prevents loading a model when it would be the only one.
-            memory_overhead_factor: Multiplier applied to a model's on-disk size to estimate its memory footprint.
             model_ttl: Time-to-live, in seconds, of an idle model before it is evicted.
         """
         self._data_dir = data_dir
         self._max_models = max_models
-        self._max_memory = max_memory
-        self._memory_overhead_factor = memory_overhead_factor
         self._model_ttl = model_ttl
         # Keyed by `(model_id, variant_id)`, ordered most-recently-used first.
         self._entries: OrderedDict[tuple[UUID, UUID], ModelCacheEntry] = OrderedDict()
@@ -124,7 +116,6 @@ class InferenceServer:
             variant_id=resolved.variant_id,
             device=device,
             xml_path=resolved.xml_path,
-            size_bytes=resolved.size_bytes,
             state=EntryState.LOADING,
             refcount=1,
         )
@@ -271,7 +262,6 @@ class InferenceServer:
             return _ResolvedVariant(
                 variant_id=model_variant.id,
                 xml_path=paths[0],
-                size_bytes=int(model_variant.weights_size * self._memory_overhead_factor),
             )
 
     # --- loading and eviction ---
@@ -294,14 +284,8 @@ class InferenceServer:
             victim: ModelCacheEntry | None = None
             with self._registry_lock:
                 cached = list(self._entries.values())  # MRU-first
-                others = [e for e in cached if e is not entry]
                 over_count = len(cached) > self._max_models
-                over_memory = (
-                    self._max_memory is not None
-                    and sum(e.size_bytes for e in cached) > self._max_memory
-                    and len(others) >= 1  # never enforced down to zero models
-                )
-                if not over_count and not over_memory:
+                if not over_count:
                     return
                 victim = next(
                     (
