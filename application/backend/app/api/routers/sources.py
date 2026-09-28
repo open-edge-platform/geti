@@ -13,7 +13,6 @@ from fastapi.responses import FileResponse, Response
 from pydantic import ValidationError
 
 from app.api.dependencies import get_source, get_source_update_service
-from app.api.schemas.error import APIErrorResponse
 from app.api.schemas.source import SourceCreate, SourceCreateAdapter, SourceView, SourceViewAdapter
 from app.api.schemas.test_result import TestResult
 from app.models import Source
@@ -103,7 +102,7 @@ UPDATE_SOURCE_BODY_EXAMPLES = {
         status.HTTP_201_CREATED: {"description": "Source created"},
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid source ID or request body"},
         status.HTTP_409_CONFLICT: {"description": "Source already exists"},
-        status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": APIErrorResponse, "description": "Source validation failed"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Source validation failed"},
     },
 )
 def create_source(
@@ -165,7 +164,7 @@ def get_source_view(source: Annotated[Source, Depends(get_source)]) -> SourceVie
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid source ID or request body"},
         status.HTTP_404_NOT_FOUND: {"description": "Source not found"},
         status.HTTP_409_CONFLICT: {"description": "Source already exists"},
-        status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": APIErrorResponse, "description": "Source validation failed"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Source validation failed"},
     },
 )
 def update_source(
@@ -237,10 +236,7 @@ def export_source(source: Annotated[Source, Depends(get_source)]) -> Response:
         status.HTTP_201_CREATED: {"description": "Source imported successfully", "model": SourceView},
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid YAML format "},
         status.HTTP_409_CONFLICT: {"description": "Source already exists"},
-        status.HTTP_422_UNPROCESSABLE_CONTENT: {
-            "model": APIErrorResponse,
-            "description": "Validation error(s)",
-        },
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Validation error(s)"},
     },
 )
 def import_source(

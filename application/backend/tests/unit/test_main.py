@@ -38,13 +38,11 @@ def test_uuid_path_parameters_are_documented_as_uuids():
     assert project_id["schema"]["format"] == "uuid"
 
 
-def test_api_error_schemas_cover_business_and_request_validation_errors():
+def test_sink_response_schema_remains_unambiguous():
     schema = main.create_app().openapi()
-    error_response = schema["components"]["schemas"]["APIErrorResponse"]
-    detail_types = {item.get("type") for item in error_response["properties"]["detail"]["anyOf"]}
     sink_items = schema["paths"]["/api/sinks"]["get"]["responses"]["200"]["content"]["application/json"]["schema"][
         "items"
     ]["oneOf"]
 
-    assert detail_types == {"array", "string"}
+    assert "APIErrorResponse" not in schema["components"]["schemas"]
     assert len(sink_items) == 5
