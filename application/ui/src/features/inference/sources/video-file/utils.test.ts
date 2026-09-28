@@ -90,8 +90,6 @@ describe('prepareVideoFileFormData', () => {
     it('rejects when the upload fails', async () => {
         server.use(
             http.post('/api/sources/media', () => {
-                // The 422 response has no documented schema in the OpenAPI spec (description only).
-                // @ts-expect-error There is an incorrect type in OpenAPI
                 return HttpResponse.json({ detail: 'Unsupported video format' }, { status: 422 });
             })
         );

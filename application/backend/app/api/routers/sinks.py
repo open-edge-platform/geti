@@ -13,6 +13,7 @@ from fastapi.responses import FileResponse, Response
 from pydantic import ValidationError
 
 from app.api.dependencies import get_sink, get_sink_service
+from app.api.schemas.error import APIErrorResponse
 from app.api.schemas.sink import SinkCreate, SinkCreateAdapter, SinkView, SinkViewAdapter
 from app.api.schemas.test_result import TestResult
 from app.models import Sink
@@ -86,6 +87,7 @@ UPDATE_SINK_BODY_EXAMPLES = {
         status.HTTP_201_CREATED: {"description": "Sink created"},
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid sink ID"},
         status.HTTP_409_CONFLICT: {"description": "Sink already exists"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": APIErrorResponse, "description": "Sink validation failed"},
     },
 )
 def create_sink(
@@ -118,7 +120,7 @@ def create_sink(
 @router.get(
     "",
     responses={
-        status.HTTP_200_OK: {"description": "List of available sink configurations", "model": list[SinkView]},
+        status.HTTP_200_OK: {"description": "List of available sink configurations"},
     },
 )
 def list_sinks(
@@ -132,7 +134,7 @@ def list_sinks(
 @router.get(
     "/{sink_id}",
     responses={
-        status.HTTP_200_OK: {"description": "Sink found", "model": SinkView},
+        status.HTTP_200_OK: {"description": "Sink found"},
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid sink ID"},
         status.HTTP_404_NOT_FOUND: {"description": "Sink not found"},
     },
@@ -149,6 +151,7 @@ def get_sink_view(sink: Annotated[Sink, Depends(get_sink)]) -> SinkView:
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid sink ID or request body"},
         status.HTTP_404_NOT_FOUND: {"description": "Sink not found"},
         status.HTTP_409_CONFLICT: {"description": "Sink already exists"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"model": APIErrorResponse, "description": "Sink validation failed"},
     },
 )
 def update_sink(
@@ -221,7 +224,10 @@ def export_sink(sink: Annotated[Sink, Depends(get_sink)]) -> Response:
         status.HTTP_201_CREATED: {"description": "Sink imported successfully", "model": SinkView},
         status.HTTP_400_BAD_REQUEST: {"description": "Invalid YAML format"},
         status.HTTP_409_CONFLICT: {"description": "Sink already exists"},
-        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Validation error(s)"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": APIErrorResponse,
+            "description": "Validation error(s)",
+        },
     },
 )
 def import_sink(

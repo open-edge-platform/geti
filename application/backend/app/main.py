@@ -20,6 +20,7 @@ if getattr(sys, "frozen", False) and __name__ == "__main__":
 
 import asyncio
 import logging
+import re
 import ssl
 from collections.abc import Awaitable, Callable
 from os import getenv
@@ -33,6 +34,7 @@ from hypercorn.asyncio import serve
 from hypercorn.config import Config
 from hypercorn.typing import ASGIFramework
 from loguru import logger
+from starlette.routing import compile_path
 
 from app.api.cache_utils import CachedStaticFiles
 from app.api.routers import (
@@ -62,6 +64,67 @@ from app.settings import get_settings
 
 settings = get_settings()
 logging.basicConfig(handlers=[InterceptHandler()], level=settings.log_level, force=True)
+
+
+def _api_fallback_response(app: FastAPI, request: Request) -> JSONResponse:
+    """Return an API 404 or a method-aware 405 for paths not handled by a matching route."""
+    matching_paths: list[tuple[int, set[str]]] = []
+    for path, path_item in app.openapi()["paths"].items():
+        path_regex, _, _ = compile_path(path)
+        if path_regex.fullmatch(request.url.path):
+            matching_paths.append(
+                (
+                    len(re.sub(r"\{[^{}]+\}", "", path)),
+                    {
+                        method.upper()
+                        for method in path_item
+                        if method.upper() in {"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"}
+                    },
+                )
+            )
+
+    if not matching_paths:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Not Found"})
+
+    most_specific_path = max(specificity for specificity, _ in matching_paths)
+    allowed_methods = set().union(
+        *(methods for specificity, methods in matching_paths if specificity == most_specific_path)
+    )
+    if not allowed_methods:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Not Found"})
+    return JSONResponse(
+        status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+        content={"detail": "Method Not Allowed"},
+        headers={"Allow": ", ".join(sorted(allowed_methods))},
+    )
+
+
+def _configure_static_routes(app: FastAPI) -> None:
+    static_dir = settings.static_files_dir
+    if static_dir is None or not static_dir.is_dir() or not any(static_dir.iterdir()):
+        return
+
+    asset_prefix = getenv("ASSET_PREFIX", "/html")
+    logger.info("Serving static files from {} by context {}", static_dir, asset_prefix)
+    app.mount(asset_prefix, CachedStaticFiles(directory=static_dir), name="static")
+
+    @app.get("/", include_in_schema=False)
+    @app.api_route(
+        "/{full_path:path}",
+        methods=["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        include_in_schema=False,
+    )
+    async def serve_spa(request: Request) -> Response:
+        """Serve the Single Page Application (SPA) index.html file for any path."""
+        if request.url.path == "/api" or request.url.path.startswith("/api/"):
+            return _api_fallback_response(app, request)
+        if request.method not in {"GET", "HEAD"}:
+            return JSONResponse(
+                status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+                content={"detail": "Method Not Allowed"},
+                headers={"Allow": "GET, HEAD"},
+            )
+        return FileResponse(cast(Path, static_dir) / "index.html")
 
 
 def create_app() -> FastAPI:
@@ -160,18 +223,7 @@ def create_app() -> FastAPI:
             content={"detail": str(exc) or "This feature is not implemented yet."},
         )
 
-    static_dir = settings.static_files_dir
-    if static_dir is not None and static_dir.is_dir() and any(static_dir.iterdir()):
-        asset_prefix = getenv("ASSET_PREFIX", "/html")
-        logger.info("Serving static files from {} by context {}", static_dir, asset_prefix)
-
-        app.mount(asset_prefix, CachedStaticFiles(directory=static_dir), name="static")
-
-        @app.get("/", include_in_schema=False)
-        @app.get("/{full_path:path}", include_in_schema=False)
-        async def serve_spa() -> FileResponse:
-            """Serve the Single Page Application (SPA) index.html file for any path."""
-            return FileResponse(cast(Path, static_dir) / "index.html")
+    _configure_static_routes(app)
 
     return app
 

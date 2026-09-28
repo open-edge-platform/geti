@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
 from app.api.dependencies import get_file_name_and_extension, get_source_media_service
 from app.api.schemas import SourceMediaUploadView
+from app.api.schemas.error import APIErrorResponse
 from app.services import SourceMediaService
 
 router = APIRouter(prefix="/api/sources/media", tags=["Sources"])
@@ -24,7 +25,10 @@ ALLOWED_VIDEO_EXTENSIONS = {"mp4", "avi", "mov", "mkv", "webm", "flv", "wmv", "m
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"description": "Video uploaded successfully"},
-        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Unsupported video format"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": APIErrorResponse,
+            "description": "Invalid video upload",
+        },
     },
 )
 async def upload_source_media(

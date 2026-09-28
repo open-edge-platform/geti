@@ -10,6 +10,7 @@ from starlette.responses import StreamingResponse
 from app.api.dependencies import get_staged_dataset_service
 from app.api.io_utils import file_iterator
 from app.api.schemas import StagedDatasetView
+from app.api.schemas.error import APIErrorResponse
 from app.api.validators import StagedDatasetID
 from app.services import StagedDatasetService
 
@@ -20,7 +21,13 @@ router = APIRouter(prefix="/api/staged_datasets", tags=["Dataset Import/Export"]
     "",
     response_model=StagedDatasetView,
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_201_CREATED: {"description": "Dataset archive uploaded successfully"}},
+    responses={
+        status.HTTP_201_CREATED: {"description": "Dataset archive uploaded successfully"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {
+            "model": APIErrorResponse,
+            "description": "Invalid dataset archive",
+        },
+    },
 )
 async def upload_archive(
     file: Annotated[UploadFile, File()],
