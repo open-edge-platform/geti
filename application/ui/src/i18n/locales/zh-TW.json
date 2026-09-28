@@ -48,7 +48,7 @@
             "on": "開",
             "off": "關",
             "noMaximum": "無上限",
-            "active": "當前專案",
+            "active": "目前專案",
             "dataset": "資料集",
             "filters": "篩選條件",
             "images": "圖片",
@@ -203,8 +203,8 @@
         },
         "bulkLabels": {
             "title": "批次指派標籤",
-            "uploadInstructions": "請選擇要指派給已上傳圖片的標籤，然後按一下「繼續」；如果想稍後再標註，請選擇「略過」。",
-            "selectedInstructions": "請選擇要指派給所選圖片的標籤，然後按一下「指派」。",
+            "uploadInstructions": "請選擇要指派給已上傳圖片的標籤，然後點擊「繼續」；如果想稍後再標註，請選擇「略過」。",
+            "selectedInstructions": "請選擇要指派給所選圖片的標籤，然後點擊「指派」。",
             "imageOnlyNote": "所選標籤只會指派給圖片，其中的影片（如有）將不帶標註上傳。",
             "selectedImagesNote": "所選標籤只會指派給圖片，其中的影片（如有）保持不變。",
             "noResults": "找不到符合的結果，請換個關鍵字再試一次。",
@@ -526,7 +526,7 @@
             },
             "throughput": {
                 "title": "吞吐量",
-                "axisLabel": "要求/秒"
+                "axisLabel": "請求/秒"
             },
             "latency": {
                 "title": "延遲",
@@ -549,8 +549,8 @@
             }
         },
         "stream": {
-            "start": "開始推流",
-            "enablePipelineToStart": "啟用管線以開始推流",
+            "start": "開始串流",
+            "enablePipelineToStart": "啟用管線以開始串流",
             "connectError": "影片串流連線失敗",
             "captureFrame": "擷取幀",
             "captureSuccess": "幀已擷取並加入資料集。"
@@ -762,8 +762,8 @@
             },
             "autoSegmentation": {
                 "label": "自動分割",
-                "detectionDescription": "將游標移至物件上方預覽建議的矩形，再按一下以建立標註。",
-                "segmentationDescription": "將游標移至物件上方預覽建議的多邊形，再按一下以建立標註。",
+                "detectionDescription": "將游標移至物件上方預覽建議的矩形，再點擊以建立標註。",
+                "segmentationDescription": "將游標移至物件上方預覽建議的多邊形，再點擊以建立標註。",
                 "loading": "正在處理影像，請稍候……",
                 "error": "Segment Anything 工具發生錯誤：{{message}}",
                 "unknownError": "發生未知錯誤，請重新整理頁面重試。",
@@ -839,7 +839,7 @@
             "logs": {
                 "copySuccess": "複製成功",
                 "copyError": "複製失敗",
-                "copyPathTooltip": "按一下複製路徑",
+                "copyPathTooltip": "點擊複製路徑",
                 "showTraceback": "顯示堆疊追蹤",
                 "levelLabel": "層級",
                 "levelHelpTitle": "最低記錄層級",
@@ -1112,7 +1112,7 @@
             "badRequest": "目前的要求有誤，伺服器無法處理。",
             "forbidden": "您沒有權限存取此頁面。",
             "notFound": "此頁面不存在！",
-            "unauthorized": "目前尚未登入或登入已逾期，無法檢視該內容",
+            "unauthorized": "目前尚未登入或登入已過期，無法檢視該內容",
             "serverError": "伺服器發生錯誤，未能完成您的要求。",
             "serviceUnavailable": "API 服務目前無法使用",
             "goHome": "回到首頁"
