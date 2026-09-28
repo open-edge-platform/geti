@@ -1632,7 +1632,7 @@ requires-dist = [
     { name = "linkify-it-py", marker = "extra == 'docs'" },
     { name = "myst-parser", marker = "extra == 'docs'", specifier = ">=2.0.0" },
     { name = "nbsphinx", marker = "extra == 'docs'" },
-    { name = "nncf", git = "https://github.com/openvinotoolkit/nncf.git?rev=ae0908fe75e9cbe31051545b6ef818d084cb2797" },
+    { name = "nncf", specifier = "~=3.4" },
     { name = "numpy", specifier = ">=2.0" },
     { name = "omegaconf", specifier = "==2.3.0" },
     { name = "onnx", specifier = "==1.22.0" },
@@ -3194,8 +3194,8 @@ wheels = [
 
 [[package]]
 name = "nncf"
-version = "3.4.0.dev0+ae0908fe7"
-source = { git = "https://github.com/openvinotoolkit/nncf.git?rev=ae0908fe75e9cbe31051545b6ef818d084cb2797#ae0908fe75e9cbe31051545b6ef818d084cb2797" }
+version = "3.4.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "networkx" },
     { name = "ninja" },
@@ -3210,6 +3210,10 @@ dependencies = [
     { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu')" },
     { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-cuda') or (extra == 'extra-8-getitune-cpu' and extra == 'extra-8-getitune-xpu') or (extra == 'extra-8-getitune-cuda' and extra == 'extra-8-getitune-xpu')" },
     { name = "tabulate" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/fa/1c/d48fd3a520ec492867fb59679b30bf1e39468b73a7e24184e36f0dc3b8de/nncf-3.4.0.tar.gz", hash = "sha256:40b835e275b091197b853344de98ebe1026b58acfb83ffe69b9a0be305371d66", size = 559320, upload-time = "2026-09-17T13:11:34.646Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/16/8b/4c1f567ae289c36e48557ec9889c0d3b153e05cf8b043e342939e494a5d9/nncf-3.4.0-py3-none-any.whl", hash = "sha256:bc1b8b2fec7ac76462d8156df8c1b415e95ff3fc453e494787c64ea413f6663c", size = 797266, upload-time = "2026-09-17T13:11:33.409Z" },
 ]
 
 [[package]]
