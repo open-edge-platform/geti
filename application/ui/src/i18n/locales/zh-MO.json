@@ -7,7 +7,7 @@
             "goBack": "返回",
             "rename": "重新命名",
             "save": "儲存",
-            "assign": "指派",
+            "assign": "分配",
             "back": "返回",
             "clear": "清除",
             "clearAll": "清除全部",
@@ -107,12 +107,12 @@
             "deleted": "已刪除的視圖",
             "title": "視圖",
             "entireDataset": "整個數據集",
-            "assignToExistingView": "指派至現有視圖",
-            "assignTo": "指派至",
+            "assignToExistingView": "分配至現有視圖",
+            "assignTo": "分配至",
             "selectView": "選擇視圖",
             "assignmentNote": "此操作不會影響該視圖中已有的其他媒體檔案。",
-            "mediaAssigned_one": "已成功指派 {{count}} 個媒體檔案。",
-            "mediaAssigned_other": "已成功指派 {{count}} 個媒體檔案。",
+            "mediaAssigned_one": "已成功分配 {{count}} 個媒體檔案。",
+            "mediaAssigned_other": "已成功分配 {{count}} 個媒體檔案。",
             "openView": "開啟 {{viewName}}",
             "saveView": "儲存視圖",
             "viewNameLabel": "視圖名稱",
@@ -169,8 +169,8 @@
         "empty": {
             "noMatches": "沒有符合篩選條件的媒體檔案。",
             "changeFilter": "請清除或更換篩選條件。",
-            "viewEmpty": "該視圖暫無媒體檔案。",
-            "assignOrBack": "可以為該視圖指派媒體檔案，或返回整個數據集。",
+            "viewEmpty": "該視圖暫時沒有媒體檔案。",
+            "assignOrBack": "可以為該視圖分配媒體檔案，或返回整個數據集。",
             "goToEntireDataset": "前往 {{datasetName}}",
             "datasetEmpty": "目前數據集為空。",
             "uploadToStart": "上載第一個媒體檔案即可開始。"
@@ -202,7 +202,7 @@
             "deletedSuccess_other": "已成功刪除 {{count}} 個檔案"
         },
         "bulkLabels": {
-            "title": "批量分配標籤",
+            "title": "批次分配標籤",
             "uploadInstructions": "請選擇要分配給已上載圖片的標籤，然後按一下「繼續」；如果想稍後再標註，請選擇「跳過」。",
             "selectedInstructions": "請選擇要分配給所選圖片的標籤，然後按一下「分配」。",
             "imageOnlyNote": "所選標籤只會分配給圖片，其中的影片（如有）將不帶標註上載。",
@@ -248,7 +248,7 @@
             "learnMoreFormats": "了解支援的數據格式",
             "dialogHeading": "匯入數據集",
             "scanningMessage": "正在掃描並解析待匯入的數據集壓縮檔案……",
-            "mapLabelsMessage": "為已上載的數據集映射標籤",
+            "mapLabelsMessage": "為已上載的數據集對應標籤",
             "deleteStagedFile": {
                 "title": "刪除暫存檔案",
                 "confirmation": "確定要刪除數據集檔案「{{stagedDatasetId}}」嗎？"
@@ -259,8 +259,8 @@
             },
             "labelMapping": {
                 "statisticsHeading": "已匯入數據集統計",
-                "heading": "標籤映射（可選）",
-                "unmappedNote": "未映射的內容將以無標籤形式匯入",
+                "heading": "標籤對應（可選）",
+                "unmappedNote": "未對應的內容將以無標籤形式匯入",
                 "datasetLabelsColumn": "數據集中的標籤",
                 "projectLabelsColumn": "項目中的標籤",
                 "selectLabelPlaceholder": "請選擇標籤",
@@ -453,10 +453,10 @@
             },
             "rateLimit": {
                 "notSet": "未設定",
-                "samplesPerSecond_one": "每秒採集 {{count}} 個樣本",
-                "samplesPerSecond_other": "每秒採集 {{count}} 個樣本",
-                "oneSamplePerSeconds_one": "每 {{count}} 秒採集 1 個樣本",
-                "oneSamplePerSeconds_other": "每 {{count}} 秒採集 1 個樣本"
+                "samplesPerSecond_one": "每秒擷取 {{count}} 個樣本",
+                "samplesPerSecond_other": "每秒擷取 {{count}} 個樣本",
+                "oneSamplePerSeconds_one": "每 {{count}} 秒擷取 1 個樣本",
+                "oneSamplePerSeconds_other": "每 {{count}} 秒擷取 1 個樣本"
             },
             "fields": {
                 "samples": "樣本數",
@@ -502,18 +502,18 @@
             }
         },
         "collection": {
-            "sidebarLabel": "數據採集策略",
+            "sidebarLabel": "數據擷取策略",
             "maxDatasetSize": {
                 "title": "數據集大小上限",
-                "description": "最多採集的項目數"
+                "description": "最多擷取的項目數"
             },
             "captureRate": {
-                "title": "採集頻率",
-                "description": "在串流播放時採集幀",
-                "toggleLabel": "自動採集"
+                "title": "擷取頻率",
+                "description": "在串流播放時擷取幀",
+                "toggleLabel": "自動擷取"
             },
             "confidenceThreshold": {
-                "description": "信心值低於閾值時採集幀",
+                "description": "信心值低於閾值時擷取幀",
                 "sliderLabel": "閾值"
             }
         },
@@ -552,8 +552,8 @@
             "start": "開始串流",
             "enablePipelineToStart": "啟用管線以開始串流",
             "connectError": "影片串流連線失敗",
-            "captureFrame": "採集幀",
-            "captureSuccess": "幀已採集並加入數據集。"
+            "captureFrame": "擷取幀",
+            "captureSuccess": "幀已擷取並加入數據集。"
         },
         "settings": {
             "folderPath": "資料夾路徑：{{path}}",
@@ -571,7 +571,7 @@
         },
         "validation": {
             "nameEmpty": "項目名稱不能為空",
-            "nameExists": "該項目名稱已被佔用"
+            "nameExists": "該項目名稱已被使用"
         },
         "panel": {
             "manageProjects": "管理項目",
@@ -670,7 +670,7 @@
         "import": {
             "title": "從數據集建立項目—匯入",
             "labelMapping": {
-                "title": "標籤映射"
+                "title": "標籤對應"
             },
             "preparingMessage": "正在準備將數據集匯入為新項目",
             "taskSelection": {
@@ -680,7 +680,7 @@
             },
             "jobsList": {
                 "selectTaskType": "選擇工作類型",
-                "mapLabelsButton": "映射標籤"
+                "mapLabelsButton": "對應標籤"
             }
         },
         "taskType": "工作類型"
@@ -688,8 +688,8 @@
     "labels": {
         "fields": {
             "hotkeyPlaceholder": "快捷鍵",
-            "nameExists": "該標籤名稱已被佔用",
-            "hotkeyExists": "該快捷鍵已被佔用"
+            "nameExists": "該標籤名稱已被使用",
+            "hotkeyExists": "該快捷鍵已被使用"
         },
         "editor": {
             "namePlaceholder": "標籤名稱",
@@ -830,7 +830,7 @@
             }
         },
         "metrics": {
-            "noMetrics": "暫無可用指標",
+            "noMetrics": "未有可用指標",
             "loadError": "訓練指標載入失敗",
             "evaluationsTitle": "評測",
             "noEvaluations": "測試集評測指標暫不可用"
@@ -851,7 +851,7 @@
                     "error": "連線錯誤"
                 },
                 "entriesCount": "{{filtered}} / {{total}} 條",
-                "noEntries": "暫無記錄項目",
+                "noEntries": "未有記錄項目",
                 "noMatchingEntries": "沒有相符的記錄項目",
                 "scrollToBottom": "捲動到底部",
                 "dialogTitle": "訓練記錄",
@@ -861,11 +861,11 @@
                 "downloadStarted": "訓練記錄下載已開始"
             },
             "parameters": {
-                "noParameters": "暫無參數。",
+                "noParameters": "未有參數。",
                 "learningParameters": "學習參數",
                 "filters": "篩選條件",
                 "augmentations": "數據增強",
-                "intensityMapping": "強度映射"
+                "intensityMapping": "強度對應"
             },
             "architectures": {
                 "metrics": {
@@ -983,11 +983,11 @@
                         "automatic": "自動",
                         "custom": "自訂"
                     },
-                    "offDescription": "模型將整張圖片作為一個整體處理，不劃分為更小的圖塊。這種方式簡單直接，但在高解像度圖片中偵測小物件時可能力不從心，因為模型可能遺漏精細細節",
+                    "offDescription": "模型將整張圖片作為一個整體處理，不劃分為更小的圖塊。這種方式簡單直接，但在高解像度圖片中偵測小物件時可能效果欠佳，因為模型可能遺漏精細細節",
                     "automaticDescription": "這意味著系統將根據圖片解像度和標註尺寸自動設定參數。"
                 },
                 "intensityMapping": {
-                    "title": "強度映射"
+                    "title": "強度對應"
                 }
             }
         },
@@ -1000,7 +1000,7 @@
             "searchPlaceholder": "搜尋模型……",
             "noModelsFound": "找不到模型",
             "empty": {
-                "title": "暫無模型。",
+                "title": "未有模型。",
                 "description": "訓練第一個模型即可開始。"
             },
             "deletedWeightsBadge": "權重已刪除",
@@ -1025,7 +1025,7 @@
             }
         },
         "variants": {
-            "empty": "暫無可用的模型變體。",
+            "empty": "未有可用的模型變體。",
             "columns": {
                 "precision": "精確度"
             },
