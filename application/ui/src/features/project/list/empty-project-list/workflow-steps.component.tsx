@@ -9,8 +9,8 @@ import classes from './workflow-steps.module.scss';
 
 const STEPS = [
     { labelKey: 'project.list.workflow.addData', Icon: FolderLight },
-    { labelKey: 'project.list.workflow.annotate', Icon: Edit },
-    { labelKey: 'project.list.workflow.train', Icon: AutoTraining },
+    { labelKey: 'common.actions.annotate', Icon: Edit },
+    { labelKey: 'common.actions.train', Icon: AutoTraining },
     { labelKey: 'project.list.workflow.optimize', Icon: Adjustments },
     { labelKey: 'project.list.workflow.runInference', Icon: AICPUIcon },
 ] as const;

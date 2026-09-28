@@ -30,11 +30,14 @@ runs:
       if: ${{ inputs.install-just == 'true' }}
       uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
       with:
-        just-version: ${{ inputs.just-version }}
+        # extractions/setup-just defaults to the latest release when just-version is unset,
+        # but here it's always set: callers either override it explicitly
+        # or inherit the pinned default above.
+        just-version: ${{ inputs.just-version }} # zizmor: ignore[unpinned-tools]
 
     - name: Install uv and set the Python version
       if: ${{ inputs.install-uv == 'true' }}
-      uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+      uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       with:
         version-file: ${{ inputs.uv-version-file }}
         enable-cache: false # Cache disabled as a safety measure against cache-poisoning attacks

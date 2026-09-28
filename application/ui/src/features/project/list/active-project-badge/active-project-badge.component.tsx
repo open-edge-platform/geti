@@ -16,7 +16,7 @@ export const ActiveProjectBadge = ({ size = 'M' }: ActiveProjectBadgeProps) => {
 
     return (
         <Badge variant={'neutral'} UNSAFE_className={clsx(classes.activeTag, { [classes.small]: size === 'S' })}>
-            <Text>{t('project.list.activeBadge')}</Text>
+            <Text>{t('common.labels.active')}</Text>
         </Badge>
     );
 };

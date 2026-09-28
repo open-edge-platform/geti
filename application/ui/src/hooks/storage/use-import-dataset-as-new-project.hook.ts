@@ -3,7 +3,7 @@
 
 import type { TaskType } from '@/api/types';
 
-import { ImportDatasetAsNewProjectState } from '../../features/dataset/import-export/import-dataset/util';
+import { ImportDatasetAsNewProjectState } from '../../shared/import-dataset-state';
 import { useDatasetImportStorage } from './use-dataset-import-storage.hook';
 import { DatasetImportState } from './utils';
 

@@ -1,0 +1,62 @@
+.labelsContainerRect,
+.labelsContainerPolygon {
+    display: var(--annotation-labels-display, flex);
+    flex-direction: row;
+    height: 100%;
+    width: max-content;
+    pointer-events: auto;
+}
+
+/* Counter-scaling lives on the foreignObject so the chip keeps a constant screen size
+   without React having to recompute its geometry on every zoom step. */
+.labelsScaleRect,
+.labelsScalePolygon {
+    transform-box: fill-box;
+    transform: scale(calc(1 / var(--zoom-scale, 1)));
+}
+
+/* Rectangle labels: the chip's bottom-left sits on the annotation's top-left corner */
+.labelsScaleRect {
+    transform-origin: left bottom;
+}
+
+/* Polygon labels: the box origin is the centroid, so the chip pivots there */
+.labelsScalePolygon {
+    transform-origin: left top;
+}
+
+/* translate offset accounts for stroke width (half of the 3px) and small adjustment to prevent antialiasing issues */
+.labelsContainerRect {
+    align-items: flex-end;
+    transform: translate(-1.5px, -1.3px);
+}
+
+.labelsContainerPolygon {
+    align-items: center;
+    transform: translate(-50%, -50%);
+}
+
+.label {
+    --text-color: lch(from var(--label-color) calc((50 - l) * infinity) 0 0);
+
+    display: flex;
+    align-items: center;
+    height: var(--spectrum-global-dimension-size-300);
+    padding: 0 var(--spectrum-global-dimension-size-100);
+    background-color: var(--label-color);
+    color: var(--text-color);
+    white-space: nowrap;
+    border-top-left-radius: var(--border-top-left);
+    border-top-right-radius: var(--border-top-right);
+    border-bottom-left-radius: var(--border-bottom-left);
+    border-bottom-right-radius: var(--border-bottom-right);
+}
+
+.removeButton {
+    all: unset;
+    cursor: pointer;
+    margin-left: var(--spectrum-global-dimension-size-50);
+    color: var(--text-color);
+    line-height: 1;
+    pointer-events: auto;
+}

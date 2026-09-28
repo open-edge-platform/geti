@@ -991,7 +991,9 @@ class FilterBoundingBoxes(tvt_v2.Transform):
     @typing.no_type_check
     def forward(self, *_inputs: BaseSample) -> BaseSample:
         """Filter bounding boxes and corresponding labels/masks."""
-        assert len(_inputs) == 1, "Only single sample input is supported"  # noqa: S101
+        if len(_inputs) != 1:
+            msg = f"Only single sample input is supported, got {len(_inputs)} samples."
+            raise ValueError(msg)
         inputs = _inputs[0]
 
         bboxes = inputs.bboxes

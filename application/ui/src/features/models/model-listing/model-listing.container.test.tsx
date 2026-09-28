@@ -97,4 +97,30 @@ describe('ModelListingContainer', () => {
         expect(await screen.findByText(/No models yet\./i)).toBeInTheDocument();
         expect(screen.getByText(/Train your first model to get started\./i)).toBeInTheDocument();
     });
+
+    it('requests and renders model details only after the model row is expanded', async () => {
+        const user = userEvent.setup();
+        const model = getMockedModel({ id: 'model-1', name: 'YOLOX Model v1', architecture: 'architecture-1' });
+        const requestedModelIds: string[] = [];
+
+        server.use(
+            http.get('/api/projects/{project_id}/models', () => HttpResponse.json([model])),
+            http.get('/api/projects/{project_id}/models/{model_id}', ({ params }) => {
+                requestedModelIds.push(String(params.model_id));
+
+                return HttpResponse.json(model);
+            })
+        );
+
+        renderModelListing();
+
+        expect(await screen.findByText('YOLOX Model v1')).toBeInTheDocument();
+        expect(screen.queryByRole('tablist', { name: 'Model details' })).not.toBeInTheDocument();
+        expect(requestedModelIds).toEqual([]);
+
+        await user.click(screen.getByText('YOLOX Model v1'));
+
+        expect(await screen.findByRole('tablist', { name: 'Model details' })).toBeInTheDocument();
+        expect(requestedModelIds).toEqual(['model-1']);
+    });
 });

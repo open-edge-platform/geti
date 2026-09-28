@@ -1,15 +1,17 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-"""Endpoint for uploading video files for use as 'video_file' pipeline sources."""
+"""Endpoints for managing video files uploaded for use as 'video_file' pipeline sources."""
 
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
-from app.api.dependencies import get_file_name_and_extension, get_source_media_service
-from app.api.schemas import SourceMediaUploadView
-from app.services import SourceMediaService
+from app.api.dependencies import get_file_name_and_extension, get_source_media_service, get_source_service
+from app.api.schemas import SourceMediaDeletionView, SourceMediaUploadView
+from app.services import SourceMediaService, SourceService
+from app.services.base import ResourceInUseError, ResourceNotFoundError
 
 router = APIRouter(prefix="/api/sources/media", tags=["Sources"])
 
@@ -53,3 +55,34 @@ async def upload_source_media(
         return SourceMediaUploadView(video_path=str(video_path))
     finally:
         await file.close()
+
+
+@router.delete(
+    "/{source_media_id}",
+    response_model=SourceMediaDeletionView,
+    status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_200_OK: {"description": "Unreferenced video deleted successfully"},
+        status.HTTP_404_NOT_FOUND: {"description": "No uploaded video with this UUID was found"},
+        status.HTTP_409_CONFLICT: {"description": "A source is using the media"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Malformed source media UUID"},
+    },
+)
+def delete_source_media(
+    source_media_id: UUID,
+    source_service: Annotated[SourceService, Depends(get_source_service)],
+) -> SourceMediaDeletionView:
+    """Delete an uploaded video file that is not referenced by any source.
+
+    Uploads are addressed by their UUID (the subdirectory created on upload). Malformed
+    UUIDs are rejected with 422 by request validation; a well-formed UUID that does not
+    match a stored upload yields 404, and a source still using the media yields 409 with
+    nothing deleted.
+    """
+    try:
+        deleted_video_path = source_service.delete_unreferenced_media(source_media_id)
+    except ResourceNotFoundError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e)) from e
+    except ResourceInUseError as e:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e)) from e
+    return SourceMediaDeletionView(deleted_video_path=deleted_video_path)

@@ -4,7 +4,7 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { render } from 'test-utils/render';
 
-import { acceptedExtensions } from '../../utils';
+import { acceptedExtensions } from '../../../../../shared/media-file-utils';
 import { AddMediaButton } from './add-media-button.component';
 
 describe('AddMediaButton', () => {

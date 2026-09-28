@@ -2,13 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ExportDatasetJob } from '@/api/types';
+import { BottomProgressBar } from '@/components/bottom-progress-bar/bottom-progress-bar.component';
+import { CancelJobConfirmation } from '@/components/cancel-job-confirmation/cancel-job-confirmation.component';
 import { useTranslation } from '@/i18n';
 import { Divider, Flex, Loading, Text, View } from '@geti-ui/ui';
 import { getJobProgress, isJobRunning } from 'hooks/api/util';
 import { useExportDataset } from 'hooks/storage/use-export-dataset.hook';
 
-import { BottomProgressBar } from '../../../../models/model-listing/current-running-jobs/bottom-progress-bar.component';
-import { CancelJobConfirmation } from '../../cancel-job-confirmation/cancel-job-confirmation.component';
 import { ExportJobDetails } from './export-details/export-details.component';
 
 type ExportActiveJobProps = {

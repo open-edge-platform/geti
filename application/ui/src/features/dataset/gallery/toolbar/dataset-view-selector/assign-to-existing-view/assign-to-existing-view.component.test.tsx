@@ -143,7 +143,7 @@ describe('AssignToExistingView', () => {
         expect(getSearchParams().get('datasetViewId')).toBeNull();
 
         const toast = await screen.findByLabelText('toast');
-        const link = within(toast).getByRole('link', { name: `Open ${COLLECTION_ONE.name} view` });
+        const link = within(toast).getByRole('link', { name: `Open ${COLLECTION_ONE.name}` });
 
         expect(link).toHaveAttribute('href', expect.stringContaining('datasetViewId=collection-one'));
         expect(link).toHaveAttribute('href', expect.stringContaining('sortBy=name'));

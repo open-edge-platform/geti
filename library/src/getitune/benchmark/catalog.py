@@ -219,7 +219,9 @@ def _run_script(script_path: Path, data_root: Path, name: str, *, raw_dir: Path 
         bufsize=1,  # line-buffered
     )
 
-    assert proc.stdout is not None  # noqa: S101 - guaranteed by PIPE above
+    if proc.stdout is None:
+        msg = "subprocess.PIPE guarantee violated for benchmark command output."
+        raise RuntimeError(msg)
     try:
         for raw_line in proc.stdout:
             line = raw_line.rstrip()
@@ -335,7 +337,9 @@ def provision_dataset(entry: DatasetEntry, data_root: Path) -> Path:
             entry.name,
         )
 
-    assert entry.script is not None  # noqa: S101 - guaranteed by DatasetEntry.__post_init__
+    if entry.script is None:
+        msg = f"Dataset '{entry.name}' has no preparation script defined."
+        raise RuntimeError(msg)
     script_path = _resolve_script_path(entry.script)
 
     if not script_path.exists():

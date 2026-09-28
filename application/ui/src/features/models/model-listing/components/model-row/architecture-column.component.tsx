@@ -22,7 +22,7 @@ export const ArchitectureColumn = ({ architectureId, architecture }: Architectur
     return (
         <Flex direction={'column'} gap={'size-100'}>
             <Text UNSAFE_className={classes.smallText}>
-                {architecture.name} ({architecture.license})
+                {architecture.name} ({architecture.license.name})
             </Text>
             {architecture.performanceCategory !== undefined && (
                 <PerformanceCategoryBadge

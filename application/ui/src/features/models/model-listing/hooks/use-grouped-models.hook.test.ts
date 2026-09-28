@@ -5,7 +5,7 @@ import { getMockedDatasetRevision } from 'mocks/mock-dataset-revision';
 import { getMockedModel } from 'mocks/mock-model';
 import { renderHook } from 'test-utils/render';
 
-import { isFailedModel } from '../utils/utils';
+import { isFailedModel } from '../../../../shared/model-status';
 import { useGroupedModels } from './use-grouped-models.hook';
 
 describe('useGroupedModels', () => {

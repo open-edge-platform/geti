@@ -10,8 +10,8 @@ import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../../../api/utils';
+import { PredictionsSetupProvider } from '../../../../../modules/annotator/predictions-setup-provider.component';
 import { server } from '../../../../../msw-node-setup';
-import { PredictionsSetupProvider } from '../../../../annotator/predictions-setup-provider.component';
 import { PredictionModelSelector } from './prediction-model-selector.component';
 
 const STORAGE_KEY = '123-model-variant-id';

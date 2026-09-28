@@ -23,6 +23,14 @@ export class ImportDatasetPage {
         await fileChooser.setFiles([{ name, mimeType: 'application/zip', buffer: Buffer.from('fake zip content') }]);
     }
 
+    async uploadZipFile(filePath: string) {
+        const fileChooserPromise = this.page.waitForEvent('filechooser');
+        await this.getDialog().getByRole('button', { name: 'Upload' }).click();
+
+        const fileChooser = await fileChooserPromise;
+        await fileChooser.setFiles(filePath);
+    }
+
     getPreparingStatus() {
         return this.getDialog().getByText('Preparing');
     }

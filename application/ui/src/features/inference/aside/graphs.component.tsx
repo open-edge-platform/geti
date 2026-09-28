@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 
+import { useTranslation } from '@/i18n';
 import { Content, Heading, IllustratedMessage, View } from '@geti-ui/ui';
 import dayjs from 'dayjs';
 import { usePipelineMetrics } from 'hooks/api/pipeline.hook';
@@ -56,6 +57,7 @@ type GraphProps = {
 };
 
 const Graph = ({ label, data, fractionDigits }: GraphProps) => {
+    const { t } = useTranslation();
     const end = data.at(-1)?.timestamp ?? Date.now();
 
     return (
@@ -77,7 +79,12 @@ const Graph = ({ label, data, fractionDigits }: GraphProps) => {
                 tickLine={false}
                 tickMargin={8}
             >
-                <Label value='time' position='insideBottom' offset={-14} style={AXIS_LABEL_STYLE} />
+                <Label
+                    value={t('inference.metrics.time')}
+                    position='insideBottom'
+                    offset={-14}
+                    style={AXIS_LABEL_STYLE}
+                />
             </XAxis>
             <YAxis
                 tickLine={false}
@@ -112,30 +119,33 @@ const Graph = ({ label, data, fractionDigits }: GraphProps) => {
 };
 
 export const Graphs = () => {
+    const { t } = useTranslation();
     const { latencyData, throughputData } = useMetricsData();
 
     return (
         <View height={'100%'} UNSAFE_style={{ overflow: 'hidden auto' }}>
             {latencyData.length === 0 ? (
                 <IllustratedMessage>
-                    <Heading>No statistics available</Heading>
-                    <Content>
-                        Pipeline metrics will show here once the pipeline starts running and processing data.
-                    </Content>
+                    <Heading>{t('inference.metrics.empty.title')}</Heading>
+                    <Content>{t('inference.metrics.empty.description')}</Content>
                 </IllustratedMessage>
             ) : (
                 <>
                     <View>
                         <Heading level={4} marginBottom={'size-300'}>
-                            Throughput
+                            {t('inference.metrics.throughput.title')}
                         </Heading>
-                        <Graph label='requests/sec' data={throughputData} fractionDigits={2} />
+                        <Graph
+                            label={t('inference.metrics.throughput.axisLabel')}
+                            data={throughputData}
+                            fractionDigits={2}
+                        />
                     </View>
                     <View>
                         <Heading level={4} marginBottom={'size-300'}>
-                            Latency
+                            {t('inference.metrics.latency.title')}
                         </Heading>
-                        <Graph label='ms' data={latencyData} fractionDigits={1} />
+                        <Graph label={t('inference.metrics.latency.axisLabel')} data={latencyData} fractionDigits={1} />
                     </View>
                 </>
             )}

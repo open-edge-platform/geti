@@ -122,7 +122,9 @@ class BaseModule(nn.Module, metaclass=ABCMeta):
                 other_cfgs = []
                 pretrained_cfg = []
                 for init_cfg in init_cfgs:
-                    assert isinstance(init_cfg, dict)  # noqa: S101
+                    if not isinstance(init_cfg, dict):
+                        msg = f"Each init_cfg entry must be a dict, got {type(init_cfg).__name__}."
+                        raise TypeError(msg)
                     if init_cfg["type"] == "Pretrained" or init_cfg["type"] is PretrainedInit:
                         pretrained_cfg.append(init_cfg)
                     else:

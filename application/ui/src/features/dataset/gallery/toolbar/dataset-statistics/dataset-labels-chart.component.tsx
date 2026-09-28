@@ -1,21 +1,24 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useTranslation } from '@/i18n';
 import { dimensionValue } from '@geti-ui/ui';
 import {
     Bar,
     BarChart,
+    BarShapeProps,
     CartesianGrid,
     Label,
     LabelList,
     LabelProps,
+    Rectangle,
     ResponsiveContainer,
     Tooltip,
     XAxis,
     YAxis,
 } from 'recharts';
 
-import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../../../../shared/annotator/labels';
+import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../../../../shared/labels';
 
 type DatasetLabelsChartProps = {
     totalItems: number;
@@ -67,6 +70,7 @@ const ItemLabel = (props: LabelProps & { labelColor?: string }) => {
 };
 
 export const DatasetLabelsChart = ({ totalItems, instancesPerLabel }: DatasetLabelsChartProps) => {
+    const { t } = useTranslation();
     const projectLabels = useProjectLabelsWithEmptyLabel();
 
     const emptyLabelInstance = instancesPerLabel.find(({ label_id }) => label_id === null);
@@ -111,7 +115,17 @@ export const DatasetLabelsChart = ({ totalItems, instancesPerLabel }: DatasetLab
                     tickLine={false}
                 />
 
-                <Bar dataKey='score' radius={[4, 4, 4, 4]} fill={'color'} barSize={BAR_SIZE}>
+                <Bar
+                    dataKey='score'
+                    radius={[4, 4, 4, 4]}
+                    fill={'color'}
+                    barSize={BAR_SIZE}
+                    shape={(props: BarShapeProps) => (
+                        <g role='img' aria-label={`${props.payload.label}: ${props.payload.score}`}>
+                            <Rectangle {...props} />
+                        </g>
+                    )}
+                >
                     <LabelList
                         dataKey='score'
                         position='insideRight'
@@ -123,7 +137,7 @@ export const DatasetLabelsChart = ({ totalItems, instancesPerLabel }: DatasetLab
 
                 <Tooltip
                     shared={false}
-                    formatter={(value) => [value, 'Annotations']}
+                    formatter={(value) => [value, t('dataset.statistics.annotationsChartTooltip')]}
                     itemStyle={{ color: 'var(--spectrum-global-color-gray-800)' }}
                     contentStyle={{ background: 'var(--spectrum-global-color-gray-50)' }}
                 />

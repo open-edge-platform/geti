@@ -16,6 +16,7 @@ type AriaComponentsListBoxProps = ComponentProps<typeof AriaComponentsListBox>;
 
 type SelectionStateOptions = {
     allowDuplicateSelectionEvents?: boolean;
+    disallowSelectAll?: boolean;
     selectOnFocus?: boolean;
 };
 
@@ -53,6 +54,7 @@ export const VirtualizerGridLayout = <T extends GridItem>({
     isLoadingMore,
     selectionMode,
     selectionBehavior,
+    disallowSelectAll,
     layoutOptions,
     scrollToIndex,
     onLoadMore,
@@ -92,6 +94,7 @@ export const VirtualizerGridLayout = <T extends GridItem>({
                         selectedKeys={selectedKeys}
                         selectionMode={selectionMode}
                         selectionBehavior={selectionBehavior}
+                        disallowSelectAll={disallowSelectAll}
                         onSelectionChange={onSelectionChange}
                         allowDuplicateSelectionEvents={allowDuplicateSelectionEvents}
                         selectOnFocus={selectOnFocus}

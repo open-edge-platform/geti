@@ -41,7 +41,7 @@ export const DeleteProjectDialog = ({
         <DialogContainer onDismiss={onClose}>
             {isOpen && (
                 <AlertDialog
-                    title={t('project.delete.title')}
+                    title={t('common.actions.delete')}
                     variant='destructive'
                     cancelLabel={t('common.actions.cancel')}
                     primaryActionLabel={t('common.actions.delete')}

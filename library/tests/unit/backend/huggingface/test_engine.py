@@ -45,6 +45,7 @@ class _StubHFModel(HFModel):
         self._data_input_params = DataInputParams(input_size=(640, 640), mean=(0.0, 0.0, 0.0), std=(1.0, 1.0, 1.0))
         self._intensity_config = None
         self._best_checkpoint = None
+        self._best_confidence_threshold = None
         self.hf_model = MagicMock()
 
     def build_targets(self, batch: SampleBatch) -> dict[str, Any]:
@@ -392,6 +393,8 @@ class TestTrain:
         assert args.greater_is_better is True
         assert args.load_best_model_at_end is False
         assert args.save_strategy.value == "no"
+        assert args.logging_strategy.value == "steps"
+        assert args.logging_steps == 1
 
     def test_train_monitor_is_configurable(self, tmp_path: Path, model: _StubHFModel) -> None:
         engine = self._engine(tmp_path, model)
@@ -448,6 +451,147 @@ class TestTrain:
             engine.train(max_epochs=1, batch=2)
 
         trainer.save_model.assert_called_once()
+
+    def test_train_extracts_best_confidence_threshold_from_fmeasure(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer()
+        fmeasure = MagicMock()
+        # The engine reads the backing attribute (the property raises while
+        # the sweep has not computed) — set the same field here.
+        fmeasure._current_confidence_threshold = 0.145
+        trainer._val_metric = MagicMock()
+        trainer._val_metric.FMeasure = fmeasure
+        best_dir = tmp_path / "wd" / "best_checkpoint"
+        best_dir.mkdir(parents=True)  # exercised load_checkpoint path
+        engine._model.load_checkpoint = MagicMock()  # type: ignore[method-assign]
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.train(max_epochs=1, batch=2)
+
+        # Extraction runs after load_checkpoint; the pre-sweep checkpoint config
+        # has no persisted threshold, so the in-memory value must survive.
+        assert model.best_confidence_threshold == pytest.approx(0.145)
+
+    def test_train_keeps_threshold_none_without_fmeasure(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer()
+        trainer._val_metric = MagicMock()
+        trainer._val_metric.FMeasure = None
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.train(max_epochs=1, batch=2)
+
+        assert model.best_confidence_threshold is None
+
+    def test_train_does_not_fail_when_threshold_sweep_never_computed(self, tmp_path: Path, model: _StubHFModel) -> None:
+        """A never-computed FMeasure must be treated as "no threshold", not raise."""
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer()
+        fmeasure = MagicMock()
+        fmeasure._current_confidence_threshold = None
+        trainer._val_metric = MagicMock()
+        trainer._val_metric.FMeasure = fmeasure
+        # Without a saved best checkpoint (no load path) the extraction is the
+        # only threshold source; the property would raise RuntimeError here.
+        engine._model.load_checkpoint = MagicMock()  # type: ignore[method-assign]
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.train(max_epochs=1, batch=2)
+
+        assert model.best_confidence_threshold is None
+
+    def test_predict_uses_model_best_confidence_threshold_by_default(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        engine._datamodule.subsets["test"] = MagicMock()  # pyrefly: ignore[missing-attribute]
+        model._best_confidence_threshold = 0.11
+        trainer = MagicMock()
+        trainer.predict_batches.return_value = []
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.predict(batch=2)
+
+        assert trainer.predict_batches.called
+
+    def test_predict_explicit_threshold_overrides_model_value(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        engine._datamodule.subsets["test"] = MagicMock()  # pyrefly: ignore[missing-attribute]
+        trainer = MagicMock()
+        trainer.predict_batches.return_value = []
+
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.predict(confidence_threshold=0.9, batch=2)
+
+        trainer.predict_batches.assert_called_once()
+
+    def test_test_passes_best_threshold_as_compute_kwargs(self, tmp_path: Path, model: _StubHFModel) -> None:
+        engine = self._engine(tmp_path, model)
+        engine._datamodule.subsets["test"] = MagicMock()  # pyrefly: ignore[missing-attribute]
+        model._best_confidence_threshold = 0.33
+        default_metric = MagicMock()
+        model.build_default_metric = MagicMock(return_value=default_metric)  # type: ignore[method-assign]
+        trainer = MagicMock()
+        with patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer):
+            engine.test(batch=2)
+
+        trainer.evaluate.assert_called_once_with(
+            split="test",
+            metric=default_metric,
+            compute_kwargs={"best_confidence_threshold": 0.33},
+        )
+
+    def test_train_forwards_hf_recipe_training_args_to_training_arguments(
+        self, tmp_path: Path, model: _StubHFModel
+    ) -> None:
+        """App-level training block (converted recipe hyperparameters) reaches TrainingArguments."""
+        engine = self._engine(tmp_path, model)
+        engine._datamodule.subsets["train"] = MagicMock()  # pyrefly: ignore[missing-attribute]
+        engine._datamodule.subsets["train"].__len__.return_value = 800  # pyrefly: ignore[missing-attribute]
+        kwargs = {
+            "optim": "adamw_torch",
+            "weight_decay": 0.0001,
+            "lr_scheduler_type": "cosine",
+            "max_grad_norm": 0.1,
+            "gradient_accumulation_steps": 4,
+            "warmup_ratio": 0.05,
+        }
+
+        with (
+            patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=self._mock_trainer()),
+            patch("getitune.backend.huggingface.engine.TrainingArguments") as args_cls,
+        ):
+            engine.train(max_epochs=3, batch=1, **kwargs)
+
+        _, call_kwargs = args_cls.call_args
+        assert call_kwargs["optim"] == "adamw_torch"
+        assert call_kwargs["weight_decay"] == pytest.approx(0.0001)
+        assert call_kwargs["lr_scheduler_type"] == "cosine"
+        assert call_kwargs["max_grad_norm"] == pytest.approx(0.1)
+        assert call_kwargs["gradient_accumulation_steps"] == 4
+        # warmup_ratio -> optimizer steps: 800 samples / (batch 1 x accum 4) =
+        # 200 optimizer steps/epoch x 3 epochs x 0.05 ratio = 30.
+        assert call_kwargs["warmup_steps"] == int(0.05 * 200 * 3)
+
+    def test_train_injects_plateau_mode_max_for_higher_better_metrics(
+        self, tmp_path: Path, model: _StubHFModel
+    ) -> None:
+        """ReduceLROnPlateau defaults to mode=min; maximized val metrics must get mode=max."""
+        engine = self._engine(tmp_path, model)
+
+        with (
+            patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=self._mock_trainer()),
+            patch("getitune.backend.huggingface.engine.TrainingArguments") as args_cls,
+        ):
+            engine.train(
+                max_epochs=1,
+                batch=2,
+                lr_scheduler_type="reduce_lr_on_plateau",
+                lr_scheduler_kwargs={"factor": 0.1, "patience": 7},
+            )
+
+        call_kwargs = args_cls.call_args.kwargs
+        assert call_kwargs["metric_for_best_model"] == "val/map"
+        scheduler_kwargs = call_kwargs["lr_scheduler_kwargs"]
+        assert scheduler_kwargs == {"factor": 0.1, "patience": 7, "mode": "max"}
 
     def test_train_disables_eval_when_no_val_split(self, tmp_path: Path, model: _StubHFModel) -> None:
         engine = self._engine(tmp_path, model, with_val=False)

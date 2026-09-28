@@ -18,7 +18,7 @@ const mockedRemoveLsExportId = vi.fn();
 vi.mock('../../../../../../hooks/storage/use-export-dataset.hook', () => ({
     useExportDataset: () => ({
         removeLsExportId: mockedRemoveLsExportId,
-        getLsExportIds: vi.fn(() => []),
+        lsExportIds: [],
         addLsExportId: vi.fn(),
     }),
 }));

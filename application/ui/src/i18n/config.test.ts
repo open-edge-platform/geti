@@ -21,7 +21,7 @@ describe('createI18nInstance', () => {
         const instance = createI18nInstance({ lng: 'en' });
 
         expect(instance.isInitialized).toBe(true);
-        expect(instance.t('navigation.dataset')).toBe('Dataset');
+        expect(instance.t('common.labels.dataset')).toBe('Dataset');
     });
 
     it('does not touch language storage when a language is pinned', () => {
@@ -47,37 +47,53 @@ describe('createI18nInstance', () => {
 
         expect(instance.language).toBe('en');
         expect(instance.resolvedLanguage).toBe('en');
-        expect(instance.t('navigation.dataset')).toBe('Dataset');
+        expect(instance.t('common.labels.dataset')).toBe('Dataset');
         expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe('en');
     });
 
-    it.each(['zh-CN', 'zh-TW', 'zh-Hant-HK', 'zh-MO', 'fr-FR', 'not a language', '---', ''])(
+    it.each(['fr-FR', 'not a language', '---', ''])(
         'renders English for unsupported browser language %s',
         (language) => {
             setNavigatorLanguage(language);
             const instance = createI18nInstance();
 
             expect(instance.resolvedLanguage).toBe('en');
-            expect(instance.t('navigation.dataset')).toBe('Dataset');
+            expect(instance.t('common.labels.dataset')).toBe('Dataset');
         }
     );
 
-    it.each(['zh-CN', 'zh-TW', 'zh-HK', 'zh-MO', 'klingon', 'not a language'])(
-        'renders English for unsupported stored language %s',
+    it.each(['zh', 'zh-CN', 'zh-TW', 'zh-Hant-HK', 'zh-MO'])(
+        'renders Simplified Chinese for browser language %s',
         (language) => {
-            localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+            setNavigatorLanguage(language);
             const instance = createI18nInstance();
 
-            expect(instance.resolvedLanguage).toBe('en');
-            expect(instance.t('navigation.dataset')).toBe('Dataset');
+            expect(instance.resolvedLanguage).toBe('zh-CN');
+            expect(instance.t('common.labels.dataset')).toBe('数据集');
         }
     );
 
-    it('renders English for a pinned unsupported language', () => {
-        const instance = createI18nInstance({ lng: 'zh-CN' });
+    it.each(['klingon', 'not a language'])('renders English for unsupported stored language %s', (language) => {
+        localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+        const instance = createI18nInstance();
 
         expect(instance.resolvedLanguage).toBe('en');
-        expect(instance.t('navigation.dataset')).toBe('Dataset');
+        expect(instance.t('common.labels.dataset')).toBe('Dataset');
+    });
+
+    it('renders the stored Simplified Chinese language', () => {
+        localStorage.setItem(LANGUAGE_STORAGE_KEY, 'zh-CN');
+        const instance = createI18nInstance();
+
+        expect(instance.resolvedLanguage).toBe('zh-CN');
+        expect(instance.t('common.labels.dataset')).toBe('数据集');
+    });
+
+    it('renders English for a pinned unsupported language', () => {
+        const instance = createI18nInstance({ lng: 'fr-FR' });
+
+        expect(instance.resolvedLanguage).toBe('en');
+        expect(instance.t('common.labels.dataset')).toBe('Dataset');
     });
 });
 
@@ -88,11 +104,11 @@ describe('English fallback', () => {
             supportedLngs: ['en', 'zh-TW'],
             resources: {
                 en: resources.en,
-                'zh-TW': { translation: { navigation: { dataset: 'TW dataset' } } },
+                'zh-TW': { translation: { common: { labels: { dataset: 'TW dataset' } } } },
             },
         });
 
-        expect(instance.t('navigation.dataset')).toBe('TW dataset');
+        expect(instance.t('common.labels.dataset')).toBe('TW dataset');
         expect(instance.t('navigation.models')).toBe('Models');
     });
 });

@@ -1,0 +1,39 @@
+# Copyright (C) 2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+id: object-detection-rtdetrv2-r18
+name: RT-DETRv2-R18
+pretrained_weights:
+  source: huggingface
+  repo_id: PekingU/rtdetr_v2_r18vd
+  revision: 5650961749fa93567c0d46fc7f43ea4f9e914107
+description: "RT-DETRv2-R18 is the most lightweight member of the RT-DETRv2 family: a real-time end-to-end detector with selective multi-scale feature extraction and improved training strategies."
+stats:
+  gigaflops: 60.0
+  trainable_parameters: 20.174608
+  benchmark_metrics:
+    coco_map_50_95: 47.9
+    coco_map_50: 66.6
+capabilities:
+  xai: false
+  tiling: false
+hyperparameters:
+  training:
+    learning_rate: 0.0001
+    weight_decay: 0.0001
+    input_size_width: 640
+    input_size_height: 640
+    max_epochs: 100
+    batch_size: 8
+    early_stopping:
+      patience: 10
+    scheduler:
+      type: reduce_lr_on_plateau
+      factor: 0.1
+      patience: 7
+      warmup:
+        enable: true
+        epochs: 3
+    gradient_clip:
+      enable: true
+      max_grad_norm: 0.1

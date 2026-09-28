@@ -5,6 +5,8 @@
 
 from getitune.backend.huggingface.models import (
     HFDetectionModel,
+    HFDinov3MulticlassClsModel,
+    HFDinov3MultilabelClsModel,
     HFInstSegModel,
     HFModel,
     HFMulticlassClsModel,
@@ -75,6 +77,8 @@ __all__ = [
     "EdgeCrafter",
     "EfficientNet",
     "HFDetectionModel",
+    "HFDinov3MulticlassClsModel",
+    "HFDinov3MultilabelClsModel",
     "HFInstSegModel",
     "HFModel",
     "HFMulticlassClsModel",

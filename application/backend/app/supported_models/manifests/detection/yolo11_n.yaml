@@ -1,6 +1,9 @@
 id: object-detection-yolo11-n
 name: YOLO11-N
-license: AGPL-3.0
+
+license:
+  name: AGPL-3.0
+  url: https://www.ultralytics.com/legal/agpl-3-0-software-license
 
 pretrained_weights:
   source: direct_link

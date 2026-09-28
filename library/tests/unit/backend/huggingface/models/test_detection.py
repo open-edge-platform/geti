@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import math
 
+import pytest
 import torch
 import transformers as tf
 from torchvision import tv_tensors
@@ -56,6 +57,31 @@ def test_export_parameters() -> None:
     params = HFDetectionModel(_tiny_config(), _label_info())._export_parameters
     assert params.model_type == "ssd"
     assert params.task_type == "detection"
+    assert params.confidence_threshold == pytest.approx(0.25)
+
+
+def test_export_parameters_embed_computed_best_confidence_threshold() -> None:
+    """The auto-computed F1-optimal threshold overrides the static default in export metadata."""
+    model = HFDetectionModel(_tiny_config(), _label_info())
+    model._best_confidence_threshold = 0.14
+
+    assert model._export_parameters.confidence_threshold == pytest.approx(0.14)
+
+    model._best_confidence_threshold = None
+    assert model._export_parameters.confidence_threshold == pytest.approx(0.25)
+
+
+def test_default_confidence_threshold_matches_export_default() -> None:
+    model = HFDetectionModel(_tiny_config(), _label_info())
+
+    assert model.default_confidence_threshold == pytest.approx(0.25)
+
+
+def test_default_metric_includes_fmeasure() -> None:
+    from getitune.metrics.fmeasure import MeanAveragePrecisionFMeasure
+
+    model = HFDetectionModel(_tiny_config(), _label_info())
+    assert isinstance(model.build_default_metric(), MeanAveragePrecisionFMeasure)
 
 
 class TestBuildTargets:

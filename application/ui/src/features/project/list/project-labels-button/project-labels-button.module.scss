@@ -1,0 +1,7 @@
+.labelDot {
+    display: inline-block;
+    width: var(--spectrum-global-dimension-size-100);
+    height: var(--spectrum-global-dimension-size-100);
+    border-radius: 50%;
+    flex-shrink: 0;
+}

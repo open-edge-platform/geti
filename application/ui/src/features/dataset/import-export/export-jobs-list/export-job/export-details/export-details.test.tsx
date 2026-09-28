@@ -112,4 +112,60 @@ describe('ExportJobDetails', () => {
 
         expect(await screen.findByText(/All media/)).toBeVisible();
     });
+
+    it('names the dataset view being exported', async () => {
+        server.use(
+            http.get('/api/projects/{project_id}/dataset/views', () => {
+                return HttpResponse.json([
+                    {
+                        id: 'view-1',
+                        project_id: 'project-123',
+                        name: 'Canada signs',
+                        created_at: '2026-01-19T08:15:00.000000+00:00',
+                    },
+                ]);
+            })
+        );
+
+        renderApp({
+            dataset_id: 'staged-dataset-123',
+            dataset_view_id: 'view-1',
+            project_id: 'project-123',
+            export_format: 'COCO',
+            filters: { include_unannotated: true },
+        });
+
+        expect(await screen.findByText('Export dataset view')).toBeVisible();
+        expect(await screen.findByText('View: Canada signs')).toBeVisible();
+    });
+
+    it('falls back to a neutral label when the exported view no longer exists', async () => {
+        server.use(
+            http.get('/api/projects/{project_id}/dataset/views', () => {
+                return HttpResponse.json([]);
+            })
+        );
+
+        renderApp({
+            dataset_id: 'staged-dataset-123',
+            dataset_view_id: 'deleted-view',
+            project_id: 'project-123',
+            export_format: 'COCO',
+            filters: { include_unannotated: true },
+        });
+
+        expect(await screen.findByText('View: Deleted view')).toBeVisible();
+    });
+
+    it('does not show a view row when the entire dataset was exported', async () => {
+        renderApp({
+            dataset_id: 'dataset-123',
+            project_id: 'project-123',
+            export_format: 'COCO',
+            filters: { include_unannotated: true },
+        });
+
+        expect(await screen.findByText('Export dataset')).toBeVisible();
+        expect(screen.queryByText(/^View: /)).not.toBeInTheDocument();
+    });
 });

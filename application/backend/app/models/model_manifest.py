@@ -94,6 +94,7 @@ class WeightsSource(StrEnum):
 
     TIMM = "timm"  # Weights are managed by the timm library
     DIRECT_LINK = "direct_link"  # Weights URL and checksum are defined directly in the manifest file
+    HUGGINGFACE = "huggingface"  # Weights are stored as a Hugging Face Hub repository snapshot
 
 
 class DirectLinkPretrainedWeights(BaseModel):
@@ -125,8 +126,21 @@ class TimmPretrainedWeights(BaseModel):
     source: Literal[WeightsSource.TIMM] = WeightsSource.TIMM
 
 
+class HuggingFacePretrainedWeights(BaseModel):
+    """Pretrained weights provided as a Hugging Face Hub repository snapshot."""
+
+    model_config = ConfigDict(extra="forbid")
+    source: Literal[WeightsSource.HUGGINGFACE] = WeightsSource.HUGGINGFACE
+    repo_id: str = Field(title="Repository ID", description="Hugging Face Hub repository identifier")
+    revision: str | None = Field(
+        default=None,
+        title="Repository revision",
+        description="Hugging Face Hub branch, tag, or commit hash to download",
+    )
+
+
 PretrainedWeights = Annotated[
-    DirectLinkPretrainedWeights | TimmPretrainedWeights,
+    DirectLinkPretrainedWeights | TimmPretrainedWeights | HuggingFacePretrainedWeights,
     Field(discriminator="source"),
 ]
 
@@ -143,14 +157,24 @@ class TimmMetadata(BaseModel):
     )
 
 
+class License(BaseModel):
+    """License information for a model architecture."""
+
+    model_config = ConfigDict(extra="forbid")
+    name: str = Field(title="License Name", description="Display name of the license")
+    url: str = Field(title="License URL", description="URL to LICENSE file source")
+
+
 class ModelManifest(BaseModel):
     """ModelManifest contains the necessary information for training a specific machine learning model."""
 
     model_config = ConfigDict(extra="forbid")
     id: str = Field(title="Model architecture ID", description="Unique identifier for the model architecture")
     name: str = Field(title="Model architecture name", description="Friendly name of the model architecture")
-    license: str = Field(
-        default="Apache 2.0", title="License", description="License under which the model architecture is released"
+    license: License = Field(
+        default_factory=lambda: License(name="Apache 2.0", url="https://www.apache.org/licenses/LICENSE-2.0.txt"),
+        title="License",
+        description="License under which the model architecture is released",
     )
     pretrained_weights: PretrainedWeights = Field(
         title="Pretrained Weights", description="Information about the pretrained weights for the model architecture"

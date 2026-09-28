@@ -3,12 +3,12 @@
 
 import { usePrefetchQuery } from '@tanstack/react-query';
 import { usePrefetchPipeline } from 'hooks/api/pipeline.hook';
+import { usePrefetchModels } from 'hooks/api/use-get-models.hook';
 import { usePrefetchDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { datasetViewsQueryOptions } from '../../../dataset/gallery/toolbar/dataset-view-selector/api/use-dataset-views';
 import { usePrefetchTaskModelArchitectures } from '../../hooks/api/use-get-model-architectures.hook';
-import { usePrefetchModels } from '../../hooks/api/use-get-models.hook';
 import { usePrefetchTrainingDevices } from './use-get-training-devices';
 
 export const usePrefetchTrainModelData = () => {

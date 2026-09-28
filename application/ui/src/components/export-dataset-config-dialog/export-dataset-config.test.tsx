@@ -2,7 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Project } from '@/api/types';
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { getMockedJob } from 'mocks/mock-job';
 import { HttpResponse } from 'msw';
 import { render } from 'test-utils/render';
 
@@ -159,5 +160,61 @@ describe('ExportDatasetConfig', () => {
 
         fireEvent.click(await screen.findByRole('radio', { name: 'COCO' }));
         expect(await screen.findByText(COCO_WARNING)).toBeVisible();
+    });
+
+    describe('dataset views', () => {
+        const renderViewApp = () => {
+            let exportRequestBody: Record<string, unknown> | undefined;
+
+            server.use(
+                http.get('/api/projects/{project_id}', () => {
+                    return HttpResponse.json(
+                        getMockedProject({ task: { exclusive_labels: true, task_type: 'detection' } })
+                    );
+                }),
+                http.post('/api/jobs', async ({ request }) => {
+                    exportRequestBody = (await request.json()) as Record<string, unknown>;
+
+                    return HttpResponse.json(getMockedJob({ job_id: 'job-1' }));
+                })
+            );
+
+            render(
+                <ExportDatasetConfig
+                    dialogState={mockDialogState}
+                    datasetId={null}
+                    datasetViewId='view-1'
+                    datasetViewName='Canada signs'
+                    statistics={undefined}
+                />
+            );
+
+            return () => exportRequestBody;
+        };
+
+        it('shows the name of the dataset view being exported', async () => {
+            renderViewApp();
+
+            expect(await screen.findByRole('heading', { name: 'Export dataset view' })).toBeVisible();
+            expect(screen.getByText('View: Canada signs')).toBeVisible();
+        });
+
+        it('sends the dataset view id when submitting the export job', async () => {
+            const getExportRequestBody = renderViewApp();
+
+            fireEvent.click(await screen.findByRole('button', { name: 'Export' }));
+
+            await waitFor(() => expect(getExportRequestBody()).toBeDefined());
+            expect(getExportRequestBody()).toEqual(
+                expect.objectContaining({ dataset_id: null, dataset_view_id: 'view-1' })
+            );
+        });
+
+        it('does not show a view row when exporting the entire dataset', async () => {
+            renderApp(getMockedProject({ task: { exclusive_labels: true, task_type: 'detection' } }));
+
+            expect(await screen.findByText('Export dataset')).toBeVisible();
+            expect(screen.queryByText(/^View: /)).not.toBeInTheDocument();
+        });
     });
 });

@@ -22,7 +22,7 @@ from getitune.backend.huggingface.models.utils import (
 from getitune.backend.lightning.models.base import DataInputParams
 from getitune.data.entity.sample import PredictionBatch
 from getitune.data.utils.structures.mask.mask_util import encode_rle
-from getitune.metrics.mean_ap import MaskRLEMeanAPCallable
+from getitune.metrics.fmeasure import MaskRLEMeanAPFMeasureCallable
 from getitune.types.export import TaskLevelExportParameters
 from getitune.types.task import TaskType
 
@@ -106,10 +106,19 @@ class HFInstSegModel(HFModel):
         return super()._export_parameters.wrap(
             model_type=self.export_model_type,
             task_type="instance_segmentation",
-            confidence_threshold=self._confidence_threshold,
+            confidence_threshold=(
+                self.best_confidence_threshold
+                if self.best_confidence_threshold is not None
+                else self._confidence_threshold
+            ),
             iou_threshold=self._iou_threshold,
             label_info=label_info,
         )
+
+    @property
+    def default_confidence_threshold(self) -> float:
+        """Threshold used when validation did not compute an F1 optimum."""
+        return self._confidence_threshold
 
     def build_targets(self, batch: SampleBatch) -> dict[str, Any]:
         """Convert Geti's uint8 instance masks and labels to MaskFormer's targets (G9)."""
@@ -129,46 +138,67 @@ class HFInstSegModel(HFModel):
         size, for the same reason as detection: ``to_metric_inputs`` then
         only has to reproject the (simpler) ground truth once, instead of
         rescaling every prediction individually.
+
+        Decoded **per query**, identical to the exported runtime path
+        (``forward_for_tracing`` + ModelAPI's ``DETRInstSeg`` decode): one
+        prediction per query with ``mask > 0.5``, label = argmax class
+        (background excluded), and score = top foreground-class probability.
+        The HF ``post_process_instance_segmentation`` merge is intentionally
+        *not* used here: it merges overlapping queries per pixel, which is a
+        semantic that diverges from the per-query ModelAPI decode.
         """
         input_size = (int(batch.images[0].shape[-2]), int(batch.images[0].shape[-1]))
-        decoded = self._image_processor.post_process_instance_segmentation(  # pyrefly: ignore[missing-attribute]
-            outputs,
-            threshold=0.0,
-            target_sizes=[input_size] * len(batch.images),
-            return_binary_maps=True,
+        masks_logits = f.interpolate(
+            outputs.masks_queries_logits,  # pyrefly: ignore[missing-attribute]
+            size=input_size,
+            mode="bilinear",
         )
+        masks_probs = masks_logits.sigmoid()
+        class_probs = outputs.class_queries_logits.softmax(dim=-1)[..., :-1]  # pyrefly: ignore[missing-attribute]
+        scores, labels = class_probs.max(dim=-1)
 
-        bboxes, masks, labels, scores = [], [], [], []
-        for image_result in decoded:
-            segmentation = image_result["segmentation"]
-            if segmentation.ndim == 2:
-                binary_maps = torch.empty((0, *input_size), dtype=torch.bool, device=segmentation.device)
-            else:
-                binary_maps = segmentation.bool()
-            device = binary_maps.device
-            bboxes.append(
-                tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
-                    _traceable_masks_to_boxes(binary_maps),
-                    format=tv_tensors.BoundingBoxFormat.XYXY,
-                    canvas_size=input_size,
+        bboxes, masks, batch_labels, batch_scores = [], [], [], []
+        for image_idx, image_masks in enumerate(masks_probs):
+            per_query_masks, per_query_labels, per_query_scores, per_query_boxes = [], [], [], []
+            for query_idx in range(image_masks.shape[0]):
+                # NOTE: no score filtering here. ``postprocess`` returns every
+                # query so callers can threshold at any level (metric sweeps,
+                # ``HFEngine.predict()``); user-facing filtering lives at the
+                # engine boundary (``unbatch_predictions``). Dropping
+                # sub-threshold queries here would make results non-recoverable.
+                binary = (image_masks[query_idx] > 0.5).bool()
+                box = _traceable_masks_to_boxes(binary.unsqueeze(0))[0]
+
+                per_query_masks.append(binary.unsqueeze(0))
+                per_query_labels.append(labels[image_idx, query_idx].reshape(1))
+                per_query_scores.append(scores[image_idx, query_idx].reshape(1))
+                per_query_boxes.append(box.reshape(1, 4))
+            if per_query_boxes:
+                bboxes.append(
+                    tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+                        torch.cat(per_query_boxes), format=tv_tensors.BoundingBoxFormat.XYXY, canvas_size=input_size
+                    )
                 )
-            )
-            masks.append(tv_tensors.Mask(binary_maps))
-            segments_info = image_result["segments_info"]
-            labels.append(
-                torch.tensor([segment["label_id"] for segment in segments_info], dtype=torch.long, device=device)
-            )
-            scores.append(
-                torch.tensor([segment["score"] for segment in segments_info], dtype=torch.float32, device=device)
-            )
+                masks.append(tv_tensors.Mask(torch.cat(per_query_masks)))
+                batch_labels.append(torch.cat(per_query_labels).cpu())
+                batch_scores.append(torch.cat(per_query_scores).cpu())
+            else:
+                bboxes.append(
+                    tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+                        torch.zeros((0, 4)), format=tv_tensors.BoundingBoxFormat.XYXY, canvas_size=input_size
+                    )
+                )
+                masks.append(tv_tensors.Mask(torch.zeros((0, *input_size), dtype=torch.bool)))
+                batch_labels.append(torch.zeros(0, dtype=torch.long))
+                batch_scores.append(torch.zeros(0, dtype=torch.float32))
 
         return PredictionBatch(
             images=batch.images,
             imgs_info=batch.imgs_info,
             bboxes=bboxes,
             masks=masks,
-            labels=labels,
-            scores=scores,
+            labels=batch_labels,
+            scores=batch_scores,
         )
 
     def to_metric_inputs(self, outputs: ModelOutput, batch: SampleBatch) -> dict[str, Any]:
@@ -231,8 +261,8 @@ class HFInstSegModel(HFModel):
         return {"preds": preds, "target": target}
 
     def build_default_metric(self) -> Metric | MetricCollection:
-        """Mean average precision over RLE-encoded masks, the standard instance-seg metric."""
-        return MaskRLEMeanAPCallable(self.label_info)
+        """Mask RLE MAP with F-measure: F1 sweep also yields the optimal confidence threshold."""
+        return MaskRLEMeanAPFMeasureCallable(self.label_info)
 
     def forward_for_tracing(self, images: torch.Tensor) -> dict[str, torch.Tensor]:
         """Return per-query boxes/labels/masks for ONNX/OpenVINO export.
@@ -255,7 +285,7 @@ class HFInstSegModel(HFModel):
         outputs = self.hf_model(pixel_values=images)
         masks_logits = f.interpolate(outputs.masks_queries_logits, size=input_size, mode="bilinear")
         masks_probs = masks_logits.sigmoid()
-        class_probs = outputs.class_queries_logits.softmax(dim=-1)[..., :-1]
+        class_probs = outputs.class_queries_logits.softmax(dim=-1)[..., :-1]  # pyrefly: ignore[missing-attribute]
         scores, labels = class_probs.max(dim=-1)
 
         batch_size, num_queries = masks_probs.shape[:2]
