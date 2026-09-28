@@ -18,7 +18,7 @@
 
 </div>
 
-**_Geti™_** provides access to one of the largest open-source collections of computer vision models, with an end-to-end workflow for training, optimization, and deployment on Intel® hardware.
+**_Geti™_** provides access to one of the largest open-source collections of computer vision models — **1,600+ model variants** — with an end-to-end workflow for training, optimization, and deployment on Intel® hardware.
 
 Available as a Docker container or native Windows application, Geti™ guides you through the entire model lifecycle—from dataset preparation and training to optimization and deployment.
 Fine-tune models on Intel® CPUs and GPUs, then deploy supported models through OpenVINO™ for inference on **Intel® CPUs, GPUs, and NPUs**, including **Intel® Core™ Ultra platforms (Panther Lake)** and **Intel® Arc™ B-series GPUs**. Model and device compatibility follows [OpenVINO™ device support](https://docs.openvino.ai/2026/documentation/compatibility-and-support/supported-devices.html).
@@ -27,13 +27,13 @@ The Geti™ application is powered by **_getitune_**, an open-source engine for 
 
 ### Explore the model catalog
 
-**Detect objects and segment individual instances with RF-DETR, DINOv3 DETR, EdgeCrafter (ECDet), YOLO, and Mask R-CNN.** Geti™ brings these model families into a workflow for dataset preparation, training, optimization, and deployment.
+**Detect objects and segment individual instances with RF-DETR, DINOv3 DETR, EdgeCrafter (ECDet), YOLO, and Mask R-CNN.** Geti™ brings these model families into a workflow for dataset preparation, training, optimization, and deployment. Explore **1,600+ model variants** across Geti's model catalog, including classification backbones available through the **timm** integration.
 
 | Task | Model highlights |
 | --- | --- |
 | **Object detection** — locate objects with bounding boxes | **RF-DETR · DINOv3 DETR · EdgeCrafter (ECDet)**<br>D-FINE · RT-DETR · YOLO11 / YOLO12 / YOLO26 · YOLOX · ATSS · SSD |
 | **Instance segmentation** — outline each object with a pixel mask | **RF-DETR Seg · Mask R-CNN · YOLO11 / YOLO26 Seg**<br>RTMDet Instance |
-| **Image classification** — assign labels to images | DINOv2 · ViT · EfficientNet · MobileNetV3 · YOLO26 Cls<br>Additional backbones through the library's [timm](https://github.com/huggingface/pytorch-image-models) integration |
+| **Image classification** — assign labels to images | DINOv2 · ViT · EfficientNet · MobileNetV3 · YOLO26 Cls<br>ResNet · ConvNeXt · Swin Transformer via timm<br>Additional backbones through the library's [timm](https://github.com/huggingface/pytorch-image-models) integration |
 
 The Geti™ application supports all three task types above. The standalone `getitune` library also provides **semantic segmentation** (DINOv2, Lite-HRNet, SegNeXt, YOLO26 Sem) and **keypoint detection** (RTMPose), with curated recipes and a unified engine API.
 
@@ -223,7 +223,7 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
     </tr>
     <tr>
-      <td rowspan="7"><b>Classification</b> (multi-class, multi-label)<br>Assign one or more labels to an entire image. Common use cases: defect classification, product categorization, content tagging.</td>
+      <td rowspan="10"><b>Classification</b> (multi-class, multi-label)<br>Assign one or more labels to an entire image. Common use cases: defect classification, product categorization, content tagging.</td>
       <td>ViT Tiny</td>
       <td><a href="https://arxiv.org/abs/2010.11929">ViT</a></td>
     </tr>
@@ -248,7 +248,19 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
     </tr>
     <tr>
-      <td>Additional classification backbones through the library's <i>timm</i> integration</td>
+      <td>ResNet (via <i>timm</i>)</td>
+      <td><a href="https://arxiv.org/abs/1512.03385">ResNet</a></td>
+    </tr>
+    <tr>
+      <td>ConvNeXt (via <i>timm</i>)</td>
+      <td><a href="https://arxiv.org/abs/2201.03545">ConvNeXt</a></td>
+    </tr>
+    <tr>
+      <td>Swin Transformer (via <i>timm</i>)</td>
+      <td><a href="https://arxiv.org/abs/2103.14030">Swin Transformer</a></td>
+    </tr>
+    <tr>
+      <td>Additional classification backbones through the library's <i>timm</i> integration — part of Geti's <b>1,600+ model variants</b></td>
       <td><a href="https://github.com/huggingface/pytorch-image-models">timm</a></td>
     </tr>
   </tbody>
