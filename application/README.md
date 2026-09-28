@@ -28,10 +28,11 @@ train and optimize models, and run real-time inference through configurable pipe
 
 Main capabilities:
 
+- **Detection, segmentation, and classification**: train object detection and instance segmentation models such as RF-DETR, DINOv3 DETR, EdgeCrafter (ECDet), YOLO, and Mask R-CNN, alongside image classification models. Explore the [model catalog](../README.md#key-features) for task-specific options.
 - **No-code model lifecycle**: move from data upload and annotation to training, evaluation, and deployment in one UI.
 - **Built-in data and annotation workflows**: manage datasets, labels, and revisions with manual and AI-assisted annotation tools.
 - **Pipeline-based deployment**: connect sources (cameras or files) to trained models and route predictions to sinks such as storage, MQTT, or webhooks.
-- **Edge-oriented optimization**: export OpenVINO-optimized models for efficient inference on Intel hardware, with support for other accelerators.
+- **Intel hardware acceleration**: fine-tune on Intel® CPUs and GPUs, then deploy supported models through OpenVINO™ for inference on Intel® CPUs, GPUs, and NPUs, including Intel® Core™ Ultra platforms (Panther Lake) and Intel® Arc™ B-series GPUs. Model and device compatibility follows [OpenVINO™ device support](https://docs.openvino.ai/2026/documentation/compatibility-and-support/supported-devices.html).
 
 ### Installation
 
