@@ -1,8 +1,9 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { API_BASE_URL } from '@/api';
 import { createI18nInstance } from '@/i18n';
-import { HttpResponse } from 'msw';
+import { HttpResponse, http as mswHttp } from 'msw';
 
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
@@ -89,7 +90,7 @@ describe('prepareVideoFileFormData', () => {
 
     it('rejects when the upload fails', async () => {
         server.use(
-            http.post('/api/sources/media', () => {
+            mswHttp.post(`${API_BASE_URL}/api/sources/media`, () => {
                 return HttpResponse.json({ detail: 'Unsupported video format' }, { status: 422 });
             })
         );
