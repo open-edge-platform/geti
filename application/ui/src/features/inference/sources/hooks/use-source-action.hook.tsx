@@ -51,7 +51,7 @@ export const useSourceAction = <T extends SourceConfigPayload>({
             toast({
                 type: 'error',
                 message: t('inference.sources.form.saveError', {
-                    details: details ?? t('inference.sources.form.saveErrorFallback'),
+                    details: details ?? t('inference.connection.saveErrorFallback'),
                 }),
             });
         }

@@ -15,12 +15,7 @@ export const IpCamera = ({ defaultState }: IpCameraProps) => {
     return (
         <Flex direction='column' gap='size-200'>
             <TextField isHidden label='id' name='id' defaultValue={defaultState?.id} />
-            <TextField
-                width={'100%'}
-                label={t('inference.sources.fields.name')}
-                name='name'
-                defaultValue={defaultState?.name}
-            />
+            <TextField width={'100%'} label={t('common.labels.name')} name='name' defaultValue={defaultState?.name} />
             <TextField
                 isRequired
                 width={'100%'}

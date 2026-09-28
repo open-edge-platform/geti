@@ -6,8 +6,8 @@ import { useTranslation } from '@/i18n';
 import { Button, ButtonGroup } from '@geti-ui/ui';
 
 import { useImportDatasetToProject } from '../../../../../hooks/storage/use-import-dataset-to-project.hook';
+import { ImportDatasetToProjectState } from '../../../../../shared/import-dataset-state';
 import { LabelMappingButtons } from '../label-mapping/label-mapping-buttons.component';
-import { ImportDatasetToProjectState } from '../util';
 
 type ImportDatasetButtonsProps = {
     onClose: () => void;
@@ -24,7 +24,7 @@ export const ImportDatasetButtons = ({ currentStep, stagedDatasetId, onClose }: 
         return (
             <ButtonGroup>
                 <Button onPress={onClose} variant='secondary'>
-                    {t('dataset.import.cancel')}
+                    {t('common.actions.cancel')}
                 </Button>
             </ButtonGroup>
         );
@@ -48,7 +48,7 @@ export const ImportDatasetButtons = ({ currentStep, stagedDatasetId, onClose }: 
     return (
         <ButtonGroup>
             <Button onPress={onClose} variant='secondary'>
-                {t('dataset.import.cancel')}
+                {t('common.actions.cancel')}
             </Button>
         </ButtonGroup>
     );

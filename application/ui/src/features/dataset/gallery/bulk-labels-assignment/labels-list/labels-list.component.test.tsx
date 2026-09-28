@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 import { getMockedLabel } from 'mocks/mock-labels';
 import { render } from 'test-utils/render';
 
-import { EMPTY_LABEL_ID } from '../../../../../shared/annotator/labels';
+import { EMPTY_LABEL_ID } from '../../../../../shared/labels';
 import { LabelsList } from './labels-list.component';
 
 const labels: Label[] = [

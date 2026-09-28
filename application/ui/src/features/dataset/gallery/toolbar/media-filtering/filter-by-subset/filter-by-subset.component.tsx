@@ -6,14 +6,9 @@ import { useTranslation } from '@/i18n';
 import { Checkbox, CheckboxGroup, Flex, Text } from '@geti-ui/ui';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
 
-import classes from './filter-by-subset.module.scss';
+import { SUBSET_LABEL_KEYS, SUBSETS } from '../../../../../../shared/subsets';
 
-const SUBSET_OPTIONS: { name: DatasetSubset }[] = [
-    { name: 'training' },
-    { name: 'validation' },
-    { name: 'testing' },
-    { name: 'unassigned' },
-];
+import classes from './filter-by-subset.module.scss';
 
 export const FilterBySubset = () => {
     const { t } = useTranslation();
@@ -29,9 +24,9 @@ export const FilterBySubset = () => {
             <Flex direction='column'>
                 <CheckboxGroup value={selectedSubsets} onChange={handleSelectionChange}>
                     <>
-                        {SUBSET_OPTIONS.map((item) => (
-                            <Checkbox key={item.name} value={item.name}>
-                                {t(`dataset.filters.subsetOptions.${item.name}`)}
+                        {SUBSETS.map((subset) => (
+                            <Checkbox key={subset} value={subset}>
+                                {t(SUBSET_LABEL_KEYS[subset])}
                             </Checkbox>
                         ))}
                     </>

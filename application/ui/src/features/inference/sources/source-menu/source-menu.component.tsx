@@ -51,10 +51,10 @@ const DisconnectSourceWarningDialog = ({
             </Content>
             <ButtonGroup>
                 <Button variant={'secondary'} onPress={onCancel}>
-                    {t('inference.sources.menu.disconnectDialog.cancel')}
+                    {t('common.actions.cancel')}
                 </Button>
                 <Button variant={'accent'} onPress={onDisconnect} isDisabled={isPending}>
-                    {t('inference.sources.menu.disconnectDialog.confirm')}
+                    {t('common.actions.disconnect')}
                 </Button>
             </ButtonGroup>
         </Dialog>
@@ -202,7 +202,7 @@ export const SourceMenu = ({ id, name, isConnected, onEdit, isPipelineRunning, o
                 onSuccess: () => {
                     toast({
                         type: 'success',
-                        message: t('inference.sources.menu.removeSuccess', { name }),
+                        message: t('inference.connection.removeSuccess', { name }),
                     });
                 },
             }
@@ -220,13 +220,13 @@ export const SourceMenu = ({ id, name, isConnected, onEdit, isPipelineRunning, o
                     disabledKeys={isConnected ? [SOURCE_MENU_OPTIONS.REMOVE, SOURCE_MENU_OPTIONS.TEST] : []}
                 >
                     {isConnected ? (
-                        <Item key={SOURCE_MENU_OPTIONS.DISCONNECT}>{t('inference.sources.menu.disconnect')}</Item>
+                        <Item key={SOURCE_MENU_OPTIONS.DISCONNECT}>{t('common.actions.disconnect')}</Item>
                     ) : (
-                        <Item key={SOURCE_MENU_OPTIONS.CONNECT}>{t('inference.sources.menu.connect')}</Item>
+                        <Item key={SOURCE_MENU_OPTIONS.CONNECT}>{t('common.actions.connect')}</Item>
                     )}
-                    <Item key={SOURCE_MENU_OPTIONS.TEST}>{t('inference.sources.menu.testConnection')}</Item>
-                    <Item key={SOURCE_MENU_OPTIONS.EDIT}>{t('inference.sources.menu.edit')}</Item>
-                    <Item key={SOURCE_MENU_OPTIONS.REMOVE}>{t('inference.sources.menu.remove')}</Item>
+                    <Item key={SOURCE_MENU_OPTIONS.TEST}>{t('common.actions.testConnection')}</Item>
+                    <Item key={SOURCE_MENU_OPTIONS.EDIT}>{t('common.actions.edit')}</Item>
+                    <Item key={SOURCE_MENU_OPTIONS.REMOVE}>{t('common.actions.remove')}</Item>
                 </Menu>
             </MenuTrigger>
             <DialogContainer onDismiss={() => setIsDisconnectConfirmationDialogVisible(false)}>

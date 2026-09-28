@@ -51,14 +51,14 @@ export const useProjectMenuActions = (
 
                 enablePipelineMutation.mutate(mutationParams, {
                     onSuccess: () => {
-                        toast({ type: 'success', message: t('project.list.menu.pipelineEnabled') });
+                        toast({ type: 'success', message: t('inference.pipeline.toggle.enabledSuccess') });
                     },
                 });
                 break;
             case 'disable-pipeline':
                 disablePipelineMutation.mutate(mutationParams, {
                     onSuccess: () => {
-                        toast({ type: 'success', message: t('project.list.menu.pipelineDisabled') });
+                        toast({ type: 'success', message: t('inference.pipeline.toggle.disabledSuccess') });
                     },
                 });
                 break;

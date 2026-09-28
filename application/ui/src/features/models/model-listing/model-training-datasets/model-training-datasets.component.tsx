@@ -1,16 +1,16 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
 import type { DatasetRevision, DatasetSubset, Model } from '@/api/types';
-import { Flex, MediaViewModes, Text, ViewModes } from '@geti-ui/ui';
+import { GalleryViewModeMenu } from '@/components/gallery-view-mode-menu/gallery-view-mode-menu.component';
+import { useTranslation } from '@/i18n';
+import { Flex, Text, ViewModes } from '@geti-ui/ui';
 import { useNumberFormatter } from 'react-aria';
 
 import { useGetDatasetRevisionItems } from '../../../../hooks/use-get-dataset-revision-items.hook';
 import { useViewMode } from '../../../../hooks/use-view-mode.hook';
-import { GALLERY_VIEW_MODES, type GalleryViewMode } from '../../../../shared/gallery-view-modes';
-import { getAllModelsWithOpenVINOVariants, type SelectableModel } from '../../utils';
+import { type GalleryViewMode } from '../../../../shared/gallery-view-modes';
+import { getAllModelsWithOpenVINOVariants, type SelectableModel } from '../../../../shared/selectable-model';
 import { Box } from '../components/box/box.component';
 import { SubsetGallery } from './subset-gallery.component';
 
@@ -37,7 +37,7 @@ const SubsetBox = ({ title, subset, datasetRevisionId, totalItems, selectedModel
     return (
         <Box
             title={`${title} ${formatter.format(subsetPercentage)} (${totalCount})`}
-            actions={<MediaViewModes viewMode={viewMode} setViewMode={setViewMode} items={GALLERY_VIEW_MODES} />}
+            actions={<GalleryViewModeMenu viewMode={viewMode} setViewMode={setViewMode} />}
             content={
                 <SubsetGallery
                     items={items}
@@ -55,30 +55,31 @@ const SubsetBox = ({ title, subset, datasetRevisionId, totalItems, selectedModel
 };
 
 const ModelTrainingContent = ({ datasetRevision, model }: { datasetRevision: DatasetRevision; model: Model }) => {
+    const { t } = useTranslation();
     const totalItems = datasetRevision.item_counts?.total ?? 0;
     const datasetRevisionId = String(datasetRevision.id);
 
     // Predictions can only be run with an OpenVINO variant of the model being inspected
-    const selectedModel = useMemo(() => getAllModelsWithOpenVINOVariants([model]).at(0), [model]);
+    const selectedModel = getAllModelsWithOpenVINOVariants([model]).at(0);
 
     return (
         <Flex gap={'size-300'} width={'100%'}>
             <SubsetBox
-                title={'Training'}
+                title={t('common.labels.training')}
                 subset={'training'}
                 datasetRevisionId={datasetRevisionId}
                 totalItems={totalItems}
                 selectedModel={selectedModel}
             />
             <SubsetBox
-                title={'Validation'}
+                title={t('common.labels.validation')}
                 subset={'validation'}
                 datasetRevisionId={datasetRevisionId}
                 totalItems={totalItems}
                 selectedModel={selectedModel}
             />
             <SubsetBox
-                title={'Testing'}
+                title={t('common.labels.testing')}
                 subset={'testing'}
                 datasetRevisionId={datasetRevisionId}
                 totalItems={totalItems}
@@ -95,10 +96,12 @@ export const ModelTrainingDatasets = ({
     datasetRevision?: DatasetRevision;
     model: Model;
 }) => {
+    const { t } = useTranslation();
+
     if (!datasetRevision || !datasetRevision.id) {
         return (
             <Flex justifyContent={'center'} alignItems={'center'} height={'size-3000'}>
-                <Text>No dataset revision found for this model</Text>
+                <Text>{t('dataset.revisions.notFoundForModel')}</Text>
             </Flex>
         );
     }
@@ -106,7 +109,7 @@ export const ModelTrainingDatasets = ({
     if (datasetRevision.files_deleted) {
         return (
             <Flex justifyContent={'center'} alignItems={'center'} height={'size-3000'}>
-                <Text>The files for this dataset revision have been deleted.</Text>
+                <Text>{t('dataset.revisions.filesDeleted')}</Text>
             </Flex>
         );
     }

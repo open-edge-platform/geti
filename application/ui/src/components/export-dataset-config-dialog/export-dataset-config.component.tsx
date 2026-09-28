@@ -28,7 +28,7 @@ import { isEmpty } from 'lodash-es';
 
 import { useExportDatasetJobAction } from '../../hooks/use-export-dataset-job-action.hook';
 import { Link } from '../../platform/components/link.component';
-import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../shared/annotator/labels';
+import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../shared/labels';
 import { isNonEmptyString } from '../../shared/util';
 import { MultiSelectList } from '../multi-select-list/multi-select-list.component';
 import { getFormatOptions } from '../util';
@@ -160,7 +160,7 @@ const ExportDatasetDialogContent = ({
                         />
 
                         <Checkbox name='include_unannotated' defaultSelected={formState.include_unannotated}>
-                            {t('dataset.export.includeUnannotated')}
+                            {t('dataset.includeUnannotated')}
                         </Checkbox>
 
                         <Divider size='S' />
@@ -195,10 +195,10 @@ const ExportDatasetDialogContent = ({
 
             <ButtonGroup>
                 <Button onPress={dialogState.close} variant='secondary'>
-                    {t('dataset.export.cancel')}
+                    {t('common.actions.cancel')}
                 </Button>
                 <Button type='submit' form={FORM_ID} variant='accent' isPending={isPending} isDisabled={isPending}>
-                    {t('dataset.export.submit')}
+                    {t('common.actions.export')}
                 </Button>
             </ButtonGroup>
         </Dialog>

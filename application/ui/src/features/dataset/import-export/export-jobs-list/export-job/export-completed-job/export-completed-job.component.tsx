@@ -71,7 +71,7 @@ export const ExportCompletedJob = ({ job, datasetName }: ExportCompletedJobProps
                             removeStagedDatasetMutation.isPending
                         }
                     >
-                        {t('dataset.export.download')}
+                        {t('common.actions.download')}
                     </Button>
                 </Flex>
             </Flex>

@@ -21,14 +21,14 @@ export const DeleteStagedFileConfirmation = ({ stagedDatasetId, deleteEntry }: D
     return (
         <DialogTrigger>
             <Button variant='secondary' style='fill' aria-label='delete import dataset status'>
-                {t('dataset.import.deleteStagedFile.delete')}
+                {t('common.actions.delete')}
             </Button>
             <AlertDialog
                 title={t('dataset.import.deleteStagedFile.title')}
                 variant='destructive'
-                cancelLabel={t('dataset.import.deleteStagedFile.cancel')}
+                cancelLabel={t('common.actions.cancel')}
                 autoFocusButton='primary'
-                primaryActionLabel={t('dataset.import.deleteStagedFile.delete')}
+                primaryActionLabel={t('common.actions.delete')}
                 onPrimaryAction={handleCancel}
                 isPrimaryActionDisabled={deleteFileMutation.isPending}
             >

@@ -34,26 +34,24 @@ export const SettingsList = ({ source }: SettingsListProps) => {
 
     if (source.source_type === 'images_folder') {
         const ignoreExistingImagesValue = source.ignore_existing_images
-            ? t('inference.sources.settings.yes')
-            : t('inference.sources.settings.no');
+            ? t('common.labels.yes')
+            : t('common.labels.no');
 
         return (
             <ul className={classes.list}>
-                <li>{t('inference.sources.settings.folderPath', { path: source.images_folder_path })}</li>
+                <li>{t('inference.settings.folderPath', { path: source.images_folder_path })}</li>
                 <li>{t('inference.sources.settings.ignoreExistingImages', { value: ignoreExistingImagesValue })}</li>
             </ul>
         );
     }
 
     if (source.source_type === 'ip_camera') {
-        const authRequiredValue = source.auth_required
-            ? t('inference.sources.settings.yes')
-            : t('inference.sources.settings.no');
+        const authRequiredValue = source.auth_required ? t('common.labels.yes') : t('common.labels.no');
 
         return (
             <ul className={classes.list}>
                 <li>{t('inference.sources.settings.streamUrl', { url: source.stream_url })}</li>
-                <li>{t('inference.sources.settings.authRequired', { value: authRequiredValue })}</li>
+                <li>{t('inference.settings.authRequired', { value: authRequiredValue })}</li>
             </ul>
         );
     }

@@ -1,6 +1,8 @@
 id: instance-segmentation-eomt-large-640
 name: EoMT-Large-640
-license: MIT
+license:
+  name: MIT
+  url: https://choosealicense.com/licenses/mit
 pretrained_weights:
   source: huggingface
   repo_id: tue-mps/coco_instance_eomt_large_640

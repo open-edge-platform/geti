@@ -15,6 +15,7 @@ div:has(> .grid) {
 .modelName {
     font-size: var(--spectrum-global-dimension-font-size-200);
     padding-right: var(--spectrum-global-dimension-size-100);
+    overflow-wrap: anywhere;
 }
 
 .runningStatusBadge {

@@ -4,7 +4,8 @@
 import { act, screen, waitFor } from '@testing-library/react';
 import { renderHook } from 'test-utils/render';
 
-import { MediaUploadProvider, useMediaUploadState } from '../providers/media-upload-provider.component';
+import { useMediaUploadState } from '../providers/media-upload-context';
+import { MediaUploadProvider } from '../providers/media-upload-provider.component';
 import { computeSummary } from '../providers/media-upload-reducer';
 import { useUploadActions } from './use-upload-actions';
 

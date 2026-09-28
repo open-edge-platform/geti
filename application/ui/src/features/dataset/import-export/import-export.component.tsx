@@ -21,7 +21,7 @@ export const ImportExport = () => {
     const isDatasetView = datasetViewId !== ENTIRE_DATASET_VIEW_ID;
     const { data: datasetViews } = useOptionalDatasetViewsQuery(isDatasetView);
     const datasetViewName = isDatasetView
-        ? (datasetViews?.find(({ id }) => id === datasetViewId)?.name ?? 'Deleted view')
+        ? (datasetViews?.find(({ id }) => id === datasetViewId)?.name ?? t('dataset.views.deleted'))
         : undefined;
 
     const handleMenuAction = (option: Key) => {
@@ -47,7 +47,7 @@ export const ImportExport = () => {
                     <Item key='export'>
                         {isDatasetView ? t('dataset.export.headingDatasetView') : t('dataset.importExport.exportItem')}
                     </Item>
-                    <Item key='import'>{t('dataset.importExport.importItem')}</Item>
+                    <Item key='import'>{t('dataset.import.dialogHeading')}</Item>
                 </Menu>
             </MenuTrigger>
 

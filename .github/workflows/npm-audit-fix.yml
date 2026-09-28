@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@b09bb98e06d4d774595224525879c09bc6e98c40 # v2.20.1
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
         with:
           egress-policy: audit
 
@@ -37,9 +37,11 @@ jobs:
       # `npm audit fix` resolves new versions, so it must honor the
       # `min-release-age` setting in application/ui/.npmrc, which requires
       # npm >= 11.14.0. The npm shipped with the pinned Node version may be
-      # older, so install a compatible npm globally first.
+      # older, so install a compatible npm globally first. There is no
+      # lockfile-based way to pin npm itself (it must exist before any
+      # lockfile-aware install can run), so the version is hardcoded instead.
       - name: Ensure npm supports min-release-age
-        run: npm i -g npm@11.14.0
+        run: npm i -g npm@11.14.0 # zizmor: ignore[adhoc-packages]
 
       - name: Install dependencies
         working-directory: application/ui

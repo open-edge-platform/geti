@@ -53,10 +53,12 @@ export const EmptyProjectList = () => {
 
                 <Flex alignItems={'center'} gap={'size-100'}>
                     <Button variant='accent' id='create-new-project-button' onPress={handleCreateProject}>
-                        <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>{t('project.list.empty.createNewProject')}</Text>
+                        <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>{t('project.list.createNewProject')}</Text>
                     </Button>
                     <Button variant='accent' id='create-from-dataset-button' onPress={handleCreateFromDataset}>
-                        <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>{t('project.list.empty.createFromDataset')}</Text>
+                        <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>
+                            {t('project.list.createProjectFromDataset')}
+                        </Text>
                     </Button>
                 </Flex>
 

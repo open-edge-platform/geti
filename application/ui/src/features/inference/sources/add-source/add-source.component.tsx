@@ -45,7 +45,7 @@ export const AddSource = <T extends SourceConfigPayload>({
                 <>{componentFields(state)}</>
 
                 <Button type='submit' isDisabled={isPending} UNSAFE_style={{ maxWidth: 'fit-content' }}>
-                    {t('inference.sources.add.submit')}
+                    {t('common.actions.addAndUse')}
                 </Button>
             </Flex>
         </Form>

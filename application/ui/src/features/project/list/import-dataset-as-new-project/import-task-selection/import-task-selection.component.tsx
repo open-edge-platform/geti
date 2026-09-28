@@ -11,9 +11,9 @@ import { useProjects } from 'hooks/api/project.hook';
 import { useStagedDatasetSuspense } from 'hooks/api/staged-dataset.hook';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';
 
+import { validateProjectName } from '../../../../../shared/project-name-validator';
 import { generateUniqueProjectName } from '../../../create/utils';
 import { useImportDatasetDialog } from '../../../providers/import-dataset-dialog-provider.component';
-import { validateProjectName } from '../../../validator';
 import { MAP_PROJECT_TYPE_TO_TITLE_KEY } from '../../util';
 import { getAllowedTaskTypes, getRecommendedTaskType, TASK_SELECTION_FORM_ID } from './util';
 
@@ -104,7 +104,7 @@ export const ImportTaskSelection = ({ stagedDatasetId }: ImportTaskSelectionProp
                     isRequired
                     items={items}
                     name={'task_type'}
-                    label={t('project.import.taskSelection.taskType')}
+                    label={t('project.taskType')}
                     aria-label={'Task type'}
                     marginBottom={'size-150'}
                     placeholder={t('project.import.taskSelection.selectTaskPlaceholder')}

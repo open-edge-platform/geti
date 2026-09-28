@@ -85,7 +85,7 @@ export const DateFilter = () => {
                     isDisabled={startValue === null && endValue === null}
                     onPress={handleClear}
                 >
-                    <Text>{t('dataset.filters.dateRange.clear')}</Text>
+                    <Text>{t('common.actions.clear')}</Text>
                 </ActionButton>
             </Flex>
 

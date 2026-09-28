@@ -32,15 +32,15 @@ export const ImportTaskSelectionButtons = ({
     return (
         <ButtonGroup>
             <Button variant='negative' isPending={isPending} isDisabled={isDisabled} onPress={handleDeleteJob}>
-                {t('project.import.actions.delete')}
+                {t('common.actions.delete')}
             </Button>
 
             <Button onPress={onClose} isPending={isPending} isDisabled={isDisabled} variant='secondary'>
-                {t('project.import.actions.hide')}
+                {t('common.actions.hide')}
             </Button>
 
             <Button type='submit' form={TASK_SELECTION_FORM_ID} variant='primary' isDisabled={isDisabled}>
-                {t('project.import.actions.next')}
+                {t('common.actions.next')}
             </Button>
         </ButtonGroup>
     );

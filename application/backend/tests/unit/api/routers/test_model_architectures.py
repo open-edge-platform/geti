@@ -145,7 +145,7 @@ class TestModelArchitecturesEndpoint:
         assert timm_card["task"] == "classification"
         assert timm_card["name"] == "Other models (TIMM)"
         assert timm_card["timm_metadata"] is None
-        assert timm_card["license"] == "varies by model"
+        assert timm_card["license"]["name"] == "varies by model"
         assert f"Geti offers {TimmCatalog.count_backbones()} of these models" in timm_card["description"]
         assert timm_card["capabilities"] is not None
         assert timm_card["capabilities"]["xai"] is False

@@ -6,7 +6,8 @@ import userEvent from '@testing-library/user-event';
 import { renderHook } from 'test-utils/render';
 
 import { useUploadActions } from '../../hooks/use-upload-actions';
-import { MediaUploadProvider, useMediaUploadDispatch } from '../../providers/media-upload-provider.component';
+import { useMediaUploadDispatch } from '../../providers/media-upload-context';
+import { MediaUploadProvider } from '../../providers/media-upload-provider.component';
 
 const makeFile = (name: string, size = 1024): File => new File(['x'.repeat(size)], name, { type: 'image/jpeg' });
 

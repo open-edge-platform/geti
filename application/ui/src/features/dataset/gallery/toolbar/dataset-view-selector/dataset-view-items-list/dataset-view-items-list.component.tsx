@@ -81,8 +81,8 @@ const DatasetViewItem = ({
                         <MoreMenu />
                     </ActionButton>
                     <Menu onAction={handleAction} aria-label={'Dataset view actions menu'}>
-                        <Item key={DATASET_VIEW_ITEM_OPTIONS.RENAME}>{t('dataset.views.rename')}</Item>
-                        <Item key={DATASET_VIEW_ITEM_OPTIONS.DELETE}>{t('dataset.views.delete')}</Item>
+                        <Item key={DATASET_VIEW_ITEM_OPTIONS.RENAME}>{t('common.actions.rename')}</Item>
+                        <Item key={DATASET_VIEW_ITEM_OPTIONS.DELETE}>{t('common.actions.delete')}</Item>
                     </Menu>
                 </MenuTrigger>
             </Flex>

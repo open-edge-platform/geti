@@ -1,9 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Dispatch, SetStateAction, Suspense, useMemo, useState } from 'react';
+import { Dispatch, ReactNode, SetStateAction, Suspense, useState } from 'react';
 
 import type { Media } from '@/api/types';
+import { GalleryViewModeMenu } from '@/components/gallery-view-mode-menu/gallery-view-mode-menu.component';
 import { useTranslation } from '@/i18n';
 import {
     ActionButton,
@@ -14,7 +15,6 @@ import {
     Divider,
     Flex,
     Heading,
-    MediaViewModes,
     ViewModes,
 } from '@geti-ui/ui';
 import { SortDown, SortUp } from '@geti-ui/ui/icons';
@@ -24,7 +24,6 @@ import { useSelectAllDatasetMedia } from 'hooks/use-select-all-dataset-media.hoo
 
 import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { isImage } from '../../../../shared/media-item-utils';
-import { TrainModel } from '../../../models/train-model/train-model.component';
 import { ImportExport } from '../../import-export/import-export.component';
 import { useSelectedData } from '../../providers/selected-data-provider.component';
 import { DeleteMediaItem } from '../delete-media-item/delete-media-item.component';
@@ -44,6 +43,7 @@ type ToolbarProps = {
     items: Media[];
     viewMode: ViewModes;
     setViewMode: Dispatch<SetStateAction<ViewModes>>;
+    trainModel: ReactNode;
 };
 
 type AnnotateButtonProps = {
@@ -56,7 +56,7 @@ const AnnotateButton = ({ isDisabled, onClick }: AnnotateButtonProps) => {
 
     return (
         <Button margin={0} variant={'primary'} onPress={onClick} isDisabled={isDisabled}>
-            {t('dataset.mediaActions.annotate')}
+            {t('common.actions.annotate')}
         </Button>
     );
 };
@@ -119,7 +119,7 @@ const SortMediaByUploadDate = () => {
     );
 };
 
-export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
+export const Toolbar = ({ items, viewMode, setViewMode, trainModel }: ToolbarProps) => {
     const { t } = useTranslation();
     const { selectedMediaItem, onSelectedMediaItemChange } = useSelectDatasetItem();
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys } = useSelectedData();
@@ -152,14 +152,12 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
         });
     };
 
-    const selectedImagesIds = useMemo(() => {
-        // The gallery only holds the pages it has loaded, so ids resolved by "select all" are the
-        // only way to tell whether an unloaded selected item is an image.
-        const imageIds = new Set(selectAllImageIds);
-        items.filter(isImage).forEach((item) => imageIds.add(String(item.id)));
+    // The gallery only holds the pages it has loaded, so ids resolved by "select all" are the
+    // only way to tell whether an unloaded selected item is an image.
+    const imageIds = new Set(selectAllImageIds);
+    items.filter(isImage).forEach((item) => imageIds.add(String(item.id)));
 
-        return Array.from(selectedKeys).filter((itemId) => imageIds.has(itemId));
-    }, [selectedKeys, items, selectAllImageIds]);
+    const selectedImagesIds = Array.from(selectedKeys).filter((itemId) => imageIds.has(itemId));
 
     const resetSelectedMediaIds = () => {
         setSelectedKeys(new Set());
@@ -172,7 +170,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
         <Flex direction={'column'} gridArea={'toolbar'} gap={'size-200'} marginBottom={'size-200'}>
             <Flex alignItems={'center'} justifyContent={'space-between'}>
                 <Flex alignItems={'center'} gap={'size-200'}>
-                    <Heading margin={0}>{t('dataset.gallery.heading')}</Heading>
+                    <Heading margin={0}>{t('common.labels.dataset')}</Heading>
 
                     {FEATURE_FLAGS.DATASET_VIEWS && (
                         <Suspense fallback={null}>
@@ -186,7 +184,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                     <MediaUpload />
 
-                    {noMediaSelected && <TrainModel />}
+                    {noMediaSelected && trainModel}
 
                     {noMediaSelected && (
                         <AnnotateButton
@@ -252,11 +250,7 @@ export const Toolbar = ({ items, viewMode, setViewMode }: ToolbarProps) => {
 
                             <DatasetStatistics />
 
-                            <MediaViewModes
-                                viewMode={viewMode}
-                                setViewMode={setViewMode}
-                                items={[ViewModes.LARGE, ViewModes.MEDIUM, ViewModes.SMALL]}
-                            />
+                            <GalleryViewModeMenu viewMode={viewMode} setViewMode={setViewMode} />
                         </>
                     )}
                 </Flex>

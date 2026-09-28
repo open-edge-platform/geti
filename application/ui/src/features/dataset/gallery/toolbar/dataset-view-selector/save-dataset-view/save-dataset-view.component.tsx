@@ -71,7 +71,7 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds, datasetViews }: Save
             </Content>
             <ButtonGroup>
                 <Button variant={'secondary'} onPress={() => onClose()}>
-                    {t('dataset.views.close')}
+                    {t('common.actions.close')}
                 </Button>
                 <Button
                     variant={'accent'}
@@ -80,7 +80,7 @@ const SaveDatasetViewDialog = ({ onClose, selectedMediaIds, datasetViews }: Save
                     isDisabled={isSaveDisabled}
                     isPending={createDatasetViewMutation.isPending}
                 >
-                    {t('dataset.views.save')}
+                    {t('common.actions.save')}
                 </Button>
             </ButtonGroup>
         </Dialog>

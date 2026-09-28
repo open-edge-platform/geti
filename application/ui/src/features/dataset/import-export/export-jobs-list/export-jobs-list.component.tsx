@@ -11,10 +11,9 @@ type ExportJobsListProps = {
     predicate: (item: { datasetId: string | null }) => boolean;
 };
 export const ExportJobsList = ({ predicate }: ExportJobsListProps) => {
-    const { getLsExportIds } = useExportDataset();
+    const { lsExportIds } = useExportDataset();
 
-    const exportItems = getLsExportIds() ?? [];
-    const filteredExportItems = exportItems.filter(predicate);
+    const filteredExportItems = (lsExportIds ?? []).filter(predicate);
 
     if (isEmpty(filteredExportItems)) {
         return null;

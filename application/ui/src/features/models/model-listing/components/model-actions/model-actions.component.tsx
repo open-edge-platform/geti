@@ -4,14 +4,16 @@
 import { useState } from 'react';
 
 import type { Model } from '@/api/types';
+import { useTranslation } from '@/i18n';
 import { ActionButton, AlertDialog, DialogContainer, Item, Key, Menu, MenuTrigger } from '@geti-ui/ui';
 import { MoreMenu } from '@geti-ui/ui/icons';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
+import { isFailedModel, isTrainingModel } from '../../../../../shared/model-status';
 import { useDeleteModel } from '../../../hooks/api/use-delete-model.hook';
 import { useRenameModel } from '../../../hooks/api/use-rename-model.hook';
 import { TrainingLogsDialog } from '../../../training-logs/training-logs-dialog.component';
-import { hasDeletedWeights, isFailedModel, isTrainingModel } from '../../utils/utils';
+import { hasDeletedWeights } from '../../utils/utils';
 import { RenameModelDialog } from '../model-row/rename-model-dialog.component';
 
 const MODEL_ACTIONS = {
@@ -32,6 +34,7 @@ type ModelActionsProps = {
 };
 
 export const ModelActions = ({ model }: ModelActionsProps) => {
+    const { t } = useTranslation();
     const projectId = useProjectIdentifier();
     const deleteModelMutation = useDeleteModel();
     const renameModelMutation = useRenameModel();
@@ -94,10 +97,10 @@ export const ModelActions = ({ model }: ModelActionsProps) => {
                     <MoreMenu />
                 </ActionButton>
                 <Menu onAction={handleAction} aria-label={'Model actions menu'} disabledKeys={disabledKeys}>
-                    <Item key={MODEL_ACTIONS.RENAME}>Rename</Item>
-                    <Item key={MODEL_ACTIONS.DELETE_WEIGHTS}>Delete weights</Item>
-                    <Item key={MODEL_ACTIONS.DELETE_MODEL}>Delete model</Item>
-                    <Item key={MODEL_ACTIONS.VIEW_LOGS}>View training logs</Item>
+                    <Item key={MODEL_ACTIONS.RENAME}>{t('common.actions.rename')}</Item>
+                    <Item key={MODEL_ACTIONS.DELETE_WEIGHTS}>{t('models.actions.deleteWeights')}</Item>
+                    <Item key={MODEL_ACTIONS.DELETE_MODEL}>{t('models.actions.deleteModel')}</Item>
+                    <Item key={MODEL_ACTIONS.VIEW_LOGS}>{t('models.actions.viewLogs')}</Item>
                 </Menu>
             </MenuTrigger>
 
@@ -114,28 +117,28 @@ export const ModelActions = ({ model }: ModelActionsProps) => {
             <DialogContainer onDismiss={() => setIsDialogOpen(null)}>
                 {isDialogOpen === DIALOG_TYPES.DELETE_WEIGHTS && (
                     <AlertDialog
-                        title='Delete weights'
+                        title={t('models.actions.deleteWeights')}
                         variant='destructive'
-                        primaryActionLabel='Delete weights'
+                        primaryActionLabel={t('models.actions.deleteWeights')}
                         onPrimaryAction={() => handleDeleteModel(true)}
                         isPrimaryActionDisabled={deleteModelMutation.isPending}
-                        cancelLabel='Cancel'
+                        cancelLabel={t('common.actions.cancel')}
                     >
-                        {`Are you sure you want to delete the weights for model "${modelName}"?`}
+                        {t('models.actions.deleteWeightsDescription', { modelName })}
                     </AlertDialog>
                 )}
             </DialogContainer>
             <DialogContainer onDismiss={() => setIsDialogOpen(null)}>
                 {isDialogOpen === DIALOG_TYPES.DELETE_MODEL && (
                     <AlertDialog
-                        title='Delete model'
+                        title={t('models.actions.deleteModel')}
                         variant='destructive'
-                        primaryActionLabel='Delete model'
+                        primaryActionLabel={t('models.actions.deleteModel')}
                         onPrimaryAction={() => handleDeleteModel(false)}
                         isPrimaryActionDisabled={deleteModelMutation.isPending}
-                        cancelLabel='Cancel'
+                        cancelLabel={t('common.actions.cancel')}
                     >
-                        {`Are you sure you want to delete model "${modelName}"? This action cannot be undone.`}
+                        {t('models.actions.deleteModelDescription', { modelName })}
                     </AlertDialog>
                 )}
             </DialogContainer>

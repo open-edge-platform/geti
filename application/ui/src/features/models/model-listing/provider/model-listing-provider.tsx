@@ -4,9 +4,9 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 
 import type { DatasetRevision } from '@/api/types';
+import { useGetModels } from 'hooks/api/use-get-models.hook';
 import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
 
-import { useGetModels } from '../../hooks/api/use-get-models.hook';
 import { useGroupedModels } from '../hooks/use-grouped-models.hook';
 import type { GroupByMode, GroupedModels, SortBy, SortDescriptor } from '../types';
 import { DEFAULT_SORT, DEFAULT_SORT_DIRECTIONS } from '../utils/sorting';

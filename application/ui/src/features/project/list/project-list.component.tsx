@@ -1,9 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useState } from 'react';
 
 import type { TaskType } from '@/api/types';
+import { LanguagePicker } from '@/components/language-picker/language-picker.component';
 import { useTranslation } from '@/i18n';
 import { Content, Divider, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
@@ -86,9 +87,7 @@ const ProjectGrid = () => {
     const { searchName, setSearchName, selectedTaskTypes, setSelectedTaskTypes, filteredProjects, isFiltering } =
         useProjectFilters(projectsWithoutActivePipeline);
 
-    const sortedProjects = useMemo(() => {
-        return SORT_BY_HANDLERS[sortBy](filteredProjects);
-    }, [filteredProjects, sortBy]);
+    const sortedProjects = SORT_BY_HANDLERS[sortBy](filteredProjects);
 
     const projectNames = projects.map((project) => project.name);
 
@@ -156,7 +155,12 @@ const ProjectGrid = () => {
 };
 
 const AppInfo = () => {
-    return <Text UNSAFE_className={classes.version}>v{version}</Text>;
+    return (
+        <Flex alignItems={'center'} gap={'size-200'}>
+            <Text UNSAFE_className={classes.version}>v{version}</Text>
+            <LanguagePicker />
+        </Flex>
+    );
 };
 
 export const ProjectList = () => {
@@ -173,7 +177,7 @@ export const ProjectList = () => {
                     </View>
                 </Flex>
 
-                <View bottom={'size-150'} left={'size-150'} position={'absolute'}>
+                <View bottom={'size-200'} left={'size-300'} position={'absolute'}>
                     <AppInfo />
                 </View>
             </Content>

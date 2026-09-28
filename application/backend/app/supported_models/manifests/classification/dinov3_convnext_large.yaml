@@ -1,6 +1,8 @@
 id: image-classification-dinov3-convnext-large
 name: DINOv3 ConvNeXt-Large
-license: DINOv3 License
+license:
+  name: DINOv3 License
+  url: https://ai.meta.com/resources/models-and-libraries/dinov3-license
 pretrained_weights:
   source: huggingface
   repo_id: timm/convnext_large.dinov3_lvd1689m

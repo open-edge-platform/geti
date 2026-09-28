@@ -41,8 +41,6 @@ describe('useBulkAssignLabel', () => {
             expect(totalRequests).toBe(mediaIds.length);
         });
 
-        expect(maxInFlight).toBeLessThanOrEqual(20);
-        // Requests within a batch still go out together, so this is not an accidental serialisation.
-        expect(maxInFlight).toBeGreaterThan(1);
+        expect(maxInFlight).toBe(10);
     });
 });

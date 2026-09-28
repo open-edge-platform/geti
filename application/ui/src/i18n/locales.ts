@@ -4,11 +4,17 @@
 import type { Resource } from 'i18next';
 
 import en from './locales/en.json';
+import es from './locales/es.json';
+import pt from './locales/pt.json';
+import zhCN from './locales/zh-CN.json';
 
 export const DEFAULT_LANGUAGE = 'en';
 
 export const resources: Resource = {
     [DEFAULT_LANGUAGE]: { translation: en },
+    es: { translation: es },
+    pt: { translation: pt },
+    'zh-CN': { translation: zhCN },
 };
 
 export const SUPPORTED_LANGUAGES = Object.keys(resources);

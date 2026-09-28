@@ -142,6 +142,11 @@ svg {
     }
 }
 
+/* Some locales (e.g. Portuguese) write month names in lowercase, but the calendar title is a heading. */
+[class*='spectrum-Calendar-title']::first-letter {
+    text-transform: uppercase;
+}
+
 /* `Skeleton` from @geti-ui/ui sets `animation: shimmer`, but the package ships no keyframes. */
 @keyframes shimmer {
     from {

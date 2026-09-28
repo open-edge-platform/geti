@@ -25,11 +25,11 @@ export const ProjectLabelsButton = ({ labels }: ProjectLabelsButtonProps) => {
                 <Tag />
             </ActionButton>
 
-            <Dialog width={'size-2400'} aria-label={t('project.list.card.labelsDialog.title')}>
+            <Dialog width={'size-2400'} aria-label={'Labels'}>
                 <Content>
                     <Flex direction={'column'} gap={'size-100'}>
                         <Heading level={4} margin={0}>
-                            {t('project.list.card.labelsDialog.title')}
+                            {t('common.labels.labels')}
                         </Heading>
 
                         <Flex wrap gap={'size-100'}>

@@ -423,6 +423,54 @@ test.describe('Dataset', () => {
 
             expect(createAnnotationPayloads).toEqual([]);
         });
+
+        test('Continue stays disabled between the upload finishing and the labels being assigned', async ({
+            network,
+            datasetPage,
+        }) => {
+            mockNetwork(
+                network,
+                getMockedProject({
+                    task: {
+                        task_type: 'classification',
+                        exclusive_labels: true,
+                        labels: mockedLabels,
+                    },
+                })
+            );
+
+            // The upload awaits this refresh before assigning, so a slow one keeps the dialog parked in
+            // the window where Continue used to briefly re-enable.
+            network.use(
+                http.get('/api/projects/{project_id}/dataset/media', async () => {
+                    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+                    return HttpResponse.json({
+                        items: mockedImages,
+                        pagination: { offset: 0, limit: 20, count: mockedImages.length, total: mockedImages.length },
+                    });
+                })
+            );
+
+            await datasetPage.goto();
+
+            await datasetPage.uploadFiles(filesToUpload);
+
+            await expect(datasetPage.getLabelAssignmentHeading()).toBeVisible();
+
+            await datasetPage.selectLabel(mockedLabels[0].name);
+
+            await datasetPage.clickContinue();
+
+            await expect(datasetPage.getUploadFinishedText(filesToUpload.length)).toBeVisible();
+
+            // Checked at this instant rather than with a retrying assertion, which would mask the bug by
+            // waiting until the assignment starts and disables the button again.
+            // eslint-disable-next-line playwright/prefer-web-first-assertions
+            expect(await datasetPage.getContinueButton().isDisabled()).toBe(true);
+
+            await expect(datasetPage.getLabelAssignmentHeading()).toBeHidden();
+        });
     });
 
     test.describe('Bulk labelling for selected images', () => {

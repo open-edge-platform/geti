@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Dispatch, SetStateAction, useMemo } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 
 import type { ConfigurableParameter, TrainingConfiguration } from '@/api/types';
 import { Flex } from '@geti-ui/ui';
@@ -39,10 +39,7 @@ export const LearningParametersListContainer = ({
 }: LearningParametersListContainerProps) => {
     const [inputSizeParameters, restParameters] = partition(learningParameters.parameters, isInputSizeParameter);
 
-    const learningParametersBasedOnDependency = useMemo(
-        () => filterDependentParameters(restParameters),
-        [restParameters]
-    );
+    const learningParametersBasedOnDependency = filterDependentParameters(restParameters);
 
     const handleLearningParametersChange = (updatedParameters: ConfigurableParameter[], groupKeys: string[]) => {
         onTrainingConfigurationChange((config) => {

@@ -4,7 +4,7 @@
 import { useTranslation } from '@/i18n';
 import { Button, FileTrigger } from '@geti-ui/ui';
 
-import { acceptedExtensions } from '../../utils';
+import { acceptedExtensions } from '../../../../../shared/media-file-utils';
 
 type AddMediaButtonProps = {
     onFileUpload: (files: File[]) => Promise<void>;

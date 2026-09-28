@@ -65,7 +65,7 @@ test.describe('Annotator Classification', () => {
             });
 
             await test.step('count the total annotations, including the mask', async () => {
-                expect(await page.getByLabel('annotation full image').count()).toBe(2);
+                await expect(page.getByLabel('annotation full image')).toHaveCount(1);
             });
         });
 

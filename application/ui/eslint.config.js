@@ -1,6 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -127,11 +128,72 @@ const sharedComponentsAliasConfig = {
     },
 };
 
+// Layers, lowest first: foundation -> modules -> features -> routes. A layer only imports layers
+// below it. Modules (large reusable capabilities, e.g. the annotator) and features are isolated
+// from their siblings; code needed by several of them moves down a layer, routes compose them.
+const foundationLayers = [
+    './src/api',
+    './src/components',
+    './src/constants',
+    './src/hooks',
+    './src/i18n',
+    './src/platform',
+    './src/query-client',
+    './src/shared',
+    './src/test-utils',
+];
+
+const listDirectories = (relativePath) =>
+    fs
+        .readdirSync(path.join(dirname, relativePath), { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => `./${relativePath}/${entry.name}`);
+
+const moduleDirs = listDirectories('src/modules');
+const featureDirs = listDirectories('src/features');
+
+const siblingZones = (dirs, from, message) =>
+    dirs.map((dir) => ({
+        target: dir,
+        from: [...dirs.filter((other) => other !== dir), ...from],
+        message,
+    }));
+
+const layerBoundariesConfig = {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+        'import/no-restricted-paths': [
+            'error',
+            {
+                basePath: dirname,
+                zones: [
+                    {
+                        target: foundationLayers,
+                        from: ['./src/modules', './src/features', './src/routes'],
+                        message: 'Foundation code cannot depend on modules, features or routes. Invert the dependency.',
+                    },
+                    ...siblingZones(
+                        moduleDirs,
+                        ['./src/features', './src/routes'],
+                        'Modules can only import foundation code.'
+                    ),
+                    ...siblingZones(
+                        featureDirs,
+                        ['./src/routes'],
+                        'Features cannot import other features. Move shared code down a layer or compose in a route.'
+                    ),
+                ],
+            },
+        ],
+    },
+};
+
 export default [
     {
         ignores: [...sharedEslintConfig[0].ignores, 'src/api/openapi-spec.d.ts'],
     },
     ...sharedEslintConfig,
+    layerBoundariesConfig,
     {
         rules: {
             'no-restricted-imports': [

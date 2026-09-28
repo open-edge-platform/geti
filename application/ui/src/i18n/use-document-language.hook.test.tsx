@@ -16,7 +16,7 @@ const createIsolatedInstance = (language: string): I18n =>
         supportedLngs: ['en', 'zh-TW'],
         resources: {
             en: structuredClone(resources.en),
-            'zh-TW': { translation: { navigation: { dataset: '資料集' } } },
+            'zh-TW': { translation: { common: { labels: { dataset: '資料集' } } } },
         },
     });
 
@@ -74,7 +74,7 @@ describe('useDocumentLanguage', () => {
 
             return (
                 <>
-                    <h1>{t('navigation.dataset')}</h1>
+                    <h1>{t('common.labels.dataset')}</h1>
                     <span data-testid='locale'>{locale}</span>
                 </>
             );
