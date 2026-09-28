@@ -1,6 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useEffect, useMemo, useRef } from 'react';
+
 import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
@@ -18,29 +20,46 @@ export const AiTool = () => {
     const { mediaItem } = useSelectedMediaItem();
     const { appendAnnotations } = useAnnotationActions();
     const { setActiveTool } = useTool();
-    const taskType = project.task.task_type;
 
-    if (taskType !== 'detection' && taskType !== 'instance_segmentation') {
+    // The provider hands out a fresh `appendAnnotations` on every render, so the
+    // action is tracked through a ref to keep the target below referentially
+    // stable while the user draws, edits or undoes annotations.
+    const appendRef = useRef(appendAnnotations);
+
+    useEffect(() => {
+        appendRef.current = appendAnnotations;
+    }, [appendAnnotations]);
+
+    const target = useMemo<AnnotationTarget | null>(() => {
+        const taskType = project.task.task_type;
+
+        if (taskType !== 'detection' && taskType !== 'instance_segmentation') {
+            return null;
+        }
+
+        const frameNumber = isVideoFrame(mediaItem) ? mediaItem.frame_number : null;
+        const mediaKey = frameNumber === null ? mediaItem.id : `${mediaItem.id}:${frameNumber}`;
+        const mediaName = frameNumber === null ? mediaItem.name : `${mediaItem.name}, frame ${frameNumber}`;
+        const mediaUrl =
+            frameNumber === null
+                ? getMediaBinaryUrl(projectId, mediaItem.id)
+                : getVideoFrameBinaryUrl(projectId, mediaItem.id, frameNumber);
+
+        return {
+            key: mediaKey,
+            width: mediaItem.width,
+            height: mediaItem.height,
+            taskType,
+            exclusiveLabels: project.task.exclusive_labels,
+            labels: project.task.labels ?? [],
+            source: { id: mediaKey, name: mediaName, url: mediaUrl },
+            apply: (annotations) => appendRef.current(annotations),
+        };
+    }, [project, mediaItem, projectId]);
+
+    if (target === null) {
         return null;
     }
-
-    const frameNumber = isVideoFrame(mediaItem) ? mediaItem.frame_number : null;
-    const mediaKey = frameNumber === null ? mediaItem.id : `${mediaItem.id}:${frameNumber}`;
-    const mediaName = frameNumber === null ? mediaItem.name : `${mediaItem.name}, frame ${frameNumber}`;
-    const mediaUrl =
-        frameNumber === null
-            ? getMediaBinaryUrl(projectId, mediaItem.id)
-            : getVideoFrameBinaryUrl(projectId, mediaItem.id, frameNumber);
-    const target: AnnotationTarget = {
-        key: mediaKey,
-        width: mediaItem.width,
-        height: mediaItem.height,
-        taskType,
-        exclusiveLabels: project.task.exclusive_labels,
-        labels: project.task.labels ?? [],
-        source: { id: mediaKey, name: mediaName, url: mediaUrl },
-        apply: appendAnnotations,
-    };
 
     return <AssistantDrawer target={target} onClose={() => setActiveTool(null)} />;
 };

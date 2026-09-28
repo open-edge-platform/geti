@@ -12,9 +12,10 @@ use serde_json::{json, Value};
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager, State};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use tokio::process::{ChildStdin, Command};
+use tokio::process::ChildStdin;
 use tokio::sync::watch;
 
+use crate::assistant::process::assistant_command;
 use crate::MAIN_WINDOW_LABEL;
 
 const SHORT_TIMEOUT: Duration = Duration::from_secs(30);
@@ -68,7 +69,13 @@ fn candidate_binaries() -> Vec<PathBuf> {
                 .join("resources")
                 .join("codex.exe"),
         );
-        candidates.push(local.join("Microsoft").join("WinGet").join("Links").join("codex.exe"));
+        candidates.push(
+            local
+                .join("Microsoft")
+                .join("WinGet")
+                .join("Links")
+                .join("codex.exe"),
+        );
     }
     if let Some(appdata) = std::env::var_os("APPDATA") {
         let npm = PathBuf::from(appdata).join("npm");
@@ -88,13 +95,6 @@ fn discover_binary() -> Option<PathBuf> {
     candidate_binaries().into_iter().find(|path| path.is_file())
 }
 
-fn is_batch(binary: &Path) -> bool {
-    binary
-        .extension()
-        .and_then(|extension| extension.to_str())
-        .is_some_and(|extension| extension.eq_ignore_ascii_case("cmd") || extension.eq_ignore_ascii_case("bat"))
-}
-
 fn resolve_binary(executable: Option<String>) -> Result<PathBuf, String> {
     match executable.filter(|path| !path.trim().is_empty()) {
         Some(path) => {
@@ -108,22 +108,13 @@ fn resolve_binary(executable: Option<String>) -> Result<PathBuf, String> {
     }
 }
 
-fn command(binary: &Path) -> Command {
-    let mut command = if is_batch(binary) {
-        let mut command = Command::new("cmd.exe");
-        command.arg("/C").arg(binary);
-        command
-    } else {
-        Command::new(binary)
-    };
-    command.creation_flags(0x0800_0000);
-    command
-}
-
 fn not_found_message() -> String {
     let searched: Vec<String> = candidate_binaries()
         .iter()
-        .filter_map(|path| path.parent().map(|parent| parent.to_string_lossy().into_owned()))
+        .filter_map(|path| {
+            path.parent()
+                .map(|parent| parent.to_string_lossy().into_owned())
+        })
         .take(4)
         .collect();
     format!(
@@ -144,9 +135,12 @@ pub fn codex_locate() -> CodexLocation {
 }
 
 #[tauri::command]
-pub async fn codex_diagnostics(app: AppHandle, executable: Option<String>) -> Result<String, String> {
+pub async fn codex_diagnostics(
+    app: AppHandle,
+    executable: Option<String>,
+) -> Result<String, String> {
     let binary = resolve_binary(executable)?;
-    let mut probe = command(&binary);
+    let mut probe = assistant_command(&binary);
     probe
         .arg("--version")
         .stdin(Stdio::null())
@@ -196,7 +190,10 @@ pub async fn codex_operation(
     on_event: Channel<Value>,
     state: State<'_, CodexState>,
 ) -> Result<Value, String> {
-    if !matches!(operation.as_str(), "status" | "login" | "logout" | "models" | "response") {
+    if !matches!(
+        operation.as_str(),
+        "status" | "login" | "logout" | "models" | "response"
+    ) {
         return Err("Unsupported ChatGPT operation.".to_string());
     }
     let (cancel, mut cancelled) = watch::channel(false);
@@ -236,7 +233,8 @@ fn codex_home(app: &AppHandle) -> Result<PathBuf, String> {
         .join("assistant-codex");
     std::fs::create_dir_all(home.join("workspace"))
         .map_err(|error| format!("Could not prepare ChatGPT storage: {error}"))?;
-    std::fs::canonicalize(home).map_err(|error| format!("Could not resolve ChatGPT storage: {error}"))
+    std::fs::canonicalize(home)
+        .map_err(|error| format!("Could not resolve ChatGPT storage: {error}"))
 }
 
 async fn run(
@@ -249,7 +247,7 @@ async fn run(
     let binary = resolve_binary(executable)?;
     let home = codex_home(app)?;
     let workspace = home.join("workspace");
-    let mut process = command(&binary);
+    let mut process = assistant_command(&binary);
     process
         .args([
             "app-server",
@@ -285,8 +283,18 @@ async fn run(
         _ => "Codex could not start.".to_string(),
     })?;
     let mut stdin = child.stdin.take().ok_or("ChatGPT input unavailable.")?;
-    let mut stdout = BufReader::new(child.stdout.take().ok_or("ChatGPT output unavailable.")?).lines();
-    let result = exchange(app, operation, &body, &workspace, &events, &mut stdin, &mut stdout).await;
+    let mut stdout =
+        BufReader::new(child.stdout.take().ok_or("ChatGPT output unavailable.")?).lines();
+    let result = exchange(
+        app,
+        operation,
+        &body,
+        &workspace,
+        &events,
+        &mut stdin,
+        &mut stdout,
+    )
+    .await;
     let _ = child.kill().await;
     let _ = child.wait().await;
     result
@@ -333,16 +341,21 @@ async fn exchange(
         if received > MAX_RESPONSE_BYTES {
             return Err("The ChatGPT response exceeded the size limit.".to_string());
         }
-        let value: Value = serde_json::from_str(&line).map_err(|_| "Invalid ChatGPT response.".to_string())?;
+        let value: Value =
+            serde_json::from_str(&line).map_err(|_| "Invalid ChatGPT response.".to_string())?;
         if value.get("error").is_some() && value.get("id").is_some() {
             return Err("ChatGPT rejected the request. Check the installed Codex version and account access.".to_string());
         }
         if value["id"] == 1 {
             send(stdin, json!({ "method": "initialized", "params": {} })).await?;
             let request = match operation {
-                "login" => json!({ "method": "account/login/start", "params": { "type": "chatgpt" } }),
+                "login" => {
+                    json!({ "method": "account/login/start", "params": { "type": "chatgpt" } })
+                }
                 "logout" => json!({ "method": "account/logout", "params": {} }),
-                "models" => json!({ "method": "model/list", "params": { "limit": 100, "includeHidden": false } }),
+                "models" => {
+                    json!({ "method": "model/list", "params": { "limit": 100, "includeHidden": false } })
+                }
                 "response" => json!({
                     "method": "thread/start",
                     "params": {
@@ -357,11 +370,17 @@ async fn exchange(
                 }),
                 _ => json!({ "method": "account/read", "params": { "refreshToken": false } }),
             };
-            send(stdin, json!({ "id": 2, "method": request["method"], "params": request["params"] })).await?;
+            send(
+                stdin,
+                json!({ "id": 2, "method": request["method"], "params": request["params"] }),
+            )
+            .await?;
         } else if value["id"] == 2 {
             match operation {
                 "models" => {
-                    let page = value["result"]["data"].as_array().ok_or("Invalid ChatGPT model list.")?;
+                    let page = value["result"]["data"]
+                        .as_array()
+                        .ok_or("Invalid ChatGPT model list.")?;
                     models.extend(page.iter().cloned());
                     if models.len() > MAX_MODELS {
                         return Err("The ChatGPT model list exceeded the size limit.".to_string());
@@ -382,8 +401,12 @@ async fn exchange(
                     }
                 }
                 "login" => {
-                    let url = value["result"]["authUrl"].as_str().ok_or("ChatGPT did not return a login URL.")?;
-                    if !url.starts_with("https://auth.openai.com/") && !url.starts_with("https://chatgpt.com/") {
+                    let url = value["result"]["authUrl"]
+                        .as_str()
+                        .ok_or("ChatGPT did not return a login URL.")?;
+                    if !url.starts_with("https://auth.openai.com/")
+                        && !url.starts_with("https://chatgpt.com/")
+                    {
                         return Err("Invalid ChatGPT login URL.".to_string());
                     }
                     events
@@ -420,7 +443,9 @@ async fn exchange(
             if let Some(delta) = value["params"]["delta"].as_str() {
                 answer.push_str(delta);
             }
-        } else if value["method"] == "item/completed" && value["params"]["item"]["type"] == "agentMessage" {
+        } else if value["method"] == "item/completed"
+            && value["params"]["item"]["type"] == "agentMessage"
+        {
             if let Some(text) = value["params"]["item"]["text"].as_str() {
                 answer = text.to_string();
             }
@@ -428,7 +453,8 @@ async fn exchange(
             if value["params"]["turn"]["status"] != "completed" {
                 return Err("ChatGPT could not complete the turn.".to_string());
             }
-            return serde_json::from_str(&answer).map_err(|_| "ChatGPT returned a malformed response.".to_string());
+            return serde_json::from_str(&answer)
+                .map_err(|_| "ChatGPT returned a malformed response.".to_string());
         } else if value.get("method").is_some() && value.get("id").is_some() {
             send(
                 stdin,

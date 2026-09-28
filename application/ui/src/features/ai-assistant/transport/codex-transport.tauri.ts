@@ -1,12 +1,21 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { i18n } from '@/i18n';
 import { Channel, invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 import { openUrl } from '@tauri-apps/plugin-opener';
 
 import { getAiConnection } from '../connection';
-import type { CodexAccount, CodexLocation, CodexModel, StreamRequest, StreamResult } from '../types';
+import {
+    ASSISTANT_STOPPED_MESSAGE,
+    AssistantStoppedError,
+    type CodexAccount,
+    type CodexLocation,
+    type CodexModel,
+    type StreamRequest,
+    type StreamResult,
+} from '../types';
 import { parseCodexResult } from './parse-response';
 
 type CodexEvent = { type: 'login'; url: string };
@@ -50,9 +59,12 @@ const invokeCodex = async <T>(command: string, args?: Record<string, unknown>): 
     try {
         return await invoke<T>(command, args);
     } catch (reason: unknown) {
-        throw reason instanceof Error
-            ? reason
-            : new Error(typeof reason === 'string' ? reason : 'The ChatGPT operation failed.');
+        if (reason instanceof Error) {
+            if (reason.message === ASSISTANT_STOPPED_MESSAGE) throw new AssistantStoppedError();
+            throw reason;
+        }
+        if (reason === ASSISTANT_STOPPED_MESSAGE) throw new AssistantStoppedError();
+        throw new Error(typeof reason === 'string' ? reason : i18n.t('assistant.codexOperationFailed'));
     }
 };
 
@@ -189,7 +201,7 @@ export const codexRespond = async (request: StreamRequest): Promise<StreamResult
     const state = { cancelled: false, started: false, reject: rejectCancellation };
     responses.set(request.requestId, state);
     const pending = enqueue(async () => {
-        if (state.cancelled) throw new Error('Stopped.');
+        if (state.cancelled) throw new AssistantStoppedError();
         state.started = true;
         return invokeCodex('codex_operation', {
             requestId: request.requestId,
@@ -221,7 +233,7 @@ export const codexCancel = (requestId: string): void => {
     const state = responses.get(requestId);
     if (!state || state.cancelled) return;
     state.cancelled = true;
-    state.reject(new Error('Stopped.'));
+    state.reject(new AssistantStoppedError());
     // Queued work never entered Rust, so no early-cancellation record is needed.
     if (!state.started) return;
     void invokeCodex('codex_cancel', { requestId }).catch((error: unknown) => {

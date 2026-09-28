@@ -1,11 +1,19 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { i18n } from '@/i18n';
 import { invoke } from '@tauri-apps/api/core';
 import { open } from '@tauri-apps/plugin-dialog';
 
 import { getAiConnection } from '../connection';
-import type { AssistantAccount, CodexLocation, StreamRequest, StreamResult } from '../types';
+import {
+    ASSISTANT_STOPPED_MESSAGE,
+    AssistantStoppedError,
+    type AssistantAccount,
+    type CodexLocation,
+    type StreamRequest,
+    type StreamResult,
+} from '../types';
 import { parseCodexResult } from './parse-response';
 
 const asRecord = (value: unknown): Record<string, unknown> =>
@@ -15,9 +23,12 @@ const invokeClaude = async <T>(command: string, args?: Record<string, unknown>):
     try {
         return await invoke<T>(command, args);
     } catch (reason: unknown) {
-        throw reason instanceof Error
-            ? reason
-            : new Error(typeof reason === 'string' ? reason : 'The Claude operation failed.');
+        if (reason instanceof Error) {
+            if (reason.message === ASSISTANT_STOPPED_MESSAGE) throw new AssistantStoppedError();
+            throw reason;
+        }
+        if (reason === ASSISTANT_STOPPED_MESSAGE) throw new AssistantStoppedError();
+        throw new Error(typeof reason === 'string' ? reason : i18n.t('assistant.claudeOperationFailed'));
     }
 };
 

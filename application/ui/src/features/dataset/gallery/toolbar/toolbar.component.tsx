@@ -142,7 +142,10 @@ export const Toolbar = ({ items, viewMode, setViewMode, trainModel }: ToolbarPro
     const noMediaSelected = selectedKeys.size === 0;
     const selectedMediaItemsIds = Array.from(selectedKeys);
     const firstSelectedItem = items.find(({ id }) => selectedKeys.has(id));
-    const firstAnnotatableItem = firstSelectedItem ?? items.at(0);
+    // With a selection, only a *loaded* selected item may be opened; otherwise
+    // the batch menu (which uses the selection ids) and the primary button
+    // would target different media.
+    const firstAnnotatableItem = noMediaSelected ? items.at(0) : firstSelectedItem;
     const resolveBatchMediaIds = async (): Promise<string[] | null> => {
         if (selectedMediaItemsIds.length > 0) return selectedMediaItemsIds;
 

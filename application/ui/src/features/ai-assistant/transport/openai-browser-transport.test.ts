@@ -20,7 +20,7 @@ it('explains opaque browser failures from the OpenAI API', async () => {
         .mockRejectedValueOnce(new TypeError('Failed to fetch'));
 
     await expect(streamResponseInBrowser(request)).rejects.toThrow(
-        'Verify the API key and API billing, or use the Anthropic API or Windows app.'
+        'The browser could not reach OpenAI. Check your network connection, or use the Anthropic API or Windows app.'
     );
 });
 

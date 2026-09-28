@@ -1,9 +1,21 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { ActionButton, Content, Heading, InlineAlert, Tooltip, TooltipTrigger } from '@geti-ui/ui';
+import { useTranslation } from '@/i18n';
+import {
+    ActionButton,
+    Button,
+    Content,
+    Flex,
+    Heading,
+    InlineAlert,
+    ProgressCircle,
+    Text,
+    Tooltip,
+    TooltipTrigger,
+} from '@geti-ui/ui';
 import { Close, Delete, Gear } from '@geti-ui/ui/icons';
 import { createPortal } from 'react-dom';
 
@@ -20,35 +32,71 @@ import { MessageList } from './message-list.component';
 import classes from './assistant.module.scss';
 
 export const AssistantDrawer = ({ target, onClose }: { target: AnnotationTarget; onClose: () => void }) => {
+    const { t } = useTranslation();
     const status = useConnectionStatus();
     const chat = useAiChat(target);
     const [attachment, setAttachment] = useState<ChatAttachment | null>(null);
     const [attachmentError, setAttachmentError] = useState<string | null>(null);
+    const [attachmentAttempt, setAttachmentAttempt] = useState(0);
     const [settingsOpen, setSettingsOpen] = useState(false);
+    const autoOpenedSettings = useRef(false);
+    const drawerRef = useRef<HTMLElement | null>(null);
 
     useEffect(() => {
+        const controller = new AbortController();
         let active = true;
         setAttachment(null);
         setAttachmentError(null);
-        void loadMediaAttachment(target.source)
+        void loadMediaAttachment(target.source, controller.signal)
             .then((value) => {
                 if (active) setAttachment(value);
             })
             .catch((error: unknown) => {
-                if (active) {
-                    setAttachmentError(
-                        error instanceof Error ? error.message : 'The current media could not be loaded.'
-                    );
+                if (active && !(error instanceof DOMException && error.name === 'AbortError')) {
+                    setAttachmentError(error instanceof Error ? error.message : t('assistant.mediaLoadFailed'));
                 }
             });
         return () => {
             active = false;
+            controller.abort();
         };
-    }, [target.source]);
+    }, [target.source, attachmentAttempt, t]);
 
     useEffect(() => {
-        if (!status.isLoading) setSettingsOpen(!status.isReady);
+        // Open the settings panel once when the assistant is not ready; after
+        // that the user controls it and status changes must not fight the toggle.
+        if (status.isLoading || autoOpenedSettings.current) return;
+        if (!status.isReady) {
+            autoOpenedSettings.current = true;
+            setSettingsOpen(true);
+        }
     }, [status.isLoading, status.isReady]);
+
+    // `onClose` is a fresh closure on every parent render; the one-shot effects
+    // below must not re-run with it, so it is tracked through a ref.
+    const onCloseRef = useRef(onClose);
+
+    useEffect(() => {
+        onCloseRef.current = onClose;
+    }, [onClose]);
+
+    useEffect(() => {
+        const onKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') onCloseRef.current();
+        };
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, []);
+
+    useEffect(() => {
+        const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        drawerRef.current?.focus();
+
+        return () => {
+            previouslyFocused?.focus();
+        };
+    }, []);
 
     const submit = (text: string) => {
         if (attachment === null) return;
@@ -62,11 +110,18 @@ export const AssistantDrawer = ({ target, onClose }: { target: AnnotationTarget;
     return createPortal(
         <>
             <div className={classes.backdrop} aria-hidden='true' />
-            <aside className={classes.drawer} role='dialog' aria-modal={false} aria-label='Annotate with AI'>
+            <aside
+                ref={drawerRef}
+                className={classes.drawer}
+                role='dialog'
+                aria-modal={false}
+                aria-label='Annotate with AI'
+                tabIndex={-1}
+            >
                 <header className={classes.header}>
                     <div>
                         <Heading level={3} margin={0}>
-                            Annotate with AI
+                            {t('assistant.title')}
                         </Heading>
                         <AssistantSwitcher isDisabled={chat.status === 'busy'} />
                     </div>
@@ -75,7 +130,7 @@ export const AssistantDrawer = ({ target, onClose }: { target: AnnotationTarget;
                             <ActionButton isQuiet aria-label='Clear conversation' onPress={chat.clear}>
                                 <Delete />
                             </ActionButton>
-                            <Tooltip>Clear conversation</Tooltip>
+                            <Tooltip>{t('assistant.clearConversation')}</Tooltip>
                         </TooltipTrigger>
                         <TooltipTrigger>
                             <ActionButton
@@ -86,13 +141,13 @@ export const AssistantDrawer = ({ target, onClose }: { target: AnnotationTarget;
                             >
                                 <Gear />
                             </ActionButton>
-                            <Tooltip>Connection settings</Tooltip>
+                            <Tooltip>{t('assistant.connectionSettings')}</Tooltip>
                         </TooltipTrigger>
                         <TooltipTrigger>
                             <ActionButton isQuiet aria-label='Close assistant' onPress={onClose}>
                                 <Close />
                             </ActionButton>
-                            <Tooltip>Close</Tooltip>
+                            <Tooltip>{t('common.actions.close')}</Tooltip>
                         </TooltipTrigger>
                     </div>
                 </header>
@@ -104,7 +159,16 @@ export const AssistantDrawer = ({ target, onClose }: { target: AnnotationTarget;
                     {attachmentError !== null && (
                         <InlineAlert variant='negative' width='100%'>
                             <Content>{attachmentError}</Content>
+                            <Button variant='secondary' onPress={() => setAttachmentAttempt((value) => value + 1)}>
+                                {t('assistant.tryAgain')}
+                            </Button>
                         </InlineAlert>
+                    )}
+                    {attachment === null && attachmentError === null && (
+                        <Flex alignItems='center' gap='size-100'>
+                            <ProgressCircle size='S' isIndeterminate aria-label='Loading media' />
+                            <Text>{t('assistant.mediaLoading')}</Text>
+                        </Flex>
                     )}
                     {attachment !== null && (
                         <Composer

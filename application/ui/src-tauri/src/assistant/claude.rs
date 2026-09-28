@@ -11,8 +11,9 @@ use serde::Serialize;
 use serde_json::{json, Value};
 use tauri::{AppHandle, Manager, State};
 use tokio::io::AsyncWriteExt;
-use tokio::process::Command;
 use tokio::sync::watch;
+
+use crate::assistant::process::assistant_command;
 
 const SHORT_TIMEOUT: Duration = Duration::from_secs(30);
 const LONG_TIMEOUT: Duration = Duration::from_secs(300);
@@ -42,7 +43,13 @@ fn candidate_binaries() -> Vec<PathBuf> {
     if let Some(local) = std::env::var_os("LOCALAPPDATA") {
         let local = PathBuf::from(local);
         candidates.push(local.join("Programs").join("Claude").join("claude.exe"));
-        candidates.push(local.join("Microsoft").join("WinGet").join("Links").join("claude.exe"));
+        candidates.push(
+            local
+                .join("Microsoft")
+                .join("WinGet")
+                .join("Links")
+                .join("claude.exe"),
+        );
     }
     if let Some(appdata) = std::env::var_os("APPDATA") {
         let npm = PathBuf::from(appdata).join("npm");
@@ -56,13 +63,6 @@ fn discover_binary() -> Option<PathBuf> {
     candidate_binaries().into_iter().find(|path| path.is_file())
 }
 
-fn is_batch(binary: &Path) -> bool {
-    binary
-        .extension()
-        .and_then(|extension| extension.to_str())
-        .is_some_and(|extension| extension.eq_ignore_ascii_case("cmd") || extension.eq_ignore_ascii_case("bat"))
-}
-
 fn resolve_binary(executable: Option<String>) -> Result<PathBuf, String> {
     match executable.filter(|path| !path.trim().is_empty()) {
         Some(path) => {
@@ -74,18 +74,6 @@ fn resolve_binary(executable: Option<String>) -> Result<PathBuf, String> {
         }
         None => Ok(discover_binary().unwrap_or_else(|| PathBuf::from("claude.exe"))),
     }
-}
-
-fn command(binary: &Path) -> Command {
-    let mut command = if is_batch(binary) {
-        let mut command = Command::new("cmd.exe");
-        command.arg("/C").arg(binary);
-        command
-    } else {
-        Command::new(binary)
-    };
-    command.creation_flags(0x0800_0000);
-    command
 }
 
 fn not_found_message() -> String {
@@ -124,7 +112,10 @@ pub async fn claude_operation(
     body: Option<Value>,
     state: State<'_, ClaudeState>,
 ) -> Result<Value, String> {
-    if !matches!(operation.as_str(), "status" | "login" | "logout" | "response") {
+    if !matches!(
+        operation.as_str(),
+        "status" | "login" | "logout" | "response"
+    ) {
         return Err("Unsupported Claude operation.".to_string());
     }
     let (cancel, mut cancelled) = watch::channel(false);
@@ -178,7 +169,7 @@ async fn run(
 }
 
 async fn run_simple(binary: &Path, args: &[&str], timeout: Duration) -> Result<String, String> {
-    let mut process = command(binary);
+    let mut process = assistant_command(binary);
     process
         .args(args)
         .stdin(Stdio::null())
@@ -187,7 +178,9 @@ async fn run_simple(binary: &Path, args: &[&str], timeout: Duration) -> Result<S
         .kill_on_drop(true);
     let output = match tokio::time::timeout(timeout, process.output()).await {
         Ok(Ok(output)) => output,
-        Ok(Err(error)) if error.kind() == std::io::ErrorKind::NotFound => return Err(not_found_message()),
+        Ok(Err(error)) if error.kind() == std::io::ErrorKind::NotFound => {
+            return Err(not_found_message())
+        }
         Ok(Err(_)) => return Err("Claude Code could not start.".to_string()),
         Err(_) => return Err("The Claude operation timed out.".to_string()),
     };
@@ -209,7 +202,8 @@ async fn run_status(binary: &Path) -> Result<Value, String> {
     let Ok(text) = output else {
         return Ok(json!({ "connected": false, "account": null }));
     };
-    let status: Value = serde_json::from_str(&text).map_err(|_| "Claude returned an invalid auth status.".to_string())?;
+    let status: Value = serde_json::from_str(&text)
+        .map_err(|_| "Claude returned an invalid auth status.".to_string())?;
     let connected = status["loggedIn"].as_bool().unwrap_or(false)
         || status["authenticated"].as_bool().unwrap_or(false)
         || status["connected"].as_bool().unwrap_or(false);
@@ -238,7 +232,7 @@ async fn run_response(app: &AppHandle, binary: &Path, body: &Value) -> Result<Va
         .map_err(|error| format!("Could not prepare Claude storage: {error}"))?;
     let schema = output_schema();
     let message = build_message(body);
-    let mut process = command(binary);
+    let mut process = assistant_command(binary);
     process
         .args([
             "-p",
@@ -267,7 +261,9 @@ async fn run_response(app: &AppHandle, binary: &Path, body: &Value) -> Result<Va
     }
     let mut child = process.spawn().map_err(|error| match error.kind() {
         std::io::ErrorKind::NotFound => not_found_message(),
-        std::io::ErrorKind::PermissionDenied => "Permission to run Claude Code was denied.".to_string(),
+        std::io::ErrorKind::PermissionDenied => {
+            "Permission to run Claude Code was denied.".to_string()
+        }
         _ => "Claude Code could not start.".to_string(),
     })?;
     let mut stdin = child.stdin.take().ok_or("Claude input unavailable.")?;
@@ -337,7 +333,9 @@ fn build_message(body: &Value) -> Value {
                     if part["type"] != "input_image" {
                         continue;
                     }
-                    if let Some((media_type, data)) = parse_data_url(part["image_url"].as_str().unwrap_or_default()) {
+                    if let Some((media_type, data)) =
+                        parse_data_url(part["image_url"].as_str().unwrap_or_default())
+                    {
                         images.push(json!({ "type": "image", "source": {
                             "type": "base64", "media_type": media_type, "data": data
                         }}));
@@ -367,7 +365,11 @@ fn parse_data_url(url: &str) -> Option<(&str, &str)> {
     let payload = url.strip_prefix("data:")?;
     let (metadata, data) = payload.split_once(',')?;
     let media_type = metadata.strip_suffix(";base64")?;
-    if !matches!(media_type, "image/jpeg" | "image/png" | "image/gif" | "image/webp") || data.is_empty() {
+    if !matches!(
+        media_type,
+        "image/jpeg" | "image/png" | "image/gif" | "image/webp"
+    ) || data.is_empty()
+    {
         return None;
     }
     Some((media_type, data))

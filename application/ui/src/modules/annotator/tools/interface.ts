@@ -12,7 +12,7 @@ export interface ToolConfig {
     label: string;
     ariaLabel: string;
     tooltip?: {
-        img: string;
+        img?: string;
         description: string;
     };
 }

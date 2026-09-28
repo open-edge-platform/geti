@@ -46,9 +46,13 @@ export const HotkeysList = () => {
                 hotkey={formatHotkeyForDisplay(HOTKEYS.nextMedia)}
             />
             <Divider size='S' gridColumn={'1/-1'} />
-            {availableTools.map((tool) => (
-                <HotkeyItem key={tool.type} hotkeyName={tool.label} hotkey={formatHotkeyForDisplay(tool.hotkey)} />
-            ))}
+            {availableTools
+                .filter(
+                    (tool): tool is (typeof availableTools)[number] & { hotkey: string } => tool.hotkey !== undefined
+                )
+                .map((tool) => (
+                    <HotkeyItem key={tool.type} hotkeyName={tool.label} hotkey={formatHotkeyForDisplay(tool.hotkey)} />
+                ))}
             <Divider size='S' gridColumn={'1/-1'} />
             <HotkeyItem hotkeyName={t('common.actions.undo')} hotkey={formatHotkeyForDisplay(HOTKEYS.undo)} />
             <HotkeyItem

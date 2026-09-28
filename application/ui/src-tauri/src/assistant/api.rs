@@ -42,6 +42,7 @@ pub enum OpenAiEvent {
         status: Option<u16>,
         code: Option<String>,
     },
+    Cancelled,
 }
 
 #[derive(Clone, Serialize)]
@@ -148,13 +149,17 @@ pub async fn openai_responses_stream(
     on_event: Channel<OpenAiEvent>,
     state: State<'_, ApiState>,
 ) -> Result<(), String> {
-    let key = stored_key(OPENAI_ACCOUNT)?
-        .ok_or_else(|| "No OpenAI API key is stored. Add one in the assistant settings.".to_string())?;
+    let key = stored_key(OPENAI_ACCOUNT)?.ok_or_else(|| {
+        "No OpenAI API key is stored. Add one in the assistant settings.".to_string()
+    })?;
     let mut cancelled = begin_job(&request_id, &state)?;
 
     let outcome = tokio::select! {
         result = run_openai(body, &key, &on_event) => result,
-        _ = cancelled.changed() => fail_openai(&on_event, "Stopped.", None, None),
+        _ = cancelled.changed() => {
+            let _ = on_event.send(OpenAiEvent::Cancelled);
+            Ok(())
+        },
     };
     end_job(&request_id, &state);
     outcome
@@ -167,8 +172,9 @@ pub async fn anthropic_messages_stream(
     on_event: Channel<AnthropicEvent>,
     state: State<'_, ApiState>,
 ) -> Result<(), String> {
-    let key = stored_key(ANTHROPIC_ACCOUNT)?
-        .ok_or_else(|| "No Anthropic API key is stored. Add one in the assistant settings.".to_string())?;
+    let key = stored_key(ANTHROPIC_ACCOUNT)?.ok_or_else(|| {
+        "No Anthropic API key is stored. Add one in the assistant settings.".to_string()
+    })?;
     let mut cancelled = begin_job(&request_id, &state)?;
 
     let outcome = tokio::select! {
@@ -258,7 +264,12 @@ async fn run_openai(
         };
         received += chunk.len();
         if received > MAX_STREAM_BYTES {
-            return fail_openai(on_event, "The OpenAI response exceeded the size limit.", None, None);
+            return fail_openai(
+                on_event,
+                "The OpenAI response exceeded the size limit.",
+                None,
+                None,
+            );
         }
         for line in drain_complete_lines(&mut buffer, &chunk) {
             if dispatch_openai(&line, on_event, key) {
@@ -438,7 +449,11 @@ fn dispatch_anthropic(line: &str, on_event: &Channel<AnthropicEvent>) -> bool {
     }
     let terminal = serde_json::from_str::<Value>(payload)
         .ok()
-        .and_then(|event| event["type"].as_str().map(|kind| matches!(kind, "message_stop" | "error")))
+        .and_then(|event| {
+            event["type"]
+                .as_str()
+                .map(|kind| matches!(kind, "message_stop" | "error"))
+        })
         .unwrap_or(payload == "[DONE]");
     if payload != "[DONE]" {
         let _ = on_event.send(AnthropicEvent::Sse {
@@ -485,7 +500,10 @@ mod tests {
     #[test]
     fn preserves_partial_lines_and_redacts_tokens() {
         let mut buffer = Vec::new();
-        assert_eq!(drain_complete_lines(&mut buffer, b"data: one\r\ndata:"), ["data: one"]);
+        assert_eq!(
+            drain_complete_lines(&mut buffer, b"data: one\r\ndata:"),
+            ["data: one"]
+        );
         assert_eq!(drain_complete_lines(&mut buffer, b" two\n"), ["data: two"]);
         assert_eq!(redact("bad sk-ant-secret key", ""), "bad [redacted] key");
     }

@@ -4,6 +4,7 @@
 pub mod api;
 pub mod claude;
 pub mod codex;
+pub mod process;
 
 pub use api::ApiState;
 pub use claude::ClaudeState;

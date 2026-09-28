@@ -1,32 +1,37 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { i18n } from '@/i18n';
 import { Channel, invoke } from '@tauri-apps/api/core';
 
 import { hasSecureAiBackend } from '../platform';
-import type { StreamRequest, StreamResult } from '../types';
+import { AssistantStoppedError, type StreamRequest, type StreamResult } from '../types';
 import { cancelResponseInBrowser, streamResponseInBrowser } from './openai-browser-transport';
 import { parseCompletedResponse } from './parse-response';
 
-/** Mirrors `StreamEvent` in `src-tauri/src/assistant/openai.rs`. */
+/** Mirrors `OpenAiEvent` in `src-tauri/src/assistant/api.rs`. */
 type StreamEvent =
     | { type: 'delta'; text: string }
     | { type: 'completed'; response: unknown }
-    | { type: 'failed'; message: string; status: number | null; code: string | null };
+    | { type: 'failed'; message: string; status: number | null; code: string | null }
+    | { type: 'cancelled' };
 
 const streamViaTauri = async (request: StreamRequest): Promise<StreamResult> => {
     const channel = new Channel<StreamEvent>();
 
     let completed: unknown = null;
     let failure: string | null = null;
+    let cancelled = false;
 
     channel.onmessage = (event) => {
         if (event.type === 'delta') {
             request.onDelta(event.text);
         } else if (event.type === 'completed') {
             completed = event.response;
-        } else {
+        } else if (event.type === 'failed') {
             failure = event.message;
+        } else {
+            cancelled = true;
         }
     };
 
@@ -45,12 +50,13 @@ const streamViaTauri = async (request: StreamRequest): Promise<StreamResult> => 
         onEvent: channel,
     });
 
+    if (cancelled) throw new AssistantStoppedError();
     if (failure !== null) {
         throw new Error(failure);
     }
 
     if (completed === null) {
-        throw new Error('OpenAI did not return a response.');
+        throw new Error(i18n.t('assistant.openAiIncomplete'));
     }
 
     return parseCompletedResponse(completed);

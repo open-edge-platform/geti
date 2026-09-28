@@ -31,7 +31,9 @@ const DrawingToolsTooltip = ({ tool }: DrawingToolsTooltipProps) => {
 
     return (
         <IllustratedMessage>
-            <img className={classes.drawingToolsTooltipsImg} src={tooltip?.img} alt={label} />
+            {tooltip?.img !== undefined && (
+                <img className={classes.drawingToolsTooltipsImg} src={tooltip.img} alt={label} />
+            )}
             <View UNSAFE_className={classes.drawingToolsTooltipsContent}>
                 <Flex alignItems={'center'} justifyContent={'space-between'} order={2}>
                     <Heading UNSAFE_className={classes.drawingToolsTooltipsTitle}>{label}</Heading>

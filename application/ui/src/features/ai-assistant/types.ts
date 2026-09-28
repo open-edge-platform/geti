@@ -58,6 +58,17 @@ export interface StreamRequest {
 
 export class AssistantConnectionError extends Error {}
 
+/** Wire marker used by the desktop shell when a native operation is stopped. */
+export const ASSISTANT_STOPPED_MESSAGE = 'Stopped.';
+
+/** Raised when the user stops an in-flight assistant response. */
+export class AssistantStoppedError extends Error {
+    constructor() {
+        super(ASSISTANT_STOPPED_MESSAGE);
+        this.name = 'AssistantStoppedError';
+    }
+}
+
 export interface CodexAccount {
     email: string | null;
     plan: string | null;
@@ -109,6 +120,8 @@ export interface ChatMessage {
     attachments?: ChatAttachment[];
     toolCalls?: ChatToolCall[];
     error?: string;
+    /** The user pressed Stop; the partial answer is shown without error styling. */
+    stopped?: boolean;
 }
 
 export type ChatStatus = 'idle' | 'busy';
