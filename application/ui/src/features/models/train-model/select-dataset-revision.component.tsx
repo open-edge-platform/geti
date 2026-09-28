@@ -2,16 +2,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useMemo } from 'react';
+
 import { useTranslation } from '@/i18n';
 import { Content, ContextualHelp, Heading, Item, Picker, Section } from '@geti-ui/ui';
 
 import { DatasetSource, useTrainModelState } from './train-model-provider.component';
 
-const SECTION_TITLES: Record<DatasetSource['kind'], string> = {
-    current: 'Current dataset',
-    view: 'Dataset views',
-    revision: 'Dataset revisions',
-};
+const SECTION_TITLE_KEYS = {
+    current: 'models.training.setup.selectDataset.sections.current',
+    view: 'models.training.setup.selectDataset.sections.views',
+    revision: 'models.training.setup.selectDataset.sections.revisions',
+} as const satisfies Record<DatasetSource['kind'], string>;
 
 export const SelectDatasetRevision = () => {
     const { t } = useTranslation();
@@ -22,18 +23,18 @@ export const SelectDatasetRevision = () => {
             (['current', 'view', 'revision'] as const)
                 .map((kind) => ({
                     id: kind,
-                    name: SECTION_TITLES[kind],
+                    name: t(SECTION_TITLE_KEYS[kind]),
                     children: datasetSources.filter((source) => source.kind === kind),
                 }))
                 .filter(({ children }) => children.length > 0),
-        [datasetSources]
+        [t, datasetSources]
     );
 
     return (
         <Picker
             flex={1}
             items={sections}
-	    label={t('models.training.setup.selectDataset.label')}
+            label={t('models.training.setup.selectDataset.label')}
             data-testid={'select-dataset'}
             selectedKey={selectedDatasetSourceId}
             onSelectionChange={(key) => onSelectDatasetSourceId(String(key))}

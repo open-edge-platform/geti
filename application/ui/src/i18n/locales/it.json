@@ -916,7 +916,12 @@
                     "label": "Seleziona dataset",
                     "useCurrentDataset": "Usa dataset attuale",
                     "helpTitle": "Selezione di un dataset",
-                    "helpDescription": "Scegli la versione del dataset da usare per l'addestramento. Se desideri addestrare il nuovo modello esattamente sui stessi dati (media e annotazioni) di un altro modello, seleziona la revisione del dataset corrispondente. Al contrario, se desideri addestrare sulla versione più recente dei dati (quello che vedi nella pagina \"Dataset\"), seleziona \"Usa dataset attuale\"."
+                    "helpDescription": "Scegli i dati da usare per l'addestramento. Seleziona \"Usa dataset attuale\" per addestrare sulla versione più recente di tutti i dati (quello che vedi nella pagina \"Dataset\"). Seleziona una vista del dataset per addestrare solo sui media assegnati a quella vista. Seleziona una revisione del dataset per addestrare esattamente sugli stessi dati (media e annotazioni) di un altro modello.",
+                    "sections": {
+                        "current": "Dataset attuale",
+                        "views": "Viste del dataset",
+                        "revisions": "Revisioni del dataset"
+                    }
                 },
                 "selectModel": {
                     "label": "Seleziona pesi di input",

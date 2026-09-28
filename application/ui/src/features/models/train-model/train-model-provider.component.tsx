@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, Dispatch, ReactNode, SetStateAction, use, useState } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, use, useMemo, useState } from 'react';
 
 import type {
     Model,
@@ -9,12 +9,12 @@ import type {
     TrainingConfiguration,
     TrainingDevice,
 } from '@/api/types';
-import { useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { useTranslation } from '@/i18n';
+import { useDatasetViewsQuery } from 'hooks/api/dataset-views.hook';
 import { useGetSuccessfulModels } from 'hooks/api/use-get-models.hook';
+import { useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { useGetDatasetRevisions } from 'hooks/use-get-dataset-revisions.hook';
 
-import { useDatasetViewsQuery } from '../../dataset/gallery/toolbar/dataset-view-selector/api/use-dataset-views';
 import { useGetTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
 import { useGetTrainingDevices } from './api/use-get-training-devices';
 import { useTimmModelSelection, type TimmModelSelection } from './hooks/use-timm-model-selection';
@@ -89,7 +89,12 @@ const useDatasetSources = (): DatasetSource[] => {
 
     return useMemo(
         () => [
-            { id: CURRENT_DATASET_SOURCE_ID, name: t('models.training.setup.selectDataset.useCurrentDataset'), kind: 'current' as const, value: null },
+            {
+                id: CURRENT_DATASET_SOURCE_ID,
+                name: t('models.training.setup.selectDataset.useCurrentDataset'),
+                kind: 'current' as const,
+                value: null,
+            },
             ...(datasetViews?.map(({ id, name }) => ({
                 id: getViewSourceId(String(id)),
                 name,
@@ -103,7 +108,7 @@ const useDatasetSources = (): DatasetSource[] => {
                 value: String(id),
             })) ?? []),
         ],
-        [datasetViews, datasetRevisions]
+        [t, datasetViews, datasetRevisions]
     );
 };
 

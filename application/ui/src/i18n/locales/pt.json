@@ -916,7 +916,12 @@
                     "label": "Selecionar dataset",
                     "useCurrentDataset": "Utilizar dataset atual",
                     "helpTitle": "Selecionar um dataset",
-                    "helpDescription": "Escolha a versão do dataset a utilizar para o treino. Se pretender treinar o novo modelo exatamente com os mesmos dados (multimédia e anotações) de outro modelo, selecione a revisão correspondente do dataset. Caso contrário, se pretender treinar com a versão mais recente dos dados (o que vê na página \"Dataset\"), selecione \"Utilizar dataset atual\"."
+                    "helpDescription": "Escolha os dados a utilizar para o treino. Selecione \"Utilizar dataset atual\" para treinar com a versão mais recente de todos os dados (o que vê na página \"Dataset\"). Selecione uma vista do dataset para treinar apenas com a multimédia atribuída a essa vista. Selecione uma revisão do dataset para treinar exatamente com os mesmos dados (multimédia e anotações) de outro modelo.",
+                    "sections": {
+                        "current": "Dataset atual",
+                        "views": "Vistas do dataset",
+                        "revisions": "Revisões do dataset"
+                    }
                 },
                 "selectModel": {
                     "label": "Selecionar pesos de entrada",
