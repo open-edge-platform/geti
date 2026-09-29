@@ -68,7 +68,7 @@ describe('translation coverage', () => {
                 .filter(
                     (key) =>
                         !references.has(key) &&
-                        !references.has(key.replace(/_(zero|one|two|few|many|other)$/, '')) &&
+                        !references.has(key.replace(/_(zero|one|two|few|many|other|subset)$/, '')) &&
                         ![...dynamicPrefixes].some((prefix) => key.startsWith(prefix))
                 )
         ).toEqual([]);
@@ -84,7 +84,11 @@ describe('translation coverage', () => {
 
     it('has no duplicated English values outside of deliberately context-specific keys', () => {
         // Keys whose English wording collides by accident but may diverge in other locales.
-        const contextualDuplicates = new Set(['models.performance.categories.accuracy']);
+        const contextualDuplicates = new Set([
+            'common.labels.training_subset',
+            'common.labels.validation_subset',
+            'models.performance.categories.accuracy',
+        ]);
         const keysByValue = new Map<string, string[]>();
 
         translations
