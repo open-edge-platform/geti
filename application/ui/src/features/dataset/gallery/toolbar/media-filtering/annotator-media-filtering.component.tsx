@@ -32,7 +32,7 @@ export const AnnotatorMediaFiltering = () => {
                 <Tooltip>{t('dataset.filters.more')}</Tooltip>
             </TooltipTrigger>
             <Dialog size='S'>
-                <Heading>{t('dataset.filters.title')}</Heading>
+                <Heading>{t('common.labels.filters')}</Heading>
                 <Divider />
                 <Content>
                     <Flex direction='column' gap='size-300'>

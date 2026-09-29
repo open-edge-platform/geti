@@ -8,7 +8,13 @@ from __future__ import annotations
 import csv
 from pathlib import Path
 
-from getitune.backend.huggingface.trainers.utils import remap_log_key, write_metrics_csv
+import pytest
+
+from getitune.backend.huggingface.trainers.utils import (
+    plateau_warmup_lr,
+    remap_log_key,
+    write_metrics_csv,
+)
 
 
 class TestRemapLogKey:
@@ -25,9 +31,17 @@ class TestRemapLogKey:
         assert remap_log_key("train_loss") == "train/loss"
 
     def test_unprefixed_training_keys_default_to_train(self) -> None:
-        assert remap_log_key("loss") == "train/loss"
+        assert remap_log_key("loss") == "train/total_loss"
         assert remap_log_key("grad_norm") == "train/grad_norm"
-        assert remap_log_key("learning_rate") == "train/learning_rate"
+        assert remap_log_key("learning_rate") == "lr"
+
+    def test_canonical_keys_are_preserved(self) -> None:
+        assert remap_log_key("val/map") == "val/map"
+        assert remap_log_key("validation/iter_time") == "validation/iter_time"
+        assert remap_log_key("train/data_time") == "train/data_time"
+
+    def test_early_stopping_alias_becomes_validation_key(self) -> None:
+        assert remap_log_key("eval_val/map") == "val/map"
 
 
 class TestWriteMetricsCsv:
@@ -43,10 +57,11 @@ class TestWriteMetricsCsv:
         with csv_path.open() as fh:
             rows = list(csv.DictReader(fh))
         assert len(rows) == 2
-        assert rows[0]["train/loss"] == "2.0"
+        assert rows[0]["train/total_loss"] == "2.0"
+        assert rows[0]["lr"] == "5e-05"
         assert rows[0]["val/loss"] == ""
         assert rows[1]["val/loss"] == "1.5"
-        assert rows[1]["train/loss"] == ""
+        assert rows[1]["train/total_loss"] == ""
 
     def test_columns_are_the_union_across_all_entries(self, tmp_path: Path) -> None:
         log_history = [
@@ -61,12 +76,13 @@ class TestWriteMetricsCsv:
             fieldnames = csv.DictReader(fh).fieldnames
         assert fieldnames is not None
         assert set(fieldnames) == {
-            "train/loss",
+            "train/total_loss",
             "epoch",
             "step",
             "val/loss",
             "val/runtime",
             "train/runtime",
+            "train/loss",
         }
 
     def test_empty_log_history_writes_an_empty_csv(self, tmp_path: Path) -> None:
@@ -74,3 +90,19 @@ class TestWriteMetricsCsv:
         assert csv_path.exists()
         with csv_path.open() as fh:
             assert list(csv.DictReader(fh)) == []
+
+
+class TestPlateauWarmupLr:
+    """Manual warmup for plateau schedules (transformers ignores warmup_steps there)."""
+
+    def test_ramps_linearly_over_warmup_steps(self) -> None:
+        assert plateau_warmup_lr(1e-4, optimizer_step=0, warmup_steps=4) == 1e-4 / 4
+        assert plateau_warmup_lr(1e-4, optimizer_step=1, warmup_steps=4) == pytest.approx(2e-4 / 4)
+        assert plateau_warmup_lr(1e-4, optimizer_step=3, warmup_steps=4) == pytest.approx(1e-4)
+
+    def test_returns_base_lr_after_warmup(self) -> None:
+        assert plateau_warmup_lr(1e-4, optimizer_step=4, warmup_steps=4) == 1e-4
+        assert plateau_warmup_lr(1e-4, optimizer_step=500, warmup_steps=4) == 1e-4
+
+    def test_zero_warmup_is_a_noop(self) -> None:
+        assert plateau_warmup_lr(5e-5, optimizer_step=0, warmup_steps=0) == 5e-5

@@ -38,10 +38,10 @@ export const ImportJobProcessButtons = ({
                 isDisabled={isPending}
                 onPress={() => handleCancelJob(prepareJobId)}
             >
-                {t('dataset.import.cancel')}
+                {t('common.actions.cancel')}
             </Button>
             <Button onPress={onClose} variant='secondary' isPending={isPending} isDisabled={isPending}>
-                {t('dataset.import.hide')}
+                {t('common.actions.hide')}
             </Button>
         </ButtonGroup>
     );

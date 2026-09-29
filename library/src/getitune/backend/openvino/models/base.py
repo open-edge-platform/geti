@@ -351,6 +351,13 @@ class OVModel:
             msg = "Model is already optimized by PTQ"
             raise RuntimeError(msg)
 
+        # Calibrate with batch_size=1. The OpenVINO evaluation recipe's train
+        # batch_size can be large (e.g. 64 for classification); with a bigger
+        # batch the whole dataset collapses into a handful of loader batches,
+        # and NNCF's calibration count collapses with them ("Dataset contains
+        # only 1 samples"), since transform_fn feeds a single image per batch.
+        if data_module.train_subset.batch_size != 1:
+            data_module.train_subset.batch_size = 1
         train_dataset = data_module.train_dataloader()
 
         ptq_config_from_ir = self._read_ptq_config_from_ir(ov_model)

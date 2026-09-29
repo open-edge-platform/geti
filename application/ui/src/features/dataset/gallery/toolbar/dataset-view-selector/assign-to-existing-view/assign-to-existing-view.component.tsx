@@ -23,7 +23,7 @@ import { Info } from '@geti-ui/ui/icons';
 import { DATASET_VIEW_ID_PARAM, ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
-import { createSearchParams, Link, useLocation } from 'react-router-dom';
+import { createSearchParams, Link, useLocation } from 'react-router';
 
 import { useAssignMediaToExistingDatasetView } from '../api/use-assign-media-to-existing-dataset-view';
 import { SelectedMediaCount } from '../selected-media-count/selected-media-count.component';
@@ -95,7 +95,7 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
 
     return (
         <Dialog>
-            <Heading>{t('dataset.views.assignTitle')}</Heading>
+            <Heading>{t('dataset.views.assignToExistingView')}</Heading>
             <Divider size={'S'} />
             <Content>
                 <SelectedMediaCount count={selectedMediaIds.length} />
@@ -117,7 +117,7 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
             </Content>
             <ButtonGroup>
                 <Button onPress={() => onClose()} variant={'secondary'}>
-                    Close
+                    {t('common.actions.close')}
                 </Button>
                 <Button
                     type={'submit'}
@@ -126,7 +126,7 @@ const AssignToExistingViewDialog = ({ datasetViews, selectedMediaIds, onClose }:
                     isPending={isPending}
                     isDisabled={isAssignDisabled}
                 >
-                    Assign
+                    {t('common.actions.assign')}
                 </Button>
             </ButtonGroup>
         </Dialog>
@@ -189,7 +189,7 @@ export const AssignToExistingView = ({
                 onPress={() => setIsAssignToExistingViewOpen(true)}
                 isDisabled={isAssignToExistingViewDisabled}
             >
-                Assign to existing view
+                {t('dataset.views.assignToExistingView')}
             </Button>
             <DialogContainer onDismiss={closeDialog}>
                 {isAssignToExistingViewOpen && (

@@ -27,7 +27,7 @@ const mockedModelArchitectures = [
         id: TIMM_MODEL_ARCHITECTURE_ID,
         name: 'Other models (TIMM)',
         description: 'PyTorch Image Models (TIMM) is a large collection of SOTA image classification models.',
-        license: 'varies by model',
+        license: { name: 'varies by model', url: '' },
         stats: null,
     }),
 ];
@@ -37,7 +37,7 @@ const getMockedTimmManifest = (family: string, variant: string, pretrainedTag: s
         id: `image-classification-timm-${variant}.${pretrainedTag}`,
         name: `timm/${variant}.${pretrainedTag}`,
         task: 'classification',
-        license: 'Apache-2.0',
+        license: { name: 'Apache-2.0', url: 'https://www.apache.org/licenses/LICENSE-2.0.txt' },
         timm_metadata: { family, variant, pretrained_tag: pretrainedTag },
         stats: {
             gigaflops: 4.1,

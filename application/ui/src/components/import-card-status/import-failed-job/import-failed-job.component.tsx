@@ -50,7 +50,7 @@ export const ImportFailedJob = ({
     const { t } = useTranslation();
     const deleteFileMutation = useDeleteStagedDataset({ stagedDatasetId, deleteEntry });
 
-    const errorMessage = isNonEmptyString(message) ? message : t('dataset.import.unknownError');
+    const errorMessage = isNonEmptyString(message) ? message : t('common.errors.unknown');
     const errorDetails = isNonEmptyString(error) ? error : undefined;
 
     return (
@@ -65,7 +65,7 @@ export const ImportFailedJob = ({
                     isPending={deleteFileMutation.isPending}
                     isDisabled={deleteFileMutation.isPending}
                 >
-                    {t('dataset.import.close')}
+                    {t('common.actions.close')}
                 </Button>
             }
             bottomLeftMessage={

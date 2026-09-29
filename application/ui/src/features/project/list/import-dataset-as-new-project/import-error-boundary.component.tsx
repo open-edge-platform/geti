@@ -11,12 +11,7 @@ export const ImportErrorBoundary = ({ children }: { children: ReactNode }) => {
     const { datasetImportDialogState } = useImportDatasetDialog();
 
     return (
-        <ErrorBoundary
-            FallbackComponent={() => {
-                datasetImportDialogState.close();
-                return null;
-            }}
-        >
+        <ErrorBoundary fallback={null} onError={datasetImportDialogState.close}>
             {children}
         </ErrorBoundary>
     );

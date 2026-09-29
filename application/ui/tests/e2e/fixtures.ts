@@ -6,6 +6,7 @@ import { expect, test as testBase } from '@playwright/test';
 import { BoundingBoxToolPage } from '../annotator/bounding-box-tool-page';
 import { AnnotatorPage } from '../datasets/annotator-page';
 import { DatasetPage } from '../datasets/dataset-page';
+import { ImportDatasetPage } from '../datasets/import-dataset-page';
 import { InferencePage } from '../inference/inference-page';
 import { StreamPage } from '../inference/stream-page';
 import { ModelsPage } from '../models/models-page';
@@ -14,6 +15,7 @@ import { ProjectPage } from '../projects/project-page';
 interface Fixtures {
     projectPage: ProjectPage;
     datasetPage: DatasetPage;
+    importDatasetPage: ImportDatasetPage;
     annotatorPage: AnnotatorPage;
     boundingBoxTool: BoundingBoxToolPage;
     modelsPage: ModelsPage;
@@ -30,6 +32,10 @@ const test = testBase.extend<Fixtures>({
     datasetPage: async ({ page }, use) => {
         const datasetPage = new DatasetPage(page);
         await use(datasetPage);
+    },
+    importDatasetPage: async ({ page }, use) => {
+        const importDatasetPage = new ImportDatasetPage(page);
+        await use(importDatasetPage);
     },
     annotatorPage: async ({ page }, use) => {
         const annotatorPage = new AnnotatorPage(page);

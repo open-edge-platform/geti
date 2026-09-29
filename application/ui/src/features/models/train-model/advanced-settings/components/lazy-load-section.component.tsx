@@ -1,9 +1,9 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { ReactNode, RefObject, useState } from 'react';
+import { ReactNode, RefObject, useEffect, useState } from 'react';
 
-import { useIsVisible } from 'hooks/use-is-visible.hook';
+import { useIntersectionObserver } from 'usehooks-ts';
 
 type LazyLoadSectionProps = {
     children: ReactNode;
@@ -11,22 +11,25 @@ type LazyLoadSectionProps = {
 };
 
 export const LazyLoadSection = ({ children, rootRef }: LazyLoadSectionProps) => {
-    const [container, setContainer] = useState<HTMLDivElement | null>(null);
+    // The scroll container is an ancestor, so its ref is still null on our first render
+    const [root, setRoot] = useState<HTMLDivElement | null>(null);
 
-    const isVisible = useIsVisible({
-        element: container,
-        options: {
-            threshold: 0,
-            root: rootRef.current,
-            rootMargin: '150px',
-        },
+    useEffect(() => {
+        setRoot(rootRef.current);
+    }, [rootRef]);
+
+    const { ref, isIntersecting } = useIntersectionObserver({
+        threshold: 0,
+        root,
+        rootMargin: '150px',
+        freezeOnceVisible: true,
     });
 
     return (
-        // It's safe to assume that min height is at least 50px. This value is used by useIsVisible to trigger
-        // element rendering.
-        <div ref={setContainer} style={{ minHeight: '50px' }}>
-            {isVisible && children}
+        // It's safe to assume that min height is at least 50px. This value is used by the intersection observer to
+        // trigger element rendering.
+        <div ref={ref} style={{ minHeight: '50px' }}>
+            {isIntersecting && children}
         </div>
     );
 };

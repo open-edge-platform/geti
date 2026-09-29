@@ -13,22 +13,23 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
 
 ## Source Layout (`src/`)
 
-| Path                     | Responsibility                                                                                                                                     |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `index.tsx`              | App bootstrap.                                                                                                                                     |
-| `providers.tsx`          | Global providers (React Query, theming, routing context).                                                                                          |
-| `router.tsx` / `routes/` | Routing configuration and route components.                                                                                                        |
-| `layout.tsx`             | Top-level layout shell.                                                                                                                            |
-| `features/`              | Feature modules: `annotator/`, `dataset/`, `inference/`, `license/`, `models/`, `project/`. Each groups components, hooks, and tests for a domain. |
-| `components/`            | Shared, reusable UI components.                                                                                                                    |
-| `hooks/`                 | Shared React hooks.                                                                                                                                |
-| `api/`                   | **Generated** OpenAPI client (`openapi-spec.json`, `openapi-spec.d.ts`) and API access helpers.                                                    |
-| `query-client/`          | React Query client setup.                                                                                                                          |
-| `shared/`                | Cross-feature utilities and types.                                                                                                                 |
-| `constants/`             | App-wide constants.                                                                                                                                |
-| `platform/`              | Platform/environment abstractions (web vs. desktop).                                                                                               |
-| `test-utils/`            | Testing helpers.                                                                                                                                   |
-| `assets/`                | Static assets.                                                                                                                                     |
+| Path                     | Responsibility                                                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `index.tsx`              | App bootstrap.                                                                                                                       |
+| `providers.tsx`          | Global providers (React Query, theming, routing context).                                                                            |
+| `router.tsx` / `routes/` | Routing configuration and route components.                                                                                          |
+| `layout.tsx`             | Top-level layout shell.                                                                                                              |
+| `features/`              | Domain features: `dataset/`, `inference/`, `license/`, `models/`, `project/`. Each groups components, hooks, and tests for a domain. |
+| `modules/`               | Large reusable capabilities consumed by several features (currently `annotator/`).                                                   |
+| `components/`            | Shared, reusable UI components.                                                                                                      |
+| `hooks/`                 | Shared React hooks.                                                                                                                  |
+| `api/`                   | **Generated** OpenAPI client (`openapi-spec.json`, `openapi-spec.d.ts`) and API access helpers.                                      |
+| `query-client/`          | React Query client setup.                                                                                                            |
+| `shared/`                | Cross-feature, domain-agnostic utilities and types.                                                                                  |
+| `constants/`             | App-wide constants.                                                                                                                  |
+| `platform/`              | Platform/environment abstractions (web vs. desktop).                                                                                 |
+| `test-utils/`            | Testing helpers.                                                                                                                     |
+| `assets/`                | Static assets.                                                                                                                       |
 
 ## Data Fetching & API Types
 
@@ -57,8 +58,10 @@ together with the repo-wide `../../AGENTS.md` and the matching skill
   reused computed type a named `type` alias so the compiler can cache the result.
 - Function components + hooks only. Co-locate styles as CSS Modules
   (`*.module.scss`); do not add CSS-in-JS beyond what `@geti-ui/ui` already uses.
-- Group new code by feature under `src/features/` or share it via `src/components/`,
-  `src/hooks/`, or `src/shared/`.
+- Layers, lowest first: foundation (`api`, `components`, `constants`, `hooks`, `i18n`, `platform`,
+  `query-client`, `shared`, `test-utils`) → `modules/` → `features/` → `routes/`. Import only from
+  lower layers; a module or feature never imports a sibling. Move code needed by several features down
+  a layer, or compose in a route. Enforced by `import/no-restricted-paths` in `eslint.config.js`.
 - New backend endpoints need a corresponding mock handler under `mocks/` — reuse
   existing handlers.
 

@@ -64,6 +64,28 @@ class HFModelExporter(ModelExporter):
         if input_names is not None:
             self.onnx_export_configuration.setdefault("input_names", input_names)
 
+    @property
+    def metadata(self) -> dict[tuple[str, str], str]:
+        """Model metadata to embed: base export params plus ModelAPI runtime preprocessing.
+
+        Intensity metadata follows the Lightning export contract derived from the
+        DataModule's ``IntensityConfig`` (handled by the base exporter, including
+        high-bit-depth inputs such as uint16). When no intensity config is
+        attached — bare CLI usage on plain 8-bit RGB data — the standard
+        ``scale_to_unit`` (÷255) pipeline convention is written so the runtime
+        path normalizes ``uint8`` inputs the same way the training pipeline does.
+        """
+        metadata = super().metadata
+        if self.data_input_params.intensity_config is None:
+            metadata.update(
+                {
+                    ("model_info", "input_dtype"): "u8",
+                    ("model_info", "intensity_mode"): "scale_to_unit",
+                    ("model_info", "intensity_max_value"): "255.0",
+                }
+            )
+        return metadata
+
     def to_openvino(  # pyrefly: ignore[bad-override]
         self,
         model: HFModel,

@@ -11,9 +11,9 @@ import { useProjects } from 'hooks/api/project.hook';
 import { useStagedDatasetSuspense } from 'hooks/api/staged-dataset.hook';
 import { useImportDatasetAsNewProject } from 'hooks/storage/use-import-dataset-as-new-project.hook';
 
+import { validateProjectName } from '../../../../../shared/project-name-validator';
 import { generateUniqueProjectName } from '../../../create/utils';
 import { useImportDatasetDialog } from '../../../providers/import-dataset-dialog-provider.component';
-import { validateProjectName } from '../../../validator';
 import { MAP_PROJECT_TYPE_TO_TITLE_KEY } from '../../util';
 import { getAllowedTaskTypes, getRecommendedTaskType, TASK_SELECTION_FORM_ID } from './util';
 
@@ -26,12 +26,16 @@ const useFormConfig = (
     defaultTaskType: TaskType | undefined,
     allowedTaskTypes: TaskType[]
 ) => {
+    const { t } = useTranslation();
     const { data: projects } = useProjects();
     const { setCurrentStep } = useImportDatasetDialog();
     const { getImportEntry, updateImportEntry } = useImportDatasetAsNewProject();
     const importEntry = getImportEntry(stagedDatasetId);
 
-    const uniqueProjectName = generateUniqueProjectName(projects.map((project) => project.name));
+    const uniqueProjectName = generateUniqueProjectName(
+        projects.map((project) => project.name),
+        t
+    );
 
     const taskType = importEntry?.project?.task_type;
     const finalTaskType = taskType && allowedTaskTypes.includes(taskType) ? taskType : defaultTaskType;
@@ -88,7 +92,7 @@ export const ImportTaskSelection = ({ stagedDatasetId }: ImportTaskSelectionProp
                     name={'name'}
                     value={name}
                     onChange={setName}
-                    label={'Project name'}
+                    label={t('project.import.taskSelection.projectName')}
                     aria-label={'Project name'}
                     defaultValue={formState.name}
                     marginBottom={'size-250'}
@@ -100,10 +104,10 @@ export const ImportTaskSelection = ({ stagedDatasetId }: ImportTaskSelectionProp
                     isRequired
                     items={items}
                     name={'task_type'}
-                    label={'Task type'}
+                    label={t('project.taskType')}
                     aria-label={'Task type'}
                     marginBottom={'size-150'}
-                    placeholder='Select task'
+                    placeholder={t('project.import.taskSelection.selectTaskPlaceholder')}
                     defaultSelectedKey={formState.task_type}
                 >
                     {(item) => <Item>{item.label}</Item>}
@@ -116,11 +120,7 @@ export const ImportTaskSelection = ({ stagedDatasetId }: ImportTaskSelectionProp
                                 <InfoOutline />
                             </View>
 
-                            <Text>
-                                The recommended choice is based on the type of the annotations detected in the dataset.
-                                If you choose a different type, the annotations will be automatically transformed during
-                                import to fit the selected type.
-                            </Text>
+                            <Text>{t('project.import.taskSelection.recommendationHint')}</Text>
                         </Flex>
                     )}
                 </View>

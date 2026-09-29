@@ -10,6 +10,7 @@ export type Pipeline = components['schemas']['PipelineView'];
 export type Model = components['schemas']['ModelView'];
 export type ModelVariant = components['schemas']['ModelVariantView'];
 export type ModelArchitecture = components['schemas']['ModelArchitectureView'];
+export type License = components['schemas']['License'];
 export type ModelArchitectureWithPerformanceCategory = ModelArchitecture & { performanceCategory?: string };
 export type BenchmarkMetrics = components['schemas']['BenchmarkMetrics'];
 export type ModelFormat = components['schemas']['ModelFormat'];

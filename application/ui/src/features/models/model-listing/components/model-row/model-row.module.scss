@@ -4,6 +4,7 @@
 .modelName {
     font-size: var(--spectrum-global-dimension-font-size-200);
     font-weight: 400;
+    overflow-wrap: anywhere;
 }
 
 .secondaryText {
@@ -21,11 +22,13 @@
 .smallText {
     font-size: var(--spectrum-global-dimension-font-size-75);
     font-weight: 400;
+    overflow-wrap: anywhere;
 }
 
 .datasetRevisionName {
     font-size: var(--spectrum-global-dimension-font-size-100);
     font-weight: 400;
+    overflow-wrap: anywhere;
 }
 
 .datasetRevisionDate {

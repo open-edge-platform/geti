@@ -7,14 +7,13 @@ import type { Label, Project, TaskType } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { Button, ButtonGroup, Divider, Flex, Form, Text, TextField } from '@geti-ui/ui';
 import { useCreateProject } from 'hooks/api/project.hook';
-import { useNavigate } from 'react-router-dom';
-import { v4 as uuid } from 'uuid';
+import { useNavigate } from 'react-router';
 
 import { paths } from '../../../constants/paths';
+import { PROJECT_NAME_MAX_LENGTH, validateProjectName } from '../../../shared/project-name-validator';
+import { isClassificationTask } from '../../../shared/task-type-guards';
 import { LabelSelection } from '../label-selection/label-selection.component';
 import { MAP_TASK_TYPE_TO_VERB_KEY, TaskSelection } from '../task-selection/task-selection.component';
-import { isClassificationTask } from '../task-type-guards';
-import { PROJECT_NAME_MAX_LENGTH, validateProjectName } from '../validator';
 import {
     ClassificationTaskSelection,
     ClassificationTaskType,
@@ -31,7 +30,12 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
     const { t } = useTranslation();
     const [selectedTask, setSelectedTask] = useState<TaskType | null>(null);
     const [labels, setLabels] = useState<Label[]>([]);
-    const [name, setName] = useState<string>(() => generateUniqueProjectName(projects.map((project) => project.name)));
+    const [name, setName] = useState<string>(() =>
+        generateUniqueProjectName(
+            projects.map((project) => project.name),
+            t
+        )
+    );
     const taskVerb = selectedTask === null ? undefined : t(MAP_TASK_TYPE_TO_VERB_KEY[selectedTask]);
 
     const [classificationTaskType, setClassificationTaskType] = useState<ClassificationTaskType>('single-label');
@@ -66,7 +70,7 @@ export const CreateProjectForm = ({ projects }: CreateProjectFormProps) => {
             return;
         }
 
-        const projectId = uuid();
+        const projectId = crypto.randomUUID();
 
         createProjectMutation.mutate(
             {

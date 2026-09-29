@@ -3,12 +3,13 @@
 
 import { useState } from 'react';
 
+import { useTranslation } from '@/i18n';
 import { ActionButton, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { Tag } from '@geti-ui/ui/icons';
 import { useProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 
-import { isClassificationTask } from '../../../project/task-type-guards';
+import { isClassificationTask } from '../../../../shared/task-type-guards';
 import { BulkSelectedMediaLabelsAssignmentDialog } from '../bulk-labels-assignment/bulk-selected-media-labels-assignment-dialog.component';
 
 type AssignLabelProps = {
@@ -16,6 +17,7 @@ type AssignLabelProps = {
 };
 
 export const AssignLabel = ({ selectedImagesIds }: AssignLabelProps) => {
+    const { t } = useTranslation();
     const { data: project } = useProject();
     const isClassification = isClassificationTask(project.task.task_type);
     const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -27,7 +29,7 @@ export const AssignLabel = ({ selectedImagesIds }: AssignLabelProps) => {
                     <ActionButton margin={0} isQuiet onPress={() => setIsVisible(true)} aria-label={'Assign label'}>
                         <Tag />
                     </ActionButton>
-                    <Tooltip>Assign label</Tooltip>
+                    <Tooltip>{t('dataset.bulkLabels.assignLabelTooltip')}</Tooltip>
                 </TooltipTrigger>
                 <BulkSelectedMediaLabelsAssignmentDialog
                     isVisible={isVisible}

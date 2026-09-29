@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import type { Project, TaskType } from '@/api/types';
 
@@ -20,10 +20,7 @@ export const useProjectFilters = (projects: Project[]): UseProjectFiltersResult 
     const [searchName, setSearchName] = useState<string>('');
     const [selectedTaskTypes, setSelectedTaskTypes] = useState<TaskType[]>([]);
 
-    const filteredProjects = useMemo(
-        () => filterProjects(projects, searchName, selectedTaskTypes),
-        [projects, searchName, selectedTaskTypes]
-    );
+    const filteredProjects = filterProjects(projects, searchName, selectedTaskTypes);
 
     const isFiltering = searchName.trim() !== '' || selectedTaskTypes.length > 0;
 

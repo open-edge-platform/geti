@@ -38,7 +38,7 @@ export const MultiSelectList = <T extends string = string>({
     const { t } = useTranslation();
     const [selectedLabels, setSelectedLabels] = useState<Set<T>>(defaultSelectedKeys);
 
-    const resolvedSelectAllLabel = selectAllLabel ?? t('dataset.multiSelect.selectAll');
+    const resolvedSelectAllLabel = selectAllLabel ?? t('common.actions.selectAll');
 
     const allItemSelected = selectedLabels.size === items.length && items.length > 0;
 

@@ -5,10 +5,10 @@ import { useTranslation } from '@/i18n';
 import { Button, Heading, IllustratedMessage, View } from '@geti-ui/ui';
 import { NotFound } from '@geti-ui/ui/icons';
 import { isObject, isString } from 'lodash-es';
-import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
+import { isRouteErrorResponse, useRouteError } from 'react-router';
 
 import { paths } from '../../constants/paths';
-import { redirectTo } from '../utils';
+import { redirectTo } from '../../shared/redirect-to';
 
 const useErrorMessage = () => {
     const { t } = useTranslation();
@@ -48,7 +48,7 @@ const useErrorMessage = () => {
         return error.detail;
     }
 
-    return t('application.errorPage.unknownError');
+    return t('common.errors.unknown');
 };
 
 export const ErrorPage = () => {

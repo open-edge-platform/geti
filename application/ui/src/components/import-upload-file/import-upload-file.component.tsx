@@ -83,7 +83,7 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
                     {isPending && (
                         <Flex alignItems={'center'} direction={'column'} gap={'size-100'}>
                             <Heading level={1} UNSAFE_className={classes.statusTitle}>
-                                {t('dataset.import.uploading')}
+                                {t('common.status.uploading')}
                                 <ThreeDotsFlashing />
                             </Heading>
                             <Text>{t('dataset.import.datasetBeingUploaded')}</Text>
@@ -99,7 +99,7 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
                                 onSelect={(data) => handleLoadingFile(formatToFileArray(data))}
                             >
                                 <Button marginY={'size-200'} maxWidth={'size-1000'} variant={'accent'}>
-                                    {t('dataset.import.upload')}
+                                    {t('common.actions.upload')}
                                 </Button>
                             </FileTrigger>
 

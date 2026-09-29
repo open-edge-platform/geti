@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import io
-import os
 import zipfile
 from collections.abc import Iterable
 from pathlib import Path
@@ -128,7 +127,8 @@ def download_model_binary(
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zip_file:
         for path in paths:
-            zip_file.write(path, arcname=os.path.split(path)[1])
+            variant_dir = next(parent for parent in path.parents if parent.name == str(model_variant_id))
+            zip_file.write(path, arcname=path.relative_to(variant_dir))
         for demo_file in demo_files:
             zip_file.writestr(demo_file.name, demo_file.data)
 
@@ -317,6 +317,6 @@ def get_training_logs(
             )
 
         log_file = cast(Path, training_log)
-        return FileResponse(log_file, media_type="application/x-ndjson", filename=os.path.basename(log_file))
+        return FileResponse(log_file, media_type="application/x-ndjson", filename=log_file.name)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))

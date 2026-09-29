@@ -65,9 +65,24 @@ class PytorchcvWeightsLoader:
 
     def load_pretrained(self: _SupportsBackboneWeights, weights: PathLike | None = None) -> None:
         """Download EfficientNet backbone weights into the cache dir."""
+        import tempfile
+        import zipfile
+
         from pytorchcv.models.common.model_store import download_model
 
-        cache_dir = str(Path(weights).parent) if weights is not None else os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"]
+        weights_path = Path(weights) if weights is not None else None
+        if weights_path is not None and weights_path.suffix == ".zip" and weights_path.is_file():
+            final_path = weights_path.with_suffix("")
+            needs_extract = not final_path.exists() or weights_path.stat().st_mtime > final_path.stat().st_mtime
+            if needs_extract:
+                with tempfile.TemporaryDirectory(dir=weights_path.parent) as tmp_dir:
+                    with zipfile.ZipFile(weights_path) as zf:
+                        zf.extractall(tmp_dir)
+                    extracted = Path(tmp_dir) / final_path.name
+                    extracted.replace(final_path)
+            weights_path = final_path
+
+        cache_dir = str(weights_path.parent) if weights_path is not None else os.environ["PRETRAINED_WEIGHTS_CACHE_DIR"]
         download_model(
             net=self.model.backbone,
             model_name=self.model_name,

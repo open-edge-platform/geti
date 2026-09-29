@@ -8,7 +8,6 @@ import { render } from 'test-utils/render';
 
 import { getMockedPrepareImportDatasetJob } from '../../../mocks/mock-job';
 import { http } from '../../api/utils';
-import { ImportDatasetDialogStateProvider } from '../../features/dataset/providers/export-import-dataset-dialog-provider.component';
 import { server } from '../../msw-node-setup';
 import { ImportUploadFile } from './import-upload-file.component';
 
@@ -40,11 +39,7 @@ describe('ImportUploadFile', () => {
         );
         const mockedOnFileUploaded = vi.fn();
 
-        render(
-            <ImportDatasetDialogStateProvider>
-                <ImportUploadFile formatOptions='coco' onFileUploaded={mockedOnFileUploaded} />
-            </ImportDatasetDialogStateProvider>
-        );
+        render(<ImportUploadFile formatOptions='coco' onFileUploaded={mockedOnFileUploaded} />);
 
         return mockedOnFileUploaded;
     };

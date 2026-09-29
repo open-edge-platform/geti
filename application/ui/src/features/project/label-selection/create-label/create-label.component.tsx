@@ -11,12 +11,16 @@ import { useTranslation } from '@/i18n';
 import { ActionButton, DOMRefValue, Grid, TextField, TextFieldRef, useUnwrapDOMRef, View } from '@geti-ui/ui';
 import { Add } from '@geti-ui/ui/icons';
 import { useEventListener } from 'hooks/event-listener.hook';
-import { v4 as uuid } from 'uuid';
 
 import { TASK_HOTKEYS } from '../../../../shared/hotkeys-definition';
-import { getRandomDistinctColor } from '../../../annotator/label-utils';
+import { getRandomDistinctColor } from '../../../../shared/label-utils';
 
-const getInitialLabel = (): Label => ({ id: uuid(), color: getRandomDistinctColor(), name: '', hotkey: null });
+const getInitialLabel = (): Label => ({
+    id: crypto.randomUUID(),
+    color: getRandomDistinctColor(),
+    name: '',
+    hotkey: null,
+});
 
 type CreateLabelProps = {
     onCreate: (label: Label) => void;
@@ -80,7 +84,7 @@ export const CreateLabel = ({ labels, onCreate, taskType }: CreateLabelProps) =>
                 <TextField
                     ref={inputRef}
                     aria-label={'Create label input'}
-                    placeholder={t('project.create.labels.inputPlaceholder')}
+                    placeholder={t('labels.editor.createTrigger')}
                     value={newLabel.name}
                     onChange={(newName) => setNewLabel((prevLabel) => ({ ...prevLabel, name: newName }))}
                     errorMessage={validationResult}

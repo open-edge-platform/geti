@@ -1,13 +1,13 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useContext, useMemo, useState, type Dispatch, type SetStateAction } from 'react';
+import { createContext, ReactNode, useContext, useState, type Dispatch, type SetStateAction } from 'react';
 
-import { Selection } from '@geti-ui/ui';
+type SelectedMediaKeys = Set<string>;
 
 type SelectedDataState = null | {
-    selectedKeys: Selection;
-    setSelectedKeys: Dispatch<SetStateAction<Selection>>;
+    selectedKeys: SelectedMediaKeys;
+    setSelectedKeys: Dispatch<SetStateAction<SelectedMediaKeys>>;
     toggleSelectedKeys: (key: string[]) => void;
     isSelected: (key: string) => boolean;
 };
@@ -15,8 +15,7 @@ type SelectedDataState = null | {
 const SelectedDataContext = createContext<SelectedDataState>(null);
 
 export const SelectedDataProvider = ({ children }: { children: ReactNode }) => {
-    const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set());
-    const selectedKeysSet = useMemo(() => new Set(selectedKeys), [selectedKeys]);
+    const [selectedKeys, setSelectedKeys] = useState<SelectedMediaKeys>(new Set());
 
     const toggleSelectedKeys = (keys: string[]) => {
         setSelectedKeys((prevSelectedKeys) => {
@@ -31,7 +30,7 @@ export const SelectedDataProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const isSelected = (key: string) => {
-        return selectedKeysSet.has(key);
+        return selectedKeys.has(key);
     };
 
     return (

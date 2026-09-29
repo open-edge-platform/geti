@@ -5,10 +5,10 @@ import { useState } from 'react';
 
 import { useProject } from 'hooks/api/project.hook';
 
-import { isClassificationTask } from '../../project/task-type-guards';
+import { isVideoFile } from '../../../shared/media-file-utils';
+import { isClassificationTask } from '../../../shared/task-type-guards';
 import { useMediaUpload } from '../api/use-media-upload';
-import { useIsUploading } from '../providers/media-upload-provider.component';
-import { isVideoFile } from './utils';
+import { useIsUploading } from '../providers/media-upload-context';
 
 export const useUploadFiles = () => {
     const { data: project } = useProject();

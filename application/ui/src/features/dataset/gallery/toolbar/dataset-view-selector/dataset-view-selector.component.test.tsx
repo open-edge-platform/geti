@@ -5,7 +5,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DATASET_VIEW_ID_PARAM } from 'hooks/use-dataset-view-id.hook';
 import { getMockedDatasetView } from 'mocks/mock-dataset-view';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import { render } from 'test-utils/render';
 
 import { DatasetViewSelector } from './dataset-view-selector.component';

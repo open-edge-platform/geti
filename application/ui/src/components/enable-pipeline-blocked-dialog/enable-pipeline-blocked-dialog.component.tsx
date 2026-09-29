@@ -17,7 +17,7 @@ export const EnablePipelineBlockedDialog = ({ isOpen, onClose }: EnablePipelineB
             {isOpen && (
                 <AlertDialog
                     title={t('project.panel.enablePipelineBlocked.title')}
-                    primaryActionLabel={t('project.panel.enablePipelineBlocked.close')}
+                    primaryActionLabel={t('common.actions.close')}
                     variant={'warning'}
                     onPrimaryAction={onClose}
                 >

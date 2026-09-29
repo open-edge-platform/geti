@@ -108,7 +108,9 @@ class SegmentationHead(nn.Module):
         query_features: list[Tensor],
     ) -> list[Tensor]:
         """Forward at export time (single query feature, no dropout)."""
-        assert len(query_features) == 1  # noqa: S101
+        if len(query_features) != 1:
+            msg = f"forward_export expects exactly one query feature tensor, got {len(query_features)}."
+            raise ValueError(msg)
         h_out = self.image_size[0] // self.downsample_ratio
         w_out = self.image_size[1] // self.downsample_ratio
         sf = F.interpolate(spatial_features, size=(h_out, w_out), mode="bilinear", align_corners=False)

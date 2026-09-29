@@ -57,11 +57,11 @@ export const DeleteDatasetViewDialog = ({ datasetView, onSuccess, onCancel }: De
     return (
         <AlertDialog
             title={t('dataset.views.deleteTitle')}
-            primaryActionLabel={'Delete'}
+            primaryActionLabel={t('common.actions.delete')}
             variant={'destructive'}
             onPrimaryAction={deleteView}
             onCancel={onCancel}
-            secondaryActionLabel={'Close'}
+            secondaryActionLabel={t('common.actions.close')}
             isPrimaryActionDisabled={isPending}
         >
             <Content>

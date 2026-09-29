@@ -69,7 +69,7 @@ def test_adaptive_padding():
         assert kernel79_out.shape == dilation_out.shape
 
     # assert only support "same" "corner"
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError, match="padding must be"):
         AdaptivePadding(kernel_size=kernel_size, stride=stride, dilation=dilation, padding=1)
 
 

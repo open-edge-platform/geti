@@ -100,6 +100,18 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             )
         )
 
+    def _base_media_id_select(self, dataset_view_id: str) -> Select:
+        """Id/type of media items directly assigned to the view, without loading full rows."""
+        return (
+            select(MediaDB.id, MediaDB.type)
+            .join(DatasetViewItemDB, DatasetViewItemDB.media_id == MediaDB.id)
+            .where(
+                DatasetViewItemDB.dataset_view_id == dataset_view_id,
+                MediaDB.project_id == self.project_id,
+                MediaDB.type != MediaType.VIDEO_FRAME,
+            )
+        )
+
     def count_media(
         self,
         dataset_view_id: str,
@@ -152,6 +164,25 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         order_by_column = sort_column.asc() if sort_direction == SortDirection.ASC else sort_column.desc()
         stmt = stmt.order_by(order_by_column).offset(offset).limit(limit)
         return list(self.db.scalars(stmt).all())
+
+    def list_media_ids(
+        self,
+        dataset_view_id: str,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        annotation_status: str | None = None,
+        label_ids: list[str] | None = None,
+        subsets: list[str] | None = None,
+    ) -> tuple[tuple[str, str], ...]:
+        """Get the (id, type) of every media item assigned to a dataset view, without loading full rows."""
+        stmt = self._base_media_id_select(dataset_view_id).join(
+            DatasetItemDB, DatasetItemDB.id == MediaDB.id, isouter=True
+        )
+        stmt = _apply_date_range_filter(stmt, MediaDB.created_at, start_date, end_date)
+        stmt = _apply_annotation_status_filter_with_video_support(stmt, annotation_status)
+        stmt = _apply_subset_filter_with_video_support(stmt, subsets)
+        stmt = _apply_label_filter_with_video_support(stmt, label_ids)
+        return tuple((media_id, media_type) for media_id, media_type in self.db.execute(stmt).all())
 
     def _base_item_select(self, dataset_view_id: str) -> Select:
         """
@@ -220,6 +251,34 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         order_by_column = sort_column.asc() if sort_direction == SortDirection.ASC else sort_column.desc()
         stmt = stmt.order_by(order_by_column).offset(offset).limit(limit)
         return list(self.db.scalars(stmt).all())
+
+    def list_items_with_media(  # noqa: PLR0913
+        self,
+        dataset_view_id: str,
+        limit: int,
+        offset: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        annotation_status: str | None = None,
+        label_ids: list[str] | None = None,
+        subsets: list[str] | None = None,
+    ) -> list[tuple[DatasetItemDB, MediaDB]]:
+        """List (filter) the dataset items assigned to a dataset view, together with their media."""
+        stmt = (
+            select(DatasetItemDB, MediaDB)
+            .join(MediaDB, MediaDB.id == DatasetItemDB.id)
+            .where(
+                DatasetItemDB.project_id == self.project_id,
+                self._media_in_view_condition(dataset_view_id),
+            )
+        )
+        stmt = _apply_date_range_filter(stmt, DatasetItemDB.created_at, start_date, end_date)
+        stmt = _apply_annotation_status_filter(stmt, annotation_status)
+        stmt = _apply_subset_filter(stmt, subsets)
+        if label_ids:
+            stmt = stmt.join(DatasetItemLabelDB).where(DatasetItemLabelDB.label_id.in_(label_ids)).distinct()
+        stmt = stmt.order_by(DatasetItemDB.created_at.desc()).offset(offset).limit(limit)
+        return [(dataset_item, media) for (dataset_item, media) in self.db.execute(stmt).all()]
 
     def get_statistics(self, dataset_view_id: str) -> dict[str, Any]:
         """Get statistics (media & annotation counts) about the media assigned to a dataset view."""

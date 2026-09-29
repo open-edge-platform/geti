@@ -3,7 +3,7 @@
 
 import { Trans, useTranslation } from '@/i18n';
 import { Button, Flex, Text } from '@geti-ui/ui';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 import { ReactComponent as EmptyFolderImage } from '../../../../assets/empty-folder.svg';
 import { paths } from '../../../../constants/paths';
@@ -53,10 +53,12 @@ export const EmptyProjectList = () => {
 
                 <Flex alignItems={'center'} gap={'size-100'}>
                     <Button variant='accent' id='create-new-project-button' onPress={handleCreateProject}>
-                        <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>{t('project.list.empty.createNewProject')}</Text>
+                        <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>{t('project.list.createNewProject')}</Text>
                     </Button>
                     <Button variant='accent' id='create-from-dataset-button' onPress={handleCreateFromDataset}>
-                        <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>{t('project.list.empty.createFromDataset')}</Text>
+                        <Text UNSAFE_style={{ whiteSpace: 'nowrap' }}>
+                            {t('project.list.createProjectFromDataset')}
+                        </Text>
                     </Button>
                 </Flex>
 

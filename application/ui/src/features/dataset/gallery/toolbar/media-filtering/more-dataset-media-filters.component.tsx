@@ -30,7 +30,7 @@ export const MoreDatasetMediaFilters = () => {
                 <Tooltip>{t('dataset.filters.more')}</Tooltip>
             </TooltipTrigger>
             <Dialog size='S'>
-                <Heading>{t('dataset.filters.moreTitle')}</Heading>
+                <Heading>{t('dataset.filters.more')}</Heading>
                 <Divider />
                 <Content>
                     <Flex direction='column' gap='size-300'>

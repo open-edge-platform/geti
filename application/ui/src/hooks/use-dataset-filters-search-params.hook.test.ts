@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { act } from '@testing-library/react';
+import { useSearchParams } from 'react-router';
 import { stringify } from 'zipson/lib';
 
 import { renderHook } from '../test-utils/render';
@@ -391,6 +392,50 @@ describe('useDatasetFiltersSearchParams', () => {
             });
 
             expect(result.current.sortDirection).toBe('desc');
+        });
+    });
+
+    describe('clearAllFilters', () => {
+        it('clears every filter in one update', () => {
+            const encoded = encodeToBinary(stringify('id-1'));
+            const route =
+                `/projects/123?${LABELS_PARAM}=${encoded}` +
+                `&${ANNOTATION_STATUS_PARAM}=with_annotations` +
+                `&${START_DATE_PARAM}=2026-03-15T22:00:00.000Z` +
+                `&${END_DATE_PARAM}=2026-06-30T10:00:00.000Z` +
+                `&${SUBSET_PARAM}=training`;
+
+            const { result } = renderHook(() => useDatasetFiltersSearchParams(), {
+                route,
+                path: '/projects/:projectId',
+            });
+
+            act(() => {
+                result.current.clearAllFilters();
+            });
+
+            expect(result.current.selectedLabelIds).toEqual([]);
+            expect(result.current.annotationStatus).toBeNull();
+            expect(result.current.startDate).toBeNull();
+            expect(result.current.endDate).toBeNull();
+            expect(result.current.selectedSubsets).toEqual([]);
+        });
+
+        it('keeps search params that are not filters', () => {
+            const route = `/projects/123?${ANNOTATION_STATUS_PARAM}=with_annotations&${SORT_DIRECTION_PARAM}=asc&datasetViewId=collection-one`;
+
+            const { result } = renderHook(
+                () => ({ filters: useDatasetFiltersSearchParams(), searchParams: useSearchParams()[0] }),
+                { route, path: '/projects/:projectId' }
+            );
+
+            act(() => {
+                result.current.filters.clearAllFilters();
+            });
+
+            expect(result.current.filters.annotationStatus).toBeNull();
+            expect(result.current.filters.sortDirection).toBe('asc');
+            expect(result.current.searchParams.get('datasetViewId')).toBe('collection-one');
         });
     });
 });

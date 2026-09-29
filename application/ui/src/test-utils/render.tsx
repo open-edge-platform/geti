@@ -11,7 +11,7 @@ import {
     renderHook as rtlRenderHook,
     RenderOptions as RTLRenderOptions,
 } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { createMemoryRouter, RouterProvider } from 'react-router';
 
 import { paths } from '../constants/paths';
 import { createQueryClient } from '../query-client/query-client';
@@ -55,14 +55,7 @@ export const render = (ui: ReactNode, options: RenderOptions = {}) => {
     const testQueryClient = options.queryClient ?? createQueryClient();
     const router = createTestRouter(ui, options, testQueryClient);
 
-    return rtlRender(
-        <RouterProvider
-            router={router}
-            future={{
-                v7_startTransition: true,
-            }}
-        />
-    );
+    return rtlRender(<RouterProvider router={router} />);
 };
 
 export const renderHook = <TProps, TResult>(callback: (props: TProps) => TResult, options: RenderOptions = {}) => {
@@ -72,14 +65,7 @@ export const renderHook = <TProps, TResult>(callback: (props: TProps) => TResult
         const wrappedChildren = options.wrapper ? <options.wrapper>{children}</options.wrapper> : children;
         const router = createTestRouter(wrappedChildren, options, testQueryClient);
 
-        return (
-            <RouterProvider
-                router={router}
-                future={{
-                    v7_startTransition: true,
-                }}
-            />
-        );
+        return <RouterProvider router={router} />;
     };
 
     return rtlRenderHook(callback, { wrapper: Wrapper });

@@ -5,7 +5,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedDatasetView } from 'mocks/mock-dataset-view';
 import { HttpResponse } from 'msw';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../../../../api/utils';
@@ -143,7 +143,7 @@ describe('AssignToExistingView', () => {
         expect(getSearchParams().get('datasetViewId')).toBeNull();
 
         const toast = await screen.findByLabelText('toast');
-        const link = within(toast).getByRole('link', { name: `Open ${COLLECTION_ONE.name} view` });
+        const link = within(toast).getByRole('link', { name: `Open ${COLLECTION_ONE.name}` });
 
         expect(link).toHaveAttribute('href', expect.stringContaining('datasetViewId=collection-one'));
         expect(link).toHaveAttribute('href', expect.stringContaining('sortBy=name'));

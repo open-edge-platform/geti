@@ -158,7 +158,9 @@ class IoULoss(nn.Module):
             # TODO (mmdet): remove this in the future
             # reduce the weight of shape (n, 4) to (n,) to match the
             # iou_loss of shape (n,)
-            assert weight.shape == pred.shape  # noqa: S101
+            if weight.shape != pred.shape:
+                msg = f"Weight shape {weight.shape} does not match prediction shape {pred.shape}."
+                raise ValueError(msg)
             weight = weight.mean(-1)
         return self.loss_weight * iou_loss(
             pred,

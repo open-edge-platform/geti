@@ -62,10 +62,16 @@ const GalleryList = ({
     const { selectedKeys, setSelectedKeys, toggleSelectedKeys, isSelected } = useSelectedData();
 
     const handleSelectionChange = (keys: Selection) => {
-        setSelectedKeys((previousKeys) => {
-            const isSameItem = keys !== 'all' && keys.size === 1 && isEqual(previousKeys, keys);
+        if (keys === 'all') return;
 
-            return isSameItem ? new Set() : keys;
+        // Keep react-aria's own Selection instance: copying it into a plain Set drops the
+        // anchor key it uses to resolve shift-click ranges. Our media keys are always strings.
+        const mediaIds = keys as Set<string>;
+
+        setSelectedKeys((previousKeys) => {
+            const isSameItem = mediaIds.size === 1 && isEqual(previousKeys, mediaIds);
+
+            return isSameItem ? new Set() : mediaIds;
         });
     };
 
@@ -75,6 +81,7 @@ const GalleryList = ({
             ariaLabel='data-collection-grid'
             selectionMode='multiple'
             selectionBehavior='replace'
+            disallowSelectAll
             allowDuplicateSelectionEvents
             selectOnFocus={false}
             selectedKeys={selectedKeys}

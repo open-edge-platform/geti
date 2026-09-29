@@ -1,8 +1,6 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useMemo } from 'react';
-
 import { $api } from '@/api';
 import type {
     ModelArchitecture,
@@ -40,9 +38,13 @@ const getModelArchitectures = (
 };
 
 const getTaskModelArchitecturesQueryOptions = (taskType: TaskType) => {
-    return $api.queryOptions('get', '/api/model_architectures', {
-        params: { query: { task: taskType } },
-    });
+    return $api.queryOptions(
+        'get',
+        '/api/model_architectures',
+        { params: { query: { task: taskType } } },
+        // Static catalog served from the backend's model manifests
+        { staleTime: Infinity }
+    );
 };
 
 export const usePrefetchTaskModelArchitectures = () => {
@@ -56,10 +58,7 @@ export const useGetTaskModelArchitectures = () => {
 
     const { data } = useSuspenseQuery(getTaskModelArchitecturesQueryOptions(projectData.task.task_type));
 
-    const modelArchitectures = useMemo(
-        () => getModelArchitectures(data.model_architectures, data.top_picks),
-        [data.model_architectures, data.top_picks]
-    );
+    const modelArchitectures = getModelArchitectures(data.model_architectures, data.top_picks);
 
     return {
         modelArchitectures,

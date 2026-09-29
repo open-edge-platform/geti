@@ -43,7 +43,7 @@ export const DatasetStatistics = () => {
                     </Content>
                     <ButtonGroup>
                         <Button variant='secondary' onPress={close}>
-                            {t('dataset.statistics.close')}
+                            {t('common.actions.close')}
                         </Button>
                     </ButtonGroup>
                 </Dialog>

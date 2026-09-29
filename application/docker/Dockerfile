@@ -8,7 +8,7 @@ ARG EXCLUDE_AGPL_MODELS=0
 ##############
 # Backend base
 ##############
-FROM python:3.13-slim@sha256:9d2e5553305c7c7b0097999bb17187c69b921ccd6bc9d40e4bb5ebe652c00285 AS backend-base
+FROM python:3.14-slim@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d AS backend-base
 
 # uv / uvx
 COPY --from=docker.io/astral/uv:0.10.4@sha256:4cac394b6b72846f8a85a7a0e577c6d61d4e17fe2ccee65d9451a8b3c9efb4ac /uv /uvx /bin/
@@ -163,7 +163,7 @@ RUN npm run build
 #===========================================================================
 # pyav + ffmpeg
 # ===========================================================================
-FROM python:3.13-slim@sha256:9d2e5553305c7c7b0097999bb17187c69b921ccd6bc9d40e4bb5ebe652c00285 AS ffmpeg-builder
+FROM python:3.14-slim@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d AS ffmpeg-builder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -295,7 +295,7 @@ RUN python -m pip wheel --no-binary av --no-build-isolation "av==${PYAV_VERSION}
 #########################
 # Base for CPU, GPU and XPU runtime images
 #########################
-FROM python:3.13-slim@sha256:9d2e5553305c7c7b0097999bb17187c69b921ccd6bc9d40e4bb5ebe652c00285 AS runtime-base
+FROM python:3.14-slim@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d AS runtime-base
 
 LABEL org.opencontainers.image.source="https://github.com/open-edge-platform/training_extensions"
 LABEL org.opencontainers.image.description="Geti – train, optimize and deploy deep-learning models"
@@ -330,7 +330,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     && apt-get install -y --no-install-recommends \
         git=1:2.47.3-0* \
         libgl1=1.7.0-1+b2 \
-        libglib2.0-0t64=2.84.4-3~deb13u3 \
+        libglib2.0-0t64=2.84.4-3* \
         libglx-mesa0=25.0.* \
         libv4l-0t64=1.30.1-1 \
         libva2=2.22.* \

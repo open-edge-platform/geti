@@ -8,7 +8,7 @@ import { Button, ButtonGroup, Content, Dialog, DialogContainer, Divider, Form, H
 import { usePatchProject } from 'hooks/api/project.hook';
 import { isEmpty } from 'lodash-es';
 
-import { PROJECT_NAME_MAX_LENGTH, validateProjectName } from '../../features/project/validator';
+import { PROJECT_NAME_MAX_LENGTH, validateProjectName } from '../../shared/project-name-validator';
 import { toast } from '../toast/toast.component';
 
 type EditProjectNameDialogProps = {
