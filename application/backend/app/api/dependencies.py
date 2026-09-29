@@ -32,6 +32,7 @@ from app.services import (
     ProjectService,
     SinkService,
     SourceMediaService,
+    SourceService,
     SourceUpdateService,
     StagedDatasetService,
     SystemService,
@@ -171,6 +172,14 @@ def get_source_media_service(
     return SourceMediaService(source_media_dir)
 
 
+def get_source_service(
+    db: Annotated[Session, Depends(get_db)],
+    source_media_service: Annotated[SourceMediaService, Depends(get_source_media_service)],
+) -> SourceService:
+    """Provides a SourceService instance."""
+    return SourceService(db_session=db, source_media_service=source_media_service)
+
+
 def get_source_update_service(
     event_bus: Annotated[EventBus, Depends(get_event_bus)],
     db: Annotated[Session, Depends(get_db)],
@@ -246,9 +255,12 @@ def get_webrtc_manager(request: Request) -> WebRTCManager:
     return request.app.state.webrtc_manager
 
 
-def get_label_service(db: Annotated[Session, Depends(get_db)]) -> LabelService:
+def get_label_service(
+    db: Annotated[Session, Depends(get_db)],
+    event_bus: Annotated[EventBus, Depends(get_event_bus)],
+) -> LabelService:
     """Provides a LabelService instance for managing labels."""
-    return LabelService(db_session=db)
+    return LabelService(db_session=db, event_bus=event_bus)
 
 
 def get_project_service(

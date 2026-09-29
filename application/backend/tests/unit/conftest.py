@@ -19,7 +19,11 @@ from app.services.event.event_bus import EventBus
 
 @pytest.fixture(scope="session")
 def fxt_app() -> FastAPI:
-    return create_app()
+    app = create_app()
+    # The lifespan (which populates the app state) does not run for the test app, so provide the
+    # pieces of state that dependencies resolve from it.
+    app.state.event_bus = MagicMock(spec=EventBus)
+    return app
 
 
 @pytest.fixture
