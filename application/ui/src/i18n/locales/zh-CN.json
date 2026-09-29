@@ -931,6 +931,7 @@
             },
             "validation": {
                 "notEnoughAnnotations": "要训练模型，数据集中至少需要标注 3 项，不过为获得更好的效果，建议多标注一些。",
+                "notEnoughAnnotationsInView": "要训练模型，所选数据集视图中至少需要标注 3 项，不过为获得更好的效果，建议多标注一些。",
                 "emptySubsetsReason": "要训练模型，每个子集（训练集、验证集、测试集）至少需要包含一项。目前不满足该条件，因为{{subsetClause}}，且{{assignmentDetail}}。",
                 "emptySubsetClause_one": "{{list}} 子集为空",
                 "emptySubsetClause_other": "{{list}} 子集均为空",

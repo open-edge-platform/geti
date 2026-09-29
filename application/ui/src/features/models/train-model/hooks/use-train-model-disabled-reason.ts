@@ -4,6 +4,8 @@
 import { useTranslation } from '@/i18n';
 import { useGetDatasetItems } from 'hooks/use-get-dataset-items.hook';
 
+import { useTrainModelState } from '../train-model-provider.component';
+
 const MIN_NUMBER_OF_ANNOTATED_ITEMS = 3;
 
 export const useTrainModelDisabledReason = () => {
@@ -13,26 +15,45 @@ export const useTrainModelDisabledReason = () => {
         type: 'conjunction',
     });
 
-    const { totalCount, isPending: isTotalPending } = useGetDatasetItems({ annotationStatus: 'with_annotations' });
+    const { datasetSources, selectedDatasetSourceId } = useTrainModelState();
+    const selectedDatasetSource = datasetSources.find(({ id }) => id === selectedDatasetSourceId);
+    // A revision is an immutable snapshot that already satisfied these requirements when it was created.
+    const isRevisionSelected = selectedDatasetSource?.kind === 'revision';
+    const datasetViewId =
+        selectedDatasetSource?.kind === 'view' ? (selectedDatasetSource.value ?? undefined) : undefined;
+
+    const { totalCount, isPending: isTotalPending } = useGetDatasetItems({
+        annotationStatus: 'with_annotations',
+        datasetViewId,
+    });
     const { totalCount: trainingSubsetSize, isPending: isTrainingPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
         subsets: ['training'],
+        datasetViewId,
     });
     const { totalCount: testingSubsetSize, isPending: isTestingPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
         subsets: ['testing'],
+        datasetViewId,
     });
     const { totalCount: validationSubsetSize, isPending: isValidationPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
         subsets: ['validation'],
+        datasetViewId,
     });
     const { totalCount: reviewedUnassignedSubsetSize, isPending: isReviewedUnassignedPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
         subsets: ['unassigned'],
+        datasetViewId,
     });
     const { totalCount: unassignedSubsetSize, isPending: isUnassignedPending } = useGetDatasetItems({
         subsets: ['unassigned'],
+        datasetViewId,
     });
+
+    if (isRevisionSelected) {
+        return { reason: undefined };
+    }
 
     if (
         isTotalPending ||
@@ -47,7 +68,11 @@ export const useTrainModelDisabledReason = () => {
 
     if (totalCount < MIN_NUMBER_OF_ANNOTATED_ITEMS) {
         return {
-            reason: t('models.training.validation.notEnoughAnnotations'),
+            reason: t(
+                datasetViewId === undefined
+                    ? 'models.training.validation.notEnoughAnnotations'
+                    : 'models.training.validation.notEnoughAnnotationsInView'
+            ),
         };
     }
 

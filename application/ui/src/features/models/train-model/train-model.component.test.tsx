@@ -180,5 +180,34 @@ describe('TrainModel', () => {
 
             expect(await screen.findByTestId('select-dataset')).toHaveTextContent('Collection Two');
         });
+
+        it('blocks training when the selected view has too few annotated items, even if the dataset has enough', async () => {
+            server.use(
+                http.get('/api/projects/{project_id}/dataset/items', ({ request }) => {
+                    const datasetViewId = new URL(request.url).searchParams.get('dataset_view_id');
+                    const total = datasetViewId === null ? 5 : 2;
+
+                    return HttpResponse.json({
+                        items: [],
+                        pagination: { total, count: 0, limit: 10, offset: 0 },
+                    });
+                })
+            );
+
+            render(<TrainModel />);
+
+            fireEvent.click(await screen.findByRole('button', { name: 'Train model' }));
+
+            const picker = await screen.findByTestId('select-dataset');
+            await waitFor(() => {
+                expect(screen.queryByText(/you need to annotate at least 3 items/)).not.toBeInTheDocument();
+            });
+
+            fireEvent.click(picker);
+            fireEvent.click(await screen.findByRole('option', { name: 'Collection One' }));
+
+            expect(await screen.findByText(/at least 3 items in the selected dataset view/)).toBeVisible();
+            expect(screen.getByRole('button', { name: 'Start' })).toBeDisabled();
+        });
     });
 });

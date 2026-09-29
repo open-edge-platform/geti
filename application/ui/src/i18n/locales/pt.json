@@ -931,6 +931,7 @@
             },
             "validation": {
                 "notEnoughAnnotations": "Para treinar um modelo, precisa de anotar pelo menos 3 itens no seu dataset, embora recomendemos anotar vários mais para obter melhores resultados.",
+                "notEnoughAnnotationsInView": "Para treinar um modelo, precisa de anotar pelo menos 3 itens na vista do dataset selecionada, embora recomendemos anotar vários mais para obter melhores resultados.",
                 "emptySubsetsReason": "Para treinar um modelo, cada subconjunto (treino, validação, teste) necessita de pelo menos um item. Esta condição não pode ser satisfeita de momento porque {{subsetClause}} e {{assignmentDetail}}.",
                 "emptySubsetClause_one": "o subconjunto {{list}} está vazio",
                 "emptySubsetClause_other": "os subconjuntos {{list}} estão vazios",

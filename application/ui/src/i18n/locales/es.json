@@ -931,6 +931,7 @@
             },
             "validation": {
                 "notEnoughAnnotations": "Para entrenar un modelo, necesitas anotar al menos 3 elementos de tu dataset, aunque recomendamos anotar varios más para obtener mejores resultados.",
+                "notEnoughAnnotationsInView": "Para entrenar un modelo, necesitas anotar al menos 3 elementos en la vista del dataset seleccionada, aunque recomendamos anotar varios más para obtener mejores resultados.",
                 "emptySubsetsReason": "Para entrenar un modelo, cada subconjunto (entrenamiento, validación, prueba) necesita al menos un elemento. Esta condición no se puede cumplir actualmente porque {{subsetClause}} vacío y {{assignmentDetail}}.",
                 "emptySubsetClause_one": "el subconjunto {{list}} está",
                 "emptySubsetClause_other": "los subconjuntos {{list}} están",
