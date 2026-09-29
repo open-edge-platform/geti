@@ -28,7 +28,10 @@ class DatasetRevisionView(BaseIDModel):
     item_counts: ItemCount = Field(..., description="Number of items in the dataset")
     dataset_view_id: UUID | None = Field(
         None,
-        description="Dataset view the revision was created from, null if it covers the entire dataset",
+        description=(
+            "Dataset view the revision was created from, null if it covers the entire dataset. "
+            "The view may have been deleted in the meantime, in which case the id no longer resolves."
+        ),
     )
 
     model_config = {

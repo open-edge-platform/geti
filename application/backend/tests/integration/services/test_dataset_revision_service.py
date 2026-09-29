@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from app.datumaro_converter import SampleMode
 from app.db.schema import DatasetItemDB, DatasetRevisionDB, MediaDB, PipelineDB
 from app.models import DatasetItemAnnotationStatus, DatasetItemSubset, Pipeline, Project
-from app.services import DatasetRevisionService, DatasetService, DatasetViewService
+from app.services import DatasetRevisionService, DatasetService, DatasetViewService, MediaService
 from app.services.base import ResourceNotFoundError, ResourceType
 from app.services.dataset_revision_service import DATASET_REVISION_ITEM_THUMBNAIL_SIZE
 
@@ -1295,6 +1295,56 @@ class TestDatasetRevisionServiceDatasetViews:
 
         assert latest is not None
         assert latest.id == revision_id
+
+    def test_view_revision_is_invalidated_by_media_deletion(
+        self,
+        fxt_dataset_service: DatasetService,
+        fxt_dataset_revision_service: DatasetRevisionService,
+        fxt_dataset_view_service: DatasetViewService,
+        fxt_media_service: MediaService,
+        fxt_project_with_subset_items_on_disk: tuple[Project, list[tuple[MediaDB, DatasetItemDB]]],
+    ) -> None:
+        project, media_and_dataset_items = fxt_project_with_subset_items_on_disk
+        media_ids = [UUID(media.id) for media, _ in media_and_dataset_items]
+        view = fxt_dataset_view_service.create_dataset_view(
+            project_id=project.id, name="Collection One", media_ids=media_ids
+        )
+        self._save_revision(fxt_dataset_service, fxt_dataset_revision_service, project, view.id, view.name)
+
+        # Deleting a medium cascades its view assignment, so the view must still be marked as changed.
+        fxt_media_service.delete_media(project=project, media_id=media_ids[0])
+
+        latest = fxt_dataset_revision_service.get_latest_uptodate_dataset_revision(
+            project_id=project.id, dataset_view_id=view.id
+        )
+
+        assert latest is None
+
+    def test_view_revision_is_not_reused_after_the_view_is_deleted(
+        self,
+        fxt_dataset_service: DatasetService,
+        fxt_dataset_revision_service: DatasetRevisionService,
+        fxt_dataset_view_service: DatasetViewService,
+        fxt_project_with_subset_items_on_disk: tuple[Project, list[tuple[MediaDB, DatasetItemDB]]],
+    ) -> None:
+        project, media_and_dataset_items = fxt_project_with_subset_items_on_disk
+        view = fxt_dataset_view_service.create_dataset_view(
+            project_id=project.id,
+            name="Collection One",
+            media_ids=[UUID(media.id) for media, _ in media_and_dataset_items],
+        )
+        self._save_revision(fxt_dataset_service, fxt_dataset_revision_service, project, view.id, view.name)
+
+        fxt_dataset_view_service.delete_dataset_view(project_id=project.id, dataset_view_id=view.id)
+
+        # The revision keeps its scope marker, so it is neither reusable as a full-dataset one nor reachable.
+        assert fxt_dataset_revision_service.get_latest_uptodate_dataset_revision(project_id=project.id) is None
+        assert (
+            fxt_dataset_revision_service.get_latest_uptodate_dataset_revision(
+                project_id=project.id, dataset_view_id=view.id
+            )
+            is None
+        )
 
     def test_save_revision_from_view_without_all_subsets_raises(
         self,

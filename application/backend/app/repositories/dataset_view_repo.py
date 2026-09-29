@@ -59,8 +59,10 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             return
         values = [{"dataset_view_id": dataset_view_id, "media_id": media_id} for media_id in media_ids]
         stmt = insert(DatasetViewItemDB).values(values).on_conflict_do_nothing()
-        self.db.execute(stmt)
-        self._touch(dataset_view_id)
+        result = cast(CursorResult, self.db.execute(stmt))
+        # Touch the dataset view if and only if any rows were inserted.
+        if result.rowcount:
+            self._touch(dataset_view_id)
 
     def unassign_media(self, dataset_view_id: str, media_ids: list[str]) -> None:
         """Unassign one or more media items from a dataset view. Non-assigned items are silently ignored."""
@@ -70,8 +72,32 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
             DatasetViewItemDB.dataset_view_id == dataset_view_id,
             DatasetViewItemDB.media_id.in_(media_ids),
         )
+        result = cast(CursorResult, self.db.execute(stmt))
+        # Touch the dataset view if and only if any rows were deleted.
+        if result.rowcount:
+            self._touch(dataset_view_id)
+
+    def touch_views_containing_media(self, media_id: str) -> None:
+        """
+        Bump ``updated_at`` on every view the given media belongs to, directly or via its parent video.
+
+        Must be called *before* deleting the media: the deletion cascades its ``dataset_view_items`` rows, so
+        without this the membership change would leave no trace and stale revisions would look up to date.
+        """
+        view_ids = (
+            select(DatasetViewItemDB.dataset_view_id)
+            .join(
+                MediaDB,
+                (MediaDB.id == DatasetViewItemDB.media_id) | (MediaDB.video_id == DatasetViewItemDB.media_id),
+            )
+            .where(MediaDB.id == media_id)
+        )
+        stmt = (
+            update(DatasetViewDB)
+            .where(DatasetViewDB.project_id == self.project_id, DatasetViewDB.id.in_(view_ids))
+            .values(updated_at=datetime.now(UTC))
+        )
         self.db.execute(stmt)
-        self._touch(dataset_view_id)
 
     def _touch(self, dataset_view_id: str) -> None:
         """Bump the view's ``updated_at``, so that membership changes (including removals) stay detectable."""

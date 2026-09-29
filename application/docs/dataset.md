@@ -166,7 +166,9 @@ The database saves the relevant information in the following tables:
   than dataset items) allows a video to be assigned to a view before any of its frames have been annotated.
 - `dataset_revisions`: simple metadata about each revision, such as creation time and number of items. The actual data
   is instead stored in a file on the filesystem. The nullable `dataset_view_id` column records the view the revision
-  was created from; it is null for revisions that cover the entire dataset.
+  was created from; it is null for revisions that cover the entire dataset. It is intentionally not a foreign key:
+  the value is kept even after the view is deleted, so that a view-scoped revision is never mistaken for a
+  full-dataset one (at the cost of leaving a reference that no longer resolves).
 - `dataset_items_tags`: a many-to-many relationship table that associates tags with dataset items. Each record contains
   the id of the dataset item and the the tag as a string.
 
