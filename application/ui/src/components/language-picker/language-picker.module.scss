@@ -2,11 +2,15 @@
     display: inline-flex;
     align-items: center;
     gap: var(--spectrum-global-dimension-size-100);
+    white-space: nowrap;
 }
 
-.flag {
-    width: var(--spectrum-global-dimension-size-225);
-    height: var(--spectrum-global-dimension-size-150);
-    object-fit: cover;
-    border-radius: var(--spectrum-global-dimension-size-25);
+.version {
+    opacity: 0.6;
+    font-size: var(--spectrum-global-dimension-font-size-75);
+}
+
+.languageScroll {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
 }

@@ -49,7 +49,6 @@ const SelectedProjectButton = ({ name, id, isActive }: SelectedProjectProps) => 
             aria-label={`Selected project ${name}`}
             isQuiet
             height={'100%'}
-            width={'size-2400'}
             staticColor={'white'}
             UNSAFE_className={classes.selectedProjectButton}
         >

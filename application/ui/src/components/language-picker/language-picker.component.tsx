@@ -4,33 +4,15 @@
 import { SUPPORTED_LANGUAGES, useTranslation } from '@/i18n';
 import { Item, Key, Picker, Text } from '@geti-ui/ui';
 
-import cnFlag from '../../assets/flags/cn.svg?url';
-import esFlag from '../../assets/flags/es.svg?url';
-import itFlag from '../../assets/flags/it.svg?url';
-import plFlag from '../../assets/flags/pl.svg?url';
-import ptFlag from '../../assets/flags/pt.svg?url';
-import usFlag from '../../assets/flags/us.svg?url';
-
 import classes from './language-picker.module.scss';
-
-// Image files, not emoji: Windows/WebView2 renders regional-indicator flag emojis as letters.
-const LANGUAGE_FLAGS: Partial<Record<string, string>> = {
-    en: usFlag,
-    es: esFlag,
-    it: itFlag,
-    pl: plFlag,
-    pt: ptFlag,
-    'zh-CN': cnFlag,
-};
 
 const getLanguageName = (language: string): string =>
     new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language;
 
-const languages = SUPPORTED_LANGUAGES.map((language) => ({
+export const languages = SUPPORTED_LANGUAGES.map((language) => ({
     id: language,
     code: language.toUpperCase(),
     name: getLanguageName(language),
-    flag: LANGUAGE_FLAGS[language],
 }));
 
 export const LanguagePicker = () => {
@@ -48,13 +30,10 @@ export const LanguagePicker = () => {
             onSelectionChange={handleChange}
             isQuiet
         >
-            {({ id, code, name, flag }) => (
+            {({ id, code, name }) => (
                 <Item key={id} textValue={name}>
                     <Text>
-                        <span className={classes.option}>
-                            {flag !== undefined && <img src={flag} alt={name} className={classes.flag} />}
-                            {code}
-                        </span>
+                        <span className={classes.option}>{code}</span>
                     </Text>
                 </Item>
             )}
