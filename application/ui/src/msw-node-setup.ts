@@ -1,9 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { tusUploadHandlers } from 'mocks/mock-tus-upload';
 import { setupServer } from 'msw/node';
 
 import { handlers } from './api/utils';
 
 // Initialize msw's mock server with the handlers
-export const server = setupServer(...handlers);
+export const server = setupServer(...handlers, ...tusUploadHandlers);

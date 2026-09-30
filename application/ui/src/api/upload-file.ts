@@ -1,10 +1,11 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { MediaDTO, SourceMediaUpload, StagedDataset } from '@/api/types';
 import { i18n } from '@/i18n';
 
 import { fetchClient } from './client';
-import type { MediaDTO, SourceMediaUpload, StagedDataset } from './shared-types';
+import { uploadWithTus } from './tus-upload';
 
 /**
  * Wraps a file in the `multipart/form-data` body every Geti upload endpoint expects.
@@ -50,6 +51,25 @@ export const uploadDatasetArchive = async (file: File): Promise<StagedDataset> =
 
     return unwrap(result, i18n.t('dataset.import.prepareError'));
 };
+
+/** Uploads a single image or video into a project's dataset with resumable transfer. */
+export const uploadDatasetMediaResumable = (
+    projectId: string,
+    file: File,
+    onProgress?: (bytesSent: number) => void,
+    signal?: AbortSignal
+): Promise<MediaDTO> => {
+    const endpoint = `/api/projects/${encodeURIComponent(projectId)}/dataset/media/tus`;
+    return uploadWithTus<MediaDTO>('dataset-media', file, endpoint, onProgress, signal, { project_id: projectId });
+};
+
+/** Uploads a dataset archive to the import staging area with resumable transfer. */
+export const uploadDatasetArchiveResumable = (
+    file: File,
+    onProgress?: (bytesSent: number) => void,
+    signal?: AbortSignal
+): Promise<StagedDataset> =>
+    uploadWithTus<StagedDataset>('dataset-archive', file, '/api/staged_datasets/tus', onProgress, signal);
 
 /** Uploads a video file to be used as an inference pipeline source. */
 export const uploadSourceVideo = async (file: File): Promise<SourceMediaUpload> => {

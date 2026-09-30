@@ -1,8 +1,9 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
+import base64
 import os
 import tempfile
-from collections.abc import Callable
+from collections.abc import AsyncIterator, Callable
 from datetime import UTC, datetime
 from io import BytesIO
 from pathlib import Path
@@ -22,6 +23,7 @@ from app.api.dependencies import (
     get_media_segment_service,
     get_media_service,
     get_project_service,
+    get_tus_upload_service,
 )
 from app.api.schemas.media import ImageView, MediaViewAdapter, SetMediaAnnotations, VideoFrameView, VideoView
 from app.models import (
@@ -64,6 +66,7 @@ from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
 from app.services.media_service import ImageMetadata, MediaFilters
 from app.services.sam import MediaSegmentService
+from app.services.tus_upload_service import TusUploadService
 
 
 @pytest.fixture
@@ -215,6 +218,40 @@ def test_convert_video_frame_to_view(fxt_video_frame_media) -> None:
 
 
 class TestMediaEndpoints:
+    @pytest.mark.asyncio
+    async def test_create_image_from_tus_and_retry(
+        self,
+        fxt_app,
+        fxt_async_client,
+        fxt_get_project,
+        fxt_image_media,
+        fxt_media_service,
+        fxt_dataset_service,
+        tmp_path,
+    ) -> None:
+        tus_service = TusUploadService(tmp_path / "uploads", max_size=1024, expiration_seconds=3600)
+        fxt_app.dependency_overrides[get_tus_upload_service] = lambda: tus_service
+        metadata = {"filename": "test.jpg", "purpose": "dataset-media", "project_id": str(fxt_get_project.id)}
+        header = ",".join(f"{key} {base64.b64encode(value.encode()).decode()}" for key, value in metadata.items())
+        upload = tus_service.create(3, header)
+
+        async def chunks() -> AsyncIterator[bytes]:
+            yield b"abc"
+
+        await tus_service.append(upload.id, 0, chunks())
+        fxt_media_service.create_image.return_value = fxt_image_media
+        url = f"/api/projects/{fxt_get_project.id}/dataset/media/tus?upload_id={upload.id}"
+
+        response = await fxt_async_client.post(url)
+        retry = await fxt_async_client.post(url)
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert retry.status_code == status.HTTP_201_CREATED
+        assert retry.json() == response.json()
+        fxt_media_service.create_image.assert_called_once()
+        fxt_dataset_service.create_dataset_item.assert_called_once()
+        assert not upload.path.exists()
+
     def test_create_media_no_file(
         self, fxt_get_project, fxt_image_media, fxt_media_service, fxt_dataset_service, fxt_client
     ):

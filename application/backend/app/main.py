@@ -51,6 +51,7 @@ from app.api.routers import (
     sources,
     system,
     training_configurations,
+    tus_uploads,
     webrtc,
 )
 from app.api.routers import license as license_api
@@ -62,6 +63,41 @@ from app.settings import get_settings
 
 settings = get_settings()
 logging.basicConfig(handlers=[InterceptHandler()], level=settings.log_level, force=True)
+
+
+def _include_api_routers(app: FastAPI) -> None:
+    """Register application API resources."""
+    app.include_router(dataset_ie.router)
+    app.include_router(dataset_revisions.router)
+    app.include_router(dataset_views.router)
+    app.include_router(datasets.router)
+    app.include_router(jobs.router)
+    app.include_router(license_api.router)
+    app.include_router(media.router)
+    app.include_router(model_architectures.router)
+    app.include_router(models.router)
+    app.include_router(pipelines.router)
+    app.include_router(projects.router)
+    app.include_router(sinks.router)
+    app.include_router(source_media.router)
+    app.include_router(sources.router)
+    app.include_router(system.router)
+    app.include_router(training_configurations.router)
+    app.include_router(tus_uploads.router)
+    app.include_router(webrtc.router)
+
+
+async def _tus_version_middleware(
+    request: Request,
+    call_next: Callable[[Request], Awaitable[Response]],
+) -> Response:
+    """Attach the supported TUS version to every non-OPTIONS protocol response."""
+    response = await call_next(request)
+    if request.method != "OPTIONS" and (
+        request.url.path == "/api/uploads" or request.url.path.startswith("/api/uploads/")
+    ):
+        response.headers.setdefault("Tus-Resumable", "1.0.0")
+    return response
 
 
 def create_app() -> FastAPI:
@@ -84,26 +120,20 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=[
+            "Location",
+            "Tus-Resumable",
+            "Tus-Version",
+            "Tus-Extension",
+            "Tus-Max-Size",
+            "Upload-Offset",
+            "Upload-Length",
+            "Upload-Expires",
+            "Upload-Metadata",
+        ],
     )
 
-    # Include all API routers from the routers package
-    app.include_router(dataset_ie.router)
-    app.include_router(dataset_revisions.router)
-    app.include_router(dataset_views.router)
-    app.include_router(datasets.router)
-    app.include_router(jobs.router)
-    app.include_router(license_api.router)
-    app.include_router(media.router)
-    app.include_router(model_architectures.router)
-    app.include_router(models.router)
-    app.include_router(pipelines.router)
-    app.include_router(projects.router)
-    app.include_router(sinks.router)
-    app.include_router(source_media.router)
-    app.include_router(sources.router)
-    app.include_router(system.router)
-    app.include_router(training_configurations.router)
-    app.include_router(webrtc.router)
+    _include_api_routers(app)
 
     cur_dir = Path(__file__).parent
 
@@ -132,6 +162,8 @@ def create_app() -> FastAPI:
         response.headers.setdefault("Cross-Origin-Embedder-Policy", "credentialless")
         response.headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
         return response
+
+    app.middleware("http")(_tus_version_middleware)
 
     @app.exception_handler(ResourceNotFoundError)
     async def resource_not_found_exception_handler(request: Request, exc: ResourceNotFoundError) -> JSONResponse:  # noqa: ARG001

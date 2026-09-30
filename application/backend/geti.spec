@@ -66,7 +66,7 @@ datas = [
     *copy_metadata("rich"),
 ]
 binaries = [(dll, 'Library/bin/') for dll in glob.glob('.venv/Library/bin/*')]
-hiddenimports = []
+hiddenimports = ['app.services.tus_upload_service']
 
 # ---- PyTorch core ----
 tmp_ret = collect_all('torch')

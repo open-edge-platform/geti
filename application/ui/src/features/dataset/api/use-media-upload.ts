@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { uploadDatasetMedia } from '@/api';
+import { uploadDatasetMediaResumable } from '@/api';
 import type { MediaDTO } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
@@ -49,15 +49,23 @@ const getFulfilledValues = <T>(results: PromiseSettledResult<T>[]): T[] =>
 export const useMediaUpload = () => {
     const projectId = useProjectIdentifier();
     const queryClient = useQueryClient();
-    const { startUploadProgress, setItemUploading, setItemUploaded, setItemFailed, finishUploadProgress } =
-        useUploadActions();
+    const {
+        startUploadProgress,
+        setItemUploading,
+        setItemTransferProgress,
+        setItemUploaded,
+        setItemFailed,
+        finishUploadProgress,
+    } = useUploadActions();
 
     const buildUploadTask = (file: File, itemId: string): UploadTask<MediaDTO> => {
         return async () => {
             setItemUploading(itemId);
 
             try {
-                const result = await uploadDatasetMedia(projectId, file);
+                const result = await uploadDatasetMediaResumable(projectId, file, (bytesSent) =>
+                    setItemTransferProgress(itemId, bytesSent)
+                );
                 setItemUploaded(itemId);
 
                 return result;

@@ -57,15 +57,16 @@
 
 ## Media
 
-| Method   | Path                                              | Payload | Return                         | Description                                |
-| -------- | ------------------------------------------------- | ------- | ------------------------------ | ------------------------------------------ |
-| `GET`    | `/api/projects/<id>/dataset/media`                | -       | list of dataset media          | List the dataset media (images and videos) |
-| `GET`    | `/api/projects/<id>/dataset/media/<id>`           | -       | dataset media info             | Get info about a dataset media             |
-| `GET`    | `/api/projects/<id>/dataset/media/<id>/frames`    | -       | list of annotated video frames | List the annotated video frames            |
-| `GET`    | `/api/projects/<id>/dataset/media/<id>/binary`    | -       | binary                         | Get the image data of a media (full res)   |
-| `GET`    | `/api/projects/<id>/dataset/media/<id>/thumbnail` | -       | binary                         | Get the thumbnail of a media               |
-| `POST`   | `/api/projects/<id>/dataset/media`                | binary  | media info                     | Upload an image or a video to the dataset  |
-| `DELETE` | `/api/projects/<id>/dataset/media/<id>`           | -       | -                              | Delete a dataset media                     |
+| Method   | Path                                                  | Payload | Return                         | Description                                |
+| -------- | ----------------------------------------------------- | ------- | ------------------------------ | ------------------------------------------ |
+| `GET`    | `/api/projects/<id>/dataset/media`                    | -       | list of dataset media          | List the dataset media (images and videos) |
+| `GET`    | `/api/projects/<id>/dataset/media/<id>`               | -       | dataset media info             | Get info about a dataset media             |
+| `GET`    | `/api/projects/<id>/dataset/media/<id>/frames`        | -       | list of annotated video frames | List the annotated video frames            |
+| `GET`    | `/api/projects/<id>/dataset/media/<id>/binary`        | -       | binary                         | Get the image data of a media (full res)   |
+| `GET`    | `/api/projects/<id>/dataset/media/<id>/thumbnail`     | -       | binary                         | Get the thumbnail of a media               |
+| `POST`   | `/api/projects/<id>/dataset/media`                    | binary  | media info                     | Upload an image or a video to the dataset  |
+| `POST`   | `/api/projects/<id>/dataset/media/tus?upload_id=<id>` | -       | media info                     | Create media from a completed TUS upload   |
+| `DELETE` | `/api/projects/<id>/dataset/media/<id>`               | -       | -                              | Delete a dataset media                     |
 
 > `GET /api/projects/<id>/dataset/media` accepts an optional `dataset_view_id` query parameter: when provided,
 > only the media assigned to that [dataset view](#views) are returned. This is the only endpoint to list the
@@ -150,13 +151,39 @@
 
 ### Staged datasets
 
-| Method   | Path                            | Payload | Return           | Description                            |
-| -------- | ------------------------------- | ------- | ---------------- | -------------------------------------- |
-| `GET`    | `/api/staged_datasets`          | -       | list of datasets | List datasets from the staging area    |
-| `POST`   | `/api/staged_datasets`          | binary  | item info        | Upload dataset archive to staging area |
-| `GET`    | `/api/staged_datasets/<id>`     | -       | item info        | Get info about staged dataset          |
-| `GET`    | `/api/staged_datasets/<id>/zip` | -       | binary           | Download archive from the staging area |
-| `DELETE` | `/api/staged_datasets/<id>`     | -       | -                | Remove dataset from the staging area   |
+| Method   | Path                                      | Payload | Return           | Description                            |
+| -------- | ----------------------------------------- | ------- | ---------------- | -------------------------------------- |
+| `GET`    | `/api/staged_datasets`                    | -       | list of datasets | List datasets from the staging area    |
+| `POST`   | `/api/staged_datasets`                    | binary  | item info        | Upload dataset archive to staging area |
+| `POST`   | `/api/staged_datasets/tus?upload_id=<id>` | -       | item info        | Stage a completed TUS dataset archive  |
+| `GET`    | `/api/staged_datasets/<id>`               | -       | item info        | Get info about staged dataset          |
+| `GET`    | `/api/staged_datasets/<id>/zip`           | -       | binary           | Download archive from the staging area |
+| `DELETE` | `/api/staged_datasets/<id>`               | -       | -                | Remove dataset from the staging area   |
+
+### Resumable uploads
+
+The backend supports the TUS 1.0.0 creation, `HEAD`, `PATCH`, expiration, and termination operations:
+
+| Method    | Path                | Required headers                                   | Description                                       |
+| --------- | ------------------- | -------------------------------------------------- | ------------------------------------------------- |
+| `OPTIONS` | `/api/uploads`      | -                                                  | Advertise TUS version, extensions, and size limit |
+| `POST`    | `/api/uploads`      | `Tus-Resumable`, `Upload-Length`                   | Create an upload; response includes `Location`    |
+| `HEAD`    | `/api/uploads/<id>` | `Tus-Resumable`                                    | Read the acknowledged `Upload-Offset`             |
+| `PATCH`   | `/api/uploads/<id>` | `Tus-Resumable`, `Upload-Offset`, TUS content type | Append bytes at the current offset                |
+| `DELETE`  | `/api/uploads/<id>` | `Tus-Resumable`                                    | Cancel and remove an unconsumed upload            |
+
+Set `Upload-Metadata` using TUS base64-encoded UTF-8 values. The media completion endpoint requires `filename`,
+`purpose=dataset-media`, and the matching `project_id`; the archive endpoint requires `filename` ending in `.zip` and
+`purpose=dataset-archive`. After transfer, call the matching completion endpoint with `upload_id`. Repeating a
+successful completion request returns the cached result instead of creating a duplicate record. The existing
+multipart `POST /api/projects/<id>/dataset/media` and `POST /api/staged_datasets` routes remain available.
+After successful processing, the temporary payload is removed while the small idempotency record remains until expiry.
+
+Uploads are stored in the filesystem directory configured by `TUS_UPLOADS_DIR` (default: `<DATA_DIR>/tus_uploads`).
+`TUS_UPLOAD_MAX_SIZE` defaults to 10 GiB and `TUS_UPLOAD_EXPIRATION_SECONDS` defaults to 24 hours. Expired uploads
+are removed during startup and when new uploads are created. Persist the configured directory to resume after a
+restart. Concurrent writes to the same upload are coordinated within one backend process; do not share one upload
+directory across multiple backend processes because inter-process locking is not implemented yet.
 
 ## Jobs
 

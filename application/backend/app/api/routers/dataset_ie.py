@@ -2,16 +2,18 @@
 # SPDX-License-Identifier: Apache-2.0
 from pathlib import Path
 from typing import Annotated
+from uuid import UUID
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from fastapi.params import Depends
 from starlette.responses import StreamingResponse
 
-from app.api.dependencies import get_staged_dataset_service
+from app.api.dependencies import get_staged_dataset_service, get_tus_upload_service
 from app.api.io_utils import file_iterator
 from app.api.schemas import StagedDatasetView
 from app.api.validators import StagedDatasetID
 from app.services import StagedDatasetService
+from app.services.tus_upload_service import TusUploadConflictError, TusUploadNotFoundError, TusUploadService
 
 router = APIRouter(prefix="/api/staged_datasets", tags=["Dataset Import/Export"])
 
@@ -37,6 +39,48 @@ async def upload_archive(
         return StagedDatasetView.model_validate(staged_dataset, from_attributes=True)
     finally:
         await file.close()
+
+
+@router.post(
+    "/tus",
+    response_model=StagedDatasetView,
+    status_code=status.HTTP_201_CREATED,
+    responses={status.HTTP_201_CREATED: {"description": "Resumable dataset archive staged successfully"}},
+)
+async def upload_archive_from_tus(
+    upload_id: UUID,
+    staged_dataset_service: Annotated[StagedDatasetService, Depends(get_staged_dataset_service)],
+    tus_upload_service: Annotated[TusUploadService, Depends(get_tus_upload_service)],
+) -> StagedDatasetView:
+    """Stage a completed TUS upload as a dataset archive."""
+    consumer = "staged_dataset"
+    try:
+        cached_result = tus_upload_service.get_consumed_result(upload_id, consumer)
+        if cached_result is not None:
+            return StagedDatasetView.model_validate(cached_result)
+        upload = await tus_upload_service.claim_completed(upload_id)
+    except TusUploadNotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    except TusUploadConflictError as error:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+
+    consumed = False
+    try:
+        filename = Path(upload.metadata.get("filename", "").replace("\\", "/")).name.strip()
+        if upload.metadata.get("purpose") != "dataset-archive" or not filename.lower().endswith(".zip"):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="TUS upload metadata must identify a dataset archive with a .zip filename.",
+            )
+        with upload.path.open("rb") as file_obj:
+            staged_dataset = await staged_dataset_service.upload(filename="dataset.zip", file_obj=file_obj)
+        result = StagedDatasetView.model_validate(staged_dataset, from_attributes=True)
+        tus_upload_service.complete_claim(upload.id, consumer, result.model_dump(mode="json"))
+        consumed = True
+        return result
+    finally:
+        if not consumed and upload.path.parent.exists():
+            tus_upload_service.release_claim(upload.id)
 
 
 @router.get(

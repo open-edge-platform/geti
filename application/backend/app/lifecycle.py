@@ -45,6 +45,7 @@ from app.services.data_collect import DataCollector
 from app.services.event.event_bus import EventBus
 from app.services.inference import InferenceServer
 from app.services.subset_assignment import SubsetAssigner, SubsetService
+from app.services.tus_upload_service import TusUploadService
 from app.services.video import CacheConfig, VideoService
 from app.settings import get_settings
 from app.webrtc import SDPHandler, WebRTCManager, WebRTCSettings
@@ -218,6 +219,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: PLR0915
     settings = get_settings()
     settings.ensure_dirs_exist()
     app.state.settings = settings
+    if settings.tus_uploads_dir is None:
+        raise RuntimeError("TUS_UPLOADS_DIR was not initialized.")
+    tus_upload_service = TusUploadService(
+        uploads_dir=settings.tus_uploads_dir,
+        max_size=settings.tus_upload_max_size,
+        expiration_seconds=settings.tus_upload_expiration_seconds,
+    )
+    removed_uploads = tus_upload_service.cleanup_expired()
+    if removed_uploads:
+        logger.info("Removed {} expired resumable uploads during startup", removed_uploads)
+    app.state.tus_upload_service = tus_upload_service
 
     # Setup logging
     setup_logging(config=LogConfig(level=settings.log_level))

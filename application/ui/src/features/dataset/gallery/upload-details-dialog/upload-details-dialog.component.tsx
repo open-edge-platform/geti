@@ -39,6 +39,7 @@ const StatusIcon = ({ status }: { status: UploadItemStatus }): ReactNode => {
         case 'queued':
             return <Pending aria-label={'Queued'} size={'S'} />;
         case 'uploading':
+        case 'processing':
             return <Loading mode={'inline'} size={'S'} />;
         case 'uploaded':
             return (
@@ -68,7 +69,11 @@ const StatusCell = ({
     const statusContent = (
         <Flex alignItems={'center'} gap={'size-100'}>
             <StatusIcon status={item.status} />
-            <Text>{labels[item.status]}</Text>
+            <Text>
+                {item.status === 'uploading' && item.bytesSent !== undefined
+                    ? `${labels.uploading} ${formatBytes(item.bytesSent)} / ${formatBytes(item.size)}`
+                    : labels[item.status]}
+            </Text>
         </Flex>
     );
 
@@ -122,6 +127,7 @@ const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
     const labels: Record<UploadItemStatus, string> = {
         queued: t('dataset.upload.queued'),
         uploading: t('common.status.uploading'),
+        processing: t('dataset.import.preparingJob'),
         uploaded: t('dataset.upload.uploaded'),
         failed: t('common.status.failed'),
     };

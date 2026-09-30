@@ -22,6 +22,7 @@ from app.api.dependencies import (
     get_project,
     get_project_service,
     get_system_service,
+    get_tus_upload_service,
 )
 from app.api.io_utils import write_bytes_to_response, write_file_to_response, write_image_to_response
 from app.api.schemas.media import (
@@ -62,6 +63,7 @@ from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
 from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters
 from app.services.sam import MediaSegmentService
+from app.services.tus_upload_service import TusUploadConflictError, TusUploadNotFoundError, TusUploadService
 from app.utils.images import needs_display_normalization, normalize_image_to_png_bytes
 
 router = APIRouter(prefix="/api/projects/{project_id}/dataset/media", tags=["Media"])
@@ -225,6 +227,75 @@ def add_media(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Invalid image has been uploaded."
         )
+
+
+@router.post("/tus", status_code=status.HTTP_201_CREATED, response_model=MediaView)
+async def add_media_from_tus(
+    project: Annotated[Project, Depends(get_project)],
+    media_service: Annotated[MediaService, Depends(get_media_service)],
+    dataset_service: Annotated[DatasetService, Depends(get_dataset_service)],
+    tus_upload_service: Annotated[TusUploadService, Depends(get_tus_upload_service)],
+    upload_id: Annotated[UUID, Query(description="Completed TUS upload to consume")],
+) -> MediaView:
+    """Create dataset media from a completed resumable upload."""
+    consumer = f"media:{project.id}"
+    try:
+        cached_result = tus_upload_service.get_consumed_result(upload_id, consumer)
+        if cached_result is not None:
+            return MediaViewAdapter.validate_python(cached_result)
+        upload = await tus_upload_service.claim_completed(upload_id)
+    except TusUploadNotFoundError as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error)) from error
+    except TusUploadConflictError as error:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(error)) from error
+
+    upload_stream = None
+    consumed = False
+    try:
+        upload_stream = upload.path.open("rb")
+        if upload.metadata.get("purpose") != "dataset-media" or upload.metadata.get("project_id") != str(project.id):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="TUS upload metadata does not match the requested media upload and project.",
+            )
+        filename = Path(upload.metadata.get("filename", "").replace("\\", "/")).name.strip()
+        name, extension = os.path.splitext(filename)
+        if not name or not extension:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="TUS upload metadata must include a filename with an extension.",
+            )
+        media_format = _parse_media_format(extension[1:])
+        if isinstance(media_format, ImageFormat):
+            media = media_service.create_image(
+                ImageMetadata(project_id=project.id, data=upload_stream, name=name, image_format=media_format)
+            )
+            dataset_service.create_dataset_item(
+                project_id=project.id,
+                task=project.task,
+                media=media,
+                user_reviewed=False,
+            )
+        else:
+            media = media_service.create_video(
+                project_id=project.id,
+                data=upload_stream,
+                name=name,
+                video_format=media_format,
+            )
+        result = MediaViewAdapter.validate_python(media, from_attributes=True)
+        tus_upload_service.complete_claim(upload.id, consumer, result.model_dump(mode="json"))
+        consumed = True
+        return result
+    except InvalidImageError as error:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Invalid image has been uploaded."
+        ) from error
+    finally:
+        if upload_stream is not None:
+            upload_stream.close()
+        if not consumed and upload.path.parent.exists():
+            tus_upload_service.release_claim(upload.id)
 
 
 def _normalize_date_range(

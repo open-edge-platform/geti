@@ -1,13 +1,14 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-export type UploadItemStatus = 'queued' | 'uploading' | 'uploaded' | 'failed';
+export type UploadItemStatus = 'queued' | 'uploading' | 'processing' | 'uploaded' | 'failed';
 
 export type UploadFileItem = {
     id: string;
     name: string;
     size: number;
     status: UploadItemStatus;
+    bytesSent?: number;
     errorMessage?: string;
 };
 
@@ -32,6 +33,7 @@ export const INITIAL_STATE: MediaUploadState = {
 export type Action =
     | { type: 'START_UPLOAD'; payload: UploadFileItem[] }
     | { type: 'SET_UPLOADING'; payload: { itemId: string } }
+    | { type: 'SET_TRANSFER_PROGRESS'; payload: { itemId: string; bytesSent: number } }
     | { type: 'SET_UPLOADED'; payload: { itemId: string } }
     | { type: 'SET_FAILED'; payload: { itemId: string; errorMessage?: string } }
     | { type: 'FINISH_UPLOAD' }
@@ -52,6 +54,19 @@ export const reducer = (state: MediaUploadState, action: Action): MediaUploadSta
                 ...state,
                 items: state.items.map((item) =>
                     item.id === action.payload.itemId ? { ...item, status: 'uploading' } : item
+                ),
+            };
+        case 'SET_TRANSFER_PROGRESS':
+            return {
+                ...state,
+                items: state.items.map((item) =>
+                    item.id === action.payload.itemId
+                        ? {
+                              ...item,
+                              bytesSent: Math.min(item.size, action.payload.bytesSent),
+                              status: action.payload.bytesSent >= item.size ? 'processing' : 'uploading',
+                          }
+                        : item
                 ),
             };
         case 'SET_UPLOADED':

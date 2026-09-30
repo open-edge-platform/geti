@@ -1,17 +1,19 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { uploadDatasetMediaResumable } from '@/api';
 import { act, waitFor } from '@testing-library/react';
 import { getMockedMediaImage } from 'mocks/mock-media';
-import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
+import { beforeEach, vi } from 'vitest';
 
-import { http } from '../../../api/utils';
-import { server } from '../../../msw-node-setup';
 import { useMediaUploadState } from '../providers/media-upload-context';
 import { MediaUploadProvider } from '../providers/media-upload-provider.component';
 import { computeSummary } from '../providers/media-upload-reducer';
 import { MEDIA_UPLOAD_CONCURRENCY, useMediaUpload } from './use-media-upload';
+
+vi.mock('@/api', () => ({ uploadDatasetMediaResumable: vi.fn() }));
+const uploadMock = vi.mocked(uploadDatasetMediaResumable);
 
 const useMediaUploadProgress = () => {
     const upload = useMediaUpload();
@@ -36,22 +38,48 @@ const uploadMediaAndWaitForCompletion = async (
 };
 
 describe('useMediaUpload', () => {
+    beforeEach(() => {
+        uploadMock.mockReset();
+    });
+
+    it('tracks transferred bytes separately from server processing', async () => {
+        let finishProcessing: ((media: ReturnType<typeof getMockedMediaImage>) => void) | undefined;
+        uploadMock.mockImplementation(
+            async (_projectId, file, onProgress) =>
+                new Promise((resolve) => {
+                    onProgress?.(2);
+                    onProgress?.(file.size);
+                    finishProcessing = resolve;
+                })
+        );
+        const { result } = renderUpload();
+        const file = new File(['file'], 'image.jpg');
+        let pending: Promise<unknown>;
+        act(() => {
+            pending = result.current.upload.uploadMedia([file]);
+        });
+
+        await waitFor(() =>
+            expect(result.current.state.items[0]).toMatchObject({
+                bytesSent: file.size,
+                status: 'processing',
+            })
+        );
+        await act(async () => {
+            finishProcessing?.(getMockedMediaImage({ id: crypto.randomUUID() }));
+            await pending;
+        });
+        expect(result.current.state.items[0].status).toBe('uploaded');
+    });
+
     it('uploads all selected files', async () => {
         const uploadedFileNames: string[] = [];
 
-        server.use(
-            http.post('/api/projects/{project_id}/dataset/media', async ({ request, params }) => {
-                const formData = await request.formData();
-                const file = formData.get('file');
-
-                uploadedFileNames.push((file as File).name);
-                expect(params.project_id).toBe('123');
-
-                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), {
-                    status: 201,
-                });
-            })
-        );
+        uploadMock.mockImplementation(async (projectId, file) => {
+            uploadedFileNames.push(file.name);
+            expect(projectId).toBe('123');
+            return getMockedMediaImage({ id: crypto.randomUUID() });
+        });
 
         const { result } = renderUpload();
 
@@ -73,20 +101,13 @@ describe('useMediaUpload', () => {
         let runningUploads = 0;
         let maxRunningUploads = 0;
 
-        server.use(
-            http.post('/api/projects/{project_id}/dataset/media', async () => {
-                runningUploads += 1;
-                maxRunningUploads = Math.max(maxRunningUploads, runningUploads);
-
-                await new Promise((resolve) => {
-                    setTimeout(resolve, 20);
-                });
-
-                runningUploads -= 1;
-
-                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), { status: 201 });
-            })
-        );
+        uploadMock.mockImplementation(async () => {
+            runningUploads += 1;
+            maxRunningUploads = Math.max(maxRunningUploads, runningUploads);
+            await new Promise((resolve) => setTimeout(resolve, 20));
+            runningUploads -= 1;
+            return getMockedMediaImage({ id: crypto.randomUUID() });
+        });
 
         const { result } = renderUpload();
 
@@ -108,19 +129,13 @@ describe('useMediaUpload', () => {
     it('tracks upload progress counters', async () => {
         let requestCount = 0;
 
-        server.use(
-            http.post('/api/projects/{project_id}/dataset/media', async () => {
-                requestCount += 1;
-
-                if (requestCount === 2) {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
-                    return HttpResponse.json({ detail: 'Upload failed' }, { status: 400 });
-                }
-
-                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), { status: 201 });
-            })
-        );
+        uploadMock.mockImplementation(async () => {
+            requestCount += 1;
+            if (requestCount === 2) {
+                throw new Error('Upload failed');
+            }
+            return getMockedMediaImage({ id: crypto.randomUUID() });
+        });
 
         const { result } = renderUpload();
 
@@ -143,20 +158,12 @@ describe('useMediaUpload', () => {
     });
 
     it('tracks per-file status and error messages', async () => {
-        server.use(
-            http.post('/api/projects/{project_id}/dataset/media', async ({ request }) => {
-                const formData = await request.formData();
-                const file = formData.get('file') as File;
-
-                if (file.name === 'broken.jpg') {
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
-                    return HttpResponse.json({ detail: 'Upload failed' }, { status: 400 });
-                }
-
-                return HttpResponse.json(getMockedMediaImage({ id: crypto.randomUUID() }), { status: 201 });
-            })
-        );
+        uploadMock.mockImplementation(async (_projectId, file) => {
+            if (file.name === 'broken.jpg') {
+                throw new Error('Upload failed');
+            }
+            return getMockedMediaImage({ id: crypto.randomUUID() });
+        });
 
         const { result } = renderUpload();
 

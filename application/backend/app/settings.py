@@ -57,6 +57,9 @@ class Settings(BaseSettings):
     job_dir: Path | None = None
     staged_datasets_dir: Path | None = None
     source_media_dir: Path | None = None
+    tus_uploads_dir: Path | None = Field(default=None, alias="TUS_UPLOADS_DIR")
+    tus_upload_max_size: int = Field(default=10 * 1024**3, alias="TUS_UPLOAD_MAX_SIZE", gt=0)
+    tus_upload_expiration_seconds: int = Field(default=24 * 60 * 60, alias="TUS_UPLOAD_EXPIRATION_SECONDS", gt=0)
 
     # Server
     host: str = Field(default="0.0.0.0", alias="HOST")  # noqa: S104
@@ -208,6 +211,8 @@ class Settings(BaseSettings):
             self.staged_datasets_dir = self.data_dir / "staged_datasets"
         if self.source_media_dir is None:
             self.source_media_dir = self.data_dir / "source_media"
+        if self.tus_uploads_dir is None:
+            self.tus_uploads_dir = self.data_dir / "tus_uploads"
         if self.sam_ov_cache_path is None:
             self.sam_ov_cache_path = self.data_dir / ".sam_ov_cache"
 
@@ -222,6 +227,7 @@ class Settings(BaseSettings):
             self.job_dir,
             self.staged_datasets_dir,
             self.source_media_dir,
+            self.tus_uploads_dir,
             self.sam_ov_cache_path,
         ]:
             if d:

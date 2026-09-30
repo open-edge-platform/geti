@@ -1,7 +1,9 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { uploadDatasetArchive } from '@/api';
+import { useState } from 'react';
+
+import { uploadDatasetArchiveResumable } from '@/api';
 import { useTranslation } from '@/i18n';
 import { Button, Content, DropZone, FileTrigger, Flex, Heading, IllustratedMessage, Text } from '@geti-ui/ui';
 import { LinkOut } from '@geti-ui/ui/icons';
@@ -26,7 +28,11 @@ type ImportUploadFileProps = {
 
 export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUploadFileProps) => {
     const { t } = useTranslation();
-    const stagedDatasetMutation = useMutation({ mutationFn: uploadDatasetArchive });
+    const [bytesSent, setBytesSent] = useState(0);
+    const [fileSize, setFileSize] = useState(0);
+    const stagedDatasetMutation = useMutation({
+        mutationFn: (file: File) => uploadDatasetArchiveResumable(file, setBytesSent),
+    });
     const prepareImportJobMutation = useSubmitJob();
 
     const handleLoadingFile = (files: File[]) => {
@@ -52,6 +58,8 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
     };
 
     const handleImportPrepare = async (file: File) => {
+        setBytesSent(0);
+        setFileSize(file.size);
         const stagedDataset = await stagedDatasetMutation.mutateAsync(file);
 
         const prepareImportJob = await prepareImportJobMutation.mutateAsync({
@@ -83,10 +91,16 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
                     {isPending && (
                         <Flex alignItems={'center'} direction={'column'} gap={'size-100'}>
                             <Heading level={1} UNSAFE_className={classes.statusTitle}>
-                                {t('common.status.uploading')}
+                                {stagedDatasetMutation.isPending
+                                    ? t('common.status.uploading')
+                                    : t('dataset.import.preparingJob')}
                                 <ThreeDotsFlashing />
                             </Heading>
-                            <Text>{t('dataset.import.datasetBeingUploaded')}</Text>
+                            <Text>
+                                {stagedDatasetMutation.isPending && bytesSent < fileSize
+                                    ? `${t('dataset.import.datasetBeingUploaded')} (${bytesSent} / ${fileSize} bytes)`
+                                    : t('dataset.import.scanningMessage')}
+                            </Text>
                         </Flex>
                     )}
 

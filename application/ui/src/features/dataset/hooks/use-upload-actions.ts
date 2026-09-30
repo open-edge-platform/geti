@@ -7,6 +7,7 @@ import { UploadFileItem } from '../providers/media-upload-reducer';
 type UploadActions = {
     startUploadProgress: (files: File[]) => string[];
     setItemUploading: (itemId: string) => void;
+    setItemTransferProgress: (itemId: string, bytesSent: number) => void;
     setItemUploaded: (itemId: string) => void;
     setItemFailed: (itemId: string, errorMessage?: string) => void;
     finishUploadProgress: () => void;
@@ -32,6 +33,9 @@ export const useUploadActions = (): UploadActions => {
         },
         setItemUploading: (itemId: string): void => {
             dispatch({ type: 'SET_UPLOADING', payload: { itemId } });
+        },
+        setItemTransferProgress: (itemId: string, bytesSent: number): void => {
+            dispatch({ type: 'SET_TRANSFER_PROGRESS', payload: { itemId, bytesSent } });
         },
         setItemUploaded: (itemId: string): void => {
             dispatch({ type: 'SET_UPLOADED', payload: { itemId } });
