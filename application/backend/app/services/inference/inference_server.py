@@ -222,7 +222,7 @@ class InferenceServer:
             variant_id: Optional variant identifier. When None, the default OpenVINO FP16 variant is selected.
 
         Returns:
-            The resolved variant id, the path of its `.xml` file and its estimated memory footprint.
+            The resolved variant id and the path of its `.xml` file.
 
         Raises:
             ResourceNotFoundError: if the variant or its binary files do not exist.
@@ -268,9 +268,7 @@ class InferenceServer:
 
     def _make_room(self, entry: ModelCacheEntry, deadline: float) -> None:
         """
-        Evict LRU entries until `entry` fits within the count and memory budgets.
-
-        The memory budget is best-effort: it is never enforced down to zero models and never blocks a load.
+        Evict LRU entries until `entry` fits within the count budget.
         The count budget is hard, so this waits for a slot to free up.
 
         Args:
@@ -301,7 +299,7 @@ class InferenceServer:
                 self._unload(victim)  # outside the lock
                 continue
             if not over_count:
-                return  # memory budget is best-effort: never block on it
+                return
             if time.monotonic() >= deadline:
                 raise InferenceBusyError
             time.sleep(RETRY_INTERVAL)

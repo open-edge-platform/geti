@@ -228,24 +228,14 @@ variant, and a model is evicted from the cache when:
 - **The cache is full** and room is needed for another model. The least recently used model is evicted first.
   A model that is currently serving an inference request is never evicted; if all the entries are busy, the new
   request waits, and eventually fails if no slot frees up in time.
-- **The model has been idle** for longer than `INFERENCE_MODEL_TTL` seconds (60 by default). The time-to-live is
+- **The model has been idle** for longer than `INFERENCE_MODEL_TTL` seconds (120 by default). The time-to-live is
   tracked per model, and a background monitor unloads every model whose TTL has expired.
 - **The same model is requested on a different device**. A model is loaded for one device only, so switching device
   (for example, from CPU to GPU) unloads the model and loads it again on the new device.
 
-In addition to the model count, the cache enforces an approximate memory budget, `INFERENCE_MAX_MEMORY`, expressed
-in bytes and unlimited by default. The memory used by a model is not measured, but **estimated** from the size of
-its weights on disk multiplied by `INFERENCE_MEMORY_OVERHEAD_FACTOR` (1.5 by default), which accounts for runtime
-overhead such as activations and inference request buffers. Because it is only an estimate, the budget is
-best-effort: it evicts least recently used models when the total goes over the limit, but it **never prevents a
-model from being loaded when it would be the only one in the cache**, however large that model is. In other words,
-the memory limit reduces the number of models kept around, and never makes inference impossible.
-
 | Environment variable               | Default     | Description                                                              |
 | ---------------------------------- |-------------| ------------------------------------------------------------------------ |
 | `INFERENCE_MAX_MODELS`             | `2`         | Maximum number of models kept loaded at the same time.                   |
-| `INFERENCE_MAX_MEMORY`             | _unlimited_ | Approximate upper bound, in bytes, on the memory used by loaded models.  |
-| `INFERENCE_MEMORY_OVERHEAD_FACTOR` | `1.5`       | Multiplier applied to the on-disk size to estimate the memory footprint. |
 | `INFERENCE_MODEL_TTL`              | `120`       | Seconds a model may stay idle in the cache before it is unloaded.        |
 
 Inference on different models runs in parallel, while concurrent requests for the same model are serialized, since
