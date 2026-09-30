@@ -19,7 +19,7 @@ import {
     Tooltip,
     TooltipTrigger,
 } from '@geti-ui/ui';
-import { Gear } from '@geti-ui/ui/icons';
+import { Close, Gear } from '@geti-ui/ui/icons';
 import { capitalize } from 'lodash-es';
 
 import { version } from '../../../package.json';
@@ -86,16 +86,25 @@ export const Preferences = () => {
                 </ActionButton>
                 <Tooltip>{t('navigation.preferences')}</Tooltip>
             </TooltipTrigger>
-            <Dialog width={'size-4600'}>
-                <Heading>{t('navigation.preferences')}</Heading>
-                <Divider size={'S'} />
-                <Content>
-                    <Flex direction={'column'} gap={'size-200'}>
-                        <LanguagePreferences />
-                        <Text UNSAFE_className={classes.version}>Geti v{version}</Text>
-                    </Flex>
-                </Content>
-            </Dialog>
+            {(close) => (
+                <Dialog width={'size-3600'}>
+                    <Heading>
+                        <Flex justifyContent={'space-between'} alignItems={'center'}>
+                            <Text>{t('navigation.preferences')}</Text>
+                            <ActionButton isQuiet onPress={close} aria-label={'Close preferences'}>
+                                <Close />
+                            </ActionButton>
+                        </Flex>
+                    </Heading>
+                    <Divider size={'S'} />
+                    <Content>
+                        <Flex direction={'column'} gap={'size-200'}>
+                            <LanguagePreferences />
+                            <Text UNSAFE_className={classes.version}>Geti v{version}</Text>
+                        </Flex>
+                    </Content>
+                </Dialog>
+            )}
         </DialogTrigger>
     );
 };
