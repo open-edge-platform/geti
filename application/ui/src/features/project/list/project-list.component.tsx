@@ -44,30 +44,36 @@ const ProjectSidebar = ({
     const { t } = useTranslation();
 
     return (
-        <Flex direction={'column'} gap={'size-300'} UNSAFE_className={classes.sidebar}>
-            <Link to={paths.project.index({})} viewTransition>
-                <Flex alignItems={'center'} gap={'size-50'}>
-                    <img src={getiLogo} alt={t('navigation.logoAlt')} className={classes.logo} />
-                    <Text UNSAFE_className={classes.logoText}>Geti™</Text>
-                </Flex>
-            </Link>
+        <Flex direction={'column'} gap={'size-300'} justifyContent={'space-between'} UNSAFE_className={classes.sidebar}>
+            <Flex direction={'column'} gap={'size-300'}>
+                <Link to={paths.project.index({})} viewTransition>
+                    <Flex alignItems={'center'} gap={'size-50'}>
+                        <img src={getiLogo} alt={t('navigation.logoAlt')} className={classes.logo} />
+                        <Text UNSAFE_className={classes.logoText}>Geti™</Text>
+                    </Flex>
+                </Link>
 
-            <Divider size={'S'} />
+                <Divider size={'S'} />
 
-            <NewProjectCard />
+                <NewProjectCard />
 
-            {shouldShowFilters && (
-                <>
-                    <Divider size={'S'} />
+                {shouldShowFilters && (
+                    <>
+                        <Divider size={'S'} />
 
-                    <ProjectFilters
-                        searchName={searchName}
-                        onSearchChange={setSearchName}
-                        selectedTaskTypes={selectedTaskTypes}
-                        onSelectedTaskTypesChange={setSelectedTaskTypes}
-                    />
-                </>
-            )}
+                        <ProjectFilters
+                            searchName={searchName}
+                            onSearchChange={setSearchName}
+                            selectedTaskTypes={selectedTaskTypes}
+                            onSelectedTaskTypesChange={setSelectedTaskTypes}
+                        />
+                    </>
+                )}
+            </Flex>
+
+            <View>
+                <Preferences />
+            </View>
         </Flex>
     );
 };
@@ -166,10 +172,6 @@ export const ProjectList = () => {
                         </Suspense>
                     </View>
                 </Flex>
-
-                <View bottom={'size-200'} left={'size-300'} position={'absolute'}>
-                    <Preferences />
-                </View>
             </Content>
         </View>
     );
