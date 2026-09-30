@@ -12,7 +12,7 @@ import { useProject } from 'hooks/api/project.hook';
 import { Link, Outlet, useLocation } from 'react-router';
 
 import getiLogo from './assets/icons/geti-logo.webp';
-import { LanguagePreferences } from './components/language-picker/language-preferences.component';
+import { Preferences } from './components/preferences/preferences.component';
 import { paths } from './constants/paths';
 import { usePrefetchSinksQuery } from './features/inference/sinks/api/use-sinks-query';
 import { usePrefetchSourcesQuery } from './features/inference/sources/api/use-sources';
@@ -76,7 +76,7 @@ const Header = () => {
 
                     <Divider orientation={'vertical'} size={'S'} />
 
-                    <LanguagePreferences />
+                    <Preferences />
                 </Flex>
             </Grid>
         </View>

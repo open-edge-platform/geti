@@ -4,14 +4,13 @@
 import { Suspense, useState } from 'react';
 
 import type { TaskType } from '@/api/types';
-import { LanguagePicker } from '@/components/language-picker/language-picker.component';
+import { Preferences } from '@/components/preferences/preferences.component';
 import { useTranslation } from '@/i18n';
 import { Content, Divider, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
 import { partition } from 'lodash-es';
 import { Link } from 'react-router';
 
-import { version } from '../../../../package.json';
 import getiLogo from '../../../assets/icons/geti-logo.webp';
 import { paths } from '../../../constants/paths';
 import { isNonEmptyArray } from '../../../shared/util';
@@ -154,15 +153,6 @@ const ProjectGrid = () => {
     );
 };
 
-const AppInfo = () => {
-    return (
-        <Flex alignItems={'center'} gap={'size-200'}>
-            <Text UNSAFE_className={classes.version}>v{version}</Text>
-            <LanguagePicker />
-        </Flex>
-    );
-};
-
 export const ProjectList = () => {
     return (
         <View height={'100%'} position={'relative'}>
@@ -178,7 +168,7 @@ export const ProjectList = () => {
                 </Flex>
 
                 <View bottom={'size-200'} left={'size-300'} position={'absolute'}>
-                    <AppInfo />
+                    <Preferences />
                 </View>
             </Content>
         </View>

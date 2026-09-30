@@ -3,7 +3,7 @@
 
 import { useEffect, useId, useRef } from 'react';
 
-import { useTranslation } from '@/i18n';
+import { SUPPORTED_LANGUAGES, useTranslation } from '@/i18n';
 import {
     ActionButton,
     Content,
@@ -23,12 +23,19 @@ import { Gear } from '@geti-ui/ui/icons';
 import { capitalize } from 'lodash-es';
 
 import { version } from '../../../package.json';
-import { languages } from './language-picker.component';
 
-import classes from './language-picker.module.scss';
+import classes from './preferences.module.scss';
 
 const MAX_VISIBLE_ROWS = 8;
 const ROW_HEIGHT_PX = 32;
+
+const getLanguageName = (language: string): string =>
+    new Intl.DisplayNames([language], { type: 'language' }).of(language) ?? language;
+
+const languages = SUPPORTED_LANGUAGES.map((language) => ({
+    id: language,
+    name: getLanguageName(language),
+}));
 
 const LanguageList = ({ labelId }: { labelId: string }) => {
     const { i18n } = useTranslation();
@@ -56,9 +63,20 @@ const LanguageList = ({ labelId }: { labelId: string }) => {
     );
 };
 
-export const LanguagePreferences = () => {
+const LanguagePreferences = () => {
     const { t } = useTranslation();
     const labelId = useId();
+
+    return (
+        <Flex direction={'column'} gap={'size-100'}>
+            <Text id={labelId}>{t('common.labels.language')}</Text>
+            <LanguageList labelId={labelId} />
+        </Flex>
+    );
+};
+
+export const Preferences = () => {
+    const { t } = useTranslation();
 
     return (
         <DialogTrigger type={'popover'} placement={'bottom end'} hideArrow>
@@ -73,10 +91,7 @@ export const LanguagePreferences = () => {
                 <Divider size={'S'} />
                 <Content>
                     <Flex direction={'column'} gap={'size-200'}>
-                        <Flex direction={'column'} gap={'size-100'}>
-                            <Text id={labelId}>{t('common.labels.language')}</Text>
-                            <LanguageList labelId={labelId} />
-                        </Flex>
+                        <LanguagePreferences />
                         <Text UNSAFE_className={classes.version}>Geti v{version}</Text>
                     </Flex>
                 </Content>
