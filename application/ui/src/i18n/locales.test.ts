@@ -174,7 +174,7 @@ describe('translation coverage', () => {
     });
 
     it('translates visible JSX text and text props', () => {
-        const technicalText = new Set(['Geti™', ').zip', 'v', 'x', 'f', '&nbsp;']);
+        const technicalText = new Set(['Geti™', 'Geti v', ').zip', 'v', 'x', 'f', '&nbsp;']);
         const textProps =
             /^(label|title|placeholder|description|tooltip|errorMessage|alt|primaryActionLabel|secondaryActionLabel|cancelLabel|hotkey|message|bottomIconMessage|summary|emptyMessage)$/;
         const untranslated: string[] = [];
