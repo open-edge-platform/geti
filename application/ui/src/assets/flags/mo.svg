@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="-1440 -960 2880 1920">
+    <defs>
+        <clipPath id="b">
+            <path d="M-224 0h448v400h-448z"/>
+        </clipPath>
+        <clipPath id="o4">
+            <circle cx="-158" cy="-149" r="324.5"/>
+        </clipPath>
+        <clipPath id="o3">
+            <circle cx="-199" cy="-118" r="324.5"/>
+        </clipPath>
+        <clipPath id="o2">
+            <circle cx="-212" cy="-100" r="324.5"/>
+        </clipPath>
+        <clipPath id="o1">
+            <circle cy="-38" r="576"/>
+        </clipPath>
+        <clipPath id="o6">
+            <circle cx="-182" cy="-96" r="324.5"/>
+        </clipPath>
+        <clipPath id="o7">
+            <circle cx="-213" cy="-91" r="324.5"/>
+        </clipPath>
+        <clipPath id="o8">
+            <circle cx="-234" cy="-64" r="324.5"/>
+        </clipPath>
+        <g id="s">
+            <g id="B">
+                <path id="A" d="M0 0v1h.5z" fill="#ffde23" transform="translate(0-1) rotate(18)"/>
+                <use href="#A" transform="scale(-1 1)"/>
+            </g>
+            <g id="C">
+                <use href="#B" transform="rotate(72)"/>
+                <use href="#B" transform="rotate(216)"/>
+            </g>
+            <use href="#C" transform="rotate(72)"/>
+        </g>
+    </defs>
+    <path d="M-1440-960h2880V960h-2880z" fill="#0f7562"/>
+    <g clip-path="url(#b)" fill="#fff">
+        <circle cx="-209" cy="-7" r="324.5"/>
+        <circle cx="209" cy="-7" r="324.5"/>
+    </g>
+    <circle cx="224" cy="-39" r="324.5" fill="#0f7562"/>
+    <circle cx="-224" cy="-39" r="324.5" fill="#0f7562"/>
+    <g clip-path="url(#o1)" fill="#fff">
+        <path d="M-500 285.5h291v32h-291zm0 65H500v16H-500zm0 49H500v25H-500zm0 50H500v32H-500zm0 48H500v50H-500zm1000-212H209v32h291z"/>
+    </g>
+    <circle cx="158" cy="-149" r="324.5" clip-path="url(#o4)" fill="#fff"/>
+    <circle cx="199" cy="-118" r="324.5" clip-path="url(#o3)" fill="#0f7562"/>
+    <circle cy="-346" r="130" fill="#0f7562"/>
+    <circle cx="212" cy="-100" r="324.5" clip-path="url(#o2)" fill="#fff"/>
+    <g id="h">
+        <circle cx="-379" cy="307" r="381.5" clip-path="url(#o8)" fill="#fff"/>
+        <circle cx="-370" cy="343" r="381.5" clip-path="url(#o7)" fill="#0f7562"/>
+        <circle cx="-485" cy="21" r="130" fill="#0f7562"/>
+        <g clip-path="url(#o8)" fill="#fff">
+            <circle cx="-339" cy="372" r="381.5" clip-path="url(#o6)"/>
+            <path d="M-100 50l60 50h50v100h-60z"/>
+        </g>
+        <use href="#s" transform="rotate(-35 0-38) translate(0-492.5) scale(73)"/>
+        <use href="#s" transform="rotate(-65 0-38) translate(0-492.5) scale(73)"/>
+    </g>
+    <use href="#h" transform="scale(-1 1)"/>
+    <use href="#s" transform="translate(0-492.5) scale(105.5)"/>
+</svg>
