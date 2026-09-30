@@ -213,7 +213,7 @@
             "cancelUpload": "Anuluj przesyłanie",
             "assignLabelTooltip": "Przypisz etykietę",
             "assignAllSuccess": "Pomyślnie przypisano etykietę(-y) do wszystkich {{count}} obrazów",
-            "assignAllFailure": "Nie udało się przypisać etykiety(-t) do wszystkich {{count}} obrazów",
+            "assignAllFailure": "Nie udało się przypisać etykietę(-y) do wszystkich {{count}} obrazów",
             "assignPartialSuccess": "Przypisano etykietę(-y) do {{succeeded}} z {{total}} obrazów ({{failed}} nieudanych)"
         },
         "mediaActions": {
@@ -327,9 +327,9 @@
             "delete": {
                 "title": "Usuń rewizję datasetu",
                 "description": "Czy na pewno chcesz usunąć rewizję datasetu „{{name}}”? Nadal będziesz mieć dostęp do statystyk modelu, ale nie będziesz mieć dostępu do plików datasetu treningowego."
-            },
-            "includeUnannotated": "Uwzględnij multimedia bez adnotacji"
-        }
+            }
+        },
+        "includeUnannotated": "Uwzględnij multimedia bez adnotacji"
     },
     "inference": {
         "validation": {
