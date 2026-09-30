@@ -50,6 +50,7 @@ const SelectedProjectButton = ({ name, id, isActive }: SelectedProjectProps) => 
             isQuiet
             height={'100%'}
             staticColor={'white'}
+            maxWidth={'size-2400'}
             UNSAFE_className={classes.selectedProjectButton}
         >
             <View margin='size-50'>
