@@ -15,7 +15,7 @@ import { ALL_PROJECTS, getStatusGroup } from './utils';
 
 import classes from './jobs-button.module.scss';
 
-const RunningJobIndicator = () => <span className={classes.runningIndicator} />;
+const RunningJobIndicator = () => <span className={classes.runningIndicator} data-testid='running-job-indicator' />;
 
 export const JobsButton = () => {
     const { t } = useTranslation();

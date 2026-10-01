@@ -5,8 +5,6 @@ import { Page } from '@playwright/test';
 
 import { paths } from '../../src/constants/paths';
 
-// Covers the Jobs bell button (project list and in-project header) and the Jobs dialog it opens,
-// including the nested full-screen logs dialog. See `src/features/jobs/`.
 export class JobsDialogPage {
     constructor(private page: Page) {}
 
@@ -22,10 +20,8 @@ export class JobsDialogPage {
         return this.page.getByRole('button', { name: 'Jobs' });
     }
 
-    // The 8px corner dot has no accessible name (purely decorative), so a style-attribute
-    // selector is the only way to assert its presence/absence.
     getJobsButtonDot() {
-        return this.getJobsButton().locator('[style*="energy-blue"]');
+        return this.page.getByTestId('running-job-indicator');
     }
 
     async openDialog() {
@@ -45,7 +41,6 @@ export class JobsDialogPage {
         await this.page.getByRole('option', { name: optionName }).click();
     }
 
-    // Tab accessible names include the trailing count (e.g. "Running1"), so match the label prefix.
     getTab(label: string) {
         return this.page.getByRole('tab', { name: new RegExp(`^${label}\\b`) });
     }
@@ -98,9 +93,5 @@ export class JobsDialogPage {
 
     async closeLogsDialog() {
         await this.page.getByRole('button', { name: 'Close dialog' }).click();
-    }
-
-    async closeDialog() {
-        await this.page.getByRole('button', { name: 'Close', exact: true }).click();
     }
 }
