@@ -51,7 +51,7 @@ from app.api.routers import (
     sources,
     system,
     training_configurations,
-    tus_uploads,
+    uploads,
     webrtc,
 )
 from app.api.routers import license as license_api
@@ -59,6 +59,7 @@ from app.core.certs import ensure_certs_exist
 from app.core.logging import InterceptHandler, setup_hypercorn_logging
 from app.lifecycle import lifespan
 from app.services.base import ResourceNotFoundError, ResourceWithNameAlreadyExistsError
+from app.services.upload_service import TUS_VERSION
 from app.settings import get_settings
 
 settings = get_settings()
@@ -83,7 +84,7 @@ def _include_api_routers(app: FastAPI) -> None:
     app.include_router(sources.router)
     app.include_router(system.router)
     app.include_router(training_configurations.router)
-    app.include_router(tus_uploads.router)
+    app.include_router(uploads.router)
     app.include_router(webrtc.router)
 
 
@@ -91,12 +92,10 @@ async def _tus_version_middleware(
     request: Request,
     call_next: Callable[[Request], Awaitable[Response]],
 ) -> Response:
-    """Attach the supported TUS version to every non-OPTIONS protocol response."""
+    """Attach the supported TUS version to every response of the resumable upload API, including errors."""
     response = await call_next(request)
-    if request.method != "OPTIONS" and (
-        request.url.path == "/api/uploads" or request.url.path.startswith("/api/uploads/")
-    ):
-        response.headers.setdefault("Tus-Resumable", "1.0.0")
+    if request.url.path == uploads.router.prefix or request.url.path.startswith(f"{uploads.router.prefix}/"):
+        response.headers.setdefault("Tus-Resumable", TUS_VERSION)
     return response
 
 
@@ -120,16 +119,18 @@ def create_app() -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        # Browser JS can only read the response headers of the resumable upload (TUS) protocol if exposed
         expose_headers=[
             "Location",
             "Tus-Resumable",
             "Tus-Version",
             "Tus-Extension",
             "Tus-Max-Size",
+            "Tus-Checksum-Algorithm",
             "Upload-Offset",
             "Upload-Length",
+            "Upload-Defer-Length",
             "Upload-Expires",
-            "Upload-Metadata",
         ],
     )
 

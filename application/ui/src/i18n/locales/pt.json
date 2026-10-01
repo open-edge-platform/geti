@@ -68,7 +68,8 @@
             "seconds": "Segundos",
             "every": "a cada",
             "model": "Modelo",
-            "labels": "Etiquetas"
+            "labels": "Etiquetas",
+            "bytesTransferred": "{{transferred}} de {{total}}"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -164,7 +165,10 @@
             "inProgressToast_one": "A carregar {{count}} item...",
             "inProgressToast_other": "A carregar {{count}} itens...",
             "inProgressSucceededPart": "{{count}} concluído(s) com sucesso",
-            "inProgressFailedPart": "{{count}} falhado(s)"
+            "inProgressFailedPart": "{{count}} falhado(s)",
+            "cancelAll": "Cancelar tudo",
+            "cancelledSummary_one": "{{count}} carregamento cancelado",
+            "cancelledSummary_other": "{{count}} carregamentos cancelados"
         },
         "empty": {
             "noMatches": "Nenhum item multimédia corresponde ao seu filtro.",
@@ -1119,7 +1123,8 @@
         },
         "notifications": {
             "unexpectedError": "Ocorreu um erro inesperado. Por favor tente novamente.",
-            "networkError": "Erro de rede. Verifique a sua ligação e tente novamente."
+            "networkError": "Erro de rede. Verifique a sua ligação e tente novamente.",
+            "uploadTransferError": "A transferência do ficheiro falhou. Tente novamente."
         }
     },
     "downloads": {

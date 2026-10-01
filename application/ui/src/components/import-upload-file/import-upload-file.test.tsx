@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { uploadDatasetArchiveResumable } from '@/api';
+import { uploadDatasetArchive } from '@/api';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedStagedDataset } from 'mocks/mock-staged-dataset';
@@ -15,7 +15,7 @@ import { ImportUploadFile } from './import-upload-file.component';
 
 vi.mock('@/api', async (importOriginal) => ({
     ...(await importOriginal<typeof import('@/api')>()),
-    uploadDatasetArchiveResumable: vi.fn(),
+    uploadDatasetArchive: vi.fn(),
 }));
 
 describe('ImportUploadFile', () => {
@@ -25,7 +25,7 @@ describe('ImportUploadFile', () => {
     const mockedPrepareImportDatasetJob = getMockedPrepareImportDatasetJob({});
 
     const renderApp = () => {
-        vi.mocked(uploadDatasetArchiveResumable).mockResolvedValue(
+        vi.mocked(uploadDatasetArchive).mockResolvedValue(
             getMockedStagedDataset({ id: mockedStagedDatasetId, size: 123 })
         );
         server.use(
@@ -75,21 +75,43 @@ describe('ImportUploadFile', () => {
         });
     });
 
-    it('shows transfer bytes before processing the staged archive', async () => {
+    it('shows the transfer progress before processing the staged archive', async () => {
         renderApp();
         let finishStaging: ((result: ReturnType<typeof getMockedStagedDataset>) => void) | undefined;
-        vi.mocked(uploadDatasetArchiveResumable).mockImplementation(
-            async (_file, onProgress) =>
+        vi.mocked(uploadDatasetArchive).mockImplementation(
+            async (_file, options) =>
                 new Promise((resolve) => {
-                    onProgress?.(4);
+                    options?.onProgress?.(3);
                     finishStaging = resolve;
                 })
         );
 
         await userEvent.upload(screen.getByTestId(/upload-zip-file/i), [validFile]);
-        expect(await screen.findByText(/4 \/ 12 bytes/)).toBeVisible();
+        expect(await screen.findByText('3 B of 12 B')).toBeVisible();
+        expect(screen.getByRole('progressbar', { name: 'Upload progress' })).toHaveAttribute('aria-valuenow', '25');
 
         finishStaging?.(getMockedStagedDataset({ id: mockedStagedDatasetId, size: 123 }));
-        await waitFor(() => expect(screen.queryByText(/4 \/ 12 bytes/)).not.toBeInTheDocument());
+        await waitFor(() => expect(screen.queryByText('3 B of 12 B')).not.toBeInTheDocument());
+    });
+
+    it('cancels the transfer without preparing the import or reporting an error', async () => {
+        const mockedOnFileUploaded = renderApp();
+        vi.mocked(uploadDatasetArchive).mockImplementation(
+            async (_file, options) =>
+                new Promise((_resolve, reject) => {
+                    options?.onProgress?.(3);
+                    options?.signal?.addEventListener('abort', () =>
+                        reject(new DOMException('The upload was cancelled.', 'AbortError'))
+                    );
+                })
+        );
+
+        await userEvent.upload(screen.getByTestId(/upload-zip-file/i), [validFile]);
+        await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
+
+        expect(await screen.findByText('Drop the dataset .zip file here')).toBeVisible();
+        expect(vi.mocked(uploadDatasetArchive).mock.calls[0][1]?.signal?.aborted).toBe(true);
+        expect(screen.queryByText(/cancelled/i)).not.toBeInTheDocument();
+        expect(mockedOnFileUploaded).not.toHaveBeenCalled();
     });
 });

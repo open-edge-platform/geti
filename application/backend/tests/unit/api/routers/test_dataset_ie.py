@@ -1,22 +1,18 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 
-import base64
 import io
-from collections.abc import AsyncIterator, Buffer, Generator
 from pathlib import Path
-from typing import cast
-from unittest.mock import Mock
+from unittest.mock import AsyncMock, Mock
 from uuid import uuid4
 
 import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
 
-from app.api.dependencies import get_staged_dataset_service, get_tus_upload_service
+from app.api.dependencies import get_staged_dataset_service
 from app.models import DatasetFormat, StagedDataset
 from app.services import StagedDatasetService
-from app.services.tus_upload_service import TusUploadConflictError, TusUploadService
 
 
 @pytest.fixture
@@ -35,14 +31,6 @@ def fxt_staged_dataset_service(fxt_app) -> Mock:
     dataset_service = Mock(spec=StagedDatasetService)
     fxt_app.dependency_overrides[get_staged_dataset_service] = lambda: dataset_service
     return dataset_service
-
-
-@pytest.fixture
-def fxt_tus_upload_service(fxt_app, tmp_path: Path) -> Generator[TusUploadService]:
-    service = TusUploadService(tmp_path / "tus", max_size=1024, expiration_seconds=3600)
-    fxt_app.dependency_overrides[get_tus_upload_service] = lambda: service
-    yield service
-    fxt_app.dependency_overrides.pop(get_tus_upload_service, None)
 
 
 class TestDatasetIEEndpoints:
@@ -67,34 +55,49 @@ class TestDatasetIEEndpoints:
         assert response_data["size"] == fxt_staged_dataset.size
 
     @pytest.mark.asyncio
-    async def test_upload_completed_tus_archive(
+    async def test_stage_dataset_archive_from_upload(
         self,
-        fxt_async_client,
         fxt_staged_dataset_service: Mock,
         fxt_staged_dataset: StagedDataset,
-        fxt_tus_upload_service: TusUploadService,
+        fxt_upload_service,
+        fxt_create_upload,
+        fxt_client: TestClient,
     ) -> None:
-        encoded_filename = base64.b64encode(cast(Buffer, b"dataset.zip")).decode("ascii")
-        encoded_purpose = base64.b64encode(cast(Buffer, b"dataset-archive")).decode("ascii")
-        upload = fxt_tus_upload_service.create(4, f"filename {encoded_filename}, purpose {encoded_purpose}")
+        upload_id = fxt_create_upload("my-dataset.zip")
+        fxt_staged_dataset_service.upload_from_path = AsyncMock(return_value=fxt_staged_dataset)
 
-        async def chunks() -> AsyncIterator[bytes]:
-            yield b"data"
-
-        await fxt_tus_upload_service.append(upload.id, 0, chunks())
-        fxt_staged_dataset_service.upload.return_value = fxt_staged_dataset
-
-        response = await fxt_async_client.post(f"/api/staged_datasets/tus?upload_id={upload.id}")
+        response = fxt_client.post("/api/staged_datasets:from-upload", json={"upload_id": str(upload_id)})
 
         assert response.status_code == status.HTTP_201_CREATED
-        fxt_staged_dataset_service.upload.assert_awaited_once()
-        assert fxt_staged_dataset_service.upload.call_args.kwargs["filename"] == "dataset.zip"
-        assert fxt_tus_upload_service.get_consumed_result(upload.id, "staged_dataset") is not None
-        retry_response = await fxt_async_client.post(f"/api/staged_datasets/tus?upload_id={upload.id}")
-        assert retry_response.status_code == status.HTTP_201_CREATED
-        fxt_staged_dataset_service.upload.assert_awaited_once()
-        with pytest.raises(TusUploadConflictError, match="already being consumed"):
-            await fxt_tus_upload_service.claim_completed(upload.id)
+        assert response.json()["id"] == str(fxt_staged_dataset.id)
+        # The uploaded archive is moved, not copied
+        fxt_staged_dataset_service.upload_from_path.assert_awaited_once_with(
+            filename="dataset.zip", source_path=fxt_upload_service.path_for(upload_id)
+        )
+        fxt_staged_dataset_service.upload.assert_not_called()
+        assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "consumed"
+        retry = fxt_client.post("/api/staged_datasets:from-upload", json={"upload_id": str(upload_id)})
+        assert retry.status_code == status.HTTP_410_GONE
+
+    def test_stage_dataset_archive_from_upload_not_zip(
+        self, fxt_staged_dataset_service: Mock, fxt_create_upload, fxt_client: TestClient
+    ) -> None:
+        upload_id = fxt_create_upload("dataset.tar")
+        fxt_staged_dataset_service.upload_from_path = AsyncMock()
+
+        response = fxt_client.post("/api/staged_datasets:from-upload", json={"upload_id": str(upload_id)})
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_staged_dataset_service.upload_from_path.assert_not_awaited()
+        assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "completed"
+
+    @pytest.mark.usefixtures("fxt_upload_service")
+    def test_stage_dataset_archive_from_unknown_upload(
+        self, fxt_staged_dataset_service: Mock, fxt_client: TestClient
+    ) -> None:
+        response = fxt_client.post("/api/staged_datasets:from-upload", json={"upload_id": str(uuid4())})
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_upload_dataset_archive_missing_filename(self, fxt_staged_dataset_service: Mock, fxt_client: TestClient):
         files = {"file": ("", io.BytesIO(b"data"), "application/zip")}

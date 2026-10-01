@@ -15,7 +15,8 @@ import { IpCamera } from './ip-camera/ip-camera.component';
 import { getIpCameraInitialConfig, ipCameraBodyFormatter } from './ip-camera/utils';
 import { UsbCamera } from './usb-camera/usb-camera-fields.component';
 import { getUsbCameraInitialConfig, usbCameraBodyFormatter } from './usb-camera/utils';
-import { getVideoFileInitialConfig, prepareVideoFileFormData, videoFileBodyFormatter } from './video-file/utils';
+import { useVideoFileUpload } from './video-file/use-video-file-upload.hook';
+import { getVideoFileInitialConfig, videoFileBodyFormatter } from './video-file/utils';
 import { VideoFile } from './video-file/video-file.component';
 
 interface SourceOptionsProps {
@@ -27,6 +28,7 @@ interface SourceOptionsProps {
 
 export const SourceOptions = ({ onSaved, hasHeader, children, existingNames = [] }: SourceOptionsProps) => {
     const { t } = useTranslation();
+    const videoFileUpload = useVideoFileUpload();
 
     return (
         <>
@@ -87,9 +89,15 @@ export const SourceOptions = ({ onSaved, hasHeader, children, existingNames = []
                             <AddSource
                                 onSaved={onSaved}
                                 config={getVideoFileInitialConfig(t, existingNames)}
-                                componentFields={(state: VideoFileSourceConfig) => <VideoFile defaultState={state} />}
+                                componentFields={(state: VideoFileSourceConfig) => (
+                                    <VideoFile
+                                        defaultState={state}
+                                        uploadProgress={videoFileUpload.progress}
+                                        onCancelUpload={videoFileUpload.cancel}
+                                    />
+                                )}
                                 bodyFormatter={videoFileBodyFormatter}
-                                prepareFormData={prepareVideoFileFormData}
+                                prepareFormData={videoFileUpload.prepareFormData}
                             />
                         ),
                     },

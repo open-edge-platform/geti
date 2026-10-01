@@ -46,7 +46,7 @@ from app.services.license_service import LicenseService
 from app.services.sink_status_service import SinkStatusService
 from app.services.source_status_service import SourceStatusService
 from app.services.training_configuration_service import TrainingConfigurationService
-from app.services.tus_upload_service import TusUploadService
+from app.services.upload_service import UploadService
 from app.services.video import VideoService
 from app.webrtc.manager import WebRTCManager
 
@@ -399,20 +399,9 @@ def get_staged_dataset_service(
     return StagedDatasetService(staged_datasets_dir)
 
 
-def get_tus_upload_service(request: Request) -> TusUploadService:
-    """Provides the application-wide TUS upload store."""
-    service = getattr(request.app.state, "tus_upload_service", None)
-    if service is None:
-        settings = request.app.state.settings
-        if settings.tus_uploads_dir is None:
-            raise RuntimeError("TUS_UPLOADS_DIR was not initialized.")
-        service = TusUploadService(
-            uploads_dir=settings.tus_uploads_dir,
-            max_size=settings.tus_upload_max_size,
-            expiration_seconds=settings.tus_upload_expiration_seconds,
-        )
-        request.app.state.tus_upload_service = service
-    return service
+def get_upload_service(request: Request) -> UploadService:
+    """Provides the application-wide UploadService managing resumable (TUS) uploads."""
+    return request.app.state.upload_service
 
 
 def get_job_queue(request: Request) -> JobQueue:

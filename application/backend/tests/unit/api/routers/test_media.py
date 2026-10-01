@@ -1,9 +1,8 @@
 # Copyright (C) 2026 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
-import base64
 import os
 import tempfile
-from collections.abc import AsyncIterator, Callable
+from collections.abc import Callable
 from datetime import UTC, datetime
 from io import BytesIO
 from pathlib import Path
@@ -23,7 +22,6 @@ from app.api.dependencies import (
     get_media_segment_service,
     get_media_service,
     get_project_service,
-    get_tus_upload_service,
 )
 from app.api.schemas.media import ImageView, MediaViewAdapter, SetMediaAnnotations, VideoFrameView, VideoView
 from app.models import (
@@ -64,9 +62,8 @@ from app.services.dataset_service import AnnotationValidationError, SubsetAlread
 from app.services.inference import InferenceBusyError
 from app.services.media_numpy_loader import BinaryNotFoundError
 from app.services.media_prediction_service import VideoRangeError
-from app.services.media_service import ImageMetadata, MediaFilters
+from app.services.media_service import ImageMetadata, InvalidImageError, MediaFilters
 from app.services.sam import MediaSegmentService
-from app.services.tus_upload_service import TusUploadService
 
 
 @pytest.fixture
@@ -218,40 +215,6 @@ def test_convert_video_frame_to_view(fxt_video_frame_media) -> None:
 
 
 class TestMediaEndpoints:
-    @pytest.mark.asyncio
-    async def test_create_image_from_tus_and_retry(
-        self,
-        fxt_app,
-        fxt_async_client,
-        fxt_get_project,
-        fxt_image_media,
-        fxt_media_service,
-        fxt_dataset_service,
-        tmp_path,
-    ) -> None:
-        tus_service = TusUploadService(tmp_path / "uploads", max_size=1024, expiration_seconds=3600)
-        fxt_app.dependency_overrides[get_tus_upload_service] = lambda: tus_service
-        metadata = {"filename": "test.jpg", "purpose": "dataset-media", "project_id": str(fxt_get_project.id)}
-        header = ",".join(f"{key} {base64.b64encode(value.encode()).decode()}" for key, value in metadata.items())
-        upload = tus_service.create(3, header)
-
-        async def chunks() -> AsyncIterator[bytes]:
-            yield b"abc"
-
-        await tus_service.append(upload.id, 0, chunks())
-        fxt_media_service.create_image.return_value = fxt_image_media
-        url = f"/api/projects/{fxt_get_project.id}/dataset/media/tus?upload_id={upload.id}"
-
-        response = await fxt_async_client.post(url)
-        retry = await fxt_async_client.post(url)
-
-        assert response.status_code == status.HTTP_201_CREATED
-        assert retry.status_code == status.HTTP_201_CREATED
-        assert retry.json() == response.json()
-        fxt_media_service.create_image.assert_called_once()
-        fxt_dataset_service.create_dataset_item.assert_called_once()
-        assert not upload.path.exists()
-
     def test_create_media_no_file(
         self, fxt_get_project, fxt_image_media, fxt_media_service, fxt_dataset_service, fxt_client
     ):
@@ -352,6 +315,140 @@ class TestMediaEndpoints:
             video_format="mp4",
         )
         fxt_dataset_service.create_dataset_item.assert_not_called()
+
+    def test_create_image_from_upload(
+        self,
+        fxt_get_project,
+        fxt_image_media,
+        fxt_media_service,
+        fxt_dataset_service,
+        fxt_upload_service,
+        fxt_create_upload,
+        fxt_client,
+    ):
+        upload_id = fxt_create_upload("../test_file.jpg")
+        upload_path = fxt_upload_service.path_for(upload_id)
+        fxt_media_service.create_image.return_value = fxt_image_media
+
+        response = fxt_client.post(
+            f"/api/projects/{fxt_get_project.id}/dataset/media:from-upload", json={"upload_id": str(upload_id)}
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()["id"] == str(fxt_image_media.id)
+        metadata: ImageMetadata = fxt_media_service.create_image.call_args.args[0]
+        assert metadata.project_id == fxt_get_project.id
+        assert metadata.name == "test_file"
+        assert metadata.image_format == ImageFormat.JPG
+        # The uploaded file is handed over by path, to be moved rather than copied
+        assert metadata.data == upload_path
+        fxt_dataset_service.create_dataset_item.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            task=fxt_get_project.task,
+            media=fxt_image_media,
+            user_reviewed=False,
+        )
+        assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "consumed"
+        # An upload can be consumed only once
+        retry = fxt_client.post(
+            f"/api/projects/{fxt_get_project.id}/dataset/media:from-upload", json={"upload_id": str(upload_id)}
+        )
+        assert retry.status_code == status.HTTP_410_GONE
+        fxt_media_service.create_image.assert_called_once()
+
+    def test_create_media_from_upload_with_name(
+        self, fxt_get_project, fxt_image_media, fxt_media_service, fxt_create_upload, fxt_client
+    ):
+        upload_id = fxt_create_upload("test_file.png")
+        fxt_media_service.create_image.return_value = fxt_image_media
+
+        response = fxt_client.post(
+            f"/api/projects/{fxt_get_project.id}/dataset/media:from-upload",
+            json={"upload_id": str(upload_id), "name": "renamed"},
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        metadata: ImageMetadata = fxt_media_service.create_image.call_args.args[0]
+        assert metadata.name == "renamed"
+        assert metadata.image_format == ImageFormat.PNG
+
+    def test_create_video_from_upload(
+        self,
+        fxt_get_project,
+        fxt_video_media,
+        fxt_media_service,
+        fxt_dataset_service,
+        fxt_upload_service,
+        fxt_create_upload,
+        fxt_client,
+    ):
+        upload_id = fxt_create_upload("test_file.mp4")
+        fxt_media_service.create_video.return_value = fxt_video_media
+
+        response = fxt_client.post(
+            f"/api/projects/{fxt_get_project.id}/dataset/media:from-upload", json={"upload_id": str(upload_id)}
+        )
+
+        assert response.status_code == status.HTTP_201_CREATED
+        assert response.json()["type"] == "video"
+        fxt_media_service.create_video.assert_called_once_with(
+            project_id=fxt_get_project.id,
+            data=fxt_upload_service.path_for(upload_id),
+            name="test_file",
+            video_format="mp4",
+        )
+        fxt_dataset_service.create_dataset_item.assert_not_called()
+
+    @pytest.mark.parametrize("filename", ["test_file.svg", "test_file"])
+    def test_create_media_from_upload_unsupported_format(
+        self, fxt_get_project, fxt_media_service, fxt_create_upload, fxt_client, filename
+    ):
+        upload_id = fxt_create_upload(filename)
+
+        response = fxt_client.post(
+            f"/api/projects/{fxt_get_project.id}/dataset/media:from-upload", json={"upload_id": str(upload_id)}
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_media_service.create_image.assert_not_called()
+        fxt_media_service.create_video.assert_not_called()
+        # The upload is released, so that the client can delete it
+        assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "completed"
+
+    def test_create_media_from_upload_invalid_image(
+        self, fxt_get_project, fxt_media_service, fxt_upload_service, fxt_create_upload, fxt_client
+    ):
+        upload_id = fxt_create_upload("test_file.jpg")
+        fxt_media_service.create_image.side_effect = InvalidImageError
+
+        response = fxt_client.post(
+            f"/api/projects/{fxt_get_project.id}/dataset/media:from-upload", json={"upload_id": str(upload_id)}
+        )
+
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "completed"
+        assert fxt_upload_service.path_for(upload_id).exists()
+
+    def test_create_media_from_incomplete_upload(
+        self, fxt_get_project, fxt_media_service, fxt_create_upload, fxt_client
+    ):
+        upload_id = fxt_create_upload("test_file.jpg", data=b"abc", length=10)
+
+        response = fxt_client.post(
+            f"/api/projects/{fxt_get_project.id}/dataset/media:from-upload", json={"upload_id": str(upload_id)}
+        )
+
+        assert response.status_code == status.HTTP_409_CONFLICT
+        fxt_media_service.create_image.assert_not_called()
+
+    @pytest.mark.usefixtures("fxt_upload_service")
+    def test_create_media_from_unknown_upload(self, fxt_get_project, fxt_media_service, fxt_client):
+        response = fxt_client.post(
+            f"/api/projects/{fxt_get_project.id}/dataset/media:from-upload", json={"upload_id": str(uuid4())}
+        )
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        fxt_media_service.create_image.assert_not_called()
 
     def test_list_media(self, fxt_get_project, fxt_image_media, fxt_video_media, fxt_media_service, fxt_client):
         fxt_media_service.count_media.return_value = 2

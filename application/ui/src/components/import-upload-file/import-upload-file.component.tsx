@@ -1,9 +1,9 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
-import { uploadDatasetArchiveResumable } from '@/api';
+import { isAbortError, uploadDatasetArchive } from '@/api';
 import { useTranslation } from '@/i18n';
 import { Button, Content, DropZone, FileTrigger, Flex, Heading, IllustratedMessage, Text } from '@geti-ui/ui';
 import { LinkOut } from '@geti-ui/ui/icons';
@@ -15,6 +15,7 @@ import { Link } from '../../platform/components/link.component';
 import { getFilesFromDropEvent } from '../../shared/drop-zone.utils';
 import { ThreeDotsFlashing } from '../three-dots-flashing/three-dots-flashing.component';
 import { toast } from '../toast/toast.component';
+import { UploadProgress } from '../upload-progress/upload-progress.component';
 import { formatToFileArray, isSupportedDatasetZip } from './util';
 
 import classes from './import-upload-file.module.scss';
@@ -30,8 +31,19 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
     const { t } = useTranslation();
     const [bytesSent, setBytesSent] = useState(0);
     const [fileSize, setFileSize] = useState(0);
+    const abortControllerRef = useRef<AbortController | null>(null);
     const stagedDatasetMutation = useMutation({
-        mutationFn: (file: File) => uploadDatasetArchiveResumable(file, setBytesSent),
+        mutationFn: (file: File) => {
+            const abortController = new AbortController();
+            abortControllerRef.current = abortController;
+
+            return uploadDatasetArchive(file, { onProgress: setBytesSent, signal: abortController.signal });
+        },
+        onSettled: () => {
+            abortControllerRef.current = null;
+        },
+        // A cancelled upload is a deliberate user action, not an error worth notifying about.
+        meta: { error: { notify: (error: unknown) => !isAbortError(error) } },
     });
     const prepareImportJobMutation = useSubmitJob();
 
@@ -54,7 +66,8 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
             return;
         }
 
-        handleImportPrepare(files[0]);
+        // Failures are already reported by the mutations' error notifications.
+        handleImportPrepare(files[0]).catch(() => undefined);
     };
 
     const handleImportPrepare = async (file: File) => {
@@ -96,11 +109,19 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
                                     : t('dataset.import.preparingJob')}
                                 <ThreeDotsFlashing />
                             </Heading>
-                            <Text>
-                                {stagedDatasetMutation.isPending && bytesSent < fileSize
-                                    ? `${t('dataset.import.datasetBeingUploaded')} (${bytesSent} / ${fileSize} bytes)`
-                                    : t('dataset.import.scanningMessage')}
-                            </Text>
+                            {stagedDatasetMutation.isPending && bytesSent < fileSize ? (
+                                <>
+                                    <Text>{t('dataset.import.datasetBeingUploaded')}</Text>
+                                    <UploadProgress
+                                        bytesSent={bytesSent}
+                                        bytesTotal={fileSize}
+                                        width={'size-4600'}
+                                        onCancel={() => abortControllerRef.current?.abort()}
+                                    />
+                                </>
+                            ) : (
+                                <Text>{t('dataset.import.scanningMessage')}</Text>
+                            )}
                         </Flex>
                     )}
 

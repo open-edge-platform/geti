@@ -15,15 +15,26 @@ export const getVideoFileInitialConfig = (t: TranslateFn, existingNames: string[
     loop: false,
 });
 
+export type VideoFileUploadOptions = {
+    onProgress?: (bytesSent: number, bytesTotal: number) => void;
+    signal?: AbortSignal;
+};
+
 // Uploads the selected file (if any) and writes the resulting path back into `video_path`, so
 // `videoFileBodyFormatter` can stay a plain, synchronous formatter like its sibling sources.
-export const prepareVideoFileFormData = async (formData: FormData): Promise<void> => {
+export const prepareVideoFileFormData = async (
+    formData: FormData,
+    { onProgress, signal }: VideoFileUploadOptions = {}
+): Promise<void> => {
     const file = formData.get('video_file');
 
     // An untouched file input still yields a File entry (empty filename) once it has a `name`,
     // so only treat it as "a file was selected" when it actually has a name.
     if (file instanceof File && file.name !== '') {
-        const { video_path } = await uploadSourceVideo(file);
+        const { video_path } = await uploadSourceVideo(file, {
+            signal,
+            onProgress: (bytesSent) => onProgress?.(bytesSent, file.size),
+        });
 
         formData.set('video_path', video_path);
     }

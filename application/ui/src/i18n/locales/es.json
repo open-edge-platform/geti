@@ -68,7 +68,8 @@
             "seconds": "Segundos",
             "every": "cada",
             "model": "Modelo",
-            "labels": "Etiquetas"
+            "labels": "Etiquetas",
+            "bytesTransferred": "{{transferred}} de {{total}}"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -164,7 +165,10 @@
             "inProgressToast_one": "Cargando {{count}} elemento...",
             "inProgressToast_other": "Cargando {{count}} elementos...",
             "inProgressSucceededPart": "{{count}} correctos",
-            "inProgressFailedPart": "{{count}} fallidos"
+            "inProgressFailedPart": "{{count}} fallidos",
+            "cancelAll": "Cancelar todo",
+            "cancelledSummary_one": "Se canceló {{count}} carga",
+            "cancelledSummary_other": "Se cancelaron {{count}} cargas"
         },
         "empty": {
             "noMatches": "Ningún elemento multimedia coincide con tu filtro.",
@@ -1119,7 +1123,8 @@
         },
         "notifications": {
             "unexpectedError": "Se ha producido un error inesperado. Inténtalo de nuevo.",
-            "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo."
+            "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo.",
+            "uploadTransferError": "La transferencia del archivo ha fallado. Inténtalo de nuevo."
         }
     },
     "downloads": {

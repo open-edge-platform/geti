@@ -8,6 +8,11 @@ import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
 import { getVideoFileInitialConfig, prepareVideoFileFormData, videoFileBodyFormatter } from './utils';
 
+vi.mock('../../../../api/tus-upload', async (importOriginal) => ({
+    ...(await importOriginal<typeof import('../../../../api/tus-upload')>()),
+    transferFile: vi.fn(async () => '00000000-0000-4000-8000-000000000001'),
+}));
+
 const buildFormData = (fields: Record<string, string | Blob>): FormData => {
     const formData = new FormData();
 
@@ -68,7 +73,7 @@ describe('prepareVideoFileFormData', () => {
     it('uploads the selected file and overwrites video_path with the returned path', async () => {
         const resolvedPath = '/data/source_media/uuid/sample.mp4';
         server.use(
-            http.post('/api/sources/media', () => {
+            http.post('/api/sources/media:from-upload', () => {
                 return HttpResponse.json({ video_path: resolvedPath }, { status: 201 });
             })
         );
@@ -89,7 +94,7 @@ describe('prepareVideoFileFormData', () => {
 
     it('rejects when the upload fails', async () => {
         server.use(
-            http.post('/api/sources/media', () => {
+            http.post('/api/sources/media:from-upload', () => {
                 // The 422 response has no documented schema in the OpenAPI spec (description only).
                 // @ts-expect-error There is an incorrect type in OpenAPI
                 return HttpResponse.json({ detail: 'Unsupported video format' }, { status: 422 });

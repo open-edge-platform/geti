@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { uploadDatasetMediaResumable } from '@/api';
+import { isAbortError, uploadDatasetMedia } from '@/api';
 import type { MediaDTO } from '@/api/types';
 import { useQueryClient } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
@@ -55,23 +55,40 @@ export const useMediaUpload = () => {
         setItemTransferProgress,
         setItemUploaded,
         setItemFailed,
+        setItemCancelled,
+        getItemAbortSignal,
+        releaseItem,
         finishUploadProgress,
     } = useUploadActions();
 
     const buildUploadTask = (file: File, itemId: string): UploadTask<MediaDTO> => {
         return async () => {
-            setItemUploading(itemId);
+            const signal = getItemAbortSignal(itemId);
 
             try {
-                const result = await uploadDatasetMediaResumable(projectId, file, (bytesSent) =>
-                    setItemTransferProgress(itemId, bytesSent)
-                );
+                if (signal?.aborted) {
+                    throw signal.reason;
+                }
+
+                setItemUploading(itemId);
+
+                const result = await uploadDatasetMedia(projectId, file, {
+                    signal,
+                    onProgress: (bytesSent) => setItemTransferProgress(itemId, bytesSent),
+                });
                 setItemUploaded(itemId);
 
                 return result;
             } catch (error) {
-                setItemFailed(itemId, getErrorMessage(error));
+                if (isAbortError(error)) {
+                    setItemCancelled(itemId);
+                } else {
+                    setItemFailed(itemId, getErrorMessage(error));
+                }
+
                 throw error;
+            } finally {
+                releaseItem(itemId);
             }
         };
     };

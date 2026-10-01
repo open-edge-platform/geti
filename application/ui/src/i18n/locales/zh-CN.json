@@ -68,7 +68,8 @@
             "seconds": "秒",
             "every": "每",
             "model": "模型",
-            "labels": "标签"
+            "labels": "标签",
+            "bytesTransferred": "{{transferred}} / {{total}}"
         },
         "viewModes": {
             "large": "大缩略图",
@@ -164,7 +165,10 @@
             "inProgressToast_one": "正在上传 {{count}} 个文件……",
             "inProgressToast_other": "正在上传 {{count}} 个文件……",
             "inProgressSucceededPart": "成功 {{count}} 个",
-            "inProgressFailedPart": "失败 {{count}} 个"
+            "inProgressFailedPart": "失败 {{count}} 个",
+            "cancelAll": "全部取消",
+            "cancelledSummary_one": "已取消 {{count}} 个上传",
+            "cancelledSummary_other": "已取消 {{count}} 个上传"
         },
         "empty": {
             "noMatches": "没有符合筛选条件的媒体文件。",
@@ -1119,7 +1123,8 @@
         },
         "notifications": {
             "unexpectedError": "发生未知错误，请重试。",
-            "networkError": "网络连接异常，请检查网络后重试。"
+            "networkError": "网络连接异常，请检查网络后重试。",
+            "uploadTransferError": "文件传输失败。请重试。"
         }
     },
     "downloads": {

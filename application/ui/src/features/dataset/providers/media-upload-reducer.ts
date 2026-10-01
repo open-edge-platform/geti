@@ -1,7 +1,11 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-export type UploadItemStatus = 'queued' | 'uploading' | 'processing' | 'uploaded' | 'failed';
+export type UploadItemStatus = 'queued' | 'uploading' | 'processing' | 'uploaded' | 'failed' | 'cancelled';
+
+// Once the transfer is complete the server creates the media item regardless, so only items that
+// are still waiting or transferring can be cancelled.
+export const isCancellable = (status: UploadItemStatus): boolean => status === 'queued' || status === 'uploading';
 
 export type UploadFileItem = {
     id: string;
@@ -16,6 +20,7 @@ export type UploadProgressSummary = {
     total: number;
     succeeded: number;
     failed: number;
+    cancelled: number;
 };
 
 export type MediaUploadState = {
@@ -36,6 +41,7 @@ export type Action =
     | { type: 'SET_TRANSFER_PROGRESS'; payload: { itemId: string; bytesSent: number } }
     | { type: 'SET_UPLOADED'; payload: { itemId: string } }
     | { type: 'SET_FAILED'; payload: { itemId: string; errorMessage?: string } }
+    | { type: 'SET_CANCELLED'; payload: { itemIds: string[] } }
     | { type: 'FINISH_UPLOAD' }
     | { type: 'OPEN_DIALOG' }
     | { type: 'CLOSE_DIALOG' };
@@ -53,14 +59,16 @@ export const reducer = (state: MediaUploadState, action: Action): MediaUploadSta
             return {
                 ...state,
                 items: state.items.map((item) =>
-                    item.id === action.payload.itemId ? { ...item, status: 'uploading' } : item
+                    item.id === action.payload.itemId && item.status === 'queued'
+                        ? { ...item, status: 'uploading' }
+                        : item
                 ),
             };
         case 'SET_TRANSFER_PROGRESS':
             return {
                 ...state,
                 items: state.items.map((item) =>
-                    item.id === action.payload.itemId
+                    item.id === action.payload.itemId && item.status === 'uploading'
                         ? {
                               ...item,
                               bytesSent: Math.min(item.size, action.payload.bytesSent),
@@ -85,6 +93,16 @@ export const reducer = (state: MediaUploadState, action: Action): MediaUploadSta
                         : item
                 ),
             };
+        case 'SET_CANCELLED': {
+            const itemIds = new Set(action.payload.itemIds);
+
+            return {
+                ...state,
+                items: state.items.map((item) =>
+                    itemIds.has(item.id) && isCancellable(item.status) ? { ...item, status: 'cancelled' } : item
+                ),
+            };
+        }
         case 'FINISH_UPLOAD':
             return { ...state, isUploading: false };
         case 'OPEN_DIALOG':
@@ -99,10 +117,12 @@ export const reducer = (state: MediaUploadState, action: Action): MediaUploadSta
 export const computeSummary = (items: UploadFileItem[]): UploadProgressSummary => {
     const succeeded = items.filter((item) => item.status === 'uploaded').length;
     const failed = items.filter((item) => item.status === 'failed').length;
+    const cancelled = items.filter((item) => item.status === 'cancelled').length;
 
     return {
         total: items.length,
         succeeded,
         failed,
+        cancelled,
     };
 };

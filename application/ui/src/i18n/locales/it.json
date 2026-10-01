@@ -68,7 +68,8 @@
             "seconds": "Secondi",
             "every": "ogni",
             "model": "Modello",
-            "labels": "Etichette"
+            "labels": "Etichette",
+            "bytesTransferred": "{{transferred}} di {{total}}"
         },
         "viewModes": {
             "large": "Anteprime grandi",
@@ -164,7 +165,10 @@
             "inProgressToast_one": "Caricamento {{count}} elemento in corso...",
             "inProgressToast_other": "Caricamento {{count}} elementi in corso...",
             "inProgressSucceededPart": "{{count}} riusciti",
-            "inProgressFailedPart": "{{count}} non riusciti"
+            "inProgressFailedPart": "{{count}} non riusciti",
+            "cancelAll": "Annulla tutto",
+            "cancelledSummary_one": "{{count}} caricamento annullato",
+            "cancelledSummary_other": "{{count}} caricamenti annullati"
         },
         "empty": {
             "noMatches": "Nessun media corrisponde al tuo filtro.",
@@ -1119,7 +1123,8 @@
         },
         "notifications": {
             "unexpectedError": "Si è verificato un errore imprevisto. Per favore riprova.",
-            "networkError": "Errore di rete. Controlla la tua connessione e riprova."
+            "networkError": "Errore di rete. Controlla la tua connessione e riprova.",
+            "uploadTransferError": "Il trasferimento del file non è riuscito. Riprova."
         }
     },
     "downloads": {

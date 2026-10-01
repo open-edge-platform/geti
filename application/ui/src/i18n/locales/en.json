@@ -68,7 +68,8 @@
             "seconds": "Seconds",
             "every": "every",
             "model": "Model",
-            "labels": "Labels"
+            "labels": "Labels",
+            "bytesTransferred": "{{transferred}} of {{total}}"
         },
         "viewModes": {
             "large": "Large thumbnails",
@@ -164,7 +165,10 @@
             "inProgressToast_one": "Uploading {{count}} item...",
             "inProgressToast_other": "Uploading {{count}} items...",
             "inProgressSucceededPart": "{{count}} succeeded",
-            "inProgressFailedPart": "{{count}} failed"
+            "inProgressFailedPart": "{{count}} failed",
+            "cancelAll": "Cancel all",
+            "cancelledSummary_one": "Cancelled {{count}} upload",
+            "cancelledSummary_other": "Cancelled {{count}} uploads"
         },
         "empty": {
             "noMatches": "No media items match your filter.",
@@ -1119,7 +1123,8 @@
         },
         "notifications": {
             "unexpectedError": "An unexpected error occurred. Please try again.",
-            "networkError": "Network error. Please check your connection and try again."
+            "networkError": "Network error. Please check your connection and try again.",
+            "uploadTransferError": "The file transfer failed. Please try again."
         }
     },
     "downloads": {

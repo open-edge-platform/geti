@@ -68,6 +68,7 @@
         "sonner": "^2.0.7",
         "spin-delay": "^2.0.1",
         "static-path": "~0.0.4",
+        "tus-js-client": "~4.3.1",
         "usehooks-ts": "^3.1.1",
         "utif": "^3.1.0",
         "zipson": "^0.2.12"
