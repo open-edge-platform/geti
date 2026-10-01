@@ -354,6 +354,7 @@
         },
         "sources": {
             "uploadError": "Impossibile caricare il file video.",
+            "deleteVideoError": "Impossibile eliminare il file video caricato.",
             "list": {
                 "addSource": "Aggiungi nuova sorgente"
             },

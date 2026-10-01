@@ -354,6 +354,7 @@
         },
         "sources": {
             "uploadError": "视频文件上传失败。",
+            "deleteVideoError": "已上传的视频文件删除失败。",
             "list": {
                 "addSource": "新增输入源"
             },
