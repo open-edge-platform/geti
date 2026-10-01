@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Suspense, useState } from 'react';
+import { ReactNode, Suspense, useState } from 'react';
 
 import type { TaskType } from '@/api/types';
 import { Preferences } from '@/components/preferences/preferences.component';
@@ -78,7 +78,7 @@ const ProjectSidebar = ({
     );
 };
 
-const ProjectGrid = () => {
+const ProjectGrid = ({ jobsButton }: { jobsButton?: ReactNode }) => {
     const { t } = useTranslation();
     const projectsQuery = useProjects();
     const projects = projectsQuery.data;
@@ -120,11 +120,10 @@ const ProjectGrid = () => {
                 <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'} gap={'size-300'}>
                     {shouldShowFilters && <SortProjects sortBy={sortBy} onSort={setSortBy} />}
 
-                    {shouldShowFilters && (
-                        <Text marginStart={'auto'} UNSAFE_className={classes.projectMetadata}>
-                            {countLabel}
-                        </Text>
-                    )}
+                    <Flex marginStart={'auto'} alignItems={'center'} gap={'size-200'}>
+                        {shouldShowFilters && <Text UNSAFE_className={classes.projectMetadata}>{countLabel}</Text>}
+                        {jobsButton}
+                    </Flex>
                 </Flex>
 
                 {isFiltering && sortedProjects.length === 0 && <NoMatchingProjects />}
@@ -159,7 +158,7 @@ const ProjectGrid = () => {
     );
 };
 
-export const ProjectList = () => {
+export const ProjectList = ({ jobsButton }: { jobsButton?: ReactNode }) => {
     return (
         <View height={'100%'} position={'relative'}>
             <Content height={'100%'} margin={'0'}>
@@ -168,7 +167,7 @@ export const ProjectList = () => {
 
                     <View flex={1} UNSAFE_style={{ overflow: 'auto' }}>
                         <Suspense fallback={<Loading size='M' mode='inline' />}>
-                            <ProjectGrid />
+                            <ProjectGrid jobsButton={jobsButton} />
                         </Suspense>
                     </View>
                 </Flex>

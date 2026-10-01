@@ -1091,6 +1091,40 @@
             "architecture": "Arquitectura"
         }
     },
+    "jobs": {
+        "button": "Jobs",
+        "allProjects": "All projects",
+        "currentProjectLabel": "{{name}} (current)",
+        "projectsSection": "Projects",
+        "title": {
+            "all": "All projects jobs",
+            "current": "Current project jobs",
+            "named": "{{project}} jobs"
+        },
+        "tabs": {
+            "all": "All",
+            "finished": "Finished"
+        },
+        "status": {
+            "pending": "Scheduled",
+            "cancelling": "Cancelling",
+            "done": "Completed"
+        },
+        "type": {
+            "quantize": "Optimization"
+        },
+        "columns": {
+            "type": "Type"
+        },
+        "meta": {
+            "started": "Started {{time}}",
+            "elapsed": "Elapsed {{time}}"
+        },
+        "emptyState": "No jobs in this category",
+        "actions": {
+            "viewLogs": "View logs"
+        }
+    },
     "license": {
         "label": "Licencia: ",
         "agreement": {

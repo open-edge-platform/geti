@@ -1091,6 +1091,47 @@
             "architecture": "Architecture"
         }
     },
+    "jobs": {
+        "button": "Jobs",
+        "allProjects": "All projects",
+        "currentProjectLabel": "{{name}} (current)",
+        "projectsSection": "Projects",
+        "title": {
+            "all": "All projects jobs",
+            "current": "Current project jobs",
+            "named": "{{project}} jobs"
+        },
+        "tabs": {
+            "all": "All",
+            "finished": "Finished"
+        },
+        "status": {
+            "pending": "Scheduled",
+            "cancelling": "Cancelling",
+            "done": "Completed"
+        },
+        "type": {
+            "quantize": "Optimization"
+        },
+        "columns": {
+            "type": "Type",
+            "name": "Name",
+            "architecture": "Architecture",
+            "device": "Device"
+        },
+        "cancel": {
+            "title": "Cancel job",
+            "confirmation": "Are you sure you want to cancel job {{jobId}}?"
+        },
+        "meta": {
+            "started": "Started {{time}}",
+            "elapsed": "Elapsed {{time}}"
+        },
+        "emptyState": "No jobs in this category",
+        "actions": {
+            "viewLogs": "View logs"
+        }
+    },
     "license": {
         "label": "License: ",
         "agreement": {

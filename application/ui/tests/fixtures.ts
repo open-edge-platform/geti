@@ -23,6 +23,7 @@ import { DatasetPage } from './datasets/dataset-page';
 import { ImportDatasetPage } from './datasets/import-dataset-page';
 import { InferencePage } from './inference/inference-page';
 import { StreamPage } from './inference/stream-page';
+import { JobsDialogPage } from './jobs/jobs-dialog-page';
 import { JobsPage } from './jobs/jobs-page';
 import { ModelsPage } from './models/models-page';
 
@@ -52,6 +53,7 @@ interface Fixtures {
     inferencePage: InferencePage;
     modelsPage: ModelsPage;
     jobsPage: JobsPage;
+    jobsDialogPage: JobsDialogPage;
     polygonTool: PolygonToolPage;
     boundingBoxTool: BoundingBoxToolPage;
     ssimTool: SSIMToolPage;
@@ -256,6 +258,11 @@ const test = testBase.extend<Fixtures>({
         const jobsPage = new JobsPage(page);
 
         await use(jobsPage);
+    },
+    jobsDialogPage: async ({ page }, use) => {
+        const jobsDialogPage = new JobsDialogPage(page);
+
+        await use(jobsDialogPage);
     },
     boundingBoxTool: async ({ page }, use) => {
         const boundingBoxTool = new BoundingBoxToolPage(page);
