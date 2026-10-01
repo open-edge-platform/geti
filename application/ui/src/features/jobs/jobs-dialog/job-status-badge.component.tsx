@@ -8,8 +8,6 @@ import { Badge } from '@geti-ui/ui';
 
 import classes from './jobs-dialog.module.scss';
 
-// `className` overrides the Spectrum variant's background for tones with no native Badge variant
-// (energy-blue, orange).
 export interface BadgeTone {
     variant: 'positive' | 'negative' | 'neutral' | 'yellow' | 'purple';
     className?: string;
