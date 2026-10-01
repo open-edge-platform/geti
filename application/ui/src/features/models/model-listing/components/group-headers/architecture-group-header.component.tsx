@@ -5,6 +5,7 @@ import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { dimensionValue, Flex, Heading, Text } from '@geti-ui/ui';
 
+import { ModelLicenseLink } from '../../../components/model-license-link.component';
 import { PerformanceCategoryBadge } from '../model-row/performance-category-badge.component';
 
 type ArchitectureGroupHeaderProps = {
@@ -31,6 +32,11 @@ export const ArchitectureGroupHeader = ({ architecture }: ArchitectureGroupHeade
                     performanceCategory={architecture.performanceCategory}
                 />
             )}
+
+            <Text>
+                {t('license.label')}
+                <ModelLicenseLink license={architecture.license} />
+            </Text>
         </Flex>
     );
 };
