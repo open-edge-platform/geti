@@ -35,7 +35,7 @@ export const JobsButton = () => {
                         {hasRunningJob && <RunningJobIndicator />}
                     </span>
                 </ActionButton>
-                <Tooltip>{t('jobs.button')}</Tooltip>
+                <Tooltip>{t('common.labels.jobs')}</Tooltip>
             </TooltipTrigger>
 
             {isOpen && (

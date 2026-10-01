@@ -88,6 +88,7 @@ describe('translation coverage', () => {
             'common.labels.training_subset',
             'common.labels.validation_subset',
             'models.performance.categories.accuracy',
+            'jobs.tabs.finished',
         ]);
         const keysByValue = new Map<string, string[]>();
 
