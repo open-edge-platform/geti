@@ -1086,40 +1086,40 @@
         }
     },
     "jobs": {
-        "allProjects": "All projects",
-        "currentProjectLabel": "{{name}} (current)",
-        "projectsSection": "Projects",
+        "allProjects": "Tutti i progetti",
+        "currentProjectLabel": "{{name}} (attuale)",
+        "projectsSection": "Progetti",
         "title": {
-            "all": "All projects jobs",
-            "current": "Current project jobs",
-            "named": "{{project}} jobs"
+            "all": "Processi di tutti i progetti",
+            "current": "Processi del progetto attuale",
+            "named": "Processi del progetto {{project}}"
         },
         "tabs": {
-            "all": "All",
-            "finished": "Finished"
+            "all": "Tutti",
+            "finished": "Completati"
         },
         "status": {
-            "pending": "Scheduled",
-            "cancelling": "Cancelling",
-            "done": "Completed"
+            "pending": "Pianificato",
+            "cancelling": "Annullamento in corso",
+            "done": "Completato"
         },
         "type": {
-            "quantize": "Optimization"
+            "quantize": "Ottimizzazione"
         },
         "columns": {
-            "type": "Type"
+            "type": "Tipo"
         },
         "cancel": {
             "title": "Annulla processo",
             "confirmation": "Sei sicuro di voler annullare il processo {{jobId}}?"
         },
         "meta": {
-            "started": "Started {{time}}",
-            "elapsed": "Elapsed {{time}}"
+            "started": "Avviato {{time}}",
+            "elapsed": "Tempo trascorso: {{time}}"
         },
-        "emptyState": "No jobs in this category",
+        "emptyState": "Nessun processo in questa categoria",
         "actions": {
-            "viewLogs": "View logs"
+            "viewLogs": "Visualizza log"
         }
     },
     "license": {

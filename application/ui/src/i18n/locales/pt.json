@@ -1086,40 +1086,40 @@
         }
     },
     "jobs": {
-        "allProjects": "All projects",
-        "currentProjectLabel": "{{name}} (current)",
-        "projectsSection": "Projects",
+        "allProjects": "Todos os projetos",
+        "currentProjectLabel": "{{name}} (atual)",
+        "projectsSection": "Projetos",
         "title": {
-            "all": "All projects jobs",
-            "current": "Current project jobs",
-            "named": "{{project}} jobs"
+            "all": "Tarefas de todos os projetos",
+            "current": "Tarefas do projeto atual",
+            "named": "Tarefas do projeto {{project}}"
         },
         "tabs": {
-            "all": "All",
-            "finished": "Finished"
+            "all": "Todas",
+            "finished": "Concluídas"
         },
         "status": {
-            "pending": "Scheduled",
-            "cancelling": "Cancelling",
-            "done": "Completed"
+            "pending": "Agendada",
+            "cancelling": "A cancelar",
+            "done": "Concluída"
         },
         "type": {
-            "quantize": "Optimization"
+            "quantize": "Otimização"
         },
         "columns": {
-            "type": "Type"
+            "type": "Tipo"
         },
         "cancel": {
             "title": "Cancelar tarefa",
             "confirmation": "Tem a certeza de que pretende cancelar a tarefa {{jobId}}?"
         },
         "meta": {
-            "started": "Started {{time}}",
-            "elapsed": "Elapsed {{time}}"
+            "started": "Iniciada {{time}}",
+            "elapsed": "Tempo decorrido: {{time}}"
         },
-        "emptyState": "No jobs in this category",
+        "emptyState": "Nenhuma tarefa nesta categoria",
         "actions": {
-            "viewLogs": "View logs"
+            "viewLogs": "Ver registos"
         }
     },
     "license": {
