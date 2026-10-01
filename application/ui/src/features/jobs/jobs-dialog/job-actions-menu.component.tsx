@@ -4,7 +4,8 @@
 import { useState } from 'react';
 
 import { useTranslation } from '@/i18n';
-import { ActionMenu, AlertDialog, DialogContainer, Item, type Key } from '@geti-ui/ui';
+import { ActionButton, AlertDialog, DialogContainer, Item, Menu, MenuTrigger, type Key } from '@geti-ui/ui';
+import { MoreMenu } from '@geti-ui/ui/icons';
 import { useCancelJob } from 'hooks/api/jobs/jobs.hook';
 import { isJobPending, isJobRunning } from 'hooks/api/util';
 
@@ -41,12 +42,17 @@ export const JobActionsMenu = ({ job, onViewLogs }: JobActionsMenuProps) => {
 
     return (
         <>
-            <ActionMenu isQuiet aria-label={`Job actions for ${job.metadata.model.name}`} onAction={handleAction}>
-                {[
-                    <Item key={ACTIONS.LOGS}>{t('jobs.actions.viewLogs')}</Item>,
-                    ...(canCancel ? [<Item key={ACTIONS.CANCEL}>{t('common.actions.cancel')}</Item>] : []),
-                ]}
-            </ActionMenu>
+            <MenuTrigger>
+                <ActionButton isQuiet aria-label={`Job actions for ${job.metadata.model.name}`}>
+                    <MoreMenu />
+                </ActionButton>
+                <Menu onAction={handleAction} aria-label={'Job actions menu'}>
+                    {[
+                        <Item key={ACTIONS.LOGS}>{t('jobs.actions.viewLogs')}</Item>,
+                        ...(canCancel ? [<Item key={ACTIONS.CANCEL}>{t('common.actions.cancel')}</Item>] : []),
+                    ]}
+                </Menu>
+            </MenuTrigger>
 
             <DialogContainer onDismiss={() => setIsConfirmOpen(false)}>
                 {isConfirmOpen && (
