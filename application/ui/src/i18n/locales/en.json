@@ -352,6 +352,7 @@
         },
         "sources": {
             "uploadError": "Failed to upload video file.",
+            "deleteVideoError": "Failed to delete uploaded video file.",
             "list": {
                 "addSource": "Add new source"
             },

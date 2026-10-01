@@ -352,6 +352,7 @@
         },
         "sources": {
             "uploadError": "Falha ao carregar o ficheiro de vídeo.",
+            "deleteVideoError": "Falha ao eliminar o ficheiro de vídeo carregado.",
             "list": {
                 "addSource": "Adicionar nova fonte"
             },

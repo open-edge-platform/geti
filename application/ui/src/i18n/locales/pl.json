@@ -352,6 +352,7 @@
         },
         "sources": {
             "uploadError": "Nie udało się przesłać pliku wideo.",
+            "deleteVideoError": "Nie udało się usunąć przesłanego pliku wideo.",
             "list": {
                 "addSource": "Dodaj nowe źródło"
             },

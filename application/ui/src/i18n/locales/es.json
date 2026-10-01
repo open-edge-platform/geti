@@ -352,6 +352,7 @@
         },
         "sources": {
             "uploadError": "No se pudo cargar el archivo de vídeo.",
+            "deleteVideoError": "No se pudo eliminar el archivo de vídeo cargado.",
             "list": {
                 "addSource": "Añadir nueva fuente"
             },
