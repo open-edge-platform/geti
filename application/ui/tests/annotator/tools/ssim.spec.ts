@@ -5,6 +5,7 @@ import { expect } from '@playwright/test';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
 
+import { FEATURE_FLAGS } from '../../../src/constants/feature-flags';
 import { http, test } from '../../fixtures';
 import { candyBinaryHandler, redLabel } from '../annotator-fixtures';
 
@@ -17,8 +18,9 @@ const mockedProject = getMockedProject({
     },
 });
 
-// TODO: Re-enable in 3.1 when SSIM tool is restored.
-test.describe.skip('SSIM tool', () => {
+test.describe('SSIM tool', () => {
+    test.skip(!FEATURE_FLAGS.SSIM_TOOL, 'SSIM tool is behind the SSIM_TOOL feature flag');
+
     test.beforeEach(async ({ network }) => {
         network.use(
             http.get('/api/projects/{project_id}', () => {
@@ -44,11 +46,11 @@ test.describe.skip('SSIM tool', () => {
             await ssimTool.drawTemplate({ x: 100, y: 100, width: 150, height: 150 });
         });
 
-        await test.step('Expect at least one polygon annotation', async () => {
+        await test.step('Expect the template and its matches as polygon annotations', async () => {
             await expect(async () => {
                 const items = await annotatorPage.getAnnotationsListItems('annotation polygon');
 
-                expect(items.length).toBeGreaterThanOrEqual(1);
+                expect(items.length).toBeGreaterThanOrEqual(2);
             }).toPass({ timeout: 15000 });
         });
     });

@@ -788,6 +788,10 @@
                 "label": "Magnetic Lasso",
                 "description": "Hover along an object's edge and click periodically to snap the outline to its borders.",
                 "error": "Failed to select the shape boundaries, could you please try again?"
+            },
+            "ssim": {
+                "label": "Detection assistant",
+                "description": "Draw a box around an object to automatically find and annotate similar objects in the image."
             }
         },
         "video": {

@@ -16,7 +16,10 @@ import {
     isRectWithinRoi,
 } from '../utils';
 
-const MAX_NUMBER_ITEMS = 500;
+// Upper bound on matches (template included), so a weak template can't flood the image.
+const MAX_NUMBER_ITEMS = 100;
+// Scores are min-max normalised per run, so this is relative to the template's own score (1.0).
+const DEFAULT_CONFIDENCE_THRESHOLD = 0.9;
 
 type SSIMMatch = Omit<ToolSSIMMatch, 'shape'> & {
     shape: Rect;
@@ -142,7 +145,10 @@ const filterSSIMResults = (
     return collector;
 };
 
-const guessNumberOfItemsThreshold = (matches: SSIMMatch[], confidenceThreshold = 0.9): number => {
+const guessNumberOfItemsThreshold = (
+    matches: SSIMMatch[],
+    confidenceThreshold = DEFAULT_CONFIDENCE_THRESHOLD
+): number => {
     const guess = matches.findIndex(({ confidence }) => confidence < confidenceThreshold);
 
     return guess === -1 ? matches.length : guess;
@@ -219,6 +225,9 @@ export const useSSIM = (enabled = true) => {
                 },
                 shapeType
             );
+        },
+        onError: (_error, { template, shapeType = 'rectangle' }) => {
+            updateToolState({ matches: [{ shape: template, confidence: 1 }], threshold: 1 }, shapeType);
         },
     });
 

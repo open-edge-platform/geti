@@ -30,14 +30,8 @@ export const SSIMTool = () => {
             return;
         }
 
-        const predictedShapes = toolState.shapes.slice(1);
-
-        if (predictedShapes.length === 0) {
-            reset();
-            return;
-        }
-
-        addAndSelectAnnotations(predictedShapes, selectedLabel ? [selectedLabel] : []);
+        // The first shape is the user-drawn template, which is kept as an annotation too.
+        addAndSelectAnnotations(toolState.shapes, selectedLabel ? [selectedLabel] : []);
         reset();
     }, [toolState.shapes, isProcessing, addAndSelectAnnotations, selectedLabel, reset]);
 
