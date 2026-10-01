@@ -8,7 +8,6 @@ import {
     isClassificationTask,
     isDetectionTask,
     isMultiLabelClassificationTask,
-    isPrefetchEnabledForTask,
     isSegmentationTask,
 } from './task-type-guards';
 
@@ -53,30 +52,6 @@ describe('isSegmentationTask', () => {
 
     it('returns false for null', () => {
         expect(isSegmentationTask(null)).toBe(false);
-    });
-});
-
-describe('isPrefetchEnabledForTask', () => {
-    it('returns true for "detection"', () => {
-        expect(isPrefetchEnabledForTask('detection')).toBe(true);
-    });
-
-    it('returns true for "instance_segmentation"', () => {
-        expect(isPrefetchEnabledForTask('instance_segmentation')).toBe(true);
-    });
-
-    it('returns false for "classification"', () => {
-        expect(isPrefetchEnabledForTask('classification')).toBe(false);
-    });
-
-    it('returns false for null', () => {
-        expect(isPrefetchEnabledForTask(null)).toBe(false);
-    });
-
-    it('returns true only for detection and instance_segmentation among all task types', () => {
-        const enabledTypes = ALL_TASK_TYPES.filter((t) => isPrefetchEnabledForTask(t));
-        expect(enabledTypes).toEqual(expect.arrayContaining(['detection', 'instance_segmentation']));
-        expect(enabledTypes).not.toContain('classification');
     });
 });
 

@@ -118,8 +118,6 @@ export const getToolIcon = (polygonMode: PolygonMode | null) => {
     return TOOL_ICON[polygonMode];
 };
 
-export const getFormattedPoints = (points: Point[]): string => points.map(({ x, y }) => `${x},${y}`).join(' ');
-
 type PointerSVGElement = PointerEvent<SVGElement>;
 type CallbackPointerVoid = (event: PointerSVGElement) => void;
 
