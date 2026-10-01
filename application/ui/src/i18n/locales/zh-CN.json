@@ -1095,40 +1095,40 @@
         }
     },
     "jobs": {
-        "allProjects": "All projects",
-        "currentProjectLabel": "{{name}} (current)",
-        "projectsSection": "Projects",
+        "allProjects": "所有项目",
+        "currentProjectLabel": "{{name}}（当前）",
+        "projectsSection": "项目",
         "title": {
-            "all": "All projects jobs",
-            "current": "Current project jobs",
-            "named": "{{project}} jobs"
+            "all": "所有项目的任务",
+            "current": "当前项目的任务",
+            "named": "{{project}} 的任务"
         },
         "tabs": {
-            "all": "All",
-            "finished": "Finished"
+            "all": "全部",
+            "finished": "已完成"
         },
         "status": {
-            "pending": "Scheduled",
-            "cancelling": "Cancelling",
-            "done": "Completed"
+            "pending": "已计划",
+            "cancelling": "正在取消",
+            "done": "已完成"
         },
         "type": {
-            "quantize": "Optimization"
+            "quantize": "优化"
         },
         "columns": {
-            "type": "Type"
+            "type": "类型"
         },
         "cancel": {
             "title": "取消任务",
             "confirmation": "确定要取消任务 {{jobId}} 吗？"
         },
         "meta": {
-            "started": "Started {{time}}",
-            "elapsed": "Elapsed {{time}}"
+            "started": "开始于 {{time}}",
+            "elapsed": "已用时 {{time}}"
         },
-        "emptyState": "No jobs in this category",
+        "emptyState": "此类别中没有任务",
         "actions": {
-            "viewLogs": "View logs"
+            "viewLogs": "查看日志"
         }
     },
     "license": {
