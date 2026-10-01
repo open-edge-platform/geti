@@ -183,7 +183,7 @@ describe('useStreamJobStatus', () => {
         const toastSpy = vi.spyOn(toastModule, 'toast');
         const failedJob = getMockedJob({ status: 'FAILED' });
 
-        renderHook(() => useStreamJobStatus(failedJob.job_id));
+        renderHook(() => useStreamJobStatus(failedJob.job_id, PROJECT_ID));
 
         await waitFor(() => {
             expect(MockEventSourceConstructor).toHaveBeenCalled();

@@ -3,8 +3,8 @@
 
 import { ACTIVE_JOB_STATUSES, useModelJobs, useStreamJobStatus } from 'hooks/api/jobs/jobs.hook';
 
-const JobStreamSync = ({ jobId }: { jobId: string }) => {
-    useStreamJobStatus(jobId);
+const JobStreamSync = ({ jobId, projectId }: { jobId: string; projectId: string }) => {
+    useStreamJobStatus(jobId, projectId);
     return null;
 };
 
@@ -15,7 +15,7 @@ export const ActiveJobsSync = () => {
     return (
         <>
             {activeJobs.map((job) => (
-                <JobStreamSync key={job.job_id} jobId={job.job_id} />
+                <JobStreamSync key={job.job_id} jobId={job.job_id} projectId={job.metadata.project.id} />
             ))}
         </>
     );

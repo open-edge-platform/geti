@@ -77,7 +77,7 @@ const CancelRunningJob = ({ job, onCancel }: CancelRunningJobProps) => {
 
 export const RunningJobRow = ({ job, onCancel, datasetRevisions, groupBy, modelArchitectures }: RunningJobRowProps) => {
     const { t } = useTranslation();
-    useStreamJobStatus(job.job_id);
+    useStreamJobStatus(job.job_id, job.metadata.project.id);
 
     const statusMessage =
         job.message || (job.status === 'PENDING' ? t('models.jobs.pending') : t('models.jobs.running'));

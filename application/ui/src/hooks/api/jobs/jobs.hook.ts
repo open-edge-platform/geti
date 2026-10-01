@@ -17,10 +17,9 @@ import { isJobFailed, isQuantizeJob, isTrainJob } from '../util';
 
 const TERMINAL_STATUSES: string[] = ['DONE', 'FAILED', 'CANCELLED'];
 
-export const useStreamJobStatus = (jobId: string | undefined) => {
+export const useStreamJobStatus = (jobId: string | undefined, projectId: string | undefined) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
-    const projectId = useProjectIdentifier();
     const modelIdRef = useRef<string | null>(null);
 
     const { close } = useSSE<Job>(jobId ? `/api/jobs/${jobId}/status` : undefined, {
@@ -51,6 +50,11 @@ export const useStreamJobStatus = (jobId: string | undefined) => {
         },
         onClose: () => {
             queryClient.invalidateQueries({ queryKey: getQueryKey(['get', '/api/jobs']) });
+
+            if (!projectId) {
+                return;
+            }
+
             queryClient.invalidateQueries({
                 queryKey: getQueryKey([
                     'get',
