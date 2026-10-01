@@ -3,7 +3,7 @@
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field, TypeAdapter, computed_field
+from pydantic import BaseModel, Field, StringConstraints, TypeAdapter, computed_field
 
 from app.core.models import BaseIDNameModel
 from app.models import (
@@ -165,7 +165,7 @@ class BaseSourceConfigCreate(BaseIDNameModel):
 class USBCameraSourceConfigCreate(BaseSourceConfigCreate):
     source_type: Literal[SourceType.USB_CAMERA]
     device_id: int
-    codec: str | None = None
+    codec: Annotated[str | None, StringConstraints(min_length=4, max_length=4, to_upper=True)] = None
 
     @property
     def config_data(self) -> USBCameraConfig:

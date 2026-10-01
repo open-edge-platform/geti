@@ -21,7 +21,10 @@ router = APIRouter(prefix="/api/staged_datasets", tags=["Dataset Import/Export"]
     "",
     response_model=StagedDatasetView,
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_201_CREATED: {"description": "Dataset archive uploaded successfully"}},
+    responses={
+        status.HTTP_201_CREATED: {"description": "Dataset archive uploaded successfully"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Invalid dataset archive"},
+    },
 )
 async def upload_archive(
     file: Annotated[UploadFile, File()],

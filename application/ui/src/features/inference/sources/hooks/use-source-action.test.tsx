@@ -3,9 +3,10 @@
 
 import { startTransition } from 'react';
 
+import { API_BASE_URL } from '@/api';
 import type { ImagesFolderSourceConfig, VideoFileSourceConfig } from '@/api/types';
 import { act, screen, waitFor } from '@testing-library/react';
-import { HttpResponse } from 'msw';
+import { HttpResponse, http as mswHttp } from 'msw';
 import { renderHook } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
@@ -207,9 +208,7 @@ describe('useSourceAction', () => {
             let sourceWasCreated = false;
 
             server.use(
-                http.post('/api/sources/media', () => {
-                    // The 422 response has no documented schema in the OpenAPI spec (description only).
-                    // @ts-expect-error There is an incorrect type in OpenAPI
+                mswHttp.post(`${API_BASE_URL}/api/sources/media`, () => {
                     return HttpResponse.json({ detail: 'Unsupported video format' }, { status: 422 });
                 }),
                 http.post('/api/sources', () => {
