@@ -59,7 +59,9 @@ export const formatElapsed = (job: ModelJob): string => {
     if (!job.started_at) return '—';
 
     const elapsed = dayjs.duration(Math.max(0, dayjs(job.finished_at ?? undefined).diff(job.started_at)));
-    const template = elapsed.asHours() >= 1 ? 'H[h] m[m] s[s]' : elapsed.asMinutes() >= 1 ? 'm[m] s[s]' : 's[s]';
+    const hours = Math.floor(elapsed.asHours());
 
-    return elapsed.format(template);
+    if (hours >= 1) return `${hours}h ${elapsed.format('m[m] s[s]')}`;
+    if (elapsed.asMinutes() >= 1) return elapsed.format('m[m] s[s]');
+    return elapsed.format('s[s]');
 };
