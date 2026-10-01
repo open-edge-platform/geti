@@ -58,3 +58,14 @@ export const uploadSourceVideo = async (file: File): Promise<SourceMediaUpload> 
 
     return unwrap(result, i18n.t('inference.sources.uploadError'));
 };
+
+/** Deletes an uploaded source video that is not referenced by any source. */
+export const deleteSourceVideo = async (sourceMediaId: string): Promise<void> => {
+    const { error } = await fetchClient.DELETE('/api/sources/media/{source_media_id}', {
+        params: { path: { source_media_id: sourceMediaId } },
+    });
+
+    if (error !== undefined) {
+        throw error;
+    }
+};
