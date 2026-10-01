@@ -101,15 +101,17 @@ export const useAvailableTools = (): ToolConfig[] => {
         },
     };
 
+    const ssimTools = FEATURE_FLAGS.SSIM_TOOL ? [ssimToolConfig] : [];
+
     const taskToolConfig: Record<string, ToolConfig[]> = {
         classification: [],
-        detection: [selectionToolConfig, boundingBoxToolConfig, autoSegmentationDetectionConfig],
+        detection: [selectionToolConfig, boundingBoxToolConfig, autoSegmentationDetectionConfig, ...ssimTools],
         instance_segmentation: [
             selectionToolConfig,
             polygonToolConfig,
             magneticLassoToolConfig,
             autoSegmentationConfig,
-            ...(FEATURE_FLAGS.SSIM_TOOL ? [ssimToolConfig] : []),
+            ...ssimTools,
         ],
     };
 
