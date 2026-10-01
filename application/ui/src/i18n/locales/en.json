@@ -70,7 +70,8 @@
             "seconds": "Seconds",
             "every": "every",
             "model": "Model",
-            "labels": "Labels"
+            "labels": "Labels",
+            "language": "Language"
         },
         "viewModes": {
             "large": "Large thumbnails",
@@ -98,7 +99,8 @@
         "models": "Models",
         "modelsDescription": "Models page to visualise your models",
         "inference": "Inference",
-        "inferenceDescription": "Inference page showing live inference on your project"
+        "inferenceDescription": "Inference page showing live inference on your project",
+        "preferences": "Preferences"
     },
     "dataset": {
         "validation": {

@@ -70,7 +70,8 @@
             "seconds": "Segundos",
             "every": "a cada",
             "model": "Modelo",
-            "labels": "Etiquetas"
+            "labels": "Etiquetas",
+            "language": "Idioma"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -98,7 +99,8 @@
         "models": "Modelos",
         "modelsDescription": "Página de modelos para visualizar os seus modelos",
         "inference": "Inferência",
-        "inferenceDescription": "Página de inferência que mostra a inferência em tempo real no seu projeto"
+        "inferenceDescription": "Página de inferência que mostra a inferência em tempo real no seu projeto",
+        "preferences": "Preferências"
     },
     "dataset": {
         "validation": {

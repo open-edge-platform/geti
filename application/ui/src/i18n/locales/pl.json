@@ -70,7 +70,8 @@
             "seconds": "Sekundy",
             "every": "co",
             "model": "Model",
-            "labels": "Etykiety"
+            "labels": "Etykiety",
+            "language": "Język"
         },
         "viewModes": {
             "large": "Duże miniatury",
@@ -98,7 +99,8 @@
         "models": "Modele",
         "modelsDescription": "Strona modeli do wizualizacji Twoich modeli",
         "inference": "Wnioskowanie",
-        "inferenceDescription": "Strona wnioskowania pokazująca wnioskowanie na żywo w Twoim projekcie"
+        "inferenceDescription": "Strona wnioskowania pokazująca wnioskowanie na żywo w Twoim projekcie",
+        "preferences": "Preferencje"
     },
     "dataset": {
         "validation": {
