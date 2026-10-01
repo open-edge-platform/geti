@@ -41,7 +41,7 @@ export const JobActionsMenu = ({ job, onViewLogs }: JobActionsMenuProps) => {
 
     return (
         <>
-            <ActionMenu isQuiet aria-label='Job actions' onAction={handleAction}>
+            <ActionMenu isQuiet aria-label={`Job actions for ${job.metadata.model.name}`} onAction={handleAction}>
                 {[
                     <Item key={ACTIONS.LOGS}>{t('jobs.actions.viewLogs')}</Item>,
                     ...(canCancel ? [<Item key={ACTIONS.CANCEL}>{t('common.actions.cancel')}</Item>] : []),
