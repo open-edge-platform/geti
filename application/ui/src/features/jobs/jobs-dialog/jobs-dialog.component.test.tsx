@@ -198,7 +198,7 @@ describe('JobsDialog', () => {
     it('shows "Cancel" only for pending and running jobs, not for cancelling/done/failed/cancelled', async () => {
         mockJobs([trainJob({ job_id: 'pending', status: 'PENDING', started_at: null })]);
         renderDialog();
-        await userEvent.click(await screen.findByRole('button', { name: 'Job actions' }));
+        await userEvent.click(await screen.findByRole('button', { name: 'Job actions for pending model' }));
         expect(screen.getByRole('menuitem', { name: 'View logs' })).toBeInTheDocument();
         expect(screen.getByRole('menuitem', { name: 'Cancel' })).toBeInTheDocument();
     });
@@ -213,7 +213,7 @@ describe('JobsDialog', () => {
             }),
         ]);
         renderDialog();
-        await userEvent.click(await screen.findByRole('button', { name: 'Job actions' }));
+        await userEvent.click(await screen.findByRole('button', { name: 'Job actions for job model' }));
         expect(screen.getByRole('menuitem', { name: 'View logs' })).toBeInTheDocument();
         expect(screen.queryByRole('menuitem', { name: 'Cancel' })).not.toBeInTheDocument();
     });
@@ -230,7 +230,7 @@ describe('JobsDialog', () => {
 
         renderDialog();
 
-        await userEvent.click(await screen.findByRole('button', { name: 'Job actions' }));
+        await userEvent.click(await screen.findByRole('button', { name: 'Job actions for running model' }));
         await userEvent.click(screen.getByRole('menuitem', { name: 'Cancel' }));
 
         expect(await screen.findByRole('alertdialog', { name: 'Cancel job' })).toBeInTheDocument();
@@ -245,7 +245,7 @@ describe('JobsDialog', () => {
         renderDialog();
 
         await userEvent.click(await screen.findByRole('tab', { name: /^Running\b/ }));
-        await userEvent.click(screen.getByRole('button', { name: 'Job actions' }));
+        await userEvent.click(screen.getByRole('button', { name: 'Job actions for running model' }));
         await userEvent.click(screen.getByRole('menuitem', { name: 'View logs' }));
 
         expect(await screen.findByText('Training Logs')).toBeInTheDocument();
