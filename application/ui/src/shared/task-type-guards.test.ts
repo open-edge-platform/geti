@@ -11,8 +11,6 @@ import {
     isSegmentationTask,
 } from './task-type-guards';
 
-const ALL_TASK_TYPES: TaskType[] = ['classification', 'detection', 'instance_segmentation'];
-
 describe('isClassificationTask', () => {
     it('returns true for "classification"', () => {
         expect(isClassificationTask('classification')).toBe(true);
