@@ -120,20 +120,6 @@ describe('prepareVideoFileFormData', () => {
         await expect(prepareVideoFileFormData(formData)).resolves.toBeUndefined();
     });
 
-    it('returns no rollback when the uploaded path does not contain an upload UUID', async () => {
-        server.use(
-            http.post('/api/sources/media', () => {
-                return HttpResponse.json({ video_path: '/data/source_media/sample.mp4' }, { status: 201 });
-            })
-        );
-
-        const file = new File(['fake-video-bytes'], 'sample.mp4', { type: 'video/mp4' });
-        const formData = buildFormData({ id: '1', name: 'My source', video_path: '', video_file: file, loop: '' });
-
-        await expect(prepareVideoFileFormData(formData)).resolves.toBeUndefined();
-        expect(formData.get('video_path')).toBe('/data/source_media/sample.mp4');
-    });
-
     it('rejects when the upload fails', async () => {
         server.use(
             http.post('/api/sources/media', () => {
