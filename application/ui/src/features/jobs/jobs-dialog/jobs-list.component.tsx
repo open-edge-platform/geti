@@ -38,10 +38,10 @@ export const JobsList = ({
                     columnGap={'size-200'}
                     UNSAFE_className={`${classes.grid} ${classes.header}`}
                 >
-                    <Text>{t('jobs.columns.name')}</Text>
+                    <Text>{t('common.labels.name')}</Text>
                     <Text>{t('jobs.columns.type')}</Text>
-                    <Text>{t('jobs.columns.architecture')}</Text>
-                    <Text>{t('jobs.columns.device')}</Text>
+                    <Text>{t('common.labels.architecture')}</Text>
+                    <Text>{t('common.labels.device')}</Text>
                     <div />
                 </Grid>
             )}

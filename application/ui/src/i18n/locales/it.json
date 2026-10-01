@@ -45,6 +45,8 @@
             "no": "No",
             "unknown": "Sconosciuto",
             "name": "Nome",
+            "architecture": "Architettura",
+            "device": "Dispositivo",
             "on": "Attivo",
             "off": "Inattivo",
             "noMaximum": "Nessun massimo",
@@ -70,6 +72,7 @@
             "seconds": "Secondi",
             "every": "ogni",
             "model": "Modello",
+            "jobs": "Processi",
             "labels": "Etichette",
             "language": "Lingua"
         },
@@ -305,12 +308,6 @@
         "importExport": {
             "trigger": "Importa/esporta dataset",
             "exportItem": "Esporta dataset"
-        },
-        "jobs": {
-            "cancel": {
-                "title": "Annulla processo",
-                "confirmation": "Sei sicuro di voler annullare il processo {{jobId}}?"
-            }
         },
         "revisions": {
             "createdOn": "Creato {{date}}",
@@ -813,7 +810,6 @@
     "models": {
         "jobs": {
             "error": "Processo non riuscito. Controlla i log per i dettagli e riprova.",
-            "heading": "Processi",
             "pending": "In sospeso...",
             "running": "In corso...",
             "stopDialog": {
@@ -1012,7 +1008,6 @@
             "fineTunedFrom": "Ottimizzazione fine da",
             "columns": {
                 "trained": "Addestrato",
-                "device": "Dispositivo",
                 "totalSize": "Dimensione totale"
             }
         },
@@ -1087,12 +1082,10 @@
             }
         },
         "columns": {
-            "modelName": "Nome modello",
-            "architecture": "Architettura"
+            "modelName": "Nome modello"
         }
     },
     "jobs": {
-        "button": "Jobs",
         "allProjects": "All projects",
         "currentProjectLabel": "{{name}} (current)",
         "projectsSection": "Projects",
@@ -1115,6 +1108,10 @@
         },
         "columns": {
             "type": "Type"
+        },
+        "cancel": {
+            "title": "Annulla processo",
+            "confirmation": "Sei sicuro di voler annullare il processo {{jobId}}?"
         },
         "meta": {
             "started": "Started {{time}}",

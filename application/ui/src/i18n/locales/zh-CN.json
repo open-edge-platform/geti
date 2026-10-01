@@ -45,6 +45,8 @@
             "no": "否",
             "unknown": "未知",
             "name": "名称",
+            "architecture": "架构",
+            "device": "设备",
             "on": "开",
             "off": "关",
             "noMaximum": "无上限",
@@ -70,6 +72,7 @@
             "seconds": "秒",
             "every": "每",
             "model": "模型",
+            "jobs": "任务",
             "labels": "标签",
             "language": "语言"
         },
@@ -305,12 +308,6 @@
         "importExport": {
             "trigger": "导入 / 导出数据集",
             "exportItem": "导出数据集"
-        },
-        "jobs": {
-            "cancel": {
-                "title": "取消任务",
-                "confirmation": "确定要取消任务 {{jobId}} 吗？"
-            }
         },
         "revisions": {
             "createdOn": "创建于 {{date}}",
@@ -813,7 +810,6 @@
     "models": {
         "jobs": {
             "error": "任务失败，请查看日志了解详情，然后重试。",
-            "heading": "任务",
             "pending": "等待中……",
             "running": "运行中……",
             "stopDialog": {
@@ -1012,7 +1008,6 @@
             "fineTunedFrom": "微调自",
             "columns": {
                 "trained": "训练时间",
-                "device": "设备",
                 "totalSize": "总大小"
             }
         },
@@ -1087,12 +1082,10 @@
             }
         },
         "columns": {
-            "modelName": "模型名称",
-            "architecture": "架构"
+            "modelName": "模型名称"
         }
     },
     "jobs": {
-        "button": "Jobs",
         "allProjects": "All projects",
         "currentProjectLabel": "{{name}} (current)",
         "projectsSection": "Projects",
@@ -1115,6 +1108,10 @@
         },
         "columns": {
             "type": "Type"
+        },
+        "cancel": {
+            "title": "取消任务",
+            "confirmation": "确定要取消任务 {{jobId}} 吗？"
         },
         "meta": {
             "started": "Started {{time}}",
