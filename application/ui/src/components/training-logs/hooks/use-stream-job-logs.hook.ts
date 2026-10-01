@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { useSSE } from '../../../../hooks/use-sse.hook';
+import { useSSE } from '../../../hooks/use-sse.hook';
 import { type LogEntry } from '../log-types';
 
 type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
@@ -13,12 +13,12 @@ type UseStreamJobLogsReturn = {
     connectionStatus: ConnectionStatus;
 };
 
-export const useStreamJobLogs = (jobId: string | undefined): UseStreamJobLogsReturn => {
+export const useStreamJobLogs = (jobId: string | undefined, options: { retry: boolean }): UseStreamJobLogsReturn => {
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting');
 
     useSSE<LogEntry>(jobId ? `/api/jobs/${jobId}/logs` : undefined, {
-        retry: true,
+        retry: options.retry,
         onMessage: (entry) => {
             setLogs((prev) => [...prev, entry]);
         },

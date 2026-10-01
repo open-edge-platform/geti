@@ -5,13 +5,13 @@ import { useState, type ReactNode } from 'react';
 
 import type { DatasetRevision, ModelArchitectureWithPerformanceCategory, QuantizeJob, TrainJob } from '@/api/types';
 import { BottomProgressBar } from '@/components/bottom-progress-bar/bottom-progress-bar.component';
+import { TrainingLogsDialog } from '@/components/training-logs/training-logs-dialog.component';
 import { useTranslation } from '@/i18n';
 import { Button, DialogContainer, Flex, Grid, Text } from '@geti-ui/ui';
-import { isJobPending, isTrainJob } from 'hooks/api/util';
+import { isJobPending, isJobRunning, isTrainJob } from 'hooks/api/util';
 import { DATE_TIME_FORMAT, useFormatDate } from 'hooks/use-format-date.hook';
 
 import { useGetModel } from '../../hooks/api/use-get-model.hook';
-import { TrainingLogsDialog } from '../../training-logs/training-logs-dialog.component';
 import { ArchitectureColumn } from '../components/model-row/architecture-column.component';
 import { DatasetColumn } from '../components/model-row/dataset-revision-column.component';
 import { RUNNING_JOB_GRID_COLUMNS } from './running-job-table-header.component';
@@ -30,7 +30,7 @@ type JobRowProps = JobRowColumnsProps & {
     actions?: ReactNode;
 };
 
-const ViewLogsButton = ({ jobId }: { jobId: string }) => {
+const ViewLogsButton = ({ job }: { job: TrainJob | QuantizeJob }) => {
     const { t } = useTranslation();
     const [isLogsDialogOpen, setIsLogsDialogOpen] = useState(false);
 
@@ -40,7 +40,13 @@ const ViewLogsButton = ({ jobId }: { jobId: string }) => {
                 {t('models.jobs.logs')}
             </Button>
             <DialogContainer type={'fullscreen'} onDismiss={() => setIsLogsDialogOpen(false)}>
-                {isLogsDialogOpen && <TrainingLogsDialog jobId={jobId} />}
+                {isLogsDialogOpen && (
+                    <TrainingLogsDialog
+                        jobId={job.job_id}
+                        projectId={job.metadata.project.id}
+                        isJobActive={isJobRunning(job) || isJobPending(job)}
+                    />
+                )}
             </DialogContainer>
         </>
     );
@@ -106,7 +112,7 @@ export const JobRow = ({ job, progress, statusBadges, actions, datasetRevisions,
                 </Flex>
 
                 <Flex gap={'size-100'} direction={'column'} alignItems={'center'}>
-                    <ViewLogsButton jobId={job.job_id} />
+                    <ViewLogsButton job={job} />
                     {actions}
                 </Flex>
             </Grid>
