@@ -237,7 +237,7 @@ describe('RunningJobRow', () => {
             server.use(http.get('/api/jobs', () => HttpResponse.json([job])));
 
             const { result: jobsResult } = renderHook(() => {
-                useStreamJobStatus(job.job_id);
+                useStreamJobStatus(job.job_id, job.metadata.project.id);
                 return useGetCurrentRunningJobs();
             });
 
@@ -262,7 +262,7 @@ describe('RunningJobRow', () => {
             server.use(http.get('/api/jobs', () => HttpResponse.json([job])));
 
             renderHook(() => {
-                useStreamJobStatus(job.job_id);
+                useStreamJobStatus(job.job_id, job.metadata.project.id);
             });
 
             await waitFor(() => {
