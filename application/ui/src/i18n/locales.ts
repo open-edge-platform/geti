@@ -11,14 +11,15 @@ import pt from './locales/pt.json';
 import zhCN from './locales/zh-CN.json';
 
 export const DEFAULT_LANGUAGE = 'en';
+type Catalog = typeof en;
 
 export const resources: Resource = {
     [DEFAULT_LANGUAGE]: { translation: en },
-    es: { translation: es },
-    it: { translation: it },
-    pl: { translation: pl },
-    pt: { translation: pt },
-    'zh-CN': { translation: zhCN },
+    es: { translation: es satisfies Catalog },
+    it: { translation: it satisfies Catalog },
+    pl: { translation: pl satisfies Catalog },
+    pt: { translation: pt satisfies Catalog },
+    'zh-CN': { translation: zhCN satisfies Catalog },
 };
 
 export const SUPPORTED_LANGUAGES = Object.keys(resources);
