@@ -788,6 +788,10 @@
                 "label": "Lazo magnético",
                 "description": "Pasa el cursor por el borde de un objeto y haz clic periódicamente para ajustar el contorno a sus bordes.",
                 "error": "No se pudieron seleccionar los límites de la forma. ¿Puedes intentarlo de nuevo?"
+            },
+            "ssim": {
+                "label": "Asistente de detección",
+                "description": "Dibuja un recuadro alrededor de un objeto para encontrar y anotar automáticamente objetos similares en la imagen."
             }
         },
         "video": {
