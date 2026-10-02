@@ -1122,7 +1122,14 @@
             "started": "Iniciada {{time}}",
             "elapsed": "Tempo decorrido: {{time}}"
         },
-        "emptyState": "Nenhuma tarefa nesta categoria",
+        "emptyState": {
+            "all": "Nenhuma tarefa nesta categoria",
+            "running": "Nenhuma tarefa em execução",
+            "finished": "Nenhuma tarefa concluída",
+            "scheduled": "Nenhuma tarefa agendada",
+            "cancelled": "Nenhuma tarefa cancelada",
+            "failed": "Nenhuma tarefa com falha"
+        },
         "actions": {
             "viewLogs": "Ver registos"
         }

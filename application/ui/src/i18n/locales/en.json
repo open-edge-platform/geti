@@ -1122,7 +1122,14 @@
             "started": "Started {{time}}",
             "elapsed": "Elapsed {{time}}"
         },
-        "emptyState": "No jobs in this category",
+        "emptyState": {
+            "all": "No jobs in this category",
+            "running": "No running jobs",
+            "finished": "No finished jobs",
+            "scheduled": "No scheduled jobs",
+            "cancelled": "No cancelled jobs",
+            "failed": "No failed jobs"
+        },
         "actions": {
             "viewLogs": "View logs"
         }

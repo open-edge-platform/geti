@@ -1122,7 +1122,14 @@
             "started": "开始于 {{time}}",
             "elapsed": "已用时 {{time}}"
         },
-        "emptyState": "此类别中没有任务",
+        "emptyState": {
+            "all": "此类别中没有任务",
+            "running": "没有正在运行的任务",
+            "finished": "没有已完成的任务",
+            "scheduled": "没有已计划的任务",
+            "cancelled": "没有已取消的任务",
+            "failed": "没有失败的任务"
+        },
         "actions": {
             "viewLogs": "查看日志"
         }

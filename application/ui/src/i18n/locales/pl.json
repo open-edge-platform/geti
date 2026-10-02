@@ -1126,7 +1126,14 @@
             "started": "Rozpoczęto {{time}}",
             "elapsed": "Czas trwania: {{time}}"
         },
-        "emptyState": "Brak zadań w tej kategorii",
+        "emptyState": {
+            "all": "Brak zadań w tej kategorii",
+            "running": "Brak zadań w trakcie",
+            "finished": "Brak zakończonych zadań",
+            "scheduled": "Brak zaplanowanych zadań",
+            "cancelled": "Brak anulowanych zadań",
+            "failed": "Brak zadań zakończonych niepowodzeniem"
+        },
         "actions": {
             "viewLogs": "Wyświetl dzienniki"
         }

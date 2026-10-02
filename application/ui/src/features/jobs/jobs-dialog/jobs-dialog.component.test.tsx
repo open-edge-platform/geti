@@ -263,7 +263,7 @@ describe('JobsDialog', () => {
 
         await userEvent.click(await screen.findByRole('tab', { name: 'Failed' }));
 
-        expect(await screen.findByRole('heading', { name: 'No jobs in this category' })).toBeInTheDocument();
+        expect(await screen.findByRole('heading', { name: 'No failed jobs' })).toBeInTheDocument();
         expect(screen.queryByText('Architecture')).not.toBeInTheDocument();
     });
 

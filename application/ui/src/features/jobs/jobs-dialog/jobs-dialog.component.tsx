@@ -72,6 +72,7 @@ export const JobsDialog = ({ initialProjectId, currentProjectId, onClose }: Jobs
                             jobs={visible}
                             isAllProjects={isAllProjects}
                             showStatusBadge={statusGroup === 'all'}
+                            statusGroup={statusGroup}
                             projectName={projectName}
                             architectureName={architectureName}
                             onViewLogs={setLogsJob}
