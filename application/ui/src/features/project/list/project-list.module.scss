@@ -32,10 +32,11 @@ $card-content-height: 68px;
 .card {
     --border-size: var(--spectrum-global-dimension-size-25);
 
+    position: relative;
+    height: calc($thumbnail-height + $card-content-height);
     border: var(--border-size) solid var(--spectrum-global-color-gray-200);
     border-radius: var(--spectrum-global-dimension-size-50);
     background-color: var(--spectrum-global-color-gray-50);
-    height: 100%;
     overflow: hidden;
     transition:
         background-color,
@@ -45,11 +46,6 @@ $card-content-height: 68px;
         background-color: var(--spectrum-global-color-gray-100);
         border-color: var(--energy-blue);
     }
-}
-
-.cardWrapper {
-    position: relative;
-    height: calc($thumbnail-height + $card-content-height);
 }
 
 .thumbnailContainer {
