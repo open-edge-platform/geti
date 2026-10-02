@@ -428,7 +428,7 @@ COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STA
 
 # Optionally strip the model manifests of AGPL-3.0 licensed models
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        grep -rl '^license: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+        grep -rliF 'AGPL-3.0' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
 
 ######################
@@ -452,7 +452,7 @@ COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STA
 
 # Optionally strip the model manifests of AGPL-3.0 licensed models
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        grep -rl '^license: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+        grep -rliF 'AGPL-3.0' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
 
 #######################
@@ -495,5 +495,5 @@ COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STA
 
 # Optionally strip the model manifests of AGPL-3.0 licensed models
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        grep -rl '^license: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+        grep -rliF 'AGPL-3.0' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
