@@ -1086,14 +1086,10 @@
         }
     },
     "jobs": {
+        "title": "Lavori",
         "allProjects": "Tutti i progetti",
         "currentProjectLabel": "{{name}} (attuale)",
         "projectsSection": "Progetti",
-        "title": {
-            "all": "Processi di tutti i progetti",
-            "current": "Processi del progetto attuale",
-            "named": "Processi del progetto {{project}}"
-        },
         "tabs": {
             "all": "Tutti",
             "finished": "Completati"

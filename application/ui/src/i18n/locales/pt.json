@@ -1086,14 +1086,10 @@
         }
     },
     "jobs": {
+        "title": "Tarefas",
         "allProjects": "Todos os projetos",
         "currentProjectLabel": "{{name}} (atual)",
         "projectsSection": "Projetos",
-        "title": {
-            "all": "Tarefas de todos os projetos",
-            "current": "Tarefas do projeto atual",
-            "named": "Tarefas do projeto {{project}}"
-        },
         "tabs": {
             "all": "Todas",
             "finished": "Concluídas"

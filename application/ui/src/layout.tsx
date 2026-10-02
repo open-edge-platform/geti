@@ -71,15 +71,15 @@ const Header = () => {
                 </TabList>
 
                 <Flex gap={'size-200'} alignItems={'center'}>
-                    <Suspense fallback={<Loading size='S' mode='inline' />}>
-                        <JobsButton />
-                    </Suspense>
-
                     <Suspense fallback={<Loading />}>
                         <ProjectsListPanel />
                     </Suspense>
 
                     <Divider orientation={'vertical'} size={'S'} />
+
+                    <Suspense fallback={<Loading size='S' mode='inline' />}>
+                        <JobsButton />
+                    </Suspense>
 
                     <Preferences />
                 </Flex>

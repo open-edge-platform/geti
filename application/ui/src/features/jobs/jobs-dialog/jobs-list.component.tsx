@@ -10,14 +10,14 @@ import { JOB_GRID_COLUMNS, JobRow } from './job-row.component';
 
 import classes from './jobs-dialog.module.scss';
 
-interface JobsListProps {
+type JobsListProps = {
     jobs: ModelJob[];
     isAllProjects: boolean;
     showStatusBadge: boolean;
     projectName: (projectId: string) => string;
     architectureName: (architectureId: string) => string;
     onViewLogs: (job: ModelJob) => void;
-}
+};
 
 export const JobsList = ({
     jobs,

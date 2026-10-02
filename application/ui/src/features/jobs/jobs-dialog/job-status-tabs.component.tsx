@@ -7,11 +7,11 @@ import { Flex, Item, TabList, Tabs, Text } from '@geti-ui/ui';
 import type { StatusGroup } from '../utils';
 import { STATUS_BADGE, TONE, ToneBadge } from './job-status-badge.component';
 
-interface JobStatusTabsProps {
+type JobStatusTabsProps = {
     counts: Record<StatusGroup, number>;
     selected: StatusGroup;
     onChange: (group: StatusGroup) => void;
-}
+};
 
 const TABS = [
     { group: 'all', labelKey: 'jobs.tabs.all', tone: TONE.blue },

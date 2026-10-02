@@ -3,7 +3,7 @@
 
 import { BottomProgressBar } from '@/components/bottom-progress-bar/bottom-progress-bar.component';
 import { useTranslation } from '@/i18n';
-import { Flex, Grid, Text } from '@geti-ui/ui';
+import { Flex, Grid, Loading, Text } from '@geti-ui/ui';
 
 import { formatDateTime } from '../../../shared/date-utils';
 import { formatElapsed, getStatusGroup, type ModelJob } from '../utils';
@@ -19,17 +19,17 @@ const JOB_TYPE_KEY = {
     quantize: 'jobs.type.quantize',
 } as const satisfies Record<ModelJob['job_type'], string>;
 
-interface JobRowProps {
+type JobRowProps = {
     job: ModelJob;
     showStatusBadge: boolean;
     projectName?: string;
     architectureName: string;
     onViewLogs: () => void;
-}
+};
 
 export const JobRow = ({ job, showStatusBadge, projectName, architectureName, onViewLogs }: JobRowProps) => {
     const { t } = useTranslation();
-    const isRunning = getStatusGroup(job.status) === 'running';
+    const isRunning = getStatusGroup(job.status) === 'running' && job.progress > 0;
     const device = 'device' in job.metadata ? job.metadata.device.name : '—';
 
     const meta = job.started_at
@@ -48,7 +48,10 @@ export const JobRow = ({ job, showStatusBadge, projectName, architectureName, on
                     <Text UNSAFE_className={classes.modelName}>{job.metadata.model.name}</Text>
                     {showStatusBadge && <JobStatusBadge status={job.status} />}
                 </Flex>
-                <Text UNSAFE_className={classes.metaText}>{meta.filter(Boolean).join(' · ')}</Text>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <Text UNSAFE_className={classes.metaText}>{meta.filter(Boolean).join(' · ')}</Text>
+                    {job.progress === 0 && <Loading size={'S'} mode={'inline'} />}
+                </div>
                 {job.message && <Text UNSAFE_className={classes.messageText}>{job.message}</Text>}
                 {job.error && <Text UNSAFE_className={classes.errorText}>{job.error}</Text>}
             </Flex>
