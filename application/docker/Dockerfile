@@ -429,14 +429,7 @@ COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STA
 
 # Optionally strip the model manifests of AGPL-3.0 licensed models.
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        find /application/backend/app/supported_models/manifests -type f -print0 | \
-        while IFS= read -r -d '' manifest; do \
-            if grep -Eq '^[[:space:]]*license:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest" || \
-               { grep -Eq '^[[:space:]]*license:[[:space:]]*$' "$manifest" && \
-                 grep -Eq '^[[:space:]]*name:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest"; }; then \
-                rm -v "$manifest"; \
-            fi; \
-        done; \
+        grep -rliF 'AGPL-3.0' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
 
 ######################
@@ -460,14 +453,7 @@ COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STA
 
 # Optionally strip the model manifests of AGPL-3.0 licensed models.
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        find /application/backend/app/supported_models/manifests -type f -print0 | \
-        while IFS= read -r -d '' manifest; do \
-            if grep -Eq '^[[:space:]]*license:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest" || \
-               { grep -Eq '^[[:space:]]*license:[[:space:]]*$' "$manifest" && \
-                 grep -Eq '^[[:space:]]*name:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest"; }; then \
-                rm -v "$manifest"; \
-            fi; \
-        done; \
+        grep -rliF 'AGPL-3.0' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
 
 #######################
@@ -510,12 +496,5 @@ COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STA
 
 # Optionally strip the model manifests of AGPL-3.0 licensed models.
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        find /application/backend/app/supported_models/manifests -type f -print0 | \
-        while IFS= read -r -d '' manifest; do \
-            if grep -Eq '^[[:space:]]*license:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest" || \
-               { grep -Eq '^[[:space:]]*license:[[:space:]]*$' "$manifest" && \
-                 grep -Eq '^[[:space:]]*name:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest"; }; then \
-                rm -v "$manifest"; \
-            fi; \
-        done; \
+        grep -rliF 'AGPL-3.0' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
