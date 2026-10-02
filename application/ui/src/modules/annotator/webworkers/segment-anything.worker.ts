@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { buildSegmentAnythingInstance } from '@geti-ui/smart-tools/segment-anything';
-import { setOrtWasmPaths } from '@geti-ui/smart-tools/utils';
+import { sessionParams, setOrtWasmPaths } from '@geti-ui/smart-tools/utils';
 import { expose, proxy } from 'comlink';
 
 import type { SegmentAnythingWorkerApi } from './segment-anything.worker.interface';
@@ -19,8 +19,51 @@ import './ort-session-params';
 // Must run before any SAM session is created.
 setOrtWasmPaths(`${process.env.ASSET_PREFIX}/ort/`);
 
+const WEBGPU_PROBE_TIMEOUT_MS = 5_000;
+
+// The TS DOM lib doesn't ship WebGPU types; this is the subset the probe needs.
+type WebGpuNavigator = {
+    gpu?: {
+        requestAdapter: () => Promise<{ requestDevice: () => Promise<{ destroy: () => void }> } | null>;
+    };
+};
+
+// ORT already skips WebGPU when there's no adapter, but awaits a hung driver forever.
+const canUseWebGpu = async (): Promise<boolean> => {
+    const { gpu } = navigator as WebGpuNavigator;
+
+    if (gpu === undefined) {
+        return false;
+    }
+
+    const probe = async () => {
+        const adapter = await gpu.requestAdapter();
+
+        if (adapter === null) {
+            return false;
+        }
+
+        (await adapter.requestDevice()).destroy();
+
+        return true;
+    };
+
+    try {
+        return await Promise.race([
+            probe(),
+            new Promise<boolean>((resolve) => setTimeout(() => resolve(false), WEBGPU_PROBE_TIMEOUT_MS)),
+        ]);
+    } catch {
+        return false;
+    }
+};
+
 const WorkerApi: SegmentAnythingWorkerApi = {
-    build: async () => {
+    build: async ({ cpuOnly = false } = {}) => {
+        if (sessionParams.executionProviders.includes('webgpu') && (cpuOnly || !(await canUseWebGpu()))) {
+            sessionParams.executionProviders = ['cpu'];
+        }
+
         const instance = await buildSegmentAnythingInstance();
 
         return proxy(instance);

@@ -6,8 +6,8 @@
 // runs the decoder, which is far lighter than the encoder used to be.
 //
 // Tauri overrides these via `sam-timeouts.tauri.ts` (resolved by the
-// `.tauri.*` extension list in rsbuild.config.ts) because WKWebView/WebView2
-// either do not support WebGPU or fall back to CPU.
+// `.tauri.*` extension list in rsbuild.config.ts) because Tauri runs ORT
+// single-threaded, which is slow whenever WebGPU is unavailable.
 
 export const SAM_DECODER_TIMEOUT_MS = 20_000;
 export const SAM_WORKER_BUILD_TIMEOUT_MS = 10_000;

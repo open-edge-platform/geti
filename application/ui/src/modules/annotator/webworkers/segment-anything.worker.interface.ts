@@ -6,6 +6,10 @@ import type { ProxyMarked } from 'comlink';
 
 export type SegmentAnythingWorkerInstance = SegmentAnythingModelWrapper & ProxyMarked;
 
+export type SegmentAnythingWorkerBuildOptions = {
+    cpuOnly?: boolean;
+};
+
 export type SegmentAnythingWorkerApi = {
-    build: () => Promise<SegmentAnythingWorkerInstance>;
+    build: (options?: SegmentAnythingWorkerBuildOptions) => Promise<SegmentAnythingWorkerInstance>;
 };

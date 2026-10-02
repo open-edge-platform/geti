@@ -5,7 +5,7 @@ import { fetchClient } from '@/api';
 import type { Media } from '@/api/types';
 import { i18n } from '@/i18n';
 import { EncodingOutput, InvalidEncodingError, parseEncoding } from '@geti-ui/smart-tools/segment-anything';
-import { queryOptions, skipToken, useQuery, type QueryKey } from '@tanstack/react-query';
+import { queryOptions, skipToken, useQuery, useQueryClient, type QueryKey } from '@tanstack/react-query';
 import { Remote, wrap } from 'comlink';
 import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
@@ -29,6 +29,57 @@ import {
 import { InteractiveAnnotationPoint } from './segment-anything.interface';
 
 type SegmentAnythingRemoteInstance = Remote<SegmentAnythingWorkerInstance>;
+type SegmentAnythingWorkerData = { worker: Worker; instance: SegmentAnythingRemoteInstance };
+
+const SEGMENT_ANYTHING_WORKER_QUERY_KEY: QueryKey = ['workers', 'SEGMENT_ANYTHING'];
+
+// Once a WebGPU-backed worker has failed, every worker for the rest of the page is CPU-only.
+let forceCpu = false;
+
+const spawnSegmentAnythingWorker = async (signal: AbortSignal, cpuOnly: boolean) => {
+    const worker = new Worker(new URL('../../webworkers/segment-anything.worker', import.meta.url), {
+        type: 'module',
+    });
+    // Terminate the worker if the query is cancelled (e.g. annotator unmounts)
+    // before build/init resolve, so we don't leak the in-flight worker.
+    //
+    // CRITICAL: pass an arrow function, NOT `worker.terminate` directly.
+    // addEventListener invokes the listener with `this = signal`, and
+    // `Worker.prototype.terminate` requires `this` to be a Worker — it
+    // throws "Illegal invocation" silently and the worker is never
+    // killed. With React StrictMode double-mounting effects (or any
+    // transient cancellation), every cycle leaked a fresh worker, each
+    // of which independently re-fetched opencv (~1MB), the ort bundle,
+    // ort wasm, and the SAM `.onnx` models. That was the dominant
+    // source of the "ort/opencv fetched 6 times" symptom.
+    signal.addEventListener('abort', () => worker.terminate(), { once: true });
+
+    try {
+        const samWorker = wrap<SegmentAnythingWorkerApi>(worker);
+        const instance = await executeWithTimeout(
+            samWorker.build({ cpuOnly }),
+            i18n.t('annotator.tools.autoSegmentation.operations.workerBuild'),
+            SAM_WORKER_BUILD_TIMEOUT_MS
+        );
+
+        // Only the decoder runs locally; image embeddings come from the backend.
+        await executeWithTimeout(
+            instance.init('SEGMENT_ANYTHING_DECODER'),
+            i18n.t('annotator.tools.autoSegmentation.operations.workerInit'),
+            SAM_WORKER_INIT_TIMEOUT_MS
+        );
+
+        if (signal.aborted) {
+            throw signal.reason;
+        }
+
+        return { worker, instance };
+    } catch (error) {
+        worker.terminate();
+
+        throw error;
+    }
+};
 
 // `gcTime: Infinity` is critical: the default 5-min gc would evict the worker
 // entry whenever SAM is unmounted (switching tools/projects), causing the
@@ -39,50 +90,19 @@ type SegmentAnythingRemoteInstance = Remote<SegmentAnythingWorkerInstance>;
 // lifetime of the page reuses the same worker (and its resident sessions)
 // across every mount.
 const segmentAnythingWorkerQueryOptions = (enabled = true) =>
-    queryOptions<{ worker: Worker; instance: SegmentAnythingRemoteInstance }>({
-        queryKey: ['workers', 'SEGMENT_ANYTHING'],
+    queryOptions<SegmentAnythingWorkerData>({
+        queryKey: SEGMENT_ANYTHING_WORKER_QUERY_KEY,
         queryFn: async ({ signal }) => {
-            const worker = new Worker(new URL('../../webworkers/segment-anything.worker', import.meta.url), {
-                type: 'module',
-            });
-            // Terminate the worker if the query is cancelled (e.g. annotator unmounts)
-            // before build/init resolve, so we don't leak the in-flight worker.
-            //
-            // CRITICAL: pass an arrow function, NOT `worker.terminate` directly.
-            // addEventListener invokes the listener with `this = signal`, and
-            // `Worker.prototype.terminate` requires `this` to be a Worker — it
-            // throws "Illegal invocation" silently and the worker is never
-            // killed. With React StrictMode double-mounting effects (or any
-            // transient cancellation), every cycle leaked a fresh worker, each
-            // of which independently re-fetched opencv (~1MB), the ort bundle,
-            // ort wasm, and the SAM `.onnx` models. That was the dominant
-            // source of the "ort/opencv fetched 6 times" symptom.
-            signal.addEventListener('abort', () => worker.terminate(), { once: true });
-
             try {
-                const samWorker = wrap<SegmentAnythingWorkerApi>(worker);
-                const instance = await executeWithTimeout(
-                    samWorker.build(),
-                    i18n.t('annotator.tools.autoSegmentation.operations.workerBuild'),
-                    SAM_WORKER_BUILD_TIMEOUT_MS
-                );
-
-                // Only the decoder runs locally; image embeddings come from the backend.
-                await executeWithTimeout(
-                    instance.init('SEGMENT_ANYTHING_DECODER'),
-                    i18n.t('annotator.tools.autoSegmentation.operations.workerInit'),
-                    SAM_WORKER_INIT_TIMEOUT_MS
-                );
-
-                if (signal.aborted) {
-                    throw signal.reason;
+                return await spawnSegmentAnythingWorker(signal, forceCpu);
+            } catch (error) {
+                if (forceCpu || signal.aborted) {
+                    throw error;
                 }
 
-                return { worker, instance };
-            } catch (error) {
-                worker.terminate();
+                forceCpu = true;
 
-                throw error;
+                return spawnSegmentAnythingWorker(signal, true);
             }
         },
         staleTime: Infinity,
@@ -206,6 +226,20 @@ const useDecoderOutputType = () => {
 
 const useDecodingFn = (model: SegmentAnythingRemoteInstance | undefined, encoding: EncodingOutput | undefined) => {
     const decoderOutput = useDecoderOutputType();
+    const queryClient = useQueryClient();
+
+    // A failed decode on a live worker usually means the GPU device was lost; rebuild once on CPU.
+    const rebuildWorkerOnCpu = (failedModel: SegmentAnythingRemoteInstance) => {
+        const current = queryClient.getQueryData<SegmentAnythingWorkerData>(SEGMENT_ANYTHING_WORKER_QUERY_KEY);
+
+        if (forceCpu || current?.instance !== failedModel) {
+            return;
+        }
+
+        forceCpu = true;
+        current.worker.terminate();
+        void queryClient.resetQueries({ queryKey: SEGMENT_ANYTHING_WORKER_QUERY_KEY, exact: true });
+    };
 
     // TODO: look into returning a new "decoder model" instance that already has the encoding data
     // stored in memory, to reduce  memory usage
@@ -222,21 +256,27 @@ const useDecodingFn = (model: SegmentAnythingRemoteInstance | undefined, encodin
             return [];
         }
 
-        const { shapes } = await executeWithTimeout(
-            model.processDecoder(encoding, {
-                points,
-                boxes: [],
-                // Decoding runs against the already-computed `encoding`; no image is needed.
-                image: undefined,
-                outputConfig: {
-                    type: decoderOutput,
-                },
-            }),
-            i18n.t('annotator.tools.autoSegmentation.operations.decoder'),
-            SAM_DECODER_TIMEOUT_MS
-        );
+        try {
+            const { shapes } = await executeWithTimeout(
+                model.processDecoder(encoding, {
+                    points,
+                    boxes: [],
+                    // Decoding runs against the already-computed `encoding`; no image is needed.
+                    image: undefined,
+                    outputConfig: {
+                        type: decoderOutput,
+                    },
+                }),
+                i18n.t('annotator.tools.autoSegmentation.operations.decoder'),
+                SAM_DECODER_TIMEOUT_MS
+            );
 
-        return shapes.map(convertToolShapeToGetiShape);
+            return shapes.map(convertToolShapeToGetiShape);
+        } catch (error) {
+            rebuildWorkerOnCpu(model);
+
+            throw error;
+        }
     };
 };
 
