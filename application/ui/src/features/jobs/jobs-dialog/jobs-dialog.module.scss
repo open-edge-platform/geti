@@ -28,6 +28,12 @@
     color: var(--spectrum-global-color-gray-700);
 }
 
+.metaRow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spectrum-global-dimension-size-100);
+}
+
 .errorText {
     font-size: var(--spectrum-global-dimension-font-size-75);
     color: var(--spectrum-semantic-negative-color-text-small);
