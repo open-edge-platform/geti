@@ -427,9 +427,16 @@ RUN uv pip install --no-deps --force-reinstall /dist/av-*.whl && \
 COPY --link --chown=${UID}:${UID} application/backend/app /application/backend/app
 COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
 
-# Optionally strip the model manifests of AGPL-3.0 licensed models
+# Optionally strip the model manifests of AGPL-3.0 licensed models.
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        grep -rl '^  name: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+        find /application/backend/app/supported_models/manifests -type f -print0 | \
+        while IFS= read -r -d '' manifest; do \
+            if grep -Eq '^[[:space:]]*license:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest" || \
+               { grep -Eq '^[[:space:]]*license:[[:space:]]*$' "$manifest" && \
+                 grep -Eq '^[[:space:]]*name:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest"; }; then \
+                rm -v "$manifest"; \
+            fi; \
+        done; \
     fi
 
 ######################
@@ -451,9 +458,16 @@ RUN uv pip install --no-deps --force-reinstall /dist/av-*.whl && \
 COPY --link --chown=${UID}:${UID} application/backend/app /application/backend/app
 COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
 
-# Optionally strip the model manifests of AGPL-3.0 licensed models
+# Optionally strip the model manifests of AGPL-3.0 licensed models.
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        grep -rl '^  name: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+        find /application/backend/app/supported_models/manifests -type f -print0 | \
+        while IFS= read -r -d '' manifest; do \
+            if grep -Eq '^[[:space:]]*license:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest" || \
+               { grep -Eq '^[[:space:]]*license:[[:space:]]*$' "$manifest" && \
+                 grep -Eq '^[[:space:]]*name:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest"; }; then \
+                rm -v "$manifest"; \
+            fi; \
+        done; \
     fi
 
 #######################
@@ -494,7 +508,14 @@ RUN uv pip install --no-deps --force-reinstall /dist/av-*.whl && \
 COPY --link --chown=${UID}:${UID} application/backend/app /application/backend/app
 COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
 
-# Optionally strip the model manifests of AGPL-3.0 licensed models
+# Optionally strip the model manifests of AGPL-3.0 licensed models.
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        grep -rl '^  name: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+        find /application/backend/app/supported_models/manifests -type f -print0 | \
+        while IFS= read -r -d '' manifest; do \
+            if grep -Eq '^[[:space:]]*license:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest" || \
+               { grep -Eq '^[[:space:]]*license:[[:space:]]*$' "$manifest" && \
+                 grep -Eq '^[[:space:]]*name:[[:space:]]*AGPL-3\.0[[:space:]]*$' "$manifest"; }; then \
+                rm -v "$manifest"; \
+            fi; \
+        done; \
     fi
