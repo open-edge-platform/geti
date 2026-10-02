@@ -41,11 +41,23 @@ const isPointInShape = (shape: AnnotationDTO['shape'], { x, y }: { x: number; y:
         return x >= shape.x && x <= shape.x + shape.width && y >= shape.y && y <= shape.y + shape.height;
     }
 
-    if (shape.type === 'polygon') {
-        const xs = shape.points.map((point) => point.x);
-        const ys = shape.points.map((point) => point.y);
+        const points = shape.points;
+        let inside = false;
 
-        return x >= Math.min(...xs) && x <= Math.max(...xs) && y >= Math.min(...ys) && y <= Math.max(...ys);
+        for (let index = 0, previous = points.length - 1; index < points.length; previous = index++) {
+            const currentPoint = points[index];
+            const previousPoint = points[previous];
+            const intersects =
+                currentPoint.y > y !== previousPoint.y > y &&
+                x <
+                    ((previousPoint.x - currentPoint.x) * (y - currentPoint.y)) /
+                        (previousPoint.y - currentPoint.y) +
+                        currentPoint.x;
+
+            if (intersects) inside = !inside;
+        }
+
+        return inside;
     }
 
     return false;
