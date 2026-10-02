@@ -3,8 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # If set to 1, uninstalls ultralytics and its AGPL-licensed dependencies after installation.
-# TODO: revert to 0 before merging - temporarily set to 1 to validate the fix in CI.
-ARG EXCLUDE_AGPL_MODELS=1
+ARG EXCLUDE_AGPL_MODELS=0
 
 ##############
 # Backend base
@@ -427,7 +426,7 @@ RUN uv pip install --no-deps --force-reinstall /dist/av-*.whl && \
 COPY --link --chown=${UID}:${UID} application/backend/app /application/backend/app
 COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
 
-# Optionally strip the model manifests of AGPL-3.0 licensed models.
+# Optionally strip the model manifests of AGPL-3.0 licensed models
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
         grep -rliF 'AGPL-3.0' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
@@ -451,7 +450,7 @@ RUN uv pip install --no-deps --force-reinstall /dist/av-*.whl && \
 COPY --link --chown=${UID}:${UID} application/backend/app /application/backend/app
 COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
 
-# Optionally strip the model manifests of AGPL-3.0 licensed models.
+# Optionally strip the model manifests of AGPL-3.0 licensed models
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
         grep -rliF 'AGPL-3.0' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
@@ -494,7 +493,7 @@ RUN uv pip install --no-deps --force-reinstall /dist/av-*.whl && \
 COPY --link --chown=${UID}:${UID} application/backend/app /application/backend/app
 COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STATIC_FILES_DIR}
 
-# Optionally strip the model manifests of AGPL-3.0 licensed models.
+# Optionally strip the model manifests of AGPL-3.0 licensed models
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
         grep -rliF 'AGPL-3.0' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
