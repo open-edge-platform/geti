@@ -12,7 +12,12 @@ import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
 import { findGroupByKey } from '../../model-listing/model-training-parameters/utils';
 import { deepReplaceParameters } from '../advanced-settings/utils';
-import { CURRENT_DATASET_SOURCE_ID, TrainModelContextProps } from '../train-model-provider.component';
+import {
+    CURRENT_DATASET_SOURCE_ID,
+    getRevisionSourceId,
+    getViewSourceId,
+    TrainModelContextProps,
+} from '../train-model-provider.component';
 import { mockedTrainingConfiguration } from './mocks';
 import { useTrainModel } from './use-train-model';
 import { getTrainingConfigurationUpdatePayload } from './utils';
@@ -165,11 +170,16 @@ describe('useTrainModel', () => {
 
             mockTrainModelState.mockReturnValue({
                 ...DEFAULT_STATE,
-                selectedDatasetSourceId: 'revision-dataset-rev-1',
+                selectedDatasetSourceId: getRevisionSourceId(datasetRevisionId),
                 selectedModelRevisionId: 'model-entry-1',
                 datasetSources: [
                     { id: CURRENT_DATASET_SOURCE_ID, name: 'Use entire dataset', kind: 'current', value: null },
-                    { id: 'revision-dataset-rev-1', name: 'Rev 1', kind: 'revision', value: datasetRevisionId },
+                    {
+                        id: getRevisionSourceId(datasetRevisionId),
+                        name: 'Rev 1',
+                        kind: 'revision',
+                        value: datasetRevisionId,
+                    },
                 ],
                 modelRevisions: [
                     {
@@ -216,10 +226,15 @@ describe('useTrainModel', () => {
 
             mockTrainModelState.mockReturnValue({
                 ...DEFAULT_STATE,
-                selectedDatasetSourceId: 'view-dataset-view-1',
+                selectedDatasetSourceId: getViewSourceId(datasetViewId),
                 datasetSources: [
                     { id: CURRENT_DATASET_SOURCE_ID, name: 'Use entire dataset', kind: 'current', value: null },
-                    { id: 'view-dataset-view-1', name: 'Collection One', kind: 'view', value: datasetViewId },
+                    {
+                        id: getViewSourceId(datasetViewId),
+                        name: 'Collection One',
+                        kind: 'view',
+                        value: datasetViewId,
+                    },
                 ],
             });
 

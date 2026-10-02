@@ -919,7 +919,7 @@
                 },
                 "selectDataset": {
                     "label": "Selecionar dataset",
-                    "useCurrentDataset": "Utilizar dataset completo",
+                    "useEntireDataset": "Utilizar dataset completo",
                     "helpTitle": "Selecionar um dataset",
                     "helpDescription": "Escolha os dados a utilizar para o treino. Selecione \"Utilizar dataset completo\" para treinar com a versão mais recente de todos os dados (o que vê na página \"Dataset\"). Selecione uma vista do dataset para treinar apenas com a multimédia atribuída a essa vista. Selecione uma revisão do dataset para treinar exatamente com os mesmos dados (multimédia e anotações) de outro modelo.",
                     "sections": {

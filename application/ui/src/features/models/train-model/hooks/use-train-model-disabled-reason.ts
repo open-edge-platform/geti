@@ -22,37 +22,40 @@ export const useTrainModelDisabledReason = () => {
     const datasetViewId =
         selectedDatasetSource?.kind === 'view' ? (selectedDatasetSource.value ?? undefined) : undefined;
 
+    // Only the totals are needed, so a single item per page is enough.
+    const countOptions = { datasetViewId, limit: 1, enabled: !isRevisionSelected };
+
     const { totalCount, isPending: isTotalPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
-        datasetViewId,
+        ...countOptions,
     });
     const { totalCount: trainingSubsetSize, isPending: isTrainingPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
         subsets: ['training'],
-        datasetViewId,
+        ...countOptions,
     });
     const { totalCount: testingSubsetSize, isPending: isTestingPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
         subsets: ['testing'],
-        datasetViewId,
+        ...countOptions,
     });
     const { totalCount: validationSubsetSize, isPending: isValidationPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
         subsets: ['validation'],
-        datasetViewId,
+        ...countOptions,
     });
     const { totalCount: reviewedUnassignedSubsetSize, isPending: isReviewedUnassignedPending } = useGetDatasetItems({
         annotationStatus: 'with_annotations',
         subsets: ['unassigned'],
-        datasetViewId,
+        ...countOptions,
     });
     const { totalCount: unassignedSubsetSize, isPending: isUnassignedPending } = useGetDatasetItems({
         subsets: ['unassigned'],
-        datasetViewId,
+        ...countOptions,
     });
 
     if (isRevisionSelected) {
-        return { reason: undefined };
+        return { reason: undefined, isPending: false };
     }
 
     if (
@@ -63,7 +66,7 @@ export const useTrainModelDisabledReason = () => {
         isReviewedUnassignedPending ||
         isUnassignedPending
     ) {
-        return { reason: undefined };
+        return { reason: undefined, isPending: true };
     }
 
     if (totalCount < MIN_NUMBER_OF_ANNOTATED_ITEMS) {
@@ -73,6 +76,7 @@ export const useTrainModelDisabledReason = () => {
                     ? 'models.training.validation.notEnoughAnnotations'
                     : 'models.training.validation.notEnoughAnnotationsInView'
             ),
+            isPending: false,
         };
     }
 
@@ -85,7 +89,7 @@ export const useTrainModelDisabledReason = () => {
     const emptySubsets = subsetSizes.filter(({ value }) => value === 0);
 
     if (emptySubsets.length === 0 || emptySubsets.length <= reviewedUnassignedSubsetSize) {
-        return { reason: undefined };
+        return { reason: undefined, isPending: false };
     }
 
     const emptySubsetNames = emptySubsets.map(({ label }) => label);
@@ -117,5 +121,6 @@ export const useTrainModelDisabledReason = () => {
 
     return {
         reason: t('models.training.validation.emptySubsetsReason', { subsetClause, assignmentDetail }),
+        isPending: false,
     };
 };

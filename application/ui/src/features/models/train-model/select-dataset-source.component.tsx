@@ -15,7 +15,7 @@ const SECTION_TITLE_KEYS = {
     revision: 'models.training.setup.selectDataset.sections.revisions',
 } as const satisfies Record<DatasetSource['kind'], string | undefined>;
 
-export const SelectDatasetRevision = () => {
+export const SelectDatasetSource = () => {
     const { t } = useTranslation();
     const { datasetSources, selectedDatasetSourceId, onSelectDatasetSourceId } = useTrainModelState();
 

@@ -97,7 +97,7 @@ describe('RunningJobRow', () => {
         // The revision name only appears once the model behind the job has been fetched.
         expect(await screen.findByText(datasetRevision.name)).toBeVisible();
         const datasetBadge = screen.getByTestId('dataset-count');
-        expect(within(datasetBadge).getByText(datasetRevision.item_counts?.total?.toString() ?? ''));
+        expect(within(datasetBadge).getByText(datasetRevision.item_counts?.total?.toString() ?? '')).toBeVisible();
 
         const labelsBadge = screen.getByTestId('labels-count');
         const labelSchemaRevision = mockModel.training_info.label_schema_revision ?? {};
@@ -105,7 +105,7 @@ describe('RunningJobRow', () => {
             'labels' in labelSchemaRevision && Array.isArray(labelSchemaRevision.labels)
                 ? labelSchemaRevision.labels.length
                 : '';
-        expect(within(labelsBadge).getByText(labelsCount));
+        expect(within(labelsBadge).getByText(labelsCount)).toBeVisible();
     });
 
     it('shows the dataset view a training job was started on, before its revision exists', async () => {

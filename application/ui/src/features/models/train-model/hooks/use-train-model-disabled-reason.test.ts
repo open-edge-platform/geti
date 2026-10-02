@@ -4,7 +4,12 @@
 import { renderHook } from 'test-utils/render';
 import { vi } from 'vitest';
 
-import { CURRENT_DATASET_SOURCE_ID, type TrainModelContextProps } from '../train-model-provider.component';
+import {
+    CURRENT_DATASET_SOURCE_ID,
+    getRevisionSourceId,
+    getViewSourceId,
+    type TrainModelContextProps,
+} from '../train-model-provider.component';
 import { useTrainModelDisabledReason } from './use-train-model-disabled-reason';
 
 const mockUseGetDatasetItems = vi.hoisted(() => vi.fn());
@@ -13,12 +18,15 @@ vi.mock('hooks/use-get-dataset-items.hook', () => ({
     useGetDatasetItems: mockUseGetDatasetItems,
 }));
 
+const VIEW_SOURCE_ID = getViewSourceId('collection-one');
+const REVISION_SOURCE_ID = getRevisionSourceId('rev-1');
+
 const CURRENT_DATASET_STATE: Partial<TrainModelContextProps> = {
     selectedDatasetSourceId: CURRENT_DATASET_SOURCE_ID,
     datasetSources: [
         { id: CURRENT_DATASET_SOURCE_ID, name: 'Use entire dataset', kind: 'current', value: null },
-        { id: 'view-collection-one', name: 'Collection One', kind: 'view', value: 'collection-one' },
-        { id: 'revision-rev-1', name: 'Dataset 1', kind: 'revision', value: 'rev-1' },
+        { id: VIEW_SOURCE_ID, name: 'Collection One', kind: 'view', value: 'collection-one' },
+        { id: REVISION_SOURCE_ID, name: 'Dataset 1', kind: 'revision', value: 'rev-1' },
     ],
 };
 
@@ -71,6 +79,7 @@ describe('useTrainModelDisabledReason', () => {
 
             renderHook(() => useTrainModelDisabledReason());
 
+            expect(mockUseGetDatasetItems).toHaveBeenCalled();
             mockUseGetDatasetItems.mock.calls.forEach(([options]) => {
                 expect(options.datasetViewId).toBeUndefined();
             });
@@ -79,7 +88,7 @@ describe('useTrainModelDisabledReason', () => {
         it('counts only the items of the selected dataset view', () => {
             mockTrainModelState.mockReturnValue({
                 ...CURRENT_DATASET_STATE,
-                selectedDatasetSourceId: 'view-collection-one',
+                selectedDatasetSourceId: VIEW_SOURCE_ID,
             });
             mockDatasetItems({
                 total: 3,
@@ -92,6 +101,7 @@ describe('useTrainModelDisabledReason', () => {
 
             renderHook(() => useTrainModelDisabledReason());
 
+            expect(mockUseGetDatasetItems).toHaveBeenCalled();
             mockUseGetDatasetItems.mock.calls.forEach(([options]) => {
                 expect(options.datasetViewId).toBe('collection-one');
             });
@@ -100,7 +110,7 @@ describe('useTrainModelDisabledReason', () => {
         it('reports a view-specific reason when the selected view has too few annotated items', () => {
             mockTrainModelState.mockReturnValue({
                 ...CURRENT_DATASET_STATE,
-                selectedDatasetSourceId: 'view-collection-one',
+                selectedDatasetSourceId: VIEW_SOURCE_ID,
             });
             mockDatasetItems({
                 total: 2,
@@ -119,27 +129,27 @@ describe('useTrainModelDisabledReason', () => {
             );
         });
 
-        it('never blocks training on an existing dataset revision', () => {
+        it('never blocks training on an existing dataset revision, and skips the count queries', () => {
             mockTrainModelState.mockReturnValue({
                 ...CURRENT_DATASET_STATE,
-                selectedDatasetSourceId: 'revision-rev-1',
+                selectedDatasetSourceId: REVISION_SOURCE_ID,
             });
-            mockDatasetItems({
-                total: 0,
-                training: 0,
-                testing: 0,
-                validation: 0,
-                reviewedUnassigned: 0,
-                unassigned: 0,
-            });
+            mockDatasetItems(
+                { total: 0, training: 0, testing: 0, validation: 0, reviewedUnassigned: 0, unassigned: 0 },
+                true
+            );
 
             const { result } = renderHook(() => useTrainModelDisabledReason());
 
-            expect(result.current.reason).toBeUndefined();
+            expect(result.current).toEqual({ reason: undefined, isPending: false });
+            expect(mockUseGetDatasetItems).toHaveBeenCalled();
+            mockUseGetDatasetItems.mock.calls.forEach(([options]) => {
+                expect(options.enabled).toBe(false);
+            });
         });
     });
 
-    it('returns undefined reason when queries are pending', () => {
+    it('returns undefined reason and reports pending when queries are pending', () => {
         mockDatasetItems(
             { total: 0, training: 0, testing: 0, validation: 0, reviewedUnassigned: 0, unassigned: 0 },
             true
@@ -147,7 +157,7 @@ describe('useTrainModelDisabledReason', () => {
 
         const { result } = renderHook(() => useTrainModelDisabledReason());
 
-        expect(result.current.reason).toBeUndefined();
+        expect(result.current).toEqual({ reason: undefined, isPending: true });
     });
 
     it('returns reason when total annotated items is less than 3', () => {

@@ -25,11 +25,7 @@ export const DatasetColumn = ({ datasetRevision, labelsCount, pendingDatasetName
     const formatter = useNumberFormatter();
 
     if (datasetRevision === undefined) {
-        return (
-            <Flex alignItems={'center'} justifyContent={pendingDatasetName === undefined ? 'center' : 'start'}>
-                {pendingDatasetName ?? t('common.labels.unknown')}
-            </Flex>
-        );
+        return <Flex alignItems={'center'}>{pendingDatasetName ?? t('common.labels.unknown')}</Flex>;
     }
 
     return (

@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import { createContext, Dispatch, ReactNode, SetStateAction, use, useMemo, useState } from 'react';
@@ -37,6 +37,8 @@ export type DatasetSource = {
 export const CURRENT_DATASET_SOURCE_ID = 'use-current-dataset';
 
 export const getViewSourceId = (datasetViewId: string) => `view-${datasetViewId}`;
+
+export const getRevisionSourceId = (datasetRevisionId: string) => `revision-${datasetRevisionId}`;
 
 type ModelRevisionWithValue = Pick<Model, 'id' | 'name' | 'architecture'> & { value: string | null };
 
@@ -91,7 +93,7 @@ const useDatasetSources = (): DatasetSource[] => {
         () => [
             {
                 id: CURRENT_DATASET_SOURCE_ID,
-                name: t('models.training.setup.selectDataset.useCurrentDataset'),
+                name: t('models.training.setup.selectDataset.useEntireDataset'),
                 kind: 'current' as const,
                 value: null,
             },
@@ -102,7 +104,7 @@ const useDatasetSources = (): DatasetSource[] => {
                 value: String(id),
             })) ?? []),
             ...(datasetRevisions?.map(({ id, name }) => ({
-                id: `revision-${id}`,
+                id: getRevisionSourceId(String(id)),
                 name,
                 kind: 'revision' as const,
                 value: String(id),

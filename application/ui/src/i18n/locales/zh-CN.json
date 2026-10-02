@@ -919,7 +919,7 @@
                 },
                 "selectDataset": {
                     "label": "选择数据集",
-                    "useCurrentDataset": "使用整个数据集",
+                    "useEntireDataset": "使用整个数据集",
                     "helpTitle": "选择数据集",
                     "helpDescription": "选择用于训练的数据。选择“使用整个数据集”可使用全部数据的最新版本（即“数据集”页面中所见）进行训练。选择数据集视图可仅使用分配给该视图的媒体进行训练。选择数据集版本可使用与其他模型完全相同的数据（媒体和标注）进行训练。",
                     "sections": {
