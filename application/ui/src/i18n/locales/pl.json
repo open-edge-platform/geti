@@ -923,9 +923,9 @@
                 },
                 "selectDataset": {
                     "label": "Wybierz dataset",
-                    "useCurrentDataset": "Użyj bieżącego datasetu",
+                    "useCurrentDataset": "Użyj całego datasetu",
                     "helpTitle": "Wybór datasetu",
-                    "helpDescription": "Wybierz wersję datasetu, której chcesz użyć do trenowania. Jeśli chcesz wytrenować nowy model\n                            na dokładnie tych samych danych (multimediach i adnotacjach) co inny model, wybierz odpowiednią\n                            rewizję datasetu. Natomiast jeśli chcesz trenować na najnowszej wersji\n                            danych (widocznej na stronie „dataset”), wybierz „Użyj\n                            bieżącego datasetu”."
+                    "helpDescription": "Wybierz wersję datasetu, której chcesz użyć do trenowania. Jeśli chcesz wytrenować nowy model\n                            na dokładnie tych samych danych (multimediach i adnotacjach) co inny model, wybierz odpowiednią\n                            rewizję datasetu. Natomiast jeśli chcesz trenować na najnowszej wersji\n                            danych (widocznej na stronie „dataset”), wybierz „Użyj\n                            całego datasetu”."
                 },
                 "selectModel": {
                     "label": "Wybierz wagi wejściowe",

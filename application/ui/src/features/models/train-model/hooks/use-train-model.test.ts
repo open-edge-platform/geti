@@ -26,7 +26,7 @@ const DEFAULT_STATE: Partial<TrainModelContextProps> = {
     isAdvancedSettingsMode: false,
     trainingConfiguration: mockedTrainingConfiguration,
     defaultTrainingConfiguration: mockedTrainingConfiguration,
-    datasetSources: [{ id: CURRENT_DATASET_SOURCE_ID, name: 'Use current dataset', kind: 'current', value: null }],
+    datasetSources: [{ id: CURRENT_DATASET_SOURCE_ID, name: 'Use entire dataset', kind: 'current', value: null }],
     modelRevisions: [
         { id: 'default-pre-trained-weights', name: 'Default pre-trained weights', architecture: '', value: null },
     ],
@@ -168,7 +168,7 @@ describe('useTrainModel', () => {
                 selectedDatasetSourceId: 'revision-dataset-rev-1',
                 selectedModelRevisionId: 'model-entry-1',
                 datasetSources: [
-                    { id: CURRENT_DATASET_SOURCE_ID, name: 'Use current dataset', kind: 'current', value: null },
+                    { id: CURRENT_DATASET_SOURCE_ID, name: 'Use entire dataset', kind: 'current', value: null },
                     { id: 'revision-dataset-rev-1', name: 'Rev 1', kind: 'revision', value: datasetRevisionId },
                 ],
                 modelRevisions: [
@@ -218,7 +218,7 @@ describe('useTrainModel', () => {
                 ...DEFAULT_STATE,
                 selectedDatasetSourceId: 'view-dataset-view-1',
                 datasetSources: [
-                    { id: CURRENT_DATASET_SOURCE_ID, name: 'Use current dataset', kind: 'current', value: null },
+                    { id: CURRENT_DATASET_SOURCE_ID, name: 'Use entire dataset', kind: 'current', value: null },
                     { id: 'view-dataset-view-1', name: 'Collection One', kind: 'view', value: datasetViewId },
                 ],
             });

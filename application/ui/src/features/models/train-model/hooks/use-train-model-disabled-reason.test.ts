@@ -16,7 +16,7 @@ vi.mock('hooks/use-get-dataset-items.hook', () => ({
 const CURRENT_DATASET_STATE: Partial<TrainModelContextProps> = {
     selectedDatasetSourceId: CURRENT_DATASET_SOURCE_ID,
     datasetSources: [
-        { id: CURRENT_DATASET_SOURCE_ID, name: 'Use current dataset', kind: 'current', value: null },
+        { id: CURRENT_DATASET_SOURCE_ID, name: 'Use entire dataset', kind: 'current', value: null },
         { id: 'view-collection-one', name: 'Collection One', kind: 'view', value: 'collection-one' },
         { id: 'revision-rev-1', name: 'Dataset 1', kind: 'revision', value: 'rev-1' },
     ],

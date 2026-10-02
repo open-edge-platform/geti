@@ -919,9 +919,9 @@
                 },
                 "selectDataset": {
                     "label": "Select dataset",
-                    "useCurrentDataset": "Use current dataset",
+                    "useCurrentDataset": "Use entire dataset",
                     "helpTitle": "Selecting a dataset",
-                    "helpDescription": "Choose the data to use for training. Select \"Use current dataset\" to train on the most recent version of all the data (what you see in the \"Dataset\" page). Select a dataset view to train only on the media assigned to that view. Select a dataset revision to train on the exact same data (media and annotations) as another model.",
+                    "helpDescription": "Choose the data to use for training. Select \"Use entire dataset\" to train on the most recent version of all the data (what you see in the \"Dataset\" page). Select a dataset view to train only on the media assigned to that view. Select a dataset revision to train on the exact same data (media and annotations) as another model.",
                     "sections": {
                         "views": "Dataset views",
                         "revisions": "Dataset revisions"

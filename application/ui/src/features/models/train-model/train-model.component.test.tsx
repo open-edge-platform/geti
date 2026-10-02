@@ -152,7 +152,7 @@ describe('TrainModel', () => {
             fireEvent.click(await screen.findByRole('button', { name: 'Train model' }));
 
             const picker = await screen.findByTestId('select-dataset');
-            expect(picker).toHaveTextContent('Use current dataset');
+            expect(picker).toHaveTextContent('Use entire dataset');
 
             fireEvent.click(picker);
 
@@ -167,7 +167,7 @@ describe('TrainModel', () => {
             fireEvent.click(await screen.findByTestId('select-dataset'));
 
             expect(await screen.findByRole('group', { name: 'Dataset views' })).toBeVisible();
-            expect(screen.getByRole('option', { name: 'Use current dataset' })).toBeVisible();
+            expect(screen.getByRole('option', { name: 'Use entire dataset' })).toBeVisible();
             expect(screen.queryByRole('group', { name: 'Current dataset' })).not.toBeInTheDocument();
         });
 
