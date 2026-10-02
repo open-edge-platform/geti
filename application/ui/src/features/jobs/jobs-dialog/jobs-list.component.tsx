@@ -5,7 +5,7 @@ import { useTranslation } from '@/i18n';
 import { Grid, Heading, IllustratedMessage, Text } from '@geti-ui/ui';
 
 import { ReactComponent as EmptyJobsImage } from '../../../assets/empty-dataset.svg';
-import type { ModelJob } from '../utils';
+import type { ModelJob, StatusGroup } from '../utils';
 import { JOB_GRID_COLUMNS, JobRow } from './job-row.component';
 
 import classes from './jobs-dialog.module.scss';
@@ -14,6 +14,7 @@ type JobsListProps = {
     jobs: ModelJob[];
     isAllProjects: boolean;
     showStatusBadge: boolean;
+    statusGroup: StatusGroup;
     projectName: (projectId: string) => string;
     architectureName: (architectureId: string) => string;
     onViewLogs: (job: ModelJob) => void;
@@ -23,6 +24,7 @@ export const JobsList = ({
     jobs,
     isAllProjects,
     showStatusBadge,
+    statusGroup,
     projectName,
     architectureName,
     onViewLogs,
@@ -59,7 +61,7 @@ export const JobsList = ({
             ) : (
                 <IllustratedMessage>
                     <EmptyJobsImage />
-                    <Heading>{t('jobs.emptyState')}</Heading>
+                    <Heading>{t(`jobs.emptyState.${statusGroup}`)}</Heading>
                 </IllustratedMessage>
             )}
         </div>

@@ -1113,7 +1113,14 @@
             "started": "Avviato {{time}}",
             "elapsed": "Tempo trascorso: {{time}}"
         },
-        "emptyState": "Nessun processo in questa categoria",
+        "emptyState": {
+            "all": "Nessun processo in questa categoria",
+            "running": "Nessun processo in corso",
+            "finished": "Nessun processo completato",
+            "scheduled": "Nessun processo pianificato",
+            "cancelled": "Nessun processo annullato",
+            "failed": "Nessun processo fallito"
+        },
         "actions": {
             "viewLogs": "Visualizza log"
         }
