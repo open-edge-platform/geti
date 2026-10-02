@@ -318,10 +318,11 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
         stmt = stmt.order_by(DatasetItemDB.created_at.desc()).offset(offset).limit(limit)
         return [(dataset_item, media) for (dataset_item, media) in self.db.execute(stmt).all()]
 
-    def list_unassigned_items(self, dataset_view_id: str) -> list[DatasetItemLabelDB]:
-        """List the label rows of the dataset items of a view that have no subset assigned yet."""
+    def list_unassigned_items(self, dataset_view_id: str) -> list[tuple[DatasetItemLabelDB, str | None]]:
+        """List label rows of unassigned dataset items of a view, each paired with the parent
+        video id of the underlying media (None for images and standalone media)."""
         stmt = (
-            select(DatasetItemLabelDB)
+            select(DatasetItemLabelDB, MediaDB.video_id)
             .join(DatasetItemDB, DatasetItemDB.id == DatasetItemLabelDB.dataset_item_id)
             .join(MediaDB, MediaDB.id == DatasetItemDB.id)
             .where(
@@ -330,7 +331,7 @@ class DatasetViewRepository(BaseRepository[DatasetViewDB]):
                 self._media_in_view_condition(dataset_view_id),
             )
         )
-        return list(self.db.scalars(stmt).all())
+        return [(row[0], row[1]) for row in self.db.execute(stmt).all()]
 
     def has_all_subsets_assigned(self, dataset_view_id: str) -> bool:
         """Return True if the view has at least one item in each of TRAINING, VALIDATION and TESTING subsets."""

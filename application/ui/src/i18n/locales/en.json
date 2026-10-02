@@ -58,7 +58,9 @@
             "statusUppercase": "STATUS",
             "settings": "Settings",
             "training": "Training",
+            "training_subset": "Training",
             "validation": "Validation",
+            "validation_subset": "Validation",
             "testing": "Testing",
             "unassigned": "Unassigned",
             "trainingLowercase": "training",
@@ -68,7 +70,8 @@
             "seconds": "Seconds",
             "every": "every",
             "model": "Model",
-            "labels": "Labels"
+            "labels": "Labels",
+            "language": "Language"
         },
         "viewModes": {
             "large": "Large thumbnails",
@@ -96,7 +99,8 @@
         "models": "Models",
         "modelsDescription": "Models page to visualise your models",
         "inference": "Inference",
-        "inferenceDescription": "Inference page showing live inference on your project"
+        "inferenceDescription": "Inference page showing live inference on your project",
+        "preferences": "Preferences"
     },
     "dataset": {
         "validation": {
@@ -350,6 +354,7 @@
         },
         "sources": {
             "uploadError": "Failed to upload video file.",
+            "deleteVideoError": "Failed to delete uploaded video file.",
             "list": {
                 "addSource": "Add new source"
             },

@@ -58,7 +58,9 @@
             "statusUppercase": "状态",
             "settings": "设置",
             "training": "训练",
+            "training_subset": "训练",
             "validation": "验证",
+            "validation_subset": "验证",
             "testing": "测试",
             "unassigned": "未分配",
             "trainingLowercase": "训练",
@@ -68,7 +70,8 @@
             "seconds": "秒",
             "every": "每",
             "model": "模型",
-            "labels": "标签"
+            "labels": "标签",
+            "language": "语言"
         },
         "viewModes": {
             "large": "大缩略图",
@@ -96,7 +99,8 @@
         "models": "模型",
         "modelsDescription": "模型页面，用于浏览模型",
         "inference": "推理",
-        "inferenceDescription": "推理页面，用于查看项目的实时推理效果"
+        "inferenceDescription": "推理页面，用于查看项目的实时推理效果",
+        "preferences": "首选项"
     },
     "dataset": {
         "validation": {
@@ -350,6 +354,7 @@
         },
         "sources": {
             "uploadError": "视频文件上传失败。",
+            "deleteVideoError": "已上传的视频文件删除失败。",
             "list": {
                 "addSource": "新增输入源"
             },

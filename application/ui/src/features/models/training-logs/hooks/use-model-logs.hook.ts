@@ -41,7 +41,7 @@ export const useModelLogs = (modelId: string | undefined) => {
         queryKey: getQueryKey([
             'get',
             '/api/projects/{project_id}/models/{model_id}/logs',
-            { params: { path: { project_id: projectId, model_id: modelId } } },
+            { params: { path: { project_id: projectId, model_id: modelId ?? '' } } },
         ]),
         queryFn: () => {
             assertIsNotNullable(modelId);

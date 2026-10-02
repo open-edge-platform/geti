@@ -58,7 +58,9 @@
             "statusUppercase": "ESTADO",
             "settings": "Configuración",
             "training": "Entrenamiento",
+            "training_subset": "Entrenamiento",
             "validation": "Validación",
+            "validation_subset": "Validación",
             "testing": "Prueba",
             "unassigned": "Sin asignar",
             "trainingLowercase": "entrenamiento",
@@ -68,7 +70,8 @@
             "seconds": "Segundos",
             "every": "cada",
             "model": "Modelo",
-            "labels": "Etiquetas"
+            "labels": "Etiquetas",
+            "language": "Idioma"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -96,7 +99,8 @@
         "models": "Modelos",
         "modelsDescription": "Página de modelos para visualizar tus modelos",
         "inference": "Inferencia",
-        "inferenceDescription": "Página de inferencia que muestra la inferencia en vivo en tu proyecto"
+        "inferenceDescription": "Página de inferencia que muestra la inferencia en vivo en tu proyecto",
+        "preferences": "Preferencias"
     },
     "dataset": {
         "validation": {
@@ -350,6 +354,7 @@
         },
         "sources": {
             "uploadError": "No se pudo cargar el archivo de vídeo.",
+            "deleteVideoError": "No se pudo eliminar el archivo de vídeo cargado.",
             "list": {
                 "addSource": "Añadir nueva fuente"
             },
