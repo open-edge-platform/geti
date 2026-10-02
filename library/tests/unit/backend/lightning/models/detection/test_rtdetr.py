@@ -125,17 +125,24 @@ class TestRTDETR:
             label_info=label_info,
             data_input_params=DataInputParams((320, 320), (0.0, 0.0, 0.0), (1.0, 1.0, 1.0)),
         )
+        valid_bboxes = tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
+            torch.tensor([[10.0, 10.0, 50.0, 50.0]]),
+            format="XYXY",
+            canvas_size=(320, 320),
+        )
+        # validate_bboxes only inspects the first non-None entry, so the degenerate
+        # shape must be on a later sample to reach the model's defensive guard.
         degenerate_bboxes = tv_tensors.BoundingBoxes(  # pyrefly: ignore[no-matching-overload]
             torch.zeros((1, 0), dtype=torch.float32),
             format="XYXY",
             canvas_size=(320, 320),
         )
         entity = SampleBatch(
-            images=torch.randn(1, 3, 320, 320),
-            bboxes=[degenerate_bboxes],
-            labels=[torch.zeros(0, dtype=torch.long)],
+            images=torch.randn(2, 3, 320, 320),
+            bboxes=[valid_bboxes, degenerate_bboxes],
+            labels=[torch.zeros(1, dtype=torch.long), torch.zeros(0, dtype=torch.long)],
         )
 
         result = model._customize_inputs(entity)
 
-        assert result["targets"][0]["boxes"].numel() == 0
+        assert result["targets"][1]["boxes"].numel() == 0
