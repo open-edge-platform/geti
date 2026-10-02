@@ -8,10 +8,10 @@ import { Badge } from '@geti-ui/ui';
 
 import classes from './jobs-dialog.module.scss';
 
-export interface BadgeTone {
+export type BadgeTone = {
     variant: 'positive' | 'negative' | 'neutral' | 'yellow' | 'purple';
     className?: string;
-}
+};
 
 export const TONE = {
     blue: { variant: 'neutral', className: classes.toneEnergyBlue },

@@ -1095,14 +1095,10 @@
         }
     },
     "jobs": {
+        "title": "任务",
         "allProjects": "所有项目",
         "currentProjectLabel": "{{name}}（当前）",
         "projectsSection": "项目",
-        "title": {
-            "all": "所有项目的任务",
-            "current": "当前项目的任务",
-            "named": "{{project}} 的任务"
-        },
         "tabs": {
             "all": "全部",
             "finished": "已完成"

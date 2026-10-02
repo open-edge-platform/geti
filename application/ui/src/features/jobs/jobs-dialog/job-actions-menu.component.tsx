@@ -16,10 +16,10 @@ const ACTIONS = {
     CANCEL: 'cancel',
 };
 
-interface JobActionsMenuProps {
+type JobActionsMenuProps = {
     job: ModelJob;
     onViewLogs: () => void;
-}
+};
 
 export const JobActionsMenu = ({ job, onViewLogs }: JobActionsMenuProps) => {
     const { t } = useTranslation();

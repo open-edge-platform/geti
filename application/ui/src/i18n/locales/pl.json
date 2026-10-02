@@ -1099,14 +1099,10 @@
         }
     },
     "jobs": {
+        "title": "Zadania",
         "allProjects": "Wszystkie projekty",
         "currentProjectLabel": "{{name}} (bieżący)",
         "projectsSection": "Projekty",
-        "title": {
-            "all": "Zadania we wszystkich projektach",
-            "current": "Zadania bieżącego projektu",
-            "named": "Zadania projektu {{project}}"
-        },
         "tabs": {
             "all": "Wszystkie",
             "finished": "Zakończone"

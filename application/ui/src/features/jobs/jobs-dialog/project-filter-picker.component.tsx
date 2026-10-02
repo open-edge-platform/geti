@@ -7,18 +7,20 @@ import { Item, Picker, Section } from '@geti-ui/ui';
 
 import { ALL_PROJECTS } from '../utils';
 
-interface ProjectFilterPickerProps {
+type ProjectFilterPickerProps = {
     projects: Project[];
     value: string;
     onChange: (projectId: string) => void;
     currentProjectId?: string;
-}
+};
 
 export const ProjectFilterPicker = ({ projects, value, onChange, currentProjectId }: ProjectFilterPickerProps) => {
     const { t } = useTranslation();
 
     return (
         <Picker
+            label={'Projects'}
+            labelPosition={'side'}
             aria-label='Filter jobs by project'
             width={'size-3000'}
             selectedKey={value}

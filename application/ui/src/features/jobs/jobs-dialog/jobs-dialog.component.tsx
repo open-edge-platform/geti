@@ -24,11 +24,11 @@ import { JobStatusTabs } from './job-status-tabs.component';
 import { JobsList } from './jobs-list.component';
 import { ProjectFilterPicker } from './project-filter-picker.component';
 
-interface JobsDialogProps {
+type JobsDialogProps = {
     initialProjectId: string;
     currentProjectId?: string;
     onClose: () => void;
-}
+};
 
 export const JobsDialog = ({ initialProjectId, currentProjectId, onClose }: JobsDialogProps) => {
     const { t } = useTranslation();
@@ -47,23 +47,19 @@ export const JobsDialog = ({ initialProjectId, currentProjectId, onClose }: Jobs
     const visible = filterJobs(sortJobs(scoped), ALL_PROJECTS, statusGroup);
     const isAllProjects = projectId === ALL_PROJECTS;
 
-    const title = isAllProjects
-        ? t('jobs.title.all')
-        : projectId === currentProjectId
-          ? t('jobs.title.current')
-          : t('jobs.title.named', { project: projectName(projectId) });
-
     return (
         <DialogContainer onDismiss={onClose}>
             <Dialog width={'90vw'} height={'80vh'}>
-                <Heading>{title}</Heading>
+                <Heading>{t('jobs.title')}</Heading>
                 <Header>
-                    <ProjectFilterPicker
-                        projects={projects}
-                        value={projectId}
-                        onChange={setProjectId}
-                        currentProjectId={currentProjectId}
-                    />
+                    {projects.length > 1 && (
+                        <ProjectFilterPicker
+                            projects={projects}
+                            value={projectId}
+                            onChange={setProjectId}
+                            currentProjectId={currentProjectId}
+                        />
+                    )}
                     <ActionButton isQuiet aria-label={'Close jobs'} marginStart={'size-200'} onPress={onClose}>
                         <CloseSemiBold />
                     </ActionButton>
