@@ -70,7 +70,7 @@ export const groupModelsByArchitecture = (models: Model[]): GroupedModels[] => {
     const groups: Record<string, GroupedModels> = {}; // architecture -> models
 
     models.forEach((model) => {
-        const arch = model.architecture ?? 'Unknown';
+        const arch = model.architecture;
 
         if (!groups[arch]) {
             groups[arch] = {
