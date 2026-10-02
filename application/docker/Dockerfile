@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # If set to 1, uninstalls ultralytics and its AGPL-licensed dependencies after installation.
-ARG EXCLUDE_AGPL_MODELS=0
+# TODO: revert to 0 before merging - temporarily set to 1 to validate the fix in CI.
+ARG EXCLUDE_AGPL_MODELS=1
 
 ##############
 # Backend base
@@ -428,7 +429,7 @@ COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STA
 
 # Optionally strip the model manifests of AGPL-3.0 licensed models
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        grep -rl '^license: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+        grep -rl '^  name: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
 
 ######################
@@ -452,7 +453,7 @@ COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STA
 
 # Optionally strip the model manifests of AGPL-3.0 licensed models
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        grep -rl '^license: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+        grep -rl '^  name: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
 
 #######################
@@ -495,5 +496,5 @@ COPY --link --chown=${UID}:${UID} --from=web-ui /home/application/ui/dist/ ${STA
 
 # Optionally strip the model manifests of AGPL-3.0 licensed models
 RUN if [ "$EXCLUDE_AGPL_MODELS" = "1" ]; then \
-        grep -rl '^license: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
+        grep -rl '^  name: AGPL-3.0$' /application/backend/app/supported_models/manifests | xargs -r rm -v; \
     fi
