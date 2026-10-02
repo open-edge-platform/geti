@@ -215,6 +215,33 @@ After removing the weights, it is no longer possible to use the model for infere
 In any case, the deletion of a model has no impact on the other models in the project, even if they were fine-tuned
 from the deleted model (in this case, the parent link is deleted too).
 
+## Model caching in the inference server
+
+Loading a model into the inference server is expensive: the OpenVINO IR files must be read from disk and compiled
+for the target device. To avoid paying that cost on every request, the inference server keeps a small cache of
+loaded models, so that switching back and forth between models (for example, when comparing predictions of two
+models on the same media) does not trigger a reload every time.
+
+The cache holds at most `INFERENCE_MAX_MODELS` models at the same time (2 by default). Entries are keyed by model
+variant, and a model is evicted from the cache when:
+
+- **The cache is full** and room is needed for another model. The least recently used model is evicted first.
+  A model that is currently serving an inference request is never evicted; if all the entries are busy, the new
+  request waits, and eventually fails if no slot frees up in time.
+- **The model has been idle** for longer than `INFERENCE_MODEL_TTL` seconds (120 by default). The time-to-live is
+  tracked per model, and a background monitor unloads every model whose TTL has expired.
+- **The same model is requested on a different device**. A model is loaded for one device only, so switching device
+  (for example, from CPU to GPU) unloads the model and loads it again on the new device.
+
+| Environment variable               | Default     | Description                                                              |
+| ---------------------------------- |-------------| ------------------------------------------------------------------------ |
+| `INFERENCE_MAX_MODELS`             | `2`         | Maximum number of models kept loaded at the same time.                   |
+| `INFERENCE_MODEL_TTL`              | `120`       | Seconds a model may stay idle in the cache before it is unloaded.        |
+
+Inference on different models runs in parallel, while concurrent requests for the same model are serialized, since
+the underlying ModelAPI objects are not safe for concurrent use. Concurrent requests for a model that is not cached
+yet share a single load, rather than loading the same model several times.
+
 ## API
 
 See the [API reference](api.md#models).

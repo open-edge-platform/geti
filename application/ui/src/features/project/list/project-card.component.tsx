@@ -73,18 +73,14 @@ export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: Pro
     };
 
     return (
-        <div className={classes.cardWrapper} aria-label={`Project: ${item.name}`}>
+        <div className={clsx(classes.card, { [classes.activeCard]: isActive })} aria-label={`Project: ${item.name}`}>
             <NavLink
                 to={paths.project.dataset.index({ projectId: item.id })}
                 viewTransition
                 onPointerEnter={prefetchProject}
                 onFocus={prefetchProject}
             >
-                <Flex
-                    direction={'column'}
-                    height={'100%'}
-                    UNSAFE_className={clsx({ [classes.card]: true, [classes.activeCard]: isActive })}
-                >
+                <Flex direction={'column'} height={'100%'}>
                     <View position={'relative'} UNSAFE_className={classes.thumbnailContainer}>
                         <ProjectThumbnail project={item} prioritizeImage={prioritizeImage} />
 

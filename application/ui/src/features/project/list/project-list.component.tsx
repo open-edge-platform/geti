@@ -4,6 +4,7 @@
 import { Suspense, useState } from 'react';
 
 import type { TaskType } from '@/api/types';
+import { Preferences } from '@/components/preferences/preferences.component';
 import { useTranslation } from '@/i18n';
 import { ActionButton, Content, Divider, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
@@ -11,6 +12,7 @@ import { partition } from 'lodash-es';
 import { Link } from 'react-router';
 
 import { version } from '../../../../package.json';
+import getiLogo from '../../../assets/icons/geti-logo.webp';
 import { paths } from '../../../constants/paths';
 import { downloadFile } from '../../../platform/download-file';
 import { isNonEmptyArray } from '../../../shared/util';
@@ -56,15 +58,36 @@ const ProjectSidebar = ({
             {shouldShowFilters && (
                 <>
                     <Divider size={'S'} />
+        <Flex direction={'column'} gap={'size-300'} justifyContent={'space-between'} UNSAFE_className={classes.sidebar}>
+            <Flex direction={'column'} gap={'size-300'}>
+                <Link to={paths.project.index({})} viewTransition>
+                    <Flex alignItems={'center'} gap={'size-50'}>
+                        <img src={getiLogo} alt={t('navigation.logoAlt')} className={classes.logo} />
+                        <Text UNSAFE_className={classes.logoText}>Geti™</Text>
+                    </Flex>
+                </Link>
 
-                    <ProjectFilters
-                        searchName={searchName}
-                        onSearchChange={setSearchName}
-                        selectedTaskTypes={selectedTaskTypes}
-                        onSelectedTaskTypesChange={setSelectedTaskTypes}
-                    />
-                </>
-            )}
+                <Divider size={'S'} />
+
+                <NewProjectCard />
+
+                {shouldShowFilters && (
+                    <>
+                        <Divider size={'S'} />
+
+                        <ProjectFilters
+                            searchName={searchName}
+                            onSearchChange={setSearchName}
+                            selectedTaskTypes={selectedTaskTypes}
+                            onSelectedTaskTypesChange={setSelectedTaskTypes}
+                        />
+                    </>
+                )}
+            </Flex>
+
+            <View>
+                <Preferences />
+            </View>
         </Flex>
     );
 };
@@ -183,10 +206,6 @@ export const ProjectList = () => {
                         </Suspense>
                     </View>
                 </Flex>
-
-                <View bottom={'size-200'} left={'size-300'} position={'absolute'}>
-                    <AppInfo />
-                </View>
             </Content>
         </View>
     );
