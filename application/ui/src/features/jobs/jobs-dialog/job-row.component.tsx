@@ -48,7 +48,7 @@ export const JobRow = ({ job, showStatusBadge, projectName, architectureName, on
                     <Text UNSAFE_className={classes.modelName}>{job.metadata.model.name}</Text>
                     {showStatusBadge && <JobStatusBadge status={job.status} />}
                 </Flex>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <div className={classes.metaRow}>
                     <Text UNSAFE_className={classes.metaText}>{meta.filter(Boolean).join(' · ')}</Text>
                     {job.progress === 0 && <Loading size={'S'} mode={'inline'} />}
                 </div>
