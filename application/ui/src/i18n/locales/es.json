@@ -45,6 +45,8 @@
             "no": "No",
             "unknown": "Desconocido",
             "name": "Nombre",
+            "architecture": "Arquitectura",
+            "device": "Dispositivo",
             "on": "Activado",
             "off": "Desactivado",
             "noMaximum": "Sin máximo",
@@ -70,6 +72,7 @@
             "seconds": "Segundos",
             "every": "cada",
             "model": "Modelo",
+            "jobs": "Tareas",
             "labels": "Etiquetas",
             "language": "Idioma"
         },
@@ -305,12 +308,6 @@
         "importExport": {
             "trigger": "Importar/exportar dataset",
             "exportItem": "Exportar dataset"
-        },
-        "jobs": {
-            "cancel": {
-                "title": "Cancelar tarea",
-                "confirmation": "¿Seguro que quieres cancelar la tarea {{jobId}}?"
-            }
         },
         "revisions": {
             "createdOn": "Creado el {{date}}",
@@ -813,7 +810,6 @@
     "models": {
         "jobs": {
             "error": "La tarea ha fallado. Consulta los registros para ver los detalles e inténtalo de nuevo.",
-            "heading": "Tareas",
             "pending": "Pendiente...",
             "running": "En ejecución...",
             "stopDialog": {
@@ -1012,7 +1008,6 @@
             "fineTunedFrom": "Afinado a partir de",
             "columns": {
                 "trained": "Entrenado",
-                "device": "Dispositivo",
                 "totalSize": "Tamaño total"
             }
         },
@@ -1087,8 +1082,47 @@
             }
         },
         "columns": {
-            "modelName": "Nombre del modelo",
-            "architecture": "Arquitectura"
+            "modelName": "Nombre del modelo"
+        }
+    },
+    "jobs": {
+        "title": "Trabajos",
+        "allProjects": "Todos los proyectos",
+        "currentProjectLabel": "{{name}} (actual)",
+        "projectsSection": "Proyectos",
+        "tabs": {
+            "all": "Todas",
+            "finished": "Finalizadas"
+        },
+        "status": {
+            "pending": "Programada",
+            "cancelling": "Cancelando",
+            "done": "Completada"
+        },
+        "type": {
+            "quantize": "Optimización"
+        },
+        "columns": {
+            "type": "Tipo"
+        },
+        "cancel": {
+            "title": "Cancelar tarea",
+            "confirmation": "¿Seguro que quieres cancelar la tarea {{jobId}}?"
+        },
+        "meta": {
+            "started": "Iniciada {{time}}",
+            "elapsed": "Tiempo transcurrido: {{time}}"
+        },
+        "emptyState": {
+            "all": "No hay tareas en esta categoría",
+            "running": "No hay tareas en ejecución",
+            "finished": "No hay tareas finalizadas",
+            "scheduled": "No hay tareas programadas",
+            "cancelled": "No hay tareas canceladas",
+            "failed": "No hay tareas fallidas"
+        },
+        "actions": {
+            "viewLogs": "Ver registros"
         }
     },
     "license": {

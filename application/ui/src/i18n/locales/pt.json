@@ -45,6 +45,8 @@
             "no": "Não",
             "unknown": "Desconhecido",
             "name": "Nome",
+            "architecture": "Arquitetura",
+            "device": "Dispositivo",
             "on": "Ligado",
             "off": "Desligado",
             "noMaximum": "Sem máximo",
@@ -70,6 +72,7 @@
             "seconds": "Segundos",
             "every": "a cada",
             "model": "Modelo",
+            "jobs": "Tarefas",
             "labels": "Etiquetas",
             "language": "Idioma"
         },
@@ -305,12 +308,6 @@
         "importExport": {
             "trigger": "Importar/exportar dataset",
             "exportItem": "Exportar dataset"
-        },
-        "jobs": {
-            "cancel": {
-                "title": "Cancelar tarefa",
-                "confirmation": "Tem a certeza de que pretende cancelar a tarefa {{jobId}}?"
-            }
         },
         "revisions": {
             "createdOn": "Criado em {{date}}",
@@ -813,7 +810,6 @@
     "models": {
         "jobs": {
             "error": "A tarefa falhou. Verifique os registos para obter detalhes e tente novamente.",
-            "heading": "Tarefas",
             "pending": "Pendente...",
             "running": "Em execução...",
             "stopDialog": {
@@ -1012,7 +1008,6 @@
             "fineTunedFrom": "Afinado a partir de",
             "columns": {
                 "trained": "Treinado",
-                "device": "Dispositivo",
                 "totalSize": "Tamanho total"
             }
         },
@@ -1087,8 +1082,47 @@
             }
         },
         "columns": {
-            "modelName": "Nome do Modelo",
-            "architecture": "Arquitetura"
+            "modelName": "Nome do Modelo"
+        }
+    },
+    "jobs": {
+        "title": "Tarefas",
+        "allProjects": "Todos os projetos",
+        "currentProjectLabel": "{{name}} (atual)",
+        "projectsSection": "Projetos",
+        "tabs": {
+            "all": "Todas",
+            "finished": "Concluídas"
+        },
+        "status": {
+            "pending": "Agendada",
+            "cancelling": "A cancelar",
+            "done": "Concluída"
+        },
+        "type": {
+            "quantize": "Otimização"
+        },
+        "columns": {
+            "type": "Tipo"
+        },
+        "cancel": {
+            "title": "Cancelar tarefa",
+            "confirmation": "Tem a certeza de que pretende cancelar a tarefa {{jobId}}?"
+        },
+        "meta": {
+            "started": "Iniciada {{time}}",
+            "elapsed": "Tempo decorrido: {{time}}"
+        },
+        "emptyState": {
+            "all": "Nenhuma tarefa nesta categoria",
+            "running": "Nenhuma tarefa em execução",
+            "finished": "Nenhuma tarefa concluída",
+            "scheduled": "Nenhuma tarefa agendada",
+            "cancelled": "Nenhuma tarefa cancelada",
+            "failed": "Nenhuma tarefa com falha"
+        },
+        "actions": {
+            "viewLogs": "Ver registos"
         }
     },
     "license": {

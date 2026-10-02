@@ -45,6 +45,8 @@
             "no": "Nie",
             "unknown": "Nieznany",
             "name": "Nazwa",
+            "architecture": "Architektura",
+            "device": "Urządzenie",
             "on": "Wł.",
             "off": "Wył.",
             "noMaximum": "Brak maksimum",
@@ -70,6 +72,7 @@
             "seconds": "Sekundy",
             "every": "co",
             "model": "Model",
+            "jobs": "Zadania",
             "labels": "Etykiety",
             "language": "Język"
         },
@@ -305,12 +308,6 @@
         "importExport": {
             "trigger": "Importuj/eksportuj dataset",
             "exportItem": "Eksportuj dataset"
-        },
-        "jobs": {
-            "cancel": {
-                "title": "Anuluj zadanie",
-                "confirmation": "Czy na pewno chcesz anulować zadanie {{jobId}}?"
-            }
         },
         "revisions": {
             "createdOn": "Utworzono {{date}}",
@@ -817,7 +814,6 @@
     "models": {
         "jobs": {
             "error": "Zadanie nie powiodło się. Sprawdź dzienniki, aby uzyskać szczegóły, i spróbuj ponownie.",
-            "heading": "Zadania",
             "pending": "Oczekiwanie...",
             "running": "W trakcie...",
             "stopDialog": {
@@ -1016,7 +1012,6 @@
             "fineTunedFrom": "Dostrojony na podstawie",
             "columns": {
                 "trained": "Wytrenowano",
-                "device": "Urządzenie",
                 "totalSize": "Całkowity rozmiar"
             }
         },
@@ -1091,8 +1086,47 @@
             }
         },
         "columns": {
-            "modelName": "Nazwa modelu",
-            "architecture": "Architektura"
+            "modelName": "Nazwa modelu"
+        }
+    },
+    "jobs": {
+        "title": "Zadania",
+        "allProjects": "Wszystkie projekty",
+        "currentProjectLabel": "{{name}} (bieżący)",
+        "projectsSection": "Projekty",
+        "tabs": {
+            "all": "Wszystkie",
+            "finished": "Zakończone"
+        },
+        "status": {
+            "pending": "Zaplanowane",
+            "cancelling": "W trakcie anulowania",
+            "done": "Zakończone"
+        },
+        "type": {
+            "quantize": "Optymalizacja"
+        },
+        "columns": {
+            "type": "Typ"
+        },
+        "cancel": {
+            "title": "Anuluj zadanie",
+            "confirmation": "Czy na pewno chcesz anulować zadanie {{jobId}}?"
+        },
+        "meta": {
+            "started": "Rozpoczęto {{time}}",
+            "elapsed": "Czas trwania: {{time}}"
+        },
+        "emptyState": {
+            "all": "Brak zadań w tej kategorii",
+            "running": "Brak zadań w trakcie",
+            "finished": "Brak zakończonych zadań",
+            "scheduled": "Brak zaplanowanych zadań",
+            "cancelled": "Brak anulowanych zadań",
+            "failed": "Brak zadań zakończonych niepowodzeniem"
+        },
+        "actions": {
+            "viewLogs": "Wyświetl dzienniki"
         }
     },
     "license": {

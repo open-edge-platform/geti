@@ -45,6 +45,8 @@
             "no": "No",
             "unknown": "Unknown",
             "name": "Name",
+            "architecture": "Architecture",
+            "device": "Device",
             "on": "On",
             "off": "Off",
             "noMaximum": "No maximum",
@@ -70,6 +72,7 @@
             "seconds": "Seconds",
             "every": "every",
             "model": "Model",
+            "jobs": "Jobs",
             "labels": "Labels",
             "language": "Language"
         },
@@ -305,12 +308,6 @@
         "importExport": {
             "trigger": "Import/export dataset",
             "exportItem": "Export dataset"
-        },
-        "jobs": {
-            "cancel": {
-                "title": "Cancel job",
-                "confirmation": "Are you sure you want to cancel job {{jobId}}?"
-            }
         },
         "revisions": {
             "createdOn": "Created {{date}}",
@@ -813,7 +810,6 @@
     "models": {
         "jobs": {
             "error": "Job failed. Please check the logs for details and try again.",
-            "heading": "Jobs",
             "pending": "Pending...",
             "running": "Running...",
             "stopDialog": {
@@ -1012,7 +1008,6 @@
             "fineTunedFrom": "Fine-tuned from",
             "columns": {
                 "trained": "Trained",
-                "device": "Device",
                 "totalSize": "Total size"
             }
         },
@@ -1087,8 +1082,47 @@
             }
         },
         "columns": {
-            "modelName": "Model Name",
-            "architecture": "Architecture"
+            "modelName": "Model Name"
+        }
+    },
+    "jobs": {
+        "title": "Jobs",
+        "allProjects": "All projects",
+        "currentProjectLabel": "{{name}} (current)",
+        "projectsSection": "Projects",
+        "tabs": {
+            "all": "All",
+            "finished": "Finished"
+        },
+        "status": {
+            "pending": "Scheduled",
+            "cancelling": "Cancelling",
+            "done": "Completed"
+        },
+        "type": {
+            "quantize": "Optimization"
+        },
+        "columns": {
+            "type": "Type"
+        },
+        "cancel": {
+            "title": "Cancel job",
+            "confirmation": "Are you sure you want to cancel job {{jobId}}?"
+        },
+        "meta": {
+            "started": "Started {{time}}",
+            "elapsed": "Elapsed {{time}}"
+        },
+        "emptyState": {
+            "all": "No jobs in this category",
+            "running": "No running jobs",
+            "finished": "No finished jobs",
+            "scheduled": "No scheduled jobs",
+            "cancelled": "No cancelled jobs",
+            "failed": "No failed jobs"
+        },
+        "actions": {
+            "viewLogs": "View logs"
         }
     },
     "license": {

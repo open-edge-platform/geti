@@ -45,6 +45,8 @@
             "no": "否",
             "unknown": "未知",
             "name": "名称",
+            "architecture": "架构",
+            "device": "设备",
             "on": "开",
             "off": "关",
             "noMaximum": "无上限",
@@ -70,6 +72,7 @@
             "seconds": "秒",
             "every": "每",
             "model": "模型",
+            "jobs": "任务",
             "labels": "标签",
             "language": "语言"
         },
@@ -305,12 +308,6 @@
         "importExport": {
             "trigger": "导入 / 导出数据集",
             "exportItem": "导出数据集"
-        },
-        "jobs": {
-            "cancel": {
-                "title": "取消任务",
-                "confirmation": "确定要取消任务 {{jobId}} 吗？"
-            }
         },
         "revisions": {
             "createdOn": "创建于 {{date}}",
@@ -813,7 +810,6 @@
     "models": {
         "jobs": {
             "error": "任务失败，请查看日志了解详情，然后重试。",
-            "heading": "任务",
             "pending": "等待中……",
             "running": "运行中……",
             "stopDialog": {
@@ -1012,7 +1008,6 @@
             "fineTunedFrom": "微调自",
             "columns": {
                 "trained": "训练时间",
-                "device": "设备",
                 "totalSize": "总大小"
             }
         },
@@ -1087,8 +1082,47 @@
             }
         },
         "columns": {
-            "modelName": "模型名称",
-            "architecture": "架构"
+            "modelName": "模型名称"
+        }
+    },
+    "jobs": {
+        "title": "任务",
+        "allProjects": "所有项目",
+        "currentProjectLabel": "{{name}}（当前）",
+        "projectsSection": "项目",
+        "tabs": {
+            "all": "全部",
+            "finished": "已完成"
+        },
+        "status": {
+            "pending": "已计划",
+            "cancelling": "正在取消",
+            "done": "已完成"
+        },
+        "type": {
+            "quantize": "优化"
+        },
+        "columns": {
+            "type": "类型"
+        },
+        "cancel": {
+            "title": "取消任务",
+            "confirmation": "确定要取消任务 {{jobId}} 吗？"
+        },
+        "meta": {
+            "started": "开始于 {{time}}",
+            "elapsed": "已用时 {{time}}"
+        },
+        "emptyState": {
+            "all": "此类别中没有任务",
+            "running": "没有正在运行的任务",
+            "finished": "没有已完成的任务",
+            "scheduled": "没有已计划的任务",
+            "cancelled": "没有已取消的任务",
+            "failed": "没有失败的任务"
+        },
+        "actions": {
+            "viewLogs": "查看日志"
         }
     },
     "license": {
