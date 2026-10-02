@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 from app.db.schema import MediaDB
 from app.models import DatasetItem, DatasetItemAnnotationStatus, Media, MediaType, Project, Video, VideoFrame
 from app.models.media import ImageFormat, MediaAdapter, MediaSortBy, SortDirection, VideoFormat
-from app.repositories import MediaRepository
+from app.repositories import DatasetViewRepository, MediaRepository
 from app.services.video import VideoService
 from app.utils.images import convert_to_jpeg_compatible, crop_to_thumbnail
 
@@ -372,6 +372,8 @@ class MediaService(BaseSessionManagedService):
         except FileNotFoundError:
             logger.warning("Media {} thumbnail was not found during deletion", media_id)
 
+        view_repo = DatasetViewRepository(project_id=str(project.id), db=self.db_session)
+        view_repo.touch_views_containing_media(str(media.id))
         repo.delete(obj_id=str(media.id))
 
     def get_frame_binary(self, project_id: UUID, video: Video, frame_index: int) -> Image.Image:

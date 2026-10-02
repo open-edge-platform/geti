@@ -919,9 +919,13 @@
                 },
                 "selectDataset": {
                     "label": "Seleccionar dataset",
-                    "useCurrentDataset": "Usar el dataset actual",
+                    "useEntireDataset": "Usar el dataset completo",
                     "helpTitle": "Selección de un dataset",
-                    "helpDescription": "Elige la versión del dataset que quieres usar para el entrenamiento. Si quieres entrenar el nuevo modelo\n                            con exactamente los mismos datos (multimedia y anotaciones) que otro modelo, selecciona la\n                            revisión del dataset correspondiente. En cambio, si quieres entrenar con la versión más reciente\n                            de los datos (lo que ves en la página \"Dataset\"), selecciona \"Usar\n                            el dataset actual\"."
+                    "helpDescription": "Elige los datos que quieres usar para el entrenamiento. Selecciona \"Usar el dataset completo\" para entrenar con la versión más reciente de todos los datos (lo que ves en la página \"Dataset\"). Selecciona una vista del dataset para entrenar solo con los archivos multimedia asignados a esa vista. Selecciona una revisión del dataset para entrenar con exactamente los mismos datos (multimedia y anotaciones) que otro modelo.",
+                    "sections": {
+                        "views": "Vistas del dataset",
+                        "revisions": "Revisiones del dataset"
+                    }
                 },
                 "selectModel": {
                     "label": "Seleccionar pesos de entrada",
@@ -932,6 +936,7 @@
             },
             "validation": {
                 "notEnoughAnnotations": "Para entrenar un modelo, necesitas anotar al menos 3 elementos de tu dataset, aunque recomendamos anotar varios más para obtener mejores resultados.",
+                "notEnoughAnnotationsInView": "Para entrenar un modelo, necesitas anotar al menos 3 elementos en la vista del dataset seleccionada, aunque recomendamos anotar varios más para obtener mejores resultados.",
                 "emptySubsetsReason": "Para entrenar un modelo, cada subconjunto (entrenamiento, validación, prueba) necesita al menos un elemento. Esta condición no se puede cumplir actualmente porque {{subsetClause}} vacío y {{assignmentDetail}}.",
                 "emptySubsetClause_one": "el subconjunto {{list}} está",
                 "emptySubsetClause_other": "los subconjuntos {{list}} están",
