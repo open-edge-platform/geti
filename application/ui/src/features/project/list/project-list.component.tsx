@@ -43,21 +43,9 @@ const ProjectSidebar = ({
     selectedTaskTypes: TaskType[];
     setSelectedTaskTypes: (taskTypes: TaskType[]) => void;
 }) => {
+    const { t } = useTranslation();
+
     return (
-        <Flex direction={'column'} gap={'size-300'} UNSAFE_className={classes.sidebar}>
-            <Link to={paths.project.index({})} viewTransition>
-                <Flex alignItems={'center'} gap={'size-50'}>
-                    <Text UNSAFE_className={classes.logoText}>Geti™</Text>
-                </Flex>
-            </Link>
-
-            <Divider size={'S'} />
-
-            <NewProjectCard />
-
-            {shouldShowFilters && (
-                <>
-                    <Divider size={'S'} />
         <Flex direction={'column'} gap={'size-300'} justifyContent={'space-between'} UNSAFE_className={classes.sidebar}>
             <Flex direction={'column'} gap={'size-300'}>
                 <Link to={paths.project.index({})} viewTransition>
@@ -169,26 +157,6 @@ const ProjectGrid = () => {
                     </Grid>
                 )}
             </Flex>
-        </Flex>
-    );
-};
-
-const AppInfo = () => {
-    const { t } = useTranslation();
-
-    const handleDownloadLogs = () => {
-        downloadFile('/api/system/logs', 'geti_logs.zip');
-    };
-
-    return (
-        <Flex gap='size-200' alignItems='center'>
-            <Text UNSAFE_className={classes.version}>v{version}</Text>
-            <View UNSAFE_className={classes.version}>|</View>
-            <ActionButton isQuiet UNSAFE_className={classes.version} onPress={handleDownloadLogs}>
-                <Text UNSAFE_style={{ textDecoration: 'underline' }}>
-                    {t('project.list.downloadLogs', { defaultValue: 'Download logs' })}
-                </Text>
-            </ActionButton>
         </Flex>
     );
 };
