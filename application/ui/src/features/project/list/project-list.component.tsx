@@ -6,15 +6,13 @@ import { Suspense, useState } from 'react';
 import type { TaskType } from '@/api/types';
 import { Preferences } from '@/components/preferences/preferences.component';
 import { useTranslation } from '@/i18n';
-import { ActionButton, Content, Divider, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
+import { Content, Divider, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
 import { partition } from 'lodash-es';
 import { Link } from 'react-router';
 
-import { version } from '../../../../package.json';
 import getiLogo from '../../../assets/icons/geti-logo.webp';
 import { paths } from '../../../constants/paths';
-import { downloadFile } from '../../../platform/download-file';
 import { isNonEmptyArray } from '../../../shared/util';
 import { EmptyProjectList } from './empty-project-list/empty-project-list.component';
 import { NoMatchingProjects } from './filter-projects/no-matching-projects.component';
