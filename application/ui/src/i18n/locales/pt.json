@@ -915,7 +915,7 @@
                 },
                 "toast": {
                     "trainingStarted": "O treino do modelo foi iniciado com sucesso.",
-                    "trainingStartedWithLink": "O treino do modelo foi iniciado com sucesso. <link>Abra o ecrã de modelos para acompanhar o progresso.</link>"
+                    "trainingStartedWithLink": "O treino do modelo foi iniciado com sucesso. <modelsLink>Abra o ecrã de modelos para acompanhar o progresso.</modelsLink>"
                 },
                 "selectDataset": {
                     "label": "Selecionar dataset",

@@ -915,7 +915,7 @@
                 },
                 "toast": {
                     "trainingStarted": "模型训练启动成功。",
-                    "trainingStartedWithLink": "模型训练已成功启动。<link>打开模型页面查看进度。</link>"
+                    "trainingStartedWithLink": "模型训练已成功启动。<modelsLink>打开模型页面查看进度。</modelsLink>"
                 },
                 "selectDataset": {
                     "label": "选择数据集",

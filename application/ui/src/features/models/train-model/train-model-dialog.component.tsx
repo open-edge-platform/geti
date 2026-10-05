@@ -54,7 +54,15 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
                                 <Trans
                                     i18nKey='models.training.setup.toast.trainingStartedWithLink'
                                     components={{
-                                        link: <Link to={paths.project.models({ projectId })} viewTransition />,
+                                        modelsLink: (
+                                            <Link
+                                                to={paths.project.models({ projectId })}
+                                                viewTransition
+                                                style={{
+                                                    textDecoration: 'underline',
+                                                }}
+                                            />
+                                        ),
                                     }}
                                 />
                             </Text>
