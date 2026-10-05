@@ -84,14 +84,12 @@ describe('JobsDialog', () => {
 
         renderDialog();
 
-        // Wait for jobs (and their counts) to load before inspecting tabs.
         await screen.findByText('running model');
 
         expect(screen.getByRole('tab', { name: /^All\b/ })).toHaveTextContent('All3');
         expect(screen.getByRole('tab', { name: /^Running\b/ })).toHaveTextContent('Running1');
         expect(screen.getByRole('tab', { name: /^Scheduled\b/ })).toHaveTextContent('Scheduled1');
         expect(screen.getByRole('tab', { name: /^Finished\b/ })).toHaveTextContent('Finished1');
-        // Zero-count tabs show no number.
         expect(screen.getByRole('tab', { name: 'Cancelled' })).toHaveTextContent('Cancelled');
         expect(screen.getByRole('tab', { name: 'Failed' })).toHaveTextContent('Failed');
     });
@@ -119,7 +117,9 @@ describe('JobsDialog', () => {
 
         renderDialog({ initialProjectId: 'project-a', currentProjectId: 'project-a' });
 
-        await screen.findByText('Current project jobs');
+        expect(await screen.findByRole('button', { name: /Filter jobs by project/ })).toHaveTextContent(
+            PROJECT_A.name
+        );
         expect(await screen.findByText('in-a model')).toBeInTheDocument();
         expect(screen.queryByText('in-b model')).not.toBeInTheDocument();
     });
@@ -253,7 +253,7 @@ describe('JobsDialog', () => {
         await userEvent.click(screen.getByRole('button', { name: 'Close dialog' }));
 
         await waitFor(() => expect(screen.queryByText('Training Logs')).not.toBeInTheDocument());
-        expect(screen.getByText('All projects jobs')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Filter jobs by project/ })).toHaveTextContent('All projects');
         expect(screen.getByRole('tab', { name: /^Running\b/, selected: true })).toBeInTheDocument();
     });
 
@@ -265,17 +265,6 @@ describe('JobsDialog', () => {
 
         expect(await screen.findByRole('heading', { name: 'No failed jobs' })).toBeInTheDocument();
         expect(screen.queryByText('Architecture')).not.toBeInTheDocument();
-    });
-
-    it('marks the current project in the project picker', async () => {
-        mockJobs([]);
-        renderDialog({ initialProjectId: 'project-a', currentProjectId: 'project-a' });
-
-        await screen.findByText('Current project jobs');
-        await userEvent.click(screen.getByRole('button', { name: /Filter jobs by project/ }));
-
-        expect(await screen.findByRole('option', { name: 'Alpha (current)' })).toBeInTheDocument();
-        expect(screen.getByRole('option', { name: 'Beta' })).toBeInTheDocument();
     });
 
     it('shows "—" for a quantize job device', async () => {

@@ -1095,7 +1095,6 @@
         }
     },
     "jobs": {
-        "title": "Lavori",
         "allProjects": "Tutti i progetti",
         "currentProjectLabel": "{{name}} (attuale)",
         "projectsSection": "Progetti",

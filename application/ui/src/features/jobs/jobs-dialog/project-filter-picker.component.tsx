@@ -19,7 +19,7 @@ export const ProjectFilterPicker = ({ projects, value, onChange, currentProjectI
 
     return (
         <Picker
-            label={'Projects'}
+            label={t('jobs.projectsSection')}
             labelPosition={'side'}
             aria-label='Filter jobs by project'
             width={'size-3000'}

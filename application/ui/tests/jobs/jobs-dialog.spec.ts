@@ -13,32 +13,29 @@ const PROJECT_B = getMockedProject({ id: 'project-b', name: 'Beta' });
 test.describe('Jobs dialog', () => {
     test('opens in "All projects" scope from the project list', async ({ jobsDialogPage, network }) => {
         network.use(
-            http.get('/api/projects', () => HttpResponse.json([PROJECT_A])),
+            http.get('/api/projects', () => HttpResponse.json([PROJECT_A, PROJECT_B])),
             http.get('/api/jobs', () => HttpResponse.json([]))
         );
 
         await jobsDialogPage.gotoProjectList();
         await jobsDialogPage.openDialog();
 
-        await expect(jobsDialogPage.getHeading('All projects jobs')).toBeVisible();
+        await expect(jobsDialogPage.getProjectPicker()).toHaveText('All projects');
     });
 
     test('opens scoped to the current project from inside a project', async ({ jobsDialogPage, network }) => {
         network.use(
-            http.get('/api/projects', () => HttpResponse.json([PROJECT_A])),
+            http.get('/api/projects', () => HttpResponse.json([PROJECT_A, PROJECT_B])),
             http.get('/api/jobs', () => HttpResponse.json([]))
         );
 
         await jobsDialogPage.gotoProject('project-a');
         await jobsDialogPage.openDialog();
 
-        await expect(jobsDialogPage.getHeading('Current project jobs')).toBeVisible();
+        await expect(jobsDialogPage.getProjectPicker()).toHaveText(`${PROJECT_A.name} (current)`);
     });
 
-    test('switching the project picker re-filters the list and updates the title', async ({
-        jobsDialogPage,
-        network,
-    }) => {
+    test('switching the project picker re-filters the list', async ({ jobsDialogPage, network }) => {
         const jobInA = getMockedJob({
             job_id: 'job-a',
             metadata: {
@@ -81,7 +78,7 @@ test.describe('Jobs dialog', () => {
 
         await jobsDialogPage.selectProject('Beta');
 
-        await expect(jobsDialogPage.getHeading('Beta jobs')).toBeVisible();
+        await expect(jobsDialogPage.getProjectPicker()).toHaveText('Beta');
         await expect(jobsDialogPage.getJobByName('beta model')).toBeVisible();
         await expect(jobsDialogPage.getJobByName('alpha model')).toBeHidden();
     });
@@ -260,7 +257,7 @@ test.describe('Jobs dialog', () => {
         });
 
         network.use(
-            http.get('/api/projects', () => HttpResponse.json([PROJECT_A])),
+            http.get('/api/projects', () => HttpResponse.json([PROJECT_A, PROJECT_B])),
             http.get('/api/jobs', () => HttpResponse.json([runningJob])),
             http.get('/api/jobs/{job_id}/logs', () => {
                 return new HttpResponse(':ok\n\n', {
@@ -281,7 +278,8 @@ test.describe('Jobs dialog', () => {
         await jobsDialogPage.closeLogsDialog();
 
         await expect(jobsDialogPage.getLogsHeading()).toBeHidden();
-        await expect(jobsDialogPage.getHeading('All projects jobs')).toBeVisible();
+        await expect(jobsDialogPage.getHeading('Jobs')).toBeVisible();
+        await expect(jobsDialogPage.getProjectPicker()).toHaveText('All projects');
         await expect(jobsDialogPage.getTab('Running')).toHaveAttribute('aria-selected', 'true');
     });
 

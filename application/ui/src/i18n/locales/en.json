@@ -1095,7 +1095,6 @@
         }
     },
     "jobs": {
-        "title": "Jobs",
         "allProjects": "All projects",
         "currentProjectLabel": "{{name}} (current)",
         "projectsSection": "Projects",

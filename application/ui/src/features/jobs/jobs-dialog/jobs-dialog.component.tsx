@@ -50,7 +50,7 @@ export const JobsDialog = ({ initialProjectId, currentProjectId, onClose }: Jobs
     return (
         <DialogContainer onDismiss={onClose}>
             <Dialog width={'90vw'} height={'80vh'}>
-                <Heading>{t('jobs.title')}</Heading>
+                <Heading>{t('common.labels.jobs')}</Heading>
                 <Header>
                     {projects.length > 1 && (
                         <ProjectFilterPicker

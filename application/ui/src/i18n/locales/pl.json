@@ -1099,7 +1099,6 @@
         }
     },
     "jobs": {
-        "title": "Zadania",
         "allProjects": "Wszystkie projekty",
         "currentProjectLabel": "{{name}} (bieżący)",
         "projectsSection": "Projekty",

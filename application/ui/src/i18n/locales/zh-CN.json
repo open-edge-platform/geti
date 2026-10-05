@@ -1095,7 +1095,6 @@
         }
     },
     "jobs": {
-        "title": "任务",
         "allProjects": "所有项目",
         "currentProjectLabel": "{{name}}（当前）",
         "projectsSection": "项目",
