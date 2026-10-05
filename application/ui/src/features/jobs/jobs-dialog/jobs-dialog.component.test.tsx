@@ -117,9 +117,7 @@ describe('JobsDialog', () => {
 
         renderDialog({ initialProjectId: 'project-a', currentProjectId: 'project-a' });
 
-        expect(await screen.findByRole('button', { name: /Filter jobs by project/ })).toHaveTextContent(
-            PROJECT_A.name
-        );
+        expect(await screen.findByRole('button', { name: /Filter jobs by project/ })).toHaveTextContent(PROJECT_A.name);
         expect(await screen.findByText('in-a model')).toBeInTheDocument();
         expect(screen.queryByText('in-b model')).not.toBeInTheDocument();
     });
