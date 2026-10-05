@@ -6,13 +6,13 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useProject } from 'hooks/api/project.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { useAnnotationActions } from '../../../../shared/annotator/annotation-actions-provider.component';
-import { useTool } from '../../../../shared/annotator/tool-provider.component';
-import { isVideoFrame } from '../../../../shared/media-item-utils';
-import { getMediaBinaryUrl, getVideoFrameBinaryUrl } from '../../../../shared/media-url.utils';
 import type { AnnotationTarget } from '../../../../features/ai-assistant/annotation/annotation-tools';
 import { AssistantDrawer } from '../../../../features/ai-assistant/components/assistant-drawer.component';
+import { isVideoFrame } from '../../../../shared/media-item-utils';
+import { getMediaBinaryUrl, getVideoFrameBinaryUrl } from '../../../../shared/media-url.utils';
+import { useAnnotationActions } from '../../annotation-actions-provider.component';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
+import { useTool } from '../../tool-provider.component';
 
 export const AiTool = () => {
     const projectId = useProjectIdentifier();

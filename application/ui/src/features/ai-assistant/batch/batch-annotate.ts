@@ -5,7 +5,7 @@ import { fetchClient } from '@/api';
 import type { AnnotationDTO, Media, Project } from '@/api/types';
 import { i18n } from '@/i18n';
 
-import { mapLocalAnnotationsToServer } from '../../../shared/annotator/annotation-mappers';
+import { mapLocalAnnotationsToServer } from '../../../modules/annotator/annotation-mappers';
 import { getMediaBinaryUrl, getVideoFrameBinaryUrl } from '../../../shared/media-url.utils';
 import {
     annotationInstructions,
