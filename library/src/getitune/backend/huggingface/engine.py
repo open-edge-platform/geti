@@ -72,6 +72,7 @@ class HFEngine(Engine):
         device: str | DeviceType = "auto",
         checkpoint: PathLike | None = None,
         training: dict[str, Any] | None = None,
+        num_devices: int = 1,
         **kwargs,
     ) -> None:
         """Initialize the engine.
@@ -91,6 +92,8 @@ class HFEngine(Engine):
                 from a recipe's ``training:`` block. Only used to fill in
                 whichever of :meth:`train`'s parameters are left as ``None``
                 — explicit call-site arguments always win.
+            num_devices: Number of distributed processes to use. Values above
+                one require launching the training script with ``torchrun``.
             **kwargs: Extra keyword arguments accepted for parity with other
                 engines' constructors (e.g. ``task=`` forwarded by
                 ``create_engine``); unused by this backend.
@@ -108,6 +111,10 @@ class HFEngine(Engine):
         self._work_dir.mkdir(parents=True, exist_ok=True)
         self._device = self._resolve_device(device)
         self._training_defaults = dict(training or {})
+        if num_devices < 1:
+            msg = f"num_devices must be at least 1, got {num_devices}"
+            raise ValueError(msg)
+        self.num_devices = num_devices
 
         if isinstance(data, DataModule):
             self._datamodule: DataModule | None = data
@@ -193,6 +200,14 @@ class HFEngine(Engine):
                 "got a bare data-root path. Build a DataModule first, e.g. via "
                 "DataModule(...) directly, or by resolving a recipe through "
                 "HFEngine.from_config() / create_engine()."
+            )
+            raise ValueError(msg)
+
+        world_size = int(os.environ.get("WORLD_SIZE", "1"))
+        if world_size != self.num_devices:
+            msg = (
+                f"HFEngine is configured for {self.num_devices} device(s), but WORLD_SIZE={world_size}. "
+                "For multi-device training, launch with torchrun and set num_devices to the process count."
             )
             raise ValueError(msg)
 
@@ -293,6 +308,9 @@ class HFEngine(Engine):
             training_args_kwargs["warmup_steps"] = int(warmup_ratio * total_steps)
 
         args = TrainingArguments(**training_args_kwargs)
+        if world_size == 1 and args.n_gpu > 1:
+            # Per-image annotations cannot be scattered safely by DataParallel.
+            args._n_gpu = 1  # noqa: SLF001
         val_subset = self._datamodule.subsets.get("val")
         trainer = GetiTuneHFTrainer(
             self._model,
@@ -306,12 +324,14 @@ class HFEngine(Engine):
             callbacks=trainer_callbacks,
         )
         trainer.train()
+        trainer.accelerator.wait_for_everyone()
 
         best_dir = self._work_dir / self._CHECKPOINT_DIR_NAME
         if best_dir.exists():
             self._model.load_checkpoint(best_dir)
         else:
             trainer.save_model(str(best_dir))
+        trainer.accelerator.wait_for_everyone()
         self._model.record_checkpoint(best_dir)
         # Extract only when the selected checkpoint carries no threshold: the
         # best-checkpoint save persists its *same-epoch* validation threshold
@@ -321,7 +341,8 @@ class HFEngine(Engine):
         if self._model.best_confidence_threshold is None:
             self._extract_best_confidence_threshold(trainer)
 
-        write_metrics_csv(trainer.state.log_history, self._work_dir)
+        if trainer.is_world_process_zero():
+            write_metrics_csv(trainer.state.log_history, self._work_dir)
 
         summary = summarize_log_history(trainer.state.log_history)
         summary.update(trainer._best_eval_metrics)  # noqa: SLF001

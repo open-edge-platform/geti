@@ -152,6 +152,17 @@ def test_engine_construction_with_data_root(tmp_path: Path, model: _StubHFModel)
     assert engine.datamodule == tmp_path
 
 
+def test_engine_accepts_num_devices(tmp_path: Path, model: _StubHFModel) -> None:
+    engine = HFEngine(model=model, data=tmp_path, num_devices=2)
+
+    assert engine.num_devices == 2
+
+
+def test_engine_rejects_invalid_num_devices(tmp_path: Path, model: _StubHFModel) -> None:
+    with pytest.raises(ValueError, match="num_devices must be at least 1"):
+        HFEngine(model=model, data=tmp_path, num_devices=0)
+
+
 def test_engine_rejects_non_hf_model(tmp_path: Path) -> None:
     with pytest.raises(TypeError, match="model must be an HFModel"):
         HFEngine(model=object(), data=tmp_path)  # type: ignore[arg-type]
@@ -367,6 +378,32 @@ class TestTrain:
         trainer._best_eval_metrics = best_eval_metrics or {"val/map": 0.5, "val/map_50": 0.7}
         return trainer
 
+    def test_train_requires_matching_torchrun_world_size(
+        self, tmp_path: Path, model: _StubHFModel, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        engine = HFEngine(model=model, data=tmp_path, num_devices=2)
+        engine._datamodule = MagicMock()
+        monkeypatch.setenv("WORLD_SIZE", "1")
+
+        with pytest.raises(ValueError, match="torchrun"):
+            engine.train(max_epochs=1, batch=2)
+
+    def test_train_uses_one_gpu_when_multiple_are_visible(
+        self, tmp_path: Path, model: _StubHFModel, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        engine = self._engine(tmp_path, model)
+        trainer = self._mock_trainer()
+        args = MagicMock(n_gpu=2)
+        monkeypatch.setenv("WORLD_SIZE", "1")
+
+        with (
+            patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=trainer),
+            patch("getitune.backend.huggingface.engine.TrainingArguments", return_value=args),
+        ):
+            engine.train(max_epochs=1, batch=2)
+
+        assert args._n_gpu == 1
+
     @pytest.mark.parametrize(
         ("task", "expected_monitor"),
         [
@@ -559,6 +596,7 @@ class TestTrain:
             patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=self._mock_trainer()),
             patch("getitune.backend.huggingface.engine.TrainingArguments") as args_cls,
         ):
+            args_cls.return_value.n_gpu = 1
             engine.train(max_epochs=3, batch=1, **kwargs)
 
         _, call_kwargs = args_cls.call_args
@@ -581,6 +619,7 @@ class TestTrain:
             patch("getitune.backend.huggingface.engine.GetiTuneHFTrainer", return_value=self._mock_trainer()),
             patch("getitune.backend.huggingface.engine.TrainingArguments") as args_cls,
         ):
+            args_cls.return_value.n_gpu = 1
             engine.train(
                 max_epochs=1,
                 batch=2,
