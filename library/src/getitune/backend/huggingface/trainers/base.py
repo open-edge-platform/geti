@@ -356,6 +356,7 @@ class GetiTuneHFTrainer(Trainer):
             return {}
 
         self.model_wrapper.ensure_predict_ready()
+        metric_obj.to(self.args.device)
         metric_obj.reset()
 
         pipeline = self._eval_gpu_pipeline if split == "val" else self._test_gpu_pipeline
@@ -378,10 +379,7 @@ class GetiTuneHFTrainer(Trainer):
                 batch = self._prepare_batch(inputs, pipeline)
                 outputs = model(**self.model_wrapper.build_eval_inputs(batch))
                 metric_inputs = self.model_wrapper.to_metric_inputs(outputs, batch)
-                # HF postprocess returns CPU tensors while the batch lives on the
-                # accelerator, so move every tensor in the metric inputs to CPU once
-                # here instead of scattering .cpu() through each to_metric_inputs.
-                metric_inputs = apply_to_collection(metric_inputs, torch.Tensor, lambda t: t.cpu())
+                metric_inputs = apply_to_collection(metric_inputs, torch.Tensor, lambda t: t.to(self.args.device))
                 metric_obj.update(**metric_inputs)
                 iter_time += perf_counter() - start
                 num_batches += 1
