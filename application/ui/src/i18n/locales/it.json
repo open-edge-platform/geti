@@ -58,7 +58,9 @@
             "statusUppercase": "STATO",
             "settings": "Impostazioni",
             "training": "Addestramento",
+            "training_subset": "Addestramento",
             "validation": "Validazione",
+            "validation_subset": "Validazione",
             "testing": "Test",
             "unassigned": "Non assegnato",
             "trainingLowercase": "addestramento",
@@ -69,7 +71,8 @@
             "every": "ogni",
             "model": "Modello",
             "labels": "Etichette",
-            "bytesTransferred": "{{transferred}} di {{total}}"
+            "bytesTransferred": "{{transferred}} di {{total}}",
+            "language": "Lingua"
         },
         "viewModes": {
             "large": "Anteprime grandi",
@@ -97,7 +100,8 @@
         "models": "Modelli",
         "modelsDescription": "Pagina dei modelli per visualizzare i tuoi modelli",
         "inference": "Inferenza",
-        "inferenceDescription": "Pagina di inferenza che mostra l'inferenza in tempo reale sul tuo progetto"
+        "inferenceDescription": "Pagina di inferenza che mostra l'inferenza in tempo reale sul tuo progetto",
+        "preferences": "Preferenze"
     },
     "dataset": {
         "validation": {
@@ -354,6 +358,7 @@
         },
         "sources": {
             "uploadError": "Impossibile caricare il file video.",
+            "deleteVideoError": "Impossibile eliminare il file video caricato.",
             "list": {
                 "addSource": "Aggiungi nuova sorgente"
             },

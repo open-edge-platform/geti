@@ -44,7 +44,7 @@ def _validate_video_extension(extension: str) -> None:
     status_code=status.HTTP_201_CREATED,
     responses={
         status.HTTP_201_CREATED: {"description": "Video uploaded successfully"},
-        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Unsupported video format"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Invalid video upload"},
     },
 )
 async def upload_source_media(

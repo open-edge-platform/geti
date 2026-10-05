@@ -1,10 +1,11 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { uploadSourceVideo } from '@/api';
+import { deleteSourceVideo, uploadSourceVideo } from '@/api';
 import type { VideoFileSourceConfig } from '@/api/types';
 import type { TranslateFn } from '@/i18n';
 
+import type { PrepareFormData } from '../hooks/use-source-action.hook';
 import { getUniqueName } from '../utils';
 
 export const getVideoFileInitialConfig = (t: TranslateFn, existingNames: string[] = []): VideoFileSourceConfig => ({
@@ -30,14 +31,20 @@ export const prepareVideoFileFormData = async (
 
     // An untouched file input still yields a File entry (empty filename) once it has a `name`,
     // so only treat it as "a file was selected" when it actually has a name.
-    if (file instanceof File && file.name !== '') {
-        const { video_path } = await uploadSourceVideo(file, {
+    if (!(file instanceof File) || file.name === '') {
+        return undefined;
+    }
+
+    const { video_path } = await uploadSourceVideo(file, {
             signal,
             onProgress: (bytesSent) => onProgress?.(bytesSent, file.size),
         });
 
         formData.set('video_path', video_path);
-    }
+    // Uploads are stored as `<source_media_dir>/<uuid>/<filename>`; the UUID identifies the upload.
+    const sourceMediaId = video_path.split(/[\\/]/).at(-2);
+
+    return sourceMediaId ? () => deleteSourceVideo(sourceMediaId) : undefined;
 };
 
 export const videoFileBodyFormatter = (formData: FormData): VideoFileSourceConfig => ({

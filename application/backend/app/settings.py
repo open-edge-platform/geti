@@ -110,7 +110,7 @@ class Settings(BaseSettings):
         description="Maximum number for images or video frames passed for inference",
     )
     inference_model_ttl: int = Field(
-        default=60,
+        default=120,
         alias="INFERENCE_MODEL_TTL",
         description="Time to live for a model loaded for inference, before unloading",
     )
@@ -124,6 +124,12 @@ class Settings(BaseSettings):
             "Additionally, the first and last frames are also considered key frames."
         ),
         gt=0,
+    )
+    inference_max_models: int = Field(
+        default=2,
+        alias="INFERENCE_MAX_MODELS",
+        description="Maximum number of models the inference server keeps loaded in memory at the same time",
+        ge=1,
     )
 
     # SAM (Segment Anything Model)

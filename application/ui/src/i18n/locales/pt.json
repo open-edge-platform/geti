@@ -58,7 +58,9 @@
             "statusUppercase": "ESTADO",
             "settings": "Definições",
             "training": "Treino",
+            "training_subset": "Treino",
             "validation": "Validação",
+            "validation_subset": "Validação",
             "testing": "Teste",
             "unassigned": "Não atribuído",
             "trainingLowercase": "treino",
@@ -69,7 +71,8 @@
             "every": "a cada",
             "model": "Modelo",
             "labels": "Etiquetas",
-            "bytesTransferred": "{{transferred}} de {{total}}"
+            "bytesTransferred": "{{transferred}} de {{total}}",
+            "language": "Idioma"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -97,7 +100,8 @@
         "models": "Modelos",
         "modelsDescription": "Página de modelos para visualizar os seus modelos",
         "inference": "Inferência",
-        "inferenceDescription": "Página de inferência que mostra a inferência em tempo real no seu projeto"
+        "inferenceDescription": "Página de inferência que mostra a inferência em tempo real no seu projeto",
+        "preferences": "Preferências"
     },
     "dataset": {
         "validation": {
@@ -354,6 +358,7 @@
         },
         "sources": {
             "uploadError": "Falha ao carregar o ficheiro de vídeo.",
+            "deleteVideoError": "Falha ao eliminar o ficheiro de vídeo carregado.",
             "list": {
                 "addSource": "Adicionar nova fonte"
             },

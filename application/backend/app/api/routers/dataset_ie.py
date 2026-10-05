@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 from pathlib import Path
 from typing import Annotated
+from urllib.parse import quote
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 from fastapi.params import Depends
@@ -34,7 +35,10 @@ def _validate_archive_filename(filename: str | None) -> None:
     "",
     response_model=StagedDatasetView,
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_201_CREATED: {"description": "Dataset archive uploaded successfully"}},
+    responses={
+        status.HTTP_201_CREATED: {"description": "Dataset archive uploaded successfully"},
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "Invalid dataset archive"},
+    },
 )
 async def upload_archive(
     file: Annotated[UploadFile, File()],
@@ -149,7 +153,7 @@ def download_archive(
         file_iterator(file_path),
         media_type="application/zip",
         headers={
-            "Content-Disposition": f"attachment; filename={file_path.name}",
+            "Content-Disposition": f"attachment; filename*=utf-8''{quote(file_path.name)}",
         },
     )
 
