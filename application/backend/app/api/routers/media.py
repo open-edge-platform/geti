@@ -3,12 +3,10 @@
 
 import os
 from datetime import datetime
-from functools import partial
 from pathlib import Path
 from typing import Annotated, Any, BinaryIO
 from uuid import UUID
 
-from anyio import to_thread
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile, status
 from fastapi.openapi.models import Example
 from starlette.responses import Response
@@ -237,16 +235,15 @@ async def add_media_from_upload(
     """
     async with consume_upload(upload_service, body.upload_id) as claimed:
         name, extension = split_upload_filename(claimed.upload.filename)
-        return await to_thread.run_sync(
-            partial(
-                _create_media,
-                project=project,
-                media_service=media_service,
-                dataset_service=dataset_service,
-                name=body.name if body.name is not None else name,
-                extension=extension,
-                data=claimed.path,  # moved into the dataset, not copied
-            )
+        # `media_service`/`dataset_service` are bound to a SQLAlchemy `Session` created for this request; run this
+        # synchronously, in the same execution context, instead of handing it off to a worker thread.
+        return _create_media(
+            project=project,
+            media_service=media_service,
+            dataset_service=dataset_service,
+            name=body.name if body.name is not None else name,
+            extension=extension,
+            data=claimed.path,  # moved into the dataset, not copied
         )
 
 

@@ -429,8 +429,10 @@ class UploadService:
                 yield ClaimedUpload(upload=upload, path=path)
             except BaseException:
                 with anyio.CancelScope(shield=True):
-                    if path.is_file():
-                        await to_thread.run_sync(self._release, upload_id)
+                    # Release regardless of whether the consumer already moved the file away: if it failed after
+                    # moving it, the upload must still be releasable (retryable or deletable) instead of staying
+                    # stuck in CONSUMED forever.
+                    await to_thread.run_sync(self._release, upload_id)
                 raise
             await to_thread.run_sync(partial(path.unlink, missing_ok=True))
         logger.info("Consumed upload {} ('{}')", upload.id, upload.filename)

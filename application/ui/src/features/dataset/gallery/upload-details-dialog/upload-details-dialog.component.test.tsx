@@ -232,4 +232,27 @@ describe('UploadDetailsDialog', () => {
 
         expect(screen.getByText('Cancelled 2 uploads')).toBeVisible();
     });
+
+    it('shows a mixed final subheader including cancelled uploads when the batch was not fully cancelled', () => {
+        const { result } = renderUpload();
+
+        let ids: string[] = [];
+        act(() => {
+            ids = result.current.upload.startUploadProgress([
+                makeFile('one.jpg'),
+                makeFile('two.jpg'),
+                makeFile('three.jpg'),
+            ]);
+            result.current.dispatch({ type: 'OPEN_DIALOG' });
+        });
+
+        act(() => {
+            result.current.upload.setItemUploaded(ids[0]);
+            result.current.upload.setItemFailed(ids[1], 'bad');
+            result.current.upload.cancelItems([ids[2]]);
+            result.current.upload.finishUploadProgress();
+        });
+
+        expect(screen.getByText('Uploaded 1 item, 1 failed, 1 cancelled')).toBeVisible();
+    });
 });

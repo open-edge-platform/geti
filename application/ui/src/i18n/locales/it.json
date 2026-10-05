@@ -163,6 +163,8 @@
             "failedSummary_other": "Impossibile caricare {{count}} elementi",
             "mixedSummary_one": "{{uploaded}} elemento caricato, {{failed}} non riuscito",
             "mixedSummary_other": "{{uploaded}} elementi caricati, {{failed}} non riusciti",
+            "mixedCancelledSummary_one": "{{uploaded}} elemento caricato, {{failed}} non riuscito, {{cancelled}} annullato",
+            "mixedCancelledSummary_other": "{{uploaded}} elementi caricati, {{failed}} non riusciti, {{cancelled}} annullati",
             "genericError": "Impossibile caricare media.",
             "uploadMedia": "Carica media",
             "showDetails": "Mostra dettagli",

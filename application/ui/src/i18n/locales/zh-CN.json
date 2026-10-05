@@ -163,6 +163,8 @@
             "failedSummary_other": "{{count}} 个文件上传失败",
             "mixedSummary_one": "已上传 {{uploaded}} 个文件，失败 {{failed}} 个",
             "mixedSummary_other": "已上传 {{uploaded}} 个文件，失败 {{failed}} 个",
+            "mixedCancelledSummary_one": "已上传 {{uploaded}} 个文件，失败 {{failed}} 个，已取消 {{cancelled}} 个",
+            "mixedCancelledSummary_other": "已上传 {{uploaded}} 个文件，失败 {{failed}} 个，已取消 {{cancelled}} 个",
             "genericError": "媒体文件上传失败。",
             "uploadMedia": "上传媒体文件",
             "showDetails": "查看详情",

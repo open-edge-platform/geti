@@ -163,6 +163,8 @@
             "failedSummary_other": "Failed to upload {{count}} items",
             "mixedSummary_one": "Uploaded {{uploaded}} item, {{failed}} failed",
             "mixedSummary_other": "Uploaded {{uploaded}} items, {{failed}} failed",
+            "mixedCancelledSummary_one": "Uploaded {{uploaded}} item, {{failed}} failed, {{cancelled}} cancelled",
+            "mixedCancelledSummary_other": "Uploaded {{uploaded}} items, {{failed}} failed, {{cancelled}} cancelled",
             "genericError": "Failed to upload media.",
             "uploadMedia": "Upload media",
             "showDetails": "Show details",

@@ -89,7 +89,9 @@ export const VideoFile = ({ defaultState, uploadProgress, onCancelUpload }: Vide
                     <UploadProgress
                         bytesSent={uploadProgress.bytesSent}
                         bytesTotal={uploadProgress.bytesTotal}
-                        onCancel={onCancelUpload}
+                        // Once the transfer is complete, the server is already consuming the upload: cancelling the
+                        // signal at that point would no longer prevent the source from being saved.
+                        onCancel={uploadProgress.bytesSent < uploadProgress.bytesTotal ? onCancelUpload : undefined}
                     />
                 )}
             </Flex>

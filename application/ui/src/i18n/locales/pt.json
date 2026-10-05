@@ -163,6 +163,8 @@
             "failedSummary_other": "Falha ao carregar {{count}} itens",
             "mixedSummary_one": "{{uploaded}} item carregado, {{failed}} falhou",
             "mixedSummary_other": "{{uploaded}} itens carregados, {{failed}} falharam",
+            "mixedCancelledSummary_one": "{{uploaded}} item carregado, {{failed}} falhou, {{cancelled}} cancelado",
+            "mixedCancelledSummary_other": "{{uploaded}} itens carregados, {{failed}} falharam, {{cancelled}} cancelados",
             "genericError": "Falha ao carregar itens multimédia.",
             "uploadMedia": "Carregar multimédia",
             "showDetails": "Mostrar detalhes",

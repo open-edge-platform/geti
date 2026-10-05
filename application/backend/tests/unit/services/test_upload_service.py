@@ -394,6 +394,20 @@ class TestUploadService:
             assert claimed.path.read_bytes() == b"abc"
 
     @pytest.mark.asyncio
+    async def test_consume_failure_after_file_moved_still_releases_upload(
+        self, fxt_upload_service: UploadService
+    ) -> None:
+        """A consumer that moves the file away before failing must not leave the upload stuck as CONSUMED."""
+        upload = await fxt_upload_service.create(size=3, metadata_header=None, body=_chunks(b"abc"))
+
+        with pytest.raises(RuntimeError):
+            async with fxt_upload_service.consume(upload.id) as claimed:
+                claimed.path.unlink()  # simulate the consumer moving the file away
+                raise RuntimeError("consumer failed after moving the file")
+
+        assert (await fxt_upload_service.get(upload.id)).state == UploadState.COMPLETED
+
+    @pytest.mark.asyncio
     async def test_consume_incomplete_upload(self, fxt_upload_service: UploadService) -> None:
         upload = await fxt_upload_service.create(size=6, metadata_header=None, body=_chunks(b"abc"))
 

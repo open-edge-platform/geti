@@ -173,4 +173,12 @@ describe('VideoFile', () => {
 
         expect(screen.queryByRole('progressbar')).toBeNull();
     });
+
+    it('hides the cancel button once the transfer has completed', () => {
+        const onCancelUpload = vi.fn();
+        renderApp({ uploadProgress: { bytesSent: 2000, bytesTotal: 2000 }, onCancelUpload });
+
+        expect(screen.getByRole('progressbar', { name: 'Upload progress' })).toHaveAttribute('aria-valuenow', '100');
+        expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull();
+    });
 });

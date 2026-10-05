@@ -157,6 +157,14 @@ const buildSubheader = (
     if (succeeded === 0 && failed === 0 && cancelled > 0) {
         return t('dataset.upload.cancelledSummary', { count: cancelled });
     }
+    if (cancelled > 0) {
+        return t('dataset.upload.mixedCancelledSummary', {
+            count: succeeded,
+            uploaded: succeeded,
+            failed,
+            cancelled,
+        });
+    }
     if (failed === 0) return t('dataset.upload.uploadedSummary', { count: succeeded });
     if (succeeded === 0) return t('dataset.upload.failedSummary', { count: failed });
 

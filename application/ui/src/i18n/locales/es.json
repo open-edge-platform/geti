@@ -163,6 +163,8 @@
             "failedSummary_other": "No se pudieron cargar {{count}} elementos",
             "mixedSummary_one": "{{uploaded}} elemento cargado, {{failed}} fallido",
             "mixedSummary_other": "{{uploaded}} elementos cargados, {{failed}} fallidos",
+            "mixedCancelledSummary_one": "{{uploaded}} elemento cargado, {{failed}} fallido, {{cancelled}} cancelado",
+            "mixedCancelledSummary_other": "{{uploaded}} elementos cargados, {{failed}} fallidos, {{cancelled}} cancelados",
             "genericError": "No se pudieron cargar los elementos multimedia.",
             "uploadMedia": "Cargar multimedia",
             "showDetails": "Mostrar detalles",
