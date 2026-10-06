@@ -68,7 +68,6 @@ export const SSIMTool = () => {
         <>
             <svg
                 aria-label='ssim preview'
-                aria-busy={isProcessing}
                 viewBox={`0 0 ${image.width} ${image.height}`}
                 style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible' }}
             >

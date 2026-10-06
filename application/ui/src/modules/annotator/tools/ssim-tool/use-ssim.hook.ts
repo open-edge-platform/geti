@@ -4,7 +4,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { i18n } from '@/i18n';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Remote, wrap } from 'comlink';
 
 import type { Shape } from '../../../../shared/types';
@@ -25,6 +25,7 @@ import {
 // Building the worker downloads and compiles the OpenCV wasm, which can be slow on a cold cache.
 const SSIM_WORKER_BUILD_TIMEOUT_MS = 30_000;
 const SSIM_EXECUTE_TIMEOUT_MS = 10_000;
+const SSIM_WORKER_QUERY_KEY = ['workers', 'SSIM'];
 
 type SSIMState = {
     shapes: Shape[];
@@ -40,7 +41,7 @@ const INITIAL_SSIM_STATE: SSIMState = {
 
 export const useSSIMWorker = (enabled = true) => {
     const { data, isLoading, isError, error } = useQuery<{ worker: Worker; instance: Remote<SSIMWorkerInstance> }>({
-        queryKey: ['workers', 'SSIM'],
+        queryKey: SSIM_WORKER_QUERY_KEY,
         queryFn: async ({ signal }) => {
             const worker = new Worker(new URL('../../webworkers/ssim-worker', import.meta.url), {
                 type: 'module',
@@ -74,12 +75,14 @@ export const useSSIMWorker = (enabled = true) => {
         enabled,
     });
 
-    return { worker: data?.instance, isLoading, isError, error };
+    return { worker: data?.instance, rawWorker: data?.worker, isLoading, isError, error };
 };
 
 export const useSSIM = (enabled = true) => {
+    const queryClient = useQueryClient();
     const {
         worker: ssim,
+        rawWorker,
         isLoading: isLoadingWorker,
         isError: isWorkerError,
         error: workerError,
@@ -116,15 +119,24 @@ export const useSSIM = (enabled = true) => {
         error: executionError,
     } = useMutation({
         mutationFn: async (runSSIMProps: RunSSIMProps) => {
-            if (ssim === undefined) {
-                throw new Error('SSIM worker is not initialized yet');
-            }
+            try {
+                if (ssim === undefined) {
+                    throw new Error('SSIM worker is not initialized yet');
+                }
 
-            return executeWithTimeout(
-                ssim.executeSSIM(toToolRunSSIMProps(runSSIMProps)),
-                i18n.t('annotator.tools.ssim.label'),
-                SSIM_EXECUTE_TIMEOUT_MS
-            );
+                return await executeWithTimeout(
+                    ssim.executeSSIM(toToolRunSSIMProps(runSSIMProps)),
+                    i18n.t('annotator.tools.ssim.label'),
+                    SSIM_EXECUTE_TIMEOUT_MS
+                );
+            } catch (executeError) {
+                // Comlink calls can't be cancelled and the worker runs them serially, so a stuck (or
+                // never built) worker would block every later run: replace it instead.
+                rawWorker?.terminate();
+                void queryClient.resetQueries({ queryKey: SSIM_WORKER_QUERY_KEY });
+
+                throw executeError;
+            }
         },
         onSuccess: (matches, { existingAnnotations, autoMergeDuplicates, template, roi, shapeType }) => {
             const ssimMatches = convertToolMatchesToGetiMatches(matches);
