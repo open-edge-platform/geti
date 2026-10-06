@@ -4,14 +4,17 @@
 import type { Label } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { ActionButton, Divider, Flex } from '@geti-ui/ui';
+import dayjs from 'dayjs';
 import { useDatasetFiltersSearchParams } from 'hooks/use-dataset-filters-search-params.hook';
+import { DATE_TIME_FORMAT, useFormatDate } from 'hooks/use-format-date.hook';
 import { useProjectLabels } from 'hooks/use-project-labels.hook';
 import { capitalize, isEmpty } from 'lodash-es';
 
-import { formatDateRangeEnd, formatDateRangeStart, formatFilterDate } from '../../../../shared/date-utils';
 import { SUBSET_LABEL_KEYS } from '../../../../shared/subsets';
 import { isNonEmptyArray } from '../../../../shared/util';
 import { FilterChips } from '../toolbar/media-filtering/filter-chips/filter-chips.component';
+
+const formatFilterDate = (date: string): string => dayjs(date).format('DD/MM/YYYY HH:mm');
 
 export const ActiveFiltersList = () => {
     const { t } = useTranslation();
@@ -28,10 +31,13 @@ export const ActiveFiltersList = () => {
         selectedSubsets,
         setSelectedSubsets,
     } = useDatasetFiltersSearchParams();
+    const formatDate = useFormatDate(DATE_TIME_FORMAT);
 
     const handleRemoveLabel = (id: string) => {
         setSelectedLabelIds(selectedLabelIds.filter((selectedId) => selectedId !== id));
     };
+
+    const d = new Date().toLocaleDateString();
 
     const selectedLabels = selectedLabelIds
         .map((id) => labels.find((label) => label.id === id))
@@ -66,7 +72,7 @@ export const ActiveFiltersList = () => {
 
             {startDate !== null && (
                 <FilterChips
-                    name={formatDateRangeStart(startDate, t)}
+                    name={t('dataset.filters.dateRange.from', { date: formatDate(startDate) ?? '-' })}
                     ariaLabel={`Remove From ${formatFilterDate(startDate)} filter`}
                     onClose={() => setStartDate(null)}
                 />
@@ -74,7 +80,7 @@ export const ActiveFiltersList = () => {
 
             {endDate !== null && (
                 <FilterChips
-                    name={formatDateRangeEnd(endDate, t)}
+                    name={t('dataset.filters.dateRange.to', { date: formatDate(endDate) ?? '-' })}
                     ariaLabel={`Remove To ${formatFilterDate(endDate)} filter`}
                     onClose={() => setEndDate(null)}
                 />

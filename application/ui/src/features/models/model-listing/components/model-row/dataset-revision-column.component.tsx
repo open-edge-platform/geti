@@ -5,9 +5,9 @@ import type { DatasetRevision } from '@/api/types';
 import { useTranslation } from '@/i18n';
 import { Flex, Text } from '@geti-ui/ui';
 import { Image, Tag } from '@geti-ui/ui/icons';
+import { DATE_TIME_FORMAT, useFormatDate } from 'hooks/use-format-date.hook';
 import { useNumberFormatter } from 'react-aria';
 
-import { formatDateTime } from '../../../../../shared/date-utils';
 import { ModelBadge } from './model-badge.component';
 
 import styles from './model-row.module.scss';
@@ -23,6 +23,7 @@ export const DatasetColumn = ({ datasetRevision, labelsCount, pendingDatasetName
     const { t } = useTranslation();
     const totalCount = datasetRevision?.item_counts?.total;
     const formatter = useNumberFormatter();
+    const formatDate = useFormatDate(DATE_TIME_FORMAT);
 
     if (datasetRevision === undefined) {
         return <Flex alignItems={'center'}>{pendingDatasetName ?? t('common.labels.unknown')}</Flex>;
@@ -31,7 +32,7 @@ export const DatasetColumn = ({ datasetRevision, labelsCount, pendingDatasetName
     return (
         <Flex direction={'column'} gap={'size-50'}>
             <Text UNSAFE_className={styles.datasetRevisionName}>{datasetRevision.name}</Text>
-            <Text UNSAFE_className={styles.datasetRevisionDate}>{formatDateTime(datasetRevision.created_at)}</Text>
+            <Text UNSAFE_className={styles.datasetRevisionDate}>{formatDate(datasetRevision.created_at) ?? '-'}</Text>
             <Flex gap={'size-100'}>
                 {labelsCount !== undefined && (
                     <ModelBadge id={'labels-count'}>
