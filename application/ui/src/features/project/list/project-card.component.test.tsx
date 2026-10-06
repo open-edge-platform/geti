@@ -8,15 +8,13 @@ import userEvent from '@testing-library/user-event';
 import { getMockedPipeline } from 'mocks/mock-pipeline';
 import { getMockedProject } from 'mocks/mock-project';
 import { HttpResponse } from 'msw';
+import { localISOString } from 'test-utils/local-iso-string';
 import { render } from 'test-utils/render';
 
 import { http } from '../../../api/utils';
 import { server } from '../../../msw-node-setup';
 import { ProjectCard } from './project-card.component';
 import { getProjectTypeTitle } from './util';
-
-const localISOString = (year: number, month: number, day: number, hours = 0, minutes = 0) =>
-    new Date(year, month - 1, day, hours, minutes).toISOString();
 
 describe('ProjectCard', () => {
     const mockProject = getMockedProject({

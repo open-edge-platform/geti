@@ -6,13 +6,10 @@ import { useState, type ReactNode } from 'react';
 import { Button, ThemeProvider } from '@geti-ui/ui';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { localISOString } from 'test-utils/local-iso-string';
 import { render, renderHook } from 'test-utils/render';
 
 import { DATE_TIME_FORMAT, useFormatDate } from './use-format-date.hook';
-
-// Dates are formatted in the local timezone, so the inputs are built from local time components
-const localISOString = (year: number, month: number, day: number, hours = 0, minutes = 0) =>
-    new Date(year, month - 1, day, hours, minutes).toISOString();
 
 const localISOStringNoOffset = (year: number, month: number, day: number, hours = 0, minutes = 0) => {
     const pad = (n: number) => String(n).padStart(2, '0');

@@ -4,15 +4,12 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedDatasetRevision } from 'mocks/mock-dataset-revision';
+import { localISOString } from 'test-utils/local-iso-string';
 import { render } from 'test-utils/render';
 
 import { getMockedModel, getMockedModelArchitecture } from '../../../../../../mocks/mock-model';
 import { formatBytes } from '../../../../../shared/util';
 import { ModelRow } from './model-row.component';
-
-// Dates are formatted in the local timezone, so the inputs are built from local time components
-const localISOString = (year: number, month: number, day: number, hours = 0, minutes = 0) =>
-    new Date(year, month - 1, day, hours, minutes).toISOString();
 
 describe('ModelRow', () => {
     const defaultModel = getMockedModel({

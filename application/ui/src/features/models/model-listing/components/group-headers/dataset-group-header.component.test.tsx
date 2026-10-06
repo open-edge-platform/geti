@@ -2,14 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { screen } from '@testing-library/react';
+import { localISOString } from 'test-utils/local-iso-string';
 import { render } from 'test-utils/render';
 
 import type { DatasetGroup } from '../../types';
 import { DatasetGroupHeader } from './dataset-group-header.component';
-
-// Dates are formatted in the local timezone, so the input is built from local time components.
-const localISOString = (year: number, month: number, day: number, hours: number, minutes: number) =>
-    new Date(year, month - 1, day, hours, minutes).toISOString();
 
 const mockDataset: DatasetGroup = {
     id: 'dataset-123',

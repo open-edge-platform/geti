@@ -19,9 +19,6 @@ import { getTestingMetric } from './utils';
 
 import classes from './model-row.module.scss';
 
-// Copyright (C) 2025-2026 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
-
 type ModelRowProps = {
     model: Model;
     parentRevisionModel?: Model;
