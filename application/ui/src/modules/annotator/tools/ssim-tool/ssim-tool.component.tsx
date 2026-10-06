@@ -1,9 +1,11 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
+import { toast } from '@/components/toast/toast.component';
 import { useZoom } from '@/components/zoom/zoom.provider';
+import { useTranslation } from '@/i18n';
 
 import { useProjectTask } from '../../../../hooks/use-project-task.hook';
 import { isDetectionTask } from '../../../../shared/task-type-guards';
@@ -14,19 +16,39 @@ import { useSelectedMediaItem } from '../../selected-media-item-provider.compone
 import { Rectangle } from '../../shapes/rectangle.component';
 import { DEFAULT_ANNOTATION_STYLES } from '../../utils';
 import { DrawingBox } from '../drawing-box-tool/drawing-box.component';
+import { ToolLoading } from '../tool-loading.component';
 import { useAddAndSelectAnnotations } from '../use-add-and-select-annotations.hook';
 import { useSSIM } from './use-ssim.hook';
 
 import classes from './ssim-tool.module.scss';
 
 export const SSIMTool = () => {
+    const { t } = useTranslation();
     const { scale: zoom } = useZoom();
     const { roi, image } = useSelectedMediaItem();
     const { annotations } = useAnnotationActions();
     const { selectedLabel } = useAnnotatorLabels();
     const { addAndSelectAnnotations } = useAddAndSelectAnnotations();
-    const { runSSIM, reset, toolState, isProcessing, isLoading } = useSSIM();
+    const { runSSIM, reset, toolState, isProcessing, isLoading, isError, error } = useSSIM();
     const shapeType = isDetectionTask(useProjectTask()) ? 'rectangle' : 'polygon';
+    const hasShownErrorToastRef = useRef(false);
+
+    useEffect(() => {
+        if (isError && !hasShownErrorToastRef.current) {
+            toast({
+                type: 'error',
+                message: t('annotator.tools.ssim.error', {
+                    message: error?.message ?? t('annotator.tools.autoSegmentation.unknownError'),
+                }),
+            });
+
+            hasShownErrorToastRef.current = true;
+        }
+
+        if (!isError) {
+            hasShownErrorToastRef.current = false;
+        }
+    }, [isError, error, t]);
 
     useEffect(() => {
         if (isProcessing || toolState.shapes.length === 0) {
@@ -38,11 +60,15 @@ export const SSIMTool = () => {
         reset();
     }, [toolState.shapes, isProcessing, addAndSelectAnnotations, selectedLabel, reset]);
 
+    if (isLoading) {
+        return <ToolLoading message={t('annotator.tools.ssim.loading')} />;
+    }
+
     return (
         <>
             <svg
                 aria-label='ssim preview'
-                data-loading={isLoading}
+                aria-busy={isProcessing}
                 viewBox={`0 0 ${image.width} ${image.height}`}
                 style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible' }}
             >
@@ -92,7 +118,8 @@ export const SSIMTool = () => {
                 onComplete={(shapes) => {
                     const [template] = shapes;
 
-                    if (template === undefined) {
+                    // A second run would overwrite the in-flight one's results before they are added.
+                    if (template === undefined || isProcessing) {
                         return [];
                     }
 
