@@ -788,6 +788,10 @@
                 "label": "智能勾边",
                 "description": "沿着目标边缘移动并定时点击，将轮廓吸附到其边界。",
                 "error": "形状边界选取失败，请再试一次。"
+            },
+            "ssim": {
+                "label": "检测助手",
+                "description": "在目标周围绘制一个框，即可自动查找并标注图像中的相似目标。"
             }
         },
         "video": {
@@ -919,9 +923,13 @@
                 },
                 "selectDataset": {
                     "label": "选择数据集",
-                    "useCurrentDataset": "使用当前数据集",
+                    "useEntireDataset": "使用整个数据集",
                     "helpTitle": "选择数据集",
-                    "helpDescription": "选择用于训练的数据集版本。如果希望新模型使用与其他模型完全相同的数据（媒体和标注）进行训练，请选择对应的数据集版本。反之，如果希望使用最新版本的数据（即“数据集”页面中所见）进行训练，请选择“使用当前数据集”。"
+                    "helpDescription": "选择用于训练的数据。选择“使用整个数据集”可使用全部数据的最新版本（即“数据集”页面中所见）进行训练。选择数据集视图可仅使用分配给该视图的媒体进行训练。选择数据集版本可使用与其他模型完全相同的数据（媒体和标注）进行训练。",
+                    "sections": {
+                        "views": "数据集视图",
+                        "revisions": "数据集版本"
+                    }
                 },
                 "selectModel": {
                     "label": "选择输入权重",
@@ -932,6 +940,7 @@
             },
             "validation": {
                 "notEnoughAnnotations": "要训练模型，数据集中至少需要标注 3 项，不过为获得更好的效果，建议多标注一些。",
+                "notEnoughAnnotationsInView": "要训练模型，所选数据集视图中至少需要标注 3 项，不过为获得更好的效果，建议多标注一些。",
                 "emptySubsetsReason": "要训练模型，每个子集（训练集、验证集、测试集）至少需要包含一项。目前不满足该条件，因为{{subsetClause}}，且{{assignmentDetail}}。",
                 "emptySubsetClause_one": "{{list}} 子集为空",
                 "emptySubsetClause_other": "{{list}} 子集均为空",

@@ -792,6 +792,10 @@
                 "label": "Lasso magnetyczne",
                 "description": "Przesuwaj kursor wzdłuż krawędzi obiektu i klikaj okresowo, aby dopasować kontur do jego granic.",
                 "error": "Nie udało się zaznaczyć granic kształtu. Spróbuj ponownie."
+            },
+            "ssim": {
+                "label": "Asystent wykrywania",
+                "description": "Narysuj ramkę wokół obiektu, aby automatycznie znaleźć i oznaczyć podobne obiekty na obrazie."
             }
         },
         "video": {
@@ -923,9 +927,13 @@
                 },
                 "selectDataset": {
                     "label": "Wybierz dataset",
-                    "useCurrentDataset": "Użyj bieżącego datasetu",
+                    "useEntireDataset": "Użyj całego datasetu",
                     "helpTitle": "Wybór datasetu",
-                    "helpDescription": "Wybierz wersję datasetu, której chcesz użyć do trenowania. Jeśli chcesz wytrenować nowy model\n                            na dokładnie tych samych danych (multimediach i adnotacjach) co inny model, wybierz odpowiednią\n                            rewizję datasetu. Natomiast jeśli chcesz trenować na najnowszej wersji\n                            danych (widocznej na stronie „dataset”), wybierz „Użyj\n                            bieżącego datasetu”."
+                    "helpDescription": "Wybierz dane, których chcesz użyć do trenowania. Wybierz „Użyj całego datasetu”, aby trenować na najnowszej wersji wszystkich danych (widocznych na stronie „Dataset”). Wybierz widok datasetu, aby trenować tylko na multimediach przypisanych do tego widoku. Wybierz rewizję datasetu, aby trenować na dokładnie tych samych danych (multimediach i adnotacjach) co inny model.",
+                    "sections": {
+                        "views": "Widoki datasetu",
+                        "revisions": "Rewizje datasetu"
+                    }
                 },
                 "selectModel": {
                     "label": "Wybierz wagi wejściowe",
@@ -936,6 +944,7 @@
             },
             "validation": {
                 "notEnoughAnnotations": "Aby wytrenować model, musisz opisać adnotacjami co najmniej 3 elementy w datasecie, chociaż zalecamy opisanie kilku więcej, aby uzyskać lepsze wyniki.",
+                "notEnoughAnnotationsInView": "Aby wytrenować model, musisz opisać adnotacjami co najmniej 3 elementy w wybranym widoku datasetu, chociaż zalecamy opisanie kilku więcej, aby uzyskać lepsze wyniki.",
                 "emptySubsetsReason": "Aby wytrenować model, każdy podzbiór (treningowy, walidacyjny, testowy) musi zawierać co najmniej jeden element. Ten warunek nie jest obecnie spełniony, ponieważ {{subsetClause}} pusty(-e) i {{assignmentDetail}}.",
                 "emptySubsetClause_one": "podzbiór {{list}} jest",
                 "emptySubsetClause_other": "podzbiory {{list}} są",

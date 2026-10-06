@@ -1,8 +1,8 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import { useTranslation } from '@/i18n';
-import { BoundingBox, Polygon, SegmentAnythingIcon, Selector } from '@geti-ui/ui/icons';
+import { BoundingBox, DetectionTool, Polygon, SegmentAnythingIcon, Selector } from '@geti-ui/ui/icons';
 
 import { ReactComponent as MagneticLasso } from '../../../../assets/icons/magnetic-lasso.svg';
 import BoundingBoxImg from '../../../../assets/tools/bounding-box.webp';
@@ -10,6 +10,7 @@ import MagneticLassoImg from '../../../../assets/tools/magnetic-lasso.webp';
 import PolygonImg from '../../../../assets/tools/polygon.webp';
 import SAMDetectionImg from '../../../../assets/tools/sam-detection.webp';
 import SAMSegmentationImg from '../../../../assets/tools/sam-segmentation.webp';
+import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { useProjectTask } from '../../../../hooks/use-project-task.hook';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
@@ -89,14 +90,28 @@ export const useAvailableTools = (): ToolConfig[] => {
         },
     };
 
+    const ssimToolConfig: ToolConfig = {
+        type: 'ssim',
+        icon: DetectionTool,
+        hotkey: HOTKEYS.ssimTool,
+        label: t('annotator.tools.ssim.label'),
+        ariaLabel: 'Detection assistant',
+        tooltip: {
+            description: t('annotator.tools.ssim.description'),
+        },
+    };
+
+    const ssimTools = FEATURE_FLAGS.SSIM_TOOL ? [ssimToolConfig] : [];
+
     const taskToolConfig: Record<string, ToolConfig[]> = {
         classification: [],
-        detection: [selectionToolConfig, boundingBoxToolConfig, autoSegmentationDetectionConfig],
+        detection: [selectionToolConfig, boundingBoxToolConfig, autoSegmentationDetectionConfig, ...ssimTools],
         instance_segmentation: [
             selectionToolConfig,
             polygonToolConfig,
             magneticLassoToolConfig,
             autoSegmentationConfig,
+            ...ssimTools,
         ],
     };
 

@@ -788,6 +788,10 @@
                 "label": "Laço Magnético",
                 "description": "Passe o cursor junto ao contorno de um objeto e clique periodicamente para fixar o contorno às suas extremidades.",
                 "error": "Falha ao selecionar os limites da forma. Pode tentar novamente?"
+            },
+            "ssim": {
+                "label": "Assistente de deteção",
+                "description": "Desenhe uma caixa à volta de um objeto para encontrar e anotar automaticamente objetos semelhantes na imagem."
             }
         },
         "video": {
@@ -919,9 +923,13 @@
                 },
                 "selectDataset": {
                     "label": "Selecionar dataset",
-                    "useCurrentDataset": "Utilizar dataset atual",
+                    "useEntireDataset": "Utilizar dataset completo",
                     "helpTitle": "Selecionar um dataset",
-                    "helpDescription": "Escolha a versão do dataset a utilizar para o treino. Se pretender treinar o novo modelo exatamente com os mesmos dados (multimédia e anotações) de outro modelo, selecione a revisão correspondente do dataset. Caso contrário, se pretender treinar com a versão mais recente dos dados (o que vê na página \"Dataset\"), selecione \"Utilizar dataset atual\"."
+                    "helpDescription": "Escolha os dados a utilizar para o treino. Selecione \"Utilizar dataset completo\" para treinar com a versão mais recente de todos os dados (o que vê na página \"Dataset\"). Selecione uma vista do dataset para treinar apenas com a multimédia atribuída a essa vista. Selecione uma revisão do dataset para treinar exatamente com os mesmos dados (multimédia e anotações) de outro modelo.",
+                    "sections": {
+                        "views": "Vistas do dataset",
+                        "revisions": "Revisões do dataset"
+                    }
                 },
                 "selectModel": {
                     "label": "Selecionar pesos de entrada",
@@ -932,6 +940,7 @@
             },
             "validation": {
                 "notEnoughAnnotations": "Para treinar um modelo, precisa de anotar pelo menos 3 itens no seu dataset, embora recomendemos anotar vários mais para obter melhores resultados.",
+                "notEnoughAnnotationsInView": "Para treinar um modelo, precisa de anotar pelo menos 3 itens na vista do dataset selecionada, embora recomendemos anotar vários mais para obter melhores resultados.",
                 "emptySubsetsReason": "Para treinar um modelo, cada subconjunto (treino, validação, teste) necessita de pelo menos um item. Esta condição não pode ser satisfeita de momento porque {{subsetClause}} e {{assignmentDetail}}.",
                 "emptySubsetClause_one": "o subconjunto {{list}} está vazio",
                 "emptySubsetClause_other": "os subconjuntos {{list}} estão vazios",
