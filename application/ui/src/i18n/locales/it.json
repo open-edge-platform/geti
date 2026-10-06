@@ -1139,16 +1139,30 @@
     "license": {
         "label": "Licenza: ",
         "agreement": {
-            "title": "Accordo di licenza",
-            "intro": "Installando, utilizzando o distribuendo questa applicazione, riconosci che:",
-            "termsRead": "Hai letto e compreso i termini di licenza ai link seguenti;",
-            "termsGovern": "Confermato che i termini collegati disciplinano i contenuti che cerchi di accedere e utilizzare; e",
-            "termsAccepted": "Accettato e concordato i termini di licenza collegati.",
+            "title": "Accordi di licenza",
+            "intro": "Leggi e accetta le seguenti licenze per continuare a usare Geti.",
+            "progress": "{{current}} di {{total}}",
+            "required": "Obbligatoria",
+            "optional": "Facoltativa",
+            "optionalInfo": "Questa licenza è fornita a titolo informativo. Si applica solo se utilizzi i modelli a cui si riferisce.",
+            "consent": "Accettando qui sotto, accetti i termini e le condizioni della {{license}}.",
+            "fullLicense": "Leggi la licenza completa",
+            "agree": "Ho letto e accetto la {{license}}",
+            "previous": "Precedente",
             "accept": "Accetta e continua"
         },
-        "links": {
-            "intelSimplified": "Licenza software semplificata Intel",
-            "dinov2": "Licenza DINOv3"
+        "notices": {
+            "intelSimplified": {
+                "name": "Licenza software semplificata Intel",
+                "notice": "L'applicazione Geti per Windows è concessa in licenza in base alla Licenza software semplificata Intel (versione di ottobre 2022).\n\nLa licenza stabilisce le condizioni alle quali puoi utilizzare e ridistribuire l'applicazione, insieme alle relative esclusioni e limitazioni di responsabilità. I componenti di terze parti inclusi nell'applicazione possono essere disciplinati da propri termini di licenza.\n\nLeggi i termini completi della licenza prima di continuare."
+            },
+            "ultralytics": {
+                "name": "Licenza AGPL-3.0 di Ultralytics"
+            },
+            "dinov3": {
+                "name": "Licenza DINOv3",
+                "notice": "Geti offre modelli di classificazione basati su DINOv3, i cui pesi preaddestrati sono resi disponibili da Meta con la Licenza DINOv3.\n\nSe addestri o distribuisci questi modelli, l'uso dei pesi DINOv3 è disciplinato dai termini della Licenza DINOv3."
+            }
         }
     },
     "application": {

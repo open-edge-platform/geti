@@ -1,17 +1,207 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-.list {
-    list-style-type: disc;
-    padding-inline-start: var(--spectrum-global-dimension-size-500);
-    margin-block: var(--spectrum-global-dimension-size-100);
-}
-
 .licenseBackground {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: var(--spectrum-global-dimension-size-300);
+    box-sizing: border-box;
     background-color: var(--spectrum-global-color-gray-100);
     background-image: url('../../assets/background.webp');
     background-blend-mode: luminosity;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+}
+
+.dialog {
+    display: grid;
+    grid-template-columns: minmax(240px, 30%) 1fr;
+    width: 100%;
+    max-width: 1000px;
+    height: 100%;
+    max-height: 660px;
+    overflow: hidden;
+    border-radius: var(--spectrum-alias-border-radius-medium);
+    background-color: var(--spectrum-global-color-gray-50);
+    box-shadow: 0 8px 32px rgb(0 0 0 / 40%);
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spectrum-global-dimension-size-200);
+    padding: var(--spectrum-global-dimension-size-300) var(--spectrum-global-dimension-size-200);
+    overflow-y: auto;
+    border-right: 1px solid var(--spectrum-global-color-gray-200);
+    background-color: var(--spectrum-global-color-gray-75);
+}
+
+.headerIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--spectrum-global-dimension-size-500);
+    height: var(--spectrum-global-dimension-size-500);
+    border-radius: 50%;
+    color: var(--spectrum-global-color-blue-500);
+    background-color: var(--spectrum-global-color-gray-200);
+}
+
+.title {
+    font-size: var(--spectrum-global-dimension-font-size-300);
+}
+
+.intro {
+    color: var(--spectrum-global-color-gray-700);
+}
+
+.steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spectrum-global-dimension-size-50);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.step {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--spectrum-global-dimension-size-150);
+    width: 100%;
+    padding: var(--spectrum-global-dimension-size-150);
+    border: none;
+    border-left: 3px solid transparent;
+    border-radius: var(--spectrum-alias-border-radius-regular);
+    color: var(--spectrum-global-color-gray-800);
+    background: transparent;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--spectrum-global-color-gray-200);
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+        background: transparent;
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--spectrum-alias-focus-color);
+        outline-offset: -2px;
+    }
+}
+
+.stepActive {
+    border-left-color: var(--spectrum-global-color-blue-500);
+    color: var(--spectrum-global-color-gray-900);
+    background-color: var(--spectrum-global-color-gray-200);
+
+    .stepNumber {
+        color: var(--spectrum-global-color-static-white);
+        background-color: var(--spectrum-global-color-blue-500);
+    }
+}
+
+.stepNumber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--spectrum-global-dimension-size-400);
+    height: var(--spectrum-global-dimension-size-400);
+    border-radius: 50%;
+    background-color: var(--spectrum-global-color-gray-300);
+    font-weight: 600;
+}
+
+.stepLabel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spectrum-global-dimension-size-75);
+    font-weight: 600;
+}
+
+.stepChevron {
+    width: var(--spectrum-global-dimension-size-150);
+    color: var(--spectrum-global-color-gray-600);
+}
+
+.badge {
+    min-height: auto;
+    padding-block: 2px;
+    font-size: var(--spectrum-global-dimension-font-size-75);
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+
+.content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--spectrum-global-dimension-size-200);
+    min-height: 0;
+    padding: var(--spectrum-global-dimension-size-300);
+    overflow-y: auto;
+}
+
+.progress {
+    color: var(--spectrum-global-color-gray-700);
+}
+
+.licenseHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spectrum-global-dimension-size-100);
+}
+
+.licenseName {
+    font-size: var(--spectrum-global-dimension-font-size-500);
+}
+
+.notice {
+    flex: 1;
+    min-height: var(--spectrum-global-dimension-size-1200);
+    padding: var(--spectrum-global-dimension-size-200);
+    overflow-y: auto;
+    border: 1px solid var(--spectrum-global-color-gray-300);
+    border-radius: var(--spectrum-alias-border-radius-regular);
+    background-color: var(--spectrum-global-color-gray-75);
+
+    &:focus-visible {
+        outline: 2px solid var(--spectrum-alias-focus-color);
+        outline-offset: 2px;
+    }
+}
+
+.noticeText {
+    display: block;
+    margin-bottom: var(--spectrum-global-dimension-size-200);
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+}
+
+.linkOut {
+    margin-inline-start: var(--spectrum-global-dimension-size-50);
+    vertical-align: middle;
+}
+
+.footer {
+    padding: var(--spectrum-global-dimension-size-200) var(--spectrum-global-dimension-size-300);
+    border-top: 1px solid var(--spectrum-global-color-gray-200);
 }
