@@ -4,8 +4,8 @@
 import { BottomProgressBar } from '@/components/bottom-progress-bar/bottom-progress-bar.component';
 import { useTranslation } from '@/i18n';
 import { Flex, Grid, Loading, Text } from '@geti-ui/ui';
+import { DATE_TIME_FORMAT, useFormatDate } from 'hooks/use-format-date.hook';
 
-import { formatDateTime } from '../../../shared/date-utils';
 import { formatElapsed, getStatusGroup, type ModelJob } from '../utils';
 import { JobActionsMenu } from './job-actions-menu.component';
 import { JobStatusBadge } from './job-status-badge.component';
@@ -29,6 +29,7 @@ type JobRowProps = {
 
 export const JobRow = ({ job, showStatusBadge, projectName, architectureName, onViewLogs }: JobRowProps) => {
     const { t } = useTranslation();
+    const formatDateTime = useFormatDate(DATE_TIME_FORMAT);
     const isRunning = getStatusGroup(job.status) === 'running' && job.progress > 0;
     const device = 'device' in job.metadata ? job.metadata.device.name : '—';
 
