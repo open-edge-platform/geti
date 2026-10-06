@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import { PointerEvent, useEffect, useRef, useState } from 'react';
@@ -17,9 +17,9 @@ import { useAnnotatorLabels } from '../../annotator-labels-provider.component';
 import { useSelectedMediaItem } from '../../selected-media-item-provider.component';
 import { useNextMediaItem } from '../../shell/utils';
 import { SvgToolCanvas } from '../svg-tool-canvas.component';
+import { ToolLoading } from '../tool-loading.component';
 import { useAddAndSelectAnnotations } from '../use-add-and-select-annotations.hook';
 import { getRelativePoint, removeOffLimitPoints } from '../utils';
-import { SAMLoading } from './sam-loading.component';
 import { useSegmentAnythingModel } from './use-segment-anything.hook';
 import { useSingleStackFn } from './use-single-stack-fn.hook';
 import { useWithCancel } from './use-with-cancel';
@@ -160,7 +160,7 @@ export const SegmentAnythingTool = () => {
     }, [isError, error, t]);
 
     if (isLoading) {
-        return <SAMLoading isLoading={isLoading} />;
+        return <ToolLoading message={t('annotator.tools.autoSegmentation.loading')} />;
     }
 
     return (

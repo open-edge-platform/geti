@@ -5,6 +5,7 @@ import { IconWrapper } from '@/components/icon-wrapper/icon-wrapper.component';
 import { ActionButton, Flex, Heading, IllustratedMessage, Text, Tooltip, TooltipTrigger, View } from '@geti-ui/ui';
 import { useHotkeys } from 'react-hotkeys-hook';
 
+import { isNonEmptyString } from '../../../../shared/util';
 import type { ToolType } from '../../tool-type';
 import type { ToolConfig } from '../interface';
 
@@ -31,7 +32,7 @@ const DrawingToolsTooltip = ({ tool }: DrawingToolsTooltipProps) => {
 
     return (
         <IllustratedMessage>
-            {tooltip?.img !== undefined && (
+            {isNonEmptyString(tooltip?.img) && (
                 <img className={classes.drawingToolsTooltipsImg} src={tooltip.img} alt={label} />
             )}
             <View UNSAFE_className={classes.drawingToolsTooltipsContent}>
