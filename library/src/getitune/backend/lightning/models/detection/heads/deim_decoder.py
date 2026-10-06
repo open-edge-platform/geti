@@ -97,48 +97,26 @@ class TransformerDecoderLayer(nn.Module):
         """Add positional embedding to tensor if provided."""
         return tensor if pos is None else tensor + pos
 
-    def _self_attention(
-        self,
-        q: Tensor,
-        k: Tensor,
-        v: Tensor,
-        attn_mask: Tensor | None = None,
-    ) -> Tensor:
-        """Memory-efficient self-attention using scaled_dot_product_attention.
-
-        Uses Flash Attention when available (PyTorch 2.0+, CUDA, no mask or causal mask).
-
-        Args:
-            q: Query tensor of shape (B, N, C).
-            k: Key tensor of shape (B, N, C).
-            v: Value tensor of shape (B, N, C).
-            attn_mask: Optional attention mask of shape (N, N) or (B, N, N).
-
-        Returns:
-            Attention output of shape (B, N, C).
-        """
+    def _self_attention(self, q: Tensor, k: Tensor, v: Tensor, attn_mask: Tensor | None = None) -> Tensor:
         B, N, C = q.shape  # noqa: N806
+        w_q, w_k, w_v = self.qkv_proj.weight.chunk(3, dim=0)
+        b_q, b_k, b_v = self.qkv_proj.bias.chunk(3, dim=0)
 
-        # Project Q, K, V together for efficiency
-        qkv = self.qkv_proj(q)
-        qkv = qkv.reshape(B, N, 3, self.n_head, self.head_dim).permute(2, 0, 3, 1, 4)
-        q, k, v = qkv.unbind(0)  # Each: (B, n_head, N, head_dim)
+        def _heads(x: Tensor) -> Tensor:
+            return x.reshape(B, N, self.n_head, self.head_dim).transpose(1, 2)
 
-        # Convert boolean mask to float mask for scaled_dot_product_attention
-        # True means "mask out" (don't attend), so we use -inf for those positions
+        q = _heads(f.linear(q, w_q, b_q))
+        k = _heads(f.linear(k, w_k, b_k))
+        v = _heads(f.linear(v, w_v, b_v))
+
         if attn_mask is not None:
             if attn_mask.dtype == torch.bool:
                 attn_mask = attn_mask.float().masked_fill(attn_mask, float("-inf"))
-            # Expand mask for multi-head attention: (N, N) -> (1, 1, N, N)
             if attn_mask.dim() == 2:
                 attn_mask = attn_mask.unsqueeze(0).unsqueeze(0)
 
-        # Use scaled_dot_product_attention - automatically uses Flash Attention when possible
         out = f.scaled_dot_product_attention(q, k, v, attn_mask=attn_mask, dropout_p=0.0)
-
-        # Reshape back: (B, n_head, N, head_dim) -> (B, N, C)
-        out = out.transpose(1, 2).reshape(B, N, C)
-        return self.out_proj(out)
+        return self.out_proj(out.transpose(1, 2).reshape(B, N, C))
 
     def forward(
         self,
