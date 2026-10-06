@@ -788,7 +788,12 @@
             },
             "ssim": {
                 "label": "检测助手",
-                "description": "在目标周围绘制一个框，即可自动查找并标注图像中的相似目标。"
+                "description": "在目标周围绘制一个框，即可自动查找并标注图像中的相似目标。",
+                "loading": "正在加载检测助手，请稍候……",
+                "error": "检测助手工具出错：{{message}}",
+                "operations": {
+                    "workerBuild": "检测助手工作进程构建"
+                }
             }
         },
         "video": {

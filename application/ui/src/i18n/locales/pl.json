@@ -792,7 +792,12 @@
             },
             "ssim": {
                 "label": "Asystent wykrywania",
-                "description": "Narysuj ramkę wokół obiektu, aby automatycznie znaleźć i oznaczyć podobne obiekty na obrazie."
+                "description": "Narysuj ramkę wokół obiektu, aby automatycznie znaleźć i oznaczyć podobne obiekty na obrazie.",
+                "loading": "Ładowanie asystenta wykrywania, poczekaj...",
+                "error": "Błąd narzędzia asystenta wykrywania: {{message}}",
+                "operations": {
+                    "workerBuild": "Kompilacja workera asystenta wykrywania"
+                }
             }
         },
         "video": {

@@ -788,7 +788,12 @@
             },
             "ssim": {
                 "label": "Asistente de detección",
-                "description": "Dibuja un recuadro alrededor de un objeto para encontrar y anotar automáticamente objetos similares en la imagen."
+                "description": "Dibuja un recuadro alrededor de un objeto para encontrar y anotar automáticamente objetos similares en la imagen.",
+                "loading": "Cargando el asistente de detección, espera...",
+                "error": "Error en la herramienta Asistente de detección: {{message}}",
+                "operations": {
+                    "workerBuild": "Compilación del worker del Asistente de detección"
+                }
             }
         },
         "video": {
