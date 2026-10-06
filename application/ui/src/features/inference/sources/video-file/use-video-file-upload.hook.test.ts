@@ -31,7 +31,7 @@ describe('useVideoFileUpload', () => {
         );
         const { result } = renderHook(() => useVideoFileUpload());
         const formData = buildFormData();
-        let pending: Promise<void> | undefined;
+        let pending: ReturnType<typeof result.current.prepareFormData> | undefined;
 
         act(() => {
             pending = result.current.prepareFormData(formData);
@@ -58,7 +58,7 @@ describe('useVideoFileUpload', () => {
                 })
         );
         const { result } = renderHook(() => useVideoFileUpload());
-        let pending: Promise<void> | undefined;
+        let pending: ReturnType<typeof result.current.prepareFormData> | undefined;
 
         act(() => {
             pending = result.current.prepareFormData(buildFormData());

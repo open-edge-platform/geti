@@ -128,7 +128,7 @@ describe('prepareVideoFileFormData', () => {
 
     it('rejects when the upload fails', async () => {
         server.use(
-            mswHttp.post(`${API_BASE_URL}/api/sources/media`, () => {
+            mswHttp.post(`${API_BASE_URL}/api/sources/media:from-upload`, () => {
                 return HttpResponse.json({ detail: 'Unsupported video format' }, { status: 422 });
             })
         );

@@ -3,10 +3,9 @@
 
 import { startTransition } from 'react';
 
-import { API_BASE_URL } from '@/api';
 import type { ImagesFolderSourceConfig, VideoFileSourceConfig } from '@/api/types';
 import { act, screen, waitFor } from '@testing-library/react';
-import { HttpResponse, http as mswHttp } from 'msw';
+import { HttpResponse } from 'msw';
 import { renderHook } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
@@ -257,13 +256,6 @@ describe('useSourceAction', () => {
             expect(result.current[0]).toEqual(videoConfig);
         });
         it('neither creates the source nor reports an error when the video upload is cancelled', async () => {
-            const videoConfig: VideoFileSourceConfig = {
-                id: '',
-                name: 'My video source',
-                source_type: 'video_file',
-                video_path: '',
-                loop: false,
-            };
             let sourceWasCreated = false;
             server.use(
                 http.post('/api/sources', () => {
@@ -295,7 +287,7 @@ describe('useSourceAction', () => {
             const deletedIds: string[] = [];
 
             server.use(
-                http.post('/api/sources/media', () =>
+                http.post('/api/sources/media:from-upload', () =>
                     HttpResponse.json({ video_path: `/data/source_media/${sourceMediaId}/sample.mp4` }, { status: 201 })
                 ),
                 http.post('/api/sources', createSource),

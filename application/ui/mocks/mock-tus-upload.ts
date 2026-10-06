@@ -9,7 +9,15 @@ import { getMockedStagedDataset } from './mock-staged-dataset';
 type MockUpload = { length: number; offset: number; isConsumed: boolean };
 
 const uploads = new Map<string, MockUpload>();
-const protocolHeaders = { 'Tus-Resumable': '1.0.0' };
+const protocolHeaders = {
+    'Tus-Resumable': '1.0.0',
+    // Component/E2E tests run the UI and API on different origins, so the TUS response headers
+    // (read via the XHR/fetch Headers API, not the body) must be explicitly exposed, mirroring the
+    // real backend's `CORSMiddleware` config (see `app/main.py`).
+    'Access-Control-Expose-Headers':
+        'Location, Tus-Resumable, Tus-Version, Tus-Extension, Tus-Max-Size, Tus-Checksum-Algorithm, ' +
+        'Upload-Offset, Upload-Length, Upload-Defer-Length, Upload-Expires',
+};
 const capabilityHeaders = {
     ...protocolHeaders,
     'Tus-Version': '1.0.0',
