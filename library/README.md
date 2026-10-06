@@ -72,27 +72,26 @@ All recipes live under `src/getitune/recipe/<task>/`. Pass any of these YAMLs di
 Each task directory also ships an `openvino_model.yaml` recipe for running and optimizing pre-exported OpenVINO IR models via `OVEngine`.
 
 > [!NOTE]
-> Ultralytics YOLO models are distributed under the AGPL-3.0 license, an OSI approved license ideal for open-source research, academic, and personal projects. For commercial use, enhanced support, and tailored licensing terms, please explore flexible Ultralytics licensing options at https://www.ultralytics.com/license.
+> Ultralytics YOLO models are distributed under the AGPL-3.0 license and NOT installed by default.
+> To include them, you need the `ultralytics` extra as explained in the [this section](#advanced-install-ultralytics-yolo).
 
 ---
 
 ## Installation
 
 ```bash
-# With uv (recommended)
-# CPU-only by default
+# Add as dependency to an existing project managed through uv (recommended)
+# CPU-only by default (see below for other options)
+uv add getitune
+
+# Or use uv pip-compatible interface
 uv pip install "getitune"
 
-# Or with pip
+# Or install directly through pip
 pip install "getitune"
-
-# For hardware-specific PyTorch wheels, see "Advanced Installation: Specify Hardware Backend" below.
 ```
 
-> [!IMPORTANT]
-> Due to licensing constraints, the PyPI package doesn't include Ultralytics YOLO models.
->
-> To use Ultralytics YOLO models, you must [install from source](#advanced-install-from-source).
+For an installation tailored to your hardware and use case, also check the sections below:
 
 <details>
 <summary><strong> Advanced Installation: Specify Hardware Backend</strong></summary>
@@ -122,7 +121,24 @@ uv pip install "getitune[cpu]"
 </details>
 
 <details>
-<summary><a id="advanced-install-from-source"></a><strong> Advanced Installation: Install from Source with Ultralytics YOLO Support</strong></summary>
+<summary><a id="advanced-install-ultralytics-yolo"></a><strong> Advanced Installation: Include Ultralytics YOLO Support</strong></summary>
+
+Ultralytics YOLO models are governed by the [AGPL3.0 License](https://www.ultralytics.com/legal/agpl-3-0-software-license)
+therefore they are NOT included by default in `getitune`. To enable them, you must explicitly specify the `ultralytics`
+extra while installing the package, e.g.:
+
+```bash
+# Default CPU-only backend
+pip install getitune[ultralytics]
+
+# With specific backend ('xpu', 'cuda' or 'cpu')
+pip install getitune[xpu,ultralytics]
+```
+
+</details>
+
+<details>
+<summary><a id="advanced-install-from-source"></a><strong> Advanced Installation: Install from Source</strong></summary>
 
 ```bash
 git clone https://github.com/open-edge-platform/geti.git
@@ -147,16 +163,6 @@ pip install -e ".[xpu]" \
 pip install -e ".[cuda]" \
   --extra-index-url https://download.pytorch.org/whl/cu130
 ```
-
-> [!NOTE]
-> For **Ultralytics YOLO models**, add `--extra ultralytics` for `uv sync` or `[ultralytics]` for `pip install`:
->
-> ```bash
-> uv sync --extra xpu --extra ultralytics --reinstall-package triton-xpu  # Intel GPU + YOLO
->
-> # or with pip
-> pip install -e ".[xpu,ultralytics]" --extra-index-url https://download.pytorch.org/whl/xpu  #Intel GPU + YOLO
-> ```
 
 </details>
 
@@ -395,7 +401,7 @@ engine.test()
 engine.export()
 
 
-# -- Ultralytics Backend --
+# -- Ultralytics Backend (requires 'ultralytics' extra) --
 from getitune.backend.ultralytics.engine import UltralyticsEngine
 from getitune.backend.ultralytics.models import UltralyticsDetectionModel
 
@@ -408,11 +414,6 @@ engine = UltralyticsEngine(
 engine.train(epochs=50)
 engine.test()
 engine.export()
-
-> [!NOTE]
-> Ultralytics YOLO models and the `UltralyticsEngine` backend require [installing from source](#advanced-installation-install-from-source) with the `[ultralytics]` extra.
-> The PyPI package does **not** include Ultralytics support.
-
 
 # -- OpenVINO Backend (inference) --
 from getitune.backend.openvino.engine import OVEngine
@@ -732,6 +733,6 @@ python scripts/benchmark.py \
 The core Geti™ Library (`getitune`) is licensed under [Apache License Version 2.0](https://github.com/open-edge-platform/training_extensions/blob/develop/LICENSE).
 By contributing to the project, you agree to the license and copyright terms therein and release your contribution under these terms.
 
-Ultralytics YOLO models are distributed under the AGPL-3.0 license, an OSI approved license ideal for open-source research, academic, and personal projects. For commercial use, enhanced support, and tailored licensing terms, please explore flexible Ultralytics licensing options at https://www.ultralytics.com/license.
+Ultralytics YOLO models are distributed under the AGPL-3.0 license; more details can be found in [this notice](https://github.com/open-edge-platform/training_extensions/blob/develop/THIRD-PARTY-NOTICES.md).
 
 ---
