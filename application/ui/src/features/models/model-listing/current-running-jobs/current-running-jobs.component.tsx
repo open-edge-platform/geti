@@ -43,7 +43,7 @@ export const CurrentRunningJobs = ({ datasetRevisions }: CurrentRunningJobsProps
             UNSAFE_style={{ padding: 'var(--spectrum-global-dimension-size-300)' }}
         >
             <Heading level={2} UNSAFE_style={{ fontSize: dimensionValue('size-300') }}>
-                {t('models.jobs.heading')}
+                {t('common.labels.jobs')}
             </Heading>
 
             <View backgroundColor={'gray-75'}>

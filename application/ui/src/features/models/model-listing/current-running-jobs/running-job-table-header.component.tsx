@@ -24,7 +24,7 @@ export const RunningJobTableHeader = () => {
             }}
         >
             <Text>{t('models.columns.modelName')}</Text>
-            <Text>{t('models.columns.architecture')}</Text>
+            <Text>{t('common.labels.architecture')}</Text>
             <Text>{t('common.labels.dataset')}</Text>
             <div />
         </Grid>
