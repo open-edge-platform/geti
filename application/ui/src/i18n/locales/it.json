@@ -919,7 +919,7 @@
                 },
                 "toast": {
                     "trainingStarted": "Addestramento del modello avviato con successo.",
-                    "trainingStartedWithLink": "Addestramento del modello avviato con successo. <link>Apri la schermata dei modelli per visualizzare l'avanzamento.</link>"
+                    "trainingStartedWithLink": "Addestramento del modello avviato con successo. <modelsLink>Apri la schermata dei modelli per visualizzare l'avanzamento.</modelsLink>"
                 },
                 "selectDataset": {
                     "label": "Seleziona dataset",
