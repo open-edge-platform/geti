@@ -791,7 +791,12 @@
             },
             "ssim": {
                 "label": "Detection assistant",
-                "description": "Draw a box around an object to automatically find and annotate similar objects in the image."
+                "description": "Draw a box around an object to automatically find and annotate similar objects in the image.",
+                "loading": "Loading detection assistant, please wait...",
+                "error": "Error in Detection assistant tool: {{message}}",
+                "operations": {
+                    "workerBuild": "Detection assistant worker build"
+                }
             }
         },
         "video": {

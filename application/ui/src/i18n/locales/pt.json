@@ -791,7 +791,12 @@
             },
             "ssim": {
                 "label": "Assistente de deteção",
-                "description": "Desenhe uma caixa à volta de um objeto para encontrar e anotar automaticamente objetos semelhantes na imagem."
+                "description": "Desenhe uma caixa à volta de um objeto para encontrar e anotar automaticamente objetos semelhantes na imagem.",
+                "loading": "A carregar o assistente de deteção, aguarde por favor...",
+                "error": "Erro na ferramenta Assistente de deteção: {{message}}",
+                "operations": {
+                    "workerBuild": "Compilação do worker do Assistente de deteção"
+                }
             }
         },
         "video": {

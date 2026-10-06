@@ -791,7 +791,12 @@
             },
             "ssim": {
                 "label": "Assistente di rilevamento",
-                "description": "Disegna un riquadro attorno a un oggetto per trovare e annotare automaticamente oggetti simili nell'immagine."
+                "description": "Disegna un riquadro attorno a un oggetto per trovare e annotare automaticamente oggetti simili nell'immagine.",
+                "loading": "Caricamento dell'assistente di rilevamento in corso, per favore aspetta...",
+                "error": "Errore nello strumento Assistente di rilevamento: {{message}}",
+                "operations": {
+                    "workerBuild": "Compilazione worker dell'Assistente di rilevamento"
+                }
             }
         },
         "video": {
