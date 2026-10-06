@@ -330,12 +330,11 @@ For developers who would like to contribute with a pull request, see the [Contri
 ## License
 
 Geti™ source code is licensed under the [Apache License Version 2.0](LICENSE).
-Docker images are distributed under Apache 2.0 license, while the Windows MSIX App is licensed under the
-[Intel Simplified Software License](https://software.intel.com/sites/landingpage/pintool/intel-simplified-software-license.txt).
-Some third-party components used or linked by Geti™ may be governed by different license terms, listed separately in
-[this file](THIRD-PARTY-NOTICES.md).
+Docker images contain Geti™ components licensed under Apache 2.0 and may also contain third-party components governed by
+different license terms, listed separately in [this file](THIRD-PARTY-NOTICES.md).
+The Windows MSIX App is licensed under the [Intel Simplified Software License](https://software.intel.com/sites/landingpage/pintool/intel-simplified-software-license.txt).
 
 Regarding models trained with Geti™, their license depends on the model type and is indicated within the application;
 most are licensed under Apache 2.0, while some fall under more restrictive licenses (e.g. [Ultralytics AGPL3.0 models](./THIRD-PARTY-NOTICES.md#ultralytics)).
 
-It is the end user's responsibility to ensure that the specific use of Geti and the models complies with the respective licenses.
+It is the end user's responsibility to ensure that the specific use of Geti™ and the models complies with the respective licenses.

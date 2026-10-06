@@ -5,7 +5,7 @@ the Intel software and their required license, copyright statement, permission
 notice, disclaimers, or other terms. This third-party software is governed by
 the separate license terms listed in this file.
 
-| Component   | License    | Full text            |
+| Component   | License    | Notice               |
 | ----------- | ---------- | -------------------- |
 | FFmpeg      | LGPL / GPL | [Link](#ffmpeg)      |
 | Ultralytics | AGPL-3.0   | [Link](#ultralytics) |

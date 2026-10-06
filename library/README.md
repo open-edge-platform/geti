@@ -25,9 +25,9 @@
 
 <!-- markdownlint-enable  MD042 -->
 
-[![Codecov](https://codecov.io/gh/open-edge-platform/training_extensions/branch/develop/graph/badge.svg?token=9HVFNMPFGD)](https://codecov.io/gh/open-edge-platform/training_extensions)
-[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/open-edge-platform/training_extensions/badge)](https://securityscorecards.dev/viewer/?uri=github.com/open-edge-platform/training_extensions)
-[![Pre-Merge Test](https://github.com/open-edge-platform/training_extensions/actions/workflows/pre_merge.yaml/badge.svg)](https://github.com/open-edge-platform/training_extensions/actions/workflows/pre_merge.yaml)
+[![Codecov](https://codecov.io/gh/open-edge-platform/geti/branch/develop/graph/badge.svg?token=9HVFNMPFGD)](https://codecov.io/gh/open-edge-platform/geti)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/open-edge-platform/geti/badge)](https://securityscorecards.dev/viewer/?uri=github.com/open-edge-platform/geti)
+[![Pre-Merge Test](https://github.com/open-edge-platform/geti/actions/workflows/pre_merge.yaml/badge.svg)](https://github.com/open-edge-platform/geti/actions/workflows/pre_merge.yaml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Downloads](https://static.pepy.tech/personalized-badge/getitune?period=total&units=international_system&left_color=grey&right_color=green&left_text=PyPI%20Downloads)](https://pepy.tech/project/getitune)
 
@@ -123,7 +123,7 @@ uv pip install "getitune[cpu]"
 <details>
 <summary><a id="advanced-install-ultralytics-yolo"></a><strong> Advanced Installation: Include Ultralytics YOLO Support</strong></summary>
 
-Ultralytics YOLO models are governed by the [AGPL3.0 License](https://www.ultralytics.com/legal/agpl-3-0-software-license)
+Ultralytics YOLO models are governed by the [AGPL-3.0 License](https://www.ultralytics.com/legal/agpl-3-0-software-license)
 therefore they are NOT included by default in `getitune`. To enable them, you must explicitly specify the `ultralytics`
 extra while installing the package, e.g.:
 
@@ -730,9 +730,9 @@ python scripts/benchmark.py \
 
 ## License
 
-The core Geti™ Library (`getitune`) is licensed under [Apache License Version 2.0](https://github.com/open-edge-platform/training_extensions/blob/develop/LICENSE).
+The core Geti™ Library (`getitune`) is licensed under [Apache License Version 2.0](https://github.com/open-edge-platform/geti/blob/develop/LICENSE).
 By contributing to the project, you agree to the license and copyright terms therein and release your contribution under these terms.
 
-Ultralytics YOLO models are distributed under the AGPL-3.0 license; more details can be found in [this notice](https://github.com/open-edge-platform/training_extensions/blob/develop/THIRD-PARTY-NOTICES.md).
+Ultralytics YOLO models are distributed under the AGPL-3.0 license; more details can be found in [this notice](https://github.com/open-edge-platform/geti/blob/develop/THIRD-PARTY-NOTICES.md).
 
 ---
