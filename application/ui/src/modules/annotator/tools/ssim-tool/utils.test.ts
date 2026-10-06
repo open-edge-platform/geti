@@ -96,10 +96,13 @@ describe('SSIM utils', () => {
             ).toEqual([match(template, 1), accepted, separate]);
         });
 
-        it('drops matches that extend past the image', () => {
+        it('clamps matches that extend past the image', () => {
             const outside = match(rect(995, 995), 0.99);
 
-            expect(filterSSIMResults(imageBounds, [outside], template, [])).toEqual([match(template, 1)]);
+            expect(filterSSIMResults(imageBounds, [outside], template, [])).toEqual([
+                match(template, 1),
+                match(rect(995, 995, 5, 5), 0.99),
+            ]);
         });
 
         it(`caps the result at ${MAX_NUMBER_ITEMS} items, template included`, () => {

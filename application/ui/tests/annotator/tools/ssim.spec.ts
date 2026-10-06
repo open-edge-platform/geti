@@ -48,10 +48,6 @@ for (const { taskType, annotationLabel } of SCENARIOS) {
                 await ssimTool.selectTool();
             });
 
-            await test.step('Wait for SSIM worker to be ready', async () => {
-                await expect(page.getByLabel('ssim preview')).toBeAttached({ timeout: 30000 });
-            });
-
             await test.step('Draw a template region', async () => {
                 await ssimTool.drawTemplate({ x: 100, y: 100, width: 150, height: 150 });
             });

@@ -2,15 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { RunSSIMProps as ToolRunSSIMProps, SSIMMatch as ToolSSIMMatch } from '@geti-ui/smart-tools';
-import { roiFromImage } from '@geti-ui/smart-tools/utils';
+import { clampBox, roiFromImage } from '@geti-ui/smart-tools/utils';
 
 import type { Rect, RegionOfInterest, Shape } from '../../../../shared/types';
-import {
-    convertToolShapeToGetiShape,
-    getBoundingRectFromShape,
-    intersectionOverUnion,
-    isRectWithinRoi,
-} from '../utils';
+import { convertToolShapeToGetiShape, getBoundingRectFromShape, intersectionOverUnion } from '../utils';
 
 // Upper bound on matches (template included), so a weak template can't flood the image.
 export const MAX_NUMBER_ITEMS = 100;
@@ -78,10 +73,13 @@ export const filterSSIMResults = (
 ): SSIMMatch[] => {
     const collector: SSIMMatch[] = [{ shape: template, confidence: 1 }];
     const filterAsMatches = filter.map((shape) => ({ shape, confidence: 1 }));
-    // Downscaling and the half-pixel offset in smart-tools can push matches slightly past the image edge.
-    const filteredItems = items.filter(({ shape }) => isRectWithinRoi(imageBounds, shape));
+    // smart-tools' downscaling and half-pixel offset push matches at the right/bottom edge past the image.
+    const clampedItems = items.map((item) => ({
+        ...item,
+        shape: { type: 'rectangle' as const, ...clampBox(item.shape, imageBounds) },
+    }));
 
-    for (const value of filteredItems) {
+    for (const value of clampedItems) {
         if (collector.length >= maxItems) {
             break;
         }
