@@ -37,8 +37,6 @@ export const ActiveFiltersList = () => {
         setSelectedLabelIds(selectedLabelIds.filter((selectedId) => selectedId !== id));
     };
 
-    const d = new Date().toLocaleDateString();
-
     const selectedLabels = selectedLabelIds
         .map((id) => labels.find((label) => label.id === id))
         .filter(Boolean) as Label[];
