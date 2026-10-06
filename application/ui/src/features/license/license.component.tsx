@@ -2,12 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useTranslation } from '@/i18n';
-import { Flex, Grid, View } from '@geti-ui/ui';
+import { Flex, Grid, Text, View } from '@geti-ui/ui';
 
 import { useAcceptLicense } from './api/use-accept-license.hook';
 import { LicenseDetails } from './license-details.component';
 import { LicenseFooter } from './license-footer.component';
-import { LicenseProgress } from './license-progress.component';
 import { LicenseSteps } from './license-steps.component';
 import { getLicenses } from './licenses';
 import { useLicenseSteps } from './use-license-steps.hook';
@@ -19,7 +18,6 @@ export const License = () => {
     const licenses = getLicenses(t);
     const steps = useLicenseSteps(licenses);
     const { mutate: acceptLicense, isPending: isAccepting } = useAcceptLicense();
-    const hasMultipleLicenses = licenses.length > 1;
 
     return (
         <View height={'100vh'} padding={'size-300'} UNSAFE_className={styles.licenseBackground}>
@@ -46,13 +44,13 @@ export const License = () => {
                         <Flex direction={'column'} minWidth={0} minHeight={0}>
                             <View flex padding={'size-300'} overflow={'auto'} minHeight={0}>
                                 <Flex direction={'column'} gap={'size-200'} height={'100%'}>
-                                    {hasMultipleLicenses && (
-                                        <LicenseProgress
-                                            current={steps.currentIndex + 1}
-                                            total={licenses.length}
-                                            isFirst={steps.isFirst}
-                                            onPrevious={steps.goToPrevious}
-                                        />
+                                    {licenses.length > 1 && (
+                                        <Text>
+                                            {t('license.agreement.progress', {
+                                                current: steps.currentIndex + 1,
+                                                total: licenses.length,
+                                            })}
+                                        </Text>
                                     )}
                                     <LicenseDetails
                                         license={steps.current}
@@ -63,7 +61,6 @@ export const License = () => {
                             </View>
 
                             <LicenseFooter
-                                showPrevious={hasMultipleLicenses}
                                 isFirst={steps.isFirst}
                                 isLast={steps.isLast}
                                 canProceed={steps.canProceed}

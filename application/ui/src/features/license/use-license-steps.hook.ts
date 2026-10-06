@@ -14,8 +14,8 @@ export const useLicenseSteps = (licenses: LicenseNotice[]) => {
     const firstPendingIndex = licenses.findIndex(({ id, isRequired }) => isRequired && !agreedIds.has(id));
     const areAllRequiredAgreed = firstPendingIndex === -1;
 
-    const goToPrevious = () => setCurrentIndex((index) => Math.max(index - 1, 0));
-    const goToNext = () => setCurrentIndex((index) => Math.min(index + 1, licenses.length - 1));
+    const goToPrevious = () => setCurrentIndex((index) => index - 1);
+    const goToNext = () => setCurrentIndex((index) => index + 1);
 
     const setCurrentAgreed = (isAgreed: boolean) => {
         setAgreedIds((previous) => {

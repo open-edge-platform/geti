@@ -5,7 +5,6 @@ import { useTranslation } from '@/i18n';
 import { Button, ButtonGroup, View } from '@geti-ui/ui';
 
 type LicenseFooterProps = {
-    showPrevious: boolean;
     isFirst: boolean;
     isLast: boolean;
     canProceed: boolean;
@@ -17,7 +16,6 @@ type LicenseFooterProps = {
 };
 
 export const LicenseFooter = ({
-    showPrevious,
     isFirst,
     isLast,
     canProceed,
@@ -32,18 +30,13 @@ export const LicenseFooter = ({
     return (
         <View borderTopWidth={'thin'} borderTopColor={'default'} paddingY={'size-200'} paddingX={'size-300'}>
             <ButtonGroup align={'end'} width={'100%'}>
-                {showPrevious && (
-                    <Button variant={'secondary'} isDisabled={isFirst} onPress={onPrevious}>
+                {!isFirst && (
+                    <Button variant={'secondary'} onPress={onPrevious}>
                         {t('license.agreement.previous')}
                     </Button>
                 )}
                 {isLast ? (
-                    <Button
-                        variant={'accent'}
-                        onPress={onAccept}
-                        isPending={isAccepting}
-                        isDisabled={!canAccept || isAccepting}
-                    >
+                    <Button variant={'accent'} onPress={onAccept} isPending={isAccepting} isDisabled={!canAccept}>
                         {t('license.agreement.accept')}
                     </Button>
                 ) : (

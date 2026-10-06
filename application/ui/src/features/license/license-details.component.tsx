@@ -54,7 +54,7 @@ export const LicenseDetails = ({ license, isAgreed, onAgreedChange }: LicenseDet
             </Well>
 
             {license.isRequired && (
-                <Checkbox key={license.id} isSelected={isAgreed} onChange={onAgreedChange}>
+                <Checkbox isSelected={isAgreed} onChange={onAgreedChange}>
                     {t('license.agreement.agree', { license: license.name })}
                 </Checkbox>
             )}

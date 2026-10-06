@@ -55,15 +55,4 @@ describe('useLicenseSteps', () => {
         expect(result.current.areAllRequiredAgreed).toBe(false);
         expect(result.current.lastReachableIndex).toBe(0);
     });
-
-    it('clamps navigation to the available licenses', () => {
-        const { result } = renderHook(() => useLicenseSteps(licenses));
-
-        act(() => result.current.goToPrevious());
-        expect(result.current.currentIndex).toBe(0);
-
-        act(() => result.current.goTo(2));
-        act(() => result.current.goToNext());
-        expect(result.current.currentIndex).toBe(2);
-    });
 });
