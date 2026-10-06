@@ -4,6 +4,7 @@
 import { useCallback, useMemo, useState } from 'react';
 
 import { i18n } from '@/i18n';
+import { roiFromImage } from '@geti-ui/smart-tools/utils';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Remote, wrap } from 'comlink';
 
@@ -138,10 +139,10 @@ export const useSSIM = (enabled = true) => {
                 throw executeError;
             }
         },
-        onSuccess: (matches, { existingAnnotations, autoMergeDuplicates, template, roi, shapeType }) => {
+        onSuccess: (matches, { imageData, existingAnnotations, autoMergeDuplicates, template, shapeType }) => {
             const ssimMatches = convertToolMatchesToGetiMatches(matches);
             const existingRects = autoMergeDuplicates ? getExistingRects(existingAnnotations) : [];
-            const filteredMatches = filterSSIMResults(roi, ssimMatches, template, existingRects);
+            const filteredMatches = filterSSIMResults(roiFromImage(imageData), ssimMatches, template, existingRects);
             const threshold = guessNumberOfItemsThreshold(filteredMatches);
 
             updateToolState(

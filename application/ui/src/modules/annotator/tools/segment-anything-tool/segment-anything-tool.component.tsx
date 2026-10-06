@@ -72,7 +72,6 @@ export const SegmentAnythingTool = () => {
     const cancellableThrottledDecodingQueryFn = useWithCancel(throttledDecodingQueryFn);
 
     const canvasRef = useRef<SVGRectElement>(null);
-    const hasShownErrorToastRef = useRef(false);
     // Counter (not boolean) because pointer moves overlap and we cancel
     // intermediate ones — the cursor stays busy while ANY call is pending.
     const pendingDecodesRef = useRef(0);
@@ -143,20 +142,17 @@ export const SegmentAnythingTool = () => {
     });
 
     useEffect(() => {
-        if (isError && !hasShownErrorToastRef.current) {
-            toast({
-                type: 'error',
-                message: t('annotator.tools.autoSegmentation.error', {
-                    message: error?.message ?? t('annotator.tools.autoSegmentation.unknownError'),
-                }),
-            });
-
-            hasShownErrorToastRef.current = true;
-        }
-
         if (!isError) {
-            hasShownErrorToastRef.current = false;
+            return;
         }
+
+        toast({
+            id: 'segment-anything-tool-error',
+            type: 'error',
+            message: t('annotator.tools.autoSegmentation.error', {
+                message: error?.message ?? t('annotator.tools.autoSegmentation.unknownError'),
+            }),
+        });
     }, [isError, error, t]);
 
     if (isLoading) {

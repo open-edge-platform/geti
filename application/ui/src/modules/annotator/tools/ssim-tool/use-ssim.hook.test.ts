@@ -22,7 +22,6 @@ class FakeWorker {
 }
 
 const template = { type: 'rectangle' as const, x: 10, y: 10, width: 20, height: 20 };
-const roi = { x: 0, y: 0, width: 100, height: 100 };
 
 describe('useSSIM', () => {
     beforeEach(() => {
@@ -45,7 +44,6 @@ describe('useSSIM', () => {
         act(() => {
             result.current.runSSIM({
                 imageData: { width: 100, height: 100 } as ImageData,
-                roi,
                 template,
                 existingAnnotations: [],
                 autoMergeDuplicates: true,
@@ -77,7 +75,6 @@ describe('useSSIM', () => {
         act(() => {
             result.current.runSSIM({
                 imageData: { width: 100, height: 100 } as ImageData,
-                roi,
                 template,
                 existingAnnotations: [],
                 autoMergeDuplicates: true,

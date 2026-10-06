@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { toast } from '@/components/toast/toast.component';
 import { useZoom } from '@/components/zoom/zoom.provider';
@@ -31,23 +31,19 @@ export const SSIMTool = () => {
     const { addAndSelectAnnotations } = useAddAndSelectAnnotations();
     const { runSSIM, reset, toolState, isProcessing, isLoading, isError, error } = useSSIM();
     const shapeType = isDetectionTask(useProjectTask()) ? 'rectangle' : 'polygon';
-    const hasShownErrorToastRef = useRef(false);
 
     useEffect(() => {
-        if (isError && !hasShownErrorToastRef.current) {
-            toast({
-                type: 'error',
-                message: t('annotator.tools.ssim.error', {
-                    message: error?.message ?? t('annotator.tools.autoSegmentation.unknownError'),
-                }),
-            });
-
-            hasShownErrorToastRef.current = true;
-        }
-
         if (!isError) {
-            hasShownErrorToastRef.current = false;
+            return;
         }
+
+        toast({
+            id: 'ssim-tool-error',
+            type: 'error',
+            message: t('annotator.tools.ssim.error', {
+                message: error?.message ?? t('annotator.tools.autoSegmentation.unknownError'),
+            }),
+        });
     }, [isError, error, t]);
 
     useEffect(() => {
@@ -114,17 +110,17 @@ export const SSIMTool = () => {
                 image={image}
                 zoom={zoom}
                 selectedLabel={selectedLabel}
+                // A second run would overwrite the in-flight one's results before they are added.
+                isDisabled={isProcessing}
                 onComplete={(shapes) => {
                     const [template] = shapes;
 
-                    // A second run would overwrite the in-flight one's results before they are added.
-                    if (template === undefined || isProcessing) {
+                    if (template === undefined) {
                         return [];
                     }
 
                     runSSIM({
                         imageData: image,
-                        roi,
                         template,
                         existingAnnotations: annotations.map((annotation) => annotation.shape),
                         autoMergeDuplicates: true,

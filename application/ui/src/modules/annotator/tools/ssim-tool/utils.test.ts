@@ -14,7 +14,7 @@ import {
     type SSIMMatch,
 } from './utils';
 
-const roi: RegionOfInterest = { x: 0, y: 0, width: 1000, height: 1000 };
+const imageBounds: RegionOfInterest = { x: 0, y: 0, width: 1000, height: 1000 };
 
 const rect = (x: number, y: number, width = 10, height = 10): Rect => ({ type: 'rectangle', x, y, width, height });
 
@@ -46,7 +46,6 @@ describe('SSIM utils', () => {
             expect(
                 toToolRunSSIMProps({
                     imageData,
-                    roi,
                     template: rect(5, 5, 20, 20),
                     existingAnnotations: [rect(100, 100), { type: 'full_image' }],
                     autoMergeDuplicates: true,
@@ -54,7 +53,7 @@ describe('SSIM utils', () => {
                 })
             ).toEqual({
                 imageData,
-                roi,
+                roi: { x: 0, y: 0, width: 1, height: 1 },
                 template: { x: 5, y: 5, width: 20, height: 20, shapeType: 'rect' },
                 existingAnnotations: [{ x: 100, y: 100, width: 10, height: 10, shapeType: 'rect' }],
                 autoMergeDuplicates: true,
@@ -77,7 +76,7 @@ describe('SSIM utils', () => {
         const template = rect(0, 0);
 
         it('always keeps the template first', () => {
-            expect(filterSSIMResults(roi, [], template, [])).toEqual([match(template, 1)]);
+            expect(filterSSIMResults(imageBounds, [], template, [])).toEqual([match(template, 1)]);
         });
 
         it('drops matches that overlap the template, accepted matches or existing annotations', () => {
@@ -89,7 +88,7 @@ describe('SSIM utils', () => {
 
             expect(
                 filterSSIMResults(
-                    roi,
+                    imageBounds,
                     [overlapsTemplate, accepted, overlapsAccepted, overlapsExisting, separate],
                     template,
                     [rect(500, 500)]
@@ -97,10 +96,10 @@ describe('SSIM utils', () => {
             ).toEqual([match(template, 1), accepted, separate]);
         });
 
-        it('drops matches outside of the region of interest', () => {
+        it('drops matches that extend past the image', () => {
             const outside = match(rect(995, 995), 0.99);
 
-            expect(filterSSIMResults(roi, [outside], template, [])).toEqual([match(template, 1)]);
+            expect(filterSSIMResults(imageBounds, [outside], template, [])).toEqual([match(template, 1)]);
         });
 
         it(`caps the result at ${MAX_NUMBER_ITEMS} items, template included`, () => {
@@ -108,7 +107,7 @@ describe('SSIM utils', () => {
                 match(rect((index % 50) * 20, 20 + Math.floor(index / 50) * 20), 0.99)
             );
 
-            expect(filterSSIMResults(roi, matches, template, [])).toHaveLength(MAX_NUMBER_ITEMS);
+            expect(filterSSIMResults(imageBounds, matches, template, [])).toHaveLength(MAX_NUMBER_ITEMS);
         });
     });
 

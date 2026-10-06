@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { RunSSIMProps as ToolRunSSIMProps, SSIMMatch as ToolSSIMMatch } from '@geti-ui/smart-tools';
+import { roiFromImage } from '@geti-ui/smart-tools/utils';
 
 import type { Rect, RegionOfInterest, Shape } from '../../../../shared/types';
 import {
@@ -22,7 +23,7 @@ export type SSIMMatch = Omit<ToolSSIMMatch, 'shape'> & {
 
 export type SSIMShapeType = Extract<Shape['type'], 'rectangle' | 'polygon'>;
 
-export type RunSSIMProps = Omit<ToolRunSSIMProps, 'template' | 'existingAnnotations' | 'shapeType'> & {
+export type RunSSIMProps = Omit<ToolRunSSIMProps, 'roi' | 'template' | 'existingAnnotations' | 'shapeType'> & {
     template: Rect;
     existingAnnotations: Shape[];
     shapeType: SSIMShapeType;
@@ -46,14 +47,13 @@ export const getExistingRects = (shapes: Shape[]): Rect[] => {
 
 export const toToolRunSSIMProps = ({
     imageData,
-    roi,
     template,
     existingAnnotations,
     autoMergeDuplicates,
 }: RunSSIMProps): ToolRunSSIMProps => {
     return {
         imageData,
-        roi,
+        roi: roiFromImage(imageData),
         template: toToolRect(template),
         existingAnnotations: getExistingRects(existingAnnotations).map(toToolRect),
         autoMergeDuplicates,
@@ -69,7 +69,7 @@ export const convertToolMatchesToGetiMatches = (matches: ToolSSIMMatch[]): SSIMM
 };
 
 export const filterSSIMResults = (
-    roi: RegionOfInterest,
+    imageBounds: RegionOfInterest,
     items: SSIMMatch[],
     template: Rect,
     filter: Rect[],
@@ -78,7 +78,8 @@ export const filterSSIMResults = (
 ): SSIMMatch[] => {
     const collector: SSIMMatch[] = [{ shape: template, confidence: 1 }];
     const filterAsMatches = filter.map((shape) => ({ shape, confidence: 1 }));
-    const filteredItems = items.filter(({ shape }) => isRectWithinRoi(roi, shape));
+    // Downscaling and the half-pixel offset in smart-tools can push matches slightly past the image edge.
+    const filteredItems = items.filter(({ shape }) => isRectWithinRoi(imageBounds, shape));
 
     for (const value of filteredItems) {
         if (collector.length >= maxItems) {
