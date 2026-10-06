@@ -282,7 +282,10 @@ export const AnnotationActionsProvider = ({
     );
 };
 
-const useRequiredContext = <T,>(context: Context<T | null>, hookName: string): T => {
+const useRequiredContext = <T,>(
+    context: Context<T | null>,
+    hookName: 'useAnnotations' | 'useAnnotationCommands' | 'useIsAnnotatorReadOnly' | 'useAnnotationSubmission'
+): T => {
     const value = useContext(context);
 
     if (value === null) {
