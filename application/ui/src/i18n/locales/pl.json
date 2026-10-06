@@ -792,6 +792,10 @@
                 "label": "Lasso magnetyczne",
                 "description": "Przesuwaj kursor wzdłuż krawędzi obiektu i klikaj okresowo, aby dopasować kontur do jego granic.",
                 "error": "Nie udało się zaznaczyć granic kształtu. Spróbuj ponownie."
+            },
+            "ssim": {
+                "label": "Asystent wykrywania",
+                "description": "Narysuj ramkę wokół obiektu, aby automatycznie znaleźć i oznaczyć podobne obiekty na obrazie."
             }
         },
         "video": {

@@ -18,7 +18,7 @@ export class SSIMToolPage {
     }
 
     getTool() {
-        return this.page.getByRole('button', { name: 'ssim tool' });
+        return this.page.getByRole('button', { name: 'Detection assistant' });
     }
 
     async selectTool() {

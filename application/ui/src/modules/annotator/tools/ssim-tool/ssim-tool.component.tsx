@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 
 import { useZoom } from '@/components/zoom/zoom.provider';
 
+import { useProjectTask } from '../../../../hooks/use-project-task.hook';
+import { isDetectionTask } from '../../../../shared/task-type-guards';
 import { useAnnotationActions } from '../../annotation-actions-provider.component';
 import { getFormattedPoints } from '../../annotations/utils';
 import { useAnnotatorLabels } from '../../annotator-labels-provider.component';
@@ -24,20 +26,15 @@ export const SSIMTool = () => {
     const { selectedLabel } = useAnnotatorLabels();
     const { addAndSelectAnnotations } = useAddAndSelectAnnotations();
     const { runSSIM, reset, toolState, isProcessing, isLoading } = useSSIM();
+    const shapeType = isDetectionTask(useProjectTask()) ? 'rectangle' : 'polygon';
 
     useEffect(() => {
         if (isProcessing || toolState.shapes.length === 0) {
             return;
         }
 
-        const predictedShapes = toolState.shapes.slice(1);
-
-        if (predictedShapes.length === 0) {
-            reset();
-            return;
-        }
-
-        addAndSelectAnnotations(predictedShapes, selectedLabel ? [selectedLabel] : []);
+        // The first shape is the user-drawn template, which is kept as an annotation too.
+        addAndSelectAnnotations(toolState.shapes, selectedLabel ? [selectedLabel] : []);
         reset();
     }, [toolState.shapes, isProcessing, addAndSelectAnnotations, selectedLabel, reset]);
 
@@ -105,7 +102,7 @@ export const SSIMTool = () => {
                         template,
                         existingAnnotations: annotations.map((annotation) => annotation.shape),
                         autoMergeDuplicates: true,
-                        shapeType: 'polygon',
+                        shapeType,
                     });
 
                     return [];

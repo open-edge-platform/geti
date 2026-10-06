@@ -788,6 +788,10 @@
                 "label": "Laccio magnetico",
                 "description": "Passa il mouse lungo il bordo di un oggetto e fai clic periodicamente per agganciare il contorno ai suoi bordi.",
                 "error": "Impossibile selezionare i limiti della forma, puoi provare di nuovo?"
+            },
+            "ssim": {
+                "label": "Assistente di rilevamento",
+                "description": "Disegna un riquadro attorno a un oggetto per trovare e annotare automaticamente oggetti simili nell'immagine."
             }
         },
         "video": {
