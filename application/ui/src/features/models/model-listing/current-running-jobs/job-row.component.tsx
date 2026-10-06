@@ -8,8 +8,8 @@ import { BottomProgressBar } from '@/components/bottom-progress-bar/bottom-progr
 import { useTranslation } from '@/i18n';
 import { Button, DialogContainer, Flex, Grid, Text } from '@geti-ui/ui';
 import { isJobPending, isTrainJob } from 'hooks/api/util';
+import { DATE_TIME_FORMAT, useFormatDate } from 'hooks/use-format-date.hook';
 
-import { formatDateTime } from '../../../../shared/date-utils';
 import { useGetModel } from '../../hooks/api/use-get-model.hook';
 import { TrainingLogsDialog } from '../../training-logs/training-logs-dialog.component';
 import { ArchitectureColumn } from '../components/model-row/architecture-column.component';
@@ -66,7 +66,8 @@ export const JobRow = ({ job, progress, statusBadges, actions, datasetRevisions,
             ? labelSchemaRevision.labels.length
             : undefined;
 
-    const formattedStartedAt = job.started_at ? formatDateTime(job.started_at) : t('models.jobs.waitingToStart');
+    const formatDate = useFormatDate(DATE_TIME_FORMAT);
+    const formattedStartedAt = job.started_at ? (formatDate(job.started_at) ?? '-') : t('models.jobs.waitingToStart');
 
     return (
         <BottomProgressBar progress={progress}>

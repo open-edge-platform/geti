@@ -106,6 +106,20 @@ const isTauriRestrictedSyntax = {
         'Do not branch on `isTauri()` at runtime. Add or split a capability module via a `.tauri.{ts,tsx}` twin instead.',
 };
 
+// Forbid building dates/numbers straight from Intl or Date.prototype.toLocale*. These bypass the
+// ThemeProvider locale (useFormatDate / useNumberFormatter), so the formatted text drifts from the
+// rest of the app whenever the user switches language. The hook itself and tests are allow-listed.
+const noDirectIntlFormattingRestrictedSyntax = [
+    {
+        selector: "NewExpression[callee.object.name='Intl'][callee.property.name=/^(DateTimeFormat|NumberFormat)$/]",
+        message: 'Use useFormatDate / useNumberFormatter so the ThemeProvider locale applies.',
+    },
+    {
+        selector: 'CallExpression[callee.property.name=/^(toLocaleDateString|toLocaleTimeString|toLocaleString)$/]',
+        message: 'Use useFormatDate / useNumberFormatter so the ThemeProvider locale applies.',
+    },
+];
+
 // Containment rule for the shared `src/components/` folder: it must be reached
 // through the `@/components/*` alias. A relative `../components/` specifier is
 // ambiguous on its own, so the trees that own a local `components/` folder are
@@ -124,6 +138,7 @@ const sharedComponentsAliasConfig = {
                 message:
                     'Do not import `src/components/` with a relative path. Use the `@/components/*` alias instead.',
             },
+            ...noDirectIntlFormattingRestrictedSyntax,
         ],
     },
 };
@@ -214,7 +229,7 @@ export default [
                     ' SPDX-License-Identifier: Apache-2.0',
                 ],
             ],
-            'no-restricted-syntax': ['error', isTauriRestrictedSyntax],
+            'no-restricted-syntax': ['error', isTauriRestrictedSyntax, ...noDirectIntlFormattingRestrictedSyntax],
         },
     },
     sharedComponentsAliasConfig,
