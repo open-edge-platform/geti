@@ -4,11 +4,10 @@
 import { API_BASE_URL, fetchClient } from '@/api';
 import { useTranslation, type TranslateFn } from '@/i18n';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
-import { downloadFile } from '../../../../platform/download-file';
-import { getQueryKey } from '../../../../query-client/query-client';
-import { assertIsNotNullable } from '../../../../shared/util';
+import { downloadFile } from '../../../platform/download-file';
+import { getQueryKey } from '../../../query-client/query-client';
+import { assertIsNotNullable } from '../../../shared/util';
 import { type LogEntry } from '../log-types';
 import { parseLogLine } from '../log-utils';
 
@@ -33,9 +32,8 @@ const fetchModelLogs = async (t: TranslateFn, projectId: string, modelId: string
         .filter((entry): entry is LogEntry => entry !== null);
 };
 
-export const useModelLogs = (modelId: string | undefined) => {
+export const useModelLogs = (projectId: string, modelId: string | undefined) => {
     const { t } = useTranslation();
-    const projectId = useProjectIdentifier();
 
     return useQuery({
         queryKey: getQueryKey([
@@ -49,7 +47,7 @@ export const useModelLogs = (modelId: string | undefined) => {
             return fetchModelLogs(t, projectId, modelId);
         },
         enabled: !!modelId,
-        staleTime: Infinity, // Completed/failed model logs don't change
+        staleTime: Infinity,
     });
 };
 
@@ -58,15 +56,14 @@ const downloadModelLogsFile = (t: TranslateFn, projectId: string, modelId: strin
     downloadFile(url, `training-logs-${modelId}.log`, t('models.training.logs.downloadStarted'));
 };
 
-export const useDownloadModelLogs = (modelId: string) => {
+export const useDownloadModelLogs = (projectId: string, modelId: string) => {
     const { t } = useTranslation();
-    const projectId = useProjectIdentifier();
 
     const mutation = useMutation({
         mutationFn: async () => {
             assertIsNotNullable(modelId);
 
-            await downloadModelLogsFile(t, projectId, modelId);
+            downloadModelLogsFile(t, projectId, modelId);
         },
     });
 

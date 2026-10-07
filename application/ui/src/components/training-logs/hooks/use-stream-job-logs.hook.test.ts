@@ -3,8 +3,6 @@
 
 import { act, waitFor } from '@testing-library/react';
 import { getMockedLogEntry } from 'mocks/mock-log-entry';
-import { renderHook } from 'test-utils/render';
-
 import {
     getLastEventSource,
     MockEventSourceConstructor,
@@ -12,7 +10,9 @@ import {
     simulateSSEError,
     simulateSSEMessage,
     simulateSSEOpen,
-} from '../../../../test-utils/mock-event-source';
+} from 'test-utils/mock-event-source';
+import { renderHook } from 'test-utils/render';
+
 import { useStreamJobLogs } from './use-stream-job-logs.hook';
 
 describe('useStreamJobLogs', () => {
@@ -21,20 +21,20 @@ describe('useStreamJobLogs', () => {
     });
 
     it('does not create an EventSource when jobId is undefined', () => {
-        renderHook(() => useStreamJobLogs(undefined));
+        renderHook(() => useStreamJobLogs(undefined, { retry: true }));
 
         expect(MockEventSourceConstructor).not.toHaveBeenCalled();
     });
 
     it('creates an EventSource with the correct URL when jobId is provided', () => {
-        renderHook(() => useStreamJobLogs('job-1'));
+        renderHook(() => useStreamJobLogs('job-1', { retry: true }));
 
         expect(MockEventSourceConstructor).toHaveBeenCalledTimes(1);
         expect(getLastEventSource().url).toContain('/api/jobs/job-1/logs');
     });
 
     it('accumulates log entries as SSE messages arrive', async () => {
-        const { result } = renderHook(() => useStreamJobLogs('job-1'));
+        const { result } = renderHook(() => useStreamJobLogs('job-1', { retry: true }));
         const eventSource = getLastEventSource();
 
         act(() => {
@@ -56,7 +56,7 @@ describe('useStreamJobLogs', () => {
     });
 
     it('sets connectionStatus to connecting on SSE error (retry)', async () => {
-        const { result } = renderHook(() => useStreamJobLogs('job-1'));
+        const { result } = renderHook(() => useStreamJobLogs('job-1', { retry: true }));
         const eventSource = getLastEventSource();
 
         act(() => {
@@ -77,7 +77,7 @@ describe('useStreamJobLogs', () => {
     });
 
     it('preserves log order across multiple consecutive messages', async () => {
-        const { result } = renderHook(() => useStreamJobLogs('job-1'));
+        const { result } = renderHook(() => useStreamJobLogs('job-1', { retry: true }));
         const eventSource = getLastEventSource();
 
         act(() => {

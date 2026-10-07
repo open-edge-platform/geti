@@ -45,6 +45,8 @@
             "no": "No",
             "unknown": "Unknown",
             "name": "Name",
+            "architecture": "Architecture",
+            "device": "Device",
             "on": "On",
             "off": "Off",
             "noMaximum": "No maximum",
@@ -70,6 +72,7 @@
             "seconds": "Seconds",
             "every": "every",
             "model": "Model",
+            "jobs": "Jobs",
             "labels": "Labels",
             "bytesTransferred": "{{transferred}} of {{total}}",
             "language": "Language"
@@ -311,12 +314,6 @@
         "importExport": {
             "trigger": "Import/export dataset",
             "exportItem": "Export dataset"
-        },
-        "jobs": {
-            "cancel": {
-                "title": "Cancel job",
-                "confirmation": "Are you sure you want to cancel job {{jobId}}?"
-            }
         },
         "revisions": {
             "createdOn": "Created {{date}}",
@@ -794,6 +791,15 @@
                 "label": "Magnetic Lasso",
                 "description": "Hover along an object's edge and click periodically to snap the outline to its borders.",
                 "error": "Failed to select the shape boundaries, could you please try again?"
+            },
+            "ssim": {
+                "label": "Detection assistant",
+                "description": "Draw a box around an object to automatically find and annotate similar objects in the image.",
+                "loading": "Loading detection assistant, please wait...",
+                "error": "Error in Detection assistant tool: {{message}}",
+                "operations": {
+                    "workerBuild": "Detection assistant worker build"
+                }
             }
         },
         "video": {
@@ -819,7 +825,6 @@
     "models": {
         "jobs": {
             "error": "Job failed. Please check the logs for details and try again.",
-            "heading": "Jobs",
             "pending": "Pending...",
             "running": "Running...",
             "stopDialog": {
@@ -921,13 +926,17 @@
                 },
                 "toast": {
                     "trainingStarted": "Model training started successfully.",
-                    "trainingStartedWithLink": "Model training started successfully. <link>Open models screen to see progress.</link>"
+                    "trainingStartedWithLink": "Model training started successfully. <modelsLink>Open models screen to see progress.</modelsLink>"
                 },
                 "selectDataset": {
                     "label": "Select dataset",
-                    "useCurrentDataset": "Use current dataset",
+                    "useEntireDataset": "Use entire dataset",
                     "helpTitle": "Selecting a dataset",
-                    "helpDescription": "Choose the version of the dataset to use for training. If you want to train the new model\n                            on the exact same data (media and annotations) as another model, please select the\n                            corresponding dataset revision. Conversely, if you want to train on the most recent version\n                            of the data (what you see in the \"Dataset\" page), please select \"Use\n                            current dataset\"."
+                    "helpDescription": "Choose the data to use for training. Select \"Use entire dataset\" to train on the most recent version of all the data (what you see in the \"Dataset\" page). Select a dataset view to train only on the media assigned to that view. Select a dataset revision to train on the exact same data (media and annotations) as another model.",
+                    "sections": {
+                        "views": "Dataset views",
+                        "revisions": "Dataset revisions"
+                    }
                 },
                 "selectModel": {
                     "label": "Select input weights",
@@ -938,6 +947,7 @@
             },
             "validation": {
                 "notEnoughAnnotations": "In order to train a model, you need to annotate at least 3 items in your dataset, although we recommend annotating several more for better results.",
+                "notEnoughAnnotationsInView": "In order to train a model, you need to annotate at least 3 items in the selected dataset view, although we recommend annotating several more for better results.",
                 "emptySubsetsReason": "In order to train a model, each subset (training, validation, testing) needs at least one item. This condition is currently not satisfiable, because the {{subsetClause}} empty and {{assignmentDetail}}.",
                 "emptySubsetClause_one": "{{list}} subset is",
                 "emptySubsetClause_other": "{{list}} subsets are",
@@ -1018,7 +1028,6 @@
             "fineTunedFrom": "Fine-tuned from",
             "columns": {
                 "trained": "Trained",
-                "device": "Device",
                 "totalSize": "Total size"
             }
         },
@@ -1093,8 +1102,46 @@
             }
         },
         "columns": {
-            "modelName": "Model Name",
-            "architecture": "Architecture"
+            "modelName": "Model Name"
+        }
+    },
+    "jobs": {
+        "allProjects": "All projects",
+        "currentProjectLabel": "{{name}} (current)",
+        "projectsSection": "Projects",
+        "tabs": {
+            "all": "All",
+            "finished": "Finished"
+        },
+        "status": {
+            "pending": "Scheduled",
+            "cancelling": "Cancelling",
+            "done": "Completed"
+        },
+        "type": {
+            "quantize": "Optimization"
+        },
+        "columns": {
+            "type": "Type"
+        },
+        "cancel": {
+            "title": "Cancel job",
+            "confirmation": "Are you sure you want to cancel job {{jobId}}?"
+        },
+        "meta": {
+            "started": "Started {{time}}",
+            "elapsed": "Elapsed {{time}}"
+        },
+        "emptyState": {
+            "all": "No jobs in this category",
+            "running": "No running jobs",
+            "finished": "No finished jobs",
+            "scheduled": "No scheduled jobs",
+            "cancelled": "No cancelled jobs",
+            "failed": "No failed jobs"
+        },
+        "actions": {
+            "viewLogs": "View logs"
         }
     },
     "license": {

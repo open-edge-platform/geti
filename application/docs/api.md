@@ -258,3 +258,7 @@ Job types:
 - `import_dataset_as_new_project`
 - `export_dataset`
 - `stage_dataset`
+
+> A `train` job accepts either `dataset_revision_id` (train on an existing revision) or `dataset_view_id`
+> (train on the media assigned to a [dataset view](#views)) in its parameters, but not both; when neither is
+> given, the job trains on the entire dataset in its most recent state.
