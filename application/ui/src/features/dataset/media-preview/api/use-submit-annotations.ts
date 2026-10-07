@@ -20,7 +20,12 @@ import {
 import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode';
 import { incrementCachedAnnotatedFrameCount } from '../../../../modules/annotator/utils';
 import { getQueryKey } from '../../../../query-client/query-client';
-import { EMPTY_LABEL_ID, isNonEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../../../shared/labels';
+import {
+    EMPTY_LABEL_ID,
+    isEmptyLabel,
+    isNonEmptyLabel,
+    useProjectLabelsWithEmptyLabel,
+} from '../../../../shared/labels';
 import { isVideoFrame } from '../../../../shared/media-item-utils';
 import type { Annotation } from '../../../../shared/types';
 import { isNonEmptyArray } from '../../../../shared/util';
@@ -142,9 +147,7 @@ export const useSubmitAnnotations = ({ mediaItem, mode }: UseSubmitAnnotationsPa
         return !isEqual(currentServerAnnotations, mapLocalAnnotationsToServer(initialAnnotations));
     }, [annotations, initialAnnotations]);
 
-    const hasEmptyLabelSelection = annotations.some((annotation) =>
-        annotation.labels.some((label) => label.id === EMPTY_LABEL_ID)
-    );
+    const hasEmptyLabelSelection = annotations.some((annotation) => annotation.labels.some(isEmptyLabel));
     const hasInvalidAnnotation = annotations.some((annotation) => annotation.labels.length === 0);
 
     const canSubmit =

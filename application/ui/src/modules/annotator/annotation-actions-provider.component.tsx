@@ -10,7 +10,7 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEqual } from 'lodash-es';
 
 import { getQueryKey } from '../../query-client/query-client';
-import { EMPTY_LABEL_ID, isNonEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../shared/labels';
+import { EMPTY_LABEL_ID, isEmptyLabel, isNonEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../shared/labels';
 import { isVideoFrame } from '../../shared/media-item-utils';
 import type { Annotation, AnnotationLabelRef, Shape } from '../../shared/types';
 import { UndoRedoProvider } from '../../shared/undo-redo/undo-redo-provider.component';
@@ -243,7 +243,7 @@ export const AnnotationActionsProvider = ({
     }, [annotations, initialAnnotationsDTO]);
 
     const hasEmptyLabelSelection = useMemo(() => {
-        return annotations.some((annotation) => annotation.labels.some((label) => label.id === EMPTY_LABEL_ID));
+        return annotations.some((annotation) => annotation.labels.some(isEmptyLabel));
     }, [annotations]);
 
     const hasInvalidAnnotation = useMemo(() => {
