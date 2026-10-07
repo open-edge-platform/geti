@@ -53,12 +53,12 @@ const renderSubmitAnnotations = ({
     );
 
     return renderHook(
-        () => ({ ...useAnnotations(), ...useAnnotationCommands(), ...useSubmitAnnotations({ mediaItem, mode }) }),
+        () => ({ ...useAnnotations(), ...useAnnotationCommands(), ...useSubmitAnnotations({ mediaItem }) }),
         { wrapper }
     );
 };
 
-describe('submitPredictions', () => {
+describe('submit in prediction mode', () => {
     const label1 = getMockedLabel({ id: 'label-1', name: 'Cat', color: '#FF0000' });
     const label2 = getMockedLabel({ id: 'label-2', name: 'Dog', color: '#00FF00' });
 
@@ -89,7 +89,7 @@ describe('submitPredictions', () => {
         await waitFor(() => expect(result.current).not.toBeNull());
 
         await act(async () => {
-            await result.current.submitPredictions('training');
+            await result.current.submit('training');
         });
 
         await waitFor(() => {
@@ -123,7 +123,7 @@ describe('submitPredictions', () => {
 
         await waitFor(() => expect(result.current).not.toBeNull());
 
-        await act(() => result.current.submitPredictions('training'));
+        await act(() => result.current.submit('training'));
 
         await waitFor(() => {
             expect(savedBody).toBeDefined();
@@ -190,7 +190,7 @@ describe('Label normalization', () => {
 
         await waitFor(() => expect(result.current.annotations).toHaveLength(1));
 
-        await act(() => result.current.submitAnnotations('training'));
+        await act(() => result.current.submit('training'));
 
         await waitFor(() => {
             expect(savedBody).toBeDefined();

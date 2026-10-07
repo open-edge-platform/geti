@@ -17,23 +17,17 @@ import {
     mapLocalAnnotationsToServer,
     mapServerAnnotationsToLocal,
 } from '../../../../modules/annotator/annotation-mappers';
-import type { AnnotatorMode } from '../../../../modules/annotator/annotator-mode';
-import { incrementCachedAnnotatedFrameCount } from '../../../../modules/annotator/utils';
 import { getQueryKey } from '../../../../query-client/query-client';
-import {
-    EMPTY_LABEL_ID,
-    isEmptyLabel,
-    isNonEmptyLabel,
-    useProjectLabelsWithEmptyLabel,
-} from '../../../../shared/labels';
+import { isEmptyLabel, isNonEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../../../shared/labels';
 import { isVideoFrame } from '../../../../shared/media-item-utils';
 import type { Annotation } from '../../../../shared/types';
 import { isNonEmptyArray } from '../../../../shared/util';
+import { incrementCachedAnnotatedFrameCount } from './increment-cached-annotated-frame-count';
 
 type DatasetItemsPage = { items: DatasetItem[] };
 
 const filterOutAnnotationWithEmptyLabel = (annotations: Annotation[]): Annotation[] => {
-    return annotations.filter((annotation) => annotation.labels.some((label) => label.id !== EMPTY_LABEL_ID));
+    return annotations.filter((annotation) => annotation.labels.some(isNonEmptyLabel));
 };
 
 const useSaveAnnotationsMutation = (mediaItem: Media) => {
@@ -99,17 +93,15 @@ const useSaveAnnotationsMutation = (mediaItem: Media) => {
     });
 };
 
-type UseSubmitAnnotationsParams = {
-    mediaItem: Media;
-    mode: AnnotatorMode;
-};
-
-export const useSubmitAnnotations = ({ mediaItem, mode }: UseSubmitAnnotationsParams) => {
+export const useSubmitAnnotations = ({ mediaItem }: { mediaItem: Media }) => {
     const projectId = useProjectIdentifier();
     const projectLabels = useProjectLabelsWithEmptyLabel();
-    const { annotations, initialAnnotations, initialPredictions } = useAnnotations();
+    const { mode, annotations, initialAnnotations, initialPredictions } = useAnnotations();
     const { resetAnnotations } = useAnnotationCommands();
     const saveMutation = useSaveAnnotationsMutation(mediaItem);
+
+    // In prediction mode `annotations` holds the predictions, so the user's edits are only read in annotation mode.
+    const isPredictionMode = mode === 'prediction';
 
     const saveAnnotations = async (annotationsDTO: AnnotationDTO[], subset: DatasetSubset) => {
         const query = isVideoFrame(mediaItem) ? { frame_index: mediaItem.frame_number } : undefined;
@@ -122,44 +114,51 @@ export const useSubmitAnnotations = ({ mediaItem, mode }: UseSubmitAnnotationsPa
         resetAnnotations(mapServerAnnotationsToLocal(annotationsDTO));
     };
 
-    const submitAnnotations = async (subset: DatasetSubset) => {
+    const submit = async (subset: DatasetSubset) => {
         const validLabelIds = new Set(projectLabels.map((label) => label.id));
-        const serverAnnotations = mapLocalAnnotationsToServer(
-            filterOutAnnotationWithEmptyLabel(annotations),
-            validLabelIds
+
+        if (isPredictionMode) {
+            const predictionsWithoutConfidences = mapLocalAnnotationsToServer(initialPredictions, validLabelIds)
+                .map(({ confidences, ...restOfAnnotation }) => restOfAnnotation)
+                .filter((annotation) => isNonEmptyArray(annotation.labels) && annotation.labels.every(isNonEmptyLabel));
+
+            await saveAnnotations(predictionsWithoutConfidences, subset);
+
+            return;
+        }
+
+        await saveAnnotations(
+            mapLocalAnnotationsToServer(filterOutAnnotationWithEmptyLabel(annotations), validLabelIds),
+            subset
         );
-
-        await saveAnnotations(serverAnnotations, subset);
     };
 
-    const submitPredictions = async (subset: DatasetSubset) => {
-        const validLabelIds = new Set(projectLabels.map((label) => label.id));
-        const serverPredictionsWithoutConfidences = mapLocalAnnotationsToServer(initialPredictions, validLabelIds)
-            .map(({ confidences, ...restOfAnnotation }) => restOfAnnotation)
-            .filter((annotation) => isNonEmptyArray(annotation.labels) && annotation.labels.every(isNonEmptyLabel));
+    const initialServerAnnotations = useMemo(
+        () => mapLocalAnnotationsToServer(initialAnnotations),
+        [initialAnnotations]
+    );
 
-        await saveAnnotations(serverPredictionsWithoutConfidences, subset);
-    };
-
-    const hasChangedAnnotations = useMemo(() => {
-        const currentServerAnnotations = mapLocalAnnotationsToServer(filterOutAnnotationWithEmptyLabel(annotations));
-
-        return !isEqual(currentServerAnnotations, mapLocalAnnotationsToServer(initialAnnotations));
-    }, [annotations, initialAnnotations]);
+    // Only the current side drops empty-label annotations: removing a saved "empty" label counts as a change.
+    const hasChangedAnnotations = useMemo(
+        () =>
+            !isEqual(
+                mapLocalAnnotationsToServer(filterOutAnnotationWithEmptyLabel(annotations)),
+                initialServerAnnotations
+            ),
+        [annotations, initialServerAnnotations]
+    );
 
     const hasEmptyLabelSelection = annotations.some((annotation) => annotation.labels.some(isEmptyLabel));
-    const hasInvalidAnnotation = annotations.some((annotation) => annotation.labels.length === 0);
+    const hasInvalidAnnotation = !isPredictionMode && annotations.some((annotation) => annotation.labels.length === 0);
 
-    const canSubmit =
-        mode === 'prediction'
-            ? initialPredictions.length > 0
-            : !hasInvalidAnnotation && (hasChangedAnnotations || hasEmptyLabelSelection);
+    const canSubmit = isPredictionMode
+        ? initialPredictions.length > 0
+        : !hasInvalidAnnotation && (hasChangedAnnotations || hasEmptyLabelSelection);
 
     return {
         canSubmit,
         hasInvalidAnnotation,
         isSaving: saveMutation.isPending,
-        submitAnnotations,
-        submitPredictions,
+        submit,
     };
 };

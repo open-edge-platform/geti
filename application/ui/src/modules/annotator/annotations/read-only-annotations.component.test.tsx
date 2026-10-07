@@ -81,7 +81,12 @@ const setupMocks = ({
     isReadOnlyMode = true,
     hideLabels = false,
 }: SetupOptions = {}) => {
-    vi.mocked(useAnnotations).mockReturnValue({ annotations, initialAnnotations: [], initialPredictions: [] });
+    vi.mocked(useAnnotations).mockReturnValue({
+        mode: 'annotation',
+        annotations,
+        initialAnnotations: [],
+        initialPredictions: [],
+    });
     vi.mocked(useIsAnnotatorReadOnly).mockReturnValue(isReadOnlyMode);
     vi.mocked(useAnnotationCommands).mockReturnValue({
         updateAnnotations: vi.fn(),

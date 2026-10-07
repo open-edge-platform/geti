@@ -147,19 +147,11 @@ export const SecondaryToolbar = ({
     const { selectableModels } = usePredictionSetup();
     const isPlaying = videoPlayerContext?.videoControls?.isPlaying ?? false;
 
-    const { isSaving, submitAnnotations, submitPredictions, canSubmit, hasInvalidAnnotation } = useSubmitAnnotations({
-        mediaItem,
-        mode,
-    });
+    const { isSaving, submit, canSubmit, hasInvalidAnnotation } = useSubmitAnnotations({ mediaItem });
     const { initialAnnotations, initialPredictions } = useAnnotations();
 
     const handleSubmit = async () => {
-        await submitAnnotations(subset);
-        onSelectNextMediaItem();
-    };
-
-    const handleSubmitPredictions = async () => {
-        await submitPredictions(subset);
+        await submit(subset);
         onSelectNextMediaItem();
     };
 
@@ -191,14 +183,10 @@ export const SecondaryToolbar = ({
         (event) => {
             event.preventDefault();
 
-            if (isPredictionMode) {
-                handleSubmitPredictions();
-            } else {
-                handleSubmit();
-            }
+            handleSubmit();
         },
         { enabled: !isSubmitDisabled },
-        [isSubmitDisabled, isPredictionMode, handleSubmitPredictions, handleSubmit]
+        [isSubmitDisabled, handleSubmit]
     );
 
     return (
@@ -233,7 +221,7 @@ export const SecondaryToolbar = ({
                             <PredictionButtons
                                 onModeChange={onModeChange}
                                 isDisabled={isSubmitDisabled}
-                                onSubmit={handleSubmitPredictions}
+                                onSubmit={handleSubmit}
                             />
                         )}
                         {isAnnotationMode && isImage(mediaItem) && (

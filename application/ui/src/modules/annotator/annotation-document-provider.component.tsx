@@ -1,4 +1,4 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 import { Context, createContext, ReactNode, useContext, useMemo, useRef } from 'react';
@@ -13,6 +13,8 @@ import { mapServerAnnotationsToLocal } from './annotation-mappers';
 import type { AnnotatorMode } from './annotator-mode';
 
 type AnnotationsContextValue = {
+    mode: AnnotatorMode;
+    // What is on screen: the user's edits in annotation mode, the predictions in prediction mode.
     annotations: Annotation[];
     initialAnnotations: Annotation[];
     initialPredictions: Annotation[];
@@ -122,8 +124,8 @@ export const AnnotationDocumentProvider = ({
     const isReadOnlyMode = isReadOnly || mode === 'prediction';
 
     const annotationsValue = useMemo<AnnotationsContextValue>(
-        () => ({ annotations: annotationsToRender, initialAnnotations, initialPredictions: predictions }),
-        [annotationsToRender, initialAnnotations, predictions]
+        () => ({ mode, annotations: annotationsToRender, initialAnnotations, initialPredictions: predictions }),
+        [mode, annotationsToRender, initialAnnotations, predictions]
     );
 
     return (
