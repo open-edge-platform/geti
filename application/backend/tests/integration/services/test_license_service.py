@@ -8,6 +8,7 @@ import pytest
 from app.services.license_service import LicenseService
 
 APP_VERSION = "1.0.0"
+EXPECTED_MARKER = f"{APP_VERSION}:{LicenseService.TERMS_REVISION}"
 
 
 class TestLicenseService:
@@ -27,7 +28,7 @@ class TestLicenseService:
 
         consent_file = tmp_path / LicenseService.CONSENT_FILENAME
         assert consent_file.exists()
-        assert consent_file.read_text() == APP_VERSION
+        assert consent_file.read_text() == EXPECTED_MARKER
         assert fxt_license_service.is_accepted()
 
         assert LicenseService(data_dir=tmp_path, app_version=APP_VERSION).is_accepted()
@@ -45,8 +46,15 @@ class TestLicenseService:
 
         new_service.accept()
         consent_file = tmp_path / LicenseService.CONSENT_FILENAME
-        assert consent_file.read_text() == APP_VERSION
+        assert consent_file.read_text() == EXPECTED_MARKER
         assert new_service.is_accepted()
+
+    def test_consent_without_current_terms_revision_is_not_accepted(self, tmp_path: Path) -> None:
+        """Consent recorded for the same app version but older terms requires re-acceptance."""
+        (tmp_path / LicenseService.CONSENT_FILENAME).write_text(APP_VERSION)
+
+        service = LicenseService(data_dir=tmp_path, app_version=APP_VERSION)
+        assert not service.is_accepted()
 
     def test_empty_marker_file_is_not_accepted(self, tmp_path: Path) -> None:
         """An empty consent file (e.g. legacy pre-version marker) is treated as not accepted."""
