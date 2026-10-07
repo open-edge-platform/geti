@@ -23,7 +23,7 @@ import { EMPTY_LABEL_ID } from '../../../../shared/labels';
 import { renderHook } from '../../../../test-utils/render';
 import { useSubmitAnnotations } from './use-submit-annotations';
 
-const renderAnnotationActions = ({
+const renderSubmitAnnotations = ({
     initialAnnotationsDTO = [],
     initialPredictionsDTO = [],
     mediaItem = getMockedMediaImage(),
@@ -80,7 +80,7 @@ describe('submitPredictions', () => {
             })
         );
 
-        const { result } = renderAnnotationActions({
+        const { result } = renderSubmitAnnotations({
             labels: [label1, label2],
             initialPredictionsDTO: predictionsDTO,
             mode: 'prediction',
@@ -115,7 +115,7 @@ describe('submitPredictions', () => {
             })
         );
 
-        const { result } = renderAnnotationActions({
+        const { result } = renderSubmitAnnotations({
             mode: 'prediction',
             labels: [label1, label2],
             initialPredictionsDTO: predictionsDTO,
@@ -136,7 +136,7 @@ describe('submitPredictions', () => {
 describe('Label normalization', () => {
     it('stores label refs (not full labels) when adding annotations', async () => {
         const label1 = getMockedLabel({ id: 'label-1', name: 'Cat', color: '#FF0000' });
-        const { result } = renderAnnotationActions({ mode: 'annotation', labels: [label1] });
+        const { result } = renderSubmitAnnotations({ mode: 'annotation', labels: [label1] });
 
         await waitFor(() => expect(result.current).not.toBeNull());
 
@@ -151,7 +151,7 @@ describe('Label normalization', () => {
     });
 
     it('annotation with no refs is invalid', async () => {
-        const { result } = renderAnnotationActions({ mode: 'annotation', labels: [] });
+        const { result } = renderSubmitAnnotations({ mode: 'annotation', labels: [] });
 
         await waitFor(() => expect(result.current).not.toBeNull());
 
@@ -180,7 +180,7 @@ describe('Label normalization', () => {
             })
         );
 
-        const { result } = renderAnnotationActions({ mode: 'annotation', labels: [label1] });
+        const { result } = renderSubmitAnnotations({ mode: 'annotation', labels: [label1] });
 
         await waitFor(() => expect(result.current).not.toBeNull());
 
@@ -210,7 +210,7 @@ describe('canSubmit on initial load', () => {
             { labels: [{ id: label1.id }], shape: getMockedShape({ type: 'rectangle' }), confidences: null },
         ];
 
-        const { result } = renderAnnotationActions({
+        const { result } = renderSubmitAnnotations({
             mode: 'annotation',
             labels: [label1],
             initialAnnotationsDTO: annotationsDTO,
@@ -232,7 +232,7 @@ describe('canSubmit on initial load', () => {
             { labels: [{ id: label1.id }], shape: getMockedShape({ type: 'rectangle' }), confidences: null },
         ];
 
-        const { result } = renderAnnotationActions({
+        const { result } = renderSubmitAnnotations({
             mode: 'annotation',
             labels: [label1, label2],
             initialAnnotationsDTO: annotationsDTO,
