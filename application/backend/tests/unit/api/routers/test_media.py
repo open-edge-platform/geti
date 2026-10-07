@@ -426,6 +426,8 @@ class TestMediaEndpoints:
         )
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+        fxt_media_service.db_session.rollback.assert_called_once()
+        fxt_media_service.db_session.commit.assert_not_called()
         assert fxt_client.get(f"/api/uploads/{upload_id}").json()["state"] == "completed"
         assert fxt_upload_service.path_for(upload_id).exists()
 
