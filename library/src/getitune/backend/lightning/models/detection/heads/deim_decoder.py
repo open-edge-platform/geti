@@ -97,17 +97,28 @@ class TransformerDecoderLayer(nn.Module):
         """Add positional embedding to tensor if provided."""
         return tensor if pos is None else tensor + pos
 
-    def _self_attention(self, q: Tensor, k: Tensor, v: Tensor, attn_mask: Tensor | None = None) -> Tensor:
-        B, N, C = q.shape  # noqa: N806
-        w_q, w_k, w_v = self.qkv_proj.weight.chunk(3, dim=0)
-        b_q, b_k, b_v = self.qkv_proj.bias.chunk(3, dim=0)
+    def _self_attention(self, qk: Tensor, v: Tensor, attn_mask: Tensor | None = None) -> Tensor:
+        """Self-attention with fused Q/K projection and a separate V projection.
 
-        def _heads(x: Tensor) -> Tensor:
-            return x.reshape(B, N, self.n_head, self.head_dim).transpose(1, 2)
+        Q and K are projected together from the position-embedded queries, while V is
+        projected from the raw target (matching ``nn.MultiheadAttention(q, k, value=tgt)``
+        semantics used by upstream DEIMv2).
 
-        q = _heads(f.linear(q, w_q, b_q))
-        k = _heads(f.linear(k, w_k, b_k))
-        v = _heads(f.linear(v, w_v, b_v))
+        Args:
+            qk: Position-embedded query features used for both Q and K, shape (B, N, C).
+            v: Raw target features used for V (no positional embedding), shape (B, N, C).
+            attn_mask: Optional attention mask of shape (N, N) or (B, N, N).
+
+        Returns:
+            Attention output of shape (B, N, C).
+        """
+        B, N, C = qk.shape  # noqa: N806
+        weight, bias = self.qkv_proj.weight, self.qkv_proj.bias
+
+        # Fused Q/K projection (one matmul), separate V projection from the raw target.
+        qk_proj = f.linear(qk, weight[: 2 * C], bias[: 2 * C])
+        q, k = qk_proj.reshape(B, N, 2, self.n_head, self.head_dim).permute(2, 0, 3, 1, 4).unbind(0)
+        v = f.linear(v, weight[2 * C :], bias[2 * C :]).reshape(B, N, self.n_head, self.head_dim).transpose(1, 2)
 
         if attn_mask is not None:
             if attn_mask.dtype == torch.bool:
@@ -140,10 +151,9 @@ class TransformerDecoderLayer(nn.Module):
         Returns:
             Updated query features of shape (B, N, C).
         """
-        # self attention using memory-efficient scaled_dot_product_attention
-        q = k = self.with_pos_embed(target, query_pos_embed)
-
-        target2 = self._self_attention(q, k, target, attn_mask=attn_mask)
+        # self attention: Q/K use position-embedded queries, V uses the raw target
+        qk = self.with_pos_embed(target, query_pos_embed)
+        target2 = self._self_attention(qk, target, attn_mask=attn_mask)
         target = target + self.dropout1(target2)
         target = self.norm1(target)
 
