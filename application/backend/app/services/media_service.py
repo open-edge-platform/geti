@@ -261,6 +261,8 @@ class MediaService(BaseSessionManagedService):
             repo = MediaRepository(project_id=str(project_id), db=self.db_session)
             db_media = repo.save(media)
         except Exception as e:
+            # Release any cached handle on the video, otherwise it cannot be moved/deleted on Windows
+            self._get_video_service().release(binary_path)
             self._discard_binary(binary_path, source_path)
             raise e
         return MediaAdapter.validate_python(db_media)
@@ -397,6 +399,8 @@ class MediaService(BaseSessionManagedService):
         repo = MediaRepository(project_id=str(project.id), db=self.db_session)
 
         binary_path = self.get_media_binary_path(project_id=project.id, media=media)
+        if media.type == MediaType.VIDEO:
+            self._get_video_service().release(binary_path)
         try:
             os.remove(binary_path)
         except FileNotFoundError:
