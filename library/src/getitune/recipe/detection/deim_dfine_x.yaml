@@ -177,6 +177,7 @@ overrides:
     task: DETECTION
     train_subset:
       batch_size: 8
+      num_workers: 4
       augmentations_cpu:
         - class_path: torchvision.transforms.v2.RandomZoomOut
           init_args:
@@ -199,6 +200,7 @@ overrides:
 
     val_subset:
       batch_size: 8
+      num_workers: 4
       augmentations_cpu:
         - class_path: getitune.data.augmentation.transforms.Resize
           init_args:
@@ -208,6 +210,7 @@ overrides:
       augmentations_gpu: []
     test_subset:
       batch_size: 8
+      num_workers: 4
       augmentations_cpu:
         - class_path: getitune.data.augmentation.transforms.Resize
           init_args:
