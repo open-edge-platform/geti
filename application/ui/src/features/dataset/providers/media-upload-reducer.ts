@@ -1,6 +1,8 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { TranslateFn } from '@/i18n';
+
 export type UploadItemStatus = 'queued' | 'uploading' | 'processing' | 'uploaded' | 'failed' | 'cancelled';
 
 // Once the transfer is complete the server creates the media item regardless, so only items that
@@ -125,4 +127,20 @@ export const computeSummary = (items: UploadFileItem[]): UploadProgressSummary =
         failed,
         cancelled,
     };
+};
+
+export const formatFinalSummary = (
+    t: TranslateFn,
+    { succeeded, failed, cancelled }: Omit<UploadProgressSummary, 'total'>
+): string => {
+    if (succeeded === 0 && failed === 0 && cancelled > 0) {
+        return t('dataset.upload.cancelledSummary', { count: cancelled });
+    }
+    if (cancelled > 0) {
+        return t('dataset.upload.mixedCancelledSummary', { count: succeeded, uploaded: succeeded, failed, cancelled });
+    }
+    if (failed === 0) return t('dataset.upload.uploadedSummary', { count: succeeded });
+    if (succeeded === 0) return t('dataset.upload.failedSummary', { count: failed });
+
+    return t('dataset.upload.mixedSummary', { count: succeeded, uploaded: succeeded, failed });
 };

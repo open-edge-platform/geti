@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { PrepareFormData } from '../hooks/use-source-action.hook';
 import { prepareVideoFileFormData } from './utils';
@@ -19,6 +19,13 @@ export type VideoFileUpload = {
 export const useVideoFileUpload = (): VideoFileUpload => {
     const [progress, setProgress] = useState<VideoFileUploadProgress | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
+
+    // Leaving the form mid-transfer must not keep uploading (and then save) the source in the background.
+    useEffect(() => {
+        return () => {
+            abortControllerRef.current?.abort();
+        };
+    }, []);
 
     const prepareFormData: PrepareFormData = async (formData: FormData) => {
         const abortController = new AbortController();

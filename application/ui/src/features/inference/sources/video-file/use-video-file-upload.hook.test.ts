@@ -72,4 +72,24 @@ describe('useVideoFileUpload', () => {
 
         expect(result.current.progress).toBeNull();
     });
+
+    it('aborts the transfer when unmounted', async () => {
+        let signal: AbortSignal | undefined;
+        vi.mocked(uploadSourceVideo).mockImplementation(
+            async (_file, options) =>
+                new Promise(() => {
+                    signal = options?.signal;
+                })
+        );
+        const { result, unmount } = renderHook(() => useVideoFileUpload());
+
+        act(() => {
+            void result.current.prepareFormData(buildFormData());
+        });
+        await waitFor(() => expect(signal).toBeDefined());
+
+        unmount();
+
+        expect(signal?.aborted).toBe(true);
+    });
 });

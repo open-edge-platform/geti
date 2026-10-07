@@ -74,7 +74,14 @@ export const useMediaUpload = () => {
 
                 const result = await uploadDatasetMedia(projectId, file, {
                     signal,
-                    onProgress: (bytesSent) => setItemTransferProgress(itemId, bytesSent),
+                    onProgress: (bytesSent) => {
+                        setItemTransferProgress(itemId, bytesSent);
+
+                        // Now `processing` (not cancellable): a racing "Cancel all" must not abort it.
+                        if (bytesSent >= file.size) {
+                            releaseItem(itemId);
+                        }
+                    },
                 });
                 setItemUploaded(itemId);
 

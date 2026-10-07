@@ -35,6 +35,7 @@ import { useUploadActions } from '../../hooks/use-upload-actions';
 import { useMediaUploadDispatch, useMediaUploadState } from '../../providers/media-upload-context';
 import {
     computeSummary,
+    formatFinalSummary,
     isCancellable,
     type UploadFileItem,
     type UploadItemStatus,
@@ -154,21 +155,7 @@ const buildSubheader = (
         });
     }
 
-    if (succeeded === 0 && failed === 0 && cancelled > 0) {
-        return t('dataset.upload.cancelledSummary', { count: cancelled });
-    }
-    if (cancelled > 0) {
-        return t('dataset.upload.mixedCancelledSummary', {
-            count: succeeded,
-            uploaded: succeeded,
-            failed,
-            cancelled,
-        });
-    }
-    if (failed === 0) return t('dataset.upload.uploadedSummary', { count: succeeded });
-    if (succeeded === 0) return t('dataset.upload.failedSummary', { count: failed });
-
-    return t('dataset.upload.mixedSummary', { count: succeeded, uploaded: succeeded, failed });
+    return formatFinalSummary(t, { succeeded, failed, cancelled });
 };
 
 const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
@@ -176,7 +163,7 @@ const UploadDetailsDialogContent = ({ onClose }: { onClose: () => void }) => {
     const labels: Record<UploadItemStatus, string> = {
         queued: t('dataset.upload.queued'),
         uploading: t('common.status.uploading'),
-        processing: t('dataset.import.preparingJob'),
+        processing: t('dataset.upload.processing'),
         uploaded: t('dataset.upload.uploaded'),
         failed: t('common.status.failed'),
         cancelled: t('common.status.cancelled'),

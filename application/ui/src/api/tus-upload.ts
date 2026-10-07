@@ -87,6 +87,7 @@ export const transferFile = (file: File, { onProgress, signal }: TransferOptions
         const settle = (callback: () => void): void => {
             if (!isSettled) {
                 isSettled = true;
+                signal?.removeEventListener('abort', onAbort);
                 callback();
             }
         };
@@ -110,17 +111,15 @@ export const transferFile = (file: File, { onProgress, signal }: TransferOptions
             onError: (error) => settle(() => reject(toTransferError(error))),
         });
 
-        signal?.addEventListener(
-            'abort',
-            () =>
-                settle(() => {
-                    // Terminating (TUS DELETE) discards the partial bytes on the server and forgets the
-                    // stored resume point, so a cancelled upload leaves nothing behind.
-                    upload.abort(true).catch(() => undefined);
-                    reject(createAbortError());
-                }),
-            { once: true }
-        );
+        const onAbort = (): void =>
+            settle(() => {
+                // Terminating (TUS DELETE) discards the partial bytes on the server and forgets the
+                // stored resume point, so a cancelled upload leaves nothing behind.
+                upload.abort(true).catch(() => undefined);
+                reject(createAbortError());
+            });
+
+        signal?.addEventListener('abort', onAbort, { once: true });
 
         upload
             .findPreviousUploads()

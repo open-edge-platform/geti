@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { isAbortError, uploadDatasetArchive } from '@/api';
 import { useTranslation } from '@/i18n';
@@ -46,6 +46,13 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
         meta: { error: { notify: (error: unknown) => !isAbortError(error) } },
     });
     const prepareImportJobMutation = useSubmitJob();
+
+    // Closing the dialog mid-transfer discards the partial upload instead of finishing it in the background.
+    useEffect(() => {
+        return () => {
+            abortControllerRef.current?.abort();
+        };
+    }, []);
 
     const handleLoadingFile = (files: File[]) => {
         const hasMultipleFiles = files.length > 1;

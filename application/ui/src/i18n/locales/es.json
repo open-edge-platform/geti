@@ -152,6 +152,7 @@
         },
         "upload": {
             "queued": "En cola",
+            "processing": "Procesando",
             "uploaded": "Cargado",
             "errorTitle": "Error de carga",
             "details": "Detalles de la carga",

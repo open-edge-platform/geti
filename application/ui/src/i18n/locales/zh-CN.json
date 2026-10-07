@@ -152,6 +152,7 @@
         },
         "upload": {
             "queued": "排队中",
+            "processing": "处理中",
             "uploaded": "已上传",
             "errorTitle": "上传错误",
             "details": "上传详情",

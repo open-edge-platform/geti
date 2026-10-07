@@ -152,6 +152,7 @@
         },
         "upload": {
             "queued": "Queued",
+            "processing": "Processing",
             "uploaded": "Uploaded",
             "errorTitle": "Upload error",
             "details": "Upload details",

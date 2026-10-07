@@ -152,6 +152,7 @@
         },
         "upload": {
             "queued": "W kolejce",
+            "processing": "Przetwarzanie",
             "uploaded": "Przesłano",
             "errorTitle": "Błąd przesyłania",
             "details": "Szczegóły przesyłania",

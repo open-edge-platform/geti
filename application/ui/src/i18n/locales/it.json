@@ -152,6 +152,7 @@
         },
         "upload": {
             "queued": "In coda",
+            "processing": "Elaborazione",
             "uploaded": "Caricato",
             "errorTitle": "Errore di caricamento",
             "details": "Dettagli caricamento",

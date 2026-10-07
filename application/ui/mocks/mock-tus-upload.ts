@@ -118,7 +118,7 @@ export const tusUploadHandlers = [
     http.post('*/api/sources/media\\:from-upload', async ({ request }) => {
         return (
             (await consume(request)) ??
-            HttpResponse.json({ video_path: `/data/sources/${crypto.randomUUID()}.mp4` }, { status: 201 })
+            HttpResponse.json({ video_path: `/data/source_media/${crypto.randomUUID()}/sample.mp4` }, { status: 201 })
         );
     }),
 ];

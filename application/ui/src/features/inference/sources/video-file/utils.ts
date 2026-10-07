@@ -22,6 +22,7 @@ export type VideoFileUploadOptions = {
 
 // Uploads the selected file (if any) and writes the resulting path back into `video_path`, so
 // `videoFileBodyFormatter` can stay a plain, synchronous formatter like its sibling sources.
+// The returned rollback deletes the upload so it is not left orphaned when the source is not saved.
 export const prepareVideoFileFormData = async (
     formData: FormData,
     { onProgress, signal }: VideoFileUploadOptions = {}

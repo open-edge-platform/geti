@@ -14,7 +14,7 @@ import {
     MediaUploadDispatchContext,
     MediaUploadStateContext,
 } from './media-upload-context';
-import { computeSummary, INITIAL_STATE, reducer } from './media-upload-reducer';
+import { computeSummary, formatFinalSummary, INITIAL_STATE, reducer } from './media-upload-reducer';
 
 const UPLOAD_TOAST_ID = 'upload-progress-notification';
 const UPLOAD_TOAST_FONT_SIZE = 'var(--spectrum-global-dimension-font-size-75)';
@@ -72,25 +72,7 @@ const showInProgressToast = (total: number, succeeded: number, failed: number, o
     });
 };
 
-const showFinalToast = (
-    succeeded: number,
-    failed: number,
-    cancelled: number,
-    openDialog: () => void,
-    t: TranslateFn
-): void => {
-    let text: string;
-
-    if (succeeded === 0 && failed === 0 && cancelled > 0) {
-        text = t('dataset.upload.cancelledSummary', { count: cancelled });
-    } else if (failed === 0) {
-        text = t('dataset.upload.uploadedSummary', { count: succeeded });
-    } else if (succeeded === 0) {
-        text = t('dataset.upload.failedSummary', { count: failed });
-    } else {
-        text = t('dataset.upload.mixedSummary', { count: succeeded, uploaded: succeeded, failed });
-    }
-
+const showFinalToast = (text: string, openDialog: () => void): void => {
     toast({
         id: UPLOAD_TOAST_ID,
         type: 'neutral',
@@ -118,7 +100,7 @@ export const MediaUploadProvider = ({ children }: { children: ReactNode }) => {
 
         if (!state.isUploading) {
             lastToastUpdateRef.current = 0;
-            showFinalToast(summary.succeeded, summary.failed, summary.cancelled, openDialog, t);
+            showFinalToast(formatFinalSummary(t, summary), openDialog);
 
             return;
         }

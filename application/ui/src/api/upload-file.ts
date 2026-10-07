@@ -1,10 +1,10 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import type { MediaDTO, SourceMediaUpload, StagedDataset } from '@/api/types';
 import { i18n } from '@/i18n';
 
 import { fetchClient } from './client';
+import type { MediaDTO, SourceMediaUpload, StagedDataset } from './shared-types';
 import { createAbortError, discardUpload, transferFile, type TransferOptions } from './tus-upload';
 
 // openapi-fetch resolves with `{ data, error }` rather than rejecting, and its result union does

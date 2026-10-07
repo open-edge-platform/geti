@@ -152,6 +152,7 @@
         },
         "upload": {
             "queued": "Em fila",
+            "processing": "A processar",
             "uploaded": "Carregado",
             "errorTitle": "Erro de carregamento",
             "details": "Detalhes do carregamento",

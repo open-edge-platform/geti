@@ -243,9 +243,11 @@ describe('useMediaUpload', () => {
 
     it('does not cancel items whose transfer already completed', async () => {
         let finishProcessing: ((media: ReturnType<typeof getMockedMediaImage>) => void) | undefined;
+        let signal: AbortSignal | undefined;
         uploadMock.mockImplementation(
             async (_projectId, file, options) =>
                 new Promise((resolve) => {
+                    signal = options?.signal;
                     options?.onProgress?.(file.size);
                     finishProcessing = resolve;
                 })
@@ -260,6 +262,7 @@ describe('useMediaUpload', () => {
 
         act(() => result.current.actions.cancelItems([result.current.state.items[0].id]));
         expect(result.current.state.items[0].status).toBe('processing');
+        expect(signal?.aborted).toBe(false);
 
         await act(async () => {
             finishProcessing?.(getMockedMediaImage({ id: crypto.randomUUID() }));
