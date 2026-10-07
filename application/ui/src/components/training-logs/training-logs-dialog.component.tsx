@@ -23,19 +23,21 @@ import { LogViewer } from './log-viewer.component';
 import classes from './training-logs-dialog.module.scss';
 
 type TrainingLogsDialogProps = {
+    projectId: string;
+    isJobActive: boolean;
     jobId?: string;
     modelId?: string;
 };
 
-const ActiveJobLogs = ({ jobId }: { jobId: string }) => {
-    const { logs, connectionStatus } = useStreamJobLogs(jobId);
+const ActiveJobLogs = ({ jobId, isJobActive }: { jobId: string; isJobActive: boolean }) => {
+    const { logs, connectionStatus } = useStreamJobLogs(jobId, { retry: isJobActive });
 
     return <LogViewer logs={logs} isStreaming connectionStatus={connectionStatus} />;
 };
 
-const HistoricalModelLogs = ({ modelId }: { modelId: string }) => {
+const HistoricalModelLogs = ({ projectId, modelId }: { projectId: string; modelId: string }) => {
     const { t } = useTranslation();
-    const { data: logs, isPending, isError, error } = useModelLogs(modelId);
+    const { data: logs, isPending, isError, error } = useModelLogs(projectId, modelId);
 
     if (isPending) {
         return (
@@ -60,10 +62,10 @@ const HistoricalModelLogs = ({ modelId }: { modelId: string }) => {
     return <LogViewer logs={logs ?? []} />;
 };
 
-export const TrainingLogsDialog = ({ jobId, modelId }: TrainingLogsDialogProps) => {
+export const TrainingLogsDialog = ({ jobId, modelId, projectId, isJobActive }: TrainingLogsDialogProps) => {
     const { t } = useTranslation();
     const dialogContainer = useDialogContainer();
-    const { downloadModelLogs, isDownloading } = useDownloadModelLogs(String(modelId));
+    const { downloadModelLogs, isDownloading } = useDownloadModelLogs(projectId, String(modelId));
 
     return (
         <Dialog aria-label={'Training logs'} UNSAFE_className={classes.dialog}>
@@ -92,8 +94,8 @@ export const TrainingLogsDialog = ({ jobId, modelId }: TrainingLogsDialogProps) 
             </Header>
             <Divider />
             <Content UNSAFE_className={classes.contentArea}>
-                {jobId && <ActiveJobLogs jobId={jobId} />}
-                {!jobId && modelId && <HistoricalModelLogs modelId={modelId} />}
+                {jobId && <ActiveJobLogs jobId={jobId} isJobActive={isJobActive} />}
+                {!jobId && modelId && <HistoricalModelLogs projectId={projectId} modelId={modelId} />}
                 {!jobId && !modelId && (
                     <Flex alignItems={'center'} justifyContent={'center'} height={'100%'}>
                         <Text UNSAFE_className={classes.errorText}>{t('models.training.logs.noJobOrModel')}</Text>

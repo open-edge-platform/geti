@@ -113,11 +113,6 @@ def get_inference_media_limit(request: Request) -> int:
     return request.app.state.settings.inference_media_limit
 
 
-def get_inference_model_ttl(request: Request) -> int:
-    """Provides the inference model TTL from settings."""
-    return request.app.state.settings.inference_model_ttl
-
-
 def get_inference_keyframe_stride(request: Request) -> int:
     """Provides the inference frame skip from settings."""
     return request.app.state.settings.inference_keyframe_stride
@@ -255,9 +250,12 @@ def get_webrtc_manager(request: Request) -> WebRTCManager:
     return request.app.state.webrtc_manager
 
 
-def get_label_service(db: Annotated[Session, Depends(get_db)]) -> LabelService:
+def get_label_service(
+    db: Annotated[Session, Depends(get_db)],
+    event_bus: Annotated[EventBus, Depends(get_event_bus)],
+) -> LabelService:
     """Provides a LabelService instance for managing labels."""
-    return LabelService(db_session=db)
+    return LabelService(db_session=db, event_bus=event_bus)
 
 
 def get_project_service(
@@ -301,7 +299,6 @@ def get_media_prediction_service(
     label_service: Annotated[LabelService, Depends(get_label_service)],
     media_service: Annotated[MediaService, Depends(get_media_service)],
     inference_server: Annotated[InferenceServer, Depends(get_inference_server)],
-    inference_model_ttl: Annotated[int, Depends(get_inference_model_ttl)],
     inference_keyframe_stride: Annotated[int, Depends(get_inference_keyframe_stride)],
     media_numpy_loader: Annotated[MediaNumpyLoader, Depends(get_media_numpy_loader)],
     db: Annotated[Session, Depends(get_db)],
@@ -311,7 +308,6 @@ def get_media_prediction_service(
         label_service=label_service,
         media_service=media_service,
         inference_server=inference_server,
-        inference_model_ttl=inference_model_ttl,
         inference_keyframe_stride=inference_keyframe_stride,
         media_numpy_loader=media_numpy_loader,
         db_session=db,
