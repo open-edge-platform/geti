@@ -3,8 +3,8 @@
 
 """add_uploads
 
-Revision ID: 8c1f3a2b7d4e
-Revises: 6fec06bf05e4
+Revision ID: b7e2d94a1f3c
+Revises: 8c41d7b2e905
 Create Date: 2026-09-30 16:45:00.000000
 
 """
@@ -15,8 +15,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "8c1f3a2b7d4e"
-down_revision: str | Sequence[str] | None = "6fec06bf05e4"
+revision: str = "b7e2d94a1f3c"
+down_revision: str | Sequence[str] | None = "8c41d7b2e905"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
