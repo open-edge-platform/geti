@@ -3,6 +3,6 @@
 
 import type { TranslateFn } from '@/i18n';
 
-import { getUltralyticsLicense, type LicenseNotice } from './license-notices';
+import { getDinov3License, getUltralyticsLicense, type LicenseNotice } from './license-notices';
 
-export const getLicenses = (t: TranslateFn): LicenseNotice[] => [getUltralyticsLicense(t)];
+export const getLicenses = (t: TranslateFn): LicenseNotice[] => [getUltralyticsLicense(t), getDinov3License(t)];
