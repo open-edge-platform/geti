@@ -8,15 +8,14 @@ import { useAcceptLicense } from './api/use-accept-license.hook';
 import { LicenseDetails } from './license-details.component';
 import { LicenseFooter } from './license-footer.component';
 import { LicenseSteps } from './license-steps.component';
-import { getLicenses } from './licenses';
+import { LICENSES } from './licenses';
 import { useLicenseSteps } from './use-license-steps.hook';
 
 import styles from './license.module.scss';
 
 export const License = () => {
     const { t } = useTranslation();
-    const licenses = getLicenses(t);
-    const steps = useLicenseSteps(licenses);
+    const steps = useLicenseSteps(LICENSES);
     const { mutate: acceptLicense, isPending: isAccepting } = useAcceptLicense();
 
     return (
@@ -34,7 +33,7 @@ export const License = () => {
                 >
                     <Grid columns={['minmax(240px, 30%)', '1fr']} height={'100%'}>
                         <LicenseSteps
-                            licenses={licenses}
+                            licenses={LICENSES}
                             currentIndex={steps.currentIndex}
                             agreedIds={steps.agreedIds}
                             lastReachableIndex={steps.lastReachableIndex}
@@ -44,11 +43,11 @@ export const License = () => {
                         <Flex direction={'column'} minWidth={0} minHeight={0}>
                             <View flex padding={'size-300'} overflow={'auto'} minHeight={0}>
                                 <Flex direction={'column'} gap={'size-200'} height={'100%'}>
-                                    {licenses.length > 1 && (
+                                    {LICENSES.length > 1 && (
                                         <Text>
                                             {t('license.agreement.progress', {
                                                 current: steps.currentIndex + 1,
-                                                total: licenses.length,
+                                                total: LICENSES.length,
                                             })}
                                         </Text>
                                     )}

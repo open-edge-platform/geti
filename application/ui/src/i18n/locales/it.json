@@ -1144,25 +1144,9 @@
             "progress": "{{current}} di {{total}}",
             "required": "Obbligatoria",
             "optional": "Facoltativa",
-            "optionalInfo": "Questa licenza è fornita a titolo informativo. Si applica solo se utilizzi i modelli a cui si riferisce.",
-            "consent": "Accettando qui sotto, accetti i termini e le condizioni della {{license}}.",
             "fullLicense": "Leggi la licenza completa",
-            "agree": "Ho letto e accetto la {{license}}",
             "previous": "Precedente",
             "accept": "Accetta e continua"
-        },
-        "notices": {
-            "intelSimplified": {
-                "name": "Licenza software semplificata Intel",
-                "notice": "L'applicazione Geti per Windows è concessa in licenza in base alla Licenza software semplificata Intel (versione di ottobre 2022).\n\nLa licenza stabilisce le condizioni alle quali puoi utilizzare e ridistribuire l'applicazione, insieme alle relative esclusioni e limitazioni di responsabilità. I componenti di terze parti inclusi nell'applicazione possono essere disciplinati da propri termini di licenza.\n\nLeggi i termini completi della licenza prima di continuare."
-            },
-            "ultralytics": {
-                "name": "Licenza AGPL-3.0 di Ultralytics"
-            },
-            "dinov3": {
-                "name": "Licenza DINOv3",
-                "notice": "Geti offre modelli di classificazione basati su DINOv3, i cui pesi preaddestrati sono resi disponibili da Meta con la Licenza DINOv3.\n\nSe addestri o distribuisci questi modelli, l'uso dei pesi DINOv3 è disciplinato dai termini della Licenza DINOv3."
-            }
         }
     },
     "application": {

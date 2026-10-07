@@ -6,7 +6,7 @@ import { Checkbox, Flex, Heading, Text, Well } from '@geti-ui/ui';
 import { LinkOut } from '@geti-ui/ui/icons';
 
 import { Link } from '../../platform/components/link.component';
-import type { LicenseNotice } from './license-notices';
+import { LEGAL_STATEMENTS, type LicenseNotice } from './license-notices';
 import { RequirementBadge } from './requirement-badge.component';
 
 import styles from './license.module.scss';
@@ -32,11 +32,7 @@ export const LicenseDetails = ({ license, isAgreed, onAgreedChange }: LicenseDet
                 </Flex>
             </div>
 
-            <Text>
-                {license.isRequired
-                    ? t('license.agreement.consent', { license: license.name })
-                    : t('license.agreement.optionalInfo')}
-            </Text>
+            <Text>{license.isRequired ? LEGAL_STATEMENTS.consent(license.name) : LEGAL_STATEMENTS.optionalInfo}</Text>
 
             <Well
                 role={'region'}
@@ -55,7 +51,7 @@ export const LicenseDetails = ({ license, isAgreed, onAgreedChange }: LicenseDet
 
             {license.isRequired && (
                 <Checkbox isSelected={isAgreed} onChange={onAgreedChange}>
-                    {t('license.agreement.agree', { license: license.name })}
+                    {LEGAL_STATEMENTS.agree(license.name)}
                 </Checkbox>
             )}
         </>

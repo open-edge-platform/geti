@@ -1144,25 +1144,9 @@
             "progress": "第 {{current}} 项，共 {{total}} 项",
             "required": "必需",
             "optional": "可选",
-            "optionalInfo": "此许可仅供参考，仅在您使用其涵盖的模型时适用。",
-            "consent": "在下方勾选同意，即表示您接受 {{license}} 的条款和条件。",
             "fullLicense": "阅读完整许可",
-            "agree": "我已阅读并同意 {{license}}",
             "previous": "上一步",
             "accept": "接受并继续"
-        },
-        "notices": {
-            "intelSimplified": {
-                "name": "Intel Simplified Software License",
-                "notice": "Geti Windows 应用依据 Intel Simplified Software License（2022 年 10 月版）授权。\n\n该许可规定了您使用和再分发本应用的条件，以及相关免责声明和责任限制。本应用中包含的第三方组件可能受其各自许可条款的约束。\n\n请在继续之前阅读完整的许可条款。"
-            },
-            "ultralytics": {
-                "name": "Ultralytics AGPL-3.0 License"
-            },
-            "dinov3": {
-                "name": "DINOv3 License",
-                "notice": "Geti 提供基于 DINOv3 的分类模型，其预训练权重由 Meta 依据 DINOv3 License 提供。\n\n如果您训练或部署这些模型，则您对 DINOv3 权重的使用受 DINOv3 License 条款的约束。"
-            }
         }
     },
     "application": {
