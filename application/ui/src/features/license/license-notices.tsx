@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { Link } from '../../platform/components/link.component';
 
 // Everything in this file has legal meaning, so it is kept verbatim in English and never translated.
+// Bump `LicenseService.TERMS_REVISION` in the backend whenever this text or the license lists change.
 
 const ULTRALYTICS_TERMS_URL =
     // eslint-disable-next-line max-len

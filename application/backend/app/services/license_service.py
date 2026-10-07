@@ -16,7 +16,7 @@ class LicenseService:
     """
 
     CONSENT_FILENAME = ".license_accepted"
-    # Bump whenever the license terms shown to users change.
+    # Bump whenever the license terms shown to users change (see ui/src/features/license/license-notices.tsx).
     TERMS_REVISION = 2
 
     def __init__(self, data_dir: Path, app_version: str) -> None:
