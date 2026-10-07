@@ -5,7 +5,9 @@
 
 This page lists the `rt_info["model_info"]` values that each recipe used by Geti writes into its exported model.
 Together these values define the pre- and post-processing that the runtime (ModelAPI) applies.
-For the meaning of each key, see [openvino-ir-metadata.md](openvino-ir-metadata.md).
+For the meaning of each key, see [openvino-ir-metadata.md](openvino-ir-metadata.md);
+for the outputs and postprocessing implied by each `model_type`, see its [output contract](openvino-ir-metadata.md#output-contract-per-model_type).
+When a key is not written, ModelAPI uses the wrapper default listed in that page; the notes below each table describe the effect.
 
 The values below assume the default Geti training flow:
 
@@ -28,26 +30,26 @@ and **identity** stands for `mean_values="0.0 0.0 0.0"`, `scale_values="1.0 1.0 
 
 ### Keys written for every model
 
-| Key                                                      | Value                                                                                                                                                                                                                              |
-| -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `labels`, `label_ids`, `label_info`                      | From the project labels. Lightning and HF instance segmentation models add a leading `getitune_empty_lbl` label with id `None`. Lightning semantic segmentation models drop a leading `getitune_background_lbl` label, if present. |
-| `getitune_version`                                       | Version of the library used for export.                                                                                                                                                                                            |
-| `input_dtype`                                            | `u8`                                                                                                                                                                                                                               |
-| `intensity_mode`                                         | `scale_to_unit`                                                                                                                                                                                                                    |
-| `intensity_percentile_low` / `intensity_percentile_high` | `1.0` / `99.0`                                                                                                                                                                                                                     |
-| `intensity_scale_factor` / `intensity_min_value`         | `1.0` / `0.0`                                                                                                                                                                                                                      |
+| Key                                                      | Value                                                                                                                                                                                                                                                                                                                                                                                                                |
+| -------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `labels`, `label_ids`, `label_info`                      | From the project labels. Lightning and HF instance segmentation models add a leading `getitune_empty_lbl` label with id `None`, because the ModelAPI `MaskRCNN` / `DETRInstSeg` wrappers map class index `i` to `labels[i + 1]`. Lightning semantic segmentation models drop a leading `getitune_background_lbl` label, if present, because the ModelAPI `Segmentation` wrapper maps channel `k` to `labels[k - 1]`. |
+| `getitune_version`                                       | Version of the library used for export.                                                                                                                                                                                                                                                                                                                                                                              |
+| `input_dtype`                                            | `u8`                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `intensity_mode`                                         | `scale_to_unit`                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `intensity_percentile_low` / `intensity_percentile_high` | `1.0` / `99.0`                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `intensity_scale_factor` / `intensity_min_value`         | `1.0` / `0.0`                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 `intensity_max_value` is written only if the project sets an intensity mapping.
 In the default flow, the effective preprocessing is `u8 → /255 → (x − mean_values) / scale_values`.
 
 ### Confidence threshold
 
-| Backend / task                                | `confidence_threshold`                                                        |
-| --------------------------------------------- | ----------------------------------------------------------------------------- |
-| Lightning detection                           | Best F1 threshold from validation; not written if it was never computed       |
-| Lightning instance segmentation               | Best F1 threshold from validation, falling back to `0.05`                     |
-| HF detection / instance segmentation          | Best F1 threshold from validation, falling back to `0.25` / `0.05`            |
-| Ultralytics detection / instance segmentation | `min(best validation threshold, 0.25)` (recipe `export.confidence_threshold`) |
+| Backend / task                                | `confidence_threshold`                                                                               |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Lightning detection                           | Best F1 threshold from validation; if never computed, the key is not written and ModelAPI uses `0.5` |
+| Lightning instance segmentation               | Best F1 threshold from validation, falling back to `0.05`                                            |
+| HF detection / instance segmentation          | Best F1 threshold from validation, falling back to `0.25` / `0.05`                                   |
+| Ultralytics detection / instance segmentation | `min(best validation threshold, 0.25)` (recipe `export.confidence_threshold`)                        |
 
 ### Tiling
 
@@ -85,6 +87,12 @@ Only the postprocessing keys change:
 | Hugging Face | `multilabel=True`, `output_raw_scores=True`                                                  |
 | Ultralytics  | `multilabel=True`, `output_raw_scores=True`, `confidence_threshold=0.5`, `nms_execute=False` |
 
+All classifiers output logits `[1, C]`; ModelAPI applies softmax (multi-class) or sigmoid (multi-label).
+Effect of the keys that are not written:
+
+- Ultralytics multi-class models: `output_raw_scores` defaults to `False`, so ModelAPI does not return the full score vector.
+- Hugging Face multi-label models: `confidence_threshold` defaults to `0.5`, the same value the other backends write.
+
 ## Detection
 
 `task_type=detection`.
@@ -105,6 +113,19 @@ Only the postprocessing keys change:
 | object-detection-yolo12-{n,s,m,l,x}          | `yolo12_{n,s,m,l,x}.yaml`               | Ultralytics  | `yolo12{n,s,m,l,x}.yaml`                 | `YOLO11`     | 640                   | `fit_to_window_letterbox` | 114         | False                    | identity                                                                                                                      | `iou_threshold=0.5`, `nms_execute=True` |
 | object-detection-yolo26-{n,s,m,l,x}          | `yolo26_{n,s,m,l,x}.yaml`               | Ultralytics  | `yolo26{n,s,m,l,x}.yaml`                 | `YOLO11`     | 640                   | `fit_to_window_letterbox` | 114         | False                    | identity                                                                                                                      | `iou_threshold=0.5`, `nms_execute=True` |
 
+### Detection model outputs
+
+| Models                                                   | Outputs                                                                                                                 | ModelAPI parser              |
+| -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| ATSS, SSD, YOLOX                                         | Boxes `[1, N, 5]` as `x1, y1, x2, y2, score` in network-input pixels, labels `[1, N]`; one entry per prior, without NMS | `SSD`, boxes + labels layout |
+| RT-DETR, D-FINE, DEIMv2, RF-DETR, EdgeCrafter, RT-DETRv2 | `bboxes` `[1, K, 4]` as `x1, y1, x2, y2` normalized to `[0, 1]`, `labels` `[1, K]`, `scores` `[1, K]`; top-K queries    | `SSD`, three-output layout   |
+| YOLO11, YOLO12, YOLO26                                   | A single `[1, 4 + C, N]` tensor: `cx, cy, w, h` in network-input pixels and `C` class scores per anchor, without NMS    | `YOLO11`                     |
+
+Notes:
+
+- **RT-DETRv2 (Hugging Face):** `nms_execute` is not written, so ModelAPI does not run NMS on its outputs.
+- **YOLO12 / YOLO26:** they export `model_type=YOLO11` and are decoded with the `YOLO11` wrapper.
+
 ## Instance segmentation
 
 `task_type=instance_segmentation`.
@@ -121,6 +142,21 @@ Only the postprocessing keys change:
 | instance-segmentation-eomt-dinov3-large-640     | `eomt_dinov3_large_640.yaml`                               | Hugging Face | `tue-mps/eomt-dinov3-coco-instance-large-640`                | `DETRInstSeg` | 640                               | `fit_to_window`           | 0           | False                    | ImageNet                                                        | `iou_threshold=0.5`                                     |
 | instance-segmentation-yolo11-{n,s,m,l,x}        | `yolo11_{n,s,m,l,x}_seg.yaml`                              | Ultralytics  | `yolo11{n,s,m,l,x}-seg.yaml`                                 | `YOLO-seg`    | 640                               | `fit_to_window_letterbox` | 114         | False                    | identity                                                        | `iou_threshold=0.5`, `nms_execute=True`                 |
 | instance-segmentation-yolo26-{n,s,m,l,x}        | `yolo26_{n,s,m,l,x}_seg.yaml`                              | Ultralytics  | `yolo26{n,s,m,l,x}-seg.yaml`                                 | `YOLO-seg`    | 640                               | `fit_to_window_letterbox` | 114         | False                    | identity                                                        | `iou_threshold=0.5`, `nms_execute=True`                 |
+
+### Instance segmentation model outputs
+
+| Models                                                       | Outputs                                                                                                                                                                                                                 |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Mask R-CNN (EfficientNet-B2, Swin-T, ResNet-50), RTMDet-Inst | Boxes `[1, N, 5]` as `x1, y1, x2, y2, score` in network-input pixels, labels `[1, N]`, per-box masks `[1, N, h, w]`; NMS already applied in the graph                                                                   |
+| RF-DETR-Seg                                                  | `boxes` `[1, N, 5]` in network-input pixels, `labels` `[1, N]`, full-image `masks`                                                                                                                                      |
+| Mask2Former, EoMT                                            | `boxes` `[1, Q, 5]` in network-input pixels (derived from the mask extents; score is the top class probability), `labels` `[1, Q]`, `masks` `[1, Q, H, W]` with per-query probabilities at the network-input resolution |
+| YOLO11-seg, YOLO26-seg                                       | Detection tensor `[1, 4 + C + M, N]` and prototype tensor `[1, M, ph, pw]`                                                                                                                                              |
+
+Notes:
+
+- **Label offset:** for `MaskRCNN` and `DETRInstSeg`, output class index `i` maps to `labels[i + 1]` (index 0 is the placeholder).
+  For `YOLO-seg`, index `i` maps to `labels[i]`.
+- **Mask2Former / EoMT (Hugging Face):** `nms_execute` is not written, so ModelAPI does not run NMS on their outputs.
 
 ## Semantic segmentation
 
@@ -139,3 +175,11 @@ The values are the recipe defaults.
 
 The tiled Lightning recipes (`*_tile.yaml`) also write `tile_size`, `tiles_overlap` and `max_pred_number`.
 The tiled DINOv2 recipe normalizes in the CPU pipeline with the same ImageNet values.
+
+Notes:
+
+- **`soft_threshold` has no effect:** ModelAPI only applies it when `blur_strength != -1`, and every recipe writes `blur_strength=-1`.
+  The hard prediction is the per-pixel argmax.
+- **YOLO26-sem logits:** the argmax is the same as for probabilities, but the soft prediction returned with `return_soft_prediction=True` contains logits, not probabilities.
+- **Labels:** ModelAPI maps channel `k ≥ 1` to `labels[k - 1]` and treats channel 0 as background.
+  Lightning models remove the background label to match this; Hugging Face and Ultralytics models export the project labels unchanged.
