@@ -4,13 +4,14 @@
 import { ReactNode, Suspense, useState } from 'react';
 
 import type { TaskType } from '@/api/types';
-import { Preferences } from '@/components/preferences/preferences.component';
+import { LanguagesSelector } from '@/components/languages-selector/languages-selector.component';
 import { useTranslation } from '@/i18n';
 import { Content, Divider, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
 import { useProjects } from 'hooks/api/project.hook';
 import { partition } from 'lodash-es';
 import { Link } from 'react-router';
 
+import { version } from '../../../../package.json';
 import getiLogo from '../../../assets/icons/geti-logo.webp';
 import { paths } from '../../../constants/paths';
 import { isNonEmptyArray } from '../../../shared/util';
@@ -71,9 +72,9 @@ const ProjectSidebar = ({
                 )}
             </Flex>
 
-            <View>
-                <Preferences />
-            </View>
+            <Flex gap={'size-200'} alignItems={'center'} justifyContent={'center'}>
+                <Text UNSAFE_className={classes.version}>Geti v{version}</Text>
+            </Flex>
         </Flex>
     );
 };
@@ -123,6 +124,7 @@ const ProjectGrid = ({ jobsButton }: { jobsButton?: ReactNode }) => {
                     <Flex marginStart={'auto'} alignItems={'center'} gap={'size-200'}>
                         {shouldShowFilters && <Text UNSAFE_className={classes.projectMetadata}>{countLabel}</Text>}
                         {jobsButton}
+                        <LanguagesSelector />
                     </Flex>
                 </Flex>
 
