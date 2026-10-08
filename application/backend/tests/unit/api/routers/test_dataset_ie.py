@@ -4,6 +4,7 @@
 import io
 from pathlib import Path
 from unittest.mock import Mock
+from urllib.parse import quote
 from uuid import uuid4
 
 import pytest
@@ -123,8 +124,8 @@ class TestDatasetIEEndpoints:
         response = fxt_client.get(f"/api/staged_datasets/{fxt_staged_dataset.id}/zip")
 
         assert response.status_code == status.HTTP_200_OK
-        assert (
-            response.headers["content-disposition"] == f"attachment; filename={Path(fxt_staged_dataset.filename).name}"
+        assert response.headers["content-disposition"] == (
+            f"attachment; filename*=utf-8''{quote(Path(fxt_staged_dataset.filename).name)}"
         )
         assert response.headers["content-type"] == "application/zip"
         assert response.content == file_content

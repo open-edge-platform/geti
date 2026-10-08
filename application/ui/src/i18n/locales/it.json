@@ -45,6 +45,8 @@
             "no": "No",
             "unknown": "Sconosciuto",
             "name": "Nome",
+            "architecture": "Architettura",
+            "device": "Dispositivo",
             "on": "Attivo",
             "off": "Inattivo",
             "noMaximum": "Nessun massimo",
@@ -58,7 +60,9 @@
             "statusUppercase": "STATO",
             "settings": "Impostazioni",
             "training": "Addestramento",
+            "training_subset": "Addestramento",
             "validation": "Validazione",
+            "validation_subset": "Validazione",
             "testing": "Test",
             "unassigned": "Non assegnato",
             "trainingLowercase": "addestramento",
@@ -68,7 +72,9 @@
             "seconds": "Secondi",
             "every": "ogni",
             "model": "Modello",
-            "labels": "Etichette"
+            "jobs": "Processi",
+            "labels": "Etichette",
+            "language": "Lingua"
         },
         "viewModes": {
             "large": "Anteprime grandi",
@@ -96,7 +102,8 @@
         "models": "Modelli",
         "modelsDescription": "Pagina dei modelli per visualizzare i tuoi modelli",
         "inference": "Inferenza",
-        "inferenceDescription": "Pagina di inferenza che mostra l'inferenza in tempo reale sul tuo progetto"
+        "inferenceDescription": "Pagina di inferenza che mostra l'inferenza in tempo reale sul tuo progetto",
+        "preferences": "Preferenze"
     },
     "dataset": {
         "validation": {
@@ -302,12 +309,6 @@
             "trigger": "Importa/esporta dataset",
             "exportItem": "Esporta dataset"
         },
-        "jobs": {
-            "cancel": {
-                "title": "Annulla processo",
-                "confirmation": "Sei sicuro di voler annullare il processo {{jobId}}?"
-            }
-        },
         "revisions": {
             "createdOn": "Creato {{date}}",
             "unnamedName": "Dataset #{{id}}",
@@ -350,6 +351,7 @@
         },
         "sources": {
             "uploadError": "Impossibile caricare il file video.",
+            "deleteVideoError": "Impossibile eliminare il file video caricato.",
             "list": {
                 "addSource": "Aggiungi nuova sorgente"
             },
@@ -783,6 +785,15 @@
                 "label": "Laccio magnetico",
                 "description": "Passa il mouse lungo il bordo di un oggetto e fai clic periodicamente per agganciare il contorno ai suoi bordi.",
                 "error": "Impossibile selezionare i limiti della forma, puoi provare di nuovo?"
+            },
+            "ssim": {
+                "label": "Assistente di rilevamento",
+                "description": "Disegna un riquadro attorno a un oggetto per trovare e annotare automaticamente oggetti simili nell'immagine.",
+                "loading": "Caricamento dell'assistente di rilevamento in corso, per favore aspetta...",
+                "error": "Errore nello strumento Assistente di rilevamento: {{message}}",
+                "operations": {
+                    "workerBuild": "Compilazione worker dell'Assistente di rilevamento"
+                }
             }
         },
         "video": {
@@ -808,7 +819,6 @@
     "models": {
         "jobs": {
             "error": "Processo non riuscito. Controlla i log per i dettagli e riprova.",
-            "heading": "Processi",
             "pending": "In sospeso...",
             "running": "In corso...",
             "stopDialog": {
@@ -910,13 +920,17 @@
                 },
                 "toast": {
                     "trainingStarted": "Addestramento del modello avviato con successo.",
-                    "trainingStartedWithLink": "Addestramento del modello avviato con successo. <link>Apri la schermata dei modelli per visualizzare l'avanzamento.</link>"
+                    "trainingStartedWithLink": "Addestramento del modello avviato con successo. <modelsLink>Apri la schermata dei modelli per visualizzare l'avanzamento.</modelsLink>"
                 },
                 "selectDataset": {
                     "label": "Seleziona dataset",
-                    "useCurrentDataset": "Usa dataset attuale",
+                    "useEntireDataset": "Usa l'intero dataset",
                     "helpTitle": "Selezione di un dataset",
-                    "helpDescription": "Scegli la versione del dataset da usare per l'addestramento. Se desideri addestrare il nuovo modello esattamente sui stessi dati (media e annotazioni) di un altro modello, seleziona la revisione del dataset corrispondente. Al contrario, se desideri addestrare sulla versione più recente dei dati (quello che vedi nella pagina \"Dataset\"), seleziona \"Usa dataset attuale\"."
+                    "helpDescription": "Scegli i dati da usare per l'addestramento. Seleziona \"Usa l'intero dataset\" per addestrare sulla versione più recente di tutti i dati (quello che vedi nella pagina \"Dataset\"). Seleziona una vista del dataset per addestrare solo sui media assegnati a quella vista. Seleziona una revisione del dataset per addestrare esattamente sugli stessi dati (media e annotazioni) di un altro modello.",
+                    "sections": {
+                        "views": "Viste del dataset",
+                        "revisions": "Revisioni del dataset"
+                    }
                 },
                 "selectModel": {
                     "label": "Seleziona pesi di input",
@@ -927,6 +941,7 @@
             },
             "validation": {
                 "notEnoughAnnotations": "Per addestrare un modello, è necessario annotare almeno 3 elementi nel tuo dataset, sebbene consigliamo di annotarne diversi di più per ottenere risultati migliori.",
+                "notEnoughAnnotationsInView": "Per addestrare un modello, è necessario annotare almeno 3 elementi nella vista del dataset selezionata, sebbene consigliamo di annotarne diversi di più per ottenere risultati migliori.",
                 "emptySubsetsReason": "Per addestrare un modello, ogni sottoinsieme (addestramento, validazione, test) deve contenere almeno un elemento. Questa condizione non è attualmente soddisfacibile, poiché {{subsetClause}} vuoto e {{assignmentDetail}}.",
                 "emptySubsetClause_one": "{{list}} sottoinsieme è",
                 "emptySubsetClause_other": "{{list}} sottoinsiemi sono",
@@ -1007,7 +1022,6 @@
             "fineTunedFrom": "Ottimizzazione fine da",
             "columns": {
                 "trained": "Addestrato",
-                "device": "Dispositivo",
                 "totalSize": "Dimensione totale"
             }
         },
@@ -1082,8 +1096,46 @@
             }
         },
         "columns": {
-            "modelName": "Nome modello",
-            "architecture": "Architettura"
+            "modelName": "Nome modello"
+        }
+    },
+    "jobs": {
+        "allProjects": "Tutti i progetti",
+        "currentProjectLabel": "{{name}} (attuale)",
+        "projectsSection": "Progetti",
+        "tabs": {
+            "all": "Tutti",
+            "finished": "Completati"
+        },
+        "status": {
+            "pending": "Pianificato",
+            "cancelling": "Annullamento in corso",
+            "done": "Completato"
+        },
+        "type": {
+            "quantize": "Ottimizzazione"
+        },
+        "columns": {
+            "type": "Tipo"
+        },
+        "cancel": {
+            "title": "Annulla processo",
+            "confirmation": "Sei sicuro di voler annullare il processo {{jobId}}?"
+        },
+        "meta": {
+            "started": "Avviato {{time}}",
+            "elapsed": "Tempo trascorso: {{time}}"
+        },
+        "emptyState": {
+            "all": "Nessun processo in questa categoria",
+            "running": "Nessun processo in corso",
+            "finished": "Nessun processo completato",
+            "scheduled": "Nessun processo pianificato",
+            "cancelled": "Nessun processo annullato",
+            "failed": "Nessun processo fallito"
+        },
+        "actions": {
+            "viewLogs": "Visualizza log"
         }
     },
     "license": {

@@ -5,16 +5,18 @@ import { Suspense } from 'react';
 
 import { $api } from '@/api';
 import { useTranslation } from '@/i18n';
-import { Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/ui';
+import { Divider, Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/ui';
 import { usePrefetchQuery } from '@tanstack/react-query';
 import { usePrefetchPipeline } from 'hooks/api/pipeline.hook';
 import { useProject } from 'hooks/api/project.hook';
 import { Link, Outlet, useLocation } from 'react-router';
 
 import getiLogo from './assets/icons/geti-logo.webp';
+import { Preferences } from './components/preferences/preferences.component';
 import { paths } from './constants/paths';
 import { usePrefetchSinksQuery } from './features/inference/sinks/api/use-sinks-query';
 import { usePrefetchSourcesQuery } from './features/inference/sources/api/use-sources';
+import { JobsButton } from './features/jobs/jobs-button.component';
 import { ProjectsListPanel } from './features/project/panel/projects-list-panel.component';
 import { useProjectIdentifier } from './hooks/use-project-identifier.hook';
 
@@ -31,7 +33,7 @@ const Header = () => {
                 gap={'size-300'}
                 marginStart={'size-300'}
                 marginEnd={'size-200'}
-                columns={['auto', '2fr', 'fit-content(var(--spectrum-global-dimension-size-3000))']}
+                columns={['auto', '2fr', 'auto', 'fit-content(var(--spectrum-global-dimension-size-3400))']}
                 rows={'1fr'}
                 alignItems={'center'}
             >
@@ -68,9 +70,19 @@ const Header = () => {
                     </Item>
                 </TabList>
 
-                <Suspense fallback={<Loading />}>
-                    <ProjectsListPanel />
-                </Suspense>
+                <Flex gap={'size-200'} alignItems={'center'}>
+                    <Suspense fallback={<Loading />}>
+                        <ProjectsListPanel />
+                    </Suspense>
+
+                    <Divider orientation={'vertical'} size={'S'} />
+
+                    <Suspense fallback={<Loading size='S' mode='inline' />}>
+                        <JobsButton />
+                    </Suspense>
+
+                    <Preferences />
+                </Flex>
             </Grid>
         </View>
     );

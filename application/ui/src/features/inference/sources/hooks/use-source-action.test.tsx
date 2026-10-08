@@ -3,9 +3,10 @@
 
 import { startTransition } from 'react';
 
+import { API_BASE_URL } from '@/api';
 import type { ImagesFolderSourceConfig, VideoFileSourceConfig } from '@/api/types';
 import { act, screen, waitFor } from '@testing-library/react';
-import { HttpResponse } from 'msw';
+import { HttpResponse, http as mswHttp } from 'msw';
 import { renderHook } from 'test-utils/render';
 
 import { http } from '../../../../api/utils';
@@ -135,6 +136,8 @@ describe('useSourceAction', () => {
             const prepareFormData = async (formData: FormData) => {
                 await Promise.resolve();
                 formData.set('images_folder_path', '/mutated/by/prepare');
+
+                return undefined;
             };
 
             server.use(
@@ -167,7 +170,7 @@ describe('useSourceAction', () => {
         });
 
         it('falls back to the previous state (not a partial body) and never calls bodyFormatter when prepareFormData rejects', async () => {
-            const prepareFormData = async (): Promise<void> => {
+            const prepareFormData = async () => {
                 throw { detail: 'upload failed' };
             };
             const bodyFormatterSpy = vi.fn(bodyFormatter);
@@ -196,20 +199,20 @@ describe('useSourceAction', () => {
     });
 
     describe('video-file integration (real prepareVideoFileFormData + videoFileBodyFormatter)', () => {
+        const sourceMediaId = '712750b2-5a82-47ee-8fba-f3dc96cb615d';
+        const videoConfig: VideoFileSourceConfig = {
+            id: '',
+            name: 'My video source',
+            source_type: 'video_file',
+            video_path: '',
+            loop: false,
+        };
+
         it('does not create the source when the video upload fails', async () => {
-            const videoConfig: VideoFileSourceConfig = {
-                id: '',
-                name: 'My video source',
-                source_type: 'video_file',
-                video_path: '',
-                loop: false,
-            };
             let sourceWasCreated = false;
 
             server.use(
-                http.post('/api/sources/media', () => {
-                    // The 422 response has no documented schema in the OpenAPI spec (description only).
-                    // @ts-expect-error There is an incorrect type in OpenAPI
+                mswHttp.post(`${API_BASE_URL}/api/sources/media`, () => {
                     return HttpResponse.json({ detail: 'Unsupported video format' }, { status: 422 });
                 }),
                 http.post('/api/sources', () => {
@@ -245,6 +248,65 @@ describe('useSourceAction', () => {
 
             expect(sourceWasCreated).toBe(false);
             expect(result.current[0]).toEqual(videoConfig);
+        });
+
+        const submitVideoFile = async (createSource: () => Response) => {
+            const deletedIds: string[] = [];
+
+            server.use(
+                http.post('/api/sources/media', () =>
+                    HttpResponse.json({ video_path: `/data/source_media/${sourceMediaId}/sample.mp4` }, { status: 201 })
+                ),
+                http.post('/api/sources', createSource),
+                http.delete('/api/sources/media/{source_media_id}', ({ params }) => {
+                    deletedIds.push(params.source_media_id);
+                    return HttpResponse.json({ deleted_video_path: '' });
+                })
+            );
+
+            const { result } = renderHook(() =>
+                useSourceAction({
+                    config: videoConfig,
+                    isNewSource: true,
+                    bodyFormatter: videoFileBodyFormatter,
+                    prepareFormData: prepareVideoFileFormData,
+                })
+            );
+            const [, submitAction] = result.current;
+
+            const formData = new FormData();
+            formData.append('id', videoConfig.id);
+            formData.append('name', videoConfig.name);
+            formData.append('video_path', '');
+            formData.append('video_file', new File(['fake-video-bytes'], 'sample.mp4', { type: 'video/mp4' }));
+            formData.append('loop', '');
+
+            await act(async () => {
+                startTransition(async () => submitAction(formData));
+            });
+
+            return deletedIds;
+        };
+
+        it('deletes the uploaded video when creating the source fails', async () => {
+            const deletedIds = await submitVideoFile(() =>
+                HttpResponse.json({ detail: 'Name already in use' }, { status: 409 })
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText('Failed to save source configuration, Name already in use')).toBeVisible();
+                expect(deletedIds).toEqual([sourceMediaId]);
+            });
+        });
+
+        it('keeps the uploaded video when the source is created', async () => {
+            const deletedIds = await submitVideoFile(() => HttpResponse.json({ ...videoConfig, id: 'new-id' }));
+
+            await waitFor(() => {
+                expect(screen.getByText('Source configuration created successfully.')).toBeVisible();
+            });
+
+            expect(deletedIds).toEqual([]);
         });
     });
 });

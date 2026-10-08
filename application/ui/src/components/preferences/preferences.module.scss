@@ -1,0 +1,9 @@
+.version {
+    opacity: 0.6;
+    font-size: var(--spectrum-global-dimension-font-size-75);
+}
+
+.languageScroll {
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}

@@ -45,6 +45,8 @@
             "no": "否",
             "unknown": "未知",
             "name": "名稱",
+            "architecture": "架構",
+            "device": "裝置",
             "on": "開",
             "off": "關",
             "noMaximum": "無上限",
@@ -58,7 +60,9 @@
             "statusUppercase": "狀態",
             "settings": "設定",
             "training": "訓練",
+            "training_subset": "訓練",
             "validation": "驗證",
+            "validation_subset": "驗證",
             "testing": "測試",
             "unassigned": "未分配",
             "trainingLowercase": "訓練",
@@ -68,7 +72,9 @@
             "seconds": "秒",
             "every": "每",
             "model": "模型",
-            "labels": "標籤"
+            "jobs": "工作",
+            "labels": "標籤",
+            "language": "語言"
         },
         "viewModes": {
             "large": "大縮略圖",
@@ -96,7 +102,8 @@
         "models": "模型",
         "modelsDescription": "模型頁面，用於瀏覽模型",
         "inference": "推理",
-        "inferenceDescription": "推理頁面，用於檢視項目的即時推理效果"
+        "inferenceDescription": "推理頁面，用於檢視項目的即時推理效果",
+        "preferences": "偏好設定"
     },
     "dataset": {
         "validation": {
@@ -302,12 +309,6 @@
             "trigger": "匯入 / 匯出數據集",
             "exportItem": "匯出數據集"
         },
-        "jobs": {
-            "cancel": {
-                "title": "取消工作",
-                "confirmation": "確定要取消工作 {{jobId}} 嗎？"
-            }
-        },
         "revisions": {
             "createdOn": "建立於 {{date}}",
             "unnamedName": "數據集 #{{id}}",
@@ -350,6 +351,7 @@
         },
         "sources": {
             "uploadError": "影片檔案上載失敗。",
+            "deleteVideoError": "無法刪除已上載的影片檔案。",
             "list": {
                 "addSource": "新增輸入源"
             },
@@ -783,6 +785,15 @@
                 "label": "智能勾邊",
                 "description": "沿著物件邊緣移動並定時點選，將輪廓吸附至其邊界。",
                 "error": "形狀邊界選取失敗，請再試一次。"
+            },
+            "ssim": {
+                "label": "檢測助手",
+                "description": "在物件周圍繪製方框，即可自動尋找並標註圖片中的相似物件。",
+                "loading": "正在載入檢測助手，請稍候……",
+                "error": "檢測助手工具發生錯誤：{{message}}",
+                "operations": {
+                    "workerBuild": "檢測助手工作進程建置"
+                }
             }
         },
         "video": {
@@ -808,7 +819,6 @@
     "models": {
         "jobs": {
             "error": "工作失敗，請檢視記錄了解詳情，然後重試。",
-            "heading": "工作",
             "pending": "等候中……",
             "running": "運行中……",
             "stopDialog": {
@@ -914,9 +924,13 @@
                 },
                 "selectDataset": {
                     "label": "選擇數據集",
-                    "useCurrentDataset": "使用目前數據集",
+                    "useEntireDataset": "使用整個數據集",
                     "helpTitle": "選擇數據集",
-                    "helpDescription": "選擇用於訓練的數據集版本。如果希望新模型使用與其他模型完全相同的數據（媒體和標註）進行訓練，請選擇對應的數據集版本。反之，如果希望使用最新版本的數據（即「數據集」頁面中所見）進行訓練，請選擇「使用目前數據集」。"
+                    "helpDescription": "選擇用於訓練的數據集版本。如果希望新模型使用與其他模型完全相同的數據（媒體和標註）進行訓練，請選擇對應的數據集版本。反之，如果希望使用最新版本的數據（即「數據集」頁面中所見）進行訓練，請選擇「使用目前數據集」。",
+                    "sections": {
+                        "views": "數據集視圖",
+                        "revisions": "數據集版本"
+                    }
                 },
                 "selectModel": {
                     "label": "選擇輸入權重",
@@ -927,6 +941,7 @@
             },
             "validation": {
                 "notEnoughAnnotations": "要訓練模型，數據集中至少需要標註 3 項，不過為獲得更好的效果，建議多標註一些。",
+                "notEnoughAnnotationsInView": "要訓練模型，所選數據集視圖中至少需要標註 3 項，不過為獲得更好的效果，建議多標註一些。",
                 "emptySubsetsReason": "要訓練模型，每個子集（訓練集、驗證集、測試集）至少需要包含一項。目前不滿足該條件，因為{{subsetClause}}，且{{assignmentDetail}}。",
                 "emptySubsetClause_one": "{{list}} 子集為空",
                 "emptySubsetClause_other": "{{list}} 子集均為空",
@@ -1007,7 +1022,6 @@
             "fineTunedFrom": "微調自",
             "columns": {
                 "trained": "訓練時間",
-                "device": "裝置",
                 "totalSize": "總大小"
             }
         },
@@ -1082,8 +1096,46 @@
             }
         },
         "columns": {
-            "modelName": "模型名稱",
-            "architecture": "架構"
+            "modelName": "模型名稱"
+        }
+    },
+    "jobs": {
+        "allProjects": "所有項目",
+        "currentProjectLabel": "{{name}}（目前）",
+        "projectsSection": "項目",
+        "tabs": {
+            "all": "全部",
+            "finished": "已完成"
+        },
+        "status": {
+            "pending": "已排定",
+            "cancelling": "正在取消",
+            "done": "已完成"
+        },
+        "type": {
+            "quantize": "優化"
+        },
+        "columns": {
+            "type": "類型"
+        },
+        "cancel": {
+            "title": "取消工作",
+            "confirmation": "確定要取消工作 {{jobId}} 嗎？"
+        },
+        "meta": {
+            "started": "開始於 {{time}}",
+            "elapsed": "已用時間 {{time}}"
+        },
+        "emptyState": {
+            "all": "此類別中沒有工作",
+            "running": "沒有運行中的工作",
+            "finished": "沒有已完成的工作",
+            "scheduled": "沒有已排定的工作",
+            "cancelled": "沒有已取消的工作",
+            "failed": "沒有失敗的工作"
+        },
+        "actions": {
+            "viewLogs": "檢視紀錄"
         }
     },
     "license": {
