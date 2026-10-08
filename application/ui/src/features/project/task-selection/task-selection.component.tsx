@@ -110,6 +110,7 @@ export const TaskSelection = ({ selectedTask, setSelectedTask }: TaskSelectionPr
                     gap={'size-300'}
                     width={'100%'}
                     justifyContent={'center'}
+                    justifyItems={'center'}
                 >
                     {taskOptions.map((taskOption) => (
                         <Option
