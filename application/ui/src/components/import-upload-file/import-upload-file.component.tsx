@@ -27,17 +27,14 @@ type ImportUploadFileProps = {
     onFileUploaded: (data: FileUploadedResponse) => void;
 };
 
-export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUploadFileProps) => {
-    const { t } = useTranslation();
-    const [bytesSent, setBytesSent] = useState(0);
-    const [fileSize, setFileSize] = useState(0);
+const useUploadFile = (onProgress: (bytesSent: number) => void) => {
     const abortControllerRef = useRef<AbortController | null>(null);
     const stagedDatasetMutation = useMutation({
         mutationFn: (file: File) => {
             const abortController = new AbortController();
             abortControllerRef.current = abortController;
 
-            return uploadDatasetArchive(file, { onProgress: setBytesSent, signal: abortController.signal });
+            return uploadDatasetArchive(file, { onProgress, signal: abortController.signal });
         },
         onSettled: () => {
             abortControllerRef.current = null;
@@ -45,7 +42,6 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
         // A cancelled upload is a deliberate user action, not an error worth notifying about.
         meta: { error: { notify: (error: unknown) => !isAbortError(error) } },
     });
-    const prepareImportJobMutation = useSubmitJob();
 
     // Closing the dialog mid-transfer discards the partial upload instead of finishing it in the background.
     useEffect(() => {
@@ -53,6 +49,16 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
             abortControllerRef.current?.abort();
         };
     }, []);
+
+    return { stagedDatasetMutation, abort: () => abortControllerRef.current?.abort() };
+};
+
+export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUploadFileProps) => {
+    const { t } = useTranslation();
+    const [bytesSent, setBytesSent] = useState(0);
+    const [fileSize, setFileSize] = useState(0);
+    const { stagedDatasetMutation, abort } = useUploadFile(setBytesSent);
+    const prepareImportJobMutation = useSubmitJob();
 
     const handleLoadingFile = (files: File[]) => {
         const hasMultipleFiles = files.length > 1;
@@ -123,7 +129,7 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
                                         bytesSent={bytesSent}
                                         bytesTotal={fileSize}
                                         width={'size-4600'}
-                                        onCancel={() => abortControllerRef.current?.abort()}
+                                        onCancel={abort}
                                     />
                                 </>
                             ) : (
