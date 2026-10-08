@@ -5,6 +5,7 @@ import { i18n } from '@/i18n';
 import { DetailedError, Upload, type PreviousUpload } from 'tus-js-client';
 
 import { API_BASE_URL, fetchClient } from './client';
+import isObject from "lodash-es/isObject";
 
 export const TUS_VERSION = '1.0.0';
 
@@ -28,7 +29,7 @@ export type TransferOptions = {
 export const createAbortError = (): DOMException => new DOMException('The upload was cancelled.', 'AbortError');
 
 export const isAbortError = (error: unknown): boolean =>
-    typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError';
+    isObject(error) && 'name' in error && error.name === 'AbortError';
 
 const getUploadsEndpoint = (): string => `${(API_BASE_URL || window.location.origin).replace(/\/$/, '')}/api/uploads`;
 
