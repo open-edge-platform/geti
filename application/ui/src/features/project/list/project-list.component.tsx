@@ -4,6 +4,7 @@
 import { ReactNode, Suspense, useState } from 'react';
 
 import type { TaskType } from '@/api/types';
+import getiLogo from '@/assets/icons/geti-logo.webp';
 import { LanguagesSelector } from '@/components/languages-selector/languages-selector.component';
 import { useTranslation } from '@/i18n';
 import { Content, Divider, Flex, Grid, Loading, Text, View } from '@geti-ui/ui';
@@ -12,7 +13,6 @@ import { partition } from 'lodash-es';
 import { Link } from 'react-router';
 
 import { version } from '../../../../package.json';
-import getiLogo from '../../../assets/icons/geti-logo.webp';
 import { paths } from '../../../constants/paths';
 import { isNonEmptyArray } from '../../../shared/util';
 import { EmptyProjectList } from './empty-project-list/empty-project-list.component';

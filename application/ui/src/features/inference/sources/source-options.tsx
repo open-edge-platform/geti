@@ -4,11 +4,9 @@
 import { ReactNode } from 'react';
 
 import type { IPCameraSourceConfig, USBCameraSourceConfig, VideoFileSourceConfig } from '@/api/types';
+import { IpCamera as IpCameraIcon, VideoFile as VideoFileIcon, Webcam as WebcamIcon } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 
-import { ReactComponent as IpCameraIcon } from '../../../assets/icons/ip-camera.svg';
-import { ReactComponent as Video } from '../../../assets/icons/video-file.svg';
-import { ReactComponent as WebcamIcon } from '../../../assets/icons/webcam.svg';
 import { AddSource } from './add-source/add-source.component';
 import { DisclosureGroup } from './disclosure-group.component';
 import { IpCamera } from './ip-camera/ip-camera.component';
@@ -83,7 +81,7 @@ export const SourceOptions = ({ onSaved, hasHeader, children, existingNames = []
                     {
                         label: t('inference.sources.options.videoFile'),
                         value: 'video_file',
-                        icon: <Video width={'24px'} />,
+                        icon: <VideoFileIcon width={'24px'} />,
 
                         content: (
                             <AddSource

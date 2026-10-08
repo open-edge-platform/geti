@@ -1,15 +1,11 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { MagneticLasso } from '@/assets/icons';
+import { BoundingBoxImg, MagneticLassoImg, PolygonImg, SAMDetectionImg, SAMSegmentationImg } from '@/assets/tools';
 import { useTranslation } from '@/i18n';
 import { BoundingBox, DetectionTool, Polygon, SegmentAnythingIcon, Selector } from '@geti-ui/ui/icons';
 
-import { ReactComponent as MagneticLasso } from '../../../../assets/icons/magnetic-lasso.svg';
-import BoundingBoxImg from '../../../../assets/tools/bounding-box.webp';
-import MagneticLassoImg from '../../../../assets/tools/magnetic-lasso.webp';
-import PolygonImg from '../../../../assets/tools/polygon.webp';
-import SAMDetectionImg from '../../../../assets/tools/sam-detection.webp';
-import SAMSegmentationImg from '../../../../assets/tools/sam-segmentation.webp';
 import { FEATURE_FLAGS } from '../../../../constants/feature-flags';
 import { useProjectTask } from '../../../../hooks/use-project-task.hook';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';

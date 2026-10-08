@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 
 import { $api } from '@/api';
 import { LanguagesSelector } from '@/components/languages-selector/languages-selector.component';
+import getiLogo from '@/assets/icons/geti-logo.webp';
 import { useTranslation } from '@/i18n';
 import { Divider, Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/ui';
 import { usePrefetchQuery } from '@tanstack/react-query';
