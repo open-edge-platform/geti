@@ -73,8 +73,7 @@
             "every": "every",
             "model": "Model",
             "jobs": "Jobs",
-            "labels": "Labels",
-            "language": "Language"
+            "labels": "Labels"
         },
         "viewModes": {
             "large": "Large thumbnails",
@@ -102,8 +101,7 @@
         "models": "Models",
         "modelsDescription": "Models page to visualise your models",
         "inference": "Inference",
-        "inferenceDescription": "Inference page showing live inference on your project",
-        "preferences": "Preferences"
+        "inferenceDescription": "Inference page showing live inference on your project"
     },
     "dataset": {
         "validation": {

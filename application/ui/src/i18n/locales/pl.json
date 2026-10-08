@@ -73,8 +73,7 @@
             "every": "co",
             "model": "Model",
             "jobs": "Zadania",
-            "labels": "Etykiety",
-            "language": "Język"
+            "labels": "Etykiety"
         },
         "viewModes": {
             "large": "Duże miniatury",
@@ -102,8 +101,7 @@
         "models": "Modele",
         "modelsDescription": "Strona modeli do wizualizacji Twoich modeli",
         "inference": "Wnioskowanie",
-        "inferenceDescription": "Strona wnioskowania pokazująca wnioskowanie na żywo w Twoim projekcie",
-        "preferences": "Preferencje"
+        "inferenceDescription": "Strona wnioskowania pokazująca wnioskowanie na żywo w Twoim projekcie"
     },
     "dataset": {
         "validation": {

@@ -73,8 +73,7 @@
             "every": "a cada",
             "model": "Modelo",
             "jobs": "Tarefas",
-            "labels": "Etiquetas",
-            "language": "Idioma"
+            "labels": "Etiquetas"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -102,8 +101,7 @@
         "models": "Modelos",
         "modelsDescription": "Página de modelos para visualizar os seus modelos",
         "inference": "Inferência",
-        "inferenceDescription": "Página de inferência que mostra a inferência em tempo real no seu projeto",
-        "preferences": "Preferências"
+        "inferenceDescription": "Página de inferência que mostra a inferência em tempo real no seu projeto"
     },
     "dataset": {
         "validation": {
