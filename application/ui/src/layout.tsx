@@ -32,7 +32,6 @@ const Header = () => {
                 height='100%'
                 gap={'size-300'}
                 marginStart={'size-300'}
-                marginEnd={'size-200'}
                 columns={['auto', '2fr', 'auto', 'fit-content(var(--spectrum-global-dimension-size-3400))']}
                 rows={'1fr'}
                 alignItems={'center'}

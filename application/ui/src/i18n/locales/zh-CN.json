@@ -1106,7 +1106,7 @@
             "finished": "已完成"
         },
         "status": {
-            "pending": "已计划",
+            "pending": "排队中",
             "cancelling": "正在取消",
             "done": "已完成"
         },
@@ -1125,10 +1125,10 @@
             "elapsed": "已用时 {{time}}"
         },
         "emptyState": {
-            "all": "此类别中没有任务",
+            "all": "没有任务",
             "running": "没有正在运行的任务",
             "finished": "没有已完成的任务",
-            "scheduled": "没有已计划的任务",
+            "scheduled": "没有排队中的任务",
             "cancelled": "没有已取消的任务",
             "failed": "没有失败的任务"
         },

@@ -1106,7 +1106,7 @@
             "finished": "Completati"
         },
         "status": {
-            "pending": "Pianificato",
+            "pending": "In coda",
             "cancelling": "Annullamento in corso",
             "done": "Completato"
         },
@@ -1125,10 +1125,10 @@
             "elapsed": "Tempo trascorso: {{time}}"
         },
         "emptyState": {
-            "all": "Nessun processo in questa categoria",
+            "all": "Nessun processo",
             "running": "Nessun processo in corso",
             "finished": "Nessun processo completato",
-            "scheduled": "Nessun processo pianificato",
+            "scheduled": "Nessun processo in coda",
             "cancelled": "Nessun processo annullato",
             "failed": "Nessun processo fallito"
         },

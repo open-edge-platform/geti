@@ -89,6 +89,8 @@ describe('translation coverage', () => {
             'common.labels.validation_subset',
             'models.performance.categories.accuracy',
             'jobs.tabs.finished',
+            'jobs.status.pending',
+            'common.upload.queued',
         ]);
         const keysByValue = new Map<string, string[]>();
 

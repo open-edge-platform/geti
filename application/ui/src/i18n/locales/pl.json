@@ -1110,7 +1110,7 @@
             "finished": "Zakończone"
         },
         "status": {
-            "pending": "Zaplanowane",
+            "pending": "W kolejce",
             "cancelling": "W trakcie anulowania",
             "done": "Zakończone"
         },
@@ -1129,10 +1129,10 @@
             "elapsed": "Czas trwania: {{time}}"
         },
         "emptyState": {
-            "all": "Brak zadań w tej kategorii",
+            "all": "Brak zadań",
             "running": "Brak zadań w trakcie",
             "finished": "Brak zakończonych zadań",
-            "scheduled": "Brak zaplanowanych zadań",
+            "scheduled": "Brak zadań w kolejce",
             "cancelled": "Brak anulowanych zadań",
             "failed": "Brak zadań zakończonych niepowodzeniem"
         },
