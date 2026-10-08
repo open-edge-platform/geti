@@ -2,10 +2,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { i18n } from '@/i18n';
+import { isObject } from 'lodash-es';
 import { DetailedError, Upload, type PreviousUpload } from 'tus-js-client';
 
 import { API_BASE_URL, fetchClient } from './client';
-import { isObject } from 'lodash-es';
 
 export const TUS_VERSION = '1.0.0';
 
