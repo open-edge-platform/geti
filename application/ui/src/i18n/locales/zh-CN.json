@@ -134,7 +134,7 @@
         "filters": {
             "allMedia": "全部媒体",
             "withAnnotations": "已标注的媒体",
-            "missingAnnotations": "缺少标注的媒体",
+            "missingAnnotations": "未标注的媒体",
             "subset": "按数据子集筛选",
             "searchLabels": "搜索标签",
             "labelsSelected_one": "已选 {{count}} 个标签",
@@ -251,7 +251,7 @@
             "multipleFilesError": "不支持选择文件夹或多个文件，请只上传单个文件。",
             "unsupportedFormatError": "文件格式不支持，请上传有效的 .zip 文件。",
             "datasetBeingUploaded": "数据集正在上传",
-            "dropZipHere": "把数据集 .zip 文件拖拽到这里",
+            "dropZipHere": "将数据集 .zip 文件拖拽到这里",
             "learnMoreFormats": "了解支持的数据格式",
             "dialogHeading": "导入数据集",
             "scanningMessage": "正在扫描解析待导入的数据集压缩包……",
