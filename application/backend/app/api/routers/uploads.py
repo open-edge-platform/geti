@@ -179,17 +179,6 @@ async def get_upload_capabilities(
     return _capabilities_response(upload_service.max_size)
 
 
-@router.options(
-    "/{upload_id}", status_code=status.HTTP_204_NO_CONTENT, response_class=Response, openapi_extra=_CAPABILITIES_OPENAPI
-)
-async def get_upload_resource_capabilities(
-    upload_id: UUID,  # noqa: ARG001
-    upload_service: Annotated[UploadService, Depends(get_upload_service)],
-) -> Response:
-    """Advertise the supported TUS version, extensions and maximum upload size."""
-    return _capabilities_response(upload_service.max_size)
-
-
 @router.post(
     "",
     status_code=status.HTTP_201_CREATED,
