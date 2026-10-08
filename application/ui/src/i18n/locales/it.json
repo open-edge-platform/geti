@@ -73,8 +73,7 @@
             "every": "ogni",
             "model": "Modello",
             "jobs": "Processi",
-            "labels": "Etichette",
-            "language": "Lingua"
+            "labels": "Etichette"
         },
         "viewModes": {
             "large": "Anteprime grandi",
@@ -102,8 +101,7 @@
         "models": "Modelli",
         "modelsDescription": "Pagina dei modelli per visualizzare i tuoi modelli",
         "inference": "Inferenza",
-        "inferenceDescription": "Pagina di inferenza che mostra l'inferenza in tempo reale sul tuo progetto",
-        "preferences": "Preferenze"
+        "inferenceDescription": "Pagina di inferenza che mostra l'inferenza in tempo reale sul tuo progetto"
     },
     "dataset": {
         "validation": {

@@ -27,7 +27,7 @@ export const LanguagesSelector = () => {
 
     return (
         <MenuTrigger>
-            <ActionButton isQuiet>
+            <ActionButton isQuiet aria-label='Language'>
                 <Icon UNSAFE_className={classes.icon}>
                     <EarthIcon />
                 </Icon>

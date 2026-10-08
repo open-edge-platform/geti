@@ -73,8 +73,7 @@
             "every": "cada",
             "model": "Modelo",
             "jobs": "Tareas",
-            "labels": "Etiquetas",
-            "language": "Idioma"
+            "labels": "Etiquetas"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -102,8 +101,7 @@
         "models": "Modelos",
         "modelsDescription": "Página de modelos para visualizar tus modelos",
         "inference": "Inferencia",
-        "inferenceDescription": "Página de inferencia que muestra la inferencia en vivo en tu proyecto",
-        "preferences": "Preferencias"
+        "inferenceDescription": "Página de inferencia que muestra la inferencia en vivo en tu proyecto"
     },
     "dataset": {
         "validation": {
