@@ -1,10 +1,10 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { EmptyDataset } from '@/assets/illustrations';
 import { useTranslation } from '@/i18n';
 import { Grid, Heading, IllustratedMessage, Text } from '@geti-ui/ui';
 
-import { ReactComponent as EmptyJobsImage } from '../../../assets/empty-dataset.svg';
 import type { ModelJob, StatusGroup } from '../utils';
 import { JOB_GRID_COLUMNS, JobRow } from './job-row.component';
 
@@ -60,7 +60,7 @@ export const JobsList = ({
                 ))
             ) : (
                 <IllustratedMessage>
-                    <EmptyJobsImage />
+                    <EmptyDataset />
                     <Heading>{t(`jobs.emptyState.${statusGroup}`)}</Heading>
                 </IllustratedMessage>
             )}

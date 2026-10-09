@@ -4,6 +4,7 @@
 import { Suspense } from 'react';
 
 import { $api } from '@/api';
+import getiLogo from '@/assets/icons/geti-logo.webp';
 import { LanguagesSelector } from '@/components/languages-selector/languages-selector.component';
 import { useTranslation } from '@/i18n';
 import { Divider, Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/ui';
@@ -12,7 +13,6 @@ import { usePrefetchPipeline } from 'hooks/api/pipeline.hook';
 import { useProject } from 'hooks/api/project.hook';
 import { Link, Outlet, useLocation } from 'react-router';
 
-import getiLogo from './assets/icons/geti-logo.webp';
 import { paths } from './constants/paths';
 import { usePrefetchSinksQuery } from './features/inference/sinks/api/use-sinks-query';
 import { usePrefetchSourcesQuery } from './features/inference/sources/api/use-sources';

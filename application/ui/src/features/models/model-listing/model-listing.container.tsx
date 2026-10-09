@@ -3,13 +3,13 @@
 
 import { ReactNode } from 'react';
 
+import { NoTrainedModels } from '@/assets/illustrations';
 import { useTranslation } from '@/i18n';
 import { dimensionValue, Divider, Flex, Heading } from '@geti-ui/ui';
 import { useGetCurrentRunningJobs } from 'hooks/api/jobs/jobs.hook';
 import { usePrefetchModels } from 'hooks/api/use-get-models.hook';
 import { isEmpty } from 'lodash-es';
 
-import { ReactComponent as NoTrainedModels } from '../../../assets/no-trained-models.svg';
 import { usePrefetchTaskModelArchitectures } from '../hooks/api/use-get-model-architectures.hook';
 import { TrainModel } from '../train-model/train-model.component';
 import { Header } from './components/header.component';

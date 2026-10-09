@@ -80,6 +80,15 @@ const apiBarrelRestrictedImportPattern = {
     message: 'Do not import the `@/api` barrel from within `src/api/`. Use a direct relative import instead.',
 };
 
+// Containment rule for `src/assets/`. Assets are reached through the `@/assets/*` alias, and
+// SVG components only through the `@/assets/icons` / `@/assets/illustrations` barrels, so moving
+// or renaming a file is a one-line change in the barrel. `?url` imports don't end in `.svg`, so
+// they stay allowed.
+const assetsRestrictedImportPatterns = {
+    regex: '^\\.\\.?/(\\.\\./)*assets/',
+    message: 'Do not import `src/assets/` with a relative path. Use the `@/assets/*` alias instead.',
+};
+
 // Containment rule for the translation engine. Only src/i18n/** may name
 // `i18next` / `react-i18next`; everywhere else goes through the `@/i18n`
 // barrel, so swapping or removing the engine stays a single-folder change.
@@ -251,6 +260,7 @@ export default [
                     paths: restrictedImportPaths,
                     patterns: [
                         ...restrictedImportPatterns,
+                        assetsRestrictedImportPatterns,
                         tauriRestrictedImportPattern,
                         i18nEngineRestrictedImportPattern,
                     ],
@@ -268,6 +278,7 @@ export default [
                     paths: restrictedImportPaths,
                     patterns: [
                         ...restrictedImportPatterns,
+                        assetsRestrictedImportPatterns,
                         tauriRestrictedImportPattern,
                         openapiSpecRestrictedImportPattern,
                         apiBarrelRestrictedImportPattern,
@@ -289,6 +300,7 @@ export default [
                     paths: restrictedImportPaths,
                     patterns: [
                         ...restrictedImportPatterns,
+                        assetsRestrictedImportPatterns,
                         tauriRestrictedImportPattern,
                         openapiSpecRestrictedImportPattern,
                         apiBarrelRestrictedImportPattern,
@@ -308,6 +320,7 @@ export default [
                     paths: restrictedImportPaths,
                     patterns: [
                         ...restrictedImportPatterns,
+                        assetsRestrictedImportPatterns,
                         openapiSpecRestrictedImportPattern,
                         apiBarrelRestrictedImportPattern,
                         sharedTypesRestrictedImportPattern,
@@ -329,6 +342,7 @@ export default [
                     paths: [...restrictedImportPaths, apiBarrelRestrictedImportPath],
                     patterns: [
                         ...restrictedImportPatterns,
+                        assetsRestrictedImportPatterns,
                         tauriRestrictedImportPattern,
                         i18nEngineRestrictedImportPattern,
                     ],

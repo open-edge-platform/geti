@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 import type { Project } from '@/api/types';
+import placeholderThumbnailIconUrl from '@/assets/icons/image-icon.svg?url';
 import { useTranslation } from '@/i18n';
 import { Badge, Flex, Heading, Text, View } from '@geti-ui/ui';
 import { useQueryClient } from '@tanstack/react-query';
@@ -12,7 +13,6 @@ import { getProjectQueryOptions } from 'hooks/api/project.hook';
 import { LONG_DATE_TIME_FORMAT, useFormatDate } from 'hooks/use-format-date.hook';
 import { NavLink } from 'react-router';
 
-import placeholderThumbnailIconUrl from '../../../assets/icons/image-icon.svg?url';
 import { paths } from '../../../constants/paths';
 import { getProjectThumbnailUrl } from '../../../shared/media-url.utils';
 import { ActiveProjectBadge } from './active-project-badge/active-project-badge.component';

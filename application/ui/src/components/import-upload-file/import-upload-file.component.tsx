@@ -4,13 +4,13 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { isAbortError, uploadDatasetArchive } from '@/api';
+import { DropFiles } from '@/assets/illustrations';
 import { useTranslation } from '@/i18n';
 import { Button, Content, DropZone, FileTrigger, Flex, Heading, IllustratedMessage, Text } from '@geti-ui/ui';
 import { LinkOut } from '@geti-ui/ui/icons';
 import { useMutation } from '@tanstack/react-query';
 import { useSubmitJob } from 'hooks/api/jobs/jobs.hook';
 
-import { ReactComponent as EmptyDataset } from '../../assets/drop-files.svg';
 import { Link } from '../../platform/components/link.component';
 import { getFilesFromDropEvent } from '../../shared/drop-zone.utils';
 import { ThreeDotsFlashing } from '../three-dots-flashing/three-dots-flashing.component';
@@ -111,7 +111,7 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
             onDrop={async (event) => handleLoadingFile(await getFilesFromDropEvent(event))}
         >
             <IllustratedMessage maxHeight={'size-4600'}>
-                <EmptyDataset />
+                <DropFiles />
 
                 <Content>
                     {isPending && (
