@@ -24,7 +24,7 @@
  <img src="assets/model-lifecycle-infinity-light.png" width="600" alt="Geti™ - Learning Cycle"/>
 </p>
 
-Choose an intuitive application for subject-matter experts or the simple `getitune` Python API for code-first workflows. Both paths cover the full model lifecycle and produce OpenVINO™-optimized models for Intel® CPUs, GPUs, and NPUs.
+Choose the Geti™ application for a no-code experience, or the `getitune` Python API for code-first workflows — both paths lead to production-ready models.
 
 ## Full lifecycle with an intuitive SME interface
 
