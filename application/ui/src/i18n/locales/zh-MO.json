@@ -1142,15 +1142,13 @@
         "label": "授權：",
         "agreement": {
             "title": "授權協議",
-            "intro": "安裝、使用或散佈本應用程式，即表示您確認：",
-            "termsRead": "您已閱讀並瞭解下方連結中的授權條款；",
-            "termsGovern": "確認所存取與使用內容的適用條款為連結中的條款；且",
-            "termsAccepted": "已接受並同意連結中的授權條款。",
+            "intro": "請檢閱並接受以下授權，以繼續使用 Geti。",
+            "progress": "第 {{current}} 項，共 {{total}} 項",
+            "required": "必要",
+            "optional": "選用",
+            "fullLicense": "閱讀完整授權",
+            "previous": "上一步",
             "accept": "接受並繼續"
-        },
-        "links": {
-            "intelSimplified": "Intel Simplified Software License",
-            "dinov2": "DINOv3 License"
         }
     },
     "application": {
