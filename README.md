@@ -65,15 +65,22 @@ uv pip install getitune # CPU-only by default
 > [!IMPORTANT]  
 > The PyPI package does NOT include **Ultralytics YOLO models**, which are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license). To enable these models, build from source with the `ultralytics` extra as explained in the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/installation).
 
-**Train, export, and quantize a model — the same flow as the demo above:**
+**Pick a model, then train, export, and quantize it:**
 
 ```python
 from getitune.engine import create_engine
+from getitune.utils import list_models
+
+# Explore available models to pick the one you need
+all_models = list_models()                        # All model names
+detection_models = list_models(task="DETECTION")  # Filter by task
+recipes = list_models(return_recipes=True)        # Full recipe YAML paths
 
 # Choose a model and point it at your dataset
 engine = create_engine(
     model="edgecrafter_m",
     data="./led_counting",
+    work_dir="./my_workspace",  # checkpoints, exports, and logs
     device="auto",  # "auto", "cpu", "gpu", or "xpu"
 )
 
