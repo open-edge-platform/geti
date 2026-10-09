@@ -50,7 +50,7 @@ For complete, step-by-step instructions - including prerequisites, GPU/accelerat
 Geti's training engine is also available on PyPI as `getitune`, an open-source Python library for training, optimizing, and deploying models.
 
 <p align="center">
-  <img src="assets/getitune-demo.gif" alt="Train and optimize a model with the getitune Python API" width="80%">
+  <img src="library/assets/getitune-demo.gif" alt="Train and optimize a model with the getitune Python API" width="80%">
 </p>
 
 <details>
