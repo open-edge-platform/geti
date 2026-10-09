@@ -18,7 +18,7 @@
 
 </div>
 
-**_Geti™_** is an open-source, end-to-end platform for building and continuously improving production-ready computer vision models on Intel® hardware. It unifies data annotation, fine-tuning, optimization, deployment, and inference, with 1,600+ model variants for detection, classification, and segmentation.
+**_Geti™_** is an open-source, end-to-end platform for building and continuously improving state-of-the-art, production-ready computer vision models on Intel® hardware. It unifies data annotation, fine-tuning, optimization, deployment, and inference, with 1,600+ model variants for detection, classification, and segmentation.
 
 <p align="center">
  <img src="assets/model-lifecycle-infinity-light.png" width="600" alt="Geti™ - Learning Cycle"/>
