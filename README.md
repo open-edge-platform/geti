@@ -28,7 +28,7 @@ Choose the Geti™ application for a no-code experience, or the `getitune` Pytho
 
 ## Full lifecycle with an intuitive SME interface
 
-The Geti™ application is available as a native Windows app and through pre-built Docker images for Linux, optimized for Intel® CPUs and XPUs.
+The Geti™ application runs as a native Windows app or a pre-built Docker image for Linux.
 
 - Install as a [**Windows application (MSIX)**](application/docs/install.md#windows-app)
 - Run as a [**Docker container**](application/docs/install.md#run-with-docker)
