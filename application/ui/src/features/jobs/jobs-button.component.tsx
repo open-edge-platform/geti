@@ -3,12 +3,12 @@
 
 import { useState } from 'react';
 
+import { Jobs } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 import { ActionButton, Tooltip, TooltipTrigger } from '@geti-ui/ui';
 import { useModelJobs } from 'hooks/api/jobs/jobs.hook';
 import { useParams } from 'react-router';
 
-import { ReactComponent as JobsIcon } from '../../assets/icons/jobs.svg';
 import { ActiveJobsSync } from './active-jobs-sync.component';
 import { JobsDialog } from './jobs-dialog/jobs-dialog.component';
 import { ALL_PROJECTS, getStatusGroup } from './utils';
@@ -31,7 +31,7 @@ export const JobsButton = () => {
             <TooltipTrigger>
                 <ActionButton isQuiet onPress={() => setIsOpen(true)} aria-label='Jobs'>
                     <span className={classes.iconWrapper}>
-                        <JobsIcon />
+                        <Jobs />
                         {hasRunningJob && <RunningJobIndicator />}
                     </span>
                 </ActionButton>

@@ -4,6 +4,7 @@
 export { ReactComponent as Camera } from './camera.svg';
 export { ReactComponent as CameraOff } from './camera-off.svg';
 export { ReactComponent as DoubleChevronRight } from './double-chevron-right-icon.svg';
+export { ReactComponent as Earth } from './earth.svg';
 export { ReactComponent as Error } from './error-icon.svg';
 export { ReactComponent as FolderArrowRight } from './folder-arrow-right.svg';
 export { ReactComponent as Folder } from './folder.svg';
@@ -11,6 +12,7 @@ export { ReactComponent as GenICam } from './genicam.svg';
 export { ReactComponent as Image } from './image-icon.svg';
 export { ReactComponent as ImagesFolder } from './images-folder.svg';
 export { ReactComponent as IpCamera } from './ip-camera.svg';
+export { ReactComponent as Jobs } from './jobs.svg';
 export { ReactComponent as LiveFeed } from './live-feed-icon.svg';
 export { ReactComponent as MagneticLasso } from './magnetic-lasso.svg';
 export { ReactComponent as Mqtt } from './mqtt.svg';

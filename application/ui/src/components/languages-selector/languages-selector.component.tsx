@@ -1,11 +1,10 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { Earth } from '@/assets/icons';
 import { SUPPORTED_LANGUAGES, useTranslation } from '@/i18n';
 import { ActionButton, Icon, Item, Key, Menu, MenuTrigger, Text } from '@geti-ui/ui';
 import { capitalize } from 'lodash-es';
-
-import { ReactComponent as EarthIcon } from '../../assets/icons/earth.svg';
 
 import classes from './languages-selector.module.scss';
 
@@ -29,7 +28,7 @@ export const LanguagesSelector = () => {
         <MenuTrigger>
             <ActionButton isQuiet aria-label='Language'>
                 <Icon UNSAFE_className={classes.icon}>
-                    <EarthIcon />
+                    <Earth />
                 </Icon>
                 <Text>{current.toLocaleUpperCase()}</Text>
             </ActionButton>
