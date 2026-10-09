@@ -54,7 +54,7 @@ Geti's training engine is also available on PyPI as `getitune`, an open-source P
 </p>
 
 <details>
-<summary>Python API quick start</summary>
+<summary>Install <code>getitune</code> and run the demo code</summary>
 
 ```bash
 uv pip install "getitune[xpu]" --extra-index-url https://download.pytorch.org/whl/xpu    # for Intel® XPU acceleration
@@ -65,44 +65,28 @@ uv pip install getitune # CPU-only by default
 > [!IMPORTANT]  
 > The PyPI package does NOT include **Ultralytics YOLO models**, which are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license). To enable these models, build from source with the `ultralytics` extra as explained in the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/installation).
 
-**Run the complete model lifecycle with the Python API:**
+**Train, export, and quantize a model — the same flow as the demo above:**
 
 ```python
 from getitune.engine import create_engine
-from getitune.utils import list_models
 
-# Explore available models for your task
-all_models = list_models()                              # List all model names
-classification_models = list_models(task="MULTI_CLASS_CLS")  # Filter by task
-recipes = list_models(return_recipes=True)              # Get recipe YAML paths
+# Choose a model and point it at your dataset
+engine = create_engine(model="edgecrafter_m", data="./led_counting")
 
-# Create an engine using any model name or recipe path
-engine = create_engine(
-  model="efficientnet_b0",  # Model name or recipe YAML path
-  data="/path/to/dataset",  # Dataset directory or YAML path
-  work_dir="./my_workspace",
-  device="auto",  # "auto", "cpu", "gpu", or "xpu"
-)
+# Train the model on your own Intel CPU or GPU
+engine.train()
 
-# Train and validate
-engine.train(max_epochs=50)
-test_metrics = engine.test()
-
-# Export to OpenVINO IR (default) for deployment
+# Export the trained model to OpenVINO format (.xml + .bin)
 exported_model_path = engine.export()
 
-# Load the exported OpenVINO model
-ov_engine = create_engine(model=exported_model_path, data=engine.datamodule)
+# Load the exported model into the OpenVINO engine
+openvino_engine = create_engine(model=exported_model_path, data=engine.datamodule)
 
-# Optimize the model for edge deployment with INT8 quantization
-optimized_model_path = ov_engine.optimize()
+# Quantize the model to INT8, optimized for Intel hardware
+optimized_model_path = openvino_engine.optimize()
 
-# Load and test the optimized model
-optimized_engine = create_engine(model=optimized_model_path, data=engine.datamodule)
-optimized_metrics = optimized_engine.test()
-
-# Predict with the optimized model
-predictions = optimized_engine.predict()
+# Run inference with the optimized INT8 model
+predictions = openvino_engine.predict(checkpoint=optimized_model_path)
 ```
 
 See the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/quick-start) for the full list of recipes,
