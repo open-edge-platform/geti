@@ -71,7 +71,11 @@ uv pip install getitune # CPU-only by default
 from getitune.engine import create_engine
 
 # Choose a model and point it at your dataset
-engine = create_engine(model="edgecrafter_m", data="./led_counting")
+engine = create_engine(
+    model="edgecrafter_m",
+    data="./led_counting",
+    device="auto",  # "auto", "cpu", "gpu", or "xpu"
+)
 
 # Train the model on your own Intel CPU or GPU
 engine.train()
