@@ -11,7 +11,7 @@ test.describe('License agreement (Tauri)', () => {
         await mockTauriRuntime(page);
     });
 
-    test('shows the Intel, Ultralytics and DINOv3 licenses and accepts them', async ({ page, network }) => {
+    test('shows the Intel and Ultralytics licenses and accepts them', async ({ page, network }) => {
         let licenseAccepted = false;
 
         network.use(
@@ -35,7 +35,7 @@ test.describe('License agreement (Tauri)', () => {
             await page.goto('/');
 
             await expect(page.getByRole('heading', { name: 'License Agreements' })).toBeVisible();
-            await expect(page.getByText('1 of 3')).toBeVisible();
+            await expect(page.getByText('1 of 2')).toBeVisible();
             await expect(page.getByRole('heading', { name: 'Intel Simplified Software License' })).toBeVisible();
             await expect(page.getByRole('button', { name: 'Next' })).toBeDisabled();
             await expect(page.getByRole('button', { name: /^2 Ultralytics/ })).toBeDisabled();
@@ -45,18 +45,13 @@ test.describe('License agreement (Tauri)', () => {
             await page.getByRole('checkbox', { name: /I have read and agree to the Intel/ }).check();
             await page.getByRole('button', { name: 'Next' }).click();
 
-            await expect(page.getByText('2 of 3')).toBeVisible();
+            await expect(page.getByText('2 of 2')).toBeVisible();
             await expect(page.getByRole('heading', { name: 'Ultralytics AGPL-3.0 License' })).toBeVisible();
-            await expect(page.getByRole('button', { name: 'Next' })).toBeDisabled();
+            await expect(page.getByRole('button', { name: 'Accept and continue' })).toBeDisabled();
         });
 
-        await test.step('the optional DINOv3 license does not block acceptance', async () => {
+        await test.step('agreeing to the Ultralytics license enables acceptance', async () => {
             await page.getByRole('checkbox', { name: /I have read and agree to the Ultralytics/ }).check();
-            await page.getByRole('button', { name: 'Next' }).click();
-
-            await expect(page.getByText('3 of 3')).toBeVisible();
-            await expect(page.getByRole('heading', { name: 'DINOv3 License' })).toBeVisible();
-            await expect(page.getByRole('checkbox')).toHaveCount(0);
             await expect(page.getByRole('button', { name: 'Accept and continue' })).toBeEnabled();
         });
 

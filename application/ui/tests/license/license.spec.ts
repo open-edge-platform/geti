@@ -4,7 +4,7 @@
 import { expect, http, test } from '../fixtures';
 
 test.describe('License agreement (web)', () => {
-    test('shows the Ultralytics and optional DINOv3 licenses and accepts them', async ({ page, network }) => {
+    test('shows the Ultralytics', async ({ page, network }) => {
         let licenseAccepted = false;
 
         network.use(
@@ -27,10 +27,8 @@ test.describe('License agreement (web)', () => {
         await page.goto('/');
 
         await expect(page.getByRole('heading', { name: 'License Agreements' })).toBeVisible();
-        await expect(page.getByText('1 of 2')).toBeVisible();
         await expect(page.getByRole('heading', { name: 'Ultralytics AGPL-3.0 License' })).toBeVisible();
         await expect(page.getByText('Intel Simplified Software License')).toBeHidden();
-        await expect(page.getByRole('button', { name: /^2 DINOv3/ })).toBeDisabled();
 
         const termsUrl =
             'https://www.ultralytics.com/license?utm_source=intel&utm_medium=referral&utm_campaign=geti-model-garden&utm_content=user-notice';
@@ -38,14 +36,8 @@ test.describe('License agreement (web)', () => {
         await expect(termsLink).toHaveAttribute('href', termsUrl);
         await expect(termsLink).toHaveAttribute('target', '_blank');
 
-        await expect(page.getByRole('button', { name: 'Next' })).toBeDisabled();
+        await expect(page.getByRole('button', { name: 'Accept and continue' })).toBeDisabled();
         await page.getByRole('checkbox', { name: /I have read and agree to the Ultralytics/ }).check();
-        await page.getByRole('button', { name: 'Next' }).click();
-
-        await expect(page.getByText('2 of 2')).toBeVisible();
-        await expect(page.getByRole('heading', { name: 'DINOv3 License' })).toBeVisible();
-        await expect(page.getByRole('checkbox')).toHaveCount(0);
-
         await page.getByRole('button', { name: 'Accept and continue' }).click();
 
         await expect(page.getByRole('heading', { name: 'License Agreements' })).toBeHidden();
