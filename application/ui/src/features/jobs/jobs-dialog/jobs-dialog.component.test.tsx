@@ -88,7 +88,7 @@ describe('JobsDialog', () => {
 
         expect(screen.getByRole('tab', { name: /^All\b/ })).toHaveTextContent('All3');
         expect(screen.getByRole('tab', { name: /^Running\b/ })).toHaveTextContent('Running1');
-        expect(screen.getByRole('tab', { name: /^Scheduled\b/ })).toHaveTextContent('Scheduled1');
+        expect(screen.getByRole('tab', { name: /^Queued\b/ })).toHaveTextContent('Queued1');
         expect(screen.getByRole('tab', { name: /^Finished\b/ })).toHaveTextContent('Finished1');
         expect(screen.getByRole('tab', { name: 'Cancelled' })).toHaveTextContent('Cancelled');
         expect(screen.getByRole('tab', { name: 'Failed' })).toHaveTextContent('Failed');

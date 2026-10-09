@@ -4,6 +4,7 @@
 import { Suspense } from 'react';
 
 import { $api } from '@/api';
+import { LanguagesSelector } from '@/components/languages-selector/languages-selector.component';
 import { useTranslation } from '@/i18n';
 import { Divider, Flex, Grid, Item, Loading, TabList, Tabs, Text, View } from '@geti-ui/ui';
 import { usePrefetchQuery } from '@tanstack/react-query';
@@ -12,7 +13,6 @@ import { useProject } from 'hooks/api/project.hook';
 import { Link, Outlet, useLocation } from 'react-router';
 
 import getiLogo from './assets/icons/geti-logo.webp';
-import { Preferences } from './components/preferences/preferences.component';
 import { paths } from './constants/paths';
 import { usePrefetchSinksQuery } from './features/inference/sinks/api/use-sinks-query';
 import { usePrefetchSourcesQuery } from './features/inference/sources/api/use-sources';
@@ -32,7 +32,6 @@ const Header = () => {
                 height='100%'
                 gap={'size-300'}
                 marginStart={'size-300'}
-                marginEnd={'size-200'}
                 columns={['auto', '2fr', 'auto', 'fit-content(var(--spectrum-global-dimension-size-3400))']}
                 rows={'1fr'}
                 alignItems={'center'}
@@ -81,7 +80,7 @@ const Header = () => {
                         <JobsButton />
                     </Suspense>
 
-                    <Preferences />
+                    <LanguagesSelector />
                 </Flex>
             </Grid>
         </View>

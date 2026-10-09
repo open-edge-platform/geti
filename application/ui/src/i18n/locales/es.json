@@ -74,8 +74,7 @@
             "model": "Modelo",
             "jobs": "Tareas",
             "labels": "Etiquetas",
-            "bytesTransferred": "{{transferred}} de {{total}}",
-            "language": "Idioma"
+            "bytesTransferred": "{{transferred}} de {{total}}"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -103,8 +102,7 @@
         "models": "Modelos",
         "modelsDescription": "Página de modelos para visualizar tus modelos",
         "inference": "Inferencia",
-        "inferenceDescription": "Página de inferencia que muestra la inferencia en vivo en tu proyecto",
-        "preferences": "Preferencias"
+        "inferenceDescription": "Página de inferencia que muestra la inferencia en vivo en tu proyecto"
     },
     "dataset": {
         "validation": {
@@ -1115,7 +1113,7 @@
             "finished": "Finalizadas"
         },
         "status": {
-            "pending": "Programada",
+            "pending": "En cola",
             "cancelling": "Cancelando",
             "done": "Completada"
         },
@@ -1134,10 +1132,10 @@
             "elapsed": "Tiempo transcurrido: {{time}}"
         },
         "emptyState": {
-            "all": "No hay tareas en esta categoría",
+            "all": "No hay tareas",
             "running": "No hay tareas en ejecución",
             "finished": "No hay tareas finalizadas",
-            "scheduled": "No hay tareas programadas",
+            "scheduled": "No hay tareas en cola",
             "cancelled": "No hay tareas canceladas",
             "failed": "No hay tareas fallidas"
         },

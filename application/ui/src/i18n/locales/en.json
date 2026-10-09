@@ -74,8 +74,7 @@
             "model": "Model",
             "jobs": "Jobs",
             "labels": "Labels",
-            "bytesTransferred": "{{transferred}} of {{total}}",
-            "language": "Language"
+            "bytesTransferred": "{{transferred}} of {{total}}"
         },
         "viewModes": {
             "large": "Large thumbnails",
@@ -103,8 +102,7 @@
         "models": "Models",
         "modelsDescription": "Models page to visualise your models",
         "inference": "Inference",
-        "inferenceDescription": "Inference page showing live inference on your project",
-        "preferences": "Preferences"
+        "inferenceDescription": "Inference page showing live inference on your project"
     },
     "dataset": {
         "validation": {
@@ -1115,7 +1113,7 @@
             "finished": "Finished"
         },
         "status": {
-            "pending": "Scheduled",
+            "pending": "Queued",
             "cancelling": "Cancelling",
             "done": "Completed"
         },
@@ -1134,10 +1132,10 @@
             "elapsed": "Elapsed {{time}}"
         },
         "emptyState": {
-            "all": "No jobs in this category",
+            "all": "No jobs",
             "running": "No running jobs",
             "finished": "No finished jobs",
-            "scheduled": "No scheduled jobs",
+            "scheduled": "No queued jobs",
             "cancelled": "No cancelled jobs",
             "failed": "No failed jobs"
         },

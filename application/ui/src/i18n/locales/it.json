@@ -74,8 +74,7 @@
             "model": "Modello",
             "jobs": "Processi",
             "labels": "Etichette",
-            "bytesTransferred": "{{transferred}} di {{total}}",
-            "language": "Lingua"
+            "bytesTransferred": "{{transferred}} di {{total}}"
         },
         "viewModes": {
             "large": "Anteprime grandi",
@@ -103,8 +102,7 @@
         "models": "Modelli",
         "modelsDescription": "Pagina dei modelli per visualizzare i tuoi modelli",
         "inference": "Inferenza",
-        "inferenceDescription": "Pagina di inferenza che mostra l'inferenza in tempo reale sul tuo progetto",
-        "preferences": "Preferenze"
+        "inferenceDescription": "Pagina di inferenza che mostra l'inferenza in tempo reale sul tuo progetto"
     },
     "dataset": {
         "validation": {
@@ -1115,7 +1113,7 @@
             "finished": "Completati"
         },
         "status": {
-            "pending": "Pianificato",
+            "pending": "In coda",
             "cancelling": "Annullamento in corso",
             "done": "Completato"
         },
@@ -1134,10 +1132,10 @@
             "elapsed": "Tempo trascorso: {{time}}"
         },
         "emptyState": {
-            "all": "Nessun processo in questa categoria",
+            "all": "Nessun processo",
             "running": "Nessun processo in corso",
             "finished": "Nessun processo completato",
-            "scheduled": "Nessun processo pianificato",
+            "scheduled": "Nessun processo in coda",
             "cancelled": "Nessun processo annullato",
             "failed": "Nessun processo fallito"
         },

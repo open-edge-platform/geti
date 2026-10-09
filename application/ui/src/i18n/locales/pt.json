@@ -74,8 +74,7 @@
             "model": "Modelo",
             "jobs": "Tarefas",
             "labels": "Etiquetas",
-            "bytesTransferred": "{{transferred}} de {{total}}",
-            "language": "Idioma"
+            "bytesTransferred": "{{transferred}} de {{total}}"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -103,8 +102,7 @@
         "models": "Modelos",
         "modelsDescription": "Página de modelos para visualizar os seus modelos",
         "inference": "Inferência",
-        "inferenceDescription": "Página de inferência que mostra a inferência em tempo real no seu projeto",
-        "preferences": "Preferências"
+        "inferenceDescription": "Página de inferência que mostra a inferência em tempo real no seu projeto"
     },
     "dataset": {
         "validation": {
@@ -1115,7 +1113,7 @@
             "finished": "Concluídas"
         },
         "status": {
-            "pending": "Agendada",
+            "pending": "Na fila",
             "cancelling": "A cancelar",
             "done": "Concluída"
         },
@@ -1134,10 +1132,10 @@
             "elapsed": "Tempo decorrido: {{time}}"
         },
         "emptyState": {
-            "all": "Nenhuma tarefa nesta categoria",
+            "all": "Nenhuma tarefa",
             "running": "Nenhuma tarefa em execução",
             "finished": "Nenhuma tarefa concluída",
-            "scheduled": "Nenhuma tarefa agendada",
+            "scheduled": "Nenhuma tarefa na fila",
             "cancelled": "Nenhuma tarefa cancelada",
             "failed": "Nenhuma tarefa com falha"
         },

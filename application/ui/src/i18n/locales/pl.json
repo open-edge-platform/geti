@@ -74,8 +74,7 @@
             "model": "Model",
             "jobs": "Zadania",
             "labels": "Etykiety",
-            "bytesTransferred": "{{transferred}} z {{total}}",
-            "language": "Język"
+            "bytesTransferred": "{{transferred}} z {{total}}"
         },
         "viewModes": {
             "large": "Duże miniatury",
@@ -103,8 +102,7 @@
         "models": "Modele",
         "modelsDescription": "Strona modeli do wizualizacji Twoich modeli",
         "inference": "Wnioskowanie",
-        "inferenceDescription": "Strona wnioskowania pokazująca wnioskowanie na żywo w Twoim projekcie",
-        "preferences": "Preferencje"
+        "inferenceDescription": "Strona wnioskowania pokazująca wnioskowanie na żywo w Twoim projekcie"
     },
     "dataset": {
         "validation": {
@@ -1119,7 +1117,7 @@
             "finished": "Zakończone"
         },
         "status": {
-            "pending": "Zaplanowane",
+            "pending": "W kolejce",
             "cancelling": "W trakcie anulowania",
             "done": "Zakończone"
         },
@@ -1138,10 +1136,10 @@
             "elapsed": "Czas trwania: {{time}}"
         },
         "emptyState": {
-            "all": "Brak zadań w tej kategorii",
+            "all": "Brak zadań",
             "running": "Brak zadań w trakcie",
             "finished": "Brak zakończonych zadań",
-            "scheduled": "Brak zaplanowanych zadań",
+            "scheduled": "Brak zadań w kolejce",
             "cancelled": "Brak anulowanych zadań",
             "failed": "Brak zadań zakończonych niepowodzeniem"
         },

@@ -74,8 +74,7 @@
             "model": "模型",
             "jobs": "任务",
             "labels": "标签",
-            "bytesTransferred": "{{transferred}} / {{total}}",
-            "language": "语言"
+            "bytesTransferred": "{{transferred}} / {{total}}"
         },
         "viewModes": {
             "large": "大缩略图",
@@ -103,8 +102,7 @@
         "models": "模型",
         "modelsDescription": "模型页面，用于浏览模型",
         "inference": "推理",
-        "inferenceDescription": "推理页面，用于查看项目的实时推理效果",
-        "preferences": "首选项"
+        "inferenceDescription": "推理页面，用于查看项目的实时推理效果"
     },
     "dataset": {
         "validation": {
@@ -135,7 +133,7 @@
         "filters": {
             "allMedia": "全部媒体",
             "withAnnotations": "已标注的媒体",
-            "missingAnnotations": "缺少标注的媒体",
+            "missingAnnotations": "未标注的媒体",
             "subset": "按数据子集筛选",
             "searchLabels": "搜索标签",
             "labelsSelected_one": "已选 {{count}} 个标签",
@@ -258,7 +256,7 @@
             "multipleFilesError": "不支持选择文件夹或多个文件，请只上传单个文件。",
             "unsupportedFormatError": "文件格式不支持，请上传有效的 .zip 文件。",
             "datasetBeingUploaded": "数据集正在上传",
-            "dropZipHere": "把数据集 .zip 文件拖拽到这里",
+            "dropZipHere": "将数据集 .zip 文件拖拽到这里",
             "learnMoreFormats": "了解支持的数据格式",
             "dialogHeading": "导入数据集",
             "scanningMessage": "正在扫描解析待导入的数据集压缩包……",
@@ -1115,7 +1113,7 @@
             "finished": "已完成"
         },
         "status": {
-            "pending": "已计划",
+            "pending": "排队中",
             "cancelling": "正在取消",
             "done": "已完成"
         },
@@ -1134,10 +1132,10 @@
             "elapsed": "已用时 {{time}}"
         },
         "emptyState": {
-            "all": "此类别中没有任务",
+            "all": "没有任务",
             "running": "没有正在运行的任务",
             "finished": "没有已完成的任务",
-            "scheduled": "没有已计划的任务",
+            "scheduled": "没有排队中的任务",
             "cancelled": "没有已取消的任务",
             "failed": "没有失败的任务"
         },

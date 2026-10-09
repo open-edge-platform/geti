@@ -43,7 +43,7 @@ describe('locale registry', () => {
 
     it('ships English as the default language', () => {
         expect(DEFAULT_LANGUAGE).toBe('en');
-        expect(SUPPORTED_LANGUAGES).toEqual(['en', 'es', 'it', 'pl', 'pt', 'zh-CN']);
+        expect(SUPPORTED_LANGUAGES).toEqual(['en', 'es', 'it', 'pl', 'pt', 'zh-CN', 'zh-HK', 'zh-MO', 'zh-TW']);
         expect(resources.en.translation).toHaveProperty('common.labels.dataset', 'Dataset');
     });
 });
@@ -89,6 +89,8 @@ describe('translation coverage', () => {
             'common.labels.validation_subset',
             'models.performance.categories.accuracy',
             'jobs.tabs.finished',
+            'jobs.status.pending',
+            'common.upload.queued',
         ]);
         const keysByValue = new Map<string, string[]>();
 
