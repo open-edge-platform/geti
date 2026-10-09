@@ -18,13 +18,13 @@
 
 </div>
 
-**_Geti™_** is an open-source, end-to-end platform for building and continuously improving state-of-the-art computer vision models. It covers annotation, fine-tuning, optimization, deployment, and inference — with 1,600+ model variants for detection, classification, and segmentation, optimized by OpenVINO™ for Intel® CPUs, GPUs, and NPUs.
+**_Geti™_** is an open-source, end-to-end platform for building and continuously improving your own computer vision models. It covers annotation, fine-tuning, optimization, deployment, and inference — with 1,600+ model variants for detection, classification, and segmentation, optimized by OpenVINO™ for Intel® CPUs, GPUs, and NPUs.
 
 <p align="center">
  <img src="assets/model-lifecycle-infinity-light.png" width="600" alt="Geti™ - Learning Cycle"/>
 </p>
 
-Choose the Geti™ application for a no-code experience, or the `getitune` Python API for code-first workflows — both paths lead to production-ready models. Both are developed in this repository, under [`application/`](application/) and [`library/`](library/).
+The Geti™ application is powered by **_getitune_**, its engine for model training and optimization, which is also available standalone as a Python library. Choose the application for a no-code experience, or the `getitune` Python API for code-first workflows — both paths lead to production-ready models. Both are developed in this repository, under [`application/`](application/) and [`library/`](library/).
 
 ## Full lifecycle with an intuitive SME interface
 
