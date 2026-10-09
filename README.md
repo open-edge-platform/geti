@@ -24,7 +24,7 @@
  <img src="assets/model-lifecycle-infinity-light.png" width="600" alt="Geti™ - Learning Cycle"/>
 </p>
 
-Choose the Geti™ application for a no-code experience, or the `getitune` Python API for code-first workflows — both paths lead to production-ready models.
+Choose the Geti™ application for a no-code experience, or the `getitune` Python API for code-first workflows — both paths lead to production-ready models. Both are developed in this repository, under [`application/`](application/) and [`library/`](library/).
 
 ## Full lifecycle with an intuitive SME interface
 
