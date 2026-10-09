@@ -74,6 +74,7 @@
             "model": "模型",
             "jobs": "工作",
             "labels": "標籤",
+            "bytesTransferred": "{{transferred}} / {{total}}",
             "language": "語言"
         },
         "viewModes": {
@@ -151,6 +152,7 @@
         },
         "upload": {
             "queued": "佇列中",
+            "processing": "處理中",
             "uploaded": "已上傳",
             "errorTitle": "上傳錯誤",
             "details": "上傳詳細資料",
@@ -165,13 +167,18 @@
             "failedSummary_other": "{{count}} 個檔案上傳失敗",
             "mixedSummary_one": "已上傳 {{uploaded}} 個檔案，失敗 {{failed}} 個",
             "mixedSummary_other": "已上傳 {{uploaded}} 個檔案，失敗 {{failed}} 個",
+            "mixedCancelledSummary_one": "已上傳 {{uploaded}} 個檔案，失敗 {{failed}} 個，已取消 {{cancelled}} 個",
+            "mixedCancelledSummary_other": "已上傳 {{uploaded}} 個檔案，失敗 {{failed}} 個，已取消 {{cancelled}} 個",
             "genericError": "媒體檔案上傳失敗。",
             "uploadMedia": "上傳媒體檔案",
             "showDetails": "檢視詳細資料",
             "inProgressToast_one": "正在上傳 {{count}} 個檔案……",
             "inProgressToast_other": "正在上傳 {{count}} 個檔案……",
             "inProgressSucceededPart": "成功 {{count}} 個",
-            "inProgressFailedPart": "失敗 {{count}} 個"
+            "inProgressFailedPart": "失敗 {{count}} 個",
+            "cancelAll": "全部取消",
+            "cancelledSummary_one": "已取消 {{count}} 個上傳",
+            "cancelledSummary_other": "已取消 {{count}} 個上傳"
         },
         "empty": {
             "noMatches": "沒有符合篩選條件的媒體檔案。",
@@ -1171,7 +1178,8 @@
         },
         "notifications": {
             "unexpectedError": "發生未知的錯誤，請重試。",
-            "networkError": "網路連線異常，請檢查網路後重試。"
+            "networkError": "網路連線異常，請檢查網路後重試。",
+            "uploadTransferError": "檔案傳輸失敗，請重試。"
         }
     },
     "downloads": {

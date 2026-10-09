@@ -73,7 +73,8 @@
             "every": "cada",
             "model": "Modelo",
             "jobs": "Tareas",
-            "labels": "Etiquetas"
+            "labels": "Etiquetas",
+            "bytesTransferred": "{{transferred}} de {{total}}"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -149,6 +150,7 @@
         },
         "upload": {
             "queued": "En cola",
+            "processing": "Procesando",
             "uploaded": "Cargado",
             "errorTitle": "Error de carga",
             "details": "Detalles de la carga",
@@ -163,13 +165,18 @@
             "failedSummary_other": "No se pudieron cargar {{count}} elementos",
             "mixedSummary_one": "{{uploaded}} elemento cargado, {{failed}} fallido",
             "mixedSummary_other": "{{uploaded}} elementos cargados, {{failed}} fallidos",
+            "mixedCancelledSummary_one": "{{uploaded}} elemento cargado, {{failed}} fallido, {{cancelled}} cancelado",
+            "mixedCancelledSummary_other": "{{uploaded}} elementos cargados, {{failed}} fallidos, {{cancelled}} cancelados",
             "genericError": "No se pudieron cargar los elementos multimedia.",
             "uploadMedia": "Cargar multimedia",
             "showDetails": "Mostrar detalles",
             "inProgressToast_one": "Cargando {{count}} elemento...",
             "inProgressToast_other": "Cargando {{count}} elementos...",
             "inProgressSucceededPart": "{{count}} correctos",
-            "inProgressFailedPart": "{{count}} fallidos"
+            "inProgressFailedPart": "{{count}} fallidos",
+            "cancelAll": "Cancelar todo",
+            "cancelledSummary_one": "Se canceló {{count}} carga",
+            "cancelledSummary_other": "Se cancelaron {{count}} cargas"
         },
         "empty": {
             "noMatches": "Ningún elemento multimedia coincide con tu filtro.",
@@ -1169,7 +1176,8 @@
         },
         "notifications": {
             "unexpectedError": "Se ha producido un error inesperado. Inténtalo de nuevo.",
-            "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo."
+            "networkError": "Error de red. Comprueba tu conexión e inténtalo de nuevo.",
+            "uploadTransferError": "La transferencia del archivo ha fallado. Inténtalo de nuevo."
         }
     },
     "downloads": {

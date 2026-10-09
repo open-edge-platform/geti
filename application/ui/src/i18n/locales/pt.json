@@ -73,7 +73,8 @@
             "every": "a cada",
             "model": "Modelo",
             "jobs": "Tarefas",
-            "labels": "Etiquetas"
+            "labels": "Etiquetas",
+            "bytesTransferred": "{{transferred}} de {{total}}"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -149,6 +150,7 @@
         },
         "upload": {
             "queued": "Em fila",
+            "processing": "A processar",
             "uploaded": "Carregado",
             "errorTitle": "Erro de carregamento",
             "details": "Detalhes do carregamento",
@@ -163,13 +165,18 @@
             "failedSummary_other": "Falha ao carregar {{count}} itens",
             "mixedSummary_one": "{{uploaded}} item carregado, {{failed}} falhou",
             "mixedSummary_other": "{{uploaded}} itens carregados, {{failed}} falharam",
+            "mixedCancelledSummary_one": "{{uploaded}} item carregado, {{failed}} falhou, {{cancelled}} cancelado",
+            "mixedCancelledSummary_other": "{{uploaded}} itens carregados, {{failed}} falharam, {{cancelled}} cancelados",
             "genericError": "Falha ao carregar itens multimédia.",
             "uploadMedia": "Carregar multimédia",
             "showDetails": "Mostrar detalhes",
             "inProgressToast_one": "A carregar {{count}} item...",
             "inProgressToast_other": "A carregar {{count}} itens...",
             "inProgressSucceededPart": "{{count}} concluído(s) com sucesso",
-            "inProgressFailedPart": "{{count}} falhado(s)"
+            "inProgressFailedPart": "{{count}} falhado(s)",
+            "cancelAll": "Cancelar tudo",
+            "cancelledSummary_one": "{{count}} carregamento cancelado",
+            "cancelledSummary_other": "{{count}} carregamentos cancelados"
         },
         "empty": {
             "noMatches": "Nenhum item multimédia corresponde ao seu filtro.",
@@ -1169,7 +1176,8 @@
         },
         "notifications": {
             "unexpectedError": "Ocorreu um erro inesperado. Por favor tente novamente.",
-            "networkError": "Erro de rede. Verifique a sua ligação e tente novamente."
+            "networkError": "Erro de rede. Verifique a sua ligação e tente novamente.",
+            "uploadTransferError": "A transferência do ficheiro falhou. Tente novamente."
         }
     },
     "downloads": {

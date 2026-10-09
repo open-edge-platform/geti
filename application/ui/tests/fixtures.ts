@@ -11,6 +11,7 @@ import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
 import { getMockedDatasetView } from 'mocks/mock-dataset-view';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedModelArchitecture } from 'mocks/mock-model';
+import { tusUploadHandlers } from 'mocks/mock-tus-upload';
 import { HttpResponse } from 'msw';
 
 import { handlers, http } from '../src/api/utils';
@@ -68,7 +69,10 @@ const test = testBase.extend<Fixtures>({
         async ({ context }, use) => {
             const network = defineNetworkFixture({
                 context: context as DefineNetworkFixtureOptions['context'],
+                // The stateful TUS handlers go first so they take precedence over the example
+                // responses generated from the OpenAPI spec (mirrors `src/msw-node-setup.ts`).
                 handlers: [
+                    ...tusUploadHandlers,
                     ...handlers,
                     http.get('/health', ({ response }) => {
                         return response(200).json({

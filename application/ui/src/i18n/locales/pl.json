@@ -73,7 +73,8 @@
             "every": "co",
             "model": "Model",
             "jobs": "Zadania",
-            "labels": "Etykiety"
+            "labels": "Etykiety",
+            "bytesTransferred": "{{transferred}} z {{total}}"
         },
         "viewModes": {
             "large": "Duże miniatury",
@@ -149,6 +150,7 @@
         },
         "upload": {
             "queued": "W kolejce",
+            "processing": "Przetwarzanie",
             "uploaded": "Przesłano",
             "errorTitle": "Błąd przesyłania",
             "details": "Szczegóły przesyłania",
@@ -163,13 +165,18 @@
             "failedSummary_other": "Nie udało się przesłać {{count}} elementów",
             "mixedSummary_one": "Przesłano {{uploaded}} element, {{failed}} nieudane",
             "mixedSummary_other": "Przesłano {{uploaded}} elementów, {{failed}} nieudanych",
+            "mixedCancelledSummary_one": "Przesłano {{uploaded}} element, {{failed}} nieudane, {{cancelled}} anulowano",
+            "mixedCancelledSummary_other": "Przesłano {{uploaded}} elementów, {{failed}} nieudanych, {{cancelled}} anulowano",
             "genericError": "Nie udało się przesłać multimediów.",
             "uploadMedia": "Prześlij multimedia",
             "showDetails": "Pokaż szczegóły",
             "inProgressToast_one": "Przesyłanie {{count}} elementu...",
             "inProgressToast_other": "Przesyłanie {{count}} elementów...",
             "inProgressSucceededPart": "{{count}} pomyślnie",
-            "inProgressFailedPart": "{{count}} nieudanych"
+            "inProgressFailedPart": "{{count}} nieudanych",
+            "cancelAll": "Anuluj wszystko",
+            "cancelledSummary_one": "Anulowano {{count}} przesyłanie",
+            "cancelledSummary_other": "Anulowano {{count}} przesyłań"
         },
         "empty": {
             "noMatches": "Żadne elementy multimedialne nie pasują do filtra.",
@@ -1173,7 +1180,8 @@
         },
         "notifications": {
             "unexpectedError": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
-            "networkError": "Błąd sieci. Sprawdź połączenie i spróbuj ponownie."
+            "networkError": "Błąd sieci. Sprawdź połączenie i spróbuj ponownie.",
+            "uploadTransferError": "Przesyłanie pliku nie powiodło się. Spróbuj ponownie."
         }
     },
     "downloads": {

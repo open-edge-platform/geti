@@ -73,7 +73,8 @@
             "every": "every",
             "model": "Model",
             "jobs": "Jobs",
-            "labels": "Labels"
+            "labels": "Labels",
+            "bytesTransferred": "{{transferred}} of {{total}}"
         },
         "viewModes": {
             "large": "Large thumbnails",
@@ -149,6 +150,7 @@
         },
         "upload": {
             "queued": "Queued",
+            "processing": "Processing",
             "uploaded": "Uploaded",
             "errorTitle": "Upload error",
             "details": "Upload details",
@@ -163,13 +165,18 @@
             "failedSummary_other": "Failed to upload {{count}} items",
             "mixedSummary_one": "Uploaded {{uploaded}} item, {{failed}} failed",
             "mixedSummary_other": "Uploaded {{uploaded}} items, {{failed}} failed",
+            "mixedCancelledSummary_one": "Uploaded {{uploaded}} item, {{failed}} failed, {{cancelled}} cancelled",
+            "mixedCancelledSummary_other": "Uploaded {{uploaded}} items, {{failed}} failed, {{cancelled}} cancelled",
             "genericError": "Failed to upload media.",
             "uploadMedia": "Upload media",
             "showDetails": "Show details",
             "inProgressToast_one": "Uploading {{count}} item...",
             "inProgressToast_other": "Uploading {{count}} items...",
             "inProgressSucceededPart": "{{count}} succeeded",
-            "inProgressFailedPart": "{{count}} failed"
+            "inProgressFailedPart": "{{count}} failed",
+            "cancelAll": "Cancel all",
+            "cancelledSummary_one": "Cancelled {{count}} upload",
+            "cancelledSummary_other": "Cancelled {{count}} uploads"
         },
         "empty": {
             "noMatches": "No media items match your filter.",
@@ -1169,7 +1176,8 @@
         },
         "notifications": {
             "unexpectedError": "An unexpected error occurred. Please try again.",
-            "networkError": "Network error. Please check your connection and try again."
+            "networkError": "Network error. Please check your connection and try again.",
+            "uploadTransferError": "The file transfer failed. Please try again."
         }
     },
     "downloads": {
