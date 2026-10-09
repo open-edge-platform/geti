@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { isAbortError, uploadDatasetArchive } from '@/api';
-import { EmptyDataset } from '@/assets/illustrations';
+import { DropFiles } from '@/assets/illustrations';
 import { useTranslation } from '@/i18n';
 import { Button, Content, DropZone, FileTrigger, Flex, Heading, IllustratedMessage, Text } from '@geti-ui/ui';
 import { LinkOut } from '@geti-ui/ui/icons';
@@ -111,7 +111,7 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
             onDrop={async (event) => handleLoadingFile(await getFilesFromDropEvent(event))}
         >
             <IllustratedMessage maxHeight={'size-4600'}>
-                <EmptyDataset />
+                <DropFiles />
 
                 <Content>
                     {isPending && (
