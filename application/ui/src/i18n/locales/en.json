@@ -1146,16 +1146,14 @@
     "license": {
         "label": "License: ",
         "agreement": {
-            "title": "License Agreement",
-            "intro": "By installing, using, or distributing this application, you acknowledge that:",
-            "termsRead": "You have read and understood the license terms at the links below;",
-            "termsGovern": "Confirmed the linked terms govern the contents you seek to access and use; and",
-            "termsAccepted": "Accepted and agreed to the linked license terms.",
+            "title": "License Agreements",
+            "intro": "Please review and accept the following licenses to continue using Geti.",
+            "progress": "{{current}} of {{total}}",
+            "required": "Required",
+            "optional": "Optional",
+            "fullLicense": "Read the full license",
+            "previous": "Previous",
             "accept": "Accept and continue"
-        },
-        "links": {
-            "intelSimplified": "Intel Simplified Software License",
-            "dinov2": "DINOv3 License"
         }
     },
     "application": {

@@ -1146,16 +1146,14 @@
     "license": {
         "label": "Licença: ",
         "agreement": {
-            "title": "Contrato de Licença",
-            "intro": "Ao instalar, utilizar ou distribuir esta aplicação, reconhece que:",
-            "termsRead": "Leu e compreendeu os termos da licença nas ligações abaixo;",
-            "termsGovern": "Confirmou que os termos indicados regem os conteúdos a que pretende aceder e utilizar; e",
-            "termsAccepted": "Aceitou e concordou com os termos da licença indicados.",
+            "title": "Contratos de Licença",
+            "intro": "Reveja e aceite as seguintes licenças para continuar a utilizar o Geti.",
+            "progress": "{{current}} de {{total}}",
+            "required": "Obrigatória",
+            "optional": "Opcional",
+            "fullLicense": "Ler a licença completa",
+            "previous": "Anterior",
             "accept": "Aceitar e continuar"
-        },
-        "links": {
-            "intelSimplified": "Licença de Software Simplificada da Intel",
-            "dinov2": "Licença DINOv3"
         }
     },
     "application": {
