@@ -31,6 +31,7 @@ from app.repositories import (
 )
 from app.services.dataset_revision_service import DatasetRevisionService
 from app.services.model_manifest_service import ModelManifestService
+from app.supported_models.attributions import ModelAttribution, get_model_attribution
 from app.utils.onnx_metadata import read_onnx_metadata_attrs
 
 from .base import BaseSessionManagedService, ResourceInUseError, ResourceNotFoundError, ResourceType
@@ -226,6 +227,24 @@ class ModelService(BaseSessionManagedService):
         architecture = self.get_model_revision_architecture(project_id, model_id)
         manifest = ModelManifestService.get_model_manifest_by_id(architecture)
         return manifest.license
+
+    def get_model_attribution(self, project_id: UUID, model_id: UUID) -> ModelAttribution | None:
+        """
+        Get the attribution of the original (upstream) work a model is derived from.
+
+        Args:
+            project_id (UUID): The unique identifier of the project.
+            model_id (UUID): The unique identifier of the model.
+
+        Returns:
+            ModelAttribution | None: The creators, source and copyright notice of the original work,
+            or None if no attribution is registered for the model architecture.
+
+        Raises:
+            ResourceNotFoundError: If no model with the given model_id is found.
+        """
+        architecture = self.get_model_revision_architecture(project_id, model_id)
+        return get_model_attribution(architecture)
 
     def get_model_variants(self, project_id: UUID, model_id: UUID) -> list[ModelVariant]:
         """

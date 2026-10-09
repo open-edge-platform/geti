@@ -1,4 +1,4 @@
-Copyright (c) the authors of the original model and its pretrained weights (refer to the model source for the exact copyright notice).
+<copyright notice>
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 

@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from app.models.model_manifest import License
     from app.services import MediaService
     from app.services.label_service import LabelService
+    from app.supported_models.attributions import ModelAttribution
 
 
 # Filename of the model weights inside the archive, depending on the format.
@@ -51,22 +52,53 @@ _LICENSE_FILES_BY_NAME: dict[str, dict[str, str]] = {
     "MIT": {"LICENSE": "MIT.txt"},
 }
 
+# Licenses whose terms require the copyright notice and/or the attribution of the original work to be retained in
+# redistributions. An attribution must be registered for every model under one of these licenses, see
+# `app/supported_models/licenses/attributions.yaml`.
+LICENSES_REQUIRING_ATTRIBUTION: frozenset[str] = frozenset({"MIT", "BSD-3-Clause", "CC BY-NC 4.0", "CC BY-NC-SA 4.0"})
 
-def load_license_files(license_name: str) -> dict[str, bytes]:
+# Placeholder, in the license file templates (e.g. MIT, BSD-3-Clause), for the copyright notice of the original work.
+_COPYRIGHT_PLACEHOLDER = "<copyright notice>"
+
+# Fallback copyright notice, used only if no attribution is registered for a model (should not happen).
+_GENERIC_COPYRIGHT_NOTICE = "Copyright (c) the authors of the original model and its pretrained weights"
+
+_FORMAT_DISPLAY_NAMES: dict[ModelFormat, str] = {
+    ModelFormat.OPENVINO: "OpenVINO IR",
+    ModelFormat.ONNX: "ONNX",
+}
+
+
+def _copyright_notice(attribution: ModelAttribution | None) -> str:
+    """Copyright notice of the original work, to be retained in the license file."""
+    if attribution is None:
+        return _GENERIC_COPYRIGHT_NOTICE
+    if attribution.copyright is not None:
+        return attribution.copyright
+    return f"Copyright (c) {attribution.creators}"
+
+
+def load_license_files(license_name: str, attribution: ModelAttribution | None = None) -> dict[str, bytes]:
     """Load the license files that must be redistributed together with the model.
+
+    License files that contain a copyright notice placeholder (e.g. MIT, BSD-3-Clause) are completed with
+    the copyright notice of the original work, taken from the model attribution.
 
     Args:
         license_name: Name of the license, as declared in the model manifest (`license.name`).
+        attribution: Attribution of the original work the model is derived from, if any.
 
     Returns:
         A mapping from filename inside the archive to file content. Empty if the license does
         not require any file to be bundled (a link to the license text is sufficient).
     """
     licenses_dir = resources.files("app.supported_models").joinpath("licenses")
-    return {
-        filename: licenses_dir.joinpath(resource_name).read_bytes()
-        for filename, resource_name in _LICENSE_FILES_BY_NAME.get(license_name, {}).items()
-    }
+    files: dict[str, bytes] = {}
+    for filename, resource_name in _LICENSE_FILES_BY_NAME.get(license_name, {}).items():
+        content = licenses_dir.joinpath(resource_name).read_text(encoding="utf-8")
+        content = content.replace(_COPYRIGHT_PLACEHOLDER, _copyright_notice(attribution))
+        files[filename] = content.encode("utf-8")
+    return files
 
 
 def _format_license_files_note(filenames: list[str]) -> str:
@@ -77,6 +109,28 @@ def _format_license_files_note(filenames: list[str]) -> str:
     else:
         listed = f"{', '.join(quoted[:-1])} and {quoted[-1]} files"
     return _README_LICENSE_FILES_NOTE.format(license_files=listed)
+
+
+def _format_licensing_section(
+    license: License,
+    attribution: ModelAttribution | None,
+    license_filenames: list[str],
+    model_format: ModelFormat,
+) -> str:
+    """Render the "Licensing" section of the README, including attribution and modification notices."""
+    section = _README_LICENSING.format(license_name=license.name, license_url=license.url)
+    if license_filenames:
+        section += _format_license_files_note(license_filenames)
+    if attribution is not None:
+        section += _README_ATTRIBUTION.format(
+            name=attribution.name, creators=attribution.creators, source=attribution.source
+        )
+        if attribution.copyright is not None:
+            section += _README_COPYRIGHT_NOTICE.format(copyright=attribution.copyright)
+        else:
+            section += _README_NO_COPYRIGHT_NOTICE
+    section += _README_MODIFICATIONS.format(format_name=_FORMAT_DISPLAY_NAMES[model_format])
+    return section
 
 
 @dataclass(frozen=True)
@@ -93,7 +147,12 @@ class DemoFilesService:
         self._label_service: LabelService | None = label_service
 
     def build_demo_files(
-        self, project_id: UUID, model_format: ModelFormat, *, license: License | None = None
+        self,
+        project_id: UUID,
+        model_format: ModelFormat,
+        *,
+        license: License | None = None,
+        attribution: ModelAttribution | None = None,
     ) -> list[DemoFile]:
         """Build the auxiliary deployment files to bundle in with the model archive.
 
@@ -108,6 +167,9 @@ class DemoFilesService:
                 "Licensing" section referencing the license is appended to the README, and for
                 licenses that require it (e.g. AGPL-3.0), a copy of the full license text is
                 included as a LICENSE file (plus any other required file, e.g. NOTICE).
+            attribution: Attribution of the original work the model is derived from. When provided,
+                the creators, source and copyright notice of the original work are added to the README
+                and, for licenses such as MIT and BSD-3-Clause, to the LICENSE file.
 
         Returns:
             The list of files (name + bytes) to add to the zip archive.
@@ -147,11 +209,21 @@ class DemoFilesService:
 
         readme = _README.format(model_filename=model_filename, image_filename=image_filename)
         if license is not None:
-            readme += _README_LICENSING.format(license_name=license.name, license_url=license.url)
-            license_files = load_license_files(license.name)
-            if license_files:
-                readme += _format_license_files_note(list(license_files))
-                files.extend(DemoFile(name=name, data=data) for name, data in license_files.items())
+            if attribution is None and license.name in LICENSES_REQUIRING_ATTRIBUTION:
+                logger.warning(
+                    "No attribution registered for a model under the '{}' license (project {}); "
+                    "a generic copyright notice is used.",
+                    license.name,
+                    project_id,
+                )
+            license_files = load_license_files(license.name, attribution=attribution)
+            files.extend(DemoFile(name=name, data=data) for name, data in license_files.items())
+            readme += _format_licensing_section(
+                license=license,
+                attribution=attribution,
+                license_filenames=list(license_files),
+                model_format=model_format,
+            )
 
         files.append(DemoFile(name="README.md", data=readme.encode("utf-8")))
         return files
@@ -512,4 +584,32 @@ This model is distributed under the "{license_name}" license, the full text is a
 
 _README_LICENSE_FILES_NOTE = """
 A copy of the license is included in the {license_files} of this archive.
+"""
+
+_README_ATTRIBUTION = """
+### Attribution
+
+This model is derived from the pretrained model "{name}", created by {creators}, available at <{source}>.
+"""
+
+_README_COPYRIGHT_NOTICE = """
+Copyright notice of the original work:
+
+```text
+{copyright}
+```
+"""
+
+_README_NO_COPYRIGHT_NOTICE = """
+The original work does not provide a copyright notice.
+"""
+
+_README_MODIFICATIONS = """
+### Modifications
+
+The model weights in this archive are a modified version of the original pretrained weights: they were
+fine-tuned with Geti on a custom dataset and exported to the {format_name} format.
+
+The original work is provided by its licensors "as is", without warranties of any kind; refer to the license
+for the full disclaimer of warranties and limitation of liability.
 """

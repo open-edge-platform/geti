@@ -310,6 +310,7 @@ class TestModelEndpoints:
         fxt_model_service.get_model_license.return_value = License(
             name="AGPL-3.0", url="https://www.ultralytics.com/legal/agpl-3-0-software-license"
         )
+        fxt_model_service.get_model_attribution.return_value = None
 
         response = fxt_client.get(
             f"/api/projects/{fxt_get_project.id}/models/{fxt_model.id}/variants/{model_variant_id}/binary"
@@ -347,6 +348,9 @@ class TestModelEndpoints:
                 assert "README.md" in namelist
                 assert "LICENSE" in namelist
                 assert "## Licensing" in zip_file.read("README.md").decode()
+                fxt_model_service.get_model_attribution.assert_called_once_with(
+                    project_id=fxt_get_project.id, model_id=fxt_model.id
+                )
             else:
                 assert "demo.py" not in namelist
                 assert "demo_async.py" not in namelist

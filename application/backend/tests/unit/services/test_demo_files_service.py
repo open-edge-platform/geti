@@ -12,6 +12,7 @@ from app.models.model_manifest import License
 from app.models.model_revision import ModelFormat
 from app.services.demo_files_service import _LICENSE_FILES_BY_NAME, DemoFilesService, load_license_files
 from app.services.model_manifest_service import ModelManifestService
+from app.supported_models.attributions import ModelAttribution
 
 # Licenses which explicitly allow to satisfy their terms with a link to the license text
 # (e.g. CC BY-NC 4.0, Section 3(a)(1)(C)), so no copy is bundled with the exported model.
@@ -146,3 +147,105 @@ class TestLicenseFiles:
         unhandled = _all_used_license_names() - set(_LICENSE_FILES_BY_NAME) - _LINK_ONLY_LICENSES
 
         assert not unhandled, f"Licenses without redistribution policy: {sorted(unhandled)}"
+
+
+_MIT_ATTRIBUTION = ModelAttribution(
+    name="Foo Net",
+    models=("image-classification-timm-foo_*",),
+    creators="Foo Research Lab",
+    copyright="Copyright (c) 2021 Foo Research Lab\nCopyright (c) Bar Inc.",
+    source="https://github.com/foo/foo-net",
+)
+
+
+class TestDemoFilesServiceAttribution:
+    @pytest.mark.parametrize("license_name", ["MIT", "BSD-3-Clause"])
+    def test_upstream_copyright_notice_in_license_file(
+        self, fxt_demo_files_service: DemoFilesService, license_name: str
+    ) -> None:
+        """MIT and BSD-3-Clause require the original copyright notice to be retained in copies."""
+        files = fxt_demo_files_service.build_demo_files(
+            project_id=uuid4(),
+            model_format=ModelFormat.OPENVINO,
+            license=License(name=license_name, url="https://example.com/license"),
+            attribution=_MIT_ATTRIBUTION,
+        )
+
+        license_text = {f.name: f.data for f in files}["LICENSE"].decode("utf-8")
+        assert "Copyright (c) 2021 Foo Research Lab\nCopyright (c) Bar Inc." in license_text
+        assert "<copyright notice>" not in license_text
+
+    @pytest.mark.parametrize(
+        "license_name, expect_license_file",
+        [("MIT", True), ("BSD-3-Clause", True), ("CC BY-NC 4.0", False), ("CC BY-NC-SA 4.0", False)],
+    )
+    @pytest.mark.parametrize(
+        "model_format, format_name", [(ModelFormat.OPENVINO, "OpenVINO IR"), (ModelFormat.ONNX, "ONNX")]
+    )
+    def test_attribution_and_modifications_in_readme(
+        self,
+        fxt_demo_files_service: DemoFilesService,
+        license_name: str,
+        expect_license_file: bool,
+        model_format: ModelFormat,
+        format_name: str,
+    ) -> None:
+        license_url = "https://example.com/license"
+
+        files = fxt_demo_files_service.build_demo_files(
+            project_id=uuid4(),
+            model_format=model_format,
+            license=License(name=license_name, url=license_url),
+            attribution=_MIT_ATTRIBUTION,
+        )
+
+        by_name = {f.name: f.data for f in files}
+        readme = by_name["README.md"].decode("utf-8")
+        assert ("LICENSE" in by_name) is expect_license_file
+        # Link to the license text
+        assert f"[here]({license_url})" in readme
+        # Identification of the creators, source and copyright notice of the original work
+        assert "### Attribution" in readme
+        assert (
+            'This model is derived from the pretrained model "Foo Net", created by Foo Research Lab, '
+            "available at <https://github.com/foo/foo-net>." in readme
+        )
+        assert "```text\nCopyright (c) 2021 Foo Research Lab\nCopyright (c) Bar Inc.\n```" in readme
+        # Indication of the modifications and reference to the disclaimer of warranties
+        assert "### Modifications" in readme
+        assert f"fine-tuned with Geti on a custom dataset and exported to the {format_name} format" in readme
+        assert "disclaimer of warranties" in readme
+
+    def test_attribution_without_copyright_notice(self, fxt_demo_files_service: DemoFilesService) -> None:
+        attribution = _MIT_ATTRIBUTION.model_copy(update={"copyright": None})
+
+        files = fxt_demo_files_service.build_demo_files(
+            project_id=uuid4(),
+            model_format=ModelFormat.OPENVINO,
+            license=License(name="MIT", url="https://example.com/license"),
+            attribution=attribution,
+        )
+
+        by_name = {f.name: f.data for f in files}
+        assert "Copyright (c) Foo Research Lab" in by_name["LICENSE"].decode("utf-8")
+        assert "The original work does not provide a copyright notice." in by_name["README.md"].decode("utf-8")
+
+    def test_missing_attribution_falls_back_to_generic_notice(self, fxt_demo_files_service: DemoFilesService) -> None:
+        files = fxt_demo_files_service.build_demo_files(
+            project_id=uuid4(),
+            model_format=ModelFormat.OPENVINO,
+            license=License(name="MIT", url="https://example.com/license"),
+        )
+
+        by_name = {f.name: f.data for f in files}
+        license_text = by_name["LICENSE"].decode("utf-8")
+        readme = by_name["README.md"].decode("utf-8")
+        assert "Copyright (c) the authors of the original model and its pretrained weights" in license_text
+        assert "<copyright notice>" not in license_text
+        assert "### Attribution" not in readme
+        assert "### Modifications" in readme
+
+    @pytest.mark.parametrize("license_name", sorted(_LICENSE_FILES_BY_NAME))
+    def test_no_placeholder_left_in_license_files(self, license_name: str) -> None:
+        for data in load_license_files(license_name, attribution=_MIT_ATTRIBUTION).values():
+            assert b"<copyright notice>" not in data
