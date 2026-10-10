@@ -12,6 +12,7 @@
 
 <!-- markdownlint-disable MD042 -->
 
+[![python](https://img.shields.io/badge/python-3.11%E2%80%933.15-green)]()
 [![PyPI](https://img.shields.io/pypi/v/getitune)](https://pypi.org/project/getitune)
 [![python](https://img.shields.io/badge/python-3.11%E2%80%933.14-green)]()
 [![pytorch](https://img.shields.io/badge/pytorch-2.12-orange)]()
