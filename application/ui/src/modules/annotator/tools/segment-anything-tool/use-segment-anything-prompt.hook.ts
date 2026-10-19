@@ -21,10 +21,19 @@ interface UseSegmentAnythingPromptProps {
     roi: RegionOfInterest;
     // Points belong to the image (or video frame) they were placed on, so changing it clears the prompt.
     mediaItem: Media;
+    onDecodingError: (error: Error) => void;
 }
 
+// Superseded and cancelled decodes reject with `undefined` or an AbortError.
+const isDecodingFailure = (error: unknown): error is Error => error instanceof Error && error.name !== 'AbortError';
+
 // The preview follows the cursor until points are placed, then it follows the points.
-export const useSegmentAnythingPrompt = ({ decodingQueryFn, roi, mediaItem }: UseSegmentAnythingPromptProps) => {
+export const useSegmentAnythingPrompt = ({
+    decodingQueryFn,
+    roi,
+    mediaItem,
+    onDecodingError,
+}: UseSegmentAnythingPromptProps) => {
     const [previewShapes, setPreviewShapes] = useState<Shape[]>([]);
     const [points, setPoints] = useState<InteractiveAnnotationPoint[]>([]);
     // Decoded from the current `points`; fed back to the decoder to refine the object when a point is added.
@@ -70,6 +79,12 @@ export const useSegmentAnythingPrompt = ({ decodingQueryFn, roi, mediaItem }: Us
         setIsDecoding(false);
     };
 
+    const reportDecodingFailure = (error: unknown) => {
+        if (isDecodingFailure(error)) {
+            onDecodingError(error);
+        }
+    };
+
     // A decode still in flight belongs to the previous media item, so its result must not land on the new one.
     // Layout effect so the cancel happens during the commit, before a pending decode can resolve onto the new item.
     const cancelPendingDecodes = useEffectEvent(() => cancelDecoding());
@@ -90,7 +105,7 @@ export const useSegmentAnythingPrompt = ({ decodingQueryFn, roi, mediaItem }: Us
             return;
         }
 
-        decode([{ ...point, positive: true }]).catch(() => undefined);
+        decode([{ ...point, positive: true }]).catch(reportDecodingFailure);
     };
 
     const clearHover = () => {
@@ -119,7 +134,7 @@ export const useSegmentAnythingPrompt = ({ decodingQueryFn, roi, mediaItem }: Us
 
         decode(nextPoints, isAddingPoint ? refinementMask : undefined)
             .then((mask) => setRefinementMask(mask))
-            .catch(() => undefined);
+            .catch(reportDecodingFailure);
     };
 
     return { points, previewShapes, isDecoding, hover, clearHover, togglePoint, clear };
