@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { i18n } from '@/i18n';
-import { queryOptions, useQuery } from '@tanstack/react-query';
+import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Remote, wrap } from 'comlink';
 
 import { executeWithTimeout } from './execute-with-timeout';
@@ -89,4 +89,20 @@ export const useSegmentAnythingWorker = (enabled = true) => {
         ...segmentAnythingWorkerQueryOptions(enabled),
         select: (data) => data.instance,
     });
+};
+
+export const useRestartSegmentAnythingWorker = () => {
+    const queryClient = useQueryClient();
+
+    return (stuckInstance: SegmentAnythingRemoteInstance) => {
+        const { queryKey } = segmentAnythingWorkerQueryOptions();
+        const current = queryClient.getQueryData(queryKey);
+
+        if (current?.instance !== stuckInstance) {
+            return;
+        }
+
+        current.worker.terminate();
+        void queryClient.resetQueries({ queryKey, exact: true });
+    };
 };
