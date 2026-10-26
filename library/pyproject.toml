@@ -187,7 +187,8 @@ torchvision = [
     { index = "torch-cuda", extra = "cuda"},
 ]
 ultralytics = { git = "https://github.com/ultralytics/ultralytics.git", rev = "3d2cc01ee02206e0f7adc2c1e9c559b0b73e66a8" }
-openvino-model-api = { git = "https://github.com/open-edge-platform/model_api.git", branch = "master", subdirectory = "model_api" }
+# Git sources are pinned to exact commits (not branches) so lock refreshes cannot silently pull upstream changes.
+openvino-model-api = { git = "https://github.com/open-edge-platform/model_api.git", rev = "e6252ec796c9657ed0e1a7e78fdeea910761934e", subdirectory = "model_api" }
 
 [[tool.uv.index]]
 name = "torch-cpu"
