@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 
 import type { Media } from '@/api/types';
 
@@ -69,9 +69,10 @@ export const useSegmentAnythingPrompt = ({ decodingQueryFn, roi, mediaItem }: Us
     };
 
     // A decode still in flight belongs to the previous media item, so its result must not land on the new one.
+    // Layout effect so the cancel happens during the commit, before a pending decode can resolve onto the new item.
     const cancelPendingDecodes = useEffectEvent(() => cancelDecoding());
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         cancelPendingDecodes();
     }, [mediaItem]);
 
