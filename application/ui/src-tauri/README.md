@@ -551,11 +551,18 @@ cache to OS-conventional per-user directories (resolved via Tauri's
 | Platform | Data                                           | Logs                            | Cache (matplotlib)                           |
 | -------- | ---------------------------------------------- | ------------------------------- | -------------------------------------------- |
 | macOS    | `~/Library/Application Support/com.intel.geti` | `~/Library/Logs/com.intel.geti` | `~/Library/Caches/com.intel.geti/matplotlib` |
-| Windows  | `%APPDATA%\com.intel.geti`                     | `%APPDATA%\com.intel.geti\logs` | `%LOCALAPPDATA%\com.intel.geti\matplotlib`   |
+| Windows  | `%LOCALAPPDATA%\Intel\Geti`                    | `%LOCALAPPDATA%\Intel\Geti`     | `%LOCALAPPDATA%\com.intel.geti\matplotlib`   |
 | Linux    | `~/.local/share/com.intel.geti`                | `~/.local/state/com.intel.geti` | `~/.cache/com.intel.geti/matplotlib`         |
 
-Set `DATA_DIR`, `LOG_DIR`, or `MPLCONFIGDIR` in the environment to override
-any of them (the Rust shell only fills in what's missing).
+The logs folder holds both the backend's `app.log` and the desktop shell's
+`shell.log`.
+
+On macOS and Linux, set `DATA_DIR`, `LOG_DIR`, or `MPLCONFIGDIR` in the
+environment to override any of them (the Rust shell only fills in what's
+missing). On Windows the backend's `uwp.py` runtime hook pins data and logs to
+`%LOCALAPPDATA%\Intel\Geti` regardless of the environment; only `MPLCONFIGDIR`
+can be overridden. The WebView2 profile lives in
+`%LOCALAPPDATA%\com.intel.geti\EBWebView`.
 
 ### Cleanup / uninstall
 
@@ -566,7 +573,7 @@ build outputs.
 Windows:
 
 ```powershell
-Remove-Item -Recurse -Force "$env:APPDATA\com.intel.geti", "$env:LOCALAPPDATA\com.intel.geti"
+Remove-Item -Recurse -Force "$env:LOCALAPPDATA\Intel\Geti", "$env:LOCALAPPDATA\com.intel.geti"
 Remove-Item -Recurse -Force application\backend\dist, application\backend\build
 Remove-Item -Recurse -Force application\ui\src-tauri\target, application\ui\dist
 ```
