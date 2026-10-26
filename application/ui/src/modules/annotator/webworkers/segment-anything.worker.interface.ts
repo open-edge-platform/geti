@@ -9,5 +9,4 @@ export type SegmentAnythingWorkerInstance = SegmentAnythingModelWrapper & ProxyM
 export type SegmentAnythingWorkerApi = {
     prefetchAssets: (stallTimeoutMs: number) => Promise<void>;
     build: () => Promise<SegmentAnythingWorkerInstance>;
-    releaseAssets: () => void;
 };

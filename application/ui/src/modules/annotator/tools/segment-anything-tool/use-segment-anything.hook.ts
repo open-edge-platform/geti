@@ -78,8 +78,6 @@ const segmentAnythingWorkerQueryOptions = (enabled = true) =>
                     SAM_WORKER_INIT_TIMEOUT_MS
                 );
 
-                await samWorker.releaseAssets();
-
                 if (signal.aborted) {
                     throw signal.reason;
                 }
