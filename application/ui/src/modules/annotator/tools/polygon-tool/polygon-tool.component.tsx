@@ -4,7 +4,6 @@
 import { PointerEvent, useRef, useState, useTransition } from 'react';
 
 import { useZoom } from '@/components/zoom/zoom.provider';
-import { isPointOverPoint, isPolygonValid } from '@geti-ui/smart-tools/utils';
 import { isEmpty } from 'lodash-es';
 
 import { isLeftButton } from '../../../../shared/buttons-utils';
@@ -16,6 +15,7 @@ import { SvgToolCanvas } from '../svg-tool-canvas.component';
 import { useAddAndSelectAnnotations } from '../use-add-and-select-annotations.hook';
 import { PolygonDraw } from './polygon-draw.component';
 import {
+    canClosePolygonAt,
     drawingStyles,
     getToolIcon,
     isCloseMode,
@@ -59,17 +59,8 @@ export const PolygonTool = () => {
         (isCloseMode(mode) ? START_POINT_FIELD_FOCUS_RADIUS : START_POINT_FIELD_DEFAULT_RADIUS) / zoom
     );
 
-    const canPathBeClosed = (point: Point): boolean => {
-        const flatSegments = segments.flat();
-
-        if (isEmpty(flatSegments)) return false;
-
-        return (
-            Boolean(polygon) &&
-            isPolygonValid({ shapeType: 'polygon', points: polygon?.points ?? [] }) &&
-            isPointOverPoint(flatSegments[0], point, STARTING_POINT_RADIUS)
-        );
-    };
+    const canPathBeClosed = (point: Point): boolean =>
+        canClosePolygonAt(segments, polygon, point, STARTING_POINT_RADIUS);
 
     const handleIsStartingPointHovered = (point: Point): void => {
         if (!isCloseMode(mode) && canPathBeClosed(point)) {
