@@ -161,7 +161,7 @@ export const SegmentAnythingTool = () => {
             }}
         >
             <PreviewAnnotations previewAnnotations={previewAnnotations} image={image} />
-            <PromptPoints points={prompt.points} zoomScale={zoom.scale} />
+            <PromptPoints points={prompt.points} />
         </SvgToolCanvas>
     );
 };

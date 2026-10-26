@@ -3,16 +3,17 @@
 
 import type { InteractiveAnnotationPoint } from './segment-anything.interface';
 
-// In screen pixels; divided by the zoom scale so points keep their size while zooming.
-const RADIUS = 5;
-const STROKE_WIDTH = 1.5;
+// Divided by the zoom scale so points keep their on-screen size while zooming.
+const POINT_STYLE = {
+    r: 'calc(5px / var(--zoom-scale, 1))',
+    strokeWidth: 'calc(1.5px / var(--zoom-scale, 1))',
+};
 
 type PromptPointsProps = {
     points: InteractiveAnnotationPoint[];
-    zoomScale: number;
 };
 
-export const PromptPoints = ({ points, zoomScale }: PromptPointsProps) => {
+export const PromptPoints = ({ points }: PromptPointsProps) => {
     return (
         <g aria-label='Segment anything prompt points' pointerEvents='none'>
             {points.map((point) => (
@@ -21,10 +22,9 @@ export const PromptPoints = ({ points, zoomScale }: PromptPointsProps) => {
                     aria-label={point.positive ? 'Positive point' : 'Negative point'}
                     cx={point.x}
                     cy={point.y}
-                    r={RADIUS / zoomScale}
                     fill={point.positive ? 'var(--moss-tint-1)' : 'var(--coral-shade-1)'}
                     stroke='white'
-                    strokeWidth={STROKE_WIDTH / zoomScale}
+                    style={POINT_STYLE}
                 />
             ))}
         </g>

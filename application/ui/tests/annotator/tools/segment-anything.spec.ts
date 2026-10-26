@@ -160,6 +160,10 @@ test.describe('Segment anything tool', () => {
             await expect(positivePoints).toHaveCount(1);
             await expect(negativePoints).toHaveCount(1);
             await expect(preview).toBeVisible({ timeout: 15_000 });
+
+            // Points keep a fixed on-screen size (2 * 5px radius + 1.5px stroke) regardless of the zoom level.
+            const pointBox = await positivePoints.boundingBox();
+            expect(pointBox?.width).toBeCloseTo(11.5, 0);
         });
 
         await test.step('Clicking on an existing point removes it', async () => {
