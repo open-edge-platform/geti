@@ -5,38 +5,9 @@ import type { DatasetSubset } from '@/api/types';
 import { expect, type Page } from '@playwright/test';
 
 import { paths } from '../../src/constants/paths';
-import { withRelative } from '../utils/mouse';
 
 export class AnnotatorPage {
     constructor(private readonly page: Page) {}
-
-    getProcessingImage() {
-        return this.page.getByText('Processing image, please wait...');
-    }
-
-    // Hovers an image point with the Segment Anything tool and accepts its preview.
-    async annotateAt(x: number, y: number) {
-        const relative = await withRelative(this.page);
-        const point = relative(x, y);
-
-        await this.page.mouse.move(point.x, point.y);
-        await expect(this.page.getByLabel('Segment anything preview')).toBeVisible({ timeout: 15_000 });
-
-        await this.page.mouse.down();
-        await this.page.mouse.up();
-    }
-
-    // Shift + click places a positive Segment Anything point, Alt + click a negative one.
-    async addSegmentAnythingPoint(x: number, y: number, modifier: 'Shift' | 'Alt') {
-        const relative = await withRelative(this.page);
-        const point = relative(x, y);
-
-        await this.page.mouse.move(point.x, point.y);
-        await this.page.keyboard.down(modifier);
-        await this.page.mouse.down();
-        await this.page.mouse.up();
-        await this.page.keyboard.up(modifier);
-    }
 
     getToolOptions() {
         return this.page.getByRole('group', { name: 'tool options' });
