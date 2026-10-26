@@ -112,6 +112,8 @@ xpu = [
 ]
 ultralytics = [
     "ultralytics",
+    # Imported by ultralytics.trackers, which otherwise pip-installs it at import time.
+    "lap>=0.5.12",
 ]
 
 docs = [
