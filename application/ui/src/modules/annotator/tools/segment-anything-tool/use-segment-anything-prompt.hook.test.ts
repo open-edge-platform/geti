@@ -3,7 +3,7 @@
 
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { getMockedShape } from 'mocks/mock-annotation';
-import { getMockedMediaImage } from 'mocks/mock-media';
+import { getMockedMediaImage, getMockedVideoFrame } from 'mocks/mock-media';
 
 import type { InteractiveAnnotationPoint } from './segment-anything.interface';
 import { useSegmentAnythingPrompt } from './use-segment-anything-prompt.hook';
@@ -112,5 +112,35 @@ describe('useSegmentAnythingPrompt', () => {
         expect(result.current.points).toEqual([]);
         expect(result.current.previewShapes).toEqual([]);
         expect(result.current.isDecoding).toBe(false);
+    });
+
+    it('keeps the prompt when the same media item is passed as a new object', async () => {
+        const { result, rerender } = renderPrompt();
+
+        act(() => result.current.togglePoint({ x: 10, y: 20 }, true, HIT_RADIUS));
+        await waitFor(() => expect(result.current.previewShapes).toHaveLength(1));
+
+        rerender({ decodingQueryFn, roi: ROI, mediaItem: getMockedMediaImage({ id: 'image-1' }) });
+
+        expect(result.current.points).toHaveLength(1);
+        expect(result.current.previewShapes).toHaveLength(1);
+    });
+
+    it('clears the prompt when moving to another frame of the same video', async () => {
+        const { result, rerender } = renderHook((props) => useSegmentAnythingPrompt(props), {
+            initialProps: {
+                decodingQueryFn,
+                roi: ROI,
+                mediaItem: getMockedVideoFrame({ id: 'video-1', frame_number: 0 }),
+            },
+        });
+
+        act(() => result.current.togglePoint({ x: 10, y: 20 }, true, HIT_RADIUS));
+        await waitFor(() => expect(result.current.previewShapes).toHaveLength(1));
+
+        rerender({ decodingQueryFn, roi: ROI, mediaItem: getMockedVideoFrame({ id: 'video-1', frame_number: 1 }) });
+
+        expect(result.current.points).toEqual([]);
+        expect(result.current.previewShapes).toEqual([]);
     });
 });

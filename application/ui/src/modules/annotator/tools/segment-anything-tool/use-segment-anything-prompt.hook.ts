@@ -5,6 +5,7 @@ import { useEffectEvent, useLayoutEffect, useRef, useState } from 'react';
 
 import type { Media } from '@/api/types';
 
+import { getMediaItemKey } from '../../../../shared/media-item-utils';
 import type { Point, RegionOfInterest, Shape } from '../../../../shared/types';
 import { removeOffLimitPoints } from '../utils';
 import type { InteractiveAnnotationPoint, SegmentAnythingDecodingResult } from './segment-anything.interface';
@@ -18,7 +19,7 @@ interface UseSegmentAnythingPromptProps {
         previousMask?: Float32Array
     ) => Promise<SegmentAnythingDecodingResult>;
     roi: RegionOfInterest;
-    // Points belong to the image they were placed on, so changing it clears the prompt.
+    // Points belong to the image (or video frame) they were placed on, so changing it clears the prompt.
     mediaItem: Media;
 }
 
@@ -35,9 +36,10 @@ export const useSegmentAnythingPrompt = ({ decodingQueryFn, roi, mediaItem }: Us
     const throttledDecodingQueryFn = useSingleStackFn(decodingQueryFn);
     const cancellableDecodingQueryFn = useWithCancel(throttledDecodingQueryFn);
 
-    const [promptMediaItem, setPromptMediaItem] = useState(mediaItem);
-    if (promptMediaItem !== mediaItem) {
-        setPromptMediaItem(mediaItem);
+    const mediaItemKey = getMediaItemKey(mediaItem);
+    const [promptMediaItemKey, setPromptMediaItemKey] = useState(mediaItemKey);
+    if (promptMediaItemKey !== mediaItemKey) {
+        setPromptMediaItemKey(mediaItemKey);
         setPoints([]);
         setRefinementMask(undefined);
         setPreviewShapes([]);
@@ -74,7 +76,7 @@ export const useSegmentAnythingPrompt = ({ decodingQueryFn, roi, mediaItem }: Us
 
     useLayoutEffect(() => {
         cancelPendingDecodes();
-    }, [mediaItem]);
+    }, [mediaItemKey]);
 
     const clear = () => {
         cancelDecoding();
