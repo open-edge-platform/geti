@@ -5,7 +5,7 @@ import { buildSegmentAnythingInstance } from '@geti-ui/smart-tools/segment-anyth
 import { setOrtWasmPaths } from '@geti-ui/smart-tools/utils';
 import { expose, proxy } from 'comlink';
 
-import { ORT_WASM_ROOT, prefetchSegmentAnythingAssets, releaseSegmentAnythingAssets } from './segment-anything-assets';
+import { ORT_WASM_ROOT, prefetchSegmentAnythingAssets } from './segment-anything-assets';
 import type { SegmentAnythingWorkerApi } from './segment-anything.worker.interface';
 
 import './opencv-source';
@@ -27,7 +27,6 @@ const WorkerApi: SegmentAnythingWorkerApi = {
 
         return proxy(instance);
     },
-    releaseAssets: releaseSegmentAnythingAssets,
 };
 
 expose(WorkerApi);

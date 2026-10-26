@@ -2,29 +2,19 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { SegmentAnythingModels } from '@geti-ui/smart-tools/segment-anything';
-import { env } from 'onnxruntime-web';
 
 import { OPENCV_SOURCE_PATH } from './opencv-source';
 
 export const ORT_WASM_ROOT = `${process.env.ASSET_PREFIX}/ort/`;
 
-const toAbsoluteUrl = (url: string | URL) => new URL(url, self.location.href).href;
+// What smart-tools and ONNX Runtime download while building the SAM worker.
+const SEGMENT_ANYTHING_ASSETS = [
+    OPENCV_SOURCE_PATH,
+    `${ORT_WASM_ROOT}ort-wasm-simd-threaded.jsep.wasm`,
+    SegmentAnythingModels.decoder,
+];
 
-const OPENCV_URL = toAbsoluteUrl(OPENCV_SOURCE_PATH);
-const ORT_WASM_URL = toAbsoluteUrl(`${ORT_WASM_ROOT}ort-wasm-simd-threaded.jsep.wasm`);
-const DECODER_URL = toAbsoluteUrl(SegmentAnythingModels.decoder);
-
-const prefetchedAssets = new Map<string, ArrayBuffer>();
-const networkFetch = self.fetch.bind(self);
-
-// smart-tools fetches OpenCV and the decoder itself.
-self.fetch = (input, init) => {
-    const asset = prefetchedAssets.get(input instanceof Request ? input.url : toAbsoluteUrl(input));
-
-    return asset === undefined ? networkFetch(input, init) : Promise.resolve(new Response(asset));
-};
-
-const download = async (url: string, stallTimeoutMs: number): Promise<ArrayBuffer> => {
+const download = async (url: string, stallTimeoutMs: number): Promise<void> => {
     const controller = new AbortController();
     let stallTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -38,20 +28,17 @@ const download = async (url: string, stallTimeoutMs: number): Promise<ArrayBuffe
     try {
         restartStallTimer();
 
-        const response = await networkFetch(url, { signal: controller.signal });
+        const response = await fetch(url, { signal: controller.signal });
 
         if (!response.ok || response.body === null) {
             throw new Error(`Failed to download ${url} (${response.status})`);
         }
 
-        const restartStallTimerOnEveryChunk = new TransformStream<Uint8Array, Uint8Array>({
-            transform: (chunk, stream) => {
-                restartStallTimer();
-                stream.enqueue(chunk);
-            },
-        });
+        const reader = response.body.getReader();
 
-        return await new Response(response.body.pipeThrough(restartStallTimerOnEveryChunk)).arrayBuffer();
+        while (!(await reader.read()).done) {
+            restartStallTimer();
+        }
     } catch (error) {
         throw controller.signal.aborted ? controller.signal.reason : error;
     } finally {
@@ -59,17 +46,9 @@ const download = async (url: string, stallTimeoutMs: number): Promise<ArrayBuffe
     }
 };
 
-export const prefetchSegmentAnythingAssets = async (stallTimeoutMs: number) => {
-    const [opencv, ortWasm, decoder] = await Promise.all(
-        [OPENCV_URL, ORT_WASM_URL, DECODER_URL].map((url) => download(url, stallTimeoutMs))
-    );
-
-    prefetchedAssets.set(OPENCV_URL, opencv);
-    prefetchedAssets.set(DECODER_URL, decoder);
-    env.wasm.wasmBinary = ortWasm;
-};
-
-export const releaseSegmentAnythingAssets = () => {
-    prefetchedAssets.clear();
-    env.wasm.wasmBinary = undefined;
+// Downloads the assets into the browser cache, where smart-tools and ONNX Runtime then find them, so the
+// build/init timeouts measure compilation rather than a slow first download. A download only fails once
+// no data has arrived for `stallTimeoutMs`.
+export const prefetchSegmentAnythingAssets = async (stallTimeoutMs: number): Promise<void> => {
+    await Promise.all(SEGMENT_ANYTHING_ASSETS.map((url) => download(url, stallTimeoutMs)));
 };
