@@ -11,32 +11,31 @@ const ORT_WASM_URL = '/ort/ort-wasm-simd-threaded.jsep.wasm';
 const DECODER_URL = '/static/assets/decoder.onnx';
 const STALL_TIMEOUT_MS = 30_000;
 
-// Sends one chunk every `intervalMs`, then closes, or never closes when `chunks` is Infinity.
-const streamedResponse = (signal: AbortSignal | null | undefined, chunks: number, intervalMs: number) =>
-    new Response(
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Sends `chunks` one-byte chunks, each `intervalMs` after the previous one. Like a real fetch,
+// the body errors once the request is aborted.
+const slowResponse = (signal: AbortSignal, chunks: number, intervalMs: number) => {
+    let sent = 0;
+
+    return new Response(
         new ReadableStream<Uint8Array>({
-            start(controller) {
-                signal?.addEventListener('abort', () => controller.error(signal.reason));
+            start: (controller) => signal.addEventListener('abort', () => controller.error(signal.reason)),
+            pull: async (controller) => {
+                await delay(intervalMs);
 
-                let sent = 0;
-                const send = () => {
+                if (sent++ < chunks) {
                     controller.enqueue(new Uint8Array(1));
-                    sent += 1;
-
-                    if (sent >= chunks) {
-                        controller.close();
-                    } else if (Number.isFinite(chunks)) {
-                        setTimeout(send, intervalMs);
-                    }
-                };
-
-                send();
+                } else {
+                    controller.close();
+                }
             },
         })
     );
+};
 
-const mockNetwork = (respond: (url: string, init?: RequestInit) => Response) => {
-    const networkFetch = rs.fn(async (input: RequestInfo | URL, init?: RequestInit) => respond(String(input), init));
+const mockNetwork = (respond: (url: string, signal: AbortSignal) => Response) => {
+    const networkFetch = rs.fn(async (url: string, { signal }: { signal: AbortSignal }) => respond(url, signal));
 
     rs.stubGlobal('fetch', networkFetch);
 
@@ -61,7 +60,7 @@ describe('prefetchSegmentAnythingAssets', () => {
     });
 
     it('downloads every asset the SAM worker loads', async () => {
-        const networkFetch = mockNetwork((_url, init) => streamedResponse(init?.signal, 1, 0));
+        const networkFetch = mockNetwork(() => new Response('ok'));
         const { prefetchSegmentAnythingAssets } = await loadModule();
 
         await prefetchSegmentAnythingAssets(STALL_TIMEOUT_MS);
@@ -71,19 +70,23 @@ describe('prefetchSegmentAnythingAssets', () => {
 
     it('keeps a slow download going as long as data keeps arriving', async () => {
         rs.useFakeTimers();
-        mockNetwork((url, init) => streamedResponse(init?.signal, url === ORT_WASM_URL ? 4 : 1, STALL_TIMEOUT_MS - 1));
+        mockNetwork((url, signal) =>
+            url === ORT_WASM_URL ? slowResponse(signal, 3, STALL_TIMEOUT_MS - 1) : new Response('ok')
+        );
 
         const { prefetchSegmentAnythingAssets } = await loadModule();
         const prefetch = prefetchSegmentAnythingAssets(STALL_TIMEOUT_MS);
 
-        await rs.advanceTimersByTimeAsync(3 * (STALL_TIMEOUT_MS - 1));
+        await rs.advanceTimersByTimeAsync(4 * (STALL_TIMEOUT_MS - 1));
 
         await expect(prefetch).resolves.toBeUndefined();
     });
 
     it('fails a download once no data arrives for the stall timeout', async () => {
         rs.useFakeTimers();
-        mockNetwork((url, init) => streamedResponse(init?.signal, url === ORT_WASM_URL ? Infinity : 1, 0));
+        mockNetwork((url, signal) =>
+            url === ORT_WASM_URL ? slowResponse(signal, 1, STALL_TIMEOUT_MS + 1) : new Response('ok')
+        );
 
         const { prefetchSegmentAnythingAssets } = await loadModule();
         const rejection = expect(prefetchSegmentAnythingAssets(STALL_TIMEOUT_MS)).rejects.toThrow(
@@ -95,9 +98,7 @@ describe('prefetchSegmentAnythingAssets', () => {
     });
 
     it('fails when the server does not return the asset', async () => {
-        mockNetwork((url, init) =>
-            url === DECODER_URL ? new Response(null, { status: 404 }) : streamedResponse(init?.signal, 1, 0)
-        );
+        mockNetwork((url) => (url === DECODER_URL ? new Response(null, { status: 404 }) : new Response('ok')));
 
         const { prefetchSegmentAnythingAssets } = await loadModule();
 
