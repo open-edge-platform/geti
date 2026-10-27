@@ -60,6 +60,17 @@ class TestHFEpochSummaryCallback:
             "epoch   2/10 | train/total_loss=2.0000",
         ]
 
+    def test_partial_last_epoch_keeps_its_own_number(self, caplog: pytest.LogCaptureFixture) -> None:
+        """``max_steps`` can stop mid-epoch, leaving a fractional ``state.epoch``."""
+        cb = HFEpochSummaryCallback()
+        with caplog.at_level(logging.INFO, logger=_LOGGER):
+            cb.on_epoch_begin(None, _state(2.0), None)  # type: ignore[arg-type]
+            cb.on_log(None, _state(2.4), None, logs={"loss": 1.0})  # type: ignore[arg-type]
+            cb.on_epoch_end(None, _state(2.4), None)  # type: ignore[arg-type]
+            cb.on_train_end(None, _state(2.4), None)  # type: ignore[arg-type]
+
+        assert _messages(caplog) == ["epoch   3/10 | train/total_loss=1.0000"]
+
     def test_silent_on_non_main_process(self, caplog: pytest.LogCaptureFixture) -> None:
         cb = HFEpochSummaryCallback()
         state = _state(1.0, is_world_process_zero=False)

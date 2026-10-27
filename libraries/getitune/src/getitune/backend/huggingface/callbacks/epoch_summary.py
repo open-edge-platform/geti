@@ -17,6 +17,7 @@ learning rate.
 from __future__ import annotations
 
 import logging
+import math
 from typing import TYPE_CHECKING, Any
 
 from transformers import TrainerCallback
@@ -121,7 +122,10 @@ class HFEpochSummaryCallback(TrainerCallback):
         **kwargs: Any,  # noqa: ANN401
     ) -> None:
         """Mark the epoch as finished; the summary waits for validation, if any."""
-        self._pending_epoch = round(state.epoch) if state.epoch is not None else None
+        # ``state.epoch`` is a float advanced by ``1 / steps_in_epoch`` per step. It is
+        # whole at the end of a full epoch, but fractional (e.g. ``2.4``) when ``max_steps``
+        # stops training mid-epoch; ``ceil`` labels that partial epoch as epoch 3.
+        self._pending_epoch = math.ceil(state.epoch) if state.epoch is not None else None
 
     def on_evaluate(
         self,
