@@ -8,6 +8,7 @@ import {
     RefObject,
     SetStateAction,
     use,
+    useCallback,
     useEffect,
     useLayoutEffect,
     useMemo,
@@ -167,7 +168,7 @@ export const VideoPlayerProvider = ({ children, videoFrame, changeSelectedMediaI
         changeCurrentFrameIndex: setCurrentFrameIndex,
     });
 
-    const toggleMute = () => {
+    const toggleMute = useCallback(() => {
         setIsMuted((prevIsMuted) => {
             const nextIsMuted = !prevIsMuted;
 
@@ -179,21 +180,24 @@ export const VideoPlayerProvider = ({ children, videoFrame, changeSelectedMediaI
 
             return nextIsMuted;
         });
-    };
+    }, []);
 
-    const changePlaybackRate = (rate: number) => {
-        const previousRate = playbackRate;
-        if (videoRef.current === null) {
-            return;
-        }
+    const changePlaybackRate = useCallback(
+        (rate: number) => {
+            const previousRate = playbackRate;
+            if (videoRef.current === null) {
+                return;
+            }
 
-        try {
-            setPlaybackRate(rate);
-            videoRef.current.playbackRate = rate;
-        } catch {
-            setPlaybackRate(previousRate);
-        }
-    };
+            try {
+                setPlaybackRate(rate);
+                videoRef.current.playbackRate = rate;
+            } catch {
+                setPlaybackRate(previousRate);
+            }
+        },
+        [playbackRate]
+    );
 
     const handleEnded = () => {
         if (videoRef.current === null) {
@@ -203,27 +207,30 @@ export const VideoPlayerProvider = ({ children, videoFrame, changeSelectedMediaI
         videoRef.current.currentTime = 0;
     };
 
-    const value =
-        playingVideoFrame !== undefined
-            ? {
-                  videoFrame: playingVideoFrame,
-                  videoRef,
-                  videoControls,
+    const value = useMemo<VideoPlayerContextProps | null>(
+        () =>
+            playingVideoFrame !== undefined
+                ? {
+                      videoFrame: playingVideoFrame,
+                      videoRef,
+                      videoControls,
 
-                  toggleMute,
-                  isMuted,
+                      toggleMute,
+                      isMuted,
 
-                  playbackRate,
-                  changePlaybackRate,
+                      playbackRate,
+                      changePlaybackRate,
 
-                  changeCurrentFrameIndex: setCurrentFrameIndex,
+                      changeCurrentFrameIndex: setCurrentFrameIndex,
 
-                  step,
-                  changeStep: setStep,
+                      step,
+                      changeStep: setStep,
 
-                  videoError,
-              }
-            : null;
+                      videoError,
+                  }
+                : null,
+        [playingVideoFrame, videoControls, toggleMute, isMuted, playbackRate, changePlaybackRate, step, videoError]
+    );
 
     return (
         <VideoPlayerContext value={value}>

@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, Dispatch, ReactNode, useContext, useState } from 'react';
+import { createContext, Dispatch, ReactNode, useContext, useMemo, useState } from 'react';
 
 import { OverlayTriggerState, useOverlayTriggerState } from 'react-stately';
 
@@ -22,13 +22,12 @@ export const ImportDatasetDialogProvider = ({ children }: { children: ReactNode 
     const [currentStep, setCurrentStep] = useState<ImportDatasetAsNewProjectState>('uploading');
     const [currentStagedId, setCurrentStagedId] = useState<string | null>(null);
 
-    return (
-        <ImportDatasetDialogContext.Provider
-            value={{ datasetImportDialogState, currentStagedId, setCurrentStagedId, currentStep, setCurrentStep }}
-        >
-            {children}
-        </ImportDatasetDialogContext.Provider>
+    const value = useMemo(
+        () => ({ datasetImportDialogState, currentStagedId, setCurrentStagedId, currentStep, setCurrentStep }),
+        [datasetImportDialogState, currentStagedId, currentStep]
     );
+
+    return <ImportDatasetDialogContext value={value}>{children}</ImportDatasetDialogContext>;
 };
 
 export const useImportDatasetDialog = () => {

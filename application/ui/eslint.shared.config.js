@@ -66,6 +66,8 @@ export default [
             ],
             'react/default-props-match-prop-types': 'warn',
             'react/no-unused-prop-types': 'warn',
+            'react/no-unstable-nested-components': ['error', { allowAsProps: true }],
+            'react/jsx-no-constructed-context-values': 'error',
             'jsx-a11y/click-events-have-key-events': 'off',
             'jsx-a11y/no-noninteractive-element-interactions': 'off',
             'jsx-a11y/no-static-element-interactions': 'off',

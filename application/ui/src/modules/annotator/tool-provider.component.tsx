@@ -5,6 +5,7 @@ import {
     createContext,
     useContext,
     useEffect,
+    useMemo,
     useState,
     type Dispatch,
     type ReactNode,
@@ -58,5 +59,7 @@ export const ToolProvider = ({ children }: ToolProviderProps) => {
         setActiveTool(getDefaultTool(selectedProject.task.task_type));
     }, [selectedProject.task.task_type]);
 
-    return <ToolContext.Provider value={{ activeTool, setActiveTool }}>{children}</ToolContext.Provider>;
+    const value = useMemo(() => ({ activeTool, setActiveTool }), [activeTool]);
+
+    return <ToolContext.Provider value={value}>{children}</ToolContext.Provider>;
 };
