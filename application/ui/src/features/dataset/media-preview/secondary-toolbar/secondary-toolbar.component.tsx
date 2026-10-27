@@ -33,7 +33,7 @@ import { getNextItem } from '../../../../modules/annotator/shell/secondary-toolb
 import { Toolbar } from '../../../../modules/annotator/shell/toolbar-container/toolbar-container.component';
 import { useVideoPlayerContext } from '../../../../modules/annotator/video-player/video-player-provider.component';
 import { HOTKEYS } from '../../../../shared/hotkeys-definition';
-import { isImage, isVideoFrame } from '../../../../shared/media-item-utils';
+import { getMediaItemKey, isImage } from '../../../../shared/media-item-utils';
 import { isClassificationTask, isMultiLabelClassificationTask } from '../../../../shared/task-type-guards';
 import { DeleteMediaItem } from '../../gallery/delete-media-item/delete-media-item.component';
 import { useSubmitAnnotations } from '../api/use-submit-annotations';
@@ -189,7 +189,7 @@ export const SecondaryToolbar = ({
                     <Toolbar.Section>
                         <AnnotatorModes
                             // We want to reset annotation and/or prediction cue when media item changes
-                            key={isVideoFrame(mediaItem) ? `${mediaItem.id}-${mediaItem.frame_number}` : mediaItem.id}
+                            key={getMediaItemKey(mediaItem)}
                             mode={mode}
                             onModeChange={onModeChange}
                             hasAnnotations={!isEmpty(initialAnnotations)}

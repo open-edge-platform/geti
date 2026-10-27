@@ -6,7 +6,6 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import { toast } from '@/components/toast/toast.component';
 import { useZoom } from '@/components/zoom/zoom.provider';
 import { useTranslation } from '@/i18n';
-import { isPointOverPoint, isPolygonValid } from '@geti-ui/smart-tools/utils';
 import { useMutation } from '@tanstack/react-query';
 import { isEmpty, isEqual, throttle } from 'lodash-es';
 
@@ -17,6 +16,7 @@ import { useSelectedMediaItem } from '../../selected-media-item-provider.compone
 import { usePolygonConfig } from '../hooks/use-polygon-config.hook';
 import { PolygonDraw } from '../polygon-tool/polygon-draw.component';
 import {
+    canClosePolygonAt,
     drawingStyles,
     getToolIcon,
     isCloseMode,
@@ -105,17 +105,8 @@ export const MagneticLasso = () => {
         }
     };
 
-    const canPathBeClosed = (point: Point): boolean => {
-        const flatSegments = segments.flat();
-
-        if (isEmpty(flatSegments)) return false;
-
-        return (
-            Boolean(polygon) &&
-            isPolygonValid({ shapeType: 'polygon', points: polygon?.points ?? [] }) &&
-            isPointOverPoint(flatSegments[0], point, STARTING_POINT_RADIUS)
-        );
-    };
+    const canPathBeClosed = (point: Point): boolean =>
+        canClosePolygonAt(segments, polygon, point, STARTING_POINT_RADIUS);
 
     const handleIsStartingPointHovered = (point: Point): void => {
         if (!isCloseMode(mode) && canPathBeClosed(point)) {
