@@ -15,7 +15,7 @@ import { useStreamJobDetail } from './jobs.hook';
 type UseImportJobStatusProps = {
     jobId: string | null | undefined;
     onError?: (error?: unknown) => void;
-    onSuccess?: () => Promise<void>;
+    onSuccess?: () => void | Promise<void>;
 };
 
 export const useImportJobStatus = ({ jobId, onError, onSuccess }: UseImportJobStatusProps) => {

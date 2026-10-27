@@ -238,7 +238,9 @@ export function convertToolShapeToGetiShape(shape: SmartToolsShape): Shape {
                 width: shape.width,
                 height: shape.height,
             };
-        default:
+        case 'pose':
+        case 'circle':
+        case 'rotated-rect':
             throw new Error('Unknown shape type');
     }
 }
