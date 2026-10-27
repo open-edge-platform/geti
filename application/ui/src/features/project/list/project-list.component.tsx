@@ -148,11 +148,15 @@ const ProjectGrid = ({ jobsButton }: { jobsButton?: ReactNode }) => {
             />
 
             <Flex direction={'column'} gap={'size-300'} flex={1} minWidth={0} UNSAFE_className={classes.gridPanel}>
-                <Flex width={'100%'} alignItems={'center'} justifyContent={'space-between'} gap={'size-300'}>
+                <Flex wrap width={'100%'} alignItems={'center'} justifyContent={'space-between'} gap={'size-300'}>
                     {shouldShowFilters && <SortProjects sortBy={sortBy} onSort={setSortBy} />}
 
                     <Flex marginStart={'auto'} alignItems={'center'} gap={'size-75'}>
-                        {shouldShowFilters && <Text UNSAFE_className={classes.projectMetadata}>{countLabel}</Text>}
+                        {shouldShowFilters && (
+                            <span role='status' className={classes.projectMetadata}>
+                                {countLabel}
+                            </span>
+                        )}
                         <ProjectListActions jobsButton={jobsButton} />
                     </Flex>
                 </Flex>

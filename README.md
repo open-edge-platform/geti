@@ -24,7 +24,7 @@
  <img src="assets/model-lifecycle-infinity-light.png" width="600" alt="Geti™ - Learning Cycle"/>
 </p>
 
-The Geti™ application is powered by **_getitune_**, its engine for model training and optimization, which is also available standalone as a Python library. Choose the application for a no-code experience, or the `getitune` Python API for code-first workflows — both paths lead to production-ready models. Both are developed in this repository, under [`application/`](application/) and [`library/`](library/).
+The Geti™ application is powered by **_getitune_**, its engine for model training and optimization, which is also available standalone as a Python library. Choose the application for a no-code experience, or the `getitune` Python API for code-first workflows — both paths lead to production-ready models. Both are developed in this repository, under [`application/`](application/) and [`libraries/getitune/`](libraries/getitune/).
 
 ## Full lifecycle with an intuitive SME interface
 
@@ -50,7 +50,7 @@ For complete, step-by-step instructions - including prerequisites, GPU/accelerat
 Geti's training engine is also available on PyPI as `getitune`, an open-source Python library for training, optimizing, and deploying models.
 
 <p align="center">
-  <img src="library/assets/getitune-demo.gif" alt="Train and optimize a model with the getitune Python API" width="80%">
+  <img src="libraries/getitune/assets/getitune-demo.gif" alt="Train and optimize a model with the getitune Python API" width="80%">
 </p>
 
 <details>
@@ -63,7 +63,9 @@ uv pip install getitune # CPU-only by default
 ```
 
 > [!IMPORTANT]  
-> The PyPI package does NOT include **Ultralytics YOLO models**, which are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license). To enable these models, build from source with the `ultralytics` extra as explained in the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/installation).
+> **Ultralytics YOLO models** are NOT included in the package by default. To install these models, which are distributed
+> under the [AGPL-3.0 license](./THIRD-PARTY-NOTICES.md#ultralytics), you must specify the `ultralytics` extra as
+> explained in the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/installation).
 
 **Pick a model, then train, export, and quantize it:**
 
@@ -125,7 +127,7 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
   </thead>
   <tbody>
     <tr>
-      <td rowspan="11"><b>Object Detection</b><br>Locate and classify objects with bounding boxes. Common use cases: counting items, defect localization, surveillance.</td>
+      <td rowspan="12"><b>Object Detection</b><br>Locate and classify objects with bounding boxes. Common use cases: counting items, defect localization, surveillance.</td>
       <td>D-FINE M / L / X</td>
       <td><a href="https://arxiv.org/abs/2412.04234">DEIM</a> + <a href="https://arxiv.org/abs/2410.13842">D-FINE</a></td>
     </tr>
@@ -154,6 +156,10 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2304.08069">RT-DETR</a></td>
     </tr>
     <tr>
+      <td>RT-DETRv2 R18 / R34 / R50 / R101</td>
+      <td><a href="https://arxiv.org/abs/2407.17140">RT-DETRv2</a></td>
+    </tr>
+    <tr>
       <td>YOLO11 N / S / M / L / X</td>
       <td><a href="https://docs.ultralytics.com/models/yolo11#overview">Ultralytics YOLO11</a></td>
     </tr>
@@ -170,9 +176,17 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2107.08430">YOLOX</a></td>
     </tr>
     <tr>
-      <td rowspan="7"><b>Instance Segmentation</b><br>Detect objects and produce pixel-precise masks per instance. Common use cases: medical imaging, robotics, area estimation.</td>
-      <td>RTMDet Tiny</td>
-      <td><a href="https://arxiv.org/abs/2212.07784">RTMDet</a></td>
+      <td rowspan="10"><b>Instance Segmentation</b><br>Detect objects and produce pixel-precise masks per instance. Common use cases: medical imaging, robotics, area estimation.</td>
+      <td>EoMT Large 640</td>
+      <td><a href="https://arxiv.org/abs/2503.19108">EoMT</a></td>
+    </tr>
+    <tr>
+      <td>EoMT-DINOv3 Large 640</td>
+      <td><a href="https://arxiv.org/abs/2508.10104">DINOv3</a> + <a href="https://arxiv.org/abs/2503.19108">EoMT</a></td>
+    </tr>
+    <tr>
+      <td>Mask2Former Swin-T / S / B / L</td>
+      <td><a href="https://arxiv.org/abs/2112.01527">Mask2Former</a></td>
     </tr>
     <tr>
       <td>Mask-RCNN EfficientNet B2</td>
@@ -191,6 +205,10 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2511.09554">RF-DETR</a></td>
     </tr>
     <tr>
+      <td>RTMDet Tiny</td>
+      <td><a href="https://arxiv.org/abs/2212.07784">RTMDet</a></td>
+    </tr>
+    <tr>
       <td>YOLO11 N / S / M / L / X</td>
       <td><a href="https://docs.ultralytics.com/models/yolo11#overview">Ultralytics YOLO11</a></td>
     </tr>
@@ -199,9 +217,17 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
     </tr>
     <tr>
-      <td rowspan="7"><b>Classification</b> (multi-class, multi-label)<br>Assign one or more labels to an entire image. Common use cases: defect classification, product categorization, content tagging.</td>
-      <td>ViT Tiny</td>
-      <td><a href="https://arxiv.org/abs/2010.11929">ViT</a></td>
+      <td rowspan="10"><b>Classification</b> (multi-class, multi-label)<br>Assign one or more labels to an entire image. Common use cases: defect classification, product categorization, content tagging.</td>
+      <td>ConvNeXt T / S / B / L</td>
+      <td><a href="https://arxiv.org/abs/2201.03545">ConvNeXt</a></td>
+    </tr>
+    <tr>
+      <td>ConvNeXt V2 A / B / L</td>
+      <td><a href="https://arxiv.org/abs/2301.00808">ConvNeXt V2</a></td>
+    </tr>
+    <tr>
+      <td>DINOv3 ViT S / B / L</td>
+      <td><a href="https://arxiv.org/abs/2508.10104">DINOv3</a></td>
     </tr>
     <tr>
       <td>DINOv2 Small</td>
@@ -218,6 +244,10 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
     <tr>
       <td>MobileNet V3 Large</td>
       <td><a href="https://arxiv.org/abs/1905.02244">MobileNetV3</a></td>
+    </tr>
+    <tr>
+      <td>ViT Tiny</td>
+      <td><a href="https://arxiv.org/abs/2010.11929">ViT</a></td>
     </tr>
     <tr>
       <td>YOLO26 N / S / M / L / X</td>
@@ -320,13 +350,12 @@ For developers who would like to contribute with a pull request, see the [Contri
 
 ## License
 
-Geti™ is licensed under the [Apache License Version 2.0](LICENSE).
+Geti™ source code is licensed under the [Apache License Version 2.0](LICENSE).
+Docker images contain Geti™ components licensed under Apache 2.0 and may also contain third-party components governed by
+different license terms, listed separately in [this file](THIRD-PARTY-NOTICES.md).
+The Windows MSIX App is licensed under the [Intel Simplified Software License](https://software.intel.com/sites/landingpage/pintool/intel-simplified-software-license.txt).
 
-## Disclaimers
+Regarding models trained with Geti™, their license depends on the model type and is indicated within the application;
+most are licensed under Apache 2.0, while some fall under more restrictive licenses (e.g. [Ultralytics AGPL3.0 models](./THIRD-PARTY-NOTICES.md#ultralytics)).
 
-Geti™ utilizes FFmpeg.
-
-FFmpeg is an open source project licensed under LGPL and GPL. See [https://www.ffmpeg.org/legal.html](https://www.ffmpeg.org/legal.html). You are solely responsible for determining if your use of FFmpeg requires any additional licenses. Intel is not responsible for obtaining any such licenses, nor liable for any licensing fees due, in connection with your use of FFmpeg.
-
-> [!NOTE]
-> Ultralytics YOLO models are distributed under the AGPL-3.0 license, an OSI approved license ideal for open-source research, academic, and personal projects. For commercial use, enhanced support, and tailored licensing terms, please explore flexible Ultralytics licensing options at https://www.ultralytics.com/license.
+It is the end user's responsibility to ensure that the specific use of Geti™ and the models complies with the respective licenses.
