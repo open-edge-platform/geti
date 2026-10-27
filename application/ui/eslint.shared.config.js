@@ -208,7 +208,14 @@ export default [
             },
         },
         rules: {
-            '@typescript-eslint/no-floating-promises': 'error',
+            '@typescript-eslint/no-floating-promises': [
+                'error',
+                {
+                    // In data-router mode `navigate()` returns a Promise that only signals navigation
+                    // completion; errors go to the route's errorElement, so it is safe to not await it.
+                    allowForKnownSafeCalls: [{ from: 'package', name: 'NavigateFunction', package: 'react-router' }],
+                },
+            ],
             '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: { attributes: false } }],
             '@typescript-eslint/await-thenable': 'error',
             '@typescript-eslint/switch-exhaustiveness-check': 'error',
