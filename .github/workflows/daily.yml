@@ -13,7 +13,6 @@ jobs:
     uses: $/.github/workflows/build.yaml
     with:
       use-cache: false # Verify image is buildable from scratch without any cached layers
-      exclude-agpl-models: true # Daily images (pushed to GHCR) must not bundle AGPL-licensed models
     permissions:
       contents: read
       packages: write # to push Docker images to GHCR
@@ -26,9 +25,9 @@ jobs:
     permissions:
       contents: read
 
-  lib-lint-and-test:
-    name: Daily library lint and test
-    uses: $/.github/workflows/lib-lint-and-test.yaml
+  getitune-lint-and-test:
+    name: Daily getitune lint and test
+    uses: $/.github/workflows/getitune-lint-and-test.yaml
     permissions:
       contents: read
       id-token: write # The id-token permission is required by Codecov to use OIDC
@@ -62,7 +61,7 @@ jobs:
     needs:
       - build
       - backend-lint-and-test
-      - lib-lint-and-test
+      - getitune-lint-and-test
       - ui-lint-and-test
       - windows-installer
     if: failure()
@@ -73,7 +72,7 @@ jobs:
     steps:
       - &harden-runner
         name: Harden the runner (audit all outbound calls)
-        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        uses: step-security/harden-runner@ccd8616d44fd3846e67624a50d5aad6d37bf2d25 # v2.22.1
         with:
           egress-policy: audit
 
@@ -114,7 +113,7 @@ jobs:
     needs:
       - build
       - backend-lint-and-test
-      - lib-lint-and-test
+      - getitune-lint-and-test
       - ui-lint-and-test
       - windows-installer
       - check-existing-issue

@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { $api } from '@/api';
-import { usePrefetchQuery, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { QueryClient, usePrefetchQuery, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
 import { getQueryKey } from '../../query-client/query-client';
+import { PROJECTS_QUERY_KEY } from './project.hook';
 
 const getPipelineQueryOptions = (projectId: string) => {
     return $api.queryOptions('get', '/api/projects/{project_id}/pipeline', {
@@ -95,6 +96,14 @@ export const usePatchPipeline = () => {
     });
 };
 
+const invalidatePipelineAndProjects = (queryClient: QueryClient, project_id: string) =>
+    Promise.all([
+        queryClient.invalidateQueries({
+            queryKey: getQueryKey(['get', '/api/projects/{project_id}/pipeline', { params: { path: { project_id } } }]),
+        }),
+        queryClient.invalidateQueries({ queryKey: PROJECTS_QUERY_KEY }),
+    ]);
+
 export const useEnablePipeline = () => {
     const queryClient = useQueryClient();
 
@@ -106,20 +115,7 @@ export const useEnablePipeline = () => {
                     path: { project_id },
                 },
             }
-        ) => {
-            return Promise.all([
-                queryClient.invalidateQueries({
-                    queryKey: getQueryKey([
-                        'get',
-                        '/api/projects/{project_id}/pipeline',
-                        { params: { path: { project_id } } },
-                    ]),
-                }),
-                queryClient.invalidateQueries({
-                    queryKey: getQueryKey(['get', '/api/projects']),
-                }),
-            ]);
-        },
+        ) => invalidatePipelineAndProjects(queryClient, project_id),
     });
 };
 
@@ -134,20 +130,7 @@ export const useDisablePipeline = () => {
                     path: { project_id },
                 },
             }
-        ) => {
-            return Promise.all([
-                queryClient.invalidateQueries({
-                    queryKey: getQueryKey([
-                        'get',
-                        '/api/projects/{project_id}/pipeline',
-                        { params: { path: { project_id } } },
-                    ]),
-                }),
-                queryClient.invalidateQueries({
-                    queryKey: getQueryKey(['get', '/api/projects']),
-                }),
-            ]);
-        },
+        ) => invalidatePipelineAndProjects(queryClient, project_id),
     });
 };
 

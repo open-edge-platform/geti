@@ -19,9 +19,10 @@ import { PrimaryToolbar } from '../../../modules/annotator/shell/primary-toolbar
 import { AnnotatorCanvasSettings } from '../../../modules/annotator/shell/primary-toolbar/settings/annotator-canvas-settings.component';
 import { useNextMediaPrefetch, usePlayPauseVideoBySystem } from '../../../modules/annotator/shell/utils';
 import { ToolManagerProvider } from '../../../modules/annotator/tools/tool-manager-provider.component';
+import { ToolOptions } from '../../../modules/annotator/tools/tool-options/tool-options.component';
 import { VideoPlayerProvider } from '../../../modules/annotator/video-player/video-player-provider.component';
 import { VideoToolbar } from '../../../modules/annotator/video-player/video-toolbar/video-toolbar.component';
-import { isVideo, isVideoFrame } from '../../../shared/media-item-utils';
+import { getMediaItemKey, isVideo, isVideoFrame } from '../../../shared/media-item-utils';
 import { SecondaryToolbar } from './secondary-toolbar/secondary-toolbar.component';
 import { useNextPredictionPrefetch } from './use-next-prediction-prefetch.hook';
 
@@ -29,14 +30,10 @@ const DATASET_SUBSETS: DatasetSubset[] = ['unassigned', 'training', 'validation'
 
 const isDatasetSubset = (key: Key | null): key is DatasetSubset => DATASET_SUBSETS.includes(key as DatasetSubset);
 
-const constructMediaItemId = (mediaItem: Media): string => {
-    return isVideoFrame(mediaItem) ? `${mediaItem.id}-${mediaItem.frame_number}` : mediaItem.id;
-};
-
 const useSubset = (subset: DatasetSubset, mediaItem: Media) => {
     const [pendingSubset, setPendingSubset] = useState<DatasetSubset>(subset);
-    const prevMediaItemIdRef = useRef<string>(constructMediaItemId(mediaItem));
-    const currentMediaItemId = constructMediaItemId(mediaItem);
+    const prevMediaItemIdRef = useRef<string>(getMediaItemKey(mediaItem));
+    const currentMediaItemId = getMediaItemKey(mediaItem);
     const prevSubsetRef = useRef(subset);
 
     if (prevMediaItemIdRef.current !== currentMediaItemId) {
@@ -165,6 +162,7 @@ const Annotator = ({
                         isReadOnly={isPredictionMode}
                     />
                 </AnnotatorCanvasSettings>
+                {isAnnotationMode && <ToolOptions />}
             </View>
         </>
     );

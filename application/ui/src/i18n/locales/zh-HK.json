@@ -74,8 +74,7 @@
             "model": "模型",
             "jobs": "工作",
             "labels": "標籤",
-            "bytesTransferred": "{{transferred}} / {{total}}",
-            "language": "語言"
+            "bytesTransferred": "{{transferred}} / {{total}}"
         },
         "viewModes": {
             "large": "大縮略圖",
@@ -104,7 +103,11 @@
         "modelsDescription": "模型頁面，用於瀏覽模型",
         "inference": "推理",
         "inferenceDescription": "推理頁面，用於檢視項目的即時推理效果",
-        "preferences": "偏好設定"
+        "help": {
+            "documentation": "用戶文件",
+            "whatsNew": "新功能",
+            "reportIssue": "報告問題"
+        }
     },
     "dataset": {
         "validation": {
@@ -128,7 +131,7 @@
             "deleteTitle": "刪除確認",
             "deleteConfirmation": "確定要刪除數據集視圖「{{viewName}}」嗎？",
             "deleteSuccess": "數據集視圖「{{viewName}}」已成功刪除。",
-            "unassignFromView": "從該視圖移除",
+            "unassignFromView": "從該視圖取消分配",
             "selectedMediaCount_one": "已選 {{count}} 個媒體檔案",
             "selectedMediaCount_other": "已選 {{count}} 個媒體檔案"
         },
@@ -312,7 +315,7 @@
                 "unsupportedItemsEmptyLabels": "空白標籤",
                 "unsupportedItemsVideos": "影片",
                 "unsupportedItems": "要保留{{items}}，請使用 Geti 匯出格式。",
-                "subsetNotIncluded": "匯出的數據集不包含各媒體檔案的數據子集資訊。"
+                "subsetNotIncluded": "匯出的數據集不包含各媒體檔案所屬的子集資訊。"
             }
         },
         "importExport": {
@@ -589,7 +592,7 @@
             "manageProjects": "管理項目",
             "enablePipelineBlocked": {
                 "title": "無法啟用管線",
-                "message": "請確保在啟用管線之前，已選擇模型和來源。"
+                "message": "請確保在啟用管線之前，已選擇模型和輸入源。"
             }
         },
         "taskTypes": {
@@ -607,7 +610,9 @@
             "createNewProject": "新增項目",
             "createProjectFromDataset": "從數據集建立",
             "card": {
-                "created": "建立於：{{date}}"
+                "created": "建立於：{{date}}",
+                "models_one": "{{count}} 個模型",
+                "models_other": "{{count}} 個模型"
             },
             "menu": {
                 "enablePipeline": "啟用管線",
@@ -622,7 +627,9 @@
             },
             "filters": {
                 "searchPlaceholder": "搜尋項目",
-                "taskType": "依工作類型篩選"
+                "taskType": "依工作類型篩選",
+                "models": "依模型篩選",
+                "withTrainedModels": "有已訓練模型"
             },
             "noMatches": {
                 "title": "沒有符合條件的項目",
@@ -781,6 +788,7 @@
                 "unknownError": "發生未知錯誤，請重新整理頁面重試。",
                 "timeoutError": "{{operation}} 在 {{timeoutMs}}ms 後逾時，請嘗試重新整理頁面。",
                 "embeddingError": "無法取得圖片嵌入（{{status}}{{statusText}}）。",
+                "hint": "Shift + 按一下以包含區域，Alt + 按一下以排除區域。按一下以建立標註，按 Esc 清除這些點。",
                 "operations": {
                     "workerBuild": "SAM 背景程式建置",
                     "workerInit": "SAM 背景程式初始化",
@@ -803,6 +811,12 @@
                 "error": "檢測助手工具發生錯誤：{{message}}",
                 "operations": {
                     "workerBuild": "檢測助手工作進程建置"
+                },
+                "options": {
+                    "accept": "接受",
+                    "reject": "拒絕",
+                    "numberOfItems": "項目數量",
+                    "autoMergeDuplicates": "自動合併重複項"
                 }
             }
         },
@@ -894,7 +908,7 @@
                     "map50OnCoco": "COCO mAP50"
                 },
                 "card": {
-                    "numberOfParameters": "參數量：{{count}} 百萬",
+                    "numberOfParameters": "參數量：{{count}} M",
                     "gigaflops": "Gigaflops：{{value}}"
                 },
                 "sort": {
@@ -914,7 +928,7 @@
                     "selectVariantPlaceholder": "選擇變體",
                     "pretrainedWeightsLabel": "預訓練權重",
                     "selectWeightsPlaceholder": "選擇權重",
-                    "parameters": "參數量：{{count}} 百萬",
+                    "parameters": "參數量：{{count}} M",
                     "gigaflops": "GigaFlops：{{value}}"
                 }
             },
@@ -950,11 +964,11 @@
                 }
             },
             "validation": {
-                "notEnoughAnnotations": "要訓練模型，數據集中至少需要標註 3 項，不過為獲得更好的效果，建議多標註一些。",
-                "notEnoughAnnotationsInView": "要訓練模型，所選數據集視圖中至少需要標註 3 項，不過為獲得更好的效果，建議多標註一些。",
-                "emptySubsetsReason": "要訓練模型，每個子集（訓練集、驗證集、測試集）至少需要包含一項。目前不滿足該條件，因為{{subsetClause}}，且{{assignmentDetail}}。",
-                "emptySubsetClause_one": "{{list}} 子集為空",
-                "emptySubsetClause_other": "{{list}} 子集均為空",
+                "notEnoughAnnotations": "要訓練模型，至少需要在數據集中標註 3 項，為獲得更好的效果，建議標註更多。",
+                "notEnoughAnnotationsInView": "要訓練模型，至少需要在所選數據集視圖中標註 3 項，為獲得更好的效果，建議標註更多。",
+                "emptySubsetsReason": "要訓練模型，每個子集（訓練集、驗證集、測試集）至少需要包含一個條目。目前尚未滿足該條件，因為 {{subsetClause}} 為空，且 {{assignmentDetail}}。",
+                "emptySubsetClause_one": "{{list}} 子集",
+                "emptySubsetClause_other": "{{list}} 子集",
                 "reviewedOnly_one": "還有 {{count}} 個已審核項待分配",
                 "reviewedOnly_other": "還有 {{count}} 個已審核項待分配",
                 "unannotatedOnly_one": "還有 {{count}} 項需先完成標註才能分配",
@@ -1008,7 +1022,7 @@
                         "automatic": "自動",
                         "custom": "自訂"
                     },
-                    "offDescription": "模型將整張圖片作為一個整體處理，不劃分為更小的圖塊。這種方式簡單直接，但在高解像度圖片中偵測小物件時可能效果欠佳，因為模型可能遺漏精細細節",
+                    "offDescription": "模型將整張圖片作為一個整體處理，不劃分為更小的圖塊。這種方式簡單直接，但在高解像度圖片中偵測小物件時可能效果欠佳，因為模型可能遺漏細節",
                     "automaticDescription": "這意味著系統將根據圖片解像度和標註尺寸自動設定參數。"
                 },
                 "intensityMapping": {
@@ -1134,7 +1148,11 @@
         },
         "meta": {
             "started": "開始於 {{time}}",
-            "elapsed": "已用時間 {{time}}"
+            "elapsed": "已用時間 {{time}}",
+            "duration": "持續時間 {{time}}",
+            "finished": "完成於 {{time}}",
+            "failed": "失敗於 {{time}}",
+            "cancelled": "取消於 {{time}}"
         },
         "emptyState": {
             "all": "此類別中沒有工作",
