@@ -3,12 +3,14 @@
 
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 
-import type { ModelArchitecture as ModelArchitectureType, ModelArchitectureWithPerformanceCategory } from '@/api/types';
+import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
+import { ThumbsUp } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 import { Content, ContextualHelp, Divider, Flex, Heading, Radio, Text } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 
 import { ModelLicenseLink } from '../../../components/model-license-link.component';
+import { ModelBadge } from '../../../model-listing/components/model-row/model-badge.component';
 import { getAccuracyMetric } from '../utils';
 
 import classes from './model-architecture-card.module.scss';
@@ -45,24 +47,6 @@ const License = () => {
 const ModelArchitectureParameters = () => {
     const { modelArchitecture } = useModelArchitecture();
     const { t } = useTranslation();
-
-    return (
-        <ul className={classes.modelArchitectureParameters}>
-            {modelArchitecture.stats !== null && (
-                <li>
-                    {t('models.training.architectures.card.numberOfParameters', {
-                        count: modelArchitecture.stats.trainable_parameters,
-                    })}
-                </li>
-            )}
-            <License />
-        </ul>
-    );
-};
-
-const ModelArchitectureDetailedParameters = () => {
-    const { modelArchitecture } = useModelArchitecture();
-    const { t } = useTranslation();
     const accuracyMetric = getAccuracyMetric(modelArchitecture, t);
 
     return (
@@ -91,6 +75,22 @@ const ModelArchitectureDetailedParameters = () => {
     );
 };
 
+const ModelArchitectureRecommendedBadge = () => {
+    const { t } = useTranslation();
+    const { modelArchitecture } = useModelArchitecture();
+
+    if (modelArchitecture.performanceCategory === undefined) {
+        return null;
+    }
+
+    return (
+        <ModelBadge color={'var(--spectrum-global-color-gray-100)'}>
+            <ThumbsUp />
+            <Text>{t('models.training.architectures.card.recommended')}</Text>
+        </ModelBadge>
+    );
+};
+
 const ModelArchitectureName = () => {
     const { modelArchitecture, isSelected } = useModelArchitecture();
 
@@ -113,7 +113,7 @@ const ModelArchitectureName = () => {
 
 type ModelArchitectureContextProps = {
     isSelected: boolean;
-    modelArchitecture: ModelArchitectureType;
+    modelArchitecture: ModelArchitectureWithPerformanceCategory;
 };
 
 const ModelArchitectureContext = createContext<ModelArchitectureContextProps | null>(null);
@@ -150,11 +150,7 @@ export const ModelArchitectureCard = ({
                     [classes.modelArchitectureSelected]: isSelected,
                 })}
                 onClick={onSelect}
-                aria-label={
-                    modelArchitecture.performanceCategory === undefined
-                        ? modelArchitecture.name
-                        : `${modelArchitecture.name} - ${modelArchitecture.performanceCategory}`
-                }
+                aria-label={modelArchitecture.name}
                 data-architecture-name={modelArchitecture.name}
             >
                 {children}
@@ -165,6 +161,6 @@ export const ModelArchitectureCard = ({
 
 ModelArchitectureCard.Name = ModelArchitectureName;
 ModelArchitectureCard.Parameters = ModelArchitectureParameters;
-ModelArchitectureCard.DetailedParameters = ModelArchitectureDetailedParameters;
+ModelArchitectureCard.RecommendedBadge = ModelArchitectureRecommendedBadge;
 ModelArchitectureCard.Divider = ModelArchitectureDivider;
 ModelArchitectureCard.Description = ModelArchitectureDescription;
