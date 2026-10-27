@@ -6,7 +6,6 @@ import { useActionState } from 'react';
 import type { SinkConfig } from '@/api/types';
 import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
-import { isFunction } from 'lodash-es';
 
 import { getErrorMessage } from '../../../../query-client/query-client';
 import { useSinkMutation } from './use-sink-mutation.hook';
@@ -14,7 +13,7 @@ import { useSinkMutation } from './use-sink-mutation.hook';
 interface useSinkActionProps<T> {
     config: Awaited<T>;
     isNewSink: boolean;
-    onSaved?: (sink_id: string) => void;
+    onSaved?: (sink_id: string) => void | Promise<void>;
     bodyFormatter: (formData: FormData) => T;
 }
 
@@ -38,7 +37,7 @@ export const useSinkAction = <T extends SinkConfig>({
                 message: isNewSink ? t('inference.sinks.form.createSuccess') : t('inference.sinks.form.updateSuccess'),
             });
 
-            isFunction(onSaved) && onSaved(sink_id);
+            void onSaved?.(sink_id);
 
             return { ...body, id: sink_id };
         } catch (error: unknown) {
