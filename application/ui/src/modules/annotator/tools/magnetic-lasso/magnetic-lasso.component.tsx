@@ -6,7 +6,6 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import { toast } from '@/components/toast/toast.component';
 import { useZoom } from '@/components/zoom/zoom.provider';
 import { useTranslation } from '@/i18n';
-import { isPointOverPoint, isPolygonValid } from '@geti-ui/smart-tools/utils';
 import { useMutation } from '@tanstack/react-query';
 import { isEmpty, isEqual, throttle } from 'lodash-es';
 
@@ -17,11 +16,12 @@ import { useSelectedMediaItem } from '../../selected-media-item-provider.compone
 import { usePolygonConfig } from '../hooks/use-polygon-config.hook';
 import { PolygonDraw } from '../polygon-tool/polygon-draw.component';
 import {
+    canClosePolygonAt,
     drawingStyles,
     getToolIcon,
     isCloseMode,
     isPolygonReadyToClose,
-    leftRightMouseButtonHandler,
+    leftMouseButtonHandler,
     PolygonMode,
     START_POINT_FIELD_DEFAULT_RADIUS,
     START_POINT_FIELD_FOCUS_RADIUS,
@@ -58,7 +58,6 @@ export const MagneticLasso = () => {
         setSegments,
         resetTool,
         optimizePolygonOrSegments,
-        onPointerMoveRemove,
         setPointFromEvent,
     } = usePolygonConfig({ image, zoom, canvasRef });
 
@@ -106,17 +105,8 @@ export const MagneticLasso = () => {
         }
     };
 
-    const canPathBeClosed = (point: Point): boolean => {
-        const flatSegments = segments.flat();
-
-        if (isEmpty(flatSegments)) return false;
-
-        return (
-            Boolean(polygon) &&
-            isPolygonValid({ shapeType: 'polygon', points: polygon?.points ?? [] }) &&
-            isPointOverPoint(flatSegments[0], point, STARTING_POINT_RADIUS)
-        );
-    };
+    const canPathBeClosed = (point: Point): boolean =>
+        canClosePolygonAt(segments, polygon, point, STARTING_POINT_RADIUS);
 
     const handleIsStartingPointHovered = (point: Point): void => {
         if (!isCloseMode(mode) && canPathBeClosed(point)) {
@@ -165,7 +155,7 @@ export const MagneticLasso = () => {
         worker?.buildMap(point);
     };
 
-    const onPointerDown = leftRightMouseButtonHandler(
+    const onPointerDown = leftMouseButtonHandler(
         setPointFromEvent((point: Point): void => {
             if (isLoading.current) {
                 return;
@@ -176,14 +166,7 @@ export const MagneticLasso = () => {
             if (!buildMapPoint.current || !isEqual(buildMapPoint.current, point)) {
                 setBuildMapAndSegment(point);
             }
-        }),
-        () => {
-            setMode(PolygonMode.Eraser);
-
-            isLoading.current = false;
-            buildMapPoint.current = null;
-            worker?.cleanPoints();
-        }
+        })
     );
 
     const onPointerMove = throttle(
@@ -207,29 +190,31 @@ export const MagneticLasso = () => {
         250
     );
 
-    const onPointerUp = setPointFromEvent((point: Point): void => {
-        const canBeClosed = canPathBeClosed(point);
+    const onPointerUp = leftMouseButtonHandler(
+        setPointFromEvent((point: Point): void => {
+            const canBeClosed = canPathBeClosed(point);
 
-        if (isFreeDrawingAndPathCannotBeClosed(canBeClosed)) {
-            setBuildMapAndSegment(point);
-        }
+            if (isFreeDrawingAndPathCannotBeClosed(canBeClosed)) {
+                setBuildMapAndSegment(point);
+            }
 
-        if (canBeClosed) {
-            complete();
-            resetTool();
+            if (canBeClosed) {
+                complete();
+                resetTool();
 
-            isLoading.current = false;
-            worker?.cleanPoints();
-            pendingHistoryCommit.current = false;
-        } else if (pendingHistoryCommit.current) {
-            setSegments((prev) => prev);
-            pendingHistoryCommit.current = false;
-        }
+                isLoading.current = false;
+                worker?.cleanPoints();
+                pendingHistoryCommit.current = false;
+            } else if (pendingHistoryCommit.current) {
+                setSegments((prev) => prev);
+                pendingHistoryCommit.current = false;
+            }
 
-        setMode(PolygonMode.MagneticLasso);
-        isPointerDown.current = false;
-        isFreeDrawing.current = false;
-    });
+            setMode(PolygonMode.MagneticLasso);
+            isPointerDown.current = false;
+            isFreeDrawing.current = false;
+        })
+    );
 
     return (
         <SvgToolCanvas
@@ -238,8 +223,8 @@ export const MagneticLasso = () => {
             aria-label={'polygon tool'}
             onPointerUp={onPointerUp}
             onPointerDown={onPointerDown}
-            onPointerMove={mode === PolygonMode.Eraser ? onPointerMoveRemove : onPointerMove}
-            onPointerLeave={mode === PolygonMode.Eraser ? onPointerMoveRemove : onPointerMove}
+            onPointerMove={onPointerMove}
+            onPointerLeave={onPointerMove}
             style={{ cursor: `url(${toolIcon.cursorUrl}) ${toolIcon.offset}, auto` }}
         >
             {polygon !== null && !isEmpty(polygon.points) && (

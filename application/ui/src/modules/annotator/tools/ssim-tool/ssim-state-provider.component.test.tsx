@@ -19,45 +19,56 @@ let mockMediaItem = { id: 'media-1' } as Media;
 let mockTaskType = 'detection';
 let mockMode: AnnotatorMode = 'annotation';
 let mockShapes: Shape[] = [];
-const mockReset = vi.fn();
-const mockAddAndSelectAnnotations = vi.fn();
+const mockReset = rs.fn();
+const mockUpdateToolState = rs.fn();
+const mockRerun = rs.fn();
+const mockAddAndSelectAnnotations = rs.fn();
 
-vi.mock('../../tool-provider.component', () => ({
-    useTool: () => ({ activeTool: mockActiveTool, setActiveTool: vi.fn() }),
+rs.mock('../../tool-provider.component', () => ({
+    useTool: () => ({ activeTool: mockActiveTool, setActiveTool: rs.fn() }),
 }));
 
-vi.mock('../../selected-media-item-provider.component', () => ({
+rs.mock('../../selected-media-item-provider.component', () => ({
     useSelectedMediaItem: () => ({ mediaItem: mockMediaItem }),
 }));
 
-vi.mock('../../annotation-document-provider.component', () => ({
+rs.mock('../../annotation-document-provider.component', () => ({
     useAnnotations: () => ({ mode: mockMode }),
 }));
 
-vi.mock('../../annotator-labels-provider.component', () => ({
+rs.mock('../../annotator-labels-provider.component', () => ({
     useAnnotatorLabels: () => ({ selectedLabel: label }),
 }));
 
-vi.mock('../use-add-and-select-annotations.hook', () => ({
+rs.mock('../use-add-and-select-annotations.hook', () => ({
     useAddAndSelectAnnotations: () => ({ addAndSelectAnnotations: mockAddAndSelectAnnotations }),
 }));
 
-vi.mock('hooks/use-project-task.hook', () => ({
+rs.mock('hooks/use-project-task.hook', () => ({
     useProjectTask: () => mockTaskType,
 }));
 
-vi.mock('./use-ssim.hook', () => ({
-    useSSIM: vi.fn(() => ({ reset: mockReset, toolState: { shapes: mockShapes } })),
+rs.mock('./use-ssim.hook', () => ({
+    useSSIM: rs.fn(() => ({
+        reset: mockReset,
+        updateToolState: mockUpdateToolState,
+        rerun: mockRerun,
+        toolState: { shapes: mockShapes },
+    })),
 }));
 
 const Consumer = () => {
-    const { hasPreview, accept, reject } = useSSIMState();
+    const { hasPreview, accept, reject, setNumberOfItems, autoMergeDuplicates, setAutoMergeDuplicates } =
+        useSSIMState();
 
     return (
         <>
             <span>{hasPreview ? 'has preview' : 'no preview'}</span>
+            <span>{autoMergeDuplicates ? 'merging duplicates' : 'keeping duplicates'}</span>
             <button onClick={accept}>Accept</button>
             <button onClick={reject}>Reject</button>
+            <button onClick={() => setNumberOfItems(3)}>Show 3 items</button>
+            <button onClick={() => setAutoMergeDuplicates(false)}>Keep duplicates</button>
         </>
     );
 };
@@ -70,7 +81,7 @@ const renderTree = () => (
 
 describe('SSIMStateProvider', () => {
     beforeEach(() => {
-        vi.clearAllMocks();
+        rs.clearAllMocks();
         mockActiveTool = 'ssim';
         mockMediaItem = { id: 'media-1' } as Media;
         mockTaskType = 'detection';
@@ -151,5 +162,24 @@ describe('SSIMStateProvider', () => {
 
         expect(mockAddAndSelectAnnotations).not.toHaveBeenCalled();
         expect(mockReset).toHaveBeenCalledTimes(1);
+    });
+
+    it('updates the number of previewed items', () => {
+        render(renderTree());
+
+        fireEvent.click(screen.getByRole('button', { name: 'Show 3 items' }));
+
+        expect(mockUpdateToolState).toHaveBeenCalledWith({ threshold: 3 });
+    });
+
+    it('merges duplicates by default and reruns the last template when toggled', () => {
+        render(renderTree());
+
+        expect(screen.getByText('merging duplicates')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByRole('button', { name: 'Keep duplicates' }));
+
+        expect(screen.getByText('keeping duplicates')).toBeInTheDocument();
+        expect(mockRerun).toHaveBeenCalledWith({ autoMergeDuplicates: false });
     });
 });

@@ -64,7 +64,7 @@ npm run preview      # Preview production build
 │   ├── api/                 # OpenAPI client (openapi-fetch + openapi-react-query)
 │   ├── assets/              # Images, illustrations, icons
 │   ├── components/          # Reusable UI components
-│   ├── constants/           # Route paths (static-path), shared domain types
+│   ├── constants/           # Route paths (React Router generatePath helpers), shared domain types
 │   ├── features/            # Domain features (see below)
 │   │   ├── dataset/         # Data collection, gallery, media preview
 │   │   ├── inference/       # Live inference, WebRTC streaming
@@ -112,7 +112,7 @@ npm run update-spec        # Download fresh spec from backend, then regenerate
 ### Testing
 
 ```bash
-npm run test:unit          # Unit tests (Vitest + jsdom)
+npm run test:unit          # Unit tests (Rstest + jsdom)
 npm run test:unit:watch    # Watch mode
 npm run test:unit:coverage # Coverage report (v8)
 npm run test:component     # Component tests (Playwright + MSW)
@@ -148,7 +148,8 @@ The UI uses i18next and react-i18next for internationalization. English is the
 default and fallback language. Translation catalogs live in `src/i18n/locales/`
 and are registered in `src/i18n/locales.ts`; currently supported languages are
 English (`en`), Spanish (`es`), French (`fr`), Italian (`it`), Dutch (`nl`),
-Polish (`pl`), Portuguese (`pt`) and Chinese (`zh-CN`, `zh-HK`, `zh-MO`, `zh-TW`).
+Polish (`pl`), Portuguese (`pt`), Russian (`ru`) and Chinese (`zh-CN`, `zh-HK`,
+`zh-MO`, `zh-TW`).
 
 ### Code Quality
 
@@ -188,7 +189,7 @@ The application is built on four main pillars:
 
 #### Testing & CI/CD
 
-- **Vitest** - Fast unit and integration testing
+- **Rstest** - Fast unit and integration testing
 - **Playwright** - Component and end-to-end testing with shared MSW configuration for auto-mocking REST endpoints
 - **Testing Library** - User-centric React component testing; follow [guiding principles](https://testing-library.com/docs/guiding-principles) for accessibility
 - **MSW + OpenAPI** - Mock Service Worker with OpenAPI specs to simulate API responses in tests

@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
-import { Content, Dialog, DialogContainer, DialogTrigger, Flex, PressableElement, Text, View } from '@geti-ui/ui';
+import { Content, Dialog, DialogContainer, DialogTrigger, Flex, Pressable, Text, View } from '@geti-ui/ui';
 import { ChevronDownSmall } from '@geti-ui/ui/icons';
 import { clsx } from 'clsx';
 import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
@@ -25,7 +25,7 @@ type DatasetViewsTriggerProps = {
 
 const DatasetViewsTrigger = ({ selectedDatasetViewName, isDisabled }: DatasetViewsTriggerProps) => {
     return (
-        <PressableElement isDisabled={isDisabled}>
+        <Pressable isDisabled={isDisabled}>
             <div
                 role={'button'}
                 aria-label={'Select dataset view'}
@@ -48,7 +48,7 @@ const DatasetViewsTrigger = ({ selectedDatasetViewName, isDisabled }: DatasetVie
                     </Flex>
                 </View>
             </div>
-        </PressableElement>
+        </Pressable>
     );
 };
 

@@ -9,3 +9,7 @@ export const isVideoFrame = (media: Pick<Media, 'type'> | undefined): media is M
     media?.type === 'video_frame';
 
 export const isImage = (media: Pick<Media, 'type'> | undefined): media is MediaImage => media?.type === 'image';
+
+// Frames of the same video share the video's id, so the frame number is needed to tell them apart.
+export const getMediaItemKey = (media: Media): string =>
+    isVideoFrame(media) ? `${media.id}-${media.frame_number}` : media.id;
