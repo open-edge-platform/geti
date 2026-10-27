@@ -11,15 +11,19 @@ from __future__ import annotations
 
 import logging
 import os
+import types
+from contextlib import contextmanager
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 import torch
+import torch.nn.functional as F  # noqa: N812
 from rfdetr._namespace import _namespace_from_configs
 from rfdetr.config import TrainConfig
 from rfdetr.models import build_criterion_from_config, build_model_from_config, load_pretrain_weights
 from rfdetr.models._defaults import MODEL_DEFAULTS
 from rfdetr.models.backbone import Joiner
+from rfdetr.models.backbone.projector import LayerNorm as ProjectorLayerNorm
 from torch.hub import download_url_to_file
 from torchvision import tv_tensors
 from torchvision.ops import box_convert
@@ -32,6 +36,7 @@ from getitune.types.export import ExportFormat
 from getitune.types.precision import Precision
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from types import SimpleNamespace
 
     from rfdetr.models.backbone import Backbone
@@ -64,6 +69,35 @@ def _get_param_dict(args: SimpleNamespace, model_without_ddp: torch.nn.Module) -
     other_param_dicts = [{"params": param, "lr": args.lr} for param in other_params]
 
     return other_param_dicts + backbone_param_lr_pairs + decoder_param_lr_pairs
+
+
+def _fp16_safe_layer_norm_forward(self: ProjectorLayerNorm, x: torch.Tensor) -> torch.Tensor:
+    """Same as rfdetr's projector LayerNorm, but rescaled so it stays accurate when a runtime computes it in FP16.
+
+    Projector activations can reach several hundred, so the per-position sum of squared deviations
+    exceeds FP16's max (65504) on runtimes that reduce in FP16 (e.g. OpenVINO CPU on ARM), and the
+    output collapses. Dividing each position by its largest deviation bounds every square by 1, the
+    classic overflow-safe norm trick (LAPACK dnrm2). LayerNorm is invariant to re-scaling a single
+    input vector (Ba et al., 2016, "Layer Normalization", Table 1), so the output is unchanged.
+    """
+    x = x.permute(0, 2, 3, 1)
+    x = x - x.mean(dim=-1, keepdim=True)
+    x = x / x.abs().amax(dim=-1, keepdim=True).clamp_min(1.0)
+    x = F.layer_norm(x, self.normalized_shape, self.weight, self.bias, self.eps)
+    return x.permute(0, 3, 1, 2)
+
+
+@contextmanager
+def _fp16_safe_projector_norms(module: torch.nn.Module) -> Iterator[None]:
+    """Temporarily swap rfdetr projector LayerNorms for an FP16-safe equivalent (used for export)."""
+    norms = [m for m in module.modules() if isinstance(m, ProjectorLayerNorm)]
+    for norm in norms:
+        norm.forward = types.MethodType(_fp16_safe_layer_norm_forward, norm)  # pyrefly: ignore[bad-assignment]
+    try:
+        yield
+    finally:
+        for norm in norms:
+            del norm.forward
 
 
 class RFDETRMixin:
@@ -377,10 +411,8 @@ class RFDETRMixin:
         lwdetr = self.model.lwdetr  # pyrefly: ignore[missing-attribute]
         lwdetr.export()  # pyrefly: ignore[missing-attribute]
         try:
-            return super().export(output_dir, base_name, export_format, precision)  # type: ignore[misc]
-        except Exception:
-            self._restore_forward_methods(lwdetr)
-            raise
+            with _fp16_safe_projector_norms(lwdetr):
+                return super().export(output_dir, base_name, export_format, precision)  # type: ignore[misc]
         finally:
             self._restore_forward_methods(lwdetr)
 
