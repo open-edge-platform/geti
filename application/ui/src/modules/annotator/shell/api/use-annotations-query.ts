@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { fetchClient } from '@/api';
+import { ApiError, fetchClient } from '@/api';
 import type { AnnotationDTO, DatasetSubset, Media } from '@/api/types';
 import { queryOptions, useQuery, type QueryKey } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
@@ -76,7 +76,7 @@ const annotationsQueryFn = async (
     }
 
     if (error) {
-        throw error;
+        throw new ApiError(error);
     }
 
     if (data?.annotations.length === 0) {

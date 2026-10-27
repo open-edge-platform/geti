@@ -209,6 +209,7 @@ export default [
                 },
             ],
             '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: { attributes: false } }],
+            '@typescript-eslint/only-throw-error': 'error',
             '@typescript-eslint/await-thenable': 'error',
             '@typescript-eslint/switch-exhaustiveness-check': 'error',
         },
