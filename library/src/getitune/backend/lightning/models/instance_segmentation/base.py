@@ -26,7 +26,7 @@ from getitune.backend.lightning.models.base import (
     LightningModel,
 )
 from getitune.backend.lightning.models.common.pretrained_weights import PretrainedWeightsMixin
-from getitune.backend.lightning.models.common.target_utils import align_sample_batch_annotations
+from getitune.backend.lightning.models.common.target_utils import align_sample_batch_annotations, materialize_masks
 from getitune.backend.lightning.models.instance_segmentation.segmentors.maskrcnn_tv import MaskRCNN
 from getitune.backend.lightning.models.instance_segmentation.segmentors.two_stage import TwoStageDetector
 from getitune.backend.lightning.models.utils.utils import InstanceData
@@ -38,7 +38,7 @@ from getitune.data.entity.base import BatchLoss, ImageInfo
 from getitune.data.entity.sample import PredictionBatch, SampleBatch
 from getitune.data.entity.tile import TileBatchData
 from getitune.data.entity.utils import stack_batch
-from getitune.data.utils.structures.mask.mask_util import encode_rle
+from getitune.data.utils.structures.mask.mask_util import encode_rle, gt_instances_to_rle
 from getitune.metrics import MetricInput
 from getitune.metrics.fmeasure import FMeasure, MaskRLEMeanAPFMeasureCallable
 from getitune.types.export import TaskLevelExportParameters
@@ -116,13 +116,14 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
         self.export_nms = export_nms
 
     def _customize_inputs(self, entity: SampleBatch) -> dict[str, Any]:
+        if isinstance(entity.images, list):
+            entity.images, entity.imgs_info = stack_batch(entity.images, entity.imgs_info, pad_size_divisor=32)  # type: ignore[assignment,arg-type]
+        materialize_masks(entity)
         # Defensively realign per-image boxes/labels/masks counts so a divergence
         # (e.g. from tiling or crop augmentations) does not crash mmdet's
         # InstanceData, which requires all instance-level fields to share length.
         if self.training:
             align_sample_batch_annotations(entity)
-        if isinstance(entity.images, list):
-            entity.images, entity.imgs_info = stack_batch(entity.images, entity.imgs_info, pad_size_divisor=32)  # type: ignore[assignment,arg-type]
         inputs: dict[str, Any] = {}
 
         inputs["entity"] = entity
@@ -468,15 +469,16 @@ class LightningInstanceSegModel(PretrainedWeightsMixin, LightningModel):
                 },
             )
         for i in range(len(inputs.imgs_info)):  # type: ignore[arg-type]
-            inputs.imgs_info[i] if inputs.imgs_info is not None else None
+            img_info = inputs.imgs_info[i] if inputs.imgs_info is not None else None
             bboxes = inputs.bboxes[i] if inputs.bboxes is not None else None
-            masks = inputs.masks[i] if inputs.masks is not None else None
             labels = inputs.labels[i] if inputs.labels is not None else None
 
-            if masks is None:
-                msg = "Masks are required for metric computation"
-                raise ValueError(msg)
-            rles = [encode_rle(mask) for mask in masks.data]
+            rles = gt_instances_to_rle(
+                masks=inputs.masks[i] if inputs.masks is not None else None,
+                polygons=inputs.polygons[i] if inputs.polygons is not None else None,
+                img_info=img_info,
+            )
+
             target_info.append(
                 {
                     "boxes": bboxes.data,
