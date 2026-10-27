@@ -167,6 +167,7 @@ export default [
             ],
 
             'import/order': ['off'],
+            'import/no-extraneous-dependencies': 'error',
 
             'import/no-unresolved': [
                 2,

@@ -33,8 +33,10 @@
         "tauri": "tauri"
     },
     "dependencies": {
+        "@doodle3d/clipper-js": "~1.0.11",
         "@geti-ui/smart-tools": "^1.7.0",
         "@geti-ui/ui": "^1.7.0",
+        "@internationalized/date": "~3.12.4",
         "@react-aria/utils": "^3.34.1",
         "@tanstack/react-query": "~5.104.1",
         "@tauri-apps/api": "2.12.0",
