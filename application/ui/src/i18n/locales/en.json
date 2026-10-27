@@ -25,8 +25,6 @@
             "refresh": "Refresh",
             "remove": "Remove",
             "selectAll": "Select all",
-            "showLess": "Show less",
-            "showMore": "Show more",
             "skip": "Skip",
             "start": "Start",
             "submit": "Submit",
@@ -909,10 +907,12 @@
                 },
                 "card": {
                     "numberOfParameters": "Number of parameters: {{count}} million",
-                    "gigaflops": "Gigaflops: {{value}}"
+                    "gigaflops": "Gigaflops: {{value}}",
+                    "recommended": "Recommended"
                 },
                 "sort": {
                     "label": "Sort Models by:",
+                    "recommended": "Recommended first",
                     "nameAsc": "Name (A to Z)",
                     "nameDesc": "Name (Z to A)",
                     "speedAsc": "Speed (fastest first)",

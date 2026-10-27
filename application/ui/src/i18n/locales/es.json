@@ -25,8 +25,6 @@
             "refresh": "Actualizar",
             "remove": "Quitar",
             "selectAll": "Seleccionar todo",
-            "showLess": "Mostrar menos",
-            "showMore": "Mostrar más",
             "skip": "Omitir",
             "start": "Iniciar",
             "submit": "Enviar",
@@ -909,10 +907,12 @@
                 },
                 "card": {
                     "numberOfParameters": "Número de parámetros: {{count}} millones",
-                    "gigaflops": "Gigaflops: {{value}}"
+                    "gigaflops": "Gigaflops: {{value}}",
+                    "recommended": "Recomendado"
                 },
                 "sort": {
                     "label": "Ordenar modelos por:",
+                    "recommended": "Recomendados primero",
                     "nameAsc": "Nombre (A a Z)",
                     "nameDesc": "Nombre (Z a A)",
                     "speedAsc": "Velocidad (más rápido primero)",

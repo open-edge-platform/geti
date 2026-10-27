@@ -5,6 +5,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { DATASET_VIEW_ID_PARAM } from 'hooks/use-dataset-view-id.hook';
 import { getMockedDatasetItem } from 'mocks/mock-dataset-item';
 import { getMockedDatasetView } from 'mocks/mock-dataset-view';
+import { getMockedModelArchitecture } from 'mocks/mock-model';
 import { getMockedPipeline } from 'mocks/mock-pipeline';
 import { getMockedProject } from 'mocks/mock-project';
 import { getMockedTrainingConfiguration } from 'mocks/mock-training-configuration';
@@ -125,6 +126,42 @@ describe('TrainModel', () => {
             expect(
                 screen.queryByText(/In order to train a model, you need to annotate at least 3 items/)
             ).not.toBeInTheDocument();
+        });
+    });
+
+    describe('model architectures list', () => {
+        it('lists every model architecture with recommended ones first, without a show more toggle', async () => {
+            server.use(
+                http.get('/api/model_architectures', () => {
+                    return HttpResponse.json({
+                        model_architectures: ['Epsilon', 'Alpha', 'Delta', 'Charlie', 'Bravo'].map((name) =>
+                            getMockedModelArchitecture({ id: name.toLowerCase(), name })
+                        ),
+                        top_picks: { speed: 'epsilon', balance: 'charlie', accuracy: 'delta' },
+                    });
+                }),
+                http.get('/api/projects/{project_id}/dataset/items', () => {
+                    return HttpResponse.json({
+                        items: [],
+                        pagination: { total: 0, count: 0, limit: 10, offset: 0 },
+                    });
+                })
+            );
+
+            render(<TrainModel />);
+
+            fireEvent.click(await screen.findByRole('button', { name: 'Train model' }));
+
+            const radios = await screen.findAllByRole('radio');
+            expect(radios.map((radio) => radio.getAttribute('value'))).toEqual([
+                'charlie',
+                'delta',
+                'epsilon',
+                'alpha',
+                'bravo',
+            ]);
+            expect(screen.getAllByText('Recommended')).toHaveLength(3);
+            expect(screen.queryByRole('button', { name: /show (more|less)/i })).not.toBeInTheDocument();
         });
     });
 

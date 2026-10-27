@@ -1,55 +1,49 @@
-// Copyright (C) 2025 Intel Corporation
+// Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import { useState } from 'react';
+
 import { useTranslation } from '@/i18n';
-import { Button, Flex } from '@geti-ui/ui';
+import { Flex } from '@geti-ui/ui';
+import { partition } from 'lodash-es';
 
+import { SortModelArchitectures } from '../sort-model-architectures/sort-model-architectures.component';
+import { getSortOptions, SORTING_HANDLERS, SortingOptions } from '../sort-model-architectures/utils';
+import { TIMM_MODEL_ARCHITECTURE_ID } from '../timm-model-configuration/utils';
 import { useTrainModelState } from '../train-model-provider.component';
-import { AllModelArchitectures } from './all-model-architectures.component';
-import { RecommendedModelArchitectures } from './recommended-model-architectures.component';
-import { getRecommendedArchitectures } from './utils';
-
-const SHOW_MORE_THRESHOLD = 4;
+import { ModelArchitecture } from './model-architecture.component';
+import { ModelArchitecturesListLayout } from './model-architectures-list-layout/model-architectures-list-layout.component';
 
 export const ModelArchitecturesList = () => {
     const { t } = useTranslation();
-    const {
+    const { modelArchitectures, selectedModelArchitectureId, onSelectModelArchitectureId } = useTrainModelState();
+    const [sortBy, setSortBy] = useState<SortingOptions>(SortingOptions.RECOMMENDED);
+    const [[timmCard], sortableModelArchitectures] = partition(
         modelArchitectures,
-        selectedModelArchitectureId,
-        onSelectModelArchitectureId,
-        showMoreModelArchitectures,
-        onToggleShowMoreModelArchitectures,
-    } = useTrainModelState();
-
-    const recommendedArchitectures = getRecommendedArchitectures(modelArchitectures);
-    const collapsedArchitectures = recommendedArchitectures.slice(0, SHOW_MORE_THRESHOLD);
-    const canToggleArchitecturesList = modelArchitectures.length > SHOW_MORE_THRESHOLD;
+        (modelArchitecture) => modelArchitecture.id === TIMM_MODEL_ARCHITECTURE_ID
+    );
+    const sortedModelArchitectures = SORTING_HANDLERS[sortBy](sortableModelArchitectures);
+    // The TIMM card always stays last, regardless of the active sort.
+    const modelArchitecturesToRender =
+        timmCard === undefined ? sortedModelArchitectures : [...sortedModelArchitectures, timmCard];
 
     return (
-        <Flex direction={'column'} minHeight={0} gap={'size-300'}>
-            {showMoreModelArchitectures ? (
-                <AllModelArchitectures
-                    modelArchitectures={modelArchitectures}
-                    selectedModelArchitectureId={selectedModelArchitectureId}
-                    onSelectedModelArchitectureIdChange={onSelectModelArchitectureId}
-                />
-            ) : (
-                <RecommendedModelArchitectures
-                    modelArchitectures={collapsedArchitectures}
-                    selectedModelArchitectureId={selectedModelArchitectureId}
-                    onSelectedModelArchitectureIdChange={onSelectModelArchitectureId}
-                />
-            )}
-
-            {canToggleArchitecturesList && (
-                <Button
-                    alignSelf={'start'}
-                    variant={'primary'}
-                    onPress={() => onToggleShowMoreModelArchitectures(!showMoreModelArchitectures)}
-                >
-                    {showMoreModelArchitectures ? t('common.actions.showLess') : t('common.actions.showMore')}
-                </Button>
-            )}
+        <Flex direction={'column'} gap={'size-200'}>
+            <SortModelArchitectures sortBy={sortBy} onSort={setSortBy} items={getSortOptions(t)} />
+            <ModelArchitecturesListLayout
+                selectedModelArchitectureId={selectedModelArchitectureId}
+                onSelectedModelArchitectureIdChange={onSelectModelArchitectureId}
+                ariaLabel={'Model architectures'}
+            >
+                {modelArchitecturesToRender.map((modelArchitecture) => (
+                    <ModelArchitecture
+                        key={modelArchitecture.id}
+                        modelArchitecture={modelArchitecture}
+                        selectedModelArchitectureId={selectedModelArchitectureId}
+                        onSelectedModelArchitectureIdChange={onSelectModelArchitectureId}
+                    />
+                ))}
+            </ModelArchitecturesListLayout>
         </Flex>
     );
 };

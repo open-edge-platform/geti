@@ -25,8 +25,6 @@
             "refresh": "刷新",
             "remove": "移除",
             "selectAll": "全选",
-            "showLess": "收起",
-            "showMore": "显示更多",
             "skip": "跳过",
             "start": "开始",
             "submit": "提交",
@@ -909,10 +907,12 @@
                 },
                 "card": {
                     "numberOfParameters": "参数量：{{count}} M",
-                    "gigaflops": "Gigaflops：{{value}}"
+                    "gigaflops": "Gigaflops：{{value}}",
+                    "recommended": "推荐"
                 },
                 "sort": {
                     "label": "模型排序：",
+                    "recommended": "推荐优先",
                     "nameAsc": "名称（A 到 Z）",
                     "nameDesc": "名称（Z 到 A）",
                     "speedAsc": "速度（最快优先）",

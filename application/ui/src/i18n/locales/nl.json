@@ -25,8 +25,6 @@
             "refresh": "Vernieuwen",
             "remove": "Verwijderen",
             "selectAll": "Alles selecteren",
-            "showLess": "Minder weergeven",
-            "showMore": "Meer weergeven",
             "skip": "Overslaan",
             "start": "Starten",
             "submit": "Indienen",
@@ -909,10 +907,12 @@
                 },
                 "card": {
                     "numberOfParameters": "Aantal parameters: {{count}} miljoen",
-                    "gigaflops": "Gigaflops: {{value}}"
+                    "gigaflops": "Gigaflops: {{value}}",
+                    "recommended": "Aanbevolen"
                 },
                 "sort": {
                     "label": "Modellen sorteren op:",
+                    "recommended": "Aanbevolen eerst",
                     "nameAsc": "Naam (A tot Z)",
                     "nameDesc": "Naam (Z tot A)",
                     "speedAsc": "Snelheid (snelste eerst)",

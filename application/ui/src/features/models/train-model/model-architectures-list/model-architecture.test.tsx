@@ -1,16 +1,13 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-// Copyright (C) 2025 Intel Corporation
-// SPDX-License-Identifier: Apache-2.0
-
 import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getMockedModelArchitecture } from 'mocks/mock-model';
 import { render } from 'test-utils/render';
 
-import { DetailedModelArchitecture, ModelArchitecture } from './model-architecture.component';
+import { ModelArchitecture } from './model-architecture.component';
 import { ModelArchitecturesListLayout } from './model-architectures-list-layout/model-architectures-list-layout.component';
 
 type OnSelectedModelArchitectureIdChange = (modelArchitectureId: string | null) => void;
@@ -41,32 +38,6 @@ const renderModelArchitecture = ({
     return { modelArchitecture };
 };
 
-const renderDetailedModelArchitecture = ({
-    selectedModelArchitectureId = null,
-    onSelectedModelArchitectureIdChange = rs.fn<OnSelectedModelArchitectureIdChange>(),
-    modelArchitecture = getMockedModelArchitecture(),
-}: {
-    selectedModelArchitectureId?: string | null;
-    onSelectedModelArchitectureIdChange?: OnSelectedModelArchitectureIdChange;
-    modelArchitecture?: ModelArchitectureWithPerformanceCategory;
-} = {}) => {
-    render(
-        <ModelArchitecturesListLayout
-            selectedModelArchitectureId={selectedModelArchitectureId}
-            onSelectedModelArchitectureIdChange={onSelectedModelArchitectureIdChange}
-            ariaLabel={'Model architectures'}
-        >
-            <DetailedModelArchitecture
-                modelArchitecture={modelArchitecture}
-                selectedModelArchitectureId={selectedModelArchitectureId}
-                onSelectedModelArchitectureIdChange={onSelectedModelArchitectureIdChange}
-            />
-        </ModelArchitecturesListLayout>
-    );
-
-    return { modelArchitecture };
-};
-
 describe('ModelArchitecture', () => {
     it('renders the model architecture name and number of parameters', () => {
         const modelArchitecture = getMockedModelArchitecture({ name: 'Deim-DFine-L' });
@@ -78,16 +49,17 @@ describe('ModelArchitecture', () => {
         ).toBeVisible();
     });
 
-    it('does not render a performance category badge when performanceCategory is undefined', () => {
-        renderModelArchitecture({ modelArchitecture: getMockedModelArchitecture({ performanceCategory: undefined }) });
-
-        expect(screen.queryByText(/speed|balance|accuracy/i)).not.toBeInTheDocument();
-    });
-
-    it('renders the performance category badge when performanceCategory is defined', () => {
+    it('renders the recommended badge for top picks', () => {
         renderModelArchitecture({ modelArchitecture: getMockedModelArchitecture({ performanceCategory: 'speed' }) });
 
-        expect(screen.getByText('Speed')).toBeVisible();
+        expect(screen.getByText('Recommended')).toBeVisible();
+        expect(screen.queryByText(/^(speed|balance|accuracy)$/i)).not.toBeInTheDocument();
+    });
+
+    it('does not render the recommended badge for other architectures', () => {
+        renderModelArchitecture({ modelArchitecture: getMockedModelArchitecture({ performanceCategory: undefined }) });
+
+        expect(screen.queryByText('Recommended')).not.toBeInTheDocument();
     });
 
     it('calls onSelectedModelArchitectureIdChange with the architecture id when clicked', async () => {
@@ -125,7 +97,7 @@ describe('ModelArchitecture', () => {
         expect(screen.getByRole('radio', { name: 'Deim-DFine-L' })).not.toBeChecked();
     });
 
-    describe('benchmark stats (DetailedParameters)', () => {
+    describe('benchmark stats', () => {
         const detectionArchitecture = getMockedModelArchitecture({
             task: 'detection',
             stats: {
@@ -138,36 +110,16 @@ describe('ModelArchitecture', () => {
                     coco_map_50: null,
                 },
             },
-            performanceCategory: 'speed',
         });
 
-        it('does not show gigaflops or accuracy when using Parameters (default)', () => {
+        it('shows gigaflops and mAP', () => {
             renderModelArchitecture({ modelArchitecture: detectionArchitecture });
-
-            expect(screen.queryByText(/gigaflops/i)).not.toBeInTheDocument();
-            expect(screen.queryByText(/mAP/i)).not.toBeInTheDocument();
-        });
-
-        it('shows gigaflops and mAP when using DetailedParameters', () => {
-            renderDetailedModelArchitecture({ modelArchitecture: detectionArchitecture });
 
             expect(screen.getByText(`Gigaflops: ${detectionArchitecture.stats?.gigaflops}`)).toBeVisible();
             expect(screen.getByText('mAP on COCO: 55.3%')).toBeVisible();
         });
 
-        it('hides the performance category badge when using DetailedParameters', () => {
-            renderDetailedModelArchitecture({ modelArchitecture: detectionArchitecture });
-
-            expect(screen.queryByText('Speed')).not.toBeInTheDocument();
-        });
-
-        it('still shows the performance category badge when using Parameters only', () => {
-            renderModelArchitecture({ modelArchitecture: detectionArchitecture });
-
-            expect(screen.getByText('Speed')).toBeVisible();
-        });
-
-        it('shows Top-1 Acc for classification tasks when using DetailedParameters', () => {
+        it('shows Top-1 Acc for classification tasks', () => {
             const classificationArchitecture = getMockedModelArchitecture({
                 task: 'classification',
                 stats: {
@@ -182,7 +134,7 @@ describe('ModelArchitecture', () => {
                 },
             });
 
-            renderDetailedModelArchitecture({ modelArchitecture: classificationArchitecture });
+            renderModelArchitecture({ modelArchitecture: classificationArchitecture });
 
             expect(screen.getByText('Top-1 Acc on ImageNet: 76.2%')).toBeVisible();
         });

@@ -25,8 +25,6 @@
             "refresh": "Atualizar",
             "remove": "Remover",
             "selectAll": "Selecionar tudo",
-            "showLess": "Mostrar menos",
-            "showMore": "Mostrar mais",
             "skip": "Ignorar",
             "start": "Iniciar",
             "submit": "Submeter",
@@ -909,10 +907,12 @@
                 },
                 "card": {
                     "numberOfParameters": "Número de parâmetros: {{count}} milhões",
-                    "gigaflops": "Gigaflops: {{value}}"
+                    "gigaflops": "Gigaflops: {{value}}",
+                    "recommended": "Recomendado"
                 },
                 "sort": {
                     "label": "Ordenar por:",
+                    "recommended": "Recomendados primeiro",
                     "nameAsc": "Nome (A a Z)",
                     "nameDesc": "Nome (Z a A)",
                     "speedAsc": "Velocidade (mais rápido primeiro)",
