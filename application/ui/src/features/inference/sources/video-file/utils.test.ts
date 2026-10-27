@@ -5,9 +5,15 @@ import { API_BASE_URL } from '@/api';
 import { createI18nInstance } from '@/i18n';
 import { HttpResponse, http as mswHttp } from 'msw';
 
+import * as actualTusUpload from '../../../../api/tus-upload' with { rstest: 'importActual' };
 import { http } from '../../../../api/utils';
 import { server } from '../../../../msw-node-setup';
 import { getVideoFileInitialConfig, prepareVideoFileFormData, videoFileBodyFormatter } from './utils';
+
+rs.mock('../../../../api/tus-upload', () => ({
+    ...actualTusUpload,
+    transferFile: rs.fn(async () => '00000000-0000-4000-8000-000000000001'),
+}));
 
 const buildFormData = (fields: Record<string, string | Blob>): FormData => {
     const formData = new FormData();
@@ -69,7 +75,7 @@ describe('prepareVideoFileFormData', () => {
     it('uploads the selected file and overwrites video_path with the returned path', async () => {
         const resolvedPath = '/data/source_media/uuid/sample.mp4';
         server.use(
-            http.post('/api/sources/media', () => {
+            http.post('/api/sources/media:from-upload', () => {
                 return HttpResponse.json({ video_path: resolvedPath }, { status: 201 });
             })
         );
@@ -92,7 +98,7 @@ describe('prepareVideoFileFormData', () => {
         const sourceMediaId = '712750b2-5a82-47ee-8fba-f3dc96cb615d';
         const deletedIds: string[] = [];
         server.use(
-            http.post('/api/sources/media', () => {
+            http.post('/api/sources/media:from-upload', () => {
                 return HttpResponse.json(
                     { video_path: `C:\\data\\source_media\\${sourceMediaId}\\sample.mp4` },
                     { status: 201 }
@@ -123,7 +129,7 @@ describe('prepareVideoFileFormData', () => {
 
     it('rejects when the upload fails', async () => {
         server.use(
-            mswHttp.post(`${API_BASE_URL}/api/sources/media`, () => {
+            mswHttp.post(`${API_BASE_URL}/api/sources/media:from-upload`, () => {
                 return HttpResponse.json({ detail: 'Unsupported video format' }, { status: 422 });
             })
         );

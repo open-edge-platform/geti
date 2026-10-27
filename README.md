@@ -18,26 +18,17 @@
 
 </div>
 
-**_Geti™_** is an end-to-end platform for building AI computer vision models.
-
-Available as a Docker container or native Windows application, Geti™ guides you through the entire model lifecycle—from dataset preparation and training to optimization and deployment.
-Geti™ is optimized for fine-tuning and fast inference across the full Intel® XPU portfolio.
-
-The Geti™ application is powered by **_getitune_**, an open-source engine for model training and optimization, which is also available standalone as a Python library. Geti™ and _getitune_ are both developed in this repository, in the [`application`](application/) and [`library`](library/) folders, respectively.
+**_Geti™_** is an open-source, end-to-end platform for building and continuously improving your own computer vision models. It covers annotation, fine-tuning, optimization, deployment, and inference — with 1,600+ model variants for detection, classification, and segmentation, optimized by OpenVINO™ for Intel® CPUs, GPUs, and NPUs.
 
 <p align="center">
  <img src="assets/model-lifecycle-infinity-light.png" width="600" alt="Geti™ - Learning Cycle"/>
 </p>
 
-> [!NOTE]
-> Geti™ underwent a major revamp in v3.0, resulting in a new application that is much more lightweight and easier to install than before, while adding many new features and SOTA models. This repository contains the latest Geti™ v3. Legacy versions remain available in the old [`geti_v2`](https://github.com/open-edge-platform/geti_v2) repository; to migrate from Geti™ v2 to v3, please follow [this guide](https://docs.geti.intel.com/docs/user-guide/getting-started/installation/migration-from-geti-2x).
+The Geti™ application is powered by **_getitune_**, its engine for model training and optimization, which is also available standalone as a Python library. Choose the application for a no-code experience, or the `getitune` Python API for code-first workflows — both paths lead to production-ready models. Both are developed in this repository, under [`application/`](application/) and [`libraries/getitune/`](libraries/getitune/).
 
-> [!NOTE]
-> This repository previously hosted the _OpenVINO Training Extensions (OTX)_ project, now fully replaced by _getitune_. The legacy [`otx`](https://pypi.org/project/otx/) package is still available in Pypi although deprecated; it's recommended to migrate to `getitune`, which has a similar interface to `otx` and extends it with several new models.
+## Full lifecycle with an intuitive SME interface
 
-## Quick start with Geti™
-
-There are several ways to run Geti™, choose the one that best fits your workflow:
+The Geti™ application runs as a native Windows app or a pre-built Docker image for Linux.
 
 - Install as a [**Windows application (MSIX)**](application/docs/install.md#windows-app)
 - Run as a [**Docker container**](application/docs/install.md#run-with-docker)
@@ -46,20 +37,24 @@ There are several ways to run Geti™, choose the one that best fits your workfl
 
 For complete, step-by-step instructions - including prerequisites, GPU/accelerator support, container and source builds, the install script, and troubleshooting - see the [Installation guide](application/docs/install.md). To update an existing Geti™ installation to a newer version, follow the [Upgrade guide](application/docs/upgrade.md).
 
-Once Geti™ is up and running, follow the intuitive UI to train your first model.
-
 <p align="center">
-  <img src="assets/application.gif" alt="Application demo" width="80%">
+  <img src="assets/geti-application-demo.gif" alt="Build and optimize a model in the Geti™ application" width="80%">
 </p>
 
 > [!TIP]
 > The [documentation](https://docs.geti.intel.com/) is a valuable resource to learn more about Geti™ and its capabilities.  
 > New users are encouraged to read the step-by-step tutorial ["Train your first model"](https://docs.geti.intel.com/docs/user-guide/quick-start/training-your-first-model).
 
-## Quick start with Geti Library (`getitune`)
+## Full lifecycle with a simple Python API
 
-Geti's training engine is published on PyPI and can train, optimize, and deploy models
-from Python.
+Geti's training engine is also available on PyPI as `getitune`, an open-source Python library for training, optimizing, and deploying models.
+
+<p align="center">
+  <img src="libraries/getitune/assets/getitune-demo.gif" alt="Train and optimize a model with the getitune Python API" width="80%">
+</p>
+
+<details>
+<summary>Install <code>getitune</code> and run the demo code</summary>
 
 ```bash
 uv pip install "getitune[xpu]" --extra-index-url https://download.pytorch.org/whl/xpu    # for Intel® XPU acceleration
@@ -68,49 +63,49 @@ uv pip install getitune # CPU-only by default
 ```
 
 > [!IMPORTANT]  
-> The PyPI package does NOT include **Ultralytics YOLO models**, which are distributed under the [AGPL-3.0 license](https://www.ultralytics.com/license). To enable these models, build from source with the `ultralytics` extra as explained in the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/installation).
+> **Ultralytics YOLO models** are NOT included in the package by default. To install these models, which are distributed
+> under the [AGPL-3.0 license](./THIRD-PARTY-NOTICES.md#ultralytics), you must specify the `ultralytics` extra as
+> explained in the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/installation).
 
-**Discover available models and train a model in just a few lines of code:**
+**Pick a model, then train, export, and quantize it:**
 
 ```python
 from getitune.engine import create_engine
 from getitune.utils import list_models
 
-# Explore available models for your task
-all_models = list_models()                    # List all model names
+# Explore available models to pick the one you need
+all_models = list_models()                        # All model names
 detection_models = list_models(task="DETECTION")  # Filter by task
-recipes = list_models(return_recipes=True)    # Get full recipe YAML paths
+recipes = list_models(return_recipes=True)        # Full recipe YAML paths
 
-# Create an engine using any model name or recipe path
+# Choose a model and point it at your dataset
 engine = create_engine(
-    model="efficientnet_b0",                  # model name, recipe YAML path, or exported IR/ONNX
-    data="/path/to/dataset",                  # dataset directory or YAML path
-    work_dir="./my_workspace",                # checkpoints and logs directory
-    device="auto",                            # "auto", "cpu", "gpu", "xpu".
+    model="edgecrafter_m",
+    data="./led_counting",
+    work_dir="./my_workspace",  # checkpoints, exports, and logs
+    device="auto",  # "auto", "cpu", "gpu", or "xpu"
 )
 
-# Train and validate
-engine.train(max_epochs=50)
-metrics = engine.test()
+# Train the model on your own Intel CPU or GPU
+engine.train()
 
-# Export to OpenVINO IR (default) for deployment
+# Export the trained model to OpenVINO format (.xml + .bin)
 exported_model_path = engine.export()
 
-# load exported OpenVINO model
-ov_engine = create_engine(model=exported_model_path, data=engine.datamodule)
+# Load the exported model into the OpenVINO engine
+openvino_engine = create_engine(model=exported_model_path, data=engine.datamodule)
 
-# optimize the model for edge deployment
-optimized_model_path = ov_engine.optimize()
+# Quantize the model to INT8, optimized for Intel hardware
+optimized_model_path = openvino_engine.optimize()
 
-# test the optimized model
-metrics = ov_engine.test()
-
-# predict with the optimized model
-predictions = ov_engine.predict()
+# Run inference with the optimized INT8 model
+predictions = openvino_engine.predict(checkpoint=optimized_model_path)
 ```
 
 See the [getitune documentation](https://docs.geti.intel.com/docs/user-guide/library/get-started/quick-start) for the full list of recipes,
 advanced configuration, dataset support, backend-specific options, and deployment/optimization examples.
+
+</details>
 
 ## Key Features
 
@@ -132,7 +127,7 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
   </thead>
   <tbody>
     <tr>
-      <td rowspan="11"><b>Object Detection</b><br>Locate and classify objects with bounding boxes. Common use cases: counting items, defect localization, surveillance.</td>
+      <td rowspan="12"><b>Object Detection</b><br>Locate and classify objects with bounding boxes. Common use cases: counting items, defect localization, surveillance.</td>
       <td>D-FINE M / L / X</td>
       <td><a href="https://arxiv.org/abs/2412.04234">DEIM</a> + <a href="https://arxiv.org/abs/2410.13842">D-FINE</a></td>
     </tr>
@@ -161,6 +156,10 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2304.08069">RT-DETR</a></td>
     </tr>
     <tr>
+      <td>RT-DETRv2 R18 / R34 / R50 / R101</td>
+      <td><a href="https://arxiv.org/abs/2407.17140">RT-DETRv2</a></td>
+    </tr>
+    <tr>
       <td>YOLO11 N / S / M / L / X</td>
       <td><a href="https://docs.ultralytics.com/models/yolo11#overview">Ultralytics YOLO11</a></td>
     </tr>
@@ -177,9 +176,17 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2107.08430">YOLOX</a></td>
     </tr>
     <tr>
-      <td rowspan="7"><b>Instance Segmentation</b><br>Detect objects and produce pixel-precise masks per instance. Common use cases: medical imaging, robotics, area estimation.</td>
-      <td>RTMDet Tiny</td>
-      <td><a href="https://arxiv.org/abs/2212.07784">RTMDet</a></td>
+      <td rowspan="10"><b>Instance Segmentation</b><br>Detect objects and produce pixel-precise masks per instance. Common use cases: medical imaging, robotics, area estimation.</td>
+      <td>EoMT Large 640</td>
+      <td><a href="https://arxiv.org/abs/2503.19108">EoMT</a></td>
+    </tr>
+    <tr>
+      <td>EoMT-DINOv3 Large 640</td>
+      <td><a href="https://arxiv.org/abs/2508.10104">DINOv3</a> + <a href="https://arxiv.org/abs/2503.19108">EoMT</a></td>
+    </tr>
+    <tr>
+      <td>Mask2Former Swin-T / S / B / L</td>
+      <td><a href="https://arxiv.org/abs/2112.01527">Mask2Former</a></td>
     </tr>
     <tr>
       <td>Mask-RCNN EfficientNet B2</td>
@@ -198,6 +205,10 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2511.09554">RF-DETR</a></td>
     </tr>
     <tr>
+      <td>RTMDet Tiny</td>
+      <td><a href="https://arxiv.org/abs/2212.07784">RTMDet</a></td>
+    </tr>
+    <tr>
       <td>YOLO11 N / S / M / L / X</td>
       <td><a href="https://docs.ultralytics.com/models/yolo11#overview">Ultralytics YOLO11</a></td>
     </tr>
@@ -206,9 +217,17 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
       <td><a href="https://arxiv.org/abs/2606.03748">YOLO26</a></td>
     </tr>
     <tr>
-      <td rowspan="7"><b>Classification</b> (multi-class, multi-label)<br>Assign one or more labels to an entire image. Common use cases: defect classification, product categorization, content tagging.</td>
-      <td>ViT Tiny</td>
-      <td><a href="https://arxiv.org/abs/2010.11929">ViT</a></td>
+      <td rowspan="10"><b>Classification</b> (multi-class, multi-label)<br>Assign one or more labels to an entire image. Common use cases: defect classification, product categorization, content tagging.</td>
+      <td>ConvNeXt T / S / B / L</td>
+      <td><a href="https://arxiv.org/abs/2201.03545">ConvNeXt</a></td>
+    </tr>
+    <tr>
+      <td>ConvNeXt V2 A / B / L</td>
+      <td><a href="https://arxiv.org/abs/2301.00808">ConvNeXt V2</a></td>
+    </tr>
+    <tr>
+      <td>DINOv3 ViT S / B / L</td>
+      <td><a href="https://arxiv.org/abs/2508.10104">DINOv3</a></td>
     </tr>
     <tr>
       <td>DINOv2 Small</td>
@@ -225,6 +244,10 @@ Would you like to see a specific model added? Let us know by opening a [GitHub i
     <tr>
       <td>MobileNet V3 Large</td>
       <td><a href="https://arxiv.org/abs/1905.02244">MobileNetV3</a></td>
+    </tr>
+    <tr>
+      <td>ViT Tiny</td>
+      <td><a href="https://arxiv.org/abs/2010.11929">ViT</a></td>
     </tr>
     <tr>
       <td>YOLO26 N / S / M / L / X</td>
@@ -327,13 +350,12 @@ For developers who would like to contribute with a pull request, see the [Contri
 
 ## License
 
-Geti™ is licensed under the [Apache License Version 2.0](LICENSE).
+Geti™ source code is licensed under the [Apache License Version 2.0](LICENSE).
+Docker images contain Geti™ components licensed under Apache 2.0 and may also contain third-party components governed by
+different license terms, listed separately in [this file](THIRD-PARTY-NOTICES.md).
+The Windows MSIX App is licensed under the [Intel Simplified Software License](https://software.intel.com/sites/landingpage/pintool/intel-simplified-software-license.txt).
 
-## Disclaimers
+Regarding models trained with Geti™, their license depends on the model type and is indicated within the application;
+most are licensed under Apache 2.0, while some fall under more restrictive licenses (e.g. [Ultralytics AGPL3.0 models](./THIRD-PARTY-NOTICES.md#ultralytics)).
 
-Geti™ utilizes FFmpeg.
-
-FFmpeg is an open source project licensed under LGPL and GPL. See [https://www.ffmpeg.org/legal.html](https://www.ffmpeg.org/legal.html). You are solely responsible for determining if your use of FFmpeg requires any additional licenses. Intel is not responsible for obtaining any such licenses, nor liable for any licensing fees due, in connection with your use of FFmpeg.
-
-> [!NOTE]
-> Ultralytics YOLO models are distributed under the AGPL-3.0 license, an OSI approved license ideal for open-source research, academic, and personal projects. For commercial use, enhanced support, and tailored licensing terms, please explore flexible Ultralytics licensing options at https://www.ultralytics.com/license.
+It is the end user's responsibility to ensure that the specific use of Geti™ and the models complies with the respective licenses.

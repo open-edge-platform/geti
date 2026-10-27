@@ -5,9 +5,10 @@ from pathlib import Path
 from uuid import UUID
 
 from datumaro.experimental.categories import HierarchicalLabelCategories
-from datumaro.experimental.export_import import export_dataset, import_dataset
+from datumaro.experimental.export_import import export_dataset
 from loguru import logger
 
+from app.datumaro_converter import import_dataset
 from app.execution.base import Execution, ExecutionErr, step
 from app.models.jobs import PrepareDatasetForImportJobParams
 
@@ -63,7 +64,9 @@ class PrepareDataset(Execution[PrepareDatasetForImportJobParams]):
             raise ExecutionErr(f"Cannot find dataset zip archive in {dataset_dir}")
         dataset_archive = sorted(zip_archives)[0]
         if len(zip_archives) > 1:
-            logger.warning(f"Found more than one zip archive in {dataset_dir}. Using the first one: {dataset_archive}")
+            logger.warning(
+                "Found more than one zip archive in {}. Using the first one: {}", dataset_dir, dataset_archive
+            )
         return dataset_archive
 
     @step("Convert dataset archive to Geti format", 90)

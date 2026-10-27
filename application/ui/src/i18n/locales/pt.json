@@ -74,7 +74,7 @@
             "model": "Modelo",
             "jobs": "Tarefas",
             "labels": "Etiquetas",
-            "language": "Idioma"
+            "bytesTransferred": "{{transferred}} de {{total}}"
         },
         "viewModes": {
             "large": "Miniaturas grandes",
@@ -103,7 +103,11 @@
         "modelsDescription": "Página de modelos para visualizar os seus modelos",
         "inference": "Inferência",
         "inferenceDescription": "Página de inferência que mostra a inferência em tempo real no seu projeto",
-        "preferences": "Preferências"
+        "help": {
+            "documentation": "Documentação do utilizador",
+            "whatsNew": "Novidades",
+            "reportIssue": "Reportar um problema"
+        }
     },
     "dataset": {
         "validation": {
@@ -151,6 +155,7 @@
         },
         "upload": {
             "queued": "Em fila",
+            "processing": "A processar",
             "uploaded": "Carregado",
             "errorTitle": "Erro de carregamento",
             "details": "Detalhes do carregamento",
@@ -165,13 +170,18 @@
             "failedSummary_other": "Falha ao carregar {{count}} itens",
             "mixedSummary_one": "{{uploaded}} item carregado, {{failed}} falhou",
             "mixedSummary_other": "{{uploaded}} itens carregados, {{failed}} falharam",
+            "mixedCancelledSummary_one": "{{uploaded}} item carregado, {{failed}} falhou, {{cancelled}} cancelado",
+            "mixedCancelledSummary_other": "{{uploaded}} itens carregados, {{failed}} falharam, {{cancelled}} cancelados",
             "genericError": "Falha ao carregar itens multimédia.",
             "uploadMedia": "Carregar multimédia",
             "showDetails": "Mostrar detalhes",
             "inProgressToast_one": "A carregar {{count}} item...",
             "inProgressToast_other": "A carregar {{count}} itens...",
             "inProgressSucceededPart": "{{count}} concluído(s) com sucesso",
-            "inProgressFailedPart": "{{count}} falhado(s)"
+            "inProgressFailedPart": "{{count}} falhado(s)",
+            "cancelAll": "Cancelar tudo",
+            "cancelledSummary_one": "{{count}} carregamento cancelado",
+            "cancelledSummary_other": "{{count}} carregamentos cancelados"
         },
         "empty": {
             "noMatches": "Nenhum item multimédia corresponde ao seu filtro.",
@@ -225,8 +235,11 @@
             "downloadStarted": "A transferência de {{fileName}} foi iniciada"
         },
         "gallery": {
-            "sortOldestFirst": "Mais antigos primeiro",
-            "sortNewestFirst": "Mais recentes primeiro",
+            "sort": {
+                "label": "Ordenar por:",
+                "uploadDateDescending": "Data de carregamento (mais recentes)",
+                "uploadDateAscending": "Data de carregamento (mais antigos)"
+            },
             "selectedCount": "{{count}} selecionados",
             "totalMediaCount_one": "{{count}} item multimédia",
             "totalMediaCount_other": "{{count}} itens multimédia",
@@ -597,7 +610,9 @@
             "createNewProject": "Criar novo projeto",
             "createProjectFromDataset": "Criar a partir de dataset",
             "card": {
-                "created": "Criado: {{date}}"
+                "created": "Criado: {{date}}",
+                "models_one": "{{count}} modelo",
+                "models_other": "{{count}} modelos"
             },
             "menu": {
                 "enablePipeline": "Ativar pipeline",
@@ -612,7 +627,9 @@
             },
             "filters": {
                 "searchPlaceholder": "Pesquisar projetos",
-                "taskType": "Filtrar por tipo de tarefa"
+                "taskType": "Filtrar por tipo de tarefa",
+                "models": "Filtrar por modelos",
+                "withTrainedModels": "Com modelos treinados"
             },
             "noMatches": {
                 "title": "Nenhum projeto corresponde aos seus filtros",
@@ -771,6 +788,7 @@
                 "unknownError": "Erro desconhecido, tente atualizar a página.",
                 "timeoutError": "O tempo limite de {{operation}} expirou após {{timeoutMs}}ms. Tente atualizar a página.",
                 "embeddingError": "Não foi possível obter o embedding da imagem ({{status}}{{statusText}}).",
+                "hint": "Shift + clique para incluir uma área, Alt + clique para a excluir. Clique para criar a anotação, Esc para limpar os pontos.",
                 "operations": {
                     "workerBuild": "Compilação do worker SAM",
                     "workerInit": "Inicialização do worker SAM",
@@ -793,6 +811,12 @@
                 "error": "Erro na ferramenta Assistente de deteção: {{message}}",
                 "operations": {
                     "workerBuild": "Compilação do worker do Assistente de deteção"
+                },
+                "options": {
+                    "accept": "Aceitar",
+                    "reject": "Rejeitar",
+                    "numberOfItems": "Número de itens",
+                    "autoMergeDuplicates": "Fundir duplicados automaticamente"
                 }
             }
         },
@@ -1108,7 +1132,7 @@
             "finished": "Concluídas"
         },
         "status": {
-            "pending": "Agendada",
+            "pending": "Na fila",
             "cancelling": "A cancelar",
             "done": "Concluída"
         },
@@ -1124,13 +1148,17 @@
         },
         "meta": {
             "started": "Iniciada {{time}}",
-            "elapsed": "Tempo decorrido: {{time}}"
+            "elapsed": "Tempo decorrido: {{time}}",
+            "duration": "Duração {{time}}",
+            "finished": "Concluída {{time}}",
+            "failed": "Falhou {{time}}",
+            "cancelled": "Cancelada {{time}}"
         },
         "emptyState": {
-            "all": "Nenhuma tarefa nesta categoria",
+            "all": "Nenhuma tarefa",
             "running": "Nenhuma tarefa em execução",
             "finished": "Nenhuma tarefa concluída",
-            "scheduled": "Nenhuma tarefa agendada",
+            "scheduled": "Nenhuma tarefa na fila",
             "cancelled": "Nenhuma tarefa cancelada",
             "failed": "Nenhuma tarefa com falha"
         },
@@ -1141,16 +1169,14 @@
     "license": {
         "label": "Licença: ",
         "agreement": {
-            "title": "Contrato de Licença",
-            "intro": "Ao instalar, utilizar ou distribuir esta aplicação, reconhece que:",
-            "termsRead": "Leu e compreendeu os termos da licença nas ligações abaixo;",
-            "termsGovern": "Confirmou que os termos indicados regem os conteúdos a que pretende aceder e utilizar; e",
-            "termsAccepted": "Aceitou e concordou com os termos da licença indicados.",
+            "title": "Contratos de Licença",
+            "intro": "Reveja e aceite as seguintes licenças para continuar a utilizar o Geti.",
+            "progress": "{{current}} de {{total}}",
+            "required": "Obrigatória",
+            "optional": "Opcional",
+            "fullLicense": "Ler a licença completa",
+            "previous": "Anterior",
             "accept": "Aceitar e continuar"
-        },
-        "links": {
-            "intelSimplified": "Licença de Software Simplificada da Intel",
-            "dinov2": "Licença DINOv3"
         }
     },
     "application": {
@@ -1171,7 +1197,8 @@
         },
         "notifications": {
             "unexpectedError": "Ocorreu um erro inesperado. Por favor tente novamente.",
-            "networkError": "Erro de rede. Verifique a sua ligação e tente novamente."
+            "networkError": "Erro de rede. Verifique a sua ligação e tente novamente.",
+            "uploadTransferError": "A transferência do ficheiro falhou. Tente novamente."
         }
     },
     "downloads": {

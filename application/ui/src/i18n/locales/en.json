@@ -74,7 +74,7 @@
             "model": "Model",
             "jobs": "Jobs",
             "labels": "Labels",
-            "language": "Language"
+            "bytesTransferred": "{{transferred}} of {{total}}"
         },
         "viewModes": {
             "large": "Large thumbnails",
@@ -103,7 +103,11 @@
         "modelsDescription": "Models page to visualise your models",
         "inference": "Inference",
         "inferenceDescription": "Inference page showing live inference on your project",
-        "preferences": "Preferences"
+        "help": {
+            "documentation": "User documentation",
+            "whatsNew": "What's new",
+            "reportIssue": "Report an issue"
+        }
     },
     "dataset": {
         "validation": {
@@ -151,6 +155,7 @@
         },
         "upload": {
             "queued": "Queued",
+            "processing": "Processing",
             "uploaded": "Uploaded",
             "errorTitle": "Upload error",
             "details": "Upload details",
@@ -165,13 +170,18 @@
             "failedSummary_other": "Failed to upload {{count}} items",
             "mixedSummary_one": "Uploaded {{uploaded}} item, {{failed}} failed",
             "mixedSummary_other": "Uploaded {{uploaded}} items, {{failed}} failed",
+            "mixedCancelledSummary_one": "Uploaded {{uploaded}} item, {{failed}} failed, {{cancelled}} cancelled",
+            "mixedCancelledSummary_other": "Uploaded {{uploaded}} items, {{failed}} failed, {{cancelled}} cancelled",
             "genericError": "Failed to upload media.",
             "uploadMedia": "Upload media",
             "showDetails": "Show details",
             "inProgressToast_one": "Uploading {{count}} item...",
             "inProgressToast_other": "Uploading {{count}} items...",
             "inProgressSucceededPart": "{{count}} succeeded",
-            "inProgressFailedPart": "{{count}} failed"
+            "inProgressFailedPart": "{{count}} failed",
+            "cancelAll": "Cancel all",
+            "cancelledSummary_one": "Cancelled {{count}} upload",
+            "cancelledSummary_other": "Cancelled {{count}} uploads"
         },
         "empty": {
             "noMatches": "No media items match your filter.",
@@ -225,8 +235,11 @@
             "downloadStarted": "{{fileName}} download has started"
         },
         "gallery": {
-            "sortOldestFirst": "Oldest first",
-            "sortNewestFirst": "Newest first",
+            "sort": {
+                "label": "Sort Media by:",
+                "uploadDateDescending": "Upload date (newest)",
+                "uploadDateAscending": "Upload date (oldest)"
+            },
             "selectedCount": "{{count}} selected",
             "totalMediaCount_one": "{{count}} media item",
             "totalMediaCount_other": "{{count}} media items",
@@ -597,7 +610,9 @@
             "createNewProject": "Create new project",
             "createProjectFromDataset": "Create from dataset",
             "card": {
-                "created": "Created: {{date}}"
+                "created": "Created: {{date}}",
+                "models_one": "{{count}} model",
+                "models_other": "{{count}} models"
             },
             "menu": {
                 "enablePipeline": "Enable pipeline",
@@ -612,7 +627,9 @@
             },
             "filters": {
                 "searchPlaceholder": "Search projects",
-                "taskType": "Filter by task type"
+                "taskType": "Filter by task type",
+                "models": "Filter by models",
+                "withTrainedModels": "With trained models"
             },
             "noMatches": {
                 "title": "No projects match your filters",
@@ -771,6 +788,7 @@
                 "unknownError": "Unknown error, please try refreshing the page.",
                 "timeoutError": "{{operation}} timed out after {{timeoutMs}}ms. Please try refreshing the page.",
                 "embeddingError": "Could not fetch the image embedding ({{status}}{{statusText}}).",
+                "hint": "Shift + click to include an area, Alt + click to exclude it. Click to create the annotation, Esc to clear the points.",
                 "operations": {
                     "workerBuild": "SAM worker build",
                     "workerInit": "SAM worker init",
@@ -793,6 +811,12 @@
                 "error": "Error in Detection assistant tool: {{message}}",
                 "operations": {
                     "workerBuild": "Detection assistant worker build"
+                },
+                "options": {
+                    "accept": "Accept",
+                    "reject": "Reject",
+                    "numberOfItems": "Number of items",
+                    "autoMergeDuplicates": "Auto-merge duplicates"
                 }
             }
         },
@@ -1108,7 +1132,7 @@
             "finished": "Finished"
         },
         "status": {
-            "pending": "Scheduled",
+            "pending": "Queued",
             "cancelling": "Cancelling",
             "done": "Completed"
         },
@@ -1124,13 +1148,17 @@
         },
         "meta": {
             "started": "Started {{time}}",
-            "elapsed": "Elapsed {{time}}"
+            "elapsed": "Elapsed {{time}}",
+            "duration": "Duration {{time}}",
+            "finished": "Finished {{time}}",
+            "failed": "Failed {{time}}",
+            "cancelled": "Cancelled {{time}}"
         },
         "emptyState": {
-            "all": "No jobs in this category",
+            "all": "No jobs",
             "running": "No running jobs",
             "finished": "No finished jobs",
-            "scheduled": "No scheduled jobs",
+            "scheduled": "No queued jobs",
             "cancelled": "No cancelled jobs",
             "failed": "No failed jobs"
         },
@@ -1141,21 +1169,19 @@
     "license": {
         "label": "License: ",
         "agreement": {
-            "title": "License Agreement",
-            "intro": "By installing, using, or distributing this application, you acknowledge that:",
-            "termsRead": "You have read and understood the license terms at the links below;",
-            "termsGovern": "Confirmed the linked terms govern the contents you seek to access and use; and",
-            "termsAccepted": "Accepted and agreed to the linked license terms.",
+            "title": "License Agreements",
+            "intro": "Please review and accept the following licenses to continue using Geti.",
+            "progress": "{{current}} of {{total}}",
+            "required": "Required",
+            "optional": "Optional",
+            "fullLicense": "Read the full license",
+            "previous": "Previous",
             "accept": "Accept and continue"
-        },
-        "links": {
-            "intelSimplified": "Intel Simplified Software License",
-            "dinov2": "DINOv3 License"
         }
     },
     "application": {
         "startup": {
-            "loading": "Loading...Please wait."
+            "loading": "Loading... Please wait."
         },
         "serverError": {
             "heading": "Server Error"
@@ -1171,7 +1197,8 @@
         },
         "notifications": {
             "unexpectedError": "An unexpected error occurred. Please try again.",
-            "networkError": "Network error. Please check your connection and try again."
+            "networkError": "Network error. Please check your connection and try again.",
+            "uploadTransferError": "The file transfer failed. Please try again."
         }
     },
     "downloads": {

@@ -244,7 +244,7 @@ class VideoService:
                 width = stream.codec_context.width
                 height = stream.codec_context.height
         except Exception as e:
-            logger.error(f"Failed getting metadata for video {video_path}", exc_info=e)
+            logger.error("Failed getting metadata for video {}", video_path, exc_info=e)
             raise RuntimeError("Error occurred while getting video metadata")
 
         return VideoMetadata(
@@ -334,6 +334,23 @@ class VideoService:
             with entry.lock:
                 entry.container.close()
         logger.debug("VideoService closed, all handles released")
+
+    def release(self, video_path: Path) -> None:
+        """Close and evict the cached container handle for a video, if any.
+
+        This must be called before moving or deleting a video file that may have been
+        opened by this service, since an open handle prevents such operations on Windows.
+
+        Args:
+            video_path: Path to the video file on disk.
+        """
+        with self._dict_lock:
+            entry = self._entries.pop(str(video_path), None)
+        if entry is None:
+            return
+        with entry.lock:
+            entry.container.close()
+        logger.debug("Released video {}", video_path)
 
     def _get_or_create_entry(self, path_key: str) -> _CacheEntry:
         """Get an existing cache entry or create a new one with an open PyAV container.

@@ -161,7 +161,6 @@ const MediaPreviewContent = ({
     return (
         <ToolProvider>
             <AnnotatorProviders
-                mediaItem={mediaItem}
                 initialAnnotationsDTO={initialAnnotations}
                 initialPredictionsDTO={initialPredictions}
                 mode={mode}
@@ -191,6 +190,7 @@ export const MediaPreview = ({ close, onSelectedMediaItem }: MediaPreviewProps) 
 
     return (
         <Dialog
+            aria-label='Annotator'
             UNSAFE_style={{
                 backgroundColor: 'var(--spectrum-global-color-gray-50)',
                 '--spectrum-dialog-padding-x': 'var(--spectrum-global-dimension-size-250)',

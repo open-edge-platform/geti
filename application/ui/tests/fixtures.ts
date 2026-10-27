@@ -11,11 +11,13 @@ import { getMockedDatasetStatistics } from 'mocks/mock-dataset-item';
 import { getMockedDatasetView } from 'mocks/mock-dataset-view';
 import { getMockedMediaImage } from 'mocks/mock-media';
 import { getMockedModelArchitecture } from 'mocks/mock-model';
+import { tusUploadHandlers } from 'mocks/mock-tus-upload';
 import { HttpResponse } from 'msw';
 
 import { handlers, http } from '../src/api/utils';
 import { BoundingBoxToolPage } from './annotator/bounding-box-tool-page';
 import { PolygonToolPage } from './annotator/polygon-tool-page';
+import { SegmentAnythingToolPage } from './annotator/segment-anything-tool-page';
 import { SSIMToolPage } from './annotator/ssim-tool-page';
 import { VideoPage } from './annotator/video/video-page';
 import { AnnotatorPage } from './datasets/annotator-page';
@@ -57,6 +59,7 @@ interface Fixtures {
     polygonTool: PolygonToolPage;
     boundingBoxTool: BoundingBoxToolPage;
     ssimTool: SSIMToolPage;
+    segmentAnythingTool: SegmentAnythingToolPage;
     videoPage: VideoPage;
     annotatorPage: AnnotatorPage;
     importDatasetPage: ImportDatasetPage;
@@ -68,7 +71,10 @@ const test = testBase.extend<Fixtures>({
         async ({ context }, use) => {
             const network = defineNetworkFixture({
                 context: context as DefineNetworkFixtureOptions['context'],
+                // The stateful TUS handlers go first so they take precedence over the example
+                // responses generated from the OpenAPI spec (mirrors `src/msw-node-setup.ts`).
                 handlers: [
+                    ...tusUploadHandlers,
                     ...handlers,
                     http.get('/health', ({ response }) => {
                         return response(200).json({
@@ -271,6 +277,10 @@ const test = testBase.extend<Fixtures>({
     ssimTool: async ({ page }, use) => {
         const ssimTool = new SSIMToolPage(page);
         await use(ssimTool);
+    },
+    segmentAnythingTool: async ({ page }, use) => {
+        const segmentAnythingTool = new SegmentAnythingToolPage(page);
+        await use(segmentAnythingTool);
     },
     polygonTool: async ({ page }, use) => {
         const polygonTool = new PolygonToolPage(page);

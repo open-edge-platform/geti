@@ -57,6 +57,13 @@ class Settings(BaseSettings):
     job_dir: Path | None = None
     staged_datasets_dir: Path | None = None
     source_media_dir: Path | None = None
+    uploads_dir: Path | None = None  # default: data_dir / "uploads"
+    upload_max_size: int = Field(
+        default=50 * 1024**3, gt=0, description="Maximum size in bytes of a resumable upload (Tus-Max-Size)"
+    )
+    upload_ttl_hours: int = Field(
+        default=24, gt=0, description="Hours of inactivity after which an unfinished resumable upload expires"
+    )
 
     # Server
     host: str = Field(default="0.0.0.0", alias="HOST")  # noqa: S104
@@ -111,10 +118,11 @@ class Settings(BaseSettings):
         default=5,
         alias="INFERENCE_KEYFRAME_STRIDE",
         description=(
-            "This stride value controls which video frames are considered 'key frames' and therefore "
-            "sent to the model for inference, while predictions for other frames are interpolated based "
-            "on key frames. Key frames satisfy the condition frame_index % stride == 0. "
-            "Additionally, the first and last frames are also considered key frames."
+            "Maximum distance, in video frames, between two consecutive 'key frames' of a batch prediction "
+            "request. Only key frames are sent to the model for inference, while predictions for other "
+            "requested frames are copied from the nearest key frame. When the requested frames are already "
+            "at least this many video frames apart, every requested frame is a key frame. "
+            "The first and last requested frames are always key frames."
         ),
         gt=0,
     )
@@ -214,6 +222,8 @@ class Settings(BaseSettings):
             self.staged_datasets_dir = self.data_dir / "staged_datasets"
         if self.source_media_dir is None:
             self.source_media_dir = self.data_dir / "source_media"
+        if self.uploads_dir is None:
+            self.uploads_dir = self.data_dir / "uploads"
         if self.sam_ov_cache_path is None:
             self.sam_ov_cache_path = self.data_dir / ".sam_ov_cache"
 
@@ -228,6 +238,7 @@ class Settings(BaseSettings):
             self.job_dir,
             self.staged_datasets_dir,
             self.source_media_dir,
+            self.uploads_dir,
             self.sam_ov_cache_path,
         ]:
             if d:

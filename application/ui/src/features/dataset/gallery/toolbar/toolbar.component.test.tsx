@@ -18,36 +18,36 @@ import { MediaUploadProvider } from '../../providers/media-upload-provider.compo
 import { useSelectedData } from '../../providers/selected-data-provider.component';
 import { Toolbar } from './toolbar.component';
 
-const uploadMediaMock = vi.fn();
-const onSelectedMediaItemChangeMock = vi.fn();
+const uploadMediaMock = rs.fn();
+const onSelectedMediaItemChangeMock = rs.fn();
 
-vi.mock('../../api/use-media-upload', () => ({
+rs.mock('../../api/use-media-upload', () => ({
     useMediaUpload: () => ({
         uploadMedia: uploadMediaMock,
     }),
 }));
 
-vi.mock('../hooks/use-select-dataset-item.hook', () => ({
+rs.mock('../hooks/use-select-dataset-item.hook', () => ({
     useSelectDatasetItem: () => ({
         onSelectedMediaItemChange: onSelectedMediaItemChangeMock,
         selectedMediaItem: null,
     }),
 }));
 
-vi.mock('../../import-export/import-export.component', () => ({
+rs.mock('../../import-export/import-export.component', () => ({
     ImportExport: () => <button>Export/Import</button>,
 }));
 
-vi.mock('hooks/use-project-identifier.hook', () => ({
+rs.mock('hooks/use-project-identifier.hook', () => ({
     useProjectIdentifier: () => 'project-123',
 }));
 
-vi.mock('../../providers/selected-data-provider.component', () => ({
-    useSelectedData: vi.fn(() => ({
+rs.mock('../../providers/selected-data-provider.component', () => ({
+    useSelectedData: rs.fn(() => ({
         selectedKeys: new Set(),
-        setSelectedKeys: vi.fn(),
-        toggleSelectedKeys: vi.fn(),
-        isSelected: vi.fn().mockReturnValue(false),
+        setSelectedKeys: rs.fn(),
+        toggleSelectedKeys: rs.fn(),
+        isSelected: rs.fn().mockReturnValue(false),
     })),
 }));
 
@@ -98,7 +98,7 @@ describe('Toolbar', () => {
                 <Toolbar
                     items={items}
                     viewMode={ViewModes.LARGE}
-                    setViewMode={vi.fn()}
+                    setViewMode={rs.fn()}
                     trainModel={<button>Train model</button>}
                 />
             </MediaUploadProvider>,
@@ -116,11 +116,11 @@ describe('Toolbar', () => {
     beforeEach(() => {
         uploadMediaMock.mockClear();
         onSelectedMediaItemChangeMock.mockClear();
-        vi.mocked(useSelectedData).mockReturnValue({
+        rs.mocked(useSelectedData).mockReturnValue({
             selectedKeys: new Set(),
-            setSelectedKeys: vi.fn(),
-            toggleSelectedKeys: vi.fn(),
-            isSelected: vi.fn().mockReturnValue(false),
+            setSelectedKeys: rs.fn(),
+            toggleSelectedKeys: rs.fn(),
+            isSelected: rs.fn().mockReturnValue(false),
         });
     });
 
@@ -156,11 +156,11 @@ describe('Toolbar', () => {
         const item1 = getMockedMediaImage({ id: '1' });
         const item2 = getMockedMediaImage({ id: '2' });
 
-        vi.mocked(useSelectedData).mockReturnValue({
+        rs.mocked(useSelectedData).mockReturnValue({
             selectedKeys: new Set([item1.id, item2.id]),
-            setSelectedKeys: vi.fn(),
-            toggleSelectedKeys: vi.fn(),
-            isSelected: vi.fn().mockReturnValue(false),
+            setSelectedKeys: rs.fn(),
+            toggleSelectedKeys: rs.fn(),
+            isSelected: rs.fn().mockReturnValue(false),
         });
 
         await renderToolbar([item1, item2]);
@@ -185,11 +185,11 @@ describe('Toolbar', () => {
     it('hides "Export/Import", "Train model", "Annotate" buttons when at least one media is selected', async () => {
         const firstItem = getMockedMediaImage({ id: 'first-item' });
 
-        vi.mocked(useSelectedData).mockReturnValue({
+        rs.mocked(useSelectedData).mockReturnValue({
             selectedKeys: new Set([firstItem.id]),
-            setSelectedKeys: vi.fn(),
-            toggleSelectedKeys: vi.fn(),
-            isSelected: vi.fn().mockReturnValue(false),
+            setSelectedKeys: rs.fn(),
+            toggleSelectedKeys: rs.fn(),
+            isSelected: rs.fn().mockReturnValue(false),
         });
 
         await renderToolbar([firstItem]);
@@ -203,11 +203,11 @@ describe('Toolbar', () => {
     it('shows "Export/Import", "Train model", "Annotate" buttons when no media is selected', async () => {
         const firstItem = getMockedMediaImage({ id: 'first-item' });
 
-        vi.mocked(useSelectedData).mockReturnValue({
+        rs.mocked(useSelectedData).mockReturnValue({
             selectedKeys: new Set(),
-            setSelectedKeys: vi.fn(),
-            toggleSelectedKeys: vi.fn(),
-            isSelected: vi.fn().mockReturnValue(false),
+            setSelectedKeys: rs.fn(),
+            toggleSelectedKeys: rs.fn(),
+            isSelected: rs.fn().mockReturnValue(false),
         });
 
         await renderToolbar([firstItem]);
@@ -221,11 +221,11 @@ describe('Toolbar', () => {
     it('hides filter and view controls when at least one media is selected', async () => {
         const firstItem = getMockedMediaImage({ id: 'first-item' });
 
-        vi.mocked(useSelectedData).mockReturnValue({
+        rs.mocked(useSelectedData).mockReturnValue({
             selectedKeys: new Set(firstItem.id),
-            setSelectedKeys: vi.fn(),
-            toggleSelectedKeys: vi.fn(),
-            isSelected: vi.fn().mockReturnValue(false),
+            setSelectedKeys: rs.fn(),
+            toggleSelectedKeys: rs.fn(),
+            isSelected: rs.fn().mockReturnValue(false),
         });
 
         await renderToolbar([firstItem]);
@@ -247,46 +247,46 @@ describe('Toolbar', () => {
         expect(screen.getByRole('button', { name: 'More filters' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: /media status/i })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'View mode' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Newest first' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Sort Media by:/ })).toBeInTheDocument();
     });
 
-    it('shows "Newest first" sort button by default', async () => {
+    it('sorts by upload date, newest first, by default', async () => {
         await renderToolbar();
 
-        const sortButton = screen.getByRole('button', { name: 'Newest first' });
-
-        expect(sortButton).toHaveTextContent('Newest first');
+        expect(screen.getByRole('button', { name: /Sort Media by:/ })).toHaveTextContent('Upload date (newest)');
     });
 
-    it('toggles the sort button label between "Newest first" and "Oldest first" when clicked', async () => {
+    it('switches between newest and oldest upload date sorting', async () => {
         await renderToolbar();
 
-        const newestFirstButton = screen.getByRole('button', { name: 'Newest first' });
-        fireEvent.click(newestFirstButton);
+        fireEvent.click(screen.getByRole('button', { name: /Sort Media by:/ }));
+        fireEvent.click(await screen.findByRole('option', { name: 'Upload date (oldest)' }));
 
-        const oldestFirstButton = await screen.findByRole('button', { name: 'Oldest first' });
-        expect(oldestFirstButton).toHaveTextContent('Oldest first');
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /Sort Media by:/ })).toHaveTextContent('Upload date (oldest)');
+        });
 
-        fireEvent.click(oldestFirstButton);
+        fireEvent.click(screen.getByRole('button', { name: /Sort Media by:/ }));
+        fireEvent.click(await screen.findByRole('option', { name: 'Upload date (newest)' }));
 
-        const newestFirstButton2 = await screen.findByRole('button', { name: 'Newest first' });
-        expect(newestFirstButton2).toHaveTextContent('Newest first');
+        await waitFor(() => {
+            expect(screen.getByRole('button', { name: /Sort Media by:/ })).toHaveTextContent('Upload date (newest)');
+        });
     });
 
-    it('hides sort button when at least one media item is selected', async () => {
+    it('hides sort picker when at least one media item is selected', async () => {
         const firstItem = getMockedMediaImage({ id: 'first-item' });
 
-        vi.mocked(useSelectedData).mockReturnValue({
+        rs.mocked(useSelectedData).mockReturnValue({
             selectedKeys: new Set([firstItem.id]),
-            setSelectedKeys: vi.fn(),
-            toggleSelectedKeys: vi.fn(),
-            isSelected: vi.fn().mockReturnValue(false),
+            setSelectedKeys: rs.fn(),
+            toggleSelectedKeys: rs.fn(),
+            isSelected: rs.fn().mockReturnValue(false),
         });
 
         await renderToolbar([firstItem]);
 
-        expect(screen.queryByRole('button', { name: 'Newest first' })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: 'Oldest first' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /Sort Media by:/ })).not.toBeInTheDocument();
     });
 
     it('does not display dataset view actions until media is selected', async () => {
@@ -301,11 +301,11 @@ describe('Toolbar', () => {
     it('displays save or assign when at least one media is selected on the entire dataset', async () => {
         const firstItem = getMockedMediaImage({ id: 'first-item' });
 
-        vi.mocked(useSelectedData).mockReturnValue({
+        rs.mocked(useSelectedData).mockReturnValue({
             selectedKeys: new Set([firstItem.id]),
-            setSelectedKeys: vi.fn(),
-            toggleSelectedKeys: vi.fn(),
-            isSelected: vi.fn().mockReturnValue(false),
+            setSelectedKeys: rs.fn(),
+            toggleSelectedKeys: rs.fn(),
+            isSelected: rs.fn().mockReturnValue(false),
         });
 
         await renderToolbar([firstItem]);
@@ -319,11 +319,11 @@ describe('Toolbar', () => {
     it('displays unassign media when at least one media is selected on a dataset view', async () => {
         const firstItem = getMockedMediaImage({ id: 'first-item' });
 
-        vi.mocked(useSelectedData).mockReturnValue({
+        rs.mocked(useSelectedData).mockReturnValue({
             selectedKeys: new Set([firstItem.id]),
-            setSelectedKeys: vi.fn(),
-            toggleSelectedKeys: vi.fn(),
-            isSelected: vi.fn().mockReturnValue(false),
+            setSelectedKeys: rs.fn(),
+            toggleSelectedKeys: rs.fn(),
+            isSelected: rs.fn().mockReturnValue(false),
         });
 
         await renderToolbar([firstItem], '/projects/123?datasetViewId=collection-one');
@@ -341,11 +341,11 @@ describe('Toolbar', () => {
         expect(screen.getByRole('button', { name: 'Select dataset view' })).toBeInTheDocument();
         unmount();
 
-        vi.mocked(useSelectedData).mockReturnValue({
+        rs.mocked(useSelectedData).mockReturnValue({
             selectedKeys: new Set([firstItem.id]),
-            setSelectedKeys: vi.fn(),
-            toggleSelectedKeys: vi.fn(),
-            isSelected: vi.fn().mockReturnValue(false),
+            setSelectedKeys: rs.fn(),
+            toggleSelectedKeys: rs.fn(),
+            isSelected: rs.fn().mockReturnValue(false),
         });
 
         await renderToolbar([firstItem]);
@@ -354,15 +354,15 @@ describe('Toolbar', () => {
 
     describe('select all', () => {
         it('selects every media item matching the filters, not just the loaded pages', async () => {
-            const setSelectedKeys = vi.fn();
+            const setSelectedKeys = rs.fn();
             const allMedia = getMultipleMockedMediaImage(120);
             const loadedItems = allMedia.slice(0, 40);
 
-            vi.mocked(useSelectedData).mockReturnValue({
+            rs.mocked(useSelectedData).mockReturnValue({
                 selectedKeys: new Set(),
                 setSelectedKeys,
-                toggleSelectedKeys: vi.fn(),
-                isSelected: vi.fn().mockReturnValue(false),
+                toggleSelectedKeys: rs.fn(),
+                isSelected: rs.fn().mockReturnValue(false),
             });
 
             await renderToolbar(loadedItems, '/projects/123', allMedia);
@@ -381,14 +381,14 @@ describe('Toolbar', () => {
         });
 
         it('clears the selection when everything is already selected', async () => {
-            const setSelectedKeys = vi.fn();
+            const setSelectedKeys = rs.fn();
             const allMedia = getMultipleMockedMediaImage(3);
 
-            vi.mocked(useSelectedData).mockReturnValue({
+            rs.mocked(useSelectedData).mockReturnValue({
                 selectedKeys: new Set(allMedia.map(({ id }) => id)),
                 setSelectedKeys,
-                toggleSelectedKeys: vi.fn(),
-                isSelected: vi.fn().mockReturnValue(true),
+                toggleSelectedKeys: rs.fn(),
+                isSelected: rs.fn().mockReturnValue(true),
             });
 
             await renderToolbar(allMedia);

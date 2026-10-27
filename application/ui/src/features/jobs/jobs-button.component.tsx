@@ -3,9 +3,9 @@
 
 import { useState } from 'react';
 
+import { Jobs } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 import { ActionButton, Tooltip, TooltipTrigger } from '@geti-ui/ui';
-import { Bell } from '@geti-ui/ui/icons';
 import { useModelJobs } from 'hooks/api/jobs/jobs.hook';
 import { useParams } from 'react-router';
 
@@ -31,7 +31,7 @@ export const JobsButton = () => {
             <TooltipTrigger>
                 <ActionButton isQuiet onPress={() => setIsOpen(true)} aria-label='Jobs'>
                     <span className={classes.iconWrapper}>
-                        <Bell />
+                        <Jobs />
                         {hasRunningJob && <RunningJobIndicator />}
                     </span>
                 </ActionButton>

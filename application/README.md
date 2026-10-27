@@ -4,7 +4,7 @@
 
 <img src="../assets/geti-header.png" alt="Geti™ - Build and deploy computer vision AI models with minimal effort and data">
 
-**Full-stack web application to build and deploy computer vision AI models, powered by the [getitune](../library) library.**
+**Full-stack web application to build and deploy computer vision AI models, powered by the [getitune](../libraries/getitune) library.**
 
 [![python](https://img.shields.io/badge/python-3.14-green)]()
 [![pytorch](https://img.shields.io/badge/pytorch-2.14-orange)]()
@@ -23,7 +23,7 @@ It provides an intuitive graphical interface to upload image or video data, anno
 train and optimize models, and run real-time inference through configurable pipelines.
 
 <p align="center">
-  <img src="../assets/application.gif" alt="Application demo" width="100%">
+  <img src="../assets/geti-application-demo.gif" alt="Build and optimize a model in the Geti application" width="100%">
 </p>
 
 Main capabilities:
@@ -67,5 +67,4 @@ just gen-api-spec --output-path="openapi.json"
 
 ## License
 
-The Geti source code is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0). The Windows MSIX App is licensed under the [Intel Simplified Software License](https://software.intel.com/sites/landingpage/pintool/intel-simplified-software-license.txt).
-For more information, refer to the [LICENSE](../LICENSE) page.
+Please refer to this [section](../README.md#license) for all details about Geti™ license.

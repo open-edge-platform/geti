@@ -46,6 +46,7 @@ from app.services.license_service import LicenseService
 from app.services.sink_status_service import SinkStatusService
 from app.services.source_status_service import SourceStatusService
 from app.services.training_configuration_service import TrainingConfigurationService
+from app.services.upload_service import UploadService
 from app.services.video import VideoService
 from app.webrtc.manager import WebRTCManager
 
@@ -86,6 +87,11 @@ def get_scheduler(request: Request) -> Scheduler:
 def get_data_dir(request: Request) -> Path:
     """Provides the path to the folder that stores the projects data. This path is defined in the app settings."""
     return request.app.state.settings.data_dir
+
+
+def get_log_dir(request: Request) -> Path:
+    """Provides the path to the folder where the application logs are saved."""
+    return request.app.state.settings.log_dir
 
 
 def get_job_dir(request: Request) -> Path:
@@ -389,6 +395,11 @@ def get_staged_dataset_service(
 ) -> StagedDatasetService:
     """Provides a StagedDatasetService instance for managing staged datasets."""
     return StagedDatasetService(staged_datasets_dir)
+
+
+def get_upload_service(request: Request) -> UploadService:
+    """Provides the application-wide UploadService managing resumable (TUS) uploads."""
+    return request.app.state.upload_service
 
 
 def get_job_queue(request: Request) -> JobQueue:

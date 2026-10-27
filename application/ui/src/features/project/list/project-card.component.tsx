@@ -4,6 +4,7 @@
 import { useState } from 'react';
 
 import type { Project } from '@/api/types';
+import placeholderThumbnailIconUrl from '@/assets/icons/image-icon.svg?url';
 import { useTranslation } from '@/i18n';
 import { Badge, Flex, Heading, Text, View } from '@geti-ui/ui';
 import { useQueryClient } from '@tanstack/react-query';
@@ -12,7 +13,6 @@ import { getProjectQueryOptions } from 'hooks/api/project.hook';
 import { LONG_DATE_TIME_FORMAT, useFormatDate } from 'hooks/use-format-date.hook';
 import { NavLink } from 'react-router';
 
-import placeholderThumbnailIconUrl from '../../../assets/icons/image-icon.svg?url';
 import { paths } from '../../../constants/paths';
 import { getProjectThumbnailUrl } from '../../../shared/media-url.utils';
 import { ActiveProjectBadge } from './active-project-badge/active-project-badge.component';
@@ -68,6 +68,8 @@ export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: Pro
     const isActive = item.active_pipeline;
     const taskType = getProjectTypeTitle(item.task, t);
     const labels = item.task.labels ?? [];
+    const trainedModelsCount = item.model_counts?.trained_models;
+    const hasTrainedModels = trainedModelsCount !== undefined && trainedModelsCount > 0;
     const queryClient = useQueryClient();
 
     const prefetchProject = () => {
@@ -86,9 +88,22 @@ export const ProjectCard = ({ item, prioritizeImage = false, projectNames }: Pro
                     <View position={'relative'} UNSAFE_className={classes.thumbnailContainer}>
                         <ProjectThumbnail project={item} prioritizeImage={prioritizeImage} />
 
-                        <Flex gap={'size-50'} UNSAFE_className={classes.cardBadges}>
-                            {taskType !== undefined && <ProjectTypeBadge type={taskType} />}
-                            {isActive && <ActiveProjectBadge />}
+                        <Flex
+                            gap={'size-50'}
+                            justifyContent={'space-between'}
+                            alignItems={'end'}
+                            UNSAFE_className={classes.cardBadges}
+                        >
+                            <Flex gap={'size-50'}>
+                                {taskType !== undefined && <ProjectTypeBadge type={taskType} />}
+                                {isActive && <ActiveProjectBadge />}
+                            </Flex>
+
+                            {hasTrainedModels && (
+                                <Badge variant={'seafoam'} UNSAFE_className={classes.tag}>
+                                    <Text>{t('project.list.card.models', { count: trainedModelsCount })}</Text>
+                                </Badge>
+                            )}
                         </Flex>
                     </View>
 

@@ -74,7 +74,7 @@
             "model": "模型",
             "jobs": "任务",
             "labels": "标签",
-            "language": "语言"
+            "bytesTransferred": "{{transferred}} / {{total}}"
         },
         "viewModes": {
             "large": "大缩略图",
@@ -103,7 +103,11 @@
         "modelsDescription": "模型页面，用于浏览模型",
         "inference": "推理",
         "inferenceDescription": "推理页面，用于查看项目的实时推理效果",
-        "preferences": "首选项"
+        "help": {
+            "documentation": "用户文档",
+            "whatsNew": "新功能",
+            "reportIssue": "报告问题"
+        }
     },
     "dataset": {
         "validation": {
@@ -127,14 +131,14 @@
             "deleteTitle": "删除确认",
             "deleteConfirmation": "确定要删除数据集视图“{{viewName}}”吗？",
             "deleteSuccess": "数据集视图“{{viewName}}”已成功删除。",
-            "unassignFromView": "从该视图移除",
+            "unassignFromView": "从该视图取消分配",
             "selectedMediaCount_one": "已选 {{count}} 个媒体文件",
             "selectedMediaCount_other": "已选 {{count}} 个媒体文件"
         },
         "filters": {
             "allMedia": "全部媒体",
             "withAnnotations": "已标注的媒体",
-            "missingAnnotations": "缺少标注的媒体",
+            "missingAnnotations": "未标注的媒体",
             "subset": "按数据子集筛选",
             "searchLabels": "搜索标签",
             "labelsSelected_one": "已选 {{count}} 个标签",
@@ -151,6 +155,7 @@
         },
         "upload": {
             "queued": "排队中",
+            "processing": "处理中",
             "uploaded": "已上传",
             "errorTitle": "上传错误",
             "details": "上传详情",
@@ -165,13 +170,18 @@
             "failedSummary_other": "{{count}} 个文件上传失败",
             "mixedSummary_one": "已上传 {{uploaded}} 个文件，失败 {{failed}} 个",
             "mixedSummary_other": "已上传 {{uploaded}} 个文件，失败 {{failed}} 个",
+            "mixedCancelledSummary_one": "已上传 {{uploaded}} 个文件，失败 {{failed}} 个，已取消 {{cancelled}} 个",
+            "mixedCancelledSummary_other": "已上传 {{uploaded}} 个文件，失败 {{failed}} 个，已取消 {{cancelled}} 个",
             "genericError": "媒体文件上传失败。",
             "uploadMedia": "上传媒体文件",
             "showDetails": "查看详情",
             "inProgressToast_one": "正在上传 {{count}} 个文件……",
             "inProgressToast_other": "正在上传 {{count}} 个文件……",
             "inProgressSucceededPart": "成功 {{count}} 个",
-            "inProgressFailedPart": "失败 {{count}} 个"
+            "inProgressFailedPart": "失败 {{count}} 个",
+            "cancelAll": "全部取消",
+            "cancelledSummary_one": "已取消 {{count}} 个上传",
+            "cancelledSummary_other": "已取消 {{count}} 个上传"
         },
         "empty": {
             "noMatches": "没有符合筛选条件的媒体文件。",
@@ -225,8 +235,11 @@
             "downloadStarted": "{{fileName}} 已开始下载"
         },
         "gallery": {
-            "sortOldestFirst": "最早优先",
-            "sortNewestFirst": "最新优先",
+            "sort": {
+                "label": "排序：",
+                "uploadDateDescending": "按上传时间（最新优先）",
+                "uploadDateAscending": "按上传时间（最早优先）"
+            },
             "selectedCount": "已选 {{count}} 项",
             "totalMediaCount_one": "共 {{count}} 个媒体文件",
             "totalMediaCount_other": "共 {{count}} 个媒体文件",
@@ -251,7 +264,7 @@
             "multipleFilesError": "不支持选择文件夹或多个文件，请只上传单个文件。",
             "unsupportedFormatError": "文件格式不支持，请上传有效的 .zip 文件。",
             "datasetBeingUploaded": "数据集正在上传",
-            "dropZipHere": "把数据集 .zip 文件拖拽到这里",
+            "dropZipHere": "将数据集 .zip 文件拖拽到这里",
             "learnMoreFormats": "了解支持的数据格式",
             "dialogHeading": "导入数据集",
             "scanningMessage": "正在扫描解析待导入的数据集压缩包……",
@@ -302,7 +315,7 @@
                 "unsupportedItemsEmptyLabels": "空标签",
                 "unsupportedItemsVideos": "视频",
                 "unsupportedItems": "要保留{{items}}，请使用 Geti 导出格式。",
-                "subsetNotIncluded": "导出的数据集不包含各媒体文件的数据子集信息。"
+                "subsetNotIncluded": "导出的数据集不包含各媒体文件所属的子集信息。"
             }
         },
         "importExport": {
@@ -511,7 +524,7 @@
             },
             "captureRate": {
                 "title": "采集频率",
-                "description": "推流过程中采集帧",
+                "description": "视频流运行期间采集帧",
                 "toggleLabel": "自动采集"
             },
             "confidenceThreshold": {
@@ -579,7 +592,7 @@
             "manageProjects": "管理项目",
             "enablePipelineBlocked": {
                 "title": "无法启用流水线",
-                "message": "请确保在启用流水线之前，已选择模型和来源。"
+                "message": "请确保在启用流水线之前，已选择模型和输入源。"
             }
         },
         "taskTypes": {
@@ -597,11 +610,13 @@
             "createNewProject": "新建项目",
             "createProjectFromDataset": "从数据集创建",
             "card": {
-                "created": "创建于：{{date}}"
+                "created": "创建于：{{date}}",
+                "models_one": "{{count}} 个模型",
+                "models_other": "{{count}} 个模型"
             },
             "menu": {
                 "enablePipeline": "启用流水线",
-                "disablePipeline": "禁用流水线"
+                "disablePipeline": "停用流水线"
             },
             "sort": {
                 "label": "排序：",
@@ -612,7 +627,9 @@
             },
             "filters": {
                 "searchPlaceholder": "搜索项目",
-                "taskType": "按任务类型筛选"
+                "taskType": "按任务类型筛选",
+                "models": "按模型筛选",
+                "withTrainedModels": "有已训练模型"
             },
             "noMatches": {
                 "title": "没有符合条件的项目",
@@ -771,6 +788,7 @@
                 "unknownError": "发生未知错误，请刷新页面重试。",
                 "timeoutError": "{{operation}} 在 {{timeoutMs}}ms 后超时，请尝试刷新页面。",
                 "embeddingError": "无法获取图像嵌入（{{status}}{{statusText}}）。",
+                "hint": "Shift + 点击以包含区域，Alt + 点击以排除区域。点击以创建标注，按 Esc 清除这些点。",
                 "operations": {
                     "workerBuild": "SAM 工作进程构建",
                     "workerInit": "SAM 工作进程初始化",
@@ -793,6 +811,12 @@
                 "error": "检测助手工具出错：{{message}}",
                 "operations": {
                     "workerBuild": "检测助手工作进程构建"
+                },
+                "options": {
+                    "accept": "接受",
+                    "reject": "拒绝",
+                    "numberOfItems": "项目数量",
+                    "autoMergeDuplicates": "自动合并重复项"
                 }
             }
         },
@@ -884,7 +908,7 @@
                     "map50OnCoco": "COCO mAP50"
                 },
                 "card": {
-                    "numberOfParameters": "参数量：{{count}} 百万",
+                    "numberOfParameters": "参数量：{{count}} M",
                     "gigaflops": "Gigaflops：{{value}}"
                 },
                 "sort": {
@@ -904,7 +928,7 @@
                     "selectVariantPlaceholder": "选择变体",
                     "pretrainedWeightsLabel": "预训练权重",
                     "selectWeightsPlaceholder": "选择权重",
-                    "parameters": "参数量：{{count}} 百万",
+                    "parameters": "参数量：{{count}} M",
                     "gigaflops": "GigaFlops：{{value}}"
                 }
             },
@@ -940,11 +964,11 @@
                 }
             },
             "validation": {
-                "notEnoughAnnotations": "要训练模型，数据集中至少需要标注 3 项，不过为获得更好的效果，建议多标注一些。",
-                "notEnoughAnnotationsInView": "要训练模型，所选数据集视图中至少需要标注 3 项，不过为获得更好的效果，建议多标注一些。",
-                "emptySubsetsReason": "要训练模型，每个子集（训练集、验证集、测试集）至少需要包含一项。目前不满足该条件，因为{{subsetClause}}，且{{assignmentDetail}}。",
-                "emptySubsetClause_one": "{{list}} 子集为空",
-                "emptySubsetClause_other": "{{list}} 子集均为空",
+                "notEnoughAnnotations": "要训练模型，至少需要在数据集中标注 3 项，为获得更好的效果，建议标注更多。",
+                "notEnoughAnnotationsInView": "要训练模型，至少需要在所选数据集视图中标注 3 项，为获得更好的效果，建议标注更多。",
+                "emptySubsetsReason": "要训练模型，每个子集（训练集、验证集、测试集）至少需要包含一个条目。目前尚未满足该条件，因为 {{subsetClause}} 为空，且 {{assignmentDetail}}。",
+                "emptySubsetClause_one": "{{list}} 子集",
+                "emptySubsetClause_other": "{{list}} 子集",
                 "reviewedOnly_one": "还有 {{count}} 个已审核项待分配",
                 "reviewedOnly_other": "还有 {{count}} 个已审核项待分配",
                 "unannotatedOnly_one": "还有 {{count}} 项需先完成标注才能分配",
@@ -998,7 +1022,7 @@
                         "automatic": "自动",
                         "custom": "自定义"
                     },
-                    "offDescription": "模型将整张图像作为一个整体处理，不划分为更小的图块。这种方式简单直接，但在高分辨率图像中检测小目标时可能力不从心，因为模型可能遗漏精细细节",
+                    "offDescription": "模型将整张图像作为一个整体处理，不划分为更小的图块。这种方式简单直接，但在高分辨率图像中检测小目标时可能力不从心，因为模型可能遗漏细节",
                     "automaticDescription": "这意味着系统将根据图像分辨率和标注尺寸自动设置参数。"
                 },
                 "intensityMapping": {
@@ -1108,7 +1132,7 @@
             "finished": "已完成"
         },
         "status": {
-            "pending": "已计划",
+            "pending": "排队中",
             "cancelling": "正在取消",
             "done": "已完成"
         },
@@ -1124,13 +1148,17 @@
         },
         "meta": {
             "started": "开始于 {{time}}",
-            "elapsed": "已用时 {{time}}"
+            "elapsed": "已用时 {{time}}",
+            "duration": "持续时间 {{time}}",
+            "finished": "完成于 {{time}}",
+            "failed": "失败于 {{time}}",
+            "cancelled": "取消于 {{time}}"
         },
         "emptyState": {
-            "all": "此类别中没有任务",
+            "all": "没有任务",
             "running": "没有正在运行的任务",
             "finished": "没有已完成的任务",
-            "scheduled": "没有已计划的任务",
+            "scheduled": "没有排队中的任务",
             "cancelled": "没有已取消的任务",
             "failed": "没有失败的任务"
         },
@@ -1142,15 +1170,13 @@
         "label": "许可：",
         "agreement": {
             "title": "许可协议",
-            "intro": "安装、使用或分发本应用，即表示您确认：",
-            "termsRead": "您已阅读并理解下方链接中的许可条款；",
-            "termsGovern": "确认所访问和使用内容的适用条款为链接中的条款；且",
-            "termsAccepted": "已接受并同意链接中的许可条款。",
+            "intro": "请查看并接受以下许可，以继续使用 Geti。",
+            "progress": "第 {{current}} 项，共 {{total}} 项",
+            "required": "必需",
+            "optional": "可选",
+            "fullLicense": "阅读完整许可",
+            "previous": "上一步",
             "accept": "接受并继续"
-        },
-        "links": {
-            "intelSimplified": "Intel Simplified Software License",
-            "dinov2": "DINOv3 License"
         }
     },
     "application": {
@@ -1171,7 +1197,8 @@
         },
         "notifications": {
             "unexpectedError": "发生未知错误，请重试。",
-            "networkError": "网络连接异常，请检查网络后重试。"
+            "networkError": "网络连接异常，请检查网络后重试。",
+            "uploadTransferError": "文件传输失败。请重试。"
         }
     },
     "downloads": {

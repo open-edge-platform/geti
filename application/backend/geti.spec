@@ -8,6 +8,9 @@ from PyInstaller.utils.hooks import collect_all, collect_dynamic_libs, collect_s
 # When set to "1", exclude Ultralytics (AGPL-3.0) models from the bundle.
 EXCLUDE_AGPL_MODELS = os.environ.get("EXCLUDE_AGPL_MODELS", "0") == "1"
 
+# Analysis imports ultralytics, which would otherwise pip-install missing extras into the build venv.
+os.environ["YOLO_AUTOINSTALL"] = "false"
+
 _AGPL_MODULES = ['ultralytics', 'thop', 'pynvml']
 
 _MANIFESTS_ROOT = 'app/supported_models/manifests'
@@ -54,6 +57,8 @@ datas = [
     ('app/services/sam/mobile_sam.encoder.bin', 'app/services/sam'),
     # timm model catalog snapshot, read via importlib.resources at runtime
     ('app/supported_models/timm_catalog_snapshot.json', 'app/supported_models'),
+    # License texts bundled with exported models, read via importlib.resources at runtime
+    ('app/supported_models/licenses/*', 'app/supported_models/licenses'),
     *_collect_manifests(EXCLUDE_AGPL_MODELS),
     *copy_metadata("geti"),
     *copy_metadata("optree"),
@@ -236,12 +241,17 @@ hiddenimports += collect_submodules('cryptography')
 
 # Runtime hook to patch importlib.metadata must execute before torch is imported
 # in every process (including multiprocessing-spawned children).
-runtime_hooks = ['pyinstaller/pyi_rth_pkgmeta.py']
+runtime_hooks = ['pyinstaller/pyi_rth_pkgmeta.py', 'pyinstaller/pyi_rth_ultralytics.py']
 
 system = platform.system()
 if system == "Windows":
     # uwp.py sets DATA_DIR; certs.py must run after it to generate TLS certs there.
-    runtime_hooks += ['pyinstaller/windows/uwp.py', 'pyinstaller/windows/certs.py', 'pyinstaller/windows/proxy.py']
+    runtime_hooks += [
+        'pyinstaller/windows/error_mode.py',
+        'pyinstaller/windows/uwp.py',
+        'pyinstaller/windows/certs.py',
+        'pyinstaller/windows/proxy.py',
+    ]
 
 a = Analysis(
     ['app/main.py'],
