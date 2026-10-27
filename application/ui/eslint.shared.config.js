@@ -42,7 +42,6 @@ export default [
             '**/node_modules',
             '**/*.tsx.snap',
             'src/assets',
-            'src/__mocks__',
             '**/public',
         ],
     },
