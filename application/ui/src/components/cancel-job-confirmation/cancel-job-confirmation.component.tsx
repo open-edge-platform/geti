@@ -21,9 +21,13 @@ export const CancelJobConfirmation = ({ jobId, onRemove }: CancelJobConfirmation
         cancelMutation.mutate(
             { params: { path: { job_id: jobId } } },
             {
-                onSuccess: async () => await onRemove(),
-                onError: async (error) => {
-                    isInvalidJob(error) && (await onRemove());
+                onSuccess: () => {
+                    void onRemove();
+                },
+                onError: (error) => {
+                    if (isInvalidJob(error)) {
+                        void onRemove();
+                    }
                 },
                 onSettled: () => {
                     dialogState.close();

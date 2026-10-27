@@ -46,25 +46,27 @@ export const useDeleteMediaItem = () => {
                 body: { media_ids },
                 params: { path: { project_id: projectId } },
             },
-            { onSuccess: () => handleSuccess(media_ids, onDeleted) }
+            { onSuccess: () => void handleSuccess(media_ids, onDeleted) }
         );
     };
 
-    const handleSuccess = (deletedIds: string[], onDeleted?: (ids: string[]) => void) => {
-        queryClient.invalidateQueries({
-            queryKey: getQueryKey([
-                'get',
-                '/api/projects/{project_id}/dataset/statistics',
-                { params: { path: { project_id: projectId } } },
-            ]),
-        });
-        queryClient.invalidateQueries({
-            queryKey: getQueryKey([
-                'get',
-                '/api/projects/{project_id}/dataset/media',
-                { params: { path: { project_id: projectId } } },
-            ]),
-        });
+    const handleSuccess = async (deletedIds: string[], onDeleted?: (ids: string[]) => void) => {
+        await Promise.all([
+            queryClient.invalidateQueries({
+                queryKey: getQueryKey([
+                    'get',
+                    '/api/projects/{project_id}/dataset/statistics',
+                    { params: { path: { project_id: projectId } } },
+                ]),
+            }),
+            queryClient.invalidateQueries({
+                queryKey: getQueryKey([
+                    'get',
+                    '/api/projects/{project_id}/dataset/media',
+                    { params: { path: { project_id: projectId } } },
+                ]),
+            }),
+        ]);
 
         isFunction(onDeleted) && onDeleted(deletedIds);
 

@@ -199,6 +199,22 @@ export default [
         },
     },
     {
+        // Type-aware rules. Scoped to files covered by tsconfig.json `include`.
+        files: ['{src,tests,mocks}/**/*.{ts,tsx}'],
+        languageOptions: {
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: dirname,
+            },
+        },
+        rules: {
+            '@typescript-eslint/no-floating-promises': 'error',
+            '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: { attributes: false } }],
+            '@typescript-eslint/await-thenable': 'error',
+            '@typescript-eslint/switch-exhaustiveness-check': 'error',
+        },
+    },
+    {
         files: ['**/*.test.tsx', '**/*.test.ts'],
 
         rules: {

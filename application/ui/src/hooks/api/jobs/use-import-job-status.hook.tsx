@@ -15,7 +15,7 @@ import { useStreamJobDetail } from './jobs.hook';
 type UseImportJobStatusProps = {
     jobId: string | null | undefined;
     onError?: (error?: unknown) => void;
-    onSuccess?: () => void;
+    onSuccess?: () => Promise<void>;
 };
 
 export const useImportJobStatus = ({ jobId, onError, onSuccess }: UseImportJobStatusProps) => {
@@ -41,7 +41,7 @@ export const useImportJobStatus = ({ jobId, onError, onSuccess }: UseImportJobSt
         toast({ type: 'error', message: `${t('dataset.import.genericError')} ${message}` });
     });
     const handleDoneJob = useEffectEvent(() => {
-        isFunction(onSuccess) && onSuccess();
+        isFunction(onSuccess) && void onSuccess();
     });
 
     useEffect(() => {
