@@ -10,7 +10,7 @@ import magneticLassoClosingCursor from '@/assets/icons/cursor/magnetic-lasso-clo
 import magneticLassoDrawingCursor from '@/assets/icons/cursor/magnetic-lasso-drawing.png';
 import polygonClosingCursor from '@/assets/icons/cursor/polygon-closing.png';
 import polygonDrawingCursor from '@/assets/icons/cursor/polygon-drawing.png';
-import { isPolygonValid } from '@geti-ui/smart-tools/utils';
+import { isPointOverPoint, isPolygonValid } from '@geti-ui/smart-tools/utils';
 import { isEmpty, isNil, negate } from 'lodash-es';
 
 import { isLeftButton } from '../../../../shared/buttons-utils';
@@ -133,6 +133,22 @@ export const isCloseMode = (mode: PolygonMode | null) => {
     }
 
     return [PolygonMode.PolygonClose, PolygonMode.LassoClose, PolygonMode.MagneticLassoClose].includes(mode);
+};
+
+export const canClosePolygonAt = (
+    segments: Point[][],
+    polygon: PolygonType | null,
+    point: Point,
+    startingPointRadius: number
+): boolean => {
+    const flatSegments = segments.flat();
+
+    if (isEmpty(flatSegments) || polygon === null) return false;
+
+    return (
+        isPolygonValid({ shapeType: 'polygon', points: polygon.points }) &&
+        isPointOverPoint(flatSegments[0], point, startingPointRadius)
+    );
 };
 
 export const isPolygonReadyToClose = (currentPolygon: PolygonType | null): currentPolygon is PolygonType => {
