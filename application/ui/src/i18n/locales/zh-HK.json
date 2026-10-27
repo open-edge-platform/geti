@@ -908,7 +908,7 @@
                     "map50OnCoco": "COCO mAP50"
                 },
                 "card": {
-                    "numberOfParameters": "參數量：{{count}} 百萬",
+                    "numberOfParameters": "參數量：{{count}} M",
                     "gigaflops": "Gigaflops：{{value}}"
                 },
                 "sort": {
@@ -928,7 +928,7 @@
                     "selectVariantPlaceholder": "選擇變體",
                     "pretrainedWeightsLabel": "預訓練權重",
                     "selectWeightsPlaceholder": "選擇權重",
-                    "parameters": "參數量：{{count}} 百萬",
+                    "parameters": "參數量：{{count}} M",
                     "gigaflops": "GigaFlops：{{value}}"
                 }
             },
@@ -964,11 +964,11 @@
                 }
             },
             "validation": {
-                "notEnoughAnnotations": "要訓練模型，數據集中至少需要標註 3 項，不過為獲得更好的效果，建議多標註一些。",
-                "notEnoughAnnotationsInView": "要訓練模型，所選數據集視圖中至少需要標註 3 項，不過為獲得更好的效果，建議多標註一些。",
-                "emptySubsetsReason": "要訓練模型，每個子集（訓練集、驗證集、測試集）至少需要包含一項。目前不滿足該條件，因為{{subsetClause}}，且{{assignmentDetail}}。",
-                "emptySubsetClause_one": "{{list}} 子集為空",
-                "emptySubsetClause_other": "{{list}} 子集均為空",
+                "notEnoughAnnotations": "要訓練模型，至少需要在數據集中標註 3 項，為獲得更好的效果，建議標註更多。",
+                "notEnoughAnnotationsInView": "要訓練模型，至少需要在所選數據集視圖中標註 3 項，為獲得更好的效果，建議標註更多。",
+                "emptySubsetsReason": "要訓練模型，每個子集（訓練集、驗證集、測試集）至少需要包含一個條目。目前尚未滿足該條件，因為 {{subsetClause}} 為空，且 {{assignmentDetail}}。",
+                "emptySubsetClause_one": "{{list}} 子集",
+                "emptySubsetClause_other": "{{list}} 子集",
                 "reviewedOnly_one": "還有 {{count}} 個已審核項待分配",
                 "reviewedOnly_other": "還有 {{count}} 個已審核項待分配",
                 "unannotatedOnly_one": "還有 {{count}} 項需先完成標註才能分配",
@@ -1022,7 +1022,7 @@
                         "automatic": "自動",
                         "custom": "自訂"
                     },
-                    "offDescription": "模型將整張圖片作為一個整體處理，不劃分為更小的圖塊。這種方式簡單直接，但在高解像度圖片中偵測小物件時可能效果欠佳，因為模型可能遺漏精細細節",
+                    "offDescription": "模型將整張圖片作為一個整體處理，不劃分為更小的圖塊。這種方式簡單直接，但在高解像度圖片中偵測小物件時可能效果欠佳，因為模型可能遺漏細節",
                     "automaticDescription": "這意味著系統將根據圖片解像度和標註尺寸自動設定參數。"
                 },
                 "intensityMapping": {
