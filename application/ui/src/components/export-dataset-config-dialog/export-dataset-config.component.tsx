@@ -33,6 +33,7 @@ import { isNonEmptyString } from '../../shared/util';
 import { MultiSelectList } from '../multi-select-list/multi-select-list.component';
 import { getFormatOptions } from '../util';
 
+import largeDialogClasses from '../../shared/styles/large-dialog.module.scss';
 import classes from './export-dataset-config.module.scss';
 
 const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: string | null }) => {
@@ -131,7 +132,7 @@ const ExportDatasetDialogContent = ({
     const labels = selectedProject.task.labels?.map((label) => ({ id: label.name, name: label.name })) ?? [];
 
     return (
-        <Dialog size='L' width={{ base: '70vw' }}>
+        <Dialog UNSAFE_className={largeDialogClasses.largeDialog}>
             <Heading>
                 {datasetViewName === undefined
                     ? t('dataset.export.heading', { name })

@@ -17,6 +17,8 @@ import { useTrainModelDisabledReason } from './hooks/use-train-model-disabled-re
 import { TrainModelDialogLayout } from './train-model-dialog-layout.component';
 import { useTrainModelState } from './train-model-provider.component';
 
+import largeDialogClasses from '../../../shared/styles/large-dialog.module.scss';
+
 type TrainModelDialogProps = {
     onClose: () => void;
 };
@@ -81,7 +83,7 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
     };
 
     return (
-        <Dialog width={'clamp(800px, 50vw, 1150px)'} height={isAdvancedSettingsMode ? '80vh' : undefined}>
+        <Dialog UNSAFE_className={largeDialogClasses.largeDialog}>
             <Heading>{t('models.training.setup.dialog.title')}</Heading>
 
             <Divider size={'S'} />
