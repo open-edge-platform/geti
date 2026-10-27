@@ -131,7 +131,7 @@
             "deleteTitle": "刪除確認",
             "deleteConfirmation": "確定要刪除數據集視圖「{{viewName}}」嗎？",
             "deleteSuccess": "數據集視圖「{{viewName}}」已成功刪除。",
-            "unassignFromView": "從該視圖移除",
+            "unassignFromView": "從該視圖取消分配",
             "selectedMediaCount_one": "已選 {{count}} 個媒體檔案",
             "selectedMediaCount_other": "已選 {{count}} 個媒體檔案"
         },
@@ -315,7 +315,7 @@
                 "unsupportedItemsEmptyLabels": "空白標籤",
                 "unsupportedItemsVideos": "影片",
                 "unsupportedItems": "要保留{{items}}，請使用 Geti 匯出格式。",
-                "subsetNotIncluded": "匯出的數據集不包含各媒體檔案的數據子集資訊。"
+                "subsetNotIncluded": "匯出的數據集不包含各媒體檔案所屬的子集資訊。"
             }
         },
         "importExport": {
@@ -592,7 +592,7 @@
             "manageProjects": "管理項目",
             "enablePipelineBlocked": {
                 "title": "無法啟用管線",
-                "message": "請確保在啟用管線之前，已選擇模型和來源。"
+                "message": "請確保在啟用管線之前，已選擇模型和輸入源。"
             }
         },
         "taskTypes": {

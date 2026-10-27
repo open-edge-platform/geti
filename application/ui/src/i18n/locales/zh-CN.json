@@ -131,7 +131,7 @@
             "deleteTitle": "删除确认",
             "deleteConfirmation": "确定要删除数据集视图“{{viewName}}”吗？",
             "deleteSuccess": "数据集视图“{{viewName}}”已成功删除。",
-            "unassignFromView": "从该视图移除",
+            "unassignFromView": "从该视图取消分配",
             "selectedMediaCount_one": "已选 {{count}} 个媒体文件",
             "selectedMediaCount_other": "已选 {{count}} 个媒体文件"
         },
@@ -315,7 +315,7 @@
                 "unsupportedItemsEmptyLabels": "空标签",
                 "unsupportedItemsVideos": "视频",
                 "unsupportedItems": "要保留{{items}}，请使用 Geti 导出格式。",
-                "subsetNotIncluded": "导出的数据集不包含各媒体文件的数据子集信息。"
+                "subsetNotIncluded": "导出的数据集不包含各媒体文件所属的子集信息。"
             }
         },
         "importExport": {
@@ -524,7 +524,7 @@
             },
             "captureRate": {
                 "title": "采集频率",
-                "description": "推流过程中采集帧",
+                "description": "视频流运行期间采集帧",
                 "toggleLabel": "自动采集"
             },
             "confidenceThreshold": {
@@ -592,7 +592,7 @@
             "manageProjects": "管理项目",
             "enablePipelineBlocked": {
                 "title": "无法启用流水线",
-                "message": "请确保在启用流水线之前，已选择模型和来源。"
+                "message": "请确保在启用流水线之前，已选择模型和输入源。"
             }
         },
         "taskTypes": {
@@ -616,7 +616,7 @@
             },
             "menu": {
                 "enablePipeline": "启用流水线",
-                "disablePipeline": "禁用流水线"
+                "disablePipeline": "停用流水线"
             },
             "sort": {
                 "label": "排序：",
