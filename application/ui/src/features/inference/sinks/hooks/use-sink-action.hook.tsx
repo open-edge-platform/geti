@@ -37,7 +37,7 @@ export const useSinkAction = <T extends SinkConfig>({
                 message: isNewSink ? t('inference.sinks.form.createSuccess') : t('inference.sinks.form.updateSuccess'),
             });
 
-            void onSaved?.(sink_id);
+            await onSaved?.(sink_id);
 
             return { ...body, id: sink_id };
         } catch (error: unknown) {

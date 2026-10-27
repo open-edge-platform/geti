@@ -50,7 +50,7 @@ export const useSourceAction = <T extends SourceConfigPayload>({
                     : t('inference.sources.form.updateSuccess'),
             });
 
-            void onSaved?.(source_id);
+            await onSaved?.(source_id);
             return { ...body, id: source_id };
         } catch (error: unknown) {
             // The user cancelled the file transfer: keep the form as it is, without an error.

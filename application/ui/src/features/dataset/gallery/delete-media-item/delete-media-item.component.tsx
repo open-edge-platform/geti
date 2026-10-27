@@ -24,8 +24,8 @@ export const DeleteMediaItem = ({ itemsIds = [], onDeleted, isHotkeyEnabled = fa
     const { t } = useTranslation();
     const { deleteMedia, openDeleteDialog, closeDeleteDialog, isPending, isDeleteDialogOpen } = useDeleteMediaItem();
 
-    const handleDelete = async () => {
-        await deleteMedia(itemsIds, onDeleted);
+    const handleDelete = () => {
+        deleteMedia(itemsIds, onDeleted);
     };
 
     useHotkeys(
