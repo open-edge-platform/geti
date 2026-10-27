@@ -243,12 +243,6 @@ export default [
     },
     sharedComponentsAliasConfig,
     {
-        files: ['**/*.test.ts', '**/*.test.tsx', '**/*mock*.ts', '**/*.spec.ts'],
-        rules: {
-            'max-len': ['off'],
-        },
-    },
-    {
         // Every source file *except* `.tauri.{ts,tsx}` twins must not import
         // `@tauri-apps/*` directly.
         files: ['src/**/*.{ts,tsx}'],
