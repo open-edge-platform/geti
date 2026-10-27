@@ -20,7 +20,7 @@
         "server": "cd ../backend && just run-server",
         "format": "prettier --write .",
         "format:check": "prettier --check --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\"",
-        "lint": "eslint \"src/**/*.ts*\" --max-warnings 0",
+        "lint": "eslint \"{src,tests,mocks}/**/*.ts*\" --max-warnings 0",
         "lint:fix": "eslint --fix \"./src/**/*.ts*\"",
         "preview": "npm run build && rsbuild preview",
         "preview:tauri": "rsbuild preview --env-mode tauri --port 3001",

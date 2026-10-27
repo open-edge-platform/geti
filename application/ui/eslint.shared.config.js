@@ -43,12 +43,10 @@ export default [
             '**/*.tsx.snap',
             'src/assets',
             'src/__mocks__',
-            '**/dex_templates',
-            '**/oauth2_proxy_templates',
             '**/public',
-            'src/core/server/generated/*',
         ],
     },
+    js.configs.recommended,
     ...fixupConfigRules(
         compat.extends(
             'plugin:jsx-a11y/recommended',
