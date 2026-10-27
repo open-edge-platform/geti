@@ -131,7 +131,7 @@
             "deleteTitle": "删除确认",
             "deleteConfirmation": "确定要删除数据集视图“{{viewName}}”吗？",
             "deleteSuccess": "数据集视图“{{viewName}}”已成功删除。",
-            "unassignFromView": "从该视图移除",
+            "unassignFromView": "从该视图取消分配",
             "selectedMediaCount_one": "已选 {{count}} 个媒体文件",
             "selectedMediaCount_other": "已选 {{count}} 个媒体文件"
         },
@@ -315,7 +315,7 @@
                 "unsupportedItemsEmptyLabels": "空标签",
                 "unsupportedItemsVideos": "视频",
                 "unsupportedItems": "要保留{{items}}，请使用 Geti 导出格式。",
-                "subsetNotIncluded": "导出的数据集不包含各媒体文件的数据子集信息。"
+                "subsetNotIncluded": "导出的数据集不包含各媒体文件所属的子集信息。"
             }
         },
         "importExport": {
@@ -524,7 +524,7 @@
             },
             "captureRate": {
                 "title": "采集频率",
-                "description": "推流过程中采集帧",
+                "description": "视频流运行期间采集帧",
                 "toggleLabel": "自动采集"
             },
             "confidenceThreshold": {
@@ -592,7 +592,7 @@
             "manageProjects": "管理项目",
             "enablePipelineBlocked": {
                 "title": "无法启用流水线",
-                "message": "请确保在启用流水线之前，已选择模型和来源。"
+                "message": "请确保在启用流水线之前，已选择模型和输入源。"
             }
         },
         "taskTypes": {
@@ -616,7 +616,7 @@
             },
             "menu": {
                 "enablePipeline": "启用流水线",
-                "disablePipeline": "禁用流水线"
+                "disablePipeline": "停用流水线"
             },
             "sort": {
                 "label": "排序：",
@@ -908,7 +908,7 @@
                     "map50OnCoco": "COCO mAP50"
                 },
                 "card": {
-                    "numberOfParameters": "参数量：{{count}} 百万",
+                    "numberOfParameters": "参数量：{{count}} M",
                     "gigaflops": "Gigaflops：{{value}}"
                 },
                 "sort": {
@@ -928,7 +928,7 @@
                     "selectVariantPlaceholder": "选择变体",
                     "pretrainedWeightsLabel": "预训练权重",
                     "selectWeightsPlaceholder": "选择权重",
-                    "parameters": "参数量：{{count}} 百万",
+                    "parameters": "参数量：{{count}} M",
                     "gigaflops": "GigaFlops：{{value}}"
                 }
             },
@@ -964,11 +964,11 @@
                 }
             },
             "validation": {
-                "notEnoughAnnotations": "要训练模型，数据集中至少需要标注 3 项，不过为获得更好的效果，建议多标注一些。",
-                "notEnoughAnnotationsInView": "要训练模型，所选数据集视图中至少需要标注 3 项，不过为获得更好的效果，建议多标注一些。",
-                "emptySubsetsReason": "要训练模型，每个子集（训练集、验证集、测试集）至少需要包含一项。目前不满足该条件，因为{{subsetClause}}，且{{assignmentDetail}}。",
-                "emptySubsetClause_one": "{{list}} 子集为空",
-                "emptySubsetClause_other": "{{list}} 子集均为空",
+                "notEnoughAnnotations": "要训练模型，至少需要在数据集中标注 3 项，为获得更好的效果，建议标注更多。",
+                "notEnoughAnnotationsInView": "要训练模型，至少需要在所选数据集视图中标注 3 项，为获得更好的效果，建议标注更多。",
+                "emptySubsetsReason": "要训练模型，每个子集（训练集、验证集、测试集）至少需要包含一个条目。目前尚未满足该条件，因为 {{subsetClause}} 为空，且 {{assignmentDetail}}。",
+                "emptySubsetClause_one": "{{list}} 子集",
+                "emptySubsetClause_other": "{{list}} 子集",
                 "reviewedOnly_one": "还有 {{count}} 个已审核项待分配",
                 "reviewedOnly_other": "还有 {{count}} 个已审核项待分配",
                 "unannotatedOnly_one": "还有 {{count}} 项需先完成标注才能分配",
@@ -1022,7 +1022,7 @@
                         "automatic": "自动",
                         "custom": "自定义"
                     },
-                    "offDescription": "模型将整张图像作为一个整体处理，不划分为更小的图块。这种方式简单直接，但在高分辨率图像中检测小目标时可能力不从心，因为模型可能遗漏精细细节",
+                    "offDescription": "模型将整张图像作为一个整体处理，不划分为更小的图块。这种方式简单直接，但在高分辨率图像中检测小目标时可能力不从心，因为模型可能遗漏细节",
                     "automaticDescription": "这意味着系统将根据图像分辨率和标注尺寸自动设置参数。"
                 },
                 "intensityMapping": {

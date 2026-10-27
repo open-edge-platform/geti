@@ -1181,7 +1181,7 @@
     },
     "application": {
         "startup": {
-            "loading": "Loading...Please wait."
+            "loading": "Loading... Please wait."
         },
         "serverError": {
             "heading": "Server Error"
