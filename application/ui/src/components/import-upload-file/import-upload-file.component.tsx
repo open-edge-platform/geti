@@ -109,8 +109,9 @@ export const ImportUploadFile = ({ formatOptions, onFileUploaded }: ImportUpload
         <DropZone
             isFilled={stagedDatasetMutation.isSuccess}
             onDrop={async (event) => handleLoadingFile(await getFilesFromDropEvent(event))}
+            height={'100%'}
         >
-            <IllustratedMessage maxHeight={'size-4600'}>
+            <IllustratedMessage>
                 <DropFiles />
 
                 <Content>

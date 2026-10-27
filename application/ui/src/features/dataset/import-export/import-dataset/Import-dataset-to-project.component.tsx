@@ -14,6 +14,8 @@ import { ImportDatasetButtons } from './import-dataset-buttons/import-dataset-bu
 import { ImportProcess } from './import-process/import-process.component';
 import { LabelMapping } from './label-mapping/label-mapping.component';
 
+import largeDialogClasses from '../../../../shared/styles/large-dialog.module.scss';
+
 export const ImportDatasetToProject = () => {
     const { t } = useTranslation();
     const { data: selectedProject } = useProject();
@@ -35,13 +37,10 @@ export const ImportDatasetToProject = () => {
     return (
         <DialogContainer onDismiss={datasetImportDialogState.close}>
             {datasetImportDialogState.isOpen && (
-                <Dialog aria-label={'Import dataset to project'} width={800}>
+                <Dialog aria-label={'Import dataset to project'} UNSAFE_className={largeDialogClasses.largeDialog}>
                     <Heading>{t('dataset.import.dialogHeading')}</Heading>
                     <Divider />
-                    <Content
-                        minHeight={'size-5000'}
-                        UNSAFE_style={{ background: 'var(--spectrum-global-color-gray-50)' }}
-                    >
+                    <Content UNSAFE_style={{ background: 'var(--spectrum-global-color-gray-50)' }}>
                         {currentStep === 'uploading' && (
                             <ImportUploadFile formatOptions={formatOptions} onFileUploaded={handleFileUploaded} />
                         )}
