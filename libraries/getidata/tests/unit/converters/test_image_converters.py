@@ -476,7 +476,7 @@ def test_image_path_to_image_converter_16bit():
         test_image_path = os.path.join(temp_dir, "test_16bit.png")
         # Values above 255 to verify they survive round-trip (would be lost with uint8)
         img_array_16 = np.array([[1000, 2000], [30000, 65535]], dtype=np.uint16)
-        test_img = PILImage.fromarray(img_array_16, mode="I;16")
+        test_img = PILImage.fromarray(img_array_16)
         test_img.save(test_image_path)
 
         converter_instance = ImagePathToImageConverter()  # type: ignore[call-arg]
