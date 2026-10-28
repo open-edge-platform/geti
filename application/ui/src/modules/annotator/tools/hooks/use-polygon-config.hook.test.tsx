@@ -10,7 +10,7 @@ const mockOptimizeSegments = rs.fn();
 let mockWorker:
     { optimizeSegments: typeof mockOptimizeSegments; loadImage: () => void; cleanImg: () => void } | undefined;
 
-rs.mock('./use-intelligent-scissors-worker.hook', () => ({
+rs.mock('../../../../shared/smart-tools/use-intelligent-scissors-worker.hook', () => ({
     useIntelligentScissorsWorker: () => ({ worker: mockWorker }),
 }));
 

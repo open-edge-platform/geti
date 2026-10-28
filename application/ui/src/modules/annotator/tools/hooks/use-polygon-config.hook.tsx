@@ -6,10 +6,10 @@ import { PointerEvent, RefObject, useEffect, useMemo, useRef } from 'react';
 import { clampPointBetweenImage } from '@geti-ui/smart-tools/utils';
 import { differenceWith, isEmpty, isEqual, isNil } from 'lodash-es';
 
+import { useIntelligentScissorsWorker } from '../../../../shared/smart-tools/use-intelligent-scissors-worker.hook';
 import { Point, Polygon } from '../../../../shared/types';
 import { usePolygonState } from '../polygon-tool/polygon-state-provider.component';
 import { convertToolShapeToGetiShape, getRelativePoint, isImageOversized } from '../utils';
-import { useIntelligentScissorsWorker } from './use-intelligent-scissors-worker.hook';
 
 export const usePolygonConfig = ({
     zoom,

@@ -7,7 +7,7 @@ import { Remote, wrap } from 'comlink';
 import type {
     IntelligentScissorsWorkerApi,
     IntelligentScissorsWorkerInstance,
-} from '../../webworkers/intelligent-scissors.worker.interface';
+} from './webworkers/intelligent-scissors.worker.interface';
 
 type IntelligentScissorsRemoteInstance = Remote<IntelligentScissorsWorkerInstance>;
 
@@ -18,7 +18,7 @@ export const useIntelligentScissorsWorker = (enabled = true) => {
     }>({
         queryKey: ['workers', 'INTELLIGENT_SCISSORS'],
         queryFn: async ({ signal }) => {
-            const worker = new Worker(new URL('../../webworkers/intelligent-scissors.worker', import.meta.url), {
+            const worker = new Worker(new URL('./webworkers/intelligent-scissors.worker', import.meta.url), {
                 type: 'module',
             });
             // Wrap in an arrow so `terminate` is called as a method on `worker` (this === worker);
@@ -41,7 +41,7 @@ export const useIntelligentScissorsWorker = (enabled = true) => {
         },
         staleTime: Infinity,
         // Tanstack doesn't abort on gc, so evicting the entry would leak the worker; it is
-        // terminated by `useTerminateAnnotatorWorkersOnUnmount` instead.
+        // terminated by `useTerminateSmartToolWorkersOnUnmount` instead.
         gcTime: Infinity,
         enabled,
     });

@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 /**
- * Terminate every annotator-tool Worker (SAM, SSIM, magnetic-lasso) and drop
+ * Terminate every smart-tool Worker (SAM, SSIM, magnetic-lasso) and drop
  * the matching tanstack-query entries when the host component unmounts.
  *
  * Mounted at the **dataset section** (`DatasetSection` in `src/router.tsx`)
@@ -23,7 +23,7 @@ import { useQueryClient } from '@tanstack/react-query';
  * the worker (and its ~100 MB WASM heap of model bytes + ORT + OpenCV
  * runtimes) would persist for the lifetime of the tab.
  */
-export const useTerminateAnnotatorWorkersOnUnmount = () => {
+export const useTerminateSmartToolWorkersOnUnmount = () => {
     const queryClient = useQueryClient();
 
     useEffect(() => {

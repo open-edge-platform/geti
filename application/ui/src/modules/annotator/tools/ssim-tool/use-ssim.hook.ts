@@ -5,13 +5,14 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { i18n } from '@/i18n';
 import { roiFromImage } from '@geti-ui/smart-tools/utils';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Remote, wrap } from 'comlink';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { Remote } from 'comlink';
 import { clamp } from 'lodash-es';
 
+import { executeWithTimeout } from '../../../../shared/smart-tools/execute-with-timeout';
+import { SSIM_WORKER_QUERY_KEY, useSSIMWorker } from '../../../../shared/smart-tools/use-ssim-worker.hook';
+import type { SSIMWorkerInstance } from '../../../../shared/smart-tools/webworkers/ssim-worker.interface';
 import type { Shape } from '../../../../shared/types';
-import type { SSIMWorkerApi, SSIMWorkerInstance } from '../../webworkers/ssim-worker.interface';
-import { executeWithTimeout } from '../execute-with-timeout';
 import {
     convertRectToShape,
     convertToolMatchesToGetiMatches,
@@ -24,10 +25,7 @@ import {
     type SSIMShapeType,
 } from './utils';
 
-// Building the worker downloads and compiles the OpenCV wasm, which can be slow on a cold cache.
-const SSIM_WORKER_BUILD_TIMEOUT_MS = 30_000;
 const SSIM_EXECUTE_TIMEOUT_MS = 10_000;
-const SSIM_WORKER_QUERY_KEY = ['workers', 'SSIM'];
 
 type SSIMState = {
     shapes: Shape[];
@@ -51,45 +49,6 @@ const withShapes = (state: Omit<SSIMState, 'shapes'>, shapeType: SSIMShapeType):
     ...state,
     shapes: state.matches.slice(0, state.threshold).map(({ shape }) => convertRectToShape(shape, shapeType)),
 });
-
-export const useSSIMWorker = (enabled = true) => {
-    const { data, isLoading, isError, error } = useQuery<{ worker: Worker; instance: Remote<SSIMWorkerInstance> }>({
-        queryKey: SSIM_WORKER_QUERY_KEY,
-        queryFn: async ({ signal }) => {
-            const worker = new Worker(new URL('../../webworkers/ssim-worker', import.meta.url), {
-                type: 'module',
-            });
-            // Wrap in an arrow so `terminate` is called as a method on `worker` (this === worker);
-            // passing `worker.terminate` directly would invoke it with `this === signal` → "Illegal invocation".
-            signal.addEventListener('abort', () => worker.terminate(), { once: true });
-
-            try {
-                const instance = await executeWithTimeout(
-                    wrap<SSIMWorkerApi>(worker).build(),
-                    i18n.t('annotator.tools.ssim.operations.workerBuild'),
-                    SSIM_WORKER_BUILD_TIMEOUT_MS
-                );
-
-                if (signal.aborted) {
-                    throw signal.reason;
-                }
-
-                return { worker, instance };
-            } catch (buildError) {
-                worker.terminate();
-
-                throw buildError;
-            }
-        },
-        staleTime: Infinity,
-        // Tanstack doesn't abort on gc, so evicting the entry would leak the worker; it is
-        // terminated by `useTerminateAnnotatorWorkersOnUnmount` instead.
-        gcTime: Infinity,
-        enabled,
-    });
-
-    return { worker: data?.instance, rawWorker: data?.worker, isLoading, isError, error };
-};
 
 export const useSSIM = (shapeType: SSIMShapeType, enabled = true) => {
     const queryClient = useQueryClient();
