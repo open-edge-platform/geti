@@ -4,13 +4,12 @@
 import { createContext, ReactNode, useContext, useMemo } from 'react';
 
 import type { ModelArchitectureWithPerformanceCategory } from '@/api/types';
-import { ThumbsUp } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 import { Content, ContextualHelp, Divider, Flex, Heading, Radio, Text } from '@geti-ui/ui';
 import { clsx } from 'clsx';
 
 import { ModelLicenseLink } from '../../../components/model-license-link.component';
-import { ModelBadge } from '../../../model-listing/components/model-row/model-badge.component';
+import { PerformanceCategoryBadge } from '../../../model-listing/components/model-row/performance-category-badge.component';
 import { getAccuracyMetric } from '../utils';
 
 import classes from './model-architecture-card.module.scss';
@@ -75,8 +74,7 @@ const ModelArchitectureParameters = () => {
     );
 };
 
-const ModelArchitectureRecommendedBadge = () => {
-    const { t } = useTranslation();
+const ModelArchitecturePerformanceCategoryBadge = () => {
     const { modelArchitecture } = useModelArchitecture();
 
     if (modelArchitecture.performanceCategory === undefined) {
@@ -84,10 +82,10 @@ const ModelArchitectureRecommendedBadge = () => {
     }
 
     return (
-        <ModelBadge color={'var(--spectrum-global-color-gray-100)'}>
-            <ThumbsUp />
-            <Text>{t('models.training.architectures.card.recommended')}</Text>
-        </ModelBadge>
+        <PerformanceCategoryBadge
+            performanceCategory={modelArchitecture.performanceCategory}
+            color={'var(--spectrum-global-color-gray-100)'}
+        />
     );
 };
 
@@ -161,6 +159,6 @@ export const ModelArchitectureCard = ({
 
 ModelArchitectureCard.Name = ModelArchitectureName;
 ModelArchitectureCard.Parameters = ModelArchitectureParameters;
-ModelArchitectureCard.RecommendedBadge = ModelArchitectureRecommendedBadge;
+ModelArchitectureCard.PerformanceCategoryBadge = ModelArchitecturePerformanceCategoryBadge;
 ModelArchitectureCard.Divider = ModelArchitectureDivider;
 ModelArchitectureCard.Description = ModelArchitectureDescription;

@@ -160,7 +160,9 @@ describe('TrainModel', () => {
                 'alpha',
                 'bravo',
             ]);
-            expect(screen.getAllByText('Recommended')).toHaveLength(3);
+            expect(screen.getByText('Balance')).toBeVisible();
+            expect(screen.getByText('Accuracy')).toBeVisible();
+            expect(screen.getByText('Speed')).toBeVisible();
         });
     });
 
