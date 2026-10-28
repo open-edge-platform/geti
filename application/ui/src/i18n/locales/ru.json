@@ -953,8 +953,7 @@
                 },
                 "card": {
                     "numberOfParameters": "Количество параметров: {{count}} млн",
-                    "gigaflops": "Вычислительная сложность: {{value}} GFLOPs",
-                    "recommended": "Рекомендуется"
+                    "gigaflops": "Вычислительная сложность: {{value}} GFLOPs"
                 },
                 "sort": {
                     "label": "Сортировать модели по:",

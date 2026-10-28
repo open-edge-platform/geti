@@ -926,8 +926,7 @@
                 },
                 "card": {
                     "numberOfParameters": "Nombre de paramètres : {{count}} millions",
-                    "gigaflops": "Gigaflops : {{value}}",
-                    "recommended": "Recommandé"
+                    "gigaflops": "Gigaflops : {{value}}"
                 },
                 "sort": {
                     "label": "Trier les modèles par :",

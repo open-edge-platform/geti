@@ -121,9 +121,8 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
                 <Form id={IMPORT_DATASET_FORM_ID} validationBehavior='native' action={submitAction}>
                     <Grid
                         gap={'size-150'}
-                        width={'100%'}
                         alignItems={'center'}
-                        columns={[`1fr ${dimensionValue('size-400')} 1fr`]}
+                        columns={['fit-content(var(--spectrum-global-dimension-size-3600))', 'size-400', 'size-3600']}
                     >
                         <View>{t('dataset.import.labelMapping.datasetLabelsColumn')}</View>
                         <View />
@@ -131,10 +130,11 @@ export const LabelMapping = ({ stagedDatasetId }: LabelMappingProps) => {
 
                         {datasetLabels.map((label, index) => (
                             <Fragment key={`${label}-${index}`}>
-                                <Text>{label}</Text>
+                                <Text UNSAFE_className={classes.datasetLabel}>{label}</Text>
                                 <View>→</View>
                                 <View>
                                     <Picker
+                                        width={'100%'}
                                         items={finalLabels}
                                         placeholder={placeholderLabel}
                                         name={`targetLabel-${index}`}

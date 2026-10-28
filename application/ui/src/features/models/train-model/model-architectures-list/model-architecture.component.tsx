@@ -26,7 +26,7 @@ export const ModelArchitecture = ({
         >
             <ModelArchitectureCard.Name />
             <ModelArchitectureCard.Parameters />
-            <ModelArchitectureCard.RecommendedBadge />
+            <ModelArchitectureCard.PerformanceCategoryBadge />
         </ModelArchitectureCard>
     );
 };
