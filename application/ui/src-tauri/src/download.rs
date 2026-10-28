@@ -7,7 +7,7 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-use reqwest::{Certificate, Response, Url};
+use reqwest::{Certificate, Url};
 use serde::Deserialize;
 use tauri::ipc::Channel;
 use tauri::{AppHandle, Manager, WebviewWindow};
@@ -81,13 +81,17 @@ async fn save(url: Url, cert: Certificate, path: &Path) -> Result<(), String> {
         // Loopback traffic must not go through a proxy set in HTTP(S)_PROXY.
         .no_proxy()
         .tls_certs_only([cert])
+        // `backend_url` only checks the first URL, so never follow redirects.
+        .redirect(reqwest::redirect::Policy::none())
         .build()
         .map_err(|e| e.to_string())?
         .get(url)
         .send()
         .await
-        .and_then(Response::error_for_status)
         .map_err(|e| e.to_string())?;
+    if !response.status().is_success() {
+        return Err(format!("backend responded with {}", response.status()));
+    }
 
     // Only create (or truncate) the file once the backend has accepted the request.
     let mut file = File::create(path).map_err(|e| e.to_string())?;
