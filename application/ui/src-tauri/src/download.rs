@@ -7,10 +7,10 @@ use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 
-use reqwest::{Response, Url};
+use reqwest::{Certificate, Response, Url};
 use serde::Deserialize;
 use tauri::ipc::Channel;
-use tauri::WebviewWindow;
+use tauri::{AppHandle, Manager, WebviewWindow};
 use tauri_plugin_dialog::DialogExt;
 
 /// Where the backend side-car serves its API (see `PUBLIC_API_BASE_URL` in
@@ -35,6 +35,7 @@ pub async fn download_file(
     on_started: Channel<()>,
 ) -> Result<(), String> {
     let url = backend_url(&url)?;
+    let cert = backend_certificate(window.app_handle())?;
     let extensions: Vec<&str> = filter.extensions.iter().map(String::as_str).collect();
     // Blocking is fine here: async commands do not run on the main thread.
     let Some(path) = window
@@ -50,7 +51,7 @@ pub async fn download_file(
     let path = path.into_path().map_err(|e| e.to_string())?;
     let _ = on_started.send(());
 
-    save(url, &path)
+    save(url, cert, &path)
         .await
         .inspect_err(|e| log::error!("Download to {} failed: {e}", path.display()))
 }
@@ -64,13 +65,22 @@ fn backend_url(url: &str) -> Result<Url, String> {
     Ok(url)
 }
 
-async fn save(url: Url, path: &Path) -> Result<(), String> {
+/// The backend's self-signed certificate, which it serves from
+/// `<data dir>/certs/localhost.pem` (see `application/backend/app/main.py`).
+fn backend_certificate(app: &AppHandle) -> Result<Certificate, String> {
+    let path = crate::resolve_data_dir(app)
+        .ok_or("unknown data directory")?
+        .join("certs")
+        .join("localhost.pem");
+    let pem = std::fs::read(&path).map_err(|e| format!("{}: {e}", path.display()))?;
+    Certificate::from_pem(&pem).map_err(|e| e.to_string())
+}
+
+async fn save(url: Url, cert: Certificate, path: &Path) -> Result<(), String> {
     let mut response = reqwest::Client::builder()
         // Loopback traffic must not go through a proxy set in HTTP(S)_PROXY.
         .no_proxy()
-        // The backend's certificate is self-signed (the webview skips validation
-        // too, see `tauri.conf.json`); `backend_url` limits this to the backend.
-        .danger_accept_invalid_certs(true)
+        .tls_certs_only([cert])
         .build()
         .map_err(|e| e.to_string())?
         .get(url)
