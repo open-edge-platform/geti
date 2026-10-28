@@ -1,6 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
+import type { Media } from '@/api/types';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { getMockedShape } from 'mocks/mock-annotation';
 import { getMockedMediaImage, getMockedVideoFrame } from 'mocks/mock-media';
@@ -17,16 +18,19 @@ const decodingQueryFn = rs.fn(async (points: InteractiveAnnotationPoint[], _prev
     lowResMask: new Float32Array([points.length]),
 }));
 
-const renderPrompt = () =>
-    renderHook((props) => useSegmentAnythingPrompt(props), {
-        initialProps: { decodingQueryFn, roi: ROI, mediaItem: getMockedMediaImage({ id: 'image-1' }) },
-    });
+const onDecodingError = rs.fn();
+
+const props = (mediaItem: Media) => ({ decodingQueryFn, roi: ROI, mediaItem, onDecodingError });
+
+const renderPrompt = (mediaItem: Media = getMockedMediaImage({ id: 'image-1' })) =>
+    renderHook((hookProps) => useSegmentAnythingPrompt(hookProps), { initialProps: props(mediaItem) });
 
 const lastDecodingCall = () => decodingQueryFn.mock.lastCall;
 
 describe('useSegmentAnythingPrompt', () => {
     beforeEach(() => {
         decodingQueryFn.mockClear();
+        onDecodingError.mockClear();
     });
 
     it('previews the object under the cursor', async () => {
@@ -89,7 +93,7 @@ describe('useSegmentAnythingPrompt', () => {
         act(() => result.current.togglePoint({ x: 10, y: 20 }, true, HIT_RADIUS));
         await waitFor(() => expect(result.current.previewShapes).toHaveLength(1));
 
-        rerender({ decodingQueryFn, roi: ROI, mediaItem: getMockedMediaImage({ id: 'image-2' }) });
+        rerender(props(getMockedMediaImage({ id: 'image-2' })));
 
         expect(result.current.points).toEqual([]);
         expect(result.current.previewShapes).toEqual([]);
@@ -105,7 +109,7 @@ describe('useSegmentAnythingPrompt', () => {
         await waitFor(() => expect(decodingQueryFn).toHaveBeenCalledTimes(1));
         expect(result.current.isDecoding).toBe(true);
 
-        rerender({ decodingQueryFn, roi: ROI, mediaItem: getMockedMediaImage({ id: 'image-2' }) });
+        rerender(props(getMockedMediaImage({ id: 'image-2' })));
 
         await act(async () => resolveDecode({ shapes: [getMockedShape()], lowResMask: new Float32Array([1]) }));
 
@@ -120,27 +124,46 @@ describe('useSegmentAnythingPrompt', () => {
         act(() => result.current.togglePoint({ x: 10, y: 20 }, true, HIT_RADIUS));
         await waitFor(() => expect(result.current.previewShapes).toHaveLength(1));
 
-        rerender({ decodingQueryFn, roi: ROI, mediaItem: getMockedMediaImage({ id: 'image-1' }) });
+        rerender(props(getMockedMediaImage({ id: 'image-1' })));
 
         expect(result.current.points).toHaveLength(1);
         expect(result.current.previewShapes).toHaveLength(1);
     });
 
     it('clears the prompt when moving to another frame of the same video', async () => {
-        const { result, rerender } = renderHook((props) => useSegmentAnythingPrompt(props), {
-            initialProps: {
-                decodingQueryFn,
-                roi: ROI,
-                mediaItem: getMockedVideoFrame({ id: 'video-1', frame_number: 0 }),
-            },
-        });
+        const { result, rerender } = renderPrompt(getMockedVideoFrame({ id: 'video-1', frame_number: 0 }));
 
         act(() => result.current.togglePoint({ x: 10, y: 20 }, true, HIT_RADIUS));
         await waitFor(() => expect(result.current.previewShapes).toHaveLength(1));
 
-        rerender({ decodingQueryFn, roi: ROI, mediaItem: getMockedVideoFrame({ id: 'video-1', frame_number: 1 }) });
+        rerender(props(getMockedVideoFrame({ id: 'video-1', frame_number: 1 })));
 
         expect(result.current.points).toEqual([]);
+        expect(result.current.previewShapes).toEqual([]);
+    });
+
+    it('reports a failed decode', async () => {
+        decodingQueryFn.mockRejectedValueOnce(new Error('Decoder timed out'));
+        const { result } = renderPrompt();
+
+        act(() => result.current.hover({ x: 10, y: 20 }));
+
+        await waitFor(() => expect(onDecodingError).toHaveBeenCalledWith(new Error('Decoder timed out')));
+        expect(result.current.isDecoding).toBe(false);
+    });
+
+    it('does not report a decode that resolves after being cancelled', async () => {
+        let resolveDecode: (value: Awaited<ReturnType<typeof decodingQueryFn>>) => void = () => undefined;
+        decodingQueryFn.mockImplementationOnce(() => new Promise((resolve) => (resolveDecode = resolve)));
+        const { result } = renderPrompt();
+
+        act(() => result.current.hover({ x: 10, y: 20 }));
+        await waitFor(() => expect(decodingQueryFn).toHaveBeenCalledTimes(1));
+
+        act(() => result.current.clearHover());
+        await act(async () => resolveDecode({ shapes: [getMockedShape()], lowResMask: new Float32Array([1]) }));
+
+        expect(onDecodingError).not.toHaveBeenCalled();
         expect(result.current.previewShapes).toEqual([]);
     });
 });

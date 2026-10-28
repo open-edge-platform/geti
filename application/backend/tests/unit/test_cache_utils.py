@@ -10,90 +10,63 @@ from starlette.routing import Mount
 
 from app.api.cache_utils import CachedStaticFiles
 
-
-@pytest.fixture
-def static_dir(tmp_path):
-    """Create a temporary directory with test static files."""
-    (tmp_path / "app.js").write_text("console.log('hello');")
-    (tmp_path / "style.css").write_text("body { color: red; }")
-    (tmp_path / "opencv.wasm").write_bytes(b"\x00wasm")
-    (tmp_path / "model.data").write_bytes(b"model data")
-    (tmp_path / "image.png").write_bytes(b"PNG")
-    (tmp_path / "font.woff2").write_bytes(b"woff2")
-    (tmp_path / "index.html").write_text("<html></html>")
-    (tmp_path / "readme.txt").write_text("hello")
-    return tmp_path
+IMMUTABLE = "public, max-age=31536000, immutable"
+REVALIDATE = "no-cache"
 
 
 @pytest.fixture
-def app(static_dir):
-    """Create a Starlette app with CachedStaticFiles mounted."""
-    return Starlette(
-        routes=[
-            Mount("/static", CachedStaticFiles(directory=static_dir), name="static"),
-        ]
-    )
+def client(tmp_path):
+    """Serve a temporary directory that mirrors the UI build output."""
+    for name in (
+        "static/js/index.be24d2808a.js",
+        "static/css/index.88bedbc0a4.css",
+        "static/svg/selection.478715623d.svg",
+        "static/assets/sam_vit_h_4b8939.decoder.a1d6775264.onnx",
+        "static/js/lib-react.8cd563e1f5.js.LICENSE.txt",
+        "opencv/opencv.js",
+        "ort/ort-wasm-simd-threaded.jsep.wasm",
+        "favicon.ico",
+        "index.html",
+    ):
+        file = tmp_path / name
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_bytes(b"content")
+
+    app = Starlette(routes=[Mount("/static", CachedStaticFiles(directory=tmp_path), name="static")])
+    return AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
 
 
 @pytest.mark.asyncio
-async def test_js_cache_control(app, static_dir):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        response = await client.get("/static/app.js")
+@pytest.mark.parametrize(
+    ("path", "cache_control"),
+    [
+        ("static/js/index.be24d2808a.js", IMMUTABLE),
+        ("static/css/index.88bedbc0a4.css", IMMUTABLE),
+        ("static/svg/selection.478715623d.svg", IMMUTABLE),
+        ("static/assets/sam_vit_h_4b8939.decoder.a1d6775264.onnx", IMMUTABLE),
+        # Not fingerprinted: same URL across releases.
+        ("static/js/lib-react.8cd563e1f5.js.LICENSE.txt", REVALIDATE),
+        ("opencv/opencv.js", REVALIDATE),
+        ("ort/ort-wasm-simd-threaded.jsep.wasm", REVALIDATE),
+        ("favicon.ico", REVALIDATE),
+        ("index.html", REVALIDATE),
+    ],
+)
+async def test_cache_control(client, path, cache_control):
+    async with client:
+        response = await client.get(f"/static/{path}")
+
     assert response.status_code == 200
-    assert response.headers["cache-control"] == "public, max-age=31536000, immutable"
+    assert response.headers["cache-control"] == cache_control
 
 
 @pytest.mark.asyncio
-async def test_css_cache_control(app, static_dir):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        response = await client.get("/static/style.css")
-    assert response.status_code == 200
-    assert response.headers["cache-control"] == "public, max-age=31536000, immutable"
+async def test_unchanged_file_revalidates_without_body(client):
+    async with client:
+        first = await client.get("/static/ort/ort-wasm-simd-threaded.jsep.wasm")
+        second = await client.get(
+            "/static/ort/ort-wasm-simd-threaded.jsep.wasm", headers={"If-None-Match": first.headers["etag"]}
+        )
 
-
-@pytest.mark.asyncio
-async def test_wasm_cache_control(app, static_dir):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        response = await client.get("/static/opencv.wasm")
-    assert response.status_code == 200
-    assert response.headers["cache-control"] == "public, max-age=31536000, immutable"
-
-
-@pytest.mark.asyncio
-async def test_data_cache_control(app, static_dir):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        response = await client.get("/static/model.data")
-    assert response.status_code == 200
-    assert response.headers["cache-control"] == "public, max-age=31536000, immutable"
-
-
-@pytest.mark.asyncio
-async def test_image_cache_control(app, static_dir):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        response = await client.get("/static/image.png")
-    assert response.status_code == 200
-    assert response.headers["cache-control"] == "public, max-age=604800"
-
-
-@pytest.mark.asyncio
-async def test_font_cache_control(app, static_dir):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        response = await client.get("/static/font.woff2")
-    assert response.status_code == 200
-    assert response.headers["cache-control"] == "public, max-age=2592000, immutable"
-
-
-@pytest.mark.asyncio
-async def test_html_cache_control(app, static_dir):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        response = await client.get("/static/index.html")
-    assert response.status_code == 200
-    assert response.headers["cache-control"] == "no-cache"
-
-
-@pytest.mark.asyncio
-async def test_fallback_cache_control(app, static_dir):
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        response = await client.get("/static/readme.txt")
-    assert response.status_code == 200
-    assert response.headers["cache-control"] == "public, max-age=3600"
+    assert second.status_code == 304
+    assert second.content == b""

@@ -71,7 +71,18 @@ export const SegmentAnythingTool = () => {
     const { selectedLabel } = useAnnotatorLabels();
     const { addAndSelectAnnotations } = useAddAndSelectAnnotations();
     const { isLoading, isError, error, decodingQueryFn } = useSegmentAnythingModel({ nextMediaItem });
-    const prompt = useSegmentAnythingPrompt({ decodingQueryFn, roi, mediaItem });
+    const prompt = useSegmentAnythingPrompt({
+        decodingQueryFn,
+        roi,
+        mediaItem,
+        onDecodingError: (decodingError) => {
+            toast({
+                id: 'segment-anything-tool-error',
+                type: 'error',
+                message: t('annotator.tools.autoSegmentation.error', { message: decodingError.message }),
+            });
+        },
+    });
 
     const clampPoint = clampPointBetweenImage(image);
 
