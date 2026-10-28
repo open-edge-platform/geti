@@ -117,7 +117,7 @@ const isTauriRestrictedSyntax = {
 
 // Forbid building dates/numbers straight from Intl or Date.prototype.toLocale*. These bypass the
 // ThemeProvider locale (useFormatDate / useNumberFormatter), so the formatted text drifts from the
-// rest of the app whenever the user switches language. The hook itself and tests are allow-listed.
+// rest of the app whenever the user switches language.
 const noDirectIntlFormattingRestrictedSyntax = [
     {
         selector: "NewExpression[callee.object.name='Intl'][callee.property.name=/^(DateTimeFormat|NumberFormat)$/]",
@@ -242,12 +242,6 @@ export default [
         },
     },
     sharedComponentsAliasConfig,
-    {
-        files: ['**/*.test.ts', '**/*.test.tsx', '**/*mock*.ts', '**/*.spec.ts'],
-        rules: {
-            'max-len': ['off'],
-        },
-    },
     {
         // Every source file *except* `.tauri.{ts,tsx}` twins must not import
         // `@tauri-apps/*` directly.

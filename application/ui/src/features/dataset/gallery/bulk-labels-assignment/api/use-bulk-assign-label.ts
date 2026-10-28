@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { fetchClient } from '@/api';
+import { ApiError, fetchClient } from '@/api';
 import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
 import { useQueryClient } from '@tanstack/react-query';
@@ -26,24 +26,26 @@ export const useBulkAssignLabel = () => {
     const [isPending, setIsPending] = useState(false);
 
     const invalidateQueries = () => {
-        queryClient.invalidateQueries({
-            queryKey: getQueryKey([
-                'get',
-                '/api/projects/{project_id}/dataset/items',
-                { params: { path: { project_id: projectId } } },
-            ]),
-        });
-        queryClient.invalidateQueries({
-            queryKey: getQueryKey([
-                'get',
-                '/api/projects/{project_id}/dataset/media',
-                {
-                    params: {
-                        path: { project_id: projectId },
+        return Promise.all([
+            queryClient.invalidateQueries({
+                queryKey: getQueryKey([
+                    'get',
+                    '/api/projects/{project_id}/dataset/items',
+                    { params: { path: { project_id: projectId } } },
+                ]),
+            }),
+            queryClient.invalidateQueries({
+                queryKey: getQueryKey([
+                    'get',
+                    '/api/projects/{project_id}/dataset/media',
+                    {
+                        params: {
+                            path: { project_id: projectId },
+                        },
                     },
-                },
-            ]),
-        });
+                ]),
+            }),
+        ]);
     };
 
     const assignLabel = async (mediaId: string, labelIds: string[]) => {
@@ -64,7 +66,7 @@ export const useBulkAssignLabel = () => {
         });
 
         if (error !== undefined) {
-            throw error;
+            throw new ApiError(error);
         }
     };
 
@@ -101,7 +103,7 @@ export const useBulkAssignLabel = () => {
                 });
             }
 
-            invalidateQueries();
+            void invalidateQueries();
         } finally {
             setIsPending(false);
         }

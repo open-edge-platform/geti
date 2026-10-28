@@ -42,13 +42,10 @@ export default [
             '**/node_modules',
             '**/*.tsx.snap',
             'src/assets',
-            'src/__mocks__',
-            '**/dex_templates',
-            '**/oauth2_proxy_templates',
             '**/public',
-            'src/core/server/generated/*',
         ],
     },
+    js.configs.recommended,
     ...fixupConfigRules(
         compat.extends(
             'plugin:jsx-a11y/recommended',
@@ -76,7 +73,6 @@ export default [
                 },
             ],
 
-            'react/jsx-indent-props': ['error', 4],
             'react/require-default-props': 'off',
             'react/prop-types': 'off',
             'react/display-name': 'off',
@@ -143,13 +139,6 @@ export default [
                 },
             ],
             '@typescript-eslint/no-duplicate-enum-values': ['off'],
-            'max-len': [
-                'error',
-                {
-                    code: 120,
-                    ignorePattern: '^import .*',
-                },
-            ],
 
             'no-underscore-dangle': ['error'],
 
@@ -178,6 +167,7 @@ export default [
             ],
 
             'import/order': ['off'],
+            'import/no-extraneous-dependencies': 'error',
 
             'import/no-unresolved': [
                 2,
@@ -201,10 +191,27 @@ export default [
         },
     },
     {
-        files: ['**/*.test.tsx', '**/*.test.ts'],
-
+        // Type-aware rules. Scoped to files covered by tsconfig.json `include`.
+        files: ['{src,tests,mocks}/**/*.{ts,tsx}'],
+        languageOptions: {
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: dirname,
+            },
+        },
         rules: {
-            'max-len': 'off',
+            '@typescript-eslint/no-floating-promises': [
+                'error',
+                {
+                    // In data-router mode `navigate()` returns a Promise that only signals navigation
+                    // completion; errors go to the route's errorElement, so it is safe to not await it.
+                    allowForKnownSafeCalls: [{ from: 'package', name: 'NavigateFunction', package: 'react-router' }],
+                },
+            ],
+            '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: { attributes: false } }],
+            '@typescript-eslint/only-throw-error': 'error',
+            '@typescript-eslint/await-thenable': 'error',
+            '@typescript-eslint/switch-exhaustiveness-check': 'error',
         },
     },
 ];

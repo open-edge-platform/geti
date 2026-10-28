@@ -180,7 +180,7 @@ describe('useSourceAction', () => {
 
         it('falls back to the previous state (not a partial body) and never calls bodyFormatter when prepareFormData rejects', async () => {
             const prepareFormData = async () => {
-                throw { detail: 'upload failed' };
+                throw new Error('upload failed');
             };
             const bodyFormatterSpy = rs.fn(bodyFormatter);
 

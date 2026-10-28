@@ -55,7 +55,7 @@ export const createQueryClient = () => {
                 const invalidateQueries = meta?.invalidateQueries;
 
                 if (invalidateQueries) {
-                    client.invalidateQueries({
+                    void client.invalidateQueries({
                         predicate: (query) => {
                             return invalidateQueries.some((queryKey) => {
                                 return matchQuery({ queryKey }, query);

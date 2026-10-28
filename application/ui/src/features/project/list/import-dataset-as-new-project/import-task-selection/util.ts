@@ -21,7 +21,8 @@ export const getRecommendedTaskType = (annotationType: AnnotationType | undefine
             return 'instance_segmentation';
         case 'label':
             return 'classification';
-        default:
+        case 'unknown':
+        case undefined:
             return undefined;
     }
 };
