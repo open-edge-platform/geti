@@ -42,7 +42,6 @@ export default [
             '**/node_modules',
             '**/*.tsx.snap',
             'src/assets',
-            'src/__mocks__',
             '**/public',
         ],
     },
@@ -74,7 +73,6 @@ export default [
                 },
             ],
 
-            'react/jsx-indent-props': ['error', 4],
             'react/require-default-props': 'off',
             'react/prop-types': 'off',
             'react/display-name': 'off',
@@ -141,13 +139,6 @@ export default [
                 },
             ],
             '@typescript-eslint/no-duplicate-enum-values': ['off'],
-            'max-len': [
-                'error',
-                {
-                    code: 120,
-                    ignorePattern: '^import .*',
-                },
-            ],
 
             'no-underscore-dangle': ['error'],
 
@@ -176,6 +167,7 @@ export default [
             ],
 
             'import/order': ['off'],
+            'import/no-extraneous-dependencies': 'error',
 
             'import/no-unresolved': [
                 2,
@@ -217,15 +209,9 @@ export default [
                 },
             ],
             '@typescript-eslint/no-misused-promises': ['error', { checksVoidReturn: { attributes: false } }],
+            '@typescript-eslint/only-throw-error': 'error',
             '@typescript-eslint/await-thenable': 'error',
             '@typescript-eslint/switch-exhaustiveness-check': 'error',
-        },
-    },
-    {
-        files: ['**/*.test.tsx', '**/*.test.ts'],
-
-        rules: {
-            'max-len': 'off',
         },
     },
 ];

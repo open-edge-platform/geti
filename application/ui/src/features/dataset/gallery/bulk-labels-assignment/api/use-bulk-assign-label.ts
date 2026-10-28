@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 
-import { fetchClient } from '@/api';
+import { ApiError, fetchClient } from '@/api';
 import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
 import { useQueryClient } from '@tanstack/react-query';
@@ -66,7 +66,7 @@ export const useBulkAssignLabel = () => {
         });
 
         if (error !== undefined) {
-            throw error;
+            throw new ApiError(error);
         }
     };
 
