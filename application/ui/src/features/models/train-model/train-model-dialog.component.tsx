@@ -10,14 +10,13 @@ import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { Link, useMatch } from 'react-router';
 
 import { paths } from '../../../constants/paths';
+import { LARGE_DIALOG_SIZE } from '../../../shared/dialog-sizes';
 import { AdvancedSettings } from './advanced-settings/advanced-settings.component';
 import { BasicTrainModelContent } from './basic-train-model-content.component';
 import { useTrainModel } from './hooks/use-train-model';
 import { useTrainModelDisabledReason } from './hooks/use-train-model-disabled-reason';
 import { TrainModelDialogLayout } from './train-model-dialog-layout.component';
 import { useTrainModelState } from './train-model-provider.component';
-
-import largeDialogClasses from '../../../shared/styles/large-dialog.module.scss';
 
 type TrainModelDialogProps = {
     onClose: () => void;
@@ -83,7 +82,7 @@ export const TrainModelDialog = ({ onClose }: TrainModelDialogProps) => {
     };
 
     return (
-        <Dialog UNSAFE_className={largeDialogClasses.largeDialog}>
+        <Dialog {...LARGE_DIALOG_SIZE}>
             <Heading>{t('models.training.setup.dialog.title')}</Heading>
 
             <Divider size={'S'} />

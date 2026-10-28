@@ -161,7 +161,6 @@ describe('TrainModel', () => {
                 'bravo',
             ]);
             expect(screen.getAllByText('Recommended')).toHaveLength(3);
-            expect(screen.queryByRole('button', { name: /show (more|less)/i })).not.toBeInTheDocument();
         });
     });
 

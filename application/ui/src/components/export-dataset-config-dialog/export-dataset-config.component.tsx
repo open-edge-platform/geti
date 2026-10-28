@@ -28,12 +28,12 @@ import { OverlayTriggerState } from 'react-stately';
 
 import { useExportDatasetJobAction } from '../../hooks/use-export-dataset-job-action.hook';
 import { Link } from '../../platform/components/link.component';
+import { LARGE_DIALOG_SIZE } from '../../shared/dialog-sizes';
 import { isEmptyLabel, useProjectLabelsWithEmptyLabel } from '../../shared/labels';
 import { isNonEmptyString } from '../../shared/util';
 import { MultiSelectList } from '../multi-select-list/multi-select-list.component';
 import { getFormatOptions } from '../util';
 
-import largeDialogClasses from '../../shared/styles/large-dialog.module.scss';
 import classes from './export-dataset-config.module.scss';
 
 const WarningMessages = ({ selectedExportFormat }: { selectedExportFormat: string | null }) => {
@@ -132,7 +132,7 @@ const ExportDatasetDialogContent = ({
     const labels = selectedProject.task.labels?.map((label) => ({ id: label.name, name: label.name })) ?? [];
 
     return (
-        <Dialog UNSAFE_className={largeDialogClasses.largeDialog}>
+        <Dialog {...LARGE_DIALOG_SIZE}>
             <Heading>
                 {datasetViewName === undefined
                     ? t('dataset.export.heading', { name })

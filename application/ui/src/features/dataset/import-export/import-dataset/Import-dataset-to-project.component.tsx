@@ -8,13 +8,12 @@ import { Content, Dialog, DialogContainer, Divider, Heading } from '@geti-ui/ui'
 import { useProject } from 'hooks/api/project.hook';
 import { useImportDatasetToProject } from 'hooks/storage/use-import-dataset-to-project.hook';
 
+import { LARGE_DIALOG_SIZE } from '../../../../shared/dialog-sizes';
 import { isNonEmptyString } from '../../../../shared/util';
 import { useImportDatasetDialogState } from '../../providers/export-import-dataset-dialog-provider.component';
 import { ImportDatasetButtons } from './import-dataset-buttons/import-dataset-buttons.component';
 import { ImportProcess } from './import-process/import-process.component';
 import { LabelMapping } from './label-mapping/label-mapping.component';
-
-import largeDialogClasses from '../../../../shared/styles/large-dialog.module.scss';
 
 export const ImportDatasetToProject = () => {
     const { t } = useTranslation();
@@ -37,7 +36,7 @@ export const ImportDatasetToProject = () => {
     return (
         <DialogContainer onDismiss={datasetImportDialogState.close}>
             {datasetImportDialogState.isOpen && (
-                <Dialog aria-label={'Import dataset to project'} UNSAFE_className={largeDialogClasses.largeDialog}>
+                <Dialog aria-label={'Import dataset to project'} {...LARGE_DIALOG_SIZE}>
                     <Heading>{t('dataset.import.dialogHeading')}</Heading>
                     <Divider />
                     <Content UNSAFE_style={{ background: 'var(--spectrum-global-color-gray-50)' }}>
