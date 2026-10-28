@@ -502,21 +502,32 @@ class DataModule(LightningDataModule):
     def _eval_loader_kwargs(self, dataset: VisionDataset, config: SubsetConfig) -> dict:
         """Build ``DataLoader`` keyword arguments for a val/test/predict dataset.
 
-        The batch size, number of workers and pinned-memory behaviour are taken
-        directly from the subset config (i.e. the recipe). This keeps evaluation
-        loading configurable per recipe rather than hardcoded here.
+        The number of workers and pinned-memory behaviour are taken directly from
+        the subset config (i.e. the recipe). This keeps evaluation loading
+        configurable per recipe rather than hardcoded here.
 
         For tiled evaluation a single original image expands into *every* grid tile
         (tiles are not filtered by annotation at inference time), so one dataset item
-        can become a large nested tile batch. Recipes therefore keep the tiled
-        val/test ``batch_size`` small (typically 1) so the collated tile batch stays
-        bounded; the model still forwards tiles in groups of
-        ``TileConfig.tile_inference_batch_size`` for GPU efficiency.
+        can become a large nested tile batch. The loader ``batch_size`` is therefore
+        clamped to 1 when tiling is enabled, regardless of what the recipe or the
+        user configuration request: a loader batch of N images collates N images'
+        worth of tiles into a single in-memory batch, which can hang or OOM on
+        large images. The model still forwards tiles in groups of
+        ``TileConfig.tile_inference_batch_size`` for GPU efficiency, so the clamp
+        does not change the GPU work.
         """
         num_workers = config.num_workers
+        batch_size = config.batch_size
+        if self.tile_config.enable_tiler and batch_size > 1:
+            logger.info(
+                "Tiling enabled: clamping %s subset batch_size %d -> 1 to keep the collated tile batch bounded",
+                config.subset_name,
+                batch_size,
+            )
+            batch_size = 1
         return {
             "dataset": dataset,
-            "batch_size": config.batch_size,
+            "batch_size": batch_size,
             "shuffle": False,
             "num_workers": num_workers,
             "pin_memory": self._pin_memory,
