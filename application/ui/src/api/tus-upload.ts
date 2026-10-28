@@ -7,7 +7,7 @@ import { DetailedError, Upload, type PreviousUpload } from 'tus-js-client';
 
 import { API_BASE_URL, fetchClient } from './client';
 
-export const TUS_VERSION = '1.0.0';
+const TUS_VERSION = '1.0.0';
 
 // Chunking bounds how much a dropped connection costs and keeps each request under reverse-proxy
 // body size limits, while staying large enough for the per-request overhead to be negligible.
@@ -137,7 +137,8 @@ export const transferFile = (file: File, { onProgress, signal }: TransferOptions
                 }
 
                 upload.start();
-            });
+            })
+            .catch((error: unknown) => settle(() => reject(error instanceof Error ? toTransferError(error) : error)));
     });
 
 /** Discards an upload on the server (TUS termination). Failures are ignored: the upload expires anyway. */

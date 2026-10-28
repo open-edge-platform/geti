@@ -23,7 +23,7 @@ import { getDefaultTrainingDevice } from './select-training-device/utils';
 import { isTimmModelArchitecture } from './timm-model-configuration/utils';
 
 /** Where the training data comes from: the live dataset, one of its views, or a frozen revision. */
-export type DatasetSourceKind = 'current' | 'view' | 'revision';
+type DatasetSourceKind = 'current' | 'view' | 'revision';
 
 export type DatasetSource = {
     /** Unique key of the entry in the dataset picker. */

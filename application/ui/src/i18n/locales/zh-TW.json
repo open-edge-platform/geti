@@ -74,8 +74,7 @@
             "model": "模型",
             "jobs": "工作",
             "labels": "標籤",
-            "bytesTransferred": "{{transferred}} / {{total}}",
-            "language": "語言"
+            "bytesTransferred": "{{transferred}} / {{total}}"
         },
         "viewModes": {
             "large": "大縮圖",
@@ -104,7 +103,6 @@
         "modelsDescription": "模型頁面，用於瀏覽模型",
         "inference": "推論",
         "inferenceDescription": "推論頁面，用於檢視專案的即時推論效果",
-        "preferences": "偏好設定",
         "help": {
             "documentation": "使用者文件",
             "whatsNew": "新功能",
@@ -133,7 +131,7 @@
             "deleteTitle": "刪除確認",
             "deleteConfirmation": "確定要刪除資料集檢視「{{viewName}}」嗎？",
             "deleteSuccess": "資料集檢視「{{viewName}}」已成功刪除。",
-            "unassignFromView": "從該檢視移除",
+            "unassignFromView": "從該檢視取消指派",
             "selectedMediaCount_one": "已選 {{count}} 個媒體檔案",
             "selectedMediaCount_other": "已選 {{count}} 個媒體檔案"
         },
@@ -317,7 +315,7 @@
                 "unsupportedItemsEmptyLabels": "空白標籤",
                 "unsupportedItemsVideos": "影片",
                 "unsupportedItems": "要保留{{items}}，請使用 Geti 匯出格式。",
-                "subsetNotIncluded": "匯出的資料集不包含各媒體檔案的資料子集資訊。"
+                "subsetNotIncluded": "匯出的資料集不包含各媒體檔案所屬的子集資訊。"
             }
         },
         "importExport": {
@@ -594,7 +592,7 @@
             "manageProjects": "管理專案",
             "enablePipelineBlocked": {
                 "title": "無法啟用管線",
-                "message": "請確認在啟用管線前，已選取模型與來源。"
+                "message": "請確認在啟用管線前，已選取模型與輸入源。"
             }
         },
         "taskTypes": {
@@ -790,6 +788,7 @@
                 "unknownError": "發生未知錯誤，請重新整理頁面重試。",
                 "timeoutError": "{{operation}} 在 {{timeoutMs}}ms 後逾時，請嘗試重新整理頁面。",
                 "embeddingError": "無法取得影像嵌入（{{status}}{{statusText}}）。",
+                "hint": "Shift + 點擊以包含區域，Alt + 點擊以排除區域。點擊以建立標註，按 Esc 清除這些點。",
                 "operations": {
                     "workerBuild": "SAM 背景程式建置",
                     "workerInit": "SAM 背景程式初始化",
@@ -909,7 +908,7 @@
                     "map50OnCoco": "COCO mAP50"
                 },
                 "card": {
-                    "numberOfParameters": "參數量：{{count}} 百萬",
+                    "numberOfParameters": "參數量：{{count}} M",
                     "gigaflops": "Gigaflops：{{value}}"
                 },
                 "sort": {
@@ -929,7 +928,7 @@
                     "selectVariantPlaceholder": "選取變體",
                     "pretrainedWeightsLabel": "預訓練權重",
                     "selectWeightsPlaceholder": "選取權重",
-                    "parameters": "參數量：{{count}} 百萬",
+                    "parameters": "參數量：{{count}} M",
                     "gigaflops": "GigaFlops：{{value}}"
                 }
             },
@@ -965,11 +964,11 @@
                 }
             },
             "validation": {
-                "notEnoughAnnotations": "若要訓練模型，資料集中至少需要標註 3 個項目；為達到更好的效果，建議標註更多項目。",
-                "notEnoughAnnotationsInView": "若要訓練模型，您需要在選取的資料集檢視中至少標註 3 個項目，不過為了獲得更好的效果，建議多標註一些。",
-                "emptySubsetsReason": "若要訓練模型，每個子集（訓練集、驗證集、測試集）至少需要包含一個項目。目前不符合此條件，因為{{subsetClause}}，且{{assignmentDetail}}。",
-                "emptySubsetClause_one": "{{list}} 子集為空",
-                "emptySubsetClause_other": "{{list}} 子集均為空",
+                "notEnoughAnnotations": "若要訓練模型，至少需要在資料集中標註 3 個項目，為達到更好的效果，建議標註更多項目。",
+                "notEnoughAnnotationsInView": "若要訓練模型，至少需要在選取的資料集檢視中標註 3 個項目，為達到更好的效果，建議標註更多項目。",
+                "emptySubsetsReason": "若要訓練模型，每個子集（訓練集、驗證集、測試集）至少需要包含一個項目。目前尚不符合此條件，因為 {{subsetClause}} 為空，且 {{assignmentDetail}}。",
+                "emptySubsetClause_one": "{{list}} 子集",
+                "emptySubsetClause_other": "{{list}} 子集",
                 "reviewedOnly_one": "還有 {{count}} 個已審核項目待指派",
                 "reviewedOnly_other": "還有 {{count}} 個已審核項目待指派",
                 "unannotatedOnly_one": "還有 {{count}} 個項目需先完成標註才能指派",
@@ -1023,7 +1022,7 @@
                         "automatic": "自動",
                         "custom": "自訂"
                     },
-                    "offDescription": "模型將整張影像視為一個整體處理，不再切割為較小的圖塊。這種方式簡單直接，但在高解析度影像中偵測小物件時可能力有未逮，因為模型可能遺漏精細的細節。",
+                    "offDescription": "模型將整張影像視為一個整體處理，不再切割為較小的圖塊。這種方式簡單直接，但在高解析度影像中偵測小物件時可能力有未逮，因為模型可能遺漏細節。",
                     "automaticDescription": "這表示系統將根據影像解析度與標註尺寸自動設定參數。"
                 },
                 "intensityMapping": {

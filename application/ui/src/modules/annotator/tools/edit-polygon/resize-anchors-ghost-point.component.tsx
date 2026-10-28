@@ -79,7 +79,7 @@ export const ResizeAnchorsGhostPoint = ({
                             y2={nextPoint.y}
                             opacity={0}
                             stroke='black'
-                            strokeWidth={`calc(${2 * ANCHOR_SIZE}px / var(--zoom-level))`}
+                            strokeWidth={`calc(${2 * ANCHOR_SIZE}px / var(--zoom-scale))`}
                             onPointerMove={onPointerMove}
                             aria-label={`Line between point ${idx} and ${idx + 1}`}
                         />

@@ -3,7 +3,7 @@
 
 import { useRef } from 'react';
 
-import { fetchClient } from '@/api';
+import { ApiError, fetchClient } from '@/api';
 import { i18n } from '@/i18n';
 import { useMutation } from '@tanstack/react-query';
 import { isEqual, omit } from 'lodash-es';
@@ -33,7 +33,9 @@ export const useSelectAllDatasetMedia = () => {
             });
 
             if (error !== undefined || data === undefined) {
-                throw error ?? new Error(i18n.t('application.notifications.unexpectedError'));
+                throw error === undefined
+                    ? new Error(i18n.t('application.notifications.unexpectedError'))
+                    : new ApiError(error);
             }
 
             // The filters changed mid-request, so these ids no longer describe what the gallery

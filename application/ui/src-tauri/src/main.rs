@@ -16,6 +16,7 @@ use std::time::Duration;
 use serde::Deserialize;
 use tauri::{AppHandle, Manager, RunEvent, WindowEvent};
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogKind};
+use tauri_plugin_log::{RotationStrategy, Target, TargetKind, TimezoneStrategy};
 use tauri_plugin_opener::OpenerExt;
 
 use crate::backend::spawn_backend;
@@ -59,47 +60,74 @@ const MIGRATION_FATAL_EXIT_CODE: i32 = 3;
 /// schema in sync with `application/backend/app/lifecycle.py:FATAL_STATUS_FILENAME`.
 const FATAL_STATUS_FILENAME: &str = "fatal_status.json";
 
+/// File name (without extension) of the shell's own log, written next to the
+/// backend's `app.log` (see [`shell_log_target`]).
+const SHELL_LOG_FILE_NAME: &str = "shell";
+
+/// Size at which the shell log is rotated, and how many rotated files are kept.
+const SHELL_LOG_MAX_BYTES: u128 = 5 * 1024 * 1024;
+const SHELL_LOG_KEEP_FILES: usize = 3;
+
 /// Per-user directory the **Windows** backend actually uses for both data and
 /// logs.
 ///
 /// The frozen Windows backend's PyInstaller runtime hook
 /// (`application/backend/pyinstaller/windows/uwp.py`) unconditionally overrides
-/// `DATA_DIR` *and* `LOG_DIR` to `%LOCALAPPDATA%\Intel\Geti`, ignoring whatever
-/// the shell passed on the command line. If the shell resolved these paths from
-/// Tauri's bundle identifier (`com.intel.geti`) instead, its dialogs would point
-/// users at the wrong folder and `read_and_clear_fatal_status` would look for the
-/// backend's status file in the wrong place. Keep this in sync with `uwp.py`.
+/// `DATA_DIR` *and* `LOG_DIR` to `%LOCALAPPDATA%\Intel\Geti`, ignoring the
+/// environment, so on Windows the shell must not honour those variables either
+/// or its dialogs would point users at the wrong folder and
+/// `read_and_clear_fatal_status` would look for the backend's status file in the
+/// wrong place. Keep this in sync with `uwp.py`.
 #[cfg(windows)]
 fn backend_app_data_dir() -> Option<PathBuf> {
     std::env::var_os("LOCALAPPDATA").map(|p| PathBuf::from(p).join("Intel").join("Geti"))
 }
 
-/// Resolve the directory the backend uses for persistent data, matching the
-/// backend's own precedence: an explicit `DATA_DIR` override wins, then (on
-/// Windows) the hard-coded `%LOCALAPPDATA%\Intel\Geti` from `uwp.py`, and finally
-/// Tauri's identifier-derived `app_local_data_dir()`.
-fn resolve_data_dir(app: &AppHandle) -> Option<PathBuf> {
-    if let Some(dir) = std::env::var_os("DATA_DIR") {
-        return Some(PathBuf::from(dir));
-    }
+/// Backend data directory when it is not Tauri's `app_local_data_dir()`: the
+/// pinned folder on Windows, an explicit `DATA_DIR` elsewhere (see `backend.rs`).
+fn explicit_data_dir() -> Option<PathBuf> {
     #[cfg(windows)]
-    if let Some(dir) = backend_app_data_dir() {
-        return Some(dir);
+    {
+        backend_app_data_dir()
     }
-    app.path().app_local_data_dir().ok()
+    #[cfg(not(windows))]
+    {
+        std::env::var_os("DATA_DIR").map(PathBuf::from)
+    }
 }
 
-/// Resolve the directory the backend writes logs to, mirroring [`resolve_data_dir`]
-/// (on Windows `uwp.py` points `LOG_DIR` at the same `Intel\Geti` folder).
-fn resolve_log_dir(app: &AppHandle) -> Option<PathBuf> {
-    if let Some(dir) = std::env::var_os("LOG_DIR") {
-        return Some(PathBuf::from(dir));
-    }
+/// Backend log directory when it is not Tauri's `app_log_dir()`, mirroring
+/// [`explicit_data_dir`] for `LOG_DIR`.
+fn explicit_log_dir() -> Option<PathBuf> {
     #[cfg(windows)]
-    if let Some(dir) = backend_app_data_dir() {
-        return Some(dir);
+    {
+        backend_app_data_dir()
     }
-    app.path().app_log_dir().ok()
+    #[cfg(not(windows))]
+    {
+        std::env::var_os("LOG_DIR").map(PathBuf::from)
+    }
+}
+
+/// Resolve the directory the backend uses for persistent data.
+fn resolve_data_dir(app: &AppHandle) -> Option<PathBuf> {
+    explicit_data_dir().or_else(|| app.path().app_local_data_dir().ok())
+}
+
+/// Resolve the directory the backend (and, via [`shell_log_target`], the shell)
+/// writes logs to.
+fn resolve_log_dir(app: &AppHandle) -> Option<PathBuf> {
+    explicit_log_dir().or_else(|| app.path().app_log_dir().ok())
+}
+
+/// Log target for the shell, placed in the same directory as the backend's log
+/// (see [`resolve_log_dir`]) so users and dialogs only ever need one folder.
+fn shell_log_target() -> Target {
+    let file_name = Some(SHELL_LOG_FILE_NAME.to_string());
+    match explicit_log_dir() {
+        Some(path) => Target::new(TargetKind::Folder { path, file_name }),
+        None => Target::new(TargetKind::LogDir { file_name }),
+    }
 }
 
 /// Structured description of a fatal backend startup failure, deserialized from
@@ -339,6 +367,34 @@ If this keeps happening, you can report it on our issue tracker and attach the l
     }
 }
 
+/// Message shown when the backend executable cannot be started at all, e.g.
+/// because it is missing from the installation or blocked by security software.
+fn show_backend_spawn_failure_dialog(app: &AppHandle, error: &std::io::Error) {
+    let log_dir = log_dir_hint(app);
+    let message = format!(
+        "The Geti backend could not be started and the application will now close.\n\n\
+Error: {error}\n\n\
+This usually means the installation is incomplete or the backend was blocked by security \
+software. Logs are available at:\n  {log_dir}\n\n\
+If this keeps happening, you can report it on our issue tracker and attach the log files."
+    );
+
+    let report = app
+        .dialog()
+        .message(message)
+        .title("Geti could not start")
+        .kind(MessageDialogKind::Error)
+        .buttons(MessageDialogButtons::OkCancelCustom(
+            "Report issue".to_string(),
+            "Close".to_string(),
+        ))
+        .blocking_show();
+
+    if report {
+        open_issue_tracker(app);
+    }
+}
+
 /// Wait for the backend to exit and react to unsolicited terminations. Runs on a
 /// dedicated thread so it can call the *blocking* dialog API (which must not run
 /// on the main thread).
@@ -404,9 +460,9 @@ fn monitor_backend(app: AppHandle, control: BackendControl) {
     match code {
         Some(MIGRATION_FATAL_EXIT_CODE) => {
             log::error!("Backend reported a fatal upgrade/migration failure (exit code 3)");
-            // The backend drops a status file into DATA_DIR (== app_local_data_dir)
-            // describing the failure and, crucially, where the pre-migration backup
-            // lives. Read it so the dialog can show the user the exact path.
+            // The backend drops a status file into its data directory (see
+            // `resolve_data_dir`) describing the failure and, crucially, where the
+            // pre-migration backup lives. Read it so the dialog can show the exact path.
             let status = read_and_clear_fatal_status(&app);
             show_migration_failure_dialog(&app, status.as_ref());
             app.exit(MIGRATION_FATAL_EXIT_CODE);
@@ -438,7 +494,15 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_log::Builder::default().build())
+        .plugin(
+            tauri_plugin_log::Builder::default()
+                .targets([Target::new(TargetKind::Stdout), shell_log_target()])
+                .level(log::LevelFilter::Info)
+                .timezone_strategy(TimezoneStrategy::UseLocal)
+                .max_file_size(SHELL_LOG_MAX_BYTES)
+                .rotation_strategy(RotationStrategy::KeepSome(SHELL_LOG_KEEP_FILES))
+                .build(),
+        )
         .setup({
             let control = control.clone();
             move |app| {
@@ -449,7 +513,19 @@ fn main() {
                 #[cfg(windows)]
                 webview::log_runtime_version();
 
-                let sidecar = spawn_backend(app.handle()).expect("Failed to spawn python backend");
+                let sidecar = match spawn_backend(app.handle()) {
+                    Ok(sidecar) => sidecar,
+                    Err(e) => {
+                        log::error!("Failed to spawn the backend side-car: {e}");
+                        let app_handle = app.handle().clone();
+                        // Blocking dialogs must not run on the main thread.
+                        std::thread::spawn(move || {
+                            show_backend_spawn_failure_dialog(&app_handle, &e);
+                            app_handle.exit(1);
+                        });
+                        return Ok(());
+                    }
+                };
                 // Keep the child handle — and the job object binding the whole
                 // backend tree to our lifetime — in the shared control, then let
                 // a monitor thread watch for crashes and failed upgrades
@@ -511,7 +587,12 @@ fn main() {
     // exits without going through the CloseRequested path (e.g. Cmd+Q on
     // macOS, or programmatic shutdown).
     let exit_control = control.clone();
-    app.run(move |_app_handle, event| {
+    app.run(move |app_handle, event| {
+        #[cfg(windows)]
+        webview::on_run_event(app_handle, &event);
+        #[cfg(not(windows))]
+        let _ = app_handle;
+
         if let RunEvent::Exit = event {
             shutdown_backend(&exit_control, "runtime exit event");
         }

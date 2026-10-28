@@ -34,7 +34,7 @@ const makeControllableFn = () => {
 describe('useWithCancel', () => {
     it('returns the resolved value when fn resolves normally', async () => {
         const shapes = [getMockedShape()];
-        const fn = rs.fn().mockResolvedValue(shapes);
+        const fn = rs.fn(async (_points: InteractiveAnnotationPoint[]) => shapes);
 
         const { result } = renderHook(() => useWithCancel(fn));
 
@@ -48,15 +48,16 @@ describe('useWithCancel', () => {
 
     it('passes the correct arguments to fn', async () => {
         const points = [getMockedInteractivePoint(3, 4, false), getMockedInteractivePoint(7, 8)];
+        const previousMask = new Float32Array([0.5]);
         const fn = rs.fn().mockResolvedValue([]);
 
         const { result } = renderHook(() => useWithCancel(fn));
 
         await act(async () => {
-            await result.current.call(points);
+            await result.current.call(points, previousMask);
         });
 
-        expect(fn).toHaveBeenCalledWith(points);
+        expect(fn).toHaveBeenCalledWith(points, previousMask);
     });
 
     it('rejects with AbortError when cancel() is called while fn is in-flight', async () => {
@@ -108,9 +109,7 @@ describe('useWithCancel', () => {
 
         await expect(firstCallPromise).rejects.toMatchObject({ name: 'AbortError', message: 'Request aborted' });
 
-        // The second call should resolve normally.
-        const secondResult = await secondCallPromise;
-        expect(secondResult).toEqual(secondCallShapes);
+        await expect(secondCallPromise).resolves.toEqual(secondCallShapes);
     });
 
     it('does not throw when cancel() is called before any call', () => {
@@ -146,7 +145,7 @@ describe('useWithCancel', () => {
 
     it('works normally after a previous cancel()', async () => {
         const shapes = [getMockedShape()];
-        const fn = rs.fn().mockResolvedValue(shapes);
+        const fn = rs.fn(async (_points: InteractiveAnnotationPoint[]) => shapes);
 
         const { result } = renderHook(() => useWithCancel(fn));
 
