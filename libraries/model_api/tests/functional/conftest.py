@@ -2,10 +2,43 @@
 # Copyright (C) 2020-2024 Intel Corporation
 # SPDX-License-Identifier: Apache-2.0
 #
+import contextlib
 import json
+import sys
 from pathlib import Path
 
 import pytest
+
+
+@pytest.fixture(autouse=True)
+def _force_cpu_fp32_inference(monkeypatch):
+    """Pin CPU inference precision to f32 so reference comparisons are hardware-independent.
+
+    OpenVINO's CPU plugin enables bf16 inference by default on AMX-capable CPUs
+    (e.g. the Sapphire Rapids GitHub-hosted runners). bf16 diverges from the f32
+    reference values the functional tests compare against, producing shifted
+    bounding boxes, different contour/object counts, etc. The references are not
+    portable across bf16 implementations (AVX512 vs AMX vs emulation), so instead
+    of updating them we force f32 everywhere, matching how the references were
+    generated and how most developer machines already run.
+
+    ``create_model`` builds its ``openvino.Core`` internally via ``create_core``,
+    so we wrap ``create_core`` in every module that imported it (the adapter
+    module, the model module, and the test module) to set the precision hint.
+    """
+    from model_api.adapters import openvino_adapter as ov_adapter
+
+    original_create_core = ov_adapter.create_core
+
+    def create_core_fp32():
+        core = original_create_core()
+        with contextlib.suppress(Exception):
+            core.set_property("CPU", {"INFERENCE_PRECISION_HINT": "f32"})
+        return core
+
+    for module in list(sys.modules.values()):
+        if getattr(module, "create_core", None) is original_create_core:
+            monkeypatch.setattr(module, "create_core", create_core_fp32)
 
 
 def pytest_addoption(parser):
