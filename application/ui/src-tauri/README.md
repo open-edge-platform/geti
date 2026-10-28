@@ -547,7 +547,8 @@ On the desktop, `downloadFile()`
 shell's `download_file` command ([`src/download.rs`](./src/download.rs)). The
 shell shows the save dialog and streams the backend response straight into the
 chosen file, so the webview never holds the file in memory and needs no
-filesystem permissions. The command only accepts `https://localhost:7860` URLs.
+filesystem permissions. The command only accepts `https://localhost:7860` URLs
+and only trusts the backend's own certificate (`<data dir>/certs/localhost.pem`).
 
 ### Where is my data?
 
