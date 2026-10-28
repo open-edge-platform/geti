@@ -72,7 +72,7 @@ test.describe('Annotator - labeling', () => {
         await test.step('Draw annotations', async () => {
             await boundingBoxTool.selectTool();
 
-            for await (const annotation of annotations) {
+            for (const annotation of annotations) {
                 await boundingBoxTool.drawBoundingBox(annotation);
             }
 
@@ -115,7 +115,7 @@ test.describe('Annotator - labeling', () => {
             await test.step('Draw annotations', async () => {
                 await boundingBoxTool.selectTool();
 
-                for await (const annotation of annotations) {
+                for (const annotation of annotations) {
                     await boundingBoxTool.drawBoundingBox(annotation);
                 }
 

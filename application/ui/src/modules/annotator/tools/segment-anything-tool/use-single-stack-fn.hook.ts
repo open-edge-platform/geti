@@ -15,7 +15,7 @@ export const useSingleStackFn = <
     const wrappedFn = useCallback(
         async (...args: Parameters<Callback>): Promise<Awaited<ReturnType<Callback>>> => {
             // Wait for the previous function call to be finished
-            await new Promise<void>(async (resolve, reject) => {
+            await new Promise<void>((resolve, reject) => {
                 // Continue on if we are not waiting for the result of a previous invokation
                 if (!isProcessing.current) {
                     return resolve();

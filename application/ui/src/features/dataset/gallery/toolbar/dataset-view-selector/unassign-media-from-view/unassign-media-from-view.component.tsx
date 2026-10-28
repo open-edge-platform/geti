@@ -3,17 +3,14 @@
 
 import { useTranslation } from '@/i18n';
 import { Button } from '@geti-ui/ui';
-import { useQueryClient } from '@tanstack/react-query';
 import { ENTIRE_DATASET_VIEW_ID, useDatasetViewId } from 'hooks/use-dataset-view-id.hook';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 import { isEmpty } from 'lodash-es';
 
-import { getQueryKey } from '../../../../../../query-client/query-client';
 import { useUnassignMediaFromViewMutation } from '../api/use-unassign-media-from-view';
 
 const useUnassignMediaFromView = () => {
     const projectId = useProjectIdentifier();
-    const queryClient = useQueryClient();
     const unassignFromViewMutation = useUnassignMediaFromViewMutation();
 
     const unassignMediaFromView = ({
@@ -37,27 +34,7 @@ const useUnassignMediaFromView = () => {
                     media_ids: selectedMediaIds,
                 },
             },
-            {
-                onSuccess: async () => {
-                    await Promise.all([
-                        queryClient.invalidateQueries({
-                            queryKey: getQueryKey([
-                                'get',
-                                '/api/projects/{project_id}/dataset/media',
-                                { params: { path: { project_id: projectId } } },
-                            ]),
-                        }),
-                        queryClient.invalidateQueries({
-                            queryKey: getQueryKey([
-                                'get',
-                                '/api/projects/{project_id}/dataset/items',
-                                { params: { path: { project_id: projectId } } },
-                            ]),
-                        }),
-                    ]);
-                    onSuccess();
-                },
-            }
+            { onSuccess }
         );
     };
 

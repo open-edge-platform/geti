@@ -176,7 +176,7 @@ export const SecondaryToolbar = ({
         (event) => {
             event.preventDefault();
 
-            handleSubmit();
+            void handleSubmit();
         },
         { enabled: !isSubmitDisabled },
         [isSubmitDisabled, handleSubmit]

@@ -68,17 +68,17 @@ export const MagneticLasso = () => {
     );
 
     useEffect(() => {
-        updateBuildMapAfterUndoRedo();
+        void updateBuildMapAfterUndoRedo();
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mode, segments]);
 
-    const updateBuildMapAfterUndoRedo = (): void => {
+    const updateBuildMapAfterUndoRedo = async () => {
         if (mode !== PolygonMode.MagneticLasso || isPointerDown.current) return;
 
         if (isEmpty(segments)) {
             isLoading.current = false;
-            worker?.cleanPoints();
+            await worker?.cleanPoints();
 
             return;
         }
@@ -88,11 +88,11 @@ export const MagneticLasso = () => {
         const currentBuildMapPoint = buildMapPoint.current ?? { x: NaN, y: NaN };
 
         if (lastPoint && !isEqual(currentBuildMapPoint, lastPoint)) {
-            worker?.buildMap(lastPoint);
+            await worker?.buildMap(lastPoint);
         }
     };
 
-    const complete = async () => {
+    const complete = () => {
         if (isPolygonReadyToClose(polygon)) {
             startTransition(async () => {
                 const optimizedPolygon = await optimizePolygonOrSegments(polygon);
@@ -145,14 +145,14 @@ export const MagneticLasso = () => {
         },
     });
 
-    const setBuildMapAndSegment = (point: Point) => {
+    const setBuildMapAndSegment = async (point: Point) => {
         setLassoSegment([]);
         setSegments(addFirstPointOrNewOne(point), true);
 
         isLoading.current = true;
         buildMapPoint.current = point;
         pendingHistoryCommit.current = true;
-        worker?.buildMap(point);
+        await worker?.buildMap(point);
     };
 
     const onPointerDown = leftMouseButtonHandler(
@@ -164,7 +164,7 @@ export const MagneticLasso = () => {
             isPointerDown.current = true;
 
             if (!buildMapPoint.current || !isEqual(buildMapPoint.current, point)) {
-                setBuildMapAndSegment(point);
+                void setBuildMapAndSegment(point);
             }
         })
     );
@@ -182,7 +182,7 @@ export const MagneticLasso = () => {
             isFreeDrawing.current = true;
             buildMapPoint.current = null;
             isLoading.current = false;
-            worker?.cleanPoints();
+            void worker?.cleanPoints();
 
             setLassoSegment((newLassoSegment: Point[]) => [...newLassoSegment, point]);
             setPointerLine(() => [...segments.flat(), ...lassoSegment]);
@@ -195,7 +195,7 @@ export const MagneticLasso = () => {
             const canBeClosed = canPathBeClosed(point);
 
             if (isFreeDrawingAndPathCannotBeClosed(canBeClosed)) {
-                setBuildMapAndSegment(point);
+                void setBuildMapAndSegment(point);
             }
 
             if (canBeClosed) {
@@ -203,7 +203,7 @@ export const MagneticLasso = () => {
                 resetTool();
 
                 isLoading.current = false;
-                worker?.cleanPoints();
+                void worker?.cleanPoints();
                 pendingHistoryCommit.current = false;
             } else if (pendingHistoryCommit.current) {
                 setSegments((prev) => prev);
