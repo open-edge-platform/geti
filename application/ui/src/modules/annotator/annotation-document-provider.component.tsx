@@ -67,12 +67,12 @@ export const AnnotationDocumentProvider = ({
     const [annotations, setAnnotations, undoRedoActions] = useUndoRedoState<Annotation[]>(initialAnnotations);
     const resetHistory = undoRedoActions.reset;
 
-    const [prevInitialPredictionsDTO, setPrevInitialPredictionsDTO] = useState<AnnotationDTO[]>(initialPredictionsDTO);
+    const [prevInitialAnnotationsDTO, setPrevInitialAnnotationsDTO] = useState<AnnotationDTO[]>(initialAnnotationsDTO);
 
     // Reset annotations when source annotations change.
-    if (!isEqual(prevInitialPredictionsDTO, initialPredictionsDTO)) {
+    if (!isEqual(prevInitialAnnotationsDTO, initialAnnotationsDTO)) {
         undoRedoActions.reset(initialAnnotations);
-        setPrevInitialPredictionsDTO(initialPredictionsDTO);
+        setPrevInitialAnnotationsDTO(initialAnnotationsDTO);
     }
 
     // Updater-form setState keeps the commands stable while annotations change.
