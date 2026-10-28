@@ -130,7 +130,7 @@ describe('TrainModel', () => {
     });
 
     describe('model architectures list', () => {
-        it('lists every model architecture with recommended ones first, without a show more toggle', async () => {
+        it('lists every model architecture with recommended ones first', async () => {
             server.use(
                 http.get('/api/model_architectures', () => {
                     return HttpResponse.json({
@@ -160,9 +160,9 @@ describe('TrainModel', () => {
                 'alpha',
                 'bravo',
             ]);
-            expect(screen.getByText('Balance')).toBeVisible();
-            expect(screen.getByText('Accuracy')).toBeVisible();
-            expect(screen.getByText('Speed')).toBeVisible();
+            expect(screen.getByText('Recommended for balance')).toBeVisible();
+            expect(screen.getByText('Recommended for accuracy')).toBeVisible();
+            expect(screen.getByText('Recommended for speed')).toBeVisible();
         });
     });
 

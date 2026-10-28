@@ -74,17 +74,32 @@ const ModelArchitectureParameters = () => {
     );
 };
 
+type RecommendedForLabelKey =
+    | 'models.training.architectures.card.recommendedFor.speed'
+    | 'models.training.architectures.card.recommendedFor.balance'
+    | 'models.training.architectures.card.recommendedFor.accuracy';
+
+const RECOMMENDED_FOR_LABEL_KEYS: Record<string, RecommendedForLabelKey> = {
+    speed: 'models.training.architectures.card.recommendedFor.speed',
+    balance: 'models.training.architectures.card.recommendedFor.balance',
+    accuracy: 'models.training.architectures.card.recommendedFor.accuracy',
+};
+
 const ModelArchitecturePerformanceCategoryBadge = () => {
     const { modelArchitecture } = useModelArchitecture();
+    const { t } = useTranslation();
 
     if (modelArchitecture.performanceCategory === undefined) {
         return null;
     }
 
+    const labelKey = RECOMMENDED_FOR_LABEL_KEYS[modelArchitecture.performanceCategory.toLowerCase()];
+
     return (
         <PerformanceCategoryBadge
             performanceCategory={modelArchitecture.performanceCategory}
             color={'var(--spectrum-global-color-gray-100)'}
+            label={labelKey === undefined ? undefined : t(labelKey)}
         />
     );
 };

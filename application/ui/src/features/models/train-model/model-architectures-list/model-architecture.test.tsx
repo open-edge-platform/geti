@@ -50,19 +50,19 @@ describe('ModelArchitecture', () => {
     });
 
     it.each([
-        ['speed', 'Speed'],
-        ['balance', 'Balance'],
-        ['accuracy', 'Accuracy'],
-    ])('renders the %s performance category badge for top picks', (performanceCategory, label) => {
+        ['speed', 'Recommended for speed'],
+        ['balance', 'Recommended for balance'],
+        ['accuracy', 'Recommended for accuracy'],
+    ])('renders the %s recommendation badge for top picks', (performanceCategory, label) => {
         renderModelArchitecture({ modelArchitecture: getMockedModelArchitecture({ performanceCategory }) });
 
         expect(screen.getByText(label)).toBeVisible();
     });
 
-    it('does not render a performance category badge for other architectures', () => {
+    it('does not render a recommendation badge for other architectures', () => {
         renderModelArchitecture({ modelArchitecture: getMockedModelArchitecture({ performanceCategory: undefined }) });
 
-        expect(screen.queryByText(/^(speed|balance|accuracy)$/i)).not.toBeInTheDocument();
+        expect(screen.queryByText(/recommended for/i)).not.toBeInTheDocument();
     });
 
     it('calls onSelectedModelArchitectureIdChange with the architecture id when clicked', async () => {

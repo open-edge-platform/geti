@@ -907,7 +907,12 @@
                 },
                 "card": {
                     "numberOfParameters": "Aantal parameters: {{count}} miljoen",
-                    "gigaflops": "Gigaflops: {{value}}"
+                    "gigaflops": "Gigaflops: {{value}}",
+                    "recommendedFor": {
+                        "speed": "Aanbevolen voor snelheid",
+                        "balance": "Aanbevolen voor balans",
+                        "accuracy": "Aanbevolen voor nauwkeurigheid"
+                    }
                 },
                 "sort": {
                     "label": "Modellen sorteren op:",

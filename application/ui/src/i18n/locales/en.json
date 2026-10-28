@@ -907,7 +907,12 @@
                 },
                 "card": {
                     "numberOfParameters": "Number of parameters: {{count}} million",
-                    "gigaflops": "Gigaflops: {{value}}"
+                    "gigaflops": "Gigaflops: {{value}}",
+                    "recommendedFor": {
+                        "speed": "Recommended for speed",
+                        "balance": "Recommended for balance",
+                        "accuracy": "Recommended for accuracy"
+                    }
                 },
                 "sort": {
                     "label": "Sort Models by:",

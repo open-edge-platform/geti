@@ -12,6 +12,7 @@ type PerformanceCategoryBadgeProps = {
     performanceCategory: string;
     id?: string;
     color?: string;
+    label?: string;
 };
 
 type PerformanceCategoryLabelKey =
@@ -25,14 +26,14 @@ const PERFORMANCE_CATEGORY_LABEL_KEYS: Record<string, PerformanceCategoryLabelKe
     accuracy: 'models.performance.categories.accuracy',
 };
 
-export const PerformanceCategoryBadge = ({ performanceCategory, id, color }: PerformanceCategoryBadgeProps) => {
+export const PerformanceCategoryBadge = ({ performanceCategory, id, color, label }: PerformanceCategoryBadgeProps) => {
     const { t } = useTranslation();
     const labelKey = PERFORMANCE_CATEGORY_LABEL_KEYS[performanceCategory.toLowerCase()];
 
     return (
         <ModelBadge id={id} color={color}>
             <ThumbsUp />
-            <Text>{labelKey ? t(labelKey) : capitalize(performanceCategory)}</Text>
+            <Text>{label ?? (labelKey ? t(labelKey) : capitalize(performanceCategory))}</Text>
         </ModelBadge>
     );
 };

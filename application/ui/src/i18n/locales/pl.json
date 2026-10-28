@@ -913,7 +913,12 @@
                 },
                 "card": {
                     "numberOfParameters": "Liczba parametrów: {{count}} mln",
-                    "gigaflops": "Gigaflopy: {{value}}"
+                    "gigaflops": "Gigaflopy: {{value}}",
+                    "recommendedFor": {
+                        "speed": "Rekomendowany dla szybkości",
+                        "balance": "Rekomendowany dla równowagi",
+                        "accuracy": "Rekomendowany dla dokładności"
+                    }
                 },
                 "sort": {
                     "label": "Sortuj modele według:",

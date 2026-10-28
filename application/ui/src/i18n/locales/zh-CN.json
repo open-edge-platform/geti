@@ -907,7 +907,12 @@
                 },
                 "card": {
                     "numberOfParameters": "参数量：{{count}} M",
-                    "gigaflops": "Gigaflops：{{value}}"
+                    "gigaflops": "Gigaflops：{{value}}",
+                    "recommendedFor": {
+                        "speed": "推荐：速度",
+                        "balance": "推荐：均衡",
+                        "accuracy": "推荐：准确率"
+                    }
                 },
                 "sort": {
                     "label": "模型排序：",
