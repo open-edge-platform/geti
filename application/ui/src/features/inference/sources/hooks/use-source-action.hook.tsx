@@ -7,7 +7,6 @@ import { isAbortError } from '@/api';
 import type { SourceConfigPayload } from '@/api/types';
 import { toast } from '@/components/toast/toast.component';
 import { useTranslation } from '@/i18n';
-import { isFunction } from 'lodash-es';
 
 import { getErrorMessage } from '../../../../query-client/query-client';
 import { useSourceMutation } from './use-source-mutation.hook';
@@ -18,7 +17,7 @@ export type PrepareFormData = (formData: FormData) => Promise<(() => Promise<voi
 interface useSourceActionProps<T> {
     config: Awaited<T>;
     isNewSource: boolean;
-    onSaved?: (source_id: string) => void;
+    onSaved?: (source_id: string) => void | Promise<void>;
     bodyFormatter: (formData: FormData) => T;
     prepareFormData?: PrepareFormData;
 }
@@ -51,7 +50,7 @@ export const useSourceAction = <T extends SourceConfigPayload>({
                     : t('inference.sources.form.updateSuccess'),
             });
 
-            isFunction(onSaved) && onSaved(source_id);
+            await onSaved?.(source_id);
             return { ...body, id: source_id };
         } catch (error: unknown) {
             // The user cancelled the file transfer: keep the form as it is, without an error.

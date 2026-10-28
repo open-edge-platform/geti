@@ -30,7 +30,7 @@ const flattenDropItemToFiles = async (item: DropItem): Promise<File[]> => {
     const entries = await toArray(item.getEntries());
 
     const filesFromDirectory: File[] = [];
-    for await (const entry of entries) {
+    for (const entry of entries) {
         if (entry.kind === 'directory') {
             filesFromDirectory.push(...(await flattenDropItemToFiles(entry)));
         } else {
@@ -46,7 +46,7 @@ const flattenDropItemToFiles = async (item: DropItem): Promise<File[]> => {
  */
 export const getFilesFromDropEvent = async (event: DropEvent): Promise<File[]> => {
     const files: File[] = [];
-    for await (const item of event.items) {
+    for (const item of event.items) {
         files.push(...(await flattenDropItemToFiles(item)));
     }
 

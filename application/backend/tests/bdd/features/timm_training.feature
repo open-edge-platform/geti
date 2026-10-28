@@ -16,13 +16,12 @@ Feature: Timm Model Training Smoke Test
 
     # The following examples table contains a representative model architecture for each unique timm architecture flavor.
     # The list of model architectures was generated with `just list-timm-smoke-models --format gherkin`.
-    # gemma4_vit and mobilenetv5 removed from the scope because they have 167.4 and 294.1 million parameters respectively,
-      # which is too large for smoke testing.
+    # Families whose lightest backbone exceeds the script's `--max-gigaflops` budget (e.g. gemma4_vit, mobilenetv5,
+    # vision_transformer_sam) are excluded because they run out of memory on the CPU CI runner.
     Examples: Timm architecture flavors
       | family                    | model_architecture_id                     |
       | beit                      | beit_base_patch16_224.in22k_ft_in22k      |
       | byoanet                   | haloregnetz_b.ra3_in1k                    |
-      | byobnet                   | bat_resnext26ts.ch_in1k                   |
       | byobnet                   | test_byobnet.r160_in1k                    |
       | cait                      | cait_xxs24_224.fb_dist_in1k               |
       | coat                      | coat_lite_tiny.in1k                       |
@@ -100,7 +99,6 @@ Feature: Timm Model Training Smoke Test
       | vision_transformer        | test_vit.r160_in1k                        |
       | vision_transformer_hybrid | vit_tiny_r_s16_p8_224.augreg_in21k        |
       | vision_transformer_relpos | vit_srelpos_small_patch16_224.sw_in1k     |
-      | vision_transformer_sam    | samvit_base_patch16.sa1b                  |
       | vitamin                   | vitamin_small_224.datacomp1b_clip         |
       | volo                      | volo_d1_224.sail_in1k                     |
       | vovnet                    | ese_vovnet19b_dw.ra_in1k                  |

@@ -20,8 +20,8 @@
         "server": "cd ../backend && just run-server",
         "format": "prettier --write .",
         "format:check": "prettier --check --cache \"./src/**/*.{js,ts,jsx,tsx,css,scss,sass}\"",
-        "lint": "eslint \"src/**/*.ts*\" --max-warnings 0",
-        "lint:fix": "eslint --fix \"./src/**/*.ts*\"",
+        "lint": "eslint \"{src,tests,mocks}/**/*.ts*\" --max-warnings 0",
+        "lint:fix": "eslint --fix \"{src,tests,mocks}/**/*.ts*\"",
         "preview": "npm run build && rsbuild preview",
         "preview:tauri": "rsbuild preview --env-mode tauri --port 3001",
         "test:unit": "rstest --config rstest.config.ts",
@@ -33,8 +33,10 @@
         "tauri": "tauri"
     },
     "dependencies": {
+        "@doodle3d/clipper-js": "~1.0.11",
         "@geti-ui/smart-tools": "^1.7.0",
         "@geti-ui/ui": "^1.7.0",
+        "@internationalized/date": "~3.12.4",
         "@react-aria/utils": "^3.34.1",
         "@tanstack/react-query": "~5.104.1",
         "@tauri-apps/api": "2.12.0",

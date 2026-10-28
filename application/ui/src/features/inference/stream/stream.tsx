@@ -12,7 +12,7 @@ const useStreamToVideo = () => {
 
     const { status, webRTCConnectionRef } = useWebRTCConnection();
 
-    const connect = useCallback(async () => {
+    const connect = useCallback(() => {
         const videoOutput = videoRef.current;
         const webrtcConnection = webRTCConnectionRef.current;
         const peerConnection = webrtcConnection?.getPeerConnection();

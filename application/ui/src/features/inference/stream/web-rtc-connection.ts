@@ -205,7 +205,8 @@ export class WebRTCConnection {
                 case 'closed':
                     this.updateStatus('disconnected');
                     break;
-                default:
+                case 'connecting':
+                case 'new':
                     this.updateStatus('connecting');
                     break;
             }

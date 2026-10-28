@@ -33,7 +33,7 @@ export const DatasetDropZone = ({ children, onFilesDropped }: DatasetDropZonePro
     const handleDrop = async (event: DropEvent) => {
         const files = await getFilesFromDropEvent(event);
 
-        onFilesDropped(files);
+        void onFilesDropped(files);
     };
 
     return (

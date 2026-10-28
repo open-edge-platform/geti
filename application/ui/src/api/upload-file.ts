@@ -3,6 +3,7 @@
 
 import { i18n } from '@/i18n';
 
+import { ApiError } from './api-error';
 import { fetchClient } from './client';
 import type { MediaDTO, SourceMediaUpload, StagedDataset } from './shared-types';
 import { createAbortError, discardUpload, transferFile, type TransferOptions } from './tus-upload';
@@ -13,7 +14,7 @@ import { createAbortError, discardUpload, transferFile, type TransferOptions } f
 // both `data` and `error` are missing.
 const unwrap = <T>(result: { data?: T; error?: unknown }, fallbackMessage: string): T => {
     if (result.error !== undefined || result.data === undefined) {
-        throw result.error ?? new Error(fallbackMessage);
+        throw result.error === undefined ? new Error(fallbackMessage) : new ApiError(result.error);
     }
 
     return result.data;

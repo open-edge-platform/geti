@@ -31,13 +31,13 @@ export const usePolygonConfig = ({
 
         return () => {
             isMounted.current = false;
-            worker?.cleanImg();
+            void worker?.cleanImg();
         };
     }, [worker]);
 
     useEffect(() => {
         if (!isMounted.current || !image || isImageOversized(image)) return;
-        worker?.loadImage(image);
+        void worker?.loadImage(image);
     }, [image, worker]);
 
     const polygon = useMemo<Polygon | null>(() => {
