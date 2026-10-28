@@ -41,6 +41,7 @@ dependencies = [
     "hypercorn~=0.18.0",
     "huggingface-hub~=1.29.0",
     "safetensors~=0.8.0",
+    "tzdata>=2026.6"
 ]
 
 [project.optional-dependencies]
