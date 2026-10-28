@@ -1,7 +1,7 @@
 // Copyright (C) 2025-2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { createContext, ReactNode, useCallback, useContext, useRef, useState } from 'react';
+import { createContext, ReactNode, useCallback, useContext, useMemo, useRef, useState } from 'react';
 
 import type { Media } from '@/api/types';
 import { isEqual } from 'lodash-es';
@@ -102,23 +102,31 @@ export const SelectedMediaItemProvider = ({
     // For oversized media: wrap downscaled data in full-size dimensions so
     // drawing tools clamp to media-space, not the smaller buffer dimensions.
     const decodedAtFullSize = loadedImage.width === mediaItem.width && loadedImage.height === mediaItem.height;
-    const image = decodedAtFullSize
-        ? loadedImage
-        : ({
-              width: mediaItem.width,
-              height: mediaItem.height,
-              data: loadedImage.data,
-              colorSpace: 'srgb',
-          } as ImageData);
+    const image = useMemo(
+        () =>
+            decodedAtFullSize
+                ? loadedImage
+                : ({
+                      width: mediaItem.width,
+                      height: mediaItem.height,
+                      data: loadedImage.data,
+                      colorSpace: 'srgb',
+                  } as ImageData),
+        [decodedAtFullSize, loadedImage, mediaItem.width, mediaItem.height]
+    );
     const isImageReady = isSuccess && !isPlaceholderData && decodedAtFullSize;
 
-    const roi: RegionOfInterest = { x: 0, y: 0, width: mediaItem.width, height: mediaItem.height };
-
-    return (
-        <SelectedMediaItemContext value={{ mediaItem, roi, setMediaItem, image, isImageReady }}>
-            {children}
-        </SelectedMediaItemContext>
+    const roi: RegionOfInterest = useMemo(
+        () => ({ x: 0, y: 0, width: mediaItem.width, height: mediaItem.height }),
+        [mediaItem.width, mediaItem.height]
     );
+
+    const value = useMemo(
+        () => ({ mediaItem, roi, setMediaItem, image, isImageReady }),
+        [mediaItem, roi, setMediaItem, image, isImageReady]
+    );
+
+    return <SelectedMediaItemContext value={value}>{children}</SelectedMediaItemContext>;
 };
 
 export const useSelectedMediaItem = (): SelectedMediaItemContextProps => {

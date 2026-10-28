@@ -4,25 +4,17 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
-import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
-import typescriptEslint from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
 import header from 'eslint-plugin-header';
-import _import from 'eslint-plugin-import';
-import jsxA11Y from 'eslint-plugin-jsx-a11y';
+import importPlugin from 'eslint-plugin-import';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
+import { configs as tsConfigs, parser as tsParser } from 'typescript-eslint';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-const compat = new FlatCompat({
-    baseDirectory: dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all,
-});
 
 // https://github.com/sindresorhus/globals/issues/239
 const GLOBALS_BROWSER_FIX = Object.assign({}, globals.browser, {
@@ -36,24 +28,13 @@ header.rules.header.meta.schema = false;
 
 export default [
     {
-        ignores: [
-            '**/build',
-            '**/coverage',
-            '**/node_modules',
-            '**/*.tsx.snap',
-            'src/assets',
-            '**/public',
-        ],
+        ignores: ['**/build', '**/coverage', '**/node_modules', '**/*.tsx.snap', 'src/assets', '**/public'],
     },
     js.configs.recommended,
-    ...fixupConfigRules(
-        compat.extends(
-            'plugin:jsx-a11y/recommended',
-            'plugin:@typescript-eslint/recommended',
-            'plugin:import/recommended',
-            'plugin:import/typescript'
-        )
-    ),
+    jsxA11y.flatConfigs.recommended,
+    ...tsConfigs.recommended,
+    importPlugin.flatConfigs.recommended,
+    importPlugin.flatConfigs.typescript,
     {
         files: ['src/**/*.tsx', 'src/**/*.ts'],
         ...reactPlugin.configs.flat.recommended,
@@ -85,6 +66,8 @@ export default [
             ],
             'react/default-props-match-prop-types': 'warn',
             'react/no-unused-prop-types': 'warn',
+            'react/no-unstable-nested-components': ['error', { allowAsProps: true }],
+            'react/jsx-no-constructed-context-values': 'error',
             'jsx-a11y/click-events-have-key-events': 'off',
             'jsx-a11y/no-noninteractive-element-interactions': 'off',
             'jsx-a11y/no-static-element-interactions': 'off',
@@ -92,9 +75,6 @@ export default [
     },
     {
         plugins: {
-            import: fixupPluginRules(_import),
-            'jsx-a11y': fixupPluginRules(jsxA11Y),
-            '@typescript-eslint': fixupPluginRules(typescriptEslint),
             header,
         },
         languageOptions: {
