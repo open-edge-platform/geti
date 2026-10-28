@@ -19,9 +19,9 @@ serde = { version = "1.0", features = ["derive"] }
 log = "0.4"
 tauri = { version = "=2.12.0", features = [] }
 tauri-plugin-dialog = "=2.7.1"
-tauri-plugin-fs = "=2.5.1"
 tauri-plugin-log = "2.8.0"
 tauri-plugin-opener = "=2.6.0"
+reqwest = { version = "0.13", default-features = false, features = ["native-tls"] }
 
 # Desktop-only: guarantees a single running instance so no two
 # backends are spawned competing for the same TCP port and SQLite database.

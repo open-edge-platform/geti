@@ -540,6 +540,15 @@ Grep for `__TAURI_INTERNALS__`, not `@tauri-apps` — the bundler erases import
 specifiers, so the package name does not survive into the output, but every
 `@tauri-apps/api` entry point calls through that global.
 
+### Downloads
+
+On the desktop, `downloadFile()`
+([`download-file.tauri.ts`](../src/platform/download-file.tauri.ts)) calls the
+shell's `download_file` command ([`src/download.rs`](./src/download.rs)). The
+shell shows the save dialog and streams the backend response straight into the
+chosen file, so the webview never holds the file in memory and needs no
+filesystem permissions. The command only accepts `https://localhost:7860` URLs.
+
 ### Where is my data?
 
 The desktop shell pins the backend's `DATA_DIR`, `LOG_DIR` and matplotlib
