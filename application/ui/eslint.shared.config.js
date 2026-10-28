@@ -39,7 +39,7 @@ export default [
         files: ['src/**/*.tsx', 'src/**/*.ts'],
         ...reactPlugin.configs.flat.recommended,
     },
-    ...reactHooks.configs['recommended-latest'].map((config) => ({
+    ...reactHooks.configs.recommended.map((config) => ({
         ...config,
         files: ['src/**/*.tsx', 'src/**/*.ts'],
     })),
