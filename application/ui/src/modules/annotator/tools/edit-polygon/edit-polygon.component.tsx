@@ -1,9 +1,10 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { isPolygonValid } from '@geti-ui/smart-tools/utils';
+import { isEqual } from 'lodash-es';
 
 import { Annotation, Polygon } from '../../../../shared/types';
 import { useAnnotationCommands } from '../../annotation-document-provider.component';
@@ -23,10 +24,12 @@ export const EditPolygon = ({ annotation, zoom }: EditPolygonProps) => {
     const isAddPoint = useRef(false);
     const [shape, setShape] = useState(annotation.shape);
     const { updateAnnotations, deleteAnnotations } = useAnnotationCommands();
+    const [previousAnnotationShape, setPreviousAnnotationShape] = useState(annotation.shape);
 
-    useEffect(() => {
+    if (!isEqual(previousAnnotationShape, annotation.shape)) {
         setShape(annotation.shape);
-    }, [annotation.shape]);
+        setPreviousAnnotationShape(annotation.shape);
+    }
 
     // "removeOffLimitPoints" not only remove offlimit points but also in-between ones,
     // a new point is considered "in-between," and so it gets removed,

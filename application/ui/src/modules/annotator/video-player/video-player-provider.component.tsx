@@ -19,6 +19,7 @@ import {
 import type { MediaVideoFrame } from '@/api/types';
 import { VisuallyHidden } from '@geti-ui/ui';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
+import { isEqual } from 'lodash-es';
 
 import { getMediaBinaryUrl } from '../../../shared/media-url.utils';
 import { useVideoControls, VideoControls } from './use-video-controls';
@@ -115,13 +116,13 @@ const useSynchronizeVideoTimeWithVideoFrame = ({
 };
 
 const usePreviousVideoFrame = (videoFrame: MediaVideoFrame | undefined) => {
-    const previousVideoFrameRef = useRef<MediaVideoFrame | undefined>(videoFrame);
+    const [previousVideoFrame, setPreviousVideoFrame] = useState<MediaVideoFrame | undefined>(videoFrame);
 
-    useEffect(() => {
-        previousVideoFrameRef.current = videoFrame;
-    }, [videoFrame]);
+    if (!isEqual(previousVideoFrame, videoFrame)) {
+        setPreviousVideoFrame(videoFrame);
+    }
 
-    return previousVideoFrameRef.current;
+    return previousVideoFrame;
 };
 
 const VideoPlayerContext = createContext<VideoPlayerContextProps | null>(null);

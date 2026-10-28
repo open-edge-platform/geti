@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { Context, createContext, ReactNode, useContext, useMemo, useRef } from 'react';
+import { Context, createContext, ReactNode, useContext, useMemo, useState } from 'react';
 
 import type { AnnotationDTO, Label } from '@/api/types';
 import { isEqual } from 'lodash-es';
@@ -67,12 +67,12 @@ export const AnnotationDocumentProvider = ({
     const [annotations, setAnnotations, undoRedoActions] = useUndoRedoState<Annotation[]>(initialAnnotations);
     const resetHistory = undoRedoActions.reset;
 
-    const prevInitialAnnotationsDTORef = useRef(initialAnnotationsDTO);
+    const [prevInitialPredictionsDTO, setPrevInitialPredictionsDTO] = useState<AnnotationDTO[]>(initialPredictionsDTO);
 
     // Reset annotations when source annotations change.
-    if (!isEqual(prevInitialAnnotationsDTORef.current, initialAnnotationsDTO)) {
+    if (!isEqual(prevInitialPredictionsDTO, initialPredictionsDTO)) {
         undoRedoActions.reset(initialAnnotations);
-        prevInitialAnnotationsDTORef.current = initialAnnotationsDTO;
+        setPrevInitialPredictionsDTO(initialPredictionsDTO);
     }
 
     // Updater-form setState keeps the commands stable while annotations change.

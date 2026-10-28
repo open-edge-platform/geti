@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useTranslation } from '@/i18n';
 import { ActionButton } from '@geti-ui/ui';
@@ -21,6 +21,16 @@ export const EditPoints = ({ zoom, shape, addPoint, onComplete, moveAnchorTo, re
 
     const [selectedAnchorIndexes, setSelectedAnchorIndexes] = useState<number[]>([]);
 
+    const handleRemovePoints = (indexes = selectedAnchorIndexes) => {
+        removePoints(indexes);
+        setSelectedAnchorIndexes([]);
+    };
+
+    const handleAddPoint: EditPointsProps['addPoint'] = (idx, x, y) => {
+        addPoint(idx, x, y);
+        setSelectedAnchorIndexes([]);
+    };
+
     useEventListener('keydown', (event: KeyboardEvent) => {
         if (isKeyboardDelete(event)) {
             event.preventDefault();
@@ -28,16 +38,6 @@ export const EditPoints = ({ zoom, shape, addPoint, onComplete, moveAnchorTo, re
             handleRemovePoints();
         }
     });
-
-    useEffect(() => {
-        // Reset the selected anchors every time we add or remove a point
-        setSelectedAnchorIndexes([]);
-    }, [shape.points.length]);
-
-    const handleRemovePoints = (indexes = selectedAnchorIndexes) => {
-        removePoints(indexes);
-        setSelectedAnchorIndexes([]);
-    };
 
     const selectAnchorPoint = (idx: number, shiftKey: boolean, isContextMenu = false) => {
         setSelectedAnchorIndexes((indexes) => {
@@ -69,7 +69,7 @@ export const EditPoints = ({ zoom, shape, addPoint, onComplete, moveAnchorTo, re
                 svgRef={ref}
                 moveAnchorTo={moveAnchorTo}
                 shape={shape}
-                addPoint={addPoint}
+                addPoint={handleAddPoint}
                 onComplete={onComplete}
                 zoom={zoom}
             />
