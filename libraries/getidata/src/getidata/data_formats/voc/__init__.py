@@ -1,0 +1,4 @@
+# Copyright (C) 2022-2026 Intel Corporation
+# SPDX-License-Identifier: Apache-2.0
+
+"""Pascal VOC format support for getidata."""

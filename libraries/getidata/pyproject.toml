@@ -1,0 +1,146 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# SETUP CONFIGURATION.                                                        #
+[build-system]
+requires = [
+    "setuptools>=77.0.0",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "getidata"
+version = "0.1.0"
+description = "getidata: Type-safe dataset management for computer vision, backed by Polars"
+readme = "README.md"
+requires-python = ">=3.11,<3.15"
+license = "Apache-2.0"
+authors = [
+    { name = "Intel Corporation" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "cachetools~=7.0",
+    "defusedxml~=0.7",
+    "numpy>=2.2,<2.5",
+    "opencv-python-headless>=4.10,<5",
+    "pillow~=13.0",
+    "polars~=1.35",
+    "pyarrow>=24,<26",
+    "pyyaml~=6.0",
+    "shapely~=2.1",
+    "typing_extensions~=4.15",
+]
+
+[project.optional-dependencies]
+# Conversion to/from PyTorch tensors and torchvision tv_tensors
+torch = [
+    "torch>=2.9",
+    "torchvision>=0.24",
+]
+
+[dependency-groups]
+dev = [
+    "pytest~=9.0.3",
+    "pytest-cov>=4.0.0",
+]
+lint = [
+    "ruff==0.11.13",
+    "pyrefly~=0.51.0",
+    "types-PyYAML~=6.0.12",
+    "types-cachetools",
+    "types-defusedxml",
+]
+
+[project.urls]
+Repository = "https://github.com/open-edge-platform/geti/"
+
+[tool.uv]
+default-groups = ["dev", "lint"]
+required-version = "~=0.10.4"
+exclude-dependencies = [
+    # 'opencv-python-headless' is used instead; the GUI variant may conflict with it and waste disk space.
+    "opencv-python",
+]
+
+[tool.uv.sources]
+torch = [
+    # Pytorch indexes only provide pre-built wheels for Linux and Windows; other platforms use PyPI.
+    { index = "torch-cpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+torchvision = [
+    { index = "torch-cpu", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+
+[[tool.uv.index]]
+name = "torch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["getidata*"]
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# COVERAGE CONFIGURATION.                                                     #
+[tool.coverage.run]
+source = [
+    "src/getidata/",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+]
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# RUFF CONFIGURATION                                                          #
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "ARG", "E", "F", "I", "N", "UP", "YTT", "ASYNC", "S", "COM", "C4", "FA", "PIE", "PYI", "Q", "RSE", "RET", "SIM",
+    "TID", "TC", "PL", "RUF", "C90", "D103", "ANN001", "ANN201", "ANN205", "FAST",
+]
+ignore = [
+    "N801", "N805", "N806", "N807", "N818", "COM812", "RET503", "SIM108", "SIM105", "PLR2004",
+    "RUF010", "TC001", "RUF012", "PLC0415",
+    "UP038",  # deprecated rule: `X | Y` in isinstance is slower than a tuple
+]
+fixable = ["ALL"]
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = [
+    "S", "ANN", "D", "ARG", "PLR", "PLC0415", "PLW", "C", "UP", "N8", "RUF001", "E741", "E4", "F403", "F405",
+]
+"__init__.py" = [
+    "F4",  # unused-import
+]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+known-first-party = ["getidata"]
+
+[tool.ruff.lint.pylint]
+max-args = 7
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.pyrefly]
+python-version = "3.11.0"
+project-includes = ["src/getidata/**/*.py*", "tests/**/*.py*"]
+ignore-missing-imports = ["*"]
