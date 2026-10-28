@@ -1,7 +1,8 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { $api } from '@/api';
+import { $api, ApiError, fetchClient } from '@/api';
+import { PipelineMetrics } from '@/api/types';
 import { QueryClient, usePrefetchQuery, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { useProjectIdentifier } from 'hooks/use-project-identifier.hook';
 
@@ -38,23 +39,44 @@ const POLLING_INTERVAL = 5000;
 // Aggregate over the polling interval so that consecutive samples do not overlap
 const METRICS_TIME_WINDOW_SECONDS = POLLING_INTERVAL / 1000;
 
+const pipelineMetricsQueryOptions = (projectId: string, timeWindow: number = METRICS_TIME_WINDOW_SECONDS) => {
+    return $api.queryOptions('get', '/api/projects/{project_id}/pipeline/metrics', {
+        params: {
+            path: { project_id: projectId },
+            query: { time_window: timeWindow },
+        },
+    });
+};
+
 export const usePipelineMetrics = () => {
     const projectId = useProjectIdentifier();
 
-    return $api.useQuery(
-        'get',
-        '/api/projects/{project_id}/pipeline/metrics',
-        {
-            params: {
-                path: { project_id: projectId },
-                query: { time_window: METRICS_TIME_WINDOW_SECONDS },
-            },
+    const options = pipelineMetricsQueryOptions(projectId, METRICS_TIME_WINDOW_SECONDS);
+
+    return useQuery<PipelineMetrics[]>({
+        queryKey: options.queryKey,
+        queryFn: async ({ client, signal, queryKey }) => {
+            const { data, error } = await fetchClient.GET('/api/projects/{project_id}/pipeline/metrics', {
+                params: {
+                    path: { project_id: projectId },
+                    query: { time_window: METRICS_TIME_WINDOW_SECONDS },
+                },
+                signal,
+            });
+
+            if (error) {
+                throw new ApiError(error);
+            }
+
+            const previousMetrics: PipelineMetrics[] = client.getQueryData<PipelineMetrics[]>(queryKey) ?? [];
+
+            const allMetrics: PipelineMetrics[] = data === undefined ? previousMetrics : [...previousMetrics, data];
+
+            return allMetrics;
         },
-        {
-            refetchInterval: (query) => (query.state.status === 'success' ? POLLING_INTERVAL : false),
-            retry: false,
-        }
-    );
+        refetchInterval: (query) => (query.state.status === 'success' ? POLLING_INTERVAL : false),
+        retry: false,
+    });
 };
 
 export const usePipelineHealth = () => {

@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { useTranslation } from '@/i18n';
 import { Content, Heading, IllustratedMessage, View } from '@geti-ui/ui';
@@ -16,27 +16,35 @@ type DataPoint = {
 
 const DISPLAYED_WINDOW_MS = 5 * 60 * 1000;
 
-const appendDataPoint = (points: DataPoint[], point: DataPoint): DataPoint[] =>
-    [...points, point].filter(({ timestamp }) => timestamp > point.timestamp - DISPLAYED_WINDOW_MS);
-
 const useMetricsData = () => {
-    const [latencyData, setLatencyData] = useState<DataPoint[]>([]);
-    const [throughputData, setThroughputData] = useState<DataPoint[]>([]);
+    const { data: metrics = [] } = usePipelineMetrics();
 
-    const { data: metrics } = usePipelineMetrics();
+    const { latencyData, throughputData } = useMemo(() => {
+        const metricsData = metrics.reduce(
+            (acc, { time_window, inference }) => {
+                const timestamp = new Date(time_window.end).getTime();
+                acc.latencyData.push({ timestamp, value: inference.latency.avg_ms ?? 0 });
+                acc.throughputData.push({ timestamp, value: inference.throughput.avg_requests_per_second ?? 0 });
 
-    useEffect(() => {
-        if (!metrics) return;
-
-        const timestamp = new Date(metrics.time_window.end).getTime();
-
-        setLatencyData((prev) => appendDataPoint(prev, { timestamp, value: metrics.inference.latency.avg_ms ?? 0 }));
-        setThroughputData((prev) =>
-            appendDataPoint(prev, {
-                timestamp,
-                value: metrics.inference.throughput.avg_requests_per_second ?? 0,
-            })
+                return acc;
+            },
+            {
+                latencyData: [] as DataPoint[],
+                throughputData: [] as DataPoint[],
+            }
         );
+
+        const lastLatencyPoint = metricsData.latencyData.at(-1);
+        const lastThroughputPoint = metricsData.throughputData.at(-1);
+
+        return {
+            latencyData: metricsData.latencyData.filter(
+                ({ timestamp }) => timestamp > (lastLatencyPoint?.timestamp ?? 0) - DISPLAYED_WINDOW_MS
+            ),
+            throughputData: metricsData.throughputData.filter(
+                ({ timestamp }) => timestamp > (lastThroughputPoint?.timestamp ?? 0) - DISPLAYED_WINDOW_MS
+            ),
+        };
     }, [metrics]);
 
     return { latencyData, throughputData };
