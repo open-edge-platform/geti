@@ -2,6 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 mod backend;
+mod download;
 #[cfg(windows)]
 mod job;
 #[cfg(windows)]
@@ -492,7 +493,6 @@ fn main() {
             }
         }))
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(
             tauri_plugin_log::Builder::default()
@@ -579,7 +579,7 @@ fn main() {
                 }
             }
         })
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![download::download_file])
         .build(tauri::generate_context!())
         .expect("error building Tauri");
 
