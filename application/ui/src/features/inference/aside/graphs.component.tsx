@@ -58,7 +58,7 @@ const Graph = ({ label, data, fractionDigits }: GraphProps) => {
     const { t } = useTranslation();
     const formatDate = useFormatDate(TIME_WITH_SECONDS_FORMAT);
     const formatTime = (timestamp: number) => formatDate(timestamp) ?? '';
-    const end = data.at(-1)?.timestamp ?? Date.now();
+    const end = data.at(-1)?.timestamp;
 
     return (
         <LineChart
@@ -74,7 +74,7 @@ const Graph = ({ label, data, fractionDigits }: GraphProps) => {
                 dataKey='timestamp'
                 type='number'
                 scale='time'
-                domain={[end - DISPLAYED_WINDOW_MS, end]}
+                domain={end === undefined ? ['auto', 'auto'] : [end - DISPLAYED_WINDOW_MS, end]}
                 tickFormatter={formatTime}
                 tickLine={false}
                 tickMargin={8}

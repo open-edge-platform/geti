@@ -9,7 +9,6 @@ import {
     useCallback,
     useContext,
     useMemo,
-    useRef,
     useState,
 } from 'react';
 
@@ -40,10 +39,10 @@ export const PolygonStateProvider = ({ children }: PropsWithChildren) => {
 
     const { canUndo, canRedo, undo, redo, reset } = undoRedoActions;
 
-    const prevToolRef = useRef(activeTool);
+    const [prevTool, setPrevTool] = useState(activeTool);
 
-    if (prevToolRef.current !== activeTool) {
-        prevToolRef.current = activeTool;
+    if (prevTool !== activeTool) {
+        setPrevTool(activeTool);
         setPointerLine([]);
         setLassoSegment([]);
         reset();

@@ -1,7 +1,7 @@
 // Copyright (C) 2026 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { useTranslation } from '@/i18n';
 import { ActionButton, Flex, NumberField, Slider, View } from '@geti-ui/ui';
@@ -26,10 +26,10 @@ type ThresholdFieldProps = {
 
 const ThresholdField = ({ onChange, value, isDisabled, label, ariaLabel }: ThresholdFieldProps) => {
     const [parameterValue, setParameterValue] = useState<number>(value);
-    const previousValueRef = useRef<number>(value);
+    const [previousValue, setPreviousValue] = useState<number>(value);
 
-    if (previousValueRef.current !== value) {
-        previousValueRef.current = value;
+    if (previousValue !== value) {
+        setPreviousValue(value);
         setParameterValue(value);
     }
 
